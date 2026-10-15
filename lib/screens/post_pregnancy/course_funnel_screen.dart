@@ -15,6 +15,7 @@ import 'pp_common.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -44,9 +45,11 @@ class _CourseFunnelScreenState extends State<CourseFunnelScreenClassic> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   static const List<String> _learn = [
     "Read your baby's development, stage by stage",

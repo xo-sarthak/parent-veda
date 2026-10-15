@@ -40,6 +40,7 @@ import '../../services/pv_checklist_store.dart';
 import '../../services/pv_checklist_subjects.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
 import '../doors/pv_door_chrome.dart';
 import '../v2/v2_palette.dart';
 
@@ -151,7 +152,20 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
                     hue: widget.hue,
                     ticked: store.isTicked(list.id, q.id),
                     p: p,
-                    onTap: () => store.toggle(list.id, q.id),
+                    onTap: () async {
+                      final was = store.isTicked(list.id, q.id);
+                      await store.toggle(list.id, q.id);
+                      // The row's tick answers each tap (PvTick); only the
+                      // tick that finishes the list earns words (toasts
+                      // pass, 2026-10-15). One per list, not one per row.
+                      final all = [for (final g in list.groups) ...g.items];
+                      if (!was &&
+                          context.mounted &&
+                          all.every((x) => store.isTicked(list.id, x.id))) {
+                        pvToast(context, 'All ${all.length} ticked',
+                            kind: PvToastKind.done);
+                      }
+                    },
                   )),
                 const SizedBox(height: 20),
               ],

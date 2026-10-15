@@ -31,6 +31,7 @@ import 'pp_common.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_learn_flow.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md §4.4–4.5). An offering
 // the learn catalogue knows runs the unified flow — slot sheet, review
@@ -112,9 +113,7 @@ class _BookingSheetState extends State<_BookingSheet> {
     if (result.granted || result.outcome == PaymentOutcome.notConfigured) {
       BookingStore.instance.purchase(o);
     } else if (result.outcome != PaymentOutcome.cancelled) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(result.message ?? 'Payment failed.')));
+      pvToast(context, result.message ?? 'Payment failed.', kind: PvToastKind.gentle);
     }
   }
 

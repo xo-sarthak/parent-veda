@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'article_reader_screen.dart';
 import 'food_common.dart';
+import 'food_saved_screen.dart';
 import 'food_shopping_screen.dart';
 import '../../widgets/pv_placeholders.dart';
 import 'pp_common.dart';
@@ -28,6 +29,8 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary, pvStorePalette;
 import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
+import '../saved_toast.dart';
 
 class FoodRecipeScreen extends StatefulWidget {
   const FoodRecipeScreen({super.key, required this.recipe});
@@ -102,10 +105,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                   label: 'Add to list',
                   onTap: () {
                     FoodStore.instance.addRecipeToShopping(r);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Ingredients added to your shopping list'),
-                      behavior: SnackBarBehavior.floating,
-                    ));
+                    pvToast(context, 'Ingredients added to your shopping list', kind: PvToastKind.done);
                   },
                 ),
               ),
@@ -258,7 +258,16 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             animation: foodListenable,
             builder: (context, _) {
               final saved = FoodStore.instance.isSaved(r.id);
-              return _round(saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded, () => FoodStore.instance.toggleSave(r.id));
+              return _round(saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded, () {
+                void flip() => FoodStore.instance.toggleSave(r.id);
+                flip();
+                final nav = Navigator.of(context);
+                pvSaveToast(context,
+                    nowSaved: !saved,
+                    undo: flip,
+                    where: 'Saved to your recipes',
+                    onView: () => nav.push(MaterialPageRoute<void>(builder: (_) => const FoodSavedScreen())));
+              });
             },
           ),
         ),
@@ -484,14 +493,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   Widget _addToShopping() => PvPress(child: GestureDetector(
         onTap: () {
           FoodStore.instance.addRecipeToShopping(r);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          // Flutter 3.44 keeps a snackbar with an action on screen until it is
-          // dismissed (`persist` defaults to true when there is an action).
-          persist: false,
-            content: const Text('Ingredients added to your shopping list'),
-            behavior: SnackBarBehavior.floating,
-            action: SnackBarAction(label: 'View', onPressed: () => _push(const FoodShoppingScreen())),
-          ));
+          pvToast(context, 'Ingredients added to your shopping list',
+              kind: PvToastKind.done, action: 'View', onAction: () => _push(const FoodShoppingScreen()));
         },
         behavior: HitTestBehavior.opaque,
         child: Container(

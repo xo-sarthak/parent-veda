@@ -33,6 +33,7 @@ import '../../services/pregnancy_controller.dart' show DueDateSource;
 import '../../theme/pv_fonts.dart';
 import 'ttc_tool_chrome.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// Asks first, then transitions. Returns true if the couple went through.
 ///
@@ -327,24 +328,18 @@ class TtcTransitionScreen extends StatelessWidget {
   /// are on disk, so reopening the app lands her in pregnancy regardless.
   void _toPregnancy(BuildContext context) {
     final t = TtcS.current();
-    final messenger = ScaffoldMessenger.of(context);
-    if (leaveTtcForPregnancy(Navigator.of(context))) return;
-    messenger.showSnackBar(SnackBar(
-      content: Text(t.stageSetReopen),
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(seconds: 5),
-    ));
+    final nav = Navigator.of(context);
+    if (leaveTtcForPregnancy(nav)) return;
+    pvToast(nav.context, t.stageSetReopen);
   }
 
   Future<void> _undo(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final t = TtcS.current();
     await const TtcTransitionEngine().undo();
-    messenger.showSnackBar(SnackBar(
-      content: Text(t.transitionUndone),
-      behavior: SnackBarBehavior.floating,
-    ));
+    // pvToast checks mounted itself and falls back to the app navigator.
+    // ignore: use_build_context_synchronously
+    pvToast(navigator.context, t.transitionUndone, kind: PvToastKind.done);
     navigator.maybePop();
   }
 

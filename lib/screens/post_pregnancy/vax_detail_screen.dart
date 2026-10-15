@@ -18,6 +18,7 @@ import 'pp_common.dart';
 import 'pp_vaccine_data.dart';
 import 'pp_vax_tracker_screen.dart' show ppVaxMarkGiven;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 const Color _green = Color(0xFF1F8A5B);
 const Color _flagBg = Color(0xFFFFF0F3);
@@ -308,7 +309,6 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
   void _reminderSheet() {
     final when = vaxVisitDate(_visit) ?? vaxDueDate();
     void set(int daysBefore, String label) {
-      final messenger = ScaffoldMessenger.of(context);
       Navigator.of(context).pop();
       VaxStore.instance.setReminder(_visit.id, true);
       NotificationService.instance.requestPermission();
@@ -320,7 +320,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
             : "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(_visit)}.",
         when: when.subtract(Duration(days: daysBefore)),
       );
-      messenger.showSnackBar(SnackBar(content: Text('Reminder set - $label'), behavior: SnackBarBehavior.floating));
+      pvToast(context, 'Reminder set - $label', kind: PvToastKind.done);
     }
 
     showModalBottomSheet<void>(

@@ -47,6 +47,7 @@ import 'vax_tracker_screen.dart';
 // import 'pp_leaps_data.dart';
 import 'what_changed_screen.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
 
 export 'pp_tools_tab.dart' show ToolsHubScreen;
 // "Wonder Week Window" now opens the full leap page (LeapDefinitionScreen) for
@@ -61,9 +62,11 @@ class ToolsHubClassic extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context, [String msg = 'Coming soon']) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context, [String msg = 'Coming soon']) => pvToast(context, msg);
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context, [String msg = 'Coming soon']) => ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+  //     );
 
   void _push(BuildContext context, Widget s) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));

@@ -28,6 +28,7 @@ import '../../doctor/doctor_schedule_store.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 const _dayNames = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -198,9 +199,13 @@ class _DoctorScheduleScreenState extends State<DoctorScheduleScreen> {
     return s;
   }
 
-  void _toast(String m) => ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(content: Text(m)));
+  // Every caller is a validation complaint, so the gentle card.
+  void _toast(String m) =>
+      pvToast(context, m, kind: PvToastKind.gentle, lift: kPvSnackAtFoot);
+  // Kept for revert — the theme's dark SnackBar bar, clearing the last:
+  // void _toast(String m) => ScaffoldMessenger.of(context)
+  //   ..clearSnackBars()
+  //   ..showSnackBar(SnackBar(content: Text(m)));
 
   // ---- build ----------------------------------------------------------------
 

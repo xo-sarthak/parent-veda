@@ -54,6 +54,7 @@ import '../v2/v2_palette.dart';
 import '../doors/pv_door_chrome.dart' show PvDoorRailCard, PvDoorSingleRail, PvDoorToolScaffold, PvDoorDisclaimer;
 import 'hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
 import 'scan_report_viewer_screen.dart';
+import '../../widgets/pv_toast.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -286,10 +287,7 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
     // hum and one floating line naming what landed.
     pvCommitFeedback();
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Added · ${named.title}'),
-        duration: const Duration(seconds: 2),
-      ));
+      pvToast(context, 'Added · ${named.title}', kind: PvToastKind.done);
     }
   }
 

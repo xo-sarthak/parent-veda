@@ -32,6 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'cart_store.dart';
 import 'remote/cloud_synced_store.dart';
 import 'remote/supabase_repo.dart';
+import 'pv_sync_health.dart';
 
 enum PvOrderStatus { placed, paid, preview, cancelled }
 
@@ -295,7 +296,7 @@ class PvOrderStore extends ChangeNotifier with CloudSyncedStore {
           }
       ],
       'created_at': o.createdAt.toUtc().toIso8601String(),
-    }).catchError((_) {});
+    }).catchError(PvSyncHealth.report);
   }
 
   // ---- cloud sync ------------------------------------------------------------

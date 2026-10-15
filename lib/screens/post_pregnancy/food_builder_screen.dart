@@ -16,6 +16,7 @@ import 'food_shopping_screen.dart';
 import 'pp_common.dart';
 import 'pp_food_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class FoodBuilderScreen extends StatefulWidget {
   const FoodBuilderScreen({super.key});
@@ -276,14 +277,8 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
           PvPress(child: GestureDetector(
             onTap: () {
               FoodStore.instance.addLines(s.missing);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          // Flutter 3.44 keeps a snackbar with an action on screen until it is
-          // dismissed (`persist` defaults to true when there is an action).
-          persist: false,
-                content: const Text('Missing ingredients added to your shopping list'),
-                behavior: SnackBarBehavior.floating,
-                action: SnackBarAction(label: 'View', onPressed: () => _push(const FoodShoppingScreen())),
-              ));
+              pvToast(context, 'Missing ingredients added to your shopping list',
+                  kind: PvToastKind.done, action: 'View', onAction: () => _push(const FoodShoppingScreen()));
             },
             behavior: HitTestBehavior.opaque,
             child: Container(

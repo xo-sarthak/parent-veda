@@ -40,6 +40,7 @@ import '../../ttc/ttc_read_store.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../saved_toast.dart';
 
 /// The three reading surfaces. Sepia is not decoration - it is the one most
 /// people actually keep, and dark is what a phone at 11pm needs.
@@ -174,8 +175,12 @@ class _TtcInsightScreenState extends State<TtcInsightScreen> {
                 p: p,
                 saved: saved,
                 onBack: () => Navigator.of(context).maybePop(),
-                onSave: () =>
-                    TtcReadStore.instance.toggleSaved(insight.id),
+                onSave: () {
+                  void flip() => TtcReadStore.instance.toggleSaved(insight.id);
+                  flip();
+                  pvSaveToast(context,
+                      nowSaved: !saved, undo: flip, where: 'Saved for later', canView: false);
+                },
                 onSettings: () => _openSettings(t, p),
               ),
               // How much is left, without a number. A "40%" on a health article

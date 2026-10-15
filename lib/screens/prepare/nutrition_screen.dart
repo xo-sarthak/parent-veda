@@ -18,6 +18,7 @@ import 'consultation_detail_screen.dart';
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ---------------------------------------------------------------------------
 //  Step 1 - Assessment
@@ -79,8 +80,8 @@ class _NutritionScreenState extends State<NutritionScreen> {
               child: pvPrimaryButton(
                 _goal == null ? s.prepPickFocusToContinue : s.prepSeeMyPlans,
                 _goal == null
-                    ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(s.uiChooseMainFocusFirst), behavior: SnackBarBehavior.floating))
+                    ? () => pvToast(context, s.uiChooseMainFocusFirst,
+                        kind: PvToastKind.gentle)
                     : () => Navigator.of(context).push(MaterialPageRoute<void>(
                         builder: (_) => NutritionPlansScreen(goalId: _goal, lang: widget.lang))),
                 padding: const EdgeInsets.symmetric(vertical: 15),

@@ -44,6 +44,7 @@ import 'pp_common.dart';
 import 'pp_nuskhe_data.dart';
 import 'problem_solver_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class RemedyDetailScreen extends StatelessWidget {
   const RemedyDetailScreen({super.key, this.remedy});
@@ -60,9 +61,11 @@ class RemedyDetailScreen extends StatelessWidget {
         child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
       ));
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   /// The situation's drawn mark, as on the Nuskhe landing and the list.
   static IntentMark _situationMark(String name) => switch (name) {

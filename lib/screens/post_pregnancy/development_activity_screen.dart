@@ -16,6 +16,7 @@ import 'pp_development_data.dart';
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../saved_toast.dart';
 
 class DevelopmentActivityScreen extends StatelessWidget {
   const DevelopmentActivityScreen({super.key, required this.activity});
@@ -273,7 +274,12 @@ class DevelopmentActivityScreen extends StatelessWidget {
             */
             const Spacer(),
             PvPress(child: GestureDetector(
-              onTap: () => DevStore.instance.toggleSave(activity.id),
+              onTap: () {
+                final was = DevStore.instance.isSaved(activity.id);
+                void flip() => DevStore.instance.toggleSave(activity.id);
+                flip();
+                pvSaveToast(context, nowSaved: !was, undo: flip, canView: false);
+              },
               behavior: HitTestBehavior.opaque,
               child: Container(
                 width: 50,

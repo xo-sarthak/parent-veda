@@ -42,6 +42,7 @@ import '../../localization/app_language.dart';
 import '../../data/products/pv_catalog_adapters.dart' show pvProductIdForGuide;
 import '../products/pv_product_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 
 class ProductGuideScreenClassic extends StatelessWidget {
@@ -49,8 +50,10 @@ class ProductGuideScreenClassic extends StatelessWidget {
   final ProductGuide guide;
 
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
-  void _soon(BuildContext c, String m) =>
-      ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+  void _soon(BuildContext c, String m) => pvToast(c, m);
+  // Kept for revert — the theme's floating dark SnackBar:
+  // void _soon(BuildContext c, String m) =>
+  //     ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
   @override
   Widget build(BuildContext context) {

@@ -32,6 +32,7 @@ import '../../ask_veda/pp_veda_corpus.dart' show openPpVedaDoc;
 import 'pp_phase_faqs.dart' show phaseFaqs;
 import 'pp_phases_data.dart' show currentPhase, ppFillChild;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ---- design palette ------------------------------------------------------------
 // ONE PARENTVEDA (2026-10-10, the Ask Veda reveal pass): the pregnancy Ask
@@ -218,7 +219,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     });
   }
 
-  void _snack(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+  void _snack(String m) => pvToast(context, m);
+  // Kept for revert — the floating Material SnackBar:
+  // void _snack(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
   void _open(Widget w) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => w));
 
   @override

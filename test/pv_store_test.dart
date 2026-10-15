@@ -29,6 +29,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/screens/products/pv_product_screen.dart';
 import 'package:parentveda/screens/products/pv_search_screen.dart';
 import 'package:parentveda/screens/products/pv_wishlist_screen.dart';
+import 'package:parentveda/widgets/pv_toast.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -512,7 +513,7 @@ void main() {
       await tester.tap(find.byType(PvHeart));
       await tester.pump(const Duration(milliseconds: 300));
       expect(
-        find.byType(SnackBar),
+        find.byType(PvToastCard),
         findsNothing,
         reason: 'the heart says it with the icon, not a notice',
       );

@@ -17,6 +17,7 @@ import 'provider_profile_screen.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -48,9 +49,11 @@ class _CohortFunnelScreenState extends State<CohortFunnelScreenClassic> {
   void _openExpert(BuildContext context, String id) => Navigator.of(context)
       .push(MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: expertById(id))));
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enrolment opens soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context) => pvToast(context, 'Enrolment opens soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Enrolment opens soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   static const List<List<String>> _faqs = [
     ['What if I miss a live call?', 'Every call is recorded and shared within the hour - you never fall behind.'],

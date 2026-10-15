@@ -82,6 +82,7 @@ import '../v2/v2_palette.dart' show V2PaletteStore;
 import 'pv_details_screen.dart';
 import 'pv_doctor_notes_screen.dart';
 import 'pv_you_sheets.dart';
+import '../../widgets/pv_toast.dart';
 
 /// One row under "Your details": a label, the fact (or `--`), and how to edit.
 class PvYouDetail {
@@ -585,10 +586,8 @@ Future<void> _openNotPregnant(BuildContext c) async {
       // Told before it happens (the sheet), confirmed after (the snackbar).
       await const TtcTransitionEngine().undo();
       if (!c.mounted) return;
-      ScaffoldMessenger.of(c).showSnackBar(const SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text('Back to trying. Everything you logged is still here.'),
-      ));
+      pvToast(c, 'Back to trying. Everything you logged is still here.',
+          kind: PvToastKind.done);
       openStageDoor(c, StageDoor.tryingToConceive);
     case 'ended':
       final ctl = PregnancyController.current;

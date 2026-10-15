@@ -8,9 +8,12 @@ import 'journal_email.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
 import '../../../widgets/pv_feedback.dart' show PvPress;
+import '../../../widgets/pv_toast.dart';
 
-void _snack(BuildContext c, String m) =>
-    ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+void _snack(BuildContext c, String m) => pvToast(c, m);
+// Kept for revert — the floating Material SnackBar:
+// void _snack(BuildContext c, String m) =>
+//     ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
 void openMemory(BuildContext context, JvMemory m) =>
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => MemoryDetailScreen(memory: m)));

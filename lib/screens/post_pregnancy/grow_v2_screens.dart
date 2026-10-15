@@ -43,6 +43,7 @@ import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
 import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary, pvStorePalette;
 import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -831,10 +832,7 @@ class _GrowActivityScreenState extends State<GrowActivityScreen> {
   // rendering a play button that does nothing would be the worse of the two
   // honest options.
   Widget _demoRow(BuildContext context) => PvPress(child: GestureDetector(
-        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('No demo filmed for this one yet.')),
-        ),
+        onTap: () => pvToast(context, 'No demo filmed for this one yet.'),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),

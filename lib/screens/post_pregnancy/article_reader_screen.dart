@@ -20,6 +20,7 @@ import '../../data/reads/read_adapters.dart';
 import '../../localization/app_language.dart';
 import '../reader/pv_reader_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class ArticleReaderScreen extends StatelessWidget {
   const ArticleReaderScreen({super.key, this.article});
@@ -31,9 +32,11 @@ class ArticleReaderScreen extends StatelessWidget {
         child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
       ));
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   void _open(BuildContext context, Article a) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ArticleReaderScreen(article: a)));

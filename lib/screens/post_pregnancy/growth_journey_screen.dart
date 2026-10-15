@@ -28,6 +28,7 @@ import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
 import '../v2/v2_palette.dart';
 import 'pp_care_parts.dart' show ppCareHeading, ppCareChoices;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// The shared tool shell for Growth (2026-10-07). False draws the old page.
 const bool kPpGrowthShell = true;
@@ -509,8 +510,7 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
         final w = double.tryParse(weight.text.trim());
         final h = double.tryParse(height.text.trim());
         if (w == null || h == null) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Add at least a weight and height to save.'), behavior: SnackBarBehavior.floating));
+          pvToast(context, 'Add at least a weight and height to save.', kind: PvToastKind.gentle);
           return;
         }
         _store.log(date: date, weightKg: w, heightCm: h, headCm: double.tryParse(head.text.trim()), note: note.text.trim().isEmpty ? null : note.text.trim());

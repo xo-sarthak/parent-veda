@@ -12,15 +12,18 @@ import 'pp_child_profile.dart';
 
 import 'pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class MyChildJournalScreen extends StatelessWidget {
   const MyChildJournalScreen({super.key});
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   // Waveform bar heights (0–1) and whether "played" (purple) vs upcoming (lavender).
   static const List<double> _wave = [.40, .70, 1, .55, .85, .35, .65, .90, .45, .75, .30, .60, .50, .80];

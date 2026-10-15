@@ -56,6 +56,7 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../pregnancy/preg_tool_parts.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// The Tools tab's "Track" hue, so the marks here match the row she tapped.
 const double _kMovementHue = 206;
@@ -153,13 +154,13 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
   }
 
   Future<void> _endSession() async {
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     final hadMovements = _store.currentSessionCount > 0;
     await _store.endMovementSession();
     if (!mounted) return;
     setState(() => _showAllTimes = false);
     if (hadMovements) {
-      messenger.showSnackBar(SnackBar(content: Text(_s.sessionSavedMsg)));
+      pvToast(nav.context, _s.sessionSavedMsg, kind: PvToastKind.done);
     }
   }
 
@@ -173,7 +174,7 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
   Future<void> _saveNote() async {
     final text = _noteCtrl.text.trim();
     if (text.isEmpty) return;
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     FocusScope.of(context).unfocus();
     await DailyStore.instance.addDearBabyNote(
       week: widget.controller.currentWeek,
@@ -181,7 +182,9 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
       text: text,
     );
     _noteCtrl.clear();
-    messenger.showSnackBar(SnackBar(content: Text(_s.movementNoteSaved)));
+    // pvToast checks mounted itself and falls back to the app navigator.
+    // ignore: use_build_context_synchronously
+    pvToast(nav.context, _s.movementNoteSaved, kind: PvToastKind.done);
   }
 
   void _openRecords() => Navigator.of(context).push(

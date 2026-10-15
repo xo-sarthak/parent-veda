@@ -39,6 +39,7 @@ import '../data/nutrition/superfood_recipes.dart';
 import '../data/nutrition_data.dart' show Recipe;
 import 'nutrition/door/recipe_cook_screen.dart' show openRecipe;
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 // TESTING-ONLY: when the Dad mode switch is on AND we're on week 20, the weekly
 // flow re-voices its copy for the father (same content, read for/about her).
@@ -2213,10 +2214,7 @@ Widget _mediaPlaceholder(BuildContext context, S s,
     padding: const EdgeInsets.only(bottom: 18),
     child: video
         ? PvPress(child: GestureDetector(
-            onTap: () => ScaffoldMessenger.of(context)
-              ..clearSnackBars()
-              ..showSnackBar(
-                  SnackBar(content: Text(s.wkVideoSoon))),
+            onTap: () => pvToast(context, s.wkVideoSoon),
             child: frame,
           ))
         : frame,
@@ -4226,8 +4224,7 @@ class _VideoFeed extends StatelessWidget {
 Widget _videoReelTile(BuildContext context, _Vid v, S s, AppLanguage lang,
     {double width = 141}) {
   return PvPress(child: GestureDetector(
-      onTap: () => ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(s.wkVideoSoon))),
+      onTap: () => pvToast(context, s.wkVideoSoon),
       child: SizedBox(
         width: width, // ≈ 9:16 against the 250 height
         child: ClipRRect(
@@ -4716,12 +4713,12 @@ class _PartnerSection extends StatelessWidget {
                 backgroundColor: AppTheme.primary500,
                 padding: const EdgeInsets.symmetric(vertical: 14)),
             onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
+              final nav = Navigator.of(context);
               try {
                 await Share.share(_message(s));
               } catch (_) {
-                messenger
-                    .showSnackBar(SnackBar(content: Text(s.shareFailed)));
+                // ignore: use_build_context_synchronously
+                pvToast(nav.context, s.shareFailed, kind: PvToastKind.gentle);
               }
             },
             icon: const Icon(Icons.chat_rounded, size: 18, color: Colors.white),

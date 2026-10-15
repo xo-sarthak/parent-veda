@@ -22,6 +22,7 @@ import 'jv2_common.dart';
 import 'jv2_data.dart';
 import 'jv2_store.dart';
 import '../../../widgets/pv_feedback.dart' show PvPress;
+import '../../../widgets/pv_toast.dart';
 
 // =============================================================================
 //  THE ONE PARENTVEDA LOOK (2026-10-07)
@@ -173,9 +174,11 @@ Widget _mediaRowV3(BuildContext context, {String? photo, ValueChanged<String?>? 
           ),
         ),
       );
-  void soon(String label) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$label - coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void soon(String label) => pvToast(context, '$label - coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void soon(String label) => ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('$label - coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
   return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
     if (photo != null) ...[
       ClipRRect(
@@ -275,9 +278,11 @@ Widget _mediaRow(BuildContext context, {String? photo, ValueChanged<String?>? on
           ]),
         )),
       );
-  void soon(String label) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$label - coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void soon(String label) => pvToast(context, '$label - coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void soon(String label) => ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('$label - coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
   return Column(children: [
     if (photo != null) ...[
       ClipRRect(
@@ -353,13 +358,11 @@ Widget _mediaRowOld(BuildContext context) {
 /// Saves through PpJournalStore, then confirms. Nothing written and no photo
 /// means nothing saved, and she is told so rather than thanked.
 Future<void> _save(BuildContext context, String what, JvKind kind, {String title = '', String body = '', String? photo}) async {
-  final messenger = ScaffoldMessenger.of(context);
   final nav = Navigator.of(context);
   final ok = await PpJournalStore.instance.add(kind: kind, title: title, body: body, pickedPhotoPath: photo);
-  messenger.showSnackBar(SnackBar(
-    content: Text(ok ? '$what saved to $jvChild\'s journal' : 'Write a few words or add a photo first'),
-    behavior: SnackBarBehavior.floating,
-  ));
+  // ignore: use_build_context_synchronously — the navigator outlives this call, and pvToast falls back to the root overlay anyway.
+  pvToast(nav.context, ok ? '$what saved to $jvChild\'s journal' : 'Write a few words or add a photo first',
+      kind: ok ? PvToastKind.done : PvToastKind.gentle);
   if (ok) nav.maybePop();
 }
 
@@ -599,9 +602,7 @@ class _QuickCaptureScreenState extends State<QuickCaptureScreen> {
           ),
           const Spacer(),
           PvPress(child: GestureDetector(
-            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Voice capture - coming soon'), behavior: SnackBarBehavior.floating),
-            ),
+            onTap: () => pvToast(context, 'Voice capture - coming soon'),
             child: Container(
               width: 88,
               height: 88,

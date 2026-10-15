@@ -14,6 +14,7 @@ import 'pp_common.dart';
 import 'pp_watch_data.dart';
 import 'provider_profile_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class QuickLearnScreen extends StatefulWidget {
   const QuickLearnScreen({super.key, this.startId});
@@ -44,7 +45,9 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
     super.dispose();
   }
 
-  void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+  void _soon(String m) => pvToast(context, m);
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
   @override
   Widget build(BuildContext context) {

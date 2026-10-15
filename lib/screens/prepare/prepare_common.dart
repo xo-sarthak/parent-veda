@@ -22,6 +22,7 @@ import '../../experts/expert_link.dart';
 import '../post_pregnancy/booking_sheet.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
+import '../../widgets/pv_toast.dart';
 
 // ---- palette (mirrors the design's hexes; AppTheme holds the same base) -----
 // ⚠️ INKED — 2026-09-18, the door walk (DESIGN-SYSTEM §4.0). The kit was
@@ -299,11 +300,11 @@ class _StripePainter extends CustomPainter {
 // string. Resolving it inside the body is how a bilingual default is spelled.
 void pvComingSoon(BuildContext context, AppLanguage lang, [String? what]) {
   final s = S(lang);
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-        content: Text(s.opensSoon(what ?? s.prepBooking)),
-        behavior: SnackBarBehavior.floating),
-  );
+  pvToast(context, s.opensSoon(what ?? s.prepBooking));
+  // Kept for revert — the theme's dark SnackBar:
+  //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //     content: Text(s.opensSoon(what ?? s.prepBooking)),
+  //     behavior: SnackBarBehavior.floating));
 }
 
 // Circular striped avatar used for coaches/experts in the mock.

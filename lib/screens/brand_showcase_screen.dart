@@ -34,6 +34,7 @@ import 'prepare/prepare_hub_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -162,9 +163,11 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
     }
   }
 
-  void _toast(String m) => ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(content: Text(m)));
+  void _toast(String m) => pvToast(context, m);
+  // Kept for revert — the theme's dark SnackBar, cleared first:
+  // void _toast(String m) => ScaffoldMessenger.of(context)
+  //   ..clearSnackBars()
+  //   ..showSnackBar(SnackBar(content: Text(m)));
 
   @override
   Widget build(BuildContext context) {

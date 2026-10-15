@@ -23,6 +23,8 @@ import '../book_companion_screen.dart';
 import '../../localization/app_language.dart';
 import '../reader/pv_reader_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
+import '../saved_toast.dart';
 
 class _RTheme {
   const _RTheme(this.bg, this.ink, this.soft, this.panel, this.rule, this.accent);
@@ -99,7 +101,9 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
   }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
-  void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+  void _soon(String m) => pvToast(context, m);
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
   // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
   // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
@@ -199,7 +203,12 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
           const Spacer(),
           if (a.toc.length > 1) _iconBtn(t, Icons.toc_rounded, () => _openToc(t)),
           _iconBtn(t, Icons.text_fields_rounded, () => _openSettings(t)),
-          _iconBtn(t, _store.isSaved(a.id) ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, () => setState(() => _store.toggleSave(a.id))),
+          _iconBtn(t, _store.isSaved(a.id) ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, () {
+            final was = _store.isSaved(a.id);
+            void flip() { if (mounted) setState(() => _store.toggleSave(a.id)); }
+            flip();
+            pvSaveToast(context, nowSaved: !was, undo: flip);
+          }),
           _iconBtn(t, Icons.ios_share_rounded, () => _soon('Sharing coming soon')),
         ]),
       );

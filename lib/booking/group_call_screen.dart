@@ -53,6 +53,7 @@ import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import 'call_session.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 const _bg = Color(0xFF0E0D12);
 const _panel = Color(0xFF17151E);
@@ -659,13 +660,15 @@ class _GroupCallScreenState extends State<GroupCallScreen>
 
   void _toast(String m) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-        content: Text(m),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: _panel,
-      ));
+    pvToast(context, m);
+    // Kept for revert — a floating SnackBar on the call's dark panel colour:
+    // ScaffoldMessenger.of(context)
+    //   ..clearSnackBars()
+    //   ..showSnackBar(SnackBar(
+    //     content: Text(m),
+    //     behavior: SnackBarBehavior.floating,
+    //     backgroundColor: _panel,
+    //   ));
   }
 
   String get _clock {

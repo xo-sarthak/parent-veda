@@ -30,6 +30,7 @@ import '../cards/raga_player.dart';
 import '../memories/memories_section.dart';
 import 'week_overview_card.dart';
 import '../pv_feedback.dart' show PvPress;
+import '../pv_toast.dart';
 // import 'living_halo.dart'; // ring figure replaced by the striped Size hero
 //   (kept for revert: re-add this import + restore the old SizeRevealCard body).
 
@@ -623,8 +624,7 @@ class WeeklyVideoCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         PvPress(child: GestureDetector(
-          onTap: () => ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(s.wkVideoSoon))),
+          onTap: () => pvToast(context, s.wkVideoSoon),
           child: AspectRatio(
             aspectRatio: 16 / 9,
             child: Container(
@@ -1272,12 +1272,14 @@ class ShareJourneyCard extends StatelessWidget {
   final AppLanguage lang;
 
   Future<void> _share(BuildContext context, S s) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     try {
       final msg = '👶 ${s.partnerShareHeader(w.week)}\n\n${w.partner.shareMessage.of(lang)}\n\n${s.partnerShareFooter} 💜';
       await Share.share(msg, subject: s.partnerShareSubject(w.week));
     } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(s.shareFailed)));
+      // pvToast checks mounted itself and falls back to the app navigator.
+      // ignore: use_build_context_synchronously
+      pvToast(nav.context, s.shareFailed, kind: PvToastKind.gentle);
     }
   }
 

@@ -16,6 +16,7 @@ import 'growth_activity_screen.dart';
 import 'pp_common.dart';
 import 'remedy_detail_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class WonderWeekScreen extends StatelessWidget {
   const WonderWeekScreen({super.key});
@@ -25,9 +26,11 @@ class WonderWeekScreen extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   void _push(BuildContext context, Widget s) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));

@@ -75,6 +75,7 @@ import '../pregnancy/preg_chrome.dart'
     show PregCard, PregSectionHeading, pregSectionHeadingStyle;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// This tab's hue — the soft amber the coverflow card wears.
 const double kBumpRitualHue = 26;
@@ -552,11 +553,8 @@ Future<void> _startAddPhoto(BuildContext context, V2Palette p, int week) async {
     path = x?.path;
   } catch (_) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Couldn't open the camera. Try the gallery."),
-        ),
-      );
+      pvToast(context, "Couldn't open the camera. Try the gallery.",
+          kind: PvToastKind.gentle);
     }
     return;
   }

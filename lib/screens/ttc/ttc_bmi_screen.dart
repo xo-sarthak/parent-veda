@@ -72,6 +72,7 @@ import '../../ttc/ttc_cycle_report.dart' show kTtcWeightTracker, kTtcWeightField
 import '../../ttc/ttc_log_store.dart';
 import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// ⚠️ T6 (launch sanity, 2026-09-28): the tool wears its Tools group's
 /// colour, "Your body" (see ttc_tool_hues.dart). Kept for revert (2026-09-28):
@@ -761,10 +762,8 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
               if (mounted) setState(() => _shownEntry = _store.latest);
               await _store.setOnChecklist(true);
               if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text(t('Measurement saved.', 'Save ho gaya')),
-              ));
+              pvToast(context, t('Measurement saved.', 'Save ho gaya'),
+                  kind: PvToastKind.done);
             }),
         const SizedBox(height: 6),
         Text("Saving won't mark any medical item on your checklist as done.",

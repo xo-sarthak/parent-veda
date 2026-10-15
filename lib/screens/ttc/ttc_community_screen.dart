@@ -32,6 +32,8 @@ import 'ttc_care_circle_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
+import '../saved_toast.dart';
 
 class TtcCommunityScreen extends StatefulWidget {
   const TtcCommunityScreen({super.key, this.initialRoom});
@@ -405,10 +407,7 @@ Future<void> writeTtcPost(BuildContext context, {String? room}) async {
   ));
 
   if (context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(t.communityPosted),
-      behavior: SnackBarBehavior.floating,
-    ));
+    pvToast(context, t.communityPosted, kind: PvToastKind.done);
   }
 }
 
@@ -621,7 +620,12 @@ class _PostCard extends StatelessWidget {
                 : Icons.bookmark_border_rounded,
             label: '',
             on: store.isSaved(post.id),
-            onTap: () => store.toggleSave(post.id),
+            onTap: () {
+              final was = store.isSaved(post.id);
+              void flip() => store.toggleSave(post.id);
+              flip();
+              pvSaveToast(context, nowSaved: !was, undo: flip, where: 'Post saved', canView: false);
+            },
           ),
         ]),
       ]),

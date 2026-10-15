@@ -22,6 +22,7 @@ import '../../localization/app_language.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -55,9 +56,7 @@ class ProgramDetailScreenClassic extends StatelessWidget {
     final p = program;
     final s = S(lang);
     if (!cta.enabled) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(s.uiCohortHasAlreadyStarted),
-          behavior: SnackBarBehavior.floating));
+      pvToast(context, s.uiCohortHasAlreadyStarted);
       return;
     }
     if (cta.watch) {

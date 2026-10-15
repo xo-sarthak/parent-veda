@@ -36,6 +36,7 @@ import '../../theme/app_theme.dart';
 import '../cart_screen.dart';
 import 'hospital_bag_v2_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class HospitalBagScreen extends StatefulWidget {
   const HospitalBagScreen({super.key, required this.controller});
@@ -726,13 +727,7 @@ class _MyBagScreenState extends State<_MyBagScreen> {
       HapticFeedback.lightImpact();
       final msg = s.hb2PackedCheer(_cheer % 4);
       _cheer++;
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-          content: Text(msg),
-          duration: const Duration(milliseconds: 1300),
-          behavior: SnackBarBehavior.floating,
-        ));
+      pvToast(context, msg, kind: PvToastKind.done);
     }
   }
 
@@ -776,12 +771,14 @@ class _MyBagScreenState extends State<_MyBagScreen> {
     }
   }
 
-  void _toast(String msg) => ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(
-        content: Text(msg),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(milliseconds: 1500)));
+  void _toast(String msg) => pvToast(context, msg, kind: PvToastKind.done);
+  // Kept for revert — a floating theme SnackBar, 1.5 s, clearing the last:
+  // void _toast(String msg) => ScaffoldMessenger.of(context)
+  //   ..clearSnackBars()
+  //   ..showSnackBar(SnackBar(
+  //       content: Text(msg),
+  //       behavior: SnackBarBehavior.floating,
+  //       duration: const Duration(milliseconds: 1500)));
 
   void _share(S s, AppLanguage lang) {
     final b = StringBuffer('${s.hb2MyBag} 💛\n\n');
@@ -1395,24 +1392,16 @@ void _addPlannedToCart(BuildContext context, PregnancyController controller) {
     );
     added++;
   }
-  ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(
-          // Flutter 3.44 keeps a snackbar with an action on screen until it is
-          // dismissed (`persist` defaults to true when there is an action).
-          persist: false,
-      content: Text(added == 0 ? s.cartAllInCart : s.cartAddedN(added)),
-      action: added == 0
+  pvToast(context, added == 0 ? s.cartAllInCart : s.cartAddedN(added),
+      kind: added == 0 ? PvToastKind.info : PvToastKind.done,
+      action: added == 0 ? null : s.cartViewCart,
+      onAction: added == 0
           ? null
-          : SnackBarAction(
-              label: s.cartViewCart,
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => CartScreen(
-                      controller: controller,
-                      cartId: kHospitalCartId,
-                      title: s.cartHospitalTitle))),
-            ),
-    ));
+          : () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => CartScreen(
+                  controller: controller,
+                  cartId: kHospitalCartId,
+                  title: s.cartHospitalTitle))));
 }
 
 // ---------------------------------------------------------------------------
@@ -1663,8 +1652,7 @@ class _BagViewState extends State<_BagView> {
                 onPressed: () async {
                   await store.addSuggested(item);
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(s.hbItemAdded)));
+                    pvToast(context, s.hbItemAdded, kind: PvToastKind.done);
                   }
                 },
               ),
@@ -1953,8 +1941,7 @@ class _ShoppingView extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: FilledButton.icon(
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(s.hbStoreComingSoon))),
+            onPressed: () => pvToast(context, s.hbStoreComingSoon),
             icon: const Icon(Icons.storefront_rounded, size: 18),
             label: Text(s.hbOrderFromVeda),
           ),
@@ -2280,8 +2267,7 @@ class _ProductScreen extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(s.hbStoreComingSoon))),
+                    onPressed: () => pvToast(context, s.hbStoreComingSoon),
                     icon: const Icon(Icons.storefront_rounded, size: 18),
                     label: Text(s.hbBuyVedaCta),
                   ),
@@ -2628,8 +2614,7 @@ Future<void> _sharePartner(
     await Share.share(buf.toString());
   } catch (_) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(s.shareFailed)));
+      pvToast(context, s.shareFailed, kind: PvToastKind.gentle);
     }
   }
 }

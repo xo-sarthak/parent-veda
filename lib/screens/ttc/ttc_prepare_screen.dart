@@ -30,6 +30,7 @@ import '../../data/learn/pv_learn_view.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -379,12 +380,7 @@ class TtcOfferingScreenClassic extends StatelessWidget {
     final o = BookingCatalog.instance.offeringById(offering.id);
     if (o == null) return;
     BookingStore.instance.purchase(o);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(TtcS.current().prepareBought),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    pvToast(context, TtcS.current().prepareBought, kind: PvToastKind.done);
   }
 }
 
@@ -419,15 +415,15 @@ class _SlotRow extends StatelessWidget {
   }
 
   Future<void> _book(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     final t = TtcS.current();
     // Seat claims are server-authoritative - the store's reserve() is the only
     // path, and it can legitimately refuse.
     final booking = await BookingStore.instance.reserve(slot);
-    messenger.showSnackBar(SnackBar(
-      content: Text(booking == null ? t.prepareBookFailed : t.prepareBooked),
-      behavior: SnackBarBehavior.floating,
-    ));
+    // pvToast checks mounted itself and falls back to the app navigator.
+    // ignore: use_build_context_synchronously
+    pvToast(nav.context, booking == null ? t.prepareBookFailed : t.prepareBooked,
+        kind: booking == null ? PvToastKind.gentle : PvToastKind.done);
   }
 
   static String _fmt(DateTime d) {

@@ -15,6 +15,7 @@ import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'products_compare_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 const Color _bestRed = Color(0xFFC6295A);
 const Color _guideGreen = Color(0xFF1F8A5B);
@@ -24,24 +25,17 @@ const Color _guideRed = Color(0xFFD64545);
 // comparison and, when a rule blocks the tap, explains why (never silent).
 void ppToggleCompare(BuildContext context, PpProduct product) {
   final r = PpCompareStore.instance.toggle(product);
-  final messenger = ScaffoldMessenger.of(context);
   if (r == PpCompareResult.wrongCategory) {
-    messenger.showSnackBar(const SnackBar(
-      content: Text('Products can only be compared within the same category.'),
-      behavior: SnackBarBehavior.floating,
-    ));
+    pvToast(context, 'Products can only be compared within the same category.', kind: PvToastKind.gentle);
   } else if (r == PpCompareResult.full) {
-    messenger.showSnackBar(const SnackBar(
-      content: Text('You can compare up to two - remove one to swap in another.'),
-      behavior: SnackBarBehavior.floating,
-    ));
+    pvToast(context, 'You can compare up to two - remove one to swap in another.', kind: PvToastKind.gentle);
   }
 }
 
 // Route a buy tap: affiliate products open their retailer's site; ParentVeda's
 // own (in-app) products stay in the app (mock checkout for now).
 Future<void> ppLaunchBuy(BuildContext context, PpProduct p) async {
-  final messenger = ScaffoldMessenger.of(context);
+  final nav = Navigator.of(context);
   // ⚠️ IMS ACT BACKSTOP. Every surface already hides the Buy control for a
   // review-only product, so reaching here means a control was drawn that should
   // not have been. Refusing at the launch point too is deliberate belt-and-
@@ -49,17 +43,11 @@ Future<void> ppLaunchBuy(BuildContext context, PpProduct p) async {
   // for infant formula, which is the exact thing the Act prohibits. A guard is
   // cheap; that is not.
   if (!ppCanBuy(p)) {
-    messenger.showSnackBar(const SnackBar(
-      content: Text(kPpReviewOnlyWhy),
-      behavior: SnackBarBehavior.floating,
-    ));
+    pvToast(nav.context, kPpReviewOnlyWhy, kind: PvToastKind.gentle);
     return;
   }
   if (!ppIsAffiliate(p)) {
-    messenger.showSnackBar(SnackBar(
-      content: Text('Buying ${p.name} in-app - checkout opens soon.'),
-      behavior: SnackBarBehavior.floating,
-    ));
+    pvToast(nav.context, 'Buying ${p.name} in-app - checkout opens soon.');
     return;
   }
   bool ok;
@@ -69,10 +57,8 @@ Future<void> ppLaunchBuy(BuildContext context, PpProduct p) async {
     ok = false;
   }
   if (!ok) {
-    messenger.showSnackBar(SnackBar(
-      content: Text('Could not open ${p.retailer} - please try again.'),
-      behavior: SnackBarBehavior.floating,
-    ));
+    // ignore: use_build_context_synchronously — the navigator outlives this call, and pvToast falls back to the root overlay anyway.
+    pvToast(nav.context, 'Could not open ${p.retailer} - please try again.', kind: PvToastKind.gentle);
   }
 }
 
@@ -200,17 +186,10 @@ class PpProductCard extends StatelessWidget {
   // a rule, explain why (never a silent no-op).
   void _onToggle(BuildContext context) {
     final r = PpCompareStore.instance.toggle(product);
-    final messenger = ScaffoldMessenger.of(context);
     if (r == PpCompareResult.wrongCategory) {
-      messenger.showSnackBar(const SnackBar(
-        content: Text('Products can only be compared within the same category.'),
-        behavior: SnackBarBehavior.floating,
-      ));
+      pvToast(context, 'Products can only be compared within the same category.', kind: PvToastKind.gentle);
     } else if (r == PpCompareResult.full) {
-      messenger.showSnackBar(const SnackBar(
-        content: Text('You can compare up to 3 - remove one to swap in another.'),
-        behavior: SnackBarBehavior.floating,
-      ));
+      pvToast(context, 'You can compare up to 3 - remove one to swap in another.', kind: PvToastKind.gentle);
     }
   }
 

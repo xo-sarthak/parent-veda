@@ -94,6 +94,7 @@ import '../theme/app_theme.dart';
 import '../localization/app_language.dart';
 import 'call_session.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 // ---- palette -----------------------------------------------------------------
 // A call screen is dark whatever the rest of the app does — video reads better
@@ -471,14 +472,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
 
   void _showNearEndNotice() {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('About 5 minutes left in this consultation.'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: _panel,
-        duration: const Duration(seconds: 4),
-      ),
-    );
+    pvToast(context, 'About 5 minutes left in this consultation.');
   }
 
   String _failureCopy(CallJoinFailure f) => switch (f.kind) {

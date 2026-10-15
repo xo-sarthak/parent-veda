@@ -37,6 +37,7 @@ import 'package:flutter/foundation.dart';
 
 import '../services/remote/supabase_repo.dart';
 import '../services/remote/sync_registry.dart';
+import '../services/pv_sync_health.dart';
 
 /// Table names, in one place so a rename is one edit.
 class TtcTables {
@@ -98,7 +99,7 @@ mixin TtcSyncedStore on ChangeNotifier {
     _pushTimer = Timer(pushDebounce, () {
       // Fire-and-forget. A network hiccup must never reach the UI, and the
       // local cache is already correct - the next sync recovers a lost push.
-      pushToCloud().catchError((_) {});
+      pushToCloud().catchError(PvSyncHealth.report);
     });
   }
 

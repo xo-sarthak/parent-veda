@@ -56,6 +56,7 @@ import '../../theme/pv_fonts.dart';
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): the trying-to-conceive
 // Ask Veda's shape, in the pregnancy pieces. A back arrow and "Ask Veda" in
@@ -234,8 +235,10 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     });
   }
 
-  void _snack(String m) =>
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
+  void _snack(String m) => pvToast(context, m);
+  // Kept for revert — the theme's dark SnackBar bar:
+  // void _snack(String m) =>
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
 
   // ---- navigation: make the result sections clickable (Google-search style) --
   void _open(Widget w) =>

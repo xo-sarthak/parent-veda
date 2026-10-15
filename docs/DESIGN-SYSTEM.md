@@ -358,6 +358,23 @@ colour changes** — same offset, same blur:
 
 ---
 
+## 2.6 Motion — tokens since 2026-10-15
+
+`lib/theme/pv_motion.dart`. Before this every duration was typed where it was
+used; new motion reads from here.
+
+| Token | Value | For |
+|---|---|---|
+| `press` | 120 ms | a press settling under the finger (`PvPress`) |
+| `enter` | 360 ms, curve `settle` | something arriving: a toast, a card rising |
+| `exit` | 200 ms, curve `leave` | something leaving; **always faster than arriving** |
+| `swap` | 180 ms | words changing inside a surface that stays put |
+| `resize` | 220 ms, curve `arrive` | a surface growing to fit new content |
+
+`settle` is a mild overshoot (`Cubic(0.34, 1.36, 0.64, 1)`), closer to how iOS
+and Linear toasts land than `easeOutBack`, which bounces. With the system's
+reduce-motion setting on, movement drops out and only fades remain.
+
 # 3. THE ART SYSTEM
 
 We draw our own marks in `CustomPainter`. **We do not use stock photography for
@@ -671,6 +688,53 @@ a page body), keyboard-dismiss wrappers, detectors that also drag or
 long-press, and those whose `onTap` is null by a condition. A handler that is
 only *typed* nullable gets `PvPress(enabled: handler != null, ...)`.
 `test/tap_feedback_guard_test.dart` fails on any new unwrapped tap.
+
+## 4.0g Toasts — one notice, everywhere — BUILT 2026-10-15
+
+The user: *"our app lacks toasts a lot… the motions, smoothness and how user
+friendly they are."* Every notice is **`pvToast`** (`lib/widgets/pv_toast.dart`);
+`pvSnack`, `dcToast`, `ppCareSaved`, `ppToast`, `ttcSoon` and `pvComingSoon`
+are thin names over it. `test/toast_guard_test.dart` fails on any raw
+`SnackBar`.
+
+**Kinds.** The mark and the haptic follow the kind; a caller never picks them.
+
+| Kind | Mark | Haptic | Say |
+|---|---|---|---|
+| `done` | green tick disc | light | "Logged for 14 October" |
+| `saved` | bookmark disc + **View** | light | "Saved to your library" |
+| `undo` | none + **Undo** | selection | "Removed from your bag" |
+| `info` | none | none | "Copied" |
+| `gentle` | ⓘ on a cream card | none | "Couldn't reach the server…" |
+| `working` → `done` | spinner, then tick | on done | "Booking…" → "Booked" |
+
+**Look.** White card, ink words, an ink pill for the action (an arrow when it
+goes somewhere, none on Undo), 18 radius, the deep shadow from §2.5. Never the
+brand colour, never red: a failure in a local-first app loses nothing.
+
+**Place.** Bottom, always (decided 2026-10-15), above the nav bar on a stage
+home, at the foot on a pushed screen, above the Store's buy bar, above the
+keyboard when one is up (`pvSnackLiftFor`). One at a time.
+
+**Motion.** Rises 24 pt, scales 0.96 → 1 and fades over `enter` with `settle`;
+the mark pops a beat later, so "done" reads before the words do. Leaves down
+12 pt over `exit`. A second notice **morphs** the first (words cross-fade, the
+card resizes) instead of cutting it. Swipe down to dismiss; press and hold to
+keep it. 2.4 s for a line, 4.5 s with an action, +60 ms a word past six, at
+most 6 s; `working` waits for its handle.
+
+**When.** A commit that changes nothing visible on screen gets one (a save, a
+log on a screen that does not show it, a copy). A commit that answers in
+place does not: a tick that animates (`PvTick`), the Store's product heart.
+The last tick in a list may say the total ("All 12 packed"). A save says where
+it went and offers View (`pvSaveToast`, `lib/screens/saved_toast.dart`); an
+unsave offers Undo. The first network failure of a session says, once,
+"You're offline. Everything is saved on this phone…" (`PvSyncHealth`).
+
+Mobbin, 2026-10-15 (~60 screens): Linear, eBay, Google Photos, AllTrails,
+Gopuff (undo at the bottom, the action on the right); NYT, Google, Flo, Digg,
+Substack (a save names its place); Alan, Klarna, Perplexity, Luma (the tick
+first); Sesame (a calm cream error card).
 
 ## 4.0f One card family on every door — BUILT 2026-09-29, all nine TTC doors
 

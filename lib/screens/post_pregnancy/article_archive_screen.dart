@@ -13,6 +13,7 @@ import 'article_reader_screen.dart';
 import 'pp_articles_data.dart';
 import 'pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class ArticleArchiveScreen extends StatefulWidget {
   const ArticleArchiveScreen({super.key});
@@ -27,9 +28,11 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon() => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon() => pvToast(context, 'Coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon() => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   void _open(Article a) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ArticleReaderScreen(article: a)));

@@ -41,6 +41,7 @@ import 'meal_sheet.dart';
 import '../../../data/nutrition/nutrition_plate.dart';
 import 'nutrition_widgets.dart';
 import 'recipe_cook_screen.dart' show openShoppingList;
+import '../../../widgets/pv_toast.dart';
 
 class DietChartPlanScreen extends StatefulWidget {
   const DietChartPlanScreen({super.key, required this.chart, this.pregnancy});
@@ -62,9 +63,8 @@ class _DietChartPlanScreenState extends State<DietChartPlanScreen> {
       final bytes = await DietChartPdf.build(chart: widget.chart, content: content, lang: S.current);
       if (!mounted) return;
       if (bytes == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Couldn\'t prepare the file. Please try again when you\'re online.'),
-        ));
+        pvToast(context, 'Couldn\'t prepare the file. Please try again when you\'re online.',
+            kind: PvToastKind.gentle);
         return;
       }
       await DietChartPdf.present(chart: widget.chart, bytes: bytes);
@@ -190,8 +190,8 @@ class _DietChartPlanScreenState extends State<DietChartPlanScreen> {
                           onPressed: () {
                             pvCommitFeedback();
                             store.setPinnedChart(chart.id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Today follows this chart now.')));
+                            pvToast(context, 'Today follows this chart now.',
+                                kind: PvToastKind.done);
                           },
                           child: const Text('Make this my chart'),
                         )),

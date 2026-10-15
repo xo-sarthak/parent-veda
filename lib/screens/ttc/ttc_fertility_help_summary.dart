@@ -33,6 +33,7 @@ import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_common.dart' show ttcTitleInk, TtcSectionHeading;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class TtcFertilityHelpSummaryScreen extends StatelessWidget {
   const TtcFertilityHelpSummaryScreen({super.key});
@@ -236,12 +237,11 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
       buf.writeln('- $q');
     }
     Clipboard.setData(ClipboardData(text: buf.toString()));
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      content: Text(
-          t('Snapshot copied. Paste it into a message or your notes.',
-              'Snapshot copy ho gaya')),
-    ));
+    pvToast(
+        context,
+        t('Snapshot copied. Paste it into a message or your notes.',
+            'Snapshot copy ho gaya'),
+        kind: PvToastKind.done);
   }
 }
 

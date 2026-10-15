@@ -22,6 +22,7 @@ import 'can_i/can_i_answer.dart' as door;
 import 'can_i/can_i_door.dart';
 import 'tools/ask_veda_screen.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import 'saved_toast.dart';
 
 // ---------------------------------------------------------------------------
 //  Verdict + category visual language
@@ -489,7 +490,11 @@ class CanIAnswerScreen extends StatelessWidget {
               return IconButton(
                 tooltip: saved ? s.canISavedBadge : s.canISave,
                 icon: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded),
-                onPressed: () => CanIStore.instance.toggleSaved(entry.id),
+                onPressed: () {
+                  void flip() => CanIStore.instance.toggleSaved(entry.id);
+                  flip();
+                  pvSaveToast(context, nowSaved: !saved, undo: flip);
+                },
               );
             },
           ),

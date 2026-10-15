@@ -62,6 +62,7 @@ import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 import '../v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // Kept for revert (2026-09-30): the teal accent, the "bought" green and the
 // star glyph's amber. Everything they drew is the one ink or a neutral tag.
@@ -426,8 +427,8 @@ Future<void> showAddToChecklistSheet(
                           store.addItem(l.id, product.id);
                         }
                         Navigator.of(sheetCtx).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(s.pclAddedTo(l.name))));
+                        pvToast(context, s.pclAddedTo(l.name),
+                            kind: PvToastKind.done);
                       },
                     ),
                   ListTile(
@@ -443,9 +444,9 @@ Future<void> showAddToChecklistSheet(
                       store.addItem(id, product.id);
                       if (sheetCtx.mounted) Navigator.of(sheetCtx).pop();
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(s.pclAddedTo(
-                                name.isEmpty ? s.pclTitle : name))));
+                        pvToast(context,
+                            s.pclAddedTo(name.isEmpty ? s.pclTitle : name),
+                            kind: PvToastKind.done);
                       }
                     },
                   ),
@@ -684,9 +685,7 @@ class ProductChecklistScreen extends StatelessWidget {
 
   void _deleteList(BuildContext context, S s, ProductChecklist l) {
     ProductChecklistStore.instance.deleteChecklist(l.id);
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(s.pclDeleted)));
+    pvToast(context, s.pclDeleted, kind: PvToastKind.done);
   }
 
   Widget _curatedRow(BuildContext context, S s, _Copy c, CuratedList l) => PregOfferRow(
@@ -1173,9 +1172,7 @@ class _ChecklistDetailScreen extends StatelessWidget {
   Widget _bottomBar(BuildContext context, S s, ProductChecklist list) => _finishBar(
         saveLabel: s.pclSaveList,
         onSave: () {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(content: Text(s.pclSavedSnack)));
+          pvToast(context, s.pclSavedSnack, kind: PvToastKind.done);
           Navigator.of(context).pop();
         },
         goLabel: s.pclAddRemaining,
@@ -1203,23 +1200,15 @@ class _ChecklistDetailScreen extends StatelessWidget {
       );
       added++;
     }
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-          // Flutter 3.44 keeps a snackbar with an action on screen until it is
-          // dismissed (`persist` defaults to true when there is an action).
-          persist: false,
-        content: Text(added == 0 ? s.cartAllInCart : s.cartAddedN(added)),
-        action: SnackBarAction(
-          label: s.cartViewCart,
-          onPressed: () => _push(
-              context,
-              CartScreen(
-                  controller: controller,
-                  cartId: kProductsCartId,
-                  title: s.cartProductsTitle)),
-        ),
-      ));
+    pvToast(context, added == 0 ? s.cartAllInCart : s.cartAddedN(added),
+        kind: PvToastKind.done,
+        action: s.cartViewCart,
+        onAction: () => _push(
+            context,
+            CartScreen(
+                controller: controller,
+                cartId: kProductsCartId,
+                title: s.cartProductsTitle)));
   }
 
 //  // Kept for revert (2026-10-02): the checkbox row with the clock line and the emoji well.
@@ -1574,15 +1563,10 @@ class _ChecklistDetailScreen extends StatelessWidget {
     final wasDone = item.checked;
     store.toggleChecked(listId, item.id);
     if (wasDone) return; // un-ticking needs no words
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-        persist: false,
-        content: Text(c.gotSnack),
-        action: SnackBarAction(
-            label: c.undo,
-            onPressed: () => store.toggleChecked(listId, item.id)),
-      ));
+    pvToast(context, c.gotSnack,
+        kind: PvToastKind.undo,
+        action: c.undo,
+        onAction: () => store.toggleChecked(listId, item.id));
   }
 
   // Ticking a NOT-yet-got item asks "Already got this?" first (Yes = owned, no
@@ -1626,23 +1610,15 @@ class _ChecklistDetailScreen extends StatelessWidget {
         image: p.imageUrl,
       );
     }
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-          // Flutter 3.44 keeps a snackbar with an action on screen until it is
-          // dismissed (`persist` defaults to true when there is an action).
-          persist: false,
-        content: Text(inCart ? s.cartAllInCart : s.cartAddedN(1)),
-        action: SnackBarAction(
-          label: s.cartViewCart,
-          onPressed: () => _push(
-              context,
-              CartScreen(
-                  controller: controller,
-                  cartId: kProductsCartId,
-                  title: s.cartProductsTitle)),
-        ),
-      ));
+    pvToast(context, inCart ? s.cartAllInCart : s.cartAddedN(1),
+        kind: PvToastKind.done,
+        action: s.cartViewCart,
+        onAction: () => _push(
+            context,
+            CartScreen(
+                controller: controller,
+                cartId: kProductsCartId,
+                title: s.cartProductsTitle)));
   }
 
   void _editNote(BuildContext context, S s, ProductChecklistStore store,
@@ -2015,9 +1991,7 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
   // ignore: unused_element
   void _saveAndBack() {
     final s = S(widget.controller.language);
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(s.pclSavedSnack)));
+    pvToast(context, s.pclSavedSnack, kind: PvToastKind.done);
     Navigator.of(context).pop();
   }
 
@@ -2105,10 +2079,8 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                           note: noteC.text.trim(),
                         );
                         Navigator.of(sheetCtx).pop();
-                        ScaffoldMessenger.of(context)
-                          ..clearSnackBars()
-                          ..showSnackBar(
-                              SnackBar(content: Text(s.pclCustomAdded(name))));
+                        pvToast(context, s.pclCustomAdded(name),
+                            kind: PvToastKind.done);
                       },
                       child: Text(s.pclSave,
                           style: pvManrope(fontWeight: FontWeight.w800)),

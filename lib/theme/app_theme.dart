@@ -731,12 +731,19 @@ final ColorScheme _lightScheme = ColorScheme(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
       ),
+      // ⚠️ NO SNACKBARS SINCE 2026-10-15: every notice is `pvToast`
+      // (lib/widgets/pv_toast.dart), held by test/toast_guard_test.dart. This
+      // theme only matters if a package raises one of its own, so it borrows
+      // the toast's look (white, ink words, 18 radius) rather than a dark bar.
+      // Kept for revert: backgroundColor scheme.inverseSurface, text
+      // onInverseSurface, radius _rButton.
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: scheme.inverseSurface,
-        contentTextStyle: text.bodyMedium?.copyWith(color: scheme.onInverseSurface),
+        backgroundColor: Colors.white,
+        contentTextStyle: text.bodyMedium?.copyWith(color: neutral900, fontWeight: FontWeight.w700),
         behavior: SnackBarBehavior.floating,
+        elevation: 6,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(_rButton),
+          borderRadius: BorderRadius.circular(18),
         ),
       ),
     );

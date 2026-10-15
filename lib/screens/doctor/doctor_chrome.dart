@@ -28,6 +28,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
 import 'doctor_art.dart';
+import '../../widgets/pv_toast.dart';
 
 export '../auth/onboarding/onboarding_chrome.dart' show ObPrimary, ObSecondary;
 
@@ -1282,14 +1283,16 @@ Future<T?> dcSheet<T>(BuildContext context, {required String title, required Wid
 }
 
 /// Every commit tap answers (DESIGN-SYSTEM §4.0c).
+///
+/// Now the app's one notice (`pvToast`, 2026-10-15): a confirmation, so the
+/// tick and the haptic come with the kind. At the foot: the doctor app has
+/// no parent nav bar to clear.
 void dcToast(BuildContext context, String text) {
-  pvCommitFeedback();
-  ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(
-      content: Text(text, style: dcBody(14, color: Colors.white)),
-      backgroundColor: dcP.ink1,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ));
+  pvToast(context, text, kind: PvToastKind.done, lift: kPvSnackAtFoot);
+  // Kept for revert — an ink SnackBar with its own haptic:
+  //   pvCommitFeedback();
+  //   ScaffoldMessenger.of(context)..clearSnackBars()..showSnackBar(SnackBar(
+  //     content: Text(text, style: dcBody(14, color: Colors.white)),
+  //     backgroundColor: dcP.ink1, behavior: SnackBarBehavior.floating,
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))));
 }

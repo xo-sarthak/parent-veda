@@ -33,6 +33,7 @@ import '../widgets/storage_image.dart';
 import 'bump_book_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 enum _BumpFilter { all, t1, t2, t3, captioned, favorites }
 
@@ -813,7 +814,9 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
 
   void _snack(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    pvToast(context, msg);
+    // Kept for revert — the theme's dark SnackBar:
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 }
 

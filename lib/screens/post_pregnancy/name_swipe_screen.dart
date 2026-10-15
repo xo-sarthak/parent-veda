@@ -18,6 +18,7 @@ import 'name_matches_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 const Color _blendFg = Color(0xFF7A4600);
 const Color _blendBg = Color(0xFFF5EEE6);
@@ -93,9 +94,11 @@ class _NameSwipeScreenState extends State<NameSwipeScreen> with TickerProviderSt
   bool get _done => _index >= _deck.length;
   BabyName? get _current => _done ? null : _deck[_index];
 
-  void _snack(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
-      );
+  void _snack(String msg) => pvToast(context, msg);
+  // Kept for revert — the floating Material SnackBar:
+  // void _snack(String msg) => ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+  //     );
 
   void _toRare() => setState(() {
         _rareOnly = !_rareOnly;

@@ -13,6 +13,7 @@ import 'article_archive_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class NameDetailScreen extends StatefulWidget {
   const NameDetailScreen({super.key, this.name = 'Aarav'});
@@ -31,9 +32,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
   void _toggleLike(BabyName n) {
     _store.like(n.name);
     setState(() {});
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${n.name} added to your list'), behavior: SnackBarBehavior.floating),
-    );
+    pvToast(context, '${n.name} added to your list', kind: PvToastKind.done);
   }
 
   @override
@@ -80,9 +79,7 @@ class _NameDetailScreenState extends State<NameDetailScreen> {
             const SizedBox(height: 14),
             Center(
               child: PvPress(child: GestureDetector(
-                onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Pronunciation audio - coming soon'), behavior: SnackBarBehavior.floating),
-                ),
+                onTap: () => pvToast(context, 'Pronunciation audio - coming soon'),
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),

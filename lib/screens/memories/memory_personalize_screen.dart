@@ -43,6 +43,7 @@ import '../products/pv_store_chrome.dart'
     show PvCommit, kPvInk, kPvLine, pvStorePalette;
 import '../v2/v2_palette.dart' show V2Palette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class MemoryPersonalizeScreen extends StatefulWidget {
   const MemoryPersonalizeScreen({super.key, required this.type});
@@ -80,9 +81,7 @@ class _MemoryPersonalizeScreenState extends State<MemoryPersonalizeScreen> {
       MemoryAnalytics.photoAdded(widget.type.name);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(content: Text(S.now.couldNotAddPhoto(e))));
+        pvToast(context, S.now.couldNotAddPhoto(e), kind: PvToastKind.gentle);
       }
     }
   }

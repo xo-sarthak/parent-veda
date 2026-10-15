@@ -33,6 +33,7 @@ import '../localization/app_language.dart';
 import 'ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 import '../widgets/pv_feedback.dart' show PvPress;
+import 'saved_toast.dart';
 
 // ---- palette (light-only, matching the app) ---------------------------------
 const _bg = Color(0xFFFCFBFC);
@@ -267,8 +268,13 @@ class _BookCompanionScreenState extends State<BookCompanionScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 onPressed: () {
-                  ReadNextStore.instance.toggleSave(a.id);
-                  setState(() {});
+                  final was = ReadNextStore.instance.isSaved(a.id);
+                  void flip() {
+                    ReadNextStore.instance.toggleSave(a.id);
+                    if (mounted) setState(() {});
+                  }
+                  flip();
+                  pvSaveToast(context, nowSaved: !was, undo: flip);
                 },
                 child: Icon(
                   saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,

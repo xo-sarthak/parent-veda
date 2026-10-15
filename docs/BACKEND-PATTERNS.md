@@ -2639,6 +2639,42 @@ bleeding. The fix was not better arithmetic in the hero; it was the hero asking
 the resolver (`ctx.isPeriodDay`). Same lesson as the truth hierarchy: one owner
 per fact.
 
+## 16dd. Fire-and-forget, but not silent — `PvSyncHealth` (no migration, 2026-10-15)
+
+**The problem.** Cloud writes are fire-and-forget: `.catchError((_) {})`.
+That is right for the *data* (local-first: the phone's copy is the truth and
+the next sync recovers a lost push) and wrong for *trust*. She saves on a
+train, nothing says the cloud missed it, and later her partner's phone does
+not show it. The error was swallowed at the exact place we knew something.
+
+**The pattern.** Swallow, but report: `.catchError(PvSyncHealth.report)`.
+The reporter decides what the person hears, and it is deliberately stingy:
+
+- **Once per session.** The first network failure raises one gentle notice;
+  every later one is silent. A tunnel should cost one sentence, not twenty.
+  The flag lives in memory, so a still-offline next launch hears it again.
+- **Only network failures.** A `TimeoutException` or a socket error is her
+  connection. A schema mismatch or an RLS refusal is *our* bug, and telling
+  her "you're offline" would be a lie. Those stay silent here; the contract
+  tests (`test/ttc_schema_contract_test.dart`) are what catch them.
+- **Only when signed in.** An uninitialised backend must behave exactly like
+  being logged out (CLAUDE.md), and those writes never leave the phone.
+
+**The trade-off.** Classifying by the error's *text* (`'SocketException'`)
+rather than its type keeps `dart:io` out of a services file and survives the
+HTTP client wrapping its errors; it costs precision, since a new client could
+word a failure differently and slip through as "not network". Missing a
+notice is the safe direction to be wrong in: she was going to hear nothing
+before this anyway.
+
+**The general fact.** A `catchError` that does nothing throws away the only
+moment you knew something failed. Even when the UI must not break, route the
+error *somewhere* that can decide, so the decision lives in one place and not
+in two hundred empty closures.
+
+Wired: `CloudSyncedStore._pushNow`, `SavedStore._push`, `TtcSyncedStore`'s
+debounced push, `PvOrderStore`'s order insert.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -2712,3 +2748,4 @@ per fact.
     child, read whole (§16aa).
 31. `JournalStore._partnerChild` — sharing by reading under an existing partner policy (§16bb).
 32. `lib/ask_veda/pp_veda_corpus.dart` + the service's `scope_domain` / `stage_key_for` — namespaced prune, versioned cache key; `pvSignOut` — independent guards (§16cc).
+33. `lib/services/pv_sync_health.dart` — fire-and-forget, but report once (§16dd).

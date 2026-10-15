@@ -54,6 +54,7 @@ import '../widgets/mic_dictation_button.dart';
 import 'pregnancy/preg_chrome.dart' show PregNote, pregGroupLabelStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine;
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 /// ⚠️ THREE, AND THE CAP IS DELIBERATE RATHER THAN ARBITRARY. Review set it,
 /// and it holds up: a journal entry with twelve photos is an album, and the
@@ -298,8 +299,7 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
         'Location is switched off on this phone. You can type the place instead.',
       _ => 'Could not find the place just now. You can type it instead.',
     };
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    pvToast(context, msg, kind: PvToastKind.gentle);
   }
 
   @override

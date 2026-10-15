@@ -45,6 +45,7 @@ import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'garbh_shravan_surfaces.dart';
 import '../data/samvad_mantras_data.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 // --- warm palette ---
 // =============================================================================
@@ -2634,9 +2635,8 @@ class _BreathingScreenState extends State<_BreathingScreen> {
             onPressed: () {
               if (widget.daily) GarbhStore.instance.markDone('kriya');
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${s.gsWellDone} - ${s.gsWellDoneBody}')),
-              );
+              pvToast(context, '${s.gsWellDone} - ${s.gsWellDoneBody}',
+                  kind: PvToastKind.done);
             },
             child: Text(s.gsFinish),
           ),

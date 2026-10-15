@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'name_swipe_screen.dart';
 import 'pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 const List<(IconData, String)> _genders = [
   (Icons.male_rounded, 'Boy'),
@@ -80,9 +81,7 @@ class _NameFinderScreenState extends State<NameFinderScreen> {
             // optional nakshatra
             const SizedBox(height: 26),
             _pad(PvPress(child: GestureDetector(
-              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('You can add the birth star later'), behavior: SnackBarBehavior.floating),
-              ),
+              onTap: () => pvToast(context, 'You can add the birth star later'),
               behavior: HitTestBehavior.opaque,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),

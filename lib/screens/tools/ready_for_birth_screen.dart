@@ -46,6 +46,7 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../product_guide/product_guide_chooser.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// The Tools tab's "Get ready" hue, so the marks here match the row she tapped.
 const double _kReadyHue = 28;
@@ -520,8 +521,8 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
               Navigator.of(ctx).pop();
               await _bag.createBag(generateDefaultBag(_ctx.delivery), _ctx.delivery);
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(S.now.uiFreshStartFullList)));
+                pvToast(context, S.now.uiFreshStartFullList,
+                    kind: PvToastKind.done);
               }
             },
             child: Text(S.now.uiStartAgain2),

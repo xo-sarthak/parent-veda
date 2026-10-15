@@ -46,6 +46,7 @@ import '../../doctor/doctor_directory.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ---- Soft-solid palette (from the design) ---------------------------------
 const _bg = Color(0xFFFBF6FE);
@@ -187,18 +188,22 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     setState(() => _screen = s);
   }
 
-  void _soon(String label) => ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(
-        content: Text(S.now.comingSoonLabel(label)),
-        duration: const Duration(milliseconds: 1100)));
+  void _soon(String label) => pvToast(context, S.now.comingSoonLabel(label));
+  // Kept for revert — the theme's dark SnackBar, cleared first, 1.1 s:
+  // void _soon(String label) => ScaffoldMessenger.of(context)
+  //   ..clearSnackBars()
+  //   ..showSnackBar(SnackBar(
+  //       content: Text(S.now.comingSoonLabel(label)),
+  //       duration: const Duration(milliseconds: 1100)));
 
-  // Shows a message at the bottom of the screen (errors, hints). Pass a larger
-  // [ms] to keep long messages on screen long enough to read.
-  void _toast(String msg, {int ms = 1800}) => ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(
-        content: Text(msg), duration: Duration(milliseconds: ms)));
+  // Shows a message at the bottom of the screen (errors, hints). [ms] is kept
+  // for the callers; the one notice now times itself by word count.
+  void _toast(String msg, {int ms = 1800}) => pvToast(context, msg);
+  // Kept for revert — the theme's dark SnackBar, cleared first, held [ms]:
+  // void _toast(String msg, {int ms = 1800}) => ScaffoldMessenger.of(context)
+  //   ..clearSnackBars()
+  //   ..showSnackBar(SnackBar(
+  //       content: Text(msg), duration: Duration(milliseconds: ms)));
 
   // Creates the account in Supabase, then continues the flow.
   //
@@ -1765,9 +1770,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   /// Nudges rather than silently doing nothing: a dead button teaches the user
   /// the app is broken, where a message teaches them what to do next.
   void _nudgeForDate() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.now.uiPleaseAddDueDate)),
-    );
+    pvToast(context, S.now.uiPleaseAddDueDate, kind: PvToastKind.gentle);
   }
 
   Widget _primaryBtn(String label, VoidCallback onTap) => SizedBox(

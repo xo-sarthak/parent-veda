@@ -32,6 +32,7 @@ import '../cards/food_emoji.dart';
 import 'week_whatsapp_info_card.dart';
 import '../../theme/pv_fonts.dart';
 import '../pv_feedback.dart' show PvPress;
+import '../pv_toast.dart';
 
 const LinearGradient _pageGradient = LinearGradient(
   begin: Alignment.topCenter,
@@ -848,8 +849,7 @@ class WeekVideoCard extends StatelessWidget {
         ]),
         const SizedBox(height: 14),
         PvPress(child: GestureDetector(
-          onTap: () => ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(s.wkVideoSoon))),
+          onTap: () => pvToast(context, s.wkVideoSoon),
           child: AspectRatio(
             aspectRatio: 16 / 9,
             child: Container(
@@ -1040,13 +1040,15 @@ class WeekShareCard extends StatelessWidget {
   final AppLanguage lang;
 
   Future<void> _share(BuildContext context, S s) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     try {
       final msg =
           '👶 ${s.partnerShareHeader(w.week)}\n\n${w.partner.shareMessage.of(lang)}\n\n${s.partnerShareFooter} 💜';
       await Share.share(msg, subject: s.partnerShareSubject(w.week));
     } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(s.shareFailed)));
+      // pvToast checks mounted itself and falls back to the app navigator.
+      // ignore: use_build_context_synchronously
+      pvToast(nav.context, s.shareFailed, kind: PvToastKind.gentle);
     }
   }
 

@@ -63,6 +63,7 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // Kept for revert: the phase colours before the one ink.
 // const Color _activeColor = Color(0xFFE8833A); // orange - active contraction
@@ -324,8 +325,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     setState(() => _laborResponse = response);
     _save();
     if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(_s.laborSavedNote)));
+      pvToast(context, _s.laborSavedNote, kind: PvToastKind.done);
     }
   }
 
@@ -1880,9 +1880,11 @@ class _SummaryScreen extends StatelessWidget {
               minimumSize: const WidgetStatePropertyAll(Size.fromHeight(50)),
             ),
             onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
+              final nav = Navigator.of(context);
               await Clipboard.setData(ClipboardData(text: summaryText()));
-              messenger.showSnackBar(SnackBar(content: Text(s.summaryCopied)));
+              // pvToast checks mounted itself and falls back to the app navigator.
+              // ignore: use_build_context_synchronously
+              pvToast(nav.context, s.summaryCopied, kind: PvToastKind.done);
             },
             icon: const Icon(Icons.copy_rounded, size: 18),
             label: Text(s.copySummaryCta,

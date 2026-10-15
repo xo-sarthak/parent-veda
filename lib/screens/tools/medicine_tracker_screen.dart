@@ -32,6 +32,7 @@ import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class MedicineTrackerScreen extends StatefulWidget {
   const MedicineTrackerScreen({super.key, required this.controller});
@@ -1278,6 +1279,8 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
 
   void _snack(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    pvToast(context, msg, kind: PvToastKind.done);
+    // Kept for revert — the theme's dark SnackBar bar:
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 }

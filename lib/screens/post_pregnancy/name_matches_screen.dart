@@ -13,6 +13,7 @@ import 'journal_screen.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 const Color _gold = Color(0xFFE9C877);
 
@@ -28,9 +29,11 @@ class _NameMatchesScreenState extends State<NameMatchesScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _snack(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
-      );
+  void _snack(String msg) => pvToast(context, msg);
+  // Kept for revert — the floating Material SnackBar:
+  // void _snack(String msg) => ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+  //     );
 
   @override
   Widget build(BuildContext context) {

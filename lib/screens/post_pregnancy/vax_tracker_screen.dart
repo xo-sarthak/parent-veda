@@ -24,6 +24,7 @@ import 'pp_vaccine_data.dart';
 import 'vax_detail_screen.dart';
 import 'vax_timeline_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 export 'pp_vax_tracker_screen.dart' show VaxTrackerScreen, ppVaxMarkGiven;
 
@@ -349,7 +350,6 @@ class VaxTrackerClassic extends StatelessWidget {
     final lead = v.lead;
     final base = vaxVisitDate(v) ?? vaxDueDate();
     void set(int daysBefore, String label) {
-      final messenger = ScaffoldMessenger.of(context);
       Navigator.of(context).pop();
       VaxStore.instance.setReminder(v.id, true);
       NotificationService.instance.requestPermission();
@@ -361,7 +361,7 @@ class VaxTrackerClassic extends StatelessWidget {
             : "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(v)}.",
         when: base.subtract(Duration(days: daysBefore)),
       );
-      messenger.showSnackBar(SnackBar(content: Text('Alarm set - $label'), behavior: SnackBarBehavior.floating));
+      pvToast(context, 'Alarm set - $label', kind: PvToastKind.done);
     }
 
     showModalBottomSheet<void>(

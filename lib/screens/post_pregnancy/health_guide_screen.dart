@@ -16,6 +16,7 @@ import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class HealthGuideScreen extends StatelessWidget {
   const HealthGuideScreen({super.key});
@@ -24,9 +25,11 @@ class HealthGuideScreen extends StatelessWidget {
   static const Color _greenBg = Color(0xFFEAF6EF);
   static const Color _warnBg = Color(0xFFFFF7EE);
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 

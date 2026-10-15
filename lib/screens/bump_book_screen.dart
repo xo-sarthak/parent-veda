@@ -35,6 +35,7 @@ import '../theme/app_theme.dart';
 import '../widgets/storage_image.dart';
 import '../theme/pv_fonts.dart';
 import '../services/pdf_fonts.dart';
+import '../widgets/pv_toast.dart';
 
 /// What the book opens on. The bump ritual's book sheet lists the three
 /// things the book does as three rows; each one opens this screen and, for
@@ -534,7 +535,6 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
 
   // --- Download (multi-page PDF) ---------------------------------------------
   Future<void> _download(List<BumpPhoto> photos) async {
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     setState(() => _busy = true);
     try {
@@ -564,9 +564,11 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
             _BumpBookPreviewScreen(bytes: pdfBytes, filePath: file.path, lang: widget.lang),
       ));
     } catch (_) {
-      messenger.showSnackBar(SnackBar(
-          content: Text(_t('Could not build the book. Please try again.',
-              'किताब नहीं बन पाई। एक बार फिर कोशिश कीजिए।'))));
+      pvToast(
+          navigator.context,
+          _t('Could not build the book. Please try again.',
+              'किताब नहीं बन पाई। एक बार फिर कोशिश कीजिए।'),
+          kind: PvToastKind.gentle);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -787,10 +789,10 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                   // Intentionally disabled - no real commerce yet.
                   onPressed: () {
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(_t(
-                            'We will notify you when printed copies are ready.',
-                            'छपी हुई कॉपी तैयार होते ही हम आपको बता देंगे।'))));
+                    pvToast(
+                        context,
+                        _t('We will notify you when printed copies are ready.',
+                            'छपी हुई कॉपी तैयार होते ही हम आपको बता देंगे।'));
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: _accentDeep,
@@ -848,7 +850,7 @@ class _BumpBookPreviewScreen extends StatelessWidget {
   final AppLanguage lang;
 
   Future<void> _share(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     try {
       await Share.shareXFiles(
         [XFile(filePath, mimeType: 'application/pdf')],
@@ -857,8 +859,10 @@ class _BumpBookPreviewScreen extends StatelessWidget {
             : 'मेरी बंप जर्नी की यादगार किताब',
       );
     } catch (_) {
-      messenger.showSnackBar(SnackBar(
-          content: Text(lang.isEnglish ? 'Could not share.' : 'शेयर नहीं हो पाया.')));
+      // ignore: use_build_context_synchronously
+      pvToast(nav.context,
+          lang.isEnglish ? 'Could not share.' : 'शेयर नहीं हो पाया.',
+          kind: PvToastKind.gentle);
     }
   }
 

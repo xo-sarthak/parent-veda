@@ -41,6 +41,7 @@ import '../products/pv_store_chrome.dart' show PvChip, PvCommit, kPvLine, pvStor
 import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 const Color _lav = Color(0xFFB79BDD);
 const Color _dividerDark = Color(0xFF45414A);
@@ -92,9 +93,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(String msg) => pvToast(context, msg);
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(String msg) => ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+  //     );
 
   // Required monthly contribution for the target (ordinary-annuity FV at an
   // assumed 11% p.a.), rounded to the nearest ₹100. Illustration only.

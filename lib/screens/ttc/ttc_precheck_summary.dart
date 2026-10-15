@@ -50,6 +50,7 @@ import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class TtcPrecheckSummaryScreen extends StatelessWidget {
   const TtcPrecheckSummaryScreen({super.key});
@@ -439,11 +440,11 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
     }
 
     Clipboard.setData(ClipboardData(text: buf.toString()));
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      content: Text(t('Summary copied. Paste it into a message or your notes.',
-          'Summary copy ho gayi')),
-    ));
+    pvToast(
+        context,
+        t('Summary copied. Paste it into a message or your notes.',
+            'Summary copy ho gayi'),
+        kind: PvToastKind.done);
   }
 }
 

@@ -50,6 +50,7 @@ import '../../services/sponsor_admin_store.dart';
 import '../../services/usage_events.dart';
 import '../../theme/app_theme.dart';
 import 'enterprise_common.dart';
+import '../../widgets/pv_toast.dart';
 
 class SponsorDashboardScreen extends StatefulWidget {
   const SponsorDashboardScreen({super.key, this.lang = AppLanguage.english});
@@ -478,12 +479,13 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
 
     final res = await SponsorAdminStore.instance.removeMember(r.workEmail);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(res['ok'] == true
-          ? _p('${r.workEmail} removed.', '${r.workEmail} हटा दिया गया।')
-          : (res['message'] ?? _p('That did not work.', 'यह नहीं हो पाया।'))
-              .toString()),
-    ));
+    pvToast(
+        context,
+        res['ok'] == true
+            ? _p('${r.workEmail} removed.', '${r.workEmail} हटा दिया गया।')
+            : (res['message'] ?? _p('That did not work.', 'यह नहीं हो पाया।'))
+                .toString(),
+        kind: res['ok'] == true ? PvToastKind.done : PvToastKind.gentle);
   }
 
   static String monthInitial(DateTime d) =>

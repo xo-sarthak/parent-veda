@@ -14,6 +14,7 @@ import 'watch_common.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class WatchLibraryScreen extends StatelessWidget {
   const WatchLibraryScreen({super.key});
@@ -63,9 +64,7 @@ class WatchLibraryScreen extends StatelessWidget {
 
                 const SizedBox(height: 8),
                 _pad(PvPress(child: GestureDetector(
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Offline downloads coming soon'), behavior: SnackBarBehavior.floating),
-                  ),
+                  onTap: () => pvToast(context, 'Offline downloads coming soon'),
                   behavior: HitTestBehavior.opaque,
                   child: Row(children: [
                     const Icon(Icons.download_outlined, size: 18, color: ppPurple),

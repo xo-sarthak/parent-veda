@@ -21,6 +21,7 @@ import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // Kept for revert: the soft shadow every card and chip cast before the
 // one-ParentVeda pass (2026-09-30), which draws hairlines instead.
@@ -640,8 +641,8 @@ class _SymptomDetail extends StatelessWidget {
                       );
                       if (ctx.mounted) Navigator.pop(ctx);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(s.symLogged(x.name.of(lang)))));
+                        pvToast(context, s.symLogged(x.name.of(lang)),
+                            kind: PvToastKind.done);
                       }
                     },
                     child: Text(s.saveCta),

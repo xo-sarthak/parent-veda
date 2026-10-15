@@ -20,6 +20,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_recipes_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class RecipePageScreen extends StatelessWidget {
   const RecipePageScreen({super.key, this.recipe});
@@ -31,9 +32,11 @@ class RecipePageScreen extends StatelessWidget {
         child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
       ));
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   @override
   Widget build(BuildContext context) {

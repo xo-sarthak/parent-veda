@@ -18,6 +18,7 @@ import 'video/pv_video_player.dart';
 import 'watch_common.dart';
 import 'watch_quicklearn_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class WatchPlayerScreen extends StatefulWidget {
   const WatchPlayerScreen({super.key, required this.video});
@@ -51,7 +52,9 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 22), child: c);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
-  void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+  void _soon(String m) => pvToast(context, m);
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
   Widget _player() {
     return PvVideoPlayer(

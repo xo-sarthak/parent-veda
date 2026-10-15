@@ -18,6 +18,7 @@ import '../../booking/prescription.dart';
 import '../../booking/prescription_bridge.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
+import '../../widgets/pv_toast.dart';
 
 class PrescriptionViewScreen extends StatefulWidget {
   const PrescriptionViewScreen({
@@ -45,15 +46,14 @@ class _PrescriptionViewScreenState extends State<PrescriptionViewScreen> {
     );
     setState(() => _saved = true);
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-        content: Text(filed == 0
+    pvToast(
+        context,
+        filed == 0
             ? 'Saved to Health → Prescriptions.'
             : filed == 1
                 ? 'Saved. 1 medicine added to your health records.'
-                : 'Saved. $filed medicines added to your health records.'),
-      ));
+                : 'Saved. $filed medicines added to your health records.',
+        kind: PvToastKind.done);
   }
 
   @override

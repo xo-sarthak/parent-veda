@@ -34,6 +34,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'door/diet_chart_plan_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class DietChartsScreen extends StatefulWidget {
   const DietChartsScreen({super.key, required this.pregnancy});
@@ -525,10 +526,11 @@ class _DietChartScreenState extends State<DietChartScreen> {
         // Devanagari — so an offline Hindi export would be a document full of
         // empty rectangles. She might print that and take it to a doctor.
         // Saying "not right now" is the honest failure; a blank chart is not.
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Could not prepare the file. Please try again on a '
-              'connection.'),
-        ));
+        pvToast(
+            context,
+            'Could not prepare the file. Please try again on a '
+            'connection.',
+            kind: PvToastKind.gentle);
         return;
       }
       await DietChartPdf.present(chart: widget.chart, bytes: bytes);

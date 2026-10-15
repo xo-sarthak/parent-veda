@@ -19,6 +19,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'mm_crisis_path.dart';
 import 'mm_talk_tab.dart' show showCounsellingBookingSheet;
+import '../../widgets/pv_toast.dart';
 
 class MmTrackTab extends StatefulWidget {
   const MmTrackTab({super.key, this.embedded = false});
@@ -68,12 +69,8 @@ class _MmTrackTabState extends State<MmTrackTab> {
       // own words back to her.
       openCrisisPath(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text('Saved. This stays private to you.'),
-        backgroundColor: p.ink1,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ));
+      pvToast(context, 'Saved. This stays private to you.',
+          kind: PvToastKind.done);
     }
   }
 

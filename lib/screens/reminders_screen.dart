@@ -31,6 +31,7 @@ import 'pregnancy/preg_chrome.dart';
 import 'pregnancy/preg_messages_screen.dart' show PregMessageSwitches;
 import 'pregnancy/preg_tool_chrome.dart';
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../widgets/pv_toast.dart';
 
 /// A quick-add suggestion (its title comes from S so it stays bilingual).
 typedef _Preset = ({
@@ -264,10 +265,8 @@ class RemindersScreen extends StatelessWidget {
                     await NotificationService.instance.requestPermission();
                     await NotificationService.instance.showNow();
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context)
-                        ..clearSnackBars()
-                        ..showSnackBar(SnackBar(
-                            content: Text(S.now.uiTestNotificationSentCheck)));
+                      pvToast(context, S.now.uiTestNotificationSentCheck,
+                          kind: PvToastKind.done);
                     }
                   },
                 ),
@@ -284,11 +283,7 @@ class RemindersScreen extends StatelessWidget {
                     final result =
                         await NotificationService.instance.scheduleTestIn1Min();
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context)
-                        ..clearSnackBars()
-                        ..showSnackBar(SnackBar(
-                            duration: const Duration(seconds: 8),
-                            content: Text(result)));
+                      pvToast(context, result);
                     }
                   },
                 ),
@@ -620,18 +615,14 @@ class _ReminderEditorState extends State<_ReminderEditor> {
           _repeat == ReminderRepeat.customDays ? weekdays : const [],
     ));
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(s.rmdSaved)));
+    pvToast(context, s.rmdSaved, kind: PvToastKind.done);
   }
 
   void _delete(S s) {
     final id = widget.existing?.id;
     if (id != null) ReminderStore.instance.remove(id);
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(s.rmdRemoved)));
+    pvToast(context, s.rmdRemoved, kind: PvToastKind.done);
   }
 
   @override
@@ -971,9 +962,7 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
     }
     store.upsert(r);
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(s.mrSaved)));
+    pvToast(context, s.mrSaved, kind: PvToastKind.done);
   }
 
   @override

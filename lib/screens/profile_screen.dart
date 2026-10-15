@@ -65,6 +65,7 @@ import '../theme/pv_fonts.dart';
 import '../services/auth/social_auth.dart';
 import '../services/auth/delete_account.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen(
@@ -541,7 +542,6 @@ class ProfileScreenClassic extends StatelessWidget {
   Future<void> _deleteAccount(BuildContext context) async {
     final s = S.now;
     final controller = TextEditingController();
-    final messenger = ScaffoldMessenger.of(context);
     final nav = Navigator.of(context);
 
     final confirmed = await showDialog<bool>(
@@ -589,18 +589,18 @@ class ProfileScreenClassic extends StatelessWidget {
 
     if (confirmed != true) return;
 
-    messenger
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(s.deleteAccountWorking)));
+    // One notice that turns from "working" into the answer, in place.
+    // ignore: use_build_context_synchronously
+    final working = pvToastWorking(nav.context, s.deleteAccountWorking);
 
     final ok = await DeleteAccount.run();
 
-    messenger.clearSnackBars();
     if (!ok) {
       // Still signed in, nothing lost, free to try again.
-      messenger.showSnackBar(SnackBar(content: Text(s.deleteAccountFailed)));
+      working.gentle(s.deleteAccountFailed);
       return;
     }
+    working.dismiss();
     if (!context.mounted) return;
 
     // THE APP CLOSES, and that is the point rather than a shortcut.
@@ -720,15 +720,14 @@ class ProfileScreenClassic extends StatelessWidget {
   /// Testing reset - clear the due date + pregnancy-map data, snap back to the
   /// week-20 placeholder, and drop the user on a fresh Today screen.
   Future<void> _resetForTesting(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
     final nav = Navigator.of(context);
     await controller.resetForTesting();
     JourneyDatesStore.instance.clearAll();
     await ScansStore.instance.clearAllForTesting();
     AppNav.instance.goToday();
     nav.popUntil((r) => r.isFirst); // back to the main scaffold (Today)
-    messenger.showSnackBar(SnackBar(
-        content: Text(S.now.uiResetWeekDueDate)));
+    // ignore: use_build_context_synchronously
+    pvToast(nav.context, S.now.uiResetWeekDueDate, kind: PvToastKind.done);
   }
 
   /// "Sign out" - clears the local auth flag and replays the auth flow over the
@@ -828,8 +827,7 @@ class _InvitePartnerCardState extends State<_InvitePartnerCard> {
     final code = _code;
     if (code == null) return;
     Clipboard.setData(ClipboardData(text: code));
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.now.uiPairingCodeCopied)));
+    pvToast(context, S.now.uiPairingCodeCopied, kind: PvToastKind.done);
   }
 
   @override
@@ -1080,14 +1078,12 @@ class _WhatsAppCardState extends State<_WhatsAppCard> {
       source: 'profile_screen',
     );
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-        content: Text(ok
+    pvToast(
+        context,
+        ok
             ? (optIn ? S.now.whatsappUpdatesOn : S.now.whatsappUpdatesOff)
-            : S.now.couldNotSaveRetry),
-        duration: const Duration(milliseconds: 1400),
-      ));
+            : S.now.couldNotSaveRetry,
+        kind: ok ? PvToastKind.done : PvToastKind.gentle);
   }
 
   Future<void> _toggle(bool v) async {

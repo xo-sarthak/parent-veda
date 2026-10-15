@@ -30,6 +30,8 @@ import '../widgets/mic_dictation_button.dart';
 import 'community_profile_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
+import 'saved_toast.dart';
 
 const Color _accent = AppTheme.primary500;
 const Color _like = AppTheme.secondary500;
@@ -190,10 +192,12 @@ bool _isExpertAuthor(CommunityPost post) =>
     post.cred.isNotEmpty || post.type == PostType.expert;
 
 void _toast(BuildContext c, String m) {
-  ScaffoldMessenger.of(c)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(
-        content: Text(m), duration: const Duration(milliseconds: 1300)));
+  pvToast(c, m);
+  // Kept for revert — the theme's dark SnackBar, cleared first, 1.3 s:
+  // ScaffoldMessenger.of(c)
+  //   ..clearSnackBars()
+  //   ..showSnackBar(SnackBar(
+  //       content: Text(m), duration: const Duration(milliseconds: 1300)));
 }
 
 /// One engagement action (icon + optional count), Twitter-style.
@@ -982,14 +986,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           size: 22),
                       onPressed: () {
                         store.setDoctorMode(!store.doctorMode);
-                        ScaffoldMessenger.of(context)
-                          ..clearSnackBars()
-                          ..showSnackBar(SnackBar(
-                            duration: const Duration(milliseconds: 1100),
-                            content: Text(store.doctorMode
-                                ? s.cmDoctorOn
-                                : s.cmDoctorOff),
-                          ));
+                        pvToast(
+                            context,
+                            store.doctorMode ? s.cmDoctorOn : s.cmDoctorOff,
+                            kind: PvToastKind.done);
                       },
                     ),
                     const SizedBox(width: 4),
@@ -1627,8 +1627,7 @@ class _PulseCardView extends StatelessWidget {
         ));
       case PulseType.expert:
         return PvPress(child: GestureDetector(
-          onTap: () => ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(s.cmComingSoon))),
+          onTap: () => pvToast(context, s.cmComingSoon),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.notifications_active_rounded, size: 16, color: color),
             const SizedBox(width: 6),
@@ -1858,7 +1857,12 @@ class CommunityPostCard extends StatelessWidget {
                                     : Icons.bookmark_border_rounded,
                                 label: '',
                                 color: saved ? _accent : AppTheme.neutral500,
-                                onTap: () => store.toggleSave(post.id)),
+                                onTap: () {
+                                  void flip() => store.toggleSave(post.id);
+                                  flip();
+                                  pvSaveToast(context,
+                                      nowSaved: !saved, undo: flip, where: 'Post saved', canView: false);
+                                }),
                             _EngageButton(
                                 icon: Icons.ios_share_rounded,
                                 label: '',
@@ -2720,8 +2724,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     );
     CommunityStore.instance.addPost(post);
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(asDoctor ? s.cmPostedAsDoctor : s.cmPosted)));
+    pvToast(context, asDoctor ? s.cmPostedAsDoctor : s.cmPosted,
+        kind: PvToastKind.done);
   }
 
   @override

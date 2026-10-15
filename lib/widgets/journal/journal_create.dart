@@ -24,28 +24,37 @@ import '../../theme/app_theme.dart';
 import '../mic_dictation_button.dart';
 import '../../theme/pv_fonts.dart';
 import '../pv_feedback.dart' show PvPress;
+import '../pv_toast.dart';
 
 /// A small, on-brand "saved" confirmation at the bottom of the screen.
+///
+/// Now `pvToast` (2026-10-15). The messenger's context still finds the root
+/// overlay, so no caller changes.
 void _savedSnack(ScaffoldMessengerState m, String msg) {
-  m
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: AppTheme.primary600,
-      duration: const Duration(seconds: 2),
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      content: Row(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-        const SizedBox(width: 10),
-        Flexible(
-          child: Text(msg,
-              style: pvManrope(
-                  color: Colors.white, fontWeight: FontWeight.w600)),
-        ),
-      ]),
-    ));
+  pvToast(m.context, msg, kind: PvToastKind.done);
 }
+
+// Kept for revert — a violet SnackBar with a white tick:
+//   void _savedSnackOld(ScaffoldMessengerState m, String msg) {
+//     m
+//       ..hideCurrentSnackBar()
+//       ..showSnackBar(SnackBar(
+//         behavior: SnackBarBehavior.floating,
+//         backgroundColor: AppTheme.primary600,
+//         duration: const Duration(seconds: 2),
+//         shape:
+//             RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+//         content: Row(mainAxisSize: MainAxisSize.min, children: [
+//           const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+//           const SizedBox(width: 10),
+//           Flexible(
+//             child: Text(msg,
+//                 style: pvManrope(
+//                     color: Colors.white, fontWeight: FontWeight.w600)),
+//           ),
+//         ]),
+//       ));
+//   }
 
 // ---------------------------------------------------------------------------
 //  Public entry points
@@ -220,8 +229,7 @@ Future<void> openJournalAddPhoto(
     _savedSnack(messenger, s.jcSavedPhoto);
   } catch (_) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(s.cameraFailed)));
+      pvToast(context, s.cameraFailed, kind: PvToastKind.gentle);
     }
   }
 }
@@ -362,8 +370,7 @@ class _VoiceRecordSheetState extends State<_VoiceRecordSheet> {
     } else {
       if (!await _rec.hasPermission()) {
         if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(s.jcMicNeeded)));
+          pvToast(context, s.jcMicNeeded, kind: PvToastKind.gentle);
         }
         return;
       }

@@ -39,6 +39,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'life_stage_store.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'pv_sync_health.dart';
 
 /// The wire vocabulary — `id` is what the database's check constraint accepts.
 /// Persisted, compared, sent: identity, never display.
@@ -329,7 +330,7 @@ class SavedStore extends ChangeNotifier {
     if (uid == null) return;
     SupabaseRepo.upsertRow(table, {...it.toRow(), 'user_id': uid},
             onConflict: 'user_id,kind,item_id')
-        .catchError((_) {});
+        .catchError(PvSyncHealth.report);
   }
 
   // ---- merge -----------------------------------------------------------------

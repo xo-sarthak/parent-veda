@@ -87,6 +87,7 @@ import '../products/pv_shelf_screen.dart';
 import '../products/pv_store_chrome.dart';
 import '../products/pv_store_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// ⚠️ 320, WHICH IS THE DESIGN'S OWN HERO HUE — put back 2026-09-03.
 ///
@@ -2127,18 +2128,15 @@ class _TtcProductPageState extends State<TtcProductPageClassic> {
                     // a vote nobody makes twice.
                     onVote: (v) {
                       setState(() => _vote = v);
-                      ScaffoldMessenger.of(context)
-                        ..clearSnackBars()
-                        ..showSnackBar(SnackBar(
-                          content: Text(
-                              v == 'up'
-                                  ? 'Thank you. That helps us know which '
-                                      'pages are worth writing.'
-                                  : 'Thanks for telling us. We rewrite pages '
-                                      'people mark this way before we write '
-                                      'new ones.',
-                              style: ttcBody(13, color: Colors.white, h: 1.4)),
-                        ));
+                      pvToast(
+                          context,
+                          v == 'up'
+                              ? 'Thank you. That helps us know which '
+                                  'pages are worth writing.'
+                              : 'Thanks for telling us. We rewrite pages '
+                                  'people mark this way before we write '
+                                  'new ones.',
+                          kind: PvToastKind.done);
                     },
                   ),
 
@@ -2375,10 +2373,8 @@ class _TtcProductPageState extends State<TtcProductPageClassic> {
     if (picked.length < 2) {
       // ⚠️ IT SAYS WHAT HAPPENED. A tick with no visible effect is the same
       // dead button by another route.
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Added to compare. Tick one more on any shelf.',
-            style: ttcBody(13, color: Colors.white)),
-      ));
+      pvToast(context, 'Added to compare. Tick one more on any shelf.',
+          kind: PvToastKind.done);
       setState(() {});
       return;
     }

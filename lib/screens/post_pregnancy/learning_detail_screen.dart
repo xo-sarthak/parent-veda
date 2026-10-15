@@ -22,6 +22,7 @@ import 'provider_profile_screen.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -64,8 +65,10 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
         .push(MaterialPageRoute<void>(builder: (_) => CourseLessonScreen(course: course, index: i)));
   }
 
-  void _snack(String msg) =>
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
+  void _snack(String msg) => pvToast(context, msg);
+  // Kept for revert — the floating Material SnackBar:
+  // void _snack(String msg) =>
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
 
   // --- CTA action -------------------------------------------------------
   void _onCta(LearningCta cta) {

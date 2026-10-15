@@ -28,19 +28,21 @@
 //  checkout) draw no bar — the sticky commit bar takes that space.
 // =============================================================================
 
+export '../../widgets/pv_toast.dart'
+    show kPvStickyBarClearance, kPvSnackOverTtcBar, kPvSnackAtFoot, pvSnackLiftFor;
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 
 import '../../data/products/pv_category_images.dart';
 import '../../models/pv_product.dart';
-import '../../services/father_preview.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
 import '../../services/pv_compare_store.dart';
 import '../../services/saved_store.dart';
 import '../../theme/pv_fonts.dart';
-import '../../widgets/global_ask_fab.dart' show fabRouteObserver;
+import '../../widgets/pv_toast.dart';
 import '../post_pregnancy/pp_common.dart' show PpBottomNav, PpTab;
 import '../ttc/ttc_common.dart' show TtcBottomNav;
 import '../auth/onboarding/onboarding_chrome.dart' show ObPress;
@@ -122,180 +124,166 @@ void pvOpenProduct(BuildContext context, PvProduct p, {String? heroTag}) {
 /// make it look like one". So a notice is a white card with ink text, and it
 /// floats ABOVE the sticky bar (52 + padding + the safe inset) rather than
 /// over it. Never the brand colour, never a fill that matches a button.
+/// The house notice, kept as a name so ~100 callers need no edit.
+///
+/// ⚠️ NOW A SHIM OVER `pvToast` (2026-10-15, the user: "our app lacks toasts
+/// a lot", asking for Mobbin-grade motion). The white card, ink pill and
+/// lift rules are unchanged; what changed is the engine underneath: one
+/// overlay notice that rises with a settle, morphs into the next instead of
+/// cutting it, swipes away and holds while pressed. See
+/// `lib/widgets/pv_toast.dart`. The mapping: a leading [icon] is a
+/// confirmation (`done`), "Undo" is `undo`, any other action is `info` with
+/// a pill.
 void pvSnack(
   BuildContext context,
   String text, {
   String? action,
   VoidCallback? onAction,
-  // How far above the screen's foot to float. Defaults to the Store's sticky
-  // bar clearance; a screen with a shorter bar passes its own, or the
-  // confirmation floats over its content (the recipe page, 2026-09-23: it
-  // sat on top of an ingredient row).
   double? lift,
-  // A leading mark for a notice that CONFIRMS something ("on your list").
-  // Opt-in, never the default: this helper also carries errors ("Payment did
-  // not go through"), and a tick on those would say the opposite of the words.
   IconData? icon,
 }) {
-  final p = pvStorePalette;
-  final inset = MediaQuery.of(context).padding.bottom;
-  final messenger = ScaffoldMessenger.of(context);
-  lift ??= pvSnackLiftFor(context);
-  // ⚠️ REDESIGNED 2026-09-23 — the user: "these pop ups… look very bland and
-  // poor, and it is just staying on the screen." Two fixes in one:
-  //  · STAYING: Flutter 3.44 made a SnackBar with an `action` persist until
-  //    dismissed (`persist ?? action != null`). This one builds its own
-  //    action inside `content` and passes no `action`, so it always times
-  //    out; `persist: false` says so explicitly as well.
-  //  · BLAND: still WHITE (the user's rule above — an ink notice over an ink
-  //    bar reads as one object), but lifted by a soft shadow instead of a
-  //    hairline, an optional tick in a tinted disc, bolder words, and the
-  //    action as a small INK PILL with an arrow — the base UI's pill — rather
-  //    than faint coloured text. Mobbin 2026-09-23: Notion Mail, Quicken,
-  //    Drive (the action on the right, bold, short), Character AI and
-  //    Linktree (the tick that says done before the words do).
-  messenger
-    ..clearSnackBars()
-    ..showSnackBar(
-      SnackBar(
-        persist: false,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        padding: EdgeInsets.zero,
-        margin: EdgeInsets.fromLTRB(16, 0, 16, (lift ?? kPvStickyBarClearance) + inset),
-        duration: Duration(milliseconds: action == null ? 2200 : 3600),
-        // ⚠️ IT RISES INTO PLACE (2026-09-30, the user: "very abrupt… no
-        // animation, no effect, no motion, no smoothness"). The SnackBar's
-        // own entrance is a plain fade; the card now also lifts 14 points
-        // and settles with an ease-out, the way iOS and Material 3 toasts
-        // arrive. Kept for revert: `content: Container(` with no wrapper.
-        content: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
-          duration: const Duration(milliseconds: 320),
-          curve: Curves.easeOutCubic,
-          builder: (context, v, child) => Opacity(
-            opacity: v,
-            child: Transform.translate(
-                offset: Offset(0, (1 - v) * 14), child: child),
-          ),
-          child: Container(
-          padding: EdgeInsets.fromLTRB(icon == null ? 16 : 12, 10, action == null ? 16 : 8, 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            // ⚠️ A SHADOW YOU CAN SEE (2026-10-01, the user: the notice "needs
-            // shadow … it blends with the screen, so no difference"). White on
-            // a white page with a 10% shadow read as no card at all. Now a
-            // deeper, wider fall, a tighter contact shadow under the edge and
-            // a hairline, so it lifts off every ground. Kept for revert: the
-            // two shadows were alpha 0.10 blur 24 offset 8, and alpha 0.06
-            // blur 3 offset 1, with no border.
-            border: Border.all(color: p.ink1.withValues(alpha: 0.10), width: 1),
-            boxShadow: [
-              BoxShadow(color: p.ink1.withValues(alpha: 0.24), blurRadius: 30, spreadRadius: 1, offset: const Offset(0, 12)),
-              BoxShadow(color: p.ink1.withValues(alpha: 0.16), blurRadius: 8, offset: const Offset(0, 3)),
-            ],
-          ),
-          child: Row(children: [
-            if (icon != null) ...[
-              Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(color: const Color(0xFFE3F2E6), shape: BoxShape.circle),
-                child: Icon(icon, size: 17, color: const Color(0xFF2E7D4F)),
-              ),
-              const SizedBox(width: 10),
-            ],
-            Expanded(
-              child: Text(text,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.3, color: p.ink1)),
-            ),
-            if (action != null) ...[
-              const SizedBox(width: 10),
-              Material(
-                color: p.ink1,
-                shape: const StadiumBorder(),
-                child: InkWell(
-                  customBorder: const StadiumBorder(),
-                  onTap: () {
-                    messenger.hideCurrentSnackBar();
-                    (onAction ?? () {})();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(action,
-                          style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
-                      const SizedBox(width: 3),
-                      const Icon(Icons.arrow_forward_rounded, size: 15, color: Colors.white),
-                    ]),
-                  ),
-                ),
-              ),
-            ],
-          ]),
-        ),
-        ),
-      ),
-    );
-  // Kept for revert — the white card with a hairline and a text action:
-  //   SnackBar(content: Text(text, style: pvManrope(fontSize: 13.5, ...)),
-  //     backgroundColor: Colors.white, shape: RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.circular(14), side: BorderSide(color: p.ink1 18%)),
-  //     action: SnackBarAction(label: action, textColor: p.action, ...))
+  pvToast(context, text,
+      kind: icon != null
+          ? PvToastKind.done
+          : action == 'Undo'
+              ? PvToastKind.undo
+              : PvToastKind.info,
+      icon: icon == Icons.check_rounded ? null : icon,
+      action: action,
+      onAction: onAction,
+      lift: lift);
 }
 
-/// Where a notice floats from: above the sticky commit bar (52 pill + 12 +
-/// 12 = 76) AND above the Ask pill's lane (it sits at bottom 92, 64 tall),
-/// so a notice with an action never has its action under the FAB — found on
-/// the phone with "View bag" half-covered.
-const double kPvStickyBarClearance = 164;
+// Kept for revert — the SnackBar-based pvSnack (2026-09-23 .. 2026-10-15):
+// void pvSnack(
+//   BuildContext context,
+//   String text, {
+//   String? action,
+//   VoidCallback? onAction,
+//   // How far above the screen's foot to float. Defaults to the Store's sticky
+//   // bar clearance; a screen with a shorter bar passes its own, or the
+//   // confirmation floats over its content (the recipe page, 2026-09-23: it
+//   // sat on top of an ingredient row).
+//   double? lift,
+//   // A leading mark for a notice that CONFIRMS something ("on your list").
+//   // Opt-in, never the default: this helper also carries errors ("Payment did
+//   // not go through"), and a tick on those would say the opposite of the words.
+//   IconData? icon,
+// }) {
+//   final p = pvStorePalette;
+//   final inset = MediaQuery.of(context).padding.bottom;
+//   final messenger = ScaffoldMessenger.of(context);
+//   lift ??= pvSnackLiftFor(context);
+//   // ⚠️ REDESIGNED 2026-09-23 — the user: "these pop ups… look very bland and
+//   // poor, and it is just staying on the screen." Two fixes in one:
+//   //  · STAYING: Flutter 3.44 made a SnackBar with an `action` persist until
+//   //    dismissed (`persist ?? action != null`). This one builds its own
+//   //    action inside `content` and passes no `action`, so it always times
+//   //    out; `persist: false` says so explicitly as well.
+//   //  · BLAND: still WHITE (the user's rule above — an ink notice over an ink
+//   //    bar reads as one object), but lifted by a soft shadow instead of a
+//   //    hairline, an optional tick in a tinted disc, bolder words, and the
+//   //    action as a small INK PILL with an arrow — the base UI's pill — rather
+//   //    than faint coloured text. Mobbin 2026-09-23: Notion Mail, Quicken,
+//   //    Drive (the action on the right, bold, short), Character AI and
+//   //    Linktree (the tick that says done before the words do).
+//   messenger
+//     ..clearSnackBars()
+//     ..showSnackBar(
+//       SnackBar(
+//         persist: false,
+//         behavior: SnackBarBehavior.floating,
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         padding: EdgeInsets.zero,
+//         margin: EdgeInsets.fromLTRB(16, 0, 16, (lift ?? kPvStickyBarClearance) + inset),
+//         duration: Duration(milliseconds: action == null ? 2200 : 3600),
+//         // ⚠️ IT RISES INTO PLACE (2026-09-30, the user: "very abrupt… no
+//         // animation, no effect, no motion, no smoothness"). The SnackBar's
+//         // own entrance is a plain fade; the card now also lifts 14 points
+//         // and settles with an ease-out, the way iOS and Material 3 toasts
+//         // arrive. Kept for revert: `content: Container(` with no wrapper.
+//         content: TweenAnimationBuilder<double>(
+//           tween: Tween(begin: 0, end: 1),
+//           duration: const Duration(milliseconds: 320),
+//           curve: Curves.easeOutCubic,
+//           builder: (context, v, child) => Opacity(
+//             opacity: v,
+//             child: Transform.translate(
+//                 offset: Offset(0, (1 - v) * 14), child: child),
+//           ),
+//           child: Container(
+//           padding: EdgeInsets.fromLTRB(icon == null ? 16 : 12, 10, action == null ? 16 : 8, 10),
+//           decoration: BoxDecoration(
+//             color: Colors.white,
+//             borderRadius: BorderRadius.circular(18),
+//             // ⚠️ A SHADOW YOU CAN SEE (2026-10-01, the user: the notice "needs
+//             // shadow … it blends with the screen, so no difference"). White on
+//             // a white page with a 10% shadow read as no card at all. Now a
+//             // deeper, wider fall, a tighter contact shadow under the edge and
+//             // a hairline, so it lifts off every ground. Kept for revert: the
+//             // two shadows were alpha 0.10 blur 24 offset 8, and alpha 0.06
+//             // blur 3 offset 1, with no border.
+//             border: Border.all(color: p.ink1.withValues(alpha: 0.10), width: 1),
+//             boxShadow: [
+//               BoxShadow(color: p.ink1.withValues(alpha: 0.24), blurRadius: 30, spreadRadius: 1, offset: const Offset(0, 12)),
+//               BoxShadow(color: p.ink1.withValues(alpha: 0.16), blurRadius: 8, offset: const Offset(0, 3)),
+//             ],
+//           ),
+//           child: Row(children: [
+//             if (icon != null) ...[
+//               Container(
+//                 width: 30,
+//                 height: 30,
+//                 decoration: BoxDecoration(color: const Color(0xFFE3F2E6), shape: BoxShape.circle),
+//                 child: Icon(icon, size: 17, color: const Color(0xFF2E7D4F)),
+//               ),
+//               const SizedBox(width: 10),
+//             ],
+//             Expanded(
+//               child: Text(text,
+//                   maxLines: 2,
+//                   overflow: TextOverflow.ellipsis,
+//                   style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.3, color: p.ink1)),
+//             ),
+//             if (action != null) ...[
+//               const SizedBox(width: 10),
+//               Material(
+//                 color: p.ink1,
+//                 shape: const StadiumBorder(),
+//                 child: InkWell(
+//                   customBorder: const StadiumBorder(),
+//                   onTap: () {
+//                     messenger.hideCurrentSnackBar();
+//                     (onAction ?? () {})();
+//                   },
+//                   child: Padding(
+//                     padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+//                     child: Row(mainAxisSize: MainAxisSize.min, children: [
+//                       Text(action,
+//                           style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
+//                       const SizedBox(width: 3),
+//                       const Icon(Icons.arrow_forward_rounded, size: 15, color: Colors.white),
+//                     ]),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ]),
+//         ),
+//         ),
+//       ),
+//     );
+//   // Kept for revert — the white card with a hairline and a text action:
+//   //   SnackBar(content: Text(text, style: pvManrope(fontSize: 13.5, ...)),
+//   //     backgroundColor: Colors.white, shape: RoundedRectangleBorder(
+//   //       borderRadius: BorderRadius.circular(14), side: BorderSide(color: p.ink1 18%)),
+//   //     action: SnackBarAction(label: action, textColor: p.action, ...))
+// }
 
-/// ⚠️ WHERE A NOTICE SITS IN TRYING TO CONCEIVE (2026-09-30). Every caller
-/// that passed no `lift` got the Store's 164, which clears the Store's sticky
-/// buy bar and nothing else. Trying to conceive has no such bar, so "Logged
-/// for 28 September" and "Your period is logged" floated in the middle of the
-/// home and the cycle report, over the content (the user: "the pop up that is
-/// appearing in the center of the screen has not been fixed"). So, by the top
-/// route: the TTC home, which hosts all five tabs under a floating bar 14
-/// above the inset and about 70 tall, sits the notice just above that bar;
-/// any other TTC screen sits it at the foot like every lifted TTC call
-/// already did (`lift: 24`). Other stages and the Store keep 164 until
-/// someone walks them. Null means "the caller's default".
-const double kPvSnackOverTtcBar = 96;
-const double kPvSnackAtFoot = 24;
-
-double? pvSnackLiftFor(BuildContext context) {
-  // ⚠️ THE TOP PAGE, NOT THE TOP ROUTE (2026-09-30, second pass). The first
-  // version read the top route with popUntil, and a sheet that had just
-  // called `maybePop` (async) was still that route: unnamed, so the notice
-  // fell back to the Store's 164 and floated mid-screen over the Cycle
-  // companion's dates (seen on the phone). The app's route observer skips
-  // sheets, dialogs and menus. Kept for revert: the popUntil read of
-  // `Navigator.maybeOf(context)`.
-  final name = fabRouteObserver.topPageName;
-  if (name != null && name.startsWith('ttc')) {
-    return name == 'ttc/today' ? kPvSnackOverTtcBar : kPvSnackAtFoot;
-  }
-  // ⚠️ PREGNANCY SITS WHERE TRYING TO CONCEIVE'S DOES (2026-10-02, the user:
-  // "toast alert in pregnancy side needs to be like TTC"). Pregnancy's shell
-  // is unnamed, so it got the Store's 164, which floated a notice mid-screen
-  // over the content. Now: just above the bottom bar while only the shell is
-  // showing (the same `PvNavBar` as trying to conceive, so the same 96), and
-  // at the foot on any screen pushed over it. The Store's own screens keep
-  // the default, because their sticky buy bar needs the 164. The father's
-  // shell is not drawn the same way and keeps the default.
-  final stage = LifeStageStore.instance.stage ?? LifeStage.pregnancy;
-  if (stage == LifeStage.pregnancy &&
-      !FatherPreview.instance.on &&
-      !(name ?? '').startsWith('store/')) {
-    return fabRouteObserver.pageCount <= 1 ? kPvSnackOverTtcBar : kPvSnackAtFoot;
-  }
-  return null;
-}
+// The notice lift (`kPvStickyBarClearance`, `kPvSnackOverTtcBar`,
+// `kPvSnackAtFoot`, `pvSnackLiftFor`) moved to `lib/widgets/pv_toast.dart`
+// on 2026-10-15, rules unchanged; re-exported at the top of this file.
 
 // ---- the bottom bar for a tab-root screen ------------------------------------
 

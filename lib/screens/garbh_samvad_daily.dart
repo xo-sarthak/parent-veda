@@ -54,6 +54,7 @@ import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 import 'garbh_journal_screen.dart';
+import '../widgets/pv_toast.dart';
 
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF2F2C30); // V3 ink3
@@ -161,11 +162,11 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
       // ⚠️ NOT AN ERROR DIALOG. A refused mic is a normal answer, and the
       // narrator is right there - so this points at the way through rather
       // than at what went wrong.
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text(
-            'To record your voice, ParentVeda needs the microphone. You can '
-            'still listen to the narrator below.'),
-      ));
+      pvToast(
+          context,
+          'To record your voice, ParentVeda needs the microphone. You can '
+          'still listen to the narrator below.',
+          kind: PvToastKind.gentle);
       return;
     }
     final dir = await getApplicationDocumentsDirectory();

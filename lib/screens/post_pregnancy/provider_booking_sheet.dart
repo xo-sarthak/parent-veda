@@ -13,6 +13,7 @@ import 'pp_experts_data.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_learn_flow.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// Opens the mock booking sheet for [e]. Local only - no backend.
 // ⚠️ FACADE since 2026-09-20. A doctor with a consult offering books through
@@ -69,12 +70,7 @@ class _BookingSheetState extends State<_BookingSheet> {
     final day = _days[_day];
     final slot = _slots[_slot];
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Requested: ${widget.expert.name}, $day · $slot. We\'ll confirm shortly.'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    pvToast(context, 'Requested: ${widget.expert.name}, $day · $slot. We\'ll confirm shortly.', kind: PvToastKind.done);
   }
 
   @override

@@ -18,6 +18,7 @@ import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/widgets/pv_toast.dart';
 
 class _Pushes extends NavigatorObserver {
   final List<Route<dynamic>> pushed = [];
@@ -120,7 +121,7 @@ void main() {
       expect(tester.takeException(), isNull, reason: 'Settings › "$t" threw');
       // A switch answers in place: a changed value or a note on screen.
       final answered =
-          obs.pushed.isNotEmpty || find.byType(SnackBar).evaluate().isNotEmpty;
+          obs.pushed.isNotEmpty || find.byType(PvToastCard).evaluate().isNotEmpty;
       expect(answered, isTrue, reason: 'Settings › "$t" did nothing');
     }
   });

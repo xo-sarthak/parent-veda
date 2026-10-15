@@ -44,6 +44,7 @@ import '../../doors/pv_door_chrome.dart';
 import '../../v2/v2_palette.dart';
 import 'symptoms_today_body.dart' show openSymptomRead;
 import 'symptoms_widgets.dart';
+import '../../../widgets/pv_toast.dart';
 
 const _dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -271,11 +272,8 @@ Future<void> copySymptomWeek(
 ) async {
   await Clipboard.setData(ClipboardData(text: symptomWeekNote(c)));
   if (!context.mounted) return;
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text('Copied. Paste it into a message to your doctor.'),
-    ),
-  );
+  pvToast(context, 'Copied. Paste it into a message to your doctor.',
+      kind: PvToastKind.done);
 }
 
 class _WeekGrid extends StatelessWidget {

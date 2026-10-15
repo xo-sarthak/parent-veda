@@ -34,6 +34,7 @@ import '../v2/v2_palette.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart' show PregCard, pregFilledStyle, pregSectionHeadingStyle;
+import '../../widgets/pv_toast.dart';
 
 class NutritionStageScreen extends StatefulWidget {
   const NutritionStageScreen(
@@ -611,9 +612,9 @@ void _openBookingSheet(BuildContext context, V2Palette p, _ExpertOption option) 
             onPressed: () {
               Navigator.of(sheetContext).pop();
               requestExpertOptionPlaceholder(option.title);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Request sent for "${option.title}". Our team will reach out to schedule it.'),
-              ));
+              pvToast(context,
+                  'Request sent for "${option.title}". Our team will reach out to schedule it.',
+                  kind: PvToastKind.done);
             },
             child: Text('Request this',
                 style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: Colors.white)),

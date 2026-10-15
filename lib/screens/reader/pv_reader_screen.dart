@@ -61,6 +61,7 @@ import 'pv_read_tile.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart' show V3BracketArt, bracketMarkFor;
 import '../../data/brackets/ttc_brackets.dart' show kTtcBrackets;
+import '../saved_toast.dart';
 
 /// The six colours a reading surface needs. Deliberately a small, closed set —
 /// a reading mode is not a theme and must not grow into one.
@@ -810,7 +811,13 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
               // The title travels with the bookmark — see `toggleSave`.
-              () => _store.toggleSave(a.id, title: a.title.en, subtitle: a.kicker.en)),
+              () {
+                // Says where it went, with Undo on the way out (toasts pass).
+                final was = _store.isSaved(a.id);
+                void flip() => _store.toggleSave(a.id, title: a.title.en, subtitle: a.kicker.en);
+                flip();
+                pvSaveToast(context, nowSaved: !was, undo: flip);
+              }),
           // NO SHARE BUTTON. See the head of this file — it goes in when it
           // shares, not before.
         ]),

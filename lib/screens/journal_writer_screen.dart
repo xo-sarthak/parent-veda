@@ -18,6 +18,7 @@ import '../theme/pv_fonts.dart';
 import 'pregnancy/preg_chrome.dart' show pregPageTitleStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 const int kMaxNotePhotos = 2;
 
@@ -71,7 +72,7 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
 
   Future<void> _toggleMic() async {
     final s = S(widget.lang);
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     if (_listening) {
       await _speech.stop();
       if (mounted) setState(() => _listening = false);
@@ -88,7 +89,8 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
       },
     );
     if (!available) {
-      messenger.showSnackBar(SnackBar(content: Text(s.micPermissionNeeded)));
+      // ignore: use_build_context_synchronously
+      pvToast(nav.context, s.micPermissionNeeded, kind: PvToastKind.gentle);
       return;
     }
     _dictationBase = _ctrl.text;
@@ -108,9 +110,9 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
 
   Future<void> _addPhoto() async {
     final s = S(widget.lang);
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     if (_photos.length >= kMaxNotePhotos) {
-      messenger.showSnackBar(SnackBar(content: Text(s.photoLimitReached)));
+      pvToast(nav.context, s.photoLimitReached, kind: PvToastKind.gentle);
       return;
     }
     setState(() => _busyPhoto = true);
@@ -121,7 +123,7 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
       if (path != null) _photos.add(path);
     });
     if (path == null) {
-      messenger.showSnackBar(SnackBar(content: Text(s.cameraFailed)));
+      pvToast(nav.context, s.cameraFailed, kind: PvToastKind.gentle);
     }
   }
 
@@ -134,7 +136,6 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
   Future<void> _save() async {
     final s = S(widget.lang);
     final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
     if (_listening) await _speech.stop();
     final text = _ctrl.text.trim();
     // Nothing written and no photos → just leave without creating an empty note.
@@ -154,7 +155,8 @@ class _JournalWriterScreenState extends State<JournalWriterScreen> {
         photoPaths: _photos,
       );
     }
-    messenger.showSnackBar(SnackBar(content: Text(s.journalSaved)));
+    // ignore: use_build_context_synchronously
+    pvToast(navigator.context, s.journalSaved, kind: PvToastKind.done);
     navigator.pop();
   }
 

@@ -30,6 +30,7 @@ import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 enum DdcMethod { lmp, conception, ivf, ultrasound, known }
 
@@ -779,8 +780,7 @@ class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
               // outranks anything we counted.
               await p.setDueDate(edd, source: ddcSourceFor(_method));
               if (!mounted) return;
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(s.ddcStarted)));
+              pvToast(context, s.ddcStarted, kind: PvToastKind.done);
               Navigator.of(context).popUntil((r) => r.isFirst);
             },
             style: _bigFilled(),

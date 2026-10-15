@@ -20,6 +20,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_phases_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 /// Present the switcher as a modal bottom sheet.
 Future<void> showMultiChildSheet(BuildContext context) => showModalBottomSheet<void>(
@@ -185,11 +186,7 @@ class MultiChildSheet extends StatelessWidget {
     );
     if (!context.mounted) return;
     Navigator.of(context).maybePop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text('${nameCtl.text.trim()} added'),
-          behavior: SnackBarBehavior.floating),
-    );
+    pvToast(context, '${nameCtl.text.trim()} added', kind: PvToastKind.done);
   }
 
   /// A blank optional field is 0, not an error and not a zero measurement.
@@ -387,9 +384,7 @@ class MultiChildSheet extends StatelessWidget {
         await _store.switchTo(c.id);
         if (!context.mounted) return;
         Navigator.of(context).maybePop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Showing ${c.nameMid} now'), behavior: SnackBarBehavior.floating),
-        );
+        pvToast(context, 'Showing ${c.nameMid} now', kind: PvToastKind.done);
       },
       behavior: HitTestBehavior.opaque,
       child: Container(

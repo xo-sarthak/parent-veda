@@ -27,6 +27,7 @@ import 'journal_compose_screen.dart';
 import 'pregnancy/preg_chrome.dart' show pregGroupLabelStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 export 'journal/pv_journal_screen.dart' show JournalScreen;
 
@@ -1488,8 +1489,10 @@ class _JournalScreenState extends State<JournalScreenClassic> {
 
   void _snack(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    pvToast(context, msg);
+    // Kept for revert — the theme's dark SnackBar:
+    // ScaffoldMessenger.of(context)
+    //     .showSnackBar(SnackBar(content: Text(msg)));
   }
 }
 

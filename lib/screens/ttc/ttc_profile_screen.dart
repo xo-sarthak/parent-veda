@@ -43,6 +43,7 @@ import 'ttc_home_version.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_strings.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ FACADE since 2026-09-19. Both the opener and the screen land on the
 // unified You screen (`lib/screens/profile/pv_you_screen.dart`) for the
@@ -363,17 +364,12 @@ class TtcProfileScreenClassic extends StatelessWidget {
   /// only, not the ordinary one.
   Future<void> _toPregnancy(BuildContext context) async {
     final nav = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
     final t = TtcS.current();
 
     LifeStageStore.instance.setStage(LifeStage.pregnancy);
 
     if (!leaveTtcForPregnancy(nav)) {
-      messenger.showSnackBar(SnackBar(
-        content: Text(t.stageSetReopen),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 5),
-      ));
+      pvToast(nav.context, t.stageSetReopen);
     }
   }
 

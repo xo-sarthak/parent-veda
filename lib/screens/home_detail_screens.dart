@@ -26,6 +26,7 @@ import 'doors/pv_list_row.dart' show PvMarkWell;
 import 'pregnancy/preg_chrome.dart' show PregCard, pregFilledStyle, pregGroupLabelStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 /// A remembered line, in the tip form (DESIGN-SYSTEM §4.0 addendum): a left
 /// hairline in the ink, the group label, the line. What the gradient
@@ -364,7 +365,7 @@ class _TalkComposerScreenState extends State<TalkComposerScreen> {
 
   Future<void> _toggleMic() async {
     final s = S(widget.lang);
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     if (_listening) {
       await _speech.stop();
       if (mounted) setState(() => _listening = false);
@@ -381,7 +382,8 @@ class _TalkComposerScreenState extends State<TalkComposerScreen> {
       },
     );
     if (!available) {
-      messenger.showSnackBar(SnackBar(content: Text(s.micPermissionNeeded)));
+      // ignore: use_build_context_synchronously
+      pvToast(nav.context, s.micPermissionNeeded, kind: PvToastKind.gentle);
       return;
     }
     _dictationBase = _ctrl.text;
@@ -401,7 +403,6 @@ class _TalkComposerScreenState extends State<TalkComposerScreen> {
   Future<void> _save() async {
     final s = S(widget.lang);
     final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
     if (_listening) await _speech.stop();
     final text = _ctrl.text.trim();
     if (text.isEmpty) {
@@ -415,7 +416,8 @@ class _TalkComposerScreenState extends State<TalkComposerScreen> {
       text: text,
       spoken: _usedVoice,
     );
-    messenger.showSnackBar(SnackBar(content: Text(s.talkSaved)));
+    // ignore: use_build_context_synchronously
+    pvToast(navigator.context, s.talkSaved, kind: PvToastKind.done);
     navigator.pop();
   }
 

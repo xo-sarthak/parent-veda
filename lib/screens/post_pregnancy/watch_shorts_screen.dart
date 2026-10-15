@@ -17,6 +17,7 @@ import 'pp_expert_link.dart';
 import 'pp_watch_data.dart';
 import 'watch_channel_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class WatchShortsScreen extends StatefulWidget {
   const WatchShortsScreen({super.key, this.startId});
@@ -51,7 +52,9 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
     super.dispose();
   }
 
-  void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+  void _soon(String m) => pvToast(context, m);
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
   WatchVideo _at(int page) => _vids[page % _vids.length];

@@ -28,6 +28,7 @@ import 'pp_products_data.dart';
 import 'products_compare_screen.dart';
 import '../products/pv_product_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class ProductDetailScreenClassic extends StatelessWidget {
   const ProductDetailScreenClassic({super.key, this.product = fallback});
@@ -67,21 +68,15 @@ class ProductDetailScreenClassic extends StatelessWidget {
   // Route the buy: an affiliate product (Amazon / FirstCry) opens its retailer's
   // site; ParentVeda's own (in-app) product stays in the app (mock checkout).
   Future<void> _buy(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     // ⚠️ IMS ACT BACKSTOP, matching ppLaunchBuy. The CTA is not drawn for a
     // review-only product; if it somehow is, the link still must not open.
     if (!ppCanBuy(product)) {
-      messenger.showSnackBar(const SnackBar(
-        content: Text(kPpReviewOnlyWhy),
-        behavior: SnackBarBehavior.floating,
-      ));
+      pvToast(nav.context, kPpReviewOnlyWhy, kind: PvToastKind.gentle);
       return;
     }
     if (!ppIsAffiliate(product)) {
-      messenger.showSnackBar(SnackBar(
-        content: Text('Buying ${product.name} in-app - checkout opens soon.'),
-        behavior: SnackBarBehavior.floating,
-      ));
+      pvToast(nav.context, 'Buying ${product.name} in-app - checkout opens soon.');
       return;
     }
     bool ok;
@@ -91,10 +86,8 @@ class ProductDetailScreenClassic extends StatelessWidget {
       ok = false;
     }
     if (!ok) {
-      messenger.showSnackBar(SnackBar(
-        content: Text('Could not open ${product.retailer} - please try again.'),
-        behavior: SnackBarBehavior.floating,
-      ));
+      // ignore: use_build_context_synchronously — the navigator outlives this call, and pvToast falls back to the root overlay anyway.
+      pvToast(nav.context, 'Could not open ${product.retailer} - please try again.', kind: PvToastKind.gentle);
     }
   }
 
@@ -102,17 +95,11 @@ class ProductDetailScreenClassic extends StatelessWidget {
   // cross-category or full attempt is explained, never silently dropped.
   void _toggleCompare(BuildContext context) {
     final r = PpCompareStore.instance.toggle(product);
-    final messenger = ScaffoldMessenger.of(context);
     if (r == PpCompareResult.wrongCategory) {
-      messenger.showSnackBar(const SnackBar(
-        content: Text('Products can only be compared within the same category. Clear your comparison to start a new one.'),
-        behavior: SnackBarBehavior.floating,
-      ));
+      pvToast(context, 'Products can only be compared within the same category. Clear your comparison to start a new one.',
+          kind: PvToastKind.gentle);
     } else if (r == PpCompareResult.full) {
-      messenger.showSnackBar(const SnackBar(
-        content: Text('You can compare up to 3 - remove one first.'),
-        behavior: SnackBarBehavior.floating,
-      ));
+      pvToast(context, 'You can compare up to 3 - remove one first.', kind: PvToastKind.gentle);
     }
   }
 
@@ -261,9 +248,7 @@ class ProductDetailScreenClassic extends StatelessWidget {
             PvPress(child: GestureDetector(
               onTap: () {
                 Navigator.of(sheetCtx).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Opening the full paper on the publisher\'s site…'), behavior: SnackBarBehavior.floating),
-                );
+                pvToast(context, 'Opening the full paper on the publisher\'s site…');
               },
               behavior: HitTestBehavior.opaque,
               child: Container(

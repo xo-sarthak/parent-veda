@@ -21,6 +21,8 @@ import 'yoga_instructor_screen.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
+import '../saved_toast.dart';
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -43,8 +45,10 @@ class YogaClassScreenClassic extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context, String m) => ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+  void _soon(BuildContext context, String m) => pvToast(context, m);
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon(BuildContext context, String m) => ScaffoldMessenger.of(context)
+  //     .showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +68,11 @@ class YogaClassScreenClassic extends StatelessWidget {
                   _pad(Row(children: [
                     Expanded(child: ppBack(context, cls.categoryInfo.title)),
                     PvPress(child: GestureDetector(
-                      onTap: () => store.toggleSave(cls.id),
+                      onTap: () {
+                        void flip() => store.toggleSave(cls.id);
+                        flip();
+                        pvSaveToast(context, nowSaved: !saved, undo: flip, canView: false);
+                      },
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         width: 38,

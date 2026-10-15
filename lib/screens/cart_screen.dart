@@ -17,6 +17,7 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 import 'v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
+import '../widgets/pv_toast.dart';
 
 const Color _accent = AppTheme.neutral900;
 
@@ -118,23 +119,15 @@ Future<void> showAddToCartFlow(
             title: s.cartProductsTitle));
     return;
   }
-  ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(
-          // Flutter 3.44 keeps a snackbar with an action on screen until it is
-          // dismissed (`persist` defaults to true when there is an action).
-          persist: false,
-      content: Text(s.cartAddedToCart),
-      action: SnackBarAction(
-        label: s.cartViewCart,
-        onPressed: () => _push(
-            context,
-            CartScreen(
-                controller: controller,
-                cartId: kProductsCartId,
-                title: s.cartProductsTitle)),
-      ),
-    ));
+  pvToast(context, s.cartAddedToCart,
+      kind: PvToastKind.done,
+      action: s.cartViewCart,
+      onAction: () => _push(
+          context,
+          CartScreen(
+              controller: controller,
+              cartId: kProductsCartId,
+              title: s.cartProductsTitle)));
 }
 
 Future<String?> _chooseSize(BuildContext context, S s, List<String> sizes) {

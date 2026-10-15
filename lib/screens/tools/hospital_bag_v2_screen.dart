@@ -21,6 +21,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
 import '../cart_screen.dart' show showSingleBuyNow;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => s));
@@ -975,9 +976,8 @@ class _ProductExperience extends StatelessWidget {
                 : FilledButton(
                     onPressed: () {
                       _choose(context, item, p);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('${s.hb2v2Selected}: ${p.name}'),
-                          duration: const Duration(milliseconds: 900)));
+                      pvToast(context, '${s.hb2v2Selected}: ${p.name}',
+                          kind: PvToastKind.done);
                     },
                     child: Text(s.hb2v2ChooseThis),
                   ),

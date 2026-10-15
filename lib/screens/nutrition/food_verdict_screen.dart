@@ -24,6 +24,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import '../pregnancy/preg_chrome.dart' show PregCard, PregSectionHeading, pregGroupLabelStyle;
 import '../products/pv_store_chrome.dart' show kPvInk;
+import '../../widgets/pv_toast.dart';
 
 /// Opens search over the food library and pushes the verdict page on pick.
 /// Shared entry point — the Nutrition landing's search bar calls this too, so
@@ -467,9 +468,9 @@ class _AskDieticianFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: TextButton.icon(
-        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Noted. Our dietician team will follow up.'),
-        )),
+        onPressed: () => pvToast(
+            context, 'Noted. Our dietician team will follow up.',
+            kind: PvToastKind.done),
         icon: Icon(Icons.chat_bubble_outline_rounded, size: 16, color: p.ink2),
         label: Text('Still unsure? Ask our dietician',
             style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink2)),

@@ -34,6 +34,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show FabState;
 import '../auth/auth_flow_screen.dart';
 import 'pv_you_chrome.dart';
+import '../../widgets/pv_toast.dart';
 
 Future<void> pvSignOut(BuildContext context) async {
   final nav = Navigator.of(context);
@@ -127,7 +128,6 @@ Future<void> pvDeleteAccount(BuildContext context) async {
   final p = pvStorePalette;
   final s = S.now;
   final input = TextEditingController();
-  final messenger = ScaffoldMessenger.of(context);
   final nav = Navigator.of(context);
 
   final confirmed = await showModalBottomSheet<bool>(
@@ -273,15 +273,15 @@ Future<void> pvDeleteAccount(BuildContext context) async {
   Future<void>.delayed(const Duration(milliseconds: 600), input.dispose);
   if (confirmed != true) return;
 
-  messenger
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(content: Text(s.deleteAccountWorking)));
+  // One notice that turns from "working" into the answer, in place.
+  // ignore: use_build_context_synchronously
+  final working = pvToastWorking(nav.context, s.deleteAccountWorking);
   final ok = await DeleteAccount.run();
-  messenger.clearSnackBars();
   if (!ok) {
-    messenger.showSnackBar(SnackBar(content: Text(s.deleteAccountFailed)));
+    working.gentle(s.deleteAccountFailed);
     return;
   }
+  working.dismiss();
   if (!context.mounted) return;
   await showDialog<void>(
     context: context,

@@ -36,6 +36,7 @@ import '../../localization/app_language.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, kPvInk, pvStorePalette;
 import '../v2/v2_palette.dart' show V2Palette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class MemoryPreviewScreen extends StatefulWidget {
   const MemoryPreviewScreen({
@@ -114,9 +115,11 @@ class _MemoryPreviewScreenState extends State<MemoryPreviewScreen> {
     await MemoryExport.share(bytes);
   }
 
-  void _snack(String m) => ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(content: Text(m)));
+  void _snack(String m) => pvToast(context, m);
+  // Kept for revert — the theme's dark SnackBar, cleared first:
+  // void _snack(String m) => ScaffoldMessenger.of(context)
+  //   ..clearSnackBars()
+  //   ..showSnackBar(SnackBar(content: Text(m)));
 
   @override
   Widget build(BuildContext context) {

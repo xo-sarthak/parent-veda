@@ -21,6 +21,7 @@ import '../services/memory_store.dart';
 import '../services/journey_pdf.dart';
 import '../theme/app_theme.dart';
 import 'journal_writer_screen.dart';
+import '../widgets/pv_toast.dart';
 
 class JourneyBookletScreen extends StatefulWidget {
   const JourneyBookletScreen({
@@ -67,7 +68,6 @@ class _JourneyBookletScreenState extends State<JourneyBookletScreen> {
 
   Future<void> _create() async {
     final s = S(widget.lang);
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     setState(() => _busy = true);
     try {
@@ -101,7 +101,7 @@ class _JourneyBookletScreenState extends State<JourneyBookletScreen> {
         ),
       ));
     } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(s.bookletFailed)));
+      pvToast(navigator.context, s.bookletFailed, kind: PvToastKind.gentle);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -252,14 +252,15 @@ class _BookletPreviewScreen extends StatelessWidget {
 
   Future<void> _share(BuildContext context) async {
     final s = S(lang);
-    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
     try {
       await Share.shareXFiles(
         [XFile(filePath, mimeType: 'application/pdf')],
         text: s.celebrationShareText,
       );
     } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(s.shareFailed)));
+      // ignore: use_build_context_synchronously
+      pvToast(nav.context, s.shareFailed, kind: PvToastKind.gentle);
     }
   }
 

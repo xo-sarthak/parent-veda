@@ -50,6 +50,7 @@ import 'doors/pv_shelf_card.dart' show PvShelfCard, pvShelfRailHeight;
 import 'doors/pv_shelf_spec.dart' show PvShelfKind;
 import 'garbh_invite_screen.dart';
 import 'v2/v2_palette.dart';
+import '../widgets/pv_toast.dart';
 
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF2F2C30); // V3 ink3
@@ -658,14 +659,14 @@ class _EntryRow extends StatelessWidget {
 /// Delete one journal entry: gone from the album at once, with Undo.
 ///
 /// ⚠️ THE FILE GOES ONLY WHEN THE UNDO HAS PASSED. Removing the entry first and
-/// the audio file after the snackbar closes means Undo puts back the very same
+/// the audio file after the notice closes means Undo puts back the very same
 /// recording, not a row pointing at a file that no longer exists. If she undoes,
 /// nothing on the phone was touched. A path that is not a file on this phone (a
 /// link) is never deleted from here.
 Future<void> garbhDeleteJournalEntry(
     BuildContext context, GarbhJournalEntry entry) async {
   final store = GarbhJournalStore.instance;
-  final messenger = ScaffoldMessenger.of(context);
+  final nav = Navigator.of(context);
   final path = entry.path;
   final audio = RagaAudioStore.instance;
   if (path != null && audio.isPlayingAsset(path)) await audio.stop();
@@ -677,19 +678,18 @@ Future<void> garbhDeleteJournalEntry(
     GarbhEntryKind.photo => 'Photo deleted.',
     GarbhEntryKind.heard => 'Removed from My Journal.',
   };
-  messenger.clearSnackBars();
-  final bar = messenger.showSnackBar(SnackBar(
-    persist: false,
-    content: Text(what),
-    action: SnackBarAction(
-      label: 'Undo',
-      onPressed: () {
+  // ignore: use_build_context_synchronously
+  final notice = pvToast(nav.context, what,
+      kind: PvToastKind.undo,
+      action: 'Undo',
+      onAction: () {
         undone = true;
         store.add(entry);
-      },
-    ),
-  ));
-  await bar.closed;
+      });
+  // The file goes only once Undo is no longer on offer: the notice timed
+  // out, was swiped away, or was replaced (`closed`, as `bar.closed` was).
+  // Kept for revert: `final bar = messenger.showSnackBar(...); await bar.closed;`
+  await notice.closed;
   if (undone || path == null || path.startsWith('http')) return;
   try {
     final f = File(path);

@@ -114,6 +114,8 @@ const Map<String, int> kTapFeedbackAllowed = {
   'lib/widgets/baby_voice/speaker_button.dart': 1,
   'lib/widgets/pv_feedback.dart': 1,
   'lib/widgets/pv_placeholders.dart': 1,
+  // The toast's swipe-away: a drag, not a tap (the Undo pill is pressed).
+  'lib/widgets/pv_toast.dart': 1,
 };
 
 void main() {

@@ -44,6 +44,7 @@ import 'ttc_tools_screen.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart' show V2PaletteStore;
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
 
 // ---- palette (same hexes as pregnancy & parenting) --------------------------
 // ⚠️ Unified with the pregnancy ground — see pp_common.dart for the
@@ -637,12 +638,11 @@ class TtcBuilding extends StatelessWidget {
 /// The one "not yet" affordance. A tap always acknowledges itself - a control
 /// that silently does nothing reads as a bug, which is worse than honesty.
 void ttcSoon(BuildContext context, String what) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('$what: ${TtcS.current().comingSoon}'),
-      behavior: SnackBarBehavior.floating,
-    ),
-  );
+  pvToast(context, '$what: ${TtcS.current().comingSoon}');
+  // Kept for revert — the theme's dark SnackBar:
+  //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //     content: Text('$what: ${TtcS.current().comingSoon}'),
+  //     behavior: SnackBarBehavior.floating));
 }
 
 /// A horizontal progress bar. The app-wide replacement for percentage rings.

@@ -28,6 +28,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../products/pv_store_chrome.dart' show PvChip, PvCommit, pvStorePalette;
 import '../v2/v2_palette.dart';
+import '../../widgets/pv_toast.dart';
 
 const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -395,13 +396,14 @@ class PpCareEntryRow extends StatelessWidget {
 /// The confirmation after a log: names what was saved (the app explains
 /// itself), with Undo where it can be taken back.
 void ppCareSaved(BuildContext context, String what, {VoidCallback? undo}) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      content: Text(what),
-      action: undo == null ? null : SnackBarAction(label: 'Undo', onPressed: undo),
-    ));
+  pvToast(context, what,
+      kind: undo == null ? PvToastKind.done : PvToastKind.undo,
+      action: undo == null ? null : 'Undo',
+      onAction: undo);
+  // Kept for revert — the theme's dark SnackBar with a text Undo:
+  //   ScaffoldMessenger.of(context)..hideCurrentSnackBar()..showSnackBar(
+  //     SnackBar(behavior: SnackBarBehavior.floating, content: Text(what),
+  //       action: undo == null ? null : SnackBarAction(label: 'Undo', onPressed: undo)));
 }
 
 /// A serif section heading inside a tool page.

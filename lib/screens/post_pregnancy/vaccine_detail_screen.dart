@@ -17,6 +17,7 @@ import 'pp_common.dart';
 import 'product_detail_screen.dart';
 import 'vaccine_learn_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 const Color _green = Color(0xFF1F8A5B);
 const Color _flagBg = Color(0xFFFFF0F3);
@@ -38,9 +39,11 @@ class VaccineDetailScreen extends StatelessWidget {
   void _push(BuildContext context, Widget s) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
-  void _snack(BuildContext context, String msg) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
-      );
+  void _snack(BuildContext context, String msg) => pvToast(context, msg, kind: PvToastKind.done);
+  // Kept for revert — the floating Material SnackBar:
+  // void _snack(BuildContext context, String msg) => ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+  //     );
 
   @override
   Widget build(BuildContext context) {
@@ -200,7 +203,6 @@ class VaccineDetailScreen extends StatelessWidget {
   void _reminderSheet(BuildContext context) {
     final due = DateTime(2026, 7, 22, 9, 0); // PCV dose 3 due date (scenario)
     void set(int daysBefore, String label) {
-      final messenger = ScaffoldMessenger.of(context);
       Navigator.of(context).pop();
       // Best-effort local notification (Android configured; a no-op if the
       // platform can't schedule). Fire-and-forget - no context use after await.
@@ -213,7 +215,7 @@ class VaccineDetailScreen extends StatelessWidget {
             : "${ChildProfileStore.instance.name}'s PCV dose 3 is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - 22 Jul.",
         when: due.subtract(Duration(days: daysBefore)),
       );
-      messenger.showSnackBar(SnackBar(content: Text('Reminder set - $label'), behavior: SnackBarBehavior.floating));
+      pvToast(context, 'Reminder set - $label', kind: PvToastKind.done);
     }
 
     showModalBottomSheet<void>(

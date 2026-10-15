@@ -12,6 +12,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 import '../localization/app_language.dart';
 import '../theme/app_theme.dart';
+import 'pv_toast.dart';
 
 class MicDictateButton extends StatefulWidget {
   const MicDictateButton({
@@ -63,8 +64,7 @@ class _MicDictateButtonState extends State<MicDictateButton> {
     }
     if (!ok) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(widget.s.micDenied)));
+        pvToast(context, widget.s.micDenied, kind: PvToastKind.gentle);
       }
       return;
     }

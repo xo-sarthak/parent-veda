@@ -30,6 +30,7 @@ import 'brand_store.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -97,7 +98,9 @@ class _SamplingScreenState extends State<SamplingScreen> {
 
   void _say(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    pvToast(context, msg, kind: PvToastKind.gentle);
+    // Kept for revert — the theme's dark SnackBar bar:
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override

@@ -37,6 +37,7 @@ import 'pp_post_detail_screen.dart';
 import 'pp_section_extras.dart';
 import 'pp_opening_soon.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // The identity used while testing "Doctor mode" for the parenting side (until
 // real doctor logins exist). Display-only - the store's endorsement bookkeeping
@@ -56,12 +57,13 @@ const List<List<Color>> _ppBadgeGradients = [
 void ppPush(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => w));
 
-void ppToast(BuildContext c, String m) => ScaffoldMessenger.of(c)
-  ..clearSnackBars()
-  ..showSnackBar(SnackBar(
-      content: Text(m),
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(milliseconds: 1400)));
+void ppToast(BuildContext c, String m) => pvToast(c, m);
+// Kept for revert — a 1.4 s dark SnackBar:
+// void ppToast(BuildContext c, String m) => ScaffoldMessenger.of(c)
+//   ..clearSnackBars()
+//   ..showSnackBar(SnackBar(content: Text(m),
+//       behavior: SnackBarBehavior.floating,
+//       duration: const Duration(milliseconds: 1400)));
 
 // ===========================================================================
 //  Parenting data queries. The shared CommunityStore's OWN list getters read

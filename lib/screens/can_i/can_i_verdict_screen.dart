@@ -49,6 +49,7 @@ import '../tools/ask_veda_screen.dart';
 import '../v2/v2_palette.dart';
 import 'can_i_answer.dart' show canIShareText, shareCanIAnswer;
 import 'can_i_widgets.dart';
+import '../saved_toast.dart';
 
 class CanIVerdictScreen extends StatelessWidget {
   const CanIVerdictScreen({super.key, required this.entry, required this.controller});
@@ -96,8 +97,9 @@ class CanIVerdictScreen extends StatelessWidget {
                 leadingWidth: 56,
                 actions: [
                   _round(p, saved ? Icons.favorite_rounded : Icons.favorite_border_rounded, () {
-                    pvCommitFeedback();
-                    CanIStore.instance.toggleSaved(e.id);
+                    void flip() => CanIStore.instance.toggleSaved(e.id);
+                    flip();
+                    pvSaveToast(context, nowSaved: !saved, undo: flip);
                   }, tint: saved ? const Color(0xFFE0475F) : null),
                   const SizedBox(width: 8),
                   _round(p, Icons.ios_share_rounded, () {

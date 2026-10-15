@@ -21,6 +21,7 @@ import 'outbound.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -328,9 +329,7 @@ class LaunchDetailScreen extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: () {
             BrandAnalytics.instance.event(c, BrandEvent.resourceOpened, meta: {'resource': r.label});
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(S.now.comingSoonLabel(r.label)), behavior: SnackBarBehavior.floating),
-            );
+            pvToast(context, S.now.comingSoonLabel(r.label));
           },
           child: Container(
             padding: const EdgeInsets.all(14),
@@ -368,9 +367,7 @@ class LaunchDetailScreen extends StatelessWidget {
             BrandAnalytics.instance.event(c, BrandEvent.ctaTapped);
             final url = c.brand.landingUrl;
             if (url == null || url.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(S.now.uiBrandLinkComingSoon), behavior: SnackBarBehavior.floating),
-              );
+              pvToast(context, S.now.uiBrandLinkComingSoon);
               return;
             }
             await openOutbound(url, campaign: c);

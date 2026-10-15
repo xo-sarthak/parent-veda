@@ -33,6 +33,7 @@ import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import 'ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import 'ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle) on the full Read
 // recommendations page: the serif page title under a back arrow (no emoji in
@@ -444,8 +445,7 @@ class _BookCard extends StatelessWidget {
                 minimumSize: const Size(0, 36),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              onPressed: () => ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(s.rnBuyComingSoon))),
+              onPressed: () => pvToast(context, s.rnBuyComingSoon),
               child: Text(s.rnBuyNow,
                   style: text.labelMedium?.copyWith(color: Colors.white)),
             ),
@@ -1140,8 +1140,7 @@ class DailyReadsHomeCard extends StatelessWidget {
     if (ok) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(r.title.now)));
+      pvToast(context, r.title.now);
     }
   }
 }

@@ -24,6 +24,7 @@ import '../../localization/app_language.dart';
 import '../../data/mind_mood_extras.dart';
 import '../mind_mood/mm_article_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
@@ -300,8 +301,7 @@ class FatherReadsScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(r.title.now)));
+      pvToast(context, r.title.now);
     }
   }
 }

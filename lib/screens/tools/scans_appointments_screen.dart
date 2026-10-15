@@ -33,6 +33,7 @@ import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // Kept for the Roadmap rows (unreached, kept for revert); nothing live draws
 // in the teal since 2026-09-30.
@@ -503,8 +504,7 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
       journalTitle: s.scnCompletedJournal(m.title.of(p.language)),
       week: m.anchorWeek,
     );
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(s.scnMarkedDone)));
+    pvToast(context, s.scnMarkedDone, kind: PvToastKind.done);
   }
 
   void _openScan(S s, JourneyMilestone m) {

@@ -24,6 +24,7 @@ import 'package:flutter/foundation.dart';
 
 import 'supabase_repo.dart';
 import 'sync_registry.dart';
+import '../pv_sync_health.dart';
 
 mixin CloudSyncedStore on ChangeNotifier {
   // Guards the auto-push: stays false until the first cloud sync finishes, so
@@ -74,7 +75,9 @@ mixin CloudSyncedStore on ChangeNotifier {
 
   void _pushNow() {
     // Fire-and-forget; never let a network hiccup break the UI.
-    SupabaseRepo.saveState(cloudKey, cloudData()).catchError((_) {});
+    // A failure stays off the UI, except one calm offline notice a session
+    // (PvSyncHealth).
+    SupabaseRepo.saveState(cloudKey, cloudData()).catchError(PvSyncHealth.report);
   }
 
   @override

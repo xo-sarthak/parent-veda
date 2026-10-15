@@ -43,6 +43,7 @@ import 'pp_common.dart';
 import 'pp_health_data.dart';
 import 'pp_wallet_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -616,8 +617,7 @@ class WalletEmergencyCardScreen extends StatelessWidget {
             onTap: () async {
               await Clipboard.setData(ClipboardData(text: text));
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Copied — paste anywhere')));
+              pvToast(context, 'Copied — paste anywhere', kind: PvToastKind.done);
             },
             behavior: HitTestBehavior.opaque,
             child: Container(

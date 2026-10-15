@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'jv2_common.dart';
 import 'jv2_data.dart';
+import '../../../widgets/pv_toast.dart';
 
 /// The subject line for a shared memory / letter.
 String jvEmailSubject(JvMemory m) => 'A memory from $jvParent: ${m.title}';
@@ -69,7 +70,6 @@ class _EmailSheetState extends State<_EmailSheet> {
   Future<void> _send() async {
     if (_sending) return;
     setState(() => _sending = true);
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final uri = jvMailtoUri(widget.memory, recipient: _email.text.trim());
     var launched = false;
@@ -80,12 +80,12 @@ class _EmailSheetState extends State<_EmailSheet> {
     }
     if (!mounted) return;
     navigator.pop();
-    messenger.showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      content: Text(launched
-          ? 'Opening your mail app - the letter is ready to send.'
-          : 'Could not open a mail app on this device. Draft saved for now.'),
-    ));
+    pvToast(
+        navigator.context,
+        launched
+            ? 'Opening your mail app - the letter is ready to send.'
+            : 'Could not open a mail app on this device. Draft saved for now.',
+        kind: launched ? PvToastKind.done : PvToastKind.gentle);
   }
 
   @override

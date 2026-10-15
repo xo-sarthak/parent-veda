@@ -27,6 +27,8 @@ import '../services/read_next_store.dart';
 import 'book_companion_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
+import 'saved_toast.dart';
 
 // ---- reader preferences (session-scoped, mirrors PP ReadingStore font/mode) --
 enum ReadReaderMode { light, sepia, dark }
@@ -130,8 +132,10 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
 
   Widget _pad(Widget c) =>
       Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
-  void _soon(String m) => ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
+  void _soon(String m) => pvToast(context, m);
+  // Kept for revert — the theme's floating dark SnackBar:
+  // void _soon(String m) => ScaffoldMessenger.of(context)
+  //     .showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
   // The blocks present on this read (for the table of contents), in order.
   List<(String, String)> _tocEntries() {
@@ -283,7 +287,11 @@ class _ReadReaderScreenState extends State<ReadReaderScreen> {
         if (_tocEntries().length > 1) _iconBtn(t, Icons.toc_rounded, () => _openToc(t)),
         _iconBtn(t, Icons.text_fields_rounded, () => _openSettings(t)),
         _iconBtn(t, saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-            () => ReadNextStore.instance.toggleSave(a.id),
+            () {
+              void flip() => ReadNextStore.instance.toggleSave(a.id);
+              flip();
+              pvSaveToast(context, nowSaved: !saved, undo: flip);
+            },
             color: saved ? _progressColor : null),
         _iconBtn(t, Icons.ios_share_rounded, () => _soon(_tr('Sharing coming soon', 'शेयर करना जल्द आ रहा है'))),
       ]),

@@ -15,6 +15,7 @@ import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class DoctorEarningsScreen extends StatelessWidget {
   const DoctorEarningsScreen({super.key});
@@ -144,11 +145,9 @@ class DoctorEarningsScreen extends StatelessWidget {
               style: ppBody(12.5, color: ppSoft, h: 1.5)),
           const SizedBox(height: 12),
           PvPress(child: GestureDetector(
-            onTap: () => ScaffoldMessenger.of(context)
-              ..clearSnackBars()
-              ..showSnackBar(const SnackBar(
-                  content: Text(
-                      'Bank/KYC onboarding comes with the payout release.'))),
+            onTap: () => pvToast(
+                context, 'Bank/KYC onboarding comes with the payout release.',
+                lift: kPvSnackAtFoot),
             behavior: HitTestBehavior.opaque,
             child: Container(
               height: 42,

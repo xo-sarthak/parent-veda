@@ -48,6 +48,7 @@ import 'solve_problem_screen.dart';
 import 'vax_detail_screen.dart';
 import 'vax_tracker_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
 // import 'vaccination_screen.dart';
@@ -88,9 +89,11 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
-  void _soon() => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Editing coming soon'), behavior: SnackBarBehavior.floating),
-      );
+  void _soon() => pvToast(context, 'Editing coming soon');
+  // Kept for revert — the floating Material SnackBar:
+  // void _soon() => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Editing coming soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   // Progressive reveal: each section fades + rises with a staggered delay.
   Widget _rv(int i, Widget c) {

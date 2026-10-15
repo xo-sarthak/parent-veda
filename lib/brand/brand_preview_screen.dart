@@ -23,6 +23,7 @@ import 'needs_attention.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
+import '../widgets/pv_toast.dart';
 
 const _bg = Color(0xFFFBF9FE);
 const _ink = Color(0xFF2F2C30);
@@ -139,9 +140,7 @@ class _BrandPreviewScreenState extends State<BrandPreviewScreen> {
               onPressed: () {
                 BrandStudioStore.instance.replayAll();
                 setState(() {});
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.now.uiResetRestartAppSee), behavior: SnackBarBehavior.floating),
-                );
+                pvToast(context, S.now.uiResetRestartAppSee, kind: PvToastKind.done);
               },
               child: Text(S.now.uiReset, style: _t(12.5, w: FontWeight.w800, c: _purple)),
             ),

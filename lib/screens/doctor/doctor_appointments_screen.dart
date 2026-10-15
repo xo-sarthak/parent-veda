@@ -30,8 +30,10 @@ import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import '../post_pregnancy/pp_experts_data.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
+import 'doctor_chrome.dart' show dcToast;
 import 'doctor_prescription_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class DoctorAppointmentsScreen extends StatefulWidget {
   const DoctorAppointmentsScreen({super.key});
@@ -497,9 +499,11 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
 
     switch (code) {
       case 'ok':
-        _toast(outcome == DoctorOutcome.cancelled
-            ? 'Cancelled. The parent has their credit back.'
-            : 'Marked as a no-show. You are still paid for this slot.');
+        dcToast(
+            context,
+            outcome == DoctorOutcome.cancelled
+                ? 'Cancelled. The parent has their credit back.'
+                : 'Marked as a no-show. You are still paid for this slot.');
       case 'already_cancelled':
         _toast('This consultation was already cancelled.');
       case 'already_missed':
@@ -515,9 +519,14 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
     }
   }
 
-  void _toast(String m) => ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(content: Text(m)));
+  // Every remaining caller is a refusal or a failure; the success goes
+  // through `dcToast`.
+  void _toast(String m) =>
+      pvToast(context, m, kind: PvToastKind.gentle, lift: kPvSnackAtFoot);
+  // Kept for revert — the theme's dark SnackBar bar, clearing the last:
+  // void _toast(String m) => ScaffoldMessenger.of(context)
+  //   ..clearSnackBars()
+  //   ..showSnackBar(SnackBar(content: Text(m)));
 
   Widget _statusPill(Booking b, {required bool past, required bool hasRx}) {
     final (label, colour) = switch (b.status) {

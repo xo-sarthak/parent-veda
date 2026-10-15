@@ -19,6 +19,7 @@ import 'pp_courses_data.dart';
 import '../learn/pv_lesson_screen.dart';
 import 'course_detail_screen.dart' show pvViewForCourse;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
@@ -48,9 +49,11 @@ class CourseLessonScreenClassic extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _snack(BuildContext context, String msg) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
-      );
+  void _snack(BuildContext context, String msg) => pvToast(context, msg);
+  // Kept for revert — the floating Material SnackBar:
+  // void _snack(BuildContext context, String msg) => ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+  //     );
 
   // The lesson name without its "Module N · " prefix, for natural sentences.
   String get _name => lesson.title.contains('·') ? lesson.title.split('·').last.trim() : lesson.title;
