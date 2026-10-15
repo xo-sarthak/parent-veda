@@ -28,10 +28,10 @@ L = a day or more.
 
 ## Medium
 
-6. **Tap feedback, second pass: DONE 2026-10-15.** 1,338 taps now settle when pressed, across all
-   stages; a test fails on any new tap without it. 75 left alone on purpose (backdrops, drags,
-   keyboard dismiss, conditional taps). Optional later: the 40 conditional taps by hand.
-   STILL-OPEN §83.10.
+6. **Tap feedback, second pass: DONE 2026-10-15 (`9223ce4`).** 1,338 taps now settle when pressed,
+   across all stages; a test fails on any new tap without it. 75 left alone on purpose (backdrops,
+   drags, keyboard dismiss, conditional taps). All 7,846 tests pass. Optional later: the 40
+   conditional taps by hand. STILL-OPEN §83.10.
 7. **Add to calendar (M).** Scans and appointments into the phone's calendar.
 8. **Baby vault (M).** Read aloud for the letters, and "open your letters" at birth.
 9. **Door consistency pass (M).** One layout and set of controls across every door (STILL-OPEN §83.14).
@@ -122,4 +122,7 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
 - **Daily insight tab images.** Marked "to discuss" (STILL-OPEN §83.13).
 - **Device checks.** His side of pregnancy, the TTC calendar, and the small fixes (his week page, the
   Talk to someone icon on all three homes, "Up next" on Milestones, the press settle), and the
-  phases change (Development door → Phases, a doc phase, a 2-year-old's "guide is being written").
+  phases change (Development door → Phases, a doc phase, a 2-year-old's "guide is being written"),
+  and the tap feedback (press a card, scroll a list starting on a card, tap an icon inside a card:
+  only the icon moves).
+- **Push.** `9223ce4` (tap feedback) and anything before it not yet pushed.
