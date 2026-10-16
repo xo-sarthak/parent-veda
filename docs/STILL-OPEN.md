@@ -8247,6 +8247,7 @@ facade; every old body is `…Classic`, kept for revert. 4,109 tests green.
 
 ### 65.1 Deploy 0083 and load the catalogue into `products`
 **2026-10-16: 0083 RUN by the user and verified. `razorpay-create-order` redeployed the same day with server pricing. Still owed: load the unified rows.**
+**ON HOLD 2026-10-16 (user's call):** products change daily, so this is admin-panel work, not a Dart export. First step when resumed: flip `products` to `ContentOwner.editor` + a Directus Products screen, seeded once by the export. Full reasoning and the staged plan (sale dates, coupons, order snapshot): BACKEND-PATTERNS §16hh.
 
 `supabase db push` is the user's. Until the unified rows are in the table the
 create-order function cannot price a line and charges the phone's figure with
@@ -9276,7 +9277,9 @@ of *Yoga* is the class packs. The fourth, *Nutrition*, has had its own
 door on the home since the nutrition pass. So Tools now shows **Learn**
 and **Prepare** side by side and they overlap almost entirely.
 
-Retiring Prepare's tile is one line — except that `YogaHomeScreen` (the
+**[2026-10-16: settled by §91.0. Every way in, Prepare's tile included,
+opens the one Yoga & fitness hub, so the library no longer depends on
+Prepare.]** Retiring Prepare's tile is one line — except that `YogaHomeScreen` (the
 recorded yoga library, not just the paid classes) is reachable in
 pregnancy ONLY from that hub, and the *Yoga & fitness* door opens the
 bracket rather than the library. So the order is: give the library a door
@@ -9360,7 +9363,9 @@ lifting, each with per-trimester notes; the Kegel tool.
 
 **Proposed:** five tabs — Today (one practice for her month, derived;
 the `_kCurrentMonth = 7` screen turned out to be dead code — its only call
-site is commented out — so the live surface the door replaces is
+site is commented out — **[2026-10-16 correction: not dead. The Move door's
+yoga card pushed it again (`move/yoga`). Retired for real in §91.0; the door
+now opens the one Yoga & fitness hub.]** — so the live surface the door replaces is
 `YogaHomeScreen` with `kPregnancyYogaCategories`), Practise (chips over rows), Is it safe
 to…? (the eight verdicts rendered in place, reading `can_i_data`, never
 restated), Pelvic floor (the Kegel tool + reads), Talk (the stop-and-call flag
@@ -9374,7 +9379,8 @@ for movement + consult).
 3. Should "how are you today?" be asked here, or DERIVED from the Symptoms
    check-in ("derive, never ask")?
 
-**Owed content if it goes ahead:** step lists for 27 sessions, an `avoid`
+**Owed content if it goes ahead:** step lists for 27 sessions (there are 21
+in `kYogaSessions`; corrected 2026-10-16), an `avoid`
 line per session, pose art, three pelvic-floor reads.
 
 ## 75.0 The Recipes tab takes Blinkit's shape — 2026-09-22
@@ -10148,6 +10154,8 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
 ## 83.0 Notebook batch — 2026-10-10 (open decisions and parked items)
 
 - 83.1 His side TTC: BUILT 2026-10-10. Pregnancy his side BUILT 2026-10-13 (0b5477e), device check owed. His Today is her TtcHomeV3 with TtcPartnerMode (lib/screens/ttc/ttc_partner_home.dart): same header/strip/calendar/doors/reads; no logging (view-only line on the home and the calendar's day panel); rail keeps her cycle + shared cards, never her logs; hero in his voice; his block (mission, supporting her, tonight, her body, his half). Old Slate TtcPartnerTodayScreen kept for revert. OWED: his Learn/Tools/More already partner-aware (check on device); pregnancy his side (Father Mode) still old.
+- 83.1a 2026-10-16 HIS SIDE TTC, walk + declutter BUILT. A device walk of his side (and Mobbin: Flo for Partners, Clue Connect, Oura tips) found: (1) the grey FOR YOU eyebrow and a default-weight 'Your part today' (now the home's `_Head` look + `TtcSectionHeading`); (2) his block was five ruled paragraphs, ~25 lines (now one mission card + a row of four tiles, each opening the one reader via `openTtcTipRead`, `ttcPartnerRead`); (3) the Cycle companion let him add, correct and remove HER period dates, under 'Only she can change it' (now view-only, his voice via `ttcWindowForHim`); (4) the calendar legend and Messages said 'your period' (his voice now); (5) the home's I'm pregnant door would move HIS phone to pregnancy alone (now a view-only line); (6) His side door mid-grid (now first, `ttcHisDoorsFirst`); (7) the Talk to an expert list priced the andrologist consult nobody can book (no price, 'Coming soon', all stages). Kept: the CHANCE OF PREGNANCY TODAY card on his rail (a window grade, not a probability; the user: he should know her fertile days). OWED: Wave 3 (real pairing, a derived her-window row for his phone, his own key-moment messages; see §79.13); the His side door speaks of him in the third person; his Messages still schedule from local data. Tests: test/ttc_his_side_v3_test.dart.
+- 83.1b 2026-10-16 TTC CYCLE BASICS, both sides, BUILT. (1) Fertile days shown whole: the period no longer hides the window on a short cycle (`ttcCycleWindowSpan`, `ttcCycleLegendSpans` in lib/ttc/ttc_cycle_report.dart; calendar band on bleeding days too), with one line when they overlap; the parts line counts this cycle's parts (`ttcCyclePartsLine`). TTC-SPEC 1.5. (2) "Coming up" (fertile days, next period, how far) on the companion and the report (`TtcComingUp`). (3) His voice on the cycle report (all swaps now in `ttcWindowForHim`). (4) Calendar: one month at a time again, arrows and a sideways swipe, the day panel and Upcoming right under it; `_WeeksGrid` kept for revert. (5) 'Day of your cycle' opens the Cycle companion, not 'How conception works' (the 'Cycle companion · Your period dates' card also opens it; drop one if two doors is too many). (6) His FOR YOU: reading rows with drawn marks, not insight tiles. (7) The add-a-period sheet asks when a date is under 15 days from a logged start (move it / log separately) and words a 15-20 day cycle; an LH or temperature reading before cycle day 7 says it is very early, with Undo. OWED: spotting as its own choice in the too-close question (no spotting log yet); the old tracker screen's LH/temperature setters (`ttc_cycle_screens.dart:470,482`) don't say 'early'; the Messages window text is a past estimate and is not re-worded for an overlap. Tests: ttc_cycle_spans_test 'a short cycle', ttc_calendar_test, ttc_daily_insights_test, ttc_his_side_v3_test.
 - 83.2 Baby vault (`dear_baby_vault_screen.dart`): parts 1-4 BUILT 2026-10-10 (cover, keepsake paper cards with week seal + italic date + that week's size, trimester trail oldest first, Write / Say it aloud invitation on top; test/dear_baby_vault_test.dart). DONE 2026-10-15: the three owed parts, folded with REMAINING-CHANGES 12. Read aloud on every letter plus "Read them all aloud" (GarbhNarrator; a floating bar with Stop); never locked. The book is sealed until birth (a lock-badged tile), then "Download your letters book" (lib/services/letter_book_pdf.dart, PdfPreview, Close / Share). At birth: DearBabyVaultStore.markBorn from the arrival sheet (stage == parenting as the fallback), then DearBabyOpeningScreen once per session until she opens them; the Write invitation steps aside after birth. Parenting way back: You > "Dear Baby letters" (shown only when letters exist) and a ready card on the parenting home until opened. The loss path opens nothing. Mobbin: MOBBIN-DISCOVERY §22. Pattern: BACKEND-PATTERNS §16ff. Tests: dear_baby_vault_test, letter_book_pdf_test. OWED: a device check. A Devanagari letter read aloud uses the en-IN voice, and an offline PDF falls back to Helvetica (the existing PdfFontSet behaviour), so Devanagari prints only when the fonts can load.
 - 83.3 DONE 2026-10-10: renamed "I'm pregnant" everywhere she reads it (You action, TTC home card, chat, chapter, milestone, timeline); the confirm says a home test can be wrong; new You row "Not pregnant after all?" (pregnancy) offers "The test was wrong" (engine undo, back to trying) or "My pregnancy ended" (After a loss). IVF round's "Record the positive test" kept: the clinic's beta is the confirmation.
 - 83.4 DONE 2026-10-10: calendar button top right of the pregnancy home (Messages, Calendar, Saved), as on TTC.
@@ -10156,7 +10164,6 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
 - 83.7 Parenting Yoga cards show "Live group" with no schedule (shared widget). Decide.
 - 83.8 8 new superfood recipes have no chosen photo (`nut_r_<id>` in `read_images.dart`).
 - 83.9 DONE 2026-10-10: sign-out cancels every scheduled notification and mutes all scheduling paths until she signs in again (NotificationService.silenceForSignOut / _muted); reminders stay saved and re-arm via SyncRegistry on sign-in.
-- 83.1a 2026-10-16 HIS SIDE TTC, walk + declutter BUILT. A device walk of his side (and Mobbin: Flo for Partners, Clue Connect, Oura tips) found: (1) the grey FOR YOU eyebrow and a default-weight 'Your part today' (now the home's `_Head` look + `TtcSectionHeading`); (2) his block was five ruled paragraphs, ~25 lines (now one mission card + a row of four tiles, each opening the one reader via `openTtcTipRead`, `ttcPartnerRead`); (3) the Cycle companion let him add, correct and remove HER period dates, under 'Only she can change it' (now view-only, his voice via `ttcWindowForHim`); (4) the calendar legend and Messages said 'your period' (his voice now); (5) the home's I'm pregnant door would move HIS phone to pregnancy alone (now a view-only line); (6) His side door mid-grid (now first, `ttcHisDoorsFirst`); (7) the Talk to an expert list priced the andrologist consult nobody can book (no price, 'Coming soon', all stages). Kept: the CHANCE OF PREGNANCY TODAY card on his rail (a window grade, not a probability; the user: he should know her fertile days). OWED: Wave 3 (real pairing, a derived her-window row for his phone, his own key-moment messages; see §79.13); the His side door speaks of him in the third person; his Messages still schedule from local data. Tests: test/ttc_his_side_v3_test.dart.
 - 83.10 DONE 2026-10-15: tap feedback second pass. 1,338 plain taps wrapped in PvPress by a parser-driven pass (729 parenting, 180 TTC, 429 elsewhere); 1,372 in all. PvPress gained two rules (a scroll lets go past the touch slop; only the innermost press settles). 75 left alone on purpose: 40 onTap null by a condition, 15 drag / long-press / tap-down, 10 no onTap, 7 full-screen layers, 3 keyboard dismiss. Held by test/tap_feedback_guard_test.dart and test/pv_feedback_test.dart. DESIGN-SYSTEM 4.0c. OWED, optional: the 40 conditional ones could take PvPress(enabled: <condition>, ...) by hand.
 - 83.11 Ask Veda: answer reveal is paced, not streamed; real streaming needs a service endpoint. Parenting Ask Veda palette was moved to pregnancy's white/ink (beyond brief) — keep or revert.
 - 83.12 Phone OTP edge functions (`phone-otp-send`, `phone-otp-verify`) DEPLOYED 2026-10-16 via the CLI (the dashboard editor cannot bundle `_shared/`); both answer 401 unauthenticated. Still owed: the MSG91 secrets (or PHONE_OTP_MOCK=true for dev) and the DLT-registered template. All other functions deployed (checked 10-10).
@@ -10407,3 +10414,41 @@ existing Garbh suites (updated on purpose where the old look was asserted).
   day (morning / evening) as a small mark.
 - 90.7 Device walk owed: the home card and the door, each pillar and back;
   play a raga in "All ragas" and leave (it stops); record, listen back, keep.
+
+## 91.0 One Yoga & fitness hub for all three stages — 2026-10-16
+
+**Why.** The Yog4Lyf comparison (`research/competitors/yog4lyf/`, report in
+Downloads) and the user's own walk showed yoga scattered: the Move door's card
+opened the retired month-tab `PrenatalYogaScreen` (always month 7), Prepare's
+tile opened a different marketplace, parenting and TTC had their own ways in,
+and Kegel Care showed "Preparing for birth" to new mothers.
+
+**Built.**
+- `YogaHomeScreen` is the hub ("Yoga & fitness"): For you / All, chips, a
+  floating Filter pill and sheet, count line, stage label on every card in All.
+  Catalogue: `lib/data/move/pv_move_catalog.dart` folds the 27 classes, the 21
+  month sessions, the TTC pack and the 6 TTC move practices; stage is a tag.
+- For you is derived: TTC = today's practice for her cycle phase + fertility
+  classes; pregnancy = her month's sessions (`garbhMonth(currentWeek)`, month 1
+  with a "add your due date" line when none is set) + prenatal + Kegel + "when
+  to stop"; parenting = an after-birth note (weeks, caesarean, gone at 12 weeks)
+  + recovery + core with "After your six-week check" (`kYogaAfterCheckIds`) +
+  Kegel. Nothing is hidden.
+- Every entry opens it: Move door, Prepare tile, surface `yoga`, `pp_yoga`,
+  Explore drawer, My bookings, and a new TTC More "Yoga & fitness" section.
+  `PrenatalYogaScreen` is retired, kept for revert.
+- Kegel Care postpartum mode: 0-6 weeks "Breathe first" (breath only), then
+  "Kegels, done properly" capped at 5s x 10; postpartum safety list without
+  "contractions"; `pp_kegel` surface linked from the pelvic floor pages;
+  "Logged for today" toast.
+- TTC practice of the day follows the cycle (`TtcPractice.phases`); home,
+  Mind & body Today and his side all pass the phase.
+- The Move door's count is read from `kYogaSessions.length` (it said 22).
+
+**Open.**
+- Every video in the hub is still a placeholder (classes and the 21 sessions).
+- The TTC yoga pack still says "planned around your cycle"; the in-app
+  practice now is, the live classes depend on the teacher.
+- Not walked on a phone yet.
+- The formatter rewrapped all of `pp_yoga_data.dart` and
+  `yoga_home_screen.dart` (long lines), so their diffs look bigger than the change.

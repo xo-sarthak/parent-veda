@@ -23,7 +23,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/screens/ttc/ttc_cycle_companion.dart'
+    show ttcCyclePartsLine, kTtcFourPartsLine, ttcPeriodShortLine, ttcPeriodTooCloseLine;
 import 'package:parentveda/screens/ttc/ttc_cycle_report_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_ovulation_screen.dart'
+    show ttcOvMovedLine, kTtcOvMoved;
 import 'package:parentveda/screens/ttc/ttc_cycle_report_v3.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
@@ -376,6 +380,83 @@ void main() {
         expect(find.textContaining(s.phase.label), findsWidgets,
             reason: '${s.phase.label} was drawn but never named');
       }
+    });
+  });
+
+  // ===========================================================================
+  // 2026-10-16, the device walk: on 20-22 day cycles the fertile days showed
+  // as 1, then 3, then 0, under "four parts". The window is now listed whole.
+  group('a short cycle', () {
+    // Her phone: cycles of 20 and 22 days, today on day 17 of a 21-day one.
+    void shortCycles() {
+      final now = DateTime.now();
+      CycleStore.instance
+        ..logPeriodStart(now.subtract(const Duration(days: 58)))
+        ..logPeriodStart(now.subtract(const Duration(days: 38)))
+        ..logPeriodStart(now.subtract(const Duration(days: 16)));
+    }
+
+    test('every cycle keeps its six fertile days, even inside the period', () {
+      shortCycles();
+      for (final i in [0, 1, 2]) {
+        final w = ttcCycleWindowSpan(index: i);
+        expect(w, isNotNull, reason: 'cycle $i');
+        expect(w!.days, 6, reason: 'cycle $i');
+        expect(ttcCycleWindowStartsInPeriod(index: i), isTrue,
+            reason: 'cycle $i opens while she is bleeding');
+      }
+    });
+
+    test('the legend names three parts, the fertile days whole', () {
+      shortCycles();
+      final legend = ttcCycleLegendSpans();
+      expect(legend.map((s) => s.phase), [
+        TtcPhase.period,
+        TtcPhase.fertileWindow,
+        TtcPhase.afterWindow,
+      ]);
+      expect(legend[1].days, 6);
+      final line = ttcCyclePartsLine(legend);
+      expect(line, contains('three parts'));
+      expect(line, isNot(contains('four')));
+    });
+
+    test('a 28-day cycle still has four parts and no overlap', () {
+      midCycle();
+      expect(ttcCyclePartsLine(ttcCycleLegendSpans()), kTtcFourPartsLine);
+      expect(ttcCycleWindowStartsInPeriod(), isFalse);
+    });
+
+    test('the period sheet asks about a date too close, and words a short one',
+        () {
+      final a = DateTime(2026, 10, 10);
+      final b = DateTime(2026, 9, 30);
+      expect(ttcPeriodTooCloseLine(a, b, 10), contains('too close'));
+      expect(ttcPeriodShortLine(17), contains('17-day cycle'));
+      expect(ttcPeriodShortLine(17).toLowerCase(), isNot(contains('you have')));
+    });
+
+    // The device: an LH positive on day 2 put this cycle's ovulation on day
+    // 3, and the next window rolled forward onto the next period.
+    testWidgets('coming up never puts the next fertile days on the next period',
+        (tester) async {
+      shortCycles();
+      CycleStore.instance.logLhPositive(2);
+      await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(body: SingleChildScrollView(child: TtcComingUp()))));
+      expect(find.textContaining('Your next fertile days'), findsOneWidget);
+      final next = CycleStore.instance.lastPeriodStart!
+          .add(Duration(days: TtcStore.instance.today.cycleLength));
+      final row = tester.widgetList<Text>(find.byType(Text))
+          .map((t) => t.data ?? '')
+          .firstWhere((s) => s.contains(' – '));
+      expect(row, isNot(startsWith('${next.day} ')),
+          reason: 'the next fertile days must not start on the period');
+    });
+
+    test('an early ovulation reading is said, a usual one is not', () {
+      expect(ttcOvMovedLine(4), contains('very early'));
+      expect(ttcOvMovedLine(12), kTtcOvMoved);
     });
   });
 }

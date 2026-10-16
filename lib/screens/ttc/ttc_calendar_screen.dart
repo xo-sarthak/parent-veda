@@ -56,8 +56,13 @@ import '../../ttc/ttc_treatment_round.dart';
 import '../../ttc/ttc_treatment_store.dart';
 import '../../theme/pv_fonts.dart';
 import 'ttc_common.dart';
+import '../../ttc/ttc_cycle_report.dart' show ttcCycleWindowStartsInPeriod;
 import 'ttc_cycle_companion.dart'
-    show showTtcPeriodDateActions, showTtcPeriodLogSheet, ttcShortDate;
+    show
+        showTtcPeriodDateActions,
+        showTtcPeriodLogSheet,
+        ttcShortDate,
+        kTtcWindowInPeriodLine;
 import 'ttc_cycle_palette.dart';
 import 'ttc_appointments_screen.dart'
     show TtcApptEntry, openTtcAppointment;
@@ -134,6 +139,19 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
     if (m != _month) setState(() => _month = m);
   }
 
+  /// One month at a time (2026-10-16), a year either side of today, as the
+  /// week run allowed.
+  void _stepMonth(int delta) {
+    final n = DateTime.now();
+    final target = DateTime(_month.year, _month.month + delta);
+    final lo = DateTime(n.year, n.month - 12);
+    final hi = DateTime(n.year, n.month + 12);
+    if (target.isBefore(lo) || target.isAfter(hi)) return;
+    setState(() => _month = target);
+  }
+
+  // Kept for revert with `_WeeksGrid` (2026-10-16).
+  // ignore: unused_element
   void _jumpToMonth(int delta) {
     final target = DateTime(_month.year, _month.month + delta, 1);
     // Land the 1st's week on the top row: the "second row" rule then names
@@ -179,9 +197,12 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
                 _month = DateTime(n.year, n.month);
                 _selected = DateTime(n.year, n.month, n.day);
               });
-              _weeks.animateTo(_offsetOfWeek(_weekIndexOf(_dayOf(n))),
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutCubic);
+              // The week run is kept for revert; only scroll it if it is on.
+              if (_weeks.hasClients) {
+                _weeks.animateTo(_offsetOfWeek(_weekIndexOf(_dayOf(n))),
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOutCubic);
+              }
             },
           ),
           children: [
@@ -197,24 +218,51 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
                   null,
             ),
             const SizedBox(height: 18),
-            // Kept for revert (2026-10-13, the paged month became one scroll):
-            //   _MonthGrid(month: _month, selected: _selected,
+            // ⚠️ ONE MONTH AT A TIME, BACK SINCE 2026-10-16. The user: "once
+            // we are providing the arrows to change the month, why provide a
+            // vertical scroll? ... the stuff beneath it is getting hidden, and
+            // that actually carries meaning." The week run scrolled INSIDE the
+            // page, so a swipe moved the weeks instead of the page and the day
+            // panel below never came up. Withings and Apple Health on Mobbin:
+            // one month, the arrows, and what comes next right under it. A
+            // sideways swipe steps a month as the arrows do. A window that
+            // crosses a month is said by `_BoundaryNote` (that was the reason
+            // for the scroll). Kept for revert:
+            //   _WeeksGrid(month: _month, origin: _origin,
+            //       weekCount: _weekCount, controller: _weeks,
+            //       selected: _selected,
             //       onSelect: (d) => setState(() => _selected = d),
-            //       onMonth: (delta) => setState(() {
-            //         _month = DateTime(_month.year, _month.month + delta);
-            //       }),
-            //       t: t),
-            //   _BoundaryNote(month: _month, t: t),
-            //   const SizedBox(height: 14),
-            _WeeksGrid(
-              month: _month,
-              origin: _origin,
-              weekCount: _weekCount,
-              controller: _weeks,
-              selected: _selected,
-              onSelect: (d) => setState(() => _selected = d),
-              onMonth: _jumpToMonth,
+            //       onMonth: _jumpToMonth),
+            GestureDetector(
+              key: const ValueKey('ttc_calendar_month'),
+              behavior: HitTestBehavior.translucent,
+              onHorizontalDragEnd: (d) {
+                final v = d.primaryVelocity ?? 0;
+                if (v.abs() < 200) return;
+                _stepMonth(v < 0 ? 1 : -1);
+              },
+              child: _MonthGrid(
+                  month: _month,
+                  selected: _selected,
+                  onSelect: (d) => setState(() => _selected = d),
+                  onMonth: _stepMonth,
+                  t: t),
             ),
+            _BoundaryNote(month: _month, t: t),
+            if (ttcCycleWindowStartsInPeriod()) ...[
+              const SizedBox(height: 4),
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 1),
+                  child: Icon(Icons.info_outline_rounded,
+                      size: 15, color: ttcMuted),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: Text(ttcWindowForHim(kTtcWindowInPeriodLine),
+                        style: ttcBody(12.5, h: 1.45))),
+              ]),
+            ],
             const SizedBox(height: 14),
             _Legend(
               open: _legendOpen,
@@ -554,8 +602,7 @@ bool _sameDay(DateTime? a, DateTime b) =>
 
 // ---- the grid ---------------------------------------------------------------
 
-// Unused since 2026-10-13 (see _WeeksGrid). Kept for revert.
-// ignore: unused_element
+// Back in use since 2026-10-16 (one month at a time); see the call site.
 class _MonthGrid extends StatelessWidget {
   const _MonthGrid({
     required this.month,
@@ -615,6 +662,7 @@ class _MonthGrid extends StatelessWidget {
         Row(children: [
           Expanded(
             child: Text('${_monthNames[month.month - 1]} ${month.year}',
+                key: const ValueKey('ttc_calendar_month_title'),
                 style: pvFraunces(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
@@ -708,9 +756,7 @@ class _MonthGrid extends StatelessWidget {
 }
 
 /// Says so when the fertile run does not fit inside the month on screen.
-// Unused since 2026-10-13: the weeks scroll, so a run is never cut. Kept
-// for revert.
-// ignore: unused_element
+// Back in use since 2026-10-16, with the one-month grid.
 class _BoundaryNote extends StatelessWidget {
   const _BoundaryNote({required this.month, required this.t});
 
@@ -808,11 +854,17 @@ class TtcFertileBand extends StatelessWidget {
   /// resolver), and the band drawn under the pink circles read as one mess
   /// (the user: "the purple border… the days overlapping, going away from
   /// each other"). Kept for revert: `isFertile` alone.
-  static bool shows(DateTime? d) {
-    if (!isFertile(d)) return false;
-    final f = ttcFactsFor(d!);
-    return !(f.isPeriodStart || f.isBleedDay);
-  }
+  //
+  // ⚠️ SHOWN ON BLEEDING DAYS TOO, SINCE 2026-10-16 (the user's decision, as
+  // Clue does). On her 20-22 day cycles the window opens inside the period,
+  // and hiding it there left one fertile day in one cycle, three in the next
+  // and none in the third. The band runs behind the period's circles; the
+  // day is still NAMED the period (rule 4), and a line under the month says
+  // why both show. Kept for revert:
+  //   if (!isFertile(d)) return false;
+  //   final f = ttcFactsFor(d!);
+  //   return !(f.isPeriodStart || f.isBleedDay);
+  static bool shows(DateTime? d) => isFertile(d);
 
   @override
   Widget build(BuildContext context) {
@@ -1630,7 +1682,10 @@ class _CalendarIntro extends StatelessWidget {
                 : kTtcCalendarIntroNoEstimate;
 
     // One action, only where it fills the gap the sentence names.
-    final (String, IconData, VoidCallback)? action = empty
+    // His side (2026-10-16): her dates and her clinic's are hers to add.
+    final (String, IconData, VoidCallback)? action = TtcPartnerMode.instance.on
+        ? null
+        : empty
         ? (
             kTtcCalendarAddPeriod,
             Icons.add_rounded,
@@ -1648,7 +1703,9 @@ class _CalendarIntro extends StatelessWidget {
       key: const ValueKey('ttc_calendar_intro'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(text, style: ttcBody(14, color: ttcInk, h: 1.5)),
+        // His voice (2026-10-16): "Filled circles are her period". Kept for
+        // revert: Text(text, ...).
+        Text(ttcWindowForHim(text), style: ttcBody(14, color: ttcInk, h: 1.5)),
         if (action != null) ...[
           const SizedBox(height: 12),
           Semantics(
@@ -2058,6 +2115,8 @@ class TtcCalendarSummary extends StatelessWidget {
 /// edge, so a fertile run that crosses into the next month stays one band.
 /// The header still names a month and its arrows still step by one; they
 /// scroll this list rather than swapping a page.
+// Unused since 2026-10-16 (one month at a time again). Kept for revert.
+// ignore: unused_element
 class _WeeksGrid extends StatelessWidget {
   const _WeeksGrid({
     required this.month,

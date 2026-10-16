@@ -36,7 +36,8 @@ import '../../theme/pv_fonts.dart';
 import 'ttc_common.dart';
 import 'ttc_what_is_this.dart';
 import '../v2/v3_hero_field.dart' show v3FieldChroma;
-import 'ttc_cycle_companion.dart' show showTtcPeriodLogSheet;
+import 'ttc_cycle_companion.dart'
+    show showTtcPeriodLogSheet, kTtcWindowInPeriodLine;
 // Kept for revert (2026-09-27): ... show kTtcCompanionHue, showTtcPeriodLogSheet;
 import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_report_states.dart';
@@ -51,6 +52,7 @@ import 'ttc_surface_router.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_cycle_headline.dart';
+import 'ttc_window_screen.dart' show ttcWindowForHim;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcCycleReportScreen extends StatefulWidget {
@@ -530,6 +532,13 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
     final hasSeries =
         r.withWeight.length >= 2 || r.withTemp.length >= 2;
 
+    // The parts as the legend and the timeline list them (2026-10-16): the
+    // fertile days whole, even where they begin inside the period, and the
+    // count from this cycle rather than a fixed "four".
+    final legend = ttcCycleLegendSpans(index: _index);
+    final parts = _partsWord(legend);
+    final overlap = ttcCycleWindowStartsInPeriod(index: _index);
+
     // ⚠️ THE FIELD FROM THE ONE PALETTE (2026-09-27). `here.phase.hue` gave
     // each part its own hue, so the days before the fertile days opened on a
     // BLUE page: "the colour above is blue… what was the need of blue?". Now
@@ -543,22 +552,25 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       variant: 2,
       eyebrow: t.reportTitle,
       // Kept for revert: title: _heroLine(here.phase),
-      title: hasHere
+      // His side (2026-10-16): "She's in the waiting days".
+      title: ttcWindowForHim(hasHere
           ? _heroLine(here.phase)
           : _index > 0
               ? 'An earlier cycle'
-              : 'Your period may start any day',
+              : 'Your period may start any day'),
       // An earlier cycle's stretches are worked out looking back from its own
       // length (2026-09-26), so they no longer shift and the words say so.
       // "Stretches" was our word; the four parts are named in plain words
       // (2026-09-27). Kept for revert: '... The four stretches are worked out
       // looking back ...' / '... The four stretches are estimates ...'.
-      intro: _index > 0
-          ? 'One whole cycle, start to finish. Its four parts are worked out '
+      // The number of parts is this cycle's own (2026-10-16). Kept for
+      // revert: "Its four parts" / "split into four parts".
+      intro: ttcWindowForHim(_index > 0
+          ? 'One whole cycle, start to finish. Its $parts parts are worked out '
               'looking back, from how long this cycle ran.'
-          : '${headline == null ? '' : '$headline. '}One whole cycle, start to finish, split into four parts. The '
+          : '${headline == null ? '' : '$headline. '}One whole cycle, start to finish, split into $parts parts. The '
               'dates are estimates from what you log, and they shift as you '
-              'log more.',
+              'log more.'),
       // ⚠️ THE i DOES ONE THING ON EVERY STATE (tools pass, 2026-09-27): it
       // opened a sheet here and an inline panel on the other three. Now the
       // same inline panel everywhere. Kept for revert:
@@ -617,12 +629,12 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             ]),
             const SizedBox(height: 6),
             Text(
-                _view == TtcCycleView.dial
+                ttcWindowForHim(_view == TtcCycleView.dial
                     ? 'The ring is one cycle. It starts at the top on day 1, '
                         'the first day of your period, and moves clockwise, '
                         'one step per day.'
                     : 'Every day of this cycle, in order. The colour of a day '
-                        'says which part of your cycle it belongs to.',
+                        'says which part of your cycle it belongs to.'),
                 style: ttcBody(13, h: 1.55)),
             const SizedBox(height: 18),
 
@@ -639,17 +651,41 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TtcPhaseLegend(
-                      spans: spans,
+                      // Kept for revert: spans: spans,
+                      spans: legend,
                       loggedDots: _view == TtcCycleView.calendar),
                 ),
+                if (overlap) ...[
+                  const SizedBox(height: 12),
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 1),
+                      child: Icon(Icons.info_outline_rounded,
+                          size: 15, color: ttcMuted),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                        child: Text(ttcWindowForHim(kTtcWindowInPeriodLine),
+                            style: ttcBody(12.5, h: 1.45))),
+                  ]),
+                ],
+                if (_index == 0) ...[
+                  const SizedBox(height: 14),
+                  const Align(
+                      alignment: Alignment.centerLeft, child: TtcComingUp()),
+                ],
               ]),
             ),
             const SizedBox(height: 24),
 
             // ---- the four stops -----------------------------------------
             // Kept for revert: ttcSectionTitle('The four stretches, in order').
-            ttcSectionTitle(kTtcReportFourParts),
-            TtcCycleCard(child: TtcCycleTimeline(spans: spans)),
+            // Kept for revert: ttcSectionTitle(kTtcReportFourParts) and
+            // TtcCycleTimeline(spans: spans).
+            ttcSectionTitle(legend.length == 4 || legend.isEmpty
+                ? ttcWindowForHim(kTtcReportFourParts)
+                : ttcWindowForHim('The $parts parts of your cycle')),
+            TtcCycleCard(child: TtcCycleTimeline(spans: legend)),
             // ⚠️ THE "ESTIMATES" LINE ONCE, IN THE INTRO (2026-09-27). This
             // said it a second time for the current cycle; the looking-back
             // line stays, because it is a different fact. Kept for revert:
@@ -946,6 +982,12 @@ String ttcWhichCycle(int index, int available) {
 
 /// The heading over the timeline of the four parts.
 const String kTtcReportFourParts = 'The four parts of your cycle';
+
+/// How many parts this cycle has, as a word (2026-10-16).
+String _partsWord(List<TtcPhaseSpan> legend) {
+  final n = {for (final s in legend) s.phase}.length;
+  return const {1: 'one', 2: 'two', 3: 'three'}[n] ?? 'four';
+}
 
 // ---- the numbers, and the way to add them (2026-09-27) ---------------------
 

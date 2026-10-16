@@ -29,9 +29,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_cycle_report.dart';
+import '../../ttc/cycle_store.dart';
+import '../../ttc/ttc_chapter.dart' show TtcChapterEngine;
+import '../../ttc/ttc_fertile_window.dart';
+import '../../ttc/ttc_period_due.dart' show ttcShortDay;
+import '../../ttc/ttc_store.dart';
 import '../../theme/pv_fonts.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_palette.dart';
+import 'ttc_window_screen.dart' show ttcWindowForHim;
 // Kept for revert (2026-09-27): import 'ttc_phase_colours.dart';
 
 /// Which drawing is on screen.
@@ -546,7 +552,7 @@ class _Stop extends StatelessWidget {
                     runSpacing: 4,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Text('$index · ${span.phase.label}',
+                      Text('$index · ${ttcWindowForHim(span.phase.label)}',
                           style: ttcFraunces(16,
                               w: FontWeight.w600, color: ttcTitleInk)),
                       if (here)
@@ -557,7 +563,7 @@ class _Stop extends StatelessWidget {
                             color: TtcCycleColours.tint(span.phase),
                             borderRadius: BorderRadius.circular(999),
                           ),
-                          child: Text('YOU ARE HERE',
+                          child: Text(ttcWindowForHim('YOU ARE HERE'),
                               style: pvManrope(
                                   fontSize: 9,
                                   fontWeight: FontWeight.w800,
@@ -570,7 +576,8 @@ class _Stop extends StatelessWidget {
                   Text(meta.toString(),
                       style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w600)),
                   const SizedBox(height: 6),
-                  Text(ttcPhaseBlurb(span.phase), style: ttcBody(13, h: 1.55)),
+                  Text(ttcWindowForHim(ttcPhaseBlurb(span.phase)),
+                      style: ttcBody(13, h: 1.55)),
                 ],
               ),
             ),
@@ -687,7 +694,7 @@ class TtcPhaseLegend extends StatelessWidget {
           for (final span in spans)
             _Key(
                 colour: TtcCycleColours.fill(span.phase),
-                label: span.phase.label),
+                label: ttcWindowForHim(span.phase.label)),
           if (loggedDots)
             // Kept for revert: 'a dot means you logged' (2026-09-27).
             const _Key(
@@ -720,4 +727,150 @@ class _Key extends StatelessWidget {
         const SizedBox(width: 6),
         Text(label, style: ttcBody(11, color: ttcMuted, w: FontWeight.w700)),
       ]);
+}
+
+// =============================================================================
+//  Coming up (2026-10-16)
+// -----------------------------------------------------------------------------
+//  The user: "how will the person be able to understand where they are
+//  actually and what comes next?" Withings and Ultrahuman on Mobbin answer it
+//  under the picture: "Days around ovulation 1-7 Mar · Period 20-24 Mar",
+//  "Fertile window 10-16 Jul · in 3 days". Two rows, soonest first, from the
+//  dates every other surface already uses (`ttcFertileWindowNow`, and the next
+//  period at her usual length): no new arithmetic.
+// =============================================================================
+
+/// What comes next in her cycle: her fertile days and her next period, each
+/// with its dates and how far away it is.
+class TtcComingUp extends StatelessWidget {
+  const TtcComingUp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final rows = <(int, Widget)>[];
+
+    final start = CycleStore.instance.lastPeriodStart;
+    final length = TtcStore.instance.today.cycleLength;
+    final next = start != null && length > 0
+        ? DateTime(start.year, start.month, start.day + length)
+        : null;
+
+    // ⚠️ THIS CYCLE'S WINDOW, OR THE NEXT ONE COUNTED FROM THE NEXT PERIOD
+    // (2026-10-16, the device). `ttcFertileWindowNow` rolls THIS cycle's
+    // ovulation day forward, and when that came from an early LH reading
+    // (day 3) the next window landed on 18-23 Oct, around a period due on the
+    // 21st. Once this cycle's window has passed, the next one is placed the
+    // calendar way: ovulation 14 days before the period after next.
+    final w = ttcFertileWindowNow();
+    if (w != null && w.cyclesAhead == 0) {
+      rows.add((
+        w.openNow ? 0 : w.daysUntilOpen,
+        _ComingRow(
+          phase: TtcPhase.fertileWindow,
+          label: w.openNow ? 'Your fertile days, now' : 'Your fertile days',
+          dates: '${ttcShortDay(w.opensOn)} – ${ttcShortDay(w.closesOn)}',
+          when: w.openNow ? 'now' : ttcInDays(w.daysUntilOpen),
+        ),
+      ));
+    } else if (w != null && next != null) {
+      final ov = length - TtcChapterEngine.lutealPhaseDays; // cycle day
+      final opens = DateTime(next.year, next.month,
+          next.day + ov - ttcWindowOpensBeforeOvulation - 1);
+      final closes = DateTime(next.year, next.month,
+          next.day + ov + ttcWindowClosesAfterOvulation - 1);
+      final until = opens.difference(today).inDays;
+      rows.add((
+        until,
+        _ComingRow(
+          phase: TtcPhase.fertileWindow,
+          label: 'Your next fertile days',
+          dates: '${ttcShortDay(opens)} – ${ttcShortDay(closes)}',
+          when: ttcInDays(until),
+        ),
+      ));
+    }
+
+    if (next != null) {
+      final until = next.difference(today).inDays;
+      rows.add((
+        until,
+        _ComingRow(
+          phase: TtcPhase.period,
+          label: until < 0 ? 'Your period was due' : 'Your next period',
+          dates: 'around ${ttcShortDay(next)}',
+          when: until < 0 ? '${-until} days ago' : ttcInDays(until),
+        ),
+      ));
+    }
+    if (rows.isEmpty) return const SizedBox.shrink();
+    rows.sort((a, b) => a.$1.compareTo(b.$1));
+
+    return Column(
+      key: const ValueKey('ttc_coming_up'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('COMING UP',
+            style: pvManrope(
+                fontSize: 9.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.1,
+                color: ttcMuted)),
+        const SizedBox(height: 4),
+        for (final r in rows) r.$2,
+      ],
+    );
+  }
+}
+
+/// "today", "tomorrow", "in 5 days".
+String ttcInDays(int n) => n <= 0
+    ? 'today'
+    : n == 1
+        ? 'tomorrow'
+        : 'in $n days';
+
+class _ComingRow extends StatelessWidget {
+  const _ComingRow({
+    required this.phase,
+    required this.label,
+    required this.dates,
+    required this.when,
+  });
+
+  final TtcPhase phase;
+  final String label;
+  final String dates;
+  final String when;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7),
+        child: Row(children: [
+          Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+                color: TtcCycleColours.fill(phase),
+                borderRadius: BorderRadius.circular(3)),
+          ),
+          const SizedBox(width: 10),
+          // Two lines, not one: the name, then the dates and how far away.
+          // On one line the three ran past the edge of a 360dp phone.
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(ttcWindowForHim(label),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text('$dates · $when',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: ttcBody(12.5, color: ttcSoft)),
+            ]),
+          ),
+        ]),
+      );
 }

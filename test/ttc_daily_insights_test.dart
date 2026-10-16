@@ -194,13 +194,13 @@ void main() {
           reason: '"today" printed under last Tuesday');
     });
 
-    test('the day of her cycle opens a read, not the screen the hero opens',
-        () {
+    // 2026-10-16, the user: the day card opened "How conception works". A day
+    // number opens the screen that says where she is in her cycle.
+    test('the day of her cycle opens her cycle, never an unrelated read', () {
       history();
       final c = ttcInsightsFor(day(0)).firstWhere((c) => c.id == 'cycle_day');
-      expect(c.go, TtcInsightGo.read);
-      expect(ttcReadById(c.readId!), isNotNull);
-      expect(ttcRailReadIds(day(0)), contains(c.readId));
+      expect(c.go, TtcInsightGo.cycle);
+      expect(c.readId, isNull);
     });
 
     test('discharge is reported separately from how she feels', () {

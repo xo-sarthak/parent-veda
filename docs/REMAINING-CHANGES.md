@@ -214,12 +214,89 @@ tell me; I rerun the converter.
   145 toys show for all ages.
 - **Doc issue, kids' books:** the scoring sheets are empty; "Why Recommended" only repeats the theme.
 
+## TTC: fertile days that overlap the period, what we found and what was decided (2026-10-16)
+
+**What you saw.** On her side the calendar showed one fertile day in the 19 Aug cycle, three in the 8 Sep
+cycle and none in the 30 Sep cycle, while the Cycle companion said "four parts" and listed two.
+
+**The biology, in plain words.** Two things happen in two different places at the same time:
+
+- **The womb sheds its lining.** That is the period, days 1 to about 5.
+- **The ovary is already ripening the next egg.** This starts on day 1 and runs alongside the bleeding.
+  The egg is released (ovulation) about 14 days *before the next period*. That number is fairly fixed;
+  it is the first half of the cycle that varies.
+- **The fertile days** are ovulation day plus the 5 days before it, because sperm can live up to about
+  5 days. That makes 6 days.
+
+So in a 28-day cycle, ovulation is around day 14 and the fertile days are days 9 to 14, well after the
+period. In a 21-day cycle, ovulation is around day 7 and the fertile days are days 2 to 7. They begin
+while she is still bleeding. Shedding and egg-ripening don't conflict, because the womb rebuilds its
+lining in the days after the period. An embryo only arrives about a week after ovulation, by which time
+the lining is ready.
+
+**What the app was doing.** The maths was right (ovulation = cycle length − 14, window = 6 days).
+But every picture let **the period win any shared day**, so the fertile days that fell on bleeding
+days were hidden:
+
+| Cycle | Window | Shown before |
+|---|---|---|
+| 20 days | days 1–6 | 1 day |
+| 22 days | days 3–8 | 3 days |
+| 21 days | days 2–7 | 2 days |
+
+The "four parts" line was fixed text. On a cycle under about 25 days, "the days before the fertile days"
+never happens, so there are only three parts.
+
+**What was decided (you, 2026-10-16): show both, as Clue does.**
+
+- The fertile days are always their full 6 days, on the calendar and in every list. A bleeding day is
+  still *called* the period; the fertile shade runs behind it.
+- One line says why: "With a shorter cycle, your fertile days can begin before your period ends."
+- The parts line counts this cycle's real parts ("three parts this time").
+- A "Coming up" list says what's next and how far away it is.
+- The estimate itself did not change. Only what is drawn moved. Recorded as TTC-SPEC 1.5.
+
+**Why the 30 Sep cycle still shows only 30 Sep – 2 Oct.** The test data has an ovulation-test positive
+logged on about day 2 of that cycle. Her own test outranks our calendar estimate, so ovulation is
+placed on day 3. The window would be 5 days earlier still, but it can't begin before the cycle does,
+so it shows 3 days. Without that entry it would be 1–6 Oct.
+
+- **New:** saving a reading that early now says "Day N is very early for ovulation, check it is the right day",
+  with Undo.
+- **Fixed:** "Coming up" no longer carries this early day into the next cycle (it showed fertile days
+  around the next period). The next window is placed from the next period instead.
+
+**Random period dates.** Every "add a period" path now asks when a date is under 15 days from a period
+already logged ("too close to be a new cycle. It may be spotting. Or did that period really start
+on X?"). It offers "Move that start" or "No, log a separate period". A 15–20 day cycle saves with one
+calm line: one short cycle is common, and repeated cycles under 21 days are worth mentioning to a
+doctor. It never blocks, because she knows her body.
+
+**How other apps handle it.** Two levels of confidence here:
+
+- **Seen on Mobbin:** Clue and Fitbit calendars draw the fertile days as one full band next to the
+  period. Withings and Apple Health show one month with arrows and a "what's next" list under it, which
+  is the calendar layout we moved to.
+- **The Mobbin screens are all 28-day cycles,** so none of them shows an overlap.
+- **Not verified, general knowledge only:** Flo and Clue let you log a period on any day rather than
+  blocking it. They flag short or irregular cycles in their analysis screens. Their fertile predictions
+  follow the same rule (ovulation about 14 days before the next period), so on a short cycle their
+  windows would also reach into the period.
+
+**Open for you:**
+
+- Remove the early ovulation-test entry from the test phone's 30 Sep cycle, or keep it as a test case.
+- "Day of your cycle" and the "Cycle companion · Your period dates" card both open the Cycle companion now.
+  Keep both, or drop the second.
+- The too-close question has no "it was spotting" button, because the app has no spotting log yet.
+
 ## Needs you, not code
 
 - **Ask Veda hosting.** The Railway trial ended and the service is down. Pick a host or plan.
 - **Supabase** (checked against the live DB 2026-10-16). Every migration 0001-0096 is RUN and verified
   (0083, 0093-0096 run by the user that day; `kChildSexGivenColumn` flipped to true). Edge functions: all 8
-  deployed and current (`razorpay-create-order` redeployed 2026-10-16 with server pricing). Still owed: load
+  deployed and current (`razorpay-create-order` redeployed 2026-10-16 with server pricing). Products catalogue ON HOLD
+  (admin-panel work, BACKEND-PATTERNS §16hh); it was: load
   the unified catalogue into `products` (STILL-OPEN §65.1). Also done: 0082, 0084, 0086, 0088, 0089, 0090 + expert-photos bucket,
   0092 (final version), the three `service_role` grants. Still owed: re-run the Ask Veda ingest
   (`python -m ingest.ingest` in the askveda repo); whether the doctor demo was re-seeded after 0089.
@@ -241,4 +318,8 @@ tell me; I rerun the converter.
   then "Baby has arrived", the home card, the envelope, and download and share the book.
 - **Device check, all phases screen.** Parenting home → phase hero → all phases: the NOW card, the
   chapter chips, a tap on a past and a future phase, and a tablet if one is to hand.
+- **TTC test phone.** Decide on the early ovulation-test entry in the 30 Sep cycle (see the fertile-days section above), and whether two rail cards may both open the Cycle companion.
 - **Push.** `9223ce4` (tap feedback) and anything before it not yet pushed.
+
+- **Yoga & fitness hub (2026-10-16), device walk.** Pregnancy: Yoga & fitness → Classes and tools → yoga card; More → All programmes and sessions → Yoga. Parenting: Explore → Yoga & Classes, and the pelvic floor page → Kegel Care (should say "Breathe first" in the first six weeks). TTC: More → Yoga & fitness; home movement card on a period day and in the two-week wait.
+- **Yoga videos.** The 21 month sessions and the recorded classes are placeholders; filming is owed.

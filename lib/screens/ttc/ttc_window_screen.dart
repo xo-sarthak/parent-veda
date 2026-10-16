@@ -95,6 +95,15 @@ String ttcWindowForHim(String s) => !TtcPartnerMode.instance.on
         .replaceAll('the day you ovulate', 'the day she ovulates')
         .replaceAll('where you are today', 'where she is today')
         .replaceAll('inside you', 'inside her')
+        // 2026-10-16, the walk: the cycle companion, the report and Messages
+        // say these too. One helper for every screen he reaches.
+        .replaceAll('Where you are', 'Where she is')
+        .replaceAll('when you can get pregnant', 'when she can get pregnant')
+        .replaceAll('you log ', 'she logs ')
+        .replaceAll("you haven't logged", "she hasn't logged")
+        .replaceAll('YOU ARE HERE', 'SHE IS HERE')
+        .replaceAll(RegExp(r'\bYours\b'), 'Hers')
+        .replaceAll(RegExp(r'\byours\b'), 'hers')
         .replaceAll(RegExp(r'\bYOUR\b'), 'HER')
         .replaceAll(RegExp(r'\bYour\b'), 'Her')
         .replaceAll(RegExp(r'\byour\b'), 'her');

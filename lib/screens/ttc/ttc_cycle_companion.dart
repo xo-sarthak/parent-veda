@@ -64,6 +64,8 @@ import 'ttc_cycle_palette.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_marks.dart' show ttcToolHeaderMark;
 import 'ttc_cycle_headline.dart';
+import 'ttc_partner_home.dart' show TtcPartnerViewOnlyLine;
+import 'ttc_window_screen.dart' show ttcWindowForHim;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// Which of the four the screen is in.
@@ -94,8 +96,12 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge(
-            [CycleStore.instance, TtcStore.instance, TtcLang.instance]),
+        animation: Listenable.merge([
+          CycleStore.instance,
+          TtcStore.instance,
+          TtcLang.instance,
+          TtcPartnerMode.instance,
+        ]),
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
           final t = TtcS.current();
@@ -280,7 +286,7 @@ class _Hero extends StatelessWidget {
             const SizedBox(height: 14),
             ttcToolHeaderMark('cycle', v2BlockTint(hue % 360, p))!,
             const SizedBox(height: 12),
-            Text(title,
+            Text(_his(title),
                 style: pvFraunces(
                     fontSize: 32,
                     fontWeight: FontWeight.w600,
@@ -288,7 +294,7 @@ class _Hero extends StatelessWidget {
                     letterSpacing: -0.9,
                     color: p.ink1)),
             const SizedBox(height: 8),
-            Text(line,
+            Text(_his(line),
                 style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1)),
           ],
         ),
@@ -464,9 +470,13 @@ class _CompanionSheet extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: ttcBody(13.5, h: 1.55)),
             const SizedBox(height: 18),
-            _QuietAction(
-                label: 'Add a period date',
-                onTap: () => showTtcPeriodLogSheet(context)),
+            // His side (2026-10-16): her dates are hers to add.
+            if (TtcPartnerMode.instance.on)
+              TtcPartnerViewOnlyLine(p: p, text: kTtcPartnerDatesEmpty)
+            else
+              _QuietAction(
+                  label: 'Add a period date',
+                  onTap: () => showTtcPeriodLogSheet(context)),
           ]),
         ),
         const SizedBox(height: 28),
@@ -594,6 +604,10 @@ class _CompanionSheet extends StatelessWidget {
     return [
       Row(children: [
         Expanded(child: _Eyebrow('Your dates', p: p)),
+        // ⚠️ HIS SIDE IS VIEW-ONLY (2026-10-16). The walk found him able to
+        // add, correct and remove HER period dates from his own phone, a line
+        // under "Only she can change it." No pill, no hint, no row actions.
+        if (!TtcPartnerMode.instance.on)
         // A pill you can hit, not a word (2026-09-27): a 13pt label with
         // no edge was the only way to add a period once one existed. Kept
         // for revert: GestureDetector(Text('Add a date', ttcBody(13, w800))).
@@ -625,6 +639,9 @@ class _CompanionSheet extends StatelessWidget {
         ),
       ]),
       const SizedBox(height: 6),
+      if (TtcPartnerMode.instance.on)
+        TtcPartnerViewOnlyLine(p: p, text: kTtcPartnerDatesViewOnly)
+      else
       // ⚠️ A TAP, NOT ONLY A SWIPE (tools pass, 2026-09-27). The swipe was
       // the only way to fix a date and nothing showed it; each row now
       // carries a pencil and opens "Change" and "Remove" on a tap (Withings'
@@ -732,6 +749,10 @@ class _ThisCycleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ring = picture == TtcCompanionPicture.ring;
+    // The legend lists the fertile days whole (2026-10-16); the ring and the
+    // days grid keep the contiguous spans, where a bleeding day reads Period.
+    final parts = ttcCycleLegendSpans();
+    final overlap = ttcCycleWindowStartsInPeriod();
     return TtcCycleCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -751,8 +772,10 @@ class _ThisCycleCard extends StatelessWidget {
           ),
         ]),
         const SizedBox(height: 6),
-        // The four parts named once, in plain words (2026-09-27).
-        Text(kTtcFourPartsLine, style: ttcBody(13, h: 1.45)),
+        // The parts named once, in plain words (2026-09-27), and counted from
+        // this cycle (2026-10-16): a short cycle has three, and the line said
+        // four over a legend of two. Kept for revert: kTtcFourPartsLine.
+        Text(_his(ttcCyclePartsLine(parts)), style: ttcBody(13, h: 1.45)),
         const SizedBox(height: 10),
         if (ring)
           TtcCycleRing(spans: spans, today: DateTime.now())
@@ -766,7 +789,14 @@ class _ThisCycleCard extends StatelessWidget {
         // also carry the dates and the lengths, which is the thing she actually
         // came to read. A legend that is only a legend is a caption nobody
         // needs twice.
-        for (final s in spans) _StretchRow(span: s),
+        // Kept for revert: for (final s in spans) _StretchRow(span: s),
+        for (final s in parts) _StretchRow(span: s),
+        if (overlap) ...[
+          const SizedBox(height: 4),
+          _QuietNote(text: _his(kTtcWindowInPeriodLine)),
+        ],
+        const SizedBox(height: 10),
+        const TtcComingUp(),
         const SizedBox(height: 4),
         ttcDivider(),
         const SizedBox(height: 8),
@@ -821,7 +851,7 @@ class _StretchRow extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(span.phase.label,
+          child: Text(_his(span.phase.label),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: ttcBody(13,
@@ -972,7 +1002,14 @@ class _DayCell extends StatelessWidget {
             : null,
         boxShadow: isToday && !expected ? ttcTodayRings(mark) : null,
       ),
-      child: Column(
+      // ⚠️ THE TWO LINES SCALE TO THE CELL (2026-10-16): the month's name over
+      // the 1st, or "Now" under today, ran 2.4pt past a 360dp cell. Scaled
+      // down rather than clipped, so nothing is lost on a small phone.
+      child: Center(
+       child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (showsMonth)
@@ -1018,6 +1055,8 @@ class _DayCell extends StatelessWidget {
                       color: Colors.white)),
             ),
         ],
+      ),
+       ),
       ),
     );
   }
@@ -1077,11 +1116,11 @@ class _RhythmCard extends StatelessWidget {
         ]),
         if (lengths.length > 1) ...[
           const SizedBox(height: 14),
-          Text(
+          Text(_his(
               'Across your last ${lengths.length} cycles. '
               '${spread == 0 ? "Yours hasn't changed at all" : 'Yours changes by '
                   '$spread ${spread == 1 ? 'day' : 'days'}'}'
-              '${spread != null && spread <= 4 ? '. That\'s a steady rhythm.' : '.'}',
+              '${spread != null && spread <= 4 ? '. That\'s a steady rhythm.' : '.'}'),
               style: ttcBody(13, h: 1.45, color: ttcSoft)),
         ],
         if (next != null) ...[
@@ -1180,11 +1219,14 @@ class _DateRowState extends State<_DateRow> {
     }
 
     final offset = widget.open ? -_kRowReveal : _drag;
+    // His side (2026-10-16): the row shows her date and nothing more.
+    final viewOnly = TtcPartnerMode.instance.on;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: Stack(children: [
         // ---- the two actions, behind ------------------------------------
+        if (!viewOnly)
         Positioned.fill(
           child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             _RowAction(
@@ -1210,10 +1252,10 @@ class _DateRowState extends State<_DateRow> {
         // ---- the row itself ---------------------------------------------
         GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onHorizontalDragUpdate: (d) => setState(() {
+          onHorizontalDragUpdate: viewOnly ? null : (d) => setState(() {
             _drag = (_drag + d.delta.dx).clamp(-_kRowReveal, 0.0);
           }),
-          onHorizontalDragEnd: (_) {
+          onHorizontalDragEnd: viewOnly ? null : (_) {
             // Past a third of the way is a commitment; short of it, snap back.
             final opened = _drag < -_kRowReveal / 3;
             setState(() => _drag = 0);
@@ -1221,9 +1263,11 @@ class _DateRowState extends State<_DateRow> {
           },
           // A tap opens Change and Remove (2026-09-27). Kept for revert:
           //   onTap: widget.open ? () => widget.onOpen(false) : null,
-          onTap: widget.open
-              ? () => widget.onOpen(false)
-              : () => showTtcPeriodDateActions(context, widget.start),
+          onTap: viewOnly
+              ? null
+              : widget.open
+                  ? () => widget.onOpen(false)
+                  : () => showTtcPeriodDateActions(context, widget.start),
           child: AnimatedContainer(
             duration: Duration(milliseconds: _drag == 0 ? 220 : 0),
             curve: Curves.easeOut,
@@ -1292,6 +1336,7 @@ class _DateRowState extends State<_DateRow> {
                     // (2026-09-27). Kept for revert:
                     //   Icon(Icons.keyboard_double_arrow_left_rounded,
                     //       size: 15, color: ttcMuted.withValues(alpha: 0.6)),
+                    if (!viewOnly)
                     Semantics(
                       button: true,
                       label: 'Change or remove ${ttcLongDate(widget.start)}',
@@ -1733,6 +1778,23 @@ TtcHomePeriodIntent ttcHomePeriodIntent({
   return gap > 0 ? TtcHomePeriodIntent.newCycle : TtcHomePeriodIntent.earlier;
 }
 
+/// Under this, a cycle is a short one worth a calm word (2026-10-16): 21
+/// days is the low end of the usual range.
+const int kTtcShortCycleDays = 21;
+
+/// The too-close question on the add-a-period sheet (2026-10-16).
+String ttcPeriodTooCloseLine(DateTime picked, DateTime nearest, int gap) =>
+    '${ttcShortDate(picked)} is $gap ${gap == 1 ? 'day' : 'days'} from the '
+    'period you logged on ${ttcShortDate(nearest)}, too close to be a new '
+    'cycle. It may be spotting. Or did that period really start on '
+    '${ttcShortDate(picked)}?';
+
+/// The one calm line for a 15 to 20 day cycle. Never a diagnosis.
+String ttcPeriodShortLine(int gap) =>
+    'That makes a $gap-day cycle, shorter than usual. One short cycle is '
+    "common. If cycles under 21 days keep happening, it's worth mentioning "
+    'to a doctor.';
+
 /// The words under the calendar for [intent]: what Save will do, said plainly.
 String ttcHomePeriodLine(
     TtcHomePeriodIntent intent, DateTime? anchor, DateTime picked) {
@@ -1862,6 +1924,61 @@ class _LogSheetState extends State<_LogSheet> {
   /// The duplicate's bleeding days differ from what the sheet now holds.
   bool get _duplicateBleedChanged =>
       _duplicate && CycleStore.instance.bleedDaysFor(_picked!) != _bleed;
+
+  // ⚠️ EVERY WAY IN ASKS, NOT ONLY THE HOME'S (2026-10-16). The user: "make
+  // sure that the user cannot keep logging random dates." The home's sheet
+  // already asked when a date sat under 15 days from a logged start; this
+  // sheet (the companion's "Add a period date", the calendar's) saved it
+  // silently and left it "Not in your average". Now it asks the same
+  // question, and a short-but-real cycle (15 to 20 days) saves with one calm
+  // line. It never blocks: she knows her body, and the truth hierarchy puts
+  // her observation above our arithmetic.
+
+  /// The logged start nearest the picked day, and how many days away. Null
+  /// on the home's sheet (it has its own), on a correction and on a repeat.
+  (DateTime, int)? get _nearest {
+    final picked = _picked;
+    if (picked == null || widget.home || _isEdit || _duplicate) return null;
+    final p = DateTime(picked.year, picked.month, picked.day);
+    DateTime? best;
+    int? gap;
+    for (final s in CycleStore.instance.periodStarts) {
+      final g = p.difference(DateTime(s.year, s.month, s.day)).inDays.abs();
+      if (gap == null || g < gap) {
+        gap = g;
+        best = s;
+      }
+    }
+    return best == null ? null : (best, gap!);
+  }
+
+  bool get _tooClose =>
+      (_nearest?.$2 ?? 1 << 20) < CycleStore.minPlausibleCycleDays;
+
+  bool get _shortCycle {
+    final g = _nearest?.$2;
+    return g != null &&
+        g >= CycleStore.minPlausibleCycleDays &&
+        g < kTtcShortCycleDays;
+  }
+
+  /// "Move that start", from the too-close question: the period she logged
+  /// really began on the picked day.
+  void _moveNearest() {
+    final n = _nearest;
+    final picked = _picked;
+    if (n == null || picked == null) return;
+    CycleStore.instance
+      ..movePeriodStart(n.$1, picked)
+      ..logBleedDays(picked, _bleed);
+    HapticFeedback.selectionClick();
+    final navigator = Navigator.of(context);
+    navigator.maybePop();
+    if (widget.notify) {
+      pvSnack(navigator.context, 'Changed to ${ttcShortDate(picked)}',
+          icon: Icons.check_rounded);
+    }
+  }
 
   TtcHomePeriodIntent? get _homeIntent => !widget.home || _picked == null
       ? null
@@ -2243,6 +2360,48 @@ class _LogSheetState extends State<_LogSheet> {
                       ),
                       const SizedBox(height: 12),
                     ],
+                    if (_tooClose) ...[
+                      Container(
+                        key: const ValueKey('ttc_period_too_close_line'),
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: const Border.fromBorderSide(
+                              BorderSide(color: ttcLine)),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Text(
+                            ttcPeriodTooCloseLine(
+                                _picked!, _nearest!.$1, _nearest!.$2),
+                            style: ttcBody(13.5,
+                                color: ttcTitleInk,
+                                w: FontWeight.w600,
+                                h: 1.45)),
+                      ),
+                      const SizedBox(height: 12),
+                      _QuietAction(
+                        key: const ValueKey('ttc_period_move_nearest'),
+                        label:
+                            'Move that start to ${ttcShortDate(_picked!)}',
+                        onTap: _moveNearest,
+                      ),
+                      const SizedBox(height: 10),
+                      _QuietAction(
+                        key: const ValueKey('ttc_period_log_anyway'),
+                        label: 'No, log a separate period',
+                        muted: true,
+                        onTap: _save,
+                      ),
+                    ] else ...[
+                    if (_shortCycle) ...[
+                      Padding(
+                        key: const ValueKey('ttc_period_short_line'),
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(ttcPeriodShortLine(_nearest!.$2),
+                            style: ttcBody(13, h: 1.45)),
+                      ),
+                    ],
                     // Kept as it was for every other caller.
                     _QuietAction(
                       label: _isEdit
@@ -2254,6 +2413,7 @@ class _LogSheetState extends State<_LogSheet> {
                               : 'Save this period',
                       onTap: _picked == null ? null : _save,
                     ),
+                    ],
                   ],
                   const SizedBox(height: 10),
                   _QuietAction(
@@ -2484,7 +2644,7 @@ class _Eyebrow extends StatelessWidget {
   final V2Palette p;
 
   @override
-  Widget build(BuildContext context) => Text(text.toUpperCase(),
+  Widget build(BuildContext context) => Text(_his(text).toUpperCase(),
       style: pvManrope(
           fontSize: 9.5,
           fontWeight: FontWeight.w800,
@@ -2672,7 +2832,61 @@ const String kTtcCirclePicture = 'Circle';
 const String kTtcCalendarPicture = 'Calendar';
 
 /// The four parts of a cycle, named once in plain words.
+/// The parts line for this cycle, counted from its legend (2026-10-16).
+/// Four parts reads as before; a short cycle, where the fertile days begin
+/// inside the period and "the days before" never happens, names three.
+String ttcCyclePartsLine(List<TtcPhaseSpan> parts) {
+  final has = {for (final s in parts) s.phase};
+  if (has.length == 4 || has.isEmpty) return kTtcFourPartsLine;
+  final names = [
+    if (has.contains(TtcPhase.period)) 'your period',
+    if (has.contains(TtcPhase.beforeWindow)) 'the days before your fertile days',
+    if (has.contains(TtcPhase.fertileWindow))
+      'your fertile days (when you can get pregnant)',
+    if (has.contains(TtcPhase.afterWindow)) 'the wait for your next period',
+  ];
+  final word = const {1: 'one', 2: 'two', 3: 'three'}[names.length]!;
+  final list = names.length == 1
+      ? names.first
+      : '${names.sublist(0, names.length - 1).join(', ')}, and ${names.last}';
+  return 'Your cycle has $word ${names.length == 1 ? 'part' : 'parts'} '
+      'this time: $list.';
+}
+
+/// Under the legend when the fertile days begin on a bleeding day.
+const String kTtcWindowInPeriodLine =
+    'With a shorter cycle, your fertile days can begin before your period '
+    'ends. Both are shown.';
+
+/// A quiet line with an info mark, on the page (DESIGN-SYSTEM 4.0).
+class _QuietNote extends StatelessWidget {
+  const _QuietNote({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 1),
+            child: Icon(Icons.info_outline_rounded, size: 15, color: ttcMuted),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: ttcBody(12.5, h: 1.45))),
+        ]),
+      );
+}
+
 const String kTtcFourPartsLine =
     'Your cycle has four parts: your period, the days before your fertile '
     'days, your fertile days (when you can get pregnant), and the wait for '
     'your next period.';
+
+/// His side's voice on this screen (2026-10-16): the same facts about HER.
+/// `ttcWindowForHim` does nothing on her side, and now carries every swap
+/// this screen needs ("Yours", "Where you are", ...).
+String _his(String s) => ttcWindowForHim(s);
+
+const String kTtcPartnerDatesViewOnly =
+    'Her dates, as she logs them. Only she can change them.';
+const String kTtcPartnerDatesEmpty = 'Her dates show here once she adds them.';

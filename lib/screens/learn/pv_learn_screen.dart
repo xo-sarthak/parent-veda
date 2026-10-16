@@ -707,8 +707,13 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
                         view: v,
                         title: v.title,
                         sub: v.expert.name,
-                        foot: _footLine(v),
-                        price: v.priceLabel,
+                        // ⚠️ NO PRICE WITHOUT A PERSON (2026-10-16). The page
+                        // it opens refuses the booking ("Coming soon", see
+                        // pv_offering_content.dart), and the More tab says
+                        // the same; the list showed "₹599 · Next tomorrow".
+                        // Kept for revert: foot: _footLine(v), price:
+                        // v.priceLabel.
+                        foot: kPvLearnNoPersonFoot,
                         onTap: () => _open(v),
                       )
                     : PvLearnRow(
@@ -757,8 +762,13 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
                         view: v,
                         title: v.title,
                         sub: v.expert.name,
-                        foot: _footLine(v),
-                        price: v.priceLabel,
+                        // ⚠️ NO PRICE WITHOUT A PERSON (2026-10-16). The page
+                        // it opens refuses the booking ("Coming soon", see
+                        // pv_offering_content.dart), and the More tab says
+                        // the same; the list showed "₹599 · Next tomorrow".
+                        // Kept for revert: foot: _footLine(v), price:
+                        // v.priceLabel.
+                        foot: kPvLearnNoPersonFoot,
                         onTap: () => _open(v),
                       )
                     : PvLearnRow(
@@ -975,3 +985,7 @@ int? pvConsultMinutes(PvOfferingView v) {
   }
   return null;
 }
+
+/// The foot of a consult row with no named person (2026-10-16): the same
+/// words as the More tab and the page it opens.
+const String kPvLearnNoPersonFoot = "Coming soon · We're adding a specialist";

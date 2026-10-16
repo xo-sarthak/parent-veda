@@ -372,9 +372,11 @@ class _TtcHomeV3State extends State<TtcHomeV3>
         final checkMonths = TtcHomePrefs.instance.checkDismissed
             ? null
             : ttcHomeCheckMonths();
-        final doorIds = ttcHomeDoorOrderNow([
-          for (final b in bracketsFor(LifeStage.tryingToConceive)) b.id,
-        ]);
+        final doorIds = ttcHisDoorsFirst(
+            ttcHomeDoorOrderNow([
+              for (final b in bracketsFor(LifeStage.tryingToConceive)) b.id,
+            ]),
+            him: him);
 
         return Scaffold(
           backgroundColor: p.ground,
@@ -523,8 +525,11 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // 101". It names the next step instead of counting them:
                   // the course has done its job as a way in once she is in.
                   // HIS SIDE (2026-10-10): his block, where her next steps sit.
+                  // Not in `_pad` (2026-10-16): the block pads its own head and
+                  // cards, and its row runs edge to edge. Kept for revert:
+                  // _pad(TtcPartnerHomeBlock(p: p)),
                   if (him) ...[
-                    _pad(TtcPartnerHomeBlock(p: p)),
+                    TtcPartnerHomeBlock(p: p),
                     const SizedBox(height: 32),
                   ],
                   if (!him && TtcHomePrefs.instance.offer101) ...[
@@ -1073,7 +1078,19 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // Understated on purpose, and it keeps V1's rule: no
                   // celebration styling, no tint block, no eyebrow. It is a
                   // door, and it must never read as "why haven't you tested?".
-                  _pad(_TestDoor(p: p)),
+                  //
+                  // HIS SIDE (2026-10-16): the record is hers to make. On his
+                  // phone this door would move HIS phone to pregnancy, alone
+                  // (`TtcTransitionEngine.confirmPregnancy` sets the stage). It
+                  // is not hidden; his place says who marks it. Kept for
+                  // revert: _pad(_TestDoor(p: p)) for both.
+                  if (him)
+                    _pad(TtcPartnerViewOnlyLine(
+                        key: const ValueKey('ttc_partner_pregnant_line'),
+                        p: p,
+                        text: kTtcPartnerPregnantLine))
+                  else
+                    _pad(_TestDoor(p: p)),
                   const SizedBox(height: 22),
 
                   // ⚠️ EVERY TOOL CARRIES THIS AND THE BUSIEST SCREEN DID NOT
@@ -3869,7 +3886,8 @@ class _InsightRail extends StatelessWidget {
     // One picker (launch sanity MB18, 2026-09-28): the movement Mind & body ›
     // Today names. Kept for revert:
     //   final m = ttcPickForToday(ttcMovements, now: selected, offset: 2);
-    final m = ttcTodaysMoveTip(on: selected);
+    // Follows her cycle phase (Yoga & fitness pass, 2026-10-16).
+    final m = ttcTodaysMoveTip(on: selected, phase: phase);
     // ⚠️ NEVER A PRODUCT THE RAIL BELOW ALREADY SHOWS (2026-09-28, the user:
     // "no random repetition"). Today's pick rotates through the guide by
     // date, and on some days it landed on Folic acid while the Recommended

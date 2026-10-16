@@ -21,7 +21,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart';
-import 'package:parentveda/screens/ttc/ttc_common.dart';
+// Unused since the week-run test went (2026-10-16): import 'package:parentveda/screens/ttc/ttc_common.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
@@ -187,24 +187,33 @@ void main() {
       expect(find.byKey(const ValueKey('ttc_calendar_summary')), findsNothing);
     });
 
-    testWidgets('the weeks scroll, and the arrow steps a month', (tester) async {
+    // 2026-10-16, the user: "once we are providing the arrows to change the
+    // month, why provide a vertical scroll?" One month at a time again; the
+    // arrows and a sideways swipe step it. Kept for revert: the week-run test
+    // ('the weeks scroll, and the arrow steps a month').
+    testWidgets('one month at a time: the arrow and a swipe step a month',
+        (tester) async {
       logCleanHistory();
       await pumpCalendar(tester);
-      expect(find.byKey(const ValueKey('ttc_calendar_weeks')), findsOneWidget);
-      final n = DateTime.now();
-      final next = DateTime(n.year, n.month + 1);
-      // The next month's 1st is labelled in the run, not on a new page.
-      expect(
-          find.byKey(ValueKey('ttc_cal_month_label_${next.year}_${next.month}')),
-          findsOneWidget);
-      await tester.tap(find.byIcon(Icons.chevron_right_rounded).first);
-      await tester.pumpAndSettle();
-      final title = tester.widget<Text>(
-          find.byKey(const ValueKey('ttc_calendar_month_title')));
-      expect(title.data, endsWith('${next.year}'));
+      expect(find.byKey(const ValueKey('ttc_calendar_weeks')), findsNothing);
       const names = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
-      expect(title.data, startsWith(names[next.month - 1]));
+      String title() => tester
+          .widget<Text>(find.byKey(const ValueKey('ttc_calendar_month_title')))
+          .data!;
+      final n = DateTime.now();
+      expect(title(), '${names[n.month - 1]} ${n.year}');
+
+      await tester.tap(find.byIcon(Icons.chevron_right_rounded).first);
+      await tester.pumpAndSettle();
+      final next = DateTime(n.year, n.month + 1);
+      expect(title(), '${names[next.month - 1]} ${next.year}');
+
+      // A swipe to the right goes back a month.
+      await tester.fling(find.byKey(const ValueKey('ttc_calendar_month')),
+          const Offset(400, 0), 1200);
+      await tester.pumpAndSettle();
+      expect(title(), '${names[n.month - 1]} ${n.year}');
     });
 
     testWidgets('fertile days still ahead are striped, and the key says so',

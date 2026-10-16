@@ -39,7 +39,9 @@ import '../v2/v2_palette.dart';
 import 'chats/ttc_chat.dart';
 import 'ttc_common.dart';
 import 'ttc_content_prefs_sheet.dart' show TtcSwitchRow;
+import 'ttc_strings.dart' show TtcPartnerMode;
 import 'ttc_surface_router.dart';
+import 'ttc_window_screen.dart' show ttcWindowForHim;
 
 /// The empty state's words (M1): what arrives, not what is missing.
 const String kTtcMessagesEmptyTitle =
@@ -129,7 +131,8 @@ class _TtcMessagesScreenState extends State<TtcMessagesScreen> {
       backgroundColor: ttcBg,
       body: SafeArea(
         child: ListenableBuilder(
-          listenable: _store,
+          // His side (2026-10-16): the words follow the his/her view.
+          listenable: Listenable.merge([_store, TtcPartnerMode.instance]),
           builder: (context, _) {
             final list = _store.delivered();
             final unread = list.where((m) => !m.read).length;
@@ -408,7 +411,9 @@ class _MessageTile extends StatelessWidget {
                         // M1 (2026-09-28): the words as they read today, not
                         // as they were frozen at send time. Kept for revert:
                         // Text(message.title, ...) and Text(message.body, ...).
-                        child: Text(message.shownOn(DateTime.now()).$1,
+                        // His side (2026-10-16): her messages, about her.
+                        child: Text(
+                            _his(message.shownOn(DateTime.now()).$1),
                             style: pvManrope(
                                 fontSize: 15,
                                 height: 1.3,
@@ -421,7 +426,7 @@ class _MessageTile extends StatelessWidget {
                           style: pvManrope(fontSize: 12, color: p.ink3)),
                     ]),
                     const SizedBox(height: 4),
-                    Text(message.shownOn(DateTime.now()).$2,
+                    Text(_his(message.shownOn(DateTime.now()).$2),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(
@@ -473,8 +478,8 @@ class _Settings extends StatelessWidget {
       for (final k in TtcMessageKind.values)
         TtcSwitchRow(
           key: ValueKey('ttc-message-switch-${k.name}'),
-          title: k.label,
-          sub: k.when,
+          title: _his(k.label),
+          sub: _his(k.when),
           value: store.isOn(k),
           onChanged: (v) => store.setOn(k, v),
         ),
@@ -533,3 +538,7 @@ class _Settings extends StatelessWidget {
 //     );
 //   }
 // }
+
+/// His side's voice on this screen (2026-10-16): `ttcWindowForHim`, which now
+/// carries the logging lines too ("The evening she logs a period").
+String _his(String s) => ttcWindowForHim(s);

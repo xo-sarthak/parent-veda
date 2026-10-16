@@ -8,6 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/localization/app_language.dart';
+import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart' show kTtcCalendarIntro;
+import 'package:parentveda/screens/ttc/ttc_cycle_companion.dart';
+import 'package:parentveda/screens/ttc/ttc_cycle_report_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_daily_insights.dart';
 import 'package:parentveda/screens/ttc/ttc_home_v3.dart';
 import 'package:parentveda/screens/ttc/ttc_partner_home.dart';
@@ -141,5 +145,106 @@ void main() {
       expect(at, greaterThan(0), reason: line);
       expect(src.substring(at - 80, at).contains('ttcWindowForHim('), isTrue, reason: line);
     }
+  });
+
+  // ---- 2026-10-16: his home decluttered, and every screen he reaches is
+  // view-only and in his voice (the device walk).
+
+  testWidgets("his home: one mission card and a row, no I'm pregnant door",
+      (t) async {
+    TtcPartnerMode.instance.on = true;
+    await pump(t);
+    expect(find.byKey(const ValueKey('ttc_partner_mission')), findsOneWidget);
+    // Rows in the reading list's look, not insight tiles (2026-10-16).
+    for (final e in ['Supporting her', 'Tonight, ask her', 'Her body', 'Your half']) {
+      expect(find.text(e), findsOneWidget, reason: e);
+    }
+    expect(find.text("I'm pregnant"), findsNothing);
+    expect(find.text(kTtcPartnerPregnantLine), findsOneWidget);
+    // The long body text is a tap away, not on the page.
+    expect(find.textContaining('progesterone'), findsNothing);
+    // The mission card is one labelled button for a screen reader.
+    final sem = t.ensureSemantics();
+    await t.pump();
+    expect(find.bySemanticsLabel(RegExp("^TODAY'S MISSION")), findsOneWidget);
+    sem.dispose();
+  });
+
+  testWidgets('her home keeps her door and has no part of his', (t) async {
+    await pump(t);
+    expect(find.text("I'm pregnant"), findsOneWidget);
+    expect(find.text(kTtcPartnerPregnantLine), findsNothing);
+    expect(find.byKey(const ValueKey('ttc_partner_mission')), findsNothing);
+  });
+
+  test('his door leads the grid on his side only', () {
+    const ids = ['ttc_conceiving', 'ttc_pcos', 'ttc_male_fertility', 'ttc_not_yet'];
+    expect(ttcHisDoorsFirst(ids, him: true).first, 'ttc_male_fertility');
+    expect(ttcHisDoorsFirst(ids, him: true).length, ids.length);
+    expect(ttcHisDoorsFirst(ids, him: false), ids);
+  });
+
+  test('his pieces open as complete reads, her body in paragraphs', () {
+    final paras = ttcPartnerParagraphs(
+        'One.\n\nTwo.\n\nThree.', 'Ek.\n\nDo.\n\nTeen.');
+    expect(paras.map((p) => p.en), ['One.', 'Two.', 'Three.']);
+    expect(paras[1].hi, 'Do.');
+    final read = ttcPartnerRead(
+        id: 'x', kicker: 'Her body', teaser: 'A line.',
+        title: const LocalizedText(en: 'T', hi: 'T'), paragraphs: paras);
+    expect(read.title.en, isNotEmpty);
+    expect(read.whenToSeeSomeone.body.en, isNotEmpty);
+    // Each paragraph once: the first as the lede, the rest as the body,
+    // and a standfirst of its own (the device showed one text three times).
+    expect(read.scaleSetter.en, 'One.');
+    expect(read.teaser.en, 'A line.');
+    expect(read.sections.first.paragraphs.map((p) => p.en), ['Two.', 'Three.']);
+  });
+
+  testWidgets('cycle companion on his side: her dates, nothing to change',
+      (t) async {
+    TtcPartnerMode.instance.on = true;
+    t.view.physicalSize = const Size(400, 5000);
+    t.view.devicePixelRatio = 1.0;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(
+        key: UniqueKey(), home: const TtcCycleCompanionScreen()));
+    await t.pump(const Duration(milliseconds: 300));
+    expect(t.takeException(), isNull);
+    expect(find.byKey(const ValueKey('ttc_companion_add_date')), findsNothing);
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text('Remove'), findsNothing);
+    expect(find.byIcon(Icons.edit_outlined), findsNothing);
+    expect(find.text(kTtcPartnerDatesViewOnly), findsOneWidget);
+    expect(find.text('HER DATES'), findsOneWidget);
+    expect(find.text('YOUR DATES'), findsNothing);
+  });
+
+  test('the calendar legend speaks about her on his side', () {
+    TtcPartnerMode.instance.on = true;
+    final s = ttcWindowForHim(kTtcCalendarIntro);
+    expect(s, contains('her period'));
+    expect(s, isNot(contains('your period')));
+  });
+
+  test('a consult with no named person shows no price anywhere', () {
+    final src = File('lib/screens/learn/pv_learn_screen.dart')
+        .readAsStringSync()
+        .replaceAll('\r\n', '\n');
+    expect('foot: kPvLearnNoPersonFoot,'.allMatches(src).length, 2);
+  });
+
+  testWidgets('the cycle report on his side speaks about her', (t) async {
+    TtcPartnerMode.instance.on = true;
+    t.view.physicalSize = const Size(400, 6000);
+    t.view.devicePixelRatio = 1.0;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(
+        MaterialApp(key: UniqueKey(), home: const TtcCycleReportScreen()));
+    await t.pump(const Duration(milliseconds: 300));
+    expect(t.takeException(), isNull);
+    expect(find.textContaining("You're in"), findsNothing);
+    expect(find.textContaining('your cycle'), findsNothing);
+    expect(find.textContaining('YOU ARE HERE'), findsNothing);
   });
 }

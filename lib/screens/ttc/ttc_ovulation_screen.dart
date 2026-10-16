@@ -160,6 +160,22 @@ String ttcOvFarLine(TtcOvFar far, int expectedOvulationDay) =>
 const String kTtcOvNegativeLabel = 'Negative';
 const String kTtcOvPositiveLabel = 'Positive';
 const String kTtcOvMoved = 'Your fertile days now follow this test.';
+
+// ⚠️ AN EARLY DAY IS SAID, NOT REFUSED (2026-10-16). The walk found a cycle
+// with no fertile days at all: an LH positive or temperature rise logged on
+// a bleeding day moves ovulation inside the period, and the window with it.
+// Her reading outranks our estimate (the truth hierarchy), so it is saved;
+// the line says it is unusually early, and Undo is right there.
+const int kTtcEarliestLikelyOvulationDay = 7;
+
+/// The line after an early reading (before cycle day 7).
+String ttcOvEarlyLine(int day) =>
+    'Saved. Day $day is very early for ovulation, so check it is the right '
+    'day. Undo if it was a slip.';
+
+/// What the save says: the usual line, or the early one.
+String ttcOvMovedLine(int day) =>
+    day < kTtcEarliestLikelyOvulationDay ? ttcOvEarlyLine(day) : kTtcOvMoved;
 const String kTtcOvBack = 'Your fertile days go back to our calendar estimate.';
 const String kTtcOvTempHeading = 'Temperature rise';
 // Kept for revert (2026-09-28): 'Add the day it rose'
@@ -221,7 +237,8 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
         cycle.logLhPositive(cd);
         pvSnack(
           context,
-          kTtcOvMoved,
+          // 2026-10-16: an early day is said, so a slip is undone at once.
+          ttcOvMovedLine(cd),
           icon: Icons.check_rounded,
           lift: 24,
           action: 'Undo',
@@ -252,7 +269,7 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
     cycle.logLhPositive(cd);
     pvSnack(
       context,
-      kTtcOvMoved,
+      ttcOvMovedLine(cd),
       icon: Icons.check_rounded,
       lift: 24,
       action: 'Undo',
@@ -314,7 +331,17 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
       ),
     );
     if (picked == null || !mounted) return;
+    final prevShift = CycleStore.instance.temperatureShiftDay;
     CycleStore.instance.logTemperatureShift(picked);
+    // 2026-10-16: an early rise is said, with Undo, as the LH test is.
+    if (picked < kTtcEarliestLikelyOvulationDay) {
+      pvSnack(context, ttcOvEarlyLine(picked),
+          icon: Icons.info_outline_rounded,
+          lift: 24,
+          action: 'Undo',
+          onAction: () =>
+              CycleStore.instance.logTemperatureShift(prevShift));
+    }
   }
 
   @override

@@ -180,4 +180,17 @@ void main() {
               'line to _allowed with the reason it is not a page section');
     });
   });
+
+  // His side (2026-10-16). His home block was hand-built: a grey "FOR YOU"
+  // eyebrow and a default-weight "Your part today" that read as another
+  // font beside her headings. The scan above missed it (the gap before the
+  // title was 4), so this pins the block to the home's own heading.
+  test('his home block uses the home heading, purple eyebrow', () {
+    final src = _live('lib/screens/ttc/ttc_partner_home.dart');
+    expect(src, contains("TtcSectionHeading('Your part today'"));
+    expect(src, isNot(contains('color: p.ink3)),')),
+        reason: 'a section eyebrow is p.action, never grey');
+    expect(src, isNot(contains('letterSpacing: 0.8')),
+        reason: 'eyebrow tracking is 1.4, as on her cards');
+  });
 }

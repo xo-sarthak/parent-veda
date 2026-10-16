@@ -543,20 +543,21 @@ class TtcPhaseSpan {
   int get days => lastCycleDay - firstCycleDay + 1;
 }
 
-/// The four stretches of the cycle [index] back from the current one.
+/// What every picture of the cycle [index] back is drawn from: its first day,
+/// its length, its estimated ovulation day and its bleed days. Null when the
+/// cycle is not ours to draw (the same refusals as the report).
 ///
-/// Empty when phases are not ours to draw. Fewer than four is a legitimate
-/// answer, not a bug: on a short cycle the assumed bleed days can swallow
-/// "Before your window" entirely, and drawing a stretch of zero days to keep
-/// the count at four would be inventing one.
-List<TtcPhaseSpan> ttcCyclePhaseSpans({int index = 0}) {
+/// ⚠️ ONE PLACE FOR THE FOUR NUMBERS (2026-10-16). The spans and the whole
+/// fertile window below both read this, so they can never disagree about
+/// which day she ovulated.
+({DateTime start, int length, int ov, int bleed})? _cycleBasis(int index) {
   final cycle = CycleStore.instance;
   final store = TtcStore.instance;
   final starts = [...cycle.periodStarts]..sort();
-  if (starts.isEmpty) return const [];
+  if (starts.isEmpty) return null;
 
   final pos = starts.length - 1 - index;
-  if (pos < 0) return const [];
+  if (pos < 0) return null;
   final start = _dayOnly(starts[pos]);
 
   // ⚠️ THE SAME REFUSALS AS THE REPORT, READ THE SAME WAY. Asked at the END of
@@ -566,7 +567,7 @@ List<TtcPhaseSpan> ttcCyclePhaseSpans({int index = 0}) {
   final length = nextStart != null
       ? nextStart.difference(start).inDays
       : store.today.cycleLength;
-  if (length < 1) return const [];
+  if (length < 1) return null;
 
   // Kept for revert: `last`, which only the old ov line below read.
   //   final last = start.add(Duration(days: length - 1));
@@ -581,14 +582,28 @@ List<TtcPhaseSpan> ttcCyclePhaseSpans({int index = 0}) {
   final ov = index == 0 || nextStart == null
       ? engine.estimatedOvulationDay(store.state())
       : ttcLookBackOvulationDay(start, nextStart);
-  if (ov == null) return const [];
+  if (ov == null) return null;
   // The cycle she is in only (2026-09-26): an earlier cycle's own clinic
   // dates already refused its look-back above. Kept for revert:
   //   if (!store.today.behaviour.showsFertilityWindow) return const [];
   if ((index == 0 || nextStart == null) &&
       !store.today.behaviour.showsFertilityWindow) {
-    return const [];
+    return null;
   }
+
+  return (start: start, length: length, ov: ov, bleed: ttcBleedDaysFor(start));
+}
+
+/// The four stretches of the cycle [index] back from the current one.
+///
+/// Empty when phases are not ours to draw. Fewer than four is a legitimate
+/// answer, not a bug: on a short cycle the assumed bleed days can swallow
+/// "Before your window" entirely, and drawing a stretch of zero days to keep
+/// the count at four would be inventing one.
+List<TtcPhaseSpan> ttcCyclePhaseSpans({int index = 0}) {
+  final b = _cycleBasis(index);
+  if (b == null) return const [];
+  final (:start, :length, :ov, :bleed) = b;
 
   // Where today falls. Outside the cycle entirely is the ordinary case for a
   // cycle she has paged back to.
@@ -596,7 +611,6 @@ List<TtcPhaseSpan> ttcCyclePhaseSpans({int index = 0}) {
 
   // ---- consecutive runs of one phase -------------------------------------
   final out = <TtcPhaseSpan>[];
-  final bleed = ttcBleedDaysFor(start);
   var runStart = 1;
   var runPhase = ttcPhaseForCycleDay(1, ov, bleedDays: bleed);
 
@@ -635,3 +649,83 @@ List<TtcPhaseSpan> ttcCyclePhaseSpans({int index = 0}) {
 }
 
 DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+// =============================================================================
+//  The fertile days, whole (2026-10-16)
+// -----------------------------------------------------------------------------
+//  The user, on her 20-22 day cycles: "for the cycle from 19 August there is
+//  only one fertile day ... from 8 September there were only three ... and from
+//  30 September no fertile days I can see. Yet the heading says the four parts
+//  of your cycle." The cause: the window is ovulation day - 5 to ovulation day,
+//  and on a short cycle it opens while she is still bleeding; every picture
+//  let the period win the shared days (`ttcPhaseForCycleDay`), so a 20-day
+//  cycle showed one fertile day and a 21-day one two.
+//
+//  DECIDED (the user, 2026-10-16): show both, as Clue does. A bleeding day is
+//  still NAMED "Period" (the spans and the ring keep period-wins, so a day has
+//  one phase), but the fertile days are listed and banded in full, and one
+//  line says why they can begin before a period ends.
+// =============================================================================
+
+/// The whole fertile window of the cycle [index] back, as one span: ovulation
+/// day - 5 to ovulation day, clipped only to the cycle itself, never to the
+/// period. Null when the cycle is not ours to draw.
+TtcPhaseSpan? ttcCycleWindowSpan({int index = 0}) {
+  final b = _cycleBasis(index);
+  if (b == null) return null;
+  final (:start, :length, :ov, bleed: _) = b;
+  final first = (ov - ttcWindowOpensBeforeOvulation).clamp(1, length);
+  final last = (ov + ttcWindowClosesAfterOvulation).clamp(1, length);
+  if (ov + ttcWindowClosesAfterOvulation < 1 ||
+      ov - ttcWindowOpensBeforeOvulation > length) {
+    return null;
+  }
+  final todayCycleDay = _dayOnly(DateTime.now()).difference(start).inDays + 1;
+  final TtcSpanStatus status;
+  int? into;
+  if (todayCycleDay < first) {
+    status = TtcSpanStatus.ahead;
+  } else if (todayCycleDay > last) {
+    status = TtcSpanStatus.done;
+  } else {
+    status = TtcSpanStatus.here;
+    into = todayCycleDay - first + 1;
+  }
+  return TtcPhaseSpan(
+    phase: TtcPhase.fertileWindow,
+    firstDay: start.add(Duration(days: first - 1)),
+    lastDay: start.add(Duration(days: last - 1)),
+    firstCycleDay: first,
+    lastCycleDay: last,
+    status: status,
+    dayInto: into,
+  );
+}
+
+/// True when the cycle's fertile days begin on one of its bleeding days.
+bool ttcCycleWindowStartsInPeriod({int index = 0}) {
+  final b = _cycleBasis(index);
+  final w = ttcCycleWindowSpan(index: index);
+  if (b == null || w == null) return false;
+  return w.firstCycleDay <= b.bleed;
+}
+
+/// The parts of the cycle as a legend lists them: the spans, with the fertile
+/// days replaced by the whole window, in the order they begin (the period
+/// first on a tie). This is what the legend rows, the timeline and the parts
+/// line read; the ring and the day grids keep the contiguous spans.
+List<TtcPhaseSpan> ttcCycleLegendSpans({int index = 0}) {
+  final spans = ttcCyclePhaseSpans(index: index);
+  final w = ttcCycleWindowSpan(index: index);
+  if (spans.isEmpty || w == null) return spans;
+  final out = [
+    for (final s in spans)
+      if (s.phase != TtcPhase.fertileWindow) s,
+    w,
+  ]..sort((a, b) {
+      final byDay = a.firstCycleDay.compareTo(b.firstCycleDay);
+      if (byDay != 0) return byDay;
+      return a.phase.index.compareTo(b.phase.index);
+    });
+  return out;
+}

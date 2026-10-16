@@ -269,8 +269,15 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
       // conception works answers that in plain words. The home's read rows
       // leave out any read a rail card opens (`ttcRailReadIds`), so it is
       // never listed twice. Kept for revert: go: TtcInsightGo.cycle,
-      go: TtcInsightGo.read,
-      readId: kTtcCycleDayReadId,
+      //
+      // ⚠️ BACK TO THE CYCLE COMPANION (2026-10-16). The user: "I am clicking
+      // on day of the cycle, and you are telling me how conception works. It
+      // is confusing." A day number asks where she is in her cycle, and the
+      // companion's ring answers exactly that ("Day 17 of about 21", the part
+      // she is in, what comes next); no read in the library does. Its label
+      // and its page now say the same thing. Kept for revert:
+      //   go: TtcInsightGo.read, readId: kTtcCycleDayReadId,
+      go: TtcInsightGo.cycle,
     ));
   }
 
