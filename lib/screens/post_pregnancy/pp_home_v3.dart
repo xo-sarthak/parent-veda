@@ -2609,7 +2609,7 @@ class _PhaseAtAGlance extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: pvManrope(fontSize: _kBody, fontWeight: FontWeight.w500, height: 1.55, color: p.ink1)),
         const SizedBox(height: 4),
-        // ⚠️ A PHASE WITH A DOC (1–15, 2026-10-13) says what the doc says:
+        // ⚠️ A PHASE WITH A DOC (1–15 on 2026-10-13, all 20 since 2026-10-16) says what the doc says:
         // `workingOn` is its Living Through This Phase titles, under the
         // doc's own label, and the older "What is normal" line (authored, not
         // in the doc) steps aside. The summary is already the doc's hero.

@@ -250,7 +250,7 @@ PhaseDomain ppDocDomainAsPhase(PpDocDomain d) => switch (d) {
 
 /// [p] with its phase doc laid over it, or [p] unchanged when it has none.
 ///
-/// ⚠️ THE DOC IS THE SOURCE OF TRUTH (the user, 2026-10-13). Phases 1–15 have
+/// ⚠️ THE DOC IS THE SOURCE OF TRUTH (the user, 2026-10-13). Phases 1–20 (16–20 since 2026-10-16) have
 /// a doc (lib/data/pp_phase_docs.dart). Laying it over HERE, once, rather
 /// than in each screen means the hero, the phase map, the phase page, the
 /// at-a-glance card and the age page all say the same thing:

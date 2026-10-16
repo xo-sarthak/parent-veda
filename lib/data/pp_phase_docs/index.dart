@@ -15,6 +15,11 @@ import 'phase_12.dart';
 import 'phase_13.dart';
 import 'phase_14.dart';
 import 'phase_15.dart';
+import 'phase_16.dart';
+import 'phase_17.dart';
+import 'phase_18.dart';
+import 'phase_19.dart';
+import 'phase_20.dart';
 import '../pp_phase_docs.dart';
 
 /// Every phase with a doc, in phase order.
@@ -34,4 +39,9 @@ const List<PpPhaseDoc> kPpPhaseDocList = [
   kPpPhaseDoc13,
   kPpPhaseDoc14,
   kPpPhaseDoc15,
+  kPpPhaseDoc16,
+  kPpPhaseDoc17,
+  kPpPhaseDoc18,
+  kPpPhaseDoc19,
+  kPpPhaseDoc20,
 ];

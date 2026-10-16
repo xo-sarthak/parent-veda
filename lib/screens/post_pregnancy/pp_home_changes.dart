@@ -54,7 +54,7 @@ class PhaseChange {
   final AgePhase phase;
 
   /// The phase doc and its Child Snapshot card, when the phase has a doc
-  /// (1–15, 2026-10-13). Then the card says the doc's words and opens the
+  /// (1–15 on 2026-10-13, all 20 since 2026-10-16). Then the card says the doc's words and opens the
   /// doc's milestone page (`ppOpenMilestoneRead`) instead of the sheet.
   final PpPhaseDoc? doc;
   final PpSnapshot? snapshot;
@@ -190,7 +190,7 @@ String _lower(String s) =>
 List<PhaseChange> phaseChangesFor(AgePhase phase) {
   // ⚠️ A PHASE WITH A DOC SHOWS THE DOC'S FIVE (the user, 2026-10-13: the
   // Child Snapshot's fixed five domains, in its fixed order, each opening its
-  // milestone page). "Only what is changing" below is for phases 16–20.
+  // milestone page). "Only what is changing" below was for phases 16–20; every phase has a doc since 2026-10-16, so it is kept for a phase added without one.
   if (ppPhaseDocFor(phase.number) case final doc?) {
     return [
       for (final s in doc.snapshot)

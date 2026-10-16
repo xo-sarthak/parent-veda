@@ -41,7 +41,7 @@ class PhaseDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = phase;
-    // ⚠️ A PHASE WITH A DOC (1–15, 2026-10-13). `kPhases` has already laid
+    // ⚠️ A PHASE WITH A DOC (1–15 on 2026-10-13, all 20 since 2026-10-16). `kPhases` has already laid
     // the doc over this phase: `workingOn` is its Living Through titles and
     // `milestones` its Child Snapshot. Those are NOT the AAP 75% milestones,
     // so they must not sit under the "three in four children" caption; they

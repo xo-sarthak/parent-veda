@@ -167,6 +167,11 @@ void main() {
       // Snapshot is five fixed domains (the user: the doc is the source of
       // truth), so they show five. The shrink-with-the-data rule still holds
       // for phases 16–20, which have no doc yet. Was: phase 1 shows 3.
+      // 2026-10-16: 16–20 have docs too, so every phase shows five and the
+      // loop below is empty; it stays for any phase added without a doc.
+      for (final p in kPhases) {
+        expect(phaseChangesFor(p).length, 5, reason: 'phase ${p.number}: the doc\'s five domains');
+      }
       expect(phaseChangesFor(kPhases.first).length, 5);
       expect(phaseChangesLine(phaseChangesFor(kPhases.first), kPhases.first),
           'Five things are changing at 0–4 weeks.');

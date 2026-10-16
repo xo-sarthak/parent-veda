@@ -71,11 +71,11 @@ L = a day or more.
       paintings). Until a painting is dropped in as `assets/phases/phase_NN.webp`, that phase shows
       its number in its own colour. No code change needed per painting.
     - Test: `test/phase_map_screen_test.dart` (9 tests) plus 261 related parenting tests pass.
-17. **Phases 16–20 into the app (S once the files are local).** The five docs are in Drive. The
-    converter (`tools/phase_pages/docx_to_dart.py`) is already widened for their titles and asides,
-    and rerunning it left phases 1–15 unchanged. Waits on the five .docx files being downloaded into
-    the local "My Child phase-wise content" folder. Then: convert, the dropped-lines audit, the age
-    and cross-link checks, the "1–15" comments and tests to "1–20", STILL-OPEN §85.
+17. **Phases 16–20: DONE 2026-10-16.** All 20 phases now show their doc. The five .docx files sit
+    in the local "My Child phase-wise content" folder with the rest. The dropped-lines audit found
+    no lost content and no editor note in the app; every age matches its slot. To see it: You →
+    Developer, set the child to 19 months or older, then Parenting home → the phase hero.
+    STILL-OPEN §85.
 
 ## Drive content: what is missing, where the app differs, and issues in the docs
 
@@ -123,9 +123,7 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
 ### My Child phases (PH001–PH020) — STILL-OPEN §85
 - **Missing:** PH016–PH020 (19 months to 5 years). Those phases say "This phase's guide is being
   written" and keep only the old "When to call the doctor" lines (your call, 2026-10-14).
-  **Update 2026-10-15:** all five are now in Drive and read in full. They are not in the app yet:
-  the Drive tool cannot save a .docx, so they wait on you downloading them into the local folder
-  (Large item 17).
+  **DONE 2026-10-16:** all five are in the app (Large item 17).
 - **Doc issue, PH016:** the age is on the title line ("Words and Opinions 19–24 months"), and editor
   notes are left in: "Word count: 201 ✓", "Milestone Pages — … — Revised", a stray
   "PH016 · Words and Opinions" under "ACTIVITY PAGE PH016", and "(≈90 words)" after headings.
@@ -135,6 +133,10 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
   milestone…", "Important: I would remove 'If your toddler shows no curiosity…'", and "Important
   revision: I would remove the original variation involving a step stool…". Its typical age reads
   31–36 months; the app labels phase 18 as 31–35 months (same span, end month 36).
+- **Doc issue, PH020:** no "Activity Pages" heading before ACT099 (the app copes), and two doctor
+  lines run together with no space ("…contact your doctor.If your child…"; the app splits them).
+- **Doc issue, PH019 and PH020:** a line break in the middle of a linked name ("Playing / By the
+  Rules", "Helping / With Food Tasks"). The app joins them.
 - **Doc issue, PH019 and PH020:** word-count and checklist notes such as "(203 words — within
   180–220 ✓)", "(5 cards ✓ …)", "(3 bullets ✓)".
 - **App differs:** the converter drops all the editor notes above, so none shows in the app. They
@@ -201,8 +203,7 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
   the MSG91 secrets (STILL-OPEN §83.12).
 - **Phase docs (Drive).** Fix the six doc issues (PH015's missing activity, PH010's two names, the
   Phase 4 file name, activity times, panel sign-off) and the editor notes left in PH016–PH020.
-  Download PH016–PH020 as .docx into the local "My Child phase-wise content" folder. Then I pull
-  them in.
+  After a fix, download the changed .docx into the local "My Child phase-wise content" folder.
 - **Phase paintings.** Generate the 20 in ChatGPT from `docs/PHASE-PAINTING-PROMPTS.md` and send
   them as `phase_01` … `phase_20`.
 - **Phase films.** New films for the phases; Brain Development in Watch is empty until then.

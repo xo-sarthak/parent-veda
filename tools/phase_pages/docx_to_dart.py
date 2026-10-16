@@ -73,6 +73,8 @@ def paragraphs(path):
 def clean_para(text):
     # "…Pretend PlayWhy⏎ParentVeda Recommends It:" - a label broken across lines.
     t = re.sub(r'Why\s*\n\s*ParentVeda Recommends', 'Why ParentVeda Recommends', text)
+    # PH020: "Playing ⏎By the Rules (PH019)" - a soft break inside a linked name.
+    t = re.sub(r' \n(?=[^\n·]*\(PH\d+\))', ' ', t)
     # "Settling Into Feeds — note: the activity page names…": an editor's
     # aside. Removed BEFORE the bracket notes, which would split it in two.
     t = re.sub(r'\s+—\s+note:[^\n]*', '', t)
@@ -111,7 +113,9 @@ def lines_of(paras):
     return out
 
 
-GLUE = re.compile(r"^(.{3,70}?[a-z?!)])([A-Z][a-z]*[’']?[a-z]*\b.*)$")
+# PH019's title ends in a closing quote: 'Talking About "We"You may hear…'.
+# The quote must close a word, or 'About "' splits at the opening one.
+GLUE = re.compile(r"^(.{3,70}?(?:[a-z?!)]|[a-z][\"”’]))([A-Z][a-z]*[’']?[a-z]*\b.*)$")
 
 
 def unglue(line):
@@ -125,6 +129,11 @@ def unglue(line):
 def split_ticks(line):
     """'✓ A.✓ B.' -> ['A.', 'B.']"""
     return [x.strip() for x in line.split('✓') if x.strip()]
+
+
+def split_glued(line):
+    """PH020: 'contact your doctor.If your child…' - two sentences with no space."""
+    return [x.strip() for x in re.split(r'(?<=[.!?])(?=[A-Z])', line) if x.strip()]
 
 
 def is_heading(line, *names):
@@ -260,7 +269,9 @@ def parse_milestones(rows, code):
             continue
         if re.match(r'^When to (Contact|Consult) Your Doctor$', t):
             field = 'doctor'; continue
-        if field in ('ways', 'doctor'):
+        if field == 'doctor':
+            cur[field] += split_glued(t)
+        elif field == 'ways':
             cur[field].append(t)
         elif field in ('activities', 'relatedTopics'):
             cur[field] += [x.strip() for x in t.split('·') if x.strip()]
@@ -365,15 +376,18 @@ def parse(path):
         if s and not (s == 'doctor' and cur in ('milestones', 'activities')):
             cur = s
             continue
+        # PH020 has no "Activity Pages" heading: its first "ACT099 · …" title starts them.
+        if cur == 'milestones' and re.match(r'^ACT\d+\s*·', t):
+            cur = 'activities'
         # The age line under the title ("8 months (34–38 weeks)", "13–15 months").
-        if cur == 'hero' and not sections['hero'] and re.match(r'^[\d–\- ]+(weeks?|months?)\b', t):
+        if cur == 'hero' and not sections['hero'] and re.match(r'^[\d–\- ]+(weeks?|months?|years?)\b', t):  # PH019: "3–4 years"
             continue
         sections[cur].append((is_list, t))
 
     hero = [t for _, t in sections['hero']]
     if not 3 <= len(hero) <= 7:
         raise DocError(f'{code}: hero has {len(hero)} paragraphs: {[h[:30] for h in hero]}')
-    doctor = [t for _, t in sections['doctor']]
+    doctor = [x for _, t in sections['doctor'] for x in split_glued(t)]
     if len(doctor) < 3:
         raise DocError(f'{code}: phase doctor list has {len(doctor)} lines')
     return {

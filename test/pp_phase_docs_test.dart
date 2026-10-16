@@ -39,13 +39,35 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('the docs', () {
-    test('phases 1 to 15, each named as its doc', () {
-      expect(kPpPhaseDocs.keys.toList()..sort(), [for (var i = 1; i <= 15; i++) i]);
+    // 2026-10-16: PH016–PH020 arrived, so every phase has its doc. Was 1 to 15.
+    test('phases 1 to 20, each named as its doc', () {
+      expect(kPpPhaseDocs.keys.toList()..sort(), [for (var i = 1; i <= 20; i++) i]);
       expect(ppPhaseDocFor(1)!.name, 'The Settling In');
       expect(ppPhaseDocFor(4)!.name, 'Finding a Rhythm');
       expect(ppPhaseDocFor(10)!.name, 'Showing and Sharing', reason: '"(9 months)" is the file name, not the phase');
       expect(ppPhaseDocFor(15)!.name, 'Big Feelings');
-      expect(ppPhaseDocFor(16), isNull);
+      // expect(ppPhaseDocFor(16), isNull); // kept for revert: 16-20 had no doc
+      expect(ppPhaseDocFor(16)!.name, 'Words and Opinions', reason: 'the age on its title line is not the name');
+      expect(ppPhaseDocFor(19)!.living.first.title, 'Talking About "We"');
+      expect(ppPhaseDocFor(20)!.name, 'Big Questions');
+      expect(ppPhaseDocFor(20)!.activities.first.title, 'What Do They Know?',
+          reason: 'PH020 has no Activity Pages heading; ACT099 starts them');
+      expect(ppPhaseDocFor(21), isNull);
+    });
+
+    test('no editor note reaches the app (PH016-PH020 carry many)', () {
+      final note = RegExp(r'Word count|~\d+ words|\d+ words —|ords\)$|I would remove|Why I changed|Revised|✓');
+      for (final d in kPpPhaseDocList.where((d) => d.phase >= 16)) {
+        final text = [
+          d.name, ...d.hero, ...d.doctor,
+          for (final c in d.living) ...[c.title, c.body, ...c.tips],
+          for (final m in d.milestones) ...[m.title, m.whatIsIt, m.insight, ...m.ways, ...m.doctor, ...m.relatedTopics],
+          for (final a in d.activities) ...[a.title, a.intro, a.variations, ...a.steps],
+        ];
+        for (final t in text) {
+          expect(note.hasMatch(t), isFalse, reason: 'PH0${d.phase}: "$t"');
+        }
+      }
     });
 
     test('every phase is the doc shape', () {
@@ -122,6 +144,8 @@ void main() {
 
     test('a phase with no doc yet says its guide is being written, and nothing authored', () {
       // Was: 'phases 16 to 20 are untouched' (the authored phase in full).
+      // Since 2026-10-16 every phase has a doc, so this loop is empty; it
+      // stays as the rule for any phase added without one.
       for (final a in kPhasesAuthored.where((x) => ppPhaseDocFor(x.number) == null)) {
         final p = ppPhaseWithDoc(a);
         expect(p.name, a.name, reason: 'phase ${a.number} keeps its name');

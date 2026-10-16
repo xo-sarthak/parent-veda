@@ -67,8 +67,7 @@ const PpPhaseDoc kPpPhaseDoc07 = PpPhaseDoc(
         'Bang and Discover',
       ],
       relatedTopics: [
-        'Exploring',
-        'With Both Hands',
+        'Exploring With Both Hands',
         'Fine Motor Play',
         'Object Exploration',
       ],

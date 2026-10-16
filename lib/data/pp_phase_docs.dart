@@ -1,9 +1,9 @@
 // =============================================================================
 //  My Child phase docs — the user's phase-wise content, the source of truth
 // -----------------------------------------------------------------------------
-//  2026-10-13. The user's "My Child phase-wise content" docs, PH001–PH015, one
-//  per age phase 1–15 of `kPhasesAuthored` (pp_phases_data.dart; matched by
-//  age: PH001 is 0–4 weeks, PH015 is 16–18 months). Each holds three things:
+//  2026-10-13. The user's "My Child phase-wise content" docs, PH001–PH020 (16–20 added 2026-10-16), one
+//  per age phase 1–20 of `kPhasesAuthored` (pp_phases_data.dart; matched by
+//  age: PH001 is 0–4 weeks, PH020 is 4–5 years). Each holds three things:
 //
 //    · the phase page — Hero → Living Through This Phase → Child Snapshot →
 //      When to Contact Your Doctor;
@@ -13,7 +13,7 @@
 //  The user, 2026-10-13: "follow the document as the source of truth". Where a
 //  phase has a doc, the screens draw the doc; the older AAP draft text stays
 //  in pp_phases_data.dart for what the docs do not cover (the India note,
-//  feeding and sleep numbers, growth ranges, sources) and for phases 16–20.
+//  feeding and sleep numbers, growth ranges, sources) and for phases 16–20 until 2026-10-16.
 //
 //  ⚠️ GENERATED. `lib/data/pp_phase_docs/phase_NN.dart` and `index.dart` are
 //  written by `tools/phase_pages/docx_to_dart.py` from the docx files. Fix a
@@ -150,7 +150,7 @@ class PpPhaseDoc {
     required this.activities,
   });
 
-  /// The app phase number, 1–15.
+  /// The app phase number, 1–20.
   final int phase;
 
   /// "PH001".

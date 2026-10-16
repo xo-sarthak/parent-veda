@@ -10219,6 +10219,12 @@ the phase map's page; the "A new stage" message.
   the authored AAP text. ONE EXCEPTION, kept on purpose: the authored "When to call the doctor"
   lines stay on 16–20, so a child of 19 months to 5 years never loses the route to a doctor. The
   doc's own doctor lines replace them when it lands. CONFIRMED by the user 2026-10-14.
+  **CLOSED 2026-10-16:** PH016–PH020 are in (`lib/data/pp_phase_docs/phase_16..20.dart`), so all
+  20 phases show their doc, doctor lines included. `kPhaseGuideComing` stays for any phase added
+  without a doc. The converter learned four new shapes (a closing-quote card title, a soft break
+  inside a linked name, glued doctor sentences, PH020's missing Activity Pages heading), and the fix
+  for the second one also mended phase 7's related topic "Exploring With Both Hands", which had
+  been split in two.
 - **Leap films retired 2026-10-14** (the user: new phase films to come). "leap4brain" and
   "Inside the fussy leaps" are commented out in `pp_watch_data.dart`, with every link to them
   (activities, food, reading, reco), because `watchVideoById` falls back to the FIRST film on a
