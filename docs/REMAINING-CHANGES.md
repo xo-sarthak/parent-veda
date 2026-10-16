@@ -153,6 +153,26 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
   such section and the old text is gone.
 - **App differs:** Ask Veda does not know the phase text yet (needs the askveda repo).
 
+**In plain words: what to fix in the phase docs, and whether it matters** (written 2026-10-16)
+
+1. **PH015 (16–18 months) names an activity that was never written.** The Emotional milestone page
+   says "try *Naming All the Feelings*", but the doc has no such activity, so the app shows the
+   name with nothing to open. Fix: write it, or change the name to one that exists. Worth doing.
+2. **PH010 (9 months) gives one milestone two names.** The summary at the top and the milestone's
+   own page name it slightly differently ("Pointing to Show" vs "Pointing to Share Interest";
+   "Sharing with You" vs "Sharing With You"). The app has to pick one. Fix: choose the right
+   name. Worth doing.
+3. **No time or difficulty on activities.** No doc says "5 min · Easy", and the app never makes it
+   up, so every activity says "At your pace". Fix: only if you want times shown.
+4. **"Needs paediatric panel sign-off".** Each doc asks for a child-doctor review; none has had
+   one. They went live on your word. A reminder, not a mistake in the text.
+5. **PH004's file name** is "Phase 4 - Finding a Rhythm", not "PH004 — …". No effect on the app.
+6. **Writer's notes left in PH016–PH020** ("Word count: 201 ✓", "I would remove…", a stray
+   "ords)"). The app already strips them all, and a test checks it; cleaning them is only tidiness.
+
+After any fix: download the changed .docx into the local "My Child phase-wise content" folder and
+tell me; I rerun the converter.
+
 ### Pregnancy week pages — STILL-OPEN §84
 - **Missing:** weeks 1–4 and 24–40. Week 19 skipped at your request.
 - **Doc issue, weeks 5–23:** "Symptom cards require medical review before publishing"; not reviewed.
