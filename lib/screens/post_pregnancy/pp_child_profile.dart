@@ -237,7 +237,8 @@ class Child {
 
 /// Flip to true once `supabase/migrations/0093_children_sex_given.sql` has
 /// been run. Until then `sex_given` is kept on this phone only.
-const bool kChildSexGivenColumn = false;
+/// Run and verified on the live database 2026-10-16.
+const bool kChildSexGivenColumn = true;
 
 class ChildProfileStore extends ChangeNotifier {
   ChildProfileStore._();

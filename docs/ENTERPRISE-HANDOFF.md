@@ -12,6 +12,8 @@ email, Premium appears, and HR can see uptake.
 > Everything below in "what to build next" now exists. Migrations `0059`
 > (demo bypass) and `0060` (sponsor admin) are written but **not yet run** —
 > that is the one outstanding action, along with `supabase/seed/sponsor_demo.sql`.
+> (2026-10-16: this note may be stale. STILL-OPEN treats `0060` as live, and the
+> live-DB check that day did not test `0059`/`0060`. Verify before acting on it.)
 >
 > | Built | Where |
 > |---|---|

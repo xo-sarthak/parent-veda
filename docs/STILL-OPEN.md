@@ -491,7 +491,7 @@ Password. The user does this in the dashboard; until then the code email
 arrives empty and nothing on the app side can tell. Also confirm Email OTP
 length is 6.
 
-**5.4c `0084` is written, not run.** The user applies it in the SQL editor.
+**5.4c `0084` is written, not run.** The user applies it in the SQL editor. **CONFIRMED against the live DB 2026-10-16: RUN.**
 Until it runs, the ledger readers 404, the store keeps an empty cache, and
 every Earnings number is ₹0 with its empty-state copy — correct, and not the
 feature.
@@ -555,7 +555,7 @@ pile is `doctor_tasks.dart`, shown as the bell count, the rows and
 Classes (classes come from the compiled catalogue, not `booking_slots` —
 the §5.1c gap); the read covers are Openverse-proxied StockSnap, to be
 mirrored to R2 with the others; `0088` and `0089` must be RUN; the demo
-must be re-seeded after `0089` (its backdated rows froze 0%).
+must be re-seeded after `0089` (its backdated rows froze 0%). **CONFIRMED against the live DB 2026-10-16: 0088 and 0089 RUN; whether the demo was re-seeded is unknown.**
 
 **5.4l Every tab is a door (2026-09-21, audit #8d) — BUILT and WALKED.**
 All five tabs open on a photograph with an eyebrow, a Fraunces heading and
@@ -605,7 +605,7 @@ attention card unboxed (audit §9.3). Practice-setup row commented out —
 KYC happens before the account. The photo: `doctor_photo_sheet.dart`,
 `DoctorSession.setPhoto/clearPhoto`, `SupabaseRepo.uploadPublicFile`,
 migration `0090_expert_photo.sql`. **The user must (1) create the PUBLIC
-bucket `expert-photos` in the dashboard, (2) run 0090,** then pick a photo
+bucket `expert-photos` in the dashboard, (2) run 0090,** **CONFIRMED against the live DB 2026-10-16: both DONE.** Then pick a photo
 on the phone and check it lands on the profile and in the parent app's
 directory. Owed: nothing crops the picture — the avatar shows a centre
 square of whatever was chosen; a square crop step is the next thing if
@@ -8246,6 +8246,7 @@ Courses are the first tile of their Tools hubs. Every old product screen is a
 facade; every old body is `…Classic`, kept for revert. 4,109 tests green.
 
 ### 65.1 Deploy 0083 and load the catalogue into `products`
+**2026-10-16: 0083 RUN by the user and verified. `razorpay-create-order` redeployed the same day with server pricing. Still owed: load the unified rows.**
 
 `supabase db push` is the user's. Until the unified rows are in the table the
 create-order function cannot price a line and charges the phone's figure with
@@ -8537,6 +8538,7 @@ real difference; test 30 photos on each before picking. Then:
 (the function's header has them).
 
 ### 68.2 Migration 0086 is written, not run
+**CONFIRMED against the live DB 2026-10-16: RUN.**
 `can_i_misses` + the desk's view. Run it; the misses log is inert until
 then (the client's upsert fails silently, as designed).
 
@@ -9720,7 +9722,7 @@ in code and tested. **Build 18 is not made yet**: the user took the phone away a
   - The evening-before reminder counts them, the home shows a visit-day card, and the doctor's note lists them.
 
   **Open:**
-  1. **The user must run `supabase/migrations/0092_ttc_doctor_questions.sql`, but only when told.** Until then cloud writes fail silently and the phone works fully.
+  1. **CONFIRMED against the live DB 2026-10-16: 0092 RUN, final version (`asked_at` present).** Was: **The user must run `supabase/migrations/0092_ttc_doctor_questions.sql`, but only when told.** Until then cloud writes fail silently and the phone works fully.
   2. An "about him" flag was not built.
   3. The pattern is written up in BACKEND-PATTERNS §16r.
 - **80.3 More is a CRED-style bento** (`pv_more_bento.dart`, gated by `kPvTtcMoreBento`), and **Tools holds only tools**
@@ -10097,7 +10099,7 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
 `Downloads\competitor-walks\combined-parent\v1` is the source of truth). Every item and its state is in
 `docs/PARENTING-GAP-TRACKER.md`. Owed:
 
-  - **§82.1 The user runs three migrations.** `0093_children_sex_given.sql` (then flip `kChildSexGivenColumn` to true
+  - **§82.1 The user runs three migrations.** (DONE 2026-10-16: 0093, 0094, 0095 run and verified; `kChildSexGivenColumn` is true.) `0093_children_sex_given.sql` (then flip `kChildSexGivenColumn` to true
     in `pp_child_profile.dart`), `0094_pp_nappy_pump_tummy.sql`, `0095_pp_emergency_cards.sql`. Until each runs, its
     writes fail silently and the data stays on the phone, as before.
   - **§82.2 Door tiles in age and priority order: ON.** The user turned it on ("You can turn that switch on",
@@ -10154,9 +10156,10 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
 - 83.7 Parenting Yoga cards show "Live group" with no schedule (shared widget). Decide.
 - 83.8 8 new superfood recipes have no chosen photo (`nut_r_<id>` in `read_images.dart`).
 - 83.9 DONE 2026-10-10: sign-out cancels every scheduled notification and mutes all scheduling paths until she signs in again (NotificationService.silenceForSignOut / _muted); reminders stay saved and re-arm via SyncRegistry on sign-in.
+- 83.1a 2026-10-16 HIS SIDE TTC, walk + declutter BUILT. A device walk of his side (and Mobbin: Flo for Partners, Clue Connect, Oura tips) found: (1) the grey FOR YOU eyebrow and a default-weight 'Your part today' (now the home's `_Head` look + `TtcSectionHeading`); (2) his block was five ruled paragraphs, ~25 lines (now one mission card + a row of four tiles, each opening the one reader via `openTtcTipRead`, `ttcPartnerRead`); (3) the Cycle companion let him add, correct and remove HER period dates, under 'Only she can change it' (now view-only, his voice via `ttcWindowForHim`); (4) the calendar legend and Messages said 'your period' (his voice now); (5) the home's I'm pregnant door would move HIS phone to pregnancy alone (now a view-only line); (6) His side door mid-grid (now first, `ttcHisDoorsFirst`); (7) the Talk to an expert list priced the andrologist consult nobody can book (no price, 'Coming soon', all stages). Kept: the CHANCE OF PREGNANCY TODAY card on his rail (a window grade, not a probability; the user: he should know her fertile days). OWED: Wave 3 (real pairing, a derived her-window row for his phone, his own key-moment messages; see §79.13); the His side door speaks of him in the third person; his Messages still schedule from local data. Tests: test/ttc_his_side_v3_test.dart.
 - 83.10 DONE 2026-10-15: tap feedback second pass. 1,338 plain taps wrapped in PvPress by a parser-driven pass (729 parenting, 180 TTC, 429 elsewhere); 1,372 in all. PvPress gained two rules (a scroll lets go past the touch slop; only the innermost press settles). 75 left alone on purpose: 40 onTap null by a condition, 15 drag / long-press / tap-down, 10 no onTap, 7 full-screen layers, 3 keyboard dismiss. Held by test/tap_feedback_guard_test.dart and test/pv_feedback_test.dart. DESIGN-SYSTEM 4.0c. OWED, optional: the 40 conditional ones could take PvPress(enabled: <condition>, ...) by hand.
 - 83.11 Ask Veda: answer reveal is paced, not streamed; real streaming needs a service endpoint. Parenting Ask Veda palette was moved to pregnancy's white/ink (beyond brief) — keep or revert.
-- 83.12 Phone OTP edge functions (`phone-otp-send`, `phone-otp-verify`) still undeployed; need MSG91 secrets. All other functions deployed (checked 10-10).
+- 83.12 Phone OTP edge functions (`phone-otp-send`, `phone-otp-verify`) DEPLOYED 2026-10-16 via the CLI (the dashboard editor cannot bundle `_shared/`); both answer 401 unauthenticated. Still owed: the MSG91 secrets (or PHONE_OTP_MOCK=true for dev) and the DLT-registered template. All other functions deployed (checked 10-10).
 - 83.13 Daily insights tab images: to discuss.
 - 83.14 Still to do from the notebook: recipes UI (Mobbin study first; PILOT BUILT 2026-10-15, see 83.14a), flash cards for heavy tools, door UI consistency, Ask Veda pregnancy review. DONE c1204b0 (2026-10-14): a home-screen mark leading to Talk to someone, on all three homes.
 - 83.14a 2026-10-15 RECIPES, PILOT BUILT (waits on the user's look). Mobbin study in MOBBIN-DISCOVERY §21. New page (`FoodRecipeScreen._buildDocPage`) and new card (`FoodPhotoCard`), both switched on per dish by `FoodRecipe.docFormat`, so only Mixed dal khichdi (7-8M-REC-11, from Drive "Recipes (not reviewed)") wears them; the other 139 keep the old page and shelf card until approved. Cook mode shared with pregnancy (`CookModeScreen.steps`). The photo is in (ChatGPT, from the prompt in REMAINING-CHANGES; `assets/recipes/pp_7_8m_mixed_dal_khichdi.webp`). `foodCatalog` now honours `ContentOwner.bundled` (BACKEND-PATTERNS §16ee). Migration 0096 (recipe-doc columns) for the user to run; nothing needs it yet.

@@ -217,10 +217,14 @@ tell me; I rerun the converter.
 ## Needs you, not code
 
 - **Ask Veda hosting.** The Railway trial ended and the service is down. Pick a host or plan.
-- **Supabase.** Run migrations 0092 and 0096 (the recipe-doc columns; nothing needs 0096 yet). Grant the three `service_role` permissions Ask Veda needs.
-  Confirm 0088, 0089, 0090 and the expert-photos bucket.
-- **Phone OTP.** The `phone-otp-send` and `phone-otp-verify` functions are not deployed; they need
-  the MSG91 secrets (STILL-OPEN §83.12).
+- **Supabase** (checked against the live DB 2026-10-16). Every migration 0001-0096 is RUN and verified
+  (0083, 0093-0096 run by the user that day; `kChildSexGivenColumn` flipped to true). Edge functions: all 8
+  deployed and current (`razorpay-create-order` redeployed 2026-10-16 with server pricing). Still owed: load
+  the unified catalogue into `products` (STILL-OPEN §65.1). Also done: 0082, 0084, 0086, 0088, 0089, 0090 + expert-photos bucket,
+  0092 (final version), the three `service_role` grants. Still owed: re-run the Ask Veda ingest
+  (`python -m ingest.ingest` in the askveda repo); whether the doctor demo was re-seeded after 0089.
+- **Phone OTP.** Both functions deployed 2026-10-16. Set the secrets `MSG91_AUTHKEY` and
+  `MSG91_OTP_TEMPLATE_ID` (or `PHONE_OTP_MOCK=true` for testing); the template needs DLT registration.
 - **Phase docs (Drive).** Fix the six doc issues (PH015's missing activity, PH010's two names, the
   Phase 4 file name, activity times, panel sign-off) and the editor notes left in PH016–PH020.
   After a fix, download the changed .docx into the local "My Child phase-wise content" folder.
