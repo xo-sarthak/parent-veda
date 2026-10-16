@@ -92,7 +92,8 @@ class YogaClass {
   final double rating; // out of 5
   final int reviewsCount;
   final YogaMode mode;
-  final String schedule; // "Live · Mon, Wed, Fri · 7am IST" / "Recorded · watch anytime"
+  final String
+  schedule; // "Live · Mon, Wed, Fri · 7am IST" / "Recorded · watch anytime"
   final String durationLabel; // "45 min"
   final String price; // "₹499 / class · free on ParentVeda+"
   final String level; // "All levels" / "Postnatal" / "Extra-gentle"
@@ -106,63 +107,86 @@ class YogaClass {
 
   /// Full label ("Live 1:1" / "Live group" / "Recorded").
   String get modeLabel => switch (mode) {
-        YogaMode.liveOneToOne => 'Live 1:1',
-        YogaMode.liveGroup => 'Live group',
-        YogaMode.recorded => 'Recorded',
-      };
+    YogaMode.liveOneToOne => 'Live 1:1',
+    YogaMode.liveGroup => 'Live group',
+    YogaMode.recorded => 'Recorded',
+  };
 
   /// Short badge for the card corner ("1:1" / "GROUP" / "RECORDED").
   String get modePill => switch (mode) {
-        YogaMode.liveOneToOne => '1:1',
-        YogaMode.liveGroup => 'GROUP',
-        YogaMode.recorded => 'RECORDED',
-      };
+    YogaMode.liveOneToOne => '1:1',
+    YogaMode.liveGroup => 'GROUP',
+    YogaMode.recorded => 'RECORDED',
+  };
+
+  /// Labelled "After your six-week check" in the Yoga & fitness hub. Shown,
+  /// never hidden: she can read about it and plan, the label says when.
+  bool get afterCheck => kYogaAfterCheckIds.contains(id);
 
   /// The primary CTA verb for this mode.
   String get ctaLabel => switch (mode) {
-        YogaMode.liveOneToOne => 'Book 1:1 session',
-        YogaMode.liveGroup => 'Join this class',
-        YogaMode.recorded => 'Start practising',
-      };
+    YogaMode.liveOneToOne => 'Book 1:1 session',
+    YogaMode.liveGroup => 'Join this class',
+    YogaMode.recorded => 'Start practising',
+  };
 }
+
+/// Classes that wait for her six-week check after birth (longer after a
+/// caesarean): the core and diastasis work, and carrying a baby while moving.
+/// The same rule as the movement pages in `pp_you_maa_content.dart`, which put
+/// deep core and diastasis training in the "cleared" bands.
+const Set<String> kYogaAfterCheckIds = {
+  'co_group',
+  'co_1to1',
+  'co_deepcore_rec',
+  'co_pelvic_rec',
+  'po_babywearing_rec',
+};
 
 // ---- categories -------------------------------------------------------------
 const List<YogaCategory> kYogaCategories = [
   YogaCategory(
-      id: 'yoga',
-      title: 'Yoga & Meditation',
-      subtitle: 'Everyday practice for strength and calm.',
-      icon: Icons.self_improvement_outlined),
+    id: 'yoga',
+    title: 'Yoga & Meditation',
+    subtitle: 'Everyday practice for strength and calm.',
+    icon: Icons.self_improvement_outlined,
+  ),
   YogaCategory(
-      id: 'prenatal',
-      title: 'Prenatal Yoga',
-      subtitle: 'Safe, trimester-aware movement through pregnancy.',
-      icon: Icons.pregnant_woman_outlined),
+    id: 'prenatal',
+    title: 'Prenatal Yoga',
+    subtitle: 'Safe, trimester-aware movement through pregnancy.',
+    icon: Icons.pregnant_woman_outlined,
+  ),
   YogaCategory(
-      id: 'postnatal',
-      title: 'Postnatal Yoga',
-      subtitle: 'Rebuild gently in the fourth trimester and beyond.',
-      icon: Icons.child_friendly_outlined),
+    id: 'postnatal',
+    title: 'Postnatal Yoga',
+    subtitle: 'Rebuild gently in the fourth trimester and beyond.',
+    icon: Icons.child_friendly_outlined,
+  ),
   YogaCategory(
-      id: 'postivf',
-      title: 'Post-IVF Yoga',
-      subtitle: 'Extra-gentle, mindful care after fertility treatment.',
-      icon: Icons.volunteer_activism_outlined),
+    id: 'postivf',
+    title: 'Post-IVF Yoga',
+    subtitle: 'Extra-gentle, mindful care after fertility treatment.',
+    icon: Icons.volunteer_activism_outlined,
+  ),
   YogaCategory(
-      id: 'breathing',
-      title: 'Breathing & Lamaze',
-      subtitle: 'Breath for labour, and a calmer everyday.',
-      icon: Icons.air_outlined),
+    id: 'breathing',
+    title: 'Breathing & Lamaze',
+    subtitle: 'Breath for labour, and a calmer everyday.',
+    icon: Icons.air_outlined,
+  ),
   YogaCategory(
-      id: 'meditation',
-      title: 'Meditation',
-      subtitle: 'Quiet the mind - ten minutes a day.',
-      icon: Icons.nightlight_outlined),
+    id: 'meditation',
+    title: 'Meditation',
+    subtitle: 'Quiet the mind - ten minutes a day.',
+    icon: Icons.nightlight_outlined,
+  ),
   YogaCategory(
-      id: 'core',
-      title: 'Core & Recovery',
-      subtitle: 'Heal the deep core and pelvic floor, the right way.',
-      icon: Icons.fitness_center_outlined),
+    id: 'core',
+    title: 'Core & Recovery',
+    subtitle: 'Heal the deep core and pelvic floor, the right way.',
+    icon: Icons.fitness_center_outlined,
+  ),
 ];
 
 // ---- catalog ----------------------------------------------------------------
@@ -176,7 +200,12 @@ const List<YogaClass> kYogaClasses = [
     instructorCredential: 'Certified Yoga Acharya · 15 yrs',
     instructorBio:
         'Aditi trained in Mysore and has spent fifteen years working almost entirely with pregnant and postpartum women. She is unusually careful about diastasis recti and pelvic-floor recovery, and will slow a session down rather than push a pose that is not ready.',
-    instructorFocus: ['Postpartum recovery', 'Pelvic floor', 'Diastasis recti', 'Gentle prenatal'],
+    instructorFocus: [
+      'Postpartum recovery',
+      'Pelvic floor',
+      'Diastasis recti',
+      'Gentle prenatal',
+    ],
     rating: 4.9,
     reviewsCount: 214,
     mode: YogaMode.liveGroup,
@@ -188,8 +217,17 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A warm, unhurried morning flow to wake the body and settle the mind before the day begins. Aditi keeps every posture optional and offers a softer variation for tired parents - you set the pace.',
     reviews: [
-      YogaReview(author: 'Ritika S.', note: 'The 6:30 slot is perfect before the baby wakes. Calm, never rushed.'),
-      YogaReview(author: 'Devang P.', stars: 5, note: 'Aditi explains the why behind each pose. I actually feel it in my back now.'),
+      YogaReview(
+        author: 'Ritika S.',
+        note:
+            'The 6:30 slot is perfect before the baby wakes. Calm, never rushed.',
+      ),
+      YogaReview(
+        author: 'Devang P.',
+        stars: 5,
+        note:
+            'Aditi explains the why behind each pose. I actually feel it in my back now.',
+      ),
     ],
     seed: 1,
   ),
@@ -210,8 +248,17 @@ const List<YogaClass> kYogaClasses = [
     about:
         'One-to-one Hatha yoga shaped around your current strength, any niggles, and how much time you have. Aditi builds a plan you can keep even between sessions.',
     reviews: [
-      YogaReview(author: 'Meera N.', note: 'She adjusted everything for my old knee injury. Felt truly seen.'),
-      YogaReview(author: 'Ananya R.', stars: 5, note: 'Worth every rupee - it is like having a coach who remembers exactly where you left off.'),
+      YogaReview(
+        author: 'Meera N.',
+        note:
+            'She adjusted everything for my old knee injury. Felt truly seen.',
+      ),
+      YogaReview(
+        author: 'Ananya R.',
+        stars: 5,
+        note:
+            'Worth every rupee - it is like having a coach who remembers exactly where you left off.',
+      ),
     ],
     seed: 2,
   ),
@@ -232,8 +279,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A slow, floor-based sequence to release the neck, shoulders and hips after a long day of carrying and lifting. Dim the lights, roll out your mat, and let go.',
     reviews: [
-      YogaReview(author: 'Sana K.', note: 'My go-to after bedtime chaos. I sleep so much better on the nights I do it.'),
-      YogaReview(author: 'Priya M.', stars: 4, note: 'Gentle and short enough that I actually keep coming back to it.'),
+      YogaReview(
+        author: 'Sana K.',
+        note:
+            'My go-to after bedtime chaos. I sleep so much better on the nights I do it.',
+      ),
+      YogaReview(
+        author: 'Priya M.',
+        stars: 4,
+        note: 'Gentle and short enough that I actually keep coming back to it.',
+      ),
     ],
     seed: 3,
   ),
@@ -254,8 +309,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A grounded, standing-and-mat practice to build real functional strength for the daily lift-carry-rock of parenting - without any equipment.',
     reviews: [
-      YogaReview(author: 'Karan V.', note: 'My back stopped complaining after the school-bag lifts. Simple and effective.'),
-      YogaReview(author: 'Lakshmi T.', stars: 5, note: 'No fancy gear, no jumping - just steady strength I can feel.'),
+      YogaReview(
+        author: 'Karan V.',
+        note:
+            'My back stopped complaining after the school-bag lifts. Simple and effective.',
+      ),
+      YogaReview(
+        author: 'Lakshmi T.',
+        stars: 5,
+        note: 'No fancy gear, no jumping - just steady strength I can feel.',
+      ),
     ],
     seed: 4,
   ),
@@ -278,8 +341,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A prenatal flow that adapts pose-by-pose to your trimester - building the strength and openness that help in labour, while always keeping you and baby safe. Radhika calls out modifications live.',
     reviews: [
-      YogaReview(author: 'Neha J.', note: 'She always checks in on how far along everyone is. I never felt unsafe.'),
-      YogaReview(author: 'Ishita B.', stars: 5, note: 'The hip openers were a lifesaver in my third trimester.'),
+      YogaReview(
+        author: 'Neha J.',
+        note:
+            'She always checks in on how far along everyone is. I never felt unsafe.',
+      ),
+      YogaReview(
+        author: 'Ishita B.',
+        stars: 5,
+        note: 'The hip openers were a lifesaver in my third trimester.',
+      ),
     ],
     seed: 5,
   ),
@@ -300,8 +371,17 @@ const List<YogaClass> kYogaClasses = [
     about:
         'One-to-one prenatal sessions tailored to your body, your due date, and anything your obstetrician has flagged. Ideal for high-risk pregnancies or if group classes feel like too much.',
     reviews: [
-      YogaReview(author: 'Pooja D.', note: 'With my placenta previa I was scared to move. Radhika made it safe and calm.'),
-      YogaReview(author: 'Sneha K.', stars: 5, note: 'She coordinated with what my doctor said. That trust meant everything.'),
+      YogaReview(
+        author: 'Pooja D.',
+        note:
+            'With my placenta previa I was scared to move. Radhika made it safe and calm.',
+      ),
+      YogaReview(
+        author: 'Sneha K.',
+        stars: 5,
+        note:
+            'She coordinated with what my doctor said. That trust meant everything.',
+      ),
     ],
     seed: 6,
   ),
@@ -322,8 +402,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A recorded sequence of supported hip and pelvic openers - the movements that create space for baby and can make labour feel more manageable. Safe from the second trimester onward.',
     reviews: [
-      YogaReview(author: 'Aarti S.', note: 'Did this daily in my last month. My midwife noticed how relaxed my hips were.'),
-      YogaReview(author: 'Divya R.', stars: 5, note: 'Simple, calming and I could pause whenever I needed the loo!'),
+      YogaReview(
+        author: 'Aarti S.',
+        note:
+            'Did this daily in my last month. My midwife noticed how relaxed my hips were.',
+      ),
+      YogaReview(
+        author: 'Divya R.',
+        stars: 5,
+        note: 'Simple, calming and I could pause whenever I needed the loo!',
+      ),
     ],
     seed: 7,
   ),
@@ -344,8 +432,15 @@ const List<YogaClass> kYogaClasses = [
     about:
         'Twenty gentle minutes of cat-cow, supported stretches and breath to release the lower-back tension that builds as your bump grows. Do it on the days your back is loudest.',
     reviews: [
-      YogaReview(author: 'Reema T.', note: 'The only thing that touched my sciatica at 30 weeks.'),
-      YogaReview(author: 'Kavya P.', stars: 4, note: 'Short and doable even when I was exhausted.'),
+      YogaReview(
+        author: 'Reema T.',
+        note: 'The only thing that touched my sciatica at 30 weeks.',
+      ),
+      YogaReview(
+        author: 'Kavya P.',
+        stars: 4,
+        note: 'Short and doable even when I was exhausted.',
+      ),
     ],
     seed: 8,
   ),
@@ -368,8 +463,17 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A live class for the fourth trimester - reconnecting breath and core, easing feeding-tight shoulders, and moving in a way that honours how new your body still is. Babies welcome on the mat.',
     reviews: [
-      YogaReview(author: 'Tanvi M.', note: 'She lets us pause to feed or soothe. First class that felt made for new mums.'),
-      YogaReview(author: 'Rhea S.', stars: 5, note: 'My posture from all the nursing has completely changed. Thank you Sana.'),
+      YogaReview(
+        author: 'Tanvi M.',
+        note:
+            'She lets us pause to feed or soothe. First class that felt made for new mums.',
+      ),
+      YogaReview(
+        author: 'Rhea S.',
+        stars: 5,
+        note:
+            'My posture from all the nursing has completely changed. Thank you Sana.',
+      ),
     ],
     seed: 9,
   ),
@@ -390,8 +494,17 @@ const List<YogaClass> kYogaClasses = [
     about:
         'Private postnatal sessions that meet your body where it is - whether you had a vaginal birth or a C-section, six weeks or six months ago. Sana screens for diastasis and builds up safely.',
     reviews: [
-      YogaReview(author: 'Anjali V.', note: 'After my C-section I had no idea where to start. She gave me a real, safe plan.'),
-      YogaReview(author: 'Megha D.', stars: 5, note: 'She checked my ab separation before anything else. Felt properly cared for.'),
+      YogaReview(
+        author: 'Anjali V.',
+        note:
+            'After my C-section I had no idea where to start. She gave me a real, safe plan.',
+      ),
+      YogaReview(
+        author: 'Megha D.',
+        stars: 5,
+        note:
+            'She checked my ab separation before anything else. Felt properly cared for.',
+      ),
     ],
     seed: 10,
   ),
@@ -412,8 +525,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'The gentlest possible re-entry - breath, pelvic-floor awareness and soft mobility you can start once your doctor clears you. No crunches, no pressure, no rush.',
     reviews: [
-      YogaReview(author: 'Simran K.', note: 'Cleared at 8 weeks and this was exactly the soft start I needed.'),
-      YogaReview(author: 'Nidhi R.', stars: 5, note: 'I could do it beside the cot during naps. Perfect length.'),
+      YogaReview(
+        author: 'Simran K.',
+        note:
+            'Cleared at 8 weeks and this was exactly the soft start I needed.',
+      ),
+      YogaReview(
+        author: 'Nidhi R.',
+        stars: 5,
+        note: 'I could do it beside the cot during naps. Perfect length.',
+      ),
     ],
     seed: 11,
   ),
@@ -434,8 +555,15 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A playful flow you can do while holding or wearing your baby - turning fussy afternoons into gentle movement for you both. Every pose has a hands-free option too.',
     reviews: [
-      YogaReview(author: 'Ira S.', note: 'She loves the swaying bits and I get to stretch. Win-win.'),
-      YogaReview(author: 'Bhavna T.', stars: 4, note: 'Clever way to move when you genuinely cannot put the baby down.'),
+      YogaReview(
+        author: 'Ira S.',
+        note: 'She loves the swaying bits and I get to stretch. Win-win.',
+      ),
+      YogaReview(
+        author: 'Bhavna T.',
+        stars: 4,
+        note: 'Clever way to move when you genuinely cannot put the baby down.',
+      ),
     ],
     seed: 12,
   ),
@@ -458,8 +586,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'Private, extra-gentle sessions for the delicate window after an IVF transfer or early pregnancy - restorative postures, calming breath, and absolutely nothing that strains the abdomen.',
     reviews: [
-      YogaReview(author: 'Shreya G.', note: 'After three cycles I was terrified to move. Kavya made me feel safe again.'),
-      YogaReview(author: 'Payal M.', stars: 5, note: 'She understood the emotional side too, not just the physical.'),
+      YogaReview(
+        author: 'Shreya G.',
+        note:
+            'After three cycles I was terrified to move. Kavya made me feel safe again.',
+      ),
+      YogaReview(
+        author: 'Payal M.',
+        stars: 5,
+        note: 'She understood the emotional side too, not just the physical.',
+      ),
     ],
     seed: 13,
   ),
@@ -480,8 +616,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A small, warm live circle of restorative movement and breath for the anxious wait after a transfer. As much about steadying the mind as the body, with others who truly understand.',
     reviews: [
-      YogaReview(author: 'Ritu A.', note: 'Being with others in the same wait was as healing as the yoga itself.'),
-      YogaReview(author: 'Naina S.', stars: 5, note: 'The breathwork got me through the longest fortnight of my life.'),
+      YogaReview(
+        author: 'Ritu A.',
+        note:
+            'Being with others in the same wait was as healing as the yoga itself.',
+      ),
+      YogaReview(
+        author: 'Naina S.',
+        stars: 5,
+        note: 'The breathwork got me through the longest fortnight of my life.',
+      ),
     ],
     seed: 14,
   ),
@@ -502,8 +646,15 @@ const List<YogaClass> kYogaClasses = [
     about:
         'Fully supported, propped restorative postures held long and soft - designed to calm the nervous system after the intensity of fertility treatment. Nothing to achieve, only to rest.',
     reviews: [
-      YogaReview(author: 'Zoya H.', note: 'I cried in the first savasana - in a good, releasing way.'),
-      YogaReview(author: 'Gauri P.', stars: 5, note: 'The most restful 30 minutes of my week, every week.'),
+      YogaReview(
+        author: 'Zoya H.',
+        note: 'I cried in the first savasana - in a good, releasing way.',
+      ),
+      YogaReview(
+        author: 'Gauri P.',
+        stars: 5,
+        note: 'The most restful 30 minutes of my week, every week.',
+      ),
     ],
     seed: 15,
   ),
@@ -526,8 +677,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A live, hands-on Lamaze session teaching the breathing patterns for each stage of labour - so that when the day comes, the breath is already in your body. Partners are encouraged to join.',
     reviews: [
-      YogaReview(author: 'Sunita R.', note: 'The patterned breathing genuinely got me through transition. I still hear Farah counting.'),
-      YogaReview(author: 'Alia K.', stars: 5, note: 'My husband joined and finally knew how to help. Huge.'),
+      YogaReview(
+        author: 'Sunita R.',
+        note:
+            'The patterned breathing genuinely got me through transition. I still hear Farah counting.',
+      ),
+      YogaReview(
+        author: 'Alia K.',
+        stars: 5,
+        note: 'My husband joined and finally knew how to help. Huge.',
+      ),
     ],
     seed: 16,
   ),
@@ -548,8 +707,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'Private breath coaching - whether you are preparing a personal labour plan, managing anxiety, or learning to down-regulate a racing mind. Farah tailors every pattern to you.',
     reviews: [
-      YogaReview(author: 'Charu D.', note: 'We built a breathing plan for my birth. I felt so prepared.'),
-      YogaReview(author: 'Manasi V.', stars: 5, note: 'Also helped my panic attacks postpartum. Genuinely life-changing.'),
+      YogaReview(
+        author: 'Charu D.',
+        note: 'We built a breathing plan for my birth. I felt so prepared.',
+      ),
+      YogaReview(
+        author: 'Manasi V.',
+        stars: 5,
+        note:
+            'Also helped my panic attacks postpartum. Genuinely life-changing.',
+      ),
     ],
     seed: 17,
   ),
@@ -570,8 +737,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A clear, unhurried introduction to the core pranayama techniques - ujjayi, nadi shodhana and simple extended exhales - and when to reach for each in daily life.',
     reviews: [
-      YogaReview(author: 'Vidya S.', note: 'Finally understood alternate-nostril breathing instead of just copying it.'),
-      YogaReview(author: 'Rohan M.', stars: 5, note: 'Fifteen minutes that changed how I handle stressful mornings.'),
+      YogaReview(
+        author: 'Vidya S.',
+        note:
+            'Finally understood alternate-nostril breathing instead of just copying it.',
+      ),
+      YogaReview(
+        author: 'Rohan M.',
+        stars: 5,
+        note: 'Fifteen minutes that changed how I handle stressful mornings.',
+      ),
     ],
     seed: 18,
   ),
@@ -592,8 +767,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A pocket-sized guided breath for the hard moments - three rounds to slow the heart, soften the jaw and come back to the present. Save it for the 2am wobbles.',
     reviews: [
-      YogaReview(author: 'Preeti K.', note: 'I use this on the bathroom floor when it all gets too much. It works.'),
-      YogaReview(author: 'Sameer T.', stars: 4, note: 'Short enough to actually do. That is the whole point.'),
+      YogaReview(
+        author: 'Preeti K.',
+        note:
+            'I use this on the bathroom floor when it all gets too much. It works.',
+      ),
+      YogaReview(
+        author: 'Sameer T.',
+        stars: 4,
+        note: 'Short enough to actually do. That is the whole point.',
+      ),
     ],
     seed: 19,
   ),
@@ -616,8 +799,15 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A gentle nightly sit - twenty guided minutes to unwind, let go of the day, and drop into sleep. Different theme each evening, no experience needed, cameras off if you like.',
     reviews: [
-      YogaReview(author: 'Harini R.', note: 'The 9pm circle has become my favourite part of the day.'),
-      YogaReview(author: 'Isha M.', stars: 5, note: 'Knowing others are sitting quietly with me keeps me consistent.'),
+      YogaReview(
+        author: 'Harini R.',
+        note: 'The 9pm circle has become my favourite part of the day.',
+      ),
+      YogaReview(
+        author: 'Isha M.',
+        stars: 5,
+        note: 'Knowing others are sitting quietly with me keeps me consistent.',
+      ),
     ],
     seed: 20,
   ),
@@ -638,8 +828,17 @@ const List<YogaClass> kYogaClasses = [
     about:
         'Private guidance to build a meditation habit that fits your real, interrupted life - working with new-parent anxiety, intrusive thoughts, or simply a mind that will not slow down.',
     reviews: [
-      YogaReview(author: 'Tara S.', note: 'She helped me meditate in five-minute pockets instead of chasing an hour I never had.'),
-      YogaReview(author: 'Kunal D.', stars: 5, note: 'Practical and kind. No incense-and-mystery, just what actually helps.'),
+      YogaReview(
+        author: 'Tara S.',
+        note:
+            'She helped me meditate in five-minute pockets instead of chasing an hour I never had.',
+      ),
+      YogaReview(
+        author: 'Kunal D.',
+        stars: 5,
+        note:
+            'Practical and kind. No incense-and-mystery, just what actually helps.',
+      ),
     ],
     seed: 21,
   ),
@@ -660,8 +859,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A softly narrated wind-down to quiet a racing mind and carry you into sleep - for the nights when the baby is finally down but you still cannot switch off.',
     reviews: [
-      YogaReview(author: 'Maya K.', note: 'I have never once heard the end. That is the highest praise I can give.'),
-      YogaReview(author: 'Farhan S.', stars: 5, note: 'Rescued me during the four-month sleep regression.'),
+      YogaReview(
+        author: 'Maya K.',
+        note:
+            'I have never once heard the end. That is the highest praise I can give.',
+      ),
+      YogaReview(
+        author: 'Farhan S.',
+        stars: 5,
+        note: 'Rescued me during the four-month sleep regression.',
+      ),
     ],
     seed: 22,
   ),
@@ -682,8 +889,15 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A tender, honest meditation for the overwhelm of early motherhood - naming the hard feelings, softening the guilt, and returning a little compassion to yourself.',
     reviews: [
-      YogaReview(author: 'Ananya P.', note: 'The line about "you are enough today" undid me in the best way.'),
-      YogaReview(author: 'Roshni V.', stars: 4, note: 'Felt like being understood, not fixed.'),
+      YogaReview(
+        author: 'Ananya P.',
+        note: 'The line about "you are enough today" undid me in the best way.',
+      ),
+      YogaReview(
+        author: 'Roshni V.',
+        stars: 4,
+        note: 'Felt like being understood, not fixed.',
+      ),
     ],
     seed: 23,
   ),
@@ -706,8 +920,17 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A physiotherapist-led live class to reconnect and strengthen the deep core and pelvic floor after birth - the right way, in the right order. Addresses leaking, heaviness and that "core disconnect".',
     reviews: [
-      YogaReview(author: 'Deepa S.', note: 'The leaking when I sneezed is basically gone. I did not know that was fixable.'),
-      YogaReview(author: 'Vaishali M.', stars: 5, note: 'A real physio, not just an instructor. That made all the difference.'),
+      YogaReview(
+        author: 'Deepa S.',
+        note:
+            'The leaking when I sneezed is basically gone. I did not know that was fixable.',
+      ),
+      YogaReview(
+        author: 'Vaishali M.',
+        stars: 5,
+        note:
+            'A real physio, not just an instructor. That made all the difference.',
+      ),
     ],
     seed: 24,
   ),
@@ -728,8 +951,17 @@ const List<YogaClass> kYogaClasses = [
     about:
         'Private assessment and a progressive plan for abdominal separation (diastasis recti). Meghna measures your gap, corrects the movements that make it worse, and rebuilds from the inside out.',
     reviews: [
-      YogaReview(author: 'Swati R.', note: 'My four-finger gap is down to one. Objectively measurable progress.'),
-      YogaReview(author: 'Nandini K.', stars: 5, note: 'She stopped me doing the planks that were making it worse. Wish I had found her sooner.'),
+      YogaReview(
+        author: 'Swati R.',
+        note:
+            'My four-finger gap is down to one. Objectively measurable progress.',
+      ),
+      YogaReview(
+        author: 'Nandini K.',
+        stars: 5,
+        note:
+            'She stopped me doing the planks that were making it worse. Wish I had found her sooner.',
+      ),
     ],
     seed: 25,
   ),
@@ -750,8 +982,16 @@ const List<YogaClass> kYogaClasses = [
     about:
         'The foundational deep-core work everyone skips - breath-led activation of the transverse abdominis and pelvic floor. Master this before you go anywhere near a sit-up.',
     reviews: [
-      YogaReview(author: 'Aparna S.', note: 'Turns out I had never actually engaged my core correctly. Eye-opening.'),
-      YogaReview(author: 'Jyoti M.', stars: 5, note: 'Twenty minutes, no equipment, real foundations.'),
+      YogaReview(
+        author: 'Aparna S.',
+        note:
+            'Turns out I had never actually engaged my core correctly. Eye-opening.',
+      ),
+      YogaReview(
+        author: 'Jyoti M.',
+        stars: 5,
+        note: 'Twenty minutes, no equipment, real foundations.',
+      ),
     ],
     seed: 26,
   ),
@@ -772,32 +1012,45 @@ const List<YogaClass> kYogaClasses = [
     about:
         'A short, do-it-anywhere daily routine of correct pelvic-floor work - not just endless kegels, but the coordinated release-and-lift that actually builds control. Great alongside any recovery plan.',
     reviews: [
-      YogaReview(author: 'Ruchi V.', note: 'I do it while the kettle boils. Small habit, big difference.'),
-      YogaReview(author: 'Sneha T.', stars: 4, note: 'Loved learning that relaxing matters as much as squeezing.'),
+      YogaReview(
+        author: 'Ruchi V.',
+        note: 'I do it while the kettle boils. Small habit, big difference.',
+      ),
+      YogaReview(
+        author: 'Sneha T.',
+        stars: 4,
+        note: 'Loved learning that relaxing matters as much as squeezing.',
+      ),
     ],
     seed: 27,
   ),
 ];
 
 // ---- lookups ----------------------------------------------------------------
-YogaCategory yogaCategoryById(String id) =>
-    kYogaCategories.firstWhere((c) => c.id == id, orElse: () => kYogaCategories.first);
+YogaCategory yogaCategoryById(String id) => kYogaCategories.firstWhere(
+  (c) => c.id == id,
+  orElse: () => kYogaCategories.first,
+);
 
-YogaClass yogaClassById(String id) =>
-    kYogaClasses.firstWhere((c) => c.id == id, orElse: () => kYogaClasses.first);
+YogaClass yogaClassById(String id) => kYogaClasses.firstWhere(
+  (c) => c.id == id,
+  orElse: () => kYogaClasses.first,
+);
 
 /// All classes delivered in [mode].
 List<YogaClass> yogaClassesByMode(YogaMode mode) =>
     kYogaClasses.where((c) => c.mode == mode).toList();
 
 /// Classes in one category, filtered to a single mode (the cult.fit rail).
-List<YogaClass> yogaClassesIn(String categoryId, YogaMode mode) =>
-    kYogaClasses.where((c) => c.category == categoryId && c.mode == mode).toList();
+List<YogaClass> yogaClassesIn(String categoryId, YogaMode mode) => kYogaClasses
+    .where((c) => c.category == categoryId && c.mode == mode)
+    .toList();
 
 /// Categories that actually have at least one class in [mode] - so the home only
 /// renders section headers that have a non-empty rail underneath.
-List<YogaCategory> yogaCategoriesWithClasses(YogaMode mode) =>
-    kYogaCategories.where((cat) => yogaClassesIn(cat.id, mode).isNotEmpty).toList();
+List<YogaCategory> yogaCategoriesWithClasses(YogaMode mode) => kYogaCategories
+    .where((cat) => yogaClassesIn(cat.id, mode).isNotEmpty)
+    .toList();
 
 /// Free-text search across title, instructor and category (mode-agnostic).
 List<YogaClass> yogaSearch(String query) {
@@ -829,16 +1082,21 @@ class YogaStore extends ChangeNotifier with CloudSyncedStore {
   String get cloudKey => _prefsKey;
 
   @override
-  Object cloudData() =>
-      {'saved': _saved.toList(), 'booked': _booked.toList()};
+  Object cloudData() => {'saved': _saved.toList(), 'booked': _booked.toList()};
 
   @override
   void applyCloudData(Object data) {
     if (data is! Map) return;
     final s = data['saved'];
-    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    if (s is List)
+      _saved
+        ..clear()
+        ..addAll(s.map((e) => e.toString()));
     final b = data['booked'];
-    if (b is List) _booked..clear()..addAll(b.map((e) => e.toString()));
+    if (b is List)
+      _booked
+        ..clear()
+        ..addAll(b.map((e) => e.toString()));
   }
 
   @override
@@ -863,13 +1121,16 @@ class YogaStore extends ChangeNotifier with CloudSyncedStore {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
       if (raw != null) applyCloudData(jsonDecode(raw));
-    } catch (_) {/* keep the starter state */}
+    } catch (_) {
+      /* keep the starter state */
+    }
     notifyListeners();
     try {
       await syncStateFromCloud();
-    } catch (_) {/* stay local */}
+    } catch (_) {
+      /* stay local */
+    }
   }
-
 
   bool isSaved(String id) => _saved.contains(id);
   void toggleSave(String id) {
@@ -895,4 +1156,6 @@ class YogaStore extends ChangeNotifier with CloudSyncedStore {
 /// is really deciding on a person, and seeing their other classes is the
 /// cheapest way to judge whether they are the right one.
 List<YogaClass> classesByInstructor(String name, {String? excludeId}) =>
-    kYogaClasses.where((c) => c.instructorName == name && c.id != excludeId).toList();
+    kYogaClasses
+        .where((c) => c.instructorName == name && c.id != excludeId)
+        .toList();

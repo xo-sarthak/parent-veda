@@ -62,9 +62,28 @@ int _dayIndex(DateTime d) =>
 ///
 /// [offset] is how the two partners get different cards on the same day. Half a
 /// library apart, so they are never on the same one.
-TtcPractice ttcPracticeOfTheDay(TtcPracticeKind kind,
-    {DateTime? on, int offset = 0}) {
-  final list = ttcPracticesOfKind(kind);
+///
+/// [phase] makes the movement follow her cycle (the Yoga & fitness pass,
+/// 2026-10-16): the rotation runs over only the practices tagged for today's
+/// phase, so a period day or the two-week wait gets a gentle one. `any`, an
+/// unknown phase, or a phase nothing is tagged for falls back to the whole
+/// library, which is exactly the old behaviour. With three cards a phase, the
+/// partner offset of three lands on the same card, so the partner moves one
+/// along instead.
+TtcPractice ttcPracticeOfTheDay(
+  TtcPracticeKind kind, {
+  DateTime? on,
+  int offset = 0,
+  TtcDayPhase? phase,
+}) {
+  final all = ttcPracticesOfKind(kind);
+  final tagged = (phase == null || phase == TtcDayPhase.any)
+      ? const <TtcPractice>[]
+      : all.where((p) => p.phases.contains(phase)).toList();
+  final list = tagged.isEmpty ? all : tagged;
+  if (tagged.isNotEmpty && offset != 0 && offset % list.length == 0) {
+    offset += 1;
+  }
   final i = (_dayIndex(on ?? DateTime.now()) + offset) % list.length;
   return list[i];
 }
@@ -77,15 +96,15 @@ const int kTtcPartnerOffset = 3;
 // -----------------------------------------------------------------------------
 
 String _fieldFor(TtcPracticeKind kind) => switch (kind) {
-      TtcPracticeKind.move => kTtcMindMoveField,
-      TtcPracticeKind.breathe => kTtcMindBreatheField,
-    };
+  TtcPracticeKind.move => kTtcMindMoveField,
+  TtcPracticeKind.breathe => kTtcMindBreatheField,
+};
 
 bool ttcPracticeDoneToday(TtcPracticeKind kind, {DateTime? on}) =>
     TtcLogStore.instance
-            .valueFor(kTtcMindTracker, _fieldFor(kind), on: on)
-            ?.value ==
-        1;
+        .valueFor(kTtcMindTracker, _fieldFor(kind), on: on)
+        ?.value ==
+    1;
 
 /// Mark one of today's two practices done, or undo it.
 ///
@@ -113,8 +132,8 @@ const String kTtcHomeCookedField = 'homecooked';
 
 bool ttcHabitTicked(String field, {DateTime? on}) =>
     (TtcLogStore.instance.valueFor(kTtcHabitsTracker, field, on: on)?.value ??
-            0) >
-        0;
+        0) >
+    0;
 
 void ttcSetHabitTick(String field, bool on, {DateTime? day}) {
   if (on) {
@@ -164,7 +183,7 @@ void ttcSetHabitTick(String field, bool on, {DateTime? day}) {
 //  `TtcGarbhCourseStore.clearDailyPractice` hands it back.
 
 /// Today's movement — her chosen one if session 8 set it, otherwise the day's.
-TtcPractice ttcTodaysMove({DateTime? on, int offset = 0}) {
+TtcPractice ttcTodaysMove({DateTime? on, int offset = 0, TtcDayPhase? phase}) {
   final chosen = TtcGarbhCourseStore.instance.moveId;
   if (chosen != null) {
     final p = ttcPracticeById(chosen);
@@ -172,7 +191,12 @@ TtcPractice ttcTodaysMove({DateTime? on, int offset = 0}) {
     // renamed falls back to the rotation instead of showing an empty card.
     if (p != null && p.kind == TtcPracticeKind.move) return p;
   }
-  return ttcPracticeOfTheDay(TtcPracticeKind.move, on: on, offset: offset);
+  return ttcPracticeOfTheDay(
+    TtcPracticeKind.move,
+    on: on,
+    offset: offset,
+    phase: phase,
+  );
 }
 
 /// Today's breath or calm — same rule.
@@ -230,8 +254,12 @@ bool get ttcTodayIsHerPractice =>
 ///
 /// The body is the blurb and then the steps, each a sentence already, so the
 /// read's short answer is the blurb's first line and the rest is how to do it.
-TtcMovement ttcTodaysMoveTip({DateTime? on}) {
-  final p = ttcTodaysMove(on: on);
+TtcMovement ttcTodaysMoveTip({DateTime? on, TtcDayPhase? phase}) =>
+    ttcPracticeAsTip(ttcTodaysMove(on: on, phase: phase));
+
+/// Any practice in the daily-tip shape, so the Yoga & fitness hub opens a
+/// practice through the same read the home's card opens.
+TtcMovement ttcPracticeAsTip(TtcPractice p) {
   final body = [p.blurb, ...p.steps].join(' ');
   return TtcMovement(
     id: p.id,

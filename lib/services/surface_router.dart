@@ -137,12 +137,11 @@ Widget? _screenFor(String id, PregnancyController c, AppLanguage lang) =>
       // correct screen, no error. `prepare_hub_screen.dart` had been passing
       // the filter correctly all along, which is what made the omission here
       // invisible — one call site was right, so the screen "worked".
-      'yoga' => const YogaHomeScreen(
-          categoryFilter: kPregnancyYogaCategories,
-          backLabel: 'Back',
-          eyebrow: 'ParentVeda Yoga',
-          heroTitle: 'Prenatal yoga & movement',
-        ),
+      // 2026-10-16: the one Yoga & fitness hub, For you = her month. Kept
+      // for revert: YogaHomeScreen(categoryFilter: kPregnancyYogaCategories,
+      //   backLabel: 'Back', eyebrow: 'ParentVeda Yoga',
+      //   heroTitle: 'Prenatal yoga & movement')
+      'yoga' => YogaHomeScreen(backLabel: 'Back', pregnancy: c),
 
       // ---- Reads -----------------------------------------------------------
       'daily_reads' => ReadNextScreen(controller: c),

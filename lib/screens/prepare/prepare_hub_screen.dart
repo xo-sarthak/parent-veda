@@ -163,12 +163,12 @@ class PrepareHubScreen extends StatelessWidget {
               // filtered to pregnancy categories — one UI both tabs. The old
               // month-tabbed PrenatalYogaScreen is retired (kept for revert).
               _tile(context, IntentMark.lotusMark, 160, s.uiYoga, s.prepTileYogaSub,
+                  // 2026-10-16: the one Yoga & fitness hub. Kept for revert:
+                  //   YogaHomeScreen(categoryFilter: kPregnancyYogaCategories,
+                  //     backLabel: s.uiPrepare, eyebrow: s.prepYogaEyebrow,
+                  //     heroTitle: s.prepYogaHeroTitle, intro: s.prepYogaIntro)
                   s.prepTileYogaCount, onTap: () => openSection(YogaHomeScreen(
-                        categoryFilter: kPregnancyYogaCategories,
                         backLabel: s.uiPrepare,
-                        eyebrow: s.prepYogaEyebrow,
-                        heroTitle: s.prepYogaHeroTitle,
-                        intro: s.prepYogaIntro,
                       ))),
               // _tile(context, Icons.self_improvement_rounded, 'Yoga', 'Trimester-safe movement, month by month.',
               //     '9-month program', onTap: () => openSection(const PrenatalYogaScreen())),

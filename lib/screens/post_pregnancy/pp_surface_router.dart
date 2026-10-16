@@ -87,6 +87,9 @@ import 'what_changed_screen.dart';
 import 'yoga_home_screen.dart';
 import 'pp_recipes_screen.dart';
 import 'pp_buying_guides_screen.dart';
+// The one tool shared with pregnancy: Kegel Care reads the stage itself and
+// runs its after-birth mode here (2026-10-16).
+import '../tools/kegel_care_screen.dart' show KegelCareScreen;
 
 /// ⚠️ A SECTION IS A SURFACE TOO, AND IT RESOLVES BEFORE THE HAND-WRITTEN LIST.
 ///
@@ -372,6 +375,10 @@ Widget? _ppScreenFor(String id) => switch (id) {
       'pp_feed_timer' => const PpBreastTimerScreen(),
       'pp_care_history' => const PpCareHistoryScreen(),
       'pp_tummy_time' => const PpTummyTimeScreen(),
+      // Kegel Care after birth: no controller, so it reads weeks since birth
+      // (breathe first to six weeks, then gentle kegels). Linked from the
+      // pelvic floor pages in "You, Maa" (2026-10-16).
+      'pp_kegel' => const KegelCareScreen(),
       // Everything for this month on one page (gap analysis P1, 2026-10-07).
       'pp_month_checklist' => const PpMonthChecklistScreen(),
 
@@ -471,11 +478,11 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // ---- Mother -----------------------------------------------------------
       // The same yoga screen the Explore drawer opens, filtered to the
       // postnatal categories. Not a second yoga screen.
-      'pp_yoga' => const YogaHomeScreen(
-          backLabel: 'Back',
-          eyebrow: 'ParentVeda Yoga',
-          heroTitle: 'Recovery & movement',
-        ),
+      // 2026-10-16: the one Yoga & fitness hub; its For you is the
+      // after-birth view. Kept for revert:
+      //   const YogaHomeScreen(backLabel: 'Back', eyebrow: 'ParentVeda Yoga',
+      //       heroTitle: 'Recovery & movement'),
+      'pp_yoga' => const YogaHomeScreen(backLabel: 'Back'),
 
       // ---- Tradition --------------------------------------------------------
       'pp_nuskhe' => const NuskheScreen(),

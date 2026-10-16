@@ -68,6 +68,7 @@ import 'ttc_tool_chrome.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_common.dart' show ttcTitleInk;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../ttc/ttc_home_situation.dart';
 
 /// The two hues Today's blocks take.
 ///
@@ -109,15 +110,16 @@ class TtcMindTodayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TtcToolScaffold(
-        // The breath field's hue (MB13, 2026-09-28). Kept for revert:
-        //   hue: kTtcBreatheHue,
-        hue: kTtcBreatheFieldHue,
-        eyebrow: 'MIND & BODY',
-        title: 'Today',
-        intro: 'One movement, one breath and two small things. Nothing here '
-            'keeps count.',
-        children: const [TtcMindTodayBody()],
-      );
+    // The breath field's hue (MB13, 2026-09-28). Kept for revert:
+    //   hue: kTtcBreatheHue,
+    hue: kTtcBreatheFieldHue,
+    eyebrow: 'MIND & BODY',
+    title: 'Today',
+    intro:
+        'One movement, one breath and two small things. Nothing here '
+        'keeps count.',
+    children: const [TtcMindTodayBody()],
+  );
 }
 
 /// The body alone, for rendering inside a focus group's tab.
@@ -154,90 +156,101 @@ class TtcMindTodayBody extends StatelessWidget {
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
-        final move = ttcTodaysMove();
+        // Same phase as the home's card, so both name one practice.
+        final move = ttcTodaysMove(phase: ttcHomePhaseOn(DateTime.now()));
         final breathe = ttcTodaysBreathe();
         final hers = ttcTodayIsHerPractice;
 
-        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // WARNING: 8, NOT 22 — the same lesson `TtcPcosStandBody` carries.
-          // Inline under the door's tab rail this is the second gap in a row,
-          // and two gaps read as one large empty band.
-          const SizedBox(height: 8),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // WARNING: 8, NOT 22 — the same lesson `TtcPcosStandBody` carries.
+            // Inline under the door's tab rail this is the second gap in a row,
+            // and two gaps read as one large empty band.
+            const SizedBox(height: 8),
 
-          // ⚠️ ONE LINE THAT SAYS WHERE THE TWO CARDS CAME FROM, and it only
-          // appears once there is something to say. Before session 8 the cards
-          // are the day's and the line would be explaining a mechanism nobody
-          // asked about; after it, its absence would make her own choice look
-          // like a coincidence.
-          if (hers) ...[
-            _inset(_YourPracticeStrip(p: p)),
-            const SizedBox(height: 18),
-          ],
+            // ⚠️ ONE LINE THAT SAYS WHERE THE TWO CARDS CAME FROM, and it only
+            // appears once there is something to say. Before session 8 the cards
+            // are the day's and the line would be explaining a mechanism nobody
+            // asked about; after it, its absence would make her own choice look
+            // like a coincidence.
+            if (hers) ...[
+              _inset(_YourPracticeStrip(p: p)),
+              const SizedBox(height: 18),
+            ],
 
-          // Sentence case (tools pass, 2026-09-27). Kept for revert:
-          //   "TODAY'S MOVEMENT", "TODAY'S BREATH OR CALM",
-          //   'AND ONE THING TOGETHER', 'AND TWO SMALL THINGS'
-          _inset(_label("Today's movement", p)),
-          // 12 under a heading, the door's rhythm (2026-09-27; was 10).
-          const SizedBox(height: 12),
-          _inset(_PracticeBlock(practice: move, hue: kTtcMoveHue, p: p)),
-
-          // 24, the door's gap between blocks (2026-09-27; was 22).
-          const SizedBox(height: 24),
-          // "Today's breath", the Sanskar's own name for the same card (MB18,
-          // 2026-09-28: one picker, so one name). Kept for revert:
-          //   _inset(_label("Today's breathing", p)),
-          _inset(_label("Today's breath", p)),
-          const SizedBox(height: 12),
-          _inset(
-              _PracticeBlock(practice: breathe, hue: kTtcBreatheHue, p: p)),
-
-          // ⚠️ THE COUPLE PART IS SHOWN ONLY IF SHE ASKED FOR IT IN SESSION 8.
-          // It is not a third practice and does not get a block — it is a line
-          // she chose to be reminded of, and the brief offers "or neither".
-          if (TtcGarbhCourseStore.instance.couple case final part?) ...[
-            const SizedBox(height: 24),
-            // Kept for revert (2026-09-28): 'One thing together'.
-            _inset(_label('One thing to do together', p)),
+            // Sentence case (tools pass, 2026-09-27). Kept for revert:
+            //   "TODAY'S MOVEMENT", "TODAY'S BREATH OR CALM",
+            //   'AND ONE THING TOGETHER', 'AND TWO SMALL THINGS'
+            _inset(_label("Today's movement", p)),
+            // 12 under a heading, the door's rhythm (2026-09-27; was 10).
             const SizedBox(height: 12),
-            _inset(_CouplePart(part: part, p: p)),
+            _inset(_PracticeBlock(practice: move, hue: kTtcMoveHue, p: p)),
+
+            // 24, the door's gap between blocks (2026-09-27; was 22).
+            const SizedBox(height: 24),
+            // "Today's breath", the Sanskar's own name for the same card (MB18,
+            // 2026-09-28: one picker, so one name). Kept for revert:
+            //   _inset(_label("Today's breathing", p)),
+            _inset(_label("Today's breath", p)),
+            const SizedBox(height: 12),
+            _inset(
+              _PracticeBlock(practice: breathe, hue: kTtcBreatheHue, p: p),
+            ),
+
+            // ⚠️ THE COUPLE PART IS SHOWN ONLY IF SHE ASKED FOR IT IN SESSION 8.
+            // It is not a third practice and does not get a block — it is a line
+            // she chose to be reminded of, and the brief offers "or neither".
+            if (TtcGarbhCourseStore.instance.couple case final part?) ...[
+              const SizedBox(height: 24),
+              // Kept for revert (2026-09-28): 'One thing together'.
+              _inset(_label('One thing to do together', p)),
+              const SizedBox(height: 12),
+              _inset(_CouplePart(part: part, p: p)),
+            ],
+
+            const SizedBox(height: 24),
+            _inset(_label('Two small things', p)),
+            // 6 under a serif heading before its one-line intro (was 4).
+            const SizedBox(height: 6),
+            // Why these two are here, in one line (tools pass, 2026-09-27).
+            _inset(
+              Text(
+                'Two small habits that make the rest easier. Tick them when '
+                "they're done.",
+                style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // ⚠️ TICKS, NOT TIMED SESSIONS — the brief is explicit. Both write
+            // into the `habits` tracker rather than into anything owned here, so
+            // "What you're working on" shows them too. See `ttc_mind_today.dart`.
+            //
+            // ⚠️ ONE PANEL WITH A HAIRLINE BETWEEN THEM, NOT TWO CARDS. They are
+            // the same kind of thing done at the same moment, and two separate
+            // bordered boxes made a four-item list out of a two-item one.
+            _inset(_TickPanel(p: p)),
+
+            const SizedBox(height: 22),
+
+            // ⚠️ NO STREAK, NO COUNT, NO "3 DAYS IN A ROW". Forbidden four times
+            // in the brief, and the data would support one — see the closing note
+            // in `ttc_mind_today.dart` for why the absence is deliberate rather
+            // than unfinished.
+            _inset(
+              Text(
+                hers
+                    ? 'This is the practice you chose. Nothing here keeps count, '
+                          "and a day you skip isn't a day lost."
+                    : 'Two cards a day, and they change tomorrow. Nothing here '
+                          "keeps count, and a day you skip isn't a day lost.",
+                style: pvManrope(fontSize: 12.5, height: 1.6, color: p.ink3),
+              ),
+            ),
+            const SizedBox(height: 10),
           ],
-
-          const SizedBox(height: 24),
-          _inset(_label('Two small things', p)),
-          // 6 under a serif heading before its one-line intro (was 4).
-          const SizedBox(height: 6),
-          // Why these two are here, in one line (tools pass, 2026-09-27).
-          _inset(Text(
-              'Two small habits that make the rest easier. Tick them when '
-              "they're done.",
-              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2))),
-          const SizedBox(height: 10),
-
-          // ⚠️ TICKS, NOT TIMED SESSIONS — the brief is explicit. Both write
-          // into the `habits` tracker rather than into anything owned here, so
-          // "What you're working on" shows them too. See `ttc_mind_today.dart`.
-          //
-          // ⚠️ ONE PANEL WITH A HAIRLINE BETWEEN THEM, NOT TWO CARDS. They are
-          // the same kind of thing done at the same moment, and two separate
-          // bordered boxes made a four-item list out of a two-item one.
-          _inset(_TickPanel(p: p)),
-
-          const SizedBox(height: 22),
-
-          // ⚠️ NO STREAK, NO COUNT, NO "3 DAYS IN A ROW". Forbidden four times
-          // in the brief, and the data would support one — see the closing note
-          // in `ttc_mind_today.dart` for why the absence is deliberate rather
-          // than unfinished.
-          _inset(Text(
-              hers
-                  ? 'This is the practice you chose. Nothing here keeps count, '
-                      "and a day you skip isn't a day lost."
-                  : 'Two cards a day, and they change tomorrow. Nothing here '
-                      "keeps count, and a day you skip isn't a day lost.",
-              style: pvManrope(fontSize: 12.5, height: 1.6, color: p.ink3))),
-          const SizedBox(height: 10),
-        ]);
+        );
       },
     );
   }
@@ -253,13 +266,16 @@ class TtcMindTodayBody extends StatelessWidget {
   // doors/ttc_door_screen.dart, copied rather than imported so a tool body
   // does not import the door that renders it. Kept for revert:
   //   pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)
-  static Widget _label(String s, V2Palette p) => Text(s,
-      style: pvFraunces(
-          fontSize: 21,
-          fontWeight: FontWeight.w600,
-          height: 1.2,
-          letterSpacing: -0.45,
-          color: p.ink1));
+  static Widget _label(String s, V2Palette p) => Text(
+    s,
+    style: pvFraunces(
+      fontSize: 21,
+      fontWeight: FontWeight.w600,
+      height: 1.2,
+      letterSpacing: -0.45,
+      color: p.ink1,
+    ),
+  );
 }
 
 // =============================================================================
@@ -272,8 +288,11 @@ class TtcMindTodayBody extends StatelessWidget {
 /// it gets the width — and the width is what lets the blurb, the timing and the
 /// setting all show without a tap.
 class _PracticeBlock extends StatelessWidget {
-  const _PracticeBlock(
-      {required this.practice, required this.hue, required this.p});
+  const _PracticeBlock({
+    required this.practice,
+    required this.hue,
+    required this.p,
+  });
 
   final TtcPractice practice;
   final double hue;
@@ -284,21 +303,20 @@ class _PracticeBlock extends StatelessWidget {
   // Unused since the art left the card (2026-09-28); kept for revert.
   // ignore: unused_element
   IconData get _mark => switch (practice.anim) {
-        TtcBreathAnim() => Icons.air_rounded,
-        TtcBodyScanAnim() => Icons.accessibility_new_rounded,
-        TtcListenAnim() => Icons.graphic_eq_rounded,
-        TtcTimerAnim() => Icons.directions_walk_rounded,
-        TtcFigureAnim() => Icons.self_improvement_rounded,
-      };
+    TtcBreathAnim() => Icons.air_rounded,
+    TtcBodyScanAnim() => Icons.accessibility_new_rounded,
+    TtcListenAnim() => Icons.graphic_eq_rounded,
+    TtcTimerAnim() => Icons.directions_walk_rounded,
+    TtcFigureAnim() => Icons.self_improvement_rounded,
+  };
 
   @override
   Widget build(BuildContext context) {
     final done = ttcPracticeDoneToday(practice.kind);
     final tint = v2BlockTint(hue, p);
-    final deep = HSLColor.fromColor(tint)
-        .withSaturation(0.46)
-        .withLightness(0.34)
-        .toColor();
+    final deep = HSLColor.fromColor(
+      tint,
+    ).withSaturation(0.46).withLightness(0.34).toColor();
 
     return InkWell(
       onTap: () => openTtcSurface(context, 'ttc_practice/${practice.id}'),
@@ -309,19 +327,20 @@ class _PracticeBlock extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
         ),
         clipBehavior: Clip.antiAlias,
-        child: Stack(children: [
-          // Large, quiet, and cropped by the block — the same treatment the
-          // door's own tiles use where there is no illustration yet.
-          // ⚠️ NO ART BEHIND THE WORDS (the user, 2026-09-28: the basics of
-          // placement inside these cards). The 132pt faded figure sat under
-          // the time and place line. Headspace and Calm keep a practice card's
-          // text on a clean ground (https://mobbin.com/screens/d05b1798-9389-4073-999b-693b84cca19e);
-          // the card's colour already says Move or Breathe. Kept for revert:
-          //   Positioned(right: -18, bottom: -14, child: Icon(_mark, size: 132,
-          //       color: Colors.white.withValues(alpha: 0.42))),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-            child: Column(
+        child: Stack(
+          children: [
+            // Large, quiet, and cropped by the block — the same treatment the
+            // door's own tiles use where there is no illustration yet.
+            // ⚠️ NO ART BEHIND THE WORDS (the user, 2026-09-28: the basics of
+            // placement inside these cards). The 132pt faded figure sat under
+            // the time and place line. Headspace and Calm keep a practice card's
+            // text on a clean ground (https://mobbin.com/screens/d05b1798-9389-4073-999b-693b84cca19e);
+            // the card's colour already says Move or Breathe. Kept for revert:
+            //   Positioned(right: -18, bottom: -14, child: Icon(_mark, size: 132,
+            //       color: Colors.white.withValues(alpha: 0.42))),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ⚠️ NO KIND CHIP (launch sanity MB6 and MB2, 2026-09-28).
@@ -350,74 +369,95 @@ class _PracticeBlock extends StatelessWidget {
                   // happened.
                   if (done) ...[
                     _Chip(
-                        label: 'Done today',
-                        icon: Icons.check_rounded,
-                        fg: Colors.white,
-                        bg: deep.withValues(alpha: 0.92)),
+                      label: 'Done today',
+                      icon: Icons.check_rounded,
+                      fg: Colors.white,
+                      bg: deep.withValues(alpha: 0.92),
+                    ),
                     const SizedBox(height: 14),
                   ],
                   // 18, under the 21 of the heading above it now that the
                   // heading is serif too (2026-09-27): a card title the same
                   // size as its section heading flattens the hierarchy.
                   // Kept for revert: 21.
-                  Text(practice.title,
-                      style: pvFraunces(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          height: 1.18,
-                          letterSpacing: -0.4,
-                          color: p.ink1)),
+                  Text(
+                    practice.title,
+                    style: pvFraunces(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      height: 1.18,
+                      letterSpacing: -0.4,
+                      color: p.ink1,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   // Room for the whole blurb: the block is full width and the
                   // blurb is two lines by construction in the library.
-                  Text(practice.blurb,
-                      style: pvManrope(
-                          fontSize: 13.5, height: 1.5, color: p.ink2)),
+                  Text(
+                    practice.blurb,
+                    style: pvManrope(
+                      fontSize: 13.5,
+                      height: 1.5,
+                      color: p.ink2,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   // ⚠️ ONE QUIET LINE FOR TIME AND PLACE (2026-09-28): two bold
                   // coloured lines with icons made four text styles in one
                   // card. The card's own wording, unformatted, as before.
-                  Text('${practice.duration} · ${practice.setting}',
-                      maxLines: 2,
-                      style: pvManrope(
-                          fontSize: 12.5,
-                          height: 1.4,
-                          fontWeight: FontWeight.w600,
-                          color: p.ink3)),
+                  Text(
+                    '${practice.duration} · ${practice.setting}',
+                    maxLines: 2,
+                    style: pvManrope(
+                      fontSize: 12.5,
+                      height: 1.4,
+                      fontWeight: FontWeight.w600,
+                      color: p.ink3,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   // Kept for revert (2026-09-28): the icon row below.
                   // ignore: dead_code
-                  if (false) Row(children: [
-                    Icon(Icons.schedule_rounded, size: 14, color: deep),
-                    const SizedBox(width: 6),
-                    // ⚠️ THE CARD'S OWN WORDING, NOT A NUMBER WE FORMAT. "About
-                    // 3 minutes" and "1 to 2 minutes" hedge on purpose, and
-                    // rounding either to "3 min" promises a precision the
-                    // practice does not have — which is the thing somebody
-                    // plans their morning around.
-                    Flexible(
-                      child: Text(practice.duration,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(
+                  if (false)
+                    Row(
+                      children: [
+                        Icon(Icons.schedule_rounded, size: 14, color: deep),
+                        const SizedBox(width: 6),
+                        // ⚠️ THE CARD'S OWN WORDING, NOT A NUMBER WE FORMAT. "About
+                        // 3 minutes" and "1 to 2 minutes" hedge on purpose, and
+                        // rounding either to "3 min" promises a precision the
+                        // practice does not have — which is the thing somebody
+                        // plans their morning around.
+                        Flexible(
+                          child: Text(
+                            practice.duration,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: deep)),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(Icons.place_outlined, size: 14, color: deep),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      flex: 2,
-                      child: Text(practice.setting,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(
+                              color: deep,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Icon(Icons.place_outlined, size: 14, color: deep),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          flex: 2,
+                          child: Text(
+                            practice.setting,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: deep)),
+                              color: deep,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ]),
                   // ⚠️ A BUTTON, NOT A LINE OF BOLD TEXT (2026-09-28): an ink
                   // pill says "press me" the way every other action in the app
                   // does. Kept for revert: Row(Text('Start', w800), arrow icon).
@@ -427,26 +467,35 @@ class _PracticeBlock extends StatelessWidget {
                       color: ttcTitleInk,
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      // Kept for revert (2026-09-28): done ? 'Do it again'
-                      // : 'Start'. The pill names the practice it opens.
-                      // 2026-09-29: Flexible with one ellipsised line, so the
-                      // pill gives way at text scale 1.5 on a 360pt door
-                      // instead of overflowing by 47. Kept for revert: the
-                      // Text bare.
-                      Flexible(
-                        child: Text(done ? 'Practise again' : 'Start practice',
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Kept for revert (2026-09-28): done ? 'Do it again'
+                        // : 'Start'. The pill names the practice it opens.
+                        // 2026-09-29: Flexible with one ellipsised line, so the
+                        // pill gives way at text scale 1.5 on a 360pt door
+                        // instead of overflowing by 47. Kept for revert: the
+                        // Text bare.
+                        Flexible(
+                          child: Text(
+                            done ? 'Practise again' : 'Start practice',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: pvManrope(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white)),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.arrow_forward_rounded,
-                          size: 16, color: Colors.white),
-                    ]),
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
                   ),
                   // ⚠️ WHAT "START" LEADS TO, SAID BEFORE THE TAP (tools pass,
                   // 2026-09-27). She had to go in to find out it is a guided
@@ -458,25 +507,32 @@ class _PracticeBlock extends StatelessWidget {
                   if (false && !done) ...[
                     const SizedBox(height: 4),
                     Text(
-                        'Opens the steps and a timer. Tap "Mark done today" '
-                        'at the end.',
-                        style: pvManrope(
-                            fontSize: 12, height: 1.45, color: p.ink2)),
+                      'Opens the steps and a timer. Tap "Mark done today" '
+                      'at the end.',
+                      style: pvManrope(
+                        fontSize: 12,
+                        height: 1.45,
+                        color: p.ink2,
+                      ),
+                    ),
                   ],
-                ]),
-          ),
-        ]),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip(
-      {required this.label,
-      required this.icon,
-      required this.fg,
-      required this.bg});
+  const _Chip({
+    required this.label,
+    required this.icon,
+    required this.fg,
+    required this.bg,
+  });
 
   final String label;
   final IconData icon;
@@ -485,17 +541,27 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-        decoration: BoxDecoration(
-            color: bg, borderRadius: BorderRadius.circular(999)),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 11, color: fg),
-          const SizedBox(width: 5),
-          Text(label,
-              style: pvManrope(
-                  fontSize: 11.5, fontWeight: FontWeight.w800, color: fg)),
-        ]),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+    decoration: BoxDecoration(
+      color: bg,
+      borderRadius: BorderRadius.circular(999),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 11, color: fg),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: pvManrope(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w800,
+            color: fg,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 // =============================================================================
@@ -515,12 +581,18 @@ class _YourPracticeStrip extends StatelessWidget {
     final breathe = store.breatheId;
     final couple = store.couple;
     store.clearDailyPractice();
-    pvSnack(context, 'Today now shows a different practice each day.',
-        icon: Icons.check_rounded,
-        action: 'Undo',
-        onAction: () => store.setDailyPractice(
-            moveId: move, breatheId: breathe, couple: couple),
-        lift: 24);
+    pvSnack(
+      context,
+      'Today now shows a different practice each day.',
+      icon: Icons.check_rounded,
+      action: 'Undo',
+      onAction: () => store.setDailyPractice(
+        moveId: move,
+        breatheId: breathe,
+        couple: couple,
+      ),
+      lift: 24,
+    );
   }
 
   // ⚠️ THE CARD FAMILY'S SHAPE, AND A BUTTON FOR THE WAY BACK (2026-09-28).
@@ -532,66 +604,81 @@ class _YourPracticeStrip extends StatelessWidget {
   // The strip as it was is `_buildStrip`, kept for revert.
   @override
   Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        padding: kTtcCardPad,
-        decoration: BoxDecoration(
-          // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
-          color: p.surface, border: Border.fromBorderSide(BorderSide(color: p.line)),
-          borderRadius: BorderRadius.circular(kTtcCardRadius),
+    width: double.infinity,
+    padding: kTtcCardPad,
+    decoration: BoxDecoration(
+      // Kept for revert (2026-09-29, no tinted slab behind text): color: p.surfaceAlt,
+      color: p.surface,
+      border: Border.fromBorderSide(BorderSide(color: p.line)),
+      borderRadius: BorderRadius.circular(kTtcCardRadius),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'You picked this practice in the free preconception course.',
+          style: ttcCardBody(p),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('You picked this practice in the free preconception course.',
-              style: ttcCardBody(p)),
-          const SizedBox(height: 12),
-          TtcQuietPill(
-            label: 'Show a different practice each day',
-            icon: Icons.shuffle_rounded,
-            onTap: () => _clear(context),
-          ),
-        ]),
-      );
+        const SizedBox(height: 12),
+        TtcQuietPill(
+          label: 'Show a different practice each day',
+          icon: Icons.shuffle_rounded,
+          onTap: () => _clear(context),
+        ),
+      ],
+    ),
+  );
 
   // Kept for revert (2026-09-28). Nothing calls it.
   // ignore: unused_element
   Widget _buildStrip(BuildContext context) => Container(
-        padding: const EdgeInsets.fromLTRB(13, 11, 11, 11),
-        decoration: BoxDecoration(
-          color: p.surfaceAlt,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(Icons.check_circle_outline_rounded, size: 16, color: p.ink3),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Kept for revert (2026-09-27): 'The practice you built in
-                  // session eight.' Someone who came from a link does not know
-                  // what session eight is.
-                  Text(
-                      'You picked this practice in the free preconception '
-                      'course.',
-                      style: pvManrope(
-                          fontSize: 12.5, height: 1.5, color: p.ink2)),
-                  const SizedBox(height: 6),
-                  // ⚠️ THE WAY BACK IS ON THE SAME LINE AS THE FACT. Undoing
-                  // this without it means finding the course and redoing
-                  // session 8 to choose something else, which is a settings
-                  // screen with extra steps.
-                  PvPress(child: GestureDetector(
-                    onTap: TtcGarbhCourseStore.instance.clearDailyPractice,
-                    behavior: HitTestBehavior.opaque,
-                    child: Text('Show a different practice each day instead',
-                        style: pvManrope(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                            color: p.action)),
-                  )),
-                ]),
+    padding: const EdgeInsets.fromLTRB(13, 11, 11, 11),
+    decoration: BoxDecoration(
+      color: p.surfaceAlt,
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.check_circle_outline_rounded, size: 16, color: p.ink3),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Kept for revert (2026-09-27): 'The practice you built in
+              // session eight.' Someone who came from a link does not know
+              // what session eight is.
+              Text(
+                'You picked this practice in the free preconception '
+                'course.',
+                style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2),
+              ),
+              const SizedBox(height: 6),
+              // ⚠️ THE WAY BACK IS ON THE SAME LINE AS THE FACT. Undoing
+              // this without it means finding the course and redoing
+              // session 8 to choose something else, which is a settings
+              // screen with extra steps.
+              PvPress(
+                child: GestureDetector(
+                  onTap: TtcGarbhCourseStore.instance.clearDailyPractice,
+                  behavior: HitTestBehavior.opaque,
+                  child: Text(
+                    'Show a different practice each day instead',
+                    style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: p.action,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ]),
-      );
+        ),
+      ],
+    ),
+  );
 }
 
 /// The gratitude or conversation line, when she asked for one.
@@ -604,15 +691,15 @@ class _CouplePart extends StatelessWidget {
   Widget build(BuildContext context) {
     final (title, blurb) = switch (part) {
       TtcCoupleDaily.gratitude => (
-          'One thing you like about each other',
-          'Say it out loud, one each. It takes about thirty seconds, and '
-              "people say it's the part that changed the most.",
-        ),
+        'One thing you like about each other',
+        'Say it out loud, one each. It takes about thirty seconds, and '
+            "people say it's the part that changed the most.",
+      ),
       TtcCoupleDaily.conversation => (
-          'One honest question, and just listen',
-          'Ask, and let the answer be, without trying to fix it. That is the '
-              'whole practice.',
-        ),
+        'One honest question, and just listen',
+        'Ask, and let the answer be, without trying to fix it. That is the '
+            'whole practice.',
+      ),
     };
 
     // ⚠️ THE SAME CARD AS THE TWO PRACTICES ABOVE IT (2026-09-28). It was a
@@ -625,10 +712,13 @@ class _CouplePart extends StatelessWidget {
     // Kept for revert: Container(padding: all(15), surface, radius 18,
     //   border p.line; title pvFraunces 16.5; blurb pvManrope 12.5).
     final tint = v2BlockTint(
-        ttcRitualPartHue(part == TtcCoupleDaily.gratitude
+      ttcRitualPartHue(
+        part == TtcCoupleDaily.gratitude
             ? TtcRitualPart.gratitude
-            : TtcRitualPart.conversation),
-        p);
+            : TtcRitualPart.conversation,
+      ),
+      p,
+    );
     return Container(
       width: double.infinity,
       padding: kTtcCardPad,
@@ -636,17 +726,21 @@ class _CouplePart extends StatelessWidget {
         color: tint,
         borderRadius: BorderRadius.circular(kTtcCardRadius),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        TtcCardChip(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TtcCardChip(
             label: 'Together',
             icon: Icons.people_outline_rounded,
             fg: ttcCardDeep(tint),
-            bg: Colors.white.withValues(alpha: 0.82)),
-        const SizedBox(height: 14),
-        Text(title, style: ttcCardTitle(p)),
-        const SizedBox(height: 6),
-        Text(blurb, style: ttcCardBody(p)),
-      ]),
+            bg: Colors.white.withValues(alpha: 0.82),
+          ),
+          const SizedBox(height: 14),
+          Text(title, style: ttcCardTitle(p)),
+          const SizedBox(height: 6),
+          Text(blurb, style: ttcCardBody(p)),
+        ],
+      ),
     );
   }
 }
@@ -678,42 +772,55 @@ class _TickPanel extends StatelessWidget {
         border: Border.all(color: p.line),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Column(children: [
-        _Tick(
-          p: p,
-          field: kTtcBedtimeField,
-          label: bed == null ? 'In bed by about eleven' : 'In bed by about $bed',
-          blurb: "Roughly is fine. You don't have to be strict about it.",
-          // ⚠️ THE TIME IS CHANGEABLE HERE (tools pass, 2026-09-27). It could
-          // only be set in session 5 of the course, which most people never
-          // open, so "eleven" read as a rule she was already failing. The
-          // same store field the course writes, so both stay in step.
-          action: bed == null ? 'Pick your own time' : 'Change time',
-          onAction: () => _pickBedtime(context, bed),
-        ),
-        // Indented to the card's 18 with the rows (2026-09-28; was 15).
-        Divider(height: 1, thickness: 1, color: p.line, indent: 18, endIndent: 18),
-        _Tick(
-          p: p,
-          field: kTtcHomeCookedField,
-          label: 'Home-cooked meals today',
-          // ⚠️ IT DOES NOT TEACH FOOD, AND THAT IS A BOUNDARY THE BRIEF SETS:
-          // this area "references Getting ready, does not own or teach food".
-          // So the tick records the fact and says nothing about what to eat.
-          // ⚠️ "GETTING READY" IS A PILL THAT GOES THERE (launch sanity MB8,
-          // 2026-09-28). The blurb named another door she could not tap. Now
-          // the words say what counts and the pill opens the Getting ready
-          // door on its Diet tab, the same quiet pill as the bedtime's. Kept
-          // for revert:
-          //   blurb: 'Mostly home-cooked counts. What to eat is in Getting '
-          //       'ready.',
-          blurb: 'Mostly home-cooked counts.',
-          action: 'What to eat, in Getting ready',
-          actionIcon: Icons.restaurant_outlined,
-          onAction: () => openTtcDoor(context, kTtcGettingReadyDoorId,
-              initialGroup: 'diet'),
-        ),
-      ]),
+      child: Column(
+        children: [
+          _Tick(
+            p: p,
+            field: kTtcBedtimeField,
+            label: bed == null
+                ? 'In bed by about eleven'
+                : 'In bed by about $bed',
+            blurb: "Roughly is fine. You don't have to be strict about it.",
+            // ⚠️ THE TIME IS CHANGEABLE HERE (tools pass, 2026-09-27). It could
+            // only be set in session 5 of the course, which most people never
+            // open, so "eleven" read as a rule she was already failing. The
+            // same store field the course writes, so both stay in step.
+            action: bed == null ? 'Pick your own time' : 'Change time',
+            onAction: () => _pickBedtime(context, bed),
+          ),
+          // Indented to the card's 18 with the rows (2026-09-28; was 15).
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: p.line,
+            indent: 18,
+            endIndent: 18,
+          ),
+          _Tick(
+            p: p,
+            field: kTtcHomeCookedField,
+            label: 'Home-cooked meals today',
+            // ⚠️ IT DOES NOT TEACH FOOD, AND THAT IS A BOUNDARY THE BRIEF SETS:
+            // this area "references Getting ready, does not own or teach food".
+            // So the tick records the fact and says nothing about what to eat.
+            // ⚠️ "GETTING READY" IS A PILL THAT GOES THERE (launch sanity MB8,
+            // 2026-09-28). The blurb named another door she could not tap. Now
+            // the words say what counts and the pill opens the Getting ready
+            // door on its Diet tab, the same quiet pill as the bedtime's. Kept
+            // for revert:
+            //   blurb: 'Mostly home-cooked counts. What to eat is in Getting '
+            //       'ready.',
+            blurb: 'Mostly home-cooked counts.',
+            action: 'What to eat, in Getting ready',
+            actionIcon: Icons.restaurant_outlined,
+            onAction: () => openTtcDoor(
+              context,
+              kTtcGettingReadyDoorId,
+              initialGroup: 'diet',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -731,19 +838,22 @@ Future<void> _pickBedtime(BuildContext context, String? current) async {
   final t = await showTimePicker(context: context, initialTime: start);
   if (t == null) return;
   TtcGarbhCourseStore.instance.setTimes(
-      bed: '${t.hour.toString().padLeft(2, '0')}:'
-          '${t.minute.toString().padLeft(2, '0')}');
+    bed:
+        '${t.hour.toString().padLeft(2, '0')}:'
+        '${t.minute.toString().padLeft(2, '0')}',
+  );
 }
 
 class _Tick extends StatelessWidget {
-  const _Tick(
-      {required this.p,
-      required this.field,
-      required this.label,
-      required this.blurb,
-      this.action,
-      this.actionIcon = Icons.schedule_rounded,
-      this.onAction});
+  const _Tick({
+    required this.p,
+    required this.field,
+    required this.label,
+    required this.blurb,
+    this.action,
+    this.actionIcon = Icons.schedule_rounded,
+    this.onAction,
+  });
 
   final V2Palette p;
   final String field;
@@ -769,61 +879,85 @@ class _Tick extends StatelessWidget {
       onTap: () => ttcSetHabitTick(field, !on),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 130),
-            width: 23,
-            height: 23,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: on ? ttcTitleInk : Colors.transparent,
-              borderRadius: BorderRadius.circular(8),
-              border: on ? null : Border.all(color: p.line, width: 1.6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 130),
+              width: 23,
+              height: 23,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: on ? ttcTitleInk : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                border: on ? null : Border.all(color: p.line, width: 1.6),
+              ),
+              child: on
+                  ? const Icon(
+                      Icons.check_rounded,
+                      size: 15,
+                      color: Colors.white,
+                    )
+                  : null,
             ),
-            child: on
-                ? const Icon(Icons.check_rounded, size: 15, color: Colors.white)
-                : null,
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label,
-                      style: pvManrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          height: 1.3,
-                          color: p.ink1)),
+                  Text(
+                    label,
+                    style: pvManrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
+                      color: p.ink1,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(blurb,
-                      style: pvManrope(
-                          fontSize: 12.5, height: 1.5, color: p.ink2)),
+                  Text(
+                    blurb,
+                    style: pvManrope(
+                      fontSize: 12.5,
+                      height: 1.5,
+                      color: p.ink2,
+                    ),
+                  ),
                   if (action != null && onAction != null) ...[
                     const SizedBox(height: 10),
                     TtcQuietPill(
-                        label: action!,
-                        icon: actionIcon,
-                        onTap: onAction!),
+                      label: action!,
+                      icon: actionIcon,
+                      onTap: onAction!,
+                    ),
                   ],
                   // Kept for revert (2026-09-28): the action as bold text.
                   // ignore: dead_code
                   if (false && action != null && onAction != null)
                     // ignore: dead_code
-                    PvPress(enabled: onAction != null, child: GestureDetector(
-                      onTap: onAction,
-                      behavior: HitTestBehavior.opaque,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 6, bottom: 2),
-                        child: Text(action!,
+                    PvPress(
+                      enabled: onAction != null,
+                      child: GestureDetector(
+                        onTap: onAction,
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 6, bottom: 2),
+                          child: Text(
+                            action!,
                             style: pvManrope(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w800,
-                                color: ttcTitleInk)),
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w800,
+                              color: ttcTitleInk,
+                            ),
+                          ),
+                        ),
                       ),
-                    )),
-                ]),
-          ),
-        ]),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

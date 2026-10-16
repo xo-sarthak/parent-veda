@@ -1446,3 +1446,13 @@ Before any screen ships:
 - [ ] Destructive actions use `danger`; urgent paths stay calm
 - [ ] It would still be right if she were frightened
 - [ ] It could not be told apart from the V3 home
+
+## 4.0h Yoga & fitness hub — one library, For you first — BUILT 2026-10-16
+
+`YogaHomeScreen` on `PregToolScaffold`. Order: search, For you / All (`PvChip`),
+then For you rails (`PvSectionHead` + See all) or All (chip row, count line,
+active filters with Clear all, rails per chip or a row list). A floating ink
+Filter pill opens a ground sheet (`PvCommit` "Show N results", `PvSecondary`
+"Clear all"). Cards keep the class card's look; in All every card carries its
+stage label (Fertility / Pregnancy / After birth). "After your six-week check"
+is a label, never a hidden class. Hearts on cards stay silent (§4.0g).

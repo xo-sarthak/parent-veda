@@ -17,7 +17,7 @@
 //    1. Move safely        is it safe, month by month, yoga, what to avoid
 //    2. Pelvic floor       kegels, leaking, perineal massage
 //    3. Sleep and rest     side sleeping, can't sleep, tiredness
-//    4. Classes and tools  the 22 month-by-month yoga sessions, Kegel Care
+//    4. Classes and tools  the Yoga & fitness hub (2026-10-16), Kegel Care
 //
 //  The gap analysis names three tabs; the build brief adds a fourth that
 //  gathers the two follow-along tools in one place, as well as beside the
@@ -38,14 +38,15 @@ import 'package:flutter/material.dart' show Icons;
 import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../reads/read_images.dart' show readImageFor;
 import 'pv_door_data.dart';
+import '../prepare_data.dart' show kYogaSessions;
 
 /// Surfaces this door opens. Resolved by `pv_door_router.dart`.
 ///
 /// ⚠️ CONSTANTS, NOT LITERALS, BECAUSE THESE ARE IDENTITIES — see
 /// `pv_door_scans.dart`. Each becomes a route name.
 ///
-/// The 22 month-by-month prenatal yoga sessions (`kYogaSessions`,
-/// `PrenatalYogaScreen`).
+/// The Yoga & fitness hub, opened on her month's sessions
+/// (`YogaHomeScreen`; was `PrenatalYogaScreen` until 2026-10-16).
 const String kMoveSurfaceYoga = 'move/yoga';
 
 /// The Kegel Care routine (`KegelCareScreen`).
@@ -64,9 +65,13 @@ const String kMoveTabClasses = 'classes';
 // class and the screen opened videos, with nothing saying which was which
 // (the user's note: "no indication of it being a class/live"). The screen now
 // marks its videos as self-guided and lists the live classes on their own.
-const String _yogaTitle = 'Pregnancy yoga: videos and live classes';
-const String _yogaBlurb = '22 follow-along videos, month by month, and live '
-    'classes with a teacher.';
+// Kept for revert (2026-10-16): 'Pregnancy yoga: videos and live classes' /
+// '22 follow-along videos, month by month, and live classes with a teacher.'
+// The card now opens the one Yoga & fitness hub, and "22" was wrong (there
+// are 21); the count is read from the list so it cannot drift again.
+const String _yogaTitle = 'Yoga & fitness: classes and videos';
+final String _yogaBlurb = 'Follow-along videos for your month '
+    '(${kYogaSessions.length} in all), and classes with a teacher.';
 const String _kegelTitle = 'Kegel Care: a guided daily routine';
 const String _kegelBlurb = 'It times each squeeze and rest, and builds up as '
     'your pregnancy goes on.';

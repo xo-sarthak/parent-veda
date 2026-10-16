@@ -107,6 +107,7 @@ import 'ttc_strings.dart' show TtcPartnerMode;
 import 'ttc_tab_root_header.dart';
 import 'ttc_tools_screen.dart' show ttcMovedToMoreById;
 import 'ttc_common.dart' show ttcTitleInk, ttcSectionHeadingStyle;
+import '../post_pregnancy/yoga_home_screen.dart';
 
 /// The page's title. The bar's pill says the same word.
 const String kTtcMoreTitle = 'More';
@@ -411,6 +412,24 @@ List<TtcMoreSection> ttcMoreSections({required bool partner}) {
       lead: 'Learn at your own pace, or live with an expert',
       hue: 206,
       rows: [for (final v in courses) _offerRow(v)],
+    ),
+    // ONE Yoga & fitness hub for every stage (2026-10-16): TTC had no way in
+    // but the fertility pack's own card. For you there is today's practice
+    // for her cycle phase, then the fertility classes.
+    TtcMoreSection(
+      id: 'move',
+      title: 'Yoga & fitness',
+      lead: 'Gentle movement that follows your cycle',
+      hue: 150,
+      rows: [
+        TtcMoreRow(
+          id: 'yoga_fitness',
+          art: ttcArtTab(TtcTabMark.lotus),
+          title: 'Yoga & fitness',
+          line: "Today's practice, and classes with a teacher",
+          open: (c) => _push(c, const YogaHomeScreen(backLabel: 'More'), 'move'),
+        ),
+      ],
     ),
     TtcMoreSection(
       id: 'groups',

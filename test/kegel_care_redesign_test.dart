@@ -22,17 +22,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/localization/app_language.dart';
 import 'package:parentveda/screens/tools/kegel_care_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
+import 'package:parentveda/services/family_profile.dart';
+import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 import 'package:parentveda/services/tools_store.dart';
 
 bool _isEmoji(int r) =>
-    r >= 0x1F000 || r == 0xFE0F || (r >= 0x2600 && r <= 0x27BF && r != 0x2713 && r != 0x2714);
+    r >= 0x1F000 ||
+    r == 0xFE0F ||
+    (r >= 0x2600 && r <= 0x27BF && r != 0x2713 && r != 0x2714);
 
 List<String> _emojiTexts(WidgetTester t) => [
-      for (final w in t.widgetList<Text>(find.byType(Text, skipOffstage: false)))
-        if ((w.data ?? w.textSpan?.toPlainText() ?? '').runes.any(_isEmoji))
-          w.data ?? w.textSpan!.toPlainText(),
-    ];
+  for (final w in t.widgetList<Text>(find.byType(Text, skipOffstage: false)))
+    if ((w.data ?? w.textSpan?.toPlainText() ?? '').runes.any(_isEmoji))
+      w.data ?? w.textSpan!.toPlainText(),
+];
 
 String _code(String p) => File(p)
     .readAsStringSync()
@@ -50,24 +55,34 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    c = PregnancyController(dueDate: DateTime.now().add(const Duration(days: 120)));
+    c = PregnancyController(
+      dueDate: DateTime.now().add(const Duration(days: 120)),
+    );
     await c.load();
     s = S(c.language);
     await store.init();
     await store.setKegelCustomRoutine(hold: 2, relax: 2, reps: 3);
   });
 
-  Future<void> pump(WidgetTester t, {double scale = 1.0, double width = 900}) async {
+  Future<void> pump(
+    WidgetTester t, {
+    double scale = 1.0,
+    double width = 900,
+  }) async {
     t.view.physicalSize = Size(width, 3200);
     t.view.devicePixelRatio = 1.0;
     addTearDown(t.view.reset);
-    await t.pumpWidget(MaterialApp(
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
-        child: child!,
+    await t.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(scale)),
+          child: child!,
+        ),
+        home: KegelCareScreen(controller: c),
       ),
-      home: KegelCareScreen(controller: c),
-    ));
+    );
     await t.pump();
     await t.pump(const Duration(milliseconds: 300));
   }
@@ -78,13 +93,15 @@ void main() {
   }
 
   group('the front page', () {
-    testWidgets('the routine is three numbers, with its time under them',
-        (t) async {
+    testWidgets('the routine is three numbers, with its time under them', (
+      t,
+    ) async {
       await pump(t);
       expect(find.byKey(const ValueKey('kg_routine_numbers')), findsOneWidget);
       final nums = find.descendant(
-          of: find.byKey(const ValueKey('kg_routine_numbers')),
-          matching: find.byType(Text));
+        of: find.byKey(const ValueKey('kg_routine_numbers')),
+        matching: find.byType(Text),
+      );
       expect(nums, findsNWidgets(6)); // three values, three captions
       expect(find.text('2'), findsWidgets);
       expect(find.text('3'), findsWidgets);
@@ -95,8 +112,9 @@ void main() {
       await done(t);
     });
 
-    testWidgets('what, why and how are folded; their words open on a tap',
-        (t) async {
+    testWidgets('what, why and how are folded; their words open on a tap', (
+      t,
+    ) async {
       await pump(t);
       for (final f in ['what', 'why', 'how']) {
         expect(find.byKey(ValueKey('kg_fold_$f')), findsOneWidget, reason: f);
@@ -118,7 +136,11 @@ void main() {
         s.kegelSafetyDizziness,
         s.kegelSafetyContractions,
       ]) {
-        expect(find.text(line, skipOffstage: false), findsOneWidget, reason: line);
+        expect(
+          find.text(line, skipOffstage: false),
+          findsOneWidget,
+          reason: line,
+        );
       }
       await done(t);
     });
@@ -133,8 +155,9 @@ void main() {
   // FIRST ON PURPOSE: `ToolsStore` is a singleton, so once any test below saves a
   // session the journey is no longer empty. File order is run order.
   group('the Care Journey before any session', () {
-    testWidgets('three numbers at zero, seven plain rings, the invitation',
-        (t) async {
+    testWidgets('three numbers at zero, seven plain rings, the invitation', (
+      t,
+    ) async {
       await pump(t);
       await t.tap(find.byKey(const ValueKey('kegel_care_journey_row')));
       await t.pumpAndSettle();
@@ -157,7 +180,9 @@ void main() {
       await t.pump(const Duration(milliseconds: 400));
     }
 
-    testWidgets('a dot a rep, a cue, one ink Pause and a quiet Exit', (t) async {
+    testWidgets('a dot a rep, a cue, one ink Pause and a quiet Exit', (
+      t,
+    ) async {
       await pump(t);
       await start(t);
       expect(find.byKey(const ValueKey('kg_rep_dots')), findsOneWidget);
@@ -190,30 +215,38 @@ void main() {
       await done(t);
     });
 
-    testWidgets('through to the close: no emoji, three numbers, and a choice saves',
-        (t) async {
-      await pump(t);
-      final before = store.kegelSessions;
-      await start(t);
-      // 3 reps of (2s hold + 2s relax).
-      for (var i = 0; i < 26; i++) {
-        await t.pump(const Duration(seconds: 1));
-      }
-      expect(find.byKey(const ValueKey('kg_done_title')), findsOneWidget);
-      final title = t.widget<Text>(find.byKey(const ValueKey('kg_done_title'))).data!;
-      expect(title.runes.any(_isEmoji), isFalse, reason: 'the heart is drawn: "$title"');
-      expect(title.trim(), isNotEmpty);
-      expect(find.byKey(const ValueKey('kg_done_numbers')), findsOneWidget);
-      expect(_emojiTexts(t), isEmpty);
-      // One tap on a choice records the session and goes back.
-      await t.tap(find.byKey(const ValueKey('kg_fb_comfortable')));
-      await t.pumpAndSettle();
-      expect(store.kegelSessions, before + 1);
-      expect(store.kegelHistory.first.repetitions, 3);
-      expect(store.kegelHistory.first.feedback, 'comfortable');
-      expect(t.takeException(), isNull);
-      await done(t);
-    });
+    testWidgets(
+      'through to the close: no emoji, three numbers, and a choice saves',
+      (t) async {
+        await pump(t);
+        final before = store.kegelSessions;
+        await start(t);
+        // 3 reps of (2s hold + 2s relax).
+        for (var i = 0; i < 26; i++) {
+          await t.pump(const Duration(seconds: 1));
+        }
+        expect(find.byKey(const ValueKey('kg_done_title')), findsOneWidget);
+        final title = t
+            .widget<Text>(find.byKey(const ValueKey('kg_done_title')))
+            .data!;
+        expect(
+          title.runes.any(_isEmoji),
+          isFalse,
+          reason: 'the heart is drawn: "$title"',
+        );
+        expect(title.trim(), isNotEmpty);
+        expect(find.byKey(const ValueKey('kg_done_numbers')), findsOneWidget);
+        expect(_emojiTexts(t), isEmpty);
+        // One tap on a choice records the session and goes back.
+        await t.tap(find.byKey(const ValueKey('kg_fb_comfortable')));
+        await t.pumpAndSettle();
+        expect(store.kegelSessions, before + 1);
+        expect(store.kegelHistory.first.repetitions, 3);
+        expect(store.kegelHistory.first.feedback, 'comfortable');
+        expect(t.takeException(), isNull);
+        await done(t);
+      },
+    );
 
     testWidgets('the close holds at 1.5x text on a narrow phone', (t) async {
       await pump(t, scale: 1.5, width: 360);
@@ -234,9 +267,15 @@ void main() {
       await t.pumpAndSettle();
     }
 
-    testWidgets('a session today fills today\'s dot and nothing else', (t) async {
+    testWidgets('a session today fills today\'s dot and nothing else', (
+      t,
+    ) async {
       await store.recordKegelSession(
-          holdSeconds: 5, relaxSeconds: 5, repetitions: 10, feedback: 'easy');
+        holdSeconds: 5,
+        relaxSeconds: 5,
+        repetitions: 10,
+        feedback: 'easy',
+      );
       await open(t);
       expect(find.byIcon(Icons.check_rounded), findsOneWidget);
       // The sessions count, read from the store: it carries the earlier tests'
@@ -244,27 +283,42 @@ void main() {
       // expect(find.text('1'), findsWidgets) only passed while the seven-day
       // strip showed the 1st of a month (fixed 2026-10-09).
       expect(
-          find.descendant(
-              of: find.byKey(const ValueKey('kg_journey_numbers')),
-              matching: find.text('${store.kegelSessions}')),
-          findsWidgets);
+        find.descendant(
+          of: find.byKey(const ValueKey('kg_journey_numbers')),
+          matching: find.text('${store.kegelSessions}'),
+        ),
+        findsWidgets,
+      );
       expect(t.takeException(), isNull);
       await done(t);
     });
 
     testWidgets('no streak, target or missed day anywhere on it', (t) async {
       await store.recordKegelSession(
-          holdSeconds: 5, relaxSeconds: 5, repetitions: 10, feedback: 'easy');
+        holdSeconds: 5,
+        relaxSeconds: 5,
+        repetitions: 10,
+        feedback: 'easy',
+      );
       await open(t);
-      expect(find.textContaining(RegExp(r'streak|goal|target|missed|keep it up',
-              caseSensitive: false), skipOffstage: false), findsNothing);
+      expect(
+        find.textContaining(
+          RegExp(r'streak|goal|target|missed|keep it up', caseSensitive: false),
+          skipOffstage: false,
+        ),
+        findsNothing,
+      );
       expect(_emojiTexts(t), isEmpty);
       await done(t);
     });
 
     testWidgets('holds at 1.5x text on a narrow phone', (t) async {
       await store.recordKegelSession(
-          holdSeconds: 5, relaxSeconds: 5, repetitions: 10, feedback: 'easy');
+        holdSeconds: 5,
+        relaxSeconds: 5,
+        repetitions: 10,
+        feedback: 'easy',
+      );
       await pump(t, scale: 1.5, width: 360);
       await t.tap(find.byKey(const ValueKey('kegel_care_journey_row')));
       await t.pumpAndSettle();
@@ -273,7 +327,180 @@ void main() {
     });
   });
 
+  // AFTER BIRTH (2026-10-16). In Parenting the pregnancy week clamps to 40, so a
+  // new mother was shown "Preparing for birth", the hardest routine and a
+  // contractions line. The tool now reads the stage and weeks since birth.
+  group('after birth', () {
+    tearDown(() {
+      LifeStageStore.instance.resetForTest();
+      ChildProfileStore.instance.resetForTest();
+      FamilyProfileStore.instance.setBirthDetails(mode: BirthMode.notSaid);
+    });
+
+    Future<void> pumpPp(WidgetTester t, int daysSinceBirth) async {
+      LifeStageStore.instance.setStage(LifeStage.parenting);
+      ChildProfileStore.instance.debugSetDob(
+        DateTime.now().subtract(Duration(days: daysSinceBirth)),
+      );
+      t.view.physicalSize = const Size(900, 3200);
+      t.view.devicePixelRatio = 1.0;
+      addTearDown(t.view.reset);
+      await t.pumpWidget(const MaterialApp(home: KegelCareScreen()));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 300));
+    }
+
+    Future<void> openJourney(WidgetTester t) async {
+      await t.ensureVisible(
+        find.byKey(const ValueKey('kegel_care_journey_row')),
+      );
+      await t.tap(find.byKey(const ValueKey('kegel_care_journey_row')));
+      await t.pumpAndSettle();
+    }
+
+    testWidgets('never "Preparing for birth", never the contractions line', (
+      t,
+    ) async {
+      for (final days in [10, 70, 200]) {
+        await pumpPp(t, days);
+        expect(
+          find.textContaining('Preparing for birth', skipOffstage: false),
+          findsNothing,
+          reason: 'day $days',
+        );
+        expect(
+          find.text(s.kegelSafetyContractions, skipOffstage: false),
+          findsNothing,
+          reason: 'day $days',
+        );
+        expect(
+          find.textContaining('stage of pregnancy', skipOffstage: false),
+          findsNothing,
+          reason: 'day $days',
+        );
+        expect(find.byKey(const ValueKey('kg_pp_safety')), findsOneWidget);
+        for (final line in [
+          'Heavy bleeding',
+          'Pain',
+          'Heaviness, or a bulge you can feel',
+          'Leaking that is getting worse',
+        ]) {
+          expect(
+            find.text(line, skipOffstage: false),
+            findsOneWidget,
+            reason: line,
+          );
+        }
+        expect(find.byKey(const ValueKey('kg_pp_physio')), findsOneWidget);
+        await openJourney(t);
+        expect(
+          find.textContaining('Preparing for birth', skipOffstage: false),
+          findsNothing,
+          reason: 'journey, day $days',
+        );
+        expect(t.takeException(), isNull);
+        await done(t);
+      }
+    });
+
+    testWidgets('0-6 weeks: "Breathe first", a breath timer, no edit', (
+      t,
+    ) async {
+      await pumpPp(t, 20);
+      expect(find.text('Breathe first'), findsOneWidget);
+      expect(find.byKey(const ValueKey('kg_breathe_note')), findsOneWidget);
+      expect(find.textContaining('caesarean'), findsNothing);
+      expect(find.byIcon(Icons.edit_outlined), findsNothing);
+      // The custom squeeze routine (2/2/3) does not apply: in 4, out 6, 5 rounds.
+      expect(find.text('Rounds'), findsOneWidget);
+      expect(find.text('6'), findsWidgets);
+      await t.ensureVisible(find.byKey(const ValueKey('kg_start')));
+      await t.tap(find.byKey(const ValueKey('kg_start')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 400));
+      expect(find.text('Breathe in'), findsOneWidget);
+      expect(find.text('Gently squeeze and lift'), findsNothing);
+      expect(
+        find.text('Let the belly rise and the pelvic floor soften'),
+        findsOneWidget,
+      );
+      await t.tap(find.byKey(const ValueKey('kg_exit')));
+      await t.pumpAndSettle();
+      await done(t);
+    });
+
+    testWidgets('0-6 weeks after a caesarean: as your doctor advises', (
+      t,
+    ) async {
+      FamilyProfileStore.instance.setBirthDetails(mode: BirthMode.cSection);
+      await pumpPp(t, 20);
+      expect(
+        find.textContaining('As your doctor advises after a caesarean.'),
+        findsOneWidget,
+      );
+      await done(t);
+    });
+
+    testWidgets(
+      'after six weeks: "Kegels, done properly", capped at 5 s x 10',
+      (t) async {
+        await store.clearKegelCustomRoutine();
+        await pumpPp(t, 200);
+        expect(find.text('Kegels, done properly'), findsOneWidget);
+        expect(find.text('Breathe first'), findsNothing);
+        final nums = t
+            .widgetList<Text>(
+              find.descendant(
+                of: find.byKey(const ValueKey('kg_routine_numbers')),
+                matching: find.byType(Text),
+              ),
+            )
+            .map((w) => int.tryParse(w.data ?? ''))
+            .whereType<int>()
+            .toList();
+        expect(nums, hasLength(3));
+        expect(nums[0], lessThanOrEqualTo(5));
+        expect(nums[2], lessThanOrEqualTo(10));
+        await done(t);
+      },
+    );
+  });
+
+  group('pregnancy is unchanged', () {
+    testWidgets('late pregnancy still reads "Preparing for birth"', (t) async {
+      LifeStageStore.instance.setStage(LifeStage.pregnancy);
+      addTearDown(LifeStageStore.instance.resetForTest);
+      // Week 37. Real async: SharedPreferences never answers inside the fake
+      // clock (and a fresh controller's load would read back setUp's date).
+      await t.runAsync(
+        () => c.setDueDate(DateTime.now().add(const Duration(days: 20))),
+      );
+      await pump(t);
+      expect(find.text('Breathe first'), findsNothing);
+      expect(find.byKey(const ValueKey('kg_pp_safety')), findsNothing);
+      expect(
+        find.text(s.kegelSafetyContractions, skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(find.textContaining('stage of pregnancy'), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('kegel_care_journey_row')));
+      await t.pumpAndSettle();
+      expect(find.text(s.kegelStage3), findsOneWidget);
+      await done(t);
+    });
+  });
+
   group('wiring', () {
+    test('the parenting router opens it bare, and the pelvic floor pages link '
+        'to it', () {
+      final router = _code('lib/screens/post_pregnancy/pp_surface_router.dart');
+      expect(router, contains("'pp_kegel' => const KegelCareScreen()"));
+      final content = File(
+        'lib/screens/post_pregnancy/pp_you_maa_content.dart',
+      ).readAsStringSync();
+      expect("surfaceId: 'pp_kegel'".allMatches(content).length, 2);
+    });
+
     test('the live code uses the numbers, the folds and the dots; the old '
         'pieces are kept but not built', () {
       final live = _code('lib/screens/tools/kegel_care_screen.dart');
@@ -283,8 +510,11 @@ void main() {
       expect(live, contains('_WeekDots('));
       // Defined once and never called.
       for (final old in ['_IntroCard(', '_Expandable(', '_routineRow(']) {
-        expect(RegExp(RegExp.escape(old)).allMatches(live).length, 1,
-            reason: '$old is built again');
+        expect(
+          RegExp(RegExp.escape(old)).allMatches(live).length,
+          1,
+          reason: '$old is built again',
+        );
       }
       // The save rule is untouched: three full repetitions or nothing.
       expect(live, contains('kMinRepsToSave = 3'));

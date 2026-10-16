@@ -45,6 +45,7 @@ import 'ttc_round_strings.dart'
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../ttc/ttc_home_situation.dart';
 
 class TtcPartnerTodayScreen extends StatelessWidget {
   const TtcPartnerTodayScreen({super.key});
@@ -119,7 +120,9 @@ class TtcPartnerTodayScreen extends StatelessWidget {
             // fertile days, and no result (a closed round shows nothing;
             // how the test went is hers to tell). `ttcPartnerRoundLine`.
             if (ttcPartnerRoundLine(
-                    TtcTreatmentStore.instance.cycle, DateTime.now())
+                  TtcTreatmentStore.instance.cycle,
+                  DateTime.now(),
+                )
                 case final round?) ...[
               _RoundLineCard(line: round),
               const SizedBox(height: 12),
@@ -204,27 +207,44 @@ class _PracticeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final move =
-        ttcPracticeOfTheDay(TtcPracticeKind.move, offset: kTtcPartnerOffset);
-    final breathe =
-        ttcPracticeOfTheDay(TtcPracticeKind.breathe, offset: kTtcPartnerOffset);
+    final move = ttcPracticeOfTheDay(
+      TtcPracticeKind.move,
+      offset: kTtcPartnerOffset,
+      phase: ttcHomePhaseOn(DateTime.now()),
+    );
+    final breathe = ttcPracticeOfTheDay(
+      TtcPracticeKind.breathe,
+      offset: kTtcPartnerOffset,
+    );
 
     return _SlateCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('A FEW MINUTES, YOURS',
-            style: ttcBody(10, color: ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */, w: FontWeight.w800)),
-        const SizedBox(height: 6),
-        // ⚠️ IT SAYS THE CARDS ARE NOT HERS, BECAUSE HE WILL ASSUME THEY ARE.
-        // Everything else on this screen is about her; a practice card with no
-        // such line reads as a chore she has set him.
-        Text('These are different from hers, on purpose. Nothing here keeps '
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'A FEW MINUTES, YOURS',
+            style: ttcBody(
+              10,
+              color:
+                  ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */,
+              w: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          // ⚠️ IT SAYS THE CARDS ARE NOT HERS, BECAUSE HE WILL ASSUME THEY ARE.
+          // Everything else on this screen is about her; a practice card with no
+          // such line reads as a chore she has set him.
+          Text(
+            'These are different from hers, on purpose. Nothing here keeps '
             'score, and neither of you is waiting on the other.',
-            style: ttcBody(13, color: ttcSlateSoft, h: 1.6)),
-        const SizedBox(height: 14),
-        _PracticeRow(practice: move),
-        const SizedBox(height: 10),
-        _PracticeRow(practice: breathe),
-      ]),
+            style: ttcBody(13, color: ttcSlateSoft, h: 1.6),
+          ),
+          const SizedBox(height: 14),
+          _PracticeRow(practice: move),
+          const SizedBox(height: 10),
+          _PracticeRow(practice: breathe),
+        ],
+      ),
     );
   }
 }
@@ -237,41 +257,58 @@ class _PracticeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final done = ttcPracticeDoneToday(practice.kind);
 
-    return PvPress(child: GestureDetector(
-      onTap: () => openTtcSurface(context, 'ttc_practice/${practice.id}'),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.all(13),
-        decoration: BoxDecoration(
-          color: ttcSlatePanel,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(children: [
-          Icon(
-              practice.kind == TtcPracticeKind.move
-                  ? Icons.self_improvement_rounded
-                  : Icons.air_rounded,
-              size: 18,
-              color: ttcSlate),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(practice.title,
-                      style: ttcBody(13.5,
-                          color: ttcSlateInk, w: FontWeight.w700, h: 1.3)),
-                  const SizedBox(height: 3),
-                  Text(practice.duration,
-                      style: ttcBody(11.5, color: ttcSlateSoft)),
-                ]),
+    return PvPress(
+      child: GestureDetector(
+        onTap: () => openTtcSurface(context, 'ttc_practice/${practice.id}'),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            color: ttcSlatePanel,
+            borderRadius: BorderRadius.circular(14),
           ),
-          const SizedBox(width: 8),
-          Icon(done ? Icons.check_circle_rounded : Icons.arrow_forward_rounded,
-              size: 17, color: ttcSlate),
-        ]),
+          child: Row(
+            children: [
+              Icon(
+                practice.kind == TtcPracticeKind.move
+                    ? Icons.self_improvement_rounded
+                    : Icons.air_rounded,
+                size: 18,
+                color: ttcSlate,
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      practice.title,
+                      style: ttcBody(
+                        13.5,
+                        color: ttcSlateInk,
+                        w: FontWeight.w700,
+                        h: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      practice.duration,
+                      style: ttcBody(11.5, color: ttcSlateSoft),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                done ? Icons.check_circle_rounded : Icons.arrow_forward_rounded,
+                size: 17,
+                color: ttcSlate,
+              ),
+            ],
+          ),
+        ),
       ),
-    ));
+    );
   }
 }
 
@@ -284,27 +321,32 @@ class _ModePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget seg(String label, bool active, VoidCallback onTap) =>
-        PvPress(child: GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
-            decoration: BoxDecoration(
-              // ⚠️ ONE BLACK ON HIS SIDE TOO (2026-09-29): a chosen segment is
-              // the switch black; slate stays on his headers and tints only.
-              // Kept for revert (2026-09-29):
-              //   color: active ? (him ? ttcSlate : ttcTitleInk) : Colors.transparent,
-              color: active ? ttcTitleInk : Colors.transparent,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(label,
-                style: ttcBody(12,
-                    color: active ? Colors.white : ttcMuted,
-                    w: FontWeight.w800)),
+    Widget seg(String label, bool active, VoidCallback onTap) => PvPress(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+          decoration: BoxDecoration(
+            // ⚠️ ONE BLACK ON HIS SIDE TOO (2026-09-29): a chosen segment is
+            // the switch black; slate stays on his headers and tints only.
+            // Kept for revert (2026-09-29):
+            //   color: active ? (him ? ttcSlate : ttcTitleInk) : Colors.transparent,
+            color: active ? ttcTitleInk : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
           ),
-        ));
+          child: Text(
+            label,
+            style: ttcBody(
+              12,
+              color: active ? Colors.white : ttcMuted,
+              w: FontWeight.w800,
+            ),
+          ),
+        ),
+      ),
+    );
     return Material(
       elevation: 5,
       shadowColor: Colors.black26,
@@ -316,10 +358,13 @@ class _ModePill extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          seg(t.partnerHer, !him, () => TtcPartnerMode.instance.on = false),
-          seg(t.partnerHim, him, () => TtcPartnerMode.instance.on = true),
-        ]),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            seg(t.partnerHer, !him, () => TtcPartnerMode.instance.on = false),
+            seg(t.partnerHim, him, () => TtcPartnerMode.instance.on = true),
+          ],
+        ),
       ),
     );
   }
@@ -370,41 +415,47 @@ class _Hero extends StatelessWidget {
     // right and one amber circle off the bottom, a greeting, the serif
     // headline, a summary, an onward link, a progress bar, a hairline divider,
     // and three circular shortcuts.
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Dad has "WEEKLY SNAPSHOT" here; she has "YOUR CHAPTER". His hero
-      // floated with nothing naming it.
-      Padding(
-        padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
-        child: ttcEyebrow(t.partnerTodayTitle, color: ttcSlateSoft),
-      ),
-      ClipRRect(
-        borderRadius: BorderRadius.circular(ttcCardRadius),
-        child: Stack(children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [ttcSlate, ttcSlateDeep],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Dad has "WEEKLY SNAPSHOT" here; she has "YOUR CHAPTER". His hero
+        // floated with nothing naming it.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
+          child: ttcEyebrow(t.partnerTodayTitle, color: ttcSlateSoft),
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(ttcCardRadius),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [ttcSlate, ttcSlateDeep],
+                    ),
+                  ),
                 ),
               ),
-            ),
+              // The two soft circles Dad's hero carries. Amber is the accent on
+              // his side exactly as coral is on hers.
+              Positioned(
+                right: -34,
+                top: -40,
+                child: _softCircle(150, Colors.white.withValues(alpha: 0.06)),
+              ),
+              // The amber circle sat behind "What's next" like a stuck blob on
+              // a phone (2026-09-27). Kept for revert:
+              // Positioned(right: 26, bottom: -42,
+              //     child: _softCircle(96, ttcSlateAmber.withValues(alpha: 0.20))),
+              _body(context, hi),
+            ],
           ),
-          // The two soft circles Dad's hero carries. Amber is the accent on
-          // his side exactly as coral is on hers.
-          Positioned(
-              right: -34,
-              top: -40,
-              child: _softCircle(150, Colors.white.withValues(alpha: 0.06))),
-          // The amber circle sat behind "What's next" like a stuck blob on
-          // a phone (2026-09-27). Kept for revert:
-          // Positioned(right: 26, bottom: -42,
-          //     child: _softCircle(96, ttcSlateAmber.withValues(alpha: 0.20))),
-          _body(context, hi),
-        ]),
-      ),
-    ]);
+        ),
+      ],
+    );
   }
 
   static String _greeting(TtcS t) {
@@ -415,10 +466,10 @@ class _Hero extends StatelessWidget {
   }
 
   static Widget _softCircle(double size, Color c) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-      );
+    width: size,
+    height: size,
+    decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+  );
 
   Widget _body(BuildContext context, bool hi) {
     return Container(
@@ -436,72 +487,107 @@ class _Hero extends StatelessWidget {
       // parity" would route around the own-row rule in prose, which is exactly
       // the leak the partner Ask Veda door is careful to avoid. The segmented
       // bar is chapter-level and therefore safe.
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Dad opens "Good afternoon, {name}". Same beat.
-        Text(_greeting(t),
-            style: ttcBody(12.5,
-                color: Colors.white.withValues(alpha: 0.85),
-                w: FontWeight.w600)),
-        const SizedBox(height: 6),
-        // Fraunces, as the father mode does for its headers.
-        // ⚠️ THE DAYS, NOT THE CHAPTER NAME (the user, 2026-09-27: "Trying
-        // Together… how does that make sense? Why are we even using it?").
-        // Kept for revert: Text(chapter.title(hi), ...)
-        Text(ttcChapterHisTitle(chapter),
-            style: ttcFraunces(26, w: FontWeight.w600, color: Colors.white)),
-        const SizedBox(height: 8),
-        Text(chapter.tagline(hi),
-            style: ttcBody(13,
-                color: Colors.white.withValues(alpha: 0.92), h: 1.5)),
-        const SizedBox(height: 12),
-        // Dad's "Open her week ›" — the onward link sits under the summary,
-        // not floating in the top corner.
-        PvPress(child: GestureDetector(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (_) => const TtcJourneyMapScreen(),
-            settings: const RouteSettings(name: 'ttc/journey'),
-          )),
-          behavior: HitTestBehavior.opaque,
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(t.journeyMap,
-                style: ttcBody(12.5, color: Colors.white, w: FontWeight.w700)),
-            const Icon(Icons.chevron_right_rounded,
-                size: 17, color: Colors.white),
-          ]),
-        )),
-        // ⚠️ NO FIVE-STEP CHAPTER BAR AND NO "Next: The Waiting Days" LINE
-        // (2026-09-27): both spoke in chapter names, which the user asked to
-        // stop showing on their own. Her home dropped the same pair. Kept for
-        // revert:
-        //   const SizedBox(height: 18),
-        //   TtcChapterBar(today: today),
-        //   const SizedBox(height: 14),
-        //   Text(chapter.nextUp(hi), style: ttcBody(12.5, ...)),
-        const SizedBox(height: 16),
-        Container(height: 1, color: Colors.white.withValues(alpha: 0.16)),
-        const SizedBox(height: 14),
-        // Dad's Baby / Mother / What's-next circles. Same component hers uses -
-        // it is white-on-translucent, so it carries across palettes unchanged.
-        Row(children: [
-          TtcHeroShortcut(
-              icon: Icons.self_improvement_rounded,
-              // Who each is for (2026-09-27). Kept for revert: t.shortcutMe.
-              label: 'For you',
-              onTap: () =>
-                  openTtcChapter(context, chapter, tab: TtcChapterTab.me)),
-          TtcHeroShortcut(
-              icon: Icons.favorite_rounded,
-              // Kept for revert: t.shortcutUs.
-              label: 'You both',
-              onTap: () =>
-                  openTtcChapter(context, chapter, tab: TtcChapterTab.us)),
-          TtcHeroShortcut(
-              icon: Icons.event_available_rounded,
-              label: t.shortcutNext,
-              onTap: () =>
-                  openTtcChapter(context, chapter, tab: TtcChapterTab.next)),
-        ]),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Dad opens "Good afternoon, {name}". Same beat.
+          Text(
+            _greeting(t),
+            style: ttcBody(
+              12.5,
+              color: Colors.white.withValues(alpha: 0.85),
+              w: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          // Fraunces, as the father mode does for its headers.
+          // ⚠️ THE DAYS, NOT THE CHAPTER NAME (the user, 2026-09-27: "Trying
+          // Together… how does that make sense? Why are we even using it?").
+          // Kept for revert: Text(chapter.title(hi), ...)
+          Text(
+            ttcChapterHisTitle(chapter),
+            style: ttcFraunces(26, w: FontWeight.w600, color: Colors.white),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            chapter.tagline(hi),
+            style: ttcBody(
+              13,
+              color: Colors.white.withValues(alpha: 0.92),
+              h: 1.5,
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Dad's "Open her week ›" — the onward link sits under the summary,
+          // not floating in the top corner.
+          PvPress(
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const TtcJourneyMapScreen(),
+                  settings: const RouteSettings(name: 'ttc/journey'),
+                ),
+              ),
+              behavior: HitTestBehavior.opaque,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    t.journeyMap,
+                    style: ttcBody(
+                      12.5,
+                      color: Colors.white,
+                      w: FontWeight.w700,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 17,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // ⚠️ NO FIVE-STEP CHAPTER BAR AND NO "Next: The Waiting Days" LINE
+          // (2026-09-27): both spoke in chapter names, which the user asked to
+          // stop showing on their own. Her home dropped the same pair. Kept for
+          // revert:
+          //   const SizedBox(height: 18),
+          //   TtcChapterBar(today: today),
+          //   const SizedBox(height: 14),
+          //   Text(chapter.nextUp(hi), style: ttcBody(12.5, ...)),
+          const SizedBox(height: 16),
+          Container(height: 1, color: Colors.white.withValues(alpha: 0.16)),
+          const SizedBox(height: 14),
+          // Dad's Baby / Mother / What's-next circles. Same component hers uses -
+          // it is white-on-translucent, so it carries across palettes unchanged.
+          Row(
+            children: [
+              TtcHeroShortcut(
+                icon: Icons.self_improvement_rounded,
+                // Who each is for (2026-09-27). Kept for revert: t.shortcutMe.
+                label: 'For you',
+                onTap: () =>
+                    openTtcChapter(context, chapter, tab: TtcChapterTab.me),
+              ),
+              TtcHeroShortcut(
+                icon: Icons.favorite_rounded,
+                // Kept for revert: t.shortcutUs.
+                label: 'You both',
+                onTap: () =>
+                    openTtcChapter(context, chapter, tab: TtcChapterTab.us),
+              ),
+              TtcHeroShortcut(
+                icon: Icons.event_available_rounded,
+                label: t.shortcutNext,
+                onTap: () =>
+                    openTtcChapter(context, chapter, tab: TtcChapterTab.next),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -525,48 +611,68 @@ class _MissionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(ttcCardRadius),
         border: Border.all(color: ttcSlateAmber, width: 1.4),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // ⚠️ THE EYEBROW GIVES WAY, NOT THE CARD (2026-09-28). At 390 wide
-        // "TODAY'S MISSION", a Spacer and the chip overflowed by 61px in the
-        // render test (test/ttc_no_repetition_test.dart), and a larger text
-        // size on a phone does the same. The eyebrow now takes what is left
-        // and the chip keeps its words. Kept for revert: the eyebrow as a
-        // bare Text, then `const Spacer()`.
-        Row(children: [
-          Expanded(
-            child: Text(t.partnerMission.toUpperCase(),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: ttcBody(10,
-                    color: ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */, w: FontWeight.w800)),
-          ),
-          if (mission.forHimself) ...[
-            const SizedBox(width: 8),
-            Flexible(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                decoration: BoxDecoration(
-                    color: ttcSlatePanel,
-                    borderRadius: BorderRadius.circular(999)),
-                // The chip names what the mission is about (change 5,
-                // 2026-09-28): "This one is about you" pointed at "this one";
-                // `partnerAboutHimself` now reads "For your own health".
-                child: Text(t.partnerAboutHimself,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: ttcBody(9.5, color: ttcSlate, w: FontWeight.w800)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ⚠️ THE EYEBROW GIVES WAY, NOT THE CARD (2026-09-28). At 390 wide
+          // "TODAY'S MISSION", a Spacer and the chip overflowed by 61px in the
+          // render test (test/ttc_no_repetition_test.dart), and a larger text
+          // size on a phone does the same. The eyebrow now takes what is left
+          // and the chip keeps its words. Kept for revert: the eyebrow as a
+          // bare Text, then `const Spacer()`.
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  t.partnerMission.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: ttcBody(
+                    10,
+                    color:
+                        ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */,
+                    w: FontWeight.w800,
+                  ),
+                ),
               ),
-            ),
-          ],
-        ]),
-        const SizedBox(height: 11),
-        Text(mission.title(hi),
-            style: ttcFraunces(19, w: FontWeight.w600, color: ttcSlateInk)),
-        const SizedBox(height: 9),
-        Text(mission.body(hi),
-            style: ttcBody(14, color: ttcSlateSoft, h: 1.65)),
-      ]),
+              if (mission.forHimself) ...[
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: ttcSlatePanel,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    // The chip names what the mission is about (change 5,
+                    // 2026-09-28): "This one is about you" pointed at "this one";
+                    // `partnerAboutHimself` now reads "For your own health".
+                    child: Text(
+                      t.partnerAboutHimself,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ttcBody(9.5, color: ttcSlate, w: FontWeight.w800),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 11),
+          Text(
+            mission.title(hi),
+            style: ttcFraunces(19, w: FontWeight.w600, color: ttcSlateInk),
+          ),
+          const SizedBox(height: 9),
+          Text(
+            mission.body(hi),
+            style: ttcBody(14, color: ttcSlateSoft, h: 1.65),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -583,27 +689,37 @@ class _SupportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     return _SlateCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(t.partnerSupport, style: ttcJakarta(16.5, color: ttcSlateInk)),
-        const SizedBox(height: 14),
-        _labelled(t.partnerSheMayFeel, brief.sheMayFeel(hi)),
-        const SizedBox(height: 14),
-        Container(height: 1, color: ttcSlateLine),
-        const SizedBox(height: 14),
-        _labelled(t.partnerYouCan, brief.youCan(hi)),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(t.partnerSupport, style: ttcJakarta(16.5, color: ttcSlateInk)),
+          const SizedBox(height: 14),
+          _labelled(t.partnerSheMayFeel, brief.sheMayFeel(hi)),
+          const SizedBox(height: 14),
+          Container(height: 1, color: ttcSlateLine),
+          const SizedBox(height: 14),
+          _labelled(t.partnerYouCan, brief.youCan(hi)),
+        ],
+      ),
     );
   }
 
   Widget _labelled(String label, String body) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label.toUpperCase(),
-              style: ttcBody(9.5, color: ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */, w: FontWeight.w800)),
-          const SizedBox(height: 7),
-          Text(body, style: ttcBody(14, color: ttcSlateSoft, h: 1.65)),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label.toUpperCase(),
+        style: ttcBody(
+          9.5,
+          color:
+              ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */,
+          w: FontWeight.w800,
+        ),
+      ),
+      const SizedBox(height: 7),
+      Text(body, style: ttcBody(14, color: ttcSlateSoft, h: 1.65)),
+    ],
+  );
 }
 
 // ---- tonight, ask her -------------------------------------------------------
@@ -620,24 +736,45 @@ class _TonightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _SlateCard(
       color: ttcSlatePanel,
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 2),
-          child: Icon(Icons.chat_bubble_outline_rounded,
-              size: 18, color: ttcSlate),
-        ),
-        const SizedBox(width: 11),
-        Expanded(
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(kTtcTonightLabel.toUpperCase(),
-                style: ttcBody(10, color: ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */, w: FontWeight.w800)),
-            const SizedBox(height: 7),
-            Text(ttcTonightQuestion(),
-                style: ttcFraunces(17, w: FontWeight.w600, color: ttcSlateInk)),
-          ]),
-        ),
-      ]),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(
+              Icons.chat_bubble_outline_rounded,
+              size: 18,
+              color: ttcSlate,
+            ),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  kTtcTonightLabel.toUpperCase(),
+                  style: ttcBody(
+                    10,
+                    color:
+                        ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */,
+                    w: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Text(
+                  ttcTonightQuestion(),
+                  style: ttcFraunces(
+                    17,
+                    w: FontWeight.w600,
+                    color: ttcSlateInk,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -653,34 +790,49 @@ class _RoundLineCard extends StatelessWidget {
     final (kind, what, note) = line;
     return Semantics(
       container: true,
-      label: '$kTtcPartnerRoundEyebrow, $kind. $what.${note == null ? '' : ' $note'}',
+      label:
+          '$kTtcPartnerRoundEyebrow, $kind. $what.${note == null ? '' : ' $note'}',
       child: _SlateCard(
         key: const ValueKey('ttc_partner_round_line'),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 2),
-            child: Icon(Icons.event_note_outlined, size: 18, color: ttcSlate),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 2),
+              child: Icon(Icons.event_note_outlined, size: 18, color: ttcSlate),
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${kTtcPartnerRoundEyebrow.toUpperCase()} · ${kind.toUpperCase()}',
-                      style: ttcBody(10,
-                          color: ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */, w: FontWeight.w800)),
+                  Text(
+                    '${kTtcPartnerRoundEyebrow.toUpperCase()} · ${kind.toUpperCase()}',
+                    style: ttcBody(
+                      10,
+                      color:
+                          ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */,
+                      w: FontWeight.w800,
+                    ),
+                  ),
                   const SizedBox(height: 7),
-                  Text(what,
-                      style: ttcFraunces(17,
-                          w: FontWeight.w600, color: ttcSlateInk)),
+                  Text(
+                    what,
+                    style: ttcFraunces(
+                      17,
+                      w: FontWeight.w600,
+                      color: ttcSlateInk,
+                    ),
+                  ),
                   if (note != null) ...[
                     const SizedBox(height: 6),
-                    Text(note,
-                        style: ttcBody(13, color: ttcSlateInk, h: 1.45)),
+                    Text(note, style: ttcBody(13, color: ttcSlateInk, h: 1.45)),
                   ],
-                ]),
-          ),
-        ]),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -713,23 +865,39 @@ class _HerBodyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     return _SlateCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.school_outlined, size: 18, color: ttcSlate /* was ttcSlateAmber (2026-09-29, contrast) */),
-          const SizedBox(width: 9),
-          Expanded(
-              child: Text(t.partnerHerBody,
-                  style: ttcJakarta(16.5, color: ttcSlateInk))),
-        ]),
-        const SizedBox(height: 12),
-        Text(brief.herBody(hi),
-            style: ttcBody(14, color: ttcSlateSoft, h: 1.7)),
-        const SizedBox(height: 14),
-        Container(height: 1, color: ttcSlateLine),
-        const SizedBox(height: 12),
-        Text(t.partnerHerBodyNote,
-            style: ttcBody(11.5, color: ttcSlateSoft, h: 1.5)),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.school_outlined,
+                size: 18,
+                color: ttcSlate /* was ttcSlateAmber (2026-09-29, contrast) */,
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  t.partnerHerBody,
+                  style: ttcJakarta(16.5, color: ttcSlateInk),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            brief.herBody(hi),
+            style: ttcBody(14, color: ttcSlateSoft, h: 1.7),
+          ),
+          const SizedBox(height: 14),
+          Container(height: 1, color: ttcSlateLine),
+          const SizedBox(height: 12),
+          Text(
+            t.partnerHerBodyNote,
+            style: ttcBody(11.5, color: ttcSlateSoft, h: 1.5),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -747,18 +915,28 @@ class _YourBodyCard extends StatelessWidget {
     final hi = t.hinglish;
     return _SlateCard(
       color: ttcSlatePanel,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.male_rounded, size: 18, color: ttcSlate),
-          const SizedBox(width: 9),
-          Expanded(
-              child:
-                  Text(t.partnerYourBody, style: ttcJakarta(16, color: ttcSlateInk))),
-        ]),
-        const SizedBox(height: 12),
-        Text(brief.yourBody(hi),
-            style: ttcBody(14, color: ttcSlateSoft, h: 1.65)),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.male_rounded, size: 18, color: ttcSlate),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  t.partnerYourBody,
+                  style: ttcJakarta(16, color: ttcSlateInk),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            brief.yourBody(hi),
+            style: ttcBody(14, color: ttcSlateSoft, h: 1.65),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -786,37 +964,56 @@ class _LearnCard extends StatelessWidget {
       // paragraph and the takeaway in a panel. His had a title and a takeaway,
       // so the same piece of writing looked like a caption on his side and an
       // article on hers - and he had no way to tell there was more behind it.
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Text(t.partnerLearn.toUpperCase(),
-              style: ttcBody(10, color: ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */, w: FontWeight.w800)),
-          const Spacer(),
-          Text(t.readSeconds(insight.readTime(hi)),
-              style: ttcBody(11, color: ttcSlateSoft, w: FontWeight.w700)),
-        ]),
-        const SizedBox(height: 10),
-        Text(insight.title(hi),
-            style: ttcJakarta(16.5, color: ttcSlateInk)),
-        const SizedBox(height: 8),
-        Text(
-          insight.body(hi).split('\n\n').first,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-          style: ttcBody(13.5, color: ttcSlateSoft, h: 1.55),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: ttcSlatePanel,
-            borderRadius: BorderRadius.circular(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                t.partnerLearn.toUpperCase(),
+                style: ttcBody(
+                  10,
+                  color:
+                      ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */,
+                  w: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                t.readSeconds(insight.readTime(hi)),
+                style: ttcBody(11, color: ttcSlateSoft, w: FontWeight.w700),
+              ),
+            ],
           ),
-          child: Text(insight.takeaway(hi),
-              style: ttcBody(13,
-                  color: ttcSlateInk, w: FontWeight.w700, h: 1.45)),
-        ),
-      ]),
+          const SizedBox(height: 10),
+          Text(insight.title(hi), style: ttcJakarta(16.5, color: ttcSlateInk)),
+          const SizedBox(height: 8),
+          Text(
+            insight.body(hi).split('\n\n').first,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: ttcBody(13.5, color: ttcSlateSoft, h: 1.55),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: ttcSlatePanel,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text(
+              insight.takeaway(hi),
+              style: ttcBody(
+                13,
+                color: ttcSlateInk,
+                w: FontWeight.w700,
+                h: 1.45,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -838,24 +1035,42 @@ class _AskVedaCard extends StatelessWidget {
     final hi = t.hinglish;
     return _SlateCard(
       onTap: () => openTtcAskVeda(context, partnerMode: true),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.auto_awesome_outlined,
-              size: 16, color: ttcSlate /* was ttcSlateAmber (2026-09-29, contrast) */),
-          const SizedBox(width: 8),
-          Text(hi ? 'ASK VEDA' : 'ASK VEDA',
-              style: ttcBody(10, color: ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */, w: FontWeight.w800)),
-        ]),
-        const SizedBox(height: 10),
-        Text(hi ? 'Kuch bhi poochho' : 'Ask anything',
-            style: ttcJakarta(16.5, color: ttcSlateInk)),
-        const SizedBox(height: 8),
-        Text(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.auto_awesome_outlined,
+                size: 16,
+                color: ttcSlate /* was ttcSlateAmber (2026-09-29, contrast) */,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                hi ? 'ASK VEDA' : 'ASK VEDA',
+                style: ttcBody(
+                  10,
+                  color:
+                      ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */,
+                  w: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            hi ? 'Kuch bhi poochho' : 'Ask anything',
+            style: ttcJakarta(16.5, color: ttcSlateInk),
+          ),
+          const SizedBox(height: 8),
+          Text(
             hi
                 ? 'Sawaal jo poochhne mein ajeeb lage — yahin poochho. Jawaab tumhare liye, is safar ke hisaab se.'
                 : "Ask the questions that feel awkward to say out loud. The answers fit where the two of you are right now.",
-            style: ttcBody(13.5, color: ttcSlateSoft, h: 1.6)),
-      ]),
+            style: ttcBody(13.5, color: ttcSlateSoft, h: 1.6),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -942,8 +1157,12 @@ class _AskVedaCard extends StatelessWidget {
 //  TtcCard: her surfaces must never accidentally render in his colours.
 
 class _SlateCard extends StatelessWidget {
-  const _SlateCard(
-      {super.key, required this.child, this.onTap, this.color = Colors.white});
+  const _SlateCard({
+    super.key,
+    required this.child,
+    this.onTap,
+    this.color = Colors.white,
+  });
 
   final Widget child;
   final VoidCallback? onTap;
@@ -959,14 +1178,23 @@ class _SlateCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(ttcCardRadius),
         boxShadow: const [
           BoxShadow(
-              color: Color(0x1422333B), blurRadius: 22, offset: Offset(0, 8)),
+            color: Color(0x1422333B),
+            blurRadius: 22,
+            offset: Offset(0, 8),
+          ),
         ],
       ),
       child: child,
     );
     if (onTap == null) return card;
-    return PvPress(enabled: onTap != null, child: GestureDetector(
-        onTap: onTap, behavior: HitTestBehavior.opaque, child: card));
+    return PvPress(
+      enabled: onTap != null,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: card,
+      ),
+    );
   }
 }
 
@@ -976,39 +1204,56 @@ class _HisTop extends StatelessWidget {
   const _HisTop();
 
   static const _m = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    return Row(children: [
-      Semantics(
-        button: true,
-        label: 'Profile',
-        child: InkWell(
-          onTap: () => openTtcProfile(context),
-          customBorder: const CircleBorder(),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: ttcSlatePanel,
-              shape: BoxShape.circle,
+    return Row(
+      children: [
+        Semantics(
+          button: true,
+          label: 'Profile',
+          child: InkWell(
+            onTap: () => openTtcProfile(context),
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: ttcSlatePanel,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.person_outline_rounded,
+                size: 22,
+                color: ttcSlateInk,
+              ),
             ),
-            child: const Icon(Icons.person_outline_rounded,
-                size: 22, color: ttcSlateInk),
           ),
         ),
-      ),
-      Expanded(
-        child: Text('${now.day} ${_m[now.month - 1]}',
+        Expanded(
+          child: Text(
+            '${now.day} ${_m[now.month - 1]}',
             textAlign: TextAlign.center,
-            style: ttcBody(15, color: ttcSlateInk, w: FontWeight.w700)),
-      ),
-      const SizedBox(width: 44),
-    ]);
+            style: ttcBody(15, color: ttcSlateInk, w: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(width: 44),
+      ],
+    );
   }
 }
 
@@ -1028,53 +1273,75 @@ class _HisInsights extends StatelessWidget {
         ttcPickForToday(insights, offset: 1 + i),
     ];
     final seen = <String>{};
-    final unique = [for (final p in picks) if (seen.add(p.id)) p];
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(4, 6, 4, 10),
-        child: Text('FOR YOU TODAY',
-            style: ttcBody(10.5, color: ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */, w: FontWeight.w800)),
-      ),
-      SizedBox(
-        // 176 left a third of each card blank on the phone (build 10).
-        height: 142,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.none,
-          itemCount: unique.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 10),
-          itemBuilder: (context, i) {
-            final ins = unique[i];
-            return SizedBox(
-              width: 236,
-              child: _SlateCard(
-                onTap: () => openTtcInsight(context, ins),
-                child: Column(
+    final unique = [
+      for (final p in picks)
+        if (seen.add(p.id)) p,
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 6, 4, 10),
+          child: Text(
+            'FOR YOU TODAY',
+            style: ttcBody(
+              10.5,
+              color:
+                  ttcSlate /* was ttcSlateAmber: 2.4:1 on white, below the text rule (2026-09-29) */,
+              w: FontWeight.w800,
+            ),
+          ),
+        ),
+        SizedBox(
+          // 176 left a third of each card blank on the phone (build 10).
+          height: 142,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            itemCount: unique.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final ins = unique[i];
+              return SizedBox(
+                width: 236,
+                child: _SlateCard(
+                  onTap: () => openTtcInsight(context, ins),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(t.readSeconds(ins.readTime(hi)),
-                          style: ttcBody(11,
-                              color: ttcSlateSoft, w: FontWeight.w700)),
+                      Text(
+                        t.readSeconds(ins.readTime(hi)),
+                        style: ttcBody(
+                          11,
+                          color: ttcSlateSoft,
+                          w: FontWeight.w700,
+                        ),
+                      ),
                       const SizedBox(height: 8),
-                      Text(ins.title(hi),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: ttcJakarta(15.5, color: ttcSlateInk)),
+                      Text(
+                        ins.title(hi),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: ttcJakarta(15.5, color: ttcSlateInk),
+                      ),
                       const SizedBox(height: 6),
                       Expanded(
-                        child: Text(ins.takeaway(hi),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: ttcBody(12.5,
-                                color: ttcSlateSoft, h: 1.45)),
+                        child: Text(
+                          ins.takeaway(hi),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: ttcBody(12.5, color: ttcSlateSoft, h: 1.45),
+                        ),
                       ),
-                    ]),
-              ),
-            );
-          },
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 }
 
@@ -1084,29 +1351,39 @@ class _HisDoorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _SlateCard(
-        key: const ValueKey('ttc_partner_his_door'),
-        onTap: () => openTtcSurface(context, 'ttc_door/ttc_male_fertility'),
-        child: Row(children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: ttcSlatePanel,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.biotech_outlined,
-                size: 22, color: ttcSlateInk),
+    key: const ValueKey('ttc_partner_his_door'),
+    onTap: () => openTtcSurface(context, 'ttc_door/ttc_male_fertility'),
+    child: Row(
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: ttcSlatePanel,
+            borderRadius: BorderRadius.circular(14),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child: const Icon(
+            Icons.biotech_outlined,
+            size: 22,
+            color: ttcSlateInk,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text('His side', style: ttcJakarta(16, color: ttcSlateInk)),
               const SizedBox(height: 3),
-              Text('Your tests, your habits and what really changes sperm health.',
-                  style: ttcBody(12.5, color: ttcSlateSoft, h: 1.45)),
-            ]),
+              Text(
+                'Your tests, your habits and what really changes sperm health.',
+                style: ttcBody(12.5, color: ttcSlateSoft, h: 1.45),
+              ),
+            ],
           ),
-          const Icon(Icons.chevron_right_rounded, size: 20, color: ttcSlateSoft),
-        ]),
-      );
+        ),
+        const Icon(Icons.chevron_right_rounded, size: 20, color: ttcSlateSoft),
+      ],
+    ),
+  );
 }

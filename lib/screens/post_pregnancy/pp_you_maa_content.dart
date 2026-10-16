@@ -2927,6 +2927,12 @@ final PpArea _pelvicFloor = PpArea(
           'wound, dizziness, or any increase in bleeding.',
           kind: PpCalloutKind.doctor,
         ),
+        // The same tool opens on "Breathe first" in the first six weeks, a
+        // slow breath timer with no squeeze (2026-10-16).
+        PpLink('Breathe along: Kegel Care',
+            surfaceId: 'pp_kegel',
+            blurb: 'A slow breath timer for the first six weeks, gentle kegels '
+                'after your check.'),
       ],
     ),
     PpPage(
@@ -3011,6 +3017,10 @@ final PpArea _pelvicFloor = PpArea(
         PpIndiaNote('You can do these sitting in a bus, standing in a queue, or '
             'while feeding at 3am. Nobody can tell. This is the one exercise in '
             'your recovery that needs no floor space, no privacy and no time.'),
+        // Reachability for the Kegel Care tool's after-birth mode (2026-10-16).
+        PpLink('Do them with a guide: Kegel Care',
+            surfaceId: 'pp_kegel',
+            blurb: 'A gentle timed routine that stays light, and logs each day.'),
       ],
     ),
     PpPage(

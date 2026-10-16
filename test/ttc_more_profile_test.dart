@@ -239,6 +239,8 @@ void main() {
         //   'chapter': 'ttc/chapter',
         'employer': 'employer',
         'invite': 'invite',
+        // 2026-10-16: the one Yoga & fitness hub.
+        'yoga_fitness': 'move',
       };
       final rows = [
         for (final s in ttcMoreSections(partner: false)) ...s.rows,

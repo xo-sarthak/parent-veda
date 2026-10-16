@@ -1,5 +1,10 @@
 // =============================================================================
 //  PrenatalYogaScreen (S4) - Prepare › Yoga (interactive)
+//  ⚠️ RETIRED 2026-10-16, KEPT FOR REVERT. Nothing pushes it any more: the Move
+//  door's yoga card and every other way in open the one Yoga & fitness hub
+//  (`YogaHomeScreen`), whose For you shows her month's sessions from the same
+//  `kYogaSessions`, worked out from her due date. This screen always opened on
+//  month 7 (`_kCurrentMonth`).
 // -----------------------------------------------------------------------------
 //  Renamed "Prenatal Yoga" -> "Yoga" in the UI. The screen now opens on the
 //  mother's CURRENT pregnancy month and offers Month 1-9 tabs; each month lists

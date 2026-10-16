@@ -1017,3 +1017,21 @@ Decided with the user: a painting per phase, and the 20 phases grouped into five
 
 **Owed.** The 20 paintings (`docs/PHASE-PAINTING-PROMPTS.md`, saved as
 `assets/phases/phase_NN.webp`).
+
+## 25. Yoga & fitness hub — one library for three stages (2026-10-16)
+
+**Question.** Do fitness apps keep stage content apart (Flo) or show one library (Peloton)?
+
+**Found.**
+- Peloton Classes: search, type chips with All, big cards, floating Filter pill (mobbin.com/screens/660faab6-e6a4-470a-b139-fda69e4bd2b6).
+- Tonal Explore: For You beside Workouts, a count line, floating Filter (mobbin.com/screens/efb364af-d90c-4f41-a5a2-18edc1c9829a).
+- Equinox+: active filter chips with Clear all, a result count (mobbin.com/screens/00ba8848-6018-4b9c-9d99-e01dfa59c012).
+- Fitbit: titled rails with See all (mobbin.com/screens/3b31174e-5841-45df-a679-d85df702abf8).
+- Centr: teacher avatars as a filter row; a grouped explore list (mobbin.com/screens/4b0f249a-e9a5-4cf5-8776-093604b1553f).
+- Flo: a "Prepregnancy fitness" row inside the stage's own page, nothing from other stages (mobbin.com/screens/7a7ca385-7a01-4a1f-94a6-fe2c6fc80a93).
+
+**Adopted.** Both: one library (Peloton) that opens on a stage's own view (Flo). For you / All, chips, the floating Filter pill and sheet, count + Clear all, rails with See all, a stage label on mixed cards.
+
+**Declined.** Teacher avatar row (seven seed teachers, no real photos yet); sort menu (nothing worth sorting by yet).
+
+**Owed.** Real class photos and videos.

@@ -141,7 +141,8 @@ import '../../data/reads/read_adapters.dart' show kMmReadPrefix, kBsReadPrefix, 
 import '../garbh/garbh_today_practice.dart' show GarbhTodayPractice;
 import '../../data/doors/pv_door_after_loss.dart';
 import '../pregnancy/preg_ended_screen.dart' show PregTryAgainScreen;
-import '../prepare/prenatal_yoga_screen.dart';
+// Kept for revert (2026-10-16), the yoga card opens the hub now:
+// import '../prepare/prenatal_yoga_screen.dart';
 import '../tools/kegel_care_screen.dart';
 import '../tools/product_checklist_screen.dart';
 import '../tools/due_date_calculator_screen.dart';
@@ -149,6 +150,7 @@ import '../post_pregnancy/baby_naming_home_screen.dart';
 import '../../data/doors/pv_door_partner.dart';
 import '../../data/doors/pv_door_twins.dart';
 import '../father/father_week_guide_screen.dart';
+import '../post_pregnancy/yoga_home_screen.dart';
 
 /// A tile's OWN drawn mark, where the door has something better than its
 /// format's. Null means "the format mark", which is the rule everywhere else.
@@ -471,8 +473,12 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   kCondSurfaceAfterLoss => PvDoorScreen(
       page: kAfterLossDoor, bracket: kPregAfterLossBracket, pregnancy: c),
   kAfterLossSurfaceTryAgain => const PregTryAgainScreen(),
-  // Move & rest's two tools: the 22 prenatal yoga sessions and Kegel Care.
-  kMoveSurfaceYoga => PrenatalYogaScreen(lang: c.language),
+  // Move & rest's two tools: the Yoga & fitness hub and Kegel Care.
+  // 2026-10-16: the yoga card opened the retired month-tab screen; it now
+  // opens the one hub, whose For you shows the month's sessions. Kept for
+  // revert:
+  //   kMoveSurfaceYoga => PrenatalYogaScreen(lang: c.language),
+  kMoveSurfaceYoga => YogaHomeScreen(backLabel: 'Back', pregnancy: c),
   kMoveSurfaceKegel => KegelCareScreen(controller: c),
   // Getting ready for baby (2026-09-29): the name finder the parenting stage
   // ships (reused, not copied), the shopping checklist with its newborn

@@ -99,7 +99,10 @@ void main() {
 
     test('the home reads the picker (wiring gate)', () {
       final home = _live('lib/screens/ttc/ttc_home_v3.dart');
-      expect(home, contains('final m = ttcTodaysMoveTip(on: selected);'));
+      // The Yoga & fitness pass (2026-10-16) added the cycle phase; it is
+      // still the one picker.
+      expect(home,
+          contains('final m = ttcTodaysMoveTip(on: selected, phase: phase);'));
       expect(home, contains('final items = ttcSanskarItems(chapter);'));
       final ritual = _live('lib/screens/ttc/ttc_ritual_screen.dart');
       expect(ritual, contains('ttcSanskarItems(chapter)'));
@@ -212,8 +215,10 @@ void main() {
     expect(find.textContaining('What to eat is in Getting ready'),
         findsNothing);
     expect(_live('lib/screens/ttc/ttc_mind_today_screen.dart'),
-        contains("openTtcDoor(context, kTtcGettingReadyDoorId,\n"
-            "              initialGroup: 'diet')"));
+        // Matched on meaning, not on line wrapping (2026-10-16: the
+        // formatter rewrapped the call and broke the old exact match).
+        matches(RegExp(r"openTtcDoor\(\s*context,\s*kTtcGettingReadyDoorId,"
+            r"\s*initialGroup: 'diet',?\s*\)")));
   });
 
   test('MB21: the TTC psychologist is not drawn as a glum face', () {
