@@ -58,6 +58,24 @@ L = a day or more.
 14. **Investment explainers (L, content).** The money explainers for parents.
 15. **Ask Veda pregnancy review (L, two repos).** Walk the pregnancy answers. Fixes to the answers live
     in `C:\Projects\parentveda-askveda`, so this needs that repo open.
+16. **All phases screen: REDESIGN BUILT 2026-10-15, waits on your look and the paintings.**
+    - Mobbin pass first (MOBBIN-DISCOVERY §24): Noom course map, Alan journey,
+      Duolingo sections, Moonly chapters, Flo. Declined: locks, coins and streaks, a dark theme.
+    - `phase_map_screen.dart` now opens on the child's own phase (a painting card with "Open this
+      phase"), then five chapters (Newborn, Baby, Young toddler, Toddler, Little kid) with a chip row
+      that jumps to each, and every phase as a round painting on a dashed rail. Past phases get a ✓,
+      the current one is bigger and ringed. Nothing is locked. From 600 px wide it becomes a 2-column
+      grid of tiles. The old screen is kept commented out for revert.
+    - To see it: Parenting home → the phase hero → all phases.
+    - Paintings: 20 prompts in `docs/PHASE-PAINTING-PROMPTS.md` (house style of the onboarding
+      paintings). Until a painting is dropped in as `assets/phases/phase_NN.webp`, that phase shows
+      its number in its own colour. No code change needed per painting.
+    - Test: `test/phase_map_screen_test.dart` (9 tests) plus 261 related parenting tests pass.
+17. **Phases 16–20 into the app (S once the files are local).** The five docs are in Drive. The
+    converter (`tools/phase_pages/docx_to_dart.py`) is already widened for their titles and asides,
+    and rerunning it left phases 1–15 unchanged. Waits on the five .docx files being downloaded into
+    the local "My Child phase-wise content" folder. Then: convert, the dropped-lines audit, the age
+    and cross-link checks, the "1–15" comments and tests to "1–20", STILL-OPEN §85.
 
 ## Drive content: what is missing, where the app differs, and issues in the docs
 
@@ -105,6 +123,22 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
 ### My Child phases (PH001–PH020) — STILL-OPEN §85
 - **Missing:** PH016–PH020 (19 months to 5 years). Those phases say "This phase's guide is being
   written" and keep only the old "When to call the doctor" lines (your call, 2026-10-14).
+  **Update 2026-10-15:** all five are now in Drive and read in full. They are not in the app yet:
+  the Drive tool cannot save a .docx, so they wait on you downloading them into the local folder
+  (Large item 17).
+- **Doc issue, PH016:** the age is on the title line ("Words and Opinions 19–24 months"), and editor
+  notes are left in: "Word count: 201 ✓", "Milestone Pages — … — Revised", a stray
+  "PH016 · Words and Opinions" under "ACTIVITY PAGE PH016", and "(≈90 words)" after headings.
+- **Doc issue, PH017:** the fifth Living Through card ("Trying the Fork") ends in a broken fragment
+  "ords)", and "~205 words — within 180–220 ✓" is left in.
+- **Doc issue, PH018:** three editor's notes are left in the doc: "Why I changed the Language
+  milestone…", "Important: I would remove 'If your toddler shows no curiosity…'", and "Important
+  revision: I would remove the original variation involving a step stool…". Its typical age reads
+  31–36 months; the app labels phase 18 as 31–35 months (same span, end month 36).
+- **Doc issue, PH019 and PH020:** word-count and checklist notes such as "(203 words — within
+  180–220 ✓)", "(5 cards ✓ …)", "(3 bullets ✓)".
+- **App differs:** the converter drops all the editor notes above, so none shows in the app. They
+  should still come out of the docs.
 - **Missing:** new phase films. Brain Development in Watch is empty since the leap films went.
 - **Doc issue, PH015:** the activity "Naming All the Feelings" is named on a milestone page but never
   written. The app shows the name with no link.
@@ -166,7 +200,11 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
 - **Phone OTP.** The `phone-otp-send` and `phone-otp-verify` functions are not deployed; they need
   the MSG91 secrets (STILL-OPEN §83.12).
 - **Phase docs (Drive).** Fix the six doc issues (PH015's missing activity, PH010's two names, the
-  Phase 4 file name, activity times, panel sign-off) and add PH016–PH020. Then I pull them in.
+  Phase 4 file name, activity times, panel sign-off) and the editor notes left in PH016–PH020.
+  Download PH016–PH020 as .docx into the local "My Child phase-wise content" folder. Then I pull
+  them in.
+- **Phase paintings.** Generate the 20 in ChatGPT from `docs/PHASE-PAINTING-PROMPTS.md` and send
+  them as `phase_01` … `phase_20`.
 - **Phase films.** New films for the phases; Brain Development in Watch is empty until then.
 - **Daily insight tab images.** Marked "to discuss" (STILL-OPEN §83.13).
 - **Device checks.** His side of pregnancy, the TTC calendar, and the small fixes (his week page, the
@@ -176,4 +214,6 @@ pull it in. Detail and history stay in the STILL-OPEN section named on each bloc
   only the icon moves).
 - **Device check, Baby vault.** Write two letters, read one aloud, "Read them all", tap the sealed book;
   then "Baby has arrived", the home card, the envelope, and download and share the book.
+- **Device check, all phases screen.** Parenting home → phase hero → all phases: the NOW card, the
+  chapter chips, a tap on a past and a future phase, and a tablet if one is to hand.
 - **Push.** `9223ce4` (tap feedback) and anything before it not yet pushed.

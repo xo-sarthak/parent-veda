@@ -3,7 +3,7 @@
 Usage (from the repo root):
     python -I tools/phase_pages/docx_to_dart.py "<My Child phase-wise content folder>"
 
-Each doc (PH001-PH015) holds a phase page (Hero, Living Through This Phase,
+Each doc (PH001-PH020) holds a phase page (Hero, Living Through This Phase,
 Child Snapshot, When to Contact Your Doctor), five milestone pages and an
 activity set. The docs were written over many revisions and their layout
 varies (labels inline or on their own line, tips as list items or "✓" lines,
@@ -42,7 +42,7 @@ NOTE = re.compile(r'\s*\((?:[^()]*\b(?:' + NOTE_WORDS + r')\b[^()]*|[^()]*✓[^(
 # A paragraph that is a note to the builder, dropped whole.
 DROP = re.compile(r'^(Change log|Note:|Note —|Needs paediatric|paediatric panel|Panel to review|Page components|'
                   r'\(No |\(Full |Revision|Important revision|Important:|I would |Why I changed|Medical Flag Summary|Status:|AAP notes|~?\d+ words|\d+ cards|'
-                  r'5 fixed domains)', re.I)
+                  r'5 fixed domains|Word count|PH\d+\s*·|[a-z]*ords?\)$)', re.I)
 INLINE_LABELS = ['One-line summary:', 'Related Topics:', 'Why ParentVeda Recommends It:',
                  "What You'll Need:", 'Variations:', 'Linked Milestones', 'Domain:', 'Typical age:',
                  'What It Builds:', 'Secondary Domain:']
@@ -355,6 +355,8 @@ def parse(path):
     n = int(m.group(1) or m.group(2))
     code = f'PH{n:03d}'
     name = re.sub(r'\s*\(\d+ months?\)$', '', m.group(3)).strip()
+    # PH016 puts its age on the title line: "Words and Opinions 19–24 months".
+    name = re.sub(r'\s+\d+\s*[–-]\s*\d+\s+(months?|years?)$', '', name).strip()
 
     sections = {k: [] for k in ('hero', 'living', 'snapshot', 'doctor', 'milestones', 'activities')}
     cur = 'hero'  # a doc with no Hero heading starts its hero after the title

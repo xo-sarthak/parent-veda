@@ -980,3 +980,40 @@ training puzzle games hub with tiles ... each with a simple drawn icon";
 - Every tap is a `PvPress`.
 - Moving bars and pulses stop under reduced motion.
 - Leaving a list stops what it started.
+
+## 24. The all-phases screen — a journey, not a list (2026-10-15)
+
+**Why.** The user called `PhaseMapScreen` "very bland … random stuff listed, not intuitive": twenty
+identical rows under a block of text. Asked for images, an easy layout, full responsiveness.
+Decided with the user: a painting per phase, and the 20 phases grouped into five chapters.
+
+**Found.**
+- [Noom Course Map](https://mobbin.com/screens/7328d9ae-184b-4cbf-8941-d5ed2d74a1a4):
+  an illustrated round disc per stop on a dotted path, title beside it.
+- Alan journey ([1](https://mobbin.com/screens/6c47d7b0-f8a0-479b-9ea6-6b2f89693d0d),
+  [2](https://mobbin.com/screens/df679b59-f12a-4b1a-bc95-de27f6388e29)): a picture per stop on a
+  dashed rail; the current stop larger and ringed, done stops ticked, stops ahead quieter.
+- [Duolingo](https://mobbin.com/screens/3cc1779f-ef61-4e0a-8b00-adecbd24aa6d): a section banner
+  that says where you are in a long path.
+- [Moonly Runes](https://mobbin.com/screens/3426c659-f2a7-4fe5-b687-136f731713d4): a chapter
+  heading on the rail, its items under it.
+- [Flo](https://mobbin.com/screens/347a171b-a63b-4c2f-b8cf-9b0377c8b255): a full-bleed image for
+  the current stage.
+
+**Adopted.**
+- The screen opens on the child's own phase: a 4:3 painting card, "PHASE N · AGE · NOW", the name,
+  the doc hero's first sentence, an "Open this phase" pill (Flo). Side by side on a wide screen.
+- Five chapters with a header each (name, span, phase count) and a chip row that jumps to one
+  (Duolingo, Moonly). The chapter is derived from each phase's start month.
+- Each phase a round painting on a dashed rail with its age, name and one line from its doc; past
+  phases ticked, the current one bigger and ringed in its accent (Noom, Alan).
+- From 600 px wide, a 2-column grid of tiles; content capped at 720 px and centred.
+- A phase with no painting yet shows its number in its own accent, so the screen ships complete.
+
+**Declined.**
+- Locks on phases ahead: a parent may read ahead; nothing is hidden.
+- Coins, streaks, progress scores.
+- A dark theme: the app is a white ground.
+
+**Owed.** The 20 paintings (`docs/PHASE-PAINTING-PROMPTS.md`, saved as
+`assets/phases/phase_NN.webp`).
