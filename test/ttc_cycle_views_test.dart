@@ -88,12 +88,16 @@ void main() {
       expect(fills.length, TtcPhase.values.length);
     });
 
+    // ⚠️ 2026-10-17: the quiet parts are a light lilac and a light peach
+    // (the user: the old greys were "bland"), so they carry some hue. What
+    // keeps the rule is LIGHTNESS: only the period and the fertile days are
+    // strong; the other two are washes. Kept for revert: s > 0.4 == coloured.
     test('only the period and the fertile days carry a hue', () {
       for (final p in TtcPhase.values) {
-        final s = HSLColor.fromColor(TtcCycleColours.fill(p)).saturation;
+        final l = HSLColor.fromColor(TtcCycleColours.fill(p)).lightness;
         final coloured =
             p == TtcPhase.period || p == TtcPhase.fertileWindow;
-        expect(s > 0.4, coloured,
+        expect(l < 0.7, coloured,
             reason: '${p.name}: colour only where it means something');
       }
     });
@@ -107,13 +111,19 @@ void main() {
       }
     });
 
+    // 2026-10-17: red and teal. Numerals on them are 13.5pt+ at w800, which
+    // is "large text" (3:1); the period keeps its old 3.9 floor. Kept for
+    // revert: fertile >= 4.5 (the violet).
     test('the two colours are full enough to carry white numerals', () {
       expect(contrast(TtcCycleColours.period, Colors.white),
           greaterThanOrEqualTo(3.9));
       expect(contrast(TtcCycleColours.fertile, Colors.white),
+          greaterThanOrEqualTo(3.5));
+      expect(contrast(TtcCycleColours.ovulation, Colors.white),
           greaterThanOrEqualTo(4.5));
     });
 
+    // Purple for one build on 2026-10-17, ink again the same day (the user).
     test('today is ink, never a cycle colour', () {
       for (final p in TtcPhase.values) {
         expect(TtcCycleColours.today, isNot(TtcCycleColours.fill(p)));
@@ -326,7 +336,9 @@ void main() {
         (tester) async {
       healthy();
       CycleStore.instance.logBleedDays(ago(40), 5);
-      await pumpTall(tester, const TtcCycleCompanionScreen());
+      // The dates moved to Period history (2026-10-17). Kept for revert:
+      //   await pumpTall(tester, const TtcCycleCompanionScreen());
+      await pumpTall(tester, const TtcPeriodHistoryScreen());
       final edit = find.byKey(
         ValueKey('ttc_period_row_edit_${ago(40).toIso8601String()}'),
       );
@@ -362,7 +374,9 @@ void main() {
 
     testWidgets('"Add a date" is a pill she can hit', (tester) async {
       healthy();
-      await pumpTall(tester, const TtcCycleCompanionScreen());
+      // On Period history since 2026-10-17. Kept for revert:
+      //   await pumpTall(tester, const TtcCycleCompanionScreen());
+      await pumpTall(tester, const TtcPeriodHistoryScreen());
       final add = find.byKey(const ValueKey('ttc_companion_add_date'));
       await tester.ensureVisible(add);
       expect(tester.getSize(add).height, greaterThanOrEqualTo(36));

@@ -211,6 +211,13 @@ void main() {
         key: UniqueKey(), home: const TtcCycleCompanionScreen()));
     await t.pump(const Duration(milliseconds: 300));
     expect(t.takeException(), isNull);
+    // The hub (2026-10-17): no Log button on his side.
+    expect(find.byKey(const ValueKey('ttc_hub_log')), findsNothing);
+    // Her dates live on Period history now.
+    await t.pumpWidget(MaterialApp(
+        key: UniqueKey(), home: const TtcPeriodHistoryScreen()));
+    await t.pump(const Duration(milliseconds: 300));
+    expect(t.takeException(), isNull);
     expect(find.byKey(const ValueKey('ttc_companion_add_date')), findsNothing);
     expect(find.text('Correct'), findsNothing);
     expect(find.text('Remove'), findsNothing);

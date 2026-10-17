@@ -658,8 +658,10 @@ void main() {
       tester.view.physicalSize = const Size(400, 6000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
+      // The stats and the note moved to Period history (2026-10-17). Kept
+      // for revert: home: TtcCycleCompanionScreen().
       await tester.pumpWidget(
-          const MaterialApp(home: TtcCycleCompanionScreen()));
+          const MaterialApp(home: TtcPeriodHistoryScreen()));
       await tester.pump(const Duration(milliseconds: 300));
 
       final facts = find.byKey(const ValueKey('ttc_companion_fact'));

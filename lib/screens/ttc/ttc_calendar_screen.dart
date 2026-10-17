@@ -64,6 +64,7 @@ import 'ttc_cycle_companion.dart'
         ttcShortDate,
         kTtcWindowInPeriodLine;
 import 'ttc_cycle_palette.dart';
+import 'ttc_cycle_hub.dart' show TtcHubMonth;
 import 'ttc_appointments_screen.dart'
     show TtcApptEntry, openTtcAppointment;
 import 'ttc_symptom_log_screen.dart' show TtcSymptomLogScreen;
@@ -233,6 +234,19 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
             //       selected: _selected,
             //       onSelect: (d) => setState(() => _selected = d),
             //       onMonth: _jumpToMonth),
+            // ⚠️ THE HUB'S MONTH (2026-10-17): one drawing for the Cycle
+            // companion and this screen, so a day cannot look different on
+            // the two. The period and the fertile days are capsules, logged
+            // things are dots, and the month pages sideways. A clinic round
+            // keeps the grid below: its soft bands are drawn only there.
+            if (ttcCalendarRound() == null)
+              TtcHubMonth(
+                key: const ValueKey('ttc_calendar_month'),
+                selected: _selected,
+                onPick: (d) => setState(() => _selected = d),
+                titleKey: const ValueKey('ttc_calendar_month_title'),
+              )
+            else ...[
             GestureDetector(
               key: const ValueKey('ttc_calendar_month'),
               behavior: HitTestBehavior.translucent,
@@ -249,6 +263,7 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
                   t: t),
             ),
             _BoundaryNote(month: _month, t: t),
+            ],
             if (ttcCycleWindowStartsInPeriod()) ...[
               const SizedBox(height: 4),
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

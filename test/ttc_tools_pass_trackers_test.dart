@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_cycle_companion.dart';
+import 'package:parentveda/screens/ttc/ttc_cycle_hub.dart' show ttcHubHeadline;
 import 'package:parentveda/screens/ttc/ttc_cycle_report_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_mood_face.dart';
 import 'package:parentveda/screens/ttc/ttc_symptom_log_screen.dart';
@@ -124,7 +125,9 @@ void main() {
   group('Cycle companion', () {
     testWidgets('a date row opens change and remove on a tap', (tester) async {
       healthy();
-      await pumpTall(tester, const TtcCycleCompanionScreen());
+      // The dates live on Period history since 2026-10-17. Kept for revert:
+      //   await pumpTall(tester, const TtcCycleCompanionScreen());
+      await pumpTall(tester, const TtcPeriodHistoryScreen());
       final edit = find.byKey(
         ValueKey('ttc_period_row_edit_${ago(40).toIso8601String()}'),
       );
@@ -148,8 +151,13 @@ void main() {
     ) async {
       healthy();
       await pumpTall(tester, const TtcCycleCompanionScreen());
-      expect(find.text(kTtcFourPartsLine), findsOneWidget);
-      expect(find.text(kTtcCirclePicture), findsOneWidget);
+      // The hub (2026-10-17): the part she is in is named once, in the
+      // ring's middle, and the month's key names the colours. Kept for
+      // revert: find.text(kTtcFourPartsLine) and find.text(kTtcCirclePicture).
+      final head = ttcHubHeadline();
+      expect(head, isNotNull);
+      expect(find.text(head!.part), findsWidgets);
+      expect(find.byKey(const ValueKey('ttc_hub_month_key')), findsOneWidget);
     });
 
     testWidgets('the log sheet opens on a day handed to it', (tester) async {

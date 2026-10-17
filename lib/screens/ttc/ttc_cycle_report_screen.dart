@@ -42,6 +42,7 @@ import 'ttc_cycle_companion.dart'
 import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_report_states.dart';
 import 'ttc_cycle_report_v3.dart';
+import 'ttc_ovulation_screen.dart' show ttcWindowSourceLine;
 import 'ttc_symptom_log_screen.dart'
     show
         TtcSymptomLogScreen,
@@ -669,11 +670,32 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                             style: ttcBody(12.5, h: 1.45))),
                   ]),
                 ],
-                if (_index == 0) ...[
-                  const SizedBox(height: 14),
-                  const Align(
-                      alignment: Alignment.centerLeft, child: TtcComingUp()),
-                ],
+                // ⚠️ WHERE THE FERTILE DAYS COME FROM (2026-10-17), not "Coming
+                // up": the hub's predictions card carries what comes next. The
+                // user lost a cycle to a test entry no screen mentioned. Kept
+                // for revert: const Align(child: TtcComingUp()).
+                if (_index == 0)
+                  if (ttcWindowSourceLine() case final src?) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                        key: const ValueKey('ttc_report_source'),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 1),
+                            child: Icon(
+                                src.fromTest
+                                    ? Icons.science_outlined
+                                    : Icons.event_note_outlined,
+                                size: 15,
+                                color: ttcMuted),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                              child: Text(ttcWindowForHim(src.line),
+                                  style: ttcBody(12.5, h: 1.45))),
+                        ]),
+                  ],
               ]),
             ),
             const SizedBox(height: 24),

@@ -20,6 +20,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/ttc/ttc_log_store.dart' show TtcLogStore;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_cycle_companion.dart';
@@ -174,30 +175,40 @@ void main() {
           reason: 'the empty state did not say what the first date is worth');
     });
 
+    // ⚠️ THE HUB SINCE 2026-10-17. The ring, the predictions, the month, the
+    // tracked day and three rows on one screen; the report is a row. Kept for
+    // revert: find.text('This cycle'), find.text('See your cycle report'),
+    // every phase label, and the Circle | Calendar switch.
     testWidgets('healthy draws the cycle and links the report', (tester) async {
       healthy();
       await pump(tester);
-      expect(find.text('This cycle'), findsOneWidget);
-      // One name for the report, 2026-09-27 (tools pass). Was:
-      //   expect(find.text('See this month in full'), findsOneWidget,
-      expect(find.text('See your cycle report'), findsOneWidget,
+      expect(find.byKey(const ValueKey('ttc_hub_week')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_hub_ring')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_hub_headline')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_hub_predictions')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_hub_month_pages')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_hub_tracked')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_hub_row_report')), findsOneWidget,
           reason: 'the report was unreachable from here, which is the gap this '
               'rebuild existed to close');
-      // All four stretches, named.
-      for (final phase in TtcPhase.values) {
-        expect(find.text(phase.label), findsWidgets);
-      }
+      expect(find.byKey(const ValueKey('ttc_hub_row_tests')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_hub_row_history')), findsOneWidget);
     });
 
     testWidgets('the picture can be switched to days', (tester) async {
+      // The hub draws the ring AND the month on one screen (2026-10-17), so
+      // there is no switch: picking a day in the month moves the tracked
+      // card to it.
       healthy();
       await pump(tester);
-      // "Calendar" since 2026-09-27, the report's word. Was:
-      //   await tester.tap(find.text('Days'));
-      await tester.tap(find.text('Calendar'));
-      await tester.pump(const Duration(milliseconds: 300));
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final cell = find.byKey(
+          ValueKey('ttc_hub_day_${TtcLogStore.dayKey(yesterday)}'));
+      await tester.ensureVisible(cell.first);
+      await tester.tap(cell.first);
+      await tester.pump(const Duration(milliseconds: 400));
       expect(tester.takeException(), isNull);
-      expect(find.textContaining('when the next period is expected'),
+      expect(find.textContaining('Tracked on ${yesterday.day} '),
           findsOneWidget);
     });
 

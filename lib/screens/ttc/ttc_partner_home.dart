@@ -328,7 +328,8 @@ const String kTtcTonightReadNote =
 const String kTtcHerBodyTileEyebrow = 'Her body';
 const String kTtcHerBodyTileValue = "What's happening now";
 const String kTtcYourHalfTileEyebrow = 'Your half';
-const String kTtcYourHalfTileValue = 'Your side of it';
+// Kept for revert (2026-10-17, explicit labels): 'Your side of it'.
+const String kTtcYourHalfTileValue = 'Your side of trying';
 
 /// Each piece's one-line standfirst in the reader (2026-10-16). Its own
 /// line, not the first paragraph: the reader draws the standfirst, then the

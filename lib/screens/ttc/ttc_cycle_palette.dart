@@ -51,6 +51,20 @@
 //  those files for stray colours.
 // =============================================================================
 
+// =============================================================================
+//  ⚠️ RED AND TEAL SINCE 2026-10-17. The user, holding our ring and calendar
+//  next to Clue's, Flo's and Withings' (Mobbin eed61cd1, 785854fd, 4bbe6258):
+//  "the user interface is looking very bland… even the ring, the calendar…
+//  I don't even like the colour choices." The rule above still holds, two
+//  colours that mean something and quiet ones for the rest, but the two are
+//  now the ones the whole category reads without a key: RED is bleeding
+//  (Clue, Flo, Apple, Fitbit) and TEAL is fertile days (Clue's ring and
+//  calendar). The plum-rose and the violet sat close to the app's purple
+//  chrome, so a fertile day read as a button. The brand purple stays for
+//  buttons, chrome and TODAY. The 2026-09-27 values are kept beside each
+//  constant for revert.
+// =============================================================================
+
 import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_chapter.dart' show FertilityLevel;
@@ -64,31 +78,39 @@ abstract final class TtcCycleColours {
 
   /// Bleeding: her period days, the period marker in a chart, the rose outline
   /// on the day the next one is due.
-  static const Color period = Color(0xFFD9466E);
+  // Kept for revert (2026-10-17): Color(0xFFD9466E).
+  static const Color period = Color(0xFFE0434A);
 
   /// A soft rose, behind text or as a chart band.
-  static const Color periodTint = Color(0xFFFBDDE5);
+  // Kept for revert (2026-10-17): Color(0xFFFBDDE5).
+  static const Color periodTint = Color(0xFFFDE3E4);
 
   /// Rose text on [periodTint] or white.
-  static const Color periodInk = Color(0xFF9E1F46);
+  // Kept for revert (2026-10-17): Color(0xFF9E1F46).
+  static const Color periodInk = Color(0xFFA3202A);
 
   /// Fertile days, as a fill: a ring arc, a grid square, a legend swatch, the
   /// Fertile window's curve.
-  static const Color fertile = Color(0xFF8F52CF);
+  // Kept for revert (2026-10-17): Color(0xFF8F52CF).
+  static const Color fertile = Color(0xFF17958F);
 
   /// A soft violet, behind text or as a chart band.
-  static const Color fertileTint = Color(0xFFEBDDF8);
+  // Kept for revert (2026-10-17): Color(0xFFEBDDF8).
+  static const Color fertileTint = Color(0xFFD3F1EE);
 
   /// Violet text on [fertileTint] or white.
-  static const Color fertileInk = Color(0xFF5A2596);
+  // Kept for revert (2026-10-17): Color(0xFF5A2596).
+  static const Color fertileInk = Color(0xFF0C6B66);
 
   /// The day of ovulation: the deepest violet, a dot or bold numerals.
-  static const Color ovulation = Color(0xFF6B319B);
+  // Kept for revert (2026-10-17): Color(0xFF6B319B).
+  static const Color ovulation = Color(0xFF0E7F79);
 
   // ---- the two quiet parts --------------------------------------------------
 
   /// The days between the period and the fertile days.
-  static const Color before = Color(0xFFE4DFEA);
+  // Kept for revert (2026-10-17): Color(0xFFE4DFEA).
+  static const Color before = Color(0xFFE6DEF3);
 
   /// The wait after the fertile days, until the next period.
   ///
@@ -98,7 +120,8 @@ abstract final class TtcCycleColours {
   /// days before the window stay a cool light grey; the wait is warm, so the
   /// two quiet parts differ in hue as well as lightness. Kept for revert:
   /// Color(0xFFC9C1D3).
-  static const Color waiting = Color(0xFFDCCBB5);
+  // Kept for revert (2026-10-17): Color(0xFFDCCBB5).
+  static const Color waiting = Color(0xFFF7D9C2);
 
   /// Text on either grey, and their small marks.
   static const Color quietInk = Color(0xFF4A4254);
@@ -107,6 +130,9 @@ abstract final class TtcCycleColours {
 
   /// Today, and a day she has selected. The base UI's ink, never a cycle
   /// colour.
+  /// ⚠️ INK, AS IT WAS (2026-10-17, the user: the circle round today on the
+  /// home hero "was black before, so let it stay black only"). Purple for
+  /// one build, kept for revert: ttcPurple.
   static const Color today = ttcTitleInk;
 
   /// A day she logged something (a symptom, a number, a journal line).
@@ -117,10 +143,12 @@ abstract final class TtcCycleColours {
 
   /// The hue the Fertile window tool's hero field is drawn in. The same
   /// violet family as [fertile].
-  static const double fertileHue = 273;
+  // Kept for revert (2026-10-17): 273.
+  static const double fertileHue = 176;
 
   /// The hue of the rose family, for a hero field during her period.
-  static const double periodHue = 344;
+  // Kept for revert (2026-10-17): 344.
+  static const double periodHue = 357;
 
   // ---- per phase ------------------------------------------------------------
 
@@ -141,10 +169,12 @@ abstract final class TtcCycleColours {
   /// A soft version of the phase, for a chip or a chart band behind a line.
   static Color tint(TtcPhase phase) => switch (phase) {
         TtcPhase.period => periodTint,
-        TtcPhase.beforeWindow => const Color(0xFFF3F0F6),
+        // Kept for revert (2026-10-17): Color(0xFFF3F0F6).
+        TtcPhase.beforeWindow => const Color(0xFFF4F0FA),
         TtcPhase.fertileWindow => fertileTint,
         // Kept for revert (2026-09-28): Color(0xFFE9E5EE).
-        TtcPhase.afterWindow => const Color(0xFFF6EDE1),
+        // Kept for revert (2026-10-17): Color(0xFFF6EDE1).
+        TtcPhase.afterWindow => const Color(0xFFFDF0E6),
       };
 
   /// Text naming a phase, on [tint] or white.
@@ -158,10 +188,12 @@ abstract final class TtcCycleColours {
   /// are taken a step darker so a 14pt dot still shows on white.
   static Color mark(TtcPhase phase) => switch (phase) {
         TtcPhase.period => period,
-        TtcPhase.beforeWindow => const Color(0xFFB7AEC2),
+        // Kept for revert (2026-10-17): Color(0xFFB7AEC2).
+        TtcPhase.beforeWindow => const Color(0xFFA996C9),
         TtcPhase.fertileWindow => fertile,
         // Kept for revert (2026-09-28): Color(0xFF948AA1).
-        TtcPhase.afterWindow => const Color(0xFFB0875A),
+        // Kept for revert (2026-10-17): Color(0xFFB0875A).
+        TtcPhase.afterWindow => const Color(0xFFD9915B),
       };
 
   // ---- the fertile days, graded ----------------------------------------------
@@ -169,10 +201,11 @@ abstract final class TtcCycleColours {
   /// One violet ramp for the six days, used by the calendar's capsule and the
   /// Fertile window's bars, so a Peak day is the same colour on both.
   static Color fertileLevel(FertilityLevel level) => switch (level) {
-        FertilityLevel.peak => const Color(0xFFB58DE3),
-        FertilityLevel.high => const Color(0xFFD2B9F0),
-        FertilityLevel.medium => const Color(0xFFE8DBF7),
-        FertilityLevel.low => const Color(0xFFF3F0F6),
+        // Kept for revert (2026-10-17): B58DE3, D2B9F0, E8DBF7, F3F0F6.
+        FertilityLevel.peak => const Color(0xFF7FD3CC),
+        FertilityLevel.high => const Color(0xFFA9E2DD),
+        FertilityLevel.medium => const Color(0xFFCFEFEB),
+        FertilityLevel.low => const Color(0xFFEAF7F5),
       };
 
   // ---- a treatment round on the calendar --------------------------------------
@@ -191,17 +224,34 @@ abstract final class TtcCycleColours {
   ///
   /// ⚠️ THE GREYS GET A NEAR-GREY FIELD. A violet page in the waiting days
   /// would say "fertile" in the one colour this palette keeps for it.
+  //
+  // ⚠️ EVERY PART HAS ITS OWN FIELD SINCE 2026-10-17. The user: "stop making
+  // the hero section grey… the grey is not looking well… use good colours."
+  // The quiet parts were the fertile hue at 0.22 chroma, which read as a
+  // grey page for most of the month. Now each part wears its own family:
+  // red in the period, lilac before the fertile days, teal in them, peach in
+  // the wait, the same families as the ring and the month. Kept for revert:
+  //   heroHue: period => periodHue, _ => fertileHue;
+  //   heroChromaScale: period || fertileWindow => 1, _ => 0.22.
   static double heroHue(TtcPhase? phase) => switch (phase) {
         TtcPhase.period => periodHue,
-        _ => fertileHue,
+        TtcPhase.beforeWindow => beforeHue,
+        TtcPhase.fertileWindow => fertileHue,
+        TtcPhase.afterWindow => waitingHue,
+        null => beforeHue,
       };
 
-  /// A multiplier on the field's usual chroma: full for the two coloured
-  /// parts, a whisper for the rest.
-  static double heroChromaScale(TtcPhase? phase) => switch (phase) {
-        TtcPhase.period || TtcPhase.fertileWindow => 1,
-        _ => 0.22,
-      };
+  /// The lilac of [before], for a hero field.
+  static const double beforeHue = 266;
+
+  /// The peach of [waiting], for a hero field.
+  // 8, not 24 (the device walk, 2026-10-17): the field leans each hue
+  // about 34 degrees on, and 24 leant into olive. 8 leans into apricot.
+  static const double waitingHue = 8;
+
+  /// A multiplier on the field's usual chroma: every part is coloured now;
+  /// the page with no part to name (nothing logged, a clinic) is softer.
+  static double heroChromaScale(TtcPhase? phase) => phase == null ? 0.6 : 1;
 }
 
 /// A card on a cycle page: white, one hairline, no shadow.

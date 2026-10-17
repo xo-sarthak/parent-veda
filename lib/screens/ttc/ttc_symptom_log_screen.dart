@@ -89,6 +89,8 @@ import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
 import '../../widgets/pv_feedback.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
+import 'ttc_ovulation_screen.dart'
+    show kTtcOvPositive, ttcOvPositiveCleared, ttcOvPositiveSaved;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_palette.dart';
@@ -433,6 +435,9 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
 
   void _toggle(TtcSymptomGroup group, TtcSymptom symptom) {
     final store = TtcLogStore.instance;
+    // A positive strip moves her fertile days from here too (2026-10-17), by
+    // the same rule as the Ovulation tests screen (`ttcOvPositiveSaved`).
+    final wasPositive = _selected.contains(kTtcOvPositive);
     if (_selected.contains(symptom.id)) {
       store.clear(kTtcSymptomTracker, symptom.id, on: _day);
     } else {
@@ -444,6 +449,13 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
         }
       }
       store.log(kTtcSymptomTracker, symptom.id, 1, on: _day);
+    }
+    final isPositive =
+        store.valueFor(kTtcSymptomTracker, kTtcOvPositive, on: _day) != null;
+    if (!wasPositive && isPositive) {
+      ttcOvPositiveSaved(context, _day, lift: 80);
+    } else if (wasPositive && !isPositive) {
+      ttcOvPositiveCleared(context, _day, lift: 80);
     }
     setState(() {});
   }

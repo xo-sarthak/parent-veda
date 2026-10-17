@@ -740,6 +740,86 @@ class _Key extends StatelessWidget {
 //  period at her usual length): no new arithmetic.
 // =============================================================================
 
+/// The rows the cycle hub's predictions card lists (2026-10-17): fertile
+/// days, ovulation and the next period, soonest first, from the same dates
+/// as [TtcComingUp] below. Ovulation is the window's last day (the window
+/// closes on it, `ttcWindowClosesAfterOvulation` is 0).
+List<({TtcPhase phase, String label, String dates, String when, bool ovulation})>
+    ttcComingUpRows() {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final rows = <(int,
+      ({TtcPhase phase, String label, String dates, String when, bool ovulation}))>[];
+  final start = CycleStore.instance.lastPeriodStart;
+  final length = TtcStore.instance.today.cycleLength;
+  final next = start != null && length > 0
+      ? DateTime(start.year, start.month, start.day + length)
+      : null;
+
+  DateTime? opens, closes;
+  var thisCycle = false;
+  final w = ttcFertileWindowNow();
+  if (w != null && w.cyclesAhead == 0) {
+    opens = w.opensOn;
+    closes = w.closesOn;
+    thisCycle = true;
+  } else if (w != null && next != null) {
+    final ov = length - TtcChapterEngine.lutealPhaseDays;
+    opens = DateTime(next.year, next.month,
+        next.day + ov - ttcWindowOpensBeforeOvulation - 1);
+    closes = DateTime(next.year, next.month,
+        next.day + ov + ttcWindowClosesAfterOvulation - 1);
+  }
+  if (opens != null && closes != null) {
+    final openNow = !today.isBefore(opens) && !today.isAfter(closes);
+    final until = opens.difference(today).inDays;
+    rows.add((
+      openNow ? 0 : until,
+      (
+        phase: TtcPhase.fertileWindow,
+        label: openNow
+            ? 'Your fertile days, now'
+            : thisCycle
+                ? 'Your fertile days'
+                : 'Your next fertile days',
+        dates: '${ttcShortDay(opens)} – ${ttcShortDay(closes)}',
+        when: openNow ? 'now' : ttcInDays(until),
+        ovulation: false,
+      ),
+    ));
+    final ovOn = closes.subtract(
+        const Duration(days: ttcWindowClosesAfterOvulation));
+    final ovUntil = ovOn.difference(today).inDays;
+    if (ovUntil >= 0) {
+      rows.add((
+        ovUntil,
+        (
+          phase: TtcPhase.fertileWindow,
+          label: 'Ovulation, estimated',
+          dates: ttcShortDay(ovOn),
+          when: ttcInDays(ovUntil),
+          ovulation: true,
+        ),
+      ));
+    }
+  }
+  if (next != null) {
+    final until = next.difference(today).inDays;
+    rows.add((
+      until,
+      (
+        phase: TtcPhase.period,
+        label: until < 0 ? 'Your period was due' : 'Your next period',
+        dates: 'around ${ttcShortDay(next)}',
+        when: until < 0 ? '${-until} days ago' : ttcInDays(until),
+        ovulation: false,
+      ),
+    ));
+  }
+  rows.sort((a, b) => a.$1.compareTo(b.$1));
+  return [for (final r in rows) r.$2];
+}
+
 /// What comes next in her cycle: her fertile days and her next period, each
 /// with its dates and how far away it is.
 class TtcComingUp extends StatelessWidget {

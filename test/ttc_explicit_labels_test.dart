@@ -288,6 +288,7 @@ const Map<String, String> _kAllowed = {
   // ---- map markers and headlines where "here" is the point --------------
   'You are here': 'the map marker on the chapter reader and the report ring',
   'YOU ARE HERE': 'the same marker, uppercase',
+  'SHE IS HERE': 'the same marker on his side (ttcWindowForHim)',
   'Your fertile days are here': 'a hero headline: the days have arrived',
   "Here's what happens next": 'a page title over the list it introduces',
   "Here's how your round usually goes":

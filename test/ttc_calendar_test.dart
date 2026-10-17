@@ -79,7 +79,9 @@ void main() {
         (tester) async {
       logCleanHistory();
       await pumpCalendar(tester);
-      expect(find.byType(TtcFertileBand), findsWidgets);
+      // The hub's month draws the capsule since 2026-10-17. Kept for
+      // revert: expect(find.byType(TtcFertileBand), findsWidgets);
+      expect(find.byKey(const ValueKey('ttc_hub_fertile_band')), findsWidgets);
     });
 
     testWidgets('and none at all when the engine refuses to estimate',
@@ -88,6 +90,7 @@ void main() {
       await pumpCalendar(tester);
       final bands = tester.widgetList(find.byType(TtcFertileBand));
       expect(bands, isEmpty);
+      expect(find.byKey(const ValueKey('ttc_hub_fertile_band')), findsNothing);
     });
   });
 

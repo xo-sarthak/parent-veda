@@ -49,6 +49,8 @@ import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_day_context.dart' show ttcDayContext;
 import '../../ttc/ttc_cycle_report.dart';
 import '../../ttc/ttc_store.dart';
+import '../../ttc/ttc_log_store.dart';
+import '../../ttc/ttc_symptom_data.dart' show kTtcSymptomTracker;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
@@ -67,6 +69,10 @@ import 'ttc_cycle_headline.dart';
 import 'ttc_partner_home.dart' show TtcPartnerViewOnlyLine;
 import 'ttc_window_screen.dart' show ttcWindowForHim;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../doors/pv_list_row.dart' show PvListRow, PvRowGroup;
+import 'ttc_cycle_hub.dart';
+import 'ttc_ovulation_screen.dart' show kTtcOvPositive, ttcOvResultOn;
+import 'ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 
 /// Which of the four the screen is in.
 ///
@@ -93,6 +99,11 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
   /// The row currently slid open. One at a time, so a half-open row cannot be
   /// left behind another one.
   DateTime? _openRow;
+
+  /// The day the hub's week strip, month and "tracked" card are on
+  /// (2026-10-17). Today on open; not remembered between visits.
+  DateTime _day = DateTime(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -161,7 +172,14 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
               ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  _Hero(p: p, screen: screen, spans: spans, hue: heroHue),
+                  _Hero(
+                    p: p,
+                    screen: screen,
+                    spans: spans,
+                    hue: heroHue,
+                    day: _day,
+                    onDay: (d) => setState(() => _day = d),
+                  ),
                   _CompanionSheet(
                     p: p,
                     t: t,
@@ -171,6 +189,8 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
                     openRow: _openRow,
                     onPicture: (v) => setState(() => _picture = v),
                     onOpenRow: (d) => setState(() => _openRow = d),
+                    day: _day,
+                    onDay: (d) => setState(() => _day = d),
                   ),
                 ],
               ),
@@ -193,7 +213,13 @@ class _Hero extends StatelessWidget {
       {required this.p,
       required this.screen,
       required this.spans,
-      required this.hue});
+      required this.hue,
+      required this.day,
+      required this.onDay});
+
+  /// The hub's picked day, for the week strip (2026-10-17).
+  final DateTime day;
+  final ValueChanged<DateTime> onDay;
 
   final V2Palette p;
   final TtcCompanionState screen;
@@ -273,12 +299,24 @@ class _Hero extends StatelessWidget {
               // (2026-09-27): "Cycle day 12" twice, a line apart, read as
               // two different things. Kept for revert:
               //   screen != TtcCompanionState.empty
-              if (today.cycleDay != null &&
-                  screen == TtcCompanionState.healthy) ...[
-                const SizedBox(width: 10),
-                _SpineChip(p: p, label: 'Cycle day ${today.cycleDay}'),
-              ],
+              // The ring's middle carries the cycle day now (2026-10-17).
+              // Kept for revert:
+              //   if (today.cycleDay != null &&
+              //       screen == TtcCompanionState.healthy) ...[
+              //     const SizedBox(width: 10),
+              //     _SpineChip(p: p, label: 'Cycle day ${today.cycleDay}'),
+              //   ],
             ]),
+            // ⚠️ THE HUB'S HERO IS THE WEEK (2026-10-17). The user: "everything
+            // is there under a single screen" on Clue and Flo, while ours
+            // opened on a mark, a 32pt title and a paragraph before any
+            // picture. On a healthy cycle the hero is the week strip (Flo,
+            // Apple Health) and the ring below carries the sentence. The
+            // other three states keep the title and the line: they explain.
+            if (screen == TtcCompanionState.healthy) ...[
+              const SizedBox(height: 18),
+              TtcHubWeekStrip(selected: day, onPick: onDay),
+            ] else ...[
             // The tool's mark over the title (2026-09-29, ttc_tool_marks.dart):
             // the object she tapped on the Tools row. 14 + 40 + 12 where the
             // gap was 26, so the hero grows by 40 and no more. Kept for
@@ -296,6 +334,7 @@ class _Hero extends StatelessWidget {
             const SizedBox(height: 8),
             Text(_his(line),
                 style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1)),
+            ],
           ],
         ),
       ),
@@ -335,6 +374,8 @@ class _BackArrow extends StatelessWidget {
       );
 }
 
+// Kept for revert (2026-10-17): the ring carries the cycle day now.
+// ignore: unused_element
 class _SpineChip extends StatelessWidget {
   const _SpineChip({required this.p, required this.label});
   final V2Palette p;
@@ -388,7 +429,13 @@ class _CompanionSheet extends StatelessWidget {
     required this.openRow,
     required this.onPicture,
     required this.onOpenRow,
+    this.day,
+    this.onDay,
   });
+
+  /// The hub's picked day (2026-10-17). Null on Period history.
+  final DateTime? day;
+  final ValueChanged<DateTime>? onDay;
 
   final V2Palette p;
   final TtcS t;
@@ -431,7 +478,42 @@ class _CompanionSheet extends StatelessWidget {
   // ---------------------------------------------------------------------------
   //  Healthy
   // ---------------------------------------------------------------------------
-  List<Widget> _healthy(BuildContext context) => [
+  // ⚠️ THE HUB (2026-10-17). The user: competitor screens are "simple yet
+  // efficient, and everything is there under a single screen", ours was
+  // "something here, something there". One screen now: the ring and its
+  // sentence, the predictions and where they come from, the month, what was
+  // tracked on the picked day, and rows to the three rooms that need their
+  // own page. The cards below it were the old body, kept for revert in
+  // [_healthyKept].
+  List<Widget> _healthy(BuildContext context) {
+    final d = day ?? DateTime.now();
+    // ⚠️ NOT CONST (the device walk, 2026-10-17): a const widget is never
+    // rebuilt with its parent, so clearing a test moved the month while the
+    // predictions card kept naming the old test. Each rebuild of this page
+    // (it listens to the stores) must reach them.
+    return [
+      TtcHubCard(child: TtcHubRing(key: ValueKey(_hubStamp()))),
+      const SizedBox(height: 14),
+      // ignore: prefer_const_constructors
+      TtcHubPredictions(),
+      const SizedBox(height: 14),
+      TtcHubCard(
+        child: TtcHubMonth(selected: d, onPick: (v) => onDay?.call(v)),
+      ),
+      const SizedBox(height: 14),
+      TtcHubTracked(day: d),
+      const SizedBox(height: 22),
+      _Eyebrow('More about your cycle', p: p),
+      const SizedBox(height: 10),
+      _HubRows(p: p),
+      const SizedBox(height: 24),
+      _Estimates(p: p),
+    ];
+  }
+
+  // Kept for revert (2026-10-17): the body before the hub.
+  // ignore: unused_element
+  List<Widget> _healthyKept(BuildContext context) => [
         _Eyebrow('Where you are', p: p),
         const SizedBox(height: 12),
         _ThisCycleCard(
@@ -728,6 +810,160 @@ void _openReport(BuildContext context) =>
       settings: const RouteSettings(name: 'ttc/cycle_report'),
       builder: (_) => const TtcCycleReportScreen(),
     ));
+
+/// What the ring is drawn from: a new value restarts its sweep and redraws
+/// it when her dates or her test change.
+String _hubStamp() {
+  final c = CycleStore.instance;
+  return '${c.periodStarts.length}|${c.lastPeriodStart}|${c.lhPositiveDay}|'
+      '${c.temperatureShiftDay}';
+}
+
+/// How many positive strips she logged this cycle, up to today.
+int ttcPositivesThisCycle() {
+  final start = CycleStore.instance.lastPeriodStart;
+  if (start == null) return 0;
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  var n = 0;
+  for (var d = DateTime(start.year, start.month, start.day);
+      !d.isAfter(today);
+      d = d.add(const Duration(days: 1))) {
+    if (ttcOvResultOn(d) == kTtcOvPositive) n++;
+  }
+  return n;
+}
+
+/// The hub's three rooms (2026-10-17): the things that need a page of their
+/// own, each with a line that says what is inside before the tap.
+class _HubRows extends StatelessWidget {
+  const _HubRows({required this.p});
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final him = TtcPartnerMode.instance.on;
+    final positives = ttcPositivesThisCycle();
+    final periods = CycleStore.instance.periodStarts.length;
+    return PvRowGroup(p: p, children: [
+      KeyedSubtree(
+        key: const ValueKey('ttc_hub_row_tests'),
+        child: PvListRow(
+          p: p,
+          leading: TtcMarkLeading(
+              tool: TtcToolMark.ovulation,
+              tint: TtcCycleColours.fertileTint,
+              size: 40),
+          title: 'Ovulation tests',
+          // The window may follow a positive saved without a strip result
+          // (an older entry): say that one too, or the row and the source
+          // line above disagree (the device walk, 2026-10-17).
+          line: positives > 0
+              ? '$positives positive this cycle'
+              : CycleStore.instance.lhPositiveDay != null
+                  ? 'A positive on day ${CycleStore.instance.lhPositiveDay} '
+                      'is used for the fertile days'
+                  : (him
+                      ? 'None logged this cycle'
+                      : 'Log a strip, see this cycle'),
+          onTap: () => openTtcOvulationTests(context),
+        ),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('ttc_hub_row_history'),
+        child: PvListRow(
+          p: p,
+          leading: TtcMarkLeading(
+              tool: TtcToolMark.cycle,
+              tint: TtcCycleColours.periodTint,
+              size: 40),
+          title: 'Period history',
+          line: '$periods ${periods == 1 ? 'period' : 'periods'} logged'
+              '${him ? '' : ' · add or correct'}',
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: const RouteSettings(name: 'ttc/period_history'),
+            builder: (_) => const TtcPeriodHistoryScreen(),
+          )),
+        ),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('ttc_hub_row_report'),
+        child: PvListRow(
+          p: p,
+          leading: TtcMarkLeading(
+              tool: TtcToolMark.cycleReport,
+              tint: TtcCycleColours.tint(TtcPhase.beforeWindow),
+              size: 40),
+          title: kTtcCycleReportName,
+          line: 'Your rhythm and patterns across cycles',
+          onTap: () => _openReport(context),
+        ),
+      ),
+    ]);
+  }
+}
+
+/// Her period dates and her rhythm, on their own page (2026-10-17). They
+/// were the bottom half of the Cycle companion; the hub links here.
+class TtcPeriodHistoryScreen extends StatefulWidget {
+  const TtcPeriodHistoryScreen({super.key});
+
+  @override
+  State<TtcPeriodHistoryScreen> createState() => _TtcPeriodHistoryScreenState();
+}
+
+class _TtcPeriodHistoryScreenState extends State<TtcPeriodHistoryScreen> {
+  DateTime? _openRow;
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: Listenable.merge(
+            [CycleStore.instance, TtcStore.instance, TtcPartnerMode.instance]),
+        builder: (context, _) {
+          final p = V2PaletteStore.instance.current;
+          final sheet = _CompanionSheet(
+            p: p,
+            t: TtcS.current(),
+            screen: TtcCompanionState.healthy,
+            spans: const [],
+            picture: TtcCompanionPicture.ring,
+            openRow: _openRow,
+            onPicture: (_) {},
+            onOpenRow: (d) => setState(() => _openRow = d),
+          );
+          final showsRhythm = CycleStore.instance.cycleLengths.isNotEmpty;
+          return Scaffold(
+            backgroundColor: p.ground,
+            body: SafeArea(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(18, 6, 18, ttcBottomInset),
+                children: [
+                  Row(children: [
+                    _BackArrow(p: p),
+                    const SizedBox(width: 10),
+                    Text('Period history',
+                        style: pvManrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink1)),
+                  ]),
+                  const SizedBox(height: 18),
+                  if (showsRhythm) ...[
+                    _Eyebrow('Your rhythm', p: p),
+                    const SizedBox(height: 12),
+                    _RhythmCard(p: p),
+                    const SizedBox(height: 28),
+                  ],
+                  ...sheet._dates(context),
+                  const SizedBox(height: 24),
+                  _Estimates(p: p),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+}
 
 // =============================================================================
 //  This cycle — the picture, the four stretches, and the way into the report
@@ -1778,6 +2014,26 @@ TtcHomePeriodIntent ttcHomePeriodIntent({
   return gap > 0 ? TtcHomePeriodIntent.newCycle : TtcHomePeriodIntent.earlier;
 }
 
+// ---- spotting (2026-10-17) -------------------------------------------------
+
+/// The daily log's own Spotting chip: one fact, two doors.
+const String kTtcSpottingId = 'disch_spotting';
+
+/// Whether [day] has spotting logged.
+bool ttcSpottingOn(DateTime day) =>
+    TtcLogStore.instance.valueFor(kTtcSymptomTracker, kTtcSpottingId, on: day) !=
+    null;
+
+void ttcLogSpotting(DateTime day) =>
+    TtcLogStore.instance.log(kTtcSymptomTracker, kTtcSpottingId, 1, on: day);
+
+void ttcClearSpotting(DateTime day) =>
+    TtcLogStore.instance.clear(kTtcSymptomTracker, kTtcSpottingId, on: day);
+
+/// What the save says. Spotting is shown and never counted.
+String ttcSpottingSavedLine(DateTime day) =>
+    'Spotting saved for ${ttcShortDate(day)}. It does not start a new cycle.';
+
 /// Under this, a cycle is a short one worth a calm word (2026-10-16): 21
 /// days is the low end of the usual range.
 const int kTtcShortCycleDays = 21;
@@ -2122,6 +2378,23 @@ class _LogSheetState extends State<_LogSheet> {
     // the kind line on day one (`TtcPeriodCameLine`), which links the read.
   }
 
+  /// "It was spotting" (2026-10-17): the day is saved as spotting, the one
+  /// fact the Discharge chip also writes, and no period starts. Every app
+  /// with a help page on it (Flo, Clue, Natural Cycles, Apple Health, Fitbit)
+  /// keeps spotting apart from the period, and none lets it start a cycle.
+  void _saveSpotting() {
+    final picked = _picked;
+    if (picked == null) return;
+    ttcLogSpotting(picked);
+    HapticFeedback.selectionClick();
+    final navigator = Navigator.of(context);
+    navigator.maybePop();
+    if (widget.notify) {
+      pvSnack(navigator.context, ttcSpottingSavedLine(picked),
+          action: 'Undo', onAction: () => ttcClearSpotting(picked));
+    }
+  }
+
   void _save() {
     final picked = _picked;
     if (picked == null) return;
@@ -2388,6 +2661,13 @@ class _LogSheetState extends State<_LogSheet> {
                       ),
                       const SizedBox(height: 10),
                       _QuietAction(
+                        key: const ValueKey('ttc_period_was_spotting'),
+                        label: 'That bleeding was spotting',
+                        muted: true,
+                        onTap: _saveSpotting,
+                      ),
+                      const SizedBox(height: 10),
+                      _QuietAction(
                         key: const ValueKey('ttc_period_log_anyway'),
                         label: 'No, log a separate period',
                         muted: true,
@@ -2413,6 +2693,21 @@ class _LogSheetState extends State<_LogSheet> {
                               : 'Save this period',
                       onTap: _picked == null ? null : _save,
                     ),
+                    // Spotting has its own door, next to the period
+                    // (2026-10-17): a new date only, never a correction.
+                    if (!_isEdit && !_duplicate && _picked != null) ...[
+                      const SizedBox(height: 4),
+                      Center(
+                        child: TextButton(
+                          key: const ValueKey('ttc_period_log_spotting'),
+                          onPressed: _saveSpotting,
+                          child: Text('Only light spotting? Log spotting instead',
+                              style: ttcBody(13,
+                                  color: ttcTitleInk,
+                                  w: FontWeight.w700)),
+                        ),
+                      ),
+                    ],
                     ],
                   ],
                   const SizedBox(height: 10),

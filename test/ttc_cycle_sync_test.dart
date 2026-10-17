@@ -60,7 +60,10 @@ void main() {
 
   testWidgets('Cycle companion leads with the same sentence', (t) async {
     dayFive();
-    final h = ttcCycleHeadline()!;
+    // The hub's ring says the sentence without its dates (2026-10-17); the
+    // predictions card under it carries them. Kept for revert:
+    //   expect(find.textContaining(h), findsWidgets);
+    final h = ttcCycleHeadline()!.replaceAll(RegExp(r' \(.*\)$'), '');
     await pump(t, const TtcCycleScreen());
     expect(find.textContaining(h), findsWidgets);
   });

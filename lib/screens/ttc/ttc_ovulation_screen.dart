@@ -188,6 +188,138 @@ const String kTtcOvMedicated =
     "Your clinic's medicines time this cycle, so there are no strips to log "
     'here. Your round has your dates.';
 
+// =============================================================================
+//  One rule for a positive strip, wherever it is saved (2026-10-17)
+// -----------------------------------------------------------------------------
+//  The user, after a cycle showed only three fertile days: "I was not even
+//  aware of it… it's nowhere displayed… I don't even know how to access it."
+//  An LH positive had been saved on day 2 and had moved the window, silently
+//  on every cycle screen. And a positive saved from the home's "Test" button
+//  (the daily logger) did NOT move it at all; it waited as an offer here. One
+//  fact, two homes, two behaviours.
+//
+//  Now both doors call these two functions:
+//    · a positive from day 7 on moves the window at once and says so, with
+//      Undo (Flo and Fitbit move it the same way, help.flo.health 360015162972,
+//      support.google.com/fitbit 14236808);
+//    · an earlier one is SAVED as a test result but does not move the window
+//      until she says "Use it" (Fitbit drops an implausible positive; we ask,
+//      because her strip outranks our estimate once she confirms it).
+// =============================================================================
+
+/// The first day of the cycle [day] falls in, or null before any period.
+DateTime? ttcOvCycleStartFor(DateTime day) {
+  final d = _dayOnly(day);
+  DateTime? start;
+  for (final s in CycleStore.instance.periodStarts) {
+    final s0 = _dayOnly(s);
+    if (!s0.isAfter(d) && (start == null || s0.isAfter(start))) start = s0;
+  }
+  return start;
+}
+
+/// Whether [day] is in the cycle she is in now: the only cycle a strip can
+/// move the window of (`CycleStore.logLhPositive` writes the current cycle).
+bool _inCurrentCycle(DateTime day) {
+  final last = CycleStore.instance.lastPeriodStart;
+  final start = ttcOvCycleStartFor(day);
+  return last != null && start != null && _dayOnly(last) == start;
+}
+
+/// The words when an early positive is kept but not used.
+String ttcOvEarlyKeptLine(int day) =>
+    'Saved. Day $day is very early for a positive, so your fertile days '
+    'still follow your period dates.';
+
+/// Call after a positive strip is saved for [day], from any screen.
+void ttcOvPositiveSaved(BuildContext context, DateTime day,
+    {double lift = 24}) {
+  if (!_inCurrentCycle(day)) return;
+  final cycle = CycleStore.instance;
+  final start = ttcOvCycleStartFor(day)!;
+  final cd = _dayOnly(day).difference(start).inDays + 1;
+  final prev = cycle.lhPositiveDay;
+  // An earlier positive in this cycle already places ovulation.
+  if (prev != null && prev <= cd) return;
+  if (cd < kTtcEarliestLikelyOvulationDay) {
+    pvSnack(context, ttcOvEarlyKeptLine(cd),
+        icon: Icons.info_outline_rounded,
+        lift: lift,
+        action: 'Use this test',
+        onAction: () => cycle.logLhPositive(cd));
+    return;
+  }
+  cycle.logLhPositive(cd);
+  // Undo takes back the whole save: the strip and the move.
+  pvSnack(context, kTtcOvMoved,
+      icon: Icons.check_rounded,
+      lift: lift,
+      action: 'Undo',
+      onAction: () {
+        ttcOvSetResult(day, null);
+        cycle.logLhPositive(prev);
+      });
+}
+
+/// Call after a positive strip is taken off [day]. When it was the one the
+/// window followed, the window follows the next positive from day 7 on, or
+/// goes back to the period dates.
+void ttcOvPositiveCleared(BuildContext context, DateTime day,
+    {double lift = 24}) {
+  if (!_inCurrentCycle(day)) return;
+  final cycle = CycleStore.instance;
+  final start = ttcOvCycleStartFor(day)!;
+  final cd = _dayOnly(day).difference(start).inDays + 1;
+  final prev = cycle.lhPositiveDay;
+  if (prev != cd) return;
+  int? next;
+  final today = _dayOnly(DateTime.now());
+  for (var d = start; !d.isAfter(today); d = d.add(const Duration(days: 1))) {
+    final n = d.difference(start).inDays + 1;
+    if (n >= kTtcEarliestLikelyOvulationDay &&
+        ttcOvResultOn(d) == kTtcOvPositive) {
+      next = n;
+      break;
+    }
+  }
+  cycle.logLhPositive(next);
+  pvSnack(
+    context,
+    next == null
+        ? kTtcOvBack
+        : 'Your fertile days now follow your positive on day $next.',
+    icon: Icons.check_rounded,
+    lift: lift,
+    action: 'Undo',
+    onAction: () => cycle.logLhPositive(prev),
+  );
+}
+
+/// Where her fertile days come from this cycle, said in one line on every
+/// cycle screen (2026-10-17). Null when there is no window to explain.
+({String line, bool fromTest})? ttcWindowSourceLine() {
+  final cycle = CycleStore.instance;
+  final start = cycle.lastPeriodStart;
+  if (start == null) return null;
+  final lh = cycle.lhPositiveDay;
+  final temp = cycle.temperatureShiftDay;
+  if (lh != null) {
+    final on = _dayOnly(start).add(Duration(days: lh - 1));
+    return (
+      line: 'Based on your positive ovulation test on ${ttcRoundDate(on)}',
+      fromTest: true,
+    );
+  }
+  if (temp != null) {
+    final on = _dayOnly(start).add(Duration(days: temp - 1));
+    return (
+      line: 'Based on your temperature rise on ${ttcRoundDate(on)}',
+      fromTest: true,
+    );
+  }
+  return (line: 'Estimated from your period dates', fromTest: false);
+}
+
 String ttcOvResultLine(DateTime day, int cycleDay, String? result) {
   final when = '${ttcRoundDate(day)}, day $cycleDay of your cycle';
   return switch (result) {
@@ -226,6 +358,18 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
     final wasPositive = prevChip == kTtcOvPositive || prevLh == cd;
 
     ttcOvSetResult(day, result);
+
+    // ⚠️ THE SHARED RULE (2026-10-17): the daily logger calls the same two
+    // functions, and a positive before day 7 waits for "Use it". The block
+    // below is the previous path, kept for revert.
+    if (result == kTtcOvPositive) {
+      ttcOvPositiveSaved(context, day);
+      return;
+    }
+    if (wasPositive && prevLh == cd) {
+      ttcOvPositiveCleared(context, day);
+      return;
+    }
 
     void undo() {
       ttcOvSetResult(day, prevChip);
