@@ -92,10 +92,12 @@ void main() {
         'lib/screens/prepare/prepare_hub_screen.dart',
         'lib/screens/post_pregnancy/explore_drawer.dart',
         'lib/screens/post_pregnancy/my_bookings_screen.dart',
-        'lib/screens/ttc/ttc_more_tab.dart',
+        // TTC comes through the shared opener (ttc_shell_test, 2026-10-17).
+        'lib/screens/move/pv_move_hub.dart',
       ]) {
         expect(_live(f), contains('YogaHomeScreen('), reason: f);
       }
+      expect(_live('lib/screens/ttc/ttc_more_tab.dart'), contains('pvMoveHub('));
     });
 
     test('the retired month-tab screen is pushed from nowhere', () {

@@ -107,7 +107,10 @@ import 'ttc_strings.dart' show TtcPartnerMode;
 import 'ttc_tab_root_header.dart';
 import 'ttc_tools_screen.dart' show ttcMovedToMoreById;
 import 'ttc_common.dart' show ttcTitleInk, ttcSectionHeadingStyle;
-import '../post_pregnancy/yoga_home_screen.dart';
+// TTC imports nothing from another stage's screens (ttc_shell_test), so the
+// shared hub comes through screens/move (2026-10-17). Kept for revert:
+// import '../post_pregnancy/yoga_home_screen.dart';
+import '../move/pv_move_hub.dart';
 
 /// The page's title. The bar's pill says the same word.
 const String kTtcMoreTitle = 'More';
@@ -427,7 +430,7 @@ List<TtcMoreSection> ttcMoreSections({required bool partner}) {
           art: ttcArtTab(TtcTabMark.lotus),
           title: 'Yoga & fitness',
           line: "Today's practice, and classes with a teacher",
-          open: (c) => _push(c, const YogaHomeScreen(backLabel: 'More'), 'move'),
+          open: (c) => _push(c, pvMoveHub(backLabel: 'More'), 'move'),
         ),
       ],
     ),
