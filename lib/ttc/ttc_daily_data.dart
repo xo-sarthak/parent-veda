@@ -958,6 +958,12 @@ const List<TtcMyth> ttcMyths = [
 /// Action". Five minutes, exactly like Garbh Sanskar, different purpose.)
 enum TtcRitualPart { reflection, breath, conversation, gratitude, action }
 
+/// The parts the couple does TOGETHER, so either partner's tick or un-tick
+/// counts for both (the user, 2026-10-17). "Today's conversation" is "one
+/// question, to ask each other"; the other four are each person's own, and
+/// one partner's breath is not the other's. Read by `TtcRitualStore`.
+const Set<TtcRitualPart> kTtcSharedRitualParts = {TtcRitualPart.conversation};
+
 extension TtcRitualPartCopy on TtcRitualPart {
   String title(bool hi) {
     switch (this) {

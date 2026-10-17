@@ -25,6 +25,7 @@ import '../services/remote/supabase_repo.dart';
 // (2026-09-28). The two stores import each other, which Dart allows; the
 // questions store reads the visits' dates, this one reads the counts.
 import 'ttc_doctor_questions_store.dart' show TtcDoctorQuestionsStore;
+import 'ttc_row_merge.dart';
 import 'ttc_sync.dart';
 
 // =============================================================================
@@ -183,10 +184,22 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
 
   static const _key = 'ttc_records';
 
+  /// Edit times, removals, owners and what is waiting to upload (0098).
+  static const _bookKey = 'ttc_records_sync';
+  final TtcRowBook _book = TtcRowBook();
+
   final List<TtcRecord> _items = [];
   bool _loaded = false;
 
   bool get isLoaded => _loaded;
+
+  /// Results the cloud has not confirmed: the sign-out sheet and Settings
+  /// read this through `SyncRegistry.hasPendingChanges`.
+  @override
+  bool get hasPendingPush => _book.dirty.isNotEmpty;
+
+  @visibleForTesting
+  TtcRowBook get bookForTest => _book;
 
   /// Newest result first - how a folder of reports is actually read.
   List<TtcRecord> get records {
@@ -227,6 +240,7 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
       forPartner: forPartner,
     );
     _items.add(r);
+    _book.touch(r.id);
     _persist();
     notifyListeners();
     return r;
@@ -245,14 +259,20 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     return _lastStamp;
   }
 
+  /// ⚠️ A SOFT DELETE SINCE 0098 (2026-10-17). The hard delete below was one
+  /// call that could miss (offline, racing an upload), and the next pull then
+  /// brought the result back. Now the removal is a row with a time, uploaded
+  /// like any edit, so every phone takes it and an older copy cannot undo it.
   void remove(String id) {
-    final before = _items.length;
-    _items.removeWhere((e) => e.id == id);
-    if (_items.length == before) return;
+    final i = _items.indexWhere((e) => e.id == id);
+    if (i < 0) return;
+    final gone = _items.removeAt(i);
+    _book.remove(id, _cloudColumns(gone));
     _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      SupabaseRepo.delete('ttc_records', id).catchError((_) {});
-    }
+    // Kept for revert (2026-10-17):
+    //   if (SupabaseRepo.isLoggedIn) {
+    //     SupabaseRepo.delete('ttc_records', id).catchError((_) {});
+    //   }
     notifyListeners();
   }
 
@@ -270,11 +290,16 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
   /// snackbar and tap Undo make that window small, and the next sync pushes
   /// the local row again anyway, because local is the source of truth here.
   /// That second push is what makes it safe rather than lucky.
+  ///
+  /// ⚠️ SUPERSEDED 2026-10-17 (0098): there is no delete request to race any
+  /// more. The removal and the Undo are two changes to one row, each with a
+  /// time, and the Undo is newer, so it wins on every phone.
   void restore(Iterable<TtcRecord> rows) {
     var changed = false;
     for (final r in rows) {
       if (_items.any((e) => e.id == r.id)) continue;
       _items.add(r);
+      _book.touch(r.id);
       changed = true;
     }
     if (!changed) return;
@@ -304,6 +329,7 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     final i = _items.indexWhere((e) => e.id == updated.id);
     if (i < 0) return;
     _items[i] = updated;
+    _book.touch(updated.id);
     _persist();
     notifyListeners();
   }
@@ -315,14 +341,72 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
   @visibleForTesting
   void resetForTest() {
     _items.clear();
+    _book.clear();
     _loaded = true;
     notifyListeners();
   }
 
   // ---- cloud ----------------------------------------------------------------
 
+  /// The row's own columns, without the owner or the two times. Nulls are
+  /// sent, not left out, so clearing a note on one phone clears it everywhere.
+  static Map<String, dynamic> _cloudColumns(TtcRecord r) => {
+        'test_id': r.testId,
+        'label': r.label,
+        'value': r.value,
+        'unit': r.unit,
+        'taken_on': TtcSyncUtil.date(r.takenOn),
+        'note': r.note,
+        'for_partner': r.forPartner,
+      };
+
+  // ⚠️ NEWER WINS, BOTH WAYS (2026-10-17, 0098). The union pull kept
+  // whatever this phone had, so an edit made on the other phone never
+  // arrived and a removal made there came back from here. Kept for revert
+  // as `_pullUnionKept`.
   @override
   Future<void> pullFromCloud() async {
+    final rows = await SupabaseRepo.fetchShared('ttc_records',
+        orderBy: 'taken_on', ascending: true);
+    applyCloudRows(rows);
+  }
+
+  /// The merge, network-free so a test can hand it rows.
+  @visibleForTesting
+  void applyCloudRows(List<Map<String, dynamic>> rows) {
+    for (final row in _book.merge(_items.map((e) => e.id), rows)) {
+      final id = row['id'] as String;
+      final i = _items.indexWhere((e) => e.id == id);
+      if (_book.removed.containsKey(id)) {
+        if (i >= 0) _items.removeAt(i);
+        continue;
+      }
+      final on = TtcSyncUtil.parseDate(row['taken_on']);
+      if (on == null) continue;
+      final r = TtcRecord(
+        id: id,
+        testId: row['test_id'] as String?,
+        label: (row['label'] as String?) ?? '',
+        value: (row['value'] as String?) ?? '',
+        unit: (row['unit'] as String?) ?? '',
+        takenOn: on,
+        note: row['note'] as String?,
+        forPartner: row['for_partner'] == true,
+        // Local-only (see `attachments`): the cloud copy never carries them,
+        // so taking it must not drop the files on this phone.
+        attachments: i >= 0 ? _items[i].attachments : const [],
+      );
+      if (i >= 0) {
+        _items[i] = r;
+      } else {
+        _items.add(r);
+      }
+    }
+  }
+
+  // Kept for revert (2026-10-17): the union pull.
+  // ignore: unused_element
+  Future<void> _pullUnionKept() async {
     final rows = await SupabaseRepo.fetchShared('ttc_records',
         orderBy: 'taken_on', ascending: true);
     for (final row in rows) {
@@ -342,8 +426,45 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     }
   }
 
+  /// Uploads only what is waiting, each row confirmed (2026-10-17, 0098).
+  ///
+  /// ⚠️ THE OWNER GOES BACK UNCHANGED. The old push below wrote
+  /// `user_id: <me>` on every row, the partner's included, so an upsert by id
+  /// turned his result into hers. A row pulled from the cloud keeps the
+  /// cloud's `user_id`; only a row made on this phone takes ours.
   @override
   Future<void> pushToCloud() async {
+    final uid = SupabaseRepo.userId;
+    if (uid == null) return;
+    for (final id in List.of(_book.dirty)) {
+      final live = _items.where((e) => e.id == id).firstOrNull;
+      final cols = live != null ? _cloudColumns(live) : _book.removedRows[id];
+      if (cols == null) {
+        _book.dirty.remove(id);
+        continue;
+      }
+      final sent = _book.stamps[id] ??=
+          DateTime.now().toUtc().millisecondsSinceEpoch;
+      final t = _book.times(id);
+      final ok = await TtcSyncUtil.upsertConfirmed(
+        'ttc_records',
+        {
+          ...cols,
+          'id': id,
+          'user_id': _book.owners[id] ?? uid,
+          'updated_at': t.updatedAt,
+          'removed_at': live == null ? t.removedAt : null,
+        },
+        onConflict: 'id',
+      );
+      _book.confirmed(id, ok: ok, sent: sent);
+    }
+    await _persist();
+  }
+
+  // Kept for revert (2026-10-17): every row, every time, as ours.
+  // ignore: unused_element
+  Future<void> _pushAllKept() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
     await TtcSyncUtil.upsertAll(
@@ -384,6 +505,8 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
               }
             })
             .whereType<TtcRecord>());
+      final book = p.getString(_bookKey);
+      if (book != null) _book.loadJson(jsonDecode(book));
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
@@ -395,6 +518,7 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
       final p = await SharedPreferences.getInstance();
       await p.setStringList(
           _key, _items.map((e) => jsonEncode(e.toJson())).toList());
+      await p.setString(_bookKey, jsonEncode(_book.toJson()));
     } catch (_) {/* best-effort */}
   }
 }
@@ -598,10 +722,20 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
 
   static const _key = 'ttc_appointments';
 
+  /// Edit times, removals, owners and what is waiting to upload (0098).
+  static const _bookKey = 'ttc_appointments_sync';
+  final TtcRowBook _book = TtcRowBook();
+
   final List<TtcAppointment> _items = [];
   bool _loaded = false;
 
   bool get isLoaded => _loaded;
+
+  @override
+  bool get hasPendingPush => _book.dirty.isNotEmpty;
+
+  @visibleForTesting
+  TtcRowBook get bookForTest => _book;
 
   /// Soonest first - an appointments list is read forwards, not backwards.
   List<TtcAppointment> get all {
@@ -647,6 +781,7 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
       remindEveningBefore: remindEveningBefore,
     ));
     _items.add(a);
+    _book.touch(a.id);
     _persist();
     _arm(a);
     // A new visit can take unticked questions from the one after it.
@@ -667,6 +802,7 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     if (i < 0) return;
     final planned = _withReminderPlan(updated, before: _items[i]);
     _items[i] = planned;
+    _book.touch(planned.id);
     _persist();
     _arm(planned);
     rearmReminders(except: planned.id);
@@ -801,17 +937,21 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     }
   }
 
+  /// A soft delete since 0098 (2026-10-17), for the reason on
+  /// `TtcRecordsStore.remove`.
   void remove(String id) {
-    final before = _items.length;
-    _items.removeWhere((e) => e.id == id);
-    if (_items.length == before) return;
+    final i = _items.indexWhere((e) => e.id == id);
+    if (i < 0) return;
+    final gone = _items.removeAt(i);
+    _book.remove(id, _cloudColumns(gone));
     // Its unticked questions roll to the next visit, whose count changes.
     rearmReminders();
     cancelPhone(ttcAppointmentReminderId(id)).catchError((_) {});
     _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      SupabaseRepo.delete('ttc_appointments', id).catchError((_) {});
-    }
+    // Kept for revert (2026-10-17):
+    //   if (SupabaseRepo.isLoggedIn) {
+    //     SupabaseRepo.delete('ttc_appointments', id).catchError((_) {});
+    //   }
     notifyListeners();
   }
 
@@ -826,6 +966,7 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
   void restore(TtcAppointment a) {
     if (_items.any((e) => e.id == a.id)) return;
     _items.add(a);
+    _book.touch(a.id);
     _persist();
     _arm(a);
     rearmReminders(except: a.id);
@@ -839,14 +980,75 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
   @visibleForTesting
   void resetForTest() {
     _items.clear();
+    _book.clear();
     _loaded = true;
     notifyListeners();
   }
 
   // ---- cloud ----------------------------------------------------------------
 
+  /// The row's own columns, without the owner or the two times.
+  static Map<String, dynamic> _cloudColumns(TtcAppointment a) => {
+        'title': a.title,
+        'with_whom': a.withWhom,
+        'starts_utc': SupabaseRepo.dbTime(a.startsUtc),
+        'note': a.note,
+      };
+
+  // Newer wins, both ways (2026-10-17, 0098), as on the records.
   @override
   Future<void> pullFromCloud() async {
+    final rows = await SupabaseRepo.fetchShared('ttc_appointments',
+        orderBy: 'starts_utc', ascending: true);
+    applyCloudRows(rows);
+  }
+
+  /// The merge, network-free so a test can hand it rows.
+  ///
+  /// The reminder is this phone's (see `remindEveningBefore`), so taking the
+  /// cloud's copy keeps it. A visit the other phone moved has its reminder
+  /// worked out again; one it removed has its reminder cancelled here.
+  @visibleForTesting
+  void applyCloudRows(List<Map<String, dynamic>> rows) {
+    final taken = _book.merge(_items.map((e) => e.id), rows);
+    for (final row in taken) {
+      final id = row['id'] as String;
+      final i = _items.indexWhere((e) => e.id == id);
+      if (_book.removed.containsKey(id)) {
+        if (i >= 0) {
+          _items.removeAt(i);
+          cancelPhone(ttcAppointmentReminderId(id)).catchError((_) {});
+        }
+        continue;
+      }
+      final at = DateTime.tryParse(row['starts_utc']?.toString() ?? '');
+      if (at == null) continue;
+      final before = i >= 0 ? _items[i] : null;
+      final a = _withReminderPlan(
+        TtcAppointment(
+          id: id,
+          title: (row['title'] as String?) ?? '',
+          withWhom: (row['with_whom'] as String?) ?? '',
+          startsUtc: at.toUtc(),
+          note: row['note'] as String?,
+          remindEveningBefore: before?.remindEveningBefore ?? false,
+          remindAtUtc: before?.remindAtUtc,
+        ),
+        before: before,
+      );
+      if (i >= 0) {
+        _items[i] = a;
+      } else {
+        _items.add(a);
+      }
+      _arm(a);
+    }
+    if (taken.isNotEmpty) rearmReminders();
+  }
+
+  // Kept for revert (2026-10-17): the union pull.
+  // ignore: unused_element
+  Future<void> _pullUnionKept() async {
     final rows = await SupabaseRepo.fetchShared('ttc_appointments',
         orderBy: 'starts_utc', ascending: true);
     for (final row in rows) {
@@ -863,8 +1065,41 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     }
   }
 
+  /// Only what is waiting, confirmed, owner unchanged (2026-10-17, 0098),
+  /// as on the records.
   @override
   Future<void> pushToCloud() async {
+    final uid = SupabaseRepo.userId;
+    if (uid == null) return;
+    for (final id in List.of(_book.dirty)) {
+      final live = _items.where((e) => e.id == id).firstOrNull;
+      final cols = live != null ? _cloudColumns(live) : _book.removedRows[id];
+      if (cols == null) {
+        _book.dirty.remove(id);
+        continue;
+      }
+      final sent = _book.stamps[id] ??=
+          DateTime.now().toUtc().millisecondsSinceEpoch;
+      final t = _book.times(id);
+      final ok = await TtcSyncUtil.upsertConfirmed(
+        'ttc_appointments',
+        {
+          ...cols,
+          'id': id,
+          'user_id': _book.owners[id] ?? uid,
+          'updated_at': t.updatedAt,
+          'removed_at': live == null ? t.removedAt : null,
+        },
+        onConflict: 'id',
+      );
+      _book.confirmed(id, ok: ok, sent: sent);
+    }
+    await _persist();
+  }
+
+  // Kept for revert (2026-10-17): every row, every time, as ours.
+  // ignore: unused_element
+  Future<void> _pushAllKept() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
     await TtcSyncUtil.upsertAll(
@@ -902,6 +1137,8 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
               }
             })
             .whereType<TtcAppointment>());
+      final book = p.getString(_bookKey);
+      if (book != null) _book.loadJson(jsonDecode(book));
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
@@ -913,6 +1150,7 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
       final p = await SharedPreferences.getInstance();
       await p.setStringList(
           _key, _items.map((e) => jsonEncode(e.toJson())).toList());
+      await p.setString(_bookKey, jsonEncode(_book.toJson()));
     } catch (_) {/* best-effort */}
   }
 }

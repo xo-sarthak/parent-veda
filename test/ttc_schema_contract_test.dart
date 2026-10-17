@@ -56,17 +56,22 @@ const Map<String, List<String>> written = {
     'id', 'user_id', 'for_partner', 'name', 'dose',
   ],
   TtcTables.supplementTaken: ['user_id', 'supplement_id', 'taken_on'],
-  TtcTables.ritual: ['user_id', 'part', 'completed_on'],
+  // 0098 (2026-10-17): the merge clock and the soft delete on the ritual,
+  // the records and the appointments. Kept for revert: without the two times.
+  TtcTables.ritual: [
+    'user_id', 'part', 'completed_on', 'updated_at', 'removed_at',
+  ],
   TtcTables.timeline: [
     'id', 'user_id', 'stage', 'kind', 'happened_on', 'title_en', 'title_hi',
     'detail_en', 'detail_hi',
   ],
   'ttc_records': [
     'id', 'user_id', 'test_id', 'label', 'value', 'unit', 'taken_on', 'note',
-    'for_partner',
+    'for_partner', 'updated_at', 'removed_at',
   ],
   'ttc_appointments': [
-    'id', 'user_id', 'title', 'with_whom', 'starts_utc', 'note',
+    'id', 'user_id', 'title', 'with_whom', 'starts_utc', 'note', 'updated_at',
+    'removed_at',
   ],
   // 0092, 2026-09-28: the questions for the doctor left the journal for a
   // table of their own (TtcDoctorQuestionsStore.pushToCloud).
@@ -121,10 +126,11 @@ void main() {
   ].join('\n');
 
   /// Columns a later migration adds with `alter table ... add column`
-  /// (0097, 2026-10-17), per table.
-  final altered = File('supabase/migrations/0097_ttc_cycle_sync_clock.sql')
-      .readAsStringSync()
-      .replaceAll('\r\n', '\n');
+  /// (0097 and 0098, 2026-10-17), per table.
+  final altered = [
+    File('supabase/migrations/0097_ttc_cycle_sync_clock.sql'),
+    File('supabase/migrations/0098_ttc_records_ritual_sync_clock.sql'),
+  ].map((f) => f.readAsStringSync()).join('\n').replaceAll('\r\n', '\n');
   bool addedLater(String table, String column) => RegExp(
           'alter table public\\.$table\\s+add column if not exists '
           '$column\\s')

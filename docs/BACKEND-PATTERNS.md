@@ -2899,6 +2899,42 @@ its syncer, and `LocalOwner.wipeThisPhone` runs them all after the wipe.
 - A timestamp is only a clock if it is stamped when the thing happened, not when it was written down.
 - In a local-first app, the local cache belongs to someone. Write down who, and check it before you upload.
 
+### 16ii-b. The same pattern on rows two people write (0098, 2026-10-17)
+
+The records, the appointments and the daily ritual got the same clock and soft delete (migration 0098). Their tables
+are **couple-scoped**: RLS says "me *or my partner*", so either phone may write a row. That changes two things.
+
+**1. Keep the owner on the way back up.** The old push built every row as `{..., 'user_id': <me>}`, including rows
+it had pulled from the partner. An upsert by `id` updates every column it is given, `user_id` included, so his
+semen analysis quietly became hers. RLS didn't stop it, because "me" passes the check. The fix is to remember the
+cloud's `user_id` per id (`TtcRowBook.owners`) and send that back. Only a row this phone created takes our id.
+
+> General fact: **an upsert is a full write of the columns you send.** Any column you fill "for convenience" (owner,
+> created_at, a default) overwrites what the row already said. Send only what this side actually owns.
+
+**2. Decide per kind of data what "two people disagree" means.** The user decided two cases:
+
+| Data | Rule | How |
+|---|---|---|
+| A result, a visit | Latest edit wins, whole row | One row, one id; `ttcMergePlan` on `updated_at` |
+| A shared ritual part ("Today's conversation") | The couple's: the newest tick or un-tick by either wins | Each person writes **only their own row** `(user_id, part, day)`; the screen takes the newest row across both |
+| An individual ritual part (breath, gratitude…) | Each person's own | Her rows only; his are ignored for display |
+
+The ritual's trick is worth naming: **two writers never share one row.** Her un-tick of a part he ticked isn't a
+write to his row (which would mean two phones fighting over one record). It's a newer row of *hers*, with
+`removed_at`, and the reader resolves the two. A conflict that the data model makes impossible needs no conflict
+resolution. The cost: the reader must look at both people's rows to answer "is it done?", and the streak (which
+counts the couple) reads a different question than the tick (which counts her).
+
+**Shared bookkeeping.** `TtcRowBook` (`lib/ttc/ttc_row_merge.dart`) holds what a synced table needs beside its rows:
+- edit stamps;
+- removals, plus the removed row's columns, so the upload can still fill NOT NULL columns;
+- owners;
+- the waiting set.
+
+Its `merge()` is the newer-wins pull. Each store keeps its rows and applies what `merge()` says to take. The pulls
+are exposed as `applyCloudRows(rows)` so `test/ttc_records_ritual_merge_test.dart` runs without a network.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

@@ -28,6 +28,10 @@ Read first:
   - stores that register by hand call `SyncRegistry.registerReset`;
   - `test/sync_reset_coverage_test.dart` guards it.
 - **Settings > ACCOUNT > "Your data"** shows whether changes are waiting.
+- **Records, appointments and the ritual (step 1, 2026-10-17, migration 0098).** Same pattern, on `TtcRowBook`.
+  Couple-scoped rows keep their owner on push (the old push rewrote the partner's rows as hers). The ritual's
+  shared part is the couple's and the other four are each person's. All three feed the pending-changes check. See
+  BACKEND-PATTERNS §16ii-b and `docs/BACKEND-SYNC-LOG.md` step 1.
 
 ---
 
@@ -54,10 +58,10 @@ reappearing after a reinstall).
 
 | Store (file) | Table | Today | Note |
 |---|---|---|---|
-| `TtcRecordsStore` (`lib/ttc/ttc_records_store.dart` ~163) | `ttc_records` (0042) | union by id, hard `delete` (~254) | test results she typed in; an offline delete returns |
-| `TtcAppointmentsStore` (same file ~587) | `ttc_appointments` | union, hard delete (~809); Undo re-adds the same id (~821) | doctor visits |
-| `TtcSupplementsStore` (`lib/ttc/ttc_supplements_store.dart`) | `ttc_supplements`, `ttc_supplement_taken` | union, hard delete | couple-scoped (0042): her partner can write too, so newer-wins needs care (see §6) |
-| `TtcRitualStore` (`lib/ttc/ttc_ritual_store.dart`) | `ttc_ritual` | union, `deleteMatch` | an un-ticked ritual part comes back |
+| ~~`TtcRecordsStore`~~ | `ttc_records` | **DONE 2026-10-17 (0098)** | see §0 |
+| ~~`TtcAppointmentsStore`~~ | `ttc_appointments` | **DONE 2026-10-17 (0098)** | see §0 |
+| `TtcSupplementsStore` (`lib/ttc/ttc_supplements_store.dart`) | `ttc_supplements`, `ttc_supplement_taken` | union, hard delete | couple-scoped (0042): her partner can write too, so newer-wins needs care (see §6). **Check its push for the owner flip too** (see §16ii-b) |
+| ~~`TtcRitualStore`~~ | `ttc_ritual` | **DONE 2026-10-17 (0098)** | see §0 |
 | `FamilyTimeline` (`lib/services/family_timeline.dart` ~253) | `journey_timeline` | `putIfAbsent` | 0041 grants no `update` on this table; a soft delete needs an update grant or a policy change |
 
 None of these tables has `updated_at` except where noted; all need `removed_at`.
@@ -198,6 +202,13 @@ trade-offs change:
 Decide per table. Most Parenting logs are append-only, so row-level is enough. Settings-like rows (the child
 profile, emergency cards) may want per-field.
 
+**Decided so far (the user, 2026-10-17):**
+- `ttc_records` and `ttc_appointments`: row-level, latest edit wins.
+- `ttc_ritual`: shared parts (`conversation`) are the couple's, so the newest row across both wins. Individual
+  parts are each person's own. Each phone writes only its own rows (BACKEND-PATTERNS §16ii-b).
+- **Every couple-scoped store must keep the row's owner on push.** Check this before converting any `pp_*` or
+  supplements store; the flip is silent.
+
 ---
 
 ## 7. Smaller items found on the way
@@ -222,8 +233,9 @@ left alone for now so two sessions don't clash:
   delete-account. `PvToast._update` dropped an update made before the notice's host had mounted, so work that failed
   at once (a refused delete, an offline call) left the "working" spinner on screen forever. The update is now kept in
   `_current` and the host reads it when it mounts (`lib/widgets/pv_toast.dart`).
-- `test/ttc_no_repetition_test.dart`: four "her home" cases. The home's "New to trying?" rail and a reading row open
-  the same read ("The three months before").
+- ~~`test/ttc_no_repetition_test.dart`~~ **Passes as of 2026-10-17 evening** (after `79922cf`). It was: four
+  "her home" cases where the home's "New to trying?" rail and a reading row opened the same read.
+- ~~`test/ttc_shell_test.dart` yoga import~~ The import is now commented out (`6597c69`); not re-run here.
 - `test/ttc_reader_test.dart`: "save is reachable and sticks". The save icon is found twice.
 - `test/ttc_shell_test.dart`: `ttc_more_tab.dart` imports `../post_pregnancy/yoga_home_screen.dart` (the yoga
   commit `187919a`).
@@ -234,9 +246,9 @@ left alone for now so two sessions don't clash:
 
 ## Suggested order
 
-1. **§1 TTC tables** (records, appointments, ritual), one migration. Then **supplements and the timeline**, after the
-   §6 decision.
-2. **§3 dirty sets** for the same stores, so the sign-out warning and the Settings row tell the truth for them.
+1. ~~**§1 TTC tables** (records, appointments, ritual)~~ **DONE 2026-10-17 (0098), with their §3 waiting sets.**
+   Next: **supplements and the timeline**. The timeline needs an update grant first (0041 has none, on purpose).
+2. ~~**§3 dirty sets** for the same stores~~ done with step 1.
 3. **§2 push-before-pull on resume** for blob stores (small, app-wide), then per-item merge for the curated lists.
 4. **§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.
 5. **§1 Pregnancy tables**, one migration.
