@@ -42,7 +42,7 @@ import '../../data/prepare_data.dart' show kPrepOpeningSoon;
 import '../../services/app_nav.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
-import '../../theme/pv_fonts.dart';
+// import '../../theme/pv_fonts.dart'; // kept for revert: only the commented-out pill used it
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../../widgets/pv_feedback.dart';
 import '../calendar_screen.dart';
@@ -54,10 +54,11 @@ import '../doors/pv_door_router.dart' show openPvDoorSurface;
 import '../enterprise/employer_benefits_screen.dart';
 import '../journey_map_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../learn/pv_learn_screen.dart' show openPvLearn;
 import '../learn/pv_offering_screen.dart' show pvOpenOffering;
 import '../preg_week_screen.dart';
 import '../prepare/consultations_screen.dart';
-import '../prepare/prepare_hub_screen.dart';
+// import '../prepare/prepare_hub_screen.dart'; // kept for revert (2026-10-17)
 import '../brackets/hub/hub_intent_art.dart';
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_more_marks.dart'
@@ -126,9 +127,11 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
     }
   }
 
-  void _openPrepare() => _push(
-      'prepare',
-      () => PrepareHubScreen(lang: _c.language, backLabel: 'More'));
+  // Kept for revert (2026-10-17): the "All programmes and sessions" pill
+  // below is commented out, so nothing opens Prepare from here.
+  //   void _openPrepare() => _push(
+  //       'prepare',
+  //       () => PrepareHubScreen(lang: _c.language, backLabel: 'More'));
 
   /// ⚠️ TTC'S MARKS (2026-10-02, the user: match Tools and More to TTC's
   /// marks). The same objects the TTC More tab draws for the same rows:
@@ -257,6 +260,12 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
               'Courses and masterclasses',
               [for (final v in _courses.take(6)) _offeringRow(v, 240)],
               lead: 'Learn at your own pace, or live with an expert',
+              // Every course, now the pill below is gone (2026-10-17).
+              link: 'See all courses',
+              onLink: () {
+                pvCommitFeedback();
+                openPvLearn(context, stage: LifeStage.pregnancy);
+              },
               empty: 'Nothing open yet. New courses are added here as they open.',
             ),
 
@@ -266,6 +275,12 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
               'Groups',
               [for (final v in _groups.take(6)) _offeringRow(v, 160)],
               lead: 'A few weeks of live calls in a small group',
+              link: 'See all groups',
+              onLink: () {
+                pvCommitFeedback();
+                openPvLearn(context,
+                    stage: LifeStage.pregnancy, kind: PvLearnKind.cohort);
+              },
               empty: 'Nothing scheduled yet. Groups appear here when a date is set.',
             ),
 
@@ -328,33 +343,39 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
                   () => _push('invite', () => InviteFriendsScreen(controller: _c))),
             ]),
 
-            // ---- the whole of Prepare, unfiltered: one outlined pill ------------
-            //
-            // ⚠️ UNSCOPED ON PURPOSE. Yoga, birthing classes and the nutrition
-            // funnel have no section above; this row is their door.
-            Padding(
-              padding: const EdgeInsets.fromLTRB(kTtcTabRootGutter, 24, kTtcTabRootGutter, 0),
-              child: InkWell(
-                key: const ValueKey('preg_more_all_programmes'),
-                onTap: _openPrepare,
-                borderRadius: BorderRadius.circular(999),
-                child: Container(
-                  constraints: const BoxConstraints(minHeight: 48),
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: p.line, width: 1.2),
-                  ),
-                  child: Row(children: [
-                    Expanded(
-                      child: Text('All programmes and sessions',
-                          style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
-                    ),
-                    Icon(Icons.arrow_forward_rounded, size: 18, color: p.ink2),
-                  ]),
-                ),
-              ),
-            ),
+            // ---- "All programmes and sessions": COMMENTED OUT 2026-10-17 -------
+            // Kept for revert. Redundant: every tile on that page has its own
+            // door. Yoga is the Yoga & fitness door, birthing classes the
+            // Labour door, courses and groups the sections above (now with
+            // "See all"), and nutrition the Nutrition door and "Talk to a
+            // nutritionist". The page itself was the old Prepare UI.
+            // // ---- the whole of Prepare, unfiltered: one outlined pill ------------
+            // //
+            // // ⚠️ UNSCOPED ON PURPOSE. Yoga, birthing classes and the nutrition
+            // // funnel have no section above; this row is their door.
+            // Padding(
+            //   padding: const EdgeInsets.fromLTRB(kTtcTabRootGutter, 24, kTtcTabRootGutter, 0),
+            //   child: InkWell(
+            //     key: const ValueKey('preg_more_all_programmes'),
+            //     onTap: _openPrepare,
+            //     borderRadius: BorderRadius.circular(999),
+            //     child: Container(
+            //       constraints: const BoxConstraints(minHeight: 48),
+            //       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            //       decoration: BoxDecoration(
+            //         borderRadius: BorderRadius.circular(999),
+            //         border: Border.all(color: p.line, width: 1.2),
+            //       ),
+            //       child: Row(children: [
+            //         Expanded(
+            //           child: Text('All programmes and sessions',
+            //               style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+            //         ),
+            //         Icon(Icons.arrow_forward_rounded, size: 18, color: p.ink2),
+            //       ]),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

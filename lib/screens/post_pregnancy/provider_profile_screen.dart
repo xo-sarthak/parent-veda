@@ -265,7 +265,7 @@ class ProviderProfileScreen extends StatelessWidget {
                 const SizedBox(height: 28),
                 _pad(Text('Classes with ${_firstName(e)}', style: ppJakarta(18))),
                 const SizedBox(height: 4),
-                _pad(Text('Live and recorded sessions in Yoga & Classes.',
+                _pad(Text('Live and recorded sessions in Yoga & fitness.',
                     style: ppBody(12, color: ppMuted, h: 1.4))),
                 const SizedBox(height: 12),
                 for (var i = 0; i < yogaClasses.length; i++)

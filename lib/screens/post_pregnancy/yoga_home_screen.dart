@@ -44,7 +44,7 @@ import 'package:flutter/material.dart';
 import '../../data/garbh_data.dart' show garbhMonth;
 import '../../data/move/pv_move_catalog.dart';
 import '../../data/prepare_data.dart' show yogaSessionsForMonth;
-import '../../localization/app_language.dart';
+// import '../../localization/app_language.dart'; // kept for revert: only the old session push used it
 import '../../services/family_profile.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
@@ -59,12 +59,13 @@ import '../doors/pv_list_row.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_offering_screen.dart' show pvOpenOffering;
 import '../pregnancy/preg_tool_chrome.dart';
-import '../prepare/prepare_video_screen.dart';
+// import '../prepare/prepare_video_screen.dart'; // kept for revert (2026-10-17)
 import '../products/pv_store_chrome.dart'
     show PvChip, PvCommit, PvSecondary, PvSectionHead;
 import '../tools/kegel_care_screen.dart';
 import '../ttc/ttc_daily_tip_open.dart' show openTtcTipRead, ttcMovementAsRead;
 import '../v2/v2_palette.dart';
+import '../v2/v3_film_screen.dart';
 import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_common.dart';
 import 'pp_age_bands.dart' show ppDaysSinceBirth;
@@ -179,13 +180,31 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
         _open(i.yogaClass!);
       case PvMoveKind.session:
         final s = i.session!;
+        // 2026-10-17: a session opens the house film page, not the old
+        // striped Prepare player (the user found it on the phone walk).
+        // Kept for revert:
+        //   Navigator.of(context).push(
+        //     MaterialPageRoute<void>(
+        //       builder: (_) => PrepareVideoScreen(
+        //         lang: _preg?.language ?? AppLanguage.english,
+        //         title: s.title.now,
+        //         subtitle: '${s.duration.now} · ${s.focus.now}',
+        //         blurb: s.blurb.now,
+        //       ),
+        //     ),
+        //   );
+        final film = pvSessionFilm(s);
+        final now = _preg?.currentWeek;
         Navigator.of(context).push(
           MaterialPageRoute<void>(
-            builder: (_) => PrepareVideoScreen(
-              lang: _preg?.language ?? AppLanguage.english,
-              title: s.title.now,
-              subtitle: '${s.duration.now} · ${s.focus.now}',
-              blurb: s.blurb.now,
+            settings: const RouteSettings(name: 'move/session'),
+            builder: (_) => V3FilmScreen(
+              video: film,
+              week: now != null && film.matchesWeek(now) ? now : film.weekStart,
+              pregnancy: _preg,
+              // The saved-films list reads kVideos; a saved session would
+              // vanish from it.
+              canSave: false,
             ),
           ),
         );

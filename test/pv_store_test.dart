@@ -609,10 +609,19 @@ void main() {
       // ⚠️ MORE, SINCE 2026-09-29 (the structure pass): the pregnancy bar is
       // Today · Learn · Products · Tools · More, and Prepare is More › All
       // programmes and sessions. Was: tools_hub_screen.dart.
-      expect(
-        read('lib/screens/pregnancy/preg_more_screen.dart'),
-        contains('PrepareHubScreen('),
-      );
+      // 2026-10-17: More's "All programmes and sessions" pill is commented
+      // out (every tile has its own door). Kept for revert:
+      //   expect(
+      //     read('lib/screens/pregnancy/preg_more_screen.dart'),
+      //     contains('PrepareHubScreen('),
+      //   );
+      final more = read('lib/screens/pregnancy/preg_more_screen.dart')
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('//'))
+          .join('\n');
+      expect(more, isNot(contains('PrepareHubScreen(')));
+      expect(more, contains("link: 'See all courses'"));
+      expect(more, contains("link: 'See all groups'"));
     });
 
     test('parenting: the Products tab lands on the store with its bar', () {

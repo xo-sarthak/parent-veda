@@ -142,6 +142,12 @@ List<PpToolGroup> ppToolGroups() {
           words: ['medicine', 'chai', 'fasting']),
       PpTool('How have you been?', 'Two questions. No score, nothing saved.', 'pp_mood_check',
           IntentMark.cuppedHands, words: ['mood', 'sad', 'low', 'anxious']),
+      // Her own body after birth (2026-10-17: the user looked for Kegel Care
+      // here and it was only inside the yoga hub and a pelvic floor page).
+      PpTool('Kegel Care', 'Breathing first, then kegels after your check.', 'pp_kegel', IntentMark.spineMark,
+          words: ['kegel', 'pelvic floor', 'leak', 'exercise']),
+      PpTool('Yoga & fitness', 'Recovery classes, core and calm.', 'pp_yoga', IntentMark.lotusMark,
+          words: ['yoga', 'exercise', 'core', 'workout', 'postnatal']),
     ]),
     PpToolGroup('Plan and keep', 268, [
       PpTool('Baby names', '2,031 names, with meaning, origin and Devanagari.', 'pp_names', IntentMark.pageMark,

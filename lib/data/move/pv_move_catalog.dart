@@ -21,6 +21,8 @@
 import '../../screens/post_pregnancy/pp_yoga_data.dart';
 import '../../services/life_stage_store.dart';
 import '../../ttc/ttc_practice_data.dart';
+import '../../models/pv_video.dart';
+import '../garbh_data.dart' show garbhMonth;
 import '../prepare_data.dart';
 
 /// The chips of the hub's All view, in order. `fertility` takes the post-IVF
@@ -169,4 +171,23 @@ List<PvMoveItem> pvMoveFiltered({
             (i.stageLabel?.toLowerCase().contains(q) ?? false),
       )
       .toList(growable: false);
+}
+
+/// A month session as a film, so it opens the house film page
+/// (`V3FilmScreen`) like every other film (2026-10-17). Its weeks are the
+/// weeks of its pregnancy month, by the same [garbhMonth] the hub uses.
+PvVideo pvSessionFilm(YogaSession s) {
+  final weeks = [
+    for (var w = 1; w <= 40; w++)
+      if (garbhMonth(w) == s.month) w,
+  ];
+  return PvVideo(
+    id: s.id,
+    title: s.title,
+    reason: s.blurb,
+    duration: s.duration.en,
+    category: VideoCategory.skill,
+    weekStart: weeks.isEmpty ? 4 : weeks.first,
+    weekEnd: weeks.isEmpty ? 40 : weeks.last,
+  );
 }

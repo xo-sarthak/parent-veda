@@ -11,10 +11,14 @@
 
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:parentveda/data/move/pv_move_catalog.dart';
+import 'package:parentveda/data/garbh_data.dart' show garbhMonth;
 import 'package:parentveda/data/prepare_data.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_tools_tab.dart';
+import 'package:parentveda/screens/v2/v3_film_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_yoga_data.dart';
 import 'package:parentveda/ttc/ttc_mind_today.dart';
 import 'package:parentveda/ttc/ttc_phase.dart';
@@ -30,6 +34,55 @@ String _live(String p) => _src(p)
     .join('\n');
 
 void main() {
+  // The phone walk of 2026-10-17: a session opened the old Prepare player,
+  // More kept a redundant pill into old Prepare, and Kegel Care was missing
+  // from Parenting's Tools.
+  group('walk fixes', () {
+    test('a session opens the house film page, not the old player', () {
+      final hub = _live('lib/screens/post_pregnancy/yoga_home_screen.dart');
+      expect(hub, contains('V3FilmScreen('));
+      expect(hub, isNot(contains('PrepareVideoScreen(')));
+    });
+
+    test("a session's film spans exactly its pregnancy month", () {
+      for (final s in kYogaSessions) {
+        final f = pvSessionFilm(s);
+        expect(f.id, s.id);
+        expect(garbhMonth(f.weekStart), s.month, reason: s.id);
+        expect(garbhMonth(f.weekEnd), s.month, reason: s.id);
+        if (f.weekEnd < 40) {
+          expect(garbhMonth(f.weekEnd + 1), isNot(s.month), reason: s.id);
+        }
+      }
+    });
+
+    testWidgets('the film page opens with no pregnancy, and offers no save',
+        (t) async {
+      final f = pvSessionFilm(kYogaSessions.first);
+      await t.pumpWidget(MaterialApp(
+          home: V3FilmScreen(
+              video: f, week: f.weekStart, pregnancy: null, canSave: false)));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(t.takeException(), isNull);
+      expect(find.text(f.title.en), findsOneWidget);
+      expect(find.byIcon(Icons.bookmark_border_rounded), findsNothing);
+    });
+
+    test('Parenting Tools lists Kegel Care and Yoga & fitness', () {
+      final ids = [
+        for (final g in ppToolGroups())
+          for (final t in g.tools) t.surfaceId,
+      ];
+      expect(ids, containsAll(['pp_kegel', 'pp_yoga']));
+    });
+
+    test("Pregnancy More has no 'All programmes and sessions' pill", () {
+      final more = _live('lib/screens/pregnancy/preg_more_screen.dart');
+      expect(more, isNot(contains("ValueKey('preg_more_all_programmes')")));
+      expect(more, isNot(contains('PrepareHubScreen(')));
+    });
+  });
+
   group('wiring', () {
     test('every way in opens the hub', () {
       for (final f in [

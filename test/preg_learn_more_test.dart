@@ -195,7 +195,7 @@ void main() {
         'preg_more_read_watch',
         'preg_more_journey',
         'preg_more_benefits',
-        'preg_more_all_programmes',
+        // 'preg_more_all_programmes', // commented out 2026-10-17, kept for revert
       ];
       double? last;
       for (final k in keys) {

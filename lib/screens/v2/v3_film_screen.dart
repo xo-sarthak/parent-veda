@@ -61,14 +61,23 @@ class V3FilmScreen extends StatefulWidget {
       {super.key,
       required this.video,
       required this.week,
-      required this.pregnancy});
+      required this.pregnancy,
+      this.canSave = true});
 
   final PvVideo video;
 
   /// Her week, for the reads and films that fill the page. The film's own
   /// range is a span; this is the point in it she is at.
   final int week;
-  final PregnancyController pregnancy;
+  ///
+  /// Null when a film opens outside Pregnancy (a month session from the Yoga
+  /// & fitness hub's All view, 2026-10-17): the page then shows the film and
+  /// why it matters, and leaves out the reads, tool and films that need her.
+  final PregnancyController? pregnancy;
+
+  /// False for a film the saved-films list cannot show (it reads kVideos),
+  /// so a save is never one that vanishes.
+  final bool canSave;
 
   @override
   State<V3FilmScreen> createState() => _V3FilmScreenState();
@@ -102,13 +111,13 @@ class _V3FilmScreenState extends State<V3FilmScreen> {
 
   void _openRead(ReadItem item) => _push(
       item.hasCompanion
-          ? BookCompanionScreen(item: item, controller: widget.pregnancy)
-          : ReadReaderScreen(item: item, controller: widget.pregnancy),
+          ? BookCompanionScreen(item: item, controller: widget.pregnancy!)
+          : ReadReaderScreen(item: item, controller: widget.pregnancy!),
       'read/${item.id}');
 
   void _openTool(String surfaceId) {
     final s = screenForSurface(
-        surfaceId, widget.pregnancy, widget.pregnancy.language);
+        surfaceId, widget.pregnancy!, widget.pregnancy!.language);
     if (s == null) return; // `_toolFor` only names ids the router serves
     _push(s, surfaceId);
   }
@@ -120,9 +129,14 @@ class _V3FilmScreenState extends State<V3FilmScreen> {
           backgroundColor: Colors.black,
           body: _player(V2PaletteStore.instance.current));
     }
-    final tool = _toolFor(v.id);
-    final reads = v3ReadsForFilm(v, widget.week);
-    final more = v3ShelfVideosFor(widget.week, excludeId: v.id, take: 4);
+    // No pregnancy (opened from another stage): the film and its why only.
+    final withHer = widget.pregnancy != null;
+    final tool = withHer ? _toolFor(v.id) : null;
+    final reads =
+        withHer ? v3ReadsForFilm(v, widget.week) : const <ReadItem>[];
+    final more = withHer
+        ? v3ShelfVideosFor(widget.week, excludeId: v.id, take: 4)
+        : const <PvVideo>[];
 
     return ListenableBuilder(
       listenable:
@@ -167,6 +181,7 @@ class _V3FilmScreenState extends State<V3FilmScreen> {
                                         color: p.ink1)),
                               ),
                               const SizedBox(width: 10),
+                              if (widget.canSave)
                               IconButton(
                                 tooltip: saved ? 'Saved' : 'Save',
                                 onPressed: () =>

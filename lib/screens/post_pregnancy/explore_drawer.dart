@@ -182,7 +182,8 @@ List<ExploreEntry> ppExploreEntries() => [
     //     'Live cohorts, courses & masterclasses.', const LearningHomeScreen()),
     ExploreEntry(Icons.school_outlined, 'Courses & Masterclasses',
         'Expert-led, and vetted for your stage.', const CoursesExploreScreen()),
-    ExploreEntry(Icons.self_improvement_outlined, 'Yoga & Classes',
+    // 2026-10-17: one name for the one hub. Was 'Yoga & Classes'.
+    ExploreEntry(Icons.self_improvement_outlined, 'Yoga & fitness',
         'Live & recorded classes for every stage.', const YogaHomeScreen()),
     ExploreEntry(Icons.event_available_outlined, 'My Bookings',
         'Your classes & sessions, all in one place.', const MyBookingsScreen()),
