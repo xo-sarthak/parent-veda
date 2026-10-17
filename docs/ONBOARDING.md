@@ -1,4 +1,133 @@
-# Onboarding — the Mobbin audit, the decision, and the brief
+# Onboarding: the one file
+
+**V3 is built (2026-10-17).** Designed as a clickable prototype first and approved by the user before any
+code changed: https://claude.ai/artifact/UPsKkkZ8Wo8x3F1XuDQgpt (local copy:
+`C:\Projects\parentveda-onboarding-preview\index.html`). It has not been walked on a phone yet.
+
+This file replaces `ONBOARDING-AUDIT.md`, `ONBOARDING-V2.md` and `design-prompts/ONBOARDING-DESIGN-PROMPT.md`.
+The audit and V2 are kept below as History A and B, word for word. The design prompt is deleted: it
+briefed the old `AuthFlowScreen`, which was replaced on 2026-09-22.
+
+Code: `lib/screens/auth/onboarding/` (`onboarding_flow.dart`, `onboarding_questions.dart`,
+`onboarding_chrome.dart`, `onboarding_art.dart`). Tests: `test/onboarding_flow_test.dart`,
+`test/onboarding_schema_contract_test.dart`, `test/family_profile_bucket_test.dart`.
+
+---
+
+## 1. Why V3
+
+The user, 2026-10-17: "our onboarding sucks… specifically the data user has provided. I don't think we are
+using it", and "users should not feel like they wasted their time". Reading the code agreed:
+
+- Several answers were saved and never read: regular periods, folic acid, the skilling interests and time,
+  the care role, and the reminders switch (STILL-OPEN §79.4).
+- **Bug B1:** the parenting feeding and sleep answers were wiped when the child was created. They were written
+  to single-value fields, the per-child bucket stored only the sets, and `addChild` loaded an empty bucket for
+  the new child. Fixed in `family_profile.dart` (`setFeeding`/`setSleep` fill the set; the `'_none'` bucket
+  is carried onto the first child).
+- Trying asked "how long have you been trying" twice (here and in the TTC intro) with different options, had
+  no reveal, and asked a couple who had not started how long they had been trying.
+- The due date's source never reached the cloud, so a new phone treated a clinic's date as our estimate.
+- A father without her code had no way in.
+
+**The rule V3 keeps:** every answer has a reader, and the reveal shows each one coming back.
+
+## 2. The flow
+
+- **Shared:** Welcome → Privacy → Who (Mother / Partner) → [Partner: "I have her code" → the old pairing
+  screen, or "Set up on my own"] → Stage → Name → Hello.
+- **Trying (her):** Where are you (Getting ready + month / On our own / With a clinic + kind) → Last period →
+  Regular? → Promise → How long + her age band (not for Getting ready) → Folic acid → Building → Reveal (one
+  per path) → Account → Reach.
+- **Pregnancy:** Dates (4 ways in; scan weeks; embryo day; twins) → Week → First pregnancy? (+ optional
+  "gentle") → Priorities → Promise → Diet → Building → Reveal → Account → Reach.
+- **Parenting:** Child (+ twins, + another child) → Week → Feeding → Sleep → Promise → Priorities →
+  Building → Reveal → Account → Reach.
+- **Skilling:** Child (age + optional birthday) → Interests → Time → Building → Reveal → Account → Reach.
+- **The partner on his own. The rule: never ask him about her body.** No period, cycle, loss history, birth
+  mode or diet.
+  - Trying: Where are you two → How long + her age → Promise → About him (his age, his habits) → What helps
+    him → Building → his Reveal → Account → **Link with her** → Reach.
+  - Pregnancy: the date page without "Last period" → Week → First baby? (his) → Promise → What helps him → …
+    → Link with her → Reach.
+  - Parenting: her child screen without the birth-mode and role rows.
+- **The TTC intro is the film only.** Its language, period, how-long and path steps are commented out, kept
+  for revert. **No language question anywhere (the user: "NO LANGUAGE QUES! It's only English").**
+
+## 3. Every answer, where it is saved, and what reads it
+
+| Answer | Saved | Read by |
+|---|---|---|
+| Where are you (trying) | `ttc_journeys.path` (on our own / clinic kind); Getting ready = `ttc_duration=planning` + `TtcReadyPlanStore.plannedStart` | `TtcStore.journeyStart`, the Ready-to-Try plan, You, the reveal |
+| Last period | `CycleStore.logPeriodStart` | the cycle engine; the reveal's window comes from the same engine (`_ttcWindow`) |
+| Regular? = no | `family_profile.other.ttc_cycles` | **New reader:** `TtcJourneyState.statedIrregular`, irregular until three cycles are logged |
+| How long | `other.ttc_duration` + `TtcStore.setJourneyStart` (0/3/9/18 months, the intro's bands) | seek-help timing |
+| Her age band | `TtcFertilityHelpStore.ageBand` | every TTC tool that asks; the give-back and reveal |
+| Folic acid | `TtcSupplementsStore` ("Folic acid", ticked when yes) | her supplements list; the plan's prefill |
+| Dates (pregnancy) | `profiles.due_date`, **`due_date_source`, `dating_date` (0102)** | the week; clinic-owned dates are never recalculated, now on a new phone too |
+| Twins (pregnancy) | `ReadyBirthContextStore.setTwins` | `FamilyProfileStore.expectingTwins` |
+| Gentle | `family_profile.gentle` (blob) | **New readers:** no "weeks to go" on the pregnancy hero; loss reads out of the home feed (`gentleHides`). Not sent to Ask Veda (the user, 2026-10-17). "A hard birth" has no reader yet |
+| Child | `children` row, **`birth_mode`, `born_weeks` (0102, behind `kChildBirthColumns`)** | the family profile, which falls back to the child's copy on the other parent's phone |
+| Feeding, sleep | family profile, per child | recommendations, Ask Veda context (bug B1 fixed) |
+| Twins (child), second child | `setBirth(multiple:)`, a second `children` row | the child switcher |
+| Care role = father | `profiles.role`, `user_role` | **New reader:** the splash routes him as the father |
+| Skilling interests, time | `other.sk_interests`, `other.sk_time` | **New reader:** `skFirstActivity`, on the reveal and the skilling home |
+| Skilling birthday | the real `dob` (was always "today, N years ago") | the age band |
+| His age, habits | `TtcReadyPlanStore.setHisAnswers` | his part of the Ready-to-Try plan |
+| What helps him | `family_profile.fatherHelp` (blob, his order) | **New readers:** `ttcHisDoorsFirst(help:)`, `pregPartnerOrder` |
+| Reminders | the OS permission, and **`TtcMessagesStore.setPhoneOn`** (closes §79.4); Getting ready also turns on the plan's monthly note | phone messages |
+
+## 4. Backend (migration 0102, `supabase/migrations/0102_onboarding_v3.sql`)
+
+- `profiles.due_date_source`, `profiles.dating_date`. Written by `PregnancyController.setDueDate` as a
+  **separate** update, so a database without 0102 loses only these and never the due date.
+- `children.birth_mode`, `children.born_weeks`. The app sends them only once `kChildBirthColumns` is flipped
+  to true, **after 0102 is run** (the `sex_given` pattern).
+- `ttc_ready_plans`: one row per person, couple-readable, own-row writes, four policies (not one `for all`,
+  which would let the partner delete her row), the 0100 newer-wins guard. `TtcReadyPlanStore` syncs to it
+  with `TtcSyncedStore`; the edit time decides newer wins.
+- `link_as_partner` refuses instead of re-pairing anyone already linked to someone else. Both directions use
+  it now: her Partner screen has "Did he send you a code?", through `SupabaseRepo.linkAsPartner`.
+- No columns for her age band, gentle, twins or what helps him: they ride in the family profile's
+  `user_state` blob. The reason is in BACKEND-PATTERNS §16jj.
+
+## 5. Look and motion
+
+- **No lavender, onboarding only (the user's choice).** `kObPalette` in `onboarding_chrome.dart`: white
+  ground, `#F2F2F1` surfaceAlt, neutral greys, ink for actions, underlined Terms/Privacy links. Onboarding has
+  its own choice tile and progress bar in the same shape as the shared ones, because `PvChoiceTile` and
+  `PvQuestionProgress` carry a violet cast and are app-wide. The lilac art hues became sage and sand.
+  **The rest of the app is unchanged.**
+- **Motion** (built-in widgets only, every one off when the phone asks for less motion): the tick draws on
+  with a haptic; the give-back fades in after the tap; the progress bar grows from the last step; the week
+  counts up on the week beat; building ticks follow their work; the reveal headline settles and its lines
+  arrive one by one; the account rows tick in; the reminder preview arrives.
+
+## 6. Open
+
+- **The first arrival home** (the user's third ask): prototype it first, then build. Not in this build.
+- **A planner who logs a period** gets the cycle chapter, because `preparingTogether` only shows with no cycle
+  data (`ttc_chapter.dart`). Switching the chapter alone would bring back the "two clocks" bug of 2026-09-27
+  (the hero showing fertile days while the chapter says preparing). It needs a getting-ready mode for the
+  whole TTC home. That is a design decision.
+- **"A hard birth"** is asked and saved but nothing reads it yet.
+- **Editing the new answers later on You** (gentle, what helps him, the age band) is not built.
+- **His plan card** reads his partner's `ttc_ready_plans` row: the table and sync exist, the card does not
+  (§92.0).
+- **The You screen's language switch** still exists (`pv_you_screen.dart` `_languageRow`). Onboarding no
+  longer asks; whether You keeps it is the user's call.
+- **Unpairing** from her side still goes through Help.
+- The returning-user path, phone sign-in, and the stage-change flows (born, pregnant, loss) are unchanged.
+- Run 0102, then flip `kChildBirthColumns`. Walk all paths on a phone (BEFORE-LAUNCH).
+
+---
+
+
+## History A: the Mobbin audit and the first decision (was `ONBOARDING-AUDIT.md`, 2026-09-16)
+
+Kept word for word. Section numbers below are this history's own.
+
+## Onboarding — the Mobbin audit, the decision, and the brief
 
 **Written 2026-09-16.** First piece of work done with the Mobbin MCP. Read this
 before touching `lib/screens/auth/auth_flow_screen.dart` or briefing Claude
@@ -12,7 +141,7 @@ file has the permanent Mobbin links).
 
 ---
 
-## 1. What Mobbin can and cannot do for this
+### 1. What Mobbin can and cannot do for this
 
 **How it was used.** Three tools: `search_flows` (a whole recorded walk through
 an app, every screen in order), `search_screens` (single screens by
@@ -39,7 +168,7 @@ exhausted, first-timer, marketed-at, wide literacy — and the standing rules
 
 ---
 
-## 2. What we ask today
+### 2. What we ask today
 
 From `auth_flow_screen.dart` (2,708 lines, the "Soft solid" Claude Design of
 2026-07, Plus Jakarta Sans and `#7C3FC4` — **both since retired by
@@ -67,7 +196,7 @@ same tap. What it never does: **show her anything back** — the flow ends on a
 
 ---
 
-## 3. The comparison
+### 3. The comparison
 
 Seven flows read screen by screen; the table holds the decisions, not the looks.
 
@@ -119,7 +248,7 @@ Seven flows read screen by screen; the table holds the decisions, not the looks.
 
 ---
 
-## 4. The decision — our flow
+### 4. The decision — our flow
 
 **Seven screens for a pregnant mother, five of them a single question, one a
 beat, one a reveal.** Down from a form. Every ask names what it unlocks.
@@ -143,7 +272,7 @@ beat, one a reveal.** Down from a form. Every ask names what it unlocks.
     ─► home
 ```
 
-### Screen by screen — what it asks, what it unlocks, where it writes
+#### Screen by screen — what it asks, what it unlocks, where it writes
 
 | # | Screen | Ask | Unlocks (said on screen) | Writes |
 |---|---|---|---|---|
@@ -155,7 +284,7 @@ beat, one a reveal.** Down from a form. Every ask names what it unlocks.
 | 6 | Reveal | nothing | — | — |
 | 7 | Reach | two optional consents | reminders; the week's guidance on WhatsApp | `NotificationService` permission; `phone`, `wa_opt_in`, `phone_verified_at` |
 
-### The Date screen, per stage
+#### The Date screen, per stage
 
 - **Pregnant** — one screen, Apple's four methods as a chip row above one date
   field: *Last period* (default) · *Due date from my doctor* · *Scan date* ·
@@ -172,7 +301,7 @@ beat, one a reveal.** Down from a form. Every ask names what it unlocks.
   would duplicate `ttc_intro_flow.dart`, which already gates `TtcHomeScreen`.
   TTC goes Stage → Reach → home, and the intro flow takes over there.
 
-### The Reveal, per stage
+#### The Reveal, per stage
 
 The screen with no question on it. Display type, the baby image for the week
 where we have one (`assets/baby/`), one line beneath, one button.
@@ -186,7 +315,7 @@ where we have one (`assets/baby/`), one line beneath, one button.
 No percentages, no "chance", no "on track" — the fact and nothing else.
 `ttc_clinical_review_test.dart` scans for the language and will catch a slip.
 
-### The Reach screen
+#### The Reach screen
 
 Two rows, both off, both optional, a quiet *Not now* beneath:
 
@@ -208,7 +337,7 @@ screen and it reads as one decision — "how do you want to hear from us" — no
 two interruptions. Two separate screens would put the eighth and ninth screen
 in front of her for the same question.
 
-### What is derived rather than asked
+#### What is derived rather than asked
 
 - Her name and email — Google.
 - Her stage's home — from the stage tile, never a second question.
@@ -219,7 +348,7 @@ in front of her for the same question.
   health question. Those belong inside the stage, where an answer can give
   something back.
 
-### Sign-in: Google only, and what that costs
+#### Sign-in: Google only, and what that costs
 
 You asked for one button and the audit backs it: Sesame, Wispr, Saily,
 Vocabulary all ship two buttons or fewer. Trade-offs, stated:
@@ -236,7 +365,7 @@ Vocabulary all ship two buttons or fewer. Trade-offs, stated:
 - **Shared phones.** `social_auth.dart` already notes the Google picker
   quirk; the Hello screen's "not you?" is the recovery.
 
-### Phone OTP — how, and why it is not the identity
+#### Phone OTP — how, and why it is not the identity
 
 The phone is a **verified attribute**, not the login. Google is the identity;
 the phone exists for WhatsApp and, later, for pairing by number. That decides
@@ -261,9 +390,9 @@ so the provider relationship exists.
 
 ---
 
-## 5. Decisions — taken 2026-09-16
+### 5. Decisions — taken 2026-09-16
 
-### 5.1 Skilling as a fourth tile — DECIDED: show it; `SkillingPreviewScreen` is its home for now
+#### 5.1 Skilling as a fourth tile — DECIDED: show it; `SkillingPreviewScreen` is its home for now
 
 `LifeStage.skilling` was a value and not a destination: nothing wrote it, the
 splash never routed to it, the only screen was `skilling_preview_screen.dart`.
@@ -273,30 +402,30 @@ exists. `JourneyState` keeps refusing to infer from it — that is a separate
 permit and nothing here needs it. The preview screen's class doc must be
 updated to say it is now reachable, and its "design preview only" caveat goes.
 
-### 5.2 Filled button, or the outlined pill — taken on the recommendation
+#### 5.2 Filled button, or the outlined pill — taken on the recommendation
 
 One filled `action` button per screen, read as §4.3's "single primary commit"
 applied per step; choice tiles are outlined. Every reference in the set does
 the same.
 
-### 5.3 "Have a code?" — taken on the recommendation: one link, one sheet
+#### 5.3 "Have a code?" — taken on the recommendation: one link, one sheet
 
 One footer link; the sheet routes by code format to the referral engine or the
 enterprise activation flow.
 
-### 5.4 The partner's name — taken on the recommendation: at the pairing invite
+#### 5.4 The partner's name — taken on the recommendation: at the pairing invite
 
 **We only ever hold a name its owner gave.** Hers from Google on screen 2; his
 from his own Google on his own device. The invite she sends may carry a
 nickname for the pairing message; nothing leaving the phone uses it. Closes
 STILL-OPEN §22.4's open point.
 
-### 5.5 iOS — DECIDED: Android only for now
+#### 5.5 iOS — DECIDED: Android only for now
 
 One button on the welcome screen. Sign in with Apple lands with an iOS build,
 if and when there is one.
 
-### 5.6 The phone — DECIDED: in onboarding, after the reveal, essential
+#### 5.6 The phone — DECIDED: in onboarding, after the reveal, essential
 
 The number is a business requirement (WhatsApp is the retention channel), so
 it stays on screen 7, made as cheap as a tap by the Phone Number Hint sheet.
@@ -306,7 +435,7 @@ A/B against the onboarding ask. Not now.
 
 ---
 
-## 6. What the build touches — for after the design lands
+### 6. What the build touches — for after the design lands
 
 - **New** `lib/screens/auth/onboarding_flow.dart` (or one file per screen
   under `lib/screens/auth/onboarding/`). The old `AuthFlowScreen` stays,
@@ -332,7 +461,7 @@ A/B against the onboarding ask. Not now.
 
 ---
 
-## 7. The brief for Claude Design — paste from here
+### 7. The brief for Claude Design — paste from here
 
 > **ParentVeda — first-run onboarding, seven screens.** Mobile, 390×844.
 > Use the ParentVeda design system already in the project: ground `#F5F3F6`,
@@ -392,7 +521,7 @@ A/B against the onboarding ask. Not now.
 
 ---
 
-## 8. Reference index — permanent links
+### 8. Reference index — permanent links
 
 Local files in `research/mobbin/onboarding/` (gitignored). Each Mobbin link is
 the canonical one and does not expire.
@@ -417,3 +546,276 @@ the canonical one and does not expire.
 screen explaining why the app wants to send reminders", "onboarding result
 screen revealing something computed from the answers". Queries that did not:
 app names Mobbin does not carry, and two intents in one sentence.
+
+---
+
+## History B: V2, the research, the flow and the art prompts (was `ONBOARDING-V2.md`, 2026-09-22)
+
+Kept word for word, including the art prompts.
+
+## Onboarding V2 — the research, the flow, and the art it needs
+
+**2026-09-22.** The user, on the phone: *"this particular screen for the
+onboarding flow does not look good and what we created before is very bland
+… I have seen really good applications having very creative onboarding flows
+like Headspace. Do a very deep research to create a really good onboarding
+flow for us. The onboarding flow consists of questions, personalization and
+everything, because we need deep personalization — that is what we are
+offering in our application."*
+
+This is the research it was built on, the flow that came out of it, and the
+list of images it needs with the prompts to generate them.
+
+---
+
+### 0. First, a wiring fact that changes what "bland" means
+
+The screen in the user's screenshot — heavy violet, *"Care that grows with
+your family"*, *"Loved by 50,000+ parents"*, Create account / Log in /
+Google — **is not the onboarding we built.** It is the old
+`AuthFlowScreen` (`lib/screens/auth/auth_flow_screen.dart`).
+
+`SplashScreen` pushes `OnboardingFlow` and the old push beside it is
+commented out, so a **fresh install** gets the new flow. But three other
+doors still open the old one:
+
+| Where | Line |
+|---|---|
+| Sign out | `lib/screens/profile/pv_account_actions.dart:53` |
+| "Sign in to see your bookings" | `lib/screens/post_pregnancy/my_bookings_screen.dart:654` |
+| The old profile screen | `lib/screens/profile_screen.dart:749` |
+
+So the most likely way to see that screenshot today is to **sign out** — and
+the second-worst outcome of this whole piece of work would be to build a
+beautiful onboarding that half the doors do not open. The wiring gate
+applies: every entry point lands on one flow.
+
+⚠️ **"Loved by 50,000+ parents" has to go regardless.** This app refuses to
+draw a distribution bar it cannot measure (`pv_reviews_screen.dart`) and
+refuses to state a personalised probability (`ttc_clinical_review_test.dart`).
+A founder-invented user count on the very first screen contradicts both. If
+the number is real it can stay with a source; if it is aspirational it is a
+number we made up, on the screen where trust is cheapest to lose.
+
+---
+
+### 1. What the good ones actually do
+
+Fourteen flows read on Mobbin: Headspace, Flo, Noom, Lifesum, Yazio, Hers,
+MyFitnessPal, Calm Sleep, pliability, Replika, BitePal, Superpower, Stardust,
+Ten Percent Happier, Life Reset, Liven, Mimo, Speak, MacroFactor.
+
+Seven patterns, ranked by how much they would change ours:
+
+#### 1.1 ASK BEFORE YOU AUTHENTICATE — the structural one
+
+**Every single question-led app puts account creation at the END.** Flo asks
+"Are you pregnant?" as its *first* screen, before anything. Noom runs seven
+sections of questions first. Lifesum, Yazio, Hers, BitePal, MacroFactor,
+Superpower — all of them ask first, sign up last.
+
+Ours opens on Google sign-in. That is backwards, and the reason is not
+fashion: a person who has answered nine questions about her pregnancy has
+built something she does not want to lose, and *that* is what makes the
+account worth creating. BitePal names it on the screen — **"Now let's create
+account / Save your progress & reach your goals."**
+
+We can do this without touching the backend: the app is local-first by
+constitution, answers already land in `FamilyProfileStore`, and
+`PendingProfile` already exists to stash a profile write that cannot reach
+the cloud and replay it at the next login. The session simply happens later.
+
+#### 1.2 ONE QUESTION, ONE SCREEN, A BAR AT THE TOP
+
+Universal. Replika, Lifesum, Superpower, BitePal, Yazio, Noom, Calm Sleep,
+pliability, Hers, MyFitnessPal — every one is a single question, a stack of
+full-width tappable options, and a progress bar. Nobody asks two things at
+once and nobody uses a dropdown.
+
+Two refinements worth stealing:
+
+- **Noom labels the bar with the SECTION** ("DEMOGRAPHIC PROFILE") and shows
+  seven dots, so the length is honest and the person knows which part they
+  are in.
+- **MyFitnessPal splits the options into "Recommended for you" and "More"** —
+  personalisation visible *inside* the question, before any answer.
+
+#### 1.3 THE ANSWER ANSWERS BACK
+
+Headspace's *"That's great to hear"* is a whole screen after an answer.
+BitePal ticks each choice green as you tap. Our `ObOption.giveBack` already
+does the line version and the audit was right to build it — what is missing
+is the **full beat**, two or three times across the flow, where the app stops
+and says something back in its own voice.
+
+#### 1.4 THE CURVED BAND — Headspace's actual signature
+
+Look at any Headspace screen: a saturated colour field at the top holding one
+simple illustration, its bottom edge a **curve**, white content below. That
+curve is doing almost all of the warmth. It is one clip path and it is the
+single highest-leverage visual change available to us.
+
+#### 1.5 "BUILDING YOUR PLAN"
+
+Flo (a ring counting to 100%), Noom (seven named sections cross-checking),
+Lifesum, Life Reset, Liven, Ten Percent Happier, Mimo, Speak. All of them.
+
+It is theatre — but it is **honest** theatre if the work named is work that
+actually happens. Noom's version is the model: it names the sections rather
+than spinning a generic loader. Ours can name the real things: the week, the
+stage, her questions' answers, the reads chosen for her.
+
+#### 1.6 THE REVEAL
+
+Flo's *"Your personal pregnancy program"* — six lines of what she now gets.
+MacroFactor's checklist. This is the payoff the questions bought, and we
+already have a `reveal` step; it just needs to be built out of **her own
+answers** rather than a fixed list.
+
+#### 1.7 PRIVACY, SAID EARLY AND PLAINLY
+
+Flo gives it a whole screen — *"Your body. Your data"* — with a shield and
+two explicit consents. For an India-first family health app holding a due
+date, a child's name and symptom logs, this is not boilerplate; it is one of
+the few things we can say that a competitor cannot say as easily, because
+local-first is genuinely how this app is built.
+
+#### What we are NOT taking
+
+| Seen | Why not |
+|---|---|
+| Noom's 30+ questions | Ours must stay short enough that nobody abandons. Two or three per stage, as the audit priced. |
+| BitePal / Speak / Mimo mascots | A cartoon raccoon cannot hold a miscarriage conversation. This app talks to women at 2 a.m. |
+| Stardust's astrology framing | Charming, and it is a horoscope. Clinical invariants. |
+| A paywall in onboarding | Money is decided server-side and later. |
+| Any invented statistic | See §0. |
+
+---
+
+### 2. The flow
+
+Mother, pregnancy. Trying and Parenting take the same spine with their own
+date step, questions and reveal.
+
+```
+ 1  WELCOME          art band · "For the whole journey" · Get started / I have an account
+ 2  PRIVACY          art band · three plain lines · Continue
+ 3  WHO              Mother · Father or partner · Trying together
+ 4  STAGE            Trying · Pregnant · Parenting · Skilling   (four small arts)
+ 5  NAME             one soft field, skippable
+    → BEAT 1         "Nice to meet you, Priya."
+ 6  DATE             method chips + date wheel   (unchanged — it works)
+    → BEAT 2         "Week 14. Most women find the tiredness lifts around now."
+ 7  QUESTION 1       progress bar · give-back line
+ 8  QUESTION 2
+    → BEAT 3         "What we will never do" — the no-diagnosis promise
+ 9  QUESTION 3
+10  BUILDING         named steps, real work
+11  REVEAL           built from HER answers
+12  ACCOUNT          Google / phone — now there is a reason
+13  REACH            notifications · WhatsApp
+```
+
+Thirteen screens. Headspace is twelve, Flo is twelve, Noom is over thirty.
+
+**What each step writes** is unchanged from V1 (`onboarding_flow.dart`
+header): the stage on `profiles`, the due date + `DueDateSource` on the
+pregnancy controller, a `children` row where relevant, the answers on
+`FamilyProfileStore`, the reach choices. Only the **order** moves, so the
+account arrives at 12 instead of 1 and everything before it is local.
+
+---
+
+### 3. The art — ten images, and the prompts for them
+
+⚠️ **This is a deliberate departure from DESIGN-SYSTEM §3.** The app's rule is
+drawn marks and line icons, no illustration, because chrome should be quiet.
+Onboarding is not chrome — it is the one surface whose whole job is a first
+impression, and the drawn-mark family is a 100×100 utility glyph set that
+cannot carry a full-bleed hero. The illustration lives in the curved band and
+**stops at the app's front door**; nothing past the reveal uses it.
+
+**House style for every prompt below** — paste this block with each one:
+
+> Soft, warm, hand-painted editorial illustration. Flat shapes with gentle
+> gouache texture, no outlines, no gradients meshes, no 3D, no photorealism.
+> Calm and quiet, never cute or cartoonish — no mascots, no big-eyed
+> characters, no emoji. Indian family, South Asian skin tones, contemporary
+> Indian clothing (kurta, salwar, saree, plain modern wear), never sari-and-
+> temple cliché. Palette: dusty rose #E8C4CE, sage #C5D6C4, warm sand
+> #E8D9C0, soft lilac #D8CCE8, muted terracotta #D9A08A, off-white #F5F3F6.
+> No saturated primaries, no neon. Faces simplified and serene or turned
+> away; never a clinical or medical setting; never a stethoscope, chart or
+> hospital. Square 1:1, subject centred with generous breathing room, plain
+> flat background in one of the palette colours, no text anywhere in the
+> image.
+
+#### The ten
+
+| # | Where | Prompt (append the house style) |
+|---|---|---|
+| **A1** | Welcome | A woman resting one hand on a rounded pregnant belly while a man beside her rests his hand over hers, both seated close, seen from the side at a calm distance. Behind them a soft arc of warm light. Dusty rose and warm sand background. |
+| **A2** | Privacy | A simple house shape drawn as a soft rounded form, with a warm light glowing inside it and two small figures visible through the window as gentle silhouettes. A softly drawn ring encircles the house like a protective boundary. Sage green background. |
+| **A3** | Stage · Trying | A small seedling with two leaves in cupped open hands, seen from above. Warm sand background. Simple, small, centred. |
+| **A4** | Stage · Pregnant | A rounded pregnant silhouette in profile, drawn as one soft filled shape with no facial detail, a small crescent curve inside suggesting the baby. Dusty rose background. |
+| **A5** | Stage · Parenting | Two hands holding a swaddled baby bundle, seen from the side, the baby drawn as a simple wrapped form. Soft lilac background. |
+| **A6** | Stage · Skilling | A child's hands stacking three wooden blocks, seen from the side. Muted terracotta background. |
+| **A7** | Beat 1 · the name | A single open hand raised in a small greeting, warm and unhurried, with two soft floating shapes near it like a quiet hello. Warm sand background. |
+| **A8** | Beat 2 · the week | A crescent-shaped curled form suggesting a very small baby at rest, surrounded by a soft glowing halo, abstract and gentle rather than anatomical. Dusty rose background. |
+| **A9** | Beat 3 · the promise | Two open hands held palm-up side by side, offering rather than instructing, with a small steady light resting above them. Sage green background. |
+| **A10** | Building · the reveal | A woman seated cross-legged and calm, reading, with several soft rounded shapes arranged around her like cards settling into place. Soft lilac background. |
+
+**Delivery:** PNG, 1:1, at least 1200×1200, transparent OR flat background
+(either works — the band supplies its own colour). Drop them in
+`assets/onboarding/` named `ob_a1.png` … `ob_a10.png`.
+
+**If a generated image is wrong, it is wrong on the subject, not the style** —
+that is the lesson from the learn covers (STILL-OPEN §69.10). Look at it
+before it ships.
+
+---
+
+### 3b. What was built — 2026-09-22
+
+| Piece | Where |
+|---|---|
+| The twelve paintings and the curved band | `lib/screens/auth/onboarding/onboarding_art.dart` |
+| `ObProgress` (the named bar) and `ObBeat` (the full-screen reply) | `onboarding_chrome.dart` |
+| The reordered flow, six new screens | `onboarding_flow.dart` |
+| A card that can wear a painting | `ObGridCard.art` / `.artHeight` |
+| "Replay onboarding · testing" | the You screen's Developer section |
+
+Three findings worth keeping:
+
+- **Two steps were born unreachable.** The stage card still jumped straight
+  to the date, so `name` and `beatHello` were built, analysed clean, and
+  never once rendered. Found by reading the test that walks the path, not by
+  the compiler — the wiring gate exactly. The test now asserts the name
+  screen by name so it cannot happen twice.
+- **The "no progress bar anywhere" rule was NARROWED, not deleted.** It is
+  right for a flow of unlike screens and wrong for a contiguous run of like
+  ones; `onboarding_chrome.dart`'s header carries the whole argument.
+- **The who-screen was the one that did not get the treatment.** Two Material
+  glyphs in pale wells between two illustrated screens — invisible in code,
+  obvious on the phone, in order. Found on the device walk (§0's lesson,
+  again).
+
+Also fixed from §0: **sign out lands on `OnboardingFlow`**, not the retired
+`AuthFlowScreen`. That was the single most common way to see the first-run
+experience, and it was showing the old screen.
+
+### 4. Open, and owed
+
+- **Two of §0's three doors remain.** Sign out is done. Still on the old
+  screen: `my_bookings_screen.dart:654` (the "sign in to see your bookings"
+  prompt) and `profile_screen.dart:749` (the old profile). Both are
+  sign-in-only prompts rather than first runs, so the right answer may be a
+  sign-in SHEET rather than either flow — decide, then wire.
+- **The account step has only Google.** Phone/OTP exists in the app
+  (`PhoneOtp`, used by the reach step) and for this market it should be on
+  this screen too.
+- **The 50,000 number** needs a decision: real with a source, or gone.
+- Trying and Parenting need their own **beat copy** — the pregnancy beats are
+  written above, the other two stages are not.
+- The reveal is currently a fixed list; building it from her answers is the
+  part that makes the questions worth asking.

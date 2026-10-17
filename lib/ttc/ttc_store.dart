@@ -280,6 +280,9 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
         ownership: ownership,
         today: on,
         statedCycleLength: _statedLength,
+        // Onboarding's "Are your periods fairly regular?" (V3, 2026-10-17).
+        statedIrregular:
+            FamilyProfileStore.instance.otherFor('ttc_cycles') == 'no',
       );
 
   // ---- writes ---------------------------------------------------------------

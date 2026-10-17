@@ -1,17 +1,29 @@
 // =============================================================================
-//  OnboardingFlow — the first run, as decided in docs/ONBOARDING-AUDIT.md
+//  OnboardingFlow — the first run (docs/ONBOARDING.md)
 // -----------------------------------------------------------------------------
+//  ⚠️ V3, 2026-10-17: EVERY ANSWER HAS A READER. The user: "users should not
+//  feel like they wasted their time". Approved as a clickable prototype first.
+//  What changed: trying asks where she is (getting ready / on our own / with a
+//  clinic), her last period and how long ONCE (the TTC intro is the film only),
+//  and has a reveal per path; pregnancy asks scan weeks, embryo day, twins and
+//  an optional "gentle"; parenting adds twins and a second child; skilling a
+//  real birthday; the partner can set up on his own and is never asked about
+//  her body; colours are onboarding's own (no lavender). The table of every
+//  answer, where it is saved and what reads it is docs/ONBOARDING.md §3.
+//  The older history below stays true of the shape.
+//
 //  Sesame's welcome, Flo's questions, Apple's date, Oura's reveal, Flo's
 //  permission ask, our home. Built from the Claude Design "ParentVeda
 //  Onboarding" (2026-09-16) plus the question block the audit priced in and the
 //  user asked for (2026-09-17): two or three give-back questions per stage,
 //  after the date and before the reveal, so the reveal stays the payoff.
 //
-//  The mother's path, REORDERED 2026-09-22 (docs/ONBOARDING-V2.md):
+//  The mother's path, REORDERED 2026-09-22 (docs/ONBOARDING.md (History B)):
 //      welcome → privacy → who → stage → name → «hello»
 //        → [date] → «week» → questions… → «promise» → building
 //        → [reveal] → account → reach → home
-//  Trying to conceive has no date and no reveal (nothing honest to compute).
+//  Trying to conceive has no date, and since V3 a reveal per path. Kept for
+//  revert: "Trying to conceive has no date and no reveal".
 //  «…» are BEATS — a whole screen where the app answers back (§1.3).
 //
 //  ⚠️ THE ACCOUNT MOVED FROM FIRST TO TWELFTH, AND IT IS THE POINT OF THE
@@ -29,7 +41,7 @@
 //  reach the cloud and replays it at the next login. The session simply
 //  happens later. Nothing new is written and nothing is written twice.
 //  The partner's path leaves at `who` into the old AuthFlowScreen positioned on
-//  its pairing branch — those screens are kept as-is (ONBOARDING-AUDIT §4).
+//  its pairing branch — those screens are kept as-is (ONBOARDING.md History A §4).
 //
 //  WHAT IT WRITES, AND WHERE (FAMILY-MODEL §4): the session (Google), her name
 //  and stage on `profiles`, the due date + DueDateSource on the pregnancy
@@ -53,6 +65,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -65,12 +78,29 @@ import '../../../services/life_stage_store.dart';
 import '../../../services/notification_service.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../services/remote/supabase_repo.dart';
+import '../../../services/ready_birth_context_store.dart';
 import '../../../services/whatsapp_prefs.dart';
+import '../../../ttc/cycle_store.dart';
+import '../../../ttc/ttc_care_pathway.dart' show TtcPath;
+import '../../../ttc/ttc_chapter.dart' show TtcChapterEngine, TtcJourneyState;
+import '../../../ttc/ttc_fertile_window.dart'
+    show ttcWindowOpensBeforeOvulation, ttcWindowClosesAfterOvulation;
+import '../../../ttc/ttc_fertility_help_rules.dart'
+    show FertilityAgeBand, FertilityAgeBandCopy;
+import '../../../ttc/ttc_fertility_help_store.dart';
+import '../../../ttc/ttc_messages_store.dart';
+import '../../../ttc/ttc_ready_plan.dart'
+    show HisAge, HisAgeCopy, HisHabit, HisHabitCopy, readyMonthLabel;
+import '../../../ttc/ttc_ready_plan_store.dart';
+import '../../../ttc/ttc_store.dart';
+import '../../../ttc/ttc_supplements_store.dart';
+import '../../ttc/ttc_strings.dart' show TtcPartnerMode;
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_date_sheet.dart';
 import '../../post_pregnancy/pp_child_profile.dart';
 import '../../referral/enter_code_sheet.dart';
 import '../../skilling/sk_child_store.dart';
+import '../../skilling/sk_first_activity.dart';
 import '../../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd, ddcSourceFor;
 import '../../v2/v2_palette.dart';
@@ -103,6 +133,9 @@ enum ObStep {
   reveal,
   account,
   reach,
+  // Onboarding V3 (2026-10-17): the partner's two ways in, and his link step.
+  partnerHow,
+  pLink,
 }
 
 /// True when the account that just signed in was created well before now,
@@ -124,7 +157,7 @@ bool obAccountIsExisting(DateTime? createdAt, {DateTime? now}) {
 /// The "You already have an account" notice. Top-level so a widget test can
 /// draw it without running Google. True: open it; false: use another.
 Future<bool?> showObExistingAccountSheet(BuildContext context, String email) {
-  final p = V2PaletteStore.instance.current;
+  final p = kObPalette;
   return showModalBottomSheet<bool>(
     context: context,
     isDismissible: false,
@@ -241,6 +274,35 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   int? _bornWeeks;
   bool _earlyNotSure = false;
   CareRole? _careRole;
+
+  // ---- Onboarding V3 (2026-10-17) ---------------------------------------------
+  // The partner who sets up on his own. Never asked about her body.
+  bool _partnerOwn = false;
+  String? _partnerHow; // 'code' | 'own', on the partnerHow screen
+
+  // Trying: the month they want to start (getting ready), the kind of clinic
+  // care, her last period, her age band. His age and habits.
+  DateTime? _readyMonth;
+  bool _readyUnsure = false;
+  String? _clinicKind; // 'oi' | 'iui' | 'ivf' | 'unsure'
+  DateTime? _lmp;
+  bool _lmpUnknown = false;
+  FertilityAgeBand? _ageBand;
+  HisAge? _hisAge;
+  final Set<String> _hisHabits = {}; // tobacco, alcohol, medicines, none
+
+  // Pregnancy: what the scan said, the embryo's age, twins, and "gentle".
+  int? _scanWeeks;
+  int? _embryoDay;
+  bool _twins = false;
+  String? _gentle; // 'loss' | 'hard' | 'skip'
+
+  // Parenting: twins, and a second child. Skilling: a real birthday.
+  bool _childTwins = false;
+  bool _secondChild = false;
+  final _child2Name = TextEditingController();
+  DateTime? _child2Dob;
+  DateTime? _skDob;
   // questions
   final Map<String, Set<String>> _answers = {};
   int _q = 0;
@@ -257,12 +319,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   bool _busy = false;
   String? _toast;
 
-  List<ObQuestion> get _questions =>
-      onboardingQuestionsFor(_stage ?? '', childName: _childName.text);
+  // Kept for revert (Onboarding V3): the stage's fixed list. `_run` and
+  // `_runQuestions` replace it, because the run now depends on the answers.
+  //   List<ObQuestion> get _questions =>
+  //       onboardingQuestionsFor(_stage ?? '', childName: _childName.text);
 
   @override
   void dispose() {
     _childName.dispose();
+    _child2Name.dispose();
     _nameField.dispose();
     _phone.dispose();
     _otp.dispose();
@@ -271,13 +336,72 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   void _go(ObStep s) => setState(() => _history.add(s));
 
+  /// The partner who set up on his own (not the one who joined with a code).
+  bool get _isPartner => _partnerOwn;
+
+  /// Her answer to "Where are you with this?": planning, trying or clinic.
+  String? get _where => _answers['ttc_where']?.firstOrNull;
+  bool get _planning => _where == 'planning';
+
+  // The question run's own pages, beside the question ids.
+  static const _kPromise = '#promise';
+  static const _kPeriod = '#period';
+  static const _kAboutHim = '#him';
+
+  /// The run of questions for who she is and where she is, in order.
+  ///
+  /// ⚠️ IDS, NOT QUESTIONS, AND RECOMPUTED ON EVERY READ (Onboarding V3).
+  /// Which questions are asked depends on earlier answers: "Getting ready"
+  /// drops "How long have you been trying?", and the partner gets his own
+  /// run. The promise beat sits in the run where the prototype put it rather
+  /// than being inserted after the second answer.
+  List<String> get _run {
+    final he = _isPartner;
+    switch (_stage) {
+      case 'trying':
+        if (he) {
+          return ['ttc_where', if (!_planning) 'ttc_duration', _kPromise,
+            _kAboutHim, 'p_help_trying'];
+        }
+        return ['ttc_where', _kPeriod, 'ttc_cycles', _kPromise,
+          if (!_planning) 'ttc_duration', 'ttc_folic'];
+      case 'pregnancy':
+        return he
+            ? ['p_first', _kPromise, 'p_help_pregnancy']
+            : ['preg_parity', 'preg_priorities', _kPromise, 'preg_diet'];
+      case 'parenting':
+        return ['pp_feeding', 'pp_sleep', _kPromise, 'pp_priorities'];
+      case 'skilling':
+        return ['sk_interests', 'sk_time'];
+    }
+    return const [];
+  }
+
+  /// The questions in the run (its own pages left out), for the summary, the
+  /// reveal and the re-apply in `_runBuild`.
+  List<ObQuestion> get _runQuestions => [
+    for (final id in _run)
+      if (!id.startsWith('#')) obQuestion(id, childName: _childName.text),
+  ];
+
   void _back() {
     if (_history.length <= 1) return;
     setState(() {
       if (_step == ObStep.question && _q > 0) {
         _q--;
+        // Step back over the beat: it is a pause, not a question.
+        if (_q > 0 && _run[_q] == _kPromise) _q--;
       } else {
         _history.removeLast();
+        // Leaving the beat backwards lands on the question before it, never
+        // on the beat's own empty slot in the run.
+        final run = _run;
+        if (_step == ObStep.question &&
+            _q > 0 &&
+            _q < run.length &&
+            run[_q] == _kPromise) {
+          _q--;
+        }
       }
     });
   }
@@ -304,48 +428,48 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   /// After the date (or after stage, for trying): questions if the stage has
-  /// any, else straight to the reveal / reach.
+  /// any, else straight to building.
   void _afterDate() {
     _q = 0;
-    if (_questions.isNotEmpty) {
+    if (_run.isNotEmpty) {
       _go(ObStep.question);
     } else {
       _afterQuestions();
     }
   }
 
-  /// One beat inside the question run, and only one.
-  ///
-  /// ⚠️ A BEAT AFTER EVERY ANSWER IS A FLOW THAT WILL NOT STOP TALKING. It
-  /// lands after the second question and only when a third is still coming,
-  /// so it reads as the app pausing mid-conversation rather than as a screen
-  /// between her and the end.
-  bool _promiseShown = false;
+  // Kept for revert (Onboarding V3): the beat was inserted after the second
+  // answer whenever a third followed. It now has its own place in `_run`.
+  //   bool _promiseShown = false;
+  //   if (_q == 1 && !_promiseShown) { _promiseShown = true; _go(beatPromise); }
 
   void _nextQuestion() {
-    if (_q + 1 < _questions.length) {
-      if (_q == 1 && !_promiseShown) {
-        _promiseShown = true;
-        _go(ObStep.beatPromise);
-      } else {
-        setState(() => _q++);
-      }
-    } else {
+    final run = _run;
+    if (_q + 1 >= run.length) {
       _afterQuestions();
+      return;
     }
+    setState(() => _q++);
+    if (run[_q] == _kPromise) _go(ObStep.beatPromise);
+  }
+
+  /// The promise beat's button: on to the question after it.
+  void _afterPromise() {
+    setState(() {
+      _history.removeLast();
+      if (_q + 1 < _run.length) {
+        _q++;
+      }
+    });
+    if (_q >= _run.length - 1 && _run[_q] == _kPromise) _afterQuestions();
   }
 
   void _afterQuestions() => _go(ObStep.building);
 
-  /// What `building` does when its work is done. Trying still has no reveal —
-  /// there is no week to show and nothing honest to compute.
-  void _afterBuilding() {
-    if (_stage == 'trying') {
-      _go(ObStep.account);
-    } else {
-      _go(ObStep.reveal);
-    }
-  }
+  /// What `building` does when its work is done: the reveal, for every stage
+  /// since V3. Trying has one too now (one per path), because "Getting
+  /// ready", a cycle and a clinic each have something true to show.
+  void _afterBuilding() => _go(ObStep.reveal);
 
   void _say(String m) {
     setState(() => _toast = m);
@@ -361,7 +485,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     return AnimatedBuilder(
       animation: V2PaletteStore.instance,
       builder: (context, _) {
-        final p = V2PaletteStore.instance.current;
+        final p = kObPalette;
         final page = switch (_step) {
           ObStep.welcome => _welcome(p),
           ObStep.privacy => _privacy(p),
@@ -378,6 +502,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           ObStep.reveal => _reveal(p),
           ObStep.account => _account(p),
           ObStep.reach => _reach(p),
+          ObStep.partnerHow => _partnerHowPage(p),
+          ObStep.pLink => _pLink(p),
         };
         return Stack(
           children: [
@@ -511,7 +637,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                               height: 22,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: v2BlockTint([344.0, 42.0, 268.0][i], p),
+                                // No lavender (Onboarding V3). Kept for revert: 268.0 third.
+                                color: v2BlockTint([344.0, 42.0, 140.0][i], p),
                                 border: Border.all(
                                   color: p.surface,
                                   width: 1.6,
@@ -827,7 +954,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       return;
     }
     if (_name.trim().isEmpty) _name = _googleName();
-    _go(ObStep.reach);
+    // His link step first (Onboarding V3). Kept for revert: _go(ObStep.reach).
+    _go(_isPartner ? ObStep.pLink : ObStep.reach);
   }
 
   /// Who just signed in. Supabase may not be initialised (tests, previews):
@@ -1001,27 +1129,35 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   /// Kept for revert: this returned `List<String>` of the bare labels.
   List<(String, String)> _summaryRows() {
     final out = <(String, String)>[];
+    if (_name0.isNotEmpty) out.add(('Your name', _name0));
+    if (_isPartner) out.add(('You are', 'Her partner'));
     switch (_stage) {
       case 'trying':
-        out.add(('Your journey', 'Trying to conceive'));
+        final m = _readyMonth;
+        out.add((
+          'Your journey',
+          _planning && m != null
+              ? 'Getting ready to try · from ${readyMonthLabel(m)}'
+              : switch (_where) {
+                  'planning' => 'Getting ready',
+                  'trying' => 'Trying on our own',
+                  'clinic' => 'With a doctor or clinic',
+                  _ => 'Trying to conceive',
+                },
+        ));
+        if (_lmp != null) out.add(('Last period', _long(_lmp!)));
       case 'pregnancy':
         final edd = _edd;
         if (edd != null) {
-          final days = 280 - edd.difference(_today()).inDays;
-          final w = (days ~/ 7).clamp(0, 42);
-          out.add(('Your pregnancy', 'Week $w · due ${_short(edd)}'));
+          out.add(('Your pregnancy', 'Due ${_long(edd)}${_twins ? ' · twins' : ''}'));
         }
       case 'parenting':
         final dob = _childDob;
-        final named = _childName.text.trim();
         if (dob != null) {
-          final age = _monthsWeeks(dob);
-          final old = age.$1 == 0
-              ? '${age.$2} ${age.$2 == 1 ? 'week' : 'weeks'} old'
-              : '${age.$1} ${age.$1 == 1 ? 'month' : 'months'} old';
+          final named = _childName.text.trim();
           out.add((
             'Your little one',
-            named.isEmpty ? old : '$named · $old',
+            '${named.isEmpty ? 'Your baby' : named}, ${_ageLine(dob)}',
           ));
         }
       case 'skilling':
@@ -1033,9 +1169,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           ));
         }
     }
-    for (final q in _questions) {
+    for (final q in _runQuestions) {
+      if (q.id == 'ttc_where') continue; // said above, in words
       final chosen = _answers[q.id];
       if (chosen == null || chosen.isEmpty) continue;
+      if (q.id == 'ttc_duration' && chosen.contains('skip')) continue;
       final labels = q.options
           .where((o) => chosen.contains(o.id))
           .map((o) => o.label)
@@ -1053,9 +1191,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   Widget _beatHello(V2Palette p) => ObBeat(
     p: p,
-    art: ObArt.hello,
+    // His own painting when he sets up alone (Onboarding V3).
+    art: _isPartner ? ObArt.helloPartner : ObArt.hello,
     title: _name0.isEmpty ? 'Good to have you here.' : 'Hello, $_name0.',
-    body:
+    body: _isPartner
+        ? 'This is your side of it. A few questions about where you two are, '
+              'and a couple about you. Nothing about her is asked here. That '
+              'comes from her, if she links and chooses to share.'
+        : _stage == 'trying'
+        ? "Tell us where you are with this, and we'll set things up for that. "
+              'A few questions, and every answer is used.'
+        :
         // Kept for revert: 'From here the app is yours. What it shows you on
         // a Tuesday morning depends on what you tell us next — the week you
         // are in, what you are worried about, what you would rather not read.'
@@ -1073,12 +1219,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   Widget _beatWeek(V2Palette p) {
     String title;
     String body;
+    Widget? headline;
     if (_stage == 'pregnancy') {
       final edd = _edd;
       final days = edd == null ? 0 : 280 - edd.difference(_today()).inDays;
       final w = (days ~/ 7).clamp(0, 42);
       final tri = w < 13 ? 'first' : (w < 27 ? 'second' : 'third');
       title = 'Week $w.';
+      headline = ObCountUp(
+        value: w,
+        builder: (n) => Text('Week $n.', style: obBeatTitleStyle(p)),
+      );
       body =
           "You're in your $tri trimester. Each week has its own page: "
           "what's changing, what to ask your doctor, and what you don't "
@@ -1100,6 +1251,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       p: p,
       art: ObArt.week,
       title: title,
+      headline: headline,
       body: body,
       cta: 'Continue',
       onNext: _afterDate,
@@ -1127,10 +1279,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         'If your doctor says something different from what you read '
         'here, go with your doctor.',
     cta: 'Good',
-    onNext: () => setState(() {
-      _q++;
-      _history.removeLast();
-    }),
+    // Kept for revert: setState(() { _q++; _history.removeLast(); }).
+    onNext: _afterPromise,
   );
 
   // ---- 10 building ---------------------------------------------------------------
@@ -1148,19 +1298,28 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   int _built = 0;
   bool _buildingStarted = false;
 
-  static const _buildLines = [
+  /// The second line names the real work for her path (Onboarding V3).
+  List<String> get _buildLines => [
     'Saving your answers',
-    'Working out your week',
+    switch (_stage) {
+      'trying' when _isPartner => 'Setting up your side',
+      'trying' when _planning => 'Starting your Ready-to-Try plan',
+      'trying' when _where == 'clinic' => "Putting your clinic's timing first",
+      'trying' => 'Working out your cycle',
+      'pregnancy' => 'Working out your week',
+      'parenting' => 'Working out their age',
+      _ => 'Picking a first activity',
+    },
     'Choosing what to show you first',
     'Setting up your home',
   ];
+  // Kept for revert: the one fixed list for every stage.
+  //   'Saving your answers', 'Working out your week',
+  //   'Choosing what to show you first', 'Setting up your home'
 
   /// ⚠️ AFTER THE FRAME, NEVER DURING IT. `_building` calls this from its
   /// `build`, and the first thing it does is write to `FamilyProfileStore` —
-  /// a `ChangeNotifier`. Notifying listeners while a build is in flight is
-  /// the classic "setState() or markNeedsBuild() called during build" crash,
-  /// and it would not fire here today only because nothing happens to be
-  /// listening on this route yet. That is luck, not design.
+  /// a `ChangeNotifier`. Notifying during a build is the classic crash.
   void _startBuilding() {
     if (_buildingStarted) return;
     _buildingStarted = true;
@@ -1169,31 +1328,39 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     });
   }
 
-  void _runBuild() {
-    // The real local write, before any session exists — this is what
-    // local-first buys us, and it is what "Saving your answers" refers to.
-    //
-    // ⚠️ IDEMPOTENT ON PURPOSE. Each question already applies itself the
-    // moment she taps an option, so this is a re-apply rather than the only
-    // write — deliberately, because a flow resumed from `startAt`, or one
-    // where she went back and changed an answer, must land the LAST state and
-    // not the first. `apply` sets rather than accumulates, so running it
-    // twice is the same as running it once.
-    for (final q in _questions) {
-      final chosen = _answers[q.id];
-      if (chosen != null) q.apply(FamilyProfileStore.instance, chosen);
+  /// ⚠️ EACH TICK FOLLOWS ITS WORK (Onboarding V3, §5.4). The first line ticks
+  /// when the answers are applied, the second when the reveal has been worked
+  /// out from them. The work is quick, so a minimum pace keeps each line
+  /// readable; it never ticks BEFORE its work. Lines three and four are the
+  /// ordering the home does from these answers when it opens, and are paced.
+  Future<void> _runBuild() async {
+    final calm = obCalm(context);
+    final pace = Duration(milliseconds: calm ? 0 : 420);
+    Future<bool> tick(int i, void Function() work) async {
+      final sw = Stopwatch()..start();
+      work();
+      final rest = pace - sw.elapsed;
+      if (rest > Duration.zero) await Future<void>.delayed(rest);
+      if (!mounted || _step != ObStep.building) return false;
+      setState(() => _built = i);
+      return true;
     }
-    for (var i = 1; i <= _buildLines.length; i++) {
-      Future<void>.delayed(Duration(milliseconds: 420 * i), () {
-        if (!mounted || _step != ObStep.building) return;
-        setState(() => _built = i);
-        if (i == _buildLines.length) {
-          Future<void>.delayed(const Duration(milliseconds: 460), () {
-            if (mounted && _step == ObStep.building) _afterBuilding();
-          });
-        }
-      });
+
+    // ⚠️ IDEMPOTENT ON PURPOSE. Each question already applied itself when
+    // she tapped; this lands the LAST state, after any change of mind.
+    if (!await tick(1, () {
+      for (final q in _runQuestions) {
+        final chosen = _answers[q.id];
+        if (chosen != null) q.apply(FamilyProfileStore.instance, chosen);
+      }
+    })) {
+      return;
     }
+    if (!await tick(2, () => _revealData())) return;
+    if (!await tick(3, () {})) return;
+    if (!await tick(4, () {})) return;
+    await Future<void>.delayed(Duration(milliseconds: calm ? 0 : 460));
+    if (mounted && _step == ObStep.building) _afterBuilding();
   }
 
   Widget _building(V2Palette p) {
@@ -1320,6 +1487,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               ),
             ),
             const SizedBox(height: 10),
+            // Each row ticks in, like things being packed (§5.6).
+            ObStagger(
+              step: const Duration(milliseconds: 70),
+              children: [
             for (final row in _summaryRows())
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
@@ -1370,6 +1541,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   ],
                 ),
               ),
+              ],
+            ),
           ],
         ),
       ),
@@ -1393,14 +1566,23 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             text: 'By continuing you agree to our ',
             style: pvManrope(fontSize: 11.5, height: 1.4, color: p.ink3),
             children: [
+              // Ink and underlined since V3 (no violet in onboarding).
               TextSpan(
                 text: 'Terms',
-                style: TextStyle(color: p.action, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  color: p.action,
+                  fontWeight: FontWeight.w700,
+                  decoration: TextDecoration.underline,
+                ),
               ),
               const TextSpan(text: ' and '),
               TextSpan(
                 text: 'Privacy Policy',
-                style: TextStyle(color: p.action, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  color: p.action,
+                  fontWeight: FontWeight.w700,
+                  decoration: TextDecoration.underline,
+                ),
               ),
               const TextSpan(text: '.'),
             ],
@@ -1420,7 +1602,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     final v = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: V2PaletteStore.instance.current.ground,
+      backgroundColor: kObPalette.ground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1440,7 +1622,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               style: pvFraunces(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
-                color: V2PaletteStore.instance.current.ink1,
+                color: kObPalette.ink1,
               ),
             ),
             const SizedBox(height: 14),
@@ -1451,7 +1633,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             ),
             const SizedBox(height: 16),
             ObPrimary(
-              p: V2PaletteStore.instance.current,
+              p: kObPalette,
               label: 'Save',
               onTap: () => Navigator.of(ctx).pop(c.text),
             ),
@@ -1476,16 +1658,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         subtitle: 'The other person gets their own app, linked to yours.',
       ),
       // ⚠️ THIS SCREEN WAS THE ONE THAT DID NOT GET THE TREATMENT — the user,
-      // 2026-09-22, walking it: the welcome and the privacy screens carry a
-      // painting, the stage screen carries four, "and that one screen where
-      // we have to choose either it's a mother or a father seemed very
-      // bland". It was two Material glyphs in pale wells with an empty bottom
-      // half, sitting between two illustrated screens — a gap you can only
-      // see on the device, in order.
-      //
-      // Two portraits, drawn as a pair and turned toward each other, and a
-      // taller well than the four-up stage cards because these are twice the
-      // width: at 76pt the picture read as a swatch above a caption.
+      // 2026-09-22: two portraits now, drawn as a pair and turned toward each
+      // other, with a taller well than the four-up stage cards.
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1499,7 +1673,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               artHeight: 132,
               hue: 344,
               selected: false,
-              onTap: () => _go(ObStep.stage),
+              onTap: () {
+                _partnerOwn = false;
+                _go(ObStep.stage);
+              },
             ),
           ),
           const SizedBox(width: 12),
@@ -1507,13 +1684,16 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             child: ObGridCard(
               p: p,
               title: 'Partner',
-              subtitle: 'Join with her code',
+              // Kept for revert: 'Join with her code'. Since V3 he can also
+              // set up on his own.
+              subtitle: 'Father, or the other parent',
               icon: Icons.people_outline_rounded,
               art: ObArt.whoPartner,
               artHeight: 132,
               hue: 104,
               selected: false,
-              onTap: _partner,
+              // Kept for revert: onTap: _partner (straight to the code).
+              onTap: () => _go(ObStep.partnerHow),
             ),
           ),
         ],
@@ -1525,6 +1705,73 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       ),
     ],
   );
+
+  /// The partner's two ways in (Onboarding V3, 2026-10-17).
+  ///
+  /// ⚠️ A FATHER WITHOUT HER CODE USED TO HAVE NO WAY IN, and "Set up my own"
+  /// elsewhere sent him through her questions about her body (the user,
+  /// 2026-10-17). Mobbin: Flo is invite-only from her side; Stardust lets
+  /// either start. We let him start, and keep her in control: his side runs
+  /// on what HE told us until she types his code and chooses to share.
+  Widget _partnerHowPage(V2Palette p) {
+    final how = _partnerHow;
+    return ObPage(
+      p: p,
+      onBack: _back,
+      body: [
+        ObHead(
+          p: p,
+          eyebrow: 'Partner',
+          title: 'How are you joining?',
+          subtitle:
+              "Either way, you see the same stage she's in, written for you.",
+        ),
+        ObTile(
+          p: p,
+          title: 'I have her code',
+          subtitle: 'Six characters, from her You screen',
+          selected: how == 'code',
+          onTap: () => setState(() => _partnerHow = 'code'),
+        ),
+        const SizedBox(height: 8),
+        ObTile(
+          p: p,
+          title: 'Set up on my own',
+          subtitle: 'She can link with you later',
+          selected: how == 'own',
+          onTap: () => setState(() => _partnerHow = 'own'),
+        ),
+        ObGiveBack(
+          p: p,
+          text: switch (how) {
+            'code' =>
+              'Your app links to hers. You see what she chooses to share, '
+                  'and nothing she logs privately.',
+            'own' =>
+              "You get your own home for the stage you're in, written to you "
+                  'as the partner. When she links with you, the two homes '
+                  'join up.',
+            _ => '',
+          },
+        ),
+      ],
+      bottom: ObPrimary(
+        p: p,
+        label: 'Continue',
+        onTap: how == null
+            ? null
+            : () {
+                if (how == 'code') {
+                  _partnerOwn = false;
+                  _partner();
+                } else {
+                  _partnerOwn = true;
+                  _go(ObStep.stage);
+                }
+              },
+      ),
+    );
+  }
 
   void _partner() {
     // The pairing branch is the old screen's, unchanged and already positioned.
@@ -1581,9 +1828,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ObHead(
           p: p,
           eyebrow: 'Where you are',
-          title: 'Where are you right now?',
-          subtitle:
-              'This shapes your home. You can change it any time.',
+          title: _isPartner
+              ? 'Where are you two right now?'
+              : 'Where are you right now?',
+          subtitle: _isPartner
+              ? 'This shapes your side of the app. Once she links, it follows hers.'
+              : 'This shapes your home. You can change it any time.',
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1592,7 +1842,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               child: card(
                 'trying',
                 'Trying to conceive',
-                'Cycle and timing',
+                // V3: getting ready is part of this stage now. Kept for
+                // revert: 'Cycle and timing'.
+                'Or getting ready to',
                 Icons.favorite_border_rounded,
                 344,
                 ObArt.stageTrying,
@@ -1605,7 +1857,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 'Pregnant',
                 'Week by week',
                 Icons.pregnant_woman_rounded,
-                275,
+                344, // was 275, a violet (no lavender, Onboarding V3)
                 ObArt.stagePregnant,
               ),
             ),
@@ -1622,7 +1874,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 // Gap analysis P2 (2026-10-07): the promise the setup makes. Kept for revert: 'Sleep and leaps'.
                 'Sleep, feeding and every month',
                 Icons.child_care_rounded,
-                205,
+                140, // was 205 (Onboarding V3, the prototype's sage)
                 ObArt.stageParenting,
               ),
             ),
@@ -1639,11 +1891,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             ),
           ],
         ),
-        const SizedBox(height: 18),
-        Text(
-          'Expecting twins or more? You can say so later.',
-          style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3),
-        ),
+        // Kept for revert: "Expecting twins or more? You can say so later."
+        // There was no later; twins are asked on the date pages since V3.
       ],
     );
   }
@@ -1663,18 +1912,53 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     (DdcMethod.ivf, 'IVF transfer', 'The day of the embryo transfer'),
   ];
 
-  DateTime? get _edd => _methodDate == null
-      ? null
-      : ddcComputeEdd(
-          method: _method,
-          lmp: _methodDate,
-          known: _methodDate,
-          scan: _methodDate,
-          transfer: _methodDate,
-        );
+  /// The due date from what she gave.
+  ///
+  /// ⚠️ SCAN WEEKS AND EMBRYO DAY ARE ASKED NOW (Onboarding V3). Before, a
+  /// scan date was always read as an 8-week scan and every transfer as a
+  /// day-5 embryo, so a 12-week scan put her due date four weeks late. The
+  /// date waits until the second answer is in.
+  DateTime? get _edd {
+    final d = _methodDate;
+    if (d == null) return null;
+    if (_method == DdcMethod.ultrasound && _scanWeeks == null) return null;
+    if (_method == DdcMethod.ivf && _embryoDay == null) return null;
+    return ddcComputeEdd(
+      method: _method,
+      lmp: d,
+      known: d,
+      scan: d,
+      transfer: d,
+      gaWeeks: _scanWeeks ?? 8,
+      embryoDay: _embryoDay ?? 5,
+    );
+  }
+
+  /// (week, day) on the due date [edd], today.
+  (int, int) _weekDay(DateTime edd) {
+    final days = 280 - edd.difference(_today()).inDays;
+    return ((days ~/ 7).clamp(0, 42), (days % 7).clamp(0, 6));
+  }
 
   Widget _datePregnant(V2Palette p) {
-    final m = _methods.firstWhere((e) => e.$1 == _method);
+    // The partner is never asked about her period (Onboarding V3).
+    final methods = [
+      for (final e in _methods)
+        if (!(_isPartner && e.$1 == DdcMethod.lmp)) e,
+    ];
+    if (!methods.any((e) => e.$1 == _method)) _method = methods.first.$1;
+    final m = methods.firstWhere((e) => e.$1 == _method);
+    final edd = _edd;
+    final known = _method == DdcMethod.known;
+    final src = switch (_method) {
+      DdcMethod.known =>
+        " Your doctor gave this date, so we'll never recalculate it.",
+      DdcMethod.ultrasound =>
+        " It comes from your scan, so we'll never recalculate it.",
+      DdcMethod.ivf =>
+        " It comes from your transfer date, so we'll never recalculate it.",
+      _ => '',
+    };
     return ObPage(
       p: p,
       onBack: _back,
@@ -1684,12 +1968,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final e in _methods)
+            for (final e in methods)
               ObPill(
                 p: p,
                 label: e.$2,
                 selected: _method == e.$1,
-                onTap: () => setState(() => _method = e.$1),
+                onTap: () => setState(() {
+                  _method = e.$1;
+                  _methodDate = null;
+                }),
               ),
           ],
         ),
@@ -1699,8 +1986,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           label: m.$3,
           onTap: () => _pickDate(
             initial: _methodDate ?? DateTime.now(),
-            first: DateTime.now().subtract(const Duration(days: 300)),
-            last: DateTime.now().add(const Duration(days: 300)),
+            first: known
+                ? DateTime.now()
+                : DateTime.now().subtract(const Duration(days: 300)),
+            last: known
+                ? DateTime.now().add(const Duration(days: 300))
+                : DateTime.now(),
             onPicked: (d) => setState(() => _methodDate = d),
           ),
           child: Text(
@@ -1712,19 +2003,95 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             ),
           ),
         ),
-        const SizedBox(height: 14),
-        Text(
-          'Not sure? The first day of your last period is enough to start. You can change it any time.',
-          style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3),
-        ),
+        if (_method == DdcMethod.ultrasound) ...[
+          _subLabel(p, 'How many weeks did the scan say?'),
+          Wrap(spacing: 6, runSpacing: 6, children: [
+            for (var w = 6; w <= 13; w++)
+              ObPill(
+                p: p,
+                label: '$w wk',
+                selected: _scanWeeks == w,
+                onTap: () => setState(() => _scanWeeks = w),
+              ),
+          ]),
+        ],
+        if (_method == DdcMethod.ivf) ...[
+          _subLabel(p, 'Embryo age at transfer'),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final d in const [3, 5])
+              ObPill(
+                p: p,
+                label: 'Day $d',
+                selected: _embryoDay == d,
+                onTap: () => setState(() => _embryoDay = d),
+              ),
+          ]),
+        ],
+        // Kept for revert: the stage screen's "Expecting twins or more? You
+        // can say so later." There was no later; it is asked here now.
+        _subLabel(p, 'Expecting more than one?'),
+        Wrap(spacing: 8, children: [
+          ObPill(
+            p: p,
+            label: 'Twins or more',
+            selected: _twins,
+            onTap: () => setState(() => _twins = !_twins),
+          ),
+        ]),
+        if (edd != null)
+          ObGiveBack(
+            p: p,
+            text: () {
+              final (w, d) = _weekDay(edd);
+              return 'Due ${_long(edd)}. You\'re in week $w, day $d.$src'
+                  '${_twins ? ' Twin pregnancies have their own scan schedule, and we\'ll show it.' : ''}';
+            }(),
+          )
+        else ...[
+          const SizedBox(height: 14),
+          Text(
+            _isPartner
+                ? 'Use the date her doctor gave you. If she links later, her '
+                      'date takes over.'
+                : 'Not sure? The first day of your last period is enough to '
+                      'start. You can change it any time.',
+            style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3),
+          ),
+        ],
       ],
       bottom: ObPrimary(
         p: p,
         label: 'Continue',
-        onTap: _edd == null ? null : _afterDatePage,
+        onTap: edd == null ? null : _afterDatePage,
       ),
     );
   }
+
+  /// A small label over a row of pills, inside a page.
+  Widget _subLabel(V2Palette p, String text, {String? optional}) => Padding(
+    padding: const EdgeInsets.only(top: 16, bottom: 8),
+    child: Text.rich(
+      TextSpan(
+        text: text,
+        style: pvManrope(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          color: p.ink2,
+        ),
+        children: [
+          if (optional != null)
+            TextSpan(
+              text: '  $optional',
+              style: pvManrope(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: p.ink3,
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
 
   /// The name as it reads mid-question: "Meera", or "your baby".
   String _obChildName() {
@@ -1734,6 +2101,31 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   Widget _dateChild(V2Palette p, {required bool skilling}) {
     final ready = skilling ? _childAge != null : _childDob != null;
+    final dob = _childDob;
+    final who = _childName.text.trim().isEmpty
+        ? (skilling ? 'Your child' : 'Your baby')
+        : _childName.text.trim();
+    String give = '';
+    if (!skilling && dob != null) {
+      give = '$who is ${_ageLine(dob)}';
+      final w = _bornWeeks;
+      if (_bornEarly == true && w != null) {
+        final corrected = DateTime(dob.year, dob.month, dob.day + (40 - w) * 7);
+        if (corrected.isBefore(_today())) {
+          give += ', or ${_ageLine(corrected)} counted from the due date. '
+              "We'll use that one for milestones";
+        }
+      }
+      give += '.';
+      if (_birthMode == BirthMode.cSection) {
+        give += ' Your own recovery pages start with healing after a C-section.';
+      }
+      if (_careRole == CareRole.father) give += " We'll write to you as dad.";
+    }
+    if (skilling && _childAge != null) {
+      give = 'We pick activities for age $_childAge.'
+          '${_skDob != null ? ' With the birthday, the next age band starts on the right day.' : ' Add a birthday and the next age band starts on the right day, not on a guess.'}';
+    }
     return ObPage(
       p: p,
       onBack: _back,
@@ -1760,7 +2152,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               color: p.ink1,
             ),
             decoration: obBareInput(
-              hint: "Your baby's name",
+              hint: skilling ? "Your child's name" : "Your baby's name",
               style: pvFraunces(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -1770,7 +2162,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           ),
         ),
         const SizedBox(height: 10),
-        if (skilling)
+        if (skilling) ...[
           ObField(
             p: p,
             label: 'Age',
@@ -1783,12 +2175,44 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     p: p,
                     label: '$a',
                     selected: _childAge == a,
-                    onTap: () => setState(() => _childAge = a),
+                    onTap: () => setState(() {
+                      _childAge = a;
+                      // A birthday that disagrees with the age is dropped.
+                      if (_skDob != null && _yearsSince(_skDob!) != a) {
+                        _skDob = null;
+                      }
+                    }),
                   ),
               ],
             ),
-          )
-        else
+          ),
+          const SizedBox(height: 10),
+          // Onboarding V3: a real date of birth when she gives one. Until now
+          // it was always "today, N years ago", so every child's next age band
+          // started on the day they signed up.
+          ObField(
+            p: p,
+            label: 'Birthday — optional',
+            onTap: () => _pickDate(
+              initial: _skDob ??
+                  DateTime(_today().year - (_childAge ?? 7), _today().month),
+              first: DateTime(_today().year - 13, _today().month, _today().day),
+              last: DateTime(_today().year - 6, _today().month, _today().day),
+              onPicked: (d) => setState(() {
+                _skDob = d;
+                _childAge = _yearsSince(d).clamp(6, 12);
+              }),
+            ),
+            child: Text(
+              _skDob == null ? 'Tap to choose' : _long(_skDob!),
+              style: pvFraunces(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: _skDob == null ? p.ink3 : p.ink1,
+              ),
+            ),
+          ),
+        ] else
           ObField(
             p: p,
             label: 'Birthday',
@@ -1813,6 +2237,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           label: 'Boy or girl (optional)',
           child: Wrap(
             spacing: 8,
+            runSpacing: 8,
             children: [
               ObPill(
                 p: p,
@@ -1826,24 +2251,34 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 selected: _childIsBoy == false,
                 onTap: () => setState(() => _childIsBoy = false),
               ),
+              if (!skilling)
+                ObPill(
+                  p: p,
+                  label: 'Twins',
+                  selected: _childTwins,
+                  onTap: () => setState(() => _childTwins = !_childTwins),
+                ),
             ],
           ),
         ),
         if (!skilling) ...[
-          const SizedBox(height: 10),
-          ObField(
-            p: p,
-            label: 'How was ${_obChildName()} born? Optional',
-            child: Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final m in BirthMode.values)
-                ObPill(
-                  p: p,
-                  label: m.label,
-                  selected: _birthMode == m,
-                  onTap: () => setState(() => _birthMode = m),
-                ),
-            ]),
-          ),
+          // The partner is not asked how she gave birth (Onboarding V3).
+          if (!_isPartner) ...[
+            const SizedBox(height: 10),
+            ObField(
+              p: p,
+              label: 'How was ${_obChildName()} born? Optional',
+              child: Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final m in BirthMode.values)
+                  ObPill(
+                    p: p,
+                    label: m.label,
+                    selected: _birthMode == m,
+                    onTap: () => setState(() => _birthMode = m),
+                  ),
+              ]),
+            ),
+          ],
           const SizedBox(height: 10),
           ObField(
             p: p,
@@ -1857,13 +2292,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   onTap: () => setState(() {
                     _bornEarly = false;
                     _bornWeeks = null;
+                    _earlyNotSure = false;
                   }),
                 ),
                 ObPill(
                   p: p,
                   label: 'Yes, early',
                   selected: _bornEarly == true,
-                  onTap: () => setState(() => _bornEarly = true),
+                  onTap: () => setState(() {
+                    _bornEarly = true;
+                    _earlyNotSure = false;
+                  }),
                 ),
                 ObPill(
                   p: p,
@@ -1893,30 +2332,89 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               ],
             ]),
           ),
-          const SizedBox(height: 10),
-          ObField(
-            p: p,
-            label: 'Who are you to ${_obChildName()}? Optional',
-            child: Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final r in CareRole.values)
-                ObPill(
-                  p: p,
-                  label: r.label,
-                  selected: _careRole == r,
-                  onTap: () => setState(() => _careRole = r),
+          if (!_isPartner) ...[
+            const SizedBox(height: 10),
+            ObField(
+              p: p,
+              label: 'Who are you to ${_obChildName()}? Optional',
+              child: Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final r in CareRole.values)
+                  ObPill(
+                    p: p,
+                    label: r.label,
+                    selected: _careRole == r,
+                    onTap: () => setState(() => _careRole = r),
+                  ),
+              ]),
+            ),
+          ],
+          // Onboarding V3: a second child, here rather than "later" (§62.3).
+          if (_secondChild) ...[
+            _subLabel(p, 'Another child'),
+            ObField(
+              p: p,
+              label: 'Name — optional',
+              child: TextField(
+                controller: _child2Name,
+                textCapitalization: TextCapitalization.words,
+                onChanged: (_) => setState(() {}),
+                style: pvFraunces(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: p.ink1,
                 ),
-            ]),
+                decoration: obBareInput(
+                  hint: 'Name',
+                  style: pvFraunces(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: p.ink3,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ObField(
+              p: p,
+              label: 'Birthday',
+              onTap: () => _pickDate(
+                initial: _child2Dob ?? DateTime.now(),
+                first: DateTime.now().subtract(const Duration(days: 365 * 6)),
+                last: DateTime.now(),
+                onPicked: (d) => setState(() => _child2Dob = d),
+              ),
+              child: Text(
+                _child2Dob == null ? 'Tap to choose' : _long(_child2Dob!),
+                style: pvFraunces(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: _child2Dob == null ? p.ink3 : p.ink1,
+                ),
+              ),
+            ),
+          ] else
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ObLink(
+                p: p,
+                label: '+ Add another child',
+                center: false,
+                onTap: () => setState(() => _secondChild = true),
+              ),
+            ),
+        ],
+        ObGiveBack(p: p, text: give),
+        if (give.isEmpty) ...[
+          const SizedBox(height: 14),
+          Text(
+            skilling
+                ? "We pick activities by age. That's all we need."
+                // "and the leaps" dropped 2026-10-07: the app no longer counts by them.
+                : 'The name is up to you. We count the weeks and months from the birthday, '
+                      'and the birth answers help us show the right pages first.',
+            style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3),
           ),
         ],
-        const SizedBox(height: 14),
-        Text(
-          skilling
-              ? "We pick activities by age. That's all we need."
-              // "and the leaps" dropped 2026-10-07: the app no longer counts by them.
-              : 'The name is up to you. We count the weeks and months from the birthday, '
-                  'and the birth answers help us show the right pages first.',
-          style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3),
-        ),
       ],
       bottom: ObPrimary(
         p: p,
@@ -1924,6 +2422,27 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         onTap: ready ? _afterDatePage : null,
       ),
     );
+  }
+
+  static int _yearsSince(DateTime d) {
+    final n = _today();
+    var y = n.year - d.year;
+    if (n.month < d.month || (n.month == d.month && n.day < d.day)) y--;
+    return y;
+  }
+
+  /// "4 months, 2 weeks", "6 weeks old", "2 years, 5 months".
+  static String _ageLine(DateTime dob) {
+    final (m, w) = _monthsWeeks(dob);
+    if (m >= 24) {
+      final rest = m % 12;
+      return '${m ~/ 12} years${rest == 0 ? '' : ', $rest ${rest == 1 ? 'month' : 'months'}'}';
+    }
+    if (m < 2) {
+      final weeks = _today().difference(dob).inDays ~/ 7;
+      return '$weeks ${weeks == 1 ? 'week' : 'weeks'} old';
+    }
+    return '$m months${w == 0 ? '' : ', $w ${w == 1 ? 'week' : 'weeks'}'}';
   }
 
   Future<void> _pickDate({
@@ -1967,15 +2486,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   // ---- questions ----------------------------------------------------------------
 
   Widget _question(V2Palette p) {
-    final qs = _questions;
-    if (qs.isEmpty) return const SizedBox.shrink();
-    final q = qs[_q.clamp(0, qs.length - 1)];
+    final run = _run;
+    if (run.isEmpty) return const SizedBox.shrink();
+    final id = run[_q.clamp(0, run.length - 1)];
+    if (id == _kPeriod) return _ttcPeriod(p);
+    if (id == _kAboutHim) return _aboutHim(p);
+    if (id == _kPromise) return const SizedBox.shrink(); // the beat shows
+    final q = obQuestion(id, childName: _childName.text);
     final chosen = _answers[q.id] ?? <String>{};
-    final giveBack = q.multi
-        ? (chosen.isEmpty ? '' : (q.multiGiveBack ?? ''))
-        : (chosen.isEmpty
-              ? ''
-              : q.options.firstWhere((o) => o.id == chosen.first).giveBack);
+    final giveBack = _giveBackFor(q, chosen);
 
     void choose(ObOption o) {
       setState(() {
@@ -1991,29 +2510,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       q.apply(FamilyProfileStore.instance, _answers[q.id]!);
     }
 
-    return ObPage(
-      p: p,
-      onBack: _back,
-      trailing: ObLink(p: p, label: 'Skip', onTap: _nextQuestion),
+    return _questionPage(
+      p,
+      title: _titleFor(q),
+      subtitle: q.subtitle,
+      canContinue: chosen.isNotEmpty,
       body: [
-        // ⚠️ THE ONE PLACE A BAR BELONGS — see onboarding_chrome's header for
-        // why the "no progress bar anywhere" rule was narrowed rather than
-        // dropped. Named with the stage, because Noom's finding is that a
-        // labelled section reads as a subject with an end and a bare count
-        // reads as a chore with a length.
-        ObProgress(
-          p: p,
-          label: switch (_stage) {
-            'pregnancy' => 'About your pregnancy',
-            'trying' => 'About where you are',
-            'skilling' => 'About your child',
-            _ => 'About your baby',
-          },
-          step: _q + 1,
-          total: qs.length,
-        ),
-        const SizedBox(height: 22),
-        ObHead(p: p, title: q.title, subtitle: q.subtitle),
         if (q.multi)
           Wrap(
             spacing: 8,
@@ -2033,67 +2535,461 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             ObTile(
               p: p,
               title: o.label,
+              subtitle: o.subtitle,
               selected: chosen.contains(o.id),
               compact: true,
               onTap: () => choose(o),
             ),
             const SizedBox(height: 8),
           ],
+        ..._extraFor(p, q, chosen),
         ObGiveBack(p: p, text: giveBack),
+      ],
+    );
+  }
+
+  /// The frame every page in the run shares: the named bar, Skip, the
+  /// question, and Continue.
+  Widget _questionPage(
+    V2Palette p, {
+    required String title,
+    String? subtitle,
+    required bool canContinue,
+    required List<Widget> body,
+  }) {
+    final run = _run;
+    final asked = [for (final id in run) if (id != _kPromise) id];
+    final here = run[_q.clamp(0, run.length - 1)];
+    return ObPage(
+      p: p,
+      onBack: _back,
+      trailing: ObLink(p: p, label: 'Skip', onTap: _nextQuestion),
+      body: [
+        // ⚠️ THE ONE PLACE A BAR BELONGS — see onboarding_chrome's header for
+        // why the "no progress bar anywhere" rule was narrowed rather than
+        // dropped. Named with the stage (Noom's finding).
+        ObProgress(
+          p: p,
+          label: _isPartner
+              ? switch (_stage) {
+                  'trying' => 'About you two',
+                  'pregnancy' => 'About you and the baby',
+                  _ => 'About your baby',
+                }
+              : switch (_stage) {
+                  'pregnancy' => 'About your pregnancy',
+                  'trying' => 'About where you are',
+                  'skilling' => 'About your child',
+                  _ => 'About your baby',
+                },
+          step: asked.indexOf(here) + 1,
+          total: asked.length,
+        ),
+        const SizedBox(height: 22),
+        ObHead(p: p, title: title, subtitle: subtitle),
+        ...body,
       ],
       bottom: ObPrimary(
         p: p,
         label: 'Continue',
-        onTap: chosen.isEmpty ? null : _nextQuestion,
+        onTap: canContinue ? _nextQuestion : null,
       ),
+    );
+  }
+
+  /// The partner reads the shared questions about "you two".
+  String _titleFor(ObQuestion q) =>
+      _isPartner && q.id == 'ttc_where' ? 'Where are you two with this?' : q.title;
+
+  static const _monthsShort = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  /// The seven months they can choose to start in: next month and six more,
+  /// the same choice the TTC intro offered (d8724d1).
+  List<DateTime> get _readyMonths {
+    final t = _today();
+    return [for (var i = 1; i <= 7; i++) DateTime(t.year, t.month + i)];
+  }
+
+  /// What appears under a question once it is answered, in place (no extra
+  /// screen): the month, the kind of clinic care, her age band, "gentle".
+  List<Widget> _extraFor(V2Palette p, ObQuestion q, Set<String> chosen) {
+    switch (q.id) {
+      case 'ttc_where':
+        if (chosen.contains('planning')) {
+          return [
+            _subLabel(p, 'Which month do you want to start trying?',
+                optional: 'Optional'),
+            Wrap(spacing: 6, runSpacing: 6, children: [
+              for (final m in _readyMonths)
+                ObPill(
+                  p: p,
+                  label: _monthsShort[m.month - 1],
+                  selected: _readyMonth == m,
+                  onTap: () => setState(() {
+                    _readyMonth = m;
+                    _readyUnsure = false;
+                  }),
+                ),
+              ObPill(
+                p: p,
+                label: 'Not sure yet',
+                selected: _readyUnsure,
+                onTap: () => setState(() {
+                  _readyMonth = null;
+                  _readyUnsure = true;
+                }),
+              ),
+            ]),
+          ];
+        }
+        if (chosen.contains('clinic')) {
+          return [
+            _subLabel(p, 'Which kind?', optional: 'Optional'),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final (id, label) in const [
+                ('oi', 'Ovulation medicine'),
+                ('iui', 'IUI'),
+                ('ivf', 'IVF'),
+                ('unsure', 'Not sure yet'),
+              ])
+                ObPill(
+                  p: p,
+                  label: label,
+                  selected: _clinicKind == id,
+                  onTap: () => setState(() => _clinicKind = id),
+                ),
+            ]),
+          ];
+        }
+      case 'ttc_duration':
+        return [
+          _subLabel(p, _isPartner ? 'Her age' : 'Your age',
+              optional: 'Optional. It changes when we suggest a check-up'),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final b in FertilityAgeBand.values)
+              ObPill(
+                p: p,
+                label: b.label.en,
+                selected: _ageBand == b,
+                onTap: () => setState(() => _ageBand = b),
+              ),
+          ]),
+        ];
+      case 'preg_parity':
+        if (chosen.contains('subsequent')) {
+          return [
+            _subLabel(p, 'Anything we should be gentle about?',
+                optional: 'Optional'),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final (id, label) in const [
+                ('loss', 'A past loss'),
+                ('hard', 'A hard birth'),
+                ('skip', 'Rather not say'),
+              ])
+                ObPill(
+                  p: p,
+                  label: label,
+                  selected: _gentle == id,
+                  onTap: () => setState(() => _gentle = id),
+                ),
+            ]),
+          ];
+        }
+    }
+    return const [];
+  }
+
+  /// When a check-up is worth suggesting, from how long and her age band.
+  /// The population guidance (a year under 35, six months from 35, soon
+  /// from 40), never a personal probability.
+  bool get _doctorSoon {
+    final d = _answers['ttc_duration']?.firstOrNull;
+    final a = _ageBand;
+    final from35 = a != null && a != FertilityAgeBand.under35;
+    return d == 'year' ||
+        (d == 'six' && from35) ||
+        (d == 'months' && a == FertilityAgeBand.over40);
+  }
+
+  /// The give-back, where it depends on more than the option tapped.
+  String _giveBackFor(ObQuestion q, Set<String> chosen) {
+    if (chosen.isEmpty) return '';
+    final first = chosen.first;
+    String labels(int n) => [
+      for (final id in chosen.take(n))
+        q.options.firstWhere((o) => o.id == id).label.toLowerCase(),
+    ].join(' and ');
+    switch (q.id) {
+      case 'ttc_where':
+        final m = _readyMonth;
+        if (_isPartner) {
+          return switch (first) {
+            'planning' =>
+              'Good timing for you too. Sperm take about three months to '
+                  'develop, so what you change now counts by '
+                  '${m == null ? 'the time you start' : readyMonthLabel(m)}.',
+            'trying' =>
+              'Your side explains the timing: what the fertile days are and '
+                  'how you can help. Her own dates show only if she links and '
+                  'chooses to share them.',
+            _ =>
+              "Then her clinic sets the timing. Your side covers the steps "
+                  "you're part of, and what to ask at the appointments you go to.",
+          };
+        }
+        if (first == 'planning' && m != null) {
+          return 'Good timing. Starting a few months early gives folic acid '
+              'and a check-up time to work. Your Ready-to-Try plan counts '
+              'down to ${readyMonthLabel(m)}, and the "how long trying" clock '
+              'only starts then.';
+        }
+      case 'ttc_duration':
+        if (first == 'skip') break;
+        if (_doctorSoon) {
+          return "It's a good time to see a doctor, for both of you. It's a "
+              "calm check, not an emergency, and we'll help you prepare the "
+              'questions.';
+        }
+        final lead = first == 'starting'
+            ? 'Most couples get pregnant within a year. The first months are '
+                  'for getting to know your cycle.'
+            : 'This is still normal for many couples.';
+        final rule = switch (_ageBand) {
+          FertilityAgeBand.under35 =>
+            'Under 35, doctors suggest a check-up after a year of trying.',
+          FertilityAgeBand.over40 =>
+            'From 40, doctors suggest seeing someone soon rather than waiting.',
+          null =>
+            "Tell us your age and we'll know when a check-up makes sense.",
+          _ => 'From 35, doctors suggest a check-up after six months.',
+        };
+        return '$lead $rule';
+      case 'preg_parity':
+        if (first == 'subsequent') {
+          return switch (_gentle) {
+            'loss' =>
+              "Thank you for telling us. We'll keep the countdown quiet, and "
+                  "loss stories stay out of your feed unless you look for them.",
+            'hard' => "Thank you for telling us. You don't have to say more.",
+            _ =>
+              "Then we'll skip the basics you already know and start with "
+                  "what's different this time.",
+          };
+        }
+      case 'preg_priorities':
+        return 'Your home will open with ${labels(2)}'
+            '${chosen.length > 2 ? ', then the rest' : ''}. You can change '
+            'this any time in You.';
+      case 'pp_priorities':
+        return 'Your home will open with ${labels(2)}. You can change this '
+            'any time in You.';
+      case 'p_help_trying':
+      case 'p_help_pregnancy':
+        return 'Your side will open with ${labels(2)}.';
+      case 'sk_interests':
+        final a = skFirstActivity((chosen.toList()..sort()).join(','), null);
+        if (a != null) {
+          return "Today's first activity: ${a.title}. The rest follow from "
+              'there.';
+        }
+    }
+    return q.multi
+        ? (q.multiGiveBack ?? '')
+        : q.options.firstWhere((o) => o.id == first).giveBack;
+  }
+
+  /// Her fertile window from the one date she gave, worked out by the same
+  /// engine the home uses, so the two can never disagree (`TtcChapterEngine`,
+  /// the window constants in `ttc_fertile_window.dart`). Null when the engine
+  /// would not estimate, or when a clinic runs the timing.
+  ({DateTime opens, DateTime closes, DateTime next})? get _ttcWindow {
+    final lmp = _lmp;
+    if (lmp == null || _lmpUnknown || _where == 'clinic') return null;
+    const engine = TtcChapterEngine();
+    final today = _today();
+    final st = TtcJourneyState(
+      lastPeriodStart: lmp,
+      today: today,
+      statedIrregular: _answers['ttc_cycles']?.contains('no') ?? false,
+    );
+    final ov = engine.estimatedOvulationDay(st);
+    if (ov == null) return null;
+    final len = engine.cycleLengthFor(st);
+    final day0 = DateTime(lmp.year, lmp.month, lmp.day);
+    final cycleDay = today.difference(day0).inDays + 1;
+    final opens = ov - ttcWindowOpensBeforeOvulation;
+    final closes = ov + ttcWindowClosesAfterOvulation;
+    var ahead = 0;
+    while (cycleDay > closes + ahead * len && ahead < 24) {
+      ahead++;
+    }
+    DateTime dateOf(int d) =>
+        DateTime(day0.year, day0.month, day0.day + d - 1 + ahead * len);
+    var k = 1;
+    while (!DateTime(day0.year, day0.month, day0.day + k * len)
+        .isAfter(today)) {
+      k++;
+    }
+    return (
+      opens: dateOf(opens),
+      closes: dateOf(closes),
+      next: DateTime(day0.year, day0.month, day0.day + k * len),
+    );
+  }
+
+  /// "When did your last period start?" (Onboarding V3). Moved here from the
+  /// TTC intro, so she sees her fertile days before she makes an account
+  /// (Flo and Oura do the same).
+  Widget _ttcPeriod(V2Palette p) {
+    final w = _ttcWindow;
+    final String give;
+    if (_lmpUnknown) {
+      give = "That's fine. Tap \"Period started\" on the first day of your "
+          "next one, and we'll start from there.";
+    } else if (_lmp != null && _where == 'clinic') {
+      give = 'Saved. Your clinic will ask for this date, so it is ready when '
+          'they do.';
+    } else if (w != null) {
+      give = 'If your cycle is about 28 days, your next period is around '
+          '${_short(w.next)} and your fertile days are likely around '
+          '${_short(w.opens)} to ${_short(w.closes)}. Each period you log '
+          'makes this sharper.';
+    } else if (_lmp != null) {
+      give = "Saved. That was a while ago, so we'll start the estimate from "
+          'your next period.';
+    } else {
+      give = '';
+    }
+    return _questionPage(
+      p,
+      title: 'When did your last period start?',
+      subtitle: switch (_where) {
+        'planning' =>
+          "Start logging now and you'll know your cycle well by the time you "
+              'begin.',
+        'clinic' =>
+          "Your clinic asks for this at almost every visit. We'll keep it "
+              'ready for you.',
+        _ => 'This one date gives us your cycle and your likely fertile days.',
+      },
+      canContinue: _lmp != null || _lmpUnknown,
+      body: [
+        ObField(
+          p: p,
+          label: 'First day of your last period',
+          onTap: () => _pickDate(
+            initial: _lmp ?? _today(),
+            first: _today().subtract(const Duration(days: 90)),
+            last: _today(),
+            onPicked: (d) => setState(() {
+              _lmp = d;
+              _lmpUnknown = false;
+            }),
+          ),
+          child: Text(
+            _lmp == null ? 'Tap to choose' : _long(_lmp!),
+            style: pvFraunces(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: _lmp == null ? p.ink3 : p.ink1,
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: ObLink(
+            p: p,
+            center: false,
+            label: _lmpUnknown ? 'I remember it now' : "I don't remember",
+            onTap: () => setState(() {
+              _lmpUnknown = !_lmpUnknown;
+              if (_lmpUnknown) _lmp = null;
+            }),
+          ),
+        ),
+        ObGiveBack(p: p, text: give),
+      ],
+    );
+  }
+
+  /// "A little about you." His part of the Ready-to-Try plan: the plan's own
+  /// two questions for him (`HisAge`, `HisHabit`), asked here rather than
+  /// invented, and saved where the plan reads them.
+  Widget _aboutHim(V2Palette p) {
+    final h = _hisHabits;
+    final give = [
+      if (_hisAge == HisAge.fortyOrOver) 'From 40, a check-up early on is worth it.',
+      if (h.contains('tobacco'))
+        'Stopping tobacco is the biggest single thing you can do for sperm '
+            'health, and it counts in about three months.',
+      if (h.contains('alcohol'))
+        'Cutting down on drinks helps too, and it also counts in about three '
+            'months.',
+      if (h.contains('medicines'))
+        "Some everyday medicines affect sperm. Ask your doctor, but don't stop "
+            'anything on your own.',
+      if (h.contains('none'))
+        "Good. A quick check-up is still worth it, and for men it's simple.",
+    ].join(' ');
+    void toggle(String id) => setState(() {
+      if (id == 'none') {
+        final had = h.contains('none');
+        h.clear();
+        if (!had) h.add('none');
+      } else {
+        h.remove('none');
+        h.contains(id) ? h.remove(id) : h.add(id);
+      }
+    });
+    return _questionPage(
+      p,
+      title: 'A little about you.',
+      subtitle: 'For your part of the plan. It stays on your phone unless you '
+          'choose to share it.',
+      canContinue: _hisAge != null || h.isNotEmpty,
+      body: [
+        _subLabel(p, 'Your age'),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final a in HisAge.values)
+            ObPill(
+              p: p,
+              label: a.label,
+              selected: _hisAge == a,
+              onTap: () => setState(() => _hisAge = a),
+            ),
+        ]),
+        _subLabel(p, 'Any of these?', optional: 'Pick all that fit'),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final x in HisHabit.values)
+            ObPill(
+              p: p,
+              label: x.label,
+              selected: h.contains(x.name),
+              onTap: () => toggle(x.name),
+            ),
+          ObPill(
+            p: p,
+            label: 'None of these',
+            selected: h.contains('none'),
+            onTap: () => toggle('none'),
+          ),
+        ]),
+        ObGiveBack(p: p, text: give),
+      ],
     );
   }
 
   // ---- 06 reveal ----------------------------------------------------------------
 
   Widget _reveal(V2Palette p) {
-    String big;
-    String small;
-    String eyebrow;
-    switch (_stage) {
-      case 'pregnancy':
-        final edd = _edd!;
-        final days = 280 - edd.difference(_today()).inDays;
-        final w = (days ~/ 7).clamp(0, 42);
-        final d = (days % 7).clamp(0, 6);
-        final tri = w < 13 ? 'First' : (w < 27 ? 'Second' : 'Third');
-        eyebrow = 'Week $w';
-        // "Week 14, day 0" is obstetric notation (14+0) and it is correct;
-        // it is also the only line on the screen that reads like a chart. On
-        // the day a week turns, the week alone is the whole answer.
-        big = d == 0 ? 'Week $w.' : 'Week $w, day $d.';
-        small = '$tri trimester · Due ${_short(edd)}';
-      case 'parenting':
-        final dob = _childDob!;
-        final age = _monthsWeeks(dob);
-        final name = _childName.text.trim().isEmpty
-            ? 'Your baby'
-            : _childName.text.trim();
-        eyebrow = age.$1 == 0 ? 'Week ${age.$2}' : 'Month ${age.$1}';
-        big = age.$1 == 0
-            ? '$name is ${age.$2} ${age.$2 == 1 ? 'week' : 'weeks'} old.'
-            : '$name is ${age.$1} ${age.$1 == 1 ? 'month' : 'months'}${age.$2 > 0 ? ', ${age.$2} ${age.$2 == 1 ? 'week' : 'weeks'}' : ''}.';
-        small = "Here's what's changing this month.";
-      default:
-        final name = _childName.text.trim().isEmpty
-            ? 'Your child'
-            : _childName.text.trim();
-        eyebrow = 'Age ${_childAge ?? 6}';
-        big = '$name, ${_childAge ?? 6}.';
-        small = "Here's where we start.";
-    }
+    final d = _revealData();
     return ObPage(
       p: p,
       onBack: _back,
       body: [
-        // Kept for revert: a 220pt `p.surfaceAlt` box with the eyebrow
-        // centred in it — a placeholder that read as a missing image, which
-        // is exactly what it was.
         const SizedBox(height: 8),
         ClipRRect(
           borderRadius: BorderRadius.circular(24),
@@ -2105,7 +3001,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ),
         const SizedBox(height: 24),
         Text(
-          eyebrow.toUpperCase(),
+          d.eyebrow.toUpperCase(),
           style: pvManrope(
             fontSize: 11.5,
             fontWeight: FontWeight.w800,
@@ -2114,58 +3010,68 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           ),
         ),
         const SizedBox(height: 10),
-        Text(
-          big,
-          style: pvFraunces(
-            fontSize: 36,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.9,
-            height: 1.1,
-            color: p.ink1,
+        ObSettle(
+          child: Text(
+            d.big,
+            style: pvFraunces(
+              fontSize: 36,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.9,
+              height: 1.1,
+              color: p.ink1,
+            ),
           ),
         ),
         const SizedBox(height: 10),
         Text(
-          small,
+          d.small,
           style: pvManrope(fontSize: 15.5, height: 1.45, color: p.ink2),
         ),
-        // ⚠️ THE PAYOFF THE QUESTIONS BOUGHT. The reveal showed her week and
-        // then stopped, leaving the lower half white — which is a strange
-        // place to stop, because the screen before it was three questions
-        // about what she wants and this is the first chance to show that they
-        // landed. Flo's version of this screen is a list of what she now
-        // gets; ours is that list built from her own answers.
-        //
-        // Every line is true of the app as configured. The priorities really
-        // are `PregPriority` values and `togglePregPriority` really does
-        // reorder her home — the option ids in `onboarding_questions.dart`
-        // ARE the enum's names, which is why this can be stated rather than
-        // promised.
+        // ⚠️ EVERY LINE IS ONE OF HER ANSWERS COMING BACK (Onboarding V3),
+        // and each is true of the app as it is configured now. They arrive one
+        // after another for that reason (§5.5).
         const SizedBox(height: 26),
-        for (final row in _revealRows())
-          Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  margin: const EdgeInsets.only(top: 8, right: 12),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: p.ink3,
-                  ),
+        ObStagger(
+          start: const Duration(milliseconds: 180),
+          children: [
+            for (final row in d.items)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      margin: const EdgeInsets.only(top: 8, right: 12),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: p.ink3,
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            row.$1,
+                            style: pvManrope(
+                                fontSize: 15, height: 1.45, color: p.ink1),
+                          ),
+                          if (row.$2.isNotEmpty)
+                            Text(
+                              row.$2,
+                              style: pvManrope(
+                                  fontSize: 13, height: 1.4, color: p.ink3),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: Text(
-                    row,
-                    style: pvManrope(fontSize: 15, height: 1.45, color: p.ink1),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+          ],
+        ),
       ],
       bottom: ObPrimary(
         p: p,
@@ -2175,46 +3081,200 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     );
   }
 
-  /// What she now has, in the app's own terms.
-  ///
-  /// ⚠️ NO NEW CONFIG. The middle line reuses the option LABELS she chose
-  /// rather than a second table of marketing copy keyed by the same ids — a
-  /// table like that drifts from the question the moment anyone edits either
-  /// one, and nobody notices because both still compile.
-  List<String> _revealRows() {
-    final out = <String>[
-      switch (_stage) {
-        'pregnancy' => 'A page for every week, from this one to birth',
-        'parenting' => 'What changes for them, month by month',
-        _ => 'A skill at a time, at the age they are',
-      },
-    ];
-    for (final q in _questions) {
-      final chosen = _answers[q.id];
-      if (chosen == null || chosen.isEmpty) continue;
-      final labels = q.options
-          .where((o) => chosen.contains(o.id))
-          .map((o) => o.label)
-          .toList();
-      if (labels.isEmpty) continue;
-      if (q.multi) {
-        // ⚠️ MIDDOTS, NOT "AND". `_and` produced "Eating well, Worry and mood
-        // and Preparing for birth" — grammatical, and it stutters, because
-        // one of the options has an "and" inside it already. A list whose
-        // items may contain the conjunction cannot be joined with the
-        // conjunction.
-        out.add('${labels.join(' · ')}, first on your home');
-      } else if (q.id.endsWith('_diet')) {
-        // The label is a title ("Vegetarian"); mid-sentence it is a word.
-        out.add(
-          'Every recipe and food page will be '
-          '${labels.first.toLowerCase()}',
-        );
-      }
+  /// The reveal, built from her answers: an eyebrow, the headline, one line
+  /// under it, and the list of what she now has, one item per answer.
+  ({String eyebrow, String big, String small, List<(String, String)> items})
+      _revealData() {
+    const ask = ('Ask Veda anything, in your own words, any time', '');
+    final items = <(String, String)>[];
+    final folicYes = _answers['ttc_folic']?.contains('yes') ?? false;
+    final irregular = _answers['ttc_cycles']?.contains('no') ?? false;
+    List<String> picked(String id) {
+      final q = obQuestion(id, childName: _childName.text);
+      final c = _answers[id] ?? const <String>{};
+      return [for (final o in q.options) if (c.contains(o.id)) o.label];
     }
-    out.add('Ask Veda anything, in your own words, any time');
-    return out;
+
+    if (_isPartner && _stage == 'trying') {
+      final habits = [for (final h in _hisHabits) if (h != 'none') h];
+      items.add(habits.isEmpty
+          ? ('Your part of the plan: a simple check-up', 'Quick for men, and worth doing early')
+          : ('Your part of the plan: ${habits.map((h) => const {'tobacco': 'tobacco', 'alcohol': 'drinks', 'medicines': 'medicines'}[h]).join(', ')}',
+              'What to change, and why it counts in about three months'));
+      final helps = picked('p_help_trying');
+      if (helps.isNotEmpty) items.add(('${helps.take(2).join(' · ')}, first on your side', ''));
+      if (_doctorSoon) items.add(('A check-up for both of you is a good next step', "We'll help you prepare"));
+      items.add(('Link with her next', 'Then you see what she chooses to share'));
+      items.add(('Ask Veda anything, any time', ''));
+      final m = _readyMonth;
+      return (
+        eyebrow: 'Your side of it',
+        big: _planning
+            ? (m == null ? 'Getting ready, together.' : 'Ready by ${readyMonthLabel(m)}.')
+            : _where == 'clinic'
+                ? "Her clinic's plan, from your side."
+                : 'The timing, explained for you.',
+        small: _planning
+            ? 'Your part starts now. Sperm take about three months, so what you change today counts by then.'
+            : 'Her dates stay hers. When she links, you see what she shares.',
+        items: items,
+      );
+    }
+    if (_isPartner && _stage == 'pregnancy') {
+      final edd = _edd!;
+      final (w, _) = _weekDay(edd);
+      final tri = w < 14 ? 'first' : (w < 28 ? 'second' : 'third');
+      items.add(('Your part each week', 'One small thing you can do, and talking to the baby'));
+      final helps = picked('p_help_pregnancy');
+      if (helps.isNotEmpty) items.add(('${helps.take(2).join(' · ')}, first on your side', ''));
+      if (_twins) items.add(('Twins: the pages for two', ''));
+      items.add(('Link with her next', 'Her week, and the scans you can go to'));
+      items.add(('Ask Veda anything, any time', ''));
+      return (
+        eyebrow: 'Week $w',
+        big: 'Week $w. Due ${_short(edd)}.',
+        small: "Her $tri trimester. Here's your side of it.",
+        items: items,
+      );
+    }
+
+    switch (_stage) {
+      case 'trying':
+        if (_planning) {
+          final m = _readyMonth;
+          items.add(m == null
+              ? ('Your Ready-to-Try plan', 'Pick a month in it and it counts down to it')
+              : ('Your Ready-to-Try plan, first on your home',
+                  'Tests to ask about, folic acid timing, food for your kitchen. His part is optional'));
+          items.add(folicYes
+              ? ('Folic acid, 400 mcg a day. Already started', 'Ticked off in your supplements')
+              : ('Folic acid, 400 mcg a day. Start this week', 'First on your supplements list'));
+          if (m != null) items.add(('The trying clock starts in ${readyMonthLabel(m)}', 'Not today. Doctor timing counts from then'));
+          items.add(_lmp != null
+              ? ('Your periods, logged from today', 'A few cycles of dates by the time you start')
+              : ('Log your next period', 'A few cycles of dates by the time you start'));
+          if (irregular) items.add(('Irregular periods: worth mentioning at the check-up', 'Your dates will be ready to show'));
+          items.add(ask);
+          return (
+            eyebrow: 'Getting ready to try',
+            big: m == null ? 'Getting ready, at your pace.' : 'Ready by ${readyMonthLabel(m)}.',
+            small: 'A plan for the two of you, month by month. When you start trying, the cycle home takes over.',
+            items: items,
+          );
+        }
+        if (_where == 'clinic') {
+          final kind = const {'oi': 'Ovulation medicine', 'iui': 'IUI', 'ivf': 'IVF'}[_clinicKind];
+          // ⚠️ HONEST ABOUT WHEN WE STEP ASIDE. Timing ownership follows real
+          // clinic dates in the treatment tracker, never the label tapped here
+          // (ttc_care_pathway.dart), so the line says what she has to do.
+          items.add(("Your clinic's dates come first", 'Add them, and our estimate steps aside for theirs'));
+          items.add(('Questions to take to your next appointment', ''));
+          if (!folicYes) items.add(('Folic acid, 400 mcg a day', 'Ask your clinic if your dose is different'));
+          items.add(ask);
+          return (
+            eyebrow: "Your clinic's plan",
+            big: '${kind ?? 'Treatment'}, with your clinic.',
+            small: 'Your clinic sets the dates. We help you get ready for each one.',
+            items: items,
+          );
+        }
+        if (irregular) items.add(('A rough estimate for now', 'It firms up as you log periods'));
+        final dur = _answers['ttc_duration']?.firstOrNull;
+        if (_doctorSoon) {
+          items.add(('A check-up is a good next step', "For both of you. We'll help you prepare"));
+        } else if (dur != null && dur != 'skip') {
+          items.add(("We'll tell you when a check-up makes sense", switch (_ageBand) {
+            FertilityAgeBand.under35 => 'At a year, or sooner if you would like',
+            FertilityAgeBand.over40 => "Soon, since you're 40 or over",
+            null => 'At a year, or sooner if you would like',
+            _ => "At six months, since you're 35 or over",
+          }));
+        }
+        items.add(folicYes
+            ? ('Folic acid: ticked off', 'In your supplements')
+            : ('Folic acid, 400 mcg a day', 'First on your supplements list'));
+        items.add(ask);
+        final w = _ttcWindow;
+        return w == null
+            ? (
+                eyebrow: 'Your cycle',
+                big: 'Your cycle starts with one date.',
+                small: 'Tap "Period started" on the first day, and your fertile days appear.',
+                items: items,
+              )
+            : (
+                eyebrow: 'Your cycle',
+                big: 'Fertile days likely around ${_short(w.opens)} to ${_short(w.closes)}.',
+                small: 'Next period around ${_short(w.next)}. Based on a 28-day cycle, and it gets sharper as you log.',
+                items: items,
+              );
+      case 'pregnancy':
+        final edd = _edd!;
+        final (w, d) = _weekDay(edd);
+        final tri = w < 14 ? 'First' : (w < 28 ? 'Second' : 'Third');
+        items.add(('A page for every week, from this one to birth', _twins ? 'With the twin scan schedule' : ''));
+        final prios = picked('preg_priorities');
+        if (prios.isNotEmpty) items.add(('${prios.take(2).join(' · ')}, first on your home', ''));
+        final diet = picked('preg_diet');
+        if (diet.isNotEmpty) items.add(('Every recipe and food page will be ${diet.first.toLowerCase()}', ''));
+        if (_answers['preg_parity']?.contains('subsequent') ?? false) {
+          items.add((_gentle == 'loss'
+              ? 'No countdown, and no loss stories in your feed unless you look'
+              : 'Skipping the basics you already know', ''));
+        }
+        items.add(ask);
+        return (
+          eyebrow: 'Week $w',
+          big: d == 0 ? 'Week $w.' : 'Week $w, day $d.',
+          small: "$tri trimester · Due ${_short(edd)}"
+              "${_method != DdcMethod.lmp ? " · your doctor's date" : ''}",
+          items: items,
+        );
+      case 'parenting':
+        final dob = _childDob!;
+        final (m, _) = _monthsWeeks(dob);
+        final who = _childName.text.trim().isEmpty ? 'Your baby' : _childName.text.trim();
+        items.add(('What changes for them, month by month', _bornEarly == true ? 'Milestones counted from the due date' : ''));
+        final feeding = picked('pp_feeding');
+        if (feeding.isNotEmpty) items.add(('Feeding: ${feeding.first.toLowerCase()}', 'Your feeding page opens there'));
+        final sleep = _answers['pp_sleep']?.firstOrNull;
+        if (sleep != null && sleep != 'well') items.add(('Sleep: ${picked('pp_sleep').first.toLowerCase()}', "What's normal this month, first"));
+        final prios = picked('pp_priorities');
+        if (prios.isNotEmpty) items.add(('${prios.take(2).join(' · ')}, first on your home', ''));
+        if (_birthMode == BirthMode.cSection) items.add(('Your recovery after a C-section', 'Kegel and yoga set to match'));
+        if (_childTwins) items.add(('Twins: we know there are two', ''));
+        if (_secondChild && _child2Dob != null) {
+          final n2 = _child2Name.text.trim();
+          items.add(('${n2.isEmpty ? 'Your second child' : n2} too', 'Switch between them from the top of the home'));
+        }
+        items.add(ask);
+        final dad = _careRole == CareRole.father || _isPartner;
+        return (
+          eyebrow: m < 2 ? 'Week ${_today().difference(dob).inDays ~/ 7}' : 'Month $m',
+          big: '$who is ${_ageLine(dob)}.',
+          small: dad ? "Here's what's changing this month, written to you as dad." : "Here's what's changing this month.",
+          items: items,
+        );
+      default:
+        final who = _childName.text.trim().isEmpty ? 'Your child' : _childName.text.trim();
+        items.add(('A skill at a time, at the age they are', ''));
+        final a = skFirstActivity(
+          ((_answers['sk_interests'] ?? const <String>{}).toList()..sort()).join(','),
+          _answers['sk_time']?.firstOrNull,
+        );
+        if (a != null) items.add(('Today: ${a.title}', a.time));
+        items.add(ask);
+        return (
+          eyebrow: 'Age ${_childAge ?? 6}',
+          big: '$who, ${_childAge ?? 6}.',
+          small: "Here's where we start.",
+          items: items,
+        );
+    }
   }
+
+  // Kept for revert (Onboarding V3): `_revealRows()`, the single list of
+  // strings the reveal used before every line had to come from an answer.
 
   static DateTime _today() {
     final n = DateTime.now();
@@ -2232,6 +3292,101 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     }
     final weeks = (now.difference(anchor).inDays ~/ 7).clamp(0, 4);
     return (months.clamp(0, 240), weeks);
+  }
+
+  // ---- his link step (Onboarding V3) ---------------------------------------------
+
+  String? _myCode;
+  bool _codeAsked = false;
+
+  /// His pairing code, read once from his profile after he signs in.
+  Future<void> _loadMyCode() async {
+    if (_codeAsked) return;
+    _codeAsked = true;
+    final row = await SupabaseRepo.fetchMyProfile('pairing_code');
+    final code = row?['pairing_code'] as String?;
+    if (mounted && code != null && code.isNotEmpty) {
+      setState(() => _myCode = code);
+    }
+  }
+
+  /// "Link with her, when she's ready." Either can start the link (every
+  /// profile has a code, and `link_as_partner` links whoever enters one with
+  /// its owner); she types his code on her You screen, so linking stays her
+  /// choice. Until then his side runs on what he told us.
+  Widget _pLink(V2Palette p) {
+    _loadMyCode();
+    final code = _myCode;
+    return ObPage(
+      p: p,
+      onBack: _back,
+      body: [
+        ObHead(
+          p: p,
+          eyebrow: 'Your partner',
+          title: "Link with her, when she's ready.",
+          subtitle: 'Send her your code. She enters it in her app, under '
+              'You, then Partner, and decides what to share.',
+        ),
+        if (code != null)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (final ch in code.split(''))
+                Container(
+                  width: 42,
+                  height: 52,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: p.surfaceAlt,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    ch,
+                    style: pvFraunces(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: p.ink1,
+                    ),
+                  ),
+                ),
+            ],
+          )
+        else
+          Text(
+            'Your code is on your You screen, under Partner.',
+            style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2),
+          ),
+        ObGiveBack(
+          p: p,
+          text: 'Until she links, your side works from what you told us'
+              '${_stage == 'pregnancy' ? ': the due date and your week' : ''}. '
+              'After that, you see only what she shares, never her private '
+              'notes or symptoms, and she can stop sharing any time.',
+        ),
+      ],
+      bottom: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ObPrimary(
+            p: p,
+            label: 'Share code',
+            onTap: code == null
+                ? null
+                : () {
+                    Share.share(
+                      'Link with me on ParentVeda. Open the app, go to You, '
+                      'then Partner, and enter my code: $code',
+                      subject: 'My ParentVeda code',
+                    );
+                    _go(ObStep.reach);
+                  },
+          ),
+          ObLink(p: p, label: 'Later', onTap: () => _go(ObStep.reach)),
+        ],
+      ),
+    );
   }
 
   // ---- 07 reach -----------------------------------------------------------------
@@ -2261,7 +3416,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           sub: 'A short note on the morning something new begins.',
           onChanged: (v) => setState(() => _reminders = v),
           child: _reminders
-              ? Container(
+              ? ObStagger(children: [Container(
                   margin: const EdgeInsets.only(top: 12),
                   padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                   decoration: BoxDecoration(
@@ -2291,7 +3446,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                       ),
                     ],
                   ),
-                )
+                )])
               : null,
         ),
         const SizedBox(height: 10),
@@ -2406,13 +3561,31 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     );
   }
 
-  String _previewNotification() => switch (_stage) {
-    'pregnancy' =>
-      "Week ${((280 - (_edd ?? _today()).difference(_today()).inDays) ~/ 7) + 1} starts tomorrow — here's what to expect.",
-    'parenting' => "A new month starts this week — here's what's changing.",
-    'skilling' => "Today's ten-minute activity is ready.",
-    _ => 'Your fertile days this cycle, the morning they start.',
-  };
+  String _previewNotification() {
+    if (_isPartner) {
+      return switch (_stage) {
+        'pregnancy' => 'This week: one small thing you can do for her.',
+        'trying' => 'Your part this week: one small change, and why it helps.',
+        _ => 'A new month starts this week. Here is what is changing.',
+      };
+    }
+    final edd = _edd;
+    return switch (_stage) {
+      'pregnancy' when edd != null =>
+        'Week ${_weekDay(edd).$1 + 1} starts tomorrow. Here is what to expect.',
+      'parenting' => "A new month starts this week. Here's what's changing.",
+      'skilling' => "Today's ten-minute activity is ready.",
+      'trying' when _planning =>
+        'Your Ready-to-Try plan: a few small things for this month.',
+      'trying' when _ttcWindow != null =>
+        'Your fertile days start around ${_short(_ttcWindow!.opens)}.',
+      _ => 'A short note on the morning something new begins.',
+    };
+  }
+  // Kept for revert (Onboarding V3): the previews before they were written
+  // from her answers (the trying line was "Your fertile days this cycle, the
+  // morning they start.").
+
 
   Widget _reachRow(
     V2Palette p, {
@@ -2499,7 +3672,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       context: context,
       isScrollControlled: true,
       isDismissible: false,
-      backgroundColor: V2PaletteStore.instance.current.ground,
+      backgroundColor: kObPalette.ground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -2516,44 +3689,123 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     if (_busy) return;
     setState(() => _busy = true);
     final stage = _stage ?? 'pregnancy';
+    // A father: the partner on his own, or "Who are you to the baby? Father".
+    final isFather = _isPartner || _careRole == CareRole.father;
+    final profile = FamilyProfileStore.instance;
 
     // 1. Stage — locally first, before any network, exactly as the old flow.
     LifeStageStore.instance.setStageId(stage);
-    FamilyProfileStore.instance.setStage(switch (stage) {
+    profile.setStage(switch (stage) {
       'trying' => JourneyStage.tryingToConceive,
       'pregnancy' => JourneyStage.pregnancy,
       _ => JourneyStage.parenting,
     });
 
-    // 2. The date, in the store that owns it.
+    // 2. Trying (Onboarding V3): every answer into the store that owns it,
+    //    once, at the end. A woman who leaves halfway leaves nothing
+    //    half-configured (the TTC intro's rule, kept).
+    if (stage == 'trying') {
+      final ttc = TtcStore.instance;
+      final plan = TtcReadyPlanStore.instance;
+      await plan.load();
+      if (!_isPartner && _lmp != null && !_lmpUnknown) {
+        CycleStore.instance.logPeriodStart(_lmp!);
+      }
+      if (_planning) {
+        await plan.setPlannedStart(_readyMonth);
+      } else {
+        if (_where == 'trying') ttc.setPath(TtcPath.natural);
+        if (_where == 'clinic') {
+          final path = const {
+            'oi': TtcPath.ovulationInduction,
+            'iui': TtcPath.iui,
+            'ivf': TtcPath.ivf,
+          }[_clinicKind];
+          if (path != null) ttc.setPath(path);
+        }
+        // The intro's bands, so "how long" is one answer with one meaning.
+        final months = const {'starting': 0, 'months': 3, 'six': 9, 'year': 18}[
+            _answers['ttc_duration']?.firstOrNull];
+        if (months != null) {
+          ttc.setJourneyStart(
+              DateTime.now().subtract(Duration(days: (months * 30.44).round())));
+        }
+      }
+      final band = _ageBand;
+      if (band != null) await TtcFertilityHelpStore.instance.setAgeBand(band);
+      if (_isPartner) {
+        TtcPartnerMode.instance.on = true;
+        await plan.setHisAnswers(
+          age: _hisAge,
+          habits: _hisHabits.isEmpty
+              ? null
+              : {for (final h in HisHabit.values) if (_hisHabits.contains(h.name)) h},
+        );
+      } else {
+        // Folic acid: "yes" is ticked today; "not yet" puts it first on her
+        // supplements list, unticked. Never ticked twice (toggleTaken flips).
+        final folic = _answers['ttc_folic']?.firstOrNull;
+        if (folic != null) {
+          final s = TtcSupplementsStore.instance;
+          final row = s.add('Folic acid', dose: '400 mcg daily');
+          if (folic == 'yes' && !s.isTaken(row.id)) s.toggleTaken(row.id);
+        }
+      }
+    }
+
+    // 3. The date, in the store that owns it.
     DateTime? due;
     if (stage == 'pregnancy' && _edd != null) {
       due = _edd;
-      await widget.pregnancy.setDueDate(due!, source: ddcSourceFor(_method));
+      await widget.pregnancy.setDueDate(
+        due!,
+        source: ddcSourceFor(_method),
+        datingDate: _method == DdcMethod.known ? null : _methodDate,
+      );
+      if (_twins) await ReadyBirthContextStore.instance.setTwins(true);
+      if (_answers['preg_parity']?.contains('subsequent') ?? false) {
+        profile.setGentle(_gentle);
+      }
     }
     if (stage == 'parenting' && _childDob != null) {
-      await ChildProfileStore.instance.addChild(
+      final first = await ChildProfileStore.instance.addChild(
         name: _childName.text,
         // A skipped "Boy or girl" is NOT a boy (gap analysis P1, 2026-10-07):
         // isBoy is only a stand-in for the WHO chart, sexGiven says so.
         isBoy: _childIsBoy ?? true,
         sexGiven: _childIsBoy != null,
         dob: _childDob!,
+        birthMode: _birthMode?.name,
+        bornWeeks: _bornEarly == true ? _bornWeeks : null,
       );
-      // The birth answers, on this child (2026-10-07).
+      // The birth answers, on this child (2026-10-07). Since bug B1 was fixed
+      // (2026-10-17) the feeding and sleep answers given before the child
+      // existed are carried onto it by the family profile itself.
       FamilyProfileStore.instance.setBirthDetails(
         mode: _birthMode,
         early: _bornEarly,
         bornWeeks: _bornWeeks,
-        role: _careRole,
+        role: _isPartner ? CareRole.father : _careRole,
       );
+      if (_childTwins) profile.setBirth(multiple: true);
+      // A second child (Onboarding V3), then back to the first, whose answers
+      // these were.
+      final dob2 = _child2Dob;
+      if (_secondChild && dob2 != null) {
+        await ChildProfileStore.instance.addChild(
+          name: _child2Name.text,
+          isBoy: true,
+          sexGiven: false,
+          dob: dob2,
+        );
+        await ChildProfileStore.instance.switchTo(first.id);
+      }
     }
     if (stage == 'skilling' && _childAge != null) {
-      final dob = DateTime(
-        _today().year - _childAge!,
-        _today().month,
-        _today().day,
-      );
+      // A real birthday when she gave one; else "today, N years ago", as
+      // before (kept for revert as the only path).
+      final dob = _skDob ??
+          DateTime(_today().year - _childAge!, _today().month, _today().day);
       SkChildStore.instance.update(name: _childName.text, dob: dob);
       await ChildProfileStore.instance.addChild(
         name: _childName.text,
@@ -2563,7 +3815,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       );
     }
 
-    // 3. Reminders — the OS prompt, only because she flipped the switch.
+    // 4. Reminders — the OS prompt, only because she flipped the switch; and
+    //    the choice itself is kept now (STILL-OPEN §79.4). `setPhoneOn(true)`
+    //    alone does nothing on a fresh install (it defaults on), so the
+    //    permission is asked here directly.
     if (_reminders) {
       try {
         await NotificationService.instance.requestPermission();
@@ -2571,11 +3826,19 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         /* the switch was the consent; the OS answer is its own */
       }
     }
+    if (stage == 'trying') {
+      await TtcMessagesStore.instance.setPhoneOn(_reminders);
+      // Getting ready: the plan's own monthly note, on the same switch.
+      if (_planning && _reminders && _readyMonth != null) {
+        await TtcReadyPlanStore.instance.setNotify(true);
+      }
+    }
 
-    // 4. The profile row. Built once, used by both paths (cloud or stash).
+    // 5. The profile row. Built once, used by both paths (cloud or stash).
     final fields = <String, dynamic>{
       if (_name.isNotEmpty) 'name': _name,
-      'role': 'mother',
+      // Kept for revert: 'role': 'mother' (every profile was saved as her).
+      'role': isFather ? 'father' : 'mother',
       if (due != null) 'due_date': due.toIso8601String().split('T').first,
       ...WhatsAppPrefs.fieldsFor(
         optIn: _whatsapp,
@@ -2594,17 +3857,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       await PendingProfile.save(fields);
     }
 
-    // 5. The flags the splash reads.
+    // 6. The flags the splash reads.
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(kAuthCompletedKey, true);
-      await prefs.setString(kUserRoleKey, 'mother');
+      await prefs.setString(kUserRoleKey, isFather ? 'father' : 'mother');
     } catch (_) {
       /* best-effort */
     }
 
     if (!mounted) return;
-    widget.onDone(stage, false);
+    widget.onDone(stage, isFather);
   }
 }
 
@@ -2678,7 +3941,7 @@ class _OtpSheetState extends State<_OtpSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final p = V2PaletteStore.instance.current;
+    final p = kObPalette;
     final c = widget.controller;
     final masked = _mask(widget.phone);
     final line = switch (c.step) {

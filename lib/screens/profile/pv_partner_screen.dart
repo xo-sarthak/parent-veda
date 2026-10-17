@@ -26,6 +26,7 @@ import '../../models/pv_product.dart' show PvStageCopy;
 import '../../services/life_stage_store.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_toast.dart';
 import '../ttc/ttc_partner_day_example.dart';
 import 'pv_you_chrome.dart';
 
@@ -46,6 +47,38 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
   bool _linked = false;
   bool _share = true;
   bool _loading = true;
+
+  /// HIS code, typed by her (Onboarding V3, 2026-10-17). A partner can now
+  /// set up on his own and send her his code; she enters it here, so linking
+  /// stays her choice.
+  final _theirCode = TextEditingController();
+  bool _linking = false;
+
+  @override
+  void dispose() {
+    _theirCode.dispose();
+    super.dispose();
+  }
+
+  Future<void> _linkWithTheirCode() async {
+    final code = _theirCode.text.trim();
+    if (code.length < 6 || _linking) return;
+    setState(() => _linking = true);
+    // `link_as_partner` links whoever enters a code with its owner, and since
+    // 0102 refuses rather than replacing an existing link.
+    final refused = await SupabaseRepo.linkAsPartner(code);
+    if (!mounted) return;
+    setState(() => _linking = false);
+    if (refused != null) {
+      pvToast(context, refused);
+      return;
+    }
+    pvToast(context, 'Linked. You choose what they see, below.',
+        kind: PvToastKind.done);
+    _theirCode.clear();
+    setState(() => _loading = true);
+    await _load();
+  }
 
   @override
   void initState() {
@@ -288,6 +321,61 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
                       label: 'Share the code',
                       icon: Icons.ios_share_rounded,
                       onTap: _code == null ? null : _shareCode,
+                    ),
+                    // Onboarding V3: he may have set up first and sent HIS
+                    // code. Either code links the two of you.
+                    const SizedBox(height: 22),
+                    Text(
+                      'Did $_who send you a code?',
+                      style: pvManrope(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: p.ink1,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    PvQuietLine(
+                        'Enter it here to link. Nothing of yours is shared until you choose it above.'),
+                    const SizedBox(height: 10),
+                    PvCard(
+                      key: const ValueKey('pv_partner_enter_code'),
+                      child: TextField(
+                        controller: _theirCode,
+                        enabled: SupabaseRepo.isLoggedIn,
+                        textCapitalization: TextCapitalization.characters,
+                        maxLength: 6,
+                        onChanged: (_) => setState(() {}),
+                        style: pvFraunces(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 4,
+                          color: p.ink1,
+                        ),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          counterText: '',
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          filled: false,
+                          hintText: SupabaseRepo.isLoggedIn
+                              ? 'Their code'
+                              : 'Sign in first',
+                          hintStyle: pvFraunces(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                            color: p.ink3,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    PvCommit(
+                      label: _linking ? 'Linking…' : 'Link',
+                      busy: _linking,
+                      onTap: _theirCode.text.trim().length == 6 && !_linking
+                          ? _linkWithTheirCode
+                          : null,
                     ),
                   ] else
                     // A note is one quiet line, not a slab (2026-09-29).

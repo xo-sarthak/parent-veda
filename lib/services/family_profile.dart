@@ -474,6 +474,17 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   /// profile and this is an app-wide fact.
   DateTime? _dob;
 
+  /// "Anything we should be gentle about?" (Onboarding V3, 2026-10-17), asked
+  /// only after "I've been pregnant before": 'loss', 'hard' or 'skip'; null if
+  /// never answered. It stays IN THIS APP: not sent to Ask Veda (the user,
+  /// 2026-10-17). Read by [gentleAboutLoss].
+  String? _gentle;
+
+  /// What he said would help him most (the partner's own setup, Onboarding
+  /// V3), in the order he picked. Orders his doors on the TTC home
+  /// (`ttcHisDoorsFirst`) and his block on the pregnancy home.
+  final List<String> _fatherHelp = [];
+
   /// Only consulted for trying-to-conceive; pregnancy and parenting are derived.
   JourneyStage? _declaredStage;
   final Set<ProfileField> _asked = {}; // fields already prompted (don't nag)
@@ -492,10 +503,22 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   /// The free-text answer for a field, if she gave one.
   String? otherFor(String field) => _other[field];
   Set<NotifyTopic> get notify => Set.unmodifiable(_notify);
-  bool get premature => _premature;
+  /// Also true when only the child's cloud copy says "born early" (0102).
+  bool get premature => _premature || (_bornWeeks == null && _activeChild()?.bornWeeks != null);
   bool get nicu => _nicu;
-  BirthMode? get birthMode => _birthMode;
-  int? get bornWeeks => _bornWeeks;
+  /// This phone's answer first; else the child's own copy, which is how the
+  /// OTHER parent's phone learns it (`children.birth_mode`, 0102).
+  BirthMode? get birthMode => _birthMode ?? _one(_activeChild()?.birthMode, BirthMode.values);
+  int? get bornWeeks => _bornWeeks ?? _activeChild()?.bornWeeks;
+
+  Child? _activeChild() {
+    try {
+      final c = ChildProfileStore.instance;
+      return c.activeChildId == null ? null : c.active;
+    } catch (_) {
+      return null;
+    }
+  }
   CareRole? get role => _role;
   VaxSchedule? get vaxSchedule => _vaxSchedule;
 
@@ -505,6 +528,25 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   }
   bool get multiple => _multiple;
   bool get onboarded => _onboarded;
+
+  String? get gentle => _gentle;
+
+  /// She told us about a past loss: countdowns go quiet and loss stories stay
+  /// out of her feed unless she searches for them.
+  bool get gentleAboutLoss => _gentle == 'loss';
+
+  /// True when [text] is about losing a pregnancy and she asked us to be
+  /// gentle about that. ⚠️ A FILTER FOR WHAT WE PUT IN FRONT OF HER, NEVER FOR
+  /// SEARCH OR ASK: what she looks for herself she always finds.
+  bool gentleHides(String text) {
+    if (!gentleAboutLoss) return false;
+    final t = text.toLowerCase();
+    return t.contains('miscarri') || t.contains('stillbirth') ||
+        t.contains('pregnancy loss') || t.contains('after loss') ||
+        t.contains('ectopic');
+  }
+
+  List<String> get fatherHelp => List.unmodifiable(_fatherHelp);
 
   DateTime? get dob => _dob;
 
@@ -776,13 +818,23 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _save();
   }
 
+  /// Single-choice write (onboarding). ⚠️ It fills the SET too: the per-child
+  /// bucket stores only the sets, so a value written here alone was dropped the
+  /// first time the child bucket was saved (bug B1, 2026-10-17).
   void setFeeding(FeedingMethod? f) {
     _feeding = f;
+    _feedings
+      ..clear()
+      ..addAll([?f]);
     _save(field: 'feeding', value: f?.name);
   }
 
+  /// See [setFeeding]: the set is the stored copy.
   void setSleep(SleepPattern? s) {
     _sleep = s;
+    _sleeps
+      ..clear()
+      ..addAll([?s]);
     _save(field: 'sleep', value: s?.name);
   }
 
@@ -877,6 +929,19 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _save(field: 'parity', value: p?.name);
   }
 
+  void setGentle(String? g) {
+    _gentle = (g == null || g.isEmpty) ? null : g;
+    _save(field: 'gentle', value: _gentle == null ? null : 'set');
+  }
+
+  /// His picks, in the order he made them.
+  void setFatherHelp(List<String> ids) {
+    _fatherHelp
+      ..clear()
+      ..addAll(ids);
+    _save(field: 'fatherHelp', value: ids.join(','));
+  }
+
   void setStage(JourneyStage? s) {
     _declaredStage = s;
     _save();
@@ -959,7 +1024,16 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   void _onChildSwitched() {
     final now = _bucketId;
     if (now == _loadedBucket) return;
-    _perChild[_loadedBucket] = _childBucket();
+    final carried = _childBucket();
+    _perChild[_loadedBucket] = carried;
+    // ⚠️ The answers given before the first child existed (onboarding) belong
+    // to that child: carry the '_none' bucket across instead of loading an
+    // empty one. Without this, addChild wiped feeding, sleep, conditions and
+    // born-early the moment it made the child active (bug B1, 2026-10-17).
+    if (_loadedBucket == '_none' && !_perChild.containsKey(now)) {
+      _perChild[now] = carried;
+      _perChild.remove('_none');
+    }
     _applyChildBucket(_perChild[now] ?? const {});
     _loadedBucket = now;
     notifyListeners();
@@ -1012,6 +1086,10 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
       ..addAll(_decode(m['pregPriorities'], PregPriority.values));
     _diet = _one(m['diet'], DietPreference.values);
     _parity = _one(m['parity'], Parity.values);
+    _gentle = m['gentle'] as String?;
+    _fatherHelp
+      ..clear()
+      ..addAll([for (final e in (m['fatherHelp'] as List?) ?? const []) '$e']);
     _declaredStage = _one(m['stage'], JourneyStage.values);
     _asked
       ..clear()
@@ -1079,6 +1157,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
         'pregPriorities': _pregPriorities.map((e) => e.name).toList(),
         'diet': _diet?.name,
         'parity': _parity?.name,
+        'gentle': _gentle,
+        'fatherHelp': _fatherHelp,
         'stage': _declaredStage?.name,
         // ⚠️ DATE ONLY, NO TIME, NO ZONE. `toIso8601String()` on a local
         // DateTime would carry a time that means nothing here and would shift a

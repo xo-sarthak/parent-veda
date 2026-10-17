@@ -359,7 +359,13 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
     // HIS SIDE (2026-10-13): her home with less on it, and one block of his
     // own. See preg_partner_home.dart for what he sees and why.
     final him = FatherPreview.instance.on;
-    final reads = v2ReadsFor(week, activeDay);
+    // "Gentle" (Onboarding V3): after a past loss, loss reads stay out of her
+    // feed. They are still in search and in their doors. Kept for revert:
+    //   final reads = v2ReadsFor(week, activeDay);
+    final reads = [
+      for (final r in v2ReadsFor(week, activeDay))
+        if (!FamilyProfileStore.instance.gentleHides(r.title.en)) r,
+    ];
     final video = v2VideoFor(week);
     // The three under "Watch These Videos This Week" — never the film above.
     final shelf = v3ShelfVideosFor(week, excludeId: video?.id);
@@ -492,7 +498,11 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 // "20 weeks to go" with an (i), and past the due date the
                 // count keeps going (2026-09-30, gap analysis). Counted for the
                 // SELECTED day, like everything else on the fold.
-                timeLeft: pregTimeLeft(_daysToDue(_selected)),
+                // No countdown when she asked us to be gentle after a loss
+                // (Onboarding V3). The week stays; only "N weeks to go" goes.
+                timeLeft: FamilyProfileStore.instance.gentleAboutLoss
+                    ? null
+                    : pregTimeLeft(_daysToDue(_selected)),
                 pastDueCount: pregPastDueCount(_daysToDue(_selected)),
                 onHowCounted: () => showPregHowWeeksCounted(context, pregnancy),
                 onPastDue: () => openPvDoorRead(context, kPregPastDueReadId, pregnancy),

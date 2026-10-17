@@ -72,6 +72,7 @@ import '../profile/pv_you_screen.dart';
 import '../saved_screen.dart';
 import '../v2/v3_hero_chrome.dart';
 import 'sk_child_store.dart';
+import 'sk_first_activity.dart';
 import 'sk_practice_store.dart';
 import 'sk_surface_router.dart';
 
@@ -118,6 +119,19 @@ class SkillingPreviewScreen extends StatelessWidget {
             const SizedBox(height: 22),
             _pad(_PreviewBanner(p: p)),
             const SizedBox(height: 26),
+            // Onboarding V3: what the child enjoys and the time she has pick
+            // one activity to start with. Absent when she skipped both.
+            if (skFirstActivityFromProfile() case final first?) ...[
+              _pad(_QuestionCard(
+                key: const ValueKey('sk_first_activity'),
+                p: p,
+                n: '1',
+                title: first.title,
+                body: '${first.time}. Picked from what you told us they '
+                    'enjoy. The doors below hold the rest.',
+              )),
+              const SizedBox(height: 26),
+            ],
 
             _pad(_Head(
                 eyebrow: 'Where to go',
@@ -551,7 +565,8 @@ class _CompassPainter extends CustomPainter {
 
 class _QuestionCard extends StatelessWidget {
   const _QuestionCard(
-      {required this.p,
+      {super.key,
+      required this.p,
       required this.n,
       required this.title,
       required this.body});

@@ -586,8 +586,29 @@ const String kTtcPartnerPregnantLine =
 /// His door ("His side", bracket `ttc_male_fertility`) leads the topic grid
 /// on his side (2026-10-16), as `kTtcHisLearnFirst` already does on Learn.
 /// Her order is untouched.
-List<String> ttcHisDoorsFirst(List<String> ids, {required bool him}) {
+///
+/// [help] is what he said would help him most when he set up on his own
+/// (Onboarding V3, `FamilyProfileStore.fatherHelp`, in his order): those
+/// doors come first, then his own door, then the rest. Kept for revert:
+///   if (!him || !ids.contains(his)) return ids;
+///   return [his, for (final id in ids) if (id != his) id];
+List<String> ttcHisDoorsFirst(List<String> ids,
+    {required bool him, List<String> help = const []}) {
   const his = 'ttc_male_fertility';
-  if (!him || !ids.contains(his)) return ids;
-  return [his, for (final id in ids) if (id != his) id];
+  if (!him) return ids;
+  final first = <String>{
+    for (final h in help)
+      if (kTtcHelpDoor[h] case final door? when ids.contains(door)) door,
+    if (ids.contains(his)) his,
+  }.toList();
+  return [...first, for (final id in ids) if (!first.contains(id)) id];
 }
+
+/// His onboarding answer ("What would help you most?") to the door it opens.
+const Map<String, String> kTtcHelpDoor = {
+  'timing': 'ttc_conceiving',
+  'health': 'ttc_male_fertility',
+  'support': 'ttc_mind_body',
+  'doctor': 'ttc_infertility',
+  'feel': 'ttc_mind_body',
+};

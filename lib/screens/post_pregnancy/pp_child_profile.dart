@@ -114,7 +114,21 @@ class Child {
     required this.headCm,
     this.birthWeightKg = 0,
     this.sexGiven = true,
+    this.birthMode,
+    this.bornWeeks,
   });
+
+  /// How the baby was born, as a `BirthMode` name (normal, cSection, assisted,
+  /// notSaid), or null if never said. Onboarding V3, 2026-10-17.
+  ///
+  /// A plain String rather than the enum because the enum lives in the family
+  /// profile, which already imports this file. The family profile stays the
+  /// reader on the phone that asked; this copy is how the OTHER parent's phone
+  /// learns it (`children.birth_mode`, 0102).
+  String? birthMode;
+
+  /// Weeks of pregnancy at birth when born early, else null (0102).
+  int? bornWeeks;
 
   final String id;
   String name;
@@ -169,6 +183,8 @@ class Child {
         headCm: headCm,
         birthWeightKg: birthWeightKg,
         sexGiven: sexGiven,
+        birthMode: birthMode,
+        bornWeeks: bornWeeks,
       );
 
   /// 'YYYY-MM-DD' for the `dob date` column (and the local cache).
@@ -186,6 +202,8 @@ class Child {
         'headCm': headCm,
         'birthWeightKg': birthWeightKg,
         'sexGiven': sexGiven,
+        'birthMode': birthMode,
+        'bornWeeks': bornWeeks,
       };
 
   factory Child.fromJson(Map<String, dynamic> j) => Child(
@@ -198,6 +216,8 @@ class Child {
         headCm: (j['headCm'] as num?)?.toDouble() ?? 0,
         birthWeightKg: (j['birthWeightKg'] as num?)?.toDouble() ?? 0,
         sexGiven: j['sexGiven'] != false,
+        birthMode: j['birthMode'] as String?,
+        bornWeeks: (j['bornWeeks'] as num?)?.toInt(),
       );
 
   // camelCase model <-> snake_case columns. `user_id` is NOT here: on insert
@@ -214,6 +234,8 @@ class Child {
         // Only once the column exists: PostgREST rejects a row naming an
         // unknown column, and a rejected fire-and-forget write is silent.
         if (kChildSexGivenColumn) 'sex_given': sexGiven,
+        if (kChildBirthColumns) 'birth_mode': birthMode,
+        if (kChildBirthColumns) 'born_weeks': bornWeeks,
       };
 
   factory Child.fromRow(Map<String, dynamic> r) => Child(
@@ -232,8 +254,15 @@ class Child {
         // Missing column (migration not run) reads as "given", and the sync
         // below then keeps the phone's own answer rather than this default.
         sexGiven: r['sex_given'] != false,
+        birthMode: r['birth_mode'] as String?,
+        bornWeeks: (r['born_weeks'] as num?)?.toInt(),
       );
 }
+
+/// Flip to true once `supabase/migrations/0102_onboarding_v3.sql` has been
+/// run on the live database. Until then birth mode and born-early weeks stay
+/// on this phone (the child's local copy and the family profile).
+const bool kChildBirthColumns = false;
 
 /// Flip to true once `supabase/migrations/0093_children_sex_given.sql` has
 /// been run. Until then `sex_given` is kept on this phone only.
@@ -358,6 +387,8 @@ class ChildProfileStore extends ChangeNotifier {
     double heightCm = 0,
     double headCm = 0,
     double birthWeightKg = 0,
+    String? birthMode,
+    int? bornWeeks,
   }) async {
     final c = Child(
       id: 'child_${DateTime.now().microsecondsSinceEpoch}',
@@ -369,6 +400,8 @@ class ChildProfileStore extends ChangeNotifier {
       headCm: headCm,
       birthWeightKg: birthWeightKg,
       sexGiven: sexGiven,
+      birthMode: birthMode,
+      bornWeeks: bornWeeks,
     );
     _children.add(c);
     _activeId = c.id;
@@ -447,6 +480,14 @@ class ChildProfileStore extends ChangeNotifier {
         for (final c in _children) {
           if (c.id == id) byId[id]!.sexGiven = c.sexGiven;
         }
+      }
+      // Same for the birth columns (0102): a cloud row without them, or with
+      // them still empty, keeps what this phone knows.
+      for (final c in _children) {
+        final cloud = byId[c.id];
+        if (cloud == null) continue;
+        cloud.birthMode ??= c.birthMode;
+        cloud.bornWeeks ??= c.bornWeeks;
       }
 
       // Push up any child saved locally while logged out / offline.

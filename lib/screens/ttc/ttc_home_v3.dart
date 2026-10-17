@@ -59,6 +59,7 @@ import '../brackets/hub/problem_hub_screen.dart';
 import '../../data/hubs/hub_registry.dart';
 
 import '../../localization/app_language.dart';
+import '../../services/family_profile.dart' show FamilyProfileStore;
 import '../../services/bracket_resolver.dart';
 import '../../services/profile_photo_store.dart';
 import '../../services/life_stage_store.dart';
@@ -378,7 +379,8 @@ class _TtcHomeV3State extends State<TtcHomeV3>
             ttcHomeDoorOrderNow([
               for (final b in bracketsFor(LifeStage.tryingToConceive)) b.id,
             ]),
-            him: him);
+            him: him,
+            help: FamilyProfileStore.instance.fatherHelp);
 
         return Scaffold(
           backgroundColor: p.ground,

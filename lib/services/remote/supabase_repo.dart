@@ -235,6 +235,25 @@ class SupabaseRepo {
     return row?['partner_id'] as String?;
   }
 
+  /// Link the current user with whoever owns [code] (`link_as_partner`,
+  /// 0009, hardened in 0102). Either person may type the other's code.
+  ///
+  /// Returns null when linked, or the reason it was not, in words she can
+  /// read: the server's own refusal ("That code is already linked with
+  /// someone else") rather than a generic failure, because what she does next
+  /// depends on which one it was (BACKEND-PATTERNS §15).
+  static Future<String?> linkAsPartner(String code) async {
+    if (userId == null) return 'Sign in first, then enter the code.';
+    try {
+      await _client.rpc('link_as_partner', params: {'code': code.trim()});
+      return null;
+    } on PostgrestException catch (e) {
+      return e.message;
+    } catch (_) {
+      return 'Linking failed. Check the code and try again.';
+    }
+  }
+
   // ---- the profile row ------------------------------------------------------
   // `profiles` is keyed by `id`, not `user_id`, so the generic helpers above do
   // not fit it. These two exist so nothing outside this file has to know that.

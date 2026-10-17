@@ -785,6 +785,7 @@ TtcJourneyState cycleStateFrom({
   TimingOwnership ownership = TimingOwnership.parentveda,
   DateTime? today,
   int? statedCycleLength,
+  bool statedIrregular = false,
 }) =>
     TtcJourneyState(
       journeyStart: journeyStart,
@@ -796,4 +797,5 @@ TtcJourneyState cycleStateFrom({
       ownership: ownership,
       today: today,
       statedCycleLength: statedCycleLength,
+      statedIrregular: statedIrregular,
     );

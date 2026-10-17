@@ -16,10 +16,15 @@
 //  reads the profile, not what she told the plan a month ago. Same rule as
 //  the truth hierarchy: one fact, one home.
 //
-//  ⚠️ LOCAL ONLY, FOR NOW. The plan is hers and lives on the phone. Cloud
-//  sync would follow the checklist's `CloudSyncedStore` pattern, and that
-//  file is being changed in another pass (2026-10-17), so it waits rather
-//  than build on a moving base. Logged in `docs/STILL-OPEN.md`.
+//  ⚠️ SYNCED SINCE 2026-10-17 (Onboarding V3, migration 0102). One row per
+//  person in `ttc_ready_plans`, couple-readable, own-row writes. A real table
+//  and not the `user_state` blob, because his side needs to read her plan and
+//  the blob has no partner read. Kept for revert, the old note:
+//    LOCAL ONLY, FOR NOW. The plan is hers and lives on the phone. Cloud
+//    sync would follow the checklist's `CloudSyncedStore` pattern [...]
+//  Newer wins on `updated_at`, the time of the edit on the phone (not the
+//  upload time), checked here on a pull and on the server by 0100's guard.
+//  The monthly-note switch is NOT synced: it schedules notes on this phone.
 // =============================================================================
 
 import 'dart:convert';
@@ -29,18 +34,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/family_profile.dart';
 import '../services/notification_service.dart';
+import '../services/remote/supabase_repo.dart';
 import 'ttc_fertility_help_store.dart';
 import 'ttc_precheck_data.dart';
 import 'ttc_precheck_rules.dart';
 import 'ttc_precheck_store.dart';
 import 'ttc_ready_plan.dart';
+import 'ttc_sync.dart';
 
 /// The food tool's saved kitchen. The same string as `kTtcFoodKitchenKey` in
 /// `ttc_nutrition_screen.dart`, which a store in `lib/ttc` must not import;
 /// `test/ttc_ready_plan_test.dart` holds the two equal.
 const String kReadyKitchenPrefKey = 'ttc_food_kitchen_v1';
 
-class TtcReadyPlanStore extends ChangeNotifier {
+/// The cloud table (0102).
+const String kReadyPlansTable = 'ttc_ready_plans';
+
+class TtcReadyPlanStore extends ChangeNotifier with TtcSyncedStore {
   TtcReadyPlanStore._();
   static final TtcReadyPlanStore instance = TtcReadyPlanStore._();
 
@@ -50,6 +60,10 @@ class TtcReadyPlanStore extends ChangeNotifier {
   DateTime? _madeAt;
   bool _notify = false;
   bool _loaded = false;
+
+  /// When the answers last changed ON A PHONE. Null = never edited here.
+  DateTime? _editedAt;
+  void _edited() => _editedAt = DateTime.now();
 
   bool get isLoaded => _loaded;
 
@@ -96,22 +110,83 @@ class TtcReadyPlanStore extends ChangeNotifier {
       final raw = p.getString(_key);
       if (raw != null) {
         final j = jsonDecode(raw) as Map<String, Object?>;
-        _answers = ReadyPlanAnswers.fromJson(
-          (j['answers'] as Map?)?.cast<String, Object?>() ?? const {},
-        );
+        final saved =
+            (j['answers'] as Map?)?.cast<String, Object?>() ?? const {};
+        // An empty object is a cleared plan kept for its edit time.
+        _answers = saved.isEmpty ? null : ReadyPlanAnswers.fromJson(saved);
         _madeAt = DateTime.tryParse(j['madeAt'] as String? ?? '');
         _notify = j['notify'] == true;
+        _editedAt = DateTime.tryParse(j['editedAt'] as String? ?? '');
       }
     } catch (_) {
       /* local-first: no plan is a fine answer */
     }
     notifyListeners();
+    await syncFromCloud();
+  }
+
+  // ---- cloud (0102) ---------------------------------------------------------
+
+  @override
+  Future<void> pullFromCloud() async {
+    final uid = SupabaseRepo.userId;
+    if (uid == null) return;
+    final rows = await SupabaseRepo.fetchShared(kReadyPlansTable,
+        orderBy: 'updated_at');
+    for (final row in rows) {
+      // Only her own row for now. The partner's row is what his plan card
+      // will read (STILL-OPEN §92.0); nothing reads it yet, so nothing keeps it.
+      if (row['user_id'] != uid) continue;
+      final cloudAt = DateTime.tryParse('${row['updated_at']}');
+      final local = _editedAt;
+      if (cloudAt == null || (local != null && !cloudAt.isAfter(local))) continue;
+      final raw = (row['answers'] as Map?)?.cast<String, Object?>() ?? const {};
+      _answers = raw.isEmpty ? null : ReadyPlanAnswers.fromJson(raw);
+      _madeAt = DateTime.tryParse('${row['made_at']}')?.toLocal();
+      _editedAt = cloudAt.toLocal();
+    }
+  }
+
+  @override
+  Future<void> pushToCloud() async {
+    final uid = SupabaseRepo.userId;
+    final at = _editedAt;
+    // Nothing ever edited here: nothing of ours to send.
+    if (uid == null || at == null) return;
+    final a = _answers;
+    final start = plannedStart;
+    await SupabaseRepo.upsertRow(
+      kReadyPlansTable,
+      {
+        'user_id': uid,
+        'planned_start': start == null ? null : TtcSyncUtil.date(start),
+        'already_trying': a?.alreadyTrying ?? false,
+        // A cleared plan is an edit too: an empty object, so another phone
+        // clears it as well instead of keeping the old one.
+        'answers': a?.toJson() ?? const <String, Object?>{},
+        'made_at': _madeAt?.toUtc().toIso8601String(),
+        'updated_at': TtcSyncUtil.stamp(at),
+      },
+      onConflict: 'user_id',
+    );
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
+
+  @override
+  void resetLocal() {
+    _answers = null;
+    _madeAt = null;
+    _notify = false;
+    _editedAt = null;
   }
 
   /// Saves her answers and writes the shared ones through to their owners.
   Future<void> save(ReadyPlanAnswers a, {DateTime? now}) async {
     _answers = a.copy();
     _madeAt = now ?? DateTime.now();
+    _edited();
     notifyListeners();
     await _persist();
     await _writeThrough(a);
@@ -130,9 +205,30 @@ class TtcReadyPlanStore extends ChangeNotifier {
     a.target = month == null ? null : readyMonthOf(month);
     a.alreadyTrying = false;
     _answers = a;
+    _edited();
     notifyListeners();
     await _persist();
     if (_notify) await _schedule();
+  }
+
+  /// His part, from his own onboarding (Onboarding V3, 2026-10-17): his age
+  /// band and habits, the plan's own two questions for him.
+  ///
+  /// ⚠️ ANSWERS, NOT A PLAN, exactly like [setPlannedStart]: `madeAt` stays
+  /// null, so the plan opens on its questions with his part filled in.
+  Future<void> setHisAnswers({HisAge? age, Set<HisHabit>? habits}) async {
+    final a = _answers ?? ReadyPlanAnswers();
+    if (age != null) a.hisAge = age;
+    if (habits != null) {
+      a.hisHabits
+        ..clear()
+        ..addAll(habits);
+      a.hisHabitsAnswered = true;
+    }
+    _answers = a;
+    _edited();
+    notifyListeners();
+    await _persist();
   }
 
   /// "Clear my plan", with the old one handed back for Undo.
@@ -142,6 +238,7 @@ class TtcReadyPlanStore extends ChangeNotifier {
     _answers = null;
     _madeAt = null;
     _notify = false;
+    _edited();
     notifyListeners();
     await _persist();
     await _cancelNotes();
@@ -154,6 +251,7 @@ class TtcReadyPlanStore extends ChangeNotifier {
     _answers = was.answers;
     _madeAt = was.madeAt;
     _notify = was.notify;
+    _edited();
     notifyListeners();
     await _persist();
     if (_notify) await _schedule();
@@ -295,16 +393,20 @@ class TtcReadyPlanStore extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       final a = _answers;
-      if (a == null) {
+      // ⚠️ A CLEARED PLAN KEEPS ITS EDIT TIME, so the clear can win over an
+      // older cloud copy. Before sync it simply removed the key (kept for
+      // revert): if (a == null) { await p.remove(_key); return; }
+      if (a == null && _editedAt == null) {
         await p.remove(_key);
         return;
       }
       await p.setString(
         _key,
         jsonEncode({
-          'answers': a.toJson(),
+          'answers': a?.toJson() ?? const <String, Object?>{},
           'madeAt': _madeAt?.toIso8601String(),
           'notify': _notify,
+          'editedAt': _editedAt?.toIso8601String(),
         }),
       );
     } catch (_) {

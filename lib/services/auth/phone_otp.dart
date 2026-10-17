@@ -8,7 +8,7 @@
 //  to `profiles.phone` + `profiles.phone_verified_at` by the server, in the
 //  same transaction that consumed the code, and this side only asks.
 //
-//  THE TWO-TAP PATH (docs/ONBOARDING-AUDIT.md §4, "Reach"):
+//  THE TWO-TAP PATH (docs/ONBOARDING.md (History A) §4, "Reach"):
 //    1. [hintNumber]   Play Services shows the SIM's number; she taps it.
 //    2. [send]         the server issues a code and MSG91 carries it.
 //    3. [listenForCode] SMS Retriever hands the SMS to the app; the six

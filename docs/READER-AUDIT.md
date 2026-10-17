@@ -3,7 +3,7 @@
 **Written 2026-09-16.** The discussion the user asked to have once the pregnancy
 doors were built (STILL-OPEN §38.5): *"I want to discuss a singular format to
 view article/reads."* This is that discussion, done against shipped apps.
-Second Mobbin audit; same recipe as `ONBOARDING-AUDIT.md`.
+Second Mobbin audit; same recipe as `ONBOARDING.md` (History A).
 
 References in `research/mobbin/reader/` (gitignored; permanent links in §8).
 

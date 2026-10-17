@@ -1557,7 +1557,7 @@ rendered twice, because two lists that must agree will not.
 
 ## 16c. A verified attribute is not an identity — the phone number
 
-From the onboarding decision (2026-09-16, `docs/ONBOARDING-AUDIT.md`), built
+From the onboarding decision (2026-09-16, `docs/ONBOARDING.md (History A)`), built
 as `0080_phone_otp.sql` + `supabase/functions/phone-otp-send` /
 `phone-otp-verify` + `lib/services/auth/phone_otp.dart`.
 
@@ -3100,6 +3100,76 @@ the part of the table that was actually fetched.
 > partial fetch (one child, one page, one date range) needs its merge scoped to the same slice.
 
 History: `docs/BACKEND-SYNC-LOG.md` step 5.
+
+## 16jj. A column or the blob? And a function that refuses instead of overwriting (0102, 2026-10-17)
+
+Onboarding V3 made every answer count, which raised one question per answer: where does it live?
+The app has two homes for a person's data, and choosing between them is a design decision worth
+being able to defend.
+
+**The blob** is `user_state`: one jsonb document per store per person (§5). The family profile lives
+there, and so do her age band, "gentle", twins and what helps him, since V3. **A column** is a
+real, typed field on a real table, like `profiles.due_date_source` or `children.birth_mode`.
+
+The rule we used: **a column when someone other than this phone must read it; the blob when only
+this phone does.**
+
+- **Who reads it.** `user_state` is own-row: no partner policy, by design. When his phone has to
+  know the baby was born early (corrected age), that fact cannot sit in her blob, so it went on the
+  `children` row, which both parents can already read (`my_child_ids()`). The same reason made the
+  Ready-to-Try plan a table (`ttc_ready_plans`) and not a blob: his plan card must read hers.
+- **What can query it.** A column can go in a `where`, an index, an admin report or the WhatsApp
+  sender. A key inside a blob can, technically, but nobody will write that query well.
+- **What it costs to change.** A blob changes shape with the app, with no migration and no
+  contract. A column is a contract with every reader. Renaming it is a migration plus a release,
+  and a client that names a column that is not there yet is refused outright by PostgREST.
+
+**The trade-off we accepted:** the age band is in her blob, so his phone cannot read it. Today
+nothing on his side needs it. When something does, it moves, and that move costs a migration.
+Putting it in a column now would have cost a migration, a contract test and an RLS decision for a
+reader that does not exist yet. "Only add a field when something concrete reads it" (CLAUDE.md)
+applies to columns too.
+
+**Two habits that make adding a column safe on a fire-and-forget client:**
+
+1. **Send the new columns in their own write.** `PregnancyController.setDueDate` sends `due_date`
+   first, then `due_date_source` and `dating_date` in a second update. If the database has not run
+   0102 yet, PostgREST refuses the second write ("column does not exist") and the first still
+   lands. One combined update would have lost the due date too, silently.
+2. **Or hold the column behind a flag until the migration is run.** `kChildBirthColumns` (like
+   `kChildSexGivenColumn`) keeps `birth_mode` and `born_weeks` out of `Child.toRow()` until the
+   user confirms 0102 is live. Without the flag, every child insert would fail until then. And the
+   read side tolerates the column being absent, so a row from an older database never erases what
+   the phone knows (`cloud.birthMode ??= local.birthMode`).
+
+### 16jj-b. Four policies, not one `for all`
+
+`ttc_journeys` (0041) uses a single policy:
+`for all using (mine or my partner's) with check (mine)`. That reads as "both can see, each writes
+their own", but **`with check` only guards the row being written, and a DELETE writes no row.** So
+the `using` clause alone decides who may delete, and it says "mine or my partner's". The partner can
+delete her row. `ttc_ready_plans` therefore has four policies: select for the couple, and insert,
+update and delete for the owner only. The general fact: **for any table two people read and one
+person owns, split the policies by command.** `ttc_journeys` has the same single policy; that
+is recorded as a follow-up in STILL-OPEN §62.8.
+
+### 16jj-c. A security-definer function should refuse, not overwrite
+
+`link_as_partner(code)` (0009) runs as `security definer`: it can write both people's rows, which
+RLS would never allow the caller to do directly (§4). That power is why its rules matter. It used to
+set `partner_id` on both rows unconditionally. Since V3 either person can type the other's code, so
+a code typed by mistake would quietly break an existing couple's link, and nobody would be told.
+
+0102 makes it **refuse**: "You are already linked with someone else" or "That code is already
+linked with someone else". Re-linking the same two people is allowed, so a retry is safe. Two
+points carry over:
+
+- **A `raise` discards everything the function wrote** in that call, so a refusal can never leave
+  half a link (one side updated, the other not). Checking before writing would be enough here,
+  but the raise is the guarantee.
+- **The refusal is the message.** `SupabaseRepo.linkAsPartner` returns the server's own words, and
+  her Partner screen shows them, because what she does next depends on which refusal it was
+  (§15).
 
 ## 17. Reading list, in order
 

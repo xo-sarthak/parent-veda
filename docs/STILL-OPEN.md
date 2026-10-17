@@ -7745,7 +7745,7 @@ None of these are new; what is new is who can see them.
 
 ## 59.0 Onboarding is decided against the Mobbin audit; three things it leaves open — OPENED 2026-09-16
 
-`docs/ONBOARDING-AUDIT.md` holds the audit, the seven-screen decision and the
+`docs/ONBOARDING.md (History A)` holds the audit, the seven-screen decision and the
 Claude Design brief. Nothing is built yet; the brief goes to Claude Design
 first. What the decision leaves behind:
 
@@ -7981,11 +7981,12 @@ enough). Tests cover every screen after sign-in.
 `PvReadStore.helpfulOf` is local. When the recommendations engine reads it
 server-side, add a column and a push; not before.
 
-### 62.3 Twins, and the second child at onboarding
+### 62.3 Twins, and the second child at onboarding — DONE 2026-10-17 (Onboarding V3)
 
-The Stage screen says "Expecting twins or more? You can say so later" and
-there is no later yet. The Date screen adds one child; a second is added from
-inside Parenting. Both are `pregnancies` / multi-child work (§61.1).
+Twins are asked on the pregnancy date page (`ReadyBirthContextStore.setTwins`)
+and on the child page (`setBirth(multiple:)`); "+ Add another child" adds a
+second `children` row and switches back to the first. The Stage screen's
+"You can say so later" line is commented out, kept for revert.
 
 ### 62.4 Reveal art
 
@@ -7993,6 +7994,42 @@ The reveal draws a tinted panel with the week/month label where the design
 has the week-14 baby illustration. `assets/baby/` has per-week JPGs for
 pregnancy; wiring the right one by week, and finding month art for parenting,
 is a small follow-up.
+
+### 62.6 Onboarding V3 — BUILT 2026-10-17, not walked; what is left
+
+Every answer now has a reader (docs/ONBOARDING.md §3). Built from the approved
+prototype. Migration 0102 (`due_date_source`, `dating_date`, `birth_mode`,
+`born_weeks`, `ttc_ready_plans`, `link_as_partner` refuses). Left:
+
+- **Run 0102**, then flip `kChildBirthColumns` to true (pp_child_profile.dart).
+- **The first arrival home** (the user's third ask): prototype first, then build.
+- **A planner who logs a period** gets the cycle chapter: `preparingTogether`
+  only shows with no cycle data. Switching the chapter alone would bring back
+  the two-clocks bug of 2026-09-27; it needs a getting-ready mode for the TTC
+  home. A design decision.
+- **"A hard birth"** (the gentle row) is saved and nothing reads it yet.
+- **Editing the new answers on You**: gentle, what helps him, the age band.
+- **The You screen's language switch** still exists; onboarding no longer asks.
+  The user decides whether You keeps it.
+- **Unpairing from her side** still goes through Help.
+- Walk every path on a phone: trying ×3, his trying, pregnancy (4 dating ways),
+  his pregnancy, parenting (+twins, +second child), skilling, partner with a code.
+
+### 62.7 The partner sets up on his own — BUILT 2026-10-17
+
+Who → Partner → "Set up on my own" gives him his own run (never about her
+body), `profiles.role = father`, and a link step showing his code. She enters
+his code on You › Partner ("Did he send you a code?"), through
+`SupabaseRepo.linkAsPartner`. A TTC father now lands on the TTC home in his
+view (splash `_homeFor`). What helps him orders his doors (`ttcHisDoorsFirst`)
+and his pregnancy block (`pregPartnerOrder`).
+
+### 62.8 `ttc_journeys` has one `for all` policy — follow-up, OPENED 2026-10-17
+
+`using (mine or my partner's) with check (mine)` lets the partner DELETE her
+row, because `with check` does not guard a delete (BACKEND-PATTERNS §16jj-b).
+`ttc_ready_plans` (0102) splits the policies by command; `ttc_journeys` should
+too. A small migration; not done in V3 because nothing deletes that row today.
 
 ### 62.5 The design project could carry the questions
 
@@ -9646,7 +9683,8 @@ Owed:
   details, egg-freezing costs, letrozole status in India, the NICE age table, NFHS-5 figures, helpline numbers
   (1091 varies by state), lab and strip prices, the ibuprofen-around-ovulation tip, Suraksha/ICTC naming.
 - **§79.4 Setup screens**: the PDF's onboarding feedback is NOTED ONLY in `docs/TTC-GAP-PLAN.md` §9 (the user
-  handles it separately), plus carrying the onboarding reminders choice into `TtcMessagesStore.setPhoneOn`.
+  handles it separately). The reminders choice now reaches `TtcMessagesStore.setPhoneOn` — DONE 2026-10-17
+  (Onboarding V3, §62.6).
 - **§79.5 Community** (held back): its PDF items (honest counts, votable poll, two-week-wait and over-35 rooms,
   pinned threads, live thread on the home) wait for the release decision; every entry point is commented, not
   deleted.
@@ -10484,10 +10522,13 @@ they start trying.
   one; You reads "Getting ready to try · from <month>".
 
 **Open.**
-- **His side's plan card is NOT built.** The plan lives on her phone only, and
-  his side is his own phone, so a card there would be empty or wrong. It needs
-  the plan synced (a table, RLS for the couple, a migration, then the card).
-- Cloud sync of the plan itself (same reason; plan answers are local-only).
+- **His side's plan card is NOT built.** Since 2026-10-17 the plan syncs to
+  `ttc_ready_plans` (0102, couple-readable, own-row writes), so the card can be
+  built on his partner's row; the card itself is still owed.
+- ~~Cloud sync of the plan itself~~ DONE 2026-10-17 (0102,
+  `TtcReadyPlanStore` with `TtcSyncedStore`). Needs 0102 run on the live DB.
+- His age and habits can now come from his own onboarding
+  (`setHisAnswers`), on his phone's row.
 - Doctor review of the test list and folic acid wording; dietitian review of
   the regional food blocks. Bylines stay "ParentVeda team" until then.
 - Not walked on a phone yet.

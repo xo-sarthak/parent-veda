@@ -561,38 +561,18 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
     }
 
-    testWidgets('step one has no arrow; later steps go back one step',
+    // ⚠️ ONE STEP SINCE ONBOARDING V3 (2026-10-17): the intro is the film
+    // alone, so there is no later step to go back to. Kept for revert in git
+    // history: "step one has no arrow; later steps go back one step" and "the
+    // back gesture steps back too, and never leaves mid-flow".
+    testWidgets('the film is the first and only screen: no arrow, Skip leaves',
         (tester) async {
       const t = TtcS(false);
       await pumpStage(tester);
-      expect(find.text(t.introLanguageTitle), findsOneWidget);
+      expect(find.text(t.introVideoTitle), findsOneWidget);
       expect(_back, findsNothing, reason: 'the first screen; Skip leaves');
-
-      await tester.tap(find.text('English'));
-      await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text(t.introVideoTitle), findsOneWidget);
-      expect(_back, findsOneWidget);
-      await tester.tap(_back);
-      await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text(t.introLanguageTitle), findsOneWidget);
+      expect(find.text(t.introSkip), findsOneWidget);
       expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('the back gesture steps back too, and never leaves mid-flow',
-        (tester) async {
-      const t = TtcS(false);
-      await pumpStage(tester);
-      await tester.tap(find.text('English'));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.tap(find.text(t.introContinue));
-      await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text(t.introPeriodTitle), findsOneWidget);
-
-      await tester.binding.handlePopRoute();
-      await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text(t.introVideoTitle), findsOneWidget);
-      expect(await TtcIntroGate.owed(), isTrue,
-          reason: 'stepping back is not skipping');
     });
   });
 }

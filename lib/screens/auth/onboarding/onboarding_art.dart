@@ -8,7 +8,7 @@
 //  drawn-mark family is a 100x100 utility glyph set that cannot carry a
 //  full-bleed hero. So ten commissioned paintings live here and NOWHERE past
 //  the reveal — the moment she reaches a home screen, the app is back to its
-//  own hand. (docs/ONBOARDING-V2.md §3.)
+//  own hand. (docs/ONBOARDING.md (History B) §3.)
 //
 //  THE CURVED BAND is Headspace's actual signature, and reading fourteen
 //  onboarding flows on Mobbin it is the single highest-leverage visual
@@ -71,6 +71,11 @@ enum ObArt {
 
   /// His portrait, turned toward hers. The pair.
   whoPartner,
+
+  /// A man waving, the companion to [hello]. His "Hello" when he sets up on
+  /// his own (Onboarding V3, 2026-10-17; painted in ChatGPT from the user's
+  /// brief).
+  helloPartner,
 }
 
 /// The file for a painting. Public because `ObGridCard` paints one into its
@@ -90,6 +95,7 @@ String _asset(ObArt a) => switch (a) {
   ObArt.plan => 'assets/onboarding/ob_a10.jpg',
   ObArt.whoMother => 'assets/onboarding/ob_a11.jpg',
   ObArt.whoPartner => 'assets/onboarding/ob_a12.jpg',
+  ObArt.helloPartner => 'assets/onboarding/ob_a13.jpg',
 };
 
 /// The hue behind each painting — the fallback field, and the tint the band
@@ -100,14 +106,17 @@ double obArtHue(ObArt a) => switch (a) {
   ObArt.privacy => 104, // sage
   ObArt.stageTrying => 42, // warm sand
   ObArt.stagePregnant => 344,
-  ObArt.stageParenting => 268, // soft lilac
+  // No lavender in onboarding (the user, 2026-10-17): the two lilac fields
+  // became sage and warm sand. Kept for revert: stageParenting 268, plan 268.
+  ObArt.stageParenting => 140, // sage
   ObArt.stageSkilling => 18, // terracotta
   ObArt.hello => 42,
   ObArt.week => 344,
   ObArt.promise => 104,
-  ObArt.plan => 268,
+  ObArt.plan => 42, // warm sand
   ObArt.whoMother => 344,
   ObArt.whoPartner => 104,
+  ObArt.helloPartner => 42,
 };
 
 /// The band: a painting with a curved bottom edge, the content below it.

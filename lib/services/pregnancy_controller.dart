@@ -441,6 +441,26 @@ class PregnancyController extends ChangeNotifier {
           dueStr = partner?['due_date'] as String?;
         }
       }
+      // Where the date came from (0102). Its own read, so a database that has
+      // not run 0102 yet costs only this, never the due date itself.
+      if (_dueDateSource == DueDateSource.unknown && (dueStr ?? '').isNotEmpty) {
+        try {
+          final src = await client
+              .from('profiles')
+              .select('due_date_source')
+              .eq('id', uid)
+              .maybeSingle();
+          final name = src?['due_date_source'] as String?;
+          final found = DueDateSource.values
+              .where((v) => v.name == name)
+              .firstOrNull;
+          if (found != null) {
+            _dueDateSource = found;
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString(kDueDateSourceKey, found.name);
+          }
+        } catch (_) {/* column not there yet: keep unknown */}
+      }
       // Cloud due date = the cross-device source of truth. Apply it + refresh
       // the local cache so a fresh login shows the real current week.
       if (dueStr != null && dueStr.isNotEmpty) {
@@ -502,8 +522,12 @@ class PregnancyController extends ChangeNotifier {
 
   /// Persisted due date set from the Due Date Calculator - drives the whole app
   /// (current week/day everywhere). Survives restarts.
+  ///
+  /// [datingDate] is the date she gave to get there: her last period, the scan
+  /// day or the transfer day (Onboarding V3). Kept so the due date can be
+  /// explained, and sent to `profiles.dating_date` (0102).
   Future<void> setDueDate(DateTime dueDate,
-      {DueDateSource source = DueDateSource.unknown}) async {
+      {DueDateSource source = DueDateSource.unknown, DateTime? datingDate}) async {
     _dueDate = _dateOnly(dueDate);
     _dueDateIsSet = true;
     _dueDateSource = source;
@@ -522,6 +546,15 @@ class PregnancyController extends ChangeNotifier {
         await client.from('profiles').update(
             {'due_date': _dueDate.toIso8601String().split('T').first}).eq(
             'id', uid);
+        // ⚠️ A SEPARATE WRITE for the 0102 columns: if the database has not
+        // run 0102 yet, this one fails alone and the due date above still
+        // lands. One combined update would have lost both.
+        await client.from('profiles').update({
+          'due_date_source': source.name,
+          'dating_date': datingDate == null
+              ? null
+              : _dateOnly(datingDate).toIso8601String().split('T').first,
+        }).eq('id', uid);
       }
     } catch (_) {/* offline - local only */}
   }

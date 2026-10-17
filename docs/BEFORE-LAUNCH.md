@@ -75,6 +75,8 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 - [ ] **LAUNCH** · Content edits have no history ("last write wins, silently"); an audit trigger is owed · dev · STILL-OPEN §7.2 · added 2026-10-17
 - [ ] **CHECK** · The three `service_role` grants (recipes, reads, products): STILL-OPEN §80.15 says owed, REMAINING-CHANGES says done · user · added 2026-10-17
 - [ ] **CHECK** · Was the demo re-seeded after 0089? Unknown · user · STILL-OPEN §5.4k · added 2026-10-17
+- [ ] **LAUNCH** · Run **0102** (Onboarding V3: `profiles.due_date_source` + `dating_date`, `children.birth_mode` + `born_weeks`, the `ttc_ready_plans` table, `link_as_partner` refuses instead of re-pairing), then flip `kChildBirthColumns` to true in `pp_child_profile.dart` · user runs, dev flips · ONBOARDING.md §4, STILL-OPEN §62.6 · added 2026-10-17
+- [ ] **LAUNCH** · Walk the V3 onboarding on a phone, every path: trying (getting ready, on our own, clinic), his trying, pregnancy (four dating ways, twins, gentle), his pregnancy, parenting (twins, a second child), skilling, partner with a code; then her "Did he send you a code?" link · user + dev · STILL-OPEN §62.6 · added 2026-10-17
 
 ---
 
@@ -85,7 +87,7 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 - [ ] **LAUNCH** · The Directus presentation pass before anyone else gets a login: `brand_sample_claims` would name rows by home address · user · STILL-OPEN §7.1, DIRECTUS-SETUP §1b · added 2026-10-17
 - [ ] **LAUNCH** · Expert registration numbers really checked before a clinician goes live (`kTtcRegistrationChecksRecorded = false`) · user · STILL-OPEN §16.0 · added 2026-10-17
 - [ ] **CHECK** · The email templates carry `{{ .Token }}` and OTP length is 6, at least for the doctor app's magic link. Nothing marks it done · user · AUTH-SETUP §3b · added 2026-10-17
-- [ ] **CHECK** · Server-side rate limit on the SMS send (per phone, per IP). BACKEND-PATTERNS describes a rule; confirm it's live · dev · ONBOARDING-AUDIT · added 2026-10-17
+- [ ] **CHECK** · Server-side rate limit on the SMS send (per phone, per IP). BACKEND-PATTERNS describes a rule; confirm it's live · dev · ONBOARDING.md History A · added 2026-10-17
 - [ ] **CHECK** · The `directus_cms` role has a password and gets "permission denied" on `journal_entries`. STILL-OPEN §7 says it was proved; tick if so · user · DIRECTUS-SETUP §0 · added 2026-10-17
 - [ ] **LAUNCH** · Sponsor-uploaded resources: a review path and a "never medical advice" rule before any sponsor uploads · dev · STILL-OPEN §11.5 · added 2026-10-17
 
@@ -142,8 +144,8 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **CHECK** · Razorpay live keys and merchant KYC: no doc records moving off test mode · user · STILL-OPEN §65.2 · added 2026-10-17
 
 **Messaging:**
-- [ ] **BLOCKER** · Phone OTP: `MSG91_AUTHKEY` and `MSG91_OTP_TEMPLATE_ID` secrets, DLT-registered template including the 11-character SMS hash · user · STILL-OPEN §83.12, ONBOARDING-AUDIT · added 2026-10-17
-- [ ] **LAUNCH** · WhatsApp off Meta's test number (Meta verification); Render paid tier · user · CONTENT-BACKEND, ONBOARDING-AUDIT · added 2026-10-17
+- [ ] **BLOCKER** · Phone OTP: `MSG91_AUTHKEY` and `MSG91_OTP_TEMPLATE_ID` secrets, DLT-registered template including the 11-character SMS hash · user · STILL-OPEN §83.12, ONBOARDING.md History A · added 2026-10-17
+- [ ] **LAUNCH** · WhatsApp off Meta's test number (Meta verification); Render paid tier · user · CONTENT-BACKEND, ONBOARDING.md History A · added 2026-10-17
 
 **Sponsors** (STILL-OPEN line 21: §11.6 blocks the sponsor programme):
 - [ ] **DECIDE** · An email provider (Resend, SES or Postmark), so activation codes have a sender · user · STILL-OPEN §11.6 · added 2026-10-17

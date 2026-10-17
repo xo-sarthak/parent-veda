@@ -16,6 +16,8 @@
 //  store it claims to feed rather than against its own widget.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,19 +53,26 @@ void main() {
   }
 
   // ===========================================================================
+  //  ⚠️ THE FILM ONLY, SINCE ONBOARDING V3 (2026-10-17). Onboarding now asks
+  //  where she is, her last period and how long, once, and writes the same
+  //  stores; the language question went on the user's word ("NO LANGUAGE
+  //  QUES!"). These tests used to walk language → film → three questions.
+  //  Kept for revert in git history (the pre-V3 version of this file).
   group('the gate', () {
     testWidgets('a first arrival in the stage gets the introduction',
         (tester) async {
       await pumpStageEntry(tester);
-      expect(find.text(const TtcS(false).introLanguageTitle), findsOneWidget,
+      expect(find.text(const TtcS(false).introVideoTitle), findsOneWidget,
           reason: 'the first-run flow is built but nothing shows it');
+      expect(find.text(const TtcS(false).introLanguageTitle), findsNothing,
+          reason: 'no language question (2026-10-17)');
     });
 
     testWidgets('and a later arrival goes straight to the home',
         (tester) async {
       await TtcIntroGate.markSeen();
       await pumpStageEntry(tester);
-      expect(find.text(const TtcS(false).introLanguageTitle), findsNothing);
+      expect(find.text(const TtcS(false).introVideoTitle), findsNothing);
     });
 
     testWidgets('skipping still counts as seen — it never asks twice',
@@ -78,103 +87,47 @@ void main() {
   });
 
   // ===========================================================================
-  group('every step can be left', () {
-    testWidgets('skip is on the language step, the video and all three questions',
-        (tester) async {
+  group('the film is the whole introduction', () {
+    testWidgets('it can be left, and finishing it asks nothing', (tester) async {
       final t = const TtcS(false);
       await pumpStageEntry(tester);
-
-      // Walk the whole flow, asserting the escape exists at each stop. A skip
-      // that only appears on the screens we do not mind losing is a funnel,
-      // not an escape.
       expect(find.text(t.introSkip), findsOneWidget);
-
-      await tester.tap(find.text('English'));
-      await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text(t.introVideoTitle), findsOneWidget);
-      expect(find.text(t.introSkip), findsOneWidget);
-
       await tester.tap(find.text(t.introContinue));
-      await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text(t.introPeriodTitle), findsOneWidget);
-      expect(find.text(t.introSkip), findsOneWidget);
-
-      // "I don't know" is a real answer here, not a skip — see the note on the
-      // step. It moves on without writing a guessed date.
-      await tester.tap(find.text(t.introDontKnow));
-      await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text(t.introTryingTitle), findsOneWidget);
-
-      await tester.tap(find.text(t.introRatherNotSay));
-      await tester.pump(const Duration(milliseconds: 200));
-      expect(find.text(t.introPathTitle), findsOneWidget);
-      expect(find.text(t.introSkip), findsOneWidget);
-    });
-
-    testWidgets('and declining every question leaves the stage unconfigured',
-        (tester) async {
-      final t = const TtcS(false);
-      await pumpStageEntry(tester);
-
-      await tester.tap(find.text('English'));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.tap(find.text(t.introContinue));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.tap(find.text(t.introDontKnow));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.tap(find.text(t.introRatherNotSay));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.tap(find.text(t.introRatherNotSay));
       await tester.pump(const Duration(milliseconds: 400));
 
-      // ⚠️ NOTHING INVENTED FROM SILENCE. A guessed period start is worse than
-      // none: with no date the engine refuses to estimate and says so; with a
-      // wrong one it estimates confidently and is wrong everywhere at once.
+      // None of the old questions follow the film any more.
+      expect(find.text(t.introPeriodTitle), findsNothing);
+      expect(find.text(t.introTryingTitle), findsNothing);
+      expect(find.text(t.introPathTitle), findsNothing);
+      expect(await TtcIntroGate.owed(), isFalse);
+      // ⚠️ NOTHING INVENTED FROM SILENCE.
       expect(CycleStore.instance.periodStarts, isEmpty);
-      expect(find.text(t.introPathTitle), findsNothing,
-          reason: 'the flow did not finish');
     });
   });
 
   // ===========================================================================
-  //  The answers reach the engines
+  //  The answers still reach the engines — from onboarding now
   // ---------------------------------------------------------------------------
-  //  Three questions instead of the reference app's seventeen, and the whole
-  //  justification for each is that something concrete reads it. These assert
-  //  that claim rather than trusting it.
-  group('the three answers are read by something', () {
+  group('the answers onboarding asks are read by something', () {
+    test('onboarding writes the period, the path and the journey start', () {
+      final src = File('lib/screens/auth/onboarding/onboarding_flow.dart')
+          .readAsStringSync();
+      expect(src, contains('CycleStore.instance.logPeriodStart('));
+      expect(src, contains('ttc.setPath('));
+      expect(src, contains('ttc.setJourneyStart('));
+      expect(src, contains('plan.setPlannedStart('));
+    });
+
     testWidgets('the pathway answer reaches TimingOwnership', (tester) async {
-      final t = const TtcS(false);
-      await pumpStageEntry(tester);
+      TtcStore.instance.setPath(TtcPath.ivf);
 
-      await tester.tap(find.text('English'));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.tap(find.text(t.introContinue));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.tap(find.text(t.introDontKnow));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.tap(find.text(t.introRatherNotSay));
-      await tester.pump(const Duration(milliseconds: 200));
-
-      await tester.tap(find.text(TtcPath.ivf.label(false)));
-      await tester.pump(const Duration(milliseconds: 400));
-
-      // ⚠️ THE ONE ANSWER WITH REAL TEETH. It decides whether the app may
-      // generate a fertile window at all — a woman on IVF shown an ovulation
-      // estimate is being handed a second opinion against a clinician who
-      // outranks our calculation by six places in the truth hierarchy.
-      //
-      // ⚠️ 2026-09-26, THE USER'S DECISION: the answer sets the pathway (and
-      // with it the tier), and the first date her clinic gives her for this
-      // cycle hands the timing over. The label alone is her own cycle. Kept
-      // for revert: the two expectations below held straight after the tap.
+      // ⚠️ THE ONE ANSWER WITH REAL TEETH. A clinic owns the timing only with
+      // a real date from her clinic for this cycle (2026-09-26), never on the
+      // pathway label alone.
       expect(TtcStore.instance.path, TtcPath.ivf);
       expect(TtcStore.instance.pathway.ownership,
           TimingOwnership.clinicControlled);
       expect(TtcStore.instance.today.clinicInvolved, isFalse);
-      // 2026-09-26: a clinic owns the timing only with a real date from
-      // her clinic for this cycle in the treatment tracker, never on the
-      // pathway label alone. Kept for revert: the label alone did it.
       TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
           DateTime.now().add(const Duration(days: 20)));
       addTearDown(TtcTreatmentStore.instance.resetForTest);
@@ -183,23 +136,18 @@ void main() {
           reason: 'a clinic-run cycle must not get an app-made window');
     });
 
-    testWidgets('the how-long answer anchors mid-band, not at an edge',
-        (tester) async {
-      // Nine months for "six months to a year". The readiness rules raise
-      // seeking help at twelve months, so anchoring at the bottom of a band
-      // delays that by half a year and the top brings it forward by the same —
-      // and she is never told which the app picked.
+    test('the how-long answer anchors mid-band, the same in both places', () {
+      // Nine months for "six months to a year": the readiness rules raise
+      // seeking help at twelve months, so the bottom of a band delays that
+      // by half a year and the top brings it forward by the same.
       expect(TtcTryingFor.sixToTwelve.approxMonths, 9);
       expect(TtcTryingFor.upToSix.approxMonths, 3);
       expect(TtcTryingFor.justStarted.approxMonths, 0);
-    });
-
-    testWidgets('and every option carries copy in both languages',
-        (tester) async {
-      for (final option in TtcTryingFor.values) {
-        expect(option.label(false), isNotEmpty);
-        expect(option.label(true), isNotEmpty);
-      }
+      expect(TtcTryingFor.overAYear.approxMonths, 18);
+      final src = File('lib/screens/auth/onboarding/onboarding_flow.dart')
+          .readAsStringSync();
+      expect(src, contains("{'starting': 0, 'months': 3, 'six': 9, 'year': 18}"),
+          reason: "onboarding's bands are the intro's");
     });
   });
 

@@ -42,6 +42,7 @@ import '../tools/due_date_calculator_screen.dart'
     show DdcMethod, ddcComputeEdd;
 import '../../services/life_stage_store.dart';
 import '../../services/whatsapp_prefs.dart';
+import '../../services/remote/supabase_repo.dart';
 import '../../doctor/doctor_directory.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
@@ -1290,21 +1291,17 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     final code = _code.text.trim();
     if (code.length < 4) return;
     _go('pairing');
-    try {
-      // Securely link this father to the mother whose code this is
-      // (the link_as_partner SQL function sets both profiles' partner_id).
-      await Supabase.instance.client
-          .rpc('link_as_partner', params: {'code': code});
-      if (!mounted) return;
+    // Through the repo since 2026-10-17 (Onboarding V3), so both directions
+    // share one call. Kept for revert: the direct
+    //   Supabase.instance.client.rpc('link_as_partner', params: {'code': code})
+    // with `on PostgrestException catch (e) => _toast(e.message)`.
+    final refused = await SupabaseRepo.linkAsPartner(code);
+    if (!mounted) return;
+    if (refused == null) {
       _go('paired');
-    } on PostgrestException catch (e) {
-      if (!mounted) return;
+    } else {
       _go('pairCode');
-      _toast(e.message); // e.g. "Invalid pairing code"
-    } catch (_) {
-      if (!mounted) return;
-      _go('pairCode');
-      _toast('Pairing failed. Check the code and try again.');
+      _toast(refused); // e.g. "Invalid pairing code"
     }
   }
 

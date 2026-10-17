@@ -168,7 +168,14 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
   DateTime? _plannedMonth;
   TtcPath? _path;
 
-  static const _steps = 5; // language · video · 3 questions
+  // ⚠️ THE FILM ONLY, SINCE ONBOARDING V3 (2026-10-17). Onboarding now asks
+  // where she is (getting ready / on our own / with a clinic), her last
+  // period and how long, once, and writes them to the same stores. Asking
+  // again here was the duplicate the user caught. The language step went on
+  // the user's word ("NO LANGUAGE QUES! It's only English"). The steps stay
+  // in this file, unreachable, kept for revert:
+  //   static const _steps = 5; // language · video · 3 questions
+  static const _steps = 1; // the film
 
   void _next() {
     if (_step >= _steps - 1) {
@@ -285,13 +292,15 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
     );
   }
 
-  Widget _current(TtcS t) => switch (_step) {
-        0 => _language(t),
-        1 => _video(t),
-        2 => _periodQuestion(t),
-        3 => _tryingQuestion(t),
-        _ => _pathQuestion(t),
-      };
+  Widget _current(TtcS t) => _video(t);
+  // Kept for revert (Onboarding V3, see `_steps`):
+  //   switch (_step) {
+  //     0 => _language(t),
+  //     1 => _video(t),
+  //     2 => _periodQuestion(t),
+  //     3 => _tryingQuestion(t),
+  //     _ => _pathQuestion(t),
+  //   };
 
   // ===========================================================================
   //  1. Language
@@ -306,6 +315,8 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
   //  Telugu, Tamil and Kannada because a competitor does would promise four
   //  languages that resolve to English the moment she taps one.
   // ===========================================================================
+  // Unreachable since Onboarding V3; kept for revert (see `_steps`).
+  // ignore: unused_element
   Widget _language(TtcS t) => _Page(
         title: t.introLanguageTitle,
         body: t.introLanguageBody,
@@ -411,6 +422,8 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
   // ===========================================================================
   //  3. The one date the stage cannot work without
   // ===========================================================================
+  // Unreachable since Onboarding V3; kept for revert (see `_steps`).
+  // ignore: unused_element
   Widget _periodQuestion(TtcS t) => _Page(
         title: t.introPeriodTitle,
         body: t.introPeriodBody,
@@ -457,6 +470,8 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
     return [for (var i = 1; i <= 7; i++) DateTime(now.year, now.month + i)];
   }
 
+  // Unreachable since Onboarding V3; kept for revert (see `_steps`).
+  // ignore: unused_element
   Widget _tryingQuestion(TtcS t) => _Page(
         title: t.introTryingTitle,
         body: t.introTryingBody,
@@ -520,6 +535,8 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
   //  Defaults to nothing rather than to `natural`. Not answering leaves the
   //  pathway untouched, which is what the store already does.
   // ===========================================================================
+  // Unreachable since Onboarding V3; kept for revert (see `_steps`).
+  // ignore: unused_element
   Widget _pathQuestion(TtcS t) => _Page(
         title: t.introPathTitle,
         body: t.introPathBody,

@@ -8,7 +8,7 @@ audit document for that folder:
 
 | Folder | Audit |
 |---|---|
-| `onboarding/` | `docs/ONBOARDING-AUDIT.md` §8 |
+| `onboarding/` | `docs/ONBOARDING.md (History A)` §8 |
 | `reader/` | `docs/READER-AUDIT.md` §8 |
 
 Re-download: run the flow / screen search again with the same query and save

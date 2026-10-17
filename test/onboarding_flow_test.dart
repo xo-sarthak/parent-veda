@@ -24,10 +24,13 @@ Iterable<String> _code(String src) =>
 
 void main() {
   group('the question bank', () {
-    test('every stage has two or three questions, none more', () {
-      for (final s in ['trying', 'pregnancy', 'parenting', 'skilling']) {
+    // Onboarding V3 (2026-10-17): trying's bank is four, because "Where are
+    // you with this?" was added, and "Getting ready" then skips "How long".
+    // Kept for revert: inInclusiveRange(2, 3).
+    test('every stage has two to four questions, none more', () {
+      for (final s in ['trying', 'pregnancy', 'parenting', 'skilling', 'partner']) {
         final n = onboardingQuestionsFor(s).length;
-        expect(n, inInclusiveRange(2, 3), reason: s);
+        expect(n, inInclusiveRange(2, 4), reason: s);
       }
       expect(onboardingQuestionsFor('nonsense'), isEmpty);
     });
@@ -35,7 +38,7 @@ void main() {
     test(
       'every single-select option gives something back; multi-selects give one line',
       () {
-        for (final s in ['trying', 'pregnancy', 'parenting', 'skilling']) {
+        for (final s in ['trying', 'pregnancy', 'parenting', 'skilling', 'partner']) {
           for (final q in onboardingQuestionsFor(s, childName: 'Aarav')) {
             if (q.multi) {
               expect(q.multiGiveBack, isNotNull, reason: q.id);
@@ -287,8 +290,10 @@ void main() {
       expect(find.text('When is the baby due?'), findsOneWidget);
     });
 
+    // Onboarding V3 (2026-10-17). Kept for revert in git: "trying path: stage
+    // → questions → reach, with no date and no reveal", the pre-V3 run.
     testWidgets(
-      'trying path: stage → questions → reach, with no date and no reveal',
+      'trying path: where she is, her period, the questions, a reveal, the account',
       (t) async {
         phone(t);
         await t.pumpWidget(
@@ -310,44 +315,182 @@ void main() {
         await t.pumpAndSettle();
         await t.tap(find.text('Continue'));
         await t.pumpAndSettle();
-        expect(find.text('How long have you been trying?'), findsOneWidget);
-        // ⚠️ THE BAR, AND ONLY HERE. `onboarding_chrome` narrowed the old "no
-        // progress bar anywhere" rule to allow one over the question run —
-        // named with the stage, which is the half that makes it a subject
-        // rather than a chore. Both halves are asserted so neither can be
-        // quietly dropped.
+        expect(find.text('Where are you with this?'), findsOneWidget);
+        // ⚠️ THE BAR, AND ONLY HERE, named with the stage. Five asked: where,
+        // last period, regular, how long, folic acid (the beat is not counted).
         expect(find.text('ABOUT WHERE YOU ARE'), findsOneWidget);
-        expect(find.text('1 of 3'), findsOneWidget);
+        expect(find.text('1 of 5'), findsOneWidget);
         // Choosing an answer reveals the give-back before any Continue.
-        await t.tap(find.text('Just starting'));
+        await t.tap(find.text('Trying on our own'));
         await t.pumpAndSettle();
         expect(find.text('GOOD TO KNOW'), findsOneWidget);
-        expect(find.textContaining('within a year'), findsOneWidget);
+        await t.tap(find.text('Continue'));
+        await t.pumpAndSettle();
+        // Her last period, moved here from the TTC intro.
+        expect(find.text('When did your last period start?'), findsOneWidget);
+        await t.tap(find.text("I don't remember"));
+        await t.pumpAndSettle();
         await t.tap(find.text('Continue'));
         await t.pumpAndSettle();
         expect(find.text('Are your periods fairly regular?'), findsOneWidget);
         // Skip is always there.
         await t.tap(find.text('Skip'));
         await t.pumpAndSettle();
-        // ⚠️ THE BEAT LANDS HERE, AND SKIPPING DOES NOT SKIP IT. It is not a
-        // question — it is the app saying what it will never do — so it sits
-        // between question two and question three whichever way she leaves
-        // two, by answering or by skipping. Asserted rather than tapped
-        // past, because a promise the flow can route around is not one.
+        // ⚠️ THE BEAT, AND SKIPPING DOES NOT SKIP IT.
         expect(find.text("What we'll never do."), findsOneWidget);
         await t.tap(find.text('Good'));
         await t.pumpAndSettle();
+        expect(find.text('How long have you been trying?'), findsOneWidget);
+        // The age band sits under it, optional, and changes the give-back.
+        await t.tap(find.text('Six months to a year'));
+        await t.pumpAndSettle();
+        await t.ensureVisible(find.text('35 to 37'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('35 to 37'));
+        await t.pumpAndSettle();
+        expect(find.textContaining('good time to see a doctor'), findsOneWidget);
+        await t.tap(find.text('Continue'));
+        await t.pumpAndSettle();
+        expect(find.text('Is anyone taking folic acid yet?'), findsOneWidget);
         await t.tap(find.text('Skip'));
         await t.pumpAndSettle();
         // Building runs on timers; let them all fire.
         await t.pump(const Duration(seconds: 3));
         await t.pumpAndSettle();
-        // ⚠️ THE ACCOUNT COMES LAST NOW, and trying still has no reveal —
-        // there is no week to show and nothing honest to compute.
+        // ⚠️ TRYING HAS A REVEAL NOW: one per path. No period date, so it
+        // says what the one date will unlock rather than guess.
+        expect(find.text('YOUR CYCLE'), findsOneWidget);
+        expect(find.text('Your cycle starts with one date.'), findsOneWidget);
+        expect(find.text('A check-up is a good next step'), findsOneWidget);
+        await t.tap(find.text("Let's begin"));
+        await t.pumpAndSettle();
         expect(find.textContaining('Keep all of this'), findsOneWidget);
         expect(find.text('Continue with Google'), findsOneWidget);
       },
     );
+
+    testWidgets('getting ready: no "how long", and a plan for the reveal', (
+      t,
+    ) async {
+      phone(t);
+      await t.pumpWidget(
+        MaterialApp(
+          home: OnboardingFlow(
+            pregnancy: PregnancyController(now: DateTime(2026, 9, 17)),
+            onDone: (_, _) {},
+            startAt: ObStep.stage,
+            startName: 'Priya',
+          ),
+        ),
+      );
+      await t.pumpAndSettle();
+      await t.tap(find.text('Trying to conceive'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Getting ready'));
+      await t.pumpAndSettle();
+      // The month question opens in place.
+      expect(
+        find.text('Which month do you want to start trying?  Optional'),
+        findsOneWidget,
+      );
+      expect(find.text('1 of 4'), findsOneWidget);
+      await t.tap(find.text('Not sure yet'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text("I don't remember"));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Skip'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Good'));
+      await t.pumpAndSettle();
+      // ⚠️ A COUPLE WHO HAVE NOT STARTED ARE NOT ASKED HOW LONG THEY HAVE
+      // BEEN TRYING.
+      expect(find.text('How long have you been trying?'), findsNothing);
+      expect(find.text('Is anyone taking folic acid yet?'), findsOneWidget);
+      await t.tap(find.text('Not yet'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.pump(const Duration(seconds: 3));
+      await t.pumpAndSettle();
+      expect(find.text('GETTING READY TO TRY'), findsOneWidget);
+      expect(find.text('Getting ready, at your pace.'), findsOneWidget);
+      expect(
+        find.text('Folic acid, 400 mcg a day. Start this week'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the partner on his own: never asked about her body', (
+      t,
+    ) async {
+      phone(t);
+      await t.pumpWidget(
+        MaterialApp(
+          home: OnboardingFlow(
+            pregnancy: PregnancyController(now: DateTime(2026, 9, 17)),
+            onDone: (_, _) {},
+            startAt: ObStep.who,
+          ),
+        ),
+      );
+      await t.pumpAndSettle();
+      await t.tap(find.text('Partner'));
+      await t.pumpAndSettle();
+      expect(find.text('How are you joining?'), findsOneWidget);
+      await t.tap(find.text('Set up on my own'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      expect(find.text('Where are you two right now?'), findsOneWidget);
+      await t.tap(find.text('Trying to conceive'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      // His hello says what is and is not asked.
+      expect(find.textContaining('Nothing about her is asked here'), findsOneWidget);
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      expect(find.text('Where are you two with this?'), findsOneWidget);
+      expect(find.text('ABOUT YOU TWO'), findsOneWidget);
+      await t.tap(find.text('Trying on our own'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      // ⚠️ NO PERIOD, NO CYCLE: straight to how long, with HER age band.
+      expect(find.text('When did your last period start?'), findsNothing);
+      expect(find.text('Are your periods fairly regular?'), findsNothing);
+      expect(find.text('How long have you been trying?'), findsOneWidget);
+      expect(find.text('Her age  Optional. It changes when we suggest a check-up'),
+          findsOneWidget);
+      await t.tap(find.text('Skip'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Good'));
+      await t.pumpAndSettle();
+      expect(find.text('A little about you.'), findsOneWidget);
+      await t.tap(find.text('Tobacco, in any form'));
+      await t.pumpAndSettle();
+      expect(find.textContaining('three months'), findsOneWidget);
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      expect(find.text('What would help you most?'), findsOneWidget);
+      await t.tap(find.text('My own health'));
+      await t.pumpAndSettle();
+      expect(FamilyProfileStore.instance.fatherHelp, ['health']);
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.pump(const Duration(seconds: 3));
+      await t.pumpAndSettle();
+      expect(find.text('YOUR SIDE OF IT'), findsOneWidget);
+      expect(find.text('Your part of the plan: tobacco'), findsOneWidget);
+    });
 
     testWidgets('parent path: baby screen needs a birthday, name is optional', (
       t,
@@ -442,7 +585,12 @@ void main() {
       await t.pumpAndSettle();
       await t.tap(find.text('Continue'));
       await t.pumpAndSettle();
-      await t.tap(find.text('Just starting'));
+      // Onboarding V3: where she is, then her last period, then the rest.
+      await t.tap(find.text('Trying on our own'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
+      await t.tap(find.text("I don't remember"));
       await t.pumpAndSettle();
       await t.tap(find.text('Continue'));
       await t.pumpAndSettle();
@@ -452,19 +600,26 @@ void main() {
       await t.pumpAndSettle();
       await t.tap(find.text('Good'));
       await t.pumpAndSettle();
+      await t.tap(find.text("We've just started"));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Continue'));
+      await t.pumpAndSettle();
       await t.tap(find.text('Yes'));
       await t.pumpAndSettle();
       await t.tap(find.text('Continue'));
       await t.pumpAndSettle();
       await t.pump(const Duration(seconds: 3));
       await t.pumpAndSettle();
+      // Trying has a reveal since V3; the account follows it.
+      await t.tap(find.text("Let's begin"));
+      await t.pumpAndSettle();
       expect(find.text('ON THIS PHONE NOW'), findsOneWidget);
-      // Its own stage, which trying used to have no line for.
+      // Its own stage, in her words.
       expect(find.text('Your journey'), findsOneWidget);
-      expect(find.text('Trying to conceive'), findsOneWidget);
+      expect(find.text('Trying on our own'), findsOneWidget);
       // Each answer under the name of its question.
       expect(find.text('Trying for'), findsOneWidget);
-      expect(find.text('Just starting'), findsOneWidget);
+      expect(find.text("We've just started"), findsOneWidget);
       expect(find.text('Your periods'), findsOneWidget);
       expect(find.text('Yes, mostly'), findsOneWidget);
       expect(find.text('Folic acid'), findsOneWidget);

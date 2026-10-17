@@ -7,6 +7,7 @@
 //  keep loading in the background; MainScaffold shows its own loader if needed.
 // =============================================================================
 
+import 'ttc/ttc_strings.dart' show TtcPartnerMode;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -188,6 +189,13 @@ class _SplashScreenState extends State<SplashScreen>
     if (role == 'father' && stage == LifeStage.parenting.id) {
       FatherPreview.instance.on = true;
       return _parentingRoute();
+    }
+    // A partner who set up on his own while they are trying (Onboarding V3,
+    // 2026-10-17) lands on the TTC home in his view, not on the pregnancy
+    // father shell, which has nothing to say before a pregnancy.
+    if (role == 'father' && stage == LifeStage.tryingToConceive.id) {
+      TtcPartnerMode.instance.on = true;
+      return _ttcRoute();
     }
     if (role == 'father') return _fatherRoute();
     if (stage == LifeStage.tryingToConceive.id) return _ttcRoute();

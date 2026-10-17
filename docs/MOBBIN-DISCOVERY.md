@@ -17,7 +17,7 @@ CLAUDE.md invariants) → brief → build → this ledger.
 
 | # | Audit | Date | Doc | Built? |
 |---|---|---|---|---|
-| 1 | Onboarding | 2026-09-16 | `ONBOARDING-AUDIT.md` | Yes, 2026-09-17 (`lib/screens/auth/onboarding/`) |
+| 1 | Onboarding | 2026-09-16 | `ONBOARDING.md` (History A) | Yes, 2026-09-17 (`lib/screens/auth/onboarding/`) |
 | 2 | Reading | 2026-09-16 · 17 | `READER-AUDIT.md` · `DESIGN-SYSTEM.md` §4.0a | Five additions, then the whole app on one reader through adapters (guarded) |
 | 3 | Saved / bookmarks | 2026-09-16 | `FAMILY-MODEL.md` §5–6 | Yes (`saved_items`, `SavedScreen`) |
 | 4 | Family model — stage transitions, second child, partner | 2026-09-16 | `FAMILY-MODEL.md` §2–4 | Written down; `pregnancies` table owed |
@@ -27,6 +27,7 @@ CLAUDE.md invariants) → brief → build → this ledger.
 | 8 | ParentVeda+ (doctor app) — provider home, earnings ledger, payouts, availability, front door | 2026-09-18 | `DOCTOR-APP-AUDIT.md` | Yes, same day (`0084`, `doctor_chrome.dart`, five `*_tab.dart`); not walked — STILL-OPEN §5.4 |
 | 10 | Profile — one *You* screen for four stages | 2026-09-19 | `PROFILE-AUDIT.md` | Yes, same day (`lib/screens/profile/`, nine files; `ProfileScreen` and `TtcProfileScreen` are facades); not walked — STILL-OPEN §67 |
 | 11 | Learning — one funnel for courses, masterclasses, cohorts, 1:1 consults and class packs | 2026-09-20 | `LEARNING-AUDIT.md` | Yes, same day (`lib/screens/learn/`, ten files; twenty-five facades); not walked — STILL-OPEN §69 |
+| 12 | Onboarding V3 — every answer used; the partner who sets up alone | 2026-10-17 | `ONBOARDING.md` §1–2 | Yes, 2026-10-17, after a clickable prototype was approved; not walked — STILL-OPEN §62.6. Flo (onboarding, TTC and pregnancy switches), Clue, Oura, Stardust. Partner pass: Flo is invite-only from her side and "you're always in control"; Stardust lets either start with a code. Adopted: either can start, she types his code, her data reaches him only after that. The library has no dad app and no baby tracker |
 
 ---
 

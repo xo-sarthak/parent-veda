@@ -25,9 +25,12 @@
 import '../../../services/family_profile.dart';
 
 class ObOption {
-  const ObOption(this.id, this.label, this.giveBack);
+  const ObOption(this.id, this.label, this.giveBack, {this.subtitle});
   final String id;
   final String label;
+
+  /// A short line under the label (Onboarding V3), e.g. "Medicine, IUI or IVF".
+  final String? subtitle;
 
   /// The line shown the moment this option is chosen.
   final String giveBack;
@@ -67,6 +70,7 @@ class ObQuestion {
 /// gets its name where it is written. `test/onboarding_flow_test.dart` fails
 /// the build if a question has none.
 const Map<String, String> kObSummaryLabels = {
+  'ttc_where': 'Your journey',
   'ttc_duration': 'Trying for',
   'ttc_cycles': 'Your periods',
   'ttc_folic': 'Folic acid',
@@ -78,7 +82,22 @@ const Map<String, String> kObSummaryLabels = {
   'pp_priorities': 'Matters most',
   'sk_interests': 'Enjoys',
   'sk_time': 'Time each day',
+  'p_help_trying': 'Help with',
+  'p_help_pregnancy': 'Help with',
+  'p_first': 'This baby',
 };
+
+/// One question by id, from any stage's bank (Onboarding V3, 2026-10-17).
+/// The flow builds its run from ids, because which questions are asked
+/// depends on earlier answers and on who is answering.
+ObQuestion obQuestion(String id, {String? childName}) {
+  for (final stage in const ['trying', 'pregnancy', 'parenting', 'skilling', 'partner']) {
+    for (final q in onboardingQuestionsFor(stage, childName: childName)) {
+      if (q.id == id) return q;
+    }
+  }
+  throw ArgumentError('No onboarding question "$id"');
+}
 
 /// The questions for a stage, in order. [childName] personalises the skilling
 /// and parenting titles when it is known.
@@ -95,6 +114,10 @@ List<ObQuestion> onboardingQuestionsFor(String stageId, {String? childName}) {
       return _parenting(name);
     case 'skilling':
       return _skilling(name);
+    // His own questions when he sets up alone (Onboarding V3). Never about
+    // her body; see the flow's partner path.
+    case 'partner':
+      return _partner;
     default:
       return const [];
   }
@@ -103,43 +126,49 @@ List<ObQuestion> onboardingQuestionsFor(String stageId, {String? childName}) {
 // ---- Trying to conceive ------------------------------------------------------
 
 final List<ObQuestion> _trying = [
+  // ⚠️ NEW FIRST QUESTION, ONBOARDING V3 (2026-10-17). "Getting ready" used
+  // to be the first answer to "How long have you been trying?" (d8724d1),
+  // which asked a couple who have not started how long they have been
+  // trying. It is its own answer now, beside the two ways of trying. The
+  // persisted identity is unchanged: getting ready still saves
+  // `ttc_duration = planning`, which `ttcStartFromAnswer`, You and the
+  // Ready-to-Try plan already read.
   ObQuestion(
-    id: 'ttc_duration',
-    title: 'How long have you been trying?',
-    subtitle: "There's no wrong answer. It just helps us talk to you in the right way.",
+    id: 'ttc_where',
+    title: 'Where are you with this?',
+    subtitle: 'So we start in the right place. You can change it any time.',
     options: const [
-      // ⚠️ ADDED 2026-10-17 (the Ready-to-Try plan): a couple who have not
-      // started. `ttcStartFromAnswer` reads no start from it, and
-      // `TtcStore.journeyStart` counts from the month in her plan instead,
-      // so the seek-help timing never starts before trying does.
       ObOption(
         'planning',
-        "Not yet, we're getting ready",
+        'Getting ready',
         'Good timing. Starting a few months early gives folic acid and a '
-            "check-up time to work. We'll help you make a plan.",
+            "check-up time to work. We'll help you make a Ready-to-Try plan.",
+        subtitle: 'Not trying yet. Planning for the coming months',
       ),
       ObOption(
-        'starting',
-        'Just starting',
-        'Most couples get pregnant within a year of trying. The first months are for getting to know your cycle, not for worrying.',
+        'trying',
+        'Trying on our own',
+        'Then your home starts with your cycle: when your fertile days are '
+            'likely, and what helps in each part of the month.',
+        subtitle: 'No treatment, just timing',
       ),
       ObOption(
-        'months',
-        'A few months',
-        'A few months is normal. Three months of period dates tells you more about your fertile days than any article can.',
-      ),
-      ObOption(
-        'six',
-        'Six months or more',
-        "This is still normal for many couples. If you're over 35, six months is a good time to see a doctor. It's a calm check, not an emergency.",
-      ),
-      ObOption(
-        'year',
-        'Over a year',
-        "After a year, doctors suggest a check-up for both of you. It's fine to ask. Most causes can be found, and many are simple.",
+        'clinic',
+        'With a doctor or clinic',
+        'Then your clinic sets the timing. When you add their dates, our '
+            'estimate steps aside for theirs, and we help you get ready for '
+            'each step.',
+        subtitle: 'Medicine, IUI or IVF',
       ),
     ],
-    apply: (s, c) => s.setOther('ttc_duration', c.join(',')),
+    apply: (s, c) {
+      if (c.contains('planning')) {
+        s.setOther('ttc_duration', 'planning');
+      } else if (s.otherFor('ttc_duration') == 'planning') {
+        // She changed her mind: not getting ready after all.
+        s.setOther('ttc_duration', '');
+      }
+    },
   ),
   ObQuestion(
     id: 'ttc_cycles',
@@ -148,20 +177,67 @@ final List<ObQuestion> _trying = [
       ObOption(
         'yes',
         'Yes, mostly',
-        'Regular usually means a period every 21 to 35 days. The app will work out your fertile days from your own dates.',
+        'Then the estimate gets sharper with each period you log.',
+        subtitle: 'About every 21 to 35 days',
       ),
       ObOption(
         'no',
         'Not really',
-        'Irregular periods are common and often have a simple reason. Writing down the dates is the most useful thing to do before you see a doctor.',
+        "Irregular periods are common and often have a simple reason. We'll "
+            'treat our estimate as a rough one until a few periods are logged, '
+            'and keep your dates ready to show a doctor.',
       ),
       ObOption(
         'unsure',
         'Not sure',
-        "That's completely fine, lots of people don't. Note the first day of your next period and we'll work it out together.",
+        "That's completely fine. Note the first day of your next period and "
+            "we'll work it out together.",
       ),
     ],
+    // Read by the cycle engine since V3 (`TtcJourneyState.statedIrregular`).
     apply: (s, c) => s.setOther('ttc_cycles', c.join(',')),
+  ),
+  // ⚠️ THE OPTIONS CHANGED, THE IDS DID NOT (Onboarding V3). They are
+  // persisted identities: 'starting', 'months', 'six' and 'year' are what
+  // `ttcStartFromAnswer` and You read. The bands are now the TTC intro's own
+  // (0, 3, 9 and 18 months back, `TtcTryingFor`), so the question is asked
+  // once. 'planning' moved to "Where are you with this?".
+  ObQuestion(
+    id: 'ttc_duration',
+    title: 'How long have you been trying?',
+    subtitle: 'We only use this to know when to suggest seeing someone.',
+    options: const [
+      ObOption(
+        'starting',
+        "We've just started",
+        'Most couples get pregnant within a year. The first months are for '
+            'getting to know your cycle.',
+      ),
+      ObOption(
+        'months',
+        'Up to six months',
+        'This is still normal for many couples.',
+      ),
+      ObOption(
+        'six',
+        'Six months to a year',
+        'This is still normal for many couples. From 35, doctors suggest a '
+            'check-up after six months.',
+      ),
+      ObOption(
+        'year',
+        'Over a year',
+        "It's a good time to see a doctor, for both of you. It's a calm "
+            "check, not an emergency, and we'll help you prepare the questions.",
+      ),
+      ObOption(
+        'skip',
+        "I'd rather not say",
+        "That's fine. We won't bring up timing. The doctor-prep pages are "
+            'there if you ever want them.',
+      ),
+    ],
+    apply: (s, c) => s.setOther('ttc_duration', c.join(',')),
   ),
   ObQuestion(
     id: 'ttc_folic',
@@ -171,15 +247,162 @@ final List<ObQuestion> _trying = [
       ObOption(
         'yes',
         'Yes',
-        'Good. The usual dose is 400 micrograms a day. It matters most in the weeks before a test turns positive.',
+        "Good. The usual dose is 400 micrograms a day. We'll tick it off "
+            "your supplements and won't nag.",
       ),
       ObOption(
         'no',
         'Not yet',
-        "It's worth starting now, at 400 micrograms a day. It matters most in the early weeks, before you'd even know you're pregnant.",
+        "It's worth starting now, at 400 micrograms a day. If you want, "
+            "turn on reminders next and we'll send a short morning note.",
       ),
     ],
     apply: (s, c) => s.setOther('ttc_folic', c.join(',')),
+  ),
+];
+
+// Kept for revert (Onboarding V3, 2026-10-17): the trying questions before V3.
+// final List<ObQuestion> _trying = [
+//   ObQuestion(
+//     id: 'ttc_duration',
+//     title: 'How long have you been trying?',
+//     subtitle: "There's no wrong answer. It just helps us talk to you in the right way.",
+//     options: const [
+//       // ⚠️ ADDED 2026-10-17 (the Ready-to-Try plan): a couple who have not
+//       // started. `ttcStartFromAnswer` reads no start from it, and
+//       // `TtcStore.journeyStart` counts from the month in her plan instead,
+//       // so the seek-help timing never starts before trying does.
+//       ObOption(
+//         'planning',
+//         "Not yet, we're getting ready",
+//         'Good timing. Starting a few months early gives folic acid and a '
+//             "check-up time to work. We'll help you make a plan.",
+//       ),
+//       ObOption(
+//         'starting',
+//         'Just starting',
+//         'Most couples get pregnant within a year of trying. The first months are for getting to know your cycle, not for worrying.',
+//       ),
+//       ObOption(
+//         'months',
+//         'A few months',
+//         'A few months is normal. Three months of period dates tells you more about your fertile days than any article can.',
+//       ),
+//       ObOption(
+//         'six',
+//         'Six months or more',
+//         "This is still normal for many couples. If you're over 35, six months is a good time to see a doctor. It's a calm check, not an emergency.",
+//       ),
+//       ObOption(
+//         'year',
+//         'Over a year',
+//         "After a year, doctors suggest a check-up for both of you. It's fine to ask. Most causes can be found, and many are simple.",
+//       ),
+//     ],
+//     apply: (s, c) => s.setOther('ttc_duration', c.join(',')),
+//   ),
+//   ObQuestion(
+//     id: 'ttc_cycles',
+//     title: 'Are your periods fairly regular?',
+//     options: const [
+//       ObOption(
+//         'yes',
+//         'Yes, mostly',
+//         'Regular usually means a period every 21 to 35 days. The app will work out your fertile days from your own dates.',
+//       ),
+//       ObOption(
+//         'no',
+//         'Not really',
+//         'Irregular periods are common and often have a simple reason. Writing down the dates is the most useful thing to do before you see a doctor.',
+//       ),
+//       ObOption(
+//         'unsure',
+//         'Not sure',
+//         "That's completely fine, lots of people don't. Note the first day of your next period and we'll work it out together.",
+//       ),
+//     ],
+//     apply: (s, c) => s.setOther('ttc_cycles', c.join(',')),
+//   ),
+//   ObQuestion(
+//     id: 'ttc_folic',
+//     title: 'Is anyone taking folic acid yet?',
+//     subtitle: 'The one vitamin doctors everywhere agree on.',
+//     options: const [
+//       ObOption(
+//         'yes',
+//         'Yes',
+//         'Good. The usual dose is 400 micrograms a day. It matters most in the weeks before a test turns positive.',
+//       ),
+//       ObOption(
+//         'no',
+//         'Not yet',
+//         "It's worth starting now, at 400 micrograms a day. It matters most in the early weeks, before you'd even know you're pregnant.",
+//       ),
+//     ],
+//     apply: (s, c) => s.setOther('ttc_folic', c.join(',')),
+//   ),
+// ];
+
+// ---- The partner, set up on his own (Onboarding V3, 2026-10-17) ------------
+//
+//  ⚠️ NEVER ABOUT HER BODY. No period, cycle, loss history, birth mode or
+//  diet: those reach him only if she links and chooses to share. He is asked
+//  about the two of them (the flow words the shared questions "you two") and
+//  about himself.
+
+final List<ObQuestion> _partner = [
+  ObQuestion(
+    id: 'p_help_trying',
+    title: 'What would help you most?',
+    subtitle: 'Pick as many as you like. Your side will show these first.',
+    multi: true,
+    multiGiveBack: 'Your side will open with these.',
+    options: const [
+      ObOption('timing', 'How the timing works', ''),
+      ObOption('health', 'My own health', ''),
+      ObOption('support', 'Supporting her', ''),
+      ObOption('doctor', 'When to see a doctor', ''),
+      ObOption('feel', "How I'm feeling", ''),
+    ],
+    // In the order he picked them: the flow's answer sets keep insertion order.
+    apply: (s, c) => s.setFatherHelp(c.toList()),
+  ),
+  ObQuestion(
+    id: 'p_help_pregnancy',
+    title: 'What would help you most?',
+    subtitle: 'Pick as many as you like. Your side will show these first.',
+    multi: true,
+    multiGiveBack: 'Your side will open with these.',
+    options: const [
+      ObOption('week', "What's happening each week", ''),
+      ObOption('support', 'Supporting her', ''),
+      ObOption('talk', 'Talking to the baby', ''),
+      ObOption('birth', 'Getting ready for birth', ''),
+      ObOption('feel', "How I'm feeling", ''),
+    ],
+    apply: (s, c) => s.setFatherHelp(c.toList()),
+  ),
+  ObQuestion(
+    id: 'p_first',
+    title: 'Is this your first baby?',
+    options: const [
+      ObOption(
+        'first',
+        'My first',
+        "Then we'll explain everything from the start, including what "
+            'happens at the scans you can go to.',
+      ),
+      ObOption(
+        'dad',
+        "I'm already a dad",
+        "Then we'll skip the basics and start with what's different this "
+            'time, for her and for you.',
+      ),
+    ],
+    // His own history, on his own profile. Her "first pregnancy?" is hers.
+    apply: (s, c) => s.setParity(
+      c.contains('dad') ? Parity.subsequent : Parity.first,
+    ),
   ),
 ];
 

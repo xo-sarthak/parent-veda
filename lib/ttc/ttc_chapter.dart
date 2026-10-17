@@ -174,7 +174,14 @@ class TtcJourneyState {
     this.ownership = TimingOwnership.parentveda,
     this.today,
     this.statedCycleLength,
+    this.statedIrregular = false,
   });
+
+  /// She told us her periods are not regular (onboarding, `ttc_cycles` =
+  /// 'no', Onboarding V3). Until three cycles are logged it counts as
+  /// irregular, so the estimate is held at low confidence instead of a
+  /// 28-day calendar sounding sure of itself. After that her own dates decide.
+  final bool statedIrregular;
 
   /// The usual cycle length she TOLD us, before any cycle is complete.
   ///
@@ -379,8 +386,14 @@ class TtcChapterEngine {
     return (sum / recent.length).round();
   }
 
+  /// How many logged cycles it takes for her dates to outrank what she told
+  /// us at onboarding about being irregular.
+  static const int kTtcStatedIrregularUntil = 3;
+
   /// True when logged cycles vary too much to lean on a calendar estimate.
-  bool isIrregular(TtcJourneyState s) => ttcCyclesIrregular(s.cycleLengths);
+  bool isIrregular(TtcJourneyState s) =>
+      ttcCyclesIrregular(s.cycleLengths) ||
+      (s.statedIrregular && s.cycleLengths.length < kTtcStatedIrregularUntil);
   // Kept for revert (the same test, on the old 8-day threshold):
   //   if (s.cycleLengths.length < 2) return false;
   //   final lo = s.cycleLengths.reduce((a, b) => a < b ? a : b);

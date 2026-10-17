@@ -146,7 +146,7 @@ dependencies:
   # Phone number in two taps, zero keystrokes (lib/services/auth/phone_otp.dart).
   # Phone Number Hint shows the SIM's number in a Play Services sheet; SMS
   # Retriever hands the OTP SMS to the app so the six boxes fill themselves.
-  # Android only, which is the decided platform (docs/ONBOARDING-AUDIT.md §5.5).
+  # Android only, which is the decided platform (docs/ONBOARDING.md, History A §5.5).
   # The retriever only works if the SMS ends with the app's 11-char hash -
   # that line is set on the MSG91 template, not here. See phone-otp-send.
   smart_auth: ^3.2.0

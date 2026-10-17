@@ -32,12 +32,13 @@
 //  end or twenty. A bar over a run of like things is information; a bar over
 //  a whole flow of unlike things is the task-announcing pressure the original
 //  rule was protecting against. So: `ObProgress` exists, and it appears on
-//  the question block ONLY. (docs/ONBOARDING-V2.md §1.2.)
+//  the question block ONLY. (docs/ONBOARDING.md (History B) §1.2.)
 //
 //  No decorative emoji, English only.
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
@@ -52,6 +53,165 @@ import 'onboarding_art.dart';
 /// promoted 2026-09-18 so every tile presses the same way. Kept as a name so
 /// the onboarding screens read as before.
 typedef ObPress = PvPress;
+
+// =============================================================================
+//  ONBOARDING'S OWN COLOURS, NO LAVENDER (Onboarding V3, 2026-10-17)
+// -----------------------------------------------------------------------------
+//  The user, on the prototype: "I just don't need these lavender colours at
+//  all", and then: onboarding only, not the house look. So onboarding draws
+//  from this palette instead of `V2PaletteStore`, whose `surfaceAlt` (#EDEAF0)
+//  and `action` (#6A30B6) are app-wide and carry a violet cast. The values
+//  are the approved prototype's (`parentveda-onboarding-preview`, v6):
+//  white ground, true-neutral greys, and the action colour is ink.
+//
+//  ⚠️ ONLY ONBOARDING READS THIS. Changing the shared tokens would recolour
+//  every stage; that is a separate decision (ONBOARDING.md §4).
+// =============================================================================
+const V2Palette kObPalette = V2Palette(
+  id: 'onboarding',
+  name: 'Onboarding',
+  blurb: 'Onboarding only: white ground, neutral greys, ink for actions.',
+  ground: Color(0xFFFFFFFF),
+  surface: Color(0xFFFFFFFF),
+  surfaceAlt: Color(0xFFF2F2F1),
+  line: Color(0x1F000000),
+  ink1: Color(0xFF1E1E20),
+  ink2: Color(0xFF55565A),
+  ink3: Color(0xFF6D6E72),
+  action: Color(0xFF1E1E20),
+);
+
+/// The choice controls' ink and hairline in onboarding (the shared
+/// `kPvChoiceInk` / `kPvChoiceLine` carry a violet cast, and stay as they are
+/// everywhere else).
+const Color kObChoiceInk = Color(0xFF2C2C2E);
+const Color kObChoiceLine = Color(0xFFE4E4E3);
+const Color kObTrack = Color(0xFFEDEDEC);
+
+/// True when the phone asks for less motion. Every animation here checks it.
+bool obCalm(BuildContext context) =>
+    MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+
+/// Children that arrive one after another: a short fade and rise, [step]
+/// apart (Onboarding V3 motion, ONBOARDING.md §5). Used where each item is
+/// one of her answers coming back: the reveal's lines, the summary's rows.
+class ObStagger extends StatelessWidget {
+  const ObStagger({
+    super.key,
+    required this.children,
+    this.step = const Duration(milliseconds: 60),
+    this.start = Duration.zero,
+  });
+
+  final List<Widget> children;
+  final Duration step;
+  final Duration start;
+
+  @override
+  Widget build(BuildContext context) {
+    if (obCalm(context)) return Column(children: children);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var i = 0; i < children.length; i++)
+          _ObArrive(delay: start + step * i, child: children[i]),
+      ],
+    );
+  }
+}
+
+class _ObArrive extends StatefulWidget {
+  const _ObArrive({required this.delay, required this.child});
+  final Duration delay;
+  final Widget child;
+
+  @override
+  State<_ObArrive> createState() => _ObArriveState();
+}
+
+class _ObArriveState extends State<_ObArrive>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 260),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.delayed(widget.delay, () {
+      if (mounted) _c.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final a = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+    return FadeTransition(
+      opacity: a,
+      child: SlideTransition(
+        position: Tween(begin: const Offset(0, 0.12), end: Offset.zero)
+            .animate(a),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// A number that counts up to [value] (the week, worked out from her date):
+/// the moment she sees the app thinking (ONBOARDING.md §5.3).
+class ObCountUp extends StatelessWidget {
+  const ObCountUp({
+    super.key,
+    required this.value,
+    required this.builder,
+  });
+
+  final int value;
+  final Widget Function(int shown) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    if (obCalm(context) || value <= 0) return builder(value);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: value.toDouble()),
+      duration: Duration(milliseconds: 380 + value * 12),
+      curve: Curves.easeOutCubic,
+      builder: (context, v, _) => builder(v.round()),
+    );
+  }
+}
+
+/// A headline that settles into place (scale 0.98 to 1), §5.5.
+class ObSettle extends StatelessWidget {
+  const ObSettle({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (obCalm(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, c) => Opacity(
+        opacity: t,
+        child: Transform.scale(
+          scale: 0.98 + 0.02 * t,
+          alignment: Alignment.centerLeft,
+          child: c,
+        ),
+      ),
+      child: child,
+    );
+  }
+}
 
 /// Page frame: ground, safe area, an optional back arrow and a scrolling body
 /// with the primary action pinned beneath it.
@@ -349,12 +509,115 @@ class ObTile extends StatelessWidget {
   final bool compact;
   final VoidCallback onTap;
 
-  // One answer row for every question flow (2026-10-10, "consistency for MCQ
-  // type ques"): the shared `PvChoiceTile` (lib/widgets/pv_feedback.dart).
-  // Onboarding keeps its Fraunces title and its icon well; the edge, the
-  // ring and the tick are now the same as everywhere else.
+  // ⚠️ THE SHARED SHAPE IN ONBOARDING'S COLOURS (Onboarding V3, 2026-10-17).
+  // Same row as `PvChoiceTile` (radius 16, 22pt ring, 1.6 edge when chosen),
+  // so the answer still looks like every other answer in the app; drawn here
+  // because the shared tile's ink and hairline carry a violet cast and only
+  // onboarding is losing it. The tick draws on as she taps (§5.1).
   @override
-  Widget build(BuildContext context) => PvChoiceTile(
+  Widget build(BuildContext context) {
+    final calm = obCalm(context);
+    final ms = Duration(milliseconds: calm ? 0 : 180);
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: PvPress(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onTap();
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: AnimatedContainer(
+              duration: ms,
+              curve: Curves.easeOutCubic,
+              width: double.infinity,
+              constraints: const BoxConstraints(minHeight: 56),
+              padding: EdgeInsets.fromLTRB(
+                  16, compact ? 12 : 15, 14, compact ? 12 : 15),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: selected ? kObChoiceInk : kObChoiceLine,
+                  width: selected ? 1.6 : 1.2,
+                ),
+              ),
+              child: Row(children: [
+                if (icon != null) ...[
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: p.surfaceAlt,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(icon, size: 20, color: p.ink2),
+                  ),
+                  const SizedBox(width: 14),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: pvFraunces(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.3,
+                          color: p.ink1,
+                        ),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          subtitle!,
+                          style: pvManrope(
+                              fontSize: 12.5, height: 1.4, color: p.ink3),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                AnimatedContainer(
+                  duration: ms,
+                  width: 22,
+                  height: 22,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: selected ? kObChoiceInk : Colors.transparent,
+                    border: selected
+                        ? null
+                        : Border.all(color: kObChoiceLine, width: 1.6),
+                  ),
+                  child: selected
+                      ? TweenAnimationBuilder<double>(
+                          tween: Tween(begin: calm ? 1 : 0.4, end: 1),
+                          duration: ms,
+                          curve: Curves.easeOutBack,
+                          builder: (_, t, c) =>
+                              Transform.scale(scale: t, child: c),
+                          child: const Icon(Icons.check_rounded,
+                              size: 14, color: Colors.white),
+                        )
+                      : null,
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Kept for revert (Onboarding V3): the shared tile, in its violet-cast ink.
+  // ignore: unused_element
+  Widget _buildShared(BuildContext context) => PvChoiceTile(
     label: title,
     subtitle: subtitle,
     selected: selected,
@@ -615,10 +878,19 @@ class ObGiveBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedSize(
-    duration: const Duration(milliseconds: 220),
+    duration: Duration(milliseconds: obCalm(context) ? 0 : 220),
     curve: Curves.easeOut,
     alignment: Alignment.topCenter,
-    child: text.isEmpty
+    // The answer comes after the tap: the note fades in a beat later
+    // (Onboarding V3 motion, §5.1).
+    child: AnimatedSwitcher(
+      duration: Duration(milliseconds: obCalm(context) ? 0 : 240),
+      switchInCurve: const Interval(0.25, 1, curve: Curves.easeOut),
+      child: KeyedSubtree(key: ValueKey(text), child: _body()),
+    ),
+  );
+
+  Widget _body() => text.isEmpty
         ? const SizedBox(width: double.infinity)
         // No box (2026-09-19, DESIGN-SYSTEM §4.0 addendum): the give-back
         // sits between two hairlines, eyebrow in grey. Was a lavender well
@@ -652,8 +924,7 @@ class ObGiveBack extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-  );
+          );
 }
 
 /// A labelled field in the design system's field shape.
@@ -711,7 +982,7 @@ const String kGoogleMarkSvg =
     '<path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>';
 
 // =============================================================================
-//  ADDED 2026-09-22 — the two pieces the V2 flow needed (ONBOARDING-V2 §1.2, §1.3)
+//  ADDED 2026-09-22 — the two pieces the V2 flow needed (ONBOARDING.md History B §1.2, §1.3)
 // =============================================================================
 
 /// A text field with NOTHING of its own — no box, no fill, no ring.
@@ -761,20 +1032,15 @@ class ObProgress extends StatelessWidget {
   final int step; // 1-based
   final int total;
 
-  // One progress line for every question flow (2026-10-10): the shared
-  // `PvQuestionProgress`, with the count on, since this block counts.
+  // ⚠️ ONBOARDING'S OWN BAR AGAIN (Onboarding V3, 2026-10-17): the shared
+  // `PvQuestionProgress` track is #EEECEF, a violet grey. Same label, count
+  // and 4pt line, in neutral colours. The fill moves first (320 ms) as the
+  // question changes, so the step reads as progress before the words do.
+  // Kept for revert, the shared bar:
+  //   PvQuestionProgress(done: step, total: total, startLabel: label,
+  //       goingLabel: label, count: true);
   @override
-  Widget build(BuildContext context) => PvQuestionProgress(
-    done: step,
-    total: total,
-    startLabel: label,
-    goingLabel: label,
-    count: true,
-  );
-
-  // Kept for revert (2026-10-10): the onboarding-only bar.
-  // ignore: unused_element
-  Widget _buildBefore(BuildContext context) {
+  Widget build(BuildContext context) {
     final t = total <= 0 ? 0.0 : (step / total).clamp(0.0, 1.0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -808,13 +1074,16 @@ class ObProgress extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(99),
           child: TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: t),
-            duration: const Duration(milliseconds: 320),
+            // From the previous step, so the bar grows rather than refills.
+            tween: Tween(
+                begin: total <= 0 ? 0 : ((step - 1) / total).clamp(0.0, 1.0),
+                end: t),
+            duration: Duration(milliseconds: obCalm(context) ? 0 : 320),
             curve: Curves.easeOutCubic,
             builder: (context, v, _) => LinearProgressIndicator(
               value: v,
               minHeight: 4,
-              backgroundColor: p.surfaceAlt,
+              backgroundColor: kObTrack,
               // Ink, not the action colour: this reports, it does not invite
               // a tap, and DESIGN-SYSTEM §4 spends violet only on things you
               // can act on.
@@ -826,6 +1095,15 @@ class ObProgress extends StatelessWidget {
     );
   }
 }
+
+/// The beat's title type, shared so a counting headline matches it.
+TextStyle obBeatTitleStyle(V2Palette p) => pvFraunces(
+  fontSize: 27,
+  fontWeight: FontWeight.w600,
+  letterSpacing: -0.6,
+  height: 1.15,
+  color: p.ink1,
+);
 
 /// A beat: the app stops and says something back.
 ///
@@ -847,11 +1125,16 @@ class ObBeat extends StatelessWidget {
     required this.body,
     required this.cta,
     required this.onNext,
+    this.headline,
   });
 
   final V2Palette p;
   final ObArt art;
   final String title;
+
+  /// Drawn instead of [title] when given: the week counting up (V3, §5.3).
+  /// [title] stays the words a screen reader and a test find.
+  final Widget? headline;
   final String body;
   final String cta;
   final VoidCallback onNext;
@@ -866,16 +1149,10 @@ class ObBeat extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
             children: [
-              Text(
-                title,
-                style: pvFraunces(
-                  fontSize: 27,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.6,
-                  height: 1.15,
-                  color: p.ink1,
-                ),
-              ),
+              if (headline != null)
+                Semantics(label: title, child: ExcludeSemantics(child: headline!))
+              else
+                Text(title, style: obBeatTitleStyle(p)),
               const SizedBox(height: 12),
               Text(
                 body,

@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/doors/pv_door_partner.dart' show kPartnerSurfaceDoor;
 import '../../data/scan_schedule.dart' show scansDueAt;
+import '../../services/family_profile.dart' show FamilyProfileStore;
 import '../../services/pregnancy_controller.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
@@ -52,6 +53,26 @@ bool pregInsightForHim(PregInsight c) =>
 
 List<PregInsight> pregRailForHim(List<PregInsight> all) =>
     [for (final c in all) if (pregInsightForHim(c)) c];
+
+/// His onboarding answer ("What would help you most?", Onboarding V3) to the
+/// block card it brings forward.
+const Map<String, String> kPregHelpCard = {
+  'week': 'preg_partner_mission',
+  'support': 'preg_partner_support',
+  'talk': 'preg_partner_talk',
+  'birth': 'preg_partner_guide',
+  'feel': 'preg_partner_journal',
+};
+
+/// [keys] (the block's card keys, in their own order) with the cards he asked
+/// for first, in the order he picked them. Nothing is dropped.
+List<String> pregPartnerOrder(List<String> keys, List<String> help) {
+  final lead = <String>{
+    for (final h in help)
+      if (kPregHelpCard[h] case final k? when keys.contains(k)) k,
+  }.toList();
+  return [...lead, for (final k in keys) if (!lead.contains(k)) k];
+}
 
 class PregPartnerHomeBlock extends StatelessWidget {
   const PregPartnerHomeBlock({
@@ -124,6 +145,15 @@ class PregPartnerHomeBlock extends StatelessWidget {
             () => openPvDoorSurface(context, kPartnerSurfaceDoor, pregnancy)),
       ),
     ];
+    // His order (Onboarding V3): the cards he said would help come first.
+    // Kept for revert: the list above, as written.
+    String keyOf(Widget w) => switch (w.key) {
+          ValueKey<String>(:final value) => value,
+          _ => '',
+        };
+    final order = pregPartnerOrder(
+        [for (final w in items) keyOf(w)], FamilyProfileStore.instance.fatherHelp);
+    items.sort((a, b) => order.indexOf(keyOf(a)).compareTo(order.indexOf(keyOf(b))));
 
     return Column(
       key: const ValueKey('preg_partner_block'),
