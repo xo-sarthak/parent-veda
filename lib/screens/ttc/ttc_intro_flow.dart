@@ -63,6 +63,10 @@ import '../../widgets/pv_feedback.dart' show PvChoiceTile, PvPress;
 import '../../widgets/pv_placeholders.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_care_pathway.dart';
+import '../../services/family_profile.dart' show FamilyProfileStore;
+import '../../ttc/ttc_ready_plan.dart'
+    show readyMonthLabel, readyMonthsBetween;
+import '../../ttc/ttc_ready_plan_store.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
@@ -110,10 +114,17 @@ class TtcIntroGate {
 }
 
 /// How long she says she has been trying. Maps to a journey start.
-enum TtcTryingFor { justStarted, upToSix, sixToTwelve, overAYear }
+// ⚠️ `planning` FIRST (2026-10-17, the Ready-to-Try plan): a couple who have
+// not started yet. It sets NO journey start; the month they pick goes to
+// `TtcReadyPlanStore`, which `TtcStore.journeyStart` reads, so the
+// how-long-trying clock starts in that month and not today. Never persisted
+// by index, so adding it first moves nothing.
+enum TtcTryingFor { planning, justStarted, upToSix, sixToTwelve, overAYear }
 
 extension TtcTryingForCopy on TtcTryingFor {
   String label(bool hi) => switch (this) {
+        // English on both sides: new copy is English (CLAUDE.md).
+        TtcTryingFor.planning => "Not yet, we're getting ready",
         TtcTryingFor.justStarted =>
           hi ? 'Abhi shuru kiya hai' : "We've just started",
         TtcTryingFor.upToSix => hi ? '6 mahine tak' : 'Up to six months',
@@ -128,6 +139,8 @@ extension TtcTryingForCopy on TtcTryingFor {
   /// that by up to half a year and anchoring at the top brings it forward by
   /// the same — and she will not be told which the app picked.
   int get approxMonths => switch (this) {
+        // Never used to set a start: see `_finish`.
+        TtcTryingFor.planning => 0,
         TtcTryingFor.justStarted => 0,
         TtcTryingFor.upToSix => 3,
         TtcTryingFor.sixToTwelve => 9,
@@ -150,6 +163,9 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
 
   DateTime? _lastPeriod;
   TtcTryingFor? _trying;
+
+  /// The month they want to start trying, when [_trying] is planning.
+  DateTime? _plannedMonth;
   TtcPath? _path;
 
   static const _steps = 5; // language · video · 3 questions
@@ -172,7 +188,16 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
     if (period != null) CycleStore.instance.logPeriodStart(period);
 
     final trying = _trying;
-    if (trying != null) {
+    // ⚠️ PLANNING SETS NO JOURNEY START. The month goes to the plan's store,
+    // which `TtcStore.journeyStart` reads, so seek-help timing counts from
+    // the month they actually start. The answer is also kept as the profile's
+    // "Trying for" when there is none yet, so You says it.
+    if (trying == TtcTryingFor.planning) {
+      await TtcReadyPlanStore.instance.setPlannedStart(_plannedMonth);
+      if (FamilyProfileStore.instance.otherFor('ttc_duration') == null) {
+        FamilyProfileStore.instance.setOther('ttc_duration', 'planning');
+      }
+    } else if (trying != null) {
       final months = trying.approxMonths;
       TtcStore.instance.setJourneyStart(
           DateTime.now().subtract(Duration(days: (months * 30.44).round())));
@@ -425,6 +450,13 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
   // ===========================================================================
   //  4. How long
   // ===========================================================================
+  /// Next month and the six after it. This month is left out: planning means
+  /// not yet, and a couple starting now pick "We've just started".
+  List<DateTime> _monthChoices() {
+    final now = DateTime.now();
+    return [for (var i = 1; i <= 7; i++) DateTime(now.year, now.month + i)];
+  }
+
   Widget _tryingQuestion(TtcS t) => _Page(
         title: t.introTryingTitle,
         body: t.introTryingBody,
@@ -435,10 +467,40 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
               selected: _trying == option,
               onTap: () {
                 setState(() => _trying = option);
-                _next();
+                // Planning asks one more thing on this same page: the month.
+                if (option != TtcTryingFor.planning) _next();
               },
             ),
             const SizedBox(height: 11),
+            // ⚠️ THE MONTH, INLINE, NOT A SIXTH STEP. Still five steps and
+            // still skippable: "Not sure yet" moves on with no month.
+            if (option == TtcTryingFor.planning &&
+                _trying == TtcTryingFor.planning) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(4, 2, 4, 10),
+                child: Text('Which month do you want to start trying?',
+                    style: ttcBody(14, w: FontWeight.w700)),
+              ),
+              for (final m in _monthChoices()) ...[
+                _Choice(
+                  label: readyMonthLabel(m),
+                  selected: _plannedMonth != null &&
+                      readyMonthsBetween(m, _plannedMonth!) == 0,
+                  onTap: () {
+                    setState(() => _plannedMonth = m);
+                    _next();
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+              _Ghost(
+                  label: 'Not sure yet',
+                  onTap: () {
+                    setState(() => _plannedMonth = null);
+                    _next();
+                  }),
+              const SizedBox(height: 14),
+            ],
           ],
           const SizedBox(height: 4),
           _Ghost(label: t.introRatherNotSay, onTap: _next),

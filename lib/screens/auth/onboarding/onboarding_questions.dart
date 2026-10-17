@@ -108,6 +108,16 @@ final List<ObQuestion> _trying = [
     title: 'How long have you been trying?',
     subtitle: "There's no wrong answer. It just helps us talk to you in the right way.",
     options: const [
+      // ⚠️ ADDED 2026-10-17 (the Ready-to-Try plan): a couple who have not
+      // started. `ttcStartFromAnswer` reads no start from it, and
+      // `TtcStore.journeyStart` counts from the month in her plan instead,
+      // so the seek-help timing never starts before trying does.
+      ObOption(
+        'planning',
+        "Not yet, we're getting ready",
+        'Good timing. Starting a few months early gives folic acid and a '
+            "check-up time to work. We'll help you make a plan.",
+      ),
       ObOption(
         'starting',
         'Just starting',

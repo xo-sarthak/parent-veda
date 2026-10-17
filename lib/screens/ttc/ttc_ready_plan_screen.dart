@@ -240,7 +240,10 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
             note: _a.alreadyTrying
                 ? 'Then your checklist and cycle tools fit better than a plan. '
                       'The button below opens the checklist.'
-                : 'Your plan counts the months up to it. About three months '
+                // Says where a filled-in month came from: the first-run
+                // flow's "Not yet, we're getting ready" (2026-10-17).
+                : '${_store.madeAt == null && _store.plannedStart != null && _a.target == _store.plannedStart ? 'Filled in from when you said you would start. ' : ''}'
+                      'Your plan counts the months up to it. About three months '
                       'ahead gives folic acid and a check-up time, but any month '
                       'is fine.',
             child: Column(
@@ -527,7 +530,11 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
           ? 'Your month is here.'
           : 'Trying from\n${readyMonthLabel(plan.target)}.',
       intro: arrived
-          ? 'You planned to start in ${readyMonthLabel(plan.target)}. What '
+          // ⚠️ SAYS THE CLOCK STARTED (tell her before anything changes):
+          // `TtcStore.journeyStart` counts from this month now, so the app's
+          // "how long you've been trying" begins here, and she can change it.
+          ? 'You planned to start in ${readyMonthLabel(plan.target)}, so the '
+                "app counts your trying time from the 1st of that month. What "
                 "still matters while you try is below. This isn't medical "
                 'clearance, and your doctor has the final word.'
           : "That's ${readyCountLabel(plan.monthsAway)}. A plan for the "

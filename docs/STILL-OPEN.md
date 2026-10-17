@@ -8248,7 +8248,7 @@ facade; every old body is `…Classic`, kept for revert. 4,109 tests green.
 ### 65.1 Deploy 0083 and load the catalogue into `products`
 **2026-10-16: 0083 RUN by the user and verified. `razorpay-create-order` redeployed the same day with server pricing. Still owed: load the unified rows.**
 **ON HOLD 2026-10-16 (user's call):** products change daily, so this is admin-panel work, not a Dart export. First step when resumed: flip `products` to `ContentOwner.editor` + a Directus Products screen, seeded once by the export. Full reasoning and the staged plan (sale dates, coupons, order snapshot): BACKEND-PATTERNS §16hh.
-**Ask Veda ingest, same hold (2026-10-17):** make the full ingest incremental (chunk fingerprints; embed only what changed; delete what is gone, which fixes the defect that a full run never removes unpublished content), then host Ask Veda and point the Directus publish Flow at `/reindex`. Products ride that same trigger once they are editor-owned. The `recipes` table has 28 of ~139 dishes. Detail: CONTENT-BACKEND changelog 2026-10-17.
+**Ask Veda ingest, same hold (2026-10-17):** make the full ingest incremental (chunk fingerprints; embed only what changed; delete what is gone, which fixes the defect that a full run never removes unpublished content), then host Ask Veda and point the Directus publish Flow at `/reindex`. Products ride that same trigger once they are editor-owned. The `recipes` table has the 28 July-seed dishes. Checked on the live DB 2026-10-17: **none of the 28 new-design 7-8 month dishes (`pp_7_8m_*`) are in it**, and the retired `tomatocarrotsoup` (moved to `pp_7_8m_tomato_carrot_soup` by `kFoodRecipeMoved`) is still published, so Ask Veda can answer from the old version. The fix: re-export + unpublish the moved ids + delete their chunks. That last step needs the incremental ingest's delete pass, or one manual SQL delete. Detail: CONTENT-BACKEND changelog 2026-10-17.
 
 `supabase db push` is the user's. Until the unified rows are in the table the
 create-order function cannot price a line and charges the phone's figure with
@@ -10457,3 +10457,32 @@ and Kegel Care showed "Preparing for birth" to new mothers.
   `yoga_home_screen.dart` (long lines), so their diffs look bigger than the change.
 
 **Walk fixes, 2026-10-17.** A month session opened the old Prepare player; it now opens `V3FilmScreen` through `pvSessionFilm` (the film page takes a null pregnancy and `canSave: false` outside Pregnancy). More's "All programmes and sessions" pill is commented out: every tile had its own door, and Courses and Groups gained "See all". Parenting Tools gained Kegel Care and Yoga & fitness under For you, and the More row is renamed "Yoga & fitness". Open: the film page shows no related reads when opened outside Pregnancy, by design.
+
+## 92.0 Ready-to-Try plan (TTC, the podcast's Q2 pitch) — 2026-10-17
+
+**Why.** A short couple questionnaire that turns the episode's general advice
+into their own plan: tests worth asking a doctor about, folic acid timing,
+food for their diet and home kitchen, and what to do each month up to the month
+they start trying.
+
+**Built.**
+- `lib/ttc/ttc_ready_plan.dart` (pure plan builder), `ttc_ready_plan_regions.dart`
+  (seven "in your kitchen" blocks), `ttc_ready_plan_store.dart` (local),
+  `lib/screens/ttc/ttc_ready_plan_screen.dart`, surface `ttc_ready_plan`, tile on
+  Getting ready › Your checklist. Every step ticks the checklist's own item.
+- "Not yet, we're getting ready" in onboarding (`ttc_duration` = `planning`) and
+  in the TTC first-run flow, with the month picked on the same page.
+- `TtcStore.journeyStart` reads the planned month first, so the
+  how-long-trying clock (and the six- and twelve-month seek-help timing) starts
+  in the month they start, not on install. The plan says so once the month comes.
+- Home "Your next step" offers the plan to a planning couple who have not made
+  one; You reads "Getting ready to try · from <month>".
+
+**Open.**
+- **His side's plan card is NOT built.** The plan lives on her phone only, and
+  his side is his own phone, so a card there would be empty or wrong. It needs
+  the plan synced (a table, RLS for the couple, a migration, then the card).
+- Cloud sync of the plan itself (same reason; plan answers are local-only).
+- Doctor review of the test list and folic acid wording; dietitian review of
+  the regional food blocks. Bylines stay "ParentVeda team" until then.
+- Not walked on a phone yet.

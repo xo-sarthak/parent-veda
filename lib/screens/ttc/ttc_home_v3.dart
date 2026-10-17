@@ -81,6 +81,7 @@ import 'ttc_daily_tip_open.dart';
 import '../../ttc/ttc_prepare_data.dart';
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_reads_data.dart';
+import '../../ttc/ttc_ready_plan_store.dart' show TtcReadyPlanStore;
 import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_precheck_home.dart';
 import '../../ttc/ttc_precheck_store.dart';
@@ -4041,7 +4042,25 @@ class _InsightRail extends StatelessWidget {
       // the home shows the one thing to do next and opens the checklist. Only
       // on today, only on her own cycle (a clinic round has its own steps),
       // and gone when nothing that matters is left.
-      if (selected == today && !todayState.clinicInvolved && nextStep != null)
+      // ⚠️ AND FIRST, THE PLAN SHE HAS NOT MADE (2026-10-17). A couple who
+      // said "Not yet, we're getting ready" get one card, the Ready-to-Try
+      // plan, in this same slot: the checklist's step waits until there is
+      // a plan, so the rail never asks for two things at once.
+      if (selected == today &&
+          !todayState.clinicInvolved &&
+          TtcReadyPlanStore.instance.planOwed)
+        TtcInsightCard(
+          id: 'ready_plan',
+          eyebrow: 'YOUR NEXT STEP',
+          value: 'Make your Ready-to-Try plan',
+          caption: 'Two minutes, then a plan up to your month',
+          hue: 104,
+          art: TtcInsightArt.note,
+          go: TtcInsightGo.readyPlan,
+        )
+      else if (selected == today &&
+          !todayState.clinicInvolved &&
+          nextStep != null)
         TtcInsightCard(
           id: 'precheck',
           eyebrow: 'YOUR NEXT STEP',
@@ -4183,6 +4202,8 @@ void _openInsight(
       if (id != null) _openSurface(context, 'ttc_read/$id');
     case TtcInsightGo.precheck:
       _openSurface(context, 'ttc_precheck');
+    case TtcInsightGo.readyPlan:
+      _openSurface(context, 'ttc_ready_plan');
     case TtcInsightGo.report:
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'ttc/cycle_report'),

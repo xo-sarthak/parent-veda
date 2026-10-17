@@ -403,6 +403,71 @@ void main() {
   });
 
   // ===========================================================================
+  //  The trying clock: a couple who are only planning have not started.
+  // ===========================================================================
+  group('the trying clock waits for the month they start', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      TtcStore.instance.resetForTest();
+      await TtcReadyPlanStore.instance.load();
+    });
+
+    test('"planning" gives no start of its own', () {
+      expect(ttcStartFromAnswer('planning', DateTime(2026, 10, 1)), isNull);
+      expect(
+        ttcStartFromAnswer('starting', DateTime(2026, 10, 1)),
+        DateTime(2026, 10, 1),
+      );
+    });
+
+    test(
+      'a planned month is the journey start, and nothing counts before it',
+      () async {
+        final now = DateTime.now();
+        final month = DateTime(now.year, now.month + 4);
+        await TtcReadyPlanStore.instance.setPlannedStart(month);
+        expect(TtcStore.instance.journeyStart, month);
+        expect(
+          TtcStore.instance.daysTrying,
+          0,
+          reason: 'the seek-help timing must not run before they try',
+        );
+        // Setting a month is an answer, not a plan: the home offers one.
+        expect(TtcReadyPlanStore.instance.planOwed, isTrue);
+        expect(TtcReadyPlanStore.instance.planFor(now), isNull);
+      },
+    );
+
+    test('once her month has passed, the clock counts from it', () async {
+      final now = DateTime.now();
+      final month = DateTime(now.year, now.month - 2);
+      await TtcReadyPlanStore.instance.setPlannedStart(month);
+      expect(TtcStore.instance.daysTrying, now.difference(month).inDays);
+    });
+
+    test('"We\'re already trying" in the plan hands the clock back', () async {
+      await TtcReadyPlanStore.instance.save(
+        ReadyPlanAnswers()..alreadyTrying = true,
+      );
+      expect(TtcReadyPlanStore.instance.plannedStart, isNull);
+    });
+
+    test('onboarding and the first-run flow both offer it', () {
+      expect(
+        File(
+          'lib/screens/auth/onboarding/onboarding_questions.dart',
+        ).readAsStringSync(),
+        contains("'planning',"),
+      );
+      final intro = File(
+        'lib/screens/ttc/ttc_intro_flow.dart',
+      ).readAsStringSync();
+      expect(intro, contains('TtcTryingFor.planning'));
+      expect(intro, contains('setPlannedStart'));
+    });
+  });
+
+  // ===========================================================================
   group('the screen, at 360dp', () {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});

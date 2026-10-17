@@ -24,6 +24,7 @@ import '../services/life_stage_store.dart';
 import '../services/remote/supabase_repo.dart';
 import 'cycle_store.dart';
 import 'ttc_chapter.dart';
+import 'ttc_ready_plan_store.dart';
 import 'ttc_sync.dart';
 import 'ttc_treatment_round.dart';
 import 'ttc_treatment_store.dart';
@@ -37,6 +38,9 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
     // tracker decide who owns the timing ([ownership]), so entering or
     // clearing one must rebuild every screen bound to this store.
     TtcTreatmentStore.instance.addListener(notifyListeners);
+    // And so is a planned start month (2026-10-17): see [journeyStart].
+    TtcReadyPlanStore.instance.addListener(notifyListeners);
+    TtcReadyPlanStore.instance.load();
     _load();
   }
   static final TtcStore instance = TtcStore._();
@@ -75,7 +79,17 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   /// read at its LOW end (a year, six months, three months, none), so nothing
   /// ever says she has tried longer than she told us. Kept for revert:
   ///   _journeyStart ?? LifeStageStore.instance.enteredAt;
+  ///
+  /// ⚠️ AND THE MONTH THEY PLANNED TO START, FIRST OF ALL (2026-10-17, the
+  /// Ready-to-Try plan). A couple who said "Not yet, we're getting ready"
+  /// have not started, and every "how long" in the stage (the seek-help
+  /// timing at six and twelve months above all) must count from the month
+  /// they do, not from the day they installed. A month still to come gives a
+  /// start in the future; `daysTrying` and the chapter engine already read
+  /// that as day 0. "We're already trying" in the plan clears it. Kept for
+  /// revert: the line without `plannedStart`.
   DateTime? get journeyStart =>
+      TtcReadyPlanStore.instance.plannedStart ??
       _journeyStart ??
       ttcStartFromAnswer(FamilyProfileStore.instance.otherFor('ttc_duration'),
           LifeStageStore.instance.enteredAt) ??
@@ -357,6 +371,8 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
     _partnerJoined = false;
     _partnerChapter = null;
     _loaded = true;
+    // The planned month is part of [journeyStart] now (2026-10-17).
+    TtcReadyPlanStore.instance.resetForTest();
     notifyListeners();
   }
 
@@ -500,6 +516,9 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
 DateTime? ttcStartFromAnswer(String? answer, DateTime? answeredAround) {
   if (answeredAround == null) return null;
   final months = switch (answer) {
+    // Not started yet (2026-10-17): no start from the answer. The planned
+    // month, read first by `journeyStart`, is the start.
+    'planning' => null,
     'starting' => 0,
     'months' => 3,
     'six' => 6,

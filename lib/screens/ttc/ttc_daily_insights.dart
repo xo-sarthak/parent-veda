@@ -107,6 +107,11 @@ enum TtcInsightGo {
   /// The Pre-pregnancy checklist (`ttc_precheck`): "Your next step". Added
   /// 2026-10-01, so the answers she gives there come back to the home.
   precheck,
+
+  /// The Ready-to-Try plan (`ttc_ready_plan`): "Your next step" for a couple
+  /// who said they are getting ready and have not made a plan yet. Added
+  /// 2026-10-17.
+  readyPlan,
 }
 
 /// Where a card lands, as one comparable string: the destination, plus the

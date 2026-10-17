@@ -36,6 +36,8 @@ import '../../ttc/ttc_content_prefs.dart' show TtcContentPrefs;
 // Kept for revert (2026-09-28, journal out of TTC):
 // import '../../ttc/ttc_journal_store.dart' show TtcJournalStore;
 import '../../ttc/ttc_messages_store.dart' show TtcMessagesStore;
+import '../../ttc/ttc_ready_plan.dart' show readyMonthLabel;
+import '../../ttc/ttc_ready_plan_store.dart';
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
 import '../auth/onboarding/onboarding_questions.dart';
@@ -756,8 +758,19 @@ final PvYouStageContent _trying = PvYouStageContent(
   clock: () {
     final d = _answer('trying', 'ttc_duration');
     final c = _answer('trying', 'ttc_cycles');
+    // Not started yet (2026-10-17, the Ready-to-Try plan): "Trying · not
+    // yet, we're getting ready" said two opposite things. Her planned month,
+    // when she has given one, says when.
+    final planned = TtcReadyPlanStore.instance.plannedStart;
+    final planning =
+        FamilyProfileStore.instance.otherFor('ttc_duration') == 'planning';
     return [
-      d == '--' ? 'Trying' : 'Trying · ${d.toLowerCase()}',
+      if (planning)
+        planned == null
+            ? 'Getting ready to try'
+            : 'Getting ready to try · from ${readyMonthLabel(planned)}'
+      else
+        d == '--' ? 'Trying' : 'Trying · ${d.toLowerCase()}',
       // Only a real answer; "cycles not sure" read as a slip.
       if (c != '--' && !c.toLowerCase().contains('not sure'))
         'cycles ${c.toLowerCase()}',

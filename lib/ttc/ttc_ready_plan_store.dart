@@ -74,10 +74,19 @@ class TtcReadyPlanStore extends ChangeNotifier {
   }
 
   /// The plan for today, or null when there is none.
+  ///
+  /// ⚠️ NULL UNTIL SHE HAS ASKED FOR ONE (`madeAt`). A month set by the
+  /// first-run flow is an answer, not a plan: the screen opens on the
+  /// questions with that month filled in.
   ReadyPlan? planFor(DateTime now) {
     final a = _answers;
-    return a == null ? null : buildReadyPlan(a, now: now);
+    if (a == null || _madeAt == null) return null;
+    return buildReadyPlan(a, now: now);
   }
+
+  /// She has said she is planning but has not made a plan yet: the home's
+  /// "next step" offers one.
+  bool get planOwed => _madeAt == null && plannedStart != null;
 
   Future<void> load() async {
     if (_loaded) return;
@@ -106,6 +115,23 @@ class TtcReadyPlanStore extends ChangeNotifier {
     notifyListeners();
     await _persist();
     await _writeThrough(a);
+    if (_notify) await _schedule();
+  }
+
+  /// The month they want to start trying, from the TTC first-run flow
+  /// ("Not yet, we're getting ready"), before any plan exists.
+  ///
+  /// ⚠️ ONLY THE MONTH, NOT A PLAN. It sets the answer the plan's first
+  /// question would ask, so the plan opens with it filled in, and it moves
+  /// `TtcStore.journeyStart`. `madeAt` stays null: she has not asked for a
+  /// plan yet, and the home offers her one.
+  Future<void> setPlannedStart(DateTime? month) async {
+    final a = _answers ?? ReadyPlanAnswers();
+    a.target = month == null ? null : readyMonthOf(month);
+    a.alreadyTrying = false;
+    _answers = a;
+    notifyListeners();
+    await _persist();
     if (_notify) await _schedule();
   }
 
@@ -286,7 +312,8 @@ class TtcReadyPlanStore extends ChangeNotifier {
     }
   }
 
-  @visibleForTesting
+  /// Testing only. Not `@visibleForTesting`: `TtcStore.resetForTest` calls
+  /// it, the same shape every TTC store's reset has.
   void resetForTest() {
     _answers = null;
     _madeAt = null;
