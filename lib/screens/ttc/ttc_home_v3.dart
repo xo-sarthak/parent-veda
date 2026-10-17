@@ -2942,8 +2942,35 @@ class _WindowLine extends StatelessWidget {
           onTapOverride: () => openTtcSurface(context, 'ttc_chat/should_test'));
     }
 
-    return _block(cue, big, sub,
+    // Kept for revert: return _block(cue, big, sub, ...).
+    return _block(cue, big, _pillLine(line, sub),
         openTreatment: treatment.contains(line.state));
+  }
+
+  /// ⚠️ ONE SHORT LINE IN THE PILL (2026-10-16). The user: the pill "is
+  /// taking so much space, can we shorten the text". The waiting, due, late,
+  /// last-day and period sentences ran to two lines inside a tappable pill,
+  /// and the hero has a fixed height, so the extra line shrank the big
+  /// answer above it too. Flo and Clue keep this line to a few words under
+  /// the headline. Each long sentence now has a short line saying the same
+  /// fact, in words that suit her side and his (no "you", no "her").
+  /// Any other state keeps its sentence.
+  String _pillLine(TtcHeroLine line, String sub) {
+    if (sub.length <= 32) return sub;
+    return switch (line.state) {
+      TtcHeroState.waiting => 'Fertile days over this cycle',
+      TtcHeroState.periodDue => 'A few days either way is normal',
+      TtcHeroState.periodLate => 'A week either side is common',
+      TtcHeroState.windowLastDay => 'Last fertile day this cycle',
+      TtcHeroState.periodExpectedBy => 'Going by the usual cycle length',
+      TtcHeroState.onPeriod => line.windowFrom == null
+          ? 'Fertile days show as more is logged'
+          : 'Fertile days from around ${_fmt(line.windowFrom!)}',
+      TtcHeroState.pastCycle
+          when line.windowFrom != null && line.windowTo != null =>
+        'Fertile then: ${_fmt(line.windowFrom!)} to ${_fmt(line.windowTo!)}',
+      _ => sub,
+    };
   }
 
   // Kept for revert: `_openBody` joined the count and the dates into one

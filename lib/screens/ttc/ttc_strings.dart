@@ -33,16 +33,48 @@ import '../../ttc/ttc_chapter.dart' show TtcNoEstimate;
 /// TTC Today tab for design review, exactly like the pregnancy shell's Mom|Dad
 /// switch, and like that one it is marked for removal before launch.
 class TtcPartnerMode extends ChangeNotifier {
-  TtcPartnerMode._();
+  // Kept for revert: TtcPartnerMode._();
   static final TtcPartnerMode instance = TtcPartnerMode._();
+
+  /// ⚠️ SAVED SINCE 2026-10-16. It was memory-only, so every restart or
+  /// reinstall put the app back on her side while the walk (and the user)
+  /// expected his: the pill then showed a side nobody had picked. Saved the
+  /// way [TtcLang] saves its choice.
+  TtcPartnerMode._() {
+    _load();
+  }
+  static const String kKey = 'ttc_partner_mode_on';
 
   bool _on = false;
   bool get on => _on;
 
+  /// Set once anyone picks a side, so a slow first read never overwrites
+  /// a choice made after launch.
+  bool _picked = false;
+
   set on(bool v) {
+    _picked = true;
     if (_on == v) return;
     _on = v;
+    _persist();
     notifyListeners();
+  }
+
+  Future<void> _load() async {
+    try {
+      final saved =
+          (await SharedPreferences.getInstance()).getBool(kKey);
+      if (!_picked && saved != null && saved != _on) {
+        _on = saved;
+        notifyListeners();
+      }
+    } catch (_) {/* keep the default */}
+  }
+
+  Future<void> _persist() async {
+    try {
+      await (await SharedPreferences.getInstance()).setBool(kKey, _on);
+    } catch (_) {/* best-effort, same as every other TTC store */}
   }
 }
 
