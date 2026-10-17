@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/child_scoped_store.dart';
 import '../../care_partner/care_journey.dart';
+import '../../services/notification_service.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
 import '../../services/family_profile.dart';
@@ -468,6 +469,94 @@ const List<VaxVisit> kVaxVisits = [
 
 VaxVisit vaxVisitById(String id) => kVaxVisits.firstWhere((v) => v.id == id, orElse: () => kVaxVisits.first);
 
+// =============================================================================
+//  Dose rows and shared reminders (2026-10-17, 0104, sync log step 6)
+// =============================================================================
+
+/// One dose's synced state: one row per (child, visit) in `pp_vaccine_doses`.
+class VaxDoseRow {
+  const VaxDoseRow({
+    required this.id,
+    required this.done,
+    this.givenOn,
+    required this.reminder,
+    this.reminderAt,
+  });
+
+  final String id;
+  final bool done;
+  final DateTime? givenOn;
+  final bool reminder;
+  final DateTime? reminderAt;
+
+  /// The row's own columns. `reminder_hour`, `reminder_minute` and
+  /// `reminder_id` (0023) stay unused: `reminder_at` holds the whole moment.
+  Map<String, dynamic> toCloud() => {
+        'vaccine_id': id,
+        'done': done,
+        'done_at': givenOn?.toUtc().toIso8601String(),
+        'reminder': reminder,
+        'reminder_at': reminderAt?.toUtc().toIso8601String(),
+      };
+
+  static VaxDoseRow fromCloud(Map<String, dynamic> r) {
+    DateTime? at(Object? v) =>
+        v == null ? null : DateTime.tryParse(v.toString())?.toLocal();
+    return VaxDoseRow(
+      id: (r['vaccine_id'] ?? '').toString(),
+      done: r['done'] == true,
+      givenOn: at(r['done_at']),
+      reminder: r['reminder'] == true,
+      reminderAt: at(r['reminder_at']),
+    );
+  }
+}
+
+/// The phone notification id for a visit's alarm. One helper, so arming and
+/// cancelling always agree. Same value the screens used before 2026-10-17, so
+/// an alarm armed by an older version can still be cancelled.
+int vaxAlarmId(String visitId) => visitId.hashCode & 0x7fffffff;
+
+/// Pure: which alarms this phone must arm and which it must cancel, going
+/// from [before] to [after] (visit id -> fire time). An alarm whose time has
+/// passed is never armed. Unit-tested in `test/pp_records_merge_test.dart`.
+({Map<String, DateTime> arm, Set<String> cancel}) vaxAlarmChanges(
+  Map<String, DateTime> before,
+  Map<String, DateTime> after,
+  DateTime now,
+) {
+  final arm = <String, DateTime>{};
+  final cancel = <String>{};
+  for (final id in before.keys) {
+    if (!after.containsKey(id)) cancel.add(id);
+  }
+  for (final e in after.entries) {
+    final was = before[e.key];
+    if (was != null && was.isAtSameMomentAs(e.value)) continue;
+    if (was != null) cancel.add(e.key); // moved: replace the old one
+    if (e.value.isAfter(now)) arm[e.key] = e.value;
+  }
+  return (arm: arm, cancel: cancel);
+}
+
+/// The alarm's words, built from the visit and the moment it fires, so the
+/// other parent's phone writes the same reminder (moved here from the two
+/// vaccine screens on 2026-10-17).
+({String title, String body}) vaxReminderText(VaxVisit v, DateTime at) {
+  final due = vaxVisitDate(v) ?? vaxDueDate();
+  final daysBefore = DateTime(due.year, due.month, due.day)
+      .difference(DateTime(at.year, at.month, at.day))
+      .inDays;
+  final name = ChildProfileStore.instance.name;
+  final shot = v.lead.shortName;
+  return (
+    title: 'Vaccine reminder - $shot',
+    body: daysBefore <= 0
+        ? "$name's $shot (${v.ageLabel}) is due today."
+        : "$name's $shot (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(v)}.",
+  );
+}
+
 /// When the reminder for the next visit should fire: that visit's date for
 /// THIS child, at 9am. Falls back to tomorrow morning when nothing is left.
 DateTime vaxDueDate() {
@@ -534,9 +623,19 @@ class VaxStore extends ChangeNotifier {
   // `done_at` column 0023 already has. Missing = ticked without a date.
   final Map<String, DateTime> _givenOn = {};
 
+  // When each reminder fires (2026-10-17, 0104). Reminders are SHARED: the
+  // time syncs, and each parent's phone arms its own alarm from it (the user:
+  // both phones should buzz). The alarm itself never syncs; it is derived here.
+  final Map<String, DateTime> _reminderAt = {};
+
   bool _loaded = false;
   static const _prefsKey = 'pp_vax';
   static const _table = 'pp_vaccine_doses';
+  // Newer-wins bookkeeping, keyed by dose (0104, sync log step 6). A dose row
+  // is state, not a list item, so it has no removed_at: un-ticking sends
+  // done = false.
+  final ChildLogLedger _sync = ChildLogLedger(_table, 'pp_vax_sync',
+      keyColumn: 'vaccine_id', hasRemovedAt: false);
 
   String? get _childId => ChildProfileStore.instance.activeChildId;
 
@@ -563,8 +662,17 @@ class VaxStore extends ChangeNotifier {
             if (d != null) _givenOn[k.toString()] = d;
           });
         }
+        final at = j['reminderAt'];
+        if (at is Map) {
+          at.forEach((k, v) {
+            final d = DateTime.tryParse(v.toString());
+            if (d != null) _reminderAt[k.toString()] = d;
+          });
+        }
       }
     } catch (_) {/* keep the schedule defaults */}
+    await _sync.load();
+    SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
     try {
@@ -578,6 +686,8 @@ class VaxStore extends ChangeNotifier {
     _done.clear();
     _reminders.clear();
     _givenOn.clear();
+    _reminderAt.clear();
+    _sync.clear();
     notifyListeners();
   }
 
@@ -586,6 +696,35 @@ class VaxStore extends ChangeNotifier {
     SyncRegistry.registerReset(_resetLocal);
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
+    try {
+      final before = _alarms();
+      final merged = await _sync.pull<VaxDoseRow>(
+        childId: childId,
+        local: _rowsFor(childId),
+        idOf: (d) => d.id,
+        fromRow: VaxDoseRow.fromCloud,
+      );
+      _done.clear();
+      _reminders.clear();
+      _givenOn.clear();
+      _reminderAt.clear();
+      for (final d in merged) {
+        if (d.done) _done.add(d.id);
+        if (d.givenOn != null) _givenOn[d.id] = d.givenOn!;
+        if (d.reminder) _reminders.add(d.id);
+        if (d.reminderAt != null) _reminderAt[d.id] = d.reminderAt!;
+      }
+      await _persist();
+      notifyListeners();
+      _applyAlarmChanges(vaxAlarmChanges(before, _alarms(), DateTime.now()));
+      await _pushWaiting();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  /// The old pull, kept for revert: it only ever ADDED doses, so a dose
+  /// un-ticked on one phone never reached the other.
+  // ignore: unused_element
+  Future<void> _syncFromCloudKept(String childId) async {
     try {
       final rows = await SupabaseRepo.fetchByChild(_table, childId);
       for (final r in rows) {
@@ -607,6 +746,83 @@ class VaxStore extends ChangeNotifier {
     } catch (_) {/* offline - keep local */}
   }
 
+  bool _hasPending() => _sync.hasPending;
+
+  /// Every dose this phone has any state for: ticked, reminded, or changed
+  /// here and remembered by the book (so an un-tick still merges).
+  List<VaxDoseRow> _rowsFor(String childId) => [
+        for (final id in {..._done, ..._reminders, ..._sync.keysFor(childId)})
+          _rowOf(id),
+      ];
+
+  VaxDoseRow _rowOf(String id) => VaxDoseRow(
+        id: id,
+        done: _done.contains(id),
+        givenOn: _givenOn[id],
+        reminder: _reminders.contains(id),
+        reminderAt: _reminderAt[id],
+      );
+
+  /// Uploads whatever the cloud has not confirmed (0104).
+  Future<void> _pushWaiting() {
+    final child = _childId;
+    return _sync.push(
+      () => {
+        if (child != null)
+          for (final d in _rowsFor(child)) d.id: d.toCloud(),
+      },
+      fallbackChildId: child,
+    );
+  }
+
+  /// A dose changed on this phone: remember it and upload it.
+  void _changed(String visitId) {
+    _sync.touch(visitId, _childId, columns: _rowOf(visitId).toCloud());
+    _pushWaiting();
+  }
+
+  // ---- the alarms (shared reminders, armed on each phone) -------------------
+
+  /// Each dose's alarm as this phone should hold it: reminded, not yet given,
+  /// with a time.
+  Map<String, DateTime> _alarms() => {
+        for (final id in _reminders)
+          if (!_done.contains(id) && _reminderAt[id] != null)
+            id: _reminderAt[id]!,
+      };
+
+  void _applyAlarmChanges(({Map<String, DateTime> arm, Set<String> cancel}) c) {
+    for (final id in c.cancel) {
+      NotificationService.instance.cancel(vaxAlarmId(id));
+    }
+    for (final e in c.arm.entries) {
+      _arm(e.key, e.value);
+    }
+  }
+
+  /// Bring one dose's alarm in line with its state.
+  void _refreshAlarm(String visitId, Map<String, DateTime> before) {
+    final now = _alarms();
+    _applyAlarmChanges(vaxAlarmChanges(
+      {if (before[visitId] != null) visitId: before[visitId]!},
+      {if (now[visitId] != null) visitId: now[visitId]!},
+      DateTime.now(),
+    ));
+  }
+
+  void _arm(String visitId, DateTime at) {
+    final text = vaxReminderText(vaxVisitById(visitId), at);
+    NotificationService.instance.scheduleOneOff(
+      id: vaxAlarmId(visitId),
+      title: text.title,
+      body: text.body,
+      when: at,
+    );
+  }
+
+  /// The old one-row upsert, kept for revert (it wrote user_id = me over the
+  /// other parent's row).
+  // ignore: unused_element
   Future<void> _pushDose(String visitId) async {
     await ChildSync.pushKeyed(
       _table,
@@ -630,6 +846,7 @@ class VaxStore extends ChangeNotifier {
           'done': _done.toList(),
           'reminders': _reminders.toList(),
           'givenOn': {for (final e in _givenOn.entries) e.key: e.value.toIso8601String()},
+          'reminderAt': {for (final e in _reminderAt.entries) e.key: e.value.toIso8601String()},
         }),
       );
     } catch (_) {}
@@ -642,6 +859,7 @@ class VaxStore extends ChangeNotifier {
 
   /// [on] is the day it was given; null keeps any date already recorded.
   void markDone(String visitId, {DateTime? on}) {
+    final before = _alarms();
     _done.add(visitId);
     if (on != null) _givenOn[visitId] = DateTime(on.year, on.month, on.day);
     // Health's vaccination section shows an invitation until a real dose is
@@ -650,7 +868,10 @@ class VaxStore extends ChangeNotifier {
     CareJourney.vaccinationDone();
     notifyListeners();
     _persist();
-    _pushDose(visitId);
+    // _pushDose(visitId); // kept for revert
+    _changed(visitId);
+    // Given: the reminder for it has nothing left to say.
+    _refreshAlarm(visitId, before);
   }
 
   void markNotDone(String visitId) {
@@ -659,32 +880,46 @@ class VaxStore extends ChangeNotifier {
     // visits, and Undo did nothing. Kept for revert:
     // if (kVaxVisits.firstWhere((v) => v.id == visitId).status != VaxStatus.done) {
     if (_done.contains(visitId)) {
+      final before = _alarms();
       _done.remove(visitId);
       _givenOn.remove(visitId);
       notifyListeners();
       _persist();
-      // Still has a reminder? keep the row and just clear `done`.
-      if (_reminders.contains(visitId)) {
-        _pushDose(visitId);
-      } else {
-        ChildSync.removeKeyed(_table, _childId, 'vaccine_id', visitId);
-      }
+      // Kept for revert: a hard delete when nothing was left, lost offline.
+      // Un-ticking is now an edit (done = false) that wins like any other.
+      // if (_reminders.contains(visitId)) {
+      //   _pushDose(visitId);
+      // } else {
+      //   ChildSync.removeKeyed(_table, _childId, 'vaccine_id', visitId);
+      // }
+      _changed(visitId);
+      _refreshAlarm(visitId, before);
     }
   }
 
   bool hasReminder(String visitId) => _reminders.contains(visitId);
-  void setReminder(String visitId, bool on) {
+  /// [at] is when the alarm fires. The store arms or cancels this phone's
+  /// alarm, and the other parent's phone arms the same one after it syncs
+  /// (2026-10-17, 0104). Before, the screens armed it and nothing cancelled
+  /// it: turning a reminder off left the alarm set.
+  void setReminder(String visitId, bool on, {DateTime? at}) {
+    final before = _alarms();
     on ? _reminders.add(visitId) : _reminders.remove(visitId);
+    if (on && at != null) _reminderAt[visitId] = at;
+    if (!on) _reminderAt.remove(visitId);
     notifyListeners();
     _persist();
     // Persisting this closes the second half of flag #4: the reminder armed a
     // real OS notification that survived a restart while the store forgot it,
     // so the app and the phone disagreed about what was scheduled.
-    if (on || _done.contains(visitId)) {
-      _pushDose(visitId);
-    } else {
-      ChildSync.removeKeyed(_table, _childId, 'vaccine_id', visitId);
-    }
+    // Kept for revert (a hard delete when nothing was left):
+    // if (on || _done.contains(visitId)) {
+    //   _pushDose(visitId);
+    // } else {
+    //   ChildSync.removeKeyed(_table, _childId, 'vaccine_id', visitId);
+    // }
+    _changed(visitId);
+    _refreshAlarm(visitId, before);
   }
 
   /// A visit's live status (respecting anything the parent has marked done).

@@ -44,6 +44,13 @@ Read first:
   - A row the partner owns goes up as a plain UPDATE: an upsert is checked against the INSERT policy
     (`auth.uid() = user_id`) even when it updates, and would be refused. BACKEND-PATTERNS §16ii-f.
   - See `docs/BACKEND-SYNC-LOG.md` step 5.
+- **The rest of the child's record (step 6, 2026-10-18, migration 0104, NOT YET RUN).** Documents, the six health
+  tables, doctor questions (now with ids), the emergency card (Clear syncs), milestones and vaccine doses.
+  - `ChildLogLedger` gained a keyed mode for the composite-key tables, and an owner-is-last-editor mode for the
+    card, whose UPDATE policy pins `user_id`.
+  - Vaccine reminders are shared: the time syncs and each phone arms its own alarm. Turning a reminder off now
+    cancels the alarm, which it never did.
+  - See `docs/BACKEND-SYNC-LOG.md` step 6.
 
 ---
 
@@ -103,10 +110,10 @@ but it is not used as a merge clock. The rest have neither column.
 | ~~`pp_feeding_data.dart`~~ | ~~`pp_feed_logs`~~ **DONE 2026-10-17 (0101)** |
 | ~~`pp_sleep_data.dart`~~ | ~~`pp_sleep_logs`~~ **DONE 2026-10-17 (0101)** |
 | ~~`pp_growth_data.dart`~~ | ~~`pp_growth_measurements`~~ **DONE 2026-10-17 (0101)** |
-| `pp_documents_data.dart` | `pp_documents` |
-| `pp_health_data.dart` | `pp_medications`, `pp_prescriptions`, `pp_allergies`, `pp_symptoms`, `pp_reports`, `pp_doctor_visits`, `pp_doctor_questions`, `pp_emergency_cards` |
-| `pp_milestones_data.dart` | `pp_milestone_observations` (composite key) |
-| `pp_vaccine_data.dart` | `pp_vaccine_doses` (composite key) |
+| ~~`pp_documents_data.dart`~~ | ~~`pp_documents`~~ **DONE 2026-10-18 (0104)** |
+| ~~`pp_health_data.dart`~~ | ~~`pp_medications`, `pp_prescriptions`, `pp_allergies`, `pp_symptoms`, `pp_reports`, `pp_doctor_visits`, `pp_doctor_questions`, `pp_emergency_cards`~~ **DONE 2026-10-18 (0104)** |
+| ~~`pp_milestones_data.dart`~~ | ~~`pp_milestone_observations` (composite key)~~ **DONE 2026-10-18 (0104)** |
+| ~~`pp_vaccine_data.dart`~~ | ~~`pp_vaccine_doses` (composite key)~~ **DONE 2026-10-18 (0104)** |
 | `pp_names_data.dart` | `pp_name_votes` |
 | `pp_child_profile.dart` | `children` (shared read with the partner) |
 
@@ -223,8 +230,10 @@ profile, emergency cards) may want per-field.
 - `ttc_ritual`: shared parts (`conversation`) are the couple's, so the newest row across both wins. Individual
   parts are each person's own. Each phone writes only its own rows (BACKEND-PATTERNS §16ii-b).
 - The six Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth): row-level, newer wins. They are
-  append-only, so two parents almost never edit the same row (2026-10-17, step 5). Still open: documents,
-  health, milestones, vaccines, names and the child profile, where per-field may be worth asking about.
+  append-only, so two parents almost never edit the same row (2026-10-17, step 5).
+- Documents and the health records: row-level, latest edit wins. The emergency card: latest save wins, whole
+  card, and Clear syncs. Vaccine reminders: shared, so both phones buzz (the user, 2026-10-17, step 6).
+- Still open: name votes and the child profile (`children`), step 7.
 - **Every couple-scoped store must keep the row's owner on push.** Check this before converting any `pp_*` or
   supplements store; the flip is silent.
 
@@ -238,6 +247,9 @@ profile, emergency cards) may want per-field.
   sends 1 for a removed row. If that check ever changes, keep the removed-row value valid.
 - **The trigger reminders** (`TtcTreatmentStore` reminder ids 918001/918002) are not cancelled by the store reset.
   `NotificationService.silenceForSignOut` probably covers them; confirm on a device.
+- **One vaccine row holds two facts** (given, reminder). Under row-level newer-wins, one parent marking it given
+  while the other sets its reminder at the same moment loses one change. Rare; split the row only if it is ever
+  seen (step 6, 2026-10-18).
 - **`DeleteAccount.run` keeps an unused `local_wipe.dart` import** (marked `// ignore`); drop it in the next pass
   there.
 
@@ -270,11 +282,45 @@ left alone for now so two sessions don't clash:
 2. ~~**§3 dirty sets** for the same stores~~ done with step 1.
 3. ~~**§2 push-before-pull**~~ **DONE 2026-10-17 (step 3).** Next in §2: per-item merge for the curated lists.
 4. ~~**§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.~~ **DONE 2026-10-17
-   (step 5, 0101 run 2026-10-17).** Next in Parenting: documents, health, milestones and vaccines, still on
-   `ChildSync.merge`; the composite-key tables (vaccines, milestones) need `pushKeyed` reworked too.
+   (step 5, 0101 run 2026-10-17).** ~~Next in Parenting: documents, health, milestones and vaccines~~ **DONE
+   2026-10-18 (step 6, 0104 to run).** Left in Parenting: `pp_name_votes` and the `children` profile (step 7).
 5. **§1 Pregnancy tables**, one migration.
 6. **§4, §5, §7** as tidy-up.
 
 For each step: write a pure merge test with no network (like `test/ttc_row_merge_test.dart`), extend
 `ttc_schema_contract_test` (or the stage's own contract test) to read the new migration, and walk two phones on one
 account before calling it done.
+
+---
+
+## 9. Ask Veda: content and the index (added 2026-10-18)
+
+Not user data: our own content, and the index Ask Veda answers from. Same failure shape as the rest of this file,
+a copy drifting from its source in silence. Built 2026-10-17: the recipes export is an exact mirror (commit
+`fa2be7c`; every column, update on conflict, archive what is gone, a schema contract test), and the Ask Veda ingest
+is incremental (askveda repo; `content_hash` fingerprints, embeds only what changed, removes chunks of content that
+is gone, never for a table that failed to read). Both SQL files have been run and the recipes table verified:
+161 published, 28 new-design (`pp_7_8m_*`), 1 archived (`tomatocarrotsoup`).
+
+### 9.1 Run the ingest once (USER, when the laptop can take it)
+```
+cd C:\Projects\parentveda-askveda
+.venv\Scripts\python.exe -m ingest.ingest
+```
+The last hot run: every chunk gets its fingerprint for the first time. Expect roughly
+`0 unchanged · ~8,900 embedded · 1+ removed`. Every run after that takes seconds. Until it runs, Ask Veda does not
+know the 28 new-design dishes and still holds the archived soup. Never run by an agent (it heats the laptop to 95 °C).
+
+### 9.2 Duplicate recipes in the index (DECISION: the user's yes)
+The parenting corpus (`parentingCorpus()` in `lib/screens/post_pregnancy/parenting_veda.dart`) still feeds an older
+list of 21 dishes (`kRecipes`, `pp_recipes_data.dart`) into `veda_knowledge`. 16 of them share an id with
+`kFoodRecipes`, so Ask Veda holds two copies of each dish, and one of the old ones is the retired tomato-carrot soup.
+Two copies can fill two of the 2-3 chunks an answer reads, and the older one can win.
+Proposed: the corpus export skips a recipe whose id is in `kFoodRecipes` (or in `kFoodRecipeMoved`) and keeps the
+5 that exist only in the old list. After the export + import, the incremental ingest removes the 16 by itself.
+
+### 9.3 Write the sync-log step and the patterns note (on the user's word)
+A `BACKEND-SYNC-LOG.md` step "Recipes mirror and the short Ask Veda ingest" (the checklist, what the user ran, and
+the routine for a new recipe doc), plus a BACKEND-PATTERNS section on the exact-mirror pattern (`do update` + archive,
+guarded by ContentOwnership). The text is drafted; it waits for the other terminal's step to land first so the step
+numbers do not collide.

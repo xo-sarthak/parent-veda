@@ -10,7 +10,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'pp_child_profile.dart';
+// import 'pp_child_profile.dart'; // only the alarm text used it; it moved to VaxStore (kept for revert)
 
 import '../../services/notification_service.dart';
 import 'askveda_screen.dart';
@@ -310,16 +310,19 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
     final when = vaxVisitDate(_visit) ?? vaxDueDate();
     void set(int daysBefore, String label) {
       Navigator.of(context).pop();
-      VaxStore.instance.setReminder(_visit.id, true);
       NotificationService.instance.requestPermission();
-      NotificationService.instance.scheduleOneOff(
-        id: (_visit.id.hashCode & 0x7fffffff),
-        title: 'Vaccine reminder - ${_vax.shortName}',
-        body: daysBefore == 0
-            ? "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due today."
-            : "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(_visit)}.",
-        when: when.subtract(Duration(days: daysBefore)),
-      );
+      // The store arms the alarm now, and the other parent's phone arms the
+      // same one after it syncs (2026-10-17, 0104). Kept for revert:
+      // NotificationService.instance.scheduleOneOff(
+      //   id: (_visit.id.hashCode & 0x7fffffff),
+      //   title: 'Vaccine reminder - ${_vax.shortName}',
+      //   body: daysBefore == 0
+      //       ? "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due today."
+      //       : "${ChildProfileStore.instance.name}'s ${_vax.shortName} (${_visit.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(_visit)}.",
+      //   when: when.subtract(Duration(days: daysBefore)),
+      // );
+      VaxStore.instance.setReminder(_visit.id, true,
+          at: when.subtract(Duration(days: daysBefore)));
       pvToast(context, 'Reminder set - $label', kind: PvToastKind.done);
     }
 

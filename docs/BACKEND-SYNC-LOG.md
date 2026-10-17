@@ -21,6 +21,7 @@ owed.
 | 2026-10-17 | Step 3: blob stores push before pull | none | `f32af1e` | nothing to run |
 | 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | `a0eb5b9` | yes (2026-10-17) |
 | 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | `f7ed88e` | yes (2026-10-17) |
+| 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | not yet | **not yet** |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -417,3 +418,121 @@ change.
   `pp_care_log_data.dart`
 - `test/pp_logs_merge_test.dart` (new), `test/sync_guard_contract_test.dart`
 - `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`, `docs/BEFORE-LAUNCH.md`, `docs/BACKEND-PATTERNS.md`
+
+---
+
+## Step 6: The rest of the child's record (documents, health, milestones, vaccines, emergency card)
+
+**Date:** 2026-10-18 (planned and approved 2026-10-17). **Migration:** 0104 (not yet run). **Commit:** not yet.
+
+**Numbering note:** this was written as 0103. The other terminal created `0103_ttc_partner_cannot_delete.sql` at
+the same time, so this one became 0104. The two touch different tables.
+
+**The problem (STILL-OPEN-BACKEND §1, the rest of the Parenting row).** Everything step 5 found, plus one bug
+each:
+
+| Area | Bug |
+|---|---|
+| Documents; health records (medicines, prescriptions, allergies, symptoms, reports, doctor visits) | Union pull, hard delete, and an upsert as me over the other parent's rows (step 5's three bugs) |
+| Doctor questions | Matched by **text**, with no client id: removing one removed every copy, and the same question asked twice became one |
+| Emergency card | The cloud copy always won, so an offline edit was lost; **Clear never reached the cloud**, so the card came back |
+| Milestones | The cloud overwrote everything, so un-ticking came back |
+| Vaccines | The pull only ever **added** doses, so un-ticking never reached the other phone. A synced reminder showed "Alarm set" on a phone with no alarm armed |
+
+**Decisions (the user, 2026-10-17):**
+- Health rows and documents: **latest edit wins**, whole row.
+- Emergency card: **latest save wins**, whole card, and Clear syncs.
+- Vaccine reminders: **shared**. "Both should" buzz. So the reminder time syncs, and each phone arms its own
+  alarm.
+
+**Done (2026-10-18):**
+- [x] Migration `0104_pp_records_sync_clock.sql`:
+  - `updated_at` + `removed_at` on documents, the six health tables, questions and milestone observations;
+  - `removed_at` on the card, which already had `updated_at`;
+  - `updated_at` + `reminder_at` on vaccine doses. A dose row is state, so un-ticking sends `done = false`, and
+    the table needs no `removed_at`;
+  - 0100's guard on all 11 tables;
+  - RLS unchanged, and a check query at the bottom.
+- [x] **`ChildLogLedger` gains a keyed mode** (`keyColumn`) for the composite-key tables. The book id is
+  `<child>|<key>`, so the same milestone of two children is two rows.
+  - The upsert conflicts on `child_id,<key>`.
+  - A row the other parent owns is an UPDATE matched on child + key, through the new
+    `SupabaseRepo.updateChildRowConfirmed`.
+  - `lastRows` keeps a changed row's columns, so a child not on screen can still upload.
+  - `keysFor(child)` lists every key the book remembers. Without it, a dose un-ticked here (now in no local set)
+    would lose to the cloud's older "done".
+  - Defaults unchanged, so step 5's six stores are untouched.
+- [x] **`ownerIsLastEditor`** for the emergency card: its UPDATE policy also requires `auth.uid() = user_id`, so it
+  can't be saved under the other parent's name. It's always upserted as us, and "owner" means last editor.
+  **`hasRemovedAt: false`** for vaccine doses.
+- [x] Stores:
+  - **`BabyDocumentsStore`**: add and edit touch; remove is a soft delete.
+  - **`HealthStore`**: one ledger per table.
+    - The six record tables pull with `_pullTable`. `_push` and `_remove` now go through the ledger, so the
+      add/edit call sites didn't change. Removals carry their columns.
+    - **Questions** now have ids (`_questionIds`, index for index, so no screen changed). On the first sync after
+      the update, `adoptQuestionIds` gives a question saved before ids the id of a live cloud row with the same
+      text. Two equal questions claim two rows, or get a new id.
+    - **The card**: save touches, and Clear is a soft delete that syncs.
+    - The old `_mergeTable`, `_mergeQuestions`, `_mergeEmergency`, `_pushEmergency`, `_pushKept` and
+      `_removeKept` are kept for revert.
+  - **`MilestoneStore`**: keyed ledger; un-ticking is a soft delete.
+  - **`VaxStore`**: keyed ledger. Each row carries `done`, `done_at`, `reminder` and `reminder_at`.
+    - **The store arms the alarm now, not the screens.** `setReminder(id, on, at:)` arms or cancels it.
+    - After every pull, the pure `vaxAlarmChanges(before, after, now)` says which alarms to arm, re-arm or
+      cancel. A time already passed is never armed. A dose marked given cancels its alarm.
+    - The alarm text moved into `vaxReminderText`, so both phones write the same reminder.
+    - `vaxAlarmId` is one id helper, with the same value as before, so alarms armed by older versions can
+      still be cancelled.
+- [x] **Found on the way and fixed:** switching a vaccine reminder **off never cancelled the phone alarm**. The
+  screens armed it, and nothing ever cancelled it. The store now cancels it.
+- [x] **Planned but not done, on purpose:** "keep this phone's attachments when taking a cloud row". Reading
+  `pp_attachments.dart` showed attachments already upload to Storage and sync as storage paths (closed
+  2026-10-07). So they sync like any other column, and the rule would have been wrong.
+- [x] Tests:
+  - New `test/pp_records_merge_test.dart` (22 cases), covering:
+    - **keyed tables:** an un-ticked milestone stays un-ticked; two children, two rows; the other parent's keyed
+      row is an UPDATE on child + key; our own upserts on the composite key; a child not on screen still
+      uploads; no child, no booking;
+    - **vaccines:** an un-ticked dose beats an older "done", and sends no `removed_at`; the dose row
+      round-trips the reminder time;
+    - **the card:** always saved as us; Clear uploads with the card; the other parent's newer Clear clears it
+      here;
+    - **questions:** adoption by text; two equal questions stay two; a removed row is never adopted;
+    - **the alarm plan:** arm, cancel, move, no-op, skip-past, and one id;
+    - **a source scan** that the four stores are wired and the two screens no longer arm alarms.
+  - `test/sync_guard_contract_test.dart`:
+    - it now reads only the `do $$` block that creates the trigger (0104 also loops to add columns);
+    - one new case for the 11 tables.
+
+**Verified (2026-10-18):**
+- `flutter analyze` is clean on every touched file.
+- 1,119 tests pass across 110 files: every Parenting test, plus every sync, schema and TTC merge test.
+
+**Known limits, named:**
+- **One row, two facts.** A vaccine row holds both "given" and "reminder". Under row-level newer-wins, if one
+  parent marks the dose given while the other sets its reminder at the same moment, the later save wins whole.
+  That's rare, and it's what the user chose for health rows.
+- **Mixed versions.** Until both phones update, the old app still hard-deletes and still writes `user_id = me`,
+  as in step 5.
+
+**User runs:**
+1. 0104 in the Supabase SQL editor.
+2. Optional: the check query at the bottom. Expect 11 rows. `has_clock` and `guarded` should be true on every row;
+   `has_removed_at` true on all but `pp_vaccine_doses`, which has `has_reminder_at` instead.
+
+**Owed (the two-phone walk):**
+- set a vaccine reminder on phone A; phone B buzzes at the same time;
+- switch the reminder off on B; A stops too;
+- un-tick a dose on B; A shows it un-ticked;
+- clear the emergency card on A; it stays cleared on B;
+- remove an allergy offline; it stays removed.
+
+**Files:**
+- `supabase/migrations/0104_pp_records_sync_clock.sql` (new)
+- `lib/services/remote/child_scoped_store.dart`, `lib/services/remote/supabase_repo.dart`
+- `lib/screens/post_pregnancy/pp_documents_data.dart`, `pp_health_data.dart`, `pp_milestones_data.dart`,
+  `pp_vaccine_data.dart`, `vax_detail_screen.dart`, `vax_tracker_screen.dart`
+- `test/pp_records_merge_test.dart` (new), `test/sync_guard_contract_test.dart`
+- `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`. `docs/BEFORE-LAUNCH.md` and `docs/BACKEND-PATTERNS.md`
+  follow once the other terminal has committed its edits to them.

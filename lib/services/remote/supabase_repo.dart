@@ -168,6 +168,30 @@ class SupabaseRepo {
     }
   }
 
+  /// [updateSharedConfirmed] for a composite-key child table (2026-10-17,
+  /// 0104): the row is matched on `child_id` + [column] == [value] rather
+  /// than an `id`. Milestone observations and vaccine doses.
+  static Future<bool> updateChildRowConfirmed(
+    String table,
+    String childId,
+    String column,
+    Object value,
+    Map<String, dynamic> changes,
+  ) async {
+    if (userId == null) return false;
+    try {
+      await _client
+          .from(table)
+          .update(changes)
+          .eq('child_id', childId)
+          .eq(column, value);
+      return true;
+    } catch (e) {
+      debugPrint('[repo] update $table refused: $e');
+      return false;
+    }
+  }
+
   /// Delete row [id] from a co-parented [table] (see [updateShared]).
   static Future<void> deleteShared(String table, String id) async {
     if (userId == null) return;

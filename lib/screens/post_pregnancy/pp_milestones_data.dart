@@ -388,6 +388,10 @@ class MilestoneStore extends ChangeNotifier {
   bool _loaded = false;
   static const _prefsKey = 'pp_milestones';
   static const _table = 'pp_milestone_observations';
+  // Newer-wins bookkeeping, keyed by milestone (0104, sync log step 6).
+  final ChildLogLedger _sync = ChildLogLedger(
+      _table, 'pp_milestones_sync',
+      keyColumn: 'milestone_id');
 
   String? get _childId => ChildProfileStore.instance.activeChildId;
 
@@ -408,6 +412,8 @@ class MilestoneStore extends ChangeNotifier {
         });
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
     try {
@@ -419,6 +425,7 @@ class MilestoneStore extends ChangeNotifier {
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _observed.clear();
+    _sync.clear();
     notifyListeners();
   }
 
@@ -428,26 +435,62 @@ class MilestoneStore extends ChangeNotifier {
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {
-      final rows = await SupabaseRepo.fetchByChild(_table, childId);
-      final cloudIds = <String>{};
-      for (final r in rows) {
-        final id = (r['milestone_id'] ?? '').toString();
-        if (id.isEmpty) continue;
-        cloudIds.add(id);
-        _observed[id] = MilestoneObs(
-          date: SupabaseRepo.parseDbTime(r['observed_on']),
-          note: r['note']?.toString(),
-        );
-      }
-      for (final entry in _observed.entries) {
-        if (cloudIds.contains(entry.key)) continue;
-        await _push(entry.key, entry.value);
-      }
+      // The old pull, kept for revert: the cloud overwrote every row and a
+      // milestone un-ticked on one phone came back from the other.
+      // final rows = await SupabaseRepo.fetchByChild(_table, childId);
+      // final cloudIds = <String>{};
+      // for (final r in rows) {
+      //   final id = (r['milestone_id'] ?? '').toString();
+      //   if (id.isEmpty) continue;
+      //   cloudIds.add(id);
+      //   _observed[id] = MilestoneObs(
+      //     date: SupabaseRepo.parseDbTime(r['observed_on']),
+      //     note: r['note']?.toString(),
+      //   );
+      // }
+      // for (final entry in _observed.entries) {
+      //   if (cloudIds.contains(entry.key)) continue;
+      //   await _push(entry.key, entry.value);
+      // }
+      final merged = await _sync.pull<MapEntry<String, MilestoneObs>>(
+        childId: childId,
+        local: _observed.entries.toList(),
+        idOf: (e) => e.key,
+        fromRow: (r) => MapEntry(
+          (r['milestone_id'] ?? '').toString(),
+          MilestoneObs(
+            date: SupabaseRepo.parseDbTime(r['observed_on']),
+            note: r['note']?.toString(),
+          ),
+        ),
+      );
+      _observed
+        ..clear()
+        ..addEntries(merged);
       await _persist();
       notifyListeners();
+      await _pushWaiting();
     } catch (_) {/* offline - keep local */}
   }
 
+  bool _hasPending() => _sync.hasPending;
+
+  /// The row's own columns (0104).
+  static Map<String, dynamic> _cols(String id, MilestoneObs obs) => {
+        'milestone_id': id,
+        'observed_on': SupabaseRepo.dbTime(obs.date),
+        'note': obs.note,
+      };
+
+  /// Uploads whatever the cloud has not confirmed (0104).
+  Future<void> _pushWaiting() => _sync.push(
+        () => {for (final e in _observed.entries) e.key: _cols(e.key, e.value)},
+        fallbackChildId: _childId,
+      );
+
+  // The old one-row upsert, kept for revert (it wrote user_id = me over the
+  // other parent's row).
+  // ignore: unused_element
   Future<void> _push(String id, MilestoneObs obs) => ChildSync.pushKeyed(
         _table,
         _childId,
@@ -565,14 +608,20 @@ class MilestoneStore extends ChangeNotifier {
     _observed[id] = obs;
     notifyListeners();
     _persist();
-    _push(id, obs);
+    // _push(id, obs); // kept for revert
+    _sync.touch(id, _childId, columns: _cols(id, obs));
+    _pushWaiting();
   }
 
   void unobserve(String id) {
-    _observed.remove(id);
+    final was = _observed.remove(id);
     notifyListeners();
     _persist();
-    ChildSync.removeKeyed(_table, _childId, 'milestone_id', id);
+    // A hard delete fired once, lost offline; kept for revert. Un-ticking is
+    // now a soft delete that uploads like any other change.
+    // ChildSync.removeKeyed(_table, _childId, 'milestone_id', id);
+    if (was != null) _sync.remove(id, _cols(id, was), _childId);
+    _pushWaiting();
   }
 
   /// Demo observations. Deliberately NOT called - see the constructor note.

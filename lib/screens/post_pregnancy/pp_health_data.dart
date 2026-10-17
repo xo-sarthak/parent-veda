@@ -455,6 +455,10 @@ class HealthStore extends ChangeNotifier {
   // loaded. A parent who has entered nothing now correctly sees the
   // invitation state. See BACKEND-PARENTING-BRIEF §5.
   final List<String> _questions = [];
+  // Each question's row id (2026-10-17, 0104), index for index with
+  // _questions. They used to be matched by TEXT, so removing one removed
+  // every copy. '' = a question saved before ids, adopted on the next sync.
+  final List<String> _questionIds = [];
   final List<Medication> _medications = [];
   final List<Prescription> _prescriptions = [];
   final List<Allergy> _allergies = [];
@@ -480,6 +484,66 @@ class HealthStore extends ChangeNotifier {
 
   static const _prefsKey = 'pp_health';
 
+  // ---- newer-wins bookkeeping (0104, sync log step 6) -----------------------
+  // One ledger per table: the six record tables, the questions, and the
+  // emergency card (one row per child, always saved as the last editor,
+  // because its UPDATE policy pins user_id to the caller).
+  static const _recordTables = [
+    'pp_medications',
+    'pp_prescriptions',
+    'pp_allergies',
+    'pp_symptoms',
+    'pp_reports',
+    'pp_doctor_visits',
+  ];
+  final Map<String, ChildLogLedger> _ledgers = {
+    for (final t in [..._recordTables, 'pp_doctor_questions'])
+      t: ChildLogLedger(t, '${t}_sync'),
+    'pp_emergency_cards': ChildLogLedger(
+        'pp_emergency_cards', 'pp_emergency_cards_sync',
+        keyColumn: 'child_id', ownerIsLastEditor: true),
+  };
+
+  bool _hasPending() => _ledgers.values.any((l) => l.hasPending);
+
+  /// The rows held now for [table], by id (by child id for the card).
+  Map<String, Map<String, dynamic>> _liveFor(String table) {
+    Map<String, Map<String, dynamic>> by<T>(
+            List<T> l, Map<String, dynamic> Function(T) row, String Function(T) id) =>
+        {for (final x in l) id(x): row(x)};
+    switch (table) {
+      case 'pp_medications':
+        return by(_medications, _medRow, (m) => m.id);
+      case 'pp_prescriptions':
+        return by(_prescriptions, _presRow, (p) => p.id);
+      case 'pp_allergies':
+        return by(_allergies, _allergyRow, (a) => a.id);
+      case 'pp_symptoms':
+        return by(_symptoms, _symptomRow, (x) => x.id);
+      case 'pp_reports':
+        return by(_reports, _reportRow, (r) => r.id);
+      case 'pp_doctor_visits':
+        return by(_visits, _visitRow, (v) => v.id);
+      case 'pp_doctor_questions':
+        return {
+          for (var i = 0; i < _questions.length; i++)
+            if (_questionIds[i].isNotEmpty)
+              _questionIds[i]: {'id': _questionIds[i], 'question': _questions[i]},
+        };
+      case 'pp_emergency_cards':
+        final child = _childId;
+        final card = _emergencyJson();
+        return {
+          if (child != null && card != null) child: {'card': card},
+        };
+    }
+    return const {};
+  }
+
+  /// Uploads whatever [table]'s cloud has not confirmed.
+  Future<void> _pushTable(String table) =>
+      _ledgers[table]!.push(() => _liveFor(table), fallbackChildId: _childId);
+
   Future<void> init() async {
     if (_loaded) return;
     try {
@@ -487,6 +551,10 @@ class HealthStore extends ChangeNotifier {
       final raw = prefs.getString(_prefsKey);
       if (raw != null) _applyLocal(Map<String, dynamic>.from(jsonDecode(raw)));
     } catch (_) {/* start empty */}
+    for (final l in _ledgers.values) {
+      await l.load();
+    }
+    SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
 
@@ -510,6 +578,13 @@ class HealthStore extends ChangeNotifier {
         ..clear()
         ..addAll(qs.map((e) => e.toString()));
     }
+    final qids = j['questionIds'];
+    _questionIds
+      ..clear()
+      ..addAll([
+        for (var i = 0; i < _questions.length; i++)
+          qids is List && i < qids.length ? qids[i].toString() : '',
+      ]);
     fill('medications', _medications, _medFrom);
     fill('prescriptions', _prescriptions, _presFrom);
     fill('allergies', _allergies, _allergyFrom);
@@ -528,6 +603,7 @@ class HealthStore extends ChangeNotifier {
         _prefsKey,
         jsonEncode({
           'questions': _questions,
+          'questionIds': _questionIds,
           'medications': _medications.map(_medRow).toList(),
           'prescriptions': _prescriptions.map(_presRow).toList(),
           'allergies': _allergies.map(_allergyRow).toList(),
@@ -548,6 +624,10 @@ class HealthStore extends ChangeNotifier {
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _questions.clear();
+    _questionIds.clear();
+    for (final l in _ledgers.values) {
+      l.clear();
+    }
     _medications.clear();
     _prescriptions.clear();
     _allergies.clear();
@@ -567,21 +647,105 @@ class HealthStore extends ChangeNotifier {
     // No child yet (still on the seeded placeholder) → nothing to key rows to.
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {
-      await _mergeTable('pp_medications', childId, _medications, _medRow, _medFrom, (m) => m.id);
-      await _mergeTable('pp_prescriptions', childId, _prescriptions, _presRow, _presFrom, (p) => p.id);
-      await _mergeTable('pp_allergies', childId, _allergies, _allergyRow, _allergyFrom, (a) => a.id);
-      await _mergeTable('pp_symptoms', childId, _symptoms, _symptomRow, _symptomFrom, (s) => s.id);
-      await _mergeTable('pp_reports', childId, _reports, _reportRow, _reportFrom, (r) => r.id);
-      await _mergeTable('pp_doctor_visits', childId, _visits, _visitRow, _visitFrom, (v) => v.id);
-      await _mergeQuestions(childId);
+      // The union merges, kept for revert: they could never carry a removal,
+      // and the upsert wrote user_id = me over the other parent's rows.
+      // await _mergeTable('pp_medications', childId, _medications, _medRow, _medFrom, (m) => m.id);
+      // await _mergeTable('pp_prescriptions', childId, _prescriptions, _presRow, _presFrom, (p) => p.id);
+      // await _mergeTable('pp_allergies', childId, _allergies, _allergyRow, _allergyFrom, (a) => a.id);
+      // await _mergeTable('pp_symptoms', childId, _symptoms, _symptomRow, _symptomFrom, (s) => s.id);
+      // await _mergeTable('pp_reports', childId, _reports, _reportRow, _reportFrom, (r) => r.id);
+      // await _mergeTable('pp_doctor_visits', childId, _visits, _visitRow, _visitFrom, (v) => v.id);
+      // await _mergeQuestions(childId);
+      await _pullTable('pp_medications', childId, _medications, _medFrom, (m) => m.id);
+      await _pullTable('pp_prescriptions', childId, _prescriptions, _presFrom, (p) => p.id);
+      await _pullTable('pp_allergies', childId, _allergies, _allergyFrom, (a) => a.id);
+      await _pullTable('pp_symptoms', childId, _symptoms, _symptomFrom, (s) => s.id);
+      await _pullTable('pp_reports', childId, _reports, _reportFrom, (r) => r.id);
+      await _pullTable('pp_doctor_visits', childId, _visits, _visitFrom, (v) => v.id);
+      await _pullQuestions(childId);
       try {
-        await _mergeEmergency(childId);
+        // await _mergeEmergency(childId); // kept for revert: cloud always won
+        await _pullEmergency(childId);
       } catch (_) {/* table not there yet (0095): keep the local card */}
       await _persist();
       notifyListeners();
+      for (final t in _ledgers.keys) {
+        await _pushTable(t);
+      }
     } catch (_) {/* offline - keep local */}
   }
 
+  /// Newer-wins pull of one record table into [local] (0104).
+  Future<void> _pullTable<T>(
+    String table,
+    String childId,
+    List<T> local,
+    T Function(Map<String, dynamic>) fromRow,
+    String Function(T) idOf,
+  ) async {
+    final merged = await _ledgers[table]!.pull<T>(
+        childId: childId, local: local, idOf: idOf, fromRow: fromRow);
+    local
+      ..clear()
+      ..addAll(merged);
+  }
+
+  /// The questions, newer wins, now by id. A question saved before ids first
+  /// adopts the id of a cloud row with the same text, so the first sync after
+  /// the update does not double every question.
+  Future<void> _pullQuestions(String childId) async {
+    final ledger = _ledgers['pp_doctor_questions']!;
+    final rows = await SupabaseRepo.fetchByChild('pp_doctor_questions', childId);
+    final adopted = adoptQuestionIds(_questions, _questionIds, rows);
+    for (var i = 0; i < adopted.length; i++) {
+      if (_questionIds[i].isEmpty) {
+        _questionIds[i] = adopted[i].id;
+        // A brand-new id: the cloud has never seen it, so it uploads.
+        if (adopted[i].isNew) ledger.touch(adopted[i].id, childId);
+      }
+    }
+    final merged = ledger.apply<({String id, String text})>(
+      childId: childId,
+      local: [
+        for (var i = 0; i < _questions.length; i++)
+          (id: _questionIds[i], text: _questions[i]),
+      ],
+      rows: rows,
+      idOf: (q) => q.id,
+      fromRow: (r) => (
+        id: (r['id'] ?? '').toString(),
+        text: (r['question'] ?? '').toString(),
+      ),
+    );
+    await ledger.save();
+    _questions
+      ..clear()
+      ..addAll(merged.map((q) => q.text));
+    _questionIds
+      ..clear()
+      ..addAll(merged.map((q) => q.id));
+  }
+
+  /// The emergency card, latest save wins, and a cleared card stays cleared
+  /// (0104; the user, 2026-10-17).
+  Future<void> _pullEmergency(String childId) async {
+    final ledger = _ledgers['pp_emergency_cards']!;
+    final card = _emergencyJson();
+    final merged = await ledger.pull<MapEntry<String, Object?>>(
+      childId: childId,
+      local: [if (card != null) MapEntry(childId, card)],
+      idOf: (e) => e.key,
+      fromRow: (r) => MapEntry(childId, r['card']),
+      orderBy: 'updated_at',
+    );
+    if (merged.isEmpty) {
+      _emergency = null;
+    } else {
+      _emergencyFrom(merged.first.value);
+    }
+  }
+
+  // ignore: unused_element
   Future<void> _mergeTable<T>(
     String table,
     String childId,
@@ -606,6 +770,7 @@ class HealthStore extends ChangeNotifier {
 
   // Questions are plain strings in the app but need a stable row id in the
   // cloud, so they're matched on their text.
+  // ignore: unused_element
   Future<void> _mergeQuestions(String childId) async {
     final rows = await SupabaseRepo.fetchByChild('pp_doctor_questions', childId);
     final cloud = {for (final r in rows) (r['question'] ?? '').toString()};
@@ -623,8 +788,25 @@ class HealthStore extends ChangeNotifier {
       ..addAll(cloud);
   }
 
-  /// Push one row for a co-parented table (insert or update as needed).
+  /// One record changed on this phone: remember it and upload (0104). [row]
+  /// is unused now (the ledger reads the live rows); kept so no call site
+  /// changes.
   Future<void> _push(String table, String id, Map<String, dynamic> row) async {
+    _ledgers[table]!.touch(id, _childId);
+    await _pushTable(table);
+  }
+
+  /// One record removed on this phone: a soft delete that uploads (0104).
+  /// [row] is its columns as they were, for the table's NOT NULL columns.
+  Future<void> _remove(String table, String id, Map<String, dynamic> row) async {
+    _ledgers[table]!.remove(id, row, _childId);
+    await _pushTable(table);
+  }
+
+  /// The old one-row upsert, kept for revert: it wrote user_id = me over the
+  /// other parent's rows.
+  // ignore: unused_element
+  Future<void> _pushKept(String table, String id, Map<String, dynamic> row) async {
     final childId = _childId;
     if (id.isEmpty || childId == null || !SupabaseRepo.isLoggedIn) return;
     try {
@@ -633,7 +815,9 @@ class HealthStore extends ChangeNotifier {
     } catch (_) {/* offline - reconciled on the next sync */}
   }
 
-  Future<void> _remove(String table, String id) async {
+  /// The old hard delete, kept for revert: fired once, lost offline.
+  // ignore: unused_element
+  Future<void> _removeKept(String table, String id) async {
     if (id.isEmpty || !SupabaseRepo.isLoggedIn) return;
     try {
       await SupabaseRepo.deleteShared(table, id);
@@ -880,37 +1064,49 @@ class HealthStore extends ChangeNotifier {
   void addQuestion(String q) {
     final t = q.trim();
     if (t.isEmpty) return;
+    final id = _newId('q');
     _questions.add(t);
+    _questionIds.add(id);
     notifyListeners();
-    _after(() async {
-      final childId = _childId;
-      if (childId == null || !SupabaseRepo.isLoggedIn) return;
-      try {
-        await SupabaseRepo.insert('pp_doctor_questions',
-            {'id': _newId('q'), 'child_id': childId, 'question': t});
-      } catch (_) {}
-    });
+    // Kept for revert: an insert with a fresh id each time, never matched to
+    // the local question again.
+    // _after(() async {
+    //   final childId = _childId;
+    //   if (childId == null || !SupabaseRepo.isLoggedIn) return;
+    //   try {
+    //     await SupabaseRepo.insert('pp_doctor_questions',
+    //         {'id': _newId('q'), 'child_id': childId, 'question': t});
+    //   } catch (_) {}
+    // });
+    _after(() => _push('pp_doctor_questions', id, const {}));
   }
 
   void removeQuestion(int i) {
     if (i < 0 || i >= _questions.length) return;
     final q = _questions.removeAt(i);
+    final id = i < _questionIds.length ? _questionIds.removeAt(i) : '';
     notifyListeners();
-    _after(() async {
-      final childId = _childId;
-      if (childId == null || !SupabaseRepo.isLoggedIn) return;
-      try {
-        // Questions have no client-side id, so they're matched on text.
-        final rows =
-            await SupabaseRepo.fetchByChild('pp_doctor_questions', childId);
-        for (final r in rows) {
-          if ((r['question'] ?? '').toString() == q) {
-            await SupabaseRepo.deleteShared(
-                'pp_doctor_questions', r['id'].toString());
-          }
-        }
-      } catch (_) {}
-    });
+    // Kept for revert: matched on TEXT, so it removed every copy.
+    // _after(() async {
+    //   final childId = _childId;
+    //   if (childId == null || !SupabaseRepo.isLoggedIn) return;
+    //   try {
+    //     // Questions have no client-side id, so they're matched on text.
+    //     final rows =
+    //         await SupabaseRepo.fetchByChild('pp_doctor_questions', childId);
+    //     for (final r in rows) {
+    //       if ((r['question'] ?? '').toString() == q) {
+    //         await SupabaseRepo.deleteShared(
+    //             'pp_doctor_questions', r['id'].toString());
+    //       }
+    //     }
+    //   } catch (_) {}
+    // });
+    if (id.isEmpty) {
+      _persist(); // never synced: nothing to remove in the cloud
+      return;
+    }
+    _after(() => _remove('pp_doctor_questions', id, {'id': id, 'question': q}));
   }
 
   // ---- medications (also covers prescriptions) ----
@@ -934,7 +1130,7 @@ class HealthStore extends ChangeNotifier {
     if (i < 0 || i >= _medications.length) return;
     final row = _medications.removeAt(i);
     notifyListeners();
-    _after(() => _remove('pp_medications', row.id));
+    _after(() => _remove('pp_medications', row.id, _medRow(row)));
   }
 
   // ---- prescriptions (the script itself; may carry image/PDF attachments) ----
@@ -958,7 +1154,7 @@ class HealthStore extends ChangeNotifier {
     if (i < 0 || i >= _prescriptions.length) return;
     final row = _prescriptions.removeAt(i);
     notifyListeners();
-    _after(() => _remove('pp_prescriptions', row.id));
+    _after(() => _remove('pp_prescriptions', row.id, _presRow(row)));
   }
 
   // ---- allergies ----
@@ -983,7 +1179,7 @@ class HealthStore extends ChangeNotifier {
     if (i < 0 || i >= _allergies.length) return;
     final row = _allergies.removeAt(i);
     notifyListeners();
-    _after(() => _remove('pp_allergies', row.id));
+    _after(() => _remove('pp_allergies', row.id, _allergyRow(row)));
   }
 
   // ---- symptoms ----
@@ -1007,7 +1203,7 @@ class HealthStore extends ChangeNotifier {
     if (i < 0 || i >= _symptoms.length) return;
     final row = _symptoms.removeAt(i);
     notifyListeners();
-    _after(() => _remove('pp_symptoms', row.id));
+    _after(() => _remove('pp_symptoms', row.id, _symptomRow(row)));
   }
 
   // ---- reports (manual records; may carry image/PDF attachments) ----
@@ -1031,7 +1227,7 @@ class HealthStore extends ChangeNotifier {
     if (i < 0 || i >= _reports.length) return;
     final row = _reports.removeAt(i);
     notifyListeners();
-    _after(() => _remove('pp_reports', row.id));
+    _after(() => _remove('pp_reports', row.id, _reportRow(row)));
   }
 
   // ---- doctor visits (parent-added; the seeded ones stay in the timeline) ----
@@ -1053,7 +1249,7 @@ class HealthStore extends ChangeNotifier {
     if (i < 0 || i >= _visits.length) return;
     final row = _visits.removeAt(i);
     notifyListeners();
-    _after(() => _remove('pp_doctor_visits', row.id));
+    _after(() => _remove('pp_doctor_visits', row.id, _visitRow(row)));
   }
 
   // ---- emergency card (create / edit / delete) ----
@@ -1069,7 +1265,14 @@ class HealthStore extends ChangeNotifier {
     _emergency = e;
     notifyListeners();
     _persist();
-    _pushEmergency();
+    // _pushEmergency(); // kept for revert: fire-and-forget, lost offline
+    final child = _childId;
+    final card = _emergencyJson();
+    if (child != null && card != null) {
+      _ledgers['pp_emergency_cards']!
+          .touch(child, child, columns: {'card': card});
+      _pushTable('pp_emergency_cards');
+    }
   }
 
   // ---- the card in the cloud (0095, 2026-10-07) -------------------------------
@@ -1078,6 +1281,7 @@ class HealthStore extends ChangeNotifier {
   // card stays local, as it always was.
   static const _emergencyTable = 'pp_emergency_cards';
 
+  // ignore: unused_element
   void _pushEmergency() {
     final card = _emergencyJson();
     if (card == null) return;
@@ -1088,6 +1292,7 @@ class HealthStore extends ChangeNotifier {
 
   /// Cloud wins when it has a card (the other parent may have edited it);
   /// a card only this phone has goes up.
+  // ignore: unused_element
   Future<void> _mergeEmergency(String childId) async {
     final rows = await SupabaseRepo.fetchByChild(_emergencyTable, childId, orderBy: 'updated_at');
     if (rows.isNotEmpty && rows.first['card'] is Map) {
@@ -1097,10 +1302,18 @@ class HealthStore extends ChangeNotifier {
     }
   }
 
+  /// Clearing now reaches the other phone too (0104; the user, 2026-10-17).
+  /// Before, the cloud kept the card and the next pull brought it back.
   void clearEmergency() {
+    final card = _emergencyJson();
     _emergency = null;
     notifyListeners();
     _persist();
+    final child = _childId;
+    if (child != null && card != null) {
+      _ledgers['pp_emergency_cards']!.remove(child, {'card': card}, child);
+      _pushTable('pp_emergency_cards');
+    }
   }
 
   // The card is child-scoped in spirit, but it is a single small record rather
@@ -1146,4 +1359,42 @@ class HealthStore extends ChangeNotifier {
           : const <EmergencyContact>[],
     );
   }
+}
+
+/// Pure: an id for every question (0104). A question saved before ids
+/// (empty id) adopts a live cloud row with the same text that no other local
+/// question holds; otherwise it gets a new id, which [isNew] marks for upload.
+/// Two equal questions stay two: each claims a different cloud row, or a new
+/// id. Unit-tested in `test/pp_records_merge_test.dart`.
+List<({String id, bool isNew})> adoptQuestionIds(
+  List<String> texts,
+  List<String> ids,
+  List<Map<String, dynamic>> cloudRows,
+) {
+  final claimed = {...ids.where((i) => i.isNotEmpty)};
+  final out = <({String id, bool isNew})>[];
+  final stamp = DateTime.now().microsecondsSinceEpoch;
+  for (var i = 0; i < texts.length; i++) {
+    final have = i < ids.length ? ids[i] : '';
+    if (have.isNotEmpty) {
+      out.add((id: have, isNew: false));
+      continue;
+    }
+    String? match;
+    for (final r in cloudRows) {
+      final id = (r['id'] ?? '').toString();
+      if (id.isEmpty || claimed.contains(id) || r['removed_at'] != null) continue;
+      if ((r['question'] ?? '').toString() == texts[i]) {
+        match = id;
+        break;
+      }
+    }
+    if (match != null) {
+      claimed.add(match);
+      out.add((id: match, isNew: false));
+    } else {
+      out.add((id: 'q_${stamp}_$i', isNew: true));
+    }
+  }
+  return out;
 }

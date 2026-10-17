@@ -351,16 +351,19 @@ class VaxTrackerClassic extends StatelessWidget {
     final base = vaxVisitDate(v) ?? vaxDueDate();
     void set(int daysBefore, String label) {
       Navigator.of(context).pop();
-      VaxStore.instance.setReminder(v.id, true);
       NotificationService.instance.requestPermission();
-      NotificationService.instance.scheduleOneOff(
-        id: (v.id.hashCode & 0x7fffffff),
-        title: 'Vaccine reminder - ${lead.shortName}',
-        body: daysBefore == 0
-            ? "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due today."
-            : "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(v)}.",
-        when: base.subtract(Duration(days: daysBefore)),
-      );
+      // The store arms the alarm now, and the other parent's phone arms the
+      // same one after it syncs (2026-10-17, 0104). Kept for revert:
+      // NotificationService.instance.scheduleOneOff(
+      //   id: (v.id.hashCode & 0x7fffffff),
+      //   title: 'Vaccine reminder - ${lead.shortName}',
+      //   body: daysBefore == 0
+      //       ? "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due today."
+      //       : "${ChildProfileStore.instance.name}'s ${lead.shortName} (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(v)}.",
+      //   when: base.subtract(Duration(days: daysBefore)),
+      // );
+      VaxStore.instance.setReminder(v.id, true,
+          at: base.subtract(Duration(days: daysBefore)));
       pvToast(context, 'Alarm set - $label', kind: PvToastKind.done);
     }
 

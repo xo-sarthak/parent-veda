@@ -75,6 +75,8 @@ class BabyDocumentsStore extends ChangeNotifier {
   bool _loaded = false;
   static const _prefsKey = 'pp_documents';
   static const _table = 'pp_documents';
+  // Newer-wins bookkeeping beside the rows (0104, sync log step 6).
+  final ChildLogLedger _sync = ChildLogLedger(_table, 'pp_documents_sync');
 
   String? get _childId => ChildProfileStore.instance.activeChildId;
 
@@ -103,6 +105,8 @@ class BabyDocumentsStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
     try {
@@ -110,10 +114,19 @@ class BabyDocumentsStore extends ChangeNotifier {
     } catch (_) {/* stay local */}
   }
 
+  bool _hasPending() => _sync.hasPending;
+
+  /// Uploads whatever the cloud has not confirmed (0104).
+  Future<void> _pushWaiting() => _sync.push(
+        () => {for (final d in _docs) d.id: _toRow(d)},
+        fallbackChildId: _childId,
+      );
+
   /// A sign-out, or another account signing in (2026-10-17): this store
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _docs.clear();
+    _sync.clear();
     notifyListeners();
   }
 
@@ -123,12 +136,19 @@ class BabyDocumentsStore extends ChangeNotifier {
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {
-      final merged = await ChildSync.merge<BabyDocument>(
-        table: _table,
+      // The union merge, kept for revert: it could never carry a removal.
+      // final merged = await ChildSync.merge<BabyDocument>(
+      //   table: _table,
+      //   childId: childId,
+      //   local: _docs,
+      //   idOf: (d) => d.id,
+      //   toRow: _toRow,
+      //   fromRow: _fromRow,
+      // );
+      final merged = await _sync.pull<BabyDocument>(
         childId: childId,
         local: _docs,
         idOf: (d) => d.id,
-        toRow: _toRow,
         fromRow: _fromRow,
       );
       _docs
@@ -136,6 +156,7 @@ class BabyDocumentsStore extends ChangeNotifier {
         ..addAll(merged);
       await _persist();
       notifyListeners();
+      await _pushWaiting();
     } catch (_) {/* offline - keep local */}
   }
 
@@ -183,7 +204,9 @@ class BabyDocumentsStore extends ChangeNotifier {
     _docs.insert(0, d);
     notifyListeners();
     _persist();
-    ChildSync.push(_table, _childId, d.id, _toRow(d));
+    // ChildSync.push(_table, _childId, d.id, _toRow(d)); // kept for revert
+    _sync.touch(d.id, _childId);
+    _pushWaiting();
   }
 
   void updateDocument(int i, BabyDocument d) {
@@ -191,7 +214,9 @@ class BabyDocumentsStore extends ChangeNotifier {
     _docs[i] = d;
     notifyListeners();
     _persist();
-    ChildSync.push(_table, _childId, d.id, _toRow(d));
+    // ChildSync.push(_table, _childId, d.id, _toRow(d)); // kept for revert
+    _sync.touch(d.id, _childId);
+    _pushWaiting();
   }
 
   void removeDocument(int i) {
@@ -199,6 +224,10 @@ class BabyDocumentsStore extends ChangeNotifier {
     final row = _docs.removeAt(i);
     notifyListeners();
     _persist();
-    ChildSync.remove(_table, row.id);
+    // A hard delete fired once, lost offline; kept for revert. A removal is
+    // now a soft delete that uploads like any other change.
+    // ChildSync.remove(_table, row.id);
+    _sync.remove(row.id, _toRow(row), _childId);
+    _pushWaiting();
   }
 }

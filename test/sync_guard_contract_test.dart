@@ -30,18 +30,40 @@ void main() {
     for (final f in Directory('supabase/migrations').listSync()) {
       if (f is! File || !f.path.endsWith('.sql')) continue;
       final sql = f.readAsStringSync().replaceAll('\r\n', '\n');
-      if (!sql.contains('execute function public.pv_sync_newer_wins()')) {
-        continue;
-      }
-      final m = RegExp(r'foreach t in array array\[(.*?)\]', dotAll: true)
-          .firstMatch(sql);
-      if (m == null) throw StateError('${f.path} lists its tables in one array');
-      for (final q in RegExp(r"'([a-z_]+)'").allMatches(m.group(1)!)) {
-        out.add(q.group(1)!);
+      // One `do $$ ... end $$;` block per loop: only the block that creates
+      // the trigger counts (0104 also loops to add columns).
+      for (final block in sql.split(r'end $$;')) {
+        if (!block.contains('execute function public.pv_sync_newer_wins()')) {
+          continue;
+        }
+        final m = RegExp(r'foreach t in array array\[(.*?)\]', dotAll: true)
+            .firstMatch(block);
+        if (m == null) continue; // the commented check block in 0100
+        for (final q in RegExp(r"'([a-z_]+)'").allMatches(m.group(1)!)) {
+          out.add(q.group(1)!);
+        }
       }
     }
     return out;
   }();
+
+  test('the rest of the child record is guarded (0104)', () {
+    for (final t in [
+      'pp_documents',
+      'pp_medications',
+      'pp_prescriptions',
+      'pp_allergies',
+      'pp_symptoms',
+      'pp_reports',
+      'pp_doctor_visits',
+      'pp_doctor_questions',
+      'pp_milestone_observations',
+      'pp_emergency_cards',
+      'pp_vaccine_doses',
+    ]) {
+      expect(guarded, contains(t));
+    }
+  });
 
   test('the Parenting logs are guarded (0101)', () {
     for (final t in [
