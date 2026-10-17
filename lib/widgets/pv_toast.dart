@@ -202,7 +202,14 @@ class PvToast extends ChangeNotifier {
   void _update(int id, String text, PvToastKind kind, String? action,
       VoidCallback? onAction) {
     final c = _current;
-    if (c == null || c.id != id || _host == null) return;
+    // ⚠️ NOT `|| _host == null` (2026-10-17). Work that fails at once (a
+    // refused delete, an offline call) answers before the notice's host has
+    // mounted on the next frame, and the old guard dropped that answer: the
+    // "working" spinner then stayed on screen forever. The new words are kept
+    // in `_current`; a host that mounts later reads them in `initState` and
+    // arms its timer from them. Kept for revert:
+    //   if (c == null || c.id != id || _host == null) return;
+    if (c == null || c.id != id) return;
     // The same notice, new words: the id (and so the handle, and its
     // `closed`) carries over; the card cross-fades on its content.
     _current = PvToastData(
@@ -213,7 +220,7 @@ class PvToast extends ChangeNotifier {
         onAction: onAction,
         lift: c.lift);
     _feel(kind);
-    _host!._present();
+    _host?._present(); // a host not mounted yet reads it on mount
     notifyListeners();
   }
 

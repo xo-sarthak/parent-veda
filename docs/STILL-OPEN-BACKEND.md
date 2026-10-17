@@ -218,16 +218,17 @@ profile, emergency cards) may want per-field.
 The full suite run after `853650e` showed these. They are not from the sync work, and the user asked that they be
 left alone for now so two sessions don't clash:
 
-- `test/pv_delete_account_flow_test.dart`: "a refused delete ends on a plain message". `pumpAndSettle` times out
-  after the tap. It fails the same way with the pre-sync versions of `pv_account_actions.dart` and
-  `delete_account.dart`, so those files didn't cause it.
+- ~~`test/pv_delete_account_flow_test.dart`~~ **FIXED 2026-10-17.** The cause was in the shared toast, not
+  delete-account. `PvToast._update` dropped an update made before the notice's host had mounted, so work that failed
+  at once (a refused delete, an offline call) left the "working" spinner on screen forever. The update is now kept in
+  `_current` and the host reads it when it mounts (`lib/widgets/pv_toast.dart`).
 - `test/ttc_no_repetition_test.dart`: four "her home" cases. The home's "New to trying?" rail and a reading row open
   the same read ("The three months before").
 - `test/ttc_reader_test.dart`: "save is reachable and sticks". The save icon is found twice.
 - `test/ttc_shell_test.dart`: `ttc_more_tab.dart` imports `../post_pregnancy/yoga_home_screen.dart` (the yoga
   commit `187919a`).
-- `test/tap_feedback_guard_test.dart`: `lib/screens/post_pregnancy/yoga_home_screen.dart` has one tap without
-  `PvPress` (the same commit).
+- ~~`test/tap_feedback_guard_test.dart`~~ **FIXED 2026-10-17.** The yoga screen's "Clear all" is wrapped in
+  `PvPress`.
 
 ---
 

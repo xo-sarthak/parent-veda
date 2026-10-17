@@ -611,16 +611,19 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
                 onTap: () => setState(() => _modes.remove(m)),
               ),
             if (_modes.isNotEmpty)
-              GestureDetector(
-                key: const ValueKey('move_clear_all'),
-                onTap: () => setState(_modes.clear),
-                child: Text(
-                  'Clear all',
-                  style: pvManrope(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: p.ink1,
-                    decoration: TextDecoration.underline,
+              // Settles under the finger like every other tap (2026-10-17).
+              PvPress(
+                child: GestureDetector(
+                  key: const ValueKey('move_clear_all'),
+                  onTap: () => setState(_modes.clear),
+                  child: Text(
+                    'Clear all',
+                    style: pvManrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink1,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),
