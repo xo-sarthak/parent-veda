@@ -101,6 +101,10 @@ const Map<String, int> kTapFeedbackAllowed = {
   'lib/screens/symptoms/door/symptoms_widgets.dart': 1,
   'lib/screens/tools/garbh_games.dart': 1,
   'lib/screens/ttc/ttc_appointments_screen.dart': 9,
+  // Swipe-only, no tap (2026-10-17): the month steps by a sideways drag.
+  'lib/screens/ttc/ttc_calendar_screen.dart': 1,
+  // Swipe-only, no tap (2026-10-17): the week strip steps by a drag.
+  'lib/screens/ttc/ttc_cycle_hub.dart': 1,
   'lib/screens/ttc/ttc_cycle_companion.dart': 3,
   'lib/screens/ttc/ttc_cycle_report_v3.dart': 1,
   'lib/screens/ttc/ttc_cycle_screens.dart': 3,

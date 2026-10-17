@@ -132,10 +132,13 @@ void main() {
       final src = File('lib/ttc/cycle_store.dart')
           .readAsStringSync()
           .replaceAll('\r\n', '\n');
-      expect(src, contains("_clearSignal(s, 'lh')"));
-      expect(src, contains("_clearSignal(s, 'temperature')"));
-      expect(src, contains('SupabaseRepo.delete(TtcTables.signals'));
-      expect(src, contains("if (_clearedSignals.contains('\$kind|"));
+      // Since the sync rework the same day (0097): a clear is a soft-deleted
+      // row that uploads, and the pull is newer-wins, so it holds on every
+      // phone. Kept for revert: the `_clearSignal` / `_clearedSignals` checks.
+      expect(src, contains("_tomb(_sRow('lh', s))"));
+      expect(src, contains("_tomb(_sRow('temperature', s))"));
+      expect(src, contains("'removed_at': removed == null ? null"));
+      expect(src, contains('ttcMergePlan(local: local, cloud: cloudStamp)'));
     });
 
     test('the daily logger calls the same rule', () {

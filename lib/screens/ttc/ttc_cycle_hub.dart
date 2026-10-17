@@ -39,6 +39,7 @@ import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
 import 'ttc_calendar_screen.dart' show ttcFactsFor, TtcEstimateStripes;
+import '../../widgets/pv_feedback.dart' show PvPress;
 import 'ttc_common.dart';
 import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_headline.dart' show ttcCycleHeadline;
@@ -262,7 +263,7 @@ class TtcHubWeekStrip extends StatelessWidget {
                     color: ttcTitleInk)),
           ),
           if (!_same(_dayOnly(selected), today))
-            GestureDetector(
+            PvPress(child: GestureDetector(
               key: const ValueKey('ttc_hub_week_today'),
               onTap: () => onPick(today),
               child: Container(
@@ -276,7 +277,7 @@ class TtcHubWeekStrip extends StatelessWidget {
                     style: ttcBody(12,
                         color: ttcTitleInk, w: FontWeight.w800)),
               ),
-            ),
+            )),
         ]),
         const SizedBox(height: 12),
         Row(children: [
@@ -369,7 +370,7 @@ class _WeekDay extends StatelessWidget {
       button: true,
       selected: selected,
       label: '${_d(day.date)}${isToday ? ', today' : ''}',
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -406,7 +407,7 @@ class _WeekDay extends StatelessWidget {
           const SizedBox(height: 5),
           _Dots(day: day),
         ]),
-      ),
+      )),
     );
   }
 }
@@ -924,13 +925,13 @@ class _SourceLine extends StatelessWidget {
                 WidgetSpan(
                   alignment: PlaceholderAlignment.baseline,
                   baseline: TextBaseline.alphabetic,
-                  child: GestureDetector(
+                  child: PvPress(child: GestureDetector(
                     key: const ValueKey('ttc_hub_source_change'),
                     onTap: () => openTtcOvulationTests(context),
                     child: Text(' · Change',
                         style: ttcBody(12.5,
                             color: ttcTitleInk, w: FontWeight.w800)),
-                  ),
+                  )),
                 ),
             ]),
             style: ttcBody(12.5, h: 1.45),
@@ -1229,7 +1230,7 @@ class _MonthCell extends StatelessWidget {
 
     return Opacity(
       opacity: inMonth ? 1 : 0.35,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         key: ValueKey('ttc_hub_day_${TtcLogStore.dayKey(day.date)}'),
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -1292,7 +1293,7 @@ class _MonthCell extends StatelessWidget {
               _Dots(day: day),
           ]),
         ),
-      ),
+      )),
     );
   }
 }
