@@ -50,12 +50,18 @@ import '../../services/tools_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/journal/journal_create.dart'
     show editJournalEntry, openJournalRecordVoice;
+import '../../widgets/journal/journal_keepsake.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../widgets/storage_image.dart';
 import '../journal_compose_screen.dart' show openJournalCompose;
 import '../journal_screen.dart' show JournalScreenClassic;
 import '../v2/v2_palette.dart';
-import '../v2/v3_tip_art.dart' show V3TipArt;
+
+// The keepsake's shared pieces live in journal_keepsake.dart since 2026-10-17,
+// so the parenting journal draws the same book. Re-exported for the callers
+// that always found them here.
+export '../../widgets/journal/journal_keepsake.dart'
+    show kJournalPaper, journalHeroTag;
 
 /// The one line the journal exists to keep. Also the home section's title.
 const String kJournalPromise =
@@ -65,7 +71,9 @@ const _months = [
   'January', 'February', 'March', 'April', 'May', 'June', 'July', //
   'August', 'September', 'October', 'November', 'December',
 ];
-const _days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+// The date block's day names are kJournalDays (journal_keepsake.dart) since
+// 2026-10-17. Kept for revert:
+// const _days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
 String _shortMonth(int m) => _months[m - 1].substring(0, 3);
 
@@ -180,14 +188,8 @@ const Map<JournalFilter, String> _filterLabels = {
 //  question turns in. All of it is under a second and none of it repeats.
 // =============================================================================
 
-/// The journal's paper. ⚠️ THE ONE PAGE THAT IS NOT WHITE, ON PURPOSE: a
-/// keepsake is paper (5 Minute Journal, the storybook journal's `jvPaper`), and
-/// the white cards on it read as pages laid on a table. One constant — white
-/// again is one edit.
-const Color kJournalPaper = Color(0xFFFAF7F2);
-
-/// The painting's warm accent — the tip card's sun.
-const Color _warm = Color(0xFFC9831F);
+// kJournalPaper and the warm accent moved to journal_keepsake.dart
+// (2026-10-17), with the cover, the dots, the question card and the rows.
 
 class JournalScreen extends StatefulWidget {
   const JournalScreen({super.key, required this.controller});
@@ -613,22 +615,11 @@ class _Rise extends StatelessWidget {
   final int index;
   final Widget child;
 
+  // The stagger itself is JournalRise (journal_keepsake.dart), shared with
+  // the parenting journal since 2026-10-17.
   @override
-  Widget build(BuildContext context) {
-    final start = (0.35 + 0.08 * index.clamp(0, 6)).clamp(0.0, 0.85);
-    final a = CurvedAnimation(
-        parent: open,
-        curve: Interval(start, (start + 0.4).clamp(0.0, 1.0),
-            curve: Curves.easeOutCubic));
-    return AnimatedBuilder(
-      animation: a,
-      builder: (_, c) => Opacity(
-        opacity: a.value,
-        child: Transform.translate(offset: Offset(0, 18 * (1 - a.value)), child: c),
-      ),
-      child: child,
-    );
-  }
+  Widget build(BuildContext context) =>
+      JournalRise(open: open, index: index, child: child);
 }
 
 // =============================================================================
@@ -650,86 +641,23 @@ class _Cover extends StatelessWidget {
   final String? name;
   final int week;
 
+  // A painting for the trimester when she has no photograph: the user's own
+  // artwork once it is in the table (`journal_cover_t1..3`), the drawn sky
+  // until then. Drawn by the shared JournalCover since 2026-10-17.
   @override
   Widget build(BuildContext context) {
-    // A painting for the trimester when she has no photograph: the user's own
-    // artwork once it is in the table (`journal_cover_t1..3`), the drawn sky
-    // until then.
-    final painted = readImageFor('journal_cover_t$trimester');
-    final dark = photo != null || painted != null;
-    final ink = dark ? Colors.white : pal.ink1;
-    final soft = dark ? Colors.white.withValues(alpha: 0.82) : pal.ink2;
     final who = (name ?? '').trim();
-
-    return Stack(fit: StackFit.expand, children: [
-      if (photo != null)
-        StorageImage(photo!, fit: BoxFit.cover)
-      else if (painted != null)
-        Image.network(painted,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => V3TipArt(
-                variant: trimester + 2, ink: pal.ink1, accent: _warm))
-      else
-        V3TipArt(variant: trimester + 2, ink: pal.ink1, accent: _warm),
-      if (dark)
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0, 0.3, 0.55, 1],
-              colors: [
-                Color(0x59000000),
-                Color(0x00000000),
-                Color(0x14000000),
-                Color(0xB3000000),
-              ],
-            ),
-          ),
-        )
-      else
-        // The painting fades into the paper, so the page continues from it.
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0.55, 1],
-              colors: [Color(0x00FAF7F2), kJournalPaper],
-            ),
-          ),
-        ),
-      Positioned(
-        left: 22,
-        right: 22,
-        bottom: 26,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('MY JOURNAL  ·  WEEK $week',
-                style: pvManrope(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.4,
-                    color: soft)),
-            const SizedBox(height: 8),
-            Text('Dear little one,',
-                style: pvFraunces(
-                    fontSize: 40,
-                    height: 1.05,
-                    fontStyle: FontStyle.italic,
-                    letterSpacing: -0.6,
-                    color: ink)),
-            const SizedBox(height: 10),
-            Text(
-                who.isEmpty
-                    ? 'Everything I kept for you while I waited.'
-                    : 'Everything I kept for you while I waited.  — $who',
-                style: pvManrope(fontSize: 15, height: 1.4, color: soft)),
-          ],
-        ),
-      ),
-    ]);
+    return JournalCover(
+      pal: pal,
+      photo: photo,
+      painting: readImageFor('journal_cover_t$trimester'),
+      artVariant: trimester + 2,
+      eyebrow: 'MY JOURNAL  ·  WEEK $week',
+      salutation: 'Dear little one,',
+      signoff: who.isEmpty
+          ? 'Everything I kept for you while I waited.'
+          : 'Everything I kept for you while I waited.  — $who',
+    );
   }
 }
 
@@ -750,115 +678,25 @@ class _FortyWeeks extends StatelessWidget {
   final Set<int> kept;
   final Animation<double> open;
 
+  // Two rows of twenty, drawn by the shared JournalDotStrip since 2026-10-17;
+  // the parenting journal draws a child's twelve months with it.
   @override
   Widget build(BuildContext context) {
     final left = (40 - current).clamp(0, 40);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text('Week $current',
-                  style: pvFraunces(fontSize: 22, color: pal.ink1)),
-              Text(' of 40',
-                  style: pvFraunces(fontSize: 22, color: pal.ink3)),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                    left == 0
-                        ? 'Any day now'
-                        : (left == 1
-                            ? 'A week until you meet'
-                            : '$left weeks until you meet'),
-                    textAlign: TextAlign.right,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: pvManrope(fontSize: 13, color: pal.ink2)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          // Two rows of twenty. Each dot pops in on its own beat as the page
-          // opens — the first 40% of the opening clock.
-          LayoutBuilder(builder: (context, box) {
-            final gap = (box.maxWidth - 20 * 11) / 19;
-            return Column(children: [
-              for (var row = 0; row < 2; row++) ...[
-                if (row == 1) const SizedBox(height: 10),
-                Row(children: [
-                  for (var i = 0; i < 20; i++) ...[
-                    if (i > 0) SizedBox(width: gap),
-                    _dot(row * 20 + i + 1),
-                  ],
-                ]),
-              ],
-            ]);
-          }),
-          const SizedBox(height: 12),
-          Wrap(spacing: 14, runSpacing: 6, children: [
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              _key(pal.ink1, filled: true),
-              const SizedBox(width: 6),
-              Text('A week you kept something in',
-                  style: pvManrope(fontSize: 11.5, color: pal.ink3)),
-            ]),
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              _key(pal.action, filled: false),
-              const SizedBox(width: 6),
-              Text('This week',
-                  style: pvManrope(fontSize: 11.5, color: pal.ink3)),
-            ]),
-          ]),
-        ],
-      ),
-    );
-  }
-
-  Widget _key(Color c, {required bool filled}) => Container(
-        width: 9,
-        height: 9,
-        decoration: BoxDecoration(
-          color: filled ? c : null,
-          shape: BoxShape.circle,
-          border: filled ? null : Border.all(color: c, width: 1.6),
-        ),
-      );
-
-  Widget _dot(int w) {
-    final isNow = w == current;
-    // A week not yet reached cannot hold something she kept — a dot there
-    // would read as a mistake (it was one: test data dated ahead of her).
-    final has = w <= current && kept.contains(w);
-    final past = w < current;
-    final t = (w - 1) / 40 * 0.4;
-    final a = CurvedAnimation(
-        parent: open,
-        curve: Interval(t, (t + 0.18).clamp(0.0, 1.0), curve: Curves.easeOutBack));
-    final Color fill = has
-        ? pal.ink1
-        : (past ? pal.ink3.withValues(alpha: 0.28) : Colors.transparent);
-    return AnimatedBuilder(
-      animation: a,
-      builder: (_, _) => Transform.scale(
-        scale: a.value.clamp(0.0, 1.2),
-        child: Container(
-          width: 11,
-          height: 11,
-          decoration: BoxDecoration(
-            color: isNow && !has ? null : fill,
-            shape: BoxShape.circle,
-            border: isNow
-                ? Border.all(color: pal.action, width: 2)
-                : (past || has
-                    ? null
-                    : Border.all(color: pal.ink3.withValues(alpha: 0.35))),
-          ),
-        ),
-      ),
+    return JournalDotStrip(
+      pal: pal,
+      count: 40,
+      perRow: 20,
+      current: current,
+      kept: kept,
+      open: open,
+      headline: 'Week $current',
+      headlineMuted: ' of 40',
+      right: left == 0
+          ? 'Any day now'
+          : (left == 1 ? 'A week until you meet' : '$left weeks until you meet'),
+      keptLegend: 'A week you kept something in',
+      nowLegend: 'This week',
     );
   }
 }
@@ -884,146 +722,26 @@ class _QuestionCard extends StatelessWidget {
   final VoidCallback onSay;
   final VoidCallback onAnother;
 
+  // The card is the shared JournalQuestionCard since 2026-10-17.
   @override
   Widget build(BuildContext context) {
     final q = journalPromptFor(week, skip: skip);
     final size = pregSizeOrFallback(week, PregSizeSetStore.instance.set, ''); // doc fruit first (2026-10-13); was pregSizeFor
     final tri = week <= 13 ? 1 : (week <= 27 ? 2 : 3);
-    final art = readImageFor('journal_question_t$tri');
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: pal.surface,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: const [
-            BoxShadow(
-                color: Color(0x14000000), blurRadius: 24, offset: Offset(0, 8)),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 132,
-              width: double.infinity,
-              child: art != null
-                  ? Image.network(art,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => V3TipArt(
-                          variant: week, ink: pal.ink1, accent: _warm))
-                  : V3TipArt(variant: week, ink: pal.ink1, accent: _warm),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    Expanded(
-                      child: Text("THIS WEEK'S QUESTION",
-                          style: pvManrope(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                              color: pal.action)),
-                    ),
-                    if (journalPromptCount(week) > 1)
-                      SizedBox(
-                        width: 36,
-                        height: 36,
-                        child: IconButton(
-                          tooltip: 'Another question',
-                          padding: EdgeInsets.zero,
-                          onPressed: onAnother,
-                          icon: AnimatedRotation(
-                            turns: skip * 0.5,
-                            duration: const Duration(milliseconds: 380),
-                            curve: Curves.easeOutCubic,
-                            child: Icon(Icons.refresh_rounded,
-                                size: 20, color: pal.ink2),
-                          ),
-                        ),
-                      ),
-                  ]),
-                  const SizedBox(height: 6),
-                  // Another question turns in: the old one slides up and out,
-                  // the new one rises into its place.
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 380),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    transitionBuilder: (child, a) => FadeTransition(
-                      opacity: a,
-                      child: SlideTransition(
-                        position: Tween(
-                                begin: const Offset(0, 0.25), end: Offset.zero)
-                            .animate(a),
-                        child: child,
-                      ),
-                    ),
-                    layoutBuilder: (current, previous) => Stack(
-                      alignment: Alignment.topLeft,
-                      children: [...previous, ?current],
-                    ),
-                    child: Text(q,
-                        key: ValueKey(q),
-                        style: pvFraunces(
-                            fontSize: 23,
-                            height: 1.3,
-                            letterSpacing: -0.2,
-                            color: pal.ink1)),
-                  ),
-                  if (size != null) ...[
-                    const SizedBox(height: 10),
-                    Text(
-                        'Your baby is ${size.line.replaceFirst('About', 'about')} this week.',
-                        style: pvManrope(
-                            fontSize: 13.5,
-                            height: 1.4,
-                            fontStyle: FontStyle.italic,
-                            color: pal.ink2)),
-                  ],
-                  const SizedBox(height: 18),
-                  Wrap(spacing: 8, runSpacing: 8, children: [
-                    FilledButton(
-                      onPressed: () {
-                        pvCommitFeedback();
-                        onWrite(q);
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: pal.ink1,
-                        foregroundColor: pal.surface,
-                        minimumSize: const Size(0, 44),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        shape: const StadiumBorder(),
-                        textStyle: pvManrope(
-                            fontSize: 14.5, fontWeight: FontWeight.w700),
-                      ),
-                      child: const Text('Write it'),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: onSay,
-                      icon: const Icon(Icons.mic_none_rounded, size: 18),
-                      label: const Text('Say it'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: pal.ink1,
-                        side: BorderSide(color: pal.line),
-                        minimumSize: const Size(0, 44),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        shape: const StadiumBorder(),
-                        textStyle: pvManrope(
-                            fontSize: 14.5, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ]),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return JournalQuestionCard(
+      pal: pal,
+      eyebrow: "THIS WEEK'S QUESTION",
+      question: q,
+      art: readImageFor('journal_question_t$tri'),
+      artVariant: week,
+      canTurn: journalPromptCount(week) > 1,
+      skip: skip,
+      sub: size == null
+          ? null
+          : 'Your baby is ${size.line.replaceFirst('About', 'about')} this week.',
+      onWrite: onWrite,
+      onSay: onSay,
+      onAnother: onAnother,
     );
   }
 }
@@ -1139,92 +857,20 @@ class _WeekSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (photo != null)
-            // stoic.'s week card: the week IS its photograph.
-            ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: AspectRatio(
-                aspectRatio: 16 / 11,
-                child: Stack(fit: StackFit.expand, children: [
-                  StorageImage(photo!, fit: BoxFit.cover),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        stops: [0.45, 1],
-                        colors: [Color(0x00000000), Color(0xA6000000)],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 18,
-                    right: 18,
-                    bottom: 16,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            _range(range.start, range.end).toUpperCase() +
-                                (current ? '  ·  THIS WEEK' : ''),
-                            style: pvManrope(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.1,
-                                color: Colors.white.withValues(alpha: 0.85))),
-                        const SizedBox(height: 4),
-                        Text('Week $week',
-                            style: pvFraunces(
-                                fontSize: 32, height: 1.1, color: Colors.white)),
-                        if (_summary.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(_summary,
-                              style: pvManrope(
-                                  fontSize: 13,
-                                  color: Colors.white.withValues(alpha: 0.9))),
-                        ],
-                      ],
-                    ),
-                  ),
-                ]),
-              ),
-            )
-          else ...[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text('Week $week',
-                    style: pvFraunces(
-                        fontSize: 28, letterSpacing: -0.3, color: pal.ink1)),
-                const SizedBox(width: 10),
-                if (current)
-                  Text('THIS WEEK',
-                      style: pvManrope(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.1,
-                          color: pal.action)),
-                // The range gives way first — the week number never does.
-                Expanded(
-                  child: Text(_range(range.start, range.end),
-                      textAlign: TextAlign.right,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(fontSize: 12.5, color: pal.ink3)),
-                ),
-              ],
-            ),
-            if (size != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Text(size.line.replaceFirst('About', 'Baby, about'),
-                    style: pvFraunces(
-                        fontSize: 14.5,
-                        fontStyle: FontStyle.italic,
-                        color: pal.ink3)),
-              ),
-          ],
+          // stoic.'s week card when the week has a photo, the plain heading
+          // otherwise: the shared JournalSectionHead since 2026-10-17.
+          JournalSectionHead(
+            pal: pal,
+            title: 'Week $week',
+            current: current,
+            currentLabel: 'THIS WEEK',
+            range: _range(range.start, range.end),
+            photoEyebrow: _range(range.start, range.end).toUpperCase() +
+                (current ? '  ·  THIS WEEK' : ''),
+            summary: _summary,
+            photo: photo,
+            subtitle: size?.line.replaceFirst('About', 'Baby, about'),
+          ),
           const SizedBox(height: 4),
           if (entries.isEmpty)
             // ⚠️ A FEATURE IS NEVER HIDDEN. Her week with nothing in it asks,
@@ -1295,145 +941,53 @@ class JournalEntryRow extends StatelessWidget {
       if (e.isPartner) 'FROM YOUR PARTNER',
     ].join(' · ');
 
-    return PvPress(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // The date block — 5 Minute Journal's.
-              SizedBox(
-                width: 44,
-                child: Column(children: [
-                  Text(_days[d.weekday - 1],
-                      style: pvManrope(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                          color: pal.ink3)),
-                  Text('${d.day}',
-                      style: pvFraunces(
-                          fontSize: 24, height: 1.15, color: pal.ink1)),
-                ]),
+    // The row itself is the shared JournalPageRow since 2026-10-17; what is
+    // pregnancy's own (voice notes, a place) rides in as extras.
+    return JournalPageRow(
+      pal: pal,
+      date: d,
+      eyebrow: eyebrow,
+      title: title,
+      body: body,
+      photos: e.images,
+      heroId: e.id,
+      quiet: quiet,
+      empty: empty,
+      onTap: onTap,
+      extras: [
+        if (e.audios.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          for (var i = 0; i < e.audios.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: JournalVoiceChip(
+                pal: pal,
+                ref: e.audios[i],
+                label: e.audios.length == 1 ? 'Voice note' : 'Voice note ${i + 1}',
+                player: voice,
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(eyebrow,
-                        style: pvManrope(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.9,
-                            color: pal.ink3)),
-                    const SizedBox(height: 5),
-                    if (empty)
-                      Text('A page with nothing on it yet — tap to add words '
-                          'or a photo.',
-                          style: pvManrope(
-                              fontSize: 14,
-                              height: 1.45,
-                              fontStyle: FontStyle.italic,
-                              color: pal.ink3)),
-                    if (title.isNotEmpty)
-                      Text(title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvFraunces(
-                              fontSize: quiet ? 16.5 : 18.5,
-                              height: 1.3,
-                              color: pal.ink1)),
-                    if (body.isNotEmpty) ...[
-                      if (title.isNotEmpty) const SizedBox(height: 4),
-                      Text(body,
-                          maxLines: quiet ? 2 : 4,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(
-                              fontSize: 14, height: 1.5, color: pal.ink2)),
-                    ],
-                    if (e.images.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      _Photos(paths: e.images, heroId: e.id),
-                    ],
-                    if (e.audios.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      for (var i = 0; i < e.audios.length; i++)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: JournalVoiceChip(
-                            pal: pal,
-                            ref: e.audios[i],
-                            label: e.audios.length == 1
-                                ? 'Voice note'
-                                : 'Voice note ${i + 1}',
-                            player: voice,
-                          ),
-                        ),
-                    ],
-                    if ((e.place ?? '').trim().isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Row(children: [
-                        Icon(Icons.place_outlined, size: 14, color: pal.ink3),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(e.place!.trim(),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: pvManrope(fontSize: 12.5, color: pal.ink3)),
-                        ),
-                      ]),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
+        ],
+        if ((e.place ?? '').trim().isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            Icon(Icons.place_outlined, size: 14, color: pal.ink3),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(e.place!.trim(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 12.5, color: pal.ink3)),
+            ),
+          ]),
+        ],
+      ],
     );
   }
 }
 
-/// The Hero tag a single-photo entry's picture flies under, from its row to
-/// its page.
-String journalHeroTag(String entryId) => 'journal_photo_$entryId';
-
-/// One photo wide; two or three as a row of squares.
-class _Photos extends StatelessWidget {
-  const _Photos({required this.paths, required this.heroId});
-  final List<String> paths;
-  final String heroId;
-
-  @override
-  Widget build(BuildContext context) {
-    if (paths.length == 1) {
-      return AspectRatio(
-        aspectRatio: 4 / 3,
-        // The photo travels into the entry page (`journalHeroTag`).
-        child: Hero(
-          tag: journalHeroTag(heroId),
-          child: StorageImage(paths.first,
-              fit: BoxFit.cover, borderRadius: BorderRadius.circular(14)),
-        ),
-      );
-    }
-    return Row(children: [
-      for (var i = 0; i < paths.length && i < 3; i++) ...[
-        if (i > 0) const SizedBox(width: 6),
-        Expanded(
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: StorageImage(paths[i],
-                fit: BoxFit.cover, borderRadius: BorderRadius.circular(12)),
-          ),
-        ),
-      ],
-    ]);
-  }
-}
+// journalHeroTag and the photo strip (`_Photos`) moved to journal_keepsake.dart
+// as journalHeroTag and JournalPhotos (2026-10-17).
 
 class _PhotoGrid extends StatelessWidget {
   const _PhotoGrid(

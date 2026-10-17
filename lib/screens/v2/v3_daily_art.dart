@@ -28,7 +28,9 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-enum V3DailyMark { memory, note, photo, voice, capsule }
+// `first` and `letter` added 2026-10-17 for the parenting journal tiles, which
+// now share the pregnancy home's card (V3JournalSection).
+enum V3DailyMark { memory, note, photo, voice, capsule, first, letter }
 
 /// A mark in a tinted well. [tint] is the well's pastel; everything else is
 /// derived from it.
@@ -164,6 +166,43 @@ class _DailyPainter extends CustomPainter {
                 center: Offset.zero, width: 34 * s, height: 3.5 * s),
             cut);
         canvas.restore();
+
+      // A five-point star: "a first". Filled, no knock-out, so it holds at 30px.
+      case V3DailyMark.first:
+        final star = Path();
+        for (var i = 0; i < 10; i++) {
+          final r = (i.isEven ? 34.0 : 15.0) * s;
+          final a = -math.pi / 2 + i * math.pi / 5;
+          final pt = Offset(50 * s + r * math.cos(a), 52 * s + r * math.sin(a));
+          if (i == 0) {
+            star.moveTo(pt.dx, pt.dy);
+          } else {
+            star.lineTo(pt.dx, pt.dy);
+          }
+        }
+        star.close();
+        canvas.drawPath(star, obj);
+
+      // An envelope with its flap knocked out as a white V: "a letter".
+      case V3DailyMark.letter:
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+              Rect.fromLTWH(18 * s, 28 * s, 64 * s, 46 * s),
+              Radius.circular(7 * s)),
+          obj,
+        );
+        canvas.drawPath(
+          Path()
+            ..moveTo(24 * s, 34 * s)
+            ..lineTo(50 * s, 54 * s)
+            ..lineTo(76 * s, 34 * s),
+          Paint()
+            ..color = cut.color
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 5 * s
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round,
+        );
     }
 
     canvas.restore();

@@ -838,23 +838,70 @@ class _PpHomeV3State extends State<PpHomeV3> {
                     title: 'Record a memory for your child today',
                     p: p)),
                 const SizedBox(height: 14),
-                _pad(_JournalInvite(
+                // ONE CARD, BOTH STAGES (2026-10-17). The user: the two
+                // journals "look as separate things". Pregnancy kept the
+                // shared V3JournalSection; this home now uses it too, with
+                // its own four ways in. Each tile opens the page it always
+                // reached, by name. The private _JournalInvite (photo square,
+                // prompt line, four text chips) is kept for revert below.
+                _pad(V3JournalSection(
+                  key: const ValueKey('pp_home_journal'),
                   p: p,
-                  onPhoto: () => _openCapture(context, 'A photo from today'),
-                  onMilestone: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                          settings:
-                              const RouteSettings(name: 'pp/journal/guided'),
-                          builder: (_) => const GuidedMemoryScreen())),
-                  onThought: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                          settings:
-                              const RouteSettings(name: 'pp/journal/write'),
-                          builder: (_) => const WriteStoryScreen())),
-                  onMoment: () =>
-                      _openCapture(context, 'A moment from today'),
+                  actions: [
+                    V3QuickAction(
+                        icon: Icons.edit_note_rounded,
+                        mark: V3DailyMark.memory,
+                        hue: 42,
+                        label: 'Add a\nmemory',
+                        onTap: () => showAddMemorySheet(context)),
+                    V3QuickAction(
+                        icon: Icons.star_outline_rounded,
+                        mark: V3DailyMark.first,
+                        hue: 18,
+                        label: 'A\nfirst',
+                        onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                                settings: const RouteSettings(
+                                    name: 'pp/journal/guided'),
+                                builder: (_) => const GuidedMemoryScreen()))),
+                    V3QuickAction(
+                        icon: Icons.photo_camera_outlined,
+                        mark: V3DailyMark.photo,
+                        hue: 206,
+                        label: 'Add a\nphoto',
+                        onTap: () =>
+                            _openCapture(context, 'A photo from today')),
+                    V3QuickAction(
+                        icon: Icons.mail_outline_rounded,
+                        mark: V3DailyMark.letter,
+                        hue: 330,
+                        label: 'Write a\nletter',
+                        onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                                settings: const RouteSettings(
+                                    name: 'pp/journal/letter'),
+                                builder: (_) => const LetterScreen()))),
+                  ],
                   onOpenAll: () => _openJournal(context),
                 )),
+                // Kept for revert (2026-10-17): the parenting-only card.
+                // _pad(_JournalInvite(
+                //   p: p,
+                //   onPhoto: () => _openCapture(context, 'A photo from today'),
+                //   onMilestone: () => Navigator.of(context).push(
+                //       MaterialPageRoute<void>(
+                //           settings:
+                //               const RouteSettings(name: 'pp/journal/guided'),
+                //           builder: (_) => const GuidedMemoryScreen())),
+                //   onThought: () => Navigator.of(context).push(
+                //       MaterialPageRoute<void>(
+                //           settings:
+                //               const RouteSettings(name: 'pp/journal/write'),
+                //           builder: (_) => const WriteStoryScreen())),
+                //   onMoment: () =>
+                //       _openCapture(context, 'A moment from today'),
+                //   onOpenAll: () => _openJournal(context),
+                // )),
                 const SizedBox(height: 32),
 
                 // ---- QUESTIONS FOR THIS PHASE -------------------------------
@@ -3776,6 +3823,8 @@ class _ReadRail extends StatelessWidget {
 
 /// "Record a memory for your child today": a photo square on the left, a
 /// prompt and four entry chips on the right, "Open the journal ›" under it.
+// Kept for revert (2026-10-17): the home now uses the shared V3JournalSection.
+// ignore: unused_element
 class _JournalInvite extends StatelessWidget {
   const _JournalInvite({
     required this.p,

@@ -17,7 +17,9 @@ import '../../pregnancy/preg_tool_chrome.dart';
 import '../../products/pv_store_chrome.dart' show PvChip, PvCommit, pvStorePalette;
 import '../../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
-import '../../v2/v2_palette.dart' show V2Palette, v2BlockTint;
+import '../../v2/v2_palette.dart' show V2Palette, V2PaletteStore, v2BlockTint;
+import '../../v2/v3_daily_art.dart' show V3DailyArt, V3DailyMark;
+import '../../../widgets/journal/journal_keepsake.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
 import 'jv2_store.dart';
@@ -45,6 +47,12 @@ import '../../../widgets/pv_toast.dart';
 //  Only the chrome changed. Every save still goes through `_save` ->
 //  PpJournalStore.instance.add with the same kind, title, body and photo.
 //  Each old build is kept for revert beside its replacement.
+//
+//  ON THE JOURNAL'S PAPER (2026-10-17). The journal itself became the
+//  pregnancy journal's keepsake (journal_keepsake.dart), so the pages it opens
+//  moved onto the same paper: JournalPaperScaffold, the add sheet as drawn
+//  tinted wells (the home card's marks). The tool-shell builds above each new
+//  one are kept for revert as `_buildToolShell`. Saves are unchanged.
 // =============================================================================
 
 /// The journal's field colour: the rose of pregnancy's Keep group (Memories,
@@ -71,8 +79,84 @@ Widget _writingCard(V2Palette p, Widget child, {Key? key}) => Container(
 Widget _journalMark(TtcTabMark m, {double size = 40}) =>
     TtcMarkLeading(tab: m, tint: v2BlockTint(kPpJournalHue, pvStorePalette), size: size);
 
-// ---- add-memory bottom sheet (the one look) ----------------------------------
+// ---- add-memory bottom sheet, on the journal's paper (2026-10-17) ------------
+//  The same four ways in, as the home card draws them: a drawn mark in a
+//  tinted well. Each opens its page by name, so the rest of the app can tell
+//  which page of the journal is on screen.
 void showAddMemorySheet(BuildContext context) {
+  void go(Widget s, String route) {
+    Navigator.of(context).pop();
+    Navigator.of(context).push(MaterialPageRoute<void>(settings: RouteSettings(name: route), builder: (_) => s));
+  }
+
+  final p = V2PaletteStore.instance.current;
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: kJournalPaper,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: p.line, borderRadius: BorderRadius.circular(999)))),
+          const SizedBox(height: 18),
+          Text('ADD TO THE JOURNAL',
+              style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.action)),
+          const SizedBox(height: 6),
+          Text("Add to $jvChild's story", style: pvFraunces(fontSize: 26, height: 1.2, letterSpacing: -0.3, color: p.ink1)),
+          const SizedBox(height: 10),
+          _paperAddRow(p, const ValueKey('jv_add_guided'), V3DailyMark.first, 18, 'A first',
+              'A milestone, with a question to help', () => go(const GuidedMemoryScreen(), 'pp/journal/guided')),
+          _paperAddRow(p, const ValueKey('jv_add_quick'), V3DailyMark.photo, 200, 'Quick capture',
+              'A photo and a line or two', () => go(const QuickCaptureScreen(), 'pp/journal/capture')),
+          _paperAddRow(p, const ValueKey('jv_add_story'), V3DailyMark.memory, 268, 'Write a story',
+              'A title, and as much as you like', () => go(const WriteStoryScreen(), 'pp/journal/write')),
+          _paperAddRow(p, const ValueKey('jv_add_letter'), V3DailyMark.letter, 330, 'Letter to $jvChild',
+              'For them to read one day', () => go(const LetterScreen(), 'pp/journal/letter'), last: true),
+        ]),
+      ),
+    ),
+  );
+}
+
+/// One way in: the drawn mark in its tinted well, a name, one line.
+Widget _paperAddRow(V2Palette p, Key key, V3DailyMark mark, double hue, String title, String line, VoidCallback onTap,
+        {bool last = false}) =>
+    PvPress(
+      child: InkWell(
+        key: key,
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(border: last ? null : Border(bottom: BorderSide(color: p.line))),
+          child: Row(children: [
+            Container(
+              width: 46,
+              height: 46,
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(color: v2BlockTint(hue, p), borderRadius: BorderRadius.circular(14)),
+              child: V3DailyArt(mark: mark, tint: v2BlockTint(hue, p)),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+                const SizedBox(height: 2),
+                Text(line, style: pvManrope(fontSize: 13, height: 1.35, color: p.ink2)),
+              ]),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+          ]),
+        ),
+      ),
+    );
+
+// ---- add-memory bottom sheet (the one look, 2026-10-07) ----------------------
+// Kept for revert (2026-10-17): the white sheet of PvListRows with TTC marks.
+// ignore: unused_element
+void _showAddMemorySheetToolShell(BuildContext context) {
   void go(Widget s) {
     Navigator.of(context).pop();
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -397,8 +481,42 @@ class _GuidedMemoryScreenState extends State<GuidedMemoryScreen> {
 
   // The one look (2026-10-07): the tool shell, ink chips for the tabs, the
   // prompts as PvListRows with drawn marks. Same prompts, same tap target.
+  // On the journal's paper (2026-10-17): the same prompts, the same tap
+  // target, each opening Quick capture by name.
   @override
   Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return JournalPaperScaffold(
+      pal: p,
+      eyebrow: 'A first',
+      title: 'Guided Memories',
+      intro: 'Pick a first and answer one prompt. It goes straight into $jvChild\'s journal.',
+      children: [
+        journalPad(Wrap(spacing: 8, runSpacing: 8, children: [
+          for (var i = 0; i < _tabs.length; i++)
+            PvChip(label: _tabs[i], selected: i == _tab, onTap: () => setState(() => _tab = i)),
+        ])),
+        const SizedBox(height: 18),
+        journalPad(PvRowGroup(p: p, children: [
+          for (final g in jvGuided)
+            PvListRow(
+              key: ValueKey('jv_guided_${g.title}'),
+              p: p,
+              leading: _journalMark(_markFor(g.title)),
+              title: g.title,
+              line: '${g.subtitle} · ${g.minutes} min',
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'pp/journal/capture'),
+                  builder: (_) => QuickCaptureScreen(prompt: g.title))),
+            ),
+        ])),
+      ],
+    );
+  }
+
+  // The tool-shell page (2026-10-07), kept for revert (2026-10-17).
+  // ignore: unused_element
+  Widget _buildToolShell(BuildContext context) {
     final p = pvStorePalette;
     return PregToolScaffold(
       hue: kPpJournalHue,
@@ -516,8 +634,52 @@ class _QuickCaptureScreenState extends State<QuickCaptureScreen> {
   // photo/video/voice are the round attach strip, Save is the ink commit.
   // The big purple mic is gone from this build: Voice in the strip says the
   // same "coming soon" it did. Same save: kind moment, title = the prompt.
+  // On the journal's paper (2026-10-17): the prompt as the italic serif
+  // title, the words in a white card, the attach strip, the ink commit.
   @override
   Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return JournalPaperScaffold(
+      pal: p,
+      eyebrow: 'A moment',
+      title: prompt ?? "What's happening today?",
+      italic: true,
+      children: [
+        journalPad(_capsLabel(p, 'In your words')),
+        const SizedBox(height: 8),
+        journalPad(_writingCard(
+          p,
+          key: const ValueKey('jv_quick_field'),
+          TextField(
+            controller: _text,
+            autofocus: true,
+            minLines: 4,
+            maxLines: null,
+            style: pvManrope(fontSize: 15, height: 1.6, color: p.ink1),
+            cursorColor: p.ink1,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              filled: false,
+              hintText: 'A line or two is plenty.',
+              hintStyle: pvManrope(fontSize: 15, height: 1.6, color: p.ink3),
+            ),
+          ),
+        )),
+        const SizedBox(height: 18),
+        journalPad(_mediaRowV3(context, photo: _photo, onPhoto: (v) => setState(() => _photo = v))),
+        const SizedBox(height: 18),
+        journalPad(PvCommit(
+          key: const ValueKey('jv_quick_save'),
+          label: 'Save',
+          onTap: () => _save(context, 'Memory', JvKind.moment, title: prompt ?? '', body: _text.text, photo: _photo),
+        )),
+      ],
+    );
+  }
+
+  // The tool-shell page (2026-10-07), kept for revert (2026-10-17).
+  // ignore: unused_element
+  Widget _buildToolShell(BuildContext context) {
     final p = pvStorePalette;
     return PregToolScaffold(
       hue: kPpJournalHue,
@@ -649,8 +811,68 @@ class _WriteStoryScreenState extends State<WriteStoryScreen> {
 
   // The one look (2026-10-07): title and story each under a small-caps
   // label in a white card, the attach strip, the ink commit. Same save.
+  // On the journal's paper (2026-10-17): the same two fields and save.
   @override
   Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return JournalPaperScaffold(
+      pal: p,
+      eyebrow: 'A story',
+      title: 'Write a Story',
+      intro: 'Anything you want to remember about today, in your own words.',
+      children: [
+        journalPad(_capsLabel(p, 'Title')),
+        const SizedBox(height: 8),
+        journalPad(_writingCard(
+          p,
+          key: const ValueKey('jv_story_title'),
+          TextField(
+            controller: _title,
+            style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1),
+            cursorColor: p.ink1,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              filled: false,
+              hintText: 'Add a title',
+              hintStyle: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, height: 1.25, color: p.ink3),
+            ),
+          ),
+        )),
+        const SizedBox(height: 16),
+        journalPad(_capsLabel(p, 'The story')),
+        const SizedBox(height: 8),
+        journalPad(_writingCard(
+          p,
+          key: const ValueKey('jv_story_body'),
+          TextField(
+            controller: _body,
+            minLines: 6,
+            maxLines: null,
+            style: pvManrope(fontSize: 15, height: 1.7, color: p.ink1),
+            cursorColor: p.ink1,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              filled: false,
+              hintText: 'Today was so special…',
+              hintStyle: pvManrope(fontSize: 15, height: 1.7, color: p.ink3),
+            ),
+          ),
+        )),
+        const SizedBox(height: 18),
+        journalPad(_mediaRowV3(context, photo: _photo, onPhoto: (v) => setState(() => _photo = v))),
+        const SizedBox(height: 18),
+        journalPad(PvCommit(
+          key: const ValueKey('jv_story_save'),
+          label: 'Save Story',
+          onTap: () => _save(context, 'Story', JvKind.story, title: _title.text, body: _body.text, photo: _photo),
+        )),
+      ],
+    );
+  }
+
+  // The tool-shell page (2026-10-07), kept for revert (2026-10-17).
+  // ignore: unused_element
+  Widget _buildToolShell(BuildContext context) {
     final p = pvStorePalette;
     return PregToolScaffold(
       hue: kPpJournalHue,
@@ -770,8 +992,53 @@ class _LetterScreenState extends State<LetterScreen> {
   // The one look (2026-10-07): the letter is still set in italic serif, as a
   // letter should be, but on a white card with a hairline instead of ivory
   // paper. Same save: kind letter, title "Letter to <name>".
+  // On the journal's paper (2026-10-17): the letter still in italic serif,
+  // its title the salutation's italic too.
   @override
   Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final letterStyle = pvFraunces(fontSize: 16, height: 1.9, color: p.ink1).copyWith(fontStyle: FontStyle.italic);
+    return JournalPaperScaffold(
+      pal: p,
+      eyebrow: 'A letter',
+      title: 'Letter to $jvChild',
+      italic: true,
+      intro: 'Write it for the day they are old enough to read it.',
+      children: [
+        journalPad(_capsLabel(p, 'Your letter')),
+        const SizedBox(height: 8),
+        journalPad(_writingCard(
+          p,
+          key: const ValueKey('jv_letter_body'),
+          TextField(
+            controller: _body,
+            minLines: 10,
+            maxLines: null,
+            style: letterStyle,
+            cursorColor: p.ink1,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              filled: false,
+              hintText: 'Dear $jvChild,\n\nOne day, when you read this…',
+              hintStyle: letterStyle.copyWith(color: p.ink3),
+            ),
+          ),
+        )),
+        const SizedBox(height: 18),
+        journalPad(_mediaRowV3(context, photo: _photo, onPhoto: (v) => setState(() => _photo = v))),
+        const SizedBox(height: 18),
+        journalPad(PvCommit(
+          key: const ValueKey('jv_letter_save'),
+          label: 'Save Letter',
+          onTap: () => _save(context, 'Letter', JvKind.letter, title: 'Letter to $jvChild', body: _body.text, photo: _photo),
+        )),
+      ],
+    );
+  }
+
+  // The tool-shell page (2026-10-07), kept for revert (2026-10-17).
+  // ignore: unused_element
+  Widget _buildToolShell(BuildContext context) {
     final p = pvStorePalette;
     final letterStyle = pvFraunces(fontSize: 16, height: 1.9, color: p.ink1).copyWith(fontStyle: FontStyle.italic);
     return PregToolScaffold(

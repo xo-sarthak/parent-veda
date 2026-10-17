@@ -2201,6 +2201,11 @@ months old'`, part of the Journal demo world (see 12.2).
 
 ## 12.2 My Journal is a demo, with the real path written and commented
 
+> **Out of date — closed.** The demo was replaced on 2026-10-07 by the real
+> parenting journal (`PpJournalScreen` over `PpJournalStore`, synced through
+> `journal_entries`), and on 2026-10-17 it became the same keepsake as the
+> pregnancy journal (§93.0). Kept below as the record.
+
 Greets "Priya", child "Aarav", entries dated 2025. **Decision: it stays a demo
 for now**, but the real-data code sits beside it commented out, so shipping is a
 comment swap rather than a rewrite. See `journal_v2/jv2_data.dart`.
@@ -10485,4 +10490,43 @@ they start trying.
 - Cloud sync of the plan itself (same reason; plan answers are local-only).
 - Doctor review of the test list and folic acid wording; dietitian review of
   the regional food blocks. Bylines stay "ParentVeda team" until then.
+- Not walked on a phone yet.
+
+## 93.0 One journal, two stages — the parenting journal is the pregnancy keepsake — 2026-10-17
+
+The user: the pregnancy and parenting journals "look as separate things… it
+looks like something else was built." The data was already one system (one
+`JournalStore`, one `journal_entries` table, parenting rows tagged
+`pp_child:` / `pp_kind:`, BACKEND-PATTERNS §16x), so this was drawing only.
+Prototype approved first (artifact "ParentVeda One Journal").
+
+**Built:**
+
+- `lib/widgets/journal/journal_keepsake.dart` — the cover, dot strip, question
+  card, section heading, entry row, photos, stagger and a paper writing page,
+  moved out of `pv_journal_screen.dart`. Pregnancy calls them with the values
+  it always used.
+- Parenting home: the shared `V3JournalSection` replaces `_JournalInvite`
+  (kept for revert). Tiles: Add a memory, A first, Add a photo, Write a letter.
+  Two new drawn marks (`V3DailyMark.first`, `.letter`).
+- `PpJournalScreen` on the keepsake: "Dear <name>,", the child's twelve months
+  as dots, a question for the child's age (`lib/data/pp_journal_prompts.dart`,
+  English, no he/she), months as sections. The tool-shell page is kept.
+- `PpJournalEntryScreen` (`pp/journal/entry`) — a memory opens as a page, not a
+  sheet. A partner's memory still has no Delete.
+- The add sheet and Guided / Quick capture / Story / Letter on the paper
+  (`JournalPaperScaffold`); saves unchanged.
+- The pregnancy home's "Open your journal" is now named (`journal`).
+- Test: `test/journal_one_book_test.dart`.
+
+**Owed:**
+
+- **§93.1 Paintings for the parenting journal**: `pp_journal_cover_b1..3` and
+  `pp_journal_question_b1..3` (b1 under a year, b2 one to three, b3 three and
+  up). Prompts handed over 2026-10-17. Until they are in the image table and on
+  R2 the drawn sky shows, as it does for pregnancy (§77.1, still owed too).
+- **§93.2 Pregnancy's compose screen** could take `JournalPaperScaffold`
+  (that is §77.3).
+- **§93.3 No edit for a parenting memory.** It had none before; the page keeps
+  Delete only. Worth adding when the capture screens can open with a memory.
 - Not walked on a phone yet.

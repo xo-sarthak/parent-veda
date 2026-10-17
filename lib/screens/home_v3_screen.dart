@@ -1113,7 +1113,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 //     label: 'Add a\nphoto',
                 //     onTap: () => openJournalAddPhoto(context, pregnancy)),
               ],
+              // Named (2026-10-17): it was the only way into a journal
+              // without a route name, so nothing could tell it was open.
               onOpenAll: () => Navigator.of(context).push(MaterialPageRoute(
+                  settings: const RouteSettings(name: 'journal'),
                   builder: (_) => JournalScreen(controller: pregnancy))),
             ),
             const SizedBox(height: 28),

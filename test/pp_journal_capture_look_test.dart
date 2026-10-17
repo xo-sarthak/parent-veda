@@ -4,8 +4,10 @@
 //  The user: "My journal section when clicked opens up with the old UI,
 //  everything purple." Everything reached from the journal (the add sheet,
 //  Guided / Quick capture / Story / Letter, the entry sheet) now wears the tool
-//  shell or a white sheet. These pin: each screen draws on the shell with no
-//  overflow at 360dp, 1x and 1.5x; the new builds carry no purple or old
+//  shell or a white sheet. 2026-10-17: they moved again, onto the journal's
+//  paper (JournalPaperScaffold), and a memory opens as a page
+//  (PpJournalEntryScreen) instead of a sheet. These pin: each screen draws on
+//  the paper with no overflow at 360dp, 1x and 1.5x; the new builds carry no purple or old
 //  pp-fonts (source scan); a save still lands in PpJournalStore; a partner's
 //  memory still shows the note and no Delete.
 // =============================================================================
@@ -22,7 +24,7 @@ import 'package:parentveda/screens/post_pregnancy/journal_v2/jv2_data.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_v2/jv2_store.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_v2/pp_journal_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
-import 'package:parentveda/screens/pregnancy/preg_tool_chrome.dart';
+import 'package:parentveda/widgets/journal/journal_keepsake.dart';
 import 'package:parentveda/services/journal_store.dart';
 
 const _capture = 'lib/screens/post_pregnancy/journal_v2/journal_capture_screens.dart';
@@ -80,18 +82,17 @@ void main() {
 
   for (final scale in [1.0, 1.5]) {
     for (final s in screens.entries) {
-      testWidgets('${s.key} draws on the tool shell, no overflow at 360dp ${scale}x', (t) async {
+      testWidgets('${s.key} draws on the journal paper, no overflow at 360dp ${scale}x', (t) async {
         _phone(t);
         await t.pumpWidget(_app(s.value(), scale));
         await t.pumpAndSettle();
-        expect(find.byType(PregToolScaffold), findsOneWidget);
-        expect(find.byType(PregToolBack), findsOneWidget, reason: 'a round back, not an X');
-        expect(find.byIcon(Icons.close_rounded), findsNothing);
+        expect(find.byType(JournalPaperScaffold), findsOneWidget);
+        expect(find.byIcon(Icons.close_rounded), findsNothing, reason: 'a back arrow, not an X');
         expect(t.takeException(), isNull);
       });
     }
 
-    testWidgets('the add sheet is white rows with marks, and each row opens its screen (${scale}x)', (t) async {
+    testWidgets('the add sheet is paper rows with drawn marks, and each row opens its screen (${scale}x)', (t) async {
       _phone(t);
       await t.pumpWidget(_app(
           Builder(
@@ -160,14 +161,14 @@ void main() {
   });
 
   for (final scale in [1.0, 1.5]) {
-    testWidgets('the entry sheet is white and offers Delete on her own memory (${scale}x)', (t) async {
+    testWidgets('a memory opens as a page and offers Delete on her own (${scale}x)', (t) async {
       _phone(t);
       await PpJournalStore.instance.add(kind: JvKind.story, title: 'Bath time', body: 'So many splashes.');
       await t.pumpWidget(_app(const PpJournalScreen(), scale));
       await t.pumpAndSettle();
       await t.tap(find.text('Bath time'));
       await t.pumpAndSettle();
-      expect(find.byKey(const ValueKey('pp_journal_entry_sheet')), findsOneWidget);
+      expect(find.byType(PpJournalEntryScreen), findsOneWidget);
       expect(find.byKey(const ValueKey('pp_journal_delete')), findsOneWidget);
       expect(find.byKey(const ValueKey('pp_journal_partner_note')), findsNothing);
       expect(t.takeException(), isNull);
@@ -202,7 +203,7 @@ void main() {
       ('THE ONE PARENTVEDA LOOK', 'Kept for revert (2026-10-07): the purple-welled sheet'),
     ]);
     final list = _newBuilds(File(_list).readAsStringSync(), [
-      ('the entry sheet, the one look', 'void _openBeforeShell('),
+      ('Widget ppJournalRow(', 'One memory, opened to read'),
     ]);
     for (final (name, src) in [('capture', capture), ('list', list)]) {
       expect(src.length, greaterThan(500), reason: '$name: the scan found the new builds');
