@@ -12,6 +12,9 @@
 //  should be deleted along with the bulk of kFoodRecipes (step 6, which shrinks
 //  the Dart to ~5 seed dishes).
 //
+//  Until then the seed is an exact mirror (2026-10-17): insert, update on
+//  conflict, archive whatever the app stopped shipping.
+//
 //  Note it checks the GENERATOR, not the database: it regenerates the seed and
 //  compares it against the source of truth. Nothing here talks to Supabase, so
 //  it runs in the normal suite with no network and no credentials.
@@ -62,29 +65,59 @@ void main() {
       );
     });
 
-    test('can never overwrite an editor', () {
+    // The recipes seed is an exact MIRROR since 2026-10-17 (it used to be
+    // `do nothing`, which froze the table at the July 28 while the app grew to
+    // ~140). The editor guard moved from the SQL to ContentOwnership: the tool
+    // writes nothing once recipes are editor-owned (see the ratchet test below).
+    // Kept for revert: the old 'can never overwrite an editor' test is in git
+    // history (2f55b63 and earlier).
+    test('updates every bundled dish it already holds', () {
       if (!seedFile.existsSync()) return;
       final sql = seedFile.readAsStringSync();
-
-      // Match the STATEMENT, not the prose — the generated header explains the
-      // guard in a comment, and counting that too made this test pass for the
-      // wrong reason (29 guards for 28 inserts).
-      final guards =
-          ') on conflict (source_key) do nothing;'.allMatches(sql).length;
+      final inserts = 'insert into public.recipes'.allMatches(sql).length;
       expect(
-        guards,
-        'insert into public.recipes'.allMatches(sql).length,
-        reason: 'Every insert must be guarded. An unguarded re-run would '
-            'replace whatever an editor has published with the older bundled '
-            'copy — silently, and with no way to tell it happened.',
+        ') on conflict (source_key) do update set'.allMatches(sql).length,
+        inserts,
+        reason:
+            'Every insert must update on conflict. A skip leaves the table '
+            'at whatever it held the first time, and nobody notices.',
       );
+      // A dish archived earlier and added back must come back.
+      expect('  status = excluded.status'.allMatches(sql).length, inserts);
+    });
 
-      expect(
-        sql.contains('do update'),
-        isFalse,
-        reason: 'An upsert here would overwrite editor content on every re-run. '
-            'The seed exists to establish a starting point, not to enforce one.',
+    test('archives every dish the app no longer ships', () {
+      if (!seedFile.existsSync()) return;
+      final sql = seedFile.readAsStringSync();
+      final start = sql.indexOf(
+        "update public.recipes set status = 'archived'",
       );
+      expect(
+        start,
+        isNonNegative,
+        reason:
+            'Without the archive pass a retired dish stays published, '
+            'and Ask Veda keeps answering from it.',
+      );
+      final archive = sql.substring(start);
+      for (final r in kFoodRecipes) {
+        expect(
+          archive.contains("'${r.id}'"),
+          isTrue,
+          reason:
+              '${r.id} is live in the app but missing from the keep '
+              'list, so the seed would archive it.',
+        );
+      }
+      for (final old in kFoodRecipeMoved.keys) {
+        expect(
+          archive.contains("'$old'"),
+          isFalse,
+          reason:
+              '$old moved to ${kFoodRecipeMoved[old]}; it must not be '
+              'kept published.',
+        );
+      }
     });
   });
 
