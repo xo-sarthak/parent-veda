@@ -20,7 +20,7 @@ owed.
 | 2026-10-17 | Step 2: supplements, family timeline | 0099 | `6a36b7f` | yes (2026-10-17) |
 | 2026-10-17 | Step 3: blob stores push before pull | none | `f32af1e` | nothing to run |
 | 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | `a0eb5b9` | yes (2026-10-17) |
-| 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | not yet | **not yet** |
+| 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | `f7ed88e` | yes (2026-10-17) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -323,7 +323,7 @@ must be done or decided before real users, from this review and from every other
 
 ## Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth)
 
-**Date:** 2026-10-17. **Migration:** 0101 (not yet run). **Commit:** not yet.
+**Date:** 2026-10-17. **Migration:** 0101 (run 2026-10-17). **Commit:** `f7ed88e`.
 
 **The problem (STILL-OPEN-BACKEND §1, Parenting row):** the six child-scoped log stores synced the way the TTC
 tables did before 0097. All six go through one helper, `ChildSync`:
@@ -396,8 +396,12 @@ in step 1: ask only if a table is genuinely co-edited. None of these six is.
 - **Rows cached before this release** carry no stamp. Where the cloud has a copy, the cloud's copy wins.
 
 **User runs:**
-1. 0101 in the Supabase SQL editor.
+1. 0101 in the Supabase SQL editor (DONE 2026-10-17).
 2. Optional: the check query at the bottom of the file. Expect six rows, all `true`.
+
+**Verified live (2026-10-17):** the user ran the check query on the production database. All six tables
+(`pp_feed_logs`, `pp_growth_measurements`, `pp_nappy_logs`, `pp_pump_logs`, `pp_sleep_logs`, `pp_tummy_logs`)
+returned `true` for `has_updated_at`, `has_removed_at` and `guarded`.
 
 **Owed:** the two-phone walk for a parenting log (both parents on one child): log a feed on A, delete it on B,
 sync A, and check it stays gone. Then correct a feed the other parent logged, and check "logged by" doesn't

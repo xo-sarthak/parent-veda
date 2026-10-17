@@ -37,7 +37,7 @@ Read first:
   - The timeline gained an own-row UPDATE (the user's decision). Without it the upsert upload was always
     refused, so the timeline had very likely never synced.
   - See `docs/BACKEND-SYNC-LOG.md` step 2.
-- **Parenting logs (step 5, 2026-10-17, migration 0101, NOT YET RUN).** Feeds, sleeps, nappies, pumping, tummy
+- **Parenting logs (step 5, 2026-10-17, migration 0101, run 2026-10-17).** Feeds, sleeps, nappies, pumping, tummy
   time and growth: same pattern, on `ChildLogLedger` (`child_scoped_store.dart`) over the shared `SyncRowBook`
   (`lib/services/remote/sync_row_book.dart`, which `TtcRowBook` is now a typedef of).
   - The ledger remembers each row's child, so a pull of one child leaves another's rows alone.
@@ -270,7 +270,7 @@ left alone for now so two sessions don't clash:
 2. ~~**§3 dirty sets** for the same stores~~ done with step 1.
 3. ~~**§2 push-before-pull**~~ **DONE 2026-10-17 (step 3).** Next in §2: per-item merge for the curated lists.
 4. ~~**§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.~~ **DONE 2026-10-17
-   (step 5, 0101 not yet run).** Next in Parenting: documents, health, milestones and vaccines, still on
+   (step 5, 0101 run 2026-10-17).** Next in Parenting: documents, health, milestones and vaccines, still on
    `ChildSync.merge`; the composite-key tables (vaccines, milestones) need `pushKeyed` reworked too.
 5. **§1 Pregnancy tables**, one migration.
 6. **§4, §5, §7** as tidy-up.
