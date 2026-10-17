@@ -18,7 +18,8 @@ owed.
 | 2026-10-17 | Before this log: the cycle and daily-log sync | 0097 | `853650e` | yes |
 | 2026-10-17 | Step 1: records, appointments, ritual | 0098 | `01fceb2` | yes (2026-10-17) |
 | 2026-10-17 | Step 2: supplements, family timeline | 0099 | `6a36b7f` | yes (2026-10-17) |
-| 2026-10-17 | Step 3: blob stores push before pull | none | pending | nothing to run |
+| 2026-10-17 | Step 3: blob stores push before pull | none | `f32af1e` | nothing to run |
+| 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | pending | yes (2026-10-17) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -196,7 +197,7 @@ moments on the phone.
 
 ## Step 3: Blob stores push before pull (the 38 `CloudSyncedStore`s)
 
-**Dates:** started 2026-10-17 · built 2026-10-17 · commit pending · no migration · two-phone walk owed.
+**Dates:** started 2026-10-17 · built 2026-10-17 · committed `f32af1e` on 2026-10-17 · no migration · two-phone walk owed.
 
 **Problem (STILL-OPEN-BACKEND §2).** The 38 blob stores (one JSON blob per user per store in `user_state`, such as
 the hospital bag, cart, saved readings and journeys) push on every change, fire-and-forget, and their sync is
@@ -251,3 +252,65 @@ is the remaining §2 work.
 - per-item merge for the curated blob lists (§2);
 - Parenting logs, then Pregnancy tables (§1);
 - the tidy-ups (§4, §5, §7).
+
+---
+
+## Step 4: The server enforces "newer wins" and refuses a clock from the future
+
+**Dates:** asked for by the user 2026-10-17 (after an industry-standards review) · built 2026-10-17 · commit
+pending · 0100 run by the user on 2026-10-17.
+
+**Problem (found in the 2026-10-17 review, not in STILL-OPEN-BACKEND before).** Every synced row table merges
+"newer wins" on the phone's edit time, but only the *phone* applied the rule, and only on a pull.
+1. **An older write could overwrite a newer row.** Phone A edits offline at 10:00, phone B edits the same row at
+   10:05 and uploads. A reconnects and uploads its 10:00 copy before it next pulls, and the upsert replaces B's
+   newer row. B repairs it on its next sync; until then the cloud holds the older version.
+2. **A phone with a wrong clock won forever.** A phone set a year ahead stamps every edit a year ahead, so it
+   would beat every real edit until that date.
+
+**Done (all 2026-10-17):**
+- [x] `supabase/migrations/0100_sync_guard_newer_wins.sql`: one trigger function, `pv_sync_newer_wins`, run
+  `before insert or update` on 13 tables:
+  - `ttc_cycles`, `ttc_cycle_signals`, `ttc_logs`, `ttc_doctor_questions`;
+  - `ttc_records`, `ttc_appointments`, `ttc_ritual`;
+  - `ttc_supplements`, `ttc_supplement_taken`, `journey_timeline`;
+  - `saved_items`, `journal_entries`, `father_journal_entries`.
+
+  What it does:
+  - **A stamp more than 5 minutes ahead** of the server is pulled back to the server's `now()`. It's clamped, not
+    refused: a refused row would wait on the phone forever, and her change would never land.
+  - **An update older than the stored row is skipped** (the trigger returns NULL). Postgres skips that row
+    without an error, so the phone counts the upload as confirmed, and its next pull takes the newer row.
+  - **Equal stamps pass**, so app versions from before the clock (which send no `updated_at`) still sync.
+  - Nothing stamps the upload time: only a future stamp is ever changed.
+  - A self-contained check block sits at the bottom of the migration, commented out. It runs in a transaction and
+    rolls back.
+- [x] New `test/sync_guard_contract_test.dart` (5 cases), which fails the build:
+  - if a TTC table written with `updated_at` + `removed_at` has no trigger;
+  - if any migration gives a table `removed_at` by `alter table` without adding the trigger;
+  - if saved items or the journals lose it;
+  - if the rule changes shape: no clamp, no skip, or a second assignment to `updated_at`.
+
+**Verified (2026-10-17):** `flutter analyze` is clean on the new test; the guard and schema contract tests pass.
+**Not verifiable here:** the trigger running on Postgres. There's no local database in this repo, so the check
+block in the migration is how to see it working live.
+
+**Known cost, named:** with a phone more than 5 minutes fast, every edit of that row is clamped to the server's
+time. The phone keeps its own (future) stamp, so on later syncs it thinks its copy is newer and re-uploads the row.
+That costs one extra upload per affected row per sync, never wrong data. It goes away when the phone's clock is
+right.
+
+**User runs:**
+1. 0100 in the Supabase SQL editor (DONE 2026-10-17).
+2. Optional: the check block at the bottom of the file, pasted on its own. Expect `a | newer | true` and
+   `b | future | true`.
+
+**Files:**
+- `supabase/migrations/0100_sync_guard_newer_wins.sql`
+- `test/sync_guard_contract_test.dart`
+- `docs/BACKEND-SYNC-LOG.md`
+- `docs/BEFORE-LAUNCH.md` (new; see below)
+- `CLAUDE.md` (one row in "Where the detail lives")
+
+**Also on 2026-10-17:** `docs/BEFORE-LAUNCH.md` was created at the user's request. It's one list of everything that
+must be done or decided before real users, from this review and from every other doc. It's maintained from now on.

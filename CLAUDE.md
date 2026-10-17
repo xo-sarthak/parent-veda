@@ -287,6 +287,8 @@ source for exactly this reason.
 | File | What it holds |
 |---|---|
 | `docs/STILL-OPEN.md` | Everything parked or half-built. **Read before raising or closing an open point.** |
+| `docs/BEFORE-LAUNCH.md` | **Everything that must be done or decided before real users**, one checklist, each item dated, with an owner and where its detail lives. Add to it whenever work finds a launch blocker; tick items off with a date. |
+| `docs/STILL-OPEN-BACKEND.md` + `docs/BACKEND-SYNC-LOG.md` | Sync and data-safety work: what is left, and the dated history of what was done, step by step |
 | `docs/TTC-SPEC.md` | The Trying-to-Conceive build spec and its decision record |
 | `docs/TTC-AUDIT.md` | Defects found walking the built TTC stage on a device, tiered by severity |
 | `docs/BACKEND-PATTERNS.md` | RLS shapes, co-parenting, sync patterns |
