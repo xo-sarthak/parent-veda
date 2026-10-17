@@ -29,6 +29,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../services/family_timeline.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart' show FertilityLevel, TtcChapterEngine;
@@ -36,9 +37,12 @@ import '../../ttc/ttc_fertile_window.dart'
     show ttcWindowClosesAfterOvulation, ttcWindowOpensBeforeOvulation;
 import '../../ttc/ttc_cycle_report.dart';
 import '../../ttc/ttc_log_store.dart';
+import '../../ttc/ttc_records_store.dart' show TtcAppointmentsStore;
 import '../../ttc/ttc_store.dart';
+import '../../ttc/ttc_treatment_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
-import 'ttc_calendar_screen.dart' show ttcFactsFor, TtcEstimateStripes;
+import 'ttc_calendar_screen.dart'
+    show ttcFactsFor, TtcEstimateStripes, kTtcCalendarEstimateKey;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import 'ttc_common.dart';
 import 'ttc_cycle_palette.dart';
@@ -51,7 +55,7 @@ import 'ttc_ovulation_screen.dart'
         kTtcOvPositive,
         ttcOvResultOn,
         ttcWindowSourceLine;
-import 'ttc_strings.dart' show TtcPartnerMode;
+import 'ttc_strings.dart' show TtcLang, TtcPartnerMode;
 import 'ttc_symptom_log_screen.dart' show TtcSymptomLogScreen;
 import 'ttc_window_screen.dart' show ttcWindowForHim;
 
@@ -168,6 +172,27 @@ TtcPhase? _phaseOf(DateTime d) {
     ov: DateTime(ov.year, ov.month, ov.day - ttcWindowClosesAfterOvulation),
   );
 }
+
+/// Every store a day on the cycle screens is read from, as one thing to
+/// listen to (2026-10-18).
+///
+/// ⚠️ ONE LIST, NEXT TO THE READER. The Cycle companion listened to four
+/// stores and the Calendar to six, each list written on its own screen, apart
+/// from [ttcHubDay] and `ttcFactsFor`, which read eight. A symptom is saved
+/// in [TtcLogStore], which the companion did not listen to, so its month and
+/// its "tracked" card kept the old day until she opened the screen again (the
+/// user, 2026-10-18). A store added to the reader belongs here, and both
+/// screens hear it. Built per call, not cached: tests reset the singletons.
+Listenable ttcCycleViewChanges() => Listenable.merge([
+      CycleStore.instance,
+      TtcStore.instance,
+      TtcLogStore.instance,
+      TtcAppointmentsStore.instance,
+      TtcTreatmentStore.instance,
+      FamilyTimeline.instance,
+      TtcLang.instance,
+      TtcPartnerMode.instance,
+    ]);
 
 TtcHubDay ttcHubDay(DateTime day) {
   final d = _dayOnly(day);
@@ -324,17 +349,29 @@ class _WeekCaption extends StatelessWidget {
       if (cycleDay != null && cycleDay > 0 && !day.predictedPeriod)
         'day $cycleDay',
     ];
+    // ⚠️ THE SMALL-MARK COLOUR, WITH A WHITE EDGE (2026-10-18, the user:
+    // the dot by "The waiting days" "isn't visible"). It used the phase's big
+    // fill, a pale sand, on a hero that is washed in the same sand. `mark` is
+    // the same hue a step deeper, made for dots; the white edge keeps it off
+    // any hero colour. An expected period is hollow, as it is everywhere.
+    // Kept for revert: a 10px disc in ttcLine / periodTint / fill(part).
     return Row(key: const ValueKey('ttc_hub_week_caption'), children: [
       Container(
-        width: 10,
-        height: 10,
+        key: const ValueKey('ttc_hub_week_caption_dot'),
+        width: 12,
+        height: 12,
         decoration: BoxDecoration(
-          color: part == null
-              ? ttcLine
-              : day.predictedPeriod
-                  ? TtcCycleColours.periodTint
-                  : TtcCycleColours.fill(part),
+          color: day.predictedPeriod
+              ? Colors.white
+              : part == null
+                  ? ttcMuted
+                  : TtcCycleColours.mark(part),
           shape: BoxShape.circle,
+          border: Border.all(
+              color: day.predictedPeriod
+                  ? TtcCycleColours.period
+                  : Colors.white,
+              width: 2),
         ),
       ),
       const SizedBox(width: 8),
@@ -1307,8 +1344,12 @@ class _MonthKey extends StatelessWidget {
         Row(mainAxisSize: MainAxisSize.min, children: [
           swatch,
           const SizedBox(width: 6),
-          Text(_voice(label),
-              style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700)),
+          // Flexible (2026-10-18): the estimate key is a whole phrase, and
+          // with large text it wraps instead of running off the card.
+          Flexible(
+            child: Text(_voice(label),
+                style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700)),
+          ),
         ]);
     Widget pill(Color c) => Container(
           width: 16,
@@ -1320,22 +1361,48 @@ class _MonthKey extends StatelessWidget {
         width: 6,
         height: 6,
         decoration: BoxDecoration(color: c, shape: BoxShape.circle));
+    // ⚠️ THE ONLY KEY ON THE CALENDAR (2026-10-18, the user: "same above and
+    // below"). The Calendar screen kept its own key under this one, so the
+    // marks were named twice. That key's rules move here: a mark is named only
+    // when this calendar can draw it. A clinic path draws no fertile days and
+    // counts to no period, and an engine that refused to estimate draws no
+    // window, so their keys would promise colours the grid never shows.
+    final store = TtcStore.instance;
+    final behaviour = store.behaviour;
+    final window = behaviour.showsFertilityWindow &&
+        const TtcChapterEngine().estimatedOvulationDay(store.state()) != null;
     return Wrap(
       key: const ValueKey('ttc_hub_month_key'),
       spacing: 14,
       runSpacing: 8,
       children: [
         key(pill(TtcCycleColours.period), 'Period'),
-        key(pill(TtcCycleColours.periodTint), 'Expected period'),
-        key(pill(TtcCycleColours.fertileLevel(FertilityLevel.high)),
-            'Fertile days'),
-        key(
-            Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                    color: TtcCycleColours.ovulation, shape: BoxShape.circle)),
-            'Ovulation'),
+        if (behaviour.countsToPeriod)
+          key(pill(TtcCycleColours.periodTint), 'Expected period'),
+        if (window) ...[
+          key(pill(TtcCycleColours.fertileLevel(FertilityLevel.high)),
+              'Fertile days'),
+          key(
+              Container(
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                      color: TtcCycleColours.ovulation,
+                      shape: BoxShape.circle)),
+              'Ovulation'),
+          // The fertile days still ahead are striped in the cells.
+          key(
+              ClipRRect(
+                borderRadius: BorderRadius.circular(99),
+                child: Container(
+                  width: 16,
+                  height: 10,
+                  color: TtcCycleColours.fertileTint,
+                  child: const CustomPaint(painter: TtcEstimateStripes()),
+                ),
+              ),
+              kTtcCalendarEstimateKey),
+        ],
         key(dot(TtcCycleColours.period), 'Spotting'),
         key(dot(TtcCycleColours.ovulation), 'Positive test'),
         key(dot(TtcCycleColours.logged), 'Logged'),

@@ -64,7 +64,7 @@ import 'ttc_cycle_companion.dart'
         ttcShortDate,
         kTtcWindowInPeriodLine;
 import 'ttc_cycle_palette.dart';
-import 'ttc_cycle_hub.dart' show TtcHubMonth;
+import 'ttc_cycle_hub.dart' show TtcHubMonth, ttcCycleViewChanges;
 import 'ttc_appointments_screen.dart'
     show TtcApptEntry, openTtcAppointment;
 import 'ttc_symptom_log_screen.dart' show TtcSymptomLogScreen;
@@ -164,6 +164,27 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
         curve: Curves.easeOutCubic);
   }
 
+  /// The key for the clinic round's grid (2026-10-18). The hub's month keys
+  /// itself; this one names the round's marks and bands as well.
+  Widget _legend(TtcS t) => _Legend(
+        open: _legendOpen,
+        onToggle: () => setState(() => _legendOpen = !_legendOpen),
+        behaviour: TtcStore.instance.behaviour,
+        // A marker can be absent for TWO reasons and the legend only knew
+        // one. It correctly hid the fertile rows on a clinic path, then
+        // showed them anyway when the engine had refused to estimate from
+        // an unreliable history - so the key advertised two colours the
+        // grid never drew, on the one screen she would go looking for
+        // them.
+        hasEstimate: const TtcChapterEngine()
+                .estimatedOvulationDay(TtcStore.instance.state()) !=
+            null,
+        // The round's own marks, only when there is a round to draw.
+        roundKind: ttcCalendarRound()?.kind,
+        hasRound: ttcCalendarRound() != null,
+        t: t,
+      );
+
   @override
   void dispose() {
     _weeks.dispose();
@@ -173,15 +194,14 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([
-        TtcStore.instance,
-        TtcLogStore.instance,
-        // Kept for revert (2026-09-28): TtcJournalStore.instance,
-        TtcAppointmentsStore.instance,
-        TtcTreatmentStore.instance,
-        FamilyTimeline.instance,
-        TtcLang.instance,
-      ]),
+      // Every store a day is read from, one list beside the reader
+      // (2026-10-18): this list had no CycleStore, so a period logged from
+      // here changed nothing on screen. Kept for revert:
+      //   Listenable.merge([TtcStore.instance, TtcLogStore.instance,
+      //     TtcAppointmentsStore.instance, TtcTreatmentStore.instance,
+      //     FamilyTimeline.instance, TtcLang.instance])
+      // (and before 2026-09-28, TtcJournalStore.instance too).
+      animation: ttcCycleViewChanges(),
       builder: (context, _) {
         final t = TtcS.current();
         return TtcPage(
@@ -210,7 +230,10 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
             // The answer first (2026-10-13, Mobbin: Oura, Apple Health): one
             // sentence saying where she is and what is next, so the grid is
             // for looking closer, not for working it out.
-            const TtcCalendarSummary(),
+            // ⚠️ NOT CONST (2026-10-18): a const widget is never rebuilt with
+            // its parent, so the sentence kept the old day after a log.
+            // ignore: prefer_const_constructors
+            TtcCalendarSummary(),
             // What this calendar is showing her (tools pass,
             // 2026-09-27). See [_CalendarIntro].
             _CalendarIntro(
@@ -263,6 +286,8 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
                   t: t),
             ),
             _BoundaryNote(month: _month, t: t),
+            const SizedBox(height: 14),
+            _legend(t),
             ],
             if (ttcCycleWindowStartsInPeriod()) ...[
               const SizedBox(height: 4),
@@ -278,25 +303,11 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
                         style: ttcBody(12.5, h: 1.45))),
               ]),
             ],
-            const SizedBox(height: 14),
-            _Legend(
-              open: _legendOpen,
-              onToggle: () => setState(() => _legendOpen = !_legendOpen),
-              behaviour: TtcStore.instance.behaviour,
-              // A marker can be absent for TWO reasons and the legend only knew
-              // one. It correctly hid the fertile rows on a clinic path, then
-              // showed them anyway when the engine had refused to estimate from
-              // an unreliable history - so the key advertised two colours the
-              // grid never drew, on the one screen she would go looking for
-              // them.
-              hasEstimate: const TtcChapterEngine()
-                      .estimatedOvulationDay(TtcStore.instance.state()) !=
-                  null,
-              // The round's own marks, only when there is a round to draw.
-              roundKind: ttcCalendarRound()?.kind,
-              hasRound: ttcCalendarRound() != null,
-              t: t,
-            ),
+            // ⚠️ ONE KEY (2026-10-18, the user: "same above and below"). The
+            // hub's month carries its own key, with these rules, so this one
+            // stays only under the clinic round's grid, which it was written
+            // for. Kept for revert: SizedBox(14) and this `_Legend` here, for
+            // every calendar.
             const SizedBox(height: 18),
             _DayPanel(day: _selected, t: t),
             const SizedBox(height: 18),

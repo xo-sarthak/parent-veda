@@ -313,7 +313,7 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                         'on their own.',
                 // One name with the Tools tile (2026-09-27). Kept for revert:
                 // 'Open the Cycle Companion'.
-                footLabel: 'Open your cycle companion',
+                footLabel: 'Open your Cycle Companion',
                 onFoot: () => _openSurface(context, 'ttc_cycle'),
                 footNote: 'Estimates come from your own dates and are never a '
                     "diagnosis. If your cycles stay irregular, it's worth "

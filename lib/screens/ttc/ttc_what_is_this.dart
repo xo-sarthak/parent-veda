@@ -21,7 +21,8 @@ import 'ttc_common.dart';
 import 'ttc_surface_router.dart' show openTtcSurface;
 
 /// The one name for each screen, used on its header, its ⓘ and every link.
-const String kTtcCycleCompanionName = 'Cycle companion';
+// Capital C, the user's word (2026-10-18). Kept for revert: 'Cycle companion'.
+const String kTtcCycleCompanionName = 'Cycle Companion';
 const String kTtcCycleReportName = 'Cycle report';
 
 class TtcWhatIsLine {
@@ -74,7 +75,7 @@ TtcWhatIs ttcWhatIsReport({required String note}) => TtcWhatIs(
             'It needs two periods logged before the parts can show.'),
       ],
       note: note,
-      linkLabel: 'Open your cycle companion',
+      linkLabel: 'Open your Cycle Companion',
       linkSurface: 'ttc_cycle',
       contentKey: const ValueKey('ttc_report_about'),
     );
@@ -226,7 +227,7 @@ const TtcWhatIs kTtcWhatIsToday = TtcWhatIs(
   ],
   note: 'Everything here comes from the dates you log. It is never a '
       'diagnosis.',
-  linkLabel: 'Open your cycle companion',
+  linkLabel: 'Open your Cycle Companion',
   linkSurface: 'ttc_cycle',
 );
 

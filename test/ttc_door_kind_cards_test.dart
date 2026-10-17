@@ -756,7 +756,7 @@ void main() {
         'Talk to a gynaecologist',
         'ttc/offering/ttc_consult_gynae',
       ),
-      ('ttc_pcos', 'track', TtcCardKind.tool, 'Cycle companion', 'ttc_cycle'),
+      ('ttc_pcos', 'track', TtcCardKind.tool, 'Cycle Companion', 'ttc_cycle'),
       (
         'ttc_infertility',
         'track',

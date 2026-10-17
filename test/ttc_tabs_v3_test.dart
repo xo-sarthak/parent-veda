@@ -243,7 +243,7 @@ void main() {
       for (final row in [
         'Notes for your doctor',
         'Calendar',
-        'Cycle companion',
+        'Cycle Companion',
         'Fertile window',
         'All programmes and sessions',
       ]) {
@@ -300,7 +300,7 @@ void main() {
         expect(find.text(gone), findsNothing,
             reason: '$gone lives on the profile or in Settings');
       }
-      for (final gone in ['Calendar', 'Cycle companion', 'Fertile window']) {
+      for (final gone in ['Calendar', 'Cycle Companion', 'Fertile window']) {
         expect(find.text(gone), findsNothing,
             reason: '$gone lives on Today and Tools');
       }
@@ -320,7 +320,7 @@ void main() {
       // ⚠️ SHORT AND GROUPED (2026-09-27): Calendar, the cycle companion
       // and the fertile window left You (they live on Today and Tools), and
       // the programmes row is "Programmes and sessions". Kept for revert:
-      //   'Calendar', 'Cycle companion', 'Fertile window',
+      //   'Calendar', 'Cycle Companion', 'Fertile window',
       //   'All programmes and sessions'
       //
       // ⚠️ AND SINCE 2026-09-28 THE ROWS ARE BEHIND THE MORE TAB'S TILES: a
@@ -358,7 +358,7 @@ void main() {
         for (final row in e.value) {
           expect(find.text(row), findsWidgets, reason: '${e.key}: $row');
         }
-        for (final gone in ['Calendar', 'Cycle companion', 'Fertile window']) {
+        for (final gone in ['Calendar', 'Cycle Companion', 'Fertile window']) {
           expect(find.text(gone), findsNothing,
               reason: '$gone lives on Today and Tools');
         }

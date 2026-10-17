@@ -1462,7 +1462,7 @@ void main() {
         for (final s in page.sections)
           for (final t in s.tiles.whereType<TtcToolTile>()) t.surfaceId: t.title,
       };
-      expect(titles['ttc_cycle'], 'Cycle companion');
+      expect(titles['ttc_cycle'], 'Cycle Companion');
       expect(titles['ttc_symptom_log'], 'Symptoms and mood');
     });
 

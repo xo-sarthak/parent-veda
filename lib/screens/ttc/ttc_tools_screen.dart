@@ -208,7 +208,7 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'cycle',
         icon: Icons.timeline_rounded,
-        nameEn: 'Cycle companion',
+        nameEn: 'Cycle Companion',
         nameHi: 'Cycle Companion',
         // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Your periods, and what they tell you'.
         descEn: 'Log your period dates and see your cycle',

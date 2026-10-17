@@ -2263,7 +2263,7 @@ const Map<String, String> kPrecheckToolChip = {
   'ttc_bmi': 'Open the BMI check',
   'ttc_partner': 'Open his side',
   'ttc_window': 'Open Fertile window',
-  'ttc_cycle': 'Open Cycle companion',
+  'ttc_cycle': 'Open Cycle Companion',
 };
 
 class _LinkChip extends StatelessWidget {

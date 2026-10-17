@@ -471,7 +471,7 @@ bool _companionShared(Set<String> labels) {
   if (!labels.contains(card)) return false;
   bool dayTile(String l) => l.startsWith('DAY OF YOUR CYCLE · ');
   final others = labels
-      .where((l) => l != card && l != 'Cycle companion' && !dayTile(l));
+      .where((l) => l != card && l != 'Cycle Companion' && !dayTile(l));
   return others.length <= 1;
 }
 

@@ -663,7 +663,8 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         TtcToolTile(
           // One name for one tool (2026-09-28): the Tools tab and Body and
           // cycle say 'Cycle companion'. Kept for revert: 'Cycle Companion'.
-          title: 'Cycle companion',
+          // Capital C again, the user's word (2026-10-18), everywhere at once.
+          title: 'Cycle Companion',
           id: 'ttc_tile_cycle_companion',
           blurb: 'Your pattern is read from this log. Three months of dates '
               'lets it tell you much more.',

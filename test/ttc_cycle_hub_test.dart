@@ -18,14 +18,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_cycle_companion.dart';
 import 'package:parentveda/screens/ttc/ttc_cycle_hub.dart';
+import 'package:parentveda/screens/ttc/ttc_cycle_palette.dart';
 import 'package:parentveda/screens/ttc/ttc_ovulation_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
-import 'package:parentveda/ttc/ttc_symptom_data.dart' show kTtcSymptomTracker;
+import 'package:parentveda/ttc/ttc_symptom_data.dart';
 import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
@@ -293,5 +295,80 @@ void main() {
       await t.pump(const Duration(milliseconds: 400));
       expect(find.textContaining('Tracked on ${ago(2).day} '), findsOneWidget);
     });
+  });
+
+  // ===========================================================================
+  //  2026-10-18, from the user's screenshots: a log shows at once, the
+  //  calendar has one key, and the caption dot can be seen.
+  // ===========================================================================
+  group('what she logs shows at once', () {
+    testWidgets('the Cycle Companion, without opening it again', (t) async {
+      history();
+      await pumpTall(t, const TtcCycleCompanionScreen());
+      final s = kTtcSymptomGroups
+          .expand((g) => g.symptoms)
+          .firstWhere((s) =>
+              s.id != 'disch_spotting' &&
+              s.id != kTtcOvPositive &&
+              s.id != kTtcOvNegative);
+      final tracked = find.descendant(
+          of: find.byKey(const ValueKey('ttc_hub_tracked')),
+          matching: find.textContaining(s.label, findRichText: true));
+      expect(tracked, findsNothing);
+      TtcLogStore.instance.log(kTtcSymptomTracker, s.id, 1);
+      await t.pump();
+      expect(tracked, findsOneWidget);
+    });
+
+    testWidgets('the Calendar, when a period is logged', (t) async {
+      history();
+      await pumpTall(t, const TtcCalendarScreen());
+      String line() => t
+          .widget<Text>(find.byKey(const ValueKey('ttc_calendar_summary')))
+          .data!;
+      final before = line();
+      CycleStore.instance.logPeriodStart(ago(0));
+      await t.pump();
+      expect(line(), isNot(before));
+    });
+
+    test('both screens listen to the one list', () {
+      String code(String p) => File(p).readAsStringSync();
+      expect(
+          RegExp(r'animation: ttcCycleViewChanges\(\)')
+              .allMatches(code('lib/screens/ttc/ttc_cycle_companion.dart'))
+              .length,
+          2);
+      expect(code('lib/screens/ttc/ttc_calendar_screen.dart'),
+          contains('animation: ttcCycleViewChanges(),'));
+    });
+  });
+
+  group('one key under the month', () {
+    testWidgets('the Calendar names its marks once', (t) async {
+      history();
+      await pumpTall(t, const TtcCalendarScreen());
+      expect(find.byKey(const ValueKey('ttc_hub_month_key')), findsOneWidget);
+      expect(find.text(const TtcS(false).calendarLogged), findsNothing);
+      expect(find.text('Fertile days'), findsOneWidget);
+    });
+
+    testWidgets('no estimate, no fertile days in the key', (t) async {
+      await pumpTall(t, const TtcCalendarScreen());
+      expect(find.byKey(const ValueKey('ttc_hub_month_key')), findsOneWidget);
+      expect(find.text('Fertile days'), findsNothing);
+      expect(find.text('Ovulation'), findsNothing);
+    });
+  });
+
+  testWidgets('the caption dot is the deeper mark, edged in white', (t) async {
+    history(day: 20);
+    await pumpTall(t, const TtcCycleCompanionScreen());
+    final box = t
+        .widget<Container>(
+            find.byKey(const ValueKey('ttc_hub_week_caption_dot')))
+        .decoration! as BoxDecoration;
+    expect(box.color, isNot(TtcCycleColours.waiting));
+    expect(box.border, isNotNull);
   });
 }

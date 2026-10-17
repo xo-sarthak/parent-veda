@@ -199,10 +199,11 @@ void main() {
         ..logPeriodStart(now.subtract(const Duration(days: 40)))
         ..logPeriodStart(now.subtract(const Duration(days: 12)));
       await pumpTall(tester, const TtcCalendarScreen());
-      // Twice on purpose: once in the legend, which is now open by default,
-      // and once as the actual entry under Coming up. Asserting "at least one"
-      // would pass on the legend alone and stop testing the countdown.
-      expect(find.text(const TtcS(false).calendarNextPeriod), findsNWidgets(2));
+      // Once, and exactly once: since 2026-10-18 the month's one key says
+      // "Expected period", so this text is only the entry under Coming up.
+      // Asserting "at least one" would stop testing the countdown. Kept for
+      // revert (legend + entry): findsNWidgets(2).
+      expect(find.text(const TtcS(false).calendarNextPeriod), findsOneWidget);
     });
 
     test('no "expected period" marker is drawn on a clinic path', () {

@@ -295,7 +295,7 @@ void main() {
         expect(row.icon, tool.icon, reason: id);
         expect(row.subtitle, tool.descEn, reason: id);
       }
-      expect(ttcToolById('cycle')!.nameEn, 'Cycle companion');
+      expect(ttcToolById('cycle')!.nameEn, 'Cycle Companion');
       // One name since the launch walk (2026-09-27): 'Fertility window' before.
       expect(ttcToolById('window')!.nameEn, 'Fertile window');
       expect(ttcToolById('records')!.nameEn, 'Records and reports');

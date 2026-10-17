@@ -107,12 +107,12 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge([
-          CycleStore.instance,
-          TtcStore.instance,
-          TtcLang.instance,
-          TtcPartnerMode.instance,
-        ]),
+        // ⚠️ EVERY STORE A DAY IS READ FROM (2026-10-18, the user: a symptom
+        // logged did not show "until I open that screen again"). The list had
+        // no TtcLogStore, where symptoms are saved. Kept for revert:
+        //   Listenable.merge([CycleStore.instance, TtcStore.instance,
+        //     TtcLang.instance, TtcPartnerMode.instance])
+        animation: ttcCycleViewChanges(),
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
           final t = TtcS.current();
@@ -917,8 +917,9 @@ class _TtcPeriodHistoryScreenState extends State<TtcPeriodHistoryScreen> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge(
-            [CycleStore.instance, TtcStore.instance, TtcPartnerMode.instance]),
+        // The one list (2026-10-18). Kept for revert: Listenable.merge(
+        //   [CycleStore.instance, TtcStore.instance, TtcPartnerMode.instance]),
+        animation: ttcCycleViewChanges(),
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
           final sheet = _CompanionSheet(

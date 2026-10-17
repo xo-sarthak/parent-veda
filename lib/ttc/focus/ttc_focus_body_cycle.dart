@@ -91,7 +91,7 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
         // are the Tools tab's (`ttc_tools_screen.dart`). Kept for revert:
         //   title: 'Your cycle',  title: 'Note how you feel',
         TtcToolTile(
-          title: 'Cycle companion',
+          title: 'Cycle Companion',
           id: 'ttc_tile_cycle_companion',
           blurb: 'Log your period and see your own pattern build up.',
           surfaceId: 'ttc_cycle',
