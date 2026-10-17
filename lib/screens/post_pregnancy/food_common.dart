@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_food_data.dart';
+import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../v2/v2_palette.dart';
 
 // Warm, food-friendly tints, varied by seed.
 const List<(Color, Color)> _kFoodTints = [
@@ -203,7 +205,14 @@ class FoodPhoto extends StatelessWidget {
         builder: (context, box) => FoodPhoto(recipe: recipe, height: box.maxHeight, radius: radius),
       );
     }
-    final thumb = FoodThumb(seed: recipe.seed, height: height, radius: radius);
+    // ⚠️ NEUTRAL, NOT THE TINTED THUMB (2026-10-17). FoodThumb rotates peach,
+    // lavender and blush stripes by seed, and with 27 of the 28 doc dishes
+    // still waiting on their photo, most cards came out lilac or pink: the
+    // user's "old UI hints, the lavender background some places". Mobbin:
+    // where a recipe has no picture (Woolworths) the block is a pale neutral,
+    // never a coloured stripe. FoodThumb stays as it was for the old cards.
+    // Was: final thumb = FoodThumb(seed: recipe.seed, height: height, radius: radius);
+    final thumb = _NeutralFoodBlock(height: height, radius: radius);
     final path = recipe.photo;
     if (path == null) return thumb;
     return ClipRRect(
@@ -214,6 +223,29 @@ class FoodPhoto extends StatelessWidget {
         width: double.infinity,
         fit: BoxFit.cover,
         errorBuilder: (_, _, _) => thumb,
+      ),
+    );
+  }
+}
+
+/// The doc-format dish before its photo arrives: the page's own pale surface
+/// and a line bowl in the third ink.
+class _NeutralFoodBlock extends StatelessWidget {
+  const _NeutralFoodBlock({required this.height, required this.radius});
+  final double height;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: Container(
+        height: height,
+        width: double.infinity,
+        color: p.surfaceAlt,
+        alignment: Alignment.center,
+        child: Icon(Icons.ramen_dining_outlined, size: height * 0.24, color: p.ink3),
       ),
     );
   }
@@ -250,6 +282,7 @@ class FoodPhotoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = recipe;
     final h = photoHeight ?? width * 0.75;
+    final p = V2PaletteStore.instance.current;
     return SizedBox(
       width: width,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -293,14 +326,21 @@ class FoodPhotoCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(top: 9),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(r.title, style: ppJakarta(14.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
+              // Was ppJakarta and ppMuted (#A99CBB, a lavender grey); the house
+              // palette since 2026-10-17.
+              Text(r.title,
+                  style: pvJakarta(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis),
               const SizedBox(height: 4),
               Row(children: [
-                Icon(Icons.schedule_rounded, size: 12.5, color: ppMuted),
+                Icon(Icons.schedule_rounded, size: 12.5, color: p.ink3),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text('${r.totalMin} min  ·  ${foodAgeLabel(r.ageTag)}',
-                      style: ppBody(12, color: ppMuted, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      style: pvManrope(fontSize: 12, fontWeight: FontWeight.w600, color: p.ink3),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
                 ),
               ]),
             ]),

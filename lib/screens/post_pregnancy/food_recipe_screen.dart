@@ -742,7 +742,9 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                   for (final e in r.substitutions.entries) _docSwap(p, e.key, e.value),
                 ],
                 const SizedBox(height: 30),
-                _related(title: 'More on ParentVeda'),
+                // Was _related(title: 'More on ParentVeda'): the old page's rows,
+                // a purple mark in a lilac well. Kept for revert.
+                _docRelated(p),
                 const SizedBox(height: 18),
                 Text('By ParentVeda team', style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
                 const SizedBox(height: 28),
@@ -756,7 +758,79 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
 
   TextStyle _docBody(V2Palette p) => pvManrope(fontSize: 15, height: 1.6, color: p.ink1);
 
+  // ---- more on ParentVeda: plain rows, ink marks, grey hairline -------------
+  // 2026-10-17 (the user: "old UI hints, the lavender background some places,
+  // pink purple"). The shared _related rows put a purple mark in a lilac well
+  // with lavender-grey labels. Mobbin: Kitchen Stories, Alma and Yazio all end
+  // a recipe with white rows, a grey hairline and ink icons; none tints them.
+  // Same rows and taps as _related, in the house palette.
+  Widget _docRelated(V2Palette p) {
+    final rows = <(IconData, String, String, VoidCallback)>[
+      if (r.relatedArticle != null) (Icons.menu_book_outlined, 'Article', r.relatedArticle!, () => _push(const ArticleReaderScreen())),
+      if (r.relatedVideoId != null)
+        (Icons.play_circle_outline, 'Watch', watchVideoById(r.relatedVideoId!).title, () {
+          final v = watchVideoById(r.relatedVideoId!);
+          _push(v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v));
+        }),
+      if (r.relatedProductId != null)
+        (
+          Icons.shopping_bag_outlined,
+          'Product',
+          productById(r.relatedProductId!).name,
+          () => openProductWithGuideCheck(
+                context,
+                id: productById(r.relatedProductId!).id,
+                name: productById(r.relatedProductId!).name,
+                onOpenNormal: () => _push(ProductDetailScreen(product: productById(r.relatedProductId!))),
+              )
+        ),
+      (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about feeding at ${foodAgeLabel(r.ageTag)}', () => openPpTab(context, 1)),
+    ];
+    return Column(
+      key: const ValueKey('pp_recipe_doc_related'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('More on ParentVeda', style: pvFraunces(fontSize: 21, fontWeight: FontWeight.w600, color: p.ink1)),
+        const SizedBox(height: 14),
+        for (final row in rows)
+          PvPress(child: GestureDetector(
+            onTap: row.$4,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: p.line)),
+              child: Row(children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(11)),
+                  child: Icon(row.$1, size: 18, color: p.ink1),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(row.$2.toUpperCase(),
+                        style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink3)),
+                    const SizedBox(height: 3),
+                    Text(row.$3,
+                        style: pvManrope(fontSize: 14, fontWeight: FontWeight.w600, color: p.ink1),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                  ]),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+              ]),
+            ),
+          )),
+      ],
+    );
+  }
+
   String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
+  String _lowerFirst(String s) => s.isEmpty ? s : s[0].toLowerCase() + s.substring(1);
 
   Widget _docSection(V2Palette p, String title, {String? side, String? sub}) => Padding(
         padding: const EdgeInsets.only(top: 30, bottom: 10),
@@ -995,7 +1069,10 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(n.name, style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
                   const SizedBox(height: 4),
-                  Text('From ${ppFill(n.note).replaceAll(RegExp(r'\.$'), '').toLowerCase()}',
+                  // Only the first letter is lowered: a doc note can carry
+                  // "vitamin-C" or "(tomato/lemon)" later in the line, and
+                  // lowering the whole note printed "vitamin-c".
+                  Text('From ${_lowerFirst(ppFill(n.note).replaceAll(RegExp(r'\.$'), ''))}',
                       style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
                 ]),
               ),
@@ -1041,7 +1118,14 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
         ]),
       );
 
-  Widget _docSwap(V2Palette p, String from, String to) => Padding(
+  // A swap with nothing after it is a note in the doc ("change the vegetables
+  // each time", "add a little mashed carrot"): the line alone, no arrow.
+  Widget _docSwap(V2Palette p, String from, String to) => to.isEmpty
+      ? Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Text(_cap(from), style: pvManrope(fontSize: 14.5, height: 1.45, color: p.ink1)),
+        )
+      : Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(children: [
           Flexible(child: Text(_cap(from), style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1))),
@@ -1065,11 +1149,21 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
               icon: Icons.shopping_basket_outlined,
               onTap: () {
                 FoodStore.instance.addRecipeToShopping(r);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: const Text('Ingredients added to your shopping list'),
-                  behavior: SnackBarBehavior.floating,
-                  action: SnackBarAction(label: 'View', onPressed: () => _push(const FoodShoppingScreen())),
-                ));
+                // pvToast, the one notice (toasts pass, 1b3f04e). The Material
+                // SnackBar it replaces took the theme's purple. Mobbin: Recime's
+                // "6 items added · View groceries" is the same shape. Lifted
+                // over the pinned foot so it never covers the two buttons.
+                pvToast(context, 'Added to your shopping list',
+                    kind: PvToastKind.done,
+                    action: 'View',
+                    onAction: () => _push(const FoodShoppingScreen()),
+                    lift: 84);
+                // Kept for revert:
+                // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                //   content: const Text('Ingredients added to your shopping list'),
+                //   behavior: SnackBarBehavior.floating,
+                //   action: SnackBarAction(label: 'View', onPressed: () => _push(const FoodShoppingScreen())),
+                // ));
               },
             ),
           ),

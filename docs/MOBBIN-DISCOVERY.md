@@ -868,6 +868,41 @@ recipe page for a baby.
   - the page and card on all 139 dishes;
   - a photo for each dish.
 
+### 21a. The pilot's components, in the house look (2026-10-17)
+
+**Why:** the user approved the pilot, with one complaint: "old UI hints, for example the lavender background
+some places, pink purple". The page's own code was already in V2Palette, but the parts it borrowed were not:
+- the shared "More on ParentVeda" rows (`_related`): a purple mark in a lilac well;
+- the photo placeholder (`FoodThumb`), which rotates peach, lavender and blush stripes;
+- the card's lavender-grey meta line (`ppMuted`);
+- a Material SnackBar in the theme's purple;
+- shelf hues in the rails that ran into lilac and pink.
+
+**Queries:** "recipe detail bottom section with related articles and ingredient links as rows", "recipe grid
+where some recipes have no photo", "recipe page with nutrition tiles, storage tips and a safety note".
+
+**Found:**
+- **The foot of a recipe:** Kitchen Stories ("More delicious ideas for you"), Alma (ingredient rows) and Yazio
+  end on white rows with a grey hairline and ink icons. None tints the block.
+- **Added to the list:** Recime's dark "6 items added · View groceries" bar and Kitchen Stories' "added to your
+  shopping list · Undo" are the same notice as our pvToast with an action.
+- **No photo yet:** Woolworths shows a pale neutral block. No app puts a coloured stripe where a photo goes.
+- **Facts, steps, nutrition:** HelloFresh's facts row, Lifesum's numbered steps and Crouton's notes confirm
+  what §21 already chose.
+
+**Adopted (doc-format dishes only; the older dishes keep their look):**
+- **`_docRelated`:** the same rows and taps, with an ink mark on the pale surface, the grey line and the third
+  ink for labels.
+- **A neutral placeholder:** `FoodPhoto` draws a plain surface block with a line bowl until the photo arrives.
+- **The card's title and meta** are in the house palette.
+- **"Add all to list"** confirms with pvToast and a View action.
+- **Rail shelf hues** stay in the warm food range (orange to leaf green).
+- **A test:** `test/pp_recipes_test.dart` fails if ppPurple, ppPanel, ppMuted, ppHair or ppBorder paints
+  anywhere on a doc page or doc card.
+
+**Declined:** a "More for 7–8 months" photo rail at the foot (Kitchen Stories). It is a new section, and the
+ask was the look, not the layout.
+
 ## 22. The Dear Baby vault — read aloud, the opening at birth, the book (2026-10-15)
 
 **Trigger.** REMAINING-CHANGES items 8 (Baby vault) and 12 (Keepsake PDF),

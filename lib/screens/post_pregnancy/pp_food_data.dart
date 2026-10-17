@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/content_ownership.dart';
 import '../../services/recipe_store.dart';
+import '../../data/pp_recipe_docs/band_7_8m.dart';
 import '../../services/remote/cloud_synced_store.dart';
 
 /// One key nutrient line for the Nutrition Breakdown.
@@ -783,39 +784,42 @@ const List<FoodRecipe> kFoodRecipes = [
     tags: {'iron', 'calcium', 'smoothie', 'drink', 'ragi', 'banana', 'fussy eater'},
     ingredientKeys: {'ragi', 'banana', 'milk', 'dates'},
   ),
-  FoodRecipe(
-    id: 'tomatocarrotsoup',
-    title: 'Tomato & carrot soup',
-    subtitle: 'Smooth, warm and vitamin-A rich',
-    category: 'Soups',
-    slot: 'Evening snack',
-    ageTag: '8 to 12 mo',
-    veg: true,
-    immunity: true,
-    situations: {'Cough & cold'},
-    prepMin: 5,
-    cookMin: 15,
-    difficulty: 'Easy',
-    seed: 10,
-    highlight: 'Vitamin A + C',
-    why:
-        'A silky tomato-carrot soup is warmth and vitamins in a cup, vitamin A for immunity and vitamin C to help him absorb iron from the rest of his meals. Lovely as a light evening sip, especially with a stuffy nose.',
-    nutrients: [
-      FoodNutrient('Vitamin A', 'good', 'Immunity and eyes.'),
-      FoodNutrient('Vitamin C', 'good', 'Boosts iron absorption.'),
-      FoodNutrient('Hydration', 'good', 'Gentle fluids.'),
-    ],
-    frequency: 'A few times a week',
-    ingredients: ['1 tomato', '1 small carrot', 'A little water', 'A drop of ghee'],
-    steps: ['Cook tomato and carrot soft.', 'Blend smooth and strain if needed.', 'Warm through with a drop of ghee; serve just-warm.'],
-    storage: ['Fridge up to 2 days; reheat gently.'],
-    mistakes: ['Adding stock cubes or salt, the vegetables are sweet enough.'],
-    substitutions: {'carrot': 'pumpkin or bottle gourd'},
-    healthierNote: 'No cream, no salt, no stock cubes, just blended vegetables and a drop of ghee for absorption.',
-    tags: {'vitamin a', 'vitamin c', 'soup', 'sick day', 'tomato', 'vegetables'},
-    ingredientKeys: {'tomato', 'vegetables'},
-    relatedCommunity: 'Sick-day meals that worked',
-  ),
+  // REPLACED 2026-10-17 by 7-8M-REC-22 Tomato and carrot soup (Drive "Recipes (not reviewed)"),
+  // id pp_7_8m_tomato_carrot_soup. Saves and cooks of 'tomatocarrotsoup' move there through
+  // kFoodRecipeMoved. Kept for revert.
+//   FoodRecipe(
+//     id: 'tomatocarrotsoup',
+//     title: 'Tomato & carrot soup',
+//     subtitle: 'Smooth, warm and vitamin-A rich',
+//     category: 'Soups',
+//     slot: 'Evening snack',
+//     ageTag: '8 to 12 mo',
+//     veg: true,
+//     immunity: true,
+//     situations: {'Cough & cold'},
+//     prepMin: 5,
+//     cookMin: 15,
+//     difficulty: 'Easy',
+//     seed: 10,
+//     highlight: 'Vitamin A + C',
+//     why:
+//         'A silky tomato-carrot soup is warmth and vitamins in a cup, vitamin A for immunity and vitamin C to help him absorb iron from the rest of his meals. Lovely as a light evening sip, especially with a stuffy nose.',
+//     nutrients: [
+//       FoodNutrient('Vitamin A', 'good', 'Immunity and eyes.'),
+//       FoodNutrient('Vitamin C', 'good', 'Boosts iron absorption.'),
+//       FoodNutrient('Hydration', 'good', 'Gentle fluids.'),
+//     ],
+//     frequency: 'A few times a week',
+//     ingredients: ['1 tomato', '1 small carrot', 'A little water', 'A drop of ghee'],
+//     steps: ['Cook tomato and carrot soft.', 'Blend smooth and strain if needed.', 'Warm through with a drop of ghee; serve just-warm.'],
+//     storage: ['Fridge up to 2 days; reheat gently.'],
+//     mistakes: ['Adding stock cubes or salt, the vegetables are sweet enough.'],
+//     substitutions: {'carrot': 'pumpkin or bottle gourd'},
+//     healthierNote: 'No cream, no salt, no stock cubes, just blended vegetables and a drop of ghee for absorption.',
+//     tags: {'vitamin a', 'vitamin c', 'soup', 'sick day', 'tomato', 'vegetables'},
+//     ingredientKeys: {'tomato', 'vegetables'},
+//     relatedCommunity: 'Sick-day meals that worked',
+//   ),
   FoodRecipe(
     id: 'besanchilla',
     title: 'Soft besan chilla',
@@ -1311,40 +1315,43 @@ const List<FoodRecipe> kFoodRecipes = [
     situations: {'Loose motion'},
     relatedProductId: 'spoons',
   ),
-  FoodRecipe(
-    id: 'suji_kheer_nosugar',
-    title: 'Suji kheer without sugar',
-    subtitle: 'Soft and naturally sweet with fruit',
-    category: 'First Foods',
-    slot: 'Morning snack',
-    ageTag: '6 to 12 mo',
-    veg: true,
-    prepMin: 2,
-    cookMin: 8,
-    difficulty: 'Easy',
-    seed: 37,
-    highlight: 'Energy',
-    why: 'Roasted suji cooked soft makes a smooth porridge; mashed banana or dates sweeten it without sugar.',
-    nutrients: [
-      FoodNutrient('Energy', 'good', 'Filling for a small stomach.'),
-      FoodNutrient('Calcium', 'some', 'From the milk.'),
-    ],
-    frequency: 'A few times a week',
-    ingredients: ['1 tbsp suji (semolina)', '1/2 tsp ghee', '1/2 cup water and milk', '1/4 ripe banana, mashed'],
-    steps: [
-      'Roast the suji in ghee on low heat for 2 minutes until it smells nutty.',
-      'Add the water slowly, stirring, and cook until soft.',
-      'Stir in the milk and the mashed banana.',
-      'Cool to just warm.',
-    ],
-    storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
-    mistakes: ['Adding sugar or jaggery before one.'],
-    substitutions: {'banana': 'soaked mashed dates'},
-    healthierNote: 'Banana does the sweetening instead of sugar.',
-    tags: {'first food', 'kheer', 'porridge', 'suji'},
-    ingredientKeys: {'banana', 'milk'},
-    relatedProductId: 'spoons',
-  ),
+  // REPLACED 2026-10-17 by 7-8M-REC-02 Suji kheer (Drive "Recipes (not reviewed)"),
+  // id pp_7_8m_suji_kheer. Saves and cooks of 'suji_kheer_nosugar' move there through
+  // kFoodRecipeMoved. Kept for revert.
+//   FoodRecipe(
+//     id: 'suji_kheer_nosugar',
+//     title: 'Suji kheer without sugar',
+//     subtitle: 'Soft and naturally sweet with fruit',
+//     category: 'First Foods',
+//     slot: 'Morning snack',
+//     ageTag: '6 to 12 mo',
+//     veg: true,
+//     prepMin: 2,
+//     cookMin: 8,
+//     difficulty: 'Easy',
+//     seed: 37,
+//     highlight: 'Energy',
+//     why: 'Roasted suji cooked soft makes a smooth porridge; mashed banana or dates sweeten it without sugar.',
+//     nutrients: [
+//       FoodNutrient('Energy', 'good', 'Filling for a small stomach.'),
+//       FoodNutrient('Calcium', 'some', 'From the milk.'),
+//     ],
+//     frequency: 'A few times a week',
+//     ingredients: ['1 tbsp suji (semolina)', '1/2 tsp ghee', '1/2 cup water and milk', '1/4 ripe banana, mashed'],
+//     steps: [
+//       'Roast the suji in ghee on low heat for 2 minutes until it smells nutty.',
+//       'Add the water slowly, stirring, and cook until soft.',
+//       'Stir in the milk and the mashed banana.',
+//       'Cool to just warm.',
+//     ],
+//     storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
+//     mistakes: ['Adding sugar or jaggery before one.'],
+//     substitutions: {'banana': 'soaked mashed dates'},
+//     healthierNote: 'Banana does the sweetening instead of sugar.',
+//     tags: {'first food', 'kheer', 'porridge', 'suji'},
+//     ingredientKeys: {'banana', 'milk'},
+//     relatedProductId: 'spoons',
+//   ),
   FoodRecipe(
     id: 'applestew',
     title: 'Stewed apple',
@@ -1450,41 +1457,44 @@ const List<FoodRecipe> kFoodRecipes = [
     ingredientKeys: {'vegetables'},
     relatedProductId: 'spoons',
   ),
-  FoodRecipe(
-    id: 'carrot_beet_mash',
-    title: 'Carrot and beetroot mash',
-    subtitle: 'A bright first vegetable',
-    category: 'First Foods',
-    slot: 'Lunch',
-    ageTag: '6+ mo',
-    veg: true,
-    vegan: true,
-    prepMin: 5,
-    cookMin: 15,
-    difficulty: 'Easy',
-    seed: 41,
-    highlight: 'Vitamin A + iron',
-    why: 'Carrot brings vitamin A and beetroot a little iron and natural sweetness. The colour may turn his poo pink, which is harmless.',
-    nutrients: [
-      FoodNutrient('Vitamin A', 'excellent', 'For eyes and immunity.'),
-      FoodNutrient('Folate', 'good', 'From beetroot.'),
-    ],
-    frequency: 'A few times a week',
-    ingredients: ['1 small carrot', '1/2 small beetroot', 'Water'],
-    steps: [
-      'Peel and cube both.',
-      'Steam until very soft.',
-      'Mash or blend, thinning with water.',
-      'Serve warm.',
-    ],
-    storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
-    mistakes: ['Too much beetroot at once: start small.'],
-    substitutions: {'beetroot': 'pumpkin'},
-    healthierNote: 'Just vegetables.',
-    tags: {'beetroot', 'carrot', 'first food', 'vegetables'},
-    ingredientKeys: {'vegetables'},
-    relatedProductId: 'spoons',
-  ),
+  // REPLACED 2026-10-17 by 7-8M-REC-04 Beetroot and carrot mash (Drive "Recipes (not reviewed)"),
+  // id pp_7_8m_beetroot_and_carrot_mash. Saves and cooks of 'carrot_beet_mash' move there through
+  // kFoodRecipeMoved. Kept for revert.
+//   FoodRecipe(
+//     id: 'carrot_beet_mash',
+//     title: 'Carrot and beetroot mash',
+//     subtitle: 'A bright first vegetable',
+//     category: 'First Foods',
+//     slot: 'Lunch',
+//     ageTag: '6+ mo',
+//     veg: true,
+//     vegan: true,
+//     prepMin: 5,
+//     cookMin: 15,
+//     difficulty: 'Easy',
+//     seed: 41,
+//     highlight: 'Vitamin A + iron',
+//     why: 'Carrot brings vitamin A and beetroot a little iron and natural sweetness. The colour may turn his poo pink, which is harmless.',
+//     nutrients: [
+//       FoodNutrient('Vitamin A', 'excellent', 'For eyes and immunity.'),
+//       FoodNutrient('Folate', 'good', 'From beetroot.'),
+//     ],
+//     frequency: 'A few times a week',
+//     ingredients: ['1 small carrot', '1/2 small beetroot', 'Water'],
+//     steps: [
+//       'Peel and cube both.',
+//       'Steam until very soft.',
+//       'Mash or blend, thinning with water.',
+//       'Serve warm.',
+//     ],
+//     storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
+//     mistakes: ['Too much beetroot at once: start small.'],
+//     substitutions: {'beetroot': 'pumpkin'},
+//     healthierNote: 'Just vegetables.',
+//     tags: {'beetroot', 'carrot', 'first food', 'vegetables'},
+//     ingredientKeys: {'vegetables'},
+//     relatedProductId: 'spoons',
+//   ),
   FoodRecipe(
     id: 'idli_dalwater',
     title: 'Mashed idli with dal water',
@@ -1519,40 +1529,43 @@ const List<FoodRecipe> kFoodRecipes = [
     ingredientKeys: {'rice'},
     relatedProductId: 'spoons',
   ),
-  FoodRecipe(
-    id: 'oats_banana_porridge',
-    title: 'Oats and banana porridge',
-    subtitle: 'Creamy and naturally sweet',
-    category: 'First Foods',
-    slot: 'Breakfast',
-    ageTag: '6 to 12 mo',
-    veg: true,
-    prepMin: 2,
-    cookMin: 6,
-    difficulty: 'Easy',
-    seed: 43,
-    highlight: 'Fibre + energy',
-    why: 'Plain oats cook into a creamy porridge, and banana sweetens it without sugar.',
-    nutrients: [
-      FoodNutrient('Fibre', 'good', 'Keeps him regular.'),
-      FoodNutrient('Potassium', 'good', 'From banana.'),
-    ],
-    frequency: 'A few times a week',
-    ingredients: ['2 tbsp plain rolled oats, powdered', '1/2 cup water or milk', '1/4 ripe banana'],
-    steps: [
-      'Cook the oats in water on low heat until soft.',
-      'Mash the banana and stir in.',
-      'Thin to his texture and cool.',
-    ],
-    storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
-    mistakes: ['Using flavoured instant oats with sugar and salt.'],
-    substitutions: {'banana': 'stewed apple'},
-    healthierNote: 'Plain oats, no sugar.',
-    tags: {'banana', 'first food', 'oats', 'porridge'},
-    ingredientKeys: {'banana', 'milk', 'oats'},
-    situations: {'Constipation'},
-    relatedProductId: 'spoons',
-  ),
+  // REPLACED 2026-10-17 by 7-8M-REC-01 Oats porridge (Drive "Recipes (not reviewed)"),
+  // id pp_7_8m_oats_porridge. Saves and cooks of 'oats_banana_porridge' move there through
+  // kFoodRecipeMoved. Kept for revert.
+//   FoodRecipe(
+//     id: 'oats_banana_porridge',
+//     title: 'Oats and banana porridge',
+//     subtitle: 'Creamy and naturally sweet',
+//     category: 'First Foods',
+//     slot: 'Breakfast',
+//     ageTag: '6 to 12 mo',
+//     veg: true,
+//     prepMin: 2,
+//     cookMin: 6,
+//     difficulty: 'Easy',
+//     seed: 43,
+//     highlight: 'Fibre + energy',
+//     why: 'Plain oats cook into a creamy porridge, and banana sweetens it without sugar.',
+//     nutrients: [
+//       FoodNutrient('Fibre', 'good', 'Keeps him regular.'),
+//       FoodNutrient('Potassium', 'good', 'From banana.'),
+//     ],
+//     frequency: 'A few times a week',
+//     ingredients: ['2 tbsp plain rolled oats, powdered', '1/2 cup water or milk', '1/4 ripe banana'],
+//     steps: [
+//       'Cook the oats in water on low heat until soft.',
+//       'Mash the banana and stir in.',
+//       'Thin to his texture and cool.',
+//     ],
+//     storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
+//     mistakes: ['Using flavoured instant oats with sugar and salt.'],
+//     substitutions: {'banana': 'stewed apple'},
+//     healthierNote: 'Plain oats, no sugar.',
+//     tags: {'banana', 'first food', 'oats', 'porridge'},
+//     ingredientKeys: {'banana', 'milk', 'oats'},
+//     situations: {'Constipation'},
+//     relatedProductId: 'spoons',
+//   ),
   FoodRecipe(
     id: 'papaya_mash',
     title: 'Papaya mash',
@@ -1588,38 +1601,41 @@ const List<FoodRecipe> kFoodRecipes = [
     situations: {'Constipation'},
     relatedProductId: 'spoons',
   ),
-  FoodRecipe(
-    id: 'paneerstrips',
-    title: 'Soft paneer strips',
-    subtitle: 'Protein small hands can hold',
-    category: 'Finger Foods',
-    slot: 'Evening snack',
-    ageTag: '8 to 12 mo',
-    veg: true,
-    prepMin: 5,
-    cookMin: 3,
-    difficulty: 'Easy',
-    seed: 45,
-    highlight: 'Protein + calcium',
-    why: 'Fresh soft paneer is easy to gum and full of protein and calcium.',
-    nutrients: [
-      FoodNutrient('Protein', 'good', 'For growth.'),
-      FoodNutrient('Calcium', 'good', 'For bones.'),
-    ],
-    frequency: 'A few times a week',
-    ingredients: ['50 g fresh paneer'],
-    steps: [
-      'Cut into finger-length strips.',
-      'Warm briefly in a pan with a drop of ghee, or serve fresh.',
-      'Let him pick them up.',
-    ],
-    storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
-    mistakes: ['Cutting into small hard cubes for a new eater.'],
-    substitutions: {'paneer': 'tofu'},
-    healthierNote: 'Fresh, unsalted paneer.',
-    tags: {'finger food', 'paneer', 'protein'},
-    ingredientKeys: {'paneer'},
-  ),
+  // REPLACED 2026-10-17 by 7-8M-REC-17 Soft paneer cubes (Drive "Recipes (not reviewed)"),
+  // id pp_7_8m_soft_paneer_cubes. Saves and cooks of 'paneerstrips' move there through
+  // kFoodRecipeMoved. Kept for revert.
+//   FoodRecipe(
+//     id: 'paneerstrips',
+//     title: 'Soft paneer strips',
+//     subtitle: 'Protein small hands can hold',
+//     category: 'Finger Foods',
+//     slot: 'Evening snack',
+//     ageTag: '8 to 12 mo',
+//     veg: true,
+//     prepMin: 5,
+//     cookMin: 3,
+//     difficulty: 'Easy',
+//     seed: 45,
+//     highlight: 'Protein + calcium',
+//     why: 'Fresh soft paneer is easy to gum and full of protein and calcium.',
+//     nutrients: [
+//       FoodNutrient('Protein', 'good', 'For growth.'),
+//       FoodNutrient('Calcium', 'good', 'For bones.'),
+//     ],
+//     frequency: 'A few times a week',
+//     ingredients: ['50 g fresh paneer'],
+//     steps: [
+//       'Cut into finger-length strips.',
+//       'Warm briefly in a pan with a drop of ghee, or serve fresh.',
+//       'Let him pick them up.',
+//     ],
+//     storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
+//     mistakes: ['Cutting into small hard cubes for a new eater.'],
+//     substitutions: {'paneer': 'tofu'},
+//     healthierNote: 'Fresh, unsalted paneer.',
+//     tags: {'finger food', 'paneer', 'protein'},
+//     ingredientKeys: {'paneer'},
+//   ),
   FoodRecipe(
     id: 'sweetpotato_wedges',
     title: 'Baked sweet potato wedges',
@@ -1687,39 +1703,42 @@ const List<FoodRecipe> kFoodRecipes = [
     tags: {'finger food', 'vegetables'},
     ingredientKeys: {'vegetables'},
   ),
-  FoodRecipe(
-    id: 'idli_fingers',
-    title: 'Mini idli fingers',
-    subtitle: 'Soft and easy to grab',
-    category: 'Finger Foods',
-    slot: 'Breakfast',
-    ageTag: '8 to 12 mo',
-    veg: true,
-    vegan: true,
-    prepMin: 5,
-    cookMin: 12,
-    difficulty: 'Easy',
-    seed: 48,
-    highlight: 'Easy to digest',
-    why: 'Small, soft idlis are perfect for little hands, and fermentation makes them easy to digest.',
-    nutrients: [
-      FoodNutrient('Protein', 'good', 'Rice and urad dal.'),
-      FoodNutrient('Energy', 'good', 'Filling.'),
-    ],
-    frequency: 'A few times a week',
-    ingredients: ['Idli batter (unsalted portion for babies)', 'Grated carrot (optional)'],
-    steps: [
-      'Stir grated carrot into his portion of batter.',
-      'Steam in mini idli moulds for 10 to 12 minutes.',
-      'Cut into fingers when cool.',
-    ],
-    storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
-    mistakes: ['Using salted batter for babies under one.'],
-    substitutions: {'carrot': 'beetroot'},
-    healthierNote: 'Steamed.',
-    tags: {'breakfast', 'finger food', 'idli'},
-    ingredientKeys: {'rice', 'vegetables'},
-  ),
+  // REPLACED 2026-10-17 by 7-8M-REC-26 Soft idli pieces (Drive "Recipes (not reviewed)"),
+  // id pp_7_8m_soft_idli_pieces. Saves and cooks of 'idli_fingers' move there through
+  // kFoodRecipeMoved. Kept for revert.
+//   FoodRecipe(
+//     id: 'idli_fingers',
+//     title: 'Mini idli fingers',
+//     subtitle: 'Soft and easy to grab',
+//     category: 'Finger Foods',
+//     slot: 'Breakfast',
+//     ageTag: '8 to 12 mo',
+//     veg: true,
+//     vegan: true,
+//     prepMin: 5,
+//     cookMin: 12,
+//     difficulty: 'Easy',
+//     seed: 48,
+//     highlight: 'Easy to digest',
+//     why: 'Small, soft idlis are perfect for little hands, and fermentation makes them easy to digest.',
+//     nutrients: [
+//       FoodNutrient('Protein', 'good', 'Rice and urad dal.'),
+//       FoodNutrient('Energy', 'good', 'Filling.'),
+//     ],
+//     frequency: 'A few times a week',
+//     ingredients: ['Idli batter (unsalted portion for babies)', 'Grated carrot (optional)'],
+//     steps: [
+//       'Stir grated carrot into his portion of batter.',
+//       'Steam in mini idli moulds for 10 to 12 minutes.',
+//       'Cut into fingers when cool.',
+//     ],
+//     storage: ['Best fresh; leftovers in the fridge up to 24 hours, reheated until hot and cooled to warm.'],
+//     mistakes: ['Using salted batter for babies under one.'],
+//     substitutions: {'carrot': 'beetroot'},
+//     healthierNote: 'Steamed.',
+//     tags: {'breakfast', 'finger food', 'idli'},
+//     ingredientKeys: {'rice', 'vegetables'},
+//   ),
   FoodRecipe(
     id: 'egg_fingers',
     title: 'Egg omelette fingers',
@@ -4902,58 +4921,68 @@ const List<FoodRecipe> kFoodRecipes = [
     ingredientKeys: {'banana'},
   ),
 
+  // The hand-written pilot (2026-10-15), now generated with the rest of its band
+  // into lib/data/pp_recipe_docs/band_7_8m.dart (same id, same values). Kept
+  // for revert.
+//   // ---- Drive: "Recipes (not reviewed)" / 7-8 month band (PROMPT4) FINAL ----
+//   // The pilot of the doc format and the new recipe page (2026-10-15). Copied
+//   // from the doc as written; the doc's own status is "Editorial Review Pending
+//   // — Medical Review Pending". The other 27 of the band follow once the user
+//   // has approved the page on this one.
+//   FoodRecipe(
+//     id: 'pp_7_8m_mixed_dal_khichdi',
+//     docId: '7-8M-REC-11',
+//     photo: 'assets/recipes/pp_7_8m_mixed_dal_khichdi.webp',
+//     title: 'Mixed dal khichdi',
+//     subtitle: 'Two dals, rice and veg in one soft, balanced bowl.',
+//     category: 'Lunch',
+//     alsoIn: {'First Foods', 'Dinner'},
+//     slot: 'Lunch',
+//     ageTag: '7 to 8 mo',
+//     veg: true,
+//     vegan: true,
+//     serves: 2,
+//     mealRole: 'Small meal',
+//     texture: 'Soft mash',
+//     prepMin: 5,
+//     cookMin: 20,
+//     difficulty: 'Easy',
+//     seed: 147,
+//     highlight: 'Protein + iron',
+//     why:
+//         'This khichdi brings moong and masoor dal with rice and soft veg — protein, iron, energy and a little fat from ghee in one bowl. The everyday all-in-one meal of Indian baby food.',
+//     nutrients: [
+//       FoodNutrient('Protein', '', 'Moong and masoor dal.'),
+//       FoodNutrient('Iron (from plants)', '', 'The dals.'),
+//       FoodNutrient('Energy', '', 'Rice.'),
+//     ],
+//     frequency: 'Most days as a main meal.',
+//     ingredients: ['Rice', 'Moong dal', 'Masoor dal (red lentil)', 'Soft vegetables, chopped', 'Water', 'Ghee'],
+//     amounts: ['1 tbsp (about 12 g)', '½ tbsp (about 6 g)', '½ tbsp (about 6 g)', '2 tbsp (about 25 g)', '1 cup (240 ml)', '¼ tsp'],
+//     equipment: ['a pressure cooker', 'a masher'],
+//     steps: [
+//       'Wash the rice and both dals together.',
+//       'Add the veg and water; pressure cook till very soft.',
+//       'Mash to a soft khichdi.',
+//       'Stir in the ghee. Cool till just warm.',
+//     ],
+//     storage: ['Fresh; fridge up to 24 hours.'],
+//     mistakes: [
+//       'Cook everything fully soft. No salt.',
+//       'If masoor dal is new, give a small amount first and watch for any reaction.',
+//     ],
+//     substitutions: {'masoor': 'all moong dal', 'rice': 'dalia'},
+//     healthierNote: '',
+//     tags: {'khichdi', 'dal', 'moong', 'masoor', 'rice', 'protein', 'iron', 'first foods', 'lunch', 'dinner'},
+//     ingredientKeys: {'rice', 'moong dal', 'vegetables'},
+//   ),
+
   // ---- Drive: "Recipes (not reviewed)" / 7-8 month band (PROMPT4) FINAL ----
-  // The pilot of the doc format and the new recipe page (2026-10-15). Copied
-  // from the doc as written; the doc's own status is "Editorial Review Pending
-  // — Medical Review Pending". The other 27 of the band follow once the user
-  // has approved the page on this one.
-  FoodRecipe(
-    id: 'pp_7_8m_mixed_dal_khichdi',
-    docId: '7-8M-REC-11',
-    photo: 'assets/recipes/pp_7_8m_mixed_dal_khichdi.webp',
-    title: 'Mixed dal khichdi',
-    subtitle: 'Two dals, rice and veg in one soft, balanced bowl.',
-    category: 'Lunch',
-    alsoIn: {'First Foods', 'Dinner'},
-    slot: 'Lunch',
-    ageTag: '7 to 8 mo',
-    veg: true,
-    vegan: true,
-    serves: 2,
-    mealRole: 'Small meal',
-    texture: 'Soft mash',
-    prepMin: 5,
-    cookMin: 20,
-    difficulty: 'Easy',
-    seed: 147,
-    highlight: 'Protein + iron',
-    why:
-        'This khichdi brings moong and masoor dal with rice and soft veg — protein, iron, energy and a little fat from ghee in one bowl. The everyday all-in-one meal of Indian baby food.',
-    nutrients: [
-      FoodNutrient('Protein', '', 'Moong and masoor dal.'),
-      FoodNutrient('Iron (from plants)', '', 'The dals.'),
-      FoodNutrient('Energy', '', 'Rice.'),
-    ],
-    frequency: 'Most days as a main meal.',
-    ingredients: ['Rice', 'Moong dal', 'Masoor dal (red lentil)', 'Soft vegetables, chopped', 'Water', 'Ghee'],
-    amounts: ['1 tbsp (about 12 g)', '½ tbsp (about 6 g)', '½ tbsp (about 6 g)', '2 tbsp (about 25 g)', '1 cup (240 ml)', '¼ tsp'],
-    equipment: ['a pressure cooker', 'a masher'],
-    steps: [
-      'Wash the rice and both dals together.',
-      'Add the veg and water; pressure cook till very soft.',
-      'Mash to a soft khichdi.',
-      'Stir in the ghee. Cool till just warm.',
-    ],
-    storage: ['Fresh; fridge up to 24 hours.'],
-    mistakes: [
-      'Cook everything fully soft. No salt.',
-      'If masoor dal is new, give a small amount first and watch for any reaction.',
-    ],
-    substitutions: {'masoor': 'all moong dal', 'rice': 'dalia'},
-    healthierNote: '',
-    tags: {'khichdi', 'dal', 'moong', 'masoor', 'rice', 'protein', 'iron', 'first foods', 'lunch', 'dinner'},
-    ingredientKeys: {'rice', 'moong dal', 'vegetables'},
-  ),
+  // All 28, approved on the pilot by the user 2026-10-17. Generated by
+  // tools/recipe_pages/docx_to_dart.py; the doc is the source of truth, so fix
+  // the doc and re-run rather than editing the generated file. The doc's own
+  // status is "Editorial Review Pending — Medical Review Pending".
+  ...kRecipeBand78m,
 ];
 
 // ---- nutrition focuses ------------------------------------------------------
@@ -5004,7 +5033,7 @@ const List<NutritionFocus> kNutritionFocuses = [
     sources: ['Sweet potato', 'Carrot', 'Pumpkin', 'Spinach', 'Mango'],
     easyFoods: ['Sweet potato mash', 'Tomato & carrot soup'],
     deficiency: 'A varied vegetable diet usually covers it; ask your paediatrician if unsure.',
-    recipeIds: ['sweetpotatomash', 'tomatocarrotsoup'],
+    recipeIds: ['sweetpotatomash', 'pp_7_8m_tomato_carrot_soup'], // was 'tomatocarrotsoup'
     seed: 34,
   ),
   NutritionFocus(
@@ -5067,8 +5096,34 @@ Listenable get foodListenable =>
     Listenable.merge([FoodStore.instance, RecipeStore.instance]);
 
 // ---- lookups + engine -------------------------------------------------------
-FoodRecipe foodRecipeById(String id) =>
-    foodCatalog.firstWhere((r) => r.id == id, orElse: () => foodCatalog.first);
+/// ⚠️ OLD IDS THAT NOW LIVE UNDER A NEW ONE (2026-10-17).
+///
+/// When a Drive band doc replaces a near-identical older dish, the older dish
+/// is commented out. Its id is still in people's saved and cooked lists, both
+/// on the phone and in the cloud copy of `pp_food`, and [foodRecipeById] falls
+/// back to the FIRST dish for an unknown id. So without this map a mother who
+/// saved the old tomato soup would open her saves and find ragi pancakes. The
+/// lookup and the store both route through it, so the bookmark follows the
+/// dish. Add a line whenever a doc replaces an older dish; never remove one.
+const Map<String, String> kFoodRecipeMoved = {
+  'suji_kheer_nosugar': 'pp_7_8m_suji_kheer',
+  'carrot_beet_mash': 'pp_7_8m_beetroot_and_carrot_mash',
+  'tomatocarrotsoup': 'pp_7_8m_tomato_carrot_soup',
+  'oats_banana_porridge': 'pp_7_8m_oats_porridge',
+  'idli_fingers': 'pp_7_8m_soft_idli_pieces',
+  'paneerstrips': 'pp_7_8m_soft_paneer_cubes',
+};
+
+/// [id] after any move in [kFoodRecipeMoved].
+String foodRecipeCurrentId(String id) => kFoodRecipeMoved[id] ?? id;
+
+FoodRecipe foodRecipeById(String id) {
+  final want = foodRecipeCurrentId(id);
+  return foodCatalog.firstWhere((r) => r.id == want, orElse: () => foodCatalog.first);
+}
+// Kept for revert:
+// FoodRecipe foodRecipeById(String id) =>
+//     foodCatalog.firstWhere((r) => r.id == id, orElse: () => foodCatalog.first);
 NutritionFocus focusById(String id) =>
     kNutritionFocuses.firstWhere((f) => f.id == id, orElse: () => kNutritionFocuses.first);
 List<FoodRecipe> foodByCategory(String category) {
@@ -5143,7 +5198,7 @@ Map<String, FoodRecipe> todaysMeals() => {
       'Breakfast': foodRecipeById('ragipancake'),
       'Morning snack': foodRecipeById('ragismoothie'),
       'Lunch': foodRecipeById('moongkhichdi'),
-      'Evening snack': foodRecipeById('tomatocarrotsoup'),
+      'Evening snack': foodRecipeById('pp_7_8m_tomato_carrot_soup'), // was 'tomatocarrotsoup'
       'Dinner': foodRecipeById('palakdal'),
     };
 
@@ -5282,9 +5337,11 @@ class FoodStore extends ChangeNotifier with CloudSyncedStore {
   void applyCloudData(Object data) {
     if (data is! Map) return;
     final s = data['saved'];
-    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    // Through kFoodRecipeMoved, so a save of a replaced dish lands on the dish
+    // that replaced it (the Set drops the doubles if she had saved both).
+    if (s is List) _saved..clear()..addAll(s.map((e) => foodRecipeCurrentId(e.toString())));
     final c = data['cooked'];
-    if (c is List) _cooked..clear()..addAll(c.map((e) => e.toString()));
+    if (c is List) _cooked..clear()..addAll(c.map((e) => foodRecipeCurrentId(e.toString())));
     final sh = data['shopping'];
     if (sh is Map) {
       _shopping

@@ -228,7 +228,10 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
       : PvShelfCard(
         key: ValueKey('pp_recipe_${r.id}'),
         p: p,
-        hue: (80 + i * 26) % 360,
+        // Kept inside the warm food hues (orange to leaf green). The old
+        // `(80 + i * 26) % 360` ran into lilac and pink from about the seventh
+        // card, beside the doc dishes (the user, 2026-10-17: "pink purple").
+        hue: 20.0 + (i * 26) % 120,
         kind: PvShelfKind.recipe,
         kindWord: r.ageTag,
         fact: _time(r),
