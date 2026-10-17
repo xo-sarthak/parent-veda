@@ -2959,6 +2959,32 @@ The user chose (2026-10-17) to grant UPDATE on **own rows only**. `using` and `w
 which has no edit, only `refreshDerived` for the app's own milestones. `test/ttc_schema_contract_test.dart` pins
 the own-row shape.
 
+### 16ii-d. "Cloud wins" needs to know what the phone hasn't sent yet (blob stores, 2026-10-17)
+
+The 38 `CloudSyncedStore`s keep one JSON blob per user per store, and their sync is "cloud wins": if the cloud
+has a blob, take it. That rule is right for a fresh install and wrong for a phone holding a change the cloud never
+got. The push was fire-and-forget, so an offline change failed, nothing remembered it, and the next sync replaced
+it with the cloud's older blob.
+
+> General fact: **a fire-and-forget write needs a durable "not yet confirmed" mark, or the next read overwrites
+> it.** Retry logic is the easy half. The hard half is knowing, after a restart, that there's anything to retry.
+
+The fix is three small pieces in the mixin:
+1. **A waiting mark on disk** per store. It's set on change, and cleared only when an upload of the *newest*
+   state is confirmed. An edit counter makes that test exact: capture it before the upload, compare it after.
+2. **Push before pull.** A sync that finds the mark set uploads this phone's blob instead of reading the cloud's.
+3. **One upload at a time.** Two overlapping upserts aren't ordered, so the older blob could land last. A
+   change during an upload sets a "go again" flag instead of starting a second one, the same as
+   `TtcSyncedStore.runPush`.
+
+**The trade-off:** a blob has no per-item clock, so "push first" means the waiting phone wins the *whole* blob.
+With two phones, the other phone's edit in the meantime is lost, where before the offline phone's edit always
+was. It's a strictly better failure, but still a failure. The real fix for lists people curate is per-item
+newer-wins inside the blob (STILL-OPEN-BACKEND §2).
+
+Tested without a network through `CloudBlobIo`, a swappable seam over the three cloud calls
+(`test/blob_push_before_pull_test.dart`).
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

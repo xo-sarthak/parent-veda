@@ -140,8 +140,12 @@ Grow, Food, Journeys, NameMatch, Reco, Reading, Watch, Yoga. Find them with `gre
   `TtcPrecheckStore` does. Do this for lists the user curates: saved readings, hospital bag ticks, checklists, cart.
 - **Move to rows** with soft deletes for anything that is really a record: orders, scan reports, readings.
 
-**Cheapest safety first:** push before pull on resume, so a phone's own unpushed change can't be replaced by an
-older cloud blob. Today the resume order is pull, then push.
+~~**Cheapest safety first:** push before pull on resume.~~ **DONE 2026-10-17 (sync log step 3).**
+- Each blob store now keeps a waiting mark on disk. A sync that finds it set uploads first instead of taking the
+  cloud's blob.
+- Uploads run one at a time, and the mark feeds the sign-out warning.
+- What's left in §2 is the per-item merge above, for the curated lists. Until then, with two phones, the phone with
+  a waiting change wins the whole blob.
 
 ---
 
@@ -254,7 +258,7 @@ left alone for now so two sessions don't clash:
 1. ~~**§1 TTC tables** (records, appointments, ritual)~~ **DONE 2026-10-17 (0098), with their §3 waiting sets.**
    ~~Supplements and the timeline~~ **DONE 2026-10-17 (0099).** All of TTC's row tables are now converted.
 2. ~~**§3 dirty sets** for the same stores~~ done with step 1.
-3. **§2 push-before-pull on resume** for blob stores (small, app-wide), then per-item merge for the curated lists.
+3. ~~**§2 push-before-pull**~~ **DONE 2026-10-17 (step 3).** Next in §2: per-item merge for the curated lists.
 4. **§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.
 5. **§1 Pregnancy tables**, one migration.
 6. **§4, §5, §7** as tidy-up.

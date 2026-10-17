@@ -17,7 +17,8 @@ owed.
 |---|---|---|---|---|
 | 2026-10-17 | Before this log: the cycle and daily-log sync | 0097 | `853650e` | yes |
 | 2026-10-17 | Step 1: records, appointments, ritual | 0098 | `01fceb2` | yes (2026-10-17) |
-| 2026-10-17 | Step 2: supplements, family timeline | 0099 | pending | not yet |
+| 2026-10-17 | Step 2: supplements, family timeline | 0099 | `6a36b7f` | yes (2026-10-17) |
+| 2026-10-17 | Step 3: blob stores push before pull | none | pending | nothing to run |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -103,7 +104,8 @@ upsert by `id` therefore rewrote his result as hers, and the ritual push did the
 
 ## Step 2: TTC supplements and the family timeline
 
-**Dates:** started 2026-10-17 · built 2026-10-17 · commit pending · 0099 not run yet · two-phone walk owed.
+**Dates:** started 2026-10-17 · built 2026-10-17 · committed `6a36b7f` on 2026-10-17 · 0099 run by the user on 2026-10-17 ·
+two-phone walk owed.
 
 **Problem.** The same as step 1: a union pull, hard deletes, every row re-sent, and uploads failing silently. Both
 stores are couple-scoped, so the step 1 owner flip applies too.
@@ -169,7 +171,7 @@ analyzer notes, reported by the other terminal:
 
 Analyze is clean on that file, and the 20 test files that touch the home pass (557, 11 skipped).
 
-**User must run:** 0099 in the Supabase SQL editor. Until it runs, uploads from these two stores are refused, so
+**User must run:** 0099 in the Supabase SQL editor (DONE 2026-10-17). Until it runs, uploads from these two stores are refused, so
 changes wait on the phone and the sign-out sheet says so. Nothing is lost. After it runs, it's worth re-running
 `select count(*) from journey_timeline;` once the app has opened. It should then be close to the number of
 moments on the phone.
@@ -188,4 +190,64 @@ moments on the phone.
 **Still owed after this step:**
 - the Pregnancy and Parenting tables (§1);
 - the blob stores (§2, push-before-pull first);
+- the tidy-ups (§4, §5, §7).
+
+---
+
+## Step 3: Blob stores push before pull (the 38 `CloudSyncedStore`s)
+
+**Dates:** started 2026-10-17 · built 2026-10-17 · commit pending · no migration · two-phone walk owed.
+
+**Problem (STILL-OPEN-BACKEND §2).** The 38 blob stores (one JSON blob per user per store in `user_state`, such as
+the hospital bag, cart, saved readings and journeys) push on every change, fire-and-forget, and their sync is
+"cloud wins". Nothing remembered whether a push had landed. So a change made offline failed to upload, nothing
+retried it, and the next resume or launch took the cloud's older blob over it. The change was lost, silently.
+
+**Found on the way (2026-10-17):** the fix is not just reordering `SyncRegistry.resyncOnResume`, because the store
+didn't know it had anything to push. "Push before pull" needs a record of what's waiting first. Also, two pushes
+in flight at once could land out of order and leave the cloud with the older blob.
+
+**Done (all 2026-10-17):**
+- [x] `lib/services/remote/cloud_synced_store.dart`, the mixin, so all 38 stores get it at once:
+  - **A waiting mark per store, kept on disk** (`pv_blob_waiting_<cloudKey>`). A change sets it. Only a
+    confirmed upload of the newest state clears it: an edit counter, so a change mid-upload keeps it set.
+  - **Push before pull:** `syncStateFromCloud`, which runs at launch, login and resume, uploads this phone's
+    blob when a change is waiting, instead of taking the cloud's.
+  - **One upload at a time** (`_uploadWaiting`, with a fold-in for changes that arrive mid-upload).
+  - **It feeds `SyncRegistry.hasPendingChanges`**, so the sign-out sheet and Settings now cover the blob stores
+    too.
+  - The sign-out reset clears the mark. The key is wiped with the rest of the phone's data (`LocalWipe`).
+  - `CloudBlobIo`: a test seam over the three cloud calls.
+  - The old `_pushNow` is kept for revert.
+- [x] Tests: new `test/blob_push_before_pull_test.dart` (5 cases):
+  - cloud still wins when nothing waits;
+  - an offline change survives the next sync and uploads first;
+  - the mark survives a relaunch;
+  - a change mid-upload ends in the newest blob;
+  - a sign-out reset clears it.
+
+**Verified (2026-10-17):**
+- `flutter analyze` is clean on the mixin and the test.
+- All 60 test files that name one of the 38 blob stores pass (1,080 tests), as do the sync, journal and sign-out
+  tests (143).
+- Wiring: every file declaring a `CloudSyncedStore` calls `syncStateFromCloud()`, so every store registers its
+  waiting mark.
+
+**The trade-off, named:** still one blob per store. With two phones, the one whose change is waiting now wins
+whole, and an edit made on the other phone in the meantime is overwritten. Before, the offline phone always lost,
+silently. Per-item merge inside the blob, for curated lists (hospital bag, checklists, cart, saved readings),
+is the remaining §2 work.
+
+**User runs:** nothing; no migration.
+
+**Files:**
+- `lib/services/remote/cloud_synced_store.dart`
+- `test/blob_push_before_pull_test.dart`
+- `docs/STILL-OPEN-BACKEND.md`
+- `docs/BACKEND-PATTERNS.md`
+- `docs/BACKEND-SYNC-LOG.md`
+
+**Still owed after this step:**
+- per-item merge for the curated blob lists (§2);
+- Parenting logs, then Pregnancy tables (§1);
 - the tidy-ups (§4, §5, §7).
