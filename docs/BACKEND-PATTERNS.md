@@ -2985,6 +2985,73 @@ newer-wins inside the blob (STILL-OPEN-BACKEND §2).
 Tested without a network through `CloudBlobIo`, a swappable seam over the three cloud calls
 (`test/blob_push_before_pull_test.dart`).
 
+### 16ii-e. The whole picture: four layers that make two copies safe (2026-10-17)
+
+§16ii to §16ii-d are the parts. This is how they fit together, in plain terms, and the order you'd build them in
+on any offline-first app.
+
+**The picture to keep in your head.** The cloud is a **shared notebook**; each phone holds a **photocopy** of it.
+The app writes on the photocopy first (instant and offline), then copies changes into the notebook, and on
+opening checks the notebook for anything new. Copying *in* is easy. The two hard cases are **deleting** and
+**disagreeing**, and every layer below answers one of them.
+
+| Layer | The failure it stops | The mechanism | Where |
+|---|---|---|---|
+| 1. A delete is a row | A delete that misses the notebook (offline, a race, another phone's copy) and comes back | `removed_at`: the removal is written *into* the notebook with a time, so every phone takes it | 0097–0099, §16ii |
+| 2. Every row keeps its author | One partner's phone re-signing the other's pages as its own | Remember the cloud's `user_id` per row, send it back unchanged | §16ii-b |
+| 3. The phone remembers what it hasn't sent | An offline change replaced by the notebook's older copy on the next open | A durable "waiting" mark, cleared only by a confirmed upload; send *before* reading | §16ii-d |
+| 4. The notebook guards its own door | An older copy, or a wrong clock, overwriting newer work | A `BEFORE` trigger: clamp a future stamp, skip an older update | 0100, §16ii-c's sibling |
+
+**Why it takes all four.** Each layer closes a gap the others leave open:
+- Layer 1 without layer 4: deletes travel, but a stale phone can still write an older *live* copy over a newer
+  removal in the cloud. Its own next pull fixes it; nobody else's does until then.
+- Layer 4 without layer 3: the cloud refuses stale writes, but a change that never left the phone is still lost
+  on the next open.
+- Layers 1–4 without layer 2: everything converges correctly, onto the wrong owner.
+
+> General fact: **in a distributed system, every rule you enforce in only one place is a suggestion to every
+> other place.** The phones applied "newer wins" for months. Only when the database applied it too (layer 4)
+> did it become a guarantee: one decision point that every writer passes through.
+
+**The two decisions under it, and their costs:**
+- **Whose clock?** The *phone's* edit time, not the server's upload time, because an offline Monday edit
+  uploaded on Wednesday must still lose to an online Tuesday edit. The cost is trusting device clocks. Layer 4
+  bounds that trust: no stamp more than 5 minutes ahead of the server.
+- **Clamp or refuse a bad clock?** Clamp. A refused row waits on the phone forever and her change never lands;
+  a clamped row lands with a sane time. The cost is one wasted re-upload per sync while the phone's clock stays
+  wrong, never wrong data.
+
+**How a skipped write stays honest.** When the trigger returns `NULL`, Postgres skips that row *without an error*.
+That's deliberate: the phone counts the upload as confirmed and stops retrying, and its next pull downloads the
+newer row that beat it. An error would have made the phone retry a write that can never win, forever.
+
+**The bug that taught the most: the timeline that never synced.** `journey_timeline` was made append-only by
+granting no UPDATE. The app's upload is an upsert, `INSERT ... ON CONFLICT DO UPDATE`, and Postgres checks every
+privilege a statement *might* need before running it, so every upload was refused, even for new rows. Cloud
+writes are fire-and-forget, so nothing ever said so. Three lessons in one:
+1. A permission written to forbid one thing (rewrites) can forbid another (all writes).
+2. A soft delete *is* an update, so "append-only" and "deletes that stick" can't both live in the grant.
+3. Silent failure needs reporting somewhere. That's why crash and sync-failure reporting is a launch blocker
+   (`docs/BEFORE-LAUNCH.md` §7).
+
+**Proving it live.** A trigger can't be unit-tested without a database, and this repo has none. So 0100 ships a
+check block you paste into the SQL editor. It builds a throwaway table inside `begin; ... rollback;`, tries an
+hour-old overwrite and a year-ahead clock, prints the result, and leaves nothing behind. Run on production
+2026-10-17:
+
+| id | v | clock_ok | Read it as |
+|---|---|---|---|
+| a | newer | true | the hour-old "OLDER" write was skipped |
+| b | future | true | the year-ahead stamp was clamped to now |
+
+> General fact: **a transaction that ends in `rollback` is a free sandbox on a live database.** Everything inside
+> it, tables and triggers included, disappears. It's the safe way to prove behaviour on production without
+> touching production data.
+
+**If you build this again elsewhere, build it in this order:** ids made on the device → an edit-time clock plus a
+soft delete per row → a waiting mark with confirmed uploads → keep the owner on shared rows → a server-side guard
+→ reporting for the failures that are still silent. History: `docs/BACKEND-SYNC-LOG.md`, steps 1–4.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3058,6 +3125,16 @@ Tested without a network through `CloudBlobIo`, a swappable seam over the three 
     child, read whole (§16aa).
 31. `JournalStore._partnerChild` — sharing by reading under an existing partner policy (§16bb).
 32. `lib/ask_veda/pp_veda_corpus.dart` + the service's `scope_domain` / `stage_key_for` — namespaced prune, versioned cache key; `pvSignOut` — independent guards (§16cc).
+33. `lib/ttc/ttc_row_merge.dart` (`ttcMergePlan`, `TtcRowBook`) → `0097_ttc_cycle_sync_clock.sql` —
+    the newer-wins rule as a pure function, and a delete as a row with a time (§16ii).
+34. `0098_ttc_records_ritual_sync_clock.sql` → `lib/ttc/ttc_ritual_store.dart` — rows two people write: keep
+    the owner, and make a conflict impossible by never letting two writers share a row (§16ii-b).
+35. `0099_ttc_supplements_timeline_sync_clock.sql` — the upsert that needs UPDATE even for a new row, and
+    a soft delete that no longer cascades (§16ii-c).
+36. `lib/services/remote/cloud_synced_store.dart` — a durable "not yet sent" mark, push before pull, one
+    upload at a time (§16ii-d).
+37. `0100_sync_guard_newer_wins.sql` — the server as the single decision point; clamp, don't refuse; a
+    skipped row that stays honest; the rollback sandbox (§16ii-e).
 33. `lib/services/pv_sync_health.dart` — fire-and-forget, but report once (§16dd).
 34. `lib/services/dear_baby_vault_store.dart` — a stored event with a derived fallback (§16ff).
 35. `lib/screens/garbh_browse_screen.dart` `shravanBrowse` — one source for what plays (§16gg).

@@ -19,7 +19,7 @@ owed.
 | 2026-10-17 | Step 1: records, appointments, ritual | 0098 | `01fceb2` | yes (2026-10-17) |
 | 2026-10-17 | Step 2: supplements, family timeline | 0099 | `6a36b7f` | yes (2026-10-17) |
 | 2026-10-17 | Step 3: blob stores push before pull | none | `f32af1e` | nothing to run |
-| 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | pending | yes (2026-10-17) |
+| 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | `a0eb5b9` | yes (2026-10-17) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -257,8 +257,8 @@ is the remaining §2 work.
 
 ## Step 4: The server enforces "newer wins" and refuses a clock from the future
 
-**Dates:** asked for by the user 2026-10-17 (after an industry-standards review) · built 2026-10-17 · commit
-pending · 0100 run by the user on 2026-10-17.
+**Dates:** asked for by the user 2026-10-17 (after an industry-standards review) · built 2026-10-17 · committed
+`a0eb5b9` on 2026-10-17 · 0100 run by the user on 2026-10-17.
 
 **Problem (found in the 2026-10-17 review, not in STILL-OPEN-BACKEND before).** Every synced row table merges
 "newer wins" on the phone's edit time, but only the *phone* applied the rule, and only on a pull.
@@ -292,7 +292,10 @@ pending · 0100 run by the user on 2026-10-17.
   - if the rule changes shape: no clamp, no skip, or a second assignment to `updated_at`.
 
 **Verified (2026-10-17):** `flutter analyze` is clean on the new test; the guard and schema contract tests pass.
-**Not verifiable here:** the trigger running on Postgres. There's no local database in this repo, so the check
+**Verified live (2026-10-17):** the user ran the check block on the production database. Result: `a | newer | true`
+and `b | future | true`. The older write was skipped and the future clock clamped, exactly as designed.
+
+**Not verifiable in the repo itself:** the trigger running on Postgres. There's no local database in this repo, so the check
 block in the migration is how to see it working live.
 
 **Known cost, named:** with a phone more than 5 minutes fast, every edit of that row is clamped to the server's
