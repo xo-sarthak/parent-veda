@@ -37,7 +37,9 @@ import 'phase_detail_screen.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_phases_data.dart';
+import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../v2/v2_palette.dart';
 
 /// The painting for phase [n] (1–20).
 String phasePaintingPath(int n) =>
@@ -68,6 +70,22 @@ String phaseStopLine(AgePhase p) {
   return doc.living.isNotEmpty ? doc.living.first.title : '';
 }
 
+// ⚠️ THE HOUSE LOOK, 2026-10-17 (the user: "very old UI, font not matching
+// and very purple"). Every phase's `accent` is ppPurple (pp_phases_data.dart),
+// so the whole road was lilac, and titles were Fraunces at w400 beside
+// Pregnancy's w600. Colours now come from V2Palette, marks are ink, and
+// headings take Pregnancy's section weight. The layout is unchanged.
+// The old values are noted inline as "was ..." for revert.
+V2Palette get _c => V2PaletteStore.instance.current;
+const Color _mark = ppInk; // was phase.accent
+TextStyle _serif(double size) => pvFraunces(
+  fontSize: size,
+  fontWeight: FontWeight.w600,
+  height: 1.15,
+  letterSpacing: -0.45,
+  color: _c.ink1,
+);
+
 /// The first sentence of the doc's hero, for the "now" card.
 String _firstSentence(String s) {
   final m = RegExp(r'^(.+?[.!?])(\s|$)').firstMatch(s.trim());
@@ -83,19 +101,56 @@ class PhaseMapScreen extends StatefulWidget {
 
 class _PhaseMapScreenState extends State<PhaseMapScreen> {
   final _chapterKeys = List.generate(kPhaseChapters.length, (_) => GlobalKey());
+  final _scroll = ScrollController();
+
+  // ⚠️ THE CHIPS FOLLOW THE READER, 2026-10-17 (the user: "those toggles of
+  // newborn, baby, young toddler aren't clickable"). They did scroll, but the
+  // dark pill was pinned to his own chapter, and the last chapters can barely
+  // scroll, so a tap looked dead. The pill now moves on tap and tracks the
+  // chapter whose header has passed the top as she scrolls.
+  int? _selected;
+  bool _jumping = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_track);
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _track() {
+    if (_jumping) return;
+    var at = -1;
+    for (var i = 0; i < _chapterKeys.length; i++) {
+      final box =
+          _chapterKeys[i].currentContext?.findRenderObject() as RenderBox?;
+      if (box == null || !box.attached) continue;
+      if (box.localToGlobal(Offset.zero).dy <= 160) at = i;
+    }
+    // Above the first chapter, the pill rests on his own chapter again.
+    final next = at < 0 ? null : at;
+    if (next != _selected) setState(() => _selected = next);
+  }
 
   void _open(AgePhase p) => Navigator.of(
     context,
   ).push(MaterialPageRoute<void>(builder: (_) => PhaseDetailScreen(phase: p)));
 
   void _jump(int chapter) {
+    setState(() => _selected = chapter);
     final c = _chapterKeys[chapter].currentContext;
     if (c != null) {
+      _jumping = true;
       Scrollable.ensureVisible(
         c,
         duration: const Duration(milliseconds: 380),
         curve: Curves.easeOutCubic,
-      );
+      ).whenComplete(() => _jumping = false);
     }
   }
 
@@ -103,11 +158,11 @@ class _PhaseMapScreenState extends State<PhaseMapScreen> {
   Widget build(BuildContext context) {
     final child = ChildProfileStore.instance;
     return Scaffold(
-      backgroundColor: ppBg,
+      backgroundColor: _c.ground, // was ppBg
       body: SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: child,
+          animation: Listenable.merge([child, V2PaletteStore.instance]),
           builder: (context, _) {
             final phases = kPhases;
             final currentIndex = phaseIndexForMonths(
@@ -124,6 +179,7 @@ class _PhaseMapScreenState extends State<PhaseMapScreen> {
                   child: w,
                 );
                 return SingleChildScrollView(
+                  controller: _scroll,
                   padding: const EdgeInsets.only(top: 12, bottom: 44),
                   child: Center(
                     child: ConstrainedBox(
@@ -131,14 +187,14 @@ class _PhaseMapScreenState extends State<PhaseMapScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          padded(ppBack(context, 'My Child')),
-                          const SizedBox(height: 16),
-                          padded(ppEyebrow('Birth to five', color: ppPurple)),
+                          padded(ppBackBar(context, 'My Child')), // was ppBack
+                          const SizedBox(height: 10),
+                          padded(ppEyebrow('Birth to five', color: _c.ink3)), // was ppPurple
                           const SizedBox(height: 6),
                           padded(
                             Text(
                               '${child.name}’s journey',
-                              style: ppFraunces(wide ? 34 : 29, h: 1.1),
+                              style: _serif(wide ? 32 : 28), // was ppFraunces(34 : 29) w400
                             ),
                           ),
                           const SizedBox(height: 18),
@@ -151,7 +207,7 @@ class _PhaseMapScreenState extends State<PhaseMapScreen> {
                           ),
                           const SizedBox(height: 22),
                           _ChapterChips(
-                            current: nowChapter,
+                            current: _selected ?? nowChapter,
                             onTap: _jump,
                             pad: pad,
                           ),
@@ -176,7 +232,7 @@ class _PhaseMapScreenState extends State<PhaseMapScreen> {
                             Text(
                               'Every child moves through these at their own pace. The ages are where most children are, never a deadline — and your paediatrician knows your child better than any table does.',
                               textAlign: TextAlign.center,
-                              style: ppBody(12, color: ppMuted, h: 1.55),
+                              style: ppBody(12, color: _c.ink3, h: 1.55),
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -184,7 +240,7 @@ class _PhaseMapScreenState extends State<PhaseMapScreen> {
                             Text(
                               'Twenty phases from birth to five years, following the checkpoints paediatricians actually use. They are different lengths on purpose — development moves fastest at the start.',
                               textAlign: TextAlign.center,
-                              style: ppBody(12, color: ppMuted, h: 1.55),
+                              style: ppBody(12, color: _c.ink3, h: 1.55),
                             ),
                           ),
                         ],
@@ -217,10 +273,8 @@ class PhasePainting extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            phase.accent.withValues(alpha: 0.16),
-            phase.accent.withValues(alpha: 0.32),
-          ],
+          // Was phase.accent at 0.16 and 0.32 (lilac).
+          colors: [_c.surfaceAlt, _c.line],
         ),
       ),
       child: FittedBox(
@@ -228,7 +282,7 @@ class PhasePainting extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           child: Text(
             '${phase.number}',
-            style: ppFraunces(30, color: phase.accent, w: FontWeight.w500),
+            style: pvFraunces(fontSize: 30, fontWeight: FontWeight.w600, color: _c.ink2), // was phase.accent
           ),
         ),
       ),
@@ -273,16 +327,16 @@ class _NowHero extends StatelessWidget {
           'PHASE ${phase.number} · ${phase.ageLabel.toUpperCase()} · NOW',
           style: ppBody(
             10.5,
-            color: phase.accent,
+            color: _c.ink2, // was phase.accent
             w: FontWeight.w800,
           ).copyWith(letterSpacing: 0.9),
         ),
         const SizedBox(height: 6),
-        Text(phase.name, style: ppFraunces(24, h: 1.15)),
+        Text(phase.name, style: _serif(24)), // was ppFraunces w400
         const SizedBox(height: 6),
         Text(
           line,
-          style: ppBody(13.5, h: 1.5),
+          style: ppBody(13.5, color: _c.ink2, h: 1.5),
           maxLines: 4,
           overflow: TextOverflow.ellipsis,
         ),
@@ -314,9 +368,10 @@ class _NowHero extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: phase.accent.withValues(alpha: 0.07),
+        // Was phase.accent at 0.07 fill and 0.3 border (a lilac card).
+        color: _c.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: phase.accent.withValues(alpha: 0.3)),
+        border: Border.all(color: _c.line),
       ),
       child: wide
           ? Row(
@@ -414,10 +469,10 @@ class _Chapter extends StatelessWidget {
     final header = Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Expanded(child: Text(ch.name, style: ppFraunces(22, h: 1.15))),
+        Expanded(child: Text(ch.name, style: _serif(21))), // was ppFraunces w400
         Text(
           '${ch.span} · ${phases.length} ${phases.length == 1 ? 'phase' : 'phases'}',
-          style: ppBody(12, color: ppMuted, w: FontWeight.w600, h: 1.3),
+          style: ppBody(12, color: _c.ink3, w: FontWeight.w600, h: 1.3),
         ),
       ],
     );
@@ -459,7 +514,7 @@ class _Chapter extends StatelessWidget {
       children: [
         header,
         const SizedBox(height: 4),
-        Container(height: 1, color: ppHair),
+        Container(height: 1, color: _c.line), // was ppHair
         const SizedBox(height: 12),
         body,
       ],
@@ -517,7 +572,7 @@ class _PhaseStop extends StatelessWidget {
                       Positioned.fill(
                         child: CustomPaint(
                           painter: _DashPainter(
-                            color: ppLine,
+                            color: _c.line,
                             topGap: first,
                             bottomGap: last,
                           ),
@@ -531,7 +586,7 @@ class _PhaseStop extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: Colors.white,
                         border: Border.all(
-                          color: now ? phase.accent : ppHair,
+                          color: now ? _mark : _c.line, // was phase.accent : ppHair
                           width: now ? 2 : 1,
                         ),
                       ),
@@ -582,7 +637,7 @@ class _PhaseStop extends StatelessWidget {
                               phase.ageLabel.toUpperCase(),
                               style: ppBody(
                                 10.5,
-                                color: now ? phase.accent : ppMuted,
+                                color: now ? _mark : _c.ink3, // was phase.accent : ppMuted
                                 w: FontWeight.w800,
                                 h: 1.3,
                               ).copyWith(letterSpacing: 0.8),
@@ -598,7 +653,7 @@ class _PhaseStop extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: phase.accent,
+                                color: _mark, // was phase.accent
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
@@ -619,7 +674,7 @@ class _PhaseStop extends StatelessWidget {
                         phase.name,
                         style: ppJakarta(
                           now ? 16.5 : 15,
-                          color: past ? ppSoft : ppTitleInk,
+                          color: past ? _c.ink2 : _c.ink1, // was ppSoft : ppTitleInk
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -630,7 +685,7 @@ class _PhaseStop extends StatelessWidget {
                           line,
                           style: ppBody(
                             12.5,
-                            color: past ? ppMuted : ppSoft,
+                            color: past ? _c.ink3 : _c.ink2,
                             h: 1.4,
                           ),
                           maxLines: 1,
@@ -643,7 +698,7 @@ class _PhaseStop extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Center(
-                child: Text('›', style: ppBody(22, color: ppMuted, h: 1)),
+                child: Text('›', style: ppBody(22, color: _c.ink3, h: 1)),
               ),
             ],
           ),
@@ -679,7 +734,7 @@ class _PhaseTile extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: now ? phase.accent : ppHair,
+              color: now ? _mark : _c.line, // was phase.accent : ppHair
               width: now ? 1.6 : 1,
             ),
           ),
@@ -706,7 +761,7 @@ class _PhaseTile extends StatelessWidget {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: now ? phase.accent : ppInk,
+                            color: _mark, // was now ? phase.accent : ppInk
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
@@ -732,7 +787,7 @@ class _PhaseTile extends StatelessWidget {
                       phase.ageLabel.toUpperCase(),
                       style: ppBody(
                         10.5,
-                        color: now ? phase.accent : ppMuted,
+                        color: now ? _mark : _c.ink3, // was phase.accent : ppMuted
                         w: FontWeight.w800,
                         h: 1.3,
                       ).copyWith(letterSpacing: 0.8),
@@ -740,7 +795,7 @@ class _PhaseTile extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       phase.name,
-                      style: ppJakarta(15, color: past ? ppSoft : ppTitleInk),
+                      style: ppJakarta(15, color: past ? _c.ink2 : _c.ink1),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -748,7 +803,7 @@ class _PhaseTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         line,
-                        style: ppBody(12.5, h: 1.4),
+                        style: ppBody(12.5, color: _c.ink2, h: 1.4),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

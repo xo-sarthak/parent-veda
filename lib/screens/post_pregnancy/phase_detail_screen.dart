@@ -31,6 +31,20 @@ import 'pp_phases_data.dart';
 import 'pp_phase_film.dart' show ppOpenPhaseRead;
 import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../theme/pv_fonts.dart';
+import '../v2/v2_palette.dart';
+import 'phase_map_screen.dart' show PhasePainting;
+
+// ⚠️ THE HOUSE LOOK, 2026-10-17 (the user: "very old UI, font not matching
+// and very purple"). Same sections in the same order; only the chrome changed:
+// the bare-arrow back bar the rest of the app uses, Pregnancy's w600 serif for
+// headings in place of Jakarta, V2Palette ink in place of the phase accent
+// (ppPurple on all twenty), and the phase painting at the top so the art made
+// from docs/PHASE-PAINTING-PROMPTS.md shows here as well as on the map.
+// The old values are noted inline as "was ..." for revert.
+V2Palette get _c => V2PaletteStore.instance.current;
+TextStyle _serif(double size) => pvFraunces(
+    fontSize: size, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.45, color: _c.ink1);
 
 class PhaseDetailScreen extends StatelessWidget {
   const PhaseDetailScreen({super.key, required this.phase});
@@ -48,42 +62,47 @@ class PhaseDetailScreen extends StatelessWidget {
     // take the doc's own labels, and the full doc page is one tap away.
     final hasDoc = ppPhaseDocFor(p.number) != null;
     return Scaffold(
-      backgroundColor: ppBg,
+      backgroundColor: _c.ground, // was ppBg
       body: SafeArea(
         bottom: false,
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
-            _pad(ppBack(context, 'His journey')),
-            const SizedBox(height: 18),
+            _pad(ppBackBar(context, 'His journey')), // was ppBack
+            const SizedBox(height: 14),
+            _pad(ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: AspectRatio(aspectRatio: 4 / 3, child: PhasePainting(phase: p)),
+            )),
+            const SizedBox(height: 16),
             _pad(Row(children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
                 decoration: BoxDecoration(
-                  color: p.accent.withValues(alpha: 0.12),
+                  color: _c.surfaceAlt, // was p.accent at 0.12
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(p.ageLabel,
-                    style: ppBody(11.5, color: p.accent, w: FontWeight.w800)),
+                    style: ppBody(11.5, color: _c.ink1, w: FontWeight.w800)),
               ),
               if (p.checkpoint) ...[
                 const SizedBox(width: 8),
-                const Icon(Icons.verified_outlined, size: 15, color: ppMuted),
+                Icon(Icons.verified_outlined, size: 15, color: _c.ink3),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text('Doctor checkpoint',
-                      style: ppBody(11.5, color: ppMuted, w: FontWeight.w700),
+                      style: ppBody(11.5, color: _c.ink3, w: FontWeight.w700),
                       maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
               ],
             ])),
             const SizedBox(height: 12),
-            _pad(Text(p.name, style: ppFraunces(30, h: 1.1))),
+            _pad(Text(p.name, style: _serif(28))), // was ppFraunces(30) w400
             // Doc-only phases (2026-10-14): the docs carry no tagline, so it
             // draws only where one exists.
             if (p.tagline.isNotEmpty) ...[
               const SizedBox(height: 6),
-              _pad(Text(p.tagline, style: ppBody(14.5, color: p.accent, w: FontWeight.w700))),
+              _pad(Text(p.tagline, style: ppBody(14.5, color: _c.ink2, w: FontWeight.w700))),
             ],
             const SizedBox(height: 14),
             _pad(Text(p.summary, style: ppBody(15, color: ppInk, h: 1.65))),
@@ -94,9 +113,9 @@ class PhaseDetailScreen extends StatelessWidget {
                 onTap: () => ppOpenPhaseRead(context, p),
                 behavior: HitTestBehavior.opaque,
                 child: Row(children: [
-                  Flexible(child: Text('Read this phase in full', style: ppBody(13.5, color: ppPurple, w: FontWeight.w700))),
+                  Flexible(child: Text('Read this phase in full', style: ppBody(13.5, color: _c.ink1, w: FontWeight.w700))),
                   const SizedBox(width: 6),
-                  const Icon(Icons.arrow_forward, size: 15, color: ppPurple),
+                  Icon(Icons.arrow_forward, size: 15, color: _c.ink1), // was ppPurple
                 ]),
               ))),
             ],
@@ -143,7 +162,7 @@ class PhaseDetailScreen extends StatelessWidget {
 
             if (p.workingOn.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _pad(Text(hasDoc ? 'Living through this phase' : 'What he is working on', style: ppJakarta(18))),
+            _pad(Text(hasDoc ? 'Living through this phase' : 'What he is working on', style: _serif(21))), // was ppJakarta(18)
             const SizedBox(height: 12),
             _pad(Column(children: [
               for (final w in p.workingOn)
@@ -154,7 +173,7 @@ class PhaseDetailScreen extends StatelessWidget {
                       width: 6,
                       height: 6,
                       margin: const EdgeInsets.only(top: 7),
-                      decoration: BoxDecoration(color: p.accent, shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: _c.ink1, shape: BoxShape.circle), // was p.accent
                     ),
                     const SizedBox(width: 11),
                     Expanded(child: Text(w, style: ppBody(14, color: ppInk, h: 1.55))),
@@ -166,12 +185,12 @@ class PhaseDetailScreen extends StatelessWidget {
             // ---- milestones by domain ----
             if (p.milestones.isNotEmpty) ...[
             const SizedBox(height: 22),
-            _pad(Text(hasDoc ? 'Child snapshot' : 'Most children can, by the end of this phase', style: ppJakarta(18))),
+            _pad(Text(hasDoc ? 'Child snapshot' : 'Most children can, by the end of this phase', style: _serif(21))), // was ppJakarta(18)
             if (!hasDoc) ...[
               const SizedBox(height: 4),
               _pad(Text(
                 'These are the milestones about three in four children reach by this age — not an average, and not a deadline.',
-                style: ppBody(12.5, color: ppMuted, h: 1.45),
+                style: ppBody(12.5, color: _c.ink3, h: 1.45),
               )),
             ],
             const SizedBox(height: 14),
@@ -186,7 +205,7 @@ class PhaseDetailScreen extends StatelessWidget {
             // ---- fuller description ----
             for (final s in p.sections) ...[
               const SizedBox(height: 22),
-              _pad(Text(s.heading, style: ppJakarta(17))),
+              _pad(Text(s.heading, style: _serif(20))), // was ppJakarta(17)
               const SizedBox(height: 10),
               for (final para in s.paragraphs) ...[
                 _pad(Text(para, style: ppBody(14.5, color: ppInk, h: 1.65))),
@@ -200,15 +219,15 @@ class PhaseDetailScreen extends StatelessWidget {
               _pad(Container(
                 padding: const EdgeInsets.all(17),
                 decoration: BoxDecoration(
-                  color: ppPurple.withValues(alpha: 0.07),
+                  color: _c.surfaceAlt, // was ppPurple at 0.07, border at 0.20
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: ppPurple.withValues(alpha: 0.20)),
+                  border: Border.all(color: _c.line),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    const Icon(Icons.fact_check_outlined, size: 17, color: ppPurple),
+                    Icon(Icons.fact_check_outlined, size: 17, color: _c.ink1),
                     const SizedBox(width: 9),
-                    Expanded(child: Text('A screening is due around now', style: ppJakarta(15))),
+                    Expanded(child: Text('A screening is due around now', style: ppJakarta(15, color: _c.ink1))),
                   ]),
                   const SizedBox(height: 9),
                   Text(p.screeningNote!, style: ppBody(13.5, color: ppInk, h: 1.6)),
@@ -273,7 +292,7 @@ class PhaseDetailScreen extends StatelessWidget {
             // feature is never hidden and only its empty copy changes.
             const SizedBox(height: 26),
             _pad(Row(children: [
-              Expanded(child: Text('Things that help at this stage', style: ppJakarta(16.5))),
+              Expanded(child: Text('Things that help at this stage', style: _serif(20))), // was ppJakarta(16.5)
             ])),
             const SizedBox(height: 6),
             _pad(Text(
@@ -281,7 +300,7 @@ class PhaseDetailScreen extends StatelessWidget {
                     ? 'Nothing is picked out for this phase yet. The full '
                         'catalogue is organised by what you are solving.'
                     : 'Chosen for where he is now.',
-                style: ppBody(12.5, color: ppMuted, h: 1.5))),
+                style: ppBody(12.5, color: _c.ink3, h: 1.5))),
             const SizedBox(height: 12),
             if (p.productIds.isNotEmpty)
               _pad(Column(children: [
@@ -296,9 +315,9 @@ class PhaseDetailScreen extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
                 Text(p.productIds.isEmpty ? 'Browse products' : 'See all for this stage',
-                    style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                    style: ppBody(13, color: _c.ink1, w: FontWeight.w700)),
                 const SizedBox(width: 6),
-                const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
+                Icon(Icons.arrow_forward_rounded, size: 15, color: _c.ink1), // was ppPurple
               ]),
             ))),
 
@@ -306,7 +325,7 @@ class PhaseDetailScreen extends StatelessWidget {
             _pad(Text(
               'Based on the AAP/CDC 2022 developmental milestone framework. Guidance to help you notice things — never a diagnosis, and never a substitute for your paediatrician.',
               textAlign: TextAlign.center,
-              style: ppBody(11.5, color: ppMuted, h: 1.55),
+              style: ppBody(11.5, color: _c.ink3, h: 1.55),
             )),
           ],
         ),
@@ -320,11 +339,11 @@ class PhaseDetailScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: ppHair),
+          border: Border.all(color: _c.line), // was ppHair
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Icon(d.icon, size: 16, color: p.accent),
+            Icon(d.icon, size: 16, color: _c.ink1), // was p.accent
             const SizedBox(width: 9),
             // A doc phase says the doc's domain names (Brain … Nutrition).
             Expanded(
@@ -338,14 +357,14 @@ class PhaseDetailScreen extends StatelessWidget {
                             PhaseDomain.social => 'Emotional',
                             PhaseDomain.adaptive => 'Nutrition',
                           },
-                    style: ppJakarta(14.5))),
+                    style: ppJakarta(14.5, color: _c.ink1))),
           ]),
           const SizedBox(height: 10),
           for (final m in p.inDomain(d))
             Padding(
               padding: const EdgeInsets.only(bottom: 7),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Icon(Icons.check_rounded, size: 14, color: ppMuted),
+                Icon(Icons.check_rounded, size: 14, color: _c.ink3),
                 const SizedBox(width: 9),
                 Expanded(child: Text(m.text, style: ppBody(13.5, color: ppInk, h: 1.5))),
               ]),

@@ -579,6 +579,28 @@ Widget ppBack(BuildContext context, String label) => PvPress(child: GestureDetec
       ]),
     ));
 
+/// The back bar the rest of the app uses: a bare 22pt ink arrow with a bold
+/// title beside it (TtcBackBar, Pregnancy's Journey, Profile, the reader).
+/// `ppBack` above is the older grey arrow + thin grey label; it stays for the
+/// screens not yet moved over. Added 2026-10-17 for the phase map and page.
+Widget ppBackBar(BuildContext context, String title, {Widget? trailing}) => Row(children: [
+      PvPress(child: GestureDetector(
+        onTap: () => Navigator.of(context).maybePop(),
+        behavior: HitTestBehavior.opaque,
+        child: const Padding(
+          padding: EdgeInsets.fromLTRB(2, 8, 14, 8),
+          child: Icon(Icons.arrow_back, size: 22, color: ppInk),
+        ),
+      )),
+      Expanded(
+        child: Text(title,
+            style: pvJakarta(fontSize: 17, fontWeight: FontWeight.w700, color: ppInk),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis),
+      ),
+      ?trailing,
+    ]);
+
 Widget ppSectionDivider() => const Padding(
       padding: EdgeInsets.symmetric(vertical: 26),
       child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),

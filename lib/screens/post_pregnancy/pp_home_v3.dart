@@ -1585,6 +1585,39 @@ String _subAge(ChildProfileStore c) {
   return '$w weeks  ·  Day $d';
 }
 
+const _kHeroMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/// The header's round button: Pregnancy's `_Round` (v3_preg_hero.dart), so the
+/// three homes share one button.
+class _HeroRound extends StatelessWidget {
+  const _HeroRound({required this.p, required this.child, required this.onTap, required this.semantic});
+  final V2Palette p;
+  final Widget child;
+  final VoidCallback onTap;
+  final String semantic;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: semantic,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: p.surface.withValues(alpha: 0.85),
+              shape: BoxShape.circle,
+              border: Border.all(color: p.line),
+            ),
+            child: child,
+          ),
+        ),
+      );
+}
+
 class _Hero extends StatelessWidget {
   const _Hero(
       {required this.phase,
@@ -1616,7 +1649,9 @@ class _Hero extends StatelessWidget {
         SafeArea(
           bottom: false,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
+            // Was fromLTRB(22, 18, 22, 22); 18/10 is TTC's and Pregnancy's, so
+            // the header row sits at the same height and inset on all three.
+            padding: const EdgeInsets.fromLTRB(18, 10, 18, 22),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1635,18 +1670,79 @@ class _Hero extends StatelessWidget {
                 // ink2 where the sheet would take ink3.
                 // Saved and profile — parenting V3 had neither, while
                 // pregnancy V3 had both. See the note in v3_hero_chrome.dart.
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: V3HeroChrome(
-                    tone: V3HeroTone.onField,
-                    p: p,
-                    initial: child.nameMid.isEmpty ? '' : child.nameMid[0],
-                    onSaved: onSaved,
-                    onProfile: onProfile,
-                    avatarOpensProfile: true,
-                    onTalk: onTalk,
-                  ),
-                ),
+                // ⚠️ THE SAME HEADER ROW AS TTC AND PREGNANCY (2026-10-17, the
+                // user: the top-left and top-right buttons "don't align well").
+                // Parenting had all three buttons on the right in V3HeroChrome's
+                // photo-hero style (no border, white at 0.62, ink1). Now it is
+                // Pregnancy's three slots (v3_preg_hero.dart): avatar and Talk
+                // left, the date centred, Saved right, in fixed-width sides so
+                // the date stays centred, with Pregnancy's round button.
+                // Kept for revert:
+                // Align(
+                //   alignment: Alignment.centerRight,
+                //   child: V3HeroChrome(
+                //     tone: V3HeroTone.onField,
+                //     p: p,
+                //     initial: child.nameMid.isEmpty ? '' : child.nameMid[0],
+                //     onSaved: onSaved,
+                //     onProfile: onProfile,
+                //     avatarOpensProfile: true,
+                //     onTalk: onTalk,
+                //   ),
+                // ),
+                Builder(builder: (context) {
+                  const side = 84.0; // 38 + 8 + 38, Pregnancy's width
+                  final today = DateTime.now();
+                  final initial = child.nameMid.isEmpty ? '' : child.nameMid[0];
+                  return Row(children: [
+                    SizedBox(
+                      width: side,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          _HeroRound(
+                            p: p,
+                            semantic: 'Profile',
+                            onTap: onProfile,
+                            child: initial.isEmpty
+                                ? Icon(Icons.person_outline_rounded, size: 18, color: p.ink2)
+                                : Text(initial.toUpperCase(),
+                                    style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+                          ),
+                          const SizedBox(width: 8),
+                          _HeroRound(
+                            p: p,
+                            semantic: 'Talk to someone',
+                            onTap: onTalk,
+                            child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
+                          ),
+                        ]),
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text('${today.day} ${_kHeroMonths[today.month - 1]}',
+                              style: pvManrope(
+                                  fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.1, color: p.ink1)),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: side,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: _HeroRound(
+                          p: p,
+                          semantic: 'Saved',
+                          onTap: onSaved,
+                          child: Icon(Icons.bookmark_border_rounded, size: 18, color: p.ink2),
+                        ),
+                      ),
+                    ),
+                  ]);
+                }),
                 const Spacer(),
                 // ⚠️ THE EYEBROW IS THE DOOR TO THE PHASE MAP. It was plain
                 // type; nothing on this screen reached the spine at all. The
