@@ -10571,3 +10571,34 @@ Prototype approved first (artifact "ParentVeda One Journal").
 - **§93.3 No edit for a parenting memory.** It had none before; the page keeps
   Delete only. Worth adding when the capture screens can open with a memory.
 - Not walked on a phone yet.
+
+## 94.0 Pregnancy calendar rebuilt as one hub — 2026-10-17
+
+The three tabs (Timeline · Calendar · Upcoming) became one hub, Coming up and
+Whole journey; four fact fixes in the milestones (GTT at the first visit in
+India, Group B Strep "if advised", Td injections added, NT to 13 weeks 6
+days). Committed 94d0cf6. The full record — files, the design decision, the
+Mobbin table (MOBBIN-DISCOVERY §26) and the fact table — is
+`docs/PREG-CALENDAR.md`.
+
+**Owed:**
+
+- **§94.1 His calendar button on the pregnancy home — DECIDED 2026-10-17:
+  keep Saved.** Only two round buttons fit on a 360pt phone; his stay
+  Messages + Saved, and he reaches the read-only calendar from More ›
+  Calendar. `home_v3_screen.dart` keeps `onCalendar: him ? null`.
+- **§94.2 "Booked" checks are matched by name.** `Appointment` has no link to
+  the check it books; "Add as appointment" fills in the check's name and the
+  calendar matches on that. Renamed, the check reads as open again (never
+  wrong, less helpful). The real fix is a `checkId` on `Appointment`: a
+  column, a migration and a contract-test update. Backend; on the user's word.
+- **§94.3 Symptoms from the calendar log today only.** `SymptomCompanionScreen`
+  takes no day, so Add on a past day says so instead of opening it.
+- **§94.4 Programs have no session dates.** `PrepareStore` keeps ids only, so
+  they are listed in Coming up, undated, never a dot.
+- **§94.5 Td injections are English only** (`hi` repeats the English), per the
+  2026-08-27 rule.
+- **§94.6 TTC calendar discussion next.** What pregnancy now has that TTC lacks:
+  the empty day that invites, Add as rows that say why a row waits, Coming up
+  with date blocks, the fact table.
+- Not walked on a phone yet.

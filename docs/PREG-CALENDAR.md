@@ -5,11 +5,8 @@ Coming up and Whole journey as their own pages. The approved prototype is at
 claude.ai/artifact/N6Y95pDA2i5dkQQbFaAF26, and the plan was "do for pregnancy
 what was done for TTC".
 
-> **Fold-in owed:** `docs/MOBBIN-DISCOVERY.md` and `docs/STILL-OPEN.md` had
-> another terminal's uncommitted edits when this landed, so this record waits
-> here. Once those are committed:
-> - move the Mobbin section into MOBBIN-DISCOVERY as the next audit;
-> - move "Open" into STILL-OPEN.
+> **Folded in 2026-10-17:** the Mobbin section is MOBBIN-DISCOVERY §26,
+> the open points are STILL-OPEN §94. This file stays as the design record.
 
 ## Where it lives
 
@@ -90,12 +87,9 @@ sync on another device sees a change, not a deletion followed by a stranger.
 
 ## Open
 
-1. **His calendar button on the pregnancy home.**
-   - `home_v3_screen.dart` passes `onCalendar: him ? null`, so he reaches the
-     calendar from More only.
-   - That file had another terminal's uncommitted work, so it was left alone.
-   - The change is one line, once it is free: pass the calendar for him too.
-     `CalendarScreen` already makes it read-only.
+1. **His calendar button on the pregnancy home — decided 2026-10-17: keep
+   Saved.** Only two round buttons fit; his stay Messages + Saved, and he
+   reaches the read-only calendar from More › Calendar.
 2. **"Booked" is matched by name.** An appointment has no link to the check it
    books, so "Add as appointment" fills in the check's name and the calendar
    matches on that. If she renames it, the check reads as open again, which is

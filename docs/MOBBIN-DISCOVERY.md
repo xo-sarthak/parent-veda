@@ -1071,3 +1071,28 @@ Decided with the user: a painting per phase, and the 20 phases grouped into five
 **Declined.** Teacher avatar row (seven seed teachers, no real photos yet); sort menu (nothing worth sorting by yet).
 
 **Owed.** Real class photos and videos.
+
+## 26. Pregnancy calendar — one hub, Coming up, Whole journey (2026-10-17)
+
+**Question.** The pregnancy calendar was three tabs of old UI. What do competitors put on one calendar screen, and how do they show what is next and the whole pregnancy? Asked screen by screen, the way the TTC cycle hub was done.
+
+**Found.**
+- Clue pregnancy home: "Your first trimester · 1 week + 5 days", "39 weeks until May 17 ✎", ‹ › by week, a Back to today pill (mobbin.com/screens/4109e86e-82be-4437-8709-fa3f54efcdda, mobbin.com/screens/e6d1a043-3433-4b1c-a1b5-8060482d9d4e).
+- Oura Pregnancy Insights: three trimester rings, "33 weeks 2 days · Meet your baby in about 47 days", Trimester / Due date tiles (mobbin.com/screens/ee1f0724-69a9-4eaa-b2a4-b3e54e844051, mobbin.com/screens/4ccc949c-fa00-41db-a72e-67f4e19f214e).
+- Apple Health cycle tracking: a pregnancy card with a start-to-due bar, then a "Log" list of rows with + (mobbin.com/screens/9710c735-c8a6-46aa-88bd-36edf8b8610b).
+- Withings Cycle Logs: one row per kind, + to add (mobbin.com/screens/00c25e9d-8599-41e3-8c22-81ebfec69660).
+- Weverse / Todoist / Asana months: dots under the date, the picked day's list under the grid, a friendly empty line (mobbin.com/screens/5d94bb1b-51b2-4765-b836-b9a3ff2f4148, mobbin.com/screens/a62d6a9f-94af-4e57-b0df-444edf90996f, mobbin.com/screens/74725910-5a3c-4ec9-917d-728e9b882bbd).
+- Lex / Fixtured / Canopi / Binance upcoming: a date block left, an "In 3 days" eyebrow, day groups, "No more events today" (mobbin.com/screens/cb327064-1d9b-4275-a731-287cf1bf7ac0, mobbin.com/screens/11d10641-8ab2-4157-9269-eeadff8b16a6, mobbin.com/screens/d88f4063-64d0-4234-9afc-433ca89af1be, mobbin.com/screens/8339ece6-cfa5-4995-a7ab-e52de69fb419).
+- Zocdoc Well Guide / CVS visit checklist: checks marked Due with an action (mobbin.com/screens/86529650-4ea4-42ec-ad0e-a1d14a9c9fb0, mobbin.com/screens/387b81ad-b6ed-483c-88d5-5cf2384388b5).
+- CVS / Zocdoc / Fresha appointment pages: When, Where, With rows, then the actions (mobbin.com/screens/c3a9a7d5-a6bb-44a6-a76e-bf9339c78b2e, mobbin.com/screens/71930370-307b-4a90-9185-988981407a2f, mobbin.com/screens/5ef9f1bf-25b5-487c-b347-2dd30dc2d263).
+- Runna / stoic. week cards, Flo week chips (mobbin.com/screens/9eb278de-d059-4726-b181-8ec7d161ba4c, mobbin.com/screens/5e124ffa-c154-4e2c-8faf-6bad200a3b81, mobbin.com/screens/347a171b-a63b-4c2f-b8cf-9b0377c8b255).
+
+**Adopted.** Hero: weeks and days, a three-segment trimester bar (Oura's rings flattened for space), days to go with Change (Clue), and the due date's source (Apple Health). Month: dots, this week as a band, a Today pill off-month. Day: rows plus one Add; Add as a list of rows that says why a row waits (Apple Health, Withings). Coming up: date block plus countdown, day groups. Usual checks: a window, never a date, with "Add date" turning it into her booking (Zocdoc). Item sheet: When / Where / With / Notes, then actions (CVS). Whole journey: one card per week with counts, opening on "You are here" (Runna, stoic.).
+
+**Declined.** Flo's full-screen baby bubble (b9868b90) — the home already carries the week film. Week and trimester tags inside month cells. A continuous week scroll (TTC tried and reverted it 2026-10-16). Icon-grid pickers for Add (FocusFlight, Craft). Cover images on upcoming rows (Meetup, Luma). Book buttons on checks (we do not book scans). Maps and directions. Stardust's hormone graph.
+
+**Queries that worked.** Describe the content, not the gesture: "month calendar where each day has small coloured dots for logged entries, with selected day's entries listed in a card below and an add button"; "pregnancy app list of upcoming doctor appointments and prenatal tests by week"; "upcoming events agenda grouped by today, this week, later with countdown chips and date blocks on the left". App plus flow for flows: "Flo pregnancy mode monthly calendar, tapping a day to see and log symptoms".
+
+**Library gaps.** No real pregnancy month-calendar screen: pregnancy apps lead with the week, not the month (which is why our hero leads too). Ovia, BabyCenter and What to Expect are not in the library.
+
+**Built.** 94d0cf6. Record: `docs/PREG-CALENDAR.md`; prototype claude.ai/artifact/N6Y95pDA2i5dkQQbFaAF26.
