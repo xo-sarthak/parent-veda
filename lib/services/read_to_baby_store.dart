@@ -78,6 +78,10 @@ class ReadToBabyStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => 'read_to_baby_prefs';
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'categories': [kRtbSpeaking, kRtbStories], 'religions': <String>[], 'sections': <String>[], 'offset': 0};
+
   @override
   Object cloudData() => {
         'categories': _categories.toList(),

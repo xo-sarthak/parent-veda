@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
 import 'ttc_chapter.dart';
+import 'ttc_row_merge.dart';
 import 'ttc_sync.dart';
 
 /// Recorded against a period that had not finished when she logged it.
@@ -46,6 +47,10 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   static const _lhKey = 'ttc_lh_positive';
   static const _bbtKey = 'ttc_temp_shift';
   static const _bleedKey = 'ttc_bleed_days';
+  static const _clearedSignalsKey = 'ttc_signals_cleared';
+  static const _stampsKey = 'ttc_cycle_stamps';
+  static const _tombsKey = 'ttc_cycle_tombs';
+  static const _dirtyKey = 'ttc_cycle_dirty';
 
   /// First days of logged periods, oldest first. The only cycle fact we store.
   final List<DateTime> _periodStarts = [];
@@ -55,6 +60,71 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
 
   /// Cycle day a sustained temperature rise was seen, per cycle start.
   final Map<String, int> _tempShift = {};
+
+  /// Signals she cleared, as 'lh|2026-09-30' (2026-10-17). A TOMBSTONE.
+  ///
+  /// ⚠️ WHY IT EXISTS (the device walk, 2026-10-17): clearing an LH positive
+  /// removed it here only. The pull is a union (`putIfAbsent`), so the next
+  /// sync put the cloud's copy straight back, and a test the user had just
+  /// cleared returned after a reinstall. Deleting the cloud row fixes the
+  /// online case; this set fixes the offline one, where that delete never
+  /// arrived: a pull skips any signal she cleared until she logs it again.
+  /// The same pattern `TtcLogStore` uses (`_cleared`, H12).
+  //
+  // ⚠️ SUPERSEDED THE SAME DAY by the row clock below: a removal is now a
+  // soft-deleted row (0097) that reaches every phone, not a note on this one.
+  // The set is still read once, so a clear made on the previous build turns
+  // into a removal that uploads.
+  final Set<String> _clearedSignals = {};
+
+  // ---- the row clock (2026-10-17, 0097) -------------------------------------
+  //
+  // Every synced row has a key: 'c|2026-09-30' for a period (its bleed days
+  // ride on it), 'lh|2026-09-30' and 'temperature|2026-09-30' for a test
+  // result on that cycle. Per key the store keeps:
+  //
+  //  · when she last changed it ON THIS PHONE (the merge clock; the newer
+  //    change wins on every phone, see `ttc_row_merge.dart`);
+  //  · whether that change was a removal (a soft delete, kept as a row);
+  //  · whether the cloud has confirmed it yet (the "dirty" set; a row stays
+  //    in it until its upload succeeds, so nothing is lost offline).
+  //
+  // A row from before this release has no time and reads as `ttcEpoch`, so
+  // the cloud's copy wins wherever there is one.
+
+  /// Row key → when she last changed it (UTC).
+  final Map<String, DateTime> _stamps = {};
+
+  /// Row key → when she removed it. A removed row is not shown anywhere.
+  final Map<String, DateTime> _tombs = {};
+
+  /// Row keys the cloud has not confirmed yet.
+  final Set<String> _dirty = {};
+
+  static String _cRow(DateTime d) => 'c|${_key(d)}';
+  static String _sRow(String kind, DateTime start) => '$kind|${_key(start)}';
+
+  void _touch(String row) {
+    _stamps[row] = DateTime.now().toUtc();
+    _tombs.remove(row);
+    _dirty.add(row);
+  }
+
+  void _tomb(String row) {
+    final t = DateTime.now().toUtc();
+    _stamps[row] = t;
+    _tombs[row] = t;
+    _dirty.add(row);
+  }
+
+  @override
+  bool get hasPendingPush => _dirty.isNotEmpty;
+
+  @visibleForTesting
+  Set<String> get dirtyRowsForTest => Set.unmodifiable(_dirty);
+
+  @visibleForTesting
+  Map<String, DateTime> get tombstonesForTest => Map.unmodifiable(_tombs);
 
   /// How many days she bled, per cycle start (ISO date key).
   ///
@@ -171,6 +241,7 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     _periodStarts
       ..add(d)
       ..sort();
+    _touch(_cRow(d));
     _persist();
     notifyListeners();
   }
@@ -188,6 +259,8 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     } else {
       _bleedDays[_key(d)] = days;
     }
+    // The bleed days ride on the cycle row (0097).
+    _touch(_cRow(d));
     _persist();
     notifyListeners();
   }
@@ -219,9 +292,20 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     if (lh != null) _lhPositive[_key(b)] = lh;
     if (temp != null) _tempShift[_key(b)] = temp;
 
+    // The old date is REMOVED as a row and the new one written, so every
+    // phone moves it (2026-10-17). Kept for revert:
+    //   _deleteCycleFromCloud(a).catchError((_) {});
+    _tomb(_cRow(a));
+    _touch(_cRow(b));
+    if (lh != null) {
+      _tomb(_sRow('lh', a));
+      _touch(_sRow('lh', b));
+    }
+    if (temp != null) {
+      _tomb(_sRow('temperature', a));
+      _touch(_sRow('temperature', b));
+    }
     _persist();
-    // The old row has to be told to go, or a union merge pulls it back.
-    _deleteCycleFromCloud(a).catchError((_) {});
     notifyListeners();
   }
 
@@ -250,11 +334,13 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     if (bleed != null) _bleedDays[_key(d)] = bleed;
     if (lh != null) _lhPositive[_key(d)] = lh;
     if (temp != null) _tempShift[_key(d)] = temp;
+    // A restore is a newer change than the removal, so it wins everywhere
+    // (2026-10-17). The upload follows the notify like any other change.
+    // Kept for revert: pushToCloud().catchError((_) {});
+    _touch(_cRow(d));
+    if (lh != null) _touch(_sRow('lh', d));
+    if (temp != null) _touch(_sRow('temperature', d));
     _persist();
-    // WARNING: AND IT HAS TO GO BACK UP. `removePeriodStart` deletes the cloud
-    // row explicitly, so a local-only restore would be undone by the next sync
-    // -- the row would reappear for a second and then vanish again.
-    pushToCloud().catchError((_) {});
     notifyListeners();
   }
 
@@ -264,13 +350,16 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     final before = _periodStarts.length;
     _periodStarts.removeWhere((e) => _sameDay(e, d));
     if (_periodStarts.length == before) return;
-    _lhPositive.remove(_key(d));
-    _tempShift.remove(_key(d));
+    final hadLh = _lhPositive.remove(_key(d)) != null;
+    final hadTemp = _tempShift.remove(_key(d)) != null;
     _bleedDays.remove(_key(d));
+    // A removal is a row (2026-10-17, 0097), so it reaches every phone and
+    // an older upload cannot undo it. Kept for revert:
+    //   _deleteCycleFromCloud(d).catchError((_) {});
+    _tomb(_cRow(d));
+    if (hadLh) _tomb(_sRow('lh', d));
+    if (hadTemp) _tomb(_sRow('temperature', d));
     _persist();
-    // Deleting has to reach the cloud explicitly: a union merge would otherwise
-    // pull the removed period straight back on the next sync.
-    _deleteCycleFromCloud(d).catchError((_) {});
     notifyListeners();
   }
 
@@ -279,13 +368,28 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   void logLhPositive(int? cycleDay) {
     final s = lastPeriodStart;
     if (s == null) return;
+    // A soft delete, not a cloud delete (2026-10-17). Kept for revert:
+    //   if (_lhPositive.remove(_key(s)) != null) _clearSignal(s, 'lh');
+    //   ... else _clearedSignals.remove('lh|${_key(s)}');
     if (cycleDay == null) {
-      _lhPositive.remove(_key(s));
+      if (_lhPositive.remove(_key(s)) != null) _tomb(_sRow('lh', s));
     } else {
       _lhPositive[_key(s)] = cycleDay;
+      _touch(_sRow('lh', s));
     }
     _persist();
     notifyListeners();
+  }
+
+  /// A cleared signal must leave the cloud too, and stay cleared offline.
+  /// Superseded by the soft delete (`_tomb`); kept for revert.
+  // ignore: unused_element
+  void _clearSignal(DateTime start, String kind) {
+    _clearedSignals.add('$kind|${_key(start)}');
+    if (SupabaseRepo.isLoggedIn) {
+      SupabaseRepo.delete(TtcTables.signals, _signalId(start, kind))
+          .catchError((_) {});
+    }
   }
 
   /// Records the cycle day a sustained basal-temperature rise was seen.
@@ -293,13 +397,21 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     final s = lastPeriodStart;
     if (s == null) return;
     if (cycleDay == null) {
-      _tempShift.remove(_key(s));
+      if (_tempShift.remove(_key(s)) != null) {
+        _tomb(_sRow('temperature', s));
+      }
     } else {
       _tempShift[_key(s)] = cycleDay;
+      _touch(_sRow('temperature', s));
     }
     _persist();
     notifyListeners();
   }
+
+  /// A sign-out, or another account signing in (2026-10-17): her cycle
+  /// leaves this phone's memory. The account in the cloud keeps it.
+  @override
+  void resetLocal() => resetForTest();
 
   /// Testing / sign-out reset.
   @visibleForTesting
@@ -308,6 +420,10 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     _lhPositive.clear();
     _tempShift.clear();
     _bleedDays.clear();
+    _clearedSignals.clear();
+    _stamps.clear();
+    _tombs.clear();
+    _dirty.clear();
     _loaded = true;
     notifyListeners();
   }
@@ -334,6 +450,23 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
       _bleedDays
         ..clear()
         ..addAll(_decodeMap(p.getStringList(_bleedKey)));
+      _clearedSignals
+        ..clear()
+        ..addAll(p.getStringList(_clearedSignalsKey) ?? const []);
+      _stamps
+        ..clear()
+        ..addAll(_decodeStamps(p.getStringList(_stampsKey)));
+      _tombs
+        ..clear()
+        ..addAll(_decodeStamps(p.getStringList(_tombsKey)));
+      _dirty
+        ..clear()
+        ..addAll(p.getStringList(_dirtyKey) ?? const []);
+      // A clear from the previous build becomes a removal that uploads.
+      for (final row in _clearedSignals) {
+        if (!_tombs.containsKey(row)) _tomb(row);
+      }
+      _clearedSignals.clear();
     } catch (_) {/* keep defaults - a storage failure is never a crash */}
     _loaded = true;
     notifyListeners();
@@ -352,8 +485,100 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   static String _signalId(DateTime start, String kind) =>
       'ttcs_${TtcSyncUtil.date(start)}_$kind';
 
+  // ⚠️ NEWER WINS, BOTH WAYS (2026-10-17, 0097). The pull below used to be a
+  // union, which can never take anything away: a period removed or moved on
+  // one phone came back from the next phone that still held it, and a test
+  // she cleared returned after a reinstall (the device walk). Now each row's
+  // edit time decides (`ttcMergePlan`): the cloud's newer copy is taken,
+  // removals included, and the phone's newer copy is queued to upload.
+  // The union pull is kept below as `_pullUnionKept`, for revert.
   @override
   Future<void> pullFromCloud() async {
+    final cycles = await SupabaseRepo.fetch(TtcTables.cycles,
+        orderBy: 'started_on', ascending: true);
+    final signals = await SupabaseRepo.fetch(TtcTables.signals,
+        orderBy: 'cycle_start', ascending: true);
+
+    final cloudStamp = <String, DateTime>{};
+    final cloudRow = <String, Map<String, dynamic>>{};
+    for (final row in cycles) {
+      final d = TtcSyncUtil.parseDate(row['started_on']);
+      if (d == null) continue;
+      final k = _cRow(d);
+      cloudStamp[k] = ttcParseStamp(row['updated_at']) ?? ttcEpoch;
+      cloudRow[k] = row;
+    }
+    for (final row in signals) {
+      final start = TtcSyncUtil.parseDate(row['cycle_start']);
+      final kind = row['kind'];
+      if (start == null || (kind != 'lh' && kind != 'temperature')) continue;
+      final k = _sRow(kind as String, start);
+      cloudStamp[k] = ttcParseStamp(row['updated_at']) ?? ttcEpoch;
+      cloudRow[k] = row;
+    }
+
+    final local = <String, DateTime>{
+      for (final d in _periodStarts) _cRow(d): _stamps[_cRow(d)] ?? ttcEpoch,
+      for (final k in _lhPositive.keys)
+        'lh|$k': _stamps['lh|$k'] ?? ttcEpoch,
+      for (final k in _tempShift.keys)
+        'temperature|$k': _stamps['temperature|$k'] ?? ttcEpoch,
+      for (final k in _tombs.keys) k: _stamps[k] ?? _tombs[k]!,
+    };
+
+    final plan = ttcMergePlan(local: local, cloud: cloudStamp);
+    for (final k in plan.take) {
+      _takeCloud(k, cloudRow[k]!, cloudStamp[k]!);
+    }
+    _dirty.addAll(plan.push);
+    // A row both sides hold at the same time is already in the cloud.
+    for (final k in cloudStamp.keys) {
+      if (!plan.take.contains(k) && !plan.push.contains(k)) _dirty.remove(k);
+    }
+    _periodStarts.sort();
+  }
+
+  /// Takes the cloud's copy of one row: its value, or its removal.
+  void _takeCloud(String k, Map<String, dynamic> row, DateTime stamp) {
+    final bar = k.indexOf('|');
+    final kind = k.substring(0, bar);
+    final d = DateTime.tryParse(k.substring(bar + 1));
+    if (d == null) return;
+    final day = _dayOnly(d);
+    final removedAt = ttcParseStamp(row['removed_at']);
+    if (kind == 'c') {
+      if (removedAt != null) {
+        _periodStarts.removeWhere((e) => _sameDay(e, day));
+        _bleedDays.remove(_key(day));
+        _tombs[k] = removedAt;
+      } else {
+        if (!_periodStarts.any((e) => _sameDay(e, day))) _periodStarts.add(day);
+        final bleed = row['bleed_days'];
+        if (bleed is int) {
+          _bleedDays[_key(day)] = bleed;
+        } else if (row.containsKey('bleed_days')) {
+          _bleedDays.remove(_key(day));
+        }
+        _tombs.remove(k);
+      }
+    } else {
+      final target = kind == 'lh' ? _lhPositive : _tempShift;
+      final cycleDay = row['cycle_day'];
+      if (removedAt != null || cycleDay is! int) {
+        target.remove(_key(day));
+        _tombs[k] = removedAt ?? stamp;
+      } else {
+        target[_key(day)] = cycleDay;
+        _tombs.remove(k);
+      }
+    }
+    _stamps[k] = stamp;
+    _dirty.remove(k);
+  }
+
+  // Kept for revert (2026-10-17): the union pull.
+  // ignore: unused_element
+  Future<void> _pullUnionKept() async {
     final cycles = await SupabaseRepo.fetch(TtcTables.cycles,
         orderBy: 'started_on', ascending: true);
     // Union, not cloud-wins: a period logged offline must survive reconnecting.
@@ -370,13 +595,74 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
       final start = TtcSyncUtil.parseDate(row['cycle_start']);
       final day = row['cycle_day'];
       if (start == null || day is! int) continue;
-      final target = row['kind'] == 'lh' ? _lhPositive : _tempShift;
+      // A signal she cleared stays cleared (the tombstone above).
+      final kind = row['kind'] == 'lh' ? 'lh' : 'temperature';
+      if (_clearedSignals.contains('$kind|${_key(start)}')) continue;
+      final target = kind == 'lh' ? _lhPositive : _tempShift;
       target.putIfAbsent(_key(start), () => day);
     }
   }
 
+  /// Uploads the rows the cloud has not confirmed, one by one (2026-10-17). A
+  /// row leaves the waiting set only when the cloud took it AND she has not
+  /// changed it again meanwhile; anything else waits for the next resume,
+  /// change or login. The old push (every row, unconfirmed, no times) is kept
+  /// below as `_pushAllKept`, for revert.
   @override
   Future<void> pushToCloud() async {
+    final uid = SupabaseRepo.userId;
+    if (uid == null) return;
+    for (final k in List.of(_dirty)) {
+      final row = _rowFor(k, uid);
+      if (row == null) {
+        _dirty.remove(k);
+        continue;
+      }
+      final sent = _stamps[k];
+      final ok = await TtcSyncUtil.upsertConfirmed(
+          k.startsWith('c|') ? TtcTables.cycles : TtcTables.signals, row,
+          onConflict: 'id');
+      if (ok && _stamps[k] == sent) _dirty.remove(k);
+    }
+    await _persist();
+  }
+
+  /// The cloud row for one key, with its edit time and removal.
+  Map<String, dynamic>? _rowFor(String k, String uid) {
+    final bar = k.indexOf('|');
+    final kind = k.substring(0, bar);
+    final dateKey = k.substring(bar + 1);
+    final d = DateTime.tryParse(dateKey);
+    if (d == null) return null;
+    final stamp = _stamps[k] ?? DateTime.now().toUtc();
+    final removed = _tombs[k];
+    if (kind == 'c') {
+      return {
+        'id': _cycleId(d),
+        'user_id': uid,
+        'started_on': dateKey,
+        'updated_at': TtcSyncUtil.stamp(stamp),
+        'removed_at': removed == null ? null : TtcSyncUtil.stamp(removed),
+        'bleed_days': removed == null ? _bleedDays[dateKey] : null,
+      };
+    }
+    if (kind != 'lh' && kind != 'temperature') return null;
+    final value = (kind == 'lh' ? _lhPositive : _tempShift)[dateKey];
+    return {
+      'id': _signalId(d, kind),
+      'user_id': uid,
+      'cycle_start': dateKey,
+      'kind': kind,
+      // A removed row keeps a valid day for the 1-90 check; it is never read.
+      'cycle_day': value ?? 1,
+      'updated_at': TtcSyncUtil.stamp(stamp),
+      'removed_at': removed == null ? null : TtcSyncUtil.stamp(removed),
+    };
+  }
+
+  // Kept for revert (2026-10-17): every row, unconfirmed, no times.
+  // ignore: unused_element
+  Future<void> _pushAllKept() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
 
@@ -423,7 +709,9 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> persistLocalCache() => _persist();
 
   /// A removed period must be removed in the cloud too - a union merge would
-  /// otherwise bring it straight back on the next pull.
+  /// otherwise bring it straight back on the next pull. Superseded by the
+  /// soft delete (2026-10-17); kept for revert.
+  // ignore: unused_element
   Future<void> _deleteCycleFromCloud(DateTime day) async {
     if (!SupabaseRepo.isLoggedIn) return;
     await SupabaseRepo.delete(TtcTables.cycles, _cycleId(day));
@@ -440,7 +728,27 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
       await p.setStringList(_lhKey, _encodeMap(_lhPositive));
       await p.setStringList(_bbtKey, _encodeMap(_tempShift));
       await p.setStringList(_bleedKey, _encodeMap(_bleedDays));
+      await p.setStringList(_clearedSignalsKey, _clearedSignals.toList());
+      await p.setStringList(_stampsKey, _encodeStamps(_stamps));
+      await p.setStringList(_tombsKey, _encodeStamps(_tombs));
+      await p.setStringList(_dirtyKey, _dirty.toList());
     } catch (_) {/* best-effort */}
+  }
+
+  // "c|2026-09-30|2026-10-17T10:04:00.000Z": the row key, then the time.
+  static List<String> _encodeStamps(Map<String, DateTime> m) => [
+        for (final e in m.entries) '${e.key}|${e.value.toIso8601String()}',
+      ];
+
+  static Map<String, DateTime> _decodeStamps(List<String>? raw) {
+    final out = <String, DateTime>{};
+    for (final s in raw ?? const <String>[]) {
+      final i = s.lastIndexOf('|');
+      if (i <= 0) continue;
+      final t = DateTime.tryParse(s.substring(i + 1));
+      if (t != null) out[s.substring(0, i)] = t.toUtc();
+    }
+    return out;
   }
 
   // "2026-07-27|14" - a flat encoding so the whole store stays in

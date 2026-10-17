@@ -824,6 +824,10 @@ class DevStore extends ChangeNotifier with CloudSyncedStore {
     } catch (_) {/* stay local */}
   }
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'completed': <String>[], 'checkIns': <String, bool>{}};
+
   @override
   Object cloudData() => {
         'saved': _saved.toList(),

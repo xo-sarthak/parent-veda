@@ -84,8 +84,17 @@ class MemoryStore extends ChangeNotifier {
     await _syncFromCloud();
   }
 
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _journal.clear();
+    _photos.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('weekly_journal_notes');

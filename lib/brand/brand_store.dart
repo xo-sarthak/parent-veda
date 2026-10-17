@@ -143,6 +143,10 @@ class BrandStudioStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   String get cloudKey => 'brand_studio';
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'impressions': <String, int>{}, 'completed': <String>[], 'dismissed': <String>[], 'demoMode': false, 'lastNotificationAt': null};
+
   @override
   Object cloudData() => _toMap();
   @override

@@ -92,8 +92,20 @@ class ScansStore extends ChangeNotifier {
     await _syncFromCloud();
   }
 
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _notes.clear();
+    _completed.clear();
+    _appts.clear();
+    _partnerCompleted.clear();
+    _partnerAppts.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // completed_scans - keyed by scan_id (no `id` column)

@@ -256,6 +256,10 @@ class ProductChecklistStore extends ChangeNotifier with CloudSyncedStore {
   // --- cloud sync ------------------------------------------------------------
   @override
   String get cloudKey => 'product_checklists';
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <Object>[];
+
   @override
   Object cloudData() => _lists.map((l) => l.toJson()).toList();
   @override

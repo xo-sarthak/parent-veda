@@ -155,8 +155,20 @@ class DailyStore extends ChangeNotifier {
 
   // === Cloud sync (Supabase) - two day-maps, a list, a string-list, and the
   //     father's mission-done day set. ==========================================
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _moods.clear();
+    _talk.clear();
+    _kept.clear();
+    _movement.clear();
+    _missionsDone.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // daily_moods - one mood per day, keyed by (user_id, day)

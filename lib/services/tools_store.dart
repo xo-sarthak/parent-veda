@@ -511,8 +511,30 @@ class ToolsStore extends ChangeNotifier {
   //  *history* is deferred (no-id append-only log). camelCase <-> snake_case.
   // ===========================================================================
 
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _movementSessions.clear();
+    _prePregnancyWeight = null;
+    _heightCm = null;
+    _weightEntries.clear();
+    _kegelSessions = 0;
+    _kegelThisWeek.clear();
+    _kegelLast = null;
+    _kegelHoldAdjust = 0;
+    _kegelRepAdjust = 0;
+    _kegelHistory.clear();
+    _kegelCustomHold = null;
+    _kegelCustomRelax = null;
+    _kegelCustomReps = null;
+    _kegelVoiceOn = true;
+    _contractionSessions.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // weight_profile (single row per user)

@@ -59,8 +59,16 @@ class CalendarStore extends ChangeNotifier {
   // Same recipe as symptom_store - but no translator needed here, since the
   // field names already match the column names. We reuse the model's toJson /
   // personalFromJson directly.
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _personal.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('calendar_personal_events',

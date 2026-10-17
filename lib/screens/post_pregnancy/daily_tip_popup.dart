@@ -144,6 +144,10 @@ class DailyTipStore extends ChangeNotifier with CloudSyncedStore {
     _ready = true;
   }
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'lastShown': ''};
+
   @override
   Object cloudData() => {'lastShown': _lastShown}; // 'saved' moved to saved_items
 

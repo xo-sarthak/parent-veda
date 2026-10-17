@@ -65,8 +65,17 @@ class MedicineStore extends ChangeNotifier {
   }
 
   // Two tables in one store → merge each. Same recipe as symptom, twice.
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _meds.clear();
+    _logs.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // medications

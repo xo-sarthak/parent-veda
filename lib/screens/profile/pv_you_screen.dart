@@ -30,6 +30,7 @@
 //  under Developer, debug-only, with the other "· testing" affordances.
 // =============================================================================
 
+import '../../services/remote/sync_registry.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
@@ -1605,6 +1606,21 @@ class _PvYouScreenState extends State<PvYouScreen> {
         value: _phoneVerified ? 'Phone verified' : null,
         onTap: signedIn ? null : () => pvSignOut(context),
       ),
+      // ⚠️ WHERE HER DATA IS, SAID PLAINLY (2026-10-17). Clue lists sync as a
+      // plain settings row (Mobbin 67872707). One line, no spinner: saved to
+      // the account, or changes still waiting (offline). Read from the stores
+      // that track unconfirmed changes (`SyncRegistry.hasPendingChanges`).
+      if (signedIn)
+        PvYouRow(
+          key: const ValueKey('pv_you_data_sync'),
+          icon: SyncRegistry.hasPendingChanges
+              ? Icons.cloud_upload_outlined
+              : Icons.cloud_done_outlined,
+          title: 'Your data',
+          subtitle: SyncRegistry.hasPendingChanges
+              ? 'Some changes are waiting to save to your account'
+              : 'Saved to your account, ready on any phone',
+        ),
       if (privacy) _privacyRow(stage),
       if (signedIn)
         PvYouRow(

@@ -303,6 +303,10 @@ class PvOrderStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => 'pv_orders_v1';
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{};
+
   @override
   Object cloudData() => {
         'addr': _addresses.map((a) => a.toJson()).toList(),

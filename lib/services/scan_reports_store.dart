@@ -329,6 +329,10 @@ class ScanReportsStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => 'scan_reports';
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <Object>[];
+
   @override
   Object cloudData() => _reports.map((r) => r.toJson()).toList();
 

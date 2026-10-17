@@ -69,6 +69,10 @@ class GarbhStore extends ChangeNotifier with CloudSyncedStore {
   // --- cloud sync (favourites + streak; today's done-state stays local) ------
   @override
   String get cloudKey => 'garbh';
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'favs': <String>[], 'streak': 0, 'streakDate': '', 'done': <String>[], 'doneDate': '0000-00-00'};
+
   @override
   Object cloudData() => {
         'favs': _favs.toList(),

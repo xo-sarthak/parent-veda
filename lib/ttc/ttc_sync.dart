@@ -29,6 +29,15 @@
 //
 //  The one exception is ttc_journeys, which is genuinely one row of settings
 //  and where last-write-wins is correct.
+//
+//  ⚠️ 2026-10-17: "newest wins" was written here and never built. The pull
+//  was a union and every push re-sent every row, so another phone that still
+//  held an old value pushed it back over an edit or a removal. Her cycle
+//  (CycleStore) and her daily log (TtcLogStore) now carry the edit time and a
+//  soft delete per row (0097), merge with `ttc_row_merge.dart`, and upload
+//  only what changed, confirmed. This mixin now runs ONE upload at a time and
+//  runs one more when a change lands mid-upload, so a slow upload can no
+//  longer write back a row deleted while it was in flight.
 // =============================================================================
 
 import 'dart:async';
@@ -72,6 +81,11 @@ mixin TtcSyncedStore on ChangeNotifier {
   bool _cloudReady = false;
   Timer? _pushTimer;
 
+  /// An upload is running; a change during it asks for one more after it.
+  bool _pushing = false;
+  bool _pushAgain = false;
+  bool _pendingRegistered = false;
+
   /// Row writes are heavier than a blob upsert, and several TTC surfaces change
   /// many times in a few seconds - ticking five ritual parts, stepping a weight
   /// value. Coalesce them into one round of writes.
@@ -88,8 +102,42 @@ mixin TtcSyncedStore on ChangeNotifier {
   /// offline read matches what the cloud just gave us.
   Future<void> persistLocalCache();
 
+  /// Forget everything in memory: a sign-out, or another account signing in
+  /// (2026-10-17). The local cache has already been wiped by then. Required,
+  /// so a new TTC store cannot leave a person's data behind for the next.
+  void resetLocal();
+
+  void _resetForAccount() {
+    _pushTimer?.cancel();
+    _cloudReady = false;
+    resetLocal();
+  }
+
   @visibleForTesting
   bool get cloudReady => _cloudReady;
+
+  /// True while this store holds changes the cloud has not confirmed. Stores
+  /// that track it (CycleStore, TtcLogStore) override this; the sign-out
+  /// dialog and Settings read it through [SyncRegistry.hasPendingChanges].
+  bool get hasPendingPush => false;
+
+  /// Runs [pushToCloud], one at a time. A call that arrives while an upload
+  /// is running is folded into one more run after it.
+  Future<void> runPush() async {
+    if (_pushing) {
+      _pushAgain = true;
+      return;
+    }
+    _pushing = true;
+    try {
+      do {
+        _pushAgain = false;
+        await pushToCloud();
+      } while (_pushAgain);
+    } finally {
+      _pushing = false;
+    }
+  }
 
   @override
   void notifyListeners() {
@@ -99,7 +147,9 @@ mixin TtcSyncedStore on ChangeNotifier {
     _pushTimer = Timer(pushDebounce, () {
       // Fire-and-forget. A network hiccup must never reach the UI, and the
       // local cache is already correct - the next sync recovers a lost push.
-      pushToCloud().catchError(PvSyncHealth.report);
+      // One at a time since 2026-10-17 (`runPush`). Kept for revert:
+      //   pushToCloud().catchError(PvSyncHealth.report);
+      runPush().catchError(PvSyncHealth.report);
     });
   }
 
@@ -113,14 +163,23 @@ mixin TtcSyncedStore on ChangeNotifier {
   /// a LATER login re-syncs without an app restart.
   Future<void> syncFromCloud() async {
     SyncRegistry.register(syncFromCloud);
+    // Once per store: a fresh closure each call would never dedupe.
+    if (!_pendingRegistered) {
+      _pendingRegistered = true;
+      SyncRegistry.registerPending(() => hasPendingPush);
+      SyncRegistry.registerReset(_resetForAccount);
+    }
     if (SupabaseRepo.isLoggedIn) {
       try {
         await pullFromCloud();
         await persistLocalCache();
         // Seed the cloud with anything local that it did not have. Safe because
         // every write here is an upsert keyed by an app-generated id.
-        await pushToCloud();
-      } catch (_) {/* offline - keep local, try again after the next login */}
+        await runPush();
+      } catch (e) {
+        // Offline - keep local, try again on the next resume or login.
+        PvSyncHealth.report(e);
+      }
     }
     _cloudReady = true;
     // Reflect the merged state WITHOUT re-pushing.
@@ -146,6 +205,18 @@ class TtcSyncUtil {
     final d = DateTime.tryParse(s);
     return d == null ? null : DateTime(d.year, d.month, d.day);
   }
+
+  /// One row, and whether the cloud took it (2026-10-17). The stores that
+  /// track what is waiting to upload keep a row waiting until this is true.
+  static Future<bool> upsertConfirmed(
+    String table,
+    Map<String, dynamic> row, {
+    String? onConflict,
+  }) =>
+      SupabaseRepo.upsertRowConfirmed(table, row, onConflict: onConflict);
+
+  /// The time a row changed, in the shape the timestamp columns take.
+  static String stamp(DateTime t) => t.toUtc().toIso8601String();
 
   /// Upsert many rows one table at a time, swallowing individual failures so a
   /// single bad row cannot stop the rest of a sync.

@@ -826,6 +826,10 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
     return '$h:${d.minute.toString().padLeft(2, '0')}$ampm';
   }
 
+  /// A sign-out, or another account signing in (2026-10-17): this store forgets the person in memory; the cloud keeps it.
+  @override
+  void resetLocal() => resetForTest();
+
   @visibleForTesting
   void resetForTest() {
     _cycle = const TtcTreatmentCycle(dates: {});

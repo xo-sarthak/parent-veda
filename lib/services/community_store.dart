@@ -107,6 +107,10 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
   // --- cloud sync (all persistent state; "not interested" stays session-only) -
   @override
   String get cloudKey => 'community';
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{};
+
   @override
   Object cloudData() => {
         'joined': _joined.toList(),

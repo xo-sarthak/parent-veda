@@ -48,8 +48,16 @@ class SymptomStore extends ChangeNotifier {
   // Pull the user's rows from Supabase and merge with what we have locally:
   // cloud wins, but local-only rows (e.g. logged offline) are kept AND pushed
   // up. Best-effort - on any error we just keep the local cache.
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _logs.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows =

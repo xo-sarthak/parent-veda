@@ -87,6 +87,9 @@ class TtcPrecheckStore extends ChangeNotifier with CloudSyncedStore {
   static const _kEntries = 'ttc_precheck_entries';
   static const _kOpened = 'ttc_precheck_opened';
 
+  /// The sign-out reset blob (2026-10-17); see [applyCloudData].
+  static const Map<String, String> _kResetBlob = {'__reset__': ''};
+
   /// When she last opened the checklist (ISO), for "since you were last here"
   /// (2026-10-01, the fifth change to what the checklist gives back).
   static const _kLastVisit = 'ttc_precheck_last_visit';
@@ -164,6 +167,10 @@ class TtcPrecheckStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => 'ttc_precheck';
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => _kResetBlob;
+
   @override
   Object cloudData() =>
       {for (final e in _entries.entries) e.key: e.value.encode()};
@@ -175,6 +182,16 @@ class TtcPrecheckStore extends ChangeNotifier with CloudSyncedStore {
   /// sent up once, so the two end up equal.
   @override
   void applyCloudData(Object data) {
+    // A sign-out reset (2026-10-17): the merge below would keep every answer
+    // on this phone and send them up again, so the reset blob empties the
+    // store instead. Only `cloudEmptyData` is ever this exact object.
+    if (identical(data, _kResetBlob)) {
+      _entries.clear();
+      _everOpened = false;
+      _sinceVisit = null;
+      _visitBegun = false;
+      return;
+    }
     if (data is! Map) return;
     var localOnly = false;
     final seen = <String>{};

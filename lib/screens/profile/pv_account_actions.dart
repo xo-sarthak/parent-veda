@@ -8,8 +8,18 @@
 //  so dropping only our session lets the next Google tap re-enter the same
 //  account with no picker), clears the auth flag, then hands back to the
 //  auth flow when the pregnancy shell is up (that flow re-loads the profile
-//  and re-syncs on success), or pops to the root otherwise. Local data is
-//  not touched — local-first means signing out is not deleting.
+//  and re-syncs on success), or pops to the root otherwise.
+//
+//  ⚠️ AND SINCE 2026-10-17 IT WIPES THIS PHONE. "Local data is not touched"
+//  was the rule, and it meant the next person to sign in on the phone had the
+//  last person's cycles, logs and saved things merged INTO THEIR ACCOUNT by
+//  the first sync. Now a sheet says what happens (Perplexity on Mobbin:
+//  "Signing out will clear your history from this device. Synced queries are
+//  available upon signing back in"), warns if a change has not reached the
+//  account yet, and on confirm the local cache is wiped and every store
+//  emptied (`LocalOwner.wipeThisPhone`). The account keeps everything.
+//  Signing out of an app that was never signed in wipes nothing: that data
+//  belongs to nobody else.
 //
 //  DELETE ACCOUNT keeps the typed-keyword confirmation and `DeleteAccount.run`
 //  (the edge function that answers only for the token's own user). The
@@ -30,15 +40,125 @@ import '../../services/father_preview.dart';
 import '../../services/notification_service.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/remote/sync_registry.dart';
+import '../../services/remote/supabase_repo.dart';
+import '../../services/auth/local_owner.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show FabState;
 import '../auth/auth_flow_screen.dart';
 import 'pv_you_chrome.dart';
 import '../../widgets/pv_toast.dart';
 
+/// The words on the sign-out sheet (2026-10-17), here so a test can find them.
+const String kPvSignOutTitle = 'Sign out?';
+const String kPvSignOutBody =
+    'Signing out removes your data from this phone. It stays saved in your '
+    'account and comes back when you sign in again.';
+const String kPvSignOutPending =
+    "Some changes haven't reached your account yet. Connect to the internet "
+    'and wait a moment, or sign out anyway and lose them.';
+
+/// Asks before signing out, and says what happens to her data. True to go.
+Future<bool> pvConfirmSignOut(BuildContext context) async {
+  final p = pvStorePalette;
+  final pending = SyncRegistry.hasPendingChanges;
+  final ok = await showModalBottomSheet<bool>(
+    context: context,
+    backgroundColor: p.ground,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Expanded(
+                child: Text(kPvSignOutTitle,
+                    style: pvFraunces(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                        color: p.ink1)),
+              ),
+              PvRoundIcon(
+                icon: Icons.close_rounded,
+                size: 34,
+                onTap: () => Navigator.of(ctx).pop(false),
+              ),
+            ]),
+            const SizedBox(height: 10),
+            Text(kPvSignOutBody,
+                key: const ValueKey('pv_sign_out_body'),
+                style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+            if (pending) ...[
+              const SizedBox(height: 12),
+              Row(
+                  key: const ValueKey('pv_sign_out_pending'),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Icon(Icons.cloud_off_outlined,
+                          size: 17, color: p.ink1),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(kPvSignOutPending,
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              height: 1.45,
+                              fontWeight: FontWeight.w700,
+                              color: p.ink1)),
+                    ),
+                  ]),
+            ],
+            const SizedBox(height: 18),
+            InkWell(
+              key: const ValueKey('pv_sign_out_confirm'),
+              onTap: () => Navigator.of(ctx).pop(true),
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                height: 52,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: p.ink1,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(pending ? 'Sign out anyway' : 'Sign out',
+                    style: pvManrope(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text('Stay signed in',
+                    style: pvManrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink2)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+  return ok == true;
+}
+
 Future<void> pvSignOut(BuildContext context) async {
   final nav = Navigator.of(context);
   final controller = PregnancyController.current;
+  // Ask first, and say what happens (2026-10-17). Only when signed in: the
+  // same function also opens sign-in from the "Not signed in" row.
+  final wasSignedIn = SupabaseRepo.isLoggedIn;
+  if (wasSignedIn && !await pvConfirmSignOut(context)) return;
   // ⚠️ THREE SEPARATE TRIES, NOT ONE (2026-10-10). The three steps used to
   // share one `try`, so the first failure skipped the rest. The one that
   // fails in practice is `Supabase.instance`, which THROWS when the backend
@@ -72,6 +192,14 @@ Future<void> pvSignOut(BuildContext context) async {
   try {
     await NotificationService.instance.silenceForSignOut();
   } catch (_) {/* best-effort */}
+  // ⚠️ THIS PHONE FORGETS THE PERSON (2026-10-17): the local cache is
+  // wiped and every store emptied, so the next account to sign in starts
+  // clean and nothing of hers is uploaded into it. Her account keeps it all.
+  if (wasSignedIn) {
+    try {
+      await LocalOwner.wipeThisPhone();
+    } catch (_) {/* best-effort */}
+  }
   // The Ask Veda button stays off the sign-in screens.
   FabState.instance.markAppSignedOut();
   // ⚠️ THE WHOLE STACK GOES (2026-10-10). This used to push onboarding ON TOP

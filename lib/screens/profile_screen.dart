@@ -14,6 +14,7 @@
 //  tab can be a permanent destination.
 // =============================================================================
 
+import 'profile/pv_account_actions.dart' show pvSignOut;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -490,7 +491,10 @@ class ProfileScreenClassic extends StatelessWidget {
           const SizedBox(height: 10),
           // --- Sign out (replays the auth flow) ---------------------------
           OutlinedButton.icon(
-            onPressed: () => _signOut(context),
+            // One way out, the shared one (2026-10-17): it asks, says what
+            // happens to her data, and wipes this phone. Kept for revert:
+            //   onPressed: () => _signOut(context),
+            onPressed: () => pvSignOut(context),
             icon: const Icon(Icons.logout_rounded, size: 18),
             label: Text(s.profileSignOut),
             style: OutlinedButton.styleFrom(
@@ -732,6 +736,8 @@ class ProfileScreenClassic extends StatelessWidget {
 
   /// "Sign out" - clears the local auth flag and replays the auth flow over the
   /// app; completing it re-sets the flag (and feeds any picked due date in).
+  // Kept for revert (2026-10-17): the old sign-out, superseded by pvSignOut.
+  // ignore: unused_element
   Future<void> _signOut(BuildContext context) async {
     final nav = Navigator.of(context);
     try {

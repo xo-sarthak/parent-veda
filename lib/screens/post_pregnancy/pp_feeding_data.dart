@@ -102,8 +102,16 @@ class FeedingStore extends ChangeNotifier {
     } catch (_) {/* stay local */}
   }
 
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _logs.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {

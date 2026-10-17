@@ -623,6 +623,10 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
     } catch (_) {/* stay local */}
   }
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'following': <String>[], 'progress': <String, double>{}, 'recent': <String>[], 'lastSeconds': <String, int>{}, 'completed': <String>[], 'collections': <Object>[]};
+
   @override
   Object cloudData() => {
         // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore

@@ -427,6 +427,10 @@ class GrowStore extends ChangeNotifier with CloudSyncedStore {
     } catch (_) {/* stay local */}
   }
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'days': <String>[], 'last': <String, String>{}};
+
   @override
   Object cloudData() => {'days': _days.toList(), 'last': _last};
 

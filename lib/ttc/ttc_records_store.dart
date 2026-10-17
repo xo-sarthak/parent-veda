@@ -308,6 +308,10 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     notifyListeners();
   }
 
+  /// A sign-out, or another account signing in (2026-10-17): this store forgets the person in memory; the cloud keeps it.
+  @override
+  void resetLocal() => resetForTest();
+
   @visibleForTesting
   void resetForTest() {
     _items.clear();
@@ -827,6 +831,10 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     rearmReminders(except: a.id);
     notifyListeners();
   }
+
+  /// A sign-out, or another account signing in (2026-10-17): this store forgets the person in memory; the cloud keeps it.
+  @override
+  void resetLocal() => resetForTest();
 
   @visibleForTesting
   void resetForTest() {

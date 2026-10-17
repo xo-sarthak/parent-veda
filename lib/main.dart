@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'services/auth/local_owner.dart';
+import 'services/remote/sync_registry.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -140,6 +142,16 @@ Future<void> main() async {
   // arrives during the first frame is missed. See session_watch.dart for what
   // goes wrong without it.
   SessionWatch.start();
+
+  // ⚠️ WHOSE DATA IS ON THIS PHONE, BEFORE ANY STORE LOADS (2026-10-17). The
+  // stores load lazily and sync as they load, so the check has to come first:
+  // if a different account is signed in than the one the local cache belongs
+  // to, the cache is wiped here, before anything can be merged or uploaded.
+  // An install from before this check adopts the signed-in user. See
+  // lib/services/auth/local_owner.dart.
+  try {
+    await LocalOwner.ensureCurrent();
+  } catch (_) {/* never block the launch on it */}
 
   runApp(const ParentVedaApp());
 }
@@ -479,6 +491,11 @@ class _ParentVedaAppState extends State<ParentVedaApp>
       UsageEvents.instance.endSession();
     } else if (state == AppLifecycleState.resumed) {
       UsageEvents.instance.startSession();
+      // Pull what changed on her other phone, and retry any upload that
+      // failed while offline (2026-10-17). Every stage, once a minute at
+      // most; silent when logged out. Before this, a change made on another
+      // phone showed only after this one was closed and reopened.
+      SyncRegistry.resyncOnResume();
     }
   }
 

@@ -34,12 +34,19 @@ const Map<String, List<String>> written = {
     'user_id', 'journey_start', 'path', 'pregnancy_confirmed_on',
     'partner_joined', 'current_chapter', 'updated_at',
   ],
-  TtcTables.cycles: ['id', 'user_id', 'started_on'],
+  // 0097 (2026-10-17): the merge clock, the soft delete and the bleed days.
+  // Kept for revert: cycles ['id', 'user_id', 'started_on']; signals without
+  // the two times; logs without removed_at.
+  TtcTables.cycles: [
+    'id', 'user_id', 'started_on', 'updated_at', 'removed_at', 'bleed_days',
+  ],
   TtcTables.signals: [
-    'id', 'user_id', 'cycle_start', 'kind', 'cycle_day',
+    'id', 'user_id', 'cycle_start', 'kind', 'cycle_day', 'updated_at',
+    'removed_at',
   ],
   TtcTables.logs: [
     'user_id', 'tracker', 'field', 'logged_on', 'value', 'note', 'updated_at',
+    'removed_at',
   ],
   TtcTables.journal: [
     'id', 'user_id', 'author_id', 'kind', 'body', 'prompt', 'photo_path',
@@ -113,6 +120,16 @@ void main() {
         .readAsStringSync(),
   ].join('\n');
 
+  /// Columns a later migration adds with `alter table ... add column`
+  /// (0097, 2026-10-17), per table.
+  final altered = File('supabase/migrations/0097_ttc_cycle_sync_clock.sql')
+      .readAsStringSync()
+      .replaceAll('\r\n', '\n');
+  bool addedLater(String table, String column) => RegExp(
+          'alter table public\\.$table\\s+add column if not exists '
+          '$column\\s')
+      .hasMatch(altered);
+
   /// The body of one `create table public.<name> ( ... )` block.
   String tableBody(String table) {
     final start = sql.indexOf('create table if not exists public.$table');
@@ -149,7 +166,8 @@ void main() {
           // Column definitions start a line; the leading newline keeps this
           // from matching a column name inside a references/check clause.
           final declared = RegExp('^\\s*$column\\s', multiLine: true)
-              .hasMatch(body);
+                  .hasMatch(body) ||
+              addedLater(entry.key, column);
           expect(declared, isTrue,
               reason:
                   '${entry.key}.$column is written by the client but is not '

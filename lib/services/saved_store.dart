@@ -306,6 +306,7 @@ class SavedStore extends ChangeNotifier {
       _loaded = true;
     }
     SyncRegistry.register(syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     await syncFromCloud();
   }
 
@@ -338,6 +339,13 @@ class SavedStore extends ChangeNotifier {
   /// Pull every row of mine, merge by key with last-writer-wins on
   /// `updatedAt`, push back whatever this device knew that the cloud did not
   /// (or knew more recently), persist, notify. No-op when logged out.
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _items.clear();
+    notifyListeners();
+  }
+
   Future<void> syncFromCloud() async {
     if (!SupabaseRepo.isLoggedIn) return;
     await _importLegacyCloudOnce();

@@ -749,6 +749,10 @@ class ReadingStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => _prefsKey;
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'progress': <String, double>{}, 'fontScale': 1.0, 'mode': 'light'};
+
   @override
   Object cloudData() => {
         // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore

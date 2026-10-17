@@ -49,8 +49,16 @@ class BumpStore extends ChangeNotifier {
     await _syncFromCloud();
   }
 
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _photos.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('bump_photos');

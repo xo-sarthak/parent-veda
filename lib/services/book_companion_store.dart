@@ -102,6 +102,10 @@ class BookCompanionStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   String get cloudKey => 'book_companion_progress';
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'ideas': <String, Object>{}, 'chapters': <String, Object>{}};
+
   @override
   Object cloudData() => _toMap();
   @override

@@ -580,6 +580,10 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
 
   // ---- CloudSyncedStore ------------------------------------------------------
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'entitlements': <Object>[], 'bookings': <Object>[]};
+
   @override
   Object cloudData() => _toMap();
 

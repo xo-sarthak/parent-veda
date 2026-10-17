@@ -441,6 +441,10 @@ class JourneyStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   String get cloudKey => 'journeys';
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'started': <String, String>{}, 'done': <String, Object>{}};
+
   @override
   Object cloudData() => _toMap();
   @override

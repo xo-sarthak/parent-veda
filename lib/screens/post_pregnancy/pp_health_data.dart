@@ -544,8 +544,25 @@ class HealthStore extends ChangeNotifier {
 
   /// Merge each table cloud-side, exactly as the pregnancy stores do: fetch the
   /// child's rows, push up anything only we have, adopt the union.
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _questions.clear();
+    _medications.clear();
+    _prescriptions.clear();
+    _allergies.clear();
+    _symptoms.clear();
+    _reports.clear();
+    _visits.clear();
+    _growthEntered = false;
+    _vaxEntered = false;
+    _emergency = null;
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     final childId = _childId;
     // No child yet (still on the seeded placeholder) → nothing to key rows to.
     if (!SupabaseRepo.isLoggedIn || childId == null) return;

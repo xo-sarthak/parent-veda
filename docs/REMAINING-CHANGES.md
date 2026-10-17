@@ -290,6 +290,55 @@ doctor. It never blocks, because she knows her body.
   Keep both, or drop the second.
 - The too-close question has no "it was spotting" button, because the app has no spotting log yet.
 
+## TTC: one cycle hub, tests that explain themselves, spotting (2026-10-17)
+
+**What you said.** The competitor screens are "stunning, understandable, simple yet efficient, and everything is there
+under a single screen"; ours was "bland" and "something here, something there". And you didn't know an ovulation
+test had been marked positive, or where to find it.
+
+**What changed.**
+
+- **One cycle screen.** The Cycle companion is now the hub, top to bottom:
+  - the week;
+  - the ring, saying the home's sentence ("Your period may start in 5 days") with today's day as a bubble;
+  - Cycle predictions: fertile days, ovulation and next period, each with "in N days";
+  - the line that says where the fertile days come from;
+  - the month, with dots for what you logged;
+  - what was tracked on the day you tap;
+  - three rows: Ovulation tests, Period history, Cycle report.
+- **New colours.** Red for the period, teal for fertile days, the app's purple for today. This is the reading every
+  cycle app uses (Clue, Flo, Apple).
+- **A positive test from the home's Test button moves your fertile days**, the same as from the Ovulation tests
+  screen, and says so with Undo. One before day 7 is kept but does not move them until you tap "Use this test".
+- **Spotting.** "That bleeding was spotting" when a date is too close to the last period, and "Only light spotting?
+  Log spotting instead" on the add sheet. It never starts a new cycle.
+
+**What competitors do, from their own help pages.**
+
+- **A positive test.** Flo moves ovulation to the day after a positive
+  (help.flo.health/hc/en-us/articles/360015162972). Fitbit does the same, and drops the window when positives make no
+  sense (support.google.com/fitbit/answer/14236808). Apple puts the positive on day 5 of the window
+  (support.apple.com/en-us/120356). Natural Cycles lets temperature overrule a test
+  (help.naturalcycles.com/hc/en-us/articles/11833294713501).
+  - None of them says on screen that a test moved the window. We now do.
+- **Spotting.**
+  - Flo logs it under Vaginal discharge.
+  - Clue has red and brown spotting under Period, and only bleeding more than 10 days after the last period starts a
+    cycle.
+  - Natural Cycles won't start a cycle before day 16 and asks you to log the bleeding as spotting.
+  - Apple keeps Spotting as its own row.
+  - In every app with documentation, spotting never starts a cycle.
+- **Short cycles.** Clue's help centre says that in very short cycles the window and the period "may even overlap"
+  (support.helloclue.com/hc/en-us/articles/26992386736925). We say it on the screen.
+- **A new user with one period logged.** Flo predicts from one period and gets better with more. Clue and Fitbit need
+  about three cycles for trends. Natural Cycles needs one to three cycles.
+
+**Open for you.**
+
+- Walk the hub on the phone, and give the colours a yes or no.
+- Three things still open the companion from the home: the hero pill, "Day of your cycle" and the "Cycle companion"
+  card. Should one go?
+
 ## Needs you, not code
 
 - **Ask Veda hosting.** The Railway trial ended and the service is down. Pick a host or plan.
@@ -321,5 +370,5 @@ doctor. It never blocks, because she knows her body.
 - **TTC test phone.** Decide on the early ovulation-test entry in the 30 Sep cycle (see the fertile-days section above), and whether two rail cards may both open the Cycle companion.
 - **Push.** `9223ce4` (tap feedback) and anything before it not yet pushed.
 
-- **Yoga & fitness hub (2026-10-16), device walk.** Pregnancy: Yoga & fitness → Classes and tools → yoga card; More → All programmes and sessions → Yoga. Parenting: Explore → Yoga & Classes, and the pelvic floor page → Kegel Care (should say "Breathe first" in the first six weeks). TTC: More → Yoga & fitness; home movement card on a period day and in the two-week wait.
+- **Yoga & fitness hub (2026-10-16), device walk.** Pregnancy: Yoga & fitness → Classes and tools → yoga card; a session in For you opens the film page (2026-10-17); More has no "All programmes and sessions" pill, and Courses and Groups have "See all". Parenting: More → Everything else → Yoga & fitness, and Tools → For you → Kegel Care and Yoga & fitness (should say "Breathe first" in the first six weeks). TTC: More → Yoga & fitness; home movement card on a period day and in the two-week wait.
 - **Yoga videos.** The 21 month sessions and the recorded classes are placeholders; filming is owed.

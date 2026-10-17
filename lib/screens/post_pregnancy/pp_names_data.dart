@@ -661,6 +661,10 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
   // pp_name_votes, one row per parent per name, because the partner's side has
   // to be able to count them. Keeping a second copy here would let the two
   // drift, and a match computed from stale likes is worse than no match.
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'crowned': ''};
+
   @override
   Object cloudData() => {'crowned': _crowned};
 
@@ -713,8 +717,16 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
 
   /// Adopt my votes from the cloud, push up anything only this device has, then
   /// refresh the matches. Registered so it re-runs after a login.
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetVotes() {
+    _matches.clear();
+    notifyListeners();
+  }
+
   Future<void> _syncVotes() async {
     SyncRegistry.register(_syncVotes);
+    SyncRegistry.registerReset(_resetVotes);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // Own rows only - RLS forbids reading the partner's, by design.

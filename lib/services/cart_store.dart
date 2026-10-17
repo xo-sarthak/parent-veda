@@ -178,6 +178,10 @@ class CartStore extends ChangeNotifier with CloudSyncedStore {
   // --- cloud sync ------------------------------------------------------------
   @override
   String get cloudKey => 'cart_v1';
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{};
+
   @override
   Object cloudData() =>
       _carts.map((k, v) => MapEntry(k, v.map((i) => i.toJson()).toList()));

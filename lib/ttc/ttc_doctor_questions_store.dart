@@ -617,6 +617,10 @@ class TtcDoctorQuestionsStore extends ChangeNotifier with TtcSyncedStore {
     } catch (_) {/* a reminder must never stop a question being saved */}
   }
 
+  /// A sign-out, or another account signing in (2026-10-17): this store forgets the person in memory; the cloud keeps it.
+  @override
+  void resetLocal() => resetForTest();
+
   @visibleForTesting
   void resetForTest() {
     _rows.clear();

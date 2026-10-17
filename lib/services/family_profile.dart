@@ -1119,6 +1119,10 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   String get cloudKey => 'family_profile';
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{};
+
   @override
   Object cloudData() => _toMap();
   @override

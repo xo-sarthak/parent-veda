@@ -1081,6 +1081,10 @@ class YogaStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => _prefsKey;
 
+  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  @override
+  Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'booked': <String>[]};
+
   @override
   Object cloudData() => {'saved': _saved.toList(), 'booked': _booked.toList()};
 

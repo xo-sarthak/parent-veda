@@ -2773,6 +2773,132 @@ find to stop.
 date nobody wrote down. When the real source arrives, grep for every place
 that decided without it.
 
+## 16hh. How a marketplace runs prices and discounts — and why products are on hold (no migration, 2026-10-16)
+
+**The question.** Products change daily: three yesterday, five today, a sale tomorrow. Is that a Dart file
+or an admin panel? Amazon, Flipkart and Myntra answer it the same way.
+
+**Split a product by how often each part changes.** Catalogue (what it is: rarely) → variant/SKU (rarely) →
+offer (who sells it, at what price: daily) → price (MRP + selling price with `starts_at`/`ends_at`: hourly
+in a sale) → promotion (a rule applied at checkout: per campaign) → inventory (every order). Put the price
+inside the product row and a sale rewrites every product and invalidates every cache. Keep it separate and
+a sale is a handful of rows. Amazon adds one product with many offers, and the Buy Box picks the winner.
+
+**Shown can be stale; charged never.** Listing prices come from a cache or search index and may be minutes
+old. The charged price is recomputed on the server at checkout from live tables, with "price changed" if it
+moved. `razorpay-create-order` already does this. MRP is a legal figure in India (sell below, never above),
+so the discount % is computed from MRP, never typed in.
+
+**Promotions are data evaluated by code.** Condition (category, cart minimum, first order, card, code) +
+benefit (% or ₹ off, free item) + limits (dates, budget, uses per person, cap) + stacking rules + who funds
+it. The cart sends ids and a coupon code. The server works out the total.
+
+**The order is a snapshot.** Name, price, discount and tax are copied at payment, so a later price change
+never rewrites history and a refund uses what was paid. **Inventory** is reserved for minutes at checkout
+and committed on payment success. **The variability lives in the admin side** (Seller Central, bulk feeds),
+never in an app release.
+
+**For ParentVeda.** Two kinds of product. *Affiliate* (`soldHere: false`, `buyUrl`): the retailer owns the
+price, so there's nothing to discount and no engine is needed. *Sold here*: these need the machinery. The
+blocker is ownership: products are `ContentOwner.bundled`, so the Dart file is the truth, which is the
+opposite of what a changing catalogue needs. Staged plan, **ON HOLD** (STILL-OPEN §65.1):
+(1) flip products to `editor`, add a Directus Products screen, and export once to fill the table;
+(2) `sale_price` + `sale_starts_at` / `sale_ends_at`; (3) a `coupons` table evaluated in create-order, with
+the order line snapshotting price and discount; (4) at scale only: stock reservation, multiple sellers,
+bank offers.
+
+**The trade-off of (1).** It loses "every product is reviewed in code and guarded by tests". It gains
+changes without a release. The guard moves to panel permissions and a server check (refuse a price of 0 or
+less, or one above MRP). This is not the "rules stay out of the database" prohibition: a price is content,
+not a clinical rule.
+
+## 16ii. Data that survives a phone switch — the cycle sync, sign-out and the owner (0097, 2026-10-17)
+
+**What happened.** On the test phone, an ovulation test the user had just cleared came back after a reinstall. An
+audit of her cycle sync then found that nothing guaranteed a change made on one phone would hold on another. It is
+worth reading in full, because every rule below answers one of these failures:
+
+1. **A field that never synced.** Her bleeding days lived only in `shared_preferences`, so on a new phone every
+   period came back without its length. A column that the client never writes is invisible: the app looks perfect
+   on the phone that has it.
+2. **A union merge can't take anything away.** The pull added whatever the phone lacked (`putIfAbsent`) and kept
+   whatever it had, and the push re-sent every row. So a removal or an edit on phone A was undone by phone B, which
+   still held the old row and pushed it straight back.
+3. **A clock stamped at the wrong moment.** `ttc_logs.updated_at` was written at UPLOAD time, on every row, every
+   push. That makes the phone that uploaded last always look newest, which is not a clock at all.
+4. **A hard delete that has to land first time.** A delete sent while offline, or racing an upload already in
+   flight, simply didn't happen, and the next sync brought the row back.
+5. **A failure nobody heard.** `upsertRow` swallows errors, so a failed upload was never retried until the next
+   cold start.
+6. **The wrong person's data.** Nothing recorded which account the phone's cache belonged to. Signing out left
+   every singleton store full, and the next person to sign in had the first person's cycles merged into THEIR
+   account by the first sync.
+
+**The rule: every synced row carries an edit time and a soft delete, and the newer change wins.**
+
+| Column | Meaning |
+|---|---|
+| `updated_at` | When she made the change, ON THE PHONE |
+| `removed_at` | Set when the change was a removal; the row stays |
+
+`ttc_row_merge.dart` holds the whole decision as a pure function (`ttcMergePlan`): per key, take the cloud's copy
+if it is newer, upload the phone's if it is newer, do nothing if they match. Removals are rows like any other change,
+so they win and lose by the same rule. It is tested with no network (`test/ttc_row_merge_test.dart`). The journal
+(§16l), saved items (§16d) and doctor's questions (§16r) already worked this way; the cycle and the daily log now
+join them.
+
+**Why the phone writes `updated_at`, not a server trigger.** A trigger would stamp the moment the row ARRIVED. A
+change made offline on Monday and uploaded on Wednesday would then beat a change made online on Tuesday, which is
+backwards. The trade-off: we trust the phone's clock. Phones that sync time with the network are right to the
+second; a phone with a badly wrong clock can win a conflict it shouldn't. For one person's own data, edited by that
+person, that is the right side of the trade. For data many people edit at once you'd want server-assigned versions
+instead.
+
+**Dirty flags: upload only what changed, and only forget it once the cloud confirms it.** Each store keeps the set
+of keys the cloud has not confirmed (`_dirty`). A push sends those rows through `upsertRowConfirmed`, which returns
+whether the server took the row. A key leaves the set only if the upload succeeded AND she has not edited it again
+in the meantime (its edit time is unchanged). The same set answers "are there changes not saved to your account?",
+which the sign-out sheet and the Settings row read through `SyncRegistry.hasPendingChanges`.
+
+**One upload at a time.** `TtcSyncedStore.runPush` refuses to start a second push while one runs; a change during a
+push asks for exactly one more afterwards. Two overlapping pushes were how a slow upload could write back a row
+deleted while it was in flight.
+
+**Pull on resume.** `main.dart` calls `SyncRegistry.resyncOnResume()` when the app returns to the screen, at most
+once a minute. Without it, a change made on her other phone appeared only after this one was killed and reopened.
+
+**Whose data is this? (`LocalOwner`)** The phone records the user id its cache belongs to (`pv_local_owner_uid`).
+Three moments check it:
+
+- **At launch, before any store loads** (`main.dart`). Stores load lazily and sync as they load, so the check has
+  to come first.
+- **Before every resync** (`SyncRegistry.resyncAll`), which covers signing in without a restart.
+- **On sign-out**, which now wipes deliberately.
+
+If a different account is found signed in, the cache is wiped and every store emptied BEFORE anything merges or
+uploads. An install from before this release has no owner; the signed-in user adopts it, so nobody loses anything
+on update.
+
+**Sign-out wipes the device; the account keeps the data.** This is the industry pattern. Perplexity's sheet:
+"Signing out will clear your query history from this device. Synced queries are available upon signing back in".
+Ours says the same, and if `hasPendingChanges` is true it warns first that some changes haven't reached the account
+yet.
+
+**Emptying a singleton needs every store's help (`SyncRegistry.registerReset`).** Clearing `shared_preferences` is
+not enough: the singletons still hold the last person in memory. So every syncing store registers a reset next to
+its syncer, and `LocalOwner.wipeThisPhone` runs them all after the wipe.
+
+- **Both sync mixins make it REQUIRED:** `TtcSyncedStore.resetLocal()` and `CloudSyncedStore.cloudEmptyData`. A new
+  store that forgets is a compile error, not a privacy bug.
+- **For stores that register by hand**, `test/sync_reset_coverage_test.dart` scans `lib/`: every
+  `SyncRegistry.register(` needs a matching `registerReset(`.
+
+**The general lessons:**
+
+- A merge that cannot express "this was removed" will eventually undo every removal.
+- A timestamp is only a clock if it is stamped when the thing happened, not when it was written down.
+- In a local-first app, the local cache belongs to someone. Write down who, and check it before you upload.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -2849,3 +2975,5 @@ that decided without it.
 33. `lib/services/pv_sync_health.dart` — fire-and-forget, but report once (§16dd).
 34. `lib/services/dear_baby_vault_store.dart` — a stored event with a derived fallback (§16ff).
 35. `lib/screens/garbh_browse_screen.dart` `shravanBrowse` — one source for what plays (§16gg).
+36. `supabase/functions/razorpay-create-order/index.ts` `priceLines` — the server prices the order; the phone never does (§16hh).
+37. `lib/ttc/ttc_row_merge.dart`, `CycleStore` / `TtcLogStore` push and pull, `lib/services/auth/local_owner.dart`, `SyncRegistry.registerReset` — newer wins, soft deletes, dirty flags, and whose data is on the phone (§16ii).

@@ -24,6 +24,8 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../remote/supabase_repo.dart';
+import 'local_owner.dart';
+// ignore: unused_import
 import 'local_wipe.dart';
 import 'social_auth.dart';
 
@@ -80,7 +82,11 @@ class DeleteAccount {
     // seeded with the deleted user's data — see local_wipe.dart. This also
     // subsumes the pending profile and the auth flag, which is why neither is
     // cleared separately any more.
-    await LocalWipe.run();
+    // And every store forgets the person in memory too (2026-10-17): the
+    // wipe cleared the cache, but the singletons still held her data, and a
+    // new account signing in would have uploaded it. Kept for revert:
+    //   await LocalWipe.run();
+    await LocalOwner.wipeThisPhone();
 
     return true;
   }

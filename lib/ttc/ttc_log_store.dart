@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
+import 'ttc_row_merge.dart';
 import 'ttc_sync.dart';
 
 class TtcLogValue {
@@ -123,7 +124,31 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
   static const _clearedKey = 'ttc_logs_cleared';
 
   /// Cleared keys → when they were cleared (ms since epoch).
+  ///
+  /// ⚠️ SINCE 2026-10-17 (0097) THESE ARE SOFT-DELETED ROWS, NOT A LOCAL NOTE.
+  /// A clear uploads as a row with `removed_at`, so it reaches every phone
+  /// and the newer-wins merge keeps it; it is no longer a one-shot cloud
+  /// delete that could miss. The map stays the record of what she removed.
   final Map<String, int> _cleared = {};
+
+  // ---- the row clock (2026-10-17, 0097) -------------------------------------
+  //
+  // When she last changed each key ON THIS PHONE (ms since epoch, UTC), and
+  // which keys the cloud has not confirmed yet. `updated_at` used to be
+  // stamped at UPLOAD time on every row of every push, which made it useless
+  // as a clock: the phone that uploaded last always looked newest. See
+  // `ttc_row_merge.dart`.
+  static const _dirtyKey = 'ttc_logs_dirty';
+  final Map<String, int> _stamps = {};
+  final Set<String> _dirty = {};
+
+  @override
+  bool get hasPendingPush => _dirty.isNotEmpty;
+
+  @visibleForTesting
+  Set<String> get dirtyKeysForTest => Set.unmodifiable(_dirty);
+
+  static int _now() => DateTime.now().toUtc().millisecondsSinceEpoch;
 
   @visibleForTesting
   Set<String> get clearedKeysForTest => Set.unmodifiable(_cleared.keys);
@@ -208,6 +233,8 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
     final k = dayKey(on ?? DateTime.now());
     // Logged again: no longer deleted (H12).
     _cleared.remove('$tracker/$field/$k');
+    _stamps['$tracker/$field/$k'] = _now();
+    _dirty.add('$tracker/$field/$k');
     _values['$tracker/$field/$k'] = TtcLogValue(
       tracker: tracker,
       field: field,
@@ -223,26 +250,28 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
     final day = dayKey(on ?? DateTime.now());
     final k = '$tracker/$field/$day';
     if (_values.remove(k) == null) return;
-    // H12: remember the delete until a pull shows the cloud has it too.
-    _cleared[k] = DateTime.now().millisecondsSinceEpoch;
+    // H12: remember the delete. Since 2026-10-17 it uploads as a soft-deleted
+    // row (removed_at), so every phone takes it and an older upload cannot
+    // undo it. Kept for revert: the one-shot `SupabaseRepo.deleteMatch` of
+    // this row, fired here.
+    final t = _now();
+    _cleared[k] = t;
+    _stamps[k] = t;
+    _dirty.add(k);
     _persist();
-    // Clearing must reach the cloud explicitly - a union pull would bring the
-    // cleared value straight back.
-    if (SupabaseRepo.isLoggedIn) {
-      SupabaseRepo.deleteMatch(TtcTables.logs, {
-        'user_id': SupabaseRepo.userId!,
-        'tracker': tracker,
-        'field': field,
-        'logged_on': day,
-      }).catchError((_) {});
-    }
     notifyListeners();
   }
+
+  /// A sign-out, or another account signing in (2026-10-17).
+  @override
+  void resetLocal() => resetForTest();
 
   @visibleForTesting
   void resetForTest() {
     _values.clear();
     _cleared.clear();
+    _stamps.clear();
+    _dirty.clear();
     _loaded = true;
     notifyListeners();
   }
@@ -272,8 +301,12 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
           // `habits/hours` on the same day. First one in wins, and since the
           // list is read in save order that is the newer write.
           _values.putIfAbsent(v.key, () => v);
+          // The edit time (2026-10-17); a row saved before has none.
+          final u = m['u'];
+          if (u is num) _stamps.putIfAbsent(v.key, () => u.toInt());
         } catch (_) {/* a corrupt row is dropped, not fatal */}
       }
+      _dirty.addAll(p.getStringList(_dirtyKey) ?? const []);
       final raw = p.getString(_clearedKey);
       if (raw != null) {
         final m = jsonDecode(raw);
@@ -297,8 +330,70 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
   //  for us - re-logging the same field on the same day overwrites in Postgres
   //  exactly as it does in memory.
 
+  // ⚠️ NEWER WINS, BOTH WAYS (2026-10-17, 0097). The union pull below kept
+  // whatever this phone had (`putIfAbsent`), so an edit made on another phone
+  // never arrived, and a value cleared there came back from here. Now the
+  // edit time decides per key (`ttcMergePlan`), removals included. The union
+  // pull is kept below as `_pullUnionKept`, for revert.
   @override
   Future<void> pullFromCloud() async {
+    final rows = await SupabaseRepo.fetch(TtcTables.logs,
+        orderBy: 'logged_on', ascending: true);
+    final cloudStamp = <String, DateTime>{};
+    final cloudRow = <String, Map<String, dynamic>>{};
+    for (final row in rows) {
+      final tracker = row['tracker'];
+      final field = row['field'];
+      final day = row['logged_on']?.toString();
+      if (tracker is! String || field is! String || day == null) continue;
+      // ⚠️ AND ON THE WAY IN FROM POSTGRES, for the reason written on
+      // `kTtcHabitMerge`.
+      final key = '${ttcMergedTracker(tracker)}/$field/$day';
+      final stamp = ttcParseStamp(row['updated_at']) ?? ttcEpoch;
+      // Two cloud rows on one key (a pre-merge tracker id): the newer one.
+      final seen = cloudStamp[key];
+      if (seen != null && !stamp.isAfter(seen)) continue;
+      cloudStamp[key] = stamp;
+      cloudRow[key] = row;
+    }
+    DateTime at(int ms) => DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
+    final local = <String, DateTime>{
+      for (final k in _values.keys)
+        k: _stamps[k] == null ? ttcEpoch : at(_stamps[k]!),
+      for (final e in _cleared.entries) e.key: at(_stamps[e.key] ?? e.value),
+    };
+    final plan = ttcMergePlan(local: local, cloud: cloudStamp);
+    for (final k in plan.take) {
+      final row = cloudRow[k]!;
+      final stamp = cloudStamp[k]!;
+      final removed = ttcParseStamp(row['removed_at']);
+      final value = row['value'];
+      if (removed != null || value is! num) {
+        _values.remove(k);
+        _cleared[k] = (removed ?? stamp).millisecondsSinceEpoch;
+      } else {
+        final parts = k.split('/');
+        _values[k] = TtcLogValue(
+          tracker: parts[0],
+          field: parts[1],
+          dayKey: parts[2],
+          value: value.toDouble(),
+          note: row['note'] as String?,
+        );
+        _cleared.remove(k);
+      }
+      _stamps[k] = stamp.millisecondsSinceEpoch;
+      _dirty.remove(k);
+    }
+    _dirty.addAll(plan.push);
+    for (final k in cloudStamp.keys) {
+      if (!plan.take.contains(k) && !plan.push.contains(k)) _dirty.remove(k);
+    }
+  }
+
+  // Kept for revert (2026-10-17): the union pull with the H12 re-delete.
+  // ignore: unused_element
+  Future<void> _pullUnionKept() async {
     final rows = await SupabaseRepo.fetch(TtcTables.logs,
         orderBy: 'logged_on', ascending: true);
     // H12: which tombstoned keys the cloud still holds.
@@ -349,8 +444,53 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
     _cleared.removeWhere((k, at) => !stillThere.contains(k) && at < settled);
   }
 
+  /// Uploads the keys the cloud has not confirmed, each with the time she
+  /// changed it and, for a clear, `removed_at` (2026-10-17). A key leaves the
+  /// waiting set only when the cloud took it and she has not changed it
+  /// again meanwhile. The old push (every row, stamped at upload time) is
+  /// kept below as `_pushAllKept`, for revert.
   @override
   Future<void> pushToCloud() async {
+    final uid = SupabaseRepo.userId;
+    if (uid == null) return;
+    for (final k in List.of(_dirty)) {
+      final parts = k.split('/');
+      if (parts.length != 3) {
+        _dirty.remove(k);
+        continue;
+      }
+      final v = _values[k];
+      final removedMs = v == null ? _cleared[k] : null;
+      if (v == null && removedMs == null) {
+        _dirty.remove(k);
+        continue;
+      }
+      final sent = _stamps[k] ?? _now();
+      String iso(int ms) => TtcSyncUtil.stamp(
+          DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true));
+      final ok = await TtcSyncUtil.upsertConfirmed(
+        TtcTables.logs,
+        {
+          'user_id': uid,
+          'tracker': parts[0],
+          'field': parts[1],
+          'logged_on': parts[2],
+          // A removed row keeps a value for the NOT NULL column; never read.
+          'value': v?.value ?? 0,
+          'note': v?.note,
+          'updated_at': iso(sent),
+          'removed_at': removedMs == null ? null : iso(removedMs),
+        },
+        onConflict: 'user_id,tracker,field,logged_on',
+      );
+      if (ok && (_stamps[k] ?? sent) == sent) _dirty.remove(k);
+    }
+    await _persist();
+  }
+
+  // Kept for revert (2026-10-17): every row, stamped at upload time.
+  // ignore: unused_element
+  Future<void> _pushAllKept() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
     await TtcSyncUtil.upsertAll(
@@ -386,10 +526,12 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
                   'd': v.dayKey,
                   'v': v.value,
                   if (v.note != null) 'n': v.note,
+                  if (_stamps[v.key] != null) 'u': _stamps[v.key],
                 }))
             .toList(),
       );
       await p.setString(_clearedKey, jsonEncode(_cleared));
+      await p.setStringList(_dirtyKey, _dirty.toList());
     } catch (_) {/* best-effort */}
   }
 }

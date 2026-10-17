@@ -54,6 +54,20 @@ mixin CloudSyncedStore on ChangeNotifier {
   /// Adopt a blob previously produced by [cloudData] into the store's state.
   void applyCloudData(Object data);
 
+  /// The blob of a store nobody has used yet (2026-10-17): what a sign-out,
+  /// or another account signing in, resets the store to through
+  /// [applyCloudData]. Required, so a new blob store cannot leave a person's
+  /// data in memory for the next account to upload.
+  Object get cloudEmptyData;
+
+  void _resetForAccount() {
+    _pushTimer?.cancel();
+    _cloudReady = false;
+    applyCloudData(cloudEmptyData);
+    // Reflect it WITHOUT pushing: there is no account to push to.
+    super.notifyListeners();
+  }
+
   /// Write the store's current in-memory state to its shared_preferences cache
   /// (called after adopting the cloud blob, so offline reads match).
   Future<void> persistLocalCache();
@@ -89,6 +103,7 @@ mixin CloudSyncedStore on ChangeNotifier {
   /// Run once at startup, after the local cache has been loaded.
   Future<void> syncStateFromCloud() async {
     SyncRegistry.register(syncStateFromCloud);
+    SyncRegistry.registerReset(_resetForAccount);
     if (SupabaseRepo.isLoggedIn) {
       try {
         final data = await SupabaseRepo.loadState(cloudKey);

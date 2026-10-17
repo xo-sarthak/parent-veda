@@ -417,8 +417,17 @@ class ChildProfileStore extends ChangeNotifier {
     await _syncFromCloud();
   }
 
+  /// A sign-out, or another account signing in (2026-10-17): this store
+  /// forgets the person in memory; the cloud keeps it.
+  void _resetLocal() {
+    _children.clear();
+    _activeId = null;
+    notifyListeners();
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // fetchShared, NOT fetch: a co-parented read. This returns MY children
