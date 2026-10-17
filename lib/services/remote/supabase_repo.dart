@@ -148,6 +148,26 @@ class SupabaseRepo {
     await _client.from(table).update(changes).eq('id', id);
   }
 
+  /// [updateShared], and whether the cloud took it (2026-10-17, 0101). For a
+  /// row the PARTNER owns: an upsert would be refused, because Postgres checks
+  /// the INSERT policy (`auth.uid() = user_id`) on every row an upsert
+  /// proposes, even one that ends up updating. A plain UPDATE leaves user_id
+  /// alone. A row 0100's guard skips as older still counts as taken.
+  static Future<bool> updateSharedConfirmed(
+    String table,
+    String id,
+    Map<String, dynamic> changes,
+  ) async {
+    if (userId == null) return false;
+    try {
+      await _client.from(table).update(changes).eq('id', id);
+      return true;
+    } catch (e) {
+      debugPrint('[repo] update $table refused: $e');
+      return false;
+    }
+  }
+
   /// Delete row [id] from a co-parented [table] (see [updateShared]).
   static Future<void> deleteShared(String table, String id) async {
     if (userId == null) return;

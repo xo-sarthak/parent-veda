@@ -131,6 +131,8 @@ class NappyStore extends ChangeNotifier {
 
   bool _loaded = false;
   static const _prefsKey = 'pp_nappies';
+  // Newer-wins bookkeeping beside the rows (0101, sync log step 5).
+  final ChildLogLedger _sync = ChildLogLedger(table, 'pp_nappies_sync');
   static const table = 'pp_nappy_logs';
 
   String? get _childId => ChildProfileStore.instance.activeChildId;
@@ -146,6 +148,8 @@ class NappyStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
     try {
@@ -153,10 +157,19 @@ class NappyStore extends ChangeNotifier {
     } catch (_) {/* stay local */}
   }
 
+  bool _hasPending() => _sync.hasPending;
+
+  /// Uploads whatever the cloud has not confirmed (0101).
+  Future<void> _pushWaiting() => _sync.push(
+        () => {for (final x in _logs) x.id: toRow(x)},
+        fallbackChildId: _childId,
+      );
+
   /// A sign-out, or another account signing in (2026-10-17): this store
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _logs.clear();
+    _sync.clear();
     notifyListeners();
   }
 
@@ -166,12 +179,20 @@ class NappyStore extends ChangeNotifier {
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {
-      final merged = await ChildSync.merge<NappyLog>(
-        table: table,
+      // The union merge, kept for revert: it could never carry a removal.
+      // final merged = await ChildSync.merge<NappyLog>(
+      // table: table,
+      // childId: childId,
+      // local: _logs,
+      // idOf: (n) => n.id,
+      // toRow: toRow,
+      // fromRow: fromRow,
+      // orderBy: 'time',
+      // );
+      final merged = await _sync.pull<NappyLog>(
         childId: childId,
         local: _logs,
         idOf: (n) => n.id,
-        toRow: toRow,
         fromRow: fromRow,
         orderBy: 'time',
       );
@@ -180,6 +201,7 @@ class NappyStore extends ChangeNotifier {
         ..addAll(merged);
       await _persist();
       notifyListeners();
+      await _pushWaiting();
     } catch (_) {/* offline - keep local */}
   }
 
@@ -241,7 +263,9 @@ class NappyStore extends ChangeNotifier {
   void add(NappyLog n) {
     _logs.add(n);
     _persist();
-    ChildSync.push(table, _childId, n.id, toRow(n));
+    // ChildSync.push(table, _childId, n.id, toRow(n)); // kept for revert
+    _sync.touch(n.id, _childId);
+    _pushWaiting();
     notifyListeners();
   }
 
@@ -249,9 +273,15 @@ class NappyStore extends ChangeNotifier {
       add(NappyLog(id: _id(), time: time, kind: kind, colour: colour, texture: texture, note: note));
 
   void remove(String id) {
+    for (final x in _logs) {
+      if (x.id == id) _sync.remove(id, toRow(x), _childId);
+    }
     _logs.removeWhere((n) => n.id == id);
     _persist();
-    ChildSync.remove(table, id);
+    // A hard delete fired once, lost offline; kept for revert. A removal is
+    // now a soft delete that uploads like any other change.
+    // ChildSync.remove(table, id);
+    _pushWaiting();
     notifyListeners();
   }
 
@@ -296,6 +326,8 @@ class PumpStore extends ChangeNotifier {
 
   bool _loaded = false;
   static const _prefsKey = 'pp_pumps';
+  // Newer-wins bookkeeping beside the rows (0101, sync log step 5).
+  final ChildLogLedger _sync = ChildLogLedger(table, 'pp_pumps_sync');
   static const table = 'pp_pump_logs';
 
   String? get _childId => ChildProfileStore.instance.activeChildId;
@@ -311,6 +343,8 @@ class PumpStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
     try {
@@ -318,10 +352,19 @@ class PumpStore extends ChangeNotifier {
     } catch (_) {/* stay local */}
   }
 
+  bool _hasPending() => _sync.hasPending;
+
+  /// Uploads whatever the cloud has not confirmed (0101).
+  Future<void> _pushWaiting() => _sync.push(
+        () => {for (final x in _logs) x.id: toRow(x)},
+        fallbackChildId: _childId,
+      );
+
   /// A sign-out, or another account signing in (2026-10-17): this store
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _logs.clear();
+    _sync.clear();
     notifyListeners();
   }
 
@@ -331,12 +374,20 @@ class PumpStore extends ChangeNotifier {
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {
-      final merged = await ChildSync.merge<PumpLog>(
-        table: table,
+      // The union merge, kept for revert: it could never carry a removal.
+      // final merged = await ChildSync.merge<PumpLog>(
+      // table: table,
+      // childId: childId,
+      // local: _logs,
+      // idOf: (p) => p.id,
+      // toRow: toRow,
+      // fromRow: fromRow,
+      // orderBy: 'time',
+      // );
+      final merged = await _sync.pull<PumpLog>(
         childId: childId,
         local: _logs,
         idOf: (p) => p.id,
-        toRow: toRow,
         fromRow: fromRow,
         orderBy: 'time',
       );
@@ -345,6 +396,7 @@ class PumpStore extends ChangeNotifier {
         ..addAll(merged);
       await _persist();
       notifyListeners();
+      await _pushWaiting();
     } catch (_) {/* offline - keep local */}
   }
 
@@ -393,7 +445,9 @@ class PumpStore extends ChangeNotifier {
   void add(PumpLog p) {
     _logs.add(p);
     _persist();
-    ChildSync.push(table, _childId, p.id, toRow(p));
+    // ChildSync.push(table, _childId, p.id, toRow(p)); // kept for revert
+    _sync.touch(p.id, _childId);
+    _pushWaiting();
     notifyListeners();
   }
 
@@ -401,9 +455,15 @@ class PumpStore extends ChangeNotifier {
       add(PumpLog(id: _id(), time: time, leftMl: leftMl, rightMl: rightMl, durationMin: durationMin, note: note));
 
   void remove(String id) {
+    for (final x in _logs) {
+      if (x.id == id) _sync.remove(id, toRow(x), _childId);
+    }
     _logs.removeWhere((p) => p.id == id);
     _persist();
-    ChildSync.remove(table, id);
+    // A hard delete fired once, lost offline; kept for revert. A removal is
+    // now a soft delete that uploads like any other change.
+    // ChildSync.remove(table, id);
+    _pushWaiting();
     notifyListeners();
   }
 
@@ -795,6 +855,8 @@ class TummyStore extends ChangeNotifier {
 
   bool _loaded = false;
   static const _prefsKey = 'pp_tummy';
+  // Newer-wins bookkeeping beside the rows (0101, sync log step 5).
+  final ChildLogLedger _sync = ChildLogLedger(table, 'pp_tummy_sync');
   static const table = 'pp_tummy_logs';
 
   String? get _childId => ChildProfileStore.instance.activeChildId;
@@ -810,6 +872,8 @@ class TummyStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
     try {
@@ -817,10 +881,19 @@ class TummyStore extends ChangeNotifier {
     } catch (_) {/* stay local */}
   }
 
+  bool _hasPending() => _sync.hasPending;
+
+  /// Uploads whatever the cloud has not confirmed (0101).
+  Future<void> _pushWaiting() => _sync.push(
+        () => {for (final x in _logs) x.id: toRow(x)},
+        fallbackChildId: _childId,
+      );
+
   /// A sign-out, or another account signing in (2026-10-17): this store
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _logs.clear();
+    _sync.clear();
     notifyListeners();
   }
 
@@ -830,12 +903,20 @@ class TummyStore extends ChangeNotifier {
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {
-      final merged = await ChildSync.merge<TummyLog>(
-        table: table,
+      // The union merge, kept for revert: it could never carry a removal.
+      // final merged = await ChildSync.merge<TummyLog>(
+      // table: table,
+      // childId: childId,
+      // local: _logs,
+      // idOf: (t) => t.id,
+      // toRow: toRow,
+      // fromRow: fromRow,
+      // orderBy: 'time',
+      // );
+      final merged = await _sync.pull<TummyLog>(
         childId: childId,
         local: _logs,
         idOf: (t) => t.id,
-        toRow: toRow,
         fromRow: fromRow,
         orderBy: 'time',
       );
@@ -844,6 +925,7 @@ class TummyStore extends ChangeNotifier {
         ..addAll(merged);
       await _persist();
       notifyListeners();
+      await _pushWaiting();
     } catch (_) {/* offline - keep local */}
   }
 
@@ -895,15 +977,23 @@ class TummyStore extends ChangeNotifier {
     final l = TummyLog(id: _id(), time: start, seconds: seconds);
     _logs.add(l);
     _persist();
-    ChildSync.push(table, _childId, l.id, toRow(l));
+    // ChildSync.push(table, _childId, l.id, toRow(l)); // kept for revert
+    _sync.touch(l.id, _childId);
+    _pushWaiting();
     notifyListeners();
     return true;
   }
 
   void remove(String id) {
+    for (final x in _logs) {
+      if (x.id == id) _sync.remove(id, toRow(x), _childId);
+    }
     _logs.removeWhere((t) => t.id == id);
     _persist();
-    ChildSync.remove(table, id);
+    // A hard delete fired once, lost offline; kept for revert. A removal is
+    // now a soft delete that uploads like any other change.
+    // ChildSync.remove(table, id);
+    _pushWaiting();
     notifyListeners();
   }
 

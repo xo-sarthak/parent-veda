@@ -50,7 +50,9 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 ### Sync and data safety (this session's work; history in `docs/BACKEND-SYNC-LOG.md`)
 - [x] **LAUNCH** · Run `supabase/migrations/0100_sync_guard_newer_wins.sql` · user · sync log step 4 · added 2026-10-17 · **done 2026-10-17**
 - [ ] **LAUNCH** · The two-phone walk for sync steps 1–4: delete offline on phone A, sync B, check it stays gone; edit on both, check the newer wins · user + dev · sync log · added 2026-10-17
-- [ ] **LAUNCH** · Pregnancy and Parenting row stores still bring deleted data back (~30 tables, union merge, hard deletes) · dev · STILL-OPEN-BACKEND §1 · added 2026-10-17
+- [ ] **LAUNCH** · Run `supabase/migrations/0101_pp_logs_sync_clock.sql` (Parenting logs: clock, soft delete, guard) · user · sync log step 5 · added 2026-10-17
+- [ ] **LAUNCH** · The two-phone walk for step 5, both parents on one child: log a feed on A, delete it on B, sync A, check it stays gone; correct the other parent's feed, check "logged by" does not change · user + dev · sync log step 5 · added 2026-10-17
+- [ ] **LAUNCH** · Pregnancy and Parenting row stores still bring deleted data back (~30 tables, union merge, hard deletes) · dev · STILL-OPEN-BACKEND §1 · added 2026-10-17 · *2026-10-17: the six Parenting logs are fixed (step 5, 0101 to run); left: Parenting documents, health, milestones, vaccines, and all of Pregnancy*
 - [ ] **LAUNCH** · Uploads outside TTC fail silently, so the sign-out sheet can say "saved" while changes are unsent · dev · STILL-OPEN-BACKEND §3 · added 2026-10-17
 - [ ] **DECIDE** · How rows both parents write are merged, per table (child profile, emergency cards) · user · STILL-OPEN-BACKEND §6 · added 2026-10-17
 - [ ] **LAUNCH** · Blob stores: per-item merge for curated lists (hospital bag, checklists, cart, saved readings). Until then two phones can overwrite each other · dev · STILL-OPEN-BACKEND §2 · added 2026-10-17

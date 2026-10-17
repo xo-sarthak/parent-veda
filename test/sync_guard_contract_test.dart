@@ -22,16 +22,39 @@ void main() {
       .readAsStringSync()
       .replaceAll('\r\n', '\n');
 
-  /// The table names in the `foreach t in array array[ ... ]` list.
+  /// The table names in the `foreach t in array array[ ... ]` list of every
+  /// migration that attaches the guard: 0100, and each later one that adds
+  /// tables to it (0101, the Parenting logs).
   final guarded = () {
-    final m = RegExp(r'foreach t in array array\[(.*?)\]', dotAll: true)
-        .firstMatch(guard);
-    if (m == null) throw StateError('0100 lists its tables in one array');
-    return {
-      for (final q in RegExp(r"'([a-z_]+)'").allMatches(m.group(1)!))
-        q.group(1)!,
-    };
+    final out = <String>{};
+    for (final f in Directory('supabase/migrations').listSync()) {
+      if (f is! File || !f.path.endsWith('.sql')) continue;
+      final sql = f.readAsStringSync().replaceAll('\r\n', '\n');
+      if (!sql.contains('execute function public.pv_sync_newer_wins()')) {
+        continue;
+      }
+      final m = RegExp(r'foreach t in array array\[(.*?)\]', dotAll: true)
+          .firstMatch(sql);
+      if (m == null) throw StateError('${f.path} lists its tables in one array');
+      for (final q in RegExp(r"'([a-z_]+)'").allMatches(m.group(1)!)) {
+        out.add(q.group(1)!);
+      }
+    }
+    return out;
   }();
+
+  test('the Parenting logs are guarded (0101)', () {
+    for (final t in [
+      'pp_feed_logs',
+      'pp_sleep_logs',
+      'pp_nappy_logs',
+      'pp_pump_logs',
+      'pp_tummy_logs',
+      'pp_growth_measurements',
+    ]) {
+      expect(guarded, contains(t));
+    }
+  });
 
   /// Every table a migration later gives a soft delete with `alter table`.
   final softDeletedLater = () {

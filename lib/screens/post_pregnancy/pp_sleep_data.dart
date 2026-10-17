@@ -69,6 +69,8 @@ class SleepStore extends ChangeNotifier {
 
   bool _loaded = false;
   static const _prefsKey = 'pp_sleeps';
+  // Newer-wins bookkeeping beside the rows (0101, sync log step 5).
+  final ChildLogLedger _sync = ChildLogLedger(_table, 'pp_sleeps_sync');
   static const _table = 'pp_sleep_logs';
 
   String? get _childId => ChildProfileStore.instance.activeChildId;
@@ -85,6 +87,8 @@ class SleepStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
     try {
@@ -92,10 +96,19 @@ class SleepStore extends ChangeNotifier {
     } catch (_) {/* stay local */}
   }
 
+  bool _hasPending() => _sync.hasPending;
+
+  /// Uploads whatever the cloud has not confirmed (0101).
+  Future<void> _pushWaiting() => _sync.push(
+        () => {for (final x in _logs) x.id: _toRow(x)},
+        fallbackChildId: _childId,
+      );
+
   /// A sign-out, or another account signing in (2026-10-17): this store
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _logs.clear();
+    _sync.clear();
     notifyListeners();
   }
 
@@ -105,12 +118,20 @@ class SleepStore extends ChangeNotifier {
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {
-      final merged = await ChildSync.merge<SleepLog>(
-        table: _table,
+      // The union merge, kept for revert: it could never carry a removal.
+      // final merged = await ChildSync.merge<SleepLog>(
+      // table: _table,
+      // childId: childId,
+      // local: _logs,
+      // idOf: (s) => s.id,
+      // toRow: _toRow,
+      // fromRow: _fromRow,
+      // orderBy: 'start_at',
+      // );
+      final merged = await _sync.pull<SleepLog>(
         childId: childId,
         local: _logs,
         idOf: (s) => s.id,
-        toRow: _toRow,
         fromRow: _fromRow,
         orderBy: 'start_at',
       );
@@ -119,6 +140,7 @@ class SleepStore extends ChangeNotifier {
         ..addAll(merged);
       await _persist();
       notifyListeners();
+      await _pushWaiting();
     } catch (_) {/* offline - keep local */}
   }
 
@@ -251,7 +273,9 @@ class SleepStore extends ChangeNotifier {
   void add(SleepLog e) {
     _logs.add(e);
     _persist();
-    ChildSync.push(_table, _childId, e.id, _toRow(e));
+    // ChildSync.push(_table, _childId, e.id, _toRow(e)); // kept for revert
+    _sync.touch(e.id, _childId);
+    _pushWaiting();
     notifyListeners();
   }
 
@@ -260,9 +284,15 @@ class SleepStore extends ChangeNotifier {
   }
 
   void remove(String id) {
+    for (final x in _logs) {
+      if (x.id == id) _sync.remove(id, _toRow(x), _childId);
+    }
     _logs.removeWhere((s) => s.id == id);
     _persist();
-    ChildSync.remove(_table, id);
+    // A hard delete fired once, lost offline; kept for revert. A removal is
+    // now a soft delete that uploads like any other change.
+    // ChildSync.remove(_table, id);
+    _pushWaiting();
     notifyListeners();
   }
 

@@ -37,6 +37,13 @@ Read first:
   - The timeline gained an own-row UPDATE (the user's decision). Without it the upsert upload was always
     refused, so the timeline had very likely never synced.
   - See `docs/BACKEND-SYNC-LOG.md` step 2.
+- **Parenting logs (step 5, 2026-10-17, migration 0101, NOT YET RUN).** Feeds, sleeps, nappies, pumping, tummy
+  time and growth: same pattern, on `ChildLogLedger` (`child_scoped_store.dart`) over the shared `SyncRowBook`
+  (`lib/services/remote/sync_row_book.dart`, which `TtcRowBook` is now a typedef of).
+  - The ledger remembers each row's child, so a pull of one child leaves another's rows alone.
+  - A row the partner owns goes up as a plain UPDATE: an upsert is checked against the INSERT policy
+    (`auth.uid() = user_id`) even when it updates, and would be refused. BACKEND-PATTERNS §16ii-f.
+  - See `docs/BACKEND-SYNC-LOG.md` step 5.
 
 ---
 
@@ -92,10 +99,10 @@ but it is not used as a merge clock. The rest have neither column.
 
 | Store | Tables |
 |---|---|
-| `pp_care_log_data.dart` | `pp_nappy_logs`, `pp_pump_logs`, `pp_tummy_logs` |
-| `pp_feeding_data.dart` | `pp_feed_logs` |
-| `pp_sleep_data.dart` | `pp_sleep_logs` |
-| `pp_growth_data.dart` | `pp_growth_measurements` |
+| ~~`pp_care_log_data.dart`~~ | ~~`pp_nappy_logs`, `pp_pump_logs`, `pp_tummy_logs`~~ **DONE 2026-10-17 (0101)** |
+| ~~`pp_feeding_data.dart`~~ | ~~`pp_feed_logs`~~ **DONE 2026-10-17 (0101)** |
+| ~~`pp_sleep_data.dart`~~ | ~~`pp_sleep_logs`~~ **DONE 2026-10-17 (0101)** |
+| ~~`pp_growth_data.dart`~~ | ~~`pp_growth_measurements`~~ **DONE 2026-10-17 (0101)** |
 | `pp_documents_data.dart` | `pp_documents` |
 | `pp_health_data.dart` | `pp_medications`, `pp_prescriptions`, `pp_allergies`, `pp_symptoms`, `pp_reports`, `pp_doctor_visits`, `pp_doctor_questions`, `pp_emergency_cards` |
 | `pp_milestones_data.dart` | `pp_milestone_observations` (composite key) |
@@ -215,6 +222,9 @@ profile, emergency cards) may want per-field.
 - `ttc_records` and `ttc_appointments`: row-level, latest edit wins.
 - `ttc_ritual`: shared parts (`conversation`) are the couple's, so the newest row across both wins. Individual
   parts are each person's own. Each phone writes only its own rows (BACKEND-PATTERNS §16ii-b).
+- The six Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth): row-level, newer wins. They are
+  append-only, so two parents almost never edit the same row (2026-10-17, step 5). Still open: documents,
+  health, milestones, vaccines, names and the child profile, where per-field may be worth asking about.
 - **Every couple-scoped store must keep the row's owner on push.** Check this before converting any `pp_*` or
   supplements store; the flip is silent.
 
@@ -259,7 +269,9 @@ left alone for now so two sessions don't clash:
    ~~Supplements and the timeline~~ **DONE 2026-10-17 (0099).** All of TTC's row tables are now converted.
 2. ~~**§3 dirty sets** for the same stores~~ done with step 1.
 3. ~~**§2 push-before-pull**~~ **DONE 2026-10-17 (step 3).** Next in §2: per-item merge for the curated lists.
-4. **§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.
+4. ~~**§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.~~ **DONE 2026-10-17
+   (step 5, 0101 not yet run).** Next in Parenting: documents, health, milestones and vaccines, still on
+   `ChildSync.merge`; the composite-key tables (vaccines, milestones) need `pushKeyed` reworked too.
 5. **§1 Pregnancy tables**, one migration.
 6. **§4, §5, §7** as tidy-up.
 

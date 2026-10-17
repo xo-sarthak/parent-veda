@@ -20,6 +20,7 @@ owed.
 | 2026-10-17 | Step 2: supplements, family timeline | 0099 | `6a36b7f` | yes (2026-10-17) |
 | 2026-10-17 | Step 3: blob stores push before pull | none | `f32af1e` | nothing to run |
 | 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | `a0eb5b9` | yes (2026-10-17) |
+| 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | not yet | **not yet** |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -317,3 +318,98 @@ right.
 
 **Also on 2026-10-17:** `docs/BEFORE-LAUNCH.md` was created at the user's request. It's one list of everything that
 must be done or decided before real users, from this review and from every other doc. It's maintained from now on.
+
+---
+
+## Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth)
+
+**Date:** 2026-10-17. **Migration:** 0101 (not yet run). **Commit:** not yet.
+
+**The problem (STILL-OPEN-BACKEND §1, Parenting row):** the six child-scoped log stores synced the way the TTC
+tables did before 0097. All six go through one helper, `ChildSync`:
+- **The pull was a union** (`ChildSync.merge`). It added what the phone lacked and kept what it held, so it could
+  never take anything away. A feed one parent deleted came back from the other parent's phone.
+- **A delete was one hard delete** (`ChildSync.remove`), fired once. Offline, or racing an upload, it was lost.
+- **Every upsert wrote `user_id = me`**, so correcting a feed the partner logged rewrote "logged by" to you.
+- **Nothing told the sign-out sheet** that a log was still waiting to upload.
+
+**Decision (§6, 2026-10-17):** row-level, newer wins. These logs are append-only, and two parents almost never
+edit the same feed, so per-field merging would cost complexity and buy nothing. This falls under the rule agreed
+in step 1: ask only if a table is genuinely co-edited. None of these six is.
+
+**Done (2026-10-17):**
+- [x] Migration `0101_pp_logs_sync_clock.sql`:
+  - `updated_at` and `removed_at` on `pp_feed_logs`, `pp_sleep_logs`, `pp_nappy_logs`, `pp_pump_logs`,
+    `pp_tummy_logs` and `pp_growth_measurements`;
+  - 0100's `pv_sync_newer_wins` trigger attached to all six;
+  - RLS unchanged and still strict (insert only as yourself, update any row of your child);
+  - a check query at the bottom, commented out.
+- [x] `SyncRowBook` (`lib/services/remote/sync_row_book.dart`): the book `TtcRowBook` was, moved beside the rest
+  of the sync plumbing so both stages share one implementation. `TtcRowBook` is now a typedef of it; the
+  original class is commented out in `lib/ttc/ttc_row_merge.dart`, kept for revert. One addition: `merge` takes
+  an optional `inScope` filter (see the child point below). Without it, the behaviour is identical, and every
+  TTC merge test still passes.
+- [x] `ChildLogLedger` (in `lib/services/remote/child_scoped_store.dart`): the per-store bookkeeping for the six
+  log tables. It holds stamps, soft deletes, owners, the waiting set, and **which child each row belongs to**.
+  - `pull` fetches one child's rows (removed ones included) and merges newer-wins.
+  - `push` uploads waiting rows one at a time; a change made during an upload gets a second pass.
+  - `uploadFor` is the pure upload decision, so it's unit-tested.
+- [x] **Which child.** A store's cache can hold rows of several children, but a pull fetches one child. The
+  ledger remembers each row's child. A pull of child A then neither re-uploads child B's rows under A nor
+  mistakes B's removals for rows "the cloud has never seen".
+- [x] **Whose row: a correction found while building, not in the plan.** The plan was "send the partner's
+  `user_id` back unchanged", as in step 1. Checking the Postgres docs showed that would be **refused**:
+  `insert ... on conflict do update` checks the INSERT policy's `WITH CHECK` on every proposed row, even one
+  that ends up updating. These tables insert only as yourself (`auth.uid() = user_id`).
+  - So a row the partner owns now goes up as a **plain UPDATE** with no `id` or `user_id` in it, through the new
+    `SupabaseRepo.updateSharedConfirmed`.
+  - Our own rows are still upserted.
+  - The trigger guards both paths.
+  - Step 1's TTC tables didn't hit this, because their policies are `for all` with "me or my partner" on both
+    sides.
+- [x] The six stores (`pp_feeding_data.dart`, `pp_sleep_data.dart`, `pp_growth_data.dart`, and `NappyStore`,
+  `PumpStore` and `TummyStore` in `pp_care_log_data.dart`):
+  - add marks the row waiting and uploads; remove is a soft delete that uploads like any other change;
+  - each registers `hasPending` with `SyncRegistry` (the sign-out sheet and Settings);
+  - reset clears the ledger;
+  - the old `ChildSync.merge`, `.push` and `.remove` calls are commented out, kept for revert.
+- [x] Not changed: `ChildSync.merge` itself, still used by documents, health, milestones and vaccines (the rest
+  of the Parenting row in §1).
+- [x] Tests:
+  - New `test/pp_logs_merge_test.dart` (14 cases): a removal survives an older live copy; the partner's newer
+    removal removes it here; newer edits win both ways; a pre-release cached row loses to the cloud; a pull of one
+    child leaves another's rows alone; Undo ends live; the partner's row goes as an UPDATE with no `user_id`; ours
+    is an upsert; a removal carries its NOT NULL columns; nothing is sent before a child exists; seed rows never
+    enter the book; the book survives a restart; a source scan checks all six stores are wired and call none of
+    the old helpers.
+  - `test/sync_guard_contract_test.dart` now reads the trigger list from every migration that attaches the guard
+    (0100 and 0101), plus one new case for the six tables.
+
+**Verified (2026-10-17):**
+- `flutter analyze` is clean on every touched file.
+- 1,038 tests pass: every `pp_*` and `post_pregnancy_*` file, plus all the sync and TTC merge tests.
+
+**Known limits, named:**
+- **Mixed versions.** Until both parents update, the old app still hard-deletes and still writes `user_id = me`.
+  A row the old app hard-deleted, but the new app holds with a stamp, is re-uploaded. That's the union's old
+  behaviour, not a new loss.
+- **Rows cached before this release** carry no stamp. Where the cloud has a copy, the cloud's copy wins.
+
+**User runs:**
+1. 0101 in the Supabase SQL editor.
+2. Optional: the check query at the bottom of the file. Expect six rows, all `true`.
+
+**Owed:** the two-phone walk for a parenting log (both parents on one child): log a feed on A, delete it on B,
+sync A, and check it stays gone. Then correct a feed the other parent logged, and check "logged by" doesn't
+change.
+
+**Files:**
+- `supabase/migrations/0101_pp_logs_sync_clock.sql` (new)
+- `lib/services/remote/sync_row_book.dart` (new)
+- `lib/services/remote/child_scoped_store.dart`
+- `lib/services/remote/supabase_repo.dart`
+- `lib/ttc/ttc_row_merge.dart`
+- `lib/screens/post_pregnancy/pp_feeding_data.dart`, `pp_sleep_data.dart`, `pp_growth_data.dart`,
+  `pp_care_log_data.dart`
+- `test/pp_logs_merge_test.dart` (new), `test/sync_guard_contract_test.dart`
+- `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`, `docs/BEFORE-LAUNCH.md`, `docs/BACKEND-PATTERNS.md`

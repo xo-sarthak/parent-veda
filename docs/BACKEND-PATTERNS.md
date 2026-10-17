@@ -2926,7 +2926,8 @@ write to his row (which would mean two phones fighting over one record). It's a 
 resolution. The cost: the reader must look at both people's rows to answer "is it done?", and the streak (which
 counts the couple) reads a different question than the tick (which counts her).
 
-**Shared bookkeeping.** `TtcRowBook` (`lib/ttc/ttc_row_merge.dart`) holds what a synced table needs beside its rows:
+**Shared bookkeeping.** `TtcRowBook` (`lib/ttc/ttc_row_merge.dart`; since step 5 it's a typedef of `SyncRowBook` in
+`lib/services/remote/sync_row_book.dart`, §16ii-f) holds what a synced table needs beside its rows:
 - edit stamps;
 - removals, plus the removed row's columns, so the upload can still fill NOT NULL columns;
 - owners;
@@ -3052,6 +3053,54 @@ hour-old overwrite and a year-ahead clock, prints the result, and leaves nothing
 soft delete per row → a waiting mark with confirmed uploads → keep the owner on shared rows → a server-side guard
 → reporting for the failures that are still silent. History: `docs/BACKEND-SYNC-LOG.md`, steps 1–4.
 
+### 16ii-f. An upsert is also checked as an INSERT: the partner's feed (0101, 2026-10-17)
+
+The six Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) got the same clock and soft delete in
+migration 0101, on the same bookkeeping. `TtcRowBook` moved to `lib/services/remote/sync_row_book.dart` as
+`SyncRowBook`, and the TTC name is now a typedef of it. Two stages, one rule, one implementation: two copies of a
+merge rule drift apart, and the bug you fix in one stays in the other.
+
+These tables are **child-scoped**, not couple-scoped, and that changes the RLS:
+
+| Policy | TTC (0041/0042) | Parenting logs (0023/0024/0094) |
+|---|---|---|
+| Insert | `for all`: me or my partner | `with check`: my child **and `auth.uid() = user_id`** |
+| Update | `for all`: me or my partner | `using`: my child (any parent may correct any row) |
+
+The plan was step 1's: remember the partner's `user_id` and send it back on the upsert. Reading the Postgres docs
+before shipping showed that would be **refused**.
+
+> General fact: **`INSERT ... ON CONFLICT DO UPDATE` checks the INSERT policy's `WITH CHECK` on every row it
+> proposes, whether or not that row ends up inserted.** The proposed row is the one you sent, so a row carrying
+> someone else's `user_id` fails "insert only as yourself", even though it would only ever have updated.
+> This is the policy-level twin of §16ii-c, where the statement needed the UPDATE *grant* because it *might*
+> update. Here it needs to pass the INSERT *policy*, because it *might* insert.
+
+So the upload picks its statement by owner (`ChildLogLedger.uploadFor`):
+- **A row we own, or a new row:** an upsert with our `user_id`. Both policies pass.
+- **A row the partner owns:** a plain `UPDATE ... WHERE id = ?` with no `id` or `user_id` in the body. Only the
+  UPDATE policy applies, so "logged by" stays theirs. The row must already exist, and it does: we only learn
+  an owner from the cloud.
+
+0100's trigger fires before both an insert and an update, so the newer-wins guard covers both paths.
+
+The cost of the strict policy: the client needs two write paths and has to know the owner. The alternative was to
+widen the insert check to "me or my partner". That's one write path, but then either parent could *create* a row
+in the other's name, which turns attribution from a fact into a claim. Keeping the policy strict and the client
+slightly smarter is the right way round: **policies are the security boundary, so they stay narrow, and the
+convenience goes in the code.**
+
+**One more thing child data needs: which child.** A store's cache can hold rows for more than one child, but a pull
+fetches one child's rows. With newer-wins, "the cloud doesn't have this row" means "upload it". So without
+remembering each row's child, a pull of child A would decide that child B's rows were missing from the cloud, and
+upload them under A. The ledger keeps `childOf` per id, and `SyncRowBook.merge(inScope:)` limits the decision to
+the part of the table that was actually fetched.
+
+> General fact: **"absent from the result" only means "absent" if the query could have returned it.** Every
+> partial fetch (one child, one page, one date range) needs its merge scoped to the same slice.
+
+History: `docs/BACKEND-SYNC-LOG.md` step 5.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3135,6 +3184,8 @@ soft delete per row → a waiting mark with confirmed uploads → keep the owner
     upload at a time (§16ii-d).
 37. `0100_sync_guard_newer_wins.sql` — the server as the single decision point; clamp, don't refuse; a
     skipped row that stays honest; the rollback sandbox (§16ii-e).
+38. `0101_pp_logs_sync_clock.sql` → `ChildLogLedger.uploadFor` (`lib/services/remote/child_scoped_store.dart`) —
+    an upsert is checked as an INSERT too; scope a merge to the slice you fetched (§16ii-f).
 33. `lib/services/pv_sync_health.dart` — fire-and-forget, but report once (§16dd).
 34. `lib/services/dear_baby_vault_store.dart` — a stored event with a derived fallback (§16ff).
 35. `lib/screens/garbh_browse_screen.dart` `shravanBrowse` — one source for what plays (§16gg).
