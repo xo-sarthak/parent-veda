@@ -262,7 +262,8 @@ class Child {
 /// Flip to true once `supabase/migrations/0102_onboarding_v3.sql` has been
 /// run on the live database. Until then birth mode and born-early weeks stay
 /// on this phone (the child's local copy and the family profile).
-const bool kChildBirthColumns = false;
+/// Run on the live database 2026-10-17 (the user).
+const bool kChildBirthColumns = true;
 
 /// Flip to true once `supabase/migrations/0093_children_sex_given.sql` has
 /// been run. Until then `sex_given` is kept on this phone only.

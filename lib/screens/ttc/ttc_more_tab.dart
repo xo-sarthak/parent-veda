@@ -161,7 +161,9 @@ const Map<String, (TtcRowHome, String)> kTtcFormerYouRows = {
   // Settings: how the app behaves for her, her account, help.
   'Messages': (TtcRowHome.settings, 'Messages'),
   'What you see': (TtcRowHome.settings, 'What you see'),
-  'Language': (TtcRowHome.settings, 'Language'),
+  // No home since 2026-10-17: the Language row shows on Pregnancy only (the
+  // user: English only). Kept for revert:
+  //   'Language': (TtcRowHome.settings, 'Language'),
   'Reminders': (TtcRowHome.settings, 'Reminders'),
   'WhatsApp updates': (TtcRowHome.settings, 'WhatsApp updates'),
   'Get help now': (TtcRowHome.settings, 'Get help now'),

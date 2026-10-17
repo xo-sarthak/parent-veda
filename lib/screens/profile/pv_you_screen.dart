@@ -853,10 +853,15 @@ class _PvYouScreenState extends State<PvYouScreen> {
         // this stage since 2026-09-28 (its page is Your answers, under Your
         // health). Kept for revert:
         //   'Language, reminders, WhatsApp updates and what leads on your home',
-        caption: 'Language, reminders and WhatsApp updates',
+        // No language row outside Pregnancy (2026-10-17). Kept for revert:
+        //   caption: 'Language, reminders and WhatsApp updates',
+        //   rows: () => _preferencesRows(p, stage),
+        caption: stage.shopStage == LifeStage.pregnancy
+            ? 'Language, reminders and WhatsApp updates'
+            : 'Reminders and WhatsApp updates',
         icon: Icons.tune_rounded,
         hue: 222,
-        rows: () => _preferencesRows(p, stage),
+        rows: () => _shownPreferences(p, stage),
       ),
       _tile(
         id: 'support',
@@ -1322,8 +1327,22 @@ class _PvYouScreenState extends State<PvYouScreen> {
 
   // ---- F: preferences ------------------------------------------------------------------------
 
+  // Kept for revert: children: _preferencesRows(p, stage).
   Widget _preferences(V2Palette p, LifeStage stage) =>
-      PvYouSection(title: 'Preferences', children: _preferencesRows(p, stage));
+      PvYouSection(title: 'Preferences', children: _shownPreferences(p, stage));
+
+  /// The preference rows as shown: the Language row on Pregnancy only.
+  ///
+  /// ⚠️ THE LANGUAGE ROW IS HIDDEN, NOT REMOVED (the user, 2026-10-17: "NO
+  /// LANGUAGE QUES! It's only English", and hide this row on Trying, Parenting
+  /// and Skilling; Pregnancy is untouched). `_preferencesRows` keeps it at [0]
+  /// because TTC's Settings reads [1] and [2] by position; dropping it there
+  /// would hand Settings the wrong rows. Anyone who already chose Hindi keeps
+  /// it: nothing is switched for them.
+  List<Widget> _shownPreferences(V2Palette p, LifeStage stage) {
+    final rows = _preferencesRows(p, stage);
+    return stage.shopStage == LifeStage.pregnancy ? rows : rows.sublist(1);
+  }
 
   /// The preferences' rows, shared by its section and its bento page.
   ///
@@ -2505,7 +2524,9 @@ class _PvYouScreenState extends State<PvYouScreen> {
       PvSettingsSection(
         title: 'Preferences',
         rows: [
-          m(_languageRow(stage)),
+          // Pregnancy only since 2026-10-17 (see `_shownPreferences`).
+          // Kept for revert: m(_languageRow(stage)),
+          if (stage.shopStage == LifeStage.pregnancy) m(_languageRow(stage)),
           for (final t in content.preferenceThings) thing(t),
           // Show or hide the floating Ask Veda button, for the whole app
           // (2026-10-02). The same page serves every stage, so one switch.

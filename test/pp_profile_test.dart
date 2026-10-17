@@ -183,7 +183,10 @@ void main() {
   });
 
   group('Settings', () {
-    testWidgets('holds the account, language and the Developer section',
+    // No Language row outside Pregnancy since 2026-10-17 (the user: English
+    // only). Kept for revert: 'holds the account, language and the Developer
+    // section', with find.text('Language') findsOneWidget.
+    testWidgets('holds the account and the Developer section, no language',
         (tester) async {
       await pump(tester, profile);
       await tester.ensureVisible(find.byKey(kPvProfileSettingsRowKey));
@@ -191,7 +194,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.byType(PvSettingsScreen), findsOneWidget);
-      expect(find.text('Language'), findsOneWidget);
+      expect(find.text('Language'), findsNothing);
       expect(find.text('Messages'), findsOneWidget);
       // Ships in every build (kPvShipDeveloperSection, 2026-10-07).
       expect(kPvShipDeveloperSection, isTrue);

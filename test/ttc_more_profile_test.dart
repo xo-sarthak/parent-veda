@@ -385,17 +385,15 @@ void main() {
       expect(src, contains('const bool kPvShipDeveloperSection = true;'));
     });
 
-    testWidgets('a choice made in Settings repaints Settings', (tester) async {
-      addTearDown(() => TtcLang.instance.hinglish = false);
+    // ⚠️ NO LANGUAGE ROW ON TTC SINCE 2026-10-17 (the user: "NO LANGUAGE
+    // QUES! It's only English"; the row stays on Pregnancy). This test used
+    // to pick Hindi here and check Settings repainted. Kept for revert in git.
+    testWidgets('Settings has no language choice on TTC', (tester) async {
       await pump(tester, _profile);
       await openSettings(tester);
-      expect(find.text('English'), findsOneWidget);
-      await tester.tap(find.text('Language'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('हिंदी').last);
-      await tester.pumpAndSettle();
       expect(find.byType(PvSettingsScreen), findsOneWidget);
-      expect(find.text('हिंदी'), findsOneWidget);
+      expect(find.text('Language'), findsNothing);
+      expect(find.text('Reminders'), findsOneWidget);
     });
 
     test('the avatar opens the profile, not the More tab', () {
@@ -752,7 +750,7 @@ void main() {
         for (final t in content.journeyThings) t.title,
         "I'm pregnant",
         'Your partner',
-        'Language',
+        // 'Language' left TTC 2026-10-17 (English only); see the test below.
         'Reminders',
         'WhatsApp updates',
         'Help',

@@ -353,4 +353,27 @@ void main() {
       expect(sql, contains('for insert with check (auth.uid() = user_id)'));
     });
   });
+  // 0103 (2026-10-17): a partner reads her journey and treatment rows and may
+  // never delete them. One `for all` policy allowed it, because `with check`
+  // does not guard a DELETE (BACKEND-PATTERNS §16jj-b).
+  test('the partner can read, never delete, her journey and treatment rows', () {
+    final m = File('supabase/migrations/0103_ttc_partner_cannot_delete.sql')
+        .readAsStringSync()
+        .replaceAll('\r\n', '\n');
+    for (final t in ['ttc_journeys', 'ttc_treatment']) {
+      String policy(String cmd) {
+        final start = m.indexOf('create policy ${t}_$cmd on public.$t');
+        expect(start, greaterThan(-1), reason: '$t has no $cmd policy');
+        return m.substring(start, m.indexOf(';', start));
+      }
+
+      expect(policy('select'), contains('my_partner_id'));
+      for (final cmd in ['insert', 'update', 'delete']) {
+        expect(policy(cmd), isNot(contains('my_partner_id')),
+            reason: '$t $cmd must be own-row');
+      }
+    }
+    expect(m, contains('drop policy if exists ttc_journeys_rw'));
+    expect(m, contains('drop policy if exists ttc_treatment_couple'));
+  });
 }

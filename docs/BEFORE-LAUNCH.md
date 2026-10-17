@@ -75,7 +75,8 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 - [ ] **LAUNCH** · Content edits have no history ("last write wins, silently"); an audit trigger is owed · dev · STILL-OPEN §7.2 · added 2026-10-17
 - [ ] **CHECK** · The three `service_role` grants (recipes, reads, products): STILL-OPEN §80.15 says owed, REMAINING-CHANGES says done · user · added 2026-10-17
 - [ ] **CHECK** · Was the demo re-seeded after 0089? Unknown · user · STILL-OPEN §5.4k · added 2026-10-17
-- [ ] **LAUNCH** · Run **0102** (Onboarding V3: `profiles.due_date_source` + `dating_date`, `children.birth_mode` + `born_weeks`, the `ttc_ready_plans` table, `link_as_partner` refuses instead of re-pairing), then flip `kChildBirthColumns` to true in `pp_child_profile.dart` · user runs, dev flips · ONBOARDING.md §4, STILL-OPEN §62.6 · added 2026-10-17
+- [x] **LAUNCH** · Run **0102** (Onboarding V3: `profiles.due_date_source` + `dating_date`, `children.birth_mode` + `born_weeks`, the `ttc_ready_plans` table, `link_as_partner` refuses instead of re-pairing), then flip `kChildBirthColumns` to true in `pp_child_profile.dart` · user runs, dev flips · ONBOARDING.md §4, STILL-OPEN §62.6 · added 2026-10-17 · *done 2026-10-17: the user ran 0102; `kChildBirthColumns` flipped to true*
+- [ ] **LAUNCH** · Run **0103**: a partner can read, never delete, her `ttc_journeys` and `ttc_treatment` rows (one `for all` policy split into four) · user · BACKEND-PATTERNS §16jj-b · added 2026-10-17
 - [ ] **LAUNCH** · Walk the V3 onboarding on a phone, every path: trying (getting ready, on our own, clinic), his trying, pregnancy (four dating ways, twins, gentle), his pregnancy, parenting (twins, a second child), skilling, partner with a code; then her "Did he send you a code?" link · user + dev · STILL-OPEN §62.6 · added 2026-10-17
 
 ---

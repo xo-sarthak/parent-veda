@@ -3150,8 +3150,10 @@ their own", but **`with check` only guards the row being written, and a DELETE w
 the `using` clause alone decides who may delete, and it says "mine or my partner's". The partner can
 delete her row. `ttc_ready_plans` therefore has four policies: select for the couple, and insert,
 update and delete for the owner only. The general fact: **for any table two people read and one
-person owns, split the policies by command.** `ttc_journeys` has the same single policy; that
-is recorded as a follow-up in STILL-OPEN §62.8.
+person owns, split the policies by command.** `ttc_journeys` and `ttc_treatment` had the same
+single policy; **0103 splits both** (2026-10-17). The couple tables where BOTH may write by
+design (supplements, ritual, records, appointments) keep one policy: there, deleting is no wider
+than editing, so it says what is meant.
 
 ### 16jj-c. A security-definer function should refuse, not overwrite
 
