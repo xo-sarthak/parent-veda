@@ -78,7 +78,13 @@ void main() {
       await tester.tap(find.byIcon(Icons.bookmark_border_rounded));
       await tester.pumpAndSettle();
       expect(TtcReadStore.instance.isSaved(i.id), isTrue);
-      expect(find.byIcon(Icons.bookmark_rounded), findsOneWidget);
+      // ⚠️ THE BUTTON FLIPPED, said as "the empty mark is gone" (2026-10-17).
+      // Counting filled bookmarks found two since the toasts pass
+      // (2026-10-15): the button's, and the "Saved" toast's own mark, which
+      // is right to be there. Kept for revert:
+      //   expect(find.byIcon(Icons.bookmark_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.bookmark_border_rounded), findsNothing);
+      expect(find.byIcon(Icons.bookmark_rounded), findsWidgets);
     });
 
     testWidgets('reading settings open, with size and background',

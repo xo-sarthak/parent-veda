@@ -459,10 +459,19 @@ final List<(List<RegExp>, String)> _allowedDestinationRules = [
 /// names it, and the rail card carries it for a scroll. Tight on purpose:
 /// the rail card must be one of them, and besides it and the named pill only
 /// ONE other label (the headline) may share the page.
+///
+/// ⚠️ PLUS "DAY OF YOUR CYCLE", ON PURPOSE (2026-10-17). The user, 2026-10-16:
+/// "I am clicking on day of the cycle, and you are telling me how conception
+/// works. It is confusing." The tile went back to the companion, whose ring
+/// answers "where am I in my cycle" (`ttc_daily_insights.dart`). It is the
+/// question the page answers, not a second door to it, so it does not count
+/// against the one-other-label rule. Kept for revert: no `dayTile` filter.
 bool _companionShared(Set<String> labels) {
   const card = 'CYCLE COMPANION · Your period dates';
   if (!labels.contains(card)) return false;
-  final others = labels.where((l) => l != card && l != 'Cycle companion');
+  bool dayTile(String l) => l.startsWith('DAY OF YOUR CYCLE · ');
+  final others = labels
+      .where((l) => l != card && l != 'Cycle companion' && !dayTile(l));
   return others.length <= 1;
 }
 

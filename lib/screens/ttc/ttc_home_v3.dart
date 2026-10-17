@@ -5047,7 +5047,12 @@ class _ReadRail extends StatelessWidget {
     // and "Your cycle" opens the normal-cycle read; listed again here, one
     // read sat behind two tiles on one screen. Kept for revert:
     //   for (final id in ttcHomeReadIdsFor(day, phase: phase)) ?ttcReadById(id),
-    final onRail = ttcRailReadIds(day);
+    // ⚠️ AND NEVER THE READ THE COURSE CARD NAMES AS "NEXT" (2026-10-17):
+    // while "New to trying?" shows, its next step opens a read too. Kept for
+    // revert: final onRail = ttcRailReadIds(day);
+    final next101 =
+        TtcHomePrefs.instance.offer101 ? ttc101NextReadId() : null;
+    final onRail = [...ttcRailReadIds(day), ?next101];
     final byPhase = [
       for (final id in ttcHomeReadIdsFor(day,
           phase: phase, count: 4 + onRail.length))

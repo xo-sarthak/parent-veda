@@ -450,6 +450,28 @@ class TtcCheckCard extends StatelessWidget {
 //  The course card
 // =============================================================================
 
+/// The step the course card names as "Next": the first step she has not
+/// opened, else the first step.
+///
+/// ⚠️ ONE FUNCTION, BECAUSE THE HOME'S READ ROWS ASK TOO (2026-10-17). The
+/// rows leave out what a card above them already opens, and this card's
+/// "Next" was missing from that list: a new user saw "The three months
+/// before" behind the course card and again as a read row
+/// (test/ttc_no_repetition_test.dart). Both now read this one pick.
+String? ttc101NextReadId() {
+  final prefs = TtcHomePrefs.instance;
+  String? nextId;
+  for (final id in kTtc101ReadIds) {
+    if (ttcReadById(id) == null) continue;
+    nextId ??= id;
+    if (!prefs.opened(id)) {
+      nextId = id;
+      break;
+    }
+  }
+  return nextId;
+}
+
 /// "New here? Start with Trying to conceive 101", with the next step named.
 /// No count and no progress bar: it steps aside once she has opened two.
 class Ttc101Card extends StatelessWidget {
@@ -460,16 +482,8 @@ class Ttc101Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prefs = TtcHomePrefs.instance;
-    String? nextId;
-    for (final id in kTtc101ReadIds) {
-      if (ttcReadById(id) == null) continue;
-      nextId ??= id;
-      if (!prefs.opened(id)) {
-        nextId = id;
-        break;
-      }
-    }
+    // Kept for revert (2026-10-17): the loop now in `ttc101NextReadId`.
+    final nextId = ttc101NextReadId();
     final next = nextId == null ? null : ttcReadById(nextId);
     // Only the steps that resolve, the same ones the list draws.
     final stepCount = kTtc101ReadIds.where((id) => ttcReadById(id) != null).length;
@@ -494,7 +508,7 @@ class Ttc101Card extends StatelessWidget {
                 onAllSteps();
                 return;
               }
-              prefs.markOpened(next.id);
+              TtcHomePrefs.instance.markOpened(next.id);
               openTtcSurface(context, '$kTtcReadPrefix${next.id}');
             },
             child: Padding(
