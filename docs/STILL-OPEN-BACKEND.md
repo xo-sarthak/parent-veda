@@ -32,6 +32,11 @@ Read first:
   Couple-scoped rows keep their owner on push (the old push rewrote the partner's rows as hers). The ritual's
   shared part is the couple's and the other four are each person's. All three feed the pending-changes check. See
   BACKEND-PATTERNS §16ii-b and `docs/BACKEND-SYNC-LOG.md` step 1.
+- **Supplements and the family timeline (step 2, 2026-10-17, migration 0099).** Same pattern.
+  - Removing a supplement now soft-deletes its ticks, which a hard delete used to cascade.
+  - The timeline gained an own-row UPDATE (the user's decision). Without it the upsert upload was always
+    refused, so the timeline had very likely never synced.
+  - See `docs/BACKEND-SYNC-LOG.md` step 2.
 
 ---
 
@@ -60,9 +65,9 @@ reappearing after a reinstall).
 |---|---|---|---|
 | ~~`TtcRecordsStore`~~ | `ttc_records` | **DONE 2026-10-17 (0098)** | see §0 |
 | ~~`TtcAppointmentsStore`~~ | `ttc_appointments` | **DONE 2026-10-17 (0098)** | see §0 |
-| `TtcSupplementsStore` (`lib/ttc/ttc_supplements_store.dart`) | `ttc_supplements`, `ttc_supplement_taken` | union, hard delete | couple-scoped (0042): her partner can write too, so newer-wins needs care (see §6). **Check its push for the owner flip too** (see §16ii-b) |
+| ~~`TtcSupplementsStore`~~ | `ttc_supplements`, `ttc_supplement_taken` | **DONE 2026-10-17 (0099)** | see §0 |
 | ~~`TtcRitualStore`~~ | `ttc_ritual` | **DONE 2026-10-17 (0098)** | see §0 |
-| `FamilyTimeline` (`lib/services/family_timeline.dart` ~253) | `journey_timeline` | `putIfAbsent` | 0041 grants no `update` on this table; a soft delete needs an update grant or a policy change |
+| ~~`FamilyTimeline`~~ | `journey_timeline` | **DONE 2026-10-17 (0099)**, own-row UPDATE granted | see §0 |
 
 None of these tables has `updated_at` except where noted; all need `removed_at`.
 
@@ -247,7 +252,7 @@ left alone for now so two sessions don't clash:
 ## Suggested order
 
 1. ~~**§1 TTC tables** (records, appointments, ritual)~~ **DONE 2026-10-17 (0098), with their §3 waiting sets.**
-   Next: **supplements and the timeline**. The timeline needs an update grant first (0041 has none, on purpose).
+   ~~Supplements and the timeline~~ **DONE 2026-10-17 (0099).** All of TTC's row tables are now converted.
 2. ~~**§3 dirty sets** for the same stores~~ done with step 1.
 3. **§2 push-before-pull on resume** for blob stores (small, app-wide), then per-item merge for the curated lists.
 4. **§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.

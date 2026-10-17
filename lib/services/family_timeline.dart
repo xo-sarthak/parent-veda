@@ -34,6 +34,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ttc/ttc_row_merge.dart';
 import '../ttc/ttc_sync.dart';
 import 'life_stage_store.dart';
 import 'remote/supabase_repo.dart';
@@ -128,10 +129,27 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
 
   static const _key = 'pv_family_timeline';
 
+  /// Edit times, removals, owners and what waits to upload (2026-10-17, 0099).
+  static const _bookKey = 'pv_family_timeline_sync';
+  final TtcRowBook _book = TtcRowBook();
+
   final Map<String, TimelineEvent> _events = {};
   bool _loaded = false;
 
   bool get isLoaded => _loaded;
+
+  @override
+  bool get hasPendingPush => _book.dirty.isNotEmpty;
+
+  @visibleForTesting
+  TtcRowBook get bookForTest => _book;
+
+  /// A moment her partner's phone wrote. Shown, never uploaded from here:
+  /// 0099 lets each person change only their own rows.
+  bool _theirs(String id, String? uid) {
+    final owner = _book.owners[id];
+    return owner != null && uid != null && owner != uid;
+  }
 
   /// The whole story, oldest first - the order a life is lived in.
   List<TimelineEvent> get events {
@@ -174,6 +192,7 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
       detailEn: detailEn,
       detailHi: detailHi,
     );
+    _book.touch(id);
     _persist();
     notifyListeners();
   }
@@ -205,20 +224,26 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
       detailEn: newDetail,
       detailHi: e.detailHi,
     );
+    // Since 0099 a correction reaches the cloud, and so the other phone.
+    _book.touch(id);
     _persist();
     notifyListeners();
   }
 
   /// Removing exists only for a mis-tap the parent made themselves - there is
   /// deliberately no bulk clear and no edit.
+  ///
+  /// A soft delete since 0099 (2026-10-17): the removal is a row with a time,
+  /// so an offline phone or the other phone's copy cannot bring it back.
   void remove(String id) {
-    if (_events.remove(id) == null) return;
+    final gone = _events.remove(id);
+    if (gone == null) return;
+    _book.remove(id, _cloudColumns(gone));
     _persist();
-    // Delete IS granted (a mis-tapped positive test must be undoable) - and it
-    // has to reach the cloud, or the union pull restores the moment.
-    if (SupabaseRepo.isLoggedIn) {
-      SupabaseRepo.delete(TtcTables.timeline, id).catchError((_) {});
-    }
+    // Kept for revert (2026-10-17): the hard delete.
+    //   if (SupabaseRepo.isLoggedIn) {
+    //     SupabaseRepo.delete(TtcTables.timeline, id).catchError((_) {});
+    //   }
     notifyListeners();
   }
 
@@ -229,6 +254,7 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
   @visibleForTesting
   void resetForTest() {
     _events.clear();
+    _book.clear();
     _loaded = true;
     notifyListeners();
   }
@@ -243,6 +269,8 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
           if (e != null) _events[e.id] = e;
         } catch (_) {/* a corrupt row is dropped, never fatal */}
       }
+      final book = p.getString(_bookKey);
+      if (book != null) _book.loadJson(jsonDecode(book));
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
@@ -252,9 +280,68 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
   // ---- cloud ----------------------------------------------------------------
   //  Couple-readable, own-write, and APPEND-ONLY: 0041 grants no UPDATE on this
   //  table at all. A life story you can silently rewrite is not a record.
+  //
+  //  ⚠️ SUPERSEDED 2026-10-17 (0099, the user's decision). Without UPDATE the
+  //  upload could never work: an upsert is INSERT ... ON CONFLICT DO UPDATE,
+  //  and Postgres demands UPDATE for it even on a new row, so every upload
+  //  was refused (silently). 0099 grants UPDATE on her OWN rows only. The
+  //  "never rewrite what she wrote" rule now lives here, in code: there is
+  //  still no edit, only `refreshDerived` for the app's own milestones.
 
+  /// The moment's own columns, without the owner or the two times. Nulls are
+  /// sent so a cleared detail clears everywhere.
+  static Map<String, dynamic> _cloudColumns(TimelineEvent e) => {
+        'stage': e.stage.id,
+        'kind': e.kind.name,
+        'happened_on': TtcSyncUtil.date(e.date),
+        'title_en': e.titleEn,
+        'title_hi': e.titleHi,
+        'detail_en': e.detailEn,
+        'detail_hi': e.detailHi,
+      };
+
+  // Newer wins, both ways (2026-10-17, 0099). The ids are fixed per moment
+  // ("ttc_positive_test"), so the cloud's copy of an id IS the same moment,
+  // and the newer copy is the right one. Kept for revert: `_pullUnionKept`.
   @override
   Future<void> pullFromCloud() async {
+    final rows = await SupabaseRepo.fetchShared(TtcTables.timeline,
+        orderBy: 'happened_on', ascending: true);
+    applyCloudRows(rows);
+  }
+
+  /// The merge, network-free so a test can hand it rows.
+  @visibleForTesting
+  void applyCloudRows(List<Map<String, dynamic>> rows) {
+    for (final row in _book.merge(_events.keys, rows)) {
+      final id = row['id'] as String;
+      if (_book.removed.containsKey(id)) {
+        _events.remove(id);
+        continue;
+      }
+      final on = TtcSyncUtil.parseDate(row['happened_on']);
+      final titleEn = row['title_en'];
+      if (on == null || titleEn is! String) continue;
+      _events[id] = TimelineEvent(
+        id: id,
+        dateIso: on.toIso8601String(),
+        stage: LifeStageCopy.fromId(row['stage'] as String?) ??
+            LifeStage.tryingToConceive,
+        kind: TimelineKind.values
+                .where((e) => e.name == row['kind'])
+                .firstOrNull ??
+            TimelineKind.action,
+        titleEn: titleEn,
+        titleHi: (row['title_hi'] as String?) ?? titleEn,
+        detailEn: row['detail_en'] as String?,
+        detailHi: row['detail_hi'] as String?,
+      );
+    }
+  }
+
+  // Kept for revert (2026-10-17): the union pull.
+  // ignore: unused_element
+  Future<void> _pullUnionKept() async {
     final rows = await SupabaseRepo.fetchShared(TtcTables.timeline,
         orderBy: 'happened_on', ascending: true);
     for (final row in rows) {
@@ -284,8 +371,45 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
     }
   }
 
+  /// Her own moments only, only what is waiting, each confirmed (2026-10-17).
+  ///
+  /// A moment her partner wrote is never sent: RLS would refuse it, and it
+  /// would then wait forever. If she removes one of his, it goes from this
+  /// phone only.
   @override
   Future<void> pushToCloud() async {
+    final uid = SupabaseRepo.userId;
+    if (uid == null) return;
+    for (final id in List.of(_book.dirty)) {
+      final live = _events[id];
+      final cols = live != null ? _cloudColumns(live) : _book.removedRows[id];
+      if (cols == null || _theirs(id, uid)) {
+        _book.dirty.remove(id);
+        continue;
+      }
+      final sent = _book.stamps[id] ??=
+          DateTime.now().toUtc().millisecondsSinceEpoch;
+      final t = _book.times(id);
+      final ok = await TtcSyncUtil.upsertConfirmed(
+        TtcTables.timeline,
+        {
+          ...cols,
+          'id': id,
+          'user_id': uid,
+          'updated_at': t.updatedAt,
+          'removed_at': live == null ? t.removedAt : null,
+        },
+        onConflict: 'id',
+      );
+      _book.confirmed(id, ok: ok, sent: sent);
+    }
+    await _persist();
+  }
+
+  // Kept for revert (2026-10-17): every moment, every time; refused by the
+  // database from the start (no UPDATE grant before 0099).
+  // ignore: unused_element
+  Future<void> _pushAllKept() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
     await TtcSyncUtil.upsertAll(
@@ -316,6 +440,7 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
       final p = await SharedPreferences.getInstance();
       await p.setStringList(
           _key, _events.values.map((e) => jsonEncode(e.toJson())).toList());
+      await p.setString(_bookKey, jsonEncode(_book.toJson()));
     } catch (_) {/* best-effort */}
   }
 }

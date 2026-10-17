@@ -52,10 +52,14 @@ const Map<String, List<String>> written = {
     'id', 'user_id', 'author_id', 'kind', 'body', 'prompt', 'photo_path',
     'written_at',
   ],
+  // 0099 (2026-10-17): the merge clock and the soft delete on supplements,
+  // their ticks and the timeline. Kept for revert: without the two times.
   TtcTables.supplements: [
-    'id', 'user_id', 'for_partner', 'name', 'dose',
+    'id', 'user_id', 'for_partner', 'name', 'dose', 'updated_at', 'removed_at',
   ],
-  TtcTables.supplementTaken: ['user_id', 'supplement_id', 'taken_on'],
+  TtcTables.supplementTaken: [
+    'user_id', 'supplement_id', 'taken_on', 'updated_at', 'removed_at',
+  ],
   // 0098 (2026-10-17): the merge clock and the soft delete on the ritual,
   // the records and the appointments. Kept for revert: without the two times.
   TtcTables.ritual: [
@@ -63,7 +67,7 @@ const Map<String, List<String>> written = {
   ],
   TtcTables.timeline: [
     'id', 'user_id', 'stage', 'kind', 'happened_on', 'title_en', 'title_hi',
-    'detail_en', 'detail_hi',
+    'detail_en', 'detail_hi', 'updated_at', 'removed_at',
   ],
   'ttc_records': [
     'id', 'user_id', 'test_id', 'label', 'value', 'unit', 'taken_on', 'note',
@@ -126,10 +130,11 @@ void main() {
   ].join('\n');
 
   /// Columns a later migration adds with `alter table ... add column`
-  /// (0097 and 0098, 2026-10-17), per table.
+  /// (0097, 0098 and 0099, 2026-10-17), per table.
   final altered = [
     File('supabase/migrations/0097_ttc_cycle_sync_clock.sql'),
     File('supabase/migrations/0098_ttc_records_ritual_sync_clock.sql'),
+    File('supabase/migrations/0099_ttc_supplements_timeline_sync_clock.sql'),
   ].map((f) => f.readAsStringSync()).join('\n').replaceAll('\r\n', '\n');
   bool addedLater(String table, String column) => RegExp(
           'alter table public\\.$table\\s+add column if not exists '
@@ -318,19 +323,34 @@ void main() {
       expect(sql, contains('add column if not exists asked_at timestamptz'));
     });
 
-    test('the timeline stays append-only', () {
-      // Kept for revert (2026-09-28): expect(sql.contains('for update'),
-      // isFalse). 0092 has an own-row UPDATE policy of its own, which is
-      // right for an edited question, so the check now looks only at the
-      // timeline's policies.
-      expect(
-          RegExp(r'on public\.journey_timeline\s+for update')
-              .hasMatch(sql),
-          isFalse);
-      expect(
-          sql.contains(
-              'grant select, insert, delete on public.journey_timeline'),
-          isTrue);
+    // ⚠️ SUPERSEDED 2026-10-17 (0099, the user's decision). Append-only
+    // meant no UPDATE grant, and an upsert needs UPDATE even for a new row,
+    // so the timeline could never sync. Kept for revert:
+    //   test('the timeline stays append-only', () {
+    //     expect(RegExp(r'on public\.journey_timeline\s+for update')
+    //         .hasMatch(sql), isFalse);
+    //     expect(sql.contains(
+    //         'grant select, insert, delete on public.journey_timeline'),
+    //         isTrue);
+    //   });
+    test('the timeline: everyone updates only their own moments (0099)', () {
+      final m = File(
+              'supabase/migrations/0099_ttc_supplements_timeline_sync_clock.sql')
+          .readAsStringSync()
+          .replaceAll('\r\n', '\n');
+      final policy = RegExp(
+              r'create policy journey_timeline_update on public\.journey_timeline\s+'
+              r'for update\s+using \((.*?)\)\s+with check \((.*?)\);')
+          .firstMatch(m);
+      expect(policy, isNotNull, reason: 'an own-row update policy');
+      for (final clause in [policy!.group(1)!, policy.group(2)!]) {
+        expect(clause.trim(), 'auth.uid() = user_id');
+        expect(clause, isNot(contains('my_partner_id')),
+            reason: "a partner must never change the other's moment");
+      }
+      expect(m, contains('grant update on public.journey_timeline'));
+      // Insert and delete stay own-row, as 0041 set them.
+      expect(sql, contains('for insert with check (auth.uid() = user_id)'));
     });
   });
 }

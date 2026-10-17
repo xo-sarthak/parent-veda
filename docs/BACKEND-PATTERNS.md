@@ -2935,6 +2935,30 @@ counts the couple) reads a different question than the tick (which counts her).
 Its `merge()` is the newer-wins pull. Each store keeps its rows and applies what `merge()` says to take. The pulls
 are exposed as `applyCloudRows(rows)` so `test/ttc_records_ritual_merge_test.dart` runs without a network.
 
+### 16ii-c. An upsert needs UPDATE even for a new row: the timeline that never synced (0099, 2026-10-17)
+
+`journey_timeline` was made append-only in 0041 by granting `select, insert, delete`, with no `update`. The intent
+was sound: a life story you can silently rewrite isn't a record. But the app writes every row with an **upsert**,
+and PostgREST turns an upsert into `INSERT ... ON CONFLICT (id) DO UPDATE SET ...`.
+
+> General fact: **Postgres checks every privilege a statement *might* need before it runs.** `ON CONFLICT DO
+> UPDATE` might update, so the statement needs UPDATE, even when the row is brand new and no conflict happens.
+> Without it the whole insert is refused.
+
+So every timeline upload since 0041 was refused, and because cloud writes are fire-and-forget (`.catchError`),
+nothing on the phone ever said so. Two lessons:
+
+- **A permission meant to forbid one thing can forbid another.** "No UPDATE" was meant to block rewrites. It also
+  blocked the only write path the client had. If a table really must be append-only, the client has to insert with
+  `ON CONFLICT DO NOTHING` (PostgREST: `ignoreDuplicates: true`), which needs INSERT alone.
+- **A soft delete is an update.** Any table that wants removals to survive offline phones needs UPDATE somewhere.
+  So "append-only" and "removals that stick" can't both be held by the grant; one of them has to move into code.
+
+The user chose (2026-10-17) to grant UPDATE on **own rows only**. `using` and `with check` are both
+`auth.uid() = user_id`, never the partner. The "no rewriting what she wrote" rule now lives in `FamilyTimeline`,
+which has no edit, only `refreshDerived` for the app's own milestones. `test/ttc_schema_contract_test.dart` pins
+the own-row shape.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

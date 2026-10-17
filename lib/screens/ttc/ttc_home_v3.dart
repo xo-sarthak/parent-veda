@@ -98,7 +98,8 @@ import '../v2/v3_daily_art.dart';
 import '../../ttc/ttc_home_hero.dart';
 import '../../ttc/ttc_treatment_store.dart';
 // ---- the treatment round (2026-09-26, docs/TTC-TREATMENT-FLOW.md B4) --------
-import '../../ttc/ttc_treatment_round.dart' show TtcRoundPhaseX;
+// Unused (analyzer, 2026-10-17); kept for revert:
+// import '../../ttc/ttc_treatment_round.dart' show TtcRoundPhaseX;
 import 'ttc_round_home_card.dart';
 import 'ttc_tool_chrome.dart' show ttcChapterFieldHue;
 import 'ttc_visit_today_card.dart';
@@ -1211,7 +1212,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
         return;
       }
       Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: RouteSettings(name: 'hub/' + id),
+        settings: RouteSettings(name: 'hub/$id'),
         builder: (_) => ProblemHubScreen(
           config: hub,
           bracket: b,
@@ -1255,7 +1256,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
     final journey = journeyFor(action);
     if (journey != null) {
       Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: RouteSettings(name: 'journey/' + action),
+        settings: RouteSettings(name: 'journey/$action'),
         builder: (_) => JourneyScreen(
           config: journey,
           onSurface: _openSurface,

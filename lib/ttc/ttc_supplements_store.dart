@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/remote/supabase_repo.dart';
 // Moved (2026-09-28, journal out of TTC): was ttc_journal_store.dart.
 import 'ttc_author.dart';
+import 'ttc_row_merge.dart';
 import 'ttc_sync.dart';
 
 class TtcSupplement {
@@ -179,7 +180,34 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
   final Set<String> _taken = {};
   bool _loaded = false;
 
+  // ⚠️ TWO BOOKS, ONE PER TABLE (2026-10-17, 0099). Edit times, removals,
+  // owners and what waits to upload, for the supplements (by id) and for the
+  // ticks (by "supplementId|day"). See `TtcRowBook`.
+  static const _bookKey = 'ttc_supplements_sync';
+  static const _takenBookKey = 'ttc_supplements_taken_sync';
+  final TtcRowBook _book = TtcRowBook();
+  final TtcRowBook _takenBook = TtcRowBook();
+
   bool get isLoaded => _loaded;
+
+  @override
+  bool get hasPendingPush =>
+      _book.dirty.isNotEmpty || _takenBook.dirty.isNotEmpty;
+
+  @visibleForTesting
+  TtcRowBook get bookForTest => _book;
+
+  @visibleForTesting
+  TtcRowBook get takenBookForTest => _takenBook;
+
+  /// A soft delete for every tick of [id]: since 0099 the cloud no longer
+  /// cascades them, because the supplement is never hard-deleted.
+  void _removeTicksOf(String id) {
+    for (final k in _taken.where((k) => k.startsWith('$id|')).toList()) {
+      _taken.remove(k);
+      _takenBook.remove(k, const {});
+    }
+  }
   List<TtcSupplement> get items => List.unmodifiable(_items);
 
   List<TtcSupplement> forAuthor(TtcAuthor author) =>
@@ -212,6 +240,7 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
       author: author,
     );
     _items.add(item);
+    _book.touch(item.id);
     _persist();
     notifyListeners();
     return item;
@@ -243,6 +272,7 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
       dose: (dose ?? old.dose).trim(),
       author: old.author,
     );
+    _book.touch(id);
     _persist();
     notifyListeners();
     return true;
@@ -318,9 +348,17 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
           .where((k) => k.startsWith('$id|'))
           .map((k) => '${keep.id}|${k.substring(id.length + 1)}')
           .toList();
-      _taken
-        ..removeWhere((k) => k.startsWith('$id|'))
-        ..addAll(moved);
+      // Since 0099 each move is two changes: the old tick removed, the new
+      // one added, both uploaded. Kept for revert:
+      //   _taken..removeWhere((k) => k.startsWith('$id|'))..addAll(moved);
+      _removeTicksOf(id);
+      for (final k in moved) {
+        if (_taken.add(k)) _takenBook.touch(k);
+      }
+    }
+    for (final id in dropIds) {
+      final gone = _items.firstWhere((e) => e.id == id);
+      _book.remove(id, _cloudColumns(gone));
     }
     _items.removeWhere((e) => dropIds.contains(e.id));
     final kept = TtcSupplement(
@@ -330,12 +368,14 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
       author: keep.author,
     );
     _items[_items.indexWhere((e) => e.id == keep.id)] = kept;
+    _book.touch(keep.id);
     _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      for (final id in dropIds) {
-        SupabaseRepo.delete(TtcTables.supplements, id).catchError((_) {});
-      }
-    }
+    // Kept for revert (2026-10-17): hard deletes, with the ticks cascading.
+    //   if (SupabaseRepo.isLoggedIn) {
+    //     for (final id in dropIds) {
+    //       SupabaseRepo.delete(TtcTables.supplements, id).catchError((_) {});
+    //     }
+    //   }
     notifyListeners();
     return kept;
   }
@@ -352,32 +392,44 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
     notifyListeners();
   }
 
+  /// A soft delete since 0099 (2026-10-17): the supplement and each of its
+  /// ticks become removed rows, uploaded like any change, so the other phone
+  /// cannot bring them back.
   void remove(String id) {
-    final before = _items.length;
-    _items.removeWhere((e) => e.id == id);
-    if (_items.length == before) return;
-    _taken.removeWhere((k) => k.startsWith('$id|'));
+    final i = _items.indexWhere((e) => e.id == id);
+    if (i < 0) return;
+    final gone = _items.removeAt(i);
+    _book.remove(id, _cloudColumns(gone));
+    _removeTicksOf(id);
     _persist();
-    // Removing has to reach the cloud - the union pull would restore it. The
-    // taken rows cascade from the supplement's delete.
-    if (SupabaseRepo.isLoggedIn) {
-      SupabaseRepo.delete(TtcTables.supplements, id).catchError((_) {});
-    }
+    // Kept for revert (2026-10-17): the hard delete, ticks cascading.
+    //   _taken.removeWhere((k) => k.startsWith('$id|'));
+    //   if (SupabaseRepo.isLoggedIn) {
+    //     SupabaseRepo.delete(TtcTables.supplements, id).catchError((_) {});
+    //   }
     notifyListeners();
   }
 
+  /// One tick is one row per (supplement, day), whoever of the two ticked it,
+  /// so the newer tick or un-tick wins (2026-10-17, 0099).
   void toggleTaken(String id, {DateTime? on}) {
     final day = _dayKey(on ?? DateTime.now());
     final k = '$id|$day';
     final removed = _taken.remove(k);
-    if (!removed) _taken.add(k);
-    _persist();
-    if (removed && SupabaseRepo.isLoggedIn) {
-      SupabaseRepo.deleteMatch(TtcTables.supplementTaken, {
-        'supplement_id': id,
-        'taken_on': day,
-      }).catchError((_) {});
+    if (removed) {
+      _takenBook.remove(k, const {});
+    } else {
+      _taken.add(k);
+      _takenBook.touch(k);
     }
+    _persist();
+    // Kept for revert (2026-10-17): the un-tick was a hard delete.
+    //   if (removed && SupabaseRepo.isLoggedIn) {
+    //     SupabaseRepo.deleteMatch(TtcTables.supplementTaken, {
+    //       'supplement_id': id,
+    //       'taken_on': day,
+    //     }).catchError((_) {});
+    //   }
     notifyListeners();
   }
 
@@ -389,6 +441,8 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
   void resetForTest() {
     _items.clear();
     _taken.clear();
+    _book.clear();
+    _takenBook.clear();
     _loaded = true;
     notifyListeners();
   }
@@ -411,6 +465,10 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
       _taken
         ..clear()
         ..addAll(p.getStringList(_takenKey) ?? const []);
+      final book = p.getString(_bookKey);
+      if (book != null) _book.loadJson(jsonDecode(book));
+      final takenBook = p.getString(_takenBookKey);
+      if (takenBook != null) _takenBook.loadJson(jsonDecode(takenBook));
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
@@ -421,8 +479,72 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
   //  COUPLE-SCOPED: both lists live on one screen because zinc and CoQ10 are
   //  his in the same way folic acid is hers.
 
+  /// The supplement's own columns, without the owner or the two times.
+  static Map<String, dynamic> _cloudColumns(TtcSupplement s) => {
+        'for_partner': s.author == TtcAuthor.partner,
+        'name': s.name,
+        'dose': s.dose,
+      };
+
+  // ⚠️ NEWER WINS, BOTH WAYS (2026-10-17, 0099), for the list and the ticks.
+  // The union pull is kept below as `_pullUnionKept`, for revert.
   @override
   Future<void> pullFromCloud() async {
+    final rows = await SupabaseRepo.fetchShared(TtcTables.supplements,
+        orderBy: 'created_at', ascending: true);
+    final taken = await SupabaseRepo.fetchShared(TtcTables.supplementTaken,
+        orderBy: 'taken_on', ascending: true);
+    applyCloudRows(rows, taken);
+  }
+
+  /// The merge, network-free so a test can hand it rows.
+  @visibleForTesting
+  void applyCloudRows(
+    List<Map<String, dynamic>> rows,
+    List<Map<String, dynamic>> taken,
+  ) {
+    for (final row in _book.merge(_items.map((e) => e.id), rows)) {
+      final id = row['id'] as String;
+      final i = _items.indexWhere((e) => e.id == id);
+      if (_book.removed.containsKey(id)) {
+        if (i >= 0) _items.removeAt(i);
+        // Its ticks go too, on this phone only: the phone that removed it
+        // uploads their removals itself.
+        _taken.removeWhere((k) => k.startsWith('$id|'));
+        continue;
+      }
+      final s = TtcSupplement(
+        id: id,
+        name: (row['name'] as String?) ?? '',
+        dose: (row['dose'] as String?) ?? '',
+        author: row['for_partner'] == true ? TtcAuthor.partner : TtcAuthor.me,
+      );
+      if (i >= 0) {
+        _items[i] = s;
+      } else {
+        _items.add(s);
+      }
+    }
+
+    // A tick's key is "supplementId|day", the table's own primary key.
+    final tickRows = <Map<String, dynamic>>[
+      for (final row in taken)
+        if (row['supplement_id'] is String && row['taken_on'] != null)
+          {...row, 'id': '${row['supplement_id']}|${row['taken_on']}'},
+    ];
+    for (final row in _takenBook.merge(_taken, tickRows)) {
+      final k = row['id'] as String;
+      if (_takenBook.removed.containsKey(k)) {
+        _taken.remove(k);
+      } else {
+        _taken.add(k);
+      }
+    }
+  }
+
+  // Kept for revert (2026-10-17): the union pull.
+  // ignore: unused_element
+  Future<void> _pullUnionKept() async {
     final rows = await SupabaseRepo.fetchShared(TtcTables.supplements,
         orderBy: 'created_at', ascending: true);
     for (final row in rows) {
@@ -447,8 +569,67 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
     }
   }
 
+  /// Only what is waiting, each confirmed, each row's owner kept
+  /// (2026-10-17, 0099).
+  ///
+  /// ⚠️ SUPPLEMENTS BEFORE TICKS. A tick references its supplement (foreign
+  /// key), so a tick for a supplement the cloud has not got yet is refused.
+  /// It stays waiting and goes on the next push, after its supplement.
   @override
   Future<void> pushToCloud() async {
+    final uid = SupabaseRepo.userId;
+    if (uid == null) return;
+    int now() => DateTime.now().toUtc().millisecondsSinceEpoch;
+    for (final id in List.of(_book.dirty)) {
+      final live = _items.where((e) => e.id == id).firstOrNull;
+      final cols = live != null ? _cloudColumns(live) : _book.removedRows[id];
+      if (cols == null) {
+        _book.dirty.remove(id);
+        continue;
+      }
+      final sent = _book.stamps[id] ??= now();
+      final t = _book.times(id);
+      final ok = await TtcSyncUtil.upsertConfirmed(
+        TtcTables.supplements,
+        {
+          ...cols,
+          'id': id,
+          'user_id': _book.owners[id] ?? uid,
+          'updated_at': t.updatedAt,
+          'removed_at': live == null ? t.removedAt : null,
+        },
+        onConflict: 'id',
+      );
+      _book.confirmed(id, ok: ok, sent: sent);
+    }
+    for (final k in List.of(_takenBook.dirty)) {
+      final i = k.lastIndexOf('|');
+      final live = _taken.contains(k);
+      if (i <= 0 || (!live && !_takenBook.removed.containsKey(k))) {
+        _takenBook.dirty.remove(k);
+        continue;
+      }
+      final sent = _takenBook.stamps[k] ??= now();
+      final t = _takenBook.times(k);
+      final ok = await TtcSyncUtil.upsertConfirmed(
+        TtcTables.supplementTaken,
+        {
+          'user_id': _takenBook.owners[k] ?? uid,
+          'supplement_id': k.substring(0, i),
+          'taken_on': k.substring(i + 1),
+          'updated_at': t.updatedAt,
+          'removed_at': live ? null : t.removedAt,
+        },
+        onConflict: 'supplement_id,taken_on',
+      );
+      _takenBook.confirmed(k, ok: ok, sent: sent);
+    }
+    await _persist();
+  }
+
+  // Kept for revert (2026-10-17): every row, every time, as ours.
+  // ignore: unused_element
+  Future<void> _pushAllKept() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
     await TtcSyncUtil.upsertAll(
@@ -490,6 +671,8 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
       await p.setStringList(
           _listKey, _items.map((e) => jsonEncode(e.toJson())).toList());
       await p.setStringList(_takenKey, _taken.toList());
+      await p.setString(_bookKey, jsonEncode(_book.toJson()));
+      await p.setString(_takenBookKey, jsonEncode(_takenBook.toJson()));
     } catch (_) {/* best-effort */}
   }
 }
