@@ -9616,9 +9616,10 @@ now removes his uploaded photos when an entry is deleted.
 
 **Owed:**
 
-- **§77.1 Paintings** for the cover (`journal_cover_t1..3`, only when she has
+- ~~**§77.1 Paintings** for the cover (`journal_cover_t1..3`, only when she has
   no photo) and the question card (`journal_question_t1..3`) — ChatGPT
-  prompts handed over 2026-09-23. The drawn sky stands in until then.
+  prompts handed over 2026-09-23. The drawn sky stands in until then.~~
+  **DONE 2026-10-18** (§93.1).
 - **§77.2 The book views** ("Read it as a book", "With your partner's
   entries") are still the old screen's purple booklet. Next pass.
 - **§77.3 The compose screen** is base UI but plain; it could take the
@@ -10562,10 +10563,12 @@ Prototype approved first (artifact "ParentVeda One Journal").
 
 **Owed:**
 
-- **§93.1 Paintings for the parenting journal**: `pp_journal_cover_b1..3` and
-  `pp_journal_question_b1..3` (b1 under a year, b2 one to three, b3 three and
-  up). Prompts handed over 2026-10-17. Until they are in the image table and on
-  R2 the drawn sky shows, as it does for pregnancy (§77.1, still owed too).
+- ~~**§93.1 Paintings for the parenting journal**~~ **DONE 2026-10-18.** All
+  twelve (`pp_journal_cover_b1..3`, `pp_journal_question_b1..3`, and
+  pregnancy's `journal_cover_t1..3`, `journal_question_t1..3`) are on R2 and in
+  `kReadImageUrls` with an "Illustration · ParentVeda" credit. One mismatch
+  to look at on the phone: `pp_journal_cover_b1` (first year) shows a mother
+  writing, with no baby in it.
 - **§93.2 Pregnancy's compose screen** could take `JournalPaperScaffold`
   (that is §77.3).
 - **§93.3 No edit for a parenting memory.** It had none before; the page keeps

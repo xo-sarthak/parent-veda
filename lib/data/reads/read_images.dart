@@ -28,6 +28,23 @@
 // connection from Indian networks (checked: all ten failed, all 86 others
 // served), so one host — StockSnap — for the whole table.
 const Map<String, String> kReadImageUrls = {
+  // ---- The journal keepsake's paintings (2026-10-18) ----------------------
+  // Commissioned for ParentVeda (ChatGPT image prompts, STILL-OPEN §77.1 and
+  // §93.1), not stock: the URL is our own R2 copy, so there is no outside
+  // source to mirror. Covers by trimester / by stretch of childhood (b1 under
+  // a year, b2 one to three, b3 three and up); question cards the same way.
+  'journal_cover_t1': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/journal_cover_t1.jpg',
+  'journal_cover_t2': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/journal_cover_t2.jpg',
+  'journal_cover_t3': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/journal_cover_t3.jpg',
+  'journal_question_t1': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/journal_question_t1.jpg',
+  'journal_question_t2': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/journal_question_t2.jpg',
+  'journal_question_t3': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/journal_question_t3.jpg',
+  'pp_journal_cover_b1': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/pp_journal_cover_b1.jpg',
+  'pp_journal_cover_b2': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/pp_journal_cover_b2.jpg',
+  'pp_journal_cover_b3': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/pp_journal_cover_b3.jpg',
+  'pp_journal_question_b1': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/pp_journal_question_b1.jpg',
+  'pp_journal_question_b2': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/pp_journal_question_b2.jpg',
+  'pp_journal_question_b3': 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/pp_journal_question_b3.jpg',
   // ---- Garbh Sanskar pillars (2026-09-23) --------------------------------
   // Were hotlinked straight from Unsplash in home_v3_screen.dart — no mirror,
   // no licence line. Shravan (a tabla) and Samvad (a heart held on a bump)
@@ -2094,6 +2111,19 @@ const Map<String, String> kReadImageUrls = {
 
 /// Read id → licence · source · creator, for the credit line.
 const Map<String, String> kReadImageCredits = {
+  // The journal keepsake's paintings (2026-10-18): commissioned, our own.
+  'journal_cover_t1': 'Illustration · ParentVeda',
+  'journal_cover_t2': 'Illustration · ParentVeda',
+  'journal_cover_t3': 'Illustration · ParentVeda',
+  'journal_question_t1': 'Illustration · ParentVeda',
+  'journal_question_t2': 'Illustration · ParentVeda',
+  'journal_question_t3': 'Illustration · ParentVeda',
+  'pp_journal_cover_b1': 'Illustration · ParentVeda',
+  'pp_journal_cover_b2': 'Illustration · ParentVeda',
+  'pp_journal_cover_b3': 'Illustration · ParentVeda',
+  'pp_journal_question_b1': 'Illustration · ParentVeda',
+  'pp_journal_question_b2': 'Illustration · ParentVeda',
+  'pp_journal_question_b3': 'Illustration · ParentVeda',
   'garbh_pillar_shravan': 'Unsplash License · Unsplash',
   'garbh_pillar_samvad': 'Unsplash License · Unsplash',
   'garbh_pillar_buddhi': 'CC0 · Wikimedia Commons · Profpcde',

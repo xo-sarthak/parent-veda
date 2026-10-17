@@ -20,6 +20,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/pp_journal_prompts.dart';
+import 'package:parentveda/data/reads/read_images.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_v2/jv2_data.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_v2/jv2_store.dart';
 import 'package:parentveda/screens/post_pregnancy/journal_v2/pp_journal_screen.dart';
@@ -82,6 +83,15 @@ void main() {
     expect(find.byType(PpJournalEntryScreen), findsOneWidget);
     expect(find.text('At the ceiling fan.'), findsOneWidget);
     expect(t.takeException(), isNull);
+  });
+
+  test('every journal painting resolves to our own copy, with a credit', () {
+    for (final band in [1, 2, 3]) {
+      for (final id in ['journal_cover_t$band', 'journal_question_t$band', 'pp_journal_cover_b$band', 'pp_journal_question_b$band']) {
+        expect(readImageFor(id), '$kReadImageBase$id.jpg', reason: id);
+        expect(kReadImageCredits[id], isNotNull, reason: '$id has no credit');
+      }
+    }
   });
 
   test('the parenting questions never assume he or she', () {
