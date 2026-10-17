@@ -7,6 +7,8 @@
 //  breaking the page, and a narrow phone or a tablet overflowing.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,12 +64,20 @@ void main() {
       }
     });
 
-    testWidgets('no painting yet: the number disc stands in, nothing breaks', (t) async {
-      _ageMonths(2);
-      await _pump(t, 390);
-      await t.pumpAndSettle();
-      expect(find.byKey(const ValueKey('phase-fallback-1')), findsWidgets);
-      expect(t.takeException(), isNull);
+    // Kept for revert: written before any painting existed (2026-10-15).
+    // testWidgets('no painting yet: the number disc stands in, nothing breaks', (t) async {
+    //   _ageMonths(2);
+    //   await _pump(t, 390);
+    //   await t.pumpAndSettle();
+    //   expect(find.byKey(const ValueKey('phase-fallback-1')), findsWidgets);
+    //   expect(t.takeException(), isNull);
+    // });
+
+    test('every phase has its painting on disk (2026-10-17)', () {
+      for (var n = 1; n <= 20; n++) {
+        expect(File(phasePaintingPath(n)).existsSync(), isTrue,
+            reason: 'missing ${phasePaintingPath(n)}');
+      }
     });
 
     testWidgets('a stop opens its phase', (t) async {
