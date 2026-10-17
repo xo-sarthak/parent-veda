@@ -226,7 +226,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
       ),
       CardSection(
         LocalizedText(en: 'Typical timing', hi: 'आम तौर पर कब'),
-        LocalizedText(en: 'Usually between weeks 11 and 13.', hi: 'आम तौर पर हफ़्ता 11 से 13 के बीच।'),
+        LocalizedText(en: 'Between 11 weeks and 13 weeks 6 days.', hi: 'आम तौर पर हफ़्ता 11 से 13 के बीच।'),
       ),
     ],
     bullets: [
@@ -304,7 +304,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
       ),
       CardSection(
         LocalizedText(en: 'Typical timing', hi: 'आम तौर पर कब'),
-        LocalizedText(en: 'Usually between weeks 24 and 28.', hi: 'आम तौर पर हफ़्ता 24 से 28 के बीच।'),
+        LocalizedText(en: 'Usually between weeks 24 and 28. In India it is often done at your first visit too.', hi: 'आम तौर पर हफ़्ता 24 से 28 के बीच।'),
       ),
     ],
     bullets: [
@@ -392,7 +392,7 @@ const List<JourneyMilestone> kJourneyMilestones = [
     anchorWeek: 36,
     emoji: '🧫',
     rangeLabel: LocalizedText(en: 'Week 36–37', hi: 'हफ़्ता 36–37'),
-    title: LocalizedText(en: 'Group B Strep test', hi: 'Group B Strep test'),
+    title: LocalizedText(en: 'Group B Strep test (if advised)', hi: 'Group B Strep test'),
     sections: [
       CardSection(
         LocalizedText(en: 'Why this matters', hi: 'यह क्यों ज़रूरी है'),
@@ -406,7 +406,8 @@ const List<JourneyMilestone> kJourneyMilestones = [
       CardSection(
         LocalizedText(en: 'Typical timing', hi: 'आम तौर पर कब'),
         LocalizedText(
-            en: 'Usually around weeks 36 to 37.',
+            en: 'Around weeks 36 to 37, if your doctor advises it. Many '
+                'hospitals in India test only when there is a reason to.',
             hi: 'आम तौर पर हफ़्ता 36 से 37 के बीच।'),
       ),
     ],
@@ -420,6 +421,52 @@ const List<JourneyMilestone> kJourneyMilestones = [
           LocalizedText(
               en: 'Do you offer this test routinely here?',
               hi: 'क्या यहाँ यह टेस्ट रूटीन में होता है?'),
+        ],
+      ),
+    ],
+  ),
+
+  // Td injections (2026-10-17, the calendar's fact check): MoHFW gives two
+  // doses of tetanus-diphtheria vaccine in pregnancy, the first at booking and
+  // the second four weeks later (one booster if she was vaccinated in a
+  // pregnancy within the last three years). English only, per the 2026-08-27
+  // rule; `hi` repeats it.
+  JourneyMilestone(
+    id: 'm_td',
+    type: JourneyNodeType.medical,
+    anchorWeek: 12,
+    emoji: '🩺',
+    rangeLabel: LocalizedText(
+        en: 'At booking, then 4 weeks later',
+        hi: 'At booking, then 4 weeks later'),
+    title: LocalizedText(en: 'Td injections', hi: 'Td injections'),
+    sections: [
+      CardSection(
+        LocalizedText(en: 'Why this matters', hi: 'Why this matters'),
+        LocalizedText(
+          en: 'Two doses of the tetanus-diphtheria vaccine protect you and your '
+              'newborn from tetanus.',
+          hi: 'Two doses of the tetanus-diphtheria vaccine protect you and your '
+              'newborn from tetanus.',
+        ),
+      ),
+      CardSection(
+        LocalizedText(en: 'Typical timing', hi: 'Typical timing'),
+        LocalizedText(
+          en: 'The first dose at your first visit, the second four weeks later. '
+              'Your doctor decides the dates.',
+          hi: 'The first dose at your first visit, the second four weeks later. '
+              'Your doctor decides the dates.',
+        ),
+      ),
+    ],
+    bullets: [
+      BulletBlock(
+        LocalizedText(en: 'Questions to ask', hi: 'Questions to ask'),
+        [
+          LocalizedText(
+              en: 'I had a Td injection in a recent pregnancy. Do I need both doses?',
+              hi: 'I had a Td injection in a recent pregnancy. Do I need both doses?'),
         ],
       ),
     ],

@@ -20,32 +20,59 @@
 //    * Group labels inside a list or a card are the small grey caps.
 //    * No violet: the milestone colour from `calMeta` is the brand violet, so
 //      this screen draws milestones in the ink (see [_catColor]).
+//
+//  ⚠️ REBUILT AS ONE HUB (2026-10-17). `CalendarScreen` now opens
+//  `PregCalendarHub` (lib/screens/pregnancy/calendar/): where she is, the
+//  month, the picked day with Add, Coming up, the usual checks, Whole
+//  journey. The class name, its constructor and the route name `calendar`
+//  are unchanged, so the home, More, search and Ask Veda still land here.
+//  The three-tab screen below is commented out, kept for revert.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
-import '../localization/app_language.dart';
-import '../models/calendar_event.dart';
-import '../services/calendar_store.dart';
-import '../services/journal_store.dart';
+// import '../localization/app_language.dart'; // kept for revert
+// import '../models/calendar_event.dart'; // kept for revert
+// import '../services/calendar_store.dart'; // kept for revert
+// import '../services/journal_store.dart'; // kept for revert
 import '../services/pregnancy_controller.dart';
-import '../services/prepare_store.dart';
-import '../services/scans_store.dart';
-import '../services/tools_store.dart';
-import '../widgets/global_ask_fab.dart' show kAskFabReserve;
-import '../theme/app_theme.dart';
-import '../widgets/mic_dictation_button.dart';
-import '../widgets/trimester_progress_bar.dart';
-import 'brackets/hub/hub_intent_art.dart' show IntentMark;
-import 'doors/pv_list_row.dart' show PvMarkWell;
-import 'journal_screen.dart';
-import 'pregnancy/preg_chrome.dart';
-import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
-import 'v2/v2_palette.dart' show V2Palette;
-import 'weekly_card_stack_screen.dart';
-import '../theme/pv_fonts.dart';
-import '../widgets/pv_feedback.dart' show PvPress;
+// import '../services/prepare_store.dart'; // kept for revert
+// import '../services/scans_store.dart'; // kept for revert
+// import '../services/tools_store.dart'; // kept for revert
+// import '../widgets/global_ask_fab.dart' show kAskFabReserve; // kept for revert
+// import '../theme/app_theme.dart'; // kept for revert
+// import '../widgets/mic_dictation_button.dart'; // kept for revert
+// import '../widgets/trimester_progress_bar.dart'; // kept for revert
+// import 'brackets/hub/hub_intent_art.dart' show IntentMark; // kept for revert
+// import 'doors/pv_list_row.dart' show PvMarkWell; // kept for revert
+// import 'journal_screen.dart'; // kept for revert
+// import 'pregnancy/preg_chrome.dart'; // kept for revert
+// import 'products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette; // kept for revert
+// import 'v2/v2_palette.dart' show V2Palette; // kept for revert
+// import 'weekly_card_stack_screen.dart'; // kept for revert
+// import '../theme/pv_fonts.dart'; // kept for revert
+// import '../widgets/pv_feedback.dart' show PvPress; // kept for revert
+import '../services/father_preview.dart';
+import 'pregnancy/calendar/preg_calendar_hub.dart';
 
+class CalendarScreen extends StatelessWidget {
+  const CalendarScreen({super.key, required this.controller});
+  final PregnancyController controller;
+
+  // His side reads the same calendar and changes nothing (2026-10-17).
+  @override
+  Widget build(BuildContext context) => PregCalendarHub(
+        controller: controller,
+        readOnly: FatherPreview.instance.on,
+      );
+}
+
+// ---------------------------------------------------------------------------
+//  KEPT FOR REVERT (2026-10-17): the three-tab calendar. To restore it, make
+//  CalendarScreen a StatefulWidget again (createState below), uncomment the
+//  imports above and remove this block comment.
+// ---------------------------------------------------------------------------
+/*
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key, required this.controller});
   final PregnancyController controller;
@@ -1524,3 +1551,4 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   static const Color _green = Color(0xFF4F7A52);
 }
+*/

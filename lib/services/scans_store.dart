@@ -283,6 +283,26 @@ class ScansStore extends ChangeNotifier {
     }
   }
 
+  /// Replace one of HER appointments, kept by id (the calendar's Edit,
+  /// 2026-10-17). A partner's appointment is not hers to change, so an id she
+  /// does not own is a no-op. Same id, so the local row and its cloud copy stay
+  /// one identity: the cloud write is an update of that row, not a new one.
+  Future<void> updateAppointment(Appointment a) async {
+    final i = _appts.indexWhere((x) => x.id == a.id);
+    if (i < 0) return;
+    _appts[i] = a;
+    notifyListeners();
+    await _persistAppts();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        await SupabaseRepo.update('appointments', a.id, _toApptRow(a));
+      } catch (_) {}
+    }
+  }
+
+  /// Whether [id] is one of her own appointments (editable), not the partner's.
+  bool ownsAppointment(String id) => _appts.any((a) => a.id == id);
+
   Future<void> deleteAppointment(String id) async {
     _appts.removeWhere((a) => a.id == id);
     notifyListeners();

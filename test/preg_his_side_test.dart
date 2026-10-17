@@ -106,7 +106,14 @@ void main() {
     expect(tools, contains("if (!FatherPreview.instance.on)\n        _ToolGroup('Track'"));
     expect(tools, contains("_Tool('Your journal'"));
     final more = _code('lib/screens/pregnancy/preg_more_screen.dart');
-    expect(more, contains("if (!FatherPreview.instance.on)\n              _row('preg_more_calendar'"));
+    // Kept for revert: the calendar row was hidden from him (2026-10-13).
+    // expect(more, contains("if (!FatherPreview.instance.on)\n              _row('preg_more_calendar'"));
+    // Since 2026-10-17 he sees her calendar READ-ONLY (CalendarScreen passes
+    // readOnly from FatherPreview), so the row is his too, with his words.
+    expect(more, isNot(contains("if (!FatherPreview.instance.on)\n              _row('preg_more_calendar'")));
+    expect(more, contains('Her appointments and what is coming up, to see'));
+    expect(_code('lib/screens/calendar_screen.dart'),
+        contains('readOnly: FatherPreview.instance.on'));
     expect(more, contains("'preg_more_partner_guide'"));
   });
 

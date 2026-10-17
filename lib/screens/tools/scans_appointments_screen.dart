@@ -512,163 +512,9 @@ class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
         builder: (_) => _ScanDetail(milestone: m, controller: p)));
   }
 
-  Future<void> _addAppt(S s) async {
-    final titleCtrl = TextEditingController();
-    final timeCtrl = TextEditingController();
-    final locCtrl = TextEditingController();
-    final docCtrl = TextEditingController();
-    final notesCtrl = TextEditingController();
-    var type = ApptType.doctor;
-    var date = DateTime.now();
-    final pal = pvStorePalette;
-
-    String typeLabel(ApptType t) => switch (t) {
-          ApptType.doctor => s.scnTypeDoctor,
-          ApptType.scan => s.scnTypeScan,
-          ApptType.test => s.scnTypeTest,
-          ApptType.vaccination => s.scnTypeVaccination,
-          ApptType.custom => s.scnTypeCustom,
-        };
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setSheet) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-            ),
-            padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                            color: kPvLine,
-                            borderRadius: BorderRadius.circular(99))),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(s.scnAddAppt,
-                      style: pvFraunces(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                          color: pal.ink1)),
-                  const SizedBox(height: 14),
-                  // The store's hairline chip, ink when chosen. Kept for
-                  // revert: a hand-drawn pill, teal when chosen.
-                  Wrap(spacing: 8, runSpacing: 8, children: [
-                    for (final t in ApptType.values)
-                      PvChip(
-                        label: typeLabel(t),
-                        selected: type == t,
-                        onTap: () => setSheet(() => type = t),
-                      ),
-                  ]),
-                  const SizedBox(height: 14),
-                  _field(s.scnApptTitle, titleCtrl),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(14),
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: ctx,
-                        initialDate: date,
-                        firstDate: DateTime(date.year - 1),
-                        lastDate: DateTime(date.year + 2),
-                      );
-                      if (picked != null) setSheet(() => date = picked);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: kPvLine),
-                          borderRadius: BorderRadius.circular(14)),
-                      child: Row(children: [
-                        Icon(Icons.calendar_today_rounded,
-                            size: 18, color: pal.ink2),
-                        const SizedBox(width: 12),
-                        Text(s.formatLongDate(date),
-                            style: pvManrope(fontSize: 13.5, color: pal.ink1)),
-                      ]),
-                    ),
-                  ),
-                  _field(s.scnApptTime, timeCtrl),
-                  _field(s.scnApptLocation, locCtrl),
-                  _field(s.scnApptDoctor, docCtrl),
-                  _field(s.medNotes, notesCtrl, max: 2),
-                  const SizedBox(height: 6),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      style: pregFilledStyle(),
-                      onPressed: () {
-                        final t = titleCtrl.text.trim();
-                        if (t.isEmpty) {
-                          Navigator.pop(ctx);
-                          return;
-                        }
-                        ScansStore.instance.addAppointment(Appointment(
-                          id: 'ap_${DateTime.now().microsecondsSinceEpoch}',
-                          title: t,
-                          dateIso: date.toIso8601String(),
-                          time: timeCtrl.text.trim(),
-                          location: locCtrl.text.trim(),
-                          doctor: docCtrl.text.trim(),
-                          type: type,
-                          notes: notesCtrl.text.trim(),
-                        ));
-                        Navigator.pop(ctx);
-                      },
-                      child: Text(s.saveCta),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // A white field with the hairline, ink when focused. Kept for revert: a
-  // filled grey field with no border (a tint behind text).
-  Widget _field(String hint, TextEditingController c, {int max = 1}) {
-    final pal = pvStorePalette;
-    OutlineInputBorder b(Color color, [double w = 1]) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: color, width: w));
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextField(
-        controller: c,
-        minLines: 1,
-        maxLines: max,
-        style: pvManrope(fontSize: 14.5, color: pal.ink1),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: pvManrope(fontSize: 14, color: pal.ink3),
-          filled: true,
-          fillColor: Colors.white,
-          border: b(kPvLine),
-          enabledBorder: b(kPvLine),
-          focusedBorder: b(kPvInk, 1.4),
-        ),
-      ),
-    );
-  }
+  // The form moved to [showPregAppointmentSheet] (2026-10-17) so the
+  // calendar's Add and Edit open this same sheet: one appointment form, not two.
+  Future<void> _addAppt(S s) => showPregAppointmentSheet(context);
 }
 
 // =============================================================================
@@ -947,4 +793,188 @@ class _ScanInterpretScreen extends StatelessWidget {
       ]),
     );
   }
+}
+
+// =============================================================================
+//  The appointment form: one sheet for Scans & appointments and the calendar
+// -----------------------------------------------------------------------------
+//  Moved here from `_ScansAppointmentsScreenState._addAppt` on 2026-10-17, so
+//  the calendar's Add (with the day she picked), its Edit (with the
+//  appointment) and its "Add as appointment" on a usual check (with that
+//  check's name and type) all open the same form. Returns what was saved, or
+//  null when she closed it.
+// =============================================================================
+Future<Appointment?> showPregAppointmentSheet(
+  BuildContext context, {
+  DateTime? initial,
+  Appointment? editing,
+  String? title,
+  ApptType? type,
+}) async {
+  final s = S.now;
+  final titleCtrl = TextEditingController(text: editing?.title ?? title ?? '');
+  final timeCtrl = TextEditingController(text: editing?.time ?? '');
+  final locCtrl = TextEditingController(text: editing?.location ?? '');
+  final docCtrl = TextEditingController(text: editing?.doctor ?? '');
+  final notesCtrl = TextEditingController(text: editing?.notes ?? '');
+  var kind = editing?.type ?? type ?? ApptType.doctor;
+  var date = editing?.date ?? initial ?? DateTime.now();
+  final pal = pvStorePalette;
+  Appointment? saved;
+
+  String typeLabel(ApptType t) => switch (t) {
+        ApptType.doctor => s.scnTypeDoctor,
+        ApptType.scan => s.scnTypeScan,
+        ApptType.test => s.scnTypeTest,
+        ApptType.vaccination => s.scnTypeVaccination,
+        ApptType.custom => s.scnTypeCustom,
+      };
+
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setSheet) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: kPvLine,
+                          borderRadius: BorderRadius.circular(99))),
+                ),
+                const SizedBox(height: 16),
+                Text(editing != null ? 'Edit appointment' : s.scnAddAppt,
+                    style: pvFraunces(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        color: pal.ink1)),
+                const SizedBox(height: 14),
+                // The store's hairline chip, ink when chosen. Kept for
+                // revert: a hand-drawn pill, teal when chosen.
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  for (final t in ApptType.values)
+                    PvChip(
+                      label: typeLabel(t),
+                      selected: kind == t,
+                      onTap: () => setSheet(() => kind = t),
+                    ),
+                ]),
+                const SizedBox(height: 14),
+                _apptField(s.scnApptTitle, titleCtrl),
+                InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: date,
+                      firstDate: DateTime(date.year - 1),
+                      lastDate: DateTime(date.year + 2),
+                    );
+                    if (picked != null) setSheet(() => date = picked);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: kPvLine),
+                        borderRadius: BorderRadius.circular(14)),
+                    child: Row(children: [
+                      Icon(Icons.calendar_today_rounded,
+                          size: 18, color: pal.ink2),
+                      const SizedBox(width: 12),
+                      Text(s.formatLongDate(date),
+                          style: pvManrope(fontSize: 13.5, color: pal.ink1)),
+                    ]),
+                  ),
+                ),
+                _apptField(s.scnApptTime, timeCtrl),
+                _apptField(s.scnApptLocation, locCtrl),
+                _apptField(s.scnApptDoctor, docCtrl),
+                _apptField(s.medNotes, notesCtrl, max: 2),
+                const SizedBox(height: 6),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: pregFilledStyle(),
+                    onPressed: () {
+                      final t = titleCtrl.text.trim();
+                      if (t.isEmpty) {
+                        Navigator.pop(ctx);
+                        return;
+                      }
+                      final a = Appointment(
+                        id: editing?.id ??
+                            'ap_${DateTime.now().microsecondsSinceEpoch}',
+                        title: t,
+                        dateIso: date.toIso8601String(),
+                        time: timeCtrl.text.trim(),
+                        location: locCtrl.text.trim(),
+                        doctor: docCtrl.text.trim(),
+                        type: kind,
+                        notes: notesCtrl.text.trim(),
+                        status: editing?.status ?? 'upcoming',
+                      );
+                      if (editing != null) {
+                        ScansStore.instance.updateAppointment(a);
+                      } else {
+                        ScansStore.instance.addAppointment(a);
+                      }
+                      saved = a;
+                      Navigator.pop(ctx);
+                    },
+                    child: Text(s.saveCta),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  return saved;
+}
+
+// A white field with the hairline, ink when focused. Kept for revert: a
+// filled grey field with no border (a tint behind text).
+Widget _apptField(String hint, TextEditingController c, {int max = 1}) {
+  final pal = pvStorePalette;
+  OutlineInputBorder b(Color color, [double w = 1]) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(color: color, width: w));
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: TextField(
+      controller: c,
+      minLines: 1,
+      maxLines: max,
+      style: pvManrope(fontSize: 14.5, color: pal.ink1),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: pvManrope(fontSize: 14, color: pal.ink3),
+        filled: true,
+        fillColor: Colors.white,
+        border: b(kPvLine),
+        enabledBorder: b(kPvLine),
+        focusedBorder: b(kPvInk, 1.4),
+      ),
+    ),
+  );
 }

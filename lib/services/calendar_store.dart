@@ -111,6 +111,34 @@ class CalendarStore extends ChangeNotifier {
     }
   }
 
+  /// Change one of her notes in place (the calendar's Edit, 2026-10-17). Same
+  /// id, so the cloud write is an update of the row it already has.
+  Future<void> updatePersonal(String id,
+      {required String title, String description = '', required DateTime date}) async {
+    final i = _personal.indexWhere((e) => e.id == id);
+    if (i < 0) return;
+    final ev = CalendarEvent(
+      id: id,
+      title: title,
+      description: description,
+      category: CalEventCategory.personal,
+      date: date,
+      isSystemGenerated: false,
+    );
+    _personal[i] = ev;
+    notifyListeners();
+    await _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      try {
+        final row = ev.toJson()..remove('id');
+        await SupabaseRepo.update('calendar_personal_events', id, row);
+      } catch (_) {/* offline - best-effort */}
+    }
+  }
+
+  /// Her notes, as stored (the hub assembles its own day items from these).
+  List<CalendarEvent> get personal => List.unmodifiable(_personal);
+
   Future<void> deletePersonal(String id) async {
     _personal.removeWhere((e) => e.id == id);
     notifyListeners();

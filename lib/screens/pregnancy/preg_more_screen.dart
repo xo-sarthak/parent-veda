@@ -308,9 +308,14 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
               }, badge: PregMessagesStore.instance.unreadCount),
               // ⚠️ CALENDAR'S TAB MOVED HERE (2026-09-29): Learn took its slot.
               // Her calendar edits her appointments: not on his side (2026-10-13).
-              if (!FatherPreview.instance.on)
+              // Kept for revert: `if (!FatherPreview.instance.on)` before this
+              // row. Since 2026-10-17 he sees it READ-ONLY (CalendarScreen
+              // passes readOnly from FatherPreview): her appointments and what
+              // is coming up, with no Add, Edit or Delete.
               _row('preg_more_calendar', IntentMark.calendarDay, 206, 'Calendar',
-                  'Your appointments, scans and what is coming up',
+                  FatherPreview.instance.on
+                      ? 'Her appointments and what is coming up, to see'
+                      : 'Your appointments, scans and what is coming up',
                   () => _push('calendar', () => CalendarScreen(controller: _c))),
               _row('preg_more_journey_map', IntentMark.timelineRail, 104, 'Journey map',
                   'Where you are this month, and what comes next',
