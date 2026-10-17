@@ -596,6 +596,18 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
       heading: 'Your checklist',
       group: 'checklist',
       tiles: [
+        // ⚠️ ADDED 2026-10-17 (the podcast pitch, Q2): the checklist made
+        // personal. A few answers (their month, her diet and kitchen, what a
+        // doctor has told her) become a month-by-month plan whose steps tick
+        // the checklist's own items. First, because it is the way in for a
+        // couple who have not started; the checklist stays beside it.
+        TtcToolTile(
+          title: 'Your Ready-to-Try plan',
+          id: 'ttc_tile_your_ready_to_try_plan',
+          blurb: 'A few questions, then a month-by-month plan for the two of '
+              'you, up to the month you start trying.',
+          surfaceId: 'ttc_ready_plan',
+        ),
         // ⚠️ THE BRIEF'S OWN FORMAT NAMES — both of these shipped as the
         // nearest existing thing (`Tool` and `Booking`) rather than as what
         // the brief called them. The chip is the promise about what happens

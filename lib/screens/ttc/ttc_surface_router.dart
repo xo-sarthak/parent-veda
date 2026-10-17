@@ -50,6 +50,7 @@ import 'ttc_semen_report_screen.dart';
 import 'ttc_shop_v3.dart';
 import 'ttc_precheck_screen.dart';
 import 'ttc_prepare_screen.dart';
+import 'ttc_ready_plan_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
@@ -267,6 +268,10 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // PCOS checker, the vaccination list, supplements and medicines, so it
       // opens knowing what she has already done.
       'ttc_precheck' => const TtcPrecheckScreen(),
+      // The Ready-to-Try plan (2026-10-17): a personal view over the
+      // checklist above, built from a few answers. Its steps tick the same
+      // items. See the head of `lib/ttc/ttc_ready_plan.dart`.
+      'ttc_ready_plan' => const TtcReadyPlanScreen(),
 
       // ⚠️ THE MERGED TRACKER ITSELF, NOT A MENU IN FRONT OF IT — 2026-09-04.
       //

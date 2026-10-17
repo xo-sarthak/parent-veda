@@ -103,6 +103,10 @@ const _brief = <(String, String, TtcTileFormat)>[
   ('habits', 'Money before a baby', TtcTileFormat.article), // was 'before'
 
   // 5) Your checklist
+  // ⚠️ ADDED ON PURPOSE 2026-10-17 (the Ready-to-Try plan, the podcast's Q2
+  // pitch): a decision, not a drift. The plan is the checklist made
+  // personal, so it opens this tab.
+  ('checklist', 'Your Ready-to-Try plan', TtcTileFormat.tool),
   ('checklist', 'Your pre-pregnancy checklist', TtcTileFormat.checklist),
   // ⚠️ CHANGED ON PURPOSE 2026-09-28 (explicit names: every title names
   // what it opens, the user's instruction). Kept for revert: 'Talk to someone

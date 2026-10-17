@@ -1331,6 +1331,9 @@ const Map<String, String> kReadImageUrls = {
   // Your pre-pregnancy checklist
   'ttc_tile_your_pre_pregnancy_checklist':
       'https://cdn.stocksnap.io/img-thumbs/960w/EEJM42JAOO.jpg',
+  // Your Ready-to-Try plan (2026-10-17): a notebook and pen, the plan written down
+  'ttc_tile_your_ready_to_try_plan':
+      'https://cdn.stocksnap.io/img-thumbs/960w/2012ZBLKWM.jpg',
   // Talk to someone before you start
   'ttc_tile_talk_to_someone_before_you_start':
       'https://cdn.stocksnap.io/img-thumbs/960w/NDIQFBYIHR.jpg',
@@ -2636,6 +2639,7 @@ const Map<String, String> kReadImageCredits = {
   'ttc_read_after_abortion': 'CC0 · StockSnap · Leeroy',
   'ttc_read_money_before_baby': 'CC BY-SA 3.0 · Wikimedia Commons · Reserve Bank of India / Kshitij Gupta',
   'ttc_tile_your_pre_pregnancy_checklist': 'CC0 · StockSnap · Startup Stock Photos',
+  'ttc_tile_your_ready_to_try_plan': 'CC0 · StockSnap · Aaron Burden',
   'ttc_tile_talk_to_someone_before_you_start': 'CC0 · StockSnap · Burst',
   'ttc_tile_talk_to_a_nutritionist': 'CC0 · StockSnap · Healthy Living',
   'ttc_read_his_age': 'CC0 · StockSnap · Wil Stewart',
@@ -3226,6 +3230,7 @@ const Map<String, String> kOpenverseIds = {
   'ttc_read_first_gyn_visit': '23b62d71-a070-408f-8a9b-5d3aa94d440a',
   'ttc_read_after_abortion': '63c4376d-7222-4b99-a96f-aea259c9134d',
   'ttc_tile_your_pre_pregnancy_checklist': '3ed07a55-8c9d-4cde-a6af-12716edfd015',
+  'ttc_tile_your_ready_to_try_plan': 'dbe17331-d6fa-423d-b980-1112e327f484',
   'ttc_tile_talk_to_someone_before_you_start': 'e523e59c-781b-4c14-8100-6043c7c24826',
   'ttc_tile_talk_to_a_nutritionist': '0f0a76a1-1d24-41ef-b9b3-955da96e24eb',
   'ttc_read_his_age': 'b95bee5b-f1ab-45b2-95c8-7b879e6712e7',

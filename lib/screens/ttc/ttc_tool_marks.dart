@@ -155,7 +155,8 @@ TtcToolMark? ttcToolMarkForSurface(String surfaceId) {
     'ttc_treatment' => TtcToolMark.treatment,
     'ttc_nutrition' => TtcToolMark.nutrition,
     'ttc_can_i' => TtcToolMark.canI,
-    'ttc_precheck' => TtcToolMark.precheck,
+    // The plan is the checklist made personal, so it draws the clipboard.
+    'ttc_precheck' || 'ttc_ready_plan' => TtcToolMark.precheck,
     'ttc_garbh_course' => TtcToolMark.courses,
     'ttc_cycle_report' => TtcToolMark.cycleReport,
     'ttc_ritual' || 'ttc_practice' || 'ttc_mind_today' => TtcToolMark.practice,
