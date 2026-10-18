@@ -13,6 +13,84 @@ Read first:
 
 ---
 
+## RESUME HERE: the step plan (kept current, updated 2026-10-18)
+
+**A new chat starts here.** This section says which step is next and what each one is. The rest of this file is the
+detail behind each step. `docs/BACKEND-SYNC-LOG.md` is the dated history of the steps already done, one entry per
+step, newest at the bottom. When a step lands: tick it here, add its log entry there, and update
+`docs/BEFORE-LAUNCH.md`.
+
+### Done (all committed, every migration run and checked on the live database)
+
+| Step | What | Migration | Commit |
+|---|---|---|---|
+| 1 | TTC records, appointments, ritual | 0098 | `01fceb2` |
+| 2 | TTC supplements and the family timeline | 0099 | `6a36b7f` |
+| 3 | Blob stores push before they pull | none | `f32af1e` |
+| 4 | Server guard `pv_sync_newer_wins` (an older edit can't overwrite a newer one) | 0100 | `a0eb5b9` |
+| 5 | Parenting logs: feeds, sleep, nappies, pumping, tummy time, growth | 0101 | `f7ed88e` |
+| 6 | Parenting records: documents, health, milestones, vaccines, emergency card | 0104 | `af76d8f`, docs `2ba778e` |
+
+### Still to do, in order
+
+**6 more steps finish the sync work.** Each step is the same shape: plan → user decides the merge rule → migration →
+store changes → a pure merge test → the user runs the migration and its check query → log entry.
+
+| Step | What | Where the detail is | Size |
+|---|---|---|---|
+| **7 (NEXT)** | Parenting's last two: `pp_name_votes` (`pp_names_data.dart`) and the `children` profile (`pp_child_profile.dart`). `children` is the access root: every child record's RLS checks it, so a mistake here can hide a child's records from a parent. Needs a decision first: whole-row "latest edit wins", or per-field (§6) | §1 Parenting, §6 | medium, careful |
+| 8 | Pregnancy part 1: calendar events, bump photos, daily moods and the other daily tables, weekly journal notes, reminders | §1 Pregnancy | large |
+| 9 | Pregnancy part 2: medicines and their logs, scans and appointments, symptoms, the tools (weight, movement, kegel, contractions) | §1 Pregnancy | large |
+| 10 | Blob stores, per-item merge for the lists people curate (saved readings, hospital bag, checklists, cart), so two phones editing different items both keep their edits. Records hiding in blobs (orders, scan reports, readings) move to rows | §2 | medium |
+| 11 | Uploads that fail silently: batch the first-sync upserts, and make sure every converted store reports its waiting changes to the sign-out warning | §3 | small (mostly done inside steps 1-9) |
+| 12 | Tidy-up: local-only stores cleared on sign-out (§4), purge soft-deleted rows after 90 days (§5), the small items (§7) | §4, §5, §7 | small |
+
+Steps 8 and 9 may be one step or two; decide when step 8 is planned. After step 12 the sync work is complete. The
+backend is then **launch-ready** once the user's checks below are done and the backend items in BEFORE-LAUNCH §1 and
+§7 (crash reporting, uptime alerts, backups) are closed.
+
+### Owed by the user (not blocking the next step)
+
+1. **The two-phone walk** for steps 1-6, on one account or as a linked couple. Step 6's list is in the sync log; the
+   short version: a vaccine reminder set on phone A buzzes on phone B; switched off on B, A stops too; a dose
+   un-ticked on B shows un-ticked on A; the emergency card cleared on A stays cleared on B; an allergy removed
+   offline stays removed. Earlier steps: delete something on one phone, it stays gone on the other, including after
+   going offline and back.
+
+2. **The family timeline count.** Run in the Supabase SQL editor:
+   ```sql
+   select count(*) from journey_timeline;
+   ```
+   Run it once now, then open the app on a phone that has timeline moments, and run it again.
+   - **Why:** step 2 found that the family timeline had very likely **never reached the cloud**. Migration 0041 gave
+     `journey_timeline` no UPDATE permission ("append-only"). The app uploads with an upsert
+     (`INSERT ... ON CONFLICT DO UPDATE`), and Postgres checks every permission a statement *might* need before it
+     runs it. So an upsert needs UPDATE even for a brand-new row, and every timeline upload was refused. The app
+     swallows upload errors, so nobody saw it.
+   - **What the numbers mean:** a first count near zero confirms the bug was real. The second count should be close
+     to the number of moments on the phone, which proves 0099's fix works and the backlog uploaded. If the second
+     count is still near zero, uploads are still being refused, and that needs looking at before launch.
+   - It's also tracked in BEFORE-LAUNCH §1 as a CHECK item.
+
+3. **Choose a crash reporter: Sentry or Firebase Crashlytics.**
+   - **Why we need one:** today, when something fails on a user's phone (a crash, or a sync upload the server
+     refuses), only that phone knows. `PvSyncHealth` sees a refused upload and tells nobody. That is how the timeline
+     bug above went unnoticed. A crash reporter sends the error (which store, which table, the error text, never the
+     user's data) to a dashboard we watch, so a broken upload is found in a day, not after launch. It's a BLOCKER in
+     BEFORE-LAUNCH §7.
+   - **Firebase Crashlytics:** free with no event limit. Strong at native crashes on Android and iOS. Needs the
+     Firebase SDK and a Firebase project in the app. Weaker for "handled" errors such as a refused sync, which it
+     treats as second-class "non-fatal" events.
+   - **Sentry:** a free tier of about 5,000 errors a month, then the Team plan at about $26/month (about ₹2,200).
+     Better for handled errors with context (tags like store and table, breadcrumbs of what happened first), has a
+     Flutter SDK, and also covers the Ask Veda Python service and the edge functions, so one dashboard sees the whole
+     backend.
+   - **Recommendation:** Sentry, because what we most need to catch is refused syncs and server errors, not just
+     crashes, and it covers both repos. Crashlytics is the right choice if staying at $0 matters more.
+   - Once chosen, wiring it in is a dev task: report from `PvSyncHealth` and the global error handler.
+
+---
+
 ## 0. What is already done (so it is not redone)
 
 - **Her cycle and daily log.** `CycleStore` (`ttc_cycles`, `ttc_cycle_signals`) and `TtcLogStore` (`ttc_logs`) have
@@ -276,6 +354,8 @@ left alone for now so two sessions don't clash:
 ---
 
 ## Suggested order
+
+*Superseded 2026-10-18 by "RESUME HERE" at the top of this file, which is the list kept current. Kept below as history.*
 
 1. ~~**§1 TTC tables** (records, appointments, ritual)~~ **DONE 2026-10-17 (0098), with their §3 waiting sets.**
    ~~Supplements and the timeline~~ **DONE 2026-10-17 (0099).** All of TTC's row tables are now converted.
