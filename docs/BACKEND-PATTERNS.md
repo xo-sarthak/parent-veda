@@ -3173,6 +3173,50 @@ points carry over:
   her Partner screen shows them, because what she does next depends on which refusal it was
   (§15).
 
+### 16ii-g. Sync the fact, not the side effect: shared vaccine reminders (0104, 2026-10-18)
+
+Step 6 moved the rest of the child's record onto the ledger: documents, the health tables, doctor questions,
+milestones, vaccine doses and the emergency card. Three ideas came out of it.
+
+**1. Sync the fact; derive the side effect on each device.** A vaccine reminder is two things: a fact ("remind us
+about the 6-week dose at 9:00 on the 20th") and a side effect (an alarm the operating system holds on one phone).
+The old code synced the flag, but only the phone that set it ever armed an alarm. So the other parent's phone said
+"Alarm set" and never buzzed. The user wanted both phones to buzz. The fix is not to sync the alarm (an OS
+notification can't travel). It's to sync the fact, including the exact moment (`reminder_at`), and let each phone
+work out its own alarms from it.
+
+- After every pull, a pure function compares this phone's alarms before and after:
+  `vaxAlarmChanges(before, after, now)` returns what to arm, re-arm and cancel.
+- Every local change goes through the same path, so one code path owns the alarm.
+- That also fixed a bug nobody had seen: turning a reminder off never cancelled the alarm, because the screens
+  armed it and nothing ever cancelled it.
+
+> General fact: **derived state should be recomputed from synced state, never synced itself.** A notification, a
+> cache, a badge count or a search index lives on one device. Sync the facts they come from, and rebuild them
+> wherever the facts land. Diffing before and after keeps the rebuild cheap and idempotent.
+
+**2. Composite keys in the book.** Milestones, vaccine doses and the card have no `id`. Their key is
+`(child_id, milestone_id)`, `(child_id, vaccine_id)`, or just `child_id`.
+- The ledger's keyed mode names each row `<child>|<key>` in the book, so the same milestone of two children is two
+  rows.
+- The upload targets `on conflict (child_id, <key>)`.
+- The other parent's row is an `UPDATE ... where child_id = ? and <key> = ?`.
+
+**A row that is state, not a list item, needs care with "absent".** An un-ticked dose is in no local set. If the
+merge only looked at the sets, the dose would be absent here, and "absent here, present in the cloud" means "take
+the cloud's copy". The cloud's copy is the older "done", so the un-tick would be undone. The fix is that the book
+remembers every key it has stamped (`keysFor`), and those take part in the merge too.
+
+**3. When the policy decides who the owner is.** The card's UPDATE policy also says `auth.uid() = user_id`, so
+neither the upsert nor the plain UPDATE can keep the other parent's name on it. Here the owner means "last
+editor" (`ownerIsLastEditor`), and that's a policy choice made in 0095, not something the client can decide.
+
+**The cost, named:** one vaccine row holds two facts, "given" and "reminder". Under row-level newer-wins, if one
+parent marks the dose given while the other sets its reminder at the same moment, one change is lost. Splitting
+the row would remove that risk and add a table. Not worth it until it's ever seen.
+
+History: `docs/BACKEND-SYNC-LOG.md` step 6.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3258,6 +3302,7 @@ points carry over:
     skipped row that stays honest; the rollback sandbox (§16ii-e).
 38. `0101_pp_logs_sync_clock.sql` → `ChildLogLedger.uploadFor` (`lib/services/remote/child_scoped_store.dart`) —
     an upsert is checked as an INSERT too; scope a merge to the slice you fetched (§16ii-f).
+39. `0104_pp_records_sync_clock.sql` → `vaxAlarmChanges` (`pp_vaccine_data.dart`) and `ChildLogLedger`'s keyed mode — sync the fact and derive the alarm on each phone; composite keys; "absent" for state rows (§16ii-g).
 33. `lib/services/pv_sync_health.dart` — fire-and-forget, but report once (§16dd).
 34. `lib/services/dear_baby_vault_store.dart` — a stored event with a derived fallback (§16ff).
 35. `lib/screens/garbh_browse_screen.dart` `shravanBrowse` — one source for what plays (§16gg).

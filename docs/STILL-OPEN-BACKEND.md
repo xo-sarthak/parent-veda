@@ -44,7 +44,7 @@ Read first:
   - A row the partner owns goes up as a plain UPDATE: an upsert is checked against the INSERT policy
     (`auth.uid() = user_id`) even when it updates, and would be refused. BACKEND-PATTERNS §16ii-f.
   - See `docs/BACKEND-SYNC-LOG.md` step 5.
-- **The rest of the child's record (step 6, 2026-10-18, migration 0104, NOT YET RUN).** Documents, the six health
+- **The rest of the child's record (step 6, 2026-10-18, migration 0104, run 2026-10-18).** Documents, the six health
   tables, doctor questions (now with ids), the emergency card (Clear syncs), milestones and vaccine doses.
   - `ChildLogLedger` gained a keyed mode for the composite-key tables, and an owner-is-last-editor mode for the
     card, whose UPDATE policy pins `user_id`.
@@ -283,7 +283,7 @@ left alone for now so two sessions don't clash:
 3. ~~**§2 push-before-pull**~~ **DONE 2026-10-17 (step 3).** Next in §2: per-item merge for the curated lists.
 4. ~~**§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.~~ **DONE 2026-10-17
    (step 5, 0101 run 2026-10-17).** ~~Next in Parenting: documents, health, milestones and vaccines~~ **DONE
-   2026-10-18 (step 6, 0104 to run).** Left in Parenting: `pp_name_votes` and the `children` profile (step 7).
+   2026-10-18 (step 6, 0104 run 2026-10-18).** Left in Parenting: `pp_name_votes` and the `children` profile (step 7).
 5. **§1 Pregnancy tables**, one migration.
 6. **§4, §5, §7** as tidy-up.
 

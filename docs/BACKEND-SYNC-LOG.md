@@ -21,7 +21,7 @@ owed.
 | 2026-10-17 | Step 3: blob stores push before pull | none | `f32af1e` | nothing to run |
 | 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | `a0eb5b9` | yes (2026-10-17) |
 | 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | `f7ed88e` | yes (2026-10-17) |
-| 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | not yet | **not yet** |
+| 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | `af76d8f` | yes (2026-10-18) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -423,7 +423,7 @@ change.
 
 ## Step 6: The rest of the child's record (documents, health, milestones, vaccines, emergency card)
 
-**Date:** 2026-10-18 (planned and approved 2026-10-17). **Migration:** 0104 (not yet run). **Commit:** not yet.
+**Date:** 2026-10-18 (planned and approved 2026-10-17). **Migration:** 0104 (run 2026-10-18). **Commit:** `af76d8f`.
 
 **Numbering note:** this was written as 0103. The other terminal created `0103_ttc_partner_cannot_delete.sql` at
 the same time, so this one became 0104. The two touch different tables.
@@ -516,10 +516,14 @@ each:
 - **Mixed versions.** Until both phones update, the old app still hard-deletes and still writes `user_id = me`,
   as in step 5.
 
-**User runs:**
+**User runs (DONE 2026-10-18):**
 1. 0104 in the Supabase SQL editor.
 2. Optional: the check query at the bottom. Expect 11 rows. `has_clock` and `guarded` should be true on every row;
    `has_removed_at` true on all but `pp_vaccine_doses`, which has `has_reminder_at` instead.
+
+**Verified live (2026-10-18):** the user ran 0104 and the check query. All 11 rows have `has_clock` and
+`guarded` true; `has_removed_at` is true on all but `pp_vaccine_doses`, which has `has_reminder_at` instead, as
+expected.
 
 **Owed (the two-phone walk):**
 - set a vaccine reminder on phone A; phone B buzzes at the same time;
