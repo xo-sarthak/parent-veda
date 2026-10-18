@@ -64,7 +64,9 @@ enum PvToastKind {
 /// once. [lift] is how far above the screen's foot the card floats; null
 /// reads the route (above the nav bar on a stage home, at the foot on a
 /// pushed screen, above the Store's buy bar in the Store). [icon] overrides
-/// the kind's mark when a confirmation has a more specific one.
+/// the kind's mark when a confirmation has a more specific one. [hold]
+/// overrides how long it stays, for the rare notice with a set time (the
+/// first home's "Set from your answers", 4 s, 2026-10-18).
 PvToastHandle pvToast(
   BuildContext context,
   String text, {
@@ -73,9 +75,15 @@ PvToastHandle pvToast(
   VoidCallback? onAction,
   double? lift,
   IconData? icon,
+  Duration? hold,
 }) =>
     PvToast.instance.show(context, text,
-        kind: kind, action: action, onAction: onAction, lift: lift, icon: icon);
+        kind: kind,
+        action: action,
+        onAction: onAction,
+        lift: lift,
+        icon: icon,
+        hold: hold);
 
 /// A notice for work in progress: `pvToastWorking(c, 'Booking…')`, then
 /// `handle.done('Booked')` or `handle.gentle('Could not book. Try again.')`.
@@ -113,6 +121,7 @@ class PvToastData {
     this.onAction,
     this.lift,
     this.icon,
+    this.holdFor,
   });
   final int id;
   final String text;
@@ -125,8 +134,12 @@ class PvToastData {
   /// How long it stays. Long enough to read, short enough not to linger:
   /// 2.4 s for a line, 4.5 s when there is something to tap, plus 60 ms a
   /// word past six, never more than 6 s. A spinner stays until it resolves.
+  /// A set time, when the caller gave one. Null: the rule below.
+  final Duration? holdFor;
+
   Duration? get hold {
     if (kind == PvToastKind.working) return null;
+    if (holdFor != null) return holdFor;
     final words = text.trim().split(RegExp(r'\s+')).length;
     final base = action == null ? 2400 : 4500;
     final extra = words > 6 ? (words - 6) * 60 : 0;
@@ -162,6 +175,7 @@ class PvToast extends ChangeNotifier {
     VoidCallback? onAction,
     double? lift,
     IconData? icon,
+    Duration? hold,
   }) {
     final data = PvToastData(
       id: ++_seq,
@@ -171,6 +185,7 @@ class PvToast extends ChangeNotifier {
       onAction: onAction,
       lift: lift ?? pvSnackLiftFor(context),
       icon: icon,
+      holdFor: hold,
     );
     final handle = PvToastHandle._(data.id);
     // The root overlay, so a notice raised from a sheet or a dialog still

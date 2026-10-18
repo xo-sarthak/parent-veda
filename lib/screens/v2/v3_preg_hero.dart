@@ -54,6 +54,7 @@ import '../../theme/pv_fonts.dart';
 import 'pv_day_strip.dart';
 import 'v2_palette.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_home_arrival.dart';
 
 /// The field's hue behind the pregnancy fold — KEPT FOR REVERT. It fed
 /// `V3HeroField`, whose equalised-chroma recipe turns a warm hue into khaki
@@ -410,9 +411,12 @@ class _V3PregHeroState extends State<V3PregHero> {
                   Positioned(
                     top: 18,
                     child: Column(children: [
-                      Text('Week ${widget.week}',
-                          style: pvFraunces(
-                              fontSize: 30, letterSpacing: -0.75, fontWeight: FontWeight.w600, height: 1.1, color: p.ink1)),
+                      // Counts up on the first home (pv_home_arrival.dart).
+                      PvArriveCount(
+                          text: 'Week ${widget.week}',
+                          builder: (s) => Text(s,
+                              style: pvFraunces(
+                                  fontSize: 30, letterSpacing: -0.75, fontWeight: FontWeight.w600, height: 1.1, color: p.ink1))),
                       const SizedBox(height: 2),
                       // Past the due date it keeps counting (the gap analysis:
                       // "40 weeks and 3 days", instead of stopping).
@@ -517,8 +521,10 @@ class V3PregSheet extends StatelessWidget {
   final List<Widget> children;
   final double bottomClearance;
 
+  // The first home rises and its sections follow (pv_home_arrival.dart,
+  // 2026-10-18); every other open is exactly as before.
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => PvArrive.sheet(child: Container(
         constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height * 0.72),
         decoration: BoxDecoration(
           color: p.ground,
@@ -528,8 +534,8 @@ class V3PregSheet extends StatelessWidget {
           ],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ...children,
+          ...pvArriveEach(children),
           SizedBox(height: bottomClearance),
         ]),
-      );
+      ));
 }

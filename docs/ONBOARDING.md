@@ -103,22 +103,43 @@ using it", and "users should not feel like they wasted their time". Reading the 
   counts up on the week beat; building ticks follow their work; the reveal headline settles and its lines
   arrive one by one; the account rows tick in; the reminder preview arrives.
 
+## 5b. The first home (built 2026-10-18)
+
+Prototype: https://claude.ai/artifact/QDYotDV9DFZ7UvcxU3Uwxd, approved by the user ("motion is important, we
+need to welcome them"). Source `C:\Projects\parentveda-onboarding-preview\home-arrival.html`.
+
+- **The welcome, once.** `lib/widgets/pv_home_arrival.dart`. `_finish()` calls `PvFirstHome.owe()`; the first
+  home to draw claims it. The field fades in, the header and hero settle and the big number counts up
+  (`PvArriveCount`), the sheet rises at 380 ms, its sections follow 70 ms apart (`pvArriveEach`), and at about
+  1 s a 4 s note says "Set from your answers. Change any time in You." (gentle: "We keep things quiet here").
+  All four homes: TTC (`ttc_home_v3.dart`), Pregnancy (`home_v3_screen.dart` + `V3PregSheet`), Parenting
+  (`pp_home_v3.dart`), Skilling (`skilling_preview_screen.dart`). Off with reduced motion.
+- **In memory, not a prefs flag** (the plan said `first_home_seen_v1`). The welcome belongs to the moment
+  onboarding hands over, in the same process; nothing would ever have read a stored flag. If the app dies in
+  between she loses the motion, not the home.
+- **No screen in front of the home** (the user's two decisions): onboarding marks the TTC intro seen and the
+  film becomes the first Today card for her first week, until she opens it (`TtcIntroGate.offerCard`); the
+  pregnancy and parenting daily tip skips the launch that ends onboarding (`PvFirstHome.thisLaunch`).
+- **Getting ready** (decided 2026-10-17). While `TtcReadyPlanStore.gettingReadyFor()` is set (her planned
+  month is still ahead), the TTC hero reads "Your month to start / February / 4 months to go · Ready-to-Try
+  plan" and opens the plan; her plan leads the rail; the "chance of pregnancy today" card waits; Getting ready
+  is the first door. Periods still log. "Started trying sooner?" sets the plan's month to this month, with an
+  Undo toast. The cycle engine is untouched, so the clinical tests stand. A clinic date still wins the hero.
+- **His code on his home** until she links (`TtcHisLinkCard`, one read of his own profile row).
+- Tests: `test/first_home_arrival_test.dart`.
+
 ## 6. Open
 
-- **The first arrival home** (the user's third ask): prototype it first, then build. Not in this build.
-- **A planner who logs a period** gets the cycle chapter, because `preparingTogether` only shows with no cycle
-  data (`ttc_chapter.dart`). Switching the chapter alone would bring back the "two clocks" bug of 2026-09-27
-  (the hero showing fertile days while the chapter says preparing). It needs a getting-ready mode for the
-  whole TTC home. That is a design decision.
+- ~~**The first arrival home**~~ BUILT 2026-10-18, §5b. Walk it on a phone.
+- ~~**A planner who logs a period**~~ BUILT 2026-10-18 as the getting-ready home, §5b.
 - **"A hard birth"** is asked and saved but nothing reads it yet.
 - **Editing the new answers later on You** (gentle, what helps him, the age band) is not built.
 - **His plan card** reads his partner's `ttc_ready_plans` row: the table and sync exist, the card does not
   (§92.0).
-- **The You screen's language switch** still exists (`pv_you_screen.dart` `_languageRow`). Onboarding no
-  longer asks; whether You keeps it is the user's call.
+- ~~**The You screen's language switch**~~ DONE 2026-10-17: the row shows on Pregnancy only.
 - **Unpairing** from her side still goes through Help.
 - The returning-user path, phone sign-in, and the stage-change flows (born, pregnant, loss) are unchanged.
-- Run 0102, then flip `kChildBirthColumns`. Walk all paths on a phone (BEFORE-LAUNCH).
+- ~~Run 0102, then flip `kChildBirthColumns`~~ done 2026-10-17. Walk all paths on a phone (BEFORE-LAUNCH).
 
 ---
 

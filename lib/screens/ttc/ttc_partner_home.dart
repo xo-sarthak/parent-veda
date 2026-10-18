@@ -48,12 +48,14 @@ import '../../ttc/ttc_home_hero.dart' show TtcHeroState;
 import '../../ttc/ttc_partner_data.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
+import '../../services/remote/supabase_repo.dart';
+import 'package:share_plus/share_plus.dart';
 import '../doors/pv_list_row.dart';
 // Kept for revert with the tile row: import '../v2/pv_insight_rail.dart';
 import 'doors/ttc_tab_art.dart' show TtcTabMark;
 import 'ttc_tool_marks.dart' show TtcMarkLeading;
 import '../v2/v2_palette.dart';
-import 'ttc_common.dart' show TtcSectionHeading;
+import 'ttc_common.dart' show TtcSectionHeading, ttcTitleInk;
 import 'ttc_daily_insights.dart' show TtcInsightCard;
 import 'ttc_daily_tip_open.dart' show openTtcTipRead;
 import 'ttc_round_strings.dart' show kTtcPartnerRoundEyebrow, ttcPartnerRoundLine;
@@ -612,3 +614,87 @@ const Map<String, String> kTtcHelpDoor = {
   'doctor': 'ttc_infertility',
   'feel': 'ttc_mind_body',
 };
+
+// =============================================================================
+//  His code on his home, until she links (2026-10-18)
+// -----------------------------------------------------------------------------
+//  A partner who set up on his own saw his code once, on onboarding's last
+//  step, and after that only on You. The home is where he comes back to, so
+//  the code waits there until she has entered it. One read of his own profile
+//  row (RLS allows it); offline, or once linked, it draws nothing.
+// =============================================================================
+class TtcHisLinkCard extends StatefulWidget {
+  const TtcHisLinkCard({super.key, required this.p});
+  final V2Palette p;
+
+  @override
+  State<TtcHisLinkCard> createState() => _TtcHisLinkCardState();
+}
+
+class _TtcHisLinkCardState extends State<TtcHisLinkCard> {
+  String? _code;
+
+  @override
+  void initState() {
+    super.initState();
+    SupabaseRepo.fetchMyProfile('pairing_code, partner_id').then((row) {
+      final code = row?['pairing_code'] as String?;
+      if (!mounted || row?['partner_id'] != null) return;
+      if (code != null && code.isNotEmpty) setState(() => _code = code);
+    }).catchError((_) {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final code = _code;
+    if (code == null) return const SizedBox.shrink();
+    final p = widget.p;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+      child: Container(
+        key: const ValueKey('ttc_his_link_card'),
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 2, 0, 0),
+        decoration: BoxDecoration(
+          border: Border(left: BorderSide(color: p.ink1, width: 1.5)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('LINK WITH HER',
+              style: pvManrope(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                  color: p.action)),
+          const SizedBox(height: 6),
+          Text('Your code: $code',
+              style: pvFraunces(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
+                  letterSpacing: -0.3,
+                  color: p.ink1)),
+          const SizedBox(height: 6),
+          Text(
+              'She enters it in her app, under You, then Partner. Until then '
+              'your side works from what you told us.',
+              style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+          const SizedBox(height: 4),
+          TextButton(
+            onPressed: () => Share.share(
+                'Link with me on ParentVeda. Open the app, go to You, then '
+                'Partner, and enter my code: $code'),
+            style: TextButton.styleFrom(
+                foregroundColor: ttcTitleInk,
+                minimumSize: const Size(44, 44),
+                padding: const EdgeInsets.symmetric(horizontal: 0)),
+            child: Text('Share code',
+                style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: ttcTitleInk)),
+          ),
+        ]),
+      ),
+    );
+  }
+}

@@ -136,6 +136,7 @@ import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 import '../v2/pv_insight_rail.dart';
 import '../reader/pv_reader_screen.dart';
+import '../../widgets/pv_home_arrival.dart';
 
 // ---- One type scale for the whole home (2026-10-07) ------------------------
 //
@@ -214,7 +215,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
+    // The first home's welcome (2026-10-18, pv_home_arrival.dart): once,
+    // right after onboarding; every other open is exactly as before.
+    return PvHomeArrival(child: AnimatedBuilder(
       animation: Listenable.merge([
         ChildProfileStore.instance,
         V2PaletteStore.instance,
@@ -274,15 +277,19 @@ class _PpHomeV3State extends State<PpHomeV3> {
             // So: the field fills the whole screen and does not scroll, and the
             // sheet slides over it. The parallax is free.
             Positioned.fill(
-              child: PpHeroField(
-                  accent: phase.accent,
-                  ground: p.ground,
-                  variant: phase.number),
+              child: PvArrive.field(
+                child: PpHeroField(
+                    accent: phase.accent,
+                    ground: p.ground,
+                    variant: phase.number),
+              ),
             ),
             ListView(
               padding: EdgeInsets.zero,
               children: [
-                _Hero(
+                PvArrive(
+                  delay: PvArriveAt.header,
+                  child: _Hero(
                   phase: phase,
                   child: child,
                   p: p,
@@ -306,7 +313,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   onProfile: () => openPvYou(context, stage: LifeStage.parenting),
                   // Talk to someone, from the header (2026-10-14).
                   onTalk: () => _openSurface(context, 'pp_experts'),
-                ),
+                )),
                 _Sheet(p: p, children: [
                 const SizedBox(height: 22),
                 // ---- HER LETTERS, READY TO OPEN (2026-10-15) -----------------
@@ -983,7 +990,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
           ]),
         );
       },
-    );
+    ));
   }
 
   Widget _pad(Widget child) => Padding(
@@ -1818,13 +1825,16 @@ class _Hero extends StatelessWidget {
                 // only thing she is given.
                 // Two or more children: "Aarav ▾" (gap analysis P2, 2026-10-07).
                 PpChildSwitch(p: p),
-                Text(_bigAge(child),
-                    style: pvFraunces(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w600,
-                        height: 1.05,
-                        letterSpacing: -1.3,
-                        color: p.ink1)),
+                // Counts up on the first home (pv_home_arrival.dart).
+                PvArriveCount(
+                    text: _bigAge(child),
+                    builder: (s) => Text(s,
+                        style: pvFraunces(
+                            fontSize: 42,
+                            fontWeight: FontWeight.w600,
+                            height: 1.05,
+                            letterSpacing: -1.3,
+                            color: p.ink1))),
                 const SizedBox(height: 2),
                 Text(_subAge(child),
                     style: pvManrope(
@@ -1899,8 +1909,10 @@ class _Sheet extends StatelessWidget {
   final V2Palette p;
   final List<Widget> children;
 
+  // The first home rises and its sections follow (pv_home_arrival.dart,
+  // 2026-10-18); every other open is exactly as before.
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => PvArrive.sheet(child: Container(
         // ⚠️ THE SHEET OWNS THE BOTTOM CLEARANCE, NOT THE SCROLL VIEW.
         //
         // The clearance for the floating nav used to be `ListView(padding:
@@ -1933,11 +1945,11 @@ class _Sheet extends StatelessWidget {
           ],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ...children,
+          ...pvArriveEach(children),
           // Clearance for the floating bottom nav, inside the opaque sheet.
           const SizedBox(height: 150),
         ]),
-      );
+      ));
 }
 
 // -----------------------------------------------------------------------------

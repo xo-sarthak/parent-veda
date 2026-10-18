@@ -74,6 +74,7 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import 'v2_palette.dart';
 import 'v3_tip_art.dart';
+import '../../widgets/pv_home_arrival.dart' show PvFirstHome;
 
 /// Once per app process, not once per build and not once per visit to Today.
 /// Same guard shape as `launch_promo.dart` — see that file for the convention.
@@ -113,6 +114,11 @@ Future<void> showDailyTip(
 }) async {
   if (!kDailyTipEnabled || _dailyTipShown || line.trim().isEmpty) return;
   _dailyTipShown = true;
+  // ⚠️ NOT OVER THE FIRST HOME (2026-10-18, the user's decision). On the
+  // launch that ends onboarding the home is arriving, and a dialog over it
+  // would be the first thing she sees of it. The tip starts from her next
+  // open.
+  if (PvFirstHome.thisLaunch) return;
 
   await showGeneralDialog<void>(
     context: context,

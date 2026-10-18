@@ -66,6 +66,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../widgets/pv_home_arrival.dart' show PvFirstHome;
+import '../../ttc/ttc_intro_flow.dart' show TtcIntroGate;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -3733,6 +3735,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       }
       final band = _ageBand;
       if (band != null) await TtcFertilityHelpStore.instance.setAgeBand(band);
+      // ⚠️ THE INTRO FILM NO LONGER STANDS IN FRONT OF HER HOME (2026-10-18,
+      // the user's decision). She has just had her reveal; the film waits as
+      // the first card on her home for a week instead.
+      await TtcIntroGate.markSeen();
+      await TtcIntroGate.offerCard();
       if (_isPartner) {
         TtcPartnerMode.instance.on = true;
         await plan.setHisAnswers(
@@ -3867,6 +3874,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     }
 
     if (!mounted) return;
+    // The home she lands on welcomes her, once (pv_home_arrival.dart).
+    PvFirstHome.owe();
     widget.onDone(stage, isFather);
   }
 }

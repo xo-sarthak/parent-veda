@@ -110,6 +110,46 @@ class TtcIntroGate {
   static Future<void> resetForTest() async {
     final p = await SharedPreferences.getInstance();
     await p.remove(_key);
+    await p.remove(_cardKey);
+    _cardUntil = null;
+  }
+
+  // ---- the film as a card on her home (2026-10-18) -------------------------
+  //
+  // ⚠️ THE FILM STOOD BETWEEN ONBOARDING AND HER HOME. She had just been
+  // through a reveal, and a second front door followed it. The user decided:
+  // onboarding marks the introduction seen, and the film waits on her home as
+  // the first card of the Today rail for her first week, until she opens it.
+  // Local, like the gate, for the same reason.
+
+  static const _cardKey = 'ttc_intro_card_until_v1';
+  static DateTime? _cardUntil;
+
+  /// True while the card is offered: the first week, until she opens it.
+  static bool cardShowing({DateTime? now}) {
+    final until = _cardUntil;
+    return until != null && (now ?? DateTime.now()).isBefore(until);
+  }
+
+  /// Onboarding: offer the card for [days] days.
+  static Future<void> offerCard({int days = 7}) async {
+    final until = DateTime.now().add(Duration(days: days));
+    _cardUntil = until;
+    final p = await SharedPreferences.getInstance();
+    await p.setString(_cardKey, until.toIso8601String());
+  }
+
+  /// The home reads it once.
+  static Future<void> loadCard() async {
+    final p = await SharedPreferences.getInstance();
+    _cardUntil = DateTime.tryParse(p.getString(_cardKey) ?? '');
+  }
+
+  /// She opened the film: the card has done its job.
+  static Future<void> cardOpened() async {
+    _cardUntil = null;
+    final p = await SharedPreferences.getInstance();
+    await p.remove(_cardKey);
   }
 }
 

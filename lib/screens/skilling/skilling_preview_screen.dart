@@ -75,6 +75,7 @@ import 'sk_child_store.dart';
 import 'sk_first_activity.dart';
 import 'sk_practice_store.dart';
 import 'sk_surface_router.dart';
+import '../../widgets/pv_home_arrival.dart';
 
 class SkillingPreviewScreen extends StatelessWidget {
   const SkillingPreviewScreen({super.key, this.lang = AppLanguage.english});
@@ -82,12 +83,13 @@ class SkillingPreviewScreen extends StatelessWidget {
   final AppLanguage lang;
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
+  Widget build(BuildContext context) => PvHomeArrival(
+      child: AnimatedBuilder(
         // The compass lights a point when a skill has been practised, so the
         // screen listens to the keepsake. See `_CompassCard`.
         animation: SkPracticeStore.instance,
         builder: (context, _) => _body(context),
-      );
+      ));
 
   Widget _body(BuildContext context) {
     // Lazy, idempotent, fire-and-forget: the keepsake notifies once loaded
@@ -107,14 +109,18 @@ class SkillingPreviewScreen extends StatelessWidget {
         // Same structure as parenting and TTC: the field is the PAGE's surface
         // and does not scroll; the content sheet slides over it.
         Positioned.fill(
-          child: V3HeroField(
-              accent: accent,
-              ground: p.ground,
-              variant: 3,
-              chroma: v3FieldChroma(258)),
+          child: PvArrive.field(
+            child: V3HeroField(
+                accent: accent,
+                ground: p.ground,
+                variant: 3,
+                chroma: v3FieldChroma(258)),
+          ),
         ),
         ListView(padding: EdgeInsets.zero, children: [
-          _Hero(p: p, count: brackets.length),
+          PvArrive(
+              delay: PvArriveAt.header,
+              child: _Hero(p: p, count: brackets.length)),
           _Sheet(p: p, children: [
             const SizedBox(height: 22),
             _pad(_PreviewBanner(p: p)),
@@ -313,13 +319,15 @@ class _Hero extends StatelessWidget {
                 // age, a cycle day. The only honest number here is how many
                 // skills the stage covers, because nothing about any child has
                 // been recorded and the alternative big numbers are all scores.
-                Text('$count skills',
-                    style: pvFraunces(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w600,
-                        height: 1.05,
-                        letterSpacing: -1.3,
-                        color: p.ink1)),
+                PvArriveCount(
+                    text: '$count skills',
+                    builder: (s) => Text(s,
+                        style: pvFraunces(
+                            fontSize: 42,
+                            fontWeight: FontWeight.w600,
+                            height: 1.05,
+                            letterSpacing: -1.3,
+                            color: p.ink1))),
                 const SizedBox(height: 3),
                 Text('Nothing measured. Nothing ranked.',
                     style: pvManrope(
@@ -346,8 +354,10 @@ class _Sheet extends StatelessWidget {
   final V2Palette p;
   final List<Widget> children;
 
+  // The first home rises and its sections follow (pv_home_arrival.dart,
+  // 2026-10-18); every other open is exactly as before.
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => PvArrive.sheet(child: Container(
         // The sheet owns the bottom clearance. Once the background belongs to
         // the page, every piece of scroll-view padding is a window onto it.
         constraints: BoxConstraints(
@@ -364,10 +374,10 @@ class _Sheet extends StatelessWidget {
           ],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ...children,
+          ...pvArriveEach(children),
           const SizedBox(height: 60),
         ]),
-      );
+      ));
 }
 
 /// The line that stops this screen being mistaken for a shipped stage.

@@ -146,6 +146,7 @@ import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
 import 'symptoms/door/symptoms_today_body.dart' show openSymptomRead;
 import 'journal_compose_screen.dart' show openJournalCompose;
 import 'garbh/garbh_today_practice.dart' show GarbhTodayPractice, openGarbhDoor;
+import '../widgets/pv_home_arrival.dart';
 
 class HomeV3Screen extends StatefulWidget {
   const HomeV3Screen({super.key, required this.pregnancy, required this.home});
@@ -408,7 +409,13 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
     //   final fieldHue = switch (trimester) { 1 => 104.0, 2 => 24.0, _ => 268.0 };
     final trimester = activeDay <= 91 ? 1 : (activeDay <= 189 ? 2 : 3);
     // const fieldHue = kPregFieldHue;
-    return AnnotatedRegion<SystemUiOverlayStyle>(
+    // The first home's welcome (2026-10-18, pv_home_arrival.dart): once,
+    // right after onboarding. Gentle says so in its note.
+    return PvHomeArrival(
+      note: FamilyProfileStore.instance.gentleAboutLoss
+          ? kPvFirstHomeNoteGentle
+          : kPvFirstHomeNote,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
       // The clock, battery and signal sit on the light field now (they sat
       // on the photograph until 2026-09-22), so they are dark again.
       value: const SystemUiOverlayStyle(
@@ -433,7 +440,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
           // `V3HeroField` at a warm hue came out khaki). Kept for revert:
           //   V3HeroField(accent: v2BlockTint(fieldHue, p), ground: p.ground,
           //       variant: trimester, chroma: v3FieldChroma(fieldHue)),
-          Positioned.fill(child: PregField(ground: p.ground, variant: trimester)),
+          Positioned.fill(
+              child: PvArrive.field(
+                  child: PregField(ground: p.ground, variant: trimester))),
         // NO HORIZONTAL PADDING ON THE LIST. The hero has to reach both
         // edges, and a list that pads everything cannot let one child out.
         // Every other section wraps itself in _pad() instead.
@@ -451,7 +460,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // v3_preg_hero.dart for the user's words. The full-bleed
             // photograph (`V3Hero`) is commented out below, kept for revert.
             if (day != null)
-              V3PregHero(
+              PvArrive(
+                delay: PvArriveAt.header,
+                child: V3PregHero(
                 p: p,
                 // "Week 41" once she is past her due date (2026-09-30); the
                 // figure's art clamps to week 40 inside the hero. Kept for revert:
@@ -521,7 +532,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                     : () => Navigator.of(context).push(MaterialPageRoute<void>(
                         settings: const RouteSettings(name: 'calendar'),
                         builder: (_) => CalendarScreen(controller: pregnancy))),
-              ),
+              )),
             // ---- THE SHEET: everything under the fold ------------------------
             V3PregSheet(p: p, children: [
             // ---- KEPT FOR REVERT: the full-bleed photograph hero ---------------
@@ -1387,7 +1398,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
         ]),
         ),
       ),
-    );
+    ));
   }
 
   /// Same six doors as V2 — the grid is the part both versions share, so that

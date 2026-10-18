@@ -8001,16 +8001,24 @@ Every answer now has a reader (docs/ONBOARDING.md §3). Built from the approved
 prototype. Migration 0102 (`due_date_source`, `dating_date`, `birth_mode`,
 `born_weeks`, `ttc_ready_plans`, `link_as_partner` refuses). Left:
 
-- **Run 0102**, then flip `kChildBirthColumns` to true (pp_child_profile.dart).
-- **The first arrival home** (the user's third ask): prototype first, then build.
-- **A planner who logs a period** gets the cycle chapter: `preparingTogether`
-  only shows with no cycle data. Switching the chapter alone would bring back
-  the two-clocks bug of 2026-09-27; it needs a getting-ready mode for the TTC
-  home. A design decision.
+- ~~**Run 0102**, then flip `kChildBirthColumns` to true~~ DONE 2026-10-17
+  (the user ran it; flipped in 86345e7).
+- **The first arrival home** (the user's third ask): PROTOTYPED 2026-10-18,
+  https://claude.ai/artifact/QDYotDV9DFZ7UvcxU3Uwxd (source
+  `C:\Projects\parentveda-onboarding-preview\home-arrival.html`). BUILT
+  2026-10-18 on the user's go (ONBOARDING.md §5b, `pv_home_arrival.dart`); not
+  walked. DECIDED 2026-10-18 (the user): onboarding marks the TTC
+  intro film seen and the film becomes the first Today rail card for her first
+  7 days; no pregnancy daily-tip dialog on the first arrival.
+- **A planner who logs a period** gets the cycle chapter. DECIDED 2026-10-17
+  (the user): a "Getting ready" home while `plannedStart` is ahead. The hero
+  leads with her month and plan, periods log as a calendar with no fertile-day
+  words, and "We've started trying" ends it with an Undo. The engine is
+  unchanged. BUILT 2026-10-18 with the arrival home (ONBOARDING.md §5b).
 - **"A hard birth"** (the gentle row) is saved and nothing reads it yet.
 - **Editing the new answers on You**: gentle, what helps him, the age band.
-- **The You screen's language switch** still exists; onboarding no longer asks.
-  The user decides whether You keeps it.
+- ~~**The You screen's language switch**~~ DONE 2026-10-17 (86345e7): the row
+  shows on Pregnancy only.
 - **Unpairing from her side** still goes through Help.
 - Walk every path on a phone: trying ×3, his trying, pregnancy (4 dating ways),
   his pregnancy, parenting (+twins, +second child), skilling, partner with a code.
@@ -8024,7 +8032,11 @@ his code on You › Partner ("Did he send you a code?"), through
 view (splash `_homeFor`). What helps him orders his doors (`ttcHisDoorsFirst`)
 and his pregnancy block (`pregPartnerOrder`).
 
-### 62.8 `ttc_journeys` has one `for all` policy — follow-up, OPENED 2026-10-17
+### 62.8 `ttc_journeys` has one `for all` policy — DONE 2026-10-18 (0103, run by the user)
+
+0103 split `ttc_journeys` and `ttc_treatment` into select (couple) plus
+insert/update/delete (own row). Pinned in `test/ttc_schema_contract_test.dart`.
+The note below is the original.
 
 `using (mine or my partner's) with check (mine)` lets the partner DELETE her
 row, because `with check` does not guard a delete (BACKEND-PATTERNS §16jj-b).

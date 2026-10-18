@@ -177,7 +177,10 @@ void main() {
 
   test('the home wires all three', () {
     final src = _code('lib/screens/home_v3_screen.dart');
-    expect(src, contains('timeLeft: pregTimeLeft('));
+    // Gentle (Onboarding V3, 2026-10-17) hides the countdown, so the call
+    // sits behind a condition now. Kept for revert:
+    //   expect(src, contains('timeLeft: pregTimeLeft('));
+    expect(src, contains(': pregTimeLeft(_daysToDue(_selected))'));
     expect(src, contains('pastDueCount: pregPastDueCount('));
     expect(src, contains('PregArrivalCard(p: p)'));
     expect(src, contains('case PregInsightGo.scanWindow:'));

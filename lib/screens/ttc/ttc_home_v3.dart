@@ -83,6 +83,10 @@ import '../../ttc/ttc_prepare_data.dart';
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_ready_plan_store.dart' show TtcReadyPlanStore;
+import '../../ttc/ttc_ready_plan.dart' show readyMonthOf, ttcGettingReadyLine;
+import '../../widgets/pv_home_arrival.dart';
+import '../../widgets/pv_toast.dart';
+import 'ttc_intro_flow.dart' show TtcIntroFlow, TtcIntroGate;
 import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_precheck_home.dart';
 import '../../ttc/ttc_precheck_store.dart';
@@ -254,6 +258,12 @@ class _TtcHomeV3State extends State<TtcHomeV3>
     // Her age band decides the check card's 6-or-12 months and the door
     // order. Lazy-loaded store: without this the home can read "unknown".
     TtcFertilityHelpStore.instance.load().catchError((_) {});
+    // The planned month decides the getting-ready home (2026-10-18).
+    TtcReadyPlanStore.instance.load().catchError((_) {});
+    // The intro film's card, for her first week (2026-10-18).
+    TtcIntroGate.loadCard().then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -330,7 +340,9 @@ class _TtcHomeV3State extends State<TtcHomeV3>
     }
 
     final p = V2PaletteStore.instance.current;
-    return AnimatedBuilder(
+    // The first home's welcome (2026-10-18, pv_home_arrival.dart): once,
+    // right after onboarding; every other open is exactly as before.
+    return PvHomeArrival(child: AnimatedBuilder(
       // ⚠️ `TtcLogStore` IS IN THIS LIST NOW. Without it, logging a symptom and
       // coming back showed the old strip and the old cards — the exact
       // complaint that started this pass: *"I actually am not able to see it in
@@ -355,6 +367,9 @@ class _TtcHomeV3State extends State<TtcHomeV3>
         // the door order; without this the home kept the old answer until
         // something else rebuilt it.
         TtcFertilityHelpStore.instance,
+        // ⚠️ THE PLANNED MONTH (2026-10-18). "We've started trying" and its
+        // Undo change the whole hero; without this the page kept the old one.
+        TtcReadyPlanStore.instance,
       ]),
       builder: (context, _) {
         final hinglish = TtcLang.instance.hinglish;
@@ -389,11 +404,13 @@ class _TtcHomeV3State extends State<TtcHomeV3>
             // content sheet slides over it. See the note in v3_hero_field.dart
             // about why nobody blends two sections.
             Positioned.fill(
-              child: V3HeroField(
-                  accent: accent,
-                  ground: p.ground,
-                  variant: _chapterNumber(chapter),
-                  chroma: v3FieldChroma(_chapterHue(chapter))),
+              child: PvArrive.field(
+                child: V3HeroField(
+                    accent: accent,
+                    ground: p.ground,
+                    variant: _chapterNumber(chapter),
+                    chroma: v3FieldChroma(_chapterHue(chapter))),
+              ),
             ),
             ListView(
               // ⚠️ ROOM FOR THE NAV AND THE ASK FAB. `ttcBottomInset` is what
@@ -429,7 +446,9 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                 // hero never reached at all — is the icon on the right. See the
                 // wiring gate in CLAUDE.md; the reason this list is written out
                 // is that a replaced hero is exactly where a door goes missing.
-                _CycleHeader(
+                PvArrive(
+                  delay: PvArriveAt.header,
+                  child: _CycleHeader(
                   today: today,
                   p: p,
                   hinglish: hinglish,
@@ -450,7 +469,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                       builder: (_) =>
                           const TtcPrepareScreen(onlyCategory: 'consults'))),
                   unread: TtcMessagesStore.instance.unreadCount,
-                ),
+                )),
                 _Sheet(p: p, children: [
                   const SizedBox(height: 26),
 
@@ -511,6 +530,19 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                       today: _today),
                   const SizedBox(height: 26),
 
+                  // ---- GETTING READY: "STARTED TRYING SOONER?" (2026-10-18) -
+                  //
+                  // While her planned month is ahead the home shows her month
+                  // and her plan, not fertile days. This is the way out, said
+                  // before it happens and undoable (the user's rule: tell her
+                  // before anything changes). It goes by itself when her
+                  // month comes. Her side only: the plan is hers to move.
+                  if (!him &&
+                      TtcReadyPlanStore.instance.gettingReadyFor() != null) ...[
+                    _pad(_StartedTryingCard(p: p)),
+                    const SizedBox(height: 26),
+                  ],
+
                   // ---- IT MAY BE TIME FOR A CHECK (gap analysis, P2) -------
                   //
                   // One calm card at 12 months of trying (6 at 35 and over or
@@ -535,6 +567,9 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   if (him) ...[
                     TtcPartnerHomeBlock(p: p),
                     const SizedBox(height: 32),
+                    // His code, until she has linked (2026-10-18). Draws
+                    // nothing once they are linked, or offline.
+                    TtcHisLinkCard(p: p),
                   ],
                   if (!him && TtcHomePrefs.instance.offer101) ...[
                     _pad(Ttc101Card(
@@ -1159,7 +1194,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
           ]),
         );
       },
-    );
+    ));
   }
 
   void _openBracket(BuildContext context, String id) {
@@ -2901,6 +2936,21 @@ class _WindowLine extends StatelessWidget {
       ...kTtcRoundHeroStates,
     };
 
+    // ⚠️ GETTING READY LEADS WITH HER MONTH (2026-10-18, decided by the
+    // user). A couple planning for February who log a period were told "Your
+    // fertile days are today" four months early. Forcing the chapter instead
+    // would bring back the two-clocks bug of 2026-09-27, so the engine is
+    // untouched and only the words change: her month, and her plan. A clinic
+    // date still wins, and "We've started trying" on the sheet ends it, with
+    // an Undo.
+    final readyFor = TtcReadyPlanStore.instance.gettingReadyFor();
+    if (readyFor != null && !treatment.contains(line.state)) {
+      return _block('Your month to start',
+          _CycleHeader._months[readyFor.month - 1],
+          ttcGettingReadyLine(readyFor),
+          onTapOverride: () => openTtcSurface(context, 'ttc_ready_plan'));
+    }
+
     // "Waiting to hear" opens the result, since that is what it asks for.
     if (line.state == TtcHeroState.treatmentTestDay && line.days > 0) {
       return _block(cue, big, sub,
@@ -3087,15 +3137,18 @@ class _WindowLine extends StatelessWidget {
               //
               // Two lines, because "today and 2 more days" is the longest thing
               // it ever has to say and it must not shrink to fit.
-              Text(big,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: pvFraunces(
-                      fontSize: 44,
-                      fontWeight: FontWeight.w600,
-                      height: 1.06,
-                      letterSpacing: -1.6,
-                      color: p.ink1)),
+              // Counts up on the first home (pv_home_arrival.dart).
+              PvArriveCount(
+                  text: big,
+                  builder: (big) => Text(big,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvFraunces(
+                          fontSize: 44,
+                          fontWeight: FontWeight.w600,
+                          height: 1.06,
+                          letterSpacing: -1.6,
+                          color: p.ink1))),
               const SizedBox(height: 8),
 
               // ---- the explainer, with the way in --------------------
@@ -3496,8 +3549,10 @@ class _Sheet extends StatelessWidget {
   final V2Palette p;
   final List<Widget> children;
 
+  // The first home rises and its sections follow (pv_home_arrival.dart);
+  // every other open is exactly as before.
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => PvArrive.sheet(child: Container(
         // The sheet owns the bottom clearance. See the long note on parenting's
         // `_Sheet`: once the background belongs to the page, every piece of
         // padding in the scroll view is a window onto it.
@@ -3515,11 +3570,72 @@ class _Sheet extends StatelessWidget {
           ],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ...children,
+          ...pvArriveEach(children),
           // Clearance for the floating nav AND the Ask FAB, inside the opaque
           // sheet. `ttcBottomInset` is what every other TTC screen reserves;
           // 150 is what the parenting sheet reserves. Whichever is larger.
           SizedBox(height: ttcBottomInset > 150 ? ttcBottomInset : 150),
+        ]),
+      ));
+}
+
+/// "Started trying sooner?" on the getting-ready home (2026-10-18). The ruled
+/// shape of the check card, so it reads as a note from the page, not an ad.
+class _StartedTryingCard extends StatelessWidget {
+  const _StartedTryingCard({required this.p});
+  final V2Palette p;
+
+  Future<void> _started(BuildContext context) async {
+    pvCommitFeedback();
+    final store = TtcReadyPlanStore.instance;
+    final before = store.plannedStart;
+    await store.setPlannedStart(readyMonthOf(DateTime.now()));
+    if (!context.mounted) return;
+    pvToast(context,
+        'Your home now shows your fertile days. Your plan is still in Tools.',
+        action: 'Undo', onAction: () => store.setPlannedStart(before));
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: const ValueKey('ttc_home_started_trying'),
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 2, 0, 0),
+        decoration: BoxDecoration(
+          border: Border(left: BorderSide(color: p.ink1, width: 1.5)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('STARTED TRYING SOONER?',
+              style: pvManrope(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                  color: p.action)),
+          const SizedBox(height: 6),
+          Text('Tell us, and your home shows your fertile days',
+              style: pvFraunces(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
+                  letterSpacing: -0.3,
+                  color: p.ink1)),
+          const SizedBox(height: 6),
+          Text('Your plan stays. You can change your mind with one tap.',
+              style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+          const SizedBox(height: 4),
+          TextButton(
+            key: const ValueKey('ttc_home_started_trying_go'),
+            onPressed: () => _started(context),
+            style: TextButton.styleFrom(
+                foregroundColor: ttcTitleInk,
+                minimumSize: const Size(44, 44),
+                padding: const EdgeInsets.symmetric(horizontal: 0)),
+            child: Text("We've started trying",
+                style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: ttcTitleInk)),
+          ),
         ]),
       );
 }
@@ -3957,7 +4073,39 @@ class _InsightRail extends StatelessWidget {
     // pill (`ttcHomeHidesQuickRow`). test/ttc_no_repetition_test.dart holds
     // it. Kept for revert: the round-step card, and the blood-test card on
     // every round.
+    // ⚠️ GETTING READY (2026-10-18): her plan leads, and the "chance of
+    // pregnancy today" card waits for her month. See the hero.
+    final readyFor = TtcReadyPlanStore.instance.gettingReadyFor();
+    final planOwed = TtcReadyPlanStore.instance.planOwed;
     final all = <TtcInsightCard>[
+      // ⚠️ THE INTRO FILM, AS A CARD (2026-10-18, the user's decision). It
+      // used to stand between onboarding and her home as a whole screen; now
+      // onboarding marks it seen and it waits here for her first week, until
+      // she opens it.
+      if (selected == today && TtcIntroGate.cardShowing())
+        const TtcInsightCard(
+          id: 'intro_film',
+          eyebrow: 'BEFORE YOU START',
+          value: 'Trying to conceive, explained',
+          caption: 'Two minutes on what this stage is for',
+          hue: 206,
+          art: TtcInsightArt.note,
+          go: TtcInsightGo.introFilm,
+        ),
+      if (selected == today && readyFor != null)
+        TtcInsightCard(
+          id: 'ready_plan',
+          eyebrow: 'YOUR NEXT STEP',
+          value: planOwed
+              ? 'Make your Ready-to-Try plan'
+              : 'Your Ready-to-Try plan',
+          caption: planOwed
+              ? 'Two minutes, then a plan up to your month'
+              : 'Up to ${_CycleHeader._months[readyFor.month - 1]}',
+          hue: 104,
+          art: TtcInsightArt.note,
+          go: TtcInsightGo.readyPlan,
+        ),
       // Day one of a new period: the read about it leads the rail
       // (2026-09-30), where the hero's pill used to be. Same condition.
       if (selected == today && ttcIsNewPeriodDayOne(selected))
@@ -4017,7 +4165,9 @@ class _InsightRail extends StatelessWidget {
           art: TtcInsightArt.ring,
           go: TtcInsightGo.shouldTest,
         ),
-      ...ttcInsightsFor(selected),
+      for (final c in ttcInsightsFor(selected))
+        if (readyFor == null || c.id != 'chance') c,
+      // Kept for revert: ...ttcInsightsFor(selected),
       // ⚠️ THE CYCLE REPORT RIGHT AFTER HER CYCLE (2026-09-30, the user:
       // "cycle companion and cycle report… come at the very end, so their
       // position can be put a bit further [forward]"). The cycle cards above
@@ -4050,6 +4200,7 @@ class _InsightRail extends StatelessWidget {
       // plan, in this same slot: the checklist's step waits until there is
       // a plan, so the rail never asks for two things at once.
       if (selected == today &&
+          readyFor == null &&
           !todayState.clinicInvolved &&
           TtcReadyPlanStore.instance.planOwed)
         TtcInsightCard(
@@ -4062,6 +4213,7 @@ class _InsightRail extends StatelessWidget {
           go: TtcInsightGo.readyPlan,
         )
       else if (selected == today &&
+          readyFor == null &&
           !todayState.clinicInvolved &&
           nextStep != null)
         TtcInsightCard(
@@ -4207,6 +4359,13 @@ void _openInsight(
       _openSurface(context, 'ttc_precheck');
     case TtcInsightGo.readyPlan:
       _openSurface(context, 'ttc_ready_plan');
+    case TtcInsightGo.introFilm:
+      // Opened once, the card has done its job.
+      TtcIntroGate.cardOpened();
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'ttc/intro'),
+        builder: (ctx) => TtcIntroFlow(onDone: () => Navigator.of(ctx).pop()),
+      ));
     case TtcInsightGo.report:
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'ttc/cycle_report'),

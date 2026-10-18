@@ -102,6 +102,16 @@ class TtcReadyPlanStore extends ChangeNotifier with TtcSyncedStore {
   /// "next step" offers one.
   bool get planOwed => _madeAt == null && plannedStart != null;
 
+  /// Her planned month while it is still ahead, else null: the getting-ready
+  /// home (2026-10-18). This month or a past one is not "getting ready" any
+  /// more; the ordinary trying home takes over by itself.
+  DateTime? gettingReadyFor({DateTime? now}) {
+    final start = plannedStart;
+    if (start == null) return null;
+    final at = now ?? DateTime.now();
+    return start.isAfter(DateTime(at.year, at.month)) ? start : null;
+  }
+
   Future<void> load() async {
     if (_loaded) return;
     _loaded = true;

@@ -325,6 +325,15 @@ class ReadyPlan {
 /// The first day of the month [d] falls in.
 DateTime readyMonthOf(DateTime d) => DateTime(d.year, d.month);
 
+/// The getting-ready hero's small line (2026-10-18): "4 months to go ·
+/// Ready-to-Try plan". Months, never days: a month is what they planned.
+String ttcGettingReadyLine(DateTime month, {DateTime? now}) {
+  final at = now ?? DateTime.now();
+  final n = (month.year - at.year) * 12 + month.month - at.month;
+  final left = n <= 1 ? 'Next month' : '$n months to go';
+  return '$left  ·  Ready-to-Try plan';
+}
+
 /// Whole calendar months from [from]'s month to [to]'s month.
 int readyMonthsBetween(DateTime from, DateTime to) =>
     (to.year - from.year) * 12 + (to.month - from.month);

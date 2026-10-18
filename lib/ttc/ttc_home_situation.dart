@@ -32,6 +32,7 @@
 //    on a day she chose to look at, stated as a condition, never as a hope.
 // =============================================================================
 
+import 'ttc_ready_plan_store.dart' show TtcReadyPlanStore;
 import 'cycle_store.dart';
 // Kept for revert: only the old phase code below read it.
 // import 'ttc_care_pathway.dart' show TimingOwnership;
@@ -319,6 +320,7 @@ bool ttcToggleSexOn(DateTime day) {
 const String kTtcDoorFertileWindow = 'ttc_conceiving';
 const String kTtcDoorIvf = 'ttc_infertility';
 const String kTtcDoorNotYet = 'ttc_not_yet';
+const String kTtcDoorGettingReady = 'ttc_preconception_health';
 
 /// [ids] reordered for her situation. ORDER ONLY: every id that comes in goes
 /// out, once, and nothing is added (a lead door that is not in [ids], such as
@@ -327,14 +329,17 @@ const String kTtcDoorNotYet = 'ttc_not_yet';
 /// Leaders, strongest first: a clinic pathway puts IVF & IUI first; trying
 /// long enough for a check puts "Taking a while" next; the waiting or late
 /// days put the fertile window (which holds waiting and testing) next. The
-/// rest keep their own order.
+/// rest keep their own order. Getting ready (2026-10-18), with her month
+/// still ahead, puts "Getting ready" first: that is the stage she is in.
 List<String> ttcHomeDoorOrder(
   List<String> ids, {
   required bool clinicPathway,
   required bool tryingLong,
   required TtcDayPhase phase,
+  bool gettingReady = false,
 }) {
   final leaders = <String>[
+    if (gettingReady && !clinicPathway) kTtcDoorGettingReady,
     if (clinicPathway) kTtcDoorIvf,
     if (tryingLong) kTtcDoorNotYet,
     if (phase == TtcDayPhase.waiting || phase == TtcDayPhase.late)
@@ -358,6 +363,8 @@ List<String> ttcHomeDoorOrderNow(List<String> ids, {DateTime? now}) {
     clinicPathway: TtcStore.instance.today.clinicInvolved,
     tryingLong: ttcTryingLongReached(facts, at, ignoreCare: true),
     phase: ttcHomePhaseOn(at),
+    gettingReady:
+        TtcReadyPlanStore.instance.gettingReadyFor(now: at) != null,
   );
 }
 

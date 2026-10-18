@@ -112,6 +112,10 @@ enum TtcInsightGo {
   /// who said they are getting ready and have not made a plan yet. Added
   /// 2026-10-17.
   readyPlan,
+
+  /// The TTC intro film, as a card for her first week instead of a screen
+  /// between onboarding and her home. Added 2026-10-18.
+  introFilm,
 }
 
 /// Where a card lands, as one comparable string: the destination, plus the
