@@ -70,6 +70,33 @@ void main() {
     expect(guarded, contains('pp_name_votes'));
   });
 
+  test('Pregnancy part 1 is guarded (0106)', () {
+    for (final t in [
+      'calendar_personal_events',
+      'bump_photos',
+      'baby_talk',
+      'daily_moods',
+      'kept_affirmations',
+      'daily_movement_responses',
+      'father_missions',
+      'weekly_journal_notes',
+      'reminders',
+    ]) {
+      expect(guarded, contains(t));
+    }
+  });
+
+  test('father_missions can be upserted: 0106 gives it an UPDATE policy', () {
+    // An upsert is checked against UPDATE even for a new row (0099); 0010
+    // gave this table select, insert and delete only.
+    final sql = File('supabase/migrations/0106_preg_part1_sync_clock.sql')
+        .readAsStringSync();
+    expect(
+        sql,
+        matches(RegExp(
+            r'create policy "father_missions own update" on public\.father_missions\s+for update')));
+  });
+
   test('0105 leaves my_child_ids() alone: a removed child keeps its records',
       () {
     final sql = File('supabase/migrations/0105_pp_children_votes_sync_clock.sql')

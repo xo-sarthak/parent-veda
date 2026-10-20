@@ -22,7 +22,8 @@ owed.
 | 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | `a0eb5b9` | yes (2026-10-17) |
 | 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | `f7ed88e` | yes (2026-10-17) |
 | 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | `af76d8f` | yes (2026-10-18) |
-| 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | `d76594b` | **not yet** |
+| 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | `d76594b` | yes (2026-10-20) |
+| 2026-10-20 | Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders) | 0106 | pending | **not yet** |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -546,7 +547,7 @@ expected.
 
 ## Step 7: The child profile and the name votes
 
-**Date:** 2026-10-20 (planned and approved 2026-10-20). **Migration:** 0105 (**not yet run**). **Commit:** `d76594b`.
+**Date:** 2026-10-20 (planned and approved 2026-10-20). **Migration:** 0105 (run 2026-10-20). **Commit:** `d76594b`.
 
 **The problem (STILL-OPEN-BACKEND §1, the last two Parenting rows).**
 
@@ -615,7 +616,8 @@ expected.
   out from the growth log, so nothing reads the cloud copy (only `delete-account` touches `children` server-side).
 - **Mixed versions.** Until both phones update, the old app still hard-deletes and inserts a missing child again.
 
-**User runs (OWED):**
+**User runs (DONE 2026-10-20):** the user ran 0105. The optional check query result was not reported.
+
 1. 0105 in the Supabase SQL editor, **before** installing a build with this change (until then the uploads carry
    columns the table lacks, are refused, and simply wait).
 2. Optional: the check query at the bottom. Expect 2 rows, `has_clock` and `guarded` true on both, `has_removed_at`
@@ -633,4 +635,121 @@ expected.
 - `lib/screens/profile/pv_child_screen.dart`, `pv_you_screen.dart`, `pv_you_sheets.dart`
 - `test/pp_children_sync_test.dart` (new), `test/sync_guard_contract_test.dart`
 - `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`, `docs/BACKEND-PATTERNS.md` (§16ii-h, reading list 38),
+  `docs/BEFORE-LAUNCH.md`
+
+---
+
+## Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders)
+
+**Date:** 2026-10-20 (planned and approved 2026-10-20). **Migration:** 0106 (**not yet run**). **Commit:** pending.
+
+**No merge decision was needed.** All nine tables are own-only: every policy is `auth.uid() = user_id`, and none
+mentions `my_partner_id()`. The father's phone writes only his own rows. So the rule is her cycle's: the phone's
+edit time wins (§16ii).
+
+**The problem (STILL-OPEN-BACKEND §1, the first half of the Pregnancy rows):**
+
+| Table | Store | Bug |
+|---|---|---|
+| `calendar_personal_events` | `CalendarStore` | Cloud wins per id, and a row only this phone holds is inserted again, so a deleted note comes back. The delete is a one-shot hard delete |
+| `bump_photos` | `BumpStore` | Same, and the hard delete **left the photo in Storage** for good |
+| `baby_talk` | `DailyStore` | Re-saving a day did a hard delete then an insert **under a new id**, so two phones each held a different "today" |
+| `daily_moods` | `DailyStore` | Local days were never dropped, so a mood cleared on another phone was pushed back |
+| `kept_affirmations` | `DailyStore` | A **union**: an un-kept affirmation could never leave |
+| `daily_movement_responses` | `DailyStore` | The cloud overwrote local answers, and the existing `updated_at` was never used |
+| `father_missions` | `DailyStore` (his phone) | A union, so un-done came back. **No UPDATE policy**, so an upsert would be refused (the 0099 trap) |
+| `weekly_journal_notes` | `MemoryStore` | Cloud wins per id, and a local row is inserted again; hard delete |
+| `reminders` | `ReminderStore` | Same, and a reminder removed on one phone **kept buzzing** on the other |
+
+None of the five stores fed the sign-out "unsent changes" warning.
+
+**Done (2026-10-20):**
+- [x] **New `OwnRowLedger`** (`lib/services/remote/own_row_ledger.dart`). It is `ChildLogLedger` without the child:
+  - no "which child" and no "whose row"; every row is upserted as us;
+  - keyed mode (`keyColumn: 'day'` or `'text'`): the key's value is the book id, and the upsert conflicts on
+    `user_id,<key>`;
+  - state mode (`hasRemovedAt: false`): no `removed_at` is sent, and every stamped key takes part in the merge;
+  - `onRemovalConfirmed`: a clean-up that must wait until the cloud has taken the removal (a Storage file).
+  - Step 9 reuses it. `ChildLogLedger` is untouched.
+- [x] Migration `0106_preg_part1_sync_clock.sql`:
+  - `updated_at` where it was missing;
+  - `removed_at` on all but `daily_movement_responses` (a state answer);
+  - **an own-row UPDATE policy on `father_missions`**;
+  - 0100's guard on all nine;
+  - a check query at the bottom.
+- [x] Stores, with the old calls and the old pull (`_syncFromCloudOld`) kept for revert:
+  - **`CalendarStore`**: add and edit stamp the row; delete is soft.
+  - **`BumpStore`**:
+    - add, favourite, caption and the media backfill stamp the row; delete is soft;
+    - **the Storage file is removed once the cloud confirms the removal**, so a failed upload never leaves the other
+      phone with a row pointing at nothing;
+    - a removal taken from the cloud deletes this phone's local file.
+  - **`DailyStore`**: five ledgers.
+    - `saveTalk` **keeps the day's id** and edits in place.
+    - Clearing a mood, un-keeping an affirmation and un-doing a mission are soft deletes.
+    - Movement is state.
+  - **`MemoryStore`**:
+    - add and edit stamp the row; delete is soft;
+    - local files go at once, the Storage copies after confirmation;
+    - a removal taken from the cloud deletes this phone's copies.
+  - **`ReminderStore`**: upsert, toggle and the reword stamp the row; remove is soft. **The pull keeps the alarms in
+    step**: a reminder taken from the cloud cancels this phone's alarm, then re-arms it if it is on (§16ii-g).
+  - Every store registers `SyncRegistry.registerPending` and clears its ledger on sign-out.
+- [x] Tests:
+  - New `test/own_row_ledger_test.dart` (13 cases):
+    - newer wins either way;
+    - a removal stays removed;
+    - the other phone's removal is taken;
+    - a legacy row takes the cloud's copy;
+    - a new row waits;
+    - the upload carries times and columns;
+    - keyed rows get their key and conflict target;
+    - a cleared mood uploads with its typed key;
+    - an un-kept affirmation stays gone;
+    - a state row sends no `removed_at` and is never beaten by an older answer;
+    - logged out, nothing is sent.
+  - New `test/preg_part1_sync_test.dart` (5 cases):
+    - re-saving a day's talk keeps one id;
+    - every store uses the ledger and reports pending;
+    - no live hard delete is left;
+    - the reminder pull cancels and re-arms;
+    - Storage waits for confirmation.
+  - `test/sync_guard_contract_test.dart`: the nine tables are guarded; `father_missions` has its UPDATE policy.
+
+**Verified (2026-10-20):**
+- `flutter analyze` is clean on the six source files and three test files.
+- 237 tests pass across 18 files: the Pregnancy store tests (bump ritual, Dear Baby vault, letter book, calendar
+  hub, messages, sign-out mute, reminder words), the reset coverage, and every sync, merge and schema test.
+
+**Known limits, named:**
+- **The media backfill stamps the row.** When a photo first reaches Storage, the new path is a real change other
+  phones need, so it counts as an edit. A caption changed at that same moment on another phone could lose to it.
+  Rare: the backfill runs on the phone that took the photo, soon after.
+- **Calendar dates are sent without an offset** (unchanged from before). Worth a look if her two phones are ever in
+  different time zones.
+- **Mixed versions.** Until both phones update, the old app still hard-deletes and re-inserts.
+
+**User runs (OWED):**
+1. 0106 in the Supabase SQL editor, **before** installing a build with this change. Until then the uploads carry
+   columns the tables lack, are refused, and simply wait.
+2. Optional: the check query at the bottom. Expect 9 rows:
+   - `has_clock` and `guarded` true on every row;
+   - `has_removed_at` true on all but `daily_movement_responses`;
+   - `has_update_policy` true for `father_missions`.
+
+**Owed (the two-phone walk, one account):**
+- delete a calendar note offline → it stays gone;
+- clear today's mood on A → cleared on B;
+- un-keep an affirmation → it stays un-kept;
+- remove a reminder on A → B stops buzzing;
+- delete a bump photo → it's gone on B, and its file is gone from Storage.
+
+**Files:**
+- `supabase/migrations/0106_preg_part1_sync_clock.sql` (new)
+- `lib/services/remote/own_row_ledger.dart` (new)
+- `lib/services/calendar_store.dart`, `bump_store.dart`, `daily_store.dart`, `memory_store.dart`,
+  `reminder_store.dart`
+- `test/own_row_ledger_test.dart` (new), `test/preg_part1_sync_test.dart` (new),
+  `test/sync_guard_contract_test.dart`
+- `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`, `docs/BACKEND-PATTERNS.md` (§16ii-i, reading list 39),
   `docs/BEFORE-LAUNCH.md`

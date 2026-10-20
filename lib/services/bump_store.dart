@@ -17,9 +17,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/bump_photo.dart';
 import '../models/journal_entry.dart';
 import 'journal_store.dart';
+import 'remote/own_row_ledger.dart';
 import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'remote/sync_row_book.dart';
 
 class BumpStore extends ChangeNotifier {
   BumpStore._();
@@ -29,6 +31,23 @@ class BumpStore extends ChangeNotifier {
 
   final List<BumpPhoto> _photos = [];
   bool _loaded = false;
+
+  /// Newer-wins sync for her photos (2026-10-20, sync log step 8, 0106).
+  final OwnRowLedger _sync = OwnRowLedger('bump_photos', 'bump_photos_sync');
+
+  /// Photos the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _sync.hasPending;
+
+  Map<String, Map<String, dynamic>> _live() =>
+      {for (final p in _photos) p.id: _toRow(p)};
+
+  /// The Storage file goes only once the cloud has taken the removal: if the
+  /// row upload failed and the file were already gone, her other phone would
+  /// hold a photo row pointing at nothing. The old delete never removed it
+  /// at all, so every deleted photo stayed in Storage.
+  Future<void> _pushWaiting() => _sync.push(_live,
+      onRemovalConfirmed: (_, cols) =>
+          StorageService.remove((cols['image_url'] ?? '').toString()));
 
   Future<void> init() async {
     if (_loaded) return;
@@ -41,6 +60,8 @@ class BumpStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(() => hasPending);
     _loaded = true;
     notifyListeners();
 
@@ -53,6 +74,9 @@ class BumpStore extends ChangeNotifier {
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _photos.clear();
+    _sync
+      ..clear()
+      ..save();
     notifyListeners();
   }
 
@@ -60,6 +84,42 @@ class BumpStore extends ChangeNotifier {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // Newer wins per photo, removals included (step 8, 0106).
+      final taken = await _sync.pull(liveKeys: _photos.map((p) => p.id));
+      final byId = {for (final p in _photos) p.id: p};
+      for (final r in taken) {
+        final id = r['id'] as String;
+        if (syncParseStamp(r['removed_at']) != null) {
+          // Removed on her other phone: drop this phone's file copy too.
+          final mine = byId.remove(id);
+          if (mine != null) _deleteLocalFile(mine.imageUrl);
+        } else {
+          byId[id] = _fromRow(r);
+        }
+      }
+      _photos
+        ..clear()
+        ..addAll(byId.values);
+      await _persist();
+      notifyListeners();
+      await _pushWaiting();
+      await _backfillMedia();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  void _deleteLocalFile(String path) {
+    try {
+      final f = File(path);
+      if (f.existsSync()) f.deleteSync();
+    } catch (_) {}
+  }
+
+  // Kept for revert (step 8, 2026-10-20): the cloud won per id and any photo
+  // only this phone held was inserted again, so a deleted photo came back.
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
     try {
       final rows = await SupabaseRepo.fetch('bump_photos');
       final byId = {for (final r in rows) r['id'].toString(): _fromRow(r)};
@@ -94,13 +154,17 @@ class BumpStore extends ChangeNotifier {
           isFavorite: p.isFavorite,
         );
         changed = true;
-        try {
-          await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
-              onConflict: 'id');
-        } catch (_) {}
+        // try { // kept for revert (step 8)
+        //   await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
+        //       onConflict: 'id');
+        // } catch (_) {}
+        _sync.touch(p.id);
       }
     }
-    if (changed) await _persist();
+    if (changed) {
+      await _persist();
+      await _pushWaiting();
+    }
   }
 
   Map<String, dynamic> _toRow(BumpPhoto p) => {
@@ -153,13 +217,15 @@ class BumpStore extends ChangeNotifier {
       caption: caption,
     );
     _photos.add(photo);
+    _sync.touch(id);
     notifyListeners();
     await _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.insert('bump_photos', _toRow(photo));
-      } catch (_) {}
-    }
+    // if (SupabaseRepo.isLoggedIn) { // kept for revert (step 8)
+    //   try {
+    //     await SupabaseRepo.insert('bump_photos', _toRow(photo));
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
 
     // Mirror into the Journal (its own file copy) → also shows in the Calendar.
     final journalPath = await JournalStore.saveImage(sourcePath);
@@ -177,45 +243,54 @@ class BumpStore extends ChangeNotifier {
     final i = _photos.indexWhere((p) => p.id == id);
     if (i < 0) return;
     _photos[i] = _photos[i].copyWith(isFavorite: !_photos[i].isFavorite);
+    _sync.touch(id);
     notifyListeners();
     await _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
-            onConflict: 'id');
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): a one-shot upsert, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
+    //         onConflict: 'id');
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
   }
 
   Future<void> updateCaption(String id, String caption) async {
     final i = _photos.indexWhere((p) => p.id == id);
     if (i < 0) return;
     _photos[i] = _photos[i].copyWith(caption: caption);
+    _sync.touch(id);
     notifyListeners();
     await _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
-            onConflict: 'id');
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): a one-shot upsert, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('bump_photos', _toRow(_photos[i]),
+    //         onConflict: 'id');
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
   }
 
+  /// A soft delete (step 8, 0106). The removal travels to her other phones;
+  /// the Storage file goes once the cloud has confirmed it ([_pushWaiting]).
   Future<void> delete(String id) async {
     for (final p in _photos.where((p) => p.id == id)) {
-      try {
-        final f = File(p.imageUrl);
-        if (f.existsSync()) f.deleteSync();
-      } catch (_) {}
+      _deleteLocalFile(p.imageUrl);
+      _sync.remove(id, _toRow(p));
     }
     _photos.removeWhere((p) => p.id == id);
     notifyListeners();
     await _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.delete('bump_photos', id);
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): a one-shot hard delete that left the Storage
+    // file behind.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.delete('bump_photos', id);
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
     // Remove the mirrored journal entry (and its file copy).
     await JournalStore.instance.deleteEntry('bump_$id');
   }

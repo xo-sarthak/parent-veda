@@ -14,8 +14,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/reminder.dart';
 import 'notification_service.dart';
+import 'remote/own_row_ledger.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'remote/sync_row_book.dart';
 
 class ReminderStore extends ChangeNotifier {
   ReminderStore._();
@@ -24,6 +26,17 @@ class ReminderStore extends ChangeNotifier {
   static const _key = 'reminders';
   final List<Reminder> _items = [];
   bool _loaded = false;
+
+  /// Newer-wins sync for her reminders (2026-10-20, sync log step 8, 0106).
+  final OwnRowLedger _sync = OwnRowLedger('reminders', 'reminders_sync');
+
+  /// Reminders the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _sync.hasPending;
+
+  Map<String, Map<String, dynamic>> _live() =>
+      {for (final r in _items) r.id: _toRow(r)};
+
+  Future<void> _pushWaiting() => _sync.push(_live);
 
   Future<void> init() async {
     if (_loaded) return;
@@ -39,6 +52,8 @@ class ReminderStore extends ChangeNotifier {
               (e) => Reminder.fromJson(Map<String, dynamic>.from(e as Map))));
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(() => hasPending);
     _rewordOldReminders();
     _loaded = true;
     notifyListeners();
@@ -100,6 +115,9 @@ class ReminderStore extends ChangeNotifier {
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _items.clear();
+    _sync
+      ..clear()
+      ..save();
     notifyListeners();
   }
 
@@ -107,6 +125,42 @@ class ReminderStore extends ChangeNotifier {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // Newer wins per reminder, removals included (step 8, 0106). The fact
+      // syncs; each phone keeps its own alarms in step with it (§16ii-g): a
+      // reminder removed or switched off on her other phone stops buzzing
+      // here, and one changed there is re-armed here.
+      final taken = await _sync.pull(
+          liveKeys: _items.map((r) => r.id), orderBy: 'created_at');
+      final byId = {for (final r in _items) r.id: r};
+      for (final row in taken) {
+        final id = row['id'] as String;
+        final mine = byId[id];
+        if (mine != null) _cancelOs(mine);
+        if (syncParseStamp(row['removed_at']) != null) {
+          byId.remove(id);
+        } else {
+          final theirs = _fromRow(row);
+          byId[id] = theirs;
+          if (theirs.enabled) _scheduleOs(theirs);
+        }
+      }
+      _items
+        ..clear()
+        ..addAll(byId.values);
+      // The cloud may still hold the old wording; reword before scheduling.
+      _rewordOldReminders(push: true);
+      await _persist();
+      notifyListeners();
+      await _pushWaiting();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  // Kept for revert (step 8, 2026-10-20): the cloud won per id and any
+  // reminder only this phone held was inserted again, so a removed reminder
+  // came back, and kept buzzing on the phone that still held it.
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
     try {
       final rows = await SupabaseRepo.fetch('reminders', orderBy: 'created_at');
       final byId = {for (final r in rows) r['id'].toString(): _fromRow(r)};
@@ -126,19 +180,28 @@ class ReminderStore extends ChangeNotifier {
     } catch (_) {/* offline - keep local */}
   }
 
-  // Fire-and-forget cloud writes (like _persist) - best-effort.
+  // Cloud writes go through the ledger (step 8, 0106): stamped, kept until
+  // the cloud confirms, retried on the next sync. Still not awaited by the
+  // callers, like _persist.
   Future<void> _cloudPush(Reminder r) async {
-    if (!SupabaseRepo.isLoggedIn) return;
-    try {
-      await SupabaseRepo.upsert('reminders', _toRow(r), onConflict: 'id');
-    } catch (_) {/* offline - syncs up on next init */}
+    _sync.touch(r.id);
+    await _pushWaiting();
+    // Kept for revert (step 8): a one-shot upsert, lost offline.
+    // if (!SupabaseRepo.isLoggedIn) return;
+    // try {
+    //   await SupabaseRepo.upsert('reminders', _toRow(r), onConflict: 'id');
+    // } catch (_) {/* offline - syncs up on next init */}
   }
 
-  Future<void> _cloudDelete(String id) async {
-    if (!SupabaseRepo.isLoggedIn) return;
-    try {
-      await SupabaseRepo.delete('reminders', id);
-    } catch (_) {/* offline - best-effort */}
+  /// A soft delete: the removal travels to her other phones.
+  Future<void> _cloudDelete(Reminder r) async {
+    _sync.remove(r.id, _toRow(r));
+    await _pushWaiting();
+    // Kept for revert (step 8): a one-shot hard delete, lost offline.
+    // if (!SupabaseRepo.isLoggedIn) return;
+    // try {
+    //   await SupabaseRepo.delete('reminders', id);
+    // } catch (_) {/* offline - best-effort */}
   }
 
   // camelCase model <-> snake_case columns. `dayOfMonth` -> `day_of_month`;
@@ -267,7 +330,7 @@ class ReminderStore extends ChangeNotifier {
     _items.removeWhere((x) => x.id == id);
     if (r != null) _cancelOs(r);
     _persistNotify();
-    _cloudDelete(id); // remove from cloud too
+    if (r != null) _cloudDelete(r); // remove from cloud too
   }
 
   void toggle(String id) {

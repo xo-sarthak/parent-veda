@@ -20,7 +20,7 @@ detail behind each step. `docs/BACKEND-SYNC-LOG.md` is the dated history of the 
 step, newest at the bottom. When a step lands: tick it here, add its log entry there, and update
 `docs/BEFORE-LAUNCH.md`.
 
-### Done (committed, and every migration run and checked on the live database, except step 7: committed `d76594b` 2026-10-20, 0105 not yet run)
+### Done (all committed, every migration run on the live database; 0105 run 2026-10-20)
 
 | Step | What | Migration | Commit |
 |---|---|---|---|
@@ -30,22 +30,22 @@ step, newest at the bottom. When a step lands: tick it here, add its log entry t
 | 4 | Server guard `pv_sync_newer_wins` (an older edit can't overwrite a newer one) | 0100 | `a0eb5b9` |
 | 5 | Parenting logs: feeds, sleep, nappies, pumping, tummy time, growth | 0101 | `f7ed88e` |
 | 6 | Parenting records: documents, health, milestones, vaccines, emergency card | 0104 | `af76d8f`, docs `2ba778e` |
-| 7 | Parenting's last two: the child profile (soft delete + Restore) and the name votes | 0105 (**the user runs it**) | `d76594b` |
+| 7 | Parenting's last two: the child profile (soft delete + Restore) and the name votes | 0105 (run 2026-10-20) | `d76594b` |
+| 8 | Pregnancy part 1: calendar, bump photos, the daily tables, weekly notes, reminders (`OwnRowLedger`) | 0106 (**the user runs it**) | pending |
 
 ### Still to do, in order
 
-**5 more steps finish the sync work.** Each step is the same shape: plan → user decides the merge rule → migration →
+**4 more steps finish the sync work.** Each step is the same shape: plan → user decides the merge rule → migration →
 store changes → a pure merge test → the user runs the migration and its check query → log entry.
 
 | Step | What | Where the detail is | Size |
 |---|---|---|---|
-| **8 (NEXT)** | Pregnancy part 1: calendar events, bump photos, daily moods and the other daily tables, weekly journal notes, reminders | §1 Pregnancy | large |
-| 9 | Pregnancy part 2: medicines and their logs, scans and appointments, symptoms, the tools (weight, movement, kegel, contractions) | §1 Pregnancy | large |
+| **9 (NEXT)** | Pregnancy part 2: medicines and their logs, scans and appointments, symptoms, the tools (weight, movement, kegel, contractions) | §1 Pregnancy | large |
 | 10 | Blob stores, per-item merge for the lists people curate (saved readings, hospital bag, checklists, cart), so two phones editing different items both keep their edits. Records hiding in blobs (orders, scan reports, readings) move to rows | §2 | medium |
 | 11 | Uploads that fail silently: batch the first-sync upserts, and make sure every converted store reports its waiting changes to the sign-out warning | §3 | small (mostly done inside steps 1-9) |
 | 12 | Tidy-up: local-only stores cleared on sign-out (§4), purge soft-deleted rows after 90 days (§5), the small items (§7) | §4, §5, §7 | small |
 
-Steps 8 and 9 may be one step or two; decide when step 8 is planned. After step 12 the sync work is complete. The
+Step 9 reuses step 8's `OwnRowLedger` (`lib/services/remote/own_row_ledger.dart`): its tables are own-only too, but check each policy first. After step 12 the sync work is complete. The
 backend is then **launch-ready** once the user's checks below are done and the backend items in BEFORE-LAUNCH §1 and
 §7 (crash reporting, uptime alerts, backups) are closed.
 
@@ -129,12 +129,16 @@ backend is then **launch-ready** once the user's checks below are done and the b
   - Vaccine reminders are shared: the time syncs and each phone arms its own alarm. Turning a reminder off now
     cancels the alarm, which it never did.
   - See `docs/BACKEND-SYNC-LOG.md` step 6.
-- **The child profile and the name votes (step 7, 2026-10-20, migration 0105, NOT YET RUN).**
+- **The child profile and the name votes (step 7, 2026-10-20, migration 0105, run 2026-10-20).**
   - Removing a child is a soft delete; `my_child_ids()` is unchanged, so the records stay reachable, and "Removed
     children" on the You screen restores one.
   - The growth figures don't move the clock (`setMeasures`).
   - A skipped name stays skipped.
   - See `docs/BACKEND-SYNC-LOG.md` step 7 and BACKEND-PATTERNS §16ii-h.
+- **Pregnancy part 1 (step 8, 2026-10-20, migration 0106, NOT YET RUN).** Calendar notes, bump photos, the five
+  daily tables, weekly notes and reminders, on the new `OwnRowLedger` (all own-only, so newer wins with no
+  decision). Bump and note photos leave Storage once the removal is confirmed; reminders re-arm or cancel their
+  alarms after a pull; `father_missions` got its missing UPDATE policy. See `docs/BACKEND-SYNC-LOG.md` step 8.
 
 ---
 
@@ -173,12 +177,12 @@ None of these tables has `updated_at` except where noted; all need `removed_at`.
 
 | Store | Tables |
 |---|---|
-| `calendar_store.dart` | `calendar_personal_events` |
-| `bump_store.dart` | `bump_photos` |
-| `daily_store.dart` | `daily_moods`, `baby_talk`, `kept_affirmations`, `daily_movement_responses`, `father_missions` |
+| ~~`calendar_store.dart`~~ | ~~`calendar_personal_events`~~ **DONE 2026-10-20 (0106, not yet run)** |
+| ~~`bump_store.dart`~~ | ~~`bump_photos`~~ **DONE 2026-10-20 (0106, not yet run)** |
+| ~~`daily_store.dart`~~ | ~~`daily_moods`, `baby_talk`, `kept_affirmations`, `daily_movement_responses`, `father_missions`~~ **DONE 2026-10-20 (0106, not yet run)** |
 | `medicine_store.dart` | `medications`, `medication_logs` |
-| `memory_store.dart` | `weekly_journal_notes` |
-| `reminder_store.dart` | `reminders` |
+| ~~`memory_store.dart`~~ | ~~`weekly_journal_notes`~~ **DONE 2026-10-20 (0106, not yet run)** |
+| ~~`reminder_store.dart`~~ | ~~`reminders`~~ **DONE 2026-10-20 (0106, not yet run)** |
 | `scans_store.dart` | `completed_scans`, `appointments` |
 | `symptom_store.dart` | `symptom_logs` |
 | `tools_store.dart` | `weight_profile`, `weight_entries`, `movement_sessions`, `kegel_state`, `contraction_sessions` |
@@ -198,8 +202,8 @@ but it is not used as a merge clock. The rest have neither column.
 | ~~`pp_health_data.dart`~~ | ~~`pp_medications`, `pp_prescriptions`, `pp_allergies`, `pp_symptoms`, `pp_reports`, `pp_doctor_visits`, `pp_doctor_questions`, `pp_emergency_cards`~~ **DONE 2026-10-18 (0104)** |
 | ~~`pp_milestones_data.dart`~~ | ~~`pp_milestone_observations` (composite key)~~ **DONE 2026-10-18 (0104)** |
 | ~~`pp_vaccine_data.dart`~~ | ~~`pp_vaccine_doses` (composite key)~~ **DONE 2026-10-18 (0104)** |
-| ~~`pp_names_data.dart`~~ | ~~`pp_name_votes`~~ **DONE 2026-10-20 (0105, not yet run)** |
-| ~~`pp_child_profile.dart`~~ | ~~`children` (shared read with the partner)~~ **DONE 2026-10-20 (0105, not yet run)**: soft delete + Restore |
+| ~~`pp_names_data.dart`~~ | ~~`pp_name_votes`~~ **DONE 2026-10-20 (0105, run 2026-10-20)** |
+| ~~`pp_child_profile.dart`~~ | ~~`children` (shared read with the partner)~~ **DONE 2026-10-20 (0105, run 2026-10-20)**: soft delete + Restore |
 
 Child records are shared between both parents (FAMILY-MODEL.md), so two people really can edit the same row; see §6
 before choosing the merge.
@@ -375,7 +379,7 @@ left alone for now so two sessions don't clash:
    (step 5, 0101 run 2026-10-17).** ~~Next in Parenting: documents, health, milestones and vaccines~~ **DONE
    2026-10-18 (step 6, 0104 run 2026-10-18).** ~~Left in Parenting: `pp_name_votes` and the `children` profile (step 7).~~
    **DONE 2026-10-20 (step 7, 0105).**
-5. **§1 Pregnancy tables**, one migration.
+5. **§1 Pregnancy tables**, one migration. ~~Part 1~~ **DONE 2026-10-20 (step 8, 0106).** Part 2 is step 9.
 6. **§4, §5, §7** as tidy-up.
 
 For each step: write a pure merge test with no network (like `test/ttc_row_merge_test.dart`), extend

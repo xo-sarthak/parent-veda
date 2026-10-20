@@ -3259,6 +3259,44 @@ a skip is `liked = false`, never a delete. **Read the policy before you classify
 
 History: `docs/BACKEND-SYNC-LOG.md` step 7.
 
+### 16ii-i. One ledger for one owner's rows, and clean-up that waits for the cloud (0106, 2026-10-20)
+
+Step 8 converted nine Pregnancy tables in five stores. Three ideas came out of it.
+
+**1. Write the loop once.** Steps 1–7 each grew their own push loop: one at a time, upload only the dirty rows,
+confirm, retry next sync. The child tables shared one (`ChildLogLedger`). Pregnancy's tables are simpler: own-only,
+so there's no "which child" and no "whose row". They got their own small class, `OwnRowLedger`, which every
+single-owner table can use, including step 9's. Two copies of a loop like this drift: one gets the "a change made
+during the upload" fix, and the other doesn't.
+
+- **Keyed mode** covers tables with no `id`. A mood is one row per `day`, a kept affirmation one per `text`. The key's
+  value becomes the book id, and the upsert conflicts on `user_id,<key>`. The key keeps its type in the upload,
+  because the book holds a copy of the row's columns rather than rebuilding them from the string.
+- **State mode** covers rows that are answers, not list items ("felt movement today: not yet"). They're never
+  removed, only changed, so no `removed_at` is sent, and every key the book has stamped joins the merge. That's
+  step 6's `keysFor` lesson, built in.
+
+> General fact: **a sync rule is only as safe as its least-careful copy.** Put the rule (newer wins, soft delete,
+> confirm before forgetting) in one place, and let stores supply only what differs: the table, the key, and how to
+> turn a row into their model.
+
+**2. Clean-up that can't be undone waits for the cloud.** Deleting a bump photo used to remove the row and leave the
+file in Storage forever. The obvious fix, deleting the file at the same time as the row, is wrong offline. If the
+row's removal fails to upload, her other phone still has the row, now pointing at a file that's gone. So the file is
+removed only once the cloud confirms the removal (`onRemovalConfirmed`). This phone's local copy can go at once,
+because it's only a cache.
+
+> General fact: **order irreversible side effects after the commit that makes them safe.** It's the same idea as the
+> outbox pattern: decide in the transaction, and act on the outside world only after it's durable.
+
+**3. Read the policy before you classify the table, again.** `father_missions` had select, insert and delete
+policies, but no UPDATE. Under the old code that was fine: it only ever inserted or deleted. The new code upserts,
+and Postgres checks an upsert against the UPDATE policy even for a brand-new row (§16ii-c). Without 0106's new
+policy, every mission upload would have been refused, silently. **Changing how a client writes can change which
+policies it needs.**
+
+History: `docs/BACKEND-SYNC-LOG.md` step 8.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3351,3 +3389,4 @@ History: `docs/BACKEND-SYNC-LOG.md` step 7.
 36. `supabase/functions/razorpay-create-order/index.ts` `priceLines` — the server prices the order; the phone never does (§16hh).
 37. `lib/ttc/ttc_row_merge.dart`, `CycleStore` / `TtcLogStore` push and pull, `lib/services/auth/local_owner.dart`, `SyncRegistry.registerReset` — newer wins, soft deletes, dirty flags, and whose data is on the phone (§16ii).
 38. `0105_pp_children_votes_sync_clock.sql` → `childrenMerge` / `ChildProfileStore.setMeasures` — a soft delete on the access root, and a mirror column that must not move the clock (§16ii-h).
+39. `lib/services/remote/own_row_ledger.dart` → `BumpStore._pushWaiting` — one sync loop for every single-owner table, keyed and state rows, and a Storage clean-up that waits for the cloud (§16ii-i).

@@ -22,7 +22,9 @@ import '../models/journey_node.dart';
 import 'journal_store.dart';
 import 'prepare_store.dart';
 import 'pregnancy_controller.dart';
+import 'remote/own_row_ledger.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_row_book.dart';
 import 'remote/sync_registry.dart';
 import 'scans_store.dart';
 import 'tools_store.dart';
@@ -35,6 +37,18 @@ class CalendarStore extends ChangeNotifier {
 
   final List<CalendarEvent> _personal = [];
   bool _loaded = false;
+
+  /// Newer-wins sync for her notes (2026-10-20, sync log step 8, 0106).
+  final OwnRowLedger _sync =
+      OwnRowLedger('calendar_personal_events', 'calendar_personal_events_sync');
+
+  /// Notes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _sync.hasPending;
+
+  Map<String, Map<String, dynamic>> _live() =>
+      {for (final e in _personal) e.id: e.toJson()};
+
+  Future<void> _pushWaiting() => _sync.push(_live);
 
   Future<void> init() async {
     if (_loaded) return;
@@ -49,6 +63,8 @@ class CalendarStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(() => hasPending);
     _loaded = true;
     notifyListeners();
 
@@ -63,6 +79,9 @@ class CalendarStore extends ChangeNotifier {
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _personal.clear();
+    _sync
+      ..clear()
+      ..save();
     notifyListeners();
   }
 
@@ -70,6 +89,32 @@ class CalendarStore extends ChangeNotifier {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // Newer wins per note, removals included (step 8, 0106).
+      final taken = await _sync.pull(
+          liveKeys: _personal.map((e) => e.id), orderBy: 'date');
+      final byId = {for (final e in _personal) e.id: e};
+      for (final r in taken) {
+        final id = r['id'] as String;
+        if (syncParseStamp(r['removed_at']) != null) {
+          byId.remove(id);
+        } else {
+          byId[id] = CalendarEvent.personalFromJson(r);
+        }
+      }
+      _personal
+        ..clear()
+        ..addAll(byId.values);
+      await _persist();
+      notifyListeners();
+      await _pushWaiting();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  // Kept for revert (step 8, 2026-10-20): the cloud won per id and any note
+  // only this phone held was inserted again, so a deleted note came back.
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
     try {
       final rows = await SupabaseRepo.fetch('calendar_personal_events',
           orderBy: 'date');
@@ -101,14 +146,16 @@ class CalendarStore extends ChangeNotifier {
       isSystemGenerated: false,
     );
     _personal.add(ev);
+    _sync.touch(ev.id);
     notifyListeners();
     await _persist();
-    // Push to the cloud (best-effort).
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.insert('calendar_personal_events', ev.toJson());
-      } catch (_) {/* offline - syncs up on next init */}
-    }
+    // Kept for revert (step 8): a one-shot insert, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.insert('calendar_personal_events', ev.toJson());
+    //   } catch (_) {/* offline - syncs up on next init */}
+    // }
+    await _pushWaiting();
   }
 
   /// Change one of her notes in place (the calendar's Edit, 2026-10-17). Same
@@ -126,29 +173,38 @@ class CalendarStore extends ChangeNotifier {
       isSystemGenerated: false,
     );
     _personal[i] = ev;
+    _sync.touch(id);
     notifyListeners();
     await _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        final row = ev.toJson()..remove('id');
-        await SupabaseRepo.update('calendar_personal_events', id, row);
-      } catch (_) {/* offline - best-effort */}
-    }
+    // Kept for revert (step 8): a one-shot update, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     final row = ev.toJson()..remove('id');
+    //     await SupabaseRepo.update('calendar_personal_events', id, row);
+    //   } catch (_) {/* offline - best-effort */}
+    // }
+    await _pushWaiting();
   }
 
   /// Her notes, as stored (the hub assembles its own day items from these).
   List<CalendarEvent> get personal => List.unmodifiable(_personal);
 
+  /// A soft delete (step 8, 0106): the removal travels to her other phones
+  /// and an older copy can't bring the note back.
   Future<void> deletePersonal(String id) async {
-    _personal.removeWhere((e) => e.id == id);
+    final i = _personal.indexWhere((e) => e.id == id);
+    if (i < 0) return;
+    final gone = _personal.removeAt(i);
+    _sync.remove(id, gone.toJson());
     notifyListeners();
     await _persist();
-    // Delete from the cloud too (NEW vs symptom).
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.delete('calendar_personal_events', id);
-      } catch (_) {/* offline - best-effort */}
-    }
+    // Kept for revert (step 8): a one-shot hard delete, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.delete('calendar_personal_events', id);
+    //   } catch (_) {/* offline - best-effort */}
+    // }
+    await _pushWaiting();
   }
 
   Future<void> _persist() async {

@@ -16,9 +16,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/memory_models.dart';
+import 'remote/own_row_ledger.dart';
 import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'remote/sync_row_book.dart';
 
 class MemoryStore extends ChangeNotifier {
   MemoryStore._();
@@ -30,6 +32,25 @@ class MemoryStore extends ChangeNotifier {
   final List<JournalEntry> _journal = [];
   final List<PhotoMemory> _photos = [];
   bool _loaded = false;
+
+  /// Newer-wins sync for her weekly notes (2026-10-20, sync log step 8, 0106).
+  final OwnRowLedger _sync =
+      OwnRowLedger('weekly_journal_notes', 'weekly_journal_notes_sync');
+
+  /// Notes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _sync.hasPending;
+
+  Map<String, Map<String, dynamic>> _live() =>
+      {for (final e in _journal) e.id: _noteToRow(e)};
+
+  /// A removed note's photos leave Storage only once the cloud has taken the
+  /// removal, so her other phone never holds a note pointing at nothing.
+  Future<void> _pushWaiting() => _sync.push(_live,
+      onRemovalConfirmed: (_, cols) {
+        for (final p in (cols['photos'] as List?) ?? const []) {
+          StorageService.remove(p.toString());
+        }
+      });
 
   /// Journal entries, newest first.
   List<JournalEntry> get journal {
@@ -75,6 +96,8 @@ class MemoryStore extends ChangeNotifier {
       }
       await _migrateToOnePerWeek();
     } catch (_) {/* start empty */}
+    await _sync.load();
+    SyncRegistry.registerPending(() => hasPending);
     _loaded = true;
     notifyListeners();
 
@@ -89,6 +112,9 @@ class MemoryStore extends ChangeNotifier {
   void _resetLocal() {
     _journal.clear();
     _photos.clear();
+    _sync
+      ..clear()
+      ..save();
     notifyListeners();
   }
 
@@ -96,6 +122,44 @@ class MemoryStore extends ChangeNotifier {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // Newer wins per note, removals included (step 8, 0106).
+      final taken = await _sync.pull(liveKeys: _journal.map((e) => e.id));
+      final byId = {for (final e in _journal) e.id: e};
+      for (final r in taken) {
+        final id = r['id'] as String;
+        if (syncParseStamp(r['removed_at']) != null) {
+          // Removed on her other phone: drop this phone's file copies too.
+          final mine = byId.remove(id);
+          if (mine != null) _deleteLocalFiles(mine.photoPaths);
+        } else {
+          byId[id] = _noteFromRow(r);
+        }
+      }
+      _journal
+        ..clear()
+        ..addAll(byId.values);
+      await _persistJournal();
+      notifyListeners();
+      await _pushWaiting();
+      await _backfillMedia();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  void _deleteLocalFiles(List<String> paths) {
+    for (final p in paths) {
+      try {
+        final f = File(p);
+        if (f.existsSync()) f.deleteSync();
+      } catch (_) {}
+    }
+  }
+
+  // Kept for revert (step 8, 2026-10-20): the cloud won per id and any note
+  // only this phone held was inserted again, so a deleted note came back.
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
     try {
       final rows = await SupabaseRepo.fetch('weekly_journal_notes');
       final byId = {for (final r in rows) r['id'].toString(): _noteFromRow(r)};
@@ -122,13 +186,17 @@ class MemoryStore extends ChangeNotifier {
       if (!listEquals(paths, e.photoPaths)) {
         e.photoPaths = paths;
         changed = true;
-        try {
-          await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(e),
-              onConflict: 'id');
-        } catch (_) {}
+        // try { // kept for revert (step 8)
+        //   await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(e),
+        //       onConflict: 'id');
+        // } catch (_) {}
+        _sync.touch(e.id);
       }
     }
-    if (changed) await _persistJournal();
+    if (changed) {
+      await _persistJournal();
+      await _pushWaiting();
+    }
   }
 
   Map<String, dynamic> _noteToRow(JournalEntry e) => {
@@ -229,14 +297,17 @@ class MemoryStore extends ChangeNotifier {
       existing.text = text;
       existing.photoPaths = capped;
       await _deleteFiles(removed);
+      _sync.touch(existing.id);
       await _persistJournal();
       notifyListeners();
-      if (SupabaseRepo.isLoggedIn) {
-        try {
-          await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(existing),
-              onConflict: 'id');
-        } catch (_) {}
-      }
+      // Kept for revert (step 8): a one-shot upsert, lost offline.
+      // if (SupabaseRepo.isLoggedIn) {
+      //   try {
+      //     await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(existing),
+      //         onConflict: 'id');
+      //   } catch (_) {}
+      // }
+      await _pushWaiting();
       return existing;
     }
     final entry = JournalEntry(
@@ -249,13 +320,15 @@ class MemoryStore extends ChangeNotifier {
       photoPaths: capped,
     );
     _journal.add(entry);
+    _sync.touch(entry.id);
     await _persistJournal();
     notifyListeners();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.insert('weekly_journal_notes', _noteToRow(entry));
-      } catch (_) {}
-    }
+    // if (SupabaseRepo.isLoggedIn) { // kept for revert (step 8)
+    //   try {
+    //     await SupabaseRepo.insert('weekly_journal_notes', _noteToRow(entry));
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
     return entry;
   }
 
@@ -270,28 +343,38 @@ class MemoryStore extends ChangeNotifier {
       e.photoPaths = capped;
       await _deleteFiles(removed);
     }
+    _sync.touch(e.id);
     await _persistJournal();
     notifyListeners();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(e),
-            onConflict: 'id');
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): a one-shot upsert, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('weekly_journal_notes', _noteToRow(e),
+    //         onConflict: 'id');
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
   }
 
   Future<void> deleteJournal(String id) async {
     final idx = _journal.indexWhere((x) => x.id == id);
     if (idx < 0) return;
     final e = _journal.removeAt(idx);
-    await _deleteFiles(e.photoPaths);
+    // A soft delete (step 8, 0106): the removal travels to her other phones.
+    // The files on this phone go now; the Storage copies once the cloud has
+    // taken the removal ([_pushWaiting]).
+    // await _deleteFiles(e.photoPaths); // kept for revert
+    _deleteLocalFiles(e.photoPaths);
+    _sync.remove(id, _noteToRow(e));
     await _persistJournal();
     notifyListeners();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.delete('weekly_journal_notes', id);
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): a one-shot hard delete, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.delete('weekly_journal_notes', id);
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
   }
 
   Future<void> _deleteFiles(List<String> paths) async {

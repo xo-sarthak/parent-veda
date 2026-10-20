@@ -16,8 +16,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/own_row_ledger.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'remote/sync_row_book.dart';
 
 /// A single Talk-To-Baby message saved into Dear Baby. Text-based for now
 /// (spoken notes are transcribed via speech-to-text before saving).
@@ -80,6 +82,53 @@ class DailyStore extends ChangeNotifier {
   final Map<int, String> _movement = {};
   final Set<int> _missionsDone = {}; // days whose Father mission is marked done
   bool _loaded = false;
+
+  // --- newer-wins sync, one ledger per table (2026-10-20, sync log step 8,
+  //     0106). All five tables are own-only. Moods, movement and missions are
+  //     keyed by `day`, kept affirmations by their `text`; movement answers
+  //     are state, never removed. -------------------------------------------
+  final OwnRowLedger _moodSync =
+      OwnRowLedger('daily_moods', 'daily_moods_sync', keyColumn: 'day');
+  final OwnRowLedger _talkSync = OwnRowLedger('baby_talk', 'baby_talk_sync');
+  final OwnRowLedger _keptSync = OwnRowLedger(
+      'kept_affirmations', 'kept_affirmations_sync',
+      keyColumn: 'text');
+  final OwnRowLedger _moveSync = OwnRowLedger(
+      'daily_movement_responses', 'daily_movement_sync',
+      keyColumn: 'day', hasRemovedAt: false);
+  final OwnRowLedger _missionSync =
+      OwnRowLedger('father_missions', 'father_missions_sync', keyColumn: 'day');
+
+  List<OwnRowLedger> get _ledgers =>
+      [_moodSync, _talkSync, _keptSync, _moveSync, _missionSync];
+
+  /// Changes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _ledgers.any((l) => l.hasPending);
+
+  Map<String, Map<String, dynamic>> _moodRows() => {
+        for (final e in _moods.entries)
+          '${e.key}': {'day': e.key, 'mood_id': e.value},
+      };
+  Map<String, Map<String, dynamic>> _talkRows() =>
+      {for (final e in _talk) e.id: _talkToRow(e)};
+  Map<String, Map<String, dynamic>> _keptRows() => {
+        for (final t in _kept) t: {'text': t},
+      };
+  Map<String, Map<String, dynamic>> _moveRows() => {
+        for (final e in _movement.entries)
+          '${e.key}': {'day': e.key, 'response': e.value},
+      };
+  Map<String, Map<String, dynamic>> _missionRows() => {
+        for (final d in _missionsDone) '$d': {'day': d},
+      };
+
+  Future<void> _pushAll() async {
+    await _moodSync.push(_moodRows);
+    await _talkSync.push(_talkRows);
+    await _keptSync.push(_keptRows);
+    await _moveSync.push(_moveRows);
+    await _missionSync.push(_missionRows);
+  }
 
   // --- getters ---------------------------------------------------------------
 
@@ -146,6 +195,10 @@ class DailyStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    for (final l in _ledgers) {
+      await l.load();
+    }
+    SyncRegistry.registerPending(() => hasPending);
     _loaded = true;
     notifyListeners();
 
@@ -163,6 +216,11 @@ class DailyStore extends ChangeNotifier {
     _kept.clear();
     _movement.clear();
     _missionsDone.clear();
+    for (final l in _ledgers) {
+      l
+        ..clear()
+        ..save();
+    }
     notifyListeners();
   }
 
@@ -170,6 +228,76 @@ class DailyStore extends ChangeNotifier {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
     if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // Newer wins per row, removals included (step 8, 0106). Each pull
+      // returns the cloud rows that are newer than this phone's; each
+      // carries its key as `id`.
+      bool gone(Map<String, dynamic> r) =>
+          syncParseStamp(r['removed_at']) != null;
+      int dayOf(Map<String, dynamic> r) => int.tryParse('${r['id']}') ?? -1;
+
+      for (final r in await _moodSync.pull(
+          liveKeys: _moods.keys.map((d) => '$d'), orderBy: 'day')) {
+        if (gone(r)) {
+          _moods.remove(dayOf(r));
+        } else {
+          _moods[dayOf(r)] = (r['mood_id'] ?? '').toString();
+        }
+      }
+      await _persist(_moodKey,
+          jsonEncode(_moods.map((k, v) => MapEntry(k.toString(), v))));
+
+      final talkById = {for (final e in _talk) e.id: e};
+      for (final r in await _talkSync.pull(liveKeys: talkById.keys)) {
+        if (gone(r)) {
+          talkById.remove(r['id']);
+        } else {
+          talkById[r['id'] as String] = _talkFromRow(r);
+        }
+      }
+      _talk
+        ..clear()
+        ..addAll(talkById.values);
+      await _persist(
+          _talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
+
+      for (final r in await _keptSync.pull(liveKeys: List.of(_kept))) {
+        final t = r['id'] as String;
+        if (gone(r)) {
+          _kept.remove(t);
+        } else if (!_kept.contains(t)) {
+          _kept.add(t);
+        }
+      }
+      await _persist(_keptKey, jsonEncode(_kept));
+
+      for (final r in await _moveSync.pull(
+          liveKeys: _movement.keys.map((d) => '$d'), orderBy: 'day')) {
+        _movement[dayOf(r)] = (r['response'] ?? '').toString();
+      }
+      await _persist(_movementKey,
+          jsonEncode(_movement.map((k, v) => MapEntry(k.toString(), v))));
+
+      for (final r in await _missionSync.pull(
+          liveKeys: _missionsDone.map((d) => '$d'), orderBy: 'day')) {
+        if (gone(r)) {
+          _missionsDone.remove(dayOf(r));
+        } else {
+          _missionsDone.add(dayOf(r));
+        }
+      }
+      await _persist(_missionKey, jsonEncode(_missionsDone.toList()));
+
+      notifyListeners();
+      await _pushAll();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  // Kept for revert (step 8, 2026-10-20). Moods and movement never dropped a
+  // local day, kept affirmations and missions were a union, and baby talk
+  // re-inserted any row only this phone held: a removal could never travel.
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
     try {
       // daily_moods - one mood per day, keyed by (user_id, day)
       final moodRows = await SupabaseRepo.fetch('daily_moods',
@@ -301,27 +429,35 @@ class DailyStore extends ChangeNotifier {
 
   Future<void> setMood(int day, String moodId) async {
     _moods[day] = moodId;
+    _moodSync.touch('$day', columns: {'day': day, 'mood_id': moodId});
     notifyListeners();
     await _persist(_moodKey,
         jsonEncode(_moods.map((k, v) => MapEntry(k.toString(), v))));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('daily_moods', {'day': day, 'mood_id': moodId},
-            onConflict: 'user_id,day');
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): a one-shot upsert, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('daily_moods', {'day': day, 'mood_id': moodId},
+    //         onConflict: 'user_id,day');
+    //   } catch (_) {}
+    // }
+    await _moodSync.push(_moodRows);
   }
 
   Future<void> clearMood(int day) async {
-    if (_moods.remove(day) == null) return;
+    final was = _moods.remove(day);
+    if (was == null) return;
+    // A soft delete (step 8): the cleared day travels to her other phones.
+    _moodSync.remove('$day', {'day': day, 'mood_id': was});
     notifyListeners();
     await _persist(_moodKey,
         jsonEncode(_moods.map((k, v) => MapEntry(k.toString(), v))));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.deleteBy('daily_moods', 'day', day);
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): a one-shot hard delete, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.deleteBy('daily_moods', 'day', day);
+    //   } catch (_) {}
+    // }
+    await _moodSync.push(_moodRows);
   }
 
   /// Saves (or replaces) the Talk-To-Baby entry for [day] into Dear Baby.
@@ -332,9 +468,13 @@ class DailyStore extends ChangeNotifier {
     required String text,
     required bool spoken,
   }) async {
+    // The day's entry keeps its id and is edited in place (step 8, 0106). It
+    // used to be deleted and re-inserted under a new id on every save, so two
+    // phones each held a different "today" and both came back.
+    final old = talkForDay(day);
     _talk.removeWhere((e) => e.day == day);
     final entry = TalkEntry(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      id: old?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
       day: day,
       week: week,
       prompt: prompt,
@@ -343,15 +483,18 @@ class DailyStore extends ChangeNotifier {
       spoken: spoken,
     );
     _talk.add(entry);
+    _talkSync.touch(entry.id);
     notifyListeners();
     await _persist(
         _talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.deleteBy('baby_talk', 'day', day); // replace this day's entry
-        await SupabaseRepo.insert('baby_talk', _talkToRow(entry));
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): delete the day, insert under a new id.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.deleteBy('baby_talk', 'day', day); // replace this day's entry
+    //     await SupabaseRepo.insert('baby_talk', _talkToRow(entry));
+    //   } catch (_) {}
+    // }
+    await _talkSync.push(_talkRows);
     return entry;
   }
 
@@ -379,14 +522,16 @@ class DailyStore extends ChangeNotifier {
       spoken: false,
     );
     _talk.add(entry);
+    _talkSync.touch(entry.id);
     notifyListeners();
     await _persist(
         _talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.insert('baby_talk', _talkToRow(entry));
-      } catch (_) {}
-    }
+    // if (SupabaseRepo.isLoggedIn) { // kept for revert (step 8)
+    //   try {
+    //     await SupabaseRepo.insert('baby_talk', _talkToRow(entry));
+    //   } catch (_) {}
+    // }
+    await _talkSync.push(_talkRows);
     return entry;
   }
 
@@ -394,49 +539,68 @@ class DailyStore extends ChangeNotifier {
     final t = text.trim();
     final wasPresent = _kept.remove(t);
     if (!wasPresent) _kept.add(t);
+    // Un-keeping is a soft delete (step 8): a union pull used to keep it.
+    if (wasPresent) {
+      _keptSync.remove(t, {'text': t});
+    } else {
+      _keptSync.touch(t, columns: {'text': t});
+    }
     notifyListeners();
     await _persist(_keptKey, jsonEncode(_kept));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        if (wasPresent) {
-          await SupabaseRepo.deleteBy('kept_affirmations', 'text', t);
-        } else {
-          await SupabaseRepo.upsert('kept_affirmations', {'text': t},
-              onConflict: 'user_id,text');
-        }
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): one-shot writes, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     if (wasPresent) {
+    //       await SupabaseRepo.deleteBy('kept_affirmations', 'text', t);
+    //     } else {
+    //       await SupabaseRepo.upsert('kept_affirmations', {'text': t},
+    //           onConflict: 'user_id,text');
+    //     }
+    //   } catch (_) {}
+    // }
+    await _keptSync.push(_keptRows);
   }
 
   Future<void> setMovement(int day, String response) async {
     _movement[day] = response;
+    _moveSync.touch('$day', columns: {'day': day, 'response': response});
     notifyListeners();
     await _persist(_movementKey,
         jsonEncode(_movement.map((k, v) => MapEntry(k.toString(), v))));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('daily_movement_responses',
-            {'day': day, 'response': response},
-            onConflict: 'user_id,day');
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): a one-shot upsert, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('daily_movement_responses',
+    //         {'day': day, 'response': response},
+    //         onConflict: 'user_id,day');
+    //   } catch (_) {}
+    // }
+    await _moveSync.push(_moveRows);
   }
 
   /// Toggles the Father Mode mission-done flag for [day].
   Future<void> toggleMissionDone(int day) async {
     final nowDone = !_missionsDone.remove(day);
     if (nowDone) _missionsDone.add(day);
+    // Un-doing is a soft delete (step 8): a union pull used to keep it.
+    if (nowDone) {
+      _missionSync.touch('$day', columns: {'day': day});
+    } else {
+      _missionSync.remove('$day', {'day': day});
+    }
     notifyListeners();
     await _persist(_missionKey, jsonEncode(_missionsDone.toList()));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        if (nowDone) {
-          await SupabaseRepo.insert('father_missions', {'day': day});
-        } else {
-          await SupabaseRepo.deleteBy('father_missions', 'day', day);
-        }
-      } catch (_) {}
-    }
+    // Kept for revert (step 8): one-shot writes, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     if (nowDone) {
+    //       await SupabaseRepo.insert('father_missions', {'day': day});
+    //     } else {
+    //       await SupabaseRepo.deleteBy('father_missions', 'day', day);
+    //     }
+    //   } catch (_) {}
+    // }
+    await _missionSync.push(_missionRows);
   }
 
   Future<void> _persist(String key, String value) async {
