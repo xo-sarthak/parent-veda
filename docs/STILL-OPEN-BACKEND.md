@@ -31,7 +31,7 @@ step, newest at the bottom. When a step lands: tick it here, add its log entry t
 | 5 | Parenting logs: feeds, sleep, nappies, pumping, tummy time, growth | 0101 | `f7ed88e` |
 | 6 | Parenting records: documents, health, milestones, vaccines, emergency card | 0104 | `af76d8f`, docs `2ba778e` |
 | 7 | Parenting's last two: the child profile (soft delete + Restore) and the name votes | 0105 (run 2026-10-20) | `d76594b` |
-| 8 | Pregnancy part 1: calendar, bump photos, the daily tables, weekly notes, reminders (`OwnRowLedger`) | 0106 (**the user runs it**) | pending |
+| 8 | Pregnancy part 1: calendar, bump photos, the daily tables, weekly notes, reminders (`OwnRowLedger`) | 0106 (run 2026-10-21) | `d5787b2` |
 
 ### Still to do, in order
 
@@ -135,7 +135,7 @@ backend is then **launch-ready** once the user's checks below are done and the b
   - The growth figures don't move the clock (`setMeasures`).
   - A skipped name stays skipped.
   - See `docs/BACKEND-SYNC-LOG.md` step 7 and BACKEND-PATTERNS §16ii-h.
-- **Pregnancy part 1 (step 8, 2026-10-20, migration 0106, NOT YET RUN).** Calendar notes, bump photos, the five
+- **Pregnancy part 1 (step 8, 2026-10-20, migration 0106 run 2026-10-21, `d5787b2`).** Calendar notes, bump photos, the five
   daily tables, weekly notes and reminders, on the new `OwnRowLedger` (all own-only, so newer wins with no
   decision). Bump and note photos leave Storage once the removal is confirmed; reminders re-arm or cancel their
   alarms after a pull; `father_missions` got its missing UPDATE policy. See `docs/BACKEND-SYNC-LOG.md` step 8.
@@ -177,12 +177,12 @@ None of these tables has `updated_at` except where noted; all need `removed_at`.
 
 | Store | Tables |
 |---|---|
-| ~~`calendar_store.dart`~~ | ~~`calendar_personal_events`~~ **DONE 2026-10-20 (0106, not yet run)** |
-| ~~`bump_store.dart`~~ | ~~`bump_photos`~~ **DONE 2026-10-20 (0106, not yet run)** |
-| ~~`daily_store.dart`~~ | ~~`daily_moods`, `baby_talk`, `kept_affirmations`, `daily_movement_responses`, `father_missions`~~ **DONE 2026-10-20 (0106, not yet run)** |
+| ~~`calendar_store.dart`~~ | ~~`calendar_personal_events`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
+| ~~`bump_store.dart`~~ | ~~`bump_photos`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
+| ~~`daily_store.dart`~~ | ~~`daily_moods`, `baby_talk`, `kept_affirmations`, `daily_movement_responses`, `father_missions`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
 | `medicine_store.dart` | `medications`, `medication_logs` |
-| ~~`memory_store.dart`~~ | ~~`weekly_journal_notes`~~ **DONE 2026-10-20 (0106, not yet run)** |
-| ~~`reminder_store.dart`~~ | ~~`reminders`~~ **DONE 2026-10-20 (0106, not yet run)** |
+| ~~`memory_store.dart`~~ | ~~`weekly_journal_notes`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
+| ~~`reminder_store.dart`~~ | ~~`reminders`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
 | `scans_store.dart` | `completed_scans`, `appointments` |
 | `symptom_store.dart` | `symptom_logs` |
 | `tools_store.dart` | `weight_profile`, `weight_entries`, `movement_sessions`, `kegel_state`, `contraction_sessions` |

@@ -23,7 +23,7 @@ owed.
 | 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | `f7ed88e` | yes (2026-10-17) |
 | 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | `af76d8f` | yes (2026-10-18) |
 | 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | `d76594b` | yes (2026-10-20) |
-| 2026-10-20 | Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders) | 0106 | pending | **not yet** |
+| 2026-10-20 | Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders) | 0106 | `d5787b2` | yes (2026-10-21) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -641,7 +641,7 @@ expected.
 
 ## Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders)
 
-**Date:** 2026-10-20 (planned and approved 2026-10-20). **Migration:** 0106 (**not yet run**). **Commit:** pending.
+**Date:** 2026-10-20 (planned and approved 2026-10-20). **Migration:** 0106 (run 2026-10-21, checked: 9 of 9). **Commit:** `d5787b2`.
 
 **No merge decision was needed.** All nine tables are own-only: every policy is `auth.uid() = user_id`, and none
 mentions `my_partner_id()`. The father's phone writes only his own rows. So the rule is her cycle's: the phone's
@@ -729,7 +729,7 @@ None of the five stores fed the sign-out "unsent changes" warning.
   different time zones.
 - **Mixed versions.** Until both phones update, the old app still hard-deletes and re-inserts.
 
-**User runs (OWED):**
+**User runs (DONE 2026-10-21: 0106 run, the check query returned all 9 rows as expected):**
 1. 0106 in the Supabase SQL editor, **before** installing a build with this change. Until then the uploads carry
    columns the tables lack, are refused, and simply wait.
 2. Optional: the check query at the bottom. Expect 9 rows:
