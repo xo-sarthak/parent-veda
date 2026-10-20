@@ -22,6 +22,7 @@ import '../../screens/post_pregnancy/pp_child_profile.dart';
 import '../../services/family_profile.dart';
 import '../../services/life_stage_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_toast.dart';
 import '../post_pregnancy/family_profile_screen.dart';
 import '../post_pregnancy/growth_journey_screen.dart';
 import '../post_pregnancy/health_guide_screen.dart';
@@ -212,8 +213,11 @@ class _PvChildScreenState extends State<PvChildScreen> {
           'Remove ${c.name}?',
           style: pvFraunces(fontSize: 20, color: p.ink1),
         ),
+        // Kept for revert (sync log step 7, 2026-10-20: removing is now a
+        // soft delete, and a removed child can be restored):
+        // 'Their records on this account — feeds, sleep, growth, vaccines, notes — go with them. You and your partner are not affected. This cannot be undone.',
         content: Text(
-          'Their records on this account — feeds, sleep, growth, vaccines, notes — go with them. You and your partner are not affected. This cannot be undone.',
+          '${c.name} leaves both your phones. Their feeds, sleep, growth, vaccines and notes are kept, and you can bring them back from Removed children on your profile.',
           style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2),
         ),
         actions: [
@@ -233,7 +237,15 @@ class _PvChildScreenState extends State<PvChildScreen> {
     );
     if (ok == true) {
       await ChildProfileStore.instance.deleteChild(c.id);
-      if (mounted) Navigator.of(context).maybePop();
+      if (!mounted) return;
+      pvToast(
+        context,
+        '${c.name} removed. Records kept.',
+        kind: PvToastKind.undo,
+        action: 'Undo',
+        onAction: () => ChildProfileStore.instance.restoreChild(c.id),
+      );
+      Navigator.of(context).maybePop();
     }
   }
 

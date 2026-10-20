@@ -65,6 +65,19 @@ void main() {
     }
   });
 
+  test('the child profile and the name votes are guarded (0105)', () {
+    expect(guarded, contains('children'));
+    expect(guarded, contains('pp_name_votes'));
+  });
+
+  test('0105 leaves my_child_ids() alone: a removed child keeps its records',
+      () {
+    final sql = File('supabase/migrations/0105_pp_children_votes_sync_clock.sql')
+        .readAsStringSync();
+    // Only the header comment may name it; no statement redefines it.
+    expect(sql, isNot(contains('create or replace function public.my_child_ids')));
+  });
+
   test('the Parenting logs are guarded (0101)', () {
     for (final t in [
       'pp_feed_logs',

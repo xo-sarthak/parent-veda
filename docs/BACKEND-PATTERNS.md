@@ -3217,6 +3217,48 @@ the row would remove that risk and add a table. Not worth it until it's ever see
 
 History: `docs/BACKEND-SYNC-LOG.md` step 6.
 
+### 16ii-h. Soft delete on the access root, and a mirror column must not move the clock (0105, 2026-10-20)
+
+Step 7 converted the last two Parenting tables: `children` and `pp_name_votes`. Two ideas came out of it.
+
+**1. Deleting the row that grants access deletes the access.** `children` is not just one more table. Every `pp_*`
+policy asks `child_id in (select public.my_child_ids())`, and that function reads `children`. The `pp_*` tables
+have no foreign key to `children`, so the old hard delete cascaded nothing. It quietly removed the id from
+`my_child_ids()`, and every feed, vaccine and record of that child stayed in the database where **neither parent
+could read it**. Nothing failed, so nobody saw it.
+
+- The fix is a soft delete (`removed_at`), with `my_child_ids()` **deliberately unchanged**. A removed child still
+  counts as "my child" to the policies, so the records stay reachable, and a restore (just a newer edit) brings
+  everything back on both phones.
+- For the same reason `children` must never join the 90-day purge of soft-deleted rows (STILL-OPEN-BACKEND §5).
+- The owner column is what `my_child_ids()` reads, so the push **never sends `user_id`** for a child the other
+  parent created. That child goes up as a plain UPDATE (§16ii-f).
+
+> General fact: **before you delete a row, ask what reads it to decide access.** In a schema where permissions flow
+> through a parent row, that row is load-bearing. Removing it doesn't remove the children; it strands them. A soft
+> delete keeps the access path and makes "undo" free.
+
+**2. A derived column must not count as an edit.** The child row carries `weight_kg`, `height_cm` and `head_cm`, a
+mirror of the newest growth measurement (0021 flagged it as "mirror, not truth"). Logging a weight used to call
+`update()`, which is an edit. Under whole-row newer-wins, that means a weight logged on a phone that hadn't pulled
+yet would carry the old name and win, undoing the other parent's rename.
+
+- `setMeasures()` changes the figures and queues the row without stamping a new edit time. The server's guard lets
+  an equal stamp through and skips an older one.
+- When a cloud row is taken, this phone keeps its own figures, because the growth log (which syncs on its own) is
+  their source.
+
+> General fact: **the merge clock should move only for facts a person chose.** A value computed from other synced
+> data is a cache. If writing it bumps the clock, a background recompute can outrank a real human edit. Either
+> derive it on every device (§16ii-g) or write it without a new stamp.
+
+**Name votes were simpler than the plan feared.** STILL-OPEN-BACKEND listed them under "two people write", but 0027
+makes them own-rows-only: neither parent can read the other's votes, and matches come from a `security definer`
+function. So it's single-person data, and the phone's clock is the right one. Like a vaccine dose, a vote is state:
+a skip is `liked = false`, never a delete. **Read the policy before you classify the table.**
+
+History: `docs/BACKEND-SYNC-LOG.md` step 7.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3308,3 +3350,4 @@ History: `docs/BACKEND-SYNC-LOG.md` step 6.
 35. `lib/screens/garbh_browse_screen.dart` `shravanBrowse` — one source for what plays (§16gg).
 36. `supabase/functions/razorpay-create-order/index.ts` `priceLines` — the server prices the order; the phone never does (§16hh).
 37. `lib/ttc/ttc_row_merge.dart`, `CycleStore` / `TtcLogStore` push and pull, `lib/services/auth/local_owner.dart`, `SyncRegistry.registerReset` — newer wins, soft deletes, dirty flags, and whose data is on the phone (§16ii).
+38. `0105_pp_children_votes_sync_clock.sql` → `childrenMerge` / `ChildProfileStore.setMeasures` — a soft delete on the access root, and a mirror column that must not move the clock (§16ii-h).

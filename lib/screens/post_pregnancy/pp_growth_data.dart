@@ -422,7 +422,10 @@ class GrowthStore extends ChangeNotifier {
     _items.add(m);
     // Keep the child profile's "latest" figures in step with the newest entry.
     final newest = all.first;
-    _child.update(weightKg: newest.weightKg, heightCm: newest.heightCm, headCm: newest.headCm ?? _child.headCm);
+    // _child.update(weightKg: newest.weightKg, heightCm: newest.heightCm, headCm: newest.headCm ?? _child.headCm); // kept for revert
+    // setMeasures, not update (sync log step 7): the figures mirror this log,
+    // so they must not count as an edit of the child's profile.
+    _child.setMeasures(weightKg: newest.weightKg, heightCm: newest.heightCm, headCm: newest.headCm ?? _child.headCm);
     // A logged measurement is what flips Health's growth section from an
     // invitation to her real figures.
     HealthStore.instance.markGrowthEntered();

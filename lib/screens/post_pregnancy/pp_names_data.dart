@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/remote/cloud_synced_store.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
+import '../../services/remote/sync_row_book.dart';
 
 /// One baby name and everything the detail/swipe/match screens show for it.
 class BabyName {
@@ -629,6 +630,48 @@ const Map<int, NumProfile> kNumerology = {
 NumProfile numProfile(int n) => kNumerology[((n - 1) % 9) + 1] ?? kNumerology[1]!;
 
 // -----------------------------------------------------------------------------
+//  Votes sync newer wins (2026-10-20, sync log step 7, migration 0105)
+// -----------------------------------------------------------------------------
+//  A vote is one person's own row (0027: nobody can read the partner's), so
+//  "newer wins" by this phone's clock is right. A vote is state, not a list
+//  item: a skip is liked = false, never a delete. Before this, the pull kept
+//  only liked rows and re-uploaded every name the phone still listed as liked,
+//  so a skip made offline, or on the other phone, came back as a like.
+
+/// Pure: merges the cloud's own vote [rows] (`name`, `liked`, `updated_at`)
+/// into this phone's [liked] list and [skipped] set, newer wins per name.
+/// Names this phone holds that are newer, or that the cloud lacks, are left
+/// in [book]'s waiting set.
+({List<String> liked, Set<String> skipped}) nameVotesMerge({
+  required SyncRowBook book,
+  required List<String> liked,
+  required Set<String> skipped,
+  required List<Map<String, dynamic>> rows,
+}) {
+  final cloud = [
+    for (final r in rows)
+      if ((r['name'] ?? '').toString().isNotEmpty) {...r, 'id': r['name'].toString()},
+  ];
+  final taken = book.merge(
+    [for (final n in liked) if (n.isNotEmpty) n, ...skipped],
+    cloud,
+  );
+  final outLiked = List.of(liked);
+  final outSkipped = Set.of(skipped);
+  for (final r in taken) {
+    final n = r['id'] as String;
+    if (r['liked'] == true) {
+      outSkipped.remove(n);
+      if (!outLiked.contains(n)) outLiked.add(n);
+    } else {
+      outLiked.remove(n);
+      outSkipped.add(n);
+    }
+  }
+  return (liked: outLiked, skipped: outSkipped);
+}
+
+// -----------------------------------------------------------------------------
 //  Shared match store - the names both parents have said yes to.
 // -----------------------------------------------------------------------------
 //  A plain ChangeNotifier singleton (same pattern as PpCompareStore). Seeded
@@ -650,6 +693,22 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
   /// Names BOTH parents have liked, from public.pp_name_matches(). Derived
   /// server-side and never stored - see 0027_pp_name_votes.sql.
   final List<String> _matches = [];
+
+  /// Names she said "not for me" to (step 7, 2026-10-20). Kept so a skip is a
+  /// row with its own time, and an older "liked" cannot bring the name back.
+  final Set<String> _skipped = {};
+
+  /// The votes' sync bookkeeping, keyed by name (step 7, 0105).
+  final SyncRowBook _book = SyncRowBook();
+  bool _pushing = false;
+  bool _again = false;
+
+  /// Her votes and their bookkeeping, on this phone. Separate from the KV
+  /// blob below, which is the crown's and goes to user_state.
+  static const _votesKey = 'pp_name_votes_local';
+
+  /// Votes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _book.dirty.isNotEmpty;
 
   // ---- persistence (user_state KV; own-only, a personal preference) --------
   static const _prefsKey = 'pp_names';
@@ -700,9 +759,23 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> init() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final votes = prefs.getString(_votesKey);
+      if (votes != null) {
+        final m = jsonDecode(votes);
+        if (m is Map) {
+          _liked
+            ..clear()
+            ..addAll(((m['liked'] as List?) ?? const []).map((e) => e.toString()));
+          _skipped
+            ..clear()
+            ..addAll(((m['skipped'] as List?) ?? const []).map((e) => e.toString()));
+          _book.loadJson(m['book']);
+        }
+      }
       final raw = prefs.getString(_prefsKey);
       if (raw != null) applyCloudData(jsonDecode(raw));
     } catch (_) {/* keep the starter state */}
+    SyncRegistry.registerPending(() => hasPending);
     notifyListeners();
     try {
       await syncStateFromCloud();
@@ -721,13 +794,96 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
   /// forgets the person in memory; the cloud keeps it.
   void _resetVotes() {
     _matches.clear();
+    // Her votes too (step 7): they used to stay in memory after a sign-out.
+    _liked.clear();
+    _skipped.clear();
+    _book.clear();
+    _saveVotes();
     notifyListeners();
+  }
+
+  Future<void> _saveVotes() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          _votesKey,
+          jsonEncode({
+            'liked': _liked,
+            'skipped': _skipped.toList(),
+            'book': _book.toJson(),
+          }));
+    } catch (_) {}
+  }
+
+  /// A vote changed on this phone: stamp it, keep it, send it.
+  void _vote(String name) {
+    if (name.isEmpty) return;
+    _book.touch(name);
+    _saveVotes();
+    _pushWaiting().then((_) => _refreshMatches()).then((_) => notifyListeners());
   }
 
   Future<void> _syncVotes() async {
     SyncRegistry.register(_syncVotes);
     SyncRegistry.registerReset(_resetVotes);
     if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      // Own rows only - RLS forbids reading the partner's, by design.
+      final rows = await SupabaseRepo.fetch(_votesTable, orderBy: 'created_at');
+      final merged = nameVotesMerge(
+          book: _book, liked: _liked, skipped: _skipped, rows: rows);
+      _liked
+        ..clear()
+        ..addAll(merged.liked);
+      _skipped
+        ..clear()
+        ..addAll(merged.skipped);
+      await _saveVotes();
+      notifyListeners();
+      await _pushWaiting();
+      await _refreshMatches();
+      notifyListeners();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  /// Uploads every waiting vote, one at a time; a vote cast while it runs is
+  /// picked up by a second pass. Always as us: a vote is only ever its owner's.
+  Future<void> _pushWaiting() async {
+    if (_pushing) {
+      _again = true;
+      return;
+    }
+    _pushing = true;
+    try {
+      do {
+        _again = false;
+        final uid = SupabaseRepo.userId;
+        if (uid == null) return;
+        for (final name in _book.dirty.toList()) {
+          final sent = _book.stamps[name];
+          final ok = await SupabaseRepo.upsertRowConfirmed(
+            _votesTable,
+            {
+              'user_id': uid,
+              'name': name,
+              'liked': _liked.contains(name),
+              'updated_at': _book.times(name).updatedAt,
+            },
+            onConflict: 'user_id,name',
+          );
+          _book.confirmed(name, ok: ok, sent: sent);
+        }
+        await _saveVotes();
+      } while (_again);
+    } finally {
+      _pushing = false;
+    }
+  }
+
+  // Kept for revert (step 7, 2026-10-20): only "liked" rows were adopted, and
+  // every name still liked here was pushed up again, so a skip came back.
+  // ignore: unused_element
+  Future<void> _syncVotesOld() async {
     try {
       // Own rows only - RLS forbids reading the partner's, by design.
       final rows = await SupabaseRepo.fetch(_votesTable, orderBy: 'created_at');
@@ -802,24 +958,30 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
   void like(String name) {
     if (_liked.contains(name)) return;
     _liked.add(name);
+    _skipped.remove(name);
     notifyListeners();
-    _pushVote(name, true).then((_) => _refreshMatches()).then((_) {
-      if (_matches.isNotEmpty) notifyListeners();
-    });
+    // _pushVote(name, true).then((_) => _refreshMatches()).then((_) { // kept for revert
+    //   if (_matches.isNotEmpty) notifyListeners();
+    // });
+    _vote(name);
   }
 
   /// An explicit "not for me". Recorded (liked = false) so the name is not
   /// offered again, and so a later un-skip is an upsert rather than a new row.
   void skip(String name) {
     if (_liked.remove(name)) notifyListeners();
-    _pushVote(name, false);
+    _skipped.add(name);
+    // _pushVote(name, false); // kept for revert
+    _vote(name);
   }
 
   void crown(String name) {
     _crowned = name;
     if (!_liked.contains(name)) {
       _liked.add(name);
-      _pushVote(name, true);
+      _skipped.remove(name);
+      // _pushVote(name, true); // kept for revert
+      _vote(name);
     }
     notifyListeners();
   }

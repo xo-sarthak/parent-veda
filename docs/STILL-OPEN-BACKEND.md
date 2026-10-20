@@ -13,14 +13,14 @@ Read first:
 
 ---
 
-## RESUME HERE: the step plan (kept current, updated 2026-10-18)
+## RESUME HERE: the step plan (kept current, updated 2026-10-20)
 
 **A new chat starts here.** This section says which step is next and what each one is. The rest of this file is the
 detail behind each step. `docs/BACKEND-SYNC-LOG.md` is the dated history of the steps already done, one entry per
 step, newest at the bottom. When a step lands: tick it here, add its log entry there, and update
 `docs/BEFORE-LAUNCH.md`.
 
-### Done (all committed, every migration run and checked on the live database)
+### Done (committed, and every migration run and checked on the live database, except step 7: built 2026-10-20, its commit and 0105 are owed)
 
 | Step | What | Migration | Commit |
 |---|---|---|---|
@@ -30,16 +30,16 @@ step, newest at the bottom. When a step lands: tick it here, add its log entry t
 | 4 | Server guard `pv_sync_newer_wins` (an older edit can't overwrite a newer one) | 0100 | `a0eb5b9` |
 | 5 | Parenting logs: feeds, sleep, nappies, pumping, tummy time, growth | 0101 | `f7ed88e` |
 | 6 | Parenting records: documents, health, milestones, vaccines, emergency card | 0104 | `af76d8f`, docs `2ba778e` |
+| 7 | Parenting's last two: the child profile (soft delete + Restore) and the name votes | 0105 (**the user runs it**) | pending |
 
 ### Still to do, in order
 
-**6 more steps finish the sync work.** Each step is the same shape: plan → user decides the merge rule → migration →
+**5 more steps finish the sync work.** Each step is the same shape: plan → user decides the merge rule → migration →
 store changes → a pure merge test → the user runs the migration and its check query → log entry.
 
 | Step | What | Where the detail is | Size |
 |---|---|---|---|
-| **7 (NEXT)** | Parenting's last two: `pp_name_votes` (`pp_names_data.dart`) and the `children` profile (`pp_child_profile.dart`). `children` is the access root: every child record's RLS checks it, so a mistake here can hide a child's records from a parent. Needs a decision first: whole-row "latest edit wins", or per-field (§6) | §1 Parenting, §6 | medium, careful |
-| 8 | Pregnancy part 1: calendar events, bump photos, daily moods and the other daily tables, weekly journal notes, reminders | §1 Pregnancy | large |
+| **8 (NEXT)** | Pregnancy part 1: calendar events, bump photos, daily moods and the other daily tables, weekly journal notes, reminders | §1 Pregnancy | large |
 | 9 | Pregnancy part 2: medicines and their logs, scans and appointments, symptoms, the tools (weight, movement, kegel, contractions) | §1 Pregnancy | large |
 | 10 | Blob stores, per-item merge for the lists people curate (saved readings, hospital bag, checklists, cart), so two phones editing different items both keep their edits. Records hiding in blobs (orders, scan reports, readings) move to rows | §2 | medium |
 | 11 | Uploads that fail silently: batch the first-sync upserts, and make sure every converted store reports its waiting changes to the sign-out warning | §3 | small (mostly done inside steps 1-9) |
@@ -129,6 +129,12 @@ backend is then **launch-ready** once the user's checks below are done and the b
   - Vaccine reminders are shared: the time syncs and each phone arms its own alarm. Turning a reminder off now
     cancels the alarm, which it never did.
   - See `docs/BACKEND-SYNC-LOG.md` step 6.
+- **The child profile and the name votes (step 7, 2026-10-20, migration 0105, NOT YET RUN).**
+  - Removing a child is a soft delete; `my_child_ids()` is unchanged, so the records stay reachable, and "Removed
+    children" on the You screen restores one.
+  - The growth figures don't move the clock (`setMeasures`).
+  - A skipped name stays skipped.
+  - See `docs/BACKEND-SYNC-LOG.md` step 7 and BACKEND-PATTERNS §16ii-h.
 
 ---
 
@@ -192,8 +198,8 @@ but it is not used as a merge clock. The rest have neither column.
 | ~~`pp_health_data.dart`~~ | ~~`pp_medications`, `pp_prescriptions`, `pp_allergies`, `pp_symptoms`, `pp_reports`, `pp_doctor_visits`, `pp_doctor_questions`, `pp_emergency_cards`~~ **DONE 2026-10-18 (0104)** |
 | ~~`pp_milestones_data.dart`~~ | ~~`pp_milestone_observations` (composite key)~~ **DONE 2026-10-18 (0104)** |
 | ~~`pp_vaccine_data.dart`~~ | ~~`pp_vaccine_doses` (composite key)~~ **DONE 2026-10-18 (0104)** |
-| `pp_names_data.dart` | `pp_name_votes` |
-| `pp_child_profile.dart` | `children` (shared read with the partner) |
+| ~~`pp_names_data.dart`~~ | ~~`pp_name_votes`~~ **DONE 2026-10-20 (0105, not yet run)** |
+| ~~`pp_child_profile.dart`~~ | ~~`children` (shared read with the partner)~~ **DONE 2026-10-20 (0105, not yet run)**: soft delete + Restore |
 
 Child records are shared between both parents (FAMILY-MODEL.md), so two people really can edit the same row; see §6
 before choosing the merge.
@@ -277,6 +283,8 @@ singleton still holds the last person's data until the app restarts, so the next
   `ttc_logs` (0097), and to `saved_items` and `ttc_doctor_questions`. `saved_items` already purges after 30 days
   (0081:93); the TTC tables don't. For one person's cycle that's tens of rows a year: harmless, but worth a purge.
   - **Fix:** a scheduled function (or `pg_cron`) that hard-deletes rows with `removed_at < now() - interval '90 days'`.
+  - **Never `children`** (step 7, 2026-10-20). A removed child must stay restorable, and the row is what
+    `my_child_ids()` reads: purging it would strand every record of that child where neither parent can read it.
   - **Safe**, because a phone that was offline that long syncs as a fresh install for those rows: the cloud no longer
     has them, so the phone's copy uploads. Pick a window longer than any realistic offline gap.
 - **The phones keep removed keys too** (`CycleStore._tombs`, `TtcLogStore._cleared`).
@@ -311,7 +319,9 @@ profile, emergency cards) may want per-field.
   append-only, so two parents almost never edit the same row (2026-10-17, step 5).
 - Documents and the health records: row-level, latest edit wins. The emergency card: latest save wins, whole
   card, and Clear syncs. Vaccine reminders: shared, so both phones buzz (the user, 2026-10-17, step 6).
-- Still open: name votes and the child profile (`children`), step 7.
+- The child profile (`children`): whole row, latest edit wins; the growth figures don't count as an edit. Removing
+  a child is a soft delete, with Restore (the user, 2026-10-20, step 7).
+- Name votes needed no decision: they are own-rows-only (0027), so single-person data.
 - **Every couple-scoped store must keep the row's owner on push.** Check this before converting any `pp_*` or
   supplements store; the flip is silent.
 
@@ -363,7 +373,8 @@ left alone for now so two sessions don't clash:
 3. ~~**§2 push-before-pull**~~ **DONE 2026-10-17 (step 3).** Next in §2: per-item merge for the curated lists.
 4. ~~**§1 Parenting logs**, append-only first (feeds, nappies, sleep, growth), one migration.~~ **DONE 2026-10-17
    (step 5, 0101 run 2026-10-17).** ~~Next in Parenting: documents, health, milestones and vaccines~~ **DONE
-   2026-10-18 (step 6, 0104 run 2026-10-18).** Left in Parenting: `pp_name_votes` and the `children` profile (step 7).
+   2026-10-18 (step 6, 0104 run 2026-10-18).** ~~Left in Parenting: `pp_name_votes` and the `children` profile (step 7).~~
+   **DONE 2026-10-20 (step 7, 0105).**
 5. **§1 Pregnancy tables**, one migration.
 6. **§4, §5, §7** as tidy-up.
 

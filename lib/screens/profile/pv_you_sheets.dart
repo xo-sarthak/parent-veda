@@ -14,7 +14,9 @@ import '../../screens/post_pregnancy/pp_child_profile.dart';
 import '../../services/dear_baby_vault_store.dart';
 import '../../services/pv_order_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_toast.dart';
 import '../products/pv_checkout_screen.dart' show PvAddressForm;
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabArt, TtcTabMark;
 import '../skilling/sk_grown_up_gate.dart';
 import '../skilling/sk_grown_up_screen.dart';
 import '../v2/v2_palette.dart';
@@ -440,6 +442,94 @@ Future<void> showPvKeepsakesSheet(BuildContext context) async {
         alreadyPassed: true,
       ),
       settings: const RouteSettings(name: 'sk/grown_up'),
+    ),
+  );
+}
+
+/// Removed children, with Restore (sync log step 7, 2026-10-20). Removing a
+/// child is a soft delete: the child is hidden on both phones and every record
+/// about them is kept, so a restore brings everything back. The pattern is
+/// Messages' "Recently Deleted" and Notion's Trash: one line that says what is
+/// kept, then each child as a row with its own Restore.
+Future<void> showPvRemovedChildrenSheet(
+  BuildContext context, {
+  required Color tint,
+}) async {
+  final p = pvStorePalette;
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: p.ground,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => ListenableBuilder(
+      listenable: ChildProfileStore.instance,
+      builder: (ctx, _) {
+        final gone = ChildProfileStore.instance.removedChildren;
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Removed children',
+                        style: pvFraunces(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                          color: p.ink1,
+                        ),
+                      ),
+                    ),
+                    PvRoundIcon(
+                      icon: Icons.close_rounded,
+                      size: 34,
+                      onTap: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const PvQuietLine(
+                  'Their records are kept. Restore a child and everything comes back, on your partner\'s phone too.',
+                ),
+                const SizedBox(height: 8),
+                if (gone.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: PvQuietLine('Nothing to restore.'),
+                  ),
+                for (final c in gone)
+                  PvProfileRow(
+                    key: ValueKey('pv_removed_child_${c.id}'),
+                    mark: TtcTabArt(mark: TtcTabMark.sun, tint: tint),
+                    title: c.name,
+                    trailing: PvProfilePill(
+                      key: ValueKey('pv_restore_child_${c.id}'),
+                      label: 'Restore',
+                      onTap: () async {
+                        await ChildProfileStore.instance.restoreChild(c.id);
+                        if (!ctx.mounted) return;
+                        pvToast(
+                          ctx,
+                          '${c.name} is back, with their records.',
+                          kind: PvToastKind.done,
+                        );
+                        if (ChildProfileStore.instance.removedChildren.isEmpty) {
+                          Navigator.of(ctx).pop();
+                        }
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
     ),
   );
 }

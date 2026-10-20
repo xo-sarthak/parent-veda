@@ -38,6 +38,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../care_partner/care_journey.dart';
 import '../../services/remote/sync_registry.dart';
+import '../../services/remote/sync_row_book.dart';
 import '../../services/family_profile.dart';
 
 /// Expected 50th-centile figures for a given age, used as a gentle reference
@@ -270,6 +271,108 @@ const bool kChildBirthColumns = true;
 /// Run and verified on the live database 2026-10-16.
 const bool kChildSexGivenColumn = true;
 
+// -----------------------------------------------------------------------------
+//  Sync, newer wins (2026-10-20, sync log step 7, migration 0105)
+// -----------------------------------------------------------------------------
+//  Whole row, latest edit wins (the user's decision). Two things are special
+//  about this table:
+//
+//   · It is the ACCESS ROOT. Every pp_* policy asks public.my_child_ids(),
+//     which reads children.user_id. So a removal is a soft delete (the row
+//     stays, and with it both parents' access to the records), and the push
+//     NEVER sends user_id for a child the other parent created: it goes as a
+//     plain UPDATE, because an upsert is checked against the INSERT policy
+//     (auth.uid() = user_id) and would be refused.
+//
+//   · The growth figures are a MIRROR of the growth log, which syncs on its
+//     own. They do not move the clock ([ChildProfileStore.setMeasures]), and
+//     a cloud row taken here keeps this phone's figures. Otherwise a weight
+//     logged on a phone that had not pulled yet would undo the other parent's
+//     rename.
+//
+//  The two functions below are pure, so the rule is tested without a network
+//  (`test/pp_children_sync_test.dart`).
+
+/// Pure: merges the cloud's `children` [rows] into this phone's [live] and
+/// [removed] children, newer wins per child. Returns the new two lists. Rows
+/// this phone holds that are newer, or that the cloud has never seen, are
+/// left in [book]'s waiting set for the next upload.
+({List<Child> live, List<Child> removed}) childrenMerge({
+  required SyncRowBook book,
+  required List<Child> live,
+  required List<Child> removed,
+  required List<Map<String, dynamic>> rows,
+}) {
+  final known = <String, Child>{
+    for (final c in removed) c.id: c,
+    for (final c in live) c.id: c,
+  };
+  final liveById = <String, Child>{for (final c in live) c.id: c};
+  final removedById = <String, Child>{for (final c in removed) c.id: c};
+  final taken = book.merge(
+    [for (final c in live) if (c.id.isNotEmpty) c.id],
+    rows,
+  );
+  for (final r in taken) {
+    final id = r['id'] as String;
+    final c = Child.fromRow(r);
+    final mine = known[id];
+    if (mine != null) {
+      // A cloud row without `sex_given` (an older app wrote it) must not turn
+      // a child whose sex was not given back into a boy; the same for the
+      // birth columns (0102) while they are empty.
+      if (!r.containsKey('sex_given')) c.sexGiven = mine.sexGiven;
+      c.birthMode ??= mine.birthMode;
+      c.bornWeeks ??= mine.bornWeeks;
+      // The growth figures are this phone's own, worked out from the growth
+      // log: never taken from another phone's row.
+      c
+        ..weightKg = mine.weightKg
+        ..heightCm = mine.heightCm
+        ..headCm = mine.headCm;
+      if (c.birthWeightKg == 0) c.birthWeightKg = mine.birthWeightKg;
+    }
+    if (syncParseStamp(r['removed_at']) != null) {
+      liveById.remove(id);
+      removedById[id] = c;
+    } else {
+      removedById.remove(id);
+      liveById[id] = c;
+    }
+  }
+  return (live: liveById.values.toList(), removed: removedById.values.toList());
+}
+
+/// Pure: what uploading child [id] sends, or null when there is nothing to
+/// send. [child] is the child as this phone holds it (live or removed).
+///
+/// A child the other parent created goes as an UPDATE with no `id` or
+/// `user_id`, so the owner, and with it who can reach the child's records,
+/// never moves. Any other child is upserted as ours.
+({bool asUpdate, Map<String, dynamic> row})? childUploadFor(
+  SyncRowBook book,
+  String id,
+  Child? child, {
+  required String uid,
+}) {
+  final cols = child?.toRow() ?? book.removedRows[id];
+  if (cols == null) return null;
+  final t = book.times(id);
+  final row = <String, dynamic>{
+    ...cols,
+    'updated_at': t.updatedAt,
+    'removed_at': t.removedAt,
+  };
+  final owner = book.owners[id];
+  if (owner != null && owner != uid) {
+    row
+      ..remove('id')
+      ..remove('user_id');
+    return (asUpdate: true, row: row);
+  }
+  return (asUpdate: false, row: {...row, 'user_id': uid});
+}
+
 class ChildProfileStore extends ChangeNotifier {
   ChildProfileStore._();
   static final ChildProfileStore instance = ChildProfileStore._();
@@ -277,9 +380,34 @@ class ChildProfileStore extends ChangeNotifier {
   static const _childrenKey = 'pp_children';
   static const _activeKey = 'pp_active_child';
 
+  /// Children a parent removed, kept so they can be restored (2026-10-20).
+  static const _removedKey = 'pp_children_removed';
+
+  /// The sync bookkeeping beside the children (step 7, 0105).
+  static const _bookKey = 'pp_children_sync';
+
   final List<Child> _children = [];
   String? _activeId;
   bool _loaded = false;
+
+  /// Removed children: hidden everywhere, their records kept, restorable.
+  final List<Child> _removed = [];
+
+  final SyncRowBook _book = SyncRowBook();
+  bool _pushing = false;
+  bool _again = false;
+
+  /// Children a parent removed, newest removal first. The You screen lists
+  /// them so either parent can bring one back.
+  List<Child> get removedChildren {
+    final out = List.of(_removed);
+    int at(Child c) => _book.removed[c.id] ?? 0;
+    out.sort((a, b) => at(b).compareTo(at(a)));
+    return List.unmodifiable(out);
+  }
+
+  /// Changes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _book.dirty.isNotEmpty;
 
   /// The placeholder shown before any real child is saved. Never persisted -
   /// note the empty id, which is what marks it as "not a real child yet".
@@ -406,26 +534,112 @@ class ChildProfileStore extends ChangeNotifier {
     );
     _children.add(c);
     _activeId = c.id;
+    _book.touch(c.id);
     notifyListeners();
     await _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.insert('children', c.toRow());
-      } catch (_) {/* offline - pushed up on next sync */}
-    }
+    // Kept for revert (step 7, 2026-10-20): a one-shot insert, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.insert('children', c.toRow());
+    //   } catch (_) {/* offline - pushed up on next sync */}
+    // }
+    await _pushWaiting();
     return c;
   }
 
+  /// Removes a child: a SOFT delete (the user, 2026-10-20). The child is
+  /// hidden on both parents' phones and stays gone, and every record about
+  /// them is kept, so [restoreChild] brings everything back.
   Future<void> deleteChild(String childId) async {
-    _children.removeWhere((c) => c.id == childId);
+    final i = _children.indexWhere((c) => c.id == childId);
+    if (i < 0) return;
+    final c = _children.removeAt(i);
+    _removed
+      ..removeWhere((x) => x.id == childId)
+      ..add(c);
+    _book.remove(childId, c.toRow());
     if (_activeId == childId) _activeId = _children.isEmpty ? null : _children.first.id;
     notifyListeners();
     await _persist();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        // Co-parented: deleteShared, so either parent can remove the child.
-        await SupabaseRepo.deleteShared('children', childId);
-      } catch (_) {}
+    // Kept for revert (step 7, 2026-10-20). A hard delete took the id out of
+    // public.my_child_ids(), so the child's records became unreadable to both
+    // parents, and the other phone inserted the child again.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     // Co-parented: deleteShared, so either parent can remove the child.
+    //     await SupabaseRepo.deleteShared('children', childId);
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
+  }
+
+  /// Brings a removed child back, with every record, on both phones. The
+  /// restore is a newer edit than the removal, so it wins everywhere.
+  Future<void> restoreChild(String childId) async {
+    final i = _removed.indexWhere((c) => c.id == childId);
+    if (i < 0) return;
+    final c = _removed.removeAt(i);
+    _children.add(c);
+    _activeId = c.id;
+    _book.touch(childId);
+    notifyListeners();
+    await _persist();
+    await _pushWaiting();
+  }
+
+  /// The growth figures, from the growth log. They change the child on this
+  /// phone and go up with the row, but they do NOT move the sync clock: they
+  /// mirror the growth log (which syncs on its own), and a weight logged on a
+  /// phone that has not pulled yet must not undo the other parent's rename.
+  /// The server's guard lets an equal stamp through and skips an older one.
+  Future<void> setMeasures({
+    required double weightKg,
+    required double heightCm,
+    required double headCm,
+  }) async {
+    if (_children.isEmpty) {
+      // No child yet: the first figures promote the placeholder, as before.
+      await update(weightKg: weightKg, heightCm: heightCm, headCm: headCm);
+      return;
+    }
+    final c = active
+      ..weightKg = weightKg
+      ..heightCm = heightCm
+      ..headCm = headCm;
+    if (_book.stamps.containsKey(c.id)) _book.dirty.add(c.id);
+    notifyListeners();
+    await _persist();
+    await _pushWaiting();
+  }
+
+  /// Uploads every waiting child, one at a time. A change made while it runs
+  /// is picked up by a second pass.
+  Future<void> _pushWaiting() async {
+    if (_pushing) {
+      _again = true;
+      return;
+    }
+    _pushing = true;
+    try {
+      do {
+        _again = false;
+        final uid = SupabaseRepo.userId;
+        if (uid == null) return;
+        final held = {for (final c in [..._removed, ..._children]) c.id: c};
+        for (final id in _book.dirty.toList()) {
+          final up = childUploadFor(_book, id, held[id], uid: uid);
+          if (up == null) continue;
+          final sent = _book.stamps[id];
+          final ok = up.asUpdate
+              ? await SupabaseRepo.updateSharedConfirmed('children', id, up.row)
+              : await SupabaseRepo.upsertRowConfirmed('children', up.row,
+                  onConflict: 'id');
+          _book.confirmed(id, ok: ok, sent: sent);
+        }
+        await _persist();
+      } while (_again);
+    } finally {
+      _pushing = false;
     }
   }
 
@@ -443,7 +657,16 @@ class ChildProfileStore extends ChangeNotifier {
         }
       }
       _activeId = prefs.getString(_activeKey);
+      final gone = prefs.getString(_removedKey);
+      if (gone != null) {
+        for (final e in (jsonDecode(gone) as List)) {
+          _removed.add(Child.fromJson(Map<String, dynamic>.from(e)));
+        }
+      }
+      final book = prefs.getString(_bookKey);
+      if (book != null) _book.loadJson(jsonDecode(book));
     } catch (_) {/* start on the seeded default */}
+    SyncRegistry.registerPending(() => hasPending);
     _loaded = true;
     notifyListeners();
 
@@ -455,6 +678,8 @@ class ChildProfileStore extends ChangeNotifier {
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _children.clear();
+    _removed.clear();
+    _book.clear();
     _activeId = null;
     notifyListeners();
   }
@@ -467,6 +692,42 @@ class ChildProfileStore extends ChangeNotifier {
       // fetchShared, NOT fetch: a co-parented read. This returns MY children
       // AND my partner's - which is how the second parent to sign in adopts the
       // baby the first parent already created, rather than making a duplicate.
+      final rows = await SupabaseRepo.fetchShared(
+        'children',
+        orderBy: 'created_at',
+        ascending: true,
+      );
+      // Newer wins per child, removals included (step 7, 0105). The cloud
+      // order (oldest first) is kept for the children the phone takes.
+      final merged = childrenMerge(
+          book: _book, live: _children, removed: _removed, rows: rows);
+      final order = [for (final r in rows) r['id'].toString()];
+      int rank(Child c) {
+        final i = order.indexOf(c.id);
+        return i < 0 ? order.length : i;
+      }
+
+      _children
+        ..clear()
+        ..addAll(merged.live..sort((a, b) => rank(a).compareTo(rank(b))));
+      _removed
+        ..clear()
+        ..addAll(merged.removed);
+      if (!_children.any((c) => c.id == _activeId)) {
+        _activeId = _children.isEmpty ? null : _children.first.id;
+      }
+      await _persist();
+      notifyListeners();
+      await _pushWaiting();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  // Kept for revert (step 7, 2026-10-20): the cloud copy won whole, so an
+  // offline edit was lost, and a child this phone held but the cloud did not
+  // was inserted again, even one the other parent had removed.
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
+    try {
       final rows = await SupabaseRepo.fetchShared(
         'children',
         orderBy: 'created_at',
@@ -528,6 +789,9 @@ class ChildProfileStore extends ChangeNotifier {
       } else {
         await prefs.setString(_activeKey, a);
       }
+      await prefs.setString(
+          _removedKey, jsonEncode(_removed.map((e) => e.toJson()).toList()));
+      await prefs.setString(_bookKey, jsonEncode(_book.toJson()));
     } catch (_) {}
   }
 
@@ -685,18 +949,21 @@ class ChildProfileStore extends ChangeNotifier {
       _children.add(c);
       _activeId = c.id;
     }
+    _book.touch(c.id);
     notifyListeners();
     await _persist();
 
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        if (promoting) {
-          await SupabaseRepo.insert('children', c.toRow());
-        } else {
-          // updateShared: co-parented, so either parent may edit the child.
-          await SupabaseRepo.updateShared('children', c.id, c.toRow());
-        }
-      } catch (_) {/* offline - reconciled on the next sync */}
-    }
+    // Kept for revert (step 7, 2026-10-20): one-shot writes, lost offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     if (promoting) {
+    //       await SupabaseRepo.insert('children', c.toRow());
+    //     } else {
+    //       // updateShared: co-parented, so either parent may edit the child.
+    //       await SupabaseRepo.updateShared('children', c.id, c.toRow());
+    //     }
+    //   } catch (_) {/* offline - reconciled on the next sync */}
+    // }
+    await _pushWaiting();
   }
 }

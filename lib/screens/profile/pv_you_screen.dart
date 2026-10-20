@@ -1840,6 +1840,25 @@ class _PvYouScreenState extends State<PvYouScreen> {
         subtitle: real.isEmpty ? content.childrenInvitation : null,
         onTap: () => showPvAddChildSheet(context),
       ),
+      ..._removedChildrenRow(tint),
+    ];
+  }
+
+  /// "Removed children", only while there is one to bring back (sync log
+  /// step 7, 2026-10-20): removing a child keeps every record, so restoring
+  /// is always possible. Opens the sheet with each child's Restore.
+  List<Widget> _removedChildrenRow(Color tint) {
+    final n = ChildProfileStore.instance.removedChildren.length;
+    if (n == 0) return const [];
+    return [
+      PvProfileRow(
+        key: const ValueKey('pv_profile_removed_children'),
+        mark: TtcTabArt(mark: TtcTabMark.sun, tint: tint),
+        title: 'Removed children',
+        subtitle: 'Records kept. Restore one at any time.',
+        badge: n,
+        onTap: () => showPvRemovedChildrenSheet(context, tint: tint),
+      ),
     ];
   }
 
@@ -1916,6 +1935,7 @@ class _PvYouScreenState extends State<PvYouScreen> {
           title: 'Your children',
           subtitle: content.childrenInvitation,
         ),
+      ..._removedChildrenRow(tint),
     ];
   }
 

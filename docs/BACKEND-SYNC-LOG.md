@@ -22,6 +22,7 @@ owed.
 | 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | `a0eb5b9` | yes (2026-10-17) |
 | 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | `f7ed88e` | yes (2026-10-17) |
 | 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | `af76d8f` | yes (2026-10-18) |
+| 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | pending | **not yet** |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -540,3 +541,96 @@ expected.
 - `test/pp_records_merge_test.dart` (new), `test/sync_guard_contract_test.dart`
 - `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`. `docs/BEFORE-LAUNCH.md` and `docs/BACKEND-PATTERNS.md`
   follow once the other terminal has committed its edits to them.
+
+---
+
+## Step 7: The child profile and the name votes
+
+**Date:** 2026-10-20 (planned and approved 2026-10-20). **Migration:** 0105 (**not yet run**). **Commit:** pending.
+
+**The problem (STILL-OPEN-BACKEND §1, the last two Parenting rows).**
+
+| Area | Bug |
+|---|---|
+| Child profile (`children`) | The pull took the cloud copy whole, so an **offline edit was lost** |
+| | A removed child **came back**: the other parent's phone still held it and inserted it again, now under their own name |
+| | The removal was a **hard delete**, which took the id out of `my_child_ids()`. Every `pp_*` policy gates on it, and no `pp_*` table has a foreign key to `children`, so the child's records stayed in the database where **neither parent could read them** |
+| | Logging growth wrote the child row as an edit, so under newer-wins a weight logged on a phone that hadn't pulled would undo the other parent's rename |
+| Name votes (`pp_name_votes`) | The pull adopted only "liked" rows and re-uploaded every name still liked on the phone, so a **skip made offline, or on the other phone, came back as a like** |
+| | Likes were never saved on the phone (only in the cloud), and stayed in memory after a sign-out |
+
+**Decisions (the user, 2026-10-20):**
+- Child profile: **whole row, latest edit wins**. The growth figures **don't count as an edit**.
+- Removing a child: **soft delete**, records kept, **with a way to restore**.
+- Name votes needed no decision: 0027 makes them own-rows-only (neither parent can read the other's), so it's
+  single-person data.
+
+**Done (2026-10-20):**
+- [x] Migration `0105_pp_children_votes_sync_clock.sql`:
+  - `updated_at` + `removed_at` on `children`; `updated_at` on `pp_name_votes` (a skip is `liked = false`, so no
+    `removed_at`);
+  - 0100's guard on both;
+  - **`my_child_ids()` deliberately unchanged**, so a removed child's records stay reachable and a restore brings
+    them back. RLS unchanged. Check query at the bottom.
+- [x] **`ChildProfileStore`** (`pp_child_profile.dart`):
+  - A `SyncRowBook`, saved beside the children (`pp_children_sync`), feeding the sign-out pending check.
+  - Pure `childrenMerge` (newer wins per child, removals included) and `childUploadFor`: a child the other parent
+    created goes as a plain UPDATE with **no `id` or `user_id`**; any other is upserted as us.
+  - `addChild`, `update`: stamp, then push through the book. `deleteChild`: soft delete; the child moves to a
+    `_removed` list (`pp_children_removed`). New `restoreChild` and `removedChildren`.
+  - New **`setMeasures`**: changes the figures and queues the row **without a new stamp** (the guard lets an equal
+    stamp through, skips an older one). A taken cloud row keeps this phone's figures. `pp_growth_data.dart` calls it
+    in place of `update`.
+  - The old insert / `updateShared` / `deleteShared` calls and the old pull (`_syncFromCloudOld`) are kept for
+    revert.
+- [x] **`NameMatchStore`** (`pp_names_data.dart`):
+  - A `_skipped` set and a `SyncRowBook` keyed by name, saved on the phone (`pp_name_votes_local`) with the likes.
+  - Pure `nameVotesMerge`; `like`, `skip` and `crown` stamp the vote; only waiting votes go up, as us, through
+    `upsertRowConfirmed` on `user_id,name`. Matches refresh after.
+  - A sign-out now clears the votes in memory too. The crown stays in the blob (step 10).
+- [x] **Restore in the UI** (pattern from Messages' "Recently Deleted" and Notion's Trash, via Mobbin):
+  - The remove dialog on the child's page now says the records are kept and where to bring the child back; after
+    removing, an Undo toast.
+  - The You screen shows a **"Removed children"** row (only while there is one) in both the Pregnancy and
+    Parenting children groups. It opens a sheet with one row per child and a Restore pill; restoring says
+    "<name> is back, with their records."
+- [x] Tests:
+  - New `test/pp_children_sync_test.dart` (12 cases): offline edit survives; the other parent's newer edit wins; a
+    taken row keeps this phone's figures; a removal stays removed when the other phone holds the child; a restore
+    beats the older removal; a removal uploads with `removed_at` and its columns; the other parent's child goes as
+    an UPDATE with no `user_id`; a new child is upserted as ours; a skip made offline stays skipped; a stale like
+    doesn't bring a name back; a new like waits to upload; a source scan of the wiring.
+  - `test/sync_guard_contract_test.dart`: both tables guarded, and 0105 doesn't redefine `my_child_ids()`.
+
+**Verified (2026-10-20):**
+- `flutter analyze` on every touched file: no new issues (one older `dead_code` warning at
+  `pv_you_screen.dart:2525`, an `if (false)` kept for revert).
+- 221 tests pass across 20 files: the child, profile, names, growth and You tests, plus every sync, merge, reset and
+  schema contract test.
+
+**Known limits, named:**
+- **Whole row.** Two parents editing different fields of the profile at the same moment: the later save wins whole.
+  Rare; the user chose it.
+- **The growth figures in the cloud can lag.** They go up only with an equal-or-newer stamp. Each phone works them
+  out from the growth log, so nothing reads the cloud copy (only `delete-account` touches `children` server-side).
+- **Mixed versions.** Until both phones update, the old app still hard-deletes and inserts a missing child again.
+
+**User runs (OWED):**
+1. 0105 in the Supabase SQL editor, **before** installing a build with this change (until then the uploads carry
+   columns the table lacks, are refused, and simply wait).
+2. Optional: the check query at the bottom. Expect 2 rows, `has_clock` and `guarded` true on both, `has_removed_at`
+   true for `children` only.
+
+**Owed (the two-phone walk):**
+- rename the child on A while B logs a weight → the new name holds on both;
+- remove a child on A → it stays gone on B; restore it on B → it's back on A, with its feeds and vaccines;
+- skip a liked name offline → it stays skipped after reconnecting, and on the other phone signed in to the same
+  account.
+
+**Files:**
+- `supabase/migrations/0105_pp_children_votes_sync_clock.sql` (new)
+- `lib/screens/post_pregnancy/pp_child_profile.dart`, `pp_names_data.dart`, `pp_growth_data.dart`
+- `lib/screens/profile/pv_child_screen.dart`, `pv_you_screen.dart`, `pv_you_sheets.dart`
+- `test/pp_children_sync_test.dart` (new), `test/sync_guard_contract_test.dart`
+- `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`, `docs/BACKEND-PATTERNS.md` (§16ii-h, reading list 38),
+  `docs/BEFORE-LAUNCH.md`
