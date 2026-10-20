@@ -22,7 +22,7 @@ owed.
 | 2026-10-17 | Step 4: the server enforces newer-wins and refuses future clocks | 0100 | `a0eb5b9` | yes (2026-10-17) |
 | 2026-10-17 | Step 5: Parenting logs (feeds, sleeps, nappies, pumping, tummy time, growth) | 0101 | `f7ed88e` | yes (2026-10-17) |
 | 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | `af76d8f` | yes (2026-10-18) |
-| 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | pending | **not yet** |
+| 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | `d76594b` | **not yet** |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -546,7 +546,7 @@ expected.
 
 ## Step 7: The child profile and the name votes
 
-**Date:** 2026-10-20 (planned and approved 2026-10-20). **Migration:** 0105 (**not yet run**). **Commit:** pending.
+**Date:** 2026-10-20 (planned and approved 2026-10-20). **Migration:** 0105 (**not yet run**). **Commit:** `d76594b`.
 
 **The problem (STILL-OPEN-BACKEND §1, the last two Parenting rows).**
 

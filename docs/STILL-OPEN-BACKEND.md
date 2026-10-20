@@ -20,7 +20,7 @@ detail behind each step. `docs/BACKEND-SYNC-LOG.md` is the dated history of the 
 step, newest at the bottom. When a step lands: tick it here, add its log entry there, and update
 `docs/BEFORE-LAUNCH.md`.
 
-### Done (committed, and every migration run and checked on the live database, except step 7: built 2026-10-20, its commit and 0105 are owed)
+### Done (committed, and every migration run and checked on the live database, except step 7: committed `d76594b` 2026-10-20, 0105 not yet run)
 
 | Step | What | Migration | Commit |
 |---|---|---|---|
@@ -30,7 +30,7 @@ step, newest at the bottom. When a step lands: tick it here, add its log entry t
 | 4 | Server guard `pv_sync_newer_wins` (an older edit can't overwrite a newer one) | 0100 | `a0eb5b9` |
 | 5 | Parenting logs: feeds, sleep, nappies, pumping, tummy time, growth | 0101 | `f7ed88e` |
 | 6 | Parenting records: documents, health, milestones, vaccines, emergency card | 0104 | `af76d8f`, docs `2ba778e` |
-| 7 | Parenting's last two: the child profile (soft delete + Restore) and the name votes | 0105 (**the user runs it**) | pending |
+| 7 | Parenting's last two: the child profile (soft delete + Restore) and the name votes | 0105 (**the user runs it**) | `d76594b` |
 
 ### Still to do, in order
 
