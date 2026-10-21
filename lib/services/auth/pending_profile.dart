@@ -45,8 +45,14 @@ class PendingProfile {
 
   static const String _key = 'pending_profile_json';
 
+  /// Whether anything is waiting, as last seen on disk. Synchronous, for the
+  /// sign-out sheet (`SyncRegistry.hasPendingChanges`); set by every save,
+  /// load and clear.
+  static bool hasPendingCached = false;
+
   /// Hold onto the onboarding answers until there is somebody to attach them to.
   static Future<void> save(Map<String, dynamic> fields) async {
+    hasPendingCached = fields.isNotEmpty;
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_key, jsonEncode(fields));
@@ -55,11 +61,39 @@ class PendingProfile {
     }
   }
 
+  /// A profile change made in the app (sync log step 11, 2026-10-21): sent
+  /// now, confirmed, and kept here if it did not land, merged over anything
+  /// already waiting so the newest value of each column wins. The next sync
+  /// ([flush], run by `SyncRegistry.resyncAll`) sends it again.
+  ///
+  /// Before this, her due date, her name and his role went up through a
+  /// bare `.update()` inside `catch (_) {}`: offline, the change lived on the
+  /// phone only, and nothing ever tried again.
+  static Future<bool> send(Map<String, dynamic> changes) async {
+    if (changes.isEmpty) return true;
+    final ok = await SupabaseRepo.updateMyProfileConfirmed(changes);
+    if (ok) {
+      // An older value of these columns may still be waiting (onboarding's
+      // due date, then a new one set here): it must not land later and
+      // overwrite this one, so it is dropped.
+      final waiting = await load();
+      if (waiting != null) {
+        waiting.removeWhere((k, _) => changes.containsKey(k));
+        waiting.isEmpty ? await clear() : await save(waiting);
+      }
+      return true;
+    }
+    final waiting = await load() ?? <String, dynamic>{};
+    await save({...waiting, ...changes});
+    return false;
+  }
+
   /// What is waiting, or null if nothing is.
   static Future<Map<String, dynamic>?> load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
+      hasPendingCached = raw != null && raw.isNotEmpty && raw != '{}';
       if (raw == null || raw.isEmpty) return null;
       final decoded = jsonDecode(raw);
       if (decoded is Map<String, dynamic>) return decoded;
@@ -72,6 +106,7 @@ class PendingProfile {
   }
 
   static Future<void> clear() async {
+    hasPendingCached = false;
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_key);
@@ -81,6 +116,13 @@ class PendingProfile {
   }
 
   /// Write anything pending into `profiles`, then forget it.
+  ///
+  /// ⚠️ ONLY THE OLD SIGN-IN SCREEN CALLED THIS until 2026-10-21. Onboarding V3
+  /// stashes her answers here whenever its write fails or there is no session
+  /// yet, and nothing in the live flow ever sent them: her name, role, due
+  /// date and WhatsApp choice could sit on the phone for good. The wiring
+  /// gate exactly. `SyncRegistry.resyncAll` now runs it on every sign-in and
+  /// every resume (sync log step 11).
   ///
   /// Call after ANY route that establishes a session. Safe to call when there
   /// is nothing pending and safe to call when logged out — both are no-ops, so

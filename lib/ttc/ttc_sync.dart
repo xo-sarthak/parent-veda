@@ -43,6 +43,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
 import '../services/remote/sync_registry.dart';
@@ -110,6 +111,8 @@ mixin TtcSyncedStore on ChangeNotifier {
   void _resetForAccount() {
     _pushTimer?.cancel();
     _cloudReady = false;
+    _lastSendRefused = false;
+    _waitingLoaded = false;
     resetLocal();
   }
 
@@ -117,9 +120,52 @@ mixin TtcSyncedStore on ChangeNotifier {
   bool get cloudReady => _cloudReady;
 
   /// True while this store holds changes the cloud has not confirmed. Stores
-  /// that track it (CycleStore, TtcLogStore) override this; the sign-out
-  /// dialog and Settings read it through [SyncRegistry.hasPendingChanges].
-  bool get hasPendingPush => false;
+  /// that track it row by row (CycleStore, TtcLogStore) override this; the
+  /// sign-out dialog and Settings read it through
+  /// [SyncRegistry.hasPendingChanges]. Before step 11 the default was a
+  /// constant `false`, so a one-row store that failed to upload still told
+  /// the sign-out sheet "everything is saved". Kept for revert:
+  ///   bool get hasPendingPush => false;
+  bool get hasPendingPush => _lastSendRefused;
+
+  // ── One-row stores: a waiting mark (sync log step 11, 2026-10-21) ─────────
+  //
+  // Her journey, her ready plan, her treatment cycle and her life stage are
+  // ONE row each, and every push sends the whole row. So "is anything
+  // waiting?" is just "did the last send land?". [sendTracked] records the
+  // answer on disk (a restart must not forget it) under [waitingKey], and
+  // the next sync re-sends the row anyway, so nothing else is needed.
+
+  bool _lastSendRefused = false;
+  bool _waitingLoaded = false;
+
+  /// The prefs key the waiting mark is kept under; null for stores that do
+  /// not use [sendTracked].
+  String? get waitingKey => null;
+
+  /// Runs [write] (a confirmed upload) and remembers whether it landed.
+  Future<bool> sendTracked(Future<bool> Function() write) async {
+    final ok = await write();
+    _lastSendRefused = !ok;
+    final key = waitingKey;
+    if (key != null) {
+      try {
+        final p = await SharedPreferences.getInstance();
+        ok ? await p.remove(key) : await p.setBool(key, true);
+      } catch (_) {/* the in-memory mark still answers the sign-out sheet */}
+    }
+    return ok;
+  }
+
+  Future<void> _loadWaiting() async {
+    final key = waitingKey;
+    if (key == null || _waitingLoaded) return;
+    _waitingLoaded = true;
+    try {
+      final p = await SharedPreferences.getInstance();
+      _lastSendRefused = _lastSendRefused || (p.getBool(key) ?? false);
+    } catch (_) {}
+  }
 
   /// Runs [pushToCloud], one at a time. A call that arrives while an upload
   /// is running is folded into one more run after it.
@@ -169,6 +215,7 @@ mixin TtcSyncedStore on ChangeNotifier {
       SyncRegistry.registerPending(() => hasPendingPush);
       SyncRegistry.registerReset(_resetForAccount);
     }
+    await _loadWaiting();
     if (SupabaseRepo.isLoggedIn) {
       try {
         await pullFromCloud();

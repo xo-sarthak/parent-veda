@@ -38,6 +38,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/sync_registry.dart';
+
 import 'cycle_store.dart';
 import 'ttc_pcos_check_data.dart';
 import 'ttc_pcos_check_rules.dart';
@@ -47,7 +49,9 @@ import 'ttc_pcos_check_rules.dart';
 enum PcosAnswerSource { hers, derived }
 
 class TtcPcosCheckStore extends ChangeNotifier {
-  TtcPcosCheckStore._();
+  TtcPcosCheckStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcPcosCheckStore instance = TtcPcosCheckStore._();
 
   static const _kAnswers = 'ttc_pcos_answers';
@@ -100,6 +104,17 @@ class TtcPcosCheckStore extends ChangeNotifier {
     notifyListeners();
     final p = await SharedPreferences.getInstance();
     await p.setString(_kDone, _completedAt!.toIso8601String());
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // reset() also writes prefs, so this one touches memory only.
+  void _resetForAccount() {
+    _answers.clear();
+    _sources.clear();
+    _completedAt = null;
+    _loaded = false;
+    notifyListeners();
   }
 
   /// Starts again. Keeps nothing — a half-remembered previous answer showing up

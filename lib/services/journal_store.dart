@@ -134,6 +134,7 @@ class JournalStore extends ChangeNotifier {
       }
       _tombstones.addAll(prefs.getStringList(_tombKey) ?? const []);
       _seen.addAll(prefs.getStringList(_seenKey) ?? const []);
+      _unsent.addAll(prefs.getStringList(_unsentKey) ?? const []);
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
@@ -150,6 +151,7 @@ class JournalStore extends ChangeNotifier {
   void _resetLocal() {
     _tombstones.clear();
     _seen.clear();
+    _unsent.clear();
     _manual.clear();
     _partner.clear();
     _partnerChild.clear();
@@ -157,9 +159,27 @@ class JournalStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Changes the cloud has not confirmed (sync log step 11, 2026-10-21): a
+  /// removal still waiting, an entry the cloud has never seen, or an edit
+  /// whose upload failed. The sync below already retried all three; the
+  /// sign-out sheet just could not see them.
+  bool get hasPendingPush =>
+      _tombstones.isNotEmpty ||
+      _unsent.isNotEmpty ||
+      _manual.any((e) => !_seen.contains(e.id));
+
+  // Registered on every sync, so it must dedupe: two tear-offs of one
+  // object's method compare equal, two `() => hasPendingPush` closures don't.
+  bool _pending() => hasPendingPush;
+
+  /// Edited entries whose upload failed, kept on disk.
+  static const _unsentKey = 'journal_unsent_ids';
+  final Set<String> _unsent = {};
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
+    SyncRegistry.registerPending(_pending);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('journal_entries');
@@ -183,6 +203,9 @@ class JournalStore extends ChangeNotifier {
       for (final e in m.push) {
         await journalUpsert('journal_entries', e);
       }
+      // Every newer copy went up above (a failure throws out of this try),
+      // so no edit is waiting any more.
+      _unsent.clear();
       _seen
         ..clear()
         ..addAll(m.seen);
@@ -355,7 +378,16 @@ class JournalStore extends ChangeNotifier {
     if (SupabaseRepo.isLoggedIn) {
       try {
         await journalUpsert('journal_entries', e);
-      } catch (_) {/* offline — newer here, so the next sync pushes it */}
+        if (_unsent.remove(e.id)) await _persist();
+      } catch (_) {
+        // Offline: newer here, so the next sync pushes it. Remembered so
+        // the sign-out sheet knows (step 11).
+        _unsent.add(e.id);
+        await _persist();
+      }
+    } else {
+      _unsent.add(e.id);
+      await _persist();
     }
   }
 
@@ -366,6 +398,7 @@ class JournalStore extends ChangeNotifier {
           _key, jsonEncode(_manual.map((e) => e.toJson()).toList()));
       await prefs.setStringList(_tombKey, _tombstones.toList());
       await prefs.setStringList(_seenKey, _seen.toList());
+      await prefs.setStringList(_unsentKey, _unsent.toList());
     } catch (_) {/* best-effort */}
   }
 

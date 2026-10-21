@@ -14,8 +14,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/sync_registry.dart';
+
 class PvSearchStore extends ChangeNotifier {
-  PvSearchStore._();
+  PvSearchStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PvSearchStore instance = PvSearchStore._();
 
   static const _key = 'pv_search_recent';
@@ -49,6 +53,15 @@ class PvSearchStore extends ChangeNotifier {
     _recent = next;
     notifyListeners();
     await _save();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // clear() also writes prefs, so this one touches memory only.
+  void _resetForAccount() {
+    _recent = const [];
+    _loaded = false;
+    notifyListeners();
   }
 
   Future<void> clear() async {

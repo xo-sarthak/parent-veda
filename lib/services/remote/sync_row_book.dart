@@ -158,7 +158,40 @@ class SyncRowBook {
     for (final id in cloudStamp.keys) {
       if (!take.contains(id) && !push.contains(id)) dirty.remove(id);
     }
+    dropSettled();
     return taken;
+  }
+
+  /// How long this phone remembers a removal the cloud has confirmed
+  /// (sync log step 12, 2026-10-21). SHORTER than the server's purge (0109,
+  /// 90 days) on purpose, and the order matters:
+  ///
+  ///   · phone forgets first (day 80): the cloud still has the removed row,
+  ///     so the next pull simply reads the removal again, and this drops it
+  ///     again at the end of the same merge. Harmless.
+  ///   · server forgets first: a phone still holding the removal would see
+  ///     "the cloud has never heard of this", upload it, and undo the purge,
+  ///     every day, for ever (see [merge]: a removal the cloud lacks is
+  ///     pushed). That is the case 80 < 90 rules out.
+  static const Duration keepRemovals = Duration(days: 80);
+
+  /// Forgets removals the cloud has confirmed (not [dirty]) and that are
+  /// older than [keepRemovals]. Returns the ids it dropped, so a ledger can
+  /// drop its own notes about them. Before step 12 a removal stayed in the
+  /// phone's book for ever.
+  Set<String> dropSettled({int? nowMs}) {
+    final cutoff = (nowMs ?? _now()) - keepRemovals.inMilliseconds;
+    final drop = <String>{
+      for (final e in removed.entries)
+        if (e.value < cutoff && !dirty.contains(e.key)) e.key,
+    };
+    for (final id in drop) {
+      removed.remove(id);
+      stamps.remove(id);
+      owners.remove(id);
+      removedRows.remove(id);
+    }
+    return drop;
   }
 
   void clear() {

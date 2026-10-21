@@ -14,8 +14,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/sync_registry.dart';
+
 class PrepareStore extends ChangeNotifier {
   PrepareStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
     _load();
   }
   static final PrepareStore instance = PrepareStore._();
@@ -29,6 +32,15 @@ class PrepareStore extends ChangeNotifier {
     final p = await SharedPreferences.getInstance();
     _booked.addAll(p.getStringList(_key) ?? const <String>[]);
     _loaded = true;
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Loaded once, in the constructor, so `_loaded` stays true: prefs are
+  // empty now, and an empty set is what a reload would find.
+  void _resetForAccount() {
+    _booked.clear();
     notifyListeners();
   }
 

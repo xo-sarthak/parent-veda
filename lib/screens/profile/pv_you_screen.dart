@@ -52,6 +52,7 @@ import '../../models/pv_product.dart' show PvStageCopy;
 import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/pv_order_store.dart';
+import '../../services/auth/pending_profile.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../services/saved_store.dart';
 import '../../services/scans_store.dart';
@@ -531,7 +532,9 @@ class _PvYouScreenState extends State<PvYouScreen> {
     //   ctl.dispose();
     Future<void>.delayed(const Duration(milliseconds: 600), ctl.dispose);
     if (v == null || v.isEmpty) return;
-    await SupabaseRepo.updateMyProfile({'name': v});
+    // Confirmed and kept if it did not land (sync log step 11, 2026-10-21).
+    // Kept for revert: await SupabaseRepo.updateMyProfile({'name': v});
+    await PendingProfile.send({'name': v});
     await PregnancyController.current?.loadProfileFromCloud();
     if (mounted) setState(() {});
   }

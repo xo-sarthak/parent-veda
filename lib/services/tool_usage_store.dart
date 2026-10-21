@@ -36,8 +36,12 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/sync_registry.dart';
+
 class ToolUsageStore extends ChangeNotifier {
-  ToolUsageStore._();
+  ToolUsageStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final ToolUsageStore instance = ToolUsageStore._();
 
   static const _key = 'tool_usage_v1';
@@ -111,6 +115,13 @@ class ToolUsageStore extends ChangeNotifier {
     } catch (_) {
       // Fire-and-forget, like every other store here.
     }
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

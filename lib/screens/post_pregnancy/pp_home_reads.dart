@@ -23,6 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
+import '../../services/remote/sync_registry.dart';
 import 'pp_child_profile.dart';
 import 'pp_content.dart';
 import 'pp_daily_tips.dart';
@@ -216,7 +217,9 @@ PvRead ppTipAsRead(String id, DailyTip tip) => PvRead(
 
 /// The last door page opened, for "Continue reading".
 class PpLastPageStore extends ChangeNotifier {
-  PpLastPageStore._();
+  PpLastPageStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PpLastPageStore instance = PpLastPageStore._();
 
   static const _key = 'pp_last_page_v1';
@@ -254,6 +257,13 @@ class PpLastPageStore extends ChangeNotifier {
     final s = _sectionId == null ? null : ppSectionFor(_sectionId!);
     final p = s?.pageById(_pageId ?? '');
     return (s == null || p == null) ? null : (section: s, page: p);
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    debugReset();
+    notifyListeners();
   }
 
   @visibleForTesting

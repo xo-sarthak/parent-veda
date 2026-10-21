@@ -697,12 +697,15 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid != null) {
       final name = _name.text.trim();
+      // Confirmed and kept if it did not land (sync log step 11,
+      // 2026-10-21). The bare update it replaced, kept for revert:
+      //   await Supabase.instance.client.from('profiles').update({...}).eq('id', uid);
       try {
-        await Supabase.instance.client.from('profiles').update({
+        await PendingProfile.send({
           'role': 'father',
           'pairing_code': null, // the father shares no code - clear his unused one
           if (name.isNotEmpty) 'name': name,
-        }).eq('id', uid);
+        });
       } catch (_) {/* best-effort */}
     }
     if (mounted) widget.onDone(null, true);

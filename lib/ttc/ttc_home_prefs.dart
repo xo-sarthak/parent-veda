@@ -18,6 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/pv_read_store.dart';
+import '../services/remote/sync_registry.dart';
 
 /// "Trying to conceive 101", in order: the free seven-step course from the
 /// gap analysis ("Behind: Learning shapes", P1), built from reads we already
@@ -41,7 +42,9 @@ const List<String> kTtc101ReadIds = [
 const int kTtc101StartedAfter = 2;
 
 class TtcHomePrefs extends ChangeNotifier {
-  TtcHomePrefs._();
+  TtcHomePrefs._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcHomePrefs instance = TtcHomePrefs._();
 
   static const String _kCheckDismissed = 'ttc_home_check_dismissed';
@@ -100,6 +103,15 @@ class TtcHomePrefs extends ChangeNotifier {
 
   /// Whether the home should still offer the course.
   bool get offer101 => opened101 < kTtc101StartedAfter;
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _loaded = false;
+    _checkDismissed = false;
+    _opened.clear();
+    notifyListeners();
+  }
 
   @visibleForTesting
   void resetForTest() {

@@ -24,6 +24,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
 import '../services/family_profile.dart';
+import '../services/remote/sync_registry.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -2379,7 +2380,9 @@ final Map<ConditionGroup, List<ConditionEntry>> kSeeMoreGroups = {
 //  this earns.
 // =============================================================================
 class ConditionsStore extends ChangeNotifier {
-  ConditionsStore._();
+  ConditionsStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final ConditionsStore instance = ConditionsStore._();
 
   static const _doorKey = 'conditions_door_answer';
@@ -2394,6 +2397,16 @@ class ConditionsStore extends ChangeNotifier {
   ConditionDoorAnswer get door => _door;
   bool get isDiagnosed => _door == ConditionDoorAnswer.diagnosed;
   bool get answered => _door != ConditionDoorAnswer.unset;
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _door = ConditionDoorAnswer.unset;
+    _medicineDeclined.clear();
+    _addedToJourney.clear();
+    _loaded = false;
+    notifyListeners();
+  }
 
   bool medicineDeclinedFor(String id) => _medicineDeclined.contains(id);
   bool isAddedToJourney(String id) => _addedToJourney.contains(id);

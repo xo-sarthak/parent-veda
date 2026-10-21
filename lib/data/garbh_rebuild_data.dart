@@ -45,6 +45,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
+import '../services/remote/sync_registry.dart';
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
@@ -302,7 +303,9 @@ class GarbhJournalEntry {
 /// that fails to save because the network is down would be the worst possible
 /// failure in this section: she has just recorded her voice for her child.
 class GarbhJournalStore extends ChangeNotifier {
-  GarbhJournalStore._();
+  GarbhJournalStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final GarbhJournalStore instance = GarbhJournalStore._();
 
   static const _entriesKey = 'garbh_journal_v1';
@@ -512,6 +515,13 @@ class GarbhJournalStore extends ChangeNotifier {
       await p.setStringList(_ritualsKey, _rituals.toList());
       await p.setBool(_ritualAskedKey, _asked);
     } catch (_) {/* local-first, best effort */}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

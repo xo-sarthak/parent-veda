@@ -39,6 +39,7 @@ import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/bracket_resolver.dart';
+import '../../services/remote/sync_registry.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'sk_child_store.dart';
@@ -92,7 +93,9 @@ class SkVoiceClip {
 }
 
 class SkVoiceStore extends ChangeNotifier {
-  SkVoiceStore._();
+  SkVoiceStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final SkVoiceStore instance = SkVoiceStore._();
 
   static const _key = 'sk_voice';
@@ -145,6 +148,15 @@ class SkVoiceStore extends ChangeNotifier {
     }
     _clips.clear();
     _save();
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Memory only: the files on disk and prefs are not touched here.
+  void _resetForAccount() {
+    _clips.clear();
+    _loaded = false;
     notifyListeners();
   }
 

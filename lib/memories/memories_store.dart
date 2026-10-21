@@ -14,6 +14,7 @@ import 'dart:ui' show Offset;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/sync_registry.dart';
 import 'memory_models.dart';
 
 /// One saved memory: which milestone, which template, and the words + photo the
@@ -88,7 +89,9 @@ class SavedMemory {
 }
 
 class MemoriesStore extends ChangeNotifier {
-  MemoriesStore._();
+  MemoriesStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final MemoriesStore instance = MemoriesStore._();
 
   static const _key = 'memories_v1';
@@ -138,6 +141,15 @@ class MemoriesStore extends ChangeNotifier {
   void delete(String id) {
     _items.removeWhere((m) => m.id == id);
     _persist();
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // resetAll() below also writes prefs, so this one touches memory only.
+  void _resetForAccount() {
+    _items.clear();
+    _loaded = false;
     notifyListeners();
   }
 

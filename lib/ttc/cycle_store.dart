@@ -21,6 +21,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
+import '../services/remote/sync_batch.dart';
 import 'ttc_chapter.dart';
 import 'ttc_row_merge.dart';
 import 'ttc_sync.dart';
@@ -536,6 +537,16 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
       if (!plan.take.contains(k) && !plan.push.contains(k)) _dirty.remove(k);
     }
     _periodStarts.sort();
+    // Removals the cloud has confirmed, older than 80 days, are forgotten
+    // (sync log step 12): the same rule and the same reason as
+    // `SyncRowBook.dropSettled`, before the server's 90-day purge (0109).
+    final cutoff = DateTime.now().toUtc().subtract(SyncRowBook.keepRemovals);
+    for (final k in _tombs.keys.toList()) {
+      if (_tombs[k]!.isBefore(cutoff) && !_dirty.contains(k)) {
+        _tombs.remove(k);
+        _stamps.remove(k);
+      }
+    }
   }
 
   /// Takes the cloud's copy of one row: its value, or its removal.
@@ -612,17 +623,34 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pushToCloud() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
+    // In batches, one table at a time (step 11, sync_batch.dart). The
+    // row-at-a-time loop it replaced, kept for revert:
+    //   for (final k in List.of(_dirty)) {
+    //     final row = _rowFor(k, uid);
+    //     if (row == null) { _dirty.remove(k); continue; }
+    //     final sent = _stamps[k];
+    //     final ok = await TtcSyncUtil.upsertConfirmed(
+    //         k.startsWith('c|') ? TtcTables.cycles : TtcTables.signals, row, onConflict: 'id');
+    //     if (ok && _stamps[k] == sent) _dirty.remove(k);
+    //   }
+    final cycles = <String, Map<String, dynamic>>{};
+    final signals = <String, Map<String, dynamic>>{};
+    final sent = <String, DateTime?>{};
     for (final k in List.of(_dirty)) {
       final row = _rowFor(k, uid);
       if (row == null) {
         _dirty.remove(k);
         continue;
       }
-      final sent = _stamps[k];
-      final ok = await TtcSyncUtil.upsertConfirmed(
-          k.startsWith('c|') ? TtcTables.cycles : TtcTables.signals, row,
-          onConflict: 'id');
-      if (ok && _stamps[k] == sent) _dirty.remove(k);
+      sent[k] = _stamps[k];
+      (k.startsWith('c|') ? cycles : signals)[k] = row;
+    }
+    for (final part in [(TtcTables.cycles, cycles), (TtcTables.signals, signals)]) {
+      final took = await SyncBatch.push(part.$2,
+          (batch) => SupabaseRepo.upsertRows(part.$1, batch, onConflict: 'id'));
+      for (final k in took) {
+        if (_stamps[k] == sent[k]) _dirty.remove(k);
+      }
     }
     await _persist();
   }

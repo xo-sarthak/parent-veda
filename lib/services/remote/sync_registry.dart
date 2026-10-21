@@ -16,6 +16,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../auth/local_owner.dart';
+import '../auth/pending_profile.dart';
 
 class SyncRegistry {
   SyncRegistry._();
@@ -60,6 +61,7 @@ class SyncRegistry {
 
   /// True when any store holds changes the cloud has not confirmed yet.
   static bool get hasPendingChanges {
+    if (PendingProfile.hasPendingCached) return true;
     for (final p in _pending) {
       try {
         if (p()) return true;
@@ -97,6 +99,11 @@ class SyncRegistry {
     try {
       await LocalOwner.ensureCurrent();
     } catch (_) {/* never block a sync on the check */}
+    // Profile changes that did not land (onboarding's answers, a due date
+    // set offline) go up first (sync log step 11, 2026-10-21).
+    try {
+      await PendingProfile.flush();
+    } catch (_) {/* kept for the next sync */}
     for (final syncer in List.of(_syncers)) {
       try {
         await syncer();

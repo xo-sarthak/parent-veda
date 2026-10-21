@@ -87,6 +87,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../booking/booking_models.dart';
 import '../booking/booking_store.dart';
 import '../services/remote/supabase_repo.dart';
+import '../services/remote/sync_batch.dart';
 import 'ttc_author.dart';
 import 'ttc_records_store.dart' show TtcAppointmentsStore;
 import 'ttc_sync.dart';
@@ -624,6 +625,7 @@ class TtcDoctorQuestionsStore extends ChangeNotifier with TtcSyncedStore {
   @visibleForTesting
   void resetForTest() {
     _rows.clear();
+    _sentAt.clear();
     _loaded = true;
     if (!_localReady.isCompleted) _localReady.complete();
     notifyListeners();
@@ -648,6 +650,16 @@ class TtcDoctorQuestionsStore extends ChangeNotifier with TtcSyncedStore {
         ..addAll((p.getStringList(_key) ?? const <String>[])
             .map(TtcDoctorQuestion.decode)
             .whereType<TtcDoctorQuestion>());
+      _sentAt.clear();
+      final sent = p.getString(_sentKey);
+      if (sent != null) {
+        final m = jsonDecode(sent);
+        if (m is Map) {
+          for (final e in m.entries) {
+            if (e.value is num) _sentAt[e.key.toString()] = (e.value as num).toInt();
+          }
+        }
+      }
       if (await migrateFromJournal(p)) await _persist();
     } catch (_) {/* keep what loaded */}
     _loaded = true;
@@ -735,11 +747,81 @@ class TtcDoctorQuestionsStore extends ChangeNotifier with TtcSyncedStore {
       } else if (cloud.updatedAt.isAfter(_rows[i].updatedAt)) {
         _rows[i] = cloud;
       }
+      // The cloud holds this version, so it is not waiting any more.
+      final now = _rows.firstWhere((q) => q.id == id);
+      if (!now.updatedAt.isAfter(cloud.updatedAt)) {
+        _sentAt[id] = now.updatedAt.millisecondsSinceEpoch;
+      }
     }
+    await _persistSent();
+  }
+
+  // ── What the cloud has confirmed (sync log step 11, 2026-10-21) ──────────
+  //
+  // The push used to re-send EVERY one of her questions on every change,
+  // through `upsertAll`, which swallowed each refusal. Nothing knew whether a
+  // question had reached the account, so the sign-out sheet could say "all
+  // saved" over one that never did. Each row already carries its edit time,
+  // so "waiting" is simply: her row's `updatedAt` is not the one the cloud
+  // last confirmed. Only those go up, in batches, and the answer is kept.
+
+  static const _sentKey = 'ttc_doctor_questions_sent';
+
+  /// id -> the `updatedAt` (ms) the cloud last confirmed for her row.
+  final Map<String, int> _sentAt = {};
+
+  bool _waiting(TtcDoctorQuestion q) =>
+      q.isMine && _sentAt[q.id] != q.updatedAt.millisecondsSinceEpoch;
+
+  @override
+  bool get hasPendingPush => _rows.any(_waiting);
+
+  Future<void> _persistSent() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(_sentKey, jsonEncode(_sentAt));
+    } catch (_) {/* best-effort: worst case, a confirmed row is sent again */}
   }
 
   @override
   Future<void> pushToCloud() async {
+    final uid = SupabaseRepo.userId;
+    if (uid == null) return;
+    final ups = <String, Map<String, dynamic>>{
+      for (final q in _rows.where(_waiting)) q.id: _rowOf(q, uid),
+    };
+    final stamp = {
+      for (final q in _rows.where(_waiting))
+        q.id: q.updatedAt.millisecondsSinceEpoch,
+    };
+    final took = await SyncBatch.push(ups,
+        (batch) => SupabaseRepo.upsertRows(table, batch, onConflict: 'id'));
+    for (final id in took) {
+      _sentAt[id] = stamp[id]!;
+    }
+    await _persistSent();
+  }
+
+  Map<String, dynamic> _rowOf(TtcDoctorQuestion q, String uid) => {
+        'id': q.id,
+        'user_id': uid,
+        'body': q.text,
+        'written_at': SupabaseRepo.dbTime(q.writtenAt),
+        'updated_at': SupabaseRepo.dbTime(q.updatedAt),
+        // Always sent, null included: an Undo has to clear the stamp in
+        // the cloud too, and a key left out would leave it set.
+        'removed_at':
+            q.removedAt == null ? null : SupabaseRepo.dbTime(q.removedAt!),
+        // Both always sent, null included, for the same reason: an
+        // untick or "Keep for the next visit" clears them.
+        'appointment_id': q.appointmentId,
+        'asked_at': q.askedAt == null ? null : SupabaseRepo.dbTime(q.askedAt!),
+      };
+
+  // The push before step 11: every one of her rows, every time, refusals
+  // swallowed. Kept for revert.
+  // ignore: unused_element
+  Future<void> _pushAllKept() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
     await TtcSyncUtil.upsertAll(

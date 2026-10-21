@@ -54,6 +54,99 @@ void main() {
             '${missing.join('\n')}');
   });
 
+  // ---- phone-only stores (sync log step 12, 2026-10-21) --------------------
+  //
+  // A store that never syncs still holds the last person in memory after a
+  // sign-out: prefs are wiped, the singleton was not, so her data stayed on
+  // screen and the next write put it back on disk for the next account. Every
+  // singleton that reads prefs now registers a reset, syncs through a mixin or
+  // ledger that carries one, or is named here with the reason it holds
+  // nothing about the person.
+  const deviceSettings = <String, String>{
+    // Device and cache: nothing in them is about the person.
+    'lib/referral/install_referrer.dart':
+        'device: "has this install been checked", once per install',
+    'lib/services/baby_voice_service.dart':
+        'device: voice mute switches for this phone',
+    'lib/services/preg_size_set_store.dart':
+        'device: which comparison set (fruit, kitchen, sweets) is drawn',
+    'lib/services/profile_analytics.dart':
+        'device: an anonymous install id for question analytics',
+    'lib/services/pv_door_strip_store.dart':
+        'device: which "start here" hint strips were dismissed',
+    'lib/services/usage_events.dart':
+        'device: a queue of screen-level usage events, no content',
+    'lib/ttc/ttc_cue_sounds.dart': 'device: practice cue sounds on or off',
+    'lib/screens/v2/v2_block_art.dart':
+        'device: door marks drawn as vectors or images',
+    // Another terminal, or the main session, is editing these.
+    'lib/screens/ttc/ttc_learn_screen.dart':
+        'deferred: another terminal is editing it; reset owed, '
+            'STILL-OPEN-BACKEND §4',
+    'lib/screens/ttc/ttc_strings.dart':
+        'deferred: another terminal is editing it; reset owed, '
+            'STILL-OPEN-BACKEND §4',
+    'lib/ttc/ttc_ready_habits_store.dart':
+        'deferred: another terminal is editing it; reset owed, '
+            'STILL-OPEN-BACKEND §4',
+    'lib/widgets/global_ask_fab.dart':
+        'deferred: another terminal is editing it; reset owed, '
+            'STILL-OPEN-BACKEND §4',
+    'lib/services/notification_service.dart':
+        'device: holds no person; every wipe cancels what it scheduled '
+            '(LocalOwner.wipeThisPhone -> cancelAllScheduled, step 12)',
+    // The doctor app signs out its own way.
+    'lib/doctor/doctor_availability.dart':
+        'doctor app: its own sign-out, a separate pass',
+    'lib/doctor/doctor_ledger.dart':
+        'doctor app: its own sign-out, a separate pass',
+    'lib/doctor/doctor_onboarding_store.dart':
+        'doctor app: its own sign-out, a separate pass',
+    'lib/doctor/doctor_schedule_store.dart':
+        'doctor app: its own sign-out, a separate pass',
+    'lib/doctor/doctor_session.dart':
+        'doctor app: its own sign-out, a separate pass',
+    'lib/doctor/doctor_updates.dart':
+        'doctor app: its own sign-out, a separate pass',
+  };
+
+  test('a singleton that reads prefs forgets the person on sign-out', () {
+    final singleton = RegExp(r'static final (\w+(<[^>]*>)? )?instance\b');
+    const covered = [
+      'SyncRegistry.registerReset(',
+      'with TtcSyncedStore',
+      'CloudSyncedStore',
+      'OwnRowLedger(',
+      'ChildLogLedger(',
+      'SyncRowBook',
+    ];
+    final missing = <String>[];
+    for (final f in Directory('lib').listSync(recursive: true)) {
+      if (f is! File || !f.path.endsWith('.dart')) continue;
+      final path = f.path.replaceAll('\\', '/');
+      if (deviceSettings.containsKey(path)) continue;
+      final src = _read(f.path);
+      if (!singleton.hasMatch(src)) continue;
+      if (!src.contains('SharedPreferences.getInstance')) continue;
+      if (covered.any(src.contains)) continue;
+      missing.add(path);
+    }
+    expect(missing, isEmpty,
+        reason: 'these singletons keep the last person in memory after a '
+            'sign-out. Register a reset (SyncRegistry.registerReset), or, if '
+            'the file holds only device settings, add it to deviceSettings '
+            'with the reason:\n${missing.join('\n')}');
+  });
+
+  test('every file the phone-only allowlist names still exists', () {
+    final gone = [
+      for (final p in deviceSettings.keys)
+        if (!File(p).existsSync()) p,
+    ];
+    expect(gone, isEmpty,
+        reason: 'remove these from deviceSettings:\n${gone.join('\n')}');
+  });
+
   test('both sync mixins require a reset', () {
     expect(_read('lib/ttc/ttc_sync.dart'), contains('void resetLocal();'));
     expect(_read('lib/services/remote/cloud_synced_store.dart'),

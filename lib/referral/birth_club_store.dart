@@ -26,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/community_data.dart';
 import '../services/community_store.dart';
+import '../services/remote/sync_registry.dart';
 import 'referral_analytics.dart';
 
 /// The community room a birth club maps to.
@@ -44,7 +45,9 @@ String birthClubRoomId(String clubKey) {
 }
 
 class BirthClubStore extends ChangeNotifier {
-  BirthClubStore._();
+  BirthClubStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final BirthClubStore instance = BirthClubStore._();
 
   static const _key = 'birth_club_v1';
@@ -130,6 +133,10 @@ class BirthClubStore extends ChangeNotifier {
       await prefs.setString(_key, jsonEncode(_unlocked.toList()));
     } catch (_) {/* in-memory stands */}
   }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() => resetAll();
 
   @visibleForTesting
   void resetAll() {

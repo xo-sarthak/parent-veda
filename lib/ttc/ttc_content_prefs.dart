@@ -16,8 +16,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/sync_registry.dart';
+
 class TtcContentPrefs extends ChangeNotifier {
-  TtcContentPrefs._();
+  TtcContentPrefs._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcContentPrefs instance = TtcContentPrefs._();
 
   static const String _kHideIntimate = 'ttc_hide_intimate';
@@ -68,6 +72,13 @@ class TtcContentPrefs extends ChangeNotifier {
       final p = await SharedPreferences.getInstance();
       await p.setBool(_kHideIntimate, v);
     } catch (_) {/* best effort; the in-memory choice still holds */}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

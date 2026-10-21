@@ -25,6 +25,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'remote/sync_registry.dart';
+
 /// Capability ids. Kept as constants rather than an enum because the registry
 /// lives in the database and can grow without a release — an unknown id from
 /// the server is simply a capability this build does not gate on yet, which is
@@ -88,7 +90,9 @@ class SponsorInfo {
 }
 
 class EntitlementStore extends ChangeNotifier {
-  EntitlementStore._();
+  EntitlementStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final EntitlementStore instance = EntitlementStore._();
 
   static const _cacheKey = 'entitlements_v1';
@@ -108,6 +112,15 @@ class EntitlementStore extends ChangeNotifier {
   /// Whether to SHOW a capability-gated affordance. Never a security decision —
   /// see the header.
   bool can(String capability) => _capabilities.contains(capability);
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _capabilities = const {};
+    _sponsor = null;
+    _loaded = false;
+    notifyListeners();
+  }
 
   void ensureLoaded() {
     if (_loaded) return;

@@ -21,6 +21,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/sync_registry.dart';
+
 import 'ttc_bmi_rules.dart';
 
 @immutable
@@ -53,7 +55,9 @@ class BmiHistoryEntry {
 }
 
 class TtcBmiStore extends ChangeNotifier {
-  TtcBmiStore._();
+  TtcBmiStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcBmiStore instance = TtcBmiStore._();
 
   static const _kHistory = 'ttc_bmi_history';
@@ -125,6 +129,13 @@ class TtcBmiStore extends ChangeNotifier {
       final p = await SharedPreferences.getInstance();
       await p.setDouble(_kHeight, metres);
     } catch (_) {/* local-first: next time she types it again */}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

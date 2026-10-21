@@ -485,7 +485,9 @@ class PumpStore extends ChangeNotifier {
 enum TimerSide { left, right }
 
 class BreastTimer extends ChangeNotifier {
-  BreastTimer._();
+  BreastTimer._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final BreastTimer instance = BreastTimer._();
 
   static const _prefsKey = 'pp_breast_timer';
@@ -619,6 +621,19 @@ class BreastTimer extends ChangeNotifier {
     _leftSec = 0;
     _rightSec = 0;
     _persist();
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _running = null;
+    _runningSince = null;
+    _feedStarted = null;
+    _leftSec = 0;
+    _rightSec = 0;
+    _endedOn = null;
+    _loaded = false;
     notifyListeners();
   }
 

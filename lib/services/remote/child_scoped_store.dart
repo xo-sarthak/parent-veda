@@ -28,6 +28,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'supabase_repo.dart';
+import 'sync_batch.dart';
 import 'sync_row_book.dart';
 
 // =============================================================================
@@ -313,16 +314,37 @@ class ChildLogLedger {
         final uid = SupabaseRepo.userId;
         if (uid == null) return;
         final rows = live();
+        // Our own rows go up in batches (step 11, sync_batch.dart); a row the
+        // partner owns stays a single UPDATE, as below. The upsert branch it
+        // replaced, kept for revert:
+        //   if (!up.asUpdate) {
+        //     ok = await SupabaseRepo.upsertRowConfirmed(table, up.row, onConflict: onConflict);
+        //   } else if (_keyed) { ...
+        final ours = <String, Map<String, dynamic>>{};
+        final oursSent = <String, int?>{};
         for (final id in book.dirty.toList()) {
           final up = uploadFor(id, rows,
               uid: uid, fallbackChildId: fallbackChildId);
-          if (up == null) continue;
+          if (up == null || up.asUpdate) continue;
+          ours[id] = up.row;
+          oursSent[id] = book.stamps[id];
+        }
+        final took = await SyncBatch.push(
+            ours,
+            (batch) =>
+                SupabaseRepo.upsertRows(table, batch, onConflict: onConflict));
+        for (final id in ours.keys) {
+          book.confirmed(id, ok: took.contains(id), sent: oursSent[id]);
+          if (!book.dirty.contains(id)) lastRows.remove(id);
+        }
+        for (final id in book.dirty.toList()) {
+          if (ours.containsKey(id)) continue;
+          final up = uploadFor(id, rows,
+              uid: uid, fallbackChildId: fallbackChildId);
+          if (up == null || !up.asUpdate) continue;
           final sent = book.stamps[id];
           final bool ok;
-          if (!up.asUpdate) {
-            ok = await SupabaseRepo.upsertRowConfirmed(table, up.row,
-                onConflict: onConflict);
-          } else if (_keyed) {
+          if (_keyed) {
             ok = await SupabaseRepo.updateChildRowConfirmed(table,
                 up.row['child_id'] as String, keyColumn, keyOf(id), up.row);
           } else {

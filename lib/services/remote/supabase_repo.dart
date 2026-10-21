@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'sync_batch.dart';
+export 'sync_batch.dart' show SyncSend;
+
 /// Shared cloud data-access layer ("repository") for ParentVeda.
 ///
 /// WHY THIS EXISTS:
@@ -575,6 +578,37 @@ class SupabaseRepo {
     } catch (e) {
       debugPrint('[repo] upsert $table refused: $e');
       return false;
+    }
+  }
+
+  /// Many rows in ONE request (sync log step 11, 2026-10-21): a first sync
+  /// used to send each row on its own, hundreds of round trips. Says WHY it
+  /// failed, because the caller treats the two very differently:
+  ///
+  ///   · [SyncSend.refused] — the server answered no (a check, a policy). One
+  ///     statement is all-or-nothing, so ONE bad row refuses the whole batch;
+  ///     the caller retries that batch row by row to find it.
+  ///   · [SyncSend.offline] — no answer at all. Retrying row by row would only
+  ///     make a hundred more failing requests, so the caller stops the round.
+  ///
+  /// Every row must carry the same keys (PostgREST builds one column list
+  /// from them); `SyncBatch` groups rows by key set before calling this.
+  static Future<SyncSend> upsertRows(
+    String table,
+    List<Map<String, dynamic>> rows, {
+    String? onConflict,
+  }) async {
+    if (userId == null) return SyncSend.offline;
+    if (rows.isEmpty) return SyncSend.ok;
+    try {
+      await _client.from(table).upsert(rows, onConflict: onConflict);
+      return SyncSend.ok;
+    } on PostgrestException catch (e) {
+      debugPrint('[repo] upsert ${rows.length} into $table refused: $e');
+      return SyncSend.refused;
+    } catch (e) {
+      debugPrint('[repo] upsert ${rows.length} into $table unreachable: $e');
+      return SyncSend.offline;
     }
   }
 

@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
+import '../services/remote/sync_batch.dart';
 import 'ttc_row_merge.dart';
 import 'ttc_sync.dart';
 
@@ -389,6 +390,16 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
     for (final k in cloudStamp.keys) {
       if (!plan.take.contains(k) && !plan.push.contains(k)) _dirty.remove(k);
     }
+    // Clears the cloud has confirmed, older than 80 days, are forgotten
+    // (sync log step 12): the same rule and the same reason as
+    // `SyncRowBook.dropSettled`, before the server's 90-day purge (0109).
+    final cutoff = _now() - SyncRowBook.keepRemovals.inMilliseconds;
+    for (final k in _cleared.keys.toList()) {
+      if (_cleared[k]! < cutoff && !_dirty.contains(k)) {
+        _cleared.remove(k);
+        _stamps.remove(k);
+      }
+    }
   }
 
   // Kept for revert (2026-10-17): the union pull with the H12 re-delete.
@@ -453,6 +464,11 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pushToCloud() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
+    // In batches (step 11, sync_batch.dart): each key's row is gathered
+    // below, then sent 100 at a time. The single-row upload it replaced is
+    // kept for revert in the comment inside the loop.
+    final ups = <String, Map<String, dynamic>>{};
+    final sentAt = <String, int>{};
     for (final k in List.of(_dirty)) {
       final parts = k.split('/');
       if (parts.length != 3) {
@@ -466,10 +482,13 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
         continue;
       }
       final sent = _stamps[k] ?? _now();
+      sentAt[k] = sent;
       String iso(int ms) => TtcSyncUtil.stamp(
           DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true));
-      final ok = await TtcSyncUtil.upsertConfirmed(
-        TtcTables.logs,
+      //   final ok = await TtcSyncUtil.upsertConfirmed(TtcTables.logs, {...},
+      //       onConflict: 'user_id,tracker,field,logged_on');
+      //   if (ok && (_stamps[k] ?? sent) == sent) _dirty.remove(k);
+      ups[k] =
         {
           'user_id': uid,
           'tracker': parts[0],
@@ -480,10 +499,15 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
           'note': v?.note,
           'updated_at': iso(sent),
           'removed_at': removedMs == null ? null : iso(removedMs),
-        },
-        onConflict: 'user_id,tracker,field,logged_on',
-      );
-      if (ok && (_stamps[k] ?? sent) == sent) _dirty.remove(k);
+        };
+    }
+    final took = await SyncBatch.push(
+        ups,
+        (batch) => SupabaseRepo.upsertRows(TtcTables.logs, batch,
+            onConflict: 'user_id,tracker,field,logged_on'));
+    for (final k in took) {
+      final sent = sentAt[k];
+      if ((_stamps[k] ?? sent) == sent) _dirty.remove(k);
     }
     await _persist();
   }

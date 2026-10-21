@@ -23,10 +23,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/sync_registry.dart';
+
 import 'ttc_vaccines_data.dart';
 
 class TtcVaccineStore extends ChangeNotifier {
-  TtcVaccineStore._();
+  TtcVaccineStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcVaccineStore instance = TtcVaccineStore._();
 
   static const _kStatus = 'ttc_vaccine_status';
@@ -90,6 +94,15 @@ class TtcVaccineStore extends ChangeNotifier {
     await p.setStringList(_kDoneOn, [
       for (final e in _doneOn.entries) '${e.key}:${e.value.toIso8601String()}'
     ]);
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _status.clear();
+    _doneOn.clear();
+    _loaded = false;
+    notifyListeners();
   }
 
   /// Empties the store in memory, for a test that needs a first open.

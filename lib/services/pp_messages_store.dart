@@ -54,6 +54,7 @@ import 'family_profile.dart';
 import 'father_preview.dart';
 import 'life_stage_store.dart';
 import 'notification_service.dart';
+import 'remote/sync_registry.dart';
 
 /// The kinds. The NAME is persisted.
 enum PpMessageKind { age, vaccine, milestones, activity }
@@ -307,7 +308,9 @@ class _OsPhone implements PpMessagePhone {
 }
 
 class PpMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
-  PpMessagesStore._();
+  PpMessagesStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PpMessagesStore instance = PpMessagesStore._();
 
   static const _kMessages = 'pp_messages_v1';
@@ -535,6 +538,19 @@ class PpMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
       } catch (_) {/* the inbox still works */}
     }
     await refresh();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Memory only; the listeners it added stay, so the next person's facts
+  // refill it.
+  void _resetForAccount() {
+    _all.clear();
+    _off.clear();
+    _on.clear();
+    _phoneOn = true;
+    _loaded = false;
+    notifyListeners();
   }
 
   @visibleForTesting

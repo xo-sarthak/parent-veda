@@ -165,7 +165,9 @@ class TtcReadyPlanStore extends ChangeNotifier with TtcSyncedStore {
     if (uid == null || at == null) return;
     final a = _answers;
     final start = plannedStart;
-    await SupabaseRepo.upsertRow(
+    // Confirmed and remembered (sync log step 11); it was
+    // `SupabaseRepo.upsertRow`, which swallowed a refusal. Kept for revert.
+    await sendTracked(() => SupabaseRepo.upsertRowConfirmed(
       kReadyPlansTable,
       {
         'user_id': uid,
@@ -178,8 +180,11 @@ class TtcReadyPlanStore extends ChangeNotifier with TtcSyncedStore {
         'updated_at': TtcSyncUtil.stamp(at),
       },
       onConflict: 'user_id',
-    );
+    ));
   }
+
+  @override
+  String? get waitingKey => 'pv_waiting_ttc_ready_plans';
 
   @override
   Future<void> persistLocalCache() => _persist();
@@ -391,6 +396,14 @@ class TtcReadyPlanStore extends ChangeNotifier with TtcSyncedStore {
         when: first,
       );
     }
+  }
+
+  /// After launch: `NotificationService.syncAll` (ReminderStore.init) wipes
+  /// every pending note, so the monthly ones are set again here, after it
+  /// (main.dart). They already end at her month.
+  Future<void> rearmAfterStartup() async {
+    await load();
+    if (_notify) await _schedule();
   }
 
   Future<void> _cancelNotes() async {

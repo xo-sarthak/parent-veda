@@ -34,8 +34,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/sync_registry.dart';
+
 class PvChecklistStore extends ChangeNotifier {
-  PvChecklistStore._();
+  PvChecklistStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PvChecklistStore instance = PvChecklistStore._();
 
   /// ⚠️ ONE KEY PER CHECKLIST, AND THE SCANS ONE KEEPS ITS ORIGINAL STRING.
@@ -48,6 +52,14 @@ class PvChecklistStore extends ChangeNotifier {
   /// Ticked ids, per checklist.
   final Map<String, Set<String>> _ticked = {};
   final Set<String> _loaded = {};
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _ticked.clear();
+    _loaded.clear();
+    notifyListeners();
+  }
 
   /// Which question ids are ticked on [list]. Unmodifiable — callers ask, they
   /// do not reach in.

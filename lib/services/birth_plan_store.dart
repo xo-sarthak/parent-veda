@@ -36,9 +36,12 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/birth_plan_data.dart';
+import 'remote/sync_registry.dart';
 
 class BirthPlanStore extends ChangeNotifier {
-  BirthPlanStore._();
+  BirthPlanStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final BirthPlanStore instance = BirthPlanStore._();
 
   /// ⚠️ VERSIONED IN THE KEY. If the shape ever changes incompatibly, a new
@@ -239,6 +242,18 @@ class BirthPlanStore extends ChangeNotifier {
       // Fire and forget. A failed write loses the plan on next launch, which
       // is a far smaller cost than a plan screen that can throw.
     }
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // clear() also writes prefs, so this one touches memory only.
+  void _resetForAccount() {
+    _choices.clear();
+    _texts.clear();
+    _discussed.clear();
+    _updatedAt = null;
+    _loaded = false;
+    notifyListeners();
   }
 
   /// Test seam: load from a map without prefs.

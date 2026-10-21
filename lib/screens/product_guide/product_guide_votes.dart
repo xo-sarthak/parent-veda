@@ -12,10 +12,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/remote/sync_registry.dart';
+
 enum PgVote { none, recommend, notForUs }
 
 class ProductGuideVotes extends ChangeNotifier {
-  ProductGuideVotes._();
+  ProductGuideVotes._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final ProductGuideVotes instance = ProductGuideVotes._();
 
   static const _key = 'pg_votes';
@@ -35,6 +39,14 @@ class ProductGuideVotes extends ChangeNotifier {
       }
     } catch (_) {/* start empty */}
     _loaded = true;
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _votes.clear();
+    _loaded = false;
     notifyListeners();
   }
 

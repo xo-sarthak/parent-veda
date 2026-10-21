@@ -25,6 +25,7 @@
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../notification_service.dart';
 import '../remote/supabase_repo.dart';
 import '../remote/sync_registry.dart';
 import 'local_wipe.dart';
@@ -70,5 +71,13 @@ class LocalOwner {
   static Future<void> wipeThisPhone() async {
     await LocalWipe.run(); // clears every key but the device's own (language)
     SyncRegistry.resetAll();
+    // ⚠️ THE LAST PERSON'S ALARMS USED TO KEEP RINGING (found 2026-10-21, sync
+    // log step 12). The wipe emptied the stores but never touched what was
+    // already scheduled with the OS, so after a delete, or another account
+    // signing in, her medicine and appointment reminders still went off.
+    // Sign-out muted them, but see `pvSignOut`: the wipe then deleted the mute.
+    try {
+      await NotificationService.instance.cancelAllScheduled();
+    } catch (_) {/* best-effort */}
   }
 }

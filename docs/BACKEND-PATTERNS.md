@@ -3418,6 +3418,134 @@ quietly needed an UPDATE policy (§16ii-c, `father_missions` in step 8), and an 
 > durable list of what hasn't been sent, a server that enforces the rule too, and errors that someone sees.** The
 > old code had the first one. Steps 1–9 added the other five.
 
+### 16ii-l. Batches, and the one bad row (sync log step 11, 2026-10-21, no migration)
+
+Every ledger used to upload its waiting rows one request at a time. That is fine for the one or two rows a normal
+edit leaves behind. It is not fine for a **first sync**: a new phone, a reinstall, or months of offline use queues
+every row the phone holds. A year of feeds, nappies and logs meant hundreds to thousands of round trips in a row,
+and offline every one of them made its own failing request.
+
+`SyncBatch.push` (`lib/services/remote/sync_batch.dart`) sends 100 rows per request. Three rules make it safe.
+
+**1. One request needs one column list.** PostgREST builds a single `INSERT … (columns)` from the rows it receives,
+so every row in one request must carry the same keys. The batcher groups rows by their key set first.
+
+**2. A statement is all-or-nothing, so one bad row refuses 99 good ones.** If one row breaks a check (as the
+Symptoms door's `'strong'` did in step 9), Postgres rolls back the whole statement. A refused batch is therefore
+retried **row by row**. That finds the bad row and lets every good one through. The bad row stays waiting, which is
+correct: it keeps the sign-out warning honest.
+
+> General fact: **batching trades isolation for throughput.** Get the throughput, then buy the isolation back on
+> failure. Retrying the failed batch one row at a time is the usual way: AWS SQS and Kafka consumers do the same
+> with their "poison message" handling.
+
+**3. "Refused" and "no answer" are different failures.** `SupabaseRepo.upsertRows` returns a `SyncSend`:
+- `refused`: the server answered no, as a `PostgrestException`. Retrying row by row finds the culprit.
+- `offline`: no answer at all. Retrying row by row would only make a hundred more failing requests, so the round
+  stops and the next sync tries again.
+
+> General fact: **classify an error before you retry it.** Retrying a permanent failure wastes requests. Retrying a
+> network failure hard is a self-made denial of service.
+
+The same step moved the last stores that still swallowed errors onto confirmed writes that keep a waiting mark:
+- the TTC journey, ready plan and treatment rows, and the life stage: `sendTracked` in the TTC mixin;
+- the doctor questions, which used to re-send **every** row on every push and now send only changed rows;
+- saved items;
+- the journals;
+- the profile writes: the due date, her name, the father's role.
+
+Two findings came out of it:
+
+- **`.catchError` on a call that already catches is dead code.** `SavedStore._push` used
+  `upsertRow(...).catchError(PvSyncHealth.report)`. But `upsertRow` swallows its own error, so the handler could
+  never run. It looked like monitoring and it wasn't.
+- **The wiring gate, again.** When onboarding V3 could not save her profile, it kept the answers in
+  `PendingProfile` (name, role, due date, WhatsApp choice). The only code that ever sent them was the **retired**
+  sign-in screen, so the answers could sit on the phone for good. `SyncRegistry.resyncAll` now runs
+  `PendingProfile.flush()` on every sign-in and every resume. A later profile change drops any older waiting value
+  of the same column, so it can't land afterwards and overwrite the new one.
+
+`test/no_silent_user_writes_test.dart` scans the live source. It ignores comment lines and the code kept for revert
+under `// ignore: unused_element`. Any fire-and-forget write in a file not on its short, explained list fails the
+build.
+
+History: `docs/BACKEND-SYNC-LOG.md` step 11.
+
+### 16ii-m. Forgetting safely: the purge window, and why the phone forgets first (0109, sync log step 12, 2026-10-21)
+
+A soft delete is a promise to remember a deletion **long enough for every phone to hear about it**. That doesn't
+mean forever. Until 0109, nothing ever forgot one. 0081 wrote `saved_items_prune()`, but nothing ever scheduled it,
+and the docs said it ran.
+
+**The server side.**
+- `pv_purge_removed(90)` runs daily through `pg_cron`.
+- It hard-deletes rows whose `removed_at` is more than 90 days old, from an **explicit** list of tables.
+- `test/purge_removed_contract_test.dart` reads every migration and checks that list against the tables that really
+  have `removed_at`. A new soft-delete table therefore can't be left out silently, and `children` can never be
+  added.
+
+**The window is a promise, with a known failure.** Cassandra calls this setting `gc_grace_seconds`. A replica that
+is away for longer than the window comes back holding a live copy of something everyone else has already forgotten
+was deleted, and it resurrects that thing. Here a "replica" is a phone: one offline for more than 90 days that still
+holds a row deleted elsewhere will upload it again. That is the trade. 90 days covers any realistic gap, and the
+rare miss means a deleted item comes back. Data is never lost.
+
+**The phone side, and the order that matters.** The phones kept their tombstones forever too
+(`SyncRowBook.removed`, `CycleStore._tombs`, `TtcLogStore._cleared`, `SavedStore`'s unsaves). They now forget a
+removal the cloud has confirmed after **80** days. That is shorter than the server's 90, on purpose:
+
+| Who forgets first | What happens next |
+|---|---|
+| The phone (day 80) | The cloud still has the removed row, so the next pull reads the removal again, and the same merge drops it again. Harmless. |
+| The server | A phone still holding the removal sees "the cloud has never heard of this" and uploads it. That undoes the purge, every day, forever. |
+
+> General fact: **when two parties each garbage-collect a shared fact, the one that can re-create it must forget
+> first.** Here the phone can re-create the fact by uploading it, so it forgets before the server does.
+
+**`children` is never purged.** A removed child must stay restorable, and `my_child_ids()` reads removed children
+too. Purging one would strand every record of that child where neither parent can read it.
+
+### 16ii-n. Sign-out has to clear memory, not just the disk, and the order of "clear everything"
+
+Signing out wipes `shared_preferences` (`LocalWipe`), then runs every registered reset (`SyncRegistry.resetAll`).
+Step 12 found three ways that was incomplete.
+
+**1. A wipe undoes whatever was written before it.** `pvSignOut` set the "notifications silenced" flag, **then**
+wiped the phone. The wipe's `prefs.clear()` deleted the flag it had just set, so the next reminder any store
+scheduled rang for someone who had signed out. The mute now runs after the wipe.
+
+**2. The OS keeps what you scheduled with it.** Emptying the stores never touched the alarms already handed to the
+operating system. After an account deletion, or another person signing in, the last person's medicine and
+appointment reminders still went off. `wipeThisPhone` now cancels every scheduled notification. The new person
+re-arms their own through the resync.
+
+> General fact: **local state lives in more places than your storage.** It is also in the OS: scheduled alarms,
+> notification channels, files on disk, the keychain. A "forget this person" has to name each place.
+
+**3. The disk was wiped, but the memory was not.** About 40 phone-only singletons (birth plan, Garbh journal,
+memories, BMI history, the skilling child and PIN, search history, …) registered no reset. Their prefs were wiped,
+but the objects in memory kept the last person's data on screen. A `_loaded` guard stopped them reloading, and the
+next write put the old data back on disk for the next account. Each now registers a memory-only reset.
+`sync_reset_coverage_test` fails any singleton that reads prefs and has no reset, unless it is on a named
+device-settings list.
+
+**The allowlist grew, on purpose.** `LocalWipe.keep` used to hold only the reading language. It now also keeps the
+install's own ids and the phone's display and sound settings:
+- **The install's own ids.** Wiping them re-ran the "once ever" Play referrer check and minted a new analytics
+  install id, so one phone counted as two installs.
+- **Display and sound settings.** Wiping them left memory and disk disagreeing.
+
+Every entry is named, with its reason, in `auth_delete_account_test.dart`. "Clear everything, keep a short named
+list" stays the right shape, because a forgotten entry fails loudly and harmlessly (a setting resets). The opposite
+design, "delete a list of personal keys", fails quietly and badly: someone's data survives.
+
+**Found, not fixed (a product decision):** a phone-only personal store **loses its data for good at sign-out**,
+because none of it ever reached the cloud. That covers the birth plan, the Garbh journal, memories, BMI history,
+the condition answers and the skilling journal. The cheap fix is the `CloudSyncedStore` blob, the non-shopping half
+of step 10. See STILL-OPEN-BACKEND §4.
+
+History: `docs/BACKEND-SYNC-LOG.md` step 12.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3513,3 +3641,6 @@ quietly needed an UPDATE policy (§16ii-c, `father_missions` in step 8), and an 
 39. `lib/services/remote/own_row_ledger.dart` → `BumpStore._pushWaiting` — one sync loop for every single-owner table, keyed and state rows, and a Storage clean-up that waits for the cloud (§16ii-i).
 40. `0107_preg_part2_sync_clock.sql` → `MedicineStore._syncFromCloud`, `ScansStore.notRemoved`, `OwnRowLedger.single` — classify by who writes, ids from the natural key, one-row tables, sync every field the model has (§16ii-j).
 41. §16ii-k — the mistakes the old sync made, why each one bites, and what the industry does instead. Read it before writing new sync code.
+42. `lib/services/remote/sync_batch.dart` → `SupabaseRepo.upsertRows` — batches, the one bad row, and refused vs offline (§16ii-l).
+43. `0109_purge_removed.sql` → `SyncRowBook.dropSettled` — the purge window as a promise, and why the phone forgets first (§16ii-m).
+44. `pvSignOut` → `LocalOwner.wipeThisPhone` → `LocalWipe.keep` — a wipe undoes what came before it, the OS keeps what you scheduled, and memory is not the disk (§16ii-n).

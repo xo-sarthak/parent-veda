@@ -24,7 +24,8 @@ owed.
 | 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | `af76d8f` | yes (2026-10-18) |
 | 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | `d76594b` | yes (2026-10-20) |
 | 2026-10-20 | Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders) | 0106 | `d5787b2` | yes (2026-10-21) |
-| 2026-10-21 | Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools) | 0107 | pending | **not yet** |
+| 2026-10-21 | Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools) | 0107 | `a728ec4` | yes (2026-10-21) |
+| 2026-10-21 | Steps 11 and 12: every write of her data confirmed, batched first sync, sign-out forgets memory and stops alarms, the 90-day purge | 0109 | pending | yes (2026-10-21) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -759,7 +760,7 @@ None of the five stores fed the sign-out "unsent changes" warning.
 
 ## Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools)
 
-**Date:** 2026-10-21 (planned and approved 2026-10-21). **Migration:** 0107 (**not yet run**). **Commit:** pending.
+**Date:** 2026-10-21 (planned and approved 2026-10-21). **Migration:** 0107 (run 2026-10-21, checked: 10 of 10, and the severity check lists 'strong'). **Commit:** `a728ec4`.
 
 **The policies were read first (step 8's lesson):**
 - All ten tables already had an own-row UPDATE policy (0003, 0005, 0006), so there was no `father_missions` trap.
@@ -856,7 +857,7 @@ skipped every table after it.
 - The Symptoms Companion's "noted N times this week" now counts days, since a symptom is one log per day.
 - **Mixed versions.** Until both phones update, the old app still hard-deletes and uses timestamp ids.
 
-**User runs (OWED):**
+**User runs (DONE 2026-10-21: 0107 run, the check query returned all 10 rows as expected and the severity check lists 'strong'):**
 1. 0107 in the Supabase SQL editor, **before** installing a build with this change. Until then the uploads carry
    columns the tables lack, are refused, and simply wait.
 2. Optional: the check queries at the bottom.
@@ -883,3 +884,146 @@ skipped every table after it.
 - `test/own_row_ledger_test.dart`, `test/preg_part2_sync_test.dart` (new), `test/sync_guard_contract_test.dart`
 - `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`, `docs/BACKEND-PATTERNS.md` (§16ii-j, §16ii-k, reading list
   40–41), `docs/BEFORE-LAUNCH.md`
+
+---
+
+## Steps 11 and 12: uploads nobody watched, batched first sync, sign-out really forgets, the purge
+
+**Date:** 2026-10-21 (planned and approved 2026-10-21). **Migration:** 0109 (run 2026-10-21; `pv-purge-removed` is cron job 3, active, `15 4 * * *`). **Commit:** pending
+(one commit for both: `saved_store.dart`, `cycle_store.dart` and `ttc_log_store.dart` carry changes from each).
+
+**Why now, before step 10.** Step 10's shopping half (cart, orders, bought, product checklists) is to be rebuilt as
+a marketplace, and designing those twice would waste one of the designs. Steps 11 and 12 touch no shopping code. Two
+read-only sweeps found more than the docs listed.
+
+### Step 11: every write of her data is confirmed, and first sync goes in batches (no migration)
+
+- [x] **Batches.**
+  - `SyncBatch.push` (`lib/services/remote/sync_batch.dart`) and `SupabaseRepo.upsertRows`, which returns `SyncSend`
+    (ok / refused / offline).
+  - Rows go 100 per request, grouped by column set.
+  - A refused batch is retried row by row, so one bad row cannot hold back 99.
+  - Offline stops the round at once.
+  - Used by `OwnRowLedger`, `ChildLogLedger` (own rows; partner rows stay single UPDATEs), `CycleStore`,
+    `TtcLogStore` and the doctor questions.
+  - The row-at-a-time loops are kept for revert, commented out.
+- [x] **The last silent writes of her data, now confirmed and each keeping a waiting mark the sign-out sheet reads:**
+  - **TTC journey, ready plan, treatment, life stage:** `sendTracked` in the TTC mixin, plus a waiting mark on disk.
+    The mixin's `hasPendingPush` used to be a constant `false`.
+  - **Doctor questions:** used to re-send every row on every push through `upsertAll`, which swallowed errors. Now
+    only rows whose `updatedAt` the cloud has not confirmed go up, and they go in batches.
+  - **Saved items:**
+    - `upsertRowConfirmed`, a waiting set on disk, and `registerPending`;
+    - the old `.catchError(PvSyncHealth.report)` could never fire, because `upsertRow` had already swallowed the
+      error.
+  - **Journals:** the sync already retried. The pending check was missing: tombstones, entries never seen, and
+    failed edits.
+  - **Profile writes** (due date, due-date source, the due date cleared, her name, the father's role):
+    `PendingProfile.send`, which keeps a failed change and drops an older waiting value of the same column once a
+    newer one lands.
+- [x] **Found: onboarding's stashed answers were never sent.** Onboarding V3 keeps her name, role, due date and
+  WhatsApp choice in `PendingProfile` when the write fails or there is no session yet. Only the retired
+  `AuthFlowScreen` ever called `flush()`. `SyncRegistry.resyncAll` now calls it on every sign-in and resume, and the
+  sign-out sheet counts it.
+- [x] **Guard:** `test/no_silent_user_writes_test.dart`.
+  - It scans the live source, skipping comments and the methods kept for revert.
+  - A fire-and-forget write fails the build unless its file is on a short list with a reason: orders (marketplace),
+    referral, doctor app, Can-I misses, WhatsApp prefs (reports failure), the old auth screen's confirmed write.
+- [x] Tests: `test/sync_batch_test.dart` (chunking, column groups, the bad-row fallback, offline stop).
+
+### Step 12: sign-out really forgets, the purge, the small items (migration 0109)
+
+- [x] **Found: sign-out un-muted the phone.**
+  - `pvSignOut` set the mute, then the wipe's `prefs.clear()` deleted it. The mute now runs after the wipe.
+  - **Found: deletion and account switch never stopped the alarms.** `LocalOwner.wipeThisPhone` now cancels every
+    scheduled notification (`NotificationService.cancelAllScheduled`). `DeleteAccount.run` also mutes after its
+    wipe.
+  - This also covers §7's trigger-shot reminders 918001 and 918002.
+- [x] **Phone-only stores forget the person in memory** (§4):
+  - 45 singletons now register a memory-only reset, including `TtcReadStore`, found by the scan. The list:
+    BreastTimer, prescriptions, care partner + presence, conditions, Garbh journal, memories, referral, birth club,
+    the five skilling stores (child + PIN, journal, portfolio, practice, voice), birth plan, Dear Baby vault,
+    pregnancy ended, profile photo, checklists, learn progress, the three search stores, tool usage, prepare,
+    credits, entitlements, the three messages stores, BMI, fertility help, PCOS check, self-check, vaccines, the
+    Garbh course, TTC home prefs, content prefs, symptom categories, tool recents, the last page read, product
+    votes, landing focus, the arrival prompt.
+  - The files a reset deletes stay on disk; only memory is cleared.
+- [x] **Device settings now survive a sign-out** (`LocalWipe.keep`):
+  - the install's own ids: Play referrer checked, analytics install id. Wiping them counted one phone as two
+    installs;
+  - the phone's display and sound settings: FAB hidden, cue sound, size view, block art, baby voice mutes, TTC
+    reading language, size set.
+  - Each is pinned to its source constant (`purge_removed_contract_test`) and named with its reason
+    (`auth_delete_account_test`).
+- [x] **Guard:** `sync_reset_coverage_test`.
+  - Any singleton that reads prefs must register a reset, use a sync mixin or ledger, or be on a named
+    device-settings list.
+  - Deferred, each with a reason in the test:
+    - **Another terminal's files:** `ttc_learn_screen` (recents), `ttc_strings` (`TtcPartnerMode`),
+      `ttc_ready_habits_store`, `global_ask_fab`.
+    - **The six doctor-app stores:** their own sign-out, a separate pass.
+- [x] **Purge (§5):** `0109_purge_removed.sql`.
+  - `pv_purge_removed(90)` runs daily at 04:15 UTC via `pg_cron` over an explicit list of 43 tables. Never
+    `children`, never `sponsor_*`.
+  - It refuses fewer than 30 days, and no app role can call it.
+  - `saved_items` joins the 90 days. 0081's 30-day prune stays unscheduled, because it would be shorter than the
+    phone's 80.
+  - **Found: that prune had never been scheduled, and the docs said it ran.**
+  - One cascade: `ttc_supplement_taken` follows its supplement.
+  - Contract test: the list equals every table that has `removed_at` in the migrations.
+- [x] **The phones forget too, first:**
+  - `SyncRowBook.dropSettled` runs at the end of every merge. It drops confirmed removals older than 80 days.
+  - The same rule applies in `CycleStore`, `TtcLogStore` and `SavedStore`.
+  - 80 < 90 so a phone can never upload a removal the server has purged (BACKEND-PATTERNS §16ii-m).
+- [x] §7: the unused `local_wipe.dart` import is commented out. The wrong "saved items already purge" lines are
+  corrected.
+
+**Verified (2026-10-21):**
+- Scoped `flutter analyze` is clean on every file touched. The only issues it shows, in `ask_veda_service.dart`,
+  were there before.
+- Tests:
+  - the step 11 set: 391 passed across the sync, journal, saved, TTC and profile tests;
+  - the step 12 set: purge contract, sign-out mute, delete account, reset coverage, row merge and logging all
+    passed;
+  - the reset sweep: 1657 passed across 85 files.
+- 2 failures are in another terminal's work, not this step's:
+  - `ttc_palette_consistency_test`: `ttcPanel` in `ttc_cycle_hub`, `ttc_ready_week` and `ttc_temp_parts`;
+  - `ttc_tab_host_test`: the Learn tab scroll, in `ttc_learn_screen`.
+
+**Known limits, named:**
+- **Phone-only personal stores lose their data for good at sign-out.** It never reached the cloud, and the wipe
+  clears it. That covers the birth plan, Garbh journal, memories, BMI history, condition answers, the skilling
+  journal and portfolio, and more. The sign-out sheet says "It stays saved in your account", which is not true for
+  these.
+  - The fix is a decision for the user: the `CloudSyncedStore` blob for each, which is the non-shopping half of
+    step 10.
+  - See STILL-OPEN-BACKEND §4 and BEFORE-LAUNCH.
+- A phone offline for more than 90 days can bring back a row deleted elsewhere: the purge window's trade.
+- Still fire-and-forget, out of scope: orders (marketplace), referral codes, the doctor app, Can-I misses.
+
+**User runs:**
+1. [x] 0109 in the Supabase SQL editor (2026-10-21; `cron.schedule` returned job id 3).
+2. [x] The `cron.job` row: one, active (checked 2026-10-21).
+3. [ ] After the first night (04:15 UTC), the run history: `succeeded`.
+
+**Owed (device, on the user's word):**
+- Sign out with a medicine alarm set: nothing rings.
+- Sign in as someone else: no birth plan, search history or messages from the last person.
+- A fresh install signs in: the logs upload in a few requests.
+
+**Files:**
+- **New:**
+  - `lib/services/remote/sync_batch.dart`
+  - `supabase/migrations/0109_purge_removed.sql`
+  - `test/sync_batch_test.dart`, `test/no_silent_user_writes_test.dart`, `test/purge_removed_contract_test.dart`
+- **Sync plumbing:** `supabase_repo.dart`, `own_row_ledger.dart`, `child_scoped_store.dart`, `sync_row_book.dart`,
+  `sync_registry.dart`.
+- **TTC:** `ttc_sync.dart`, `cycle_store.dart`, `ttc_log_store.dart`, `ttc_store.dart`, `ttc_ready_plan_store.dart`,
+  `ttc_treatment_store.dart`, `ttc_doctor_questions_store.dart`.
+- **Services:** `life_stage_store.dart`, `saved_store.dart`, `journal_store.dart`, `father_journal_store.dart`,
+  `pregnancy_controller.dart`, `notification_service.dart`.
+- **Auth:** `pending_profile.dart`, `local_owner.dart`, `local_wipe.dart`, `delete_account.dart`.
+- **Screens:** `pv_account_actions.dart`, `pv_you_screen.dart`, `auth_flow_screen.dart`.
+- The 45 store files of the reset sweep.
+- **Tests:** `pv_sign_out_mute_test.dart`, `auth_delete_account_test.dart`, `sync_reset_coverage_test.dart`.
+- **Docs:** this log, STILL-OPEN-BACKEND, BACKEND-PATTERNS (§16ii-l, m, n; reading list 42–44), BEFORE-LAUNCH.

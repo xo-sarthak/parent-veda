@@ -28,8 +28,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/sync_registry.dart';
+
 class PregnancyEndedStore extends ChangeNotifier {
-  PregnancyEndedStore._();
+  PregnancyEndedStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PregnancyEndedStore instance = PregnancyEndedStore._();
 
   static const String kEndedKey = 'pregnancy_ended_v1';
@@ -81,6 +85,13 @@ class PregnancyEndedStore extends ChangeNotifier {
         await prefs.remove(kEndedAtKey);
       }
     } catch (_) {}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   /// Tests only.

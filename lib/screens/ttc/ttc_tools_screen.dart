@@ -81,6 +81,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../localization/app_language.dart';
+import '../../services/remote/sync_registry.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_content_prefs.dart';
 import '../../ttc/ttc_log_store.dart';
@@ -818,7 +819,9 @@ String ttcMovedNote(TtcTool t) => kTtcMovedToMoreTile[t.id] == t.nameEn
 /// place, whether she has used it or not (CLAUDE.md: personalisation changes
 /// order, never structure; a feature is never hidden).
 class TtcToolRecents extends ChangeNotifier {
-  TtcToolRecents._();
+  TtcToolRecents._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcToolRecents instance = TtcToolRecents._();
 
   static const String kKey = 'ttc_tools_recent';
@@ -844,6 +847,13 @@ class TtcToolRecents extends ChangeNotifier {
     try {
       await (await SharedPreferences.getInstance()).setStringList(kKey, _ids);
     } catch (_) {}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

@@ -41,6 +41,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/remote/sync_registry.dart';
+
 /// What she did. The only three verbs the keepsake knows.
 enum SkPractice { tried, practisedAgain, made }
 
@@ -112,7 +114,9 @@ class SkKeepsakeLine {
 }
 
 class SkPracticeStore extends ChangeNotifier {
-  SkPracticeStore._();
+  SkPracticeStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final SkPracticeStore instance = SkPracticeStore._();
 
   static const _key = 'sk_practice';
@@ -172,6 +176,15 @@ class SkPracticeStore extends ChangeNotifier {
   void forgetAll() {
     _entries.clear();
     _save();
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Memory only: the files on disk and prefs are not touched here.
+  void _resetForAccount() {
+    _entries.clear();
+    _loaded = false;
     notifyListeners();
   }
 

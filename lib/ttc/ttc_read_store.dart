@@ -25,8 +25,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/sync_registry.dart';
+
 class TtcReadStore extends ChangeNotifier {
   TtcReadStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
     _load();
   }
   static final TtcReadStore instance = TtcReadStore._();
@@ -76,6 +79,12 @@ class TtcReadStore extends ChangeNotifier {
     // listener tree sixty times a second to move a two-pixel bar is how a
     // reading surface starts dropping frames.
   }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Loaded once, in the constructor, so `_loaded` stays true: prefs are
+  // empty now, and empty sets are what a reload would find.
+  void _resetForAccount() => resetForTest();
 
   @visibleForTesting
   void resetForTest() {

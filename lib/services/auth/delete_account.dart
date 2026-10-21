@@ -23,10 +23,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../notification_service.dart';
 import '../remote/supabase_repo.dart';
 import 'local_owner.dart';
-// ignore: unused_import
-import 'local_wipe.dart';
+// Unused since LocalOwner took over the wipe (2026-10-17); only the revert
+// note below names it. Kept for revert (sync log step 12, §7):
+//   // ignore: unused_import
+//   import 'local_wipe.dart';
 import 'social_auth.dart';
 
 /// The word she must type to confirm deletion.
@@ -87,6 +90,12 @@ class DeleteAccount {
     // new account signing in would have uploaded it. Kept for revert:
     //   await LocalWipe.run();
     await LocalOwner.wipeThisPhone();
+    // Silent until somebody signs in (sync log step 12, 2026-10-21): the
+    // wipe has cancelled her alarms, and nothing may schedule more for an
+    // account that no longer exists. After the wipe, so the flag survives it.
+    try {
+      await NotificationService.instance.silenceForSignOut();
+    } catch (_) {/* best-effort */}
 
     return true;
   }

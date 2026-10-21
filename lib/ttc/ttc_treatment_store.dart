@@ -874,7 +874,9 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pushToCloud() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
-    await SupabaseRepo.upsertRow(
+    // Confirmed and remembered (sync log step 11); it was
+    // `SupabaseRepo.upsertRow`, which swallowed a refusal. Kept for revert.
+    await sendTracked(() => SupabaseRepo.upsertRowConfirmed(
       'ttc_treatment',
       {
         'user_id': uid,
@@ -883,8 +885,11 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       },
       onConflict: 'user_id',
-    );
+    ));
   }
+
+  @override
+  String? get waitingKey => 'pv_waiting_ttc_treatment';
 
   @override
   Future<void> persistLocalCache() => _persist();

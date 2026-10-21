@@ -27,6 +27,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/remote/sync_registry.dart';
 import '../../ttc/ttc_symptom_data.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
@@ -43,13 +44,23 @@ const String kTtcEditCategoriesTitle = 'Show or hide';
 /// my logging screen", which is a preference about a surface rather than a fact
 /// about the family — the same reading the launch promo and the intro gate take.
 class TtcCategoryPrefs extends ChangeNotifier {
-  TtcCategoryPrefs._();
+  TtcCategoryPrefs._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcCategoryPrefs instance = TtcCategoryPrefs._();
 
   static const _key = 'ttc_hidden_symptom_categories';
 
   final Set<String> _hidden = {};
   bool _loaded = false;
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _hidden.clear();
+    _loaded = false;
+    notifyListeners();
+  }
 
   Set<String> get hidden => Set.unmodifiable(_hidden);
 

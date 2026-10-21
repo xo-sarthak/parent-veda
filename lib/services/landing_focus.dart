@@ -36,6 +36,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'life_stage_store.dart';
+import 'remote/sync_registry.dart';
 
 /// WHERE THE PARENTING SPLIT FALLS, as one line to tune.
 ///
@@ -116,13 +117,23 @@ extension TodayFocusCopy on TodayFocus {
 }
 
 class LandingFocus extends ChangeNotifier {
-  LandingFocus._();
+  LandingFocus._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final LandingFocus instance = LandingFocus._();
 
   static const _key = 'pv_landing_focus';
 
   TodayFocus? _override;
   bool _loaded = false;
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _override = null;
+    _loaded = false;
+    notifyListeners();
+  }
 
   bool get isLoaded => _loaded;
 

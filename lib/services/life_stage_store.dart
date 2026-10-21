@@ -194,11 +194,17 @@ class LifeStageStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pushToCloud() async {
     final s = _stage;
     if (s == null) return; // nothing declared - do not write a null over a value
-    await SupabaseRepo.updateMyProfile({
-      'life_stage': s.id,
-      'life_stage_at': _enteredAt?.toUtc().toIso8601String(),
-    });
+    // Confirmed and remembered (sync log step 11); it was
+    // `SupabaseRepo.updateMyProfile`, which swallowed a refusal. Kept for
+    // revert.
+    await sendTracked(() => SupabaseRepo.updateMyProfileConfirmed({
+          'life_stage': s.id,
+          'life_stage_at': _enteredAt?.toUtc().toIso8601String(),
+        }));
   }
+
+  @override
+  String? get waitingKey => 'pv_waiting_life_stage';
 
   @override
   Future<void> persistLocalCache() => _persist();

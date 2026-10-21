@@ -69,6 +69,7 @@ import 'life_stage_store.dart';
 import 'notification_service.dart';
 import 'pregnancy_controller.dart';
 import 'pregnancy_ended_store.dart';
+import 'remote/sync_registry.dart';
 
 /// The seven kinds. The NAME is persisted: renaming one strands every message
 /// already delivered under it.
@@ -314,7 +315,9 @@ class _OsPhone implements PregMessagePhone {
 }
 
 class PregMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
-  PregMessagesStore._();
+  PregMessagesStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PregMessagesStore instance = PregMessagesStore._();
 
   static const _kMessages = 'preg_messages_v1';
@@ -573,6 +576,18 @@ class PregMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
       } catch (_) {/* the inbox still works */}
     }
     await refresh();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Memory only; the listeners it added stay, so the next person's facts
+  // refill it.
+  void _resetForAccount() {
+    _all.clear();
+    _off.clear();
+    _phoneOn = true;
+    _loaded = false;
+    notifyListeners();
   }
 
   @visibleForTesting

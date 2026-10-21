@@ -11,8 +11,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/sync_registry.dart';
+
 class PvSearchHistory extends ChangeNotifier {
-  PvSearchHistory._();
+  PvSearchHistory._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PvSearchHistory instance = PvSearchHistory._();
 
   static const _key = 'pv_store_search_history_v1';
@@ -64,6 +68,13 @@ class PvSearchHistory extends ChangeNotifier {
     } catch (_) {
       /* best-effort */
     }
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

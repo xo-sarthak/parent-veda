@@ -18,11 +18,14 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
+import '../services/remote/sync_registry.dart';
 import 'care_partner_engine.dart';
 import 'care_partner_models.dart';
 
 class CarePartnerStore extends ChangeNotifier {
-  CarePartnerStore._();
+  CarePartnerStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final CarePartnerStore instance = CarePartnerStore._();
 
   static const _key = 'care_partner_v1';
@@ -247,6 +250,13 @@ class CarePartnerStore extends ChangeNotifier {
         }),
       );
     } catch (_) {/* in-memory stands */}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _pendingChannel = ReferralChannel.qr;
+    resetAll();
   }
 
   @visibleForTesting

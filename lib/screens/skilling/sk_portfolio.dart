@@ -44,6 +44,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/bracket_resolver.dart';
+import '../../services/remote/sync_registry.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'sk_child_store.dart';
@@ -100,7 +101,9 @@ class SkPortfolioPhoto {
 }
 
 class SkPortfolioStore extends ChangeNotifier {
-  SkPortfolioStore._();
+  SkPortfolioStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final SkPortfolioStore instance = SkPortfolioStore._();
 
   static const _key = 'sk_portfolio';
@@ -166,6 +169,15 @@ class SkPortfolioStore extends ChangeNotifier {
     }
     _photos.clear();
     await _save();
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Memory only: the files on disk and prefs are not touched here.
+  void _resetForAccount() {
+    _photos.clear();
+    _loaded = false;
     notifyListeners();
   }
 

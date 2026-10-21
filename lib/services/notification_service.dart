@@ -525,6 +525,16 @@ class NotificationService {
     } catch (_) {/* plugin not ready: nothing was scheduled through it */}
   }
 
+  /// Cancel every scheduled notification, without muting (sync log step 12,
+  /// 2026-10-21). For the wipe that runs when another account signs in or an
+  /// account is deleted: the last person's alarms must stop, but the person
+  /// signing in re-arms her own through the resync, so no mute is set.
+  Future<void> cancelAllScheduled() async {
+    try {
+      await _plugin.cancelAll();
+    } catch (_) {/* plugin not ready: nothing was scheduled through it */}
+  }
+
   Future<void> cancel(int id) async {
     try {
       await _plugin.cancel(id);

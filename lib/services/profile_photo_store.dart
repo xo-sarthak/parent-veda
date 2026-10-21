@@ -20,8 +20,12 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/sync_registry.dart';
+
 class ProfilePhotoStore extends ChangeNotifier {
-  ProfilePhotoStore._();
+  ProfilePhotoStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final ProfilePhotoStore instance = ProfilePhotoStore._();
 
   static const String _kPath = 'pv_profile_photo_path';
@@ -91,6 +95,15 @@ class ProfilePhotoStore extends ChangeNotifier {
         await File(old).delete();
       } catch (_) {}
     }
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // The photo file on disk is left alone; only the pointer to it is dropped.
+  void _resetForAccount() {
+    _path = null;
+    _loaded = false;
     notifyListeners();
   }
 

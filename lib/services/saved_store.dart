@@ -39,6 +39,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'life_stage_store.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'remote/sync_row_book.dart';
 import 'pv_sync_health.dart';
 
 /// The wire vocabulary — `id` is what the database's check constraint accepts.
@@ -243,7 +244,9 @@ class SavedStore extends ChangeNotifier {
   }
 
   /// Unsave = tombstone, never delete. The row stays so a stale device cannot
-  /// resurrect it; the server prunes tombstones after 30 days.
+  /// resurrect it. ⚠️ CORRECTED 2026-10-21: this used to say "the server
+  /// prunes tombstones after 30 days", but 0081's prune was never scheduled.
+  /// The purge is 0109's, after 90 days (sync log step 12).
   Future<void> unsave(SavedKind kind, String itemId) async {
     await _ensureLoaded();
     final key = '${kind.id}:$itemId';
@@ -279,6 +282,9 @@ class SavedStore extends ChangeNotifier {
   Future<void> _load() async {
     try {
       final p = await SharedPreferences.getInstance();
+      _waiting
+        ..clear()
+        ..addAll(p.getStringList(kWaitingKey) ?? const <String>[]);
       final raw = p.getString(kCacheKey);
       if (raw != null) {
         for (final e in (jsonDecode(raw) as List)) {
@@ -307,6 +313,7 @@ class SavedStore extends ChangeNotifier {
     }
     SyncRegistry.register(syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
+    SyncRegistry.registerPending(() => hasPendingPush);
     await syncFromCloud();
   }
 
@@ -324,14 +331,44 @@ class SavedStore extends ChangeNotifier {
     } catch (_) {/* best-effort; the in-memory copy is the truth this session */}
   }
 
-  /// Fire-and-forget upsert of one row. `onConflict` names the natural key,
-  /// so a second save of the same thing is an update, never a duplicate.
+  /// Upsert of one row. `onConflict` names the natural key, so a second save
+  /// of the same thing is an update, never a duplicate.
+  ///
+  /// CONFIRMED since sync log step 11 (2026-10-21). It was fire-and-forget,
+  /// and its `.catchError(PvSyncHealth.report)` could never fire, because
+  /// `upsertRow` swallowed the error before it got there. The sync below
+  /// already re-sends anything the cloud lacks, so the one thing missing was
+  /// KNOWING: a key stays in [_waiting] (kept on disk) until the cloud takes
+  /// that version, and the sign-out sheet reads it. Kept for revert:
+  ///   SupabaseRepo.upsertRow(table, {...it.toRow(), 'user_id': uid},
+  ///           onConflict: 'user_id,kind,item_id')
+  ///       .catchError(PvSyncHealth.report);
   void _push(SavedItem it) {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
-    SupabaseRepo.upsertRow(table, {...it.toRow(), 'user_id': uid},
+    _markWaiting(it.key, true);
+    SupabaseRepo.upsertRowConfirmed(table, {...it.toRow(), 'user_id': uid},
             onConflict: 'user_id,kind,item_id')
-        .catchError(PvSyncHealth.report);
+        .then((ok) {
+      // Only if nothing changed it meanwhile; a newer change has its own push.
+      if (ok && identical(_items[it.key], it)) _markWaiting(it.key, false);
+      if (!ok) PvSyncHealth.report('saved_items upload refused or offline');
+    });
+  }
+
+  static const String kWaitingKey = 'saved_items_waiting_v1';
+
+  /// Keys whose latest version the cloud has not confirmed.
+  final Set<String> _waiting = {};
+
+  bool get hasPendingPush => _waiting.isNotEmpty;
+
+  void _markWaiting(String key, bool on) {
+    final changed = on ? _waiting.add(key) : _waiting.remove(key);
+    if (!changed) return;
+    SharedPreferences.getInstance()
+        .then((p) => p.setStringList(kWaitingKey, _waiting.toList()))
+        .catchError((_) => true);
   }
 
   // ---- merge -----------------------------------------------------------------
@@ -343,6 +380,7 @@ class SavedStore extends ChangeNotifier {
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _items.clear();
+    _waiting.clear();
     notifyListeners();
   }
 
@@ -365,6 +403,20 @@ class SavedStore extends ChangeNotifier {
     _items
       ..clear()
       ..addAll(result.merged);
+    // A key the cloud now holds at our version is not waiting any more.
+    final pushing = {for (final it in result.toPush) it.key};
+    for (final k in _waiting.toList()) {
+      if (!pushing.contains(k) && cloud.containsKey(k)) _markWaiting(k, false);
+    }
+    // Unsaves the cloud has confirmed, older than 80 days, are forgotten
+    // (sync log step 12): before the server's 90-day purge (0109), for the
+    // reason in `SyncRowBook.keepRemovals`.
+    final cutoff = DateTime.now().toUtc().subtract(SyncRowBook.keepRemovals);
+    _items.removeWhere((k, it) =>
+        !it.live &&
+        it.removedAt!.isBefore(cutoff) &&
+        !pushing.contains(k) &&
+        !_waiting.contains(k));
     for (final it in result.toPush) {
       _push(it);
     }

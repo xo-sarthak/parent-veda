@@ -24,9 +24,12 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'care_visibility.dart';
+import '../services/remote/sync_registry.dart';
 
 class CarePresenceStore extends ChangeNotifier {
-  CarePresenceStore._();
+  CarePresenceStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final CarePresenceStore instance = CarePresenceStore._();
 
   static const _key = 'care_presence_v1';
@@ -91,6 +94,13 @@ class CarePresenceStore extends ChangeNotifier {
         }),
       );
     } catch (_) {/* best effort */}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetAll();
+    notifyListeners();
   }
 
   @visibleForTesting

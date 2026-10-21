@@ -112,6 +112,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/life_stage_store.dart';
 import '../services/notification_service.dart';
+import '../services/remote/sync_registry.dart';
 // ⚠️ A STORE IMPORTING A SCREEN, ON PURPOSE AND FOR ONE FUNCTION (2026-09-27).
 // A phone tap has to end on a screen, and the only code that runs at startup
 // for this feature is this store's `init` (main.dart). The opener lives with
@@ -946,7 +947,9 @@ class _OsPhone implements TtcMessagePhone {
 }
 
 class TtcMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
-  TtcMessagesStore._();
+  TtcMessagesStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcMessagesStore instance = TtcMessagesStore._();
 
   static const _kMessages = 'ttc_messages_v1';
@@ -1246,6 +1249,18 @@ class TtcMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
       } catch (_) {/* the in-app list still works */}
     }
     await refresh();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Memory only; the listeners it added stay, so the next person's facts
+  // refill it.
+  void _resetForAccount() {
+    _all.clear();
+    _off.clear();
+    _phoneOn = true;
+    _loaded = false;
+    notifyListeners();
   }
 
   @visibleForTesting

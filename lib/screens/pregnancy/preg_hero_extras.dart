@@ -25,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/remote/sync_registry.dart';
 import '../../services/stage_gateway.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
@@ -113,7 +114,9 @@ Future<void> showPregHowWeeksCounted(BuildContext context, PregnancyController c
 /// Whether the card is resting after a "Not yet". On this phone only; the
 /// cost of losing it is one more gentle question.
 class PregArrivalPrompt extends ChangeNotifier {
-  PregArrivalPrompt._();
+  PregArrivalPrompt._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PregArrivalPrompt instance = PregArrivalPrompt._();
 
   static const String kSnoozeKey = 'preg_arrival_snooze_until_v1';
@@ -147,6 +150,13 @@ class PregArrivalPrompt extends ChangeNotifier {
     try {
       await (await SharedPreferences.getInstance()).setString(kSnoozeKey, _until!.toIso8601String());
     } catch (_) {}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

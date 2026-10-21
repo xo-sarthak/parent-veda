@@ -30,9 +30,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/post_pregnancy/pp_child_profile.dart';
 import 'life_stage_store.dart';
+import 'remote/sync_registry.dart';
 
 class DearBabyVaultStore extends ChangeNotifier {
-  DearBabyVaultStore._();
+  DearBabyVaultStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final DearBabyVaultStore instance = DearBabyVaultStore._();
 
   static const _kBornOn = 'dear_baby_born_on';
@@ -115,6 +118,13 @@ class DearBabyVaultStore extends ChangeNotifier {
       final sp = await SharedPreferences.getInstance();
       await sp.setString(_kOpenedAt, _openedAt!.toIso8601String());
     } catch (_) {}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

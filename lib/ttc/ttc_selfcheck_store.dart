@@ -32,6 +32,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/sync_registry.dart';
+
 import 'ttc_fertility_help_rules.dart';
 import 'ttc_ivf_readiness.dart';
 import 'ttc_pcos_stand.dart';
@@ -51,7 +53,9 @@ List<String> _encode(Map<String, String?> m) => [
     ];
 
 class TtcSelfCheckStore extends ChangeNotifier {
-  TtcSelfCheckStore._();
+  TtcSelfCheckStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final TtcSelfCheckStore instance = TtcSelfCheckStore._();
 
   static const _kPcos = 'ttc_selfcheck_pcos_stand';
@@ -69,6 +73,13 @@ class TtcSelfCheckStore extends ChangeNotifier {
     final p = await SharedPreferences.getInstance();
     _pcos = _decode(p.getStringList(_kPcos));
     _ivf = _decode(p.getStringList(_kIvf));
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
     notifyListeners();
   }
 

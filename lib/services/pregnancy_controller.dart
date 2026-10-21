@@ -20,6 +20,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../localization/app_language.dart';
 import '../models/week_content.dart';
+import 'auth/pending_profile.dart';
+import 'remote/supabase_repo.dart';
 
 /// How the due date was arrived at.
 ///
@@ -539,24 +541,32 @@ class PregnancyController extends ChangeNotifier {
       await prefs.setString(kDueDateSourceKey, source.name);
     } catch (_) {/* best-effort */}
     // Keep the cloud profile in sync (source of truth across devices).
+    //
+    // CONFIRMED, AND KEPT IF IT DID NOT LAND (sync log step 11, 2026-10-21).
+    // These were bare `.update()`s inside `catch (_) {}`: a due date set
+    // offline stayed on this phone, and nothing ever sent it again.
+    // `PendingProfile.send` keeps a failed change and the next sync sends it.
+    // The old writes, kept for revert:
+    //   final client = Supabase.instance.client;
+    //   final uid = client.auth.currentUser?.id;
+    //   if (uid != null) {
+    //     await client.from('profiles').update({'due_date': ...}).eq('id', uid);
+    //     await client.from('profiles').update({'due_date_source': ..., 'dating_date': ...}).eq('id', uid);
+    //   }
+    if (!SupabaseRepo.isLoggedIn) return;
     try {
-      final client = Supabase.instance.client;
-      final uid = client.auth.currentUser?.id;
-      if (uid != null) {
-        await client.from('profiles').update(
-            {'due_date': _dueDate.toIso8601String().split('T').first}).eq(
-            'id', uid);
-        // ⚠️ A SEPARATE WRITE for the 0102 columns: if the database has not
-        // run 0102 yet, this one fails alone and the due date above still
-        // lands. One combined update would have lost both.
-        await client.from('profiles').update({
-          'due_date_source': source.name,
-          'dating_date': datingDate == null
-              ? null
-              : _dateOnly(datingDate).toIso8601String().split('T').first,
-        }).eq('id', uid);
-      }
-    } catch (_) {/* offline - local only */}
+      await PendingProfile.send(
+          {'due_date': _dueDate.toIso8601String().split('T').first});
+      // ⚠️ A SEPARATE WRITE for the 0102 columns: if the database has not
+      // run 0102 yet, this one fails alone and the due date above still
+      // lands. One combined update would have lost both.
+      await PendingProfile.send({
+        'due_date_source': source.name,
+        'dating_date': datingDate == null
+            ? null
+            : _dateOnly(datingDate).toIso8601String().split('T').first,
+      });
+    } catch (_) {/* offline - local only, and waiting in PendingProfile */}
   }
 
   /// Testing helper - clear any saved due date and snap back to the week-20
@@ -576,15 +586,18 @@ class PregnancyController extends ChangeNotifier {
       await prefs.remove(kPlaceholderAnchorKey);
     } catch (_) {/* best-effort */}
     // Also clear it in the cloud so the reset isn't undone on the next sync.
+    // Confirmed and kept if it did not land (sync log step 11): a clear made
+    // offline used to be undone by the cloud's old date on the next sync.
+    // The old write, kept for revert:
+    //   final client = Supabase.instance.client;
+    //   final uid = client.auth.currentUser?.id;
+    //   if (uid != null) {
+    //     await client.from('profiles').update({'due_date': null}).eq('id', uid);
+    //   }
+    if (!SupabaseRepo.isLoggedIn) return;
     try {
-      final client = Supabase.instance.client;
-      final uid = client.auth.currentUser?.id;
-      if (uid != null) {
-        await client
-            .from('profiles')
-            .update({'due_date': null}).eq('id', uid);
-      }
-    } catch (_) {/* offline - local only */}
+      await PendingProfile.send({'due_date': null});
+    } catch (_) {/* offline - local only, and waiting in PendingProfile */}
   }
 
   // --- helpers ---------------------------------------------------------------

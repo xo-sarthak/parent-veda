@@ -17,8 +17,12 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/sync_registry.dart';
+
 class PvLearnProgressStore extends ChangeNotifier {
-  PvLearnProgressStore._();
+  PvLearnProgressStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PvLearnProgressStore instance = PvLearnProgressStore._();
 
   static const _key = 'pv_learn_progress_v1';
@@ -101,6 +105,13 @@ class PvLearnProgressStore extends ChangeNotifier {
     } catch (_) {
       /* best-effort */
     }
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    resetForTest();
+    notifyListeners();
   }
 
   @visibleForTesting

@@ -32,20 +32,19 @@ step, newest at the bottom. When a step lands: tick it here, add its log entry t
 | 6 | Parenting records: documents, health, milestones, vaccines, emergency card | 0104 | `af76d8f`, docs `2ba778e` |
 | 7 | Parenting's last two: the child profile (soft delete + Restore) and the name votes | 0105 (run 2026-10-20) | `d76594b` |
 | 8 | Pregnancy part 1: calendar, bump photos, the daily tables, weekly notes, reminders (`OwnRowLedger`) | 0106 (run 2026-10-21) | `d5787b2` |
-| 9 | Pregnancy part 2: medicines, scans and appointments, symptoms, the tools (`OwnRowLedger.single` for one-row tables) | 0107 (**the user runs it**) | pending |
+| 9 | Pregnancy part 2: medicines, scans and appointments, symptoms, the tools (`OwnRowLedger.single` for one-row tables) | 0107 (run 2026-10-21) | `a728ec4` |
+| 11 + 12 | Every write of her data confirmed and batched; sign-out forgets memory and stops alarms; the 90-day purge (done before 10, see below) | 0109 (run 2026-10-21) | pending |
 
 ### Still to do, in order
 
-**3 more steps finish the sync work.** Each step is the same shape: plan → user decides the merge rule → migration →
+**Steps 11 and 12 are done (2026-10-21), ahead of 10.** Step 10 waits on the marketplace decision below. Each step is the same shape: plan → user decides the merge rule → migration →
 store changes → a pure merge test → the user runs the migration and its check query → log entry.
 
 | Step | What | Where the detail is | Size |
 |---|---|---|---|
-| **10 (NEXT)** | Blob stores, per-item merge for the lists people curate (saved readings, hospital bag, checklists, cart), so two phones editing different items both keep their edits. Records hiding in blobs (orders, scan reports, readings) move to rows | §2 | medium |
-| 11 | Uploads that fail silently: batch the first-sync upserts, and make sure every converted store reports its waiting changes to the sign-out warning | §3 | small (mostly done inside steps 1-9) |
-| 12 | Tidy-up: local-only stores cleared on sign-out (§4), purge soft-deleted rows after 90 days (§5), the small items (§7) | §4, §5, §7 | small |
+| **10 (ON HOLD, 2026-10-21)** | **Split by the user's marketplace plan.** The shopping half (cart, orders, bought products, product checklists, Brand Studio) is handed to the marketplace build, which designs them as server-side rows from the start; nothing is built for them here. The rest can go ahead when the user says. Blob stores, per-item merge for the lists people curate (saved readings, hospital bag, checklists, cart), so two phones editing different items both keep their edits. Records hiding in blobs (orders, scan reports, readings) move to rows | §2 | medium |
 
-Every Pregnancy and Parenting row table is now on a ledger (`OwnRowLedger`, `ChildLogLedger`). Step 10 is the blobs; read BACKEND-PATTERNS §16ii-k (the old sync's mistakes) before it. After step 12 the sync work is complete. The
+Every Pregnancy and Parenting row table is now on a ledger (`OwnRowLedger`, `ChildLogLedger`). Steps 11 and 12 are done. What is left is step 10 (the blobs, split above) and §4's decision on phone-only data. Read BACKEND-PATTERNS §16ii-k (the old sync's mistakes) before step 10. The
 backend is then **launch-ready** once the user's checks below are done and the backend items in BEFORE-LAUNCH §1 and
 §7 (crash reporting, uptime alerts, backups) are closed.
 
@@ -139,7 +138,7 @@ backend is then **launch-ready** once the user's checks below are done and the b
   daily tables, weekly notes and reminders, on the new `OwnRowLedger` (all own-only, so newer wins with no
   decision). Bump and note photos leave Storage once the removal is confirmed; reminders re-arm or cancel their
   alarms after a pull; `father_missions` got its missing UPDATE policy. See `docs/BACKEND-SYNC-LOG.md` step 8.
-- **Pregnancy part 2 (step 9, 2026-10-21, migration 0107, NOT YET RUN).** Medicines and their logs, scans and
+- **Pregnancy part 2 (step 9, 2026-10-21, migration 0107 run 2026-10-21, `a728ec4`).** Medicines and their logs, scans and
   appointments, symptoms, and the four tools, on `OwnRowLedger` (`.single` for the weight profile and kegel
   routine). Medicine alarms now sync and re-arm on each phone (every pull used to wipe them); medicine and symptom
   log ids come from their natural key; the partner's read of scans skips removed rows; 0107 also lets severity be
@@ -185,12 +184,12 @@ None of these tables has `updated_at` except where noted; all need `removed_at`.
 | ~~`calendar_store.dart`~~ | ~~`calendar_personal_events`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
 | ~~`bump_store.dart`~~ | ~~`bump_photos`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
 | ~~`daily_store.dart`~~ | ~~`daily_moods`, `baby_talk`, `kept_affirmations`, `daily_movement_responses`, `father_missions`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
-| ~~`medicine_store.dart`~~ | ~~`medications`, `medication_logs`~~ **DONE 2026-10-21 (0107, not yet run)** |
+| ~~`medicine_store.dart`~~ | ~~`medications`, `medication_logs`~~ **DONE 2026-10-21 (0107, run 2026-10-21)** |
 | ~~`memory_store.dart`~~ | ~~`weekly_journal_notes`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
 | ~~`reminder_store.dart`~~ | ~~`reminders`~~ **DONE 2026-10-20 (0106, run 2026-10-21)** |
-| ~~`scans_store.dart`~~ | ~~`completed_scans`, `appointments`~~ **DONE 2026-10-21 (0107, not yet run)** |
-| ~~`symptom_store.dart`~~ | ~~`symptom_logs`~~ **DONE 2026-10-21 (0107, not yet run)** |
-| ~~`tools_store.dart`~~ | ~~`weight_profile`, `weight_entries`, `movement_sessions`, `kegel_state`, `contraction_sessions`~~ **DONE 2026-10-21 (0107, not yet run)** |
+| ~~`scans_store.dart`~~ | ~~`completed_scans`, `appointments`~~ **DONE 2026-10-21 (0107, run 2026-10-21)** |
+| ~~`symptom_store.dart`~~ | ~~`symptom_logs`~~ **DONE 2026-10-21 (0107, run 2026-10-21)** |
+| ~~`tools_store.dart`~~ | ~~`weight_profile`, `weight_entries`, `movement_sessions`, `kegel_state`, `contraction_sessions`~~ **DONE 2026-10-21 (0107, run 2026-10-21)** |
 
 `daily_moods`, `daily_movement_responses`, `weight_profile` and `kegel_state` already have `updated_at` (0003, 0004),
 but it is not used as a merge clock. The rest have neither column.
@@ -258,6 +257,12 @@ Grow, Food, Journeys, NameMatch, Reco, Reading, Watch, Yoga. Find them with `gre
 
 ## 3. Uploads that fail silently in the other stages (MEDIUM: changes may never reach the account)
 
+> **DONE 2026-10-21 (step 11).** Every write of her data is confirmed and keeps a waiting mark the sign-out sheet
+> reads; first sync goes in batches of 100 (`SyncBatch`); onboarding's stashed profile is finally sent
+> (`PendingProfile.flush` on every resync). `test/no_silent_user_writes_test.dart` holds it. **Still silent, out of
+> scope:** orders (`pv_order_store`, the marketplace build), referral codes, the doctor app's availability and
+> schedule, Can-I misses. The text below is the original finding.
+
 `SupabaseRepo.upsertRow` swallows every error (`supabase_repo.dart` ~494). Every store that uses it, directly or
 through `TtcSyncUtil.upsertAll`, cannot tell that an upload failed. It never retries until the next full sync, and
 `PvSyncHealth` never hears of it.
@@ -274,6 +279,14 @@ through `TtcSyncUtil.upsertAll`, cannot tell that an upload failed. It never ret
 
 ## 4. Local-only stores keep the last person in memory (LOW: shown, never uploaded)
 
+> **DONE 2026-10-21 (step 12)** for 45 stores (sync log step 12 lists them); `sync_reset_coverage_test` now fails
+> any prefs-reading singleton with no reset. **Reset still owed** (deferred, another terminal was editing them):
+> `ttc_learn_screen` recents, `TtcPartnerMode` (`ttc_strings`), `ttc_ready_habits_store`, plus the six doctor-app
+> stores (their own sign-out). **DECISION OWED (the user): phone-only personal data is LOST at sign-out.** The
+> birth plan, Garbh journal, memories, BMI history, condition answers, the skilling journal and portfolio never
+> reach the cloud, so the wipe deletes them for good, while the sign-out sheet says "It stays saved in your
+> account". The cheap fix is the `CloudSyncedStore` blob per store (the non-shopping half of step 10).
+
 Stores that never sync are not in the reset registry. After a sign-out their `shared_preferences` are wiped, but the
 singleton still holds the last person's data until the app restarts, so the next person can see it in this session.
 
@@ -287,6 +300,11 @@ singleton still holds the last person's data until the app restarts, so the next
 ---
 
 ## 5. Tombstones and soft-deleted rows grow forever (LOW: storage)
+
+> **DONE 2026-10-21 (step 12, 0109, run 2026-10-21, cron job 3 active).** `pv_purge_removed(90)` daily via `pg_cron` over an explicit
+> list of 43 tables (never `children`); the phones drop confirmed removals after 80 days, first, on purpose
+> (BACKEND-PATTERNS §16ii-m). ⚠️ CORRECTION: the line below saying `saved_items` "already purges" was wrong; 0081's
+> prune was never scheduled. The text below is the original finding.
 
 - **Soft-deleted rows stay in the cloud tables for good.** Applies to `ttc_cycles`, `ttc_cycle_signals` and
   `ttc_logs` (0097), and to `saved_items` and `ttc_doctor_questions`. `saved_items` already purges after 30 days
@@ -342,13 +360,14 @@ profile, emergency cards) may want per-field.
   If it grows, pull only the stores for the current stage, or use a "changed since" query on `updated_at`.
 - **Signal rows (`ttc_cycle_signals`) must keep `cycle_day` between 1 and 90**, even when soft-deleted; the client
   sends 1 for a removed row. If that check ever changes, keep the removed-row value valid.
-- **The trigger reminders** (`TtcTreatmentStore` reminder ids 918001/918002) are not cancelled by the store reset.
-  `NotificationService.silenceForSignOut` probably covers them; confirm on a device.
+- ~~**The trigger reminders** (`TtcTreatmentStore` reminder ids 918001/918002) are not cancelled by the store reset.
+  `NotificationService.silenceForSignOut` probably covers them; confirm on a device.~~ **DONE 2026-10-21 (step 12):**
+  every wipe now cancels all scheduled notifications, and the sign-out mute no longer gets wiped. Device check owed.
 - **One vaccine row holds two facts** (given, reminder). Under row-level newer-wins, one parent marking it given
   while the other sets its reminder at the same moment loses one change. Rare; split the row only if it is ever
   seen (step 6, 2026-10-18).
-- **`DeleteAccount.run` keeps an unused `local_wipe.dart` import** (marked `// ignore`); drop it in the next pass
-  there.
+- ~~**`DeleteAccount.run` keeps an unused `local_wipe.dart` import** (marked `// ignore`); drop it in the next pass
+  there.~~ **DONE 2026-10-21 (step 12):** commented out, kept for revert.
 
 ---
 

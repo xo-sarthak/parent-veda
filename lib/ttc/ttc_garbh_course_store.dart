@@ -30,12 +30,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/sync_registry.dart';
+
 /// The optional couple part session 8 offers. Null is a real answer — the brief
 /// says *"or neither"* and means it.
 enum TtcCoupleDaily { gratitude, conversation }
 
 class TtcGarbhCourseStore extends ChangeNotifier {
   TtcGarbhCourseStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
     _load();
   }
   static final TtcGarbhCourseStore instance = TtcGarbhCourseStore._();
@@ -136,6 +139,12 @@ class TtcGarbhCourseStore extends ChangeNotifier {
     _persist();
     notifyListeners();
   }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // Loaded once, in the constructor, so `_loaded` stays true: prefs are
+  // empty now, and empty fields are what a reload would find.
+  void _resetForAccount() => resetForTest();
 
   @visibleForTesting
   void resetForTest() {

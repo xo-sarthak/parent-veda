@@ -58,6 +58,10 @@ class FatherJournalStore extends ChangeNotifier {
 
   /// A sign-out, or another account signing in (2026-10-17): this store
   /// forgets the person in memory; the cloud keeps it.
+  // Registered on every sync, so it must dedupe: two tear-offs of one
+  // object's method compare equal, two `() => hasPendingPush` closures don't.
+  bool _pending() => hasPendingPush;
+
   void _resetLocal() {
     _tombstones.clear();
     _seen.clear();
@@ -65,9 +69,16 @@ class FatherJournalStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Changes the cloud has not confirmed (sync log step 11, 2026-10-21): a
+  /// removal still waiting, or an entry the cloud has never seen. The sync
+  /// below already retried both; the sign-out sheet just could not see them.
+  bool get hasPendingPush =>
+      _tombstones.isNotEmpty || _manual.any((e) => !_seen.contains(e.id));
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
+    SyncRegistry.registerPending(_pending);
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       final rows = await SupabaseRepo.fetch('father_journal_entries');

@@ -16,6 +16,25 @@ void main() {
     expect(src, contains('NotificationService.instance.silenceForSignOut()'));
   });
 
+  test('the mute is set AFTER the wipe, so the wipe cannot delete it', () {
+    // Before 2026-10-21 it ran first and `prefs.clear()` removed the flag.
+    final src = File('lib/screens/profile/pv_account_actions.dart').readAsStringSync();
+    final body = src.substring(src.indexOf('Future<void> pvSignOut('));
+    final wipe = body.indexOf('await LocalOwner.wipeThisPhone()');
+    final mute = body.indexOf('NotificationService.instance.silenceForSignOut()');
+    expect(wipe, greaterThan(0));
+    expect(mute, greaterThan(wipe));
+    final del = File('lib/services/auth/delete_account.dart').readAsStringSync();
+    expect(del.indexOf('silenceForSignOut()'),
+        greaterThan(del.indexOf('await LocalOwner.wipeThisPhone()')),
+        reason: 'a deleted account goes silent too');
+  });
+
+  test('every wipe stops the last person\'s scheduled alarms', () {
+    final owner = File('lib/services/auth/local_owner.dart').readAsStringSync();
+    expect(owner, contains('NotificationService.instance.cancelAllScheduled()'));
+  });
+
   test('every scheduling path is gated, and the stores re-arm after sign-in', () {
     final n = File('lib/services/notification_service.dart').readAsStringSync();
     expect(RegExp(r'if \(await _muted\(\)\) return;').allMatches(n).length, 5,

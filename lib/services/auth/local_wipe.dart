@@ -60,6 +60,28 @@ class LocalWipe {
   /// deletion would read as the app forgetting who she is.
   static const Set<String> keep = <String>{
     PregnancyController.kLanguageKey,
+    // ── Added 2026-10-21 (sync log step 12) ─────────────────────────────────
+    // These belong to the INSTALL or the phone's display, never to a person.
+    // Wiping them did harm both ways: the in-memory singletons kept the old
+    // value while the disk lost it (so the screen and the next launch
+    // disagreed), and the install-level ids were reset as if the app had been
+    // installed again.
+    //
+    // Install-level: wiping these re-ran the "once ever" Play referrer check
+    // (re-attributing the install) and minted a new analytics install id
+    // (counting one phone as two installs).
+    'install_referrer_checked_v1', // InstallReferrer._checkedKey
+    'profile_analytics_install_id', // ProfileAnalytics._installKey
+    // Display and sound settings of this phone.
+    'ttc_hinglish', // TtcLang.kKey: the TTC reading language
+    'pv_ask_fab_hidden', // FabState.kHiddenKey
+    'ttc_practice_sound', // TtcCueSounds.prefsKey
+    'size_baby_mode', // SizeViewPref
+    'v3_block_art_vector', // V2BlockArtMode
+    'baby_voice_muted_home', // BabyVoiceService
+    'baby_voice_muted_journey',
+    'baby_voice_muted',
+    'preg_size_set', // PregSizeSetStore
   };
 
   /// Erase all locally cached account data. Best-effort and never throws — by

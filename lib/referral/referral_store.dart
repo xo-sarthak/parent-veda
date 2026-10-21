@@ -18,13 +18,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../booking/booking_store.dart';
 import '../services/remote/supabase_repo.dart';
+import '../services/remote/sync_registry.dart';
 import 'referral_analytics.dart';
 import 'referral_engine.dart';
 import 'referral_models.dart';
 import 'referral_notifications.dart';
 
 class ReferralStore extends ChangeNotifier {
-  ReferralStore._();
+  ReferralStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final ReferralStore instance = ReferralStore._();
 
   static const _key = 'referral_v1';
@@ -354,6 +357,13 @@ class ReferralStore extends ChangeNotifier {
         }),
       );
     } catch (_) {/* in-memory stands */}
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _freshRewards.clear();
+    resetAll();
   }
 
   @visibleForTesting

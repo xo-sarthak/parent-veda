@@ -33,6 +33,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'supabase_repo.dart';
+import 'sync_batch.dart';
 import 'sync_row_book.dart';
 
 class OwnRowLedger {
@@ -218,19 +219,38 @@ class OwnRowLedger {
         final uid = SupabaseRepo.userId;
         if (uid == null) return;
         final rows = live();
+        // In batches (step 11, sync_batch.dart). The row-at-a-time loop it
+        // replaced, kept for revert:
+        //   for (final key in book.dirty.toList()) {
+        //     final up = uploadFor(key, rows, uid: uid);
+        //     if (up == null) continue;
+        //     final sent = book.stamps[key];
+        //     final gone = book.removed.containsKey(key) ? book.removedRows[key] : null;
+        //     final ok = await SupabaseRepo.upsertRowConfirmed(table, up, onConflict: onConflict);
+        //     book.confirmed(key, ok: ok, sent: sent);
+        //     if (!book.dirty.contains(key)) { lastRows.remove(key); if (gone != null) onRemovalConfirmed?.call(key, gone); }
+        //   }
+        final ups = <String, Map<String, dynamic>>{};
+        final sent = <String, int?>{};
+        final gone = <String, Map<String, dynamic>>{};
         for (final key in book.dirty.toList()) {
           final up = uploadFor(key, rows, uid: uid);
           if (up == null) continue;
-          final sent = book.stamps[key];
-          final gone = book.removed.containsKey(key)
-              ? book.removedRows[key]
-              : null;
-          final ok = await SupabaseRepo.upsertRowConfirmed(table, up,
-              onConflict: onConflict);
-          book.confirmed(key, ok: ok, sent: sent);
+          ups[key] = up;
+          sent[key] = book.stamps[key];
+          final g = book.removed.containsKey(key) ? book.removedRows[key] : null;
+          if (g != null) gone[key] = g;
+        }
+        final took = await SyncBatch.push(
+            ups,
+            (batch) =>
+                SupabaseRepo.upsertRows(table, batch, onConflict: onConflict));
+        for (final key in ups.keys) {
+          book.confirmed(key, ok: took.contains(key), sent: sent[key]);
           if (!book.dirty.contains(key)) {
             lastRows.remove(key);
-            if (gone != null) onRemovalConfirmed?.call(key, gone);
+            final g = gone[key];
+            if (g != null) onRemovalConfirmed?.call(key, g);
           }
         }
         await save();

@@ -187,11 +187,6 @@ Future<void> pvSignOut(BuildContext context) async {
   } catch (_) {
     /* best-effort */
   }
-  // Signed out means silent (2026-10-10): no reminder rings for someone who
-  // has left. See NotificationService.silenceForSignOut.
-  try {
-    await NotificationService.instance.silenceForSignOut();
-  } catch (_) {/* best-effort */}
   // ⚠️ THIS PHONE FORGETS THE PERSON (2026-10-17): the local cache is
   // wiped and every store emptied, so the next account to sign in starts
   // clean and nothing of hers is uploaded into it. Her account keeps it all.
@@ -200,6 +195,18 @@ Future<void> pvSignOut(BuildContext context) async {
       await LocalOwner.wipeThisPhone();
     } catch (_) {/* best-effort */}
   }
+  // Signed out means silent (2026-10-10): no reminder rings for someone who
+  // has left. See NotificationService.silenceForSignOut.
+  //
+  // ⚠️ AFTER THE WIPE, NOT BEFORE (2026-10-21, sync log step 12). It used to
+  // run first, and the wipe's `prefs.clear()` then deleted the very flag it
+  // had set, so the next reminder any store scheduled rang for someone who
+  // had signed out. The general point: a "clear everything" step undoes any
+  // state written before it, so state that must survive goes after. Kept for
+  // revert: this block sat above the wipe.
+  try {
+    await NotificationService.instance.silenceForSignOut();
+  } catch (_) {/* best-effort */}
   // The Ask Veda button stays off the sign-in screens.
   FabState.instance.markAppSignedOut();
   // ⚠️ THE WHOLE STACK GOES (2026-10-10). This used to push onboarding ON TOP

@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
+import '../services/remote/sync_registry.dart';
 
 @immutable
 class RxItem {
@@ -74,7 +75,9 @@ class Prescription {
 }
 
 class PrescriptionStore extends ChangeNotifier {
-  PrescriptionStore._();
+  PrescriptionStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PrescriptionStore instance = PrescriptionStore._();
 
   // bookingId -> prescription (whichever RLS lets this user see).
@@ -150,6 +153,16 @@ class PrescriptionStore extends ChangeNotifier {
   /// duplicate of something already written.
   bool _loaded = false;
   bool get loaded => _loaded;
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _byBooking.clear();
+    _announced = null;
+    _newSinceLastRefresh.clear();
+    _loaded = false;
+    notifyListeners();
+  }
 
   /// Pull every prescription this user may see (their own as a parent, or
   /// theirs as the hosting expert). Best-effort; keeps the cache on failure.

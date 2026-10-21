@@ -33,8 +33,12 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'remote/sync_registry.dart';
+
 class CreditsStore extends ChangeNotifier {
-  CreditsStore._();
+  CreditsStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final CreditsStore instance = CreditsStore._();
 
   static const _cacheKey = 'consult_credits_v1';
@@ -60,6 +64,17 @@ class CreditsStore extends ChangeNotifier {
   Map<String, int> get bySource => Map.unmodifiable(_bySource);
 
   int fromSource(String source) => _bySource[source] ?? 0;
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  void _resetForAccount() {
+    _available = 0;
+    _spent = 0;
+    _expiringNext = null;
+    _bySource = const {};
+    _loaded = false;
+    notifyListeners();
+  }
 
   void ensureLoaded() {
     if (_loaded) return;

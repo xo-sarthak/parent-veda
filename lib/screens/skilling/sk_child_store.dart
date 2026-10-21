@@ -36,6 +36,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/remote/sync_registry.dart';
 import '../post_pregnancy/pp_child_profile.dart';
 import 'sk_bands.dart';
 import 'sk_consent_verifier.dart';
@@ -50,7 +51,9 @@ class SkChildSuggestion {
 }
 
 class SkChildStore extends ChangeNotifier {
-  SkChildStore._();
+  SkChildStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final SkChildStore instance = SkChildStore._();
 
   static const _key = 'sk_child';
@@ -203,6 +206,22 @@ class SkChildStore extends ChangeNotifier {
     _voiceAllowed = false;
     _photosAllowed = false;
     _save();
+    notifyListeners();
+  }
+
+  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  // are wiped, the singleton was not.
+  // forget() also writes prefs, so this one touches memory only.
+  void _resetForAccount() {
+    _name = null;
+    _dob = null;
+    _consentedAt = null;
+    _verification = SkVerification.none;
+    _pinHash = null;
+    _pinSalt = null;
+    _voiceAllowed = false;
+    _photosAllowed = false;
+    _loaded = false;
     notifyListeners();
   }
 

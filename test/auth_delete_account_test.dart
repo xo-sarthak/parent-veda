@@ -136,7 +136,26 @@ void main() {
     test('the allowlist is deliberately tiny', () {
       // Everything not named is treated as account data. If this grows, each
       // addition needs to be a thing about the DEVICE, not about her.
-      expect(LocalWipe.keep.length, lessThanOrEqualTo(3),
+      // 2026-10-21 (sync log step 12): grew from the language alone to the
+      // install's own ids and the phone's display settings, each named here
+      // with why it is about the device. The bound is now this exact set:
+      // anything added must be added here too, on purpose. Kept for revert:
+      //   expect(LocalWipe.keep.length, lessThanOrEqualTo(3), ...);
+      const justified = {
+        PregnancyController.kLanguageKey, // her reading language, the phone's
+        'install_referrer_checked_v1', // the install, not a person
+        'profile_analytics_install_id', // the install, not a person
+        'ttc_hinglish', // reading language
+        'pv_ask_fab_hidden', // display
+        'ttc_practice_sound', // sound
+        'size_baby_mode', // display
+        'v3_block_art_vector', // display
+        'baby_voice_muted_home', // sound
+        'baby_voice_muted_journey', // sound
+        'baby_voice_muted', // sound
+        'preg_size_set', // display
+      };
+      expect(LocalWipe.keep, justified,
           reason: 'an allowlist that grows quietly is how data survives a '
               'deletion — every entry must be justified');
       expect(LocalWipe.keep, contains(PregnancyController.kLanguageKey));

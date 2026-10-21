@@ -446,7 +446,9 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
     final start = _journeyStart ?? LifeStageStore.instance.enteredAt;
-    await SupabaseRepo.upsertRow(
+    // Confirmed and remembered (sync log step 11); it was
+    // `SupabaseRepo.upsertRow`, which swallowed a refusal. Kept for revert.
+    await sendTracked(() => SupabaseRepo.upsertRowConfirmed(
       TtcTables.journeys,
       {
         'user_id': uid,
@@ -467,8 +469,11 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       },
       onConflict: 'user_id',
-    );
+    ));
   }
+
+  @override
+  String? get waitingKey => 'pv_waiting_ttc_journeys';
 
   @override
   Future<void> persistLocalCache() => _persist();
