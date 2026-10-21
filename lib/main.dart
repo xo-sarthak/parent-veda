@@ -98,6 +98,8 @@ import 'services/reminder_store.dart';
 import 'ttc/ttc_content_prefs.dart';
 import 'ttc/ttc_doctor_questions_store.dart' show TtcDoctorQuestionsStore;
 import 'ttc/ttc_messages_store.dart';
+import 'ttc/ttc_ready_habits_store.dart' show TtcReadyHabitsStore;
+import 'ttc/ttc_ready_plan_store.dart' show TtcReadyPlanStore;
 import 'ttc/ttc_records_store.dart' show TtcAppointmentsStore;
 import 'ttc/ttc_treatment_store.dart';
 import 'services/scans_store.dart';
@@ -152,6 +154,12 @@ Future<void> main() async {
   try {
     await LocalOwner.ensureCurrent();
   } catch (_) {/* never block the launch on it */}
+
+  // Her "Ask Veda button" switch, read before the first frame so a hidden
+  // button never flashes on (2026-10-20).
+  try {
+    await FabState.preload();
+  } catch (_) {/* shown, as by default */}
 
   runApp(const ParentVedaApp());
 }
@@ -322,6 +330,11 @@ class _ParentVedaAppState extends State<ParentVedaApp>
         // And the appointments' "remind me the evening before" (2026-09-27),
         // which the same cancelAll() would otherwise wipe on every launch.
         .then((_) => TtcAppointmentsStore.instance.rearmAfterStartup())
+        // The Ready-to-Try plan's notes (2026-10-21): the monthly ones and
+        // her habit reminders, which the same wipe cleared on every launch.
+        // The habits store also stops them once her month has come.
+        .then((_) => TtcReadyPlanStore.instance.rearmAfterStartup())
+        .then((_) => TtcReadyHabitsStore.instance.rearmAfterStartup())
         // ⚠️ AND THE MEDICATION ALARMS, EVERY STAGE (2026-09-27, found in the
         // TTC tools pass). `MedicineStore.init` above arms them as soon as it
         // loads, racing this chain: when it won, `syncAll`'s cancelAll() wiped

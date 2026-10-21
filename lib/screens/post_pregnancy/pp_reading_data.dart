@@ -178,8 +178,11 @@ const List<ReadArticle> kReadArticles = [
           'A baby who hasn’t yet learned to drift back down on their own will fully wake at each of those moments. Hence the two-hourly wake-ups. It isn’t a habit gone wrong; it’s a brain growing up.',
         ],
         mythFact: MythFact(
-          'My baby has become a “bad sleeper” and we’ve created bad habits.',
-          'This is neurological maturation, not a habit. Nearly every baby goes through it, and it settles as they learn to link sleep cycles, usually within 2–6 weeks.',
+          // Plain words, one idea per sentence (2026-10-21). Kept for revert:
+          //   'My baby has become a “bad sleeper” and we’ve created bad habits.',
+          //   'This is neurological maturation, not a habit. Nearly every baby goes through it, and it settles as they learn to link sleep cycles, usually within 2–6 weeks.',
+          "My baby has become a bad sleeper because of our habits.",
+          "A sleep change around 4 months is a normal stage, not a bad habit. Most babies settle within 2 to 6 weeks.",
         ),
       ),
       ReadSection(
@@ -270,8 +273,11 @@ const List<ReadArticle> kReadArticles = [
           'Forget the calendar for a moment and watch your baby. Readiness, usually around six months, looks like this: he can sit with support and hold his head steady, he’s eyeing your food with real interest, and he’s lost the reflex that pushes food back out with his tongue.',
         ],
         mythFact: MythFact(
-          'Start with rice cereal, and start by four months to help him sleep.',
-          'Current guidance is to wait for readiness (around six months) and there’s no need to begin with bland cereal. Iron-rich foods matter more, and food doesn’t reliably improve sleep.',
+          // Plain words, one idea per sentence (2026-10-21). Kept for revert:
+          //   'Start with rice cereal, and start by four months to help him sleep.',
+          //   'Current guidance is to wait for readiness (around six months) and there’s no need to begin with bland cereal. Iron-rich foods matter more, and food doesn’t reliably improve sleep.',
+          "Start rice cereal by 4 months to help your baby sleep.",
+          "Start solids at around 6 months, when your baby shows they're ready. Iron-rich foods matter more than cereal, and solids don't improve sleep.",
         ),
       ),
       ReadSection(
@@ -314,8 +320,11 @@ const List<ReadArticle> kReadArticles = [
           'The part of the brain that manages big emotions, the thinking, calming, self-controlling part, is years from being built. A toddler feels enormous feelings with none of the tools to manage them. A tantrum isn’t manipulation; it’s a genuine flood, and your child is as overwhelmed by it as you are.',
         ],
         mythFact: MythFact(
-          'Giving attention to a tantrum rewards it and makes it worse.',
-          'Young children can’t calm alone, they borrow ours. Calm, connected presence (not giving in to the demand) is how they learn regulation over time.',
+          // Plain words, one idea per sentence (2026-10-21). Kept for revert:
+          //   'Giving attention to a tantrum rewards it and makes it worse.',
+          //   'Young children can’t calm alone, they borrow ours. Calm, connected presence (not giving in to the demand) is how they learn regulation over time.',
+          "Paying attention to a tantrum makes it worse.",
+          "Staying calm and close helps your child learn to calm down. Staying close is not the same as giving in.",
         ),
       ),
       ReadSection(
@@ -357,8 +366,11 @@ const List<ReadArticle> kReadArticles = [
           'For a baby, 38°C (100.4°F) or above is a fever. Keep him comfortable and well-hydrated with more frequent feeds, dress him lightly, and use paracetamol only at the dose your paediatrician advises for his weight. A child who is drinking, weeing and has moments of playfulness, even with a temperature, is usually weathering it well.',
         ],
         mythFact: MythFact(
-          'Teething causes high fever.',
-          'Teething may raise the temperature very slightly, but a genuine fever is caused by something else. Don’t blame teeth for a real fever, treat it as illness.',
+          // Plain words, one idea per sentence (2026-10-21). Kept for revert:
+          //   'Teething causes high fever.',
+          //   'Teething may raise the temperature very slightly, but a genuine fever is caused by something else. Don’t blame teeth for a real fever, treat it as illness.',
+          "Teething causes a high fever.",
+          "Teething does not cause a high fever. A real fever means an illness, so call your doctor if you're worried.",
         ),
       ),
       ReadSection(
@@ -475,8 +487,11 @@ const List<ReadArticle> kReadArticles = [
           'A baby who always falls asleep being rocked or fed learns that this is how sleep happens. So when he surfaces between cycles at night, he needs the same thing again to go back down. Learning to fall asleep in his own bed, a little awake, means he can find his own way back at 3am, without calling for you.',
         ],
         mythFact: MythFact(
-          'This means letting him cry it out.',
-          'Not at all. Drowsy-but-awake is gradual and gentle, you can stay, soothe and help. It’s about shifting the very last moment of falling asleep from your arms to his bed, slowly.',
+          // Plain words, one idea per sentence (2026-10-21). Kept for revert:
+          //   'This means letting him cry it out.',
+          //   'Not at all. Drowsy-but-awake is gradual and gentle, you can stay, soothe and help. It’s about shifting the very last moment of falling asleep from your arms to his bed, slowly.',
+          "Putting your baby down drowsy means letting them cry it out.",
+          "It doesn't. You can stay, soothe and help, and move the last moment of falling asleep to the cot slowly.",
         ),
       ),
       ReadSection(
@@ -514,8 +529,11 @@ const List<ReadArticle> kReadArticles = [
           'You may feel fierce love and flat exhaustion in the same hour. You may grieve your old freedom while adoring your new life. This isn’t failure or ingratitude, it’s the messy, normal in-between of becoming someone new. Two true things can live side by side.',
         ],
         mythFact: MythFact(
-          'A good mother feels instant, uncomplicated bliss.',
-          'Love often grows gradually, through the ordinary care of long days and nights. Mixed feelings are common and human, persistent hopelessness or dread, though, deserves support: please reach out.',
+          // Plain words, one idea per sentence (2026-10-21). Kept for revert:
+          //   'A good mother feels instant, uncomplicated bliss.',
+          //   'Love often grows gradually, through the ordinary care of long days and nights. Mixed feelings are common and human, persistent hopelessness or dread, though, deserves support: please reach out.',
+          "A good mother feels instant, simple happiness.",
+          "Love often grows slowly, through everyday care. If you feel hopeless or full of dread for days, please talk to your doctor.",
         ),
       ),
       ReadSection(
@@ -623,8 +641,11 @@ const List<ReadArticle> kReadArticles = [
           'In India, only about one in ten eligible mothers even attempt it, often because no one told them it was possible. Knowing it is an option is where a real choice begins.',
         ],
         mythFact: MythFact(
-          'Once a C-section, always a C-section.',
-          'For many mothers this isn’t true. A vaginal birth after caesarean (VBAC) is a safe and reasonable option for many, succeeding roughly three times in four when suitable mothers attempt it, with serious risks kept low.',
+          // Plain words, one idea per sentence (2026-10-21). Kept for revert:
+          //   'Once a C-section, always a C-section.',
+          //   'For many mothers this isn’t true. A vaginal birth after caesarean (VBAC) is a safe and reasonable option for many, succeeding roughly three times in four when suitable mothers attempt it, with serious risks kept low.',
+          "Once you've had a C-section, every birth must be a C-section.",
+          "Many mothers can safely have a vaginal birth after a caesarean (VBAC). It works for about 3 in 4 suitable mothers, and your doctor will tell you if it's right for you.",
         ),
       ),
       ReadSection(

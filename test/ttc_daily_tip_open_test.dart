@@ -108,11 +108,12 @@ void main() {
       final m =
           ttcMyths.firstWhere((m) => m.id == 'infertility_is_female');
       final slides = ttcMythSlides(m, false);
+      // 2026-10-21: the fact is one plain sentence now, so the kept
+      // three-slide shape has two; the why lives on the story (below).
       expect(slides.map((s) => s.title).toList(),
-          [kTtcMythSaySlide, kTtcMythTrueSlide, kTtcMythMoreSlide]);
+          [kTtcMythSaySlide, kTtcMythTrueSlide]);
       expect(slides[0].body, m.mythEn);
-      // Every word of the truth is on a slide, in order, and nothing else.
-      expect('${slides[1].body} ${slides[2].body}', m.truthEn);
+      expect(slides[1].body, m.truthEn);
     });
 
     test('every myth splits without losing a word', () {
@@ -127,8 +128,9 @@ void main() {
     testWidgets('H8: the daily myth opens on a labelled MYTH and FACT cover',
         (tester) async {
       final m = ttcMyths.firstWhere((m) => m.id == 'infertility_is_female');
-      final (fact, more) = ttcSplitFirstSentence(m.truthEn);
-      expect(more, isNotEmpty, reason: 'pick a myth whose truth runs on');
+      // 2026-10-21: a whole fact on the cover, its own why on slide 2.
+      final fact = m.truthEn;
+      final more = m.whyEn!;
       await tester.pumpWidget(MaterialApp(
         home: Builder(
           builder: (c) => TextButton(
@@ -147,6 +149,7 @@ void main() {
           reason: 'the myth and fact draw only on a cover');
       // The rest of the truth follows once, and nothing is said twice.
       expect(story.cards.map((c) => c.body).toList(), [more]);
+      expect(story.cards.single.title, kTtcMythWhySlide);
       expect(find.byKey(const ValueKey('ttc_story_myth')), findsOneWidget);
       expect(find.byKey(const ValueKey('ttc_story_fact')), findsOneWidget);
       expect(find.text(m.mythEn), findsOneWidget);

@@ -1280,6 +1280,18 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         "doctor, we'll say so clearly and help you get ready for the visit. "
         'If your doctor says something different from what you read '
         'here, go with your doctor.',
+    // The same promise as three lines she can take in at a glance (walk,
+    // 2026-10-20: the paragraph above read as a block). [body] stays the
+    // screen-reader text.
+    points: const [
+      (Icons.medical_services_outlined,
+          "We don't diagnose. Only a doctor can do that."),
+      (Icons.event_note_outlined,
+          "If something needs a doctor, we'll tell you clearly and help "
+          'you prepare.'),
+      (Icons.verified_user_outlined,
+          'If your doctor says something different, follow your doctor.'),
+    ],
     cta: 'Good',
     // Kept for revert: setState(() { _q++; _history.removeLast(); }).
     onNext: _afterPromise,

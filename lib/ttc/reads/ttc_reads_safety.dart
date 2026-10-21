@@ -113,12 +113,18 @@ final List<PvRead> kTtcReadsSafety = [
               'against the law in India.'),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: They treat me like
+          // this because I haven't given them a child, so it's my fault.
           myth: _en("They treat me like this because I haven't given them a "
               "child, so it's my fault."),
-          fact: _en('Not conceiving never causes abuse and never excuses it. '
-              'Trouble conceiving is common, can come from either partner, '
-              'and is a medical matter. The person hurting you is '
-              'responsible for what they do.'),
+          // Plain words (2026-10-21). Kept for revert: Not conceiving never
+          // causes abuse and never excuses it. Trouble conceiving is common,
+          // can come from either partner, and is a medical matter. The person
+          // hurting you is responsible for what they do.
+          fact: _en('It is not your fault. Not having a child never causes '
+              'abuse and never excuses it. Trouble conceiving is common, can '
+              'come from either partner, and is a medical matter. The person '
+              'hurting you is responsible for what they do.'),
         ),
       ),
 

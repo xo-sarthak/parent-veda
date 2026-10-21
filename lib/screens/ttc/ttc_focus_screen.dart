@@ -2840,7 +2840,7 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
       ];
       showTtcRowSheet(
         context,
-        eyebrow: 'Film · Coming soon',
+        eyebrow: 'Video · Coming soon', // kept for revert: 'Film · Coming soon'
         title: tile.title,
         body: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -108,11 +108,18 @@ final List<PvRead> kTtcReadsBodyConditions = [
           _en('Trying for a baby for a long while without getting pregnant.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Bad period pain is normal. You just have to bear it.'),
-          fact: _en("Some cramping is normal. Pain that stops you living your "
-              "day isn't something you should have to put up with. It's worth "
-              "a doctor's visit, and telling the doctor exactly what the pain "
-              "stops you doing helps them take it seriously."),
+          // Plain words (2026-10-21). Kept for revert: Bad period pain is
+          // normal. You just have to bear it.
+          myth: _en('Bad period pain is normal, so you just have to bear it.'),
+          // Plain words (2026-10-21). Kept for revert: Some cramping is
+          // normal. Pain that stops you living your day isn't something you
+          // should have to put up with. It's worth a doctor's visit, and
+          // telling the doctor exactly what the pain stops you doing helps
+          // them take it seriously.
+          fact: _en("Not when it stops your day. Some cramping is normal. "
+              "Pain that stops you doing things is worth a doctor's visit. "
+              "Tell the doctor exactly what the pain stops you doing, so they "
+              "take it seriously."),
         ),
       ),
       PvReadSection(
@@ -434,10 +441,13 @@ final List<PvRead> kTtcReadsBodyConditions = [
         ],
         mythFact: PvMythFact(
           myth: _en("If you have a thyroid problem, you can't get pregnant."),
-          fact: _en("Many women with thyroid conditions get pregnant, often "
-              "once their levels are brought into range. A thyroid problem is "
-              "a reason to get tested and treated, not a reason to give up "
-              "hope."),
+          // Plain words (2026-10-21). Kept for revert: Many women with
+          // thyroid conditions get pregnant, often once their levels are
+          // brought into range. A thyroid problem is a reason to get tested
+          // and treated, not a reason to give up hope.
+          fact: _en("Many women with a thyroid problem do get pregnant, often "
+              "once their levels are treated. It's a reason to get tested and "
+              "treated, not a reason to give up hope."),
         ),
       ),
     ],
@@ -1090,11 +1100,16 @@ final List<PvRead> kTtcReadsBodyConditions = [
               "is rarely needed."),
         ],
         mythFact: PvMythFact(
-          myth: _en("A growth on the pituitary means a brain tumour, and "
-              "that's always serious."),
-          fact: _en("Prolactinomas are almost always small and aren't cancer. "
-              "Most shrink with tablets, and many women who have one go on to "
-              "have babies."),
+          // Plain words (2026-10-21). Kept for revert: A growth on the
+          // pituitary means a brain tumour, and that's always serious.
+          myth: _en('A growth on the pituitary means a serious brain tumour.'),
+          // Plain words (2026-10-21). Kept for revert: Prolactinomas are
+          // almost always small and aren't cancer. Most shrink with
+          // tablets, and many women who have one go on to have babies.
+          fact: _en("Usually it isn't serious. A prolactinoma (a growth that "
+              "makes too much prolactin) is almost always small and isn't "
+              "cancer. Most shrink with tablets, and many women who have one "
+              "go on to have babies."),
         ),
       ),
       PvReadSection(
@@ -1333,9 +1348,13 @@ final List<PvRead> kTtcReadsBodyConditions = [
         mythFact: PvMythFact(
           myth: _en("If there's any doubt, it's safer to take TB medicines "
               "anyway."),
-          fact: _en("Six months of TB medicines is a lot to go through, and "
-              "the tablets have side effects. Treating TB that isn't there "
-              "won't help you conceive. A proper diagnosis first protects you."),
+          // Plain words (2026-10-21). Kept for revert: Six months of TB
+          // medicines is a lot to go through, and the tablets have side
+          // effects. Treating TB that isn't there won't help you conceive.
+          // A proper diagnosis first protects you.
+          fact: _en("It isn't safer. TB treatment means six months of tablets "
+              "with side effects. Treating TB that isn't there won't help you "
+              "conceive. A proper diagnosis first protects you."),
         ),
       ),
       PvReadSection(
@@ -1477,11 +1496,18 @@ final List<PvRead> kTtcReadsBodyConditions = [
               "towels."),
         ],
         mythFact: PvMythFact(
-          myth: _en('Only women with many partners get PID.'),
-          fact: _en("Anyone can get PID, including women in a long, faithful "
-              "marriage. An infection may have been picked up years earlier by "
-              "either partner without anyone knowing, and some cases follow "
-              "childbirth or a procedure."),
+          // Plain words (2026-10-21). Kept for revert: Only women with many
+          // partners get PID.
+          myth: _en('Only women with many partners get PID (a pelvic '
+              'infection).'),
+          // Plain words (2026-10-21). Kept for revert: Anyone can get PID,
+          // including women in a long, faithful marriage. An infection may
+          // have been picked up years earlier by either partner without
+          // anyone knowing, and some cases follow childbirth or a
+          // procedure.
+          fact: _en('Anyone can get PID, even in a long, faithful marriage. '
+              'Either partner may have picked up an infection years ago '
+              'without knowing. Some cases follow childbirth or a procedure.'),
         ),
       ),
       PvReadSection(

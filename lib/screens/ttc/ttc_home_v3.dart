@@ -86,7 +86,8 @@ import '../../ttc/ttc_ready_plan_store.dart' show TtcReadyPlanStore;
 import '../../ttc/ttc_ready_plan.dart' show readyMonthOf, ttcGettingReadyLine;
 import '../../widgets/pv_home_arrival.dart';
 import '../../widgets/pv_toast.dart';
-import 'ttc_intro_flow.dart' show TtcIntroFlow, TtcIntroGate;
+import 'ttc_intro_flow.dart'
+    show TtcIntroGate, openTtcIntroFilm, showTtcIntroFilmDialog;
 import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_precheck_home.dart';
 import '../../ttc/ttc_precheck_store.dart';
@@ -158,6 +159,8 @@ import 'ttc_cycle_companion.dart' show showTtcHomePeriodSheet;
 import '../learn/pv_offering_content.dart'
     show kTtcRegistrationChecksRecorded;
 import 'ttc_transition_screen.dart';
+import 'ttc_dose_parts.dart' show TtcDoseInkButton;
+import 'ttc_learn_screen.dart' show openTtcLearn101;
 
 /// The four chapters' hues, on the same controlled-pastel wheel every other
 /// stage uses.
@@ -262,7 +265,17 @@ class _TtcHomeV3State extends State<TtcHomeV3>
     TtcReadyPlanStore.instance.load().catchError((_) {});
     // The intro film's card, for her first week (2026-10-18).
     TtcIntroGate.loadCard().then((_) {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      setState(() {});
+      // The welcome pop-up, once, straight after onboarding (2026-10-20).
+      // After the arrival's entrance has settled, so it lands on a still
+      // home, never mid-animation. Her partner's home never gets it.
+      if (TtcIntroGate.popupOwed && !TtcPartnerMode.instance.on) {
+        TtcIntroGate.popupShown();
+        Future<void>.delayed(const Duration(milliseconds: 1600), () {
+          if (mounted) showTtcIntroFilmDialog(context);
+        });
+      }
     });
   }
 
@@ -573,7 +586,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   ],
                   if (!him && TtcHomePrefs.instance.offer101) ...[
                     _pad(Ttc101Card(
-                        p: p, onAllSteps: () => openTtcTabV3(context, 1))),
+                        p: p, onAllSteps: () => openTtcLearn101(context))),
                     const SizedBox(height: 26),
                   ],
 
@@ -3612,7 +3625,9 @@ class _StartedTryingCard extends StatelessWidget {
                   letterSpacing: 1.4,
                   color: p.action)),
           const SizedBox(height: 6),
-          Text('Tell us, and your home shows your fertile days',
+          // Kept for revert: 'Tell us, and your home shows your fertile days'
+          // (walk 2026-10-20: read as two steps, "tell us" then "shows").
+          Text('Already trying? See your fertile days on your home',
               style: pvFraunces(
                   fontSize: 19,
                   fontWeight: FontWeight.w600,
@@ -3620,22 +3635,20 @@ class _StartedTryingCard extends StatelessWidget {
                   letterSpacing: -0.3,
                   color: p.ink1)),
           const SizedBox(height: 6),
-          Text('Your plan stays. You can change your mind with one tap.',
+          // Kept for revert: 'Your plan stays. You can change your mind with
+          // one tap.'
+          Text('Your plan stays as it is, and you can switch back any time.',
               style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
-          const SizedBox(height: 4),
-          TextButton(
+          const SizedBox(height: 12),
+          // An ink pill, not a text link (walk 2026-10-20: it did not read
+          // as tappable). Kept for revert: the TextButton with the same key.
+          TtcDoseInkButton(
             key: const ValueKey('ttc_home_started_trying_go'),
-            onPressed: () => _started(context),
-            style: TextButton.styleFrom(
-                foregroundColor: ttcTitleInk,
-                minimumSize: const Size(44, 44),
-                padding: const EdgeInsets.symmetric(horizontal: 0)),
-            child: Text("We've started trying",
-                style: pvManrope(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w800,
-                    color: ttcTitleInk)),
+            label: "We've started trying",
+            icon: Icons.check_rounded,
+            onTap: () => _started(context),
           ),
+          const SizedBox(height: 4),
         ]),
       );
 }
@@ -4077,6 +4090,7 @@ class _InsightRail extends StatelessWidget {
     // pregnancy today" card waits for her month. See the hero.
     final readyFor = TtcReadyPlanStore.instance.gettingReadyFor();
     final planOwed = TtcReadyPlanStore.instance.planOwed;
+    final insights = ttcInsightsFor(selected);
     final all = <TtcInsightCard>[
       // ⚠️ THE INTRO FILM, AS A CARD (2026-10-18, the user's decision). It
       // used to stand between onboarding and her home as a whole screen; now
@@ -4165,7 +4179,7 @@ class _InsightRail extends StatelessWidget {
           art: TtcInsightArt.ring,
           go: TtcInsightGo.shouldTest,
         ),
-      for (final c in ttcInsightsFor(selected))
+      for (final c in insights)
         if (readyFor == null || c.id != 'chance') c,
       // Kept for revert: ...ttcInsightsFor(selected),
       // ⚠️ THE CYCLE REPORT RIGHT AFTER HER CYCLE (2026-09-30, the user:
@@ -4174,6 +4188,11 @@ class _InsightRail extends StatelessWidget {
       // open her cycle; the report is the next thing about the same subject.
       // The Cycle companion had no card at all (2026-09-30): its only way in
       // was the hero's dates, which never said where they led.
+      // ⚠️ ONE WAY IN (walk 2026-10-20): "Day of your cycle" already opens
+      // the Companion, so two cards side by side went to one screen. This
+      // card now stands in only when there is no cycle-day card (no period
+      // dates yet), as the invitation. Kept for revert: unconditional.
+      if (!insights.any((c) => c.id == 'cycle_day'))
       const TtcInsightCard(
         id: 'companion',
         eyebrow: 'CYCLE COMPANION',
@@ -4360,12 +4379,15 @@ void _openInsight(
     case TtcInsightGo.readyPlan:
       _openSurface(context, 'ttc_ready_plan');
     case TtcInsightGo.introFilm:
-      // Opened once, the card has done its job.
-      TtcIntroGate.cardOpened();
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: const RouteSettings(name: 'ttc/intro'),
-        builder: (ctx) => TtcIntroFlow(onDone: () => Navigator.of(ctx).pop()),
-      ));
+      // ⚠️ A TAP NO LONGER SPENDS THE CARD (walk 2026-10-20: "it appeared
+      // once when I clicked it, and then it disappeared"). It stays its week;
+      // the film also lives in Learn > Videos. Kept for revert:
+      //   TtcIntroGate.cardOpened();
+      //   Navigator.of(context).push(MaterialPageRoute<void>(
+      //     settings: const RouteSettings(name: 'ttc/intro'),
+      //     builder: (ctx) => TtcIntroFlow(onDone: () => Navigator.of(ctx).pop()),
+      //   ));
+      openTtcIntroFilm(context);
     case TtcInsightGo.report:
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'ttc/cycle_report'),

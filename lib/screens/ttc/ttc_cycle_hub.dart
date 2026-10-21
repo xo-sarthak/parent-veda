@@ -42,7 +42,7 @@ import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
 import 'ttc_calendar_screen.dart'
-    show ttcFactsFor, TtcEstimateStripes, kTtcCalendarEstimateKey;
+    show ttcFactsFor; // kept for revert: TtcEstimateStripes, kTtcCalendarEstimateKey
 import '../../widgets/pv_feedback.dart' show PvPress;
 import 'ttc_common.dart';
 import 'ttc_cycle_palette.dart';
@@ -623,12 +623,16 @@ class _TtcHubRingState extends State<TtcHubRing>
     final hereColour =
         here == null ? ttcTitleInk : TtcCycleColours.ink(here.phase);
 
-    return Center(
+    // ⚠️ THE RING NAMES ITS PARTS (walk 2026-10-20, approved prototype
+    // 2026-10-21). Each stretch carries its name and dates outside the ring,
+    // and a legend sits under it, so the first view reads without help.
+    // Kept for revert: maxWidth 300, centre padding 76, no labels, no legend.
+    final ring = Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 300),
+        constraints: const BoxConstraints(maxWidth: 340),
         child: AspectRatio(
           aspectRatio: 1,
-          child: AnimatedBuilder(
+          child: LayoutBuilder(builder: (context, box) => AnimatedBuilder(
             animation: _c,
             builder: (context, _) => Stack(
               alignment: Alignment.center,
@@ -642,14 +646,17 @@ class _TtcHubRingState extends State<TtcHubRing>
                       length: length,
                       todayDay: todayDay,
                       progress: Curves.easeOutCubic.transform(_c.value),
+                      labels: true,
                     ),
                   ),
                 ),
                 if (head != null)
                   Padding(
                     // Clear of the day bubble, which rides the ring's inner
-                    // edge (the device walk, 2026-10-17).
-                    padding: const EdgeInsets.symmetric(horizontal: 76),
+                    // edge (the device walk, 2026-10-17). Scales with the
+                    // ring now that a label band sits outside it.
+                    padding: EdgeInsets.symmetric(
+                        horizontal: box.maxWidth * 0.29),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       Text(head.small,
                           textAlign: TextAlign.center,
@@ -664,7 +671,7 @@ class _TtcHubRingState extends State<TtcHubRing>
                           textAlign: TextAlign.center,
                           maxLines: 3,
                           style: pvFraunces(
-                              fontSize: 22,
+                              fontSize: 20,
                               fontWeight: FontWeight.w600,
                               height: 1.12,
                               letterSpacing: -0.6,
@@ -691,9 +698,107 @@ class _TtcHubRingState extends State<TtcHubRing>
                   ),
               ],
             ),
-          ),
+          )),
         ),
       ),
+    );
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      ring,
+      const SizedBox(height: 10),
+      const _RingLegend(),
+      if (ttcHubEstimateNote() case final note?) ...[
+        const SizedBox(height: 12),
+        _EstimateNote(note: note),
+      ],
+    ]);
+  }
+}
+
+/// ⚠️ "IT GETS BETTER AS YOU LOG", SAID PLAINLY (walk 2026-10-20, the user:
+/// "they should understand the predictions will get better once we get to
+/// know your cycles"). Counts what the estimate stands on, never a chance.
+/// Null when a test or temperature set the window: the source line under
+/// the predictions already names that sign.
+({String bold, String rest})? ttcHubEstimateNote() {
+  if (ttcWindowSourceLine()?.fromTest ?? false) return null;
+  final n = CycleStore.instance.completedCycles;
+  if (n >= 2) {
+    return (
+      bold: 'Based on your last $n cycles.',
+      rest: ' Still an estimate. An ovulation test or your morning '
+          'temperature makes it more accurate.',
+    );
+  }
+  return (
+    bold: 'An early estimate, from your period dates so far.',
+    rest: ' Each period you log makes these dates more accurate.',
+  );
+}
+
+class _EstimateNote extends StatelessWidget {
+  const _EstimateNote({required this.note});
+  final ({String bold, String rest}) note;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: const ValueKey('ttc_hub_estimate_note'),
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        decoration: BoxDecoration(
+            color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 1),
+            child: Icon(Icons.trending_up_rounded, size: 16, color: ttcSoft),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(
+                    text: _voice(note.bold),
+                    style: ttcBody(12.5,
+                        color: ttcTitleInk, w: FontWeight.w800, h: 1.45)),
+                TextSpan(text: _voice(note.rest)),
+              ]),
+              style: ttcBody(12.5, h: 1.45),
+            ),
+          ),
+        ]),
+      );
+}
+
+/// The ring's key, every stretch by the name the rest of the app uses.
+class _RingLegend extends StatelessWidget {
+  const _RingLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget item(Color c, String label) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+            const SizedBox(width: 5),
+            Flexible(child: Text(label, style: ttcBody(11.5, h: 1.2))),
+          ],
+        );
+    return Wrap(
+      key: const ValueKey('ttc_hub_ring_legend'),
+      alignment: WrapAlignment.center,
+      spacing: 12,
+      runSpacing: 6,
+      children: [
+        item(TtcCycleColours.period, TtcPhase.period.label),
+        item(TtcCycleColours.mark(TtcPhase.beforeWindow),
+            TtcPhase.beforeWindow.label),
+        item(TtcCycleColours.fertile, TtcPhase.fertileWindow.label),
+        item(TtcCycleColours.ovulation, 'Ovulation'),
+        item(TtcCycleColours.mark(TtcPhase.afterWindow),
+            TtcPhase.afterWindow.label),
+      ],
     );
   }
 }
@@ -705,6 +810,7 @@ class _HubRingPainter extends CustomPainter {
     required this.length,
     required this.todayDay,
     required this.progress,
+    this.labels = false,
   });
 
   final List<TtcPhaseSpan> spans;
@@ -712,12 +818,16 @@ class _HubRingPainter extends CustomPainter {
   final int length;
   final int? todayDay;
   final double progress;
+  final bool labels;
 
   @override
   void paint(Canvas canvas, Size size) {
     final centre = Offset(size.width / 2, size.height / 2);
-    final stroke = size.shortestSide * 0.085;
-    final radius = (size.shortestSide - stroke) / 2 - stroke * 0.9;
+    final stroke = size.shortestSide * (labels ? 0.072 : 0.085);
+    // A band outside the ring for the names and dates (2026-10-21).
+    final band = labels ? size.shortestSide * 0.15 : 0.0;
+    final radius =
+        (size.shortestSide - stroke) / 2 - stroke * 0.9 - band;
     final rect = Rect.fromCircle(center: centre, radius: radius);
     double angle(double day) => -math.pi / 2 + math.pi * 2 * (day / length);
     final sweepTo = progress * length;
@@ -821,7 +931,104 @@ class _HubRingPainter extends CustomPainter {
       )..layout();
       n.paint(canvas, p - Offset(n.width / 2, n.height / 2));
     }
+
+    if (labels && progress > 0.98) {
+      _paintLabels(canvas, size, centre, radius + stroke / 2 + 8, angle);
+    }
   }
+
+  /// Name and dates for each stretch, just outside its middle. A label that
+  /// would sit on top of the one before is pushed outward, and every label
+  /// is kept inside the card's padding.
+  void _paintLabels(Canvas canvas, Size size, Offset centre, double r,
+      double Function(double) angle) {
+    String d(DateTime x) => '${x.day} ${_mon[x.month - 1]}';
+    String range(DateTime a, DateTime b) =>
+        a.month == b.month ? '${a.day}–${d(b)}' : '${d(a)} – ${d(b)}';
+    final items = <(double, String, String, Color)>[];
+    for (final s in spans) {
+      if (s.phase == TtcPhase.fertileWindow) continue;
+      final mid = (s.firstCycleDay - 1 + s.lastCycleDay) / 2;
+      final name = switch (s.phase) {
+        TtcPhase.period => 'Period',
+        TtcPhase.beforeWindow => 'Before fertile',
+        TtcPhase.afterWindow => 'Waiting days',
+        TtcPhase.fertileWindow => '',
+      };
+      final ink = switch (s.phase) {
+        TtcPhase.period => TtcCycleColours.periodInk,
+        _ => TtcCycleColours.quietInk,
+      };
+      items.add((mid, name, range(s.firstDay, s.lastDay), ink));
+    }
+    final w = window;
+    if (w != null) {
+      items.add((
+        (w.firstCycleDay - 1 + w.lastCycleDay - 1) / 2,
+        'Fertile days',
+        range(w.firstDay, w.lastDay),
+        TtcCycleColours.fertileInk,
+      ));
+      items.add((
+        w.lastCycleDay - 0.2,
+        'Ovulation',
+        '~${d(w.lastDay)}',
+        TtcCycleColours.ovulation,
+      ));
+    }
+    if (spans.isNotEmpty) {
+      final next = spans.last.lastDay.add(const Duration(days: 1));
+      items.add((length - 0.6, 'Next period', '~${d(next)}',
+          TtcCycleColours.periodInk));
+    }
+    items.sort((a, b) => a.$1.compareTo(b.$1));
+    final placed = <Rect>[];
+    for (final (day, name, dates, ink) in items) {
+      if (name.isEmpty) continue;
+      final tp = TextPainter(
+        textAlign: TextAlign.center,
+        text: TextSpan(children: [
+          TextSpan(
+              text: '$name\n',
+              style: pvManrope(
+                  fontSize: 9.5, fontWeight: FontWeight.w800, color: ink)),
+          TextSpan(
+              text: dates,
+              style: pvManrope(
+                  fontSize: 9, fontWeight: FontWeight.w600, color: ttcSoft)),
+        ]),
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: 74);
+      final a = angle(day);
+      var rr = r;
+      late Rect rect;
+      for (var tries = 0; tries < 4; tries++) {
+        final p = centre + Offset(math.cos(a) * rr, math.sin(a) * rr);
+        // Anchor by side: to the right of the ring the label grows out to
+        // the right, on the left out to the left, top and bottom centred.
+        final c = math.cos(a), sn = math.sin(a);
+        final dx = c > 0.35 ? 0.0 : (c < -0.35 ? -tp.width : -tp.width / 2);
+        final dy = sn > 0.35 ? 0.0 : (sn < -0.35 ? -tp.height : -tp.height / 2);
+        rect = Rect.fromLTWH(p.dx + dx, p.dy + dy, tp.width, tp.height);
+        if (!placed.any((o) => o.inflate(2).overlaps(rect))) break;
+        rr += 12;
+      }
+      // Never past the card's inner padding.
+      final shift = Offset(
+          rect.left < -14
+              ? -14 - rect.left
+              : (rect.right > size.width + 14 ? size.width + 14 - rect.right : 0),
+          0);
+      rect = rect.shift(shift);
+      placed.add(rect);
+      tp.paint(canvas, rect.topLeft);
+    }
+  }
+
+  static const _mon = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
 
   @override
   bool shouldRepaint(covariant _HubRingPainter old) =>
@@ -1229,16 +1436,35 @@ class _MonthCell extends StatelessWidget {
           borderRadius:
               ends(before?.fertile ?? false, after?.fertile ?? false),
         ),
-        child: day.ahead
-            ? ClipRRect(
-                borderRadius:
-                    ends(before?.fertile ?? false, after?.fertile ?? false),
-                child: const CustomPaint(
-                    key: ValueKey('ttc_cal_estimate_stripes'),
-                    painter: TtcEstimateStripes(),
-                    size: Size.infinite),
-              )
-            : null,
+        // ⚠️ NO STRIPES (the user, 2026-10-21: "everything is an estimate,
+        // so this adds a layer of repetitiveness"). The lighter tint still
+        // tells days ahead from days gone. Kept for revert:
+        //   child: day.ahead ? ClipRRect(borderRadius: ends(...),
+        //       child: const CustomPaint(
+        //           key: ValueKey('ttc_cal_estimate_stripes'),
+        //           painter: TtcEstimateStripes(), size: Size.infinite))
+        //     : null,
+      );
+    } else if (!day.bleed &&
+        !day.predictedPeriod &&
+        (day.phase == TtcPhase.beforeWindow ||
+            day.phase == TtcPhase.afterWindow)) {
+      // The two quiet stretches get their soft wash too (2026-10-21), so the
+      // month names every part of the cycle the ring does.
+      bool joins(TtcHubDay? o) =>
+          o != null &&
+          o.phase == day.phase &&
+          !o.fertile &&
+          !o.bleed &&
+          !o.predictedPeriod;
+      fertile = Container(
+        key: const ValueKey('ttc_hub_quiet_band'),
+        width: double.infinity,
+        height: 38,
+        decoration: BoxDecoration(
+          color: TtcCycleColours.tint(day.phase!),
+          borderRadius: ends(joins(before), joins(after)),
+        ),
       );
     }
     Widget? period;
@@ -1390,19 +1616,13 @@ class _MonthKey extends StatelessWidget {
                       color: TtcCycleColours.ovulation,
                       shape: BoxShape.circle)),
               'Ovulation'),
-          // The fertile days still ahead are striped in the cells.
-          key(
-              ClipRRect(
-                borderRadius: BorderRadius.circular(99),
-                child: Container(
-                  width: 16,
-                  height: 10,
-                  color: TtcCycleColours.fertileTint,
-                  child: const CustomPaint(painter: TtcEstimateStripes()),
-                ),
-              ),
-              kTtcCalendarEstimateKey),
+          // Kept for revert (2026-10-21, no stripes):
+          // key(ClipRRect(... TtcEstimateStripes() ...), kTtcCalendarEstimateKey),
         ],
+        key(pill(TtcCycleColours.tint(TtcPhase.beforeWindow)),
+            TtcPhase.beforeWindow.label),
+        key(pill(TtcCycleColours.tint(TtcPhase.afterWindow)),
+            TtcPhase.afterWindow.label),
         key(dot(TtcCycleColours.period), 'Spotting'),
         key(dot(TtcCycleColours.ovulation), 'Positive test'),
         key(dot(TtcCycleColours.logged), 'Logged'),

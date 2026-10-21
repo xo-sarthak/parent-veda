@@ -556,7 +556,7 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
     final films = v3ShelfVideosFor(week, take: 2);
     if (films.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      _head('Films', 'Films for week $week'),
+      _head('Videos', 'Videos for week $week'), // walk 2026-10-20; kept for revert: 'Films', 'Films for week $week'
       const SizedBox(height: 4),
       _pad(Column(children: [
         for (final v in films) ...[

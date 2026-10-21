@@ -163,7 +163,7 @@ class TtcS {
       "Everything we've written about trying for a baby, in one place.",
       "Everything we've written about trying for a baby, in one place.");
   String get learnSearchHint =>
-      _p('Search reads, films and questions', 'Search reads, films and questions');
+      _p('Search reads, videos and questions', 'Search reads, videos and questions');
   String get learnRecent => _p('Recent', 'Recent');
   String get learnPopular => _p('People often look for', 'People often look for');
   // Kept for revert (2026-09-28, explicit names): "Nothing here matches that
@@ -195,22 +195,25 @@ class TtcS {
   String get learnStartLead => _p(
       'Short reads for the first months, in order if you like. Each read makes the next one easier.',
       'Short reads for the first months, in order if you like. Each read makes the next one easier.');
-  String get learnFilmsEyebrow => _p('Films', 'Films');
-  String get learnFilmsTitle => _p('Short films on the way', 'Short films on the way');
+  // ⚠️ "VIDEOS", NOT "FILMS" (walk 2026-10-20, the user: "it's not a film,
+  // make it video"). Every on-screen "film" below; identifiers stay. Kept
+  // for revert: 'Films', 'Short films on the way'.
+  String get learnFilmsEyebrow => _p('Videos', 'Videos');
+  String get learnFilmsTitle => _p('Short videos on the way', 'Short videos on the way');
   // Kept for revert (2026-09-28, explicit names): "We're still making these.
   // Each one already has its notes, so you can read what it will cover."
   String get learnFilmsLead => _p(
-      "We're still making these films. Each film already has its notes, so you can read what the film will cover.",
-      "We're still making these films. Each film already has its notes, so you can read what the film will cover.");
+      "We're still making these videos. Each one already has its notes, so you can read what it will cover.",
+      "We're still making these videos. Each one already has its notes, so you can read what it will cover.");
   String get learnFilmComing => _p('Coming soon', 'Coming soon');
   String get learnFilmNotYet => _p(
-      "We're still making this film. It will play here when it's ready.",
-      "We're still making this film. It will play here when it's ready.");
+      "We're still making this video. It will play here when it's ready.",
+      "We're still making this video. It will play here when it's ready.");
   String get learnFilmTakeaways => _p("What you'll take away", "What you'll take away");
   // Kept for revert (2026-09-28, explicit names): 'What it covers' and
   // 'Read about it now'.
-  String get learnFilmCovers => _p('What the film covers', 'What the film covers');
-  String get learnFilmReadNow => _p("Read the film's notes now", "Read the film's notes now");
+  String get learnFilmCovers => _p('What the video covers', 'What the video covers');
+  String get learnFilmReadNow => _p("Read the video's notes now", "Read the video's notes now");
   String get learnByTopicEyebrow => _p('By topic', 'By topic');
   // Kept for revert (2026-09-28, explicit names): 'Open'.
   String get learnOpenDoor => _p('Open the door', 'Open the door');
@@ -232,7 +235,7 @@ class TtcS {
   String get learnFaqTitle => _p('Short answers', 'Short answers');
   String learnFaqFrom(String title) => _p('From: $title', 'From: $title');
   String learnMinRead(int m) => _p('$m min read', '$m min read');
-  String learnMinWatch(int m) => _p('$m min film', '$m min film');
+  String learnMinWatch(int m) => _p('$m min video', '$m min video');
   String get learnFinished => _p('Read', 'Read');
   String get learnFootnote => _p(
       "Everything here explains. None of it is a diagnosis, and your own doctor's word comes first.",

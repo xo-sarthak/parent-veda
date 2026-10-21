@@ -111,7 +111,9 @@ class TtcIntroGate {
     final p = await SharedPreferences.getInstance();
     await p.remove(_key);
     await p.remove(_cardKey);
+    await p.remove(_popupKey);
     _cardUntil = null;
+    _popupOwed = false;
   }
 
   // ---- the film as a card on her home (2026-10-18) -------------------------
@@ -131,21 +133,44 @@ class TtcIntroGate {
     return until != null && (now ?? DateTime.now()).isBefore(until);
   }
 
-  /// Onboarding: offer the card for [days] days.
+  /// Onboarding: offer the card for [days] days, and the welcome pop-up once.
   static Future<void> offerCard({int days = 7}) async {
     final until = DateTime.now().add(Duration(days: days));
     _cardUntil = until;
+    _popupOwed = true;
     final p = await SharedPreferences.getInstance();
     await p.setString(_cardKey, until.toIso8601String());
+    await p.setBool(_popupKey, true);
   }
 
   /// The home reads it once.
   static Future<void> loadCard() async {
     final p = await SharedPreferences.getInstance();
     _cardUntil = DateTime.tryParse(p.getString(_cardKey) ?? '');
+    _popupOwed = p.getBool(_popupKey) ?? false;
+  }
+
+  // ⚠️ THE WELCOME POP-UP (walk 2026-10-20, the user: "the video should be
+  // accessible ... right now it disappeared"). Straight after onboarding the
+  // film is offered once, centred, with Skip. A persisted flag, not
+  // PvFirstHome alone, so a kill between onboarding and the home still gets
+  // it; spent the moment it shows, so it never comes back.
+  static const _popupKey = 'ttc_intro_popup_owed_v1';
+  static bool _popupOwed = false;
+  static bool get popupOwed => _popupOwed;
+
+  static Future<void> popupShown() async {
+    _popupOwed = false;
+    final p = await SharedPreferences.getInstance();
+    await p.remove(_popupKey);
   }
 
   /// She opened the film: the card has done its job.
+  ///
+  /// ⚠️ NO LONGER CALLED ON TAP (walk 2026-10-20). The home called this
+  /// before the film opened, so one tap, even straight back out, removed the
+  /// film for good. The card now stays its full week, and the film always
+  /// has a home in Learn. Kept for revert and for tests.
   static Future<void> cardOpened() async {
     _cardUntil = null;
     final p = await SharedPreferences.getInstance();
@@ -761,4 +786,100 @@ class _Ghost extends StatelessWidget {
                   color: emphasised ? ttcTitleInk : ttcSoft)),
         ),
       );
+}
+
+
+// =============================================================================
+//  The intro film, from anywhere (2026-10-20)
+// =============================================================================
+
+/// Opens "Trying to conceive, explained": the rail card, the welcome pop-up
+/// and Learn's Videos row all come here, so it is one film in one place.
+void openTtcIntroFilm(BuildContext context) {
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: const RouteSettings(name: 'ttc/intro'),
+    builder: (ctx) => TtcIntroFlow(onDone: () => Navigator.of(ctx).pop()),
+  ));
+}
+
+/// ⚠️ CENTRED, NOT A SHEET (the user, 2026-10-20: "it should not be coming
+/// from the bottom, it should be in the center"). Brink's welcome and Insight
+/// Timer's modal are the references. While the film is not made, the still
+/// is the honest "Coming soon" placeholder and the button reads "Read the
+/// notes"; when the slot gets a file the placeholder plays, here, with no
+/// other change. The footnote answers "where did it go?" before she asks.
+Future<void> showTtcIntroFilmDialog(BuildContext context) {
+  final t = TtcS.current();
+  final slot = ttcIntroVideoSlotId(TtcLang.instance.hinglish);
+  return showDialog<void>(
+    context: context,
+    barrierColor: const Color(0x99000000),
+    builder: (ctx) => Dialog(
+      key: const ValueKey('ttc_intro_popup'),
+      backgroundColor: Colors.white,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      clipBehavior: Clip.antiAlias,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: PvVideoPlaceholder(
+                  title: t.introVideoLabel,
+                  overlayTitle: true,
+                  duration: '2 MIN',
+                  hue: 268,
+                  slotId: slot,
+                  still: pvFilmStillFor(slot),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text('Welcome. Start with this.',
+                  style: pvFraunces(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                      color: ttcTitleInk)),
+              const SizedBox(height: 6),
+              Text(t.introVideoBody,
+                  style: ttcBody(14, color: ttcInk, h: 1.5)),
+              const SizedBox(height: 18),
+              KeyedSubtree(
+                key: const ValueKey('ttc_intro_popup_watch'),
+                child: _Primary(
+                  label: 'Read the notes',
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    openTtcIntroFilm(context);
+                  },
+                ),
+              ),
+              TextButton(
+                key: const ValueKey('ttc_intro_popup_skip'),
+                onPressed: () => Navigator.of(ctx).pop(),
+                style: TextButton.styleFrom(
+                    foregroundColor: ttcTitleInk,
+                    minimumSize: const Size(44, 48)),
+                child: Text('Skip for now',
+                    style: pvManrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: ttcTitleInk)),
+              ),
+              Text(
+                  'It stays on your Today for a week, and always in Learn, '
+                  'under Videos.',
+                  textAlign: TextAlign.center,
+                  style: ttcBody(12, color: ttcInk, h: 1.4)),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

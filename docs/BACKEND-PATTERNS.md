@@ -3546,6 +3546,71 @@ of step 10. See STILL-OPEN-BACKEND §4.
 
 History: `docs/BACKEND-SYNC-LOG.md` step 12.
 
+### 16ii-o. Stop once, then let her choose: edge-triggered, not level-triggered (2026-10-21)
+
+The Ready-to-Try plan's reminders repeat daily or weekly, so on their own they
+would carry on into trying and into pregnancy. They have to stop when the plan
+is over: her chosen month has come, she tapped "We've started trying", or she
+is no longer in TTC (`readyPlanEnded`, `lib/ttc/ttc_ready_habits_store.dart`).
+
+There are two ways to write "stop when the plan is over".
+
+| | What it does | What it costs |
+|---|---|---|
+| **Level-triggered** | On every launch: if the plan is over, every reminder is off | She can never turn one back on. The next launch switches it off again |
+| **Edge-triggered** | When the plan *becomes* over, switch them off once, and record that it happened (`retiredFor`) | One more stored value, and a key that names *which* ending it was |
+
+We chose edge-triggered. A rule that re-applies itself forever overrules the
+person it serves; a rule that fires once on the change and then steps aside
+leaves her in charge. The key is the stage, "already trying" and the month, so
+picking a new month ahead clears it and the next ending can fire again.
+
+> General fact: **if a rule should fire on a change, store that it fired.**
+> Re-deriving it from the current state every time turns a one-off action into
+> a permanent override.
+
+The same store also re-arms after every launch, because of the `syncAll`
+cancel-all trap in §16m. It missed that at first: the habit reminders and the
+plan's monthly notes were wiped on the first restart and never set again. Both
+now run in the `main.dart` chain after `ReminderStore.init`. Folic acid stays on
+at the end of the plan, because it matters just as much while she tries. Test:
+`test/ttc_ready_reminders_retire_test.dart`.
+
+### 16ii-p. A retailer's price is fetched by the server, carries its date, and is never scraped (0108, 2026-10-21)
+
+The user saw a ₹95 product open a ₹1,000 listing. The buy link was a search
+page: we priced one pack and the search showed another. The fix has three
+parts.
+
+1. **Name the one listing.** An affiliate product carries an ASIN, so the
+   link opens that exact listing, not a search.
+2. **Store the price with the time it was read** (`price_checked_at`). A cached
+   price without its moment is a promise nobody can keep, and Amazon's terms ask
+   for the "as of" time on any price that is not live. The page prints it:
+   "Price on Amazon as of 21 Oct". With no checked price it says "Our guide
+   price · check today's price on Amazon".
+3. **Fetch on the server, never on the phone.** `affiliate-refresh` holds the
+   credential. A phone calling Amazon would ship the secret in the APK and spend
+   the request allowance once per user instead of once a day. It only reads,
+   through the official API, never by scraping.
+
+Amazon's own stars are kept apart (`ext_rating`, `ext_review_count`) and
+labelled "on Amazon". They never mix with `rating`, which is parents on
+ParentVeda, and review text is linked to, never copied.
+
+**The API changed under us.** PA-API 5 was retired in 2026 (calls get a 403);
+the successor is the Creators API: OAuth client-credentials with a bearer
+token, endpoints under `creatorsapi.amazon/catalog/v1`, lowerCamelCase fields,
+an `x-marketplace` header. The function is inert until its four secrets exist.
+If the response shape differs from what it expects, it leaves the row alone:
+an old price with its old date is honest, a zero is not. Hand-entered facts
+live in `lib/data/products/pv_affiliate.dart` until the catalogue reads the
+table. Test: `test/pv_affiliate_test.dart`.
+
+> General fact: **a cached value from someone else's system is only honest
+> with its timestamp.** Store when you read it, show it, and prefer a stale
+> dated value over a fresh wrong one.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

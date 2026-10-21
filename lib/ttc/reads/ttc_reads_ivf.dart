@@ -283,12 +283,19 @@ final List<PvRead> kTtcReadsIvf = [
               'situation would be.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Going to a fertility clinic means ending up on IVF.'),
-          fact: _en("Most couples who get tested don't have IVF. The tests are "
-              'there to find the exact reason, and that reason is often '
-              'treated with a tablet, a small procedure, or a change on his '
-              "side. IVF is where things go when the earlier steps don't fit. "
-              "It isn't where they start."),
+          // Plain words (2026-10-21). Kept for revert: Going to a fertility
+          // clinic means ending up on IVF.
+          myth: _en("Going to a fertility clinic means you'll end up needing "
+              "IVF."),
+          // Plain words (2026-10-21). Kept for revert: Most couples who get
+          // tested don't have IVF. The tests are there to find the exact
+          // reason, and that reason is often treated with a tablet, a small
+          // procedure, or a change on his side. IVF is where things go when
+          // the earlier steps don't fit. It isn't where they start.
+          fact: _en("Usually not. Most couples who get tested never have IVF. "
+              "The tests find the reason, and many reasons are treated with a "
+              "tablet, a small procedure or a change on his side. IVF comes "
+              "later, if the earlier steps don't fit."),
         ),
       ),
     ],

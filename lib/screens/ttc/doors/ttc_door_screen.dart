@@ -92,6 +92,7 @@
 // =============================================================================
 
 import 'package:flutter/foundation.dart' show ValueListenable;
+import '../../../ttc/ttc_age_rank.dart' show ttcAgeOrderSections;
 import 'package:flutter/material.dart';
 
 import '../../../localization/app_language.dart';
@@ -476,7 +477,7 @@ String? ttcDoorTileMeta(TtcTile t) {
     // revert: TtcVideoTile(:final duration) => '${duration.toLowerCase()} film',
     TtcVideoTile(:final duration) => ttcTileIsUnmadeFilm(t)
         ? kTtcFilmComingSoon
-        : '${duration.toLowerCase()} film',
+        : '${duration.toLowerCase()} video', // 2026-10-20; was ' film'
     TtcCarouselTile(:final cards) => '${cards.length} slides',
     TtcMythTile(:final slides) =>
       slides.isEmpty ? null : '${slides.length} slides',
@@ -928,7 +929,13 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
         final groupIndex = selected < 0 ? 0 : selected;
         final group = groups.isEmpty ? null : groups[groupIndex];
         // A page with no tabs shows every section at once.
-        final sections = group == null ? page.sections : _sectionsOf(group.id);
+        // ⚠️ HER AGE DECIDES ORDER, NEVER WHAT SHE SEES (walk 2026-10-20,
+        // lib/ttc/ttc_age_rank.dart): at 35 or over, sections and tiles about
+        // age come first. Under 35 nothing moves. Kept for revert: the
+        // unsorted list.
+        final sections = ttcAgeOrderSections(
+            group == null ? page.sections : _sectionsOf(group.id),
+            TtcFertilityHelpStore.instance.ageBand);
 
         return PvLiveSearchScope(
           search: _search,

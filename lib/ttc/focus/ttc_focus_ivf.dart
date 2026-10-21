@@ -786,14 +786,20 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
           title: 'Does bed rest after transfer help?',
           id: 'ttc_tile_does_bed_rest_after_transfer_help',
           blurb: 'One of the most widely held beliefs in fertility care.',
-          myth: 'I should stay in bed after an embryo transfer to help it '
+          // Plain words (2026-10-21). Kept for revert: I should stay in bed
+          // after an embryo transfer to help it implant.
+          myth: 'I should stay in bed after embryo transfer to help it '
               'implant.',
-          fact: "Trials haven't found that bed rest makes a pregnancy more "
-              'likely, and some found slightly worse results. Lying still '
-              "isn't what keeps an embryo in place. Gentle, everyday activity "
-              "is what's usually advised. Lying in bed for days is hard on "
-              'your body and harder on your mind. Follow whatever your own '
-              'clinic tells you.',
+          // Plain words (2026-10-21). Kept for revert: Trials haven't found
+          // that bed rest makes a pregnancy more likely, and some found
+          // slightly worse results. Lying still isn't what keeps an embryo
+          // in place. Gentle, everyday activity is what's usually advised.
+          // Lying in bed for days is hard on your body and harder on your
+          // mind. Follow whatever your own clinic tells you.
+          fact: "It doesn't help. Trials found bed rest doesn't make "
+              "pregnancy more likely, and some found slightly worse results. "
+              "Gentle, everyday activity is the usual advice. Follow what "
+              "your own clinic tells you.",
         ),
         // WARNING: AN ARTICLE NOW, AND THE MYTH FORMAT WAS THE WRONG ONE. A
         // myth card needs a false belief to correct, and there is no myth here

@@ -64,6 +64,9 @@ import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_round_strings.dart' show ttcRoundDate;
 import 'ttc_strings.dart';
+import 'ttc_cycle_palette.dart' show TtcCycleColours;
+import 'ttc_temp_parts.dart';
+import '../../ttc/ttc_temp_rise.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tools_screen.dart' show ttcToolById;
@@ -347,6 +350,9 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
   /// for this visit and nothing moves.
   bool _adoptLeft = false;
 
+  /// "Not yet" on a spotted temperature rise: it steps back for this visit.
+  bool _riseLeft = false;
+
   // ---- writes, each one said out loud ---------------------------------------
 
   void _setResult(DateTime start, DateTime day, String? result) {
@@ -421,6 +427,11 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
     );
   }
 
+  DateTime _cycleStartOrToday() {
+    final s = CycleStore.instance.lastPeriodStart;
+    return s == null ? _dayOnly(DateTime.now()) : _dayOnly(s);
+  }
+
   Future<void> _pickTempDay(int currentDay, TtcS t) async {
     final options = <int>[
       for (var back = 0; back < 4; back++)
@@ -443,7 +454,8 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Which morning did it go up and stay up?',
+                // Kept for revert: 'Which morning did it go up and stay up?'
+                'Which morning did it first go up and stay up?',
                 style: pvFraunces(
                   fontSize: 21,
                   fontWeight: FontWeight.w600,
@@ -463,7 +475,12 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
                 items: [
                   for (final d in options)
                     TtcToolOption(
-                      label: d == currentDay ? 'Today' : 'Day $d',
+                      // Real dates (walk 2026-10-20: "Day 7, Day 6 ... how
+                      // does she remember that?"). Kept for revert:
+                      //   label: d == currentDay ? 'Today' : 'Day $d',
+                      label: d == currentDay
+                          ? 'Today'
+                          : '${ttcTempDay(_cycleStartOrToday().add(Duration(days: d - 1)))} · day $d',
                       on: false,
                       onTap: () => Navigator.of(ctx).pop(d),
                     ),
@@ -595,6 +612,13 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
                   style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2),
                 ),
               ),
+              // The strips themselves, one tap away (walk 2026-10-20).
+              const SizedBox(height: 12),
+              ttcToolPad(const TtcBuyRow(
+                productId: 'lh_strips',
+                title: 'Ovulation test strips',
+                icon: Icons.science_outlined,
+              )),
               const SizedBox(height: 26),
               ttcToolPad(Container(height: 1, color: p.line)),
               const SizedBox(height: 22),
@@ -776,18 +800,39 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
     ];
   }
 
+  // ⚠️ HER READINGS, AND WHAT THEY DO (approved prototype 2026-10-21). She
+  // logs the number on a real date; two equal buttons, today or an earlier
+  // morning. Her readings are read back by `ttcDetectTempRise`: once they
+  // show the rise, we ask her to confirm it, and her "yes" is the same
+  // `logTemperatureShift` the hand-picked day always used, so her fertile
+  // days follow her body. Until then a count says every morning counts.
+  // Kept for revert: one TtcToolSecondary "Add the day your temperature
+  // rose" opening the day-only sheet, which now hides behind "Choose
+  // another day".
   List<Widget> _tempBlock(DateTime start, DateTime now, TtcS t, V2Palette p) {
     final cycle = CycleStore.instance;
     final shift = cycle.temperatureShiftDay;
     final currentDay = now.difference(start).inDays + 1;
+    final readings = ttcTempReadingsSince(start);
+    final rise = shift == null ? ttcDetectTempRise(readings) : null;
+    final shown = rise ?? shift;
+    final line = shown == null ? null : ttcTempCoverLine(readings, shown);
+    final loggedToday = readings.any((x) => x.cycleDay == currentDay);
     return [
       ttcToolPad(
-        // Kept for revert (2026-09-29, one heading style): the same Text
-        // with style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600,
-        //     color: p.ink1)
-        const TtcSectionHeading(kTtcOvTempHeading),
+        Row(children: [
+          // Kept for revert: TtcSectionHeading(kTtcOvTempHeading) alone.
+          const Expanded(child: TtcSectionHeading(kTtcOvTempHeading)),
+          IconButton(
+            key: const ValueKey('ttc_ov_temp_why'),
+            tooltip: 'Why log your temperature?',
+            onPressed: () => showTtcTempWhySheet(context),
+            icon: const Icon(Icons.info_outline_rounded,
+                size: 20, color: ttcTitleInk),
+          ),
+        ]),
       ),
-      const SizedBox(height: 8),
+      const SizedBox(height: 4),
       ttcToolPad(
         Text(
           t.ovulationBbtWhat,
@@ -795,67 +840,271 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
         ),
       ),
       const SizedBox(height: 12),
-      if (shift != null)
-        ttcToolPad(
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Recorded: day $shift, '
-                  '${ttcRoundDate(start.add(Duration(days: shift - 1)))}.',
-                  key: const ValueKey('ttc_ov_temp_line'),
-                  style: pvManrope(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w800,
-                    color: p.ink1,
+      if (readings.length >= 2) ...[
+        ttcToolPad(TtcTempMiniChart(
+            readings: readings,
+            riseDay: shown,
+            line: line,
+            riseLabel: shift == null
+                ? null
+                : 'Rose · ${ttcTempDay(start.add(Duration(days: shift - 1)))}')),
+        const SizedBox(height: 10),
+      ],
+      // ⚠️ WHAT SHE HAS RECORDED FIRST (2026-10-21): the day she marked
+      // reads before anything asks her to log more.
+      // ⚠️ ONE CARD THAT SAYS WHAT IT MEANS (user 2026-10-21: "this kinda
+      // confused me"; Mobbin: Flo's log card, Bevel, Noom). "Recorded: day
+      // 14" never said what was recorded, and two bare text links did not
+      // read as buttons. Kept for revert, the row it replaced:
+      // if (shift != null) ...[
+      //   ttcToolPad(
+      //     Row(
+      //       children: [
+      //         Expanded(
+      //           child: Text(
+      //             'Recorded: day $shift, '
+      //             '${ttcRoundDate(start.add(Duration(days: shift - 1)))}.',
+      //             key: const ValueKey('ttc_ov_temp_line'),
+      //             style: pvManrope(
+      //               fontSize: 13.5,
+      //               fontWeight: FontWeight.w800,
+      //               color: p.ink1,
+      //             ),
+      //           ),
+      //         ),
+      //         TextButton(
+      //           key: const ValueKey('ttc_ov_temp_change'),
+      //           onPressed: () => _pickTempDay(currentDay, t),
+      //           // Kept for revert (2026-09-28): 'Change'
+      //           child: Text(
+      //             'Change the day',
+      //             style: pvManrope(
+      //               fontSize: 13,
+      //               fontWeight: FontWeight.w800,
+      //               color: ttcTitleInk,
+      //               decoration: TextDecoration.underline,
+      //             ),
+      //           ),
+      //         ),
+      //         TextButton(
+      //           key: const ValueKey('ttc_ov_temp_remove'),
+      //           onPressed: () {
+      //             cycle.logTemperatureShift(null);
+      //             pvSnack(
+      //               context,
+      //               'Temperature rise removed.',
+      //               icon: Icons.check_rounded,
+      //               lift: 24,
+      //               action: 'Undo',
+      //               onAction: () => cycle.logTemperatureShift(shift),
+      //             );
+      //           },
+      //           child: Text(
+      //             'Remove',
+      //             style: pvManrope(
+      //               fontSize: 13,
+      //               fontWeight: FontWeight.w800,
+      //               color: ttcTitleInk,
+      //               decoration: TextDecoration.underline,
+      //             ),
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      if (shift != null) ...[
+        ttcToolPad(Container(
+          key: const ValueKey('ttc_ov_temp_result'),
+          padding: const EdgeInsets.fromLTRB(12, 12, 6, 12),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ttcBorder)),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                  color: TtcCycleColours.fertileTint,
+                  borderRadius: BorderRadius.circular(12)),
+              child: const Icon(Icons.thermostat_outlined,
+                  color: TtcCycleColours.fertileInk, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your temperature rose on '
+                      '${ttcTempDay(start.add(Duration(days: shift - 1)))}',
+                      key: const ValueKey('ttc_ov_temp_line'),
+                      style: pvManrope(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
+                          color: p.ink1,
+                          height: 1.3),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'This usually means you ovulated a day or two before. '
+                      'Your fertile days now follow your body.',
+                      style: pvManrope(
+                          fontSize: 12.5, height: 1.5, color: p.ink2),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('Cycle day $shift',
+                        style: pvManrope(fontSize: 11.5, color: p.ink3)),
+                  ]),
+            ),
+            IconButton(
+              key: const ValueKey('ttc_ov_temp_change'),
+              tooltip: 'Change the day',
+              onPressed: () => _pickTempDay(currentDay, t),
+              style: IconButton.styleFrom(
+                  backgroundColor: const Color(0xFFF3F3F4)),
+              icon: const Icon(Icons.edit_outlined,
+                  size: 18, color: ttcTitleInk),
+            ),
+            IconButton(
+              key: const ValueKey('ttc_ov_temp_remove'),
+              tooltip: 'Remove',
+              onPressed: () {
+                cycle.logTemperatureShift(null);
+                pvSnack(
+                  context,
+                  'Temperature rise removed.',
+                  icon: Icons.check_rounded,
+                  lift: 24,
+                  action: 'Undo',
+                  onAction: () => cycle.logTemperatureShift(shift),
+                );
+              },
+              style: IconButton.styleFrom(
+                  backgroundColor: const Color(0xFFF3F3F4)),
+              icon: const Icon(Icons.delete_outline_rounded,
+                  size: 18, color: ttcTitleInk),
+            ),
+          ]),
+        )),
+        const SizedBox(height: 12),
+      ],
+      if (shift == null && rise != null && !_riseLeft) ...[
+        ttcToolPad(Container(
+          key: const ValueKey('ttc_ov_temp_rise'),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+              color: const Color(0xFFD3F1EE),
+              borderRadius: BorderRadius.circular(18)),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    'Your temperature went up on '
+                    '${ttcTempDay(start.add(Duration(days: rise - 1)))}',
+                    style: pvManrope(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w800,
+                        color: ttcTitleInk)),
+                const SizedBox(height: 4),
+                Text(
+                    'It stayed higher for 3 mornings. That usually means you '
+                    'ovulated a day or two before. Mark it?',
+                    style: pvManrope(
+                        fontSize: 13, height: 1.45, color: p.ink2)),
+                const SizedBox(height: 10),
+                Row(children: [
+                  Expanded(
+                    child: TtcInkPill(
+                      key: const ValueKey('ttc_ov_temp_rise_yes'),
+                      label: 'Yes, mark it',
+                      onTap: () {
+                        cycle.logTemperatureShift(rise);
+                        pvSnack(context,
+                            'Marked. Your fertile days now follow your temperature.',
+                            icon: Icons.check_rounded,
+                            lift: 24,
+                            action: 'Undo',
+                            onAction: () => cycle.logTemperatureShift(null));
+                      },
+                    ),
                   ),
-                ),
-              ),
-              TextButton(
-                key: const ValueKey('ttc_ov_temp_change'),
-                onPressed: () => _pickTempDay(currentDay, t),
-                // Kept for revert (2026-09-28): 'Change'
-                child: Text(
-                  'Change the day',
-                  style: pvManrope(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: ttcTitleInk,
-                    decoration: TextDecoration.underline,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TtcInkPill(
+                      key: const ValueKey('ttc_ov_temp_rise_no'),
+                      label: 'Not yet',
+                      outlined: true,
+                      onTap: () => setState(() => _riseLeft = true),
+                    ),
                   ),
+                ]),
+                TextButton(
+                  key: const ValueKey('ttc_ov_temp_add'),
+                  onPressed: () => _pickTempDay(currentDay, t),
+                  child: Text('Not this day? Choose another',
+                      style: pvManrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: ttcTitleInk,
+                          decoration: TextDecoration.underline)),
                 ),
-              ),
-              TextButton(
-                key: const ValueKey('ttc_ov_temp_remove'),
-                onPressed: () {
-                  cycle.logTemperatureShift(null);
-                  pvSnack(
-                    context,
-                    'Temperature rise removed.',
-                    icon: Icons.check_rounded,
-                    lift: 24,
-                    action: 'Undo',
-                    onAction: () => cycle.logTemperatureShift(shift),
-                  );
-                },
-                child: Text(
-                  'Remove',
-                  style: pvManrope(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: ttcTitleInk,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ],
+              ]),
+        )),
+        const SizedBox(height: 12),
+      ] else if (shift == null) ...[
+        ttcToolPad(Text(
+          readings.length < kTtcTempRiseReadings
+              ? (readings.isEmpty
+                  ? 'Log a few mornings in a row and we can spot your rise.'
+                  : 'A few more mornings and we can spot your rise '
+                      '(${readings.length} of $kTtcTempRiseReadings).')
+              : 'No rise yet this cycle. Keep going: it usually shows a day or two after you ovulate.',
+          key: const ValueKey('ttc_ov_temp_progress'),
+          style: pvManrope(
+              fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1),
+        )),
+        const SizedBox(height: 12),
+      ],
+      // Two equal ways in (the user, 2026-10-21: "not one big and one small
+      // button ... what if she knows yesterday's temperature?").
+      ttcToolPad(Row(children: [
+        Expanded(
+          child: TtcInkPill(
+            key: const ValueKey('ttc_ov_temp_log_today'),
+            label: loggedToday ? "Change today's" : 'Log today',
+            onTap: () => showTtcTempLogSheet(context,
+                initialDay: now, cycleStart: start),
           ),
-        )
-      else
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: TtcInkPill(
+            key: const ValueKey('ttc_ov_temp_log_earlier'),
+            label: 'Add an earlier day',
+            outlined: true,
+            onTap: () => showTtcTempLogSheet(context,
+                initialDay: now.subtract(const Duration(days: 1)),
+                cycleStart: start),
+          ),
+        ),
+      ])),
+      const SizedBox(height: 12),
+      ttcToolPad(const TtcBuyRow(
+        productId: 'thermometer',
+        title: 'Basal thermometer',
+        icon: Icons.thermostat_outlined,
+        cta: 'See',
+      )),
+      const SizedBox(height: 12),
+      // Moved up (2026-10-21): her recorded day sits under the chart,
+      // before the buttons. Kept for revert: this row was here, after
+      // the thermometer row.
+      if (shift == null && rise == null)
+        // Still reachable without a rise: she may know her day from paper.
         ttcToolPad(
           TtcToolSecondary(
             key: const ValueKey('ttc_ov_temp_add'),
-            label: kTtcOvTempAdd,
+            label: 'Mark the day it went up yourself',
             onTap: () => _pickTempDay(currentDay, t),
           ),
         ),

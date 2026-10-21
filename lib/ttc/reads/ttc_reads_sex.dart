@@ -101,11 +101,16 @@ final List<PvRead> kTtcReadsSex = [
               'the month.'),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: If you miss one
+          // fertile day, the whole month is wasted.
           myth: _en('If you miss one fertile day, the whole month is wasted.'),
-          fact: _en('The fertile window is about six days long. Sex every one '
-              "to two days across it is enough, so one missed night doesn't "
-              'undo it. The days before ovulation count as much as the day '
-              'itself.'),
+          // Plain words (2026-10-21). Kept for revert: The fertile window is
+          // about six days long. Sex every one to two days across it is
+          // enough, so one missed night doesn't undo it. The days before
+          // ovulation count as much as the day itself.
+          fact: _en("It isn't. The fertile window is about six days long. Sex "
+              "every one to two days across it is enough, so one missed night "
+              "doesn't undo the month."),
         ),
       ),
       PvReadSection(
@@ -573,11 +578,18 @@ final List<PvRead> kTtcReadsSex = [
               'your partner.'),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: Pain in the first
+          // months of marriage is normal and goes away if you keep trying.
           myth: _en('Pain in the first months of marriage is normal and goes '
               'away if you keep trying.'),
-          fact: _en('Some discomfort at first can happen. Pain that keeps '
-              'coming back is a sign to see a doctor. Pushing through it can '
-              'teach the muscles to tighten even more.'),
+          // Plain words (2026-10-21). Kept for revert: Some discomfort at
+          // first can happen. Pain that keeps coming back is a sign to see a
+          // doctor. Pushing through it can teach the muscles to tighten even
+          // more.
+          fact: _en('Pain that keeps coming back is not something to push '
+              'through. Some discomfort at first can happen. If pain keeps '
+              'returning, see a doctor. Pushing through can teach the muscles '
+              'to tighten even more.'),
         ),
       ),
       PvReadSection(
@@ -836,11 +848,15 @@ final List<PvRead> kTtcReadsSex = [
               'safer choice.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Egg white from the kitchen makes a natural, '
-              'sperm-friendly lubricant.'),
-          fact: _en("There's no good evidence it helps sperm, and raw egg "
-              'can carry germs such as salmonella. It is better left in the '
-              'kitchen.'),
+          // Plain words (2026-10-21). Kept for revert: Egg white from the
+          // kitchen makes a natural, sperm-friendly lubricant.
+          myth: _en('Egg white from the kitchen is a natural lubricant that '
+              'helps sperm.'),
+          // Plain words (2026-10-21). Kept for revert: There's no good
+          // evidence it helps sperm, and raw egg can carry germs such as
+          // salmonella. It is better left in the kitchen.
+          fact: _en("Best not. There's no good evidence it helps sperm, and "
+              "raw egg can carry germs such as salmonella."),
         ),
       ),
       PvReadSection(
@@ -1005,10 +1021,16 @@ final List<PvRead> kTtcReadsSex = [
               'body is designed to carry on with normal life.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Sex in the two-week wait can cause a miscarriage.'),
-          fact: _en('Most early losses happen because of a chance mistake in '
-              'the chromosomes of the embryo. Sex, orgasm, walking and normal '
-              'daily work do not cause them.'),
+          // Plain words (2026-10-21). Kept for revert: Sex in the two-week
+          // wait can cause a miscarriage.
+          myth: _en('Having sex in the two-week wait can cause a miscarriage.'),
+          // Plain words (2026-10-21). Kept for revert: Most early losses
+          // happen because of a chance mistake in the chromosomes of the
+          // embryo. Sex, orgasm, walking and normal daily work do not cause
+          // them.
+          fact: _en("It doesn't. Most early losses happen because of a chance "
+              "error in the embryo's chromosomes. Sex, orgasm, walking and "
+              "daily work don't cause them."),
         ),
       ),
       PvReadSection(

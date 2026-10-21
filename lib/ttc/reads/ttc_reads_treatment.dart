@@ -99,8 +99,17 @@ final List<PvRead> kTtcReadsTreatment = [
           _en("This happens more often than you'd think. A pen jams, a needle bends, or some medicine leaks back out. Clinics have seen all of it, and calling quickly gives them the most options."),
         ],
         mythFact: PvMythFact(
-          myth: _en("If anything goes wrong with the trigger, the whole cycle is ruined."),
-          fact: _en("Not always. Your clinic may be able to change the plan or the collection time. Only they can say, which is why the phone call matters more than the worry."),
+          // Plain words (2026-10-21). Kept for revert: If anything goes wrong
+          // with the trigger, the whole cycle is ruined.
+          myth: _en('If anything goes wrong with the trigger shot, the whole '
+              'cycle is ruined.'),
+          // Plain words (2026-10-21). Kept for revert: Not always. Your
+          // clinic may be able to change the plan or the collection time.
+          // Only they can say, which is why the phone call matters more than
+          // the worry.
+          fact: _en('Not always. Call your clinic straight away. They may be '
+              'able to change the plan or the collection time, and only they '
+              'can say.'),
         ),
       ),
       PvReadSection(
@@ -210,8 +219,15 @@ final List<PvRead> kTtcReadsTreatment = [
           _en("If family wants you to stay in bed for two weeks, it's fine to say that doctors now advise normal, gentle activity. They're asking out of love, and you can answer kindly."),
         ],
         mythFact: PvMythFact(
-          myth: _en('You should lie flat and avoid stairs after a transfer.'),
-          fact: _en("There's no evidence that this helps, and the embryo can't fall out. Rest if you're tired, and move about as you like."),
+          // Plain words (2026-10-21). Kept for revert: You should lie flat
+          // and avoid stairs after a transfer.
+          myth: _en('After a transfer you should lie flat and avoid stairs.'),
+          // Plain words (2026-10-21). Kept for revert: There's no evidence
+          // that this helps, and the embryo can't fall out. Rest if you're
+          // tired, and move about as you like.
+          fact: _en("You don't need to. Lying flat hasn't been shown to help, "
+              "and the embryo can't fall out. Rest if you're tired and move "
+              "about as you like."),
         ),
       ),
       PvReadSection(
@@ -610,8 +626,15 @@ final List<PvRead> kTtcReadsTreatment = [
           _en("Sometimes a first test is positive and then the level falls. That's called a biochemical or chemical pregnancy. It's very common, and it can hurt in its own way, because for a day or two there was good news. Your clinic will usually treat the next steps the same way."),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: If I had rested more,
+          // it would have worked.
           myth: _en('If I had rested more, it would have worked.'),
-          fact: _en("Bed rest doesn't help an embryo implant, and normal activity doesn't harm one. How you spent the wait didn't cause this."),
+          // Plain words (2026-10-21). Kept for revert: Bed rest doesn't help
+          // an embryo implant, and normal activity doesn't harm one. How you
+          // spent the wait didn't cause this.
+          fact: _en("How you spent the wait didn't cause this. Bed rest "
+              "doesn't help an embryo implant, and normal activity doesn't "
+              "harm one."),
         ),
       ),
       PvReadSection(
@@ -1051,8 +1074,17 @@ final List<PvRead> kTtcReadsTreatment = [
           _en("Try not to compare your numbers with anyone else's. A smaller number isn't a failure, and a bigger one isn't a promise. What matters is what your own clinic makes of it."),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: More follicles always
+          // means a better cycle.
           myth: _en('More follicles always means a better cycle.'),
-          fact: _en("Not always. Very high numbers can raise the risk of OHSS, and a smaller number of good eggs can be enough. Your clinic is aiming for what's safe and right for you, not for the most."),
+          // Plain words (2026-10-21). Kept for revert: Not always. Very high
+          // numbers can raise the risk of OHSS, and a smaller number of good
+          // eggs can be enough. Your clinic is aiming for what's safe and
+          // right for you, not for the most.
+          fact: _en('Not always. Very high numbers raise the risk of OHSS '
+              '(when the ovaries over-react to the medicines). A smaller '
+              'number of good eggs can be enough. Your clinic aims for safe, '
+              'not for the most.'),
         ),
       ),
       PvReadSection(
@@ -1180,8 +1212,16 @@ final List<PvRead> kTtcReadsTreatment = [
           _en("Some clinics ask you to lie still for 10 to 15 minutes afterwards. The sperm are already inside the womb, and they won't come out when you stand up. A little fluid leaking later is normal."),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: You need to keep your
+          // legs up for an hour after an IUI.
           myth: _en('You need to keep your legs up for an hour after an IUI.'),
-          fact: _en("The sperm are placed inside the womb, past the neck of it. Standing up doesn't let them out. Follow your clinic's advice on resting, and then carry on with your day."),
+          // Plain words (2026-10-21). Kept for revert: The sperm are placed
+          // inside the womb, past the neck of it. Standing up doesn't let
+          // them out. Follow your clinic's advice on resting, and then carry
+          // on with your day.
+          fact: _en("You don't. The sperm are placed right inside the womb, "
+              "so standing up doesn't let them out. Follow your clinic's "
+              "advice on resting, then carry on with your day."),
         ),
       ),
       PvReadSection(
@@ -1467,8 +1507,15 @@ final List<PvRead> kTtcReadsTreatment = [
           _en("Clinics follow the research and their own experience. The right choice for you can also change from one round to the next."),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: Frozen embryos are
+          // second best.
           myth: _en('Frozen embryos are second best.'),
-          fact: _en("Freezing today is very fast and gentle, and most good embryos come through thawing well. An embryo isn't weaker for having waited."),
+          // Plain words (2026-10-21). Kept for revert: Freezing today is very
+          // fast and gentle, and most good embryos come through thawing well.
+          // An embryo isn't weaker for having waited.
+          fact: _en("They aren't. Freezing today is fast and gentle, and most "
+              "good embryos thaw well. An embryo isn't weaker for having "
+              "waited."),
         ),
       ),
       PvReadSection(

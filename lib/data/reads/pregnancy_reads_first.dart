@@ -1269,11 +1269,17 @@ final List<PvRead> kPregnancyReadsFirst = [
               "normal, it's easy to start wondering if something is wrong."),
         ],
         mythFact: PvMythFact(
-          myth: _en("If you don't feel sick, the pregnancy isn't strong."),
-          fact: _en("Symptoms show how your body reacts to pregnancy "
-              "hormones, and that differs a lot between women and between "
-              "pregnancies. Strong symptoms or mild ones don't tell you how "
-              "the pregnancy is doing."),
+          // Plain words (2026-10-21). Kept for revert: If you don't feel
+          //   sick, the pregnancy isn't strong.
+          myth: _en("If you don't feel sick, something is wrong with the "
+              "pregnancy."),
+          // Plain words (2026-10-21). Kept for revert: Symptoms show how your
+          //   body reacts to pregnancy hormones, and that differs a lot
+          //   between women and between pregnancies. Strong symptoms or mild
+          //   ones don't tell you how the pregnancy is doing.
+          fact: _en("Not true. How sick you feel doesn't show how your "
+              "pregnancy is doing. Symptoms depend on hormones and "
+              "differ a lot from woman to woman."),
         ),
       ),
       PvReadSection(

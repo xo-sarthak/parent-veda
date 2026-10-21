@@ -597,11 +597,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "More nausea means a healthier baby.",
+     "en": "Feeling very sick means a healthier baby.",
      "hi": "जितनी ज़्यादा मितली, शिशु उतना ही स्वस्थ।"
     },
     "truth": {
-     "en": "Symptoms vary a lot from woman to woman, and they don't reliably tell you how a pregnancy will go.",
+     "en": "How sick you feel doesn't show how your baby is doing. Nausea depends on hormones and differs a lot from woman to woman.",
      "hi": "गर्भावस्था के लक्षण हर महिला में अलग होते हैं और उनसे नतीजों का अंदाज़ा नहीं लगाया जा सकता।"
     }
    }
@@ -1023,11 +1023,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "No symptoms means something is wrong with the pregnancy.",
+     "en": "Morning sickness only happens in the morning.",
      "hi": "लक्षण न होने का मतलब है कि गर्भावस्था में कुछ गड़बड़ है।"
     },
     "truth": {
-     "en": "Healthy pregnancies can feel very different, and some come with very mild symptoms.",
+     "en": "Nausea can come at any time of day. Small meals, eaten often, help many women whatever the hour.",
      "hi": "स्वस्थ गर्भावस्थाओं में लक्षण बहुत अलग-अलग हो सकते हैं, बहुत हल्के भी।"
     }
    }
@@ -1240,7 +1240,7 @@
      "hi": "अगर लक्षण कम हो जाएँ तो कुछ गड़बड़ है।"
     },
     "truth": {
-     "en": "Symptoms come and go, and they often change through the first trimester.",
+     "en": "Symptoms often ease towards the end of the first 3 months. That is normal. If you have pain or bleeding, call your doctor.",
      "hi": "गर्भावस्था के लक्षण स्वाभाविक रूप से घटते-बढ़ते रहते हैं और पहली तिमाही में अक्सर बदलते हैं।"
     }
    }
@@ -1875,11 +1875,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "The hard part is over now.",
+     "en": "After the first 3 months, the hard part is over.",
      "hi": "अब मुश्किल हिस्सा ख़त्म हो गया।"
     },
     "truth": {
-     "en": "Each trimester brings its own changes, milestones and challenges.",
+     "en": "Many women feel better in months 4 to 6, but your body still needs rest and check-ups.",
      "hi": "हर तिमाही अपने नए अनुभव, पड़ाव और चुनौतियाँ लेकर आती है।"
     }
    }
@@ -2514,11 +2514,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "Your baby gets nothing from hearing your voice before birth.",
+     "en": "Your baby can't hear you yet, so talking doesn't matter.",
      "hi": "जन्म से पहले शिशु को आपकी आवाज़ सुनने का कोई फ़ायदा नहीं होता।"
     },
     "truth": {
-     "en": "Your baby is already growing the parts needed for hearing, and will soon start to know familiar sounds.",
+     "en": "Your baby's ears are forming now, and soon they'll hear your voice.",
      "hi": "आपके शिशु में सुनने के लिए ज़रूरी हिस्से अभी से बन रहे हैं, और वह जल्द ही जानी-पहचानी आवाज़ें पहचानने लगेगा।"
     }
    }
@@ -3599,11 +3599,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "The anomaly scan is only for finding problems.",
+     "en": "If the anomaly scan shows something, it's always serious.",
      "hi": "Anomaly scan सिर्फ़ गड़बड़ी ढूँढने के लिए होता है।"
     },
     "truth": {
-     "en": "The anomaly scan is a routine check done in every pregnancy, and most of the time it's reassuring about how your baby is growing.",
+     "en": "Many findings are small, and some settle on their own. Your doctor will explain what it means and whether you need another scan.",
      "hi": "Anomaly scan हर गर्भावस्था में किया जाने वाला एक सामान्य परीक्षण है, और ज़्यादातर बार यह शिशु के विकास को लेकर भरोसा ही देता है।"
     }
    }
@@ -4684,11 +4684,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "Babies only start to know their parents after birth.",
+     "en": "Your partner's voice doesn't matter to the baby yet.",
      "hi": "शिशु अपने माता-पिता को जन्म के बाद ही पहचानना शुरू करते हैं।"
     },
     "truth": {
-     "en": "Babies can get to know voices they hear often during pregnancy.",
+     "en": "Your baby can get to know voices they hear often, including your partner's. Talking or reading aloud a few minutes a day is enough.",
      "hi": "गर्भावस्था में बार-बार सुनी गई आवाज़ें शिशु के लिए जानी-पहचानी हो सकती हैं।"
     }
    }
@@ -4901,11 +4901,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "The baby sleeps all day.",
+     "en": "If the baby moves less for a day, it's nothing to worry about.",
      "hi": "शिशु पूरा दिन सोता रहता है।"
     },
     "truth": {
-     "en": "Your baby moves between sleep and activity, and may already have patterns you can recognise.",
+     "en": "If your baby's movements slow down or change, call your doctor or hospital the same day. Don't wait until tomorrow. It's a quick check, and it's what they want you to do.",
      "hi": "आपका शिशु सोने और सक्रिय रहने के दौरों के बीच बदलता रहता है, और उसका अपना ढर्रा भी बन चुका हो सकता है।"
     }
    }
@@ -5552,11 +5552,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "A bigger bump means an easier delivery.",
+     "en": "There's nothing you can do to prepare for labour.",
      "hi": "बड़ा बंप मतलब आसान डिलीवरी।"
     },
     "truth": {
-     "en": "Bump size doesn't reliably tell you how the birth will go or how big your baby is.",
+     "en": "Antenatal classes, breathing practice and a birth plan all help you feel ready.",
      "hi": "बंप के आकार से न डिलीवरी के अनुभव का, न शिशु के आकार का भरोसेमंद अंदाज़ा लगता है।"
     }
    }
@@ -7939,11 +7939,11 @@
    },
    "mythBuster": {
     "myth": {
-     "en": "If labour hasn't started by the due date, something is wrong.",
+     "en": "You'll be induced the day after your due date.",
      "hi": "अगर डिलीवरी की तारीख़ तक प्रसव शुरू नहीं हुआ, तो कुछ गड़बड़ है।"
     },
     "truth": {
-     "en": "Many healthy pregnancies go past the due date, with the right medical care keeping watch.",
+     "en": "Your doctor decides if and when, often about a week after it, with checks in the meantime.",
      "hi": "बहुत सी स्वस्थ गर्भावस्थाएँ सही मेडिकल निगरानी में डिलीवरी की तारीख़ के आगे तक चलती हैं।"
     }
    }

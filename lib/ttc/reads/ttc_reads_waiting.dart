@@ -163,13 +163,20 @@ final List<PvRead> kTtcReadsWaiting = [
               'anything else, including herbal remedies.'),
         ],
         mythFact: PvMythFact(
-          myth: _en("Rest in bed, avoid stairs and don't lift "
-              "anything, or it won't stick."),
-          fact: _en('Implantation happens deep inside the lining of '
-              "the womb. Walking, climbing stairs or lifting a bucket can't "
-              "shake it loose. When a month doesn't work, it's almost always "
-              'because of the egg or embryo itself, not because of anything '
-              'you did that day.'),
+          // Plain words (2026-10-21). Kept for revert: Rest in bed, avoid
+          // stairs and don't lift anything, or it won't stick.
+          myth: _en("Rest in bed, avoid stairs and don't lift anything, or it "
+              "won't stick."),
+          // Plain words (2026-10-21). Kept for revert: Implantation happens
+          // deep inside the lining of the womb. Walking, climbing stairs or
+          // lifting a bucket can't shake it loose. When a month doesn't work,
+          // it's almost always because of the egg or embryo itself, not
+          // because of anything you did that day.
+          fact: _en("Moving about won't stop it sticking. Implantation "
+              "happens deep in the lining of the womb, and walking, stairs or "
+              "lifting a bucket can't shake it loose. When a month doesn't "
+              "work, it's almost always down to the egg or embryo, not "
+              "anything you did."),
         ),
       ),
 
@@ -1496,12 +1503,16 @@ final List<PvRead> kTtcReadsWaiting = [
               "once they've checked."),
         ],
         mythFact: PvMythFact(
-          myth: _en('A late period just needs a tablet to set it '
-              'right.'),
-          fact: _en('A late period is a sign, not the problem itself. '
-              "A tablet can bring on a bleed, but it doesn't fix the reason "
-              'the period was late, and it can hide a pregnancy. A test and a '
-              'doctor come first.'),
+          // Plain words (2026-10-21). Kept for revert: A late period just
+          // needs a tablet to set it right.
+          myth: _en('A late period just needs a tablet to set it right.'),
+          // Plain words (2026-10-21). Kept for revert: A late period is a
+          // sign, not the problem itself. A tablet can bring on a bleed, but
+          // it doesn't fix the reason the period was late, and it can hide a
+          // pregnancy. A test and a doctor come first.
+          fact: _en("Not first. A late period is a sign, not the problem. A "
+              "tablet can bring on a bleed, but it doesn't fix the reason, "
+              "and it can hide a pregnancy. Do a test and see a doctor first."),
         ),
       ),
 
@@ -1791,12 +1802,18 @@ final List<PvRead> kTtcReadsWaiting = [
               'doing what it does every month.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('If this month feels different, I must be '
-              'pregnant.'),
-          fact: _en('Every cycle feels a little different. How you '
-              'feel in the second half changes with sleep, stress, food and '
-              "how closely you're paying attention. Feeling different doesn't "
-              "mean pregnant, and feeling the same doesn't mean not."),
+          // Plain words (2026-10-21). Kept for revert: If this month feels
+          // different, I must be pregnant.
+          myth: _en('If this month feels different, I must be pregnant.'),
+          // Plain words (2026-10-21). Kept for revert: Every cycle feels a
+          // little different. How you feel in the second half changes with
+          // sleep, stress, food and how closely you're paying attention.
+          // Feeling different doesn't mean pregnant, and feeling the same
+          // doesn't mean not.
+          fact: _en("Not necessarily. Every cycle feels a little different, "
+              "with changes in sleep, stress, food and how closely you're "
+              "watching. Feeling different doesn't mean pregnant, and feeling "
+              "the same doesn't mean not."),
         ),
       ),
 

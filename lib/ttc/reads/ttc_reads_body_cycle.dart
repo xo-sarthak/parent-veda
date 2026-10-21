@@ -563,9 +563,11 @@ final List<PvRead> kTtcReadsBodyCycle = [
         ],
         mythFact: PvMythFact(
           myth: _en('Implantation bleeding is a sure sign of pregnancy.'),
-          fact: _en("It can't be told apart from spotting before a period just "
-              "by looking. A test on or after the day your period is due "
-              "gives you the answer."),
+          // Plain words (2026-10-21). Kept for revert: It can't be told
+          // apart from spotting before a period just by looking. A test on
+          // or after the day your period is due gives you the answer.
+          fact: _en("It isn't. It looks the same as spotting before a period. "
+              "A test on or after the day your period is due will tell you."),
         ),
       ),
       PvReadSection(
@@ -1406,11 +1408,17 @@ final List<PvRead> kTtcReadsBodyCycle = [
               "worth ruling out."),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: Painful periods get
+          // better after marriage or after a baby.
           myth: _en('Painful periods get better after marriage or after a '
               'baby.'),
-          fact: _en("Ordinary cramps sometimes ease with age or after "
-              "childbirth. Severe pain from a condition like endometriosis "
-              "doesn't go away by waiting, and it deserves a check now."),
+          // Plain words (2026-10-21). Kept for revert: Ordinary cramps
+          // sometimes ease with age or after childbirth. Severe pain from a
+          // condition like endometriosis doesn't go away by waiting, and it
+          // deserves a check now.
+          fact: _en("Not always. Ordinary cramps sometimes ease with age or "
+              "after a baby. Severe pain from a condition like endometriosis "
+              "doesn't go away by waiting. Get it checked now."),
         ),
       ),
       PvReadSection(

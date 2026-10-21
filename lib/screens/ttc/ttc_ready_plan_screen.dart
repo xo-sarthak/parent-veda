@@ -59,6 +59,7 @@ import 'doors/ttc_tab_art.dart' show TtcTabMark;
 import 'ttc_common.dart';
 import 'ttc_precheck_parts.dart';
 import 'ttc_precheck_summary.dart';
+import 'ttc_ready_week.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_hues.dart';
@@ -312,10 +313,12 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
           TtcToolQuestion(
             n: 3,
             hue: _hue,
-            title: 'How do you eat?',
+            // Plain words (walk 2026-10-20: "how do you eat? ... I can eat
+            // from my hands"). Kept for revert: 'How do you eat?' and
+            // 'This picks your week of meals and which tests lead your list.'
+            title: 'What do you eat at home?',
             note:
-                'This picks your week of meals and which tests lead your '
-                'list.',
+                'Picks your week of meals, and which tests lead your list.',
             child: TtcToolChoice<ReadyDiet>(
               value: _a.diet,
               hue: _hue,
@@ -329,8 +332,10 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
           TtcToolQuestion(
             n: 4,
             hue: _hue,
-            title: 'Which kitchen is home?',
-            note: 'Your plan uses foods you already cook.',
+            // Kept for revert: 'Which kitchen is home?' / 'Your plan uses
+            // foods you already cook.'
+            title: 'Which food do you cook most at home?',
+            note: "We'll pick meals from food you already make.",
             child: TtcToolChoice<ReadyRegion>(
               value: _a.region,
               hue: _hue,
@@ -413,6 +418,83 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
           ),
         ),
 
+        // ---- her everyday (2026-10-21) -------------------------------------
+        // ⚠️ EACH ONE SAYS WHAT IT SETS, and each sets something in "Your
+        // week" (readyHabitsFor / readyPitchesFor). Nothing here is asked
+        // for its own sake.
+        ttcToolPad(
+          TtcToolQuestion(
+            n: 7,
+            hue: _hue,
+            title: 'How much time can you give to movement on most days?',
+            note: 'Sets your daily movement, with a smaller version for busy '
+                'days.',
+            child: TtcToolChoice<ReadyMove>(
+              value: _a.move,
+              hue: _hue,
+              options: {for (final v in ReadyMove.values) v: v.label},
+              onTap: (v) => _set(() => _a.move = v),
+            ),
+          ),
+        ),
+        ttcToolPad(
+          TtcToolQuestion(
+            n: 8,
+            hue: _hue,
+            title: 'When suits you best?',
+            note: 'Your reminders come then. You can change each one later.',
+            child: TtcToolChoice<ReadyWhen>(
+              value: _a.when,
+              hue: _hue,
+              options: {for (final v in ReadyWhen.values) v: v.label},
+              onTap: (v) => _set(() => _a.when = v),
+            ),
+          ),
+        ),
+        ttcToolPad(
+          TtcToolQuestion(
+            n: 9,
+            hue: _hue,
+            title: 'How has trying felt lately?',
+            note: 'Adds a few calm minutes to your day if it would help.',
+            child: TtcToolChoice<ReadyMood>(
+              value: _a.mood,
+              hue: _hue,
+              options: {for (final v in ReadyMood.values) v: v.label},
+              onTap: (v) => _set(() => _a.mood = v),
+            ),
+          ),
+        ),
+        ttcToolPad(
+          TtcToolQuestion(
+            n: 10,
+            hue: _hue,
+            title:
+                'Would you like a few minutes of preconception garbh sanskar?',
+            note: 'Adds the free 10-minute course, once a week.',
+            child: TtcToolChoice<ReadyGarbh>(
+              value: _a.garbh,
+              hue: _hue,
+              options: {for (final v in ReadyGarbh.values) v: v.label},
+              onTap: (v) => _set(() => _a.garbh = v),
+            ),
+          ),
+        ),
+        ttcToolPad(
+          TtcToolQuestion(
+            n: 11,
+            hue: _hue,
+            title: 'Have you had a check-up this year?',
+            note: 'If not, a check-up goes first on your list.',
+            child: TtcToolChoice<ReadyCheckup>(
+              value: _a.checkup,
+              hue: _hue,
+              options: {for (final v in ReadyCheckup.values) v: v.label},
+              onTap: (v) => _set(() => _a.checkup = v),
+            ),
+          ),
+        ),
+
         // ---- his part ------------------------------------------------------
         const SizedBox(height: 10),
         ttcToolPad(
@@ -435,7 +517,7 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
         const SizedBox(height: 14),
         ttcToolPad(
           TtcToolQuestion(
-            n: 7,
+            n: 12,
             hue: _hue,
             title: 'How old is he?',
             child: TtcToolChoice<HisAge>(
@@ -448,12 +530,14 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
         ),
         ttcToolPad(
           TtcToolQuestion(
-            n: 8,
+            n: 13,
             hue: _hue,
-            title: 'Does he use tobacco, drink or take medicines?',
+            // Kept for revert: 'Does he use tobacco, drink or take
+            // medicines?' / 'These are the three with evidence behind them.'
+            title: 'Does he use tobacco, drink, or take a daily medicine?',
             note:
-                'Pick as many as apply. These are the three with evidence '
-                'behind them.',
+                'Pick as many as apply. Some of these affect sperm, so they go '
+                'on his part of the plan.',
             child: TtcToolOptions(
               p: p,
               hue: _hue,
@@ -548,6 +632,14 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
           const SizedBox(height: 14),
         ],
 
+        // ---- your week (2026-10-21) ----------------------------------------
+        if (plan.habits.isNotEmpty) ...[
+          head('Your week'),
+          const SizedBox(height: 6),
+          ttcToolPad(TtcReadyWeek(habits: plan.habits)),
+          const SizedBox(height: 22),
+        ],
+
         // ---- this month ----------------------------------------------------
         head(arrived ? 'While you try' : 'This month'),
         const SizedBox(height: 6),
@@ -639,6 +731,34 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
           ),
         ),
 
+        // ---- help with this (2026-10-21) -----------------------------------
+        if (plan.pitches.isNotEmpty) ...[
+          const SizedBox(height: 26),
+          head('Help with this'),
+          const SizedBox(height: 8),
+          ttcToolPad(TtcReadyHelpCards(pitches: plan.pitches)),
+        ],
+
+        // ---- edit and share ------------------------------------------------
+        const SizedBox(height: 18),
+        ttcToolPad(Row(children: [
+          Expanded(
+            child: TtcToolSecondary(
+              key: const ValueKey('ttc_ready_plan_edit'),
+              label: 'Edit my plan',
+              onTap: () => _edit(),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TtcToolPrimary(
+              key: const ValueKey('ttc_ready_plan_pdf'),
+              label: 'Save as PDF',
+              onTap: () => shareTtcReadyPlanPdf(context, plan),
+            ),
+          ),
+        ])),
+
         // ---- take it with you ----------------------------------------------
         const SizedBox(height: 26),
         head('Take your plan to your doctor'),
@@ -662,7 +782,11 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
         ),
 
         // ---- the monthly note ----------------------------------------------
-        if (!arrived) ...[
+        // ⚠️ REPLACED BY THE WEEKLY NOTE in "Your week" (the user,
+        // 2026-10-21: "plan to be sent reminded each week"). Kept for revert:
+        // `if (!arrived) ...[`. A note she already turned on keeps showing
+        // here so she can turn it off.
+        if (!arrived && _store.notify) ...[
           const SizedBox(height: 26),
           head('A note each month'),
           const SizedBox(height: 6),

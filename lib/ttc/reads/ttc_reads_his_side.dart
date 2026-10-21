@@ -140,12 +140,19 @@ final List<PvRead> kTtcReadsHisSide = [
               'as a final answer.'),
         ],
         mythFact: PvMythFact(
-          myth: _en("If you've fathered a child before, your side is fine."),
-          fact: _en('Not always. Sperm production changes with age, illness, '
-              'weight, medicines and time. Secondary infertility, when a '
-              "couple who conceived before can't again, often has a male "
-              'factor. A past pregnancy is history, not a current test '
-              'result.'),
+          // Plain words (2026-10-21). Kept for revert: If you've fathered a
+          // child before, your side is fine.
+          myth: _en("If you've fathered a child before, your sperm must be "
+              "fine."),
+          // Plain words (2026-10-21). Kept for revert: Not always. Sperm
+          // production changes with age, illness, weight, medicines and
+          // time. Secondary infertility, when a couple who conceived before
+          // can't again, often has a male factor. A past pregnancy is
+          // history, not a current test result.
+          fact: _en("Not always. Sperm can change with age, illness, weight, "
+              "medicines and time. When a couple who conceived before can't "
+              "again, the man's side is often part of it. A past pregnancy "
+              "isn't a test result for today."),
         ),
       ),
 
@@ -716,13 +723,20 @@ final List<PvRead> kTtcReadsHisSide = [
               'it.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Supplements will fix a low count.'),
-          fact: _en('The evidence for antioxidant supplements in male '
-              'infertility is weak and mixed. Some trials show a small effect '
-              'on the numbers, but few show a difference in live births. Zinc '
-              'and CoQ10 have the best data of the lot, and both are worth far '
-              "less than stopping tobacco. They don't replace finding out "
-              "what's causing a low result."),
+          // Plain words (2026-10-21). Kept for revert: Supplements will fix
+          // a low count.
+          myth: _en('Supplements will fix a low sperm count.'),
+          // Plain words (2026-10-21). Kept for revert: The evidence for
+          // antioxidant supplements in male infertility is weak and mixed.
+          // Some trials show a small effect on the numbers, but few show a
+          // difference in live births. Zinc and CoQ10 have the best data of
+          // the lot, and both are worth far less than stopping tobacco.
+          // They don't replace finding out what's causing a low result.
+          fact: _en("Usually not. The evidence is weak and mixed. A few "
+              "trials show small changes in the numbers, but few show more "
+              "babies born. Zinc and CoQ10 have the most evidence, and "
+              "stopping tobacco helps far more than either. Supplements don't "
+              "replace finding the cause of a low result."),
         ),
       ),
 
@@ -2019,10 +2033,16 @@ final List<PvRead> kTtcReadsHisSide = [
               'three months.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Six weeks is long enough to see a difference.'),
-          fact: _en('A sample at six weeks measures sperm that started forming '
-              'before anything changed. Nothing reliable shows until about '
-              'week twelve.'),
+          // Plain words (2026-10-21). Kept for revert: Six weeks is long
+          // enough to see a difference.
+          myth: _en('Six weeks of changes is long enough to see a difference '
+              'in the sperm test.'),
+          // Plain words (2026-10-21). Kept for revert: A sample at six
+          // weeks measures sperm that started forming before anything
+          // changed. Nothing reliable shows until about week twelve.
+          fact: _en("It's too soon. A test at six weeks measures sperm that "
+              "started forming before anything changed. Nothing reliable "
+              "shows until about week twelve."),
         ),
       ),
       PvReadSection(
@@ -2269,12 +2289,16 @@ final List<PvRead> kTtcReadsHisSide = [
               'months of not knowing.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('A "male fertility" supplement is a treatment for a low '
-              'count.'),
-          fact: _en('Zinc and CoQ10 are the two ingredients with any '
-              'evidence, and that evidence is weak. The branded mixes with '
-              'many ingredients add nothing proven, at several times the '
-              'price.'),
+          // Plain words (2026-10-21). Kept for revert: A "male fertility"
+          // supplement is a treatment for a low count.
+          myth: _en("A 'male fertility' supplement treats a low sperm count."),
+          // Plain words (2026-10-21). Kept for revert: Zinc and CoQ10 are
+          // the two ingredients with any evidence, and that evidence is
+          // weak. The branded mixes with many ingredients add nothing
+          // proven, at several times the price.
+          fact: _en("It doesn't. Only zinc and CoQ10 have any evidence, and "
+              "it's weak. Branded mixes with many ingredients add nothing "
+              "proven, at several times the price."),
         ),
       ),
       PvReadSection(

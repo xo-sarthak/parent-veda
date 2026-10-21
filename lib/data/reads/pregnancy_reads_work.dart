@@ -1313,12 +1313,20 @@ final List<PvRead> kPregnancyReadsWork = [
               "you're treated unfairly."),
         ],
         mythFact: PvMythFact(
-          myth: _en("A private company can let you go once you tell them "
-              "you're pregnant, and there's nothing you can do."),
-          fact: _en("The Maternity Benefit Act protects women during "
-              "maternity leave, and even if you're let go while pregnant, you "
-              "may still be entitled to your maternity benefit. There are "
-              "offices whose job is to enforce this."),
+          // Plain words (2026-10-21). Kept for revert: A private company can
+          //   let you go once you tell them you're pregnant, and there's
+          //   nothing you can do.
+          myth: _en("A private company can fire you for being pregnant, and "
+              "you can do nothing."),
+          // Plain words (2026-10-21). Kept for revert: The Maternity Benefit
+          //   Act protects women during maternity leave, and even if you're
+          //   let go while pregnant, you may still be entitled to your
+          //   maternity benefit. There are offices whose job is to enforce
+          //   this.
+          fact: _en("You have rights. The law (the Maternity Benefit Act) "
+              "protects you during maternity leave. Even if you're let "
+              "go while pregnant, you may still be owed your maternity "
+              "benefit. Labour offices exist to enforce this."),
         ),
       ),
       PvReadSection(

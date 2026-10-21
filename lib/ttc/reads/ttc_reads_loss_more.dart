@@ -96,11 +96,16 @@ final List<PvRead> kTtcReadsLossMore = [
               'two late. Sensitive home tests mean more people see them now.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Testing too early caused it, or jinxed it.'),
-          fact: _en("A test only shows what's already happening. Testing "
-              "early didn't cause the loss. It let you see a pregnancy that, "
-              'with older tests, would have looked like a slightly late '
-              'period.'),
+          // Plain words (2026-10-21). Kept for revert: Testing too early
+          // caused it, or jinxed it.
+          myth: _en('Testing too early caused the loss, or jinxed it.'),
+          // Plain words (2026-10-21). Kept for revert: A test only shows
+          // what's already happening. Testing early didn't cause the loss. It
+          // let you see a pregnancy that, with older tests, would have looked
+          // like a slightly late period.
+          fact: _en("It didn't. A test only shows what is already happening. "
+              "Testing early let you see a pregnancy that, with older tests, "
+              "would have looked like a slightly late period."),
         ),
       ),
       PvReadSection(
@@ -643,12 +648,18 @@ final List<PvRead> kTtcReadsLossMore = [
           _en('Nazar, bad luck, or anything anyone said about you.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Eating papaya or pineapple brought it on.'),
-          fact: _en('Ripe papaya and pineapple, eaten as everyday food, '
-              "haven't been shown to cause miscarriage. Many doctors still "
-              'suggest skipping raw, unripe papaya in pregnancy, to be '
-              "careful. Eating these as part of your normal meals didn't cause "
-              'your loss.'),
+          // Plain words (2026-10-21). Kept for revert: Eating papaya or
+          // pineapple brought it on.
+          myth: _en('Eating papaya or pineapple caused the miscarriage.'),
+          // Plain words (2026-10-21). Kept for revert: Ripe papaya and
+          // pineapple, eaten as everyday food, haven't been shown to cause
+          // miscarriage. Many doctors still suggest skipping raw, unripe
+          // papaya in pregnancy, to be careful. Eating these as part of your
+          // normal meals didn't cause your loss.
+          fact: _en('Your normal meals did not cause your loss. Ripe papaya '
+              'and pineapple, eaten as everyday food, have not been shown to '
+              'cause miscarriage. Many doctors still suggest skipping raw, '
+              'unripe papaya in pregnancy, just to be careful.'),
         ),
       ),
       PvReadSection(
@@ -880,11 +891,16 @@ final List<PvRead> kTtcReadsLossMore = [
               "won't mind the question."),
         ],
         mythFact: PvMythFact(
-          myth: _en('The more tests we do, the more likely we are to find the '
-              'answer.'),
-          fact: _en('A test helps only when its result would change what you '
-              'do. Long panels can find things that mean nothing and lead to '
-              "treatments that don't help, at a high cost."),
+          // Plain words (2026-10-21). Kept for revert: The more tests we do,
+          // the more likely we are to find the answer.
+          myth: _en('More tests will find the answer.'),
+          // Plain words (2026-10-21). Kept for revert: A test helps only when
+          // its result would change what you do. Long panels can find things
+          // that mean nothing and lead to treatments that don't help, at a
+          // high cost.
+          fact: _en("Not always. A test helps only if its result would change "
+              "what you do next. Long test panels can find things that mean "
+              "nothing, and lead to costly treatments that don't help."),
         ),
       ),
       PvReadSection(

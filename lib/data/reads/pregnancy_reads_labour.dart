@@ -178,13 +178,17 @@ final List<PvRead> kPregnancyReadsLabour = [
               "doesn't cause it."),
         ],
         mythFact: PvMythFact(
-          myth: _en('An epidural means you are more likely to end up with a '
-              'C-section.'),
-          fact: _en("It doesn't. Large reviews of the evidence find no rise in "
-              "C-section births with an epidural. It does make forceps or "
-              "vacuum help somewhat more likely, and it makes the pushing "
-              "stage a little longer. Those are real trade-offs. A C-section "
-              "isn't one of them."),
+          // Plain words (2026-10-21). Kept for revert: An epidural means you
+          //   are more likely to end up with a C-section.
+          myth: _en("An epidural makes a C-section more likely."),
+          // Plain words (2026-10-21). Kept for revert: It doesn't. Large
+          //   reviews of the evidence find no rise in C-section births with
+          //   an epidural. It does make forceps or vacuum help somewhat more
+          //   likely, and it makes the pushing stage a little longer. Those
+          //   are real trade-offs. A C-section isn't one of them.
+          fact: _en("It doesn't. It can make the pushing stage a little "
+              "longer, and help with forceps or a vacuum a bit more "
+              "likely. A C-section isn't one of the trade-offs."),
         ),
       ),
 

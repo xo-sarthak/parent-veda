@@ -172,6 +172,59 @@ void main() {
       await TtcIntroGate.cardOpened();
       expect(TtcIntroGate.cardShowing(), isFalse);
     });
+
+    test('the welcome pop-up is owed once, and survives a restart', () async {
+      expect(TtcIntroGate.popupOwed, isFalse);
+      await TtcIntroGate.offerCard();
+      expect(TtcIntroGate.popupOwed, isTrue);
+      await TtcIntroGate.loadCard();
+      expect(TtcIntroGate.popupOwed, isTrue, reason: 'persisted, not memory');
+      await TtcIntroGate.popupShown();
+      await TtcIntroGate.loadCard();
+      expect(TtcIntroGate.popupOwed, isFalse);
+      expect(TtcIntroGate.cardShowing(), isTrue,
+          reason: 'the pop-up does not spend the card');
+    });
+  });
+
+  group('the film never disappears (walk 2026-10-20)', () {
+    test('a tap on the card no longer spends it', () {
+      final home = _src('lib/screens/ttc/ttc_home_v3.dart');
+      final live = home
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('//'))
+          .join('\n');
+      expect(live, isNot(contains('TtcIntroGate.cardOpened()')));
+      expect(live, contains('openTtcIntroFilm(context)'));
+      expect(live, contains('showTtcIntroFilmDialog(context)'));
+    });
+
+    test('Learn > Videos always has it', () {
+      final learn = _src('lib/screens/ttc/ttc_learn_screen.dart');
+      expect(learn, contains('_IntroFilmRow(onTap:'));
+      expect(learn, contains("ValueKey('ttc_learn_intro_film')"));
+    });
+
+    testWidgets('the pop-up is centred, with Skip, and says where it lives',
+        (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showTtcIntroFilmDialog(context),
+            child: const Text('open'),
+          ),
+        ),
+      ));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('ttc_intro_popup')), findsOneWidget);
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.textContaining('always in Learn'), findsOneWidget);
+      await tester.ensureVisible(find.byKey(const ValueKey('ttc_intro_popup_skip')));
+      await tester.tap(find.byKey(const ValueKey('ttc_intro_popup_skip')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('ttc_intro_popup')), findsNothing);
+    });
   });
 
   group('wiring gate', () {

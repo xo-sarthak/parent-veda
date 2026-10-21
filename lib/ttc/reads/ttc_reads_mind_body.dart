@@ -113,12 +113,19 @@ final List<PvRead> kTtcReadsMindBody = [
               "strain of trying isn't why it hasn't happened yet."),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: Stop thinking about it
+          // and it will happen.
           myth: _en('Stop thinking about it and it will happen.'),
-          fact: _en('People get pregnant while grieving, during exams, in war '
-              'zones and in the worst months of their lives. Conception '
-              "doesn't wait for a calm mind. And the couples told this most "
-              "often are the ones who've been trying longest. For them, it's "
-              'the least likely reason of all.'),
+          // Plain words (2026-10-21). Kept for revert: People get pregnant
+          // while grieving, during exams, in war zones and in the worst
+          // months of their lives. Conception doesn't wait for a calm mind.
+          // And the couples told this most often are the ones who've been
+          // trying longest. For them, it's the least likely reason of all.
+          fact: _en("Relaxing is not the missing step. People get pregnant "
+              "during grief, exams and the hardest months of their lives. "
+              "Conception doesn't wait for a calm mind. The couples told this "
+              "most have often been trying longest, and for them it's the "
+              "least likely reason of all."),
         ),
       ),
 
@@ -470,14 +477,21 @@ final List<PvRead> kTtcReadsMindBody = [
               "That's why we wrote this down."),
         ],
         mythFact: PvMythFact(
-          myth: _en('Doing it properly shapes what your child will be '
-              'like.'),
-          fact: _en("There's no evidence that practices before conception "
-              'shape a child’s intelligence or personality. What the '
-              'tradition can fairly claim, and what modern care before '
-              'pregnancy agrees with, is that the parents’ health and state '
-              'of mind before conception are worth looking after. That is a '
-              "much smaller claim, and it's the one that holds up."),
+          // Plain words (2026-10-21). Kept for revert: Doing it properly
+          // shapes what your child will be like.
+          myth: _en('Doing it properly before pregnancy shapes what your '
+              'child will be like.'),
+          // Plain words (2026-10-21). Kept for revert: There's no evidence
+          // that practices before conception shape a child’s intelligence or
+          // personality. What the tradition can fairly claim, and what modern
+          // care before pregnancy agrees with, is that the parents’ health
+          // and state of mind before conception are worth looking after. That
+          // is a much smaller claim, and it's the one that holds up.
+          fact: _en("There's no evidence it does. Nothing done before "
+              "conception has been shown to shape a child's intelligence or "
+              "personality. What does hold up is smaller: looking after both "
+              "parents' health and state of mind before pregnancy is worth "
+              "it."),
         ),
       ),
 

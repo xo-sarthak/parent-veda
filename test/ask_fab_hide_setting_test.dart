@@ -11,6 +11,8 @@
 //  it again.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -79,4 +81,22 @@ void main() {
       await t.pump(const Duration(seconds: 5));
     });
   }
+
+  // Walk 2026-10-20: "I disabled it and it was still there". A second,
+  // hard-coded button that never read the switch sat on two parenting screens.
+  test('no screen draws its own Ask Veda button', () {
+    for (final f in [
+      'lib/screens/post_pregnancy/community_screen.dart',
+      'lib/screens/post_pregnancy/products_discovery_screen.dart',
+    ]) {
+      final live = File(f)
+          .readAsStringSync()
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('//'))
+          .join('\n');
+      expect(live, isNot(contains('PpAskVedaFab(')), reason: f);
+    }
+    expect(File('lib/main.dart').readAsStringSync(),
+        contains('await FabState.preload();'));
+  });
 }

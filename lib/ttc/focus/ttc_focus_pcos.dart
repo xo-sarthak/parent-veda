@@ -194,12 +194,17 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           title: 'How common is PCOS?',
           id: 'ttc_tile_how_common_is_pcos',
           blurb: "So common that you likely know a few people who have it.",
-          myth: 'PCOS is rare, and having it means something has gone '
-              'badly wrong.',
-          fact: 'Around one in ten people of reproductive age have PCOS. It '
-              'ranges from mild to more marked. Many people have a mild kind '
-              'that only shows up as cycles that are a little hard to '
-              "predict. It's managed rather than cured.",
+          // Plain words (2026-10-21). Kept for revert: PCOS is rare, and
+          // having it means something has gone badly wrong.
+          myth: 'PCOS is rare, and having it means something is badly wrong.',
+          // Plain words (2026-10-21). Kept for revert: Around one in ten
+          // people of reproductive age have PCOS. It ranges from mild to
+          // more marked. Many people have a mild kind that only shows up as
+          // cycles that are a little hard to predict. It's managed rather
+          // than cured.
+          fact: "It's common. About one in ten people of reproductive age "
+              "have PCOS. Many have a mild kind that only shows as cycles "
+              "that are hard to predict. It is managed, not cured.",
         ),
       ],
     ),
@@ -426,12 +431,18 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           title: 'Do you have to give up rice?',
           id: 'ttc_tile_do_you_have_to_give_up_rice',
           blurb: 'The PCOS advice you will hear most often in India.',
-          myth: 'People with PCOS have to give up rice, roti and all Indian '
-              'carbohydrates.',
-          fact: 'What you eat a carbohydrate with matters far more than '
-              'cutting it out. A home thali already puts carbohydrate '
-              'together with protein, fat, fibre and curd or other fermented '
-              "food. That's exactly what keeps blood sugar from rising fast.",
+          // Plain words (2026-10-21). Kept for revert: People with PCOS
+          // have to give up rice, roti and all Indian carbohydrates.
+          myth: 'With PCOS, you have to give up rice, roti and all carbs.',
+          // Plain words (2026-10-21). Kept for revert: What you eat a
+          // carbohydrate with matters far more than cutting it out. A home
+          // thali already puts carbohydrate together with protein, fat,
+          // fibre and curd or other fermented food. That's exactly what
+          // keeps blood sugar from rising fast.
+          fact: "You don't. What you eat carbs with matters far more than "
+              "cutting them out. A home thali already pairs them with "
+              "protein, fat, fibre and curd. That mix keeps blood sugar from "
+              "rising fast.",
         ),
       ],
     ),
@@ -452,12 +463,19 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           title: 'PCOS supplements: worth it or hype?',
           id: 'ttc_tile_worth_it_or_hype',
           blurb: 'What the rest of the chemist shelf is doing.',
-          myth: 'Fertility blends, detox teas and PCOS mixes are worth trying '
-              "because they can't hurt.",
-          fact: 'Most have no proof of working in PCOS at all. Some are '
-              'harmless but costly. A few, including berberine, clash with '
-              'real medicines. Whatever you take, write it down and tell your '
-              'doctor at each visit.',
+          // Plain words (2026-10-21). Kept for revert: Fertility blends,
+          // detox teas and PCOS mixes are worth trying because they can't
+          // hurt.
+          myth: "PCOS teas, detox drinks and fertility blends are worth a "
+              "try, because they can't hurt.",
+          // Plain words (2026-10-21). Kept for revert: Most have no proof
+          // of working in PCOS at all. Some are harmless but costly. A few,
+          // including berberine, clash with real medicines. Whatever you
+          // take, write it down and tell your doctor at each visit.
+          fact: 'Not always. Most have no proof they help PCOS. Some are '
+              'harmless but costly. A few, like berberine, clash with real '
+              'medicines. Write down anything you take and tell your doctor '
+              'at each visit.',
         ),
         TtcProductTile(
           title: 'Myo-inositol',

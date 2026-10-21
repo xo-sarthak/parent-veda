@@ -721,11 +721,16 @@ final List<PvRead> kPregnancyReadsReady = [
               "because of falls and injuries."),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: A baby needs a pillow
+          //   for a nicely shaped head.
           myth: _en("A baby needs a pillow for a nicely shaped head."),
-          fact: _en("A baby should sleep flat on their back with no pillow. A "
-              "flat patch on the head is usually prevented by tummy time "
-              "while awake and by turning the baby's head a different way "
-              "at each sleep."),
+          // Plain words (2026-10-21). Kept for revert: A baby should sleep
+          //   flat on their back with no pillow. A flat patch on the head is
+          //   usually prevented by tummy time while awake and by turning the
+          //   baby's head a different way at each sleep.
+          fact: _en("No pillow. A baby should sleep flat on their back. To "
+              "avoid a flat patch, give tummy time while awake and turn "
+              "the baby's head a different way at each sleep."),
         ),
       ),
       PvReadSection(
@@ -980,11 +985,17 @@ final List<PvRead> kPregnancyReadsReady = [
               "there."),
         ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: A newborn needs a
+          //   pillow to sleep well and to shape the head.
           myth: _en("A newborn needs a pillow to sleep well and to shape the "
               "head."),
-          fact: _en("A baby sleeps safest flat on their back, with no pillow. "
-              "Tummy time while awake and changing which way the baby's "
-              "head faces at each sleep help keep the head a good shape."),
+          // Plain words (2026-10-21). Kept for revert: A baby sleeps safest
+          //   flat on their back, with no pillow. Tummy time while awake and
+          //   changing which way the baby's head faces at each sleep help
+          //   keep the head a good shape.
+          fact: _en("No pillow. A baby sleeps safest flat on their back. "
+              "Tummy time while awake, and turning the head a different "
+              "way at each sleep, help keep the head a good shape."),
         ),
       ),
       PvReadSection(

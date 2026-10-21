@@ -94,7 +94,7 @@ class _V3FilmScreenState extends State<V3FilmScreen> {
     // engine's own poster would draw one that plays nothing.
     if (!pregnancyFilmPlayable(v)) {
       return V3FilmPoster(
-          video: v, p: p, label: 'FILM · ARRIVING', playable: false);
+          video: v, p: p, label: 'VIDEO · ARRIVING' /* kept for revert: 'FILM · ARRIVING' */, playable: false);
     }
     final wv = pregnancyWatchVideo(v);
     return PvVideoPlayer(
@@ -229,7 +229,7 @@ class _V3FilmScreenState extends State<V3FilmScreen> {
                           const SizedBox(height: 32),
                           V3SectionHead(
                               eyebrow: 'Read next',
-                              title: 'Goes with this film',
+                              title: 'Goes with this video', // kept for revert: 'Goes with this film'
                               p: p),
                           const SizedBox(height: 8),
                           for (final r in reads)
@@ -241,7 +241,7 @@ class _V3FilmScreenState extends State<V3FilmScreen> {
                         if (more.isNotEmpty) ...[
                           const SizedBox(height: 32),
                           V3SectionHead(
-                              eyebrow: 'More films',
+                              eyebrow: 'More videos', // kept for revert: 'More films'
                               title: 'Also for week ${widget.week}',
                               p: p),
                           const SizedBox(height: 2),

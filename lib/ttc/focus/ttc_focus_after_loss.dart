@@ -228,12 +228,17 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           // blurb: "This matters a lot if you're not ready.",
           blurb: "Ovulation can come before the first period, which matters if you're not ready.",
           myth: "You can't get pregnant again until your period comes back.",
-          fact: 'Ovulation usually comes back before the first period, often '
-              'two to four weeks after a loss. So you can get pregnant again '
-              "before you've had a period at all. If you don't want to "
-              'conceive yet, use contraception now rather than waiting for a '
-              "period to come. This isn't often mentioned, and it's kinder to "
-              'read it here than to find out later.',
+          // Plain words (2026-10-21). Kept for revert: Ovulation usually
+          // comes back before the first period, often two to four weeks
+          // after a loss. So you can get pregnant again before you've had a
+          // period at all. If you don't want to conceive yet, use
+          // contraception now rather than waiting for a period to come.
+          // This isn't often mentioned, and it's kinder to read it here
+          // than to find out later.
+          fact: "You can. Ovulation usually comes back before your first "
+              "period, often two to four weeks after a loss. If you're not "
+              "ready to try again, start contraception now, not after a "
+              "period.",
         ),
       ],
     ),
@@ -322,11 +327,18 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           title: 'Does one miscarriage mean another?',
           id: 'ttc_tile_does_one_miscarriage_mean_another',
           blurb: "One loss doesn't change what comes next.",
-          myth: "One miscarriage means it's likely to happen again.",
-          fact: 'After a single loss, the chance for a next pregnancy is close '
-              "to what it was before. One loss isn't a pattern, and it says "
-              'nothing about your body. Things change after two or more, '
-              'which is exactly why testing starts there and not here.',
+          // Plain words (2026-10-21). Kept for revert: One miscarriage
+          // means it's likely to happen again.
+          myth: 'One miscarriage means it will probably happen again.',
+          // Plain words (2026-10-21). Kept for revert: After a single loss,
+          // the chance for a next pregnancy is close to what it was before.
+          // One loss isn't a pattern, and it says nothing about your body.
+          // Things change after two or more, which is exactly why testing
+          // starts there and not here.
+          fact: 'Usually not. After one loss, the next pregnancy is nearly as '
+              'likely to go well as before. One loss is not a pattern, and it '
+              'says nothing about your body. That is why tests start after '
+              'two or more losses, not after one.',
         ),
       ],
     ),
@@ -382,15 +394,22 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           blurb: 'One 2007 recommendation, one study, and what the evidence '
               'has shown since.',
           myth: 'You have to wait three to six months before trying again.',
-          fact: 'That advice goes back to a 2007 WHO recommendation based '
-              'mostly on a single study. Larger studies since then, including '
-              'a Norwegian one of nearly seventy-three thousand pregnancies, '
-              "haven't found the harm it assumed. For an early loss with no "
-              "complications, there's no medical reason to wait months. Many "
-              'doctors suggest waiting for one normal period, for a practical '
-              'reason: it makes the next pregnancy easier to date. If your own '
-              'doctor has told you to wait, ask what their reason is rather '
-              "than assuming it's the general advice.",
+          // Plain words (2026-10-21). Kept for revert: That advice goes
+          // back to a 2007 WHO recommendation based mostly on a single
+          // study. Larger studies since then, including a Norwegian one of
+          // nearly seventy-three thousand pregnancies, haven't found the
+          // harm it assumed. For an early loss with no complications,
+          // there's no medical reason to wait months. Many doctors suggest
+          // waiting for one normal period, for a practical reason: it makes
+          // the next pregnancy easier to date. If your own doctor has told
+          // you to wait, ask what their reason is rather than assuming it's
+          // the general advice.
+          fact: "Usually not. After an early loss with no complications, "
+              "there's no medical reason to wait months. Large studies since "
+              "the old advice found no harm in trying sooner. Many doctors "
+              "suggest waiting for one normal period, because it makes the "
+              "next pregnancy easier to date. If your own doctor said to "
+              "wait, ask them why.",
         ),
       ],
     ),

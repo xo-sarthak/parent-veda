@@ -228,11 +228,16 @@ final List<PvRead> kTtcReadsConceiving = [
         ],
         mythFact: PvMythFact(
           myth: _en('You can feel the moment you conceive.'),
-          fact: _en('Fertilisation and implantation happen without any feeling '
-              'you can pick out. The tender breasts, bloating and tiredness '
-              'of the second half come from progesterone, and they happen '
-              'whether or not you conceived. A test once your period is late '
-              'is the only way to know.'),
+          // Plain words (2026-10-21). Kept for revert: Fertilisation and
+          // implantation happen without any feeling you can pick out. The
+          // tender breasts, bloating and tiredness of the second half come
+          // from progesterone, and they happen whether or not you
+          // conceived. A test once your period is late is the only way to
+          // know.
+          fact: _en("You can't. Fertilisation and implantation can't be felt. "
+              "Sore breasts, bloating and tiredness late in the cycle come "
+              "from progesterone, pregnant or not. A test once your period is "
+              "late is the only way to know."),
         ),
       ),
 
@@ -424,42 +429,64 @@ final List<PvRead> kTtcReadsConceiving = [
               'them helps.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Lie still with your legs up for twenty minutes '
-              'afterwards.'),
-          fact: _en('Sperm reach the cervix within minutes, and the ones that '
-              'will travel are already on their way. Getting up changes '
-              "nothing. It's a good one to let go of first, because it's the "
-              'one that most often turns a private moment into a procedure.'),
+          // Plain words (2026-10-21). Kept for revert: Lie still with your
+          // legs up for twenty minutes afterwards.
+          myth: _en('You should lie still with your legs up for twenty '
+              'minutes after sex.'),
+          // Plain words (2026-10-21). Kept for revert: Sperm reach the
+          // cervix within minutes, and the ones that will travel are
+          // already on their way. Getting up changes nothing. It's a good
+          // one to let go of first, because it's the one that most often
+          // turns a private moment into a procedure.
+          fact: _en("You don't need to. Sperm reach the cervix within "
+              "minutes, so getting up changes nothing. Letting this go keeps "
+              "sex feeling like sex, not a procedure."),
         ),
       ),
 
       PvReadSection(
         mythFact: PvMythFact(
-          myth: _en('Some positions work better than others.'),
-          fact: _en("There's no evidence that position affects whether you "
-              'get pregnant. None of the studies people quote for this '
-              'measured pregnancy.'),
+          // Plain words (2026-10-21). Kept for revert: Some positions work
+          // better than others.
+          myth: _en('Some sex positions work better for getting pregnant.'),
+          // Plain words (2026-10-21). Kept for revert: There's no evidence
+          // that position affects whether you get pregnant. None of the
+          // studies people quote for this measured pregnancy.
+          fact: _en("There's no evidence they do. The studies people quote "
+              "for this never measured pregnancy."),
         ),
       ),
 
       PvReadSection(
         mythFact: PvMythFact(
-          myth: _en('Save it up for a few days so the count is higher.'),
-          fact: _en('Long gaps raise the number of sperm but make them move '
-              'less well, and movement is what matters here. Every one to two '
-              'days works best because it balances the two. Holding off for '
-              'a week before the window works against you.'),
+          // Plain words (2026-10-21). Kept for revert: Save it up for a few
+          // days so the count is higher.
+          myth: _en('Saving it up for a few days helps, because the count is '
+              'higher.'),
+          // Plain words (2026-10-21). Kept for revert: Long gaps raise the
+          // number of sperm but make them move less well, and movement is
+          // what matters here. Every one to two days works best because it
+          // balances the two. Holding off for a week before the window
+          // works against you.
+          fact: _en("It doesn't help. Long gaps raise the number of sperm but "
+              "make them swim less well, and swimming is what matters. Sex "
+              "every one to two days works best. Holding off for a week "
+              "before the fertile days works against you."),
         ),
       ),
 
       PvReadSection(
         mythFact: PvMythFact(
           myth: _en("If you're stressed, it won't happen."),
-          fact: _en('Very high stress that goes on for a long time can delay '
-              "or stop ovulation, and that's real. Everyday stress, like a "
-              "hard month at work or worrying about this, hasn't been shown "
-              'to stop you getting pregnant. So if someone tells you to just '
-              "relax, please don't hear it as your fault. It isn't."),
+          // Plain words (2026-10-21). Kept for revert: Very high stress
+          // that goes on for a long time can delay or stop ovulation, and
+          // that's real. Everyday stress, like a hard month at work or
+          // worrying about this, hasn't been shown to stop you getting
+          // pregnant. So if someone tells you to just relax, please don't
+          // hear it as your fault. It isn't.
+          fact: _en("Everyday stress doesn't stop you getting pregnant. Only "
+              "very high stress over a long time can delay or stop ovulation. "
+              "If someone tells you to just relax, it isn't your fault."),
         ),
       ),
 
@@ -548,9 +575,13 @@ final List<PvRead> kTtcReadsConceiving = [
         ],
         mythFact: PvMythFact(
           myth: _en('Drinking lots of water gives you more fertile discharge.'),
-          fact: _en('Being very dehydrated may make everything a little drier. '
-              "But drinking extra water hasn't been shown to improve fertile "
-              "discharge. Drink when you're thirsty, as you usually would."),
+          // Plain words (2026-10-21). Kept for revert: Being very
+          // dehydrated may make everything a little drier. But drinking
+          // extra water hasn't been shown to improve fertile discharge.
+          // Drink when you're thirsty, as you usually would.
+          fact: _en("Not really. Being very dehydrated may make things a "
+              "little drier. But extra water hasn't been shown to give you "
+              "more fertile discharge. Drink when you're thirsty."),
         ),
       ),
 

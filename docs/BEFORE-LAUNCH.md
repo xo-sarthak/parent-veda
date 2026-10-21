@@ -92,6 +92,11 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 
 ---
 
+### Affiliate prices (2026-10-21, STILL-OPEN §96.8)
+- [ ] **LAUNCH** · Run `supabase/migrations/0108_products_affiliate.sql` (asin, price_checked_at, ext_rating, ext_review_count on products) · user · STILL-OPEN §96.8 · added 2026-10-21
+- [ ] **DECIDE** · Which exact Amazon listing each affiliate product points at; type the ASIN, price and date into `lib/data/products/pv_affiliate.dart` (empty on purpose; nothing invented) · user · STILL-OPEN §96.8 · added 2026-10-21
+- [ ] **LAUNCH** · Creators API credentials (Associates Central → Manage Credentials; old PA-API keys do not work, PA-API 5 is retired), then deploy and schedule `affiliate-refresh` · user + dev · BACKEND-PATTERNS §16ii-p · added 2026-10-21
+
 ## 2. Security and privacy
 
 - [ ] **LAUNCH** · The skilling journal's AES key sits in `shared_preferences` beside the data; move it to the platform keystore (`flutter_secure_storage`). Needs the user's OK for the dependency · dev · STILL-OPEN §103.3, §105.3 · added 2026-10-17
@@ -196,6 +201,7 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **LAUNCH** · Directus host: Render's free tier sleeps and its disk is ephemeral; move to the paid tier at go-live · user · CONTENT-BACKEND · added 2026-10-17
 - [ ] **LAUNCH** · Funnel analytics beyond the tab tap · dev · STILL-OPEN §65.9 · added 2026-10-17
 - [ ] **LAUNCH** · Notifications: `syncAll` cancels everything, so each scheduler must join the launch chain (the real fix is owed); notification taps don't open their destination · dev · BACKEND-PATTERNS §16m, STILL-OPEN §79.2, §79.14(b) · added 2026-10-17
+- [ ] **LAUNCH** · Phone walk of the 2026-10-20 batch: Cycle Companion ring and temperature card, the plan's week and reminders (set one, restart the phone, it still rings), the intro pop-up, the article service card · user + dev · STILL-OPEN §96 · added 2026-10-21
 
 ---
 
@@ -204,6 +210,7 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **DECIDE** · Ship with placeholders or hold: the 45 Garbh Shravan tracks, every yoga video, week pages 1–4 and 24–40, FAQ Month 9, the 373 shortlist products' prices and photos · user · DOOR-CONTENT-OWED, STILL-OPEN §84, §86, §88, §89, §91 · added 2026-10-17
 - [ ] **DECIDE** · Recordings and discussion groups are sold on the buy sheet but not built (the copy is kept deliberately) · user · STILL-OPEN §5.2 · added 2026-10-17
 - [ ] **LAUNCH** · The HR web portal is unbuilt, and must not be Directus · dev · ADMIN-PANEL §7a, STILL-OPEN §11.1 · added 2026-10-17
+- [ ] **CHECK** · The user's review of the 90 rewritten myth boxes and the four paragraphs added to `preg_diet_read_food_myths` (claude.ai/artifact/Fj8i53uDYF4Cdtr6ZKoN4x) · user · STILL-OPEN §96.6 · added 2026-10-21
 
 ---
 

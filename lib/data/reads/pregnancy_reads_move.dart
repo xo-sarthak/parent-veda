@@ -109,12 +109,19 @@ final List<PvRead> kPregnancyReadsMove = [
               "Today, doctors see it differently."),
         ],
         mythFact: PvMythFact(
-          myth: _en("Exercise in pregnancy can harm the baby or bring on a "
+          // Plain words (2026-10-21). Kept for revert: Exercise in pregnancy
+          //   can harm the baby or bring on a miscarriage.
+          myth: _en("Exercise in pregnancy can harm the baby or cause a "
               "miscarriage."),
-          fact: _en("In a healthy pregnancy, moderate exercise doesn't cause "
-              "miscarriage, early labour or harm to the baby. Most early "
-              "losses happen because of a problem with the baby's "
-              "chromosomes, not because of anything the mother did."),
+          // Plain words (2026-10-21). Kept for revert: In a healthy
+          //   pregnancy, moderate exercise doesn't cause miscarriage, early
+          //   labour or harm to the baby. Most early losses happen because of
+          //   a problem with the baby's chromosomes, not because of anything
+          //   the mother did.
+          fact: _en("Not in a healthy pregnancy. Moderate exercise doesn't "
+              "cause miscarriage, early labour or harm to the baby. "
+              "Most early losses come from a problem with the baby's "
+              "chromosomes, not from anything you did."),
         ),
       ),
       PvReadSection(
@@ -1986,11 +1993,17 @@ final List<PvRead> kPregnancyReadsMove = [
               "from alone."),
         ],
         mythFact: PvMythFact(
-          myth: _en("Leaking is just what happens when you have babies. You "
-              "have to live with it."),
-          fact: _en("Leaking is common, but you don't have to accept it. "
-              "Pelvic floor exercises help most women, in pregnancy and "
-              "after, and a physiotherapist can help if they don't."),
+          // Plain words (2026-10-21). Kept for revert: Leaking is just what
+          //   happens when you have babies. You have to live with it.
+          myth: _en("Leaking urine after babies is normal. You just live with "
+              "it."),
+          // Plain words (2026-10-21). Kept for revert: Leaking is common, but
+          //   you don't have to accept it. Pelvic floor exercises help most
+          //   women, in pregnancy and after, and a physiotherapist can help
+          //   if they don't.
+          fact: _en("It's common, but you don't have to live with it. Pelvic "
+              "floor exercises help most women. If they don't, a "
+              "physiotherapist can help."),
         ),
       ),
       PvReadSection(
@@ -2357,12 +2370,16 @@ final List<PvRead> kPregnancyReadsMove = [
       PvReadSection(
         heading: _en('Which side is best?'),
         mythFact: PvMythFact(
-          myth: _en("You must sleep on your left side only, or it harms the "
-              "baby."),
-          fact: _en("Either side is safe. The left side is often suggested, "
-              "but studies found no difference between left and right. "
-              "Choose whichever is comfortable, and switch sides in the "
-              "night."),
+          // Plain words (2026-10-21). Kept for revert: You must sleep on your
+          //   left side only, or it harms the baby.
+          myth: _en("You must sleep on your left side, or it harms the baby."),
+          // Plain words (2026-10-21). Kept for revert: Either side is safe.
+          //   The left side is often suggested, but studies found no
+          //   difference between left and right. Choose whichever is
+          //   comfortable, and switch sides in the night.
+          fact: _en("Either side is safe. Studies found no difference between "
+              "left and right. Sleep on whichever side is comfortable, "
+              "and switch during the night."),
         ),
       ),
       PvReadSection(

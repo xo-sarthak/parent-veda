@@ -34,7 +34,7 @@ import 'pp_community_activity_screen.dart';
 import 'pp_community_detail_screen.dart';
 import 'pp_create_post_screen.dart';
 import 'pp_post_detail_screen.dart';
-import 'pp_section_extras.dart';
+// Kept for revert: import 'pp_section_extras.dart'; (only PpAskVedaFab came from it)
 import 'pp_opening_soon.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
@@ -968,7 +968,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
           ),
         ),
         Positioned(right: 20, bottom: 168, child: _composeFab()),
-        const PpAskVedaFab(bottom: 96),
+        // ⚠️ ONE ASK VEDA BUTTON (walk 2026-10-20: "I disabled it in settings
+        // and it was still there"). This was a second, hard-coded button that
+        // never read her Settings switch; the global one (global_ask_fab.dart)
+        // already covers this screen and obeys it. Kept for revert:
+        // const PpAskVedaFab(bottom: 96),
         const Positioned(
             left: 16, right: 16, bottom: 18, child: PpBottomNav(active: PpTab.more)),
       ]),

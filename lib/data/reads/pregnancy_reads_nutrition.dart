@@ -526,104 +526,191 @@ final List<PvRead> kPregnancyReadsNutrition = [
       PvReadSection(
         heading: _en('Will extra ghee make the birth easier?'),
         mythFact: PvMythFact(
-          myth: _en('Eat lots of ghee in the last months and the baby will slip '
-              'out easily.'),
-          fact: _en("Ghee doesn't loosen anything or make labour shorter. A "
-              "spoon or two a day in your cooking is fine. Bowls of it add "
-              "weight without helping the birth."),
+          // Plain words (2026-10-21). Kept for revert: Eat lots of ghee in
+          //   the last months and the baby will slip out easily.
+          myth: _en("Lots of ghee in the last months helps the baby slip out "
+              "easily."),
+          // Plain words (2026-10-21). Kept for revert: Ghee doesn't loosen
+          //   anything or make labour shorter. A spoon or two a day in your
+          //   cooking is fine. Bowls of it add weight without helping the
+          //   birth.
+          fact: _en("It doesn't. Ghee doesn't make labour easier or shorter. "
+              "A spoon or two a day in your cooking is fine. More just "
+              "adds weight."),
         ),
       ),
       PvReadSection(
         heading: _en("Will kesar milk change my baby's skin colour?"),
         mythFact: PvMythFact(
-          myth: _en('Saffron milk every night will make the baby fair.'),
-          fact: _en("Your baby's skin colour comes from your family's genes, "
-              "and no food changes it. A pinch of kesar in warm milk is fine "
-              "and can be a nice way to wind down. Keep it to a pinch, not "
-              "more."),
+          // Plain words (2026-10-21). Kept for revert: Saffron milk every
+          //   night will make the baby fair.
+          myth: _en("Saffron milk every night makes the baby fair."),
+          // Plain words (2026-10-21). Kept for revert: Your baby's skin
+          //   colour comes from your family's genes, and no food changes it.
+          //   A pinch of kesar in warm milk is fine and can be a nice way to
+          //   wind down. Keep it to a pinch, not more.
+          fact: _en("It doesn't. Your baby's skin colour comes from your "
+              "family's genes, and no food changes it. A pinch of kesar "
+              "in warm milk is fine. Keep it to a pinch."),
         ),
       ),
       PvReadSection(
         heading: _en('Do papaya and pineapple cause a miscarriage?'),
+        // Added 2026-10-21: the myth boxes got shorter, so this keeps the
+        // read deep enough (600 words) with a practical next step.
+        paragraphs: [
+          _en("If someone at home is worried, choose other fruit that day. Banana, "
+              "guava, orange and pomegranate are all good everyday choices."),
+        ],
         mythFact: PvMythFact(
-          myth: _en('One bite of papaya or pineapple can end a pregnancy.'),
-          fact: _en("Ripe papaya in small amounts is generally considered fine. "
-              "Raw or unripe papaya is the kind to skip, because it has more "
-              "latex. A few slices of pineapple are fine too. You'd have to "
-              "eat a very large amount for its enzyme to matter."),
+          // Plain words (2026-10-21). Kept for revert: One bite of papaya or
+          //   pineapple can end a pregnancy.
+          myth: _en("One bite of papaya or pineapple can end a pregnancy."),
+          // Plain words (2026-10-21). Kept for revert: Ripe papaya in small
+          //   amounts is generally considered fine. Raw or unripe papaya is
+          //   the kind to skip, because it has more latex. A few slices of
+          //   pineapple are fine too. You'd have to eat a very large amount
+          //   for its enzyme to matter.
+          fact: _en("It won't. Ripe papaya in small amounts is generally "
+              "fine. Skip raw or unripe papaya, which has more latex. A "
+              "few slices of pineapple are fine too."),
         ),
       ),
       PvReadSection(
         heading: _en('Are "hot" foods like eggs and mango harmful?'),
         mythFact: PvMythFact(
-          myth: _en('Eggs, mango and other "garam" foods heat the womb and '
-              'harm the baby.'),
-          fact: _en("There's no evidence that any food heats the womb. "
-              "Well-cooked eggs are one of the best proteins you can eat. "
-              "Mango is a good fruit too, in sensible amounts, especially if "
-              "your blood sugar is being watched."),
+          // Plain words (2026-10-21). Kept for revert: Eggs, mango and other
+          //   "garam" foods heat the womb and harm the baby.
+          myth: _en("Eggs, mango and other \"garam\" foods heat the womb and "
+              "harm the baby."),
+          // Plain words (2026-10-21). Kept for revert: There's no evidence
+          //   that any food heats the womb. Well-cooked eggs are one of the
+          //   best proteins you can eat. Mango is a good fruit too, in
+          //   sensible amounts, especially if your blood sugar is being
+          //   watched.
+          fact: _en("There's no proof that any food heats the womb. Well- "
+              "cooked eggs are one of the best proteins you can eat. "
+              "Mango is fine in sensible amounts, especially if your "
+              "sugar is being watched."),
         ),
       ),
       PvReadSection(
         heading: _en('Will tea make my baby dark?'),
+        // Added 2026-10-21: the myth boxes got shorter, so this keeps the
+        // read deep enough (600 words) with a practical next step.
+        paragraphs: [
+          _en("Coffee usually has more caffeine than chai. Cola, green tea and "
+              "chocolate have some too, so count them in the same day."),
+        ],
         mythFact: PvMythFact(
-          myth: _en('Drinking tea or coffee in pregnancy makes the baby dark.'),
-          fact: _en("Tea has nothing to do with skin colour. What matters is the "
-              "caffeine: keep it under about 200 mg a day, which is roughly two "
+          // Plain words (2026-10-21). Kept for revert: Drinking tea or coffee
+          //   in pregnancy makes the baby dark.
+          myth: _en("Tea or coffee in pregnancy makes the baby dark."),
+          // Plain words (2026-10-21). Kept for revert: Tea has nothing to do
+          //   with skin colour. What matters is the caffeine: keep it under
+          //   about 200 mg a day, which is roughly two to three cups of
+          //   normal chai.
+          fact: _en("It doesn't. Tea has nothing to do with skin colour. Just "
+              "keep caffeine low: under about 200 mg a day, roughly two "
               "to three cups of normal chai."),
         ),
       ),
       PvReadSection(
         heading: _en('Should I eat for two now?'),
+        // Added 2026-10-21: the myth boxes got shorter, so this keeps the
+        // read deep enough (600 words) with a practical next step.
+        paragraphs: [
+          _en("One small extra meal can be as simple as a bowl of dal with a roti, "
+              "or curd with fruit and a handful of nuts."),
+        ],
         mythFact: PvMythFact(
+          // Plain words (2026-10-21). Kept for revert: You're eating for two,
+          //   so eat double.
           myth: _en("You're eating for two, so eat double."),
-          fact: _en("You need no extra food in the first three months, and "
-              "about one small extra meal a day after that. What's on the "
-              "plate matters more than how much."),
+          // Plain words (2026-10-21). Kept for revert: You need no extra food
+          //   in the first three months, and about one small extra meal a day
+          //   after that. What's on the plate matters more than how much.
+          fact: _en("You don't need double. You need no extra food in the "
+              "first three months, and about one small extra meal a day "
+              "after that. What you eat matters more than how much."),
         ),
       ),
       PvReadSection(
         heading: _en('Will curd or banana give my baby a cold?'),
         mythFact: PvMythFact(
-          myth: _en('Curd, banana and other "thanda" foods will give the baby '
-              'a cold or a cough.'),
-          fact: _en("Your baby can't catch a cold from what you eat. Colds come "
-              "from viruses. Curd and banana are both good foods in "
-              "pregnancy. If curd at night bothers your own throat or "
-              "stomach, have it at lunch instead."),
+          // Plain words (2026-10-21). Kept for revert: Curd, banana and other
+          //   "thanda" foods will give the baby a cold or a cough.
+          myth: _en("Curd, banana and other \"thanda\" foods give the baby a "
+              "cold."),
+          // Plain words (2026-10-21). Kept for revert: Your baby can't catch
+          //   a cold from what you eat. Colds come from viruses. Curd and
+          //   banana are both good foods in pregnancy. If curd at night
+          //   bothers your own throat or stomach, have it at lunch instead.
+          fact: _en("They can't. Colds come from viruses, not food. Curd and "
+              "banana are both good in pregnancy. If curd at night "
+              "bothers your throat or stomach, have it at lunch."),
         ),
       ),
       PvReadSection(
         heading: _en('Should I drink less water so my feet swell less?'),
+        // Added 2026-10-21: the myth boxes got shorter, so this keeps the
+        // read deep enough (600 words) with a practical next step.
+        paragraphs: [
+          _en("A simple check: if your urine is pale yellow, you're probably "
+              "drinking enough. Dark yellow means drink a little more."),
+        ],
         mythFact: PvMythFact(
-          myth: _en('Drink less water in the last months, or your feet will '
-              'swell.'),
-          fact: _en("Swelling in the feet comes from the weight of your womb and "
-              "the extra fluid pregnancy brings, not from the water you drink. "
-              "Cutting water makes constipation and tiredness worse. Keep "
-              "drinking, and put your feet up when you can. Sudden swelling of "
-              "your face or hands is different: call your doctor today."),
+          // Plain words (2026-10-21). Kept for revert: Drink less water in
+          //   the last months, or your feet will swell.
+          myth: _en("Drink less water in the last months, or your feet will "
+              "swell."),
+          // Plain words (2026-10-21). Kept for revert: Swelling in the feet
+          //   comes from the weight of your womb and the extra fluid
+          //   pregnancy brings, not from the water you drink. Cutting water
+          //   makes constipation and tiredness worse. Keep drinking, and put
+          //   your feet up when you can. Sudden swelling of your face or
+          //   hands is different: call your doctor today.
+          fact: _en("Drinking less won't stop swelling. Swollen feet come "
+              "from the weight of your womb and the extra fluid of "
+              "pregnancy. Less water makes constipation and tiredness "
+              "worse, so keep drinking and put your feet up. Sudden "
+              "swelling of your face or hands is different: call your "
+              "doctor today."),
         ),
       ),
       PvReadSection(
         heading: _en("Will coconut water make my baby's skin clear?"),
         mythFact: PvMythFact(
-          myth: _en('Drink coconut water every day and the baby will be born '
-              'clean and clear.'),
-          fact: _en("Nothing you drink changes your baby's skin. Coconut water "
-              "is still a good drink: it keeps you hydrated and is gentle on "
-              "a queasy stomach. Fresh from a tender coconut is best."),
+          // Plain words (2026-10-21). Kept for revert: Drink coconut water
+          //   every day and the baby will be born clean and clear.
+          myth: _en("Coconut water every day makes the baby's skin clean and "
+              "clear."),
+          // Plain words (2026-10-21). Kept for revert: Nothing you drink
+          //   changes your baby's skin. Coconut water is still a good drink:
+          //   it keeps you hydrated and is gentle on a queasy stomach. Fresh
+          //   from a tender coconut is best.
+          fact: _en("Nothing you drink changes your baby's skin. Coconut "
+              "water is still a good drink. It keeps you hydrated and "
+              "is gentle on a queasy stomach."),
         ),
       ),
       PvReadSection(
         heading: _en('Is a bigger baby a healthier baby?'),
         mythFact: PvMythFact(
-          myth: _en('Eat more, so the baby is born big and strong.'),
+          // Plain words (2026-10-21). Kept for revert: Eat more, so the baby
+          //   is born big and strong.
+          myth: _en("Eat more so the baby is born big and strong."),
+          // Plain words (2026-10-21). Kept for revert: Bigger isn't always
+          //   better. Your baby's size depends on your genes, the placenta
+          //   and your health, not only on how much you eat. A very large
+          //   baby can make the birth harder. Steady, varied meals help your
+          //   baby grow at the pace that's right for them, and your scans
+          //   show how that's going.
           fact: _en("Bigger isn't always better. Your baby's size depends on "
-              "your genes, the placenta and your health, not only on how much "
-              "you eat. A very large baby can make the birth harder. Steady, "
-              "varied meals help your baby grow at the pace that's right for "
-              "them, and your scans show how that's going."),
+              "genes, the placenta and your health, not just how much "
+              "you eat. A very large baby can make the birth harder. "
+              "Steady, varied meals help, and your scans show how your "
+              "baby is growing."),
         ),
       ),
       PvReadSection(

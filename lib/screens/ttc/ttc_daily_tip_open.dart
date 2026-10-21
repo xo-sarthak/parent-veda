@@ -59,6 +59,9 @@ const String kTtcMythSaySlide = 'What people say';
 const String kTtcMythTrueSlide = "What's true";
 const String kTtcMythMoreSlide = 'Worth knowing';
 
+/// The second slide of a myth that has its own why (2026-10-21).
+const String kTtcMythWhySlide = 'Why';
+
 /// The kickers over a tip read: the rail card's own eyebrow, in words.
 const String kTtcNutritionKicker = "Today's nutrition";
 const String kTtcMovementKicker = "Today's movement";
@@ -169,8 +172,18 @@ List<TtcCarouselCard> ttcMythSlides(TtcMyth myth, bool hi) {
 /// shape: the cover carries the myth and the first sentence of the truth,
 /// and the rest of the truth, when there is more, follows as "Worth
 /// knowing", so every word is still on a slide and none is said twice.
+///
+/// ⚠️ A FACT AND A WHY, NOT A SPLIT SENTENCE (2026-10-21). The split left
+/// slide 2 opening "More than that doesn't add anything", pointing back at a
+/// slide she had already left. A myth with its own `whyEn` now shows the
+/// whole fact on the cover and the why, titled "Why", on slide 2. Hindi has
+/// no why yet, so it keeps the split. Kept for revert: the split for every
+/// language.
 void openTtcMythStory(BuildContext context, TtcMyth myth, bool hi) {
-  final (fact, more) = ttcSplitFirstSentence(myth.truth(hi));
+  final why = hi ? null : myth.whyEn;
+  final (fact, more) = why != null
+      ? (myth.truth(hi), why)
+      : ttcSplitFirstSentence(myth.truth(hi));
   Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: 'ttc/story'),
     builder: (_) => TtcStoryScreen(
@@ -178,7 +191,9 @@ void openTtcMythStory(BuildContext context, TtcMyth myth, bool hi) {
       // Kept for revert (2026-09-28): cards: ttcMythSlides(myth, hi),
       cards: [
         if (more.isNotEmpty)
-          TtcCarouselCard(title: kTtcMythMoreSlide, body: more),
+          TtcCarouselCard(
+              title: why != null ? kTtcMythWhySlide : kTtcMythMoreSlide,
+              body: more),
       ],
       hue: 42,
       reviewedBy: 'ParentVeda team',

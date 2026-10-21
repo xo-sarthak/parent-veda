@@ -260,6 +260,10 @@ class PvProduct {
     this.reviewOnly = false,
     this.rating = 0,
     this.reviewCount = 0,
+    this.asin,
+    this.priceCheckedAt,
+    this.extRating = 0,
+    this.extReviewCount = 0,
     this.reco,
     this.evidence,
     this.goods = const [],
@@ -323,6 +327,20 @@ class PvProduct {
 
   final double rating;
   final int reviewCount;
+
+  /// ⚠️ THE RETAILER'S OWN NUMBERS, NEVER OURS (walk 2026-10-20: "real
+  /// prices and real reviews ... plug and play"). [asin] names the exact
+  /// Amazon listing; with it the buy link is that listing, not a search page.
+  /// [priceCheckedAt] is when [price] was last read from the retailer — by
+  /// hand now (pv_affiliate.dart), by the `affiliate-refresh` function once
+  /// the Creators API is live. Null = our guide price, and the page says so.
+  /// [extRating]/[extReviewCount] are the retailer's star rating, shown
+  /// as theirs ("on Amazon") and never mixed into [rating], which is
+  /// parents on ParentVeda. Review TEXT is never copied, only linked.
+  final String? asin;
+  final DateTime? priceCheckedAt;
+  final double extRating;
+  final int extReviewCount;
 
   final PvRecommend? reco;
   final PvEvidence? evidence;

@@ -201,7 +201,7 @@ class _PpMoreScreenState extends State<PpMoreScreen> {
               _section('read_watch', 'Read and watch', [
                 _row('pp_more_reads', IntentMark.pageMark, 212, 'All reads', 'Every read, by topic and by age',
                     () => _push('pp/read', () => const ReadingHomeScreen()), art: ttcArtTab(TtcTabMark.openBook)),
-                _row('pp_more_films', IntentMark.listMark, 345, 'All films', 'Short films for each phase',
+                _row('pp_more_films', IntentMark.listMark, 345, 'All videos', 'Short videos for each phase' /* walk 2026-10-20; kept for revert: 'All films', 'Short films for each phase' */,
                     () => _push('pp/watch', () => const WatchHomeScreen()), art: ttcArtMore(TtcMoreMark.film)),
               ], lead: 'Every read and every film, in one list each'),
               _section('journey', 'Your child\'s journey', [

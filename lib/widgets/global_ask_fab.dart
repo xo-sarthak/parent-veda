@@ -93,9 +93,15 @@ const double kAskFabReserveNormal = kAskFabBottomOffset + kAskFabSize + 12;
 /// Shared, tiny reactive state the observer writes and the FAB reads.
 class FabState extends ChangeNotifier {
   FabState._() {
-    _loadHidden();
+    _loading; // starts the read
   }
   static final FabState instance = FabState._();
+
+  /// Reads her switch before the first frame (main.dart awaits it), so a
+  /// hidden button never flashes on a cold start.
+  static Future<void> preload() => instance._loading;
+  late final Future<void> _loading = _loadHidden();
+  bool _setByHerThisRun = false;
 
   /// ⚠️ HER CHOICE TO HIDE IT (2026-10-02, the user: "add a button in settings
   /// to hide it, for the whole app"). One switch, under Settings > Preferences on
@@ -109,6 +115,10 @@ class FabState extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final v = prefs.getBool(kHiddenKey) ?? false;
+      // ⚠️ A LATE READ NEVER UNDOES HER TAP (2026-10-20). If she flipped the
+      // switch while this read was in flight, her tap is newer than the
+      // stored value; overwriting it made the switch look broken.
+      if (_setByHerThisRun) return;
       if (v != _hiddenByHer) {
         _hiddenByHer = v;
         notifyListeners();
@@ -117,6 +127,7 @@ class FabState extends ChangeNotifier {
   }
 
   Future<void> setHiddenByHer(bool hidden) async {
+    _setByHerThisRun = true;
     if (hidden == _hiddenByHer) return;
     _hiddenByHer = hidden;
     notifyListeners();

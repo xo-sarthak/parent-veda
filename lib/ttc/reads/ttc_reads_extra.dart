@@ -346,9 +346,13 @@ final List<PvRead> kTtcReadsExtra = [
         mythFact: PvMythFact(
           myth: _en("A man can father a child at any age, so his age doesn't "
               'matter.'),
-          fact: _en('Men can father children late in life, and many do. But '
-              'sperm quality still changes with age. That is one reason his '
-              'half is worth checking early rather than last.'),
+          // Plain words (2026-10-21). Kept for revert: Men can father
+          // children late in life, and many do. But sperm quality still
+          // changes with age. That is one reason his half is worth checking
+          // early rather than last.
+          fact: _en("His age still matters. Many men father children late in "
+              "life, but sperm quality changes with age. That's one reason to "
+              "check his side early, not last."),
         ),
       ),
       PvReadSection(
@@ -656,10 +660,14 @@ final List<PvRead> kTtcReadsExtra = [
         ],
         mythFact: PvMythFact(
           myth: _en('A positive ovulation test means I ovulated.'),
-          fact: _en('It means LH rose. Most of the time ovulation follows '
-              'within a day or two, but not always, and less reliably when '
-              'cycles are irregular. Only a blood test or a scan can confirm '
-              'it.'),
+          // Plain words (2026-10-21). Kept for revert: It means LH rose.
+          // Most of the time ovulation follows within a day or two, but not
+          // always, and less reliably when cycles are irregular. Only a
+          // blood test or a scan can confirm it.
+          fact: _en('Not quite. It means LH (the hormone that sets off '
+              'ovulation) went up. Ovulation usually follows within a day or '
+              'two, but not always, and less reliably with irregular cycles. '
+              'Only a blood test or a scan can confirm it.'),
         ),
       ),
       PvReadSection(

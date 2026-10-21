@@ -119,11 +119,18 @@ final List<PvRead> kPregnancyReadsTwins = [
               "one before."),
         ],
         mythFact: PvMythFact(
-          myth: _en("Strong morning sickness, a big bump or a very high "
-              "pregnancy hormone level means it's twins."),
-          fact: _en("These can be a little more common with twins, but many "
-              "women carrying one baby have all three. No symptom and no "
-              "blood test can tell you it's twins. Only a scan can."),
+          // Plain words (2026-10-21). Kept for revert: Strong morning
+          //   sickness, a big bump or a very high pregnancy hormone level
+          //   means it's twins.
+          myth: _en("Bad morning sickness, a big bump or a high hormone level "
+              "means twins."),
+          // Plain words (2026-10-21). Kept for revert: These can be a little
+          //   more common with twins, but many women carrying one baby have
+          //   all three. No symptom and no blood test can tell you it's
+          //   twins. Only a scan can.
+          fact: _en("Not on its own. These are a bit more common with twins, "
+              "but many women carrying one baby have all three. Only a "
+              "scan can tell you it's twins."),
         ),
       ),
       PvReadSection(
@@ -474,11 +481,18 @@ final List<PvRead> kPregnancyReadsTwins = [
               "countries."),
         ],
         mythFact: PvMythFact(
-          myth: _en('Twins skip a generation.'),
-          fact: _en("There's no good evidence for this. It can look that way "
-              "because the tendency passes through women. A man with twins in "
-              "his family doesn't have twins himself more often, but his "
-              "daughter may. The pattern skips a man, not a generation."),
+          // Plain words (2026-10-21). Kept for revert: Twins skip a
+          //   generation.
+          myth: _en("Twins skip a generation."),
+          // Plain words (2026-10-21). Kept for revert: There's no good
+          //   evidence for this. It can look that way because the tendency
+          //   passes through women. A man with twins in his family doesn't
+          //   have twins himself more often, but his daughter may. The
+          //   pattern skips a man, not a generation.
+          fact: _en("There's no good evidence for this. The tendency to have "
+              "twins passes through women. A man with twins in his "
+              "family isn't more likely to have twins, but his daughter "
+              "may be. It skips a man, not a generation."),
         ),
       ),
       PvReadSection(

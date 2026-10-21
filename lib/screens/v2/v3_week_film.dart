@@ -203,8 +203,8 @@ class _V3WeekFilmState extends State<V3WeekFilm> {
       video: widget.video,
       p: p,
       label: canPlay
-          ? 'WEEK ${widget.week} FILM'
-          : 'WEEK ${widget.week} FILM · ARRIVING',
+          ? 'WEEK ${widget.week} VIDEO' // kept for revert: FILM, both lines
+          : 'WEEK ${widget.week} VIDEO · ARRIVING',
       playable: canPlay,
       onTap: canPlay ? () => setState(() => _playing = true) : widget.onUnavailable,
     );

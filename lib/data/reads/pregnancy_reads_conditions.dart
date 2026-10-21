@@ -537,13 +537,18 @@ final List<PvRead> kPregnancyReadsConditions = [
               "labour."),
         ],
         mythFact: PvMythFact(
-          myth: _en('Babies move less in the last weeks because there is no '
-              'space left.'),
-          fact: _en("They don't. The kind of movement changes: more stretching "
-              "and rolling, fewer sharp kicks, because a bigger baby moves "
-              "differently. But how often you feel something shouldn't fall "
-              "away. A real drop near your due date is a reason to be seen, "
-              "not a stage to expect."),
+          // Plain words (2026-10-21). Kept for revert: Babies move less in
+          //   the last weeks because there is no space left.
+          myth: _en("Babies move less near the end because there's no room."),
+          // Plain words (2026-10-21). Kept for revert: They don't. The kind
+          //   of movement changes: more stretching and rolling, fewer sharp
+          //   kicks, because a bigger baby moves differently. But how often
+          //   you feel something shouldn't fall away. A real drop near your
+          //   due date is a reason to be seen, not a stage to expect.
+          fact: _en("They don't. Kicks may feel more like rolls and "
+              "stretches, but they shouldn't come less often. If "
+              "movements slow down or change, call your doctor or "
+              "hospital the same day."),
         ),
       ),
 

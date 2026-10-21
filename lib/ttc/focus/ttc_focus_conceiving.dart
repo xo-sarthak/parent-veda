@@ -302,10 +302,15 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           title: 'Sex every day, or every other day?',
           id: 'ttc_tile_every_day_or_not',
           blurb: 'Does more often mean more likely?',
-          myth: 'The more you have sex, the better the chance.',
-          fact: 'Only up to a point. Every two days in the fertile week gives '
-              "you the same result as every day. Beyond that, more doesn't "
-              'add anything except pressure.',
+          // Plain words (2026-10-21). Kept for revert: The more you have
+          // sex, the better the chance.
+          myth: 'The more often you have sex, the better.',
+          // Plain words (2026-10-21). Kept for revert: Only up to a point.
+          // Every two days in the fertile week gives you the same result as
+          // every day. Beyond that, more doesn't add anything except
+          // pressure.
+          fact: 'Only up to a point. Sex every two days in the fertile week '
+              'works as well as every day. More than that adds only pressure.',
         ),
       ],
     ),
@@ -326,10 +331,16 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           title: 'Do sex positions matter?',
           id: 'ttc_tile_do_positions_matter',
           blurb: 'The short answer is no.',
-          myth: 'Some positions make a baby more likely.',
-          fact: 'No position has been shown to work better than another. '
-              'Sperm reach the cervix within minutes, whatever position you '
-              "used. Pick what's comfortable.",
+          // Plain words (2026-10-21). Kept for revert: Some positions make
+          // a baby more likely.
+          myth: 'Some sex positions make a baby more likely.',
+          // Plain words (2026-10-21). Kept for revert: No position has been
+          // shown to work better than another. Sperm reach the cervix
+          // within minutes, whatever position you used. Pick what's
+          // comfortable.
+          fact: "They don't. No position has been shown to work better than "
+              "another. Sperm reach the cervix within minutes either way, so "
+              "pick what's comfortable.",
         ),
         TtcMythTile(
           // Kept for revert (2026-09-28, explicit names): title: 'Should you lie down after?',
@@ -338,10 +349,16 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           // Kept for revert (2026-09-28, explicit names):
           // blurb: "You don't have to. Here's why.",
           blurb: "You don't have to. Getting up washes nothing away.",
-          myth: 'You must lie down with your legs up afterwards.',
-          fact: 'Sperm are already past the cervix within minutes. Lying down '
-              'does no harm if you like it. But getting up straight away '
-              "doesn't wash anything away or undo anything.",
+          // Plain words (2026-10-21). Kept for revert: You must lie down
+          // with your legs up afterwards.
+          myth: 'You must lie down with your legs up after sex.',
+          // Plain words (2026-10-21). Kept for revert: Sperm are already
+          // past the cervix within minutes. Lying down does no harm if you
+          // like it. But getting up straight away doesn't wash anything
+          // away or undo anything.
+          fact: "You don't need to. Sperm are past the cervix within minutes. "
+              "Lying down is fine if you like it, but getting up washes "
+              "nothing away.",
         ),
         TtcMythTile(
           // Kept for revert (2026-09-28, explicit names): title: 'Do you need to orgasm?',
@@ -351,10 +368,14 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           // blurb: "No. It isn't needed to get pregnant.",
           blurb: "No. Nothing has gone wrong if you don't have one.",
           myth: 'You have to orgasm for it to work.',
-          fact: "Getting pregnant doesn't depend on your orgasm. There's a "
-              'theory that it may help sperm move, but it has never been shown '
-              'to change whether someone gets pregnant. Nothing has gone wrong '
-              "if it doesn't happen.",
+          // Plain words (2026-10-21). Kept for revert: Getting pregnant
+          // doesn't depend on your orgasm. There's a theory that it may
+          // help sperm move, but it has never been shown to change whether
+          // someone gets pregnant. Nothing has gone wrong if it doesn't
+          // happen.
+          fact: "You don't. Getting pregnant doesn't depend on your orgasm. "
+              "It has never been shown to change whether someone gets "
+              "pregnant. Nothing has gone wrong if you don't have one.",
         ),
         // The written film on exactly these myths (2026-09-27, relevance
         // audit). It was on no door, only at the head of the timing read.

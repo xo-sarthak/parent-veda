@@ -436,3 +436,11 @@ for every question anyone had already asked.
 **A hold is enforced in data, not in a label.** 39 FAQs say "Clinical review: Yes". They are generated with
 `held: true` and filtered at every exit (export, reader, suggestions, related links) by one getter, `isLive`;
 `kPregFaqSignedOff` turns one on per line. A test walks all four exits.
+
+### Myth text changed, re-ingest owed (2026-10-21)
+
+90 myth-vs-fact boxes and 16 TTC daily myths were rewritten in plain words
+(STILL-OPEN §96.6), and four paragraphs were added to
+`preg_diet_read_food_myths`. Ask Veda answers from the ingested corpus, so
+until the next incremental ingest runs from `C:\Projects\parentveda-askveda`
+it can still quote the old wording. Nothing in the wire body changed.

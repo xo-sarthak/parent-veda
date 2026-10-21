@@ -51,10 +51,12 @@ import 'ttc_ready_plan_regions.dart';
 enum ReadyDiet { veg, eggs, nonVeg, jain }
 
 extension ReadyDietCopy on ReadyDiet {
+  // Plain words (walk 2026-10-20). Kept for revert: 'Veg with eggs',
+  // 'Non-veg'.
   String get label => switch (this) {
     ReadyDiet.veg => 'Vegetarian',
-    ReadyDiet.eggs => 'Veg with eggs',
-    ReadyDiet.nonVeg => 'Non-veg',
+    ReadyDiet.eggs => 'Vegetarian + eggs',
+    ReadyDiet.nonVeg => 'Non-vegetarian',
     ReadyDiet.jain => 'Jain',
   };
 
@@ -114,7 +116,81 @@ extension HisHabitCopy on HisHabit {
   String get label => switch (this) {
     HisHabit.tobacco => 'Tobacco, in any form',
     HisHabit.alcohol => 'Drinks most weeks',
-    HisHabit.medicines => 'Takes regular medicines',
+    // ⚠️ A MEDICINE THAT MATTERS, NAMED (walk 2026-10-20: "anyone can take
+    // any medicine ... if he takes paracetamol, how are we helping?"). The
+    // examples are the kinds known to affect sperm; picking it now puts his
+    // medicine list on the check-up and offers the male fertility consult.
+    // Kept for revert: 'Takes regular medicines'.
+    HisHabit.medicines =>
+      'A daily medicine (e.g. for BP, sugar, hair loss, testosterone, steroids)',
+  };
+}
+
+// ---- her everyday, so the plan fits a real day (2026-10-21) -----------------
+//
+// ⚠️ EVERY ANSWER FEEDS SOMETHING. Each of these sets a habit, its time or a
+// "help with this" card in `buildReadyPlan`; a question that fed nothing
+// would be cut. The names are persisted, like the enums above.
+
+/// Time she can give to movement on most days.
+enum ReadyMove { five, fifteen, thirty, notNow }
+
+extension ReadyMoveCopy on ReadyMove {
+  String get label => switch (this) {
+    ReadyMove.five => '5 min',
+    ReadyMove.fifteen => '15 min',
+    ReadyMove.thirty => '30 min',
+    ReadyMove.notNow => 'Not right now',
+  };
+}
+
+/// When suits her. Sets every reminder's time; she can change each one.
+enum ReadyWhen { morning, evening, lateNight }
+
+extension ReadyWhenCopy on ReadyWhen {
+  String get label => switch (this) {
+    ReadyWhen.morning => 'Morning',
+    ReadyWhen.evening => 'Evening',
+    ReadyWhen.lateNight => 'Late night',
+  };
+
+  /// Minutes after midnight for her own time of day.
+  int get minutes => switch (this) {
+    ReadyWhen.morning => 7 * 60,
+    ReadyWhen.evening => 19 * 60 + 30,
+    ReadyWhen.lateNight => 22 * 60,
+  };
+}
+
+/// How trying has felt lately.
+enum ReadyMood { calm, someStress, aLot }
+
+extension ReadyMoodCopy on ReadyMood {
+  String get label => switch (this) {
+    ReadyMood.calm => 'Calm',
+    ReadyMood.someStress => 'Some stress',
+    ReadyMood.aLot => 'A lot',
+  };
+}
+
+/// Preconception garbh sanskar, a few minutes a week.
+enum ReadyGarbh { yes, later }
+
+extension ReadyGarbhCopy on ReadyGarbh {
+  String get label => switch (this) {
+    ReadyGarbh.yes => 'Yes',
+    ReadyGarbh.later => 'Maybe later',
+  };
+}
+
+/// A check-up in the last year.
+enum ReadyCheckup { yes, no, notSure }
+
+extension ReadyCheckupCopy on ReadyCheckup {
+  String get label => switch (this) {
+    ReadyCheckup.yes => 'Yes',
+    ReadyCheckup.no => 'No',
+    ReadyCheckup.notSure => 'Not sure',
   };
 }
 
@@ -145,6 +221,12 @@ class ReadyPlanAnswers {
 
   ReadyFolic? folic;
 
+  ReadyMove? move;
+  ReadyWhen? when;
+  ReadyMood? mood;
+  ReadyGarbh? garbh;
+  ReadyCheckup? checkup;
+
   // ---- his part, optional and never waited for ----------------------------
   HisAge? hisAge;
   final Set<HisHabit> hisHabits = {};
@@ -168,6 +250,11 @@ class ReadyPlanAnswers {
     'conditionsAnswered': conditionsAnswered,
     'conditionsUnsure': conditionsUnsure,
     'folic': folic?.name,
+    'move': move?.name,
+    'when': when?.name,
+    'mood': mood?.name,
+    'garbh': garbh?.name,
+    'checkup': checkup?.name,
     'hisAge': hisAge?.name,
     'hisHabits': [for (final h in hisHabits) h.name],
     'hisHabitsAnswered': hisHabitsAnswered,
@@ -193,6 +280,11 @@ class ReadyPlanAnswers {
       ..conditionsAnswered = j['conditionsAnswered'] == true
       ..conditionsUnsure = j['conditionsUnsure'] == true
       ..folic = byName(ReadyFolic.values, j['folic'])
+      ..move = byName(ReadyMove.values, j['move'])
+      ..when = byName(ReadyWhen.values, j['when'])
+      ..mood = byName(ReadyMood.values, j['mood'])
+      ..garbh = byName(ReadyGarbh.values, j['garbh'])
+      ..checkup = byName(ReadyCheckup.values, j['checkup'])
       ..hisAge = byName(HisAge.values, j['hisAge'])
       ..hisHabitsAnswered = j['hisHabitsAnswered'] == true;
     for (final n in (j['conditions'] as List?) ?? const []) {
@@ -276,6 +368,49 @@ class ReadyTest {
   final String? readId;
 }
 
+/// One small daily (or weekly) thing in "Your week" (2026-10-21).
+///
+/// ⚠️ A SMALLER VERSION, ALWAYS. The user: "if she can't do it, at least
+/// recommend a bare minimum". [minimum] is what still counts on a busy day;
+/// "Make it smaller" swaps it in. No streaks: missing a day is silent.
+class ReadyHabit {
+  const ReadyHabit({
+    required this.id,
+    required this.title,
+    required this.minimum,
+    required this.minutes,
+    this.weekday,
+    this.surfaceId,
+  });
+
+  /// Stable: the store keeps her time and choices under it.
+  final String id;
+  final String title;
+  final String minimum;
+
+  /// Suggested time, minutes after midnight. She can change it.
+  final int minutes;
+
+  /// Null for every day; 1-7 (Mon-Sun) for once a week.
+  final int? weekday;
+
+  /// Where tapping the habit goes.
+  final String? surfaceId;
+}
+
+/// A calm "help with this" card: one of our own offerings, chosen by her
+/// answers. Rules live here, in code (CLAUDE.md: behaviour rules are not
+/// content), and there are never more than two.
+class ReadyPitch {
+  const ReadyPitch({required this.offeringId, required this.why});
+
+  /// A `ttcOfferings` id. The test pins that every one exists.
+  final String offeringId;
+
+  /// One line on why it fits her.
+  final String why;
+}
+
 class ReadyPlan {
   const ReadyPlan({
     required this.target,
@@ -289,6 +424,8 @@ class ReadyPlan {
     required this.hisLines,
     required this.hisPersonal,
     required this.notes,
+    this.habits = const [],
+    this.pitches = const [],
   });
 
   final DateTime target;
@@ -317,6 +454,12 @@ class ReadyPlan {
   /// Short lines that come from her answers and change nothing structural
   /// (her age, a condition).
   final List<String> notes;
+
+  /// "Your week": the small things, each with a time.
+  final List<ReadyHabit> habits;
+
+  /// At most two of our offerings that fit her answers.
+  final List<ReadyPitch> pitches;
 
   /// Her month has come (or gone).
   bool get arrived => monthsAway <= 0;
@@ -684,7 +827,103 @@ ReadyPlan? buildReadyPlan(ReadyPlanAnswers a, {required DateTime now}) {
     hisLines: _hisLines(a),
     hisPersonal: a.hisGiven,
     notes: _notes(a),
+    habits: readyHabitsFor(a),
+    pitches: readyPitchesFor(a),
   );
+}
+
+/// "Your week" for these answers. Pure, so the test reads it directly.
+List<ReadyHabit> readyHabitsFor(ReadyPlanAnswers a) {
+  final at = a.when?.minutes;
+  // Movement is suggested at her time; the morning is the usual best.
+  final moveAt = at ?? 7 * 60;
+  final veg = a.diet != ReadyDiet.nonVeg;
+  return [
+    ReadyHabit(
+      id: 'folic',
+      title: 'Folic acid',
+      minimum: 'Every day. Just the tablet.',
+      minutes: 9 * 60,
+      surfaceId: 'ttc_medication',
+    ),
+    switch (a.move) {
+      ReadyMove.thirty || ReadyMove.fifteen => ReadyHabit(
+          id: 'move',
+          title:
+              'Move for ${a.move == ReadyMove.thirty ? 30 : 15} minutes',
+          minimum: 'Busy day? 5 minutes of stretching still counts.',
+          minutes: moveAt,
+          surfaceId: 'ttc_practice/mb_walk',
+        ),
+      ReadyMove.five => ReadyHabit(
+          id: 'move',
+          title: '5 minutes of stretching',
+          minimum: 'Even 2 minutes counts.',
+          minutes: moveAt,
+          surfaceId: 'ttc_practice/mb_loosen',
+        ),
+      // No time now: the bare minimum, never nothing.
+      _ => ReadyHabit(
+          id: 'move',
+          title: '2 minutes of stretching',
+          minimum: 'A few stretches when you wake up.',
+          minutes: 7 * 60,
+          surfaceId: 'ttc_practice/mb_loosen',
+        ),
+    },
+    ReadyHabit(
+      id: 'iron',
+      title: 'Something iron-rich at lunch',
+      minimum: veg
+          ? 'One bowl of dal, chana or greens is enough.'
+          : 'Eggs, fish or a bowl of dal is enough.',
+      minutes: 13 * 60,
+      surfaceId: 'ttc_nutrition',
+    ),
+    if (a.mood == ReadyMood.someStress || a.mood == ReadyMood.aLot)
+      ReadyHabit(
+        id: 'calm',
+        title: '5 calm minutes',
+        minimum: 'Or 3 slow breaths before sleep.',
+        minutes: a.when == ReadyWhen.morning ? 21 * 60 + 30 : (at ?? 22 * 60),
+        surfaceId: 'ttc_mind_today',
+      ),
+    if (a.garbh == ReadyGarbh.yes)
+      const ReadyHabit(
+        id: 'garbh',
+        title: 'Garbh sanskar, 10 minutes',
+        minimum: 'Or one track while you rest.',
+        minutes: 8 * 60,
+        weekday: DateTime.sunday,
+        surfaceId: 'ttc_garbh_course',
+      ),
+  ];
+}
+
+/// The "help with this" cards: at most two, most useful first.
+List<ReadyPitch> readyPitchesFor(ReadyPlanAnswers a) {
+  final out = <ReadyPitch>[
+    if (a.checkup == ReadyCheckup.no || a.checkup == ReadyCheckup.notSure)
+      const ReadyPitch(
+          offeringId: 'ttc_consult_gynae',
+          why: 'A check-up before trying, by video call.'),
+    if (a.mood == ReadyMood.aLot)
+      const ReadyPitch(
+          offeringId: 'ttc_psych_consult',
+          why: 'Someone to talk to, who understands trying.'),
+    if (a.conditions.contains(ReadyCondition.pcos))
+      const ReadyPitch(
+          offeringId: 'ttc_course_pcos',
+          why: 'A short course on trying with PCOS.'),
+    if (a.hisHabits.contains(HisHabit.medicines))
+      const ReadyPitch(
+          offeringId: 'ttc_consult_androl',
+          why: 'For him: what his medicines mean for trying.'),
+    const ReadyPitch(
+        offeringId: 'ttc_course_basics',
+        why: 'The basics of trying, in short lessons.'),
+  ];
+  return out.take(2).toList();
 }
 
 String _folicLine(ReadyPlanAnswers a, int away) {
@@ -726,9 +965,9 @@ List<String> _hisLines(ReadyPlanAnswers a) {
       'Heavy drinking affects sperm. Cutting right back now shows up about '
           'three months later.',
     if (h.contains(HisHabit.medicines))
-      'Some everyday medicines affect sperm production. Worth him mentioning '
-          "what he takes at a check-up. It's not a reason to stop anything on "
-          'his own.',
+      'Some daily medicines affect sperm, like those for hair loss, '
+          'testosterone or steroids. Take a list of what he takes to the '
+          "check-up. It's not a reason to stop anything on his own.",
     if (a.hisAge == HisAge.fortyOrOver)
       'His age is worth mentioning at a check-up too. It is one of the '
           'things a doctor weighs.',

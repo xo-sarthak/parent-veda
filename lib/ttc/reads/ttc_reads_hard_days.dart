@@ -85,8 +85,11 @@ final List<PvRead> kTtcReadsHardDays = [
               'same place as most people who go on to have a baby.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('Something you did this month made your period come: the '
-              'food, the stress, lifting something heavy, the long drive.'),
+          // Plain words (2026-10-21). Kept for revert: Something you did
+          // this month made your period come: the food, the stress, lifting
+          // something heavy, the long drive.
+          myth: _en('Something I did this month brought my period on, like '
+              'the food, stress or lifting something heavy.'),
           fact: _en('Nothing you ate, carried or worried about brought this '
               'period on. Most months end in a period even when everything '
               'is working well. It is not your fault.'),
@@ -570,11 +573,17 @@ final List<PvRead> kTtcReadsHardDays = [
               'reach the whole family by the next festival.'),
         ],
         mythFact: PvMythFact(
-          myth: _en('If you keep it private, you\'re hiding something or '
+          // Plain words (2026-10-21). Kept for revert: If you keep it
+          // private, you're hiding something or don't trust your family.
+          myth: _en("Keeping it private means you're hiding something or "
               "don't trust your family."),
-          fact: _en("Keeping trying private is common and healthy. It's a "
-              'choice about timing and privacy, not about love. Plenty of '
-              'couples tell family only once there is news to share.'),
+          // Plain words (2026-10-21). Kept for revert: Keeping trying
+          // private is common and healthy. It's a choice about timing and
+          // privacy, not about love. Plenty of couples tell family only
+          // once there is news to share.
+          fact: _en("It doesn't. Keeping trying private is common and "
+              "healthy. It's about timing and privacy, not love. Plenty of "
+              "couples tell family only once there's news to share."),
         ),
       ),
 
@@ -1257,9 +1266,13 @@ final List<PvRead> kTtcReadsHardDays = [
         ],
         mythFact: PvMythFact(
           myth: _en('If you were more positive, it would have happened by now.'),
-          fact: _en('How hopeful you feel does not decide whether you get '
-              "pregnant. Your mood can't block a pregnancy, and you don't "
-              'need to force yourself to feel positive.'),
+          // Plain words (2026-10-21). Kept for revert: How hopeful you feel
+          // does not decide whether you get pregnant. Your mood can't block
+          // a pregnancy, and you don't need to force yourself to feel
+          // positive.
+          fact: _en("No. How hopeful you feel doesn't decide whether you get "
+              "pregnant. Your mood can't block a pregnancy. You don't need to "
+              "force yourself to feel positive."),
         ),
       ),
 

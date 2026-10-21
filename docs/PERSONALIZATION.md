@@ -465,3 +465,27 @@ from profile_events
 where event = 'completenessSnapshot'
 group by 1 order by 1;
 ```
+
+## 11. Trying to conceive: the first ordering rules (2026-10-21)
+
+The first TTC entries. Both follow the rule the other stages use: content and
+order change, structure never does, and nothing is hidden.
+
+- **Age orders TTC content** (`lib/ttc/ttc_age_rank.dart`). Her age band
+  (`TtcFertilityHelpStore.ageBand`, asked once and shared) gives a few whole
+  words, such as "35" or "egg reserve" for 35 and over. `ttcAgeOrder` is a
+  stable sort: items whose title or teaser carries one of those words move to
+  the front, and everything else keeps its order. Used by the TTC doors
+  (`ttcAgeOrderSections`) and the Learn shelves. Test:
+  `test/ttc_age_rank_test.dart`.
+- **An article offers one of our services by topic**
+  (`lib/screens/reader/pv_read_offer.dart`, all three stages). Shared topic
+  words between the read and an offering in `PvLearnCatalog`; the best overlap
+  wins; no overlap, no card; never on a loss or urgent read. Test:
+  `test/pv_read_offer_test.dart`.
+- **The Ready-to-Try plan builds habits from her answers**
+  (`readyHabitsFor`, `readyPitchesFor` in `lib/ttc/ttc_ready_plan.dart`).
+  Answers pick the habits, their times and at most two service pitches; rules
+  in code, never in the CMS.
+
+Still open: the TTC vocabulary for the shared profile store (§9).

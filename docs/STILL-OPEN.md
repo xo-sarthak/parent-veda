@@ -10762,3 +10762,64 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
     door pumps, violet at any opacity). It found a real overflow on Vaccine
     detail ("Call your doctor / 112 if"), fixed with Flexible.
 - **§95.9 Waves 6 to 7** (home, warm copy): not started.
+
+## 96.0 The 2026-10-20 walk: TTC fixes and cross-stage content — 2026-10-21
+
+The user walked the app on 2026-10-20 (38 screenshots) and listed 19 changes.
+Plan: `~/.claude/plans/transient-humming-cherny.md`. Prototypes approved first:
+claude.ai/artifact/RDvyCezff124mqKKoiSqRN (Cycle Companion) and
+claude.ai/artifact/P4Z5ZdWvznr8B2HuKX1cEs (plan and myths). Myth before/after
+table and the temperature card: claude.ai/artifact/Fj8i53uDYF4Cdtr6ZKoN4x.
+Nothing here has been walked on a phone.
+
+- **§96.1 Small fixes — DONE.** Onboarding "What we'll never do" as three
+  lines with icons (`ObBeat.points`). "Started trying sooner" card reworded,
+  ink button. The TTC daily rail no longer shows a second Cycle Companion card
+  when "Day of your cycle" is there. "See all 7 steps" scrolls Learn to Start
+  here (`ttcLearnShow101`). "Films" is "Videos" in every stage, and the two
+  video cards' notes links line up. Ask Veda's Settings switch: a second,
+  hard-coded button (`PpAskVedaFab`) on Community and Products ignored it, and
+  the setting loaded late on a cold start; both fixed (`FabState.preload`).
+- **§96.2 Intro video — DONE.** The card vanished because a tap cleared it
+  before the film opened. It now stays its 7 days; a centred welcome pop-up
+  shows once after onboarding (Skip, Read the notes), and the film always sits
+  in Learn under Videos.
+- **§96.3 Cycle Companion — DONE.** Ring labelled with dates for every phase,
+  the waiting days included, a legend, and a line that says the dates get
+  better as she logs. Stripes ("Striped days are an estimate") removed: every
+  date is an estimate. Ovulation tests: a buy row for LH strips, and
+  temperature rebuilt (`ttc_temp_parts.dart`, `ttc_temp_rise.dart`): two equal
+  buttons (today, an earlier day), a real °C/°F value on a real date, rise
+  detection (3 readings in a row 0.2 °C over the 6 before) that she confirms,
+  an ⓘ on why. 2026-10-21, after the user found "Recorded: day 14" confusing:
+  the marked day is pinned on the chart and explained in one card with pencil
+  and bin buttons (MOBBIN-DISCOVERY §32).
+- **§96.4 Age orders, never hides — DONE.** `ttc_age_rank.dart` reorders TTC
+  doors and Learn shelves by her age band (PERSONALIZATION.md §11).
+- **§96.5 Ready-to-Try plan V2 — DONE.** Questions reworded, five new ones
+  (movement, time of day, mood, garbh sanskar, check-ups). "Your week": habits
+  at her own times, a smaller version, skip today, a reminder each, a Sunday
+  note; two "Help with this" service cards at most; Edit and Save as PDF.
+  Reminders are set again after every launch and stop once when her month
+  comes (folic acid keeps going) (BACKEND-PATTERNS §16ii-o).
+- **§96.6 Myth vs fact, every stage — DONE.** TTC daily myths get a fact and a
+  separate why (no more "More than that…" slides); 10 pregnancy weekly myths,
+  7 parenting ones, 16 door tiles and 74 in-article boxes rewritten in plain
+  words. Only English changed; every old line is kept as a comment.
+- **§96.7 Articles point to our services — DONE.** `pv_read_offer.dart`: one
+  quiet card after the second section, only when the read and a course or
+  consult share a topic; never on a loss or urgent read.
+- **§96.8 Affiliate prices — BUILT, INERT.** An affiliate product can name its
+  exact Amazon listing (ASIN) and carry the price and stars read from it, with
+  the date. Until then the page says "Our guide price · check today's price on
+  Amazon". Migration 0108, edge function `affiliate-refresh` on Amazon's
+  Creators API (PA-API 5 was retired in 2026). BACKEND-PATTERNS §16ii-p.
+- **§96.9 Owed.**
+  - A phone walk of everything above.
+  - Real Amazon listings typed into `kPvAffiliateFacts` (`pv_affiliate.dart`):
+    the map is empty on purpose, nothing was invented.
+  - Creators API credentials, then deploy and schedule `affiliate-refresh`.
+  - The user's review of the myth table, and of four short paragraphs added to
+    `preg_diet_read_food_myths` to keep it over its 600-word floor.
+  - Ask Veda re-ingest of the changed myth text (CONTENT-BACKEND).
+  - "Book services" was parked by the user.

@@ -415,12 +415,19 @@ final List<PvRead> kTtcReadsBodyIntimate = [
               "to get pregnant."),
         ],
         mythFact: PvMythFact(
-          myth: _en('Yeast that keeps coming back means it has spread through '
-              'my whole body, and I need a special diet.'),
+          // Plain words (2026-10-21). Kept for revert: Yeast that keeps
+          // coming back means it has spread through my whole body, and I
+          // need a special diet.
+          myth: _en("Yeast infections that keep coming back mean it's all "
+              "through my body, and I need a special diet."),
+          // Plain words (2026-10-21). Kept for revert: There's no good
+          // evidence for this. Repeat infections are about the vagina
+          // itself, or a different cause being treated as yeast. A swab and
+          // the right treatment help far more than cutting out foods.
           fact: _en("There's no good evidence for this. Repeat infections are "
-              "about the vagina itself, or a different cause being treated as "
-              "yeast. A swab and the right treatment help far more than "
-              "cutting out foods."),
+              "about the vagina itself. Sometimes a different cause is being "
+              "treated as yeast. A swab and the right treatment help far more "
+              "than cutting out foods."),
         ),
       ),
       PvReadSection(
@@ -634,9 +641,14 @@ final List<PvRead> kTtcReadsBodyIntimate = [
         ],
         mythFact: PvMythFact(
           myth: _en('If I get up to pee after sex, the sperm will come out.'),
-          fact: _en("Sperm swim into the cervix within minutes, and urine comes "
-              "out of a different opening. Some fluid leaking out is normal. "
-              "Peeing after sex is fine, and it helps prevent UTIs."),
+          // Plain words (2026-10-21). Kept for revert: Sperm swim into the
+          // cervix within minutes, and urine comes out of a different
+          // opening. Some fluid leaking out is normal. Peeing after sex is
+          // fine, and it helps prevent UTIs.
+          fact: _en("They won't. Sperm swim into the cervix within minutes, "
+              "and urine comes out of a different opening. Some fluid leaking "
+              "out is normal. Peeing after sex is fine, and it helps prevent "
+              "UTIs (bladder infections)."),
         ),
       ),
       PvReadSection(
@@ -814,10 +826,17 @@ final List<PvRead> kTtcReadsBodyIntimate = [
               "for this skin."),
         ],
         mythFact: PvMythFact(
-          myth: _en('A good wash inside after sex keeps you clean and healthy.'),
-          fact: _en("Your vagina clears itself. Washing inside removes the "
-              "helpful bacteria and makes BV more likely. Rinse the outside "
-              "with water if you like, and that's all."),
+          // Plain words (2026-10-21). Kept for revert: A good wash inside
+          // after sex keeps you clean and healthy.
+          myth: _en('Washing inside after sex keeps you clean and healthy.'),
+          // Plain words (2026-10-21). Kept for revert: Your vagina clears
+          // itself. Washing inside removes the helpful bacteria and makes
+          // BV more likely. Rinse the outside with water if you like, and
+          // that's all.
+          fact: _en("It doesn't. Your vagina cleans itself. Washing inside "
+              "removes the helpful bacteria and makes BV (a common vaginal "
+              "infection) more likely. Rinsing the outside with water is all "
+              "you need."),
         ),
       ),
       PvReadSection(
@@ -1227,11 +1246,18 @@ final List<PvRead> kTtcReadsBodyIntimate = [
               "one of you can come straight back from the other."),
         ],
         mythFact: PvMythFact(
-          myth: _en("Married women who've only been with their husband don't "
-              "need these tests."),
-          fact: _en("Many of these infections cause no signs and can stay for "
-              "years. Either partner may have had one from long ago without "
-              "knowing. A test is routine care, not a judgement."),
+          // Plain words (2026-10-21). Kept for revert: Married women who've
+          // only been with their husband don't need these tests.
+          myth: _en("If you've only been with your husband, you don't need "
+              "these tests."),
+          // Plain words (2026-10-21). Kept for revert: Many of these
+          // infections cause no signs and can stay for years. Either
+          // partner may have had one from long ago without knowing. A test
+          // is routine care, not a judgement.
+          fact: _en('You may still need them. Many of these infections cause '
+              'no signs and can stay for years. Either partner may have had '
+              'one long ago without knowing. A test is routine care, not a '
+              'judgement.'),
         ),
       ),
       PvReadSection(

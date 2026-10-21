@@ -72,6 +72,9 @@
 // =============================================================================
 
 import 'dart:math' as math;
+import '../../ttc/ttc_age_rank.dart' show ttcAgeOrder;
+import '../../ttc/ttc_fertility_help_store.dart' show TtcFertilityHelpStore;
+import 'ttc_intro_flow.dart' show openTtcIntroFilm, ttcIntroVideoSlotId;
 
 import 'package:flutter/material.dart';
 
@@ -110,7 +113,7 @@ import '../v2/v3_bracket_art.dart';
 import 'doors/ttc_door_screen.dart' show ttcDoorVisiblePage;
 import 'doors/ttc_door_search.dart';
 import 'ttc_askveda_screen.dart';
-import 'ttc_common.dart' show TtcBottomNav, ttcTitleInk;
+import 'ttc_common.dart' show TtcBottomNav, openTtcTabV3, ttcTitleInk;
 import 'ttc_focus_screen.dart' show openTtcFocusTile;
 import 'ttc_prepare_screen.dart';
 import 'ttc_strings.dart';
@@ -476,6 +479,19 @@ const List<String> _kPopular = [
 //  The screen
 // =============================================================================
 
+/// ⚠️ "SEE ALL 7 STEPS" LANDS ON THE STEPS (walk 2026-10-20). The home's
+/// 101 card used to switch to Learn and leave her at the top, with the list
+/// it promised three sections down. Bumping this asks Learn, mounted already
+/// (a tab) or about to be (a push), to scroll Trying to conceive 101 into
+/// view. A counter, not a bool, so the same request twice still fires.
+final ValueNotifier<int> ttcLearnShow101 = ValueNotifier<int>(0);
+
+/// Opens Learn at Trying to conceive 101.
+void openTtcLearn101(BuildContext context) {
+  ttcLearnShow101.value++;
+  openTtcTabV3(context, 1);
+}
+
 class TtcLearnScreen extends StatefulWidget {
   const TtcLearnScreen({super.key});
 
@@ -485,6 +501,9 @@ class TtcLearnScreen extends StatefulWidget {
 
 class _TtcLearnScreenState extends State<TtcLearnScreen> {
   final PvLiveSearch _search = PvLiveSearch();
+  final ScrollController _scroll = ScrollController();
+  final GlobalKey _startKey = GlobalKey();
+  int _shown101 = 0;
 
   /// Per shelf: which door tab is chosen (null = All), and whether it is open.
   final Map<String, String?> _tab = {};
@@ -532,12 +551,34 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
     PvReadStore.instance.load();
     SavedStore.instance.load();
     TtcLearnRecents.instance.load();
+    ttcLearnShow101.addListener(_show101);
+    if (ttcLearnShow101.value != _shown101) _show101();
   }
 
   @override
   void dispose() {
+    ttcLearnShow101.removeListener(_show101);
+    _scroll.dispose();
     _search.dispose();
     super.dispose();
+  }
+
+  void _show101([int tries = 0]) {
+    _shown101 = ttcLearnShow101.value;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final ctx = _startKey.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(ctx,
+            duration: const Duration(milliseconds: 380),
+            curve: Curves.easeOutCubic);
+      } else if (tries < 3 && _scroll.hasClients) {
+        // Not built yet (below the list's cache): move toward it, then retry.
+        _scroll.jumpTo((_scroll.offset + 600)
+            .clamp(0.0, _scroll.position.maxScrollExtent));
+        _show101(tries + 1);
+      }
+    });
   }
 
   // ---- opening things -------------------------------------------------------
@@ -617,6 +658,7 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
             body: Stack(children: [
               Positioned.fill(
                 child: ListView(
+                  controller: _scroll,
                   // ⚠️ THE HEADER CARRIES THE SAFE-AREA INSET (2026-09-29,
                   // TtcTabRootHeader), so every tab root's title sits at one
                   // y. Kept for revert:
@@ -887,7 +929,10 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
   Widget _startHere(V2Palette p, TtcS t) {
     if (_start.isEmpty) return const SizedBox.shrink();
     final store = PvReadStore.instance;
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+    return Column(
+        key: _startKey,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
       _head(t.learnStartEyebrow, t.learnStartTitle, lead: t.learnStartLead),
       const SizedBox(height: 12),
       _pad(PvRowGroup(p: p, children: [
@@ -937,7 +982,21 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       _head(t.learnFilmsEyebrow, t.learnFilmsTitle, lead: t.learnFilmsLead),
       const SizedBox(height: 12),
-      _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // ⚠️ THE INTRO FILM'S PERMANENT HOME (walk 2026-10-20). Its Today card
+      // lasts a week; this row does not, so "where did that video go?" always
+      // has an answer, the one the welcome pop-up's footnote gives.
+      _pad(_IntroFilmRow(onTap: () {
+        pvCommitFeedback();
+        openTtcIntroFilm(context);
+      })),
+      const SizedBox(height: 16),
+      // ⚠️ ONE BASELINE FOR THE NOTES LINKS (walk 2026-10-20): a longer
+      // description pushed one "Read the video's notes" lower than its
+      // neighbour. IntrinsicHeight + stretch gives both cards the taller
+      // one's height, and the card's Spacer sends each link to the bottom.
+      // Kept for revert: Row(crossAxisAlignment: start), no IntrinsicHeight.
+      _pad(IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         for (var i = 0; i < films.length; i++) ...[
           if (i > 0) const SizedBox(width: 12),
           Expanded(
@@ -952,7 +1011,7 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
             ),
           ),
         ],
-      ])),
+      ]))),
       // Kept for revert (L1): the separate "Read about it now" list.
       // if (reads.isNotEmpty) ...[
       //   const SizedBox(height: 16),
@@ -1167,7 +1226,12 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
       for (final x in s.tabs)
         if (!(hide && x.id == kTtcIntimateGroupId)) x
     ];
-    final all = [for (final r in s.reads) if (ttcLearnShows(r)) r];
+    // Her age orders the shelf, never filters it (ttc_age_rank.dart). Kept
+    // for revert: the list unsorted.
+    final all = ttcAgeOrder(
+        [for (final r in s.reads) if (ttcLearnShows(r)) r],
+        TtcFertilityHelpStore.instance.ageBand,
+        (r) => '${r.title.en} ${r.teaser.en}');
     if (all.isEmpty) return const SizedBox.shrink();
     final chosen = _tab[s.key];
     final tab = chosen == null
@@ -1903,6 +1967,7 @@ class _FilmCard extends StatelessWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
+          const Spacer(),
           if (onNotes != null)
             // The one tappable part of a film that is not made yet: its
             // notes, which exist today. A 44pt target.
@@ -1918,7 +1983,8 @@ class _FilmCard extends StatelessWidget {
                   // Names whose notes (2026-09-28, explicit names). Kept for
                   // revert: 'Read the notes', maxLines: 1.
                   Flexible(
-                    child: Text("Read the film's notes",
+                    // Kept for revert: "Read the film's notes".
+                    child: Text("Read the video's notes",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(
@@ -2270,6 +2336,71 @@ class _StepMark extends StatelessWidget {
               : Text('$n',
                   style: pvManrope(
                       fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
+        ),
+      ),
+    );
+  }
+}
+
+
+/// "Trying to conceive, explained", first in Videos (2026-10-20).
+class _IntroFilmRow extends StatelessWidget {
+  const _IntroFilmRow({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final t = TtcS.current();
+    final still = pvFilmStillFor(ttcIntroVideoSlotId(TtcLang.instance.hinglish));
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: p.line)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        key: const ValueKey('ttc_learn_intro_film'),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 96,
+                height: 54,
+                child: ColoredBox(
+                  color: v2BlockTint(206, p),
+                  child: still == null
+                      ? const SizedBox.shrink()
+                      : Image.network(still,
+                          fit: BoxFit.cover,
+                          gaplessPlayback: true,
+                          errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(t.introVideoLabel,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            height: 1.3,
+                            color: p.ink1)),
+                    const SizedBox(height: 2),
+                    Text('Start here · 2 min',
+                        style: pvManrope(fontSize: 12, color: p.ink2)),
+                  ]),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink1),
+          ]),
         ),
       ),
     );

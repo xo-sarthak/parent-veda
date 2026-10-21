@@ -513,13 +513,20 @@ final List<PvRead> kPregnancyReadsScans = [
         // ⚠️ NO HEADING. The opening section runs straight on from the teaser,
         // and the myth block is the first thing under it — see the note above.
         mythFact: PvMythFact(
-          myth: _en('The scan timeline is a checklist, and a pregnancy that '
-                    'misses one of them has gone wrong somewhere.'),
-          fact: _en("It's the usual run, not a rule. Some of those tests are "
-                    "offered to everyone, some only when your history or an "
-                    "earlier result points to them, and one or two are fully "
-                    "optional. A pregnancy with six ticked and three blank "
-                    "is an ordinary pregnancy."),
+          // Plain words (2026-10-21). Kept for revert: The scan timeline is a
+          //   checklist, and a pregnancy that misses one of them has gone
+          //   wrong somewhere.
+          myth: _en("If you miss a scan or test on the list, something has "
+              "gone wrong."),
+          // Plain words (2026-10-21). Kept for revert: It's the usual run,
+          //   not a rule. Some of those tests are offered to everyone, some
+          //   only when your history or an earlier result points to them, and
+          //   one or two are fully optional. A pregnancy with six ticked and
+          //   three blank is an ordinary pregnancy.
+          fact: _en("It hasn't. The list is the usual run, not a rule. Some "
+              "tests are for everyone, some only if your history or a "
+              "result calls for them, and a few are optional. Your "
+              "doctor tells you which ones you need."),
         ),
         paragraphs: [
           _en("The timeline in this app shows nine tests across a pregnancy. "

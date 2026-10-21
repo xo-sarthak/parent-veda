@@ -116,7 +116,7 @@ class _PvLessonScreenState extends State<PvLessonScreen> {
                         left: 12,
                         top: 12,
                         child: PvKindTag(
-                          lesson.videoUrl == null ? 'Film · arriving' : 'Film',
+                          lesson.videoUrl == null ? 'Video · arriving' : 'Video', // kept for revert: 'Film · arriving' / 'Film'
                         ),
                       ),
                       if (lesson.minutes > 0)

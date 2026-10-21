@@ -1210,3 +1210,37 @@ Experts as plain rows with one booking pill: Fresha services
 
 **Built.** `pp_activity_read.dart`, `provider_results_screen.dart`,
 `development_all_activities_screen.dart`.
+
+## 32. The 2026-10-20 walk: Cycle Companion, the plan, the temperature card (2026-10-21)
+
+**Asked.** Label the cycle ring with dates; temperature logging with real
+values and a real outcome; the plan's reminders at her own times. Later, the
+user on the recorded rise row: "this kinda confused me".
+
+**Found.**
+- Ring and legend: WHOOP's cycle calendar legend, Bevel's cycle strip.
+- Logging a value on a date: Fitbit "Add blood glucose", Stardust "Add daily
+  temperature".
+- Reminder times: Ahead's time wheel, Mindvalley "Set your time", Lifesum
+  per-habit reminders.
+- The marked day lives on the chart: Flo BBT and ovulation
+  (mobbin.com/screens/0fd74099-e552-42ef-a439-b5bf63a1cb3d) shades it; Oura
+  Cycle Insights (mobbin.com/screens/02bc9ee3-1c59-4141-a934-ef325fc0819d)
+  pins a label on it.
+- A saved entry is one card that says what it is, with clear edit and delete:
+  Flo's Today log (mobbin.com/screens/129329ed-d141-4a94-b894-152a38b6e726),
+  Bevel (mobbin.com/screens/2360b267-2be9-4656-981d-17ab33e136a5), Noom
+  (mobbin.com/screens/b1907184-b955-4393-a6d5-fb923d89a99d).
+
+**Adopted.** Date labels on every arc plus a legend; a 10-day date strip and a
+°C/°F stepper; a time pill per habit (weight 600, not 800). The rise day: a
+band and a "Rose · <date>" pin on the chart, and one card ("Your temperature
+rose on …", what it usually means, "Cycle day n") with round pencil and bin
+buttons.
+
+**Declined.** Teal on controls: teal means fertile days and ovulation only;
+switches and buttons stay ink. Stripes for estimated days: every date is an
+estimate, so marking some twice was repetition (the user).
+
+**Built.** `ttc_cycle_hub.dart`, `ttc_temp_parts.dart`,
+`ttc_ovulation_screen.dart`, `ttc_ready_week.dart`.

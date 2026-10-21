@@ -90,7 +90,7 @@ class _PpPhaseFilmState extends State<PpPhaseFilm> {
           Positioned(
             left: 24,
             top: 20,
-            child: Text(canPlay ? 'PHASE ${widget.phase} FILM' : 'PHASE ${widget.phase} FILM · ARRIVING',
+            child: Text(canPlay ? 'PHASE ${widget.phase} VIDEO' : 'PHASE ${widget.phase} VIDEO · ARRIVING', // kept for revert: FILM
                 style: pvManrope(
                     fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1.1, color: p.ink1.withValues(alpha: 0.4))),
           ),

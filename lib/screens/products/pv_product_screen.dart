@@ -55,6 +55,7 @@
 import 'package:flutter/material.dart';
 // import 'package:url_launcher/url_launcher.dart'; // kept for revert: the buy link now goes through openOutbound
 
+import '../../data/products/pv_affiliate.dart' show pvAffiliatePriceNote;
 import '../../data/products/pv_product_extras.dart' show kPvIllustrativePhotoIds;
 import '../../data/book_companions.dart' show bookReadItem;
 import '../../data/products/pv_sheet_products.dart' show sheetBookCompanionFor;
@@ -700,6 +701,37 @@ class _PvProductScreenState extends State<PvProductScreen> {
             ],
           ],
         ),
+        // ⚠️ AMAZON'S RATING, LABELLED AS AMAZON'S (walk 2026-10-20,
+        // pv_affiliate.dart). Never folded into the parents' stars above,
+        // and the review text stays on Amazon: we link, we never copy.
+        if (product.extRating > 0) ...[
+          const SizedBox(height: 6),
+          Wrap(
+            key: const ValueKey('pv_product_ext_rating'),
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 10,
+            runSpacing: 4,
+            children: [
+              Text(
+                '${product.extRating.toStringAsFixed(1)} on Amazon'
+                '${product.extReviewCount > 0 ? ' · ${PvProduct.groupRupees(product.extReviewCount)} ratings' : ''}',
+                style: pvManrope(fontSize: 13, color: p.ink2),
+              ),
+              InkWell(
+                key: const ValueKey('pv_product_ext_reviews'),
+                onTap: () => _buyAffiliate(product),
+                child: Text(
+                  'Read reviews on Amazon',
+                  style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: kPvInk,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
         if (product.summary.isNotEmpty) ...[
           const SizedBox(height: 10),
           Text(
@@ -739,6 +771,17 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 fontWeight: FontWeight.w700,
                 color: p.ink2,
               ),
+            ),
+          ],
+          // Whose price this is (walk 2026-10-20). A number read off the exact
+          // listing carries its date; otherwise it is our guide price and the
+          // retailer's page has today's.
+          if (pvAffiliatePriceNote(product) case final note?) ...[
+            const SizedBox(height: 4),
+            Text(
+              note,
+              key: const ValueKey('pv_product_price_asof'),
+              style: pvManrope(fontSize: 12.5, color: p.ink3),
             ),
           ],
           const SizedBox(height: 6),

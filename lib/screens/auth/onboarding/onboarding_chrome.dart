@@ -1126,6 +1126,7 @@ class ObBeat extends StatelessWidget {
     required this.cta,
     required this.onNext,
     this.headline,
+    this.points,
   });
 
   final V2Palette p;
@@ -1136,6 +1137,11 @@ class ObBeat extends StatelessWidget {
   /// [title] stays the words a screen reader and a test find.
   final Widget? headline;
   final String body;
+
+  /// When given, drawn instead of [body]: short lines, each with a line
+  /// icon, read at a glance (the "three short lines, never a blob" rule).
+  /// [body] stays the words a screen reader hears.
+  final List<(IconData, String)>? points;
   final String cta;
   final VoidCallback onNext;
 
@@ -1154,10 +1160,42 @@ class ObBeat extends StatelessWidget {
               else
                 Text(title, style: obBeatTitleStyle(p)),
               const SizedBox(height: 12),
-              Text(
-                body,
-                style: pvManrope(fontSize: 15.5, height: 1.55, color: p.ink2),
-              ),
+              if (points == null)
+                Text(
+                  body,
+                  style: pvManrope(fontSize: 15.5, height: 1.55, color: p.ink2),
+                )
+              else
+                Semantics(
+                  label: body,
+                  child: ExcludeSemantics(
+                    child: Column(
+                      children: [
+                        for (final (icon, line) in points!)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 14),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(icon, size: 22, color: p.ink1),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Text(
+                                    line,
+                                    style: pvManrope(
+                                      fontSize: 16,
+                                      height: 1.45,
+                                      color: p.ink1,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

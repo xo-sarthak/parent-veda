@@ -45,6 +45,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../data/learn/pv_learn_view.dart' show PvOfferingView;
+import 'pv_read_offer.dart';
 
 import '../../widgets/global_ask_fab.dart';
 
@@ -206,6 +208,9 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   bool _refsOpen = false;
 
   PvRead get a => widget.read;
+
+  /// The one service that fits this read, worked out once (2026-10-21).
+  late final PvOfferingView? _offer = pvReadOfferFor(widget.read);
   AppLanguage get _lang => widget.lang;
   PvReadStore get _store => PvReadStore.instance;
 
@@ -567,8 +572,17 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                     const SizedBox(height: 26),
                   ],
 
-                  for (var i = 0; i < a.sections.length; i++)
+                  for (var i = 0; i < a.sections.length; i++) ...[
                     _section(s, i, a.sections[i]),
+                    // ⚠️ ONE SERVICE OF OURS, MID-PAGE, ONLY WHEN IT FITS
+                    // (walk 2026-10-20; pv_read_offer.dart). After the second
+                    // section, or after the last on a short read.
+                    if (_offer != null &&
+                        i == (a.sections.length >= 3 ? 1 : a.sections.length - 1)) ...[
+                      _pad(PvReadOfferCard(offering: _offer)),
+                      const SizedBox(height: 26),
+                    ],
+                  ],
 
                   if (a.faqs.isNotEmpty) ...[
                     const SizedBox(height: 6),

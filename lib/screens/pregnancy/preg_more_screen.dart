@@ -291,8 +291,8 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
                 pvCommitFeedback();
                 AppNav.instance.go(kPregTabLearn);
               }),
-              _row('preg_more_all_films', IntentMark.listMark, 345, 'All films',
-                  'Short films for each stage of your pregnancy',
+              _row('preg_more_all_films', IntentMark.listMark, 345, 'All videos', // walk 2026-10-20; kept for revert: 'All films'
+                  'Short videos for each stage of your pregnancy',
                   () => _push('watch', () => WatchLearnScreen(controller: _c))),
             ], lead: 'Every read and every film, in one list each'),
 

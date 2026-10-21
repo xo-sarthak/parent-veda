@@ -320,11 +320,15 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           id: 'ttc_tile_will_it_happen_if_you_stop_thinking_about_it',
           blurb: 'The advice everyone gives, and what the evidence says.',
           myth: "If you stop thinking about it, you'll conceive.",
-          fact: 'The largest studies find that emotional distress before '
-              "treatment doesn't decide whether it works. The advice also does "
-              "harm. It makes you responsible for something you can't "
-              "control, and turns every month that doesn't work into proof you "
-              "weren't calm enough.",
+          // Plain words (2026-10-21). Kept for revert: The largest studies
+          // find that emotional distress before treatment doesn't decide
+          // whether it works. The advice also does harm. It makes you
+          // responsible for something you can't control, and turns every
+          // month that doesn't work into proof you weren't calm enough.
+          fact: "That isn't how it works. Large studies find that feeling "
+              "upset before treatment doesn't decide whether it works. The "
+              "advice also hurts, because it blames you for something you "
+              "can't control.",
         ),
         TtcGuideTile(
           title: 'Where stress does have a real effect',
@@ -391,12 +395,19 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           title: 'Does garbh sanskar make a smarter baby?',
           id: 'ttc_tile_does_it_make_a_smarter_baby',
           blurb: "What the tradition can fairly claim, and what it can't.",
-          myth: 'Doing this shapes your baby\'s intelligence and nature.',
-          fact: "No. There's no controlled evidence that any practice before "
-              "conception changes a child's intelligence or temperament. The "
-              "tradition itself doesn't promise it. That claim comes from the "
-              'people selling programmes. The practice is worth doing for how '
-              "the months feel, and that's a full reason on its own.",
+          // Plain words (2026-10-21). Kept for revert: Doing this shapes
+          // your baby's intelligence and nature.
+          myth: "Garbh sanskar shapes your baby's intelligence and nature.",
+          // Plain words (2026-10-21). Kept for revert: No. There's no
+          // controlled evidence that any practice before conception changes
+          // a child's intelligence or temperament. The tradition itself
+          // doesn't promise it. That claim comes from the people selling
+          // programmes. The practice is worth doing for how the months
+          // feel, and that's a full reason on its own.
+          fact: "No. No good study shows that any practice before conception "
+              "changes a child's intelligence or nature. The tradition itself "
+              "doesn't promise this. It's worth doing for how these months "
+              "feel, and that's reason enough.",
         ),
         TtcGuideTile(
           // Kept for revert (2026-09-28, explicit names): title: "And if you're not religious",

@@ -33,6 +33,7 @@ import '../../screens/product_guide/product_guide_data.dart' as guide;
 import '../../services/life_stage_store.dart';
 import '../../ttc/ttc_products_data.dart' as ttc;
 import '../product_data.dart' as preg_data;
+import 'pv_affiliate.dart';
 import 'pv_product_extras.dart';
 import 'pv_sheet_products.dart';
 
@@ -380,7 +381,12 @@ PvProduct _fromTtc(ttc.TtcProduct p) {
 PvProduct _enrich(PvProduct p) {
   final x = kPvProductExtras[p.id];
   final photos = kPvProductPhotos[p.id] ?? const <String>[];
-  if (x == null && photos.isEmpty) return p;
+  // The retailer's own price and rating for the exact listing (walk
+  // 2026-10-20, pv_affiliate.dart). It wins over the overlay's price: a
+  // number read off the listing beats one we typed. Kept for revert: the
+  // early return without `f`.
+  final f = kPvAffiliateFacts[p.id];
+  if (x == null && photos.isEmpty && f == null) return p;
   final seedOk = pvShowsSeedVoices(p);
   return PvProduct(
     id: p.id,
@@ -391,12 +397,12 @@ PvProduct _enrich(PvProduct p) {
     brand: x?.brand ?? p.brand,
     summary: p.summary,
     images: p.images.isNotEmpty ? [...p.images, ...photos] : photos,
-    price: x?.price ?? p.price,
+    price: f?.price ?? x?.price ?? p.price,
     mrp: x?.mrp ?? p.mrp,
     priceNote: p.priceNote,
-    retailer: x?.retailer ?? p.retailer,
-    buyUrl: x?.buyUrl ?? p.buyUrl,
-    soldHere: x?.soldHere ?? p.soldHere,
+    retailer: f != null ? 'Amazon' : (x?.retailer ?? p.retailer),
+    buyUrl: f != null ? pvAmazonListingUrl(f.asin) : (x?.buyUrl ?? p.buyUrl),
+    soldHere: f != null ? false : (x?.soldHere ?? p.soldHere),
     reviewOnly: p.reviewOnly,
     // ⚠️ THE OVERLAY'S SEED VOICES OBEY THE SAME TTC GATE (launch sanity H13,
     // 2026-09-28). `kTtcShowSeedReviews` hid the source file's seed ratings,
@@ -408,6 +414,10 @@ PvProduct _enrich(PvProduct p) {
     // are unchanged. Kept for revert: the five lines without `seedOk`.
     rating: seedOk ? (x?.rating ?? p.rating) : p.rating,
     reviewCount: seedOk ? (x?.reviewCount ?? p.reviewCount) : p.reviewCount,
+    asin: f?.asin ?? p.asin,
+    priceCheckedAt: f?.checkedAt ?? p.priceCheckedAt,
+    extRating: f?.rating ?? p.extRating,
+    extReviewCount: f?.reviewCount ?? p.extReviewCount,
     reco: x?.reco ?? p.reco,
     evidence: p.evidence,
     goods: p.goods,

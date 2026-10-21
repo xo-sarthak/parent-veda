@@ -243,12 +243,17 @@ final List<PvRead> kPregnancyReadsLabourFeeding = [
               "sign you don't have enough."),
         ],
         mythFact: PvMythFact(
-          myth: _en("The first yellow milk is dirty or stale and should be "
-              "thrown away."),
-          fact: _en("Colostrum is the most protective milk your baby will "
-              "ever have. Older relatives were often taught to discard it, "
-              "with the best intentions. Doctors now advise giving every "
-              "drop to the baby."),
+          // Plain words (2026-10-21). Kept for revert: The first yellow milk
+          //   is dirty or stale and should be thrown away.
+          myth: _en("The first yellow milk is dirty and should be thrown "
+              "away."),
+          // Plain words (2026-10-21). Kept for revert: Colostrum is the most
+          //   protective milk your baby will ever have. Older relatives were
+          //   often taught to discard it, with the best intentions. Doctors
+          //   now advise giving every drop to the baby.
+          fact: _en("It isn't. This first milk (colostrum) is the most "
+              "protective milk your baby will ever get. Doctors advise "
+              "giving your baby every drop."),
         ),
       ),
       PvReadSection(

@@ -219,13 +219,18 @@ void main() {
       expect(title(), '${names[n.month - 1]} ${n.year}');
     });
 
-    testWidgets('fertile days still ahead are striped, and the key says so',
+    // 2026-10-21, the user: everything on the calendar is an estimate, so
+    // stripes and "Striped days are an estimate" said it twice. Gone; the
+    // key names the quiet stretches instead.
+    testWidgets('no estimate stripes, and the key names every stretch',
         (tester) async {
       logCleanHistory();
       await pumpCalendar(tester);
       expect(find.byKey(const ValueKey('ttc_cal_estimate_stripes')),
-          findsWidgets);
-      expect(find.text(kTtcCalendarEstimateKey), findsOneWidget);
+          findsNothing);
+      expect(find.text(kTtcCalendarEstimateKey), findsNothing);
+      expect(find.text('The waiting days'), findsWidgets);
+      expect(find.text('Before your fertile days'), findsWidgets);
     });
 
     test('today is not "ahead"; tomorrow is', () {
