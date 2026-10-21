@@ -102,7 +102,9 @@ import 'product_detail_screen.dart';
 // import 'journal_v2/journal_home_screen.dart'; // the demo journal, kept for revert
 import 'phase_map_screen.dart';
 // import 'family_profile_screen.dart'; // kept for revert — the avatar opens You since 2026-09-19
-import 'pp_hero_field.dart';
+// import 'pp_hero_field.dart'; // the field gave way to the painted hero (2026-10-22)
+import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart' show pvToast;
 // import 'pp_saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
 import '../dear_baby_vault_screen.dart' show DearBabyLettersReadyCard;
 import '../profile/pv_you_screen.dart';
@@ -130,8 +132,9 @@ import 'pp_child_switch.dart';
 import 'pp_visit_card.dart';
 // import 'video/pv_video_config.dart' show pvResolveVideoUrl; // the film pick moved to pp_home_reads.dart (2026-10-21)
 import 'pp_tip_links.dart';
-import 'pp_phase_film.dart';
+// import 'pp_phase_film.dart'; // the film moved onto the phase page (2026-10-22)
 import 'pp_phase_doc_reads.dart' show ppOpenMilestoneRead;
+import 'pp_phase_page.dart' show ppOpenPhasePage, PpDomainMark;
 import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
@@ -250,7 +253,8 @@ class _PpHomeV3State extends State<PpHomeV3> {
         // Wave 4, approved). Was five on a shelf rail.
         final sit = PpSituation.now();
         final doorReads = ppHomeDoorReads(3, situation: sit);
-        final video = _video(phase);
+        // The film is on the phase page now (2026-10-22). Kept for revert:
+        // final video = _video(phase);
         final products = _productsForAge(child.ageInMonths, 6);
         // Her situation's questions first (a C-section mother's, a born-early
         // baby's), from the same pool; the brain never drops one.
@@ -291,26 +295,35 @@ class _PpHomeV3State extends State<PpHomeV3> {
             //
             // So: the field fills the whole screen and does not scroll, and the
             // sheet slides over it. The parallax is free.
-            Positioned.fill(
-              child: PvArrive.field(
-                child: PpHeroField(
-                    accent: phase.accent,
-                    ground: p.ground,
-                    variant: phase.number),
-              ),
-            ),
+            // The tinted field gave way to the phase painting at the top of
+            // the hero (2026-10-22, Wave 6). Kept for revert:
+            // Positioned.fill(
+            //   child: PvArrive.field(
+            //     child: PpHeroField(
+            //         accent: phase.accent,
+            //         ground: p.ground,
+            //         variant: phase.number),
+            //   ),
+            // ),
             ListView(
               padding: EdgeInsets.zero,
               children: [
                 PvArrive(
                   delay: PvArriveAt.header,
-                  child: _Hero(
+                  // THE PAINTED HERO (2026-10-22, Wave 6, approved in the
+                  // Artifact): the phase painting fades into the page, the
+                  // child's name and age on it, the 20-step strip, and one
+                  // way into the phase page. `_Hero` is kept for revert; its
+                  // spine opened the phase map:
+                  //   onSpine: () => Navigator.of(context).push(MaterialPageRoute(
+                  //       settings: const RouteSettings(name: 'pp/phase_map'),
+                  //       builder: (_) => const PhaseMapScreen())),
+                  child: _PaintedHero(
                   phase: phase,
+                  next: next,
                   child: child,
                   p: p,
-                  onSpine: () => Navigator.of(context).push(MaterialPageRoute(
-                      settings: const RouteSettings(name: 'pp/phase_map'),
-                      builder: (_) => const PhaseMapScreen())),
+                  onSpine: () => ppOpenPhasePage(context),
                   // One Saved screen for the whole app since 2026-09-16
                   // (docs/FAMILY-MODEL.md §6). Kept for revert:
                   // onSaved: () => Navigator.of(context).push(MaterialPageRoute(
@@ -416,6 +429,24 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 // revert:
                 // _pad(PpHomeQuick(p: p, onSurface: (id) => _openSurface(context, id))),
                 // const SizedBox(height: 26),
+                // The answers a parent opens the age page for, always shown:
+                // sleep and feeding now, the WHO ranges, call the doctor if,
+                // and the sources (gap analysis P1, 2026-10-07).
+                // A note for every month from 12 months, every three from
+                // three years (gap analysis P1, 2026-10-07; pp_month_notes.dart).
+                if (ppMonthNoteFor(ChildProfileStore.instance.devAgeInMonths) case final note?) ...[
+                  const SizedBox(height: 22),
+                  _pad(PpThisMonth(note: note, p: p)),
+                ],
+                // The next well-baby visit, when it is due or close (gap
+                // analysis P2, 2026-10-07; pp_visit_card.dart).
+                if (ppVisitCardFor() case final visit?) ...[
+                  const SizedBox(height: 22),
+                  _pad(PpVisitCard(visit: visit, p: p, onOpen: () => _openSurface(context, 'pp_vaccines'))),
+                ],
+                // EXPLORE BY TOPIC UNDER "DUE NOW" (2026-10-22, Wave 6; the user:
+                // below the vaccine row "as our app is door oriented"). No
+                // eyebrow, like the other two homes.
                 // TTC's and pregnancy's heading for the door grid: "Explore by
                 // topic", no eyebrow (one ParentVeda, 2026-10-07). Kept for
                 // revert: eyebrow: 'Where to go', title: 'Start anywhere'.
@@ -446,186 +477,6 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 )),
                 const SizedBox(height: 32),
 
-                // ---- CHILD SNAPSHOT -----------------------------------------
-                //
-                // ⚠️ THIS IS THE SPINE, NOT A BRACKET, and the distinction is
-                // why the first cut of this screen was wrong.
-                //
-                // The eleven doors cover the PROBLEM space — the things she
-                // comes looking for. They were never meant to carry the phase
-                // spine or the personal tools, and building the grid and
-                // stopping left this screen missing everything V1 does between
-                // its hero and its footer. Pregnancy V3 makes the same split:
-                // doors for problems, sections for the week she is in.
-                //
-                // The Development door goes deeper on all four domains. This is
-                // the glance.
-                // ---- THIS PHASE EXPLAINED -----------------------------------
-                //
-                // ⚠️ V3 DID NOT HAVE THIS AND THE CURRENT HOME DOES. The review
-                // asked for symmetry between the two and named this section by
-                // name. It is the only place either screen explains what the
-                // phase actually IS, as opposed to what to do during it, so
-                // losing it in V3 meant the doors and the daily prompts sat on
-                // top of nothing.
-                //
-                // Summary always, the full description on tap: the sections are
-                // several paragraphs each and printing them unasked would push
-                // every door below the fold.
-                // Pregnancy's heading for its film, "Your week, explained": a
-                // serif title, no eyebrow (one ParentVeda, 2026-10-07). Kept
-                // for revert: eyebrow 'This phase explained', title
-                // 'What ${phase.ageLabel} looks like'.
-                _pad(_Head(eyebrow: '', title: 'This phase, explained', p: p)),
-                const SizedBox(height: 14),
-                // ⚠️ VIDEO FIRST. The brief: "Currently the written description
-                // comes first while the video appears much further down the
-                // page. Change the order so that the video explanation of the
-                // phase comes first, the written description follows
-                // immediately after, and any additional resources follow."
-                //
-                // The video is the same phase-matched one the old "Watch"
-                // section showed (see `_video`). Only its place changed.
-                // The film as pregnancy plays its week film: edge to edge, in
-                // place, the title and "Why this matters now" under it
-                // (pp_phase_film.dart). Kept for revert: _pad(_PhaseVideoCard(
-                // video: video, p: p, onTap: () => _openVideo(context, video))).
-                if (video != null) ...[
-                  PpPhaseFilm(
-                      video: video,
-                      phase: phase.number,
-                      p: p,
-                      onUnavailable: () => _openVideo(context, video)),
-                  const SizedBox(height: 14),
-                  _pad(PpPhaseFilmCaption(video: video, p: p)),
-                  const SizedBox(height: 20),
-                ],
-                // The prose, segregated (2026-10-07; the user: "very text
-                // heavy, like text thrown"). The summary and three short
-                // labelled points; the rest of the phase opens in the reader
-                // behind "Read the full description" (pp_phase_film.dart
-                // `ppPhaseAsRead`), so no word is lost. Kept for revert:
-                //   _pad(_PhaseExplained(
-                //     phase: phase,
-                //     p: p,
-                //     expanded: _phaseExpanded,
-                //     onToggle: () =>
-                //         setState(() => _phaseExpanded = !_phaseExpanded),
-                //   )),
-                _pad(_PhaseAtAGlance(
-                  phase: phase,
-                  p: p,
-                  onReadMore: () => ppOpenPhaseRead(context, phase),
-                )),
-                // The answers a parent opens the age page for, always shown:
-                // sleep and feeding now, the WHO ranges, call the doctor if,
-                // and the sources (gap analysis P1, 2026-10-07).
-                // A note for every month from 12 months, every three from
-                // three years (gap analysis P1, 2026-10-07; pp_month_notes.dart).
-                if (ppMonthNoteFor(ChildProfileStore.instance.devAgeInMonths) case final note?) ...[
-                  const SizedBox(height: 22),
-                  _pad(PpThisMonth(note: note, p: p)),
-                ],
-                // The next well-baby visit, when it is due or close (gap
-                // analysis P2, 2026-10-07; pp_visit_card.dart).
-                if (ppVisitCardFor() case final visit?) ...[
-                  const SizedBox(height: 22),
-                  _pad(PpVisitCard(visit: visit, p: p, onOpen: () => _openSurface(context, 'pp_vaccines'))),
-                ],
-                const SizedBox(height: 22),
-                _pad(PpAtThisAge(
-                  phase: phase,
-                  p: p,
-                  onGrowth: () => _openSurface(context, 'pp_growth'),
-                )),
-                const SizedBox(height: 16),
-                _ResourceRail(p: p, items: [
-                  _Resource(
-                      label: "This month's checklist",
-                      hue: 28,
-                      icon: Icons.checklist_rtl_outlined,
-                      mark: TtcTabMark.checklist,
-                      onTap: () => _openSurface(context, 'pp_month_checklist')),
-                  _Resource(
-                      label: 'What changes next',
-                      hue: 42,
-                      icon: Icons.timeline_outlined,
-                      mark: TtcTabMark.timelineDots,
-                      onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                              settings:
-                                  const RouteSettings(name: 'pp/phase_map'),
-                              builder: (_) => const PhaseMapScreen()))),
-                  _Resource(
-                      label: 'Something changed?',
-                      hue: 285,
-                      icon: Icons.help_outline_rounded,
-                      mark: TtcTabMark.signpost,
-                      onTap: () => _openSurface(context, 'pp_what_changed')),
-                  _Resource(
-                      label: 'When to call the doctor',
-                      hue: 188,
-                      icon: Icons.medical_services_outlined,
-                      mark: TtcTabMark.doctorChat,
-                      // This phase's own lines first (gap analysis P1, 2026-10-07).
-                      // Kept for revert: onTap: () => _openSurface(context, 'pp_baby_ok_check')),
-                      onTap: () => showPpCallDoctorSheet(context,
-                          phase: phase, p: p, onCheck: () => _openSurface(context, 'pp_baby_ok_check'))),
-                ]),
-                const SizedBox(height: 32),
-
-                // ---- HOW {NAME} IS DOING ------------------------------------
-                //
-                // ⚠️ ONLY WHAT IS CHANGING, NOT EVERY DOMAIN. The brief: "When
-                // opened, it should NOT show every possible developmental
-                // change. Determine what is actually changing at the baby's
-                // current age and surface only those under the existing
-                // categories." The cards come from the phase's own AAP
-                // milestone list — see the head of pp_home_changes.dart for
-                // why that list and not kDevAreas.
-                //
-                // The eight-row `_Snapshot` this replaces is kept below for
-                // revert; its rows were fixed at a four-month-old and did not
-                // move with the child.
-                _pad(_Head(
-                    eyebrow: 'How ${child.nameMid} is doing',
-                    title: 'Right now',
-                    p: p)),
-                if (changes.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  _pad(Text(phaseChangesLine(changes, phase),
-                      style: pvManrope(
-                          fontSize: _kBody, height: 1.45, color: p.ink3))),
-                ],
-                const SizedBox(height: 14),
-                // Kept for revert:
-                //   _pad(_Snapshot(
-                //       p: p,
-                //       onTap: () => _openSurface(context, 'pp_development'))),
-                if (changes.isEmpty)
-                  // A feature is never hidden: a phase with nothing listed
-                  // still shows the door to Development.
-                  _pad(_EmptyInvite(
-                      p: p,
-                      line: 'Nothing is listed for ${phase.ageLabel} yet. '
-                          'The Development door has the whole picture.',
-                      cta: 'Open Development',
-                      onTap: () => _openSurface(context, 'pp_development')))
-                else
-                  for (final c in changes) ...[
-                    _pad(_ChangeCard(
-                        change: c,
-                        p: p,
-                        // A doc card opens the doc's milestone page (2026-10-13);
-                        // the sheet stays for phases without a doc.
-                        onTap: () => switch ((c.doc, c.milestonePage)) {
-                              (final doc?, final page?) => ppOpenMilestoneRead(context, doc, page),
-                              _ => _showChangeSheet(context, c, child, p),
-                            })),
-                    const SizedBox(height: 12),
-                  ],
-                const SizedBox(height: 20),
-
                 // ---- ACTIVITIES TO DO TODAY ---------------------------------
                 //
                 // Was "Today · One thing to try", a single day-rotated card that
@@ -642,9 +493,15 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 //         onTap: () => _openSurface(context, 'pp_activities'))),
                 //     const SizedBox(height: 32),
                 //   ],
+                // THREE ROWS (2026-10-22, Wave 6, approved in the Artifact; Noom's
+                // "Today's plan" on Mobbin): the area's drawn mark, the title, one
+                // line, and a round check for done. A tap opens the activity in
+                // the reader; a press and hold swaps it, and the line under the
+                // rows says so. The three cards with Done and Change are kept
+                // below for revert.
                 _pad(_Head(
-                    eyebrow: 'Today',
-                    title: 'Activities to do today with your baby',
+                    eyebrow: 'Together',
+                    title: 'Three things to do with ${child.nameMid} today',
                     p: p)),
                 const SizedBox(height: 14),
                 if (activities.isEmpty)
@@ -655,35 +512,155 @@ class _PpHomeV3State extends State<PpHomeV3> {
                       cta: 'Browse every activity',
                       onTap: () => _openSurface(context, 'pp_activities')))
                 else ...[
-                  for (final a in activities) ...[
-                    _pad(_TodayActivityCard(
-                      activity: a,
-                      p: p,
-                      done: PpHomeActivitiesStore.instance.isDone(a.id),
-                      swapped: PpHomeActivitiesStore.instance.wasSwappedIn(a.id),
-                      onDone: () => PpHomeActivitiesStore.instance.markDone(a.id),
-                      onChange: () => PpHomeActivitiesStore.instance
-                          .swap(a.id, child.ageInMonths),
-                      onOpen: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                              settings: RouteSettings(
-                                  name: 'pp/activity/${a.id}'),
-                              builder: (_) =>
-                                  DevelopmentActivityScreen(activity: a))),
-                    )),
-                    const SizedBox(height: 12),
-                  ],
-                  // No counter, no streak, no "2 of 3" — the brief and the
-                  // Grow feature both refuse those. One line about tomorrow.
+                  _pad(_ActivityRows(
+                    activities: activities,
+                    p: p,
+                    onOpen: (a) => Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: RouteSettings(name: 'pp/activity/${a.id}'),
+                        builder: (_) => DevelopmentActivityScreen(activity: a))),
+                    onSwap: (a) => PpHomeActivitiesStore.instance.swap(a.id, child.ageInMonths),
+                  )),
+                  const SizedBox(height: 10),
                   _pad(Text(
                       PpHomeActivitiesStore.instance.allDone
                           ? 'All three done. Tomorrow brings three new ones.'
-                          : 'Tomorrow brings three new ones.',
+                          : 'Not right today? Press and hold one to swap it.',
                       style: pvManrope(
                           fontSize: _kMeta, height: 1.45, color: p.ink3))),
                 ],
                 const SizedBox(height: 32),
-
+                // _pad(_Head(
+                //     eyebrow: 'Today',
+                //     title: 'Activities to do today with your baby',
+                //     p: p)),
+                // const SizedBox(height: 14),
+                // if (activities.isEmpty)
+                //   _pad(_EmptyInvite(
+                //       p: p,
+                //       line: 'The activity library is still filling in for '
+                //           '${phase.ageLabel}.',
+                //       cta: 'Browse every activity',
+                //       onTap: () => _openSurface(context, 'pp_activities')))
+                // else ...[
+                //   for (final a in activities) ...[
+                //     _pad(_TodayActivityCard(
+                //       activity: a,
+                //       p: p,
+                //       done: PpHomeActivitiesStore.instance.isDone(a.id),
+                //       swapped: PpHomeActivitiesStore.instance.wasSwappedIn(a.id),
+                //       onDone: () => PpHomeActivitiesStore.instance.markDone(a.id),
+                //       onChange: () => PpHomeActivitiesStore.instance
+                //           .swap(a.id, child.ageInMonths),
+                //       onOpen: () => Navigator.of(context).push(
+                //           MaterialPageRoute<void>(
+                //               settings: RouteSettings(
+                //                   name: 'pp/activity/${a.id}'),
+                //               builder: (_) =>
+                //                   DevelopmentActivityScreen(activity: a))),
+                //     )),
+                //     const SizedBox(height: 12),
+                //   ],
+                //   // No counter, no streak, no "2 of 3" — the brief and the
+                //   // Grow feature both refuse those. One line about tomorrow.
+                //   _pad(Text(
+                //       PpHomeActivitiesStore.instance.allDone
+                //           ? 'All three done. Tomorrow brings three new ones.'
+                //           : 'Tomorrow brings three new ones.',
+                //       style: pvManrope(
+                //           fontSize: _kMeta, height: 1.45, color: p.ink3))),
+                // ],
+                // const SizedBox(height: 32),
+                // ---- HOW {NAME} IS DOING ------------------------------------
+                //
+                // ⚠️ ONLY WHAT IS CHANGING, NOT EVERY DOMAIN. The brief: "When
+                // opened, it should NOT show every possible developmental
+                // change. Determine what is actually changing at the baby's
+                // current age and surface only those under the existing
+                // categories." The cards come from the phase's own AAP
+                // milestone list — see the head of pp_home_changes.dart for
+                // why that list and not kDevAreas.
+                //
+                // The eight-row `_Snapshot` this replaces is kept below for
+                // revert; its rows were fixed at a four-month-old and did not
+                // move with the child.
+                // ONE LINE A CHANGE (2026-10-22, Wave 6, approved in the Artifact):
+                // a row with the area's drawn mark, the doc's title and line. The
+                // eyebrow names the child, never "her" (the user: "For her" read
+                // as the mother). The cards and the summary line are kept below
+                // for revert.
+                _pad(_Head(
+                    eyebrow: 'Right now',
+                    title: 'How ${child.nameMid} is growing',
+                    p: p)),
+                const SizedBox(height: 14),
+                if (changes.isEmpty)
+                  _pad(_EmptyInvite(
+                      p: p,
+                      line: 'Nothing is listed for ${phase.ageLabel} yet. '
+                          'The Development door has the whole picture.',
+                      cta: 'Open Development',
+                      onTap: () => _openSurface(context, 'pp_development')))
+                else
+                  _pad(PvRowGroup(
+                    key: const ValueKey('pp_home_changes'),
+                    p: p,
+                    children: [
+                      for (final c in changes)
+                        PvListRow(
+                          key: ValueKey('pp_home_change_${c.domain.name}'),
+                          p: p,
+                          leading: c.snapshot == null
+                              ? TtcMarkLeading(tab: TtcTabMark.sprout, tint: v2BlockTint(c.hue, p), size: 40)
+                              : PpDomainMark(c.snapshot!.domain),
+                          title: c.title,
+                          line: c.snapshot == null ? c.notice : ppFillChild(c.snapshot!.line),
+                          meta: c.category,
+                          lineMaxLines: 2,
+                          onTap: () => switch ((c.doc, c.milestonePage)) {
+                                (final doc?, final page?) => ppOpenMilestoneRead(context, doc, page),
+                                _ => _showChangeSheet(context, c, child, p),
+                              }),
+                    ],
+                  )),
+                const SizedBox(height: 32),
+                // _pad(_Head(
+                //     eyebrow: 'How ${child.nameMid} is doing',
+                //     title: 'Right now',
+                //     p: p)),
+                // if (changes.isNotEmpty) ...[
+                //   const SizedBox(height: 6),
+                //   _pad(Text(phaseChangesLine(changes, phase),
+                //       style: pvManrope(
+                //           fontSize: _kBody, height: 1.45, color: p.ink3))),
+                // ],
+                // const SizedBox(height: 14),
+                // // Kept for revert:
+                // //   _pad(_Snapshot(
+                // //       p: p,
+                // //       onTap: () => _openSurface(context, 'pp_development'))),
+                // if (changes.isEmpty)
+                //   // A feature is never hidden: a phase with nothing listed
+                //   // still shows the door to Development.
+                //   _pad(_EmptyInvite(
+                //       p: p,
+                //       line: 'Nothing is listed for ${phase.ageLabel} yet. '
+                //           'The Development door has the whole picture.',
+                //       cta: 'Open Development',
+                //       onTap: () => _openSurface(context, 'pp_development')))
+                // else
+                //   for (final c in changes) ...[
+                //     _pad(_ChangeCard(
+                //         change: c,
+                //         p: p,
+                //         // A doc card opens the doc's milestone page (2026-10-13);
+                //         // the sheet stays for phases without a doc.
+                //         onTap: () => switch ((c.doc, c.milestonePage)) {
+                //               (final doc?, final page?) => ppOpenMilestoneRead(context, doc, page),
+                //               _ => _showChangeSheet(context, c, child, p),
+                //             })),
+                //     const SizedBox(height: 12),
+                //   ],
+                // const SizedBox(height: 20),
                 // ---- READ ---------------------------------------------------
                 //
                 // "Short enough for today" → "Recommended reads for today", and
@@ -810,9 +787,11 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 //       note: 'Prices shown',
                 //       p: p)),
                 if (products.isNotEmpty) ...[
+                  // Named for the child (2026-10-22, Wave 6). Was eyebrow
+                  // 'Recommended', title 'Recommended products for your baby'.
                   _pad(_Head(
-                      eyebrow: 'Recommended',
-                      title: 'Recommended products for your baby',
+                      eyebrow: 'For ${child.nameMid}',
+                      title: 'Useful at this age',
                       p: p)),
                   const SizedBox(height: 14),
                   _ProductRail(
@@ -989,29 +968,152 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   const SizedBox(height: 32),
                 ],
 
-                // ---- LOOKING AHEAD ------------------------------------------
+                _ResourceRail(p: p, items: [
+                  _Resource(
+                      label: "This month's checklist",
+                      hue: 28,
+                      icon: Icons.checklist_rtl_outlined,
+                      mark: TtcTabMark.checklist,
+                      onTap: () => _openSurface(context, 'pp_month_checklist')),
+                  // "What changes next" went with the phase map (2026-10-22, Wave 6):
+                  // the hero opens the phase page, a swipe from the next phase.
+                  // Kept for revert:
+                  //   _Resource(
+                  //       label: 'What changes next',
+                  //       hue: 42,
+                  //       icon: Icons.timeline_outlined,
+                  //       mark: TtcTabMark.timelineDots,
+                  //       onTap: () => Navigator.of(context).push(
+                  //           MaterialPageRoute<void>(
+                  //               settings:
+                  //                   const RouteSettings(name: 'pp/phase_map'),
+                  //               builder: (_) => const PhaseMapScreen()))),
+                  _Resource(
+                      label: 'Something changed?',
+                      hue: 285,
+                      icon: Icons.help_outline_rounded,
+                      mark: TtcTabMark.signpost,
+                      onTap: () => _openSurface(context, 'pp_what_changed')),
+                  _Resource(
+                      label: 'When to call the doctor',
+                      hue: 188,
+                      icon: Icons.medical_services_outlined,
+                      mark: TtcTabMark.doctorChat,
+                      // This phase's own lines first (gap analysis P1, 2026-10-07).
+                      // Kept for revert: onTap: () => _openSurface(context, 'pp_baby_ok_check')),
+                      onTap: () => showPpCallDoctorSheet(context,
+                          phase: phase, p: p, onCheck: () => _openSurface(context, 'pp_baby_ok_check'))),
+                ]),
+                const SizedBox(height: 32),
+
+                // ---- KEPT FOR REVERT (2026-10-22, Wave 6) ------------------
                 //
-                // The only thing on the page about a time that has not arrived.
-                // It closes the screen because the last thing she should read is
-                // that there is a next, not that there is a product.
-                if (next != null) ...[
-                  // The name moved into the card (2026-10-07). Kept for
-                  // revert: title: next.name.
-                  _pad(_Head(
-                      eyebrow: 'Looking ahead', title: 'What comes next', p: p)),
-                  const SizedBox(height: 12),
-                  _pad(_AheadCard(
-                      next: next,
-                      p: p,
-                      // The phase map is where "what changes next" actually
-                      // lives, and it is already the hero's own destination.
-                      onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                              settings:
-                                  const RouteSettings(name: 'pp/phase_map'),
-                              builder: (_) => const PhaseMapScreen())))),
-                  const SizedBox(height: 30),
-                ],
+                // The phase film, its caption, "Phase at a glance" and the age
+                // page (sleep, feeding, growth, call the doctor) left the home:
+                // the hero opens the phase page, whose body is the whole phase
+                // doc with the film on top. "Looking ahead" is commented out on
+                // the user's word ("no need of it").
+                // // ---- CHILD SNAPSHOT -----------------------------------------
+                // //
+                // // ⚠️ THIS IS THE SPINE, NOT A BRACKET, and the distinction is
+                // // why the first cut of this screen was wrong.
+                // //
+                // // The eleven doors cover the PROBLEM space — the things she
+                // // comes looking for. They were never meant to carry the phase
+                // // spine or the personal tools, and building the grid and
+                // // stopping left this screen missing everything V1 does between
+                // // its hero and its footer. Pregnancy V3 makes the same split:
+                // // doors for problems, sections for the week she is in.
+                // //
+                // // The Development door goes deeper on all four domains. This is
+                // // the glance.
+                // // ---- THIS PHASE EXPLAINED -----------------------------------
+                // //
+                // // ⚠️ V3 DID NOT HAVE THIS AND THE CURRENT HOME DOES. The review
+                // // asked for symmetry between the two and named this section by
+                // // name. It is the only place either screen explains what the
+                // // phase actually IS, as opposed to what to do during it, so
+                // // losing it in V3 meant the doors and the daily prompts sat on
+                // // top of nothing.
+                // //
+                // // Summary always, the full description on tap: the sections are
+                // // several paragraphs each and printing them unasked would push
+                // // every door below the fold.
+                // // Pregnancy's heading for its film, "Your week, explained": a
+                // // serif title, no eyebrow (one ParentVeda, 2026-10-07). Kept
+                // // for revert: eyebrow 'This phase explained', title
+                // // 'What ${phase.ageLabel} looks like'.
+                // _pad(_Head(eyebrow: '', title: 'This phase, explained', p: p)),
+                // const SizedBox(height: 14),
+                // // ⚠️ VIDEO FIRST. The brief: "Currently the written description
+                // // comes first while the video appears much further down the
+                // // page. Change the order so that the video explanation of the
+                // // phase comes first, the written description follows
+                // // immediately after, and any additional resources follow."
+                // //
+                // // The video is the same phase-matched one the old "Watch"
+                // // section showed (see `_video`). Only its place changed.
+                // // The film as pregnancy plays its week film: edge to edge, in
+                // // place, the title and "Why this matters now" under it
+                // // (pp_phase_film.dart). Kept for revert: _pad(_PhaseVideoCard(
+                // // video: video, p: p, onTap: () => _openVideo(context, video))).
+                // if (video != null) ...[
+                //   PpPhaseFilm(
+                //       video: video,
+                //       phase: phase.number,
+                //       p: p,
+                //       onUnavailable: () => _openVideo(context, video)),
+                //   const SizedBox(height: 14),
+                //   _pad(PpPhaseFilmCaption(video: video, p: p)),
+                //   const SizedBox(height: 20),
+                // ],
+                // // The prose, segregated (2026-10-07; the user: "very text
+                // // heavy, like text thrown"). The summary and three short
+                // // labelled points; the rest of the phase opens in the reader
+                // // behind "Read the full description" (pp_phase_film.dart
+                // // `ppPhaseAsRead`), so no word is lost. Kept for revert:
+                // //   _pad(_PhaseExplained(
+                // //     phase: phase,
+                // //     p: p,
+                // //     expanded: _phaseExpanded,
+                // //     onToggle: () =>
+                // //         setState(() => _phaseExpanded = !_phaseExpanded),
+                // //   )),
+                // _pad(_PhaseAtAGlance(
+                //   phase: phase,
+                //   p: p,
+                //   onReadMore: () => ppOpenPhaseRead(context, phase),
+                // )),
+                // const SizedBox(height: 22),
+                // _pad(PpAtThisAge(
+                //   phase: phase,
+                //   p: p,
+                //   onGrowth: () => _openSurface(context, 'pp_growth'),
+                // )),
+                // const SizedBox(height: 16),
+                // // ---- LOOKING AHEAD ------------------------------------------
+                // //
+                // // The only thing on the page about a time that has not arrived.
+                // // It closes the screen because the last thing she should read is
+                // // that there is a next, not that there is a product.
+                // if (next != null) ...[
+                //   // The name moved into the card (2026-10-07). Kept for
+                //   // revert: title: next.name.
+                //   _pad(_Head(
+                //       eyebrow: 'Looking ahead', title: 'What comes next', p: p)),
+                //   const SizedBox(height: 12),
+                //   _pad(_AheadCard(
+                //       next: next,
+                //       p: p,
+                //       // The phase map is where "what changes next" actually
+                //       // lives, and it is already the hero's own destination.
+                //       onTap: () => Navigator.of(context).push(
+                //           MaterialPageRoute<void>(
+                //               settings:
+                //                   const RouteSettings(name: 'pp/phase_map'),
+                //               builder: (_) => const PhaseMapScreen())))),
+                //   const SizedBox(height: 30),
+                // ],
                 ]),
               ],
             ),
@@ -1147,6 +1249,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
   //   if (pool.isNotEmpty) return pool[DateTime.now().day % pool.length];
   //   final all = kWatchVideos.where(plays).toList();
   //   return all.isEmpty ? null : all[DateTime.now().day % all.length];
+  // ignore: unused_element
   WatchVideo? _video(AgePhase phase) => ppPhaseVideo(phase);
 
   // Day-rotated, age-blind. Kept for revert.
@@ -1718,6 +1821,8 @@ class _HeroRound extends StatelessWidget {
       );
 }
 
+// Kept for revert since 2026-10-22 (Wave 6): `_PaintedHero` draws the hero.
+// ignore: unused_element
 class _Hero extends StatelessWidget {
   const _Hero(
       {required this.phase,
@@ -1979,17 +2084,11 @@ class _Sheet extends StatelessWidget {
         // is far taller.
         constraints: BoxConstraints(
             minHeight: MediaQuery.sizeOf(context).height * 0.72),
-        decoration: BoxDecoration(
-          color: p.ground,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.10),
-              blurRadius: 24,
-              offset: const Offset(0, -6),
-            ),
-          ],
-        ),
+        // No card edge since 2026-10-22 (Wave 6): the painted hero fades into
+        // the page, so the sheet is the page's own ground, not a card on a
+        // field. Kept for revert: the top radius 28 and the shadow
+        // BoxShadow(black 0.10, blur 24, offset (0, -6)).
+        decoration: BoxDecoration(color: p.ground),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ...pvArriveEach(children),
           // Clearance for the floating bottom nav, inside the opaque sheet.
@@ -2873,6 +2972,8 @@ class _PhaseExplained extends StatelessWidget {
 /// small mark each, one link out): Withings Health Mate "Today's Missions",
 /// https://mobbin.com/screens/6852bc4c-c9d3-434d-b52f-54521e690076 ; Apple
 /// Health's summary card, https://mobbin.com/screens/97104df5-f817-4e56-80a0-0c46eee67e06
+// Kept for revert since 2026-10-22 (Wave 6).
+// ignore: unused_element
 class _PhaseAtAGlance extends StatelessWidget {
   const _PhaseAtAGlance({required this.phase, required this.p, required this.onReadMore});
 
@@ -3138,7 +3239,10 @@ class _FaqRowState extends State<_FaqRow> {
 /// https://mobbin.com/screens/5c8e11ba-1d6e-4802-be01-f0fd16217455 ; the
 /// next-stage peek as Oura's "Good to know in Week 40",
 /// https://mobbin.com/screens/4ccc949c-fa00-41db-a72e-67f4e19f214e
+// Kept for revert since 2026-10-22 (Wave 6).
+// ignore: unused_element
 class _AheadCard extends StatelessWidget {
+  // ignore: unused_element_parameter
   const _AheadCard({required this.next, required this.p, this.onTap});
 
   final AgePhase next;
@@ -3560,6 +3664,8 @@ class _ResourceRail extends StatelessWidget {
 
 /// One "How {name} is doing" card: category chip, the change, one line, and
 /// "See what changes ›". Tapping opens the video → text → more sheet.
+// Kept for revert since 2026-10-22 (Wave 6).
+// ignore: unused_element
 class _ChangeCard extends StatelessWidget {
   const _ChangeCard(
       {required this.change, required this.p, required this.onTap});
@@ -3741,6 +3847,8 @@ class _EmptyInvite extends StatelessWidget {
 /// Three states, per the brief: to do (a "Done" pill and a quiet "Change"),
 /// done (dimmed, a filled tick, "Done today", stays until tomorrow), and just
 /// swapped in (a small "Swapped" chip beside the title). No counter anywhere.
+// Kept for revert since 2026-10-22 (Wave 6).
+// ignore: unused_element
 class _TodayActivityCard extends StatelessWidget {
   const _TodayActivityCard({
     required this.activity,
@@ -4108,4 +4216,277 @@ class _JournalInvite extends StatelessWidget {
           ]),
         ),
       ]);
+}
+
+// -----------------------------------------------------------------------------
+//  The painted hero and the activity rows (2026-10-22, Wave 6)
+// -----------------------------------------------------------------------------
+
+/// "Aarav is 2 weeks old": days while days are counted, weeks to six months,
+/// then the age label, the same units `_bigAge` follows.
+String _ageSentence(ChildProfileStore c) {
+  final d = c.ageInDays < 1 ? 1 : c.ageInDays;
+  final age = d < 56
+      ? (d == 1 ? '1 day' : '$d days')
+      : (c.ageInMonths < 6 ? '${c.ageInWeeks.round()} weeks' : c.ageLabel);
+  final name = c.nameMid;
+  final who = name.isEmpty ? 'Your baby' : '${name[0].toUpperCase()}${name.substring(1)}';
+  return '$who is $age old';
+}
+
+/// When the next phase starts, in words: "in about 2 weeks".
+String _nextIn(ChildProfileStore c, AgePhase next) {
+  final days = (next.startMonth * 30.44 - c.ageInDays).round();
+  if (days <= 7) return 'within a week';
+  if (days < 56) return 'in about ${(days / 7).round()} weeks';
+  return 'in about ${(days / 30.44).round()} months';
+}
+
+/// The hero, painted (2026-10-22, Wave 6; the user: the parenting hero "seems
+/// very bland"). The phase painting fills the top and fades into the page, as
+/// Pregnancy's baby art fades into its field; on it, the same header row as
+/// the other two homes. Under it: the child's name and age, the phase, a
+/// strip of the twenty phases with this one in ink (the Wonder Weeks sense of
+/// "where are we", without their chart), and one way into the phase page.
+class _PaintedHero extends StatelessWidget {
+  const _PaintedHero({
+    required this.phase,
+    required this.next,
+    required this.child,
+    required this.p,
+    required this.onSpine,
+    required this.onSaved,
+    required this.onProfile,
+    required this.onTalk,
+  });
+
+  final AgePhase phase;
+  final AgePhase? next;
+  final ChildProfileStore child;
+  final V2Palette p;
+  final VoidCallback onSpine;
+  final VoidCallback onSaved;
+  final VoidCallback onProfile;
+  final VoidCallback onTalk;
+
+  @override
+  Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
+    final today = DateTime.now();
+    final initial = child.nameMid.isEmpty ? '' : child.nameMid[0];
+    final count = kPhases.length;
+    const side = 84.0; // 38 + 8 + 38, Pregnancy's width
+    return ColoredBox(
+      color: p.ground,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        SizedBox(
+          height: 250 + top,
+          child: Stack(fit: StackFit.expand, children: [
+            GestureDetector(
+              key: const ValueKey('pp_hero_painting'),
+              onTap: onSpine,
+              child: PhasePainting(phase: phase),
+            ),
+            // The fade into the page: the picture has no bottom edge.
+            IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.45, 1],
+                    colors: [p.ground.withValues(alpha: 0), p.ground],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 18,
+              right: 18,
+              top: top + 10,
+              child: Row(children: [
+                SizedBox(
+                  width: side,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      _HeroRound(
+                        p: p,
+                        semantic: 'Profile',
+                        onTap: onProfile,
+                        child: initial.isEmpty
+                            ? Icon(Icons.person_outline_rounded, size: 18, color: p.ink2)
+                            : Text(initial.toUpperCase(),
+                                style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+                      ),
+                      const SizedBox(width: 8),
+                      _HeroRound(
+                        p: p,
+                        semantic: 'Talk to someone',
+                        onTap: onTalk,
+                        child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
+                      ),
+                    ]),
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: p.surface.withValues(alpha: 0.88),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text('${today.day} ${_kHeroMonths[today.month - 1]}',
+                            style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: side,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _HeroRound(
+                      p: p,
+                      semantic: 'Saved',
+                      onTap: onSaved,
+                      child: Icon(Icons.bookmark_border_rounded, size: 18, color: p.ink2),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            PpChildSwitch(p: p),
+            Text(_ageSentence(child),
+                key: const ValueKey('pp_hero_age'),
+                style: pvFraunces(
+                    fontSize: 28, fontWeight: FontWeight.w600, height: 1.12, letterSpacing: -0.6, color: p.ink1)),
+            const SizedBox(height: 6),
+            Text('Phase ${phase.number} of $count · ${phase.ageLabel}',
+                style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink2)),
+            const SizedBox(height: 2),
+            Text(phase.name,
+                style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+            const SizedBox(height: 12),
+            Semantics(
+              label: 'Phase ${phase.number} of $count',
+              child: Row(key: const ValueKey('pp_hero_strip'), children: [
+                for (var i = 1; i <= count; i++) ...[
+                  if (i > 1) const SizedBox(width: 3),
+                  Expanded(
+                    child: Container(
+                      height: i == phase.number ? 7 : 5,
+                      decoration: BoxDecoration(
+                        color: i == phase.number
+                            ? p.ink1
+                            : (i < phase.number ? p.ink3.withValues(alpha: 0.45) : p.line),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                ],
+              ]),
+            ),
+            if (next case final n?) ...[
+              const SizedBox(height: 6),
+              Text('Next: ${n.name}, ${_nextIn(child, n)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 11.5, color: p.ink3)),
+            ],
+            const SizedBox(height: 14),
+            Semantics(
+              button: true,
+              child: PvPress(
+                child: GestureDetector(
+                  key: const ValueKey('pp_hero_open_phase'),
+                  onTap: onSpine,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                    decoration: BoxDecoration(color: p.ink1, borderRadius: BorderRadius.circular(999)),
+                    child: Text('Open this phase  ›',
+                        style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                  ),
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+/// Today's three activities as rows: the area's drawn mark, the title, one
+/// line, a round check for done. A press and hold swaps one.
+class _ActivityRows extends StatelessWidget {
+  const _ActivityRows({required this.activities, required this.p, required this.onOpen, required this.onSwap});
+  final List<DevActivity> activities;
+  final V2Palette p;
+  final ValueChanged<DevActivity> onOpen;
+  final ValueChanged<DevActivity> onSwap;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = PpHomeActivitiesStore.instance;
+    return PvRowGroup(key: const ValueKey('pp_home_activities'), p: p, children: [
+      for (final a in activities)
+        GestureDetector(
+          key: ValueKey('pp_home_activity_${a.id}'),
+          onLongPress: () {
+            onSwap(a);
+            pvToast(context, 'Swapped for another activity.');
+          },
+          child: PvListRow(
+            p: p,
+            leading: switch (devMarkFor(a.areaId)) {
+              final m? => Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: v2BlockTint(38, p), shape: BoxShape.circle),
+                  child: V3DevMark(mark: m, accent: devAreaById(a.areaId).accent, size: 28),
+                ),
+              null => TtcMarkLeading(tab: TtcTabMark.sprout, tint: v2BlockTint(38, p), size: 40),
+            },
+            title: ppFillChild(a.title),
+            line: a.metaLine,
+            trailing: Semantics(
+              button: true,
+              label: store.isDone(a.id) ? 'Done' : 'Mark as done',
+              child: GestureDetector(
+                key: ValueKey('pp_home_activity_done_${a.id}'),
+                onTap: () => store.markDone(a.id),
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: store.isDone(a.id) ? p.ink1 : Colors.transparent,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: store.isDone(a.id) ? p.ink1 : p.ink3, width: 1.5),
+                    ),
+                    child: store.isDone(a.id)
+                        ? Text('✓', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white))
+                        : null,
+                  ),
+                ),
+              ),
+            ),
+            onTap: () => onOpen(a),
+          ),
+        ),
+    ]);
+  }
 }

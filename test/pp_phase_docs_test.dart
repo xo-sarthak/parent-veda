@@ -243,19 +243,21 @@ void main() {
   });
 
   testWidgets('the phase map page: doc labels, no AAP caption over the doc snapshot, a way into the doc', (tester) async {
-    tester.view.physicalSize = const Size(400, 5000);
+    tester.view.physicalSize = const Size(400, 12000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(MaterialApp(home: PhaseDetailScreen(phase: kPhases.first)));
     await tester.pump();
     expect(tester.takeException(), isNull);
     expect(find.text('The Settling In'), findsOneWidget);
-    expect(find.text('Living through this phase'), findsOneWidget);
-    expect(find.text('Child snapshot'), findsOneWidget);
-    expect(find.text('Nutrition'), findsOneWidget);
+    // Since 2026-10-22 (Wave 6) the phase screen is the one phase page: the
+    // doc IS the page, so there is no "Read this phase in full" link to find.
+    // Was: 'Living through this phase' / 'Child snapshot' / 'Nutrition' each
+    // findsOneWidget, and the phase_detail_read_doc key.
+    expect(find.text('Living through this phase'), findsWidgets);
+    expect(find.byKey(const ValueKey('pp_doc_snapshot_nutrition')), findsOneWidget);
     expect(find.textContaining('three in four children'), findsNothing,
         reason: 'the doc snapshot is not the AAP 75% list');
-    expect(find.byKey(const ValueKey('phase_detail_read_doc')), findsOneWidget);
   });
 
   test('wired: home, phase read and messages reach the docs', () {

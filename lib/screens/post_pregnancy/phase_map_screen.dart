@@ -34,6 +34,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
 import 'phase_detail_screen.dart';
+import 'pp_phase_page.dart' show PpPhasePage;
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_phases_data.dart';
@@ -154,8 +155,16 @@ class _PhaseMapScreenState extends State<PhaseMapScreen> {
     }
   }
 
+  // ⚠️ A FACADE SINCE 2026-10-22 (Wave 6). The user: tapping the phase should
+  // show "what the phase is about", not a list of twenty to pick from and then
+  // read. Every link that opened the map (the home hero, My Child, What
+  // changed, the `pp_leaps` surface) now lands on the one phase page, on the
+  // child's own phase, with the other nineteen a swipe or a pill away. The
+  // map as it was is [buildClassic], kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => const PpPhasePage();
+
+  Widget buildClassic(BuildContext context) {
     final child = ChildProfileStore.instance;
     return Scaffold(
       backgroundColor: _c.ground, // was ppBg

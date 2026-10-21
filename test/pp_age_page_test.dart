@@ -17,6 +17,7 @@ import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_home_activities_store.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_home_v3.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_month_notes.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_phase_page.dart' show PpPhasePage;
 import 'package:parentveda/screens/post_pregnancy/pp_phases_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_who_growth_lms.dart';
 import 'package:parentveda/screens/v2/v2_palette.dart';
@@ -112,7 +113,9 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
       await tester.pump(const Duration(milliseconds: 400));
-      expect(find.byKey(const ValueKey('pp_age_call_doctor'), skipOffstage: false), findsOneWidget);
+      // The age page left the home for the phase page on 2026-10-22 (Wave 6);
+      // see the phase page test below. Was findsOneWidget here.
+      expect(find.byKey(const ValueKey('pp_age_call_doctor'), skipOffstage: false), findsNothing);
       expect(find.byKey(const ValueKey('pp_this_month'), skipOffstage: false),
           months >= 12 ? findsOneWidget : findsNothing);
       // 2026-10-07: no search bar on the parenting home; under one the feed and
@@ -120,6 +123,16 @@ void main() {
       expect(find.byKey(const ValueKey('pp_home_search'), skipOffstage: false), findsNothing);
       expect(find.byKey(const ValueKey('pp_home_quick_feed'), skipOffstage: false),
           months < 12 ? findsOneWidget : findsNothing);
+    });
+
+    testWidgets('the phase page draws them on the child\'s own phase at $months months', (tester) async {
+      _ageMonths(months);
+      tester.view.physicalSize = const Size(900, 14000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(const MaterialApp(home: PpPhasePage()));
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byKey(const ValueKey('pp_age_call_doctor'), skipOffstage: false), findsOneWidget);
     });
   }
 }

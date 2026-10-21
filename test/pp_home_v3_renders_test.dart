@@ -35,11 +35,26 @@ void main() {
 
     // The sheet's own sections, not the hero: a field with no sheet on it was
     // exactly the failure this test was written for.
-    expect(find.textContaining('Right now'), findsWidgets,
-        reason: 'the child snapshot section is missing');
+    // Was 'Right now' (the snapshot's title until 2026-10-22); Explore by
+    // topic is the first sheet section under the hero since Wave 6.
+    expect(find.textContaining('Explore by topic', skipOffstage: false), findsWidgets,
+        reason: 'the sheet is missing');
   });
 
-  testWidgets('and the phase explainer is on it', (tester) async {
+  // Since 2026-10-22 (Wave 6) the phase explainer is the phase page, one tap
+  // from the painted hero; the home carries the painting and the way in.
+  testWidgets('and the painted hero opens the phase', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('pp_hero_painting')), findsOneWidget);
+    expect(find.byKey(const ValueKey('pp_hero_open_phase')), findsOneWidget);
+    expect(find.textContaining('This phase, explained', skipOffstage: false), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Kept for revert: the explainer on the home.
+  // ignore: unused_element
+  void keptExplainer() => testWidgets('and the phase explainer is on it', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
     await tester.pump(const Duration(milliseconds: 400));
 

@@ -10761,7 +10761,39 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   - Guard: `test/pp_wave5b_old_screens_test.dart` (facade sources, reader and
     door pumps, violet at any opacity). It found a real overflow on Vaccine
     detail ("Call your doctor / 112 if"), fixed with Flexible.
-- **§95.9 Waves 6 to 7** (home, warm copy): not started.
+- **§95.9 Wave 6, the home and the one phase page — DONE 2026-10-22.**
+  Approved in claude.ai/artifact/BgbjzKhougqj37K4rmtxKM (v2). Not walked.
+  - **One phase page** (`pp_phase_page.dart`, `PpPhasePage`): a `PageView` of
+    the 20 phases, each the phase doc in `PvReaderScreen` (one reader). The
+    head is a strip of phase pills, the painting as the film's poster with
+    ‹ ›, and "Back to now" away from the child's phase. "For this phase"
+    rides as a custom block after the snapshot: the doc's activities, two
+    door reads for the phase's band, products for its age, one expert by a
+    phase-to-need map, and a class by `ageTag`. The old age page (sleep and
+    feeding now, WHO ranges, call the doctor) rides on the child's own phase
+    only. The "Next" step and the pills move the page instead of pushing.
+  - **Facades:** `PhaseMapScreen` and `PhaseDetailScreen` open the phase page;
+    their old bodies are `buildClassic`. The 20-phase map is no longer
+    reachable as a list.
+  - **Home:** the painted hero (the phase painting fading into the page,
+    "Aarav is 2 weeks old", phase n of 20, a 20-step strip, "Open this
+    phase"); the field and the sheet's card edge are commented out. Order:
+    insights, father card, Due now, Explore by topic (no eyebrow), three
+    activity rows, how the child is growing (rows with drawn area marks),
+    reads, products ("For <name>"), journal, FAQs, Keep handy. Commented out:
+    the film and "Phase at a glance", the age page, "What changes next",
+    "Looking ahead" (the user: "no need of it").
+  - **Shared reader:** `PvReaderScreen.heroHeight` (default 132) so the phase
+    page's taller head fits. Every other read is unchanged.
+  - **Decided:** an activity swap is a press and hold, with a line under the
+    rows that says so (one control per row). The home's insights heading
+    stays "My daily insights / Today", as in the other two homes.
+  - **Owed:** activity photos (rows use the drawn area mark); reads for a
+    swiped-to phase are door pages for its band, rotated, not ranked by the
+    relevance brain (which reads the current child only).
+  - Guard: `test/pp_phase_page_test.dart`. Updated tests that pinned the old
+    map, phase screen and home sections (old assertions kept commented).
+- **§95.10 Wave 7** (warm copy): not started.
 
 ## 96.0 The 2026-10-20 walk: TTC fixes and cross-stage content — 2026-10-21
 

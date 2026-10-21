@@ -41,6 +41,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pp_child_profile.dart';
 import 'phase_map_screen.dart' show PhasePainting;
+import 'pp_phase_page.dart' show PpPhasePage;
 
 // ⚠️ THE HOUSE LOOK, 2026-10-17 (the user: "very old UI, font not matching
 // and very purple"). Same sections in the same order; only the chrome changed:
@@ -69,8 +70,13 @@ class _PhaseDetailScreenState extends State<PhaseDetailScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
+  // ⚠️ A FACADE SINCE 2026-10-22 (Wave 6): one phase is the one phase page,
+  // opened on this phase, with the full doc as its body. The screen as it
+  // was is [buildClassic], kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => PpPhasePage(initial: phase.number);
+
+  Widget buildClassic(BuildContext context) {
     final p = phase;
     final film = ppPhaseVideo(p);
     // ⚠️ A PHASE WITH A DOC (1–15 on 2026-10-13, all 20 since 2026-10-16). `kPhases` has already laid

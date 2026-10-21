@@ -71,9 +71,22 @@ PvCallout _doctor(List<String> lines) => PvCallout(
     );
 
 /// The phase page, in the doc's order.
-PvRead ppPhaseDocAsRead(PpPhaseDoc doc, AgePhase phase) => PvRead(
+///
+/// The one phase page (2026-10-22, Wave 6, pp_phase_page.dart) adds its own
+/// kicker ("Coming up", "Earlier"), the "For this phase" block after the
+/// snapshot, the phase's questions and the step to the next phase. Every
+/// other caller passes none of them and gets the page it always had.
+PvRead ppPhaseDocAsRead(
+  PpPhaseDoc doc,
+  AgePhase phase, {
+  String? kicker,
+  List<PvReadSection> extra = const [],
+  List<PvReadFaq> faqs = const [],
+  List<PvReadNextStep> nextSteps = const [],
+}) =>
+    PvRead(
       id: 'pp_phase_${phase.number}',
-      kicker: _same('This phase · ${phase.ageLabel}'),
+      kicker: _same(kicker ?? 'This phase · ${phase.ageLabel}'),
       title: _same(doc.name),
       // The hero's first paragraph opens the page; the rest follow it.
       teaser: _fill(doc.hero.first),
@@ -94,12 +107,14 @@ PvRead ppPhaseDocAsRead(PpPhaseDoc doc, AgePhase phase) => PvRead(
             bullets: [for (final t in c.tips) _fill(t)],
           ),
         PvReadSection(heading: _same('Child snapshot'), custom: PpDocSnapshotBlock(doc)),
+        ...extra,
         // The India note is not in the doc and the doc does not contradict it;
         // kept so the page loses nothing it had.
         if (phase.indianNote case final n?) PvReadSection(heading: _same('In India'), paragraphs: [_fill(n)]),
       ],
       whenToSeeSomeone: _doctor(doc.doctor),
-      faqs: const [],
+      faqs: faqs, // was const []
+      nextSteps: nextSteps,
       evidence: _same(kPpPhaseSources.replaceFirst('Where this comes from: ', '')),
     );
 
@@ -152,6 +167,10 @@ void ppOpenMilestoneRead(BuildContext context, PpPhaseDoc doc, PpMilestonePage m
         customBlock: _renderBlock,
       ),
     ));
+
+/// The doc's own blocks (the snapshot rows, an activity card), for a caller
+/// that renders the phase read with its own custom blocks beside them.
+Widget ppPhaseDocBlock(BuildContext context, Object block) => _renderBlock(context, block);
 
 Widget _renderBlock(BuildContext context, Object block) => switch (block) {
       PpDocSnapshotBlock(:final doc) => _SnapshotRows(doc: doc),

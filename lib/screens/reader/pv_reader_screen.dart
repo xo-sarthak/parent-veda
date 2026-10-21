@@ -96,9 +96,15 @@ class PvReaderScreen extends StatefulWidget {
     this.resolveRead,
     this.customBlock,
     this.onReadToEnd,
+    this.heroHeight = 132,
   });
 
   final PvRead read;
+
+  /// The frame [hero] sits in. 132 for every article (see the note at the
+  /// frame); the parenting phase page passes its taller painting-and-strip
+  /// head (2026-10-22, Wave 6), where the picture IS the page's subject.
+  final double heroHeight;
 
   /// An optional picture above the masthead.
   ///
@@ -429,7 +435,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // every case, so every article has the same head whether or
                   // not its picture has been chosen yet (`_defaultHero`).
                   SizedBox(
-                    height: 132,
+                    height: widget.heroHeight, // was 132 for every read
                     width: double.infinity,
                     // Half-speed parallax, clamped so an overscroll bounce
                     // cannot drag the image out of its frame. Scoped to this
@@ -441,7 +447,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                         builder: (context, child) {
                           final off = _sc.hasClients ? _sc.offset : 0.0;
                           return Transform.translate(
-                              offset: Offset(0, (off * 0.4).clamp(0.0, 132.0)),
+                              offset: Offset(0, (off * 0.4).clamp(0.0, widget.heroHeight)),
                               child: child);
                         },
                         child: widget.hero ?? _defaultHero(s),

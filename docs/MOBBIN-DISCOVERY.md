@@ -1244,3 +1244,28 @@ estimate, so marking some twice was repetition (the user).
 
 **Built.** `ttc_cycle_hub.dart`, `ttc_temp_parts.dart`,
 `ttc_ovulation_screen.dart`, `ttc_ready_week.dart`.
+
+## 33. The parenting hero and the one phase page (2026-10-22)
+
+**Asked.** The user: the parenting hero is bland, and a phase tap should land
+on the phase itself ("what the phase is about"), like Wonder Weeks' leaps,
+not a list of twenty and then a third screen to read.
+
+**Found.** Wonder Weeks is not in the library. Flo "What happens at 42 weeks"
+(https://mobbin.com/screens/347a171b-a63b-4c2f-b8cf-9b0377c8b255): a big
+picture, a strip of week pills, the article below. Clue
+(https://mobbin.com/screens/e6d1a043-3433-4b1c-a1b5-8060482d9d4e): ‹ › between
+weeks and "Back to today". Moonlitt
+(https://mobbin.com/screens/109f55cc-1ae4-496a-b70d-a2940ebd4c17): a painting
+card with page dots. Noom "Today's plan"
+(https://mobbin.com/screens/726a894d-7bbb-4269-9e97-3007507cd4e4): short rows
+with a mark, one line each.
+
+**Adopted.** The phase pills, ‹ › on the painting and "Back to now"; the
+article as the page; activities and changes as one-line rows with marks.
+
+**Declined.** Oura's and Stardust's dark grounds; Me+ and Alan's coloured
+cards and streaks.
+
+**Built.** `pp_phase_page.dart`, `pp_home_v3.dart` (`_PaintedHero`,
+`_ActivityRows`).

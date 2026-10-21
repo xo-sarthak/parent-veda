@@ -158,7 +158,10 @@ void main() {
     expect(t.takeException(), isNull);
   });
 
-  testWidgets('Read the full description opens the phase in the reader', (t) async {
+  // Since 2026-10-22 (Wave 6) the phase glance is off the home: the painted
+  // hero's "Open this phase" opens the one phase page, whose body is the doc
+  // in the reader. Was: pp_phase_glance + pp_phase_read_more -> pp/phase_read/.
+  testWidgets('Open this phase opens the phase page in the reader', (t) async {
     kDailyTipEnabled = false;
     addTearDown(() => kDailyTipEnabled = true);
     ChildProfileStore.instance.debugSetDob(DateTime.now().subtract(const Duration(days: 130)));
@@ -170,12 +173,13 @@ void main() {
         navigatorObservers: [_Observer(pushed)],
         home: const Scaffold(body: PpHomeV3())));
     await t.pump(const Duration(milliseconds: 600));
-    expect(find.byKey(const ValueKey('pp_phase_glance')), findsOneWidget);
+    expect(find.byKey(const ValueKey('pp_hero_open_phase')), findsOneWidget);
     pushed.clear();
-    await t.tap(find.byKey(const ValueKey('pp_phase_read_more')));
+    await t.tap(find.byKey(const ValueKey('pp_hero_open_phase')));
     await t.pump(const Duration(milliseconds: 600));
-    expect(pushed.map((r) => r.settings.name), contains(startsWith('pp/phase_read/')));
-    expect(find.byType(PvReaderScreen, skipOffstage: false), findsOneWidget);
+    expect(pushed.map((r) => r.settings.name), contains(startsWith('pp/phase/')));
+    await t.pump(const Duration(milliseconds: 600));
+    expect(find.byType(PvReaderScreen, skipOffstage: false), findsWidgets);
     expect(t.takeException(), isNull);
   });
 }

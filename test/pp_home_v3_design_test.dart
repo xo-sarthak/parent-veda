@@ -277,9 +277,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       for (final t in [
-        'Activities to do today with your baby',
+        // Renamed 2026-10-22 (Wave 6): was 'Activities to do today with
+        // your baby' and 'Recommended products for your baby'.
+        'Three things to do with',
         'Recommended reads for today',
-        'Recommended products for your baby',
+        'Useful at this age',
         'Record a memory for your child today',
       ]) {
         await scrollUntil(tester, t);
@@ -292,6 +294,8 @@ void main() {
         'One thing to try',
         'Things that help',
         'This phase, in a video',
+        'This phase, explained', // the phase page holds it since 2026-10-22
+        'What comes next',
       ]) {
         expect(find.textContaining(gone, skipOffstage: false), findsNothing,
             reason: '"$gone" is still on the screen');
@@ -299,7 +303,10 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the video sits above the phase text', (tester) async {
+    // The film and the phase text are on the phase page since 2026-10-22
+    // (test/pp_phase_page_test.dart). Kept for revert, not run:
+    // ignore: unused_element
+    void keptVideoOrder() => testWidgets('the video sits above the phase text', (tester) async {
       await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
       await tester.pump(const Duration(milliseconds: 400));
       // Pregnancy's heading and film since 2026-10-07 (pp_phase_film.dart).
@@ -321,7 +328,28 @@ void main() {
           reason: 'the written description must follow the video');
     });
 
-    testWidgets('Done marks the card and keeps it', (tester) async {
+    // The three activities are rows with a round check since 2026-10-22.
+    testWidgets('the check marks an activity done', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
+      await tester.pump(const Duration(milliseconds: 400));
+      await scrollUntil(tester, 'Three things to do with');
+      await tester.pump(const Duration(milliseconds: 200));
+      final checks = find.byWidgetPredicate(
+          (w) => w.key is ValueKey<String> &&
+              (w.key! as ValueKey<String>).value.startsWith('pp_home_activity_done_'),
+          skipOffstage: false);
+      expect(checks, findsNWidgets(3));
+      await tester.scrollUntilVisible(checks.first, 200, scrollable: find.byType(Scrollable).first);
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.tap(checks.first);
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('✓', skipOffstage: false), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    // Kept for revert: the cards' Done button.
+    // ignore: unused_element
+    void keptDone() => testWidgets('Done marks the card and keeps it', (tester) async {
       await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
       await tester.pump(const Duration(milliseconds: 400));
       await scrollUntil(tester, 'Activities to do today');

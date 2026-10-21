@@ -13,8 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:parentveda/screens/post_pregnancy/phase_detail_screen.dart';
+// import 'package:parentveda/screens/post_pregnancy/phase_detail_screen.dart'; // only the kept-for-revert map tests used it (2026-10-22)
 import 'package:parentveda/screens/post_pregnancy/phase_map_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_phase_page.dart' show PpPhasePage;
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_phases_data.dart';
 
@@ -50,20 +51,40 @@ void main() {
   });
 
   group('the screen', () {
-    testWidgets('opens on the child\'s own phase, then five chapters of stops', (t) async {
+    // ⚠️ A FACADE SINCE 2026-10-22 (Wave 6): the map opens the one phase page
+    // on the child's own phase; the other phases are pills and a swipe away.
+    // The map's own tests are kept below, commented, for revert.
+    testWidgets('opens the phase page on the child\'s own phase', (t) async {
       _ageMonths(8);
       await _pump(t, 390);
       final now = kPhases[phaseIndexForMonths(ChildProfileStore.instance.ageInMonths.toDouble())];
-      expect(find.textContaining('PHASE ${now.number} ·'), findsOneWidget);
-      expect(find.text('Open this phase'), findsOneWidget);
-      for (final c in kPhaseChapters) {
-        expect(find.text(c.name), findsWidgets, reason: '${c.name} chapter missing');
-      }
-      for (final p in kPhases) {
-        expect(find.byKey(ValueKey('phase-stop-${p.number}')), findsOneWidget);
-      }
+      expect(find.byType(PpPhasePage), findsOneWidget);
+      expect(find.text('${now.number}  ${now.name}'), findsOneWidget);
+      expect(t.takeException(), isNull);
     });
 
+    testWidgets('a pill opens its phase', (t) async {
+      _ageMonths(2);
+      await _pump(t, 390);
+      await t.tap(find.byKey(const ValueKey('pp_phase_pill_5')).first);
+      await t.pumpAndSettle();
+      expect(find.text('5  ${kPhases[4].name}'), findsOneWidget);
+    });
+
+    // Kept for revert (the map before Wave 6):
+    // testWidgets('opens on the child\'s own phase, then five chapters of stops', (t) async {
+    //   _ageMonths(8);
+    //   await _pump(t, 390);
+    //   final now = kPhases[phaseIndexForMonths(ChildProfileStore.instance.ageInMonths.toDouble())];
+    //   expect(find.textContaining('PHASE ${now.number} ·'), findsOneWidget);
+    //   expect(find.text('Open this phase'), findsOneWidget);
+    //   for (final c in kPhaseChapters) {
+    //     expect(find.text(c.name), findsWidgets, reason: '${c.name} chapter missing');
+    //   }
+    //   for (final p in kPhases) {
+    //     expect(find.byKey(ValueKey('phase-stop-${p.number}')), findsOneWidget);
+    //   }
+    // });
     // Kept for revert: written before any painting existed (2026-10-15).
     // testWidgets('no painting yet: the number disc stands in, nothing breaks', (t) async {
     //   _ageMonths(2);
@@ -80,22 +101,22 @@ void main() {
       }
     });
 
-    testWidgets('a stop opens its phase', (t) async {
-      _ageMonths(2);
-      await _pump(t, 390);
-      await t.ensureVisible(find.byKey(const ValueKey('phase-stop-5')));
-      await t.tap(find.byKey(const ValueKey('phase-stop-5')));
-      await t.pumpAndSettle();
-      expect(find.byType(PhaseDetailScreen), findsOneWidget);
-    });
+    // testWidgets('a stop opens its phase', (t) async {
+    //   _ageMonths(2);
+    //   await _pump(t, 390);
+    //   await t.ensureVisible(find.byKey(const ValueKey('phase-stop-5')));
+    //   await t.tap(find.byKey(const ValueKey('phase-stop-5')));
+    //   await t.pumpAndSettle();
+    //   expect(find.byType(PhaseDetailScreen), findsOneWidget);
+    // });
 
-    testWidgets('Open this phase opens the current one', (t) async {
-      _ageMonths(14);
-      await _pump(t, 390);
-      await t.tap(find.text('Open this phase'));
-      await t.pumpAndSettle();
-      expect(find.byType(PhaseDetailScreen), findsOneWidget);
-    });
+    // testWidgets('Open this phase opens the current one', (t) async {
+    //   _ageMonths(14);
+    //   await _pump(t, 390);
+    //   await t.tap(find.text('Open this phase'));
+    //   await t.pumpAndSettle();
+    //   expect(find.byType(PhaseDetailScreen), findsOneWidget);
+    // });
 
     for (final w in [320.0, 390.0, 800.0]) {
       testWidgets('lays out at $w wide without overflow', (t) async {
