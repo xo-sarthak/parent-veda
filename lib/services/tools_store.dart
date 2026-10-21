@@ -15,8 +15,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/own_row_ledger.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'remote/sync_row_book.dart';
 
 // ---------------------------------------------------------------------------
 //  Models
@@ -269,6 +271,61 @@ class ToolsStore extends ChangeNotifier {
 
   bool _loaded = false;
 
+  // ---- newer-wins sync (2026-10-21, sync log step 9, migration 0107) -------
+  // All five tables are own-only. The weight profile and the kegel routine
+  // are ONE row per person (OwnRowLedger.single); the other three are lists
+  // whose removals are soft deletes that travel.
+  static const _me = OwnRowLedger.singleKey;
+  final OwnRowLedger _profileSync =
+      OwnRowLedger.single('weight_profile', 'weight_profile_sync');
+  final OwnRowLedger _weightSync =
+      OwnRowLedger('weight_entries', 'weight_entries_sync');
+  final OwnRowLedger _moveSync =
+      OwnRowLedger('movement_sessions', 'movement_sessions_sync');
+  final OwnRowLedger _kegelSync =
+      OwnRowLedger.single('kegel_state', 'kegel_state_sync');
+  final OwnRowLedger _ctSync =
+      OwnRowLedger('contraction_sessions', 'contraction_sessions_sync');
+
+  List<OwnRowLedger> get _ledgers =>
+      [_profileSync, _weightSync, _moveSync, _kegelSync, _ctSync];
+
+  /// Changes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _ledgers.any((l) => l.hasPending);
+
+  Map<String, Map<String, dynamic>> _profileRows() =>
+      (_prePregnancyWeight == null && _heightCm == null)
+          ? {}
+          : {
+              _me: {'pre': _prePregnancyWeight, 'height': _heightCm}
+            };
+  Map<String, Map<String, dynamic>> _weightRows() =>
+      {for (final e in _weightEntries) e.id: _weightEntryToRow(e)};
+
+  /// Only ended sessions with a movement are rows: an open one is still
+  /// being counted, and an empty one is discarded.
+  Map<String, Map<String, dynamic>> _moveRows() => {
+        for (final m in _movementSessions)
+          if (!m.isActive && m.times.isNotEmpty) m.id: _movementToRow(m)
+      };
+  bool get _hasKegel =>
+      _kegelSessions > 0 ||
+      _kegelThisWeek.isNotEmpty ||
+      _kegelCustomHold != null ||
+      !_kegelVoiceOn;
+  Map<String, Map<String, dynamic>> _kegelRows() =>
+      _hasKegel ? {_me: _kegelRow()} : {};
+  Map<String, Map<String, dynamic>> _ctRows() =>
+      {for (final c in _contractionSessions) c.id: _contractionToRow(c)};
+
+  Future<void> _pushAll() async {
+    await _profileSync.push(_profileRows);
+    await _weightSync.push(_weightRows);
+    await _moveSync.push(_moveRows);
+    await _kegelSync.push(_kegelRows);
+    await _ctSync.push(_ctRows);
+  }
+
   // ---- Movement getters -----------------------------------------------------
 
   /// The currently open session, if any (the one the mother started and has not
@@ -421,6 +478,11 @@ class ToolsStore extends ChangeNotifier {
 
   Future<void> init() async {
     if (_loaded) return;
+    // The ledgers first: closing a dangling session below stamps it.
+    for (final l in _ledgers) {
+      await l.load();
+    }
+    SyncRegistry.registerPending(() => hasPending);
     try {
       final prefs = await SharedPreferences.getInstance();
 
@@ -529,12 +591,135 @@ class ToolsStore extends ChangeNotifier {
     _kegelCustomReps = null;
     _kegelVoiceOn = true;
     _contractionSessions.clear();
+    for (final l in _ledgers) {
+      l
+        ..clear()
+        ..save();
+    }
     notifyListeners();
   }
 
+  /// Newer wins per row (step 9). Each table pulls in its own `try`, so one
+  /// failure no longer skips the rest; then everything waiting goes up.
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
+    if (!SupabaseRepo.isLoggedIn) return;
+    bool gone(Map<String, dynamic> r) =>
+        syncParseStamp(r['removed_at']) != null;
+
+    try {
+      for (final r in await _profileSync.pull(liveKeys: _profileRows().keys)) {
+        _prePregnancyWeight = (r['pre'] as num?)?.toDouble();
+        _heightCm = (r['height'] as num?)?.toDouble();
+      }
+      await _persist(_weightProfileKey,
+          jsonEncode({'pre': _prePregnancyWeight, 'height': _heightCm}));
+    } catch (_) {}
+
+    try {
+      final byId = {for (final e in _weightEntries) e.id: e};
+      for (final r in await _weightSync.pull(liveKeys: byId.keys)) {
+        final id = r['id'] as String;
+        if (gone(r)) {
+          byId.remove(id);
+        } else {
+          byId[id] = _weightEntryFromRow(r);
+        }
+      }
+      _weightEntries
+        ..clear()
+        ..addAll(byId.values);
+      await _persist(_weightEntriesKey,
+          jsonEncode(_weightEntries.map((e) => e.toJson()).toList()));
+    } catch (_) {}
+
+    try {
+      final active = _movementSessions.where((m) => m.isActive).toList();
+      final byId = {
+        for (final m in _movementSessions)
+          if (!m.isActive) m.id: m
+      };
+      for (final r in await _moveSync.pull(liveKeys: _moveRows().keys)) {
+        final id = r['id'] as String;
+        if (gone(r)) {
+          byId.remove(id);
+        } else {
+          byId[id] = _movementFromRow(r);
+        }
+      }
+      _movementSessions
+        ..clear()
+        ..addAll(byId.values)
+        ..addAll(active);
+      await _persistMovementSessions();
+    } catch (_) {}
+
+    try {
+      for (final r in await _kegelSync.pull(liveKeys: _kegelRows().keys)) {
+        _kegelSessions = (r['sessions'] as num?)?.toInt() ?? 0;
+        _kegelLast = r['last']?.toString();
+        _kegelHoldAdjust = (r['hold_adjust'] as num?)?.toInt() ?? 0;
+        _kegelRepAdjust = (r['rep_adjust'] as num?)?.toInt() ?? 0;
+        _kegelCustomHold = (r['custom_hold'] as num?)?.toInt();
+        _kegelCustomRelax = (r['custom_relax'] as num?)?.toInt();
+        _kegelCustomReps = (r['custom_reps'] as num?)?.toInt();
+        _kegelVoiceOn = (r['voice_on'] as bool?) ?? true;
+        _kegelThisWeek
+          ..clear()
+          ..addAll(((r['this_week'] as List?) ?? []).map((e) => e.toString()));
+      }
+      await _saveKegelLocal();
+    } catch (_) {}
+
+    try {
+      final byId = {for (final c in _contractionSessions) c.id: c};
+      for (final r in await _ctSync.pull(liveKeys: byId.keys)) {
+        final id = r['id'] as String;
+        if (gone(r)) {
+          byId.remove(id);
+        } else {
+          byId[id] = _contractionFromRow(r);
+        }
+      }
+      _contractionSessions
+        ..clear()
+        ..addAll(byId.values);
+      await _persist(_contractionKey,
+          jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()));
+    } catch (_) {}
+
+    // kegel_history - still a user_state blob, merged by dateIso (step 10
+    // owes it a per-item merge).
+    try {
+      final khCloud = await SupabaseRepo.loadState('tool_kegel_history');
+      if (khCloud is List) {
+        final byIso = <String, KegelRecord>{
+          for (final e in _kegelHistory) e.dateIso: e,
+        };
+        for (final e in khCloud) {
+          final r = KegelRecord.fromJson(Map<String, dynamic>.from(e));
+          byIso[r.dateIso] = r;
+        }
+        _kegelHistory
+          ..clear()
+          ..addAll(byIso.values);
+      }
+      await SupabaseRepo.saveState('tool_kegel_history',
+          _kegelHistory.map((e) => e.toJson()).toList());
+      await _persist(_kegelHistKey,
+          jsonEncode(_kegelHistory.map((e) => e.toJson()).toList()));
+    } catch (_) {}
+
+    notifyListeners();
+    await _pushAll();
+  }
+
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
+    // kept for revert (before step 9): cloud wins per id and local-only rows
+    // are pushed again, so a deleted weight entry came back and an offline
+    // change to the profile or the kegel routine was overwritten.
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // weight_profile (single row per user)
@@ -643,6 +828,8 @@ class ToolsStore extends ChangeNotifier {
     } catch (_) {/* offline - keep local */}
   }
 
+  // kept for revert (before step 9): one-shot pushes, replaced by the ledgers.
+  // ignore: unused_element
   Future<void> _cloudUpsertWeightProfile() async {
     if (!SupabaseRepo.isLoggedIn) return;
     try {
@@ -652,6 +839,20 @@ class ToolsStore extends ChangeNotifier {
     } catch (_) {}
   }
 
+  /// The kegel_state row's columns (step 9: the ledger's live row).
+  Map<String, dynamic> _kegelRow() => {
+        'sessions': _kegelSessions,
+        'last': _kegelLast,
+        'hold_adjust': _kegelHoldAdjust,
+        'rep_adjust': _kegelRepAdjust,
+        'custom_hold': _kegelCustomHold,
+        'custom_relax': _kegelCustomRelax,
+        'custom_reps': _kegelCustomReps,
+        'voice_on': _kegelVoiceOn,
+        'this_week': _kegelThisWeek,
+      };
+
+  // ignore: unused_element
   Future<void> _cloudPushKegelState() async {
     if (!SupabaseRepo.isLoggedIn) return;
     try {
@@ -762,15 +963,18 @@ class ToolsStore extends ChangeNotifier {
     } else {
       _movementSessions.remove(s);
     }
+    // Only ended sessions (with movements) go to the cloud.
+    if (keep) _moveSync.touch(s.id);
     notifyListeners();
     await _persistMovementSessions();
-    // Only ended sessions (with movements) go to the cloud.
-    if (keep && SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('movement_sessions', _movementToRow(s),
-            onConflict: 'id');
-      } catch (_) {}
-    }
+    // kept for revert (before step 9): a one-shot upsert, lost if offline.
+    // if (keep && SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('movement_sessions', _movementToRow(s),
+    //         onConflict: 'id');
+    //   } catch (_) {}
+    // }
+    await _moveSync.push(_moveRows);
   }
 
   /// Close any session left active from a previous launch (no persistence note
@@ -787,6 +991,7 @@ class ToolsStore extends ChangeNotifier {
     for (final s in _movementSessions) {
       if (s.isActive) {
         s.endIso = s.times.last.toIso8601String();
+        _moveSync.touch(s.id); // now a finished row (step 9)
         changed = true;
       }
     }
@@ -804,34 +1009,46 @@ class ToolsStore extends ChangeNotifier {
     notifyListeners();
     await _persist(_weightProfileKey,
         jsonEncode({'pre': preWeight, 'height': heightCm}));
-    await _cloudUpsertWeightProfile();
+    // kept for revert (before step 9):
+    // await _cloudUpsertWeightProfile();
+    _profileSync.touch(_me);
+    await _profileSync.push(_profileRows);
   }
 
   /// Add a weight entry. Multiple entries per day are allowed (and kept) - they
   /// are never overwritten.
   Future<void> addWeightEntry(WeightEntry entry) async {
     _weightEntries.add(entry);
+    _weightSync.touch(entry.id);
     notifyListeners();
     await _persist(_weightEntriesKey,
         jsonEncode(_weightEntries.map((e) => e.toJson()).toList()));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.insert('weight_entries', _weightEntryToRow(entry));
-      } catch (_) {}
-    }
+    // kept for revert (before step 9):
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.insert('weight_entries', _weightEntryToRow(entry));
+    //   } catch (_) {}
+    // }
+    await _weightSync.push(_weightRows);
   }
 
   /// Remove a single weight entry by id.
   Future<void> deleteWeightEntry(String id) async {
+    // A soft delete that travels (step 9).
+    for (final e in _weightEntries.where((e) => e.id == id)) {
+      _weightSync.remove(id, _weightEntryToRow(e));
+    }
     _weightEntries.removeWhere((e) => e.id == id);
     notifyListeners();
     await _persist(_weightEntriesKey,
         jsonEncode(_weightEntries.map((e) => e.toJson()).toList()));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.delete('weight_entries', id);
-      } catch (_) {}
-    }
+    // kept for revert (before step 9): a one-shot hard delete.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.delete('weight_entries', id);
+    //   } catch (_) {}
+    // }
+    await _weightSync.push(_weightRows);
   }
 
   // ---- Kegel mutations ------------------------------------------------------
@@ -909,7 +1126,16 @@ class ToolsStore extends ChangeNotifier {
     await _persistKegel();
   }
 
+  /// A kegel change: saved here, stamped, and sent (step 9).
   Future<void> _persistKegel() async {
+    await _saveKegelLocal();
+    // kept for revert (before step 9):
+    // await _cloudPushKegelState();
+    _kegelSync.touch(_me);
+    await _kegelSync.push(_kegelRows);
+  }
+
+  Future<void> _saveKegelLocal() async {
     await _persist(
         _kegelKey,
         jsonEncode({
@@ -923,7 +1149,6 @@ class ToolsStore extends ChangeNotifier {
           'voiceOn': _kegelVoiceOn,
           'thisWeek': _kegelThisWeek,
         }));
-    await _cloudPushKegelState();
   }
 
   // ---- Contraction mutations ------------------------------------------------
@@ -931,15 +1156,18 @@ class ToolsStore extends ChangeNotifier {
   Future<void> saveContractionSession(ContractionSession session) async {
     _contractionSessions.removeWhere((s) => s.id == session.id);
     _contractionSessions.add(session);
+    _ctSync.touch(session.id);
     notifyListeners();
     await _persist(_contractionKey,
         jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()));
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('contraction_sessions', _contractionToRow(session),
-            onConflict: 'id');
-      } catch (_) {}
-    }
+    // kept for revert (before step 9):
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('contraction_sessions', _contractionToRow(session),
+    //         onConflict: 'id');
+    //   } catch (_) {}
+    // }
+    await _ctSync.push(_ctRows);
   }
 
   // ---- Helpers --------------------------------------------------------------

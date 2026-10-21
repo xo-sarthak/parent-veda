@@ -140,6 +140,45 @@ void main() {
     });
   });
 
+  group('one-row tables (weight profile, kegel routine; 0107, step 9)', () {
+    OwnRowLedger profile() =>
+        OwnRowLedger.single('weight_profile', 't_wp');
+
+    test('conflicts on user_id alone and sends no removed_at', () {
+      final l = profile()..touch(OwnRowLedger.singleKey);
+      expect(l.onConflict, 'user_id');
+      final up = l.uploadFor(
+          OwnRowLedger.singleKey,
+          {
+            OwnRowLedger.singleKey: {'pre': 58.0, 'height': 160.0}
+          },
+          uid: 'me')!;
+      expect(up['user_id'], 'me');
+      expect(up['pre'], 58.0);
+      expect(up.containsKey('removed_at'), isFalse);
+      expect(up.containsKey('id'), isFalse, reason: 'the table has no id');
+    });
+
+    test('a newer cloud row is taken under the one key', () {
+      final l = profile()..book.touch(OwnRowLedger.singleKey, at: t0);
+      final taken = l.apply(liveKeys: [OwnRowLedger.singleKey], rows: [
+        {'user_id': 'me', 'pre': 60, 'updated_at': iso(t0 + minute)},
+      ]);
+      expect(taken.single['pre'], 60);
+      expect(taken.single['id'], OwnRowLedger.singleKey);
+    });
+
+    test('an older cloud row loses to a change here', () {
+      final l = profile()
+        ..book.touch(OwnRowLedger.singleKey, at: t0 + minute);
+      final taken = l.apply(liveKeys: [], rows: [
+        {'user_id': 'me', 'pre': 60, 'updated_at': iso(t0)},
+      ]);
+      expect(taken, isEmpty);
+      expect(l.hasPending, isTrue);
+    });
+  });
+
   test('logged out, nothing is sent and the change keeps waiting', () async {
     final l = OwnRowLedger('reminders', 't_rm')..touch('r1');
     await l.push(() => {

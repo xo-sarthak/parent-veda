@@ -86,6 +86,23 @@ void main() {
     }
   });
 
+  test('Pregnancy part 2 is guarded (0107)', () {
+    for (final t in [
+      'medications',
+      'medication_logs',
+      'completed_scans',
+      'appointments',
+      'symptom_logs',
+      'weight_profile',
+      'weight_entries',
+      'movement_sessions',
+      'kegel_state',
+      'contraction_sessions',
+    ]) {
+      expect(guarded, contains(t));
+    }
+  });
+
   test('father_missions can be upserted: 0106 gives it an UPDATE policy', () {
     // An upsert is checked against UPDATE even for a new row (0099); 0010
     // gave this table select, insert and delete only.

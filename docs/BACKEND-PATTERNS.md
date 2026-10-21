@@ -3297,6 +3297,127 @@ policies it needs.**
 
 History: `docs/BACKEND-SYNC-LOG.md` step 8.
 
+### 16ii-j. Read the policy, not the label; ids from the natural key; one-row tables (0107, 2026-10-21)
+
+Step 9 moved the second half of Pregnancy (medicines, scans and appointments, symptoms, and the four tools) onto
+`OwnRowLedger`. Four ideas came out of it.
+
+**1. "Shared" was a read rule, not a write rule.** Scans and appointments looked shared: his phone shows her scans.
+The policies told the real story. The partner may *read* her rows (0012), but only she inserts, updates or deletes.
+So her rows are still single-owner, and the plain newer-wins rule applies. No merge decision was needed. His copy
+stayed a separate read-only fetch. That fetch now has to skip rows with `removed_at` set, though. A soft delete is
+a row that still exists, so a plain `select` shows it.
+
+> General fact: **classify a table by who can write it, not by who can see it.** Conflicts come from two writers.
+> Extra readers only need to understand tombstones.
+
+**2. Build the id from the natural key.** A medicine is taken at most once a day, and a symptom has at most one log
+per day. Both stores still made a fresh timestamp id on every tick. So two phones ticking the same day wrote two
+rows, and "change the severity" turned into a delete plus an insert under a new id. Now the id is built from the
+thing it names: `ml_<medicine>_<day>` and `sl_<day>_<symptom>`. Two phones doing the same thing write the same
+row, an un-tick then re-tick revives that row, and an edit is an edit.
+
+> General fact: **if the domain says "one per X", put X in the id.** Then idempotency comes free: the same action
+> done twice, on two devices or after a retry, lands on one row.
+
+**3. A one-row table is still a table.** The weight profile and the kegel routine are one row per person, keyed on
+`user_id` alone. The ledger gained `OwnRowLedger.single`: a constant book key (`'me'`), a conflict target of just
+`user_id`, and no `removed_at`, because you change your profile but never delete it. The merge logic is the same.
+Only the key is fixed.
+
+**4. If the phone needs a field, it has to be in the row.** Medicine alarms lived on the phone only. Every pull
+rebuilt each medicine from its cloud row, which had no `alarms`, so the alarms were wiped and her reminders
+quietly stopped. 0107 adds an `alarms` column. The setting syncs, and each phone re-arms its own OS alarms from it
+after a pull (§16ii-g). An old row with `alarms` null keeps this phone's alarms and sends them up once.
+
+> General fact: **a pull that rebuilds a model must cover every field the model has.** Anything missing from the
+> row isn't merged; it's wiped. Either sync the field or carry the local value across on purpose.
+
+A fifth finding, about the database: the Symptoms door writes severity `'strong'`, but the table only accepted
+`mild / moderate / severe`. Every "Strong" log had been refused by the server since 2026-09-22, and nobody noticed,
+because writes were fire-and-forget. With confirmed uploads it would have waited forever and kept the sign-out
+sheet warning. 0107 widens the check. This is why §16ii-k's mistake 5 matters.
+
+History: `docs/BACKEND-SYNC-LOG.md` step 9.
+
+### 16ii-k. Mistakes we made, and what they teach (read this before writing any new sync code)
+
+The sync code that steps 1–9 replaced wasn't careless. It worked on one phone that never went offline, which is how
+it was tested. Every mistake below shows up only with a second phone, an offline moment, or a second writer. **That
+is the general lesson: sync bugs live in the cases you didn't test.** Each entry gives the mistake, a moment where
+it bites, why it happens, and what the industry does instead.
+
+**Mistake 1: "the cloud doesn't have it, so it must be new."** The old pull fetched the cloud's rows, kept any local
+row the cloud lacked, and uploaded it again.
+- *The moment:* she deletes a calendar note on phone A. Phone B still has it, sees that the cloud doesn't, and
+  uploads it. The deleted note is back on both phones.
+- *Why:* a missing row is ambiguous. It might never have been sent, or it might have been deleted. Without a record
+  of deletes, no merge can tell the two apart. Sync engineers call this *resurrection*.
+- *The fix:* **tombstones**. A delete becomes a row that says "removed at 10:42" and syncs like any other change
+  (`removed_at`, §16ii). CouchDB, WatermelonDB, CloudKit and Cassandra all do this. Tombstones are later purged
+  (step 12) once every device has seen them.
+
+**Mistake 2: "the cloud wins."** For every id both sides held, the old pull took the cloud's copy.
+- *The moment:* she edits a reminder offline. The upload fails. On the next open the pull replaces her edit with the
+  cloud's older copy, and her change is gone with no error.
+- *Why:* "the cloud wins" is only right when the cloud has everything the phone has. Offline, it doesn't. The phone
+  needs to remember what it hasn't sent yet.
+- *The fix:* **last writer wins by edit time** (each row carries `updated_at`), plus an **outbox**: a durable
+  "waiting" mark per row, cleared only when the server confirms the upload (`SyncRowBook.dirty`, §16ii-d).
+
+**Mistake 3: an edit as delete plus insert.** Baby talk, a symptom's severity and the scan timeline's appointment
+edit all deleted the row and inserted a new one, often under a new id.
+- *The moment:* she edits day 40's message on phone A, which gets id #111. Phone B holds #222 for the same day. Sync
+  sees two different messages, so both survive and the newer text can lose. The appointment edit also dropped the
+  doctor, notes and status, because the re-insert built a fresh row from only the fields on screen.
+- *Why:* sync matches by id. If the id changes on every edit, sync can't tell "the same thing, edited" from "a new
+  thing".
+- *The fix:* **stable identity**. Edit in place, and where the domain says "one per X", build the id from X
+  (§16ii-j).
+
+**Mistake 4: syncing only part of the model.** Medicine alarms were never sent, and the pull rebuilt the model
+without them.
+- *The moment:* she sets a 9 pm iron-tablet alarm. The next sync wipes it, and she stops being reminded.
+- *Why:* a pull that rebuilds the model from the row silently resets every field the row doesn't carry.
+- *The fix:* sync the **fact** (the alarm settings) and rebuild the **side effect** (the OS alarm) on each device
+  (§16ii-g). Or carry the local value across on purpose. Never by accident.
+
+**Mistake 5: fire-and-forget hid errors.** Every cloud write was `try { ... } catch (_) {}`.
+- *The moment:* "Strong" symptoms broke a database check. `father_missions` had no UPDATE policy. A column name
+  didn't match. All three failed for weeks without a single log line.
+- *Why:* swallowing an error throws away the only evidence of the problem. "Best effort" turns into "no effort, and
+  nobody knows".
+- *The fix:* **confirmed writes** (`upsertRowConfirmed`). The row stays "waiting" until the server says yes, so a
+  permanent refusal shows up as a sign-out warning instead of vanishing. Add contract tests that pin the client to
+  the schema (`ttc_schema_contract_test`, `sync_guard_contract_test`), and `PvSyncHealth` to report a failure once
+  (§16dd). The industry name is **observability**: if a write can fail, something must notice.
+
+**Mistake 6: deciding only on the phone.** Even after the phones learned "newer wins", a stale phone could still
+write an older copy straight over a newer one in the database.
+- *Why:* a rule enforced by only some writers is a suggestion. Old app versions, a bug, or a phone with a wrong
+  clock all bypass it.
+- *The fix:* the **server is the last decision point**. 0100's trigger skips an older update and clamps a clock
+  from the future (§16ii-e). Industry equivalents are conditional writes and optimistic concurrency (DynamoDB
+  condition expressions, an `If-Match` ETag on HTTP).
+
+**Mistake 7: changing how we write without re-reading the permissions.** Moving from insert or delete to upsert
+quietly needed an UPDATE policy (§16ii-c, `father_missions` in step 8), and an upsert is also checked as an INSERT
+(§16ii-f).
+- *The fix:* every time the *verb* changes, re-read the table's policies. It's now step 1 of every sync step.
+
+**Where we stop short of the gold standard (known, chosen, and cheap to revisit):**
+
+| Our choice | The stronger option | Why we haven't switched yet |
+|---|---|---|
+| The phone's clock decides | Server-assigned versions, or hybrid logical clocks | Single-owner rows are almost always edited by one person minutes apart. The server already clamps a clock from the future |
+| The whole row wins | Merging field by field, or CRDTs (as in Figma and Notion) | Two phones editing different fields of the same row at the same moment is rare for one person's tracker. CRDTs earn their cost in shared documents |
+| Sync written by hand (`OwnRowLedger`, `ChildLogLedger`) | A sync engine such as PowerSync or ElectricSQL | An engine means rewriting every store (against "extend, never rewrite"), a vendor and a monthly bill. With the loop written once, we have what we need for our case |
+| Tombstones kept | Purged after a grace period | Step 12 (90 days) |
+
+> The one-sentence version: **offline-first sync needs stable ids, deletes that are data, a clock on every row, a
+> durable list of what hasn't been sent, a server that enforces the rule too, and errors that someone sees.** The
+> old code had the first one. Steps 1–9 added the other five.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3390,3 +3511,5 @@ History: `docs/BACKEND-SYNC-LOG.md` step 8.
 37. `lib/ttc/ttc_row_merge.dart`, `CycleStore` / `TtcLogStore` push and pull, `lib/services/auth/local_owner.dart`, `SyncRegistry.registerReset` — newer wins, soft deletes, dirty flags, and whose data is on the phone (§16ii).
 38. `0105_pp_children_votes_sync_clock.sql` → `childrenMerge` / `ChildProfileStore.setMeasures` — a soft delete on the access root, and a mirror column that must not move the clock (§16ii-h).
 39. `lib/services/remote/own_row_ledger.dart` → `BumpStore._pushWaiting` — one sync loop for every single-owner table, keyed and state rows, and a Storage clean-up that waits for the cloud (§16ii-i).
+40. `0107_preg_part2_sync_clock.sql` → `MedicineStore._syncFromCloud`, `ScansStore.notRemoved`, `OwnRowLedger.single` — classify by who writes, ids from the natural key, one-row tables, sync every field the model has (§16ii-j).
+41. §16ii-k — the mistakes the old sync made, why each one bites, and what the industry does instead. Read it before writing new sync code.

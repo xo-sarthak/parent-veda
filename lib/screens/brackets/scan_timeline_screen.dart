@@ -1340,18 +1340,44 @@ Future<void> showScanDateSheet(BuildContext context,
                     onPressed: () async {
                       pvCommitFeedback();
                       final store = ScansStore.instance;
+                      // kept for revert (before sync step 9): delete then
+                      // re-add. With soft deletes that sends a removal and a
+                      // revival of one id, and it dropped the doctor, notes
+                      // and status. Now an edit is an edit.
+                      // if (existing != null) {
+                      //   await store.deleteAppointment(existing.id);
+                      // }
+                      // await store.addAppointment(Appointment(
+                      //   id: existing?.id ??
+                      //       'ap_${DateTime.now().microsecondsSinceEpoch}',
+                      //   title: scan.name.en,
+                      //   dateIso: date.toIso8601String(),
+                      //   time: time,
+                      //   location: place.text.trim(),
+                      //   type: ApptType.scan,
+                      // ));
                       if (existing != null) {
-                        await store.deleteAppointment(existing.id);
+                        await store.updateAppointment(Appointment(
+                          id: existing.id,
+                          title: scan.name.en,
+                          dateIso: date.toIso8601String(),
+                          time: time,
+                          location: place.text.trim(),
+                          doctor: existing.doctor,
+                          type: ApptType.scan,
+                          notes: existing.notes,
+                          status: existing.status,
+                        ));
+                      } else {
+                        await store.addAppointment(Appointment(
+                          id: 'ap_${DateTime.now().microsecondsSinceEpoch}',
+                          title: scan.name.en,
+                          dateIso: date.toIso8601String(),
+                          time: time,
+                          location: place.text.trim(),
+                          type: ApptType.scan,
+                        ));
                       }
-                      await store.addAppointment(Appointment(
-                        id: existing?.id ??
-                            'ap_${DateTime.now().microsecondsSinceEpoch}',
-                        title: scan.name.en,
-                        dateIso: date.toIso8601String(),
-                        time: time,
-                        location: place.text.trim(),
-                        type: ApptType.scan,
-                      ));
                       if (ctx.mounted) Navigator.of(ctx).pop();
                     },
                     child: Text(_en('Save').of(lang)),

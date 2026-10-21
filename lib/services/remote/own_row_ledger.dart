@@ -21,6 +21,11 @@
 //  item ("felt movement today: not yet"), is never removed, only changed. It
 //  sends no `removed_at`, and every key the book has stamped takes part in the
 //  merge, so a change made here is never read as "absent, take the cloud's".
+//
+//  ONE-ROW TABLES ([OwnRowLedger.single], step 9, 0107). Her weight profile
+//  and kegel routine are one row per person, keyed on `user_id` alone. The
+//  book holds that row under the constant key [singleKey], the upsert
+//  conflicts on `user_id`, and it is state (no `removed_at`).
 // =============================================================================
 
 import 'dart:convert';
@@ -36,7 +41,16 @@ class OwnRowLedger {
     this.prefsKey, {
     this.keyColumn = 'id',
     this.hasRemovedAt = true,
-  });
+  }) : single = false;
+
+  /// One row per person (weight profile, kegel routine): see the header.
+  OwnRowLedger.single(this.table, this.prefsKey)
+      : keyColumn = 'user_id',
+        hasRemovedAt = false,
+        single = true;
+
+  /// The book key of a one-row table's only row.
+  static const String singleKey = 'me';
 
   /// The cloud table, e.g. `calendar_personal_events`.
   final String table;
@@ -49,6 +63,9 @@ class OwnRowLedger {
 
   /// False for a table whose rows are state (no `removed_at` column).
   final bool hasRemovedAt;
+
+  /// True for a one-row table ([OwnRowLedger.single]).
+  final bool single;
 
   final SyncRowBook book = SyncRowBook();
 
@@ -63,7 +80,11 @@ class OwnRowLedger {
   bool get hasPending => book.dirty.isNotEmpty;
 
   /// The upsert's conflict target.
-  String get onConflict => keyColumn == 'id' ? 'id' : 'user_id,$keyColumn';
+  String get onConflict => single
+      ? 'user_id'
+      : keyColumn == 'id'
+          ? 'id'
+          : 'user_id,$keyColumn';
 
   Future<void> load() async {
     try {
@@ -128,7 +149,7 @@ class OwnRowLedger {
   }) {
     final cloud = <Map<String, dynamic>>[];
     for (final r in rows) {
-      final key = r[keyColumn]?.toString();
+      final key = single ? singleKey : r[keyColumn]?.toString();
       if (key == null || key.isEmpty) continue;
       cloud.add(keyColumn == 'id' ? r : {...r, 'id': key});
     }
@@ -148,9 +169,11 @@ class OwnRowLedger {
   /// Fetches this person's rows and [apply]s them.
   Future<List<Map<String, dynamic>>> pull({
     required Iterable<String> liveKeys,
-    String orderBy = 'created_at',
+    String? orderBy,
   }) async {
-    final rows = await SupabaseRepo.fetch(table, orderBy: orderBy);
+    // A one-row table has no created_at.
+    final rows = await SupabaseRepo.fetch(table,
+        orderBy: orderBy ?? (single ? 'updated_at' : 'created_at'));
     final taken = apply(liveKeys: liveKeys, rows: rows);
     await save();
     return taken;

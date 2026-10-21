@@ -13,8 +13,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/medication.dart';
 import 'notification_service.dart';
+import 'remote/own_row_ledger.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'remote/sync_row_book.dart';
 
 class MedicineStore extends ChangeNotifier {
   MedicineStore._();
@@ -26,6 +28,32 @@ class MedicineStore extends ChangeNotifier {
   final List<Medication> _meds = [];
   final List<MedicationLog> _logs = [];
   bool _loaded = false;
+
+  // ---- newer-wins sync (2026-10-21, sync log step 9, migration 0107) -------
+  // Both tables are own-only. A removal is a soft delete that travels, an
+  // offline change waits and goes up later, and the alarms ride on the
+  // medication row so every phone re-arms them from the same fact (§16ii-g).
+  final OwnRowLedger _medSync = OwnRowLedger('medications', 'medications_sync');
+  final OwnRowLedger _logSync =
+      OwnRowLedger('medication_logs', 'medication_logs_sync');
+
+  /// Changes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _medSync.hasPending || _logSync.hasPending;
+
+  Map<String, Map<String, dynamic>> _medRows() =>
+      {for (final m in _meds) m.id: _toMedRow(m)};
+  Map<String, Map<String, dynamic>> _logRows() =>
+      {for (final l in _logs) l.id: _toLogRow(l)};
+
+  Future<void> _pushWaiting() async {
+    await _medSync.push(_medRows);
+    await _logSync.push(_logRows);
+  }
+
+  /// One log per medication per day, so its id is made from both: two phones
+  /// ticking the same day write the same row instead of two (step 9).
+  static String logIdFor(String medId, String dateKey) =>
+      'ml_${medId}_$dateKey';
 
   /// Arms every medication's alarms. Also run after a sign-in.
   Future<void> rearmNotifications() async {
@@ -52,6 +80,9 @@ class MedicineStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
+    await _medSync.load();
+    await _logSync.load();
+    SyncRegistry.registerPending(() => hasPending);
     _loaded = true;
     notifyListeners();
 
@@ -70,12 +101,80 @@ class MedicineStore extends ChangeNotifier {
   void _resetLocal() {
     _meds.clear();
     _logs.clear();
+    _medSync
+      ..clear()
+      ..save();
+    _logSync
+      ..clear()
+      ..save();
     notifyListeners();
   }
 
+  /// Newer wins per row (step 9). A medication removed on another phone
+  /// loses its alarms here; one changed there is re-armed from its row.
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      final meds = {for (final m in _meds) m.id: m};
+      final gone = <String>[];
+      final changed = <Medication>[];
+      for (final r in await _medSync.pull(liveKeys: meds.keys)) {
+        final id = r['id'] as String;
+        if (syncParseStamp(r['removed_at']) != null) {
+          meds.remove(id);
+          gone.add(id);
+          continue;
+        }
+        final keep = meds[id]?.alarms ?? const <MedAlarm>[];
+        final m = _fromMedRow(r, keepAlarms: keep);
+        meds[id] = m;
+        changed.add(m);
+        // A row from before 0107 has no alarms: send this phone's up once.
+        if (r['alarms'] == null && keep.isNotEmpty) _medSync.touch(id);
+      }
+      _meds
+        ..clear()
+        ..addAll(meds.values);
+      await _persistMeds();
+
+      final logs = {for (final l in _logs) l.id: l};
+      for (final r in await _logSync.pull(
+          liveKeys: logs.keys, orderBy: 'taken_at_iso')) {
+        final id = r['id'] as String;
+        if (syncParseStamp(r['removed_at']) != null) {
+          logs.remove(id);
+        } else {
+          logs[id] = _fromLogRow(r);
+        }
+      }
+      _logs
+        ..clear()
+        ..addAll(logs.values);
+      await _persistLogs();
+      notifyListeners();
+
+      // The alarms follow the fact: each phone keeps its own OS alarms.
+      for (final id in gone) {
+        try {
+          await NotificationService.instance.cancelMedicationAlarms(id);
+        } catch (_) {}
+      }
+      for (final m in changed) {
+        try {
+          await NotificationService.instance.scheduleMedicationAlarms(m);
+        } catch (_) {}
+      }
+      await _pushWaiting();
+    } catch (_) {/* offline - keep local; the ledgers keep what waits */}
+  }
+
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
+    // kept for revert (before step 9): cloud wins per id, local-only rows are
+    // inserted again, so a medication deleted elsewhere came back and every
+    // pull wiped the alarms.
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // medications
@@ -125,9 +224,13 @@ class MedicineStore extends ChangeNotifier {
         'end_date_iso':
             (m.endDateIso == null || m.endDateIso!.isEmpty) ? null : m.endDateIso,
         'is_active': m.isActive,
+        // 0107: the alarm settings sync; each phone arms its own (step 9).
+        'alarms': m.alarms.map((a) => a.toJson()).toList(),
       };
 
-  Medication _fromMedRow(Map<String, dynamic> r) {
+  /// [keepAlarms]: this phone's alarms, kept when the row predates 0107.
+  Medication _fromMedRow(Map<String, dynamic> r,
+      {List<MedAlarm> keepAlarms = const []}) {
     var t = MedType.supplement;
     for (final e in MedType.values) {
       if (e.name == r['type']) {
@@ -147,6 +250,12 @@ class MedicineStore extends ChangeNotifier {
       startDateIso: (r['start_date_iso'] ?? '').toString(),
       endDateIso: r['end_date_iso']?.toString(),
       isActive: r['is_active'] != false,
+      alarms: (r['alarms'] is List)
+          ? (r['alarms'] as List)
+              .whereType<Map>()
+              .map((e) => MedAlarm.fromJson(Map<String, dynamic>.from(e)))
+              .toList()
+          : keepAlarms,
     );
   }
 
@@ -189,36 +298,49 @@ class MedicineStore extends ChangeNotifier {
 
   Future<void> addMed(Medication m) async {
     _meds.add(m);
+    _medSync.touch(m.id);
     notifyListeners();
     await _persistMeds();
     try {
       await NotificationService.instance.scheduleMedicationAlarms(m);
     } catch (_) {}
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.insert('medications', _toMedRow(m));
-      } catch (_) {/* offline - syncs up on next init */}
-    }
+    // kept for revert (before step 9): a one-shot insert, lost if offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.insert('medications', _toMedRow(m));
+    //   } catch (_) {/* offline - syncs up on next init */}
+    // }
+    await _pushWaiting();
   }
 
   Future<void> updateMed(Medication m) async {
     final i = _meds.indexWhere((x) => x.id == m.id);
     if (i < 0) return;
     _meds[i] = m;
+    _medSync.touch(m.id);
     notifyListeners();
     await _persistMeds();
     try {
       // scheduleMedicationAlarms cancels then reschedules from scratch.
       await NotificationService.instance.scheduleMedicationAlarms(m);
     } catch (_) {}
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('medications', _toMedRow(m), onConflict: 'id');
-      } catch (_) {}
-    }
+    // kept for revert (before step 9):
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('medications', _toMedRow(m), onConflict: 'id');
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
   }
 
   Future<void> deleteMed(String id) async {
+    // Soft deletes that travel (step 9): the medication and each of its logs.
+    for (final m in _meds.where((m) => m.id == id)) {
+      _medSync.remove(id, _toMedRow(m));
+    }
+    for (final l in _logs.where((l) => l.medicationId == id)) {
+      _logSync.remove(l.id, _toLogRow(l));
+    }
     _meds.removeWhere((m) => m.id == id);
     _logs.removeWhere((l) => l.medicationId == id);
     notifyListeners();
@@ -227,12 +349,14 @@ class MedicineStore extends ChangeNotifier {
     try {
       await NotificationService.instance.cancelMedicationAlarms(id);
     } catch (_) {}
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.delete('medications', id);
-        await SupabaseRepo.deleteBy('medication_logs', 'medication_id', id);
-      } catch (_) {}
-    }
+    // kept for revert (before step 9): one-shot hard deletes.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.delete('medications', id);
+    //     await SupabaseRepo.deleteBy('medication_logs', 'medication_id', id);
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
   }
 
   /// Toggle today's "taken" state for a medication (log or un-log).
@@ -242,31 +366,42 @@ class MedicineStore extends ChangeNotifier {
       final removed =
           _logs.where((l) => l.medicationId == medId && l.dateKey == key).toList();
       _logs.removeWhere((l) => l.medicationId == medId && l.dateKey == key);
+      // Soft deletes (step 9); every id for the day goes, old duplicates too.
+      for (final l in removed) {
+        _logSync.remove(l.id, _toLogRow(l));
+      }
       notifyListeners();
       await _persistLogs();
-      if (SupabaseRepo.isLoggedIn) {
-        try {
-          for (final l in removed) {
-            await SupabaseRepo.delete('medication_logs', l.id);
-          }
-        } catch (_) {}
-      }
+      // kept for revert (before step 9): one-shot hard deletes.
+      // if (SupabaseRepo.isLoggedIn) {
+      //   try {
+      //     for (final l in removed) {
+      //       await SupabaseRepo.delete('medication_logs', l.id);
+      //     }
+      //   } catch (_) {}
+      // }
     } else {
       final log = MedicationLog(
-        id: 'ml_${DateTime.now().microsecondsSinceEpoch}',
+        // kept for revert (before step 9): a new id on every tick.
+        // id: 'ml_${DateTime.now().microsecondsSinceEpoch}',
+        id: logIdFor(medId, key),
         medicationId: medId,
         dateKey: key,
         takenAtIso: DateTime.now().toIso8601String(),
       );
       _logs.add(log);
+      // A re-tick is a newer touch of the same key, so it beats the removal.
+      _logSync.touch(log.id);
       notifyListeners();
       await _persistLogs();
-      if (SupabaseRepo.isLoggedIn) {
-        try {
-          await SupabaseRepo.insert('medication_logs', _toLogRow(log));
-        } catch (_) {}
-      }
+      // kept for revert (before step 9):
+      // if (SupabaseRepo.isLoggedIn) {
+      //   try {
+      //     await SupabaseRepo.insert('medication_logs', _toLogRow(log));
+      //   } catch (_) {}
+      // }
     }
+    await _logSync.push(_logRows);
   }
 
   /// Toggle the "taken" state for any past day, not only today.
@@ -282,31 +417,42 @@ class MedicineStore extends ChangeNotifier {
           .where((l) => l.medicationId == medId && l.dateKey == key)
           .toList();
       _logs.removeWhere((l) => l.medicationId == medId && l.dateKey == key);
+      // Soft deletes (step 9); every id for the day goes, old duplicates too.
+      for (final l in removed) {
+        _logSync.remove(l.id, _toLogRow(l));
+      }
       notifyListeners();
       await _persistLogs();
-      if (SupabaseRepo.isLoggedIn) {
-        try {
-          for (final l in removed) {
-            await SupabaseRepo.delete('medication_logs', l.id);
-          }
-        } catch (_) {}
-      }
+      // kept for revert (before step 9): one-shot hard deletes.
+      // if (SupabaseRepo.isLoggedIn) {
+      //   try {
+      //     for (final l in removed) {
+      //       await SupabaseRepo.delete('medication_logs', l.id);
+      //     }
+      //   } catch (_) {}
+      // }
     } else {
       final log = MedicationLog(
-        id: 'ml_${DateTime.now().microsecondsSinceEpoch}',
+        // kept for revert (before step 9): a new id on every tick.
+        // id: 'ml_${DateTime.now().microsecondsSinceEpoch}',
+        id: logIdFor(medId, key),
         medicationId: medId,
         dateKey: key,
         takenAtIso: DateTime.now().toIso8601String(),
       );
       _logs.add(log);
+      // A re-tick is a newer touch of the same key, so it beats the removal.
+      _logSync.touch(log.id);
       notifyListeners();
       await _persistLogs();
-      if (SupabaseRepo.isLoggedIn) {
-        try {
-          await SupabaseRepo.insert('medication_logs', _toLogRow(log));
-        } catch (_) {}
-      }
+      // kept for revert (before step 9):
+      // if (SupabaseRepo.isLoggedIn) {
+      //   try {
+      //     await SupabaseRepo.insert('medication_logs', _toLogRow(log));
+      //   } catch (_) {}
+      // }
     }
+    await _logSync.push(_logRows);
   }
 
   // --- stats (gentle, judgment-free) -----------------------------------------

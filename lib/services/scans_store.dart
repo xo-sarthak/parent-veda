@@ -15,8 +15,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/journal_entry.dart';
 import '../models/scan_appointment.dart';
 import 'journal_store.dart';
+import 'remote/own_row_ledger.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
+import 'remote/sync_row_book.dart';
 
 class ScansStore extends ChangeNotifier {
   ScansStore._();
@@ -63,6 +65,35 @@ class ScansStore extends ChangeNotifier {
 
   bool _loaded = false;
 
+  // ---- newer-wins sync (2026-10-21, sync log step 9, migration 0107) -------
+  // Her rows only: the partner can READ both tables (0012) but never writes
+  // them, so her phone's edit time decides (§16ii) and his copy stays the
+  // separate read-only fetch below.
+  final OwnRowLedger _scanSync = OwnRowLedger(
+      'completed_scans', 'completed_scans_sync',
+      keyColumn: 'scan_id');
+  final OwnRowLedger _apptSync =
+      OwnRowLedger('appointments', 'appointments_sync');
+
+  /// Changes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _scanSync.hasPending || _apptSync.hasPending;
+
+  Map<String, Map<String, dynamic>> _scanRows() =>
+      {for (final c in _completed) c.scanId: _toScanRow(c)};
+  Map<String, Map<String, dynamic>> _apptRows() =>
+      {for (final a in _appts) a.id: _toApptRow(a)};
+
+  Future<void> _pushWaiting() async {
+    await _scanSync.push(_scanRows);
+    await _apptSync.push(_apptRows);
+  }
+
+  /// Pure: the partner's rows minus the ones he soft-deleted. A removal is a
+  /// row with `removed_at` set now, so a plain read would show it (step 9).
+  static List<Map<String, dynamic>> notRemoved(
+          List<Map<String, dynamic>> rows) =>
+      [for (final r in rows) if (syncParseStamp(r['removed_at']) == null) r];
+
   Future<void> init() async {
     if (_loaded) return;
     // 1) Local cache first.
@@ -85,6 +116,9 @@ class ScansStore extends ChangeNotifier {
         (jsonDecode(n) as Map).forEach((k, v) => _notes['$k'] = '$v');
       }
     } catch (_) {/* start empty */}
+    await _scanSync.load();
+    await _apptSync.load();
+    SyncRegistry.registerPending(() => hasPending);
     _loaded = true;
     notifyListeners();
 
@@ -100,12 +134,75 @@ class ScansStore extends ChangeNotifier {
     _appts.clear();
     _partnerCompleted.clear();
     _partnerAppts.clear();
+    _scanSync
+      ..clear()
+      ..save();
+    _apptSync
+      ..clear()
+      ..save();
     notifyListeners();
   }
 
+  /// Newer wins per row for her own scans and appointments (step 9), then the
+  /// partner's, read-only, without his removed rows.
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      bool gone(Map<String, dynamic> r) =>
+          syncParseStamp(r['removed_at']) != null;
+
+      final byScan = {for (final c in _completed) c.scanId: c};
+      for (final r in await _scanSync.pull(liveKeys: byScan.keys)) {
+        final id = r['id'] as String; // = scan_id (keyed table)
+        if (gone(r)) {
+          byScan.remove(id);
+        } else {
+          byScan[id] = _fromScanRow(r);
+        }
+      }
+      _completed
+        ..clear()
+        ..addAll(byScan.values);
+      await _persistCompleted();
+
+      final byId = {for (final a in _appts) a.id: a};
+      for (final r
+          in await _apptSync.pull(liveKeys: byId.keys, orderBy: 'date_iso')) {
+        final id = r['id'] as String;
+        if (gone(r)) {
+          byId.remove(id);
+        } else {
+          byId[id] = _fromApptRow(r);
+        }
+      }
+      _appts
+        ..clear()
+        ..addAll(byId.values);
+      await _persistAppts();
+
+      _partnerCompleted.clear();
+      _partnerAppts.clear();
+      final partnerId = await SupabaseRepo.myPartnerId();
+      if (partnerId != null) {
+        final pScans =
+            await SupabaseRepo.fetchByUser('completed_scans', partnerId);
+        _partnerCompleted.addAll(notRemoved(pScans).map(_fromScanRow));
+        final pAppts = await SupabaseRepo.fetchByUser('appointments', partnerId,
+            orderBy: 'date_iso');
+        _partnerAppts.addAll(notRemoved(pAppts).map(_fromApptRow));
+      }
+
+      notifyListeners();
+      await _pushWaiting();
+    } catch (_) {/* offline - keep local; the ledgers keep what waits */}
+  }
+
+  // ignore: unused_element
+  Future<void> _syncFromCloudOld() async {
+    // kept for revert (before step 9): cloud wins per id, local-only rows are
+    // pushed again, so an un-marked scan or a deleted appointment came back.
     if (!SupabaseRepo.isLoggedIn) return;
     try {
       // completed_scans - keyed by scan_id (no `id` column)
@@ -231,14 +328,17 @@ class ScansStore extends ChangeNotifier {
     final now = DateTime.now();
     final scan = CompletedScan(scanId: scanId, dateIso: now.toIso8601String());
     _completed.add(scan);
+    _scanSync.touch(scanId);
     notifyListeners();
     await _persistCompleted();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.upsert('completed_scans', _toScanRow(scan),
-            onConflict: 'user_id,scan_id');
-      } catch (_) {}
-    }
+    // kept for revert (before step 9): a one-shot upsert, lost if offline.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.upsert('completed_scans', _toScanRow(scan),
+    //         onConflict: 'user_id,scan_id');
+    //   } catch (_) {}
+    // }
+    await _scanSync.push(_scanRows);
     await JournalStore.instance.addEntry(JournalEntry(
       id: 'scan_$scanId',
       type: JournalEntryType.scan,
@@ -249,14 +349,20 @@ class ScansStore extends ChangeNotifier {
   }
 
   Future<void> unmarkCompleted(String scanId) async {
+    // A soft delete that travels (step 9).
+    for (final c in _completed.where((c) => c.scanId == scanId)) {
+      _scanSync.remove(scanId, _toScanRow(c));
+    }
     _completed.removeWhere((c) => c.scanId == scanId);
     notifyListeners();
     await _persistCompleted();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.deleteBy('completed_scans', 'scan_id', scanId);
-      } catch (_) {}
-    }
+    // kept for revert (before step 9): a one-shot hard delete.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.deleteBy('completed_scans', 'scan_id', scanId);
+    //   } catch (_) {}
+    // }
+    await _scanSync.push(_scanRows);
     await JournalStore.instance.deleteEntry('scan_$scanId');
   }
 
@@ -274,13 +380,16 @@ class ScansStore extends ChangeNotifier {
 
   Future<void> addAppointment(Appointment a) async {
     _appts.add(a);
+    _apptSync.touch(a.id);
     notifyListeners();
     await _persistAppts();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.insert('appointments', _toApptRow(a));
-      } catch (_) {}
-    }
+    // kept for revert (before step 9):
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.insert('appointments', _toApptRow(a));
+    //   } catch (_) {}
+    // }
+    await _apptSync.push(_apptRows);
   }
 
   /// Replace one of HER appointments, kept by id (the calendar's Edit,
@@ -291,33 +400,50 @@ class ScansStore extends ChangeNotifier {
     final i = _appts.indexWhere((x) => x.id == a.id);
     if (i < 0) return;
     _appts[i] = a;
+    _apptSync.touch(a.id);
     notifyListeners();
     await _persistAppts();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.update('appointments', a.id, _toApptRow(a));
-      } catch (_) {}
-    }
+    // kept for revert (before step 9):
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.update('appointments', a.id, _toApptRow(a));
+    //   } catch (_) {}
+    // }
+    await _apptSync.push(_apptRows);
   }
 
   /// Whether [id] is one of her own appointments (editable), not the partner's.
   bool ownsAppointment(String id) => _appts.any((a) => a.id == id);
 
   Future<void> deleteAppointment(String id) async {
+    // A soft delete that travels (step 9). A partner's id is not in _appts,
+    // so it is left alone, as before.
+    for (final a in _appts.where((a) => a.id == id)) {
+      _apptSync.remove(id, _toApptRow(a));
+    }
     _appts.removeWhere((a) => a.id == id);
     notifyListeners();
     await _persistAppts();
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.delete('appointments', id);
-      } catch (_) {}
-    }
+    // kept for revert (before step 9): a one-shot hard delete.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.delete('appointments', id);
+    //   } catch (_) {}
+    // }
+    await _apptSync.push(_apptRows);
   }
 
   /// Testing: clear all completed scans + appointments (empties the map's scan
   /// state) and remove their linked Journal scan entries.
   Future<void> clearAllForTesting() async {
     final ids = _completed.map((c) => c.scanId).toList();
+    // Soft deletes through the ledgers (step 9), so the other phone clears too.
+    for (final c in _completed) {
+      _scanSync.remove(c.scanId, _toScanRow(c));
+    }
+    for (final a in _appts) {
+      _apptSync.remove(a.id, _toApptRow(a));
+    }
     _completed.clear();
     _appts.clear();
     _partnerCompleted.clear();
@@ -328,12 +454,14 @@ class ScansStore extends ChangeNotifier {
     for (final id in ids) {
       await JournalStore.instance.deleteEntry('scan_$id');
     }
-    if (SupabaseRepo.isLoggedIn) {
-      try {
-        await SupabaseRepo.clear('completed_scans');
-        await SupabaseRepo.clear('appointments');
-      } catch (_) {}
-    }
+    // kept for revert (before step 9): hard clears.
+    // if (SupabaseRepo.isLoggedIn) {
+    //   try {
+    //     await SupabaseRepo.clear('completed_scans');
+    //     await SupabaseRepo.clear('appointments');
+    //   } catch (_) {}
+    // }
+    await _pushWaiting();
   }
 
   Future<void> _persistCompleted() async {

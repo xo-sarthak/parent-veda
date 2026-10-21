@@ -24,6 +24,7 @@ owed.
 | 2026-10-18 | Step 6: the rest of the child record (documents, health, milestones, vaccines, emergency card) | 0104 | `af76d8f` | yes (2026-10-18) |
 | 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | `d76594b` | yes (2026-10-20) |
 | 2026-10-20 | Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders) | 0106 | `d5787b2` | yes (2026-10-21) |
+| 2026-10-21 | Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools) | 0107 | pending | **not yet** |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -753,3 +754,132 @@ None of the five stores fed the sign-out "unsent changes" warning.
   `test/sync_guard_contract_test.dart`
 - `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`, `docs/BACKEND-PATTERNS.md` (§16ii-i, reading list 39),
   `docs/BEFORE-LAUNCH.md`
+
+---
+
+## Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools)
+
+**Date:** 2026-10-21 (planned and approved 2026-10-21). **Migration:** 0107 (**not yet run**). **Commit:** pending.
+
+**The policies were read first (step 8's lesson):**
+- All ten tables already had an own-row UPDATE policy (0003, 0005, 0006), so there was no `father_missions` trap.
+- `completed_scans` and `appointments` are partner-**readable** (0012) but written only by her.
+- So no merge decision was needed. Her rows sync newer-wins by the phone clock, and his copy stays a separate
+  read-only fetch (BACKEND-PATTERNS §16ii-j).
+
+**The problem (STILL-OPEN-BACKEND §1, the second half of the Pregnancy rows):**
+
+| Table | Store | Bug |
+|---|---|---|
+| `medications` | `MedicineStore` | Cloud wins per id, and local-only rows were inserted again, so a delete came back. **`alarms` was never sent and the pull dropped it, so every sync wiped her medicine alarms** |
+| `medication_logs` | `MedicineStore` | Un-tick was a hard delete; a re-tick made a new `ml_` id, so two phones could hold two logs for one day |
+| `completed_scans` | `ScansStore` | Un-mark was a one-shot hard delete, so it came back |
+| `appointments` | `ScansStore` | Hard delete. The scan timeline's edit deleted and re-added the row, **dropping doctor, notes and status** |
+| `symptom_logs` | `SymptomStore` | A new timestamp id on every log; a severity change was a partial one-shot update. **The door's `'strong'` broke the table's check (`mild/moderate/severe`), so every "Strong" log had been refused since 2026-09-22, silently** |
+| `weight_profile` | `ToolsStore` | The cloud overwrote an offline edit, and `updated_at` never moved |
+| `weight_entries` | `ToolsStore` | One-shot hard delete; a deleted entry came back |
+| `movement_sessions` | `ToolsStore` | Cloud wins per id |
+| `kegel_state` | `ToolsStore` | The cloud overwrote an offline change to the routine |
+| `contraction_sessions` | `ToolsStore` | An edit that failed offline was overwritten by the cloud |
+
+None of the four stores fed the sign-out "unsent changes" warning. And one failing table in `ToolsStore`'s pull
+skipped every table after it.
+
+**Done (2026-10-21):**
+- [x] **`OwnRowLedger.single`** (`lib/services/remote/own_row_ledger.dart`) for one-row tables:
+  - a constant book key (`'me'`);
+  - a conflict on `user_id` alone;
+  - no `removed_at`;
+  - a pull ordered by `updated_at`.
+  - The existing modes are unchanged.
+- [x] Migration `0107_preg_part2_sync_clock.sql`:
+  - `updated_at` on the eight tables that lacked it;
+  - `removed_at` on the eight list tables. Not on `weight_profile` or `kegel_state`, which are state;
+  - **`medications.alarms` (jsonb)**;
+  - **`symptom_logs.severity` also accepts `'strong'`**;
+  - 0100's guard on all ten;
+  - check queries at the bottom.
+- [x] Stores, with the old calls and the old pull (`_syncFromCloudOld`) kept for revert:
+  - **`MedicineStore`**: two ledgers.
+    - `alarms` rides on the row. A row from before 0107 (`alarms` null) keeps this phone's alarms and sends them up
+      once.
+    - Log ids are `ml_<medicine>_<day>`. Un-tick soft-removes every log for that medicine and day, old duplicates
+      included.
+    - `deleteMed` soft-removes the medicine and its logs.
+    - **After a pull, a medicine removed elsewhere cancels its alarms here, and a changed one is re-armed.**
+  - **`ScansStore`**: `completed_scans` keyed on `scan_id`, `appointments` on `id`.
+    - Un-mark and delete are soft.
+    - **The partner's fetch drops his removed rows** (`notRemoved`).
+    - `clearAllForTesting` soft-removes through the ledgers.
+  - **`scan_timeline_screen.dart`**: an edit is `updateAppointment`, carrying doctor, notes and status across.
+  - **`SymptomStore`**: ids are `sl_<day>_<symptom>`. `setOn` is a whole-row edit in place; `log` replaces the day's
+    cell (an older timestamp-id entry is soft-removed); `unlogOn` is soft.
+  - **`ToolsStore`**: five ledgers, two of them `.single`.
+    - A weight entry deletes softly.
+    - Movement: only ended sessions with a movement are rows; ending one, or closing a dangling one, stamps it.
+    - A contraction save stamps its session.
+    - The profile and the kegel routine stamp on every change, and the pull now saves them to the phone (it
+      didn't before).
+    - **Each table pulls in its own `try`.** Kegel history stays a blob (step 10).
+  - Every store registers `SyncRegistry.registerPending` and clears its ledgers on sign-out.
+- [x] Tests:
+  - `test/own_row_ledger_test.dart`: one-row mode (conflict on `user_id`, no `removed_at` and no `id`; newer cloud
+    taken; older cloud loses).
+  - New `test/preg_part2_sync_test.dart`:
+    - a medicine log id is one per medicine per day;
+    - tick, un-tick, tick revives the same row;
+    - a severity change keeps one log under one id;
+    - the partner's removed rows are hidden;
+    - every store uses the ledger and reports pending;
+    - no live hard delete or clear is left;
+    - alarms ride on the row and are rebuilt after a pull;
+    - the scan timeline edits in place;
+    - 0107 allows `'strong'` and adds `alarms`.
+  - `test/sync_guard_contract_test.dart`: the ten tables are guarded.
+
+**Verified (2026-10-21):**
+- `flutter analyze` is clean on the six source files and three test files.
+- 485 tests pass across 31 files:
+  - every sync, merge and schema test, the reset coverage and the sign-out tests;
+  - step 8's tests;
+  - the Pregnancy tool screens: movement, kegel, symptoms door, scan journey, scan notes, calendar hub, doctor
+    notes, home;
+  - the TTC medication and tools tests (they share `MedicineStore`).
+
+**Known limits, named:**
+- `weight_entries.time_iso` is sent without a time zone offset, and `contraction_sessions.date_iso` is a `date`
+  column, so a contraction session loses its time of day in the cloud. Both predate this step.
+- Logs of a medicine deleted on another phone, which this phone never held, stay in the cloud, orphaned. Nothing
+  shows them; step 12's purge is the place for them.
+- Scan notes (`_notes`) are still local-only (STILL-OPEN §63.9).
+- A symptom's Journal entry is never removed when the symptom is (this predates the step).
+- The Symptoms Companion's "noted N times this week" now counts days, since a symptom is one log per day.
+- **Mixed versions.** Until both phones update, the old app still hard-deletes and uses timestamp ids.
+
+**User runs (OWED):**
+1. 0107 in the Supabase SQL editor, **before** installing a build with this change. Until then the uploads carry
+   columns the tables lack, are refused, and simply wait.
+2. Optional: the check queries at the bottom.
+   - **The first should return 10 rows:**
+     - `has_clock` and `guarded` true on every row;
+     - `has_removed_at` true on all but `weight_profile` and `kegel_state`;
+     - `has_alarms` true for `medications` only.
+   - **The second** should list `'strong'` in the severity check.
+
+**Owed (the two-phone walk, one account):**
+- set a medicine alarm on A → B buzzes too;
+- delete the medicine on A → B stops buzzing;
+- tick the same medicine on both offline → one log;
+- un-mark a scan → it stays un-marked, and the partner no longer sees it;
+- change a symptom to Strong on A → B shows Strong;
+- delete a weight entry offline → it stays gone;
+- change the kegel routine on A → B has it.
+
+**Files:**
+- `supabase/migrations/0107_preg_part2_sync_clock.sql` (new)
+- `lib/services/remote/own_row_ledger.dart`
+- `lib/services/medicine_store.dart`, `scans_store.dart`, `symptom_store.dart`, `tools_store.dart`
+- `lib/screens/brackets/scan_timeline_screen.dart`
+- `test/own_row_ledger_test.dart`, `test/preg_part2_sync_test.dart` (new), `test/sync_guard_contract_test.dart`
+- `docs/BACKEND-SYNC-LOG.md`, `docs/STILL-OPEN-BACKEND.md`, `docs/BACKEND-PATTERNS.md` (§16ii-j, §16ii-k, reading list
+  40–41), `docs/BEFORE-LAUNCH.md`
