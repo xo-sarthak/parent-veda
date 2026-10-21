@@ -139,7 +139,11 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(12), door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
       expect(find.text('Days 1 to 7: the first week'), findsOneWidget);
-      expect(find.text('You made it to 40 days. What now?'), findsNothing, reason: 'the 40-day mark and after');
+      // Since 2026-10-21 (Wave 4) a later band is reachable, not hidden: the
+      // 40-day page waits under "Coming up next", after her own rails. Was
+      // findsNothing ('the 40-day mark and after').
+      expect(find.text('You made it to 40 days. What now?'), findsOneWidget);
+      expect(find.text('Coming up next'), findsOneWidget, reason: 'it is shown as what comes next, not as hers yet');
       expect(find.text('For your husband, in the first 40 days'), findsOneWidget);
       expect(find.byIcon(Icons.lock_outline_rounded), findsNothing, reason: 'every tab is for the whole forty days');
       expect(find.text('Consult'), findsNothing, reason: 'no closing card');

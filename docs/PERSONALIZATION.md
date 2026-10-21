@@ -200,6 +200,7 @@ after the baby arrives.
 | 2 | Recommendations | `pp_reco_data.dart:1065` — live |
 | — | Brand audience targeting | `brand_context.dart:34` — live, already shared by both apps |
 | 3 | Recipes | `pp_recipes_screen.dart` `ppRankRecipes` — live 2026-10-21 |
+| 3 | Doors, home reads, products, FAQs, door tiles | `pp_relevance.dart` `ppRelevanceOrder` — live 2026-10-21 (wave 4) |
 
 #### The parenting ranker (2026-10-21)
 
@@ -223,7 +224,46 @@ line ("solids start around 6 months", "under 6 months, milk is the food") is
 fixed copy, never a ranking output.
 
 Not yet signals (no store records them): dishes cooked, the child being unwell.
-Next surfaces (wave 4): home reads and products, door pages, FAQs.
+
+#### The relevance brain (wave 4, 2026-10-21)
+
+One module, `lib/screens/post_pregnancy/pp_relevance.dart`, for every surface
+that is not recipes. Approved as claude.ai/artifact/Hgfy82qx2TLA4S7MVeZE1S.
+
+- **`PpSituation.now()`** is one snapshot of what the app already knows, never
+  asked: age, days old, and a set of `PpSignal`s: **bornEarly** (premature,
+  NICU, or a corrected age applies), **cSection** (birth mode, first 90 days
+  only), **formula** / **breastfeeding** (onboarding feeding plus today's
+  feed log), **twins**. And whether the reader is the father.
+- **`ppRelevanceOrder`** is a stable scored sort, lower first: band distance
+  (now 0, next 100, earlier 200, further 300), a signal match −30, saved −5,
+  finished +30. **It returns a permutation of its input, always.** With no
+  signal the writers' order survives untouched.
+- **`ppRelevanceWhy`** gives the few words a moved card shows ("On formula"),
+  so the app explains itself.
+
+Where it runs:
+
+| Surface | What moves |
+|---|---|
+| Door rails (`pp_door_screen.dart` `_railsFor`) | Pages about her situation lead each rail; such a rail leads the tab; finished reads sink. |
+| Door other bands (`_otherBands`) | **Were hidden.** Now the next band shows open as "Coming up next", earlier and later fold at the foot. A title already on her rails is not repeated. |
+| Home reads (`ppHomeDoorReads`) | Up to two signal pages from any door lead; three rows, finished sink. |
+| Home products (`_productsForAge`) | Age fit first, then her situation inside it. |
+| Home FAQs (`phaseFaqs` pool of 6 → 3) | Her situation's questions first. |
+| Home door tiles (`ppTileOrder`) | Born early lifts Development; feeding lifts Feeding in year one. |
+
+Signals match pages by their words (`PpSignal.words`), the same trade
+`FamilyProfile.matchesSignal` made: no tags to keep in step, at the cost of a
+page that never names its subject not moving. **Clinical line:** the brain
+orders, it never decides. A born-early baby's band is not moved by corrected
+age; the page that explains corrected age moves up instead, and timing stays
+with her doctor.
+
+Not wired, deliberately left: `FamilyProfile.orderByPriority` (no callers) and
+the `recoBoosts` weights (`pp_reco_data.dart` reads only the keys). Owed:
+"Something changed?" is not stored, so it cannot be a signal yet.
+Test: `test/pp_relevance_test.dart`.
 
 ### Precedent worth copying
 

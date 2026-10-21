@@ -16,6 +16,7 @@
 // =============================================================================
 
 import '../../services/family_profile.dart';
+import 'pp_relevance.dart' show PpSignal;
 
 /// ON since 2026-10-07 evening (the user: "You can turn that switch on").
 /// Before that it waited: on 2026-09-18 they asked for the doors in
@@ -57,12 +58,22 @@ List<String> ppTileOrder(
   required int ageInDays,
   Set<Priority> priorities = const {},
   BirthMode? birthMode,
+  Set<PpSignal> signals = const {},
 }) {
   final want = {for (final p in priorities) _kPriorityDoor[p]};
   int score(String id) {
     var s = _ageScore(id, ageInDays);
     if (want.contains(id)) s += 25;
     if (id == 'parenting_maternal' && birthMode == BirthMode.cSection && ageInDays < 90) s += 30;
+    // The relevance brain's signals (2026-10-21, Wave 4, pp_relevance.dart):
+    // born early lifts Development (corrected age lives there), and how she
+    // feeds lifts Feeding while it is the daily question.
+    if (id == 'parenting_development' && signals.contains(PpSignal.bornEarly)) s += 20;
+    if (id == 'parenting_feeding' &&
+        ageInDays < 365 &&
+        (signals.contains(PpSignal.formula) || signals.contains(PpSignal.breastfeeding))) {
+      s += 10;
+    }
     return s;
   }
 

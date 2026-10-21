@@ -30,6 +30,9 @@ import 'pp_phases_data.dart' show ppFillChild;
 import 'pp_section_registry.dart';
 import 'pp_section_screen.dart';
 import 'pp_tip_links.dart';
+import '../../services/pv_read_store.dart';
+import 'pp_page_read.dart' show kPpPageReadPrefix;
+import 'pp_relevance.dart';
 
 /// One read on the home rail: a door page and the section it opens in.
 typedef PpHomeRead = ({PpSection section, PpPage page});
@@ -40,7 +43,7 @@ const Set<String> _kNotForTheRail = {'parenting_maternal', 'parenting_papers'};
 
 /// Up to [n] door pages for the child's band, one door at a time, rotated by
 /// [day] so the rail changes each morning.
-List<PpHomeRead> ppHomeDoorReads(int n, {int? day}) {
+List<PpHomeRead> ppHomeDoorReads(int n, {int? day, PpSituation? situation}) {
   final d = day ?? DateTime.now().day;
   final tagged = <List<PpHomeRead>>[];
   final general = <PpHomeRead>[];
@@ -76,7 +79,25 @@ List<PpHomeRead> ppHomeDoorReads(int n, {int? day}) {
       out.add(general[(d + i) % general.length]);
     }
   }
-  return out;
+  // THE RELEVANCE BRAIN (2026-10-21, Wave 4, pp_relevance.dart). Up to two
+  // pages about her situation (born early, C-section, formula...) lead, from
+  // any door in her band, so a day's rotation can never bury them; finished
+  // reads sink. Nothing the rotation chose is dropped unless a lifted page
+  // takes its slot within [n].
+  final sit = situation ?? PpSituation.now();
+  String rid(PpHomeRead r) => '$kPpPageReadPrefix${r.section.id}_${r.page.id}';
+  final lifted = ppRelevanceOrder(
+    [
+      for (final door in tagged)
+        for (final r in door)
+          if (sit.signalFor(r.page.title) != null && !out.any((o) => o.page.id == r.page.id)) r,
+    ],
+    situation: sit,
+    text: (r) => r.page.title,
+    readId: rid,
+  ).where((r) => !PvReadStore.instance.isFinished(rid(r))).take(2);
+  final merged = [...lifted, ...out].take(n).toList();
+  return ppRelevanceOrder(merged, situation: sit, text: (r) => r.page.title, readId: rid);
 }
 
 // =============================================================================

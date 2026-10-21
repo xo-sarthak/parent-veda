@@ -10703,5 +10703,20 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   `_buildBeforeShell`. Guard `test/pp_wave3_look_test.dart`; the tool-shell
   test no longer exempts `pp_emergency_card` / `pp_health_home`. Not walked
   on a phone.
-- **§95.6 Waves 4 to 7** (the relevance brain, phase screen, home, warm
-  copy): not started.
+- **§95.6 Wave 4, the relevance brain and one format — BUILT 2026-10-21.**
+  Artifact claude.ai/artifact/Hgfy82qx2TLA4S7MVeZE1S, approved with three
+  answers: doors show every age band (hers open and first, the next as
+  "Coming up next", the rest folded; they were hidden); product card **B, no
+  price**; FAQs on the TTC and Pregnancy homes **not now**. Brain:
+  `pp_relevance.dart` (PERSONALIZATION.md, the relevance brain). Parenting
+  home reads are three rows in the shape of Pregnancy's `V3ReadRow` /
+  TTC's `_ReadRow` (`_DoorReadRow`; the shelf rail behind
+  `kPpHomeReadsAsRail = false`); products are Pregnancy's card, no price
+  (`_ProductRail`; the priced one kept as `_ProductRailPriced`).
+  **Owed:** (1) TTC's home products still use the priced store card
+  (`PvCardRail`) and should move to card B, waiting because another terminal
+  is working in `ttc_home_v3.dart`; (2) FAQ sections for TTC and Pregnancy,
+  the questions to be written first; (3) "Something changed?" answers are
+  not stored, so they are not a signal; (4) Pregnancy doors: `lead(week)` is
+  still only set by Nutrition. Not walked on a phone.
+- **§95.7 Waves 5 to 7** (phase screen, home, warm copy): not started.

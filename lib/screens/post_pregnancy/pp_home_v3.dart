@@ -120,6 +120,7 @@ import 'pp_watch_data.dart';
 import '../../services/father_preview.dart';
 import 'pp_father_card.dart';
 import 'pp_home_reads.dart';
+import 'pp_relevance.dart';
 import 'doors/pp_door_screen.dart' show ppShelfSpecFor, ppTabMarkFor;
 import '../doors/pv_shelf_card.dart';
 import '../doors/pv_list_row.dart';
@@ -147,6 +148,10 @@ import '../../widgets/pv_home_arrival.dart';
 // Pregnancy's home scale (2026-10-21, Wave 2): the user found parenting's
 // type bigger than the other stages. Was 14; the heading was 24, the age 42.
 const double _kBody = 13;
+
+/// The five-card shelf rail the home's reads used before Wave 4 (2026-10-21).
+/// Off: reads are three rows, as in TTC and Pregnancy. Kept for revert.
+const bool kPpHomeReadsAsRail = false;
 const double _kMeta = 12;
 const double _kCardTitle = 17;
 
@@ -241,10 +246,18 @@ class _PpHomeV3State extends State<PpHomeV3> {
             PpHomeActivitiesStore.instance.todays(child.ageInMonths);
         final changes = phaseChangesFor(phase);
         final reads = _readsForAge(child.ageInMonths, 3);
-        final doorReads = ppHomeDoorReads(5);
+        // Three, as rows: the shape TTC and Pregnancy already use (2026-10-21,
+        // Wave 4, approved). Was five on a shelf rail.
+        final sit = PpSituation.now();
+        final doorReads = ppHomeDoorReads(3, situation: sit);
         final video = _video(phase);
         final products = _productsForAge(child.ageInMonths, 6);
-        final faqs = phaseFaqs(phase.number, count: 3);
+        // Her situation's questions first (a C-section mother's, a born-early
+        // baby's), from the same pool; the brain never drops one.
+        final faqs = ppRelevanceOrder(phaseFaqs(phase.number, count: 6),
+                situation: sit, text: (f) => '${f.question} ${f.answer}')
+            .take(3)
+            .toList();
         final next = nextPhase(child);
         final insights = ppHomeInsights();
 
@@ -706,8 +719,26 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 if (doorReads.isNotEmpty) ...[
                   _pad(_Head(eyebrow: 'Read', title: 'Recommended reads for today', p: p)),
                   const SizedBox(height: 14),
-                  SizedBox(
+                  // ONE FORMAT FOR READS (2026-10-21, Wave 4): three rows, the
+                  // shape of Pregnancy's V3ReadRow and TTC's _ReadRow. A row that
+                  // the brain moved says why ("On formula"). The shelf rail it
+                  // replaces is kept below, unreachable, for revert.
+                  Padding(
                     key: const ValueKey('pp_home_door_reads'),
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Column(children: [
+                      for (final r in doorReads)
+                        _DoorReadRow(
+                          read: r,
+                          p: p,
+                          why: ppRelevanceWhy(sit, r.page.title),
+                          onTap: () => ppOpenPage(context, r.section, r.page,
+                              onSurface: (ctx, id) => _openSurface(ctx, id)),
+                        ),
+                    ]),
+                  ),
+                  if (kPpHomeReadsAsRail)
+                  SizedBox(
                     height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
@@ -1029,7 +1060,11 @@ class _PpHomeV3State extends State<PpHomeV3> {
     if (!kPpTileOrderByAge) return all;
     final f = FamilyProfileStore.instance;
     final order = ppTileOrder([for (final b in all) b.id],
-        ageInDays: ChildProfileStore.instance.ageInDays, priorities: f.priorities, birthMode: f.birthMode);
+        ageInDays: ChildProfileStore.instance.ageInDays,
+        priorities: f.priorities,
+        birthMode: f.birthMode,
+        // The relevance brain's signals (2026-10-21, Wave 4).
+        signals: PpSituation.now().signals);
     final byId = {for (final b in all) b.id: b};
     return [for (final id in order) byId[id]!];
   }
@@ -1138,7 +1173,15 @@ class _PpHomeV3State extends State<PpHomeV3> {
 
     final fit = rotate(kPpProducts.where((x) => x.suitsAge(months)).toList());
     final rest = rotate(kPpProducts.where((x) => !x.suitsAge(months)).toList());
-    return [...fit, ...rest].take(n).toList();
+    // The brain (2026-10-21, Wave 4): inside the age fit, products for her
+    // situation lead (a bottle set when she formula-feeds). Age still comes
+    // first; nothing is dropped. Was: return [...fit, ...rest].take(n).toList();
+    final sit = PpSituation.now();
+    String about(PpProduct x) => '${x.name} ${x.category}';
+    return [
+      ...ppRelevanceOrder(fit, situation: sit, text: about),
+      ...ppRelevanceOrder(rest, situation: sit, text: about),
+    ].take(n).toList();
   }
 
   // ---- Navigation -----------------------------------------------------------
@@ -2060,6 +2103,73 @@ class _ActivityCard extends StatelessWidget {
 
 // The 74dp-cover row form. Superseded by the _ReadRail cards. Kept for revert.
 // ignore: unused_element
+/// A door page as a read row (2026-10-21, Wave 4): the home's reads are three
+/// rows now, as TTC's and Pregnancy's are. Same shape as [_ReadRow]: a 74
+/// cover, a serif title, one small caps line. The cover is the door's drawn
+/// mark on its tint, as the shelf card drew it; the line says why the brain
+/// moved it, or which door it is from.
+class _DoorReadRow extends StatelessWidget {
+  const _DoorReadRow({required this.read, required this.p, required this.onTap, this.why});
+
+  final PpHomeRead read;
+  final V2Palette p;
+  final VoidCallback onTap;
+  final String? why;
+
+  @override
+  Widget build(BuildContext context) {
+    final mark = bracketMarkFor(read.section.id);
+    final tint = v2CoverTint(read.page.id, p);
+    final minutes = ppShelfSpecFor(read.page).fact;
+    return InkWell(
+      key: ValueKey('pp_home_read_${read.page.id}'),
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            width: 74,
+            height: 74,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(12)),
+            child: mark == null
+                ? const SizedBox.shrink()
+                : SizedBox(width: 44, height: 44, child: V3BracketArt(mark: mark, tint: tint)),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(read.page.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvFraunces(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
+                      letterSpacing: -0.4,
+                      color: p.ink1)),
+              const SizedBox(height: 5),
+              Text(
+                  [
+                    (why ?? read.section.title).toUpperCase(),
+                    if (minutes != null && minutes.isNotEmpty) minutes.toUpperCase(),
+                  ].join(' \u00b7 '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                      fontSize: 11.5, fontWeight: FontWeight.w700, letterSpacing: 1.1, color: p.ink3)),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+// Its call sites are commented out (kept for revert); _DoorReadRow carries
+// its shape for the door reads since 2026-10-21.
+// ignore: unused_element
 class _ReadRow extends StatelessWidget {
   const _ReadRow({required this.article, required this.p, required this.onTap});
 
@@ -2256,8 +2366,64 @@ double _productHue(String category) => switch (category) {
 /// the reason the commented rail below gives at length: `PpProduct.imageUrl`
 /// is empty across the catalogue, and a wrong photograph is worse than a
 /// colour. `PpProductImage` takes over the day the catalogue has pictures.
+// ONE PRODUCT CARD FOR ALL THREE HOMES (2026-10-21, Wave 4; the user chose
+// "B: no price"). Pregnancy's V2ProductRail card, shape for shape: 132 wide, a
+// 108 picture, the name, no price. A price on the daily home turns a
+// suggestion into a listing; the product page still carries it. Not the same
+// widget because the models differ (PpProduct here, Product there), the same
+// trade _ReadRow below states. The priced card it replaces is
+// _ProductRailPriced, kept for revert.
 class _ProductRail extends StatelessWidget {
   const _ProductRail(
+      {required this.items, required this.p, required this.onOpen});
+
+  final List<PpProduct> items;
+  final V2Palette p;
+  final ValueChanged<PpProduct> onOpen;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        key: const ValueKey('pp_home_products'),
+        height: 172 + ((MediaQuery.textScalerOf(context).scale(10) / 10) - 1).clamp(0.0, 1.0) * 40,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          itemCount: items.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (context, i) {
+            final it = items[i];
+            return SizedBox(
+              width: 132,
+              child: InkWell(
+                key: ValueKey('pp_product_${it.id}'),
+                onTap: () => onOpen(it),
+                borderRadius: BorderRadius.circular(16),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  PpProductImage(
+                    url: it.imageUrl,
+                    height: 108,
+                    width: 132,
+                    radius: 16,
+                    border: false,
+                    icon: categoryByName(it.category).icon,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(it.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvJakarta(
+                          fontSize: 14, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1)),
+                ]),
+              ),
+            );
+          },
+        ),
+      );
+}
+
+// ignore: unused_element
+class _ProductRailPriced extends StatelessWidget {
+  const _ProductRailPriced(
       {required this.items, required this.p, required this.onOpen});
 
   final List<PpProduct> items;

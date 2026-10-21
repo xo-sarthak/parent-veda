@@ -55,6 +55,9 @@ import '../../doors/pv_live_search.dart';
 import '../../doors/pv_shelf_card.dart';
 import '../../doors/pv_shelf_spec.dart' show PvShelfKind;
 import '../pp_din_by_din.dart';
+import '../pp_age_bands.dart' show PpBand;
+import '../pp_page_read.dart' show kPpPageReadPrefix;
+import '../pp_relevance.dart';
 import '../pp_search.dart';
 
 // -----------------------------------------------------------------------------
@@ -163,6 +166,9 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
   PpDoor get door => widget.door;
 
+  /// The other age bands she has unfolded at the foot of a tab (band ids).
+  final Set<String> _openBands = {};
+
   /// The hero's search field, its three states shared with every door
   /// (`PvLiveSearch`). Searches this door first, then every door.
   final PvLiveSearch _search = PvLiveSearch();
@@ -267,8 +273,88 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
   String get _band => section.bandSet?.active.id ?? '';
 
-  /// The pages a tab shows, for her band, minus the pinned red flag.
-  List<(PpArea, List<PpPage>)> _railsFor(PpDoorTab tab) => [
+  /// The id a page's reading progress is kept under (pp_page_read.dart).
+  String _readIdOf(PpPage page) => '$kPpPageReadPrefix${section.id}_${page.id}';
+
+  /// The pages a tab shows for her band, minus the pinned red flag, ORDERED BY
+  /// HER SITUATION (2026-10-21, Wave 4, pp_relevance.dart): inside each rail
+  /// the pages about her situation lead (born early, C-section, formula...),
+  /// finished reads sink; and a rail about her situation leads the tab. The
+  /// brain is stable, so with no signal the writers' order is untouched. It
+  /// never drops a page. The other bands are no longer lost either: see
+  /// [_otherBands].
+  List<(PpArea, List<PpPage>)> _railsFor(PpDoorTab tab) {
+    final sit = PpSituation.now();
+    final rails = [
+      for (final (area, pages) in _bandRailsFor(tab))
+        (
+          area,
+          // First 40 days keeps its own day order (pp_din_by_din.dart).
+          area.id == kPpDinTabId
+              ? pages
+              : ppRelevanceOrder(pages,
+                  situation: sit, text: (x) => x.title, readId: _readIdOf),
+        ),
+    ];
+    return ppRelevanceOrder(rails,
+        situation: sit,
+        text: (r) => [r.$1.title, for (final x in r.$2) x.title].join(' '));
+  }
+
+  /// The other bands of this tab, each with the pages not already shown: the
+  /// next band first, then earlier ones, then later ones.
+  ///
+  /// ⚠️ THIS REPLACES HIDING. The door used to keep only her band and say
+  /// nothing about the rest, so a mother could not read ahead or look back.
+  /// Her band still leads and is the only one open; the next follows open as
+  /// "Coming up next"; the rest fold at the foot (PpBandSet.ordered's rule:
+  /// reordered, not filtered).
+  List<(PpBand, List<PpPage>, PpBandDistance)> _otherBands(PpDoorTab tab) {
+    final set = section.bandSet;
+    if (set == null) return const [];
+    final active = set.active;
+    final at = set.bands.indexWhere((b) => b.id == active.id);
+    final shown = {for (final r in _bandRailsFor(tab)) for (final x in r.$2) x.id};
+    // A page whose title is already on her rails, or is a tool's name there
+    // ("Sleep at this age" is both a chart and a page), is not shown twice.
+    final shownTitles = {
+      for (final r in _bandRailsFor(tab)) for (final x in r.$2) x.title,
+      for (final tool in tab.tools) tool.label,
+    };
+    final out = <(PpBand, List<PpPage>, PpBandDistance)>[];
+    for (var j = 0; j < set.bands.length; j++) {
+      final b = set.bands[j];
+      if (b.id == active.id) continue;
+      final seen = <String>{};
+      final pages = [
+        for (final id in tab.areaIds)
+          for (final area in section.areas.where((a) => a.id == id))
+            if (area.inBand(b.id))
+              for (final x in area.pagesFor(b.id))
+                if (x.id != tab.redFlagPageId &&
+                    !shown.contains(x.id) &&
+                    !shownTitles.contains(x.title) &&
+                    seen.add(x.id))
+                  x,
+      ];
+      if (pages.isEmpty) continue;
+      out.add((
+        b,
+        pages,
+        j == at + 1
+            ? PpBandDistance.next
+            : j < at
+                ? PpBandDistance.earlier
+                : PpBandDistance.further,
+      ));
+    }
+    out.sort((a, b) => a.$3.score.compareTo(b.$3.score));
+    return out;
+  }
+
+  /// Her band's rails, as the door always built them (kept as the source the
+  /// brain orders).
+  List<(PpArea, List<PpPage>)> _bandRailsFor(PpDoorTab tab) => [
         for (final id in tab.areaIds)
           for (final area in section.areas.where((a) => a.id == id))
             if (area.inBand(_band))
@@ -518,6 +604,57 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                         ], area.hue),
                         const SizedBox(height: kPvDoorBlockGap),
                       ],
+                      // The other bands (2026-10-21, Wave 4): the next one
+                      // open as "Coming up next", the rest folded.
+                      for (final (band, pages, dist) in _otherBands(tab)) ...[
+                        if (dist == PpBandDistance.next || _openBands.contains(band.id)) ...[
+                          ppDoorPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Text(dist == PpBandDistance.next ? 'Coming up next' : band.label,
+                                key: ValueKey('pp_door_band_head_${band.id}'),
+                                style: pvFraunces(
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2,
+                                    letterSpacing: -0.45,
+                                    color: p.ink1)),
+                            if (dist == PpBandDistance.next) ...[
+                              const SizedBox(height: 2),
+                              Text(band.label,
+                                  style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
+                            ],
+                          ])),
+                          const SizedBox(height: kPvDoorHeadingGap),
+                          _shelf(context, p, [for (final x in pages) _ShelfItem.page(x)], hue),
+                          const SizedBox(height: kPvDoorBlockGap),
+                        ] else ...[
+                          ppDoorPad(InkWell(
+                            key: ValueKey('pp_door_band_fold_${band.id}'),
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () => setState(() => _openBands.add(band.id)),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: p.line),
+                              ),
+                              child: Row(children: [
+                                Expanded(
+                                  child: Text(
+                                      '${dist == PpBandDistance.earlier ? 'Earlier' : 'Later'}  \u00b7  ${band.label}',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+                                ),
+                                const SizedBox(width: 8),
+                                Text('${pages.length}',
+                                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink3)),
+                                Icon(Icons.expand_more_rounded, size: 20, color: p.ink3),
+                              ]),
+                            ),
+                          )),
+                          const SizedBox(height: 10),
+                        ],
+                      ],
                     ],
 
                     if (tab.footer case final line?) ...[
@@ -620,6 +757,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   /// One shelf: a rail of `PvShelfCard`s at TTC's numbers.
   Widget _shelf(BuildContext context, V2Palette p, List<_ShelfItem> items, double hue) {
     if (items.isEmpty) return const SizedBox.shrink();
+    final sit = PpSituation.now();
     return SizedBox(
       height: pvShelfRailHeight(MediaQuery.textScalerOf(context)),
       child: ListView.separated(
@@ -630,12 +768,13 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
         itemBuilder: (context, i) {
           final it = items[i];
           final spec = it.page != null ? ppShelfSpecFor(it.page!) : ppShelfSpecForTool();
+          final why = it.page == null ? null : ppRelevanceWhy(sit, it.page!.title);
           return PvShelfCard(
             p: p,
             hue: (hue + i * 22) % 360,
             kind: spec.kind,
             kindWord: spec.word,
-            fact: spec.fact,
+            fact: why ?? spec.fact,
             title: it.title,
             comingSoon: it.page?.comingSoon ?? false,
             onTap: () => it.page != null
@@ -1577,6 +1716,8 @@ IntentMark ppTabMarkFor(IconData icon) {
 }
 
 class _ShelfItem {
+  // A page card shows why the brain moved it ("On formula") in place of its
+  // usual fact line, from pp_relevance.dart (2026-10-21).
   _ShelfItem.page(PpPage p)
       : page = p,
         tool = null;

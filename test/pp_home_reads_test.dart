@@ -57,7 +57,8 @@ void main() {
     expect(File('lib/screens/post_pregnancy/pp_section_screen.dart').readAsStringSync(),
         contains('PpLastPageStore.instance.opened(section.id, page.id);'));
     final home = File('lib/screens/post_pregnancy/pp_home_v3.dart').readAsStringSync();
-    expect(home, contains('ppHomeDoorReads(5)'));
+    // Three rows since 2026-10-21 (Wave 4); was ppHomeDoorReads(5) on a rail.
+    expect(home, contains('ppHomeDoorReads(3'));
     expect(home, contains("title: 'Continue reading'"));
     expect(File('lib/main.dart').readAsStringSync(), contains('PpLastPageStore.instance.init()'));
   });

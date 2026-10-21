@@ -1147,3 +1147,26 @@ Crypto.com): milestones are noticed, never scored. The 2x2 health tile grid
 `health_emergency_screen.dart`, `wallet_v2_screens.dart`
 (`WalletEmergencyCardScreen`), `milestone_journey_screen.dart`. Prototype
 claude.ai/artifact/9RNbbpCofsYtvSCgehNbQd.
+
+## 29. One format for reads, products and FAQs across three homes (2026-10-21)
+
+**Asked.** The user: reads, products and FAQs look different on the three
+homes; one ParentVeda.
+
+**Found.** Reads as a short list with a picture, title and time: Lloyds
+"Recommended reads" (mobbin.com/screens/258bba87-5578-4fe9-804c-2605bc7735f4),
+Afterpay "Read more" (mobbin.com/screens/f5ca8b7b-f65a-4a1d-8270-2b313185fe26).
+One short row of product cards: Hers (mobbin.com/screens/e2df5b43-0d78-47c4-aeb4-be8d9344583d).
+FAQs as a plain list, one open at a time: Cash App
+(mobbin.com/screens/4f22cda9-b112-4090-9aec-5911b367e667), Blue Apron
+(mobbin.com/screens/4808f17e-e11d-4174-8130-fec441fc3445).
+
+**Adopted.** Reads as three rows everywhere (TTC and Pregnancy already were;
+Parenting moved). One product card, the user's pick B: no price on the home.
+The FAQ accordion Parenting already draws is the shared shape.
+
+**Declined.** Price on the home card (Hers shows it; the home is not a shop).
+Large feature cards for reads (Finimize): rows carry more in less space.
+
+**Built.** `pp_home_v3.dart` (`_DoorReadRow`, `_ProductRail`),
+`pp_relevance.dart`. Prototype claude.ai/artifact/Hgfy82qx2TLA4S7MVeZE1S.
