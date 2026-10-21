@@ -126,7 +126,7 @@ void main() {
       expect(find.textContaining('From 1 year'), findsOneWidget, reason: 'Good habits');
       expect(find.textContaining('From 2 years'), findsOneWidget, reason: 'Before letters and numbers');
       expect(find.textContaining('From 3 years'), findsOneWidget, reason: 'Starting school');
-      expect(find.text('Talk to an early learning expert'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to an early learning expert', the consult card (2026-10-21)
 
       _ageMonths(40);
       await tester.pumpWidget(MaterialApp(

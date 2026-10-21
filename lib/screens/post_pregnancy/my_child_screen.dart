@@ -966,7 +966,8 @@ class _MyChildScreenState extends State<MyChildScreen> {
       behavior: HitTestBehavior.opaque,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text('HIS JOURNEY', style: ppBody(10.5, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
+          Text('${ChildProfileStore.instance.theirCap} journey'.toUpperCase(), style: // was 'HIS JOURNEY' (2026-10-21)
+              ppBody(10.5, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
           const Spacer(),
           // The PHASE, not the age. The identity row above already carries
           // "<age> · <phase>", so repeating ageLabel here said "3 months" twice
@@ -1325,7 +1326,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         )),
       ])),
       const SizedBox(height: 4),
-      _pad(Text('His measurements, with the typical figure for a ${_child.ageInMonths}-month-old alongside.', style: ppBody(12.5, color: ppMuted))),
+      _pad(Text('${ChildProfileStore.instance.theirCap} measurements, with the typical figure for a ${_child.ageInMonths}-month-old alongside.', style: ppBody(12.5, color: ppMuted))),
       const SizedBox(height: 14),
       _pad(Row(children: [
         Expanded(child: _growthCard('Weight', _m(_child.weightKg, 1), 'kg', '~${e.weightKg.toStringAsFixed(1)} kg')),

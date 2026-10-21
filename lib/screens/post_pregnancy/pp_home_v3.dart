@@ -144,7 +144,9 @@ import '../../widgets/pv_home_arrival.dart';
 // heading is `_Head`; every body line is [_kBody]; every meta line (minutes,
 // ages, "Tomorrow brings ...", captions) is [_kMeta]; every card title is
 // [_kCardTitle]. pvFraunces for titles, pvManrope for everything else.
-const double _kBody = 14;
+// Pregnancy's home scale (2026-10-21, Wave 2): the user found parenting's
+// type bigger than the other stages. Was 14; the heading was 24, the age 42.
+const double _kBody = 13;
 const double _kMeta = 12;
 const double _kCardTitle = 17;
 
@@ -1830,15 +1832,15 @@ class _Hero extends StatelessWidget {
                     text: _bigAge(child),
                     builder: (s) => Text(s,
                         style: pvFraunces(
-                            fontSize: 42,
+                            fontSize: 30, // was 42; Pregnancy's "Week 24" is 30
                             fontWeight: FontWeight.w600,
-                            height: 1.05,
-                            letterSpacing: -1.3,
+                            height: 1.1,
+                            letterSpacing: -0.75,
                             color: p.ink1))),
                 const SizedBox(height: 2),
                 Text(_subAge(child),
                     style: pvManrope(
-                        fontSize: 13.5,
+                        fontSize: 12.5, // was 13.5, as Pregnancy's day line
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.3,
                         color: p.ink2)),
@@ -1996,10 +1998,10 @@ class _Head extends StatelessWidget {
           if (eyebrow.isNotEmpty || note != null) const SizedBox(height: 6),
           Text(title,
               style: pvFraunces(
-                  fontSize: 24,
+                  fontSize: 21, // was 24; v3_sections' head is 21
                   fontWeight: FontWeight.w600,
                   height: 1.15,
-                  letterSpacing: -0.6,
+                  letterSpacing: -0.5,
                   color: p.ink1)),
         ],
       );

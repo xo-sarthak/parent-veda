@@ -235,7 +235,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(home: PpDoorScreen(door: door, onSurface: (_, _) {})));
         await tester.pumpAndSettle();
         expect(find.text('Log a feed'), findsOneWidget, reason: 'month $months');
-        expect(find.text('Talk to a lactation expert'), findsOneWidget);
+        expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a lactation expert', the consult card (2026-10-21)
         expect(find.text('A hot, painful lump in the breast'), findsOneWidget, reason: 'the red flag');
       }
     });

@@ -156,7 +156,8 @@ class VaxTrackerClassic extends StatelessWidget {
 
               // timeline preview
               const SizedBox(height: 26),
-              _pad(_railLabel('His journey', color: ppSoft, trailing: PvPress(child: GestureDetector(
+              _pad(_railLabel('${ChildProfileStore.instance.theirCap} journey', color: ppSoft, // was 'His journey'
+                  trailing: PvPress(child: GestureDetector(
                 onTap: () => _push(context, const VaxTimelineScreen()),
                 behavior: HitTestBehavior.opaque,
                 child: Text('Full timeline →', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),

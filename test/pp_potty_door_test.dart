@@ -145,7 +145,7 @@ void main() {
       expect(find.text('Signs your child is ready'), findsNothing, reason: 'readiness is 1 to 6, locked with Starting out');
       expect(find.textContaining('From 1 year'), findsNWidgets(2), reason: 'Starting out, Accidents');
       expect(find.textContaining('From 3 years'), findsOneWidget, reason: 'Dry nights');
-      expect(find.text('Talk to a paediatrician about it'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a paediatrician about it', the consult card (2026-10-21)
 
       _ageMonths(24);
       await tester.pumpWidget(MaterialApp(

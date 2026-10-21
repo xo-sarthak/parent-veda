@@ -482,25 +482,28 @@ Widget? ttcFamilyMarkForIntent(IntentMark? m, Color tint,
       IntentMark.bodyMark => TtcMarkLeading(tab: TtcTabMark.bigSmallHearts, tint: tint),
       IntentMark.lampMark => TtcMarkLeading(tab: TtcTabMark.sunrise, tint: tint),
       IntentMark.askDoctor => TtcMarkLeading(tab: TtcTabMark.twoBubbles, tint: tint),
-      // Door tabs only: marks the Tools list never uses.
+      // Once door tabs only. Parenting Tools uses all of them, so its rows fell
+      // back to a plain disc with an icon inside, the "missing glyphs" the
+      // user saw (2026-10-21, Wave 2). Each now maps for lists too; only the
+      // scan fan stays door-only, as no list uses it. The door-only arms,
+      // kept for revert:
+      // IntentMark.cuppedHands => forDoor ? TtcMarkLeading(tab: TtcTabMark.heartHand, tint: tint) : null,
+      // IntentMark.sunMark => forDoor ? TtcMarkLeading(tab: TtcTabMark.sun, tint: tint) : null,
+      // IntentMark.checkMark => forDoor ? TtcMarkLeading(tab: TtcTabMark.checklist, tint: tint) : null,
+      // IntentMark.questionMark => forDoor ? TtcMarkLeading(tool: TtcToolMark.canI, tint: tint) : null,
+      // IntentMark.pageMark => forDoor ? TtcMarkLeading(tab: TtcTabMark.openBook, tint: tint) : null,
+      // IntentMark.forkMark || IntentMark.cookMark => forDoor ? TtcMarkLeading(tab: TtcTabMark.bowl, tint: tint) : null,
       IntentMark.scanFan => forDoor
           ? TtcMarkLeading(tab: TtcTabMark.vialReport, tint: tint)
           : null,
-      IntentMark.cuppedHands => forDoor
-          ? TtcMarkLeading(tab: TtcTabMark.heartHand, tint: tint)
-          : null,
-      IntentMark.sunMark =>
-        forDoor ? TtcMarkLeading(tab: TtcTabMark.sun, tint: tint) : null,
-      IntentMark.checkMark => forDoor
-          ? TtcMarkLeading(tab: TtcTabMark.checklist, tint: tint)
-          : null,
-      IntentMark.questionMark =>
-        forDoor ? TtcMarkLeading(tool: TtcToolMark.canI, tint: tint) : null,
-      IntentMark.pageMark => forDoor
-          ? TtcMarkLeading(tab: TtcTabMark.openBook, tint: tint)
-          : null,
-      IntentMark.forkMark || IntentMark.cookMark =>
-        forDoor ? TtcMarkLeading(tab: TtcTabMark.bowl, tint: tint) : null,
+      IntentMark.cuppedHands => TtcMarkLeading(tab: TtcTabMark.heartHand, tint: tint),
+      IntentMark.sunMark => TtcMarkLeading(tab: TtcTabMark.sun, tint: tint),
+      IntentMark.checkMark => TtcMarkLeading(tab: TtcTabMark.checklist, tint: tint),
+      IntentMark.questionMark => TtcMarkLeading(tool: TtcToolMark.canI, tint: tint),
+      IntentMark.pageMark => TtcMarkLeading(tab: TtcTabMark.openBook, tint: tint),
+      IntentMark.forkMark || IntentMark.cookMark => TtcMarkLeading(tab: TtcTabMark.bowl, tint: tint),
+      // Kegel Care and the yoga rows: breath and the body, the lotus.
+      IntentMark.spineMark => TtcMarkLeading(tab: TtcTabMark.lotus, tint: tint),
       _ => null,
     };
 

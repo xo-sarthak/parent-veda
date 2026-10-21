@@ -159,6 +159,15 @@ void main() {
         IntentMark.bodyMark,
         IntentMark.lampMark,
         IntentMark.askDoctor,
+        // Parenting Tools rows, mapped for lists on 2026-10-21 (Wave 2).
+        IntentMark.cuppedHands,
+        IntentMark.sunMark,
+        IntentMark.checkMark,
+        IntentMark.questionMark,
+        IntentMark.pageMark,
+        IntentMark.forkMark,
+        IntentMark.cookMark,
+        IntentMark.spineMark,
       ]) {
         expect(ttcFamilyMarkForIntent(m, const Color(0xFFE4DDF5)), isNotNull,
             reason: '$m has no TTC-family mark');

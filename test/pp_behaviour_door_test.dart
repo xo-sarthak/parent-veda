@@ -185,7 +185,7 @@ void main() {
       expect(find.textContaining('This opens when'), findsOneWidget);
       // 2026-10-07: page title now English (was 'How to handle a ziddi bachcha').
       expect(find.text('How to handle a stubborn child'), findsNothing);
-      expect(find.text('Talk to a child psychologist'), findsOneWidget, reason: 'the closing still draws');
+      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget, reason: 'the closing still draws'); // was 'Talk to a child psychologist', the consult card (2026-10-21)
 
       _ageMonths(48);
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(48), door: door, onSurface: (_, _) {})));
@@ -196,7 +196,7 @@ void main() {
         expect(find.text(t.label), findsWidgets, reason: t.id);
       }
       expect(find.text('What to say when…'), findsOneWidget);
-      expect(find.text('Talk to a child psychologist'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a child psychologist', the consult card (2026-10-21)
     });
 
     testWidgets('the scripts tool opens on his band with no chooser', (tester) async {

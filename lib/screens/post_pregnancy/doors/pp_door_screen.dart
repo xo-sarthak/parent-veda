@@ -61,6 +61,11 @@ import '../pp_search.dart';
 //  Rail geometry — the pregnancy door's numbers, so the sum is the same sum:
 //  18 gutter + 142 + 10 + 142 + 10 = 322 on a 360dp screen, 38pt of the third.
 // -----------------------------------------------------------------------------
+/// The sentence a parenting door ends on when it names none of its own.
+const String kPpDoorClosingLine =
+    'Every child finds their own pace. If something worries you, your '
+    "child's doctor is always the right person to ask.";
+
 const double kPpRailCardWidth = 142;
 const double kPpRailCardHeight = 176;
 const double kPpRailGap = 10;
@@ -558,16 +563,31 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                         ),
                       )),
                       const SizedBox(height: kPvDoorBlockGap),
-                    ] else if (door.closing case final c?) ...[
-                      ppDoorPad(PpDoorRow(
-                        p: p,
-                        hue: hue,
-                        icon: Icons.chat_bubble_outline_rounded,
-                        chip: 'Consult',
-                        title: c.label,
-                        blurb: c.blurb,
-                        onTap: () => widget.onSurface(context, c.surfaceId),
-                      )),
+                    ] else ...[
+                      // The pregnancy and TTC doors end on a sentence, not a
+                      // sales card; and pitching paid help is on hold (the
+                      // user, 2026-10-21, Wave 2: every door "ends in an old
+                      // Talk to an expert row"). The consult card, kept for
+                      // revert:
+                      // ] else if (door.closing case final c?) ...[
+                      //   ppDoorPad(PpDoorRow(
+                      //     p: p,
+                      //     hue: hue,
+                      //     icon: Icons.chat_bubble_outline_rounded,
+                      //     chip: 'Consult',
+                      //     title: c.label,
+                      //     blurb: c.blurb,
+                      //     onTap: () => widget.onSurface(context, c.surfaceId),
+                      //   )),
+                      //   const SizedBox(height: kPvDoorBlockGap),
+                      ppDoorPad(Text(
+                          key: const ValueKey('pp_door_closing_line'),
+                          kPpDoorClosingLine,
+                          style: pvFraunces(
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w500,
+                              height: 1.5,
+                              color: p.ink2))),
                       const SizedBox(height: kPvDoorBlockGap),
                     ],
                     ppDoorPad(PpDoorDisclaimer(p: p, text: door.disclaimer)),
@@ -1723,7 +1743,11 @@ class _QuietHero extends StatelessWidget {
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 300),
               child: Text(headline,
-                  maxLines: 2,
+                  // With the age line under it, the headline keeps one line,
+                  // so the words are the pregnancy door's height and the hero
+                  // is its 262, not taller (2026-10-21, Wave 2; the user saw
+                  // the two door heroes differ). Was always 2.
+                  maxLines: ageLine == null ? 2 : 1,
                   overflow: TextOverflow.ellipsis,
                   style: pvManrope(
                     fontSize: 14.5,

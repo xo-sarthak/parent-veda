@@ -50,7 +50,8 @@ void main() {
     expect(ppPurple, AppTheme.primary);
     expect(ppCoral, AppTheme.secondary);
     expect(ppBg, AppTheme.scaffoldBackground);
-    expect(ppTitleInk, AppTheme.primary900);
+    // Titles moved to the one ink on 2026-10-21, as TTC's did (was primary900).
+    expect(ppTitleInk, ppInk);
   });
 
   test('ppCardDecoration is the one card shell', () {

@@ -165,7 +165,7 @@ void main() {
       expect(find.text('Read this one first'), findsOneWidget);
       expect(find.text('I am having thoughts that frighten me'), findsOneWidget);
       expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(1), reason: 'Going back, one lock on its card (the quiet rail, 2026-10-07)');
-      expect(find.text('Talk to someone about your own recovery'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to someone about your own recovery', the consult card (2026-10-21)
       expect(find.textContaining('For you  '), findsOneWidget, reason: 'the hero speaks to her, not about the baby');
       await tester.pumpWidget(MaterialApp(
           home: PpDoorScreen(key: const ValueKey('locked'), door: door, onSurface: (_, _) {}, initialTabId: 'going_back')));

@@ -743,7 +743,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Look closer at ${area.name.toLowerCase()}', style: ppJakarta(14)),
               const SizedBox(height: 3),
-              Text('His skills in this area, what is coming, and small things that help.', style: ppBody(12, color: ppMuted, h: 1.4)),
+              Text('Skills in this area so far, what is coming, and small things that help.', style: ppBody(12, color: ppMuted, h: 1.4)),
             ]),
           ),
           const SizedBox(width: 8),

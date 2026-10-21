@@ -171,7 +171,7 @@ void main() {
         expect(find.text(t.label), findsWidgets, reason: t.id);
       }
       expect(find.text('Where your baby is right now'), findsOneWidget);
-      expect(find.text('Talk to a specialist'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a specialist', the consult card (2026-10-21)
       // The rail order on screen: read, tool, read, tool, read.
       double x(String t) => tester.getTopLeft(find.text(t).first).dx;
       expect(x('The normal range is much wider than you think'), lessThan(x('Where your baby is right now')));

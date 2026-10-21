@@ -10659,5 +10659,28 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   mounted and pushes as before when not. Test `test/pv_tab_fade_test.dart`.
   Not walked on a phone. The journal capture SnackBars the audit listed were
   already inside block comments; nothing to move.
-- **§95.4 Waves 2 to 7** (look sweep, tool screens, the relevance brain, phase
-  screen, home, warm copy): not started.
+- **§95.4 Wave 2, the look sweep — DONE 2026-10-21.** Token-level, so one
+  value recolours many screens: `ppMuted` → ink3 #6F6878, `ppBorder` /
+  `ppPanelDiv` → the one line, `ppHair` and the stripes → neutral greys,
+  `ppTitleInk` → ink (TTC's 2026-09-29 move, old values kept commented in
+  `pp_common.dart`). `pp_tools_kit` buttons, chosen chips, save pill and icons
+  are ink; the insight card is a flat neutral. `ppBack` (98 screens) and
+  `ppCircleBack` redrawn as the bare 22pt ink arrow of TtcBackBar; ppBack's
+  label stays a quiet label because it names where back goes. Tools glyphs:
+  the eight marks parenting rows used (`cuppedHands`, `sunMark`, `checkMark`,
+  `questionMark`, `pageMark`, `forkMark`, `cookMark`, `spineMark`) now map for
+  lists, not only doors (`ttcFamilyMarkForIntent`), Pregnancy gains them too.
+  Reader steps and the reader's buttons, chevrons and play discs are ink; the
+  small-caps eyebrows keep violet. Home type is Pregnancy's: heading 21, age
+  30, body 13. Door hero: the headline keeps one line when the age line shows,
+  so the hero is 262 like Pregnancy's. Door foot: the "Talk to an X expert"
+  consult card is gone (paid pitches on hold); every door without its own
+  closing line ends on `kPpDoorClosingLine` above the disclaimer. "His
+  journey" now reads the child's pronoun (phase screen, My Child, vaccines).
+  Decided not to rebuild the fold tiles on `PregFoldRow`: with the tokens
+  neutral they already draw white, ink and the one line, and rebuilding four
+  screens bought nothing visible. The five Material AppBar screens already
+  draw the plain ink arrow over Pregnancy's page title; left as they are.
+  Not walked on a phone.
+- **§95.5 Waves 3 to 7** (tool screens, the relevance brain, phase screen,
+  home, warm copy): not started.

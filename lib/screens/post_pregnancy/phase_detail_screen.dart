@@ -33,6 +33,7 @@ import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import 'pp_child_profile.dart';
 import 'phase_map_screen.dart' show PhasePainting;
 
 // ⚠️ THE HOUSE LOOK, 2026-10-17 (the user: "very old UI, font not matching
@@ -68,7 +69,7 @@ class PhaseDetailScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 40),
           children: [
-            _pad(ppBackBar(context, 'His journey')), // was ppBack
+            _pad(ppBackBar(context, '${ChildProfileStore.instance.theirCap} journey')), // was ppBack; was 'His journey' (2026-10-21)
             const SizedBox(height: 14),
             _pad(ClipRRect(
               borderRadius: BorderRadius.circular(18),

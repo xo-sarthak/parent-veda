@@ -66,18 +66,32 @@ const Color ppPurple = Color(0xFF6A30B6);
 const Color ppCoral = Color(0xFFFF5A79);
 // Matched to `surfaceAlt`. Was the old lilac #F3EEF7.
 const Color ppPanel = Color(0xFFEDEAF0);
-const Color ppMuted = Color(0xFFA99CBB);
-const Color ppBorder = Color(0xFFE7DFEE);
-const Color ppHair = Color(0xFFEFEAF2);
+// ⚠️ RETONED TO NEUTRAL, 2026-10-21 (Wave 2, one ParentVeda). The user:
+// parenting "still has the old purple UI" beside TTC and Pregnancy. TTC made
+// this exact move on 2026-09-29 (ttc_common.dart): muted text is the palette's
+// ink3, hairlines are the one neutral line, and titles are the one ink. One
+// value each recolours every parenting screen that reads them. Violet stays
+// only where ppPurple is named on purpose (eyebrows, links, progress).
+// Kept for revert:
+// const Color ppMuted = Color(0xFFA99CBB);
+// const Color ppBorder = Color(0xFFE7DFEE);
+// const Color ppHair = Color(0xFFEFEAF2);
+// const Color ppPanelDiv = Color(0xFFE1D7EC);
+// const Color ppStripeA = Color(0xFFEFE7F5);
+// const Color ppStripeB = Color(0xFFF6F0FA);
+// const Color ppTitleInk = Color(0xFF2D144C);
+const Color ppMuted = Color(0xFF6F6878);
+const Color ppBorder = ppLine;
+const Color ppHair = Color(0xFFEFEEF0);
 const Color ppLine = Color(0xFFE4E2E5);
 const Color ppCoralTint = Color(0xFFFFF0F3);
 const Color ppBrown = Color(0xFF7A4600);
-const Color ppPanelDiv = Color(0xFFE1D7EC);
-const Color ppStripeA = Color(0xFFEFE7F5);
-const Color ppStripeB = Color(0xFFF6F0FA);
-// Heading ink - matches the pregnancy app's primary900 (#2D144C), the dark
-// purple-black it uses for section & card titles (slightly warmer than ppInk).
-const Color ppTitleInk = Color(0xFF2D144C);
+const Color ppPanelDiv = ppLine;
+const Color ppStripeA = Color(0xFFF1F0F2);
+const Color ppStripeB = Color(0xFFF7F6F8);
+// Heading ink: the one ink, as TTC's ttcTitleInk became. Was the pregnancy
+// app's primary900 (#2D144C), a dark plum that read purple beside TTC.
+const Color ppTitleInk = ppInk;
 
 // ---- section accents --------------------------------------------------------
 //  Aliases onto AppTheme's accent set, so parenting code reads in pp* style
@@ -637,13 +651,35 @@ class PpBottomNav extends StatelessWidget {
 //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
 //     );
 
+// ⚠️ ONE HEADER, 2026-10-21 (Wave 2). The user: parenting headers are
+// "scattered". ppBack is the back row on 98 screens, so it is redrawn here
+// rather than at each site: the same bare 22pt ink arrow, touch padding and
+// height as TtcBackBar and ppBackBar. What differs is honest: ppBack's label
+// names where back goes ("Explore", "Recipes"), not this page, so it stays a
+// quiet label beside the arrow instead of a bold title. Kept for revert:
+// Widget ppBack(BuildContext context, String label) => PvPress(child: GestureDetector(
+//       onTap: () => Navigator.of(context).maybePop(),
+//       behavior: HitTestBehavior.opaque,
+//       child: Row(mainAxisSize: MainAxisSize.min, children: [
+//         const Icon(Icons.arrow_back, size: 20, color: ppSoft),
+//         const SizedBox(width: 12),
+//         Flexible(child: Text(label, style: ppBody(14, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
+//       ]),
+//     ));
 Widget ppBack(BuildContext context, String label) => PvPress(child: GestureDetector(
       onTap: () => Navigator.of(context).maybePop(),
       behavior: HitTestBehavior.opaque,
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.arrow_back, size: 20, color: ppSoft),
-        const SizedBox(width: 12),
-        Flexible(child: Text(label, style: ppBody(14, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis)),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(2, 8, 12, 8),
+          child: Icon(Icons.arrow_back, size: 22, color: ppInk),
+        ),
+        Flexible(
+          child: Text(label,
+              style: pvManrope(fontSize: 14, fontWeight: FontWeight.w600, color: ppSoft),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
+        ),
       ]),
     ));
 
@@ -674,7 +710,7 @@ Widget ppSectionDivider() => const Padding(
       child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
     );
 
-// A round back button (34px lavender circle with ←) as used on the newer
+// A back button (now the bare ink arrow; was a 34px lavender circle) as used on the newer
 // tracker/finder frames - with an optional uppercase eyebrow and/or trailing
 // widget on the right. Tapping pops the current route.
 Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) => Row(
@@ -682,12 +718,18 @@ Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) =
         PvPress(child: GestureDetector(
           onTap: () => Navigator.of(context).maybePop(),
           behavior: HitTestBehavior.opaque,
-          child: Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
-            child: const Icon(Icons.arrow_back, size: 17, color: ppInk),
+          // The bare arrow every other header uses (2026-10-21). TTC dropped
+          // the same grey puck for the same reason. Kept for revert:
+          // child: Container(
+          //   width: 34,
+          //   height: 34,
+          //   alignment: Alignment.center,
+          //   decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
+          //   child: const Icon(Icons.arrow_back, size: 17, color: ppInk),
+          // ),
+          child: const Padding(
+            padding: EdgeInsets.fromLTRB(2, 8, 12, 8),
+            child: Icon(Icons.arrow_back, size: 22, color: ppInk),
           ),
         )),
         if (eyebrow != null) ...[

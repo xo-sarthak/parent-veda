@@ -1110,12 +1110,15 @@ class PpBlockView extends StatelessWidget {
                 width: 26,
                 height: 26,
                 alignment: Alignment.center,
+                // Ink on a neutral well, not violet (2026-10-21, Wave 2): the
+                // user saw "purple numbered pointers" in articles. Was
+                // p.action at 10% behind a p.action numeral.
                 decoration: BoxDecoration(
-                  color: p.action.withValues(alpha: 0.10),
+                  color: p.surfaceAlt,
                   shape: BoxShape.circle,
                 ),
                 child: Text('${i + 1}',
-                    style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, height: 1.55, color: p.action)),
+                    style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, height: 1.55, color: p.ink1)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1403,7 +1406,7 @@ class PpBlockView extends StatelessWidget {
             color: b.kind == PpCalloutKind.doctor ||
                     b.kind == PpCalloutKind.safety
                 ? ppAlertInk(p)
-                : p.action),
+                : p.ink1), // was p.action (2026-10-21, ink not violet)
         const SizedBox(width: 11),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1539,7 +1542,7 @@ class PpBlockView extends StatelessWidget {
                       letterSpacing: 1.1,
                       color: p.action)),
             ),
-            Icon(Icons.swipe_rounded, size: 18, color: p.action),
+            Icon(Icons.swipe_rounded, size: 18, color: p.ink1), // was p.action
           ]),
           const SizedBox(height: 8),
           Text(first,
@@ -1638,7 +1641,7 @@ class PpBlockView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: night ? Colors.white.withValues(alpha: 0.12) : p.action,
+              color: night ? Colors.white.withValues(alpha: 0.12) : p.ink1, // was p.action: one ink button
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(night ? 'Start, one step at a time' : 'Swipe through it',
@@ -1702,7 +1705,7 @@ class PpBlockView extends StatelessWidget {
           // ⚠️ NOT A CHEVRON WHEN IT GOES NOWHERE. A chevron promises a screen,
           // and a promise that does nothing teaches her that taps do nothing.
           if (live)
-            Icon(Icons.chevron_right_rounded, size: 20, color: p.action)
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink1) // was p.action
           else
             Text('SOON',
                 style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, height: 1.55, color: p.ink3)
@@ -1752,7 +1755,7 @@ class PpBlockView extends StatelessWidget {
                 color: p.surface.withValues(alpha: 0.9),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.play_arrow_rounded, size: 24, color: p.action),
+              child: Icon(Icons.play_arrow_rounded, size: 24, color: p.ink1), // was p.action
             ),
           ),
           Padding(

@@ -185,7 +185,7 @@ void main() {
       }
       expect(find.text('Is this an emergency?'), findsOneWidget);
       expect(find.text('Fever check'), findsOneWidget);
-      expect(find.text('Talk to a paediatrician'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a paediatrician', the consult card (2026-10-21)
       expect(find.text('A fever in a baby under three months'), findsNothing,
           reason: 'an 8-month-old does not see the newborn page');
       // Tap the jump: the Get help now tab, with the red flag pinned.

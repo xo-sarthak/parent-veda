@@ -42,6 +42,11 @@ List<Widget> ppToolHeader(
       ppToolPad(Text(subtitle, style: ppBody(14, h: 1.55))),
     ];
 
+// ⚠️ INK, NOT VIOLET, 2026-10-21 (Wave 2). Buttons, chosen chips, the save
+// pill and the line icons here were ppPurple; the house rule is one ink fill
+// with a white label (PvCommit, ttcTitleInk). Each line read ppPurple where it
+// now reads ppInk; the insight card's lavender gradient is a flat neutral.
+// The eyebrow and the insight tag keep violet, the one signature use.
 // ---- big primary "log" button ----------------------------------------------
 Widget ppLogButton(String label, VoidCallback onTap, {IconData icon = Icons.add_rounded}) =>
     PvPress(child: GestureDetector(
@@ -50,7 +55,7 @@ Widget ppLogButton(String label, VoidCallback onTap, {IconData icon = Icons.add_
       child: Container(
         height: 52,
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16), boxShadow: ppCardShadow),
+        decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(16), boxShadow: ppCardShadow),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Icon(icon, size: 20, color: Colors.white),
           const SizedBox(width: 8),
@@ -68,7 +73,7 @@ Widget ppGhostButton(String label, VoidCallback onTap, {IconData? icon}) => PvPr
         alignment: Alignment.center,
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppLine)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[Icon(icon, size: 18, color: ppPurple), const SizedBox(width: 8)],
+          if (icon != null) ...[Icon(icon, size: 18, color: ppInk), const SizedBox(width: 8)],
           Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w700)),
         ]),
       ),
@@ -81,19 +86,19 @@ Widget ppSectionHead(String title, {String? trailing}) => Row(children: [
     ]);
 
 // ---- plain-language insight card (the "AI insight" / pattern voice) ---------
-//  Soft lavender panel, small sparkle glyph, reassuring body. This is the tool's
+//  Soft neutral panel, small sparkle glyph, reassuring body. This is the tool's
 //  interpretive voice - observations, never diagnoses.
 Widget ppInsightCard(String text, {String tag = 'Insight', IconData icon = Icons.auto_awesome_outlined}) => Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [ppStripeB, Color(0xFFF0E9F7)]),
+        color: ppStripeB, // was a lavender gradient [ppStripeB, #F0E9F7]
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: ppBorder),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Icon(icon, size: 15, color: ppPurple),
+          Icon(icon, size: 15, color: ppInk),
           const SizedBox(width: 7),
           Text(tag.toUpperCase(), style: ppBody(10, color: ppPurple, w: FontWeight.w800).copyWith(letterSpacing: 0.9)),
         ]),
@@ -119,7 +124,7 @@ Widget ppLearnRow(BuildContext context, String title, {bool top = false, bool bo
             height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.menu_book_outlined, size: 16, color: ppPurple),
+            child: const Icon(Icons.menu_book_outlined, size: 16, color: ppInk),
           ),
           const SizedBox(width: 12),
           Expanded(child: Text(title, style: ppBody(13.5, color: ppInk, h: 1.4))),
@@ -151,7 +156,7 @@ Widget ppEmptyCard(IconData icon, String text) => Container(
           height: 42,
           alignment: Alignment.center,
           decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-          child: Icon(icon, size: 20, color: ppPurple),
+          child: Icon(icon, size: 20, color: ppInk),
         ),
         const SizedBox(width: 14),
         Expanded(child: Text(text, style: ppBody(13, h: 1.5))),
@@ -167,13 +172,13 @@ Widget ppChoiceChip(String label, bool on, VoidCallback onTap, {IconData? icon, 
       padding: EdgeInsets.symmetric(vertical: icon != null ? 11 : 11, horizontal: icon != null ? 6 : 14),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: on ? ppPurple : Colors.white,
+        color: on ? ppInk : Colors.white,
         borderRadius: BorderRadius.circular(icon != null ? 14 : 12),
-        border: Border.all(color: on ? ppPurple : ppLine),
+        border: Border.all(color: on ? ppInk : ppLine),
       ),
       child: icon != null
           ? Column(mainAxisSize: MainAxisSize.min, children: [
-              Icon(icon, size: 18, color: on ? Colors.white : ppPurple),
+              Icon(icon, size: 18, color: on ? Colors.white : ppInk),
               const SizedBox(height: 5),
               Text(label, textAlign: TextAlign.center, style: ppBody(11.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
             ])
@@ -246,7 +251,7 @@ void ppLogSheet(
                 child: Container(
                   height: 50,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
+                  decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(14)),
                   child: Text(saveLabel, style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 ),
               )),
@@ -319,7 +324,7 @@ Widget ppTimeField(String label, TimeOfDay value, VoidCallback onTap) => Column(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: ppLine)),
             child: Row(children: [
-              const Icon(Icons.schedule_rounded, size: 16, color: ppPurple),
+              const Icon(Icons.schedule_rounded, size: 16, color: ppInk),
               const SizedBox(width: 8),
               Flexible(child: Text(ppFmtTod(value), style: ppBody(14, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
             ]),

@@ -74,7 +74,7 @@ class DevelopmentHomeScreen extends StatelessWidget {
             // and the poetry already lives in the paragraph above it.
             _pad(devSectionHeader('The four ways he is growing')),
             const SizedBox(height: 4),
-            _pad(Text('His thinking, his body, his words, his feelings. Tap any to go deeper.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Thinking, body, words and feelings. Tap any to go deeper.' /* was 'His thinking, his body, ...' (2026-10-21) */, style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 16),
             _pad(Column(children: [
               _domainCard(context, Icons.psychology_outlined, 'Brain', devAreaById('cognitive')),
