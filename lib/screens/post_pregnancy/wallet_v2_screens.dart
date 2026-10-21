@@ -44,6 +44,12 @@ import 'pp_health_data.dart';
 import 'pp_wallet_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart' show PregToolScaffold, pregToolPad;
+import '../products/pv_store_chrome.dart' show PvCommit;
+import '../v2/v2_palette.dart';
 
 void _push(BuildContext c, Widget s) =>
     Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -526,8 +532,202 @@ class ReminderStoreListenable {
 class WalletEmergencyCardScreen extends StatelessWidget {
   const WalletEmergencyCardScreen({super.key});
 
+  // ==========================================================================
+  //  THE CARD AS SECTIONS (2026-10-21, Wave 3)
+  // --------------------------------------------------------------------------
+  //  The user: the Emergency card still had "the old purple UI". It printed
+  //  KEY: value lines in one block, so "not recorded" looked exactly like a
+  //  filled line, and its two buttons were violet and lavender. Now, as Apple
+  //  Health's Medical ID: name, age and blood group lead, then named sections;
+  //  an empty section says so and offers Add, it never disappears. Sharing is
+  //  the main action because it is what the card is for. Same data
+  //  (walletEmergencyText for the QR, copy and share; HealthStore for the
+  //  sections), same editor behind "Edit details". Approved as an Artifact
+  //  first (claude.ai/artifact/9RNbbpCofsYtvSCgehNbQd). The old page is
+  //  _buildBeforeShell, kept for revert.
+  // ==========================================================================
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Listenable.merge([HealthStore.instance, ChildProfileStore.instance]),
+        builder: (context, _) {
+          final p = V2PaletteStore.instance.current;
+          final child = ChildProfileStore.instance;
+          final h = HealthStore.instance;
+          final e = h.emergency;
+          final text = walletEmergencyText();
+          final allergies = h.allergies.where((a) => a.status != AllergyStatus.resolved).map((a) => a.name).toList();
+          final meds = h.medications.where((m) => !m.completed).map((m) => '${m.name} ${m.dosage}'.trim()).toList();
+          final blood = (e?.bloodGroup ?? '').trim();
+          void edit() => _push(context, const HealthEmergencyScreen());
+          return PregToolScaffold(
+            hue: 350,
+            eyebrow: 'Health',
+            title: 'Emergency card',
+            mark: IntentMark.askDoctor,
+            intro: 'For anyone looking after ${child.nameMid}: a sitter, a grandparent, '
+                'a doctor who has never met ${child.them}. Works with no signal.',
+            children: [
+              pregToolPad(Container(
+                key: const ValueKey('pp_emergency_card_sections'),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: p.line),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(child.name,
+                              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, color: p.ink1)),
+                          const SizedBox(height: 3),
+                          Text(
+                              [
+                                child.ageLabel,
+                                if ((e?.dob ?? '').isNotEmpty) 'born ${e!.dob}',
+                                if ((e?.weight ?? '').isNotEmpty) e!.weight,
+                              ].join('  \u00b7  '),
+                              style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
+                        ]),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: p.line),
+                        ),
+                        child: Column(children: [
+                          Text('BLOOD',
+                              style: pvManrope(
+                                  fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: p.ink3)),
+                          Text(blood.isEmpty ? '\u2014' : blood,
+                              style: pvManrope(fontSize: 17, fontWeight: FontWeight.w800, color: p.ink1)),
+                        ]),
+                      ),
+                    ]),
+                  ),
+                  _section(p, 'Allergies', allergies.isEmpty ? null : allergies.join(', '),
+                      empty: 'None recorded',
+                      onAdd: () => _push(context, const HealthRecordsScreen(category: 'allergies'))),
+                  _section(p, 'Medicines', meds.isEmpty ? null : meds.join('; '),
+                      empty: 'None', onAdd: () => _push(context, const HealthRecordsScreen(category: 'medications'))),
+                  _section(p, 'Paediatrician', (e?.pediatrician ?? '').isEmpty ? null : e!.pediatrician,
+                      empty: 'Not added', onAdd: edit),
+                  _section(
+                      p,
+                      'Call first',
+                      (e?.contacts ?? const []).isEmpty
+                          ? null
+                          : [
+                              for (final c in e!.contacts)
+                                [c.name, if (c.relation.isNotEmpty) '(${c.relation})', c.phone].join(' '),
+                            ].join('\n'),
+                      empty: 'No one added yet',
+                      onAdd: edit),
+                  Container(
+                    color: p.surfaceAlt,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                    child: Text('Emergency 112  \u00b7  Ambulance 108',
+                        style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: p.ink1)),
+                  ),
+                ]),
+              )),
+              const SizedBox(height: 18),
+              pregToolPad(Row(children: [
+                SizedBox(
+                  width: 96,
+                  height: 96,
+                  child: FittedBox(
+                    child: _QrSvg(svg: Barcode.qrCode().toSvg(text, width: 190, height: 190)),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text('Scan to read this card on another phone. It holds the details '
+                      'themselves, so it works offline and nothing is sent anywhere.',
+                      style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
+                ),
+              ])),
+              const SizedBox(height: 20),
+              pregToolPad(PvCommit(
+                key: const ValueKey('pp_emergency_share'),
+                label: 'Share card',
+                icon: Icons.ios_share_rounded,
+                onTap: () => Share.share(text),
+              )),
+              const SizedBox(height: 6),
+              // A Wrap, so the two links stack rather than overflow at large text.
+              pregToolPad(Wrap(alignment: WrapAlignment.center, spacing: 8, children: [
+                TextButton(
+                  key: const ValueKey('pp_emergency_copy'),
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: text));
+                    if (!context.mounted) return;
+                    pvToast(context, 'Copied, paste it anywhere', kind: PvToastKind.done);
+                  },
+                  child: Text('Copy details',
+                      style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink1)),
+                ),
+                TextButton(
+                  key: const ValueKey('pp_emergency_edit'),
+                  onPressed: edit,
+                  child: Text('Edit details',
+                      style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink1)),
+                ),
+              ])),
+              const SizedBox(height: 14),
+              pregToolPad(Text(
+                  'What is deliberately not on it: no history, no reports, no address. '
+                  'A card a stranger reads should carry only what a stranger needs.',
+                  style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3))),
+              const SizedBox(height: kAskFabReserve),
+            ],
+          );
+        },
+      );
+
+  /// One named part of the card. Empty, it says so and offers Add: a missing
+  /// line is something to fix, not something to hide.
+  Widget _section(V2Palette p, String label, String? value, {required String empty, required VoidCallback onAdd}) =>
+      Container(
+        key: ValueKey('pp_emergency_section_$label'),
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: p.line))),
+        padding: const EdgeInsets.fromLTRB(16, 11, 10, 11),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(label.toUpperCase(),
+                  style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.9, color: p.ink3)),
+              const SizedBox(height: 3),
+              Text(value ?? empty,
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      height: 1.4,
+                      fontWeight: value == null ? FontWeight.w500 : FontWeight.w700,
+                      color: value == null ? p.ink3 : p.ink1)),
+            ]),
+          ),
+          if (value == null)
+            TextButton(
+              key: ValueKey('pp_emergency_add_$label'),
+              onPressed: onAdd,
+              child: Text('Add',
+                  style: pvManrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1,
+                      decoration: TextDecoration.underline)),
+            ),
+        ]),
+      );
+
+  // The page before the shell, kept for revert.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final text = walletEmergencyText();
     final child = ChildProfileStore.instance;
     return Scaffold(
@@ -563,6 +763,7 @@ class WalletEmergencyCardScreen extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   Widget _card(BuildContext context, String name, String text) {
     // Vector QR, drawn straight from the barcode package — the same approach
     // as the care-partner poster, so it stays crisp at any size and needs no
@@ -611,6 +812,7 @@ class WalletEmergencyCardScreen extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   Widget _actions(BuildContext context, String text) => Row(children: [
         Expanded(
           child: PvPress(child: GestureDetector(

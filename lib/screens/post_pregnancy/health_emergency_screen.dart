@@ -13,6 +13,8 @@ import 'package:share_plus/share_plus.dart';
 import 'pp_common.dart';
 import 'pp_health_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart' show PregToolScaffold;
 
 class HealthEmergencyScreen extends StatefulWidget {
   const HealthEmergencyScreen({super.key});
@@ -25,10 +27,41 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
   static const Color _red = Color(0xFFB0402E);
   final _store = HealthStore.instance;
 
-  Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
+  // The tool shell's 18 gutter (2026-10-21). Was 24.
+  Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: c);
 
+  // ON THE ONE TOOL SHELL (2026-10-21, Wave 3). This is the editor behind the
+  // card's "Edit details"; the card itself is WalletEmergencyCardScreen. What
+  // it saves (HealthStore.setEmergency, the 0095 sync) and its sheet are
+  // unchanged. The old page is _buildBeforeShell, kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: _store,
+        builder: (context, _) {
+          final e = _store.emergency;
+          return PregToolScaffold(
+            hue: 350,
+            eyebrow: 'Emergency card',
+            title: e == null ? 'Make the card' : 'The card\u2019s details',
+            mark: IntentMark.askDoctor,
+            intro: 'Everything a doctor or carer needs in the first two minutes. Works offline.',
+            action: e == null
+                ? null
+                : TextButton(
+                    key: const ValueKey('pp_emergency_editor_edit'),
+                    onPressed: () => _editSheet(e),
+                    child: Text('Edit', style: ppBody(14, color: ppInk, w: FontWeight.w700)),
+                  ),
+            children: [
+              if (e == null) _pad(_emptyState()) else ..._cardView(e),
+              const SizedBox(height: 40),
+            ],
+          );
+        },
+      );
+
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -50,7 +83,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                     PvPress(child: GestureDetector(
                       onTap: () => _editSheet(e),
                       behavior: HitTestBehavior.opaque,
-                      child: Text('Edit', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                      child: Text('Edit', style: ppBody(13, color: ppInk, w: FontWeight.w700)),
                     )),
                 ])),
                 const SizedBox(height: 8),
@@ -86,7 +119,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
           child: Container(
             height: 52,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
+            decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(14)),
             child: Text('Create emergency card', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
           ),
         )),
@@ -155,9 +188,9 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: ppBorder)),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  const Icon(Icons.ios_share_rounded, size: 17, color: ppPurple),
+                  const Icon(Icons.ios_share_rounded, size: 17, color: ppInk),
                   const SizedBox(width: 8),
-                  Text('Share card', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                  Text('Share card', style: ppBody(13, color: ppInk, w: FontWeight.w700)),
                 ]),
               ),
             )),
@@ -212,7 +245,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
   Widget _contact(EmergencyContact c) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Row(children: [
-          const Icon(Icons.phone_outlined, size: 15, color: ppPurple),
+          const Icon(Icons.phone_outlined, size: 15, color: ppInk),
           const SizedBox(width: 10),
           Expanded(child: Text('${c.name} · ${c.relation}', style: ppBody(13, color: ppInk, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
           Text(c.phone, style: ppBody(12.5, color: ppSoft)),
@@ -294,7 +327,7 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                 child: Container(
                   height: 50,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
+                  decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(14)),
                   child: Text('Save', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 ),
               )),

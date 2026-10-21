@@ -9,6 +9,10 @@
 //  Seeded visits from the health timeline still show here, tagged read-only.
 // =============================================================================
 
+import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart' show PregToolScaffold;
+import '../products/pv_store_chrome.dart' show PvCommit;
 import 'package:flutter/material.dart';
 
 import '../../services/notification_service.dart';
@@ -29,7 +33,9 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
   String _q = '';
   final _store = HealthStore.instance;
 
-  Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
+  // The tool shell's 18 gutter (pregToolPad), so the cards line up under its
+  // title (2026-10-21). Was 24.
+  Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: c);
   bool _match(String s) => _q.isEmpty || s.toLowerCase().contains(_q.toLowerCase());
 
   String get _title => switch (widget.category) {
@@ -48,8 +54,38 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
     return '${d.day} ${m[d.month - 1]} ${d.year}';
   }
 
+  // ON THE ONE TOOL SHELL (2026-10-21, Wave 3): the record's six lists open
+  // under the same header as every tool, with one ink "Add" button. The
+  // search, the cards, the add and edit sheets and the medicine reminders are
+  // unchanged. The old page is _buildBeforeShell, kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: _store,
+        builder: (context, _) => PregToolScaffold(
+          hue: 214,
+          eyebrow: 'Health record',
+          title: _title,
+          mark: IntentMark.reportPage,
+          children: [
+            _pad(_search()),
+            const SizedBox(height: 14),
+            if (_addLabel != null) ...[
+              _pad(PvCommit(
+                key: ValueKey('pp_records_add_${widget.category}'),
+                label: _addLabel!,
+                icon: Icons.add_rounded,
+                onTap: _onAdd,
+              )),
+              const SizedBox(height: 18),
+            ],
+            ..._body(),
+            const SizedBox(height: kAskFabReserve),
+          ],
+        ),
+      );
+
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -122,6 +158,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         ]),
       );
 
+  // ignore: unused_element
   Widget _addButton(String label, VoidCallback onTap) => PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -130,9 +167,9 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           alignment: Alignment.center,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: ppBorder)),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.add_rounded, size: 18, color: ppPurple),
+            const Icon(Icons.add_rounded, size: 18, color: ppInk),
             const SizedBox(width: 8),
-            Text(label, style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+            Text(label, style: ppBody(13, color: ppInk, w: FontWeight.w700)),
           ]),
         ),
       ));
@@ -157,7 +194,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Icon(Icons.auto_awesome, size: 15, color: ppPurple),
+              const Icon(Icons.auto_awesome, size: 15, color: ppInk),
               const SizedBox(width: 10),
               Expanded(child: Text('Log anything you notice - a temperature, a rash, a rough night. A clear record helps you and the doctor spot patterns.', style: ppBody(12.5, h: 1.5))),
             ]),
@@ -211,8 +248,8 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             Expanded(child: Text(m.name, style: ppJakarta(14.5))),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(color: (m.completed ? ppMuted : ppPurple).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
-              child: Text(m.completed ? 'Completed' : 'Ongoing', style: ppBody(10.5, color: m.completed ? ppSoft : ppPurple, w: FontWeight.w700)),
+              decoration: BoxDecoration(color: (m.completed ? ppMuted : ppInk).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
+              child: Text(m.completed ? 'Completed' : 'Ongoing', style: ppBody(10.5, color: m.completed ? ppSoft : ppInk, w: FontWeight.w700)),
             ),
             const SizedBox(width: 8),
             _editHint(),
@@ -226,9 +263,9 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           if (m.reminderOn && m.reminderHour != null) ...[
             const SizedBox(height: 8),
             Row(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.notifications_active_outlined, size: 13, color: ppPurple),
+              const Icon(Icons.notifications_active_outlined, size: 13, color: ppInk),
               const SizedBox(width: 5),
-              Text('Reminder at ${_fmtTime(m.reminderHour!, m.reminderMinute ?? 0)}', style: ppBody(11.5, color: ppPurple, w: FontWeight.w600)),
+              Text('Reminder at ${_fmtTime(m.reminderHour!, m.reminderMinute ?? 0)}', style: ppBody(11.5, color: ppInk, w: FontWeight.w600)),
             ]),
           ],
         ]),
@@ -271,7 +308,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
 
   Widget _reportCard(MedicalReport r, int i) => _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: const Icon(Icons.description_outlined, size: 18, color: ppPurple)),
+          Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: const Icon(Icons.description_outlined, size: 18, color: ppInk)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(r.name, style: ppJakarta(14.5), maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -304,7 +341,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         if (r.summary.isNotEmpty) ...[
           const SizedBox(height: 10),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Icon(Icons.auto_awesome, size: 14, color: ppPurple),
+            const Icon(Icons.auto_awesome, size: 14, color: ppInk),
             const SizedBox(width: 8),
             Expanded(child: Text(r.summary, style: ppBody(12.5, color: ppInk, h: 1.5))),
           ]),
@@ -319,7 +356,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         onTap: () => _prescriptionSheet(existing: p, index: i),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: const Icon(Icons.receipt_long_outlined, size: 18, color: ppPurple)),
+            Container(width: 40, height: 40, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: const Icon(Icons.receipt_long_outlined, size: 18, color: ppInk)),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(p.name, style: ppJakarta(14.5), maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -348,7 +385,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
         child: Row(children: [
-          Container(width: 42, height: 42, alignment: Alignment.center, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.shield_outlined, size: 20, color: ppPurple)),
+          Container(width: 42, height: 42, alignment: Alignment.center, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.shield_outlined, size: 20, color: ppInk)),
           const SizedBox(width: 14),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(known.isEmpty ? 'No known allergies' : '${known.length} known ${known.length == 1 ? 'allergy' : 'allergies'}', style: ppJakarta(15)),
@@ -373,8 +410,8 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             Expanded(child: Text(a.name, style: ppJakarta(14.5))),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(color: ppPurple.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(999)),
-              child: Text(_allergyStatusLabel(a.status), style: ppBody(10.5, color: ppPurple, w: FontWeight.w700)),
+              decoration: BoxDecoration(color: ppInk.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(999)),
+              child: Text(_allergyStatusLabel(a.status), style: ppBody(10.5, color: ppInk, w: FontWeight.w700)),
             ),
             const SizedBox(width: 8),
             _editHint(),
@@ -664,7 +701,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                   child: Container(
                     height: 50,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
+                    decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(14)),
                     child: Text('Save', style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                   ),
                 )),
@@ -732,9 +769,9 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
 
   // A visible "Edit" affordance on editable cards, so tapping to edit is obvious.
   Widget _editHint() => Row(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.edit_outlined, size: 13, color: ppPurple),
+        const Icon(Icons.edit_outlined, size: 13, color: ppInk),
         const SizedBox(width: 4),
-        Text('Edit', style: ppBody(11.5, color: ppPurple, w: FontWeight.w700)),
+        Text('Edit', style: ppBody(11.5, color: ppInk, w: FontWeight.w700)),
       ]);
 
   Widget _tf(TextEditingController c, String label, {int maxLines = 1}) => Padding(
@@ -783,9 +820,9 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
               alignment: Alignment.center,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: ppBorder)),
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Icon(Icons.attach_file_rounded, size: 17, color: ppPurple),
+                const Icon(Icons.attach_file_rounded, size: 17, color: ppInk),
                 const SizedBox(width: 8),
-                Text('Add attachment', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                Text('Add attachment', style: ppBody(13, color: ppInk, w: FontWeight.w700)),
               ]),
             ),
           )),
@@ -808,7 +845,7 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: ppLine)),
               child: Row(children: [
-                const Icon(Icons.schedule_rounded, size: 17, color: ppPurple),
+                const Icon(Icons.schedule_rounded, size: 17, color: ppInk),
                 const SizedBox(width: 10),
                 Expanded(child: Text(t == null ? 'Set a time' : _fmtTime(t.hour, t.minute), style: ppBody(14, color: t == null ? ppMuted : ppInk, w: FontWeight.w600))),
                 const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),
@@ -829,9 +866,9 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
                   decoration: BoxDecoration(
-                    color: value == s ? ppPurple : Colors.white,
+                    color: value == s ? ppInk : Colors.white,
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: value == s ? ppPurple : ppLine),
+                    border: Border.all(color: value == s ? ppInk : ppLine),
                   ),
                   child: Text(_allergyStatusLabel(s), style: ppBody(12, color: value == s ? Colors.white : ppInk, w: FontWeight.w700)),
                 ),

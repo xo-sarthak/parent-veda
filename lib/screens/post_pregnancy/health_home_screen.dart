@@ -15,7 +15,7 @@ import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 
 import 'baby_documents_screen.dart';
 import 'health_doctor_visit_screen.dart';
-import 'health_emergency_screen.dart';
+// import 'health_emergency_screen.dart'; // the Emergency tile opens the card now (2026-10-21)
 // Old light growth screen retired in favour of the new Growth Journey tool
 // (kept for revert). import 'health_growth_screen.dart';
 import 'growth_journey_screen.dart';
@@ -28,6 +28,16 @@ import 'pp_growth_data.dart';
 import 'pp_health_data.dart';
 import 'pp_vaccine_data.dart';
 import 'vax_tracker_screen.dart';
+import 'wallet_v2_screens.dart' show WalletEmergencyCardScreen;
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvRowGroup, PvListRow;
+import '../pregnancy/preg_chrome.dart' show PregSectionHeading;
+import '../pregnancy/preg_tool_chrome.dart' show PregToolScaffold, pregToolPad;
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
+import '../v2/v2_palette.dart';
+import 'pp_tools_kit.dart' show ppShortDate;
 import '../../widgets/pv_feedback.dart' show PvPress;
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
@@ -41,8 +51,183 @@ class HealthHomeScreen extends StatelessWidget {
 
   static Color statusColor(String s) => s == 'good' ? ppPurple : s == 'watch' ? ppCoral : ppMuted;
 
+  // ==========================================================================
+  //  THE RECORD, ON THE ONE TOOL SHELL (2026-10-21, Wave 3)
+  // --------------------------------------------------------------------------
+  //  The user: Health record still had "the old purple UI". It was a long page
+  //  of lavender boxes, a 4-tile and a 6-tile icon grid and violet links, with
+  //  the records themselves last. Now, as Zocdoc's medical history and TTC's
+  //  records (ttc_records_v2.dart): the shared tool shell, then the records as
+  //  ONE list where every row says what it holds right now, so she reads her
+  //  child's record without opening anything. An empty row is the invitation
+  //  ("None yet, add one"), never hidden. Approved as an Artifact first
+  //  (claude.ai/artifact/9RNbbpCofsYtvSCgehNbQd). The old page is
+  //  _buildBeforeShell below, kept for revert.
+  // ==========================================================================
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Listenable.merge([
+          HealthStore.instance,
+          GrowthStore.instance,
+          VaxStore.instance,
+          ChildProfileStore.instance,
+        ]),
+        builder: (context, _) {
+          final child = ChildProfileStore.instance;
+          final p = V2PaletteStore.instance.current;
+          final lately = healthTimelineSorted().where((e) => !e.upcoming).take(3).toList();
+          return PregToolScaffold(
+            hue: 214,
+            eyebrow: 'Health',
+            title: '${child.name}’s health record',
+            mark: IntentMark.reportPage,
+            intro: _snapshotLine(child),
+            children: [
+              pregToolPad(const PregSectionHeading('Records')),
+              const SizedBox(height: 4),
+              pregToolPad(PvRowGroup(p: p, children: _recordRows(context, p))),
+              const SizedBox(height: 26),
+              pregToolPad(const PregSectionHeading('Growing')),
+              const SizedBox(height: 4),
+              pregToolPad(PvRowGroup(p: p, children: [
+                _row(context, p, 'pp_health_growth', 140, mTool: TtcToolMark.weight, title: 'Growth',
+                    line: _growthLine(), to: const GrowthJourneyScreen()),
+                _row(context, p, 'pp_health_vax', 200, mTool: TtcToolMark.vaccinations, title: 'Vaccines',
+                    line: VaxStore.instance.nextVisitSubtitle, to: const VaxTrackerScreen()),
+              ])),
+              const SizedBox(height: 26),
+              pregToolPad(const PregSectionHeading('Keep handy')),
+              const SizedBox(height: 4),
+              pregToolPad(PvRowGroup(p: p, children: [
+                // The card itself, not the full-page editor it used to open
+                // (the tools row below, kept). "Edit details" still reaches it.
+                _row(context, p, 'pp_health_emergency', 350, mTab: TtcTabMark.twoBubbles, title: 'Emergency card',
+                    line: HealthStore.instance.emergency == null
+                        ? 'Not made yet, it takes a minute'
+                        : 'Ready to show or share',
+                    to: const WalletEmergencyCardScreen()),
+                _row(context, p, 'pp_health_docs', 30, mTab: TtcTabMark.wallet, title: 'ID and documents',
+                    line: 'Birth certificate, ID, insurance', to: const BabyDocumentsScreen()),
+                _row(context, p, 'pp_health_visit', 260, mTab: TtcTabMark.doctorChat, title: 'Doctor visit companion',
+                    line: 'Questions to take to the next visit', to: const HealthDoctorVisitScreen()),
+                _row(context, p, 'pp_health_guide', 170, mTab: TtcTabMark.openBook, title: 'Health guide',
+                    line: 'What helped last time', to: const HealthGuideScreen()),
+              ])),
+              const SizedBox(height: 26),
+              pregToolPad(PregSectionHeading('Lately',
+                  link: 'See all',
+                  onLink: () => _push(context, const HealthTimelineScreen()))),
+              const SizedBox(height: 4),
+              if (lately.isEmpty)
+                pregToolPad(Text('Visits, illnesses and doses you add show up here, newest first.',
+                    style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)))
+              else
+                pregToolPad(PvRowGroup(p: p, children: [
+                  for (final e in lately)
+                    PvListRow(
+                      p: p,
+                      leading: const SizedBox.shrink(),
+                      title: e.title,
+                      line: [e.date, if (e.summary.isNotEmpty) e.summary].join('  ·  '),
+                      onTap: () => _push(context, const HealthTimelineScreen()),
+                    ),
+                ])),
+              // Still only when there is something real to say (see _insights).
+              const SizedBox(height: 22),
+              pregToolPad(_insights(context)),
+              const SizedBox(height: 12),
+              pregToolPad(Text('A record to keep and to show your doctor. It never replaces their advice.',
+                  style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3))),
+              const SizedBox(height: kAskFabReserve),
+            ],
+          );
+        },
+      );
+
+  String _snapshotLine(ChildProfileStore child) {
+    final g = GrowthStore.instance.latest;
+    final visits = HealthStore.instance.visits;
+    return [
+      child.ageLabel,
+      if (g != null && HealthStore.instance.growthEntered) 'last weight ${g.weightKg.toStringAsFixed(1)} kg',
+      if (visits.isNotEmpty) 'last visit ${visits.first.date}',
+    ].join('  ·  ');
+  }
+
+  String _growthLine() {
+    final g = GrowthStore.instance.latest;
+    if (g == null || !HealthStore.instance.growthEntered) return 'No measurements yet, add the first';
+    return '${g.weightKg.toStringAsFixed(1)} kg, ${g.heightCm.toStringAsFixed(0)} cm  ·  ${ppShortDate(g.date)}';
+  }
+
+  /// "Paracetamol, Vitamin D" kept to one line's worth.
+  static String _names(Iterable<String> names) {
+    final l = names.where((n) => n.trim().isNotEmpty).toList();
+    if (l.length <= 2) return l.join(', ');
+    return '${l.take(2).join(', ')} and ${l.length - 2} more';
+  }
+
+  List<Widget> _recordRows(BuildContext context, V2Palette p) {
+    final h = HealthStore.instance;
+    final active = h.medications.where((m) => !m.completed).toList();
+    final allergies = h.allergies.where((a) => a.status != AllergyStatus.resolved).toList();
+    String visitsLine() {
+      if (h.visits.isEmpty) return 'None yet, add one';
+      final last = h.visits.first;
+      final who = (last.doctor ?? '').isEmpty ? '' : ' with ${last.doctor}';
+      return '${h.visits.length}  ·  last ${last.date}$who';
+    }
+
+    return [
+      _row(context, p, 'pp_health_rec_visits', 214, mTool: TtcToolMark.appointments, title: 'Doctor visits',
+          line: visitsLine(), to: const HealthRecordsScreen(category: 'visits')),
+      _row(context, p, 'pp_health_rec_medications', 140, mTool: TtcToolMark.medication, title: 'Medicines',
+          line: active.isNotEmpty
+              ? '${active.length} taking now: ${_names(active.map((m) => m.name))}'
+              : h.medications.isEmpty
+                  ? 'None yet, add one'
+                  : 'None now  ·  ${h.medications.length} before',
+          to: const HealthRecordsScreen(category: 'medications')),
+      _row(context, p, 'pp_health_rec_prescriptions', 40, mTab: TtcTabMark.checklist, title: 'Prescriptions',
+          line: h.prescriptions.isEmpty
+              ? 'None yet, add one'
+              : '${h.prescriptions.length}  ·  ${_names(h.prescriptions.map((x) => x.name))}',
+          to: const HealthRecordsScreen(category: 'prescriptions')),
+      _row(context, p, 'pp_health_rec_reports', 330, mTab: TtcTabMark.vialReport, title: 'Reports',
+          line: h.reports.isEmpty
+              ? 'None yet, add one'
+              : '${h.reports.length}  ·  ${_names(h.reports.map((x) => x.name))}',
+          to: const HealthRecordsScreen(category: 'reports')),
+      _row(context, p, 'pp_health_rec_symptoms', 30, mTool: TtcToolMark.symptoms, title: 'Symptoms',
+          line: h.symptoms.isEmpty
+              ? 'None yet, add one'
+              : '${h.symptoms.first.name}  ·  ${h.symptoms.first.date}',
+          to: const HealthRecordsScreen(category: 'symptoms')),
+      _row(context, p, 'pp_health_rec_allergies', 350, mTool: TtcToolMark.precheck, title: 'Allergies',
+          line: allergies.isEmpty ? 'None recorded, add one' : _names(allergies.map((a) => a.name)),
+          to: const HealthRecordsScreen(category: 'allergies')),
+    ];
+  }
+
+  Widget _row(BuildContext context, V2Palette p, String key, double hue,
+          {TtcToolMark? mTool,
+          TtcTabMark? mTab,
+          required String title,
+          required String line,
+          required Widget to}) =>
+      PvListRow(
+        key: ValueKey(key),
+        p: p,
+        leading: TtcMarkLeading(tool: mTool, tab: mTab, tint: v2BlockTint(hue, p), size: 40),
+        title: title,
+        line: line,
+        trailing: Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+        onTap: () => _push(context, to),
+      );
+
+  // The page before the shell, kept for revert.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     // Timeline now read inside _bucketedTimeline. Kept for revert.
     // final timeline = healthTimelineSorted();
     // 'latest' retired - the preview is bucketed now. Kept for revert.
@@ -182,7 +367,9 @@ class HealthHomeScreen extends StatelessWidget {
     final tools = <(IconData, String, Color, VoidCallback)>[
       (Icons.badge_outlined, 'ID &\ndocuments', ppPurple, () => _push(context, const BabyDocumentsScreen())),
       (Icons.summarize_outlined, 'Doctor visit\ncompanion', ppPurple, () => _push(context, const HealthDoctorVisitScreen())),
-      (Icons.emergency_outlined, 'Emergency\ncard', ppCoral, () => _push(context, const HealthEmergencyScreen())),
+      // Opens the card itself (2026-10-21). Was the full-page editor:
+      // (Icons.emergency_outlined, 'Emergency\ncard', ppCoral, () => _push(context, const HealthEmergencyScreen())),
+      (Icons.emergency_outlined, 'Emergency\ncard', ppCoral, () => _push(context, const WalletEmergencyCardScreen())),
       (Icons.menu_book_outlined, 'Health\nguide', const Color(0xFF3E9A8C), () => _push(context, const HealthGuideScreen())),
     ];
     return _pad(Row(children: [
@@ -647,12 +834,13 @@ class HealthHomeScreen extends StatelessWidget {
   Widget _insightsCard(BuildContext context) => Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF1EAF8), Color(0xFFF6ECEF)]),
+          // A flat neutral (2026-10-21). Was a lavender-to-pink gradient.
+          color: ppPanel,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.auto_awesome, size: 16, color: ppPurple),
+            const Icon(Icons.auto_awesome, size: 16, color: ppInk),
             const SizedBox(width: 8),
             ppEyebrow('What we notice', color: ppPurple, spacing: 1.0),
           ]),
@@ -661,7 +849,7 @@ class HealthHomeScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Container(margin: const EdgeInsets.only(top: 7), width: 5, height: 5, decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle)),
+                Container(margin: const EdgeInsets.only(top: 7), width: 5, height: 5, decoration: const BoxDecoration(color: ppInk, shape: BoxShape.circle)),
                 const SizedBox(width: 11),
                 Expanded(child: Text(s, style: ppBody(13, color: ppInk, h: 1.5))),
               ]),
@@ -671,9 +859,9 @@ class HealthHomeScreen extends StatelessWidget {
             onTap: () => openPpTab(context, 1),
             behavior: HitTestBehavior.opaque,
             child: Row(children: [
-              Flexible(child: Text('Explore this with AskVeda', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              Flexible(child: Text('Explore this with AskVeda', style: ppBody(12.5, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
               const SizedBox(width: 6),
-              const Icon(Icons.arrow_forward, size: 14, color: ppPurple),
+              const Icon(Icons.arrow_forward, size: 14, color: ppInk),
             ]),
           )),
           const SizedBox(height: 8),

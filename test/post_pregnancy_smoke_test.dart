@@ -62,6 +62,7 @@ import 'package:parentveda/screens/post_pregnancy/guides_tools_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/doctor_record_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_doctor_visit_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_emergency_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/wallet_v2_screens.dart' show WalletEmergencyCardScreen;
 import 'package:parentveda/screens/post_pregnancy/health_growth_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_guide_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/health_home_screen.dart';
@@ -710,22 +711,29 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: HealthHomeScreen()));
     await tester.pumpAndSettle();
 
-    // The snapshot is DERIVED now, not a const verdict. With only a vaccine
-    // dose marked and nothing else entered, growth is honestly "Not recorded" -
-    // it used to say "Healthy" to every parent regardless.
-    expect(find.text('Not recorded'), findsWidgets); // snapshot, honestly
+    // 2026-10-21 (Wave 3): the record is one list on the tool shell. Every
+    // record row says what it holds; with nothing entered it is the invitation.
+    // The old page's "Not recorded" snapshot, vaccination summary and
+    // "Emergency\ncard" tile are kept in _buildBeforeShell.
+    expect(find.byKey(const ValueKey('pp_health_rec_visits')), findsOneWidget);
+    expect(find.text('None recorded, add one'), findsOneWidget, reason: 'allergies, empty');
+    expect(find.byKey(const ValueKey('pp_health_vax')), findsOneWidget, reason: 'vaccines stay on the record');
 
-    // the integrated Vaccination module appears as a summary on the way down
-    await tester.scrollUntilVisible(find.text('Open Vaccination Tracker'), 300,
-        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    expect(find.text('Open Vaccination Tracker'), findsOneWidget);
-
-    // The Emergency Card is now one of four TOOLS in a row under the snapshot
-    // (with ID & documents, the visit companion and the health guide) rather
-    // than a full-width CTA near the bottom - so it is reached by scrolling UP.
-    await tester.scrollUntilVisible(find.text('Emergency\ncard'), -300,
-        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    await tester.tap(find.text('Emergency\ncard'));
+    // The Emergency card row opens the CARD now, not the old editor page.
+    final row = find.byKey(const ValueKey('pp_health_emergency'));
+    // ensureVisible, not scrollUntilVisible: the row is already built (in the
+    // list's cache extent) but below the fold, so the tap would miss it.
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    expect(find.byType(WalletEmergencyCardScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('pp_emergency_add_Allergies')), findsOneWidget,
+        reason: 'an empty section says so and offers Add');
+    // ... and its "Edit details" still reaches the editor.
+    await tester.ensureVisible(find.byKey(const ValueKey('pp_emergency_edit')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('pp_emergency_edit')));
     await tester.pumpAndSettle();
     expect(find.byType(HealthEmergencyScreen), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -914,7 +922,7 @@ void main() {
     // The invariant is unchanged: the lesson opens INSIDE its own course, is
     // honest that the film is not here yet, and never lands on the flagship.
     expect(find.byType(PvLessonScreen), findsOneWidget);
-    expect(find.textContaining('FILM'), findsWidgets); // "FILM · ARRIVING", the honest marker
+    expect(find.textContaining('VIDEO'), findsWidgets); // "VIDEO · ARRIVING", the honest marker
     expect(find.text('The Complete Parenting Guide'), findsNothing); // not the flagship
     expect(tester.takeException(), isNull);
   });
@@ -1078,20 +1086,16 @@ void healthTwoStateTests() {
     await tester.pumpWidget(const MaterialApp(home: HealthHomeScreen()));
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('No measurements yet'), 300,
+    // 2026-10-21 (Wave 3): growth and vaccines are rows on the record. The row
+    // is PRESENT, not hidden; with nothing of hers it says so and invites.
+    // (The old page's 'No measurements yet' / 'Nothing marked yet' cards are
+    // kept in _buildBeforeShell.)
+    final growth = find.byKey(const ValueKey('pp_health_growth'));
+    await tester.scrollUntilVisible(growth, 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    // The section is PRESENT, not hidden - it just has nothing of hers in it.
     expect(find.text('Growth'), findsOneWidget);
-    expect(find.text('No measurements yet'), findsOneWidget);
-    expect(find.text('Add measurements'), findsOneWidget);
-
-    // Scrolling on to the vaccination section disposes the growth heading above
-    // it (lazy ListView), so assert the invitation itself rather than a heading
-    // that has legitimately left the tree.
-    await tester.scrollUntilVisible(find.text('Nothing marked yet'), 300,
-        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    expect(find.text('Nothing marked yet'), findsOneWidget);
-    expect(find.text('Open the tracker'), findsOneWidget);
+    expect(find.text('No measurements yet, add the first'), findsOneWidget);
+    expect(find.byKey(const ValueKey('pp_health_vax')), findsOneWidget);
   });
 
   testWidgets('Health: entering growth swaps the invitation for her figures',
@@ -1117,11 +1121,12 @@ void healthTwoStateTests() {
     await tester.pumpWidget(const MaterialApp(home: HealthHomeScreen()));
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('Growth'), 300,
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('pp_health_growth')), 300,
         scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    expect(find.text('No measurements yet'), findsNothing,
+    expect(find.text('No measurements yet, add the first'), findsNothing,
         reason: 'her real figures replace the invitation');
-    expect(find.text('6.4 kg'), findsWidgets,
+    // The row reads "6.4 kg, 63 cm  ·  <date>" (Wave 3; was a "6.4 kg" card).
+    expect(find.textContaining('6.4 kg'), findsWidgets,
         reason: 'the figures shown are the ones she entered');
     expect(tester.takeException(), isNull);
   });

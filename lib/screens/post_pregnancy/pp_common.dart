@@ -65,7 +65,11 @@ const Color ppSoft = Color(0xFF69636C);
 const Color ppPurple = Color(0xFF6A30B6);
 const Color ppCoral = Color(0xFFFF5A79);
 // Matched to `surfaceAlt`. Was the old lilac #F3EEF7.
-const Color ppPanel = Color(0xFFEDEAF0);
+// ⚠️ NEUTRAL, NOT LAVENDER, 2026-10-21 (Wave 3). The user: "i dont need
+// lavender color background at all!!", and for every stage. Mobbin: Fitbit
+// sets plain grey cards on white; Zocdoc white cards on a line. #F3F3F4 has
+// no hue bias. Kept for revert: const Color ppPanel = Color(0xFFEDEAF0);
+const Color ppPanel = Color(0xFFF3F3F4);
 // ⚠️ RETONED TO NEUTRAL, 2026-10-21 (Wave 2, one ParentVeda). The user:
 // parenting "still has the old purple UI" beside TTC and Pregnancy. TTC made
 // this exact move on 2026-09-29 (ttc_common.dart): muted text is the palette's

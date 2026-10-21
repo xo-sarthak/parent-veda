@@ -14,6 +14,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
+import '../v2/v3_dev_mark.dart' show DevMark, V3DevMark;
 import '../../brand/brand_models.dart';
 import '../../brand/presented_by.dart';
 import 'development_area_screen.dart';
@@ -198,7 +199,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 // right now" was two screens of chrome down.
                 const SizedBox(height: 26),
                 ppToolPad(Row(children: [
-                  const Icon(Icons.spa_outlined, size: 17, color: ppPurple),
+                  const Icon(Icons.spa_outlined, size: 17, color: ppInk),
                   const SizedBox(width: 8),
                   Expanded(child: Text('Emerging now', style: ppJakarta(17))),
                   Text('tap any card', style: ppBody(12, color: ppMuted)),
@@ -225,7 +226,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 if (settled.isNotEmpty) ...[
                   const SizedBox(height: 28),
                   ppToolPad(Row(children: [
-                    const Icon(Icons.check_circle_outline_rounded, size: 17, color: ppPurple),
+                    const Icon(Icons.check_circle_outline_rounded, size: 17, color: ppInk),
                     const SizedBox(width: 8),
                     Expanded(child: Text('Usually settled by now', style: ppJakarta(17))),
                   ])),
@@ -248,7 +249,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 ppToolPad(ppInsightCard(_insight(), tag: 'Development insight')),
                 const SizedBox(height: 26),
                 ppToolPad(Row(children: [
-                  const Icon(Icons.celebration_outlined, size: 17, color: ppPurple),
+                  const Icon(Icons.celebration_outlined, size: 17, color: ppInk),
                   const SizedBox(width: 8),
                   Expanded(child: Text('Recently celebrated', style: ppJakarta(17))),
                   Text('NN noticed', style: ppBody(12, color: ppMuted)),
@@ -268,7 +269,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 _domainRow(),
 
                 ppToolPad(Row(children: [
-                  const Icon(Icons.wb_twilight_rounded, size: 17, color: ppPurple),
+                  const Icon(Icons.wb_twilight_rounded, size: 17, color: ppInk),
                   const SizedBox(width: 8),
                   // Was 'Coming soon' (2026-10-14).
                   Expanded(child: Text('Up next', style: ppJakarta(17))),
@@ -313,9 +314,9 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: ppPurple,
+            color: ppInk,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: const [BoxShadow(color: Color(0x336A30B6), blurRadius: 18, spreadRadius: -6, offset: Offset(0, 8))],
+            boxShadow: const [BoxShadow(color: Color(0x242F2C30), blurRadius: 18, spreadRadius: -6, offset: Offset(0, 8))],
           ),
           child: Row(children: [
             const Icon(Icons.add_circle_outline_rounded, size: 19, color: Colors.white),
@@ -417,10 +418,10 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const RadialGradient(center: Alignment(-0.7, -0.8), radius: 1.3, colors: [Color(0xFFF3ECFA), Colors.white]),
+        gradient: const RadialGradient(center: Alignment(-0.7, -0.8), radius: 1.3, colors: [Color(0xFFF7F7F8), Colors.white]),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: ppHair),
-        boxShadow: const [BoxShadow(color: Color(0x1A6A30B6), blurRadius: 30, spreadRadius: -20, offset: Offset(0, 12))],
+        boxShadow: const [BoxShadow(color: Color(0x142F2C30), blurRadius: 30, spreadRadius: -20, offset: Offset(0, 12))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         ppEyebrow(ChildProfileStore.instance.ageLabel, color: ppPurple),
@@ -445,7 +446,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(16)),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Icon(Icons.auto_awesome_rounded, size: 16, color: Colors.white),
             const SizedBox(width: 10),
@@ -463,7 +464,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
             height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: ppHair)),
-            child: Icon(icon, size: 16, color: ppPurple),
+            child: Icon(icon, size: 16, color: ppInk),
           ),
           const SizedBox(width: 11),
           Expanded(
@@ -524,7 +525,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair), boxShadow: const [BoxShadow(color: Color(0x0F6A30B6), blurRadius: 18, spreadRadius: -14, offset: Offset(0, 8))]),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair), boxShadow: const [BoxShadow(color: Color(0x142F2C30), blurRadius: 18, spreadRadius: -14, offset: Offset(0, 8))]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Container(
@@ -548,9 +549,9 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
           const SizedBox(height: 14),
           if (observed)
             Row(children: [
-              const Icon(Icons.check_circle_rounded, size: 18, color: ppPurple),
+              const Icon(Icons.check_circle_rounded, size: 18, color: ppInk),
               const SizedBox(width: 8),
-              Text('Noticed ${_obsDateLabel(m.id)}', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+              Text('Noticed ${_obsDateLabel(m.id)}', style: ppBody(12.5, color: ppInk, w: FontWeight.w700)),
               const Spacer(),
               Text('Details →', style: ppBody(12, color: ppMuted, w: FontWeight.w600)),
             ])
@@ -563,7 +564,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                   child: Container(
                     height: 42,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(12)),
                     child: Text("I've seen this", style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
                   ),
                 )),
@@ -615,7 +616,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
               Text(_obsSubtitle(m.id), style: ppBody(11.5, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),
           ),
-          const Icon(Icons.check_circle_rounded, size: 20, color: ppPurple),
+          const Icon(Icons.check_circle_rounded, size: 20, color: ppInk),
         ]),
       ),
     );
@@ -647,7 +648,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
             ]),
           ),
           const SizedBox(width: 10),
-          Icon(ticked ? Icons.check_circle_rounded : Icons.circle_outlined, size: 19, color: ticked ? ppPurple : ppBorder),
+          Icon(ticked ? Icons.check_circle_rounded : Icons.circle_outlined, size: 19, color: ticked ? ppInk : ppBorder),
         ]),
       ),
     ));
@@ -777,6 +778,20 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 children: [
                   Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(99)))),
                   const SizedBox(height: 16),
+                  // One big mark first, Lyft's badge page without the badge
+                  // (2026-10-21, Wave 3). Milestones are noticed, never scored,
+                  // so no trophy, streak or confetti.
+                  Center(
+                    child: Container(
+                      key: const ValueKey('pp_milestone_detail_mark'),
+                      width: 84,
+                      height: 84,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(color: ppPanel, shape: BoxShape.circle),
+                      child: milestoneDomainMark(m.domain, 50),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                   Row(children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -807,7 +822,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
                       child: Row(children: [
-                        const Icon(Icons.check_circle_rounded, size: 20, color: ppPurple),
+                        const Icon(Icons.check_circle_rounded, size: 20, color: ppInk),
                         const SizedBox(width: 12),
                         Expanded(child: Text(_obsSubtitle(m.id), style: ppBody(13, color: ppInk, h: 1.4))),
                         PvPress(child: GestureDetector(
@@ -842,7 +857,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 7),
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(margin: const EdgeInsets.only(top: 8), width: 5, height: 5, decoration: const BoxDecoration(color: ppPurple, shape: BoxShape.circle)),
+                  Container(margin: const EdgeInsets.only(top: 8), width: 5, height: 5, decoration: const BoxDecoration(color: ppInk, shape: BoxShape.circle)),
                   const SizedBox(width: 10),
                   Expanded(child: Text(b, style: ppBody(13.5, color: ppInk, h: 1.55))),
                 ]),
@@ -921,6 +936,24 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
 /// BE COUNTER-ROTATED. Without `..setEntry(3, 2, 0.0012)` the card scales
 /// instead of turning; without handling the back separately its content renders
 /// mirrored, which reads as a rendering bug rather than as a card.
+/// The drawn mark for a milestone's area (V3DevMark, the home's and the doors'
+/// set), in the area's own ink. Self-care has no drawn mark yet, so it keeps
+/// its line icon rather than borrowing another area's drawing.
+Widget milestoneDomainMark(DevDomain d, double size) {
+  final meta = kDomainMeta[d]!;
+  final mark = switch (d) {
+    DevDomain.grossMotor => DevMark.physical,
+    DevDomain.fineMotor => DevMark.hands,
+    DevDomain.language => DevMark.language,
+    DevDomain.cognitive => DevMark.brain,
+    DevDomain.social => DevMark.social,
+    DevDomain.selfCare => null,
+  };
+  return mark == null
+      ? Icon(meta.icon, size: size * 0.66, color: meta.ink)
+      : V3DevMark(mark: mark, accent: meta.ink, size: size);
+}
+
 class MilestoneFlipCard extends StatefulWidget {
   const MilestoneFlipCard({
     super.key,
@@ -956,7 +989,7 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
         border: Border.all(color: ppHair),
         boxShadow: const [
           BoxShadow(
-              color: Color(0x0F6A30B6),
+              color: Color(0x142F2C30),
               blurRadius: 18,
               spreadRadius: -14,
               offset: Offset(0, 8)),
@@ -1001,14 +1034,14 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
   }
 
   Widget _noticed() => Row(children: [
-        const Icon(Icons.check_circle_rounded, size: 18, color: ppPurple),
+        const Icon(Icons.check_circle_rounded, size: 18, color: ppInk),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
               widget.observedLabel == null
                   ? 'Noticed'
                   : 'Noticed ${widget.observedLabel}',
-              style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+              style: ppBody(12.5, color: ppInk, w: FontWeight.w700)),
         ),
         PvPress(child: GestureDetector(
           onTap: widget.onDetail,
@@ -1029,8 +1062,9 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
         child: Container(
           height: 42,
           alignment: Alignment.center,
+          // The one ink pill (2026-10-21). Was a violet 12-radius block.
           decoration: BoxDecoration(
-              color: ppPurple, borderRadius: BorderRadius.circular(12)),
+              color: ppInk, borderRadius: BorderRadius.circular(999)),
           child: Text('I have seen this',
               style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
         ),
@@ -1045,7 +1079,7 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
       child: back
           ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('What this looks like',
-                  style: ppBody(11, color: meta.ink, w: FontWeight.w800)),
+                  style: ppBody(11, color: ppInk, w: FontWeight.w800)),
               const SizedBox(height: 8),
               Text(m.desc, style: ppBody(13.5, h: 1.55)),
               const SizedBox(height: 12),
@@ -1067,7 +1101,7 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
                   onTap: widget.onDetail,
                   behavior: HitTestBehavior.opaque,
                   child: Text('Learn more',
-                      style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
+                      style: ppBody(12, color: ppInk, w: FontWeight.w700)),
                 )),
               ]),
             ])
@@ -1078,13 +1112,16 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
               // somebody has to delete later. A tinted well carrying the
               // domain's own mark is a finished treatment that a photograph
               // can replace without this widget changing.
+              // The area's drawn mark on a neutral well (2026-10-21, Wave 3),
+              // as the home and the doors draw the areas. Was the domain icon
+              // on its tint: Container(color: meta.tint) + Icon(meta.icon).
               Container(
                 width: 56,
                 height: 56,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                    color: meta.tint, borderRadius: BorderRadius.circular(14)),
-                child: Icon(meta.icon, size: 25, color: meta.ink),
+                    color: ppPanel, borderRadius: BorderRadius.circular(14)),
+                child: milestoneDomainMark(m.domain, 34),
               ),
               const SizedBox(width: 13),
               Expanded(

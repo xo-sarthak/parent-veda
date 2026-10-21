@@ -1122,3 +1122,28 @@ calories and ratings; CREME's dark look; creator rows.
 
 **Built.** `pp_recipes_screen.dart` (`PpRecipesScreen`, `PpRecipeListScreen`,
 `ppRankRecipes`). Prototype claude.ai/artifact/YERnPpDwamz3Qa7RNCX4AM.
+
+## 28. Health record, Emergency card, Milestones (2026-10-21)
+
+**Asked.** The user: these three parenting tools still had the old purple UI;
+then, on the prototype, "i dont need lavender color background at all".
+
+**Found.** Zocdoc "Medical history" (mobbin.com/screens/b6cc665f-d3b3-4386-a34a-667add12be3f):
+a short list, each row a label, its current value and a chevron. Apple
+Health "Medical ID" (mobbin.com/screens/b936f416-d47b-43f2-87b5-76949df7cff8):
+named sections, each with Add. Lyft badge detail
+(mobbin.com/screens/1a0be947-d27e-4639-8128-6ee0e81c35ad): one big mark, a
+title, one line, a calm paragraph. Fitbit (mobbin.com/screens/318ef228-8f35-4782-9683-6ffe48870cd3):
+plain grey cards on white, which set the neutral that replaced the lavender.
+
+**Adopted.** Record rows that state what they hold; the card as sections with
+Add on the empty ones; the detail sheet's big mark; one plain neutral grey.
+
+**Declined.** Gamified badges, streaks and confetti (Finch, Runna, Kit,
+Crypto.com): milestones are noticed, never scored. The 2x2 health tile grid
+(Fitbit): rows carry the current value, tiles do not.
+
+**Built.** `health_home_screen.dart`, `health_records_screen.dart`,
+`health_emergency_screen.dart`, `wallet_v2_screens.dart`
+(`WalletEmergencyCardScreen`), `milestone_journey_screen.dart`. Prototype
+claude.ai/artifact/9RNbbpCofsYtvSCgehNbQd.

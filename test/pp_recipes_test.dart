@@ -31,7 +31,7 @@ void main() {
 
   // The old lilac values, by hex: ppMuted/ppHair/ppBorder were retoned to
   // neutrals on 2026-10-21, so their names no longer mean the old look.
-  final oldLook = [ppPurple, ppPanel, const Color(0xFFA99CBB), const Color(0xFFEFEAF2), const Color(0xFFE7DFEE)]
+  final oldLook = [ppPurple, const Color(0xFFEDEAF0), const Color(0xFFA99CBB), const Color(0xFFEFEAF2), const Color(0xFFE7DFEE)]
       .map((c) => c.toARGB32())
       .toSet();
 

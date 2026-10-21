@@ -112,7 +112,15 @@ The palette is `_baseline` in `v2_palette.dart`. **Settled 2026-08-15. Not open.
 > / `_ground`) is white too. The August reasoning below is kept as history:
 > its concern — a white card has no edge on white — is answered by the
 > stronger hairline the White spec already pairs with it, and by moving the
-> tint into the wells, which is where the design puts colour. Rule 1.1
+> tint into the wells, which is where the design puts colour.
+>
+> **No lavender fills at all since 2026-10-21.** The user: *"i dont need
+> lavender color background at all!!"*, for every stage. `surfaceAlt` (the
+> live White spec's `#F4F2F6`, the baseline's `#EDEAF0`), its step darker
+> `containerHigh` (`#EAE7EE`), `ppPanel` / `ttcPanel` (`#EDEAF0`) and
+> `AppTheme.surfaceContainerHighest` (`#E6DEED`) are now a plain neutral:
+> `#F3F3F4`, and `#E9E9EB` one step darker. No hue bias; Mobbin's Fitbit puts
+> plain grey cards on white. Violet stays on eyebrows only. Rule 1.1
 > ("the background belongs to the page") still holds; the page is just white.
 
 Full reasoning in `UX-PRINCIPLES.md` §5.0. Short version: Zepto is a purple

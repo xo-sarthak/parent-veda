@@ -19,8 +19,10 @@ import 'package:parentveda/screens/pregnancy/preg_tool_chrome.dart';
 /// Shared screens with their own, already-common chrome.
 const Set<String> _shared = {
   'pp_product_guide', // the unified store
-  'pp_emergency_card', // the Wallet card, shared with the Health Wallet
-  'pp_health_home', // the health record dashboard
+  // Both moved onto the tool shell on 2026-10-21 (Wave 3), so the shell is
+  // now checked on them too. Were exempt:
+  // 'pp_emergency_card', // the Wallet card, shared with the Health Wallet
+  // 'pp_health_home', // the health record dashboard
 };
 
 void main() {

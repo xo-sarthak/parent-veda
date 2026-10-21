@@ -26,6 +26,7 @@ import 'package:parentveda/screens/ttc/ttc_cycle_report_screen.dart'
     show TtcCycleReportScreen;
 import 'package:parentveda/screens/ttc/ttc_edit_categories_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_symptom_log_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_common.dart' show ttcPanel;
 import 'package:parentveda/screens/ttc/ttc_tool_chrome.dart' show TtcToolClose;
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_cycle_report.dart';
@@ -178,7 +179,7 @@ void main() {
                   w is Container &&
                   w.decoration is BoxDecoration &&
                   (w.decoration! as BoxDecoration).color ==
-                      const Color(0xFFEDEAF0))),
+                      ttcPanel)), // was the literal 0xFFEDEAF0 until ttcPanel went neutral
           findsNothing);
     });
 

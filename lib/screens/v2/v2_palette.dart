@@ -129,7 +129,9 @@ const _baseline = V2Palette(
   // page would have removed the last structure rather than adding brightness.
   ground: Color(0xFFF5F3F6), // was 0xFFF3EEF7 (S36)
   surface: Color(0xFFFFFFFF),
-  surfaceAlt: Color(0xFFEDEAF0), // was 0xFFECE5F2 (S33)
+  // Neutral, 2026-10-21 (no lavender in any stage). Was 0xFFEDEAF0, before
+  // that 0xFFECE5F2 (S33).
+  surfaceAlt: Color(0xFFF3F3F4),
   line: Color(0x14000000),
   ink1: Color(0xFF201C24),
   ink2: Color(0xFF5B5464),
@@ -313,8 +315,10 @@ class GroundSpec {
 }
 
 const Map<GroundOption, GroundSpec> kGrounds = {
+  // The live ground. Its surfaceAlt and the step darker were lavender
+  // (#F4F2F6, #EAE7EE); neutral since 2026-10-21, the user: no lavender.
   GroundOption.paperWhite: GroundSpec('White', Color(0xFFFFFFFF),
-      Color(0xFFF4F2F6), Color(0x1F000000), Color(0xFFEAE7EE)),
+      Color(0xFFF3F3F4), Color(0x1F000000), Color(0xFFE9E9EB)),
   GroundOption.softWhite: GroundSpec('Soft', Color(0xFFFCFCFD),
       Color(0xFFF2F0F4), Color(0x1A000000), Color(0xFFE8E5EC)),
   GroundOption.warmGrey: GroundSpec('Near', Color(0xFFFAFAFB),

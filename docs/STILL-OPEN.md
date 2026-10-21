@@ -10682,5 +10682,26 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   screens bought nothing visible. The five Material AppBar screens already
   draw the plain ink arrow over Pregnancy's page title; left as they are.
   Not walked on a phone.
-- **§95.5 Waves 3 to 7** (tool screens, the relevance brain, phase screen,
-  home, warm copy): not started.
+- **§95.5 Wave 3, Health record, Emergency card, Milestones — DONE
+  2026-10-21.** Artifact first (claude.ai/artifact/9RNbbpCofsYtvSCgehNbQd,
+  light mode only), approved. Health record (`health_home_screen.dart`) on
+  `PregToolScaffold`: Records as one `PvRowGroup` list where each row says
+  what it holds ("1 taking now: ...", "None yet, add one"), then Growing,
+  Keep handy, Lately (last three, See all). Its Emergency row opens
+  `WalletEmergencyCardScreen`, not the editor. The six record lists and the
+  editor (`HealthEmergencyScreen`) on the same shell; sheets, reminders and
+  the 0095 sync untouched. The card reads as Apple's Medical ID: name, age,
+  blood group, then Allergies / Medicines / Paediatrician / Call first, an
+  empty one says so with Add; Share is the main action; 112 and 108 stay
+  printed; the QR stays. Milestones: violet to ink, purple shadows to the ink
+  lift, the area's drawn mark (`V3DevMark`, via `milestoneDomainMark`) on a
+  neutral well, an ink pill, and a big mark atop the detail sheet (Lyft
+  shape, no badges). **No lavender, every stage:** `ppPanel`, `ttcPanel`,
+  `surfaceAlt` (both specs), `containerHigh` and `surfaceContainerHighest`
+  are plain neutral `#F3F3F4` / `#E9E9EB` (DESIGN-SYSTEM Rule 1 note); the
+  Language area's lavender tint is sand. Old pages kept as
+  `_buildBeforeShell`. Guard `test/pp_wave3_look_test.dart`; the tool-shell
+  test no longer exempts `pp_emergency_card` / `pp_health_home`. Not walked
+  on a phone.
+- **§95.6 Waves 4 to 7** (the relevance brain, phase screen, home, warm
+  copy): not started.

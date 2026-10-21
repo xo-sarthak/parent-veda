@@ -80,7 +80,11 @@ const Color ttcPurple = Color(0xFF6A30B6);
 const Color ttcPurpleDeep = Color(0xFF4A1C86);
 const Color ttcCoral = Color(0xFFFF5A79);
 // Matched to `surfaceAlt`. Was the old lilac #F3EEF7.
-const Color ttcPanel = Color(0xFFEDEAF0);
+// ⚠️ NEUTRAL, NOT LAVENDER, 2026-10-21 (Wave 3). The user: "i dont need
+// lavender color background at all!!", and for every stage. Mobbin: Fitbit
+// sets plain grey cards on white; Zocdoc white cards on a line. #F3F3F4 has
+// no hue bias. Kept for revert: const Color ttcPanel = Color(0xFFEDEAF0);
+const Color ttcPanel = Color(0xFFF3F3F4);
 // ⚠️ META TEXT IS GREY, NOT LAVENDER — 2026-09-17 (DESIGN-SYSTEM §4.0). The
 // disclaimer, captions and hairlines were tinted violet (0xFFA99CBB on
 // 0xFFE7DFEE), which on the white ground read as the palette leaking into the

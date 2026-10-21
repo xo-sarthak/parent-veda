@@ -39,7 +39,9 @@ class DomainMeta {
 const Map<DevDomain, DomainMeta> kDomainMeta = {
   DevDomain.grossMotor: DomainMeta('Gross motor', 'Movement', Icons.directions_run_rounded, Color(0xFFEAF1FB), Color(0xFF2E5AAC)),
   DevDomain.fineMotor: DomainMeta('Fine motor', 'Hands', Icons.back_hand_outlined, Color(0xFFEAF4EE), Color(0xFF2E7D57)),
-  DevDomain.language: DomainMeta('Language', 'Talking', Icons.chat_bubble_outline_rounded, Color(0xFFEDEAF7), Color(0xFF6A30B6)),
+  // Sand, not lavender (2026-10-21, the user: no lavender backgrounds). Was
+  // Color(0xFFEDEAF7) on Color(0xFF6A30B6).
+  DevDomain.language: DomainMeta('Language', 'Talking', Icons.chat_bubble_outline_rounded, Color(0xFFF3EEE6), Color(0xFF7A5A2E)),
   DevDomain.cognitive: DomainMeta('Cognitive', 'Thinking', Icons.lightbulb_outline_rounded, Color(0xFFFBF4E7), Color(0xFF9A6B00)),
   DevDomain.social: DomainMeta('Social & emotional', 'Feelings', Icons.favorite_border_rounded, Color(0xFFFBEAF0), Color(0xFFB83A63)),
   DevDomain.selfCare: DomainMeta('Self-care', 'Everyday', Icons.spa_outlined, Color(0xFFEAF6F6), Color(0xFF2A7B7B)),

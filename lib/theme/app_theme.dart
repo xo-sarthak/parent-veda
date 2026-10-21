@@ -188,7 +188,8 @@ class AppTheme {
       V2PaletteStore.instance.groundSpec.ground;
   static Color get surfaceContainerHigh =>
       V2PaletteStore.instance.groundSpec.containerHigh;
-  static const Color surfaceContainerHighest = Color(0xFFE6DEED);
+  // Neutral since 2026-10-21 (no lavender). Was 0xFFE6DEED.
+  static const Color surfaceContainerHighest = Color(0xFFE9E9EB);
 
   static const Color outline = Color(0xFFB2AEB5); // neutral300
   static const Color outlineVariant = Color(0xFFE4E2E5); // neutral100
