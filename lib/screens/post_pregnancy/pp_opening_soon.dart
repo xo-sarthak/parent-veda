@@ -35,6 +35,8 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, pvSnack, pvStorePalette;
 import 'pp_child_profile.dart';
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 
 /// The parenting community opens when there is a shared feed, moderators and
 /// real rooms (gap analysis, Behind · Community). Until then every community
@@ -93,10 +95,10 @@ class PpOpeningSoonScreen extends StatelessWidget {
           pregToolPad(Padding(
             padding: const EdgeInsets.only(bottom: 14),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 1),
-                child: Icon(icon, size: 20, color: p.ink1),
-              ),
+              // The drawn mark for the point (Wave 5b, 2026-10-21: the app's
+              // marks, not Material glyphs); a point with no drawn match keeps
+              // its line icon. Was: Icon(icon, size: 20, color: p.ink1).
+              _pointMark(icon, p.ink1),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(text, style: pvManrope(fontSize: 15, height: 1.45, color: p.ink1)),
@@ -121,6 +123,25 @@ class PpOpeningSoonScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+/// A point's drawn mark on a neutral disc, matched from the line icon every
+/// caller already passes (so no caller changes). Unknown icons stay icons.
+Widget _pointMark(IconData icon, Color ink) {
+  const tint = Color(0xFFF3F3F4);
+  final (TtcTabMark? tab, TtcToolMark? tool) = switch (icon) {
+    Icons.verified_user_outlined || Icons.shield_outlined || Icons.how_to_reg_outlined => (TtcTabMark.checklist, null),
+    Icons.videocam_outlined => (TtcTabMark.doctorChat, null),
+    Icons.local_hospital_outlined => (null, TtcToolMark.appointments),
+    Icons.groups_outlined => (null, TtcToolMark.careCircle),
+    Icons.play_circle_outline_rounded => (null, TtcToolMark.courses),
+    Icons.schedule_outlined => (null, TtcToolMark.stopwatch),
+    _ => (null, null),
+  };
+  if (tab == null && tool == null) {
+    return Padding(padding: const EdgeInsets.only(top: 1), child: Icon(icon, size: 20, color: ink));
+  }
+  return TtcMarkLeading(tab: tab, tool: tool, tint: tint, size: 28);
 }
 
 /// The community's page. Its words, in one place, so every gated screen

@@ -89,6 +89,15 @@ void main() {
             reason: 'buildClassic is reachable from: $callers');
       });
     }
+
+    // Wave 5b (2026-10-21): an activity is writing, so the activity page
+    // delegates to the reader through its adapter file.
+    test('DevelopmentActivityScreen builds the one reader through ppActivityReader', () {
+      final src = _live('lib/screens/post_pregnancy/development_activity_screen.dart');
+      expect(src, contains('Widget build(BuildContext context) => ppActivityReader(activity);'));
+      expect(src, contains('Widget buildClassic(BuildContext context)'));
+      expect(_live('lib/screens/post_pregnancy/pp_activity_read.dart'), contains('PvReaderScreen('));
+    });
   });
 
   test('the retired page renderers are constructed by no live code', () {

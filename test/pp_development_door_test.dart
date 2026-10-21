@@ -92,7 +92,7 @@ void main() {
     test('what to do: the activities beside the reassurance, tummy time as a film, the one new page', () {
       expect(door.tabs[3].areaIds, ['help_develop', 'feelings_play']);
       // Tummy time joined the activities hub, 2026-10-07 (gap analysis P2).
-      expect(door.tabs[3].tools.map((t) => t.surfaceId), ['pp_development', 'pp_tummy_time']);
+      expect(door.tabs[3].tools.map((t) => t.surfaceId), ['pp_activities', 'pp_tummy_time'], reason: 'pp_development opens this door since Wave 5b');
       expect(_listed('help_develop'), [
         // 'dev_leaps_lens' retired with the leaps, 2026-10-14.
         'dev_play_builds_brain', 'dev_tummy_time', 'dev_everyday_play', 'dev_sensory_play',

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:parentveda/screens/post_pregnancy/doors/pp_door_screen.dart' show PpDoorScreen;
 import 'package:parentveda/screens/post_pregnancy/article_archive_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/article_reader_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/askveda_screen.dart';
@@ -1004,22 +1005,20 @@ void main() {
 
   // Development: the companion home opens the birth-to-five Development Map,
   // which marks the child's current stage ("you are here") - not a checklist.
-  testWidgets('Development: home opens the Development Map', (tester) async {
+  // Wave 5b (2026-10-21): the old Development home is a facade over the
+  // Development door; the map it linked to is reached from the Brain tab
+  // (pp_brain_tab.dart). The test that walked home -> map, kept for revert:
+  //   pump DevelopmentHomeScreen, tap 'The Development Map',
+  //   expect DevelopmentMapScreen and 'YOU ARE HERE'.
+  testWidgets('Development: the old home opens the Development door', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(const MaterialApp(home: DevelopmentHomeScreen()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 800));
 
-    expect(find.text('Help ${ChildProfileStore.instance.nameMid} grow'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('The Development Map'), 250,
-        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
-    await tester.tap(find.text('The Development Map'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(DevelopmentMapScreen), findsOneWidget);
-    expect(find.text('YOU ARE HERE'), findsWidgets);
+    expect(find.byType(PpDoorScreen), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

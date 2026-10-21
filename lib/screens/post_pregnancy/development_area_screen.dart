@@ -31,6 +31,7 @@ import 'watch_category_screen.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import 'pp_activity_read.dart' show ppDevelopmentDoor;
 
 class DevelopmentAreaScreen extends StatelessWidget {
   const DevelopmentAreaScreen({super.key, required this.area});
@@ -41,8 +42,15 @@ class DevelopmentAreaScreen extends StatelessWidget {
 
   Color get _a => area.accent;
 
+  // ⚠️ A FACADE SINCE 2026-10-21 (Wave 5b, old screens reachable from the
+  // home). The area page was a second Development section beside the door; it opens
+  // the Development door on the tab that holds this area. Every caller moves in one place, as ProductDetailScreen ->
+  // PvProductScreen did. The page as it was is [buildClassic], kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ppDevelopmentDoor(areaId: area.id);
+
+  /// The page before Wave 5b, kept for revert.
+  Widget buildClassic(BuildContext context) {
     final videos = watchByCategory(watchCategoryForArea(area.id));
     final collectionId = readCollectionForArea(area.id);
     final reads = articlesInCollection(collectionId);

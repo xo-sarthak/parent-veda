@@ -25,6 +25,9 @@ const Color _flagBg = Color(0xFFFFF0F3);
 const Color _flagBorder = Color(0xFFFFD9E1);
 const Color _flagFg = Color(0xFFC6295A);
 
+// Retoned 2026-10-21 (Wave 5b): ink fills and neutral grey where violet and
+// lavender were; eyebrows stay violet, as on every tool. The sticky action
+// bar keeps this screen off PregToolScaffold, which has no foot slot.
 class VaxDetailScreen extends StatefulWidget {
   const VaxDetailScreen({super.key, required this.visitId});
   final String visitId;
@@ -125,7 +128,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                 // ---- After-Care ----
                 _pad(ppSectionDivider()),
                 _pad(Row(children: [
-                  const Icon(Icons.healing_outlined, size: 18, color: ppPurple),
+                  const Icon(Icons.healing_outlined, size: 18, color: ppInk),
                   const SizedBox(width: 10),
                   Text('After the shot', style: ppJakarta(17)),
                 ])),
@@ -147,7 +150,9 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                     Row(children: [
                       const Icon(Icons.warning_amber_rounded, size: 17, color: _flagFg),
                       const SizedBox(width: 8),
-                      Text('Call your doctor / 112 if', style: ppBody(13, color: _flagFg, w: FontWeight.w700)),
+                      // Flexible: at a large text size this line ran off a
+                      // narrow screen (found by the Wave 5b guard, 2026-10-21).
+                      Flexible(child: Text('Call your doctor / 112 if', style: ppBody(13, color: _flagFg, w: FontWeight.w700))),
                     ]),
                     const SizedBox(height: 8),
                     for (final f in _vax.redFlags) Padding(
@@ -199,7 +204,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                       child: Container(
                         height: 54,
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(color: done ? _green : ppPurple, borderRadius: BorderRadius.circular(16), boxShadow: const [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 28, spreadRadius: -10, offset: Offset(0, 12))]),
+                        decoration: BoxDecoration(color: done ? _green : ppInk, borderRadius: BorderRadius.circular(16), boxShadow: const [BoxShadow(color: Color(0x331F1F23), blurRadius: 28, spreadRadius: -10, offset: Offset(0, 12))]),
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
                           Icon(done ? Icons.check_rounded : Icons.check_circle_outline_rounded, size: 18, color: Colors.white),
                           const SizedBox(width: 8),
@@ -216,8 +221,8 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
                       width: 54,
                       height: 54,
                       alignment: Alignment.center,
-                      decoration: BoxDecoration(color: reminded ? const Color(0xFFEDE6F5) : Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: reminded ? ppPurple : ppLine)),
-                      child: Icon(reminded ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, size: 22, color: reminded ? ppPurple : ppInk),
+                      decoration: BoxDecoration(color: reminded ? const Color(0xFFF3F3F4) : Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: reminded ? ppInk : ppLine)),
+                      child: Icon(reminded ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, size: 22, color: reminded ? ppInk : ppInk),
                     ),
                   )),
                 ]),
@@ -237,7 +242,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
       child: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 14),
-        decoration: BoxDecoration(color: on ? ppPurple : Colors.white, borderRadius: BorderRadius.circular(999), border: Border.all(color: on ? ppPurple : ppLine)),
+        decoration: BoxDecoration(color: on ? ppInk : Colors.white, borderRadius: BorderRadius.circular(999), border: Border.all(color: on ? ppInk : ppLine)),
         child: Text(v.shortName, style: ppBody(12.5, color: on ? Colors.white : ppInk, w: FontWeight.w700)),
       ),
     ));
@@ -246,7 +251,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
   Widget _bullet(String text, {IconData icon = Icons.arrow_right_rounded, bool small = false}) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(padding: EdgeInsets.only(top: small ? 6 : 2), child: Icon(icon, size: small ? 7 : 18, color: ppPurple)),
+          Padding(padding: EdgeInsets.only(top: small ? 6 : 2), child: Icon(icon, size: small ? 7 : 18, color: ppInk)),
           const SizedBox(width: 10),
           Expanded(child: Text(text, style: ppBody(14, color: ppInk, h: 1.5))),
         ]),
@@ -255,7 +260,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
   Widget _check(String t) => Padding(
         padding: const EdgeInsets.only(bottom: 9),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('✓', style: TextStyle(color: ppPurple, fontWeight: FontWeight.w700)),
+          const Text('✓', style: TextStyle(color: ppInk, fontWeight: FontWeight.w700)),
           const SizedBox(width: 10),
           Expanded(child: Text(t, style: ppBody(14, color: ppInk, h: 1.5))),
         ]),
@@ -296,7 +301,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
           padding: const EdgeInsets.symmetric(vertical: 13),
           decoration: const BoxDecoration(border: Border(top: BorderSide(color: ppHair), bottom: BorderSide(color: ppHair))),
           child: Row(children: [
-            Container(width: 66, alignment: Alignment.center, padding: const EdgeInsets.symmetric(vertical: 5), decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)), child: Text(pill, style: ppBody(10, color: ppPurple, w: FontWeight.w700))),
+            Container(width: 66, alignment: Alignment.center, padding: const EdgeInsets.symmetric(vertical: 5), decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(999)), child: Text(pill, style: ppBody(10, color: ppInk, w: FontWeight.w700))),
             const SizedBox(width: 12),
             Expanded(child: Text(text, style: ppBody(14, color: ppInk))),
             const SizedBox(width: 10),
@@ -370,7 +375,7 @@ class _VaxDetailScreenState extends State<VaxDetailScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
           child: Row(children: [
-            const Icon(Icons.notifications_active_outlined, size: 18, color: ppPurple),
+            const Icon(Icons.notifications_active_outlined, size: 18, color: ppInk),
             const SizedBox(width: 12),
             Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),

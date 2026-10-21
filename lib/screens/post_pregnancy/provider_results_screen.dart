@@ -14,6 +14,11 @@ import 'pp_expert_honesty.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvRowGroup, PvListRow;
+import '../pregnancy/preg_tool_chrome.dart' show PregToolScaffold, pregToolPad;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
+import '../v2/v2_palette.dart';
 
 enum _Sort { rating, availability, price }
 
@@ -69,8 +74,77 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
     }
   }
 
+  // ⚠️ ON THE TOOL SHELL SINCE 2026-10-21 (Wave 5b, old screens reachable
+  // from the home: the hero's Talk lands here). Mobbin: Fresha's services and
+  // Noom's coaches, a white row with the name, one quiet line, and one outline
+  // pill to book. The sort chips are ink, not violet; the order rules and the
+  // opening-soon page are unchanged. The page as it was is [_buildClassic].
   @override
   Widget build(BuildContext context) {
+    final experts = _experts;
+    if (experts.isEmpty) return ppExpertsOpeningSoon();
+    final p = V2PaletteStore.instance.current;
+    return PregToolScaffold(
+      hue: 350,
+      mark: IntentMark.askDoctor,
+      eyebrow: 'Talk to someone',
+      title: widget.need?.label ?? 'Experts',
+      intro: 'Checked by ParentVeda. The order changes with the sort, nothing is hidden.',
+      children: [
+        SizedBox(
+          height: 36,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            children: [
+              _chip('Rating', _Sort.rating),
+              _chip('Availability', _Sort.availability),
+              _chip('Price', _Sort.price),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+        pregToolPad(Text('${experts.length} available · sorted by $_sortLabel',
+            style: ppBody(12.5, color: p.ink3, w: FontWeight.w600))),
+        const SizedBox(height: 6),
+        pregToolPad(PvRowGroup(p: p, children: [
+          for (final e in experts)
+            PvListRow(
+              key: ValueKey('pp_expert_row_${e.name}'),
+              p: p,
+              leading: TtcMarkLeading(tool: TtcToolMark.expert, tint: v2BlockTint(350, p), size: 40),
+              title: e.name,
+              line: e.blurb.isNotEmpty ? e.blurb : e.credential,
+              meta: [
+                '★ ${e.ratingValue.toStringAsFixed(1)}',
+                e.availableToday ? 'Today' : 'Tomorrow',
+                '₹${e.priceValue}',
+              ].join('  ·  '),
+              lineMaxLines: 2,
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: p.ink1),
+                ),
+                child: Text('Book', style: ppBody(12.5, color: p.ink1, w: FontWeight.w700)),
+              ),
+              onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: e))),
+            ),
+        ])),
+        const SizedBox(height: 22),
+        pregToolPad(Text(
+            'Ranked by ParentVeda from our research and real parent reviews. Booking is mock for now.',
+            style: ppBody(12, color: p.ink3, h: 1.55))),
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+
+  /// The page before Wave 5b, kept for revert.
+  // ignore: unused_element
+  Widget _buildClassic(BuildContext context) {
     final experts = _experts;
     if (experts.isEmpty) return ppExpertsOpeningSoon();
     return Scaffold(
@@ -151,9 +225,10 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
         margin: const EdgeInsets.only(right: 9),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: active ? ppPurple : Colors.white,
+          // Ink when chosen, as every chip in the app (was ppPurple, 2026-10-21).
+          color: active ? ppInk : Colors.white,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: active ? ppPurple : ppBorder),
+          border: Border.all(color: active ? ppInk : ppBorder),
         ),
         child: Text(label, style: ppBody(13, color: active ? Colors.white : ppSoft, w: FontWeight.w700)),
       ),

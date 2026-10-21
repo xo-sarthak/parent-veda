@@ -113,7 +113,10 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
           label: 'Things to do together today',
           blurb: 'Today\'s pick and every activity, matched to his age and to '
               'each area of growing.',
-          surfaceId: 'pp_development',
+          // Was 'pp_development' (the old hub). That surface now opens this
+          // very door (Wave 5b, 2026-10-21), so the card would loop; it opens
+          // every activity for his age instead.
+          surfaceId: 'pp_activities',
           icon: Icons.toys_outlined,
         ),
         // Gap analysis P2 (2026-10-07): "a tummy time timer on the

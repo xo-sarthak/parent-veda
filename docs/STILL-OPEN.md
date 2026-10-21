@@ -10735,13 +10735,30 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   **Owed:** no phase has a released film (`WatchVideo.videoUrl` is empty
   everywhere; only debug URLs exist), so "coming soon" is what parents see.
   Test `test/pp_phase_screen_test.dart`. Not walked on a phone.
-- **§95.8 Wave 5b, old screens reachable from the home — NEXT.** The audit
-  (artifact above, section 2): `DevelopmentActivityScreen` (6 routes) → the
-  reader via a new adapter; `DevelopmentAreaScreen` and
-  `DevelopmentHomeScreen` → the Development door; `DevelopmentAllActivities`
-  → the tool shell; `WatchPlayerScreen` + `QuickLearnScreen` → ink in place;
-  `ProviderResultsScreen` (Talk) → the tool shell; `VaxDetailScreen` and
-  `DoctorRecordScreen` (behind the new vaccine tracker) → the tool shell.
-  Facades over the old classes, old bodies kept as `…Classic`, plus a pixel
-  guard and a source test. The vaccine tracker itself is already new.
+- **§95.8 Wave 5b, old screens reachable from the home — DONE 2026-10-21.**
+  Facades, so every caller moved in one place; each old page kept as
+  `buildClassic` / `_buildClassic`.
+  - `DevelopmentActivityScreen` (10 callers) opens the one reader through
+    `pp_activity_read.dart` (`ppActivityAsRead`: steps as a `PpSteps` custom
+    block, safety as a callout, the doc's own headings kept, "More for <area>"
+    as the next step). Guarded in `reader_unification_test`.
+  - `DevelopmentAreaScreen` and `DevelopmentHomeScreen` open the Development
+    door (`ppDevelopmentDoor`; Language → Talking, every other area → What to
+    do). The door's "Things to do together today" card moved from
+    `pp_development` (now the door itself, a loop) to `pp_activities`.
+  - `DevelopmentAllActivitiesScreen` is on the tool shell, one row group per
+    area with its drawn mark, ordered by the relevance brain.
+  - `ProviderResultsScreen` is on the tool shell with Fresha-style rows and an
+    outline Book pill; the opening-soon page people actually see today draws
+    its points with drawn marks.
+  - Watch player, Quick learn, Vaccine detail and Doctor record are retoned in
+    place (ink fills, neutral grey, violet eyebrows only). **Decided against
+    the shell for Vaccine detail**: its sticky Mark-as-done bar needs a foot
+    slot `PregToolScaffold` does not have. Doctor record kept its layout for
+    the same one-pass reason; it already had the shared back arrow.
+  - **Dropped from the activity page:** the bookmark (DevStore saves). The
+    reader's own save covers it; `DevStore.isSaved` data is untouched.
+  - Guard: `test/pp_wave5b_old_screens_test.dart` (facade sources, reader and
+    door pumps, violet at any opacity). It found a real overflow on Vaccine
+    detail ("Call your doctor / 112 if"), fixed with Flexible.
 - **§95.9 Waves 6 to 7** (home, warm copy): not started.

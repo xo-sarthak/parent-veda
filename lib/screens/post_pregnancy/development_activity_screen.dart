@@ -17,6 +17,7 @@ import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../saved_toast.dart';
+import 'pp_activity_read.dart' show ppActivityReader;
 
 class DevelopmentActivityScreen extends StatelessWidget {
   const DevelopmentActivityScreen({super.key, required this.activity});
@@ -25,8 +26,14 @@ class DevelopmentActivityScreen extends StatelessWidget {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
 
+  // ⚠️ A FACADE SINCE 2026-10-21 (Wave 5b, old screens reachable from the
+  // home). An activity is writing, so it opens in the one reader. Every caller moves in one place, as ProductDetailScreen ->
+  // PvProductScreen did. The page as it was is [buildClassic], kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ppActivityReader(activity);
+
+  /// The page before Wave 5b, kept for revert.
+  Widget buildClassic(BuildContext context) {
     final area = devAreaById(activity.areaId);
     return Scaffold(
       backgroundColor: ppBg,

@@ -22,6 +22,7 @@ import 'development_map_screen.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import 'pp_activity_read.dart' show ppDevelopmentDoor;
 
 class DevelopmentHomeScreen extends StatelessWidget {
   const DevelopmentHomeScreen({super.key});
@@ -29,8 +30,15 @@ class DevelopmentHomeScreen extends StatelessWidget {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
 
+  // ⚠️ A FACADE SINCE 2026-10-21 (Wave 5b, old screens reachable from the
+  // home). The old Development home was a second section beside the door; it opens
+  // the Development door. Every caller moves in one place, as ProductDetailScreen ->
+  // PvProductScreen did. The page as it was is [buildClassic], kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ppDevelopmentDoor();
+
+  /// The page before Wave 5b, kept for revert.
+  Widget buildClassic(BuildContext context) {
     final focus = todaysFocus();
     // ⚠️ WAS `kDevActivities.take(4)` — the first four in authored order,
     // for every child at every age. A parent of a three-week-old and a parent

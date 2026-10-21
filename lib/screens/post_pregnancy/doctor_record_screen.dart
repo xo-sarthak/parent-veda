@@ -18,6 +18,7 @@ import 'pp_health_data.dart';
 import 'pp_vaccine_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
+// Retoned 2026-10-21 (Wave 5b): ink fills where violet was; eyebrows stay violet.
 class DoctorRecordScreen extends StatelessWidget {
   const DoctorRecordScreen({super.key});
 
@@ -103,7 +104,7 @@ class DoctorRecordScreen extends StatelessWidget {
                   child: Container(
                     height: 52,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(14)),
+                    decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(14)),
                     child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       const Icon(Icons.ios_share_rounded, size: 18, color: Colors.white),
                       const SizedBox(width: 8),
@@ -170,7 +171,7 @@ class DoctorRecordScreen extends StatelessWidget {
           // overflowed this row. It was invisible until the empty states made
           // the sections short enough for the lazy ListView to lay this one out.
           _pad(Row(children: [
-            Icon(icon, size: 18, color: ppPurple),
+            Icon(icon, size: 18, color: ppInk),
             const SizedBox(width: 10),
             Flexible(
               child: Text(title, style: ppJakarta(16),

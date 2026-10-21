@@ -1189,3 +1189,24 @@ white ground and calm, and the painting is the art.
 
 **Built.** `phase_detail_screen.dart`. Prototype
 claude.ai/artifact/NYQX3ovZZR4Uxwympe7gCX.
+
+## 31. The old screens behind the parenting home (2026-10-21)
+
+**Asked.** The user: old UI screens are still wired from the parenting home;
+use the app's latest marks, not icons.
+
+**Found.** An activity as a short numbered page with no cards: Nike Training
+Club "Three tips" (mobbin.com/screens/386ce592-c2a5-481f-9698-03c283ae2350),
+Lifesum instructions (mobbin.com/screens/53bf5e52-aa94-47eb-bc76-690e8236afd9).
+Experts as plain rows with one booking pill: Fresha services
+(mobbin.com/screens/3206f2b1-cf79-4213-ab4a-7cb71e3d1bb8), Noom coaches
+(mobbin.com/screens/f50b248f-3855-4a29-a8c5-9d7885340b15).
+
+**Adopted.** The activity in the one reader with numbered steps; experts as
+`PvListRow`s with an outline "Book" pill.
+
+**Declined.** Ahead's lavender activity modal with a purple CTA
+(mobbin.com/screens/2aea6bf7-4f98-4cdb-9719-52ac03034d71): lavender is out.
+
+**Built.** `pp_activity_read.dart`, `provider_results_screen.dart`,
+`development_all_activities_screen.dart`.

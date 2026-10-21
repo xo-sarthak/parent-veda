@@ -129,8 +129,8 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
               width: 46,
               height: 46,
               alignment: Alignment.center,
-              decoration: BoxDecoration(color: on ? ppPurple.withValues(alpha: 0.12) : ppPanel, borderRadius: BorderRadius.circular(14)),
-              child: Icon(i, size: 21, color: ppPurple),
+              decoration: BoxDecoration(color: on ? ppInk.withValues(alpha: 0.12) : ppPanel, borderRadius: BorderRadius.circular(14)),
+              child: Icon(i, size: 21, color: ppInk),
             ),
             const SizedBox(height: 7),
             Text(label, style: ppBody(11, color: ppSoft, w: FontWeight.w600)),
@@ -169,7 +169,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(children: [
-            Icon(i, size: 20, color: ppPurple),
+            Icon(i, size: 20, color: ppInk),
             const SizedBox(width: 14),
             Text(label, style: ppBody(14.5, color: ppInk, w: FontWeight.w600)),
           ]),
@@ -247,7 +247,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)),
-            child: const Icon(Icons.video_library_outlined, size: 19, color: ppPurple),
+            child: const Icon(Icons.video_library_outlined, size: 19, color: ppInk),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -263,7 +263,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
             height: 26,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: inIt ? ppPurple : Colors.transparent,
+              color: inIt ? ppInk : Colors.transparent,
               shape: BoxShape.circle,
               border: inIt ? null : Border.all(color: ppBorder, width: 1.5),
             ),
@@ -285,10 +285,10 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
               height: 40,
               alignment: Alignment.center,
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: ppBorder)),
-              child: const Icon(Icons.add_rounded, size: 20, color: ppPurple),
+              child: const Icon(Icons.add_rounded, size: 20, color: ppInk),
             ),
             const SizedBox(width: 14),
-            Text('Create new collection', style: ppBody(14.5, color: ppPurple, w: FontWeight.w700)),
+            Text('Create new collection', style: ppBody(14.5, color: ppInk, w: FontWeight.w700)),
           ]),
         ),
       ));
@@ -304,7 +304,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
                 controller: c,
                 autofocus: true,
                 style: ppBody(14, color: ppInk),
-                cursorColor: ppPurple,
+                cursorColor: ppInk,
                 textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => onCreate(),
@@ -327,7 +327,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
               height: 46,
               padding: const EdgeInsets.symmetric(horizontal: 18),
               alignment: Alignment.center,
-              decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: ppInk, borderRadius: BorderRadius.circular(12)),
               child: Text('Create', style: ppBody(13.5, color: Colors.white, w: FontWeight.w700)),
             ),
           )),
@@ -370,7 +370,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                 decoration: BoxDecoration(
-                  color: following ? Colors.transparent : ppPurple,
+                  color: following ? Colors.transparent : ppInk,
                   borderRadius: BorderRadius.circular(999),
                   border: following ? Border.all(color: ppBorder) : null,
                 ),
@@ -414,8 +414,8 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
               width: 34,
               height: 34,
               alignment: Alignment.center,
-              decoration: BoxDecoration(color: future ? ppPanel : ppPurple.withValues(alpha: 0.12), shape: BoxShape.circle),
-              child: Icon(icon, size: 17, color: future ? ppMuted : ppPurple),
+              decoration: BoxDecoration(color: future ? ppPanel : ppInk.withValues(alpha: 0.12), shape: BoxShape.circle),
+              child: Icon(icon, size: 17, color: future ? ppMuted : ppInk),
             ),
             if (!last) Expanded(child: Container(width: 2, color: ppHair)),
           ]),
@@ -433,7 +433,7 @@ class _WatchPlayerScreenState extends State<WatchPlayerScreen> {
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
-                      Text(type.toUpperCase(), style: ppBody(9.5, color: future ? ppMuted : ppPurple, w: FontWeight.w800).copyWith(letterSpacing: 0.6)),
+                      Text(type.toUpperCase(), style: ppBody(9.5, color: future ? ppMuted : ppInk, w: FontWeight.w800).copyWith(letterSpacing: 0.6)),
                       if (future) ...[
                         const SizedBox(width: 6),
                         Text('SOON', style: ppBody(8.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 0.5)),

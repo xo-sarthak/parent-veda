@@ -29,7 +29,8 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
   final List<WatchVideo> _vids = quickVideos;
   int _page = 0;
 
-  static const Color _dark = Color(0xFF2A1F3D);
+  // Neutral near-black, not the old dark purple 0xFF2A1F3D (Wave 5b, 2026-10-21).
+  static const Color _dark = Color(0xFF1F1F23);
 
   @override
   void initState() {
@@ -104,7 +105,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [ppPurple.withValues(alpha: 0.65), _dark],
+                  colors: [ppInk.withValues(alpha: 0.65), _dark], // was ppPurple 0.65 (2026-10-21)
                 ),
               ),
             ),
@@ -215,7 +216,7 @@ class _QuickLearnScreenState extends State<QuickLearnScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
-                child: Text('Done', style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
+                child: Text('Done', style: ppBody(13.5, color: ppInk, w: FontWeight.w700)),
               ),
             )),
           ]),
