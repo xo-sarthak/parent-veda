@@ -14,6 +14,8 @@ import 'package:flutter/services.dart';
 
 import 'pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 
 // ---- section padding --------------------------------------------------------
 Widget ppToolPad(Widget c) =>
@@ -118,18 +120,19 @@ Widget ppLearnRow(BuildContext context, String title, {bool top = false, bool bo
           top: top ? const BorderSide(color: ppHair) : BorderSide.none,
           bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none,
         )),
+        // The drawn book on a neutral disc and a chevron (2026-10-21, Wave 5),
+        // the row every other list draws. Was a lavender tile with a Material
+        // book icon and a text arrow. Kept for revert:
+        //   Container(width: 34, height: 34, decoration: BoxDecoration(color: ppPanel,
+        //       borderRadius: BorderRadius.circular(10)),
+        //       child: const Icon(Icons.menu_book_outlined, size: 16, color: ppInk)),
+        //   ... const Text('→', style: TextStyle(color: ppMuted)),
         child: Row(children: [
-          Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.menu_book_outlined, size: 16, color: ppInk),
-          ),
+          const TtcMarkLeading(tab: TtcTabMark.openBook, tint: ppPanel, size: 36),
           const SizedBox(width: 12),
-          Expanded(child: Text(title, style: ppBody(13.5, color: ppInk, h: 1.4))),
+          Expanded(child: Text(title, style: ppBody(13.5, color: ppInk, h: 1.4, w: FontWeight.w600))),
           const SizedBox(width: 10),
-          const Text('→', style: TextStyle(color: ppMuted)),
+          const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
     ));
@@ -138,7 +141,8 @@ Widget ppLearnRow(BuildContext context, String title, {bool top = false, bool bo
 Widget ppLearnBlock(BuildContext context, List<String> titles) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Learn while you track', style: ppJakarta(16)),
+        // The section heading every screen uses (serif 21). Was ppJakarta(16).
+        Text('Learn while you track', style: ppFraunces(21, w: FontWeight.w600, h: 1.2)),
         const SizedBox(height: 4),
         Text('Short, calm reads — tap to open.', style: ppBody(13)),
         const SizedBox(height: 6),

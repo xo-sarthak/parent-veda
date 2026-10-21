@@ -21,7 +21,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../widgets/pv_placeholders.dart';
+// import '../../widgets/pv_placeholders.dart'; // the film placeholder card moved onto the painting (2026-10-21)
 import 'pp_common.dart';
 import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
@@ -29,7 +29,13 @@ import 'pp_tools_kit.dart';
 import 'products_discovery_screen.dart';
 import 'pp_phases_data.dart';
 import 'pp_phase_film.dart' show ppOpenPhaseRead;
-import '../../data/pp_phase_docs.dart' show ppPhaseDocFor;
+import '../../data/pp_phase_docs.dart' show ppPhaseDocFor, PpSnapshot, PpDocDomain, PpDocDomainX;
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
+import '../v2/v3_dev_mark.dart' show DevMark, V3DevMark;
+import 'pp_home_reads.dart' show ppPhaseVideo;
+import 'pp_phase_doc_reads.dart' show ppOpenMilestoneRead;
+import 'video/pv_video_player.dart' show PvVideoPlayer;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
@@ -47,15 +53,26 @@ V2Palette get _c => V2PaletteStore.instance.current;
 TextStyle _serif(double size) => pvFraunces(
     fontSize: size, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.45, color: _c.ink1);
 
-class PhaseDetailScreen extends StatelessWidget {
+class PhaseDetailScreen extends StatefulWidget {
   const PhaseDetailScreen({super.key, required this.phase});
   final AgePhase phase;
+
+  @override
+  State<PhaseDetailScreen> createState() => _PhaseDetailScreenState();
+}
+
+class _PhaseDetailScreenState extends State<PhaseDetailScreen> {
+  AgePhase get phase => widget.phase;
+
+  /// The film is playing in the painting's place (2026-10-21, Wave 5).
+  bool _playing = false;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
   @override
   Widget build(BuildContext context) {
     final p = phase;
+    final film = ppPhaseVideo(p);
     // ⚠️ A PHASE WITH A DOC (1–15 on 2026-10-13, all 20 since 2026-10-16). `kPhases` has already laid
     // the doc over this phase: `workingOn` is its Living Through titles and
     // `milestones` its Child Snapshot. Those are NOT the AAP 75% milestones,
@@ -71,9 +88,68 @@ class PhaseDetailScreen extends StatelessWidget {
           children: [
             _pad(ppBackBar(context, '${ChildProfileStore.instance.theirCap} journey')), // was ppBack; was 'His journey' (2026-10-21)
             const SizedBox(height: 14),
+            // ⚠️ THE PAINTING IS THE FILM'S POSTER (2026-10-21, Wave 5; the
+            // user: the image "does nothing" and the film sat at the foot as a
+            // placeholder). As Insight Timer and Mindvalley do on Mobbin: one
+            // cover, one play action. With a film, a tap plays it in place, the
+            // same film the home shows (ppPhaseVideo). Without one, a quiet
+            // line says it is coming; the painting is never a blank box.
+            // Was: ClipRRect(AspectRatio(4 / 3, PhasePainting)).
             _pad(ClipRRect(
               borderRadius: BorderRadius.circular(18),
-              child: AspectRatio(aspectRatio: 4 / 3, child: PhasePainting(phase: p)),
+              child: AspectRatio(
+                aspectRatio: 4 / 3,
+                child: _playing && film != null
+                    ? PvVideoPlayer(video: film, inline: true, autoStart: true)
+                    : Stack(fit: StackFit.expand, children: [
+                        PhasePainting(phase: p),
+                        Positioned(
+                          right: film == null ? null : 12,
+                          left: film == null ? 12 : null,
+                          bottom: 12,
+                          child: film == null
+                              ? Container(
+                                  key: const ValueKey('phase_detail_film_soon'),
+                                  padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.92),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text('Film for this phase coming soon',
+                                      style: ppBody(11.5, color: _c.ink1, w: FontWeight.w700)),
+                                )
+                              : Semantics(
+                                  button: true,
+                                  label: 'Play the film for ${p.name}',
+                                  excludeSemantics: true,
+                                  child: PvPress(child: GestureDetector(
+                                    key: const ValueKey('phase_detail_play'),
+                                    onTap: () => setState(() => _playing = true),
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Container(
+                                      padding: const EdgeInsets.fromLTRB(8, 7, 13, 7),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(alpha: 0.94),
+                                        borderRadius: BorderRadius.circular(999),
+                                      ),
+                                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                        Container(
+                                          width: 24,
+                                          height: 24,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(color: _c.ink1, shape: BoxShape.circle),
+                                          child: const Icon(Icons.play_arrow_rounded, size: 16, color: Colors.white),
+                                        ),
+                                        const SizedBox(width: 7),
+                                        Text('Play this phase',
+                                            style: ppBody(12.5, color: _c.ink1, w: FontWeight.w800)),
+                                      ]),
+                                    ),
+                                  )),
+                                ),
+                        ),
+                      ]),
+              ),
             )),
             const SizedBox(height: 16),
             _pad(Row(children: [
@@ -151,15 +227,17 @@ class PhaseDetailScreen extends StatelessWidget {
             // placeholder when there is not, rather than rendering nothing and
             // hiding the gap. `slotId` names the wiring at the moment the slot
             // is created.
-            const SizedBox(height: 20),
-            _pad(PvVideoPlaceholder(
-              title: '${p.name}, in five minutes',
-              subtitle: 'What is happening for him now, and what helps.',
-              duration: '5 min',
-              hue: 268,
-              flat: true,
-              slotId: 'development/phase/${p.number}',
-            )),
+            // The film moved onto the painting above (2026-10-21, Wave 5). The
+            // separate placeholder card, kept for revert:
+            // const SizedBox(height: 20),
+            // _pad(PvVideoPlaceholder(
+            //   title: '${p.name}, in five minutes',
+            //   subtitle: 'What is happening for him now, and what helps.',
+            //   duration: '5 min',
+            //   hue: 268,
+            //   flat: true,
+            //   slotId: 'development/phase/${p.number}',
+            // )),
 
             if (p.workingOn.isNotEmpty) ...[
             const SizedBox(height: 24),
@@ -194,7 +272,25 @@ class PhaseDetailScreen extends StatelessWidget {
                 style: ppBody(12.5, color: _c.ink3, h: 1.45),
               )),
             ],
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
+            // ⚠️ A DOC PHASE DRAWS THE DOC'S OWN SNAPSHOT (2026-10-21, Wave 5):
+            // each area's drawn mark, the card's title AND its one line (the line
+            // was dropped before), and a tap opens that area's milestone page in
+            // the reader, as the phase's full read already does. Nothing here was
+            // tappable. Non-doc phases keep the AAP cards below.
+            if (ppPhaseDocFor(p.number) case final doc?)
+              _pad(Column(children: [
+                for (final s in doc.snapshot)
+                  _SnapshotRow(
+                    key: ValueKey('phase_snapshot_${s.domain.name}'),
+                    snap: s,
+                    onTap: switch (doc.milestoneFor(s.domain)) {
+                      final m? => () => ppOpenMilestoneRead(context, doc, m),
+                      null => null,
+                    },
+                  ),
+              ]))
+            else
             // The doc's fixed order (Brain, Physical, Language, Emotional,
             // Nutrition) for a doc phase; the enum's order otherwise.
             for (final d in hasDoc
@@ -247,12 +343,12 @@ class PhaseDetailScreen extends StatelessWidget {
               _pad(Container(
                 padding: const EdgeInsets.all(17),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFC98A2B).withValues(alpha: 0.08),
+                  color: _c.surfaceAlt, // was amber 0xFFC98A2B at 0.08 (2026-10-21)
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('FOR INDIAN FAMILIES',
-                      style: ppBody(9.5, color: const Color(0xFF9A6B12), w: FontWeight.w800)
+                      style: ppBody(9.5, color: _c.ink3, w: FontWeight.w800) // was 0xFF9A6B12
                           .copyWith(letterSpacing: 0.8)),
                   const SizedBox(height: 8),
                   Text(p.indianNote!, style: ppBody(13.5, color: ppInk, h: 1.6)),
@@ -372,4 +468,80 @@ class PhaseDetailScreen extends StatelessWidget {
             ),
         ]),
       );
+}
+
+/// One Child Snapshot line on the phase screen: the area's drawn mark on its
+/// tint, the area's name, the doc's title and its one line, and a chevron when
+/// it opens a milestone page. The row every list in the app draws.
+class _SnapshotRow extends StatelessWidget {
+  const _SnapshotRow({super.key, required this.snap, this.onTap});
+
+  final PpSnapshot snap;
+  final VoidCallback? onTap;
+
+  static double _hue(PpDocDomain d) => switch (d) {
+        PpDocDomain.brain => 38,
+        PpDocDomain.physical => 214,
+        PpDocDomain.language => 28,
+        PpDocDomain.emotional => 345,
+        PpDocDomain.nutrition => 140,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final c = _c;
+    final hue = _hue(snap.domain);
+    final tint = v2BlockTint(hue, c);
+    final accent = HSLColor.fromAHSL(1, hue, 0.45, 0.42).toColor();
+    final mark = switch (snap.domain) {
+      PpDocDomain.brain => DevMark.brain,
+      PpDocDomain.physical => DevMark.physical,
+      PpDocDomain.language => DevMark.language,
+      PpDocDomain.emotional => DevMark.emotional,
+      PpDocDomain.nutrition => null,
+    };
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: c.line))),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          ExcludeSemantics(
+            child: mark == null
+                ? TtcMarkLeading(tab: TtcTabMark.bowl, tint: tint, size: 40)
+                : Container(
+                    width: 40,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
+                    child: V3DevMark(mark: mark, accent: accent, size: 28),
+                  ),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(snap.domain.label,
+                  style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: c.ink3)),
+              const SizedBox(height: 2),
+              Text(ppFillChild(snap.title),
+                  style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3, color: c.ink1)),
+              const SizedBox(height: 3),
+              Text(ppFillChild(snap.line),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 12.5, height: 1.45, color: c.ink2)),
+            ]),
+          ),
+          if (onTap != null) ...[
+            const SizedBox(width: 8),
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Icon(Icons.chevron_right_rounded, size: 20, color: c.ink3),
+            ),
+          ],
+        ]),
+      ),
+    );
+  }
 }

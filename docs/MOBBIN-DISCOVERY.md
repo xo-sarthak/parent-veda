@@ -1170,3 +1170,22 @@ Large feature cards for reads (Finimize): rows carry more in less space.
 
 **Built.** `pp_home_v3.dart` (`_DoorReadRow`, `_ProductRail`),
 `pp_relevance.dart`. Prototype claude.ai/artifact/Hgfy82qx2TLA4S7MVeZE1S.
+
+## 30. The phase screen: the painting as the film's poster (2026-10-21)
+
+**Asked.** The user: the phase image does nothing; the film should start from
+it.
+
+**Found.** One cover, one play action on a content page: Insight Timer
+(mobbin.com/screens/a2e7c7e5-314b-4dd0-a997-75e6c88ae152), Mindvalley
+(mobbin.com/screens/e2bf8a14-07f5-464a-8929-1af51ee2e040). Apple TV and
+Paramount+ put a white Play pill on the cover.
+
+**Adopted.** The painting as the cover with a white "Play this phase" pill,
+playing in place; a quiet "coming soon" pill when no film exists.
+
+**Declined.** Full-bleed dark cinema heroes (Apple TV, Netflix): the app is
+white ground and calm, and the painting is the art.
+
+**Built.** `phase_detail_screen.dart`. Prototype
+claude.ai/artifact/NYQX3ovZZR4Uxwympe7gCX.

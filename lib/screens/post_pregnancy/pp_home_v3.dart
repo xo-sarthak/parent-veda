@@ -128,7 +128,7 @@ import 'pp_tile_order.dart';
 import '../../services/family_profile.dart';
 import 'pp_child_switch.dart';
 import 'pp_visit_card.dart';
-import 'video/pv_video_config.dart' show pvResolveVideoUrl;
+// import 'video/pv_video_config.dart' show pvResolveVideoUrl; // the film pick moved to pp_home_reads.dart (2026-10-21)
 import 'pp_tip_links.dart';
 import 'pp_phase_film.dart';
 import 'pp_phase_doc_reads.dart' show ppOpenMilestoneRead;
@@ -1140,13 +1140,14 @@ class _PpHomeV3State extends State<PpHomeV3> {
   // 2026-10-07): "hide the phase video card until a film exists". In release
   // the dev placeholders are off, so a video with no real URL draws no card.
   // Kept for revert: the same two picks without the playable filter.
-  WatchVideo? _video(AgePhase phase) {
-    bool plays(WatchVideo v) => pvResolveVideoUrl(v) != null;
-    final pool = watchByCategory(watchCategoryForPhase(phase)).where(plays).toList();
-    if (pool.isNotEmpty) return pool[DateTime.now().day % pool.length];
-    final all = kWatchVideos.where(plays).toList();
-    return all.isEmpty ? null : all[DateTime.now().day % all.length];
-  }
+  // The pick moved to pp_home_reads.dart (`ppPhaseVideo`, 2026-10-21) so the
+  // phase screen shows the same film. The body it had, kept for revert:
+  //   bool plays(WatchVideo v) => pvResolveVideoUrl(v) != null;
+  //   final pool = watchByCategory(watchCategoryForPhase(phase)).where(plays).toList();
+  //   if (pool.isNotEmpty) return pool[DateTime.now().day % pool.length];
+  //   final all = kWatchVideos.where(plays).toList();
+  //   return all.isEmpty ? null : all[DateTime.now().day % all.length];
+  WatchVideo? _video(AgePhase phase) => ppPhaseVideo(phase);
 
   // Day-rotated, age-blind. Kept for revert.
   // ignore: unused_element

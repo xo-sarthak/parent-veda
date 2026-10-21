@@ -10719,4 +10719,29 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   the questions to be written first; (3) "Something changed?" answers are
   not stored, so they are not a signal; (4) Pregnancy doors: `lead(week)` is
   still only set by Nutrition. Not walked on a phone.
-- **§95.7 Waves 5 to 7** (phase screen, home, warm copy): not started.
+- **§95.7 Wave 5a, the phase screen — DONE 2026-10-21.** Artifact
+  claude.ai/artifact/NYQX3ovZZR4Uxwympe7gCX, approved. `phase_detail_screen.dart`
+  is stateful now: the painting is the film's poster (an ink "Play this
+  phase" pill plays it in place via `PvVideoPlayer`; with no film, "Film for
+  this phase coming soon"); the separate `PvVideoPlaceholder` card is
+  commented out. One film pick for the home and the phase screen:
+  `ppPhaseVideo` (`pp_home_reads.dart`). The Child snapshot draws the doc's
+  own five rows (`_SnapshotRow`): the area's drawn mark (`V3DevMark`, the
+  bowl for Nutrition), the title AND the doc's line (dropped before), and a
+  tap opens that area's milestone page in the reader. `ppLearnRow` /
+  `ppLearnBlock` (`pp_tools_kit.dart`) draw the book mark and a chevron with
+  a serif 21 heading, which reaches every tool screen using them. The Indian
+  box is neutral. `pp_phase_film.dart` was not touched (another terminal).
+  **Owed:** no phase has a released film (`WatchVideo.videoUrl` is empty
+  everywhere; only debug URLs exist), so "coming soon" is what parents see.
+  Test `test/pp_phase_screen_test.dart`. Not walked on a phone.
+- **§95.8 Wave 5b, old screens reachable from the home — NEXT.** The audit
+  (artifact above, section 2): `DevelopmentActivityScreen` (6 routes) → the
+  reader via a new adapter; `DevelopmentAreaScreen` and
+  `DevelopmentHomeScreen` → the Development door; `DevelopmentAllActivities`
+  → the tool shell; `WatchPlayerScreen` + `QuickLearnScreen` → ink in place;
+  `ProviderResultsScreen` (Talk) → the tool shell; `VaxDetailScreen` and
+  `DoctorRecordScreen` (behind the new vaccine tracker) → the tool shell.
+  Facades over the old classes, old bodies kept as `…Classic`, plus a pixel
+  guard and a source test. The vaccine tracker itself is already new.
+- **§95.9 Waves 6 to 7** (home, warm copy): not started.
