@@ -93,7 +93,7 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 ---
 
 ### Affiliate prices (2026-10-21, STILL-OPEN §96.8)
-- [ ] **LAUNCH** · Run `supabase/migrations/0108_products_affiliate.sql` (asin, price_checked_at, ext_rating, ext_review_count on products) · user · STILL-OPEN §96.8 · added 2026-10-21
+- [x] **LAUNCH** · Run `supabase/migrations/0108_products_affiliate.sql` (asin, price_checked_at, ext_rating, ext_review_count on products) · user · STILL-OPEN §96.8 · added 2026-10-21 · **done 2026-10-21**
 - [ ] **DECIDE** · Which exact Amazon listing each affiliate product points at; type the ASIN, price and date into `lib/data/products/pv_affiliate.dart` (empty on purpose; nothing invented) · user · STILL-OPEN §96.8 · added 2026-10-21
 - [ ] **LAUNCH** · Creators API credentials (Associates Central → Manage Credentials; old PA-API keys do not work, PA-API 5 is retired), then deploy and schedule `affiliate-refresh` · user + dev · BACKEND-PATTERNS §16ii-p · added 2026-10-21
 
@@ -224,3 +224,4 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - 2026-10-20 · Migration 0105 (child profile + name votes: clock, soft delete, guard) run by the user · §1
 - 2026-10-21 · Migration 0106 (Pregnancy part 1: clock, soft delete, guard, the father_missions UPDATE policy) run and checked by the user, 9 of 9 tables · §1
 - 2026-10-21 · Migration 0107 (Pregnancy part 2: clock, soft delete, guard, medications.alarms, symptom severity 'strong') run and checked by the user, 10 of 10 tables · §1
+- 2026-10-21 · Migration 0108 (affiliate fields on products: asin, price_checked_at, ext_rating, ext_review_count) run by the user · §1
