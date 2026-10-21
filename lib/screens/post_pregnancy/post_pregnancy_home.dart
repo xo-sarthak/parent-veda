@@ -18,7 +18,7 @@ import 'pp_growth_data.dart';
 import 'article_reader_screen.dart';
 import 'development_area_screen.dart';
 import 'explore_drawer.dart';
-import 'recipes_screen.dart';
+// import 'recipes_screen.dart'; // kept for revert: recipes open PpRecipesScreen (2026-10-21)
 import 'food_recipe_screen.dart';
 import 'growth_activity_screen.dart';
 import 'phase_detail_screen.dart';
@@ -49,6 +49,7 @@ import 'vax_detail_screen.dart';
 import 'vax_tracker_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
+import 'pp_recipes_screen.dart' show PpRecipesScreen;
 // Redesigned tracker (vax_tracker_screen) is the live entry now; the old
 // VaccinationScreen is kept for revert.
 // import 'vaccination_screen.dart';
@@ -315,7 +316,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             const SizedBox(width: 12),
             _aheadCard('in ~7 weeks', '6-month vaccines', Icons.vaccines_outlined, () => _push(const VaxDetailScreen(visitId: 'mo6'))),
             const SizedBox(width: 12),
-            _aheadCard('at 6 months', 'First solids', Icons.restaurant_outlined, () => _push(const RecipesScreen())),
+            _aheadCard('at 6 months', 'First solids', Icons.restaurant_outlined, () => _push(const PpRecipesScreen())), // was RecipesScreen() (old look)
           ]),
         ),
       ]);

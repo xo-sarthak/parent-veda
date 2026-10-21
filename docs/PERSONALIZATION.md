@@ -199,6 +199,31 @@ after the baby arrives.
 |---|---|---|
 | 2 | Recommendations | `pp_reco_data.dart:1065` — live |
 | — | Brand audience targeting | `brand_context.dart:34` — live, already shared by both apps |
+| 3 | Recipes | `pp_recipes_screen.dart` `ppRankRecipes` — live 2026-10-21 |
+
+#### The parenting ranker (2026-10-21)
+
+The user's rule: the app moves with the child, the way TTC moves with IVF or
+IUI. Every section, rail and door order follows the child's situation, and
+nothing disappears.
+
+Recipes is the first surface. `ppRankRecipes` returns every dish it was given,
+reordered (ties keep catalogue order). Strongest first:
+
+1. **Age fit** from the corrected age (`devAgeInMonths`): made for now, then
+   the next band to open, then dishes for younger babies, then further ahead.
+2. **Diet**, preset from `FamilyProfileStore.diet` (Jain cooks vegetarian).
+   The chip is her explicit choice, so it filters; the ranker only weighs.
+3. **A complete page**: a photo, then the Drive doc format.
+4. **Saved by her.**
+5. **The tighter band**: "7 to 8 mo" beats "12 mo+" for a seven-month-old.
+
+Today's pick rotates daily through the first seven dishes for now. A clinical
+line ("solids start around 6 months", "under 6 months, milk is the food") is
+fixed copy, never a ranking output.
+
+Not yet signals (no store records them): dishes cooked, the child being unwell.
+Next surfaces (wave 4): home reads and products, door pages, FAQs.
 
 ### Precedent worth copying
 

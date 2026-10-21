@@ -20,7 +20,7 @@ import 'courses_explore_screen.dart';
 import 'next_baby_screens.dart';
 import 'read_explore_screen.dart';
 import 'reco_explore_screen.dart';
-import 'recipes_explore_screen.dart';
+// import 'recipes_explore_screen.dart'; // kept for revert: recipes open PpRecipesScreen (2026-10-21)
 import '../care_partner/care_circle_screen.dart';
 import 'pp_child_profile.dart';
 
@@ -81,6 +81,7 @@ import 'recipes_screen.dart';
 // Kept: the pre-redesign Recommendations row below is commented, not deleted.
 // ignore: unused_import
 import 'recommendations_screen.dart';
+import 'pp_recipes_screen.dart' show PpRecipesScreen;
 import '../profile/pv_you_screen.dart' show kPvShowDeveloper;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
@@ -161,7 +162,8 @@ List<ExploreEntry> ppExploreEntries() => [
     // _section(context, Icons.restaurant_menu_outlined, 'Recipes',
     //     'Age-tagged Indian food, meal plans & shopping.', const RecipesScreen()),
     ExploreEntry(Icons.restaurant_menu_outlined, 'Recipes',
-        'Curated by age — browse by meal, not by filter.', const RecipesExploreScreen()),
+        // Was const RecipesExploreScreen() (old look), kept for revert.
+        'Curated by age — browse by meal, not by filter.', const PpRecipesScreen()),
     // REDESIGNED (Recommendations brief): sticky section-nav
     // chips, Recommended For You, twelve category rails. Kept:
     // _section(context, Icons.recommend_outlined, 'Recommendations',

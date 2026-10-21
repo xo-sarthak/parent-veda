@@ -11,6 +11,7 @@ import 'food_common.dart';
 import 'food_recipe_screen.dart';
 import 'pp_common.dart';
 import 'pp_food_data.dart';
+import 'pp_recipes_screen.dart' show PpRecipeListScreen;
 
 class FoodSavedScreen extends StatelessWidget {
   const FoodSavedScreen({super.key});
@@ -18,8 +19,21 @@ class FoodSavedScreen extends StatelessWidget {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
 
+  // The one recipe list (2026-10-21): the same photo cards as Recipes, on the
+  // tool shell. "Recently cooked" is not shown: nothing in the app records a
+  // dish as cooked, and the list only ever held two seeded demo dishes.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => PpRecipeListScreen(
+        eyebrow: 'Saved',
+        title: 'Your saved dishes',
+        recipes: () => FoodStore.instance.saved,
+        splitByAge: false,
+        empty: 'Tap the bookmark on any recipe and it waits here.',
+      );
+
+  // The page before, kept for revert.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(

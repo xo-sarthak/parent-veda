@@ -600,16 +600,16 @@ void main() {
     expect(find.text('HEALTHIER VERSION'), findsNothing);
     expect(find.text('Everyday'), findsNothing);
     // The replacement is present and reachable.
-    // The shared tool shell (2026-10-07): the heading is "Why it is good".
-    expect(find.text('Why it is good'), findsOneWidget);
-    // And the equipment call-out lands with the ingredients.
+    // Every dish opens the doc page since 2026-10-21: "Why this is good for <child>".
+    expect(find.textContaining('Why this is good for'), findsOneWidget);
+    // And the ingredients follow it.
     await tester.scrollUntilVisible(
-      find.text('You will need'),
+      find.text('What you need'),
       250,
       scrollable: find.byType(Scrollable).first,
       maxScrolls: 20,
     );
-    expect(find.text('You will need'), findsOneWidget);
+    expect(find.text('What you need'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

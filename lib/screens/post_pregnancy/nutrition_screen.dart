@@ -24,7 +24,8 @@ import 'pp_common.dart';
 import 'pp_food_data.dart';
 import 'pp_nutrition_data.dart';
 import 'food_recipe_screen.dart';
-import 'recipes_screen.dart';
+// import 'recipes_screen.dart'; // kept for revert: recipes open PpRecipesScreen (2026-10-21)
+import 'pp_recipes_screen.dart' show PpRecipesScreen;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 class NutritionScreen extends StatefulWidget {
@@ -131,7 +132,8 @@ class _NutritionScreenState extends State<NutritionScreen> {
                   _pad(Row(children: [
                     Expanded(child: Text('Recipes that fit', style: ppJakarta(19))),
                     PvPress(child: GestureDetector(
-                      onTap: () => _push(const RecipesScreen()),
+                      // Was RecipesScreen() (old look), kept for revert.
+                      onTap: () => _push(const PpRecipesScreen()),
                       behavior: HitTestBehavior.opaque,
                       child: Row(children: [
                         Text('All recipes', style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),

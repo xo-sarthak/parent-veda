@@ -5314,9 +5314,13 @@ class FoodStore extends ChangeNotifier with CloudSyncedStore {
   FoodStore._();
   static final FoodStore instance = FoodStore._();
 
-  final Set<String> _saved = {'moongkhichdi', 'ragipancake'};
+  // Empty until she saves or cooks (2026-10-21). Was seeded with two demo
+  // dishes each, which showed a new parent "saved" dishes she never saved:
+  // final Set<String> _saved = {'moongkhichdi', 'ragipancake'};
+  // final List<String> _cooked = ['moongkhichdi', 'sweetpotatomash'];
+  final Set<String> _saved = {};
   final Map<String, bool> _shopping = {}; // ingredient line -> purchased
-  final List<String> _cooked = ['moongkhichdi', 'sweetpotatomash'];
+  final List<String> _cooked = [];
   bool _vegOnly = false;
 
   // ---- persistence (user_state KV; own-only, a personal preference) --------

@@ -43,8 +43,9 @@ import '../../services/life_stage_store.dart';
 import '../profile/pv_you_screen.dart';
 import 'pp_child_profile.dart';
 import 'problem_solver_screen.dart';
-import 'recipes_explore_screen.dart';
+// import 'recipes_explore_screen.dart'; // kept for revert: recipes open PpRecipesScreen (2026-10-21)
 import 'watch_home_screen.dart';
+import 'pp_recipes_screen.dart' show PpRecipesScreen;
 
 /// The rows the design names, in its order. Each maps onto a destination the
 /// app already has — nothing here is new, only re-doored.
@@ -66,7 +67,8 @@ List<ExploreEntry> _named() => [
           'Short courses, one sitting each.', const CoursesExploreScreen()),
       ExploreEntry(Icons.restaurant_menu_outlined, 'Recipes',
           'Food for you now, for ${ChildProfileStore.instance.nameMid} later.',
-          const RecipesExploreScreen()),
+          // Was const RecipesExploreScreen() (old look), kept for revert.
+          const PpRecipesScreen()),
       ExploreEntry(Icons.photo_camera_outlined, 'Memories',
           'Everything you have saved so far.', const MemoriesHomeScreen()),
       ExploreEntry(Icons.place_outlined, 'Find help',

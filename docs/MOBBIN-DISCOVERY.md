@@ -1096,3 +1096,29 @@ Decided with the user: a painting per phase, and the 20 phases grouped into five
 **Library gaps.** No real pregnancy month-calendar screen: pregnancy apps lead with the week, not the month (which is why our hero leads too). Ovia, BabyCenter and What to Expect are not in the library.
 
 **Built.** 94d0cf6. Record: `docs/PREG-CALENDAR.md`; prototype claude.ai/artifact/N6Y95pDA2i5dkQQbFaAF26.
+
+## 27. Parenting recipes, ordered by the child (2026-10-21)
+
+**Why:** Tools → Recipes opened on "When your baby is unwell" (the age chip
+filtered every dish away under six months). The user also asked for every
+screen one tap deeper to be in the same look, and one image per dish.
+
+**Queries:** "recipes home screen with a featured recipe for you and
+collections below"; "recipe browse screen with category tiles grid like
+breakfast, lunch, snacks"; "baby food app screen showing foods by baby's age
+with a starting solids guide" (the library has no baby-food app; Alma only).
+
+**Adopted:**
+- One featured dish before the lists: [NYT Cooking](https://mobbin.com/screens/7703a07f-d26b-4d1e-a5bd-660cc5df52af),
+  [Kitchen Stories "Today's Recipe"](https://mobbin.com/screens/f7d9718f-2350-40cb-917a-4d59928c45a1).
+- "Top picks for you" as the first rail: [Cherrypick](https://mobbin.com/screens/48b28392-c6b0-4f62-a327-7828f606bb1d).
+- Six meal tiles: [Blinkit](https://mobbin.com/screens/c69b2710-70ee-46d4-b9bc-d221078385f1),
+  [NYT Cooking search](https://mobbin.com/screens/f96b49e6-64c1-4bc3-92f2-f94635f7a4e7).
+- Rails with an eyebrow over a short title: [Hims](https://mobbin.com/screens/484a4184-4fb0-4918-a290-4d7708edbf95).
+- A saved rail: [CREME](https://mobbin.com/screens/715a96fa-90bc-4180-b8ba-1342b060bd0f).
+
+**Declined:** photo meal tiles (one dish photo exists; drawn marks instead);
+calories and ratings; CREME's dark look; creator rows.
+
+**Built.** `pp_recipes_screen.dart` (`PpRecipesScreen`, `PpRecipeListScreen`,
+`ppRankRecipes`). Prototype claude.ai/artifact/YERnPpDwamz3Qa7RNCX4AM.

@@ -36,6 +36,10 @@ import 'pp_child_profile.dart';
 import 'pp_recipes_screen.dart' show ppRecipeAgeRange;
 import '../saved_toast.dart';
 
+/// Every dish on the doc page (2026-10-21). False brings back the shell page
+/// for the dishes without the Drive doc format.
+const bool kPpRecipeDocPageForAll = true;
+
 class FoodRecipeScreen extends StatefulWidget {
   const FoodRecipeScreen({super.key, required this.recipe});
   final FoodRecipe recipe;
@@ -63,9 +67,10 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   //  The old page is `_buildBeforeShell`, kept for revert.
   @override
   Widget build(BuildContext context) {
-    // The Drive doc format gets the new page (2026-10-15 pilot); every other
-    // dish keeps the page below until the user has approved it on one.
-    if (r.docFormat) return _buildDocPage(context);
+    // The Drive doc format got the new page in the 2026-10-15 pilot. Since
+    // 2026-10-21 every dish opens it (the user: "one image per recipe is
+    // enough"); the shell page below is kept for revert.
+    if (kPpRecipeDocPageForAll || r.docFormat) return _buildDocPage(context);
     final p = pvStorePalette;
     final body = pvManrope(fontSize: 14, height: 1.55, color: p.ink1);
     Widget dot(String t) => pregToolPad(Padding(
@@ -712,7 +717,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                 _docFacts(p),
                 const SizedBox(height: 12),
                 _docAgeFit(p),
-                _docSection(p, 'Why this is good for him'),
+                _docSection(p, 'Why this is good for ${ChildProfileStore.instance.them}'),
                 Text(ppFill(r.why), style: _docBody(p)),
                 _docSection(p, 'What you need', side: 'Serves ${r.serves}'),
                 _docIngredients(p),
@@ -940,8 +945,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
     final (IconData icon, String line) = range == null || (months >= range.$1 && months <= range.$2)
         ? (Icons.check_circle_outline_rounded, 'Right for ${c.nameMid} now, at $months months.')
         : months < range.$1
-            ? (Icons.schedule_rounded, '$made, and ${c.nameMid} is $months months. One to keep for when he gets there.')
-            : (Icons.trending_up_rounded, '$made, and ${c.nameMid} is $months months. Still a good meal; he may be ready for more texture now.');
+            ? (Icons.schedule_rounded, '$made, and ${c.nameMid} is $months months. One to keep for when ${c.they} gets there.')
+            : (Icons.trending_up_rounded, '$made, and ${c.nameMid} is $months months. Still a good meal; ${c.they} may be ready for more texture now.');
     return Container(
       key: const ValueKey('pp_recipe_doc_agefit'),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -964,12 +969,16 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           padding: const EdgeInsets.symmetric(vertical: 11),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.line))),
           child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            SizedBox(
-              width: 118,
-              child: Text(i < r.amounts.length ? r.amounts[i] : '',
-                  style: pvJakarta(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.35, color: p.ink1)),
-            ),
-            const SizedBox(width: 10),
+            // The amount column only when the dish has one: the older dishes
+            // keep the quantity inside the ingredient line.
+            if (r.amounts.isNotEmpty) ...[
+              SizedBox(
+                width: 118,
+                child: Text(i < r.amounts.length ? r.amounts[i] : '',
+                    style: pvJakarta(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.35, color: p.ink1)),
+              ),
+              const SizedBox(width: 10),
+            ],
             Expanded(child: Text(r.ingredients[i], style: pvManrope(fontSize: 14.5, height: 1.4, color: p.ink1))),
             if (foodShoppable(r.ingredients[i])) ...[
               const SizedBox(width: 10),
@@ -1181,7 +1190,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                     for (var i = 0; i < r.ingredients.length; i++)
                       i < r.amounts.length ? '${r.amounts[i]}  ${r.ingredients[i]}' : r.ingredients[i],
                   ],
-                  enjoyLine: '${r.title} · cool it till just warm before he eats.',
+                  enjoyLine: '${r.title} · cool it till just warm before ${ChildProfileStore.instance.they} eats.',
                   photo: FoodPhoto(recipe: r, height: double.infinity, radius: 0),
                 ),
               )),

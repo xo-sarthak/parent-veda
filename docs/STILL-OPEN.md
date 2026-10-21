@@ -10617,3 +10617,35 @@ Mobbin table (MOBBIN-DISCOVERY §26) and the fact table — is
   the empty day that invites, Add as rows that say why a row waits, Coming up
   with date blocks, the fact table.
 - Not walked on a phone yet.
+
+## 95.0 Parenting, one ParentVeda pass — 2026-10-21
+
+The user's list: old UI in health record, emergency card, milestones, tools
+glyphs and drop-down tiles; toasts over the Ask Veda button; a jittery tab
+switch; bigger type than the other stages; scattered headers; a home that reads
+as a text blob and loops into old screens; the phase screen ("His journey"
+hard-coded, the picture does nothing, the film at the foot); doors that end in
+"Talk to an expert"; door content not ordered by the child; recipes opening on
+"When your baby is unwell". Plan: `~/.claude/plans/i-ll-tell-you-a-snuggly-piglet.md`,
+waves 0 to 7. Every redesigned screen is shown as an Artifact first.
+
+- **§95.1 Recipes — DONE 2026-10-21 (wave 0).** Artifact
+  claude.ai/artifact/YERnPpDwamz3Qa7RNCX4AM, approved. Cause of the bad first
+  view: the "For <name> now" chip FILTERED by age and the youngest dish is
+  6+ months, so under six months the page was only the sick-day row. Now
+  `PpRecipesScreen` orders by the child (the parenting ranker,
+  PERSONALIZATION.md §6): Today's pick → Right for now → By meal (six tiles,
+  drawn marks) → Coming up → Saved → Collections. Under six months: "Solids
+  start around 6 months" + first tastes. Every tap one layer down opens
+  `PpRecipeListScreen` (same photo cards) or `FoodRecipeScreen`, which is now
+  the doc page for EVERY dish (`kPpRecipeDocPageForAll`). Saved moved onto the
+  list. Four old entry points (Explore drawer, More sheet, old nutrition
+  screen, legacy home) open the new screen. Trust: the demo "saved" and
+  "cooked" seeds are gone; "Reviewed by a paediatric nutritionist" dropped from
+  Sick-day meals. Test: `test/pp_recipes_test.dart`.
+- **§95.2 Owed from recipes.** A photo per dish (only the khichdi has one;
+  cards show a neutral block). Nothing records "cooked", so cooked is not a
+  ranking signal yet. The unwell collection does not yet rise when the child is
+  unwell (no such signal is stored). Not walked on a phone.
+- **§95.3 Waves 1 to 7** (toasts and tab motion, look sweep, tool screens, the
+  relevance brain, phase screen, home, warm copy): not started.

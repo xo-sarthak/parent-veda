@@ -89,7 +89,9 @@ class _SickDaysScreenState extends State<SickDaysScreen> {
                 color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: p.line)),
             child: Text(
                 ppFillChild(
-                    "These are wholesome meals to support $name's recovery, not medical remedies. Keep offering fluids, and check with your paediatrician if you're unsure. Reviewed by a paediatric nutritionist and always age-appropriate for him."),
+                    "These are wholesome meals to support $name's recovery, not medical remedies. Keep offering fluids, and check with your paediatrician if you're unsure."),
+                // Dropped 2026-10-21: "Reviewed by a paediatric nutritionist and
+                // always age-appropriate for him." No reviewer has signed off yet.
                 style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink1)),
           )),
           const SizedBox(height: 18),
