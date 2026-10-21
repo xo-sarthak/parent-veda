@@ -27,6 +27,7 @@ import '../../localization/app_language.dart';
 import '../../theme/app_theme.dart';
 import 'my_child_screen.dart';
 import 'pp_home_v3.dart';
+import 'pp_tab_host.dart';
 
 enum PpHomeVersion {
   /// `MyChildScreen(home: true)` — what ships today.
@@ -66,7 +67,11 @@ class PpHomeScreen extends StatelessWidget {
     // to subscribe to it — reading a store inside build() without listening is
     // the bug that made the pregnancy version pill show "Classic" while the body
     // had already swapped, and it has now appeared three times in this codebase.
-    return ListenableBuilder(
+    //
+    // ⚠️ THE TAB HOST WRAPS THE HOME (2026-10-21): the five tabs live in this
+    // one route and fade through, as in TTC and pregnancy (pp_tab_host.dart).
+    // Kept for revert: `return ListenableBuilder(` without the host.
+    return PpTabHost(home: ListenableBuilder(
       listenable: PpHomeVersionStore.instance,
       builder: (context, _) {
         final v = PpHomeVersionStore.instance.version;
@@ -101,7 +106,7 @@ class PpHomeScreen extends StatelessWidget {
           //     child: const _Pill()),
         ]);
       },
-    );
+    ));
   }
 }
 

@@ -50,6 +50,7 @@ import '../services/pregnancy_ended_store.dart';
 import 'pregnancy/preg_ended_screen.dart' show PregEndedHome;
 import 'pregnancy/preg_learn_screen.dart';
 import 'pregnancy/preg_more_screen.dart';
+import '../widgets/pv_tab_fade.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
 
 /// The five pregnancy tabs, in nav order, as usage surfaces.
@@ -302,8 +303,18 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
           body: Stack(
             children: [
               Positioned.fill(
-                child: IndexedStack(
-                    index: AppNav.instance.index, children: pages),
+                // ⚠️ THE TTC FADE-THROUGH, NOT AN INSTANT SWAP (2026-10-21, the
+                // user: the tab effect must be one across the stages). All five
+                // pages are still built up front, as the IndexedStack did.
+                // Kept for revert:
+                //   IndexedStack(index: AppNav.instance.index, children: pages),
+                child: PvTabFadeStack(
+                  index: AppNav.instance.index,
+                  count: pages.length,
+                  lazy: false,
+                  keyPrefix: 'preg_tab',
+                  builder: (context, i) => pages[i],
+                ),
               ),
               Align(
                 alignment: Alignment.bottomCenter,

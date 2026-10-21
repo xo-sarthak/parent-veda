@@ -155,6 +155,15 @@ class PvToast extends ChangeNotifier {
   PvToastData? _current;
   PvToastData? get current => _current;
 
+  /// ⚠️ WHERE THE ASK VEDA BUTTON MUST CLEAR (2026-10-21). The toast's top
+  /// edge, measured up from the bottom of the screen, while a notice is
+  /// showing; 0 when none is. The user: toasts sat above the button when they
+  /// "can easily come below it". So the toast keeps its place at the foot and
+  /// the button (`GlobalAskFab`) glides up out of its way, then back down: the
+  /// Material FAB-and-snackbar rule. Lifting the toast over the button is
+  /// what produced the complaint.
+  final ValueNotifier<double> fabClearance = ValueNotifier<double>(0);
+
   OverlayEntry? _entry;
   _PvToastHostState? _host;
   int _seq = 0;
@@ -435,7 +444,10 @@ class _PvToastHostState extends State<_PvToastHost>
     _timer?.cancel();
     _ctrl.dispose();
     _snap.dispose();
-    if (_owner._host == this) _owner._host = null;
+    if (_owner._host == this) {
+      _owner._host = null;
+      _owner.fabClearance.value = 0;
+    }
     super.dispose();
   }
 
@@ -450,7 +462,21 @@ class _PvToastHostState extends State<_PvToastHost>
     if (_exiting) return;
     _timer?.cancel();
     _exiting = true;
+    // The button starts back down as the notice starts to leave.
+    _owner.fabClearance.value = 0;
     _ctrl.reverse();
+  }
+
+  final GlobalKey _cardKey = GlobalKey();
+
+  /// Publishes the card's top edge for the Ask Veda button, after layout.
+  void _publish(double bottom) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _exiting) return;
+      final box = _cardKey.currentContext?.findRenderObject();
+      if (box is! RenderBox || !box.hasSize) return;
+      _owner.fabClearance.value = bottom + box.size.height;
+    });
   }
 
   void _arm() {
@@ -493,6 +519,7 @@ class _PvToastHostState extends State<_PvToastHost>
       (data.lift ?? kPvStickyBarClearance) + mq.padding.bottom,
       mq.viewInsets.bottom + 16,
     ].reduce((a, b) => a > b ? a : b);
+    _publish(bottom);
     return Stack(children: [
       Positioned(
         left: 16,
@@ -515,6 +542,7 @@ class _PvToastHostState extends State<_PvToastHost>
             );
           },
           child: Listener(
+            key: _cardKey,
             onPointerDown: (_) => _hold(true),
             onPointerUp: (_) => _hold(false),
             onPointerCancel: (_) => _hold(false),
@@ -615,6 +643,17 @@ double? pvSnackLiftFor(BuildContext context) {
       !FatherPreview.instance.on &&
       !(name ?? '').startsWith('store/')) {
     return fabRouteObserver.pageCount <= 1 ? kPvSnackOverTtcBar : kPvSnackAtFoot;
+  }
+  // ⚠️ PARENTING SITS WHERE THE OTHER TWO DO (2026-10-21, the user: the toast
+  // "is coming above the floating action button of Ask Veda, whereas it can
+  // easily come below it"). Parenting fell through to the Store's 164, which
+  // is exactly the top of the button. Now: just above the bar on the tab host
+  // ('pp/my_child', which holds all five tabs), at the foot on any screen
+  // pushed over it. The Store's screens and the father's shell keep theirs.
+  if (stage == LifeStage.parenting &&
+      !FatherPreview.instance.on &&
+      !(name ?? '').startsWith('store/')) {
+    return name == 'pp/my_child' ? kPvSnackOverTtcBar : kPvSnackAtFoot;
   }
   return null;
 }

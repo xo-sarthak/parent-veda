@@ -736,6 +736,18 @@ Gopuff (undo at the bottom, the action on the right); NYT, Google, Flo, Digg,
 Substack (a save names its place); Alan, Klarna, Perplexity, Luma (the tick
 first); Sesame (a calm cream error card).
 
+### 4.0g.1 The toast and the Ask Veda button — 2026-10-21
+
+The toast stays at the foot; the button moves. `PvToast.fabClearance` publishes
+the showing card's top edge (from the screen bottom, 0 when none), and
+`GlobalAskFab` glides up to clear it by 12 (260ms, easeOutCubic; instant with
+reduced motion), then back down as the toast leaves. Where the toast sits, by
+the top page (`pvSnackLiftFor`): a stage's tab root (TTC `ttc/today`, the
+pregnancy shell, the parenting host `pp/my_child`) 96, just above the bar; any
+screen pushed over it 24; the Store 164 (its sticky buy bar). Before this,
+Parenting fell through to 164, the exact top of the button, so every toast
+sat over it. Never lift a toast to clear the button.
+
 ## 4.0f One card family on every door — BUILT 2026-09-29, all nine TTC doors
 
 The user, with a reference picture (a PCOS page of soft tinted cards, each

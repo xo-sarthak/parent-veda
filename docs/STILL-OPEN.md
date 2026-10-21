@@ -10647,5 +10647,17 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   cards show a neutral block). Nothing records "cooked", so cooked is not a
   ranking signal yet. The unwell collection does not yet rise when the child is
   unwell (no such signal is stored). Not walked on a phone.
-- **§95.3 Waves 1 to 7** (toasts and tab motion, look sweep, tool screens, the
-  relevance brain, phase screen, home, warm copy): not started.
+- **§95.3 Wave 1, toasts and one tab motion — DONE 2026-10-21.** Toasts sit
+  at the foot in every stage and the Ask Veda button glides clear of them
+  (DESIGN-SYSTEM §4.0g.1). One tab switch for all three stages: TTC's
+  fade-through lifted unchanged into `lib/widgets/pv_tab_fade.dart`
+  (`PvTabFadeStack`); TTC's host uses it, pregnancy's IndexedStack became it
+  (pages still built up front), and Parenting's five tabs now live in one
+  route (`pp_tab_host.dart`, mounted inside `PpHomeScreen`, still route
+  `pp/my_child`) instead of a pushed route per tab: one bar, tabs kept alive,
+  back on a tab returns Home. `openPpTabTo` switches in place when the host is
+  mounted and pushes as before when not. Test `test/pv_tab_fade_test.dart`.
+  Not walked on a phone. The journal capture SnackBars the audit listed were
+  already inside block comments; nothing to move.
+- **§95.4 Waves 2 to 7** (look sweep, tool screens, the relevance brain, phase
+  screen, home, warm copy): not started.

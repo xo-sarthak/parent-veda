@@ -426,10 +426,71 @@ class _StripePainter extends CustomPainter {
 /// The parenting bar's five destinations, by name.
 enum PpTab { home, products, tools, brain, more }
 
+/// Which parenting tab is showing while the tab host is on screen
+/// (2026-10-21). The same shape as TTC's `TtcTabs`: the bar writes it, the
+/// host (`pp_tab_host.dart`) listens. When no host is mounted (a screen pumped
+/// on its own, a test) `openPpTabTo` falls back to pushing the tab.
+class PpTabs extends ChangeNotifier {
+  PpTabs._();
+  static final PpTabs instance = PpTabs._();
+
+  PpTab _tab = PpTab.home;
+  int _hosts = 0;
+
+  PpTab get tab => _tab;
+  bool get hosted => _hosts > 0;
+
+  void select(PpTab t) {
+    if (t == _tab) return;
+    _tab = t;
+    notifyListeners();
+  }
+
+  /// Called by `PpTabHost` only, from initState and dispose. No notify:
+  /// nothing listens to a host that does not exist yet.
+  void attach() {
+    _hosts++;
+    _tab = PpTab.home;
+  }
+
+  void detach() {
+    _hosts = _hosts > 0 ? _hosts - 1 : 0;
+    if (_hosts == 0) _tab = PpTab.home;
+  }
+
+  @visibleForTesting
+  void resetForTest() {
+    _hosts = 0;
+    _tab = PpTab.home;
+  }
+}
+
+/// Tells a `PpBottomNav` whether it is a tab page's own copy (draws nothing:
+/// the host draws the one bar) or the host's bar.
+class PpTabScope extends InheritedWidget {
+  const PpTabScope({super.key, required this.ownsBar, required super.child});
+
+  final bool ownsBar;
+
+  static PpTabScope? maybeOf(BuildContext context) => context.dependOnInheritedWidgetOfExactType<PpTabScope>();
+
+  @override
+  bool updateShouldNotify(PpTabScope old) => old.ownsBar != ownsBar;
+}
+
 /// Central tab navigation for the parenting app: pop back to the home
-/// (route 'pp/my_child') so the stack stays shallow, then push the target tab.
-/// `more` is the exception — it is a sheet over wherever she is, not a screen.
+/// (route 'pp/my_child') so the stack stays shallow, then show the target tab.
 void openPpTabTo(BuildContext context, PpTab tab) {
+  // ⚠️ ONE HOST, NOT A ROUTE PER TAB (2026-10-21, the user: the parenting tab
+  // switch "looks very jittery"). Each tab used to be pushed: the page slid in,
+  // a second bar slid with it, and the tab was rebuilt from scratch. With the
+  // host on screen the tabs live in one route and fade through, as in TTC and
+  // pregnancy. The pushes below stay as the fallback when no host is mounted.
+  if (PpTabs.instance.hosted) {
+    Navigator.of(context).popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
+    PpTabs.instance.select(tab);
+    return;
+  }
   // More is a tab screen now, as in TTC and pregnancy (2026-10-07,
   // pp_more_screen.dart). Kept for revert:
   //   if (tab == PpTab.more) { showPpMoreSheet(context); return; }
@@ -554,7 +615,14 @@ class PpBottomNav extends StatelessWidget {
   // What it loses here is the filled purple disc behind the active icon, which
   // was the one rule this bar still broke.
   @override
-  Widget build(BuildContext context) => PvNavBar(
+  Widget build(BuildContext context) {
+    // Inside the tab host each page's own bar stands down; the host draws one.
+    final scope = PpTabScope.maybeOf(context);
+    if (scope != null && !scope.ownsBar) return const SizedBox.shrink();
+    return _bar(context);
+  }
+
+  Widget _bar(BuildContext context) => PvNavBar(
         items: [for (final (_, i, l) in _tabs) PvNavItem(i, l)],
         activeIndex: active == null ? -1 : PpTab.values.indexOf(active!),
         onTap: (i) => openPpTabTo(context, _tabs[i].$1),

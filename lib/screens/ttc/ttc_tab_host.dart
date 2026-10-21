@@ -71,6 +71,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/pv_tab_fade.dart';
+
 // Kept for revert (2026-09-29, More is its own screen, not the You screen):
 // import '../../services/father_preview.dart';
 // import '../../services/life_stage_store.dart' show LifeStage;
@@ -93,7 +95,7 @@ const List<String> kTtcTabRoutes = [
 ];
 
 /// How long one tab switch takes. Material 3's fade through is 300ms.
-const Duration kTtcTabSwitch = Duration(milliseconds: 300);
+const Duration kTtcTabSwitch = kPvTabSwitch;
 
 /// The host's bar, for tests that measure it.
 const Key kTtcTabBarKey = ValueKey('ttc_tab_host_bar');
@@ -195,22 +197,10 @@ class TtcTabHost extends StatefulWidget {
   State<TtcTabHost> createState() => _TtcTabHostState();
 }
 
-class _TtcTabHostState extends State<TtcTabHost>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _fade =
-      AnimationController(vsync: this, duration: kTtcTabSwitch, value: 1)
-        ..addStatusListener((s) {
-          // The tab that faded out goes offstage once the fade is done.
-          if (s == AnimationStatus.completed && mounted) setState(() {});
-        });
-
-  // Fade through: out in the first 30%, in (and settling from 97%) after.
-  late final Animation<double> _in = CurvedAnimation(
-      parent: _fade, curve: const Interval(0.3, 1, curve: Curves.easeOutCubic));
-  late final Animation<double> _out = ReverseAnimation(CurvedAnimation(
-      parent: _fade, curve: const Interval(0, 0.3, curve: Curves.easeIn)));
-  late final Animation<double> _scale =
-      Tween<double>(begin: 0.97, end: 1).animate(_in);
+class _TtcTabHostState extends State<TtcTabHost> {
+  // ⚠️ THE FADE MOVED TO `PvTabFadeStack` (2026-10-21), unchanged, so
+  // pregnancy and parenting switch tabs exactly the way this host does. What
+  // stays here: the store, the bar, the back rule and the scroll controllers.
 
   /// One scroll controller per tab. ⚠️ NOT OPTIONAL: when tabs were routes,
   /// each had its route's PrimaryScrollController to itself. Five pages in one
@@ -219,18 +209,12 @@ class _TtcTabHostState extends State<TtcTabHost>
   final List<ScrollController> _scrolls =
       List.generate(kTtcTabRoutes.length, (_) => ScrollController());
 
-  /// Tabs she has opened. A tab is built the first time, then kept.
-  final Set<int> _built = {0};
-
-  int _from = 0;
   int _to = 0;
 
   // Kept for revert (2026-09-29): the More tab was the You screen, and the
   // "View as" pill swapped its viewer here. More is its own screen now and
   // reads his side from TtcPartnerMode; the pill lives on the profile, which
   // is a pushed route again.
-  //   /// Whether the More tab shows his view (the "View as" pill). On a
-  //   /// pushed You screen the pill swapped the route; here it swaps this.
   //   bool _youAsFather = false;
 
   @override
@@ -244,7 +228,6 @@ class _TtcTabHostState extends State<TtcTabHost>
   void dispose() {
     TtcTabs.instance.removeListener(_onSelect);
     TtcTabs.instance._detach();
-    _fade.dispose();
     for (final c in _scrolls) {
       c.dispose();
     }
@@ -254,18 +237,7 @@ class _TtcTabHostState extends State<TtcTabHost>
   void _onSelect() {
     final next = TtcTabs.instance.index;
     if (next == _to || !mounted) return;
-    // A field on the tab she is leaving must not keep the keyboard up.
-    FocusManager.instance.primaryFocus?.unfocus();
-    setState(() {
-      _from = _to;
-      _to = next;
-      _built.add(next);
-    });
-    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
-      _fade.value = 1;
-    } else {
-      _fade.forward(from: 0);
-    }
+    setState(() => _to = next);
   }
 
   Widget _page(int i) => switch (i) {
@@ -290,50 +262,6 @@ class _TtcTabHostState extends State<TtcTabHost>
         _ => const TtcMoreTab(bottomNav: TtcBottomNav(active: 4, v3: true)),
       };
 
-  Widget _tab(int i) {
-    if (!_built.contains(i)) return const SizedBox.shrink();
-    final active = i == _to;
-    final leaving = !active && i == _from && _fade.isAnimating;
-    final shown = active || leaving;
-    // ⚠️ THE SAME WRAPPERS IN EVERY STATE. Adding or removing a transition
-    // widget when a tab goes on or off stage would change the tree above the
-    // page, and Flutter would throw the page's state away with it.
-    return Offstage(
-      offstage: !shown,
-      child: TickerMode(
-        enabled: shown,
-        child: HeroMode(
-          // Only the showing tab's photos may fly to a pushed page.
-          enabled: active,
-          child: IgnorePointer(
-            ignoring: !active,
-            child: ExcludeSemantics(
-              excluding: !active,
-              child: FadeTransition(
-                opacity: active
-                    ? _in
-                    : leaving
-                        ? _out
-                        : kAlwaysCompleteAnimation,
-                child: ScaleTransition(
-                  scale: active ? _scale : kAlwaysCompleteAnimation,
-                  child: PrimaryScrollController(
-                    controller: _scrolls[i],
-                    child: TtcTabScope(
-                      index: i,
-                      ownsBar: false,
-                      child: _page(i),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // The bar steps aside for the keyboard on every tab (Learn's rule L4,
@@ -350,8 +278,16 @@ class _TtcTabHostState extends State<TtcTabHost>
         // The ground between the two halves of the fade.
         color: ttcBg,
         child: Stack(fit: StackFit.expand, children: [
-          for (var i = 0; i < kTtcTabRoutes.length; i++)
-            KeyedSubtree(key: ValueKey('ttc_tab_$i'), child: _tab(i)),
+          PvTabFadeStack(
+            index: _to,
+            count: kTtcTabRoutes.length,
+            keyPrefix: 'ttc_tab',
+            builder: (context, i) => _page(i),
+            wrap: (i, page) => PrimaryScrollController(
+              controller: _scrolls[i],
+              child: TtcTabScope(index: i, ownsBar: false, child: page),
+            ),
+          ),
           // ⚠️ ONE BAR, ONE PLACE: the geometry Today and Tools always had
           // (14 from each side, 14 above the system inset).
           Positioned(

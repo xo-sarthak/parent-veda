@@ -22,6 +22,8 @@ import '../screens/ttc/ttc_askveda_screen.dart' as ttc_av;
 import '../services/app_nav.dart';
 import '../services/father_preview.dart';
 import '../services/pregnancy_controller.dart';
+import 'pv_toast.dart' show PvToast;
+import '../theme/pv_motion.dart';
 
 /// The one navigator the FAB pushes onto (the app's root navigator).
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
@@ -343,7 +345,8 @@ class GlobalAskFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([FabState.instance, FatherPreview.instance, AppNav.instance]),
+      animation: Listenable.merge(
+          [FabState.instance, FatherPreview.instance, AppNav.instance, PvToast.instance.fabClearance]),
       builder: (context, _) {
         // Hidden state MUST stay a Positioned child. A bare SizedBox.shrink()
         // here is a zero-sized NON-positioned child, which collapses an
@@ -367,9 +370,18 @@ class GlobalAskFab extends StatelessWidget {
         const bottom = kAskFabBottomOffset;
         final pad = MediaQuery.of(context).padding.bottom;
 
-        return Positioned(
+        // ⚠️ IT STEPS ASIDE FOR A TOAST (2026-10-21, the user: the toast must
+        // sit below the button, not above it). While a notice shows, the
+        // button glides up to clear its top edge by 12, then glides back.
+        // Kept for revert: Positioned(right: 16, bottom: bottom + (pad > 0 ? 0 : 6)).
+        final base = bottom + (pad > 0 ? 0 : 6);
+        final clear = PvToast.instance.fabClearance.value;
+        final still = MediaQuery.of(context).disableAnimations;
+        return AnimatedPositioned(
+          duration: still ? Duration.zero : const Duration(milliseconds: 260),
+          curve: PvMotion.arrive,
           right: 16,
-          bottom: bottom + (pad > 0 ? 0 : 6),
+          bottom: clear > 0 && clear + 12 > base ? clear + 12 : base,
           child: _pill(),
         );
       },
