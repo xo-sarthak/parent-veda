@@ -25,7 +25,7 @@ owed.
 | 2026-10-20 | Step 7: the child profile (soft delete + restore) and the name votes | 0105 | `d76594b` | yes (2026-10-20) |
 | 2026-10-20 | Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders) | 0106 | `d5787b2` | yes (2026-10-21) |
 | 2026-10-21 | Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools) | 0107 | `a728ec4` | yes (2026-10-21) |
-| 2026-10-21 | Steps 11 and 12: every write of her data confirmed, batched first sync, sign-out forgets memory and stops alarms, the 90-day purge | 0109 | pending | yes (2026-10-21) |
+| 2026-10-21 | Steps 11 and 12: every write of her data confirmed, batched first sync, sign-out forgets memory and stops alarms, the 90-day purge | 0109 | `984836f` | yes (2026-10-21) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -889,7 +889,7 @@ skipped every table after it.
 
 ## Steps 11 and 12: uploads nobody watched, batched first sync, sign-out really forgets, the purge
 
-**Date:** 2026-10-21 (planned and approved 2026-10-21). **Migration:** 0109 (run 2026-10-21; `pv-purge-removed` is cron job 3, active, `15 4 * * *`). **Commit:** pending
+**Date:** 2026-10-21 (planned and approved 2026-10-21). **Migration:** 0109 (run 2026-10-21; `pv-purge-removed` is cron job 3, active, `15 4 * * *`). **Commit:** `984836f`
 (one commit for both: `saved_store.dart`, `cycle_store.dart` and `ttc_log_store.dart` carry changes from each).
 
 **Why now, before step 10.** Step 10's shopping half (cart, orders, bought, product checklists) is to be rebuilt as

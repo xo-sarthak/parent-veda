@@ -33,7 +33,7 @@ step, newest at the bottom. When a step lands: tick it here, add its log entry t
 | 7 | Parenting's last two: the child profile (soft delete + Restore) and the name votes | 0105 (run 2026-10-20) | `d76594b` |
 | 8 | Pregnancy part 1: calendar, bump photos, the daily tables, weekly notes, reminders (`OwnRowLedger`) | 0106 (run 2026-10-21) | `d5787b2` |
 | 9 | Pregnancy part 2: medicines, scans and appointments, symptoms, the tools (`OwnRowLedger.single` for one-row tables) | 0107 (run 2026-10-21) | `a728ec4` |
-| 11 + 12 | Every write of her data confirmed and batched; sign-out forgets memory and stops alarms; the 90-day purge (done before 10, see below) | 0109 (run 2026-10-21) | pending |
+| 11 + 12 | Every write of her data confirmed and batched; sign-out forgets memory and stops alarms; the 90-day purge (done before 10, see below) | 0109 (run 2026-10-21) | `984836f` |
 
 ### Still to do, in order
 
