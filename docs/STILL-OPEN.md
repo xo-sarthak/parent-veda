@@ -10807,11 +10807,13 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
     copied runs in `pp_phases_data.dart`. All now 0 tells, 0 long, 0 copied,
     except one below. The rest of `pp_phases_data.dart` (71 tells) is text the
     doc overlay hides on all 20 phases, so it was left.
-  - **Left, to decide:** `CheckInQ('fine_motor', 'Does he pass a toy from one
-    hand to the other?')` matches What to Expect for 8 words, but its text is
-    the storage key `DevStore` saves answers under (synced). Rewording it
-    drops answers already given to that one question. Same phrase also in
-    `pp_milestones_data.dart:133`.
+  - **Reworded on the user's word (2026-10-22):** the fine-motor check-in is
+    now "Can he hand a toy across to his other hand?", and the `fm_transfer`
+    milestone line too. The text is the storage key, so a new
+    `kCheckInRenames` (old text -> new) moves a saved answer across when
+    `DevStore` loads; no answer is lost. The checker still counts one copied
+    run: the old text inside that map, a key never shown. Guard:
+    `test/pp_checkin_rename_test.dart`.
   - **For the content team (the docs are the source; the Dart is generated,
     tools/phase_pages):** the 20 phase docs carry 8 to 27 dashes or AI tells
     and 2 to 20 long sentences each; Flesch 51 to 67 (phase 15 lowest, 51).

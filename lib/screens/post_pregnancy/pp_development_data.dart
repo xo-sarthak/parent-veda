@@ -581,6 +581,13 @@ const List<(String, String)> kLookAheadPicks = [
 /// question nobody asked. That is the right behaviour, and it is a side effect
 /// of the key rather than a decision — worth knowing before anyone "tidies"
 /// the key into an id.
+/// A question whose wording changed: old text -> new text. The text is the
+/// storage key, so `DevStore` moves an answer saved under the old wording to
+/// the new one when it loads, and nobody loses a tick to a copy edit.
+const Map<String, String> kCheckInRenames = {
+  'Does he pass a toy from one hand to the other?': 'Can he hand a toy across to his other hand?',
+};
+
 const List<CheckInQ> kCheckIns0to6 = [
   CheckInQ('gross_motor', 'Does he push up on his forearms during tummy time?'),
   CheckInQ('social', 'Does he smile back when you smile at him?', redFlag: true),
@@ -594,7 +601,10 @@ const List<CheckInQ> kCheckIns6to12 = [
   CheckInQ('gross_motor', 'Can he sit without you holding him?', redFlag: true),
   CheckInQ('social', 'Does he look for you when you leave the room?'),
   CheckInQ('language', 'Does he babble strings of sounds, like ba-ba or da-da?', redFlag: true),
-  CheckInQ('fine_motor', 'Does he pass a toy from one hand to the other?'),
+  // Reworded 2026-10-22 (Wave 7): the old text matched What to Expect for
+  // 8 words. Answers saved under it move over in kCheckInRenames.
+  // CheckInQ('fine_motor', 'Does he pass a toy from one hand to the other?'),
+  CheckInQ('fine_motor', 'Can he hand a toy across to his other hand?'),
   CheckInQ('cognitive', 'Does he look for a toy after you hide it under a cloth?'),
   CheckInQ('emotional', 'Does he calm faster when you pick him up than when someone else does?'),
 ];
@@ -847,6 +857,11 @@ class DevStore extends ChangeNotifier with CloudSyncedStore {
       _checkIns
         ..clear()
         ..addAll(k.map((key, v) => MapEntry(key.toString(), v == true)));
+      // Carry answers across reworded questions (kCheckInRenames).
+      kCheckInRenames.forEach((from, to) {
+        final v = _checkIns.remove(from);
+        if (v != null) _checkIns.putIfAbsent(to, () => v);
+      });
     }
   }
 

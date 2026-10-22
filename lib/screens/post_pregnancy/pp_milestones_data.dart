@@ -130,7 +130,9 @@ const List<Milestone> kMilestones = [
   ),
   Milestone(
     id: 'fm_transfer', domain: DevDomain.fineMotor, title: 'Passing objects hand to hand', loMonths: 5, hiMonths: 8,
-    desc: 'Your baby moves a toy from one hand to the other and turns objects over to inspect them.',
+    // Reworded 2026-10-22 (Wave 7), the old text matched What to Expect:
+    // desc: 'Your baby moves a toy from one hand to the other and turns objects over to inspect them.',
+    desc: 'Your baby hands a toy across to the other hand, and turns things over to look at them.',
     why: 'Transferring shows growing coordination and curiosity — two hands working together with intent.',
     encourage: ['Offer toys to the middle so they choose a hand', 'Objects with interesting textures invite exploring', 'Name what they are holding'],
     variation: 'The smoothness of the hand-off improves gradually over months.',
