@@ -1917,7 +1917,7 @@ class _Hero extends StatelessWidget {
                           const SizedBox(width: 8),
                           _HeroRound(
                             p: p,
-                            semantic: 'Talk to someone',
+                            semantic: 'Talk to an expert', // was 'Talk to someone' (2026-10-22)
                             onTap: onTalk,
                             child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
                           ),
@@ -4322,7 +4322,7 @@ class _PaintedHero extends StatelessWidget {
                       const SizedBox(width: 8),
                       _HeroRound(
                         p: p,
-                        semantic: 'Talk to someone',
+                        semantic: 'Talk to an expert', // was 'Talk to someone' (2026-10-22)
                         onTap: onTalk,
                         child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
                       ),

@@ -137,7 +137,7 @@ void main() {
     expect(ttc, contains('onTalk: () =>'));
     expect(ttc, contains('onTap: onTalk,'));
     expect(_code('lib/screens/v2/v3_hero_chrome.dart'),
-        contains("label: 'Talk to someone'"));
+        contains("label: 'Talk to an expert'")); // was 'Talk to someone' (2026-10-22)
     expect(_code('lib/screens/post_pregnancy/pp_home_v3.dart'),
         contains("onTalk: () => _openSurface(context, 'pp_experts')"));
   });

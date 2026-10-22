@@ -1577,7 +1577,7 @@ class _CycleHeader extends StatelessWidget {
                     icon: Icons.forum_outlined,
                     p: p,
                     onTap: onTalk,
-                    semantic: 'Talk to someone'),
+                    semantic: 'Talk to an expert'), // was 'Talk to someone' (2026-10-22)
                 ]),
               ),
             ),

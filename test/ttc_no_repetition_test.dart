@@ -438,8 +438,9 @@ final List<(List<RegExp>, String)> _allowedDestinationRules = [
         'blood test by date, or "See your round" when none is dated yet.',
   ),
   (
-    [RegExp(r'^(semantics: )?Talk to someone$'), RegExp(r'^See all consults$')],
-    'The user, 2026-10-14: a "Talk to someone" mark in every home header, '
+    // Was 'Talk to someone'; renamed to 'Talk to an expert' (user, 2026-10-22).
+    [RegExp(r'^(semantics: )?Talk to an expert$'), RegExp(r'^See all consults$')],
+    'The user, 2026-10-14: a "Talk to an expert" mark in every home header, '
         'beside Messages and Calendar, so help is one tap from the top. It '
         'is chrome, like those two; "See all consults" under Talk to experts '
         'is the same page reached from the section that names it.',

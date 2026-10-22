@@ -214,7 +214,7 @@ class _V3HeroChromeState extends State<V3HeroChrome> {
       if (widget.onTalk != null) ...[
         Semantics(
           button: true,
-          label: 'Talk to someone',
+          label: 'Talk to an expert', // was 'Talk to someone' (2026-10-22)
           child: button(Icon(Icons.forum_outlined, size: 18, color: fg),
               widget.onTalk!),
         ),
