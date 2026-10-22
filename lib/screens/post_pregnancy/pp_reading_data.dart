@@ -160,7 +160,7 @@ const List<ReadArticle> kReadArticles = [
     author: kPpEditorialAuthor,
     authorRole: kPpEditorialRole,
     kind: ReadKind.research,
-    evidence: 'Aligned with paediatric sleep research on the maturation of infant sleep architecture around 3–4 months.',
+    evidence: 'Aligned with paediatric sleep research on the maturation of infant sleep architecture around 3 to 4 months.',
     relatedVideoId: 'sleep4mo',
     relatedVideoIds: ['q_soothe', 'q_noise', 'mumwellness'],
     relatedProductId: 'dozy',
@@ -182,7 +182,10 @@ const List<ReadArticle> kReadArticles = [
           //   'My baby has become a “bad sleeper” and we’ve created bad habits.',
           //   'This is neurological maturation, not a habit. Nearly every baby goes through it, and it settles as they learn to link sleep cycles, usually within 2–6 weeks.',
           "My baby has become a bad sleeper because of our habits.",
-          "A sleep change around 4 months is a normal stage, not a bad habit. Most babies settle within 2 to 6 weeks.",
+          // Plain words (2026-10-21), kept for revert: A sleep change around 4
+          //   months is a normal stage, not a bad habit. Most babies settle
+          //   within 2 to 6 weeks.
+          "Your baby hasn't become a bad sleeper, and your habits haven't caused this. Around 4 months, sleep changes as your baby's brain grows, and nearly every baby goes through it. Most babies settle within 2 to 6 weeks, as they learn to link their sleep cycles.",
         ),
       ),
       ReadSection(
@@ -270,14 +273,17 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'The real signs of readiness',
         paragraphs: [
-          'Forget the calendar for a moment and watch your baby. Readiness, usually around six months, looks like this: he can sit with support and hold his head steady, he’s eyeing your food with real interest, and he’s lost the reflex that pushes food back out with his tongue.',
+          'Forget the calendar for a moment and watch your baby. Readiness usually comes around six months. He can sit with support and hold his head steady, and he’s eyeing your food with real interest. He’s also lost the reflex that pushes food back out with his tongue.',
         ],
         mythFact: MythFact(
           // Plain words, one idea per sentence (2026-10-21). Kept for revert:
           //   'Start with rice cereal, and start by four months to help him sleep.',
           //   'Current guidance is to wait for readiness (around six months) and there’s no need to begin with bland cereal. Iron-rich foods matter more, and food doesn’t reliably improve sleep.',
           "Start rice cereal by 4 months to help your baby sleep.",
-          "Start solids at around 6 months, when your baby shows they're ready. Iron-rich foods matter more than cereal, and solids don't improve sleep.",
+          // Plain words (2026-10-21), kept for revert: Start solids at around 6
+          //   months, when your baby shows they're ready. Iron-rich foods
+          //   matter more than cereal, and solids don't improve sleep.
+          "Your baby doesn't need rice cereal, and starting solids early won't help them sleep. Start solids at around 6 months, when your baby shows they're ready. Iron-rich foods matter more than bland cereal at the start.",
         ),
       ),
       ReadSection(
@@ -324,7 +330,10 @@ const List<ReadArticle> kReadArticles = [
           //   'Giving attention to a tantrum rewards it and makes it worse.',
           //   'Young children can’t calm alone, they borrow ours. Calm, connected presence (not giving in to the demand) is how they learn regulation over time.',
           "Paying attention to a tantrum makes it worse.",
-          "Staying calm and close helps your child learn to calm down. Staying close is not the same as giving in.",
+          // Plain words (2026-10-21), kept for revert: Staying calm and close
+          //   helps your child learn to calm down. Staying close is not the
+          //   same as giving in.
+          "Staying calm and close during a tantrum won't make it worse. Young children can't calm down alone yet, so they borrow your calm. Staying close is not the same as giving in, and over time it's how your child learns to settle.",
         ),
       ),
       ReadSection(
@@ -370,13 +379,16 @@ const List<ReadArticle> kReadArticles = [
           //   'Teething causes high fever.',
           //   'Teething may raise the temperature very slightly, but a genuine fever is caused by something else. Don’t blame teeth for a real fever, treat it as illness.',
           "Teething causes a high fever.",
-          "Teething does not cause a high fever. A real fever means an illness, so call your doctor if you're worried.",
+          // Plain words (2026-10-21), kept for revert: Teething does not cause
+          //   a high fever. A real fever means an illness, so call your doctor
+          //   if you're worried.
+          "Teething doesn't cause a high fever, though it may raise your baby's temperature very slightly. A real fever means your baby is unwell with something else, so treat it as an illness. Call your doctor if you're worried.",
         ),
       ),
       ReadSection(
         heading: 'When to call, without hesitation',
         paragraphs: [
-          'Some things override the number entirely. Call your doctor for: any fever under three months of age, a rash that doesn’t fade under a glass, breathing difficulty, a fit, unusual drowsiness or floppiness, refusing all feeds, or simply your own strong sense that something is wrong. That instinct is data. Trust it.',
+          'Some things override the number entirely. Call your doctor for any fever under three months of age, a rash that doesn’t fade under a glass, breathing difficulty or a fit. Call, too, for unusual drowsiness or floppiness, refusing all feeds, or simply your own strong sense that something is wrong. That instinct is data. Trust it.',
         ],
         tip: ReadTip(
           'Watch the child, not the thermometer',
@@ -452,7 +464,7 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'Making it happy',
         paragraphs: [
-          'Go short and frequent rather than long, a few minutes, several times a day, building up as he tolerates it. Get down to his eye level, use a mirror or a favourite toy, and always stop before the grumbles turn to real upset, so it stays a good memory. On the tough days, lying chest-to-chest on you counts, too.',
+          'Go short and frequent rather than long, a few minutes, several times a day, building up as he tolerates it. Get down to his eye level and use a mirror or a favourite toy. Always stop before the grumbles turn to real upset, so it stays a good memory. On the tough days, lying chest-to-chest on you counts, too.',
         ],
         tip: ReadTip(
           'End on a high',
@@ -491,7 +503,10 @@ const List<ReadArticle> kReadArticles = [
           //   'This means letting him cry it out.',
           //   'Not at all. Drowsy-but-awake is gradual and gentle, you can stay, soothe and help. It’s about shifting the very last moment of falling asleep from your arms to his bed, slowly.',
           "Putting your baby down drowsy means letting them cry it out.",
-          "It doesn't. You can stay, soothe and help, and move the last moment of falling asleep to the cot slowly.",
+          // Plain words (2026-10-21), kept for revert: It doesn't. You can
+          //   stay, soothe and help, and move the last moment of falling asleep
+          //   to the cot slowly.
+          "Putting your baby down drowsy doesn't mean letting them cry it out. You can stay close, soothe and help them as they settle. The idea is to move the last moment of falling asleep from your arms to the cot, slowly and gently.",
         ),
       ),
       ReadSection(
@@ -533,13 +548,16 @@ const List<ReadArticle> kReadArticles = [
           //   'A good mother feels instant, uncomplicated bliss.',
           //   'Love often grows gradually, through the ordinary care of long days and nights. Mixed feelings are common and human, persistent hopelessness or dread, though, deserves support: please reach out.',
           "A good mother feels instant, simple happiness.",
-          "Love often grows slowly, through everyday care. If you feel hopeless or full of dread for days, please talk to your doctor.",
+          // Plain words (2026-10-21), kept for revert: Love often grows slowly,
+          //   through everyday care. If you feel hopeless or full of dread for
+          //   days, please talk to your doctor.
+          "A good mother doesn't always feel instant, simple happiness, and that's normal. Love often grows slowly, through the everyday care of long days and nights. Mixed feelings are common and human. If you feel hopeless or full of dread for days, please talk to your doctor.",
         ),
       ),
       ReadSection(
         heading: 'Be as kind to you',
         paragraphs: [
-          'You can’t pour from an empty cup, and you are not meant to do this alone. Accept the help. Lower the bar on everything that isn’t the baby or you. Protect small pockets of rest without guilt. Looking after yourself isn’t stealing from your child, it’s the very thing that lets you show up for them.',
+          'Nobody can keep giving with nothing left inside, and you were never meant to do this alone. Accept the help. Lower the bar on everything that isn’t the baby or you. Protect small pockets of rest without guilt. Looking after yourself isn’t stealing from your child, it’s the very thing that lets you show up for them.',
         ],
         tip: ReadTip(
           'One small thing',
@@ -552,7 +570,7 @@ const List<ReadArticle> kReadArticles = [
     id: 'csection',
     title: 'C-section recovery: the full picture',
     teaser: 'Major surgery, and a recovery that deserves as much attention as the birth, here’s what the weeks afterward really involve.',
-    whyToday: 'Whether you’re still deciding, have a date fixed, or are already home with your baby, this is the clear picture of recovery few people give you, in body and in heart.',
+    whyToday: 'You may be still deciding, have a date fixed, or already be home with your baby. Either way, this is the clear picture of recovery few people give you, in body and in heart.',
     collection: 'parent',
     ageTag: 'All stages',
     minutes: 9,
@@ -565,7 +583,7 @@ const List<ReadArticle> kReadArticles = [
     evidence: 'Aligned with standard obstetric guidance on caesarean recovery, wound healing and VBAC. General information for understanding, not a diagnosis, your own doctor knows your situation and your incision best.',
     sections: [
       ReadSection(paragraphs: [
-        'A C-section is major surgery, and the recovery deserves as much attention as the birth itself. Yet it is the part least talked about. Whether a mother is still deciding, has a date fixed, or is already home with her baby, this is a clear picture of what the weeks afterward involve, and what genuinely helps, in body and in heart.',
+        'A C-section is major surgery, and the recovery deserves as much attention as the birth itself. Yet it is the part least talked about. A mother may be still deciding, have a date fixed, or already be home with her baby. Either way, this is a clear picture of what the weeks afterward involve, and what really helps, in body and in heart.',
         'A quick note: this is for understanding, not diagnosis. Every recovery differs, and the timings here are general guides. A mother’s own doctor knows her situation and her incision best.',
       ]),
       ReadSection(
@@ -578,7 +596,7 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'The scar is the smallest part',
         paragraphs: [
-          'The line on the skin is the last and shallowest of several layers the surgeon moved through: skin, fat, the sheet of tissue over the muscles, the muscles themselves (parted, not cut), and the womb, each closed in turn.',
+          'The line on the skin is the last and shallowest of several layers the surgeon moved through. Under it lie fat, the sheet of tissue over the muscles, the muscles themselves (parted, not cut), and the womb. Each is closed in turn.',
           'The skin heals within weeks. The layers beneath keep healing for months. This is why a mother can look almost back to normal at six weeks and still feel tender and tired inside. The scar cannot show the whole of what is mending.',
         ],
       ),
@@ -601,8 +619,8 @@ const List<ReadArticle> kReadArticles = [
         heading: 'When the milk comes in',
         paragraphs: [
           'Few worries feel as tender as wondering whether there is enough milk. So it helps to know how normal a slow start is.',
-          'After a C-section, milk often comes in a little later. The fuller feeling many expect around day three can take longer, and research finds this happens to about one in three mothers, more so after a first baby. It is not a sign that something is wrong, or that there will not be enough.',
-          'In those first days, the body is already making colostrum, the concentrated early milk, which is exactly what a newborn needs in tiny amounts. What helps the fuller milk arrive is gentle and simple: feeding or expressing often, so the body receives the signal to make more; skin-to-skin contact, which calms both mother and baby and supports let-down; and a lactation consultant’s support if feeding feels hard.',
+          'After a C-section, milk often comes in a little later. The fuller feeling many expect around day three can take longer, and research finds this happens to about one in three mothers, more so after a first baby. A late start doesn’t mean anything has gone wrong, and it doesn’t mean there won’t be enough.',
+          'In those first days, the body is already making colostrum, the concentrated early milk, which is exactly what a newborn needs in tiny amounts. What helps the fuller milk arrive is gentle and simple. Feed or express often, so the body receives the signal to make more. Skin-to-skin contact calms both mother and baby and supports let-down. And a lactation consultant can help if feeding feels hard.',
           'The delay is common, temporary, and no one’s fault.',
         ],
       ),
@@ -610,7 +628,7 @@ const List<ReadArticle> kReadArticles = [
         heading: 'Feeding and moving while it heals',
         paragraphs: [
           'A C-section recovery is unusual, in that the patient is also the round-the-clock carer. A few practical habits make that kinder on a healing body.',
-          'Feeding positions that keep weight off the scar: the rugby (football) hold, with the baby along the mother’s side and nothing resting on the incision; side-lying, mother and baby facing each other, ideal for night feeds; and laid-back, reclining slightly with a pillow across the lap as a cushion between baby and incision.',
+          'Three feeding positions keep weight off the scar. The rugby (football) hold has the baby along the mother’s side, with nothing resting on the incision. Side-lying, mother and baby face each other, which is ideal for night feeds. Laid-back means reclining slightly, with a pillow across the lap as a cushion between baby and incision.',
           'Moving with less strain: get up by rolling onto one side first, then push up with the arms rather than the stomach. Take pain relief on the schedule a doctor advises, rather than waiting for the pain to peak. Keep water, snacks and baby essentials within reach of the feeding spot. Lift nothing heavier than the baby in the first weeks. And accept help, it is part of recovery, not a failure of it.',
         ],
         tip: ReadTip(
@@ -622,7 +640,7 @@ const List<ReadArticle> kReadArticles = [
         heading: 'About the belly',
         paragraphs: [
           '“How to reduce the belly” is one of the most common questions after a C-section, and the honest answer is reassuring. In the early weeks, the rounded tummy is mostly swelling, a still-shrinking womb, and muscles that separated during pregnancy, not fat.',
-          'So it is not something to attack with crash diets or hard workouts, especially while the body is healing and making milk. The gentler path works better: eating well rather than eating less, and, once a doctor gives clearance, rebuilding from the inside with breathing and pelvic-floor work before any sit-ups. A support binder can feel comforting, though it supports rather than slims. The shape returns with time.',
+          'So it is not something to attack with crash diets or hard workouts, especially while the body is healing and making milk. The gentler path works better: eating well rather than eating less. Once a doctor gives clearance, rebuild from the inside with breathing and pelvic-floor work before any sit-ups. A support binder can feel comforting, though it supports rather than slims. The shape returns with time.',
         ],
       ),
       ReadSection(
@@ -637,7 +655,7 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'Once a C-section, always? Not necessarily',
         paragraphs: [
-          'This belief is widely repeated, and for many mothers it is untrue. Whether a future vaginal birth fits depends on why the first C-section happened, the type of cut on the womb, and the gap before the next pregnancy, all of which a doctor can weigh.',
+          'This belief is widely repeated, and for many mothers it is untrue. Whether a future vaginal birth fits depends on why the first C-section happened, the type of cut on the womb, and the gap before the next pregnancy. A doctor can weigh all of these.',
           'In India, only about one in ten eligible mothers even attempt it, often because no one told them it was possible. Knowing it is an option is where a real choice begins.',
         ],
         mythFact: MythFact(
@@ -645,7 +663,11 @@ const List<ReadArticle> kReadArticles = [
           //   'Once a C-section, always a C-section.',
           //   'For many mothers this isn’t true. A vaginal birth after caesarean (VBAC) is a safe and reasonable option for many, succeeding roughly three times in four when suitable mothers attempt it, with serious risks kept low.',
           "Once you've had a C-section, every birth must be a C-section.",
-          "Many mothers can safely have a vaginal birth after a caesarean (VBAC). It works for about 3 in 4 suitable mothers, and your doctor will tell you if it's right for you.",
+          // Plain words (2026-10-21), kept for revert: Many mothers can safely
+          //   have a vaginal birth after a caesarean (VBAC). It works for about
+          //   3 in 4 suitable mothers, and your doctor will tell you if it's
+          //   right for you.
+          "Having one C-section doesn't mean every birth after it must be a C-section. Many mothers can safely have a vaginal birth after a caesarean (VBAC). It works for about 3 in 4 suitable mothers, and your doctor will tell you if it's right for you.",
         ),
       ),
       ReadSection(
@@ -658,7 +680,7 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'ParentVeda Insight',
         paragraphs: [
-          'Recovery is usually measured by how quickly a mother “bounces back”, the flat belly, the faded scar, the day she looks like she never had surgery. Her body is measuring something quieter: layers reconnecting, nerves regrowing a millimetre a month, a womb returning to size, milk arriving in its own time, love growing at its own pace. Bouncing back was never the real goal. Healing, in body and in heart, at her own pace, is.',
+          'Recovery is usually measured by how quickly a mother “bounces back”, the flat belly, the faded scar, the day she looks like she never had surgery. Her body is measuring something quieter. Layers are reconnecting and nerves regrow a millimetre a month. The womb returns to size, milk arrives in its own time, and love grows at its own pace. Bouncing back was never the real goal. Healing, in body and in heart, at her own pace, is.',
         ],
       ),
       ReadSection(

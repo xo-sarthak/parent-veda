@@ -415,7 +415,7 @@ const List<AgePhase> kPhasesAuthored = [
         'Feed whenever he shows hunger: rooting, sucking his hands, turning towards you. That is usually 8 to 12 times in 24 hours, and some feeds will come close together in the evening. Nothing but breast milk or formula, not even water or herbal drops.',
       ]),
       PhaseSection('Sleep now', [
-        'Newborns sleep 14 to 17 hours a day in short stretches, with no difference between day and night yet. On his back, in his own cot or crib beside your bed, with nothing soft around him.',
+        'Over a whole day, newborns sleep about 14 to 17 hours, in short stretches, and can’t yet tell day from night. On his back, in his own cot or crib beside your bed, with nothing soft around him.',
       ]),
       PhaseSection('Play that helps now', [
         'Your face is his favourite thing. Hold him about 20 to 30 cm from you and talk, sing and smile. Short bursts of tummy time on your chest count from the first days.',
@@ -789,7 +789,7 @@ const List<AgePhase> kPhasesAuthored = [
     workingOn: [
       'Sitting unsupported, hands free to play',
       'Babbling with consonants — ba, da, ma',
-      'Passing a toy from one hand to the other',
+      'Moving a toy across, from hand to hand',
     ],
     reassurance:
         '"Mama" and "dada" this early are usually sound practice rather than names. They become names in the months ahead, and it does not mean he loves you less in the meantime.',

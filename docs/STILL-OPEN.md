@@ -10793,7 +10793,31 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
     relevance brain (which reads the current child only).
   - Guard: `test/pp_phase_page_test.dart`. Updated tests that pinned the old
     map, phase screen and home sections (old assertions kept commented).
-- **§95.10 Wave 7** (warm copy): not started.
+- **§95.10 Wave 7, warm copy — DONE 2026-10-22** (copy edits only, not walked).
+  `tool/content_check/pp_content_check.py` over every Parenting door file
+  (`--all-parenting`) and the copy the home and phase page show.
+  - **Door content: clean.** 0 copied, 0 AI tells, 0 long sentences, Flesch
+    69 to 84. The 685 "door pronouns" are adults (mother, grandmother,
+    husband) and the characters of the bedtime stories and fables; none is
+    the child. `fam_settling_in` already reads warm and plain: unchanged.
+  - **Rewritten:** `pp_phase_faqs.dart` (18 tells, 4 long, and the child was
+    "he" on a page any family swipes to: now "my baby" / "my child", and three
+    scoreboard words gone), `pp_development_data.dart` (33 tells, 6 long),
+    `pp_reading_data.dart` (2 copied runs, 2 tells, 11 long), and the two
+    copied runs in `pp_phases_data.dart`. All now 0 tells, 0 long, 0 copied,
+    except one below. The rest of `pp_phases_data.dart` (71 tells) is text the
+    doc overlay hides on all 20 phases, so it was left.
+  - **Left, to decide:** `CheckInQ('fine_motor', 'Does he pass a toy from one
+    hand to the other?')` matches What to Expect for 8 words, but its text is
+    the storage key `DevStore` saves answers under (synced). Rewording it
+    drops answers already given to that one question. Same phrase also in
+    `pp_milestones_data.dart:133`.
+  - **For the content team (the docs are the source; the Dart is generated,
+    tools/phase_pages):** the 20 phase docs carry 8 to 27 dashes or AI tells
+    and 2 to 20 long sentences each; Flesch 51 to 67 (phase 15 lowest, 51).
+    PH003 has one 8-word run matching theAsianparent: "if your baby is not
+    making eye contact". Fix in the .docx, then re-run the converter.
+- **§95.11** The pass is complete through Wave 7.
 
 ## 96.0 The 2026-10-20 walk: TTC fixes and cross-stage content — 2026-10-21
 
@@ -10846,6 +10870,15 @@ Nothing here has been walked on a phone.
   the date. Until then the page says "Our guide price · check today's price on
   Amazon". Migration 0108, edge function `affiliate-refresh` on Amazon's
   Creators API (PA-API 5 was retired in 2026). BACKEND-PATTERNS §16ii-p.
+- **§96.8a Myths, round 2: whole, warm sentences — DONE 2026-10-22.** The user
+  found the 10-21 facts clipped ("Usually not.", "It hasn't."): "sentences that
+  look complete rather than just bland statements, more warm and reassuring".
+  142 of 150 boxes rewritten (TTC daily, door tiles, TTC, pregnancy and
+  parenting articles, the weekly myth-busters). Every fact now opens with a
+  sentence that answers the myth, with no new claims; loss boxes stay plain and
+  gentle. The 10-21 English is kept as "Plain words (2026-10-21)" comments
+  (the weekly JSON keeps it in git, 075359c). `test/ttc_myth_plain_test.dart`
+  fails any fact that opens with a stub, in all three stages.
 - **§96.9 Owed.**
   - A phone walk of everything above.
   - Real Amazon listings typed into `kPvAffiliateFacts` (`pv_affiliate.dart`):

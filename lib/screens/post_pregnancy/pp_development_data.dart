@@ -235,17 +235,17 @@ const List<DevArea> kDevAreas = [
     brainNote: 'His brain is wiring the idea that his actions change the world, the seed of all problem-solving.',
     seed: 1,
     about: [
-      'Thinking begins with a simple, astonishing discovery: that one thing makes another happen. Right now your baby is working out that his own hand reaching is what makes the toy move — cause, meet effect. It is the foundation every future bit of problem-solving is built on.',
-      'You will see it in the way he studies things: following your hand all the way to the toy, watching what happens when he bats at a rattle, beginning to expect the peekaboo before it comes. He is running tiny experiments all day long.',
-      'None of this needs flashcards or “brain-training”. It needs everyday moments where his actions clearly change something, and a calm narrator — you — putting words to what he is figuring out.',
+      'Thinking begins with a simple discovery: one thing makes another happen. Right now your baby is working out that his own reaching hand is what makes the toy move. That is cause and effect, and every later bit of problem-solving is built on it.',
+      'You will see it in the way he studies things. He follows your hand all the way to the toy, watches what happens when he bats at a rattle, and starts to expect the peekaboo before it comes. He is running tiny experiments all day long.',
+      'None of this needs flashcards or “brain-training”. It needs everyday moments where his actions clearly change something, and a calm narrator (you) putting words to what he is figuring out.',
     ],
     nextActivityId: 'peekaboo',
     /* relatedVideoId: 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */
     journey: [
-      DevStage('Notices contrast', 'mastered', 'He locks onto bold edges — black and white, a striped cushion, the line of your hairline against your face. Colour and fine detail come later; right now it is contrast that his eyes can actually resolve.', 'This is attention being built from nothing. Before he can learn anything about the world he has to be able to hold his gaze on one part of it, and a strong edge is the easiest thing to hold onto.'),
-      DevStage('Follows a moving toy', 'mastered', 'His eyes travel with something as you move it across him, and after a while his head follows too. Slow and close works far better than fast and far.', 'Tracking is the first time he predicts rather than reacts — his eyes arrive where the toy is going, not where it was. That same prediction is what later lets him reach for it.'),
-      DevStage('Cause & effect', 'current', 'He works out that HE did that. A hand swipes, the rattle sounds; a kick lands, the pram toy swings. You will see him do it again on purpose, watching to check it happens twice.', 'This is the beginning of thinking rather than sensing. It is also the first time he learns he has an effect on the world, which is the foundation of both confidence and every experiment he will ever run.', activities: ['peekaboo', 'highcontrast']),
-      DevStage('Object permanence', 'next', 'A toy under a cloth stops being gone and starts being hidden. Early on he looks where it disappeared; later he lifts the cloth to check.', 'It changes what absence means. It is why peekaboo becomes hilarious rather than alarming — and, a little later, it is also why you leaving the room becomes worth protesting about. Both come from the same new idea.', activities: ['peekaboo']),
+      DevStage('Notices contrast', 'mastered', 'He locks onto bold edges: black and white, a striped cushion, the line of your hairline against your face. Colour and fine detail come later; right now it is contrast that his eyes can actually resolve.', 'This is attention being built from nothing. Before he can learn anything about the world, he needs to hold his gaze on one part of it. A strong edge is the easiest thing to hold onto.'),
+      DevStage('Follows a moving toy', 'mastered', 'His eyes travel with something as you move it across him, and after a while his head follows too. Slow and close works far better than fast and far.', 'Tracking is the first time he predicts rather than reacts. His eyes arrive where the toy is going, not where it was. That same prediction is what later lets him reach for it.'),
+      DevStage('Cause & effect', 'current', 'He works out that HE did that. A hand swipes, the rattle sounds; a kick lands, the pram toy swings. You will see him do it again on purpose, watching to check it happens twice.', 'This is the beginning of thinking rather than sensing. It is also the first time he learns he has an effect on the world. Confidence grows from that, and so does every experiment he will ever run.', activities: ['peekaboo', 'highcontrast']),
+      DevStage('Object permanence', 'next', 'A toy under a cloth stops being gone and starts being hidden. Early on he looks where it disappeared; later he lifts the cloth to check.', 'It changes what absence means. It is why peekaboo becomes hilarious rather than alarming. A little later, it is also why you leaving the room becomes worth protesting about. Both come from the same new idea.', activities: ['peekaboo']),
       DevStage('Simple problem solving', 'future', 'He wants a toy, something is in the way, and instead of giving up or crying he goes around it. A cushion gets pushed aside, an arm reaches past a leg.', 'Two things are happening at once: he is holding a goal in mind, and he is trying a second route when the first fails. Persistence is not a personality trait yet, it is a skill, and this is it being practised.'),
     ],
   ),
@@ -263,18 +263,18 @@ const List<DevArea> kDevAreas = [
     seed: 2,
     about: [
       'The conversation starts long before the first word. Your baby is soaking up the melody, rhythm and turn-taking of language now, in every coo and every reply you give back. This is the groundwork the first words will stand on.',
-      'He is learning that sounds mean something, that his voice earns a response, and that talking happens back-and-forth. Squeals, raspberries and sing-song “aah-goo” are all rehearsal — the more you answer them, the more he practises.',
+      'He is learning that sounds mean something, that his voice earns a response, and that talking happens back-and-forth. Squeals, raspberries and sing-song “aah-goo” are all rehearsal, and the more you answer them, the more he practises.',
       'The simplest things matter most: narrate your day, sing, and pause to leave room for his reply. You do not need to teach words; you just need to have the conversation.',
     ],
     nextActivityId: 'narrate',
     relatedArticle: 'Talking to your baby before they can talk',
     relatedVideoId: 'babbling',
     journey: [
-      DevStage('Cooing', 'mastered', 'Soft open vowels — aah, ooh, ngah — usually aimed at your face when he is calm and fed and you are close enough for him to see you properly.', 'These are not random noises. He is discovering that he owns the sound, and that making it brings your face closer. That is the whole shape of a conversation, learned before a single word.'),
+      DevStage('Cooing', 'mastered', 'Soft open vowels like aah, ooh and ngah, usually aimed at your face. They come when he is calm and fed and you are close enough for him to see you properly.', 'These are not random noises. He is discovering that he owns the sound, and that making it brings your face closer. That is the whole shape of a conversation, learned before a single word.'),
       DevStage('Musical babble', 'current', 'Squeals, raspberries, growls and long sing-song runs. It rises and falls like speech without any of the words being real yet.', 'He is rehearsing the MUSIC of language before the vocabulary: the rhythm and the melody of the language he hears at home. A baby in a Hindi-speaking house babbles with a different tune from one in an English-speaking house, long before either says a word.', activities: ['narrate', 'song']),
-      DevStage('Turn-taking', 'next', 'You say something, he waits, and then he answers. Leave a gap and he fills it; talk over him and he stops.', 'This is the single most useful thing he learns about talking, and it is entirely about your pauses rather than your words. Conversation is a rhythm first and a vocabulary second.', activities: ['narrate']),
+      DevStage('Turn-taking', 'next', 'You say something, he waits, and then he answers. Leave a gap and he fills it; talk over him and he stops.', 'Of everything he learns about talking, this may help most, and it is all about your pauses rather than your words. Conversation is a rhythm first and a vocabulary second.', activities: ['narrate']),
       DevStage('Babble with consonants', 'future', 'Ba-ba, da-da, ma-ma arrive and get repeated endlessly. At first they mean nothing at all, however much everyone in the house insists otherwise.', 'Consonants need lips, tongue and breath working together, so this is a physical achievement as much as a language one. The syllables he practises now are the ones his first real words will be made of.'),
-      DevStage('First words', 'future', 'One sound starts meaning one thing, reliably — the same noise for milk, or for the dog, every time. It often is not a word an adult would recognise.', 'The leap is not the pronunciation, it is the idea that a sound can STAND FOR something that is not present. Understanding runs well ahead of speaking here: he knows far more words than he can say, and that gap is normal.'),
+      DevStage('First words', 'future', 'One sound starts meaning one thing, reliably: the same noise for milk, or for the dog, every time. It often is not a word an adult would recognise.', 'The leap is not the pronunciation, it is the idea that a sound can STAND FOR something that is not present. Understanding comes well before speaking here: he knows far more words than he can say, and that gap is normal.'),
     ],
   ),
   DevArea(
@@ -290,19 +290,19 @@ const List<DevArea> kDevAreas = [
     brainNote: 'Each push-up wires the neck, core and coordination he’ll build every future move on.',
     seed: 3,
     about: [
-      'Every big movement builds on the last. Head control came first; now your baby is pushing up strong on the floor and rocking — the first roll is close. Each of these is a rung on the ladder that leads to sitting, crawling and, eventually, those first steps.',
-      'This is physical strength and brain wiring at the same time: every push-up and wobble is teaching his neck, core and coordination to work together. Being on the floor, free to move, is the single best thing for it.',
-      'You cannot rush the timeline — every baby arrives at each move in his own week. What helps is plenty of safe, happy floor time and a little something just out of reach to tempt him toward it.',
+      'Every big movement builds on the last. Head control came first; now your baby is pushing up strong on the floor and rocking, and the first roll is close. Each of these is a rung on the ladder that leads to sitting, crawling and, eventually, those first steps.',
+      'This is physical strength and brain wiring at the same time: every push-up and wobble is teaching his neck, core and coordination to work together. Being on the floor, free to move, is the best thing for it.',
+      'You cannot rush the timeline. Every baby arrives at each move in his own week. What helps is plenty of safe, happy floor time and a little something just out of reach to tempt him toward it.',
     ],
     nextActivityId: 'tummy_play',
     relatedVideoId: 'tummytime',
     journey: [
       DevStage('Head control', 'mastered', 'His head stops needing your hand. He holds it steady when upright, and lifts it while lying on his front.', 'Almost everything else waits on this. He cannot look around, reach, sit or feed himself until his head is stable, so this is less a milestone than the platform the others are built on.'),
-      DevStage('Pushes up on forearms', 'mastered', 'On his tummy he plants his elbows and lifts his chest clear of the floor, and can hold it there long enough to look around.', 'It builds the shoulders, back and neck that rolling and crawling will need, and it changes what he can see: from a nose-to-the-mat view to the whole room. Short, frequent stretches beat one long one.'),
-      DevStage('Rolling', 'current', 'Rocking turns into a roll — usually tummy to back first, because it takes less strength, and back to tummy weeks or months later.', 'It is the first time he changes where he is without anyone carrying him, and the first real reason to stop leaving him alone on a bed or sofa. Independence and hazard arrive on the same afternoon.', activities: ['tummy_play', 'roll_help']),
-      DevStage('Sitting with support', 'next', 'Propped on cushions or on your leg he holds himself upright, wobbling, and topples cheerfully. Unsupported sitting follows once his trunk catches up.', 'Sitting frees his hands. Lying down, a baby needs his arms for stability; upright, both hands can explore at once, which is why so much fine-motor progress arrives just after he can sit.'),
+      DevStage('Pushes up on forearms', 'mastered', 'On his tummy he plants his elbows and lifts his chest clear of the floor, and can hold it there long enough to look around.', 'It builds the shoulders, back and neck that rolling and crawling will need. It also changes what he can see, from a nose-to-the-mat view to the whole room. Short, frequent stretches beat one long one.'),
+      DevStage('Rolling', 'current', 'Rocking turns into a roll, usually tummy to back first because it takes less strength, and back to tummy weeks or months later.', 'It is the first time he changes where he is without anyone carrying him. It is also the first real reason to stop leaving him alone on a bed or sofa. Independence and hazard arrive on the same afternoon.', activities: ['tummy_play', 'roll_help']),
+      DevStage('Sitting with support', 'next', 'Propped on cushions or on your leg he holds himself upright, wobbling, and topples cheerfully. Unsupported sitting follows once his trunk catches up.', 'Sitting frees his hands. Lying down, a baby needs his arms for stability; upright, both hands can explore at once. That is why so much fine-motor progress arrives just after he can sit.'),
       DevStage('Crawling', 'future', 'Commando shuffling, bottom-scooting, rolling across a room, or a textbook hands-and-knees crawl. All of them count, and some babies skip it entirely and go straight to pulling up.', 'The point is self-directed movement, not the style. He can now decide where to be, which changes how he learns: the world stops being what you bring him and becomes what he goes and finds.'),
-      DevStage('Standing & walking', 'future', 'He pulls up on furniture, cruises sideways along it, and eventually lets go. First steps are wide, stiff-armed and short.', 'The range here is enormous — anywhere from nine to eighteen months is ordinary — and early walking predicts nothing about later ability. What he gains is his hands: a walking child can carry something to you.'),
+      DevStage('Standing & walking', 'future', 'He pulls up on furniture, cruises sideways along it, and eventually lets go. First steps are wide, stiff-armed and short.', 'The range here is wide. Anywhere from 9 to 18 months is ordinary, and early walking predicts nothing about later ability. What he gains is his hands: a walking child can carry something to you.'),
     ],
   ),
   DevArea(
@@ -323,7 +323,7 @@ const List<DevArea> kDevAreas = [
       DevStage('Hands to midline', 'mastered', 'He brings both hands together in front of his chest, usually finds them with his eyes, and often takes them straight to his mouth.', 'Working across the middle of the body is harder than it sounds and it is a prerequisite for anything two-handed. It is also how he discovers his hands are HIS, which is the beginning of a body he owns.'),
       DevStage('Reaching & grasping', 'current', 'Swiping near a toy becomes a deliberate reach, and then a closed fist around it. Aim is poor at first, and improves fast with practice.', 'Reaching is eye and hand agreeing about where something is. It is also his first tool for satisfying his own curiosity: until now, whatever he wanted to examine had to be brought to him.', activities: ['reach_ring', 'texture']),
       DevStage('Transfers hand to hand', 'next', 'A toy in one hand gets passed to the other, often with a pause in the middle while both hands hold it.', 'It needs the two halves of his brain to cooperate, and it doubles what he can do: one hand can hold while the other explores. Most self-feeding depends on this without anyone noticing.'),
-      DevStage('Pincer grasp', 'future', 'Finger and thumb close on something small — a pea, a crumb, a bit of thread off the floor. It starts raking and refines to a neat pinch.', 'This is the hand becoming precise, and it is what makes real self-feeding possible. It is also why floor sweeping matters more from now on: anything he can pinch, he can lift, and anything he can lift goes in his mouth.'),
+      DevStage('Pincer grasp', 'future', 'Finger and thumb close on something small: a pea, a crumb, a bit of thread off the floor. It starts raking and refines to a neat pinch.', 'This is the hand becoming precise, and it is what makes real self-feeding possible. It is also why floor sweeping matters more from now on: anything he can pinch, he can lift, and anything he can lift goes in his mouth.'),
     ],
   ),
   DevArea(
@@ -336,18 +336,18 @@ const List<DevArea> kDevAreas = [
     stage: 'Borrowing your calm',
     summary: 'Beams with joy, and settles fastest in your steady arms.',
     todayTip: 'When he fusses, slow your own breathing and voice, he tunes to your calm.',
-    brainNote: 'He can’t regulate emotions alone yet, he literally borrows yours. That’s co-regulation.',
+    brainNote: 'He can’t regulate emotions alone yet, so he borrows yours. That’s co-regulation.',
     seed: 5,
     about: [
-      'Your baby feels big feelings, but he has none of the tools to manage them yet — so he borrows yours. When he settles fastest in your steady arms, that is not a habit to break; it is exactly how emotional development is meant to work at this age.',
-      'This is called co-regulation: your calm voice and slow breathing literally settle his nervous system. Every time you soothe him, you are laying down the wiring he will one day use to soothe himself.',
-      'The social side is blossoming too — he beams across a room, and a laugh now earns a laugh back. Warm, responsive back-and-forth is what teaches him that he is safe, loved and understood.',
+      'Your baby feels big feelings, but he has none of the tools to manage them yet, so he borrows yours. When he settles fastest in your steady arms, that is not a habit to break; it is exactly how emotional development is meant to work at this age.',
+      'This is called co-regulation: your calm voice and slow breathing settle his nervous system. Every time you soothe him, you are laying down the wiring he will one day use to soothe himself.',
+      'The social side is growing too. He beams across a room, and a laugh now earns a laugh back. Warm, responsive back-and-forth is what teaches him that he is safe, loved and understood.',
     ],
     relatedVideoId: 'mumwellness',
     journey: [
       DevStage('Social smile', 'mastered', 'A smile aimed at a person, in response to a face or a voice, rather than the fleeting smiles of sleep and wind that came before it.', 'It is the first thing he does purely to connect, with nothing to gain. For most parents it is also the moment the exhausting early weeks start paying something back, which matters more than anyone admits.'),
-      DevStage('Borrowing your calm', 'current', 'When he is upset your steady voice and unhurried hands settle him — not instantly, and not every time, but noticeably.', 'A baby cannot calm himself yet, so he uses yours. Every time it works he learns that big feelings end, which is the thing he will eventually be able to do alone. It is also why your own calm is worth protecting.', activities: ['song']),
-      DevStage('Expressing delight', 'next', 'Belly laughs, squeals, kicking with excitement — and repeating whatever caused it, looking at you to do it again.', 'His feelings stop being only comfort and distress and start having range. Sharing the joy is the new part: the laugh is aimed at you, not just produced near you.'),
+      DevStage('Borrowing your calm', 'current', 'When he is upset your steady voice and unhurried hands settle him. Not instantly, and not every time, but noticeably.', 'A baby cannot calm himself yet, so he uses yours. Every time it works he learns that big feelings end, which is the thing he will eventually be able to do alone. It is also why your own calm is worth protecting.', activities: ['song']),
+      DevStage('Expressing delight', 'next', 'Belly laughs, squeals, kicking with excitement. Then he repeats whatever caused it, looking at you to do it again.', 'His feelings stop being only comfort and distress and start having range. Sharing the joy is the new part: the laugh is aimed at you, not just produced near you.'),
       DevStage('Self-soothing begins', 'future', 'A thumb, a fist, a corner of cloth, turning his head away from too much. Small, unglamorous strategies that take the edge off.', 'These are his first tools for managing himself, and they arrive alongside your comfort rather than replacing it. Needing you and having a thumb are not in competition.'),
     ],
   ),
@@ -365,10 +365,10 @@ const List<DevArea> kDevAreas = [
     seed: 6,
     nextActivityId: 'peekaboo',
     journey: [
-      DevStage('Prefers faces', 'mastered', 'Given anything else to look at, he chooses a face — and yours above the others. Eye contact holds longer than it did.', 'Faces are where everything social begins, and he is wired to find them before he is wired for anything else. In a joint family this is also how he sorts the people around him into familiar and new.'),
-      DevStage('Social back-and-forth', 'current', 'He smiles or vocalises AT you, waits, and brightens when you answer. Stop answering and he tries harder, then gives up.', 'This is serve and return, the single best-supported thing in early development, and it needs nothing but your attention. What builds his brain here is that the answer comes back, not what the answer is.', activities: ['peekaboo', 'narrate']),
+      DevStage('Prefers faces', 'mastered', 'Given anything else to look at, he chooses a face, and yours above the others. Eye contact holds longer than it did.', 'Faces are where everything social begins, and he is wired to find them before he is wired for anything else. In a joint family this is also how he sorts the people around him into familiar and new.'),
+      DevStage('Social back-and-forth', 'current', 'He smiles or vocalises AT you, waits, and brightens when you answer. Stop answering and he tries harder, then gives up.', 'This is serve and return, one of the best-supported ideas in early development, and it needs nothing but your attention. What builds his brain here is that the answer comes back, not what the answer is.', activities: ['peekaboo', 'narrate']),
       DevStage('Enjoys games', 'next', 'Peekaboo, this-little-piggy, gonna-get-you. He starts anticipating the ending and laughing before it arrives.', 'Anticipating means he is holding a sequence in mind and predicting what comes next. The delight is real, and so is the thinking underneath it.'),
-      DevStage('Stranger awareness', 'future', 'New faces get a long stare, a turned-away head, or tears — including with relatives he was happy with last month.', 'It looks like a step backwards and it is the opposite: he can now tell his people from everyone else, which is exactly what attachment is. In a house with many visitors this can be hard on everyone, and it passes.'),
+      DevStage('Stranger awareness', 'future', 'New faces get a long stare, a turned-away head, or tears. That includes relatives he was happy with last month.', 'It looks like a step backwards and it is the opposite: he can now tell his people from everyone else, which is exactly what attachment is. In a house with many visitors this can be hard on everyone, and it passes.'),
     ],
   ),
   DevArea(
@@ -385,9 +385,9 @@ const List<DevArea> kDevAreas = [
     seed: 7,
     nextActivityId: 'texture',
     journey: [
-      DevStage('Sensory delight', 'current', 'He seeks out texture, contrast, light and sound — a steel bowl, a crumpled dupatta, sunlight through a curtain.', 'Everything he will later imagine is built from things he has actually felt. The ordinary house is better material than most toys, and free.', activities: ['texture', 'highcontrast']),
-      DevStage('Exploring with mouth & hands', 'next', 'Everything goes in the mouth, and gets turned over, banged and dropped on the way there.', 'His mouth has more nerve endings than his fingers do, so mouthing is genuine investigation rather than a habit to stop. It does mean small objects and floor sweeping need real attention now.'),
-      DevStage('Cause-and-effect play', 'future', 'Deliberate banging, dropping, shaking and posting — and doing it again immediately to see whether the same thing happens.', 'Repetition is the experiment, not boredom. He is testing whether the world is reliable, and dropping a spoon forty times is how you find out.'),
+      DevStage('Sensory delight', 'current', 'He seeks out texture, contrast, light and sound: a steel bowl, a crumpled dupatta, sunlight through a curtain.', 'Everything he will later imagine is built from things he has actually felt. The ordinary house is better material than most toys, and free.', activities: ['texture', 'highcontrast']),
+      DevStage('Exploring with mouth & hands', 'next', 'Everything goes in the mouth, and gets turned over, banged and dropped on the way there.', 'His mouth has more nerve endings than his fingers do, so mouthing is real investigation rather than a habit to stop. It does mean small objects and floor sweeping need real attention now.'),
+      DevStage('Cause-and-effect play', 'future', 'Deliberate banging, dropping, shaking and posting, then doing it again straight away to see whether the same thing happens.', 'Repetition is the experiment, not boredom. He is testing whether the world is reliable, and dropping a spoon forty times is how you find out.'),
     ],
   ),
   DevArea(
@@ -403,9 +403,9 @@ const List<DevArea> kDevAreas = [
     brainNote: 'The first flickers of independence, small self-soothing that grows into big self-reliance.',
     seed: 8,
     journey: [
-      DevStage('Hands to mouth', 'current', 'He finds his own hands and takes them to his mouth on purpose, rather than by accident.', 'It is his first act of self-comfort, and the first thing he does for himself without waiting for anyone. Small, and genuinely a beginning.'),
+      DevStage('Hands to mouth', 'current', 'He finds his own hands and takes them to his mouth on purpose, rather than by accident.', 'It is his first act of self-comfort, and the first thing he does for himself without waiting for anyone. Small, but a real beginning.'),
       DevStage('Holds during feeds', 'next', 'A hand rests on the bottle, or pats and holds while feeding at the breast. Not taking over, just joining in.', 'Feeding stops being something done to him and starts being something he takes part in. That shift, not the grip, is the skill.'),
-      DevStage('Finger foods', 'future', 'He picks up soft pieces himself and gets some of them in. Most of it ends up on the floor, the chair and him.', 'Self-feeding is fine motor, judgement and appetite all at once, and the mess is not a side effect of learning it — it IS the learning. Letting him do it badly is faster than doing it for him.'),
+      DevStage('Finger foods', 'future', 'He picks up soft pieces himself and gets some of them in. Most of it ends up on the floor, the chair and him.', 'Self-feeding is fine motor, judgement and appetite all at once, and the mess is not a side effect of learning it. It IS the learning. Letting him do it badly is faster than doing it for him.'),
     ],
   ),
 ];
@@ -423,7 +423,7 @@ const List<DevActivity> kDevActivities = [
     skills: ['Object permanence', 'Social connection', 'Cause & effect'],
     safety: ['Keep any cloth light and away from his face', 'Stop if he seems overwhelmed'],
     benefit: 'Plants the first seed of object permanence, the idea that things (and you) still exist when out of sight.',
-    steps: ['Hide your face behind your hands.', 'Pause a beat, let the anticipation build.', 'Reveal with a warm “peekaboo!”.', 'Watch his reaction, and follow his lead on the pace.'],
+    steps: ['Hide your face behind your hands.', 'Pause a beat, let the anticipation build.', 'Reveal with a warm “peekaboo”.', 'Watch his reaction, and follow his lead on the pace.'],
     seed: 11,
   ),
   DevActivity(
@@ -493,7 +493,7 @@ const List<DevActivity> kDevActivities = [
     skills: ['Sensory exploration', 'Fine motor', 'Curiosity'],
     safety: ['Everything larger than his mouth', 'Supervise closely'],
     benefit: 'Feeds his senses and builds the neural pathways that curiosity and creativity grow from.',
-    steps: ['Gather 3–4 safe items with different textures.', 'Offer one at a time to touch and hold.', 'Name each feeling, “soft”, “crinkly”.', 'Follow his interest; there’s no wrong way.'],
+    steps: ['Gather 3 or 4 safe items with different textures.', 'Offer one at a time to touch and hold.', 'Name each feeling, “soft”, “crinkly”.', 'Follow his interest; there’s no wrong way.'],
     seed: 16,
   ),
   DevActivity(
@@ -532,7 +532,7 @@ const String kBrainThisWeek =
 
 const List<BrainTopic> kBrainTopics = [
   BrainTopic('Recognising familiar faces', 'He now knows your face from a stranger’s, and lights up for it. This is memory and social wiring, together.', 'Lots of face-to-face time and warm eye contact strengthens it.'),
-  BrainTopic('Cause and effect', 'He’s grasping that his own actions make things happen, the foundation of thinking and problem-solving.', 'Give him simple “I did that!” moments, like a rattle that sounds when he moves it.'),
+  BrainTopic('Cause and effect', 'He’s grasping that his own actions make things happen, the foundation of thinking and problem-solving.', 'Give him simple “I did that” moments, like a rattle that sounds when he moves it.'),
   BrainTopic('The music of language', 'His brain is mapping the rhythm and melody of speech long before he understands words.', 'Talk, sing and pause for his reply, narration is brain food.'),
   BrainTopic('Borrowing calm', 'The part that manages big feelings is years from ready, for now, he regulates by tuning into you.', 'Your steady voice and slow breathing literally settle his nervous system.'),
 ];
@@ -904,34 +904,34 @@ List<String> helpBulletsFor(DevArea area, DevStage stage) {
     case 'gross_motor':
       return const [
         'Floor time beats any equipment. A firm blanket and space to push against does more than a seat or a bouncer.',
-        'Put one favourite toy just past his reach — close enough to be worth it, far enough to need the stretch.',
+        'Put one favourite toy just past his reach: close enough to be worth it, far enough to need the stretch.',
         'Let him work at it before you rescue him. The wobble IS the exercise; steadying him too soon removes the very thing building the strength.',
         'Short and often beats long and once. A few minutes several times a day, always stopping while he is still happy.',
       ];
     case 'cognitive':
       return const [
-        'Pause after you respond. He needs a beat of quiet to notice that HIS action caused YOUR reaction — that gap is where the learning happens.',
+        'Pause after you respond. He needs a beat of quiet to notice that HIS action caused YOUR reaction. That gap is where the learning happens.',
         'Repeat the same game far past your own boredom. Repetition is how a hunch becomes a rule for him.',
         'Narrate the cause out loud: "you shook it, and it rattled". Words attach to the pattern he is already sensing.',
-        'Give him things that respond honestly — a rattle, a crinkly page, a lid. Toys that do everything by themselves teach him nothing about his own effect.',
+        'Give him things that respond honestly: a rattle, a crinkly page, a lid. Toys that do everything by themselves teach him nothing about his own effect.',
       ];
     case 'language':
       return const [
         'Leave a gap after you speak, as though waiting for an answer. Turn-taking is learned long before words arrive.',
         'Answer his sounds as if they were sentences. Copying his coo back is a conversation to him.',
-        'Narrate what you are doing while you do it — changing, cooking, walking. Ordinary commentary is the richest input there is.',
+        'Narrate what you are doing while you do it: changing, cooking, walking. Ordinary commentary is the richest input there is.',
         'Face him when you talk. He is reading your mouth as much as hearing you.',
       ];
     case 'emotional':
       return const [
         'Respond to the small bids, not only the crying. A look held and returned is the whole skill in miniature.',
         'Let him set the pace with new people. Being passed around teaches him his signals do not count.',
-        'Name what he seems to feel — "that was a surprise, wasn\'t it". Long before he understands the words he learns the feeling has a shape.',
+        'Name what he seems to feel: "that was a surprise, wasn\'t it". Long before he understands the words he learns the feeling has a shape.',
         'Repair after the hard moments. Babies do not need parents who never get it wrong, only ones who come back.',
       ];
     default:
       return [
-        'Follow his lead — interest is the engine, and ${stage.name.toLowerCase()} arrives faster when he is enjoying it.',
+        'Follow his lead. Interest is the engine, and ${stage.name.toLowerCase()} arrives faster when he is enjoying it.',
         'Keep it short and stop while he is still content. Ending on a good moment makes the next one easier.',
         'Repeat it often. What looks like the same game to you is a fresh rehearsal to him.',
       ];
