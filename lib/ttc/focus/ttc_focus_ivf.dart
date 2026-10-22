@@ -796,10 +796,15 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
           // in place. Gentle, everyday activity is what's usually advised.
           // Lying in bed for days is hard on your body and harder on your
           // mind. Follow whatever your own clinic tells you.
-          fact: "It doesn't help. Trials found bed rest doesn't make "
-              "pregnancy more likely, and some found slightly worse results. "
-              "Gentle, everyday activity is the usual advice. Follow what "
-              "your own clinic tells you.",
+          // Plain words (2026-10-21), kept for revert: It doesn't help. Trials
+          // found bed rest doesn't make pregnancy more likely, and some found
+          // slightly worse results. Gentle, everyday activity is the usual
+          // advice. Follow what your own clinic tells you.
+          fact: "Bed rest after embryo transfer hasn't been shown to help it "
+              "implant. Trials found it doesn't make pregnancy more likely, "
+              "and some found slightly worse results. Gentle, everyday "
+              "activity is the usual advice, but always follow what your own "
+              "clinic tells you.",
         ),
         // WARNING: AN ARTICLE NOW, AND THE MYTH FORMAT WAS THE WRONG ONE. A
         // myth card needs a false belief to correct, and there is no myth here

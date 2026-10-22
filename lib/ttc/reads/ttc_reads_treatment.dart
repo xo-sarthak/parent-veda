@@ -107,9 +107,13 @@ final List<PvRead> kTtcReadsTreatment = [
           // clinic may be able to change the plan or the collection time.
           // Only they can say, which is why the phone call matters more than
           // the worry.
-          fact: _en('Not always. Call your clinic straight away. They may be '
-              'able to change the plan or the collection time, and only they '
-              'can say.'),
+          // Plain words (2026-10-21), kept for revert: Not always. Call your
+          // clinic straight away. They may be able to change the plan or the
+          // collection time, and only they can say.
+          fact: _en("A problem with the trigger shot doesn't always ruin the "
+              "whole cycle. Call your clinic straight away. They may be able "
+              "to change the plan or the collection time, and only they can "
+              "say."),
         ),
       ),
       PvReadSection(
@@ -225,9 +229,13 @@ final List<PvRead> kTtcReadsTreatment = [
           // Plain words (2026-10-21). Kept for revert: There's no evidence
           // that this helps, and the embryo can't fall out. Rest if you're
           // tired, and move about as you like.
-          fact: _en("You don't need to. Lying flat hasn't been shown to help, "
-              "and the embryo can't fall out. Rest if you're tired and move "
-              "about as you like."),
+          // Plain words (2026-10-21), kept for revert: You don't need to. Lying
+          // flat hasn't been shown to help, and the embryo can't fall out. Rest
+          // if you're tired and move about as you like.
+          fact: _en("You don't need to lie flat or avoid stairs after a "
+              "transfer. Lying flat hasn't been shown to help, and the embryo "
+              "can't fall out. Rest if you're tired, and move about as you "
+              "like."),
         ),
       ),
       PvReadSection(
@@ -1081,10 +1089,15 @@ final List<PvRead> kTtcReadsTreatment = [
           // numbers can raise the risk of OHSS, and a smaller number of good
           // eggs can be enough. Your clinic is aiming for what's safe and
           // right for you, not for the most.
-          fact: _en('Not always. Very high numbers raise the risk of OHSS '
-              '(when the ovaries over-react to the medicines). A smaller '
-              'number of good eggs can be enough. Your clinic aims for safe, '
-              'not for the most.'),
+          // Plain words (2026-10-21), kept for revert: Not always. Very high
+          // numbers raise the risk of OHSS (when the ovaries over-react to the
+          // medicines). A smaller number of good eggs can be enough. Your
+          // clinic aims for safe, not for the most.
+          fact: _en("More follicles don't always mean a better cycle. Very "
+              "high numbers raise the risk of OHSS (when the ovaries "
+              "over-react to the medicines). A smaller number of good eggs can "
+              "be enough. Your clinic is aiming for what's safe for you, not "
+              "for the most."),
         ),
       ),
       PvReadSection(
@@ -1219,9 +1232,14 @@ final List<PvRead> kTtcReadsTreatment = [
           // inside the womb, past the neck of it. Standing up doesn't let
           // them out. Follow your clinic's advice on resting, and then carry
           // on with your day.
-          fact: _en("You don't. The sperm are placed right inside the womb, "
-              "so standing up doesn't let them out. Follow your clinic's "
-              "advice on resting, then carry on with your day."),
+          // Plain words (2026-10-21), kept for revert: You don't. The sperm are
+          // placed right inside the womb, so standing up doesn't let them out.
+          // Follow your clinic's advice on resting, then carry on with your
+          // day.
+          fact: _en("You don't need to keep your legs up after an IUI. The "
+              "sperm are placed right inside the womb, so standing up doesn't "
+              "let them out. Follow your clinic's advice on resting, then "
+              "carry on with your day as normal."),
         ),
       ),
       PvReadSection(
@@ -1513,9 +1531,12 @@ final List<PvRead> kTtcReadsTreatment = [
           // Plain words (2026-10-21). Kept for revert: Freezing today is very
           // fast and gentle, and most good embryos come through thawing well.
           // An embryo isn't weaker for having waited.
-          fact: _en("They aren't. Freezing today is fast and gentle, and most "
-              "good embryos thaw well. An embryo isn't weaker for having "
-              "waited."),
+          // Plain words (2026-10-21), kept for revert: They aren't. Freezing
+          // today is fast and gentle, and most good embryos thaw well. An
+          // embryo isn't weaker for having waited.
+          fact: _en("Frozen embryos are not second best. Freezing today is "
+              "fast and gentle, and most good embryos thaw well. An embryo "
+              "isn't weaker for having waited."),
         ),
       ),
       PvReadSection(

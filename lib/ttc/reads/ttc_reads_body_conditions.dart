@@ -116,10 +116,14 @@ final List<PvRead> kTtcReadsBodyConditions = [
           // should have to put up with. It's worth a doctor's visit, and
           // telling the doctor exactly what the pain stops you doing helps
           // them take it seriously.
-          fact: _en("Not when it stops your day. Some cramping is normal. "
-              "Pain that stops you doing things is worth a doctor's visit. "
-              "Tell the doctor exactly what the pain stops you doing, so they "
-              "take it seriously."),
+          // Plain words (2026-10-21), kept for revert: Not when it stops your
+          // day. Some cramping is normal. Pain that stops you doing things is
+          // worth a doctor's visit. Tell the doctor exactly what the pain stops
+          // you doing, so they take it seriously.
+          fact: _en("Pain that stops you living your day is not something you "
+              "have to bear. Some cramping is normal, but pain like that is "
+              "worth a doctor's visit. Tell the doctor exactly what the pain "
+              "stops you doing, so they take it seriously."),
         ),
       ),
       PvReadSection(
@@ -1106,10 +1110,14 @@ final List<PvRead> kTtcReadsBodyConditions = [
           // Plain words (2026-10-21). Kept for revert: Prolactinomas are
           // almost always small and aren't cancer. Most shrink with
           // tablets, and many women who have one go on to have babies.
-          fact: _en("Usually it isn't serious. A prolactinoma (a growth that "
-              "makes too much prolactin) is almost always small and isn't "
-              "cancer. Most shrink with tablets, and many women who have one "
-              "go on to have babies."),
+          // Plain words (2026-10-21), kept for revert: Usually it isn't
+          // serious. A prolactinoma (a growth that makes too much prolactin) is
+          // almost always small and isn't cancer. Most shrink with tablets, and
+          // many women who have one go on to have babies.
+          fact: _en("A growth on the pituitary is usually not a serious brain "
+              "tumour. A prolactinoma (a growth that makes too much prolactin) "
+              "is almost always small and isn't cancer. Most shrink with "
+              "tablets, and many women who have one go on to have babies."),
         ),
       ),
       PvReadSection(
@@ -1352,9 +1360,14 @@ final List<PvRead> kTtcReadsBodyConditions = [
           // medicines is a lot to go through, and the tablets have side
           // effects. Treating TB that isn't there won't help you conceive.
           // A proper diagnosis first protects you.
-          fact: _en("It isn't safer. TB treatment means six months of tablets "
-              "with side effects. Treating TB that isn't there won't help you "
-              "conceive. A proper diagnosis first protects you."),
+          // Plain words (2026-10-21), kept for revert: It isn't safer. TB
+          // treatment means six months of tablets with side effects. Treating
+          // TB that isn't there won't help you conceive. A proper diagnosis
+          // first protects you.
+          fact: _en("Taking TB medicines when you may not have TB isn't the "
+              "safer choice. Treatment means six months of tablets with side "
+              "effects, and treating TB that isn't there won't help you "
+              "conceive. A proper diagnosis first is what protects you."),
         ),
       ),
       PvReadSection(

@@ -90,9 +90,12 @@ final List<PvRead> kTtcReadsHardDays = [
           // something heavy, the long drive.
           myth: _en('Something I did this month brought my period on, like '
               'the food, stress or lifting something heavy.'),
+          // Plain words (2026-10-21), kept for revert: Nothing you ate, carried
+          // or worried about brought this period on. Most months end in a
+          // period even when everything is working well. It is not your fault.
           fact: _en('Nothing you ate, carried or worried about brought this '
-              'period on. Most months end in a period even when everything '
-              'is working well. It is not your fault.'),
+              'period on. Most months end in a period, even when everything in '
+              'your body is working well. This is not your fault.'),
         ),
       ),
 
@@ -581,9 +584,15 @@ final List<PvRead> kTtcReadsHardDays = [
           // private is common and healthy. It's a choice about timing and
           // privacy, not about love. Plenty of couples tell family only
           // once there is news to share.
-          fact: _en("It doesn't. Keeping trying private is common and "
-              "healthy. It's about timing and privacy, not love. Plenty of "
-              "couples tell family only once there's news to share."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. Keeping
+          // trying private is common and healthy. It's about timing and
+          // privacy, not love. Plenty of couples tell family only once there's
+          // news to share.
+          fact: _en("Keeping it private doesn't mean you're hiding anything or "
+              "that you don't trust your family. Many couples keep trying "
+              "private, and it's a healthy choice. It's about timing and "
+              "privacy, not about love. Plenty of couples tell family only "
+              "once there's news to share."),
         ),
       ),
 
@@ -1270,9 +1279,14 @@ final List<PvRead> kTtcReadsHardDays = [
           // does not decide whether you get pregnant. Your mood can't block
           // a pregnancy, and you don't need to force yourself to feel
           // positive.
-          fact: _en("No. How hopeful you feel doesn't decide whether you get "
-              "pregnant. Your mood can't block a pregnancy. You don't need to "
-              "force yourself to feel positive."),
+          // Plain words (2026-10-21), kept for revert: No. How hopeful you feel
+          // doesn't decide whether you get pregnant. Your mood can't block a
+          // pregnancy. You don't need to force yourself to feel positive.
+          fact: _en("Being more positive would not have made this happen any "
+              "sooner. How hopeful you feel doesn't decide whether you get "
+              "pregnant, and your mood can't block a pregnancy. You don't need "
+              "to force yourself to feel positive. It's all right to feel how "
+              "you feel."),
         ),
       ),
 

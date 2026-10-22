@@ -983,10 +983,15 @@ final List<PvRead> kTtcReadsMealPlan = [
           // but none is a strong source of iron in the amounts people eat.
           // Beetroot's red colour isn't iron. Dal, chana, rajma, greens and
           // millets eaten with lemon do much more.
-          fact: _en("They won't on their own. None of them gives much iron in "
-              "the amounts people eat, and beetroot's red colour isn't iron. "
-              "Dal, chana, rajma, greens and millets, eaten with lemon, do "
-              "much more."),
+          // Plain words (2026-10-21), kept for revert: They won't on their own.
+          // None of them gives much iron in the amounts people eat, and
+          // beetroot's red colour isn't iron. Dal, chana, rajma, greens and
+          // millets, eaten with lemon, do much more.
+          fact: _en("Beetroot, pomegranate and jaggery won't fix anaemia on "
+              "their own. They're good foods, but none of them gives much iron "
+              "in the amounts people eat, and beetroot's red colour isn't "
+              "iron. Dal, chana, rajma, greens and millets, eaten with lemon, "
+              "do much more for your iron."),
         ),
       ),
       PvReadSection(

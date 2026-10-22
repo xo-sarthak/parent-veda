@@ -523,10 +523,15 @@ final List<PvRead> kPregnancyReadsScans = [
           //   only when your history or an earlier result points to them, and
           //   one or two are fully optional. A pregnancy with six ticked and
           //   three blank is an ordinary pregnancy.
-          fact: _en("It hasn't. The list is the usual run, not a rule. Some "
-              "tests are for everyone, some only if your history or a "
-              "result calls for them, and a few are optional. Your "
-              "doctor tells you which ones you need."),
+          // Plain words (2026-10-21), kept for revert: It hasn't. The list is
+          //   the usual run, not a rule. Some tests are for everyone, some only
+          //   if your history or a result calls for them, and a few are
+          //   optional. Your doctor tells you which ones you need.
+          fact: _en("Missing a scan or test on the list doesn't mean anything "
+              "has gone wrong. The list shows the usual order, not a set of "
+              "rules. Some tests are for everyone, some only if your history "
+              "calls for them, and a few are optional. Your doctor will tell "
+              "you which ones you need."),
         ),
         paragraphs: [
           _en("The timeline in this app shows nine tests across a pregnancy. "

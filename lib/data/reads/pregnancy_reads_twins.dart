@@ -128,9 +128,13 @@ final List<PvRead> kPregnancyReadsTwins = [
           //   more common with twins, but many women carrying one baby have
           //   all three. No symptom and no blood test can tell you it's
           //   twins. Only a scan can.
-          fact: _en("Not on its own. These are a bit more common with twins, "
-              "but many women carrying one baby have all three. Only a "
-              "scan can tell you it's twins."),
+          // Plain words (2026-10-21), kept for revert: Not on its own. These
+          //   are a bit more common with twins, but many women carrying one
+          //   baby have all three. Only a scan can tell you it's twins.
+          fact: _en("Bad sickness, a big bump or a high hormone level can't "
+              "tell you on their own that it's twins. These are a bit more "
+              "common with twins, but many women carrying one baby have all "
+              "three. Only a scan can tell you for sure."),
         ),
       ),
       PvReadSection(
@@ -489,10 +493,15 @@ final List<PvRead> kPregnancyReadsTwins = [
           //   passes through women. A man with twins in his family doesn't
           //   have twins himself more often, but his daughter may. The
           //   pattern skips a man, not a generation.
-          fact: _en("There's no good evidence for this. The tendency to have "
-              "twins passes through women. A man with twins in his "
-              "family isn't more likely to have twins, but his daughter "
-              "may be. It skips a man, not a generation."),
+          // Plain words (2026-10-21), kept for revert: There's no good evidence
+          //   for this. The tendency to have twins passes through women. A man
+          //   with twins in his family isn't more likely to have twins, but his
+          //   daughter may be. It skips a man, not a generation.
+          fact: _en("There's no good evidence that twins skip a generation. It "
+              "can look that way because the tendency to have twins passes "
+              "through women. A man with twins in his family isn't more likely "
+              "to have twins himself, but his daughter may be. So the pattern "
+              "skips a man, not a generation."),
         ),
       ),
       PvReadSection(

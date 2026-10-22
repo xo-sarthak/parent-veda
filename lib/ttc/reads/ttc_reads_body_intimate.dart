@@ -424,10 +424,15 @@ final List<PvRead> kTtcReadsBodyIntimate = [
           // evidence for this. Repeat infections are about the vagina
           // itself, or a different cause being treated as yeast. A swab and
           // the right treatment help far more than cutting out foods.
-          fact: _en("There's no good evidence for this. Repeat infections are "
-              "about the vagina itself. Sometimes a different cause is being "
-              "treated as yeast. A swab and the right treatment help far more "
-              "than cutting out foods."),
+          // Plain words (2026-10-21), kept for revert: There's no good evidence
+          // for this. Repeat infections are about the vagina itself. Sometimes
+          // a different cause is being treated as yeast. A swab and the right
+          // treatment help far more than cutting out foods.
+          fact: _en("Yeast infections that keep coming back are about the "
+              "vagina itself, not your whole body. Sometimes a different cause "
+              "is being treated as yeast. A swab and the right treatment help "
+              "far more than cutting out foods, and there's no good evidence "
+              "for a special diet."),
         ),
       ),
       PvReadSection(
@@ -645,10 +650,15 @@ final List<PvRead> kTtcReadsBodyIntimate = [
           // cervix within minutes, and urine comes out of a different
           // opening. Some fluid leaking out is normal. Peeing after sex is
           // fine, and it helps prevent UTIs.
-          fact: _en("They won't. Sperm swim into the cervix within minutes, "
-              "and urine comes out of a different opening. Some fluid leaking "
-              "out is normal. Peeing after sex is fine, and it helps prevent "
-              "UTIs (bladder infections)."),
+          // Plain words (2026-10-21), kept for revert: They won't. Sperm swim
+          // into the cervix within minutes, and urine comes out of a different
+          // opening. Some fluid leaking out is normal. Peeing after sex is
+          // fine, and it helps prevent UTIs (bladder infections).
+          fact: _en("Getting up to pee after sex won't make the sperm come "
+              "out. Sperm swim into the cervix within minutes, and urine comes "
+              "out of a different opening. Some fluid leaking out is normal. "
+              "Peeing after sex is fine, and it even helps prevent UTIs "
+              "(bladder infections)."),
         ),
       ),
       PvReadSection(
@@ -833,7 +843,12 @@ final List<PvRead> kTtcReadsBodyIntimate = [
           // itself. Washing inside removes the helpful bacteria and makes
           // BV more likely. Rinse the outside with water if you like, and
           // that's all.
-          fact: _en("It doesn't. Your vagina cleans itself. Washing inside "
+          // Plain words (2026-10-21), kept for revert: It doesn't. Your vagina
+          // cleans itself. Washing inside removes the helpful bacteria and
+          // makes BV (a common vaginal infection) more likely. Rinsing the
+          // outside with water is all you need.
+          fact: _en("Washing inside after sex doesn't make you cleaner or "
+              "healthier. Your vagina cleans itself, and washing inside "
               "removes the helpful bacteria and makes BV (a common vaginal "
               "infection) more likely. Rinsing the outside with water is all "
               "you need."),
@@ -1254,10 +1269,15 @@ final List<PvRead> kTtcReadsBodyIntimate = [
           // infections cause no signs and can stay for years. Either
           // partner may have had one from long ago without knowing. A test
           // is routine care, not a judgement.
-          fact: _en('You may still need them. Many of these infections cause '
-              'no signs and can stay for years. Either partner may have had '
-              'one long ago without knowing. A test is routine care, not a '
-              'judgement.'),
+          // Plain words (2026-10-21), kept for revert: You may still need them.
+          // Many of these infections cause no signs and can stay for years.
+          // Either partner may have had one long ago without knowing. A test is
+          // routine care, not a judgement.
+          fact: _en("You may still need these tests, even if you've only been "
+              "with your husband. Many of these infections cause no signs and "
+              "can stay for years, and either partner may have had one long "
+              "ago without knowing. A test is routine care, not a judgement on "
+              "either of you."),
         ),
       ),
       PvReadSection(

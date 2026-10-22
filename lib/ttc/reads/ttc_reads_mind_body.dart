@@ -487,11 +487,16 @@ final List<PvRead> kTtcReadsMindBody = [
           // care before pregnancy agrees with, is that the parents’ health
           // and state of mind before conception are worth looking after. That
           // is a much smaller claim, and it's the one that holds up.
-          fact: _en("There's no evidence it does. Nothing done before "
-              "conception has been shown to shape a child's intelligence or "
-              "personality. What does hold up is smaller: looking after both "
-              "parents' health and state of mind before pregnancy is worth "
-              "it."),
+          // Plain words (2026-10-21), kept for revert: There's no evidence it
+          // does. Nothing done before conception has been shown to shape a
+          // child's intelligence or personality. What does hold up is smaller:
+          // looking after both parents' health and state of mind before
+          // pregnancy is worth it.
+          fact: _en("Nothing done before pregnancy has been shown to shape "
+              "your child's intelligence or personality. What does hold up is "
+              "a smaller idea. Looking after both parents' health and state of "
+              "mind before pregnancy is worth it, and that is something you "
+              "can do."),
         ),
       ),
 

@@ -1277,9 +1277,14 @@ final List<PvRead> kPregnancyReadsFirst = [
           //   body reacts to pregnancy hormones, and that differs a lot
           //   between women and between pregnancies. Strong symptoms or mild
           //   ones don't tell you how the pregnancy is doing.
-          fact: _en("Not true. How sick you feel doesn't show how your "
-              "pregnancy is doing. Symptoms depend on hormones and "
-              "differ a lot from woman to woman."),
+          // Plain words (2026-10-21), kept for revert: Not true. How sick you
+          //   feel doesn't show how your pregnancy is doing. Symptoms depend on
+          //   hormones and differ a lot from woman to woman.
+          fact: _en("Not feeling sick doesn't mean anything is wrong with your "
+              "pregnancy. Symptoms depend on how your body reacts to pregnancy "
+              "hormones, and that differs a lot from woman to woman. Strong "
+              "symptoms or mild ones don't tell you how your pregnancy is "
+              "doing."),
         ),
       ),
       PvReadSection(

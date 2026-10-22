@@ -108,9 +108,13 @@ final List<PvRead> kTtcReadsSex = [
           // about six days long. Sex every one to two days across it is
           // enough, so one missed night doesn't undo it. The days before
           // ovulation count as much as the day itself.
-          fact: _en("It isn't. The fertile window is about six days long. Sex "
-              "every one to two days across it is enough, so one missed night "
-              "doesn't undo the month."),
+          // Plain words (2026-10-21), kept for revert: It isn't. The fertile
+          // window is about six days long. Sex every one to two days across it
+          // is enough, so one missed night doesn't undo the month.
+          fact: _en("Missing one fertile day doesn't mean the whole month is "
+              "wasted. The fertile window is about six days long. Sex every "
+              "one to two days across it is enough, so one missed night "
+              "doesn't undo your month."),
         ),
       ),
       PvReadSection(
@@ -586,10 +590,14 @@ final List<PvRead> kTtcReadsSex = [
           // first can happen. Pain that keeps coming back is a sign to see a
           // doctor. Pushing through it can teach the muscles to tighten even
           // more.
-          fact: _en('Pain that keeps coming back is not something to push '
-              'through. Some discomfort at first can happen. If pain keeps '
-              'returning, see a doctor. Pushing through can teach the muscles '
-              'to tighten even more.'),
+          // Plain words (2026-10-21), kept for revert: Pain that keeps coming
+          // back is not something to push through. Some discomfort at first can
+          // happen. If pain keeps returning, see a doctor. Pushing through can
+          // teach the muscles to tighten even more.
+          fact: _en("Pain that keeps coming back is not something to push "
+              "through. Some discomfort at first can happen. If pain keeps "
+              "returning, it's worth seeing a doctor, because pushing through "
+              "can teach the muscles to tighten even more."),
         ),
       ),
       PvReadSection(
@@ -855,8 +863,12 @@ final List<PvRead> kTtcReadsSex = [
           // Plain words (2026-10-21). Kept for revert: There's no good
           // evidence it helps sperm, and raw egg can carry germs such as
           // salmonella. It is better left in the kitchen.
-          fact: _en("Best not. There's no good evidence it helps sperm, and "
-              "raw egg can carry germs such as salmonella."),
+          // Plain words (2026-10-21), kept for revert: Best not. There's no
+          // good evidence it helps sperm, and raw egg can carry germs such as
+          // salmonella.
+          fact: _en("It's best to leave egg white in the kitchen. There's no "
+              "good evidence it helps sperm, and raw egg can carry germs such "
+              "as salmonella."),
         ),
       ),
       PvReadSection(
@@ -1028,9 +1040,13 @@ final List<PvRead> kTtcReadsSex = [
           // happen because of a chance mistake in the chromosomes of the
           // embryo. Sex, orgasm, walking and normal daily work do not cause
           // them.
-          fact: _en("It doesn't. Most early losses happen because of a chance "
-              "error in the embryo's chromosomes. Sex, orgasm, walking and "
-              "daily work don't cause them."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. Most early
+          // losses happen because of a chance error in the embryo's
+          // chromosomes. Sex, orgasm, walking and daily work don't cause them.
+          fact: _en("Having sex in the two-week wait does not cause a "
+              "miscarriage. Most early losses happen because of a chance error "
+              "in the embryo's chromosomes. Sex, orgasm, walking and daily "
+              "work don't cause them, so you can stay close to each other."),
         ),
       ),
       PvReadSection(

@@ -325,10 +325,15 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           // whether it works. The advice also does harm. It makes you
           // responsible for something you can't control, and turns every
           // month that doesn't work into proof you weren't calm enough.
-          fact: "That isn't how it works. Large studies find that feeling "
-              "upset before treatment doesn't decide whether it works. The "
-              "advice also hurts, because it blames you for something you "
-              "can't control.",
+          // Plain words (2026-10-21), kept for revert: That isn't how it works.
+          // Large studies find that feeling upset before treatment doesn't
+          // decide whether it works. The advice also hurts, because it blames
+          // you for something you can't control.
+          fact: "Whether you conceive doesn't depend on how calm you manage to "
+              "feel. Large studies find that feeling upset before treatment "
+              "doesn't decide whether it works. The advice can also hurt, "
+              "because it blames you for something you can't control, and that "
+              "weight isn't yours to carry.",
         ),
         TtcGuideTile(
           title: 'Where stress does have a real effect',
@@ -404,10 +409,15 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           // doesn't promise it. That claim comes from the people selling
           // programmes. The practice is worth doing for how the months
           // feel, and that's a full reason on its own.
-          fact: "No. No good study shows that any practice before conception "
-              "changes a child's intelligence or nature. The tradition itself "
-              "doesn't promise this. It's worth doing for how these months "
-              "feel, and that's reason enough.",
+          // Plain words (2026-10-21), kept for revert: No. No good study shows
+          // that any practice before conception changes a child's intelligence
+          // or nature. The tradition itself doesn't promise this. It's worth
+          // doing for how these months feel, and that's reason enough.
+          fact: "Garbh sanskar hasn't been shown to change your baby's "
+              "intelligence or nature. No good study shows that any practice "
+              "before conception does that, and the tradition itself doesn't "
+              "promise it. It's still worth doing for how these months feel, "
+              "and that's reason enough.",
         ),
         TtcGuideTile(
           // Kept for revert (2026-09-28, explicit names): title: "And if you're not religious",

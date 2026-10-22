@@ -235,10 +235,15 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           // contraception now rather than waiting for a period to come.
           // This isn't often mentioned, and it's kinder to read it here
           // than to find out later.
-          fact: "You can. Ovulation usually comes back before your first "
-              "period, often two to four weeks after a loss. If you're not "
-              "ready to try again, start contraception now, not after a "
-              "period.",
+          // Plain words (2026-10-21), kept for revert: You can. Ovulation
+          // usually comes back before your first period, often two to four
+          // weeks after a loss. If you're not ready to try again, start
+          // contraception now, not after a period.
+          fact: "You can get pregnant again before your period comes back. "
+              "Ovulation usually returns before your first period, often two "
+              "to four weeks after a loss. If you're not ready to try again "
+              "yet, that's okay: start contraception now rather than waiting "
+              "for a period.",
         ),
       ],
     ),
@@ -335,10 +340,15 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           // One loss isn't a pattern, and it says nothing about your body.
           // Things change after two or more, which is exactly why testing
           // starts there and not here.
-          fact: 'Usually not. After one loss, the next pregnancy is nearly as '
-              'likely to go well as before. One loss is not a pattern, and it '
-              'says nothing about your body. That is why tests start after '
-              'two or more losses, not after one.',
+          // Plain words (2026-10-21), kept for revert: Usually not. After one
+          // loss, the next pregnancy is nearly as likely to go well as before.
+          // One loss is not a pattern, and it says nothing about your body.
+          // That is why tests start after two or more losses, not after one.
+          fact: "One miscarriage doesn't usually mean another will follow. "
+              "After one loss, your next pregnancy is nearly as likely to go "
+              "well as it was before. One loss is not a pattern, and it says "
+              "nothing about your body. That's why tests only start after two "
+              "or more losses.",
         ),
       ],
     ),
@@ -404,12 +414,18 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           // the next pregnancy easier to date. If your own doctor has told
           // you to wait, ask what their reason is rather than assuming it's
           // the general advice.
-          fact: "Usually not. After an early loss with no complications, "
-              "there's no medical reason to wait months. Large studies since "
-              "the old advice found no harm in trying sooner. Many doctors "
-              "suggest waiting for one normal period, because it makes the "
-              "next pregnancy easier to date. If your own doctor said to "
-              "wait, ask them why.",
+          // Plain words (2026-10-21), kept for revert: Usually not. After an
+          // early loss with no complications, there's no medical reason to wait
+          // months. Large studies since the old advice found no harm in trying
+          // sooner. Many doctors suggest waiting for one normal period, because
+          // it makes the next pregnancy easier to date. If your own doctor said
+          // to wait, ask them why.
+          fact: "After an early loss with no complications, there's usually no "
+              "medical reason to wait months before trying again. Large "
+              "studies since the old advice have found no harm in trying "
+              "sooner. Many doctors suggest waiting for one normal period, "
+              "because it makes the next pregnancy easier to date. If your own "
+              "doctor has asked you to wait, it's fine to ask them why.",
         ),
       ],
     ),

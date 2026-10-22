@@ -350,9 +350,12 @@ final List<PvRead> kTtcReadsExtra = [
           // children late in life, and many do. But sperm quality still
           // changes with age. That is one reason his half is worth checking
           // early rather than last.
-          fact: _en("His age still matters. Many men father children late in "
-              "life, but sperm quality changes with age. That's one reason to "
-              "check his side early, not last."),
+          // Plain words (2026-10-21), kept for revert: His age still matters.
+          // Many men father children late in life, but sperm quality changes
+          // with age. That's one reason to check his side early, not last.
+          fact: _en("A man's age still matters, even though many men father "
+              "children late in life. Sperm quality changes with age, which is "
+              "one reason to check his side early, not last."),
         ),
       ),
       PvReadSection(
@@ -664,10 +667,15 @@ final List<PvRead> kTtcReadsExtra = [
           // Most of the time ovulation follows within a day or two, but not
           // always, and less reliably when cycles are irregular. Only a
           // blood test or a scan can confirm it.
-          fact: _en('Not quite. It means LH (the hormone that sets off '
-              'ovulation) went up. Ovulation usually follows within a day or '
-              'two, but not always, and less reliably with irregular cycles. '
-              'Only a blood test or a scan can confirm it.'),
+          // Plain words (2026-10-21), kept for revert: Not quite. It means LH
+          // (the hormone that sets off ovulation) went up. Ovulation usually
+          // follows within a day or two, but not always, and less reliably with
+          // irregular cycles. Only a blood test or a scan can confirm it.
+          fact: _en("A positive ovulation test doesn't prove that you "
+              "ovulated. It means LH (the hormone that sets off ovulation) "
+              "went up. Ovulation usually follows within a day or two, but not "
+              "always, and less reliably with irregular cycles. Only a blood "
+              "test or a scan can confirm it."),
         ),
       ),
       PvReadSection(

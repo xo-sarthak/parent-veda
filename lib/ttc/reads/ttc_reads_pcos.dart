@@ -106,10 +106,15 @@ final List<PvRead> kTtcReadsPcos = [
           // a scan, and have nothing else. PCOS needs two of three things:
           // irregular cycles, raised androgens (male-type hormones) and the
           // scan picture. That is why a scan alone isn't a diagnosis.
-          fact: _en("It doesn't. Up to a quarter of women with regular cycles "
-              "look like this on a scan and have nothing else. PCOS needs two "
-              "of three things: irregular cycles, raised male-type hormones, "
-              "and that scan picture."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. Up to a
+          // quarter of women with regular cycles look like this on a scan and
+          // have nothing else. PCOS needs two of three things: irregular
+          // cycles, raised male-type hormones, and that scan picture.
+          fact: _en('A scan showing polycystic ovaries does not, on its own, '
+              'mean you have PCOS. Up to a quarter of women with regular '
+              'cycles look like this on a scan and have nothing else. PCOS '
+              'needs two of three things: irregular cycles, raised male-type '
+              'hormones, and that scan picture.'),
         ),
       ),
 
@@ -372,9 +377,14 @@ final List<PvRead> kTtcReadsPcos = [
           // were made for. The 2023 guideline puts IVF third in line, after
           // tablets and after injections. It clearly says IVF shouldn't be
           // offered first unless there is another reason.
-          fact: _en("Usually not. PCOS is what ovulation tablets were made "
-              "for. IVF normally comes third, after tablets and injections. "
-              "It shouldn't be offered first unless there is another reason."),
+          // Plain words (2026-10-21), kept for revert: Usually not. PCOS is
+          // what ovulation tablets were made for. IVF normally comes third,
+          // after tablets and injections. It shouldn't be offered first unless
+          // there is another reason.
+          fact: _en("Having PCOS doesn't usually mean you'll need IVF. PCOS is "
+              "what ovulation tablets were made for, and IVF normally comes "
+              "third, after tablets and injections. It shouldn't be offered "
+              "first unless there is another reason."),
         ),
       ),
     ],
@@ -621,10 +631,14 @@ final List<PvRead> kTtcReadsPcos = [
           // diabetes, and very common in PCOS even when blood-sugar readings
           // are completely normal. Your HbA1c may be fine and metformin can
           // still be the right choice.
-          fact: _en("Not necessarily. Here it's given for insulin resistance "
-              "(the body needing extra insulin to handle sugar). That's "
-              "common in PCOS even when blood sugar is normal, and it isn't "
-              "diabetes."),
+          // Plain words (2026-10-21), kept for revert: Not necessarily. Here
+          // it's given for insulin resistance (the body needing extra insulin
+          // to handle sugar). That's common in PCOS even when blood sugar is
+          // normal, and it isn't diabetes.
+          fact: _en("Being given metformin doesn't necessarily mean you're "
+              "pre-diabetic. Here it's given for insulin resistance (the body "
+              "needing extra insulin to handle sugar). That's common in PCOS "
+              "even when blood sugar is normal, and it isn't diabetes."),
         ),
       ),
 
@@ -861,10 +875,14 @@ final List<PvRead> kTtcReadsPcos = [
           // carbohydrate, what you eat first, and how much. Not cutting it
           // out. A diet that's at odds with how your family eats won't last a
           // year, and a year is the time that matters.
-          fact: _en("You don't. What matters is how much you eat, what you "
-              "eat with it, and what you eat first. A diet that fights how "
-              "your family eats won't last, and it's the year ahead that "
-              "counts."),
+          // Plain words (2026-10-21), kept for revert: You don't. What matters
+          // is how much you eat, what you eat with it, and what you eat first.
+          // A diet that fights how your family eats won't last, and it's the
+          // year ahead that counts.
+          fact: _en("You don't have to give up rice and roti when you have "
+              "PCOS. What matters is how much you eat, what you eat with it, "
+              "and what you eat first. A diet that fights how your family eats "
+              "won't last, and it's the year ahead that counts."),
         ),
       ),
 

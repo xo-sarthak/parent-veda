@@ -728,9 +728,14 @@ final List<PvRead> kPregnancyReadsReady = [
           //   flat on their back with no pillow. A flat patch on the head is
           //   usually prevented by tummy time while awake and by turning the
           //   baby's head a different way at each sleep.
-          fact: _en("No pillow. A baby should sleep flat on their back. To "
-              "avoid a flat patch, give tummy time while awake and turn "
-              "the baby's head a different way at each sleep."),
+          // Plain words (2026-10-21), kept for revert: No pillow. A baby should
+          //   sleep flat on their back. To avoid a flat patch, give tummy time
+          //   while awake and turn the baby's head a different way at each
+          //   sleep.
+          fact: _en("Your baby doesn't need a pillow for a nicely shaped head. "
+              "They should sleep flat on their back, with no pillow. To help "
+              "avoid a flat patch, give tummy time while they're awake and "
+              "turn their head a different way at each sleep."),
         ),
       ),
       PvReadSection(
@@ -993,9 +998,14 @@ final List<PvRead> kPregnancyReadsReady = [
           //   flat on their back, with no pillow. Tummy time while awake and
           //   changing which way the baby's head faces at each sleep help
           //   keep the head a good shape.
-          fact: _en("No pillow. A baby sleeps safest flat on their back. "
-              "Tummy time while awake, and turning the head a different "
-              "way at each sleep, help keep the head a good shape."),
+          // Plain words (2026-10-21), kept for revert: No pillow. A baby sleeps
+          //   safest flat on their back. Tummy time while awake, and turning
+          //   the head a different way at each sleep, help keep the head a good
+          //   shape.
+          fact: _en("Your baby doesn't need a pillow, and sleeps safest "
+              "without one, flat on their back. You can still help their head "
+              "keep a nice round shape: give tummy time while they're awake, "
+              "and turn their head a different way at each sleep."),
         ),
       ),
       PvReadSection(

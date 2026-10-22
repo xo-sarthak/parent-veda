@@ -103,9 +103,14 @@ final List<PvRead> kTtcReadsLossMore = [
           // what's already happening. Testing early didn't cause the loss. It
           // let you see a pregnancy that, with older tests, would have looked
           // like a slightly late period.
-          fact: _en("It didn't. A test only shows what is already happening. "
-              "Testing early let you see a pregnancy that, with older tests, "
-              "would have looked like a slightly late period."),
+          // Plain words (2026-10-21), kept for revert: It didn't. A test only
+          // shows what is already happening. Testing early let you see a
+          // pregnancy that, with older tests, would have looked like a slightly
+          // late period.
+          fact: _en('Testing early did not cause your loss, and it could not '
+              'have jinxed it. A test only shows what is already happening in '
+              'your body. Testing early let you see a pregnancy that, with '
+              'older tests, would have looked like a slightly late period.'),
         ),
       ),
       PvReadSection(
@@ -898,9 +903,15 @@ final List<PvRead> kTtcReadsLossMore = [
           // its result would change what you do. Long panels can find things
           // that mean nothing and lead to treatments that don't help, at a
           // high cost.
-          fact: _en("Not always. A test helps only if its result would change "
-              "what you do next. Long test panels can find things that mean "
-              "nothing, and lead to costly treatments that don't help."),
+          // Plain words (2026-10-21), kept for revert: Not always. A test helps
+          // only if its result would change what you do next. Long test panels
+          // can find things that mean nothing, and lead to costly treatments
+          // that don't help.
+          fact: _en("Wanting every test after more than one loss is natural, "
+              "but more tests don't always find the answer. A test helps only "
+              "if its result would change what you do next. Long test panels "
+              "can find things that mean nothing, and lead to costly "
+              "treatments that don't help."),
         ),
       ),
       PvReadSection(

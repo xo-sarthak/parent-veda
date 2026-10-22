@@ -162,11 +162,17 @@ final List<PvRead> kTtcReadsGettingReady = [
           // hitting a number first. Putting off trying for a year to reach
           // a BMI target swaps a small benefit for a year of age. For many
           // women, that's the worse deal.
-          fact: _en("Usually not. A small weight change you can keep up, "
-              "around five per cent, is what the evidence supports, not "
-              "hitting a number first. Putting off trying for a year to reach "
-              "a BMI trades a small benefit for a year of age. For many "
-              "women, that's the worse deal."),
+          // Plain words (2026-10-21), kept for revert: Usually not. A small
+          // weight change you can keep up, around five per cent, is what the
+          // evidence supports, not hitting a number first. Putting off trying
+          // for a year to reach a BMI trades a small benefit for a year of age.
+          // For many women, that's the worse deal.
+          fact: _en("Most people don't need to reach a healthy BMI before they "
+              "start trying. The evidence supports a small weight change you "
+              "can keep up, around five per cent, rather than hitting a number "
+              "first. Putting off trying for a year to reach a BMI trades a "
+              "small benefit for a year of age, and for many women that's the "
+              "worse deal."),
         ),
       ),
 
@@ -1219,9 +1225,15 @@ final List<PvRead> kTtcReadsGettingReady = [
           // evidence for this. A varied vegetarian diet supports fertility
           // and pregnancy well. What matters is closing the few gaps above,
           // which a blood test and a little planning take care of.
-          fact: _en("There's no good evidence for this. A varied vegetarian "
-              "diet supports fertility and pregnancy well. Just close the few "
-              "gaps above, with a blood test and a little planning."),
+          // Plain words (2026-10-21), kept for revert: There's no good evidence
+          // for this. A varied vegetarian diet supports fertility and pregnancy
+          // well. Just close the few gaps above, with a blood test and a little
+          // planning.
+          fact: _en("There's no good evidence that a vegetarian diet makes it "
+              "harder to get pregnant. A varied vegetarian diet supports "
+              "fertility and pregnancy well. You just need to close the few "
+              "gaps above, which a blood test and a little planning take care "
+              "of."),
         ),
       ),
       PvReadSection(
@@ -1655,10 +1667,14 @@ final List<PvRead> kTtcReadsGettingReady = [
           // is not linked to lower fertility afterwards. Age matters, and
           // so does any condition the pill was covering up. The pill itself
           // does not use up eggs or leave lasting harm.
-          fact: _en("It doesn't. Long use of the pill isn't linked to lower "
-              "fertility afterwards. It doesn't use up eggs or leave lasting "
-              "harm. Age matters, and so does any condition the pill was "
-              "covering up."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. Long use of
+          // the pill isn't linked to lower fertility afterwards. It doesn't use
+          // up eggs or leave lasting harm. Age matters, and so does any
+          // condition the pill was covering up.
+          fact: _en("Years on the pill don't make it harder to get pregnant "
+              "later. Long use isn't linked to lower fertility afterwards, and "
+              "the pill doesn't use up eggs or leave lasting harm. Age "
+              "matters, and so does any condition the pill was covering up."),
         ),
       ),
       PvReadSection(

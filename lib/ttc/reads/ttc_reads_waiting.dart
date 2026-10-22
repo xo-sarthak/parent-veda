@@ -172,11 +172,16 @@ final List<PvRead> kTtcReadsWaiting = [
           // lifting a bucket can't shake it loose. When a month doesn't work,
           // it's almost always because of the egg or embryo itself, not
           // because of anything you did that day.
-          fact: _en("Moving about won't stop it sticking. Implantation "
-              "happens deep in the lining of the womb, and walking, stairs or "
-              "lifting a bucket can't shake it loose. When a month doesn't "
-              "work, it's almost always down to the egg or embryo, not "
-              "anything you did."),
+          // Plain words (2026-10-21), kept for revert: Moving about won't stop
+          // it sticking. Implantation happens deep in the lining of the womb,
+          // and walking, stairs or lifting a bucket can't shake it loose. When
+          // a month doesn't work, it's almost always down to the egg or embryo,
+          // not anything you did.
+          fact: _en("Everyday moving about won't stop an embryo from sticking. "
+              "Implantation happens deep in the lining of the womb, and "
+              "walking, stairs or lifting a bucket can't shake it loose. When "
+              "a month doesn't work, it's almost always down to the egg or "
+              "embryo, not anything you did."),
         ),
       ),
 
@@ -1510,9 +1515,14 @@ final List<PvRead> kTtcReadsWaiting = [
           // sign, not the problem itself. A tablet can bring on a bleed, but
           // it doesn't fix the reason the period was late, and it can hide a
           // pregnancy. A test and a doctor come first.
-          fact: _en("Not first. A late period is a sign, not the problem. A "
-              "tablet can bring on a bleed, but it doesn't fix the reason, "
-              "and it can hide a pregnancy. Do a test and see a doctor first."),
+          // Plain words (2026-10-21), kept for revert: Not first. A late period
+          // is a sign, not the problem. A tablet can bring on a bleed, but it
+          // doesn't fix the reason, and it can hide a pregnancy. Do a test and
+          // see a doctor first.
+          fact: _en("A late period needs a test and a doctor before any "
+              "tablet. A late period is a sign, not the problem itself. A "
+              "tablet can bring on a bleed, but it doesn't fix the reason, and "
+              "it can hide a pregnancy."),
         ),
       ),
 
@@ -1810,10 +1820,14 @@ final List<PvRead> kTtcReadsWaiting = [
           // sleep, stress, food and how closely you're paying attention.
           // Feeling different doesn't mean pregnant, and feeling the same
           // doesn't mean not.
-          fact: _en("Not necessarily. Every cycle feels a little different, "
-              "with changes in sleep, stress, food and how closely you're "
-              "watching. Feeling different doesn't mean pregnant, and feeling "
-              "the same doesn't mean not."),
+          // Plain words (2026-10-21), kept for revert: Not necessarily. Every
+          // cycle feels a little different, with changes in sleep, stress, food
+          // and how closely you're watching. Feeling different doesn't mean
+          // pregnant, and feeling the same doesn't mean not.
+          fact: _en("Feeling different this month doesn't always mean you're "
+              "pregnant. Every cycle feels a little different, with changes in "
+              "sleep, stress, food and how closely you're watching. And "
+              "feeling the same as usual doesn't mean you're not."),
         ),
       ),
 

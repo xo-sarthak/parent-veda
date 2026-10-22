@@ -534,9 +534,12 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   anything or make labour shorter. A spoon or two a day in your
           //   cooking is fine. Bowls of it add weight without helping the
           //   birth.
-          fact: _en("It doesn't. Ghee doesn't make labour easier or shorter. "
-              "A spoon or two a day in your cooking is fine. More just "
-              "adds weight."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. Ghee doesn't
+          //   make labour easier or shorter. A spoon or two a day in your
+          //   cooking is fine. More just adds weight.
+          fact: _en("Extra ghee won't make the birth easier or shorter. A "
+              "spoon or two a day in your cooking is fine. Bowls of it only "
+              "add weight, so a little in your food is all you need."),
         ),
       ),
       PvReadSection(
@@ -549,9 +552,13 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   colour comes from your family's genes, and no food changes it.
           //   A pinch of kesar in warm milk is fine and can be a nice way to
           //   wind down. Keep it to a pinch, not more.
-          fact: _en("It doesn't. Your baby's skin colour comes from your "
-              "family's genes, and no food changes it. A pinch of kesar "
-              "in warm milk is fine. Keep it to a pinch."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. Your baby's
+          //   skin colour comes from your family's genes, and no food changes
+          //   it. A pinch of kesar in warm milk is fine. Keep it to a pinch.
+          fact: _en("Saffron milk won't change your baby's skin colour. Your "
+              "baby's skin colour comes from your family's genes, and no food "
+              "changes it. A pinch of kesar in warm milk is still fine, and it "
+              "can be a nice way to wind down. Keep it to a pinch."),
         ),
       ),
       PvReadSection(
@@ -571,9 +578,13 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   the kind to skip, because it has more latex. A few slices of
           //   pineapple are fine too. You'd have to eat a very large amount
           //   for its enzyme to matter.
-          fact: _en("It won't. Ripe papaya in small amounts is generally "
-              "fine. Skip raw or unripe papaya, which has more latex. A "
-              "few slices of pineapple are fine too."),
+          // Plain words (2026-10-21), kept for revert: It won't. Ripe papaya in
+          //   small amounts is generally fine. Skip raw or unripe papaya, which
+          //   has more latex. A few slices of pineapple are fine too.
+          fact: _en("A bite of papaya or pineapple won't end a pregnancy. Ripe "
+              "papaya in small amounts is generally fine, but skip raw or "
+              "unripe papaya, which has more latex. A few slices of pineapple "
+              "are fine too."),
         ),
       ),
       PvReadSection(
@@ -588,10 +599,14 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   best proteins you can eat. Mango is a good fruit too, in
           //   sensible amounts, especially if your blood sugar is being
           //   watched.
-          fact: _en("There's no proof that any food heats the womb. Well- "
-              "cooked eggs are one of the best proteins you can eat. "
-              "Mango is fine in sensible amounts, especially if your "
-              "sugar is being watched."),
+          // Plain words (2026-10-21), kept for revert: There's no proof that
+          //   any food heats the womb. Well- cooked eggs are one of the best
+          //   proteins you can eat. Mango is fine in sensible amounts,
+          //   especially if your sugar is being watched.
+          fact: _en("There's no proof that eggs, mango or any other food heats "
+              "the womb or harms your baby. Well-cooked eggs are one of the "
+              "best proteins you can eat. Mango is a good fruit too, in "
+              "sensible amounts, especially if your sugar is being watched."),
         ),
       ),
       PvReadSection(
@@ -610,9 +625,13 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   with skin colour. What matters is the caffeine: keep it under
           //   about 200 mg a day, which is roughly two to three cups of
           //   normal chai.
-          fact: _en("It doesn't. Tea has nothing to do with skin colour. Just "
-              "keep caffeine low: under about 200 mg a day, roughly two "
-              "to three cups of normal chai."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. Tea has
+          //   nothing to do with skin colour. Just keep caffeine low: under
+          //   about 200 mg a day, roughly two to three cups of normal chai.
+          fact: _en("Tea and coffee don't change your baby's skin colour. What "
+              "matters is the caffeine, so keep it under about 200 mg a day. "
+              "That's roughly two to three cups of normal chai, so your daily "
+              "cup can stay."),
         ),
       ),
       PvReadSection(
@@ -630,9 +649,14 @@ final List<PvRead> kPregnancyReadsNutrition = [
           // Plain words (2026-10-21). Kept for revert: You need no extra food
           //   in the first three months, and about one small extra meal a day
           //   after that. What's on the plate matters more than how much.
-          fact: _en("You don't need double. You need no extra food in the "
-              "first three months, and about one small extra meal a day "
-              "after that. What you eat matters more than how much."),
+          // Plain words (2026-10-21), kept for revert: You don't need double.
+          //   You need no extra food in the first three months, and about one
+          //   small extra meal a day after that. What you eat matters more than
+          //   how much.
+          fact: _en("You don't need to eat double, even though you're feeding "
+              "your baby too. You need no extra food in the first three "
+              "months, and about one small extra meal a day after that. What's "
+              "on your plate matters more than how much."),
         ),
       ),
       PvReadSection(
@@ -646,9 +670,14 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   a cold from what you eat. Colds come from viruses. Curd and
           //   banana are both good foods in pregnancy. If curd at night
           //   bothers your own throat or stomach, have it at lunch instead.
-          fact: _en("They can't. Colds come from viruses, not food. Curd and "
-              "banana are both good in pregnancy. If curd at night "
-              "bothers your throat or stomach, have it at lunch."),
+          // Plain words (2026-10-21), kept for revert: They can't. Colds come
+          //   from viruses, not food. Curd and banana are both good in
+          //   pregnancy. If curd at night bothers your throat or stomach, have
+          //   it at lunch.
+          fact: _en("Your baby can't catch a cold from anything you eat. Colds "
+              "come from viruses, not food. Curd and banana are both good "
+              "foods in pregnancy. If curd at night bothers your throat or "
+              "stomach, you can have it at lunch instead."),
         ),
       ),
       PvReadSection(
@@ -670,12 +699,18 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   makes constipation and tiredness worse. Keep drinking, and put
           //   your feet up when you can. Sudden swelling of your face or
           //   hands is different: call your doctor today.
-          fact: _en("Drinking less won't stop swelling. Swollen feet come "
-              "from the weight of your womb and the extra fluid of "
-              "pregnancy. Less water makes constipation and tiredness "
-              "worse, so keep drinking and put your feet up. Sudden "
-              "swelling of your face or hands is different: call your "
-              "doctor today."),
+          // Plain words (2026-10-21), kept for revert: Drinking less won't stop
+          //   swelling. Swollen feet come from the weight of your womb and the
+          //   extra fluid of pregnancy. Less water makes constipation and
+          //   tiredness worse, so keep drinking and put your feet up. Sudden
+          //   swelling of your face or hands is different: call your doctor
+          //   today.
+          fact: _en("Drinking less water won't stop your feet from swelling. "
+              "Swollen feet come from the weight of your womb and the extra "
+              "fluid pregnancy brings. Less water makes constipation and "
+              "tiredness worse, so keep drinking and put your feet up when you "
+              "can. Sudden swelling of your face or hands is different: call "
+              "your doctor today."),
         ),
       ),
       PvReadSection(
@@ -689,9 +724,13 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   changes your baby's skin. Coconut water is still a good drink:
           //   it keeps you hydrated and is gentle on a queasy stomach. Fresh
           //   from a tender coconut is best.
-          fact: _en("Nothing you drink changes your baby's skin. Coconut "
-              "water is still a good drink. It keeps you hydrated and "
-              "is gentle on a queasy stomach."),
+          // Plain words (2026-10-21), kept for revert: Nothing you drink
+          //   changes your baby's skin. Coconut water is still a good drink. It
+          //   keeps you hydrated and is gentle on a queasy stomach.
+          fact: _en("Coconut water won't change your baby's skin, and neither "
+              "will anything else you drink. It's still a good drink: it keeps "
+              "you hydrated and is gentle on a queasy stomach. Fresh from a "
+              "tender coconut is best."),
         ),
       ),
       PvReadSection(
@@ -706,11 +745,16 @@ final List<PvRead> kPregnancyReadsNutrition = [
           //   baby can make the birth harder. Steady, varied meals help your
           //   baby grow at the pace that's right for them, and your scans
           //   show how that's going.
-          fact: _en("Bigger isn't always better. Your baby's size depends on "
-              "genes, the placenta and your health, not just how much "
-              "you eat. A very large baby can make the birth harder. "
-              "Steady, varied meals help, and your scans show how your "
-              "baby is growing."),
+          // Plain words (2026-10-21), kept for revert: Bigger isn't always
+          //   better. Your baby's size depends on genes, the placenta and your
+          //   health, not just how much you eat. A very large baby can make the
+          //   birth harder. Steady, varied meals help, and your scans show how
+          //   your baby is growing.
+          fact: _en("A bigger baby isn't always a healthier baby. Your baby's "
+              "size depends on your genes, the placenta and your health, not "
+              "just on how much you eat. A very large baby can make the birth "
+              "harder. Steady, varied meals help your baby grow at their own "
+              "pace, and your scans show how that's going."),
         ),
       ),
       PvReadSection(

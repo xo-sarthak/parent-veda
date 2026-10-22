@@ -149,10 +149,15 @@ final List<PvRead> kTtcReadsHisSide = [
           // time. Secondary infertility, when a couple who conceived before
           // can't again, often has a male factor. A past pregnancy is
           // history, not a current test result.
-          fact: _en("Not always. Sperm can change with age, illness, weight, "
-              "medicines and time. When a couple who conceived before can't "
-              "again, the man's side is often part of it. A past pregnancy "
-              "isn't a test result for today."),
+          // Plain words (2026-10-21), kept for revert: Not always. Sperm can
+          // change with age, illness, weight, medicines and time. When a couple
+          // who conceived before can't again, the man's side is often part of
+          // it. A past pregnancy isn't a test result for today.
+          fact: _en("Having fathered a child before doesn't always mean your "
+              "sperm is fine today. Sperm can change with age, illness, "
+              "weight, medicines and time. When a couple who conceived before "
+              "can't again, the man's side is often part of it. A past "
+              "pregnancy is history, not a test result for today."),
         ),
       ),
 
@@ -732,11 +737,17 @@ final List<PvRead> kTtcReadsHisSide = [
           // difference in live births. Zinc and CoQ10 have the best data of
           // the lot, and both are worth far less than stopping tobacco.
           // They don't replace finding out what's causing a low result.
-          fact: _en("Usually not. The evidence is weak and mixed. A few "
-              "trials show small changes in the numbers, but few show more "
-              "babies born. Zinc and CoQ10 have the most evidence, and "
-              "stopping tobacco helps far more than either. Supplements don't "
-              "replace finding the cause of a low result."),
+          // Plain words (2026-10-21), kept for revert: Usually not. The
+          // evidence is weak and mixed. A few trials show small changes in the
+          // numbers, but few show more babies born. Zinc and CoQ10 have the
+          // most evidence, and stopping tobacco helps far more than either.
+          // Supplements don't replace finding the cause of a low result.
+          fact: _en("Supplements don't usually fix a low sperm count. The "
+              "evidence is weak and mixed, and few trials show more babies "
+              "born, even when the numbers shift a little. Zinc and CoQ10 have "
+              "the most evidence, but stopping tobacco helps far more than "
+              "either. And no supplement replaces finding out what is causing "
+              "a low result."),
         ),
       ),
 
@@ -2040,9 +2051,14 @@ final List<PvRead> kTtcReadsHisSide = [
           // Plain words (2026-10-21). Kept for revert: A sample at six
           // weeks measures sperm that started forming before anything
           // changed. Nothing reliable shows until about week twelve.
-          fact: _en("It's too soon. A test at six weeks measures sperm that "
-              "started forming before anything changed. Nothing reliable "
-              "shows until about week twelve."),
+          // Plain words (2026-10-21), kept for revert: It's too soon. A test at
+          // six weeks measures sperm that started forming before anything
+          // changed. Nothing reliable shows until about week twelve.
+          fact: _en("Six weeks is too soon to see a difference in a sperm "
+              "test. A test at six weeks still measures sperm that started "
+              "forming before anything changed. Nothing reliable shows until "
+              "about week twelve, so keep going with the changes you've "
+              "made."),
         ),
       ),
       PvReadSection(
@@ -2296,9 +2312,13 @@ final List<PvRead> kTtcReadsHisSide = [
           // the two ingredients with any evidence, and that evidence is
           // weak. The branded mixes with many ingredients add nothing
           // proven, at several times the price.
-          fact: _en("It doesn't. Only zinc and CoQ10 have any evidence, and "
-              "it's weak. Branded mixes with many ingredients add nothing "
-              "proven, at several times the price."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. Only zinc
+          // and CoQ10 have any evidence, and it's weak. Branded mixes with many
+          // ingredients add nothing proven, at several times the price.
+          fact: _en("A 'male fertility' supplement is not a treatment for a "
+              "low sperm count. Only zinc and CoQ10 have any evidence, and "
+              "that evidence is weak. Branded mixes with many ingredients add "
+              "nothing proven, at several times the price."),
         ),
       ),
       PvReadSection(

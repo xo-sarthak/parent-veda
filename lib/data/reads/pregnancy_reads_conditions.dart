@@ -545,10 +545,14 @@ final List<PvRead> kPregnancyReadsConditions = [
           //   kicks, because a bigger baby moves differently. But how often
           //   you feel something shouldn't fall away. A real drop near your
           //   due date is a reason to be seen, not a stage to expect.
-          fact: _en("They don't. Kicks may feel more like rolls and "
-              "stretches, but they shouldn't come less often. If "
-              "movements slow down or change, call your doctor or "
-              "hospital the same day."),
+          // Plain words (2026-10-21), kept for revert: They don't. Kicks may
+          //   feel more like rolls and stretches, but they shouldn't come less
+          //   often. If movements slow down or change, call your doctor or
+          //   hospital the same day.
+          fact: _en("Your baby shouldn't move less often near the end, even "
+              "though space is tight. The kicks may feel more like rolls and "
+              "stretches as your baby grows bigger. If the movements slow down "
+              "or change, call your doctor or hospital the same day."),
         ),
       ),
 

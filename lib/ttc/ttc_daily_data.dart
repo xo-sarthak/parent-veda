@@ -820,10 +820,15 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "You can only get pregnant on one day a month.",
     mythHi: 'Har mahine sirf ek hi fertile din hota hai.',
     // Kept for revert (2026-10-21): truthEn: 'Sperm survive around five days, so your fertile window is about six days long. The days before ovulation count just as much as the day itself.'
-    truthEn: "You can get pregnant on about 6 days each cycle: the 5 days before ovulation and the day itself.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "You can get pregnant
+    // on about 6 days each cycle: the 5 days before ovulation and the day
+    // itself."
+    truthEn: "You actually have about 6 fertile days each cycle: the 5 days before you ovulate, and the day itself.",
     truthHi:
         'Sperm lagbhag paanch din zinda rehte hain, toh window karib chhe din ki hoti hai. Ovulation se pehle ke din utne hi important hain jitna khud ka din.',
-    whyEn: "Sperm can live up to 5 days inside you, waiting for the egg.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Sperm can live up to 5
+    // days inside you, waiting for the egg."
+    whyEn: "Sperm can live for up to 5 days inside you, waiting for the egg, so there's no need to time things to one exact day.",
   ),
   TtcMyth(
     id: 'infertility_is_female',
@@ -831,10 +836,14 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "Trouble getting pregnant is usually the woman's problem.",
     mythHi: 'Infertility zyadatar aurat ki samasya hoti hai.',
     // Kept for revert (2026-10-21): truthEn: "A male factor plays a part in roughly forty to fifty per cent of cases. A semen analysis is quick and low-cost, and it's often a sensible first test."
-    truthEn: "In about 4 in 10 couples, the man's side is part of the reason.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "In about 4 in 10
+    // couples, the man's side is part of the reason."
+    truthEn: "Trouble getting pregnant is often shared: in about 4 in 10 couples, the man's side is part of the reason.",
     truthHi:
         'Lagbhag chalis se pachas pratishat maamlon mein mard ka factor shaamil hota hai. Semen analysis jaldi aur sasta hai, aur aksar samajhdaari bhara pehla test hota hai.',
-    whyEn: "A semen test is quick and low-cost, so it's a good early test for him.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "A semen test is quick
+    // and low-cost, so it's a good early test for him."
+    whyEn: "A semen test is quick and low-cost, so it's a good early step for him, alongside your own tests.",
   ),
   TtcMyth(
     id: 'stress_causes_infertility',
@@ -842,10 +851,14 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "Stress alone stops you getting pregnant.",
     mythHi: 'Sirf stress se infertility hoti hai.',
     // Kept for revert (2026-10-21): truthEn: 'Very high stress over a long time can delay ovulation, but everyday worry doesn\'t stop a healthy couple from conceiving. "Just relax" isn\'t medical advice.'
-    truthEn: "Everyday worry doesn't stop you getting pregnant.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Everyday worry
+    // doesn't stop you getting pregnant."
+    truthEn: "Everyday worry doesn't stop you getting pregnant, even when it feels like it might.",
     truthHi:
         'Tez aur lagatar stress ovulation mein der kar sakta hai, lekin aam chinta kisi healthy couple ko conceive karne se nahi rokti. "Bas relax karo" medical salaah nahi hai.',
-    whyEn: "Only very high stress over a long time can delay ovulation, and that can be helped.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Only very high stress
+    // over a long time can delay ovulation, and that can be helped."
+    whyEn: "Only very high stress over a long time can delay ovulation, and that kind of stress can be helped.",
   ),
   TtcMyth(
     id: 'lying_down_after',
@@ -853,10 +866,14 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "You must lie down with your legs up after sex.",
     mythHi: 'Baad mein taange upar karke letna zaroori hai.',
     // Kept for revert (2026-10-21): truthEn: 'Sperm reach the cervix within minutes. No position has ever been shown to change the result, so do whatever feels comfortable.'
-    truthEn: "You don't need to. Any position afterwards is fine.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "You don't need to.
+    // Any position afterwards is fine."
+    truthEn: "You don't need to lie down after sex. Any position afterwards is fine, so do whatever feels comfortable.",
     truthHi:
         'Sperm minton mein cervix tak pahunch jaate hain. Position ya posture se nateeja badalta hai, ye kabhi sabit nahi hua - jo aaram se ho, wahi karein.',
-    whyEn: "Sperm reach the cervix within minutes, whatever you do next.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Sperm reach the cervix
+    // within minutes, whatever you do next."
+    whyEn: "Sperm reach the cervix within minutes, whatever you do next, so getting up won't undo anything.",
   ),
   TtcMyth(
     id: 'age_cliff_35',
@@ -864,10 +881,14 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "Fertility suddenly drops at 35.",
     mythHi: 'Pentiis par fertility ekdum girr jaati hai.',
     // Kept for revert (2026-10-21): truthEn: "Fertility goes down slowly from the early thirties, and faster after thirty-seven. It's a slope, not a cliff. Thirty-five is a guide for when to get help sooner, not a deadline."
-    truthEn: "Fertility goes down slowly from the early 30s, and faster after 37.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Fertility goes down
+    // slowly from the early 30s, and faster after 37."
+    truthEn: "Fertility doesn't suddenly drop at 35. It goes down slowly from the early 30s, and faster after 37.",
     truthHi:
         'Fertility tees ki shuruaat se dheere-dheere kam hoti hai, aur santees ke baad tezi se. Ye dhalaan hai, khaai nahi - aur pentiis ek guideline hai ki madad kab jaldi leni hai, deadline nahi.',
-    whyEn: "At 35 the advice is to see a doctor after 6 months of trying, not 12. It isn't a deadline.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "At 35 the advice is to
+    // see a doctor after 6 months of trying, not 12. It isn't a deadline."
+    whyEn: "At 35 the advice is to see a doctor after 6 months of trying instead of 12, which is a guide for getting help sooner, not a deadline.",
   ),
   TtcMyth(
     id: 'irregular_means_infertile',
@@ -875,7 +896,10 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "If your periods are irregular, you can't get pregnant.",
     mythHi: 'Irregular periods ka matlab conceive nahi kar sakte.',
     // Kept for revert (2026-10-21): truthEn: 'Irregular cycles make timing harder and are worth checking, but many women with irregular periods do conceive. Some conceive naturally, and many with simple help.'
-    truthEn: "Many women with irregular periods get pregnant, some on their own and many with simple help.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Many women with
+    // irregular periods get pregnant, some on their own and many with simple
+    // help."
+    truthEn: "You can still get pregnant with irregular periods. Many women do, some on their own and many with simple help.",
     truthHi:
         'Irregular cycles timing mushkil karte hain aur inhe jaanchna theek hai, lekin bahut si auratein irregular periods ke saath conceive karti hain - kuch naturally, bahut si thodi si madad se.',
     whyEn: "Irregular cycles make timing harder, so they're worth showing a doctor.",
@@ -886,10 +910,15 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "If it was easy last time, it will be easy again.",
     mythHi: 'Pehle conceive ho gaya toh dobara aasaani se ho jayega.',
     // Kept for revert (2026-10-21): truthEn: 'Secondary infertility, trouble conceiving after an earlier pregnancy, is real and common. Age, weight, a new health condition or a change on the male side can all make a difference. It deserves the same care as the first time.'
-    truthEn: "Trouble getting pregnant after an earlier baby is common.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Trouble getting
+    // pregnant after an earlier baby is common."
+    truthEn: "An easy pregnancy last time doesn't mean the next will be easy. Trouble getting pregnant after a baby is common.",
     truthHi:
         'Secondary infertility asli aur aam hai. Umar, wazan, koi nayi condition ya mard ki taraf badlaav - sab kuch badal sakte hain. Ise pehli baar jitna hi dhyaan chahiye.',
-    whyEn: "Age, weight, a new health condition or changes on his side can all play a part. It deserves the same care as the first time.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Age, weight, a new
+    // health condition or changes on his side can all play a part. It deserves
+    // the same care as the first time."
+    whyEn: "Age, weight, a new health condition or changes on his side can all play a part, and you deserve the same care as the first time.",
   ),
   TtcMyth(
     id: 'more_is_better',
@@ -897,10 +926,15 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "Having sex every day gives you the best chance.",
     mythHi: 'Jitna zyada koshish, utna zyada mauka.',
     // Kept for revert (2026-10-21): truthEn: "Every day or every other day across the fertile window is plenty. More than that doesn't add anything, and turning it into a timetable wears you both down."
-    truthEn: "Sex every day or every other day during your fertile days is enough.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Sex every day or
+    // every other day during your fertile days is enough."
+    truthEn: "You don't need to have sex every day. Every other day during your fertile days works just as well.",
     truthHi:
         'Fertile window mein roz ya ek din chhod kar kaafi hai. Usse zyada kuch nahi jodta, aur ise schedule bana dena dono par bhaari padta hai.',
-    whyEn: "Having sex more often doesn't raise your chances, and a strict timetable can wear you both down.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Having sex more often
+    // doesn't raise your chances, and a strict timetable can wear you both
+    // down."
+    whyEn: "Having sex more often doesn't raise your chances, and a strict timetable can wear you both down, so rest days are fine.",
   ),
   TtcMyth(
     id: 'app_predicts',
@@ -908,10 +942,15 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "An app knows exactly when you ovulate.",
     mythHi: 'App ko theek pata hai aap kab ovulate karti hain.',
     // Kept for revert (2026-10-21): truthEn: "Every app, this one included, is making an estimate from your past cycles. Your body's own signs are better evidence. That's why we always show how sure the estimate is."
-    truthEn: "Every app, including this one, gives an estimate from your past cycles.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Every app, including
+    // this one, gives an estimate from your past cycles."
+    truthEn: "No app knows exactly when you ovulate. Every app, including this one, gives an estimate from your past cycles.",
     truthHi:
         'Koi bhi app - ye bhi - pichhle cycles se andaaza lagata hai. Aapke body ke apne signals behtar saboot hain, isiliye hum hamesha batate hain ki andaaza kitna pakka hai.',
-    whyEn: "Ovulation tests and your temperature are better signs. We always show how sure our estimate is.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Ovulation tests and
+    // your temperature are better signs. We always show how sure our estimate
+    // is."
+    whyEn: "Ovulation tests and your temperature are better signs, and we always show how sure our estimate is.",
   ),
   TtcMyth(
     id: 'hot_foods',
@@ -919,10 +958,14 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "Some \"hot\" or \"cold\" foods stop you getting pregnant.",
     mythHi: 'Kuch "garam" ya "thandi" cheezein conceive hone se rokti hain.',
     // Kept for revert (2026-10-21): truthEn: "No single food stops pregnancy or causes it. What the evidence supports is your overall way of eating: whole grains, dal, vegetables and healthy fats. There's no one food to fear or chase."
-    truthEn: "No single food stops or causes pregnancy.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "No single food stops
+    // or causes pregnancy."
+    truthEn: "No single food can stop a pregnancy or cause one, whether people call it hot or cold.",
     truthHi:
         'Koi ek khana conceive hone se na rokta hai na karata hai. Jo support karta hai wo poora pattern hai - sabut anaaj, dal, sabziyan, achhi fats - koi ek cheez jise darein ya peechha karein, wo nahi.',
-    whyEn: "What helps is your everyday food: whole grains, dal, vegetables and healthy fats.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "What helps is your
+    // everyday food: whole grains, dal, vegetables and healthy fats."
+    whyEn: "What helps is your everyday way of eating, like whole grains, dal, vegetables and healthy fats, so there's no one food to fear.",
   ),
   TtcMyth(
     id: 'birth_control_delay',
@@ -930,10 +973,14 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "Years on the pill delay pregnancy for years.",
     mythHi: 'Saalon tak pill lene se fertility saalon tak late hoti hai.',
     // Kept for revert (2026-10-21): truthEn: 'For most women, cycles come back within one to three months of stopping, however long they were on it. The injection is the main exception and can take longer.'
-    truthEn: "For most women, periods come back within 1 to 3 months of stopping the pill.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "For most women,
+    // periods come back within 1 to 3 months of stopping the pill."
+    truthEn: "Years on the pill don't delay pregnancy for years. For most women, periods come back within 1 to 3 months of stopping.",
     truthHi:
         'Zyadatar auraton mein pill band karne ke ek se teen mahine mein cycles wapas aa jaate hain, chahe kitne saal li ho. Injectable iska mukhya apwaad hai aur usmein zyada waqt lag sakta hai.',
-    whyEn: "The injection is the main exception, and can take longer.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "The injection is the
+    // main exception, and can take longer."
+    whyEn: "The contraceptive injection is the main exception, and periods can take longer to come back after it.",
   ),
   TtcMyth(
     id: 'position_gender',
@@ -941,10 +988,15 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "Some positions or timings choose your baby's sex.",
     mythHi: 'Timing ya position se bachche ka gender chuna ja sakta hai.',
     // Kept for revert (2026-10-21): truthEn: "There's no evidence for any of it. In India, sex determination and sex selection are also illegal under the PCPNDT Act, and ParentVeda will never help with either."
-    truthEn: "Nothing you do can choose your baby's sex.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Nothing you do can
+    // choose your baby's sex."
+    truthEn: "No position or timing can choose your baby's sex, and there's no evidence for any of it.",
     truthHi:
         'Iska koi saboot nahi hai. India mein sex determination aur selection PCPNDT Act ke tahat gair-kanooni bhi hai - aur ParentVeda ismein kabhi madad nahi karega.',
-    whyEn: "In India, finding out or choosing a baby's sex is illegal (PCPNDT Act), and ParentVeda never helps with it.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "In India, finding out
+    // or choosing a baby's sex is illegal (PCPNDT Act), and ParentVeda never
+    // helps with it."
+    whyEn: "In India, finding out or choosing a baby's sex is illegal under the PCPNDT Act, and ParentVeda will never help with either.",
   ),
   TtcMyth(
     id: 'miscarriage_blame',
@@ -952,10 +1004,15 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "A miscarriage means you did something wrong.",
     mythHi: 'Miscarriage ka matlab aapne kuch galat kiya.',
     // Kept for revert (2026-10-21): truthEn: "Most early losses happen because of chromosome problems that nothing could have prevented. They aren't caused by lifting, travelling, working or stress."
-    truthEn: "Most early miscarriages are not caused by anything you did.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Most early
+    // miscarriages are not caused by anything you did."
+    truthEn: "A miscarriage does not mean you did something wrong. Most early losses are not caused by anything you did.",
     truthHi:
         'Zyadatar shuruaati loss chromosomal galtiyon se hote hain jinhe kuch bhi nahi rok sakta tha - na saamaan uthana, na safar, na kaam, na stress.',
-    whyEn: "Most happen because of chromosome problems nothing could prevent. Lifting, travel, work and stress don't cause them.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Most happen because of
+    // chromosome problems nothing could prevent. Lifting, travel, work and
+    // stress don't cause them."
+    whyEn: "Most early losses happen because of chromosome problems that nothing could have prevented, and lifting, travel, work and stress don't cause them.",
   ),
   TtcMyth(
     id: 'ivf_last_resort',
@@ -963,10 +1020,15 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "IVF is the only fertility treatment.",
     mythHi: 'IVF hi ek ilaaj hai.',
     // Kept for revert (2026-10-21): truthEn: "It's one of several. Ovulation induction and IUI are simpler, cheaper and often enough. A good clinic starts with the least you need, not the most."
-    truthEn: "IVF is one of several treatments, and simpler ones often work.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "IVF is one of
+    // several treatments, and simpler ones often work."
+    truthEn: "IVF is just one of several fertility treatments, and simpler ones often work.",
     truthHi:
         'Ye kai mein se ek hai. Ovulation induction aur IUI aasaan, saste aur aksar kaafi hote hain. Achha clinic sabse kam zaroori cheez se shuru karta hai, sabse zyada se nahi.',
-    whyEn: "Ovulation tablets or IUI are cheaper and often enough. A good clinic starts with the least you need.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Ovulation tablets or
+    // IUI are cheaper and often enough. A good clinic starts with the least you
+    // need."
+    whyEn: "Ovulation tablets or IUI are cheaper and often enough, and a good clinic starts with the least you need, not the most.",
   ),
   TtcMyth(
     id: 'symptom_spotting',
@@ -974,10 +1036,14 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "Early symptoms tell you you're pregnant before a test can.",
     mythHi: 'Shuruaati symptoms test se pehle bata dete hain.',
     // Kept for revert (2026-10-21): truthEn: 'Early pregnancy signs and pre-period signs come from the same hormone, so they feel exactly the same. Only a test can tell you, and waiting for it is often the hardest part.'
-    truthEn: "Only a pregnancy test can tell you.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "Only a pregnancy
+    // test can tell you."
+    truthEn: "Early symptoms can't tell you that you're pregnant. Only a test can, and waiting for it is often the hardest part.",
     truthHi:
         'Shuruaati pregnancy aur period se pehle ke symptoms ek hi hormone se aate hain, isliye ek jaise lagte hain. Sirf test bata sakta hai - aur uska intezaar sach mein sabse mushkil hissa hai.',
-    whyEn: "Early pregnancy signs and pre-period signs come from the same hormone, so they feel the same.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Early pregnancy signs
+    // and pre-period signs come from the same hormone, so they feel the same."
+    whyEn: "Early pregnancy signs and pre-period signs come from the same hormone, so they feel exactly the same.",
   ),
   TtcMyth(
     id: 'male_age',
@@ -985,10 +1051,14 @@ const List<TtcMyth> ttcMyths = [
     mythEn: "A man's age doesn't matter.",
     mythHi: 'Mard ki umar maayne nahi rakhti.',
     // Kept for revert (2026-10-21): truthEn: "It matters less sharply than a woman's age, but it does matter. Sperm quality and the health of sperm DNA slowly go down from around forty, and some risks rise a little."
-    truthEn: "It does matter, though less than a woman's age.",
+    // Plain words (2026-10-21), kept for revert: truthEn: "It does matter,
+    // though less than a woman's age."
+    truthEn: "A man's age does matter, though less than a woman's age does.",
     truthHi:
         'Aurat ki umar jitna tez asar nahi karti, lekin asar karti hai. Chalis ke aas-paas se sperm quality aur DNA integrity dheere-dheere kam hoti hai, aur kuch khatre halke se badhte hain.',
-    whyEn: "Sperm quality slowly goes down from about 40.",
+    // Plain words (2026-10-21), kept for revert: whyEn: "Sperm quality slowly
+    // goes down from about 40."
+    whyEn: "Sperm quality slowly goes down from about 40, so it's worth checking his side too.",
   ),
 ];
 

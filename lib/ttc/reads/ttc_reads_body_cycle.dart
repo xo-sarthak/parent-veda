@@ -566,8 +566,13 @@ final List<PvRead> kTtcReadsBodyCycle = [
           // Plain words (2026-10-21). Kept for revert: It can't be told
           // apart from spotting before a period just by looking. A test on
           // or after the day your period is due gives you the answer.
-          fact: _en("It isn't. It looks the same as spotting before a period. "
-              "A test on or after the day your period is due will tell you."),
+          // Plain words (2026-10-21), kept for revert: It isn't. It looks the
+          // same as spotting before a period. A test on or after the day your
+          // period is due will tell you.
+          fact: _en("Implantation bleeding isn't a sure sign that you're "
+              "pregnant. It looks just like spotting before a period, so you "
+              "can't tell them apart by looking. A test on or after the day "
+              "your period is due will give you the answer."),
         ),
       ),
       PvReadSection(
@@ -1416,9 +1421,15 @@ final List<PvRead> kTtcReadsBodyCycle = [
           // sometimes ease with age or after childbirth. Severe pain from a
           // condition like endometriosis doesn't go away by waiting, and it
           // deserves a check now.
-          fact: _en("Not always. Ordinary cramps sometimes ease with age or "
-              "after a baby. Severe pain from a condition like endometriosis "
-              "doesn't go away by waiting. Get it checked now."),
+          // Plain words (2026-10-21), kept for revert: Not always. Ordinary
+          // cramps sometimes ease with age or after a baby. Severe pain from a
+          // condition like endometriosis doesn't go away by waiting. Get it
+          // checked now.
+          fact: _en("Painful periods don't always get better after marriage or "
+              "a baby. Ordinary cramps sometimes ease with age or after "
+              "childbirth. But severe pain from a condition like endometriosis "
+              "doesn't go away by waiting, and you deserve to have it checked "
+              "now."),
         ),
       ),
       PvReadSection(

@@ -309,8 +309,13 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           // Every two days in the fertile week gives you the same result as
           // every day. Beyond that, more doesn't add anything except
           // pressure.
-          fact: 'Only up to a point. Sex every two days in the fertile week '
-              'works as well as every day. More than that adds only pressure.',
+          // Plain words (2026-10-21), kept for revert: Only up to a point. Sex
+          // every two days in the fertile week works as well as every day. More
+          // than that adds only pressure.
+          fact: "Having sex more often only helps up to a point. Every two "
+              "days in your fertile week works just as well as every day. "
+              "Going beyond that adds pressure, not a better chance, so you "
+              "can take the days off without worry.",
         ),
       ],
     ),
@@ -338,9 +343,12 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           // shown to work better than another. Sperm reach the cervix
           // within minutes, whatever position you used. Pick what's
           // comfortable.
-          fact: "They don't. No position has been shown to work better than "
-              "another. Sperm reach the cervix within minutes either way, so "
-              "pick what's comfortable.",
+          // Plain words (2026-10-21), kept for revert: They don't. No position
+          // has been shown to work better than another. Sperm reach the cervix
+          // within minutes either way, so pick what's comfortable.
+          fact: "No sex position has been shown to make a baby more likely. "
+              "Sperm reach the cervix within minutes whichever position you "
+              "use, so pick whatever feels comfortable for you both.",
         ),
         TtcMythTile(
           // Kept for revert (2026-09-28, explicit names): title: 'Should you lie down after?',
@@ -356,9 +364,12 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           // past the cervix within minutes. Lying down does no harm if you
           // like it. But getting up straight away doesn't wash anything
           // away or undo anything.
-          fact: "You don't need to. Sperm are past the cervix within minutes. "
-              "Lying down is fine if you like it, but getting up washes "
-              "nothing away.",
+          // Plain words (2026-10-21), kept for revert: You don't need to. Sperm
+          // are past the cervix within minutes. Lying down is fine if you like
+          // it, but getting up washes nothing away.
+          fact: "You don't need to lie down with your legs up after sex. Sperm "
+              "are already past the cervix within minutes. Lying down is fine "
+              "if you enjoy it, but getting up washes nothing away.",
         ),
         TtcMythTile(
           // Kept for revert (2026-09-28, explicit names): title: 'Do you need to orgasm?',
@@ -373,9 +384,13 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           // help sperm move, but it has never been shown to change whether
           // someone gets pregnant. Nothing has gone wrong if it doesn't
           // happen.
-          fact: "You don't. Getting pregnant doesn't depend on your orgasm. "
-              "It has never been shown to change whether someone gets "
-              "pregnant. Nothing has gone wrong if you don't have one.",
+          // Plain words (2026-10-21), kept for revert: You don't. Getting
+          // pregnant doesn't depend on your orgasm. It has never been shown to
+          // change whether someone gets pregnant. Nothing has gone wrong if you
+          // don't have one.
+          fact: "You don't need an orgasm to get pregnant. It has never been "
+              "shown to change whether someone conceives. If it doesn't "
+              "happen, nothing has gone wrong.",
         ),
         // The written film on exactly these myths (2026-09-27, relevance
         // audit). It was on no door, only at the head of the timing read.

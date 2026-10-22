@@ -234,10 +234,15 @@ final List<PvRead> kTtcReadsConceiving = [
           // from progesterone, and they happen whether or not you
           // conceived. A test once your period is late is the only way to
           // know.
-          fact: _en("You can't. Fertilisation and implantation can't be felt. "
-              "Sore breasts, bloating and tiredness late in the cycle come "
-              "from progesterone, pregnant or not. A test once your period is "
-              "late is the only way to know."),
+          // Plain words (2026-10-21), kept for revert: You can't. Fertilisation
+          // and implantation can't be felt. Sore breasts, bloating and
+          // tiredness late in the cycle come from progesterone, pregnant or
+          // not. A test once your period is late is the only way to know.
+          fact: _en("You can't feel the moment you conceive. Fertilisation and "
+              "implantation happen without any feeling you can pick out. Sore "
+              "breasts, bloating and tiredness late in the cycle come from "
+              "progesterone, whether you're pregnant or not. A test once your "
+              "period is late is the only way to know."),
         ),
       ),
 
@@ -438,9 +443,13 @@ final List<PvRead> kTtcReadsConceiving = [
           // already on their way. Getting up changes nothing. It's a good
           // one to let go of first, because it's the one that most often
           // turns a private moment into a procedure.
-          fact: _en("You don't need to. Sperm reach the cervix within "
-              "minutes, so getting up changes nothing. Letting this go keeps "
-              "sex feeling like sex, not a procedure."),
+          // Plain words (2026-10-21), kept for revert: You don't need to. Sperm
+          // reach the cervix within minutes, so getting up changes nothing.
+          // Letting this go keeps sex feeling like sex, not a procedure.
+          fact: _en("You don't need to lie still with your legs up after sex. "
+              "Sperm reach the cervix within minutes, so getting up changes "
+              "nothing. Letting this one go helps sex feel like sex again, not "
+              "a procedure."),
         ),
       ),
 
@@ -452,8 +461,11 @@ final List<PvRead> kTtcReadsConceiving = [
           // Plain words (2026-10-21). Kept for revert: There's no evidence
           // that position affects whether you get pregnant. None of the
           // studies people quote for this measured pregnancy.
-          fact: _en("There's no evidence they do. The studies people quote "
-              "for this never measured pregnancy."),
+          // Plain words (2026-10-21), kept for revert: There's no evidence they
+          // do. The studies people quote for this never measured pregnancy.
+          fact: _en("There's no evidence that any position helps you get "
+              "pregnant. The studies people quote for this never measured "
+              "pregnancy, so choose whatever feels good for you both."),
         ),
       ),
 
@@ -468,10 +480,15 @@ final List<PvRead> kTtcReadsConceiving = [
           // what matters here. Every one to two days works best because it
           // balances the two. Holding off for a week before the window
           // works against you.
-          fact: _en("It doesn't help. Long gaps raise the number of sperm but "
-              "make them swim less well, and swimming is what matters. Sex "
-              "every one to two days works best. Holding off for a week "
-              "before the fertile days works against you."),
+          // Plain words (2026-10-21), kept for revert: It doesn't help. Long
+          // gaps raise the number of sperm but make them swim less well, and
+          // swimming is what matters. Sex every one to two days works best.
+          // Holding off for a week before the fertile days works against you.
+          fact: _en("Saving it up for a few days doesn't help you get "
+              "pregnant. Long gaps raise the number of sperm but make them "
+              "swim less well, and swimming is what matters. Sex every one to "
+              "two days works best, and holding off for a week before the "
+              "fertile days works against you."),
         ),
       ),
 
@@ -484,9 +501,14 @@ final List<PvRead> kTtcReadsConceiving = [
           // worrying about this, hasn't been shown to stop you getting
           // pregnant. So if someone tells you to just relax, please don't
           // hear it as your fault. It isn't.
+          // Plain words (2026-10-21), kept for revert: Everyday stress doesn't
+          // stop you getting pregnant. Only very high stress over a long time
+          // can delay or stop ovulation. If someone tells you to just relax, it
+          // isn't your fault.
           fact: _en("Everyday stress doesn't stop you getting pregnant. Only "
               "very high stress over a long time can delay or stop ovulation. "
-              "If someone tells you to just relax, it isn't your fault."),
+              "So if someone tells you to just relax, please don't hear it as "
+              "your fault, because it isn't."),
         ),
       ),
 
@@ -579,9 +601,14 @@ final List<PvRead> kTtcReadsConceiving = [
           // dehydrated may make everything a little drier. But drinking
           // extra water hasn't been shown to improve fertile discharge.
           // Drink when you're thirsty, as you usually would.
-          fact: _en("Not really. Being very dehydrated may make things a "
-              "little drier. But extra water hasn't been shown to give you "
-              "more fertile discharge. Drink when you're thirsty."),
+          // Plain words (2026-10-21), kept for revert: Not really. Being very
+          // dehydrated may make things a little drier. But extra water hasn't
+          // been shown to give you more fertile discharge. Drink when you're
+          // thirsty.
+          fact: _en("Drinking extra water hasn't been shown to give you more "
+              "fertile discharge. Being very dehydrated may make things a "
+              "little drier, so just drink when you're thirsty, as you usually "
+              "would."),
         ),
       ),
 

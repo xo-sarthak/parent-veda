@@ -46,7 +46,9 @@ void main() {
     test("carries the week's own myth and its answer, and opens the sheet", () {
       final m = byGo(cards(20), PregInsightGo.myth)!;
       expect(m.eyebrow, 'Myth or fact');
-      expect(m.value, 'The anomaly scan is only for finding problems.');
+      // Kept for revert (the 2026-10-21 plain-words pass changed the myth):
+      // expect(m.value, 'The anomaly scan is only for finding problems.');
+      expect(m.value, "If the anomaly scan shows something, it's always serious.");
       expect(m.truth, isNotEmpty);
       expect(m.truth, isNot(m.value));
       expect(m.id, 'myth_w20');

@@ -186,9 +186,14 @@ final List<PvRead> kPregnancyReadsLabour = [
           //   an epidural. It does make forceps or vacuum help somewhat more
           //   likely, and it makes the pushing stage a little longer. Those
           //   are real trade-offs. A C-section isn't one of them.
-          fact: _en("It doesn't. It can make the pushing stage a little "
-              "longer, and help with forceps or a vacuum a bit more "
-              "likely. A C-section isn't one of the trade-offs."),
+          // Plain words (2026-10-21), kept for revert: It doesn't. It can make
+          //   the pushing stage a little longer, and help with forceps or a
+          //   vacuum a bit more likely. A C-section isn't one of the
+          //   trade-offs.
+          fact: _en("An epidural doesn't make a C-section more likely. It can "
+              "make the pushing stage a little longer, and it makes help with "
+              "forceps or a vacuum a bit more likely. Knowing the real "
+              "trade-offs can help you decide what feels right for you."),
         ),
       ),
 

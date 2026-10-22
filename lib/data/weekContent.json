@@ -155,7 +155,7 @@
      "hi": "आपको अभी से दो लोगों जितना खाना चाहिए।"
     },
     "truth": {
-     "en": "In early pregnancy, what you eat matters far more than how much.",
+     "en": "You don't need to eat for two in early pregnancy. What you eat matters far more than how much.",
      "hi": "शुरुआती गर्भावस्था में खाने की मात्रा से कहीं ज़्यादा मायने रखती है उसकी गुणवत्ता।"
     }
    }
@@ -388,7 +388,7 @@
      "hi": "जन्म से पहले शिशु को आपकी आवाज़ सुनने का कोई फ़ायदा नहीं होता।"
     },
     "truth": {
-     "en": "Many healthy pregnancies come with little or no nausea. How sick you feel says nothing about how your baby is doing.",
+     "en": "Not feeling sick doesn't mean something is wrong. Many healthy pregnancies come with little or no nausea, and how sick you feel says nothing about how your baby is doing.",
      "hi": "आपके शिशु में सुनने के लिए ज़रूरी हिस्से अभी से बन रहे हैं, और वह जल्द ही जानी-पहचानी आवाज़ें पहचानने लगेगा।"
     }
    }
@@ -601,7 +601,7 @@
      "hi": "जितनी ज़्यादा मितली, शिशु उतना ही स्वस्थ।"
     },
     "truth": {
-     "en": "How sick you feel doesn't show how your baby is doing. Nausea depends on hormones and differs a lot from woman to woman.",
+     "en": "Feeling very sick doesn't mean your baby is any healthier. Nausea depends on your hormones, and it differs a lot from woman to woman.",
      "hi": "गर्भावस्था के लक्षण हर महिला में अलग होते हैं और उनसे नतीजों का अंदाज़ा नहीं लगाया जा सकता।"
     }
    }
@@ -814,7 +814,7 @@
      "hi": "हर गर्भवती महिला को एक जैसे लक्षण होने चाहिए।"
     },
     "truth": {
-     "en": "Healthy pregnancies can come with very different symptoms.",
+     "en": "Healthy pregnancies can come with very different symptoms. So if yours don't match a friend's or your sister's, that's okay.",
      "hi": "स्वस्थ गर्भावस्थाओं में भी लक्षण बहुत अलग-अलग हो सकते हैं।"
     }
    }
@@ -1027,7 +1027,7 @@
      "hi": "लक्षण न होने का मतलब है कि गर्भावस्था में कुछ गड़बड़ है।"
     },
     "truth": {
-     "en": "Nausea can come at any time of day. Small meals, eaten often, help many women whatever the hour.",
+     "en": "Morning sickness can come at any time of day, not only in the morning. Small meals, eaten often, help many women whatever the hour.",
      "hi": "स्वस्थ गर्भावस्थाओं में लक्षण बहुत अलग-अलग हो सकते हैं, बहुत हल्के भी।"
     }
    }
@@ -1240,7 +1240,7 @@
      "hi": "अगर लक्षण कम हो जाएँ तो कुछ गड़बड़ है।"
     },
     "truth": {
-     "en": "Symptoms often ease towards the end of the first 3 months. That is normal. If you have pain or bleeding, call your doctor.",
+     "en": "Symptoms often ease towards the end of the first 3 months, and that is normal. If you have pain or bleeding, call your doctor.",
      "hi": "गर्भावस्था के लक्षण स्वाभाविक रूप से घटते-बढ़ते रहते हैं और पहली तिमाही में अक्सर बदलते हैं।"
     }
    }
@@ -1453,7 +1453,7 @@
      "hi": "गर्भावस्था में कसरत करना ख़तरनाक है।"
     },
     "truth": {
-     "en": "Most healthy pregnancies do well with exercise your doctor has said is fine.",
+     "en": "Most healthy pregnancies do well with exercise that your doctor has said is fine. You can ask at your next check-up what suits you.",
      "hi": "ज़्यादातर स्वस्थ गर्भावस्थाओं में डॉक्टर की सलाह से की गई हलचल फ़ायदा ही करती है।"
     }
    }
@@ -1666,7 +1666,7 @@
      "hi": "हर गर्भावस्था का बंप एक जैसा दिखना चाहिए।"
     },
     "truth": {
-     "en": "Bumps come in all shapes and sizes, and they differ from woman to woman and pregnancy to pregnancy.",
+     "en": "Bumps come in all shapes and sizes, and they differ from woman to woman and pregnancy to pregnancy. There's no right way for yours to look.",
      "hi": "बंप का आकार हर महिला और हर गर्भावस्था में काफ़ी अलग होता है।"
     }
    }
@@ -1879,7 +1879,7 @@
      "hi": "अब मुश्किल हिस्सा ख़त्म हो गया।"
     },
     "truth": {
-     "en": "Many women feel better in months 4 to 6, but your body still needs rest and check-ups.",
+     "en": "Many women feel better in months 4 to 6, but your body is still working hard. Keep resting when you need to, and keep going to your check-ups.",
      "hi": "हर तिमाही अपने नए अनुभव, पड़ाव और चुनौतियाँ लेकर आती है।"
     }
    }
@@ -2092,7 +2092,7 @@
      "hi": "अच्छी माँएँ अपने शिशु से तुरंत जुड़ाव महसूस करती हैं।"
     },
     "truth": {
-     "en": "Bonding grows differently for everyone, and often slowly, over time.",
+     "en": "Bonding grows differently for everyone, and often slowly, over time. If the feeling doesn't come straight away, it doesn't make you any less of a good mother.",
      "hi": "जुड़ाव हर किसी में अलग तरह से बनता है और अक्सर धीरे-धीरे गहरा होता है।"
     }
    }
@@ -2305,7 +2305,7 @@
      "hi": "बड़ा बंप मतलब बड़ा शिशु।"
     },
     "truth": {
-     "en": "Bump size depends on lots of things, and it doesn't reliably tell you your baby's size.",
+     "en": "A bigger bump doesn't reliably tell you your baby's size. Bump size depends on lots of things, and your scans show how your baby is growing.",
      "hi": "बंप का आकार कई बातों पर निर्भर करता है और उससे शिशु के आकार का भरोसेमंद अंदाज़ा नहीं लगता।"
     }
    }
@@ -2518,7 +2518,7 @@
      "hi": "जन्म से पहले शिशु को आपकी आवाज़ सुनने का कोई फ़ायदा नहीं होता।"
     },
     "truth": {
-     "en": "Your baby's ears are forming now, and soon they'll hear your voice.",
+     "en": "Your baby's ears are forming now, and soon they'll hear your voice. So it's a lovely time to start talking to your baby.",
      "hi": "आपके शिशु में सुनने के लिए ज़रूरी हिस्से अभी से बन रहे हैं, और वह जल्द ही जानी-पहचानी आवाज़ें पहचानने लगेगा।"
     }
    }
@@ -2731,7 +2731,7 @@
      "hi": "अगर अच्छा महसूस हो रहा है, तो अतिरिक्त आराम की ज़रूरत नहीं।"
     },
     "truth": {
-     "en": "Your body is still doing a lot of work, even when your symptoms ease.",
+     "en": "Your body is still doing a lot of work, even when your symptoms ease. So rest when you can, even on the days you feel good.",
      "hi": "लक्षण कम होने पर भी आपका शरीर बहुत बड़ा काम कर रहा होता है।"
     }
    }
@@ -2948,7 +2948,7 @@
      "hi": "हर माँ को 17वें हफ़्ते तक शिशु की हलचल महसूस हो जाती है।"
     },
     "truth": {
-     "en": "When you first feel movement varies a lot, especially in a first pregnancy.",
+     "en": "When you first feel your baby move varies a lot, especially in a first pregnancy. If you haven't felt anything yet, your doctor can talk you through what to expect.",
      "hi": "हलचल महसूस होने का समय बहुत अलग-अलग होता है, ख़ासकर पहली गर्भावस्था में।"
     }
    }
@@ -3382,7 +3382,7 @@
      "hi": "हर स्कैन में कोई न कोई गड़बड़ी निकलती है।"
     },
     "truth": {
-     "en": "Most scans are routine, and they usually show that the baby is growing as expected.",
+     "en": "Most scans are routine, and they usually show that your baby is growing as expected. It's normal to feel a little nervous before one all the same.",
      "hi": "ज़्यादातर स्कैन सामान्य होते हैं और यह भरोसा देते हैं कि शिशु ठीक से बढ़ रहा है।"
     }
    }
@@ -3603,7 +3603,7 @@
      "hi": "Anomaly scan सिर्फ़ गड़बड़ी ढूँढने के लिए होता है।"
     },
     "truth": {
-     "en": "Many findings are small, and some settle on their own. Your doctor will explain what it means and whether you need another scan.",
+     "en": "A finding on the anomaly scan isn't always serious. Many findings are small, and some settle on their own. Your doctor will explain what it means and whether you need another scan.",
      "hi": "Anomaly scan हर गर्भावस्था में किया जाने वाला एक सामान्य परीक्षण है, और ज़्यादातर बार यह शिशु के विकास को लेकर भरोसा ही देता है।"
     }
    }
@@ -3820,7 +3820,7 @@
      "hi": "गर्भ में शिशु को अपने आस-पास का कुछ पता नहीं होता।"
     },
     "truth": {
-     "en": "Your baby is already learning to hear, move, taste and react to the world around them.",
+     "en": "Your baby is already learning to hear, move, taste and react to the world around them. Your voice is part of that world now.",
      "hi": "आपका शिशु अभी से सुनने, हिलने, स्वाद लेने और माहौल पर प्रतिक्रिया देने की क्षमता विकसित कर रहा है।"
     }
    }
@@ -4037,7 +4037,7 @@
      "hi": "शिशु गर्भावस्था के आख़िरी दौर तक साफ़ नहीं सुन पाते।"
     },
     "truth": {
-     "en": "By now, your baby can already hear sounds and react to them.",
+     "en": "By now, your baby can already hear sounds and react to them. So this is a nice time to talk, sing or read to your baby.",
      "hi": "इस दौर तक आपका शिशु आवाज़ें सुन भी सकता है और उन पर प्रतिक्रिया भी दे सकता है।"
     }
    }
@@ -4254,7 +4254,7 @@
      "hi": "सीखना जन्म के बाद ही शुरू होता है।"
     },
     "truth": {
-     "en": "Your baby's brain is already laying the groundwork for learning, memory and knowing familiar things.",
+     "en": "Your baby's learning has already begun, well before birth. Their brain is laying the groundwork for learning, memory and knowing familiar things.",
      "hi": "आपके शिशु का दिमाग़ अभी से सीखने, याद रखने और पहचानने की नींव बना रहा है।"
     }
    }
@@ -4471,7 +4471,7 @@
      "hi": "गर्भ में शिशु हर समय सोता रहता है।"
     },
     "truth": {
-     "en": "Babies have cycles of sleep and activity, and some of their active times can be surprisingly busy.",
+     "en": "Babies have cycles of sleep and activity, and some of their active times can be surprisingly busy. You may start to notice when your baby tends to be awake.",
      "hi": "शिशु में सोने और सक्रिय रहने के चक्र बनते हैं, और वह कई बार हैरान कर देने वाली तरह सक्रिय हो सकता है।"
     }
    }
@@ -4905,7 +4905,7 @@
      "hi": "शिशु पूरा दिन सोता रहता है।"
     },
     "truth": {
-     "en": "If your baby's movements slow down or change, call your doctor or hospital the same day. Don't wait until tomorrow. It's a quick check, and it's what they want you to do.",
+     "en": "If your baby's movements slow down or change, call your doctor or hospital the same day, without waiting until tomorrow. It's a quick check, and it's what they want you to do.",
      "hi": "आपका शिशु सोने और सक्रिय रहने के दौरों के बीच बदलता रहता है, और उसका अपना ढर्रा भी बन चुका हो सकता है।"
     }
    }
@@ -5122,7 +5122,7 @@
      "hi": "तीसरी तिमाही सिर्फ़ शिशु के आने का इंतज़ार करने के लिए होती है।"
     },
     "truth": {
-     "en": "The third trimester is one of the most important times for growth and brain development.",
+     "en": "The third trimester is one of the most important times for growth and brain development. Your baby is doing a lot of growing in these weeks, even while you wait.",
      "hi": "तीसरी तिमाही विकास और दिमाग़ी बढ़त के सबसे अहम दौरों में से एक है।"
     }
    }
@@ -5339,7 +5339,7 @@
      "hi": "शिशु जन्म तक आँखें बंद ही रखते हैं।"
     },
     "truth": {
-     "en": "By now, babies can open and close their eyes, and may react to light.",
+     "en": "By now, your baby can open and close their eyes, and may react to light.",
      "hi": "इस दौर तक शिशु अपनी आँखें खोल-बंद कर सकते हैं और रोशनी पर प्रतिक्रिया दे सकते हैं।"
     }
    }
@@ -5556,7 +5556,7 @@
      "hi": "बड़ा बंप मतलब आसान डिलीवरी।"
     },
     "truth": {
-     "en": "Antenatal classes, breathing practice and a birth plan all help you feel ready.",
+     "en": "There's a lot you can do to feel ready for labour. Antenatal classes, breathing practice and a birth plan all help.",
      "hi": "बंप के आकार से न डिलीवरी के अनुभव का, न शिशु के आकार का भरोसेमंद अंदाज़ा लगता है।"
     }
    }
@@ -5773,7 +5773,7 @@
      "hi": "प्रसव हमेशा नाटकीय ढंग से पानी की थैली फटने से शुरू होता है।"
     },
     "truth": {
-     "en": "Labour can start in many ways, including contractions that build slowly.",
+     "en": "Labour doesn't always start with your waters breaking. It can start in many ways, including contractions that build slowly.",
      "hi": "प्रसव कई अलग-अलग तरीक़ों से शुरू हो सकता है, धीरे-धीरे बढ़ते संकुचनों से भी।"
     }
    }
@@ -5990,7 +5990,7 @@
      "hi": "शिशु अब पूरी तरह बन चुका है और बस वज़न बढ़ा रहा है।"
     },
     "truth": {
-     "en": "Important growth of the brain, lungs and nerves carries on right through the third trimester.",
+     "en": "Your baby is still growing in important ways, not just putting on weight. The brain, lungs and nerves keep developing right through the third trimester.",
      "hi": "दिमाग़, फेफड़ों और नर्वस सिस्टम का ज़रूरी विकास पूरी तीसरी तिमाही में चलता रहता है।"
     }
    }
@@ -6207,7 +6207,7 @@
      "hi": "शिशु जन्म की तैयारी सिर्फ़ प्रसव के दौरान करता है।"
     },
     "truth": {
-     "en": "Your baby has been getting ready for months, by practising breathing, growing and building organs.",
+     "en": "Your baby has been getting ready for birth for months, not just during labour. They've been practising breathing, growing and building their organs.",
      "hi": "आपका शिशु महीनों से जन्म की तैयारी कर रहा है — साँस के अभ्यास, बढ़त और अंगों के विकास के ज़रिए।"
     }
    }
@@ -6424,7 +6424,7 @@
      "hi": "शिशु की रोग-प्रतिरोधक क्षमता जन्म के बाद ही बनती है।"
     },
     "truth": {
-     "en": "Important protection starts in pregnancy, as antibodies pass from mother to baby.",
+     "en": "Your baby's protection against illness starts in pregnancy, not after birth. Antibodies pass from you to your baby while they're in the womb.",
      "hi": "ज़रूरी सुरक्षा गर्भावस्था के दौरान ही शुरू हो जाती है, जब माँ से शिशु को एंटीबॉडीज़ मिलती हैं।"
     }
    }
@@ -6641,7 +6641,7 @@
      "hi": "एक बार शिशु का सिर नीचे आ जाए, तो अब कुछ बनना बाक़ी नहीं रहता।"
     },
     "truth": {
-     "en": "The brain, lungs and immune system keep developing right up to birth.",
+     "en": "Your baby keeps developing right up to birth, even after turning head-down. The brain, lungs and immune system are all still growing.",
      "hi": "दिमाग़, फेफड़ों और रोग-प्रतिरोधक तंत्र का ज़रूरी विकास जन्म तक चलता रहता है।"
     }
    }
@@ -6858,7 +6858,7 @@
      "hi": "हर संकुचन का मतलब है कि प्रसव शुरू हो गया।"
     },
     "truth": {
-     "en": "Practice contractions (Braxton Hicks) are common, and they often feel different from real labour contractions.",
+     "en": "Not every contraction means labour has started. Practice contractions (Braxton Hicks) are common, and they often feel different from real labour contractions.",
      "hi": "Braxton Hicks संकुचन आम हैं और अक्सर असली प्रसव के संकुचनों से अलग होते हैं।"
     }
    }
@@ -7075,7 +7075,7 @@
      "hi": "प्रसव शुरू होते ही आपको तुरंत पता चल जाएगा।"
     },
     "truth": {
-     "en": "Early labour can start slowly, and it sometimes feels different from what you expected.",
+     "en": "You won't always know straight away that labour has started. Early labour can start slowly, and it can feel different from what you expected.",
      "hi": "शुरुआती प्रसव धीरे-धीरे शुरू हो सकता है और कई बार उम्मीद से अलग महसूस होता है।"
     }
    }
@@ -7292,7 +7292,7 @@
      "hi": "डिलीवरी की तारीख़ ही वह दिन है जब शिशु आएगा।"
     },
     "truth": {
-     "en": "Most babies come within a range of days before or after the due date.",
+     "en": "Your due date is a guide, not the exact day your baby will come. Most babies come within a range of days before or after it.",
      "hi": "ज़्यादातर शिशु डिलीवरी की तारीख़ से कुछ दिन पहले या बाद के दायरे में आते हैं।"
     }
    }
@@ -7509,7 +7509,7 @@
      "hi": "चलने से प्रसव ज़बरदस्ती शुरू किया जा सकता है।"
     },
     "truth": {
-     "en": "Gentle activity may help you feel comfortable and help your baby's position, but labour starts when your body and your baby are ready.",
+     "en": "Walking won't start labour on its own. Gentle activity may help you feel comfortable and help your baby's position, but labour starts when your body and your baby are ready.",
      "hi": "हल्की चहलक़दमी आराम और शिशु की मुद्रा में मदद कर सकती है, पर प्रसव तभी शुरू होता है जब आपका शरीर और शिशु तैयार हों।"
     }
    }
@@ -7726,7 +7726,7 @@
      "hi": "अगर अब तक प्रसव शुरू नहीं हुआ, तो कुछ गड़बड़ है।"
     },
     "truth": {
-     "en": "Many healthy pregnancies go on to Week 40 and beyond, with a doctor keeping watch.",
+     "en": "Labour not starting yet doesn't mean something is wrong. Many healthy pregnancies go on to Week 40 and beyond, with a doctor keeping watch.",
      "hi": "बहुत सी स्वस्थ गर्भावस्थाएँ डॉक्टर की निगरानी में हफ़्ता 40 और उसके आगे तक चलती हैं।"
     }
    }
@@ -7943,7 +7943,7 @@
      "hi": "अगर डिलीवरी की तारीख़ तक प्रसव शुरू नहीं हुआ, तो कुछ गड़बड़ है।"
     },
     "truth": {
-     "en": "Your doctor decides if and when, often about a week after it, with checks in the meantime.",
+     "en": "Being induced isn't automatic the day after your due date. Your doctor decides if and when, often about a week after it, with checks in the meantime.",
      "hi": "बहुत सी स्वस्थ गर्भावस्थाएँ सही मेडिकल निगरानी में डिलीवरी की तारीख़ के आगे तक चलती हैं।"
     }
    }

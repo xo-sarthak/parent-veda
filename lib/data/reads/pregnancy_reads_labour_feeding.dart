@@ -251,8 +251,13 @@ final List<PvRead> kPregnancyReadsLabourFeeding = [
           //   protective milk your baby will ever have. Older relatives were
           //   often taught to discard it, with the best intentions. Doctors
           //   now advise giving every drop to the baby.
-          fact: _en("It isn't. This first milk (colostrum) is the most "
-              "protective milk your baby will ever get. Doctors advise "
+          // Plain words (2026-10-21), kept for revert: It isn't. This first
+          //   milk (colostrum) is the most protective milk your baby will ever
+          //   get. Doctors advise giving your baby every drop.
+          fact: _en("The first yellow milk isn't dirty, and it's very good for "
+              "your baby. This first milk (colostrum) is the most protective "
+              "milk your baby will ever get. Older relatives were often taught "
+              "to throw it away, with the best intentions. Doctors now advise "
               "giving your baby every drop."),
         ),
       ),

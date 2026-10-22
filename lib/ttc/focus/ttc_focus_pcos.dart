@@ -202,9 +202,14 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           // more marked. Many people have a mild kind that only shows up as
           // cycles that are a little hard to predict. It's managed rather
           // than cured.
-          fact: "It's common. About one in ten people of reproductive age "
-              "have PCOS. Many have a mild kind that only shows as cycles "
-              "that are hard to predict. It is managed, not cured.",
+          // Plain words (2026-10-21), kept for revert: It's common. About one
+          // in ten people of reproductive age have PCOS. Many have a mild kind
+          // that only shows as cycles that are hard to predict. It is managed,
+          // not cured.
+          fact: "PCOS is common, and having it doesn't mean something is badly "
+              "wrong. About one in ten people of reproductive age have it. "
+              "Many have a mild kind that only shows as cycles that are hard "
+              "to predict. It's managed rather than cured.",
         ),
       ],
     ),
@@ -439,10 +444,15 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           // thali already puts carbohydrate together with protein, fat,
           // fibre and curd or other fermented food. That's exactly what
           // keeps blood sugar from rising fast.
-          fact: "You don't. What you eat carbs with matters far more than "
-              "cutting them out. A home thali already pairs them with "
-              "protein, fat, fibre and curd. That mix keeps blood sugar from "
-              "rising fast.",
+          // Plain words (2026-10-21), kept for revert: You don't. What you eat
+          // carbs with matters far more than cutting them out. A home thali
+          // already pairs them with protein, fat, fibre and curd. That mix
+          // keeps blood sugar from rising fast.
+          fact: "You don't have to give up rice, roti or carbs because you "
+              "have PCOS. What you eat them with matters far more than cutting "
+              "them out. A home thali already pairs them with protein, fat, "
+              "fibre and curd, and that mix keeps blood sugar from rising "
+              "fast.",
         ),
       ],
     ),
@@ -472,10 +482,15 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           // of working in PCOS at all. Some are harmless but costly. A few,
           // including berberine, clash with real medicines. Whatever you
           // take, write it down and tell your doctor at each visit.
-          fact: 'Not always. Most have no proof they help PCOS. Some are '
-              'harmless but costly. A few, like berberine, clash with real '
-              'medicines. Write down anything you take and tell your doctor '
-              'at each visit.',
+          // Plain words (2026-10-21), kept for revert: Not always. Most have no
+          // proof they help PCOS. Some are harmless but costly. A few, like
+          // berberine, clash with real medicines. Write down anything you take
+          // and tell your doctor at each visit.
+          fact: "These products aren't always harmless, and most have no proof "
+              "they help PCOS. Some are harmless but costly, and a few, like "
+              "berberine, clash with real medicines. Write down anything you "
+              "take and tell your doctor at each visit, so they can check it "
+              "alongside your treatment.",
         ),
         TtcProductTile(
           title: 'Myo-inositol',

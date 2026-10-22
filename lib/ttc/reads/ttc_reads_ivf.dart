@@ -292,10 +292,16 @@ final List<PvRead> kTtcReadsIvf = [
           // reason, and that reason is often treated with a tablet, a small
           // procedure, or a change on his side. IVF is where things go when
           // the earlier steps don't fit. It isn't where they start.
-          fact: _en("Usually not. Most couples who get tested never have IVF. "
-              "The tests find the reason, and many reasons are treated with a "
-              "tablet, a small procedure or a change on his side. IVF comes "
-              "later, if the earlier steps don't fit."),
+          // Plain words (2026-10-21), kept for revert: Usually not. Most
+          // couples who get tested never have IVF. The tests find the reason,
+          // and many reasons are treated with a tablet, a small procedure or a
+          // change on his side. IVF comes later, if the earlier steps don't
+          // fit.
+          fact: _en("Going to a fertility clinic doesn't usually mean you'll "
+              "end up on IVF. In fact, most couples who get tested never have "
+              "it. The tests find the reason, and many reasons are treated "
+              "with a tablet, a small procedure or a change on his side. IVF "
+              "comes later, if the earlier steps don't fit."),
         ),
       ),
     ],

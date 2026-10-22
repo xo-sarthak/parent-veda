@@ -1323,10 +1323,15 @@ final List<PvRead> kPregnancyReadsWork = [
           //   let go while pregnant, you may still be entitled to your
           //   maternity benefit. There are offices whose job is to enforce
           //   this.
-          fact: _en("You have rights. The law (the Maternity Benefit Act) "
-              "protects you during maternity leave. Even if you're let "
-              "go while pregnant, you may still be owed your maternity "
-              "benefit. Labour offices exist to enforce this."),
+          // Plain words (2026-10-21), kept for revert: You have rights. The law
+          //   (the Maternity Benefit Act) protects you during maternity leave.
+          //   Even if you're let go while pregnant, you may still be owed your
+          //   maternity benefit. Labour offices exist to enforce this.
+          fact: _en("Even at a private company, the law gives you rights, and "
+              "there are things you can do. The Maternity Benefit Act protects "
+              "you during maternity leave. If you're let go while pregnant, "
+              "you may still be owed your maternity benefit. Labour offices "
+              "exist to make sure this law is followed."),
         ),
       ),
       PvReadSection(
