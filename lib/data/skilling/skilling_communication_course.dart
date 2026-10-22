@@ -44,7 +44,7 @@ final List<SkCourse> kSkCommunicationCourses = [
       title: 'Storytelling, $name',
       level: level,
       mode: SkCourseMode.recorded,
-      blurb: 'Short films and story frames she works through at her own '
+      blurb: 'Short videos and story frames she works through at her own '
           'pace. Placeholder until a programme exists.',
       priceInr: 999,
       priceUsd: 12,

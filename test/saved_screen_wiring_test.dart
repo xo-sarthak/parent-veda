@@ -133,7 +133,7 @@ void main() {
       expect(find.text('Folic acid, plainly'), findsOneWidget);
       expect(find.text('Tummy time'), findsNothing);
       expect(find.text('VIDEOS'), findsNothing, reason: 'no hit in that kind');
-      expect(find.text('Save a film from Watch and it lands here.'), findsNothing);
+      expect(find.text('Save a video from Watch and it lands here.'), findsNothing);
     });
 
     testWidgets('unsave from the row removes it and the count follows', (t) async {

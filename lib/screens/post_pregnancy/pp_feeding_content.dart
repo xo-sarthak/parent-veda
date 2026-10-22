@@ -3846,7 +3846,7 @@ final PpArea _safety = PpArea(
         PpLink(
           'If your child chokes: what to do',
           pageId: 'safety_choking_response',
-          blurb: 'Back blows and chest thrusts, infant and older, on film.',
+          blurb: 'Back blows and chest thrusts, infant and older, on video.',
         ),
         PpVideoSlot(
           title: 'Choking and safe textures, shown clearly',
@@ -4196,7 +4196,7 @@ final PpArea _safety = PpArea(
           slotId: 'feeding/back_blows_demo',
           hue: 8,
         ),
-        PpIntro('Read this once now, calmly, and watch the film. Then make '
+        PpIntro('Read this once now, calmly, and watch the video. Then make '
             'everyone who feeds him watch it too. In a real choking you will '
             'not be reading anything.'),
         PpCallout(
@@ -4289,7 +4289,7 @@ final PpArea _safety = PpArea(
             PpCarouselCard.linked(
                 'If your child is silent: back blows, chest thrusts, and '
                     'someone calling an ambulance at the same time.',
-                'Swipe up for the steps and the film. Learn them before '
+                'Swipe up for the steps and the video. Learn them before '
                     'the first finger food.',
                 pageId: 'safety_choking_response'),
             PpCarouselCard.linked(

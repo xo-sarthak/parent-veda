@@ -41,7 +41,7 @@ final List<SkCourse> kSkConfidenceCourses = [
       title: 'At her own pace, $name',
       level: level,
       mode: SkCourseMode.recorded,
-      blurb: 'Short films and stage exercises she works through at home, '
+      blurb: 'Short videos and stage exercises she works through at home, '
           'with a private turn to record after each. Placeholder until a '
           'programme exists.',
       priceInr: 999,

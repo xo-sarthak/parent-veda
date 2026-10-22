@@ -277,7 +277,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         _Button(
             p: p,
             filled: false,
-            label: t('I already want to talk to someone',
+            label: t('I already want to talk to an expert', // en was '...someone' (2026-10-23)
                 'Main pehle se hi kisi se baat karna chahti hoon'),
             onTap: _openSummary),
       ],
@@ -685,7 +685,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         const SizedBox(height: 30),
         Divider(color: p.line, height: 1),
         const SizedBox(height: 20),
-        Text(t('Would you rather talk to someone?',
+        Text(t('Would you rather talk to an expert?', // en was '...someone?' (2026-10-23)
                 'Kisi se baat karna chahengi?'),
             style: pvJakarta(
                 fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),

@@ -108,6 +108,8 @@ class ExpertStore extends ContentStore<Expert> {
       videoConsult: row['video_consult'] != false,
       priceValue: rupees,
       ratingValue: rating,
+      // The column's own default is 'universal' (0072).
+      domain: _text(row['domain']).isEmpty ? 'universal' : _text(row['domain']),
     );
   }
 

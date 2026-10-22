@@ -211,7 +211,7 @@ void main() {
       await _pump(tester, const TtcIvfReadinessScreen());
       expect(find.textContaining("Skip any you'd rather not answer"),
           findsOneWidget);
-      expect(find.text("See if it's time to talk to someone"), findsOneWidget);
+      expect(find.text("See if it's time to talk to an expert"), findsOneWidget); // was '...someone' (2026-10-23)
     });
   });
 

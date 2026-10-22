@@ -179,7 +179,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     TtcFocusGroup(
       id: 'talk', mark: IntentMark.moodArc, tabMark: TtcTabMark.twoBubbles,
       // Kept for revert (2026-09-28, explicit names): label: 'Talk',
-      label: 'Talk to someone',
+      label: 'Talk to an expert', // was 'Talk to someone' (2026-10-23)
       icon: Icons.chat_bubble_outline_rounded,
       hue: 344,
       pinnedRedFlagReadIds: [_kStress, _kGarbh],
@@ -712,7 +712,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'Talk to someone',
+      heading: 'Talk to an expert', // was 'Talk to someone' (2026-10-23)
       group: 'talk',
       tiles: [
         // ⚠️ THE PSYCHOLOGIST THE CARD NAMES AND PRICES (2026-09-27, relevance

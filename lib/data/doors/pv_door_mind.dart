@@ -546,7 +546,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
       heading: 'Getting help', // was 'Reaching out' (2026-10-22)
       tiles: [
         PvDoorTalkTile(
-          title: 'Talk to someone today',
+          title: 'Talk to an expert today', // was 'Talk to someone today' (2026-10-23)
           blurb: 'A counsellor trained in pregnancy. Anonymous, and at your '
               'pace.',
           surfaceId: 'mind/offer/perinatal_counselling',

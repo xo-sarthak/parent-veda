@@ -167,6 +167,7 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 **Messaging:**
 - [ ] **BLOCKER** · Phone OTP: `MSG91_AUTHKEY` and `MSG91_OTP_TEMPLATE_ID` secrets, DLT-registered template including the 11-character SMS hash · user · STILL-OPEN §83.12, ONBOARDING.md History A · added 2026-10-17
 - [ ] **LAUNCH** · WhatsApp off Meta's test number (Meta verification); Render paid tier · user · CONTENT-BACKEND, ONBOARDING.md History A · added 2026-10-17
+- [ ] **LAUNCH** · Run migration `0111_wa_weekly_guide_stage.sql`: the weekly WhatsApp guide kept going to a mother after a loss or an early birth (it read `due_date` only, never `life_stage`) · user · global-changes plan, Phase 0 · added 2026-10-23
 
 **Sponsors** (STILL-OPEN line 21: §11.6 blocks the sponsor programme):
 - [ ] **DECIDE** · An email provider (Resend, SES or Postmark), so activation codes have a sender · user · STILL-OPEN §11.6 · added 2026-10-17

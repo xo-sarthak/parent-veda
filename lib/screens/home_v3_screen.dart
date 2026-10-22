@@ -831,7 +831,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                       height: 1.25,
                       color: p.ink1)),
               const SizedBox(height: 6),
-              Text('A short film on what is changing this week, for your baby and for you.',
+              Text('A short video on what is changing this week, for your baby and for you.',
                   style: pvJakarta(fontSize: 13, height: 1.5, color: p.ink2)),
             ],
             // Room for the Garbh band to arrive as its own moment. When

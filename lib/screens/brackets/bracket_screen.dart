@@ -57,7 +57,7 @@ LocalizedText _headingFor(BracketLayer l) => switch (l) {
       BracketLayer.course =>
         const LocalizedText(en: 'Learn this properly', hi: 'इसे ठीक से समझिए'),
       BracketLayer.consult =>
-        const LocalizedText(en: 'Talk to someone', hi: 'किसी से बात कीजिए'),
+        const LocalizedText(en: 'Talk to an expert', hi: 'किसी से बात कीजिए'), // en was 'Talk to someone' (2026-10-23)
     };
 
 /// Free first, paid last. Not the enum's declaration order — the enum is

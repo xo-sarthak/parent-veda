@@ -106,6 +106,7 @@ class Expert {
     this.videoConsult = false,
     this.priceValue = 0,
     this.ratingValue = 0,
+    this.domain = 'parenting',
   });
 
   final String id;
@@ -199,6 +200,15 @@ class Expert {
   final bool videoConsult;
   final int priceValue; // numeric mirror of the fee, for price sorting
   final double ratingValue; // numeric mirror of the rating, for rating sorting
+
+  /// Which stage offers them: `pregnancy | parenting | ttc | universal`, the
+  /// `expert_profiles.domain` column (0072). Bundled experts are parenting's.
+  ///
+  /// ⚠️ IT WAS NEVER READ until 2026-10-23, so every expert published from the
+  /// panel was filed under parenting - an OB-GYN or a fertility doctor
+  /// onboarded today never reached the pregnancy or TTC side. Read it through
+  /// [Expert.serviceDomain], never by comparing strings at the call site.
+  final String domain;
 
   // ---------------------------------------------------------------------------
   //  Display getters — Hindi where we have it, English where we do not.

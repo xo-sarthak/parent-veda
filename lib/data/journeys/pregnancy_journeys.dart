@@ -538,11 +538,11 @@ final JourneyConfig kPgMoodCheck = JourneyConfig(
           'anyone.'),
     ),
     JourneyStep(
-      question: _en('I would like to talk to someone'),
+      question: _en('I would like to talk to an expert'), // was '...talk to someone' (2026-10-23)
       elements: [
         JourneyElement(
           type: SolutionType.consult,
-          title: _en('Talk to someone who works with mothers'),
+          title: _en('Talk to an expert who works with mothers'), // was 'Talk to someone...' (2026-10-23)
           value: _en('A 1:1, in confidence, with someone who does this every '
               'day.'),
           action: kPgActConsult,

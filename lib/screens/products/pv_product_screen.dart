@@ -1898,7 +1898,7 @@ class _PvProductScreenState extends State<PvProductScreen> {
           ),
         if (product.experts.isEmpty)
           const PvQuietLine(
-            'An expert film for this product is being recorded.',
+            'An expert video for this product is being recorded.',
           ),
       ],
     ),

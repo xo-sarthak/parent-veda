@@ -12,6 +12,9 @@ import 'package:flutter/material.dart';
 
 import '../../screens/post_pregnancy/pp_child_profile.dart';
 import '../../services/dear_baby_vault_store.dart';
+import '../../services/family_timeline.dart';
+import '../../services/life_stage_store.dart';
+import '../../services/pregnancy_controller.dart';
 import '../../services/pv_order_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_toast.dart';
@@ -25,6 +28,35 @@ import 'pv_you_chrome.dart';
 /// Name · boy/girl · date of birth → `ChildProfileStore.addChild`. With
 /// [arrival] the copy is the birth's ("Welcome to the world"), and the caller
 /// moves the stage. Returns true when a child was added.
+/// Weeks of pregnancy at birth when she was born early (before 37 weeks),
+/// read from the due date we already hold - the same field onboarding fills
+/// from its "born early?" answer. Null when on time, or with no real due date.
+int? _bornWeeksFor(DateTime dob) {
+  final c = PregnancyController.current;
+  if (c == null || !c.isDueDateSet) return null;
+  final daysEarly = c.dueDate.difference(dob).inDays;
+  final weeks = (280 - daysEarly) ~/ 7;
+  return weeks < 37 && weeks >= 20 ? weeks : null;
+}
+
+/// The birth as the onboarding join records it (2026-10-23): the stage starts
+/// on the birthday, not the day she tapped, and the family story gets the day.
+/// The callers' own `setStage(parenting)` after this is a no-op, because the
+/// store ignores re-declaring the same stage.
+void _recordBirth(DateTime dob, String name) {
+  LifeStageStore.instance.setStage(LifeStage.parenting, at: dob);
+  final title = name.trim().isEmpty ? 'Baby was born' : '$name was born';
+  FamilyTimeline.instance.add(
+    id: 'baby_born',
+    stage: LifeStage.parenting,
+    kind: TimelineKind.milestone,
+    titleEn: title,
+    titleHi: title,
+    detailEn: 'The day pregnancy ended and parenting began.',
+    on: dob,
+  );
+}
+
 Future<bool> showPvAddChildSheet(
   BuildContext context, {
   bool arrival = false,
@@ -116,7 +148,12 @@ Future<bool> showPvAddChildSheet(
                       final d = await showDatePicker(
                         context: ctx,
                         initialDate: dob ?? now,
-                        firstDate: DateTime(now.year - 18),
+                        // A birth just happened: the last two years, not
+                        // eighteen (2026-10-23). An older child keeps the
+                        // wide range.
+                        firstDate: arrival
+                            ? DateTime(now.year - 2, now.month, now.day)
+                            : DateTime(now.year - 18),
                         lastDate: now,
                       );
                       if (d != null) setSheet(() => dob = d);
@@ -169,9 +206,16 @@ Future<bool> showPvAddChildSheet(
                         ? () async {
                             final child = await ChildProfileStore.instance.addChild(
                               name: name.text.trim(),
+                              // A skipped "Boy or girl" is NOT a boy - the
+                              // same fix onboarding has had since 2026-10-07
+                              // (here 2026-10-23). Kept for revert:
+                              // `isBoy: isBoy ?? true,` alone.
                               isBoy: isBoy ?? true,
+                              sexGiven: isBoy != null,
                               dob: dob!,
+                              bornWeeks: arrival ? _bornWeeksFor(dob!) : null,
                             );
+                            if (arrival) _recordBirth(dob!, child.name);
                             // The birth opens the Dear Baby letters
                             // (STILL-OPEN §83.2). Only the arrival does: an
                             // older child added later is not this baby.

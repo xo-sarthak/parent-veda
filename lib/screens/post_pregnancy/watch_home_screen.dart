@@ -88,7 +88,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
   bool get _topicEmpty => _topic != 'All' && !kWatchVideos.any((v) => v.category == _topic);
 
   String _picksSubtitle() => _topicEmpty
-      ? 'New ${_topic.toLowerCase()} films are on the way. Meanwhile, these are worth a watch.'
+      ? 'New ${_topic.toLowerCase()} videos are on the way. Meanwhile, these are worth a watch.'
       : _topic != 'All'
       ? 'Expert ${_quick ? 'shorts' : 'videos'} on ${_topic.toLowerCase()} - keep scrolling for more.'
       : 'Picked for his age and where he is right now - the feed keeps going.';

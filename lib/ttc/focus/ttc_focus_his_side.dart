@@ -142,7 +142,7 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
     TtcFocusGroup(
       id: 'talk', mark: IntentMark.askDoctor, tabMark: TtcTabMark.twoBubbles,
       // Kept for revert (2026-09-28, explicit names): label: 'Talk',
-      label: 'Talk to someone',
+      label: 'Talk to an expert', // was 'Talk to someone' (2026-10-23)
       icon: Icons.chat_bubble_outline_rounded,
       hue: 42,
       // ⚠️ THE BRIEF'S "REASONS TO BE SEEN SOONER" CARD, AND IT IS A REUSED

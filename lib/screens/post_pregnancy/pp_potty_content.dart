@@ -2049,7 +2049,7 @@ final PpSection kPpPottySection = PpSection(
             // The technique is taught once, on the Indian-toilet page's film.
             PpLink('The mug and front to back, shown',
                 pageId: 'indian_toilet',
-                blurb: 'The technique, on film. This page is about your child '
+                blurb: 'The technique, on video. This page is about your child '
                     'doing it alone.'),
             PpCallout(
               'Expect this to be done badly for a while. A child who is '

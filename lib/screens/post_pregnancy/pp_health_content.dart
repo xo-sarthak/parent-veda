@@ -437,7 +437,7 @@ final PpArea _emergency = PpArea(
           slotId: 'feeding/back_blows_demo',
           hue: 12,
         ),
-        PpIntro('Read this once now, calmly, and watch the film. Then ask '
+        PpIntro('Read this once now, calmly, and watch the video. Then ask '
             'everyone who feeds your child to watch it too. In a real choking '
             'you won\'t be reading.'),
         PpCallout(

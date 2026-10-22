@@ -97,7 +97,7 @@ const List<_KindCopy> _kinds = [
   _KindCopy(SavedKind.article, 'Articles', Icons.article_outlined,
       'Tap the bookmark on any article to keep it here.'),
   _KindCopy(SavedKind.video, 'Videos', Icons.play_circle_outline_rounded,
-      'Save a film from Watch and it lands here.'),
+      'Save a video from Watch and it lands here.'),
   _KindCopy(SavedKind.recipe, 'Recipes', Icons.restaurant_outlined,
       'Recipes you save from Food appear here.'),
   _KindCopy(SavedKind.product, 'Products', Icons.shopping_bag_outlined,

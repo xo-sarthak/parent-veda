@@ -509,7 +509,7 @@ final HubConfig kPpMaternal = HubConfig(
     ),
   ],
   closing: HubClosing(
-    label: _en('Talk to someone about your own recovery'),
+    label: _en('Talk to an expert about your own recovery'), // was 'Talk to someone...' (2026-10-23)
     blurb: _en('Book a 1:1 about the pelvic floor, healing, or simply how you are '
         'feeling.'),
     action: kPpActConsult,

@@ -94,7 +94,7 @@ final PpDoor kPpYouMaaDoor = PpDoor(
     ),
   ],
   closing: const PpDoorClosing(
-    label: 'Talk to someone about your own recovery',
+    label: 'Talk to an expert about your own recovery', // was 'Talk to someone...' (2026-10-23)
     blurb: 'A perinatal counsellor or psychologist, ranked by ParentVeda. '
         'For the part nobody in the house asks about.',
     surfaceId: 'pp_experts/Maternal mental health',

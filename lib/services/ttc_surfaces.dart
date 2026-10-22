@@ -105,7 +105,7 @@ const List<TtcSurface> kTtcSurfaces = [
   TtcSurface('ttc_partner', 'For your partner', 'Aapke partner ke liye'),
 
   // ---- People ---------------------------------------------------------------
-  TtcSurface('ttc_prepare', 'Talk to someone', 'Kisi se baat karein'),
+  TtcSurface('ttc_prepare', 'Talk to an expert', 'Kisi se baat karein'), // en was 'Talk to someone' (2026-10-23)
   TtcSurface('ttc_community', 'Others going through this', 'Aur log jo isi mein hain'),
   TtcSurface('ttc_care_circle', 'Your care circle', 'Aapka care circle'),
 

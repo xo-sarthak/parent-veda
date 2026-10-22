@@ -205,6 +205,17 @@ void main() {
       }
     });
 
+    test('every persisted stage id reads back as its own stage', () {
+      // Skilling was missing (fixed 2026-10-23): onboarding saved nothing and
+      // the next launch opened Pregnancy.
+      for (final s in LifeStage.values) {
+        expect(LifeStageCopy.fromId(s.id), s, reason: 'id "${s.id}"');
+      }
+      LifeStageStore.instance.resetForTest();
+      LifeStageStore.instance.setStageId('skilling');
+      expect(LifeStageStore.instance.stage, LifeStage.skilling);
+    });
+
     test('an unknown or empty answer is ignored, never guessed at', () {
       LifeStageStore.instance.setStageId('');
       expect(LifeStageStore.instance.stage, isNull);

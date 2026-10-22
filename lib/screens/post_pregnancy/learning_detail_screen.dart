@@ -81,7 +81,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
       if (course != null) {
         _openLesson(0); // recorded course -> open the first lesson
       } else {
-        _snack('Opening your player - the film is in production for now.');
+        _snack('Opening your player - the video is in production for now.');
       }
       return;
     }

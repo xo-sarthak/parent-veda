@@ -807,7 +807,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     //  Get help — the page closes on a person, not a price
     // -------------------------------------------------------------------------
     TtcFocusSection(
-      heading: 'Talk to someone who knows PCOS',
+      heading: 'Talk to an expert who knows PCOS', // was 'Talk to someone...' (2026-10-23)
       group: 'trying',
       tiles: [
         // Moved here from "What happens if we need treatment?" and pointed at

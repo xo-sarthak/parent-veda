@@ -500,7 +500,7 @@ FertilityHelpResult evaluateFertilityHelp(FertilityHelpContext c) {
     return FertilityHelpResult(
       state: FertilityHelpState.maySeeSpecialist,
       reasons: reasonsFrom(maySee),
-      headline: _en('It may be a good time to talk to someone'),
+      headline: _en('It may be a good time to talk to an expert'), // was '...someone' (2026-10-23)
       body: _en("From what you've shared, you've reached the point where the "
           "usual advice says it's worth looking into."),
       // ⚠️ THE MOST IMPORTANT SENTENCE IN THE TOOL. Left unsaid, she supplies

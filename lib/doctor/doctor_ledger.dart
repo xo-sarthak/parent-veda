@@ -90,7 +90,7 @@ extension EarningSourceX on EarningSource {
         EarningSource.masterclass => 'Nothing yet. Host a masterclass and each seat shows here.',
         EarningSource.cohort => 'Nothing yet. A cohort you lead shows here, seat by seat.',
         EarningSource.course => 'Nothing yet. Sales of a recorded course show here.',
-        EarningSource.video => 'No videos yet. Each film made with you appears here with its share.',
+        EarningSource.video => 'No videos yet. Each video made with you appears here with its share.',
         EarningSource.article => 'Nothing yet. Ad revenue on articles validated under your name.',
         EarningSource.affiliate => 'Nothing yet. Affiliate income earned on your content.',
         EarningSource.sponsorship => 'Nothing yet. Brand work where you are the named face.',

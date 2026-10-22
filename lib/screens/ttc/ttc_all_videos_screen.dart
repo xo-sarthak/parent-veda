@@ -75,7 +75,7 @@ const String kTtcAllVideosTitle = 'All videos';
 
 /// What the page says at the top while no film is made.
 const String kTtcFilmsBeingMade =
-    "Our films are being made. Here's what's coming and the notes you can read now.";
+    "Our videos are being made. Here's what's coming and the notes you can read now.";
 
 /// One film on the page.
 class TtcFilmEntry {

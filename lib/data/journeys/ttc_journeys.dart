@@ -498,7 +498,7 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
       elements: [
         JourneyElement(
           type: SolutionType.consult,
-          title: _en('Talk to someone before you start'),
+          title: _en('Talk to an expert before you start'), // was 'Talk to someone...' (2026-10-23)
           value: _en('Book a short session and ask a doctor or nutritionist '
               "what's really worth doing first."),
           action: kTtcActConsult,
@@ -597,7 +597,7 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
       ],
     ),
     JourneyStep(
-      question: _en("We'd like to talk to someone about his results"),
+      question: _en("We'd like to talk to an expert about his results"), // was '...someone...' (2026-10-23)
       elements: [
         JourneyElement(
           type: SolutionType.consult,

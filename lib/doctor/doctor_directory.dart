@@ -60,7 +60,10 @@ List<DoctorInfo> allDoctors() => [
           category: e.category,
           blurb: e.blurb,
           rating: e.rating,
-          stage: DoctorStage.parenting,
+          // Domain-aware (2026-10-23); kept for revert: always parenting.
+          stage: e.domain == 'pregnancy'
+              ? DoctorStage.pregnancy
+              : DoctorStage.parenting,
         ),
       for (final s in kSpecialists)
         DoctorInfo(

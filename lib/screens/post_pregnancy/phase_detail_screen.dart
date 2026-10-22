@@ -121,12 +121,12 @@ class _PhaseDetailScreenState extends State<PhaseDetailScreen> {
                                     color: Colors.white.withValues(alpha: 0.92),
                                     borderRadius: BorderRadius.circular(999),
                                   ),
-                                  child: Text('Film for this phase coming soon',
+                                  child: Text('Video for this phase coming soon',
                                       style: ppBody(11.5, color: _c.ink1, w: FontWeight.w700)),
                                 )
                               : Semantics(
                                   button: true,
-                                  label: 'Play the film for ${p.name}',
+                                  label: 'Play the video for ${p.name}',
                                   excludeSemantics: true,
                                   child: PvPress(child: GestureDetector(
                                     key: const ValueKey('phase_detail_play'),

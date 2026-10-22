@@ -158,7 +158,7 @@ class _PvLessonScreenState extends State<PvLessonScreen> {
                       Text(
                         lesson.blurb ??
                             (lesson.videoUrl == null
-                                ? 'The outline of this lesson is final and the film is in review. It lands here the day it is ready; your place in the course is kept.'
+                                ? 'The outline of this lesson is final and the video is in review. It lands here the day it is ready; your place in the course is kept.'
                                 : ''),
                         style: pvManrope(
                           fontSize: 14,

@@ -508,7 +508,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'Talk to someone',
+      heading: 'Talk to an expert', // was 'Talk to someone' (2026-10-23)
       group: 'support',
       tiles: [
         // ⚠️ THE PSYCHOLOGIST, NOT THE MEDICAL SHELF (2026-09-27, relevance

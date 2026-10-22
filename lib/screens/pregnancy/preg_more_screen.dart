@@ -294,7 +294,7 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
               _row('preg_more_all_films', IntentMark.listMark, 345, 'All videos', // walk 2026-10-20; kept for revert: 'All films'
                   'Short videos for each stage of your pregnancy',
                   () => _push('watch', () => WatchLearnScreen(controller: _c))),
-            ], lead: 'Every read and every film, in one list each'),
+            ], lead: 'Every read and every video, in one list each'),
 
             // ---- your journey ---------------------------------------------------
             _section('journey', 'Your journey', [

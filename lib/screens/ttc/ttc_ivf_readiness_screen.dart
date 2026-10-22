@@ -451,7 +451,7 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         ttcToolPad(TtcToolPrimary(
           key: const ValueKey('ttc_ivf_see'),
           // Says what she gets. Kept for revert: 'See what this means'.
-          label: "See if it's time to talk to someone",
+          label: "See if it's time to talk to an expert", // was '...someone' (2026-10-23)
           // The write-through, the save and the push are `_see` now
           // (2026-09-27), shared with the last-check card.
           onTap: _see,

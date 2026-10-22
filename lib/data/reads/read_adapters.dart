@@ -119,7 +119,7 @@ PvRead pvReadFromMm(MmArticle a, {bool withTalk = false}) {
       if (withTalk)
         const PvReadNextStep(
           kind: PvNextKind.consult,
-          title: LocalizedText(en: 'Talk to someone', hi: 'Kisi se baat karein'),
+          title: LocalizedText(en: 'Talk to an expert', hi: 'Kisi se baat karein'), // en was 'Talk to someone' (2026-10-23)
           value: LocalizedText(
               en: 'If this feeling needs a person.',
               hi: 'Agar is ehsaas ko insaan chahiye.'),

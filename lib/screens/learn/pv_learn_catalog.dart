@@ -457,7 +457,13 @@ class PvLearnCatalog {
     if (engine == null) return null;
     return PvOfferingView(
       id: e.id,
-      stage: LifeStage.parenting,
+      // The expert's own domain (2026-10-23); kept for revert:
+      // `stage: LifeStage.parenting,`. 'universal' stays on parenting.
+      stage: switch (e.domain) {
+        'pregnancy' => LifeStage.pregnancy,
+        'ttc' => LifeStage.tryingToConceive,
+        _ => LifeStage.parenting,
+      },
       kind: PvLearnKind.consult,
       title: 'Consult with ${e.name}',
       subtitle: e.credential,

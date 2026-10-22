@@ -1801,7 +1801,7 @@ class PpBlockView extends StatelessWidget {
           border: Border.all(color: p.line),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('TALK TO SOMEONE',
+          Text('TALK TO AN EXPERT', // was 'TALK TO SOMEONE' (2026-10-23)
               style: pvManrope(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,

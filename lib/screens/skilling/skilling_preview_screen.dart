@@ -644,7 +644,7 @@ class _PlanSheet extends StatelessWidget {
     (BracketLayer.extras, 'Beyond the six'),
     (BracketLayer.products, 'Things that help'),
     (BracketLayer.course, 'Learn it properly'),
-    (BracketLayer.consult, 'Talk to someone'),
+    (BracketLayer.consult, 'Talk to an expert'), // was 'Talk to someone' (2026-10-23)
   ];
 
   @override

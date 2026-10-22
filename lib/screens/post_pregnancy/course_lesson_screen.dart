@@ -128,7 +128,7 @@ class CourseLessonScreenClassic extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('Preview lesson', style: ppBody(13, color: ppInk, w: FontWeight.w800)),
                     const SizedBox(height: 3),
-                    Text('The lesson outline is final. The film is being produced and reviewed by our experts before it goes live.',
+                    Text('The lesson outline is final. The video is being produced and reviewed by our experts before it goes live.',
                         style: ppBody(12.5, color: ppInk, h: 1.5)),
                   ]),
                 ),

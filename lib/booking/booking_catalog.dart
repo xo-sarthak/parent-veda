@@ -293,7 +293,14 @@ class BookingCatalog {
     if (e.timings.trim().isEmpty) return null;
     return Offering(
       id: 'off_exp_${e.id}',
-      stage: ServiceStage.parenting,
+      // The expert's own domain (2026-10-23). Kept for revert:
+      // `stage: ServiceStage.parenting,` for everyone. 'universal' stays on
+      // parenting, as before, until one offering can serve several stages.
+      stage: switch (e.domain) {
+        'pregnancy' => ServiceStage.pregnancy,
+        'ttc' => ServiceStage.tryingToConceive,
+        _ => ServiceStage.parenting,
+      },
       kind: OfferingKind.consult,
       format: SessionFormat.liveOneToOne,
       catalogId: e.id,

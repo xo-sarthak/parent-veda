@@ -40,17 +40,13 @@ enum LifeStage {
   /// Day one to age five.
   parenting,
 
-  /// ⚠️ NOT A SELECTABLE STAGE — a fourth VALUE, not a fourth destination.
+  /// Age five onwards. Onboarding and the You screen's stage switch set it, and
+  /// the splash routes it to the Skilling home. `JourneyState` still refuses to
+  /// infer anything from it.
   ///
-  /// Skilling exists here so its bracket table can name a stage without lying
-  /// about which one. Nothing sets it: `LifeStageStore` never writes it, the
-  /// splash never routes to it, and `JourneyState` refuses to infer anything
-  /// from it. It is reachable only from the design preview.
-  ///
-  /// It gets a persisted id anyway, because `id` is exhaustive and a stage with
-  /// no id would be one `switch` away from a crash the day someone does wire it.
-  /// A value that can be persisted but never is costs nothing; a missing case
-  /// costs a runtime error.
+  /// (Kept for revert - the older note said nothing ever set it. That stopped
+  /// being true when onboarding offered Skilling, and `fromId` lacked the case,
+  /// so the stage was silently never saved. Fixed 2026-10-23.)
   skilling,
 }
 
@@ -93,6 +89,10 @@ extension LifeStageCopy on LifeStage {
       case 'parenting':
       case 'new':
         return LifeStage.parenting;
+      // 2026-10-23: without this case onboarding's setStageId('skilling') was a
+      // no-op, nothing was saved, and the second launch opened Pregnancy.
+      case 'skilling':
+        return LifeStage.skilling;
       default:
         return null;
     }

@@ -329,7 +329,7 @@ final JourneyConfig kPpMaternalConcern = JourneyConfig(
       elements: [
         JourneyElement(
           type: SolutionType.consult,
-          title: _en('Talk to someone now'),
+          title: _en('Talk to an expert now'), // was 'Talk to someone now' (2026-10-23)
           value: _en('A 1:1 with someone who can hear the specific thing '
               "you're feeling and tell you what it means."),
           action: kPpActConsult,

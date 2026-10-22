@@ -87,7 +87,7 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
     return PregToolScaffold(
       hue: 350,
       mark: IntentMark.askDoctor,
-      eyebrow: 'Talk to someone',
+      eyebrow: 'Talk to an expert', // was 'Talk to someone' (2026-10-23)
       title: widget.need?.label ?? 'Experts',
       intro: 'Checked by ParentVeda. The order changes with the sort, nothing is hidden.',
       children: [

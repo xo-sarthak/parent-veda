@@ -346,12 +346,12 @@ class _PhaseHeadState extends State<_PhaseHead> {
                                   color: Colors.white.withValues(alpha: 0.92),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
-                                child: Text('Film for this phase coming soon',
+                                child: Text('Video for this phase coming soon',
                                     style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: p.ink1)),
                               )
                             : Semantics(
                                 button: true,
-                                label: 'Play the film for ${ph.name}',
+                                label: 'Play the video for ${ph.name}',
                                 excludeSemantics: true,
                                 child: PvPress(
                                   child: GestureDetector(
@@ -566,7 +566,7 @@ class _Offers extends StatelessWidget {
             ),
           ),
         ],
-        _sub('Talk to someone', p),
+        _sub('Talk to an expert', p), // was 'Talk to someone' (2026-10-23)
         PvRowGroup(p: p, children: [
           PvListRow(
             key: ValueKey('pp_phase_expert_${phase.number}'),

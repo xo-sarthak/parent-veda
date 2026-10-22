@@ -48,7 +48,7 @@ final List<SkCourse> kSkCodingCourses = [
       title: '$name, recorded',
       level: level,
       mode: SkCourseMode.recorded,
-      blurb: 'Short films she watches at her own pace, with things to try '
+      blurb: 'Short videos she watches at her own pace, with things to try '
           'after each. Placeholder until a programme exists.',
       priceInr: 999,
       priceUsd: 12,
