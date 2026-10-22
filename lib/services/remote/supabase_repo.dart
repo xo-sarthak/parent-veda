@@ -436,6 +436,19 @@ class SupabaseRepo {
     );
   }
 
+  /// Merge [items] (`{key: {v, t, d}}`) into this user's [storeKey] on the
+  /// server, item by item, newer wins, in one locked statement
+  /// (`pv_state_merge`, 0110), and return the whole merged map. Throws when
+  /// logged out, offline or refused, so the caller keeps its items waiting.
+  static Future<Map<String, dynamic>> mergeState(
+      String storeKey, Map<String, dynamic> items) async {
+    if (userId == null) throw StateError('not signed in');
+    final res = await _client
+        .rpc('pv_state_merge', params: {'p_key': storeKey, 'p_items': items});
+    if (res is Map) return Map<String, dynamic>.from(res);
+    return <String, dynamic>{};
+  }
+
   // === Timestamp helpers (for timestamptz columns) ==========================
   // Store the true UTC instant and read it back in LOCAL time, so a timestamp
   // written on one device doesn't drift by the timezone offset when another

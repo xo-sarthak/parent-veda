@@ -18,7 +18,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/pv_read_store.dart';
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 /// "Trying to conceive 101", in order: the free seven-step course from the
 /// gap analysis ("Behind: Learning shapes", P1), built from reads we already
@@ -41,10 +42,16 @@ const List<String> kTtc101ReadIds = [
 /// steps aside.
 const int kTtc101StartedAfter = 2;
 
-class TtcHomePrefs extends ChangeNotifier {
-  TtcHomePrefs._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone brought back a check card she had dismissed and
+// the "New here?" card she had moved past. Items: `check_dismissed` -> bool,
+// `101|<read id>` -> true per course step opened.
+class TtcHomePrefs extends ChangeNotifier with CloudMergedStore {
+  TtcHomePrefs._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcHomePrefs._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcHomePrefs instance = TtcHomePrefs._();
 
   static const String _kCheckDismissed = 'ttc_home_check_dismissed';
@@ -68,6 +75,39 @@ class TtcHomePrefs extends ChangeNotifier {
       _opened.addAll(p.getStringList(_kOpened101) ?? const <String>[]);
       notifyListeners();
     } catch (_) {/* local-first: the defaults are a fine answer */}
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_home_prefs';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        'check_dismissed': _checkDismissed,
+        for (final id in _opened) '101|$id': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _checkDismissed = items['check_dismissed'] == true;
+    _opened
+      ..clear()
+      ..addAll([
+        for (final k in items.keys)
+          if (k.startsWith('101|')) k.substring(4),
+      ]);
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setBool(_kCheckDismissed, _checkDismissed);
+      await p.setStringList(_kOpened101, _opened.toList());
+    } catch (_) {/* best effort */}
   }
 
   Future<void> dismissCheck() async {
@@ -106,12 +146,13 @@ class TtcHomePrefs extends ChangeNotifier {
 
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
   // are wiped, the singleton was not.
-  void _resetForAccount() {
-    _loaded = false;
-    _checkDismissed = false;
-    _opened.clear();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     _loaded = false;
+  //     _checkDismissed = false;
+  //     _opened.clear();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {

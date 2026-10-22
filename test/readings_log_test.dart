@@ -58,9 +58,11 @@ void main() {
       final s = ReadingsStore.forTest();
       s.add(kind: ReadingKind.sugar, at: DateTime(2026, 9, 3, 7), mgdl: 92, context: SugarContext.fasting, note: 'before tea');
       s.setTargets(const ReadingTargets(sysUnder: 140, diaUnder: 90, fastingUnder: 95));
-      final blob = jsonDecode(jsonEncode(s.cloudData())) as Map;
-      (blob['entries'] as List).add({'nonsense': true});
-      final t = ReadingsStore.forTest()..applyCloudData(blob);
+      // Per-item since step 13: one item per reading, plus the targets.
+      final items = Map<String, Object?>.from(
+          jsonDecode(jsonEncode(s.cloudItems())) as Map);
+      items['r|bad'] = {'nonsense': true};
+      final t = ReadingsStore.forTest()..applyCloudItems(items);
       expect(t.of(ReadingKind.sugar).single.note, 'before tea');
       expect(t.of(ReadingKind.sugar).single.context, SugarContext.fasting);
       expect(t.targets.pressureLine, 'Under 140/90');

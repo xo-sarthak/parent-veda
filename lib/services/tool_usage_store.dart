@@ -36,12 +36,20 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/sync_registry.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
-class ToolUsageStore extends ChangeNotifier {
-  ToolUsageStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). The "never leaves the
+// phone" note above is kept as history: it was phone-only, so a sign-out or a
+// new phone reset her tool row to the recommended set. One item per tool id,
+// value `{n: count, last: ISO}`. Last write wins, so an open on each of two
+// phones at once can lose one increment; acceptable for a ranking hint.
+class ToolUsageStore extends ChangeNotifier with CloudMergedStore {
+  ToolUsageStore._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   ToolUsageStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final ToolUsageStore instance = ToolUsageStore._();
 
   static const _key = 'tool_usage_v1';
@@ -74,6 +82,11 @@ class ToolUsageStore extends ChangeNotifier {
   Future<void> load() async {
     if (_loaded) return;
     _loaded = true;
+    await _loadLocal();
+    await syncMergedFromCloud();
+  }
+
+  Future<void> _loadLocal() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
@@ -92,6 +105,35 @@ class ToolUsageStore extends ChangeNotifier {
       // recommended set, which is the same thing a new user gets.
     }
   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'tool_usage';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _counts.entries)
+          e.key: {'n': e.value, 'last': _last[e.key] ?? ''},
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _counts.clear();
+    _last.clear();
+    for (final e in items.entries) {
+      final v = e.value;
+      if (v is! Map) continue;
+      final n = v['n'];
+      _counts[e.key] = n is num ? n.toInt() : 0;
+      final l = v['last'];
+      if (l is String && l.isNotEmpty) _last[e.key] = l;
+    }
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() => _save();
 
   /// Call this the moment a tool is opened, from wherever it is opened.
   ///
@@ -117,12 +159,13 @@ class ToolUsageStore extends ChangeNotifier {
     }
   }
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  void _resetForAccount() {
-    resetForTest();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   void _resetForAccount() {
+  //     resetForTest();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {

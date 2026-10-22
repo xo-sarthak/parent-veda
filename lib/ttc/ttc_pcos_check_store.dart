@@ -38,7 +38,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 import 'cycle_store.dart';
 import 'ttc_pcos_check_data.dart';
@@ -48,10 +49,17 @@ import 'ttc_pcos_check_rules.dart';
 /// nothing else.
 enum PcosAnswerSource { hers, derived }
 
-class TtcPcosCheckStore extends ChangeNotifier {
-  TtcPcosCheckStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone lost a half-done check and its result. Items:
+// `a|<question id>` -> her answer, `done` -> when she finished (ISO). Answers
+// `prefill()` derived stay on this phone until she touches them: they are a
+// suggestion with provenance, and the provenance does not travel.
+class TtcPcosCheckStore extends ChangeNotifier with CloudMergedStore {
+  TtcPcosCheckStore._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcPcosCheckStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcPcosCheckStore instance = TtcPcosCheckStore._();
 
   static const _kAnswers = 'ttc_pcos_answers';
@@ -84,6 +92,65 @@ class TtcPcosCheckStore extends ChangeNotifier {
     final done = p.getString(_kDone);
     if (done != null) _completedAt = DateTime.tryParse(done);
     notifyListeners();
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_pcos_check';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _answers.entries)
+          if (_sources[e.key] != PcosAnswerSource.derived) 'a|${e.key}': e.value,
+        if (_completedAt != null) 'done': _completedAt!.toIso8601String(),
+      };
+
+  /// ⚠️ NEVER CALLS prefill() HERE. prefill() reads CycleStore; this runs
+  /// inside a merge and may only rebuild from the items. Derived answers on
+  /// this phone that the cloud has no answer for are kept as they are (they
+  /// were never items); the screen's next prefill() refreshes them.
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final derived = {
+      for (final e in _answers.entries)
+        if (_sources[e.key] == PcosAnswerSource.derived) e.key: e.value,
+    };
+    _answers.clear();
+    _sources.clear();
+    _completedAt = null;
+    for (final e in items.entries) {
+      final v = e.value;
+      if (v is! String) continue;
+      if (e.key.startsWith('a|')) {
+        _answers[e.key.substring(2)] = v;
+      } else if (e.key == 'done') {
+        _completedAt = DateTime.tryParse(v);
+      }
+    }
+    if (items.isNotEmpty) {
+      for (final e in derived.entries) {
+        if (_answers.containsKey(e.key)) continue;
+        _answers[e.key] = e.value;
+        _sources[e.key] = PcosAnswerSource.derived;
+      }
+    }
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      await _persist();
+      final p = await SharedPreferences.getInstance();
+      final done = _completedAt;
+      if (done == null) {
+        await p.remove(_kDone);
+      } else {
+        await p.setString(_kDone, done.toIso8601String());
+      }
+    } catch (_) {/* best effort */}
   }
 
   // ---------------------------------------------------------------------------
@@ -109,13 +176,14 @@ class TtcPcosCheckStore extends ChangeNotifier {
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
   // are wiped, the singleton was not.
   // reset() also writes prefs, so this one touches memory only.
-  void _resetForAccount() {
-    _answers.clear();
-    _sources.clear();
-    _completedAt = null;
-    _loaded = false;
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     _answers.clear();
+  //     _sources.clear();
+  //     _completedAt = null;
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
 
   /// Starts again. Keeps nothing — a half-remembered previous answer showing up
   /// in a fresh check is worse than typing it again.

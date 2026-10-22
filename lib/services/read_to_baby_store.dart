@@ -19,12 +19,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 import '../data/read_to_baby_data.dart';
 import '../data/spiritual_reading_data.dart';
 
-class ReadToBabyStore extends ChangeNotifier with CloudSyncedStore {
+// Per-item since step 13 (2026-10-22, sync log). It synced as one whole blob,
+// so a tradition turned on on one phone and a category on the other erased
+// each other. Items: `cat|<category>` (bool, only where it differs from the
+// default), `rel|<tradition>` and `sec|<tradition>|<index>` (true), and
+// `offset` (only when non-zero). The defaults hold no items, so an unused
+// store is empty and applyCloudItems({}) gives the defaults back.
+class ReadToBabyStore extends ChangeNotifier with CloudMergedStore {
   ReadToBabyStore._();
   static final ReadToBabyStore instance = ReadToBabyStore._();
 
@@ -71,27 +78,75 @@ class ReadToBabyStore extends ChangeNotifier with CloudSyncedStore {
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
-  // ---- cloud (CloudSyncedStore) ----------------------------------------------
+  // ---- cloud (CloudMergedStore, step 13) ---------------------------------------
   @override
   String get cloudKey => 'read_to_baby_prefs';
-
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <String, Object?>{'categories': [kRtbSpeaking, kRtbStories], 'religions': <String>[], 'sections': <String>[], 'offset': 0};
+  String? get legacyBlobKey => cloudKey;
+
+  // Kept for revert (step 13): applyCloudItems({}) is the empty state now.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'categories': [kRtbSpeaking, kRtbStories], 'religions': <String>[], 'sections': <String>[], 'offset': 0};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'categories': _categories.toList(),
+  //         'religions': _religions.toList(),
+  //         'sections': _sections.toList(),
+  //         'offset': _promptOffset,
+  //       };
+
+  static const Set<String> _defaultCategories = {kRtbSpeaking, kRtbStories};
 
   @override
-  Object cloudData() => {
-        'categories': _categories.toList(),
-        'religions': _religions.toList(),
-        'sections': _sections.toList(),
-        'offset': _promptOffset,
+  Map<String, Object?> cloudItems() => {
+        for (final c in {..._defaultCategories, ..._categories})
+          if (_categories.contains(c) != _defaultCategories.contains(c))
+            'cat|$c': _categories.contains(c),
+        for (final r in _religions) 'rel|$r': true,
+        for (final k in _sections) 'sec|$k': true,
+        // One counter, last write wins: two phones advancing at once can lose
+        // a step. It only picks the day's prompt, so that is acceptable.
+        if (_promptOffset != 0) 'offset': _promptOffset,
       };
 
   @override
-  void applyCloudData(Object data) {
+  void applyCloudItems(Map<String, Object?> items) {
+    _categories
+      ..clear()
+      ..addAll(_defaultCategories);
+    _religions.clear();
+    _sections.clear();
+    _promptOffset = 0;
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('cat|')) {
+        final c = k.substring(4);
+        if (e.value == true) {
+          _categories.add(c);
+        } else {
+          _categories.remove(c);
+        }
+      } else if (k.startsWith('rel|')) {
+        _religions.add(k.substring(4));
+      } else if (k.startsWith('sec|')) {
+        _sections.add(k.substring(4));
+      } else if (k == 'offset') {
+        final o = e.value;
+        if (o is num) _promptOffset = o.toInt();
+      }
+    }
+    _loaded = true;
+  }
+
+  @override
+  void applyLegacyBlob(Object blob) {
+    final data = blob;
     if (data is! Map) return;
     List<String> list(Object? v) => v is List ? v.whereType<String>().toList() : const [];
     if (data['categories'] != null) {

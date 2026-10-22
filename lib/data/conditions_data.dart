@@ -24,7 +24,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
 import '../services/family_profile.dart';
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -2379,10 +2380,18 @@ final Map<ConditionGroup, List<ConditionEntry>> kSeeMoreGroups = {
 //  reach for when they need cross-device sync would be more machinery than
 //  this earns.
 // =============================================================================
-class ConditionsStore extends ChangeNotifier {
-  ConditionsStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+//
+//  IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so a
+//  sign-out or a new phone lost her door answer and her journey list. Items:
+//  `door` (the answer's name), `declined|<id>` and `journey|<id>` (true).
+//  The FamilyProfileStore mirror is not re-run on apply: that store syncs
+//  its own copy.
+class ConditionsStore extends ChangeNotifier with CloudMergedStore {
+  ConditionsStore._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   ConditionsStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final ConditionsStore instance = ConditionsStore._();
 
   static const _doorKey = 'conditions_door_answer';
@@ -2398,15 +2407,50 @@ class ConditionsStore extends ChangeNotifier {
   bool get isDiagnosed => _door == ConditionDoorAnswer.diagnosed;
   bool get answered => _door != ConditionDoorAnswer.unset;
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  void _resetForAccount() {
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   void _resetForAccount() {
+  //     _door = ConditionDoorAnswer.unset;
+  //     _medicineDeclined.clear();
+  //     _addedToJourney.clear();
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'conditions_choices';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        if (_door != ConditionDoorAnswer.unset) 'door': _door.name,
+        for (final id in _medicineDeclined) 'declined|$id': true,
+        for (final id in _addedToJourney) 'journey|$id': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
     _door = ConditionDoorAnswer.unset;
     _medicineDeclined.clear();
     _addedToJourney.clear();
-    _loaded = false;
-    notifyListeners();
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k == 'door') {
+        _door = ConditionDoorAnswer.values.firstWhere(
+            (d) => d.name == e.value, orElse: () => ConditionDoorAnswer.unset);
+      } else if (k.startsWith('declined|')) {
+        _medicineDeclined.add(k.substring(9));
+      } else if (k.startsWith('journey|')) {
+        _addedToJourney.add(k.substring(8));
+      }
+    }
+    _loaded = true;
   }
+
+  @override
+  Future<void> persistLocalCache() => _save();
 
   bool medicineDeclinedFor(String id) => _medicineDeclined.contains(id);
   bool isAddedToJourney(String id) => _addedToJourney.contains(id);
@@ -2426,6 +2470,7 @@ class ConditionsStore extends ChangeNotifier {
     }
     _loaded = true;
     notifyListeners();
+    await syncMergedFromCloud();
   }
 
   /// ⚠️ THE GATE ITSELF. `diagnosed` unlocks "add to my journey" on every

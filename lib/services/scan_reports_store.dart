@@ -56,7 +56,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import 'remote/storage_service.dart';
 
 /// One file attached to a report.
@@ -207,7 +208,7 @@ class ScanReport {
       );
 }
 
-class ScanReportsStore extends ChangeNotifier with CloudSyncedStore {
+class ScanReportsStore extends ChangeNotifier with CloudMergedStore {
   ScanReportsStore._();
   static final ScanReportsStore instance = ScanReportsStore._();
 
@@ -268,7 +269,8 @@ class ScanReportsStore extends ChangeNotifier with CloudSyncedStore {
     // would do exactly that on a fresh install, which for this store means
     // deleting her reports from the cloud on a new phone.
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* offline — the local cache is still hers */}
   }
 
@@ -326,18 +328,39 @@ class ScanReportsStore extends ChangeNotifier with CloudSyncedStore {
   //  ⚠️ THE BLOB CARRIES FILE REFERENCES, NEVER FILE BYTES. The bytes go to the
   //  private media bucket. Putting a photographed report inside a JSON blob
   //  would be both enormous and the wrong place for a medical image.
+  //
+  //  PER-ITEM SINCE STEP 13 (2026-10-22, sync log). One item per report
+  //  (`<id>`, its JSON), merged item by item (CloudMergedStore): two phones
+  //  adding reports both keep theirs, and a removal travels. The per-row
+  //  timestamp the note below says this model lacks is now the mixin's.
   @override
   String get cloudKey => 'scan_reports';
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <Object>[];
+  String? get legacyBlobKey => 'scan_reports';
 
   @override
-  Object cloudData() => _reports.map((r) => r.toJson()).toList();
+  Map<String, Object?> cloudItems() =>
+      {for (final r in _reports) r.id: r.toJson()};
 
   @override
-  void applyCloudData(Object data) {
+  void applyCloudItems(Map<String, Object?> items) {
+    _reports
+      ..clear()
+      ..addAll(items.values
+          .whereType<Map>()
+          .map((m) => ScanReport.fromJson(m.cast<String, dynamic>())));
+  }
+
+  // Kept for revert (step 13): the whole-blob sync.
+  //   @override
+  //   Object get cloudEmptyData => const <Object>[];
+  //   @override
+  //   Object cloudData() => _reports.map((r) => r.toJson()).toList();
+
+  /// The old whole blob (before step 13), read once on a phone holding none.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! List) return;
     // ⚠️ REPLACE, NOT MERGE, AND THAT IS THE MIXIN'S CONTRACT RATHER THAN A
     // CHOICE MADE HERE: `applyCloudData` runs once at sync, before local edits

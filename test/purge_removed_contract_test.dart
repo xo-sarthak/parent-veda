@@ -58,11 +58,33 @@ Set<String> tablesWithRemovedAt() {
   return out;
 }
 
+/// The newest migration that (re)defines the purge: 0109, then each later one
+/// that adds tables to its list (0110, step 13).
+String latestPurgeSql() {
+  final files = Directory('supabase/migrations')
+      .listSync()
+      .whereType<File>()
+      .where((f) => f.path.endsWith('.sql'))
+      .toList()
+    ..sort((a, b) => a.path.compareTo(b.path));
+  String? last;
+  for (final f in files) {
+    final sql = f.readAsStringSync().replaceAll('\r\n', '\n');
+    if (sql.contains('create or replace function public.pv_purge_removed(')) {
+      last = sql;
+    }
+  }
+  return last!;
+}
+
 Set<String> purgeList() {
-  final sql = File('supabase/migrations/0109_purge_removed.sql')
-      .readAsStringSync()
-      .replaceAll('\r\n', '\n');
-  final head = sql.indexOf('foreach t in array array[');
+  // Kept for revert (before 0110): read 0109 only.
+  //   final sql = File('supabase/migrations/0109_purge_removed.sql')
+  //       .readAsStringSync().replaceAll('\r\n', '\n');
+  final sql = latestPurgeSql();
+  final fn =
+      sql.indexOf('create or replace function public.pv_purge_removed(');
+  final head = sql.indexOf('foreach t in array array[', fn);
   final end = sql.indexOf(']', head);
   return {
     for (final m in RegExp(r"'(\w+)'").allMatches(sql.substring(head, end)))

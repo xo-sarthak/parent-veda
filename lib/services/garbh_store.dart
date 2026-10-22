@@ -9,9 +9,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
-class GarbhStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud per item since step 13 (2026-10-22, sync log). It synced as one
+// whole blob before, so a favourite saved on one phone and a practice ticked
+// on the other erased each other. Items: `fav|<id>` = true, `done|<pillar>` =
+// the day it was ticked (yyyy-mm-dd; only today's count on apply), and one
+// `streak` item = {n, date}.
+class GarbhStore extends ChangeNotifier with CloudMergedStore {
   GarbhStore._();
   static final GarbhStore instance = GarbhStore._();
 
@@ -63,30 +69,69 @@ class GarbhStore extends ChangeNotifier with CloudSyncedStore {
       _streak = 0;
     }
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   // --- cloud sync (favourites + streak; today's done-state stays local) ------
   @override
   String get cloudKey => 'garbh';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'favs': <String>[], 'streak': 0, 'streakDate': '', 'done': <String>[], 'doneDate': '0000-00-00'};
+  // Kept for revert (step 13): the whole-blob mixin's empty state and blob.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'favs': <String>[], 'streak': 0, 'streakDate': '', 'done': <String>[], 'doneDate': '0000-00-00'};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'favs': _favs.toList(),
+  //         'streak': _streak,
+  //         'streakDate': _streakDate,
+  //         // Today's ticks (2026-09-23, the persistence audit): a practice ticked
+  //         // on one phone shows ticked on the other the same day. Only favourites
+  //         // and the streak travelled before.
+  //         'done': _doneToday.toList(),
+  //         'doneDate': _doneDate,
+  //       };
 
   @override
-  Object cloudData() => {
-        'favs': _favs.toList(),
-        'streak': _streak,
-        'streakDate': _streakDate,
-        // Today's ticks (2026-09-23, the persistence audit): a practice ticked
-        // on one phone shows ticked on the other the same day. Only favourites
-        // and the streak travelled before.
-        'done': _doneToday.toList(),
-        'doneDate': _doneDate,
-      };
+  String? get legacyBlobKey => cloudKey;
+
   @override
-  void applyCloudData(Object data) {
-    final m = data as Map;
+  Map<String, Object?> cloudItems() => {
+        for (final f in _favs) 'fav|$f': true,
+        for (final d in _doneToday) 'done|$d': _doneDate,
+        if (_streak != 0 || _streakDate.isNotEmpty)
+          'streak': {'n': _streak, 'date': _streakDate},
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _favs.clear();
+    _doneToday.clear();
+    _streak = 0;
+    _streakDate = '';
+    _doneDate = '';
+    final today = _today;
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('fav|')) {
+        _favs.add(k.substring(4));
+      } else if (k.startsWith('done|')) {
+        // A tick from an earlier day is not a tick today.
+        if (e.value == today) _doneToday.add(k.substring(5));
+      } else if (k == 'streak' && e.value is Map) {
+        final m = e.value as Map;
+        _streak = (m['n'] as num?)?.toInt() ?? 0;
+        _streakDate = (m['date'] ?? '').toString();
+      }
+    }
+    if (_doneToday.isNotEmpty) _doneDate = today;
+  }
+
+  /// The old whole blob, read once on a phone that holds nothing yet.
+  @override
+  void applyLegacyBlob(Object blob) {
+    final m = blob as Map;
     _favs
       ..clear()
       ..addAll(((m['favs'] as List?) ?? const []).map((e) => e.toString()));
@@ -108,6 +153,11 @@ class GarbhStore extends ChangeNotifier with CloudSyncedStore {
     await p.setStringList(_favsKey, _favs.toList());
     await p.setInt(_streakKey, _streak);
     await p.setString(_streakDateKey, _streakDate);
+    // Step 13: today's ticks too. With per-item merge a tick taken from the
+    // other phone but not written here would read as removed on the next
+    // launch, and that removal would travel back.
+    await p.setStringList(_doneKey, _doneToday.toList());
+    await p.setString(_doneDateKey, _doneDate);
   }
 
   // --- favorites ---

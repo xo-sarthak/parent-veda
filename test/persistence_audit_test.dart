@@ -92,18 +92,19 @@ void main() {
       await rtb.init();
       rtb.toggleCategory('affirmations');
       rtb.nextPrompt();
-      final sent = rtb.cloudData();
+      // Per-item since step 13: cloudItems / applyCloudItems.
+      final sent = rtb.cloudItems();
       rtb.toggleCategory('affirmations'); // change it locally…
-      rtb.applyCloudData(sent); // …and the cloud's copy wins back
+      rtb.applyCloudItems(sent); // …and the cloud's copy wins back
       expect(rtb.isCategoryOn('affirmations'), isTrue);
       expect(rtb.promptOffset, greaterThan(0));
 
       final sp = SpiritualPrefsStore.instance;
       sp.toggleInterested('Gayatri Mantra');
       sp.toggleNotInterested('Something else');
-      final up = sp.cloudData();
+      final up = sp.cloudItems();
       sp.toggleInterested('Gayatri Mantra');
-      sp.applyCloudData(up);
+      sp.applyCloudItems(up);
       expect(sp.isInterested('Gayatri Mantra'), isTrue);
       expect(sp.isNotInterested('Something else'), isTrue);
       expect(rtb.cloudKey, isNot(sp.cloudKey), reason: 'two stores, two blobs');

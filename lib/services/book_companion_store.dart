@@ -14,9 +14,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
-class BookCompanionStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud per item since step 13 (2026-10-22, sync log). It synced as one
+// whole blob before, so two phones opening different chapters erased each
+// other's progress. Items: `idea|<bookId>|<i>` and `chapter|<bookId>|<i>`,
+// value true, so an opened idea on either phone is kept.
+class BookCompanionStore extends ChangeNotifier with CloudMergedStore {
   BookCompanionStore._();
   static final BookCompanionStore instance = BookCompanionStore._();
 
@@ -46,7 +51,8 @@ class BookCompanionStore extends ChangeNotifier with CloudSyncedStore {
       notifyListeners();
     } catch (_) {/* start empty */}
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
@@ -102,14 +108,47 @@ class BookCompanionStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   String get cloudKey => 'book_companion_progress';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'ideas': <String, Object>{}, 'chapters': <String, Object>{}};
+  // Kept for revert (step 13): the whole-blob mixin's empty state and blob.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'ideas': <String, Object>{}, 'chapters': <String, Object>{}};
+  //
+  //   @override
+  //   Object cloudData() => _toMap();
 
   @override
-  Object cloudData() => _toMap();
+  String? get legacyBlobKey => cloudKey;
+
+  /// The old whole blob, read once on a phone that holds nothing yet.
   @override
-  void applyCloudData(Object data) => _apply(data as Map);
+  void applyLegacyBlob(Object blob) => _apply(blob as Map);
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _ideas.entries)
+          for (final i in e.value) 'idea|${e.key}|$i': true,
+        for (final e in _chapters.entries)
+          for (final i in e.value) 'chapter|${e.key}|$i': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _ideas.clear();
+    _chapters.clear();
+    for (final k in items.keys) {
+      final first = k.indexOf('|');
+      final last = k.lastIndexOf('|');
+      if (first <= 0 || last <= first) continue;
+      final kind = k.substring(0, first);
+      final book = k.substring(first + 1, last);
+      final i = int.tryParse(k.substring(last + 1));
+      if (i == null) continue;
+      final target = kind == 'idea' ? _ideas : kind == 'chapter' ? _chapters : null;
+      target?.putIfAbsent(book, () => <int>{}).add(i);
+    }
+    _loaded = true; // a later ensureLoaded must not read stale prefs over this
+  }
+
   @override
   Future<void> persistLocalCache() async {
     try {

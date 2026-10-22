@@ -3611,6 +3611,77 @@ table. Test: `test/pv_affiliate_test.dart`.
 > with its timestamp.** Store when you read it, show it, and prefer a stale
 > dated value over a fresh wrong one.
 
+### 16ii-q. Merge where the writes are already in order: the per-item store (0110, sync log step 13, 2026-10-22)
+
+**The problem.** Since 0011, about 60 light stores kept one JSON blob each in `user_state`: the hospital bag,
+saved readings, nutrition, answers to the TTC checks and so on. A sync replaced the whole blob, which causes two
+failures with two phones:
+- Phone A ticks "nappies" and phone B ticks "shawl". Each uploads its whole blob, and whichever lands second erases
+  the other's tick.
+- About 40 more stores, such as the birth plan, memories and the Garbh journal, never synced at all. A sign-out or
+  a new phone lost them for good.
+
+**The shape: a last-writer-wins map.** Each store is now a map of items, where `key -> {v, t, d}` holds:
+- `v`, the value;
+- `t`, when it was last edited (the phone's clock, in milliseconds);
+- `d`, true when the item has been removed.
+
+Two copies merge item by item, and the newer `t` wins. A removal is an item with `d: true` (a tombstone), so it
+travels instead of reading as "never had it". This is one of the simplest CRDTs (conflict-free replicated data
+types): merging any two copies, in any order, gives the same result. Choosing items is the design work. Make one
+item per thing two people could change separately: one per ticked id, one per answer, one per setting. Items that
+are too coarse bring back the original problem in miniature.
+
+**Where the merge runs, and why.** The obvious version runs on the phone: read the blob, merge, write it back. It has
+a race. Phones A and B both read version 1, both merge, both write, and B's write drops A's new item. There are two
+standard answers:
+
+| Approach | How | Cost |
+|---|---|---|
+| Compare-and-swap on the phone | Write only if the version is still the one you read; retry if not | A retry loop on every clash, and a version column |
+| Merge on the server, under a lock | One function locks the row (`select ... for update`), merges, writes | One function to keep identical to the Dart mirror |
+
+We chose the second: `pv_state_merge(p_key, p_items)`. It is `SECURITY INVOKER`, so the caller's own-row policies
+still apply. The phone sends only the items it changed and gets the whole merged map back, so one call is both the
+push and the pull. The general fact: **merge where the writes are already put in order.** The database serializes
+writes to one row anyway, so the merge belongs inside that.
+
+**The rules match the row tables:**
+- a clock more than 5 minutes ahead is pulled back (0100);
+- a tie keeps the server's copy;
+- tombstones go after 90 days on the server and 80 on the phone (§16ii-m).
+
+The Dart twin, `MergedItems.merge`, is held to the same cases by `test/cloud_merged_store_test.dart`, which also
+greps the SQL.
+
+**Items or rows?** Both exist now, so here is the rule.
+- **Rows** (`OwnRowLedger`, §16ii-j) are for records she makes one at a time that keep growing or carry a file:
+  memories (photo) and Garbh recordings (audio). They live in their own tables with the record in `data jsonb`, the
+  key `(user_id, key)`, and the purge.
+- **Items** are for everything small: answers, ticks, settings, short lists, BMI readings, scan reports (their files
+  were already in Storage).
+- The named limit: a list that grows without bound (blood-sugar readings logged four times a day for months) is one
+  blob that every merge returns whole. Past a few hundred items it belongs in rows.
+
+**Four traps found while building it.**
+1. **A reset is not a deletion.** A sign-out empties every store. To the mixin, which stamps whatever changed, that
+   looked like her removing everything. When a *different* account signs in on the phone, the wipe runs while that
+   account is logged in, and those removals would have gone to the new account. `SyncRegistry.resetting` is now true
+   during `resetAll`, and the mixin stamps nothing while it is.
+2. **`jsonb` reorders object keys.** A map value that went to the server came back with its keys in a different
+   order, so it looked edited on every notify and was stamped again. That fresh stamp could then beat a real edit made
+   on the other phone. The mixin now compares values in a canonical form with keys sorted. The general fact: never
+   compare serialized JSON across a system that stores it in its own form.
+3. **"Holds nothing" is not "new phone".** The upgrade reads the old whole blob on a phone's first run. Several stores
+   start with demo seeds, so a rule of "only when the store is empty" skipped her real data on a new phone. The rule
+   now is the old mixin's own: the old blob wins, unless this phone kept a change the old sync had not uploaded (its
+   waiting mark).
+4. **Upgrading without loss.** On a phone's first run, whatever it already holds is stamped `t = 0`. Any real edit,
+   on any phone, beats it, and nothing already on the phone is dropped.
+
+> General facts: **a last-writer-wins map is a CRDT you can build in an afternoon; merge it where writes are already
+> serialized; and when you emptied something on purpose, do not let the change tracker call it a delete.**
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3709,3 +3780,4 @@ table. Test: `test/pv_affiliate_test.dart`.
 42. `lib/services/remote/sync_batch.dart` → `SupabaseRepo.upsertRows` — batches, the one bad row, and refused vs offline (§16ii-l).
 43. `0109_purge_removed.sql` → `SyncRowBook.dropSettled` — the purge window as a promise, and why the phone forgets first (§16ii-m).
 44. `pvSignOut` → `LocalOwner.wipeThisPhone` → `LocalWipe.keep` — a wipe undoes what came before it, the OS keeps what you scheduled, and memory is not the disk (§16ii-n).
+45. `0110_state_merge_and_records.sql` (`pv_state_merge`) → `lib/services/remote/cloud_merged_store.dart` — merge where the writes are already in order, a last-writer-wins map, items vs rows, and why a reset is not a deletion (§16ii-q).

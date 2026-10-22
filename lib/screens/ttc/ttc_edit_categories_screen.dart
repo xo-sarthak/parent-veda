@@ -27,7 +27,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/sync_registry.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 import '../../ttc/ttc_symptom_data.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
@@ -43,10 +44,15 @@ const String kTtcEditCategoriesTitle = 'Show or hide';
 /// ⚠️ LOCAL, NOT SYNCED, AND THAT IS THE RIGHT SCOPE. This is "what I want on
 /// my logging screen", which is a preference about a surface rather than a fact
 /// about the family — the same reading the launch promo and the intro gate take.
-class TtcCategoryPrefs extends ChangeNotifier {
-  TtcCategoryPrefs._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone brought back every logger card she had turned
+// off. Items: `hidden|<category id>` -> true per card turned off.
+class TtcCategoryPrefs extends ChangeNotifier with CloudMergedStore {
+  TtcCategoryPrefs._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcCategoryPrefs._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcCategoryPrefs instance = TtcCategoryPrefs._();
 
   static const _key = 'ttc_hidden_symptom_categories';
@@ -56,10 +62,40 @@ class TtcCategoryPrefs extends ChangeNotifier {
 
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
   // are wiped, the singleton was not.
-  void _resetForAccount() {
-    _hidden.clear();
-    _loaded = false;
-    notifyListeners();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     _hidden.clear();
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_hidden_categories';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _hidden) 'hidden|$id': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _hidden
+      ..clear()
+      ..addAll([
+        for (final k in items.keys)
+          if (k.startsWith('hidden|')) k.substring(7),
+      ]);
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(_key, _hidden.toList());
+    } catch (_) {/* best effort */}
   }
 
   Set<String> get hidden => Set.unmodifiable(_hidden);
@@ -74,6 +110,7 @@ class TtcCategoryPrefs extends ChangeNotifier {
       ..clear()
       ..addAll(p.getStringList(_key) ?? const []);
     notifyListeners();
+    await syncMergedFromCloud();
   }
 
   Future<void> setHidden(String id, bool hidden) async {

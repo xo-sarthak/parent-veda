@@ -23,7 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
-import '../../services/remote/sync_registry.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 import 'pp_child_profile.dart';
 import 'pp_content.dart';
 import 'pp_daily_tips.dart';
@@ -216,10 +217,16 @@ PvRead ppTipAsRead(String id, DailyTip tip) => PvRead(
     );
 
 /// The last door page opened, for "Continue reading".
-class PpLastPageStore extends ChangeNotifier {
-  PpLastPageStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+///
+/// In the cloud since step 13 (2026-10-22, sync log). It was phone-only, so a
+/// sign-out or a new phone lost her place. One item: `last`, value
+/// `{s: section id, p: page id}`; the newer open wins.
+class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
+  PpLastPageStore._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   PpLastPageStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final PpLastPageStore instance = PpLastPageStore._();
 
   static const _key = 'pp_last_page_v1';
@@ -239,6 +246,38 @@ class PpLastPageStore extends ChangeNotifier {
         notifyListeners();
       }
     } catch (_) {/* nothing to continue */}
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'pp_last_page';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        if (_sectionId != null && _pageId != null)
+          'last': {'s': _sectionId, 'p': _pageId},
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final v = items['last'];
+    _sectionId = v is Map && v['s'] is String ? v['s'] as String : null;
+    _pageId = v is Map && v['p'] is String ? v['p'] as String : null;
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      if (_sectionId == null || _pageId == null) {
+        await p.remove(_key);
+      } else {
+        await p.setString(_key, jsonEncode({'s': _sectionId, 'p': _pageId}));
+      }
+    } catch (_) {}
   }
 
   /// Called by the one place every door page opens (`_ppPageScreenAndKind`).
@@ -259,12 +298,13 @@ class PpLastPageStore extends ChangeNotifier {
     return (s == null || p == null) ? null : (section: s, page: p);
   }
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  void _resetForAccount() {
-    debugReset();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   void _resetForAccount() {
+  //     debugReset();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void debugReset() {

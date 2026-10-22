@@ -20,7 +20,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../localization/app_language.dart'; // LocalizedText
 import 'bought_store.dart';
 import 'hospital_bag_store.dart'; // BagItem / BagCategory / BagItemStatus / DeliveryType
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 /// The single, plain-language journey stage for an item (computed, not stored).
 enum BagStage { needsDecision, planningToBuy, readyAtHome, packed, maybeLater }
@@ -39,7 +40,12 @@ BagStage bagStageOf(BagItem i) {
   return BagStage.needsDecision; // needed (or chosen but not yet sorted)
 }
 
-class HospitalBagV2Store extends ChangeNotifier with CloudSyncedStore {
+// In the cloud per item since step 13 (2026-10-22, sync log). It synced as one
+// whole blob before, so two phones packing different items erased each
+// other's ticks. Items: `item|<id>` = the item's JSON; `order` = the list of
+// item ids (changes only on create, add or remove); `onboarded`, `delivery`
+// and `updatedIso` one item each, written only when set.
+class HospitalBagV2Store extends ChangeNotifier with CloudMergedStore {
   HospitalBagV2Store._();
   static final HospitalBagV2Store instance = HospitalBagV2Store._();
 
@@ -149,26 +155,79 @@ class HospitalBagV2Store extends ChangeNotifier with CloudSyncedStore {
     _loaded = true;
     markBoughtFromBought();
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   // --- cloud sync ------------------------------------------------------------
   @override
   String get cloudKey => 'hb2';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{};
+  // Kept for revert (step 13): the whole-blob mixin's empty state and blob.
+  // /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  // @override
+  // Object get cloudEmptyData => const <String, Object?>{};
+  //
+  // @override
+  // Object cloudData() => {
+  //       'items': _items.map((i) => i.toJson()).toList(),
+  //       'onboarded': _onboarded,
+  //       'delivery': _delivery.name,
+  //       'updatedIso': _updatedIso,
+  //     };
 
   @override
-  Object cloudData() => {
-        'items': _items.map((i) => i.toJson()).toList(),
-        'onboarded': _onboarded,
-        'delivery': _delivery.name,
-        'updatedIso': _updatedIso,
-      };
+  String? get legacyBlobKey => cloudKey;
+
   @override
-  void applyCloudData(Object data) {
-    final m = data as Map;
+  Map<String, Object?> cloudItems() => {
+        for (final i in _items) 'item|${i.id}': i.toJson(),
+        if (_items.isNotEmpty) 'order': [for (final i in _items) i.id],
+        if (_onboarded) 'onboarded': true,
+        if (_delivery != DeliveryType.unsure) 'delivery': _delivery.name,
+        if (_updatedIso != null) 'updatedIso': _updatedIso,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _items.clear();
+    _onboarded = false;
+    _delivery = DeliveryType.unsure;
+    _updatedIso = null;
+    final byId = <String, BagItem>{};
+    var order = const <String>[];
+    for (final e in items.entries) {
+      final k = e.key;
+      final v = e.value;
+      if (k == 'onboarded') {
+        _onboarded = v == true;
+      } else if (k == 'delivery') {
+        _delivery = DeliveryType.values.firstWhere((d) => d.name == v,
+            orElse: () => DeliveryType.unsure);
+      } else if (k == 'updatedIso') {
+        _updatedIso = v?.toString();
+      } else if (k == 'order' && v is List) {
+        order = v.map((x) => x.toString()).toList();
+      } else if (k.startsWith('item|') && v is Map) {
+        try {
+          final item = BagItem.fromJson(Map<String, dynamic>.from(v));
+          byId[item.id] = item;
+        } catch (_) {/* an item this build cannot read is skipped */}
+      }
+    }
+    // The saved order first; an item the order does not know (added on the
+    // other phone while this one reordered) goes after, by id.
+    for (final id in order) {
+      final item = byId.remove(id);
+      if (item != null) _items.add(item);
+    }
+    _items.addAll(byId.values.toList()..sort((a, b) => a.id.compareTo(b.id)));
+    _loaded = true; // a later init must not read stale prefs over this
+  }
+
+  /// The old whole blob, read once on a phone that holds nothing yet.
+  @override
+  void applyLegacyBlob(Object blob) {
+    final m = blob as Map;
     _items
       ..clear()
       ..addAll(((m['items'] as List?) ?? const [])

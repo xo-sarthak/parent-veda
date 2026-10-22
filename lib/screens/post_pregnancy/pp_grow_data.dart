@@ -44,7 +44,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
@@ -400,7 +401,11 @@ String growWhyToday(DevActivity a, {int? ageMonths}) {
 //  filed off would make the comparison meaningless.
 // =============================================================================
 
-class GrowStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud since step 13 (2026-10-22, sync log) as per-item merge. It
+// synced as one whole blob, so a day done on one phone could erase a day done
+// on the other. Items: `day|<yyyy-MM-dd>` -> true, `last|<activityId>` -> the
+// last date it was done.
+class GrowStore extends ChangeNotifier with CloudMergedStore {
   GrowStore._();
   static final GrowStore instance = GrowStore._();
 
@@ -419,23 +424,52 @@ class GrowStore extends ChangeNotifier with CloudSyncedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {/* local-first: an unreadable cache is an empty one */}
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'days': <String>[], 'last': <String, String>{}};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'days': <String>[], 'last': <String, String>{}};
+  //
+  //   @override
+  //   Object cloudData() => {'days': _days.toList(), 'last': _last};
+
+  /// The local prefs blob (the shape the cloud blob had before step 13).
+  Map<String, Object?> _blob() => {'days': _days.toList(), 'last': _last};
 
   @override
-  Object cloudData() => {'days': _days.toList(), 'last': _last};
+  String? get legacyBlobKey => cloudKey;
 
   @override
-  void applyCloudData(Object data) {
+  Map<String, Object?> cloudItems() => {
+        for (final d in _days) 'day|$d': true,
+        for (final e in _last.entries) 'last|${e.key}': e.value,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _days.clear();
+    _last.clear();
+    for (final e in items.entries) {
+      if (e.key.startsWith('day|')) {
+        _days.add(e.key.substring(4));
+      } else if (e.key.startsWith('last|')) {
+        _last[e.key.substring(5)] = (e.value ?? '').toString();
+      }
+    }
+  }
+
+  /// Was applyCloudData before step 13; the same body. Also reads the local
+  /// prefs cache, which keeps the old blob shape.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     final d = data['days'];
     if (d is List) _days..clear()..addAll(d.map((e) => e.toString()));
@@ -457,7 +491,7 @@ class GrowStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {/* local write failed; in-memory state still stands */}
   }
 

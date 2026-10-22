@@ -41,12 +41,23 @@ class SyncRegistry {
   /// Empty every registered store. Best-effort: one store that throws does
   /// not stop the others.
   static void resetAll() {
-    for (final r in List.of(_resets)) {
-      try {
-        r();
-      } catch (_) {/* keep going */}
+    _resetting = true;
+    try {
+      for (final r in List.of(_resets)) {
+        try {
+          r();
+        } catch (_) {/* keep going */}
+      }
+    } finally {
+      _resetting = false;
     }
   }
+
+  /// True while [resetAll] runs (step 13). A store emptied by a reset is not
+  /// an edit: the per-item merged stores must not stamp it as removals, or the
+  /// next account to sign in would receive the last one's deletions.
+  static bool get resetting => _resetting;
+  static bool _resetting = false;
 
   static final List<Future<void> Function()> _syncers = [];
 

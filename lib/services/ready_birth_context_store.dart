@@ -16,9 +16,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/ready_for_birth_data.dart';
 import 'hospital_bag_store.dart' show DeliveryType;
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
-class ReadyBirthContextStore extends ChangeNotifier with CloudSyncedStore {
+// Per-item since step 13 (2026-10-22, sync log). It synced as one whole blob,
+// so a twins answer on one phone and a hospital tick on the other erased each
+// other. Items: `delivery`, `twins`, `season` (each only when set away from
+// its default) and `provides|<token>` (true) per thing the hospital provides.
+class ReadyBirthContextStore extends ChangeNotifier with CloudMergedStore {
   ReadyBirthContextStore._();
   static final ReadyBirthContextStore instance = ReadyBirthContextStore._();
 
@@ -58,7 +63,8 @@ class ReadyBirthContextStore extends ChangeNotifier with CloudSyncedStore {
     } catch (_) {/* start with defaults */}
     _loaded = true;
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   void _apply(Map m) {
@@ -108,14 +114,42 @@ class ReadyBirthContextStore extends ChangeNotifier with CloudSyncedStore {
   // ---- cloud sync -----------------------------------------------------------
   @override
   String get cloudKey => 'rfb_ctx';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <String, Object?>{};
+  String? get legacyBlobKey => cloudKey;
+
+  // Kept for revert (step 13): applyCloudItems({}) is the empty state now.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{};
+  //
+  //   @override
+  //   Object cloudData() => _toMap();
 
   @override
-  Object cloudData() => _toMap();
+  void applyLegacyBlob(Object blob) => _apply(blob as Map);
+
   @override
-  void applyCloudData(Object data) => _apply(data as Map);
+  Map<String, Object?> cloudItems() => {
+        if (_delivery != DeliveryType.unsure) 'delivery': _delivery.name,
+        if (_twins) 'twins': true,
+        if (_seasonOverride != null) 'season': _seasonOverride!.name,
+        for (final t in _hospitalProvides) 'provides|$t': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    // The same reading as the blob: absent fields are the defaults.
+    _apply({
+      'delivery': items['delivery'],
+      'twins': items['twins'],
+      'season': items['season'],
+      'provides': [
+        for (final k in items.keys)
+          if (k.startsWith('provides|')) k.substring('provides|'.length),
+      ],
+    });
+    _loaded = true;
+  }
   @override
   Future<void> persistLocalCache() async {
     final prefs = await SharedPreferences.getInstance();

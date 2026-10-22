@@ -13,9 +13,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
-class ExpertFollowStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud per item since step 13 (2026-10-22, sync log). It synced as one
+// whole blob before, so a follow on one phone and an unfollow on another
+// overwrote each other. Items: one per followed name, value true.
+class ExpertFollowStore extends ChangeNotifier with CloudMergedStore {
   ExpertFollowStore._();
   static final ExpertFollowStore instance = ExpertFollowStore._();
 
@@ -30,22 +34,37 @@ class ExpertFollowStore extends ChangeNotifier with CloudSyncedStore {
       ..clear()
       ..addAll(_prefs!.getStringList(_key) ?? const []);
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   // --- cloud sync ------------------------------------------------------------
   @override
   String get cloudKey => 'followed_experts';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String>[];
+  // Kept for revert (step 13): the whole-blob mixin's empty state and blob.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String>[];
+  //
+  //   @override
+  //   Object cloudData() => _followed.toList();
 
   @override
-  Object cloudData() => _followed.toList();
+  String? get legacyBlobKey => cloudKey;
+
+  /// The old whole blob, read once on a phone that holds nothing yet.
   @override
-  void applyCloudData(Object data) => _followed
+  void applyLegacyBlob(Object blob) => _followed
     ..clear()
-    ..addAll((data as List).map((e) => e.toString()));
+    ..addAll((blob as List).map((e) => e.toString()));
+
+  @override
+  Map<String, Object?> cloudItems() => {for (final f in _followed) f: true};
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) => _followed
+    ..clear()
+    ..addAll(items.keys);
   @override
   Future<void> persistLocalCache() async {
     await _prefs?.setStringList(_key, _followed.toList());

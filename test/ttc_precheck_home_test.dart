@@ -18,6 +18,7 @@ import 'package:parentveda/screens/ttc/ttc_home_v3.dart';
 import 'package:parentveda/screens/ttc/ttc_precheck_summary.dart';
 import 'package:parentveda/screens/ttc/ttc_precheck_screen.dart';
 import 'package:parentveda/screens/v2/pv_insight_rail.dart';
+import 'package:parentveda/services/remote/cloud_merged_store.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_doctor_questions_store.dart';
@@ -233,11 +234,13 @@ void main() {
 
   // ===========================================================================
   group('4. a cloud copy, hers only', () {
-    test('the blob carries every answer, keyed by item', () async {
+    // Per-item since step 13 (CloudMergedStore): cloudItems / applyCloudItems,
+    // and the per-item merge runs on the server (MergedItems.merge).
+    test('the items carry every answer, keyed by item', () async {
       final st = TtcPrecheckStore.instance;
       await st.setStatus('tobacco', PrecheckStatus.done);
       await st.setNote('tobacco', 'quit in March');
-      final blob = st.cloudData() as Map;
+      final blob = st.cloudItems();
       expect(st.cloudKey, 'ttc_precheck');
       expect(blob.keys, contains('tobacco'));
       expect(blob['tobacco'], contains('quit in March'));
@@ -246,21 +249,30 @@ void main() {
     test('a new phone adopts what the cloud holds', () async {
       final st = TtcPrecheckStore.instance;
       final when = DateTime(2026, 9, 1).toIso8601String();
-      st.applyCloudData({'alcohol': 'done|$when|0|'});
+      st.applyCloudItems({'alcohol': 'done|$when|0|'});
+      expect(st.entryFor('alcohol')?.status, PrecheckStatus.done);
+      // And a phone holding nothing reads the old whole blob once.
+      st.applyCloudItems(const {});
+      st.applyLegacyBlob({'alcohol': 'done|$when|0|'});
       expect(st.entryFor('alcohol')?.status, PrecheckStatus.done);
     });
 
-    test('a merge: the answer settled last wins, per item', () async {
+    test('a merge: the answer edited last wins, per item', () async {
       final st = TtcPrecheckStore.instance;
       await st.setStatus('tobacco', PrecheckStatus.done); // now
       final old = DateTime.now().subtract(const Duration(days: 30));
       final fresh = DateTime.now().add(const Duration(days: 1));
-      st.applyCloudData({
-        // older than hers: hers stays
-        'tobacco': 'needsAttention|${old.toIso8601String()}|0|',
-        // newer than nothing: adopted
-        'alcohol': 'notSure|${fresh.toIso8601String()}|0|',
-      });
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final mine = {
+        for (final e in st.cloudItems().entries) e.key: {'v': e.value, 't': now},
+      };
+      final merged = MergedItems.merge(mine, {
+        // edited before hers: hers stays
+        'tobacco': {'v': 'needsAttention|${old.toIso8601String()}|0|', 't': now - 1000},
+        // nothing here yet: adopted
+        'alcohol': {'v': 'notSure|${fresh.toIso8601String()}|0|', 't': now - 1000},
+      }, nowMs: now);
+      st.applyCloudItems({for (final e in merged.entries) e.key: e.value['v']});
       expect(st.entryFor('tobacco')?.status, PrecheckStatus.done,
           reason: 'an older cloud answer must not undo a newer local one');
       expect(st.entryFor('alcohol')?.status, PrecheckStatus.notSure);
@@ -268,8 +280,8 @@ void main() {
 
     test('a damaged blob is ignored, never a crash', () {
       final st = TtcPrecheckStore.instance;
-      st.applyCloudData('not a map');
-      st.applyCloudData({'x': 3, 'y': 'garbage'});
+      st.applyLegacyBlob('not a map');
+      st.applyCloudItems({'x': 3, 'y': 'garbage'});
       expect(st.entryFor('y'), isNull);
     });
 

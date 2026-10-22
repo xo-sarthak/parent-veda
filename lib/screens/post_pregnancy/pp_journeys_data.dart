@@ -21,7 +21,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 @immutable
 class JourneyDay {
@@ -345,7 +346,11 @@ Journey? journeyById(String id) {
 // =============================================================================
 //  JourneyStore — enrolment + progress
 // =============================================================================
-class JourneyStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud since step 13 (2026-10-22, sync log) as per-item merge. It
+// synced as one whole blob, so a day read on one phone could erase a day read
+// on the other. Items: `started|<journeyId>` -> ISO start date,
+// `done|<journeyId>|<day>` -> true.
+class JourneyStore extends ChangeNotifier with CloudMergedStore {
   JourneyStore._();
   static final JourneyStore instance = JourneyStore._();
 
@@ -369,7 +374,8 @@ class JourneyStore extends ChangeNotifier with CloudSyncedStore {
     _loaded = true;
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
@@ -441,14 +447,47 @@ class JourneyStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   String get cloudKey => 'journeys';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'started': <String, String>{}, 'done': <String, Object>{}};
+  //
+  //   @override
+  //   Object cloudData() => _toMap();
+
+  /// Was applyCloudData before step 13; the same body.
   @override
-  Object get cloudEmptyData => const <String, Object?>{'started': <String, String>{}, 'done': <String, Object>{}};
+  void applyLegacyBlob(Object data) => _apply(data as Map);
 
   @override
-  Object cloudData() => _toMap();
+  String? get legacyBlobKey => cloudKey;
+
   @override
-  void applyCloudData(Object data) => _apply(data as Map);
+  Map<String, Object?> cloudItems() => {
+        for (final e in _started.entries) 'started|${e.key}': e.value,
+        for (final e in _done.entries)
+          for (final day in e.value) 'done|${e.key}|$day': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _started.clear();
+    _done.clear();
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('started|')) {
+        _started[k.substring(8)] = (e.value ?? '').toString();
+      } else if (k.startsWith('done|')) {
+        final rest = k.substring(5);
+        final bar = rest.lastIndexOf('|');
+        if (bar <= 0) continue;
+        final day = int.tryParse(rest.substring(bar + 1));
+        if (day == null) continue;
+        _done.putIfAbsent(rest.substring(0, bar), () => <int>{}).add(day);
+      }
+    }
+    _loaded = true;
+  }
   @override
   Future<void> persistLocalCache() async {
     try {

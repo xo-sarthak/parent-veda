@@ -24,12 +24,20 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'care_visibility.dart';
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
-class CarePresenceStore extends ChangeNotifier {
-  CarePresenceStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). The "local only" note
+// above is kept as history: a sign-out or a new phone brought back every card
+// she had dismissed. Items: `dismissed|<key>` (true) and `shown|<key>` (epoch
+// ms), where <key> is [keyFor]. markShown does not notify, so a shown time
+// rides along with the next change that does.
+class CarePresenceStore extends ChangeNotifier with CloudMergedStore {
+  CarePresenceStore._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   CarePresenceStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final CarePresenceStore instance = CarePresenceStore._();
 
   static const _key = 'care_presence_v1';
@@ -65,7 +73,42 @@ class CarePresenceStore extends ChangeNotifier {
     } catch (_) {/* start empty; a forgotten impression is harmless */}
     _loaded = true;
     notifyListeners();
+    await syncMergedFromCloud();
   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'care_presence';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _lastShown.entries)
+          'shown|${e.key}': e.value.millisecondsSinceEpoch,
+        for (final k in _dismissed) 'dismissed|$k': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _lastShown.clear();
+    _dismissed.clear();
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('shown|')) {
+        final v = e.value;
+        if (v is num) {
+          _lastShown[k.substring(6)] =
+              DateTime.fromMillisecondsSinceEpoch(v.toInt());
+        }
+      } else if (k.startsWith('dismissed|')) {
+        _dismissed.add(k.substring(10));
+      }
+    }
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   void markShown(String partnerId, CareSurface surface, String? topic,
       {DateTime? at}) {
@@ -96,12 +139,13 @@ class CarePresenceStore extends ChangeNotifier {
     } catch (_) {/* best effort */}
   }
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  void _resetForAccount() {
-    resetAll();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   void _resetForAccount() {
+  //     resetAll();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetAll() {

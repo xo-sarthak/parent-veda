@@ -20,18 +20,86 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/cloud_merged_store.dart';
+import 'remote/storage_service.dart';
+import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 
-class ProfilePhotoStore extends ChangeNotifier {
+// IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). Her photo was only a file
+// on this phone, so a new phone or a sign-out lost it. The file now goes to
+// Storage (`media/<uid>/avatar/...`) and its reference is the one item
+// (`photo`) of a per-item merged store (CloudMergedStore). [path] stays this
+// phone's own copy; a phone that lacks it downloads one into its cache.
+class ProfilePhotoStore extends ChangeNotifier with CloudMergedStore {
   ProfilePhotoStore._() {
     SyncRegistry.registerReset(_resetForAccount);
   }
   static final ProfilePhotoStore instance = ProfilePhotoStore._();
 
   static const String _kPath = 'pv_profile_photo_path';
+  static const String _kRef = 'pv_profile_photo_ref';
 
   String? _path;
   bool _loaded = false;
+
+  /// The photo's Storage reference once uploaded; null until then.
+  String? _ref;
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'profile_photo';
+
+  @override
+  Map<String, Object?> cloudItems() => {if (_ref != null) 'photo': _ref};
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final ref = items['photo']?.toString();
+    if (ref == _ref) return;
+    _ref = ref;
+    if (ref == null) {
+      _path = null; // removed on her other phone
+      return;
+    }
+    _download(ref);
+  }
+
+  Future<void> _download(String ref) async {
+    final f = await StorageService.resolve(ref);
+    if (f == null || _ref != ref) return;
+    _path = f.path;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kPath, f.path);
+    } catch (_) {}
+    // A display change only: the item itself did not change.
+    super.notifyListeners();
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (_ref == null) {
+        await prefs.remove(_kRef);
+      } else {
+        await prefs.setString(_kRef, _ref!);
+      }
+      if (_path == null) await prefs.remove(_kPath);
+    } catch (_) {}
+  }
+
+  /// A photo still only on this phone goes up; its reference then syncs.
+  Future<void> _uploadIfNeeded() async {
+    final p = path;
+    if (p == null || _ref != null || !SupabaseRepo.isLoggedIn) return;
+    final ref = await StorageService.upload(p, 'avatar');
+    if (ref == p) return; // offline or not set up: next time
+    _ref = ref;
+    await persistLocalCache();
+    notifyListeners();
+  }
 
   /// The photo's file path, or null when she has none (or it was deleted
   /// under us, e.g. the app's data was cleared).
@@ -53,10 +121,13 @@ class ProfilePhotoStore extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       _path = prefs.getString(_kPath);
+      _ref = prefs.getString(_kRef);
     } catch (_) {
       _path = null;
     }
     notifyListeners();
+    await syncMergedFromCloud();
+    await _uploadIfNeeded();
   }
 
   /// Keeps a copy of [pickedPath] as her photo, replacing any earlier one.
@@ -77,7 +148,11 @@ class ProfilePhotoStore extends ChangeNotifier {
           await File(old).delete();
         } catch (_) {}
       }
+      final oldRef = _ref;
+      _ref = null;
+      if (oldRef != null) StorageService.remove(oldRef);
       notifyListeners();
+      await _uploadIfNeeded();
     } catch (_) {
       // A failed copy leaves her previous photo (or none) as it was.
     }
@@ -86,6 +161,13 @@ class ProfilePhotoStore extends ChangeNotifier {
   Future<void> remove() async {
     final old = _path;
     _path = null;
+    final oldRef = _ref;
+    _ref = null;
+    if (oldRef != null) StorageService.remove(oldRef);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_kRef);
+    } catch (_) {}
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_kPath);
@@ -103,6 +185,7 @@ class ProfilePhotoStore extends ChangeNotifier {
   // The photo file on disk is left alone; only the pointer to it is dropped.
   void _resetForAccount() {
     _path = null;
+    _ref = null;
     _loaded = false;
     notifyListeners();
   }

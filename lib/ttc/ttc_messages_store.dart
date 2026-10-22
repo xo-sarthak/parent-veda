@@ -112,7 +112,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/life_stage_store.dart';
 import '../services/notification_service.dart';
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 // ⚠️ A STORE IMPORTING A SCREEN, ON PURPOSE AND FOR ONE FUNCTION (2026-09-27).
 // A phone tap has to end on a screen, and the only code that runs at startup
 // for this feature is this store's `init` (main.dart). The opener lives with
@@ -946,10 +947,21 @@ class _OsPhone implements TtcMessagePhone {
   Future<void> cancel(int id) => NotificationService.instance.cancel(id);
 }
 
-class TtcMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
-  TtcMessagesStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone emptied her messages, forgot which she had read,
+// and turned back on every kind she had switched off. Items:
+// `m|<message id>` -> the delivered message with its read flag (a JSON
+// string, so its keys keep their order through Postgres), `off|<kind>` -> true
+// per kind switched off, `phone` -> whether messages go to the phone. Pending
+// messages are not items: they are recomputed from her facts on every
+// refresh, on each phone, and a pending one becomes an item when it arrives.
+class TtcMessagesStore extends ChangeNotifier
+    with WidgetsBindingObserver, CloudMergedStore {
+  TtcMessagesStore._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcMessagesStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcMessagesStore instance = TtcMessagesStore._();
 
   static const _kMessages = 'ttc_messages_v1';
@@ -1255,13 +1267,80 @@ class TtcMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
   // are wiped, the singleton was not.
   // Memory only; the listeners it added stay, so the next person's facts
   // refill it.
-  void _resetForAccount() {
-    _all.clear();
-    _off.clear();
-    _phoneOn = true;
-    _loaded = false;
-    notifyListeners();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     _all.clear();
+  //     _off.clear();
+  //     _phoneOn = true;
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_messages';
+
+  @override
+  Map<String, Object?> cloudItems() {
+    final now = DateTime.now();
+    return {
+      for (final m in _all)
+        if (m.deliveredBy(now)) 'm|${m.id}': jsonEncode(m.toJson()),
+      for (final k in _off) 'off|${k.name}': true,
+      'phone': _phoneOn,
+    };
   }
+
+  /// Delivered messages, the switches and the phone flag come from the items;
+  /// this phone's pending messages stay (they are derived, never items),
+  /// unless the cloud already holds that message as delivered. The phone
+  /// queue is re-armed after, on a microtask, never inside the merge.
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final delivered = <TtcMessage>[];
+    final off = <TtcMessageKind>{};
+    for (final e in items.entries) {
+      if (e.key.startsWith('m|') && e.value is String) {
+        try {
+          final m = TtcMessage.fromJson(jsonDecode(e.value as String));
+          if (m != null) delivered.add(m);
+        } catch (_) {/* a message it cannot read is dropped */}
+      } else if (e.key.startsWith('off|')) {
+        final k = TtcMessageKind.values
+            .where((k) => k.name == e.key.substring(4))
+            .firstOrNull;
+        if (k != null) off.add(k);
+      }
+    }
+    final now = DateTime.now();
+    final ids = delivered.map((m) => m.id).toSet();
+    final pending = items.isEmpty
+        ? const <TtcMessage>[]
+        : _all
+            .where((m) =>
+                !m.deliveredBy(now) &&
+                !ids.contains(m.id) &&
+                !off.contains(m.kind))
+            .toList();
+    delivered.sort((a, b) => b.at.compareTo(a.at));
+    _all
+      ..clear()
+      ..addAll(pending)
+      ..addAll(delivered.take(_keep));
+    _off
+      ..clear()
+      ..addAll(off);
+    _phoneOn = items['phone'] is bool ? items['phone'] as bool : true;
+    _loaded = true;
+    // A switch or the phone flag may have changed on the other phone: the
+    // phone queue follows. Not on a sign-out (no items), which the old reset
+    // left alone too.
+    if (items.isNotEmpty) _changed();
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   @visibleForTesting
   void resetForTest() {
@@ -1297,6 +1376,7 @@ class TtcMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
     } catch (_) {/* start empty; a storage failure is never a crash */}
     _loaded = true;
     notifyListeners();
+    await syncMergedFromCloud();
   }
 
   Future<void> _persist() async {

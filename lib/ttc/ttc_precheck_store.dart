@@ -27,8 +27,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/remote/cloud_synced_store.dart';
-import '../services/remote/supabase_repo.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
+// import '../services/remote/supabase_repo.dart'; // kept for revert (step 13)
+import '../services/remote/sync_registry.dart';
 import 'ttc_precheck_data.dart';
 import 'ttc_precheck_rules.dart';
 
@@ -80,15 +82,21 @@ class PrecheckEntry {
   }
 }
 
-class TtcPrecheckStore extends ChangeNotifier with CloudSyncedStore {
+// Per-item since step 13 (2026-10-22, sync log). It synced as one blob and
+// merged inside it by settledOn, on the phone, so two phones racing could
+// still lose an answer and a removed answer (Undo) never travelled. One item
+// per precheck item id, value = the entry's encoded string; the server's
+// per-item merge (newer edit wins) replaces the settledOn merge.
+class TtcPrecheckStore extends ChangeNotifier with CloudMergedStore {
   TtcPrecheckStore._();
   static final TtcPrecheckStore instance = TtcPrecheckStore._();
 
   static const _kEntries = 'ttc_precheck_entries';
   static const _kOpened = 'ttc_precheck_opened';
 
-  /// The sign-out reset blob (2026-10-17); see [applyCloudData].
-  static const Map<String, String> _kResetBlob = {'__reset__': ''};
+  // Kept for revert (step 13): the sign-out reset is applyCloudItems({}) now.
+  //   /// The sign-out reset blob (2026-10-17); see [applyCloudData].
+  //   static const Map<String, String> _kResetBlob = {'__reset__': ''};
 
   /// When she last opened the checklist (ISO), for "since you were last here"
   /// (2026-10-01, the fifth change to what the checklist gives back).
@@ -157,64 +165,107 @@ class TtcPrecheckStore extends ChangeNotifier with CloudSyncedStore {
     // `user_state`, the house pattern for a person's own small state. That
     // table is own-row by policy (0011), so her partner can never read it:
     // the checklist is hers, and no migration is needed.
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   // ---------------------------------------------------------------------------
-  //  Cloud copy (one blob in user_state; hers only)
+  //  Cloud copy (per item in user_state since step 13; hers only)
   // ---------------------------------------------------------------------------
 
   @override
   String get cloudKey => 'ttc_precheck';
-
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => _kResetBlob;
+  String? get legacyBlobKey => cloudKey;
 
   @override
-  Object cloudData() =>
+  Map<String, Object?> cloudItems() =>
       {for (final e in _entries.entries) e.key: e.value.encode()};
 
-  /// ⚠️ A MERGE, NOT "CLOUD WINS". The mixin's default adopts the cloud copy
-  /// whole, which would discard a tick she made offline on this phone before
-  /// the first sync. Per item, the answer settled LAST wins (an answer with no
-  /// date is the oldest). If this phone held answers the cloud lacked, they are
-  /// sent up once, so the two end up equal.
+  /// Her answers, item by item. An empty map is the empty state. On a
+  /// sign-out (the only time the whole store is reset, [SyncRegistry.resetting])
+  /// the visit and opened marks go too, as the old reset blob did; an empty
+  /// map from a merge only means the cloud holds no answers.
   @override
-  void applyCloudData(Object data) {
-    // A sign-out reset (2026-10-17): the merge below would keep every answer
-    // on this phone and send them up again, so the reset blob empties the
-    // store instead. Only `cloudEmptyData` is ever this exact object.
-    if (identical(data, _kResetBlob)) {
-      _entries.clear();
+  void applyCloudItems(Map<String, Object?> items) {
+    _entries.clear();
+    items.forEach((k, v) {
+      if (v is! String) return;
+      final e = PrecheckEntry.decode(v);
+      if (e != null) _entries[k] = e;
+    });
+    if (items.isEmpty && SyncRegistry.resetting) {
       _everOpened = false;
       _sinceVisit = null;
       _visitBegun = false;
-      return;
     }
-    if (data is! Map) return;
-    var localOnly = false;
-    final seen = <String>{};
-    data.forEach((k, v) {
-      if (k is! String || v is! String) return;
-      final cloud = PrecheckEntry.decode(v);
-      if (cloud == null) return;
-      seen.add(k);
-      final mine = _entries[k];
-      final cloudAt = cloud.settledOn;
-      final mineAt = mine?.settledOn;
-      if (mine == null ||
-          (cloudAt != null && (mineAt == null || cloudAt.isAfter(mineAt)))) {
-        _entries[k] = cloud;
-      } else if (mineAt != null && (cloudAt == null || mineAt.isAfter(cloudAt))) {
-        localOnly = true;
-      }
-    });
-    if (_entries.keys.any((k) => !seen.contains(k))) localOnly = true;
-    if (localOnly) {
-      SupabaseRepo.saveState(cloudKey, cloudData()).catchError((_) {});
-    }
+    _loaded = true;
   }
+
+  /// The old blob (id -> encoded entry), read once on a phone holding no
+  /// answers. The phone holds nothing, so the old settledOn merge reduces to
+  /// taking every entry, and the old "send local-only answers up" write has
+  /// nothing to send.
+  @override
+  void applyLegacyBlob(Object blob) {
+    if (blob is! Map) return;
+    blob.forEach((k, v) {
+      if (k is! String || v is! String) return;
+      final e = PrecheckEntry.decode(v);
+      if (e != null) _entries[k] = e;
+    });
+  }
+
+  // Kept for revert (step 13): the blob mixin's empty state, blob and merge.
+  //
+  // /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  // @override
+  // Object get cloudEmptyData => _kResetBlob;
+  //
+  // @override
+  // Object cloudData() =>
+  //     {for (final e in _entries.entries) e.key: e.value.encode()};
+  //
+  // /// ⚠️ A MERGE, NOT "CLOUD WINS". The mixin's default adopts the cloud copy
+  // /// whole, which would discard a tick she made offline on this phone before
+  // /// the first sync. Per item, the answer settled LAST wins (an answer with no
+  // /// date is the oldest). If this phone held answers the cloud lacked, they are
+  // /// sent up once, so the two end up equal.
+  // @override
+  // void applyCloudData(Object data) {
+  //   // A sign-out reset (2026-10-17): the merge below would keep every answer
+  //   // on this phone and send them up again, so the reset blob empties the
+  //   // store instead. Only `cloudEmptyData` is ever this exact object.
+  //   if (identical(data, _kResetBlob)) {
+  //     _entries.clear();
+  //     _everOpened = false;
+  //     _sinceVisit = null;
+  //     _visitBegun = false;
+  //     return;
+  //   }
+  //   if (data is! Map) return;
+  //   var localOnly = false;
+  //   final seen = <String>{};
+  //   data.forEach((k, v) {
+  //     if (k is! String || v is! String) return;
+  //     final cloud = PrecheckEntry.decode(v);
+  //     if (cloud == null) return;
+  //     seen.add(k);
+  //     final mine = _entries[k];
+  //     final cloudAt = cloud.settledOn;
+  //     final mineAt = mine?.settledOn;
+  //     if (mine == null ||
+  //         (cloudAt != null && (mineAt == null || cloudAt.isAfter(mineAt)))) {
+  //       _entries[k] = cloud;
+  //     } else if (mineAt != null && (cloudAt == null || mineAt.isAfter(cloudAt))) {
+  //       localOnly = true;
+  //     }
+  //   });
+  //   if (_entries.keys.any((k) => !seen.contains(k))) localOnly = true;
+  //   if (localOnly) {
+  //     SupabaseRepo.saveState(cloudKey, cloudData()).catchError((_) {});
+  //   }
+  // }
 
   @override
   Future<void> persistLocalCache() => _persist();

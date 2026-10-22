@@ -36,7 +36,8 @@ import '../localization/app_language.dart';
 import '../screens/post_pregnancy/pp_child_profile.dart';
 import 'profile_analytics.dart';
 import 'ready_birth_context_store.dart';
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 // ---- bilingual helpers ------------------------------------------------------
 //  The same three helpers every data file in lib/data/ uses, so the scanners in
@@ -416,7 +417,14 @@ extension ParityX on Parity {
 enum ProfileField { health, feeding, sleep, priorities, learning, pregHealth, pregPriorities, diet, parity }
 
 // ---- the store --------------------------------------------------------------
-class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud per item since step 13 (2026-10-22, sync log). It synced as one
+// whole blob before, so a diet set on her phone and a priority picked on his
+// erased each other. Items (built from [_toMap], so the shape stays one place):
+// a parent-level set gives `<field>|<name>` = its pick position; a scalar gives
+// `<field>` = value (absent when null or false); `other|<field>` = her text;
+// each child bucket gives `child|<id>|<field>` = value and
+// `child|<id>|<set>|<name>` = pick position.
+class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   FamilyProfileStore._();
   static final FamilyProfileStore instance = FamilyProfileStore._();
 
@@ -967,7 +975,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     notifyListeners();
     // Defensive: a cloud/Supabase hiccup must never break init (also test-safe).
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
@@ -1199,14 +1208,126 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   String get cloudKey => 'family_profile';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{};
+  // Kept for revert (step 13): the whole-blob mixin's empty state and blob.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{};
+  //
+  //   @override
+  //   Object cloudData() => _toMap();
 
   @override
-  Object cloudData() => _toMap();
+  String? get legacyBlobKey => cloudKey;
+
+  /// The old whole blob, read once on a phone that holds nothing yet.
   @override
-  void applyCloudData(Object data) => _apply(data as Map);
+  void applyLegacyBlob(Object blob) => _apply(blob as Map);
+
+  /// Parent-level multi-selects: one item per pick.
+  static const _parentSets = {
+    'priorities',
+    'notify',
+    'asked',
+    'pregConditions',
+    'pregPriorities',
+  };
+
+  /// The active child's answers, also written flat by [_toMap]. They travel
+  /// inside the child buckets only, so one fact is never two items.
+  static const _childFlat = {
+    'conditions',
+    'feedings',
+    'sleeps',
+    'learnings',
+    'premature',
+    'nicu',
+    'multiple',
+    'birthMode',
+    'bornWeeks',
+    'vaxSchedule',
+  };
+
+  static bool _present(Object? v) => v != null && v != false;
+
+  @override
+  Map<String, Object?> cloudItems() {
+    final m = _toMap();
+    final out = <String, Object?>{};
+    m.forEach((k, v) {
+      if (k == 'perChild' || _childFlat.contains(k)) return;
+      if (_parentSets.contains(k) && v is List) {
+        for (var i = 0; i < v.length; i++) {
+          out['$k|${v[i]}'] = i;
+        }
+      } else if (k == 'other' && v is Map) {
+        v.forEach((f, t) => out['other|$f'] = '$t');
+      } else if (v is List) {
+        if (v.isNotEmpty) out[k] = List<Object?>.from(v); // fatherHelp: his order
+      } else if (_present(v)) {
+        out[k] = v;
+      }
+    });
+    final per = m['perChild'];
+    if (per is Map) {
+      per.forEach((b, bucket) {
+        // No marker for a bucket with no answers: an empty profile must give
+        // no items, or a new phone would never read the old blob.
+        if (bucket is! Map) return;
+        bucket.forEach((k, v) {
+          if (v is List) {
+            for (var i = 0; i < v.length; i++) {
+              out['child|$b|$k|${v[i]}'] = i;
+            }
+          } else if (_present(v)) {
+            out['child|$b|$k'] = v;
+          }
+        });
+      });
+    }
+    return out;
+  }
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    int pos(Object? v) => v is num ? v.toInt() : 0;
+    List<String> ordered(Map<String, int> picks) => picks.keys.toList()
+      ..sort((a, b) {
+        final c = picks[a]!.compareTo(picks[b]!);
+        return c != 0 ? c : a.compareTo(b);
+      });
+    final m = <String, dynamic>{};
+    final sets = <String, Map<String, int>>{};
+    final other = <String, String>{};
+    final per = <String, Map<String, dynamic>>{};
+    final childSets = <String, Map<String, Map<String, int>>>{};
+    for (final e in items.entries) {
+      final parts = e.key.split('|');
+      if (parts.first == 'child' && parts.length >= 2) {
+        final b = parts[1];
+        final bucket = per.putIfAbsent(b, () => <String, dynamic>{});
+        if (parts.length == 3) {
+          bucket[parts[2]] = e.value;
+        } else if (parts.length >= 4) {
+          childSets
+              .putIfAbsent(b, () => {})
+              .putIfAbsent(parts[2], () => {})[parts.sublist(3).join('|')] = pos(e.value);
+        }
+      } else if (parts.first == 'other' && parts.length >= 2) {
+        other[parts.sublist(1).join('|')] = '${e.value}';
+      } else if (_parentSets.contains(parts.first) && parts.length >= 2) {
+        sets.putIfAbsent(parts.first, () => {})[parts.sublist(1).join('|')] = pos(e.value);
+      } else if (parts.length == 1) {
+        m[e.key] = e.value;
+      }
+    }
+    sets.forEach((k, picks) => m[k] = ordered(picks));
+    childSets.forEach((b, fields) =>
+        fields.forEach((k, picks) => per[b]![k] = ordered(picks)));
+    m['other'] = other;
+    m['perChild'] = per;
+    _apply(m); // an empty map gives the same empty profile cloudEmptyData did
+    _loaded = true; // a later init must not read stale prefs over this
+  }
   @override
   Future<void> persistLocalCache() async {
     final prefs = await SharedPreferences.getInstance();

@@ -30,12 +30,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/post_pregnancy/pp_child_profile.dart';
 import 'life_stage_store.dart';
-import 'remote/sync_registry.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
-class DearBabyVaultStore extends ChangeNotifier {
-  DearBabyVaultStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so a
+// sign-out or a new phone lost the birth record and replayed the opening.
+// Items, one per fact: `born_on` and `opened_at` (ISO), `child_id`,
+// `child_name`.
+class DearBabyVaultStore extends ChangeNotifier with CloudMergedStore {
+  DearBabyVaultStore._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   DearBabyVaultStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final DearBabyVaultStore instance = DearBabyVaultStore._();
 
   static const _kBornOn = 'dear_baby_born_on';
@@ -87,6 +94,49 @@ class DearBabyVaultStore extends ChangeNotifier {
       _openedAt = DateTime.tryParse(sp.getString(_kOpenedAt) ?? '');
     } catch (_) {/* local-first: an unreadable store is an unopened vault */}
     notifyListeners();
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'dear_baby_vault';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        if (_bornOn != null) 'born_on': _bornOn!.toIso8601String(),
+        if (_childId != null) 'child_id': _childId,
+        if (_childName != null) 'child_name': _childName,
+        if (_openedAt != null) 'opened_at': _openedAt!.toIso8601String(),
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    String? str(String k) => items[k] is String ? items[k] as String : null;
+    _bornOn = DateTime.tryParse(str('born_on') ?? '');
+    _childId = str('child_id');
+    _childName = str('child_name');
+    _openedAt = DateTime.tryParse(str('opened_at') ?? '');
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final sp = await SharedPreferences.getInstance();
+      Future<void> put(String key, String? v) async {
+        if (v == null) {
+          await sp.remove(key);
+        } else {
+          await sp.setString(key, v);
+        }
+      }
+
+      await put(_kBornOn, _bornOn?.toIso8601String());
+      await put(_kChildId, _childId);
+      await put(_kChildName, _childName);
+      await put(_kOpenedAt, _openedAt?.toIso8601String());
+    } catch (_) {}
   }
 
   /// Called once, by the arrival sheet, when she says the baby is here.
@@ -120,12 +170,13 @@ class DearBabyVaultStore extends ChangeNotifier {
     } catch (_) {}
   }
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  void _resetForAccount() {
-    resetForTest();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   void _resetForAccount() {
+  //     resetForTest();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {

@@ -40,12 +40,18 @@
 // =============================================================================
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
+import '../services/remote/cloud_merged_store.dart';
+import '../services/remote/own_row_ledger.dart';
+import '../services/remote/storage_service.dart';
+import '../services/remote/supabase_repo.dart';
 import '../services/remote/sync_registry.dart';
+import '../services/remote/sync_row_book.dart';
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
@@ -240,6 +246,7 @@ class GarbhJournalEntry {
     this.path,
     this.text,
     this.relationship,
+    this.ref,
   });
 
   final String id;
@@ -266,6 +273,23 @@ class GarbhJournalEntry {
   /// and it is what her album should say.
   final String? relationship;
 
+  /// The audio's Storage reference once uploaded (step 13); null until then.
+  /// [path] stays this phone's own file.
+  final String? ref;
+
+  GarbhJournalEntry withAudio({String? path, String? ref}) => GarbhJournalEntry(
+        id: id,
+        kind: kind,
+        week: week,
+        tsMs: tsMs,
+        title: title,
+        seconds: seconds,
+        path: path ?? this.path,
+        text: text,
+        relationship: relationship,
+        ref: ref ?? this.ref,
+      );
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'kind': kind.name,
@@ -277,6 +301,7 @@ class GarbhJournalEntry {
         'path': path,
         'text': text,
         'rel': relationship,
+        'ref': ref,
       };
 
   factory GarbhJournalEntry.fromJson(Map<String, dynamic> j) =>
@@ -294,6 +319,7 @@ class GarbhJournalEntry {
         path: j['path']?.toString(),
         text: j['text']?.toString(),
         relationship: j['rel']?.toString(),
+        ref: j['ref']?.toString(),
       );
 }
 
@@ -302,11 +328,145 @@ class GarbhJournalEntry {
 /// ⚠️ LOCAL-FIRST AND FIRE-AND-FORGET, like every other store here. An album
 /// that fails to save because the network is down would be the worst possible
 /// failure in this section: she has just recorded her voice for her child.
-class GarbhJournalStore extends ChangeNotifier {
+///
+/// IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log, migration 0110). The
+/// album lived only on this phone, so a sign-out or a new phone lost every
+/// recording. Two shapes, by what each thing is:
+///   * the entries are RECORDS she makes one by one: rows in
+///     `garbh_journal_entries` (OwnRowLedger, soft delete, newer wins), the
+///     audio in Storage (`media/<uid>/garbh/...`) referenced by `ref`;
+///   * the rituals, pins, the "asked" mark and today's japa are ITEMS in a
+///     per-item merged store (CloudMergedStore): `ritual|<id>`, `pin|<id>`,
+///     `asked`, `japa`.
+class GarbhJournalStore extends ChangeNotifier with CloudMergedStore {
   GarbhJournalStore._() {
     SyncRegistry.registerReset(_resetForAccount);
   }
   static final GarbhJournalStore instance = GarbhJournalStore._();
+
+  // ---- the entries: rows (step 13) -------------------------------------------
+
+  final OwnRowLedger _rows = OwnRowLedger(
+      'garbh_journal_entries', 'garbh_journal_sync',
+      keyColumn: 'key');
+
+  /// Entries the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPendingEntries => _rows.hasPending;
+
+  Map<String, dynamic> _toRow(GarbhJournalEntry e) =>
+      {'key': e.id, 'data': e.toJson()};
+
+  Map<String, Map<String, dynamic>> _liveRows() =>
+      {for (final e in _entries) e.id: _toRow(e)};
+
+  bool _rowsRegistered = false;
+
+  /// Push waiting entries (audio first), then take the cloud's newer ones.
+  Future<void> syncEntries() async {
+    if (!_rowsRegistered) {
+      _rowsRegistered = true;
+      SyncRegistry.register(syncEntries);
+      SyncRegistry.registerPending(() => _rows.hasPending);
+    }
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      await _uploadAudio();
+      await _rows.push(_liveRows, onRemovalConfirmed: (_, cols) {
+        final data = cols['data'];
+        final ref = data is Map ? data['ref']?.toString() : null;
+        if (ref != null && ref.isNotEmpty) StorageService.remove(ref);
+      });
+      final taken = await _rows.pull(liveKeys: _entries.map((e) => e.id));
+      if (taken.isEmpty) return;
+      final byId = {for (final e in _entries) e.id: e};
+      for (final r in taken) {
+        final id = r['id'].toString();
+        if (syncParseStamp(r['removed_at']) != null) {
+          byId.remove(id);
+          continue;
+        }
+        final data = r['data'];
+        if (data is! Map) continue;
+        var e = GarbhJournalEntry.fromJson(
+            {...data.cast<String, dynamic>(), 'id': id});
+        final ref = e.ref;
+        final path = e.path;
+        if (ref != null &&
+            ref.isNotEmpty &&
+            (path == null || !File(path).existsSync())) {
+          final f = await StorageService.resolve(ref);
+          if (f != null) e = e.withAudio(path: f.path);
+        }
+        byId[id] = e;
+      }
+      _entries
+        ..clear()
+        ..addAll(byId.values);
+      await _saveEntries();
+      notifyListeners();
+    } catch (_) {/* offline - keep local, still waiting */}
+  }
+
+  /// A recording still only on this phone goes to Storage, and its row is
+  /// marked changed so it carries the reference.
+  Future<void> _uploadAudio() async {
+    var changed = false;
+    for (var i = 0; i < _entries.length; i++) {
+      final e = _entries[i];
+      final path = e.path;
+      if (e.ref != null || path == null || path.isEmpty) continue;
+      if (!File(path).existsSync()) continue;
+      final ref = await StorageService.upload(path, 'garbh');
+      if (ref == path) continue; // offline or not set up: next time
+      _entries[i] = e.withAudio(ref: ref);
+      _rows.touch(e.id);
+      changed = true;
+    }
+    if (changed) await _saveEntries();
+  }
+
+  // ---- the selections: items (step 13) ---------------------------------------
+
+  @override
+  String get cloudKey => 'garbh_journal';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _rituals) 'ritual|$id': true,
+        for (final id in _pinned) 'pin|$id': true,
+        if (_asked) 'asked': true,
+        if (_japaDate.isNotEmpty) 'japa': {'count': _japa, 'date': _japaDate},
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _rituals.clear();
+    _pinned.clear();
+    _asked = false;
+    _japa = 0;
+    _japaDate = '';
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('ritual|')) {
+        _rituals.add(k.substring(7));
+      } else if (k.startsWith('pin|')) {
+        _pinned.add(k.substring(4));
+      } else if (k == 'asked') {
+        _asked = e.value == true;
+      } else if (k == 'japa' && e.value is Map) {
+        final m = e.value as Map;
+        _japa = (m['count'] as num?)?.toInt() ?? 0;
+        _japaDate = (m['date'] ?? '').toString();
+      }
+    }
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    await _saveRituals();
+    await _savePinned();
+    await _saveJapa();
+  }
 
   static const _entriesKey = 'garbh_journal_v1';
   static const _ritualsKey = 'garbh_rituals_v1';
@@ -474,18 +634,27 @@ class GarbhJournalStore extends ChangeNotifier {
       // empty one she can add to, which beats a crash on the screen whose
       // whole promise is "your things are safe here".
     }
+    await _rows.load();
+    await syncMergedFromCloud();
+    await syncEntries();
   }
 
   Future<void> add(GarbhJournalEntry e) async {
     _entries.add(e);
+    _rows.touch(e.id);
     notifyListeners();
     await _saveEntries();
+    syncEntries();
   }
 
   Future<void> remove(String id) async {
+    for (final e in _entries.where((e) => e.id == id).toList()) {
+      _rows.remove(id, _toRow(e));
+    }
     _entries.removeWhere((e) => e.id == id);
     notifyListeners();
     await _saveEntries();
+    syncEntries();
   }
 
   void toggleRitual(String id) {
@@ -521,6 +690,9 @@ class GarbhJournalStore extends ChangeNotifier {
   // are wiped, the singleton was not.
   void _resetForAccount() {
     resetForTest();
+    _rows
+      ..clear()
+      ..save();
     notifyListeners();
   }
 

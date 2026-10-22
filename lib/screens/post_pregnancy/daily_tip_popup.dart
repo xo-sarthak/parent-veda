@@ -44,7 +44,8 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import 'pp_common.dart';
 import 'pp_expert_link.dart';
 import 'pp_daily_tips.dart';
@@ -96,7 +97,10 @@ WatchVideo dailyPopupVideo([DateTime? on]) {
 //  Store — what was seen, and what was kept
 // =============================================================================
 
-class DailyTipStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud since step 13 (2026-10-22, sync log) as per-item merge. It
+// synced as one whole blob before, so two phones overwrote each other. One
+// item: `lastShown` (yyyy-MM-dd), absent while the pop-up has never shown.
+class DailyTipStore extends ChangeNotifier with CloudMergedStore {
   DailyTipStore._() {
     // Kept tips live in SavedStore since 2026-09-16 (docs/FAMILY-MODEL.md §5)
     // as rows of kind `tip`; this store keeps only "shown today".
@@ -135,24 +139,43 @@ class DailyTipStore extends ChangeNotifier with CloudSyncedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {/* an unreadable cache is an empty one */}
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
     _ready = true;
   }
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'lastShown': ''};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'lastShown': ''};
+  //
+  //   @override
+  //   Object cloudData() => {'lastShown': _lastShown}; // 'saved' moved to saved_items
+
+  /// The local prefs blob (the shape the cloud blob had before step 13).
+  Map<String, Object?> _blob() => {'lastShown': _lastShown};
 
   @override
-  Object cloudData() => {'lastShown': _lastShown}; // 'saved' moved to saved_items
+  String? get legacyBlobKey => cloudKey;
 
   @override
-  void applyCloudData(Object data) {
+  Map<String, Object?> cloudItems() =>
+      {if (_lastShown.isNotEmpty) 'lastShown': _lastShown};
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _lastShown = (items['lastShown'] ?? '').toString();
+  }
+
+  /// Was applyCloudData before step 13; the same body. Also reads the local
+  /// prefs cache, which keeps the old blob shape.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     _lastShown = (data['lastShown'] ?? '').toString();
     // saved: kept for revert - SavedStore owns kept tips now.
@@ -163,7 +186,7 @@ class DailyTipStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {/* in-memory state still stands */}
   }
 

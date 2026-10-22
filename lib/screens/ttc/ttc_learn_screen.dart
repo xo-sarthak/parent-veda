@@ -80,6 +80,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/reads/read_images.dart' show readImageFor, pvFilmStillFor;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/remote/cloud_merged_store.dart';
 
 import '../../data/brackets/ttc_brackets.dart';
 import '../../data/learn/pv_learn_view.dart';
@@ -416,14 +417,25 @@ String? ttcHitReadId(TtcDoorHit h) =>
 
 /// Recent searches on the Learn tab. Local only, like the doors' recents:
 /// they are a typing shortcut, not history anyone else needs.
-class TtcLearnRecents extends ChangeNotifier {
+///
+/// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log), which supersedes
+/// "local only" above (kept for the record). It was phone-only, so a
+/// sign-out or a new phone emptied her recent searches, and a sign-out did
+/// not forget them at all (there was no reset). Items: one per search, the
+/// text as the key -> when she last ran it (epoch ms); applied newest first,
+/// one per spelling ignoring case, trimmed to six. Times sit in [kAtKey].
+class TtcLearnRecents extends ChangeNotifier with CloudMergedStore {
   TtcLearnRecents._();
   static final TtcLearnRecents instance = TtcLearnRecents._();
 
   static const String kKey = 'ttc_learn_recent';
+
+  /// When each search in [kKey] was last run (epoch ms), in the same order.
+  static const String kAtKey = 'ttc_learn_recent_at';
   static const int _max = 6;
 
   List<String> _recent = const [];
+  final Map<String, int> _at = {};
   bool _loaded = false;
   List<String> get recent => _recent;
 
@@ -433,8 +445,16 @@ class TtcLearnRecents extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       _recent = p.getStringList(kKey) ?? const [];
+      final at = p.getStringList(kAtKey) ?? const <String>[];
+      for (var i = 0; i < _recent.length; i++) {
+        // A list saved before step 13 has no times: rank stands in for one
+        // (newest highest), small enough that any real search beats it.
+        _at[_recent[i]] = (i < at.length ? int.tryParse(at[i]) : null) ??
+            (_recent.length - i);
+      }
       notifyListeners();
     } catch (_) {/* local-first: an empty list is a fine answer */}
+    await syncMergedFromCloud();
   }
 
   Future<void> remember(String q) async {
@@ -444,23 +464,65 @@ class TtcLearnRecents extends ChangeNotifier {
       s,
       ..._recent.where((r) => r.toLowerCase() != s.toLowerCase()),
     ].take(_max).toList();
+    _at[s] = DateTime.now().millisecondsSinceEpoch;
+    _at.removeWhere((k, _) => !_recent.contains(k));
     notifyListeners();
-    try {
-      await (await SharedPreferences.getInstance()).setStringList(kKey, _recent);
-    } catch (_) {}
+    await persistLocalCache();
   }
 
   Future<void> clear() async {
     _recent = const [];
+    _at.clear();
     notifyListeners();
     try {
-      await (await SharedPreferences.getInstance()).remove(kKey);
+      final p = await SharedPreferences.getInstance();
+      await p.remove(kKey);
+      await p.remove(kAtKey);
+    } catch (_) {}
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_learn_recents';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final q in _recent) q: _at[q] ?? 0,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final byTime = [
+      for (final e in items.entries)
+        if (e.value is num) MapEntry(e.key, (e.value as num).toInt()),
+    ]..sort((a, b) => b.value.compareTo(a.value));
+    final seen = <String>{};
+    final kept = [
+      for (final e in byTime)
+        if (seen.add(e.key.toLowerCase())) e,
+    ].take(_max).toList();
+    _recent = [for (final e in kept) e.key];
+    _at
+      ..clear()
+      ..addEntries(kept);
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(kKey, _recent);
+      await p.setStringList(
+          kAtKey, [for (final q in _recent) '${_at[q] ?? 0}']);
     } catch (_) {}
   }
 
   @visibleForTesting
   void resetForTest() {
     _recent = const [];
+    _at.clear();
     _loaded = false;
   }
 }

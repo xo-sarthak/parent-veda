@@ -8,9 +8,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
-class ReadDoneStore extends ChangeNotifier with CloudSyncedStore {
+// Per-item since step 13 (2026-10-22, sync log). It synced as one whole blob,
+// so a read ticked done on one phone could be erased by the other phone's
+// older list. One item per read id, value true; an untick removes the item.
+class ReadDoneStore extends ChangeNotifier with CloudMergedStore {
   ReadDoneStore._();
   static final ReadDoneStore instance = ReadDoneStore._();
 
@@ -34,23 +38,40 @@ class ReadDoneStore extends ChangeNotifier with CloudSyncedStore {
     // Defensive: a cloud/Supabase hiccup must never break the reader (also
     // makes the store safe under the widget-test harness).
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
   // --- cloud sync ------------------------------------------------------------
   @override
   String get cloudKey => 'reads_done';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <String>[];
+  String? get legacyBlobKey => cloudKey;
+
+  // Kept for revert (step 13): applyCloudItems({}) is the empty state now.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String>[];
+  //
+  //   @override
+  //   Object cloudData() => _done.toList();
 
   @override
-  Object cloudData() => _done.toList();
-  @override
-  void applyCloudData(Object data) => _done
+  void applyLegacyBlob(Object blob) => _done
     ..clear()
-    ..addAll((data as List).map((e) => e.toString()));
+    ..addAll((blob as List).map((e) => e.toString()));
+
+  @override
+  Map<String, Object?> cloudItems() => {for (final id in _done) id: true};
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _done
+      ..clear()
+      ..addAll(items.keys);
+    _loaded = true;
+  }
   @override
   Future<void> persistLocalCache() => _persist();
 

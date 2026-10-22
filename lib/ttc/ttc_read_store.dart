@@ -25,13 +25,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
-class TtcReadStore extends ChangeNotifier {
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone lost her saved insights and her place in each.
+// Items: `s|<insight id>` -> true for a save (union-shaped, as the header
+// wanted), `p|<insight id>` -> how far she got in thousandths (an int, so the
+// value survives the trip through Postgres unchanged). setProgress() still
+// does not notify, so a new position rides the store's next notify.
+class TtcReadStore extends ChangeNotifier with CloudMergedStore {
   TtcReadStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
     _load();
   }
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcReadStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //     _load();
+  //   }
   static final TtcReadStore instance = TtcReadStore._();
 
   static const _savedKey = 'ttc_read_saved';
@@ -84,7 +95,38 @@ class TtcReadStore extends ChangeNotifier {
   // are wiped, the singleton was not.
   // Loaded once, in the constructor, so `_loaded` stays true: prefs are
   // empty now, and empty sets are what a reload would find.
-  void _resetForAccount() => resetForTest();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() => resetForTest();
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_reads';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _saved) 's|$id': true,
+        for (final e in _progress.entries)
+          if ((e.value * 1000).round() > 0) 'p|${e.key}': (e.value * 1000).round(),
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _saved.clear();
+    _progress.clear();
+    for (final e in items.entries) {
+      if (e.key.startsWith('s|')) {
+        _saved.add(e.key.substring(2));
+      } else if (e.key.startsWith('p|') && e.value is num) {
+        _progress[e.key.substring(2)] =
+            ((e.value as num) / 1000).clamp(0.0, 1.0).toDouble();
+      }
+    }
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   @visibleForTesting
   void resetForTest() {
@@ -108,6 +150,7 @@ class TtcReadStore extends ChangeNotifier {
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
+    await syncMergedFromCloud();
   }
 
   Future<void> _persist() async {

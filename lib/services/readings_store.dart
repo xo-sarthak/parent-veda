@@ -37,7 +37,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 enum ReadingKind { bloodPressure, sugar }
 
@@ -180,7 +181,13 @@ class ReadingTargets {
   }
 }
 
-class ReadingsStore extends ChangeNotifier with CloudSyncedStore {
+// PER-ITEM SINCE STEP 13 (2026-10-22, sync log). The whole-blob sync let two
+// phones erase each other's readings. Each reading is now one item
+// (`r|<id>`, its JSON) and the doctor's targets one more (`targets`), merged
+// item by item (CloudMergedStore). Known limit, named: a person logging many
+// readings a day for months grows one blob that every merge returns whole;
+// past a few hundred readings these belong in rows (OwnRowLedger).
+class ReadingsStore extends ChangeNotifier with CloudMergedStore {
   ReadingsStore._();
   static final ReadingsStore instance = ReadingsStore._();
 
@@ -209,7 +216,8 @@ class ReadingsStore extends ChangeNotifier with CloudSyncedStore {
     } catch (_) {/* a bad blob is an empty log, never a crash */}
     _loaded = true;
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   void _adopt(Object? data) {
@@ -293,29 +301,52 @@ class ReadingsStore extends ChangeNotifier with CloudSyncedStore {
     return b.toString().trimRight();
   }
 
-  // ---- cloud (CloudSyncedStore) ----------------------------------------------
+  // ---- cloud (CloudMergedStore, step 13) -------------------------------------
   @override
   String get cloudKey => 'readings';
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <String, Object?>{'entries': <Object>[], 'targets': null};
+  String? get legacyBlobKey => 'readings';
 
-  @override
-  Object cloudData() => {
+  // Kept for revert (step 13): the whole-blob sync.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'entries': <Object>[], 'targets': null};
+  //   @override
+  //   Object cloudData() => _blob();
+  //   @override
+  //   void applyCloudData(Object data) => _adopt(data);
+
+  Map<String, Object?> _blob() => {
         'entries': [for (final r in _all) r.toJson()],
         'targets': _targets.toJson(),
       };
 
   @override
-  void applyCloudData(Object data) => _adopt(data);
+  Map<String, Object?> cloudItems() => {
+        for (final r in _all) 'r|${r.id}': r.toJson(),
+        if (!_targets.isEmpty) 'targets': _targets.toJson(),
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _all
+      ..clear()
+      ..addAll([
+        for (final e in items.entries)
+          if (e.key.startsWith('r|')) ?Reading.fromJson(e.value),
+      ]);
+    _targets = ReadingTargets.fromJson(items['targets']);
+  }
+
+  @override
+  void applyLegacyBlob(Object blob) => _adopt(blob);
 
   @override
   Future<void> persistLocalCache() => _persist();
 
   Future<void> _persist() async {
     try {
-      await (await SharedPreferences.getInstance()).setString(_key, jsonEncode(cloudData()));
+      await (await SharedPreferences.getInstance()).setString(_key, jsonEncode(_blob()));
     } catch (_) {/* best-effort, the cloud copy still has it */}
   }
 }

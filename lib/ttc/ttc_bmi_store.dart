@@ -21,6 +21,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/remote/cloud_merged_store.dart';
 import '../services/remote/sync_registry.dart';
 
 import 'ttc_bmi_rules.dart';
@@ -54,11 +55,74 @@ class BmiHistoryEntry {
   }
 }
 
-class TtcBmiStore extends ChangeNotifier {
+// IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). Her readings lived only
+// on this phone, so a sign-out or a new phone emptied the history. Each
+// reading is one item (`e|<when>`, the encoded entry) in a per-item merged
+// store (CloudMergedStore), beside `unit_h`, `unit_w`, `checklist`, `height`.
+// A short list of fixed entries needs no table of its own: per-item merge
+// already keeps two phones' readings and carries a removal.
+class TtcBmiStore extends ChangeNotifier with CloudMergedStore {
   TtcBmiStore._() {
     SyncRegistry.registerReset(_resetForAccount);
   }
   static final TtcBmiStore instance = TtcBmiStore._();
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_bmi';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _history) 'e|${e.at.toIso8601String()}': e.encode(),
+        'unit_h': _heightUnit.name,
+        'unit_w': _weightUnit.name,
+        if (_onChecklist) 'checklist': true,
+        if (_heightM != null) 'height': _heightM,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _history.clear();
+    _heightUnit = BmiHeightUnit.cm;
+    _weightUnit = BmiWeightUnit.kg;
+    _onChecklist = false;
+    _heightM = null;
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('e|')) {
+        final entry = BmiHistoryEntry.decode(e.value.toString());
+        if (entry != null) _history.add(entry);
+      } else if (k == 'unit_h') {
+        _heightUnit = BmiHeightUnit.values.firstWhere(
+            (u) => u.name == e.value, orElse: () => BmiHeightUnit.cm);
+      } else if (k == 'unit_w') {
+        _weightUnit = BmiWeightUnit.values.firstWhere(
+            (u) => u.name == e.value, orElse: () => BmiWeightUnit.kg);
+      } else if (k == 'checklist') {
+        _onChecklist = e.value == true;
+      } else if (k == 'height' && e.value is num) {
+        _heightM = (e.value as num).toDouble();
+      }
+    }
+    _history.sort((a, b) => a.at.compareTo(b.at));
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(_kHistory, [for (final e in _history) e.encode()]);
+      await p.setString(_kHeightUnit, _heightUnit.name);
+      await p.setString(_kWeightUnit, _weightUnit.name);
+      await p.setBool(_kOnChecklist, _onChecklist);
+      if (_heightM == null) {
+        await p.remove(_kHeight);
+      } else {
+        await p.setDouble(_kHeight, _heightM!);
+      }
+    } catch (_) {}
+  }
 
   static const _kHistory = 'ttc_bmi_history';
   static const _kHeightUnit = 'ttc_bmi_height_unit';
@@ -118,6 +182,7 @@ class TtcBmiStore extends ChangeNotifier {
     _onChecklist = p.getBool(_kOnChecklist) ?? false;
     _heightM = p.getDouble(_kHeight);
     notifyListeners();
+    await syncMergedFromCloud();
   }
 
   /// Remember her height for next time (T2, 2026-09-28). Fire and forget.

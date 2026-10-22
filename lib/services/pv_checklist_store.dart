@@ -34,12 +34,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/sync_registry.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
-class PvChecklistStore extends ChangeNotifier {
-  PvChecklistStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). The ticks lived only on
+// this phone, so a sign-out or a new phone emptied every checklist. Each tick
+// is now one item (`<list>|<id>`) in a per-item merged store
+// (cloud_merged_store.dart): two phones ticking different questions both keep
+// theirs, and an untick travels.
+class PvChecklistStore extends ChangeNotifier with CloudMergedStore {
+  PvChecklistStore._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   PvChecklistStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final PvChecklistStore instance = PvChecklistStore._();
 
   /// ⚠️ ONE KEY PER CHECKLIST, AND THE SCANS ONE KEEPS ITS ORIGINAL STRING.
@@ -53,12 +61,75 @@ class PvChecklistStore extends ChangeNotifier {
   final Map<String, Set<String>> _ticked = {};
   final Set<String> _loaded = {};
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  void _resetForAccount() {
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     _ticked.clear();
+  //     _loaded.clear();
+  //     notifyListeners();
+  //   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'pv_checklists';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _ticked.entries)
+          for (final id in e.value) '${e.key}|$id': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
     _ticked.clear();
-    _loaded.clear();
-    notifyListeners();
+    for (final k in items.keys) {
+      final bar = k.indexOf('|');
+      if (bar <= 0) continue;
+      _ticked
+          .putIfAbsent(k.substring(0, bar), () => <String>{})
+          .add(k.substring(bar + 1));
+    }
+    // Every list is now known from the cloud: nothing left to read from prefs.
+    _loaded.addAll(_ticked.keys);
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    for (final list in {..._ticked.keys, ..._everSeen}) {
+      await _save(list);
+    }
+  }
+
+  /// Lists that held ticks at some point, so a list the cloud emptied is
+  /// written back empty rather than left holding its old ticks on disk.
+  final Set<String> _everSeen = {};
+
+  bool _allLoaded = false;
+
+  /// Reads every checklist this phone holds, then joins the cloud. A list's
+  /// ticks must all be known before the first merge, or a list not yet opened
+  /// would read as "unticked everything".
+  Future<void> _loadAll() async {
+    if (_allLoaded) return;
+    _allLoaded = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      for (final key in prefs.getKeys()) {
+        String? list;
+        if (key == 'scan_questions_ticked') {
+          list = 'scan_questions';
+        } else if (key.startsWith('checklist_') && key.endsWith('_ticked')) {
+          list = key.substring(10, key.length - 7);
+        }
+        if (list == null || list.isEmpty) continue;
+        _ticked
+            .putIfAbsent(list, () => <String>{})
+            .addAll(prefs.getStringList(key) ?? const []);
+        _loaded.add(list);
+        _everSeen.add(list);
+      }
+    } catch (_) {/* start empty */}
+    await syncMergedFromCloud();
   }
 
   /// Which question ids are ticked on [list]. Unmodifiable — callers ask, they
@@ -75,6 +146,7 @@ class PvChecklistStore extends ChangeNotifier {
   /// that shows the checklist calls this in `initState`; without the guard, a
   /// second visit would re-read prefs and notify for no change.
   Future<void> init(String list) async {
+    await _loadAll();
     if (_loaded.contains(list)) return;
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -109,6 +181,7 @@ class PvChecklistStore extends ChangeNotifier {
   /// nothing to roll back to if the write fails — the tick is already the
   /// truth in memory.
   Future<void> _save(String list) async {
+    _everSeen.add(list);
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(

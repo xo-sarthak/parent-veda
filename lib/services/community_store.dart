@@ -14,7 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/community_data.dart';
 import '../models/community_models.dart';
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import 'saved_store.dart';
 
 /// The identity used while testing "Doctor mode" (until real doctor logins
@@ -22,7 +23,14 @@ import 'saved_store.dart';
 const String kTestDoctorName = 'Dr. (You)';
 const String kTestDoctorCred = 'OB-GYN';
 
-class CommunityStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud per item since step 13 (2026-10-22, sync log). It synced as one
+// whole blob before, so a like on one phone and a join on the other erased
+// each other. Items: `joined|`, `muted|`, `liked|`, `upvoted|`, `endorsed|`,
+// `reposted|` + id = true; `vote|<pollId>` = option; `post|<id>` = the post's
+// JSON; `comments|<postId>` = her comments on it (one item per post, so two
+// phones commenting on the same post at once keep the newer list);
+// `doctorMode` = true while on.
+class CommunityStore extends ChangeNotifier with CloudMergedStore {
   CommunityStore._() {
     // Bookmarks live in SavedStore since 2026-09-16 (docs/FAMILY-MODEL.md §5);
     // screens listen to this store, so forward its changes.
@@ -76,13 +84,16 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
       ..addAll(p.getStringList(_upvotedKey) ?? const []);
 
     // First run: auto-join the pregnancy-stage communities.
-    if (!(p.getBool(_seededKey) ?? false)) {
-      for (final c in kCommunities) {
-        if (c.auto) _joined.add(c.id);
-      }
-      await p.setBool(_seededKey, true);
-      await p.setStringList(_joinedKey, _joined.toList());
-    }
+    // Step 13: moved below the first sync. Seeding before it would make a new
+    // phone "hold something", so the mixin would skip the old cloud blob and
+    // her real joins would never arrive. Kept for revert:
+    // if (!(p.getBool(_seededKey) ?? false)) {
+    //   for (final c in kCommunities) {
+    //     if (c.auto) _joined.add(c.id);
+    //   }
+    //   await p.setBool(_seededKey, true);
+    //   await p.setStringList(_joinedKey, _joined.toList());
+    // }
 
     _votes
       ..clear()
@@ -101,33 +112,117 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
       ..clear()
       ..addAll(p.getStringList(_repostedKey) ?? const []);
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
+
+    // First run: auto-join the pregnancy-stage communities, unless the cloud
+    // already brought her own joins.
+    if (!(p.getBool(_seededKey) ?? false)) {
+      if (_joined.isEmpty) {
+        for (final c in kCommunities) {
+          if (c.auto) _joined.add(c.id);
+        }
+      }
+      await p.setBool(_seededKey, true);
+      await p.setStringList(_joinedKey, _joined.toList());
+      notifyListeners();
+    }
   }
 
   // --- cloud sync (all persistent state; "not interested" stays session-only) -
   @override
   String get cloudKey => 'community';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{};
+  // Kept for revert (step 13): the whole-blob mixin's empty state and blob.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'joined': _joined.toList(),
+  //         'muted': _muted.toList(),
+  //         'liked': _liked.toList(),
+  //         // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore
+  //         'upvoted': _upvoted.toList(),
+  //         'votes': _votes,
+  //         'posts': _created.map((p) => p.toJson()).toList(),
+  //         'comments': _userComments,
+  //         'doctorMode': _doctorMode,
+  //         'docEndorsed': _doctorEndorsed.toList(),
+  //         'reposted': _reposted.toList(),
+  //       };
 
   @override
-  Object cloudData() => {
-        'joined': _joined.toList(),
-        'muted': _muted.toList(),
-        'liked': _liked.toList(),
-        // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore
-        'upvoted': _upvoted.toList(),
-        'votes': _votes,
-        'posts': _created.map((p) => p.toJson()).toList(),
-        'comments': _userComments,
-        'doctorMode': _doctorMode,
-        'docEndorsed': _doctorEndorsed.toList(),
-        'reposted': _reposted.toList(),
-      };
+  String? get legacyBlobKey => cloudKey;
+
   @override
-  void applyCloudData(Object data) {
-    final m = data as Map;
+  Map<String, Object?> cloudItems() => {
+        for (final id in _joined) 'joined|$id': true,
+        for (final id in _muted) 'muted|$id': true,
+        for (final id in _liked) 'liked|$id': true,
+        for (final id in _upvoted) 'upvoted|$id': true,
+        for (final id in _doctorEndorsed) 'endorsed|$id': true,
+        for (final id in _reposted) 'reposted|$id': true,
+        for (final e in _votes.entries) 'vote|${e.key}': e.value,
+        for (final post in _created) 'post|${post.id}': post.toJson(),
+        for (final e in _userComments.entries)
+          if (e.value.isNotEmpty) 'comments|${e.key}': e.value,
+        if (_doctorMode) 'doctorMode': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _joined.clear();
+    _muted.clear();
+    _liked.clear();
+    _upvoted.clear();
+    _doctorEndorsed.clear();
+    _reposted.clear();
+    _votes.clear();
+    _created.clear();
+    _userComments.clear();
+    _doctorMode = false;
+    final sets = <String, Set<String>>{
+      'joined': _joined,
+      'muted': _muted,
+      'liked': _liked,
+      'upvoted': _upvoted,
+      'endorsed': _doctorEndorsed,
+      'reposted': _reposted,
+    };
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k == 'doctorMode') {
+        _doctorMode = e.value == true;
+        continue;
+      }
+      final bar = k.indexOf('|');
+      if (bar <= 0) continue;
+      final kind = k.substring(0, bar);
+      final id = k.substring(bar + 1);
+      final set = sets[kind];
+      if (set != null) {
+        set.add(id);
+      } else if (kind == 'vote' && e.value != null) {
+        _votes[id] = e.value.toString();
+      } else if (kind == 'post' && e.value is Map) {
+        try {
+          _created.add(CommunityPost.fromJson(
+              Map<String, dynamic>.from(e.value as Map)));
+        } catch (_) {/* a post this build cannot read is skipped */}
+      } else if (kind == 'comments' && e.value is List) {
+        _userComments[id] =
+            (e.value as List).map((x) => x.toString()).toList();
+      }
+    }
+    // Her posts newest first, as addPost keeps them.
+    _created.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  /// The old whole blob, read once on a phone that holds nothing yet.
+  @override
+  void applyLegacyBlob(Object blob) {
+    final m = blob as Map;
     void fillSet(Set<String> s, Object? v) => s
       ..clear()
       ..addAll(((v as List?) ?? const []).map((e) => e.toString()));

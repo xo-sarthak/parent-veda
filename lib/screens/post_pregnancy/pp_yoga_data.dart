@@ -15,7 +15,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 /// How a class is delivered. The home's toggles map straight onto these three.
 enum YogaMode { liveOneToOne, liveGroup, recorded }
@@ -1068,7 +1069,12 @@ List<YogaClass> yogaSearch(String query) {
 //  YogaStore - saved + booked classes (in-memory seed). A ChangeNotifier
 //  singleton, matching the app's other stores. Booking/payment is mocked.
 // =============================================================================
-class YogaStore extends ChangeNotifier with CloudSyncedStore {
+//
+//  In the cloud since step 13 (2026-10-22, sync log) as per-item merge. It
+//  synced as one whole blob, so a save on one phone could erase a booking
+//  made on the other. Items: `saved|<classId>` -> true, `booked|<classId>` ->
+//  true.
+class YogaStore extends ChangeNotifier with CloudMergedStore {
   YogaStore._();
   static final YogaStore instance = YogaStore._();
 
@@ -1081,15 +1087,52 @@ class YogaStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => _prefsKey;
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'booked': <String>[]};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'booked': <String>[]};
+  //
+  //   @override
+  //   Object cloudData() => {'saved': _saved.toList(), 'booked': _booked.toList()};
+
+  /// The local prefs blob (the shape the cloud blob had before step 13).
+  Map<String, Object?> _blob() =>
+      {'saved': _saved.toList(), 'booked': _booked.toList()};
 
   @override
-  Object cloudData() => {'saved': _saved.toList(), 'booked': _booked.toList()};
+  String? get legacyBlobKey => cloudKey;
 
   @override
-  void applyCloudData(Object data) {
+  Map<String, Object?> cloudItems() => {
+        for (final id in _saved) 'saved|$id': true,
+        for (final id in _booked) 'booked|$id': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final saved = <String>{};
+    final booked = <String>{};
+    for (final k in items.keys) {
+      if (k.startsWith('saved|')) saved.add(k.substring(6));
+      if (k.startsWith('booked|')) booked.add(k.substring(7));
+    }
+    // Ones already here keep their place; new ones join the end.
+    final keptSaved = [for (final id in _saved) if (saved.contains(id)) id];
+    _saved
+      ..clear()
+      ..addAll(keptSaved)
+      ..addAll(saved);
+    final keptBooked = [for (final id in _booked) if (booked.contains(id)) id];
+    _booked
+      ..clear()
+      ..addAll(keptBooked)
+      ..addAll(booked);
+  }
+
+  /// Was applyCloudData before step 13; the same body. Also reads the local
+  /// prefs cache, which keeps the old blob shape.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     final s = data['saved'];
     if (s is List)
@@ -1107,7 +1150,7 @@ class YogaStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {}
   }
 
@@ -1124,13 +1167,14 @@ class YogaStore extends ChangeNotifier with CloudSyncedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {
       /* keep the starter state */
     }
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {
       /* stay local */
     }

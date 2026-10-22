@@ -57,10 +57,42 @@ const String kPvSignOutPending =
     "Some changes haven't reached your account yet. Connect to the internet "
     'and wait a moment, or sign out anyway and lose them.';
 
+/// Skilling's child records stay on the phone by decision (consent and legal
+/// review for children's data, 2026-09; kept so in step 13, 2026-10-22), so
+/// "it stays saved in your account" is not true for them. Said only when
+/// there is something to lose.
+const String kPvSignOutSkilling =
+    "Skilling's journal, photos and recordings are kept only on this phone, "
+    'so signing out removes them for good.';
+
+/// The prefs keys the five Skilling stores keep (sk_child_store, sk_journal,
+/// sk_portfolio, sk_practice_store, sk_voice_keepsake).
+const List<String> kPvSkillingKeys = [
+  'sk_journal',
+  'sk_portfolio',
+  'sk_voice',
+  'sk_practice',
+];
+
+/// True when this phone holds Skilling records a sign-out would remove.
+Future<bool> pvHasSkillingOnPhone() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    for (final k in kPvSkillingKeys) {
+      final v = prefs.get(k);
+      if (v is String && v.isNotEmpty && v != '[]' && v != '{}') return true;
+      if (v is List && v.isNotEmpty) return true;
+    }
+  } catch (_) {}
+  return false;
+}
+
 /// Asks before signing out, and says what happens to her data. True to go.
 Future<bool> pvConfirmSignOut(BuildContext context) async {
   final p = pvStorePalette;
   final pending = SyncRegistry.hasPendingChanges;
+  final skilling = await pvHasSkillingOnPhone();
+  if (!context.mounted) return false;
   final ok = await showModalBottomSheet<bool>(
     context: context,
     backgroundColor: p.ground,
@@ -92,6 +124,12 @@ Future<bool> pvConfirmSignOut(BuildContext context) async {
             Text(kPvSignOutBody,
                 key: const ValueKey('pv_sign_out_body'),
                 style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+            if (skilling) ...[
+              const SizedBox(height: 10),
+              Text(kPvSignOutSkilling,
+                  key: const ValueKey('pv_sign_out_skilling'),
+                  style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+            ],
             if (pending) ...[
               const SizedBox(height: 12),
               Row(

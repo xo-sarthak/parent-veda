@@ -147,9 +147,10 @@ void main() {
       store.logCraving('sweet');
       store.addToList('r1', ['moong', 'ghee']);
       store.setRegion(ChartRegion.gujarati);
-      final blob = store.cloudData();
+      // Per-item since step 13: cloudItems / applyCloudItems.
+      final blob = store.cloudItems();
       store.resetForTest();
-      store.applyCloudData(blob);
+      store.applyCloudItems(blob);
       expect(store.swapFor(d, 'k'), 'Poha');
       expect(store.cravingPattern(now: DateTime.now())?.kind, 'sweet');
       expect(store.shopping.length, 2);

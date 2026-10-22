@@ -69,7 +69,8 @@ import 'life_stage_store.dart';
 import 'notification_service.dart';
 import 'pregnancy_controller.dart';
 import 'pregnancy_ended_store.dart';
-import 'remote/sync_registry.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 /// The seven kinds. The NAME is persisted: renaming one strands every message
 /// already delivered under it.
@@ -314,10 +315,19 @@ class _OsPhone implements PregMessagePhone {
   Future<void> cancel(int id) => NotificationService.instance.cancel(id);
 }
 
-class PregMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
-  PregMessagesStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so a
+// sign-out or a new phone emptied the inbox, lost every read mark and turned
+// her switches back on. Items: `msg|<id>` per DELIVERED message (value = its
+// JSON, read flag included), `off|<kind>` (true) per kind she switched off,
+// and `phone` (bool). Pending messages are not items: each phone recomputes
+// them, and re-arms its alarms after a merge.
+class PregMessagesStore extends ChangeNotifier
+    with WidgetsBindingObserver, CloudMergedStore {
+  PregMessagesStore._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   PregMessagesStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final PregMessagesStore instance = PregMessagesStore._();
 
   static const _kMessages = 'preg_messages_v1';
@@ -366,6 +376,9 @@ class PregMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
   /// Load, listen, schedule. Once at startup, AFTER `ReminderStore.init`.
   Future<void> init() async {
     await _load();
+    // Before the first refresh, so a message already delivered (and read) on
+    // another phone is known here and not delivered a second time.
+    await syncMergedFromCloud();
     if (!_listening) {
       _listening = true;
       PregnancyController.current?.addListener(_changed);
@@ -578,17 +591,18 @@ class PregMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
     await refresh();
   }
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  // Memory only; the listeners it added stay, so the next person's facts
-  // refill it.
-  void _resetForAccount() {
-    _all.clear();
-    _off.clear();
-    _phoneOn = true;
-    _loaded = false;
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   // Memory only; the listeners it added stay, so the next person's facts
+  //   // refill it.
+  //   void _resetForAccount() {
+  //     _all.clear();
+  //     _off.clear();
+  //     _phoneOn = true;
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {
@@ -598,6 +612,51 @@ class PregMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
     _loaded = true;
     notifyListeners();
   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'preg_messages';
+
+  @override
+  Map<String, Object?> cloudItems() {
+    final now = DateTime.now();
+    return {
+      for (final m in _all)
+        if (m.deliveredBy(now)) 'msg|${m.id}': m.toJson(),
+      for (final k in _off) 'off|${k.name}': true,
+      'phone': _phoneOn,
+    };
+  }
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _all.clear();
+    _off.clear();
+    _phoneOn = true;
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('msg|')) {
+        final m = PregMessage.fromJson(e.value);
+        if (m != null) _all.add(m);
+      } else if (k.startsWith('off|')) {
+        final kind = PregMessageKind.values
+            .where((x) => x.name == k.substring(4))
+            .firstOrNull;
+        if (kind != null) _off.add(kind);
+      } else if (k == 'phone') {
+        _phoneOn = e.value != false;
+      }
+    }
+    _all.sort((a, b) => b.at.compareTo(a.at));
+    _loaded = true;
+    // Pending messages and the phone's alarms follow from this state: rebuild
+    // them, unawaited. Not on a sign-out (no items), which must not arm any.
+    if (items.isNotEmpty) _changed();
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   // ---- persistence ----------------------------------------------------------
 

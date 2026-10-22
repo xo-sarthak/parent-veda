@@ -81,7 +81,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../localization/app_language.dart';
-import '../../services/remote/sync_registry.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_content_prefs.dart';
 import '../../ttc/ttc_log_store.dart';
@@ -818,16 +819,27 @@ String ttcMovedNote(TtcTool t) => kTtcMovedToMoreTile[t.id] == t.nameEn
 /// strip at the top. Every group below still lists every tool, in its fixed
 /// place, whether she has used it or not (CLAUDE.md: personalisation changes
 /// order, never structure; a feature is never hidden).
-class TtcToolRecents extends ChangeNotifier {
-  TtcToolRecents._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+///
+/// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+/// a sign-out or a new phone emptied the strip. Items: one per tool in it,
+/// `<tool id>` -> when she last opened it (epoch ms); applied newest first and
+/// trimmed to three. The times are kept beside the list in [kAtKey].
+class TtcToolRecents extends ChangeNotifier with CloudMergedStore {
+  TtcToolRecents._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcToolRecents._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcToolRecents instance = TtcToolRecents._();
 
   static const String kKey = 'ttc_tools_recent';
+
+  /// When each tool in [kKey] was last opened (epoch ms), in the same order.
+  static const String kAtKey = 'ttc_tools_recent_at';
   static const int _max = 3;
 
   List<String> _ids = const [];
+  final Map<String, int> _at = {};
   bool _loaded = false;
   List<String> get ids => _ids;
 
@@ -837,28 +849,71 @@ class TtcToolRecents extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       _ids = p.getStringList(kKey) ?? const [];
+      final at = p.getStringList(kAtKey) ?? const <String>[];
+      for (var i = 0; i < _ids.length; i++) {
+        // A list saved before step 13 has no times: rank stands in for one
+        // (newest highest), small enough that any real open beats it.
+        _at[_ids[i]] = (i < at.length ? int.tryParse(at[i]) : null) ??
+            (_ids.length - i);
+      }
       notifyListeners();
     } catch (_) {/* local-first: none is a fine answer */}
+    await syncMergedFromCloud();
   }
 
   Future<void> touch(String id) async {
     _ids = [id, ..._ids.where((x) => x != id)].take(_max).toList();
+    _at[id] = DateTime.now().millisecondsSinceEpoch;
+    _at.removeWhere((k, _) => !_ids.contains(k));
     notifyListeners();
+    await persistLocalCache();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_tool_recents';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _ids) id: _at[id] ?? 0,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final byTime = [
+      for (final e in items.entries)
+        if (e.value is num) MapEntry(e.key, (e.value as num).toInt()),
+    ]..sort((a, b) => b.value.compareTo(a.value));
+    final kept = byTime.take(_max).toList();
+    _ids = [for (final e in kept) e.key];
+    _at
+      ..clear()
+      ..addEntries(kept);
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
     try {
-      await (await SharedPreferences.getInstance()).setStringList(kKey, _ids);
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(kKey, _ids);
+      await p.setStringList(kAtKey, [for (final id in _ids) '${_at[id] ?? 0}']);
     } catch (_) {}
   }
 
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
   // are wiped, the singleton was not.
-  void _resetForAccount() {
-    resetForTest();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     resetForTest();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {
     _ids = const [];
+    _at.clear();
     _loaded = false;
   }
 }

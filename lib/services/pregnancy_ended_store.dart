@@ -28,13 +28,78 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'auth/pending_profile.dart';
+import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 
+// IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log, migration 0110). This
+// lived only on her phone, so a new phone, or the same phone after a
+// sign-out, went back to showing a baby growing week by week after a loss.
+// It is now `profiles.pregnancy_ended_at` (null = not ended), written through
+// PendingProfile.send (confirmed, kept and retried when it fails) and read
+// back on every sync. 0009 lets a linked partner read her profile, so his
+// app can respect it too.
 class PregnancyEndedStore extends ChangeNotifier {
   PregnancyEndedStore._() {
     SyncRegistry.registerReset(_resetForAccount);
   }
   static final PregnancyEndedStore instance = PregnancyEndedStore._();
+
+  static const String kColumn = 'pregnancy_ended_at';
+
+  /// Set once this phone's answer has met the cloud's (step 13). Before that,
+  /// a phone that already holds "ended" sends it up rather than taking the
+  /// cloud's empty column, which would quietly undo what she told us.
+  static const String kCloudKey = 'pregnancy_ended_cloud_v1';
+
+  bool _registered = false;
+
+  /// Reads her profile's answer and takes it, unless this phone holds a
+  /// change still waiting to go up.
+  Future<void> syncFromCloud() async {
+    if (!_registered) {
+      _registered = true;
+      SyncRegistry.register(syncFromCloud);
+    }
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      final pending = await PendingProfile.load();
+      if (pending != null && pending.containsKey(kColumn)) return;
+      final row = await SupabaseRepo.fetchMyProfile(kColumn);
+      if (row == null) return; // offline or unreadable: keep what we have
+      final prefs = await SharedPreferences.getInstance();
+      final cloudAt = row[kColumn] == null
+          ? null
+          : SupabaseRepo.parseDbTime(row[kColumn]);
+      if (!(prefs.getBool(kCloudKey) ?? false)) {
+        if (_ended && cloudAt == null) {
+          await PendingProfile.send(
+              {kColumn: SupabaseRepo.dbTime(_endedAt ?? DateTime.now())});
+          await prefs.setBool(kCloudKey, true);
+          return;
+        }
+        await prefs.setBool(kCloudKey, true);
+      }
+      final ended = cloudAt != null;
+      if (ended == _ended && cloudAt == _endedAt) return;
+      _ended = ended;
+      _endedAt = cloudAt;
+      notifyListeners();
+      await _persist();
+    } catch (_) {/* offline - keep local */}
+  }
+
+  Future<void> _persist() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(kEndedKey, _ended);
+      if (_ended && _endedAt != null) {
+        await prefs.setString(kEndedAtKey, _endedAt!.toIso8601String());
+      } else {
+        await prefs.remove(kEndedAtKey);
+      }
+    } catch (_) {}
+  }
 
   static const String kEndedKey = 'pregnancy_ended_v1';
   static const String kEndedAtKey = 'pregnancy_ended_at_v1';
@@ -65,6 +130,7 @@ class PregnancyEndedStore extends ChangeNotifier {
     } catch (_) {
       // Storage failing must never show a loss she did not report.
     }
+    await syncFromCloud();
   }
 
   Future<void> markEnded() => _set(true);
@@ -85,6 +151,9 @@ class PregnancyEndedStore extends ChangeNotifier {
         await prefs.remove(kEndedAtKey);
       }
     } catch (_) {}
+    // Kept, and retried on the next sync, when it cannot go up now.
+    await PendingProfile.send(
+        {kColumn: v ? SupabaseRepo.dbTime(_endedAt!) : null});
   }
 
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs

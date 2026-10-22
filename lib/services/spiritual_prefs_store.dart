@@ -23,7 +23,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/spiritual_reading_data.dart';
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 /// Moves "not interested" marks saved under a DISPLAY title onto the English
 /// title that identifies the read (2026-09-30).
@@ -81,7 +82,11 @@ Set<String> migrateSpiritualNotInterested(
   return (en: en, hiToEn: hiToEn);
 }
 
-class SpiritualPrefsStore extends ChangeNotifier with CloudSyncedStore {
+// Per-item since step 13 (2026-10-22, sync log). It synced as one whole blob,
+// so a mark made on one phone could be erased by the other phone's older
+// lists. One item per read title, value 'interested' | 'not_interested' (one
+// item, not two sets, because a read is only ever one of the two).
+class SpiritualPrefsStore extends ChangeNotifier with CloudMergedStore {
   SpiritualPrefsStore._() {
     _load();
   }
@@ -108,7 +113,8 @@ class SpiritualPrefsStore extends ChangeNotifier with CloudSyncedStore {
     _loaded = true;
     if (_migrateNotInterested()) await _persist();
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   /// Re-keys any "not interested" mark saved under a display title. True when
@@ -128,22 +134,49 @@ class SpiritualPrefsStore extends ChangeNotifier with CloudSyncedStore {
     return true;
   }
 
-  // ---- cloud (CloudSyncedStore) ----------------------------------------------
+  // ---- cloud (CloudMergedStore, step 13) ---------------------------------------
   @override
   String get cloudKey => 'spiritual_prefs';
-
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <String, Object?>{};
+  String? get legacyBlobKey => cloudKey;
+
+  // Kept for revert (step 13): applyCloudItems({}) is the empty state now.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'interested': _interested.toList(),
+  //         'not_interested': _notInterested.toList(),
+  //       };
 
   @override
-  Object cloudData() => {
-        'interested': _interested.toList(),
-        'not_interested': _notInterested.toList(),
+  Map<String, Object?> cloudItems() => {
+        for (final k in _notInterested) k: 'not_interested',
+        // Interested wins when a stale mark sits in both.
+        for (final k in _interested) k: 'interested',
       };
 
   @override
-  void applyCloudData(Object data) {
+  void applyCloudItems(Map<String, Object?> items) {
+    _interested.clear();
+    _notInterested.clear();
+    items.forEach((k, v) {
+      if (v == 'interested') {
+        _interested.add(k);
+      } else if (v == 'not_interested') {
+        _notInterested.add(k);
+      }
+    });
+    // An item may come from a phone that saved display titles.
+    _migrateNotInterested();
+    _loaded = true;
+  }
+
+  @override
+  void applyLegacyBlob(Object blob) {
+    final data = blob;
     if (data is! Map) return;
     List<String> list(Object? v) => v is List ? v.whereType<String>().toList() : const [];
     _interested

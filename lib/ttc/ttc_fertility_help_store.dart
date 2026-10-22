@@ -24,7 +24,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 import 'cycle_store.dart';
 import 'ttc_chapter.dart' show kTtcIrregularSpreadDays;
@@ -33,10 +34,16 @@ import 'ttc_pcos_check_rules.dart';
 import 'ttc_pcos_check_store.dart';
 import 'ttc_store.dart';
 
-class TtcFertilityHelpStore extends ChangeNotifier {
-  TtcFertilityHelpStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone lost her age band and history and asked again.
+// Items: `a|<question id>` -> her answer, `done` -> when she finished (ISO),
+// in a per-item merged store (cloud_merged_store.dart).
+class TtcFertilityHelpStore extends ChangeNotifier with CloudMergedStore {
+  TtcFertilityHelpStore._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcFertilityHelpStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcFertilityHelpStore instance = TtcFertilityHelpStore._();
 
   static const _kAnswers = 'ttc_fhelp_answers';
@@ -78,6 +85,49 @@ class TtcFertilityHelpStore extends ChangeNotifier {
     final d = p.getString(_kDone);
     if (d != null) _completedAt = DateTime.tryParse(d);
     notifyListeners();
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_fertility_help';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _answers.entries) 'a|${e.key}': e.value,
+        if (_completedAt != null) 'done': _completedAt!.toIso8601String(),
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _answers.clear();
+    _completedAt = null;
+    for (final e in items.entries) {
+      final v = e.value;
+      if (v is! String) continue;
+      if (e.key.startsWith('a|')) {
+        _answers[e.key.substring(2)] = v;
+      } else if (e.key == 'done') {
+        _completedAt = DateTime.tryParse(v);
+      }
+    }
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(
+          _kAnswers, [for (final e in _answers.entries) '${e.key}:${e.value}']);
+      final done = _completedAt;
+      if (done == null) {
+        await p.remove(_kDone);
+      } else {
+        await p.setString(_kDone, done.toIso8601String());
+      }
+    } catch (_) {/* best effort */}
   }
 
   Future<void> answer(String id, String value) async {
@@ -123,12 +173,13 @@ class TtcFertilityHelpStore extends ChangeNotifier {
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
   // are wiped, the singleton was not.
   // reset() also writes prefs, so this one touches memory only.
-  void _resetForAccount() {
-    _answers.clear();
-    _completedAt = null;
-    _loaded = false;
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     _answers.clear();
+  //     _completedAt = null;
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
 
   Future<void> reset() async {
     _answers.clear();

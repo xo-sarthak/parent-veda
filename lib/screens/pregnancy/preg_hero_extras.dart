@@ -25,7 +25,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
-import '../../services/remote/sync_registry.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 import '../../services/stage_gateway.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
@@ -113,10 +114,16 @@ Future<void> showPregHowWeeksCounted(BuildContext context, PregnancyController c
 
 /// Whether the card is resting after a "Not yet". On this phone only; the
 /// cost of losing it is one more gentle question.
-class PregArrivalPrompt extends ChangeNotifier {
-  PregArrivalPrompt._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+///
+/// In the cloud since step 13 (2026-10-22, sync log): it was phone-only, so a
+/// "Not yet" on one phone still asked on the other, and a sign-out forgot it.
+/// One item: `snooze_until` (ISO).
+class PregArrivalPrompt extends ChangeNotifier with CloudMergedStore {
+  PregArrivalPrompt._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   PregArrivalPrompt._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final PregArrivalPrompt instance = PregArrivalPrompt._();
 
   static const String kSnoozeKey = 'preg_arrival_snooze_until_v1';
@@ -135,6 +142,35 @@ class PregArrivalPrompt extends ChangeNotifier {
       _until = raw == null ? null : DateTime.tryParse(raw);
       notifyListeners();
     } catch (_) {/* shown, which is the safe side */}
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'preg_arrival_prompt';
+
+  @override
+  Map<String, Object?> cloudItems() =>
+      {if (_until != null) 'snooze_until': _until!.toIso8601String()};
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final v = items['snooze_until'];
+    _until = v is String ? DateTime.tryParse(v) : null;
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      if (_until == null) {
+        await p.remove(kSnoozeKey);
+      } else {
+        await p.setString(kSnoozeKey, _until!.toIso8601String());
+      }
+    } catch (_) {}
   }
 
   /// Shown from week 37, unless resting.
@@ -152,12 +188,13 @@ class PregArrivalPrompt extends ChangeNotifier {
     } catch (_) {}
   }
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  void _resetForAccount() {
-    resetForTest();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   void _resetForAccount() {
+  //     resetForTest();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {

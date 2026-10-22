@@ -29,10 +29,13 @@
 //  PCOS stores made.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 import 'ttc_fertility_help_rules.dart';
 import 'ttc_ivf_readiness.dart';
@@ -52,10 +55,34 @@ List<String> _encode(Map<String, String?> m) => [
         if (e.value != null) '${e.key}:${e.value}',
     ];
 
-class TtcSelfCheckStore extends ChangeNotifier {
-  TtcSelfCheckStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
+/// One saved form as an item value: a JSON string with sorted keys, so the
+/// same form always encodes the same way. A map value would come back from
+/// Postgres `jsonb` with its keys reordered and read as an edit.
+String _formItem(Map<String, String> m) =>
+    jsonEncode({for (final k in m.keys.toList()..sort()) k: m[k]});
+
+Map<String, String> _formOf(Object? v) {
+  if (v is! String) return {};
+  try {
+    final m = jsonDecode(v);
+    if (m is! Map) return {};
+    return {for (final e in m.entries) e.key.toString(): e.value.toString()};
+  } catch (_) {
+    return {};
   }
+}
+
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone lost both saved forms. Items: `pcos` and `ivf`,
+// each one whole saved form. ONE ITEM PER FORM, NOT PER QUESTION, on purpose:
+// a form is saved whole, and merging two saves question by question could
+// build a form she never filled in (the header's reason, one layer down).
+class TtcSelfCheckStore extends ChangeNotifier with CloudMergedStore {
+  TtcSelfCheckStore._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcSelfCheckStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcSelfCheckStore instance = TtcSelfCheckStore._();
 
   static const _kPcos = 'ttc_selfcheck_pcos_stand';
@@ -74,14 +101,51 @@ class TtcSelfCheckStore extends ChangeNotifier {
     _pcos = _decode(p.getStringList(_kPcos));
     _ivf = _decode(p.getStringList(_kIvf));
     notifyListeners();
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_selfcheck';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        if (_pcos.isNotEmpty) 'pcos': _formItem(_pcos),
+        if (_ivf.isNotEmpty) 'ivf': _formItem(_ivf),
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _pcos = _formOf(items['pcos']);
+    _ivf = _formOf(items['ivf']);
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      if (_pcos.isEmpty) {
+        await p.remove(_kPcos);
+      } else {
+        await p.setStringList(_kPcos, _encode(_pcos));
+      }
+      if (_ivf.isEmpty) {
+        await p.remove(_kIvf);
+      } else {
+        await p.setStringList(_kIvf, _encode(_ivf));
+      }
+    } catch (_) {/* best effort */}
   }
 
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
   // are wiped, the singleton was not.
-  void _resetForAccount() {
-    resetForTest();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     resetForTest();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {

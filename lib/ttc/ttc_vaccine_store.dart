@@ -23,14 +23,22 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 import 'ttc_vaccines_data.dart';
 
-class TtcVaccineStore extends ChangeNotifier {
-  TtcVaccineStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone lost where she stood on every vaccine (and the
+// live-vaccine wait). Items: `v|<vaccine id>` -> `[status name]`, or
+// `[status name, given on (ISO)]` for `done`. Status and date are one item
+// because `set` writes them together and one must never outlive the other.
+class TtcVaccineStore extends ChangeNotifier with CloudMergedStore {
+  TtcVaccineStore._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcVaccineStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcVaccineStore instance = TtcVaccineStore._();
 
   static const _kStatus = 'ttc_vaccine_status';
@@ -72,6 +80,50 @@ class TtcVaccineStore extends ChangeNotifier {
     }
 
     notifyListeners();
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_vaccines';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _status.entries)
+          'v|${e.key}': [
+            e.value.name,
+            if (_doneOn[e.key] != null) _doneOn[e.key]!.toIso8601String(),
+          ],
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _status.clear();
+    _doneOn.clear();
+    for (final e in items.entries) {
+      final v = e.value;
+      if (!e.key.startsWith('v|') || v is! List || v.isEmpty) continue;
+      final id = e.key.substring(2);
+      final match = TtcVaccineStatus.values.where((s) => s.name == '${v[0]}');
+      if (match.isEmpty) continue;
+      _status[id] = match.first;
+      final at = v.length > 1 ? DateTime.tryParse('${v[1]}') : null;
+      if (at != null) _doneOn[id] = at;
+    }
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(_kStatus,
+          [for (final e in _status.entries) '${e.key}:${e.value.name}']);
+      await p.setStringList(_kDoneOn, [
+        for (final e in _doneOn.entries) '${e.key}:${e.value.toIso8601String()}'
+      ]);
+    } catch (_) {/* best effort */}
   }
 
   Future<void> set(String id, TtcVaccineStatus status, {DateTime? on}) async {
@@ -98,12 +150,13 @@ class TtcVaccineStore extends ChangeNotifier {
 
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
   // are wiped, the singleton was not.
-  void _resetForAccount() {
-    _status.clear();
-    _doneOn.clear();
-    _loaded = false;
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     _status.clear();
+  //     _doneOn.clear();
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
 
   /// Empties the store in memory, for a test that needs a first open.
   /// (Added 2026-09-27, tool rebuild: tests used to tidy up by hand.)

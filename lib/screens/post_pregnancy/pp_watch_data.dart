@@ -17,7 +17,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import '../../services/saved_store.dart';
 import 'pp_experts_data.dart';
 
@@ -592,7 +593,14 @@ List<WatchCollection> expertCollections() {
 //  WatchStore - saved, following + continue-watching progress (in-memory seed).
 //  A ChangeNotifier singleton, matching the app's other stores.
 // =============================================================================
-class WatchStore extends ChangeNotifier with CloudSyncedStore {
+//
+//  In the cloud since step 13 (2026-10-22, sync log) as per-item merge. It
+//  synced as one whole blob, so a playback tick on one phone could erase a
+//  follow or a collection made on the other. Items: `follow|<expertId>`,
+//  `done|<videoId>` -> true; `pos|<videoId>` -> {p: progress in thousandths,
+//  s: resume second}; `recent|<videoId>` -> when added (ms);
+//  `coll|<collectionId>` -> name; `cin|<collectionId>|<videoId>` -> true.
+class WatchStore extends ChangeNotifier with CloudMergedStore {
   WatchStore._() {
     // Saved videos live in SavedStore since 2026-09-16 (docs/FAMILY-MODEL.md
     // §5) as rows of kind `video`; this store keeps following, progress,
@@ -615,20 +623,140 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {/* keep the starter state */}
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'following': <String>[], 'progress': <String, double>{}, 'recent': <String>[], 'lastSeconds': <String, int>{}, 'completed': <String>[], 'collections': <Object>[]};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'following': <String>[], 'progress': <String, double>{}, 'recent': <String>[], 'lastSeconds': <String, int>{}, 'completed': <String>[], 'collections': <Object>[]};
+  //
+  //   @override
+  //   Object cloudData() => { ...the same map as _blob() below, without 'recentAt' };
 
   @override
-  Object cloudData() => {
+  String? get legacyBlobKey => cloudKey;
+
+  @override
+  Map<String, Object?> cloudItems() {
+    final out = <String, Object?>{
+      for (final id in _following) 'follow|$id': true,
+      for (final id in _completed) 'done|$id': true,
+    };
+    // Progress goes as a whole number of thousandths, so the value reads back
+    // from the server exactly as it was sent (a double like 1.0 may not).
+    for (final id in {..._progress.keys, ..._lastSeconds.keys}) {
+      out['pos|$id'] = {
+        if (_progress[id] != null) 'p': (_progress[id]! * 1000).round(),
+        if (_lastSeconds[id] != null) 's': _lastSeconds[id],
+      };
+    }
+    // Newest first in [_recent]; one with no time yet sorts by its place,
+    // below any real time.
+    for (var i = 0; i < _recent.length; i++) {
+      out['recent|${_recent[i]}'] = _recentAt[_recent[i]] ?? (_recent.length - i);
+    }
+    for (final c in _userCollections) {
+      out['coll|${c.id}'] = c.name;
+      for (final v in c.videoIds) {
+        out['cin|${c.id}|$v'] = true;
+      }
+    }
+    return out;
+  }
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final following = <String>{};
+    final completed = <String>{};
+    final progress = <String, double>{};
+    final seconds = <String, int>{};
+    final recent = <String, int>{};
+    final names = <String, String>{};
+    final members = <String, List<String>>{};
+    for (final e in items.entries) {
+      final k = e.key;
+      final bar = k.indexOf('|');
+      if (bar <= 0) continue;
+      final kind = k.substring(0, bar);
+      final rest = k.substring(bar + 1);
+      switch (kind) {
+        case 'follow':
+          following.add(rest);
+        case 'done':
+          completed.add(rest);
+        case 'pos':
+          final v = e.value;
+          if (v is Map) {
+            if (v['p'] is num) progress[rest] = (v['p'] as num) / 1000;
+            if (v['s'] is num) seconds[rest] = (v['s'] as num).toInt();
+          }
+        case 'recent':
+          final v = e.value;
+          recent[rest] = v is num ? v.toInt() : 0;
+        case 'coll':
+          names[rest] = (e.value ?? '').toString();
+        case 'cin':
+          final b2 = rest.lastIndexOf('|');
+          if (b2 <= 0) continue;
+          members
+              .putIfAbsent(rest.substring(0, b2), () => <String>[])
+              .add(rest.substring(b2 + 1));
+      }
+    }
+    _following
+      ..clear()
+      ..addAll(following);
+    _completed
+      ..clear()
+      ..addAll(completed);
+    _progress
+      ..clear()
+      ..addAll(progress);
+    _lastSeconds
+      ..clear()
+      ..addAll(seconds);
+    final order = recent.keys.toList()
+      ..sort((a, b) => recent[b]!.compareTo(recent[a]!)); // newest first
+    _recent
+      ..clear()
+      ..addAll(order);
+    _recentAt
+      ..clear()
+      ..addAll(recent);
+    // Collections and their videos already here keep their place; new ones
+    // join the end.
+    final before = {for (final c in _userCollections) c.id: c};
+    final ids = [
+      for (final c in _userCollections)
+        if (names.containsKey(c.id)) c.id,
+      for (final id in names.keys)
+        if (!before.containsKey(id)) id,
+    ];
+    _userCollections
+      ..clear()
+      ..addAll(ids.map((id) {
+        final got = members[id] ?? const <String>[];
+        final old = before[id]?.videoIds ?? const <String>[];
+        return UserWatchCollection(id: id, name: names[id]!, videoIds: [
+          for (final v in old)
+            if (got.contains(v)) v,
+          for (final v in got)
+            if (!old.contains(v)) v,
+        ]);
+      }));
+    _bumpSeq();
+  }
+
+  /// The local prefs blob (the shape the cloud blob had before step 13, plus
+  /// the recents' times).
+  Map<String, Object?> _blob() => {
         // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore
         'following': _following.toList(),
         'progress': _progress,
@@ -638,10 +766,13 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
         'collections': _userCollections
             .map((c) => {'id': c.id, 'name': c.name, 'videoIds': c.videoIds})
             .toList(),
+        'recentAt': _recentAt,
       };
 
+  /// Was applyCloudData before step 13; the same body, plus the recents'
+  /// times the local cache keeps. Also reads the local prefs cache.
   @override
-  void applyCloudData(Object data) {
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     void strs(String key, Set<String> into) {
       final v = data[key];
@@ -683,13 +814,30 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
           );
         }));
     }
+    final ra = data['recentAt'];
+    _recentAt.clear();
+    if (ra is Map) {
+      for (final e in ra.entries) {
+        if (e.value is num) _recentAt[e.key.toString()] = (e.value as num).toInt();
+      }
+    }
+    _bumpSeq();
+  }
+
+  /// Keeps the next minted collection id clear of every id already held, so a
+  /// collection loaded from the cache or the cloud is never minted again.
+  void _bumpSeq() {
+    for (final c in _userCollections) {
+      final n = int.tryParse(c.id.startsWith('uc_') ? c.id.substring(3) : '');
+      if (n != null && n >= _seq) _seq = n + 1;
+    }
   }
 
   @override
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {}
   }
 
@@ -715,6 +863,9 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
     'solids101': 0.2,
   };
   final List<String> _recent = [/* 'leap4brain', retired with the leaps 2026-10-14; new phase films to come */ 'sleep4mo', 'q_play'];
+
+  /// videoId -> when it joined [_recent] (ms), for the cloud items (step 13).
+  final Map<String, int> _recentAt = {};
 
   bool isSaved(String id) => SavedStore.instance.isSaved(SavedKind.video, id);
   void toggleSave(String id) {
@@ -753,7 +904,10 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
   double progressOf(String id) => _progress[id] ?? 0;
   void setProgress(String id, double p) {
     _progress[id] = p.clamp(0, 1);
-    if (!_recent.contains(id)) _recent.insert(0, id);
+    if (!_recent.contains(id)) {
+      _recent.insert(0, id);
+      _recentAt[id] = DateTime.now().millisecondsSinceEpoch;
+    }
     notifyListeners();
   }
 

@@ -19,7 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/content_ownership.dart';
 import '../../services/recipe_store.dart';
 import '../../data/pp_recipe_docs/band_7_8m.dart';
-import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 /// One key nutrient line for the Nutrition Breakdown.
 class FoodNutrient {
@@ -5310,7 +5311,11 @@ List<MealSuggestion> buildMeals({required String meal, required int maxMinutes, 
 // =============================================================================
 //  FoodStore - saved recipes + the shopping list (ingredient -> purchased).
 // =============================================================================
-class FoodStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud since step 13 (2026-10-22, sync log) as per-item merge. It
+// synced as one whole blob, so a dish saved on one phone and a shopping line
+// ticked on the other erased each other. Items: `saved|<id>` -> true,
+// `shop|<line>` -> purchased, `cooked|<id>` -> its position, `vegOnly` -> true.
+class FoodStore extends ChangeNotifier with CloudMergedStore {
   FoodStore._();
   static final FoodStore instance = FoodStore._();
 
@@ -5329,12 +5334,21 @@ class FoodStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => _prefsKey;
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'shopping': <String, bool>{}, 'cooked': <String>[], 'vegOnly': false};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'shopping': <String, bool>{}, 'cooked': <String>[], 'vegOnly': false};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'saved': _saved.toList(),
+  //         'shopping': _shopping,
+  //         'cooked': _cooked,
+  //         'vegOnly': _vegOnly,
+  //       };
 
-  @override
-  Object cloudData() => {
+  /// The local prefs blob (the shape the cloud blob had before step 13).
+  Map<String, Object?> _blob() => {
         'saved': _saved.toList(),
         'shopping': _shopping,
         'cooked': _cooked,
@@ -5342,7 +5356,56 @@ class FoodStore extends ChangeNotifier with CloudSyncedStore {
       };
 
   @override
-  void applyCloudData(Object data) {
+  String? get legacyBlobKey => cloudKey;
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _saved) 'saved|$id': true,
+        for (final e in _shopping.entries) 'shop|${e.key}': e.value,
+        for (var i = 0; i < _cooked.length; i++) 'cooked|${_cooked[i]}': i,
+        if (_vegOnly) 'vegOnly': true,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    String? partOf(String k, String prefix) =>
+        k.startsWith('$prefix|') ? k.substring(prefix.length + 1) : null;
+    final saved = <String>{};
+    final shop = <String, bool>{};
+    final cooked = <String, int>{};
+    for (final e in items.entries) {
+      final sv = partOf(e.key, 'saved');
+      if (sv != null) saved.add(sv);
+      final sh = partOf(e.key, 'shop');
+      if (sh != null) shop[sh] = e.value == true;
+      final ck = partOf(e.key, 'cooked');
+      if (ck != null) cooked[ck] = (e.value is num) ? (e.value as num).toInt() : 0;
+    }
+    // Lines and saves already here keep their place; new ones join the end.
+    final keptSaved = [for (final id in _saved) if (saved.contains(id)) id];
+    _saved
+      ..clear()
+      ..addAll(keptSaved)
+      ..addAll(saved);
+    final keptShop = {
+      for (final k in _shopping.keys) if (shop.containsKey(k)) k: shop[k]!,
+    };
+    _shopping
+      ..clear()
+      ..addAll(keptShop)
+      ..addAll(shop);
+    final order = cooked.keys.toList()
+      ..sort((a, b) => cooked[a]!.compareTo(cooked[b]!));
+    _cooked
+      ..clear()
+      ..addAll(order);
+    _vegOnly = items['vegOnly'] == true;
+  }
+
+  /// Was applyCloudData before step 13; the same body. Also reads the local
+  /// prefs cache, which keeps the old blob shape.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     final s = data['saved'];
     // Through kFoodRecipeMoved, so a save of a replaced dish lands on the dish
@@ -5363,7 +5426,7 @@ class FoodStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {}
   }
 
@@ -5380,11 +5443,12 @@ class FoodStore extends ChangeNotifier with CloudSyncedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {/* keep the starter state */}
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 

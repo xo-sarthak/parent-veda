@@ -54,7 +54,8 @@ import 'family_profile.dart';
 import 'father_preview.dart';
 import 'life_stage_store.dart';
 import 'notification_service.dart';
-import 'remote/sync_registry.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 /// The kinds. The NAME is persisted.
 enum PpMessageKind { age, vaccine, milestones, activity }
@@ -307,10 +308,20 @@ class _OsPhone implements PpMessagePhone {
   Future<void> cancel(int id) => NotificationService.instance.cancel(id);
 }
 
-class PpMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
-  PpMessagesStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so a
+// sign-out or a new phone emptied the inbox, lost every read mark and reset
+// her switches. Items: `msg|<id>` per DELIVERED message (value = its JSON,
+// read flag included), `switch|<kind>` ('on' or 'off') per kind she switched
+// herself, one item so two phones cannot leave a kind both on and off, and
+// `phone` (bool). Pending messages are not items: each phone recomputes them,
+// and re-arms its alarms after a merge.
+class PpMessagesStore extends ChangeNotifier
+    with WidgetsBindingObserver, CloudMergedStore {
+  PpMessagesStore._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   PpMessagesStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final PpMessagesStore instance = PpMessagesStore._();
 
   static const _kMessages = 'pp_messages_v1';
@@ -363,6 +374,9 @@ class PpMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> init() async {
     await _load();
+    // Before the first refresh, so a message already delivered (and read) on
+    // another phone is known here and not delivered a second time.
+    await syncMergedFromCloud();
     if (!_listening) {
       _listening = true;
       ChildProfileStore.instance.addListener(_changed);
@@ -540,18 +554,19 @@ class PpMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
     await refresh();
   }
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  // Memory only; the listeners it added stay, so the next person's facts
-  // refill it.
-  void _resetForAccount() {
-    _all.clear();
-    _off.clear();
-    _on.clear();
-    _phoneOn = true;
-    _loaded = false;
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   // Memory only; the listeners it added stay, so the next person's facts
+  //   // refill it.
+  //   void _resetForAccount() {
+  //     _all.clear();
+  //     _off.clear();
+  //     _on.clear();
+  //     _phoneOn = true;
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {
@@ -562,6 +577,55 @@ class PpMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
     _loaded = true;
     notifyListeners();
   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'pp_messages';
+
+  @override
+  Map<String, Object?> cloudItems() {
+    final now = DateTime.now();
+    return {
+      for (final m in _all)
+        if (m.deliveredBy(now)) 'msg|${m.id}': m.toJson(),
+      for (final k in _on) 'switch|${k.name}': 'on',
+      // Off after on, so a kind somehow in both reads as off, as isOn does.
+      for (final k in _off) 'switch|${k.name}': 'off',
+      'phone': _phoneOn,
+    };
+  }
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _all.clear();
+    _off.clear();
+    _on.clear();
+    _phoneOn = true;
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('msg|')) {
+        final m = PpMessage.fromJson(e.value);
+        if (m != null) _all.add(m);
+      } else if (k.startsWith('switch|')) {
+        final kind = PpMessageKind.values
+            .where((x) => x.name == k.substring(7))
+            .firstOrNull;
+        if (kind == null) continue;
+        e.value == 'off' ? _off.add(kind) : _on.add(kind);
+      } else if (k == 'phone') {
+        _phoneOn = e.value != false;
+      }
+    }
+    _all.sort((a, b) => b.at.compareTo(a.at));
+    _loaded = true;
+    // Pending messages and the phone's alarms follow from this state: rebuild
+    // them, unawaited. Not on a sign-out (no items), which must not arm any.
+    if (items.isNotEmpty) _changed();
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   Future<void> _load() async {
     if (_loaded) return;

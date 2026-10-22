@@ -30,19 +30,26 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import 'remote/supabase_repo.dart';
 
 /// Her clinician's call on one item. `ok` and `avoid` are the two things a
 /// doctor says at a visit; a third state is the absence of a record.
 enum CanIDoctorSaid { ok, avoid }
 
-class CanIActivityStore extends ChangeNotifier with CloudSyncedStore {
+// In the cloud per item since step 13 (2026-10-22, sync log). It synced as one
+// whole blob before, so a doctor's call saved on one phone could be erased by
+// a look-up on the other. Items: `r|<entryId>` = when she last opened it (ms),
+// ordered by that and trimmed to [kMaxRecents] on apply; `d|<entryId>` = her
+// doctor's call (`ok` / `avoid`).
+class CanIActivityStore extends ChangeNotifier with CloudMergedStore {
   CanIActivityStore._();
   static final CanIActivityStore instance = CanIActivityStore._();
 
   static const String _recentsKey = 'cani_recents_v1';
   static const String _doctorKey = 'cani_doctor_v1';
+  static const String _recentsAtKey = 'cani_recents_at_v1';
   static const int kMaxRecents = 20;
 
   /// The misses table and the columns the client writes. Pinned by
@@ -53,6 +60,10 @@ class CanIActivityStore extends ChangeNotifier with CloudSyncedStore {
 
   SharedPreferences? _prefs;
   final List<String> _recents = [];
+
+  /// entryId -> when she last opened it (ms). Step 13: the recency is the
+  /// item's value, so two phones' look-ups interleave by time.
+  final Map<String, int> _recentAt = {};
   final Map<String, CanIDoctorSaid> _doctor = {};
   bool _loaded = false;
 
@@ -69,8 +80,21 @@ class CanIActivityStore extends ChangeNotifier with CloudSyncedStore {
       ..addAll(_prefs?.getStringList(_recentsKey) ?? const []);
     final raw = _prefs?.getString(_doctorKey);
     if (raw != null) _applyDoctor(jsonDecode(raw));
+    final at = _prefs?.getString(_recentsAtKey);
+    if (at != null) {
+      try {
+        final m = jsonDecode(at);
+        if (m is Map) {
+          for (final e in m.entries) {
+            if (e.value is num) _recentAt[e.key.toString()] = (e.value as num).toInt();
+          }
+        }
+      } catch (_) {/* times are filled in below */}
+    }
+    _fillRecentTimes();
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   /// She opened an answer. Newest first, no duplicates, capped.
@@ -78,13 +102,16 @@ class CanIActivityStore extends ChangeNotifier with CloudSyncedStore {
     _recents
       ..remove(entryId)
       ..insert(0, entryId);
+    _recentAt[entryId] = DateTime.now().millisecondsSinceEpoch;
     if (_recents.length > kMaxRecents) _recents.removeRange(kMaxRecents, _recents.length);
+    _recentAt.removeWhere((k, _) => !_recents.contains(k));
     persistLocalCache();
     notifyListeners();
   }
 
   void clearRecents() {
     _recents.clear();
+    _recentAt.clear();
     persistLocalCache();
     notifyListeners();
   }
@@ -121,23 +148,29 @@ class CanIActivityStore extends ChangeNotifier with CloudSyncedStore {
     }).catchError((_) {});
   }
 
-  // ---- CloudSyncedStore -----------------------------------------------------
+  // ---- CloudMergedStore (step 13) -------------------------------------------
 
   @override
   String get cloudKey => 'can_i_activity';
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'recents': <String>[], 'doctor': <String, String>{}};
+  // Kept for revert (step 13): the whole-blob mixin's empty state and blob.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'recents': <String>[], 'doctor': <String, String>{}};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'recents': _recents,
+  //         'doctor': {for (final e in _doctor.entries) e.key: e.value.name},
+  //       };
 
   @override
-  Object cloudData() => {
-        'recents': _recents,
-        'doctor': {for (final e in _doctor.entries) e.key: e.value.name},
-      };
+  String? get legacyBlobKey => cloudKey;
 
+  /// The old whole blob, read once on a phone that holds nothing yet.
   @override
-  void applyCloudData(Object data) {
+  void applyLegacyBlob(Object blob) {
+    final data = blob;
     if (data is! Map) return;
     final r = data['recents'];
     if (r is List) {
@@ -146,6 +179,45 @@ class CanIActivityStore extends ChangeNotifier with CloudSyncedStore {
         ..addAll(r.whereType<String>().take(kMaxRecents));
     }
     _applyDoctor(data['doctor']);
+    _recentAt.clear();
+    _fillRecentTimes();
+  }
+
+  /// Recents read from an old list carry no time. Give them small ones in
+  /// list order: older than any real look-up, and stable once given.
+  void _fillRecentTimes() {
+    _recentAt.removeWhere((k, _) => !_recents.contains(k));
+    for (var i = 0; i < _recents.length; i++) {
+      _recentAt.putIfAbsent(_recents[i], () => _recents.length - i);
+    }
+  }
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _recents) 'r|$id': _recentAt[id] ?? 0,
+        for (final e in _doctor.entries) 'd|${e.key}': e.value.name,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _recents.clear();
+    _recentAt.clear();
+    _doctor.clear();
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('r|') && k.length > 2) {
+        final v = e.value;
+        _recentAt[k.substring(2)] = v is num ? v.toInt() : 0;
+      } else if (k.startsWith('d|') && k.length > 2) {
+        final v = CanIDoctorSaid.values.where((x) => x.name == e.value).firstOrNull;
+        if (v != null) _doctor[k.substring(2)] = v;
+      }
+    }
+    final ordered = _recentAt.keys.toList()
+      ..sort((a, b) => _recentAt[b]!.compareTo(_recentAt[a]!));
+    _recents.addAll(ordered.take(kMaxRecents));
+    _recentAt.removeWhere((k, _) => !_recents.contains(k));
+    _loaded = true; // a later init must not read stale prefs over this
   }
 
   void _applyDoctor(Object? raw) {
@@ -163,12 +235,14 @@ class CanIActivityStore extends ChangeNotifier with CloudSyncedStore {
     await p.setStringList(_recentsKey, _recents);
     await p.setString(_doctorKey,
         jsonEncode({for (final e in _doctor.entries) e.key: e.value.name}));
+    await p.setString(_recentsAtKey, jsonEncode(_recentAt));
   }
 
   /// Tests only — a clean store without prefs.
   @visibleForTesting
   void resetForTest() {
     _recents.clear();
+    _recentAt.clear();
     _doctor.clear();
   }
 }

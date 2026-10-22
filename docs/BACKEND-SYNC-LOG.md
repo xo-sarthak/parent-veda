@@ -26,6 +26,7 @@ owed.
 | 2026-10-20 | Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders) | 0106 | `d5787b2` | yes (2026-10-21) |
 | 2026-10-21 | Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools) | 0107 | `a728ec4` | yes (2026-10-21) |
 | 2026-10-21 | Steps 11 and 12: every write of her data confirmed, batched first sync, sign-out forgets memory and stops alarms, the 90-day purge | 0109 | `984836f` | yes (2026-10-21) |
+| 2026-10-22 | Step 13: nothing she makes lives only on the phone; every light store merges item by item (the non-shopping half of step 10) | 0110 | pending | **not yet** |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -1027,3 +1028,104 @@ read-only sweeps found more than the docs listed.
 - The 45 store files of the reset sweep.
 - **Tests:** `pv_sign_out_mute_test.dart`, `auth_delete_account_test.dart`, `sync_reset_coverage_test.dart`.
 - **Docs:** this log, STILL-OPEN-BACKEND, BACKEND-PATTERNS (§16ii-l, m, n; reading list 42–44), BEFORE-LAUNCH.
+
+---
+
+## Step 13: nothing she makes lives only on the phone, and no blob erases another phone's edits
+
+**Date:** 2026-10-22 (planned and approved the same day). **Migration:** 0110 (**not yet run**). **Commit:** pending.
+
+**Why.** Step 12 found that phone-only data (birth plan, Garbh journal, memories, BMI, answers) was lost for good at
+sign-out, while the sheet said "it stays saved in your account". The user: "both aren't good practices ... poor
+backend". They decided:
+- move all of it to the cloud **except Skilling**, kept on the phone pending a consent and legal review for children's
+  data;
+- in the same pass, give the old whole-blob stores per-item merge (the non-shopping half of step 10).
+
+### The mechanism
+- [x] **`pv_state_merge` (0110).** A per-item merge of `user_state`, with the row locked:
+  - items are `{v, t, d}`, and the newer edit wins;
+  - a future clock is clamped, and a tie keeps the server's copy;
+  - tombstones are dropped after 90 days;
+  - it is `SECURITY INVOKER`, so the own-row policies apply.
+- [x] **`CloudMergedStore`** (`lib/services/remote/cloud_merged_store.dart`):
+  - stores declare their items, and the mixin stamps what changed on each notify;
+  - it sends only changed items and takes the merged map back;
+  - waiting marks persist, so they survive a restart and feed the sign-out warning;
+  - phones drop settled tombstones at 80 days;
+  - on a phone's first run, what it already holds is stamped `t = 0`;
+  - the old blob is read once, and it wins unless the old sync still had a change waiting.
+- [x] **Found and fixed while building** (BACKEND-PATTERNS §16ii-q):
+  - **a sign-out reset was stamped as deletions** that could reach the next account. `SyncRegistry.resetting` now
+    stops that;
+  - **`jsonb` reordered map keys**, which made every value look edited. Values are now compared in a canonical form;
+  - **stores with demo seeds skipped the old blob** on a new phone. The upgrade now always reads the old blob.
+
+### Phone-only data, now in the cloud
+- [x] **Rows (tables in 0110, `OwnRowLedger`, files in Storage):**
+  - `memories`, with the photo as type `memory`;
+  - `garbh_journal_entries`, with the audio as type `garbh`.
+- [x] **On her profile:** "pregnancy ended" is `profiles.pregnancy_ended_at`.
+  - It goes up through `PendingProfile.send`.
+  - On a phone's first sync, a local "ended" is sent up, never undone by the empty column.
+- [x] **Profile photo:** Storage type `avatar`, with its reference as one merged item.
+- [x] **Merged items:**
+  - **Pregnancy and Parenting:**
+    - conditions answers, birth plan (2 s debounce for typing), Dear Baby vault, care-card presence;
+    - product-guide votes, landing focus, last page read, arrival prompt, tool usage;
+    - learn progress, the three search histories, the Parenting and Pregnancy messages (delivered messages, read
+      marks, switches);
+    - BMI, the checklists, the Garbh journal's rituals, pins and japa.
+  - **TTC:** fertility help, PCOS check, self-checks (one item per whole form), vaccines, the Garbh course, reads,
+    home prefs, content prefs, hidden symptom categories, tool recents, learn recents, messages, ready habits (re-arms
+    its reminders after a merge).
+  - `TtcLearnRecents` and `TtcReadyHabitsStore` now reset on sign-out through the mixin.
+- [x] **Sign-out sheet:** when Skilling holds records, one extra line says they are kept only on this phone and
+  removed for good. `kPvSkillingKeys` is pinned to the Skilling stores' own keys by a test.
+
+### The old whole-blob stores, now per item (the non-shopping half of step 10)
+- [x] **Converted** (same `cloudKey`; the items live at `<key>:items` and the old blob is kept for revert):
+  - **Pregnancy and shared:** hospital bag v1 and v2, nutrition day, journey dates, reads done and next, read-to-baby
+    and its saved pieces, spiritual prefs, ready-for-birth context, Garbh, book companion, Can-I recents and
+    decisions, community, followed experts, the family profile, TTC precheck, readings, scan reports;
+  - **Parenting:** daily tip, food, grow, journeys, names (crowned), reco, watch (5 s debounce; positions as ints),
+    yoga.
+- [x] **Not converted:**
+  - `can_i_store` and `video_store` are facades over `SavedStore` and already sync as rows;
+  - the shopping stores (cart, orders, bought, product checklists, saved products, Brand Studio, booking) go to the
+    marketplace build;
+  - `pp_development_data` and `pp_reading_data` were being edited by another terminal. **Still whole-blob, owed.**
+
+**Verified (2026-10-22):**
+- Scoped `flutter analyze` over every step-13 file: no new issues. Three already there: an unused import in
+  `ttc_tools_screen`, two curly-brace infos in `pp_yoga_data`.
+- Tests:
+  - `test/cloud_merged_store_test.dart`: 17 cases. Two phones, removals, the same answer, offline across a restart,
+    `t = 0` seeding, the old blob (including stores with seeds and a waiting old change), the 80-day drop, the
+    reset that must not send removals, jsonb key order, and the SQL rule;
+  - the helpers' runs over every test naming a converted store: 267 + 769 + 217 + about 200 passed;
+  - **the full suite was NOT completed**: the run was stopped by the system for low memory (2026-10-22). Run `flutter test` when the machine is free.
+
+**Known limits, named:**
+- A list that grows without bound in one blob (readings) is returned whole by every merge. Past a few hundred items it
+  belongs in rows.
+- Counters (tool usage, the read-to-baby offset) are last-writer-wins, so two phones counting at once can lose a step.
+- Watch collection ids come from a per-phone counter, so two phones creating a collection at once could merge them.
+- A shown time on a care card goes up only with the next change that notifies.
+
+**User runs (OWED):** 0110 in the Supabase SQL editor, then its checks: the function, 2 triggers, the new column.
+
+**Owed (device, on the user's word):**
+- Fill in the birth plan, a memory with a photo, a BMI reading and some TTC answers; sign out and back in; everything
+  returns.
+- Two phones tick different hospital-bag items; both stay.
+- With Skilling data present, the sign-out sheet names it.
+
+**Decisions owed:**
+- whether Skilling syncs before launch;
+- whether "pregnancy ended" on her profile should be visible to her linked partner (0009 lets him read her profile).
+
+**Files:** `lib/services/remote/cloud_merged_store.dart` (new), `supabase/migrations/0110_state_merge_and_records.sql`
+(new), `test/cloud_merged_store_test.dart` (new), `supabase_repo.dart` (`mergeState`), `sync_registry.dart`
+(`resetting`), about 65 store files, `pv_account_actions.dart`, and the tests updated for the new shape. The exact
+list is in the commit.

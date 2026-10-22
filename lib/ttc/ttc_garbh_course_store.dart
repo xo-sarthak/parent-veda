@@ -30,17 +30,28 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 /// The optional couple part session 8 offers. Null is a real answer — the brief
 /// says *"or neither"* and means it.
 enum TtcCoupleDaily { gratitude, conversation }
 
-class TtcGarbhCourseStore extends ChangeNotifier {
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone lost which sessions she opened and the practice
+// session 8 built. Items: `opened|<session id>` -> true (union-shaped, as the
+// header wanted), and the positional practice row as one item per slot:
+// `move`, `breathe`, `bed`, `wake`, `couple` (strings, absent when empty) and
+// `meals` (the list of times, absent when empty).
+class TtcGarbhCourseStore extends ChangeNotifier with CloudMergedStore {
   TtcGarbhCourseStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
     _load();
   }
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcGarbhCourseStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //     _load();
+  //   }
   static final TtcGarbhCourseStore instance = TtcGarbhCourseStore._();
 
   static const _openedKey = 'ttc_garbh_opened';
@@ -144,7 +155,60 @@ class TtcGarbhCourseStore extends ChangeNotifier {
   // are wiped, the singleton was not.
   // Loaded once, in the constructor, so `_loaded` stays true: prefs are
   // empty now, and empty fields are what a reload would find.
-  void _resetForAccount() => resetForTest();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() => resetForTest();
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_garbh_course';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _opened) 'opened|$id': true,
+        if (_moveId != null) 'move': _moveId,
+        if (_breatheId != null) 'breathe': _breatheId,
+        if (_bedtime != null) 'bed': _bedtime,
+        if (_wakeTime != null) 'wake': _wakeTime,
+        if (_couple != null) 'couple': _couple!.name,
+        if (_meals.isNotEmpty) 'meals': List<String>.of(_meals),
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    String? str(String k) {
+      final v = items[k];
+      return v is String && v.isNotEmpty ? v : null;
+    }
+
+    _opened
+      ..clear()
+      ..addAll([
+        for (final k in items.keys)
+          if (k.startsWith('opened|')) k.substring(7),
+      ]);
+    _moveId = str('move');
+    _breatheId = str('breathe');
+    _bedtime = str('bed');
+    _wakeTime = str('wake');
+    _couple = switch (str('couple')) {
+      'gratitude' => TtcCoupleDaily.gratitude,
+      'conversation' => TtcCoupleDaily.conversation,
+      _ => null,
+    };
+    final meals = items['meals'];
+    _meals
+      ..clear()
+      ..addAll(meals is List
+          ? [for (final t in meals) '$t'].where((t) => t.isNotEmpty)
+          : const <String>[]);
+    // The same rule `_load` reads the prefs row with.
+    _practiceSet = _moveId != null || _breatheId != null || _couple != null;
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   @visibleForTesting
   void resetForTest() {
@@ -192,6 +256,7 @@ class TtcGarbhCourseStore extends ChangeNotifier {
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
+    await syncMergedFromCloud();
   }
 
   Future<void> _persist() async {

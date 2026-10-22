@@ -141,7 +141,8 @@ void main() {
 
   test('a saved or cooked old dish carries over to the new one', () {
     final store = FoodStore.instance;
-    store.applyCloudData({
+    // Was applyCloudData before step 13 (2026-10-22); the same body.
+    store.applyLegacyBlob({
       'saved': ['tomatocarrotsoup', 'pp_7_8m_tomato_carrot_soup', 'ragipancake'],
       'cooked': ['idli_fingers'],
       'shopping': <String, bool>{},

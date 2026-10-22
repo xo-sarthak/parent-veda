@@ -38,7 +38,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/diet_chart_facets.dart' show ChartRegion;
 import '../data/nutrition/nutrition_plate.dart' show plateDateKey;
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 /// One day.
 class NutritionDay {
@@ -91,7 +92,13 @@ class ShoppingItem {
   String get key => '$recipeId|$name';
 }
 
-class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
+// Per-item since step 13 (2026-10-22, sync log). It synced as one whole blob,
+// so a glass tapped on one phone and a tick on the other erased each other.
+// Items: `water|<date>` (glasses), `tick|<date>|<need>`, `swap|<date>|<slot>`
+// (the meal), `skip|<date>|<slot>`, `craving|<ISO time>` (the kind),
+// `shop|<recipeId>|<name>` ({d: bought, o: order}), and `region`, `reminder`,
+// `chart` (each only when set, so an unused store has no items).
+class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
   NutritionDayStore._();
   static final NutritionDayStore instance = NutritionDayStore._();
 
@@ -128,11 +135,12 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
     final raw = _prefs?.getString(_key);
     if (raw != null) {
       try {
-        applyCloudData(jsonDecode(raw));
+        _fromBlob(jsonDecode(raw));
       } catch (_) {/* a bad cache is an empty one */}
     }
     notifyListeners();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   // ---- water ------------------------------------------------------------------
@@ -219,7 +227,9 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
   void addToList(String recipeId, Iterable<String> names) {
     for (final n in names) {
       if (!_shopping.any((s) => s.recipeId == recipeId && s.name == n)) {
-        _shopping.add(ShoppingItem(recipeId: recipeId, name: n));
+        final item = ShoppingItem(recipeId: recipeId, name: n);
+        _shopping.add(item);
+        _shopOrder[item.key] = _nextOrder();
       }
     }
     _save();
@@ -238,7 +248,9 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
   void toggleItem(String recipeId, String name) {
     final i = _shopping.indexWhere((s) => s.recipeId == recipeId && s.name == name);
     if (i == -1) {
-      _shopping.add(ShoppingItem(recipeId: recipeId, name: name));
+      final item = ShoppingItem(recipeId: recipeId, name: name);
+      _shopping.add(item);
+      _shopOrder[item.key] = _nextOrder();
     } else {
       _shopping.removeAt(i);
     }
@@ -294,23 +306,149 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   String get cloudKey => 'nutrition_day';
-
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <String, Object?>{};
+  String? get legacyBlobKey => cloudKey;
 
-  @override
-  Object cloudData() => {
+  // Kept for revert (step 13): applyCloudItems({}) is the empty state now,
+  // and the blob shape lives on as the local cache (_blob / _fromBlob).
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'days': {for (final e in _days.entries) e.key: e.value.toJson()},
+  //         'cravings': [for (final c in _cravings) {'at': c.at.toIso8601String(), 'kind': c.kind}],
+  //         'shopping': [for (final s in _shopping) {'r': s.recipeId, 'n': s.name, 'd': s.done}],
+  //         'region': _region?.name,
+  //         'reminder': _reminder,
+  //         'chart': _pinnedChartId,
+  //       };
+
+  /// Where each shopping line sits in the list, so the order survives a
+  /// merge (the server hands items back in no particular order). Set once,
+  /// when the line is added; a removal never renumbers the others.
+  final Map<String, int> _shopOrder = {};
+  int _lastOrder = 0;
+
+  int _nextOrder() {
+    final now = DateTime.now().microsecondsSinceEpoch;
+    _lastOrder = now > _lastOrder ? now : _lastOrder + 1;
+    return _lastOrder;
+  }
+
+  int _orderOf(ShoppingItem s) => _shopOrder[s.key] ?? 0;
+
+  /// The local cache: the old blob shape, plus each shopping line's order.
+  Map<String, Object?> _blob() => {
         'days': {for (final e in _days.entries) e.key: e.value.toJson()},
         'cravings': [for (final c in _cravings) {'at': c.at.toIso8601String(), 'kind': c.kind}],
-        'shopping': [for (final s in _shopping) {'r': s.recipeId, 'n': s.name, 'd': s.done}],
+        'shopping': [for (final s in _shopping) {'r': s.recipeId, 'n': s.name, 'd': s.done, 'o': _orderOf(s)}],
         'region': _region?.name,
         'reminder': _reminder,
         'chart': _pinnedChartId,
       };
 
   @override
-  void applyCloudData(Object data) {
+  void applyLegacyBlob(Object blob) => _fromBlob(blob);
+
+  @override
+  Map<String, Object?> cloudItems() {
+    final out = <String, Object?>{};
+    for (final e in _days.entries) {
+      final d = e.key;
+      final day = e.value;
+      if (day.water != 0) out['water|$d'] = day.water;
+      for (final n in day.ticks) {
+        out['tick|$d|$n'] = true;
+      }
+      for (final s in day.swaps.entries) {
+        out['swap|$d|${s.key}'] = s.value;
+      }
+      for (final k in day.skipped) {
+        out['skip|$d|$k'] = true;
+      }
+    }
+    for (final c in _cravings) {
+      out['craving|${c.at.toIso8601String()}'] = c.kind;
+    }
+    for (final s in _shopping) {
+      out['shop|${s.recipeId}|${s.name}'] = {'d': s.done, 'o': _orderOf(s)};
+    }
+    if (_region != null) out['region'] = _region!.name;
+    if (_reminder) out['reminder'] = true;
+    if (_pinnedChartId != null) out['chart'] = _pinnedChartId;
+    return out;
+  }
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _days.clear();
+    _cravings.clear();
+    _shopping.clear();
+    _shopOrder.clear();
+    _region = null;
+    _reminder = false;
+    _pinnedChartId = null;
+    final shop = <({ShoppingItem item, int order})>[];
+    for (final e in items.entries) {
+      final k = e.key;
+      final v = e.value;
+      final bar = k.indexOf('|');
+      final kind = bar < 0 ? k : k.substring(0, bar);
+      final rest = bar < 0 ? '' : k.substring(bar + 1);
+      // `<date>|<id>` for the per-day items; the date never holds a bar.
+      final bar2 = rest.indexOf('|');
+      final date = bar2 < 0 ? rest : rest.substring(0, bar2);
+      final id = bar2 < 0 ? '' : rest.substring(bar2 + 1);
+      switch (kind) {
+        case 'water':
+          if (v is num && date.isNotEmpty) {
+            _days.putIfAbsent(date, NutritionDay.new).water = v.toInt().clamp(0, kGlasses);
+          }
+        case 'tick':
+          if (id.isNotEmpty) _days.putIfAbsent(date, NutritionDay.new).ticks.add(id);
+        case 'swap':
+          if (id.isNotEmpty && v is String) _days.putIfAbsent(date, NutritionDay.new).swaps[id] = v;
+        case 'skip':
+          if (id.isNotEmpty) _days.putIfAbsent(date, NutritionDay.new).skipped.add(id);
+        case 'craving':
+          final at = DateTime.tryParse(rest);
+          if (at != null && v is String) _cravings.add(CravingLog(at: at, kind: v));
+        case 'shop':
+          // `shop|<recipeId>|<name>`: the recipe id never holds a bar, the
+          // name may.
+          if (date.isEmpty || id.isEmpty) break;
+          final m = v is Map ? v : const {};
+          final o = m['o'];
+          shop.add((
+            item: ShoppingItem(recipeId: date, name: id, done: m['d'] == true),
+            order: o is num ? o.toInt() : 0,
+          ));
+        case 'region':
+          _region = v is String ? ChartRegion.values.where((x) => x.name == v).firstOrNull : null;
+        case 'reminder':
+          _reminder = v == true;
+        case 'chart':
+          _pinnedChartId = v is String && v.isNotEmpty ? v : null;
+      }
+    }
+    // Newest craving first, at most a hundred, as logCraving keeps them.
+    _cravings.sort((a, b) => b.at.compareTo(a.at));
+    if (_cravings.length > 100) _cravings.removeRange(100, _cravings.length);
+    shop.sort((a, b) {
+      final c = a.order.compareTo(b.order);
+      return c != 0 ? c : a.item.key.compareTo(b.item.key);
+    });
+    for (final s in shop) {
+      _shopping.add(s.item);
+      _shopOrder[s.item.key] = s.order;
+      if (s.order > _lastOrder) _lastOrder = s.order;
+    }
+    _loaded = true;
+  }
+
+  void _fromBlob(Object? data) {
     if (data is! Map) return;
     _days.clear();
     final days = data['days'];
@@ -330,12 +468,22 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
       }
     }
     _shopping.clear();
+    _shopOrder.clear();
     final sh = data['shopping'];
     if (sh is List) {
+      var i = 0;
       for (final s in sh) {
         if (s is Map && s['r'] is String && s['n'] is String) {
-          _shopping.add(ShoppingItem(recipeId: s['r'] as String, name: s['n'] as String, done: s['d'] == true));
+          final item = ShoppingItem(recipeId: s['r'] as String, name: s['n'] as String, done: s['d'] == true);
+          _shopping.add(item);
+          // A blob from before step 13 has no order: its position stands in,
+          // which sorts it before anything added since.
+          final o = s['o'];
+          final order = o is num ? o.toInt() : i;
+          _shopOrder[item.key] = order;
+          if (order > _lastOrder) _lastOrder = order;
         }
+        i++;
       }
     }
     final r = data['region'];
@@ -348,7 +496,7 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
   @override
   Future<void> persistLocalCache() async {
     final p = _prefs ??= await SharedPreferences.getInstance();
-    await p.setString(_key, jsonEncode(cloudData()));
+    await p.setString(_key, jsonEncode(_blob()));
   }
 
   @visibleForTesting
@@ -356,6 +504,7 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
     _days.clear();
     _cravings.clear();
     _shopping.clear();
+    _shopOrder.clear();
     _region = null;
     _reminder = false;
     _pinnedChartId = null;

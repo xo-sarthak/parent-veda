@@ -36,12 +36,20 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/birth_plan_data.dart';
-import 'remote/sync_registry.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
-class BirthPlanStore extends ChangeNotifier {
-  BirthPlanStore._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so a
+// sign-out or a new phone lost her whole plan; the "not synced" note above is
+// kept as history. Items: `c|<question>|<choice>` (true) per chosen choice,
+// `t|<question>` (the text) per filled text field, `d|<section>` (true) per
+// discussed section, and `updated` (epoch ms).
+class BirthPlanStore extends ChangeNotifier with CloudMergedStore {
+  BirthPlanStore._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   BirthPlanStore._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final BirthPlanStore instance = BirthPlanStore._();
 
   /// ⚠️ VERSIONED IN THE KEY. If the shape ever changes incompatibly, a new
@@ -103,6 +111,7 @@ class BirthPlanStore extends ChangeNotifier {
     }
     _loaded = true;
     notifyListeners();
+    await syncMergedFromCloud();
   }
 
   // ---- writes ---------------------------------------------------------------
@@ -244,17 +253,70 @@ class BirthPlanStore extends ChangeNotifier {
     }
   }
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  // clear() also writes prefs, so this one touches memory only.
-  void _resetForAccount() {
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   // clear() also writes prefs, so this one touches memory only.
+  //   void _resetForAccount() {
+  //     _choices.clear();
+  //     _texts.clear();
+  //     _discussed.clear();
+  //     _updatedAt = null;
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'birth_plan';
+
+  /// Text fields notify on every edit; gather a burst into one merge.
+  @override
+  Duration get cloudPushDebounce => const Duration(seconds: 2);
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _choices.entries)
+          for (final c in e.value) 'c|${e.key}|$c': true,
+        for (final e in _texts.entries)
+          if (e.value.trim().isNotEmpty) 't|${e.key}': e.value,
+        for (final id in _discussed) 'd|$id': true,
+        if (_updatedAt != null) 'updated': _updatedAt!.millisecondsSinceEpoch,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
     _choices.clear();
     _texts.clear();
     _discussed.clear();
     _updatedAt = null;
-    _loaded = false;
-    notifyListeners();
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k == 'updated') {
+        final v = e.value;
+        if (v is num) {
+          _updatedAt = DateTime.fromMillisecondsSinceEpoch(v.toInt());
+        }
+      } else if (k.startsWith('c|')) {
+        final rest = k.substring(2);
+        final bar = rest.indexOf('|');
+        if (bar <= 0) continue;
+        _choices
+            .putIfAbsent(rest.substring(0, bar), () => <String>{})
+            .add(rest.substring(bar + 1));
+      } else if (k.startsWith('t|')) {
+        final v = e.value;
+        if (v is String) _texts[k.substring(2)] = v;
+      } else if (k.startsWith('d|')) {
+        _discussed.add(k.substring(2));
+      }
+    }
+    _loaded = true;
   }
+
+  @override
+  Future<void> persistLocalCache() => _save();
 
   /// Test seam: load from a map without prefs.
   @visibleForTesting

@@ -10,7 +10,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import 'saved_store.dart';
 
 class SavedRtbPiece {
@@ -70,7 +71,12 @@ class SavedRtbPiece {
 // so the text is kept locally (and in this store's blob) so the Saved screen
 // can open it. A fresh device with the row but no cached body shows the title
 // and tag and opens Samvad — never a blank row.
-class ReadToBabySavedStore extends ChangeNotifier with CloudSyncedStore {
+//
+// Per-item since step 13 (2026-10-22, sync log). The body cache synced as one
+// whole blob, so a piece saved on one phone could be erased by the other
+// phone's older list. One item per piece key, value = the piece's JSON
+// (key, title, body, tag, saved-at); order on apply is by saved-at.
+class ReadToBabySavedStore extends ChangeNotifier with CloudMergedStore {
   ReadToBabySavedStore._() {
     SavedStore.instance.addListener(notifyListeners);
   }
@@ -94,23 +100,47 @@ class ReadToBabySavedStore extends ChangeNotifier with CloudSyncedStore {
     _loaded = true;
     notifyListeners();
     await SavedStore.instance.load();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   // --- cloud sync ------------------------------------------------------------
   @override
   String get cloudKey => 'rtb_saved';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <Object>[];
+  String? get legacyBlobKey => cloudKey;
+
+  // Kept for revert (step 13): applyCloudItems({}) is the empty state now.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <Object>[];
+  //
+  //   @override
+  //   Object cloudData() => _items.map((e) => e.toJson()).toList();
 
   @override
-  Object cloudData() => _items.map((e) => e.toJson()).toList();
-  @override
-  void applyCloudData(Object data) => _items
+  void applyLegacyBlob(Object blob) => _items
     ..clear()
-    ..addAll((data as List)
+    ..addAll((blob as List)
         .map((e) => SavedRtbPiece.fromJson(Map<String, dynamic>.from(e))));
+
+  @override
+  Map<String, Object?> cloudItems() =>
+      {for (final p in _items) p.key: p.toJson()};
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _items.clear();
+    for (final e in items.entries) {
+      final v = e.value;
+      if (v is! Map) continue;
+      final p = SavedRtbPiece.fromJson(Map<String, dynamic>.from(v));
+      _items.add(SavedRtbPiece(
+          key: e.key, title: p.title, body: p.body, tag: p.tag, savedAt: p.savedAt));
+    }
+    _items.sort((a, b) => a.savedAt.compareTo(b.savedAt));
+    _loaded = true;
+  }
   @override
   Future<void> persistLocalCache() => _persist();
 

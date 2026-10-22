@@ -146,13 +146,14 @@ void main() {
       final s = GarbhStore.instance;
       await s.init();
       s.markDone('samvad');
-      final blob = s.cloudData() as Map;
-      expect(blob['done'], contains('samvad'));
-      expect(blob['doneDate'], isNotEmpty);
+      // Step 13: per-item (CloudMergedStore). Was cloudData()/applyCloudData.
+      final items = s.cloudItems();
+      expect(items, contains('done|samvad'));
+      expect(items['done|samvad'], isNotEmpty); // the day it was ticked
 
       s.undoDone('samvad');
       expect(s.isDone('samvad'), isFalse);
-      s.applyCloudData(blob);
+      s.applyCloudItems(items);
       expect(s.isDone('samvad'), isTrue);
       s.undoDone('samvad');
     });

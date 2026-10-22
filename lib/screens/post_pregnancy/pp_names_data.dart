@@ -15,7 +15,8 @@ import 'pp_names_catalogue.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
 import '../../services/remote/sync_row_book.dart';
@@ -678,7 +679,11 @@ NumProfile numProfile(int n) => kNumerology[((n - 1) % 9) + 1] ?? kNumerology[1]
 //  with the mock's "you both love" set so the matches screen always reads right;
 //  liking a name in the swipe deck adds to it, and tapping a name in the list
 //  crowns it. In-memory only - no persistence wired yet.
-class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
+//
+//  In the cloud since step 13 (2026-10-22, sync log) as per-item merge, for
+//  the crown only (votes keep their own table). It synced as one whole blob
+//  before. One item: `crowned` -> the name, absent while nothing is crowned.
+class NameMatchStore extends ChangeNotifier with CloudMergedStore {
   NameMatchStore._();
   static final NameMatchStore instance = NameMatchStore._();
 
@@ -720,15 +725,33 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
   // pp_name_votes, one row per parent per name, because the partner's side has
   // to be able to count them. Keeping a second copy here would let the two
   // drift, and a match computed from stale likes is worse than no match.
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'crowned': ''};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'crowned': ''};
+  //
+  //   @override
+  //   Object cloudData() => {'crowned': _crowned};
+
+  /// The local prefs blob (the shape the cloud blob had before step 13).
+  Map<String, Object?> _blob() => {'crowned': _crowned};
 
   @override
-  Object cloudData() => {'crowned': _crowned};
+  String? get legacyBlobKey => cloudKey;
 
   @override
-  void applyCloudData(Object data) {
+  Map<String, Object?> cloudItems() =>
+      {if (_crowned.isNotEmpty) 'crowned': _crowned};
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _crowned = (items['crowned'] ?? '').toString();
+  }
+
+  /// Was applyCloudData before step 13; the same body. Also reads the local
+  /// prefs cache, which keeps the old blob shape.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     _crowned = (data['crowned'] ?? _crowned).toString();
     // Back-compat: a blob written before votes existed still carries 'liked'.
@@ -743,7 +766,7 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {}
   }
 
@@ -773,12 +796,13 @@ class NameMatchStore extends ChangeNotifier with CloudSyncedStore {
         }
       }
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {/* keep the starter state */}
     SyncRegistry.registerPending(() => hasPending);
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
     try {
       await _syncVotes();

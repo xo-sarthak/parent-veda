@@ -16,12 +16,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/remote/sync_registry.dart';
+import '../services/remote/cloud_merged_store.dart';
+// import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
-class TtcContentPrefs extends ChangeNotifier {
-  TtcContentPrefs._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone showed the intimacy content she had hidden, and
+// offered the switch a second time. Items: `hide_intimate` and
+// `intimate_offered`, one bool each.
+class TtcContentPrefs extends ChangeNotifier with CloudMergedStore {
+  TtcContentPrefs._();
+  // Kept for revert (step 13): the reset now comes from the mixin.
+  //   TtcContentPrefs._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final TtcContentPrefs instance = TtcContentPrefs._();
 
   static const String _kHideIntimate = 'ttc_hide_intimate';
@@ -62,6 +69,34 @@ class TtcContentPrefs extends ChangeNotifier {
     } catch (_) {/* keep the default */}
     _loaded = true;
     notifyListeners();
+    await syncMergedFromCloud();
+  }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_content_prefs';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        'hide_intimate': _hideIntimate,
+        'intimate_offered': _intimateOffered,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _hideIntimate = items['hide_intimate'] == true;
+    _intimateOffered = items['intimate_offered'] == true;
+    _loaded = true;
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setBool(_kHideIntimate, _hideIntimate);
+      await p.setBool(_kIntimateOffered, _intimateOffered);
+    } catch (_) {/* best effort */}
   }
 
   Future<void> setHideIntimate(bool v) async {
@@ -76,10 +111,11 @@ class TtcContentPrefs extends ChangeNotifier {
 
   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
   // are wiped, the singleton was not.
-  void _resetForAccount() {
-    resetForTest();
-    notifyListeners();
-  }
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   void _resetForAccount() {
+  //     resetForTest();
+  //     notifyListeners();
+  //   }
 
   @visibleForTesting
   void resetForTest() {

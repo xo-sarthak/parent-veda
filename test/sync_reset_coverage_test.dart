@@ -80,13 +80,7 @@ void main() {
     'lib/screens/v2/v2_block_art.dart':
         'device: door marks drawn as vectors or images',
     // Another terminal, or the main session, is editing these.
-    'lib/screens/ttc/ttc_learn_screen.dart':
-        'deferred: another terminal is editing it; reset owed, '
-            'STILL-OPEN-BACKEND §4',
     'lib/screens/ttc/ttc_strings.dart':
-        'deferred: another terminal is editing it; reset owed, '
-            'STILL-OPEN-BACKEND §4',
-    'lib/ttc/ttc_ready_habits_store.dart':
         'deferred: another terminal is editing it; reset owed, '
             'STILL-OPEN-BACKEND §4',
     'lib/widgets/global_ask_fab.dart':
@@ -116,6 +110,7 @@ void main() {
       'SyncRegistry.registerReset(',
       'with TtcSyncedStore',
       'CloudSyncedStore',
+      'CloudMergedStore',
       'OwnRowLedger(',
       'ChildLogLedger(',
       'SyncRowBook',
@@ -173,6 +168,23 @@ void main() {
     expect(kPvSignOutBody, contains('removes your data from this phone'));
     expect(kPvSignOutBody, contains('stays saved in your account'));
     expect(kPvSignOutPending, contains("haven't reached your account"));
+    // Skilling stays on the phone by decision (step 13), so the sheet says so.
+    expect(kPvSignOutSkilling, contains('kept only on this phone'));
+  });
+
+  test("the Skilling keys the sheet checks are the stores' own", () {
+    const files = {
+      'sk_journal': 'lib/screens/skilling/sk_journal.dart',
+      'sk_portfolio': 'lib/screens/skilling/sk_portfolio.dart',
+      'sk_voice': 'lib/screens/skilling/sk_voice_keepsake.dart',
+      'sk_practice': 'lib/screens/skilling/sk_practice_store.dart',
+    };
+    expect(kPvSkillingKeys.toSet(), files.keys.toSet());
+    for (final e in files.entries) {
+      expect(_read(e.value), contains("_key = '${e.key}'"),
+          reason: '${e.value} no longer keeps its records under ${e.key}, so '
+              'the sign-out sheet would stop warning about them');
+    }
   });
 
   group('the registry', () {

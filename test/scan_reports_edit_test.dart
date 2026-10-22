@@ -517,11 +517,12 @@ void _durability() {
           dateIso: '2026-08-01T10:00:00.000',
           reportDateIso: '2026-07-30T00:00:00.000',
           note: 'Recheck in 4 weeks'));
-      final blob = store.cloudData();
+      // Per-item since step 13: one item per report.
+      final blob = store.cloudItems();
 
       store.resetForTest();
       expect(store.reports, isEmpty);
-      store.applyCloudData(blob);
+      store.applyCloudItems(blob);
 
       expect(store.reports.length, 1);
       final r = store.reports.single;
@@ -543,7 +544,7 @@ void _durability() {
         dateIso: '2026-08-01T10:00:00.000',
         files: [ReportFile(path: 'uid/report/img.jpg', name: 'img.jpg')],
       ));
-      final blob = store.cloudData() as List;
+      final blob = store.cloudItems().values.toList();
       final files = (blob.single as Map)['files'] as List;
       expect((files.single as Map)['path'], 'uid/report/img.jpg');
       // A photographed report inside a JSON blob would be enormous and the

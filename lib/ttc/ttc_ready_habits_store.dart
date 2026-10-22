@@ -28,6 +28,7 @@
 // ⚠️ NO STREAKS. A skipped day is stored only so the row can say "Skipped
 // today" until midnight. Nothing counts misses and nothing nags about them.
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -36,6 +37,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/reminder.dart';
 import '../services/notification_service.dart';
 import '../services/life_stage_store.dart';
+import '../services/remote/cloud_merged_store.dart';
 import 'ttc_ready_plan.dart';
 import 'ttc_ready_plan_store.dart';
 
@@ -51,7 +53,14 @@ bool readyPlanEnded(ReadyPlanAnswers? a, LifeStage? stage, DateTime now) {
       0;
 }
 
-class TtcReadyHabitsStore extends ChangeNotifier {
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so
+// a sign-out or a new phone lost her times, reminders and "smaller" choices,
+// and a sign-out did not forget them at all (there was no reset). Items:
+// `min|<habit>` -> her time (minutes), `remind|<habit>`, `smaller|<habit>` ->
+// true, `skip|<habit>` -> the day skipped, `weekly` -> bool, `retired` -> the
+// plan already stopped. After a merge the reminders are re-armed through
+// [rearmAfterStartup], and any the other phone turned off are cancelled.
+class TtcReadyHabitsStore extends ChangeNotifier with CloudMergedStore {
   TtcReadyHabitsStore._();
   static final TtcReadyHabitsStore instance = TtcReadyHabitsStore._();
 
@@ -82,6 +91,11 @@ class TtcReadyHabitsStore extends ChangeNotifier {
   Future<void> load() async {
     if (_loaded) return;
     _loaded = true;
+    await _loadPrefs();
+    await syncMergedFromCloud();
+  }
+
+  Future<void> _loadPrefs() async {
     try {
       final p = await SharedPreferences.getInstance();
       final raw = p.getString(_key);
@@ -112,6 +126,81 @@ class TtcReadyHabitsStore extends ChangeNotifier {
       /* local-first: a bad cache is an empty one */
     }
   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+
+  @override
+  String get cloudKey => 'ttc_ready_habits';
+
+  @override
+  Map<String, Object?> cloudItems() => {
+    for (final e in _minutes.entries) 'min|${e.key}': e.value,
+    for (final id in _remind) 'remind|$id': true,
+    for (final id in _smaller) 'smaller|$id': true,
+    for (final e in _skipped.entries) 'skip|${e.key}': e.value,
+    'weekly': _weekly,
+    if (_retiredFor != null) 'retired': _retiredFor,
+  };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final wasRemind = Set<String>.of(_remind);
+    final wasWeekly = _weekly;
+    _minutes.clear();
+    _remind.clear();
+    _smaller.clear();
+    _skipped.clear();
+    for (final e in items.entries) {
+      final k = e.key;
+      final v = e.value;
+      if (k.startsWith('min|') && v is num) {
+        _minutes[k.substring(4)] = v.toInt();
+      } else if (k.startsWith('remind|')) {
+        _remind.add(k.substring(7));
+      } else if (k.startsWith('smaller|')) {
+        _smaller.add(k.substring(8));
+      } else if (k.startsWith('skip|') && v is String) {
+        _skipped[k.substring(5)] = v;
+      }
+    }
+    _weekly = items['weekly'] == true;
+    final retired = items['retired'];
+    _retiredFor = retired is String ? retired : null;
+    _loaded = true;
+    // Alarms are restartable side effects: re-armed after the merge, never
+    // awaited inside it.
+    unawaited(_rearmAfterCloud(
+      wasRemind.difference(_remind),
+      wasWeekly && !_weekly,
+      rearm: items.isNotEmpty,
+    ));
+  }
+
+  /// Cancels the reminders the merge turned off, then (unless this was a
+  /// sign-out) sets again every one still on, at the times now held.
+  Future<void> _rearmAfterCloud(
+    Set<String> off,
+    bool weeklyOff, {
+    required bool rearm,
+  }) async {
+    try {
+      if (off.isNotEmpty) {
+        final a = TtcReadyPlanStore.instance.answers;
+        for (final h in a == null ? const <ReadyHabit>[] : readyHabitsFor(a)) {
+          if (off.contains(h.id)) {
+            await NotificationService.instance.cancelReminder(reminderFor(h));
+          }
+        }
+      }
+      if (weeklyOff) {
+        await NotificationService.instance.cancelReminder(weeklyReminder);
+      }
+      if (rearm) await rearmAfterStartup();
+    } catch (_) {/* a reminder that cannot be set is never a crash */}
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   Future<void> _persist() async {
     try {

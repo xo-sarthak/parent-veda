@@ -12,10 +12,15 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/read_next_data.dart';
-import 'remote/cloud_synced_store.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import 'saved_store.dart';
 
-class ReadNextStore extends ChangeNotifier with CloudSyncedStore {
+// Per-item since step 13 (2026-10-22, sync log). It synced as one whole blob,
+// so a read marked on one phone could be erased by the other phone's older
+// map. One item per read id, value = its status ('reading' | 'completed');
+// clearing a status removes the item. Bookmarks are SavedStore's, not here.
+class ReadNextStore extends ChangeNotifier with CloudMergedStore {
   static final ReadNextStore instance = ReadNextStore._();
 
   static const _key = 'readnext_state'; // status: id → 'reading' | 'completed'
@@ -58,7 +63,8 @@ class ReadNextStore extends ChangeNotifier with CloudSyncedStore {
     }
     notifyListeners();
     await SavedStore.instance.load();
-    await syncStateFromCloud();
+    // await syncStateFromCloud(); // kept for revert (step 13)
+    await syncMergedFromCloud();
   }
 
   static String _titleOf(String id) {
@@ -109,15 +115,31 @@ class ReadNextStore extends ChangeNotifier with CloudSyncedStore {
   // --- cloud sync ------------------------------------------------------------
   @override
   String get cloudKey => 'readnext';
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
   @override
-  Object get cloudEmptyData => const <String, Object?>{};
+  String? get legacyBlobKey => cloudKey;
+
+  // Kept for revert (step 13): applyCloudItems({}) is the empty state now.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{};
+  //
+  //   @override
+  //   Object cloudData() => {'status': _status};
 
   @override
-  Object cloudData() => {'status': _status};
+  Map<String, Object?> cloudItems() => Map<String, Object?>.of(_status);
+
   @override
-  void applyCloudData(Object data) {
-    final m = data as Map;
+  void applyCloudItems(Map<String, Object?> items) {
+    _status.clear();
+    items.forEach((k, v) {
+      if (v != null) _status[k] = v.toString();
+    });
+  }
+
+  @override
+  void applyLegacyBlob(Object blob) {
+    final m = blob as Map;
     _status.clear();
     ((m['status'] as Map?) ?? const {})
         .forEach((k, v) => _status[k.toString()] = v.toString());

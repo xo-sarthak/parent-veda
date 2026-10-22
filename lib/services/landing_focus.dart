@@ -36,7 +36,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'life_stage_store.dart';
-import 'remote/sync_registry.dart';
+import 'remote/cloud_merged_store.dart';
+// import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 /// WHERE THE PARENTING SPLIT FALLS, as one line to tune.
 ///
@@ -116,10 +117,15 @@ extension TodayFocusCopy on TodayFocus {
   }
 }
 
-class LandingFocus extends ChangeNotifier {
-  LandingFocus._() {
-    SyncRegistry.registerReset(_resetForAccount);
-  }
+// ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so a
+// sign-out or a new phone asked "what are you here for?" all over again. One
+// item: `focus` (the TodayFocus id); no choice is no item.
+class LandingFocus extends ChangeNotifier with CloudMergedStore {
+  LandingFocus._();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   LandingFocus._() {
+  //     SyncRegistry.registerReset(_resetForAccount);
+  //   }
   static final LandingFocus instance = LandingFocus._();
 
   static const _key = 'pv_landing_focus';
@@ -127,12 +133,43 @@ class LandingFocus extends ChangeNotifier {
   TodayFocus? _override;
   bool _loaded = false;
 
-  // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
-  // are wiped, the singleton was not.
-  void _resetForAccount() {
-    _override = null;
-    _loaded = false;
-    notifyListeners();
+  // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
+  //   // Sign-out forgets her in memory too (sync log step 12, 2026-10-21): prefs
+  //   // are wiped, the singleton was not.
+  //   void _resetForAccount() {
+  //     _override = null;
+  //     _loaded = false;
+  //     notifyListeners();
+  //   }
+
+  // ---- the cloud (step 13) --------------------------------------------------
+  // No @override on these four: the getter `override` above shadows the
+  // annotation inside this class.
+
+  // ignore: annotate_overrides
+  String get cloudKey => 'landing_focus';
+
+  // ignore: annotate_overrides
+  Map<String, Object?> cloudItems() =>
+      {if (_override != null) 'focus': _override!.id};
+
+  // ignore: annotate_overrides
+  void applyCloudItems(Map<String, Object?> items) {
+    final v = items['focus'];
+    _override = TodayFocusCopy.fromId(v is String ? v : null);
+    _loaded = true;
+  }
+
+  // ignore: annotate_overrides
+  Future<void> persistLocalCache() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      if (_override == null) {
+        await p.remove(_key);
+      } else {
+        await p.setString(_key, _override!.id);
+      }
+    } catch (_) {}
   }
 
   bool get isLoaded => _loaded;
@@ -150,6 +187,7 @@ class LandingFocus extends ChangeNotifier {
     _override = TodayFocusCopy.fromId(p.getString(_key));
     _loaded = true;
     notifyListeners();
+    await syncMergedFromCloud();
   }
 
   /// Record her choice. Passing null clears it and returns her to the phase

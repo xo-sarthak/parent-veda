@@ -21,7 +21,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/cloud_synced_store.dart';
+import '../../services/remote/cloud_merged_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
 import 'pp_child_profile.dart';
 import '../../brand/brand_context.dart';
@@ -1349,12 +1350,22 @@ List<RecoItem> relatedReco(RecoItem it, {int count = 4}) {
 // =============================================================================
 //  RecoStore - saved bookmarks, viewed history (Continue Exploring) + wishlists.
 // =============================================================================
-class RecoStore extends ChangeNotifier with CloudSyncedStore {
+//
+//  In the cloud since step 13 (2026-10-22, sync log) as per-item merge. It
+//  synced as one whole blob, so a save on one phone erased a list edit on the
+//  other. Items: `saved|<id>` -> true, `viewed|<id>` -> when last viewed (ms),
+//  `list|<name>` -> true (the list exists), `in|<name>|<id>` -> true.
+class RecoStore extends ChangeNotifier with CloudMergedStore {
   RecoStore._();
   static final RecoStore instance = RecoStore._();
 
   final Set<String> _saved = {'ac_peekaboo', 'bk_indianfaces'};
   final List<String> _viewed = ['vd_leap4', 'ln_narrate'];
+
+  /// id -> when it was last viewed (ms), for the cloud items (step 13). An id
+  /// with no time yet uses its place in [_viewed], which sorts before any real
+  /// time and keeps the old order.
+  final Map<String, int> _viewedAt = {};
   // named wishlists → item ids
   final Map<String, Set<String>> _lists = {
     'Weekend Ideas': {'od_walk'},
@@ -1370,24 +1381,107 @@ class RecoStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => _prefsKey;
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'viewed': <String>[], 'lists': <String, Object>{}};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'viewed': <String>[], 'lists': <String, Object>{}};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'saved': _saved.toList(),
+  //         'viewed': _viewed,
+  //         'lists': _lists.map((k, v) => MapEntry(k, v.toList())),
+  //       };
 
-  @override
-  Object cloudData() => {
+  /// The local prefs blob (the shape the cloud blob had before step 13, plus
+  /// the view times).
+  Map<String, Object?> _blob() => {
         'saved': _saved.toList(),
         'viewed': _viewed,
         'lists': _lists.map((k, v) => MapEntry(k, v.toList())),
+        'viewedAt': _viewedAt,
       };
 
   @override
-  void applyCloudData(Object data) {
+  String? get legacyBlobKey => cloudKey;
+
+  static const _viewedLimit = 12;
+
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _saved) 'saved|$id': true,
+        for (var i = 0; i < _viewed.length; i++)
+          'viewed|${_viewed[i]}': _viewedAt[_viewed[i]] ?? i,
+        for (final e in _lists.entries) ...{
+          'list|${e.key}': true,
+          for (final id in e.value) 'in|${e.key}|$id': true,
+        },
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    final saved = <String>{};
+    final viewed = <String, int>{};
+    final lists = <String, Set<String>>{};
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('saved|')) {
+        saved.add(k.substring(6));
+      } else if (k.startsWith('viewed|')) {
+        viewed[k.substring(7)] = (e.value is num) ? (e.value as num).toInt() : 0;
+      } else if (k.startsWith('list|')) {
+        lists.putIfAbsent(k.substring(5), () => <String>{});
+      } else if (k.startsWith('in|')) {
+        final rest = k.substring(3);
+        final bar = rest.lastIndexOf('|');
+        if (bar <= 0) continue;
+        lists.putIfAbsent(rest.substring(0, bar), () => <String>{})
+            .add(rest.substring(bar + 1));
+      }
+    }
+    // Saves and lists already here keep their place; new ones join the end.
+    final keptSaved = [for (final id in _saved) if (saved.contains(id)) id];
+    _saved
+      ..clear()
+      ..addAll(keptSaved)
+      ..addAll(saved);
+    final keptLists = {
+      for (final n in _lists.keys) if (lists.containsKey(n)) n: lists[n]!,
+    };
+    _lists
+      ..clear()
+      ..addAll(keptLists)
+      ..addAll(lists);
+    // Oldest first, trimmed to the store's limit.
+    final order = viewed.keys.toList()
+      ..sort((a, b) => viewed[a]!.compareTo(viewed[b]!));
+    final kept = order.length > _viewedLimit
+        ? order.sublist(order.length - _viewedLimit)
+        : order;
+    _viewed
+      ..clear()
+      ..addAll(kept);
+    _viewedAt
+      ..clear()
+      ..addAll({for (final id in kept) id: viewed[id]!});
+  }
+
+  /// Was applyCloudData before step 13; the same body, plus the view times
+  /// the local cache keeps. Also reads the local prefs cache.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     final s = data['saved'];
     if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
     final v = data['viewed'];
     if (v is List) _viewed..clear()..addAll(v.map((e) => e.toString()));
+    final va = data['viewedAt'];
+    _viewedAt.clear();
+    if (va is Map) {
+      for (final e in va.entries) {
+        if (e.value is num) _viewedAt[e.key.toString()] = (e.value as num).toInt();
+      }
+    }
     final l = data['lists'];
     if (l is Map) {
       _lists
@@ -1402,7 +1496,7 @@ class RecoStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {}
   }
 
@@ -1419,11 +1513,12 @@ class RecoStore extends ChangeNotifier with CloudSyncedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {/* keep the starter state */}
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
@@ -1443,7 +1538,9 @@ class RecoStore extends ChangeNotifier with CloudSyncedStore {
   void markViewed(String id) {
     _viewed.remove(id);
     _viewed.add(id);
-    if (_viewed.length > 12) _viewed.removeAt(0);
+    _viewedAt[id] = DateTime.now().millisecondsSinceEpoch;
+    // if (_viewed.length > 12) _viewed.removeAt(0); // kept for revert (step 13)
+    if (_viewed.length > _viewedLimit) _viewedAt.remove(_viewed.removeAt(0));
     notifyListeners();
   }
 
