@@ -219,7 +219,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
       id: kDietTabNow,
       label: 'What to eat now',
       icon: Icons.restaurant_menu_outlined,
-      mark: IntentMark.forkMark, // was nextStep (2026-09-22)
+      mark: IntentMark.listMark, // was forkMark, the same bowl as Recipes (2026-10-22); before that nextStep (2026-09-22)
       hue: 26,
     ),
 

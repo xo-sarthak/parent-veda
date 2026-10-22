@@ -131,7 +131,7 @@ void main() {
 
   test('Talk to someone sits in all three home headers (2026-10-14)', () {
     expect(_code('lib/screens/v2/v3_preg_hero.dart'),
-        contains("semantic: 'Talk to someone'"));
+        contains("semantic: 'Talk to an expert'"));
     expect(_code('lib/screens/home_v3_screen.dart'), contains('onTalk: () =>'));
     final ttc = _code('lib/screens/ttc/ttc_home_v3.dart');
     expect(ttc, contains('onTalk: () =>'));

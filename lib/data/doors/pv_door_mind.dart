@@ -80,6 +80,7 @@
 //    creates a perinatal-depression page outside sub-tab 4.
 // =============================================================================
 
+import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import '../mind_mood_data.dart';
@@ -249,6 +250,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
       id: kMindTabFeel,
       label: 'Feel',
       icon: Icons.self_improvement_rounded,
+      mark: IntentMark.lotusMark, // drawn mark, 2026-10-22
       hue: 288,
     ),
 
@@ -259,6 +261,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
       id: kMindTabUnderstand,
       label: 'Understand',
       icon: Icons.menu_book_outlined,
+      mark: IntentMark.bookMark, // drawn mark, 2026-10-22
       hue: 206,
     ),
 
@@ -275,6 +278,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
       id: kMindTabCloseness,
       label: 'Sex and closeness',
       icon: Icons.favorite_outline_rounded,
+      mark: IntentMark.bodyMark, // drawn mark, 2026-10-22
       hue: 26,
       note: 'Just for the two of you. If your doctor has asked you to avoid '
           'sex, follow what they said.',
@@ -289,6 +293,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
       id: kMindTabTrack,
       label: 'Track',
       icon: Icons.timeline_rounded,
+      mark: IntentMark.chartLog, // drawn mark, 2026-10-22
       hue: 160,
       inlineSurfaceId: kMindSurfaceTrack,
       inlineLabel: 'Check in today',
@@ -307,6 +312,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
       id: kMindTabMore,
       label: 'When it is more than this',
       icon: Icons.favorite_border_rounded,
+      mark: IntentMark.nextStep, // drawn mark, 2026-10-22
       hue: 344,
       // ⚠️ THE BRIEF'S 3.4, WHOLE. The flag widget has a title, lines and a
       // footer; the brief's opening sentence is the title's second half and
@@ -342,6 +348,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
       id: kMindTabTalk,
       label: 'Talk',
       icon: Icons.chat_bubble_outline_rounded,
+      mark: IntentMark.askDoctor, // drawn mark, 2026-10-22
       hue: 186,
       note: 'Counselling is the only paid part of Mind & mood. Everything '
           'else is free, and it stays free.',
@@ -577,7 +584,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kMindTabTalk,
-      heading: 'Talk to someone',
+      heading: 'Book an expert', // was 'Talk to someone'; the card chip already says Talk to an expert (2026-10-22)
       tiles: [
         for (final o in kMmTalkOfferings)
           PvDoorTalkTile(

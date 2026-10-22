@@ -364,7 +364,7 @@ final HubConfig kPgMentalHealth = HubConfig(
       action: kPgActFeelBetter,
     ),
     HubNeed(
-      label: _en('Talk to someone'),
+      label: _en('Talk to an expert'),
       blurb: _en('A 1:1 with someone who works with mothers, in confidence.'),
       mark: IntentMark.askDoctor,
       hue: 268,

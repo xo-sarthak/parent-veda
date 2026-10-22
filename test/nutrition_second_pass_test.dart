@@ -198,10 +198,10 @@ void main() {
   });
 
   group('the door', () {
-    test('Today wears the sun, What to eat now the cutlery', () {
+    test('Today wears the sun, What to eat now the list (was the cutlery, which drew the same bowl as Recipes, 2026-10-22)', () {
       final groups = kNutritionDoor.groups;
       expect(groups.firstWhere((g) => g.id == kDietTabToday).mark, IntentMark.sunMark);
-      expect(groups.firstWhere((g) => g.id == kDietTabNow).mark, IntentMark.forkMark);
+      expect(groups.firstWhere((g) => g.id == kDietTabNow).mark, IntentMark.listMark);
     });
 
     test('a recipe for a dish on the plate, when the library has one', () {

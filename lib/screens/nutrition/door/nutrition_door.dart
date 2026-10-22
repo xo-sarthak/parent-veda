@@ -260,7 +260,7 @@ class _NutritionDoorScreenState extends State<NutritionDoorScreen> {
     final store = NutritionDayStore.instance;
     final ticked = kPlateNeeds.where((n) => store.ticked(_date, n.id)).length;
     final line = ticked == 0
-        ? 'Tap what you had today. Hold one to see what counts.'
+        ? 'Tap what you had today. Long press one to see what counts.'
         : ticked == kPlateNeeds.length
             ? 'All five today. That\'s a good day for your baby.'
             : '$ticked of ${kPlateNeeds.length} today. Every one helps.';

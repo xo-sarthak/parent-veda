@@ -90,9 +90,9 @@ void main() {
       expect(t.takeException(), isNull);
     });
 
-    testWidgets('Talk to someone lists four roles, no names, and opens the consults', (t) async {
+    testWidgets('Talk to an expert lists four roles, no names, and opens the consults', (t) async {
       await pumpHome(t);
-      expect(find.text('Talk to someone', skipOffstage: false), findsOneWidget);
+      expect(find.text('Talk to an expert', skipOffstage: false), findsOneWidget); // was 'Talk to someone' (2026-10-22)
       for (final r in kPregHomeExpertRoles) {
         expect(find.byKey(ValueKey('preg_home_expert_${r.id}'), skipOffstage: false), findsOneWidget, reason: r.id);
       }

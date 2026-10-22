@@ -83,6 +83,7 @@
 //    packer**, not a second list. It opens the bag.
 // =============================================================================
 
+import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import 'pv_door_data.dart';
@@ -186,6 +187,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       id: kLabourTabTimer,
       label: 'Contraction timer',
       icon: Icons.timer_outlined,
+      mark: IntentMark.timelineRail, // drawn mark, 2026-10-22
       hue: 344,
       layout: PvDoorLayout.stack,
       // ⚠️ THE TIMER'S OWN SAFETY LINE, PINNED ABOVE IT. The brief: "Keep it
@@ -205,6 +207,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       id: kLabourTabSigns,
       label: 'Signs and stages',
       icon: Icons.timeline_rounded,
+      mark: IntentMark.chartLog, // drawn mark, 2026-10-22
       hue: 320,
     ),
 
@@ -217,6 +220,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       id: kLabourTabBag,
       label: 'Hospital bag',
       icon: Icons.work_outline_rounded,
+      mark: IntentMark.bagMark, // drawn mark, 2026-10-22
       hue: 160,
       layout: PvDoorLayout.stack,
     ),
@@ -225,6 +229,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       id: kLabourTabBirth,
       label: 'Understand the birth',
       icon: Icons.menu_book_outlined,
+      mark: IntentMark.bookMark, // drawn mark, 2026-10-22
       hue: 26,
     ),
 
@@ -238,6 +243,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       id: kLabourTabFeeding,
       label: 'Feeding and first days',
       icon: Icons.child_care_outlined,
+      mark: IntentMark.cuppedHands, // drawn mark, 2026-10-22
       hue: 12,
     ),
 
@@ -245,6 +251,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       id: kLabourTabPartner,
       label: 'For your partner',
       icon: Icons.people_outline_rounded,
+      mark: IntentMark.bodyMark, // drawn mark, 2026-10-22
       hue: 206,
     ),
 
@@ -258,6 +265,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       id: kLabourTabTalk,
       label: 'Talk and learn',
       icon: Icons.school_outlined,
+      mark: IntentMark.askDoctor, // drawn mark, 2026-10-22
       hue: 42,
       note: kLabourAreaNote,
     ),
@@ -671,7 +679,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
 
     PvDoorSection(
       group: kLabourTabTalk,
-      heading: 'Talk to someone',
+      heading: 'Book an expert', // was 'Talk to someone'; the card chip already says Talk to an expert (2026-10-22)
       tiles: [
         PvDoorTalkTile(
           title: 'Book a 1:1 about the birth',

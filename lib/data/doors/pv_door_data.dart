@@ -296,7 +296,13 @@ final class PvDoorToolTile extends PvDoorTile {
     required this.surfaceId,
     super.meta,
     super.comingSoon,
+    this.showsAs,
   });
+
+  /// What the card's chip says when the surface is not a tool (user,
+  /// 2026-10-22): the Itching surface is a written page, and a "Tool" chip on
+  /// it promised something to do. Null means a tool, as before.
+  final PvDoorFormat? showsAs;
 
   /// ⚠️ A SURFACE ID, NOT A WIDGET. The tool is built, shipped and tested; this
   /// opens it through the door router so the route NAME stays the surface id —
@@ -305,7 +311,7 @@ final class PvDoorToolTile extends PvDoorTile {
   final String surfaceId;
 
   @override
-  PvDoorFormat get format => PvDoorFormat.tool;
+  PvDoorFormat get format => showsAs ?? PvDoorFormat.tool;
 }
 
 /// A library of pages this app already ships, and which lookup finds them.

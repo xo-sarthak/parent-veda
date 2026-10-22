@@ -812,18 +812,24 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 children: [
             if (video != null) ...[
               const SizedBox(height: 14),
-              Text(video.title.en,
+              // One umbrella title for the week (user, 2026-10-22): a week
+              // holds many changes, so a title that names one ("How Babies
+              // Respond to Sound") reads as if that were all of it. The
+              // film's own title and reason line are kept for revert:
+              //   Text(video.title.en, ...)
+              //   Text('Why this matters now: ${video.reason.en}', ...)
+              // Layout per Mobbin (Insight Timer, Video Spotlight): title,
+              // then one plain line saying what the film covers.
+              Text('Your baby in week $week',
                   style: pvFraunces(
                       fontSize: 17,
                       letterSpacing: -0.43,
                       fontWeight: FontWeight.w600,
                       height: 1.25,
                       color: p.ink1)),
-              if (video.reason.en.trim().isNotEmpty) ...[
-                const SizedBox(height: 6),
-                Text('Why this matters now: ${video.reason.en}',
-                    style: pvJakarta(fontSize: 13, height: 1.5, color: p.ink2)),
-              ],
+              const SizedBox(height: 6),
+              Text('A short film on what is changing this week, for your baby and for you.',
+                  style: pvJakarta(fontSize: 13, height: 1.5, color: p.ink2)),
             ],
             // Room for the Garbh band to arrive as its own moment. When
             // there is no film the doors sit directly above it.
@@ -1298,7 +1304,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
             // names once they exist; until then the roles only, never placeholder
             // names", so no name appears here. Each row opens the consult list
             // filtered to that role, where the roster itself lives.
-            V3SectionHead(eyebrow: 'People', title: 'Talk to someone', p: p),
+            V3SectionHead(eyebrow: 'People', title: 'Talk to an expert', p: p),
             const SizedBox(height: 12),
             PregRowCard(children: [
               for (final r in kPregHomeExpertRoles)

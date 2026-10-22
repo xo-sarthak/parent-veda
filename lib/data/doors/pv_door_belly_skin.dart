@@ -59,6 +59,7 @@
 //    and letters there. Both stay; neither is merged.
 // =============================================================================
 
+import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import '../belly_skin_data.dart';
@@ -143,6 +144,7 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
       id: kBsTabSkin,
       label: 'Skin changes',
       icon: Icons.face_retouching_natural_outlined,
+      mark: IntentMark.sunMark, // drawn mark, 2026-10-22
       hue: 344,
     ),
 
@@ -150,6 +152,7 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
       id: kBsTabSafe,
       label: "What's safe to use",
       icon: Icons.verified_outlined,
+      mark: IntentMark.questionMark, // drawn mark, 2026-10-22
       hue: 206,
     ),
 
@@ -157,6 +160,7 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
       id: kBsTabBelly,
       label: 'Belly care',
       icon: Icons.spa_outlined,
+      mark: IntentMark.cuppedHands, // drawn mark, 2026-10-22
       hue: 42,
     ),
 
@@ -170,6 +174,7 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
       id: kBsTabRitual,
       label: 'The bump ritual',
       icon: Icons.photo_camera_outlined,
+      mark: IntentMark.bookMark, // drawn mark, 2026-10-22
       hue: 26,
       inlineSurfaceId: kBsSurfaceRitual,
       inlineLabel: 'Your bump, over time',
@@ -215,6 +220,8 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
           blurb: "What's normal, what soothes it, and the one kind that "
               'means calling your doctor today.',
           surfaceId: kBsSurfaceItching,
+          // A written page, so it says Article (2026-10-22).
+          showsAs: PvDoorFormat.article,
         ),
       ],
     ),

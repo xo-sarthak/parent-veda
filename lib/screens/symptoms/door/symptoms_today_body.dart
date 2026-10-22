@@ -301,7 +301,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
               p,
               'How are you?',
               sub:
-                  '${_dayWord(_selected)}. Tap what you feel, and tap again to clear it. Hold one to say how strong.',
+                  '${_dayWord(_selected)}. Tap what you feel, and tap again to clear it. Long press one to say how strong.',
             ),
           ),
           const SizedBox(height: 10),

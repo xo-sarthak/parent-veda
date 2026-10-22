@@ -71,7 +71,7 @@ final PvDoorPage kWorkMoneyDoor = PvDoorPage(
     PvDoorGroup(
       id: kWorkMoneyTabWork,
       label: 'Work',
-      mark: IntentMark.checkMark,
+      mark: IntentMark.sunMark, // was checkMark: same mark twice on one rail (2026-10-22)
       icon: Icons.work_outline_rounded,
       hue: 26,
     ),

@@ -312,7 +312,7 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
 
   String _needsLine(NutritionDayStore store) {
     final ticked = kPlateNeeds.where((n) => store.ticked(_date, n.id)).length;
-    if (ticked == 0) return 'Tap what you had today. Hold one to see what counts.';
+    if (ticked == 0) return 'Tap what you had today. Long press one to see what counts.';
     if (ticked == kPlateNeeds.length) return 'All five today. That\'s a good day for your baby.';
     return '$ticked of ${kPlateNeeds.length} today. Every one helps.';
   }

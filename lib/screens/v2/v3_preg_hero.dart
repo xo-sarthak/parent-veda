@@ -294,7 +294,7 @@ class _V3PregHeroState extends State<V3PregHero> {
                     const SizedBox(width: 8),
                     _Round(
                       p: p,
-                      semantic: 'Talk to someone',
+                      semantic: 'Talk to an expert',
                       onTap: widget.onTalk!,
                       child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
                     ),

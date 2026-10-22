@@ -232,7 +232,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       id: kGarbhTabRead,
       label: 'Talk and read',
       icon: Icons.record_voice_over_outlined,
-      mark: IntentMark.pageMark,
+      mark: IntentMark.askDoctor, // was pageMark: same mark twice on one rail (2026-10-22)
       hue: 14,
       note: 'Samvad means talking to your baby. Anything you record here is '
           'kept in My Journal.',

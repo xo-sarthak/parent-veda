@@ -176,7 +176,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorGroup(
       id: kCondTabLiving,
       label: 'Living with it',
-      mark: IntentMark.moodArc,
+      mark: IntentMark.sunMark, // was moodArc, a face outside the TTC mark family (2026-10-22)
       icon: Icons.wb_sunny_outlined,
       hue: 42,
     ),
