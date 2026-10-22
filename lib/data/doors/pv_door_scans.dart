@@ -71,6 +71,7 @@ import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import 'pv_door_data.dart';
+import 'preg_band.dart';
 import 'pv_door_twins.dart' show kTwinsSurfaceDoor;
 
 /// Surfaces this door opens. Resolved by `pv_door_router.dart`.
@@ -270,6 +271,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorSection(
       group: kScansTabScan,
       heading: 'First three months',
+      weeks: PregBand.firstTrimester, // hers leads at her week (2026-10-23)
       tiles: [
         // Added 2026-09-29 (pregnancy gap analysis, Scans & tests, P1/P2):
         // the first antenatal visit, early hCG and blood group reads, so
@@ -324,6 +326,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorSection(
       group: kScansTabScan,
       heading: 'Middle three months',
+      weeks: PregBand.secondTrimester, // hers leads at her week (2026-10-23)
       tiles: [
         PvDoorEntryTile(
           title: 'Anomaly scan',
@@ -351,6 +354,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorSection(
       group: kScansTabScan,
       heading: 'Last three months',
+      weeks: PregBand.thirdTrimester, // hers leads at her week (2026-10-23)
       tiles: [
         PvDoorEntryTile(
           title: 'Growth scan',

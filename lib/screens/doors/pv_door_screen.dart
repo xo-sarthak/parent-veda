@@ -303,6 +303,12 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
     super.dispose();
   }
 
+  /// Her week when it is real, else null. The week-20 placeholder (no due
+  /// date yet) must never reorder a door (`pregRelevanceOrder`, 2026-10-23).
+  int? get _knownWeek => widget.pregnancy.isDueDateSet
+      ? widget.pregnancy.currentWeek
+      : null;
+
   late int _group = () {
     final id = widget.initialGroup;
     if (id == null) return 0;
@@ -702,16 +708,26 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                               ),
                             ),
 
-                          for (final section in page.sectionsOf(group.id))
+                          // Hers first (2026-10-23): a section banded to her
+                          // weeks leads the tab; past ones sink, nothing hides.
+                          // Kept for revert: `page.sectionsOf(group.id)`.
+                          for (final section in page.sectionsFor(
+                            group.id,
+                            _knownWeek,
+                          ))
                             for (final tiles in [
                               // A capped rail (PvDoorSection.railMax): the rest is
                               // one "View all" away on `moreSurfaceId`.
                               section.railMax == null
                                   ? section.tilesFor(
                                       widget.pregnancy.currentWeek,
+                                      weekKnown: _knownWeek != null,
                                     )
                                   : section
-                                        .tilesFor(widget.pregnancy.currentWeek)
+                                        .tilesFor(
+                                          widget.pregnancy.currentWeek,
+                                          weekKnown: _knownWeek != null,
+                                        )
                                         .take(section.railMax!)
                                         .toList(),
                             ]) ...[

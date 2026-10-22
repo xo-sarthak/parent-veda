@@ -64,6 +64,7 @@ import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import 'pv_door_data.dart';
+import 'preg_band.dart';
 
 /// Surfaces this door opens. Constants because each becomes a route NAME, and
 /// `global_ask_fab.dart` reads route names.
@@ -225,6 +226,8 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorSection(
       group: kCondTabWhen,
       heading: 'Early months',
+      weeks: PregBand.firstTrimester, // hers leads at her week (2026-10-23)
+      tilesByWeek: true,
       tiles: [
         PvDoorEntryTile(
           title: 'Pregnancy in the wrong place (ectopic)',
@@ -260,6 +263,8 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorSection(
       group: kCondTabWhen,
       heading: 'Middle months',
+      weeks: PregBand.secondTrimester, // hers leads at her week (2026-10-23)
+      tilesByWeek: true,
       tiles: [
         PvDoorEntryTile(
           title: 'Pregnancy sugar goes high (gestational diabetes)',
@@ -293,6 +298,8 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorSection(
       group: kCondTabWhen,
       heading: 'Later months',
+      weeks: PregBand.thirdTrimester, // hers leads at her week (2026-10-23)
+      tilesByWeek: true,
       tiles: [
         PvDoorEntryTile(
           title: 'Blood pressure needs watching (high BP)',

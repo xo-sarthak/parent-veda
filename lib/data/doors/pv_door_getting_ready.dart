@@ -45,6 +45,7 @@ import 'package:flutter/material.dart' show Icons;
 import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../reads/read_images.dart' show readImageFor;
 import 'pv_door_data.dart';
+import 'preg_band.dart';
 
 /// Surfaces this door opens. Resolved by `pv_door_router.dart`.
 ///
@@ -277,6 +278,7 @@ final PvDoorPage kGettingReadyDoor = PvDoorPage(
     PvDoorSection(
       group: kReadyTabHome,
       heading: 'The last months',
+      weeks: PregBand.thirdTrimester, // hers leads at her week (2026-10-23)
       tiles: [
         PvDoorGuideTile(
           title: 'Your last three months: a to-do list',

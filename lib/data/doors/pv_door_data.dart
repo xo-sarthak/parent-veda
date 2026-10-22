@@ -83,6 +83,7 @@ import 'pv_door_labour.dart';
 import 'pv_door_mind.dart';
 import 'pv_door_nutrition.dart';
 import 'pv_door_scans.dart';
+import 'preg_band.dart';
 
 export 'pv_door_belly_skin.dart';
 export 'pv_door_complications.dart';
@@ -671,7 +672,20 @@ class PvDoorSection {
     this.strip = false,
     this.moreSurfaceId,
     this.railMax,
+    this.weeks,
+    this.tilesByWeek = false,
   }) : inlineSurfaceId = null;
+
+  /// The weeks this section is about ("Last three months" = 28 to 42), or
+  /// null for a section that fits any week. A banded section leads its tab
+  /// when it is hers (`pregRelevanceOrder`, 2026-10-23). Null keeps its place.
+  final PregBand? weeks;
+
+  /// Order this rail's tiles by the week range their `meta` already prints
+  /// ("Weeks 28 to 36"), hers first. Off by default: most rails are curated in
+  /// an order that means something, and only a rail of week-bound cards
+  /// (Move's month by month, complications by month) wants this.
+  final bool tilesByWeek;
 
   /// "View all ›" on the heading, opening this surface — for a rail that
   /// would otherwise be nineteen cards long (Nutrition's charts, 2026-09-20:
@@ -708,7 +722,9 @@ class PvDoorSection {
   })  : tiles = const [],
         folded = false,
         strip = false,
-        lead = null;
+        lead = null,
+        weeks = null,
+        tilesByWeek = false;
 
   final String heading;
   final List<PvDoorTile> tiles;
@@ -756,7 +772,17 @@ class PvDoorSection {
   /// Stable: everything keeps its order except the one tile [lead] names,
   /// which moves to where the first entry tile was. With no [lead], or a lead
   /// that names nothing on the rail, this IS [tiles].
-  List<PvDoorTile> tilesFor(int week) {
+  ///
+  /// With [tilesByWeek] and a [weekKnown] week, the rail is then ordered by
+  /// each tile's printed week range (2026-10-23). [weekKnown] is false on the
+  /// week-20 placeholder, so nothing moves for a woman with no due date.
+  List<PvDoorTile> tilesFor(int week, {bool weekKnown = true}) {
+    final led = _leadFor(week);
+    if (!tilesByWeek || !weekKnown) return led;
+    return pregRelevanceOrder(led, (t) => PregBand.parse(t.meta), week);
+  }
+
+  List<PvDoorTile> _leadFor(int week) {
     final id = lead?.call(week);
     if (id == null) return tiles;
     final at = tiles.indexWhere(
@@ -1013,6 +1039,12 @@ class PvDoorPage {
   /// The sections belonging to one group, in order.
   List<PvDoorSection> sectionsOf(String groupId) =>
       [for (final s in sections) if (s.group == groupId) s];
+
+  /// The same sections, hers first: at [week] a banded section she is in
+  /// leads, upcoming ones follow, past ones sink (2026-10-23, `PregBand`).
+  /// A null [week] (no real due date) is [sectionsOf], untouched.
+  List<PvDoorSection> sectionsFor(String groupId, int? week) =>
+      pregRelevanceOrder(sectionsOf(groupId), (s) => s.weeks, week);
 }
 
 // -----------------------------------------------------------------------------

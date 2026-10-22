@@ -149,6 +149,7 @@ final PvDoorPage kMoveDoor = PvDoorPage(
     PvDoorSection(
       group: kMoveTabMove,
       heading: 'Month by month',
+      tilesByWeek: true, // her trimester's guide first (2026-10-23)
       tiles: [
         PvDoorGuideTile(
           title: 'Moving in the first three months',
