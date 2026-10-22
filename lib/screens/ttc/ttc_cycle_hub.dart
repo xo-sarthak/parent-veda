@@ -744,8 +744,12 @@ class _EstimateNote extends StatelessWidget {
         key: const ValueKey('ttc_hub_estimate_note'),
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        // Kept for revert (2026-10-22, no tinted slab, no lavender):
+        //   color: ttcPanel, borderRadius: BorderRadius.circular(14)),
         decoration: BoxDecoration(
-            color: ttcPanel, borderRadius: BorderRadius.circular(14)),
+            color: Colors.white,
+            border: Border.all(color: ttcLine),
+            borderRadius: BorderRadius.circular(14)),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Padding(
             padding: EdgeInsets.only(top: 1),

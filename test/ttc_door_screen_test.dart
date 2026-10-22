@@ -1169,7 +1169,11 @@ void main() {
       // Order only: "Going through it" then "Track" lead, every tab stays.
       final ordered = ttcDoorOrderedGroups(page.groups!,
           bracketId: kTtcIvfBracketId, ageBand: null, roundRunning: true);
-      expect(ordered.take(2).map((g) => g.id), kTtcIvfRoundTabsFirst);
+      // 2026-10-22: Step by step stays first, its "You are here" is the
+      // round's step. Kept for revert:
+      //   expect(ordered.take(2).map((g) => g.id), kTtcIvfRoundTabsFirst);
+      expect(ordered.take(3).map((g) => g.id),
+          [kTtcIvfStepsGroupId, ...kTtcIvfRoundTabsFirst]);
       expect(ordered.map((g) => g.id).toSet(),
           page.groups!.map((g) => g.id).toSet());
       // Kept for revert (2026-09-28, explicit names): 'Going through it'.

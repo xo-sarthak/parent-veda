@@ -1104,7 +1104,9 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
         ttcToolPad(
           TtcToolSecondary(
             key: const ValueKey('ttc_ov_temp_add'),
-            label: 'Mark the day it went up yourself',
+            // Kept for revert (2026-10-22, a label names its thing):
+            //   label: 'Mark the day it went up yourself',
+            label: 'Mark the day your temperature rose',
             onTap: () => _pickTempDay(currentDay, t),
           ),
         ),

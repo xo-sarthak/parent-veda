@@ -1387,6 +1387,48 @@ class TtcS {
   String get transitionUndone =>
       _p("Undone. You're back where you were.", 'Wapas ho gaya. Aap wahin hain jahan thin.');
 
+  // ---- the new-chapter page, rebuilt (2026-10-22) ---------------------------
+  //  English only (new work is English). "Book your first appointment" left
+  //  the page: its button went into pregnancy, which its label never said.
+  String get transitionGo => 'Go to my pregnancy';
+  String get transitionWhereYouAre => 'Where you are';
+  String get transitionHowCounted => 'How we counted';
+  String get transitionHowTitle => 'How we counted your weeks';
+  String get transitionHow1 =>
+      'Weeks count from the first day of your last period, not from the day '
+      'you conceived.';
+  String get transitionHow2 =>
+      'That is why a home test usually turns positive around week 4.';
+  String get transitionHow3 =>
+      "Your first scan confirms the date, and we'll follow it.";
+  String get transitionChange => 'Change the due date';
+  String get transitionCheckTitle => "Let's check this date.";
+  String transitionTooEarly(String day, int weeks) =>
+      'We counted from the period you logged on $day, which would make this '
+      'only ${weeks == 1 ? '1 week' : '$weeks weeks'}. A home test can\'t '
+      'usually turn positive that early.';
+  String get transitionTooEarlyWhy =>
+      'If your last period started earlier, or that bleed was lighter than '
+      'usual, it may not have been a period.';
+  String get transitionChangeDate => 'Change the date';
+  String get transitionKeepPeriod => 'That was my period';
+  String get transitionKept =>
+      'Kept as it is. Your first scan will date your pregnancy.';
+  String get transitionEarly =>
+      'Very early days. Your first scan will confirm the date.';
+  String transitionStale(String day) =>
+      'We counted from your last logged period, on $day. If you\'ve had a '
+      'period since then, change the date.';
+  String get transitionStaleOk => "That's right";
+  String get transitionGuessed =>
+      "No period was logged, so we've counted about 4 weeks from today. Add "
+      'the day your last period started, or your first scan will date it.';
+  String get transitionAddDate => 'Add the date';
+  String get transitionClinic =>
+      "Dated by your clinic, from your treatment. Their date is the one we use.";
+  String get transitionPickTitle => 'When did your last period start?';
+  String transitionRedated(String day) => 'Counted again from $day.';
+
   // ---- community ------------------------------------------------------------
   String get communityYourRooms => _p('Your rooms', 'Aapke rooms');
   String get communityRooms => _p('Rooms', 'Rooms');

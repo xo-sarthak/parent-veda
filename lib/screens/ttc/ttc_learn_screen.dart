@@ -563,7 +563,12 @@ class TtcLearnScreen extends StatefulWidget {
 
 class _TtcLearnScreenState extends State<TtcLearnScreen> {
   final PvLiveSearch _search = PvLiveSearch();
-  final ScrollController _scroll = ScrollController();
+  // ⚠️ THE TAB HOST'S CONTROLLER, NOT OUR OWN (2026-10-22). An own controller
+  // here (10-20, for the 101 jump) replaced the PrimaryScrollController the
+  // tab host gives each page, so tapping Learn again no longer scrolled it to
+  // the top (test/ttc_tab_host_test.dart). Kept for revert:
+  //   final ScrollController _scroll = ScrollController();
+  ScrollController? get _scroll => PrimaryScrollController.maybeOf(context);
   final GlobalKey _startKey = GlobalKey();
   int _shown101 = 0;
 
@@ -620,7 +625,7 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
   @override
   void dispose() {
     ttcLearnShow101.removeListener(_show101);
-    _scroll.dispose();
+    // Kept for revert (2026-10-22, the host owns it): _scroll.dispose();
     _search.dispose();
     super.dispose();
   }
@@ -634,10 +639,10 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
         Scrollable.ensureVisible(ctx,
             duration: const Duration(milliseconds: 380),
             curve: Curves.easeOutCubic);
-      } else if (tries < 3 && _scroll.hasClients) {
+      } else if (tries < 3 && (_scroll?.hasClients ?? false)) {
         // Not built yet (below the list's cache): move toward it, then retry.
-        _scroll.jumpTo((_scroll.offset + 600)
-            .clamp(0.0, _scroll.position.maxScrollExtent));
+        final c = _scroll!;
+        c.jumpTo((c.offset + 600).clamp(0.0, c.position.maxScrollExtent));
         _show101(tries + 1);
       }
     });
@@ -720,7 +725,8 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
             body: Stack(children: [
               Positioned.fill(
                 child: ListView(
-                  controller: _scroll,
+                  // Kept for revert (2026-10-22): controller: _scroll,
+                  primary: true,
                   // ⚠️ THE HEADER CARRIES THE SAFE-AREA INSET (2026-09-29,
                   // TtcTabRootHeader), so every tab root's title sits at one
                   // y. Kept for revert:

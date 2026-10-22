@@ -734,7 +734,9 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
         // ---- help with this (2026-10-21) -----------------------------------
         if (plan.pitches.isNotEmpty) ...[
           const SizedBox(height: 26),
-          head('Help with this'),
+          // Kept for revert (2026-10-22, a label names its thing):
+          //   head('Help with this'),
+          head('Help with your plan'),
           const SizedBox(height: 8),
           ttcToolPad(TtcReadyHelpCards(pitches: plan.pitches)),
         ],

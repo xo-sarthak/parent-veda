@@ -14,6 +14,8 @@
 //  that has not opened yet.
 // =============================================================================
 
+import 'doors/ttc_treatment_journey.dart'
+    show TtcTreatmentJourneyBody, kTtcTreatmentJourneySurface;
 import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
@@ -445,5 +447,8 @@ Widget? ttcInlineToolFor(String surfaceId) => switch (surfaceId) {
       // is the whole point of a do-it screen: opening the door is opening the
       // practice, with nothing in between.
       'ttc_mind_today' => const TtcMindTodayBody(),
+      // The IVF door's first tab (2026-10-22): IUI, IVF and a frozen
+      // transfer, step by step, a video on every step.
+      kTtcTreatmentJourneySurface => const TtcTreatmentJourneyBody(),
       _ => null,
     };

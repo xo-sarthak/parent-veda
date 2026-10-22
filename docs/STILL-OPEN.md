@@ -10890,3 +10890,51 @@ Nothing here has been walked on a phone.
     `preg_diet_read_food_myths` to keep it over its 600-word floor.
   - Ask Veda re-ingest of the changed myth text (CONTENT-BACKEND).
   - "Book services" was parked by the user.
+
+## 97.0 TTC batch 2: the new-chapter page, IVF and IUI step by step, the age tag — 2026-10-22
+
+From the user's 2026-10-20 walk notes, sent 2026-10-22. Prototype approved the
+same day (claude.ai/artifact/Mn1GCcnp3H4tUbjPbCXJf9). Nothing here has been
+walked on a phone.
+
+- **§97.1 The new-chapter page — DONE.** `ttc_transition_screen.dart`. One ink
+  pill, "Go to my pregnancy" ("Book your first appointment" went into
+  pregnancy without saying so; booking on the pregnancy home is parked by the
+  user). Undo is an outlined pill. The week is the headline with a 3-line
+  "How we counted" sheet. The old page is kept as a comment.
+- **§97.2 The date check — DONE.** `ttcDatingCheck` in `ttc_transition.dart`.
+  Weeks count from the last period; a home test turns positive from about 3
+  weeks, usually 4. Under 21 days the page asks her to check the date (a light
+  implantation bleed is often mistaken for a period); 21 to 27 days says "very
+  early"; over 10 weeks says a period may be unlogged; no period says it was
+  guessed. A clinic date is never questioned. "Change the date" re-dates through
+  `TtcTransitionEngine.redate` (her word beats our reading of the log; the cycle
+  log itself is untouched).
+- **§97.3 IVF and IUI, step by step — DONE.** The IVF door's new first tab,
+  `kTtcIvfStepsGroupId`, body `ttc_treatment_journey` (inline tool). IUI, IVF,
+  Frozen transfer; each step card opens with its video, then what happens, how
+  long, whether it hurts, one thing to ask, Read more. "You are here" comes
+  from her round's dates. The steps cover every row the round tracker asks
+  about (`test/ttc_treatment_journey_test.dart`). The twelve step reads moved
+  under the tab as "Read more about each step", so search still finds them.
+  The round panel shows under the steps there, so a video is still first.
+- **§97.4 Videos first on the IVF door — DONE.** `ttcDoorVideosFirst`: a video
+  leads every rail. Two sections gained a film that already exists elsewhere
+  (When to get help, the semen report).
+- **§97.5 "For your age" — DONE.** The order already followed her age band
+  (onboarding and the Ready-to-Try plan set it). A quiet tag now marks the
+  cards her age lifted (`ttcIsForAge`, the same rule as the order). Nothing
+  under 35.
+- **§97.6 Found on the way.** Three lavender `ttcPanel` slabs from §96 (cycle
+  hub note, Ready-to-Try help card, temperature tip) are white with a hairline
+  now. Four labels named nothing ("Make it smaller" and others) and are named.
+  Learn had its own scroll controller since §96, so tapping Learn again no
+  longer scrolled it up; it uses the tab host's again.
+- **§97.7 Owed.**
+  - 16 step videos, briefs in DOOR-CONTENT-OWED (TTC3). Doctor-led, so real
+    clinicians on camera.
+  - A doctor's review of the step facts (durations, "does it hurt"):
+    BEFORE-LAUNCH §8.
+  - A phone walk, when the user says the phone is free.
+  - Pregnancy changes from the same walk (the jaggery page and the screens
+    without notes) go to a new session.

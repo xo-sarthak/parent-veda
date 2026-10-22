@@ -466,10 +466,14 @@ final List<(List<RegExp>, String)> _allowedDestinationRules = [
 /// answers "where am I in my cycle" (`ttc_daily_insights.dart`). It is the
 /// question the page answers, not a second door to it, so it does not count
 /// against the one-other-label rule. Kept for revert: no `dayTile` filter.
+///
+/// ⚠️ THE RAIL CARD LEFT (walk 2026-10-20, the user: it repeated "Day of your
+/// cycle"), so the day tile is now the rail's way in. Kept for revert:
+///   if (!labels.contains(card)) return false;
 bool _companionShared(Set<String> labels) {
   const card = 'CYCLE COMPANION · Your period dates';
-  if (!labels.contains(card)) return false;
   bool dayTile(String l) => l.startsWith('DAY OF YOUR CYCLE · ');
+  if (!labels.contains(card) && !labels.any(dayTile)) return false;
   final others = labels
       .where((l) => l != card && l != 'Cycle Companion' && !dayTile(l));
   return others.length <= 1;

@@ -215,6 +215,8 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **DECIDE** · Recordings and discussion groups are sold on the buy sheet but not built (the copy is kept deliberately) · user · STILL-OPEN §5.2 · added 2026-10-17
 - [ ] **LAUNCH** · The HR web portal is unbuilt, and must not be Directus · dev · ADMIN-PANEL §7a, STILL-OPEN §11.1 · added 2026-10-17
 - [ ] **CHECK** · The user's review of the 90 rewritten myth boxes and the four paragraphs added to `preg_diet_read_food_myths` (claude.ai/artifact/Fj8i53uDYF4Cdtr6ZKoN4x) · user · STILL-OPEN §96.6 · added 2026-10-21
+- [ ] **CHECK** · A doctor reviews the IVF and IUI step facts (how long, does it hurt, what to ask) in `lib/ttc/ttc_treatment_journey.dart` · user + clinician · STILL-OPEN §97.3 · added 2026-10-22
+- [ ] **CHECK** · The 16 IVF and IUI step films are filmed, or ship as notes-only placeholders (a DECIDE with the other content gaps above) · user · DOOR-CONTENT-OWED TTC3 · added 2026-10-22
 
 ---
 

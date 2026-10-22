@@ -45,6 +45,18 @@ bool _matches(String text, List<String> words) {
   return false;
 }
 
+/// Whether [text] is about her age band: the same test that lifts it, so the
+/// "For your age" tag (2026-10-22) and the order can never disagree. False
+/// under 35 or with no age given, where nothing moves.
+bool ttcIsForAge(String text, FertilityAgeBand? band) {
+  final words = ttcAgeWords(band);
+  return words.isNotEmpty && _matches(text, words);
+}
+
+/// The words a door tile is matched on.
+String ttcTileAgeText(TtcTile t) =>
+    '${t.title} ${t.blurb} ${t.keywords.join(' ')}';
+
 /// A stable sort that lifts [items] about her age to the front.
 List<T> ttcAgeOrder<T>(
     List<T> items, FertilityAgeBand? band, String Function(T) textOf) {
@@ -63,8 +75,10 @@ List<T> ttcAgeOrder<T>(
 List<TtcFocusSection> ttcAgeOrderSections(
     List<TtcFocusSection> sections, FertilityAgeBand? band) {
   if (ttcAgeWords(band).isEmpty) return sections;
-  String tileText(TtcTile t) =>
-      '${t.title} ${t.blurb} ${t.keywords.join(' ')}';
+  // Kept for revert (2026-10-22, shared with the tag):
+  //   String tileText(TtcTile t) =>
+  //       '${t.title} ${t.blurb} ${t.keywords.join(' ')}';
+  const tileText = ttcTileAgeText;
   final inner = [
     for (final s in sections)
       TtcFocusSection(

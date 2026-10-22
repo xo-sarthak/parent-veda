@@ -46,4 +46,32 @@ void main() {
     expect(File('lib/screens/ttc/ttc_learn_screen.dart').readAsStringSync(),
         contains('ttcAgeOrder('));
   });
+
+  // "For your age" (2026-10-22): the tag reads the same rule that lifts, so
+  // the order and the tag can never disagree.
+  test('the tag shows on what her age lifted, and never under 35', () {
+    for (final b in [FertilityAgeBand.thirtyFiveTo37, FertilityAgeBand.over40]) {
+      expect(ttcIsForAge('Trying after 35', b), isTrue, reason: b.name);
+      expect(ttcIsForAge('When to see a doctor', b), isFalse, reason: b.name);
+    }
+    expect(ttcIsForAge('Trying after 35', FertilityAgeBand.under35), isFalse);
+    expect(ttcIsForAge('Trying after 35', null), isFalse);
+    for (final b in FertilityAgeBand.values) {
+      for (final x in items) {
+        final lifted = ttcAgeOrder(items, b, id).indexOf(x) <
+            ttcAgeOrder(items, b, id)
+                .where((y) => ttcIsForAge(y, b))
+                .length;
+        expect(ttcIsForAge(x, b), lifted, reason: '${b.name}: $x');
+      }
+    }
+  });
+
+  test('the door draws the tag on every kind of shelf', () {
+    final src = File('lib/screens/ttc/doors/ttc_door_screen.dart')
+        .readAsStringSync();
+    // The wide single card, the grid and the rail.
+    expect('_forAge('.allMatches(src).length, greaterThanOrEqualTo(4));
+    expect(src, contains('kTtcForYourAge'));
+  });
 }

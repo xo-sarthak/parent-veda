@@ -695,8 +695,11 @@ Future<void> showTtcTempWhySheet(BuildContext context) {
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              // Kept for revert (2026-10-22, no tinted slab, no lavender):
+              //   color: ttcPanel,
               decoration: BoxDecoration(
-                color: ttcPanel,
+                color: Colors.white,
+                border: Border.all(color: ttcLine),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Text(

@@ -117,7 +117,10 @@ void main() {
       // (docs/TTC-GAP-PLAN.md §3 A), a decision, not a drift.
       // 2026-09-28 (explicit names). Kept for revert: 'Understand',
       // 'Going through it', 'Track'.
+      // 2026-10-22: 'Step by step' leads, the door's first tab (the user:
+      // "make sure that the user understands ... what happens at each step").
       expect([for (final g in ivf.groups!) g.label], [
+        'Step by step',
         'Understand treatment',
         'Should I get help?',
         'Age and second baby',

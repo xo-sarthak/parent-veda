@@ -75,6 +75,11 @@ const String kTtcIvfTopCardSurface = 'ttc_treatment/start';
 /// The tabs that lead, in this order, while a round is planned or running.
 const List<String> kTtcIvfRoundTabsFirst = ['going', 'track'];
 
+/// The IVF door's first tab (2026-10-22): IUI, IVF and a frozen transfer,
+/// step by step, with a video on every step. It stays first even while a
+/// round runs, because its "You are here" is the round's own step.
+const String kTtcIvfStepsGroupId = 'steps';
+
 const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
   bracketId: 'ttc_infertility',
 
@@ -121,6 +126,19 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
   //  whatever order they sit in -- she is not scrolling past anything. With the
   //  cost of a wrong default gone, the brief's own order wins.
   groups: [
+    // ⚠️ STEP BY STEP COMES FIRST (user 2026-10-22: "make sure that the user
+    // understands ... what happens at each step", and "vids should be first
+    // thing user sees"). The door opens on it: one card per step, the video
+    // on top. Its body is the inline tool `ttc_treatment_journey`
+    // (lib/screens/ttc/doors/ttc_treatment_journey.dart); the reads for each
+    // step sit under it.
+    TtcFocusGroup(
+        id: kTtcIvfStepsGroupId, mark: IntentMark.timelineRail, tabMark: TtcTabMark.flagPath,
+        label: 'Step by step',
+        icon: Icons.route_outlined,
+        hue: 206,
+        inlineSurfaceId: 'ttc_treatment_journey',
+        inlineLabel: 'Every step, in order'),
     TtcFocusGroup(
         id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
         // Kept for revert (2026-09-28, explicit names): label: 'Understand',
@@ -171,6 +189,16 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       heading: 'Should we get fertility help?',
       group: 'help',
       tiles: [
+        // ⚠️ A VIDEO LEADS EVERY RAIL ON THIS DOOR (user 2026-10-22). The
+        // same film Taking a while carries, one film in two places.
+        TtcVideoTile(
+          title: 'The twelve-month rule, and who should not wait',
+          id: 'ttc_tile_is_it_time_to_see_someone',
+          blurb: 'The twelve-month rule, and the situations where it does not '
+              'apply.',
+          slotId: 'ttc_vid_when_to_seek_help',
+          duration: '5 MIN',
+        ),
         // ⚠️ ONE NAME FOR ONE TOOL (2026-09-27, relevance audit). "Readiness"
         // read as IVF readiness; the screen asks whether it is worth talking
         // to someone yet, and Taking a while already calls it this.
@@ -309,6 +337,15 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       heading: 'What will the clinic test, and why?',
       group: 'understand',
       tiles: [
+        // A video first (2026-10-22): the His side door's film of the one
+        // test every couple has.
+        TtcVideoTile(
+          title: 'A semen report, line by line',
+          id: 'ttc_tile_reading_a_semen_report',
+          blurb: 'What each number on the page measures.',
+          slotId: 'ttc_vid_semen_analysis',
+          duration: '6 MIN',
+        ),
         TtcArticleTile(
           title: 'What a fertility check involves',
           id: 'ttc_tile_what_a_fertility_check_involves',
@@ -667,9 +704,15 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     // from Learn, so someone reading up before her first round, most of this
     // door's visitors, could not find them here. Order: the order a round
     // runs in, then the wait and what comes after it.
+    // ⚠️ MOVED UNDER "STEP BY STEP" (2026-10-22). The journey above it says
+    // what happens at each step and its "Read more" opens these; keeping the
+    // rail here too (rather than deleting it) keeps every read in the door's
+    // search. Kept for revert:
+    //   heading: 'What happens at each step?',
+    //   group: 'going',
     TtcFocusSection(
-      heading: 'What happens at each step?',
-      group: 'going',
+      heading: 'Read more about each step',
+      group: kTtcIvfStepsGroupId,
       tiles: [
         TtcArticleTile(
           title: 'Your first visit: the baseline scan',

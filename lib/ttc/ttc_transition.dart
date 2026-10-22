@@ -78,6 +78,8 @@ class TtcTransitionResult {
     required this.cyclesLogged,
     required this.partnerJoined,
     required this.dueDateWasDerived,
+    this.lmpUsed,
+    this.clinicOwned = false,
   });
 
   final DateTime dueDate;
@@ -99,6 +101,58 @@ class TtcTransitionResult {
   /// the test itself. The screen says so rather than presenting a guess as a
   /// date.
   final bool dueDateWasDerived;
+
+  /// The logged period it was counted from (2026-10-22), so the screen can
+  /// name the day. Null when the date came from a clinic or was guessed.
+  final DateTime? lmpUsed;
+
+  /// Dated by her clinic (a transfer, an IUI, or a date they gave). The
+  /// screen never questions such a date (CLAUDE.md, a clinic-owned date is
+  /// not ours to second-guess).
+  final bool clinicOwned;
+}
+
+/// Whether the date on the new-chapter page needs her to look again.
+///
+/// The user (walk 2026-10-20): the page said "about 2 weeks pregnant". Weeks
+/// count from the first day of the last period; ovulation is about two weeks
+/// later, and a home test turns positive from about 8 days after it (about 3
+/// weeks), usually around 4. So under 3 weeks the period she logged was
+/// almost certainly not her last one, or it was a light implantation bleed,
+/// which is easy to mistake for a period. We ASK, and never move her date
+/// for her: the same as a midwife asking "was that bleed lighter than usual?".
+enum TtcDatingCheck {
+  /// Nothing to say beyond the date.
+  fine,
+
+  /// Under 21 days: a positive test is not usually possible yet.
+  tooEarly,
+
+  /// 21 to 27 days: possible with an early test. The first scan confirms.
+  early,
+
+  /// Over 10 weeks since the logged period: probably a period went unlogged.
+  stale,
+
+  /// No period logged, so about 4 weeks was assumed.
+  guessed,
+
+  /// Her clinic dated it. Never questioned.
+  clinic,
+}
+
+/// Pure: which [TtcDatingCheck] applies on [today].
+TtcDatingCheck ttcDatingCheck(
+    {DateTime? lmp, required DateTime today, bool clinicOwned = false}) {
+  if (clinicOwned) return TtcDatingCheck.clinic;
+  if (lmp == null) return TtcDatingCheck.guessed;
+  final days = DateTime(today.year, today.month, today.day)
+      .difference(DateTime(lmp.year, lmp.month, lmp.day))
+      .inDays;
+  if (days < 21) return TtcDatingCheck.tooEarly;
+  if (days < 28) return TtcDatingCheck.early;
+  if (days > 70) return TtcDatingCheck.stale;
+  return TtcDatingCheck.fine;
 }
 
 /// What a treatment round needs before its pregnancy can be dated.
@@ -317,6 +371,40 @@ class TtcTransitionEngine {
       cyclesLogged: CycleStore.instance.completedCycles,
       partnerJoined: TtcStore.instance.partnerJoined,
       dueDateWasDerived: derived,
+      lmpUsed: given == null ? lmp : null,
+      clinicOwned: source?.clinicOwned ?? false,
+    );
+  }
+
+  /// Dates the pregnancy again from the day SHE says her last period started
+  /// (2026-10-22, "Change the date" on the new-chapter page). Her word beats
+  /// our reading of the log (the truth hierarchy: her observation sits above
+  /// our calculation). Her cycle log is left exactly as it is: only the
+  /// pregnancy's date and its timeline entry move.
+  Future<TtcTransitionResult> redate(
+      TtcTransitionResult r, DateTime lastPeriodStart,
+      {DateTime? on}) async {
+    final when = on ?? DateTime.now();
+    final today = DateTime(when.year, when.month, when.day);
+    final lmp = DateTime(
+        lastPeriodStart.year, lastPeriodStart.month, lastPeriodStart.day);
+    final due = dueDateFrom(lmp);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          PregnancyController.kDueDateKey, due.toIso8601String());
+      await prefs.remove(PregnancyController.kDueDateSourceKey);
+    } catch (_) {/* local-first: a storage failure never blocks the moment */}
+    FamilyTimeline.instance.refreshDerived('pregnancy_started', on: lmp);
+    return TtcTransitionResult(
+      dueDate: due,
+      weeksPregnant: weeksFrom(lmp, on: today),
+      timelineEvents: r.timelineEvents,
+      supplements: r.supplements,
+      cyclesLogged: r.cyclesLogged,
+      partnerJoined: r.partnerJoined,
+      dueDateWasDerived: true,
+      lmpUsed: lmp,
     );
   }
 

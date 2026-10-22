@@ -542,3 +542,31 @@ Added 2026-09-26 by the door data pass (TTC gap plan). Both new doors ship with 
 The user's Garbh Sanskar.xlsx names 45 tracks for Shravan (Listen) and no recordings exist. The brief —
 ID, weeks, kind, raga, instrument, time of day, the mother's cue — is generated into
 `docs/GARBH-AUDIO-OWED.md` by `tools/garbh_content/xlsx_to_dart.py`. Nothing from that sheet is in the app.
+
+## IVF and IUI, step by step — 16 films (2026-10-22)
+
+The IVF door's first tab (`lib/ttc/ttc_treatment_journey.dart`) puts a film on
+top of every step. All 16 slots are in `kTtcVideos` as `ttc_vid_step_*`, with
+chapters and takeaways, so each opens its notes today. Doctor-led, so a real
+clinician on camera (video plan rule); scenes may be illustrated. 60 to 110
+seconds each. Explain, remind, prepare: no doses, no dates given as hers, no
+chances.
+
+| # | Slot | Film | Covers |
+|---|---|---|---|
+| TTC3.1 | `ttc_vid_step_iui_medicine` | Tablets or injections before an IUI | letrozole or injections; which day they start |
+| TTC3.2 | `ttc_vid_step_scans` | Follicle and monitoring scans | what an internal scan is like; what is measured |
+| TTC3.3 | `ttc_vid_step_trigger` | The trigger injection | why the exact hour matters; if you are late |
+| TTC3.4 | `ttc_vid_step_iui_day` | IUI day, minute by minute | his sample and washing; the 5 minutes; after |
+| TTC3.5 | `ttc_vid_step_progesterone` | Progesterone support | pessaries, gels, injections; when it stops |
+| TTC3.6 | `ttc_vid_step_beta` | The blood test after treatment | beta hCG; why a home test can mislead |
+| TTC3.7 | `ttc_vid_step_review` | Your review appointment | what is looked back at; what to bring |
+| TTC3.8 | `ttc_vid_step_ivf_ready` | Getting ready for IVF | why some clinics quieten the cycle; protocols |
+| TTC3.9 | `ttc_vid_step_baseline` | The baseline scan | when, and what it checks |
+| TTC3.10 | `ttc_vid_step_ivf_injections` | Giving your own IVF injections | the pen; bloating and what is normal |
+| TTC3.11 | `ttc_vid_step_collection` | Egg collection day | sedation; resting after |
+| TTC3.12 | `ttc_vid_step_lab` | The lab, and the phone calls | day 1, 3 and 5; freezing |
+| TTC3.13 | `ttc_vid_step_transfer` | Embryo transfer | the day; fresh or frozen |
+| TTC3.14 | `ttc_vid_step_fet_lining` | Building the lining | medicated or natural cycle |
+| TTC3.15 | `ttc_vid_step_fet_scans` | Lining scans | what is measured before a transfer is set |
+| TTC3.16 | `ttc_vid_step_fet_transfer` | Thaw and transfer | the thaw; the transfer |

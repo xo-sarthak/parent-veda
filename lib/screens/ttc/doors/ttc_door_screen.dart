@@ -92,7 +92,8 @@
 // =============================================================================
 
 import 'package:flutter/foundation.dart' show ValueListenable;
-import '../../../ttc/ttc_age_rank.dart' show ttcAgeOrderSections;
+import '../../../ttc/ttc_age_rank.dart'
+    show ttcAgeOrderSections, ttcIsForAge, ttcTileAgeText;
 import 'package:flutter/material.dart';
 
 import '../../../localization/app_language.dart';
@@ -128,7 +129,8 @@ import '../../../data/mind_mood_data.dart'
 import '../ttc_get_help_screen.dart'
     show TtcGetHelpRow, openTtcGetHelp, ttcDialNumber, TtcDial;
 import '../ttc_intimate_offer.dart' show ttcMaybeOfferIntimateSwitch;
-import '../ttc_common.dart' show ttcSectionHeadingStyle;
+import '../ttc_common.dart'
+    show ttcSectionHeadingStyle, ttcLine, ttcTitleInk;
 import '../ttc_strings.dart';
 import '../ttc_surface_router.dart' show ttcInlineToolFor, openTtcSurface;
 // Kept for revert: `show TtcStartTreatmentCard` (the panel draws it now).
@@ -618,7 +620,20 @@ String ttcDoorDisclaimerFor(String bracketId, [String? groupId]) {
 /// subject: Understand (what the treatments involve), Going through it and
 /// Track. The other tabs (Should I get help?, Age and second baby, Money
 /// and clinics) open on their own content.
-const Set<String> kTtcIvfPanelTabs = {'understand', 'going', 'track'};
+// Kept for revert (2026-10-22): {'understand', 'going', 'track'}. Step by
+// step is the tab the door opens on, so "Starting treatment?" or "Your round"
+// lives there too, drawn UNDER the steps so a video stays the first thing she
+// sees (`ttcIvfPanelUnderTool`).
+const Set<String> kTtcIvfPanelTabs = {
+  kTtcIvfStepsGroupId,
+  'understand',
+  'going',
+  'track',
+};
+
+/// On Step by step the round panel follows the journey instead of leading it
+/// (user 2026-10-22: "vids should be first thing user sees").
+bool ttcIvfPanelUnderTool(String? groupId) => groupId == kTtcIvfStepsGroupId;
 
 /// Whether the IVF door's round panel shows on tab [groupId].
 bool ttcIvfPanelShowsOn(String? groupId) =>
@@ -683,6 +698,29 @@ const String kTtcAgeGroupId = 'age';
 /// running, the IVF door leads with [kTtcIvfRoundTabsFirst] ("Going through
 /// it", then "Track"), and the age move waits until the round closes. Order
 /// only: every tab stays.
+/// The tag on a card her age lifted (2026-10-22).
+const String kTtcForYourAge = 'For your age';
+
+/// ⚠️ A VIDEO LEADS EVERY RAIL ON THE IVF DOOR (user 2026-10-22: "vids
+/// should be first thing user sees, dont place vid in the last of the
+/// rail"). A stable sort, so the rest keep their order; other doors are left
+/// as they are.
+List<TtcFocusSection> ttcDoorVideosFirst(
+    List<TtcFocusSection> sections, String bracketId) {
+  if (bracketId != kTtcIvfBracketId) return sections;
+  return [
+    for (final s in sections)
+      TtcFocusSection(
+        heading: s.heading,
+        group: s.group,
+        tiles: [
+          ...s.tiles.whereType<TtcVideoTile>(),
+          ...s.tiles.where((t) => t is! TtcVideoTile),
+        ],
+      ),
+  ];
+}
+
 List<TtcFocusGroup> ttcDoorOrderedGroups(
   List<TtcFocusGroup> groups, {
   required String bracketId,
@@ -692,6 +730,9 @@ List<TtcFocusGroup> ttcDoorOrderedGroups(
   if (bracketId != kTtcIvfBracketId) return groups;
   if (roundRunning) {
     final lead = [
+      // Step by step stays first (2026-10-22): its "You are here" is the
+      // round's own step, so it is the tab a running round most needs.
+      ...groups.where((g) => g.id == kTtcIvfStepsGroupId),
       for (final id in kTtcIvfRoundTabsFirst)
         ...groups.where((g) => g.id == id),
     ];
@@ -887,6 +928,38 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
     return n == 1 ? '1 thing' : '$n things';
   }
 
+  /// "For your age" (2026-10-22): a quiet tag on a card her age lifted, so
+  /// she can see why it is first. Nothing under 35, where nothing moves.
+  Widget _forAge(TtcTile t, Widget card) {
+    if (!ttcIsForAge(
+        ttcTileAgeText(t), TtcFertilityHelpStore.instance.ageBand)) {
+      return card;
+    }
+    return Stack(children: [
+      card,
+      Positioned(
+        left: 8,
+        top: 8,
+        child: IgnorePointer(
+          child: Container(
+            key: ValueKey('ttc_door_for_age_${t.id ?? t.title}'),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: ttcLine),
+            ),
+            child: Text(kTtcForYourAge,
+                style: pvManrope(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w800,
+                    color: ttcTitleInk)),
+          ),
+        ),
+      ),
+    ]);
+  }
+
   void _openTile(TtcTile tile) {
     pvCommitFeedback();
     openTtcFocusTile(context, tile, bracket.hue);
@@ -933,9 +1006,15 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
         // lib/ttc/ttc_age_rank.dart): at 35 or over, sections and tiles about
         // age come first. Under 35 nothing moves. Kept for revert: the
         // unsorted list.
-        final sections = ttcAgeOrderSections(
-            group == null ? page.sections : _sectionsOf(group.id),
-            TtcFertilityHelpStore.instance.ageBand);
+        // Kept for revert (2026-10-22): the age order alone.
+        //   final sections = ttcAgeOrderSections(
+        //       group == null ? page.sections : _sectionsOf(group.id),
+        //       TtcFertilityHelpStore.instance.ageBand);
+        final sections = ttcDoorVideosFirst(
+            ttcAgeOrderSections(
+                group == null ? page.sections : _sectionsOf(group.id),
+                TtcFertilityHelpStore.instance.ageBand),
+            page.bracketId);
 
         return PvLiveSearchScope(
           search: _search,
@@ -1102,7 +1181,8 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                           // D10 (2026-09-28): on the tabs about a round only.
                           // Kept for revert: the bracket test alone.
                           if (page.bracketId == kTtcIvfBracketId &&
-                              ttcIvfPanelShowsOn(group?.id)) ...[
+                              ttcIvfPanelShowsOn(group?.id) &&
+                              !ttcIvfPanelUnderTool(group?.id)) ...[
                             pvDoorPad(TtcIvfRoundPanel(
                               onStart: () => openTtcSurface(
                                   context, kTtcIvfTopCardSurface),
@@ -1199,6 +1279,19 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                                 // Kept for revert (2026-09-27): 28.
                                 const SizedBox(height: _kTtcDoorBlockGap),
                               ],
+
+                          // The round panel, under the steps on Step by step.
+                          if (page.bracketId == kTtcIvfBracketId &&
+                              ttcIvfPanelShowsOn(group?.id) &&
+                              ttcIvfPanelUnderTool(group?.id)) ...[
+                            pvDoorPad(TtcIvfRoundPanel(
+                              onStart: () => openTtcSurface(
+                                  context, kTtcIvfTopCardSurface),
+                              onRead: (id) =>
+                                  openTtcArticle(context, id, hue: hue),
+                            )),
+                            const SizedBox(height: _kTtcDoorBlockGap),
+                          ],
 
                           // ---- this tab's sections ------------------------
                           // ONE FORMAT (2026-09-27): a heading in the one
@@ -1366,15 +1459,18 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                               pvDoorPad(
                                 LayoutBuilder(
                                   key: ttcDoorSectionWideKey(section.heading),
-                                  builder: (context, box) => TtcKindCard(
-                                    tile: tiles.single,
-                                    kind: ttcCardKindOf(tiles.single)!,
-                                    p: p,
-                                    width: box.maxWidth,
-                                    imageHeight: kTtcDoorCardsAsGrid
-                                        ? null
-                                        : ttcKindCardImageHeight(),
-                                    onTap: () => _openTile(tiles.single),
+                                  builder: (context, box) => _forAge(
+                                    tiles.single,
+                                    TtcKindCard(
+                                      tile: tiles.single,
+                                      kind: ttcCardKindOf(tiles.single)!,
+                                      p: p,
+                                      width: box.maxWidth,
+                                      imageHeight: kTtcDoorCardsAsGrid
+                                          ? null
+                                          : ttcKindCardImageHeight(),
+                                      onTap: () => _openTile(tiles.single),
+                                    ),
                                   ),
                                 ),
                               )
@@ -1392,12 +1488,15 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                                       children: [
                                         for (final t in tiles)
                                           if (ttcCardKindOf(t) case final kind?)
-                                            TtcKindCard(
-                                              tile: t,
-                                              kind: kind,
-                                              p: p,
-                                              width: w,
-                                              onTap: () => _openTile(t),
+                                            _forAge(
+                                              t,
+                                              TtcKindCard(
+                                                tile: t,
+                                                kind: kind,
+                                                p: p,
+                                                width: w,
+                                                onTap: () => _openTile(t),
+                                              ),
                                             ),
                                       ],
                                     );
@@ -1421,11 +1520,14 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                                   itemBuilder: (context, i) {
                                     final t = tiles[i];
                                     if (ttcCardKindOf(t) case final kind?) {
-                                      return TtcKindCard(
-                                        tile: t,
-                                        kind: kind,
-                                        p: p,
-                                        onTap: () => _openTile(t),
+                                      return _forAge(
+                                        t,
+                                        TtcKindCard(
+                                          tile: t,
+                                          kind: kind,
+                                          p: p,
+                                          onTap: () => _openTile(t),
+                                        ),
                                       );
                                     }
                                     // Never reached: every rail piece has a kind (a door

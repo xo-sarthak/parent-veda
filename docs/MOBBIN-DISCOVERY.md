@@ -1269,3 +1269,28 @@ cards and streaks.
 
 **Built.** `pp_phase_page.dart`, `pp_home_v3.dart` (`_PaintedHero`,
 `_ActivityRows`).
+
+## 34. TTC batch 2: the new-chapter page and IVF step by step (2026-10-22)
+
+**Found.**
+- [Flo, pregnancy mode](https://mobbin.com/screens/9ed48daa-5725-478b-ad98-da3c004b9848):
+  "Looks like you are 3 weeks pregnant", one line on how it is counted, a pill,
+  and "Change pregnancy week" beside it.
+- [Oura, due date](https://mobbin.com/screens/3cba3344-fda9-4c20-96a7-5ab7e94fd6da):
+  "If your health care professional has provided a different date, you can
+  edit it now".
+- [Clue, last period sheet](https://mobbin.com/screens/23380986-8135-447b-a48c-95580a1613f5):
+  "When did your last period start?" as one question.
+- [MasterClass curriculum](https://mobbin.com/screens/72dcf33e-58e8-486f-a178-583a2d411f67),
+  [Alan, step timeline](https://mobbin.com/screens/6c47d7b0-f8a0-479b-9ea6-6b2f89693d0d),
+  [Acorns, numbered lessons](https://mobbin.com/screens/823d2426-7995-4546-8dda-ebe3414345ba):
+  numbered steps on a line, each with its video.
+
+**Adopted.** The week as the headline with one "How we counted" line and a
+date change beside it (Flo, Oura); the last-period question asked alone
+(Clue); a vertical numbered timeline with the video on top of every step card
+(MasterClass, Alan).
+
+**Declined.** Flo's pink pill (ours is ink). Celebration screens with confetti
+(WHOOP's "Congratulations"): many couples reach this page after a loss.
+Gamified path maps (Ahead, Noom): a treatment is not a game with locks.

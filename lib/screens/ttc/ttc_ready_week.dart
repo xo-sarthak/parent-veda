@@ -198,7 +198,9 @@ class _HabitRow extends StatelessWidget {
                 pvCommitFeedback();
                 store.toggleSmaller(habit);
               },
-              child: Text(small ? 'Back to the full one' : 'Make it smaller',
+              // Kept for revert (2026-10-22, a label names its thing):
+              //   small ? 'Back to the full one' : 'Make it smaller'
+              child: Text(small ? 'Back to the full habit' : 'Make the habit smaller',
                   style: ttcBody(12.5,
                       color: ttcTitleInk, w: FontWeight.w700)),
             ),
@@ -294,8 +296,12 @@ class TtcReadyHelpCards extends StatelessWidget {
               )),
               child: Container(
                 padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+                // Kept for revert (2026-10-22, no tinted slab, no lavender):
+                //   color: ttcPanel, borderRadius: BorderRadius.circular(16)),
                 decoration: BoxDecoration(
-                    color: ttcPanel, borderRadius: BorderRadius.circular(16)),
+                    color: Colors.white,
+                    border: Border.all(color: ttcLine),
+                    borderRadius: BorderRadius.circular(16)),
                 child: Row(children: [
                   Expanded(
                     child: Column(
