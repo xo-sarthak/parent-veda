@@ -445,6 +445,16 @@ class PregnancyController extends ChangeNotifier {
       }
       // Where the date came from (0102). Its own read, so a database that has
       // not run 0102 yet costs only this, never the due date itself.
+      // Her own date, still waiting to upload, beats the cloud's (2026-10-22):
+      // try once more to send it, and keep this phone's date either way (the
+      // cloud value read above predates it).
+      final waiting = await PendingProfile.load();
+      if (!cloudDueDateApplies(waiting)) {
+        try {
+          await PendingProfile.flush();
+        } catch (_) {/* kept for the next sync */}
+        dueStr = null;
+      }
       if (_dueDateSource == DueDateSource.unknown && (dueStr ?? '').isNotEmpty) {
         try {
           final src = await client
@@ -568,6 +578,40 @@ class PregnancyController extends ChangeNotifier {
       });
     } catch (_) {/* offline - local only, and waiting in PendingProfile */}
   }
+
+  /// Forgets the due date for real (2026-10-22): the undo of a positive test
+  /// recorded by mistake. Memory, this phone and the cloud, so the date cannot
+  /// come back on the next launch or another phone. Unlike [resetForTesting]
+  /// it keeps the placeholder anchor: this is her action, not a demo reset.
+  Future<void> clearDueDate() async {
+    var anchor = _dateOnly(_now);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final a = DateTime.tryParse(prefs.getString(kPlaceholderAnchorKey) ?? '');
+      if (a != null) anchor = _dateOnly(a);
+      await prefs.remove(kDueDateKey);
+      await prefs.remove(kDueDateSourceKey);
+    } catch (_) {/* best-effort */}
+    _dueDate = _placeholderDueDate(anchor);
+    _dueDateIsSet = false;
+    _dueDateSource = DueDateSource.unknown;
+    _selectedWeek = currentWeek;
+    notifyListeners();
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      await PendingProfile.send({'due_date': null});
+    } catch (_) {/* offline - local only, and waiting in PendingProfile */}
+  }
+
+  /// Whether the cloud's due date may replace this phone's (2026-10-22).
+  ///
+  /// ⚠️ A CHANGE STILL WAITING TO UPLOAD BEATS THE CLOUD ON PULL. The cloud's
+  /// copy is only the newest word once this phone's own last word has landed.
+  /// A due date set offline (a positive test on a weak signal) waits in
+  /// `PendingProfile`; reading the cloud's older date over it at the next
+  /// launch would put her back on the wrong week. BACKEND-PATTERNS §16ii-q.
+  static bool cloudDueDateApplies(Map<String, dynamic>? waiting) =>
+      !(waiting?.containsKey('due_date') ?? false);
 
   /// Testing helper - clear any saved due date and snap back to the week-20
   /// placeholder, so the app + pregnancy map present a fresh "halfway" state.

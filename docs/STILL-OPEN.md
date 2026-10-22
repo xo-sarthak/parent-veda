@@ -10930,6 +10930,21 @@ walked on a phone.
   now. Four labels named nothing ("Make it smaller" and others) and are named.
   Learn had its own scroll controller since §96, so tapping Learn again no
   longer scrolled it up; it uses the tab host's again.
+- **§97.8 "Yes, I'm pregnant" landed on week 20 — FIXED 2026-10-22.** The
+  user found it. The engine wrote the due date to storage only; the running
+  `PregnancyController` had read storage at app start and sat on its week-20
+  placeholder, so the shell opened on week 20 until a restart, and the cloud
+  never heard (the next launch could take a stale cloud date). Now
+  `confirmPregnancy`, `redate` and `undo` go through the controller
+  (`setDueDate`, new `clearDueDate`): memory, storage and the cloud together.
+  The backend check found two more, both fixed: a stage and a due date still
+  waiting to upload were overwritten by the cloud on the next launch
+  (`LifeStageStore.pullFromCloud`, `PregnancyController.loadProfileFromCloud`).
+  BACKEND-PATTERNS §16ii-q. The TTC Profile stage switch still lands on the
+  placeholder by design (a testing switch, no date).
+- **§97.9 Owed to the pregnancy session.** No pregnancy screen reads
+  `isDueDateSet`, so a placeholder week 20 looks like a real week. An "Add your
+  due date" invitation when none is set (a feature is never hidden).
 - **§97.7 Owed.**
   - 16 step videos, briefs in DOOR-CONTENT-OWED (TTC3). Doctor-led, so real
     clinicians on camera.

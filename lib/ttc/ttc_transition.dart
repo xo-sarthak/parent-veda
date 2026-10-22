@@ -316,6 +316,23 @@ class TtcTransitionEngine {
 
     TtcStore.instance.confirmPregnancy(on: today);
 
+    // ⚠️ THROUGH THE RUNNING CONTROLLER, NOT AROUND IT (2026-10-22). The user:
+    // "Yes, I'm pregnant", then the button "landed me on preg week 20". This
+    // wrote the date to storage only, but the pregnancy controller had read
+    // storage once, at app start, and sat on its week-20 placeholder, so the
+    // shell opened on week 20 until a restart. And the cloud never heard,
+    // so the next launch could take the account's stale due date over hers.
+    // `setDueDate` moves memory, storage and the cloud (queued if offline)
+    // together. Without a controller (tests, a build where main.dart has not
+    // run) the storage write below is the fallback.
+    final ctrl = PregnancyController.current;
+    if (ctrl != null) {
+      await ctrl.setDueDate(due,
+          source: source ??
+              (given == null && lmp != null
+                  ? DueDateSource.lastPeriod
+                  : DueDateSource.unknown));
+    } else {
     // Stored where PregnancyController already looks, so the pregnancy app
     // needs no migration and no setup screen - it simply loads with a date.
     try {
@@ -331,6 +348,7 @@ class TtcTransitionEngine {
         await prefs.remove(PregnancyController.kDueDateSourceKey);
       }
     } catch (_) {/* local-first: a storage failure never blocks the moment */}
+    }
 
     // --- 2. the life stage --------------------------------------------------
     LifeStageStore.instance.setStage(LifeStage.pregnancy, at: today);
@@ -389,12 +407,18 @@ class TtcTransitionEngine {
     final lmp = DateTime(
         lastPeriodStart.year, lastPeriodStart.month, lastPeriodStart.day);
     final due = dueDateFrom(lmp);
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-          PregnancyController.kDueDateKey, due.toIso8601String());
-      await prefs.remove(PregnancyController.kDueDateSourceKey);
-    } catch (_) {/* local-first: a storage failure never blocks the moment */}
+    // Through the running controller, as in [confirmPregnancy].
+    final ctrl = PregnancyController.current;
+    if (ctrl != null) {
+      await ctrl.setDueDate(due, source: DueDateSource.lastPeriod);
+    } else {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+            PregnancyController.kDueDateKey, due.toIso8601String());
+        await prefs.remove(PregnancyController.kDueDateSourceKey);
+      } catch (_) {/* local-first: a storage failure never blocks the moment */}
+    }
     FamilyTimeline.instance.refreshDerived('pregnancy_started', on: lmp);
     return TtcTransitionResult(
       dueDate: due,
@@ -418,10 +442,18 @@ class TtcTransitionEngine {
     LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
     FamilyTimeline.instance.remove('ttc_positive_test');
     FamilyTimeline.instance.remove('pregnancy_started');
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(PregnancyController.kDueDateKey);
-      await prefs.remove(PregnancyController.kDueDateSourceKey);
-    } catch (_) {/* best-effort */}
+    // The date goes everywhere it went (2026-10-22): memory, storage and the
+    // cloud, or a mis-tap undone here comes back on the next launch or the
+    // other phone. Storage only, as before, when there is no controller.
+    final ctrl = PregnancyController.current;
+    if (ctrl != null) {
+      await ctrl.clearDueDate();
+    } else {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(PregnancyController.kDueDateKey);
+        await prefs.remove(PregnancyController.kDueDateSourceKey);
+      } catch (_) {/* best-effort */}
+    }
   }
 }

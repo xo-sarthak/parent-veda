@@ -3689,6 +3689,42 @@ every copy edit needs a rename map that lives as long as any phone might hold th
 > General facts: **a last-writer-wins map is a CRDT you can build in an afternoon; merge it where writes are already
 > serialized; and when you emptied something on purpose, do not let the change tracker call it a delete.**
 
+### 16ii-q. A change still waiting to upload beats the cloud on pull (2026-10-22)
+
+**The bug.** She taps "Yes, I'm pregnant" on a weak signal. Her stage
+("pregnancy") is saved on the phone, and the upload fails, so the store marks
+itself waiting. Next launch, online: every synced store runs pull first, then
+push (`TtcSyncedStore.syncFromCloud`). The life stage is cloud-wins, so the pull
+reads the cloud's old "trying", saves it locally, and the push sends "trying"
+back up. Her declaration is gone, and the launch after that opens Trying to
+Conceive. The due date had the same shape: `loadProfileFromCloud` ran at
+startup, before the queue of waiting profile changes (`PendingProfile`) was
+flushed, and wrote the cloud's older date over hers.
+
+**The general fact.** "Cloud wins" is a rule about which copy is NEWEST, and
+it is only true once this device's own last word has landed. While a change is
+waiting, the phone's copy is newer than the cloud's, and a pull that overwrites
+it destroys the very change the retry exists to deliver. So a pull must first
+ask: am I holding something unsent? If yes, keep it, and let the push that
+follows carry it up.
+
+**Where it lives.**
+- `LifeStageStore.pullFromCloud` returns early while `hasPendingPush`. The
+  waiting mark is persisted (sync log step 11) and loaded before the pull, so it
+  survives a restart.
+- `PregnancyController.loadProfileFromCloud` checks `PendingProfile` for a
+  waiting `due_date` (`cloudDueDateApplies`), tries one more flush, and keeps
+  the phone's date either way, because the cloud value it read predates it.
+
+**The trade-off.** Keeping the waiting copy means that if the SAME person
+changed the value on another phone after this one went offline, this phone's
+older word wins when it comes back. For a one-value declaration (stage, due
+date) that is the right failure: the person most recently acting on this phone
+is the one in front of it, and a lost declaration is far worse than a
+re-declared one. Row stores avoid the question by carrying an edit time per row
+and merging newest-wins (§16ii, 0097); a one-value field without a timestamp
+cannot, so it uses the waiting mark instead.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

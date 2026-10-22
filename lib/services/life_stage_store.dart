@@ -181,6 +181,15 @@ class LifeStageStore extends ChangeNotifier with TtcSyncedStore {
 
   @override
   Future<void> pullFromCloud() async {
+    // ⚠️ A DECLARATION STILL WAITING TO UPLOAD BEATS THE CLOUD (2026-10-22).
+    // Cloud-wins is right only once this phone's last word has landed. If
+    // "Yes, I'm pregnant" was tapped on a weak signal, the cloud still says
+    // "trying"; pulling it here would save it locally and push it back, and
+    // the next launch would put her in Trying to Conceive with her pregnancy
+    // gone. The waiting mark is loaded before this runs (`syncFromCloud`),
+    // and the push right after sends her declaration. BACKEND-PATTERNS
+    // §16ii-q. Kept for revert: no guard.
+    if (hasPendingPush) return;
     final row = await SupabaseRepo.fetchMyProfile('life_stage, life_stage_at');
     if (row == null) return;
     final stage = LifeStageCopy.fromId(row['life_stage'] as String?);

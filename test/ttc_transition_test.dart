@@ -10,6 +10,8 @@
 //  pregnancy app can pick up the due date with no migration and no setup.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -304,5 +306,77 @@ void main() {
         }
       }
     });
+  });
+
+  // ===========================================================================
+  //  The user (2026-10-22): "Yes, I'm pregnant", then the button "landed me on
+  //  preg week 20". The date went to storage only; the running pregnancy
+  //  controller had read storage at app start and sat on its week-20
+  //  placeholder. Now the engine goes through the controller.
+  group('the pregnancy app follows at once, with no restart', () {
+    late PregnancyController ctrl;
+    setUp(() {
+      // On its placeholder, the way an app opened in TTC holds it.
+      ctrl = PregnancyController(now: DateTime(2026, 7, 24));
+      PregnancyController.current = ctrl;
+    });
+    tearDown(() => PregnancyController.current = null);
+
+    test('the positive test moves the live controller to her week', () async {
+      seedAJourney();
+      expect(ctrl.isDueDateSet, isFalse);
+      expect(ctrl.currentWeek, 20, reason: 'the placeholder she was seeing');
+      final r = await engine.confirmPregnancy(on: DateTime(2026, 7, 24));
+      expect(ctrl.isDueDateSet, isTrue);
+      expect(ctrl.dueDate, r.dueDate);
+      expect(ctrl.currentWeek, r.weeksPregnant,
+          reason: 'the page and the pregnancy app disagree on the week');
+      expect(ctrl.currentWeek, isNot(20));
+      expect(ctrl.dueDateSource, DueDateSource.lastPeriod);
+    });
+
+    test("a clinic date reaches it as the clinic's", () async {
+      seedAJourney();
+      final due = DateTime(2027, 3, 1);
+      await engine.confirmPregnancy(
+          on: DateTime(2026, 7, 24),
+          dueDate: due,
+          source: DueDateSource.ivfTransfer);
+      expect(ctrl.dueDate, due);
+      expect(ctrl.dueDateSource.clinicOwned, isTrue);
+    });
+
+    test('a changed date follows, and undo forgets it everywhere', () async {
+      seedAJourney();
+      final r = await engine.confirmPregnancy(on: DateTime(2026, 7, 24));
+      final r2 =
+          await engine.redate(r, DateTime(2026, 6, 1), on: DateTime(2026, 7, 24));
+      expect(ctrl.dueDate, r2.dueDate);
+      // The page says completed weeks ("about 7 weeks", 7w4d); the pregnancy
+      // app says the week she is IN ("Week 8"). One date, two conventions.
+      expect(ctrl.currentWeek, r2.weeksPregnant + 1);
+      await engine.undo();
+      expect(ctrl.isDueDateSet, isFalse);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString(PregnancyController.kDueDateKey), isNull);
+    });
+  });
+
+  // The backend half (2026-10-22): a change still waiting to upload beats
+  // the cloud on pull (BACKEND-PATTERNS §16ii-q).
+  test("a due date waiting to upload is not replaced by the cloud's", () {
+    expect(PregnancyController.cloudDueDateApplies(null), isTrue);
+    expect(PregnancyController.cloudDueDateApplies({'name': 'A'}), isTrue);
+    expect(PregnancyController.cloudDueDateApplies({'due_date': '2027-03-01'}),
+        isFalse);
+  });
+
+  test("a stage waiting to upload is not replaced by the cloud's", () {
+    final src = File('lib/services/life_stage_store.dart').readAsStringSync();
+    final pull = src.substring(src.indexOf('Future<void> pullFromCloud()'));
+    final guard = pull.indexOf('if (hasPendingPush) return;');
+    expect(guard, greaterThan(-1));
+    expect(guard, lessThan(pull.indexOf('fetchMyProfile')),
+        reason: 'the cloud is read before her waiting declaration is kept');
   });
 }
