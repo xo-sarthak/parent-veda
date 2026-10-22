@@ -357,7 +357,7 @@ void main() {
         'Understand a scan',
         'Understand a result',
         'My reports',
-        'Talk',
+        'Experts', // was 'Talk' (2026-10-22)
       ]);
     });
 

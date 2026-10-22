@@ -119,7 +119,7 @@ final PvDoorPage kMoveDoor = PvDoorPage(
     ),
     PvDoorGroup(
       id: kMoveTabClasses,
-      label: 'Classes and tools',
+      label: 'Classes and videos', // was 'Classes and tools' (2026-10-22)
       mark: IntentMark.lotusMark,
       icon: Icons.self_improvement_rounded,
       hue: 42,
@@ -188,10 +188,10 @@ final PvDoorPage kMoveDoor = PvDoorPage(
     ),
     PvDoorSection(
       group: kMoveTabMove,
-      heading: 'Keep it safe',
+      heading: 'What to avoid', // was 'Keep it safe' (2026-10-22)
       tiles: [
         PvDoorGuideTile(
-          title: 'What to avoid',
+          title: 'Moves to skip for now', // was 'What to avoid', which is now the heading above it (2026-10-22)
           blurb: 'The sports and moves to leave out for now, and why.',
           readId: 'preg_move_read_avoid',
         ),
@@ -289,7 +289,7 @@ final PvDoorPage kMoveDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kMoveTabClasses,
-      heading: 'Follow along at home',
+      heading: 'Videos to follow at home', // was 'Follow along at home' (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: _yogaTitle,

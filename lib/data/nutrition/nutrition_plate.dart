@@ -188,7 +188,7 @@ NutritionPlate plateFor(
 
 /// One daily tick.
 class PlateNeed {
-  const PlateNeed({required this.id, required this.label, required this.line, required this.recipeTag});
+  const PlateNeed({required this.id, required this.label, required this.line, required this.recipeTag, this.absorbLine});
 
   /// Matches `NutrientGuide.id` where one exists.
   final String id;
@@ -199,17 +199,71 @@ class PlateNeed {
 
   /// The recipe tag that counts.
   final String recipeTag;
+
+  /// How to get more of it into the body, for the needs where that is a real
+  /// thing to do (iron, calcium, fibre). Null hides the block on the need page.
+  /// Added 2026-10-22, the Eat today page.
+  final String? absorbLine;
 }
 
 /// Five, in the order the day meets them. Fluids is not a nutrient guide;
 /// it is the water row, and it ticks itself at six glasses.
 const List<PlateNeed> kPlateNeeds = [
-  PlateNeed(id: 'iron', label: 'Iron', line: 'Dal, greens, jaggery, dates, with something sour to help you absorb it.', recipeTag: 'iron'),
-  PlateNeed(id: 'calcium', label: 'Calcium', line: 'Milk, curd, paneer, ragi, sesame.', recipeTag: 'calcium'),
+  PlateNeed(id: 'iron', label: 'Iron', line: 'Dal, greens, jaggery, dates, with something sour to help you absorb it.', recipeTag: 'iron',
+      absorbLine: 'Have something sour with it: lemon on the dal, amla, or an orange. Keep tea and coffee an hour away from the meal.'),
+  PlateNeed(id: 'calcium', label: 'Calcium', line: 'Milk, curd, paneer, ragi, sesame.', recipeTag: 'calcium',
+      absorbLine: 'Spread it across the day, because the body takes in a little at a time. Keep it a couple of hours apart from your iron tablet.'),
   PlateNeed(id: 'protein', label: 'Protein', line: 'Dal, paneer, egg, chana, curd. A little at every meal.', recipeTag: 'protein'),
   PlateNeed(id: 'folic_acid', label: 'Folate', line: 'Greens, oranges, beans, and your daily tablet.', recipeTag: 'folate'),
-  PlateNeed(id: 'fibre', label: 'Fibre', line: 'Whole grains, fruit with the skin on, vegetables, and water to go with it.', recipeTag: 'fibre'),
+  PlateNeed(id: 'fibre', label: 'Fibre', line: 'Whole grains, fruit with the skin on, vegetables, and water to go with it.', recipeTag: 'fibre',
+      absorbLine: 'Drink water with it. Fibre works best with plenty to drink.'),
 ];
+
+/// One everyday serving of each food on a need page, in home words first and
+/// a measure after (user, 2026-10-22: "a katori is fine, write the measure in
+/// gram or ml as well, for better judgment"). Keyed by need id, then by the
+/// food's text in `NutrientGuide.foods`.
+///
+/// ⚠️ A SERVING, NEVER A TARGET. These are typical Indian portions so she can
+/// picture one; nothing adds them up or tells her how many to eat. Figures are
+/// rounded household measures, owed a dietician's review (STILL-OPEN §98).
+const Map<String, Map<String, String>> kPlatePortions = {
+  'iron': {
+    'Dal': '1 katori cooked · about 150 ml',
+    'Dark leafy greens': '1 katori cooked · about 100 g',
+    'Jaggery': 'a small piece · about 10 g',
+    'Ragi': '1 roti or a bowl of porridge · about 30 g flour',
+    'Meat, if eaten': 'a small portion · about 75 g',
+  },
+  'calcium': {
+    'Milk and curd': '1 glass or 1 katori · about 200 ml',
+    'Paneer': 'a few cubes · about 50 g',
+    'Ragi': '1 roti · about 30 g flour',
+    'Sesame seeds': '1 spoon · about 10 g',
+  },
+  'protein': {
+    'Dal': '1 katori cooked · about 150 ml',
+    'Paneer': 'a few cubes · about 50 g',
+    'Eggs': '1 egg · about 50 g',
+    'Chicken and fish': 'a small portion · about 75 g',
+    'Soy and tofu': 'half a katori · about 50 g',
+  },
+  'folic_acid': {
+    'Leafy greens': '1 katori cooked · about 100 g',
+    'Dal and lentils': '1 katori cooked · about 150 ml',
+    'Citrus fruit': '1 orange or mosambi · about 150 g',
+    'Beetroot': 'half a beetroot · about 50 g',
+  },
+  'fibre': {
+    'Whole grains': '2 rotis or 1 katori rice · about 60 g',
+    'Fruit with the skin on': '1 apple or guava · about 150 g',
+    'Vegetables': '1 katori sabzi · about 100 g',
+    'Dal': '1 katori cooked · about 150 ml',
+  },
+};
+
+/// The serving line for one food on a need, or null.
+String? platePortionFor(String needId, String food) => kPlatePortions[needId]?[food];
 
 PlateNeed? plateNeedById(String id) => kPlateNeeds.where((n) => n.id == id).firstOrNull;
 

@@ -124,7 +124,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
     ),
     PvDoorGroup(
       id: kSymTabTalk,
-      label: 'Talk',
+      label: 'Experts', // was 'Talk' (2026-10-22)
       icon: Icons.chat_bubble_outline_rounded,
       mark: IntentMark.askDoctor,
       hue: 268,
@@ -160,7 +160,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
     // the thing neither covers — what to actually SAY when she rings.
     PvDoorSection(
       group: kSymTabNormal,
-      heading: 'When you do call',
+      heading: 'When to call your doctor', // was 'When you do call' (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: 'What to say when you call',
@@ -192,7 +192,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
     // ---- Your week ------------------------------------------------------------------
     PvDoorSection(
       group: kSymTabWeek,
-      heading: 'Take it to your doctor',
+      heading: 'Questions for your doctor', // was 'Take it to your doctor' (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: 'Send my week',
@@ -206,7 +206,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
     // ---- Talk -------------------------------------------------------------------------
     PvDoorSection(
       group: kSymTabTalk,
-      heading: 'Someone to ask',
+      heading: 'Ask an expert', // was 'Someone to ask' (2026-10-22)
       tiles: [
         PvDoorTalkTile(
           title: 'Have a doctor go through it with you',

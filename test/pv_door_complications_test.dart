@@ -37,10 +37,10 @@ void main() {
       expect(door.groups.first.id, kCondTabFind);
       expect(door.groups.map((g) => g.label), [
         'Find a condition',
-        'When it comes up',
+        'By month', // was 'When it comes up' (2026-10-22)
         'Get help now',
-        'Living with it',
-        'Talk',
+        'Day to day', // was 'Living with it' (2026-10-22)
+        'Experts', // was 'Talk' (2026-10-22)
       ]);
     });
 

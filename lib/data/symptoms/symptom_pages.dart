@@ -187,7 +187,7 @@ const Map<String, List<SymptomPageSection>> kSymptomExtraSections = {
         'Cramps with leaking fluid, a fever, or your baby moving less than usual.',
       ],
       paragraphs: [
-        "If you're not sure, call. The labour ward would always rather hear from you. The full list of signs to call about at any hour is on this door's Talk tab.",
+        "If you're not sure, call. The labour ward would always rather hear from you. The full list of signs to call about at any hour is on this door's Experts tab.",
       ],
     ),
   ],
@@ -207,7 +207,7 @@ const Map<String, List<SymptomPageSection>> kSymptomExtraSections = {
         'When it started, and whether you have pain, cramps or fluid with it.',
       ],
       paragraphs: [
-        "The signs to call about at any hour are on this door's Talk tab, and \"I'm bleeding. Is that normal?\" below says exactly what to do.",
+        "The signs to call about at any hour are on this door's Experts tab, and \"I'm bleeding. Is that normal?\" below says exactly what to do.",
       ],
     ),
   ],

@@ -167,7 +167,7 @@ final PvDoorPage kWorkMoneyDoor = PvDoorPage(
     ),
     PvDoorSection(
       group: kWorkMoneyTabLeave,
-      heading: 'His leave',
+      heading: "Your partner's leave", // was 'His leave' (2026-10-22)
       tiles: [
         PvDoorGuideTile(
           title: 'His paternity leave',

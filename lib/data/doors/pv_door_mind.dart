@@ -240,7 +240,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
   // The area's own closing note, in the reads' voice.
   closingLine: 'Nothing here is a test, and nothing is scored. If a feeling '
-      'needs a person, the Talk tab shows you who.',
+      'needs a person, the Experts tab shows you who.',
 
   groups: [
     // -------------------------------------------------------------------------
@@ -248,7 +248,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // -------------------------------------------------------------------------
     PvDoorGroup(
       id: kMindTabFeel,
-      label: 'Feel',
+      label: 'Calm down now', // was 'Feel' (2026-10-22)
       icon: Icons.self_improvement_rounded,
       mark: IntentMark.lotusMark, // drawn mark, 2026-10-22
       hue: 288,
@@ -259,7 +259,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // -------------------------------------------------------------------------
     PvDoorGroup(
       id: kMindTabUnderstand,
-      label: 'Understand',
+      label: 'Why you feel this way', // was 'Understand' (2026-10-22)
       icon: Icons.menu_book_outlined,
       mark: IntentMark.bookMark, // drawn mark, 2026-10-22
       hue: 206,
@@ -291,7 +291,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     //  is the tool; it holds no sections at all.
     PvDoorGroup(
       id: kMindTabTrack,
-      label: 'Track',
+      label: 'Mood check-in', // was 'Track' (2026-10-22)
       icon: Icons.timeline_rounded,
       mark: IntentMark.chartLog, // drawn mark, 2026-10-22
       hue: 160,
@@ -310,7 +310,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     //  the crisis path, which is where the numbers and the next step live.
     PvDoorGroup(
       id: kMindTabMore,
-      label: 'When it is more than this',
+      label: "When it's more than a low day", // was 'When it is more than this' (2026-10-22)
       icon: Icons.favorite_border_rounded,
       mark: IntentMark.nextStep, // drawn mark, 2026-10-22
       hue: 344,
@@ -346,7 +346,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // -------------------------------------------------------------------------
     PvDoorGroup(
       id: kMindTabTalk,
-      label: 'Talk',
+      label: 'Experts', // was 'Talk' (2026-10-22)
       icon: Icons.chat_bubble_outline_rounded,
       mark: IntentMark.askDoctor, // drawn mark, 2026-10-22
       hue: 186,
@@ -361,7 +361,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kMindTabFeel,
-      heading: 'In the moment',
+      heading: 'Calm down in a few minutes', // was 'In the moment' (2026-10-22)
       tiles: [
         // ⚠️ REBUILT: was a coming-soon film; now a three-minute guided
         // screen on the breathing circle, with the brief's copy 3.1.
@@ -384,7 +384,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
     PvDoorSection(
       group: kMindTabFeel,
-      heading: 'Breathe',
+      heading: 'Breathing exercises', // was 'Breathe' (2026-10-22)
       tiles: [
         for (final ex in kMmBreathingExercises)
           PvDoorToolTile(
@@ -415,7 +415,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
     PvDoorSection(
       group: kMindTabFeel,
-      heading: 'A gentle word',
+      heading: 'Kind words for a hard day', // was 'A gentle word' (2026-10-22)
       tiles: [
         // ⚠️ REBUILT: the whole rotating set is the brief's 3.2, verbatim.
         PvDoorToolTile(
@@ -442,7 +442,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
     PvDoorSection(
       group: kMindTabFeel,
-      heading: 'Longer, when you have time',
+      heading: 'Longer relaxation', // was 'Longer, when you have time' (2026-10-22)
       tiles: [
         // ⚠️ `hard_day_reset` IS NOT IN THIS RAIL. It is the tool at the top
         // of the tab now; a film of it beside the tool would be two cards for
@@ -469,13 +469,13 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
     PvDoorSection(
       group: kMindTabUnderstand,
-      heading: 'What no one talks about',
+      heading: "Feelings people don't mention", // was 'What no one talks about' (2026-10-22)
       tiles: _readsIn(MmArticleGroup.noOneTalksAbout),
     ),
 
     PvDoorSection(
       group: kMindTabUnderstand,
-      heading: 'Fears',
+      heading: 'Common fears', // was 'Fears' (2026-10-22)
       tiles: _fears(),
     ),
 
@@ -483,7 +483,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // reads exist and are hers. "Do NOT drop anything."
     PvDoorSection(
       group: kMindTabUnderstand,
-      heading: 'Everyday emotional care',
+      heading: 'Looking after your mood', // was 'Everyday emotional care' (2026-10-22)
       tiles: _readsIn(MmArticleGroup.everydayCare),
     ),
 
@@ -494,7 +494,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     //  questions first, then the relationship ones.
     PvDoorSection(
       group: kMindTabCloseness,
-      heading: 'Is it safe?',
+      heading: 'Is sex safe?', // was 'Is it safe?' (2026-10-22); approved 'Is sex safe in pregnancy?' is the first card's own title, and a heading may not repeat a card under it
       tiles: _readsById(const [
         'closeness_sex_safe',
         'closeness_when_to_stop',
@@ -520,7 +520,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kMindTabMore,
-      heading: 'Where you are',
+      heading: 'Your check-ins', // was 'Where you are' (2026-10-22)
       tiles: [
         // ⚠️ RESLOTTED from Talk, as the brief asks. "Soft questions, no
         // score" — the screener already works that way.
@@ -543,7 +543,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
     PvDoorSection(
       group: kMindTabMore,
-      heading: 'Reaching out',
+      heading: 'Getting help', // was 'Reaching out' (2026-10-22)
       tiles: [
         PvDoorTalkTile(
           title: 'Talk to someone today',
@@ -601,7 +601,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
 
     PvDoorSection(
       group: kMindTabTalk,
-      heading: "If it can't wait",
+      heading: 'Help right now', // was "If it can't wait" (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: 'Right now, free',

@@ -38,6 +38,7 @@ import '../data/reads/pregnancy_reads.dart' show pregnancyReadById;
 import '../data/doors/pv_door_data.dart' show PvDoorEntryTile, PvDoorLibrary;
 import '../data/doors/pv_door_scans.dart' show kScansDoor;
 import '../data/nutrition/nutrition_plate.dart';
+import 'move/pv_move_today_screen.dart' show moveTodaySessionFor;
 import '../data/symptoms/symptom_library.dart';
 import '../models/can_i_entry.dart';
 import '../models/home_day.dart';
@@ -107,6 +108,7 @@ class PregInsight {
     this.scanId,
     this.truth,
     this.readId,
+    this.sessionId,
   });
 
   /// Stable, so a test can assert which cards a given day produces.
@@ -132,12 +134,20 @@ class PregInsight {
 
   /// A [PregInsightGo.move] card: the Move door read it opens.
   final String? readId;
+
+  /// Move today: the yoga session the card names (`YogaSession.id`). The read
+  /// in [readId] rides along as the page's "Read first" row (2026-10-22).
+  final String? sessionId;
 }
 
 /// The Move door's reads that suit [week], in the order they are offered. Ids
 /// only: each is the door's own read, so the card and the door cannot say two
 /// things. Walking and the pelvic floor suit every week; the rest follow her
 /// trimester, and the two late ones wait for the weeks they are about.
+/// The yoga read, the one Move today offers as its article where her weeks
+/// carry it (2026-10-22).
+const String kPregMoveYogaReadId = 'preg_move_read_yoga';
+
 List<String> pregMoveReadIdsFor(int week) => [
       'preg_move_read_walking',
       'preg_move_read_pelvic_floor',
@@ -422,19 +432,47 @@ List<PregInsight> pregInsightsFor({
     for (final id in pregMoveReadIdsFor(week))
       if (pregnancyReadById(id) != null) id,
   ];
+  //
+  // ⚠️ MOVE TODAY, 2026-10-22. The user: "it says Move at top, and when you
+  // click on it, it opens an article for you to read". The card now names a
+  // movement (this month's yoga session) and opens Move today, which leads
+  // with the session and offers the read as a labelled article. The read is
+  // still picked here: the yoga read when her weeks have it, else today's.
+  // The old read-only card, kept for revert:
+  //   cards.add(PregInsight(id: 'move_$id', eyebrow: 'Move', value: r.title.en,
+  //       caption: 'Move & rest', hue: 168, art: PvInsightArt.move,
+  //       go: PregInsightGo.move, readId: id));
+  final session = moveTodaySessionFor(week, date);
   if (movePool.isNotEmpty) {
-    final id = ttcPickForToday(movePool, now: date, offset: 3);
+    final id = movePool.contains(kPregMoveYogaReadId)
+        ? kPregMoveYogaReadId
+        : ttcPickForToday(movePool, now: date, offset: 3);
     final r = pregnancyReadById(id)!;
-    cards.add(PregInsight(
-      id: 'move_$id',
-      eyebrow: 'Move',
-      value: r.title.en,
-      caption: 'Move & rest',
-      hue: 168,
-      art: PvInsightArt.move,
-      go: PregInsightGo.move,
-      readId: id,
-    ));
+    if (session == null) {
+      cards.add(PregInsight(
+        id: 'move_$id',
+        eyebrow: 'Move',
+        value: r.title.en,
+        caption: 'Article',
+        hue: 168,
+        art: PvInsightArt.move,
+        go: PregInsightGo.move,
+        readId: id,
+      ));
+    } else {
+      final s = session;
+      cards.add(PregInsight(
+        id: 'move_${s.id}',
+        eyebrow: 'Move today',
+        value: s.title.en,
+        caption: 'Yoga · ${s.duration.en}',
+        hue: 168,
+        art: PvInsightArt.move,
+        go: PregInsightGo.move,
+        readId: id,
+        sessionId: s.id,
+      ));
+    }
   }
 
   // ---- 7. A read for this week ---------------------------------------------

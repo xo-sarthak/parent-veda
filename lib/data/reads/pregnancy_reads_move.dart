@@ -75,6 +75,40 @@ final PvCallout _sleepCall = PvCallout(
       "cope."),
 );
 
+/// Move today, the page behind the home's Move card (2026-10-22). Also the
+/// surface id the reads below open it by.
+const String kMoveSurfaceToday = 'move/today';
+
+// ⚠️ EVERY MOVE READ ENDS WITH SOMETHING TO DO (user, 2026-10-22: a Move
+// article should lead to movement, and to the paid help that fits it). The
+// reads about moving get today's session and a teacher; the pelvic floor reads
+// get the Kegel routine. The ones about stopping, not exercising, or sleep get
+// none on purpose: a "try a session" under "when not to exercise" would argue
+// with the page. Products join when the store has a yoga mat (STILL-OPEN §98).
+final List<PvReadNextStep> _kMoveNext = [
+  PvReadNextStep(
+    kind: PvNextKind.activity,
+    title: _en("Try today's session"),
+    value: _en('A short prenatal yoga session for your month.'),
+    surfaceId: kMoveSurfaceToday,
+  ),
+  PvReadNextStep(
+    kind: PvNextKind.consult,
+    title: _en('Join a prenatal yoga teacher'),
+    value: _en('Live and recorded classes made for pregnancy.'),
+    surfaceId: 'move/yoga',
+  ),
+];
+
+final List<PvReadNextStep> _kPelvicNext = [
+  PvReadNextStep(
+    kind: PvNextKind.tool,
+    title: _en('Kegel Care'),
+    value: _en('A guided routine for your pelvic floor, a few minutes a day.'),
+    surfaceId: 'move/kegel',
+  ),
+];
+
 final List<PvRead> kPregnancyReadsMove = [
   // ===========================================================================
   //  MOVE SAFELY
@@ -86,6 +120,7 @@ final List<PvRead> kPregnancyReadsMove = [
   PvRead(
     id: 'preg_move_read_is_it_safe',
     hue: _hue,
+    nextSteps: _kMoveNext,
     kicker: _kMove,
     title: _en('Is it safe to exercise in pregnancy?'),
     teaser: _en("How much movement is good for you and your baby, how hard to "
@@ -280,6 +315,7 @@ final List<PvRead> kPregnancyReadsMove = [
   PvRead(
     id: 'preg_move_read_first_trimester',
     hue: _hue,
+    nextSteps: _kMoveNext,
     kicker: _kMove,
     title: _en('Moving in the first three months'),
     teaser: _en("What to do when you're tired and sick, what helps nausea, and "
@@ -448,6 +484,7 @@ final List<PvRead> kPregnancyReadsMove = [
   PvRead(
     id: 'preg_move_read_second_trimester',
     hue: _hue,
+    nextSteps: _kMoveNext,
     kicker: _kMove,
     title: _en('Moving in the middle three months'),
     teaser: _en("Your energy often comes back now. How to use it, and what to "
@@ -616,6 +653,7 @@ final List<PvRead> kPregnancyReadsMove = [
   PvRead(
     id: 'preg_move_read_third_trimester',
     hue: _hue,
+    nextSteps: _kMoveNext,
     kicker: _kMove,
     title: _en('Moving in the last three months'),
     teaser: _en("Slower, shorter and softer. How to stay active as your bump "
@@ -773,6 +811,7 @@ final List<PvRead> kPregnancyReadsMove = [
   PvRead(
     id: 'preg_move_read_walking',
     hue: _hue,
+    nextSteps: _kMoveNext,
     kicker: _kMove,
     title: _en('Walking: the easiest exercise in pregnancy'),
     teaser: _en("Why walking suits almost every pregnancy, how far and how "
@@ -929,6 +968,7 @@ final List<PvRead> kPregnancyReadsMove = [
   PvRead(
     id: 'preg_move_read_yoga',
     hue: _hue,
+    nextSteps: _kMoveNext,
     kicker: _kMove,
     title: _en("Prenatal yoga: what's safe and what to skip"),
     teaser: _en("What yoga can do for you in pregnancy, which poses to change, "
@@ -1803,6 +1843,7 @@ final List<PvRead> kPregnancyReadsMove = [
   PvRead(
     id: 'preg_move_read_pelvic_floor',
     hue: _hue,
+    nextSteps: _kPelvicNext,
     kicker: _kPelvic,
     title: _en('Your pelvic floor, and how to do kegels'),
     teaser: _en("What your pelvic floor does, why pregnancy strains it, and a "
@@ -1974,6 +2015,7 @@ final List<PvRead> kPregnancyReadsMove = [
   PvRead(
     id: 'preg_move_read_leaking',
     hue: _hue,
+    nextSteps: _kPelvicNext,
     kicker: _kPelvic,
     title: _en('Leaking a little when you cough or sneeze'),
     teaser: _en("Why it happens in pregnancy, what helps, and how to tell a "

@@ -28,10 +28,11 @@ class BumpPhoto {
 
   int get trimester => weekNumber <= 13 ? 1 : (weekNumber <= 27 ? 2 : 3);
 
-  BumpPhoto copyWith({String? caption, bool? isFavorite}) => BumpPhoto(
+  BumpPhoto copyWith({String? caption, bool? isFavorite, int? weekNumber}) =>
+      BumpPhoto(
         id: id,
         imageUrl: imageUrl,
-        weekNumber: weekNumber,
+        weekNumber: weekNumber ?? this.weekNumber,
         date: date,
         caption: caption ?? this.caption,
         isFavorite: isFavorite ?? this.isFavorite,

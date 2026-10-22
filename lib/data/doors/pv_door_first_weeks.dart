@@ -325,7 +325,7 @@ final PvDoorPage kFirstWeeksDoor = PvDoorPage(
     ),
     PvDoorSection(
       group: kFirstTabWorries,
-      heading: 'When worry takes over',
+      heading: "When worry won't stop", // was 'When worry takes over' (2026-10-22)
       tiles: [
         PvDoorGuideTile(
           title: 'Anxious in the first weeks',

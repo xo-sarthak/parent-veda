@@ -201,6 +201,24 @@ class BumpStore extends ChangeNotifier {
   BumpPhoto? get latest => photos.isEmpty ? null : photos.last;
   bool hasWeek(int week) => _photos.any((p) => p.weekNumber == week);
 
+  /// One week's photos, cover first, then in the order she added them
+  /// (2026-10-22, week rows). The cover is the photo she favourited, else the
+  /// earliest she added. Derived on read rather than stored: there is no
+  /// "cover" column, so there is nothing to drift out of step with the photos.
+  List<BumpPhoto> photosForWeek(int week) {
+    final list = _photos.where((p) => p.weekNumber == week).toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final fav = list.indexWhere((p) => p.isFavorite);
+    if (fav > 0) list.insert(0, list.removeAt(fav));
+    return list;
+  }
+
+  /// The week's cover, or null when the week has no photo.
+  BumpPhoto? coverFor(int week) {
+    final list = photosForWeek(week);
+    return list.isEmpty ? null : list.first;
+  }
+
   Future<void> addPhoto({
     required String sourcePath,
     required int week,
@@ -239,11 +257,27 @@ class BumpStore extends ChangeNotifier {
     ));
   }
 
+  /// EXCLUSIVE PER WEEK (2026-10-22). The favourite is the week's cover, and
+  /// a week has one cover, so favouriting a photo un-favourites the other
+  /// photos of its week. Each photo that changed is touched on its own: the
+  /// ledger syncs per row, so an untouched sibling would keep its old heart in
+  /// the cloud and come back as a second cover on her other phone.
   Future<void> toggleFavorite(String id) async {
     final i = _photos.indexWhere((p) => p.id == id);
     if (i < 0) return;
-    _photos[i] = _photos[i].copyWith(isFavorite: !_photos[i].isFavorite);
+    final nowFavorite = !_photos[i].isFavorite;
+    _photos[i] = _photos[i].copyWith(isFavorite: nowFavorite);
     _sync.touch(id);
+    if (nowFavorite) {
+      final week = _photos[i].weekNumber;
+      for (var j = 0; j < _photos.length; j++) {
+        final o = _photos[j];
+        if (j != i && o.weekNumber == week && o.isFavorite) {
+          _photos[j] = o.copyWith(isFavorite: false);
+          _sync.touch(o.id);
+        }
+      }
+    }
     notifyListeners();
     await _persist();
     // Kept for revert (step 8): a one-shot upsert, lost offline.
@@ -254,6 +288,34 @@ class BumpStore extends ChangeNotifier {
     //   } catch (_) {}
     // }
     await _pushWaiting();
+  }
+
+  /// Moves a photo to another week (2026-10-22), the toggleFavorite shape.
+  /// A favourite moved into a week that already has one loses its heart: the
+  /// week she moves it into keeps the cover she chose there, rather than the
+  /// move silently replacing it.
+  ///
+  /// The Journal mirror (`bump_<id>`) carries its week only in its default
+  /// title, "Bump, week N". That title follows the move; a caption she wrote
+  /// herself is hers and is left alone.
+  Future<void> setWeek(String id, int week) async {
+    final i = _photos.indexWhere((p) => p.id == id);
+    if (i < 0 || _photos[i].weekNumber == week) return;
+    final from = _photos[i].weekNumber;
+    final clash = _photos[i].isFavorite &&
+        _photos.any((p) => p.id != id && p.weekNumber == week && p.isFavorite);
+    _photos[i] = _photos[i].copyWith(
+      weekNumber: week,
+      isFavorite: clash ? false : null,
+    );
+    _sync.touch(id);
+    notifyListeners();
+    await _persist();
+    await _pushWaiting();
+    final mirror = JournalStore.instance.manualEntries.where((e) => e.id == 'bump_$id').firstOrNull;
+    if (mirror != null && mirror.title == 'Bump, week $from') {
+      await JournalStore.instance.updateEntry(mirror.copyWith(title: 'Bump, week $week'));
+    }
   }
 
   Future<void> updateCaption(String id, String caption) async {

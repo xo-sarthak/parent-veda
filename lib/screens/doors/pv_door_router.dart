@@ -151,6 +151,8 @@ import '../../data/doors/pv_door_partner.dart';
 import '../../data/doors/pv_door_twins.dart';
 import '../father/father_week_guide_screen.dart';
 import '../post_pregnancy/yoga_home_screen.dart';
+import '../move/pv_move_today_screen.dart' show PvMoveTodayScreen, moveTodaySessionFor;
+import '../preg_daily_insights.dart' show kPregMoveYogaReadId;
 
 /// A tile's OWN drawn mark, where the door has something better than its
 /// format's. Null means "the format mark", which is the rule everywhere else.
@@ -479,6 +481,12 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   // revert:
   //   kMoveSurfaceYoga => PrenatalYogaScreen(lang: c.language),
   kMoveSurfaceYoga => YogaHomeScreen(backLabel: 'Back', pregnancy: c),
+  // Move today (2026-10-22): a Move read's "Try today's session". The same
+  // session the home card names today; the yoga hub when her month has none.
+  kMoveSurfaceToday => switch (moveTodaySessionFor(c.currentWeek, DateTime.now())) {
+      final s? => PvMoveTodayScreen(session: s, pregnancy: c, readId: kPregMoveYogaReadId),
+      null => YogaHomeScreen(backLabel: 'Back', pregnancy: c),
+    },
   kMoveSurfaceKegel => KegelCareScreen(controller: c),
   // Getting ready for baby (2026-09-29): the name finder the parenting stage
   // ships (reused, not copied), the shopping checklist with its newborn
@@ -939,7 +947,7 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kMindSurfaceCrisis ||
   kMindSurfaceHelplines => true,
   kCondSurfaceAfterLoss || kAfterLossSurfaceTryAgain => true,
-  kMoveSurfaceYoga || kMoveSurfaceKegel => true,
+  kMoveSurfaceYoga || kMoveSurfaceKegel || kMoveSurfaceToday => true,
   kReadySurfaceNames || kReadySurfaceStore || kReadySurfaceBag => true,
   kTwinsSurfaceDoor => true,
   kPartnerSurfaceDoor => true,

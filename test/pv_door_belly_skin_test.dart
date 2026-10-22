@@ -43,9 +43,9 @@ void main() {
       expect(door.groups.first.id, kBsTabSkin);
       expect(door.groups.map((g) => g.label), [
         'Skin changes',
-        "What's safe to use",
+        'Safe products', // was "What's safe to use" (2026-10-22)
         'Belly care',
-        'The bump ritual',
+        'Bump photos', // was 'The bump ritual' (2026-10-22)
       ]);
     });
 

@@ -61,7 +61,7 @@ void main() {
         'What to eat now',
         'Recipes',
         'Charts & fasting',
-        'Talk',
+        'Experts', // was 'Talk' (2026-10-22)
       ]);
     });
 
@@ -154,7 +154,7 @@ void main() {
       // order moves. And "Add this to your plate now" sits first regardless —
       // the hoist goes to the first ENTRY tile, not to index zero.
       final section = door.sections
-          .firstWhere((s) => s.heading == 'Food for your stage');
+          .firstWhere((s) => s.heading == 'Food by trimester'); // was 'Food for your stage' (2026-10-22)
       List<String> order(int week) => [
             for (final t in section.tilesFor(week))
               if (t is PvDoorEntryTile) t.entryId,

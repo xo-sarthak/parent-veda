@@ -266,7 +266,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     //  the flag treatment would spend an alarm on a disclaimer.
     PvDoorGroup(
       id: kDietTabTalk,
-      label: 'Talk',
+      label: 'Experts', // was 'Talk' (2026-10-22)
       icon: Icons.chat_bubble_outline_rounded,
       mark: IntentMark.askDoctor,
       hue: 344,
@@ -285,7 +285,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kDietTabToday,
-      heading: 'Also on this door',
+      heading: 'More on food', // was 'Also on this door' (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: 'Is this food safe?',
@@ -307,7 +307,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kDietTabNow,
-      heading: 'Food for your stage',
+      heading: 'Food by trimester', // was 'Food for your stage' (2026-10-22)
       // ⚠️ HER OWN TRIMESTER LEADS THE GUIDES. Seen on a phone: "Pre-pregnancy"
       // was the second card on the rail of a door only pregnant women open —
       // not wrong (a woman planning a second baby uses it) but the wrong one
@@ -370,7 +370,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     //  them here would be editing text the brief says to reuse as-is.
     PvDoorSection(
       group: kDietTabNow,
-      heading: 'For a condition you are managing',
+      heading: 'Food for a health condition', // was 'For a condition you are managing' (2026-10-22)
       tiles: _tilesFor(PvDoorLibrary.dietCondition, [
         for (final g in kConditionGuides)
           (
@@ -386,7 +386,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kDietTabNow, // was its own tab; five tabs like every door (2026-09-20)
-      heading: 'What your body needs',
+      heading: 'Key nutrients', // was 'What your body needs' (2026-10-22)
       tiles: [
         ..._tilesFor(PvDoorLibrary.nutrient, [
           for (final n in kNutrientGuides)
@@ -422,7 +422,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
 
     PvDoorSection(
       group: kDietTabNow,
-      heading: 'The bigger questions',
+      heading: 'Common food questions', // was 'The bigger questions' (2026-10-22)
       tiles: [
         // Food beliefs at home (gap analysis Appendix A, P2, 2026-09-29).
         PvDoorGuideTile(

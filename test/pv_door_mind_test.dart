@@ -33,12 +33,12 @@ void main() {
     test('six sub-tabs, Feel first', () {
       // Sex and closeness added 2026-09-29 (pregnancy gap analysis, P2).
       expect(door.groups.map((g) => g.label), [
-        'Feel',
-        'Understand',
+        'Calm down now', // was 'Feel' (2026-10-22)
+        'Why you feel this way', // was 'Understand' (2026-10-22)
         'Sex and closeness',
-        'Track',
-        'When it is more than this',
-        'Talk',
+        'Mood check-in', // was 'Track' (2026-10-22)
+        "When it's more than a low day", // was 'When it is more than this' (2026-10-22)
+        'Experts', // was 'Talk' (2026-10-22)
       ]);
       expect(door.groups.first.id, kMindTabFeel);
     });
@@ -101,7 +101,7 @@ void main() {
     test('a rebuilt body is the brief\'s sentence, not a paraphrase', () {
       final a = mmArticleById('mood_swings')!;
       expect(a.body.en, startsWith('You were fine a moment ago.'));
-      expect(a.body.en, endsWith('The Talk tab shows you who.'));
+      expect(a.body.en, endsWith('The Experts tab shows you who.'));
       final n = mmArticleById('numb_no_joy')!;
       expect(n.body.en, contains('So here it is said plainly: it happens'));
     });
@@ -362,7 +362,7 @@ void main() {
       await tester.pump();
       // Track's tool is on screen; Feel's first section is not.
       expect(find.text('How are you feeling today?'), findsOneWidget);
-      expect(find.text('In the moment'), findsNothing);
+      expect(find.text('Calm down in a few minutes'), findsNothing); // was 'In the moment' (2026-10-22)
 
       await tester.pumpWidget(MaterialApp(
         // A key, so the second pump builds a fresh State rather than reusing
@@ -375,7 +375,7 @@ void main() {
             initialGroup: kMindTabFeel),
       ));
       await tester.pump();
-      expect(find.text('In the moment'), findsOneWidget);
+      expect(find.text('Calm down in a few minutes'), findsOneWidget); // was 'In the moment' (2026-10-22)
       expect(find.text('How are you feeling today?'), findsNothing);
     });
   });

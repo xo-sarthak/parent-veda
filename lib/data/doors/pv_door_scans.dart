@@ -219,7 +219,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     //  woman who came to check when her next scan is never meets it.
     PvDoorGroup(
       id: kScansTabTalk,
-      label: 'Talk',
+      label: 'Experts', // was 'Talk' (2026-10-22)
       mark: IntentMark.askDoctor,
       icon: Icons.chat_bubble_outline_rounded,
       hue: 160,
@@ -447,7 +447,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kScansTabResult,
-      heading: "When a word doesn't make sense",
+      heading: 'Words on your report, explained', // was "When a word doesn't make sense" (2026-10-22)
       tiles: [
         // ⚠️ IT OPENS THE DECODER'S SEARCH, NOT THE DECODER. The decoder is
         // already on screen above this card — its chips and its topic lists
@@ -488,7 +488,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kScansTabReports,
-      heading: "Making sense of what's in there",
+      heading: 'Reading your results', // was "Making sense of what's in there" (2026-10-22)
       tiles: [
         // ⚠️ RETIRED 2026-09-18 — the door walk. Every scan's own read now
         // carries "What the report will say" (its parameters, usual range,

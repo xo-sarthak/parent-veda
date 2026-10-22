@@ -149,7 +149,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
 
     PvDoorGroup(
       id: kCondTabWhen,
-      label: 'When it comes up',
+      label: 'By month', // was 'When it comes up' (2026-10-22)
       mark: IntentMark.calendarDay,
       icon: Icons.calendar_month_outlined,
       hue: 26,
@@ -175,7 +175,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
 
     PvDoorGroup(
       id: kCondTabLiving,
-      label: 'Living with it',
+      label: 'Day to day', // was 'Living with it' (2026-10-22)
       mark: IntentMark.sunMark, // was moodArc, a face outside the TTC mark family (2026-10-22)
       icon: Icons.wb_sunny_outlined,
       hue: 42,
@@ -191,7 +191,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     //  are not the same list — one is about conditions, one is about pregnancy.
     PvDoorGroup(
       id: kCondTabTalk,
-      label: 'Talk',
+      label: 'Experts', // was 'Talk' (2026-10-22)
       mark: IntentMark.askDoctor,
       icon: Icons.chat_bubble_outline_rounded,
       hue: 160,
@@ -334,7 +334,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kCondTabHelp,
-      heading: 'Know these three',
+      heading: 'Three signs to know', // was 'Know these three' (2026-10-22)
       tiles: [
         PvDoorGuideTile(
           title: 'When blood pressure gets dangerous',
@@ -360,7 +360,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kCondTabLiving,
-      heading: 'The day to day',
+      heading: 'Living with a condition', // was 'The day to day' (2026-10-22)
       tiles: [
         PvDoorGuideTile(
           title: 'Handling pregnancy sugar in India',
@@ -409,7 +409,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     // that explains them". One screen; the Tools list opens the same one.
     PvDoorSection(
       group: kCondTabLiving,
-      heading: 'Keep your numbers',
+      heading: 'Track your readings', // was 'Keep your numbers' (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: 'Blood pressure and sugar log',

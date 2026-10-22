@@ -45,7 +45,7 @@ void main() {
         'Understand the birth',
         'Feeding and first days',
         'For your partner',
-        'Talk and learn',
+        'Classes and experts', // was 'Talk and learn' (2026-10-22)
       ]);
     });
 

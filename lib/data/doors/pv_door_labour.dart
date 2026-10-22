@@ -263,7 +263,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
     //  this one is about the area.
     PvDoorGroup(
       id: kLabourTabTalk,
-      label: 'Talk and learn',
+      label: 'Classes and experts', // was 'Talk and learn' (2026-10-22)
       icon: Icons.school_outlined,
       mark: IntentMark.askDoctor, // drawn mark, 2026-10-22
       hue: 42,
@@ -294,7 +294,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
 
     PvDoorSection(
       group: kLabourTabTimer,
-      heading: 'Before you need it',
+      heading: 'Learn the timer first', // was 'Before you need it' (2026-10-22)
       tiles: [
         // ⚠️ COMING SOON. Declared in `kPgBirthPrep` as an owed element, with
         // its own note: "Learning it now is the only time you can. In labour
@@ -370,7 +370,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
 
     PvDoorSection(
       group: kLabourTabSigns,
-      heading: 'Time them',
+      heading: 'Time your contractions', // was 'Time them' (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: 'Contraction Tracker',
@@ -383,7 +383,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
 
     PvDoorSection(
       group: kLabourTabSigns,
-      heading: 'The day itself',
+      heading: 'The day of the birth', // was 'The day itself' (2026-10-22)
       tiles: [
         PvDoorGuideTile(
           title: 'Labour, step by step',
@@ -419,7 +419,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
 
     PvDoorSection(
       group: kLabourTabSigns,
-      heading: 'If the plan changes',
+      heading: 'If plans change on the day', // was 'If the plan changes' (2026-10-22)
       tiles: [
         // Twins and more (2026-09-29): how twins are born lives there.
         PvDoorToolTile(
@@ -462,7 +462,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kLabourTabBag,
-      heading: 'Pack it once, properly',
+      heading: 'Your hospital bag list', // was 'Pack it once, properly' (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: 'Ready for Birth',
@@ -508,7 +508,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
 
     PvDoorSection(
       group: kLabourTabBirth,
-      heading: 'Your choices to make now',
+      heading: 'Decisions to make before the birth', // was 'Your choices to make now' (2026-10-22)
       tiles: [
         // ⚠️ THE ONE NEW READ ON THIS DOOR, AND IT IS FIRST. The two beside it
         // are still owed, so a rail that led with them would open on two grey
@@ -588,7 +588,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kLabourTabFeeding,
-      heading: 'Before the first feed',
+      heading: 'Getting ready to feed', // was 'Before the first feed' (2026-10-22)
       tiles: [
         PvDoorGuideTile(
           title: 'How breastfeeding starts',
@@ -616,7 +616,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
 
     PvDoorSection(
       group: kLabourTabFeeding,
-      heading: 'Help, and the first weeks',
+      heading: 'Help in the first weeks', // was 'Help, and the first weeks' (2026-10-22)
       tiles: [
         PvDoorGuideTile(
           title: 'Asking for feeding help in hospital',
@@ -642,7 +642,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kLabourTabTalk,
-      heading: 'Learn with a teacher',
+      heading: 'Birth classes', // was 'Learn with a teacher' (2026-10-22)
       tiles: [
         // ⚠️ THE PAID COURSE, AND ITS PRICE IS ON THE CARD. This app's rule is
         // that a tile which costs money must be legible as such BEFORE she taps

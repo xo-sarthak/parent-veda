@@ -515,13 +515,18 @@ Cohort? cohortById(String id) {
 //  five-session list is kept below (commented) for reference/revert.
 class YogaSession {
   const YogaSession(this.id, this.title, this.duration, this.focus, this.blurb,
-      {this.month = 1});
+      {this.month = 1, this.videoUrl});
   final String id;
   final LocalizedText title;
   final LocalizedText duration; // "18 min"
   final LocalizedText focus; // "opening"
   final LocalizedText blurb;
   final int month; // 1-9, the pregnancy month this session is meant for
+
+  /// The follow-along film, once one exists (2026-10-22). Null today for every
+  /// session, and Move today then says "Video coming soon" instead of offering
+  /// a Play that leads to a placeholder. Adding the URL here turns it on.
+  final String? videoUrl;
 }
 
 // // ---- original untagged list (pre month-tabs) -----------------------------

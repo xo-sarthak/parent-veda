@@ -68,6 +68,9 @@ import '../models/week_content.dart' show WeekContent;
 import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
 import 'preg_daily_insights.dart';
+import 'move/pv_move_today_screen.dart' show openMoveToday;
+import 'nutrition/door/need_screen.dart' show NeedScreen;
+import '../data/nutrition/nutrition_plate.dart' show plateNeedById;
 import 'pregnancy/preg_partner_home.dart';
 import '../services/father_preview.dart';
 import '../data/preg_daily_tips.dart' show pregDailyTipFor;
@@ -1856,13 +1859,30 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
       case PregInsightGo.size:
         openPregWeek(context, pregnancy, _pageWeek(week));
       case PregInsightGo.eat:
-        _openBracket(context, kNutritionBracketId);
+        // The need's own page, the Jaggery page's shape (2026-10-22). Was the
+        // top of the Nutrition door, which dropped the nutrient the card named;
+        // kept for revert: _openBracket(context, kNutritionBracketId);
+        // "All five ticked" carries no need, and still opens the door.
+        if (c.needId case final id? when plateNeedById(id) != null) {
+          Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: RouteSettings(name: 'nutrition/need/$id'),
+              builder: (_) => NeedScreen(need: plateNeedById(id)!, pregnancy: pregnancy)));
+        } else {
+          _openBracket(context, kNutritionBracketId);
+        }
       case PregInsightGo.safe:
         if (c.entry case final e?) openCanIAnswer(context, e, pregnancy);
       case PregInsightGo.myth:
         showPregMythSheet(context, myth: c.value, truth: c.truth ?? '');
       case PregInsightGo.move:
-        if (c.readId case final id?) openPvDoorRead(context, id, pregnancy);
+        // Move today: a session first, the read as a labelled article
+        // (2026-10-22). With no session for her month the card is still the
+        // read, and opens it as before: openPvDoorRead(context, id, pregnancy)
+        if (c.sessionId case final s?) {
+          openMoveToday(context, pregnancy, sessionId: s, readId: c.readId);
+        } else if (c.readId case final id?) {
+          openPvDoorRead(context, id, pregnancy);
+        }
       case PregInsightGo.read:
         if (c.read case final r?) {
           Navigator.of(context).push(MaterialPageRoute<void>(

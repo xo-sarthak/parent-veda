@@ -54,7 +54,7 @@ void main() {
       expect(door.groups.map((g) => g.label), [
         'Today',
         'Listen',
-        'Talk and read',
+        'Talk and read to baby', // was 'Talk and read' (2026-10-22)
         'For you',
         'My Journal',
       ]);
@@ -118,11 +118,11 @@ void main() {
         () {
       final sections = door.sectionsOf(kGarbhTabListen);
       expect(sections.map((s) => s.heading), [
-        "Today's pick",
+        "Today's sound", // was "Today's pick" (2026-10-22)
         'Ragas',
         'Nature sounds',
         'Guided',
-        'Where these sounds come from', // since Shravan to final
+        'About these recordings', // since Shravan to final; was 'Where these sounds come from' (2026-10-22)
       ]);
       final onDoor = sections.skip(1).take(3).expand((s) => s.tiles).toList();
       expect(onDoor.length, kShravan.length);
@@ -185,7 +185,7 @@ void main() {
     test('the four games are games, by name', () {
       final s = door
           .sectionsOf(kGarbhTabForYou)
-          .firstWhere((s) => s.heading == 'A few quiet minutes');
+          .firstWhere((s) => s.heading == 'Short relaxations'); // was 'A few quiet minutes' (2026-10-22)
       expect(s.tiles.map((t) => t.title),
           ['Word Search', 'Sudoku', 'Logic Puzzle', 'Memory Match']);
       for (final t in s.tiles) {

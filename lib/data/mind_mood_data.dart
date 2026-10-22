@@ -559,7 +559,7 @@ final List<MmArticle> kMmArticles = [
       'You don\'t have to explain every mood to the people around you. "I\'m '
       'alright, it\'s just one of those days" is enough.\n\n'
       "If the low moods start lasting whole days and don't lift, tell "
-      'someone. The Talk tab shows you who.',
+      'someone. The Experts tab shows you who.',
     ),
     // id: 'mood_swings',
     // group: MmArticleGroup.isThisNormal,
@@ -850,7 +850,7 @@ final List<MmArticle> kMmArticles = [
       'Pick the one thing that matters today and let the rest wait. Say no '
       'to a visit. Hand something to your partner.\n\n'
       "If you feel overwhelmed every day, or you're lying awake with it, "
-      "please don't sit with it alone. The Talk tab shows you who to reach.",
+      "please don't sit with it alone. The Experts tab shows you who to reach.",
     ),
     // id: 'overwhelm',
     // group: MmArticleGroup.isThisNormal,
@@ -1209,7 +1209,7 @@ final List<MmArticle> kMmArticles = [
       "you're worried before then.\n\n"
       'Find one person who understands what it took to get here, and let '
       "them hear the hard parts too. If you'd like to talk to someone "
-      'trained for this, a counsellor is on the Talk tab.',
+      'trained for this, a counsellor is on the Experts tab.',
     ),
   ),
   MmArticle(
@@ -1243,7 +1243,7 @@ final List<MmArticle> kMmArticles = [
       'who will take you to hospital if labour starts before he arrives, '
       "and who you'll call first. Write it down and share it with the "
       'family.\n\n'
-      'If the loneliness is heavy most days, the counsellor on the Talk tab '
+      'If the loneliness is heavy most days, the counsellor on the Experts tab '
       'is there for that too.',
     ),
   ),
@@ -1409,7 +1409,7 @@ final List<MmArticle> kMmArticles = [
       "an extra early scan after a loss, and it's fine to ask.\n\n"
       'Let one or two people know how hard this is, even if everyone else '
       'only sees good news. If the fear is taking over your days or your '
-      'sleep, a counsellor on the Talk tab can help.',
+      'sleep, a counsellor on the Experts tab can help.',
     ),
   ),
   MmArticle(
@@ -1554,7 +1554,7 @@ final List<MmArticle> kMmArticles = [
       "appetite or your interest in everything. That isn't a mood you have "
       'to wait out or push through.\n\n'
       "It's common, it isn't your fault, and it gets better with the right "
-      'help. The same-day signs on the "When it is more than this" tab tell '
+      'help. The same-day signs on the "When it\'s more than a low day" tab tell '
       'you when to reach out today.',
     ),
   ),
@@ -1590,7 +1590,7 @@ final List<MmArticle> kMmArticles = [
     ),
     howToGetHelp: _en(
       "Say it out loud to your doctor at your next appointment. It's "
-      "exactly what perinatal counselling on the Talk tab is for. You don't "
+      "exactly what perinatal counselling on the Experts tab is for. You don't "
       'need the right words first for either conversation.',
     ),
   ),
@@ -1635,7 +1635,7 @@ final List<MmArticle> kMmArticles = [
     howToGetHelp: _en(
       'A perinatal counsellor can teach you specific ways to interrupt this '
       'pattern, which is different from being told to stop worrying. You '
-      "can book one on the Talk tab, and it's anonymous.",
+      "can book one on the Experts tab, and it's anonymous.",
     ),
   ),
   MmArticle(
@@ -2372,7 +2372,7 @@ LocalizedText mmScreenerGuidance(int totalSeverity) {
     return _en("What you've described has been with you for a while now. "
         'It might help to talk it through with someone who knows pregnancy '
         'and mood well, instead of carrying it alone. Perinatal counselling, '
-        "on the Talk tab, is anonymous and it's there for exactly this.");
+        "on the Experts tab, is anonymous and it's there for exactly this.");
   }
   return _en("Thank you for answering honestly. What you've described is "
       'worth talking through with someone soon, both a counsellor and your '

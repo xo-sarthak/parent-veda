@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/reads/pregnancy_reads.dart';
 import 'package:parentveda/models/week_content.dart';
+import 'package:parentveda/screens/move/pv_move_today_screen.dart' show yogaSessionById;
 import 'package:parentveda/screens/preg_daily_insights.dart';
 import 'package:parentveda/screens/pregnancy/preg_myth_sheet.dart';
 
@@ -97,12 +98,17 @@ void main() {
   });
 
   group('Move', () {
-    test("is one of the Move door's own reads, and opens it", () {
+    // Was "is one of the Move door's own reads, and opens it": the card named a
+    // read. Since 2026-10-22 it names this month's yoga session (Move today)
+    // and carries the read as the page's labelled article.
+    test("names this month's session, and carries a Move read as its article", () {
       final m = byGo(cards(20), PregInsightGo.move)!;
-      expect(m.eyebrow, 'Move');
-      expect(m.readId, startsWith('preg_move_read_'));
+      expect(m.eyebrow, 'Move today');
+      final s = yogaSessionById(m.sessionId!)!;
+      expect(s.month, 5, reason: 'week 20 is month 5');
+      expect(m.value, s.title.en);
+      expect(m.readId, kPregMoveYogaReadId, reason: 'the yoga read, in the weeks it covers');
       expect(pregnancyReadById(m.readId!), isNotNull, reason: 'a card whose read is missing does nothing');
-      expect(m.value, pregnancyReadById(m.readId!)!.title.en, reason: "the door's words, not ours");
     });
 
     test('every read it can offer exists, for every week', () {
@@ -128,10 +134,10 @@ void main() {
 
     test('stable within a day and different across days', () {
       final d = DateTime(2026, 9, 30);
-      expect(byGo(cards(20, on: d), PregInsightGo.move)!.readId, byGo(cards(20, on: d), PregInsightGo.move)!.readId);
+      expect(byGo(cards(20, on: d), PregInsightGo.move)!.sessionId, byGo(cards(20, on: d), PregInsightGo.move)!.sessionId);
       final seen = {
         for (var i = 0; i < 12; i++)
-          byGo(cards(20, on: d.add(Duration(days: i)), today: d.add(Duration(days: i))), PregInsightGo.move)!.readId,
+          byGo(cards(20, on: d.add(Duration(days: i)), today: d.add(Duration(days: i))), PregInsightGo.move)!.sessionId,
       };
       expect(seen.length, greaterThan(1), reason: 'something new to open every day');
     });
@@ -139,7 +145,8 @@ void main() {
     test('the card carries no exercise instruction of its own', () {
       // Its words are the door read's title and a fixed label, nothing written here.
       final m = byGo(cards(20), PregInsightGo.move)!;
-      expect(m.caption, 'Move & rest');
+      // Was 'Move & rest' (the door's name). Now the kind and the minutes.
+      expect(m.caption, 'Yoga · ${yogaSessionById(m.sessionId!)!.duration.en}');
       expect(m.truth, isNull);
     });
   });
@@ -149,7 +156,8 @@ void main() {
     expect(home, contains('case PregInsightGo.myth:'));
     expect(home, contains('showPregMythSheet('));
     expect(home, contains('case PregInsightGo.move:'));
-    expect(home, contains('openPvDoorRead(context, id, pregnancy)'));
+    expect(home, contains('openMoveToday(context, pregnancy, sessionId: s, readId: c.readId)'));
+    expect(home, contains('NeedScreen(need: plateNeedById(id)!'));
     final ids = cards(20).map((c) => c.id).toList();
     expect(ids, contains('size'));
     expect(ids.indexWhere((i) => i.startsWith('myth_')), greaterThan(ids.indexWhere((i) => i.startsWith('safe_'))));

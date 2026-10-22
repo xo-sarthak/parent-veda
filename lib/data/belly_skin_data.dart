@@ -743,7 +743,7 @@ final List<BsPage> kBsPages = [
             "option exists"),
         _en("Strong or oral salicylic acid: it's related to aspirin, and "
             "high doses are linked to complications. A low-dose face wash is "
-            "different, see What's safe to use"),
+            "different, see Safe products"),
         _en("Hydroquinone: a strong skin-lightening ingredient that gets into "
             "the body more than most creams. Pregnancy is the wrong time to "
             "use it, and pregnancy patches usually fade on their own anyway"),

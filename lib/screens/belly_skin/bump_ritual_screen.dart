@@ -44,6 +44,18 @@
 //  written into it, and a two-up grid of weeks read forward like a book. A
 //  photo opens full-bleed on tap, which is where the big picture belongs.
 //
+//  ⚠️ WEEK ROWS REPLACE THE TRIMESTER GRID — 2026-10-22, APPROVED DESIGN.
+//  "Missing weeks are simply not drawn" stopped being true on the phone: every
+//  photo saved under the current week, so a photo she took in week 19 and only
+//  found in week 20 had nowhere to go. Now every week from this one back to 4
+//  is a row (Retro's week-to-week rows, Withings' "+" tile on Mobbin): the
+//  week's photos as small tiles, cover first, and a dashed "+" that adds a
+//  photo FOR THAT WEEK. The add sheet carries a week strip (MacroFactor's date
+//  strip atop the add sheet), and a photo can move to another week. A week's
+//  cover is its favourited photo, else its earliest; the favourite is one per
+//  week (`BumpStore.toggleFavorite`). Long-press a tile to make it the cover.
+//  The trimester bands are kept below for revert.
+//
 //  ⚠️ ONE DEPARTURE FROM THE BOARD: the design's "Save as one image" on Then
 //  & Now had no behaviour behind it (the board cannot save files). Here it
 //  renders the pair to a PNG and hands it to the share sheet — which is the
@@ -292,11 +304,25 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
       final photos = store.photos.reversed.toList(); // newest first
       final thisWeekIn = store.hasWeek(week);
 
+      // Every week from this one back to 4, in both states (2026-10-22).
+      final weekRows = _WeekRows(
+        p: p,
+        week: week,
+        onAdd: (w) => _startAddPhoto(context, p, week, forWeek: w),
+        onOpen: (photo) => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            settings: const RouteSettings(name: 'bump_journey/photo'),
+            builder: (_) => _PhotoScreen(p: p, id: photo.id, week: week),
+          ),
+        ),
+      );
+
       if (photos.isEmpty) {
         return _Empty(
           p: p,
           week: week,
           inShell: widget.inShell,
+          weeks: weekRows,
           onAdd: () => _startAddPhoto(context, p, week),
         );
       }
@@ -325,7 +351,8 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
             onOpen: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
                 settings: const RouteSettings(name: 'bump_journey/photo'),
-                builder: (_) => _PhotoScreen(p: p, id: photos.first.id),
+                builder: (_) =>
+                    _PhotoScreen(p: p, id: photos.first.id, week: week),
               ),
             ),
           ),
@@ -365,27 +392,31 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
           // One section heading (2026-09-30): the serif. Kept for revert:
           // _Eyebrow('Your weeks', p: p),
           const PregSectionHeading('Your weeks'),
-          const SizedBox(height: 16),
-          for (final t in [1, 2, 3])
-            if (photos.any((x) => x.trimester == t)) ...[
-              _TrimesterBand(
-                p: p,
-                trimester: t,
-                week: week,
-                photos: photos
-                    .where((x) => x.trimester == t)
-                    .toList()
-                    .reversed
-                    .toList(),
-                onOpen: (photo) => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    settings: const RouteSettings(name: 'bump_journey/photo'),
-                    builder: (_) => _PhotoScreen(p: p, id: photo.id),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 22),
-            ],
+          const SizedBox(height: 6),
+          // The week rows, newest first (2026-10-22). Kept for revert, the
+          // trimester bands read forward:
+          // for (final t in [1, 2, 3])
+          //   if (photos.any((x) => x.trimester == t)) ...[
+          //     _TrimesterBand(
+          //       p: p,
+          //       trimester: t,
+          //       week: week,
+          //       photos: photos
+          //           .where((x) => x.trimester == t)
+          //           .toList()
+          //           .reversed
+          //           .toList(),
+          //       onOpen: (photo) => Navigator.of(context).push(
+          //         MaterialPageRoute<void>(
+          //           settings: const RouteSettings(name: 'bump_journey/photo'),
+          //           builder: (_) => _PhotoScreen(p: p, id: photo.id),
+          //         ),
+          //       ),
+          //     ),
+          //     const SizedBox(height: 22),
+          //   ],
+          weekRows,
+          const SizedBox(height: 22),
 
           // ---- still ahead: the moments to come, in the book's own type ---
           if (ahead.isNotEmpty) ...[
@@ -482,19 +513,42 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
   }
 }
 
-// ---- adding this week: source → pick → caption → save ----------------------
+// ---- adding a photo: week → source → pick → caption → save ----------------
+//
+// [week] is the week she is in; [forWeek] is the week the photo is for, when
+// she tapped a week row's "+" (2026-10-22). The strip at the top of the sheet
+// can change it to any week from 4 to this one; the two weeks ahead are drawn
+// greyed and say why they cannot be picked.
 
-Future<void> _startAddPhoto(BuildContext context, V2Palette p, int week) async {
+Future<void> _startAddPhoto(
+  BuildContext context,
+  V2Palette p,
+  int week, {
+  int? forWeek,
+}) async {
+  var chosen = forWeek ?? week;
   final source = await showModalBottomSheet<ImageSource>(
     context: context,
+    // Sized to what it holds: the week strip made it taller than the
+    // default nine-sixteenths cap on a short phone (2026-10-22).
+    isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => _Sheet(
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setSheet) => _Sheet(
       p: p,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          _WeekStrip(
+            p: p,
+            current: week,
+            selected: chosen,
+            onSelect: (w) => setSheet(() => chosen = w),
+          ),
+          const SizedBox(height: 18),
           Text(
-            'Week $week',
+            'Week $chosen',
             style: pvFraunces(
               fontSize: 22,
               fontWeight: FontWeight.w600,
@@ -540,6 +594,7 @@ Future<void> _startAddPhoto(BuildContext context, V2Palette p, int week) async {
         ],
       ),
     ),
+    ),
   );
   if (source == null || !context.mounted) return;
 
@@ -564,16 +619,117 @@ Future<void> _startAddPhoto(BuildContext context, V2Palette p, int week) async {
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => _CaptionSheet(p: p, week: week, imagePath: path!),
+    builder: (ctx) => _CaptionSheet(p: p, week: chosen, imagePath: path!),
   );
   if (caption == null || !context.mounted) return; // dismissed: not saved
 
   await BumpStore.instance.addPhoto(
     sourcePath: path,
-    week: week,
+    week: chosen,
     caption: caption,
-    journalLabel: 'Bump, week $week',
+    journalLabel: 'Bump, week $chosen',
   );
+}
+
+/// The one line a week ahead says when tapped, in the strip or on a row.
+void _toastNotYet(BuildContext context, int week) => pvToast(
+  context,
+  "You're not in week $week yet. Add it when you get there.",
+);
+
+/// The week strip at the top of the add and move sheets (2026-10-22): weeks 4
+/// to this one as chips, this one preselected by the caller, and the next two
+/// greyed. Scrolled to its end, so the weeks near now are what she sees first.
+class _WeekStrip extends StatelessWidget {
+  const _WeekStrip({
+    required this.p,
+    required this.current,
+    required this.selected,
+    required this.onSelect,
+  });
+  final V2Palette p;
+  final int current;
+  final int selected;
+  final ValueChanged<int> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final first = current < 4 ? current : 4;
+    return SizedBox(
+      height: 36,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        reverse: true,
+        child: Row(
+          children: [
+            for (var w = first; w <= current + 2; w++) ...[
+              if (w > first) const SizedBox(width: 8),
+              _WeekChip(
+                p: p,
+                week: w,
+                current: current,
+                selected: w == selected,
+                onTap: w > current
+                    ? () => _toastNotYet(context, w)
+                    : () => onSelect(w),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WeekChip extends StatelessWidget {
+  const _WeekChip({
+    required this.p,
+    required this.week,
+    required this.current,
+    required this.selected,
+    required this.onTap,
+  });
+  final V2Palette p;
+  final int week;
+  final int current;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ahead = week > current;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: ahead ? 'Week $week, not yet' : 'Week $week',
+      child: Opacity(
+        opacity: ahead ? 0.45 : 1,
+        child: PvPress(child: GestureDetector(
+          key: ValueKey('bump_week_chip_$week'),
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            height: 34,
+            padding: const EdgeInsets.symmetric(horizontal: 13),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? kPvInk : p.surface,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: selected ? kPvInk : p.line),
+            ),
+            child: Text(
+              week == current ? 'This week' : 'Week $week',
+              style: pvManrope(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: selected ? Colors.white : (ahead ? p.ink3 : p.ink1),
+              ),
+            ),
+          ),
+        )),
+      ),
+    );
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -824,6 +980,9 @@ class _ThenNowRow extends StatelessWidget {
 /// two-up grid of weeks read forward. The band is the moment's home now —
 /// "Halfway was week 20. You're in week 24 now." — so the sentence sits where
 /// the weeks it describes are, without a card of its own.
+///
+/// Kept for revert (2026-10-22): no longer drawn; the week rows replaced it.
+// ignore: unused_element
 class _TrimesterBand extends StatelessWidget {
   const _TrimesterBand({
     required this.p,
@@ -908,6 +1067,9 @@ class _TrimesterBand extends StatelessWidget {
 
 /// One week in the grid: a three-by-four photo, the heart if she marked it,
 /// the week and date under it. Tap for the full-bleed page.
+///
+/// Kept for revert (2026-10-22), with `_TrimesterBand`.
+// ignore: unused_element
 class _GridTile extends StatelessWidget {
   const _GridTile({required this.p, required this.photo, required this.onTap});
   final V2Palette p;
@@ -991,6 +1153,283 @@ class _GridTile extends StatelessWidget {
       ],
     ),
   ));
+}
+
+/// Every week from the one she is in back to week 4, newest first
+/// (2026-10-22). A week ahead appears only if a photo already sits in it (a
+/// due date that moved), so nothing she saved is ever hidden.
+class _WeekRows extends StatelessWidget {
+  const _WeekRows({
+    required this.p,
+    required this.week,
+    required this.onAdd,
+    required this.onOpen,
+  });
+  final V2Palette p;
+  final int week;
+  final ValueChanged<int> onAdd;
+  final ValueChanged<BumpPhoto> onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = BumpStore.instance;
+    var top = week;
+    var bottom = week < 4 ? week : 4;
+    for (final x in store.photos) {
+      if (x.weekNumber > top) top = x.weekNumber;
+      if (x.weekNumber < bottom) bottom = x.weekNumber;
+    }
+    if (bottom < 0) bottom = 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var w = top; w >= bottom; w--) ...[
+          if (w != top) Container(height: 1, color: p.line),
+          _WeekRow(
+            p: p,
+            week: w,
+            current: week,
+            photos: store.photosForWeek(w),
+            onAdd: () => onAdd(w),
+            onOpen: onOpen,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// One week: its name, how many photos, the photos as small tiles (the cover
+/// first, outlined in ink) and a dashed "+" for this week. Long-press a tile
+/// to make it the week's cover.
+class _WeekRow extends StatelessWidget {
+  const _WeekRow({
+    required this.p,
+    required this.week,
+    required this.current,
+    required this.photos,
+    required this.onAdd,
+    required this.onOpen,
+  });
+  final V2Palette p;
+  final int week;
+  final int current;
+  final List<BumpPhoto> photos; // cover first
+  final VoidCallback onAdd;
+  final ValueChanged<BumpPhoto> onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final n = photos.length;
+    final ahead = week > current;
+    final moment = kBumpMoments.where((m) => m.week == week).firstOrNull;
+    return Padding(
+      key: ValueKey('bump_week_row_$week'),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
+                child: Text(
+                  week == current ? 'Week $week · this week' : 'Week $week',
+                  style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink1,
+                  ),
+                ),
+              ),
+              Text(
+                n == 0
+                    ? 'Add one'
+                    : n == 1
+                    ? '1 photo'
+                    : '$n photos',
+                style: pvManrope(fontSize: 12, color: p.ink3),
+              ),
+            ],
+          ),
+          // The moment written beside its week, as the bands used to.
+          if (moment != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              week <= current ? moment.passedTitle : moment.ahead,
+              style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2),
+            ),
+          ],
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final x in photos) ...[
+                  _WeekTile(
+                    p: p,
+                    photo: x,
+                    isCover: identical(x, photos.first),
+                    onTap: () => onOpen(x),
+                    onLongPress: () async {
+                      if (!x.isFavorite) {
+                        await BumpStore.instance.toggleFavorite(x.id);
+                      }
+                      if (context.mounted) {
+                        pvToast(context, "This is week $week's cover now.",
+                            kind: PvToastKind.done);
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                _AddTile(
+                  p: p,
+                  week: week,
+                  onTap: ahead ? () => _toastNotYet(context, week) : onAdd,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+const double _kTileW = 56;
+const double _kTileH = 74;
+
+class _WeekTile extends StatelessWidget {
+  const _WeekTile({
+    required this.p,
+    required this.photo,
+    required this.isCover,
+    required this.onTap,
+    required this.onLongPress,
+  });
+  final V2Palette p;
+  final BumpPhoto photo;
+  final bool isCover;
+  final VoidCallback onTap;
+  final VoidCallback onLongPress;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: isCover
+        ? 'Week ${photo.weekNumber}, the cover'
+        : 'Week ${photo.weekNumber} photo',
+    hint: isCover ? null : 'Long press to make it the cover',
+    child: PvPress(child: GestureDetector(
+      key: ValueKey('bump_week_tile_${photo.id}'),
+      onTap: onTap,
+      onLongPress: onLongPress,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: _kTileW,
+        height: _kTileH,
+        padding: const EdgeInsets.all(1.5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isCover ? p.ink1 : Colors.transparent,
+            width: 1.4,
+          ),
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: ColoredBox(
+                color: v2BlockTint(kBumpRitualHue, p),
+                child: StorageImage(photo.imageUrl, fit: BoxFit.cover),
+              ),
+            ),
+            if (photo.isFavorite)
+              Positioned(
+                right: 4,
+                bottom: 4,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.favorite_rounded,
+                    size: 11,
+                    color: p.ink1,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    )),
+  );
+}
+
+/// The dashed "+" at the end of a week's tiles: a photo for that week.
+class _AddTile extends StatelessWidget {
+  const _AddTile({required this.p, required this.week, required this.onTap});
+  final V2Palette p;
+  final int week;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: 'Add a photo for week $week',
+    child: PvPress(child: GestureDetector(
+      key: ValueKey('bump_week_add_$week'),
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: CustomPaint(
+        painter: _DashedRRect(color: p.ink1.withValues(alpha: 0.3)),
+        child: SizedBox(
+          width: _kTileW,
+          height: _kTileH,
+          child: Icon(Icons.add_rounded, size: 20, color: p.ink2),
+        ),
+      ),
+    )),
+  );
+}
+
+/// A rounded rectangle drawn in dashes. Flutter's borders are solid only.
+class _DashedRRect extends CustomPainter {
+  const _DashedRRect({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          const Radius.circular(12),
+        ).deflate(0.6),
+      );
+    for (final m in path.computeMetrics()) {
+      var d = 0.0;
+      while (d < m.length) {
+        final end = d + 4 < m.length ? d + 4 : m.length;
+        canvas.drawPath(m.extractPath(d, end), paint);
+        d += 7;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedRRect old) => old.color != color;
 }
 
 /// The moments still to come, in the same type the passed ones are written
@@ -1148,11 +1587,15 @@ class _Empty extends StatelessWidget {
     required this.p,
     required this.week,
     required this.onAdd,
+    required this.weeks,
     this.inShell = false,
   });
   final V2Palette p;
   final int week;
   final VoidCallback onAdd;
+
+  /// The week rows (2026-10-22), in place of the three frames waiting.
+  final Widget weeks;
   final bool inShell;
   @override
   Widget build(BuildContext context) => Column(
@@ -1181,47 +1624,43 @@ class _Empty extends StatelessWidget {
         ),
         const SizedBox(height: 26),
       ],
-      Row(
-        children: [
-          for (var i = 0; i < 3; i++) ...[
-            if (i > 0) const SizedBox(width: 10),
-            Expanded(
-              child: Opacity(
-                opacity: [1.0, 0.72, 0.45][i],
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AspectRatio(
-                      aspectRatio: 3 / 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: p.ink1.withValues(alpha: 0.2),
-                            width: 1.2,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 7),
-                    Text(
-                      'Week ${week + i}',
-                      style: pvManrope(fontSize: 12, color: p.ink3),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-      const SizedBox(height: 26),
+      // Kept for revert (2026-10-22): the three frames waiting, replaced by
+      // the week rows below so a photo from an earlier week has a home.
+      // Row(children: [
+      //   for (var i = 0; i < 3; i++) ...[
+      //     if (i > 0) const SizedBox(width: 10),
+      //     Expanded(
+      //       child: Opacity(
+      //         opacity: [1.0, 0.72, 0.45][i],
+      //         child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+      //             children: [
+      //           AspectRatio(
+      //             aspectRatio: 3 / 4,
+      //             child: Container(
+      //               decoration: BoxDecoration(
+      //                 borderRadius: BorderRadius.circular(14),
+      //                 border: Border.all(
+      //                     color: p.ink1.withValues(alpha: 0.2), width: 1.2),
+      //               ),
+      //             ),
+      //           ),
+      //           const SizedBox(height: 7),
+      //           Text('Week ${week + i}',
+      //               style: pvManrope(fontSize: 12, color: p.ink3)),
+      //         ]),
+      //       ),
+      //     ),
+      //   ],
+      // ]),
+      // const SizedBox(height: 26),
       _HairlineButton(
         p: p,
         label: 'Add your first photo',
         filled: true,
         onTap: onAdd,
       ),
+      const SizedBox(height: 18),
+      weeks,
       const SizedBox(height: 30),
       // One section heading (2026-09-30). Kept for revert:
       // _Eyebrow('What it becomes', p: p),
@@ -1653,9 +2092,12 @@ class _WideHairlineButton extends StatelessWidget {
 // -----------------------------------------------------------------------------
 
 class _PhotoScreen extends StatefulWidget {
-  const _PhotoScreen({required this.p, required this.id});
+  const _PhotoScreen({required this.p, required this.id, required this.week});
   final V2Palette p;
   final String id;
+
+  /// The week she is in, so "Move to another week" knows which are ahead.
+  final int week;
   @override
   State<_PhotoScreen> createState() => _PhotoScreenState();
 }
@@ -1664,6 +2106,73 @@ class _PhotoScreenState extends State<_PhotoScreen> {
   bool _editing = false;
   bool _confirm = false;
   final _draft = TextEditingController();
+
+  /// The same week strip as the add sheet; a week ahead says why not.
+  Future<void> _move(BuildContext context, BumpPhoto photo) async {
+    final p = widget.p;
+    // A photo already sitting ahead (a due date that moved) keeps its own
+    // week pickable, so the sheet never opens with nothing selected.
+    final current =
+        photo.weekNumber > widget.week ? photo.weekNumber : widget.week;
+    var chosen = photo.weekNumber;
+    final to = await showModalBottomSheet<int>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => _Sheet(
+          p: p,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Move to another week',
+                style: pvFraunces(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.5,
+                  color: p.ink1,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                'It is in week ${photo.weekNumber} now.',
+                style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2),
+              ),
+              const SizedBox(height: 16),
+              _WeekStrip(
+                p: p,
+                current: current,
+                selected: chosen,
+                onSelect: (w) => setSheet(() => chosen = w),
+              ),
+              const SizedBox(height: 18),
+              _HairlineButton(
+                p: p,
+                label: chosen == photo.weekNumber
+                    ? 'Keep it in week $chosen'
+                    : 'Move to week $chosen',
+                filled: true,
+                onTap: () => Navigator.of(ctx).pop(chosen),
+              ),
+              const SizedBox(height: 10),
+              _QuietButton(
+                p: p,
+                label: 'Not now',
+                onTap: () => Navigator.of(ctx).pop(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (to == null || to == photo.weekNumber) return;
+    await BumpStore.instance.setWeek(photo.id, to);
+    if (context.mounted) {
+      pvToast(context, 'Moved to week $to.', kind: PvToastKind.done);
+    }
+  }
 
   @override
   void dispose() {
@@ -1840,6 +2349,13 @@ class _PhotoScreenState extends State<_PhotoScreen> {
                           ? 'Favourited'
                           : 'Favourite this week',
                       onTap: () => BumpStore.instance.toggleFavorite(photo.id),
+                    ),
+                    _Action(
+                      p: p,
+                      icon: Icons.date_range_outlined,
+                      iconColor: p.ink2,
+                      label: 'Move to another week',
+                      onTap: () => _move(context, photo),
                     ),
                     _Action(
                       p: p,

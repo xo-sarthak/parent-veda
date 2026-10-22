@@ -230,7 +230,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
     // -------------------------------------------------------------------------
     PvDoorGroup(
       id: kGarbhTabRead,
-      label: 'Talk and read',
+      label: 'Talk and read to baby', // was 'Talk and read' (2026-10-22)
       icon: Icons.record_voice_over_outlined,
       mark: IntentMark.askDoctor, // was pageMark: same mark twice on one rail (2026-10-22)
       hue: 14,
@@ -355,7 +355,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kGarbhTabListen,
-      heading: "Today's pick",
+      heading: "Today's sound", // was "Today's pick" (2026-10-22)
       tiles: [
         PvDoorAudioTile(
           title: "Today's raga",
@@ -388,7 +388,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
     // person, and the door says where they come from.
     PvDoorSection(
       group: kGarbhTabListen,
-      heading: 'Where these sounds come from',
+      heading: 'About these recordings', // was 'Where these sounds come from' (2026-10-22)
       tiles: [
         PvDoorToolTile(
           title: 'The people who recorded them',
@@ -403,7 +403,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kGarbhTabRead,
-      heading: "Today's pick",
+      heading: "Today's reading", // was "Today's pick" (2026-10-22)
       tiles: [
         PvDoorReadTile(
           title: "Today's passage to read aloud",
@@ -465,7 +465,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
     // =========================================================================
     PvDoorSection(
       group: kGarbhTabForYou,
-      heading: 'A few quiet minutes',
+      heading: 'Short relaxations', // was 'A few quiet minutes' (2026-10-22)
       tiles: [
         for (final puzzle in kPuzzles)
           PvDoorGameTile(

@@ -150,7 +150,7 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
 
     PvDoorGroup(
       id: kBsTabSafe,
-      label: "What's safe to use",
+      label: 'Safe products', // was "What's safe to use" (2026-10-22)
       icon: Icons.verified_outlined,
       mark: IntentMark.questionMark, // drawn mark, 2026-10-22
       hue: 206,
@@ -172,7 +172,7 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
     //  of a door — the same rule the timeline and the locker follow on Scans.
     PvDoorGroup(
       id: kBsTabRitual,
-      label: 'The bump ritual',
+      label: 'Bump photos', // was 'The bump ritual' (2026-10-22)
       icon: Icons.photo_camera_outlined,
       mark: IntentMark.bookMark, // drawn mark, 2026-10-22
       hue: 26,

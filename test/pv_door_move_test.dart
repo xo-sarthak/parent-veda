@@ -132,7 +132,7 @@ void main() {
         'Move safely',
         'Pelvic floor',
         'Sleep and rest',
-        'Classes and tools',
+        'Classes and videos', // was 'Classes and tools' (2026-10-22)
       ]);
     });
 

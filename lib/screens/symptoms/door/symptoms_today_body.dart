@@ -459,7 +459,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
             const SizedBox(height: 4),
             pvDoorPad(
               Text(
-                'General guidance, never a diagnosis. If anything worries you, call your doctor. The Talk tab lists the five signs to call about at any hour.',
+                'General guidance, never a diagnosis. If anything worries you, call your doctor. The Experts tab lists the five signs to call about at any hour.',
                 style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3),
               ),
             ),
