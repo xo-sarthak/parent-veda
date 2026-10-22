@@ -34,7 +34,7 @@ step, newest at the bottom. When a step lands: tick it here, add its log entry t
 | 8 | Pregnancy part 1: calendar, bump photos, the daily tables, weekly notes, reminders (`OwnRowLedger`) | 0106 (run 2026-10-21) | `d5787b2` |
 | 9 | Pregnancy part 2: medicines, scans and appointments, symptoms, the tools (`OwnRowLedger.single` for one-row tables) | 0107 (run 2026-10-21) | `a728ec4` |
 | 11 + 12 | Every write of her data confirmed and batched; sign-out forgets memory and stops alarms; the 90-day purge (done before 10, see below) | 0109 (run 2026-10-21) | `984836f` |
-| 13 | Nothing she makes lives only on the phone (about 40 stores move to the cloud); every non-shopping blob store merges item by item (`CloudMergedStore`, `pv_state_merge`). This is the non-shopping half of step 10 | 0110 (**the user runs it**) | pending |
+| 13 | Nothing she makes lives only on the phone (about 40 stores move to the cloud); every non-shopping blob store merges item by item (`CloudMergedStore`, `pv_state_merge`). This is the non-shopping half of step 10 | 0110 (run 2026-10-22) | `8c466d0` |
 
 ### Still to do, in order
 
@@ -43,7 +43,7 @@ store changes → a pure merge test → the user runs the migration and its chec
 
 | Step | What | Where the detail is | Size |
 |---|---|---|---|
-| **10 (ON HOLD, 2026-10-21; non-shopping half DONE as step 13, 2026-10-22)** | **Split by the user's marketplace plan.** The shopping half (cart, orders, bought products, product checklists, saved products, Brand Studio, the booking cache) is handed to the marketplace build, which designs them as server-side rows from the start; nothing is built for them here. The rest was done in step 13. **Two left:** `pp_development_data.dart` and `pp_reading_data.dart` were being edited by another terminal and still use the whole blob. Blob stores, per-item merge for the lists people curate (saved readings, hospital bag, checklists, cart), so two phones editing different items both keep their edits. Records hiding in blobs (orders, scan reports, readings) move to rows | §2 | medium |
+| **10 (ON HOLD, 2026-10-21; non-shopping half DONE as step 13, 2026-10-22)** | **Split by the user's marketplace plan.** The shopping half (cart, orders, bought products, product checklists, saved products, Brand Studio, the booking cache) is handed to the marketplace build, which designs them as server-side rows from the start; nothing is built for them here. The rest was done in step 13. ~~**Two left:** `pp_development_data.dart` and `pp_reading_data.dart` were being edited by another terminal and still use the whole blob.~~ **None left (2026-10-22):** both converted once the other terminal committed. Blob stores, per-item merge for the lists people curate (saved readings, hospital bag, checklists, cart), so two phones editing different items both keep their edits. Records hiding in blobs (orders, scan reports, readings) move to rows | §2 | medium |
 
 Every Pregnancy and Parenting row table is now on a ledger (`OwnRowLedger`, `ChildLogLedger`). Steps 11 and 12 are done. What is left is step 10 (the blobs, split above) and §4's decision on phone-only data. Read BACKEND-PATTERNS §16ii-k (the old sync's mistakes) before step 10. The
 backend is then **launch-ready** once the user's checks below are done and the backend items in BEFORE-LAUNCH §1 and
@@ -222,9 +222,10 @@ before choosing the merge.
 
 ## 2. Blob stores: cloud replaces local wholesale (MEDIUM: an offline change can be lost)
 
-> **DONE 2026-10-22 (step 13, 0110) for every non-shopping store but two.** They merge item by item on the server
-> (`pv_state_merge`, `CloudMergedStore`). Still whole-blob: the shopping stores (marketplace build) and
-> `pp_development_data`, `pp_reading_data` (another terminal was editing them). The text below is the original finding.
+> **DONE 2026-10-22 (step 13, 0110) for every non-shopping store.** They merge item by item on the server
+> (`pv_state_merge`, `CloudMergedStore`). Still whole-blob: only the shopping stores (marketplace build).
+> `pp_development_data` and `pp_reading_data` were converted later the same day, once another terminal had
+> committed its edits to them. The text below is the original finding.
 
 **Mechanism.** The ~35 `CloudSyncedStore` stores keep one JSON blob per user in `user_state`
 (`lib/services/remote/cloud_synced_store.dart`).

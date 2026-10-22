@@ -3679,6 +3679,13 @@ greps the SQL.
 4. **Upgrading without loss.** On a phone's first run, whatever it already holds is stamped `t = 0`. Any real edit,
    on any phone, beats it, and nothing already on the phone is dropped.
 
+**A key made of words (added 2026-10-22).** The Parenting check-in answers are keyed by the question's own text, so
+rewording a question is a data migration. `DevStore` maps old wording to new as each answer loads
+(`kCheckInRenames`). In a merged store that is enough on its own: the server still holds the old key, the store
+now names only the new one, so the mixin's next stamp sends the new item and a tombstone for the old. A rename
+becomes an ordinary edit and a removal. The general fact: **a key should be an id, not copy**, and when it is copy,
+every copy edit needs a rename map that lives as long as any phone might hold the old text.
+
 > General facts: **a last-writer-wins map is a CRDT you can build in an afternoon; merge it where writes are already
 > serialized; and when you emptied something on purpose, do not let the change tracker call it a delete.**
 

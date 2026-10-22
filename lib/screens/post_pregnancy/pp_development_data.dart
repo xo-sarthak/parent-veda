@@ -15,7 +15,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/remote/cloud_synced_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
+import '../../services/remote/cloud_merged_store.dart';
 
 /// Supportive progress words - never percentages, never grades.
 enum DevWord { emerging, practicing, growing, confident, mastered }
@@ -808,7 +809,7 @@ List<DevStage> activeStages(DevArea area) =>
 // =============================================================================
 //  DevStore - saved & completed activities + gentle check-in answers.
 // =============================================================================
-class DevStore extends ChangeNotifier with CloudSyncedStore {
+class DevStore extends ChangeNotifier with CloudMergedStore {
   DevStore._();
   static final DevStore instance = DevStore._();
 
@@ -826,27 +827,66 @@ class DevStore extends ChangeNotifier with CloudSyncedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {/* keep the starter state */}
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'completed': <String>[], 'checkIns': <String, bool>{}};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'saved': <String>[], 'completed': <String>[], 'checkIns': <String, bool>{}};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         'saved': _saved.toList(),
+  //         'completed': _completed.toList(),
+  //         'checkIns': _checkIns,
+  //       };
 
-  @override
-  Object cloudData() => {
+  /// The local prefs blob (the shape the cloud blob had before step 13).
+  Map<String, Object?> _blob() => {
         'saved': _saved.toList(),
         'completed': _completed.toList(),
         'checkIns': _checkIns,
       };
 
   @override
-  void applyCloudData(Object data) {
+  String? get legacyBlobKey => cloudKey;
+
+  // One item per saved activity, per completed activity and per answer, so two
+  // phones ticking different things both keep their tick (step 13).
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final id in _saved) 's|$id': true,
+        for (final id in _completed) 'c|$id': true,
+        for (final e in _checkIns.entries) 'q|${e.key}': e.value,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _saved.clear();
+    _completed.clear();
+    _checkIns.clear();
+    for (final e in items.entries) {
+      if (e.key.startsWith('s|')) {
+        _saved.add(e.key.substring(2));
+      } else if (e.key.startsWith('c|')) {
+        _completed.add(e.key.substring(2));
+      } else if (e.key.startsWith('q|')) {
+        _takeAnswer(e.key.substring(2), e.value == true);
+      }
+    }
+  }
+
+  /// Was applyCloudData before step 13; the same body. Also reads the local
+  /// prefs cache, which keeps the old blob shape.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     final s = data['saved'];
     if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
@@ -854,14 +894,21 @@ class DevStore extends ChangeNotifier with CloudSyncedStore {
     if (c is List) _completed..clear()..addAll(c.map((e) => e.toString()));
     final k = data['checkIns'];
     if (k is Map) {
-      _checkIns
-        ..clear()
-        ..addAll(k.map((key, v) => MapEntry(key.toString(), v == true)));
-      // Carry answers across reworded questions (kCheckInRenames).
-      kCheckInRenames.forEach((from, to) {
-        final v = _checkIns.remove(from);
-        if (v != null) _checkIns.putIfAbsent(to, () => v);
-      });
+      _checkIns.clear();
+      k.forEach((key, v) => _takeAnswer(key.toString(), v == true));
+    }
+  }
+
+  /// Carry an answer across a reworded question (kCheckInRenames): an answer
+  /// under the old wording lands on the new one, and one already given to the
+  /// new wording is never overwritten. After a merge the server still holds the
+  /// old key, so the next change sends the new key and a removal of the old.
+  void _takeAnswer(String text, bool yes) {
+    final to = kCheckInRenames[text];
+    if (to == null) {
+      _checkIns[text] = yes;
+    } else {
+      _checkIns.putIfAbsent(to, () => yes);
     }
   }
 
@@ -869,7 +916,8 @@ class DevStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      // await prefs.setString(_prefsKey, jsonEncode(cloudData())); // kept for revert (step 13)
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {}
   }
 

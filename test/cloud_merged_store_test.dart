@@ -12,6 +12,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/screens/post_pregnancy/pp_development_data.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_reading_data.dart';
 import 'package:parentveda/services/remote/cloud_merged_store.dart';
 import 'package:parentveda/services/remote/sync_registry.dart';
 
@@ -397,6 +399,56 @@ void main() {
       CloudMergeIo.isLoggedIn = () => true;
       await a.syncMergedFromCloud();
       expect(server['ticks:items']!['k']!['v'], true);
+    });
+  });
+
+  // The last two whole-blob stores, converted after step 13 (2026-10-22).
+  // Each real store runs once here, against the same fake server.
+  group('the Parenting stores', () {
+    test('DevStore: an answer under a reworded question moves to the new '
+        'wording on the server, and the old one is removed', () async {
+      final from = kCheckInRenames.keys.first;
+      final to = kCheckInRenames[from]!;
+      // Another phone, still on the old wording, answered it.
+      server['pp_development:items'] = {
+        'q|$from': {'v': true, 't': 500},
+      };
+      final s = DevStore.instance;
+      s.applyCloudItems(const {}); // no demo seeds in the way
+      await s.syncMergedFromCloud();
+      expect(s.checkInAnswer(to), isTrue);
+      expect(s.checkInAnswer(from), isNull);
+
+      // Her next change carries the rename up with it.
+      clock += 10;
+      s.toggleSave('peekaboo');
+      await settle();
+      await settle();
+      final items = server['pp_development:items']!;
+      expect(items['s|peekaboo']!['v'], true);
+      expect(items['q|$to']!['v'], true);
+      expect(items['q|$from']!['d'], true);
+    });
+
+    test('ReadingStore: progress on two articles from two phones both stay',
+        () async {
+      // The other phone read article a; this phone reads article b.
+      server['pp_reading:items'] = {
+        'p|a': {'v': 0.5, 't': 500},
+      };
+      final r = ReadingStore.instance;
+      r.applyCloudItems(const {}); // no demo seeds in the way
+      await r.syncMergedFromCloud();
+      expect(r.progressOf('a'), 0.5);
+
+      clock += 10;
+      r.setProgress('b', 0.4);
+      await r.syncMergedFromCloud(); // the 5 s debounce, not waited for
+      final items = server['pp_reading:items']!;
+      expect(items['p|a']!['v'], 0.5);
+      expect(items['p|b']!['v'], 0.4);
+      expect(r.progressOf('a'), 0.5);
+      expect(r.progressOf('b'), 0.4);
     });
   });
 }

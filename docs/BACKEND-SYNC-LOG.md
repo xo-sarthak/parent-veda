@@ -26,7 +26,7 @@ owed.
 | 2026-10-20 | Step 8: Pregnancy part 1 (calendar, bump photos, the daily tables, weekly notes, reminders) | 0106 | `d5787b2` | yes (2026-10-21) |
 | 2026-10-21 | Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools) | 0107 | `a728ec4` | yes (2026-10-21) |
 | 2026-10-21 | Steps 11 and 12: every write of her data confirmed, batched first sync, sign-out forgets memory and stops alarms, the 90-day purge | 0109 | `984836f` | yes (2026-10-21) |
-| 2026-10-22 | Step 13: nothing she makes lives only on the phone; every light store merges item by item (the non-shopping half of step 10) | 0110 | pending | **not yet** |
+| 2026-10-22 | Step 13: nothing she makes lives only on the phone; every light store merges item by item (the non-shopping half of step 10) | 0110 | `8c466d0` | yes (2026-10-22) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -1033,7 +1033,7 @@ read-only sweeps found more than the docs listed.
 
 ## Step 13: nothing she makes lives only on the phone, and no blob erases another phone's edits
 
-**Date:** 2026-10-22 (planned and approved the same day). **Migration:** 0110 (**not yet run**). **Commit:** pending.
+**Date:** 2026-10-22 (planned and approved the same day). **Migration:** 0110 (run by the user 2026-10-22). **Commit:** `8c466d0`.
 
 **Why.** Step 12 found that phone-only data (birth plan, Garbh journal, memories, BMI, answers) was lost for good at
 sign-out, while the sheet said "it stays saved in your account". The user: "both aren't good practices ... poor
@@ -1095,6 +1095,15 @@ backend". They decided:
   - the shopping stores (cart, orders, bought, product checklists, saved products, Brand Studio, booking) go to the
     marketplace build;
   - `pp_development_data` and `pp_reading_data` were being edited by another terminal. **Still whole-blob, owed.**
+    **Done later on 2026-10-22**, once the other terminal committed (`1cd9f2f`):
+    - `DevStore` items: `s|<id>` saved, `c|<id>` completed, `q|<question text>` answers. The other terminal's
+      `kCheckInRenames` now applies to each answer as it loads, from either path. After a merge the server still
+      holds the old wording, so her next change sends the new key and a tombstone for the old one; no extra code;
+    - `ReadingStore` items: `p|<article>` progress, `font`, `mode`, with a 5 s debounce because progress moves on
+      every scroll. The local blob keeps its shape, because `SavedStore` lifts the old `saved` list from it;
+    - tests: two cases in `cloud_merged_store_test` that run the real stores against the fake server, and
+      `pp_checkin_rename_test` covering both loading paths. 134 passed across the seven files that name the two
+      stores; analyze clean on the touched files.
 
 **Verified (2026-10-22):**
 - Scoped `flutter analyze` over every step-13 file: no new issues. Three already there: an unused import in
@@ -1112,8 +1121,12 @@ backend". They decided:
 - Counters (tool usage, the read-to-baby offset) are last-writer-wins, so two phones counting at once can lose a step.
 - Watch collection ids come from a per-phone counter, so two phones creating a collection at once could merge them.
 - A shown time on a care card goes up only with the next change that notifies.
+- Reading progress is last-writer-wins, not the highest value. Two phones reading the same article offline at once
+  can move it back. Each phone already refuses to move its own progress backwards, so this needs both offline.
 
-**User runs (OWED):** 0110 in the Supabase SQL editor, then its checks: the function, 2 triggers, the new column.
+**User ran (2026-10-22):** 0110 in the Supabase SQL editor; check 3 returned `pregnancy_ended_at`. Check 2 expects 4
+rows, not 2: `information_schema.triggers` lists a trigger once per event, and both fire on INSERT and UPDATE (the
+comment in 0110 was corrected after the commit).
 
 **Owed (device, on the user's word):**
 - Fill in the birth plan, a memory with a photo, a BMI reading and some TTC answers; sign out and back in; everything

@@ -293,7 +293,8 @@ revoke execute on function public.pv_purge_removed(int) from public, anon, authe
 -- -- 1. The merge exists and only signed-in users may call it:
 -- select proname, prosecdef from pg_proc where proname = 'pv_state_merge';
 --
--- -- 2. The two tables, each with its guard trigger (expect 2 rows):
+-- -- 2. The two tables, each with its guard trigger (expect 4 rows: each trigger
+-- --    is listed once for INSERT and once for UPDATE):
 -- select event_object_table, trigger_name from information_schema.triggers
 --  where trigger_name in ('memories_newer_wins', 'garbh_journal_entries_newer_wins');
 --

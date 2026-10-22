@@ -17,7 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/read_store.dart';
-import '../../services/remote/cloud_synced_store.dart';
+// import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
+import '../../services/remote/cloud_merged_store.dart';
 import '../../services/saved_store.dart';
 import '../../care_partner/care_journey.dart';
 import 'pp_book_docs.dart';
@@ -770,7 +771,7 @@ List<ReadArticle> readNextArticles(ReadArticle article, {int limit = 4}) {
 // =============================================================================
 enum ReadMode { light, sepia, dark }
 
-class ReadingStore extends ChangeNotifier with CloudSyncedStore {
+class ReadingStore extends ChangeNotifier with CloudMergedStore {
   ReadingStore._() {
     // Saved articles live in SavedStore since 2026-09-16 (docs/FAMILY-MODEL.md
     // §5) as rows of kind `article`; this store keeps progress, font, mode.
@@ -792,20 +793,65 @@ class ReadingStore extends ChangeNotifier with CloudSyncedStore {
   @override
   String get cloudKey => _prefsKey;
 
-  /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
-  @override
-  Object get cloudEmptyData => const <String, Object?>{'progress': <String, double>{}, 'fontScale': 1.0, 'mode': 'light'};
+  // Kept for revert (step 13): applyCloudItems({}) now gives the empty state.
+  //   /// What a sign-out resets this store to (2026-10-17): the blob of a store nobody has used.
+  //   @override
+  //   Object get cloudEmptyData => const <String, Object?>{'progress': <String, double>{}, 'fontScale': 1.0, 'mode': 'light'};
+  //
+  //   @override
+  //   Object cloudData() => {
+  //         // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore
+  //         'progress': _progress,
+  //         'fontScale': _fontScale,
+  //         'mode': _mode.name,
+  //       };
 
-  @override
-  Object cloudData() => {
-        // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore
+  /// The local prefs blob (the shape the cloud blob had before step 13).
+  /// SavedStore lifts an old `saved` list from this key, so the shape stays.
+  Map<String, Object?> _blob() => {
         'progress': _progress,
         'fontScale': _fontScale,
         'mode': _mode.name,
       };
 
   @override
-  void applyCloudData(Object data) {
+  String? get legacyBlobKey => cloudKey;
+
+  /// Progress moves on every scroll; one merge per pause, not per frame.
+  @override
+  Duration get cloudPushDebounce => const Duration(seconds: 5);
+
+  // One item per article's progress, plus the two reader settings (step 13).
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _progress.entries) 'p|${e.key}': e.value,
+        'font': _fontScale,
+        'mode': _mode.name,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _progress.clear();
+    _fontScale = 1.0;
+    _mode = ReadMode.light;
+    for (final e in items.entries) {
+      final v = e.value;
+      if (e.key.startsWith('p|')) {
+        if (v is num) _progress[e.key.substring(2)] = v.toDouble();
+      } else if (e.key == 'font') {
+        if (v is num) _fontScale = v.toDouble();
+      } else if (e.key == 'mode') {
+        for (final m in ReadMode.values) {
+          if (m.name == v) _mode = m;
+        }
+      }
+    }
+  }
+
+  /// Was applyCloudData before step 13; the same body. Also reads the local
+  /// prefs cache, which keeps the old blob shape.
+  @override
+  void applyLegacyBlob(Object data) {
     if (data is! Map) return;
     // saved: kept for revert - SavedStore owns bookmarks now.
     final p = data['progress'];
@@ -824,7 +870,8 @@ class ReadingStore extends ChangeNotifier with CloudSyncedStore {
   Future<void> persistLocalCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKey, jsonEncode(cloudData()));
+      // await prefs.setString(_prefsKey, jsonEncode(cloudData())); // kept for revert (step 13)
+      await prefs.setString(_prefsKey, jsonEncode(_blob()));
     } catch (_) {}
   }
 
@@ -841,11 +888,12 @@ class ReadingStore extends ChangeNotifier with CloudSyncedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyCloudData(jsonDecode(raw));
+      if (raw != null) applyLegacyBlob(jsonDecode(raw));
     } catch (_) {/* keep the starter state */}
     notifyListeners();
     try {
-      await syncStateFromCloud();
+      // await syncStateFromCloud(); // kept for revert (step 13)
+      await syncMergedFromCloud();
     } catch (_) {/* stay local */}
   }
 
