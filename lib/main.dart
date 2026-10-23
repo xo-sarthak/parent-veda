@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'brand/brand_store.dart';
 import 'localization/app_language.dart';
 import 'screens/post_pregnancy/pp_child_profile.dart';
+import 'screens/post_pregnancy/pp_changes_store.dart';
 import 'screens/post_pregnancy/pp_development_data.dart';
 import 'screens/post_pregnancy/daily_tip_popup.dart';
 import 'screens/post_pregnancy/pp_grow_data.dart';
@@ -380,6 +381,7 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // JSON blob each into user_state, where own-only RLS is exactly right - a
     // saved recipe or reading position is personal, not shared with a partner.
     DevStore.instance.init();
+    PpChangesStore.instance.init(); // "Something changed?" remembered (Wave 8)
     // The dated completion log behind Grow's daily habit (V2's streak and V3's
     // week ribbon read the same rows). Booted here, beside DevStore, because a
     // store that is only initialised from a screen loses everything it saved

@@ -26,8 +26,10 @@
 
 import '../../services/family_profile.dart';
 import '../../services/pv_read_store.dart';
+import 'pp_changes_store.dart';
 import 'pp_child_profile.dart';
 import 'pp_feeding_data.dart';
+import 'pp_what_changed_data.dart' show WcTone;
 
 /// A situation the brain can lift content for. Each has the words that mark a
 /// page as being about it, and the few words shown on a card that moved.
@@ -60,6 +62,7 @@ class PpSituation {
     required this.daysOld,
     this.signals = const {},
     this.father = false,
+    this.changes = const [],
   });
 
   /// Everything the app knows right now. Corrected age is NOT used to move a
@@ -90,6 +93,8 @@ class PpSituation {
       daysOld: child.ageInDays,
       signals: signals,
       father: fam.role == CareRole.father,
+      // What she told us in "Something changed?" (2026-10-23, Wave 8).
+      changes: PpChangesStore.instance.active(),
     );
   }
 
@@ -97,6 +102,21 @@ class PpSituation {
   final int daysOld;
   final Set<PpSignal> signals;
   final bool father;
+
+  /// What she told us in "Something changed?" and has not cleared, newest
+  /// first. Active for three weeks (pp_changes_store.dart).
+  final List<PpChange> changes;
+
+  /// The newest change this text is about, or null. With [commerce], an urgent
+  /// change matches nothing: a worry that needs a doctor never puts a product
+  /// first.
+  PpChange? changeFor(String text, {bool commerce = false}) {
+    for (final c in changes) {
+      if (commerce && c.tone == WcTone.urgent) continue;
+      if (c.matches(text)) return c;
+    }
+    return null;
+  }
 
   /// The first of her signals this text is about, or null.
   PpSignal? signalFor(String text) {
@@ -121,6 +141,10 @@ enum PpBandDistance {
 /// A signal match lifts an item by this much (lower is earlier).
 const int kPpSignalLift = 30;
 
+/// Something she told us lifts a little more than a standing signal: it is
+/// what is on her mind this week (2026-10-23, Wave 8).
+const int kPpChangeLift = 40;
+
 /// Saved items come a little earlier.
 const int kPpSavedLift = 5;
 
@@ -140,10 +164,12 @@ List<T> ppRelevanceOrder<T>(
   PpBandDistance Function(T)? band,
   String? Function(T)? readId,
   bool Function(T)? saved,
+  bool commerce = false,
 }) {
   int score(T it) {
     var s = band?.call(it).score ?? 0;
     if (situation.signalFor(text(it)) != null) s -= kPpSignalLift;
+    if (situation.changeFor(text(it), commerce: commerce) != null) s -= kPpChangeLift;
     if (saved?.call(it) ?? false) s -= kPpSavedLift;
     final rid = readId?.call(it);
     if (rid != null && PvReadStore.instance.isFinished(rid)) s += kPpFinishedSink;
@@ -157,4 +183,6 @@ List<T> ppRelevanceOrder<T>(
 
 /// The few words a card shows when the brain moved it ("On formula"), so the
 /// app explains itself. Null when nothing about her situation moved it.
-String? ppRelevanceWhy(PpSituation situation, String text) => situation.signalFor(text)?.why;
+// String? ppRelevanceWhy(PpSituation situation, String text) => situation.signalFor(text)?.why; // kept for revert (Wave 8)
+String? ppRelevanceWhy(PpSituation situation, String text) =>
+    situation.changeFor(text)?.why ?? situation.signalFor(text)?.why;

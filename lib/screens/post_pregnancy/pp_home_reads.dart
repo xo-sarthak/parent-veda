@@ -38,6 +38,7 @@ import 'pp_relevance.dart';
 import 'pp_phases_data.dart' show AgePhase, watchCategoryForPhase;
 import 'pp_watch_data.dart';
 import 'video/pv_video_config.dart' show pvResolveVideoUrl;
+import '../../data/pp_phase_videos.dart';
 
 /// One read on the home rail: a door page and the section it opens in.
 typedef PpHomeRead = ({PpSection section, PpPage page});
@@ -314,13 +315,32 @@ class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
   }
 }
 
-// ---- The phase film, one pick for every screen (2026-10-21, Wave 5) --------
+// ---- The phase video, one pick for every screen (2026-10-21, Wave 5) -------
 //
 // Was private to the home (`_PpHomeV3State._video`). The phase screen now shows
 // the same film on its painting, so the pick lives here: a playable video from
 // the phase's own category, rotated by day, else any playable video, else null
-// (and both screens then say the film is coming, never a blank box).
+// (and both screens then say the video is coming, never a blank box).
+//
+// The phase's own video leads (2026-10-23, Wave 8): a line in kPhaseVideos
+// (lib/data/pp_phase_videos.dart) puts it live. The watch pick below is the
+// fallback, kept as it was.
 WatchVideo? ppPhaseVideo(AgePhase phase) {
+  if (kPhaseVideos[phase.number] case final v?) {
+    return WatchVideo(
+      id: 'phase_${phase.number}',
+      title: phase.name,
+      topic: 'This phase',
+      category: watchCategoryForPhase(phase),
+      expertId: '',
+      ageTag: '',
+      seconds: v.seconds,
+      quick: false,
+      why: 'What this phase is about, in a few minutes.',
+      seed: phase.number,
+      videoUrl: v.url,
+    );
+  }
   bool plays(WatchVideo v) => pvResolveVideoUrl(v) != null;
   final pool = watchByCategory(watchCategoryForPhase(phase)).where(plays).toList();
   if (pool.isNotEmpty) return pool[DateTime.now().day % pool.length];

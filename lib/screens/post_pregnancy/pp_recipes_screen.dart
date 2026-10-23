@@ -441,7 +441,7 @@ Widget _ppRecipeHead(V2Palette p, String eyebrow, String? title, {String? action
         if (action != null)
           Semantics(
             button: true,
-            child: GestureDetector(
+            child: PvPress(child: GestureDetector(
               key: actionKey,
               onTap: onAction,
               behavior: HitTestBehavior.opaque,
@@ -451,7 +451,7 @@ Widget _ppRecipeHead(V2Palette p, String eyebrow, String? title, {String? action
                     style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)
                         .copyWith(decoration: TextDecoration.underline)),
               ),
-            ),
+            )),
           ),
       ]),
     ));

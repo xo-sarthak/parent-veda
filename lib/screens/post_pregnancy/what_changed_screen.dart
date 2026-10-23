@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 
 import 'community_screen.dart';
 import 'phase_map_screen.dart';
+import 'pp_changes_store.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_what_changed_data.dart';
@@ -404,13 +405,56 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
         }
       });
 
+  // Remembered by default (2026-10-23, Wave 8): the result line says so and
+  // "Not now" forgets it. Was: the answers lived only in this State.
+  bool _kept = true;
+
   void _advance() => setState(() {
         if (_step < _count - 1) {
           _step++;
         } else {
           _showResult = true;
+          _kept = true;
+          PpChangesStore.instance.note(widget.concern, wcResultFor(widget.concern, _answers).tone);
         }
       });
+
+  /// The line under the result that says what we kept, with "Not now".
+  Widget _keepLine(V2Palette p) => Container(
+        key: const ValueKey('wc_flow_keep'),
+        padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+        decoration: BoxDecoration(color: p.line.withValues(alpha: 0.35), borderRadius: BorderRadius.circular(14)),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(_kept ? Icons.bookmark_outline_rounded : Icons.bookmark_remove_outlined, size: 18, color: p.ink1),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(_kept ? "We'll keep this in mind for 3 weeks" : 'Not kept',
+                  style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+              const SizedBox(height: 2),
+              Text(
+                  _kept
+                      ? 'Pages and activities about it move up on your home. Clear it any time.'
+                      : 'Your home stays as it was.',
+                  style: pvManrope(fontSize: 12, height: 1.45, color: p.ink2)),
+            ]),
+          ),
+          PvPress(
+            child: TextButton(
+              key: const ValueKey('wc_flow_keep_toggle'),
+              onPressed: () {
+                setState(() => _kept = !_kept);
+                final store = PpChangesStore.instance;
+                _kept
+                    ? store.note(widget.concern, wcResultFor(widget.concern, _answers).tone)
+                    : store.clear(widget.concern.id);
+              },
+              child: Text(_kept ? 'Not now' : 'Keep it',
+                  style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+            ),
+          ),
+        ]),
+      );
 
   // ---- the one ParentVeda look (2026-10-07) ------------------------------------
   //  The flow on the shell every TTC and pregnancy tool wears, the same field
@@ -654,6 +698,11 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
             urgent ? 'Find a paediatrician or urgent care' : 'Talk to a paediatrician near you',
             const ProblemSolverScreen()),
       ])),
+
+      // What we kept (2026-10-23, Wave 8). Under the doctor route, so an
+      // urgent result still leads with the way to a doctor.
+      const SizedBox(height: 12),
+      pregToolPad(_keepLine(p)),
 
       // cross-app: what helps, gathered from across ParentVeda.
       const SizedBox(height: 26),

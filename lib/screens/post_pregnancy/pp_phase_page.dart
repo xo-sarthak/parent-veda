@@ -45,7 +45,9 @@ import 'pp_age_page_parts.dart' show PpAtThisAge;
 import 'pp_common.dart' show PpProductImage;
 import 'pp_courses_data.dart' show Course, kCourses;
 import 'pp_experts_data.dart' show needLabel;
+import 'pp_activity_paintings.dart' show PpActivityThumb;
 import 'pp_home_reads.dart' show ppPhaseVideo;
+import '../../data/pp_phase_videos.dart' show ppVideoLength;
 import 'pp_phase_doc_activities.dart' show ppDocActivityNamed;
 import 'pp_phase_doc_reads.dart' show ppPhaseDocAsRead, ppPhaseDocBlock, ppOpenMilestoneRead, PpDocSnapshotBlock;
 import 'pp_phase_faqs.dart' show phaseFaqs;
@@ -244,7 +246,7 @@ class _PhaseHeadState extends State<_PhaseHead> {
         label: label,
         child: Opacity(
           opacity: onTap == null ? 0.35 : 1,
-          child: GestureDetector(
+          child: PvPress(child: GestureDetector(
             onTap: onTap,
             child: Container(
               width: 32,
@@ -253,7 +255,7 @@ class _PhaseHeadState extends State<_PhaseHead> {
               decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.92), shape: BoxShape.circle),
               child: Text(glyph, style: pvManrope(fontSize: 18, fontWeight: FontWeight.w800, color: const Color(0xFF1F1F23))),
             ),
-          ),
+          )),
         ),
       );
 
@@ -262,7 +264,7 @@ class _PhaseHeadState extends State<_PhaseHead> {
     final p = V2PaletteStore.instance.current;
     final ph = widget.phase;
     final n = ph.number;
-    final film = ppPhaseVideo(ph);
+    final video = ppPhaseVideo(ph); // was `film` (films are videos now, 2026-10-23)
     return ColoredBox(
       color: p.ground,
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -280,7 +282,7 @@ class _PhaseHeadState extends State<_PhaseHead> {
               final k = i + 1;
               final on = k == n;
               final mine = k == widget.current;
-              return GestureDetector(
+              return PvPress(child: GestureDetector(
                 key: ValueKey('pp_phase_pill_$k'),
                 onTap: on ? null : () => widget.onGo(k),
                 child: Container(
@@ -295,7 +297,7 @@ class _PhaseHeadState extends State<_PhaseHead> {
                       style: pvManrope(
                           fontSize: 12, fontWeight: FontWeight.w700, color: on ? Colors.white : p.ink1)),
                 ),
-              );
+              ));
             },
           ),
         ),
@@ -306,8 +308,8 @@ class _PhaseHeadState extends State<_PhaseHead> {
             borderRadius: BorderRadius.circular(18),
             child: AspectRatio(
               aspectRatio: 4 / 3,
-              child: _playing && film != null
-                  ? PvVideoPlayer(video: film, inline: true, autoStart: true)
+              child: _playing && video != null
+                  ? PvVideoPlayer(video: video, inline: true, autoStart: true)
                   : Stack(fit: StackFit.expand, children: [
                       PhasePainting(phase: ph),
                       Positioned(
@@ -320,11 +322,30 @@ class _PhaseHeadState extends State<_PhaseHead> {
                           _round('›', n < widget.count ? () => widget.onGo(n + 1) : null, 'Next phase'),
                         ]),
                       ),
+                      // How long the video is, as FotMob and NBA put it on an
+                      // article's video (Mobbin, 2026-10-23, Wave 8).
+                      if (video != null)
+                        Positioned(
+                          right: 12,
+                          bottom: 12,
+                          child: Container(
+                            key: const ValueKey('pp_phase_video_length'),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                                color: p.ink1.withValues(alpha: 0.78), borderRadius: BorderRadius.circular(6)),
+                            child: Text(ppVideoLength(video.seconds),
+                                style: pvManrope(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white)
+                                .copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
+                          ),
+                        ),
                       if (n != widget.current)
                         Positioned(
                           right: 12,
                           top: 12,
-                          child: GestureDetector(
+                          child: PvPress(child: GestureDetector(
                             key: const ValueKey('pp_phase_back_to_now'),
                             onTap: () => widget.onGo(widget.current),
                             child: Container(
@@ -333,12 +354,12 @@ class _PhaseHeadState extends State<_PhaseHead> {
                               child: Text('Back to now',
                                   style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
                             ),
-                          ),
+                          )),
                         ),
                       Positioned(
                         left: 12,
                         bottom: 12,
-                        child: film == null
+                        child: video == null
                             ? Container(
                                 key: const ValueKey('pp_phase_film_soon'),
                                 padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
@@ -504,7 +525,7 @@ class _Offers extends StatelessWidget {
               PvListRow(
                 key: ValueKey('pp_phase_activity_${a.dev.id}'),
                 p: p,
-                leading: PpDomainMark(a.doc.domain),
+                leading: PpActivityThumb(activityId: a.dev.id, fallback: PpDomainMark(a.doc.domain)), // Wave 8
                 title: ppFillChild(a.doc.title),
                 line: a.doc.builds.isEmpty ? a.dev.metaLine : 'Builds ${a.doc.builds.take(2).join(', ').toLowerCase()}',
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(

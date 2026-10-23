@@ -10820,6 +10820,29 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
     PH003 has one 8-word run matching theAsianparent: "if your baby is not
     making eye contact". Fix in the .docx, then re-run the converter.
 - **§95.11** The pass is complete through Wave 7.
+- **§95.12 Wave 8, built 2026-10-23** (approved in
+  claude.ai/artifact/RwVWyxCE6VzYoFFJCakaCP; not walked).
+  - **"Something changed?" is remembered.** `PpChangesStore`
+    (`pp_changes_store.dart`, per child, per-item merge, key `pp_changes`, no
+    migration). Saved when the result shows, with a line under the doctor route
+    that says so and a "Not now". Active 3 weeks or until "Better now" (the
+    user). The brain lifts matching pages by 40 and says "Because you said: …";
+    an urgent change never lifts a product (`commerce: true` on the home's
+    products). The home shows one row per active change under Due now.
+  - **Phase videos** ("films" are videos now): `kPhaseVideos`
+    (`lib/data/pp_phase_videos.dart`) leads `ppPhaseVideo`; one line puts a
+    phase live, with its length on the poster. **Owed:** the videos, and their
+    hosting (the user: maybe Bunny Stream; the url takes mp4 or HLS).
+  - **Activity paintings:** `PpActivityThumb` on the home's three, the phase
+    page and All activities, and the reader hero, from `kActivityPaintings`
+    (`pp_activity_paintings.dart`). Empty, so every row keeps its mark. **Owed:**
+    149 paintings, made by the user in ChatGPT from prompts the user will ask
+    for; each batch = files in `assets/activities/<id>.webp`, the ids in the
+    set, and `- assets/activities/` in pubspec with the first batch. Size: about
+    60 KB each, roughly 9 MB for all 149 in the app.
+  - Also fixed: 7 taps from Waves 0 and 6 lacked PvPress
+    (`tap_feedback_guard_test`). One left in `ttc_ready_week.dart`, TTC's.
+  - Guard: `test/pp_wave8_test.dart`.
 
 ## 96.0 The 2026-10-20 walk: TTC fixes and cross-stage content — 2026-10-21
 

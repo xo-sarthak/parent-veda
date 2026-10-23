@@ -1294,3 +1294,23 @@ date change beside it (Flo, Oura); the last-period question asked alone
 **Declined.** Flo's pink pill (ours is ink). Celebration screens with confetti
 (WHOOP's "Congratulations"): many couples reach this page after a loss.
 Gamified path maps (Ahead, Noom): a treatment is not a game with locks.
+
+## 34. What she told us, the phase video, activity photos (2026-10-23)
+
+**Found.** Check-in chips: Noom "What might be contributing"
+(https://mobbin.com/screens/425e978e-5f24-4546-b155-e491c41e0dbb), Insight
+Timer (https://mobbin.com/screens/1e87a4d1-d014-4d85-b43f-e80ee410579e). Rows
+with a photo: Alan "Exercises and content"
+(https://mobbin.com/screens/2de2138e-2023-4b8c-bcc3-8bded31816d5), Polarsteps
+"Places" (https://mobbin.com/screens/9e542264-c982-4e50-9cd6-774dc6fd9197). A
+video on an article with its length: FotMob
+(https://mobbin.com/screens/491c37b4-be1a-4a9f-8846-ef4c6834a9c9), NBA
+(https://mobbin.com/screens/80959e6f-42bc-42c5-ba52-75c5a2b32a9b).
+
+**Adopted.** The rounded-square picture on activity rows; the length badge on
+the phase poster. The flow's chips already match; only a "kept" line was added.
+
+**Declined.** How We Feel's dark ground; Pangea's emoji chips.
+
+**Built.** `pp_changes_store.dart`, `pp_activity_paintings.dart`,
+`lib/data/pp_phase_videos.dart`.

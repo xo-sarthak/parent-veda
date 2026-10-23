@@ -804,6 +804,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     // The read's own picture, else the table's (read_images.dart).
     final url = readImageFor(a.id, own: a.imageUrl);
     if (url == null || url.isEmpty) return band;
+    // A bundled painting (an activity's, 2026-10-23) rather than a web image.
+    if (url.startsWith('assets/')) {
+      return Image.asset(url, fit: BoxFit.cover, errorBuilder: (_, _, _) => band);
+    }
     return Image.network(
       url,
       fit: BoxFit.cover,

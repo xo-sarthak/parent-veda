@@ -489,3 +489,24 @@ order change, structure never does, and nothing is hidden.
   in code, never in the CMS.
 
 Still open: the TTC vocabulary for the shared profile store (§9).
+
+## 12. Parenting: what she told us (2026-10-23, Wave 8)
+
+The first signal she gives rather than one we derive. "Something changed?"
+saves its answer per child (`PpChangesStore`) and `PpSituation.changes` carries
+the active ones into the brain (`pp_relevance.dart`):
+
+- **Lift 40**, a little more than a standing signal (30): it is this week's
+  worry. Matching is by the concern's keywords plus its area's words
+  (`kPpChangeAreaWords`).
+- **Three weeks, or "Better now".** An old worry must not steer the home for
+  months; a lapse needs no action from her.
+- **Never a product on an urgent answer.** `ppRelevanceOrder(commerce: true)`
+  skips urgent changes, so a fever that needs a doctor lifts the reads and the
+  doctor route, not something to buy.
+- **It still only orders.** Nothing is dropped, and every lift says why
+  ("Because you said: waking every 2 hours").
+
+The trade-off: storing it costs one more synced store and a "Not now" on the
+result; it buys a home that answers what she just told us. Forgetting by
+default would have been simpler and never wrong, and never useful.

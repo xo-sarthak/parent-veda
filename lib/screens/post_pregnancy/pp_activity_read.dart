@@ -24,6 +24,7 @@ import '../../models/pv_read.dart';
 import '../reader/pv_reader_screen.dart';
 import 'doors/pp_door_screen.dart' show PpDoorScreen;
 import 'pp_content.dart' show PpBlock, PpBlockView, PpStep, PpSteps;
+import 'pp_activity_paintings.dart' show ppActivityPainting;
 import 'pp_development_data.dart' show DevActivity, devAreaById;
 import 'pp_phases_data.dart' show ppFillChild;
 import 'pp_search.dart' show ppOpenSurface;
@@ -51,6 +52,8 @@ PvRead ppActivityAsRead(DevActivity a) {
     authorRole: _same('Something to do together'),
     reviewed: false,
     hue: 268,
+    // The activity's painting as the hero once it has one (Wave 8).
+    imageUrl: ppActivityPainting(a.id),
     sections: [
       if (a.skills.isNotEmpty) PvReadSection(heading: _same('What it builds'), bullets: [for (final s in a.skills) _fill(s)]),
       // The intro already opened the page for a doc activity; the benefit is

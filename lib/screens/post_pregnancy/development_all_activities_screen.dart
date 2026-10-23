@@ -22,6 +22,7 @@
 import 'package:flutter/material.dart';
 
 import 'development_activity_screen.dart';
+import 'pp_activity_paintings.dart' show PpActivityThumb;
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
@@ -80,7 +81,9 @@ class DevelopmentAllActivitiesScreen extends StatelessWidget {
                 PvListRow(
                   key: ValueKey('pp_activity_row_${a.id}'),
                   p: p,
-                  leading: _AreaMark(areaId: area.id, accent: area.accent, tint: v2BlockTint(38, p)),
+                  leading: PpActivityThumb( // the painting once it has one (Wave 8)
+                      activityId: a.id,
+                      fallback: _AreaMark(areaId: area.id, accent: area.accent, tint: v2BlockTint(38, p))),
                   title: ppFillChild(a.title),
                   line: a.metaLine,
                   trailing: Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),

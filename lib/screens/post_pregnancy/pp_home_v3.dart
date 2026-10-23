@@ -49,6 +49,8 @@ import 'package:flutter/material.dart';
 import '../brackets/hub/journey_screen.dart';
 import '../../data/journeys/journey_registry.dart';
 import 'reading_home_screen.dart';
+import 'pp_activity_paintings.dart' show PpActivityThumb;
+import 'pp_changes_store.dart';
 import 'what_changed_screen.dart';
 import '../../data/hubs/parenting_hubs.dart';
 import '../brackets/hub/hub_owed_screen.dart';
@@ -235,6 +237,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
         FatherPreview.instance, // the father's card (2026-10-07)
         PpLastPageStore.instance, // Continue reading (2026-10-07)
         FamilyProfileStore.instance, // tile order by her priorities (2026-10-07)
+        PpChangesStore.instance, // what she told us (2026-10-23, Wave 8)
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -443,6 +446,46 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 if (ppVisitCardFor() case final visit?) ...[
                   const SizedBox(height: 22),
                   _pad(PpVisitCard(visit: visit, p: p, onOpen: () => _openSurface(context, 'pp_vaccines'))),
+                ],
+                // WHAT SHE TOLD US (2026-10-23, Wave 8): one row per active
+                // "Something changed?" answer, only while active, each with its
+                // own "Better now". The reads and activities below move up for
+                // it and say why (pp_relevance.dart).
+                if (PpChangesStore.instance.active() case final told when told.isNotEmpty) ...[
+                  const SizedBox(height: 22),
+                  _pad(PvRowGroup(
+                    key: const ValueKey('pp_home_told'),
+                    p: p,
+                    children: [
+                      for (final c in told)
+                        PvListRow(
+                          key: ValueKey('pp_home_told_${c.concernId}'),
+                          p: p,
+                          leading: TtcMarkLeading(tab: TtcTabMark.twoBubbles, tint: v2BlockTint(20, p), size: 40),
+                          title: 'You told us: ${(c.concern?.label ?? c.concernId).toLowerCase()}',
+                          line: _toldAgo(c.at),
+                          trailing: PvPress(
+                            child: OutlinedButton(
+                              key: ValueKey('pp_home_told_clear_${c.concernId}'),
+                              style: OutlinedButton.styleFrom(
+                                  foregroundColor: p.ink1,
+                                  side: BorderSide(color: p.ink1),
+                                  shape: const StadiumBorder(),
+                                  visualDensity: VisualDensity.compact),
+                              onPressed: () {
+                                PpChangesStore.instance.clear(c.concernId);
+                                pvToast(context, 'Glad it is better. Your home is back to usual.');
+                              },
+                              child: const Text('Better now'),
+                            ),
+                          ),
+                          onTap: () => switch (c.concern) {
+                                final wc? => Navigator.of(context)
+                                    .push(MaterialPageRoute<void>(builder: (_) => WcFlowScreen(concern: wc))),
+                                null => _openSurface(context, 'pp_what_changed'),
+                              }),
+                    ],
+                  )),
                 ],
                 // EXPLORE BY TOPIC UNDER "DUE NOW" (2026-10-22, Wave 6; the user:
                 // below the vaccine row "as our app is door oriented"). No
@@ -1283,8 +1326,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
     final sit = PpSituation.now();
     String about(PpProduct x) => '${x.name} ${x.category}';
     return [
-      ...ppRelevanceOrder(fit, situation: sit, text: about),
-      ...ppRelevanceOrder(rest, situation: sit, text: about),
+      // commerce: an urgent "Something changed?" never lifts a product (Wave 8).
+      ...ppRelevanceOrder(fit, situation: sit, text: about, commerce: true),
+      ...ppRelevanceOrder(rest, situation: sit, text: about, commerce: true),
     ].take(n).toList();
   }
 
@@ -4282,11 +4326,11 @@ class _PaintedHero extends StatelessWidget {
         SizedBox(
           height: 250 + top,
           child: Stack(fit: StackFit.expand, children: [
-            GestureDetector(
+            PvPress(child: GestureDetector(
               key: const ValueKey('pp_hero_painting'),
               onTap: onSpine,
               child: PhasePainting(phase: phase),
-            ),
+            )),
             // The fade into the page: the picture has no bottom edge.
             IgnorePointer(
               child: DecoratedBox(
@@ -4439,7 +4483,7 @@ class _ActivityRows extends StatelessWidget {
     final store = PpHomeActivitiesStore.instance;
     return PvRowGroup(key: const ValueKey('pp_home_activities'), p: p, children: [
       for (final a in activities)
-        GestureDetector(
+        PvPress(child: GestureDetector(
           key: ValueKey('pp_home_activity_${a.id}'),
           onLongPress: () {
             onSwap(a);
@@ -4447,22 +4491,27 @@ class _ActivityRows extends StatelessWidget {
           },
           child: PvListRow(
             p: p,
-            leading: switch (devMarkFor(a.areaId)) {
-              final m? => Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: v2BlockTint(38, p), shape: BoxShape.circle),
-                  child: V3DevMark(mark: m, accent: devAreaById(a.areaId).accent, size: 28),
-                ),
-              null => TtcMarkLeading(tab: TtcTabMark.sprout, tint: v2BlockTint(38, p), size: 40),
-            },
+            // The activity's painting once it has one (2026-10-23, Wave 8);
+            // the drawn mark until then.
+            leading: PpActivityThumb(
+              activityId: a.id,
+              fallback: switch (devMarkFor(a.areaId)) {
+                final m? => Container(
+                    width: 40,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: v2BlockTint(38, p), shape: BoxShape.circle),
+                    child: V3DevMark(mark: m, accent: devAreaById(a.areaId).accent, size: 28),
+                  ),
+                null => TtcMarkLeading(tab: TtcTabMark.sprout, tint: v2BlockTint(38, p), size: 40),
+              },
+            ),
             title: ppFillChild(a.title),
             line: a.metaLine,
             trailing: Semantics(
               button: true,
               label: store.isDone(a.id) ? 'Done' : 'Mark as done',
-              child: GestureDetector(
+              child: PvPress(child: GestureDetector(
                 key: ValueKey('pp_home_activity_done_${a.id}'),
                 onTap: () => store.markDone(a.id),
                 behavior: HitTestBehavior.opaque,
@@ -4482,11 +4531,17 @@ class _ActivityRows extends StatelessWidget {
                         : null,
                   ),
                 ),
-              ),
+              )),
             ),
             onTap: () => onOpen(a),
           ),
-        ),
+        )),
     ]);
   }
+}
+
+/// "3 days ago" for the What she told us row (2026-10-23, Wave 8).
+String _toldAgo(DateTime at) {
+  final d = DateTime.now().difference(at).inDays;
+  return d <= 0 ? 'Today' : (d == 1 ? 'Yesterday' : '$d days ago');
 }
