@@ -34,7 +34,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
 | 12 | Position-aware notifications | OWED | Phase 6 |
-| 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags BUILT | Phase 1 |
+| 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags LIVE (2d3a07f) | Phase 1 |
 | 14 | Nutrition door pitches | LIVE (7df4711); supplements WAITING on sheet | Phase 2 |
 | 15 | Action doors lead with an action | LIVE (aa1fe9e) | Phase 2 |
 
@@ -48,6 +48,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 19078db | 2026-10-23 | Phase 1: pregnancy doors open on her weeks |
 | aa1fe9e | 2026-10-23 | Phase 2a: action doors, articles → services, store by her week |
 | 7df4711 | 2026-10-23 | Phase 2b: What you need + Go further, Nutrition For your week; this tracker |
+| 2d3a07f | 2026-10-23 | TTC phase tags: doors open on her cycle phase / round step |
 
 ---
 
@@ -201,7 +202,7 @@ quote cost in USD and INR first).
   Move (month by month), Getting Ready (the last months). Nothing moves on the
   week-20 placeholder. Test: `test/preg_door_relevance_test.dart`.
 - Parenting already opens on the child's band (`ppRelevanceOrder`).
-- **BUILT 2026-10-23 — TTC doors open on where she is.** `TtcFocusSection`
+- **LIVE 2d3a07f (2026-10-23) — TTC doors open on where she is.** `TtcFocusSection`
   and `TtcFocusGroup` carry `phases` (cycle phase) and `steps` (clinic round
   step); `lib/ttc/ttc_phase_rank.dart` reads them.
   - The door opens on the tab for her moment (Conceiving: Trying around the
