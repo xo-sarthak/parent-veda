@@ -35,6 +35,7 @@ import '../../widgets/pv_feedback.dart';
 import '../doors/pv_door_chrome.dart';
 import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../doors/pv_door_screen.dart' show pvDoorScreenForBracket;
+import '../pitch/pv_go_further.dart';
 import '../post_pregnancy/pp_yoga_data.dart' show YogaClass, YogaMode, kYogaClasses;
 import '../post_pregnancy/yoga_class_screen.dart';
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
@@ -200,10 +201,28 @@ class PvMoveTodayScreen extends StatelessWidget {
                 ),
               ),
 
+              // ---- WHAT YOU NEED (2026-10-23, global pass phase 2) --------
+              // Store chips say "Store"; a need the catalogue has nothing
+              // for, for her week, is plain text that does not tap.
+              _heading(p, 'What you need'),
+              PvWhatYouNeed(needs: _needs, p: p),
+
               // ---- DO IT WITH A TEACHER ----------------------------------
               if (classes.isNotEmpty) ...[
                 _heading(p, 'Do it with a teacher'),
                 for (final c in classes) _classRow(context, p, c),
+              ],
+
+              // ---- GO FURTHER: the mat or pillow, a physio, the course ----
+              // Below the session, never above it. The class lives in "Do it
+              // with a teacher", so it is not repeated here.
+              if (_further case final items when items.isNotEmpty) ...[
+                _heading(p, 'Go further'),
+                PvGoFurtherRail(
+                  items: items,
+                  p: p,
+                  week: pregnancy.isDueDateSet ? pregnancy.currentWeek : null,
+                ),
               ],
 
               // ---- READ FIRST: an article, and it says so ----------------
@@ -300,6 +319,24 @@ class PvMoveTodayScreen extends StatelessWidget {
       child: const Text('Video coming soon'),
     );
   }
+
+  /// What a session asks for. The birthing ball only from month 8, when the
+  /// sessions use one; water is never a product.
+  List<PvNeed> get _needs => [
+        const PvNeed('Yoga mat', words: ['yoga mat']),
+        const PvNeed('A bolster or pillow', categories: ['pregnancy_pillow']),
+        if (session.month >= 8)
+          const PvNeed('Birthing ball', words: ['birthing ball', 'birth ball']),
+        const PvNeed('Water nearby'),
+      ];
+
+  List<PvFurtherItem> get _further => pvFurtherItems(
+        needs: _needs,
+        offerings: const [
+          ['physiotherapist'],
+          ['trimester-safe fitness', 'fit & strong'],
+        ],
+      );
 
   Widget _heading(V2Palette p, String t) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),

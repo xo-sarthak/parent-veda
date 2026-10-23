@@ -287,6 +287,7 @@ source for exactly this reason.
 | File | What it holds |
 |---|---|
 | `docs/STILL-OPEN.md` | Everything parked or half-built. **Read before raising or closing an open point.** |
+| `docs/GLOBAL-CHANGES.md` | The app-wide pass started 2026-10-23 (fifteen changes across every stage): what is live, built, owed or waiting, item by item. **Update it in the same change that moves an item.** |
 | `docs/BEFORE-LAUNCH.md` | **Everything that must be done or decided before real users**, one checklist, each item dated, with an owner and where its detail lives. Add to it whenever work finds a launch blocker; tick items off with a date. |
 | `docs/STILL-OPEN-BACKEND.md` + `docs/BACKEND-SYNC-LOG.md` | Sync and data-safety work: what is left, and the dated history of what was done, step by step |
 | `docs/TTC-SPEC.md` | The Trying-to-Conceive build spec and its decision record |

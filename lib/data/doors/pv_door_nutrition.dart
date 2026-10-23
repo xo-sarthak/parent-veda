@@ -93,6 +93,10 @@ const String kDietSurfaceToday = 'nutrition/today';
 const String kDietSurfaceRecipeRail = 'nutrition/recipe_rail';
 const String kDietSurfaceList = 'nutrition/list';
 
+/// The Today tab's "For your week" row: a supplement from the store when
+/// it carries one for her week, the dietitian, a course (2026-10-23).
+const String kDietSurfaceForWeek = 'nutrition/for_week';
+
 const String kDietTabEat = 'eat'; // retired 2026-09-20 (a second Is it safe?); kept for revert
 const String kDietTabToday = 'today';
 const String kDietTabRecipes = 'recipes';
@@ -283,6 +287,15 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     // =========================================================================
     //  SUB-TAB 1 · Today — the tool draws above; one section under it
     // =========================================================================
+    // ⚠️ THE PITCH, UNDER THE PLATE (2026-10-23, global pass phase 2). The
+    // user: "in the nutrition door, if you're not pitching the products, the
+    // supplements, the doctor, then what are we doing?" Below the day's plate,
+    // never above it; drawn by `PvNutritionForWeek` (pv_go_further.dart).
+    PvDoorSection.inline(
+      group: kDietTabToday,
+      heading: 'For your week',
+      inlineSurfaceId: kDietSurfaceForWeek,
+    ),
     PvDoorSection(
       group: kDietTabToday,
       heading: 'More on food', // was 'Also on this door' (2026-10-22)

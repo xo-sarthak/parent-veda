@@ -153,6 +153,7 @@ import '../father/father_week_guide_screen.dart';
 import '../post_pregnancy/yoga_home_screen.dart';
 import '../move/pv_move_today_screen.dart' show PvMoveTodayScreen, moveTodaySessionFor;
 import '../preg_daily_insights.dart' show kPregMoveYogaReadId;
+import '../pitch/pv_go_further.dart' show PvNutritionForWeek;
 
 /// A tile's OWN drawn mark, where the door has something better than its
 /// format's. Null means "the format mark", which is the rule everywhere else.
@@ -582,6 +583,8 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
   // glasses and the cravings as one inline body, the way My scans is the
   // timeline. See nutrition_today_body.dart.
   kDietSurfaceToday => NutritionTodayBody(pregnancy: c),
+  // The Today tab's pitch row (2026-10-23): supplement, dietitian, course.
+  kDietSurfaceForWeek => PvNutritionForWeek(pregnancy: c),
   // The dieticians, in the base UI: the nutritionist's own card and the
   // four things she can do, booked through the same sheet as every
   // consult. The old violet block (`ExpertOptionsBlock`) stays for revert.
