@@ -94,6 +94,8 @@
 import 'package:flutter/foundation.dart' show ValueListenable;
 import '../../../ttc/ttc_age_rank.dart'
     show ttcAgeOrderSections, ttcIsForAge, ttcTileAgeText;
+// The door opens on where she is (global pass item 13, 2026-10-23).
+import '../../../ttc/ttc_phase_rank.dart';
 import 'package:flutter/material.dart';
 
 import '../../../localization/app_language.dart';
@@ -539,7 +541,9 @@ TtcFocusPage ttcDoorVisiblePage(
           for (final t in s.tiles)
             if (!ttcTileIsIntimate(t)) t,
         ] case final tiles when tiles.isNotEmpty)
-          TtcFocusSection(heading: s.heading, group: s.group, tiles: tiles),
+          // Kept for revert (2026-10-23): it dropped the phase tags.
+          //   TtcFocusSection(heading: s.heading, group: s.group, tiles: tiles),
+          s.withTiles(tiles),
   ];
   final groups = page.groups == null
       ? null
@@ -801,7 +805,19 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
   /// tab can leave the rail while the door is open, and an index would then
   /// point at the tab that slid into its place. Null or unknown opens the
   /// first tab.
-  late String? _groupId = widget.initialGroup;
+  ///
+  /// ⚠️ OPENS ON HER MOMENT (global pass item 13, 2026-10-23): with no named
+  /// tab, the first tab tagged for her cycle phase or round step, else the
+  /// first. A named tab (a deep link) always wins, and once she taps a tab
+  /// her choice holds. Kept for revert:
+  ///   late String? _groupId = widget.initialGroup;
+  late String? _groupId = widget.initialGroup ??
+      ttcDoorOpeningGroup(
+          widget.page.groups ?? const <TtcFocusGroup>[], _moment);
+
+  /// Where she is today, read once per open so the door holds still while
+  /// she reads it.
+  late final TtcDoorMoment _moment = ttcDoorMomentNow();
 
   /// The page as she has chosen to see it, rebuilt only when the switch moves.
   TtcFocusPage? _visible;
@@ -1010,10 +1026,21 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
         //   final sections = ttcAgeOrderSections(
         //       group == null ? page.sections : _sectionsOf(group.id),
         //       TtcFertilityHelpStore.instance.ageBand);
+        // Kept for revert (2026-10-23): age order, then videos first.
+        //   final sections = ttcDoorVideosFirst(
+        //       ttcAgeOrderSections(
+        //           group == null ? page.sections : _sectionsOf(group.id),
+        //           TtcFertilityHelpStore.instance.ageBand),
+        //       page.bracketId);
+        // ⚠️ HER MOMENT OUTRANKS HER AGE (global pass item 13): the phase
+        // order runs after the age order, so a section for today leads and
+        // the age order still holds among the rest.
         final sections = ttcDoorVideosFirst(
-            ttcAgeOrderSections(
-                group == null ? page.sections : _sectionsOf(group.id),
-                TtcFertilityHelpStore.instance.ageBand),
+            ttcPhaseOrderSections(
+                ttcAgeOrderSections(
+                    group == null ? page.sections : _sectionsOf(group.id),
+                    TtcFertilityHelpStore.instance.ageBand),
+                _moment),
             page.bracketId);
 
         return PvLiveSearchScope(

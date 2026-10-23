@@ -129,12 +129,14 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     //     hue: 42),
     TtcFocusGroup(
         id: 'trying', mark: IntentMark.cycleRing, tabMark: TtcTabMark.windowRing,
+        phases: {TtcDayPhase.beforeWindow, TtcDayPhase.window}, // global pass item 13, 2026-10-23
         // Kept for revert (2026-09-28, explicit names): label: 'When and how',
         label: 'When and how to try',
         icon: Icons.center_focus_weak_outlined,
         hue: 344),
     TtcFocusGroup(
         id: 'waiting', mark: IntentMark.calendarDay, tabMark: TtcTabMark.testStrip,
+        phases: {TtcDayPhase.waiting, TtcDayPhase.late}, // global pass item 13, 2026-10-23
         label: 'Waiting and testing',
         icon: Icons.hourglass_empty_rounded,
         hue: 268),
@@ -172,6 +174,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     TtcFocusSection(
       heading: 'When should we have sex?',
       group: 'trying', // was 'window', before the merge
+      phases: {TtcDayPhase.beforeWindow, TtcDayPhase.window}, // global pass item 13, 2026-10-23
       tiles: [
         // ⚠️ THE TOOL IS SECTION ONE, WHICH IS THE WHOLE MERGE. It used to be
         // one of three cards on a menu in front of this page. It is the thing
@@ -276,6 +279,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       // Kept for revert (2026-09-28, explicit names): heading: 'How many times should we try?',
       heading: 'How often should we have sex?',
       group: 'trying',
+      phases: {TtcDayPhase.beforeWindow, TtcDayPhase.window}, // global pass item 13, 2026-10-23
       tiles: [
         // The timing read already answers this exactly — every one to two
         // days across the window, and why saving it up does not help.
@@ -484,6 +488,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       // Kept for revert (2026-09-28, explicit names): heading: 'What happens in the two weeks after?',
       heading: 'What happens in the two weeks after ovulation?',
       group: 'waiting',
+      phases: {TtcDayPhase.waiting}, // global pass item 13, 2026-10-23
       tiles: [
         TtcArticleTile(
           title: 'The two-week wait, day by day',
@@ -511,6 +516,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       // Kept for revert (2026-09-28, explicit names): heading: 'When should you test, and how?',
       heading: 'When and how should you take a pregnancy test?',
       group: 'waiting',
+      phases: {TtcDayPhase.waiting, TtcDayPhase.late}, // global pass item 13, 2026-10-23
       tiles: [
         TtcToolTile(
           title: 'Should I test?',
@@ -548,6 +554,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       // Kept for revert (2026-09-28, explicit names): heading: 'What if the test says no?',
       heading: 'What if the pregnancy test says no?',
       group: 'waiting',
+      phases: {TtcDayPhase.late, TtcDayPhase.period}, // global pass item 13, 2026-10-23
       tiles: [
         TtcArticleTile(
           title: 'Late period, negative test',

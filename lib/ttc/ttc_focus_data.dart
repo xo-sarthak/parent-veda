@@ -83,6 +83,9 @@ import '../screens/ttc/ttc_illustrations.dart';
 import '../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 // The TTC tab family (2026-09-27), narrowed and exported the same way.
 import '../screens/ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+// Where she is, for the door's phase tags (global pass item 13, 2026-10-23).
+import 'ttc_phase.dart' show TtcDayPhase;
+import 'ttc_treatment_round.dart' show TtcRoundPhase;
 import 'focus/ttc_focus_conceiving.dart';
 import 'focus/ttc_focus_after_loss.dart';
 import 'focus/ttc_focus_mind_body.dart';
@@ -98,6 +101,9 @@ export 'focus/ttc_focus_ivf.dart';
 export 'focus/ttc_focus_pcos.dart';
 export '../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 export '../screens/ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+// The phase tags' types, so a focus file can tag without two more imports.
+export 'ttc_phase.dart' show TtcDayPhase;
+export 'ttc_treatment_round.dart' show TtcRoundPhase;
 
 /// What kind of thing a tile is. Drives the chip, the icon and the shape.
 enum TtcTileFormat {
@@ -766,10 +772,32 @@ class TtcFocusSection {
     required this.heading,
     required this.tiles,
     this.group,
+    this.phases = const {},
+    this.steps = const {},
   });
 
   final String heading;
   final List<TtcTile> tiles;
+
+  /// The cycle phases this section is FOR, and the clinic round steps
+  /// (global pass item 13, 2026-10-23). Read only by `ttc_phase_rank.dart`:
+  /// a section tagged for where she is today comes first in its tab.
+  ///
+  /// ⚠️ RANKING, NEVER STRUCTURE. Empty (the default) keeps its exact place;
+  /// a tag never hides a section from anyone. A loss door is never tagged.
+  final Set<TtcDayPhase> phases;
+  final Set<TtcRoundPhase> steps;
+
+  /// This section with other tiles, every other field kept. ⚠️ USE THIS to
+  /// re-order or filter tiles: a hand-built copy drops the phase tags, and
+  /// the door then quietly stops opening on her phase.
+  TtcFocusSection withTiles(List<TtcTile> tiles) => TtcFocusSection(
+        heading: heading,
+        tiles: tiles,
+        group: group,
+        phases: phases,
+        steps: steps,
+      );
 
   /// Which [TtcFocusGroup] this section appears under, on a page that has them.
   ///
@@ -822,7 +850,16 @@ class TtcFocusGroup {
     this.tabMark,
     this.inlineLabel,
     this.inlineSurfaceId,
+    this.phases = const {},
+    this.steps = const {},
   });
+
+  /// The cycle phases and round steps this tab is FOR (global pass item 13,
+  /// 2026-10-23). The door OPENS on the first tab tagged for where she is
+  /// (`ttcDoorOpeningGroup`), unless it was opened on a named tab. Tab order
+  /// never changes for this. Empty (the default) is never chosen.
+  final Set<TtcDayPhase> phases;
+  final Set<TtcRoundPhase> steps;
 
   // ---------------------------------------------------------------------------
   //  The new door (TtcDoorScreen, 2026-09-26) — three optional fields

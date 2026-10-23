@@ -138,6 +138,7 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
       // Kept for revert (2026-09-28, explicit names): heading: 'What does this bleeding mean?',
       heading: 'What does your bleeding mean?',
       group: 'cycle',
+      phases: {TtcDayPhase.period}, // global pass item 13, 2026-10-23
       tiles: [
         TtcArticleTile(
           title: 'Five kinds of bleeding',
@@ -164,6 +165,7 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
       // Kept for revert (2026-09-28, explicit names): heading: 'Is this pain usual?',
       heading: 'Is period or ovulation pain usual?',
       group: 'cycle',
+      phases: {TtcDayPhase.period, TtcDayPhase.window}, // global pass item 13, 2026-10-23
       tiles: [
         TtcArticleTile(
           title: 'Ovulation pain',

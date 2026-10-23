@@ -210,6 +210,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     TtcFocusSection(
       heading: 'Get through the day your period comes', // was 'What helps when your period comes?' (action headings, 2026-10-23)
       group: 'hard',
+      phases: {TtcDayPhase.period}, // global pass item 13, 2026-10-23
       tiles: [
         TtcToolTile(
           // Kept for revert (2026-09-28, explicit names): title: 'Talk it through',
@@ -266,6 +267,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       // Kept for revert (2026-09-28, explicit names): heading: 'When it goes on for months',
       heading: 'Keep going when trying takes months', // was 'When trying goes on for months' (action headings, 2026-10-23)
       group: 'hard',
+      phases: {TtcDayPhase.period}, // global pass item 13, 2026-10-23
       tiles: [
         TtcArticleTile(
           title: 'When trying takes over your life',

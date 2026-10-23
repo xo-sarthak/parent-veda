@@ -79,13 +79,15 @@ List<TtcFocusSection> ttcAgeOrderSections(
   //   String tileText(TtcTile t) =>
   //       '${t.title} ${t.blurb} ${t.keywords.join(' ')}';
   const tileText = ttcTileAgeText;
+  // Kept for revert (2026-10-23): a hand-built copy, which dropped the
+  // phase tags the door ranks by next (ttc_phase_rank.dart).
+  //   TtcFocusSection(
+  //     heading: s.heading,
+  //     group: s.group,
+  //     tiles: ttcAgeOrder(s.tiles, band, tileText),
+  //   ),
   final inner = [
-    for (final s in sections)
-      TtcFocusSection(
-        heading: s.heading,
-        group: s.group,
-        tiles: ttcAgeOrder(s.tiles, band, tileText),
-      ),
+    for (final s in sections) s.withTiles(ttcAgeOrder(s.tiles, band, tileText)),
   ];
   return ttcAgeOrder(inner, band, (s) => s.heading);
 }

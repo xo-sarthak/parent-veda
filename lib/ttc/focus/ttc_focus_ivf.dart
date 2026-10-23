@@ -671,6 +671,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     TtcFocusSection(
       heading: 'What will a cycle ask of me?',
       group: 'going',
+      steps: {TtcRoundPhase.gettingReady, TtcRoundPhase.stimulation, TtcRoundPhase.trigger, TtcRoundPhase.procedure}, // global pass item 13, 2026-10-23
       tiles: [
         TtcArticleTile(
           // Kept for revert (2026-09-28, explicit names): title: "The injections: what they're really like",
@@ -772,6 +773,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     TtcFocusSection(
       heading: 'The wait, and after the result',
       group: 'going',
+      steps: {TtcRoundPhase.transfer, TtcRoundPhase.waiting, TtcRoundPhase.testDay, TtcRoundPhase.result, TtcRoundPhase.betweenRounds}, // global pass item 13, 2026-10-23
       tiles: [
         TtcArticleTile(
           title: 'The two-week wait after IVF or IUI',
@@ -872,6 +874,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       // Kept for revert (2026-09-28, explicit names): heading: "Keep track of a cycle you're in",
       heading: 'Keep track of your treatment round',
       group: 'track',
+      steps: {TtcRoundPhase.gettingReady, TtcRoundPhase.stimulation, TtcRoundPhase.trigger, TtcRoundPhase.procedure, TtcRoundPhase.embryoDays, TtcRoundPhase.transfer, TtcRoundPhase.waiting, TtcRoundPhase.testDay}, // global pass item 13, 2026-10-23
       tiles: [
         TtcToolTile(
           title: 'Track this treatment cycle',

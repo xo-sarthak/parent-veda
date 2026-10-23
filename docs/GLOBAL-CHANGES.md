@@ -34,7 +34,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
 | 12 | Position-aware notifications | OWED | Phase 6 |
-| 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags OWED | Phase 1 |
+| 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags BUILT | Phase 1 |
 | 14 | Nutrition door pitches | LIVE (7df4711); supplements WAITING on sheet | Phase 2 |
 | 15 | Action doors lead with an action | LIVE (aa1fe9e) | Phase 2 |
 
@@ -201,10 +201,25 @@ quote cost in USD and INR first).
   Move (month by month), Getting Ready (the last months). Nothing moves on the
   week-20 placeholder. Test: `test/preg_door_relevance_test.dart`.
 - Parenting already opens on the child's band (`ppRelevanceOrder`).
-- **OWED — the user asked not to forget:** TTC door sections tagged by cycle
-  phase and treatment step, so each TTC door opens on hers (window, waiting,
-  IVF / IUI step). TTC sections have no phase tags today; they rank by age
-  band only.
+- **BUILT 2026-10-23 — TTC doors open on where she is.** `TtcFocusSection`
+  and `TtcFocusGroup` carry `phases` (cycle phase) and `steps` (clinic round
+  step); `lib/ttc/ttc_phase_rank.dart` reads them.
+  - The door opens on the tab for her moment (Conceiving: Trying around the
+    window, Waiting and testing in the wait or late). A named tab still wins;
+    tab order never changes.
+  - Inside a tab, her sections lead, and inside a section the reads the home's
+    read rail picks for her phase (`kTtcPhaseReadIds`) lead. Her moment
+    outranks her age; the age order holds among the rest.
+  - Her moment = the home's own readings: a clinic's round step
+    (`ttcHomeRoundPhaseOn`) wins, else her cycle phase (`ttcHomePhaseOn`).
+    Unknown (`any`) moves nothing.
+  - Tagged: Conceiving (2 tabs, 5 sections), IVF / treatment (3 sections by
+    round step), Mind & body (2, period), Body & cycle (2). PCOS, His side,
+    Getting ready, Not yet and After loss are untagged on purpose.
+  - Found on the way: three hand-built section copies (age order, the
+    hide-intimate switch) would have dropped the tags; they now use
+    `TtcFocusSection.withTiles`.
+  - Test: `test/ttc_door_phase_rank_test.dart`. Not walked on a device.
 - **OWED:** tag more pregnancy doors as content is reviewed (Symptoms, Labour,
   Partner "Week by week").
 
@@ -243,3 +258,4 @@ Getting Ready opens on the name finder; TTC Mind & body headings are actions
 | 2026-10-23 | Go further: below the action, store links marked, max three cards |
 | 2026-10-23 | Prototypes copy the real screen's header from the code |
 | 2026-10-23 | TTC phase tags right after Phase 2 |
+| 2026-10-23 | TTC doors open on her phase's tab and order inside it; her moment outranks her age; a clinic round outranks our cycle estimate |
