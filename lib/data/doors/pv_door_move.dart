@@ -39,6 +39,7 @@ import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../reads/read_images.dart' show readImageFor;
 import 'pv_door_data.dart';
 import '../prepare_data.dart' show kYogaSessions;
+import '../reads/pregnancy_reads_move.dart' show kMoveSurfaceToday;
 
 /// Surfaces this door opens. Resolved by `pv_door_router.dart`.
 ///
@@ -130,6 +131,33 @@ final PvDoorPage kMoveDoor = PvDoorPage(
     // =========================================================================
     //  TAB 1 · Move safely
     // =========================================================================
+    // ⚠️ AN ACTION DOOR LEADS WITH AN ACTION (2026-10-23, global pass phase 2).
+    // The user: "in the yoga and fitness door there are only articles, which
+    // makes absolutely no sense... an action door requires a video, stuff the
+    // user can actually see and do." The first thing on the first tab is now
+    // something to DO: her session for today, every video and class, and the
+    // Kegel routine. The reads follow under "Start here".
+    PvDoorSection(
+      group: kMoveTabMove,
+      heading: 'Move today',
+      tiles: [
+        PvDoorToolTile(
+          title: "Today's session",
+          blurb: 'A short session picked for your month, with what to skip.',
+          surfaceId: kMoveSurfaceToday,
+        ),
+        PvDoorToolTile(
+          title: 'All videos and classes',
+          blurb: 'Follow along at home, or join a class with a teacher.',
+          surfaceId: pvDoorTabSurface(kMoveTabClasses),
+        ),
+        PvDoorToolTile(
+          title: _kegelTitle,
+          blurb: _kegelBlurb,
+          surfaceId: kMoveSurfaceKegel,
+        ),
+      ],
+    ),
     PvDoorSection(
       group: kMoveTabMove,
       heading: 'Start here',

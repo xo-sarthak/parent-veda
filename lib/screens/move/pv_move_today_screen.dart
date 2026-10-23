@@ -60,7 +60,19 @@ YogaSession? yogaSessionById(String id) => kYogaSessions.where((s) => s.id == id
 /// different across days. The home card and a read's "Try today's session"
 /// both ask here, so they always name the same session.
 YogaSession? moveTodaySessionFor(int week, DateTime date) {
-  final mine = [for (final s in kYogaSessions) if (s.month == pregMonthFor(week)) s];
+  final month = pregMonthFor(week);
+  var mine = [for (final s in kYogaSessions) if (s.month == month) s];
+  // ⚠️ A VERB OPENS AN ACTION, NEVER AN ARTICLE (2026-10-23). With no session
+  // for her month (the tenth month, overdue) the home's "Move" card fell back
+  // to a read captioned "Article". The nearest earlier month's sessions are
+  // the right ones for the end of pregnancy. Kept for revert: `mine` alone.
+  if (mine.isEmpty) {
+    final earlier = [for (final s in kYogaSessions) if (s.month < month) s.month];
+    if (earlier.isNotEmpty) {
+      final nearest = earlier.reduce((a, b) => a > b ? a : b);
+      mine = [for (final s in kYogaSessions) if (s.month == nearest) s];
+    }
+  }
   return mine.isEmpty ? null : ttcPickForToday(mine, now: date, offset: 3);
 }
 

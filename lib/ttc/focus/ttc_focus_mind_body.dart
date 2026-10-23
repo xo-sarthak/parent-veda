@@ -208,7 +208,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     //  chat (rules only, no AI) that the period-logged message opens; the read
     //  beside it is the longer version of the same kindness.
     TtcFocusSection(
-      heading: 'What helps when your period comes?',
+      heading: 'Get through the day your period comes', // was 'What helps when your period comes?' (action headings, 2026-10-23)
       group: 'hard',
       tiles: [
         TtcToolTile(
@@ -230,7 +230,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
 
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'When other people make it harder',
-      heading: 'When other people make trying harder',
+      heading: 'Handle family questions and news', // was 'When other people make trying harder' (action headings, 2026-10-23)
       group: 'hard',
       tiles: [
         TtcArticleTile(
@@ -264,7 +264,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
 
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'When it goes on for months',
-      heading: 'When trying goes on for months',
+      heading: 'Keep going when trying takes months', // was 'When trying goes on for months' (action headings, 2026-10-23)
       group: 'hard',
       tiles: [
         TtcArticleTile(
@@ -287,7 +287,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // =========================================================================
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'About stress',
-      heading: 'What does stress really do?',
+      heading: 'Understand what stress really does', // was 'What does stress really do?' (action headings, 2026-10-23)
       group: 'understand',
       tiles: [
         // reuse, locked — not retitled, not rewritten.
@@ -349,7 +349,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     TtcFocusSection(
       // MB16 (2026-09-28): Garbh Sanskar, capitalised as on the home. Kept
       // for revert: heading: 'What garbh sanskar is',
-      heading: 'What Garbh Sanskar is',
+      heading: 'Understand Garbh Sanskar', // was 'What Garbh Sanskar is' (action headings, 2026-10-23)
       group: 'understand',
       tiles: [
         TtcArticleTile(
@@ -433,7 +433,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
 
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'What a practice is for',
-      heading: 'What is a daily practice for?',
+      heading: 'Start a daily practice', // was 'What is a daily practice for?' (action headings, 2026-10-23)
       group: 'understand',
       tiles: [
         TtcGuideTile(
@@ -483,20 +483,20 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // know what is in the Move library should be reading the library.
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'Move',
-      heading: 'Gentle ways to move',
+      heading: 'Move gently today', // was 'Gentle ways to move' (action headings, 2026-10-23)
       group: 'practice',
       tiles: _practiceTiles(TtcPracticeKind.move),
     ),
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'Breathe and calm',
-      heading: 'Breathing to calm down',
+      heading: 'Breathe to calm down', // was 'Breathing to calm down' (action headings, 2026-10-23)
       group: 'practice',
       tiles: _practiceTiles(TtcPracticeKind.breathe),
     ),
 
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'Go deeper',
-      heading: 'Want a longer session?',
+      heading: 'Try a longer session', // was 'Want a longer session?' (action headings, 2026-10-23)
       group: 'practice',
       tiles: [
         TtcVideoTile(
@@ -622,7 +622,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // MB20 (2026-09-28): the tab is called Sleep and routine now, so the
     // section says what it answers. Kept for revert: heading: 'Sleep and routine',
     TtcFocusSection(
-      heading: 'How do you sleep better while trying?',
+      heading: 'Sleep better while trying', // was 'How do you sleep better while trying?' (action headings, 2026-10-23)
       group: 'ready',
       tiles: [
         TtcGuideTile(
@@ -662,7 +662,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // The one labelled way to the rest of getting ready (2026-09-27,
     // relevance audit). It replaces the three sections commented out above.
     TtcFocusSection(
-      heading: 'Food, tests and habits',
+      heading: 'Get food, tests and habits ready', // was 'Food, tests and habits' (action headings, 2026-10-23)
       group: 'ready',
       tiles: [
         TtcDoorTile(
@@ -679,7 +679,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     //  Talk
     // =========================================================================
     TtcFocusSection(
-      heading: 'The people around you',
+      heading: 'Bring the people around you in', // was 'The people around you' (action headings, 2026-10-23)
       group: 'talk',
       tiles: [
         // Retitled (2026-09-27, relevance audit): "this advice" meant "just

@@ -74,23 +74,57 @@ class PvCatalogStore extends ChangeNotifier {
   List<PvProduct> forStage(LifeStage stage) =>
       [for (final p in all) if (p.stage == stage.shopStage) p];
 
-  List<PvProduct> inCategory(String categoryId, {String? subId}) => [
+  List<PvProduct> inCategory(String categoryId, {String? subId}) => _hersFirst([
         for (final p in all)
           if (p.categoryId == categoryId && (subId == null || p.subId == subId)) p
-      ];
+      ]);
+
+  /// Does [p] fit where she is NOW: her real pregnancy week, or her child's
+  /// real age? Null when there is no clock to read (no due date yet, no child
+  /// saved, TTC, Skilling) - then nothing is reordered (2026-10-23).
+  ///
+  /// ⚠️ THE WEEK-20 PLACEHOLDER IS NOT A WEEK. `forYou` used to filter on
+  /// `currentWeek` even with no due date, so a woman who had not given one
+  /// was shown week-20 products as hers.
+  bool? fitsNow(PvProduct p) {
+    switch (p.stage) {
+      case LifeStage.pregnancy:
+        final c = PregnancyController.current;
+        if (c == null || !c.isDueDateSet) return null;
+        return p.suitsWeek(c.currentWeek);
+      case LifeStage.parenting:
+        final kids = ChildProfileStore.instance;
+        if (!kids.hasRealChild) return null;
+        return p.suitsAge(kids.ageInMonths);
+      default:
+        return null;
+    }
+  }
+
+  /// Stable: what fits her week or her child's age first, the rest after in
+  /// their own order. Ranking, never a filter - every product stays on the
+  /// shelf (the user, 2026-10-23: "a week-20 mother should see week-20
+  /// products... or we are losing money").
+  List<PvProduct> _hersFirst(List<PvProduct> list) {
+    final fits = [for (final p in list) if (fitsNow(p) == true) p];
+    if (fits.isEmpty || fits.length == list.length) return list;
+    return [...fits, for (final p in list) if (fitsNow(p) != true) p];
+  }
 
   /// The ParentVeda-recommends rail: only the top two bands, strongest first.
   List<PvProduct> recommended(LifeStage stage, {int limit = 8}) {
     final list = [for (final p in forStage(stage)) if (p.recommends) p]
       ..sort((a, b) => a.reco!.band.rank.compareTo(b.reco!.band.rank));
-    return list.take(limit).toList();
+    // Hers first (2026-10-23); kept for revert: `list.take(limit)`.
+    return _hersFirst(list).take(limit).toList();
   }
 
   /// Bestsellers / most reviewed — the "what other parents buy" rail.
   List<PvProduct> popular(LifeStage stage, {int limit = 8}) {
     final list = forStage(stage).where((p) => !p.reviewOnly).toList()
       ..sort((a, b) => b.reviewCount.compareTo(a.reviewCount));
-    return list.take(limit).toList();
+    // Hers first (2026-10-23); kept for revert: `list.take(limit)`.
+    return _hersFirst(list).take(limit).toList();
   }
 
   /// "For you right now" — the stage's own clock decides. Pregnancy: the
@@ -101,13 +135,14 @@ class PvCatalogStore extends ChangeNotifier {
     Iterable<PvProduct> list = forStage(s).where((p) => !p.reviewOnly);
     switch (s) {
       case LifeStage.pregnancy:
-        final week = PregnancyController.current?.currentWeek;
-        if (week != null) {
-          list = list.where((p) => p.suitsWeek(week));
-        }
+        // Only a REAL week filters (2026-10-23). Kept for revert:
+        //   final week = PregnancyController.current?.currentWeek;
+        //   if (week != null) list = list.where((p) => p.suitsWeek(week));
+        list = list.where((p) => fitsNow(p) != false);
       case LifeStage.parenting:
-        final months = ChildProfileStore.instance.ageInMonths;
-        list = list.where((p) => p.suitsAge(months));
+        // Only a real child's age filters (2026-10-23). Kept for revert:
+        //   list = list.where((p) => p.suitsAge(ChildProfileStore.instance.ageInMonths));
+        list = list.where((p) => fitsNow(p) != false);
       case LifeStage.tryingToConceive:
         list = list.where((p) => !p.forPartner);
       case LifeStage.skilling:

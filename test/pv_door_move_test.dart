@@ -198,7 +198,15 @@ void main() {
         for (final t in door.allTiles)
           if (t is PvDoorToolTile) t.surfaceId,
       };
-      expect(all, {kMoveSurfaceYoga, kMoveSurfaceKegel},
+      // + Move today's session and the Classes tab, from the action-first
+      // section (2026-10-23); both are routed (pv_door_router).
+      // Kept for revert: {kMoveSurfaceYoga, kMoveSurfaceKegel}.
+      expect(all, {
+        kMoveSurfaceYoga,
+        kMoveSurfaceKegel,
+        'move/today',
+        pvDoorTabSurface(kMoveTabClasses),
+      },
           reason: 'a tool tile names a surface the lead has not been asked '
               'to wire.');
     });

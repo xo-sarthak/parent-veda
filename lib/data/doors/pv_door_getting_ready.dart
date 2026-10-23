@@ -121,6 +121,25 @@ final PvDoorPage kGettingReadyDoor = PvDoorPage(
     // =========================================================================
     //  TAB 1 · Baby names
     // =========================================================================
+    // ⚠️ THE TOOL FIRST (2026-10-23, global pass phase 2). The user: "baby
+    // name tool should be the first thing... we cannot be like, hey, we have
+    // this tool, it's hidden, go find it." It was second, after three reads.
+    // Kept for revert: "Choosing a name" above this section.
+    // The name finder the parenting stage already ships (couple swipe,
+    // shared matches, shortlist), opened from here rather than copied: the
+    // gap analysis asks for it in pregnancy, where the name is chosen.
+    PvDoorSection(
+      group: kReadyTabNames,
+      heading: 'Find names together',
+      tiles: [
+        PvDoorToolTile(
+          title: 'The name finder',
+          blurb: 'Swipe through names, each of you, and see the ones you '
+              'both like.',
+          surfaceId: kReadySurfaceNames,
+        ),
+      ],
+    ),
     PvDoorSection(
       group: kReadyTabNames,
       heading: 'Choosing a name',
@@ -141,21 +160,6 @@ final PvDoorPage kGettingReadyDoor = PvDoorPage(
           blurb: 'Light, peace, a star: some ideas to start you off.',
           readId: 'preg_ready_read_choosing_name',
           atHeading: 'A few names, by meaning',
-        ),
-      ],
-    ),
-    // The name finder the parenting stage already ships (couple swipe,
-    // shared matches, shortlist), opened from here rather than copied: the
-    // gap analysis asks for it in pregnancy, where the name is chosen.
-    PvDoorSection(
-      group: kReadyTabNames,
-      heading: 'Find names together',
-      tiles: [
-        PvDoorToolTile(
-          title: 'The name finder',
-          blurb: 'Swipe through names, each of you, and see the ones you '
-              'both like.',
-          surfaceId: kReadySurfaceNames,
         ),
       ],
     ),

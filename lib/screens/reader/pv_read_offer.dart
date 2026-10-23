@@ -41,6 +41,60 @@ const List<String> kPvOfferTopics = [
   'development', 'speech', 'solids', 'weaning', 'partner', 'father',
 ];
 
+/// A read's word, and the words of the expert who can help with it
+/// (2026-10-23, global pass phase 2). The user: "for each and every article,
+/// wherever possible, provide option to relevant services." Half the reads had
+/// no shared topic word with any offering - a scan read never said
+/// "obstetrician" - so they got nothing. This names the person instead.
+const Map<String, List<String>> kPvOfferAliases = {
+  // pregnancy clinical -> the obstetrician
+  'scan': ['obstetrician'], 'scans': ['obstetrician'],
+  'ultrasound': ['obstetrician'], 'report': ['obstetrician'],
+  'blood': ['obstetrician'], 'bloods': ['obstetrician'],
+  'nst': ['obstetrician'], 'doppler': ['obstetrician'],
+  'pressure': ['obstetrician'], 'sugar': ['obstetrician', 'nutritionist'],
+  'diabetes': ['obstetrician', 'nutritionist'], 'thyroid': ['obstetrician'],
+  'waters': ['obstetrician'], 'due': ['obstetrician'], 'rest': ['obstetrician'],
+  'risk': ['obstetrician'], 'movement': ['obstetrician'],
+  'vaccine': ['obstetrician'], 'vaccines': ['obstetrician'],
+  'ohss': ['fertility'], 'ivf': ['fertility'], 'help': ['fertility'],
+  // food -> the nutritionist
+  'iron': ['nutritionist'], 'weight': ['nutritionist'],
+  'supplement': ['nutritionist'], 'supplements': ['nutritionist'],
+  'folic': ['nutritionist'], 'omega': ['nutritionist'],
+  'recipes': ['nutritionist'], 'plate': ['nutritionist'], 'myths': ['nutritionist'],
+  // TTC body and tests -> fertility specialist / gynaecologist
+  'ovulation': ['fertility'], 'conception': ['fertility'],
+  'conceive': ['fertility'], 'temperature': ['fertility'],
+  'preconception': ['fertility'], 'carrier': ['fertility'],
+  'screening': ['fertility'], 'testing': ['fertility'], 'results': ['fertility'],
+  'months': ['fertility'], 'cycle': ['gynaecologist'], 'cycles': ['gynaecologist'],
+  'period': ['gynaecologist'], 'periods': ['gynaecologist'],
+  'contraception': ['gynaecologist'], 'control': ['gynaecologist'],
+  'discharge': ['gynaecologist'], 'yeast': ['gynaecologist'],
+  'uti': ['gynaecologist'], 'sti': ['gynaecologist'], 'infection': ['gynaecologist'],
+  'implantation': ['gynaecologist'], 'signs': ['gynaecologist'],
+  'meds': ['gynaecologist'], 'conditions': ['gynaecologist'],
+  // the worry of it -> the psychologist / counsellor
+  // Not 'worry': clinical reads say "when to worry" (OHSS went to the
+  // psychologist). Kept for revert: 'worry': ['psychologist', 'counsellor'],
+  'wait': ['psychologist', 'counsellor'],
+  'waiting': ['psychologist', 'counsellor'], 'family': ['psychologist', 'counsellor'],
+  'telling': ['psychologist', 'counsellor'], 'calm': ['psychologist', 'counsellor'],
+  'sex': ['psychologist', 'couple'], 'intimate': ['gynaecologist'],
+  'close': ['psychologist', 'couple'],
+  // body aches -> the physiotherapist
+  'back': ['physiotherapist'], 'pelvic': ['physiotherapist'], 'pain': ['physiotherapist'],
+};
+
+/// When nothing more specific fits, the stage's own doctor - a clinical read
+/// is always one a doctor can talk through. Never on a quiet read.
+const Map<String, List<String>> _kStageFallback = {
+  'pregnancy': ['obstetrician'],
+  'trying': ['gynaecologist'],
+  'parenting': ['paediatrician'],
+};
+
 /// Never pitch on these.
 const List<String> _kQuiet = [
   'loss', 'miscarriage', 'stillbirth', 'grief', 'ectopic', 'emergency',
@@ -68,24 +122,36 @@ PvOfferingView? pvReadOfferFor(PvRead r, {List<PvOfferingView>? catalog}) {
   if (r.sections.any((s) => s.callout?.tone == PvCalloutTone.urgent)) {
     return null;
   }
-  final topics = read.where(kPvOfferTopics.contains).toSet();
-  if (topics.isEmpty) return null;
+  final topics = {
+    ...read.where(kPvOfferTopics.contains),
+    for (final w in read) ...?kPvOfferAliases[w],
+  };
   List<PvOfferingView> all;
   try {
     all = catalog ?? PvLearnCatalog.instance.all(stage: stage);
   } catch (_) {
     return null; // local-first: a catalogue that is not ready is no card
   }
-  PvOfferingView? best;
-  var bestScore = 0;
-  for (final v in all) {
-    final hit = _words('${v.title} ${v.subtitle}').intersection(topics).length;
-    if (hit > bestScore) {
-      best = v;
-      bestScore = hit;
+  PvOfferingView? pick(Set<String> want) {
+    PvOfferingView? best;
+    var bestScore = 0;
+    for (final v in all) {
+      final hit = _words('${v.title} ${v.subtitle}').intersection(want).length;
+      if (hit > bestScore) {
+        best = v;
+        bestScore = hit;
+      }
     }
+    return best;
   }
-  return best;
+
+  // Kept for revert: no topics returned null before the pick.
+  return (topics.isEmpty ? null : pick(topics)) ??
+      pick({...?_kStageFallback[switch (stage) {
+        LifeStage.tryingToConceive => 'trying',
+        LifeStage.pregnancy => 'pregnancy',
+        _ => 'parenting',
+      }]});
 }
 
 /// The card: quiet, one line of why, the price, a chevron.
