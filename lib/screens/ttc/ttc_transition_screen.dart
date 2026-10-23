@@ -157,6 +157,17 @@ class _TtcTransitionScreenState extends State<TtcTransitionScreen> {
     return DateTime(n.year, n.month, n.day);
   }
 
+  /// "You're 7 weeks and 4 days pregnant", counted back from the due date
+  /// (280 days), so it is the same count the pregnancy home shows. With no
+  /// period logged and no date given, the date is a guess: "about 4 weeks".
+  String _weeksLine(TtcS t) {
+    final guessed = !_r.clinicOwned && _r.lmpUsed == null && !_r.dueDateWasDerived;
+    if (guessed) return t.transitionWeeks(_r.weeksPregnant);
+    final due = DateTime(_r.dueDate.year, _r.dueDate.month, _r.dueDate.day);
+    final days = (280 - due.difference(_today).inDays).clamp(0, 300);
+    return t.transitionWeeksDays(days ~/ 7, days % 7);
+  }
+
   TtcDatingCheck get _check {
     if (_settled) return TtcDatingCheck.fine;
     // A date she or a clinic gave (not counted from her log) is not ours to
@@ -220,7 +231,11 @@ class _TtcTransitionScreenState extends State<TtcTransitionScreen> {
                       children: [
                         _label(t.transitionWhereYouAre),
                         const SizedBox(height: 4),
-                        Text(t.transitionWeeks(_r.weeksPregnant),
+                        // Weeks and days, as a scan report says it; "about"
+                        // only when the date was guessed (2026-10-23). Kept
+                        // for revert:
+                        // Text(t.transitionWeeks(_r.weeksPregnant),
+                        Text(_weeksLine(t),
                             style: ttcFraunces(26,
                                 w: FontWeight.w600, color: ttcTitleInk)),
                         const SizedBox(height: 8),

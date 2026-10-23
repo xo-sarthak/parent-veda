@@ -65,6 +65,20 @@ int? pregPastDueWeek(int daysToDue) {
   return over < 14 ? 41 : 42;
 }
 
+/// The hero's two lines for pregnancy day [day] (days since the first day of
+/// her last period): ("7 weeks", "and 4 days"), or ("8 weeks", null) on a whole
+/// week. At 7 weeks 4 days she is IN her 8th week, so the week's page is week
+/// 8 while the count says 7 (user 2026-10-23: "why say week 8 w/o being in
+/// one??"). Doctors and scan reports say it this way.
+(String, String?) pregWeeksAndDays(int day) {
+  final d = day < 0 ? 0 : day;
+  final w = d ~/ 7, r = d % 7;
+  return (
+    w == 1 ? '1 week' : '$w weeks',
+    r == 0 ? null : 'and ${r == 1 ? '1 day' : '$r days'}',
+  );
+}
+
 /// "40 weeks and 3 days", for a day past the due date. Null before it.
 String? pregPastDueCount(int daysToDue) {
   if (daysToDue >= 0) return null;
@@ -93,6 +107,8 @@ Future<void> showPregHowWeeksCounted(BuildContext context, PregnancyController c
           for (final para in [
             'Pregnancy is counted from the first day of your last period, not from the day you conceived. '
                 'That is about two weeks earlier, so at week 20 your baby has been growing for about 18 weeks.',
+            // Why the count and the week's page differ by one (2026-10-23).
+            '7 weeks and 4 days means you are in your 8th week, so the page you see is week 8.',
             'Doctors everywhere count this way, so the week here is the week on your scan reports. '
                 'A full pregnancy is 40 weeks, and anywhere from 37 to 42 is normal.',
             owned

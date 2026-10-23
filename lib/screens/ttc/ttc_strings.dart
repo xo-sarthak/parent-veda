@@ -1360,6 +1360,13 @@ class TtcS {
       'Yahan kuch phir se shuru nahi hota. Aapne jo banaya wo pehle se apni jagah par hai.');
   String transitionWeeks(int w) => _p(
       'You\'re about $w weeks pregnant', 'Aap lagbhag $w hafte pregnant hain');
+  // "7 weeks and 4 days", the way doctors and scan reports say it (user
+  // 2026-10-23: "why say week 8 w/o being in one??"). English only.
+  String transitionWeeksDays(int w, int d) {
+    final weeks = w == 1 ? '1 week' : '$w weeks';
+    if (d == 0) return "You're $weeks pregnant";
+    return "You're $weeks and ${d == 1 ? '1 day' : '$d days'} pregnant";
+  }
   String get transitionWhyWeeks => _p(
       "Your pregnancy weeks are counted from the day your last period started, not from conception. That's why a positive test usually comes around week four. It's the standard way of counting, not a mistake.",
       'Pregnancy ki ginti aakhri period ke pehle din se hoti hai, conception se nahi - isiliye positive test aksar chauthe hafte ke aas-paas aata hai. Ye ek convention hai, hisaab ki galti nahi.');

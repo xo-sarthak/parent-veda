@@ -90,7 +90,8 @@ void main() {
       var how = 0, details = 0;
       await pump(tester, hero(timeLeft: '20 weeks to go', onHow: () => how++, onDetails: () => details++));
       expect(find.text('20 weeks to go'), findsOneWidget);
-      expect(find.text('Day 1'), findsOneWidget);
+      // Kept for revert: expect(find.text('Day 1'), findsOneWidget);
+      expect(find.text('and 1 day'), findsOneWidget, reason: 'day 134 is 19 weeks and 1 day');
       await tester.tap(find.byKey(const ValueKey('preg_hero_time_left')));
       expect(how, 1);
       expect(details, 0);

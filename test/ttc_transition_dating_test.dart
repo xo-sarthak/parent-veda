@@ -6,8 +6,11 @@
 // probably not her last one, or it was a light implantation bleed. The page
 // asks; it never moves her date for her.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/screens/pregnancy/preg_hero_extras.dart' show pregWeeksAndDays;
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_transition_screen.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
@@ -137,6 +140,32 @@ void main() {
       expect(find.byKey(const ValueKey('ttc_transition_change')), findsNothing);
       expect(find.text(t.transitionHowCounted), findsNothing);
     });
+  });
+
+  // The user, 2026-10-23: "why say week 8 w/o being in one??" Weeks and days,
+  // as a scan report says it, and the same count the pregnancy home shows.
+  testWidgets('the week card says weeks and days; "about" only for a guess',
+      (tester) async {
+    await _pump(tester, _result(lmp: _today.subtract(const Duration(days: 53))));
+    expect(find.text("You're 7 weeks and 4 days pregnant"), findsOneWidget);
+    await _pump(tester, _result(lmp: _today.subtract(const Duration(days: 29))));
+    expect(find.text("You're 4 weeks and 1 day pregnant"), findsOneWidget);
+    await _pump(tester, _result(lmp: _today.subtract(const Duration(days: 35))));
+    expect(find.text("You're 5 weeks pregnant"), findsOneWidget);
+    await _pump(tester, _result(derived: false));
+    expect(find.text(t.transitionWeeks(4)), findsOneWidget);
+    expect(find.textContaining('about'), findsWidgets);
+  });
+
+  test('the pregnancy hero counts the same way, and names the week she is in',
+      () {
+    expect(pregWeeksAndDays(53), ('7 weeks', 'and 4 days'));
+    expect(pregWeeksAndDays(56), ('8 weeks', null));
+    expect(pregWeeksAndDays(8), ('1 week', 'and 1 day'));
+    expect(pregWeeksAndDays(0), ('0 weeks', null));
+    final src = File('lib/screens/v2/v3_preg_hero.dart').readAsStringSync();
+    expect(src, contains('pregWeeksAndDays(widget.day)'));
+    expect(src, contains("widget.pastDueCount != null ? 'Week \${widget.week}' : weeksLine"));
   });
 
   test('redate counts again from her date, and drops a clinic source',

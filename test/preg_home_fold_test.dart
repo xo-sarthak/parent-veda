@@ -122,7 +122,8 @@ void main() {
         'July', 'August', 'September', 'October', 'November', 'December'];
       final date = tester.getRect(find.text('${n.day} ${months[n.month - 1]}'));
       final strip = tester.getRect(find.byType(PvDayStrip));
-      final title = tester.getRect(find.text('Week 20'));
+      // Was find.text('Week 20'): weeks and days since 2026-10-23.
+      final title = tester.getRect(find.text('19 weeks'));
       expect(date.top, lessThan(strip.top), reason: 'the date row is first');
       expect(strip.top, lessThan(title.top), reason: 'then the strip, then the baby and the week');
       expect(date.top, lessThan(80));
@@ -132,8 +133,13 @@ void main() {
 
     testWidgets('the hero says the week and the day once', (tester) async {
       await pumpHome(tester);
-      expect(find.text('Week 20'), findsOneWidget);
-      expect(find.text('Day 3'), findsOneWidget);
+      // Kept for revert ("Week 20 · Day 3" until 2026-10-23, user: "why say
+      // week 8 w/o being in one??"). Day 136 is 19 weeks and 3 days, in week 20:
+      // expect(find.text('Week 20'), findsOneWidget);
+      // expect(find.text('Day 3'), findsOneWidget);
+      expect(find.text('19 weeks'), findsOneWidget);
+      expect(find.text('and 3 days'), findsOneWidget);
+      expect(find.text('Week 20'), findsNothing);
       // The subtitle used to say "Week 20, day 3. The anomaly scan window."
       // — gone with the greeting (2026-09-22).
       expect(find.textContaining('Week 20, day'), findsNothing);
@@ -170,7 +176,12 @@ void main() {
       await tester.tap(t('21 weeks'), warnIfMissed: false);
       await tester.pump(const Duration(milliseconds: 300));
       expect(t('What happens in week 20'), findsOneWidget, reason: 'locked');
-      await tester.tap(t('19 weeks'), warnIfMissed: false);
+      // The hero behind now also says "19 weeks" (weeks and days, 2026-10-23),
+      // so the chip is found inside the week page. Kept for revert:
+      // await tester.tap(t('19 weeks'), warnIfMissed: false);
+      await tester.tap(
+          find.descendant(of: find.byType(PregWeekScreen), matching: t('19 weeks')),
+          warnIfMissed: false);
       await tester.pump(const Duration(milliseconds: 300));
       expect(t('What happens in week 19'), findsOneWidget);
       expect(t('For you this week'), findsOneWidget);
@@ -186,8 +197,9 @@ void main() {
           find.byKey(ValueKey('preg_day_${y.year}-${y.month}-${y.day}')));
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('Yesterday'), findsOneWidget);
-      // Yesterday was day 2 of the week.
-      expect(find.text('Day 2'), findsOneWidget);
+      // Yesterday was 19 weeks and 2 days. Kept for revert:
+      // expect(find.text('Day 2'), findsOneWidget);
+      expect(find.text('and 2 days'), findsOneWidget);
     });
 
     testWidgets('the rail runs edge to edge — it is not inside the gutter',

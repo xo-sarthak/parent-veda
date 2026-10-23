@@ -55,6 +55,7 @@ import 'pv_day_strip.dart';
 import 'v2_palette.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../widgets/pv_home_arrival.dart';
+import '../pregnancy/preg_hero_extras.dart' show pregWeeksAndDays;
 
 /// The field's hue behind the pregnancy fold — KEPT FOR REVERT. It fed
 /// `V3HeroField`, whose equalised-chroma recipe turns a warm hue into khaki
@@ -250,7 +251,10 @@ class _V3PregHeroState extends State<V3PregHero> {
     final p = widget.p;
     final now = DateTime.now();
     final sel = widget.selected;
-    final dayInWeek = ((widget.day - 1) % 7) + 1;
+    // Kept for revert ("Week 20 · Day 3"; replaced 2026-10-23 by weeks and
+    // days, "19 weeks / and 3 days"):
+    // final dayInWeek = ((widget.day - 1) % 7) + 1;
+    final (weeksLine, daysLine) = pregWeeksAndDays(widget.day);
 
     return SafeArea(
       bottom: false,
@@ -413,15 +417,20 @@ class _V3PregHeroState extends State<V3PregHero> {
                     child: Column(children: [
                       // Counts up on the first home (pv_home_arrival.dart).
                       PvArriveCount(
-                          text: 'Week ${widget.week}',
+                          // Kept for revert: text: 'Week ${widget.week}',
+                          // Past the due date the week keeps its name ("Week 41"),
+                          // and the line under it says the weeks and days.
+                          text: widget.pastDueCount != null ? 'Week ${widget.week}' : weeksLine,
                           builder: (s) => Text(s,
                               style: pvFraunces(
                                   fontSize: 30, letterSpacing: -0.75, fontWeight: FontWeight.w600, height: 1.1, color: p.ink1))),
                       const SizedBox(height: 2),
                       // Past the due date it keeps counting (the gap analysis:
                       // "40 weeks and 3 days", instead of stopping).
-                      Text(widget.pastDueCount ?? 'Day $dayInWeek',
-                          style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink2)),
+                      // Kept for revert: Text(widget.pastDueCount ?? 'Day $dayInWeek',
+                      if ((widget.pastDueCount ?? daysLine) case final s?)
+                        Text(s,
+                            style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink2)),
                       if (widget.timeLeft != null) ...[
                         const SizedBox(height: 3),
                         // Its own tap target inside the figure's: the (i) and
