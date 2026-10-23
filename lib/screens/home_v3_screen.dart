@@ -133,6 +133,7 @@ import '../services/family_profile.dart' show FamilyProfileStore;
 import '../services/ready_birth_context_store.dart' show ReadyBirthContextStore;
 import '../services/preg_messages_store.dart' show PregMessagesStore;
 import 'pregnancy/preg_messages_screen.dart' show openPregMessages;
+import 'pregnancy/preg_due_date_screen.dart' show openPregDueDate;
 import 'pregnancy/preg_myth_sheet.dart' show showPregMythSheet;
 import 'pregnancy/preg_twins.dart' show pregSizeLineFor;
 import '../services/preg_tile_order.dart';
@@ -520,6 +521,13 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 pastDueCount: pregPastDueCount(_daysToDue(_selected)),
                 onHowCounted: () => showPregHowWeeksCounted(context, pregnancy),
                 onPastDue: () => openPvDoorRead(context, kPregPastDueReadId, pregnancy),
+                // No due date yet: the week is a placeholder, so the countdown
+                // gives way to a way to set it (STILL-OPEN §97.9, 2026-10-23).
+                // His side cannot set her date, so his line only says so.
+                estimateLine: pregnancy.isDueDateSet
+                    ? null
+                    : (him ? 'An estimate until her due date is added' : 'An estimate · Add your due date'),
+                onAddDueDate: pregnancy.isDueDateSet || him ? null : () => openPregDueDate(context, pregnancy),
                 // "Has your baby arrived?" from week 37, today's week.
                 footer: PregArrivalPrompt.instance.showsFor(pregnancy.currentWeek)
                     ? PregArrivalCard(p: p)

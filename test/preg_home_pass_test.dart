@@ -66,6 +66,8 @@ void main() {
       VoidCallback? onHow,
       VoidCallback? onDetails,
       VoidCallback? onPastDue,
+      String? estimate,
+      VoidCallback? onAddDue,
       Widget? footer,
     }) =>
         V3PregHero(
@@ -83,6 +85,8 @@ void main() {
           pastDueCount: pastDue,
           onHowCounted: onHow,
           onPastDue: onPastDue,
+          estimateLine: estimate,
+          onAddDueDate: onAddDue,
           footer: footer,
         );
 
@@ -105,6 +109,35 @@ void main() {
       expect(find.text('Past your due date: what happens now'), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('preg_hero_time_left')));
       expect(past, 1);
+    });
+
+    testWidgets('no due date: an estimate line in place of the countdown, and it opens the date', (tester) async {
+      var add = 0, details = 0;
+      await pump(tester, hero(
+          timeLeft: '20 weeks to go',
+          estimate: 'An estimate · Add your due date',
+          onAddDue: () => add++,
+          onDetails: () => details++));
+      expect(find.text('An estimate · Add your due date'), findsOneWidget);
+      expect(find.text('20 weeks to go'), findsNothing, reason: 'a placeholder week has no real countdown');
+      expect(find.byIcon(Icons.chevron_right_rounded), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('preg_hero_add_due_date')));
+      expect(add, 1);
+      expect(details, 0, reason: 'the line is its own tap target, not the week page');
+    });
+
+    testWidgets('his side: the estimate line says so and does not tap', (tester) async {
+      await pump(tester, hero(estimate: 'An estimate until her due date is added'));
+      expect(find.text('An estimate until her due date is added'), findsOneWidget);
+      expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('preg_hero_add_due_date')));
+      expect(tester.takeException(), isNull);
+    });
+
+    test('the home passes the due-date state into the hero', () {
+      final src = File('lib/screens/home_v3_screen.dart').readAsStringSync();
+      expect(src, contains('estimateLine: pregnancy.isDueDateSet'));
+      expect(src, contains('() => openPregDueDate(context, pregnancy)'));
     });
 
     testWidgets('the arrival card sits at its foot', (tester) async {

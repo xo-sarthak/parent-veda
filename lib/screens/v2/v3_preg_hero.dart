@@ -176,6 +176,8 @@ class V3PregHero extends StatefulWidget {
     this.pastDueCount,
     this.onHowCounted,
     this.onPastDue,
+    this.estimateLine,
+    this.onAddDueDate,
     this.footer,
   });
 
@@ -228,6 +230,16 @@ class V3PregHero extends StatefulWidget {
 
   /// Past the due date, the time-left line opens "what happens now".
   final VoidCallback? onPastDue;
+
+  /// No due date yet (STILL-OPEN §97.9, 2026-10-23): the week is a
+  /// placeholder, so the countdown under it would be a made-up number. This
+  /// line takes its place ("An estimate · Add your due date"), as Clue puts
+  /// an editable date pill under the week. Null: the countdown as usual.
+  final String? estimateLine;
+
+  /// Opens the due-date screen from [estimateLine]. Null: the line is not
+  /// tappable (his side, who cannot set her date).
+  final VoidCallback? onAddDueDate;
 
   /// A card at the foot of the hero ("Has your baby arrived?", from week 37).
   final Widget? footer;
@@ -431,7 +443,24 @@ class _V3PregHeroState extends State<V3PregHero> {
                       if ((widget.pastDueCount ?? daysLine) case final s?)
                         Text(s,
                             style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink2)),
-                      if (widget.timeLeft != null) ...[
+                      if (widget.estimateLine != null) ...[
+                        const SizedBox(height: 3),
+                        // Its own tap target, like the time left: it must not
+                        // open the week page.
+                        PvPress(child: GestureDetector(
+                          key: const ValueKey('preg_hero_add_due_date'),
+                          behavior: HitTestBehavior.opaque,
+                          onTap: widget.onAddDueDate,
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            Text(widget.estimateLine!,
+                                style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                            if (widget.onAddDueDate != null) ...[
+                              const SizedBox(width: 2),
+                              Icon(Icons.chevron_right_rounded, size: 16, color: p.ink3),
+                            ],
+                          ]),
+                        )),
+                      ] else if (widget.timeLeft != null) ...[
                         const SizedBox(height: 3),
                         // Its own tap target inside the figure's: the (i) and
                         // the past-due line must not open the week page.
