@@ -10953,3 +10953,47 @@ walked on a phone.
   - A phone walk, when the user says the phone is free.
   - Pregnancy changes from the same walk (the jaggery page and the screens
     without notes) go to a new session.
+
+## 98.0 The 2026-10-22 pregnancy walk: what was built, what is owed — 2026-10-23
+
+The user walked Pregnancy on the phone (18 screenshots) and asked for ten
+changes. Prototype approved: artifact 1WKApV5Qck5tifamhY1TDH. Commits bf80698,
+8c16171, 63a5b7f.
+
+- **§98.1 Built.**
+  - Eat today opens the nutrient's own page (`NeedScreen`, the Jaggery page's
+    shape), with each food's serving in home words and g or ml.
+  - Move today opens a session page (`pv_move_today_screen.dart`). The button
+    says "Play video" only when `YogaSession.videoUrl` is set, otherwise
+    "Video coming soon". Move reads end with a session and a teacher.
+  - Bump photos: any past week, many per week, one favourite as the cover, a
+    calm toast for a future week, and "Move to another week".
+  - Week film titled "Your baby in week N". "Talk to an expert" everywhere.
+    "Long press". Drawn marks on every door tab (test guards it). The Itching
+    card says Article. Plain headings on every door; "Talk" tabs are "Experts".
+- **§98.2 Owed.**
+  - **Films:** one per week (only 5 films cover weeks 4-40, rec_scan1 never
+    shows), and a follow-along film for every yoga session.
+  - **Serving sizes** in `kPlatePortions` are rounded household measures; a
+    dietician should review them before launch.
+  - **Store:** a yoga mat and a pregnancy cushion, so Move reads can offer
+    products.
+  - **Four cards that open a whole door still say Tool** (twins twice, after a
+    loss, is this food safe). They need a "Topic" kind.
+  - **Two headings differ from the approved table** because a heading may not
+    repeat its first card: Mind's "Is sex safe?", and the Move card under
+    "What to avoid" is retitled "Moves to skip for now".
+  - A phone walk of all of it.
+
+## 99.0 Journal commerce, parked for the user's talk — 2026-10-23
+
+The user, 2026-10-22: "I'll discuss the commerce layer later." Nothing built.
+
+- **§99.1 Pre-order a printed journal** from the pregnancy journal, with an
+  early-order discount window, so she pays and is keen to fill it in.
+- **§99.2 The 12 monthly sheets after birth**, one a month to buy, each asking
+  for a photo.
+- **§99.3 Where it would plug in:** `PaymentService.pay`
+  (lib/booking/payment_service.dart), `CartStore`, `PvCheckoutScreen`. The bump
+  book's "Order printed copy" placeholder (`bump_book_screen.dart`) only shows
+  a toast and saves no interest at all.
