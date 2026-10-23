@@ -10713,9 +10713,9 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   TTC's `_ReadRow` (`_DoorReadRow`; the shelf rail behind
   `kPpHomeReadsAsRail = false`); products are Pregnancy's card, no price
   (`_ProductRail`; the priced one kept as `_ProductRailPriced`).
-  **Owed:** (1) TTC's home products still use the priced store card
-  (`PvCardRail`) and should move to card B, waiting because another terminal
-  is working in `ttc_home_v3.dart`; (2) FAQ sections for TTC and Pregnancy,
+  **Owed:** (1) ~~TTC's home products still use the priced store card
+  (`PvCardRail`) and should move to card B~~ DONE 2026-10-23: `_ProductRailB`
+  in `ttc_home_v3.dart`, the PvCardRail line kept for revert; (2) FAQ sections for TTC and Pregnancy,
   the questions to be written first; (3) "Something changed?" answers are
   not stored, so they are not a signal; (4) Pregnancy doors: `lead(week)` is
   still only set by Nutrition. Not walked on a phone.

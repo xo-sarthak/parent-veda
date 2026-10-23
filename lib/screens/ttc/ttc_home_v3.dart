@@ -66,7 +66,10 @@ import '../../services/life_stage_store.dart';
 import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
-import '../products/pv_store_chrome.dart' show pvSnack, PvCardRail;
+// PvCardRail left the show list with card B (2026-10-23); add it back to revert.
+import '../products/pv_store_chrome.dart'
+    show pvSnack, PvProductImage, pvOpenProduct;
+import '../../models/pv_product.dart' show PvProduct;
 import '../../services/pv_catalog_store.dart';
 
 import '../../ttc/ttc_chapter.dart';
@@ -849,7 +852,11 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                       ];
                       return picks.isEmpty
                           ? _ProductRail(p: p, hinglish: hinglish)
-                          : PvCardRail(products: picks, scope: 'ttc_home');
+                          // ONE PRODUCT CARD FOR ALL THREE HOMES (2026-10-23):
+                          // card B, no price, as the Parenting and Pregnancy
+                          // homes (STILL-OPEN §95.6). Kept for revert:
+                          //   : PvCardRail(products: picks, scope: 'ttc_home');
+                          : _ProductRailB(items: picks, p: p);
                     },
                   ),
                   const SizedBox(height: 32),
@@ -7342,4 +7349,54 @@ class _ReadRow extends StatelessWidget {
       ),
     );
   }
+}
+
+// ONE PRODUCT CARD FOR ALL THREE HOMES (2026-10-23, the user chose "B: no
+// price" in Wave 4). The Parenting home's _ProductRail and Pregnancy's
+// V2ProductRail, shape for shape: 132 wide, a 108 picture, the name, no price.
+// A price on the daily home turns a suggestion into a listing; the product
+// page still carries it. Not the same widget because the model differs
+// (PvProduct here). The priced store card it replaces is PvCardRail.
+class _ProductRailB extends StatelessWidget {
+  const _ProductRailB({required this.items, required this.p});
+
+  final List<PvProduct> items;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        key: const ValueKey('ttc_home_products'),
+        height: 172 + ((MediaQuery.textScalerOf(context).scale(10) / 10) - 1).clamp(0.0, 1.0) * 40,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          itemCount: items.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (context, i) {
+            final it = items[i];
+            final tag = 'pv_img_ttc_home_${it.id}';
+            return SizedBox(
+              width: 132,
+              child: InkWell(
+                key: ValueKey('ttc_product_${it.id}'),
+                onTap: () => pvOpenProduct(context, it, heroTag: tag),
+                borderRadius: BorderRadius.circular(16),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  SizedBox(
+                    height: 108,
+                    width: 132,
+                    child: Hero(tag: tag, child: PvProductImage(product: it, radius: 16)),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(it.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvJakarta(
+                          fontSize: 14, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1)),
+                ]),
+              ),
+            );
+          },
+        ),
+      );
 }
