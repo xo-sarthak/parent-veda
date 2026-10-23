@@ -1,6 +1,6 @@
 # Door 2: Health, the plan
 
-Written 2026-10-23. **Status: waiting for the user's answers to §9 (H1 to H7).**
+Written 2026-10-23. **Status: H1 to H7 all answered YES by the user 2026-10-23.** The new pages are written in `02-health-content.md` (H6). The H2 age-rail look is drawn at `claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q` and waits on the user's verdict before any `lib/` edit.
 The build waits on step 0 (`00-MASTER.md`, S1 to S7) and on the user's go.
 
 Files this plan touches:
@@ -208,7 +208,7 @@ No new tool; this records what already works. On Something's wrong, the jump row
 ### 3a. The telemedicine safety rule (new, applies to every Health pitch)
 A video consult must never delay an in-person visit when a sign is on the go-now list. So:
 - **No pitch** on these pages: `health_go_now`, the choking response, `health_fit`, `health_accidents`, `fever_under_3m`, `tummy_dehydration` (a go-to-hospital page), `growth_flags` (that route is the paediatrician in person).
-- Every Health expert card and row carries one fixed line under the title: **"Not for an emergency. For that, Get help now."** Tapping it goes to the tab.
+- **The two callouts are never stacked (user, 2026-10-23).** On Something's wrong, "Is this an emergency?" stays on top and the age shelf follows it directly; the paediatrician row sits after that first shelf, so the door content is not pushed down. Because the two are apart, the expert row keeps its quiet line: "Not for an emergency. For that, Get help now." Offer cards inside a page read carry the same line.
 - The test scans the source and fails if a `PpConsult` or `PpDoorTab.expert` sits on any of these pages or on the help tab.
 
 ### 3b. The expert row per tab (`PpDoorTab.expert`, S3)
@@ -216,7 +216,7 @@ A video consult must never delay an in-person visit when a sign is on the go-now
 
 | Tab | Row | Goes to | Place |
 |---|---|---|---|
-| Something's wrong | "Not an emergency, but not right? Talk to a paediatrician today · video" | `pp_experts/Pediatrician` (4 seeded) | After the tools, before the first rail |
+| Something's wrong | "Not an emergency, but not right? Talk to a paediatrician today · video" + the quiet safety line (§3a) | `pp_experts/Pediatrician` (4 seeded) | After the first rail (the age shelf), never directly under the emergency row |
 | Get help now | none | | |
 | Vaccines | "A missed or delayed dose? Ask a paediatrician" | `pp_experts/Pediatrician` | After the first rail |
 | Growing well | "Worried about his weight or height? Talk to a paediatrician" | `pp_experts/Pediatrician` | After the first rail |
@@ -443,16 +443,16 @@ Hand-offs (not Health's to write):
   - the forehead thermometer and emollient claims check
   - the H4 no-medicine rule
 
-## 9. Decisions for the user
+## 9. Decisions (all answered YES by the user 2026-10-23, as recommended)
 
-| # | Question | Recommendation |
+| # | Question | Answer |
 |---|---|---|
 | H1 | Show "Due in N days" on the Vaccines tab card when a dose is within 14 days? | **Yes** |
 | H2 | A rail for her child's age first on "Something's wrong" (§2d)? | **Yes**, prototype first |
 | H3 | A "Baby first aid and CPR" class card at the very end of Get help now? | **Yes, at the end only** |
 | H4 | Health never sells or links to buy a medicine, supplement or ORS brand; equipment only? | **Yes** |
 | H5 | Add the 7 owed specialist categories with an invitation state, so pages can point at them before real profiles exist? | **Yes** |
-| H6 | Write the 15 new India pages (§5b) in full now, the way Feeding's new copy was written (`02-health-content.md`), before the build? | **Yes** |
+| H6 | Write the 15 new India pages (§5b) in full now, the way Feeding's new copy was written (`02-health-content.md`), before the build? | **Yes. Done 2026-10-23:** `02-health-content.md`. |
 | H7 | Make Health's choking page the one source and point Feeding at it (§5c)? | **Yes** |
 
 ## 10. Costs
