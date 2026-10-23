@@ -10945,6 +10945,15 @@ walked on a phone.
 - **§97.9 Owed to the pregnancy session.** No pregnancy screen reads
   `isDueDateSet`, so a placeholder week 20 looks like a real week. An "Add your
   due date" invitation when none is set (a feature is never hidden).
+- **§97.10 Week 8 at 7 weeks 4 days — FIXED 2026-10-23 (1de28d9).** The user:
+  "why say week 8 w/o being in one??" The new-chapter page said "about 7 weeks"
+  and the pregnancy hero "Week 8 · Day 4" for the same day. Both now say weeks
+  and days ("7 weeks and 4 days", `pregWeeksAndDays`), as a scan report does;
+  "about" only for a guessed date. `currentWeek` and the week's content are
+  unchanged (she is IN week 8); the How-counted sheet says so. Update to §97.9:
+  the calendar hub already reads `isDueDateSet` ("An estimate until you add
+  your due date"); the home hero still does not. The jaggery item in §97.7 was
+  done by the pregnancy walk (§98.1, Eat today opens `NeedScreen`).
 - **§97.7 Owed.**
   - 16 step videos, briefs in DOOR-CONTENT-OWED (TTC3). Doctor-led, so real
     clinicians on camera.
