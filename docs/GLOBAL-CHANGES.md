@@ -31,11 +31,11 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 7 | Store and services follow her week / child's age | Store LIVE (aa1fe9e); services OWED | Phase 2 |
 | 8 | Expert onboarding feed | Half LIVE (faf0f04: domain read); feed OWED | Phase 7 |
 | 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + celebration pages OWED | Phase 5 |
-| 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e) + pitch BUILT (2b) | Phase 2 |
+| 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
 | 12 | Position-aware notifications | OWED | Phase 6 |
 | 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags OWED | Phase 1 |
-| 14 | Nutrition door pitches | BUILT (2b); supplements WAITING on sheet | Phase 2 |
+| 14 | Nutrition door pitches | LIVE (7df4711); supplements WAITING on sheet | Phase 2 |
 | 15 | Action doors lead with an action | LIVE (aa1fe9e) | Phase 2 |
 
 ---
@@ -47,7 +47,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | faf0f04 | 2026-10-23 | Phase 0: Skilling relaunch, birth sheet, expert domain, WhatsApp 0111, films → videos, Talk to an expert |
 | 19078db | 2026-10-23 | Phase 1: pregnancy doors open on her weeks |
 | aa1fe9e | 2026-10-23 | Phase 2a: action doors, articles → services, store by her week |
-| — (BUILT) | 2026-10-23 | Phase 2b: What you need + Go further, Nutrition For your week |
+| 7df4711 | 2026-10-23 | Phase 2b: What you need + Go further, Nutrition For your week; this tracker |
 
 ---
 
@@ -167,12 +167,12 @@ needed for those, they match by name / category.
   stays quiet, never celebratory); hand-off to the item-1 video. Prototype
   first.
 
-### 10 · Verb cards open actions — LIVE, pitch BUILT
+### 10 · Verb cards open actions — LIVE
 
 - LIVE aa1fe9e: the home's Move card never falls back to an article (an
   overdue week takes the nearest earlier month's session). TTC daily movement
   cards were already practices.
-- BUILT (2b): What you need + Go further on the session page (item 14).
+- LIVE 7df4711: What you need + Go further on the session page (item 14).
 
 ### 11 · Talk to an expert — LIVE (faf0f04)
 
@@ -208,9 +208,9 @@ quote cost in USD and INR first).
 - **OWED:** tag more pregnancy doors as content is reviewed (Symptoms, Labour,
   Partner "Week by week").
 
-### 14 · Nutrition door pitches — BUILT (2b)
+### 14 · Nutrition door pitches — LIVE (7df4711)
 
-- BUILT: "For your week" row on the Nutrition Today tab, under the plate —
+- LIVE: "For your week" row on the Nutrition Today tab, under the plate —
   dietitian, a course, and a supplement when the store carries one, with
   "your doctor decides the dose" whenever a supplement shows.
   `lib/screens/pitch/pv_go_further.dart`, `PvNutritionForWeek`.
