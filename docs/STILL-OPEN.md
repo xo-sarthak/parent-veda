@@ -10968,6 +10968,13 @@ walked on a phone.
 - **§97.9 Owed to the pregnancy session.** No pregnancy screen reads
   `isDueDateSet`, so a placeholder week 20 looks like a real week. An "Add your
   due date" invitation when none is set (a feature is never hidden).
+  **BUILT 2026-10-23, c318f07.** With no due date, the home hero keeps the
+  week, and the countdown under it becomes "An estimate · Add your due date",
+  which opens `openPregDueDate`. His side reads "An estimate until her due
+  date is added" and is not tappable (`V3PregHero.estimateLine` /
+  `onAddDueDate`, set in `home_v3_screen.dart`). The pattern is Clue's date
+  pill under the week. Guarded by `test/preg_home_pass_test.dart`. Not walked
+  on a phone.
 - **§97.10 Week 8 at 7 weeks 4 days — FIXED 2026-10-23 (1de28d9).** The user:
   "why say week 8 w/o being in one??" The new-chapter page said "about 7 weeks"
   and the pregnancy hero "Week 8 · Day 4" for the same day. Both now say weeks
