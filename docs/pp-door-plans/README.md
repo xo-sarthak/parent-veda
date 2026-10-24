@@ -5,7 +5,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 
 | # | Door | Plan | Status |
 |---|---|---|---|
-| 0 | Shared shell fixes (S1–S10) | `00-MASTER.md` | Approved 2026-10-23, not built (waits for the other terminal's Wave 8 commit) |
+| 0 | Shared shell fixes (S1–S11) | `00-MASTER.md` | Approved 2026-10-23, not built (waits for the other terminal's Wave 8 commit) |
 | 1 | Feeding | `01-feeding.md` + `01-feeding-content.md` (offerings and new copy) | All decisions D1–D6 answered 2026-10-23 (D2 look: `claude.ai/artifact/6Kgs3uNdKsbyKybfbdzdRB`). Plan final; build waits on step 0 |
 | 2 | Health | `02-health.md` + `02-health-content.md` (15 new pages) | H1–H7 all yes 2026-10-23. H2 look approved 2026-10-24 (`claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q`, v4). Plan final; build waits on step 0 |
 | 3 | You, Maa | `03-you-maa.md` + `03-you-maa-content.md` (8 new pages, 11 deepened) | M1–M9 all yes 2026-10-24. Plan final; build waits on step 0 |
@@ -13,7 +13,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 | — | No silent tap (S8) for Feeding and Health | `01-feeding.md` §11, `02-health.md` §11, `00-MASTER.md` S8 | Written 2026-10-24 |
 | 5 | Potty | `05-potty.md` + `05-potty-content.md` | PT1–PT8 + PT10 answered 2026-10-24. Plan final; build waits on step 0 |
 | 6 | First 40 Days | `06-first40.md` + `06-first40-content.md` | FD1–FD9 all yes 2026-10-24 (rows mockup `claude.ai/artifact/2BEwbvkimGDbUpNSe987fh`). Plan final; build waits on step 0 |
-| 7 | Sleep | — | |
+| 7 | Sleep | `07-sleep.md` + `07-sleep-content.md` | SL1–SL9 all yes 2026-10-24 (SL9: keep the tab width). Plan final; build waits on step 0. Owed to BEFORE-LAUNCH: the shop sells nests and swings under Sleep |
 | 8 | Behaviour | — | |
 | 9 | Early learning | — | |
 | 10 | Traditions | — | |
