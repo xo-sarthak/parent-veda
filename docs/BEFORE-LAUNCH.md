@@ -150,6 +150,7 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **LAUNCH** · A faith read-through of the spiritual content; WEB verses checked against a printed WEB · user arranges · STILL-OPEN §86 · added 2026-10-17
 - [ ] **DECIDE** · Every pregnancy read is `reviewed: false`, and Ask Veda grounds answers in them; decide whether that can ship · user · PREGNANCY-ASKVEDA-HANDOFF · added 2026-10-17
 - [ ] **LAUNCH** · Father copy is a working draft ("mine, not yours") · user · STILL-OPEN §10.1–§10.2 · added 2026-10-17
+- [ ] **LAUNCH** · Six parenting "Ask Veda" rows open Brain, not Ask Veda (quick action, two recipe rows, three watch screens, a reco row); route them to `openPpAskVeda` · dev · STILL-OPEN §100.2 · added 2026-10-24
 
 ---
 
@@ -167,7 +168,11 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 **Messaging:**
 - [ ] **BLOCKER** · Phone OTP: `MSG91_AUTHKEY` and `MSG91_OTP_TEMPLATE_ID` secrets, DLT-registered template including the 11-character SMS hash · user · STILL-OPEN §83.12, ONBOARDING.md History A · added 2026-10-17
 - [ ] **LAUNCH** · WhatsApp off Meta's test number (Meta verification); Render paid tier · user · CONTENT-BACKEND, ONBOARDING.md History A · added 2026-10-17
-- [ ] **LAUNCH** · Run migration `0111_wa_weekly_guide_stage.sql`: the weekly WhatsApp guide kept going to a mother after a loss or an early birth (it read `due_date` only, never `life_stage`) · user · global-changes plan, Phase 0 · added 2026-10-23
+- [x] **LAUNCH** · Run migration `0111_wa_weekly_guide_stage.sql`: the weekly WhatsApp guide kept going to a mother after a loss or an early birth (it read `due_date` only, never `life_stage`) · user · global-changes plan, Phase 0 · added 2026-10-23 · **DONE 2026-10-24** (user ran it; it does not cover a loss, see 0112)
+- [ ] **LAUNCH** · Run migration `0112_wa_weekly_guide_loss.sql`: the weekly WhatsApp guide still went to a mother who reported a loss and stayed in pregnancy (a loss does not change `life_stage`) · user · STAGE-TRANSITIONS B1 · added 2026-10-24
+- [ ] **BLOCKER** · Cloud row ids collide across users: `journey_timeline`, `ttc_cycles` and `ttc_cycle_signals` are keyed by `id` alone, and the ids are a date or a fixed name, so a second woman's period on the same day never syncs · user decides, then dev (sync work) · STAGE-TRANSITIONS B9, STILL-OPEN §101.9 · added 2026-10-24
+- [ ] **DECIDE** · Per-pregnancy records (the `pregnancies` table): a pregnancy after a loss shows the lost pregnancy's bump photos, scans and bag · user · STAGE-TRANSITIONS R1, STILL-OPEN §101.1 · added 2026-10-24
+- [ ] **LAUNCH** · The partner's phone never sees her stage change or her loss (it reads his own profile row) · dev · STAGE-TRANSITIONS R2, STILL-OPEN §101.2 · added 2026-10-24
 
 **Sponsors** (STILL-OPEN line 21: §11.6 blocks the sponsor programme):
 - [ ] **DECIDE** · An email provider (Resend, SES or Postmark), so activation codes have a sender · user · STILL-OPEN §11.6 · added 2026-10-17
@@ -188,6 +193,7 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **LAUNCH** · Bundle the Fraunces and Manrope TTFs for the poster PDF (Devanagari partner names print broken offline) · dev · STILL-OPEN §4.2b · added 2026-10-17
 - [ ] **LAUNCH** · TTC launch-sanity items still without a fix note: K1–K5 (calendar), D12, D19; H17 and D13 are decisions owed · dev + user · TTC-LAUNCH-SANITY · added 2026-10-17
 - [ ] **CHECK** · The due-date restore before release: it appears restored (`pregnancy_controller.dart:349`); confirm and tick · dev · SESSION doc · added 2026-10-17
+- [ ] **DECIDE** · The Developer section's "Stage · testing" chips ship in every build (`kPvShipDeveloperSection = true`, `pv_you_screen.dart:119`, the user's 2026-10-07 ask). They are the only way a parent can move from Parenting to Pregnancy, and they change the stage with nothing else (a parent lands on the old pregnancy at week 40, overdue). Turn the section off for store builds, or keep it and accept that · user · STAGE-TRANSITIONS G1 · added 2026-10-24
 - [ ] **LAUNCH** (iOS only) · Apple Developer account ($99/yr ≈ ₹8,300), Sign in with Apple, `Info.plist` URL types, `apple-app-site-association` · user · AUTH-SETUP §4 · added 2026-10-17
 
 ---

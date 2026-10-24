@@ -18,10 +18,12 @@
 import 'package:flutter/material.dart';
 
 import '../../data/doors/pv_door_after_loss.dart';
-import '../../services/life_stage_store.dart';
+// Unused since the move went to stage_moves.dart (2026-10-24). Kept for revert:
+// import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/pregnancy_ended_store.dart';
 import '../../services/stage_gateway.dart';
+import '../../services/stage_moves.dart';
 import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_screen.dart';
 import '../v2/v2_palette.dart';
@@ -253,8 +255,14 @@ class PregTryAgainScreen extends StatelessWidget {
               p: p,
               label: "I'm ready. Move to trying to conceive",
               filled: true,
-              onTap: () {
-                LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
+              onTap: () async {
+                // The clean restart, loss kept (STAGE-TRANSITIONS B2,
+                // 2026-10-24): the TTC side stops believing she is pregnant,
+                // the due date stops counting, the loss stays recorded.
+                // Kept for revert:
+                //   LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
+                await moveToTtcAfterLoss();
+                if (!context.mounted) return;
                 openStageDoor(context, StageDoor.tryingToConceive);
               },
             ),

@@ -264,6 +264,31 @@ class TtcTransitionEngine {
   /// Naegele's rule: 280 days from the first day of the last menstrual period.
   static const int gestationDays = 280;
 
+  /// The timeline ids for the pregnancy confirmed on [day] (2026-10-24,
+  /// STAGE-TRANSITIONS B3).
+  ///
+  /// ⚠️ A SECOND PREGNANCY USED TO VANISH FROM THE STORY. The ids were fixed
+  /// ('ttc_positive_test', 'pregnancy_started') and `FamilyTimeline.add`
+  /// ignores an id it already holds, so after a loss and a new positive test
+  /// nothing was recorded - and an undo then deleted the FIRST pregnancy's
+  /// entries. The first pregnancy keeps the fixed ids (every existing story
+  /// and test reads them); a later one, on a different day, gets ids dated by
+  /// its confirmation day. The same day gives the same ids, so confirming
+  /// twice stays idempotent and undo finds exactly this pregnancy's entries.
+  static ({String positive, String started}) timelineIdsFor(DateTime day) {
+    const positive = 'ttc_positive_test';
+    const started = 'pregnancy_started';
+    final first = FamilyTimeline.instance.byId(positive);
+    final d = DateTime(day.year, day.month, day.day);
+    if (first == null) return (positive: positive, started: started);
+    final f = first.date;
+    if (f.year == d.year && f.month == d.month && f.day == d.day) {
+      return (positive: positive, started: started);
+    }
+    final tag = d.toIso8601String().substring(0, 10);
+    return (positive: '$positive:$tag', started: '$started:$tag');
+  }
+
   /// Works out the due date without changing anything. Exposed separately so a
   /// screen can preview it before the couple commits.
   static DateTime dueDateFrom(DateTime lastPeriodStart) =>
@@ -354,8 +379,11 @@ class TtcTransitionEngine {
     LifeStageStore.instance.setStage(LifeStage.pregnancy, at: today);
 
     // --- 3. the family's story ----------------------------------------------
+    // Ids by pregnancy (B3, 2026-10-24); were the fixed 'ttc_positive_test'
+    // and 'pregnancy_started'. Kept for revert: the two literal ids below.
+    final ids = timelineIdsFor(today);
     FamilyTimeline.instance.add(
-      id: 'ttc_positive_test',
+      id: ids.positive, // was 'ttc_positive_test'
       stage: LifeStage.tryingToConceive,
       kind: TimelineKind.milestone,
       titleEn: "You're pregnant", // was 'A positive test' (2026-10-10)
@@ -365,7 +393,7 @@ class TtcTransitionEngine {
       on: today,
     );
     FamilyTimeline.instance.add(
-      id: 'pregnancy_started',
+      id: ids.started, // was 'pregnancy_started'
       stage: LifeStage.pregnancy,
       kind: TimelineKind.milestone,
       titleEn: 'Pregnancy began',
@@ -419,7 +447,12 @@ class TtcTransitionEngine {
         await prefs.remove(PregnancyController.kDueDateSourceKey);
       } catch (_) {/* local-first: a storage failure never blocks the moment */}
     }
-    FamilyTimeline.instance.refreshDerived('pregnancy_started', on: lmp);
+    // This pregnancy's entry (B3); was the fixed 'pregnancy_started'.
+    // Kept for revert:
+    //   FamilyTimeline.instance.refreshDerived('pregnancy_started', on: lmp);
+    final confirmed = TtcStore.instance.pregnancyConfirmedOn ?? today;
+    FamilyTimeline.instance
+        .refreshDerived(timelineIdsFor(confirmed).started, on: lmp);
     return TtcTransitionResult(
       dueDate: due,
       weeksPregnant: weeksFrom(lmp, on: today),
@@ -438,10 +471,18 @@ class TtcTransitionEngine {
   /// The timeline entries are removed too - a life story should not carry a
   /// pregnancy that was recorded by accident.
   Future<void> undo() async {
+    // Only THIS pregnancy's entries (B3, 2026-10-24): read the day before the
+    // confirmation is cleared. Kept for revert:
+    //   FamilyTimeline.instance.remove('ttc_positive_test');
+    //   FamilyTimeline.instance.remove('pregnancy_started');
+    final confirmed = TtcStore.instance.pregnancyConfirmedOn;
+    final ids = confirmed == null
+        ? (positive: 'ttc_positive_test', started: 'pregnancy_started')
+        : timelineIdsFor(confirmed);
     TtcStore.instance.clearPregnancyConfirmation();
     LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
-    FamilyTimeline.instance.remove('ttc_positive_test');
-    FamilyTimeline.instance.remove('pregnancy_started');
+    FamilyTimeline.instance.remove(ids.positive);
+    FamilyTimeline.instance.remove(ids.started);
     // The date goes everywhere it went (2026-10-22): memory, storage and the
     // cloud, or a mis-tap undone here comes back on the next launch or the
     // other phone. Storage only, as before, when there is no controller.

@@ -24,13 +24,13 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 |---|---|---|---|
 | 1 | Life-moment welcome video (pop-up, blurred) | OWED — design approved | Phase 3 |
 | 2 | Every article links to a service | LIVE for Pregnancy + TTC (aa1fe9e); Parenting OWED | Phase 2 |
-| 3 | Universal search + Ask Veda mark | OWED | Phase 4 |
+| 3 | Universal search + Ask Veda mark | ON HOLD (user, 2026-10-24): mark built as Aurora (COMMITTED c237e83, final design H vs K still open); search placement study done, choice on hold | Phase 4 |
 | 4 | "Films" → "Videos" | LIVE (faf0f04) | Phase 0 |
 | 5 | Door intro video (Option A chip) | OWED — design approved | Phase 3 |
 | 6 | Real products replace dummy products | WAITING — product master sheet | Phase 7 |
 | 7 | Store and services follow her week / child's age | Store LIVE (aa1fe9e); services OWED | Phase 2 |
 | 8 | Expert onboarding feed | Half LIVE (faf0f04: domain read); feed OWED | Phase 7 |
-| 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + celebration pages OWED | Phase 5 |
+| 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + B1–B7 BUILT (commit pending), see `docs/STAGE-TRANSITIONS.md`; celebration pages OWED | Phase 5 |
 | 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
 | 12 | Position-aware notifications | OWED | Phase 6 |
@@ -96,7 +96,7 @@ stage's Videos screen.
   masterclass; the two-week wait lands on the fertility doctor rather than the
   psychologist. Tune the word map when walking.
 
-### 3 · Universal search — OWED (Phase 4)
+### 3 · Universal search — mark LIVE, search OWED (Phase 4)
 
 **Asked:** one search bar visible on every home, searching everything we
 have, a good "no result" state, the Ask Veda mark at the right end.
@@ -109,6 +109,12 @@ Veda corpora (`lib/ask_veda/*_corpus.dart`).
 **To do:** Mobbin pass → prototype → index (`lib/services/search/`) →
 the bar on every stage home → no-result screen → an Ask Veda logo mark
 (today it is a generic sparkle icon).
+
+**Done 2026-10-24, the mark:** Aurora (option H in the prototype,
+claude.ai/artifact/3372duZQUunNEUxbC2ZWTV) is `AskVedaMark`
+(`lib/ask_veda/ask_veda_mark.dart`), now on every Ask Veda surface, the FAB
+included. H or K is still the user's call (STILL-OPEN §100). **Search:** the
+prototype's four screens wait for the user's OK.
 
 ### 4 · Films → Videos — LIVE (faf0f04)
 
@@ -162,11 +168,27 @@ needed for those, they match by name / category.
   case); the birth sheet saved a skipped sex as a boy, had no born-early
   weeks, no timeline event, a stage starting "now" not on the birthday, and
   an 18-year date picker. All fixed.
-- **OWED:** a transition test matrix (`test/stage_transitions_test.dart`) for
-  every move and every mid-way join; celebration pages for birth → parenting
-  and parenting → skilling mirroring the TTC new-chapter page (a loss path
-  stays quiet, never celebratory); hand-off to the item-1 video. Prototype
-  first.
+- **BUILT 2026-10-24 (commit pending):** the transition matrix,
+  `test/stage_transitions_test.dart` (37 tests), and fixes B1–B7: the loss →
+  trying → pregnant-again path, the WhatsApp guide after a loss (migration
+  0112, the user runs it), timeline ids per pregnancy and per baby, onboarding
+  parents dated to the birthday, messages for a second pregnancy and a second
+  child, and the Ask Veda button off the skilling home. One place for the
+  moves: `lib/services/stage_moves.dart`.
+- **The running list is `docs/STAGE-TRANSITIONS.md`** (ids, statuses, Mobbin,
+  what is recorded). It is long; read it, not this entry, for what is left.
+- **B10 (2026-10-24):** the Skilling avatar opened the stage menu, not You;
+  fixed, and M41 holds every home's avatar. The "Expecting again?" guard (G1)
+  is RECORDED: no parent reaches a Pregnancy door from Parenting (the avatar
+  opens You), only the Developer stage chips, which ship in every build.
+- **WAITING:** 0112 run; the user's call on B9, the cloud-id collision found on
+  the way; the user's call on the Developer chips (BEFORE-LAUNCH §6).
+- **OWED:** celebration pages for birth → parenting and parenting → skilling
+  mirroring the TTC new-chapter page (a loss path stays quiet, never
+  celebratory); hand-off to the item-1 video. Prototype first (R9).
+  Kept for revert, the entry before 2026-10-24: "OWED: a transition test
+  matrix (`test/stage_transitions_test.dart`) for every move and every mid-way
+  join; celebration pages ... Prototype first."
 
 ### 10 · Verb cards open actions — LIVE
 
@@ -245,7 +267,7 @@ Getting Ready opens on the name finder; TTC Mind & body headings are actions
 
 | What | Status |
 |---|---|
-| WhatsApp weekly guide kept going after a loss / early birth (read `due_date` only) | Migration `0111_wa_weekly_guide_stage.sql` written; **user must run it** (BEFORE-LAUNCH) |
+| WhatsApp weekly guide kept going after a loss / early birth (read `due_date` only) | Migration `0111_wa_weekly_guide_stage.sql` RUN by the user 2026-10-24. It misses a loss (stage stays pregnancy): 0112, see `docs/STAGE-TRANSITIONS.md` B1 |
 | 4 test failures already on main: `explore_redesign`, `shravan_library`, `tap_feedback_guard`, `ttc_tools_pass_trackers` | PARKED by the user 2026-10-23 |
 | STILL-OPEN entry for this pass | OWED — `docs/STILL-OPEN.md` was held by the other terminal; point it here |
 

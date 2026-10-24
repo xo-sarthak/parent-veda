@@ -3725,6 +3725,45 @@ re-declared one. Row stores avoid the question by carrying an edit time per row
 and merging newest-wins (§16ii, 0097); a one-value field without a timestamp
 cannot, so it uses the waiting mark instead.
 
+## 16kk. A past event scoped by the stage's start: derive, don't clear (0112, 2026-10-24)
+
+**The problem.** Reporting a loss sets one fact, `profiles.pregnancy_ended_at`. Four readers act on it: the Today page,
+the pregnancy messages, the You row and the WhatsApp weekly guide. Then she tries again and is pregnant again. The flag
+is still set, so her new pregnancy opened on the loss page, got no messages, and (on the server) no weekly guide.
+
+**The obvious fix, and why not.** Clear the flag when she becomes pregnant again. That is a *write* that every path
+into a new pregnancy has to remember: the positive test, a treatment round, onboarding, a developer switch, and every
+move added later. Miss one and the bug returns on that path only. Clearing it also erases the loss's date, which is
+part of her story.
+
+**What we did.** Keep the fact, and compare it with another fact we already have: the date the current stage began
+(`life_stage_at`).
+
+```
+ended for THIS pregnancy  =  pregnancy_ended_at is set
+                             and the pregnancy stage did not begin after it
+```
+
+- In SQL (`0112_wa_weekly_guide_loss.sql`): `pregnancy_ended_at is null or pregnancy_ended_at < life_stage_at`.
+- In the app (`PregnancyEndedStore.ended`): the same comparison against `LifeStageStore.enteredAt`. The raw fact
+  stays readable as `lossRecorded`.
+- The same idea drives the cycle after a loss: `CycleStore.restartOn` is *derived* from the loss date while she is
+  trying, so a period from before the pregnancy stops being "her cycle now" without a second date to keep in step.
+
+**The trade-off, named.** No path can forget to clear anything, and history survives. The cost: every reader must
+apply the comparison, and a reader that reads the raw column gets the old answer. That is why the SQL and the app
+side are pinned by the same test file (`test/stage_transitions_test.dart`, M22–M24), and why the raw value has a
+different name (`lossRecorded`) from the scoped one (`ended`).
+
+**The general rule.** When a later event makes an earlier one stop applying, prefer comparing timestamps to
+mutating the earlier one. It is the same reason event-sourced systems append rather than update: you can always
+recompute "what applies now", and you can never un-delete.
+
+**One wider lesson from the same work (B9, open).** A row id that is "app-generated and stable" is only safe as a
+primary key if it is unique *across users*, not just within one person's data. `ttc_cycles.id = 'ttcc_<date>'` is
+stable for her and identical for everyone who logged a period that day. With RLS, the second person's upsert hits the
+first person's row and is refused. Within-user ids want a composite key: `primary key (user_id, id)`.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3824,3 +3863,4 @@ cannot, so it uses the waiting mark instead.
 43. `0109_purge_removed.sql` → `SyncRowBook.dropSettled` — the purge window as a promise, and why the phone forgets first (§16ii-m).
 44. `pvSignOut` → `LocalOwner.wipeThisPhone` → `LocalWipe.keep` — a wipe undoes what came before it, the OS keeps what you scheduled, and memory is not the disk (§16ii-n).
 45. `0110_state_merge_and_records.sql` (`pv_state_merge`) → `lib/services/remote/cloud_merged_store.dart` — merge where the writes are already in order, a last-writer-wins map, items vs rows, and why a reset is not a deletion (§16ii-q).
+46. `0112_wa_weekly_guide_loss.sql` → `PregnancyEndedStore.ended` → `CycleStore.restartOn` — a past event scoped by the stage's start: derive, don't clear; and why a stable id is not a unique one (§16kk).

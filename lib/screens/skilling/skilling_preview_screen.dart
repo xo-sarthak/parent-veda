@@ -300,6 +300,10 @@ class _Hero extends StatelessWidget {
                               builder: (_) => const SavedScreen(stage: 'skilling'))),
                       onProfile: () =>
                           openPvYou(context, stage: LifeStage.skilling),
+                      // Without this the chrome falls back to the three-stage
+                      // menu (v3_hero_chrome.dart), so the avatar never reached
+                      // You despite the note above (2026-10-24, STAGE-TRANSITIONS B10).
+                      avatarOpensProfile: true,
                     ),
                   ),
                 ),

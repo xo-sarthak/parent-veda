@@ -201,6 +201,7 @@ class PregMessageFacts {
     this.ended = false,
     this.inPregnancy = true,
     this.partner = false,
+    this.pregnancyStart,
   });
 
   final DateTime dueDate;
@@ -208,6 +209,11 @@ class PregMessageFacts {
   final bool ended;
   final bool inPregnancy;
   final bool partner;
+
+  /// The day THIS pregnancy began in the app (the pregnancy stage's entry
+  /// date), or null when unknown. Messages delivered before it belong to an
+  /// earlier pregnancy (STAGE-TRANSITIONS B5, 2026-10-24).
+  final DateTime? pregnancyStart;
 
   static PregMessageFacts? fromStores() {
     final c = PregnancyController.current;
@@ -221,6 +227,9 @@ class PregMessageFacts {
       // pregnancy's.
       inPregnancy: stage == null || stage == LifeStage.pregnancy,
       partner: FatherPreview.instance.on,
+      pregnancyStart: stage == LifeStage.pregnancy
+          ? LifeStageStore.instance.enteredAt
+          : null,
     );
   }
 
@@ -466,7 +475,8 @@ class PregMessagesStore extends ChangeNotifier
     final facts = fixedFacts ?? PregMessageFacts.fromStores();
     if (facts == null) return;
     final now = fixedNow ?? DateTime.now();
-    final changed = apply(pregMessageCandidates(facts, now), now);
+    final changed = apply(pregMessageCandidates(facts, now), now,
+        since: facts.pregnancyStart);
 
     // ---- the phone: cancel our ids only, re-arm what is pending -------------
     for (final k in PregMessageKind.values) {
@@ -506,10 +516,18 @@ class PregMessagesStore extends ChangeNotifier
   ///    newest such new-week message is kept, so a first launch at week 20
   ///    does not fill the inbox with weeks she has lived through.
   @visibleForTesting
-  bool apply(List<PregMessage> candidates, DateTime now) {
+  ///  * [since] (B5, 2026-10-24): "sent once" means once PER PREGNANCY. A
+  ///    message delivered before this pregnancy began was a different
+  ///    pregnancy's `week:12`; it stays in her inbox, but no longer stops this
+  ///    pregnancy's week 12. Null (unknown start) keeps the old rule.
+  bool apply(List<PregMessage> candidates, DateTime now, {DateTime? since}) {
     final before = jsonEncode([for (final m in _all) m.toJson()]);
     final delivered = _all.where((m) => m.deliveredBy(now)).toList();
-    final sent = delivered.map((m) => m.id).toSet();
+    // Kept for revert: `final sent = delivered.map((m) => m.id).toSet();`
+    final sent = delivered
+        .where((m) => since == null || !m.at.isBefore(since))
+        .map((m) => m.id)
+        .toSet();
 
     final late = <PregMessage>[];
     final next = <PregMessage>[...delivered];
@@ -530,6 +548,11 @@ class PregMessagesStore extends ChangeNotifier
     }
 
     next.sort((a, b) => b.at.compareTo(a.at));
+    // One message per id, the newest (B5): an earlier pregnancy's `week:12`
+    // gives way to this pregnancy's, since ids key the phone, the read state
+    // and the cloud row (`msg|<id>`).
+    final seen = <String>{};
+    next.retainWhere((m) => seen.add(m.id));
     final keepDelivered = next.where((m) => m.deliveredBy(now)).take(_keep);
     final keepPending = next.where((m) => !m.deliveredBy(now));
     _all

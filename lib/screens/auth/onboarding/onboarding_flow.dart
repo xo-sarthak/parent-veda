@@ -77,6 +77,7 @@ import '../../../services/auth/phone_otp.dart';
 import '../../../services/auth/social_auth.dart';
 import '../../../services/family_profile.dart';
 import '../../../services/life_stage_store.dart';
+import '../../../services/stage_moves.dart';
 import '../../../services/notification_service.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../services/remote/supabase_repo.dart';
@@ -3708,7 +3709,18 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     final profile = FamilyProfileStore.instance;
 
     // 1. Stage — locally first, before any network, exactly as the old flow.
-    LifeStageStore.instance.setStageId(stage);
+    // A parent's stage starts on the child's BIRTHDAY, as the birth sheet's
+    // does (STAGE-TRANSITIONS B4, 2026-10-24): it used to start on the day
+    // she signed up. Set here, before anything listens, because re-declaring
+    // the same stage later keeps the first date. Kept for revert: the
+    // `setStageId(stage)` line alone.
+    final childDob = _childDob;
+    if (stage == 'parenting' && childDob != null) {
+      LifeStageStore.instance.setStage(LifeStage.parenting,
+          at: DateTime(childDob.year, childDob.month, childDob.day));
+    } else {
+      LifeStageStore.instance.setStageId(stage);
+    }
     profile.setStage(switch (stage) {
       'trying' => JourneyStage.tryingToConceive,
       'pregnancy' => JourneyStage.pregnancy,
@@ -3807,6 +3819,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         role: _isPartner ? CareRole.father : _careRole,
       );
       if (_childTwins) profile.setBirth(multiple: true);
+      // The birth, the same move the birth sheet makes (B4, 2026-10-24): the
+      // story gets the day and the Dear Baby letters open. The stage was
+      // dated to the birthday in step 1.
+      await recordBirth(dob: _childDob!, name: first.name, childId: first.id);
       // A second child (Onboarding V3), then back to the first, whose answers
       // these were.
       final dob2 = _child2Dob;

@@ -29,6 +29,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'auth/pending_profile.dart';
+import 'life_stage_store.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 
@@ -109,7 +110,31 @@ class PregnancyEndedStore extends ChangeNotifier {
   DateTime? _endedAt;
 
   /// True once she has told ParentVeda her pregnancy has ended.
-  bool get ended => _ended;
+  ///
+  /// ⚠️ SCOPED TO THE PREGNANCY IT ENDED (2026-10-24, STAGE-TRANSITIONS B1b).
+  /// The flag is never cleared by a later pregnancy - the loss and its date
+  /// stay recorded - but it only SPEAKS for the pregnancy it ended. After a
+  /// loss, trying again and a new positive test, the pregnancy stage has a
+  /// newer entry date than the loss, so this reads false and the new
+  /// pregnancy's Today, messages and You row are hers again. Deriving it
+  /// rather than clearing it means no move can forget to clear it, and the
+  /// cloud rule (migration 0112, `pregnancy_ended_at < life_stage_at`) reads
+  /// the same two facts. Outside pregnancy it reads as before.
+  /// Kept for revert: `bool get ended => _ended;`
+  bool get ended {
+    if (!_ended) return false;
+    final at = _endedAt;
+    final stage = LifeStageStore.instance;
+    final since = stage.enteredAt;
+    if (at == null || since == null || stage.stage != LifeStage.pregnancy) {
+      return true;
+    }
+    return !since.isAfter(at);
+  }
+
+  /// The raw answer, whichever pregnancy it was about: true once a loss has
+  /// been reported and not undone. For history, never for what Today shows.
+  bool get lossRecorded => _ended;
 
   /// True once [load] has run, so a reader can tell "not ended" from "not
   /// known yet" (the pregnancy messages wait for it, 2026-09-30).

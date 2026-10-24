@@ -11,11 +11,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../screens/post_pregnancy/pp_child_profile.dart';
-import '../../services/dear_baby_vault_store.dart';
-import '../../services/family_timeline.dart';
-import '../../services/life_stage_store.dart';
-import '../../services/pregnancy_controller.dart';
+// import '../../services/dear_baby_vault_store.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
+// import '../../services/family_timeline.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
+// import '../../services/life_stage_store.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
+// import '../../services/pregnancy_controller.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
 import '../../services/pv_order_store.dart';
+import '../../services/stage_moves.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_toast.dart';
 import '../products/pv_checkout_screen.dart' show PvAddressForm;
@@ -25,38 +26,40 @@ import '../skilling/sk_grown_up_screen.dart';
 import '../v2/v2_palette.dart';
 import 'pv_you_chrome.dart';
 
+// Weeks of pregnancy at birth when she was born early (before 37 weeks),
+// read from the due date we already hold - the same field onboarding fills
+// from its "born early?" answer. Null when on time, or with no real due date.
+// Moved to lib/services/stage_moves.dart (`bornWeeksFor`, `recordBirth`),
+// 2026-10-24, so onboarding records a birth the same way. Kept for revert:
+// int? _bornWeeksFor(DateTime dob) {
+//   final c = PregnancyController.current;
+//   if (c == null || !c.isDueDateSet) return null;
+//   final daysEarly = c.dueDate.difference(dob).inDays;
+//   final weeks = (280 - daysEarly) ~/ 7;
+//   return weeks < 37 && weeks >= 20 ? weeks : null;
+// }
+
+// /// The birth as the onboarding join records it (2026-10-23): the stage starts
+// /// on the birthday, not the day she tapped, and the family story gets the day.
+// /// The callers' own `setStage(parenting)` after this is a no-op, because the
+// /// store ignores re-declaring the same stage.
+// void _recordBirth(DateTime dob, String name) {
+//   LifeStageStore.instance.setStage(LifeStage.parenting, at: dob);
+//   final title = name.trim().isEmpty ? 'Baby was born' : '$name was born';
+//   FamilyTimeline.instance.add(
+//     id: 'baby_born',
+//     stage: LifeStage.parenting,
+//     kind: TimelineKind.milestone,
+//     titleEn: title,
+//     titleHi: title,
+//     detailEn: 'The day pregnancy ended and parenting began.',
+//     on: dob,
+//   );
+// }
+
 /// Name · boy/girl · date of birth → `ChildProfileStore.addChild`. With
 /// [arrival] the copy is the birth's ("Welcome to the world"), and the caller
 /// moves the stage. Returns true when a child was added.
-/// Weeks of pregnancy at birth when she was born early (before 37 weeks),
-/// read from the due date we already hold - the same field onboarding fills
-/// from its "born early?" answer. Null when on time, or with no real due date.
-int? _bornWeeksFor(DateTime dob) {
-  final c = PregnancyController.current;
-  if (c == null || !c.isDueDateSet) return null;
-  final daysEarly = c.dueDate.difference(dob).inDays;
-  final weeks = (280 - daysEarly) ~/ 7;
-  return weeks < 37 && weeks >= 20 ? weeks : null;
-}
-
-/// The birth as the onboarding join records it (2026-10-23): the stage starts
-/// on the birthday, not the day she tapped, and the family story gets the day.
-/// The callers' own `setStage(parenting)` after this is a no-op, because the
-/// store ignores re-declaring the same stage.
-void _recordBirth(DateTime dob, String name) {
-  LifeStageStore.instance.setStage(LifeStage.parenting, at: dob);
-  final title = name.trim().isEmpty ? 'Baby was born' : '$name was born';
-  FamilyTimeline.instance.add(
-    id: 'baby_born',
-    stage: LifeStage.parenting,
-    kind: TimelineKind.milestone,
-    titleEn: title,
-    titleHi: title,
-    detailEn: 'The day pregnancy ended and parenting began.',
-    on: dob,
-  );
-}
-
 Future<bool> showPvAddChildSheet(
   BuildContext context, {
   bool arrival = false,
@@ -213,18 +216,25 @@ Future<bool> showPvAddChildSheet(
                               isBoy: isBoy ?? true,
                               sexGiven: isBoy != null,
                               dob: dob!,
-                              bornWeeks: arrival ? _bornWeeksFor(dob!) : null,
+                              bornWeeks: arrival ? bornWeeksFor(dob!) : null,
                             );
-                            if (arrival) _recordBirth(dob!, child.name);
-                            // The birth opens the Dear Baby letters
-                            // (STILL-OPEN §83.2). Only the arrival does: an
-                            // older child added later is not this baby.
+                            // The birth: stage on the birthday, the story,
+                            // and the Dear Baby letters (STILL-OPEN §83.2),
+                            // in one move shared with onboarding
+                            // (stage_moves.dart, 2026-10-24). Only the
+                            // arrival does: an older child added later is
+                            // not this baby. Kept for revert:
+                            //   if (arrival) _recordBirth(dob!, child.name);
+                            //   if (arrival) {
+                            //     await DearBabyVaultStore.instance.markBorn(
+                            //       dob: dob!,
+                            //       childId: child.id,
+                            //       name: child.name,
+                            //     );
+                            //   }
                             if (arrival) {
-                              await DearBabyVaultStore.instance.markBorn(
-                                dob: dob!,
-                                childId: child.id,
-                                name: child.name,
-                              );
+                              await recordBirth(
+                                  dob: dob!, name: child.name, childId: child.id);
                             }
                             if (ctx.mounted) Navigator.of(ctx).pop(true);
                           }

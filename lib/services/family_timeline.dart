@@ -166,6 +166,11 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
 
   bool has(String id) => _events.containsKey(id);
 
+  /// One moment by its id, or null (2026-10-24, STAGE-TRANSITIONS B3: a
+  /// second pregnancy needs to know whether the fixed id is already a
+  /// different day's moment).
+  TimelineEvent? byId(String id) => _events[id];
+
   int get count => _events.length;
 
   /// Records a moment. Idempotent on [id]: writing the same event twice - which

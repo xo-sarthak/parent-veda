@@ -153,9 +153,17 @@ class PpMessageFacts {
     this.inParenting = true,
     this.partner = false,
     this.visits = const [],
+    this.idPrefix = '',
   });
 
   final DateTime dob;
+
+  /// Put before every message id, so each child's "6 months today" is its own
+  /// message (STAGE-TRANSITIONS B6, 2026-10-24). The first child keeps the
+  /// bare ids ('age:m6') every phone already holds, so nobody gets a repeat;
+  /// any other child's ids read `child:<id>|age:m6`. Before this a second
+  /// child's milestones were silently skipped as already sent.
+  final String idPrefix;
 
   /// As it reads mid-sentence: "Meera" or "your baby".
   final String name;
@@ -175,6 +183,8 @@ class PpMessageFacts {
       realChild: c.hasRealChild,
       inParenting: LifeStageStore.instance.stage == LifeStage.parenting,
       partner: FatherPreview.instance.on,
+      idPrefix: ppMessageIdPrefix(
+          c.activeChildId, c.children.isEmpty ? null : c.children.first.id),
       visits: [
         for (final v in kVaxVisits)
           if (vax.statusOf(v) != VaxStatus.done && !vax.isOptionalVisit(v))
@@ -188,6 +198,11 @@ class PpMessageFacts {
     );
   }
 }
+
+/// The id prefix for [activeId]'s messages: none for the first child (or
+/// before any child exists), `child:<id>|` for every other (B6).
+String ppMessageIdPrefix(String? activeId, String? firstId) =>
+    activeId == null || activeId == firstId ? '' : 'child:$activeId|';
 
 DateTime _at(DateTime d, int hour) => DateTime(d.year, d.month, d.day, hour);
 
@@ -217,7 +232,7 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
   void age(String id, DateTime day, String title, String body) {
     if (!near(day) || ageCount >= kPpPhoneSlots + 1) return;
     ageCount++;
-    out.add(PpMessage(id: id, kind: PpMessageKind.age, at: _at(day, 9), title: title, body: body));
+    out.add(PpMessage(id: '${f.idPrefix}$id', kind: PpMessageKind.age, at: _at(day, 9), title: title, body: body));
   }
 
   for (var w = 1; w <= 8; w++) {
@@ -242,7 +257,7 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
   for (final v in upcoming.take(kPpPhoneSlots)) {
     final day = v.date.subtract(const Duration(days: 3));
     out.add(PpMessage(
-      id: 'vax:${v.id}',
+      id: '${f.idPrefix}vax:${v.id}', // was 'vax:${v.id}' (B6)
       kind: PpMessageKind.vaccine,
       at: _at(day.isBefore(today) ? today : day, 10),
       title: 'The ${v.label} vaccines are coming up',
@@ -259,7 +274,7 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
     if (!near(day) || phaseCount >= 2) continue;
     phaseCount++;
     out.add(PpMessage(
-      id: 'phase:${p.number}',
+      id: '${f.idPrefix}phase:${p.number}', // was 'phase:${p.number}' (B6)
       kind: PpMessageKind.milestones,
       at: _at(day, 18),
       // The phase doc's name where there is one (2026-10-13). Was ${p.name}.

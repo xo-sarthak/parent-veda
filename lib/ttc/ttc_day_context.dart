@@ -336,7 +336,16 @@ TtcDayContext ttcDayContext(DateTime day, {DateTime? now}) {
   ));
 
   // ---- rule 1: which cycle ---------------------------------------------------
-  final starts = [...cycle.periodStarts.map(_dayOnly)]..sort();
+  // After a loss (B2, 2026-10-24): a day on or after the restart belongs to
+  // no cycle until she logs a period after it, so an old start from before
+  // the pregnancy cannot make that day "cycle day 120". Days before the
+  // restart keep the full log. Kept for revert:
+  //   final starts = [...cycle.periodStarts.map(_dayOnly)]..sort();
+  final restart = cycle.restartOn;
+  final pool = restart != null && !date.isBefore(restart)
+      ? cycle.currentPeriodStarts
+      : cycle.periodStarts;
+  final starts = [...pool.map(_dayOnly)]..sort();
   DateTime? opened;
   for (final s in starts) {
     if (!s.isAfter(date)) opened = s;

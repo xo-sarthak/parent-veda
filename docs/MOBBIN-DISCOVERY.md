@@ -1314,3 +1314,27 @@ the phase poster. The flow's chips already match; only a "kept" line was added.
 
 **Built.** `pp_changes_store.dart`, `pp_activity_paintings.dart`,
 `lib/data/pp_phase_videos.dart`.
+
+## 35. Stage transitions: loss, trying again, expecting again (2026-10-24)
+
+**Queries.** Flow "pregnancy app changing pregnancy status after pregnancy loss"; screens "period tracker app
+switching mode from pregnancy back to cycle tracking", "parenting app add a new pregnancy or another baby screen".
+The third query found only kids-profile forms (SHEIN, YouTube Kids, Alexa): the library has no parenting app with an
+"add a pregnancy" screen.
+
+**Found.** Apple Health "Set Up Pregnancy" and "Add a Current Pregnancy", which dates by period, due date, weeks or
+embryo transfer and offers "Log a Past Pregnancy"
+(https://mobbin.com/screens/fed0b0c8-baa1-41ef-8683-fb54cd0c9570,
+https://mobbin.com/flows/d0b0ae08-53d2-418e-9439-c7ace1f7dc31). Oura Women's Health: "Pregnancies · 1 logged"
+and a quiet "My pregnancy ended" (https://mobbin.com/screens/a9ff1b84-a364-47b0-aa8f-101d28a0dce4). WHOOP: "Have
+you delivered?" at week 40, and a mode switch that warns it "will reset the data"
+(https://mobbin.com/flows/de10510d-1531-4905-8d3d-d89c5292e009). Clue's mode picker, "You can change this later at
+any time" (https://mobbin.com/screens/ff343537-91bf-4235-a8ca-e667ee69f8bf); Flo's "You're going to switch to Get
+Pregnant Mode" confirm (https://mobbin.com/screens/0313c72a-488f-4267-ab78-40616abab989).
+
+**Adopted.** The "Expecting again?" guard takes Apple Health's intro-sheet shape (picture, two lines, one main
+button) in our look. Each pregnancy as its own record confirms R1 (the `pregnancies` table).
+
+**Declined.** WHOOP's reset on switching: our moves never wipe anything.
+
+**Owed.** Say what changes before it changes (Clue, Flo) when the real moves are built (STAGE-TRANSITIONS R1).

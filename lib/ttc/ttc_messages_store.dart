@@ -434,7 +434,10 @@ class TtcMessageFacts {
       pregnancyConfirmed: store.pregnancyConfirmed,
       ownership: store.ownership,
       sendsOvulationReminders: today.behaviour.sendsOvulationReminders,
-      periodStarts: cycle.periodStarts,
+      // Only her current run of cycles (B2, 2026-10-24): after a loss, a
+      // period from before the pregnancy must not make her "late". Kept for
+      // revert: `periodStarts: cycle.periodStarts,`
+      periodStarts: cycle.currentPeriodStarts,
       cycleLengths: cycle.cycleLengths,
       usualLength:
           cycle.cycleLengths.isEmpty ? null : engine.cycleLengthFor(state),

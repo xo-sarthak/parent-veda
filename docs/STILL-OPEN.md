@@ -11036,3 +11036,60 @@ The user, 2026-10-22: "I'll discuss the commerce layer later." Nothing built.
   (lib/booking/payment_service.dart), `CartStore`, `PvCheckoutScreen`. The bump
   book's "Order printed copy" placeholder (`bump_book_screen.dart`) only shows
   a toast and saves no interest at all.
+
+## 100.0 The Ask Veda mark: Aurora on every Ask Veda surface — 2026-10-24
+
+The stock sparkle (`Icons.auto_awesome`) is gone from every Ask Veda surface.
+In its place is one drawn, animated mark, `AskVedaMark`
+(`lib/ask_veda/ask_veda_mark.dart`): a violet sphere with saffron, pink and gold
+light drifting inside it. It appears on the FAB (every stage, TTC included), in
+the three Ask Veda screens, on the "Ask Veda" rows and cards, on the 11 search
+"Ask Veda about" rows, on the reader's Ask Veda next step, on the home Ask
+block and in the Settings switch. `test/ask_veda_mark_test.dart` holds the
+wiring. Prototype: claude.ai/artifact/3372duZQUunNEUxbC2ZWTV.
+
+- **§100.1 H or K is still open.** The user, 2026-10-24: "will talk about it
+  later ... for the time being use H". K (Aurora ripple: the sphere with rings
+  going out while Veda listens or answers) is in the same artifact. The change
+  would happen inside `_AuroraPainter` only; no call site moves.
+- **§100.2 Six parenting rows say "Ask Veda" but open Brain.** They call
+  `openPpTab(context, 1)`, and tab 1 has been Brain since Ask Veda left the
+  bottom nav. The six rows are the quick action in `post_pregnancy_home.dart`,
+  the two `food_recipe_screen.dart` rows, the three `watch_*` screens and
+  `reco_detail_screen.dart`'s ask row. They now carry the Aurora mark, so the
+  mismatch is more visible. The fix is `openPpAskVeda(context, q)`; it was not
+  made, because routing was not part of the ask.
+- **§100.3 `assets/blocks/block_ask.png` is no longer reached.** The home Ask
+  block draws the mark over the pebbles and the asset. The asset is kept for
+  revert.
+- **§100.4 Motion is not exercised by widget tests.** The mark stays still
+  under `flutter test` (the FAB is on nearly every screen, and a ticker that
+  never stops would make every `pumpAndSettle` time out). It is also still
+  under 18pt and when the phone asks for reduced motion. Look at the drift on
+  a phone at the next walk.
+
+## 101.0 Stage transitions: the matrix, the loss path, and what is recorded — 2026-10-24
+
+The running list is `docs/STAGE-TRANSITIONS.md`: every task with an id and a status. Read it rather than this section
+for what is left. What follows is the recorded-not-built half (R1–R8), so it can be found from here too.
+
+- **§101.1 (R1) The moves that do not exist.** A parent pregnant again, a parent trying again, and parenting →
+  skilling. They need per-pregnancy records first: bump photos, scans, the hospital bag, the birth plan and garbh are
+  single records per person today, so a pregnancy after a loss would show the lost pregnancy's bump photos. The
+  `pregnancies` table is owed (FAMILY-MODEL). The user's answer, 2026-10-24: guard now, build later. The guard (G1) turned out
+  to have no door to sit on: every home's avatar opens You, so no parent reaches Pregnancy from Parenting except
+  through the Developer stage chips (BEFORE-LAUNCH §6). The "Expecting again?" page waits as the front of R1.
+- **§101.2 (R2) The partner's phone never sees her stage change or her loss.** `fetchMyProfile` reads his own
+  profile row; only the due date falls back to hers. The comment in `pregnancy_ended_store.dart` saying his app
+  respects it is not true yet. BEFORE-LAUNCH.
+- **§101.3 (R3) After a loss, still in pregnancy:** Learn, Tools and More still speak in weeks, and the Ask Veda
+  context still sends her week. The Ask Veda part is a change in the service repo.
+- **§101.4 (R4)** Her own reminders (ReminderStore) are not paused after a loss.
+- **§101.5 (R5)** `FamilyProfileStore`'s stage is set only by onboarding (skilling as parenting) and drifts after
+  that. Nothing reads it today.
+- **§101.6 (R6)** "Replay onboarding" (developer) rewrites the stage and the stores.
+- **§101.7 (R7)** Nothing prompts past 42 weeks; the arrival card from week 37 is the only nudge.
+- **§101.8 (R8)** The Pregnancy door from TTC shows the week-20 placeholder (a preview). Whether to guard it is the
+  user's call.
+- **§101.9 (B9) Cloud ids collide across users.** `journey_timeline`, `ttc_cycles` and `ttc_cycle_signals` key rows
+  by `id` alone, and the app's ids are a date or a fixed name. Waiting on the user's call; it belongs to the sync work.

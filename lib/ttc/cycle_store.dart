@@ -20,6 +20,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/life_stage_store.dart';
+import '../services/pregnancy_ended_store.dart';
 import '../services/remote/supabase_repo.dart';
 import '../services/remote/sync_batch.dart';
 import 'ttc_chapter.dart';
@@ -153,8 +155,48 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   int? bleedDaysFor(DateTime start) => _bleedDays[_key(_dayOnly(start))];
 
   /// The current cycle's first day, or null before anything is logged.
-  DateTime? get lastPeriodStart =>
-      _periodStarts.isEmpty ? null : _periodStarts.last;
+  //   DateTime? get lastPeriodStart =>
+  //       _periodStarts.isEmpty ? null : _periodStarts.last;
+  // Kept for revert (2026-10-24): the line above, before the restart rule.
+  DateTime? get lastPeriodStart {
+    if (_periodStarts.isEmpty) return null;
+    final last = _periodStarts.last;
+    final restart = restartOn;
+    if (restart != null && last.isBefore(restart)) return null;
+    return last;
+  }
+
+  /// The period starts that belong to her CURRENT run of cycles: all of them,
+  /// or after a loss only those logged on or after [restartOn] (B2,
+  /// 2026-10-24). For anything that counts forward from the last period - the
+  /// "late, time to test" message above all. The full log stays in
+  /// [periodStarts] for history and the calendar.
+  List<DateTime> get currentPeriodStarts {
+    final restart = restartOn;
+    if (restart == null) return periodStarts;
+    return [
+      for (final s in periodStarts)
+        if (!s.isBefore(restart)) s
+    ];
+  }
+
+  /// The day her cycle starts again after a pregnancy loss, or null
+  /// (2026-10-24, STAGE-TRANSITIONS B2).
+  ///
+  /// ⚠️ AFTER A LOSS, THE LAST PERIOD SHE LOGGED IS FROM BEFORE THE PREGNANCY.
+  /// Counting from it, the home told a mother back in trying-to-conceive
+  /// that her period was about ninety days late. While she is trying and a
+  /// loss is recorded, a period logged before the loss is history: the
+  /// current cycle waits for the first period she logs after it, and the
+  /// home invites her to log it. DERIVED from the loss date the app already
+  /// stores (and syncs), not a second date to keep in step: nothing has to
+  /// remember to clear it, and undoing the loss undoes it.
+  DateTime? get restartOn {
+    final ended = PregnancyEndedStore.instance;
+    if (!ended.lossRecorded || !LifeStageStore.instance.isTrying) return null;
+    final at = ended.endedAt;
+    return at == null ? null : DateTime(at.year, at.month, at.day);
+  }
 
   /// The plausibility window for a real cycle.
   ///
@@ -170,7 +212,14 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   /// running and so is deliberately not included.
   List<int> get cycleLengths {
     final out = <int>[];
+    final restart = restartOn;
     for (var i = 1; i < _periodStarts.length; i++) {
+      // The span across a pregnancy is not a cycle (B2, 2026-10-24).
+      if (restart != null &&
+          _periodStarts[i - 1].isBefore(restart) &&
+          !_periodStarts[i].isBefore(restart)) {
+        continue;
+      }
       final len = _periodStarts[i].difference(_periodStarts[i - 1]).inDays;
       // Guard against a mis-tap producing an absurd cycle that would poison
       // the average. Clinically plausible cycles only.

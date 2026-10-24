@@ -123,7 +123,10 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
 
           final spans = ttcCyclePhaseSpans();
           final TtcCompanionState screen;
-          if (cycle.periodStarts.isEmpty) {
+          // No current cycle, not only no history (2026-10-24, B2): after a
+          // loss the log has old periods but no current cycle until she logs
+          // one. Kept for revert: `if (cycle.periodStarts.isEmpty) {`
+          if (cycle.lastPeriodStart == null) {
             screen = TtcCompanionState.empty;
           } else if (!store.today.behaviour.showsFertilityWindow) {
             screen = TtcCompanionState.clinicHeld;
