@@ -14,7 +14,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 | 5 | Potty | `05-potty.md` + `05-potty-content.md` | PT1–PT8 + PT10 answered 2026-10-24. Plan final; build waits on step 0 |
 | 6 | First 40 Days | `06-first40.md` + `06-first40-content.md` | FD1–FD9 all yes 2026-10-24 (rows mockup `claude.ai/artifact/2BEwbvkimGDbUpNSe987fh`). Plan final; build waits on step 0 |
 | 7 | Sleep | `07-sleep.md` + `07-sleep-content.md` | SL1–SL9 all yes 2026-10-24 (SL9: keep the tab width). Plan final; build waits on step 0. Owed to BEFORE-LAUNCH: the shop sells nests and swings under Sleep |
-| 8 | Behaviour | — | |
+| 8 | Behaviour | `08-behaviour.md` + `08-behaviour-content.md` | BH1–BH8 all yes 2026-10-25, recommendations checked against what parents search (colic, hitting, tantrums, screens). Plan final; build waits on step 0 |
 | 9 | Early learning | — | |
 | 10 | Traditions | — | |
 | 11 | Safety | — | |
