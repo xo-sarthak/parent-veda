@@ -30,7 +30,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 6 | Real products replace dummy products | WAITING — product master sheet | Phase 7 |
 | 7 | Store and services follow her week / child's age | Store LIVE (aa1fe9e); services OWED | Phase 2 |
 | 8 | Expert onboarding feed | Half LIVE (faf0f04: domain read); feed OWED | Phase 7 |
-| 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + B1–B7 BUILT (commit pending), see `docs/STAGE-TRANSITIONS.md`; celebration pages OWED | Phase 5 |
+| 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + B1–B7, B10 LIVE (04847a5), see `docs/STAGE-TRANSITIONS.md`; celebration pages OWED | Phase 5 |
 | 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
 | 12 | Position-aware notifications | OWED | Phase 6 |
@@ -168,7 +168,7 @@ needed for those, they match by name / category.
   case); the birth sheet saved a skipped sex as a boy, had no born-early
   weeks, no timeline event, a stage starting "now" not on the birthday, and
   an 18-year date picker. All fixed.
-- **BUILT 2026-10-24 (commit pending):** the transition matrix,
+- **LIVE 04847a5 (2026-10-24):** the transition matrix,
   `test/stage_transitions_test.dart` (37 tests), and fixes B1–B7: the loss →
   trying → pregnant-again path, the WhatsApp guide after a loss (migration
   0112, the user runs it), timeline ids per pregnancy and per baby, onboarding
