@@ -696,7 +696,7 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     }
     for (final part in [(TtcTables.cycles, cycles), (TtcTables.signals, signals)]) {
       final took = await SyncBatch.push(part.$2,
-          (batch) => SupabaseRepo.upsertRows(part.$1, batch, onConflict: 'id'));
+          (batch) => SupabaseRepo.upsertRows(part.$1, batch, onConflict: 'user_id,id'));
       for (final k in took) {
         if (_stamps[k] == sent[k]) _dirty.remove(k);
       }
@@ -753,7 +753,7 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
             'started_on': TtcSyncUtil.date(d),
           }
       ],
-      onConflict: 'id',
+      onConflict: 'user_id,id',
     );
 
     final rows = <Map<String, dynamic>>[];
@@ -779,7 +779,7 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
         'cycle_day': entry.value,
       });
     }
-    await TtcSyncUtil.upsertAll(TtcTables.signals, rows, onConflict: 'id');
+    await TtcSyncUtil.upsertAll(TtcTables.signals, rows, onConflict: 'user_id,id');
   }
 
   @override

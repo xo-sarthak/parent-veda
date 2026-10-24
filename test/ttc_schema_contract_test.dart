@@ -108,14 +108,15 @@ const Map<String, String> orderedBy = {
 /// real primary key or unique constraint, or the upsert errors at runtime.
 const Map<String, String> conflictTarget = {
   TtcTables.journeys: 'user_id',
-  TtcTables.cycles: 'id',
-  TtcTables.signals: 'id',
+  // 0113 (2026-10-24, B9): keyed per person. Kept for revert: 'id', 'id'.
+  TtcTables.cycles: 'user_id,id',
+  TtcTables.signals: 'user_id,id',
   TtcTables.logs: 'user_id,tracker,field,logged_on',
   TtcTables.journal: 'id',
   TtcTables.supplements: 'id',
   TtcTables.supplementTaken: 'supplement_id,taken_on',
   TtcTables.ritual: 'user_id,part,completed_on',
-  TtcTables.timeline: 'id',
+  TtcTables.timeline: 'user_id,id', // 0113. Kept for revert: 'id'
   'ttc_records': 'id',
   'ttc_appointments': 'id',
   TtcTables.doctorQuestions: 'id',
@@ -201,16 +202,22 @@ void main() {
     }
   });
 
+  // 0113 swaps the `id` primary key of the tables it names for
+  // `(user_id, id)`, so for those the create-table body is no longer the key.
+  final rekeyed = rekeyedTables();
+
   group('every upsert conflict target is a real key', () {
     for (final entry in conflictTarget.entries) {
       test('${entry.key} on (${entry.value})', () {
         final body = tableBody(entry.key);
         final columns = entry.value.split(',');
+        final perPerson = rekeyed.contains(entry.key);
 
         if (columns.length == 1) {
           final c = columns.single;
-          final isPk = RegExp('^\\s*$c\\s.*primary key', multiLine: true)
-              .hasMatch(body);
+          final isPk = !(perPerson && c == 'id') &&
+              RegExp('^\\s*$c\\s.*primary key', multiLine: true)
+                  .hasMatch(body);
           final isUnique = body.contains('unique ($c)');
           expect(isPk || isUnique, isTrue,
               reason: '${entry.key} upserts on $c, which is neither a primary '
@@ -219,7 +226,8 @@ void main() {
           // A composite target must match a composite primary key or a unique
           // constraint, column for column and in order.
           final joined = columns.join(', ');
-          final hasPk = body.contains('primary key ($joined)');
+          final hasPk = body.contains('primary key ($joined)') ||
+              (perPerson && joined == 'user_id, id');
           final hasUnique = body.contains('unique ($joined)');
           expect(hasPk || hasUnique, isTrue,
               reason: '${entry.key} upserts on (${entry.value}) with no '
@@ -376,4 +384,13 @@ void main() {
     expect(m, contains('drop policy if exists ttc_journeys_rw'));
     expect(m, contains('drop policy if exists ttc_treatment_couple'));
   });
+}
+
+/// The tables migration 0113 re-keys to `(user_id, id)`, read from its loop.
+Set<String> rekeyedTables() {
+  final sql = File('supabase/migrations/0113_rows_keyed_per_person.sql')
+      .readAsStringSync();
+  final loop = sql.substring(sql.indexOf('foreach t in array array['));
+  final list = loop.substring(0, loop.indexOf(']'));
+  return {for (final m in RegExp(r"'(\w+)'").allMatches(list)) m.group(1)!};
 }

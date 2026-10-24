@@ -186,12 +186,12 @@ Future<void> journalUpsert(String table, JournalEntry e) async {
   final row = journalEntryRow(e);
   if (_placeMissing) row.remove('place');
   try {
-    await SupabaseRepo.upsert(table, row, onConflict: 'id');
+    await SupabaseRepo.upsert(table, row, onConflict: 'user_id,id');
   } catch (err) {
     if (!_placeMissing && err.toString().contains('place')) {
       _placeMissing = true;
       row.remove('place');
-      await SupabaseRepo.upsert(table, row, onConflict: 'id');
+      await SupabaseRepo.upsert(table, row, onConflict: 'user_id,id');
     } else {
       rethrow;
     }

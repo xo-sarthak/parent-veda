@@ -17,6 +17,14 @@
 //  value (as a string) as the row's id, and the upsert conflicts on
 //  `user_id,<keyColumn>`.
 //
+//  `id` TOO (2026-10-24, sync log step 14, migration 0113). Every key here is
+//  unique within ONE person, never across people: ids like `sl_<date>_<symptom>`
+//  or `symptoms_evening` are built from a date or a name, so two people's
+//  phones make the same one. A table-wide key on `id` let the first account own
+//  that row for ever and RLS refused everyone else's upload, silently
+//  (STAGE-TRANSITIONS B9). So the conflict target is `user_id,<keyColumn>` for
+//  every keyed table, `id` included: one rule, which a new table cannot forget.
+//
 //  STATE TABLES ([hasRemovedAt] false). A row that is an answer, not a list
 //  item ("felt movement today: not yet"), is never removed, only changed. It
 //  sends no `removed_at`, and every key the book has stamped takes part in the
@@ -81,11 +89,13 @@ class OwnRowLedger {
   bool get hasPending => book.dirty.isNotEmpty;
 
   /// The upsert's conflict target.
-  String get onConflict => single
-      ? 'user_id'
-      : keyColumn == 'id'
-          ? 'id'
-          : 'user_id,$keyColumn';
+  String get onConflict => single ? 'user_id' : 'user_id,$keyColumn';
+  // Kept for revert (0113, step 14): `id` alone collided across people.
+  // String get onConflict => single
+  //     ? 'user_id'
+  //     : keyColumn == 'id'
+  //         ? 'id'
+  //         : 'user_id,$keyColumn';
 
   Future<void> load() async {
     try {

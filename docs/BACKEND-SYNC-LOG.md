@@ -27,6 +27,7 @@ owed.
 | 2026-10-21 | Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools) | 0107 | `a728ec4` | yes (2026-10-21) |
 | 2026-10-21 | Steps 11 and 12: every write of her data confirmed, batched first sync, sign-out forgets memory and stops alarms, the 90-day purge | 0109 | `984836f` | yes (2026-10-21) |
 | 2026-10-22 | Step 13: nothing she makes lives only on the phone; every light store merges item by item (the non-shopping half of step 10) | 0110 | `8c466d0` | yes (2026-10-22) |
+| 2026-10-24 | Step 14: rows keyed per person, so two people's same-named ids never collide (B9) | 0113 | pending | yes (2026-10-25) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -1142,3 +1143,57 @@ comment in 0110 was corrected after the commit).
 (new), `test/cloud_merged_store_test.dart` (new), `supabase_repo.dart` (`mergeState`), `sync_registry.dart`
 (`resetting`), about 65 store files, `pv_account_actions.dart`, and the tests updated for the new shape. The exact
 list is in the commit.
+
+## Step 14: rows keyed per person, so two people's same-named ids never collide
+
+**Date:** 2026-10-24 (found during the stage-transitions pass as STAGE-TRANSITIONS B9; planned and approved the same
+day, the user: "start with b9 plan it well first"). **Migration:** 0113 (run 2026-10-25). **Commit:** pending.
+
+**Why.** A primary key is unique across the whole table, not per user. The phone makes its own row ids, and some are
+built from a date or a name (`ttcc_2026-10-24`, `pregnancy_started`, `sl_2026-10-24_nausea`, `symptoms_evening`). The
+first account to upload such an id owned that row for ever; every other account's `upsert ... on conflict (id)` hit
+it, RLS refused to update someone else's row, and the write failed silently. With one tester it never shows; with real
+users the second woman to log a period on any day never got it into the cloud.
+
+### What changed
+- [x] **0113** re-keys 17 tables from `primary key (id)` to `primary key (user_id, id)`, in one `do` block (one
+  transaction), looking the constraint name up rather than guessing it:
+  - **colliding today:** `ttc_cycles`, `ttc_cycle_signals`, `journey_timeline`, `symptom_logs`, `journal_entries`,
+    `reminders`, `weight_entries`, `movement_sessions` (the last two only for legacy migrated rows);
+  - **one rule, not a flag per table:** the other OwnRowLedger `id` tables (`bump_photos`, `calendar_personal_events`,
+    `baby_talk`, `medications`, `medication_logs`, `weekly_journal_notes`, `appointments`, `contraction_sessions`), and
+    `father_journal_entries`, which shares the journal's upsert.
+- [x] **The app conflicts on the same pair:** `OwnRowLedger.onConflict` is `user_id,<key>` for every keyed table;
+  `CycleStore`, `FamilyTimeline` and `journalUpsert` send `user_id,id`. Deletes already filtered on `id` + `user_id`.
+- [x] **The shared timeline keeps one entry per event.** Both partners' `pregnancy_started` can now exist, so
+  `FamilyTimeline.preferOwnRows` keeps her own row over the partner's copy of the same id (and his when she has none).
+- [x] **Rows already refused upload by themselves.** `SyncRowBook.confirmed(ok: false)` and `SyncBatch.push` keep a
+  refused row waiting, so it goes up on the first sync after 0113. No backfill.
+- [x] **Found while checking that:** one refused journal row (`sym_...` or `scan_...`) threw out of the journal's whole
+  sync every time, so for that account the partner's journal and the media backfill never ran either. Fixed by the
+  same key change.
+
+**Left alone, on purpose:** TTC records, appointments, doctor questions and supplements (random ids, couple-read,
+and supplements has a foreign key in); `children` and the `pp_*` tables (random ids, shared through
+`my_child_ids()`); orders, bookings, `can_i_misses` and uuid tables.
+
+**Verified:** `test/rows_keyed_per_person_test.dart` (new: 0113's list, every ledger table covered, no `id` target
+left, the timeline rule), `ttc_schema_contract_test` (reads 0113), `own_row_ledger_test`, and 17 neighbouring sync and
+journal files: 200 passed. `flutter analyze` on the 8 touched files: no issues.
+
+**Known limits:**
+- **Rollout.** A build that still sends `on conflict (id)` errors against these tables once 0113 runs; its rows wait
+  on the phone and upload after the update. Pre-launch that is only the team's phones. After launch the same change
+  takes two releases (add the new key alongside the old, ship the app, then drop the old key).
+- The TTC tables left on a global `id` have random ids, so they are safe in practice, not by construction.
+
+**User ran (2026-10-25):** `supabase/migrations/0113_rows_keyed_per_person.sql`, then the check query in its header (17 rows,
+each `user_id,id`).
+
+**Owed (device, on the user's word):** two accounts log a period on the same day; `select user_id, id from
+ttc_cycles where id = 'ttcc_<that day>'` returns two rows.
+
+**Files:** `supabase/migrations/0113_rows_keyed_per_person.sql` (new), `lib/services/remote/own_row_ledger.dart`,
+`lib/ttc/cycle_store.dart`, `lib/services/family_timeline.dart`, `lib/services/journal_sync.dart`,
+`lib/services/tools_store.dart`, `test/rows_keyed_per_person_test.dart` (new), `test/ttc_schema_contract_test.dart`,
+`test/own_row_ledger_test.dart`.

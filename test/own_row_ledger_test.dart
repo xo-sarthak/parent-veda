@@ -82,7 +82,8 @@ void main() {
       expect(up['user_id'], 'me');
       expect(up['removed_at'], iso(t0));
       expect(up['title'], 'x', reason: 'NOT NULL columns still filled');
-      expect(l.onConflict, 'id');
+      // 0113 (B9): keyed per person. Kept for revert: expect(l.onConflict, 'id');
+      expect(l.onConflict, 'user_id,id');
     });
   });
 

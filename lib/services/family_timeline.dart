@@ -312,7 +312,32 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
   Future<void> pullFromCloud() async {
     final rows = await SupabaseRepo.fetchShared(TtcTables.timeline,
         orderBy: 'happened_on', ascending: true);
-    applyCloudRows(rows);
+    // Kept for revert (0113, step 14): applyCloudRows(rows);
+    applyCloudRows(preferOwnRows(rows, SupabaseRepo.userId));
+  }
+
+  /// One entry per event when both partners wrote it (0113, step 14).
+  ///
+  /// The key is now `(user_id, id)`, so her `pregnancy_started` and his can both
+  /// live in the cloud; before, his upload was refused, which hid this. The
+  /// story keys events by `id`, so two copies would overwrite each other and
+  /// the row's owner would flip on every pull. Her own row wins: it is the same
+  /// event, and keeping her copy keeps its edits and removal hers to sync. A
+  /// partner's row stays when she has none of that id.
+  @visibleForTesting
+  static List<Map<String, dynamic>> preferOwnRows(
+      List<Map<String, dynamic>> rows, String? uid) {
+    if (uid == null) return rows;
+    final mine = <String>{
+      for (final r in rows)
+        if (r['user_id']?.toString() == uid) r['id'].toString(),
+    };
+    return [
+      for (final r in rows)
+        if (r['user_id']?.toString() == uid ||
+            !mine.contains(r['id'].toString()))
+          r,
+    ];
   }
 
   /// The merge, network-free so a test can hand it rows.
@@ -404,7 +429,7 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
           'updated_at': t.updatedAt,
           'removed_at': live == null ? t.removedAt : null,
         },
-        onConflict: 'id',
+        onConflict: 'user_id,id',
       );
       _book.confirmed(id, ok: ok, sent: sent);
     }
@@ -433,7 +458,7 @@ class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
             if (e.detailHi != null) 'detail_hi': e.detailHi,
           }
       ],
-      onConflict: 'id',
+      onConflict: 'user_id,id',
     );
   }
 

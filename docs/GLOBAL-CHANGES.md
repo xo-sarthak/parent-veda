@@ -171,7 +171,7 @@ needed for those, they match by name / category.
 - **LIVE 04847a5 (2026-10-24):** the transition matrix,
   `test/stage_transitions_test.dart` (37 tests), and fixes B1–B7: the loss →
   trying → pregnant-again path, the WhatsApp guide after a loss (migration
-  0112, the user runs it), timeline ids per pregnancy and per baby, onboarding
+  0112, run by the user 2026-10-24), timeline ids per pregnancy and per baby, onboarding
   parents dated to the birthday, messages for a second pregnancy and a second
   child, and the Ask Veda button off the skilling home. One place for the
   moves: `lib/services/stage_moves.dart`.
@@ -181,8 +181,9 @@ needed for those, they match by name / category.
   fixed, and M41 holds every home's avatar. The "Expecting again?" guard (G1)
   is RECORDED: no parent reaches a Pregnancy door from Parenting (the avatar
   opens You), only the Developer stage chips, which ship in every build.
-- **WAITING:** 0112 run; the user's call on B9, the cloud-id collision found on
-  the way; the user's call on the Developer chips (BEFORE-LAUNCH §6).
+- **B9 BUILT 2026-10-24** (sync log step 14): 0113 keys 17 tables per
+  person. 0113 RUN 2026-10-25 (check query: 17 rows of `user_id,id`). WAITING: the next build; the user's call on the Developer chips
+  (BEFORE-LAUNCH §6).
 - **OWED:** celebration pages for birth → parenting and parenting → skilling
   mirroring the TTC new-chapter page (a loss path stays quiet, never
   celebratory); hand-off to the item-1 video. Prototype first (R9).
@@ -267,7 +268,7 @@ Getting Ready opens on the name finder; TTC Mind & body headings are actions
 
 | What | Status |
 |---|---|
-| WhatsApp weekly guide kept going after a loss / early birth (read `due_date` only) | Migration `0111_wa_weekly_guide_stage.sql` RUN by the user 2026-10-24. It misses a loss (stage stays pregnancy): 0112, see `docs/STAGE-TRANSITIONS.md` B1 |
+| WhatsApp weekly guide kept going after a loss / early birth (read `due_date` only) | Migration `0111_wa_weekly_guide_stage.sql` RUN by the user 2026-10-24. It misses a loss (stage stays pregnancy): 0112, RUN 2026-10-24, see `docs/STAGE-TRANSITIONS.md` B1 |
 | 4 test failures already on main: `explore_redesign`, `shravan_library`, `tap_feedback_guard`, `ttc_tools_pass_trackers` | PARKED by the user 2026-10-23 |
 | STILL-OPEN entry for this pass | OWED — `docs/STILL-OPEN.md` was held by the other terminal; point it here |
 

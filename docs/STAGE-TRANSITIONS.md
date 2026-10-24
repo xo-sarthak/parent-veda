@@ -4,8 +4,8 @@
 G1 (the "Expecting again?" guard) is RECORDED, not owed: the user caught that the parenting avatar opens You, so the
 avatar menu the prototype drew is one no parent sees. Waiting on the user for two things:
 1. A call on the Developer stage chips, which ship in every build (BEFORE-LAUNCH §6).
-2. Running migration 0112.
-3. A call on B9, the cloud id collision. That one is sync work, so it is not this file's to fix.
+2. (0112 run by the user, 2026-10-24.)
+3. B9, the cloud id collision: BUILT 2026-10-24 (sync log step 14, migration 0113); 0113 RUN 2026-10-25 (check query: 17 rows of `user_id,id`). Left: install the next build.
 R9 (celebration pages) is next.
 
 This file is the one list of what is left for GLOBAL-CHANGES item 9: every stage move, every mid-way join, and the
@@ -29,6 +29,17 @@ Plan: `C:\Users\sarth\.claude\plans\read-docs-global-changes-md-and-the-noble-sp
 | After a loss, "Move to trying to conceive" resets what? | Clean restart, loss kept | Clean restart, loss kept |
 | Moves that don't exist (parent pregnant again, parent trying again, parenting → skilling)? | Guard now, build later | Guard now, build later |
 | Mobbin pass and a running list? | — | "make sure to do a mobbin pass and keep them maintained in the md file so tht we know what all is left … as it will be a long series of tasks" |
+| A parent taps "Expecting again": what happens to the parenting home? (asked 2026-10-25) | Move the app to pregnancy, the child kept under Family | Not answered as asked. The user: "analyze what to expect for this, it offers like swtiching accounts thing so all data is intact and one dosent affect the other.. we might have tht in competitor walks folder". Analysis below (§ Switching profiles) |
+| When is "Moving on" at 6+ offered? (2026-10-25) | When every child is 6+ | "if we are having switch acc functionality then x can stay where they are, u can be in skiiling when they are 6 years old ukwim" |
+| A "Back to parenting" row in the learning space? (2026-10-25) | Yes | "need to discuss the pros n cons for it.. i mean does coming back makes sense?" Discussed below |
+| What do the celebration pages feel like? (2026-10-25) | Calm: painting, line, one button | Calm, "but it should be for like TTC -> preg, preg -> parenting, parenitng -> skilling.." (all three moves) |
+
+## Switching profiles (analysis, 2026-10-25, not yet decided)
+What the competitor walks show (`Downloads/competitor-walks`):
+- **What to Expect** (`wte-parent/shots/030_stage_dropdown.png`): a dropdown at the top of Today lists "Baby-To-Be · Due Feb 15 2027" and "Baby · Birthday Jun 29 2026", each with a pencil, and "+ Add Another Child". Picking one changes Today, Tools and the tips to that profile's stage. Both live on one account.
+- **theAsianparent** (`asianparent-parent/shots/065_profile_dropdown.png`): the header dropdown groups "Pregnancy" (due date) and "Kids" (each with a date of birth, plus "Add kid's profile"). The centre Tracker button changes to a pregnancy icon when the pregnancy is picked. The app remembers the active profile between launches.
+
+What it would mean here: the home is chosen by **whose profile is open** (her trying, a pregnancy, a child 0 to 5, a child 6+), not by one stage the whole account is in. `docs/FAMILY-MODEL.md` already says stage is a tag and a pregnancy is a record with a start and an end. This makes the tag the thing that picks the home. Its "forward is the only direction" line would change: switching is looking at another profile, not moving back.
 
 ## Where the stage changes (read 2026-10-24)
 | Move | Where |
@@ -49,7 +60,7 @@ Plan: `C:\Users\sarth\.claude\plans\read-docs-global-changes-md-and-the-noble-sp
 ### B · Bugs with one obvious fix
 | Id | Bug | Fix | Status | Test |
 |---|---|---|---|---|
-| B1 | The WhatsApp weekly guide keeps sending after a loss (0111 reads `life_stage`; a loss leaves it `pregnancy`) | Migration 0112: `pregnancy_ended_at is null or pregnancy_ended_at < life_stage_at`. **The user runs it** | LIVE 04847a5 · WAITING (user runs `supabase/migrations/0112_wa_weekly_guide_loss.sql`) | M23, M24 |
+| B1 | The WhatsApp weekly guide keeps sending after a loss (0111 reads `life_stage`; a loss leaves it `pregnancy`) | Migration 0112: `pregnancy_ended_at is null or pregnancy_ended_at < life_stage_at`. **The user runs it** | LIVE 04847a5 · 0112 run by the user 2026-10-24 | M23, M24 |
 | B1b | A new pregnancy after a loss opens on the loss page; its messages stay silent | `PregnancyEndedStore.ended` counts only when `endedAt` ≥ the pregnancy stage's `enteredAt` | LIVE 04847a5 | M22 |
 | B2 | "Move to trying to conceive" after a loss changes only the stage: TTC stuck on "A new beginning", messages silent, old due date, the period "90 days late" | `moveToTtcAfterLoss()`: clear the TTC pregnant flag and the due date, set `cycleRestartOn`, set the stage | LIVE 04847a5 | M20, M21 |
 | B3 | A second pregnancy's timeline is dropped (fixed ids); undo deletes the first pregnancy's entries | Dated ids for new events; undo removes only the ids it wrote | LIVE 04847a5 | M9, M10, M22 |
@@ -58,7 +69,7 @@ Plan: `C:\Users\sarth\.claude\plans\read-docs-global-changes-md-and-the-noble-sp
 | B6 | A second child's parenting messages are silenced (ids not per child) | New sends prefixed with the child id; legacy ids belong to the oldest child | LIVE 04847a5 | M36 |
 | B7 | Ask Veda button on the skilling home opens pregnancy Ask Veda | Hide on route `skilling` | LIVE c237e83 (rode with the Ask Veda mark commit) | M35 |
 | B8 | TTC profile "Go to pregnancy" sets the stage with no due date (week-20 placeholder) | If release-reachable: route through `recordPositiveTest`; else note it | RECORDED: the button is in `TtcProfileScreenClassic`, which nothing opens (facade since 2026-09-19). No change | M34 |
-| B9 | **Found 2026-10-24, wider than stage moves.** `journey_timeline`, `ttc_cycles` and `ttc_cycle_signals` have `id text primary key` across ALL users, and the app builds those ids from a date or a fixed name (`ttc_positive_test`, `ttcc_<date>`, `ttcs_<date>_<kind>`). After the first account writes an id, every other account's upsert of it hits that row, RLS refuses the update, and her row never reaches the cloud: two women who log a period on the same day cannot both sync it | A key per person: `primary key (user_id, id)` and the app's upserts on `user_id,id` (`family_timeline.dart`, `cycle_store.dart`, and `ttc_schema_contract_test.dart`'s conflict targets). It belongs to the sync work (STILL-OPEN-BACKEND), which is written only on the user's word | WAITING (user's call) | — |
+| B9 | **Found 2026-10-24, wider than stage moves.** `journey_timeline`, `ttc_cycles` and `ttc_cycle_signals` have `id text primary key` across ALL users, and the app builds those ids from a date or a fixed name (`ttc_positive_test`, `ttcc_<date>`, `ttcs_<date>_<kind>`). After the first account writes an id, every other account's upsert of it hits that row, RLS refuses the update, and her row never reaches the cloud: two women who log a period on the same day cannot both sync it | A key per person: `primary key (user_id, id)` and the app's upserts on `user_id,id` (`family_timeline.dart`, `cycle_store.dart`, and `ttc_schema_contract_test.dart`'s conflict targets). It belongs to the sync work (STILL-OPEN-BACKEND), which is written only on the user's word | BUILT 2026-10-24 (user's word "start with b9"). 0113 re-keys 17 tables to `(user_id, id)`; the ledger, cycles, timeline and journals conflict on `user_id,id`; the shared timeline keeps her own row over the partner's copy of an event. Wider than first found: `symptom_logs`, `journal_entries`, `reminders` and two legacy tool tables collided too. 0113 RUN 2026-10-25 (check query: 17 rows of `user_id,id`); left: install the next build | `test/rows_keyed_per_person_test.dart` |
 | B10 | **Found 2026-10-24 by the user.** The Skilling home's avatar opened the three-stage menu, not You. `V3HeroChrome` falls back to the menu unless `avatarOpensProfile: true`, and `skilling_preview_screen.dart` passed `onProfile` without it, though its own comment says the avatar is the one door to You | `avatarOpensProfile: true` | LIVE 04847a5 | M41 |
 
 Fixes that came with B2 (same rule, more readers): the TTC messages' period list (`ttc_messages_store.dart`, the

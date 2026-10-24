@@ -11092,4 +11092,6 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
 - **§101.8 (R8)** The Pregnancy door from TTC shows the week-20 placeholder (a preview). Whether to guard it is the
   user's call.
 - **§101.9 (B9) Cloud ids collide across users.** `journey_timeline`, `ttc_cycles` and `ttc_cycle_signals` key rows
-  by `id` alone, and the app's ids are a date or a fixed name. Waiting on the user's call; it belongs to the sync work.
+  by `id` alone, and the app's ids are a date or a fixed name. BUILT 2026-10-24 as sync log step 14: migration 0113
+  keys 17 tables on `(user_id, id)` and the app conflicts on the same pair. 0113 RUN 2026-10-25 (check query: 17 rows of `user_id,id`); left: install the next
+  build (an older build's writes to those tables wait on the phone until then).

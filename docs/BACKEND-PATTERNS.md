@@ -3759,10 +3759,27 @@ different name (`lossRecorded`) from the scoped one (`ended`).
 mutating the earlier one. It is the same reason event-sourced systems append rather than update: you can always
 recompute "what applies now", and you can never un-delete.
 
-**One wider lesson from the same work (B9, open).** A row id that is "app-generated and stable" is only safe as a
-primary key if it is unique *across users*, not just within one person's data. `ttc_cycles.id = 'ttcc_<date>'` is
-stable for her and identical for everyone who logged a period that day. With RLS, the second person's upsert hits the
-first person's row and is refused. Within-user ids want a composite key: `primary key (user_id, id)`.
+**One wider lesson from the same work (B9, fixed 2026-10-24 as sync step 14, migration 0113).** A row id that is
+"app-generated and stable" is only safe as a primary key if it is unique *across users*, not just within one person's
+data. `ttc_cycles.id = 'ttcc_<date>'` is stable for her and identical for everyone who logged a period that day. With
+RLS, the second person's upsert hits the first person's row and is refused. Within-user ids want a composite key:
+`primary key (user_id, id)`.
+
+What the fix taught, beyond the key itself:
+- **Put the rule where every table passes through.** 17 tables were re-keyed, eight of which collided. The other
+  nine (timestamp ids) went too, because `OwnRowLedger.onConflict` is now one line, `user_id,<key>`, with no per-table
+  flag. A flag is the thing the next table forgets; a rule in the shared class can't be forgotten.
+- **A shared read needs its own tie-break once the collision is gone.** The timeline is read by the couple. While
+  his duplicate `pregnancy_started` was refused, the phone never saw two rows with one id. Once both can exist, the
+  app must choose: her own row wins (`FamilyTimeline.preferOwnRows`). Fixing a key can expose a merge question the
+  bug was hiding.
+- **A conflict target is a contract with every build in the wild.** `on conflict (user_id, id)` needs a unique key
+  on exactly that pair, and `on conflict (id)` needs one on `id`. Swapping the key breaks old builds' writes. Pre-launch
+  that costs nothing; after launch it is expand and contract: add the new unique key alongside, ship the app, and drop
+  the old key once old builds are gone.
+- **A refused write can block more than itself.** The journal's sync threw on its first failed upsert, so one
+  colliding entry stopped the partner's journal and the media backfill too. Per-row failure handling (`SyncBatch`
+  splits a refused batch to find the bad row) keeps one bad row from taking the rest down.
 
 ## 17. Reading list, in order
 

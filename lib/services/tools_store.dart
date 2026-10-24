@@ -759,7 +759,7 @@ class ToolsStore extends ChangeNotifier {
         if (!s.isActive && s.times.isNotEmpty && !msById.containsKey(s.id)) {
           msById[s.id] = s;
           await SupabaseRepo.upsert('movement_sessions', _movementToRow(s),
-              onConflict: 'id');
+              onConflict: 'user_id,id');
         }
       }
       _movementSessions
@@ -795,7 +795,7 @@ class ToolsStore extends ChangeNotifier {
         if (!ctById.containsKey(s.id)) {
           ctById[s.id] = s;
           await SupabaseRepo.upsert('contraction_sessions', _contractionToRow(s),
-              onConflict: 'id');
+              onConflict: 'user_id,id');
         }
       }
       _contractionSessions
