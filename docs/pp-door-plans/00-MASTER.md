@@ -25,6 +25,7 @@ These need one shell fix each, not 14 separate fixes.
 | S7 | No test covers what a parent sees first | — | `test/pp_doors_first_view_test.dart`: for each door and each age, the opening tab and first card fit the child, and action doors lead with an action. This is GLOBAL-CHANGES #15, owed for parenting. |
 | S8 | A tap that can't do anything says nothing. A shop link to a category we don't stock, a consult category with no people yet, a film still "coming soon", or a class not open for her week either does nothing or opens an empty screen, and she can't tell why. (User, 2026-10-24: "if some action is not able to take place due to unavailability, the user gets a toast, so the user can understand why a tap didn't work.") | every door's links, tools, offer cards, video slots | **No silent tap, anywhere.** Before opening, the tap checks the target is there. If it isn't, it shows one `pvToast` (`lib/widgets/pv_toast.dart`, `PvToastKind.info`) saying why, in plain words, and what happens next. Examples: "Postpartum belts aren't in the Store yet. We'll add them soon." "Our physios are joining soon. A gynaecologist can help today" with an action pill. "This film is being made." "This class opens after your six-week check." Each door's plan lists its unavailable targets and their toast words. Test: `pp_doors_first_view_test` taps every link, tool and offer on each door and fails if a tap produces neither a new route nor a toast. |
 | S9 | A tab for a later age is locked ("From 1 year") and cannot be opened, even from a link on home. Parents read ahead, and stage follows age loosely. (User, 2026-10-24: "should we lock the content???", answered "Unlock, every door".) | `pp_door_screen.dart:214-252` (lock and sort) | **No lock, anywhere.** Later-age tabs open, sit last, and open with one line: "For later. This usually starts from {age}." The card says "For later". Outgrown tabs still drop. A link into such a tab opens it with the same line. The locked path is commented out, "kept for revert". Test: no door draws a lock icon. |
+| S10 | A page she has read sinks to the end of its row (`pp_relevance.dart:175`), so a red-flag list ("Go now") stops being the first card after one read. | `ppRelevanceOrder` | Red-flag pages (format RED FLAG or FLAGGED, and any page a door pins) are exempt from read-sinking in every door. Proposed by the First 40 plan; the user answered FD2 "Yes, always first" 2026-10-24. Test: a read red-flag page is still first. |
 
 **Reuse:**
 - `ppRelevanceOrder` (`pp_relevance.dart:160`)
@@ -82,7 +83,7 @@ These need one shell fix each, not 14 separate fixes.
 | 3 | You, Maa | Action (movement) | Exercises are buried in tab 2 and tab 3, with no demos. 20 consults. |
 | 4 | Development | Action | Opens on checklists. "What to do" is tab 4 with 5 pages. The activities are hidden behind a tool. |
 | 5 | Potty | Action | Opens on one chart card. No tools. |
-| 6 | First 40 Days | Action | Identical at every age. "Recovery" is links only. |
+| 6 | First 40 Days | Action | Only Day by day changes with age; the other 4 tabs (41 of 46 pages) are the same on day 3 and at 3 months. "Your recovery" is 5 windows into You, Maa plus 3 real pages. (Corrected 2026-10-24 by the door audit.) |
 | 7 | Sleep | Routine | Safe sleep and waking framed for infants, shown to toddlers |
 | 8 | Behaviour | Mixed | Calming activities are in tab 5. Dead code. Thin pages. |
 | 9 | Early learning | Action | Best fit already. Needs activity demos and rhymes. |
@@ -100,7 +101,7 @@ These need one shell fix each, not 14 separate fixes.
 - **Safety**
 
 **Candidates for missing doors:**
-1. **Everyday care:** bath, nails, nappies, clothes, teeth. Today this lives only in First 40, which is gone after 40 days.
+1. **Everyday care:** bath, nails, nappies, clothes, teeth. Today this lives only in First 40, which stays on home but moves to last after 3 months and is written for the newborn weeks. (Corrected 2026-10-24: the door is never removed.)
 2. **Travel and outings with a child**
 3. **Play and active movement for the child:** motor play, outdoor. Development and Early learning don't own it.
 4. **Childcare and back to work:** daycare and nanny choice. Today it is 2 pages in Family and 9 in You, Maa.
@@ -112,7 +113,7 @@ A new door = a section + content + door file + test. Each one is its own plan.
 
 ## How we proceed
 1. **The user approves this master plan.**
-2. **Step 0, shared shell fixes S1–S9.** One small batch with Parenting tests. This comes first because every door depends on it.
+2. **Step 0, shared shell fixes S1–S10.** One small batch with Parenting tests. This comes first because every door depends on it.
 3. **Door 1, Feeding.** A full audit using the checklist above, then a written per-door plan, then the user's approval, then the build.
 4. **Doors 2–14**, the same way, one at a time.
 5. **Thin and missing doors:** the user decides.
