@@ -33,6 +33,28 @@ These need one shell fix each, not 14 separate fixes.
 
 **Clash note:** `pp_relevance.dart` and the home files have uncommitted Wave 8 changes from another terminal. Before touching anything, run `git status` and wait for that commit to land.
 
+## S8 in detail: no silent tap (added 2026-10-24)
+
+1. **No parenting expert can be booked today.** `ppExpertIsPlaceholder` (`pp_expert_honesty.dart:36-42`) gates the whole bundled roster, so every `pp_experts/...` tap opens the full "Our first experts are joining" page. That page isn't silent, so it stays. The S8 toasts are for the two cases it doesn't cover:
+   - **A category that doesn't exist** (feeding therapist, paediatric dentist, eye, ENT, audiologist, allergist, chest, hormone). Today it falls back to the unfiltered list (`pp_surface_router.dart:127`). With real experts, that becomes the wrong list.
+   - The CPR instructor has no `category` (`pp_experts_data.dart:207`).
+2. **Video placeholders can't be tapped** (`pp_content.dart:1490` passes no onTap). The placeholder rule (`pv_placeholders.dart:26-29`) says one must not *look* tappable, so a mother who taps one gets nothing back.
+3. **Shop links open the unfiltered shop** (`pp_surface_router.dart:465`). The link works but lands on something unrelated, against the cakes-not-pizza rule.
+4. **Classes:** every bundled programme opens `ppProgramOpeningSoon`. This is honest, so it stays. Many named classes don't exist at all.
+5. **Existing "Coming soon" toasts give no reason and no next step.** There are 8 screens: article archive, article reader, cohort and course funnels, guides tools, health guide, and journal ×3. One journal toast is still a raw SnackBar.
+
+**The shell changes, S8a to S8e:**
+- **S8a, video slots answer a tap.** The look stays the same: no play button, still not tappable-looking. A tap shows "This film is still being made. The steps are written just below." with a **Read it** pill that scrolls to the first section. On go-now pages, no pill and the words "follow the steps below now". This changes the placeholder rule from "must not look tappable" to "must not look tappable, and answers a tap honestly".
+- **S8b, unknown expert category.** The router checks the category exists *and has people* before opening. If it doesn't, a toast: "We're adding paediatric {role}s. A {nearest} can check this first." with a pill to the nearest category that has people. Nearest map:
+  - dentist, eye, ENT, audiologist, allergist, chest, hormone → Paediatrician
+  - feeding therapist → Speech therapist
+- **S8c, shop links filtered.** `pp_products/<subcategory>` opens the shop filtered to that subcategory. If the subcategory has 0 items, a toast: "We're still choosing a good {item}. {one-line buying tip from the page}." No pill, or a pill to the closest stocked item.
+- **S8d, class names that don't exist.** The link checks the programme id first. If there is none: "This class isn't open yet. Tap Tell me and we'll let you know." The **Tell me** pill records interest the same way `pp_opening_soon.dart` does. On a page with steps, the pill goes to the steps instead (choking → "If he chokes").
+- **S8e, reword the 8 bare "Coming soon" toasts** to say why and what's next, and replace the raw SnackBar with `pvToast`.
+- **Test:** `pp_doors_first_view_test` taps every link, tool, offer and video slot on each door, and fails if a tap neither pushes a route nor shows a toast.
+
+**No parenting consult can be booked today:** the whole bundled roster is gated until Directus serves real experts. That is already on the before-launch path (Directus). The door plans put consults next to the worry, but they open the "joining soon" page until then.
+
 ## The per-door audit (same checklist each time)
 1. **List every element:** tab, rail, page, tool, video slot, activity, consult, product. For each: what it is, how deep it goes, and the age band.
 2. **Door type:**

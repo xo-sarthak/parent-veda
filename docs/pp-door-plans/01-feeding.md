@@ -359,3 +359,22 @@ The user's own words, where recorded: D2, *"yes, D2 approved, go for Health"*, a
 
 ## 10. Costs
 None. No paid API or service is used. The films are owed content, and their cost is quoted when they are briefed (USD + INR).
+
+## 11. Taps that can't happen yet (S8, added 2026-10-24)
+Shell rule S8 in `00-MASTER.md`: no tap is silent. Every target below is unavailable today, so it carries a toast or a filtered route. Every consult also opens the existing "experts are joining" page until real experts are live (the whole bundled roster is gated by `ppExpertIsPlaceholder`).
+
+| Target | Where | Today | Toast / fix |
+|---|---|---|---|
+| 13 video slots + 4 planned demos + door intro | Milk, Solids, Cooking, Growing, Safe; header | placeholder | S8a. Intro: "A short tour is coming. Start with the tab for his age." |
+| Nursing pillows, pumps, nursing bras, nipple cream, pads | bf_positions, bf_pumping, bf_cracked | 10 each, unfiltered shop | S8c filtered route, no toast |
+| Steamers, freezer trays | recipes_batch | 0 | "We haven't picked steamers and freezer trays yet. Any steel steamer and lidded tray works for now." Pill: Recipes |
+| High chair, booster, suction bowl, katori set, bibs, splash mat, open or 360 cup, straw cup, divided plate, insulated jar, snack cup, kids' thali, learning tower, tiffin, lunch box, bottle, apron | solids_*, recipes_*, picky_*, safety_water | 0 (only First Spoons) | S8c 0-item toast with the page's tip. Pill: First spoons where relevant |
+| Paladai, milk storage bags, cooler bag, nursing kurti | bf_pumping | 0 | "Not in our shop yet." Pill: Nursing bras |
+| Compare breast pumps | bf_pumping | general guide hub | Route to the pumps guide; if there isn't one, the toast "Opening buying guides. Breast pumps are under Feeding." |
+| Breastfeeding Basics, after birth | Milk tab | only the pregnancy class | S8d. Pill: Lactation expert |
+| Pumping and back to work; Finger foods; Fussy eater; Tiffin; First year of food | bf_pumping, solids, picky, recipes | none | S8d (Tell me) |
+| Starting solids class | solids_when | `co_weaning` exists, opening soon | link `co_weaning`; the existing page is enough |
+| Baby first aid and choking class | safety_gagging, solids_textures | none | S8d. Pill: If he chokes |
+| Feeding therapist | picky_not_eating | category missing | S8b → Speech therapist (3) |
+| Allergen tracker (D4) | solids_allergens | not built | On close: "Not saved yet. Remembering what he's tried is coming soon." |
+| Every consult (lactation, nutritionist, paediatrician) | across the door | roster gated | the existing opening-soon page; no toast needed |

@@ -460,6 +460,21 @@ Every row was recommended Yes, and the user answered Yes.
 ## 10. Costs
 None now. The films and the paediatrician's review are owed and quoted when briefed (USD + INR). No paid API or service is used.
 
+## 11. Taps that can't happen yet (S8, added 2026-10-24)
+Shell rule S8 in `00-MASTER.md`: no tap is silent. Consults open the existing "experts are joining" page until real experts are live.
+
+| Target | Where | Today | Toast / fix |
+|---|---|---|---|
+| 13 slots + 6 planned demos + door intro | all tabs | placeholder | S8a; on go-now pages no pill |
+| Paediatric dentist, eye, ENT, audiologist, allergist, chest, hormone | Keeping well row chips, teeth/eyes/ears/allergy/asthma pages | categories missing | S8b → Paediatrician |
+| Digital underarm thermometer | fever_reading | 0 (infrared 10) | "We haven't picked an underarm thermometer yet. Any digital one with a flexible tip works." Pill: Fever check |
+| Nasal aspirator, oral syringe, mosquito net, finger brush, nail clipper, lice comb, sun hat/sunscreen, record folder | their prevention and illness pages | 0 | "Not in our shop yet. A chemist will have one." Folder pill: Health record |
+| Humidifier, HEPA purifier | cold_common, prev_pollution | 10 each, not linked | link with S8c, no toast; check "ultrasonic" against the plan's "cool mist, no steam" |
+| Eczema emollient | skin_eczema | 1, scented (claims check) | hold the link until a fragrance-free one is checked |
+| Baby first aid and CPR class | Get help now foot, choking, Keeping well | no class row, instructor uncategorised | S8d. Pill: Choking steps. Never on go-now pages |
+| Fever evening, Medicine box, First tooth, Monsoon, Vaccines first year | their tabs | none | S8d. Pill: Paediatrician, or the Vaccines tool |
+| Every consult | across the door | roster gated | the existing opening-soon page |
+
 ## Sources (India facts used in §5b; every one REQUIRED_REVIEW at build)
 - National Deworming Day: [Drishti IAS](https://drishtiias.com/pdf/1581412634-national-deworming-day.pdf), [The Quint](https://www.thequint.com/amp/story/fit/national-deworming-day-in-india-2024-check-date-theme-history-significance), [Krishnagiri district (NDD scheme)](https://krishnagiri.nic.in/scheme/national-deworming-day/)
 - U-WIN and Mission Indradhanush: [PIB document](https://static.pib.gov.in/WriteReadData/specificdocs/documents/2024/nov/doc2024119432301.pdf), [MoHFW press release](https://mohfw.gov.in/press-info/7848), [Business Standard](https://www.business-standard.com/india-news/pan-india-rollout-of-u-win-to-track-routine-vaccinations-likely-by-aug-end-124071400270_1.html)
