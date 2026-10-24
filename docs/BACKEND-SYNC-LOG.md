@@ -27,7 +27,7 @@ owed.
 | 2026-10-21 | Step 9: Pregnancy part 2 (medicines, scans and appointments, symptoms, the tools) | 0107 | `a728ec4` | yes (2026-10-21) |
 | 2026-10-21 | Steps 11 and 12: every write of her data confirmed, batched first sync, sign-out forgets memory and stops alarms, the 90-day purge | 0109 | `984836f` | yes (2026-10-21) |
 | 2026-10-22 | Step 13: nothing she makes lives only on the phone; every light store merges item by item (the non-shopping half of step 10) | 0110 | `8c466d0` | yes (2026-10-22) |
-| 2026-10-24 | Step 14: rows keyed per person, so two people's same-named ids never collide (B9) | 0113 | pending | yes (2026-10-25) |
+| 2026-10-24 | Step 14: rows keyed per person, so two people's same-named ids never collide (B9) | 0113 | `b474f69` | yes (2026-10-25) |
 
 Owed across steps:
 - **The two-phone walk** for steps 1 and 2, when the phone is free. Not yet done.
@@ -1147,7 +1147,7 @@ list is in the commit.
 ## Step 14: rows keyed per person, so two people's same-named ids never collide
 
 **Date:** 2026-10-24 (found during the stage-transitions pass as STAGE-TRANSITIONS B9; planned and approved the same
-day, the user: "start with b9 plan it well first"). **Migration:** 0113 (run 2026-10-25). **Commit:** pending.
+day, the user: "start with b9 plan it well first"). **Migration:** 0113 (run 2026-10-25). **Commit:** `b474f69`.
 
 **Why.** A primary key is unique across the whole table, not per user. The phone makes its own row ids, and some are
 built from a date or a name (`ttcc_2026-10-24`, `pregnancy_started`, `sl_2026-10-24_nausea`, `symptoms_evening`). The
