@@ -1,7 +1,7 @@
 # Parenting doors: one plan per door
 
 The doors are worked one at a time. For each door: a full audit, then a written plan, then the user's go, then the build.
-Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S8) that every door plan depends on, the per-door checklist, the door order, and the list of thin and missing doors.
+Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) that every door plan depends on, the per-door checklist, the door order, and the list of thin and missing doors.
 
 | # | Door | Plan | Status |
 |---|---|---|---|
@@ -11,7 +11,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S8) t
 | 3 | You, Maa | `03-you-maa.md` + `03-you-maa-content.md` (8 new pages, 11 deepened) | M1–M9 all yes 2026-10-24. Plan final; build waits on step 0 |
 | 4 | Development | `04-development.md` + `04-development-content.md` | DV1–DV8 all yes 2026-10-24; DV2 look approved (…1bsFmZ4i5SRg8oiQFyeHHR, v2) with the tab renamed "Sit, crawl, walk" (DV9). Plan final; build waits on step 0 |
 | — | No silent tap (S8) for Feeding and Health | `01-feeding.md` §11, `02-health.md` §11, `00-MASTER.md` S8 | Written 2026-10-24 |
-| 5 | Potty | — | next |
+| 5 | Potty | `05-potty.md` + `05-potty-content.md` | PT1–PT8 + PT10 answered 2026-10-24. Plan final; build waits on step 0 |
 | 6 | First 40 Days | — | |
 | 7 | Sleep | — | |
 | 8 | Behaviour | — | |
