@@ -28,7 +28,7 @@ final PpDoor kPpSpecialCareDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'more',
-      label: 'When your child needs a little more',
+      label: 'Extra support', // was 'When your child needs a little more', three lines on a card (2026-10-24)
       icon: Icons.psychology_outlined,
       hue: 268,
       areaIds: ['additional_needs'],

@@ -28,7 +28,7 @@ final PpDoor kPpFamilyDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'grand',
-      label: 'Grandparents and the joint family',
+      label: 'Grandparents', // was 'Grandparents and the joint family', three lines on a card (2026-10-24)
       icon: Icons.elderly_outlined,
       hue: 28,
       areaIds: ['grandparents'],

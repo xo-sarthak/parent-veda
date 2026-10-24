@@ -1,6 +1,6 @@
 # Door 4: Development, the plan
 
-Written 2026-10-24. **Status: final. DV1 to DV8 answered yes by the user 2026-10-24. DV2's phone mockup comes before any `lib/` edit.** The new page copy is in `04-development-content.md`. Nothing in `lib/` changes until step 0 and the user's go. Shell rule S8 (no silent tap) is in `00-MASTER.md`.
+Written 2026-10-24. **Status: final. DV1 to DV8 answered yes by the user 2026-10-24. DV2's look approved 2026-10-24 (`claude.ai/artifact/1bsFmZ4i5SRg8oiQFyeHHR`, v2), with one change: the tab "When will my baby..." is renamed "Sit, crawl, walk", which says at a glance what the tab holds and is never cut off (DV9). Built 2026-10-24 with the other cut-off names.** The new page copy is in `04-development-content.md`. Nothing in `lib/` changes until step 0 and the user's go. Shell rule S8 (no silent tap) is in `00-MASTER.md`.
 
 ## Context
 Development is an action door, but it opens like a test. The door definition is `lib/data/doors/pp_door_development.dart` and its content is `pp_development_content.dart`, with 33 pages, none thin and all tagged. The age groups are `kPpDevelopmentBands`: 0–6 months, 6–12 months, 1–2 years, 2–3 years and 3–5 years.
@@ -40,13 +40,13 @@ What a parent meets today:
 |---|---|
 | **Play today** (renamed "What to do") | the age shelf of activities, then the play pages, then the tummy-time tool (0–12 months only) |
 | **On track** | the checklist, where your baby is (milestones), the phase map (from Phases), "Something has changed" (the tool from Talk and check, plus the orphan area), the age-by-age pages, the worth-checking page |
-| **When will my baby…** | unchanged; 0–2 years |
+| **Sit, crawl, walk** (renamed from "When will my baby...", DV9) | unchanged content; 0–2 years |
 | **Talking** | unchanged |
 
 Order by age (`PpDoor.tabOrder`): Play today is always first.
-- 0–6 months: Play today, On track, When will, Talking
-- 6–12 months: Play today, When will, Talking, On track
-- 1–2 years: Play today, Talking, When will, On track
+- 0–6 months: Play today, On track, Sit, crawl, walk, Talking
+- 6–12 months: Play today, Sit, crawl, walk, Talking, On track
+- 1–2 years: Play today, Talking, Sit, crawl, walk, On track
 - 2–3 and 3–5 years: Play today, Talking, On track
 
 "On track" stops being the landing tab, but the worry is never hidden: the worth-checking page stays one tab away with its flag treatment.
@@ -96,7 +96,7 @@ For a baby born before 37 weeks, under 2 years old, the door's age groups, the a
 |---|---|
 | On track | "Something worrying you? A developmental paediatrician". The profiles are placeholders until real people join, so S8b points to a paediatrician. |
 | Talking | "A speech therapist" (3 real) |
-| When will | "A paediatric physio" (new category, owed; S8b → Paediatrician) |
+| Sit, crawl, walk | "A paediatric physio" (new category, owed; S8b → Paediatrician) |
 | Play today | no expert. The class card for Play and Brain instead. |
 
 **In pages:** `dev_worth_checking` adds the Special needs roster (OT, special educator, 3 real) and links Special care's `sc_help_india` for RBSK and DEIC (M4 pageId; one source, no copy).
@@ -161,10 +161,11 @@ Reuse:
 | # | Question | We recommended | Your answer |
 |---|---|---|---|
 | DV1 | Six tabs become four, with Play today first at every age? | Yes | **Yes** (2026-10-24) |
-| DV2 | Activities shown straight on the first screen, 6 for his age, one tap? (mockup first) | Yes | **Yes** (2026-10-24) |
+| DV2 | Activities shown straight on the first screen, 6 for his age, one tap? (mockup first) | Yes | **Yes** (2026-10-24). Look approved 2026-10-24 on mockup v1: "make sure to keep names in such a way that this ... doesn't happen, rest i approve" (about the cut-off "When will my baby..." card) |
 | DV3 | Merge the 102 phase-doc activities into one pool, at least 12 per age? | Yes | **Yes** (2026-10-24) |
 | DV4 | Corrected age for babies born early, under 2 years, everywhere in the door? | Yes | **Yes** (2026-10-24) |
 | DV5 | A painting for every activity, plus 12 demo films and a door intro? | Yes | **Yes** (2026-10-24) |
 | DV6 | "Toys for this age", household things first, one toy link on 3 pages? | Yes | **Yes** (2026-10-24) |
 | DV7 | Specialist rows per tab, the Special needs roster, courses by id, a paediatric physio category owed? | Yes | **Yes** (2026-10-24) |
 | DV8 | A new movement-signs page, the M-CHAT line, the phases rewrite? | Yes | **Yes** (2026-10-24) |
+| DV9 | Rename "When will my baby..." so it is never cut off? | "Sit, crawl, walk", then "Sit, crawl, walk" | **Asked for by the user** (2026-10-24, on the DV2 look). "Sit, crawl, walk" was offered; the user: "swap the name ... something that is understandable in the very first glance and does not get the dotted situation". Now "Sit, crawl, walk" (mockup v3, built in `pp_door_development.dart`). Rule for every door: a tab or card name is complete, never ends in "...", and fits the tool card in two lines (about 14 characters) |

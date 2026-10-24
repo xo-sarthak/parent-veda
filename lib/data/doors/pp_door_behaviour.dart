@@ -49,7 +49,7 @@ final PpDoor kPpBehaviourDoor = PpDoor(
         // tab an infant's parent sees. The toddler tabs carry it on
         // Tantrums; no parent sees both.
         PpDoorTool(
-          label: 'What to say when…',
+          label: 'What to say', // was 'What to say when…', read as cut off (2026-10-24)
           blurb: 'The words for the family: "you are spoiling him", "let him '
               'cry". Search it while it is happening.',
           surfaceId: 'pp_scripts',
@@ -59,7 +59,7 @@ final PpDoor kPpBehaviourDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'tantrums',
-      label: 'Tantrums and the stubborn years',
+      label: 'Tantrums', // was 'Tantrums and the stubborn years', three lines on a card (2026-10-24)
       icon: Icons.whatshot_outlined,
       hue: 344,
       areaIds: ['ziddi', 'first_feelings', 'the_no_year'],
@@ -67,7 +67,7 @@ final PpDoor kPpBehaviourDoor = PpDoor(
         // The hero tool. "Find the moment, get the sentence. Referenced from
         // six pages, one tool." Its age chips came off; it opens on his band.
         PpDoorTool(
-          label: 'What to say when…',
+          label: 'What to say', // was 'What to say when…', read as cut off (2026-10-24)
           blurb: 'The exact words for the moment you are in, and what to '
               'leave unsaid. Search it while it is happening.',
           surfaceId: 'pp_scripts',

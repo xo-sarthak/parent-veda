@@ -73,7 +73,7 @@ final PpDoor kPpPottyDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'dry',
-      label: 'Dry nights, doing it herself',
+      label: 'Dry nights', // was 'Dry nights, doing it herself', three lines on a card (2026-10-24)
       icon: Icons.nights_stay_outlined,
       hue: 268,
       areaIds: ['staying_dry'],

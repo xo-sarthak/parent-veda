@@ -9,7 +9,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S8) t
 | 1 | Feeding | `01-feeding.md` + `01-feeding-content.md` (offerings and new copy) | All decisions D1–D6 answered 2026-10-23 (D2 look: `claude.ai/artifact/6Kgs3uNdKsbyKybfbdzdRB`). Plan final; build waits on step 0 |
 | 2 | Health | `02-health.md` + `02-health-content.md` (15 new pages) | H1–H7 all yes 2026-10-23. H2 look approved 2026-10-24 (`claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q`, v4). Plan final; build waits on step 0 |
 | 3 | You, Maa | `03-you-maa.md` + `03-you-maa-content.md` (8 new pages, 11 deepened) | M1–M9 all yes 2026-10-24. Plan final; build waits on step 0 |
-| 4 | Development | `04-development.md` + `04-development-content.md` | DV1–DV8 all yes 2026-10-24. Plan final; DV2 mockup before the build; build waits on step 0 |
+| 4 | Development | `04-development.md` + `04-development-content.md` | DV1–DV8 all yes 2026-10-24; DV2 look approved (…1bsFmZ4i5SRg8oiQFyeHHR, v2) with the tab renamed "Sit, crawl, walk" (DV9). Plan final; build waits on step 0 |
 | — | No silent tap (S8) for Feeding and Health | `01-feeding.md` §11, `02-health.md` §11, `00-MASTER.md` S8 | Written 2026-10-24 |
 | 5 | Potty | — | next |
 | 6 | First 40 Days | — | |
@@ -31,3 +31,18 @@ Each plan ends with a **Decisions** table with four columns: the number, the que
 
 ## A rule every door plan carries (S8)
 No silent tap. Each plan lists the targets that are not available yet (an unstocked product, an expert category with no people, a film not made, a class gated by her week) and the toast each one shows. See `00-MASTER.md` S8.
+
+## Names are never cut off
+Every tab, tool card and shelf name is complete and clear at a glance. It never ends in "..." or "…", and it fits its card in two lines (the tab card holds about 15 characters a line). The user asked for this on 2026-10-24, after "When will my baby..." was cut off on its card. `test/door_names_fit_test.dart` holds it: it fails on a door `label:` ending in dots, and on a parenting tab name that wraps past two lines.
+
+Fixed 2026-10-24 (old names commented out in place, "kept for revert"):
+| Door | Was | Now | Why |
+|---|---|---|---|
+| Development | When will my baby... | Sit, crawl, walk | ended in dots |
+| Behaviour (tool, two tabs) | What to say when… | What to say | ended in dots |
+| Behaviour | Tantrums and the stubborn years | Tantrums | three lines on the card |
+| Family | Grandparents and the joint family | Grandparents | three lines on the card |
+| Potty | Dry nights, doing it herself | Dry nights | three lines on the card |
+| Special care | When your child needs a little more | Extra support | three lines on the card |
+
+Left alone: Garbh's red-flag heading "Stop and call your doctor today if..." leads into its list, so it is a sentence, not a name; and its twin in `garbh_screen.dart` is in another terminal's open work.

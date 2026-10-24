@@ -193,7 +193,7 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.text('When will my baby...'), findsNothing);
+      expect(find.text('Sit, crawl, walk'), findsNothing);
       expect(find.text('The leaps'), findsNothing);
       expect(find.text('Phases'), findsWidgets, reason: 'the phases run to five years');
       expect(find.text('Talking'), findsWidgets);

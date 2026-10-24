@@ -86,7 +86,7 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'when_will',
-      label: 'When will my baby...',
+      label: 'Sit, crawl, walk', // was 'When will my baby...', cut off on its card (2026-10-24)
       icon: Icons.directions_walk_outlined,
       hue: 206,
       areaIds: ['when_will'],

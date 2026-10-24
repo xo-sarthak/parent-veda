@@ -174,7 +174,7 @@ void main() {
       expect(find.text('When the crying is too much'), findsOneWidget);
       // The toddler tabs are on the selector, locked, with the age they open.
       // 2026-10-07: tab label now English (was 'Tantrums and the ziddi years').
-      expect(find.text('Tantrums and the stubborn years'), findsWidgets);
+      expect(find.text('Tantrums'), findsWidgets);
       expect(find.text('Scared, shy or clingy'), findsWidgets);
       expect(find.textContaining('From 1 year'), findsNWidgets(4));
       expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(4), reason: 'one lock per locked card (the quiet rail, 2026-10-07)');
@@ -195,7 +195,7 @@ void main() {
       for (final t in door.tabs.skip(1)) {
         expect(find.text(t.label), findsWidgets, reason: t.id);
       }
-      expect(find.text('What to say when…'), findsOneWidget);
+      expect(find.text('What to say'), findsOneWidget);
       expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a child psychologist', the consult card (2026-10-21)
     });
 
