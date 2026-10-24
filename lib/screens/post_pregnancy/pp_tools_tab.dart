@@ -13,6 +13,11 @@
 //  surface router (`ppScreenForSurface`), so a tool reached from a door and
 //  from this tab is the same screen.
 //
+//  2026-10-24 (tools pass C1): eight door tools were reachable only from
+//  their doors. The user: "doors should not cover a new tool that isn't
+//  listed in tools section". They are listed now, and
+//  test/pp_tools_tab_test.dart fails if a door ever offers one this tab lacks.
+//
 //  Mobbin: a tracker row carries its latest entry ("Last feed 2h ago"), after
 //  Withings Health Mate (mobbin.com/screens/72f11245-eb96-405a-be2a-91b05ce7b01c)
 //  and Apple Health's All Health Data
@@ -98,6 +103,8 @@ List<PpToolGroup> ppToolGroups() {
           live: _lastFeed, words: ['feed', 'milk', 'bottle', 'breast', 'doodh']),
       PpTool('Sleep', 'Naps and nights, and the wake window.', 'pp_sleep', IntentMark.sunMark,
           live: _lastSleep, words: ['nap', 'night', 'neend']),
+      PpTool('Sleep Sounds', 'Sounds to help your baby settle.', 'pp_sleep_sounds', IntentMark.audioMark,
+          words: ['white noise', 'lullaby', 'lori']),
       PpTool('Nappies', 'Wet and dirty, the clearest sign milk is going in.', 'pp_nappies', IntentMark.checkMark,
           live: _nappies, words: ['diaper', 'poo', 'wee']),
       if (under1)
@@ -115,12 +122,18 @@ List<PpToolGroup> ppToolGroups() {
           live: _growth, words: ['weight', 'height', 'percentile']),
       PpTool('Vaccines', 'What is done, what is next, and the day it was given.', 'pp_vaccines',
           IntentMark.pillMark, live: () => VaxStore.instance.nextVisitSubtitle, words: ['shots', 'tika', 'vaccination']),
+      PpTool('Fever check', 'A temperature, checked calmly, and when to call.', 'pp_fever_check',
+          IntentMark.thermoMark, words: ['fever', 'temperature', 'bukhar']),
       PpTool('Is my baby OK?', 'A symptom, checked calmly, and when to call.', 'pp_baby_ok_check',
           IntentMark.questionMark, words: ['fever', 'sick', 'symptom']),
       PpTool('Health record', 'Visits, illnesses and papers in one place.', 'pp_health_home', IntentMark.reportPage,
           words: ['records', 'documents']),
+      PpTool('Before you see the doctor', 'Questions and notes to take to the visit.', 'pp_doctor_visit',
+          IntentMark.listMark, words: ['doctor', 'visit', 'questions', 'appointment']),
       PpTool('Emergency card', 'Blood group, allergies and two numbers to call.', 'pp_emergency_card',
           IntentMark.askDoctor, words: ['emergency', 'sos']),
+      PpTool('Home remedies', 'Kitchen remedies from the elders, marked honestly.', 'pp_nuskhe',
+          IntentMark.spoonMark, words: ['nuskhe', 'gharelu', 'remedy', 'ajwain']),
     ]),
     PpToolGroup('Growing and learning', 28, [
       PpTool("This month's checklist", 'What usually comes next, and what to try.', 'pp_month_checklist',
@@ -129,10 +142,20 @@ List<PpToolGroup> ppToolGroups() {
           words: ['development', 'rolling', 'walking']),
       PpTool('A gentle check-in', 'A few questions, and when to ask your paediatrician.', 'pp_dev_checkin',
           IntentMark.lampMark, words: ['delay', 'worry']),
+      // Named for where it lands: the door's "Things to do together today"
+      // opens every activity, not today's pick (tools pass R3, door label owed).
+      PpTool('Activities', "Play ideas for your baby's age, by area of growing.", 'pp_activities',
+          IntentMark.playMark, words: ['play', 'games', 'activity']),
+      PpTool("Your child's phases", 'What this phase is like, and what comes next.', 'pp_leaps',
+          IntentMark.moonMark, words: ['phase', 'leap', 'wonder weeks']),
       PpTool('Something changed?', 'Sleep, feeding or mood suddenly different.', 'pp_what_changed',
           IntentMark.nextStep, words: ['regression', 'leap', 'fussy']),
+      PpTool('What to say', 'Calm words for tantrums, hitting and big feelings.', 'pp_scripts',
+          IntentMark.bookMark, words: ['tantrum', 'hitting', 'scripts', 'discipline']),
     ]),
     PpToolGroup('Food', 96, [
+      PpTool('What to feed at this age', 'Portions and textures for this age, and signs of enough.', 'pp_food_chart',
+          IntentMark.plate, words: ['how much', 'portion', 'solids', 'enough']),
       PpTool('Can my baby eat this?', '289 foods, by age, with the reason.', 'pp_baby_food_check',
           IntentMark.forkMark, words: ['food', 'honey', 'egg', 'solids']),
       PpTool('Recipes', 'Indian home cooking for each age.', 'pp_food', IntentMark.cookMark,

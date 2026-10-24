@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/data/doors/pp_door_data.dart';
 import 'package:parentveda/screens/doors/pv_list_row.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_surface_router.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_tools_tab.dart';
@@ -20,6 +21,23 @@ void main() {
     for (final id in ids) {
       expect(ppScreenForSurface(id), isNotNull, reason: id);
     }
+  });
+
+  // The user, 2026-10-24 (tools pass C1): "doors should not cover a new tool
+  // that isn't listed in tools section". A door may show a tool; it may never
+  // be the only way to find it.
+  test('every door tool is also in the Tools tab', () {
+    final listed = {for (final g in ppToolGroups()) for (final t in g.tools) t.surfaceId};
+    bool allowed(String id) =>
+        id == 'pp_recos' || // a shop card, reached from Product guide; not a tool
+        id.startsWith('pp_what_changed/'); // the same checker, pre-filtered
+    final missing = {
+      for (final d in kPpDoors)
+        for (final tab in d.tabs)
+          for (final t in tab.tools)
+            if (!listed.contains(t.surfaceId) && !allowed(t.surfaceId)) '${d.sectionId}: ${t.surfaceId}',
+    };
+    expect(missing, isEmpty, reason: 'a door offers a tool the Tools tab does not list');
   });
 
   testWidgets('the TTC tab header, rows with drawn marks; 360 at 1.5x', (t) async {
