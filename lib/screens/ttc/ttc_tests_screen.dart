@@ -42,6 +42,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../ttc/ttc_lookup_reads.dart' show openTtcTestRead;
 import '../../ttc/ttc_tests_data.dart';
@@ -237,7 +238,8 @@ class _TtcTestsScreenState extends State<TtcTestsScreen> {
               PvRowGroup(p: p, children: [
                 TtcLookupActionRow(
                   key: const ValueKey('ttc_tests_ask_veda'),
-                  icon: Icons.auto_awesome_outlined,
+                  icon: Icons.auto_awesome_outlined, // under the mark; kept so the row API is unchanged
+                  mark: const AskVedaMark(size: 36), // the Ask Veda mark replaces the tinted tile (2026-10-24)
                   label: 'Ask Veda: "$q"',
                   hue: kIvfHue,
                   onTap: () => openTtcAskVeda(context, initialQuery: q),

@@ -7,6 +7,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../ask_veda/ask_veda_mark.dart';
 
 import '../data/can_i_data.dart';
 import '../data/product_data.dart';
@@ -253,7 +254,11 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         child: Text(emoji, style: const TextStyle(fontSize: 20)),
       );
 
-  Widget _leadIcon(IconData icon) => Container(
+  // The Ask Veda destination draws its mark (2026-10-24); it is the one
+  // destination with the sparkle, so the icon picks it out.
+  Widget _leadIcon(IconData icon) => icon == Icons.auto_awesome_rounded
+      ? const AskVedaMark(size: 40)
+      : Container(
         width: 40,
         height: 40,
         alignment: Alignment.center,

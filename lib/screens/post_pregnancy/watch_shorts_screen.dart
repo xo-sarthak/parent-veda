@@ -11,6 +11,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import 'pp_common.dart';
 import 'pp_expert_link.dart';
@@ -205,6 +206,10 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Column(children: [
+          // The Ask Veda row draws the Ask Veda mark (2026-10-24).
+          if (label == 'Ask Veda')
+            const AskVedaMark(size: 46)
+          else
           Container(
             width: 46,
             height: 46,

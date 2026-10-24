@@ -49,6 +49,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../ask_veda/ask_veda_mark.dart';
 
 import '../brand/brand_models.dart';
 import '../brand/launch_spotlight.dart';
@@ -358,7 +359,10 @@ class HomeFocusScreen extends StatelessWidget {
           mark: V2Mark.ask,
         tint: v2BlockTint(V2BlockHues.ask, p),
         icon: Icons.auto_awesome_rounded,
-        asset: 'assets/blocks/block_ask.png',
+        asset: 'assets/blocks/block_ask.png', // no longer reached; kept for revert
+        // The Ask Veda mark, the same as the FAB's (2026-10-24); it wins over
+        // the pebbles, the asset and the sparkle above.
+        art: const FittedBox(child: AskVedaMark(size: 64)),
         // Routes through the FAB's own three-way stage decision rather than a
         // second copy of it.
         onTap: () => openAskVeda(pregnancy),

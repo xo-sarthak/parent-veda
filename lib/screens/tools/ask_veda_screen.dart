@@ -22,6 +22,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../ask_veda/pv_veda_reveal.dart';
@@ -376,7 +377,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             icon: const Icon(Icons.arrow_back_rounded, size: 22, color: _vInk),
           ),
           const SizedBox(width: 2),
-          const Icon(Icons.auto_awesome_rounded, size: 17, color: _vCoral),
+          const AskVedaMark(size: 17), // was const Icon(Icons.auto_awesome_rounded, size: 17, color: _vCoral) (Ask Veda mark, 2026-10-24)
           const SizedBox(width: 7),
           Expanded(
             child: Text('Ask Veda',
@@ -769,7 +770,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
+            const AskVedaMark(size: 20), // was const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2) (Ask Veda mark, 2026-10-24)
             const SizedBox(width: 9),
             Text(s.vedaAnswerLabel, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: _vInk)),
             const Spacer(),
@@ -1435,7 +1436,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (sc.urgent) _urgentBanner(s),
           Row(children: [
-            const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
+            const AskVedaMark(size: 20), // was const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2) (Ask Veda mark, 2026-10-24)
             const SizedBox(width: 9),
             Text(s.vedaAnswerLabel,
                 style: pvManrope(
@@ -2023,7 +2024,7 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             colors: [Colors.white, Color(0xFFFDFCFD)]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2),
+            const AskVedaMark(size: 20), // was const Icon(Icons.auto_awesome_rounded, size: 20, color: _vPurple2) (Ask Veda mark, 2026-10-24)
             const SizedBox(width: 9),
             Text(s.vedaAnswerLabel,
                 style: pvManrope(

@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../ask_veda/ask_veda_mark.dart';
 
 import '../data/garbh_data.dart';
 import '../data/garbh_sheet.dart' show garbhSheetDay;
@@ -741,7 +742,7 @@ class _LearnMore extends StatelessWidget {
         onPressed: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => AskVedaScreen(controller: controller),
         )),
-        icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+        icon: const AskVedaMark(size: 16), // was const Icon(Icons.auto_awesome_rounded, size: 16) (Ask Veda mark, 2026-10-24)
         label: Text(s.gsLearnMore),
       ),
     );

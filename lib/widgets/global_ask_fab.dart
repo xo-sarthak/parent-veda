@@ -14,6 +14,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../ask_veda/ask_veda_mark.dart';
 import 'pv_feedback.dart';
 
 import '../screens/post_pregnancy/askveda_screen.dart' as pp;
@@ -263,6 +264,10 @@ class FabRouteObserver extends NavigatorObserver {
             // list, the keepsake's end line and the locked panel.
             name.startsWith('sk_') ||
             name.startsWith('sk/') ||
+            // The skilling HOME, too (2026-10-24, STAGE-TRANSITIONS B7): its
+            // route is plain 'skilling', so the two prefixes above missed it
+            // and the button sat on that home opening PREGNANCY Ask Veda.
+            name == 'skilling' ||
             // The store's transactional screens: a commit bar owns the bottom
             // (bag, checkout, the placed screen) or the photo owns the whole
             // screen (zoom). Seen on the phone 2026-09-17: the pill sat on
@@ -421,30 +426,43 @@ class GlobalAskFab extends StatelessWidget {
               width: kAskFabSize,
               height: kAskFabSize,
               alignment: Alignment.center,
-              // ⚠️ THE ONE BLACK ON TRYING TO CONCEIVE (2026-09-30): the stage's
-              // rule since 2026-09-29 is one black for everything pressable,
-              // never violet, so the violet disc would be the one purple thing
-              // on the stage. The other stages keep the violet above.
-              decoration: FabState.instance.inTtc
-                  ? const BoxDecoration(
-                      color: Color(0xFF2F2C30),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(color: Color(0x402F2C30), blurRadius: 16, spreadRadius: -2, offset: Offset(0, 7)),
-                      ],
-                    )
-                  : const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF7B47CC), Color(0xFF5526A0)],
-                ),
+              // THE AURORA MARK IS THE BUTTON (2026-10-24): the sphere is its own
+              // shape, so it replaces the disc on every stage, TTC included; the
+              // TTC one-black rule covers what is pressable in the chrome, and the
+              // Ask Veda mark is the one deliberate exception. The shadow stays so
+              // it still floats. Kept for revert: the disc decorations and the sparkle
+              // below.
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
-                  BoxShadow(color: Color(0x4D5526A0), blurRadius: 18, spreadRadius: -2, offset: Offset(0, 8)),
+                  BoxShadow(color: Color(0x4D5B3FE0), blurRadius: 18, spreadRadius: -2, offset: Offset(0, 8)),
                 ],
               ),
-              child: const Icon(Icons.auto_awesome_rounded, size: 24, color: Colors.white),
+              child: const AskVedaMark(size: kAskFabSize),
+              // // ⚠️ THE ONE BLACK ON TRYING TO CONCEIVE (2026-09-30): the stage's
+              // // rule since 2026-09-29 is one black for everything pressable,
+              // // never violet, so the violet disc would be the one purple thing
+              // // on the stage. The other stages keep the violet above.
+              // decoration: FabState.instance.inTtc
+              //     ? const BoxDecoration(
+              //         color: Color(0xFF2F2C30),
+              //         shape: BoxShape.circle,
+              //         boxShadow: [
+              //           BoxShadow(color: Color(0x402F2C30), blurRadius: 16, spreadRadius: -2, offset: Offset(0, 7)),
+              //         ],
+              //       )
+              //     : const BoxDecoration(
+              //   gradient: LinearGradient(
+              //     begin: Alignment.topLeft,
+              //     end: Alignment.bottomRight,
+              //     colors: [Color(0xFF7B47CC), Color(0xFF5526A0)],
+              //   ),
+              //   shape: BoxShape.circle,
+              //   boxShadow: [
+              //     BoxShadow(color: Color(0x4D5526A0), blurRadius: 18, spreadRadius: -2, offset: Offset(0, 8)),
+              //   ],
+              // ),
+              // child: const Icon(Icons.auto_awesome_rounded, size: 24, color: Colors.white),
             ),
           ),
         ),

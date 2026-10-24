@@ -22,6 +22,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../brand/brand_models.dart';
 import '../../brand/outbound.dart';
@@ -570,7 +571,7 @@ class ProductGuideScreenClassic extends StatelessWidget {
             border: Border.all(color: pgPurple.withValues(alpha: 0.20)),
           ),
           child: Row(children: [
-            const Icon(Icons.auto_awesome_rounded, size: 18, color: pgPurple),
+            const AskVedaMark(size: 18), // was const Icon(Icons.auto_awesome_rounded, size: 18, color: pgPurple) (Ask Veda mark, 2026-10-24)
             const SizedBox(width: 11),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

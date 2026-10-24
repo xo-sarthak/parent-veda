@@ -10,6 +10,7 @@
 
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_nav_bar.dart';
@@ -864,7 +865,7 @@ void ppFaqSheet(BuildContext context, String question) {
               },
               behavior: HitTestBehavior.opaque,
               child: Row(children: [
-                const Icon(Icons.auto_awesome_outlined, size: 16, color: ppPurple),
+                const AskVedaMark(size: 16), // was const Icon(Icons.auto_awesome_outlined, size: 16, color: ppPurple) (Ask Veda mark, 2026-10-24)
                 const SizedBox(width: 8),
                 Flexible(child: Text('Ask a follow-up in Ask Veda', style: ppBody(13, color: ppPurple, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 const SizedBox(width: 6),

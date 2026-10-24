@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import 'pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
@@ -75,7 +76,7 @@ class PpAskVedaFab extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [BoxShadow(color: Color(0x8C6A30B6), blurRadius: 22, spreadRadius: -6, offset: Offset(0, 10))],
             ),
-            child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
+            child: const AskVedaMark(size: 56), // was const Icon(Icons.auto_awesome, size: 24, color: Colors.white) (Ask Veda mark, 2026-10-24; this FAB is unused)
           ),
         )),
       );

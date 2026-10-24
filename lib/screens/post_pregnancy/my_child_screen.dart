@@ -13,6 +13,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../theme/pv_fonts.dart';
 
@@ -1836,13 +1837,16 @@ class _MyChildScreenState extends State<MyChildScreen> {
           child: Padding(
             padding: const EdgeInsets.only(top: 12),
             child: Row(children: [
-              Container(
-                width: 34,
-                height: 34,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: ppPurple.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(11)),
-                child: const Icon(Icons.auto_awesome_rounded, size: 17, color: ppPurple),
-              ),
+              // The Ask Veda mark is its own shape, so it replaces the tinted tile
+              // (2026-10-24). Kept for revert:
+              // Container(
+              //   width: 34,
+              //   height: 34,
+              //   alignment: Alignment.center,
+              //   decoration: BoxDecoration(color: ppPurple.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(11)),
+              //   child: const Icon(Icons.auto_awesome_rounded, size: 17, color: ppPurple),
+              // ),
+              const AskVedaMark(size: 34),
               const SizedBox(width: 12),
               Expanded(
                 child: Text('Ask Veda anything else',

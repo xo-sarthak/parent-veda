@@ -315,13 +315,18 @@ class PvLiveSearchWayOn extends StatelessWidget {
   const PvLiveSearchWayOn({
     super.key,
     required this.p,
-    required this.icon,
+    this.icon,
     required this.title,
     required this.line,
     required this.onTap,
-  });
+    this.mark,
+  }) : assert(icon != null || mark != null);
   final V2Palette p;
-  final IconData icon;
+  final IconData? icon;
+
+  /// A drawn mark in place of [icon]: the Ask Veda rows pass `AskVedaMark`
+  /// (2026-10-24). Was `icon` only.
+  final Widget? mark;
   final String title;
   final String line;
   final VoidCallback onTap;
@@ -337,7 +342,7 @@ class PvLiveSearchWayOn extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
               child: Row(children: [
-                Icon(icon, size: 20, color: p.ink1),
+                mark ?? Icon(icon, size: 20, color: p.ink1),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

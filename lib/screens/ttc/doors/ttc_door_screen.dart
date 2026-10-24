@@ -97,6 +97,7 @@ import '../../../ttc/ttc_age_rank.dart'
 // The door opens on where she is (global pass item 13, 2026-10-23).
 import '../../../ttc/ttc_phase_rank.dart';
 import 'package:flutter/material.dart';
+import '../../../ask_veda/ask_veda_mark.dart';
 
 import '../../../localization/app_language.dart';
 import '../../../models/bracket.dart';
@@ -1854,7 +1855,7 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
       pvDoorPad(
         PvLiveSearchWayOn(
           p: p,
-          icon: Icons.auto_awesome_outlined,
+          mark: const AskVedaMark(size: 20), // was icon: Icons.auto_awesome_outlined (Ask Veda mark, 2026-10-24)
           title: 'Ask Veda about "$q"',
           line: 'Ask in your own words and get a calm answer.',
           onTap: () {

@@ -8,6 +8,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../ask_veda/ask_veda_mark.dart';
 
 import '../localization/app_language.dart';
 import '../services/family_profile.dart';
@@ -271,7 +272,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
           _Tool(s.vedaToolTitle, Icons.auto_awesome_outlined, AppTheme.neutral900,
               () => _open(kAskVedaRoute, () => AskVedaScreen(controller: controller)),
               line: 'Ask anything, in your own words',
-              mark: IntentMark.askDoctor),
+              mark: IntentMark.askDoctor,
+              // The Ask Veda mark, not the two bubbles (2026-10-24).
+              leading: const AskVedaMark(size: 44)),
         ]),
         // The two workbenches the grid carried, debug builds only, as before.
         if (kDebugMode)
@@ -390,7 +393,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
         // TTC Tools rows draw theirs (`TtcToolMarkLeading`). A tool with no
         // such mark (the debug rows) keeps its well. Kept for revert:
         // `PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark)`.
-        leading: ttcFamilyMarkForIntent(t.mark, v2BlockTint(hue % 360, p)) ??
+        leading: t.leading ??
+            ttcFamilyMarkForIntent(t.mark, v2BlockTint(hue % 360, p)) ??
             (t.mark != null
                 ? PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark)
                 : PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon)),
@@ -422,7 +426,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
       const SizedBox(height: 14),
       _pad(PvLiveSearchWayOn(
         p: p,
-        icon: Icons.auto_awesome_outlined,
+        mark: const AskVedaMark(size: 20), // was icon: Icons.auto_awesome_outlined (Ask Veda mark, 2026-10-24)
         title: 'Ask Veda about "$q"',
         line: 'In your own words, with your week in mind.',
         onTap: () {
@@ -693,6 +697,7 @@ class ToolsHubScreenClassic extends StatelessWidget {
         Icons.auto_awesome_rounded,
         AppTheme.neutral900,
         () => open(() => AskVedaScreen(controller: controller)),
+        leading: const AskVedaMark(size: 46), // the Ask Veda mark (2026-10-24)
       ),
       // Father's "Stories, Fables & Mythology" removed (the feature was retired
       // from the father product). Kept commented for revert.
@@ -876,16 +881,17 @@ class ToolsHubScreenClassic extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 46,
-            height: 46,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: t.color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(t.icon, color: t.color, size: 24),
-          ),
+          t.leading ??
+              Container(
+                width: 46,
+                height: 46,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: t.color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(t.icon, color: t.color, size: 24),
+              ),
           const SizedBox(height: 12),
           Text(
             t.title,
@@ -975,8 +981,13 @@ class _Tool {
     this.staleDueDate = false,
     this.line,
     this.mark,
+    this.leading,
   });
   final String title;
+
+  /// A ready-made leading widget that wins over [mark] and [icon]: the Ask Veda
+  /// tile passes `AskVedaMark` (2026-10-24).
+  final Widget? leading;
 
   /// The tool's drawn mark (2026-09-30): the object on its row, and the same one
   /// above the title on its front page. Marks, not Material glyphs, for rows that

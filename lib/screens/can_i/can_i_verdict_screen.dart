@@ -32,6 +32,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../data/can_i_data.dart';
 import '../../data/can_i_groups.dart';
@@ -268,7 +269,7 @@ class CanIVerdictScreen extends StatelessWidget {
                                 controller: controller, initialQuery: 'Is ${e.name.en} safe in pregnancy?'),
                           ));
                         },
-                        icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+                        icon: const AskVedaMark(size: 18), // was const Icon(Icons.auto_awesome_outlined, size: 18) (Ask Veda mark, 2026-10-24)
                         label: const Text('Ask Veda'),
                         style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
                       ),

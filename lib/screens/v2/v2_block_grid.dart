@@ -44,7 +44,12 @@ class V2Block {
     this.bracketMark,
     this.skillMark,
     this.onTap,
+    this.art,
   });
+
+  /// A ready-made picture that wins over every mark and asset below: the Ask
+  /// block passes `AskVedaMark` (2026-10-24).
+  final Widget? art;
 
   /// THE GROUND THE OBJECT SITS ON, and the single change that made this grid
   /// stop looking unfinished.
@@ -224,7 +229,7 @@ class _Tile extends StatelessWidget {
                           : V2BlockArtMode.instance.vector
                               ? 10
                               : 6),
-                  child: block.skillMark != null
+                  child: block.art ?? (block.skillMark != null
                       ? V3SkillArt(mark: block.skillMark!, tint: block.tint)
                       : block.bracketMark != null
                       ? V3BracketArt(
@@ -242,7 +247,7 @@ class _Tile extends StatelessWidget {
                               // A missing asset must not take the screen down
                               // with it.
                               errorBuilder: (_, _, _) => _icon())
-                          : _icon(),
+                          : _icon()),
                 ),
               ),
             ),

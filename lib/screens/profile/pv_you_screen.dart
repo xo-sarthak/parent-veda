@@ -33,6 +33,7 @@
 import '../../services/remote/sync_registry.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart' show launchUrl;
@@ -2453,6 +2454,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
       return m == null ? row : row.withLeading(art(m));
     }
     if (row is PvYouSwitchRow) {
+      // A row that brings its own mark keeps it (the Ask Veda mark, 2026-10-24).
+      if (row.leading != null) return row;
       final m = _settingsMarkFor(row.title);
       return m == null ? row : row.withLeading(art(m));
     }
@@ -2557,7 +2560,10 @@ class _PvYouScreenState extends State<PvYouScreen> {
             listenable: FabState.instance,
             builder: (context, _) => m(PvYouSwitchRow(
               key: const ValueKey('pv_settings_ask_veda_button'),
-              icon: Icons.auto_awesome_outlined,
+              icon: Icons.auto_awesome_outlined, // under the mark; kept so the row's API is unchanged
+              // The button's own mark, so the switch shows what it hides
+              // (2026-10-24). Was the drawn bubble via `_settingsMarkFor`.
+              leading: const Center(child: AskVedaMark(size: 30)),
               title: 'Ask Veda button',
               subtitle: 'The round button at the bottom right of every screen',
               value: !FabState.instance.hiddenByHer,

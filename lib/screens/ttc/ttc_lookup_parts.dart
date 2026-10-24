@@ -276,6 +276,7 @@ class TtcLookupActionRow extends StatelessWidget {
     required this.onTap,
     this.line,
     this.hue = 104,
+    this.mark,
   });
 
   final IconData icon;
@@ -284,6 +285,10 @@ class TtcLookupActionRow extends StatelessWidget {
   final VoidCallback onTap;
   final double hue;
 
+  /// A drawn mark that replaces the tinted icon tile: the Ask Veda row passes
+  /// `AskVedaMark` (2026-10-24).
+  final Widget? mark;
+
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
@@ -291,7 +296,7 @@ class TtcLookupActionRow extends StatelessWidget {
     return TtcLookupRow(
       title: label,
       onTap: onTap,
-      leading: Container(
+      leading: mark ?? Container(
         width: 36,
         height: 36,
         decoration: BoxDecoration(

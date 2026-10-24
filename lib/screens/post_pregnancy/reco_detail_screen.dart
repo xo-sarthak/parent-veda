@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import 'development_activity_screen.dart';
 import 'pp_child_profile.dart';
@@ -315,7 +316,7 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
           child: Row(children: [
-            const Icon(Icons.auto_awesome_outlined, size: 17, color: ppPurple),
+            const AskVedaMark(size: 17), // was const Icon(Icons.auto_awesome_outlined, size: 17, color: ppPurple) (Ask Veda mark, 2026-10-24)
             const SizedBox(width: 11),
             Expanded(child: Text(q, style: ppBody(13, color: ppInk, h: 1.4))),
             const Icon(Icons.chevron_right_rounded, size: 18, color: ppMuted),

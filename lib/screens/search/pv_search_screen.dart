@@ -30,6 +30,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../data/doors/pv_door_data.dart';
 import '../../models/bracket.dart';
@@ -626,7 +627,7 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
                 child: Row(children: [
-                  Icon(Icons.auto_awesome_outlined, size: 20, color: p.ink1),
+                  const AskVedaMark(size: 20), // was Icon(Icons.auto_awesome_outlined, size: 20, color: p.ink1) (Ask Veda mark, 2026-10-24)
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

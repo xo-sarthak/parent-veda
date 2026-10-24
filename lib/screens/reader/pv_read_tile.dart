@@ -35,6 +35,7 @@ class PvReadTile extends StatelessWidget {
     this.imageUrl,
     this.chip,
     this.icon,
+    this.mark,
   });
 
   final SolutionType type;
@@ -43,6 +44,11 @@ class PvReadTile extends StatelessWidget {
   final String? imageUrl;
   final String? chip;
   final IconData? icon;
+
+  /// A drawn mark at a given size, in place of [icon] in both spots (the
+  /// watermark and the chip): an Ask Veda step passes `AskVedaMark`
+  /// (2026-10-24).
+  final Widget Function(double size)? mark;
   final AppLanguage lang;
   final VoidCallback onTap;
 
@@ -85,8 +91,10 @@ class PvReadTile extends StatelessWidget {
             Positioned(
               right: -22,
               bottom: -14,
-              child: Icon(icon ?? type.icon,
-                  size: 108, color: Colors.white.withValues(alpha: 0.42)),
+              child: mark != null
+                  ? Opacity(opacity: 0.55, child: mark!(108))
+                  : Icon(icon ?? type.icon,
+                      size: 108, color: Colors.white.withValues(alpha: 0.42)),
             ),
           if (photo)
             Positioned.fill(
@@ -117,7 +125,7 @@ class PvReadTile extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(icon ?? type.icon, size: 10, color: deep),
+                      mark?.call(11) ?? Icon(icon ?? type.icon, size: 10, color: deep),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(chip ?? type.chip(lang),

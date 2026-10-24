@@ -78,6 +78,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../localization/app_language.dart';
@@ -1361,7 +1362,7 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
       const SizedBox(height: 12),
       _pad(PvLiveSearchWayOn(
         p: p,
-        icon: Icons.auto_awesome_outlined,
+        mark: const AskVedaMark(size: 20), // was icon: Icons.auto_awesome_outlined (Ask Veda mark, 2026-10-24)
         title: t.learnAskVeda(q),
         line: t.learnAskVedaLine,
         onTap: () => _askVeda(q),

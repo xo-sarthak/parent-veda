@@ -47,6 +47,7 @@
 
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../data/doors/pv_door_data.dart';
 import '../../models/bracket.dart';
@@ -1099,7 +1100,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
       pvDoorPad(
         PvLiveSearchWayOn(
           p: p,
-          icon: Icons.auto_awesome_outlined,
+          mark: const AskVedaMark(size: 20), // was icon: Icons.auto_awesome_outlined (Ask Veda mark, 2026-10-24)
           title: 'Ask Veda about "$q"',
           line: 'In your own words, with your week in mind.',
           onTap: () {

@@ -33,6 +33,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../data/doors/pp_door_data.dart';
 import '../../services/bracket_resolver.dart';
@@ -526,7 +527,7 @@ class _PpSearchScreenState extends State<PpSearchScreen> {
                         const SizedBox(height: 14),
                         pad(PvLiveSearchWayOn(
                           p: p,
-                          icon: Icons.auto_awesome_outlined,
+                          mark: const AskVedaMark(size: 20), // was icon: Icons.auto_awesome_outlined (Ask Veda mark, 2026-10-24)
                           title: 'Ask Veda about "$q"',
                           line: 'In your own words, with your child\'s age in mind.',
                           onTap: () {

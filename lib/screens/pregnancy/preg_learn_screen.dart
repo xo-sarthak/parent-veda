@@ -43,6 +43,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/brackets/pregnancy_brackets.dart';
@@ -761,7 +762,7 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
       const SizedBox(height: 12),
       _pad(PvLiveSearchWayOn(
         p: p,
-        icon: Icons.auto_awesome_outlined,
+        mark: const AskVedaMark(size: 20), // was icon: Icons.auto_awesome_outlined (Ask Veda mark, 2026-10-24)
         title: 'Ask Veda about "$q"',
         line: 'An answer from what we have written',
         onTap: () => _askVeda(q),

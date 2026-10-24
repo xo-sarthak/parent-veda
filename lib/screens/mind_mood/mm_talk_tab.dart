@@ -26,6 +26,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../data/mind_mood_data.dart';
 import '../../services/pregnancy_controller.dart';
@@ -139,7 +140,8 @@ class _AskVedaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tint = v2BlockTint(268, p);
+    // Only the tile below read this; kept for revert with it (2026-10-24).
+    // final tint = v2BlockTint(268, p);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -149,14 +151,17 @@ class _AskVedaCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(
-            width: 38,
-            height: 38,
-            alignment: Alignment.center,
-            decoration:
-                BoxDecoration(color: tint, borderRadius: BorderRadius.circular(11)),
-            child: Icon(Icons.auto_awesome_rounded, size: 18, color: p.ink1),
-          ),
+          // The Ask Veda mark is its own shape, so it replaces the tinted tile
+          // (2026-10-24). Kept for revert:
+          // Container(
+          //   width: 38,
+          //   height: 38,
+          //   alignment: Alignment.center,
+          //   decoration:
+          //       BoxDecoration(color: tint, borderRadius: BorderRadius.circular(11)),
+          //   child: Icon(Icons.auto_awesome_rounded, size: 18, color: p.ink1),
+          // ),
+          const AskVedaMark(size: 38),
           const SizedBox(width: 11),
           Expanded(
             child: Text('Ask a gentle question',

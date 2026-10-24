@@ -20,6 +20,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_chapter_data.dart';
@@ -387,7 +388,7 @@ class _AskVedaCard extends StatelessWidget {
     return TtcCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(Icons.auto_awesome_outlined, size: 17, color: ttcTitleInk),
+          const AskVedaMark(size: 17), // was const Icon(Icons.auto_awesome_outlined, size: 17, color: ttcTitleInk) (Ask Veda mark, 2026-10-24)
           const SizedBox(width: 9),
           Expanded(child: Text(t.chapterAskVeda, style: ttcJakarta(16))),
         ]),

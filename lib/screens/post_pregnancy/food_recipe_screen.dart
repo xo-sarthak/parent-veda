@@ -9,6 +9,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import 'article_reader_screen.dart';
 import 'food_common.dart';
@@ -650,7 +651,10 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: ppHair)),
             child: Row(children: [
-              Container(width: 38, height: 38, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: Icon(row.$1, size: 18, color: ppPurple)),
+              // The Ask Veda row draws the Ask Veda mark (2026-10-24).
+              row.$2 == 'Ask Veda'
+                  ? const AskVedaMark(size: 38)
+                  : Container(width: 38, height: 38, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(11)), child: Icon(row.$1, size: 18, color: ppPurple)),
               const SizedBox(width: 13),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -806,13 +810,16 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: p.line)),
               child: Row(children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(11)),
-                  child: Icon(row.$1, size: 18, color: p.ink1),
-                ),
+                // The Ask Veda row draws the Ask Veda mark (2026-10-24).
+                row.$2 == 'Ask Veda'
+                    ? const AskVedaMark(size: 38)
+                    : Container(
+                        width: 38,
+                        height: 38,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(11)),
+                        child: Icon(row.$1, size: 18, color: p.ink1),
+                      ),
                 const SizedBox(width: 13),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

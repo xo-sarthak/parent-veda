@@ -77,6 +77,7 @@ import '../../ttc/ttc_fertility_help_store.dart' show TtcFertilityHelpStore;
 import 'ttc_intro_flow.dart' show openTtcIntroFilm, ttcIntroVideoSlotId;
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../data/reads/read_images.dart' show readImageFor, pvFilmStillFor;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -1548,7 +1549,7 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
       const SizedBox(height: 12),
       _pad(PvLiveSearchWayOn(
         p: p,
-        icon: Icons.auto_awesome_outlined,
+        mark: const AskVedaMark(size: 20), // was icon: Icons.auto_awesome_outlined (Ask Veda mark, 2026-10-24)
         title: t.learnAskVeda(q),
         line: t.learnAskVedaLine,
         onTap: () => _askVeda(q),

@@ -17,6 +17,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../ask_veda/pv_veda_reveal.dart';
@@ -236,7 +237,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
             child: const Icon(Icons.arrow_back_rounded, size: 22, color: ttcInk),
           )),
           const SizedBox(width: 12),
-          const Icon(Icons.auto_awesome_rounded, size: 17, color: ttcCoral),
+          const AskVedaMark(size: 17), // was const Icon(Icons.auto_awesome_rounded, size: 17, color: ttcCoral) (Ask Veda mark, 2026-10-24)
           const SizedBox(width: 7),
           Text('Ask Veda', style: ttcFraunces(21, w: FontWeight.w600)),
         ]),
@@ -344,8 +345,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
           TtcCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                const Icon(Icons.auto_awesome_outlined,
-                    size: 17, color: ttcTitleInk),
+                const AskVedaMark(size: 17), // was const Icon(Icons.auto_awesome_outlined, size: 17, color: ttcTitleInk) (Ask Veda mark, 2026-10-24)
                 const SizedBox(width: 9),
                 Expanded(
                     child: Text(_chapterTitle(chapter, t), style: ttcJakarta(16))),
@@ -407,8 +407,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
               child: Row(children: [
-                const Icon(Icons.auto_awesome_rounded,
-                    size: 17, color: Colors.white),
+                const AskVedaMark(size: 17), // was const Icon(Icons.auto_awesome_rounded, size: 17, color: Colors.white) (Ask Veda mark, 2026-10-24)
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text('Ask Veda: "$q"',
@@ -716,7 +715,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
   Widget _answerCard(String answer, TtcS t) => TtcCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.auto_awesome_rounded, size: 18, color: ttcTitleInk),
+            const AskVedaMark(size: 18), // was const Icon(Icons.auto_awesome_rounded, size: 18, color: ttcTitleInk) (Ask Veda mark, 2026-10-24)
             const SizedBox(width: 9),
             Text(t.hinglish ? 'Veda ka jawaab' : "Veda's answer",
                 style: ttcJakarta(15.5)),

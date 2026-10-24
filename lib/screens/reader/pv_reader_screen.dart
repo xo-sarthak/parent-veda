@@ -45,6 +45,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 import '../../data/learn/pv_learn_view.dart' show PvOfferingView;
 import 'pv_read_offer.dart';
 
@@ -1798,6 +1799,8 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       // An Ask Veda step says so on its chip (2026-09-19).
       chip: n.kind == PvNextKind.ask ? 'ASK VEDA' : null,
       icon: n.kind == PvNextKind.ask ? Icons.auto_awesome_outlined : null,
+      // The Ask Veda mark in place of the sparkle (2026-10-24).
+      mark: n.kind == PvNextKind.ask ? (s) => AskVedaMark(size: s) : null,
       title: n.title.of(_lang),
       value: n.value.of(_lang),
       onTap: () {
@@ -1820,6 +1823,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     String? imageUrl,
     String? chip,
     IconData? icon,
+    Widget Function(double size)? mark,
     required VoidCallback onTap,
   }) {
     // Moved whole to `pv_read_tile.dart` (2026-10-01) so every screen that
@@ -1831,6 +1835,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       imageUrl: imageUrl,
       chip: chip,
       icon: icon,
+      mark: mark,
       lang: _lang,
       onTap: onTap,
     );

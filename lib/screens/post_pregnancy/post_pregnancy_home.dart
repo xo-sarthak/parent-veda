@@ -12,6 +12,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 import 'pp_child_profile.dart';
 import 'pp_growth_data.dart';
 
@@ -456,7 +457,8 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         _pad(_sectionHeader('Quick actions')),
         const SizedBox(height: 14),
         _pad(Row(children: [
-          _qa(Icons.auto_awesome_outlined, 'Ask Veda', () => openPpTab(context, 1)),
+          _qa(Icons.auto_awesome_outlined, 'Ask Veda', () => openPpTab(context, 1),
+              mark: const AskVedaMark(size: 54)), // the Ask Veda mark (2026-10-24)
           _qa(Icons.menu_book_outlined, 'Journal', () => _push(const PpJournalScreen()) /* was JournalV2Home (demo), kept for revert */),
           _qa(Icons.compare_arrows_rounded, 'Compare', () => _push(const ProductsCompareScreen())),
           // Was: _push(const HealthGuideScreen()) - now opens the Health ecosystem.
@@ -468,12 +470,12 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
         ])),
       ]);
 
-  Widget _qa(IconData icon, String label, VoidCallback onTap) => Expanded(
+  Widget _qa(IconData icon, String label, VoidCallback onTap, {Widget? mark}) => Expanded(
         child: PvPress(child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: Column(children: [
-            Container(width: 54, height: 54, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(17)), child: Icon(icon, size: 22, color: ppPurple)),
+            mark ?? Container(width: 54, height: 54, alignment: Alignment.center, decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(17)), child: Icon(icon, size: 22, color: ppPurple)),
             const SizedBox(height: 8),
             Text(label, style: ppBody(11, color: ppInk, w: FontWeight.w600)),
           ]),

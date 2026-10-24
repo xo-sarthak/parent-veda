@@ -20,6 +20,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
@@ -283,7 +284,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
       const SizedBox(height: 14),
       _pad(PvLiveSearchWayOn(
         p: p,
-        icon: Icons.auto_awesome_outlined,
+        mark: const AskVedaMark(size: 20), // was icon: Icons.auto_awesome_outlined (Ask Veda mark, 2026-10-24)
         title: 'Ask Veda about "$q"',
         line: 'In your own words, with your child\'s age in mind.',
         onTap: () {
