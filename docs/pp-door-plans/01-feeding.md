@@ -346,6 +346,8 @@ The next band always shows open as "Coming up next". So a 5-month-old's parent s
 
 ## 9. Decisions (answered by the user 2026-10-23)
 
+The user's own words, where recorded: D2, *"yes, D2 approved, go for Health"*, after asking for a plain phone-mockup look instead of a design canvas.
+
 | # | Question | Answer |
 |---|---|---|
 | D1 | Rename "Growing well" to "Eating and growing" | **Yes.** It must read at a single glance. |

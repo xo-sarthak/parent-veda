@@ -1,6 +1,6 @@
 # Door 2: Health, the plan
 
-Written 2026-10-23. **Status: H1 to H7 all answered YES by the user 2026-10-23.** The new pages are written in `02-health-content.md` (H6). The H2 age-rail look is drawn at `claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q` and waits on the user's verdict before any `lib/` edit.
+Written 2026-10-23. **Status: H1 to H7 all answered YES by the user 2026-10-23.** The new pages are written in `02-health-content.md` (H6). The H2 age-rail look is drawn at `claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q` and was APPROVED 2026-10-24 (version 4: emergency row on top, the age shelf next, the paediatrician row after that shelf). Plan final; build waits on step 0.
 The build waits on step 0 (`00-MASTER.md`, S1 to S7) and on the user's go.
 
 Files this plan touches:
@@ -443,12 +443,14 @@ Hand-offs (not Health's to write):
   - the forehead thermometer and emollient claims check
   - the H4 no-medicine rule
 
-## 9. Decisions (all answered YES by the user 2026-10-23, as recommended)
+## 9. Decisions (answered by the user 2026-10-23: "h1-h7 yes on all as u suggested")
 
-| # | Question | Answer |
+Every row was recommended Yes, and the user answered Yes.
+
+| # | Question | Your answer |
 |---|---|---|
 | H1 | Show "Due in N days" on the Vaccines tab card when a dose is within 14 days? | **Yes** |
-| H2 | A rail for her child's age first on "Something's wrong" (§2d)? | **Yes**, prototype first |
+| H2 | A rail for her child's age first on "Something's wrong" (§2d)? | **Yes**, prototype first. On the look: *"dont u think 2 emergency call outs are repetitive"*, then *"instead of these 2 callouts, rather have one and put the other below, not one after the other, so that the actual door content doesn't all go below"*. Changed to: emergency row on top, age shelf, then the paediatrician row. Look approved 2026-10-24: *"yes its looking fine"* (artifact v4) |
 | H3 | A "Baby first aid and CPR" class card at the very end of Get help now? | **Yes, at the end only** |
 | H4 | Health never sells or links to buy a medicine, supplement or ORS brand; equipment only? | **Yes** |
 | H5 | Add the 7 owed specialist categories with an invitation state, so pages can point at them before real profiles exist? | **Yes** |

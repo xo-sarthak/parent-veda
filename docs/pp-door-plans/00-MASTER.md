@@ -23,6 +23,7 @@ These need one shell fix each, not 14 separate fixes.
 | S5 | A page card with format VIDEO is labelled "Article". All ~190 parenting videos are placeholders. | `pp_door_screen.dart:~1622` | Label it Video, with an honest "coming soon". List every video owed in `DOOR-CONTENT-OWED.md`. |
 | S6 | No parenting words in the article-to-service matcher, and a page can show its own consult block plus the reader's offer (two pitches) | `pv_read_offer.dart:49-96` | Add parenting aliases (lactation, speech, sleep, child psychologist, physio). One pitch per page. Add a parenting case to `read_offer_coverage_test.dart`. |
 | S7 | No test covers what a parent sees first | — | `test/pp_doors_first_view_test.dart`: for each door and each age, the opening tab and first card fit the child, and action doors lead with an action. This is GLOBAL-CHANGES #15, owed for parenting. |
+| S8 | A tap that can't do anything says nothing. A shop link to a category we don't stock, a consult category with no people yet, a film still "coming soon", or a class not open for her week either does nothing or opens an empty screen, and she can't tell why. (User, 2026-10-24: "if some action is not able to take place due to unavailability, the user gets a toast, so the user can understand why a tap didn't work.") | every door's links, tools, offer cards, video slots | **No silent tap, anywhere.** Before opening, the tap checks the target is there. If it isn't, it shows one `pvToast` (`lib/widgets/pv_toast.dart`, `PvToastKind.info`) saying why, in plain words, and what happens next. Examples: "Postpartum belts aren't in the Store yet. We'll add them soon." "Our physios are joining soon. A gynaecologist can help today" with an action pill. "This film is being made." "This class opens after your six-week check." Each door's plan lists its unavailable targets and their toast words. Test: `pp_doors_first_view_test` taps every link, tool and offer on each door and fails if a tap produces neither a new route nor a toast. |
 
 **Reuse:**
 - `ppRelevanceOrder` (`pp_relevance.dart:160`)
@@ -88,7 +89,7 @@ A new door = a section + content + door file + test. Each one is its own plan.
 
 ## How we proceed
 1. **The user approves this master plan.**
-2. **Step 0, shared shell fixes S1–S7.** One small batch with Parenting tests. This comes first because every door depends on it.
+2. **Step 0, shared shell fixes S1–S8.** One small batch with Parenting tests. This comes first because every door depends on it.
 3. **Door 1, Feeding.** A full audit using the checklist above, then a written per-door plan, then the user's approval, then the build.
 4. **Doors 2–14**, the same way, one at a time.
 5. **Thin and missing doors:** the user decides.
