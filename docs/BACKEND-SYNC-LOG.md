@@ -1232,7 +1232,7 @@ keeps the id), `cloud_merged_store_test`, `pp_logs_merge_test`, `sync_guard_cont
 ## Step 16: every child's records read per child (B11)
 
 **Date:** 2026-10-25 (STAGE-TRANSITIONS B11, found building F3; the user: "do b11 as its holding incomplete").
-**Migration:** none. **Commit:** owed.
+**Migration:** none. **Commit:** `c70a791`.
 
 ### Why
 Step 15 made the five care logs read per child. The other five child stores did not: growth, documents and the
