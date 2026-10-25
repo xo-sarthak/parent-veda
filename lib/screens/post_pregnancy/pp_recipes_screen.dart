@@ -603,6 +603,7 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
             ? 0
             : foodCatalog.where((r) => !r.comfortOnly && matches(r)).length;
         final preset = _preset == null ? null : ppRecipePreset(_preset!, pool);
+        final presetDishes = preset?.$2 ?? const <FoodRecipe>[];
         // The six meal tiles, the ones with the most dishes for now first.
         final cats = [
           for (final cat in kBrowseCategories)
@@ -704,7 +705,10 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
                 pregToolPad(Text('None in this diet yet. Clear the filter to see every dish.',
                     style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
               else
-                _ppRecipeGrid(context, rank(preset.$2), key: const ValueKey('pp_recipes_preset_hits')),
+                // A named list rather than the record's second field inline: the
+                // identity scan reads a dollar-digit inside rank's parentheses
+                // as string interpolation (localized_identity_test).
+                _ppRecipeGrid(context, rank(presetDishes), key: const ValueKey('pp_recipes_preset_hits')),
               const SizedBox(height: 24),
             ] else ...[
               // ---- first view: today's pick, or "get ready" before solids ----

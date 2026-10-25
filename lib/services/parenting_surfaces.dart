@@ -56,6 +56,9 @@ final List<PpSurface> kPpSurfaces = [
   // ---- Feeding -------------------------------------------------------------
   PpSurface('pp_feeding', _t(en: 'Feeding journey', hi: 'दूध और खाने का सफ़र')),
   PpSurface('pp_food', _t(en: 'Food & recipes', hi: 'खाना और रेसिपी')),
+  // The hub's "Plan what my child eats" opens it (tools pass, Food, 2026-10-25).
+  // English in both slots: new copy is English (CLAUDE.md, 2026-08-27).
+  PpSurface('pp_food_chart', _t(en: 'What to feed at this age', hi: 'What to feed at this age')),
 
   // ---- Health --------------------------------------------------------------
   PpSurface('pp_health', _t(en: 'Health record', hi: 'सेहत का रिकॉर्ड')),
