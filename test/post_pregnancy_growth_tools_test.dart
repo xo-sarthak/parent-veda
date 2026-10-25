@@ -55,7 +55,9 @@ void main() {
 
     expect(find.text('Sleep journey'), findsOneWidget);
 
-    final log = find.text('Log sleep');
+    // The button became "Log a sleep from earlier" when Asleep now led the
+    // page (tools pass 05, b11b2ec); same key. Was: find.text('Log sleep').
+    final log = find.byKey(const ValueKey('pp_sleep_log'));
     await tester.ensureVisible(log);
     await tester.tap(log);
     await tester.pumpAndSettle();

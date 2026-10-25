@@ -9,6 +9,16 @@
 //  *explanation*, the ParentVeda interpretation, AI insights, a measurement
 //  timeline and an effortless Add-measurement sheet. Reads GrowthStore. Replaces
 //  the older light HealthGrowthScreen (kept for revert).
+//
+//  WAVE 3 (2026-10-25): the add sheet checks the numbers before saving
+//  (weight 0.3-40 kg, length 30-130 cm, head 25-60 cm), and a weight over 100
+//  is read as grams ("Did you mean 3.4 kg?"), because a typo saved here lands
+//  on the WHO curve and in the doctor summary. A save says what it saved; a
+//  history row opens the same sheet to edit it; a removal has Undo. The sheet
+//  is off the old purple kit, on the palette the shell uses. Edit and Undo
+//  need no store change: the ledger's `touch` clears a removal, so removing a
+//  row and adding it back with the same id is the same row coming back, and
+//  the cloud copy follows (newer stamp wins).
 // =============================================================================
 
 import 'dart:math' as math;
@@ -26,12 +36,36 @@ import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
 import '../v2/v2_palette.dart';
-import 'pp_care_parts.dart' show ppCareHeading, ppCareChoices;
+import 'pp_care_parts.dart' show ppCareHeading, ppCareChoices, ppCareSaved;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
 
 /// The shared tool shell for Growth (2026-10-07). False draws the old page.
 const bool kPpGrowthShell = true;
+
+/// "6,4" and "6.4" both read as 6.4; empty is null.
+double? ppGrowthParse(String s) {
+  final t = s.trim().replaceAll(',', '.');
+  return t.isEmpty ? null : double.tryParse(t);
+}
+
+/// What is wrong with a measurement, in one calm sentence, or null when it
+/// can be saved. Pure, so the ranges are tested without a sheet.
+String? ppGrowthCheck({double? weightKg, double? heightCm, double? headCm, bool headTyped = false}) {
+  if (weightKg == null || heightCm == null) return 'Add at least a weight and a length to save.';
+  if (weightKg > 100) {
+    final kg = weightKg / 1000;
+    final s = kg.toStringAsFixed(kg < 10 ? 2 : 1).replaceFirst(RegExp(r'0+$'), '').replaceFirst(RegExp(r'\.$'), '');
+    return 'That looks like grams. Did you mean $s kg?';
+  }
+  if (weightKg < 0.3 || weightKg > 40) return 'That weight looks unusual. Check the scale: between 0.3 and 40 kg.';
+  if (heightCm < 30 || heightCm > 130) return 'That length looks unusual. Check it: between 30 and 130 cm.';
+  if (headTyped && headCm == null) return 'Head size needs a number, or leave it empty.';
+  if (headCm != null && (headCm < 25 || headCm > 60)) {
+    return 'That head size looks unusual. Check it: between 25 and 60 cm.';
+  }
+  return null;
+}
 
 class GrowthJourneyScreen extends StatefulWidget {
   const GrowthJourneyScreen({super.key});
@@ -133,6 +167,13 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
                   const SizedBox(height: 8),
                   Text('$_childName\'s own line, over the WHO typical range. Age in months along the bottom.',
                       style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
+                  // Corrected age, said out loud (the user's call H6, 2026-10-25).
+                  if (_store.usesCorrectedAge) ...[
+                    const SizedBox(height: 4),
+                    Text('Plotted on corrected age: $_childName\'s age minus the weeks born early, as paediatricians do until two.',
+                        key: const ValueKey('pp_growth_corrected'),
+                        style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
+                  ],
                 ]),
               )),
               const SizedBox(height: 14),
@@ -177,7 +218,7 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
       };
 
   Widget _historyRow(V2Palette p, GrowthMeasurement m) {
-    final ageM = m.ageMonthsAt(ChildProfileStore.instance.dob);
+    final ageM = _store.ageFor(m); // corrected age (H6); was m.ageMonthsAt(dob)
     final wp = _store.percentile(GrowthMetric.weight, m.weightKg, ageM);
     return PvListRow(
       key: ValueKey('pp_growth_row_${m.id}'),
@@ -188,9 +229,15 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
       trailing: IconButton(
         tooltip: 'Remove',
         icon: Icon(Icons.delete_outline_rounded, size: 20, color: p.ink3),
-        onPressed: () => ppConfirmRemove(context, 'Remove this measurement?', () => _store.remove(m.id)),
+        // Was: () => _store.remove(m.id) (kept for revert, 2026-10-25): now with Undo,
+        // which adds the same measurement back, same id.
+        onPressed: () => ppConfirmRemove(context, 'Remove this measurement?', () {
+          _store.remove(m.id);
+          if (mounted) ppCareSaved(context, 'Measurement removed.', undo: () => _store.add(m));
+        }),
       ),
-      onTap: () {},
+      // Was: onTap: () {} (a silent tap). Opens the sheet to edit it.
+      onTap: () => _openAddSheet(edit: m),
     );
   }
 
@@ -425,8 +472,7 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
 
   // ---- timeline row -------------------------------------------------------
   Widget _timelineRow(GrowthMeasurement m) {
-    final dob = ChildProfileStore.instance.dob;
-    final ageM = m.ageMonthsAt(dob);
+    final ageM = _store.ageFor(m); // corrected age (H6); was m.ageMonthsAt(dob)
     final wp = _store.percentile(GrowthMetric.weight, m.weightKg, ageM);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -460,8 +506,153 @@ class _GrowthJourneyScreenState extends State<GrowthJourneyScreen> {
     );
   }
 
-  // ---- add measurement sheet ----------------------------------------------
-  void _openAddSheet() {
+  // ---- add / edit measurement sheet (Wave 3, 2026-10-25) --------------------
+  //  Checks before it saves, stays open with a calm line when a number looks
+  //  wrong, and says what it saved. Opened with [edit], it is pre-filled and
+  //  saves over that row (same id).
+  void _openAddSheet({GrowthMeasurement? edit}) {
+    final p = V2PaletteStore.instance.current;
+    final weight = TextEditingController(text: edit == null ? '' : _trim(edit.weightKg));
+    final height = TextEditingController(text: edit == null ? '' : _trim(edit.heightCm));
+    final head = TextEditingController(text: edit?.headCm == null ? '' : _trim(edit!.headCm!));
+    final note = TextEditingController(text: edit?.note ?? '');
+    DateTime date = edit?.date ?? DateTime.now();
+    String? problem;
+
+    Widget label(String t) => Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(t, style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink2)),
+        );
+    Widget field(TextEditingController c, String l, String key, {bool number = true, int maxLines = 1}) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            label(l),
+            TextField(
+              key: ValueKey(key),
+              controller: c,
+              maxLines: maxLines,
+              keyboardType: number ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
+              style: pvManrope(fontSize: 15, color: p.ink1),
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: p.line)),
+                enabledBorder:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: p.line)),
+                focusedBorder:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: p.ink1)),
+              ),
+            ),
+          ]),
+        );
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Center(
+                  child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(color: p.line, borderRadius: BorderRadius.circular(2))),
+                ),
+                const SizedBox(height: 14),
+                Text(edit == null ? 'Add a measurement' : 'Edit this measurement',
+                    style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+                const SizedBox(height: 6),
+                Text('Just the latest figures. We place them on the curve for you.',
+                    style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+                const SizedBox(height: 16),
+                label('Measured on'),
+                InkWell(
+                  key: const ValueKey('pp_growth_date'),
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: date,
+                      firstDate: ChildProfileStore.instance.dob,
+                      lastDate: DateTime.now(),
+                    );
+                    if (picked != null) setSheet(() => date = picked);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                    decoration: BoxDecoration(
+                        color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: p.line)),
+                    child: Row(children: [
+                      Icon(Icons.calendar_today_outlined, size: 15, color: p.ink2),
+                      const SizedBox(width: 10),
+                      Text('${date.day} ${ppMonthsShort[date.month - 1]} ${date.year}',
+                          style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w600, color: p.ink1)),
+                    ]),
+                  ),
+                ),
+                field(weight, 'Weight (kg)', 'pp_growth_weight'),
+                field(height, 'Length or height (cm)', 'pp_growth_height'),
+                field(head, 'Head size (cm, optional)', 'pp_growth_head'),
+                field(note, 'Note (optional)', 'pp_growth_note', number: false, maxLines: 2),
+                if (problem != null) ...[
+                  Text(problem!,
+                      key: const ValueKey('pp_growth_problem'),
+                      style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.45, color: p.ink1)),
+                  const SizedBox(height: 12),
+                ],
+                PvCommit(
+                  key: const ValueKey('pp_growth_save'),
+                  label: edit == null ? 'Save measurement' : 'Save changes',
+                  onTap: () {
+                    final w = ppGrowthParse(weight.text);
+                    final h = ppGrowthParse(height.text);
+                    final hd = ppGrowthParse(head.text);
+                    final err = ppGrowthCheck(
+                        weightKg: w, heightCm: h, headCm: hd, headTyped: head.text.trim().isNotEmpty);
+                    if (err != null) {
+                      setSheet(() => problem = err);
+                      return;
+                    }
+                    final n = note.text.trim().isEmpty ? null : note.text.trim();
+                    if (edit == null) {
+                      _store.log(date: date, weightKg: w!, heightCm: h!, headCm: hd, note: n);
+                    } else {
+                      // The store's own update now keeps the id in place (tools pass,
+                      // 2026-10-25). Was: _store.remove(edit.id) then _store.add(...).
+                      _store.update(GrowthMeasurement(
+                          id: edit.id, date: date, weightKg: w!, heightCm: h!, headCm: hd, note: n));
+                    }
+                    // Tells Health this parent has actually entered growth.
+                    HealthStore.instance.markGrowthEntered();
+                    Navigator.of(ctx).pop();
+                    if (mounted) {
+                      ppCareSaved(context,
+                          edit == null ? 'Weight saved: ${_trim(w)} kg.' : 'Measurement updated: ${_trim(w)} kg.');
+                    }
+                  },
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Kept for revert (2026-10-25): the add sheet before the range checks, on
+  // the old kit (ppPurple, ppLine), saving whatever was typed.
+  // ignore: unused_element
+  void _openAddSheetBeforeChecks() {
     final weight = TextEditingController();
     final height = TextEditingController();
     final head = TextEditingController();
@@ -561,11 +752,11 @@ class _GrowthChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final dob = ChildProfileStore.instance.dob;
     final pts = <Offset>[]; // (ageMonths, value)
     for (final m in store.chronological) {
       final v = m.value(metric);
-      if (v != null) pts.add(Offset(m.ageMonthsAt(dob), v));
+      // Corrected age for a baby born early (H6). Was m.ageMonthsAt(dob).
+      if (v != null) pts.add(Offset(store.ageFor(m), v));
     }
     if (pts.isEmpty) return;
 

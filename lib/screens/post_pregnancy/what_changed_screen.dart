@@ -26,6 +26,9 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, kPvInk, pvStorePalette;
 import '../v2/v2_palette.dart' show V2Palette;
 import 'pp_care_parts.dart' show ppCareHeading;
+import 'pp_surface_router.dart' show ppScreenForSurface;
+import 'pp_use_ask_card.dart';
+import '../../services/pp_use_consent.dart';
 
 /// Replace `{baby}` with the child's first name (fallback: "your baby").
 String _fill(String s) {
@@ -84,8 +87,16 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _open(WcConcern c) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => WcFlowScreen(concern: c)));
+  // Fever opens Fever check, the one fever judge (H1); the newborn feeding
+  // check keeps its own screen (kWcHandOff, tools pass 2026-10-25).
+  void _open(WcConcern c) {
+    final handOff = kWcHandOff[c.id];
+    final screen = handOff == null ? null : ppScreenForSurface(handOff);
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: RouteSettings(name: handOff ?? 'pp_what_changed'),
+      builder: (_) => screen ?? WcFlowScreen(concern: c),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,13 +135,23 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
           line: c.category,
           onTap: () => _open(c),
         );
-    final common = wcCommon;
+    // ⚠️ ONE SYMPTOM TOOL FOR EVERY AGE (tools pass H2, 2026-10-25). The user:
+    // "shouldnt it be a whole symptom tool? tht cover child of all ages ...
+    // tht tools auto detects the baby". What fits the child's age comes first;
+    // the rest sit under "Other ages", shown, never hidden.
+    final months = ChildProfileStore.instance.devAgeInMonths;
+    bool fits(WcConcern c) => wcFitsAge(c, months);
+    final common = wcCommon.where(fits).toList();
+    final otherAges = kWcConcerns.where((c) => !fits(c)).toList();
+    // Kept for revert: eyebrow 'Development', title 'Something changed?', intro
+    // 'Tell us what you are noticing about {baby}, and we will walk through the likely cause together.'
     return PregToolScaffold(
       hue: 285,
-      eyebrow: 'Development',
-      mark: IntentMark.nextStep,
-      title: 'Something changed?',
-      intro: _fill('Tell us what you are noticing about {baby}, and we will walk through the likely cause together.'),
+      eyebrow: 'Health',
+      mark: IntentMark.questionMark,
+      title: 'Is my baby OK?',
+      intro: _fill('Sleep, feeding, illness or mood. Tell us what you are noticing about {baby}: '
+          'we will say what it often is, what to try, and when to call.'),
       children: [
         pregToolPad(TextField(
           key: const ValueKey('wc_search'),
@@ -167,13 +188,20 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
             const SizedBox(height: 6),
             pregToolPad(PvRowGroup(p: p, children: [for (final c in common) row(c)])),
           ],
-          for (final cat in wcCategories) ...[
+          for (final cat in wcCategories)
+            if (kWcConcerns.any((c) => c.category == cat && fits(c))) ...[
+              const SizedBox(height: 24),
+              eyebrow(cat),
+              const SizedBox(height: 6),
+              pregToolPad(PvRowGroup(p: p, children: [
+                for (final c in kWcConcerns.where((c) => c.category == cat && fits(c))) row(c),
+              ])),
+            ],
+          if (otherAges.isNotEmpty) ...[
             const SizedBox(height: 24),
-            eyebrow(cat),
+            eyebrow('Other ages'),
             const SizedBox(height: 6),
-            pregToolPad(PvRowGroup(p: p, children: [
-              for (final c in kWcConcerns.where((c) => c.category == cat)) row(c),
-            ])),
+            pregToolPad(PvRowGroup(p: p, children: [for (final c in otherAges) row(c)])),
           ],
         ],
         const SizedBox(height: 22),
@@ -384,10 +412,22 @@ class WcFlowScreen extends StatefulWidget {
 }
 
 class _WcFlowScreenState extends State<WcFlowScreen> {
-  int _step = 0;
   bool _showResult = false;
-  late final List<int?> _answers =
-      List<int?>.filled(widget.concern.questions.length, null);
+  late final List<int?> _answers = _prefilled();
+
+  /// Answers the app already knows (the child's age), so they are never asked
+  /// (tools pass H2, 2026-10-25: was "Roughly how old is {baby}?").
+  List<int?> _prefilled() {
+    final a = List<int?>.filled(widget.concern.questions.length, null);
+    final auto = kWcAgeAnswer[widget.concern.id];
+    if (auto != null && auto.$1 < a.length) {
+      a[auto.$1] = auto.$2(ChildProfileStore.instance.devAgeInMonths);
+    }
+    return a;
+  }
+
+  int? get _autoIndex => kWcAgeAnswer[widget.concern.id]?.$1;
+  late int _step = _autoIndex == 0 && _answers.length > 1 ? 1 : 0;
 
   List<WcQuestion> get _steps => widget.concern.questions;
   int get _count => _steps.length;
@@ -399,25 +439,54 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
 
   void _reset() => setState(() {
         _showResult = false;
-        _step = 0;
+        final fresh = _prefilled();
         for (int i = 0; i < _answers.length; i++) {
-          _answers[i] = null;
+          _answers[i] = fresh[i];
         }
+        _step = _autoIndex == 0 && _answers.length > 1 ? 1 : 0;
       });
 
   // Remembered by default (2026-10-23, Wave 8): the result line says so and
   // "Not now" forgets it. Was: the answers lived only in this State.
   bool _kept = true;
 
+  // ⚠️ KEPT ONLY WITH HER YES (tools pass H3, 2026-10-25). Was: noted on
+  // every result, even an urgent fever, without asking.
   void _advance() => setState(() {
-        if (_step < _count - 1) {
-          _step++;
+        var next = _step + 1;
+        if (next == _autoIndex) next++;
+        if (next < _count) {
+          _step = next;
         } else {
           _showResult = true;
-          _kept = true;
-          PpChangesStore.instance.note(widget.concern, wcResultFor(widget.concern, _answers).tone);
+          _kept = PpUseConsent.instance.allows(PpUseKind.changes);
+          if (_kept) _noteIt();
         }
       });
+
+  void _noteIt() => PpChangesStore.instance.note(widget.concern, wcResultFor(widget.concern, _answers).tone);
+
+  /// Under the result: the ask once card while unasked, the keep line after a
+  /// yes, and a quiet line after a no.
+  Widget _keepOrAsk(V2Palette p) {
+    final consent = PpUseConsent.instance;
+    if (consent.unasked(PpUseKind.changes)) {
+      return PpUseAskCard(
+        kind: PpUseKind.changes,
+        question: _fill('Remember this, so the right pages for {baby} come first?'),
+        onAnswer: (yes) => setState(() {
+          _kept = yes;
+          if (yes) _noteIt();
+        }),
+      );
+    }
+    if (!consent.allows(PpUseKind.changes)) {
+      return Text('Not kept. You can change this in You › Data and privacy.',
+          key: const ValueKey('wc_flow_not_kept'),
+          style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2));
+    }
+    return _keepLine(p);
+  }
 
   /// The line under the result that says what we kept, with "Not now".
   Widget _keepLine(V2Palette p) => Container(
@@ -565,7 +634,8 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
       const SizedBox(height: 10),
       pregToolPad(PvCommit(
         key: const ValueKey('wc_flow_next'),
-        label: _step < _count - 1 ? 'Continue' : 'See the likely cause',
+        // Was 'See the likely cause' (tools pass, 2026-10-25: never a diagnosis).
+        label: _step < _count - 1 ? 'Continue' : 'See what it might be',
         onTap: answered ? _advance : null,
       )),
     ];
@@ -631,7 +701,8 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
     final urgent = r.tone == WcTone.urgent;
     final caution = r.tone == WcTone.caution;
     final tone = urgent ? const Color(0xFFB3261E) : (caution ? const Color(0xFF8A5300) : p.action);
-    final label = urgent ? 'SEE A DOCTOR NOW' : (caution ? 'WORTH GETTING CHECKED' : 'MOST LIKELY CAUSE');
+    // Was 'MOST LIKELY CAUSE' (tools pass, 2026-10-25: never a diagnosis).
+    final label = urgent ? 'SEE A DOCTOR NOW' : (caution ? 'WORTH GETTING CHECKED' : 'WHAT IT OFTEN IS');
     final labelIcon = urgent
         ? Icons.warning_amber_rounded
         : (caution ? Icons.info_outline_rounded : Icons.lightbulb_outline_rounded);
@@ -668,6 +739,12 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
               style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
           const SizedBox(height: 8),
           Text(_fill(r.explanation), style: body),
+          if (urgent) ...[
+            const SizedBox(height: 10),
+            Text('In an emergency, call 112 or 108 (ambulance), or go to the nearest hospital.',
+                key: const ValueKey('wc_flow_emergency'),
+                style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800, height: 1.5, color: tone)),
+          ],
           Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: Container(height: 1, color: p.line)),
           Text('What to try', style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
           const SizedBox(height: 10),
@@ -702,7 +779,7 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
       // What we kept (2026-10-23, Wave 8). Under the doctor route, so an
       // urgent result still leads with the way to a doctor.
       const SizedBox(height: 12),
-      pregToolPad(_keepLine(p)),
+      pregToolPad(_keepOrAsk(p)),
 
       // cross-app: what helps, gathered from across ParentVeda.
       const SizedBox(height: 26),

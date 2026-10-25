@@ -30,18 +30,32 @@ import 'remote/cloud_merged_store.dart';
 
 /// A kind of information a tool collects. One per tool family; later tools
 /// add theirs. ⚠️ `.name` is persisted and synced: never rename a value.
-enum PpUseKind { feeds }
+enum PpUseKind {
+  feeds,
+  // Tools pass, Health family (2026-10-25).
+  nappies,
+  changes,
+}
 
 enum PpUseAnswer { unasked, yes, no }
 
 extension PpUseKindText on PpUseKind {
   /// The row label in You.
-  String get label => switch (this) { PpUseKind.feeds => 'Your feed log' };
+  String get label => switch (this) {
+        PpUseKind.feeds => 'Your feed log',
+        PpUseKind.nappies => 'Your nappy log',
+        PpUseKind.changes => 'What you tell Is my baby OK?',
+      };
 
   /// What a yes changes, in one line. Shown on the ask card and in You.
   String get why => switch (this) {
         PpUseKind.feeds => 'We use it to put the most useful pages first, '
-            'like breastfeeding or bottle pages that match how your baby feeds.',
+            'like breastfeeding or bottle pages that match how your baby feeds, '
+            'and to fill in the newborn feeding check for you.',
+        PpUseKind.nappies => 'We use it to fill in the newborn feeding check '
+            'for you, so you only confirm the count.',
+        PpUseKind.changes => 'We remember it for three weeks and move pages and '
+            'activities about it up on your home.',
       };
 }
 

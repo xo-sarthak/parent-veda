@@ -62,7 +62,9 @@ import '../../models/reminder.dart';
 import '../../services/reminder_store.dart';
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
+import 'pp_growth_data.dart';
 import 'pp_health_data.dart';
+import 'pp_tools_kit.dart' show ppShortDate;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 // =============================================================================
@@ -513,18 +515,15 @@ String walletEmergencyText() {
   final store = HealthStore.instance;
   final e = store.emergency;
 
-  final allergies = store.allergies
-      .where((a) => a.status != AllergyStatus.resolved)
-      .map((a) => a.name)
-      .toList();
-  final meds = store.medications
-      .where((m) => !m.completed)
-      .map((m) => '${m.name} ${m.dosage}'.trim())
-      .toList();
+  // One source (H7): the record, the profile and the growth log.
+  final allergies = walletAllergies();
+  final meds = walletMedicines();
+  final weight = walletWeight();
 
   final lines = <String>[
     'CHILD: ${child.name}',
-    'DOB: ${e?.dob ?? '—'}',
+    'DOB: ${walletDob()}', // was e?.dob, typed on the card (H7)
+    if (weight.isNotEmpty) 'WEIGHT: $weight',
     'BLOOD: ${(e?.bloodGroup ?? '').isEmpty ? 'not recorded' : e!.bloodGroup}',
     'ALLERGIES: ${allergies.isEmpty ? 'none recorded' : allergies.join(', ')}',
     'MEDICINES: ${meds.isEmpty ? 'none' : meds.join('; ')}',
@@ -588,3 +587,39 @@ class WalletVersionPill extends StatelessWidget {
     );
   }
 }
+
+// =============================================================================
+//  ONE SOURCE (the user's call H7, 2026-10-25)
+// -----------------------------------------------------------------------------
+//  The card had its own allergy, medicine, birth-date and weight boxes, apart
+//  from the health record and the growth log, so they could disagree; the
+//  typed allergies never even showed. The card now reads them where they
+//  live: allergies and medicines from this child's health record, birth date
+//  from the profile, weight from the newest growth entry. Edit them there and
+//  the card is current everywhere, the QR and the shared text included.
+// =============================================================================
+
+/// "12 Mar 2026", from the child's profile.
+String walletDob() {
+  final d = ChildProfileStore.instance.dob;
+  return '${ppShortDate(d)} ${d.year}';
+}
+
+/// "6.4 kg (12 Oct)", from the newest growth entry, or '' when none.
+String walletWeight() {
+  final g = GrowthStore.instance.latest;
+  if (g == null) return '';
+  return '${g.weightKg.toStringAsFixed(1)} kg (${ppShortDate(g.date)})';
+}
+
+/// Active allergies from this child's health record.
+List<String> walletAllergies() => HealthStore.instance.allergies
+    .where((a) => a.status != AllergyStatus.resolved)
+    .map((a) => a.name)
+    .toList();
+
+/// Current medicines from this child's health record.
+List<String> walletMedicines() => HealthStore.instance.medications
+    .where((m) => !m.completed)
+    .map((m) => '${m.name} ${m.dosage}'.trim())
+    .toList();

@@ -1,7 +1,9 @@
 // =============================================================================
-//  What Changed? — concern library (parenting · S22a v2)
+//  Is my baby OK? — concern library (parenting · S22a v2; one symptom tool
+//  for every age, tools pass 2026-10-25)
 // -----------------------------------------------------------------------------
-//  The data behind the "What Changed?" guided diagnostic. Each concern is a
+//  The data behind the "Is my baby OK?" guide (was "What Changed?" and was
+//  called a "guided diagnostic": it is not one, and must never read as one). Each concern is a
 //  self-contained mini-flow: a short quote the parent recognises, its own set
 //  of gentle questions (every concern asks DIFFERENT questions), and a likely-
 //  cause result with a few things to try tonight. Parents search or pick from
@@ -659,7 +661,7 @@ const List<WcConcern> kWcConcerns = [
           ['Just a bit warm and clingy', 'Cold, cough, or ear-tugging', 'Rash, drowsy, or refusing feeds']),
     ],
     result: WcResult(
-      cause: 'A likely mild viral illness — with clear doctor triggers',
+      cause: 'Often a mild viral illness, with clear doctor triggers',
       explanation:
           'Most low fevers are the body fighting a mild virus. But a baby under 3 months, a temperature over 39°C, or worrying signs always need a doctor — don\'t wait.',
       todos: [
@@ -715,7 +717,7 @@ const List<WcConcern> kWcConcerns = [
       explanation:
           'Happy, well babies often discover and fiddle with their ears, or tug when tired or teething. But ear-pulling with fever, pain, or fluid can mean an infection that needs checking.',
       todos: [
-        'If {baby} is content and well, it\'s likely harmless exploring.',
+        'If {baby} is content and well, it is often harmless exploring.',
         'Watch for fever, distress worse when lying down, or ear discharge.',
         'See a doctor if any of those appear — ears need proper examination.',
       ],
@@ -740,7 +742,7 @@ const List<WcConcern> kWcConcerns = [
           ['Happy and feeding', 'A bit off', 'Unwell / feverish']),
     ],
     result: WcResult(
-      cause: 'Most likely a harmless skin rash — with one urgent exception',
+      cause: 'Often a harmless skin rash, with one urgent exception',
       explanation:
           'Many baby rashes (heat rash, mild eczema, dribble rash) are harmless. The one that can\'t wait: a rash that does NOT fade when pressed, especially with fever or a drowsy baby.',
       todos: [
@@ -908,6 +910,76 @@ const List<WcConcern> kWcConcerns = [
       ],
     ),
   ),
+  // ---- added 2026-10-25 (tools pass, H2: one symptom tool for every age) ----
+  // REQUIRED_REVIEW: both new concerns below, every question and every result.
+  // The newborn feeding check hands over to its own screen (kWcHandOff).
+  WcConcern(
+    id: 'enough_milk',
+    category: 'Feeding',
+    icon: _iDiet,
+    label: 'Getting enough milk?',
+    quote: '"I am not sure {baby} is getting enough milk."',
+    common: true,
+    keywords: ['enough milk', 'wet nappies', 'jaundice', 'yellow', 'weight', 'newborn', 'supply'],
+    questions: [],
+    result: WcResult(
+      cause: 'Four signs that answer it',
+      explanation: 'Wet nappies, feeds, skin colour and weight together show whether milk is going in.',
+      todos: ['Open the newborn check.'],
+    ),
+  ),
+  WcConcern(
+    id: 'vomiting',
+    category: 'Tummy',
+    icon: _iTummy,
+    label: 'Vomiting',
+    quote: '"{baby} has been sick, more than the usual spit-up."',
+    keywords: ['vomit', 'vomiting', 'throwing up', 'sick', 'ulti'],
+    questions: [
+      WcQuestion('Colour', _iTummy, 'What does it look like?',
+          ['Milk or food', 'Green or yellow', 'Blood, or dark specks like coffee grounds']),
+      WcQuestion('Hydration', _iBody, 'Are wet nappies still coming?',
+          ['Yes, plenty', 'Fewer than usual', 'Not sure']),
+      WcQuestion('How often', _iTime, 'How often in the last few hours?',
+          ['Once or twice', 'Again and again, nothing stays down', 'Forceful, shooting out after every feed']),
+    ],
+    result: WcResult(
+      cause: 'Often a passing tummy bug, or a one-off',
+      explanation:
+          'Babies are often sick once or twice with a tummy bug or after a big feed. What matters most is that fluids stay down and wet nappies keep coming.',
+      todos: [
+        'Offer small, frequent feeds; on solids, small sips of water or ORS.',
+        'Keep counting wet nappies over the next few hours.',
+        'See a doctor today if it keeps happening, or comes with a fever or diarrhoea.',
+      ],
+    ),
+  ),
+  WcConcern(
+    id: 'cough',
+    category: 'Illness',
+    icon: _iIll,
+    label: 'A cough',
+    quote: '"{baby} has a cough."',
+    keywords: ['cough', 'khansi', 'wheeze', 'breathing', 'chest', 'croup'],
+    questions: [
+      WcQuestion('Breathing', _iBody, 'How is {baby} breathing?',
+          ['Normally, just coughing', 'Fast, noisy or working hard', 'Pauses, or lips look blue or grey']),
+      WcQuestion('Sound', _iIll, 'What does the cough sound like?',
+          ['A normal cold cough', 'Barking, like a seal', 'Coughing fits, going red, or a whoop']),
+      WcQuestion('How long', _iTime, 'How long has it been going?',
+          ['A few days', 'More than two weeks', 'It started suddenly, maybe after choking on something']),
+    ],
+    result: WcResult(
+      cause: 'Often a cough with a cold',
+      explanation:
+          'Most coughs in babies come with a cold and can last two to three weeks while the cold clears. The cough is the body keeping the airway clear.',
+      todos: [
+        'Keep feeds up; saline drops help a blocked nose.',
+        'Do not give a cough syrup to a baby unless your doctor says so.',
+        'See a doctor if it lasts more than two weeks, or comes with a fever.',
+      ],
+    ),
+  ),
 ];
 
 // =============================================================================
@@ -1050,6 +1122,76 @@ const Map<String, List<WcRule>> kWcRules = {
         'Keep counting wet nappies over the next few hours.',
       ])),
   ],
+  // ---- added 2026-10-25 (tools pass). REQUIRED_REVIEW: every rule. ----
+  'vomiting': [
+    WcRule(when: [WcCond(0, [1, 2])], result: _vomitUrgent),
+    WcRule(when: [WcCond(1, [1])], result: WcResult(
+      tone: WcTone.urgent,
+      cause: 'Watch closely for dehydration',
+      explanation: 'Fewer wet nappies with vomiting is the sign to act on, because babies dehydrate quickly.',
+      todos: [
+        'Offer milk feeds little and often; small sips of ORS if on solids.',
+        'See a doctor now for very few wet nappies, a dry mouth, no tears, or a floppy or drowsy baby.',
+        'In an emergency, call 112 or 108.',
+      ])),
+    WcRule(when: [WcCond(2, [2])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Forceful vomiting after feeds: see a doctor today',
+      explanation: 'Vomit that shoots out after every feed, especially in a baby under three months who still seems hungry, is worth a doctor looking at today.',
+      todos: [
+        'See your paediatrician today, not next week.',
+        'Note how many feeds came back up and how many wet nappies there were.',
+        'Go now if there is green vomit, blood, or a floppy baby.',
+      ])),
+    WcRule(when: [WcCond(2, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Nothing staying down: see a doctor today',
+      explanation: 'Vomiting again and again means fluids are not staying in. A doctor can check hydration and help.',
+      todos: [
+        'Keep offering small sips or short feeds every few minutes.',
+        'See a doctor today; go now if wet nappies stop.',
+        'In an emergency, call 112 or 108.',
+      ])),
+  ],
+  'cough': [
+    WcRule(when: [WcCond(0, [1, 2])], result: _breathingUrgent),
+    WcRule(when: [WcCond(2, [2])], result: WcResult(
+      tone: WcTone.urgent,
+      cause: 'A cough after choking: get checked now',
+      explanation: 'A cough that started suddenly after choking can mean something went into the airway, even if it seems to settle.',
+      todos: [
+        'Go to a doctor or hospital now, even if the cough eases.',
+        'If the cough stops but breathing is hard, call 112 or 108.',
+        'Do not put your finger in the mouth to search for an object.',
+      ])),
+    WcRule(when: [WcCond(1, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A barking cough: worth a doctor today',
+      explanation: 'A barking cough like a seal often comes with croup, a swelling of the upper airway that is usually worse at night.',
+      todos: [
+        'See a doctor today.',
+        'Go now if there is a harsh noise on breathing in while resting, or breathing looks hard.',
+        'Keep {baby} calm and upright; crying makes it worse.',
+      ])),
+    WcRule(when: [WcCond(1, [2])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'Coughing fits: worth a doctor today',
+      explanation: 'Long coughing fits, going red, or a whooping sound need a doctor to look, especially in a young baby.',
+      todos: [
+        'See a doctor today, sooner for a baby under six months.',
+        'Go now if {baby} goes blue or stops breathing during a fit, and call 112 or 108.',
+        'Tell the doctor which vaccines {baby} has had.',
+      ])),
+    WcRule(when: [WcCond(2, [1])], result: WcResult(
+      tone: WcTone.caution,
+      cause: 'A cough over two weeks: worth a check',
+      explanation: 'Most cold coughs fade by three weeks. One that keeps going is worth a doctor listening to the chest.',
+      todos: [
+        'Book a visit with your paediatrician.',
+        'Note when it is worst: night, after feeds, or with play.',
+        'Go sooner if breathing changes or a fever starts.',
+      ])),
+  ],
   // ---- Teething & illness ----
   'drooling_chewing': [
     WcRule(when: [WcCond(2, [1])], result: WcResult(
@@ -1062,13 +1204,17 @@ const Map<String, List<WcRule>> kWcRules = {
         'Soothe the gums separately with a chilled teether.',
       ])),
   ],
-  'low_fever': [
+  // ⚠️ ONE FEVER ANSWER (tools pass H1, 2026-10-25). This concern disagreed
+  // with Fever check in five common cases (a 2-month-old at 37.2 C: "fine"
+  // there, "urgent" here). Fever now hands over to Fever check (kWcHandOff),
+  // which is the only fever judge; these rules no longer run. Kept for revert:
+  'low_fever_kept_for_revert': [
     WcRule(when: [WcCond(1, [0])], result: _feverUrgent),
     WcRule(when: [WcCond(0, [2])], result: _feverUrgent),
     WcRule(when: [WcCond(2, [2])], result: _feverUrgent),
     WcRule(when: [WcCond(2, [1])], result: WcResult(
       tone: WcTone.caution,
-      cause: 'A cold or ear infection is likely',
+      cause: 'It can be a cold or an ear infection',
       explanation: 'A fever alongside cold symptoms or ear-tugging is usually a viral illness or an ear infection — worth checking if it persists.',
       todos: [
         'Offer fluids, keep {baby} lightly dressed, and monitor the temperature.',
@@ -1110,7 +1256,7 @@ const Map<String, List<WcRule>> kWcRules = {
       ])),
     WcRule(when: [WcCond(0, [0]), WcCond(1, [0])], result: WcResult(
       tone: WcTone.caution,
-      cause: 'Likely an ear infection',
+      cause: 'It can be an ear infection: worth a doctor',
       explanation: 'Ear-pulling with a fever or recent cold, and pain that\'s worse lying down, often points to an ear infection worth checking.',
       todos: [
         'See a doctor to examine the ears.',
@@ -1124,7 +1270,7 @@ const Map<String, List<WcRule>> kWcRules = {
     WcRule(when: [WcCond(0, [2]), WcCond(2, [2])], result: _rashUrgent),
     WcRule(when: [WcCond(1, [2]), WcCond(2, [2])], result: _rashUrgent),
     WcRule(when: [WcCond(0, [1])], result: WcResult(
-      cause: 'Likely dry skin or mild eczema',
+      cause: 'Often dry skin or mild eczema',
       explanation: 'Dry, itchy patches — often on cheeks and joints — are usually mild eczema, which is manageable and not dangerous.',
       todos: [
         'Moisturise generously with a fragrance-free emollient after short, warm baths.',
@@ -1136,7 +1282,7 @@ const Map<String, List<WcRule>> kWcRules = {
     WcRule(when: [WcCond(1, [0])], result: WcResult(
       tone: WcTone.caution,
       cause: 'Eczema worth managing',
-      explanation: 'Very itchy patches that {baby} scratches are likely eczema — worth a proper routine, and a check if it weeps or spreads.',
+      explanation: 'Very itchy patches that {baby} scratches can be eczema — worth a proper routine, and a check if it weeps or spreads.',
       todos: [
         'Moisturise generously and often; keep baths short and warm, not hot.',
         'Remove likely triggers (fragranced products, overheating, rough fabrics).',
@@ -1155,7 +1301,7 @@ const Map<String, List<WcRule>> kWcRules = {
       ])),
     WcRule(when: [WcCond(0, [1])], result: WcResult(
       tone: WcTone.caution,
-      cause: 'Likely a thrush (yeast) nappy rash',
+      cause: 'It can be a thrush (yeast) nappy rash',
       explanation: 'A bright-red rash with little spots at the edges is often a yeast rash, which needs an antifungal cream rather than a plain barrier.',
       todos: [
         'See a doctor for an antifungal cream — a barrier alone won\'t clear it.',
@@ -1212,7 +1358,7 @@ const WcResult _feverUrgent = WcResult(
   cause: 'This needs a doctor now',
   explanation: 'A baby under 3 months with any fever, a temperature over 39°C, or a fever with a rash, drowsiness or refusing feeds needs to be seen without waiting — these can be serious.',
   todos: [
-    'Call your doctor or a paediatric emergency line now — don\'t wait it out.',
+    'Call your doctor now, or 112 or 108 in an emergency. Do not wait it out.',
     'Keep {baby} lightly dressed and offer fluids on the way.',
     'Get emergency care for a non-fading rash, a fit, a stiff neck, or trouble breathing.',
   ],
@@ -1237,6 +1383,18 @@ const WcResult _rashUrgent = WcResult(
     'Press a clear glass firmly on the rash — if it stays visible, get emergency care now.',
     'Trust your instinct; don\'t wait for more symptoms to appear.',
     'Note when it started and any fever to tell the doctor.',
+  ],
+);
+
+// REQUIRED_REVIEW (tools pass, 2026-10-25).
+const WcResult _vomitUrgent = WcResult(
+  tone: WcTone.urgent,
+  cause: 'Vomit that needs a doctor now',
+  explanation: 'Green or yellow vomit, or blood, needs to be seen straight away. Most vomiting is a passing bug, but these signs can mean something that cannot wait.',
+  todos: [
+    'Go to a paediatrician or hospital now. In an emergency, call 112 or 108.',
+    'Note when it started and how many wet nappies there have been.',
+    'Do not give medicine to stop vomiting unless a doctor says so.',
   ],
 );
 
@@ -1289,3 +1447,47 @@ List<WcConcern> wcSearch(String query) {
     return false;
   }).toList();
 }
+
+// -----------------------------------------------------------------------------
+//  It knows the baby (tools pass H2, 2026-10-25)
+// -----------------------------------------------------------------------------
+//  The user: the tool "auto detects the baby from the known data in app".
+//  Ages in months (corrected age where the child was born early). A concern
+//  not listed fits every age. Concerns outside the child's age are not
+//  hidden: they sit under "Other ages" at the end of the list.
+const Map<String, (int, int?)> kWcAgeFit = {
+  'enough_milk': (0, 3),
+  'cluster_feeding': (0, 6),
+  'witching_hour': (0, 5),
+  'spitting_up': (0, 12),
+  'only_sleeps_held': (0, 12),
+  'drooling_chewing': (3, 30),
+  'refusing_solids': (6, null),
+  'eating_less_solids': (6, null),
+  'shy_new_people': (5, null),
+  'separation_upset': (6, null),
+  'head_banging': (6, null),
+  'biting_hitting': (9, null),
+  'sudden_tantrums': (12, null),
+};
+
+bool wcFitsAge(WcConcern c, int months) {
+  final f = kWcAgeFit[c.id];
+  if (f == null) return true;
+  return months >= f.$1 && (f.$2 == null || months < f.$2!);
+}
+
+/// A question the app can answer from the child's age, so it is never asked:
+/// concern id -> (question index, the option for an age in months).
+final Map<String, (int, int Function(int))> kWcAgeAnswer = {
+  'separation_upset': (0, (m) => m < 8 ? 2 : (m <= 18 ? 0 : 1)),
+  'shy_new_people': (0, (m) => m < 6 ? 2 : (m <= 12 ? 0 : 1)),
+};
+
+/// Concerns that open another tool instead of their own questions: fever goes
+/// to Fever check, the one fever judge (H1); the newborn feeding check keeps
+/// its own screen. Surface ids, resolved by the surface router.
+const Map<String, String> kWcHandOff = {
+  'low_fever': 'pp_fever_check',
+  'enough_milk': 'pp_newborn_feeding',
+};

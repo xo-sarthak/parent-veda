@@ -37,7 +37,8 @@ import '../../services/family_profile.dart' show DietPreference, FamilyProfileSt
 import 'food_common.dart' show FoodPhoto, FoodPhotoCard, foodAgeLabel, foodDietMark, foodPhotoDisc;
 import 'food_saved_screen.dart';
 import 'pp_baby_food_check_screen.dart' show PpBabyFoodCheckScreen;
-import 'pp_baby_ok_check_screen.dart' show PpBabyOkCheckScreen;
+// import 'pp_baby_ok_check_screen.dart' show PpBabyOkCheckScreen; // kept for revert (tools pass H2)
+import 'what_changed_screen.dart' show WhatChangedScreen;
 import 'pp_common.dart' show ppFill;
 import 'pp_feeding_content.dart' show kPpFeedingSection;
 import 'pp_section_screen.dart' show ppOpenPage;
@@ -676,7 +677,14 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
                       ? 'Under 6 months, milk is the food. See when to call the doctor.'
                       : 'Gentle food for a cold, loose motions or constipation.',
                   lineMaxLines: 2,
-                  onTap: () => _push(months < 6 ? const PpBabyOkCheckScreen() : const SickDaysScreen()),
+                  // Under 6 months the unwell row goes to Is my baby OK?, the one
+                  // symptom tool, on illness, tummy and feeding (tools pass H2,
+                  // 2026-10-25). Was the newborn feeding check: the label did not
+                  // match the landing. Kept for revert:
+                  // onTap: () => _push(months < 6 ? const PpBabyOkCheckScreen() : const SickDaysScreen()),
+                  onTap: () => _push(months < 6
+                      ? const WhatChangedScreen(initialCategories: ['Illness', 'Tummy', 'Feeding'])
+                      : const SickDaysScreen()),
                 ),
                 for (final (cat, title, line) in [
                   ('Travel Food', 'Food for a day out', 'dishes that travel well.'),

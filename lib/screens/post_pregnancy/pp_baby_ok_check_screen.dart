@@ -45,7 +45,10 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart' show PvChoiceTile, PvPress;
 import '../v2/v2_palette.dart';
+import '../../services/pp_use_consent.dart';
 import 'pp_care_log_data.dart';
+import 'pp_feeding_data.dart';
+import 'pp_use_ask_card.dart';
 import 'pp_content.dart';
 import 'pp_nappy_screen.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
@@ -166,6 +169,18 @@ class _PpBabyOkCheckScreenState extends State<PpBabyOkCheckScreen> {
   /// leaving the screen. See the header.
   final Map<String, bool> _answers = {};
 
+  /// From her logs, only with her yes (tools pass, 2026-10-25): a count that
+  /// already meets the sign picks the reassuring answer for her to confirm. A
+  /// low count never picks the worrying one: a log can have gaps, memory can
+  /// fill them.
+  @override
+  void initState() {
+    super.initState();
+    final consent = PpUseConsent.instance;
+    if (consent.allows(PpUseKind.nappies) && NappyStore.instance.wet24h >= 6) _answers['nappies'] = true;
+    if (consent.allows(PpUseKind.feeds) && FeedingStore.instance.countLast24h >= 8) _answers['feeds'] = true;
+  }
+
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: V2PaletteStore.instance,
@@ -180,8 +195,11 @@ class _PpBabyOkCheckScreenState extends State<PpBabyOkCheckScreen> {
       hue: 206,
       eyebrow: 'Health',
       mark: IntentMark.questionMark,
-      title: 'Is my baby OK?',
-      intro: 'Four things, thirty seconds. Nothing is saved and nothing is scored.',
+      // ⚠️ NAMED FOR WHAT IT IS (tools pass H2, 2026-10-25). It checks newborn
+      // feeding; "Is my baby OK?" is now the all-ages symptom tool. Kept for
+      // revert: title: 'Is my baby OK?',
+      title: 'Getting enough milk?',
+      intro: 'Four signs in the first weeks, thirty seconds. Nothing is saved and nothing is scored.',
       children: [
         // The emergency line, pinned before the questions (Mobbin audit,
         // 2026-10-07): CVS Health's symptom check keeps "a medical emergency,
@@ -322,6 +340,7 @@ class _CheckCard extends StatelessWidget {
         // The number, from her nappy log (gap analysis P1, 2026-10-07: "She
         // answers the question with a number, not a guess").
         if (check.id == 'nappies') ...[const SizedBox(height: 10), const _NappyCount()],
+        if (check.id == 'feeds') ...[const SizedBox(height: 10), const _FeedCount()],
         const SizedBox(height: 14),
         _Option(
           label: check.expected,
@@ -441,12 +460,19 @@ class _NappyCount extends StatelessWidget {
   Widget build(BuildContext context) {
     final store = NappyStore.instance..init();
     return AnimatedBuilder(
-      animation: store,
+      animation: Listenable.merge([store, PpUseConsent.instance]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
-        final since = DateTime.now().subtract(const Duration(hours: 24));
-        final logged = store.all.where((n) => n.time.isAfter(since)).toList();
-        final wet = logged.where((n) => n.isWet).length;
+        // The 24-hour count is the store's own now (tools pass, 2026-10-25),
+        // and it is read only with her yes; until she answers, she is asked.
+        // Was: a hand-filtered count shown without asking.
+        final consent = PpUseConsent.instance;
+        if (consent.unasked(PpUseKind.nappies) && store.all.isNotEmpty) {
+          return const PpUseAskCard(kind: PpUseKind.nappies, question: 'Use your nappy log to fill this in?');
+        }
+        final allowed = consent.allows(PpUseKind.nappies);
+        final logged = allowed ? store.last24h : const <NappyLog>[];
+        final wet = allowed ? store.wet24h : 0;
         return InkWell(
           key: const ValueKey('pp_ok_nappy_count'),
           borderRadius: BorderRadius.circular(12),
@@ -474,6 +500,45 @@ class _NappyCount extends StatelessWidget {
               Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
             ]),
           ),
+        );
+      },
+    );
+  }
+}
+
+/// Feeds in the last 24 hours from the feed log, only with her yes (tools
+/// pass, 2026-10-25), and the way to it.
+class _FeedCount extends StatelessWidget {
+  const _FeedCount();
+
+  @override
+  Widget build(BuildContext context) {
+    final store = FeedingStore.instance..init();
+    return ListenableBuilder(
+      listenable: Listenable.merge([store, PpUseConsent.instance]),
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final consent = PpUseConsent.instance;
+        if (consent.unasked(PpUseKind.feeds) && store.all.isNotEmpty) {
+          return const PpUseAskCard(kind: PpUseKind.feeds, question: 'Use your feed log to fill this in?');
+        }
+        final n = consent.allows(PpUseKind.feeds) ? store.countLast24h : 0;
+        return Container(
+          key: const ValueKey('pp_ok_feed_count'),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: p.line)),
+          child: Row(children: [
+            Icon(Icons.restaurant_outlined, size: 20, color: p.ink1),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                n == 0
+                    ? 'Keep count with Log a feed: two taps a feed.'
+                    : 'Your feed log: $n ${n == 1 ? 'feed' : 'feeds'} in the last 24 hours.',
+                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.4, color: p.ink1),
+              ),
+            ),
+          ]),
         );
       },
     );

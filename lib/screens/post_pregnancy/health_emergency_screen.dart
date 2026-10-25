@@ -12,6 +12,8 @@ import 'package:share_plus/share_plus.dart';
 
 import 'pp_common.dart';
 import 'pp_health_data.dart';
+import 'pp_wallet_data.dart' show walletDob, walletWeight, walletAllergies, walletMedicines;
+import '../../widgets/pv_toast.dart' show pvToast, PvToastKind;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_tool_chrome.dart' show PregToolScaffold;
@@ -140,7 +142,9 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(ppFill(e.name), style: ppFraunces(24, h: 1.05)),
                     const SizedBox(height: 3),
-                    Text('Born ${e.dob}  ·  ${e.weight}', style: ppBody(12.5, color: ppSoft)),
+                    // One source (H7). Was: 'Born ${e.dob}  ·  ${e.weight}'.
+                    Text(['Born ${walletDob()}', if (walletWeight().isNotEmpty) walletWeight()].join('  ·  '),
+                        style: ppBody(12.5, color: ppSoft)),
                   ]),
                 ),
               ]),
@@ -151,10 +155,12 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                 Row(children: [
                   Expanded(child: _big('Blood group', e.bloodGroup, _red)),
                   const SizedBox(width: 12),
-                  Expanded(child: _big('Allergies', e.allergies, ppInk)),
+                  // One source (H7). Was: e.allergies, typed on the card.
+                  Expanded(child: _big('Allergies', walletAllergies().isEmpty ? 'None recorded' : walletAllergies().join(', '), ppInk)),
                 ]),
                 const SizedBox(height: 16),
-                _row(Icons.medication_outlined, 'Current medications', e.medications),
+                _row(Icons.medication_outlined, 'Current medications',
+                    walletMedicines().isEmpty ? 'None' : walletMedicines().join('; ')), // was e.medications (H7)
                 const SizedBox(height: 12),
                 _row(Icons.medical_services_outlined, 'Paediatrician', e.pediatrician),
                 const SizedBox(height: 16),
@@ -212,10 +218,11 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
 
   String _shareText(EmergencyProfile e) => [
         'EMERGENCY CARD - ${ppFill(e.name)}',
-        'Born ${e.dob} · ${e.weight}',
+        // One source (H7): was e.dob, e.weight, e.allergies, e.medications.
+        ['Born ${walletDob()}', if (walletWeight().isNotEmpty) walletWeight()].join(' · '),
         'Blood group: ${e.bloodGroup}',
-        'Allergies: ${e.allergies}',
-        'Current medications: ${e.medications}',
+        'Allergies: ${walletAllergies().isEmpty ? 'None recorded' : walletAllergies().join(', ')}',
+        'Current medications: ${walletMedicines().isEmpty ? 'None' : walletMedicines().join('; ')}',
         'Paediatrician: ${e.pediatrician}',
         'Emergency contacts:',
         for (final c in e.contacts) '  • ${c.name} (${c.relation}) - ${c.phone}',
@@ -296,12 +303,20 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
               Text(existing == null ? 'Create emergency card' : 'Edit emergency card', style: ppJakarta(18)),
               const SizedBox(height: 16),
               _tf(name, 'Child’s name'),
-              _tf(dob, 'Date of birth'),
-              _tf(weight, 'Weight'),
+              // One source (H7, 2026-10-25): birth date, weight, allergies and
+              // medicines come from the profile, the growth log and the health
+              // record. Kept for revert:
+              //   _tf(dob, 'Date of birth'), _tf(weight, 'Weight'),
+              //   _tf(allergies, 'Allergies'), _tf(meds, 'Current medications'),
               _tf(blood, 'Blood group'),
-              _tf(allergies, 'Allergies'),
               _tf(ped, 'Paediatrician (name · phone)'),
-              _tf(meds, 'Current medications'),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                    'Birth date, weight, allergies and medicines come from the profile, the growth log and '
+                    'the health record, so the card is always current. Change them there.',
+                    style: ppBody(12.5, color: ppSoft, h: 1.5)),
+              ),
               _tf(c1Name, 'First person to call: name'),
               _tf(c1Phone, 'First person to call: phone', phone: true),
               _tf(c2Name, 'Second person to call: name'),
@@ -309,7 +324,12 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
               const SizedBox(height: 8),
               PvPress(child: GestureDetector(
                 onTap: () {
-                  if (name.text.trim().isEmpty) return;
+                  // No silent tap (S8, tools pass 2026-10-25): was a bare return.
+                  if (name.text.trim().isEmpty) {
+                    pvToast(ctx, 'Add your child\u2019s name first, so the card says who it is for.',
+                        kind: PvToastKind.gentle);
+                    return;
+                  }
                   _store.setEmergency(EmergencyProfile(
                     name: name.text.trim(),
                     dob: dob.text.trim(),
@@ -322,6 +342,8 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
                     contacts: contacts(),
                   ));
                   Navigator.of(ctx).pop();
+                  pvToast(context, existing == null ? 'Emergency card saved.' : 'Emergency card updated.',
+                      kind: PvToastKind.done);
                 },
                 behavior: HitTestBehavior.opaque,
                 child: Container(
@@ -380,8 +402,14 @@ class _HealthEmergencyScreenState extends State<HealthEmergencyScreen> {
               Expanded(
                 child: PvPress(child: GestureDetector(
                   onTap: () {
+                    final was = _store.emergency;
                     _store.clearEmergency();
                     Navigator.of(ctx).pop();
+                    // Undo (tools pass, 2026-10-25): a deleted card was gone at once.
+                    pvToast(context, 'Emergency card deleted.',
+                        kind: PvToastKind.undo,
+                        action: was == null ? null : 'Undo',
+                        onAction: was == null ? null : () => _store.setEmergency(was));
                   },
                   behavior: HitTestBehavior.opaque,
                   child: Container(height: 48, alignment: Alignment.center, decoration: BoxDecoration(color: ppCoral, borderRadius: BorderRadius.circular(14)), child: Text('Delete', style: ppBody(14, color: Colors.white, w: FontWeight.w700))),

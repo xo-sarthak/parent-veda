@@ -32,8 +32,8 @@ const Set<String> _shared = {
 /// listed, so the list can only shrink.
 const Set<String> _owedShell = {
   'pp_sleep_sounds',
-  'pp_fever_check',
-  'pp_doctor_visit',
+  // 'pp_fever_check', // on the shell since 2026-10-25 (tools pass, Health)
+  // 'pp_doctor_visit', // on the shell since 2026-10-25 (Wave 3, Health)
   'pp_leaps',
   'pp_scripts',
   'pp_food_chart',

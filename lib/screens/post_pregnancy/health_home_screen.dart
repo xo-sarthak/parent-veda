@@ -102,16 +102,18 @@ class HealthHomeScreen extends StatelessWidget {
                 // The card itself, not the full-page editor it used to open
                 // (the tools row below, kept). "Edit details" still reaches it.
                 _row(context, p, 'pp_health_emergency', 350, mTab: TtcTabMark.twoBubbles, title: 'Emergency card',
-                    line: HealthStore.instance.emergency == null
-                        ? 'Not made yet, it takes a minute'
-                        : 'Ready to show or share',
+                    // Was 'Not made yet, it takes a minute' / 'Ready to show or share' (2026-10-25).
+                    line: HealthStore.instance.emergency == null ? 'Not set up yet, add one' : 'Ready to show',
                     to: const WalletEmergencyCardScreen()),
                 _row(context, p, 'pp_health_docs', 30, mTab: TtcTabMark.wallet, title: 'ID and documents',
                     line: 'Birth certificate, ID, insurance', to: const BabyDocumentsScreen()),
-                _row(context, p, 'pp_health_visit', 260, mTab: TtcTabMark.doctorChat, title: 'Doctor visit companion',
-                    line: 'Questions to take to the next visit', to: const HealthDoctorVisitScreen()),
+                // Live lines (Wave 3, H4, 2026-10-25). Were: 'Doctor visit companion' /
+                // 'Questions to take to the next visit', and 'What helped last time',
+                // which implied a history the guide does not hold. Kept for revert.
+                _row(context, p, 'pp_health_visit', 260, mTab: TtcTabMark.doctorChat, title: 'Before you see the doctor',
+                    line: _visitLine(), to: const HealthDoctorVisitScreen()),
                 _row(context, p, 'pp_health_guide', 170, mTab: TtcTabMark.openBook, title: 'Health guide',
-                    line: 'What helped last time', to: const HealthGuideScreen()),
+                    line: 'Common illnesses, and when to call', to: const HealthGuideScreen()),
               ])),
               const SizedBox(height: 26),
               pregToolPad(PregSectionHeading('Lately',
@@ -154,10 +156,34 @@ class HealthHomeScreen extends StatelessWidget {
     ].join('  ·  ');
   }
 
+  // Kept for revert (2026-10-25): the date, not how long ago.
+  // String _growthLine() {
+  //   final g = GrowthStore.instance.latest;
+  //   if (g == null || !HealthStore.instance.growthEntered) return 'No measurements yet, add the first';
+  //   return '${g.weightKg.toStringAsFixed(1)} kg, ${g.heightCm.toStringAsFixed(0)} cm  ·  ${ppShortDate(g.date)}';
+  // }
+
+  /// "6.4 kg, 3 days ago": the latest weight and how fresh it is (Wave 3, H4).
   String _growthLine() {
     final g = GrowthStore.instance.latest;
     if (g == null || !HealthStore.instance.growthEntered) return 'No measurements yet, add the first';
-    return '${g.weightKg.toStringAsFixed(1)} kg, ${g.heightCm.toStringAsFixed(0)} cm  ·  ${ppShortDate(g.date)}';
+    final now = DateTime.now();
+    final days = DateTime(now.year, now.month, now.day).difference(DateTime(g.date.year, g.date.month, g.date.day)).inDays;
+    final ago = days <= 0
+        ? 'today'
+        : days == 1
+            ? 'yesterday'
+            : days < 60
+                ? '$days days ago'
+                : 'on ${ppShortDate(g.date)}';
+    return '${g.weightKg.toStringAsFixed(1)} kg, $ago';
+  }
+
+  /// "3 questions ready" or the invitation, never hidden.
+  String _visitLine() {
+    final n = HealthStore.instance.questions.length;
+    if (n == 0) return 'Add your questions';
+    return n == 1 ? '1 question ready' : '$n questions ready';
   }
 
   /// "Paracetamol, Vitamin D" kept to one line's worth.

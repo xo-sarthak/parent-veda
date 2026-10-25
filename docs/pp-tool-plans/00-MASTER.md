@@ -117,3 +117,8 @@ A finding is settled at that tool's turn, as one plan decision. **C1** (the 8 To
 ### Backend done rule (the user, 2026-10-25)
 "Whenever you are completing a tool make sure the back ends are working well." A tool is not done until: its store is child-scoped on read and write, every write syncs (ledger or merged store) with a test, any new consent kind syncs through `PpUseConsent`, and the backend docs (BACKEND-PATTERNS when there's a new pattern, sync log + STILL-OPEN-BACKEND when sync changes) are written in the same change.
 
+### Repeats settled in the Health family (2026-10-25)
+- **R1** settled: "Is my baby OK?" is the one symptom tool for every age (the user: "shouldnt it be a whole symptom tool"); the newborn feeding check is "Getting enough milk?" inside it.
+- **R2** settled: one fever answer. Fever in the symptom tool hands over to Fever check.
+- **R4** settled: Health record stays as the records home, with live status rows.
+- **R3** (Activities label) waits for the Development family.

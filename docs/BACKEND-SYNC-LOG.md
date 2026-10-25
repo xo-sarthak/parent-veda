@@ -1299,3 +1299,109 @@ comments). `sync_reset_coverage_test` also passes.
 `pp_vaccine_data.dart`, `pp_care_log_data.dart`, `pp_feeding_data.dart`, `pp_sleep_data.dart`,
 `lib/services/pp_messages_store.dart`, `lib/screens/skilling/sk_turning_six.dart`,
 `test/pp_child_records_test.dart` (new), `test/pp_records_merge_test.dart`, `test/pp_messages_family_test.dart`.
+
+
+## Step 17: one record per pregnancy (R1)
+
+**Date:** 2026-10-25 (STAGE-TRANSITIONS R1; the user: "let them take control of it and delete it permanently if
+they want tht, why decide for them?", and "lets keep it 90 days for now"). **Migration:** `0114_pregnancies.sql`
+(the user runs it). **Commit:** owed.
+
+### Why
+A pregnancy was not a thing the database could name: one due date, one stage and one loss flag per person. So a
+pregnancy after a loss opened on the lost one's bump photos, scans, hospital bag and letters; day 120 of a second
+pregnancy overwrote the first's mood; and there was no way to look back at an earlier pregnancy, or to remove it.
+
+### What changed
+- [x] **`pregnancies` (0114).** One row per pregnancy:
+  - columns: start, due date, `due_date_source`, end, outcome (`ongoing` | `loss` | `birth` | `ended`), `child_id`,
+    `archive jsonb`
+  - PK `(user_id, id)` (the B9 rule)
+  - her rows in full, plus a read for her partner (as `journey_timeline`, 0041)
+  - the newer-wins guard, and on the 90-day purge
+- [x] **`PregnancyRecords`** (`lib/services/pregnancy_records.dart`). Synced through `OwnRowLedger`; its sign-out
+  reset is registered. On first run, the records an install already implies are derived:
+  - each pregnancy the family timeline remembers
+  - the one her due date describes
+  - a recorded loss or a child born inside it
+
+  The partner's phone uses her records for its windows.
+- [x] **The window rule.** Records sort by start, and each owns the time until the next one starts, so the windows
+  partition time. Every dated pregnancy store reads through `PregnancyRecords.inCurrent`:
+  - bump photos, symptoms, weights, kicks, contractions
+  - weekly notes, letters, the journal, his journal
+  - appointments, the partner's scans, Garbh recordings
+
+  A removed pregnancy still bounds the windows.
+- [x] **Sealing.** When the next pregnancy begins (`startNew`, from `confirmPregnancy`), the undated records are
+  copied into the old pregnancy's archive and the live stores start clean, as her edit, so her other phones follow:
+  - the hospital bag (both), the birth plan, the birth context, the checklists, journey dates, scan reports
+  - scans ticked by catalogue id
+  - moods, missions and movement answers keyed by pregnancy day
+
+  `CloudMergedStore.replaceItemsAsEdit` is the new door for the merged stores. The undo ("the test was wrong") puts
+  them back.
+- [x] **The moves:**
+  - `recordLoss` and `undoLoss` end the record and carry it on again
+  - `recordBirth` ends it with the child, before the stage moves
+  - `setDueDate` re-dates the current record and never starts one
+  - `confirmPregnancy` starts the record before the due date moves
+- [x] **"Kept for you".** A quiet row at the foot of the Your family sheet, and "Your pregnancies" in You on every
+  stage. Neither is ever a switchable profile.
+  - `PregnancyKeptScreen` is one view-only page: photos, journal, weekly notes, letters, Garbh, appointments, and an
+    "also kept" line.
+  - Delete names what goes. Each dated record goes through its store's own delete, so the removals sync and the
+    Storage files go. The record is soft-deleted: off her phones now, purged after 90 days.
+  - The loss page now says, once, where it is kept.
+- [x] **Found on the way:**
+  - `MemoryStore` and `JournalStore` cached under the same prefs key (`journal_entries`), so each read the other's
+    entries as its own (split once, `journal_key_split.dart`; a source scan now refuses a shared key).
+  - The weekly notes' "one per week" migration would have fused two pregnancies' week-12 notes. It now groups by
+    week and by date.
+  - A second pregnancy's scan of the same kind would have overwritten the first one's journal entry
+    (`scan_<id>`). It now gets a dated id.
+  - The letter vault reads the letters of the pregnancy that became the child (`dearBabyLetters`).
+
+**Verified:** `test/pregnancy_records_test.dart` (new, 21) covers:
+- the backfill cases
+- the window partition, with a second pregnancy's bump opening clean
+- loss and undo; a new pregnancy sealing and its undo
+- the same pregnancy confirmed twice
+- delete
+- the words, and the wiring (source scans)
+- the shared prefs key
+
+**Known limits:**
+- A record's date decides its pregnancy. A row dated far from the truth lands in the wrong one, but the app dates
+  these itself.
+- Her pre-pregnancy weight (one row per person) carries into the next pregnancy, where she can edit it.
+- Garbh rituals, pins and favourites carry on, on purpose.
+- Personalisation reading `outcome` is still owed.
+- On his phone, before she has run the update, he derives records of his own from her due date. Once hers arrive,
+  his are what his windows use.
+
+**User ran:** 0114: owed.
+
+**Files:**
+- New: `supabase/migrations/0114_pregnancies.sql`, `lib/services/pregnancy_records.dart`,
+  `lib/services/pregnancy_archive.dart`, `lib/services/journal_key_split.dart`,
+  `lib/screens/pregnancy/pregnancy_kept_screen.dart`, `test/pregnancy_records_test.dart`.
+- Changed: the stores named above, plus `stage_moves.dart`, `ttc_transition.dart`, `pregnancy_controller.dart`,
+  `cloud_merged_store.dart`, `family_timeline.dart` and `life_stage_store.dart` (`ready`), `main.dart`,
+  `pv_family_switch.dart`, `pv_you_content.dart`, `pv_you_screen.dart`, `dear_baby_vault_screen.dart`,
+  `pv_door_after_loss.dart`.
+## Step 17: the Health tools: ask once covers what she tells the symptom tool, and edits keep their ids
+
+**Date:** 2026-10-25 (parenting tools pass, Health family; the user's rule: "make sure the back ends are working well").
+**Migration:** none. **Commit:** pending.
+
+### What changed
+- [x] **Two new consent kinds,** `nappies` and `changes`, ride the same `PpUseConsent` merged store as `feeds` (step 15). They need no new key: one item per kind under `pp_use_consent`.
+- [x] **Saved changes are read only after a yes.** `PpChangesStore.active()` returns nothing without `allows(changes)`. Every reader (home "You told us", the relevance brain) comes through it, so one check covers them. The rows themselves still sync as before (the step-13 merge); a no stops them being used, not stored. Changes she already had stay.
+- [x] **`GrowthStore.update`** replaces a measurement in place and `touch`es the same id, so an edit reaches the other phone as an edit (newer wins), not as a removal plus a new row.
+- [x] **The emergency card has one source:** allergies and medicines from the child's health record, birth date from the profile, weight from the growth log. The card's own copies of those fields are no longer shown or edited (the columns stay, kept for revert).
+
+**Verified:** `test/pp_symptom_tool_test.dart` (ask once before keeping; a no means saved changes are never read), `pp_wave8_test`, `pp_use_consent_sync_test`, `pp_child_records_test`, `pp_records_merge_test`, `sync_guard_contract_test`: all pass within the 665 run.
+
+**Files:** `lib/services/pp_use_consent.dart`, `lib/screens/post_pregnancy/pp_changes_store.dart`, `pp_growth_data.dart`, `pp_wallet_data.dart`.
+

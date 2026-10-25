@@ -340,7 +340,11 @@ Widget? _ppScreenFor(String id) => switch (id) {
       'pp_ask_veda' => const AskVedaScreen(),
       'pp_compare' => const ProductsCompareScreen(),
       'pp_crisis_path' => const PpCrisisPathScreen(),
-      'pp_baby_ok_check' => const PpBabyOkCheckScreen(),
+      // ⚠️ ONE SYMPTOM TOOL (tools pass H2, 2026-10-25): "Is my baby OK?" is
+      // the all-ages checker now; the newborn feeding check it used to be keeps
+      // its own id. Kept for revert: 'pp_baby_ok_check' => const PpBabyOkCheckScreen(),
+      'pp_baby_ok_check' => const WhatChangedScreen(),
+      'pp_newborn_feeding' => const PpBabyOkCheckScreen(),
       // Already built and already reachable from Explore and Profile; it simply
       // had no surface id, so four Traditions links pointed at nothing.
       'pp_memories' => const MemoriesHomeScreen(),

@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/notification_service.dart';
 import 'pp_attachments.dart';
+import 'pp_care_parts.dart' show ppCareSaved;
 import 'pp_common.dart';
 import 'pp_health_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
@@ -316,7 +317,11 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
             Text('${r.date}${r.doctor != null ? ' · ${r.doctor}' : ''}', style: ppBody(11.5, color: ppMuted)),
           ])),
           PvPress(child: GestureDetector(
-            onTap: () => _confirmDelete('Delete this report?', () => _store.removeReport(i)),
+            // Was: () => _store.removeReport(i) (kept for revert, 2026-10-25): now with Undo.
+            onTap: () => _confirmDelete('Delete this report?', () {
+              _store.removeReport(i);
+              _deleted('Report', () => _store.addReport(r));
+            }),
             behavior: HitTestBehavior.opaque,
             child: const Padding(padding: EdgeInsets.only(left: 6), child: Icon(Icons.delete_outline_rounded, size: 20, color: ppMuted)),
           )),
@@ -446,6 +451,13 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
               final id = existing?.reminderId;
               if (id != null) NotificationService.instance.cancel(id);
               _store.removeMedication(index);
+              // Undo puts it back with the same id, and its reminder too.
+              if (existing != null) {
+                _deleted('Medicine', () {
+                  _store.addMedication(existing);
+                  _applyMedReminder(existing);
+                });
+              }
             },
       fields: (setSheet) => [
         _tf(name, 'Name'),
@@ -529,7 +541,12 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
     AllergyStatus status = existing?.status ?? AllergyStatus.known;
     _sheet(
       title: existing == null ? 'Add allergy' : 'Edit allergy',
-      onDelete: index == null ? null : () => _store.removeAllergy(index),
+      onDelete: index == null
+          ? null
+          : () {
+              _store.removeAllergy(index);
+              if (existing != null) _deleted('Allergy', () => _store.addAllergy(existing));
+            },
       fields: (setSheet) => [
         _tf(name, 'Allergen'),
         _label('Status'),
@@ -552,7 +569,12 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
     final note = TextEditingController(text: existing?.note ?? '');
     _sheet(
       title: existing == null ? 'Log a symptom' : 'Edit symptom',
-      onDelete: index == null ? null : () => _store.removeSymptom(index),
+      onDelete: index == null
+          ? null
+          : () {
+              _store.removeSymptom(index);
+              if (existing != null) _deleted('Symptom', () => _store.addSymptom(existing));
+            },
       fields: (setSheet) => [
         _tf(name, 'Symptom (e.g. fever, rash)'),
         _tf(note, 'What you noticed', maxLines: 3),
@@ -573,7 +595,12 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
     final summary = TextEditingController(text: existing?.summary ?? '');
     _sheet(
       title: existing == null ? 'Add a visit' : 'Edit visit',
-      onDelete: index == null ? null : () => _store.removeVisit(index),
+      onDelete: index == null
+          ? null
+          : () {
+              _store.removeVisit(index);
+              if (existing != null) _deleted('Visit', () => _store.addVisit(existing));
+            },
       fields: (setSheet) => [
         _tf(title, 'Visit (e.g. 6-month check, fever review)'),
         _tf(date, 'Date'),
@@ -632,7 +659,12 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
     final List<Attachment> atts = [...?existing?.attachments];
     _sheet(
       title: existing == null ? 'Add a prescription' : 'Edit prescription',
-      onDelete: index == null ? null : () => _store.removePrescription(index),
+      onDelete: index == null
+          ? null
+          : () {
+              _store.removePrescription(index);
+              if (existing != null) _deleted('Prescription', () => _store.addPrescription(existing));
+            },
       fields: (setSheet) => [
         _tf(name, 'Prescription name (e.g. Fever review)'),
         _tf(doctor, 'Prescribed by'),
@@ -711,6 +743,14 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         ),
       ),
     );
+  }
+
+  /// Every delete says what went and offers Undo (Wave 3, H4, 2026-10-25).
+  /// Undo re-adds the same row through the store's own add, with its id, so
+  /// the cloud copy is the same row coming back, not a new one.
+  void _deleted(String what, VoidCallback undo) {
+    if (!mounted) return;
+    ppCareSaved(context, '$what deleted.', undo: undo);
   }
 
   void _confirmDelete(String title, VoidCallback onConfirm) {

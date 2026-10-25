@@ -25,7 +25,7 @@ void main() {
 
     for (var step = 0; step < options.length; step++) {
       await tapText(options[step], -120);
-      await tapText(step < options.length - 1 ? 'Continue' : 'See the likely cause', 120);
+      await tapText(step < options.length - 1 ? 'Continue' : 'See what it might be' /* was 'See the likely cause' (tools pass 2026-10-25) */, 120);
     }
   }
 
@@ -55,23 +55,31 @@ void main() {
     expect(find.text('A developmental sleep regression'), findsNothing);
   });
 
-  testWidgets('A red-flag answer routes to an urgent "see a doctor now" result', (tester) async {
+  // ⚠️ REWRITTEN 2026-10-25 (tools pass H1): this test locked in a fever
+  // answer that contradicted Fever check (a 2-month-old at 37.2 C: urgent
+  // here, "no fever" there). Fever now hands over to Fever check, so the red
+  // flag is held on a concern that keeps its own rules: green vomit.
+  testWidgets('A red-flag answer routes to an urgent "see a doctor now" result, with 112 and 108', (tester) async {
     bigView(tester);
-    final fever = wcById('low_fever')!;
-    await tester.pumpWidget(MaterialApp(home: WcFlowScreen(concern: fever)));
+    final vomit = wcById('vomiting')!;
+    await tester.pumpWidget(MaterialApp(home: WcFlowScreen(concern: vomit)));
     await tester.pumpAndSettle();
 
-    // Under 3 months with a fever is a red flag -> urgent, regardless of the
-    // other (benign) answers chosen.
     await walk(tester, const [
-      'Under 38°C',
-      'Under 3 months',
-      'Just a bit warm and clingy',
+      'Green or yellow',
+      'Yes, plenty',
+      'Once or twice',
     ]);
 
     final scrollable = find.byType(Scrollable).first;
-    await tester.scrollUntilVisible(find.text('This needs a doctor now'), -200, scrollable: scrollable, maxScrolls: 30);
-    expect(find.text('This needs a doctor now'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Vomit that needs a doctor now'), -200, scrollable: scrollable, maxScrolls: 30);
+    expect(find.text('Vomit that needs a doctor now'), findsOneWidget);
     expect(find.text('SEE A DOCTOR NOW'), findsWidgets);
+    expect(find.byKey(const ValueKey('wc_flow_emergency')), findsOneWidget);
+  });
+
+  test('fever hands over to Fever check, the one fever judge', () {
+    expect(kWcHandOff['low_fever'], 'pp_fever_check');
+    expect(kWcRules.containsKey('low_fever'), isFalse, reason: 'the old fever rules no longer run');
   });
 }

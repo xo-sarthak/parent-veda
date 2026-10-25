@@ -56,9 +56,17 @@ class RemedyListScreen extends StatelessWidget {
       };
 
   /// The dot and the word for a remedy, from the data alone.
-  static (CanIVerdict, String) _verdict(Remedy r) => r.isCaution
-      ? (CanIVerdict.moderation, '${r.ageWarning}, read the cautions')
-      : (CanIVerdict.safe, 'Gentle, ${r.age}');
+  // The honest verdict leads (tools pass H5, 2026-10-25): Avoid is red,
+  // a caution amber, and only a remedy marked Helps reads green. Was: caution
+  // amber, everything else green "Gentle". Kept for revert:
+  //   r.isCaution ? (CanIVerdict.moderation, '${r.ageWarning}, read the cautions')
+  //               : (CanIVerdict.safe, 'Gentle, ${r.age}');
+  static (CanIVerdict, String) _verdict(Remedy r) => switch (r.verdict) {
+        NuskheVerdict.avoid => (CanIVerdict.avoid, nuskheVerdictLabel(r.verdict)),
+        _ when r.isCaution => (CanIVerdict.moderation, '${nuskheVerdictLabel(r.verdict)} · ${r.ageWarning}'),
+        NuskheVerdict.helps => (CanIVerdict.safe, '${nuskheVerdictLabel(r.verdict)} · ${r.age}'),
+        NuskheVerdict.comfort => (CanIVerdict.depends, '${nuskheVerdictLabel(r.verdict)} · ${r.age}'),
+      };
 
   Widget _dot(V2Palette p, CanIVerdict v) => Container(
         width: 9,

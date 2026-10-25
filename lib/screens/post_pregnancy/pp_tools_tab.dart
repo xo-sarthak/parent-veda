@@ -124,11 +124,17 @@ List<PpToolGroup> ppToolGroups() {
           IntentMark.pillMark, live: () => VaxStore.instance.nextVisitSubtitle, words: ['shots', 'tika', 'vaccination']),
       PpTool('Fever check', 'A temperature, checked calmly, and when to call.', 'pp_fever_check',
           IntentMark.thermoMark, words: ['fever', 'temperature', 'bukhar']),
-      PpTool('Is my baby OK?', 'A symptom, checked calmly, and when to call.', 'pp_baby_ok_check',
-          IntentMark.questionMark, words: ['fever', 'sick', 'symptom']),
+      // ⚠️ ONE SYMPTOM TOOL FOR EVERY AGE (tools pass H2, 2026-10-25). Was two
+      // rows: this one opened a newborn feeding check, and "Something changed?"
+      // (below, kept for revert) was the real checker. Kept for revert:
+      // PpTool('Is my baby OK?', 'A symptom, checked calmly, and when to call.', 'pp_baby_ok_check',
+      //     IntentMark.questionMark, words: ['fever', 'sick', 'symptom']),
+      PpTool('Is my baby OK?', 'Sleep, feeding, illness or mood: checked calmly, and when to call.', 'pp_what_changed',
+          IntentMark.questionMark,
+          words: ['fever', 'sick', 'symptom', 'cough', 'vomit', 'rash', 'changed', 'regression', 'fussy', 'enough milk']),
       PpTool('Health record', 'Visits, illnesses and papers in one place.', 'pp_health_home', IntentMark.reportPage,
           words: ['records', 'documents']),
-      PpTool('Before you see the doctor', 'Questions and notes to take to the visit.', 'pp_doctor_visit',
+      PpTool('Before you see the doctor', 'Questions and a summary to share.' /* was 'Questions and notes to take to the visit.': no notes field (tools pass) */, 'pp_doctor_visit',
           IntentMark.listMark, words: ['doctor', 'visit', 'questions', 'appointment']),
       PpTool('Emergency card', 'Blood group, allergies and two numbers to call.', 'pp_emergency_card',
           IntentMark.askDoctor, words: ['emergency', 'sos']),
@@ -148,8 +154,9 @@ List<PpToolGroup> ppToolGroups() {
           IntentMark.playMark, words: ['play', 'games', 'activity']),
       PpTool("Your child's phases", 'What this phase is like, and what comes next.', 'pp_leaps',
           IntentMark.moonMark, words: ['phase', 'leap', 'wonder weeks']),
-      PpTool('Something changed?', 'Sleep, feeding or mood suddenly different.', 'pp_what_changed',
-          IntentMark.nextStep, words: ['regression', 'leap', 'fussy']),
+      // Folded into "Is my baby OK?" above (tools pass H2, 2026-10-25). Kept for revert:
+      // PpTool('Something changed?', 'Sleep, feeding or mood suddenly different.', 'pp_what_changed',
+      //     IntentMark.nextStep, words: ['regression', 'leap', 'fussy']),
       PpTool('What to say', 'Calm words for tantrums, hitting and big feelings.', 'pp_scripts',
           IntentMark.bookMark, words: ['tantrum', 'hitting', 'scripts', 'discipline']),
     ]),

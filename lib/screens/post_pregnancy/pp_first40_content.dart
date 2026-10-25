@@ -2153,7 +2153,7 @@ final PpSection kPpFirst40Section = PpSection(
             PpWhenLine('Check nappies daily in the first fortnight, and weight '
                 'at each visit. After 6 weeks, weight alone is enough.'),
             PpLink('The quick daily check',
-                surfaceId: 'pp_baby_ok_check',
+                surfaceId: 'pp_newborn_feeding', // was pp_baby_ok_check (tools pass H2)
                 blurb: 'Wet nappies, weight, jaundice and feeds. Four things, '
                     'thirty seconds, nothing to log.'),
             PpLink("Your baby's weight and growth",
@@ -2743,7 +2743,7 @@ final PpSection kPpFirst40Section = PpSection(
                   '3 hours in the day or 4 at night without a feed.'),
             ], heading: 'How to do each one', hue: 152),
             PpLink('Open the quick check',
-                surfaceId: 'pp_baby_ok_check',
+                surfaceId: 'pp_newborn_feeding', // was pp_baby_ok_check (tools pass H2)
                 blurb: 'Tap through the four checks and see whether anything '
                     'needs a call.'),
             PpWhenLine('Once a day through the first fortnight is plenty. After '
@@ -3785,9 +3785,10 @@ final PpSection kPpFirst40Section = PpSection(
   ],
   tools: [
     PpSectionTool(
-      label: 'Is my baby OK? The quick check',
+      // Was 'Is my baby OK? The quick check' on pp_baby_ok_check (tools pass H2).
+      label: 'Getting enough milk? The quick check',
       blurb: 'Four things in thirty seconds. Nothing to log, no streaks.',
-      surfaceId: 'pp_baby_ok_check',
+      surfaceId: 'pp_newborn_feeding',
     ),
     PpSectionTool(
       label: "Your baby's weight and growth",

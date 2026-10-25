@@ -50,6 +50,32 @@ const RemedyPanel _panelNair = RemedyPanel(
   note: ' & 4 practitioners, cross-checked by an MBBS paediatrician.',
 );
 
+// ---- the verdict -------------------------------------------------------------
+
+/// What a remedy honestly does (Wave 3, H5, 2026-10-25). The Health door
+/// promised "which help, which only comfort, and which aren't safe"; until
+/// this the data had no way to say it, so every remedy read as gentle.
+///   helps    paediatric guidance also suggests it (a cold spoon for gums).
+///   comfort  it may soothe; there is no evidence it treats anything.
+///   avoid    not safe for babies: the entry says why and what to do instead.
+/// REQUIRED_REVIEW: every verdict below needs a clinician's sign-off before
+/// launch (docs/BEFORE-LAUNCH.md, remedy verdicts).
+enum NuskheVerdict { helps, comfort, avoid }
+
+/// The word on a remedy's status pill.
+String nuskheVerdictLabel(NuskheVerdict v) => switch (v) {
+      NuskheVerdict.helps => 'Helps',
+      NuskheVerdict.comfort => 'Comfort only',
+      NuskheVerdict.avoid => 'Avoid',
+    };
+
+/// One sentence saying what the verdict means, for the detail page.
+String nuskheVerdictMeaning(NuskheVerdict v) => switch (v) {
+      NuskheVerdict.helps => 'Helps: a gentle step that paediatric guidance also suggests.',
+      NuskheVerdict.comfort => 'Comfort only: it may soothe, but there is no evidence it treats anything.',
+      NuskheVerdict.avoid => 'Avoid: not safe for babies. Why, and what to do instead, is below.',
+    };
+
 // ---- the remedy model -------------------------------------------------------
 
 class Remedy {
@@ -74,6 +100,7 @@ class Remedy {
     this.hasVideo = false,
     this.videoNote,
     this.popular = false,
+    this.verdict = NuskheVerdict.comfort,
   });
 
   final String id;
@@ -97,12 +124,35 @@ class Remedy {
   final String? videoNote; // caption under the demo-video placeholder
   final bool popular;
 
+  /// What it honestly does (see [NuskheVerdict]). Defaults to comfort: a
+  /// remedy is never "helps" unless someone wrote that on purpose.
+  final NuskheVerdict verdict;
+
+  /// The youngest age in months the remedy names ("8+ mo" is 8), or null
+  /// when the age is not a number (an avoid entry). Read by the "Not for
+  /// (name) yet" pill, which is shown, never used to hide the remedy.
+  int? get minMonths {
+    final m = RegExp(r'^(\d+)').firstMatch(age.trim());
+    return m == null ? null : int.tryParse(m.group(1)!);
+  }
+
+  /// True when a child of [ageInMonths] is younger than the remedy's age.
+  bool notYetFor(int ageInMonths) {
+    final min = minMonths;
+    return min != null && ageInMonths < min;
+  }
+
   /// A gated remedy (age warning present) shows the coral caution pill instead
   /// of the green "Vaidya-approved" pill on list rows and popular rows.
   bool get isCaution => ageWarning != null;
 
   /// Right-hand pill label on list/popular rows.
-  String get pillLabel => ageWarning ?? 'Vaidya-approved';
+  // Kept for revert, 2026-10-25: no vaidya approved anything, and nothing may
+  // claim an approval that does not exist.
+  // String get pillLabel => ageWarning ?? 'Vaidya-approved';
+  String get pillLabel => verdict == NuskheVerdict.avoid
+      ? nuskheVerdictLabel(verdict)
+      : ageWarning ?? 'Not yet reviewed by a doctor';
 
   /// Right-hand meta on list/popular rows.
   String get rowMeta => ageWarning != null ? 'read cautions' : age;
@@ -141,6 +191,8 @@ const List<Remedy> kRemedies = [
     description:
         'A warm carom-seed compress that eases congestion and helps a stuffy baby breathe and feed. Preventive and soothing - warmed near the chest and feet, never applied to skin directly.',
     age: '0+ mo',
+    // The burn warning on the row too, not only the detail page (H5, 2026-10-25).
+    ageWarning: 'Burn risk: warm only, near the skin, never on it',
     frequency: '2×/day',
     prepTime: '5 min',
     ingredients: [
@@ -179,6 +231,9 @@ const List<Remedy> kRemedies = [
     description:
         'The classic dadi chest and back rub - mustard oil gently warmed with garlic and ajwain, massaged onto the chest, back and soles to ease a rattly cold and comfort a fussy baby before sleep.',
     age: '3+ mo',
+    // A caution, not green (H5, 2026-10-25): garlic can burn a baby's skin and
+    // mustard oil can irritate it. REQUIRED_REVIEW.
+    ageWarning: 'Ask your doctor first: garlic and mustard oil can irritate a baby\'s skin',
     frequency: '1-2×/day',
     prepTime: '10 min',
     ingredients: [
@@ -216,7 +271,8 @@ const List<Remedy> kRemedies = [
     description:
         'Fresh tulsi (holy basil) juice with a little honey - a time-honoured throat soother for an older baby with a dry, tickly cough. Honey means this one is strictly for over-ones.',
     age: '12+ mo',
-    ageWarning: '1 year+ only (honey)',
+    // ageWarning: '1 year+ only (honey)', // kept for revert, 2026-10-25
+    ageWarning: 'Avoid under 1 year: honey',
     frequency: '2×/day',
     prepTime: '5 min',
     ingredients: [
@@ -422,6 +478,8 @@ const List<Remedy> kRemedies = [
     description:
         'The go-to dadi remedy for a gassy, colicky baby - a little hing mixed with warm water or oil, dabbed around (never in) the navel to help release trapped wind and settle a crying tummy.',
     age: '1+ mo',
+    // A caution, not green (H5, 2026-10-25). REQUIRED_REVIEW.
+    ageWarning: 'Ask your doctor first: hing can irritate a baby\'s skin',
     frequency: 'As needed',
     prepTime: '3 min',
     ingredients: [
@@ -448,7 +506,7 @@ const List<Remedy> kRemedies = [
     ],
     hasVideo: true,
     videoNote: 'Watch: the clockwise anti-gas tummy rub',
-    popular: true,
+    // popular: true, // kept for revert, 2026-10-25: a caution is not promoted on the landing
   ),
   Remedy(
     id: 'tummy_massage_bicycle',
@@ -556,6 +614,7 @@ const List<Remedy> kRemedies = [
   // ===== Teething ============================================================
   Remedy(
     id: 'chilled_spoon',
+    verdict: NuskheVerdict.helps, // REQUIRED_REVIEW (H5, 2026-10-25)
     name: 'A chilled (not frozen) spoon',
     category: 'Teething',
     icon: Icons.ac_unit,
@@ -589,6 +648,7 @@ const List<Remedy> kRemedies = [
   ),
   Remedy(
     id: 'gum_massage',
+    verdict: NuskheVerdict.helps, // REQUIRED_REVIEW (H5, 2026-10-25)
     name: 'Clean-finger gum massage',
     category: 'Teething',
     icon: Icons.back_hand_outlined,
@@ -623,6 +683,7 @@ const List<Remedy> kRemedies = [
   ),
   Remedy(
     id: 'cool_washcloth',
+    verdict: NuskheVerdict.helps, // REQUIRED_REVIEW (H5, 2026-10-25)
     name: 'A cool, damp washcloth to chew',
     category: 'Teething',
     icon: Icons.dry_cleaning_outlined,
@@ -729,6 +790,7 @@ const List<Remedy> kRemedies = [
   ),
   Remedy(
     id: 'winddown_bath',
+    verdict: NuskheVerdict.helps, // REQUIRED_REVIEW (H5, 2026-10-25)
     name: 'A warm wind-down bath & routine',
     category: 'Sleep issues',
     icon: Icons.bedtime_outlined,
@@ -763,6 +825,7 @@ const List<Remedy> kRemedies = [
   // ===== Skin issues =========================================================
   Remedy(
     id: 'coconut_moisturise',
+    verdict: NuskheVerdict.helps, // REQUIRED_REVIEW (H5, 2026-10-25)
     name: 'Coconut oil for dry skin',
     category: 'Skin issues',
     icon: Icons.water_drop_outlined,
@@ -831,6 +894,7 @@ const List<Remedy> kRemedies = [
   ),
   Remedy(
     id: 'coconut_cradlecap',
+    verdict: NuskheVerdict.helps, // REQUIRED_REVIEW (H5, 2026-10-25)
     name: 'Coconut oil for cradle cap',
     category: 'Skin issues',
     icon: Icons.spa_outlined,
@@ -894,6 +958,130 @@ const List<Remedy> kRemedies = [
     related: [
       RemedyLink('Read', 'Ubtan for babies: gentle, or skip?'),
     ],
+  ),
+
+  // ===== Not safe for babies (H5, 2026-10-25) ===============================
+  // Things families are often told to do, written calmly: what it is, why it
+  // is not safe, and what to do instead. Shown, never hidden: a parent handed
+  // ghutti by an elder needs the reason here. REQUIRED_REVIEW: every entry
+  // below needs a clinician's sign-off before launch.
+  // REQUIRED_REVIEW
+  Remedy(
+    id: 'avoid_janam_ghutti',
+    name: 'Janam ghutti (ghutti) for a newborn',
+    category: 'Stomach & colic',
+    icon: Icons.block_outlined,
+    oneLine: 'A herbal paste or drops given to newborns. Not safe for babies.',
+    description:
+        'Many families give a newborn ghutti, a herbal paste or drops, for digestion or "strength". A baby\'s first six months need only breast milk or formula. Anything else in the mouth can carry germs and fill the small tummy so they feed less, and some ghutti products have been found to contain heavy metals.',
+    age: 'Not advised',
+    ageWarning: 'Not advised for babies',
+    frequency: '-',
+    prepTime: '-',
+    ingredients: [],
+    steps: [],
+    whenToUse:
+        'Only breast milk or formula for the first six months, not even water. If an elder offers ghutti, thank them and say the doctor asked for milk only. For a gassy, unsettled tummy, try tummy massage and bicycle legs, and ask your paediatrician.',
+    redFlags: [
+      'If ghutti has already been given and your baby is vomiting, very sleepy or not feeding, see a doctor today.',
+      'Fewer than six wet nappies a day after the first week.',
+      'Any fever in a baby under 3 months.',
+    ],
+    verdict: NuskheVerdict.avoid,
+  ),
+  // REQUIRED_REVIEW
+  Remedy(
+    id: 'avoid_kajal_surma',
+    name: 'Kajal or surma on the eyes',
+    category: 'Skin issues',
+    icon: Icons.block_outlined,
+    oneLine: 'Kohl lined on a baby\'s eyes. Not safe for babies.',
+    description:
+        'Kajal and surma are lined on babies\' eyes for beauty, to "protect" the eyes or to ward off the evil eye. Many contain lead, which a baby can absorb, and a finger in the eye can carry an infection. It does not make the eyes bigger or stronger.',
+    age: 'Not advised',
+    ageWarning: 'Not advised for babies',
+    frequency: '-',
+    prepTime: '-',
+    ingredients: [],
+    steps: [],
+    whenToUse:
+        'Keep the eyes clean with cooled boiled water on a clean cotton pad, wiping from the inside corner out. If the family wants a kala teeka, a small dot behind the ear or on the sole keeps it well away from the eyes and mouth.',
+    redFlags: [
+      'Red, sticky or swollen eyes, or a yellow-green discharge.',
+      'A baby who is unusually pale, tired or not feeding well after kajal has been used for a while.',
+    ],
+    verdict: NuskheVerdict.avoid,
+  ),
+  // REQUIRED_REVIEW
+  Remedy(
+    id: 'avoid_oil_ears_nose',
+    name: 'Oil in a baby\'s ears or nose',
+    category: 'Cold & cough',
+    icon: Icons.block_outlined,
+    oneLine: 'Drops of warm oil in the ears or nostrils. Not safe for babies.',
+    description:
+        'Putting mustard or coconut oil in the ears or nose after a bath, or for a cold, is a common habit. Oil in the nose can be breathed into the lungs, and oil in the ear can trap moisture and lead to an infection. Ears clean themselves.',
+    age: 'Not advised',
+    ageWarning: 'Not advised for babies',
+    frequency: '-',
+    prepTime: '-',
+    ingredients: [],
+    steps: [],
+    whenToUse:
+        'For a blocked nose: saline drops, a gentle nasal aspirator and moist air. For the ears: wipe only the outer ear with a soft cloth. Massage oil is fine on the body, kept away from the face, ears and nose.',
+    redFlags: [
+      'Ear pain, pulling at the ear, or fluid coming out of the ear.',
+      'Coughing, choking or fast breathing after oil went into the nose.',
+      'A fever with a blocked nose in a baby under 3 months.',
+    ],
+    verdict: NuskheVerdict.avoid,
+  ),
+  // REQUIRED_REVIEW
+  Remedy(
+    id: 'avoid_gripe_water',
+    name: 'Gripe water for colic',
+    category: 'Stomach & colic',
+    icon: Icons.block_outlined,
+    oneLine: 'Sold for colic and teething. Not advised for babies.',
+    description:
+        'Gripe water is sold widely for colic, wind and teething. There is no good evidence that it helps, some products contain sugar, alcohol or herbs, and it puts something other than milk into a young baby\'s tummy.',
+    age: 'Not advised',
+    ageWarning: 'Not advised for babies',
+    frequency: '-',
+    prepTime: '-',
+    ingredients: [],
+    steps: [],
+    whenToUse:
+        'Hold baby upright to burp during and after feeds, try tummy massage and bicycle legs, and hold and rock them through the evening crying hours. Colic eases on its own, usually by 3 to 4 months. Ask your paediatrician before giving anything by mouth.',
+    redFlags: [
+      'Crying that sounds different, high-pitched or weak.',
+      'Green or forceful vomiting, a swollen belly, or blood in the stool.',
+      'A fever, or a baby who will not feed.',
+    ],
+    verdict: NuskheVerdict.avoid,
+  ),
+  // REQUIRED_REVIEW
+  Remedy(
+    id: 'avoid_honey_under_one',
+    name: 'Honey before the first birthday',
+    category: 'Cold & cough',
+    icon: Icons.block_outlined,
+    oneLine: 'Honey for a cough or on a dummy. Not safe under 1 year.',
+    description:
+        'Honey, even a lick of it, can carry the spores that cause infant botulism, a rare but serious illness. A baby\'s gut cannot handle them yet. This is true for raw, cooked and "pure" honey, and for honey mixed into tulsi, ghutti or put on a dummy.',
+    age: 'Not advised',
+    ageWarning: 'Not advised under 1 year',
+    frequency: '-',
+    prepTime: '-',
+    ingredients: [],
+    steps: [],
+    whenToUse:
+        'Before one, keep feeding often and try moist air and saline drops for a cough or cold. After the first birthday, a little honey can soothe a cough (see Tulsi and honey).',
+    redFlags: [
+      'Constipation with a weak cry, poor feeding or floppiness after honey: go to a doctor now.',
+      'Any difficulty breathing or swallowing.',
+    ],
+    verdict: NuskheVerdict.avoid,
   ),
 ];
 

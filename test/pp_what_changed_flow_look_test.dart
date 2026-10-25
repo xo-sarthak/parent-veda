@@ -39,7 +39,8 @@ void main() {
       await t.pumpWidget(MaterialApp(
         builder: (c, child) => MediaQuery(
             data: MediaQuery.of(c).copyWith(textScaler: TextScaler.linear(scale)), child: child!),
-        home: WcFlowScreen(concern: wcById('low_fever')!),
+        // Was low_fever, which now hands over to Fever check (tools pass H1, 2026-10-25).
+        home: WcFlowScreen(concern: wcById('vomiting')!),
       ));
       await t.pumpAndSettle();
       expect(find.byType(PregToolScaffold), findsOneWidget);
@@ -52,13 +53,13 @@ void main() {
         await t.pump();
       }
 
-      const answers = ['Under 38°C', 'Under 3 months', 'Just a bit warm and clingy'];
+      const answers = ['Green or yellow', 'Yes, plenty', 'Once or twice'];
       for (var i = 0; i < answers.length; i++) {
         await t.scrollUntilVisible(find.text(answers[i]), -120, scrollable: scrollable, maxScrolls: 40);
         await t.tap(find.text(answers[i]));
         await t.pump();
         expect(t.takeException(), isNull);
-        await tap(i < answers.length - 1 ? 'Continue' : 'See the likely cause');
+        await tap(i < answers.length - 1 ? 'Continue' : 'See what it might be');
       }
       await t.pumpAndSettle();
       expect(t.takeException(), isNull);

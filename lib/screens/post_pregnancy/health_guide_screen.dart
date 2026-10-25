@@ -7,13 +7,24 @@
 //  caveat), and a telehealth paediatrician. Reached from the "Health" pill on
 //  the My Child home. Faithful build of Claude Design "post pregnancy
 //  app.dc.html" · S17. Pushed screen (no bottom nav). Isolated module.
+//
+//  ⚠️ NO INVENTED HISTORY (Wave 3, H4, 2026-10-25). This page used to print a
+//  child's past and a forecast the app never had: "Last winter <name> caught
+//  a cough after the first cold day", a forecast of the next cold snap, a "Cold & cough, Jan 2026" history with a named doctor, and a
+//  "Worked last time" prescription. The app must never fabricate a child's
+//  history. Those blocks are commented out below, kept for revert; in their
+//  place: neutral, true guidance, her own symptom log from HealthStore (or an
+//  invitation to start one), and quick-adds that open the real record. A tap
+//  on something not built yet says why and what to do until then (S8).
 // =============================================================================
 
 import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 
+import 'health_records_screen.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
+import 'pp_health_data.dart';
 import 'provider_profile_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
@@ -25,7 +36,14 @@ class HealthGuideScreen extends StatelessWidget {
   static const Color _greenBg = Color(0xFFEAF6EF);
   static const Color _warnBg = Color(0xFFFFF7EE);
 
-  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert, 2026-10-25: a bare "Coming soon" (S8).
+  // void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  void _soon(BuildContext context) => pvToast(
+      context, 'Not ready yet. Until then, ask your paediatrician at the next visit.',
+      kind: PvToastKind.gentle);
+
+  void _openRecords(BuildContext context, String category) => Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => HealthRecordsScreen(category: category)));
   // Kept for revert — the floating Material SnackBar:
   // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
   //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
@@ -39,7 +57,10 @@ class HealthGuideScreen extends StatelessWidget {
       backgroundColor: ppBg,
       body: SafeArea(
         bottom: false,
-        child: ListView(
+        // Listens, so a symptom logged from here shows on the way back.
+        child: ListenableBuilder(
+          listenable: HealthStore.instance,
+          builder: (context, _) => ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 32),
           children: [
             // top bar: back + Private
@@ -75,43 +96,48 @@ class HealthGuideScreen extends StatelessWidget {
                   style: ppBody(15)),
             ])),
 
-            // pattern alert (hero)
+            // pattern alert (hero). Kept for revert, 2026-10-25: an invented
+            // history and a forecast the app never had. Never fabricate a
+            // child's history.
+            // _pad(Container(
+            //   padding: const EdgeInsets.all(20),
+            //   decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(22)),
+            //   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            //     Row(children: [ ...the coral "!" dot..., ppEyebrow('Pattern spotted', spacing: 0.9) ]),
+            //     Text('Last winter ${ChildProfileStore.instance.nameMid} caught a cough after the first cold day. '
+            //         'The first cold snap is ... next week - keep him layered and watch for a runny nose.'),
+            //     PvPress(child: GestureDetector(onTap: () => _soon(context),
+            //         child: Text('See what helped last time →', style: ppBody(13, color: ppPurple, w: FontWeight.w700)))),
+            //   ]),
+            // )),
             const SizedBox(height: 22),
             _pad(Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(22)),
+              key: const ValueKey('health_guide_true_line'),
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ppHair)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Container(
-                    width: 22,
-                    height: 22,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(color: ppCoral, shape: BoxShape.circle),
-                    child: const Text('!',
-                        style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
-                  ),
-                  const SizedBox(width: 8),
-                  ppEyebrow('Pattern spotted', spacing: 0.9),
-                ]),
+                ppEyebrow('Worth knowing', color: ppInk, spacing: 0.9),
                 const SizedBox(height: 10),
                 Text(
-                    'Last winter ${ChildProfileStore.instance.nameMid} caught a cough after the first cold day. The first cold snap is forecast next week - keep him layered and watch for a runny nose.',
+                    'Most babies catch several colds a year, more once they meet other children. '
+                    'A note of what you saw, and what the doctor advised, makes the next one easier to judge.',
                     style: ppBody(15, color: ppInk, h: 1.55)),
-                const SizedBox(height: 12),
-                PvPress(child: GestureDetector(
-                  onTap: () => _soon(context),
-                  child: Text('See what helped last time →',
-                      style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-                )),
+                const SizedBox(height: 8),
+                Text('Fast or hard breathing, a fever under 3 months, or a baby who will not feed: call your doctor.',
+                    style: ppBody(13, color: ppSoft, h: 1.5)),
               ]),
             )),
 
             // quick add
             const SizedBox(height: 16),
+            // Each opens the real record now (2026-10-25); Scan says why it waits.
             _pad(Row(children: [
-              _quick(context, Icons.add_rounded, 'Log symptom', filled: true),
+              _quick(context, Icons.add_rounded, 'Log symptom', filled: true,
+                  onTap: () => _openRecords(context, 'symptoms')),
               const SizedBox(width: 10),
-              _quick(context, Icons.description_outlined, 'Prescription'),
+              _quick(context, Icons.description_outlined, 'Prescription',
+                  onTap: () => _openRecords(context, 'prescriptions')),
               const SizedBox(width: 10),
               _quick(context, Icons.photo_camera_outlined, 'Scan'),
             ])),
@@ -128,11 +154,13 @@ class HealthGuideScreen extends StatelessWidget {
               ],
             )),
             const SizedBox(height: 14),
-            _pad(_entry('Cold & cough', 'Jan 2026', 'first cold day · woke up congested',
-                'saline drops, steam - Dr. Ananya Rao',
-                top: true)),
-            _pad(_entry('Nappy rash', 'Dec 2025', 'new wipes brand', 'zinc barrier cream',
-                top: true, bottom: true)),
+            // Kept for revert, 2026-10-25: two invented history rows with a named
+            // doctor. Her own symptom log shows here instead.
+            // _pad(_entry('Cold & cough', 'Jan 2026', 'first cold day · woke up congested',
+            //     'saline drops, steam - Dr. Ananya Rao', top: true)),
+            // _pad(_entry('Nappy rash', 'Dec 2025', 'new wipes brand', 'zinc barrier cream',
+            //     top: true, bottom: true)),
+            ..._history(context),
 
             // repeat-prescription memory aid
             const SizedBox(height: 22),
@@ -143,11 +171,16 @@ class HealthGuideScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: const Color(0xFFECE5F2))),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                ppEyebrow('Worked last time', color: ppPurple, spacing: 0.6),
+                // Kept for revert, 2026-10-25: an invented prescription.
+                // ppEyebrow('Worked last time', color: ppPurple, spacing: 0.6),
+                // Text('For a cold: saline drops + steam', style: ppJakarta(15)),
+                // Text('Prescribed by Dr. Ananya Rao in Jan 2026.', style: ppBody(13, h: 1.5)),
+                ppEyebrow('What helped last time', color: ppInk, spacing: 0.6),
                 const SizedBox(height: 8),
-                Text('For a cold: saline drops + steam', style: ppJakarta(15)),
+                Text('When something your doctor suggested helps, add it as a note on the symptom.',
+                    style: ppJakarta(15)),
                 const SizedBox(height: 5),
-                Text('Prescribed by Dr. Ananya Rao in Jan 2026.', style: ppBody(13, h: 1.5)),
+                Text('Then it is here the next time, in your own words.', style: ppBody(13, h: 1.5)),
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -179,13 +212,41 @@ class HealthGuideScreen extends StatelessWidget {
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),
+        ),
       ),
     );
   }
 
-  Widget _quick(BuildContext context, IconData icon, String label, {bool filled = false}) => Expanded(
+  /// Her own symptom log, newest first, or an invitation to start one. Never
+  /// a made-up row.
+  List<Widget> _history(BuildContext context) {
+    final list = HealthStore.instance.symptoms;
+    if (list.isEmpty) {
+      return [
+        _pad(PvPress(child: GestureDetector(
+          key: const ValueKey('health_guide_history_empty'),
+          onTap: () => _openRecords(context, 'symptoms'),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: const BoxDecoration(border: Border(top: BorderSide(color: ppHair), bottom: BorderSide(color: ppHair))),
+            child: Text('Nothing logged yet. Log a symptom and it starts here, with what you noticed.',
+                style: ppBody(13.5, color: ppInk, h: 1.5)),
+          ),
+        ))),
+      ];
+    }
+    final shown = list.take(3).toList();
+    return [
+      for (var i = 0; i < shown.length; i++)
+        _pad(_entry(shown[i].name, shown[i].date, shown[i].note.isEmpty ? 'No note' : shown[i].note, '',
+            top: true, bottom: i == shown.length - 1)),
+    ];
+  }
+
+  Widget _quick(BuildContext context, IconData icon, String label, {bool filled = false, VoidCallback? onTap}) => Expanded(
         child: PvPress(child: GestureDetector(
-          onTap: () => _soon(context),
+          onTap: onTap ?? () => _soon(context),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
             decoration: BoxDecoration(
@@ -222,14 +283,16 @@ class HealthGuideScreen extends StatelessWidget {
           Text(date, style: ppBody(12, color: ppMuted)),
         ]),
         const SizedBox(height: 4),
+        // Was 'Trigger: ' (kept for revert, 2026-10-25): the field is her note.
         Text.rich(TextSpan(children: [
-          TextSpan(text: 'Trigger: ', style: TextStyle(color: ppBrown)),
+          TextSpan(text: 'Noticed: ', style: TextStyle(color: ppBrown)),
           TextSpan(text: trigger, style: const TextStyle(color: ppSoft)),
         ]), style: ppBody(13, h: 1.5)),
-        Text.rich(TextSpan(children: [
-          TextSpan(text: 'Rx: ', style: TextStyle(color: ppPurple)),
-          TextSpan(text: rx, style: const TextStyle(color: ppSoft)),
-        ]), style: ppBody(13, h: 1.5)),
+        if (rx.isNotEmpty)
+          Text.rich(TextSpan(children: [
+            TextSpan(text: 'Rx: ', style: TextStyle(color: ppInk)),
+            TextSpan(text: rx, style: const TextStyle(color: ppSoft)),
+          ]), style: ppBody(13, h: 1.5)),
       ]),
     );
   }

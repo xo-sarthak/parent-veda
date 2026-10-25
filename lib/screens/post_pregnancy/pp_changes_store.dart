@@ -21,6 +21,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/pp_use_consent.dart';
 import '../../services/remote/cloud_merged_store.dart';
 import 'pp_child_profile.dart';
 import 'pp_what_changed_data.dart';
@@ -162,7 +163,13 @@ class PpChangesStore extends ChangeNotifier with CloudMergedStore {
   }
 
   /// The active changes for the child on screen, newest first.
+  ///
+  /// ⚠️ ONLY WITH HER YES (tools pass H3, 2026-10-25). Every reader (the home
+  /// "You told us" card, the relevance brain) comes through here, so the ask
+  /// once answer is checked in one place. Saved changes are kept either way;
+  /// a no only stops them being used.
   List<PpChange> active({DateTime? now}) {
+    if (!PpUseConsent.instance.allows(PpUseKind.changes)) return const [];
     final t = now ?? DateTime.now();
     final id = _childId;
     return _changes.values.where((c) => c.childId == id && c.activeAt(t)).toList()

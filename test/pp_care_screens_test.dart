@@ -29,6 +29,7 @@ import 'package:parentveda/screens/post_pregnancy/pp_surface_router.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_tummy_time_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/sleep_journey_screen.dart';
 import 'package:parentveda/screens/v2/v2_palette.dart';
+import 'package:parentveda/services/pp_use_consent.dart';
 
 void _ageMonths(int months) {
   ChildProfileStore.instance
@@ -160,7 +161,10 @@ void main() {
     expect(find.byKey(const ValueKey('pp_home_search')), findsOneWidget, reason: 'search is for every age');
   });
 
-  testWidgets('"Is my baby OK?" shows the wet count from the log', (tester) async {
+  // Renamed "Getting enough milk?" (tools pass H2), and the log is read only
+  // after her yes (2026-10-25).
+  testWidgets('"Getting enough milk?" shows the wet count from the log', (tester) async {
+    PpUseConsent.instance.set(PpUseKind.nappies, true);
     NappyStore.instance.log(time: DateTime.now(), kind: NappyKind.wet);
     NappyStore.instance.log(time: DateTime.now(), kind: NappyKind.mixed);
     await _pump(tester, const PpBabyOkCheckScreen(), h: 4000);

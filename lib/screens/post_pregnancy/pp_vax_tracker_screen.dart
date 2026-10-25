@@ -15,6 +15,11 @@
 //  Oura's pregnancy "Details" (mobbin.com/screens/4ccc949c-fa00-41db-a72e-67f4e19f214e);
 //  the visits as plain title-and-line rows, after Starling's document list
 //  (mobbin.com/screens/b1001e94-7485-48cf-bea3-c158623bd657).
+//
+//  WAVE 3 (2026-10-25): ticking a visit offers "Not sure of the date" (ticked,
+//  no date: `markDone` with no `on`, which the store already supported); a
+//  schedule change says what it changed; and the next visit's line
+//  (`nextVisitSubtitle`, the same words as the Tools row) sits at the top.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -35,8 +40,51 @@ import 'vax_detail_screen.dart';
 const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 String _day(DateTime d) => '${d.day} ${_months[d.month - 1]} ${d.year}';
 
-/// Mark [v] given, asking the day first. Shared with the visit's own page.
+/// Mark [v] given. She picks the day, or says she is not sure of it (a
+/// health card often has the vaccine but not the date): the visit is then
+/// ticked with no date, never a made-up one. Shared with the visit's own page.
 Future<void> ppVaxMarkGiven(BuildContext context, VaxVisit v) async {
+  final p = pvStorePalette;
+  final choice = await showModalBottomSheet<String>(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('${v.ageLabel} visit'.toUpperCase(),
+              style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+          const SizedBox(height: 6),
+          Text('When was it given?',
+              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+          const SizedBox(height: 16),
+          PvCommit(
+              key: const ValueKey('pp_vax_pick_day'),
+              label: 'Choose the day',
+              onTap: () => Navigator.of(ctx).pop('day')),
+          const SizedBox(height: 10),
+          PvSecondary(
+              key: const ValueKey('pp_vax_no_date'),
+              label: 'Not sure of the date',
+              onTap: () => Navigator.of(ctx).pop('none')),
+        ]),
+      ),
+    ),
+  );
+  if (choice == null || !context.mounted) return;
+  if (choice == 'none') {
+    VaxStore.instance.markDone(v.id);
+    ppCareSaved(context, 'Recorded: the ${v.ageLabel} visit, given. No date saved.',
+        undo: () => VaxStore.instance.markNotDone(v.id));
+    return;
+  }
+  await _ppVaxMarkGivenOnDay(context, v);
+}
+
+/// The day sheet (the whole flow before 2026-10-25, kept as its second step).
+Future<void> _ppVaxMarkGivenOnDay(BuildContext context, VaxVisit v) async {
   final c = ChildProfileStore.instance;
   final now = DateTime.now();
   final scheduled = c.dob.add(Duration(days: v.ageDays));
@@ -83,6 +131,11 @@ class VaxTrackerScreen extends StatelessWidget {
               ? 'Tick each visit ${c.name} has had, with the day. It becomes a record any doctor can read.'
               : '$given of ${kVaxVisits.length} visits recorded. The next one is below.',
           children: [
+            // ---- next due, first (Wave 3, 2026-10-25) ----
+            pregToolPad(Text(store.nextVisitSubtitle,
+                key: const ValueKey('pp_vax_next_due'),
+                style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, height: 1.4, color: p.ink1))),
+            const SizedBox(height: 22),
             // ---- which schedule ----
             pregToolPad(ppCareHeading('Which schedule does your paediatrician follow?')),
             const SizedBox(height: 6),
@@ -96,7 +149,16 @@ class VaxTrackerScreen extends StatelessWidget {
               selected: schedule,
               label: (s) => s.label,
               onPick: (s) {
-                if (s != null) FamilyProfileStore.instance.setVaxSchedule(s);
+                if (s == null || s == schedule) return;
+                FamilyProfileStore.instance.setVaxSchedule(s);
+                // Say what changed (the app explains itself, 2026-10-25).
+                ppCareSaved(context, switch (s) {
+                  VaxSchedule.uip =>
+                    'Schedule: government. Visits with only private-clinic vaccines now read optional, with no reminders.',
+                  VaxSchedule.iap => 'Schedule: private clinic. Every visit on the IAP schedule now counts as due.',
+                  VaxSchedule.notSure =>
+                    'Schedule: not sure. Every visit stays on the list; ask your paediatrician which they follow.',
+                });
               },
               keyPrefix: 'pp_vax_schedule',
             )),

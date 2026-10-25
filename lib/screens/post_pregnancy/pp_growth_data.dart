@@ -25,6 +25,7 @@ import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
 import 'pp_child_profile.dart';
 import 'pp_health_data.dart';
+import 'pp_phases_data.dart' show ppFillChild;
 import 'pp_who_growth_lms.dart';
 
 /// The metrics we chart. Head circumference is optional per measurement.
@@ -274,11 +275,32 @@ class GrowthStore extends ChangeNotifier {
         GrowthMetric.head => WhoIndicator.head,
       };
 
+  /// ⚠️ CORRECTED AGE ON THE CURVES (the user's call H6, 2026-10-25). A baby
+  /// born early is plotted at her age minus the weeks she came early, until
+  /// two, which is what paediatricians do; otherwise a preemie reads "small"
+  /// for being early. Term babies are unchanged. Vaccines keep real age.
+  /// REQUIRED_REVIEW: the 24-month cut-off.
+  double ageFor(GrowthMeasurement m) {
+    final real = m.ageMonthsAt(_child.dob);
+    final early = _child.correctionWeeks;
+    if (early == null || early <= 0 || real >= 24) return real;
+    final corrected = real - early * 7 / 30.4375;
+    return corrected < 0 ? 0 : corrected;
+  }
+
+  /// True when the curves are using corrected age for this child.
+  bool get usesCorrectedAge {
+    final m = latest;
+    final early = _child.correctionWeeks;
+    return m != null && early != null && early > 0 && m.ageMonthsAt(_child.dob) < 24;
+  }
+
   /// Percentile of the latest measurement for [metric].
   int? latestPercentile(GrowthMetric metric) {
     final m = latest;
     if (m == null) return null;
-    return percentile(metric, m.value(metric), m.ageMonthsAt(_child.dob));
+    // Was m.ageMonthsAt(_child.dob): real age (corrected age, H6).
+    return percentile(metric, m.value(metric), ageFor(m));
   }
 
   /// The shaded "typical range" (z -1 to +1, about the 16th to 84th centile)
@@ -328,7 +350,7 @@ class GrowthStore extends ChangeNotifier {
     if (_mine.length < 2) return 'A first point on the curve';
     final trend = _weightTrendPoints();
     if (trend.abs() <= 10) return 'Growing consistently';
-    return trend > 0 ? 'Following his own rising curve' : 'Tracking along steadily';
+    return trend > 0 ? ppFillChild('Following his own rising curve') : 'Tracking along steadily';
   }
 
   /// The longer ParentVeda interpretation paragraph.
@@ -345,14 +367,14 @@ class GrowthStore extends ChangeNotifier {
       return '$name\'s growth has stayed close to its own steady curve over the last ${_monthsLabel(months)}. Consistency like this is usually the most reassuring sign of all — far more than any single number.';
     }
     if (trend > 0) {
-      return '$name has been climbing along his curve over the last ${_monthsLabel(months)}. Steady, gradual change in one direction is normal and healthy — babies often find their own line and follow it.';
+      return ppFillChild('$name has been climbing along his curve over the last ${_monthsLabel(months)}. Steady, gradual change in one direction is normal and healthy — babies often find their own line and follow it.');
     }
     return 'Over the last ${_monthsLabel(months)}, $name\'s curve has eased a little lower while staying steady. One shift like this is rarely a concern on its own; it can simply be worth a mention at your next paediatric visit.';
   }
 
   /// A one-line plain explanation of what a percentile *is*.
   String get percentileMeaning =>
-      'A percentile compares $name with other babies of the same age and sex. Being in, say, the 30th percentile does not mean unhealthy — perfectly healthy babies fall right across the range. What matters most is that $name keeps following his own curve.';
+      ppFillChild('A percentile compares $name with other babies of the same age and sex. Being in, say, the 30th percentile does not mean unhealthy — perfectly healthy babies fall right across the range. What matters most is that $name keeps following his own curve.');
 
   // The WHO's printed centile lines. Crossing two of them between two
   // measurements is the standard "worth a look" rule.
@@ -367,7 +389,7 @@ class GrowthStore extends ChangeNotifier {
   double? _exactPercentile(GrowthMetric metric, GrowthMeasurement m) {
     final v = m.value(metric);
     if (v == null || v <= 0) return null;
-    final z = whoZ(_who(metric), _child.isBoy, m.ageMonthsAt(_child.dob), v);
+    final z = whoZ(_who(metric), _child.isBoy, ageFor(m), v); // was m.ageMonthsAt(_child.dob) (H6)
     return z.isNaN ? null : whoPercentileOfZ(z);
   }
 
@@ -422,7 +444,7 @@ class GrowthStore extends ChangeNotifier {
       if (flags.contains(metric)) {
         out.add('$label is ${_flagReason(metric)}. Worth showing your paediatrician at the next visit, with this chart.');
       } else {
-        out.add('$label is following the ${_ordinalBand(p)}, inside the usual range for his age.');
+        out.add(ppFillChild('$label is following the ${_ordinalBand(p)}, inside the usual range for his age.'));
       }
     }
     out.add('The shape of the curve matters more than any single point on it.');
@@ -455,6 +477,22 @@ class GrowthStore extends ChangeNotifier {
     _pushWaiting();
   }
 
+  /// Replaces a measurement in place, keeping its id, so the edit syncs as
+  /// the same row (tools pass, 2026-10-25: measurements were remove-only).
+  void update(GrowthMeasurement m) {
+    final i = _items.indexWhere((x) => x.id == m.id);
+    if (i < 0) return add(m);
+    _items[i] = m;
+    final newest = all.isEmpty ? null : all.first;
+    if (newest != null) {
+      _child.setMeasures(weightKg: newest.weightKg, heightCm: newest.heightCm, headCm: newest.headCm ?? _child.headCm);
+    }
+    notifyListeners();
+    _persist();
+    _sync.touch(m.id, _sync.childOf[m.id] ?? _childId);
+    _pushWaiting();
+  }
+
   void log({required DateTime date, required double weightKg, required double heightCm, double? headCm, String? note}) {
     add(GrowthMeasurement(id: _id(), date: date, weightKg: weightKg, heightCm: heightCm, headCm: headCm, note: note));
   }
@@ -477,8 +515,8 @@ class GrowthStore extends ChangeNotifier {
   int _weightTrendPoints() {
     final a = latest, b = previous;
     if (a == null || b == null) return 0;
-    final pa = percentile(GrowthMetric.weight, a.weightKg, a.ageMonthsAt(_child.dob));
-    final pb = percentile(GrowthMetric.weight, b.weightKg, b.ageMonthsAt(_child.dob));
+    final pa = percentile(GrowthMetric.weight, a.weightKg, ageFor(a)); // corrected age (H6)
+    final pb = percentile(GrowthMetric.weight, b.weightKg, ageFor(b));
     if (pa == null || pb == null) return 0;
     return pa - pb;
   }
@@ -498,9 +536,12 @@ class GrowthStore extends ChangeNotifier {
   /// "40th percentile" style band, rounded to the nearest 5 to avoid false
   /// precision.
   String _ordinalBand(int p) {
+    // Below 5 or above 95 says so, instead of clamping to "5th" while the
+    // insight says "below the 3rd" (tools pass, 2026-10-25).
+    if (p < 5) return 'range below the 5th percentile';
+    if (p > 95) return 'range above the 95th percentile';
     final r = (p / 5).round() * 5;
-    final v = r.clamp(5, 95);
-    return '${v}th percentile';
+    return '${r}th percentile';
   }
 
   /// Demo measurements for a fictional child. Deliberately NOT called - see the
@@ -521,7 +562,9 @@ class GrowthStore extends ChangeNotifier {
   String? latestPercentilePhrase(GrowthMetric metric) {
     final p = latestPercentile(metric);
     if (p == null) return null;
+    if (p < 5) return 'below 5th';
+    if (p > 95) return 'above 95th';
     final r = (p / 5).round() * 5;
-    return '~${r.clamp(5, 95)}th';
+    return '~${r}th';
   }
 }

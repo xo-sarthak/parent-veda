@@ -24,6 +24,15 @@
 //  top. Kept out of the new build, per the parenting trust rules: the "panel
 //  of 5 ayurvedic practitioners" count and the "reviewed and signed off" claims,
 //  which no real review stands behind yet. The old build is kept below.
+//
+//  THE VERDICT (Wave 3, H5, 2026-10-25). The data now carries one
+//  (`NuskheVerdict`: helps / comfort / avoid, REQUIRED_REVIEW), so each row
+//  wears a status pill in words: "Helps", "Comfort only" or "Avoid". The dot
+//  key keeps its amber "Age-gated, read the cautions" line, and a remedy above
+//  the child's age shows "Not for <name> yet": shown, never hidden. The things
+//  that are not safe for babies (ghutti, kajal, oil in ears or nose, gripe
+//  water, honey under one) have their own section, so the page now keeps the
+//  door's promise of "which help, which only comfort, and which aren't safe".
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -36,6 +45,7 @@ import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../v2/v2_palette.dart';
 import 'pp_care_parts.dart' show ppCareHeading;
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_nuskhe_data.dart';
 import 'pp_section_extras.dart';
@@ -91,7 +101,9 @@ class _NuskheScreenState extends State<NuskheScreen> {
         decoration: BoxDecoration(color: canIVerdictColor(v, p), shape: BoxShape.circle),
       );
 
-  Widget _remedyRow(BuildContext context, V2Palette p, Remedy r) {
+  // Kept for revert (2026-10-25): the row with only a colour dot.
+  // ignore: unused_element
+  Widget _remedyRowDotOnly(BuildContext context, V2Palette p, Remedy r) {
     final (v, word) = _verdict(r);
     return PvListRow(
       key: ValueKey('nuskhe_row_${r.id}'),
@@ -102,6 +114,65 @@ class _NuskheScreenState extends State<NuskheScreen> {
       line: r.oneLine,
       meta: word,
       trailing: _dot(p, v),
+      onTap: () => _openRemedy(context, r),
+    );
+  }
+
+  /// The pill's colour: red for avoid, amber for anything with a caution,
+  /// green only for "helps" with no caution, grey for comfort.
+  static CanIVerdict _pillTone(Remedy r) {
+    if (r.verdict == NuskheVerdict.avoid) return CanIVerdict.avoid;
+    if (r.isCaution) return CanIVerdict.moderation;
+    if (r.verdict == NuskheVerdict.helps) return CanIVerdict.safe;
+    return CanIVerdict.askDoctor;
+  }
+
+  /// A small status pill, Bevel's pattern: a tinted capsule, a dot and a word.
+  Widget _pill(V2Palette p, String word, Color tone, {Key? key}) => Container(
+        key: key,
+        constraints: const BoxConstraints(maxWidth: 112),
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+        decoration: BoxDecoration(
+          color: tone.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          _dotOf(tone),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(word,
+                maxLines: 2,
+                style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, height: 1.2, color: p.ink1)),
+          ),
+        ]),
+      );
+
+  Widget _dotOf(Color c) =>
+      Container(width: 7, height: 7, decoration: BoxDecoration(color: c, shape: BoxShape.circle));
+
+  Widget _remedyRow(BuildContext context, V2Palette p, Remedy r) {
+    final child = ChildProfileStore.instance;
+    final notYet = r.notYetFor(child.ageInMonths);
+    final tone = canIVerdictColor(_pillTone(r), p);
+    return PvListRow(
+      key: ValueKey('nuskhe_row_${r.id}'),
+      p: p,
+      leading: PvMarkWell(
+          p: p, hue: 140, size: 40, mark: _situationMark(r.category), icon: r.icon),
+      title: r.name,
+      line: r.oneLine,
+      lineMaxLines: 2,
+      // The caution in words (the potli's burn warning, hing's skin warning),
+      // so the colour is never the only carrier of it.
+      meta: r.isCaution ? r.ageWarning : 'From ${r.age}',
+      trailing: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
+        _pill(p, nuskheVerdictLabel(r.verdict), tone, key: ValueKey('nuskhe_verdict_${r.id}')),
+        if (notYet) ...[
+          const SizedBox(height: 6),
+          _pill(p, 'Not for ${child.name} yet', canIVerdictColor(CanIVerdict.moderation, p),
+              key: ValueKey('nuskhe_not_yet_${r.id}')),
+        ],
+      ]),
       onTap: () => _openRemedy(context, r),
     );
   }
@@ -120,7 +191,10 @@ class _NuskheScreenState extends State<NuskheScreen> {
       eyebrow: 'Home remedies from the elders', // was 'Dadi and Nani ke nuskhe' (2026-10-07)
       mark: IntentMark.lampMark,
       title: 'Home remedies, safely.',
-      intro: 'The remedies your grandmother swore by, each with clear notes on when not to use them.',
+      // Was: 'The remedies your grandmother swore by, each with clear notes on when not to use them.'
+      // (kept for revert, 2026-10-25). The verdicts now make the honest promise true.
+      intro: 'The remedies your grandmother swore by, marked honestly: which help, which only comfort, '
+          'and which are not safe for babies.',
       children: [
         // The safety line comes first, before any remedy.
         pregToolPad(Container(
@@ -166,9 +240,12 @@ class _NuskheScreenState extends State<NuskheScreen> {
         // The key to the dots, always on screen, so the colour is never the
         // only carrier of the meaning.
         pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Was: (safe, 'Gentle at the age shown') and the amber line (2026-10-25).
           for (final (v, word) in const [
-            (CanIVerdict.safe, 'Gentle at the age shown'),
+            (CanIVerdict.safe, 'Helps: paediatric guidance also suggests it'),
+            (CanIVerdict.askDoctor, 'Comfort only: may soothe, treats nothing'),
             (CanIVerdict.moderation, 'Age-gated, read the cautions'),
+            (CanIVerdict.avoid, 'Avoid: not safe for babies'),
           ])
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
@@ -217,6 +294,16 @@ class _NuskheScreenState extends State<NuskheScreen> {
           const SizedBox(height: 8),
           pregToolPad(PvRowGroup(p: p, children: [
             for (final r in popularRemedies) _remedyRow(context, p, r),
+          ])),
+          // What not to do, in its own place on the landing (H5, 2026-10-25).
+          const SizedBox(height: 26),
+          pregToolPad(ppCareHeading('Not safe for babies')),
+          const SizedBox(height: 4),
+          pregToolPad(Text('Often suggested, kindly meant, and best avoided. Each says why, and what to do instead.',
+              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2))),
+          const SizedBox(height: 8),
+          pregToolPad(PvRowGroup(p: p, children: [
+            for (final r in kRemedies.where((r) => r.verdict == NuskheVerdict.avoid)) _remedyRow(context, p, r),
           ])),
           const SizedBox(height: 18),
           pregToolPad(Text(

@@ -13,15 +13,15 @@ One tool at a time; the user says go per tool. Each plan records every decision 
 | 05 | Sleep | `pp_sleep` | COMMITTED (02-07-care-logs.md) | b11b2ec |
 | 06 | Tummy time | `pp_tummy_time` | COMMITTED (02-07-care-logs.md) | b11b2ec |
 | 07 | The last 7 days | `pp_care_history` | COMMITTED (02-07-care-logs.md) | b11b2ec |
-| 08 | Growth | `pp_growth` | | |
-| 09 | Vaccines | `pp_vaccines` | | |
-| 10 | Fever check | `pp_fever_check` | | |
-| 11 | Is my baby OK? | `pp_baby_ok_check` | | |
-| 12 | Something changed? | `pp_what_changed` | | |
-| 13 | Health record | `pp_health_home` | | |
-| 14 | Emergency card | `pp_emergency_card` | | |
-| 15 | Before you see the doctor | `pp_doctor_visit` | | |
-| 16 | Home remedies | `pp_nuskhe` | | |
+| 08 | Growth | `pp_growth` | BUILT 2026-10-25 (08-16-health.md) | |
+| 09 | Vaccines | `pp_vaccines` | BUILT 2026-10-25 (08-16-health.md) | |
+| 10 | Fever check | `pp_fever_check` | BUILT 2026-10-25 (08-16-health.md) | |
+| 11 | Is my baby OK? | `pp_baby_ok_check` | BUILT 2026-10-25 (08-16-health.md) | |
+| 12 | Something changed? (folded into Is my baby OK?) | `pp_what_changed` | BUILT 2026-10-25 (08-16-health.md) | |
+| 13 | Health record | `pp_health_home` | BUILT 2026-10-25 (08-16-health.md) | |
+| 14 | Emergency card | `pp_emergency_card` | BUILT 2026-10-25 (08-16-health.md) | |
+| 15 | Before you see the doctor | `pp_doctor_visit` | BUILT 2026-10-25 (08-16-health.md) | |
+| 16 | Home remedies | `pp_nuskhe` | BUILT 2026-10-25 (08-16-health.md) | |
 | 17 | This month's checklist | `pp_month_checklist` | | |
 | 18 | Milestones | `pp_milestones` | | |
 | 19 | Gentle check-in | `pp_dev_checkin` | | |

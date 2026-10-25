@@ -587,8 +587,9 @@ class WalletEmergencyCardScreen extends StatelessWidget {
                           Text(
                               [
                                 child.ageLabel,
-                                if ((e?.dob ?? '').isNotEmpty) 'born ${e!.dob}',
-                                if ((e?.weight ?? '').isNotEmpty) e!.weight,
+                                // One source (H7): was e?.dob and e?.weight, typed on the card.
+                                'born ${walletDob()}',
+                                if (walletWeight().isNotEmpty) walletWeight(),
                               ].join('  \u00b7  '),
                               style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
                         ]),

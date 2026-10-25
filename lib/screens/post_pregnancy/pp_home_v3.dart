@@ -1054,7 +1054,8 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   //                   const RouteSettings(name: 'pp/phase_map'),
                   //               builder: (_) => const PhaseMapScreen()))),
                   _Resource(
-                      label: 'Something changed?',
+                      // Was 'Something changed?' (tools pass H2: one symptom tool).
+                      label: 'Is my baby OK?',
                       hue: 285,
                       icon: Icons.help_outline_rounded,
                       mark: TtcTabMark.signpost,

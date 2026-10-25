@@ -52,6 +52,9 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart' show PvChoiceTile, kPvChoiceInk, PvPress;
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
+import 'pp_phases_data.dart' show ppFillChild;
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart';
 
 /// How urgent the answer is. Ordered, so the worst answer always wins.
 enum _Urgency { now, today, home }
@@ -142,7 +145,9 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
       if (t >= _feverC) {
         return const _Answer(
           _Urgency.now,
-          'He needs to be seen today',
+          // Was 'He needs to be seen today' under an urgency coded "now"
+          // (tools pass, 2026-10-25): the words now match the urgency.
+          'Get him seen now, today',
           'A temperature of 38 C or above in a baby under three months is '
               'always a reason to be seen the same day, even if he seems '
               'perfectly well otherwise. This is not us being cautious. It is '
@@ -177,6 +182,25 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
         [
           'Take it again if he seems worse.',
           'At this age, call about anything that worries you. Nobody will mind.',
+        ],
+      );
+    }
+
+    // ⚠️ A LOW READING OVER THREE MONTHS (tools pass, 2026-10-25). It fell
+    // through to "That is not a fever" and "watch at home".
+    // REQUIRED_REVIEW: the low threshold and the advice.
+    if (t < 36.5) {
+      return const _Answer(
+        _Urgency.today,
+        'A low reading: take it again',
+        'Below 36.5 C can be a reading taken too soon after a bath or with a '
+            'cold arm. Warm him up, wait fifteen minutes and take it again '
+            'under the arm. If it is still low, or he is cold, pale, floppy or '
+            'not feeding, get him seen today.',
+        [
+          'Skin to skin and a blanket while you wait.',
+          'Go now if anything on the first list appears.',
+          'If he seems wrong to you, that is reason enough to go.',
         ],
       );
     }
@@ -245,21 +269,32 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
     final a = _answer;
-    return Scaffold(
-      backgroundColor: p.ground,
-      body: SafeArea(
-        bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 44),
+    // ⚠️ THE SHARED TOOL SHELL (tools pass, 2026-10-25), like every other tool;
+    // it was its own Scaffold, so the one-look test owed it. Kept for revert:
+    // Scaffold > SafeArea > ListView(padding: 20, 8, 20, 44) with ppV3Back, a
+    // 'Fever check' title and the intro below as its first children.
+    return PregToolScaffold(
+      hue: 206,
+      eyebrow: 'Health',
+      mark: IntentMark.thermoMark,
+      title: 'Fever check',
+      intro: ppFillChild('His age and his temperature. Nothing is saved, and this does '
+          'not replace a doctor looking at him.'),
+      children: [
+        pregToolPad(Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ppV3Back(context, p),
-            const SizedBox(height: 16),
-            Text('Fever check', style: pvFraunces(fontSize: 27, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.4, color: p.ink1)),
-            const SizedBox(height: 9),
-            Text(
-                'His age and his temperature. Nothing is saved, and this does '
-                'not replace a doctor looking at him.',
-                style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w500, height: 1.6, color: p.ink2)),
+            // The emergency line, pinned before anything else (tools pass,
+            // 2026-10-25: 112 only appeared after "Yes, one of these").
+            Container(
+              key: const ValueKey('pp_fever_emergency'),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: ppAlertTint(p), borderRadius: BorderRadius.circular(16)),
+              child: Text(
+                  ppFillChild('Struggling to breathe, turning blue, floppy or hard to wake, or a fit: '
+                      'call 112 or 108 now, or go to the nearest hospital.'),
+                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.5, color: p.ink1)),
+            ),
 
             // ---- 1. RED FLAGS, BEFORE THE THERMOMETER --------------------
             const SizedBox(height: 26),
@@ -327,7 +362,7 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
             // to keep answering questions instead of leaving.
             if (_anyRedFlag == false) ...[
               const SizedBox(height: 30),
-              Text('How old is he?', style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.4, color: p.ink1)),
+              Text(ppFillChild('How old is he?'), style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.4, color: p.ink1)),
               const SizedBox(height: 10),
               Row(children: [
                 for (final (label, m) in const [
@@ -352,15 +387,18 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
                   style: pvFraunces(fontSize: 19, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.4, color: p.ink1)),
               const SizedBox(height: 8),
               Text(
-                  'Under the arm is fine. Unwrap him and wait fifteen minutes '
-                  'after a bath or a feed before you take it.',
+                  ppFillChild('Under the arm is fine. Unwrap him and wait fifteen minutes '
+                      'after a bath or a feed before you take it.'),
                   style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.55, color: p.ink2)),
               const SizedBox(height: 12),
+              // The low band first, and "36.5 to 38" so a 36.2 reading has one
+              // home (tools pass, 2026-10-25). Was 'Below 38 C' with 'Below
+              // 36.5 C' last, so a low reading could pick the normal band.
               for (final (label, c) in const [
-                ('Below 38 C  (below 100.4 F)', 37.2),
+                ('Below 36.5 C  (below 97.7 F)', 36.0),
+                ('36.5 to 38 C  (97.7 to 100.4 F)', 37.2),
                 ('38 to 39 C  (100.4 to 102.2 F)', 38.4),
                 ('Above 39 C  (above 102.2 F)', 39.4),
-                ('Below 36.5 C  (below 97.7 F)', 36.0),
               ]) ...[
                 _Choice(
                   label: label,
@@ -380,12 +418,13 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
 
             const SizedBox(height: 22),
             Text(
-                'If your child seems wrong to you and this screen says otherwise, '
-                'believe yourself. You know him and this does not.',
+                ppFillChild('If your child seems wrong to you and this screen says otherwise, '
+                    'believe yourself. You know him and this does not.'),
                 style: pvManrope(fontSize: 13, fontWeight: FontWeight.w500, height: 1.6, color: p.ink3)),
+            const SizedBox(height: 32),
           ],
-        ),
-      ),
+        )),
+      ],
     );
   }
 
@@ -424,12 +463,12 @@ class _AnswerCard extends StatelessWidget {
               color: urgent ? ppAlertInk(p) : p.action),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(answer.headline,
+            child: Text(ppFillChild(answer.headline),
                 style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.4, color: p.ink1)),
           ),
         ]),
         const SizedBox(height: 10),
-        Text(answer.body, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w500, height: 1.65, color: p.ink1)),
+        Text(ppFillChild(answer.body), style: pvManrope(fontSize: 14, fontWeight: FontWeight.w500, height: 1.65, color: p.ink1)),
         const SizedBox(height: 14),
         // ⚠️ PRESENT ON EVERY OUTCOME, including "watch him at home". An answer
         // that stops at "you can wait" has told her nothing about when to stop
@@ -446,7 +485,7 @@ class _AnswerCard extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(t, style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.55, color: p.ink1)),
+              child: Text(ppFillChild(t), style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.55, color: p.ink1)),
             ),
           ]),
           const SizedBox(height: 7),

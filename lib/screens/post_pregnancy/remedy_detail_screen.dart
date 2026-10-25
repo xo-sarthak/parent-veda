@@ -28,6 +28,13 @@
 //  review does not stand behind): the "Validated by ParentVeda's ayurvedic
 //  panel" badge and "checked for safety" in the footer. The named-reviewer
 //  panel stays commented out. The old build is kept below.
+//
+//  THE VERDICT (Wave 3, H5, 2026-10-25): a line under the title says what the
+//  remedy honestly does (helps / comfort only / avoid, REQUIRED_REVIEW), with
+//  "Not for <name> yet" when the child is younger than its age. An "avoid"
+//  entry has nothing to make, so it shows why and what to do instead, and
+//  keeps the red flags and the way to a doctor. A tap on something not built
+//  yet says why and what to do until then (S8), never a bare "Coming soon".
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -40,6 +47,7 @@ import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../v2/v2_palette.dart';
 import 'pp_care_parts.dart' show PpCareStats, ppCareHeading;
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_nuskhe_data.dart';
 import 'problem_solver_screen.dart';
@@ -61,7 +69,15 @@ class RemedyDetailScreen extends StatelessWidget {
         child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
       ));
 
-  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // Kept for revert, 2026-10-25: a bare "Coming soon" (S8: a tap that cannot
+  // go anywhere says why, and what to do until then).
+  // void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  void _soon(BuildContext context, {bool film = false}) => pvToast(
+      context,
+      film
+          ? 'This film is not ready yet. Until then, follow the steps below, or ask your paediatrician to show you at the next visit.'
+          : 'This page is not ready yet. Until then, ask your paediatrician at the next visit.',
+      kind: PvToastKind.gentle);
   // Kept for revert — the floating Material SnackBar:
   // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
   //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
@@ -94,6 +110,18 @@ class RemedyDetailScreen extends StatelessWidget {
     final p = V2PaletteStore.instance.current;
     final r = remedy ?? fallbackRemedy;
     final red = canIVerdictColor(CanIVerdict.avoid, p);
+    final avoid = r.verdict == NuskheVerdict.avoid;
+    final child = ChildProfileStore.instance;
+    final notYet = r.notYetFor(child.ageInMonths);
+    final tone = canIVerdictColor(
+        avoid
+            ? CanIVerdict.avoid
+            : r.isCaution
+                ? CanIVerdict.moderation
+                : r.verdict == NuskheVerdict.helps
+                    ? CanIVerdict.safe
+                    : CanIVerdict.askDoctor,
+        p);
 
     return PregToolScaffold(
       hue: 140,
@@ -102,8 +130,24 @@ class RemedyDetailScreen extends StatelessWidget {
       title: r.name,
       intro: r.oneLine,
       children: [
+        // The verdict first, in words (H5, 2026-10-25). REQUIRED_REVIEW.
+        pregToolPad(Row(key: const ValueKey('remedy_verdict'), crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(padding: const EdgeInsets.only(top: 6), child: _dot(tone)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(nuskheVerdictMeaning(r.verdict),
+                style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, height: 1.45, color: p.ink1)),
+          ),
+        ])),
+        if (notYet) ...[
+          const SizedBox(height: 8),
+          pregToolPad(Text('Not for ${child.name} yet: this is for babies from ${r.age}.',
+              key: const ValueKey('remedy_not_yet'),
+              style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w600, height: 1.45, color: p.ink2))),
+        ],
+        const SizedBox(height: 14),
         // The age gate, before anything else, when the remedy carries one.
-        if (r.isCaution) ...[
+        if (r.isCaution && !avoid) ...[
           pregToolPad(Container(
             key: const ValueKey('remedy_age_gate'),
             padding: const EdgeInsets.all(14),
@@ -120,15 +164,17 @@ class RemedyDetailScreen extends StatelessWidget {
           const SizedBox(height: 16),
         ],
         pregToolPad(Text(r.description, style: _body(p))),
-        const SizedBox(height: 18),
-        pregToolPad(PpCareStats([
-          (r.age, 'age'),
-          (r.frequency, 'frequency'),
-          (r.prepTime, 'to make'),
-        ])),
+        if (!avoid) ...[
+          const SizedBox(height: 18),
+          pregToolPad(PpCareStats([
+            (r.age, 'age'),
+            (r.frequency, 'frequency'),
+            (r.prepTime, 'to make'),
+          ])),
+        ],
 
         // optional demo video (massage / preparation), a seam for a player
-        if (r.hasVideo) ...[
+        if (r.hasVideo && !avoid) ...[
           const SizedBox(height: 26),
           pregToolPad(ppCareHeading('Watch how')),
           const SizedBox(height: 10),
@@ -138,7 +184,7 @@ class RemedyDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16), side: BorderSide(color: p.line)),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
-              onTap: () => _soon(context),
+              onTap: () => _soon(context, film: true),
               child: Padding(
                 padding: const EdgeInsets.all(14),
                 child: Row(children: [
@@ -162,7 +208,8 @@ class RemedyDetailScreen extends StatelessWidget {
           )),
         ],
 
-        // ingredients
+        // ingredients (an avoid entry has nothing to make)
+        if (!avoid) ...[
         const SizedBox(height: 26),
         pregToolPad(ppCareHeading("You'll need")),
         const SizedBox(height: 10),
@@ -208,10 +255,11 @@ class RemedyDetailScreen extends StatelessWidget {
               ),
           ]),
         )),
+        ],
 
-        // when to use
+        // when to use (for an avoid entry, what to do instead)
         const SizedBox(height: 26),
-        pregToolPad(ppCareHeading('When to use it')),
+        pregToolPad(ppCareHeading(avoid ? 'What to do instead' : 'When to use it')),
         const SizedBox(height: 10),
         pregToolPad(Text(r.whenToUse, style: _body(p))),
 

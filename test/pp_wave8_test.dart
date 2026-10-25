@@ -15,6 +15,7 @@ import 'package:parentveda/screens/post_pregnancy/pp_activity_paintings.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_changes_store.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_relevance.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_what_changed_data.dart';
+import 'package:parentveda/services/pp_use_consent.dart';
 
 WcConcern _concern(String id) => kWcConcerns.firstWhere((c) => c.id == id);
 
@@ -32,6 +33,9 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     PpChangesStore.instance.debugReset();
+    // Read only after her yes (tools pass H3, 2026-10-25).
+    PpUseConsent.instance.debugReset();
+    PpUseConsent.instance.set(PpUseKind.changes, true);
   });
 
   group('the store', () {

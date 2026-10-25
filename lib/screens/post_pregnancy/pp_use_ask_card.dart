@@ -17,8 +17,12 @@ import '../v2/v2_palette.dart';
 import 'pp_care_parts.dart' show ppCareSaved;
 
 class PpUseAskCard extends StatelessWidget {
-  const PpUseAskCard({super.key, required this.kind, required this.question});
+  const PpUseAskCard({super.key, required this.kind, required this.question, this.onAnswer});
   final PpUseKind kind;
+
+  /// Called with her answer, after it is stored, so the tool can act on it
+  /// at once (e.g. Is my baby OK? keeps the result she just saw on a yes).
+  final ValueChanged<bool>? onAnswer;
 
   /// The question in this tool's words, e.g. "Use your feed log to suggest pages?"
   final String question;
@@ -52,6 +56,7 @@ class PpUseAskCard extends StatelessWidget {
               label: 'Yes, use it',
               onTap: () {
                 consent.set(kind, true);
+                onAnswer?.call(true);
                 ppCareSaved(context, 'Thank you. ${kind.label} now helps choose what you see first.');
               },
             ),
@@ -61,6 +66,7 @@ class PpUseAskCard extends StatelessWidget {
               label: 'Not now',
               onTap: () {
                 consent.set(kind, false);
+                onAnswer?.call(false);
                 ppCareSaved(context, 'Okay. ${kind.label} stays in this tool only.');
               },
             ),
