@@ -355,14 +355,26 @@ class PpCareEntryRow extends StatelessWidget {
     required this.when,
     required this.onRemove,
     this.detail,
+    this.onTap,
   });
   final String title;
   final DateTime when;
   final String? detail;
   final VoidCallback onRemove;
 
+  /// Opens the entry to edit it (tools pass 01, 2026-10-25: Flo and
+  /// MacroFactor put an edit on every logged item; ours was remove-only).
+  /// Null keeps the row as it was.
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) {
+    final row = _row(context);
+    if (onTap == null) return row;
+    return InkWell(onTap: onTap, child: row);
+  }
+
+  Widget _row(BuildContext context) {
     final p = V2PaletteStore.instance.current;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),

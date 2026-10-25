@@ -88,6 +88,7 @@ class SleepStore extends ChangeNotifier {
       }
     } catch (_) {/* start empty */}
     await _sync.load();
+    await _loadAsleep();
     SyncRegistry.registerPending(_hasPending);
     _loaded = true;
     notifyListeners();
@@ -175,7 +176,8 @@ class SleepStore extends ChangeNotifier {
 
   // ---- reads --------------------------------------------------------------
   List<SleepLog> get all {
-    final list = [..._logs]..sort((a, b) => b.start.compareTo(a.start));
+    // Only the active child's rows (tools pass, 2026-10-25: twins blended).
+    final list = _logs.where((x) => _sync.belongsTo(x.id, _childId)).toList()..sort((a, b) => b.start.compareTo(a.start));
     return List.unmodifiable(list);
   }
 
@@ -184,6 +186,20 @@ class SleepStore extends ChangeNotifier {
   SleepLog? get last => all.isEmpty ? null : all.first;
 
   int get totalMinutesToday => todays.fold(0, (sum, s) => sum + s.minutes);
+  /// Minutes asleep in the last 24 hours, counting only the part of each
+  /// sleep inside the window. Since midnight read "0m slept today" at 6 am
+  /// after a full night (tools pass, 2026-10-25, the same call as feeds, F1).
+  int get totalMinutes24h {
+    final now = DateTime.now();
+    final from = now.subtract(const Duration(hours: 24));
+    var sum = 0;
+    for (final s in all) {
+      final a = s.start.isBefore(from) ? from : s.start;
+      final b = s.end.isAfter(now) ? now : s.end;
+      if (b.isAfter(a)) sum += b.difference(a).inMinutes;
+    }
+    return sum;
+  }
   int get nightMinutesToday => todays.where((s) => s.isNight).fold(0, (sum, s) => sum + s.minutes);
   int get dayMinutesToday => todays.where((s) => !s.isNight).fold(0, (sum, s) => sum + s.minutes);
   int get napCountToday => todays.where((s) => !s.isNight).length;
@@ -281,6 +297,104 @@ class SleepStore extends ChangeNotifier {
 
   void log({required DateTime start, required DateTime end, SleepKind kind = SleepKind.nap, String? note}) {
     add(SleepLog(id: _id(), start: start, end: end, kind: kind, note: note));
+  }
+
+  /// Replaces a sleep in place, keeping its id (tools pass, 2026-10-25).
+  void update(SleepLog e) {
+    final i = _logs.indexWhere((x) => x.id == e.id);
+    if (i < 0) return add(e);
+    _logs[i] = e;
+    _persist();
+    _sync.touch(e.id, _sync.childOf[e.id] ?? _childId);
+    _pushWaiting();
+    notifyListeners();
+  }
+
+  // ---- asleep now (the user's call, 2026-10-25) ---------------------------
+  // One tap when the baby drops off, one when they wake: Fitbit's sleep
+  // session (mobbin.com/screens/1c6f8180-ad93-4e94-a3e0-4314feb19035). The
+  // start and the child it is for are kept on this phone, so the clock
+  // survives the app closing; the finished sleep syncs like any other.
+  // A clock left running 16 hours or more was forgotten, and is dropped.
+  static const _asleepKey = 'pp_sleep_asleep_since';
+  DateTime? _asleepSince;
+  String? _asleepChild;
+
+  /// When the running sleep began, if one is running for the child on screen.
+  DateTime? get asleepSince =>
+      _asleepSince != null && (_asleepChild == null || _asleepChild == _childId) ? _asleepSince : null;
+
+  Future<void> _loadAsleep() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_asleepKey);
+      if (raw == null) return;
+      final m = Map<String, dynamic>.from(jsonDecode(raw));
+      final at = DateTime.tryParse('${m['at']}');
+      if (at == null || DateTime.now().difference(at).inHours >= 16) {
+        await prefs.remove(_asleepKey);
+        return;
+      }
+      _asleepSince = at;
+      _asleepChild = m['child']?.toString();
+    } catch (_) {}
+  }
+
+  Future<void> _saveAsleep() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (_asleepSince == null) {
+        await prefs.remove(_asleepKey);
+      } else {
+        await prefs.setString(_asleepKey, jsonEncode({'at': _asleepSince!.toIso8601String(), 'child': _asleepChild}));
+      }
+    } catch (_) {}
+  }
+
+  void startAsleep({DateTime? at}) {
+    _asleepSince = at ?? DateTime.now();
+    _asleepChild = _childId;
+    _saveAsleep();
+    notifyListeners();
+  }
+
+  /// Saves the running sleep and returns it, or null when none was running
+  /// or it lasted under a minute. Night if it began between 7 pm and 6 am.
+  SleepLog? wakeUp({DateTime? at}) {
+    final start = _asleepSince;
+    final child = _asleepChild;
+    _asleepSince = null;
+    _asleepChild = null;
+    _saveAsleep();
+    final end = at ?? DateTime.now();
+    if (start == null || end.difference(start).inMinutes < 1) {
+      notifyListeners();
+      return null;
+    }
+    final night = start.hour >= 19 || start.hour < 6;
+    final e = SleepLog(id: _id(), start: start, end: end, kind: night ? SleepKind.night : SleepKind.nap);
+    _logs.add(e);
+    _persist();
+    _sync.touch(e.id, child ?? _childId);
+    _pushWaiting();
+    notifyListeners();
+    return e;
+  }
+
+  void cancelAsleep() {
+    _asleepSince = null;
+    _asleepChild = null;
+    _saveAsleep();
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void debugReset() {
+    _logs.clear();
+    _sync.clear();
+    _asleepSince = null;
+    _asleepChild = null;
+    _loaded = true;
   }
 
   void remove(String id) {

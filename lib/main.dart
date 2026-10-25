@@ -104,6 +104,7 @@ import 'ttc/ttc_ready_plan_store.dart' show TtcReadyPlanStore;
 import 'ttc/ttc_records_store.dart' show TtcAppointmentsStore;
 import 'ttc/ttc_treatment_store.dart';
 import 'services/scans_store.dart';
+import 'services/pp_use_consent.dart';
 import 'services/symptom_store.dart';
 import 'services/tools_store.dart';
 import 'services/video_store.dart';
@@ -367,6 +368,8 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     GrowthStore.instance.init();
     VaxStore.instance.init();
     FeedingStore.instance.init();
+    // What she lets the app use from each tool (tools pass T0, 2026-10-25).
+    PpUseConsent.instance.init();
     SleepStore.instance.init();
     // Nappies and pumping (0093), and a breastfeed timer left running.
     NappyStore.instance.init();

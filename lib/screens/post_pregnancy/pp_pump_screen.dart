@@ -73,7 +73,8 @@ class _PpPumpScreenState extends State<PpPumpScreen> {
           intro: 'A quick record of what you express, so whoever gives the bottle knows what there is.',
           children: [
             pregToolPad(PpCareStats([
-              ('${_store.mlToday} ml', 'pumped today'),
+              // Per 24 hours (tools pass, 2026-10-25). Was: ('${_store.mlToday} ml', 'pumped today'),
+              ('${_store.ml24h} ml', 'pumped in 24 h'),
               (avg == null ? 'None yet' : '$avg ml', 'a session, last 7 days'),
               (last == null ? 'None yet' : ppCareAgo(last.time), 'last session'),
             ])),
@@ -100,6 +101,7 @@ class _PpPumpScreenState extends State<PpPumpScreen> {
                     if (x.rightMl != null) 'Right ${x.rightMl} ml',
                     if (x.durationMin != null) '${x.durationMin} min',
                   ].join(' · '),
+                  onTap: () => _openSheet(edit: x),
                   onRemove: () {
                     _store.remove(x.id);
                     ppCareSaved(context, 'Session removed.', undo: () => _store.add(x));
@@ -147,16 +149,19 @@ class _PpPumpScreenState extends State<PpPumpScreen> {
     );
   }
 
-  void _openSheet() {
-    var when = DateTime.now();
-    var left = 0;
-    var right = 0;
-    int? minutes;
-    final note = TextEditingController();
+  /// [edit] opens a saved session to change it, keeping its id (tools pass,
+  /// 2026-10-25: sessions were remove-only).
+  void _openSheet({PumpLog? edit}) {
+    var when = edit?.time ?? DateTime.now();
+    var left = edit?.leftMl ?? 0;
+    var right = edit?.rightMl ?? 0;
+    int? minutes = edit?.durationMin;
+    final minuteChoices = {10, 15, 20, 30, ?minutes}.toList()..sort();
+    final note = TextEditingController(text: edit?.note);
     showPpCareSheet(
       context,
-      title: 'Log a pumping session',
-      saveLabel: 'Save session',
+      title: edit == null ? 'Log a pumping session' : 'Edit this session',
+      saveLabel: edit == null ? 'Save session' : 'Save changes',
       body: (setSheet) => [
         ppCareLabel('When'),
         PpWhenRow(when: when, onChanged: (t) => setSheet(() => when = t)),
@@ -167,7 +172,7 @@ class _PpPumpScreenState extends State<PpPumpScreen> {
         const SizedBox(height: 16),
         ppCareLabel('How long, if you know'),
         ppCareChoices<int>(
-          values: const [10, 15, 20, 30],
+          values: minuteChoices,
           selected: minutes,
           label: (m) => '$m min',
           allowNone: true,
@@ -181,6 +186,19 @@ class _PpPumpScreenState extends State<PpPumpScreen> {
       onSave: () {
         if (left == 0 && right == 0) {
           ppCareSaved(context, 'Nothing saved: add how much from at least one side.');
+          return;
+        }
+        if (edit != null) {
+          _store.update(PumpLog(
+            id: edit.id,
+            time: when,
+            leftMl: left == 0 ? null : left,
+            rightMl: right == 0 ? null : right,
+            durationMin: minutes,
+            note: ppCareNoteValue(note),
+          ));
+          ppCareSaved(context, 'Session updated: ${left + right} ml, ${ppCareWhen(when).toLowerCase()}.',
+              undo: () => _store.update(edit));
           return;
         }
         _store.log(

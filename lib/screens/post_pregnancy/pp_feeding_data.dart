@@ -196,11 +196,40 @@ class FeedingStore extends ChangeNotifier {
       );
 
   // ---- reads --------------------------------------------------------------
-  /// Every feed, newest first.
+  /// ⚠️ ONE CHILD AT A TIME (tools pass 01, 2026-10-25). `_logs` holds every
+  /// child's feeds under one prefs key; the ledger knows whose each row is.
+  /// Before this, the reads never asked it, so twins' feeds blended into one
+  /// "last feed", one count and one next side. A row the ledger has never
+  /// seen (logged before the ledger, or with no child yet) counts as the
+  /// active child's, the same fallback `uploadFor` files it under.
+  bool _mine(FeedLog f) => _sync.belongsTo(f.id, _childId);
+
+  /// Every feed of the active child, newest first.
   List<FeedLog> get all {
-    final list = [..._logs]..sort((a, b) => b.time.compareTo(a.time));
+    final list = _logs.where(_mine).toList()..sort((a, b) => b.time.compareTo(a.time));
     return List.unmodifiable(list);
   }
+
+  /// The active child's feeds in the last 24 hours, newest first. Feeds are
+  /// counted per 24 hours, the way a paediatrician and Is my baby OK? count
+  /// them; since midnight read "1 feed today" at 2 am after a full night
+  /// (the user's call F1, 2026-10-25).
+  List<FeedLog> get last24h {
+    final from = DateTime.now().subtract(const Duration(hours: 24));
+    return List.unmodifiable(all.where((f) => f.time.isAfter(from)));
+  }
+
+  int get countLast24h => last24h.length;
+
+  /// Formula in a bottle in the last 24 hours. Expressed milk is breast milk:
+  /// a bottle of it must never read as formula (it lifted formula pages for
+  /// breastfeeding mothers through `methodToday`).
+  bool get formulaLast24h =>
+      last24h.any((f) => f.kind == FeedKind.bottle && f.milk == BottleMilk.formula);
+
+  /// Breast milk in the last 24 hours, at the breast or expressed.
+  bool get breastMilkLast24h => last24h.any(
+      (f) => f.kind == FeedKind.breast || (f.kind == FeedKind.bottle && f.milk == BottleMilk.expressed));
 
   List<FeedLog> get todays => List.unmodifiable(all.where((f) => _isToday(f.time)));
 
@@ -225,9 +254,10 @@ class FeedingStore extends ChangeNotifier {
     return mixed ? '$base + more' : base;
   }
 
-  /// Average gap between today's feeds, in minutes, or null if too few.
+  /// Average gap between feeds in the last 24 hours, in minutes, or null if
+  /// too few. Was today's feeds only, so it reset at midnight.
   int? get avgGapMinutes {
-    final t = todays;
+    final t = last24h;
     if (t.length < 2) return null;
     // t is newest-first; walk consecutive pairs.
     var total = 0;
@@ -249,7 +279,7 @@ class FeedingStore extends ChangeNotifier {
   // ---- interpretation (reassuring, never diagnostic) ----------------------
   /// The hero's one-line quick insight.
   String get quickInsight {
-    final n = countToday;
+    final n = countLast24h;
     if (n == 0) return 'A fresh day. Log the first feed whenever it happens — no schedule to hit.';
     final gap = avgGapMinutes;
     if (gap != null && gap < 90) {
@@ -277,35 +307,62 @@ class FeedingStore extends ChangeNotifier {
     return 'Meals and milk share the day at this stage. Appetite naturally rises and falls — trust the pattern over any single meal.';
   }
 
-  /// Plain-language pattern summaries for the Patterns section.
+  /// Plain-language pattern summaries for the Patterns section. Only lines
+  /// read from her own feeds, and one standing line when there is nothing
+  /// yet (tools pass 01: fixed sentences printed whatever the data read as
+  /// insight). The old fixed lines are kept below for revert.
   List<String> get patterns {
     final out = <String>[];
-    final n = countToday;
-    if (n >= 2) {
-      final gap = avgGapMinutes;
-      if (gap != null) out.add('Today\'s feeds are about ${ppGapLabel(gap)} apart on average.');
+    final gap = avgGapMinutes;
+    if (gap != null) out.add('Over the last 24 hours, feeds were about ${ppGapLabel(gap)} apart.');
+    final stretch = longestGapLast24h;
+    if (stretch != null && stretch >= 180) {
+      out.add('The longest stretch between feeds was ${ppGapLabel(stretch)}.');
     }
-    out.add('Night feeds tend to stretch out gently over the first year — no need to rush them.');
-    if (_logs.any((f) => f.kind == FeedKind.solid)) {
-      out.add('Solids have started appearing alongside milk — acceptance usually improves week by week.');
+    if (all.any((f) => f.kind == FeedKind.solid)) {
+      out.add('Solids have started appearing alongside milk. Acceptance usually improves week by week.');
     }
-    out.add('What matters most is the overall rhythm, not any single feed.');
+    if (out.isEmpty) {
+      out.add('Log a few feeds and the pattern shows here. What matters is the rhythm, not any single feed.');
+    }
     return out;
   }
+  // Kept for revert (printed whatever the data):
+  // out.add('Night feeds tend to stretch out gently over the first year — no need to rush them.');
+  // out.add('What matters most is the overall rhythm, not any single feed.');
+
+  /// The longest gap between two feeds in the last 24 hours, in minutes.
+  int? get longestGapLast24h {
+    final t = last24h;
+    if (t.length < 2) return null;
+    var best = 0;
+    for (var i = 0; i < t.length - 1; i++) {
+      final g = t[i].time.difference(t[i + 1].time).inMinutes.abs();
+      if (g > best) best = g;
+    }
+    return best;
+  }
+
+  /// Minutes until a gentle next-feed reminder: her own 24-hour rhythm when
+  /// there is one, else the usual gap for the age.
+  int get reminderGapMinutes => avgGapMinutes ?? _defaultGapForAge();
 
   String get name => ChildProfileStore.instance.name;
 
   // ---- writes -------------------------------------------------------------
-  void add(FeedLog e) {
+  /// [childId] files it under a child other than the one on screen: the
+  /// breastfeed timer saves to the child it started for.
+  void add(FeedLog e, {String? childId}) {
     _logs.add(e);
     _persist();
     // ChildSync.push(_table, _childId, e.id, _toRow(e)); // kept for revert
-    _sync.touch(e.id, _childId);
+    _sync.touch(e.id, childId ?? _childId);
     _pushWaiting();
     notifyListeners();
   }
 
   void log({
+    String? childId,
     required DateTime time,
     required FeedKind kind,
     FeedSideX? side,
@@ -327,7 +384,28 @@ class FeedingStore extends ChangeNotifier {
       food: food,
       take: take,
       note: note,
-    ));
+    ), childId: childId);
+  }
+
+  @visibleForTesting
+  void debugReset() {
+    _logs.clear();
+    _sync.clear();
+    // Loaded, so a screen's init() does not read the saved copy back on top
+    // of what the test logged (main boots the store before any log).
+    _loaded = true;
+  }
+
+  /// Replaces a feed in place, keeping its id, so the edit syncs as the same
+  /// row (newer wins) rather than as a removal and a new feed.
+  void update(FeedLog e) {
+    final i = _logs.indexWhere((f) => f.id == e.id);
+    if (i < 0) return add(e);
+    _logs[i] = e;
+    _persist();
+    _sync.touch(e.id, _sync.childOf[e.id] ?? _childId);
+    _pushWaiting();
+    notifyListeners();
   }
 
   void remove(String id) {
@@ -377,4 +455,44 @@ String ppGapLabel(int mins) {
   if (h == 0) return '${m}m';
   if (m == 0) return '${h}h';
   return '${h}h ${m}m';
+}
+
+/// The one notification id the next-feed reminder uses, so setting a new one
+/// replaces the old (tools pass 01, F3).
+const int kPpFeedReminderId = 7301;
+
+/// The feed the one-tap repeat logs: the last one again at [now], with the
+/// breast side switched (left to right, right to left; both stays both), the
+/// way the next-side line already suggests (tools pass 01, F2).
+FeedLog ppFeedRepeat(FeedLog last, DateTime now) => FeedLog(
+      id: '',
+      time: now,
+      kind: last.kind,
+      side: switch (last.side) {
+        FeedSideX.left => FeedSideX.right,
+        FeedSideX.right => FeedSideX.left,
+        final s => s,
+      },
+      milk: last.milk,
+      amountMl: last.amountMl,
+      food: last.food,
+      take: last.kind == FeedKind.solid ? last.take : null,
+    );
+
+/// The repeat chip's words for what one tap will log: "Breast, right",
+/// "Bottle, 110 ml", "Solids, khichdi".
+String ppFeedRepeatLabel(FeedLog last) {
+  final next = ppFeedRepeat(last, last.time);
+  return switch (next.kind) {
+    FeedKind.breast => switch (next.side) {
+        FeedSideX.left => 'Breast, left',
+        FeedSideX.right => 'Breast, right',
+        FeedSideX.both => 'Breast, both sides',
+        null => 'Breast',
+      },
+    FeedKind.bottle => next.amountMl != null
+        ? 'Bottle, ${next.amountMl} ml'
+        : (next.milk == BottleMilk.formula ? 'Bottle, formula' : 'Bottle'),
+    FeedKind.solid => 'Solids, ${(next.food ?? 'solid food').toLowerCase()}',
+  };
 }

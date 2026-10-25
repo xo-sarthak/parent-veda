@@ -110,3 +110,10 @@ A finding is settled at that tool's turn, as one plan decision. **C1** (the 8 To
   | What to say `pp_scripts` | 29 |
   | What to feed at this age `pp_food_chart` | 22 |
 - Not a fault: Sleep Sounds arms the shared player's 20-minute sleep timer on arrival, and it is meant to outlive the screen.
+
+### T0 built (2026-10-25, with tool 01)
+`PpUseConsent` (`lib/services/pp_use_consent.dart`), `PpUseAskCard` (`lib/screens/post_pregnancy/pp_use_ask_card.dart`) and the "What ParentVeda uses" section in You › Data and privacy. First kind: `feeds`. Each later tool adds its kind to `PpUseKind` (with a `label` and a `why`), shows the card on its own screen after the first save, and gates every reader with `allows(kind)`. Answers stay on this phone until consent sync is approved.
+
+### Backend done rule (the user, 2026-10-25)
+"Whenever you are completing a tool make sure the back ends are working well." A tool is not done until: its store is child-scoped on read and write, every write syncs (ledger or merged store) with a test, any new consent kind syncs through `PpUseConsent`, and the backend docs (BACKEND-PATTERNS when there's a new pattern, sync log + STILL-OPEN-BACKEND when sync changes) are written in the same change.
+

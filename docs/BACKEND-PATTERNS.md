@@ -3781,6 +3781,54 @@ What the fix taught, beyond the key itself:
   colliding entry stopped the partner's journal and the media backfill too. Per-row failure handling (`SyncBatch`
   splits a refused batch to find the bad row) keeps one bad row from taking the rest down.
 
+## 16ll. Filter by owner at read time, and consent as its own store (no migration, 2026-10-25)
+
+Two patterns from the parenting tools pass, tool 01 (`docs/pp-tool-plans/01-log-a-feed.md`).
+
+### 1. The bug: a list that knows its owner but never asks
+
+`FeedingStore` keeps every child's feeds in one list, under one prefs key. The sync ledger (`ChildLogLedger.childOf`)
+already records whose each row is, because the upload needs a `child_id`. But the *reads* (`all`, `last`, the count,
+the next breast side) never asked it. With twins, both children's feeds blended into one "last feed" and one count.
+Nothing crashed and no test failed, because every test had one child.
+
+**Two fixes, and the one we chose.**
+- *Storage per child:* one list and one prefs key per child. It is cleaner on paper, but every parent's saved feeds
+  would have to be moved into the new shape. That is a migration of shipped data on the phone, with no undo.
+- *Filter at read time (chosen):* `all` keeps only rows whose ledger child is the active child, and every derived
+  getter reads `all`, so one line fixes every reader. The cost is a map lookup per row on every read: nothing at
+  these sizes.
+
+**The rule that keeps read and write in agreement.** A row the ledger has never seen (logged before the ledger
+existed, or before a child was set) counts as the *active* child's. That is exactly the fallback the uploader uses
+(`uploadFor(..., fallbackChildId)`), so the screen and the cloud never disagree about whose a row is.
+
+**The general fact.** Ownership has to be enforced where data is *read*, not only where it is written. Postgres RLS
+does this for the server; a phone-side cache that holds several owners' rows needs the same filter in its getters.
+The same day the check moved onto the ledger itself, `ChildLogLedger.belongsTo(key, childId)`, and all five care stores (feeds, nappies, pumping, tummy time, sleep) read through it: the rule lives once, next to the map it reads. A related case: the breastfeed timer now captures the child when it *starts* and files the feed under that child on finish. Ownership belongs to the moment a record begins, not to whatever is on screen when it is saved.
+
+### 2. "May the app use this?" is its own store, synced per item
+
+The user wants what a tool learns used elsewhere (relevance, reminders) only after asking: once per kind of info,
+changeable in You. `PpUseConsent` (`lib/services/pp_use_consent.dart`) is one singleton that holds every answer, and
+every reader calls `allows(kind)`.
+
+- **One store, not a flag per tool.** Thirty tools each holding "may we use this?" would repeat the question thirty
+  times, the answers would drift, and a settings page would have to know every store. One store is one rule and one
+  settings section, which loops over the kinds.
+- **Default-deny.** Unasked counts as no, the same as `Inferable` in `journey_state.dart`. A reader can't get the
+  data by accident before the question was asked.
+- **A no changes ordering, never behaviour.** The tool works the same either way: no feature is hidden behind
+  consent.
+- **Synced with the step-13 per-item merge** (`CloudMergedStore`, `pv_state_merge`): one item per kind, the newest
+  answer wins, and no item means never asked. The state row is keyed per person (step 14), which is correct for
+  consent: it is hers, and a co-parent answers for himself. No migration was needed, because the server merge takes
+  any store key. `test/pp_use_consent_sync_test.dart` plays the server and checks the item's key and value.
+
+**The trade-off, named.** Gating each reader means a reader written later could forget to call `allows()`. The guard
+is that a kind is added together with its readers, in the same tool plan, and the plan's wiring gate greps each
+`allows(` call site.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -3881,3 +3929,4 @@ What the fix taught, beyond the key itself:
 44. `pvSignOut` → `LocalOwner.wipeThisPhone` → `LocalWipe.keep` — a wipe undoes what came before it, the OS keeps what you scheduled, and memory is not the disk (§16ii-n).
 45. `0110_state_merge_and_records.sql` (`pv_state_merge`) → `lib/services/remote/cloud_merged_store.dart` — merge where the writes are already in order, a last-writer-wins map, items vs rows, and why a reset is not a deletion (§16ii-q).
 46. `0112_wa_weekly_guide_loss.sql` → `PregnancyEndedStore.ended` → `CycleStore.restartOn` — a past event scoped by the stage's start: derive, don't clear; and why a stable id is not a unique one (§16kk).
+47. `FeedingStore._mine` → `lib/services/pp_use_consent.dart` — filter by owner at read time with the same fallback the uploader uses; consent as one default-deny store, merged per item (§16ll).

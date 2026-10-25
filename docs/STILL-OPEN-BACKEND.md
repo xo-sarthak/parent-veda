@@ -36,6 +36,7 @@ step, newest at the bottom. When a step lands: tick it here, add its log entry t
 | 11 + 12 | Every write of her data confirmed and batched; sign-out forgets memory and stops alarms; the 90-day purge (done before 10, see below) | 0109 (run 2026-10-21) | `984836f` |
 | 13 | Nothing she makes lives only on the phone (about 40 stores move to the cloud); every non-shopping blob store merges item by item (`CloudMergedStore`, `pv_state_merge`). This is the non-shopping half of step 10 | 0110 (run 2026-10-22) | `8c466d0` |
 | 14 | Rows keyed per person (B9, found 2026-10-24): 17 tables move from a table-wide `id` key to `(user_id, id)`, because ids built from a date or a name collided across people and RLS refused the second person's upload. BUILT 2026-10-24, user's word; 0113 run 2026-10-25; **left: install the next build** | 0113 (run 2026-10-25) | `b474f69` |
+| 15 | Parenting tools pass: feed reads follow the active child (twins no longer share a log), an edit updates the same row, and the "ask once" consent answers sync per item (`PpUseConsent`, `CloudMergedStore`). The same day: all five care stores read through `ChildLogLedger.belongsTo`, the breastfeed timer files under the child it started for, and edits keep row ids. Next tools add their kinds the same way | none | pending |
 
 ### Still to do, in order
 

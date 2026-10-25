@@ -1197,3 +1197,34 @@ ttc_cycles where id = 'ttcc_<that day>'` returns two rows.
 `lib/ttc/cycle_store.dart`, `lib/services/family_timeline.dart`, `lib/services/journal_sync.dart`,
 `lib/services/tools_store.dart`, `test/rows_keyed_per_person_test.dart` (new), `test/ttc_schema_contract_test.dart`,
 `test/own_row_ledger_test.dart`.
+
+## Step 15: the parenting tools pass: feed reads follow the child, and "ask once" answers sync
+
+**Date:** 2026-10-25 (parenting tools pass, tool 01 and shared piece T0; the user: "make sure the back ends are
+working well ... sinking the consent answers"). **Migration:** none. **Commit:** pending.
+
+### What changed
+- [x] **Feeds are read per child.** `FeedingStore.all` keeps only rows whose `ChildLogLedger.childOf` is the
+  active child (a row the ledger never saw counts as the active child's, the uploader's fallback). Before this,
+  twins' feeds blended into one last feed, count and next side. Upload and pull were already child-scoped; only
+  the reads were not.
+- [x] **An edit is an update of the same row.** `FeedingStore.update` keeps the id and `touch`es it, so newer-wins
+  carries the edit to the other phone instead of a removal plus a new feed.
+- [x] **"Ask once" answers sync.** `PpUseConsent` adopts `CloudMergedStore`: store key `pp_use_consent`, one item
+  per kind (`feeds` today), value `yes` or `no`, unasked = no item. It boots in `main.dart` and registers with
+  `SyncRegistry` like every merged store (sign-in, resume, sign-out reset).
+
+**Verified:** `test/pp_use_consent_sync_test.dart` (new: the yes lands on the server as `pp_use_consent:items`
+→ `feeds`, and server items come back as her answer), `test/pp_feed_tool_test.dart` (new: twins isolated, an edit
+keeps the id), `cloud_merged_store_test`, `pp_logs_merge_test`, `sync_guard_contract_test`: all pass.
+
+- [x] **The same day, all five care stores** (feeds, nappies, pumping, tummy time, sleep) read through one check on
+  the ledger, `ChildLogLedger.belongsTo`. The breastfeed timer files its feed under the child it started for
+  (`FeedingStore.log(childId:)`). `update()` on nappies, pumping and sleep keeps the row id. Test:
+  `test/pp_care_logs_tool_test.dart`. Sleep's live clock (`startAsleep`) is kept on the phone only; the finished
+  sleep syncs as a normal row.
+
+**Known limit:** a running sleep clock is per phone, so the other parent sees the sleep only once it is saved.
+
+**Files:** `lib/screens/post_pregnancy/pp_feeding_data.dart`, `lib/services/pp_use_consent.dart` (new),
+`lib/main.dart`, `test/pp_use_consent_sync_test.dart` (new), `test/pp_feed_tool_test.dart` (new).

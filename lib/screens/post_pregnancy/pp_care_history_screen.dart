@@ -150,7 +150,12 @@ class _PpCareHistoryScreenState extends State<PpCareHistoryScreen> {
               key: const ValueKey('pp_history_share'),
               label: 'Share with your doctor',
               icon: Icons.ios_share_rounded,
-              onTap: anything ? () => _share(days) : null,
+              // No silent tap (S8, tools pass 2026-10-25): with nothing logged it
+              // says why instead of sitting greyed out. Was: anything ? () => _share(days) : null
+              onTap: anything
+                  ? () => _share(days)
+                  : () => ppCareSaved(context,
+                      'Nothing logged in the last 7 days yet. Log feeds, sleep or nappies and the summary fills in.'),
             )),
             const SizedBox(height: 8),
             pregToolPad(Text(

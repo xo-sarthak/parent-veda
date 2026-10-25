@@ -19,7 +19,10 @@ import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
-import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary;
+import '../../services/notification_service.dart';
+import '../../services/pp_use_consent.dart' show PpUseKind;
+import '../../widgets/pv_toast.dart' show pvToast, PvToastKind;
+import '../products/pv_store_chrome.dart' show PvChip, PvCommit, PvSecondary;
 import '../ttc/ttc_tool_marks.dart';
 import '../v2/v2_palette.dart';
 import 'pp_breast_timer_screen.dart';
@@ -33,6 +36,7 @@ import 'pp_nappy_screen.dart';
 import 'pp_pump_screen.dart';
 import 'pp_search.dart' show openPpAskVeda;
 import 'pp_tools_kit.dart';
+import 'pp_use_ask_card.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ THE SHARED TOOL SHELL (2026-10-07, parenting gap pass). The journey was
@@ -97,8 +101,10 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
           title: 'Feeding journey',
           intro: 'A rhythm you can see, not a log to fill. A couple of taps whenever you like.',
           children: [
+            // Per 24 hours, not since midnight (the user's call F1, 2026-10-25).
+            // Was: ('${_store.countToday}', _store.countToday == 1 ? 'feed today' : 'feeds today'),
             pregToolPad(PpCareStats([
-              ('${_store.countToday}', _store.countToday == 1 ? 'feed today' : 'feeds today'),
+              ('${_store.countLast24h}', _store.countLast24h == 1 ? 'feed in 24 h' : 'feeds in 24 h'),
               (last == null ? 'None yet' : ppCareAgo(last.time), 'last feed'),
               (next == null ? 'Not yet' : '~${ppCareClock(next)}', 'next feed, roughly'),
             ])),
@@ -115,6 +121,20 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
             ],
             const SizedBox(height: 18),
             pregToolPad(PvCommit(key: const ValueKey('pp_feed_log'), label: 'Log a feed', onTap: _openLogSheet)),
+            // One tap for the commonest log (the user's call F2, 2026-10-25).
+            // Hidden until there is a last feed to repeat, never a dead chip.
+            if (last != null) ...[
+              const SizedBox(height: 10),
+              pregToolPad(Align(
+                alignment: Alignment.centerLeft,
+                child: PvChip(
+                  key: const ValueKey('pp_feed_repeat'),
+                  label: 'Same as last: ${ppFeedRepeatLabel(last)}',
+                  selected: false,
+                  onTap: _repeatLast,
+                ),
+              )),
+            ],
             const SizedBox(height: 10),
             pregToolPad(PvSecondary(
               key: const ValueKey('pp_feed_timer_open'),
@@ -135,6 +155,14 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
               stage: 'parenting',
               padding: EdgeInsets.only(top: 14),
             )),
+            // Asked once, after the first feed is saved (tools pass T0).
+            if (_store.all.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              pregToolPad(const PpUseAskCard(
+                kind: PpUseKind.feeds,
+                question: 'Use your feed log to suggest pages?',
+              )),
+            ],
             const SizedBox(height: 26),
             pregToolPad(ppCareHeading("Today's feeds")),
             const SizedBox(height: 6),
@@ -152,6 +180,7 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
                   title: _kindLabel(f.kind),
                   when: f.time,
                   detail: _detail(f),
+                  onTap: () => _openShellSheet(edit: f),
                   onRemove: () {
                     _store.remove(f.id);
                     ppCareSaved(context, 'Feed removed.', undo: () => _store.add(f));
@@ -386,21 +415,30 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
   /// The shared sheet (pp_care_parts.dart): When first (defaults to now, can
   /// be changed), then the kind, then what the kind needs. "Pump" saves to
   /// the pump log, not the feed log: it is milk expressed, not a feed given.
-  void _openShellSheet() {
-    var when = DateTime.now();
-    String kind = 'breast';
-    FeedSideX side = ppNextBreastSide()?.lastSide == FeedSideX.left ? FeedSideX.right : FeedSideX.left;
-    BottleMilk milk = BottleMilk.expressed;
-    SolidTake take = SolidTake.ate;
-    int? minutes;
-    var amount = 0;
+  ///
+  /// [edit] opens the same sheet filled with a saved feed, and saving
+  /// replaces it in place (tools pass 01, 2026-10-25: a wrong time or side
+  /// used to mean remove and log again). Pump is not offered when editing:
+  /// a feed cannot become a pumping entry.
+  void _openShellSheet({FeedLog? edit}) {
+    var when = edit?.time ?? DateTime.now();
+    String kind = switch (edit?.kind) { FeedKind.bottle => 'bottle', FeedKind.solid => 'solids', _ => 'breast' };
+    FeedSideX side = edit?.side ??
+        (ppNextBreastSide()?.lastSide == FeedSideX.left ? FeedSideX.right : FeedSideX.left);
+    BottleMilk milk = edit?.milk ?? BottleMilk.expressed;
+    SolidTake take = edit?.take ?? SolidTake.ate;
+    int? minutes = edit?.durationMin;
+    var amount = edit?.amountMl ?? 0;
     var left = 0;
     var right = 0;
-    final food = TextEditingController();
+    final food = TextEditingController(text: edit?.kind == FeedKind.solid ? edit?.food : null);
+    final note = TextEditingController(text: edit?.note);
+    // A timed feed can be 17 minutes; keep its own value choosable.
+    final minuteChoices = {5, 10, 15, 20, 30, ?minutes}.toList()..sort();
     showPpCareSheet(
       context,
-      title: 'Log a feed',
-      saveLabel: 'Save feed',
+      title: edit == null ? 'Log a feed' : 'Edit this feed',
+      saveLabel: edit == null ? 'Save feed' : 'Save changes',
       body: (setSheet) {
         Widget stepper(String label, int value, String k, ValueChanged<int> on) {
           final p = V2PaletteStore.instance.current;
@@ -428,7 +466,7 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
           const SizedBox(height: 16),
           ppCareLabel('How was this feed?'),
           ppCareChoices<String>(
-            values: const ['breast', 'bottle', 'solids', 'pump'],
+            values: edit == null ? const ['breast', 'bottle', 'solids', 'pump'] : const ['breast', 'bottle', 'solids'],
             selected: kind,
             label: (k) => switch (k) { 'breast' => 'Breast', 'bottle' => 'Bottle', 'solids' => 'Solids', _ => 'Pump' },
             keyPrefix: 'pp_feed_kind',
@@ -447,7 +485,7 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
             const SizedBox(height: 16),
             ppCareLabel('How long, if you know'),
             ppCareChoices<int>(
-              values: const [5, 10, 15, 20, 30],
+              values: minuteChoices,
               selected: minutes,
               label: (m) => '$m min',
               allowNone: true,
@@ -489,6 +527,19 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
             Text('Saved to your pumping log, so whoever gives the bottle knows what there is.',
                 style: pvManrope(fontSize: 13, height: 1.45, color: V2PaletteStore.instance.current.ink2)),
           ],
+          // The note the 2026-08 sheet had and the shell lost; the timer
+          // still wrote one, so some feeds had notes and none could be added.
+          if (kind != 'pump') ...[
+            const SizedBox(height: 16),
+            ppCareLabel('Note, if you like'),
+            TextField(
+              key: const ValueKey('pp_feed_note'),
+              controller: note,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(hintText: 'Sleepy at the breast, spat up a little...', border: OutlineInputBorder()),
+            ),
+          ],
         ];
       },
       onSave: () {
@@ -502,7 +553,8 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
           return;
         }
         final k = switch (kind) { 'bottle' => FeedKind.bottle, 'solids' => FeedKind.solid, _ => FeedKind.breast };
-        _store.log(
+        final feed = FeedLog(
+          id: edit?.id ?? '',
           time: when,
           kind: k,
           side: k == FeedKind.breast ? side : null,
@@ -511,10 +563,78 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
           amountMl: k == FeedKind.bottle && amount > 0 ? amount : null,
           food: k == FeedKind.solid ? (food.text.trim().isEmpty ? 'Solid food' : food.text.trim()) : null,
           take: k == FeedKind.solid ? take : null,
+          note: note.text.trim().isEmpty ? null : note.text.trim(),
         );
-        ppCareSaved(context, '${_kindLabel(k)} feed saved, ${ppCareWhen(when).toLowerCase()}.');
+        if (edit != null) {
+          _store.update(feed);
+          ppCareSaved(context, 'Feed updated: ${_kindLabel(k).toLowerCase()}, ${ppCareWhen(when).toLowerCase()}.',
+              undo: () => _store.update(edit));
+          return;
+        }
+        _store.log(
+          time: feed.time,
+          kind: feed.kind,
+          side: feed.side,
+          durationMin: feed.durationMin,
+          milk: feed.milk,
+          amountMl: feed.amountMl,
+          food: feed.food,
+          take: feed.take,
+          note: feed.note,
+        );
+        _savedWithReminder('${_kindLabel(k)} feed saved, ${ppCareWhen(when).toLowerCase()}.');
       },
     );
+  }
+
+  /// The one-tap repeat (F2): the last feed again, at now, the breast side
+  /// switched the way the next-side line already suggests. Undo in the toast.
+  void _repeatLast() {
+    final last = _store.last;
+    if (last == null) return;
+    final next = ppFeedRepeat(last, DateTime.now());
+    _store.log(
+      time: next.time,
+      kind: next.kind,
+      side: next.side,
+      milk: next.milk,
+      amountMl: next.amountMl,
+      food: next.food,
+      take: next.take,
+    );
+    final saved = _store.last;
+    ppCareSaved(context, '${ppFeedRepeatLabel(last)} saved, just now.',
+        undo: saved == null ? null : () => _store.remove(saved.id));
+  }
+
+  /// The save toast, offering a gentle next-feed reminder (F3). Nothing is
+  /// set unless she taps it, and a newer reminder replaces the older one.
+  void _savedWithReminder(String what) {
+    final gap = _store.reminderGapMinutes;
+    pvToast(context, what,
+        kind: PvToastKind.done,
+        action: 'Remind me in ${ppGapLabel(gap)}',
+        onAction: () => _setReminder(gap));
+  }
+
+  Future<void> _setReminder(int gapMinutes) async {
+    final ok = await NotificationService.instance.requestPermission();
+    if (!mounted) return;
+    if (!ok) {
+      pvToast(context,
+          'Notifications are off for ParentVeda. Turn them on in your phone settings to get reminders.',
+          kind: PvToastKind.gentle);
+      return;
+    }
+    await NotificationService.instance.scheduleOneOff(
+      id: kPpFeedReminderId,
+      title: 'A feed may be coming up',
+      body: 'A gentle nudge, not a schedule. Feed on cue.',
+      when: DateTime.now().add(Duration(minutes: gapMinutes)),
+    );
+    if (!mounted) return;
+    pvToast(context, 'Reminder set for about ${ppCareClock(DateTime.now().add(Duration(minutes: gapMinutes)))}.',
+        kind: PvToastKind.done);
   }
 
   /// The 2026-08 sheet, kept for revert.

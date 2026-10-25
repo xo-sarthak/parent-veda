@@ -5,14 +5,14 @@ One tool at a time; the user says go per tool. Each plan records every decision 
 
 | # | Tool | Surface | Status | Commit |
 |---|---|---|---|---|
-| C1 | Door tools listed in the Tools tab + test | — | BUILT 2026-10-25, tests green | |
-| 01 | Log a feed (+ T0 consent seam) | `pp_feeding` | audit next | |
-| 02 | Breastfeed timer | `pp_feed_timer` | | |
-| 03 | Nappies | `pp_nappies` | | |
-| 04 | Pumping | `pp_pump` | | |
-| 05 | Sleep | `pp_sleep` | | |
-| 06 | Tummy time | `pp_tummy_time` | | |
-| 07 | The last 7 days | `pp_care_history` | | |
+| C1 | Door tools listed in the Tools tab + test | — | COMMITTED | 2cd29c4 |
+| 01 | Log a feed (+ T0 consent seam) | `pp_feeding` | BUILT 2026-10-25, tests green | |
+| 02 | Breastfeed timer | `pp_feed_timer` | BUILT 2026-10-25 (02-07-care-logs.md) | |
+| 03 | Nappies | `pp_nappies` | BUILT 2026-10-25 (02-07-care-logs.md) | |
+| 04 | Pumping | `pp_pump` | BUILT 2026-10-25 (02-07-care-logs.md) | |
+| 05 | Sleep | `pp_sleep` | BUILT 2026-10-25 (02-07-care-logs.md) | |
+| 06 | Tummy time | `pp_tummy_time` | BUILT 2026-10-25 (02-07-care-logs.md) | |
+| 07 | The last 7 days | `pp_care_history` | BUILT 2026-10-25 (02-07-care-logs.md) | |
 | 08 | Growth | `pp_growth` | | |
 | 09 | Vaccines | `pp_vaccines` | | |
 | 10 | Fever check | `pp_fever_check` | | |

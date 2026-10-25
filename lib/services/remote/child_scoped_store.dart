@@ -104,6 +104,17 @@ class ChildLogLedger {
   /// The book's id for [key] of [childId].
   String bookId(String childId, String key) => _keyed ? '$childId|$key' : key;
 
+  /// ⚠️ READS FOLLOW THE CHILD (tools pass, 2026-10-25). Whether the row with
+  /// store key [key] is [childId]'s. A store keeps every child's rows in one
+  /// list; its getters must ask this, or twins' logs blend on screen (they
+  /// did, in all five care logs). A row the book has never seen counts as
+  /// [childId]'s: the same fallback [uploadFor] files it under, so the screen
+  /// and the cloud agree. No child yet: everything is shown.
+  bool belongsTo(String key, String? childId) {
+    if (childId == null) return true;
+    return (childOf[bookId(childId, key)] ?? childId) == childId;
+  }
+
   /// Every key of [childId] this phone has changed and the book remembers.
   /// For a table whose rows are state (vaccine doses): a dose un-ticked here is
   /// in no local set any more, but it must still take part in the merge, or

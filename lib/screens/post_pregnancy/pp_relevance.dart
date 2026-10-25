@@ -25,6 +25,7 @@
 // =============================================================================
 
 import '../../services/family_profile.dart';
+import '../../services/pp_use_consent.dart';
 import '../../services/pv_read_store.dart';
 import 'pp_changes_store.dart';
 import 'pp_child_profile.dart';
@@ -72,19 +73,28 @@ class PpSituation {
     final child = ChildProfileStore.instance;
     final fam = FamilyProfileStore.instance;
     final feedings = fam.feedings.isNotEmpty ? fam.feedings : {?fam.feeding};
-    final todayMethod = FeedingStore.instance.methodToday.toLowerCase();
+    // ⚠️ THE FEED LOG, ONLY WITH HER YES (tools pass 01, F4, 2026-10-25).
+    // Was `methodToday.startsWith('bottle')`, so a bottle of her own expressed
+    // milk raised the formula signal and lifted formula pages for a
+    // breastfeeding mother; and the log was used without asking. Now formula
+    // means a formula bottle, breast milk counts at the breast or expressed,
+    // and neither is read unless she said yes. Onboarding answers are untouched:
+    // she gave those for exactly this.
+    // Kept for revert: final todayMethod = FeedingStore.instance.methodToday.toLowerCase();
+    final feeds = FeedingStore.instance;
+    final useLog = PpUseConsent.instance.allows(PpUseKind.feeds);
     final signals = <PpSignal>{
       if (fam.premature || fam.nicu || child.correctionWeeks != null) PpSignal.bornEarly,
       // Recovery matters for the first three months, not for a toddler's mother.
       if (fam.birthMode == BirthMode.cSection && child.ageInDays < 90) PpSignal.cSection,
       if (feedings.contains(FeedingMethod.formula) ||
           feedings.contains(FeedingMethod.mixed) ||
-          todayMethod.startsWith('bottle'))
+          (useLog && feeds.formulaLast24h))
         PpSignal.formula,
       if (feedings.contains(FeedingMethod.breastfeeding) ||
           feedings.contains(FeedingMethod.expressed) ||
           feedings.contains(FeedingMethod.mixed) ||
-          todayMethod.startsWith('breast'))
+          (useLog && feeds.breastMilkLast24h))
         PpSignal.breastfeeding,
       if (fam.multiple) PpSignal.twins,
     };

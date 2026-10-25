@@ -10,6 +10,8 @@
 //  change. Replaces the older SleepTrackerScreen (kept for revert).
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
@@ -22,7 +24,7 @@ import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
-import '../products/pv_store_chrome.dart' show PvCommit;
+import '../products/pv_store_chrome.dart' show PvCommit, PvSecondary;
 import '../ttc/ttc_tool_marks.dart';
 import '../v2/v2_palette.dart';
 import 'pp_care_history_screen.dart';
@@ -80,6 +82,7 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
         final today = _store.todays;
         final last = _store.last;
         final wake = _store.currentWakeMinutes;
+        final asleep = _store.asleepSince;
         final c = _store.ageContext;
         final tint = HSLColor.fromAHSL(1, 250, 0.52, 0.9).toColor();
         return PregToolScaffold(
@@ -97,15 +100,44 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
               placementKey: 'sleep_journey',
               padding: EdgeInsets.only(bottom: 12),
             )),
+            // Per 24 hours (tools pass, 2026-10-25): "slept today" read 0m at
+            // 6 am after a full night. Was: (ppDur(_store.totalMinutesToday), 'slept today').
             pregToolPad(PpCareStats([
-              (_store.totalMinutesToday == 0 ? '0m' : ppDur(_store.totalMinutesToday), 'slept today'),
+              (_store.totalMinutes24h == 0 ? '0m' : ppDur(_store.totalMinutes24h), 'slept in 24 h'),
               (last == null ? 'None yet' : ppDur(last.minutes), 'last stretch'),
-              (wake == null ? 'Not yet' : ppDur(wake), 'awake for'),
+              asleep != null
+                  ? (ppDur(DateTime.now().difference(asleep).inMinutes), 'asleep for')
+                  : (wake == null ? 'Not yet' : ppDur(wake), 'awake for'),
             ])),
             const SizedBox(height: 14),
             pregToolPad(Text(_store.todaysInsight, style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1))),
             const SizedBox(height: 18),
-            pregToolPad(PvCommit(key: const ValueKey('pp_sleep_log'), label: 'Log sleep', onTap: _openLogSheet)),
+            // Asleep now / Woke up (the user's call, 2026-10-25). Typing the
+            // times afterwards stays, for a sleep that was not tapped live.
+            // Was one button: PvCommit(key: 'pp_sleep_log', label: 'Log sleep').
+            if (asleep == null) ...[
+              pregToolPad(PvCommit(key: const ValueKey('pp_sleep_asleep'), label: 'Asleep now', onTap: _asleepNow)),
+              const SizedBox(height: 10),
+              pregToolPad(PvSecondary(
+                key: const ValueKey('pp_sleep_log'),
+                label: 'Log a sleep from earlier',
+                icon: Icons.edit_calendar_outlined,
+                onTap: _openLogSheet,
+              )),
+            ] else ...[
+              pregToolPad(_AsleepLine(since: asleep)),
+              const SizedBox(height: 12),
+              pregToolPad(PvCommit(key: const ValueKey('pp_sleep_woke'), label: 'Woke up', onTap: _wokeUp)),
+              const SizedBox(height: 10),
+              pregToolPad(PvSecondary(
+                key: const ValueKey('pp_sleep_cancel'),
+                label: 'Cancel, nothing saved',
+                onTap: () {
+                  _store.cancelAsleep();
+                  ppCareSaved(context, 'Sleep clock stopped. Nothing was saved.');
+                },
+              )),
+            ],
             const SizedBox(height: 26),
             pregToolPad(ppCareHeading("Today's sleep")),
             const SizedBox(height: 6),
@@ -123,6 +155,7 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
                   title: '${_kindLabel(x.kind)} · ${ppDur(x.minutes)}',
                   when: x.start,
                   detail: 'Woke ${ppCareClock(x.end)}${x.note == null ? '' : ' · ${x.note}'}',
+                  onTap: () => _openShellSheet(edit: x),
                   onRemove: () {
                     _store.remove(x.id);
                     ppCareSaved(context, 'Sleep removed.', undo: () => _store.add(x));
@@ -452,19 +485,38 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
         ]),
       );
 
+  // ---- asleep now ---------------------------------------------------------
+  void _asleepNow() {
+    _store.startAsleep();
+    ppCareSaved(context, 'Sleep clock started. Tap Woke up when ${ChildProfileStore.instance.name} wakes.');
+  }
+
+  void _wokeUp() {
+    final s = _store.wakeUp();
+    ppCareSaved(
+        context,
+        s == null
+            ? 'Under a minute, so nothing was saved.'
+            : '${_kindLabel(s.kind)} saved: ${ppDur(s.minutes)}.',
+        undo: s == null ? null : () => _store.remove(s.id));
+  }
+
   // ---- log sheet ----------------------------------------------------------
   void _openLogSheet() => kPpSleepJourneyShell ? _openShellSheet() : _openClassicSheet();
 
   /// Fell asleep and woke up, each with its own date, so last night can be
   /// entered this morning without it landing on the wrong day.
-  void _openShellSheet() {
-    var end = DateTime.now();
-    var start = end.subtract(const Duration(minutes: 90));
-    var kind = SleepKind.nap;
+  ///
+  /// [edit] opens a saved sleep to change it, keeping its id (tools pass,
+  /// 2026-10-25: sleeps were remove-only).
+  void _openShellSheet({SleepLog? edit}) {
+    var end = edit?.end ?? DateTime.now();
+    var start = edit?.start ?? end.subtract(const Duration(minutes: 90));
+    var kind = edit?.kind ?? SleepKind.nap;
     showPpCareSheet(
       context,
-      title: 'Log sleep',
-      saveLabel: 'Save sleep',
+      title: edit == null ? 'Log sleep' : 'Edit this sleep',
+      saveLabel: edit == null ? 'Save sleep' : 'Save changes',
       body: (setSheet) => [
         ppCareLabel('Fell asleep'),
         PpWhenRow(when: start, onChanged: (t) => setSheet(() => start = t)),
@@ -484,6 +536,11 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
       onSave: () {
         if (!end.isAfter(start)) {
           ppCareSaved(context, 'Nothing saved: woke up must be after fell asleep.');
+          return;
+        }
+        if (edit != null) {
+          _store.update(SleepLog(id: edit.id, start: start, end: end, kind: kind, note: edit.note));
+          ppCareSaved(context, 'Sleep updated: ${ppDur(end.difference(start).inMinutes)}.', undo: () => _store.update(edit));
           return;
         }
         _store.log(start: start, end: end, kind: kind);
@@ -582,5 +639,41 @@ class _SleepJourneyScreenState extends State<SleepJourneyScreen> {
     total %= 24 * 60;
     if (total < 0) total += 24 * 60;
     return TimeOfDay(hour: total ~/ 60, minute: total % 60);
+  }
+}
+
+/// "Asleep since 9:10 pm, 42m so far", kept current while the screen is open.
+class _AsleepLine extends StatefulWidget {
+  const _AsleepLine({required this.since});
+  final DateTime since;
+
+  @override
+  State<_AsleepLine> createState() => _AsleepLineState();
+}
+
+class _AsleepLineState extends State<_AsleepLine> {
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final mins = DateTime.now().difference(widget.since).inMinutes;
+    return Text('Asleep since ${ppCareClock(widget.since)}, ${ppDur(mins)} so far.',
+        key: const ValueKey('pp_sleep_asleep_line'),
+        style: pvManrope(fontSize: 16, fontWeight: FontWeight.w700, height: 1.4, color: p.ink1));
   }
 }

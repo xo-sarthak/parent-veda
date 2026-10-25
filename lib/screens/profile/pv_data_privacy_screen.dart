@@ -16,6 +16,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/life_stage_store.dart';
+import '../../services/pp_use_consent.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../theme/pv_fonts.dart';
 import 'pv_account_actions.dart';
@@ -91,6 +92,32 @@ class PvDataPrivacyScreen extends StatelessWidget {
               ),
             ),
           ),
+          // What the app may use from each parenting tool, asked once per kind
+          // on the tool and changeable here (tools pass T0, 2026-10-25).
+          if (stage == LifeStage.parenting)
+            SliverToBoxAdapter(
+              child: ListenableBuilder(
+                listenable: PpUseConsent.instance,
+                builder: (context, _) => PvYouSection(
+                  title: 'What ParentVeda uses',
+                  lead: 'A yes only changes what we show first. Every tool works the same either way.',
+                  children: [
+                    for (final kind in PpUseKind.values)
+                      PvYouRow(
+                        key: ValueKey('pv_use_${kind.name}'),
+                        icon: Icons.tune_rounded,
+                        title: kind.label,
+                        subtitle: kind.why,
+                        trailing: Switch(
+                          value: PpUseConsent.instance.allows(kind),
+                          onChanged: (v) => PpUseConsent.instance.set(kind, v),
+                        ),
+                        onTap: () => PpUseConsent.instance.set(kind, !PpUseConsent.instance.allows(kind)),
+                      ),
+                  ],
+                ),
+              ),
+            ),
           SliverToBoxAdapter(
             child: PvYouSection(
               title: 'Your data',

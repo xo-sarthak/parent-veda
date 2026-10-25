@@ -106,9 +106,11 @@ class _PpNappyScreenState extends State<PpNappyScreen> {
           title: 'Nappies',
           intro: 'One tap when you change ${c.them}. Wet nappies are the clearest sign milk is going in.',
           children: [
+            // Per 24 hours, as the guidance counts (tools pass, 2026-10-25).
+            // Was: ('${_store.wetToday}', 'wet today'), ('${_store.dirtyToday}', 'dirty today'),
             pregToolPad(PpCareStats([
-              ('${_store.wetToday}', 'wet today'),
-              ('${_store.dirtyToday}', 'dirty today'),
+              ('${_store.wet24h}', 'wet in 24 h'),
+              ('${_store.dirty24h}', 'dirty in 24 h'),
               (last == null ? 'None yet' : ppCareAgo(last.time), 'last change'),
             ])),
             const SizedBox(height: 18),
@@ -150,6 +152,7 @@ class _PpNappyScreenState extends State<PpNappyScreen> {
                     if (n.texture != null) nappyTextureLabel(n.texture!),
                     if (n.note != null) n.note!,
                   ].join(' · '),
+                  onTap: () => _openSheet(edit: n),
                   onRemove: () {
                     _store.remove(n.id);
                     ppCareSaved(context, 'Nappy removed.', undo: () => _store.add(n));
@@ -197,17 +200,19 @@ class _PpNappyScreenState extends State<PpNappyScreen> {
     ]);
   }
 
-  void _openSheet() {
-    var kind = NappyKind.dirty;
-    NappyColour? colour;
-    NappyTexture? texture;
-    var when = DateTime.now();
-    final note = TextEditingController();
+  /// [edit] opens a saved nappy to change it, keeping its id (tools pass,
+  /// 2026-10-25: logs were remove-only).
+  void _openSheet({NappyLog? edit}) {
+    var kind = edit?.kind ?? NappyKind.dirty;
+    NappyColour? colour = edit?.colour;
+    NappyTexture? texture = edit?.texture;
+    var when = edit?.time ?? DateTime.now();
+    final note = TextEditingController(text: edit?.note);
     final days = ChildProfileStore.instance.ageInDays;
     showPpCareSheet(
       context,
-      title: 'Log a nappy',
-      saveLabel: 'Save nappy',
+      title: edit == null ? 'Log a nappy' : 'Edit this nappy',
+      saveLabel: edit == null ? 'Save nappy' : 'Save changes',
       body: (setSheet) {
         final p = V2PaletteStore.instance.current;
         final dirty = kind == NappyKind.dirty || kind == NappyKind.mixed;
@@ -286,6 +291,18 @@ class _PpNappyScreenState extends State<PpNappyScreen> {
       },
       onSave: () {
         final dirty = kind == NappyKind.dirty || kind == NappyKind.mixed;
+        if (edit != null) {
+          _store.update(NappyLog(
+              id: edit.id,
+              time: when,
+              kind: kind,
+              colour: dirty ? colour : null,
+              texture: dirty ? texture : null,
+              note: ppCareNoteValue(note)));
+          ppCareSaved(context, 'Nappy updated: ${nappyKindLabel(kind).toLowerCase()}, ${ppCareWhen(when).toLowerCase()}.',
+              undo: () => _store.update(edit));
+          return;
+        }
         _store.log(
             time: when,
             kind: kind,

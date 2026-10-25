@@ -1,0 +1,124 @@
+// =============================================================================
+//  What ParentVeda may use: "ask once per kind" (tools pass T0, 2026-10-25)
+// -----------------------------------------------------------------------------
+//  The user, 2026-10-24: the app should take care of what a tool learned,
+//  "maybe not auto use it but wherever relevant can ask user if that info user
+//  wants us to use or no". Their pick: ask once per kind of info, remember the
+//  answer, and let it be changed in You.
+//
+//  One store owns every answer, so there is one rule and one settings row
+//  instead of a flag inside each of thirty-odd tools. Readers (relevance,
+//  reminders, the home strip) call `allows(kind)` before using a tool's data.
+//  A "no" only changes ordering and suggestions: no feature is ever hidden,
+//  and the tool itself keeps working exactly the same.
+//
+//  Sync (the user's word, 2026-10-25): the step-13 per-item merge, the same
+//  shape as PpChangesStore. One item per kind, keyed by the kind's name, the
+//  value the answer. Unasked is no item at all. The state row is the
+//  person's own (B9 / step 14 keys rows per person), which is right: consent
+//  is hers, and a co-parent answers for himself. A new phone signs in and
+//  gets her answers back instead of asking again. No migration: the server
+//  merge takes any store key.
+// =============================================================================
+
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'remote/cloud_merged_store.dart';
+
+/// A kind of information a tool collects. One per tool family; later tools
+/// add theirs. ⚠️ `.name` is persisted and synced: never rename a value.
+enum PpUseKind { feeds }
+
+enum PpUseAnswer { unasked, yes, no }
+
+extension PpUseKindText on PpUseKind {
+  /// The row label in You.
+  String get label => switch (this) { PpUseKind.feeds => 'Your feed log' };
+
+  /// What a yes changes, in one line. Shown on the ask card and in You.
+  String get why => switch (this) {
+        PpUseKind.feeds => 'We use it to put the most useful pages first, '
+            'like breastfeeding or bottle pages that match how your baby feeds.',
+      };
+}
+
+class PpUseConsent extends ChangeNotifier with CloudMergedStore {
+  PpUseConsent._();
+  static final PpUseConsent instance = PpUseConsent._();
+
+  static const _prefsKey = 'pp_use_consent';
+  final Map<PpUseKind, PpUseAnswer> _answers = {};
+  bool _loaded = false;
+
+  @override
+  String get cloudKey => _prefsKey;
+
+  Future<void> init() async {
+    if (_loaded) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw != null) applyCloudItems((jsonDecode(raw) as Map).cast<String, Object?>());
+    } catch (_) {/* start unasked */}
+    _loaded = true;
+    notifyListeners();
+    try {
+      await syncMergedFromCloud();
+    } catch (_) {/* stay local */}
+  }
+
+  // ---- the merge's view: one item per kind ---------------------------------
+  @override
+  Map<String, Object?> cloudItems() => {
+        for (final e in _answers.entries)
+          if (e.value != PpUseAnswer.unasked) e.key.name: e.value.name,
+      };
+
+  @override
+  void applyCloudItems(Map<String, Object?> items) {
+    _answers.clear();
+    for (final e in items.entries) {
+      final kind = PpUseKind.values.where((k) => k.name == e.key).firstOrNull;
+      final answer = PpUseAnswer.values.where((a) => a.name == e.value).firstOrNull;
+      if (kind != null && answer != null) _answers[kind] = answer;
+    }
+  }
+
+  @override
+  Future<void> persistLocalCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, jsonEncode(cloudItems()));
+    } catch (_) {}
+  }
+
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    persistLocalCache();
+  }
+
+  // ---- reads -----------------------------------------------------------------
+  PpUseAnswer answerFor(PpUseKind kind) => _answers[kind] ?? PpUseAnswer.unasked;
+
+  /// True only after a yes. Unasked is a no until she says otherwise.
+  bool allows(PpUseKind kind) => answerFor(kind) == PpUseAnswer.yes;
+
+  bool unasked(PpUseKind kind) => answerFor(kind) == PpUseAnswer.unasked;
+
+  // ---- writes ----------------------------------------------------------------
+  /// Her answer. The mixin stamps the changed item and merges it up.
+  void set(PpUseKind kind, bool yes) {
+    _answers[kind] = yes ? PpUseAnswer.yes : PpUseAnswer.no;
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void debugReset() {
+    _answers.clear();
+    _loaded = false;
+  }
+}

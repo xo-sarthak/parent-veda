@@ -231,12 +231,22 @@ class NappyStore extends ChangeNotifier {
       );
 
   List<NappyLog> get all {
-    final list = [..._logs]..sort((a, b) => b.time.compareTo(a.time));
+    // Only the active child's rows (tools pass, 2026-10-25: twins blended).
+    final list = _logs.where((x) => _sync.belongsTo(x.id, _childId)).toList()..sort((a, b) => b.time.compareTo(a.time));
     return List.unmodifiable(list);
   }
 
   List<NappyLog> get todays => List.unmodifiable(all.where((n) => _isToday(n.time)));
   int get wetToday => todays.where((n) => n.isWet).length;
+  // Per 24 hours, the way the nappy guidance counts (tools pass, 2026-10-25,
+  // the same call as feeds, F1): since midnight read low all night.
+  List<NappyLog> get last24h {
+    final from = DateTime.now().subtract(const Duration(hours: 24));
+    return List.unmodifiable(all.where((n) => n.time.isAfter(from)));
+  }
+
+  int get wet24h => last24h.where((n) => n.isWet).length;
+  int get dirty24h => last24h.where((n) => n.isDirty).length;
   int get dirtyToday => todays.where((n) => n.isDirty).length;
   NappyLog? get last => all.isEmpty ? null : all.first;
 
@@ -245,15 +255,16 @@ class NappyStore extends ChangeNotifier {
   /// REQUIRED_REVIEW (paediatrician / lactation consultant).
   String insight({DateTime? now}) {
     final days = ChildProfileStore.instance.ageInDays;
-    final wet = wetToday;
+    // Per 24 hours, matching the stat above it (tools pass, 2026-10-25).
+    final wet = wet24h; // was wetToday
     final hour = (now ?? DateTime.now()).hour;
     if (days >= 0 && days < 5) {
       return 'In the first days, wet nappies climb with his age: about one on day one, two on day two, and so on, until about six a day by day five or six.';
     }
     if (days < 42) {
-      if (wet >= 6) return 'Six or more wet nappies today: a good sign that milk is going in.';
+      if (wet >= 6) return 'Six or more wet nappies in the last 24 hours: a good sign that milk is going in.';
       if (hour >= 18 && wet < 4) {
-        return 'Fewer wet nappies than usual today. Offer feeds more often, and if he has fewer than six heavy wet nappies in a day, dark urine or a dry mouth, call his paediatrician.';
+        return 'Fewer wet nappies than usual in the last 24 hours. Offer feeds more often, and if he has fewer than six heavy wet nappies in a day, dark urine or a dry mouth, call his paediatrician.';
       }
       return 'From about day five, six or more heavy wet nappies a day is the sign milk is going in. Dirty nappies vary much more.';
     }
@@ -265,6 +276,18 @@ class NappyStore extends ChangeNotifier {
     _persist();
     // ChildSync.push(table, _childId, n.id, toRow(n)); // kept for revert
     _sync.touch(n.id, _childId);
+    _pushWaiting();
+    notifyListeners();
+  }
+
+  /// Replaces a nappy in place, keeping its id, so the edit syncs as the
+  /// same row (tools pass, 2026-10-25: logs were remove-only).
+  void update(NappyLog n) {
+    final i = _logs.indexWhere((x) => x.id == n.id);
+    if (i < 0) return add(n);
+    _logs[i] = n;
+    _persist();
+    _sync.touch(n.id, _sync.childOf[n.id] ?? _childId);
     _pushWaiting();
     notifyListeners();
   }
@@ -288,6 +311,8 @@ class NappyStore extends ChangeNotifier {
   @visibleForTesting
   void debugReset() {
     _logs.clear();
+    // The ledger decides whose a row is now; a test must start it clean.
+    _sync.clear();
     _loaded = true;
   }
 }
@@ -426,12 +451,18 @@ class PumpStore extends ChangeNotifier {
       );
 
   List<PumpLog> get all {
-    final list = [..._logs]..sort((a, b) => b.time.compareTo(a.time));
+    // Only the active child's rows (tools pass, 2026-10-25: twins blended).
+    final list = _logs.where((x) => _sync.belongsTo(x.id, _childId)).toList()..sort((a, b) => b.time.compareTo(a.time));
     return List.unmodifiable(list);
   }
 
   List<PumpLog> get todays => List.unmodifiable(all.where((p) => _isToday(p.time)));
   int get mlToday => todays.fold(0, (s, p) => s + p.totalMl);
+  /// Expressed in the last 24 hours (tools pass, 2026-10-25).
+  int get ml24h {
+    final from = DateTime.now().subtract(const Duration(hours: 24));
+    return all.where((p) => p.time.isAfter(from)).fold(0, (s, p) => s + p.totalMl);
+  }
   PumpLog? get last => all.isEmpty ? null : all.first;
 
   /// Average per session over the last seven days, or null with too few.
@@ -447,6 +478,17 @@ class PumpStore extends ChangeNotifier {
     _persist();
     // ChildSync.push(table, _childId, p.id, toRow(p)); // kept for revert
     _sync.touch(p.id, _childId);
+    _pushWaiting();
+    notifyListeners();
+  }
+
+  /// Replaces a session in place, keeping its id (tools pass, 2026-10-25).
+  void update(PumpLog p) {
+    final i = _logs.indexWhere((x) => x.id == p.id);
+    if (i < 0) return add(p);
+    _logs[i] = p;
+    _persist();
+    _sync.touch(p.id, _sync.childOf[p.id] ?? _childId);
     _pushWaiting();
     notifyListeners();
   }
@@ -470,6 +512,8 @@ class PumpStore extends ChangeNotifier {
   @visibleForTesting
   void debugReset() {
     _logs.clear();
+    // The ledger decides whose a row is now; a test must start it clean.
+    _sync.clear();
     _loaded = true;
   }
 }
@@ -499,6 +543,10 @@ class BreastTimer extends ChangeNotifier {
   int _rightSec = 0;
   // The side touched last, started or paused: the one she finished on.
   TimerSide? _endedOn;
+  // ⚠️ THE CHILD THE FEED STARTED FOR (tools pass, 2026-10-25). Started for
+  // one twin, finished after switching to the other, the feed was saved to
+  // the second. Captured on the first tap, persisted, used on finish.
+  String? _childId;
   bool _loaded = false;
 
   TimerSide? get running => _running;
@@ -529,6 +577,7 @@ class BreastTimer extends ChangeNotifier {
       _leftSec = (m['left'] as num?)?.toInt() ?? 0;
       _rightSec = (m['right'] as num?)?.toInt() ?? 0;
       _endedOn = _enumOf(TimerSide.values, m['ended']);
+      _childId = m['child']?.toString();
       // A feed left running for more than three hours was forgotten, not fed.
       if (_feedStarted != null && DateTime.now().difference(_feedStarted!).inHours >= 3) _clear();
       notifyListeners();
@@ -551,6 +600,7 @@ class BreastTimer extends ChangeNotifier {
             'left': _leftSec,
             'right': _rightSec,
             'ended': _endedOn?.name,
+            'child': _childId,
           }));
     } catch (_) {}
   }
@@ -574,6 +624,7 @@ class BreastTimer extends ChangeNotifier {
     _bank(t);
     _endedOn = side;
     if (!wasThis) {
+      if (_feedStarted == null) _childId = ChildProfileStore.instance.activeChildId;
       _feedStarted ??= t;
       _running = side;
       _runningSince = t;
@@ -601,6 +652,7 @@ class BreastTimer extends ChangeNotifier {
       if (note != null && note.trim().isNotEmpty) note.trim(),
     ];
     FeedingStore.instance.log(
+      childId: _childId,
       time: _feedStarted!,
       kind: FeedKind.breast,
       side: side,
@@ -615,6 +667,7 @@ class BreastTimer extends ChangeNotifier {
 
   void _clear() {
     _endedOn = null;
+    _childId = null;
     _running = null;
     _runningSince = null;
     _feedStarted = null;
@@ -647,6 +700,7 @@ class BreastTimer extends ChangeNotifier {
     _leftSec = 0;
     _rightSec = 0;
     _endedOn = null;
+    _childId = null;
     _loaded = true;
   }
 }
@@ -964,7 +1018,8 @@ class TummyStore extends ChangeNotifier {
       );
 
   List<TummyLog> get all {
-    final list = [..._logs]..sort((a, b) => b.time.compareTo(a.time));
+    // Only the active child's rows (tools pass, 2026-10-25: twins blended).
+    final list = _logs.where((x) => _sync.belongsTo(x.id, _childId)).toList()..sort((a, b) => b.time.compareTo(a.time));
     return List.unmodifiable(list);
   }
 
@@ -1015,6 +1070,8 @@ class TummyStore extends ChangeNotifier {
   @visibleForTesting
   void debugReset() {
     _logs.clear();
+    // The ledger decides whose a row is now; a test must start it clean.
+    _sync.clear();
     _loaded = true;
   }
 }
