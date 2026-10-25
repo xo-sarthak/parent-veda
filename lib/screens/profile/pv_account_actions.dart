@@ -37,6 +37,7 @@ import '../../services/auth/delete_account.dart';
 import '../../services/app_shell.dart';
 import '../../services/auth/social_auth.dart';
 import '../../services/father_preview.dart';
+import '../../services/last_profile.dart' show LastProfile;
 import '../../services/notification_service.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/remote/sync_registry.dart';
@@ -247,6 +248,8 @@ Future<void> pvSignOut(BuildContext context) async {
   } catch (_) {/* best-effort */}
   // The Ask Veda button stays off the sign-in screens.
   FabState.instance.markAppSignedOut();
+  // Taps wait for the next home; nothing is saved until it is shown (F6).
+  LastProfile.instance.markSignedOut();
   // ⚠️ THE WHOLE STACK GOES (2026-10-10). This used to push onboarding ON TOP
   // of the signed-in app, so back returned into it; and with no pregnancy
   // controller it popped to the first route, which is the stage's own home,
@@ -470,6 +473,7 @@ Future<void> pvDeleteAccount(BuildContext context) async {
             // the app it belonged to must not stay on screen underneath.
             // Kept for revert: nav.popUntil((r) => r.isFirst);
             FabState.instance.markAppSignedOut();
+            LastProfile.instance.markSignedOut();
             if (!AppShell.openSignedOut(nav)) {
               nav.popUntil((r) => r.isFirst);
             }

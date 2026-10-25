@@ -69,6 +69,7 @@ class NotificationService {
         final launch = await _plugin.getNotificationAppLaunchDetails();
         final id = launch?.notificationResponse?.id;
         if ((launch?.didNotificationLaunchApp ?? false) && id != null) {
+          launchedFromTap = true;
           _deliverTap(id);
         }
       } catch (_) {/* best-effort */}
@@ -78,6 +79,10 @@ class NotificationService {
   // ---- notification taps (additive, 2026-09-27) ----------------------------
 
   final List<bool Function(int id)> _tapListeners = [];
+
+  /// True when a notification tap opened the app (F6, 2026-10-25): the launch
+  /// then goes where the tap says, not to the last profile used.
+  bool launchedFromTap = false;
 
   /// A tapped id no listener has claimed yet (a tap that launched the app
   /// before its feature was listening). Offered to each new listener once.

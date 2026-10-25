@@ -195,8 +195,9 @@ FamilyProfile? openProfileIn(List<FamilyProfile> all, FamilyHome here, String? a
   return null;
 }
 
-/// The stage's own home is the navigator's root; this is it.
-FamilyHome? _rootHome() => switch (LifeStageStore.instance.stage) {
+/// The stage's own home is the navigator's root; this is it. Public since F6
+/// (the launch reopens a child's home over it, last_profile.dart).
+FamilyHome familyRootHome() => switch (LifeStageStore.instance.stage) {
       LifeStage.tryingToConceive => FamilyHome.trying,
       LifeStage.pregnancy => FamilyHome.pregnancy,
       LifeStage.parenting => FamilyHome.parenting,
@@ -215,7 +216,7 @@ void openFamilyProfile(BuildContext context, FamilyProfile to, FamilyHome here) 
   // space shows her, and switching between two learning children redraws.
   if (to.home == FamilyHome.learning) SkChildStore.instance.open(to.id);
   if (to.home == here) return; // the same home redraws for the new child
-  if (to.home == _rootHome()) {
+  if (to.home == familyRootHome()) {
     // Back to the stage's own home, which is already underneath.
     nav.popUntil((r) => r.isFirst);
     return;

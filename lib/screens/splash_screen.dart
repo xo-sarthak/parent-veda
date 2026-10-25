@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../doctor/doctor_session.dart';
 import '../localization/app_language.dart';
 import '../services/father_content_controller.dart';
+import '../services/last_profile.dart' show restoreLastProfile;
 import '../services/life_stage_store.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
@@ -114,6 +115,8 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
     if (authed) {
       nav.pushReplacement(_homeFor(role, stage));
+      // The last profile used opens over the stage's home (F6, 2026-10-25).
+      unawaited(restoreLastProfile(nav, father: role == 'father'));
       return;
     }
     // ⚠️ THE FIRST RUN IS `OnboardingFlow` SINCE 2026-09-17 (docs/ONBOARDING-
@@ -138,6 +141,9 @@ class _SplashScreenState extends State<SplashScreen>
           await widget.pregnancy.loadProfileFromCloud();
           SyncRegistry.resyncAll();
           nav.pushReplacement(_homeFor(isFather ? 'father' : 'mother', stageId));
+          // Nothing is saved on a first run, so this only marks the home
+          // shown; a message tapped during onboarding opens now.
+          unawaited(restoreLastProfile(nav, father: isFather));
         },
       ),
     ));

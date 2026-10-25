@@ -114,6 +114,7 @@ import 'supabase_config.dart';
 import 'theme/app_theme.dart';
 import 'theme/pv_fonts.dart';
 import 'widgets/global_ask_fab.dart';
+import 'services/last_profile.dart' show lastProfileObserver;
 
 Future<void> main() async {
   // Flutter must be ready before we do async work like connecting to Supabase.
@@ -587,7 +588,9 @@ class _ParentVedaAppState extends State<ParentVedaApp>
       themeMode: ThemeMode.light,
       // Root navigator key + observer power the global "Ask Veda" FAB.
       navigatorKey: appNavigatorKey,
-      navigatorObservers: [fabRouteObserver],
+      // The second one saves which home was on top, so the next launch opens
+      // the last profile used (F6, 2026-10-25, last_profile.dart).
+      navigatorObservers: [fabRouteObserver, lastProfileObserver],
       // Two things wrap every route here:
       //   * the global Ask-Veda FAB (parent app only), and
       //   * the doctor swap — when a doctor logs in, the WHOLE app becomes their

@@ -4180,3 +4180,41 @@ place it could have come from) is just a migration done lazily.
 `sk_child` went from one child's fields to `{v: 2, open, children: {...}}`. The loader reads both shapes, and the
 first save writes v2. The key name is unchanged, so the sign-out wipe list and its test did not move. A new
 shape under the same key is safe only while the old reader stays.
+
+## 16ss. Record what was on screen, not what was tapped (no migration, 2026-10-25)
+
+STAGE-TRANSITIONS F6: the app should reopen on the last profile used. Each child's home is pushed over the
+stage's own home (16qq), so "the last profile" means "was a child's home on top, and which one".
+
+### 1. Save the smallest fact the other stores do not already hold
+
+Which child is open is already saved by `ChildProfileStore` and `SkChildStore`. The only new fact is *whether
+her home was on top*: `pv_last_home` = `parenting`, `learning` or `root`. Saving the child's id as well would
+have been a second copy of a fact another store owns, and the two copies drift: she can switch children inside
+the same home with no navigation, so a saved id would reopen the child she had already left.
+
+**The general rule:** before persisting something, ask who already owns it. A duplicate is not a cache, it is a
+second source of truth with no rule for which wins.
+
+### 2. Observe the state instead of instrumenting every cause
+
+Five different paths put a child's home on top (the switch, the drawer door, a tapped message, the pregnancy
+You's older-child row) and one takes it away (the back button). There were two ways to record it:
+- *At each caller:* simple to read, but every new way in has to remember, and the back button has no caller at
+  all, so she would reopen on a child she had left.
+- *A `NavigatorObserver` that derives it from the route stack (chosen):* every path is caught, including ones
+  not written yet. **The cost:** it reads route names, so a child's home pushed under a new name would be
+  invisible. That coupling is pinned by a source test that scans every push of the two homes.
+
+### 3. Validate a saved pointer against today, never trust it
+
+At launch the saved home is matched against the family *as it is now*: the child may be deleted, the learning
+space's yes taken back, or the stage moved so that home is now the root. Any mismatch lands on the root, which is
+exactly the pre-F6 behaviour. A restored pointer that can fail safe needs no migration and no version.
+
+### 4. A "ready" flag for the launch, raised however the launch ends
+
+A notification tap that launches the app arrives while the splash is up; pushed then, the splash's
+`pushReplacement` replaced it. So the message openers now wait for `LastProfile.homeShown`, which the restore
+raises in a `finally`: if the restore throws, taps still open. The existing app-live flag was not reused because
+only two of the four homes raise it; a flag that some roots never set is a hang, not a signal.

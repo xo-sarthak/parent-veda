@@ -25,6 +25,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../services/last_profile.dart' show LastProfile, kLastHomeRoot;
 import '../../services/life_stage_store.dart';
 import '../../services/preg_messages_store.dart';
 import '../../services/pregnancy_controller.dart';
@@ -88,14 +89,31 @@ void openPregMessage(BuildContext context, PregMessage m, PregnancyController c)
 /// A phone tap: wait for the pregnancy shell, then open the message's page,
 /// or the inbox when the message is not known.
 void pregOpenMessageFromPhone(PregMessage? m, {int attempt = 0}) {
-  final ctx = appNavigatorKey.currentContext;
+  var ctx = appNavigatorKey.currentContext;
   final c = PregnancyController.current;
-  if (ctx == null || c == null || FabState.instance.inTtc || FabState.instance.inParenting) {
+  // ⚠️ A CHILD'S HOME ON TOP NO LONGER DROPS THE TAP (F6, 2026-10-25). This
+  // used to wait while a parenting home was on screen and, after ten seconds,
+  // give up: a pregnant mother with her toddler's home open tapped "Week 14"
+  // and nothing happened. A pregnancy message is the pregnancy profile's, so
+  // it goes back to the pregnancy home first (the root while the stage is
+  // pregnancy; `leaveTtcForPregnancy` rebuilds it only if TTC was the root).
+  // It waits for the home to be shown, so a tap that launched the app is not
+  // pushed under the splash. Kept for revert:
+  //   if (ctx == null || c == null || FabState.instance.inTtc || FabState.instance.inParenting) {
+  final pregnant = LifeStageStore.instance.stage == LifeStage.pregnancy;
+  final away = FabState.instance.inTtc || FabState.instance.inParenting ||
+      LastProfile.instance.onTop != kLastHomeRoot;
+  if (ctx == null || c == null || !LastProfile.instance.homeShown || (away && !pregnant)) {
     if (attempt < 20) {
       Future<void>.delayed(const Duration(milliseconds: 500),
           () => pregOpenMessageFromPhone(m, attempt: attempt + 1));
     }
     return;
+  }
+  if (away) {
+    openStageDoor(ctx, StageDoor.pregnancy);
+    ctx = appNavigatorKey.currentContext;
+    if (ctx == null) return;
   }
   if (m == null) {
     openPregMessages(ctx, c);

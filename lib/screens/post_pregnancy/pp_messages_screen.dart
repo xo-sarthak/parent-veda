@@ -19,6 +19,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../services/last_profile.dart' show LastProfile;
 import '../../services/life_stage_store.dart';
 import '../../services/stage_gateway.dart';
 import '../../widgets/global_ask_fab.dart' show appNavigatorKey;
@@ -71,7 +72,10 @@ void openPpMessage(BuildContext context, PpMessage m) {
 /// A phone tap: open the message's page, or the inbox when it is not known.
 void ppOpenMessageFromPhone(PpMessage? m, {int attempt = 0}) {
   final ctx = appNavigatorKey.currentContext;
-  if (ctx == null) {
+  // Waits for the home to be shown (F6, 2026-10-25), so a tap that launched
+  // the app is not pushed under the splash. Kept for revert:
+  //   if (ctx == null) {
+  if (ctx == null || !LastProfile.instance.homeShown) {
     if (attempt < 20) {
       Future<void>.delayed(const Duration(milliseconds: 500), () => ppOpenMessageFromPhone(m, attempt: attempt + 1));
     }

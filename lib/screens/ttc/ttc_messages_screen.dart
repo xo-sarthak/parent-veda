@@ -29,6 +29,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../services/last_profile.dart' show LastProfile, kLastHomeRoot;
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_messages_store.dart';
 import '../../ttc/ttc_period_due.dart';
@@ -66,12 +67,21 @@ const String kTtcMessagesChoose = 'Choose what we send';
 /// Flo's notification opens its message in place; so does this.
 void ttcOpenMessageFromPhone(TtcMessage? m, {int attempt = 0}) {
   final ctx = appNavigatorKey.currentContext;
-  if (ctx == null || !FabState.instance.inTtc) {
+  // Waits for the home to be shown too (F6, 2026-10-25), so a tap that
+  // launched the app is not pushed under the splash. Kept for revert:
+  //   if (ctx == null || !FabState.instance.inTtc) {
+  if (ctx == null || !FabState.instance.inTtc || !LastProfile.instance.homeShown) {
     if (attempt < 20) {
       Future<void>.delayed(const Duration(milliseconds: 500),
           () => ttcOpenMessageFromPhone(m, attempt: attempt + 1));
     }
     return;
+  }
+  // ⚠️ `inTtc` IS TRUE WITH A CHILD'S HOME ON TOP (F6): the TTC home is still
+  // in the stack, under it. The message is the trying profile's, so back to
+  // that home first, or the TTC page opened over the child's home.
+  if (LastProfile.instance.onTop != kLastHomeRoot) {
+    Navigator.of(ctx).popUntil((r) => r.settings.name == ttcHomeRoute || r.isFirst);
   }
   final dest = m == null ? null : ttcFirstOpenable(m.destinations);
   openTtcSurface(ctx, dest ?? 'ttc_messages');
