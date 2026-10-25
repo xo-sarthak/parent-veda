@@ -138,6 +138,8 @@ in each door hero; one video per door listed in `DOOR-CONTENT-OWED.md`.
 chip until the video exists and no door film made, a field would have nothing to
 read it. The field and the chip go in with the first door film. Every parenting
 door plan names its film (for example `family/door_intro`).
+Health's is `health/door_intro` (a real paediatrician), owed as
+`DOOR-CONTENT-OWED` HD5; still no chip (door 2 build, 2026-10-25).
 
 ### 6 · Real products — WAITING (user's product master sheet)
 
@@ -274,7 +276,12 @@ months, Starting solids 6 to 12, Cooking from one), tools with ages, and
 `test/pp_feeding_door_test.dart` holds the first view at 2, 7, 10, 18 and 30
 months: the opening tab, the first card (an action every time: the feed timer,
 then "What to feed at this age"), and the expert row.
-**OWED:** Skilling action doors; parenting doors 2 to 14, each in its own build.
+**Health, 2026-10-25 (door 2 build):** Something's wrong opens at every age
+and Get help now is always second (the plan's exception to "most pages"); the
+calm tabs follow his age. The first card is Fever check every time, and the
+first rail is picked for his age. `test/pp_health_door_test.dart` holds the
+first view at 3 weeks, 7 months, 2 years and 4 years.
+**OWED:** Skilling action doors; parenting doors 3 to 14, each in its own build.
 
 ---
 

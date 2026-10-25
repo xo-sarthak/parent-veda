@@ -167,10 +167,20 @@ const int kPpFinishedSink = 30;
 /// she finishes. Far below any other score, so these lead in their own order.
 const int kPpAlwaysFirst = -100000;
 
+/// ⚠️ A PAGE WRITTEN FOR HER AGE LEADS AN UNTAGGED ONE (Health plan H-M2,
+/// 2026-10-25, every door). An untagged page is for every band, so it tied
+/// with a page tagged for hers and the file order decided: "A fever under
+/// three months" sat third on the Fever rail for a newborn. Smaller than any
+/// signal lift, so what she told us still wins.
+const int kPpForHerAgeLift = 10;
+
 /// Orders [items] for this child. Stable: equal scores keep their input order,
 /// so the writers' order survives wherever the brain has nothing to say.
 ///
 /// [alwaysFirst] marks the red-flag items that lead whatever else is true (S10).
+///
+/// [forHerAge] marks the items written for her age in particular
+/// ([kPpForHerAgeLift]).
 ///
 /// [text] is what the item is about (its title, plus a summary if it has one).
 /// [band] says how far its age band is from the child's; omit it when the list
@@ -183,11 +193,13 @@ List<T> ppRelevanceOrder<T>(
   String? Function(T)? readId,
   bool Function(T)? saved,
   bool Function(T)? alwaysFirst,
+  bool Function(T)? forHerAge,
   bool commerce = false,
 }) {
   int score(T it) {
     if (alwaysFirst?.call(it) ?? false) return kPpAlwaysFirst;
     var s = band?.call(it).score ?? 0;
+    if (forHerAge?.call(it) ?? false) s -= kPpForHerAgeLift;
     if (situation.signalFor(text(it)) != null) s -= kPpSignalLift;
     if (situation.changeFor(text(it), commerce: commerce) != null) s -= kPpChangeLift;
     if (saved?.call(it) ?? false) s -= kPpSavedLift;

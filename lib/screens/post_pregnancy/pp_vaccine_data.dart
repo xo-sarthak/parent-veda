@@ -15,6 +15,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show DateUtils;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/child_scoped_store.dart';
@@ -1084,6 +1085,27 @@ class VaxStore extends ChangeNotifier {
     return null;
   }
 
+  /// ⚠️ THE HEALTH DOOR'S VACCINES CARD LINE (plan H1, 2026-10-25): "Due in 5
+  /// days" when the next dose on her schedule falls within 14 days, else
+  /// null and the card keeps its count. Only ahead, never "overdue": with
+  /// nothing ticked every past visit reads due, and a card nagging a parent
+  /// who simply has not recorded would be a false alarm on every open.
+  String? get dueSoonLine {
+    final today = DateUtils.dateOnly(DateTime.now());
+    final dob = DateUtils.dateOnly(ChildProfileStore.instance.dob);
+    for (final v in kVaxVisits) {
+      if (statusOf(v) != VaxStatus.upcoming || isOptionalVisit(v)) continue;
+      final days = dob.add(Duration(days: v.ageDays)).difference(today).inDays;
+      if (days < 0 || days > 14) return null;
+      return switch (days) {
+        0 => 'Due today',
+        1 => 'Due tomorrow',
+        _ => 'Due in $days days',
+      };
+    }
+    return null;
+  }
+
   /// Private-schedule doses in [v] (empty when the visit is all government).
   List<String> privateOnlyIn(VaxVisit v) =>
       [for (final id in v.vaccineIds) if (kVaxPrivateOnly.contains(id)) id];
@@ -1169,3 +1191,6 @@ class _VaxChild {
     return s;
   }
 }
+
+/// The Vaccines tab card's due line (`PpDoorTab.dueLine`, Health H1).
+String? ppVaccineDueLine() => VaxStore.instance.dueSoonLine;

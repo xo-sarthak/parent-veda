@@ -161,7 +161,31 @@ class PpDoorTab {
     this.toMonths,
     this.expert,
     this.extraPageIds = const [],
+    this.ageRail = const {},
+    this.closing,
+    this.dueLine,
   });
+
+  /// ⚠️ A FIRST RAIL PICKED FOR HIS AGE (Health plan H-M1 / H2, look approved
+  /// 2026-10-24). Band id → the pages a parent of that age needs first. The
+  /// area rails are grouped by body part, which is right for looking a thing
+  /// up and wrong for a 3-week-old, whose fever, jaundice, skin and colic
+  /// pages sat on four different rails. Drawn as the first rail, the tools
+  /// leading it; the area rails below skip every page already on it, so
+  /// nothing shows twice. Plain data, so a test holds it row by row.
+  final Map<String, PpAgeRail> ageRail;
+
+  /// ⚠️ THIS TAB'S OWN CLOSING, IN PLACE OF THE DOOR'S (Health H3). Get help
+  /// now must not end on "Talk to a paediatrician": an emergency goes to 112,
+  /// not a video call. Its foot is the first-aid class instead, after the
+  /// footer, the one offer that makes the next emergency go better. Null
+  /// keeps the door's closing.
+  final PpDoorClosing? closing;
+
+  /// ⚠️ THE TAB CARD'S SECOND LINE, WHEN SOMETHING IS DUE (Health H1). Null,
+  /// or a function returning null, keeps the count. A top-level function, so
+  /// the data stays const: Vaccines says "Due in 5 days" when a dose is near.
+  final String? Function()? dueLine;
 
   /// ⚠️ THE EXPERT FOR THIS TAB, AFTER ITS FIRST RAIL (Feeding D2, approved
   /// 2026-10-23). The door's `closing` sits at the foot, under every tab, and
@@ -270,10 +294,28 @@ class PpDoorClosing {
     required this.label,
     required this.blurb,
     required this.surfaceId,
+    this.note,
   });
   final String label;
   final String blurb;
   final String surfaceId;
+
+  /// A quiet line under the label. Health's safety line on a consult that
+  /// shares a tab with the emergency row: "Not for an emergency. For that,
+  /// Get help now." (plan §3a).
+  final String? note;
+}
+
+/// A tab's first rail for one age (`PpDoorTab.ageRail`).
+class PpAgeRail {
+  const PpAgeRail(this.title, this.pageIds);
+
+  /// "In the first three months". The rail's heading; the screen adds the
+  /// line under it ("Picked for Aarav, 3 weeks").
+  final String title;
+
+  /// Pages of the section, in order. A page outside the band is skipped.
+  final List<String> pageIds;
 }
 
 /// Every parenting door. A section without one keeps its hub and library

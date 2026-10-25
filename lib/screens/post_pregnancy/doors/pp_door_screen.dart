@@ -57,6 +57,7 @@ import '../../doors/pv_shelf_card.dart';
 import '../../doors/pv_shelf_spec.dart' show PvShelfKind;
 import '../pp_din_by_din.dart';
 import '../pp_age_bands.dart' show PpBand;
+import '../pp_vaccine_data.dart' show VaxStore;
 import '../pp_page_read.dart' show kPpPageReadPrefix;
 import '../pp_relevance.dart';
 import '../pp_search.dart';
@@ -191,6 +192,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     super.initState();
     _scroll.addListener(_onScroll);
     PvSearchStore.instance.init();
+    if (door.tabs.any((t) => t.dueLine != null)) VaxStore.instance.init();
   }
 
   @override
@@ -382,23 +384,51 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   /// [_otherBands].
   List<(PpArea, List<PpPage>)> _railsFor(PpDoorTab tab) {
     final sit = PpSituation.now();
+    final band = _bandOf(tab);
     final rails = [
       for (final (area, pages) in _bandRailsFor(tab))
         (
           area,
-          // First 40 days keeps its own day order (pp_din_by_din.dart).
-          area.id == kPpDinTabId
+          // First 40 days keeps its own day order (pp_din_by_din.dart), and
+          // the age rail its plan's order (PpDoorTab.ageRail).
+          area.id == kPpDinTabId || area.id == kPpAgeRailId
               ? pages
               : ppRelevanceOrder(pages,
                   situation: sit,
                   text: (x) => x.title,
                   readId: _readIdOf,
-                  alwaysFirst: ppIsRedFlagPage),
+                  alwaysFirst: ppIsRedFlagPage,
+                  forHerAge: (x) => _forHerAge(x, band)),
         ),
     ];
     return ppRelevanceOrder(rails,
         situation: sit,
-        text: (r) => [r.$1.title, for (final x in r.$2) x.title].join(' '));
+        text: (r) => [r.$1.title, for (final x in r.$2) x.title].join(' '),
+        // The age rail is the first rail, whatever a signal lifts.
+        alwaysFirst: (r) => r.$1.id == kPpAgeRailId);
+  }
+
+  /// A page written for her age rather than every age (H-M2): tagged with her
+  /// band and with no more than half the door's bands. "A fever under three
+  /// months" (newborn only) and "First teeth" (3 months to 3 years) are; a
+  /// page tagged for every band but the newborn one is about every age, and
+  /// is not lifted, or nearly every page would be.
+  bool _forHerAge(PpPage x, String band) {
+    final n = section.bandSet?.bands.length ?? 0;
+    return x.bands.contains(band) && x.bands.length * 2 <= n;
+  }
+
+  /// The tab's age rail for the band it shows (`PpDoorTab.ageRail`): its
+  /// pages that exist and are for that band, never the pinned flag.
+  (PpAgeRail, List<PpPage>)? _ageRailFor(PpDoorTab tab) {
+    final rail = tab.ageRail[_bandOf(tab)];
+    if (rail == null) return null;
+    final pages = [
+      for (final id in rail.pageIds)
+        if (section.pageById(id) case final x?)
+          if (x.id != tab.redFlagPageId && x.inBand(_bandOf(tab))) x,
+    ];
+    return pages.isEmpty ? null : (rail, pages);
   }
 
   /// The tab's tools for the band it shows (`PpDoorTool.bands`, Feeding plan
@@ -502,26 +532,62 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   }
 
   /// Her band's rails, as the door always built them (kept as the source the
-  /// brain orders).
-  List<(PpArea, List<PpPage>)> _bandRailsFor(PpDoorTab tab) => [
-        for (final id in tab.areaIds)
-          for (final area in section.areas.where((a) => a.id == id))
-            if (area.inBand(_bandOf(tab)))
-              (
-                area,
-                // First 40 days: her day range first (2026-10-07,
-                // pp_din_by_din.dart). Every other area is untouched.
-                area.id == kPpDinTabId
-                    ? ppDinOrder([
-                        for (final p in area.pagesFor(_bandOf(tab)))
-                          if (p.id != tab.redFlagPageId) p,
-                      ])
-                    : [
-                        for (final p in area.pagesFor(_bandOf(tab)))
-                          if (p.id != tab.redFlagPageId) p,
-                      ],
-              ),
-      ];
+  /// brain orders). The age rail leads when the tab has one for her band,
+  /// and the area rails skip its pages (H-M1); an area left empty by that
+  /// drops, which is what "nothing shows twice" costs.
+  List<(PpArea, List<PpPage>)> _bandRailsFor(PpDoorTab tab) {
+    final age = _ageRailFor(tab);
+    final onAge = {for (final x in age?.$2 ?? const <PpPage>[]) x.id};
+    final out = <(PpArea, List<PpPage>)>[
+      if (age != null)
+        (
+          PpArea(
+              id: kPpAgeRailId,
+              title: age.$1.title,
+              blurb: 'Picked for ${ChildProfileStore.instance.nameMid}, '
+                  '${ChildProfileStore.instance.ageLabel}'),
+          age.$2,
+        ),
+    ];
+    for (final id in tab.areaIds) {
+      for (final area in section.areas.where((a) => a.id == id)) {
+        if (!area.inBand(_bandOf(tab))) continue;
+        final pages = [
+          for (final p in area.pagesFor(_bandOf(tab)))
+            if (p.id != tab.redFlagPageId && !onAge.contains(p.id)) p,
+        ];
+        if (pages.isEmpty && onAge.isNotEmpty) continue;
+        out.add((
+          area,
+          // First 40 days: her day range first (2026-10-07,
+          // pp_din_by_din.dart). Every other area is untouched.
+          area.id == kPpDinTabId ? ppDinOrder(pages) : pages,
+        ));
+      }
+    }
+    return out;
+  }
+  // Before the age rail (H-M1), kept for revert:
+  // List<(PpArea, List<PpPage>)> _bandRailsFor(PpDoorTab tab) => [
+  //       for (final id in tab.areaIds)
+  //         for (final area in section.areas.where((a) => a.id == id))
+  //           if (area.inBand(_bandOf(tab)))
+  //             (
+  //               area,
+  //               area.id == kPpDinTabId
+  //                   ? ppDinOrder([
+  //                       for (final p in area.pagesFor(_bandOf(tab)))
+  //                         if (p.id != tab.redFlagPageId) p,
+  //                     ])
+  //                   : [
+  //                       for (final p in area.pagesFor(_bandOf(tab)))
+  //                         if (p.id != tab.redFlagPageId) p,
+  //                     ],
+  //             ),
+  //     ];
+
+  /// The offer a tab ends on: its own (`PpDoorTab.closing`), else the door's.
+  PpDoorClosing? _closingOf(PpDoorTab tab) => tab.closing ?? door.closing;
 
   /// The second line on a tab's card. Counted, never typed — or, while the
   /// tab is locked, the age it opens.
@@ -529,6 +595,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     // A tab for later says so on its card (S9). Was the lock line, kept for
     // revert: `if (_unlockMonths(tab) case final m?) return _lockLine(m);`
     if (_unlockMonths(tab) != null) return 'For later';
+    // "Due in 5 days" on Vaccines when a dose is near (Health H1).
+    if (tab.dueLine?.call() case final due?) return due;
     // What she sees on the tab for her band: its tools, its pages, the pages
     // from another tab, the pinned flag (Feeding plan §2c). Was every tool
     // and the flag whatever his age, kept for revert:
@@ -544,8 +612,15 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   }
 
   double _railHeight(BuildContext context, List<PpDoorTab> tabs) =>
-      PvDoorRail.heightOf(context,
-          later: [for (final t in tabs) _unlockMonths(t) != null]);
+      PvDoorRail.heightOf(context, later: _withLine(tabs));
+
+  /// The cards that carry their second line: a tab for later (S9), and a tab
+  /// with something due (Health H1). The rail draws both the same way, the
+  /// smaller mark over the line, which is its look for a card with a line.
+  List<bool> _withLine(List<PpDoorTab> tabs) => [
+        for (final t in tabs)
+          _unlockMonths(t) != null || t.dueLine?.call() != null,
+      ];
 
   _CardSpec _toolSpec(BuildContext context, PpDoorTool tool) => _CardSpec(
         title: tool.label,
@@ -565,6 +640,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
         animation: Listenable.merge([
           ChildProfileStore.instance,
           V2PaletteStore.instance,
+          // A tab card's due line reads it (Health H1).
+          VaxStore.instance,
           _search,
           PvSearchStore.instance,
         ]),
@@ -679,7 +756,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                           // No lock on any card (S9): a tab for later carries
                           // "For later" as its count line instead. Kept for
                           // revert: `[for (final t in tabs) _unlockMonths(t) != null]`.
-                          later: [for (final t in tabs) _unlockMonths(t) != null],
+                          // A due line shows as well (Health H1).
+                          later: _withLine(tabs),
                           selected: _tab,
                           p: p,
                           onPick: (i) => setState(() => _tab = i),
@@ -760,6 +838,16 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                                 height: 1.2,
                                 letterSpacing: -0.45,
                                 color: p.ink1))),
+                        // The age rail says whose it is (H2 look, v4).
+                        if (area.id == kPpAgeRailId) ...[
+                          const SizedBox(height: 2),
+                          ppDoorPad(Text(area.blurb,
+                              key: const ValueKey('pp_door_age_rail'),
+                              style: pvManrope(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: p.ink3))),
+                        ],
                         const SizedBox(height: kPvDoorHeadingGap),
                         // Her band's tools only (PpDoorTool.bands); the rest
                         // wait in the band blocks below. Was `tab.tools`.
@@ -904,7 +992,11 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                         ),
                       )),
                       const SizedBox(height: kPvDoorBlockGap),
-                    ] else if (door.closing != null && tab.expert == null) ...[
+                    ] else if (_closingOf(tab) case final closing?
+                        when tab.expert == null) ...[
+                      // The tab's own closing where it has one (Health H3:
+                      // Get help now ends on the first-aid class, never a
+                      // consult). Was `door.closing` below, kept for revert.
                       // Was `door.closing case final c?`: a tab with its own
                       // expert row (Feeding D2) ends on the sentence below,
                       // as the approved mockup does, so one tab never pitches
@@ -921,12 +1013,16 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                         key: const ValueKey('pp_door_closing_card'),
                         p: p,
                         hue: hue,
-                        icon: Icons.chat_bubble_outline_rounded,
-                        chip: 'Consult',
-                        title: door.closing!.label,
-                        blurb: door.closing!.blurb,
+                        icon: closing.surfaceId.startsWith('pp_class/')
+                            ? Icons.school_outlined
+                            : Icons.chat_bubble_outline_rounded,
+                        chip: closing.surfaceId.startsWith('pp_class/')
+                            ? 'Class'
+                            : 'Consult',
+                        title: closing.label,
+                        blurb: closing.blurb,
                         onTap: () =>
-                            widget.onSurface(context, door.closing!.surfaceId),
+                            widget.onSurface(context, closing.surfaceId),
                       )),
                       const SizedBox(height: kPvDoorBlockGap),
                     ] else ...[
@@ -1875,6 +1971,10 @@ class _TabNote extends StatelessWidget {
 
 /// A page that leads its rail even once read (step 0 · S10): a red-flag list,
 /// or a page the door pins.
+/// The id of the age rail's synthetic area (`PpDoorTab.ageRail`). No section
+/// area may use it.
+const String kPpAgeRailId = 'pp_door_age_rail';
+
 bool ppIsRedFlagPage(PpPage page) {
   final f = (page.format ?? '').toUpperCase();
   return f == 'RED FLAG' || f == 'FLAGGED' || page.pinned;
@@ -1990,6 +2090,15 @@ class _ExpertRow extends StatelessWidget {
                               fontWeight: FontWeight.w800,
                               height: 1.3,
                               color: p.ink1)),
+                      if (expert.note case final note?) ...[
+                        const SizedBox(height: 3),
+                        Text(note,
+                            style: pvManrope(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                height: 1.35,
+                                color: p.ink3)),
+                      ],
                     ]),
               ),
               Icon(Icons.chevron_right_rounded, color: p.ink1),

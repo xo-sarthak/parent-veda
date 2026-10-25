@@ -1,7 +1,7 @@
 # Door 2: Health, the plan
 
-Written 2026-10-23. **Status: H1 to H7 all answered YES by the user 2026-10-23.** The new pages are written in `02-health-content.md` (H6). The H2 age-rail look is drawn at `claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q` and was APPROVED 2026-10-24 (version 4: emergency row on top, the age shelf next, the paediatrician row after that shelf). Plan final; build waits on step 0.
-The build waits on step 0 (`00-MASTER.md`, S1 to S7) and on the user's go.
+Written 2026-10-23. **Status: H1 to H7 all answered YES by the user 2026-10-23.** The new pages are written in `02-health-content.md` (H6). The H2 age-rail look is drawn at `claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q` and was APPROVED 2026-10-24 (version 4: emergency row on top, the age shelf next, the paediatrician row after that shelf). Plan final. **BUILT 2026-10-25**, door 2 of the pass; what differs from this plan is in §12.
+Step 0 (`00-MASTER.md`) was built first, 2026-10-25 (fbb6fae).
 
 Files this plan touches:
 - Door map: `lib/data/doors/pp_door_health.dart` (186 lines, 7 tabs)
@@ -495,3 +495,41 @@ Shell rule S8 in `00-MASTER.md`: no tap is silent. Consults open the existing "e
 - U-WIN and Mission Indradhanush: [PIB document](https://static.pib.gov.in/WriteReadData/specificdocs/documents/2024/nov/doc2024119432301.pdf), [MoHFW press release](https://mohfw.gov.in/press-info/7848), [Business Standard](https://www.business-standard.com/india-news/pan-india-rollout-of-u-win-to-track-routine-vaccinations-likely-by-aug-end-124071400270_1.html)
 - Rabies PEP: [NHM Himachal Pradesh, NRCP](https://nhm.hp.gov.in/nrcp), [The Tribune](https://www.tribuneindia.com/news/ludhiana/ivory-tower-despite-vaccines-rabies-still-kills-thousands-in-country/amp)
 - Anemia Mukt Bharat IFA syrup and the Vitamin A schedule: not confirmed by a source in this pass. Fetch the MoHFW guidelines when writing those two pages.
+## 12. As built (2026-10-25)
+Held by `test/pp_health_door_test.dart` ("door 2: the plan, held", 26 tests): the tab order per band, both labels, tool ages and places, every page's tag (§2e as data; a new page fails until it has a row), the four age rails row by row with every page on them real and in band, no pitch on a go-now page or on Get help now (a scan of every emergency page), an expert on every calm tab, each consult going to the right person, the seven owed specialists' words, the reader's safety line, the equipment-only shelves, the fifteen new pages placed with their doctor line and `REQUIRED_REVIEW`, the poo pointer, the films, the thin pages against their old size, the dosing links, the H-M2 lift, the due line, and the first view at 3 weeks, 7 months, 2 years and 4 years.
+
+**The shell (`pp_door_data.dart`, `pp_door_screen.dart`), new for this door and open to every door:**
+- `PpDoorTab.ageRail` (H-M1): band id → `PpAgeRail(title, pageIds)`. Drawn as the first rail with "Picked for {name}, {age}" under it. The tab's tools lead it; the area rails skip its pages, and an area left with nothing drops. It always stays first, whatever a signal lifts.
+- `PpDoorTab.closing`: a tab's own closing in place of the door's. Get help now ends on the first-aid class (H3), drawn with a Class chip, after the footer.
+- `PpDoorTab.dueLine`: a top-level function whose words the tab card shows as its second line (H1). Vaccines reads `VaxStore.dueSoonLine`: "Due in N days" within 14 days, looking ahead only.
+- `PpDoorClosing.note`: a quiet line under an expert row. Something's wrong carries "Not for an emergency. For that, Get help now."
+- H-M2 in `pp_relevance.dart`: `forHerAge` lifts a page by 10 (`kPpForHerAgeLift`), less than any signal.
+
+**The reader, for Health only:** `pvReadConsultNote` puts "Not for an emergency. For that, call 112 or go to a hospital." under every Health page's consult card (§3a).
+
+**The router:** `kPpOwedExpertPlural` names the seven owed specialists in a parent's words ("We're adding children's ENT doctors"); the notice used to lowercase the category ("ents"). `kPpShelfNotYet` says "Not in our shop yet. A chemist will have one." for small equipment any chemist has, instead of "we're still choosing".
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| H-M2: "a page tagged for exactly her band" lifts | A page tagged with her band **and no more than half the door's bands** lifts | With every page tagged (§2e), most pages are "I T C". Lifting all of them would push every all-ages page (the thermometer page, the red flags) down every rail. The plan's two examples, `fever_under_3m` (N) and `ill_teething` (I T), both lift |
+| §2d: the age rail "right after the tools and the expert row" | The tools lead the age rail; the expert row follows it | The H2 look, v4, approved after the plan text: emergency row, age shelf, then the paediatrician row |
+| H1: the due line in the tab card's count slot | The card is drawn with its line the way a "For later" card is (the smaller mark over the line) | The rail is quiet (`kPvDoorRailQuiet`) and draws a line only on such cards; the shared rail stays unchanged |
+| §2e: `health_signs_video` "commented out, and linkedOnly" | linkedOnly, blocks kept | A commented-out page can't be opened, so old links would break. Its film is now the first block of `health_go_now` |
+| H5: seven categories added to `pp_experts_data.dart` | No new categories. S8b already answers an owed category with the nearest one; its words were fixed | An empty category would put a need with nobody in it on Find help, which `pp_consult_filter_test` forbids. The invitation is the tap's notice |
+| H7: make Health's choking page the single source | Already true since the 2026-09-12 rebuild: Feeding's `safety_choking_response` points at Health's page | Held by the existing single-source test |
+| §3b Keeping well: "Child derma, plus the owed roles" | The row goes to Child derma; the teeth, eye and ear pages carry the owed roles | One row per tab |
+| §3c: `ill_ear` to ENT, `ill_eyes` to an eye doctor, `lt_asthma` to a chest doctor "once it exists" | Paediatrician on each | They don't exist yet, and a worried parent should reach a person, not a notice |
+| §3f: the eczema emollient | Not linked to a lotion | Held until a fragrance-free one is checked (§11). The page keeps its barrier-cream comparison |
+| §3e: five more classes and courses | Only the CPR class, on Get help now | The others need catalogue entries; owed in `DOOR-CONTENT-OWED` HD9 |
+| §4: six new films | Four new slots: `temp_underarm`, `glass_test`, `first_teeth_brushing`, `infant_cpr` | `cold_blocked_nose` already holds `health/nose_saline` and `prev_medicine` holds `health/giving_medicine`: the same films. A second slot would be one film twice |
+| §4: door intro video | Not built | S4: no chip until a film exists (GLOBAL-CHANGES #5) |
+| §5a: 17 pages deepened | 15 deepened. `prev_nails_ears` gained a when-line and the clippers shelf; `prev_allergy_probiotics` was checked and left | `prev_nails_ears` already said all three things §5a named. The probiotics page sells nothing |
+| §5b: `ill_febrile_seizure` "linked from fever_red_flags" | On the Get help now rail and the infant age rail, linking back to `health_fit` | `fever_red_flags` reads the one go-now list and stays as it is |
+| H8: link `f40_nappy_poop` | A pointer page `tummy_poo` ("What his poo tells you", N I) on the tummy rail, opening First 40's page | The pattern of Feeding's choking pointer: one page, two doors |
+| §6.7 and §6.8: a Mobbin check, then a prototype | Not run again | The age shelf and its place were approved on the H2 mockup (v4), the user's look call; nothing was laid out beyond it |
+| Expert rows with a price | No price | Prices are server-side and no expert is live; the tap opens "Our first experts are joining" |
+
+**A mistake caught on the way:** two new pages (`ill_bites`, `ill_head_bump`) were first inserted before `health_clinic_or_hospital`, which sits inside a `/* kept for revert */` block, so they compiled away silently. The test that every new page is in its area caught it. The general point: a comment-out-never-delete codebase keeps dead copies next to live ones, so "insert next to X" must check that X is live.
+
+**Owed, not in this build:** the films (HD1 to HD6), the owed shelves and classes (HD7 to HD9), and a paediatrician's read of every `REQUIRED_REVIEW` line, the fifteen new pages first (`BEFORE-LAUNCH.md`). The age gap over six years stays a gap (STILL-OPEN §102.0).

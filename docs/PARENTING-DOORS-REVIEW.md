@@ -83,7 +83,29 @@ set the child's age, open Feeding):
 - [ ] The fever check tool still has its own age chooser (the age rule says
       derive). Drop it?
 - [ ] Six tabs — seen on the phone, kept; say if it still feels crowded.
+      (Seven since Medicines, 2026-10-07.)
 - [ ] The hero photo (CDC, a stethoscope check-up) has a dated look. Swap?
+- [ ] A paediatrician's read of every `REQUIRED_REVIEW` line the door 2
+      build added: the fifteen new pages (dengue, a fit with fever, bites,
+      head bumps, throat, worms, iron syrup, Vitamin A, heat, insect bites,
+      boys and girls, nosebleeds, U-WIN, ABHA, the medicine box) and the
+      fifteen deepened ones.
+
+**Door 2 build (2026-10-25), what to check on the phone** (Developer card,
+set the child's age, open Health):
+- [ ] 3 weeks: Something's wrong opens; "Is this an emergency?" on top;
+      "In the first three months" next, led by Fever check, with "A fever in
+      a baby under three months" first; the paediatrician row after it with
+      its safety line; the Records tab third.
+- [ ] 7 months, 2 years, 4 years: the same, with "Common at 3 to 12 months",
+      "The creche years", "Common at 3 to 5 years"; no page shown twice.
+- [ ] 5 weeks: the Vaccines card says "Due in 7 days".
+- [ ] Get help now: no paediatrician anywhere; the class card after the
+      "believe yourself" line.
+- [ ] A Health page with a consult (e.g. Vomiting): the grey card says
+      "Not for an emergency".
+- [ ] A teeth page's consult: "We're adding paediatric dentists", with a
+      pill to a paediatrician.
 
 ## Development (§47)
 

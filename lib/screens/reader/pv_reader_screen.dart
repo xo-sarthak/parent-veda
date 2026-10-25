@@ -598,6 +598,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                         i == pvReadOwnConsultAfter(a)) ...[
                       _pad(PvReadConsultCard(
                         step: _ownConsult,
+                        note: pvReadConsultNote(a),
                         onTap: () => widget.openSurface
                             ?.call(context, _ownConsult.surfaceId!),
                       )),

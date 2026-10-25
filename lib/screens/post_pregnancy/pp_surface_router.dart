@@ -144,6 +144,39 @@ const Map<String, String> kPpNearestExpert = {
   'Paediatric physio': 'Physiotherapist',
 };
 
+/// ⚠️ THE OWED SPECIALISTS, IN WORDS A PARENT READS (Health H5, 2026-10-25).
+/// The notice lowercased the category and added an "s", which made "ENT"
+/// into "ents" and "Eye" into "eyes". The seven roles Health's pages point
+/// at before real profiles exist, named the way an Indian parent is
+/// referred: no invented people, only the invitation.
+const Map<String, String> kPpOwedExpertPlural = {
+  'Paediatric dentist': 'paediatric dentists',
+  'Dentist': 'paediatric dentists',
+  'Ophthalmologist': "children's eye doctors",
+  'Eye': "children's eye doctors",
+  'ENT': "children's ENT doctors",
+  'Audiologist': 'audiologists',
+  'Allergist': "children's allergy doctors",
+  'Chest': "children's chest doctors",
+  'Hormone': "children's hormone doctors",
+};
+
+/// ⚠️ A SHELF THAT IS NOT OURS TO STOCK YET, SAID PLAINLY (Health §11). For
+/// small equipment any chemist has, "we're still choosing" reads as "wait
+/// for us", which is wrong when the parent needs it tonight.
+const Map<String, String> kPpShelfNotYet = {
+  'Underarm thermometers': "We haven't picked an underarm thermometer yet. "
+      'Any digital one with a flexible tip works.',
+  'Nasal aspirators': 'Not in our shop yet. A chemist will have one.',
+  'Oral syringes': 'Not in our shop yet. A chemist will have one.',
+  'Mosquito nets': 'Not in our shop yet. A chemist will have one.',
+  'Finger toothbrushes': 'Not in our shop yet. A chemist will have one.',
+  'Baby nail clippers': 'Not in our shop yet. A chemist will have one.',
+  'Lice combs': 'Not in our shop yet. A chemist will have one.',
+  'Sun hats and sunscreen': 'Not in our shop yet. A chemist will have one.',
+  'Health record folders': 'Not in our shop yet. Any plastic folder works.',
+};
+
 /// The words a tap says when its target is not there yet (S8). Null when the
 /// target is there. Pure, so a test can hold every case.
 String? ppSurfaceUnavailable(String id) {
@@ -157,16 +190,17 @@ String? ppSurfaceUnavailable(String id) {
             .map((n) => n.label)
             .firstOrNull ??
         'Paediatrician';
-    return "We're adding ${category.toLowerCase()}s. A ${nearLabel.toLowerCase()} can check this first.";
+    final who = kPpOwedExpertPlural[category] ?? '${category.toLowerCase()}s';
+    return "We're adding $who. A ${nearLabel.toLowerCase()} can check this first.";
   }
   const shopPrefix = 'pp_products/';
   if (id.startsWith(shopPrefix)) {
     final shelf = id.substring(shopPrefix.length);
     final subId = pvSlug(shelf);
     final stocked = PvCatalogStore.instance.all.any((p) => p.subId == subId);
-    return stocked
-        ? null
-        : "We're still choosing good ${shelf.toLowerCase()}. They'll be in the Store soon.";
+    if (stocked) return null;
+    return kPpShelfNotYet[shelf] ??
+        "We're still choosing good ${shelf.toLowerCase()}. They'll be in the Store soon.";
   }
   const classPrefix = 'pp_class/';
   if (id.startsWith(classPrefix)) {

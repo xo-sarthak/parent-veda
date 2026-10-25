@@ -11119,3 +11119,15 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
   saving one as a celebrated moment with an optional photo and one journal memory, gentle "might appear soon"
   language, the checklist words renamed, Mobbin and a prototype first. Already decided and kept: one tracker, no
   score, D3, DV1 (whose tab order the door data never set: "On track" still opens first).
+
+## 102.0 Parenting doors, door by door: what the builds left open — 2026-10-25
+
+**§102.1 Health is written for to six years; the app's parenting runs to eighteen.** Health's last band,
+`hb_child`, ends at 72 months, so for an older child no band matches: the tab order is the door's own and the
+age rail does not draw. The pages still apply. When an older-child band is written it gets its own `tabOrder`
+row and age rail (`docs/pp-door-plans/02-health.md` §2a).
+
+**§102.2 Health's owed films, shelves, specialists and classes** are `DOOR-CONTENT-OWED` HD1 to HD9. Each tap
+says why today (S8).
+
+**§102.3 Feeding's** are FD5 to FD13, and its allergen tracker that remembers (D4) is its own later step.

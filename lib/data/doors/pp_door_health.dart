@@ -1,18 +1,18 @@
 // =============================================================================
-//  The Health door — the largest area, on six tabs
+//  The Health door — the largest area, on seven tabs
 // -----------------------------------------------------------------------------
 //  The content is `kPpHealthSection` (`pp_health_content.dart`), rebuilt to
-//  `ParentVeda_Health_rebuild.pdf`. This is the one parenting door with SIX
-//  tabs, on the brief's own call ("Health is the biggest area in the app and
-//  splits into six clean jobs. Forcing five would jam two unlike things
-//  together") — and on the user's, to see six on a phone before deciding.
-//  The selector is drawn for five; the sixth rides the ring. If five is the
-//  answer, the merge the brief names is Growing well into Keeping him well.
+//  `ParentVeda_Health_rebuild.pdf`. The one parenting door with more than
+//  five tabs, on the brief's own call ("Health is the biggest area in the app
+//  and splits into six clean jobs. Forcing five would jam two unlike things
+//  together"); Medicines became the seventh on 2026-10-07. The selector is
+//  drawn for five; the rest ride the ring. (This header said "six" until
+//  door 2's build, 2026-10-25.)
 //
 //  ⚠️ WHAT THE TABS ARE. Tab 1 is the default and the search: "tell me what
 //  you're seeing". Tab 2 is the panic tab, one tap from anywhere via the
-//  pinned jump on Tab 1. The other four are the calm jobs: shots, growth,
-//  prevention, papers.
+//  pinned jump on Tab 1. The other five are the calm jobs: papers and first
+//  checks, shots, growth, medicines, prevention, ordered by his age.
 //
 //  ⚠️ THE MERGES SHOW AS ABSENCES. "Not sure what is wrong" is hidden — it
 //  IS the What Changed flow, which leads Tab 1 as a tool. The vaccination
@@ -23,7 +23,26 @@
 
 import 'package:flutter/material.dart' show Icons;
 
+import '../../screens/post_pregnancy/pp_vaccine_data.dart' show ppVaccineDueLine;
 import 'pp_door_data.dart';
+
+//  ⚠️ DOOR 2 OF THE DOOR-BY-DOOR PASS (built 2026-10-25, from
+//  `docs/pp-door-plans/02-health.md`). What changed, and why:
+//
+//    · SOMETHING'S WRONG OPENS AT EVERY AGE, GET HELP NOW IS ALWAYS SECOND
+//      (§2a). A sick child is why most parents open Health. The calm tabs
+//      after them follow his age.
+//    · A FIRST RAIL FOR HIS AGE (H2, `ageRail`). The illness rails are by
+//      body part; a 3-week-old's four pages were on four of them.
+//    · AN EXPERT ON EVERY TAB BUT GET HELP NOW (§3b), after the first rail,
+//      and on Something's wrong with the safety line, because it shares the
+//      tab with the emergency row.
+//    · GET HELP NOW ENDS ON THE FIRST-AID CLASS, NEVER A CONSULT (H3).
+//    · VACCINES SAYS "DUE IN 5 DAYS" ON ITS CARD (H1).
+//    · TOOLS HAVE AGES: no home remedy for a baby under three months.
+
+/// The paediatrician, on every calm tab.
+const String _kPaed = 'pp_experts/Pediatrician';
 
 final PpDoor kPpHealthDoor = PpDoor(
   sectionId: 'parenting_health',
@@ -34,6 +53,14 @@ final PpDoor kPpHealthDoor = PpDoor(
   heroImageUrl:
       'https://images.unsplash.com/photo-1632052999447-e542d08d4f7d?w=900&h=700&fit=crop',
   hiddenAreaIds: const ['not_sure'],
+  // Plan §2a, row by row. Something's wrong and Get help now lead every age,
+  // an explicit exception to "open on the most pages".
+  tabOrder: const {
+    'hb_nb': ['wrong', 'help', 'records', 'shots', 'growing', 'medicines', 'well'],
+    'hb_infant': ['wrong', 'help', 'shots', 'growing', 'medicines', 'well', 'records'],
+    'hb_toddler': ['wrong', 'help', 'medicines', 'well', 'shots', 'growing', 'records'],
+    'hb_child': ['wrong', 'help', 'well', 'medicines', 'growing', 'shots', 'records'],
+  },
   tabs: const [
     PpDoorTab(
       id: 'wrong',
@@ -43,6 +70,32 @@ final PpDoor kPpHealthDoor = PpDoor(
       areaIds: ['fever', 'cough_cold', 'tummy', 'skin', 'other_illness'],
       jumpToTabId: 'help',
       jumpTitle: 'Is this an emergency?',
+      // H2 (look approved 2026-10-24, v4): the emergency row on top, this
+      // rail next, the paediatrician row after it, never stacked.
+      ageRail: {
+        'hb_nb': PpAgeRail('In the first three months', [
+          'fever_under_3m', 'ill_jaundice', 'skin_newborn', 'tummy_colic',
+          'cold_blocked_nose', 'ill_thrush',
+        ]),
+        'hb_infant': PpAgeRail('Common at 3 to 12 months', [
+          'ill_teething_fever', 'cold_common', 'tummy_diarrhoea',
+          'skin_nappy_rash', 'skin_eczema', 'ill_ear', 'ill_febrile_seizure',
+        ]),
+        'hb_toddler': PpAgeRail('The creche years', [
+          'cold_common', 'skin_hfmd', 'tummy_diarrhoea', 'tummy_vomiting',
+          'ill_ear', 'cough_breathing', 'ill_eyes',
+        ]),
+        'hb_child': PpAgeRail('Common at 3 to 5 years', [
+          'ill_throat', 'cold_common', 'tummy_constipation', 'ill_ear',
+          'skin_chickenpox', 'ill_worms',
+        ]),
+      },
+      expert: PpDoorClosing(
+        label: 'Talk to a paediatrician today',
+        blurb: 'Not an emergency, but not right? 1:1, on video.',
+        surfaceId: _kPaed,
+        note: 'Not for an emergency. For that, Get help now.',
+      ),
       tools: [
         PpDoorTool(
           label: 'Fever check',
@@ -59,8 +112,21 @@ final PpDoor kPpHealthDoor = PpDoor(
           surfaceId: 'pp_what_changed',
           icon: Icons.change_circle_outlined,
         ),
+        // "What to tell the doctor" is part of a sick-day visit (§2c). The
+        // same tool leads Records.
+        PpDoorTool(
+          label: 'Before you see the doctor',
+          blurb: 'A visit summary pulled from his record, the questions to '
+              'ask, and a share to the paediatrician.',
+          surfaceId: 'pp_doctor_visit',
+          icon: Icons.medical_services_outlined,
+          atEnd: true,
+        ),
       ],
     ),
+    // No expert row and no consult on this tab (§2g, §3a): an emergency goes
+    // to 112 or a hospital, never to a video call. It ends on the first-aid
+    // class instead (H3), after the footer.
     PpDoorTab(
       id: 'help',
       label: 'Get help now',
@@ -79,6 +145,11 @@ final PpDoor kPpHealthDoor = PpDoor(
       ],
       footer: 'If your child seems wrong to you and a screen says otherwise, believe '
           'yourself.',
+      closing: PpDoorClosing(
+        label: 'Learn it on a calm day: baby first aid and CPR',
+        blurb: 'Choking, burns, falls and fits, with a mannequin. Live, 2 hours.',
+        surfaceId: 'pp_class/Baby first aid and CPR',
+      ),
     ),
     PpDoorTab(
       id: 'shots',
@@ -86,6 +157,12 @@ final PpDoor kPpHealthDoor = PpDoor(
       icon: Icons.vaccines_outlined,
       hue: 206,
       areaIds: ['vaccines'],
+      dueLine: ppVaccineDueLine,
+      expert: PpDoorClosing(
+        label: 'Ask a paediatrician',
+        blurb: 'A missed or delayed dose? 1:1, on video.',
+        surfaceId: _kPaed,
+      ),
       tools: [
         PpDoorTool(
           label: 'Vaccines, and what is due next',
@@ -102,6 +179,11 @@ final PpDoor kPpHealthDoor = PpDoor(
       icon: Icons.show_chart_outlined,
       hue: 152,
       areaIds: ['growth', 'long_term'],
+      expert: PpDoorClosing(
+        label: 'Talk to a paediatrician',
+        blurb: 'Worried about his weight or height? 1:1, on video.',
+        surfaceId: _kPaed,
+      ),
       tools: [
         // The same Growth journey as Feeding. Single source; it owns the
         // percentile reads.
@@ -116,10 +198,19 @@ final PpDoor kPpHealthDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'well',
-      label: 'Keeping your child well',
+      // §2b: shorter on the card, same meaning. Kept for revert:
+      // label: 'Keeping your child well',
+      label: 'Keeping well',
       icon: Icons.spa_outlined,
       hue: 96,
       areaIds: ['prevention', 'teeth_eyes_ears'],
+      // The child dermatologist is the one specialist live today; teeth,
+      // eyes and ears point at owed ones from their pages (§3d, S8b).
+      expert: PpDoorClosing(
+        label: 'Talk to a child skin doctor',
+        blurb: 'Teeth, eyes, skin: the right specialist. 1:1, on video.',
+        surfaceId: 'pp_experts/Child derma',
+      ),
       tools: [
         // The single source every per-illness remedy card opens, filtered.
         PpDoorTool(
@@ -132,6 +223,8 @@ final PpDoor kPpHealthDoor = PpDoor(
               'see a doctor instead.',
           surfaceId: 'pp_nuskhe',
           icon: Icons.eco_outlined,
+          // No home remedy is right for a baby under three months (§2c).
+          bands: ['hb_infant', 'hb_toddler', 'hb_child'],
         ),
       ],
     ),
@@ -142,15 +235,27 @@ final PpDoor kPpHealthDoor = PpDoor(
       icon: Icons.medication_outlined,
       hue: 206,
       areaIds: ['medicines'],
+      expert: PpDoorClosing(
+        label: 'Ask a paediatrician before you give it',
+        blurb: 'Unsure about a medicine? 1:1, on video.',
+        surfaceId: _kPaed,
+      ),
       footer: 'Never a dose from us. The dose comes from your doctor or the '
           'label, by weight.',
     ),
     PpDoorTab(
       id: 'records',
-      label: 'Records and the visit',
+      // §2b: it holds the newborn checks, and the old label hid them. Kept
+      // for revert: label: 'Records and the visit',
+      label: 'Records and first checks',
       icon: Icons.folder_open_outlined,
       hue: 268,
       areaIds: ['records', 'newborn_checks'],
+      expert: PpDoorClosing(
+        label: 'Book his next check-up',
+        blurb: 'A paediatrician, 1:1, on video.',
+        surfaceId: _kPaed,
+      ),
       tools: [
         // The dashboard: status tiles, upcoming, the health timeline, and
         // his papers and ID documents. One tool, as the brief asks.
@@ -161,12 +266,14 @@ final PpDoor kPpHealthDoor = PpDoor(
           surfaceId: 'pp_health_home',
           icon: Icons.folder_open_outlined,
         ),
-        PpDoorTool(
-          label: 'Emergency card',
-          blurb: 'Create it once, show it in one tap.',
-          surfaceId: 'pp_emergency_card',
-          icon: Icons.badge_outlined,
-        ),
+        // The same card twice (Get help now has it), and the dashboard above
+        // links it (§2c). Kept for revert:
+        // PpDoorTool(
+        //   label: 'Emergency card',
+        //   blurb: 'Create it once, show it in one tap.',
+        //   surfaceId: 'pp_emergency_card',
+        //   icon: Icons.badge_outlined,
+        // ),
         PpDoorTool(
           label: 'Before you see the doctor',
           blurb: 'A visit summary pulled from his record, the questions to '

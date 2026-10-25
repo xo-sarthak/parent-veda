@@ -212,6 +212,15 @@ PvReadNextStep? pvReadOwnConsult(PvRead r) {
   return null;
 }
 
+/// ⚠️ A HEALTH CONSULT SAYS IT IS NOT FOR AN EMERGENCY (Health plan §3a,
+/// 2026-10-25). A video call must never be what a parent reaches for when a
+/// go-now sign is on screen, so every consult card on a Health page carries
+/// the same quiet line as the door's expert row. Read off the read's id
+/// (`pp_page_<section>_<page>`), so no other door changes.
+String? pvReadConsultNote(PvRead r) => r.id.startsWith('pp_page_parenting_health_')
+    ? 'Not for an emergency. For that, call 112 or go to a hospital.'
+    : null;
+
 /// The section the page's own consult follows: its first doctor box, or the
 /// matcher's slot when the page has none (after the second section, or the
 /// last on a short read).
@@ -224,9 +233,13 @@ int pvReadOwnConsultAfter(PvRead r) {
 /// The page's own consult, drawn as the offer card is: one line of why, the
 /// expert, who it is for, a chevron. No price, because none is live.
 class PvReadConsultCard extends StatelessWidget {
-  const PvReadConsultCard({super.key, required this.step, required this.onTap});
+  const PvReadConsultCard(
+      {super.key, required this.step, required this.onTap, this.note});
   final PvReadNextStep step;
   final VoidCallback onTap;
+
+  /// The quiet line under it ([pvReadConsultNote]).
+  final String? note;
 
   @override
   Widget build(BuildContext context) {
@@ -262,6 +275,15 @@ class PvReadConsultCard extends StatelessWidget {
                       Text(step.value.en,
                           style: pvManrope(
                               fontSize: 12.5, color: ink, height: 1.35)),
+                    ],
+                    if (note case final line?) ...[
+                      const SizedBox(height: 3),
+                      Text(line,
+                          style: pvManrope(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF69636C),
+                              height: 1.35)),
                     ],
                   ]),
             ),

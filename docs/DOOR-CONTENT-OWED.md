@@ -174,6 +174,25 @@ Catalogue items the door links to that do not exist yet (each tap says why, S8c/
 | FD12 | Paediatric feeding therapist (expert category) | picky_not_eating | Names a speech therapist, with a pill (S8b) |
 | FD13 | A link that opens one programme (`co_weaning`, Confident Weaning) | solids_when | Not linked: the router has no per-programme route. The reader's offer card reaches courses by topic instead |
 
+**Added by the door 2 build (2026-10-25, `docs/pp-door-plans/02-health.md` §4, §11).** Films (each slot shows the placeholder and answers a tap, S8a; on a go-now page, no pill):
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| HD1 | `health/temp_underarm` on `fever_reading` | Film · 1 min | Coming soon | Where the tip goes, how long, a squirming baby. Real parent and baby |
+| HD2 | `health/glass_test` on `skin_which_rash` | Film · 40 s | Coming soon | A glass pressed on a rash that fades, and one that does not. The same test is inside `health/when_to_rush` |
+| HD3 | `health/first_teeth_brushing` on `teeth_brushing` | Film · 1 min | Coming soon | A rice-grain smear, the lap position, twice a day |
+| HD4 | `health/infant_cpr` on `health_choking_response` | Film · 3 min | Coming soon | **Expert-filmed only**, by the CPR instructor, on a mannequin. Never AI-generated |
+| HD5 | `health/door_intro` | Film · 0:55 | Not built | A real paediatrician: the three speeds, where the go-now list is, and that the app never gives a dose. The chip waits for it (GLOBAL-CHANGES #5) |
+| HD6 | `health/when_to_rush`, now on `health_go_now` | Film · 5 min | Coming soon | Unchanged slot, moved onto the red-flag page (§2g). Breathing trouble, a fit, the glass test, shown on real children |
+
+Catalogue items and people the door points at that do not exist yet (each tap says why, S8b to S8d):
+
+| # | Target | Where | Today's tap |
+|---|---|---|---|
+| HD7 | Shelves: `Underarm thermometers`, `Nasal aspirators`, `Oral syringes`, `Mosquito nets`, `Finger toothbrushes`, `Baby nail clippers`, `Lice combs`, `Sun hats and sunscreen`, `Health record folders` | fever_reading, cold_blocked_nose, prev_medicine, prev_medicine_box, prev_monsoon, ill_dengue, ill_insect_bites, teeth_brushing, prev_nails_ears, prev_head_lice, prev_heat, rec_abha | "Not in our shop yet. A chemist will have one." (the thermometer: "Any digital one with a flexible tip works."). A fragrance-free emollient for `skin_eczema` is held until one is checked |
+| HD8 | Specialists: paediatric dentist, children's eye doctor, children's ENT, audiologist, children's allergy, chest and hormone doctors | teeth_when, teeth_brushing, teeth_dentist, eyes_checks, eyes_screens, ears_hearing | "We're adding … A paediatrician can check this first." with a pill (S8b). Real profiles arrive through onboarding (`ADMIN-PANEL.md`), never invented |
+| HD9 | Classes: Baby first aid and CPR (Get help now's closing, H3; also Feeding FD11), and owed with it: Fever, colds and tummy bugs evening; The home medicine box; First tooth to first dentist; Monsoon season; Vaccines, the first year | help tab foot; the other five have no link yet | "This class isn't open yet. Tap Tell me" (S8d). The CPR instructor exists in the roster (`pp_experts_data.dart`), with no class row |
+
 ---
 
 ## The count, for the end
