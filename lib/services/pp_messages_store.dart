@@ -318,7 +318,11 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
             : '$y years $r months';
     final note = ppMonthNoteFor(m);
     age('age:m$m', ppAddMonths(f.dob, m), '$who is $label today',
-        note == null ? 'Here is what is changing this month.' : 'This month: ${note.tryThis}');
+        // The sixth birthday says the learning space is ready (F4/F5,
+        // 2026-10-25): one of the gentle reminders the user asked for.
+        m == 72
+            ? "$who's learning space is ready, whenever you are."
+            : note == null ? 'Here is what is changing this month.' : 'This month: ${note.tryThis}');
   }
 
   // ---- vaccines: 3 days before each visit still to come --------------------

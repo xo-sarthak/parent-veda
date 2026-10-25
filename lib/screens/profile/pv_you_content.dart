@@ -60,6 +60,7 @@ import '../pregnancy/preg_messages_screen.dart' show openPregMessages;
 import '../../services/preg_messages_store.dart' show PregMessagesStore;
 import '../../services/pp_messages_store.dart' show PpMessagesStore;
 import '../post_pregnancy/pp_messages_screen.dart' show openPpMessages;
+import '../v2/pv_celebration.dart' show openBirthCelebration;
 import '../../data/doors/pv_door_after_loss.dart' show kPregEndedRowTitle, kPregEndedRowSub;
 import '../../services/pregnancy_ended_store.dart';
 import '../products/pv_orders_screen.dart';
@@ -1140,7 +1141,9 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
       final added = await showPvAddChildSheet(c, arrival: true);
       if (added && c.mounted) {
         LifeStageStore.instance.setStage(LifeStage.parenting);
-        openStageDoor(c, StageDoor.parenting);
+        // The birth page first (F4, 2026-10-25), then her baby's home. Kept
+        // for revert: openStageDoor(c, StageDoor.parenting); alone.
+        await openBirthCelebration(c, then: (c) => openStageDoor(c, StageDoor.parenting));
       }
     },
   ),

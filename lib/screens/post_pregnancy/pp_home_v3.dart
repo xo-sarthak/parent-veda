@@ -136,6 +136,7 @@ import 'pp_child_switch.dart';
 import '../../services/pp_messages_store.dart' show PpMessagesStore;
 import '../v2/pv_family_switch.dart' show FamilyHome, PvFamilyTitle;
 import 'pp_messages_screen.dart' show openPpMessages;
+import '../skilling/sk_turning_six.dart' show PpLearningSpaceCard;
 import 'pp_visit_card.dart';
 // import 'video/pv_video_config.dart' show pvResolveVideoUrl; // the film pick moved to pp_home_reads.dart (2026-10-21)
 import 'pp_tip_links.dart';
@@ -369,6 +370,11 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 // then gone: the one card on this home that is about her.
                 // It draws nothing for a family without letters.
                 DearBabyLettersReadyCard(p: p),
+                // ---- SIX TODAY: HER LEARNING SPACE IS READY (2026-10-25) ----
+                // From the sixth birthday until a grown-up opens it; "Not now"
+                // rests it 7, 14, then 30 days (sk_turning_six.dart, F4/F5).
+                // It draws nothing before six or once the space is open.
+                PpLearningSpaceCard(p: p),
                 // ---- MY DAILY INSIGHTS · TODAY ------------------------------
                 //
                 // The user (2026-10-07): "On the home screen I would require

@@ -29,6 +29,7 @@ import '../../services/life_stage_store.dart';
 import '../../services/preg_messages_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/stage_gateway.dart';
+import '../v2/pv_celebration.dart' show openBirthCelebration;
 import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show appNavigatorKey, FabState;
 import '../../widgets/pv_feedback.dart';
@@ -73,10 +74,12 @@ void openPregMessage(BuildContext context, PregMessage m, PregnancyController c)
       push('tools/hospital_bag', () => ReadyForBirthScreen(controller: c));
     case PregMessageKind.babyArrived:
       // The same sheet and the same move as You › "Baby has arrived".
-      unawaited(showPvAddChildSheet(context, arrival: true).then((added) {
+      unawaited(showPvAddChildSheet(context, arrival: true).then((added) async {
         if (added && context.mounted) {
           LifeStageStore.instance.setStage(LifeStage.parenting);
-          openStageDoor(context, StageDoor.parenting);
+          // The birth page first (F4, 2026-10-25). Kept for revert:
+          //   openStageDoor(context, StageDoor.parenting);
+          await openBirthCelebration(context, then: (c) => openStageDoor(c, StageDoor.parenting));
         }
       }));
   }

@@ -41,6 +41,7 @@ import '../../services/stage_gateway.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../profile/pv_you_sheets.dart' show showPvAddChildSheet;
+import '../v2/pv_celebration.dart' show openBirthCelebration;
 import '../v2/v2_palette.dart';
 import 'preg_chrome.dart' show pregFilledStyle;
 
@@ -266,7 +267,9 @@ class PregArrivalCard extends StatelessWidget {
     final added = await showPvAddChildSheet(context, arrival: true);
     if (added && context.mounted) {
       LifeStageStore.instance.setStage(LifeStage.parenting);
-      openStageDoor(context, StageDoor.parenting);
+      // The birth page first (F4, 2026-10-25), then her baby's home. Kept for
+      // revert: openStageDoor(context, StageDoor.parenting); alone.
+      await openBirthCelebration(context, then: (c) => openStageDoor(c, StageDoor.parenting));
     }
   }
 

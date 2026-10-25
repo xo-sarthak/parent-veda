@@ -103,6 +103,7 @@ List<FamilyProfile> familyProfilesFrom({
   required List<Child> children,
   required String skillingName,
   required DateTime now,
+  bool learningOpen = true,
 }) {
   final out = <FamilyProfile>[];
   if (stage == LifeStage.tryingToConceive) {
@@ -122,12 +123,19 @@ List<FamilyProfile> familyProfilesFrom({
         home: FamilyHome.pregnancy));
   }
   for (final c in children) {
-    final learning = familyYears(c.dob, now) >= kSkAgeFloor;
+    // ⚠️ SIX OR MORE OPENS THE LEARNING SPACE ONLY ONCE A GROWN-UP SAID YES
+    // (F4/F5, 2026-10-25, the user: "only show it to the parent once they
+    // want to see it"). Until then the child's home is Parenting, where the
+    // card asks. Kept for revert:
+    //   final learning = familyYears(c.dob, now) >= kSkAgeFloor;
+    final six = familyYears(c.dob, now) >= kSkAgeFloor;
+    final learning = six && learningOpen;
     out.add(FamilyProfile(
         id: c.id,
         kind: FamilyProfileKind.child,
         name: c.name,
-        line: '${familyAgeWords(c.dob, now)} · ${learning ? 'Learning space' : 'Parenting'}',
+        line: '${familyAgeWords(c.dob, now)} · '
+            '${learning ? 'Learning space' : six ? 'Parenting · learning space ready' : 'Parenting'}',
         home: learning ? FamilyHome.learning : FamilyHome.parenting));
   }
   // A family that joined at skilling may have no parenting record of the
@@ -157,6 +165,7 @@ List<FamilyProfile> familyProfiles() {
     children: kids.hasRealChild ? kids.children : const [],
     skillingName: SkChildStore.instance.name,
     now: DateTime.now(),
+    learningOpen: SkChildStore.instance.consented,
   );
 }
 
@@ -240,6 +249,9 @@ class PvFamilyTitle extends StatelessWidget {
           SkChildStore.instance,
         ]),
         builder: (context, _) {
+          // Whether a grown-up opened the learning space is in SkChildStore,
+          // which loads lazily; once loaded it notifies and this redraws.
+          SkChildStore.instance.load();
           final all = familyProfiles();
           if (all.length < 2) return date;
           final open = openProfileIn(all, here, ChildProfileStore.instance.activeChildId);
