@@ -32,11 +32,27 @@
 //  are the moment itself (`age:m5`, `vax:mo9`, `phase:12`), never a date, so
 //  "the same message" survives a correction and a delivered one never repeats.
 //
-//  WHO GETS THEM: parenting stage, a real child (never the placeholder), not
+//  WHO GETS THEM: every real child (never the placeholder), in ANY stage, not
 //  the partner's side (his are the father pass). Phone ids are a block of their
 //  own (929101 upwards); a refresh cancels only those. Init runs AFTER
 //  `ReminderStore.init` (whose syncAll cancels every pending notification),
 //  the same startup trap pregnancy documents.
+//
+//  ⚠️ EVERY CHILD, IN EVERY STAGE (2026-10-25, STAGE-TRANSITIONS F3). It was
+//  the parenting stage only, and the ACTIVE child only. So a mother pregnant
+//  again with a toddler heard nothing about the toddler's 18-month visit, and
+//  with two children only the one she last opened got messages: switching
+//  child dropped the other's pending reminders, because `apply` replaces
+//  pending with what this refresh computed. Now each real child has its own
+//  candidates (`familyFromStores`), their ids kept apart by B6's prefix, and
+//  with two or more each title says whose it is.
+//
+//  ⚠️ VACCINE REMINDERS STAY WITH THE ACTIVE CHILD, ON PURPOSE. They read
+//  which visits are done, and `VaxStore` keeps ONE record for whichever child
+//  is open, not one per child (STAGE-TRANSITIONS B11). Reminding a second
+//  child from that record would remind her of doses already given, or skip
+//  ones still owed. Age, stage and activity messages need only the date of
+//  birth, so they are right for every child today.
 // =============================================================================
 
 import 'dart:async';
@@ -154,9 +170,22 @@ class PpMessageFacts {
     this.partner = false,
     this.visits = const [],
     this.idPrefix = '',
+    this.named = false,
+    this.sexGiven = true,
+    this.isBoy = true,
   });
 
   final DateTime dob;
+
+  /// The family has two or more children, so every title says whose it is
+  /// ("Something to try with Aarav this week"), not only the age ones (F3).
+  final bool named;
+
+  /// This child's, for the pronouns in an authored line (he/him/his become
+  /// she/her, or the name). Not the active child's: a message is about the
+  /// child it names.
+  final bool sexGiven;
+  final bool isBoy;
 
   /// Put before every message id, so each child's "6 months today" is its own
   /// message (STAGE-TRANSITIONS B6, 2026-10-24). The first child keeps the
@@ -174,29 +203,69 @@ class PpMessageFacts {
 
   bool get speaks => realChild && inParenting && !partner;
 
+  /// The active child's facts, as before F3. Kept for the callers that ask
+  /// about one child; the store itself reads [familyFromStores].
   static PpMessageFacts fromStores() {
     final c = ChildProfileStore.instance;
+    return _forChild(c.hasRealChild ? c.active : null, withVisits: true);
+  }
+
+  /// One set of facts per real child (F3). The first child keeps the bare
+  /// ids; the active child alone carries the vaccine visits (see the header).
+  static List<PpMessageFacts> familyFromStores() {
+    final c = ChildProfileStore.instance;
+    if (!c.hasRealChild) return [_forChild(null, withVisits: false)];
+    final active = c.activeChildId;
+    return [
+      for (final k in c.children) _forChild(k, withVisits: k.id == active),
+    ];
+  }
+
+  static PpMessageFacts _forChild(Child? k, {required bool withVisits}) {
+    final c = ChildProfileStore.instance;
     final vax = VaxStore.instance;
+    final dob = k?.dob ?? c.dob;
     return PpMessageFacts(
-      dob: c.dob,
-      name: c.nameMid,
-      realChild: c.hasRealChild,
-      inParenting: LifeStageStore.instance.stage == LifeStage.parenting,
+      dob: dob,
+      name: k?.nameMid ?? c.nameMid,
+      realChild: k != null,
+      // ⚠️ ANY STAGE (F3, 2026-10-25): a child is still a child while her
+      // mother is pregnant again or trying. Kept for revert:
+      //   inParenting: LifeStageStore.instance.stage == LifeStage.parenting,
+      inParenting: true,
       partner: FatherPreview.instance.on,
       idPrefix: ppMessageIdPrefix(
-          c.activeChildId, c.children.isEmpty ? null : c.children.first.id),
-      visits: [
-        for (final v in kVaxVisits)
-          if (vax.statusOf(v) != VaxStatus.done && !vax.isOptionalVisit(v))
-            (
-              id: v.id,
-              label: v.ageLabel,
-              date: c.dob.add(Duration(days: v.ageDays)),
-              shortNames: [for (final id in v.vaccineIds) vaccineById(id).shortName],
-            ),
-      ],
+          k?.id, c.children.isEmpty ? null : c.children.first.id),
+      named: c.children.length > 1,
+      sexGiven: k?.sexGiven ?? c.sexGiven,
+      isBoy: k?.isBoy ?? c.isBoy,
+      visits: !withVisits
+          ? const []
+          : [
+              for (final v in kVaxVisits)
+                if (vax.statusOf(v) != VaxStatus.done && !vax.isOptionalVisit(v))
+                  (
+                    id: v.id,
+                    label: v.ageLabel,
+                    date: dob.add(Duration(days: v.ageDays)),
+                    shortNames: [for (final id in v.vaccineIds) vaccineById(id).shortName],
+                  ),
+            ],
     );
   }
+}
+
+/// The child a message is about: `child:<id>|` names any child but the
+/// first, whose ids are bare (B6). Null when the family has no children.
+String? ppMessageChildId(String messageId, List<String> childIds) {
+  if (messageId.startsWith('child:')) {
+    final end = messageId.indexOf('|');
+    if (end > 6) {
+      final id = messageId.substring(6, end);
+      if (childIds.contains(id)) return id;
+    }
+  }
+  return childIds.isEmpty ? null : childIds.first;
 }
 
 /// The id prefix for [activeId]'s messages: none for the first child (or
@@ -260,7 +329,8 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
       id: '${f.idPrefix}vax:${v.id}', // was 'vax:${v.id}' (B6)
       kind: PpMessageKind.vaccine,
       at: _at(day.isBefore(today) ? today : day, 10),
-      title: 'The ${v.label} vaccines are coming up',
+      // Kept for revert: 'The ${v.label} vaccines are coming up' alone.
+      title: f.named ? "$who's ${v.label} vaccines are coming up" : 'The ${v.label} vaccines are coming up',
       body: '${v.shortNames.join(', ')} are due around ${v.date.day}/${v.date.month}. '
           'Book the visit, and follow your paediatrician on the exact timing.',
     ));
@@ -278,7 +348,7 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
       kind: PpMessageKind.milestones,
       at: _at(day, 18),
       // The phase doc's name where there is one (2026-10-13). Was ${p.name}.
-      title: 'A new stage: ${ppPhaseWithDoc(p).name}',
+      title: f.named ? 'A new stage for $who: ${ppPhaseWithDoc(p).name}' : 'A new stage: ${ppPhaseWithDoc(p).name}',
       body: 'The skills that often start around now, and how to help, without a scoreboard.',
     ));
   }
@@ -299,11 +369,14 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
     if (line == null) continue;
     final week = '${day.year}-${day.month}-${day.day}';
     out.add(PpMessage(
-      id: 'act:$week',
+      // The child's prefix too (F3): two children, two Monday ideas. Was
+      // 'act:$week'; the first child's ids are unchanged.
+      id: '${f.idPrefix}act:$week',
       kind: PpMessageKind.activity,
       at: _at(day, 10),
-      title: 'Something to try this week',
-      body: ppFillChild(line),
+      title: f.named ? 'Something to try with $who this week' : 'Something to try this week',
+      // Kept for revert: body: ppFillChild(line), which spoke of the active child.
+      body: ppFillChildFor(line, sexGiven: f.sexGiven, isBoy: f.isBoy, name: f.name),
     ));
   }
   return out;
@@ -461,9 +534,12 @@ class PpMessagesStore extends ChangeNotifier
   Future<void> _refresh(DateTime? fixedNow, PpMessageFacts? fixedFacts) async {
     if (!_loaded) await _load();
     if (fixedFacts == null && !LifeStageStore.instance.isLoaded) return;
-    final facts = fixedFacts ?? PpMessageFacts.fromStores();
+    // Every child's messages (F3). Kept for revert:
+    //   final facts = fixedFacts ?? PpMessageFacts.fromStores();
+    //   final changed = apply(ppMessageCandidates(facts, now), now);
+    final family = fixedFacts == null ? PpMessageFacts.familyFromStores() : [fixedFacts];
     final now = fixedNow ?? DateTime.now();
-    final changed = apply(ppMessageCandidates(facts, now), now);
+    final changed = apply([for (final f in family) ...ppMessageCandidates(f, now)], now);
     for (final k in PpMessageKind.values) {
       for (final id in k.phoneIds) {
         await _phone.cancel(id);

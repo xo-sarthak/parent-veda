@@ -2583,7 +2583,11 @@ class _PvYouScreenState extends State<PvYouScreen> {
       PvSettingsSection(
         title: 'Notifications',
         rows: [
-          for (final t in content.notificationThings) thing(t),
+          // A row may wait for what it opens (F3: her children's messages
+          // only with a child). Kept for revert:
+          //   for (final t in content.notificationThings) thing(t),
+          for (final t in content.notificationThings)
+            if (t.shown?.call() ?? true) thing(t),
           m(prefs[1]), // Reminders
           m(prefs[2]), // WhatsApp updates
         ],

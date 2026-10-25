@@ -353,7 +353,14 @@ final RegExp _kChildPronoun = RegExp(r"\b(he|him|his|himself)\b", caseSensitive:
 /// a girl, and the name (or "your baby") when the parent did not say.
 String ppFillChild(String text, [ChildProfileStore? child]) {
   final c = child ?? ChildProfileStore.instance;
-  if (c.sexGiven && c.isBoy) return text;
+  return ppFillChildFor(text, sexGiven: c.sexGiven, isBoy: c.isBoy, name: c.active.nameMid);
+}
+
+/// [ppFillChild] for a child named by its facts rather than the active one,
+/// so each child's messages speak of that child (2026-10-25, STAGE-TRANSITIONS
+/// F3). The same words as the store's they/them/their.
+String ppFillChildFor(String text, {required bool sexGiven, required bool isBoy, required String name}) {
+  if (sexGiven && isBoy) return text;
   return text.replaceAllMapped(_kChildPronoun, (m) {
     final w = m[0]!;
     final low = w.toLowerCase();
@@ -361,14 +368,15 @@ String ppFillChild(String text, [ChildProfileStore? child]) {
     final allCaps = w.length > 1 && w == w.toUpperCase();
     final cap = w[0] == w[0].toUpperCase();
     String keep(String r) => allCaps ? r.toUpperCase() : (cap ? r[0].toUpperCase() + r.substring(1) : r);
-    if (c.sexGiven) {
+    if (sexGiven) {
       // A girl.
       return keep(switch (low) { 'he' => 'she', 'him' => 'her', 'his' => 'her', _ => 'herself' });
     }
+    // Kept for revert: c.they / c.them / c.their, which read the active child.
     final r = switch (low) {
-      'he' => c.they,
-      'him' => c.them,
-      'his' => c.their,
+      'he' => name,
+      'him' => name,
+      'his' => "$name's",
       _ => 'themselves',
     };
     return keep(r);

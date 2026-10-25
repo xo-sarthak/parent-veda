@@ -9,11 +9,20 @@
 //  EACH MESSAGE OPENS THE PAGE IT NAMES:
 //    age, a new stage, something to try  -> the parenting home (the age page)
 //    vaccines                             -> the vaccine tracker
+//
+//  ⚠️ FOR THE CHILD IT NAMES, FROM ANY HOME (2026-10-25, STAGE-TRANSITIONS
+//  F3). Every child now has messages, in every stage, so a tap first makes
+//  that child the active one, then opens the page. "Back to the home" is the
+//  parenting home only when parenting is the root; a mother who is pregnant
+//  again has the pregnancy home there, so her child's home opens over it.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import '../../services/life_stage_store.dart';
+import '../../services/stage_gateway.dart';
 import '../../widgets/global_ask_fab.dart' show appNavigatorKey;
+import 'pp_child_profile.dart';
 import '../../services/pp_messages_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
@@ -35,6 +44,9 @@ void openPpMessages(BuildContext context) {
 void openPpMessage(BuildContext context, PpMessage m) {
   pvCommitFeedback();
   PpMessagesStore.instance.markRead(m.id);
+  final kids = ChildProfileStore.instance;
+  final whose = ppMessageChildId(m.id, [for (final c in kids.children) c.id]);
+  if (whose != null && whose != kids.activeChildId) kids.switchTo(whose);
   switch (m.kind) {
     case PpMessageKind.vaccine:
       Navigator.of(context).push(MaterialPageRoute<void>(
@@ -44,8 +56,15 @@ void openPpMessage(BuildContext context, PpMessage m) {
     case PpMessageKind.age:
     case PpMessageKind.milestones:
     case PpMessageKind.activity:
-      // The age page is the parenting home: back to it.
-      Navigator.of(context).popUntil((r) => r.isFirst);
+      // The age page is the parenting home: back to it. When parenting is not
+      // the root (pregnant again, trying, the learning space), the child's
+      // home opens over the root instead. The navigator is held first: this
+      // page's own context is gone once it is popped.
+      final nav = Navigator.of(context);
+      nav.popUntil((r) => r.isFirst);
+      if (LifeStageStore.instance.stage != LifeStage.parenting) {
+        openStageDoor(nav.context, StageDoor.parenting);
+      }
   }
 }
 

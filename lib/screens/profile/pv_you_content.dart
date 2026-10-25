@@ -648,6 +648,20 @@ PvYouThing _ppMessages() => PvYouThing(
   open: openPpMessages,
 );
 
+/// Her children's messages from a stage that is not parenting (2026-10-25,
+/// STAGE-TRANSITIONS F3): a mother pregnant again, or trying, still hears
+/// about her child, so the inbox and its switches need a door here too. Only
+/// while there is a real child: with none, the row would open an empty inbox.
+PvYouThing _ppChildMessages() => PvYouThing(
+  icon: Icons.mail_outline_rounded,
+  title: "Your children's messages",
+  subtitle: 'Ages, vaccines and new stages, and when we send them',
+  dot: () => PpMessagesStore.instance.unreadCount > 0,
+  listen: PpMessagesStore.instance,
+  shown: () => ChildProfileStore.instance.hasRealChild,
+  open: openPpMessages,
+);
+
 PvYouThing _findHelp() => PvYouThing(
   icon: Icons.location_on_outlined,
   title: 'Find help near you',
@@ -1095,7 +1109,9 @@ final PvYouStageContent _trying = PvYouStageContent(
     ),
   ],
   preferenceThings: [_ttcWhatYouSee()],
-  notificationThings: [_ttcMessages()],
+  // Her children's messages too, when she has one (F3). Kept for revert:
+  //   notificationThings: [_ttcMessages()],
+  notificationThings: [_ttcMessages(), _ppChildMessages()],
   supportThings: [_ttcGetHelp()],
   childrenInvitation: 'Your first child\'s page appears here after the birth.',
   whatWeStore: [
@@ -1243,7 +1259,9 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
   profileThings: [
     _doctorNotes(LifeStage.pregnancy, art: ttcArtTab(TtcTabMark.doctorChat)),
   ],
-  notificationThings: [_pregMessages()],
+  // Her children's messages too, when she has one (F3). Kept for revert:
+  //   notificationThings: [_pregMessages()],
+  notificationThings: [_pregMessages(), _ppChildMessages()],
   supportThings: [_findHelp()],
   childrenInvitation:
       'Your baby\'s page appears here after the birth. An older child can be added now.',
