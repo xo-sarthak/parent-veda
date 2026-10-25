@@ -11,6 +11,7 @@ import 'package:parentveda/screens/doors/pv_list_row.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_surface_router.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_tools_tab.dart';
 import 'package:parentveda/screens/ttc/ttc_tab_root_header.dart';
+import 'package:parentveda/screens/ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
@@ -30,6 +31,7 @@ void main() {
     final listed = {for (final g in ppToolGroups()) for (final t in g.tools) t.surfaceId};
     bool allowed(String id) =>
         id == 'pp_recos' || // a shop card, reached from Product guide; not a tool
+        id == 'pp_leaps' || // reading in the shared reader, not a tool (tools pass D4, 2026-10-25)
         id.startsWith('pp_what_changed/'); // the same checker, pre-filtered
     final missing = {
       for (final d in kPpDoors)
@@ -38,6 +40,36 @@ void main() {
             if (!listed.contains(t.surfaceId) && !allowed(t.surfaceId)) '${d.sectionId}: ${t.surfaceId}',
     };
     expect(missing, isEmpty, reason: 'a door offers a tool the Tools tab does not list');
+  });
+
+  // The user, 2026-10-25: "make sure the tools section the UI is consistent
+  // with marks/glyphs". Every row wears its own drawn mark: none falls back to
+  // a disc with an icon, and no two tools share a glyph.
+  test('every tool wears its own drawn mark, and no two share one', () {
+    final tools = [for (final g in ppToolGroups()) ...g.tools];
+    final undrawn = [for (final t in tools) if (t.tab == null && t.tool == null) t.title];
+    expect(undrawn, isEmpty, reason: 'a row without a drawn mark falls back to an icon in a disc');
+    final seen = <Object, String>{};
+    final twice = <String>[];
+    for (final t in tools) {
+      final key = (t.tab ?? t.tool)!;
+      final other = seen[key];
+      if (other != null) twice.add('${t.title} and $other');
+      seen[key] = t.title;
+    }
+    expect(twice, isEmpty, reason: 'two tools wear the same glyph');
+  });
+
+  testWidgets('every row draws its mark, never a Material icon', (t) async {
+    t.view.physicalSize = const Size(360 * 3, 4200 * 3);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(const MaterialApp(home: ToolsHubScreen()));
+    await t.pumpAndSettle();
+    final rows = find.byType(PvListRow);
+    expect(rows, findsWidgets);
+    expect(find.descendant(of: rows, matching: find.byType(TtcMarkLeading)).evaluate().length,
+        rows.evaluate().length);
   });
 
   testWidgets('the TTC tab header, rows with drawn marks; 360 at 1.5x', (t) async {

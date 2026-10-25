@@ -26,7 +26,9 @@ import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
-import 'pp_care_parts.dart' show ppCareHeading;
+import 'pp_care_parts.dart' show ppCareHeading, ppCareSaved;
+import 'pp_use_ask_card.dart';
+import '../../services/pp_use_consent.dart';
 import 'pp_phases_data.dart' show ppFillChild;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
@@ -72,11 +74,27 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
     final p = pvStorePalette;
     Widget lead(String t) => pregToolPad(Text(t, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)));
     return AnimatedBuilder(
-      animation: _store,
+      // The child too: a switch redraws at once (tools pass, 2026-10-25).
+      animation: Listenable.merge([_store, ChildProfileStore.instance]),
       builder: (context, _) {
-        final emerging = _store.emerging;
+        // ⚠️ A TICK STAYS WHERE IT WAS (tools pass, Development, 2026-10-25).
+        // Was `_store.emerging` (seen ones left out) and every seen skill
+        // under "Usually settled by now ... windows that have already passed",
+        // so ticking an emerging skill moved it under a heading that was
+        // untrue for it. Now a seen skill stays in its own window, ticked;
+        // only a seen skill whose window has really passed sits there.
+        final age = ChildProfileStore.instance.devAgeInMonths;
+        final emerging = <Milestone>[
+          ..._store.inWindow,
+          // Seen before its window opened: shown with the emerging ones.
+          ..._store.achieved.where((m) => m.loMonths - 1 > age),
+        ];
         final soon = _store.comingSoon;
-        final settled = <Milestone>[..._store.achieved, ..._store.foundations];
+        // Was: <Milestone>[..._store.achieved, ..._store.foundations];
+        final settled = <Milestone>[
+          ..._store.achieved.where((m) => m.hiMonths < age),
+          ..._store.foundations,
+        ];
         return PregToolScaffold(
           hue: 28,
           eyebrow: 'Development',
@@ -89,10 +107,20 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
               label: 'I saw something new',
               onTap: _openQuickLog,
             )),
+            // Ask once, after the first milestone she keeps (tools pass D3,
+            // 2026-10-25). The card hides itself once she has answered.
+            if (_store.observedCount > 0) ...[
+              const SizedBox(height: 16),
+              pregToolPad(const PpUseAskCard(
+                kind: PpUseKind.development,
+                question: 'Add the milestones you see to Before you see the doctor?',
+              )),
+            ],
             const SizedBox(height: 26),
             pregToolPad(ppCareHeading('Emerging now')),
             const SizedBox(height: 6),
-            lead('Skills that often show around ${ChildProfileStore.instance.ageLabel}. Tap a card to turn it over.'),
+            // The list is by corrected age, so the label says so (was `ageLabel`).
+            lead('Skills that often show around ${ChildProfileStore.instance.ageLabelWithCorrection}. Tap a card to turn it over.'),
             const SizedBox(height: 12),
             if (emerging.isEmpty)
               lead('A quiet stretch, a lovely time to simply enjoy each other. New skills will surface soon.')
@@ -128,7 +156,10 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
             const SizedBox(height: 6),
             lead('A soft look ahead: you may begin noticing these in the months to come. Never a deadline.'),
             const SizedBox(height: 12),
-            pregToolPad(Column(children: [for (final m in soon.take(4)) _soonRow(m)])),
+            if (soon.isEmpty)
+              lead('Nothing new on the list for the next six months. Every skill above keeps growing with play and talk.')
+            else
+              pregToolPad(Column(children: [for (final m in soon.take(4)) _soonRow(m)])),
             const SizedBox(height: 14),
             pregToolPad(Container(
               padding: const EdgeInsets.all(16),
@@ -137,11 +168,17 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: p.line),
               ),
-              child: Text(
-                  ppFillChild('A row you have not ticked is not a row he has missed. If a skill he had has gone away, '
-                      'or something has felt off for a while, that is worth mentioning to your paediatrician, not '
-                      'because of anything on this page, but because you noticed it.'),
-                  style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink1)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                    ppFillChild('A row you have not ticked is not a row he has missed. If a skill he had has gone away, '
+                        'or something has felt off for a while, that is worth mentioning to your paediatrician, not '
+                        'because of anything on this page, but because you noticed it.'),
+                    style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink1)),
+                const SizedBox(height: 8),
+                Text('This is not a diagnosis or a test. The age windows are typical ranges, and your doctor knows your child best.',
+                    key: const ValueKey('pp_milestones_not_a_diagnosis'),
+                    style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
+              ]),
             )),
           ],
         );
@@ -371,7 +408,8 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                   ),
                   const SizedBox(height: 14),
                   if (q.isEmpty)
-                    Text('Type what he did and we will find the milestone it belongs to.',
+                    // Filled for the child (was a fixed "he", tools pass 2026-10-25).
+                    Text(ppFillChild('Type what he did and we will find the milestone it belongs to.'),
                         style: ppBody(13, color: ppMuted, h: 1.5))
                   else if (hits.isEmpty)
                     Text('Nothing matches that yet — it may not be a tracked milestone, which does not make it any less lovely.',
@@ -386,7 +424,9 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                             PvPress(child: GestureDetector(
                               onTap: () {
                                 Navigator.of(ctx).pop();
-                                _openDetail(m);
+                                // Straight to saving it (was _openDetail(m), then
+                                // "I've seen this", then the sheet: five taps).
+                                _store.isObserved(m.id) ? _openDetail(m) : _openObserveSheet(m);
                               },
                               behavior: HitTestBehavior.opaque,
                               child: Padding(
@@ -826,7 +866,14 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                         const SizedBox(width: 12),
                         Expanded(child: Text(_obsSubtitle(m.id), style: ppBody(13, color: ppInk, h: 1.4))),
                         PvPress(child: GestureDetector(
-                          onTap: () => _store.unobserve(m.id),
+                          // Says what it did (was a silent unobserve).
+                          onTap: () {
+                            final was = _store.observation(m.id);
+                            _store.unobserve(m.id);
+                            Navigator.of(ctx).pop();
+                            ppCareSaved(context, '"${m.title}" taken off Milestones.',
+                                undo: () => _store.markObserved(m.id, date: was?.date, note: was?.note));
+                          },
                           behavior: HitTestBehavior.opaque,
                           child: Text('Undo', style: ppBody(12.5, color: ppMuted, w: FontWeight.w700)),
                         )),
@@ -868,17 +915,57 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   // ---- observe (mark as seen) sheet ---------------------------------------
   void _openObserveSheet(Milestone m) {
     final note = TextEditingController();
+    // The day it was seen (was always today; `markObserved` took a date all
+    // along). Mobbin: Saturn's "Mark as done" sheet with its date row,
+    // mobbin.com/screens/c1c6d90c-bcf2-4334-b936-630a87738d1e.
+    var seen = DateTime.now();
     ppLogSheet(
       context,
       title: '“${m.title}” — lovely!',
       saveLabel: 'Keep this memory',
       body: (setSheet) => [
         Text('Mark this as observed and, if you like, add a little note to turn it into a memory.', style: ppBody(13, h: 1.55)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
+        InkWell(
+          key: const ValueKey('pp_milestone_seen_on'),
+          onTap: () async {
+            final now = DateTime.now();
+            final dob = ChildProfileStore.instance.dob;
+            final picked = await showDatePicker(
+              context: context,
+              initialDate: seen,
+              firstDate: dob.isAfter(now) ? now.subtract(const Duration(days: 1)) : dob,
+              lastDate: now,
+              helpText: 'When did you see it?',
+            );
+            if (picked != null) setSheet(() => seen = picked);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(children: [
+              Expanded(child: Text('Seen ${_dayWord(seen)}', style: ppBody(14, color: ppInk, w: FontWeight.w700))),
+              Text('Change', style: ppBody(13, color: ppMuted, w: FontWeight.w700)),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 8),
         ppToolTextField(note, 'A note (optional)', maxLines: 3),
       ],
-      onSave: () => _store.markObserved(m.id, note: note.text.trim().isEmpty ? null : note.text.trim()),
+      onSave: () {
+        _store.markObserved(m.id, date: seen, note: note.text.trim().isEmpty ? null : note.text.trim());
+        // Every save says what it changed (was silent).
+        ppCareSaved(context, 'Saved: ${m.title}, seen ${_dayWord(seen)}.', undo: () => _store.unobserve(m.id));
+      },
     );
+  }
+
+  /// "today", "yesterday" or the short date.
+  String _dayWord(DateTime d) {
+    final now = DateTime.now();
+    final day = DateTime(d.year, d.month, d.day);
+    final today = DateTime(now.year, now.month, now.day);
+    final diff = today.difference(day).inDays;
+    return diff == 0 ? 'today' : diff == 1 ? 'yesterday' : ppShortDate(d);
   }
 
   // ---- helpers ------------------------------------------------------------

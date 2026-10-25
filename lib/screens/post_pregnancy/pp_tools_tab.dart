@@ -35,7 +35,8 @@ import '../doors/pv_list_row.dart';
 import '../doors/pv_live_search.dart';
 import '../products/pv_store_chrome.dart' show pvStorePalette;
 import '../ttc/ttc_tab_root_header.dart' show TtcTabRootHeader, ttcTabRootIntroStyle;
-import '../ttc/ttc_tool_marks.dart' show ttcFamilyMarkForIntent;
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark, ttcFamilyMarkForIntent;
 import '../v2/v2_palette.dart';
 import 'pp_care_log_data.dart';
 import 'pp_care_parts.dart' show ppCareAgo;
@@ -49,11 +50,25 @@ import 'pp_surface_router.dart' show ppPushSurface, ppScreenForSurface, ppSurfac
 import 'pp_vaccine_data.dart';
 
 class PpTool {
-  const PpTool(this.title, this.line, this.surfaceId, this.mark, {this.live, this.words = const []});
+  const PpTool(this.title, this.line, this.surfaceId, this.mark,
+      {this.live, this.words = const [], this.tab, this.tool});
   final String title;
   final String line;
   final String surfaceId;
   final IntentMark mark;
+
+  /// The drawn mark this row wears (one of [tab] or [tool]). ⚠️ ONE GLYPH PER
+  /// TOOL (the user, 2026-10-25: "make sure the tools section the UI is
+  /// consistent with marks/glyphs"). [mark] went through the shared
+  /// `ttcFamilyMarkForIntent`, which doors and pregnancy also use: six of its
+  /// marks have no drawing, so those rows fell back to a plain disc with an
+  /// icon, and others folded onto one glyph (three bowls, three checklists,
+  /// three lotuses). Each row now names its own drawn mark, chosen by eye
+  /// from a rendered sheet of all of them; [mark] stays as the fallback.
+  /// Owed art: a moon (Sleep wears the clock) and a nappy (Nappies wears the
+  /// drops). `test/pp_tools_tab_test.dart` holds: every row drawn, none twice.
+  final TtcTabMark? tab;
+  final TtcToolMark? tool;
 
   /// The latest entry, when the tool logs something (Withings' pattern).
   final String? Function()? live;
@@ -99,91 +114,96 @@ List<PpToolGroup> ppToolGroups() {
   final under1 = ChildProfileStore.instance.ageInMonths < 12;
   return [
     PpToolGroup('Log the day', 206, [
-      PpTool('Feeding', 'Breast, bottle or solids, in one tap.', 'pp_feeding', IntentMark.forkMark,
+      PpTool('Feeding', 'Breast, bottle or solids, in one tap.', 'pp_feeding', tab: TtcTabMark.hotBottle, IntentMark.forkMark,
           live: _lastFeed, words: ['feed', 'milk', 'bottle', 'breast', 'doodh']),
-      PpTool('Sleep', 'Naps and nights, and the wake window.', 'pp_sleep', IntentMark.sunMark,
+      PpTool('Sleep', 'Naps and nights, and the wake window.', 'pp_sleep', tab: TtcTabMark.clock, IntentMark.sunMark,
           live: _lastSleep, words: ['nap', 'night', 'neend']),
-      PpTool('Sleep Sounds', 'Sounds to help your baby settle.', 'pp_sleep_sounds', IntentMark.audioMark,
+      PpTool('Sleep Sounds', 'Sounds to help your baby settle.', 'pp_sleep_sounds', tool: TtcToolMark.bell, IntentMark.audioMark,
           words: ['white noise', 'lullaby', 'lori']),
-      PpTool('Nappies', 'Wet and dirty, the clearest sign milk is going in.', 'pp_nappies', IntentMark.checkMark,
+      PpTool('Nappies', 'Wet and dirty, the clearest sign milk is going in.', 'pp_nappies', tab: TtcTabMark.cycleDrops, IntentMark.checkMark,
           live: _nappies, words: ['diaper', 'poo', 'wee']),
       if (under1)
-        PpTool('Breastfeed timer', 'Time each side, and see which side is next.', 'pp_feed_timer',
+        PpTool('Breastfeed timer', 'Time each side, and see which side is next.', 'pp_feed_timer', tool: TtcToolMark.stopwatch,
             IntentMark.timelineRail, words: ['side', 'latch']),
-      PpTool('Pumping', 'How much, from which side, and when.', 'pp_pump', IntentMark.listMark,
+      PpTool('Pumping', 'How much, from which side, and when.', 'pp_pump', tab: TtcTabMark.testStrip, IntentMark.listMark,
           live: _lastPump, words: ['express', 'pump']),
       if (under1)
-        PpTool('Tummy time', 'A few minutes, a few times a day.', 'pp_tummy_time', IntentMark.bodyMark),
-      PpTool('The last 7 days', 'Feeds, sleep and nappies, to share with your doctor.', 'pp_care_history',
+        PpTool('Tummy time', 'A few minutes, a few times a day.', 'pp_tummy_time', tab: TtcTabMark.bigSmallHearts, IntentMark.bodyMark),
+      PpTool('The last 7 days', 'Feeds, sleep and nappies, to share with your doctor.', 'pp_care_history', tab: TtcTabMark.chartLine,
           IntentMark.chartLog, words: ['history', 'report', 'week']),
     ]),
     PpToolGroup('Growth and health', 152, [
-      PpTool('Growth', 'Weight, height and head size on the WHO curves.', 'pp_growth', IntentMark.scaleMark,
+      PpTool('Growth', 'Weight, height and head size on the WHO curves.', 'pp_growth', tool: TtcToolMark.weight, IntentMark.scaleMark,
           live: _growth, words: ['weight', 'height', 'percentile']),
-      PpTool('Vaccines', 'What is done, what is next, and the day it was given.', 'pp_vaccines',
+      PpTool('Vaccines', 'What is done, what is next, and the day it was given.', 'pp_vaccines', tool: TtcToolMark.vaccinations,
           IntentMark.pillMark, live: () => VaxStore.instance.nextVisitSubtitle, words: ['shots', 'tika', 'vaccination']),
-      PpTool('Fever check', 'A temperature, checked calmly, and when to call.', 'pp_fever_check',
+      PpTool('Fever check', 'A temperature, checked calmly, and when to call.', 'pp_fever_check', tool: TtcToolMark.symptoms,
           IntentMark.thermoMark, words: ['fever', 'temperature', 'bukhar']),
       // ⚠️ ONE SYMPTOM TOOL FOR EVERY AGE (tools pass H2, 2026-10-25). Was two
       // rows: this one opened a newborn feeding check, and "Something changed?"
       // (below, kept for revert) was the real checker. Kept for revert:
       // PpTool('Is my baby OK?', 'A symptom, checked calmly, and when to call.', 'pp_baby_ok_check',
       //     IntentMark.questionMark, words: ['fever', 'sick', 'symptom']),
-      PpTool('Is my baby OK?', 'Sleep, feeding, illness or mood: checked calmly, and when to call.', 'pp_what_changed',
+      PpTool('Is my baby OK?', 'Sleep, feeding, illness or mood: checked calmly, and when to call.', 'pp_what_changed', tool: TtcToolMark.partnerHealth,
           IntentMark.questionMark,
           words: ['fever', 'sick', 'symptom', 'cough', 'vomit', 'rash', 'changed', 'regression', 'fussy', 'enough milk']),
-      PpTool('Health record', 'Visits, illnesses and papers in one place.', 'pp_health_home', IntentMark.reportPage,
+      PpTool('Health record', 'Visits, illnesses and papers in one place.', 'pp_health_home', tool: TtcToolMark.records, IntentMark.reportPage,
           words: ['records', 'documents']),
-      PpTool('Before you see the doctor', 'Questions and a summary to share.' /* was 'Questions and notes to take to the visit.': no notes field (tools pass) */, 'pp_doctor_visit',
+      PpTool('Before you see the doctor', 'Questions and a summary to share.' /* was 'Questions and notes to take to the visit.': no notes field (tools pass) */, 'pp_doctor_visit', tab: TtcTabMark.doctorChat,
           IntentMark.listMark, words: ['doctor', 'visit', 'questions', 'appointment']),
-      PpTool('Emergency card', 'Blood group, allergies and two numbers to call.', 'pp_emergency_card',
+      PpTool('Emergency card', 'Blood group, allergies and two numbers to call.', 'pp_emergency_card', tool: TtcToolMark.hospitalBag,
           IntentMark.askDoctor, words: ['emergency', 'sos']),
-      PpTool('Home remedies', 'Kitchen remedies from the elders, marked honestly.', 'pp_nuskhe',
+      PpTool('Home remedies', 'Kitchen remedies from the elders, marked honestly.', 'pp_nuskhe', tab: TtcTabMark.jarLeaf,
           IntentMark.spoonMark, words: ['nuskhe', 'gharelu', 'remedy', 'ajwain']),
     ]),
     PpToolGroup('Growing and learning', 28, [
-      PpTool("This month's checklist", 'What usually comes next, and what to try.', 'pp_month_checklist',
+      PpTool("This month's checklist", 'What usually comes next, and what to try.', 'pp_month_checklist', tab: TtcTabMark.checklist,
           IntentMark.calendarDay, words: ['month']),
-      PpTool('Milestones', 'Where your baby is right now, without a score.', 'pp_milestones', IntentMark.stepsMark,
+      PpTool('Milestones', 'Where your baby is right now, without a score.', 'pp_milestones', tab: TtcTabMark.flagPath, IntentMark.stepsMark,
           words: ['development', 'rolling', 'walking']),
-      PpTool('A gentle check-in', 'A few questions, and when to ask your paediatrician.', 'pp_dev_checkin',
+      PpTool('A gentle check-in', 'A few questions, and when to ask your paediatrician.', 'pp_dev_checkin', tab: TtcTabMark.sunrise,
           IntentMark.lampMark, words: ['delay', 'worry']),
-      // Named for where it lands: the door's "Things to do together today"
-      // opens every activity, not today's pick (tools pass R3, door label owed).
-      PpTool('Activities', "Play ideas for your baby's age, by area of growing.", 'pp_activities',
+      // Named for where it lands: every activity for this age, not today's pick.
+      // The door's "Things to do together today" now says the same (R3 settled 2026-10-25).
+      PpTool('Activities', "Play ideas for your baby's age, by area of growing.", 'pp_activities', tab: TtcTabMark.twoFigures,
           IntentMark.playMark, words: ['play', 'games', 'activity']),
-      PpTool("Your child's phases", 'What this phase is like, and what comes next.', 'pp_leaps',
-          IntentMark.moonMark, words: ['phase', 'leap', 'wonder weeks']),
+      // ⚠️ NOT A TOOL (tools pass D4, the user 2026-10-25: "why do we need to
+      // include phases screens for tools?"). It opens reading pages in the
+      // shared reader, and was listed here only because C1 saw it in the
+      // Development door's Phases tab. Home, My Child, the door and Is my baby
+      // OK? still open it; the C1 test allows it by name. Kept for revert:
+      // PpTool("Your child's phases", 'What this phase is like, and what comes next.', 'pp_leaps',
+      //     IntentMark.moonMark, words: ['phase', 'leap', 'wonder weeks']),
       // Folded into "Is my baby OK?" above (tools pass H2, 2026-10-25). Kept for revert:
       // PpTool('Something changed?', 'Sleep, feeding or mood suddenly different.', 'pp_what_changed',
       //     IntentMark.nextStep, words: ['regression', 'leap', 'fussy']),
-      PpTool('What to say', 'Calm words for tantrums, hitting and big feelings.', 'pp_scripts',
+      PpTool('What to say', 'Calm words for tantrums, hitting and big feelings.', 'pp_scripts', tab: TtcTabMark.twoBubbles,
           IntentMark.bookMark, words: ['tantrum', 'hitting', 'scripts', 'discipline']),
     ]),
     PpToolGroup('Food', 96, [
-      PpTool('What to feed at this age', 'Portions and textures for this age, and signs of enough.', 'pp_food_chart',
+      PpTool('What to feed at this age', 'Portions and textures for this age, and signs of enough.', 'pp_food_chart', tab: TtcTabMark.sprout,
           IntentMark.plate, words: ['how much', 'portion', 'solids', 'enough']),
-      PpTool('Can my baby eat this?', '289 foods, by age, with the reason.', 'pp_baby_food_check',
+      PpTool('Can my baby eat this?', '289 foods, by age, with the reason.', 'pp_baby_food_check', tab: TtcTabMark.magnifier,
           IntentMark.forkMark, words: ['food', 'honey', 'egg', 'solids']),
-      PpTool('Recipes', 'Indian home cooking for each age.', 'pp_food', IntentMark.cookMark,
+      PpTool('Recipes', 'Indian home cooking for each age.', 'pp_food', tool: TtcToolMark.nutrition, IntentMark.cookMark,
           words: ['recipe', 'khichdi', 'meal']),
     ]),
     PpToolGroup('For you', 288, [
-      PpTool('Can I...?', 'Quick answers while you breastfeed.', 'pp_maa_can_i', IntentMark.lotusMark,
+      PpTool('Can I...?', 'Quick answers while you breastfeed.', 'pp_maa_can_i', tool: TtcToolMark.canI, IntentMark.lotusMark,
           words: ['medicine', 'chai', 'fasting']),
-      PpTool('How have you been?', 'Two questions. No score, nothing saved.', 'pp_mood_check',
+      PpTool('How have you been?', 'Two questions. No score, nothing saved.', 'pp_mood_check', tab: TtcTabMark.heartHand,
           IntentMark.cuppedHands, words: ['mood', 'sad', 'low', 'anxious']),
       // Her own body after birth (2026-10-17: the user looked for Kegel Care
       // here and it was only inside the yoga hub and a pelvic floor page).
-      PpTool('Kegel Care', 'Breathing first, then kegels after your check.', 'pp_kegel', IntentMark.spineMark,
+      PpTool('Kegel Care', 'Breathing first, then kegels after your check.', 'pp_kegel', tab: TtcTabMark.tulip, IntentMark.spineMark,
           words: ['kegel', 'pelvic floor', 'leak', 'exercise']),
-      PpTool('Yoga & fitness', 'Recovery classes, core and calm.', 'pp_yoga', IntentMark.lotusMark,
+      PpTool('Yoga & fitness', 'Recovery classes, core and calm.', 'pp_yoga', tab: TtcTabMark.lotus, IntentMark.lotusMark,
           words: ['yoga', 'exercise', 'core', 'workout', 'postnatal']),
     ]),
     PpToolGroup('Plan and keep', 268, [
-      PpTool('Baby names', '2,031 names, with meaning, origin and Devanagari.', 'pp_names', IntentMark.pageMark,
+      PpTool('Baby names', '2,031 names, with meaning, origin and Devanagari.', 'pp_names', tab: TtcTabMark.openBook, IntentMark.pageMark,
           words: ['name']),
-      PpTool('Product guide', 'What is worth buying, and what to skip.', 'pp_product_guide', IntentMark.bagMark,
+      PpTool('Product guide', 'What is worth buying, and what to skip.', 'pp_product_guide', tab: TtcTabMark.wallet, IntentMark.bagMark,
           words: ['buy', 'products']),
     ]),
   ];
@@ -294,8 +314,11 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
     return PvListRow(
       key: ValueKey('pp_tool_${t.surfaceId}'),
       p: p,
-      leading: ttcFamilyMarkForIntent(t.mark, v2BlockTint(hue % 360, p)) ??
-          PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark),
+      leading: t.tab != null || t.tool != null
+          ? TtcMarkLeading(tab: t.tab, tool: t.tool, tint: v2BlockTint(hue % 360, p))
+          // The fallback for a row with no drawn mark of its own (none today).
+          : ttcFamilyMarkForIntent(t.mark, v2BlockTint(hue % 360, p)) ??
+              PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark),
       title: t.title,
       line: live ?? t.line,
       onTap: () => _open(t),

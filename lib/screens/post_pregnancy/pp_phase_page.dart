@@ -53,6 +53,7 @@ import 'pp_phase_doc_reads.dart' show ppPhaseDocAsRead, ppPhaseDocBlock, ppOpenM
 import 'pp_phase_faqs.dart' show phaseFaqs;
 import 'pp_phase_film.dart' show ppPhaseAsRead;
 import 'pp_phases_data.dart';
+import 'pp_child_profile.dart' show ChildProfileStore;
 import 'pp_products_data.dart' show PpProduct, kPpProducts, categoryByName;
 import 'pp_search.dart' show ppOpenSurface;
 import 'pp_section_registry.dart' show kPpSections;
@@ -85,12 +86,28 @@ class PpPhasePage extends StatefulWidget {
 
 class _PpPhasePageState extends State<PpPhasePage> {
   late final List<AgePhase> _phases = kPhases;
-  late final int _current = currentPhase().number;
+  // Was `late final _current = currentPhase().number`, read once: a child
+  // switch left the page on the other child's phase (tools pass, 2026-10-25).
+  late int _current = ppPhaseNowNumber();
   late final PageController _pc = PageController(
       initialPage: ((widget.initial ?? _current) - 1).clamp(0, _phases.length - 1));
 
   @override
+  void initState() {
+    super.initState();
+    ChildProfileStore.instance.addListener(_onChild);
+  }
+
+  void _onChild() {
+    final now = ppPhaseNowNumber();
+    if (now == _current || !mounted) return;
+    setState(() => _current = now);
+    if (_pc.hasClients) _pc.jumpToPage((now - 1).clamp(0, _phases.length - 1));
+  }
+
+  @override
   void dispose() {
+    ChildProfileStore.instance.removeListener(_onChild);
     _pc.dispose();
     super.dispose();
   }
@@ -122,6 +139,16 @@ class _PpPhasePageState extends State<PpPhasePage> {
       );
 }
 
+/// The child's own phase number, or one past the last when the child is past
+/// five, where the phases end (tools pass, 2026-10-25). `currentPhase()`
+/// clamps to the last phase, so a six-year-old was shown "This phase ·
+/// 4–5 years" with that phase's age page. Past the end, every phase reads as
+/// "Earlier" and none claims to be now.
+int ppPhaseNowNumber([ChildProfileStore? child]) {
+  final c = child ?? ChildProfileStore.instance;
+  return c.devAgeInMonths >= kPhases.last.endMonth ? kPhases.length + 1 : currentPhase(c).number;
+}
+
 /// One phase as a read: the doc (or the older phase prose where a doc is
 /// missing) plus this page's own "For this phase", questions and next step.
 PvRead ppPhasePageRead(AgePhase phase, {required int current}) {
@@ -141,6 +168,11 @@ PvRead ppPhasePageRead(AgePhase phase, {required int current}) {
       // the WHO ranges, call the doctor if. It reads the child's own age, so
       // it rides only on the child's own phase.
       if (n == current) PvReadSection(custom: PpPhaseAgeBlock(phase)),
+      // Past five: said once, on the last phase (tools pass, 2026-10-25).
+      if (current > kPhases.length && n == kPhases.length)
+        PvReadSection(paragraphs: [
+          _same('Your child is past five, where these phases end. This last one is kept here to look back on.'),
+        ]),
       PvReadSection(heading: _same('For this phase'), custom: PpPhaseOffersBlock(phase, doc)),
     ],
     faqs: [

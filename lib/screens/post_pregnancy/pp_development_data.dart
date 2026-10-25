@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // import '../../services/remote/cloud_synced_store.dart'; // kept for revert (step 13)
 import '../../services/remote/cloud_merged_store.dart';
+import 'pp_child_profile.dart' show ChildProfileStore;
 
 /// Supportive progress words - never percentages, never grades.
 enum DevWord { emerging, practicing, growing, confident, mastered }
@@ -178,8 +179,37 @@ class LookAhead {
 }
 
 class CheckInQ {
-  const CheckInQ(this.areaId, this.text, {this.redFlag = false, this.yesIsConcern = false});
+  const CheckInQ(this.areaId, this.text,
+      {this.redFlag = false, this.yesIsConcern = false, this.askFrom = 0, this.flagFrom = 0});
   final String areaId;
+
+  /// ⚠️ THE AGE IT IS FAIR TO ASK (tools pass, Development, 2026-10-25). The
+  /// 0-6 month questions used to start at birth, so a two-week-old honestly
+  /// got "Not yet" on smiling back and turning to voices, both act-early
+  /// signs, and her mother was told "Worth a word with your doctor". A
+  /// question is asked only from [askFrom] months (corrected age).
+  final int askFrom;
+
+  /// The age a "not yet" here becomes an act-early sign. Before it, a "not
+  /// yet" counts as an ordinary one. Taken from the milestones data's
+  /// "mention it by around" month (`pp_milestones_data.dart`), so the two
+  /// tools never disagree; where the milestones have no matching item, from
+  /// CDC/AAP 2022. REQUIRED_REVIEW (paediatrician), listed in BEFORE-LAUNCH.
+  final int flagFrom;
+
+  /// From when a "not yet" here counts at all, toward a sign or toward the
+  /// three that make it worth asking. Before it, the skill is still coming.
+  /// A red flag: its [flagFrom]. A lost skill: as soon as it is asked. An
+  /// ordinary question: three months after it is first asked, so a baby who
+  /// has only just reached a question's age is not counted against it (at 2
+  /// months three honest "not yet"s used to add up to "worth asking").
+  int get countsFrom => yesIsConcern
+      ? askFrom
+      : flagFrom > 0
+          ? flagFrom
+          : askFrom > 0
+              ? askFrom + 3
+              : 0;
 
   /// The question, authored with he/him/his (filled for the child on screen
   /// with `ppFillChild`). ALSO THE STORAGE KEY: never fill it before storing.
@@ -197,24 +227,33 @@ class CheckInQ {
 
 /// The question every band ends with. A loss of skills at any age is the one
 /// sign that always goes to the doctor (CDC "act early").
+// Asked from 6 months: a two-month-old has no words or walking to lose.
 const CheckInQ kCheckInLostSkill = CheckInQ('all',
     'Has he lost a skill he used to have, like words, sounds or walking?',
-    redFlag: true, yesIsConcern: true);
+    redFlag: true, yesIsConcern: true, askFrom: 6);
 
 /// What the answers add up to: whether to suggest the paediatrician.
 /// Any red-flag "not yet", a lost skill, or three or more "not yet"s.
-bool checkInWorthAsking(List<CheckInQ> qs, bool? Function(String text) answer) {
+/// With [months] (corrected age), a "not yet" counts only from its
+/// [CheckInQ.countsFrom]; before that the skill is still coming.
+bool checkInWorthAsking(List<CheckInQ> qs, bool? Function(String text) answer, {int? months}) {
   var notYet = 0;
   for (final q in qs) {
     final a = answer(q.text);
     if (a == null) continue;
     final concern = q.yesIsConcern ? a == true : a == false;
     if (!concern) continue;
+    if (months != null && months < q.countsFrom) continue;
     if (q.redFlag) return true;
     notYet++;
   }
   return notYet >= 3;
 }
+
+/// A "yes" to a lost skill: the one answer that shows the result at once,
+/// without waiting for the rest.
+bool checkInLostSkill(List<CheckInQ> qs, bool? Function(String text) answer) =>
+    qs.any((q) => q.yesIsConcern && answer(q.text) == true);
 
 // ---- development areas ------------------------------------------------------
 const Color _amber = Color(0xFFC98A2B);
@@ -590,39 +629,47 @@ const Map<String, String> kCheckInRenames = {
 };
 
 const List<CheckInQ> kCheckIns0to6 = [
-  CheckInQ('gross_motor', 'Does he push up on his forearms during tummy time?'),
-  CheckInQ('social', 'Does he smile back when you smile at him?', redFlag: true),
-  CheckInQ('language', 'Does he turn toward your voice or new sounds?', redFlag: true),
-  CheckInQ('fine_motor', 'Does he bring his hands together at his chest?'),
-  CheckInQ('cognitive', 'Does he follow a toy as you move it across his view?'),
-  CheckInQ('emotional', 'Does he settle more easily in your arms?'),
+  CheckInQ('gross_motor', 'Does he push up on his forearms during tummy time?', askFrom: 3),
+  // Milestones: "no social smile by around 3 months".
+  CheckInQ('social', 'Does he smile back when you smile at him?', redFlag: true, askFrom: 2, flagFrom: 3),
+  // No milestone item; CDC 2022: turns to your voice at 4 months, act early by 6.
+  CheckInQ('language', 'Does he turn toward your voice or new sounds?', redFlag: true, askFrom: 4, flagFrom: 6),
+  CheckInQ('fine_motor', 'Does he bring his hands together at his chest?', askFrom: 3),
+  CheckInQ('cognitive', 'Does he follow a toy as you move it across his view?', askFrom: 2),
+  CheckInQ('emotional', 'Does he settle more easily in your arms?', askFrom: 2),
 ];
 
 const List<CheckInQ> kCheckIns6to12 = [
-  CheckInQ('gross_motor', 'Can he sit without you holding him?', redFlag: true),
-  CheckInQ('social', 'Does he look for you when you leave the room?'),
-  CheckInQ('language', 'Does he babble strings of sounds, like ba-ba or da-da?', redFlag: true),
+  // Milestones: "sitting ... not emerging by around 9 months".
+  CheckInQ('gross_motor', 'Can he sit without you holding him?', redFlag: true, askFrom: 6, flagFrom: 9),
+  CheckInQ('social', 'Does he look for you when you leave the room?', askFrom: 7),
+  // Milestones: "no babbling or vocal play by around 9 months".
+  CheckInQ('language', 'Does he babble strings of sounds, like ba-ba or da-da?', redFlag: true, askFrom: 6, flagFrom: 9),
   // Reworded 2026-10-22 (Wave 7): the old text matched What to Expect for
   // 8 words. Answers saved under it move over in kCheckInRenames.
   // CheckInQ('fine_motor', 'Does he pass a toy from one hand to the other?'),
   CheckInQ('fine_motor', 'Can he hand a toy across to his other hand?'),
-  CheckInQ('cognitive', 'Does he look for a toy after you hide it under a cloth?'),
+  CheckInQ('cognitive', 'Does he look for a toy after you hide it under a cloth?', askFrom: 8),
   CheckInQ('emotional', 'Does he calm faster when you pick him up than when someone else does?'),
 ];
 
 const List<CheckInQ> kCheckIns1to2 = [
-  CheckInQ('gross_motor', 'Is he pulling up, cruising along furniture, or walking?', redFlag: true),
-  CheckInQ('social', 'Does he bring something over to show you?', redFlag: true),
-  CheckInQ('language', 'Does he use a few words, even unclear ones, that mean something?', redFlag: true),
+  // No milestone item for pulling up (walking is 18); CDC 2022 15-month.
+  CheckInQ('gross_motor', 'Is he pulling up, cruising along furniture, or walking?', redFlag: true, askFrom: 12, flagFrom: 15),
+  // No milestone item; CDC 2022: shows you objects by 15 months, act early by 18.
+  CheckInQ('social', 'Does he bring something over to show you?', redFlag: true, askFrom: 12, flagFrom: 18),
+  // Milestones: "no words at all by about 16 months".
+  CheckInQ('language', 'Does he use a few words, even unclear ones, that mean something?', redFlag: true, askFrom: 12, flagFrom: 16),
   CheckInQ('fine_motor', 'Does he pick up small pieces of food with finger and thumb?'),
-  CheckInQ('cognitive', 'Does he follow a simple ask, like giving you the spoon?'),
+  CheckInQ('cognitive', 'Does he follow a simple ask, like giving you the spoon?', askFrom: 15),
   CheckInQ('emotional', 'Does he look at your face to check before trying something new?'),
 ];
 
 const List<CheckInQ> kCheckIns2to3 = [
   CheckInQ('gross_motor', 'Does he run, and climb onto low furniture?'),
   CheckInQ('social', 'Does he play alongside other children, even without joining in?'),
-  CheckInQ('language', 'Does he put two words together, like more milk?', redFlag: true),
+  // Milestones: "no two-word phrases by about two years".
+  CheckInQ('language', 'Does he put two words together, like more milk?', redFlag: true, askFrom: 24, flagFrom: 24),
   CheckInQ('fine_motor', 'Does he scribble, and turn the pages of a book?'),
   CheckInQ('cognitive', 'Does he pretend, like feeding a doll or talking on a phone?'),
   CheckInQ('emotional', 'Does he show a strong opinion about what he wants?'),
@@ -631,13 +678,16 @@ const List<CheckInQ> kCheckIns2to3 = [
 const List<CheckInQ> kCheckIns3plus = [
   CheckInQ('gross_motor', 'Does he jump with both feet, or pedal a tricycle?'),
   CheckInQ('social', 'Does he take turns in a game, even with reminders?'),
-  CheckInQ('language', 'Can someone outside the family understand most of what he says?', redFlag: true),
+  // Milestones: "strangers understand very little ... by about three".
+  CheckInQ('language', 'Can someone outside the family understand most of what he says?', redFlag: true, askFrom: 36, flagFrom: 36),
   CheckInQ('fine_motor', 'Does he hold a crayon in his fingers rather than his fist?'),
   CheckInQ('cognitive', 'Does he ask why, and want a real answer?'),
   CheckInQ('emotional', 'Can he name a feeling, like happy, sad or angry?'),
 ];
 
-/// The six questions that fit a child of [months].
+/// The questions that fit a child of [months] (corrected age): the band's
+/// six, less any not yet fair to ask ([CheckInQ.askFrom]). Empty for the
+/// first weeks, when the screen says it is early for a check-in.
 List<CheckInQ> checkInsForAge(int months) {
   // Every band ends with the lost-skill question (2026-10-07).
   final band = months < 6
@@ -649,7 +699,10 @@ List<CheckInQ> checkInsForAge(int months) {
               : months < 36
                   ? kCheckIns2to3
                   : kCheckIns3plus;
-  return [...band, kCheckInLostSkill];
+  return [
+    for (final q in [...band, kCheckInLostSkill])
+      if (months >= q.askFrom) q,
+  ];
 }
 
 /// ⚠️ KEPT AS AN ALIAS, NOT DELETED. `kCheckIns` was the whole API and other
@@ -808,14 +861,36 @@ List<DevStage> activeStages(DevArea area) =>
 
 // =============================================================================
 //  DevStore - saved & completed activities + gentle check-in answers.
+// -----------------------------------------------------------------------------
+//  ⚠️ PER CHILD SINCE 2026-10-25 (tools pass, Development, sync step 19).
+//  Answers were keyed by the question's wording alone (`q|<text>`), so a
+//  sibling in the same age band opened the check-in to find the other child's
+//  answers already ticked, and a "we did this" was one set for the family. The
+//  cloud row is one `user_state` row per person, so the owner has to live in
+//  the ITEM KEY: `q|<childId>|<text>` holds {yes, at}, `c|<childId>|<id>` holds
+//  the day it was tried (BACKEND-PATTERNS §16pp).
+//
+//  Items written before the split carry no child. They are never rewritten or
+//  deleted; they are read only while the family has one child (or none), when
+//  they can only be that child's. With two children nobody can say whose they
+//  were, so neither inherits them: the check-in asks again.
 // =============================================================================
 class DevStore extends ChangeNotifier with CloudMergedStore {
   DevStore._();
   static final DevStore instance = DevStore._();
 
-  final Set<String> _saved = {'peekaboo'};
-  final Set<String> _completed = {'tummy_play'};
+  // A fake starter state, shown to every new install as if she had saved and
+  // done these. Kept for revert:
+  // final Set<String> _saved = {'peekaboo'};
+  // final Set<String> _completed = {'tummy_play'};
+  final Set<String> _saved = {};
+  // Unowned (pre-2026-10-25) items: done activity ids and answers by wording.
+  final Set<String> _completed = {};
   final Map<String, bool> _checkIns = {}; // question text -> yes/no
+  // Owned: childId -> activity id -> 'yyyy-mm-dd' tried.
+  final Map<String, Map<String, String>> _triedBy = {};
+  // Owned: childId -> question text -> the answer and the day it was given.
+  final Map<String, Map<String, DevAnswer>> _answersBy = {};
 
   // ---- persistence (user_state KV; own-only, a personal preference) --------
   static const _prefsKey = 'pp_development';
@@ -827,7 +902,14 @@ class DevStore extends ChangeNotifier with CloudMergedStore {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_prefsKey);
-      if (raw != null) applyLegacyBlob(jsonDecode(raw));
+      if (raw != null) {
+        final data = jsonDecode(raw);
+        applyLegacyBlob(data);
+        // The owned items ride in the local cache beside the old blob shape.
+        if (data is Map && data['items'] is Map) {
+          _applyOwned((data['items'] as Map).cast<String, Object?>());
+        }
+      }
     } catch (_) {/* keep the starter state */}
     notifyListeners();
     try {
@@ -848,15 +930,24 @@ class DevStore extends ChangeNotifier with CloudMergedStore {
   //         'checkIns': _checkIns,
   //       };
 
-  /// The local prefs blob (the shape the cloud blob had before step 13).
+  /// The local prefs blob (the shape the cloud blob had before step 13), plus
+  /// the owned items under `items` (2026-10-25).
   Map<String, Object?> _blob() => {
         'saved': _saved.toList(),
         'completed': _completed.toList(),
         'checkIns': _checkIns,
+        'items': _ownedItems(),
       };
 
   @override
   String? get legacyBlobKey => cloudKey;
+
+  Map<String, Object?> _ownedItems() => {
+        for (final c in _triedBy.entries)
+          for (final e in c.value.entries) 'c|${c.key}|${e.key}': e.value,
+        for (final c in _answersBy.entries)
+          for (final e in c.value.entries) 'q|${c.key}|${e.key}': e.value.toJson(),
+      };
 
   // One item per saved activity, per completed activity and per answer, so two
   // phones ticking different things both keep their tick (step 13).
@@ -865,6 +956,7 @@ class DevStore extends ChangeNotifier with CloudMergedStore {
         for (final id in _saved) 's|$id': true,
         for (final id in _completed) 'c|$id': true,
         for (final e in _checkIns.entries) 'q|${e.key}': e.value,
+        ..._ownedItems(),
       };
 
   @override
@@ -872,13 +964,43 @@ class DevStore extends ChangeNotifier with CloudMergedStore {
     _saved.clear();
     _completed.clear();
     _checkIns.clear();
+    _triedBy.clear();
+    _answersBy.clear();
     for (final e in items.entries) {
       if (e.key.startsWith('s|')) {
         _saved.add(e.key.substring(2));
-      } else if (e.key.startsWith('c|')) {
+      } else if (e.key.startsWith('c|') && !e.key.substring(2).contains('|')) {
         _completed.add(e.key.substring(2));
-      } else if (e.key.startsWith('q|')) {
+      } else if (e.key.startsWith('q|') && !e.key.substring(2).contains('|')) {
         _takeAnswer(e.key.substring(2), e.value == true);
+      }
+    }
+    _applyOwned(items);
+  }
+
+  /// The owned items: `c|<childId>|<id>` and `q|<childId>|<text>`. A key with a
+  /// second bar has an owner; question wording and activity ids never hold one.
+  void _applyOwned(Map<String, Object?> items) {
+    for (final e in items.entries) {
+      final k = e.key;
+      if (!k.startsWith('c|') && !k.startsWith('q|')) continue;
+      final rest = k.substring(2);
+      final bar = rest.indexOf('|');
+      if (bar <= 0) continue;
+      final child = rest.substring(0, bar);
+      final id = rest.substring(bar + 1);
+      if (k.startsWith('c|')) {
+        if (e.value is String) (_triedBy[child] ??= {})[id] = e.value as String;
+      } else {
+        final a = DevAnswer.fromJson(e.value);
+        if (a == null) continue;
+        final to = kCheckInRenames[id];
+        final answers = _answersBy[child] ??= {};
+        if (to == null) {
+          answers[id] = a;
+        } else {
+          answers.putIfAbsent(to, () => a);
+        }
       }
     }
   }
@@ -927,27 +1049,132 @@ class DevStore extends ChangeNotifier with CloudMergedStore {
     persistLocalCache();
   }
 
+  // ---- whose -----------------------------------------------------------------
+  /// The child on screen, or null before a child is saved (then the unowned
+  /// items are the only ones, exactly as before the split).
+  static String? Function() activeChild = () => ChildProfileStore.instance.activeChildId;
+
+  /// How many children the family has. The unowned items are read only while
+  /// this is one or none: then they can only be that child's.
+  static int Function() childCount = () => ChildProfileStore.instance.childIds.length;
+
+  bool get _legacyReadable => childCount() <= 1;
+
+  static String _day(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  // ---- saved (the reader's bookmark is the live save; these are older) ------
   bool isSaved(String id) => _saved.contains(id);
   void toggleSave(String id) {
     _saved.contains(id) ? _saved.remove(id) : _saved.add(id);
     notifyListeners();
   }
 
-  bool isCompleted(String id) => _completed.contains(id);
-  void toggleComplete(String id) {
-    _completed.contains(id) ? _completed.remove(id) : _completed.add(id);
+  // Unknown ids are dropped rather than mapped to the first activity, which
+  // `devActivityById` falls back to.
+  List<DevActivity> get savedActivities => [
+        for (final id in _saved)
+          if (kDevActivities.any((a) => a.id == id)) devActivityById(id),
+      ];
+
+  // ---- tried ("We tried this") ---------------------------------------------
+  /// The day the child on screen tried [id], or null (also null for an
+  /// unowned tick, which kept no day).
+  DateTime? triedOn(String id) {
+    final child = activeChild();
+    final owned = child == null ? null : _triedBy[child]?[id];
+    return owned == null ? null : DateTime.tryParse(owned);
+  }
+
+  bool isCompleted(String id) {
+    if (triedOn(id) != null) return true;
+    if (activeChild() != null && !_legacyReadable) return false;
+    return _completed.contains(id);
+  }
+
+  /// Marks [id] tried today for the child on screen, or clears it.
+  void toggleComplete(String id) => isCompleted(id) ? untry(id) : markTried(id);
+
+  void markTried(String id, {DateTime? on}) {
+    final child = activeChild();
+    if (child == null) {
+      _completed.add(id);
+    } else {
+      (_triedBy[child] ??= {})[id] = _day(on ?? DateTime.now());
+    }
     notifyListeners();
   }
 
-  List<DevActivity> get savedActivities => _saved.map(devActivityById).toList();
-
-  bool? checkInAnswer(String text) => _checkIns[text];
-  void setCheckIn(String text, bool yes) {
-    _checkIns[text] = yes;
+  void untry(String id) {
+    final child = activeChild();
+    if (child != null) _triedBy[child]?.remove(id);
+    // An unowned tick goes too, while it is readable as this child's.
+    if (child == null || _legacyReadable) _completed.remove(id);
     notifyListeners();
   }
 
-  int get checkInsAnswered => _checkIns.length;
+  // ---- the gentle check-in ----------------------------------------------------
+  /// The child on screen's answer to [text], with the day it was given.
+  DevAnswer? answerFor(String text) {
+    final child = activeChild();
+    final owned = child == null ? null : _answersBy[child]?[text];
+    if (owned != null) return owned;
+    if (child != null && !_legacyReadable) return null;
+    final legacy = _checkIns[text];
+    return legacy == null ? null : DevAnswer(legacy, null);
+  }
+
+  bool? checkInAnswer(String text) => answerFor(text)?.yes;
+
+  void setCheckIn(String text, bool yes, {DateTime? on}) {
+    final child = activeChild();
+    if (child == null) {
+      _checkIns[text] = yes;
+    } else {
+      (_answersBy[child] ??= {})[text] = DevAnswer(yes, on ?? DateTime.now());
+    }
+    notifyListeners();
+  }
+
+  /// Start the check-in again for the child on screen: their answers go, and
+  /// so do unowned answers while those read as this child's.
+  void clearCheckIns(Iterable<String> texts) {
+    final child = activeChild();
+    for (final t in texts) {
+      if (child != null) _answersBy[child]?.remove(t);
+      if (child == null || _legacyReadable) _checkIns.remove(t);
+    }
+    notifyListeners();
+  }
+
+  int get checkInsAnswered {
+    final child = activeChild();
+    final owned = child == null ? const <String>{} : (_answersBy[child]?.keys.toSet() ?? const <String>{});
+    final legacy = (child == null || _legacyReadable) ? _checkIns.keys.toSet() : const <String>{};
+    return {...owned, ...legacy}.length;
+  }
+}
+
+/// One check-in answer: yes or not yet, and the day it was given (null for an
+/// answer saved before 2026-10-25, which kept no day).
+class DevAnswer {
+  const DevAnswer(this.yes, this.at);
+  final bool yes;
+  final DateTime? at;
+
+  Map<String, Object?> toJson() => {
+        'yes': yes,
+        if (at != null) 'at': DevStore._day(at!),
+      };
+
+  static DevAnswer? fromJson(Object? v) {
+    if (v is bool) return DevAnswer(v, null);
+    if (v is! Map) return null;
+    final yes = v['yes'];
+    if (yes is! bool) return null;
+    final at = v['at'];
+    return DevAnswer(yes, at is String ? DateTime.tryParse(at) : null);
+  }
 }
 
 // =============================================================================

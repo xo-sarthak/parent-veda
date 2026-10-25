@@ -41,6 +41,9 @@ import 'pp_month_notes.dart';
 import 'pp_phases_data.dart';
 import 'pp_vaccine_data.dart';
 import 'vax_tracker_screen.dart';
+import 'pp_search.dart' show ppOpenSurface;
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 
 class PpMonthChecklistScreen extends StatefulWidget {
   const PpMonthChecklistScreen({super.key});
@@ -74,7 +77,12 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
         final phase = currentPhase();
         final note = ppMonthNoteFor(c.devAgeInMonths);
         final ms = MilestoneStore.instance;
-        final emerging = ms.emerging;
+        // Was `ms.emerging.take(6)`: the catalogue is in domain order, so six
+        // were often all movement, and a ticked row vanished at once (its
+        // untick could never run). Now every skill in the window, seen ones
+        // kept and ticked, one from each area in turn (tools pass, 2026-10-25).
+        final emerging = _byAreaInTurn(ms.inWindow);
+        const shown = 8;
         final vax = VaxStore.instance;
         final next = vax.nextVisit;
         final body = pvManrope(fontSize: 14, height: 1.55, color: p.ink1);
@@ -117,7 +125,7 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
               emerging.isEmpty
                   ? Text('Nothing new on the list for this age. Keep playing and talking; it all counts.', style: body)
                   : Column(children: [
-                      for (final m in emerging.take(6))
+                      for (final m in emerging.take(shown))
                         _TickRow(
                           key: ValueKey('pp_checklist_ms_${m.id}'),
                           label: m.title,
@@ -125,15 +133,35 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
                           onTap: () {
                             pvCommitFeedback();
                             if (ms.isObserved(m.id)) {
+                              final was = ms.observation(m.id);
                               ms.unobserve(m.id);
+                              ppCareSaved(context, '"${m.title}" taken off Milestones.',
+                                  undo: () => ms.markObserved(m.id, date: was?.date, note: was?.note));
                             } else {
                               ms.markObserved(m.id);
-                              ppCareSaved(context, '"${m.title}" saved to the milestone journey.');
+                              // Was 'saved to the milestone journey.': the tool is Milestones now.
+                              ppCareSaved(context, '"${m.title}" saved to Milestones, seen today.',
+                                  undo: () => ms.unobserve(m.id));
                             }
                           },
                         ),
                       const SizedBox(height: 4),
-                      Text('Ticks go to the milestone journey. A skill not here yet is not a worry on its own.',
+                      // Was plain text naming "the milestone journey". Now a
+                      // link, and it says how many more there are.
+                      InkWell(
+                        key: const ValueKey('pp_checklist_all_milestones'),
+                        onTap: () => ppOpenSurface(context, 'pp_milestones'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            emerging.length > shown
+                                ? 'See all ${emerging.length} in Milestones  →'
+                                : 'Ticks go to Milestones  →',
+                            style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1),
+                          ),
+                        ),
+                      ),
+                      Text('A skill not here yet is not a worry on its own.',
                           style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
                     ]),
             ),
@@ -174,7 +202,8 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    Icon(Icons.local_hospital_outlined, size: 20, color: p.ink1),
+                    // A drawn mark (was Icon(Icons.local_hospital_outlined)).
+                    TtcMarkLeading(tab: TtcTabMark.doctorChat, tint: v2BlockTint(28, p), size: 28),
                     const SizedBox(width: 8),
                     Flexible(child: Text('Call the doctor if', style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1))),
                   ]),
@@ -184,6 +213,10 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
                     if (doctor != null) const SizedBox(height: 6),
                     Text('Talk to your doctor if ${note.callIf}', style: body),
                   ],
+                  const SizedBox(height: 8),
+                  Text('This is general guidance, not a diagnosis. Your own doctor knows ${c.nameMid} best.',
+                      key: const ValueKey('pp_checklist_not_a_diagnosis'),
+                      style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
                 ]),
               )),
             if (you != null) section('And you', Text(you, style: body)),
@@ -193,6 +226,21 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
       },
     );
   }
+}
+
+/// One skill from each area in turn, so a short list is never all movement.
+List<Milestone> _byAreaInTurn(List<Milestone> ms) {
+  final byArea = <DevDomain, List<Milestone>>{};
+  for (final m in ms) {
+    (byArea[m.domain] ??= []).add(m);
+  }
+  final out = <Milestone>[];
+  for (var i = 0; out.length < ms.length; i++) {
+    for (final list in byArea.values) {
+      if (i < list.length) out.add(list[i]);
+    }
+  }
+  return out;
 }
 
 class _TickRow extends StatelessWidget {

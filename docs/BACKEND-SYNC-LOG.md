@@ -1304,7 +1304,7 @@ comments). `sync_reset_coverage_test` also passes.
 ## Step 17: the Health tools: ask once covers what she tells the symptom tool, and edits keep their ids
 
 **Date:** 2026-10-25 (parenting tools pass, Health family; the user's rule: "make sure the back ends are working well").
-**Migration:** none. **Commit:** pending.
+**Migration:** none. **Commit:** `66a1610`.
 
 ### What changed
 - [x] **Two new consent kinds,** `nappies` and `changes`, ride the same `PpUseConsent` merged store as `feeds` (step 15). They need no new key: one item per kind under `pp_use_consent`.
@@ -1405,3 +1405,42 @@ pregnancy overwrote the first's mood; and there was no way to look back at an ea
   `cloud_merged_store.dart`, `family_timeline.dart` and `life_stage_store.dart` (`ready`), `main.dart`,
   `pv_family_switch.dart`, `pv_you_content.dart`, `pv_you_screen.dart`, `dear_baby_vault_screen.dart`,
   `pv_door_after_loss.dart`.
+
+## Step 19: the Development tools: a check-in answer and a "we tried this" belong to one child
+
+**Date:** 2026-10-25 (parenting tools pass, Development family 17-21; the user's rule: "make sure the back ends are
+working well"). **Migration:** none. **Commit:** pending.
+
+### Why
+`DevStore` (`pp_development`, the step-13 per-item merge) kept the gentle check-in's answers keyed by the question's
+wording (`q|<text>`) and one "done" set for the family (`c|<id>`). A sibling in the same age band opened the
+check-in with the other child's answers already ticked, and twins shared every "done". It also started every new
+install with a fake saved activity (`peekaboo`) and a fake done one (`tummy_play`), which the recommendations then
+read as hers.
+
+### What changed
+- [x] **The owner rides in the item key.** New items `q|<childId>|<text>` hold `{yes, at}` (the answer and the day),
+  and `c|<childId>|<activityId>` holds the day it was tried. The state row is one `user_state` row per person (step
+  14), so the item key is the only place a child can be named. No migration: the server merge takes any key.
+- [x] **Items from before the split are kept, not moved.** An unowned `q|<text>` or `c|<id>` is never rewritten or
+  deleted. It is read only while the family has one child (or none), when it can only be that child's. With two
+  children nobody can say whose it was, so neither child inherits it.
+- [x] **The fake starter rows are commented out** (kept for revert). Recommendations read the reader's bookmarks
+  (`PvReadStore`, `pp_activity_<id>`), which is where an activity is saved now.
+- [x] **A new consent kind, `development`** ("Milestones and check-in answers"), on the same `PpUseConsent` merged
+  store as feeds, nappies and changes. With a yes, the check-in's "not yet" answers go to the doctor-visit questions
+  (`HealthStore.addQuestion`, already per child) and the visit summary lists the milestones seen in the last three
+  months. Without it, nothing is read.
+
+- [x] **Found on the way: two children could share one id.** `child_<microseconds>` alone, so two children added
+  back to back (twins at onboarding) could land on one tick, and every per-child store then treated them as one
+  child. Ids now end in a counter, as feed ids do (`ChildProfileStore._newChildId`). Ids already saved keep their
+  shape, and nothing reads an id's parts, so no data moves.
+
+**Verified:** `test/pp_development_tools_test.dart` (two children's answers and tries stay apart; an old answer is read
+with one child and not with two, and still goes up unchanged; the item keys on a played server; the rename carries
+inside an owned key; no fake starter rows), `test/pp_development_screens_test.dart` (the visit reads development only
+after a yes), `cloud_merged_store_test`, `pp_checkin_rename_test`, `pp_use_consent_sync_test`.
+
+**Files:** `lib/screens/post_pregnancy/pp_development_data.dart` (`DevStore`, `DevAnswer`), `pp_child_profile.dart`, `pp_reco_data.dart`,
+`health_doctor_visit_screen.dart`, `development_checkin_screen.dart`, `lib/services/pp_use_consent.dart`.

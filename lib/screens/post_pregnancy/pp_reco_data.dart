@@ -31,6 +31,8 @@ import '../../brand/brand_studio.dart';
 import '../../brand/rank_floor.dart';
 import '../../services/family_profile.dart';
 import 'pp_development_data.dart';
+import 'pp_grow_data.dart' show kGrowActivities;
+import '../../services/pv_read_store.dart' show PvReadStore;
 import 'pp_phases_data.dart';
 import 'pp_products_data.dart';
 import 'pp_reading_data.dart';
@@ -1113,7 +1115,15 @@ class RecoContext {
     for (final a in ReadingStore.instance.saved) {
       addWords(readCollectionById(a.collection).title);
     }
-    for (final act in DevStore.instance.savedActivities) {
+    // An activity is saved with the reader's bookmark now (Wave 5b), as
+    // `pp_activity_<id>`; DevStore's own set is only what was saved before
+    // that (tools pass, Development, 2026-10-25).
+    final bookmarked = [
+      for (final id in PvReadStore.instance.saved)
+        if (id.startsWith('pp_activity_'))
+          ...kGrowActivities.where((a) => a.id == id.substring('pp_activity_'.length)),
+    ];
+    for (final act in [...DevStore.instance.savedActivities, ...bookmarked]) {
       for (final sk in act.skills) {
         addWords(sk);
       }

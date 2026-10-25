@@ -85,7 +85,9 @@ final PpDoor kPpEarlyLearningDoor = PpDoor(
         // The one tracker, Development's. "Milestones and speech, the same
         // tracker used in Development. Kept in one place."
         PpDoorTool(
-          label: 'Where your baby is right now',
+          // Named as the tool is (tools pass, 2026-10-25). Was 'Where your
+          // baby is right now', three lines on a tab that opens at age 2.
+          label: 'Milestones',
           blurb: 'Milestones, speech and what usually comes next. Kept in one '
               'place so nothing here has to guess.',
           surfaceId: 'pp_milestones',

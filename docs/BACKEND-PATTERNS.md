@@ -4026,3 +4026,53 @@ so each silently adopted the other's entries, and whichever wrote last won on th
 the cloud kept each in its own table. Keys are a namespace with no compiler, so `pregnancy_records_test` now scans
 every `static const *Key = '...'` and fails on a duplicate. The split runs once and tells the shapes apart by a
 field only one of them writes.
+
+## 16pp. The owner in the item key, and an orphan read only where it can have one owner (no migration, 2026-10-25)
+
+Sync step 19, the parenting tools pass (Development, `docs/pp-tool-plans/17-21-development.md`).
+
+### 1. When the row is per person, the child has to live in the key
+
+16mm put the owner into the phone's local shape because the *server* row was keyed by child
+(`(child_id, milestone_id)`). `DevStore` is the other case. It syncs through `user_state`: one row per person,
+holding a map of items (the step-13 merge). There is no `child_id` column to put the owner in. Its items were
+`q|<question text>` and `c|<activity id>`, so a check-in answer belonged to the *family*, and a sibling in the same
+age band opened the check-in with the other child's answers already ticked.
+
+**Two fixes, and the one we chose.**
+- *A table per child-scoped thing:* a new `pp_checkin_answers (child_id, question, ...)` table with its own RLS and
+  ledger. That is the most explicit shape, but it means a migration, policies, a ledger and a contract test for a
+  handful of yes/no answers.
+- *The owner in the item key (chosen):* `q|<childId>|<text>` and `c|<childId>|<id>`. The merge already treats each
+  key as its own item with its own clock, so two phones answering for two children never collide. No migration,
+  because the server merge takes any key. The cost: the key is now a small format (`kind|owner|id`) that the store
+  has to parse, and it only works because neither question wording nor activity ids ever contain a `|`. The parser
+  relies on that, and a test pins it.
+
+**The general fact.** The key of a merged item is its identity, so it must say everything that makes it *this* fact
+and not another: here, *whose* answer, not only *which* question. It is the same rule as 16mm (the local key must be
+as specific as the server's), applied where the item key is the only key there is.
+
+### 2. An item with no owner: keep it, and read it only where it can have one owner
+
+The old `q|<text>` items have no child. 16mm handled its orphans by lazy adoption: the first child read takes them,
+which is right when the orphans almost certainly belong to that child (one value, written before twins existed). A
+check-in answer is different. With twins, adopting would hand one child the other's answers, which is the bug being
+fixed.
+
+So the orphan is **never rewritten and never deleted**, and it is **read only while the family has one child (or
+none)**. Then it can only be that child's. With two, nobody can say whose it was, so neither inherits it, and the
+check-in simply asks again. Nothing is lost: the item stays on the server, and if the family ever goes back to one
+child, it is readable again.
+
+**The trade-off, named.** A family that adds a second child loses sight of the first child's old answers (not the
+data, only the view of it). That cost is small, because check-in answers go stale in weeks anyway (the screen now
+offers "Start again" after six). Guessing an owner, by contrast, can put one child's "not yet" on another child's
+doctor-visit list. Hiding the data is recoverable; misattributing it is not.
+
+### 3. A starter state is data
+
+`DevStore` was initialised with `{'peekaboo'}` saved and `{'tummy_play'}` done, so a screen had something to show.
+Once the store synced, that fake state went up to the server as hers, and the recommendations read it as an interest
+she had shown. **A store's initial value is what a new user's data is.** It should be empty, and the empty state is
+the screen's job ("a feature is never hidden": the screen invites the first one).

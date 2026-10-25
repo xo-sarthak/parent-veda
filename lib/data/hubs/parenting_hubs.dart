@@ -391,7 +391,8 @@ final HubConfig kPpEarlyLearning = HubConfig(
   needsTitle: _en('What do you need?'),
   needs: [
     HubNeed(
-      label: _en('Something to do today'),
+      // R3 (tools pass, 2026-10-25): it opens every idea for this age. Was _en('Something to do today').
+      label: _en('Activities for this age'),
       blurb: _en("A small activity matched to your child's age: playful, "
           'and never a worksheet.'),
       mark: IntentMark.blocksMark,

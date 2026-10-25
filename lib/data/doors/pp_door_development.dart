@@ -65,8 +65,10 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
         // tracker, "When something is worth checking" then the
         // check-in, then the born-early read. Educate, then hand over.
         PpDoorTool(
-          label: 'Where your baby is right now',
-          blurb: 'His milestones as windows: usually settled by now, emerging '
+          // Named as the tool is (tools pass, 2026-10-25). Was 'Where your
+          // baby is right now', and the blurb's fixed "His milestones".
+          label: 'Milestones',
+          blurb: 'Skills as windows: usually settled by now, emerging '
               'now, and a soft look ahead. Never a score.',
           surfaceId: 'pp_milestones',
           icon: Icons.checklist_rtl_outlined,
@@ -110,7 +112,9 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
         // activities by age and by area, and it was a second front door that
         // never met the reassurance pages. Here it is one card beside them.
         PpDoorTool(
-          label: 'Things to do together today',
+          // R3 (tools pass, 2026-10-25): it opens every idea for this age,
+          // not today's pick. Was 'Things to do together today'.
+          label: 'Activities for this age',
           blurb: 'Today\'s pick and every activity, matched to his age and to '
               'each area of growing.',
           // Was 'pp_development' (the old hub). That surface now opens this

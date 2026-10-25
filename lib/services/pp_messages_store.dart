@@ -173,9 +173,16 @@ class PpMessageFacts {
     this.named = false,
     this.sexGiven = true,
     this.isBoy = true,
+    this.correctionWeeks,
   });
 
   final DateTime dob;
+
+  /// Weeks to take off for a baby born early, so "A new stage" arrives when
+  /// the phase page says the phase starts (corrected age to 24 months). Null
+  /// for a term baby. ⚠️ `bornWeeks` is kept once per family, so it is
+  /// applied to the child on screen only (tools pass, 2026-10-25).
+  final int? correctionWeeks;
 
   /// The family has two or more children, so every title says whose it is
   /// ("Something to try with Aarav this week"), not only the age ones (F3).
@@ -242,6 +249,7 @@ class PpMessageFacts {
       named: c.children.length > 1,
       sexGiven: k?.sexGiven ?? c.sexGiven,
       isBoy: k?.isBoy ?? c.isBoy,
+      correctionWeeks: (k == null || k.id == c.activeChildId) ? c.correctionWeeks : null,
       visits: !withVisits
           ? const []
           : [
@@ -349,7 +357,12 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
   var phaseCount = 0;
   for (final p in kPhasesAuthored) {
     if (p.startMonth < 1) continue;
-    final day = ppAddMonths(f.dob, p.startMonth.floor());
+    // By corrected age to 24 months, like the phase page (tools pass,
+    // 2026-10-25). Was ppAddMonths(f.dob, ...): a baby born eight weeks early
+    // was told a stage had started two months before the page showed it.
+    final corrected = f.correctionWeeks != null && p.startMonth < 24;
+    final day = ppAddMonths(
+        corrected ? f.dob.add(Duration(days: 7 * f.correctionWeeks!)) : f.dob, p.startMonth.floor());
     if (!near(day) || phaseCount >= 2) continue;
     phaseCount++;
     out.add(PpMessage(

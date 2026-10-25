@@ -1591,7 +1591,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
         owed('Start and manage potty training',
             'A plan you can start this week, what to do about accidents and '
             'regressions, and when to simply pause.',
-            meanwhile: 'Something to do today',
+            meanwhile: 'Activities for this age', // R3 (tools pass, 2026-10-25). Was 'Something to do today'.
             meanwhileWhy: 'Activities for where your child is now.',
             surface: 'pp_activities');
 

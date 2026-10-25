@@ -66,7 +66,9 @@ final List<PpSurface> kPpSurfaces = [
   // ---- Development ---------------------------------------------------------
   PpSurface('pp_development', _t(en: 'Development', hi: 'विकास')),
   PpSurface('pp_milestones', _t(en: 'Milestones', hi: 'पड़ाव')),
-  PpSurface('pp_activities', _t(en: "Today's activity", hi: 'आज की गतिविधि')),
+  // R3 (tools pass, 2026-10-25): the surface is every idea for this age, not
+  // today's. Was _t(en: "Today's activity", hi: 'आज की गतिविधि').
+  PpSurface('pp_activities', _t(en: 'Activities', hi: 'गतिविधियाँ')),
 
   // ---- Learn / watch / read ------------------------------------------------
   PpSurface('pp_read', _t(en: 'Read', hi: 'पढ़िए')),

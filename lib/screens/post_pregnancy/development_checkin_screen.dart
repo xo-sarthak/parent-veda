@@ -33,7 +33,13 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_phases_data.dart' show ppFillChild;
-import 'pp_search.dart' show openPpAskVeda;
+import 'pp_search.dart' show ppOpenSurface; // was also openPpAskVeda (the generic visit question, 2026-10-25)
+import 'pp_care_parts.dart' show ppCareSaved;
+import 'pp_health_data.dart' show HealthStore;
+import 'pp_use_ask_card.dart';
+import '../../services/pp_use_consent.dart';
+import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The line the gap analysis asked for, word for word.
@@ -48,13 +54,21 @@ class DevelopmentCheckinScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([_s, ChildProfileStore.instance]),
+      animation: Listenable.merge([_s, ChildProfileStore.instance, PpUseConsent.instance]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
         final c = ChildProfileStore.instance;
-        final questions = checkInsForAge(c.ageInMonths);
+        // Corrected age (tools pass, Development, 2026-10-25). Was
+        // `c.ageInMonths`: a baby born early got questions for an older child,
+        // while Milestones and the Brain tab already used corrected age.
+        final months = c.devAgeInMonths;
+        final questions = checkInsForAge(months);
         final answered = questions.where((q) => _s.checkInAnswer(q.text) != null).length;
-        final allDone = answered == questions.length;
+        final allDone = questions.isNotEmpty && answered == questions.length;
+        // A lost skill is the one answer that does not wait for the rest.
+        final lost = checkInLostSkill(questions, _s.checkInAnswer);
+        final oldest = _oldestAnswer(questions);
+        final stale = oldest != null && DateTime.now().difference(oldest).inDays > 42;
         return PregToolScaffold(
           hue: 28,
           eyebrow: 'Development',
@@ -62,43 +76,145 @@ class DevelopmentCheckinScreen extends StatelessWidget {
           title: 'A gentle check-in',
           intro: 'A few questions for ${c.nameMid}\'s age. No scores and no comparing: just a clearer picture.',
           children: [
-            // How far through, as Hers and Liven show it (Mobbin audit,
-            // 2026-10-07; mobbin.com/screens/36a95b41-2c68-44be-942f-9249916a4699,
-            // mobbin.com/screens/529b0ea8-3610-4a28-93d6-13231f1aaad8). Progress
-            // through the questions, never a score.
-            pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('$answered of ${questions.length} answered',
-                  key: const ValueKey('pp_checkin_progress'),
-                  style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
-              const SizedBox(height: 6),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(3),
-                child: LinearProgressIndicator(
-                  value: questions.isEmpty ? 0 : answered / questions.length,
-                  minHeight: 5,
-                  backgroundColor: p.line,
-                  valueColor: AlwaysStoppedAnimation<Color>(p.ink1),
+            if (questions.isEmpty)
+              pregToolPad(_TooEarly(p: p))
+            else ...[
+              // How far through, as Hers and Liven show it (Mobbin audit,
+              // 2026-10-07; mobbin.com/screens/36a95b41-2c68-44be-942f-9249916a4699,
+              // mobbin.com/screens/529b0ea8-3610-4a28-93d6-13231f1aaad8). Progress
+              // through the questions, never a score.
+              pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('$answered of ${questions.length} answered',
+                    key: const ValueKey('pp_checkin_progress'),
+                    style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: answered / questions.length,
+                    minHeight: 5,
+                    backgroundColor: p.line,
+                    valueColor: AlwaysStoppedAnimation<Color>(p.ink1),
+                  ),
                 ),
-              ),
-            ])),
-            const SizedBox(height: 18),
-            for (final (i, q) in questions.indexed)
-              pregToolPad(_Question(q: q, index: i, p: p)),
-            const SizedBox(height: 6),
-            if (allDone)
-              pregToolPad(_Reflection(questions: questions, p: p))
-            else
-              pregToolPad(Text(
-                '${questions.length - answered} to go. Answer however feels true today.',
-                style: pvManrope(fontSize: 13, color: p.ink2),
-              )),
+              ])),
+              // Answers are kept, so say from when, and offer a fresh start
+              // (Apple Health's "take it again", mobbin.com/screens/3c8ad2b2-26b9-4931-b8ab-d08688e05b31).
+              if (answered > 0) ...[
+                const SizedBox(height: 10),
+                pregToolPad(_StartAgain(questions: questions, oldest: oldest, stale: stale, p: p)),
+              ],
+              const SizedBox(height: 18),
+              if (lost) ...[
+                pregToolPad(_Reflection(questions: questions, months: months, p: p)),
+                const SizedBox(height: 12),
+              ],
+              for (final (i, q) in questions.indexed)
+                pregToolPad(_Question(q: q, index: i, p: p)),
+              const SizedBox(height: 6),
+              if (allDone && !lost)
+                pregToolPad(_Reflection(questions: questions, months: months, p: p))
+              else if (!allDone)
+                pregToolPad(Text(
+                  '${questions.length - answered} to go. Answer however feels true today.',
+                  style: pvManrope(fontSize: 13, color: p.ink2),
+                )),
+            ],
             const SizedBox(height: 32),
           ],
         );
       },
     );
   }
+
+  DateTime? _oldestAnswer(List<CheckInQ> qs) {
+    DateTime? oldest;
+    for (final q in qs) {
+      final at = _s.answerFor(q.text)?.at;
+      if (at != null && (oldest == null || at.isBefore(oldest))) oldest = at;
+    }
+    return oldest;
+  }
 }
+
+/// The first weeks: nothing is fair to ask yet. Shown, never hidden, and it
+/// says when the questions start and where to look meanwhile.
+class _TooEarly extends StatelessWidget {
+  const _TooEarly({required this.p});
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: const ValueKey('checkin_too_early'),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: p.line),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('It\'s early for a check-in',
+              style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
+          const SizedBox(height: 8),
+          Text(
+            'In the first weeks, feeding, sleep and being held are the whole job. '
+            'The questions start at around 2 months, when the first smiles come.',
+            style: pvManrope(fontSize: 14.5, height: 1.55, color: p.ink1),
+          ),
+          const SizedBox(height: 10),
+          TextButton(
+            key: const ValueKey('checkin_too_early_milestones'),
+            style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: p.ink1),
+            onPressed: () => ppOpenSurface(context, 'pp_milestones'),
+            child: Text('What comes first, in Milestones  →',
+                style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+          ),
+        ]),
+      );
+}
+
+class _StartAgain extends StatelessWidget {
+  const _StartAgain({required this.questions, required this.oldest, required this.stale, required this.p});
+  final List<CheckInQ> questions;
+  final DateTime? oldest;
+  final bool stale;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = DevStore.instance;
+    final when = oldest == null ? null : '${oldest!.day} ${_kMonths[oldest!.month - 1]}';
+    return Row(children: [
+      Expanded(
+        child: Text(
+          stale
+              ? 'These answers are from $when. Start again for a fresh picture.'
+              : when == null
+                  ? 'Your answers are kept, so you can come back to them.'
+                  : 'Answered from $when. Your answers are kept.',
+          key: const ValueKey('checkin_answered_when'),
+          style: pvManrope(fontSize: 12.5, height: 1.4, color: stale ? p.ink1 : p.ink3),
+        ),
+      ),
+      TextButton(
+        key: const ValueKey('checkin_start_again'),
+        style: TextButton.styleFrom(foregroundColor: p.ink1),
+        onPressed: () {
+          final before = {for (final q in questions) q.text: s.checkInAnswer(q.text)};
+          s.clearCheckIns(questions.map((q) => q.text));
+          ppCareSaved(context, 'Answers cleared. Start again whenever you like.', undo: () {
+            before.forEach((t, a) {
+              if (a != null) s.setCheckIn(t, a);
+            });
+          });
+        },
+        child: Text('Start again', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
+      ),
+    ]);
+  }
+}
+
+const _kMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 class _Question extends StatelessWidget {
   const _Question({required this.q, required this.index, required this.p});
@@ -137,16 +253,26 @@ class _Question extends StatelessWidget {
   }
 }
 
+/// The "not yet" answers, as questions for the visit, in the child's words.
+List<String> checkInVisitQuestions(List<CheckInQ> qs, bool? Function(String) answer) => [
+      for (final q in qs)
+        if (q.yesIsConcern ? answer(q.text) == true : answer(q.text) == false)
+          q.yesIsConcern
+              ? 'Check-in: ${ppFillChild(q.text)} Yes. What should we look at?'
+              : 'Check-in, not yet: ${ppFillChild(q.text)} Is that something to look at?',
+    ];
+
 class _Reflection extends StatelessWidget {
-  const _Reflection({required this.questions, required this.p});
+  const _Reflection({required this.questions, required this.months, required this.p});
   final List<CheckInQ> questions;
+  final int months;
   final V2Palette p;
 
   @override
   Widget build(BuildContext context) {
     final s = DevStore.instance;
     final c = ChildProfileStore.instance;
-    final ask = checkInWorthAsking(questions, s.checkInAnswer);
+    final ask = checkInWorthAsking(questions, s.checkInAnswer, months: months);
     final notYet = questions.where((q) {
       final a = s.checkInAnswer(q.text);
       return q.yesIsConcern ? a == true : a == false;
@@ -158,41 +284,82 @@ class _Reflection extends StatelessWidget {
                 'Keep offering the everyday play and closeness; it is doing its job.'
             : 'A "not yet" or two is common at every age. Children grow in bursts and in their own order. '
                 'Keep offering chances to practise, and check in again in a few weeks.';
-    return Container(
-      key: ValueKey(ask ? 'checkin_result_ask' : 'checkin_result_ok'),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ask ? p.ink1 : p.line, width: ask ? 1.5 : 1),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Icon(ask ? Icons.local_hospital_outlined : Icons.favorite_border_rounded, size: 20, color: p.ink1),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(ask ? 'Worth a word with your doctor' : 'What this tells us',
-                style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
-          ),
-        ]),
-        const SizedBox(height: 8),
-        Text(line, style: pvManrope(fontSize: 14.5, height: 1.55, color: p.ink1)),
-        if (ask) ...[
-          const SizedBox(height: 8),
-          Text('This is not a diagnosis. Many children who start late catch up, and when help is needed, '
-              'starting early makes it easier.',
-              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
-        ],
-        const SizedBox(height: 10),
-        TextButton(
-          key: const ValueKey('checkin_ask_veda'),
-          style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: p.ink1),
-          onPressed: () => openPpAskVeda(context, 'What should I ask the paediatrician about my child\'s development?'),
-          child: Text('Questions to take to the visit  →',
-              style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Container(
+        key: ValueKey(ask ? 'checkin_result_ask' : 'checkin_result_ok'),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: ask ? p.ink1 : p.line, width: ask ? 1.5 : 1),
         ),
-      ]),
-    );
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            // Drawn marks, not Material glyphs (the user, 2026-10-13 and 10-25).
+            // Was Icon(ask ? Icons.local_hospital_outlined : Icons.favorite_border_rounded).
+            TtcMarkLeading(tab: ask ? TtcTabMark.doctorChat : TtcTabMark.heartHand, tint: v2BlockTint(28, p), size: 28),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(ask ? 'Worth a word with your doctor' : 'What this tells us',
+                  style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
+            ),
+          ]),
+          const SizedBox(height: 8),
+          Text(line, style: pvManrope(fontSize: 14.5, height: 1.55, color: p.ink1)),
+          const SizedBox(height: 8),
+          // Every result says it, not only the worrying one (2026-10-25).
+          Text(
+              ask
+                  ? 'This is not a diagnosis. Many children who start late catch up, and when help is needed, '
+                      'starting early makes it easier.'
+                  : 'This is not a diagnosis or a test, just a way to notice. Your paediatrician knows ${c.nameMid} best.',
+              key: const ValueKey('checkin_not_a_diagnosis'),
+              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+          if (notYet > 0) ...[
+            const SizedBox(height: 10),
+            TextButton(
+              key: const ValueKey('checkin_ask_veda'),
+              style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: p.ink1),
+              onPressed: () => _toVisit(context),
+              child: Text('Questions to take to the visit  →',
+                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+            ),
+          ],
+        ]),
+      ),
+      if (notYet > 0) ...[
+        const SizedBox(height: 12),
+        const PpUseAskCard(
+          kind: PpUseKind.development,
+          question: 'Add these to Before you see the doctor?',
+        ),
+      ],
+    ]);
+  }
+
+  // Was openPpAskVeda(context, 'What should I ask the paediatrician about my
+  // child's development?'): a generic question that knew nothing she had
+  // answered. Now the "not yet" items go to the visit list, with her yes.
+  void _toVisit(BuildContext context) {
+    final s = DevStore.instance;
+    if (!PpUseConsent.instance.allows(PpUseKind.development)) {
+      ppOpenSurface(context, 'pp_doctor_visit');
+      ppCareSaved(context,
+          'Your visit list is open. To add check-in answers to it for you, say yes to "Milestones and check-in answers" in You.');
+      return;
+    }
+    final h = HealthStore.instance;
+    final have = h.questions.toSet();
+    final add = [for (final q in checkInVisitQuestions(questions, s.checkInAnswer)) if (!have.contains(q)) q];
+    for (final q in add) {
+      h.addQuestion(q);
+    }
+    ppOpenSurface(context, 'pp_doctor_visit');
+    ppCareSaved(
+        context,
+        add.isEmpty
+            ? 'Your check-in questions are already on your visit list.'
+            : 'Added ${add.length} ${add.length == 1 ? 'question' : 'questions'} to your visit list.');
   }
 }
 

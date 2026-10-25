@@ -801,7 +801,8 @@ const PpArea _firstFeelings = PpArea(
         ),
         PpWhenLine('Common from about 12 months, usually fading through the '
             'third year as language arrives.'),
-        PpLink('Something to do today',
+        // R3 (tools pass, 2026-10-25): it opens every idea for this age. Was 'Something to do today'.
+        PpLink('Activities for this age',
             surfaceId: 'pp_activities',
             blurb: 'Play that burns off the feeling before it comes out.'),
       ],

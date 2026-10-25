@@ -22,8 +22,10 @@ void main() {
   final band = checkInsForAge(20);
   bool? Function(String) answers(Map<String, bool> m) => (t) => m[t];
 
+  // From 6 months: the lost-skill question waits until there are words or
+  // sounds to lose (tools pass, Development, 2026-10-25).
   test('every band has act-early questions and ends with the lost-skill one', () {
-    for (final m in [3, 8, 20, 30, 48]) {
+    for (final m in [8, 20, 30, 48]) {
       final qs = checkInsForAge(m);
       expect(qs.last, same(kCheckInLostSkill), reason: '$m months');
       expect(qs.where((q) => q.redFlag && !q.yesIsConcern), isNotEmpty, reason: '$m months');

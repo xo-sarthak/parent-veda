@@ -122,3 +122,10 @@ A finding is settled at that tool's turn, as one plan decision. **C1** (the 8 To
 - **R2** settled: one fever answer. Fever in the symptom tool hands over to Fever check.
 - **R4** settled: Health record stays as the records home, with live status rows.
 - **R3** (Activities label) waits for the Development family.
+
+### Settled in the Development family (2026-10-25)
+- **R3** settled: everything that opens every activity is named for it ("Activities for this age"); the links that looped back to the door open Activities; area links open on their area (`pp_activities/<area>`).
+- **Phases are not a tool** (D4, the user: "why do we need to include phases screens for tools?"). `pp_leaps` is reading in the shared reader; it left the Tools tab, and C1 allows it by name.
+- **One drawn mark per Tools row** (the user: "make sure the tools section the UI is consistent with marks/glyphs"). Every `PpTool` names its own `tab:`/`tool:` mark, none shared and none falling back to an icon; `test/pp_tools_tab_test.dart` holds it. Later tools keep to it: a new row picks a mark no other row wears.
+- New consent kind `development` (milestones and check-in answers, for the doctor visit).
+

@@ -102,7 +102,11 @@ void main() {
       // questions from one domain and none from another would skew it without
       // any visible sign, which is the quietest possible way to break a screen
       // whose whole promise is that it is not a score.
-      for (final months in [2, 8, 18, 30, 48]) {
+      // The first band is checked as written: since 2026-10-25 its questions
+      // start at 2-4 months (tools pass, Development), so no single age before
+      // 6 months asks all six. The others are checked once every question is due.
+      expect(kCheckIns0to6.map((q) => q.areaId).toSet().length, 6);
+      for (final months in [8, 18, 30, 48]) {
         // Since 2026-10-07 every band ends with the lost-skill question (gap
         // analysis P2, escalation). It carries its own area id, 'all', so the
         // six domains are still counted exactly once each.

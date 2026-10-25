@@ -227,7 +227,8 @@ final JourneyConfig kPpPrepareForSchool = JourneyConfig(
       elements: [
         JourneyElement(
           type: SolutionType.activity,
-          title: _en('Something to try today'),
+          // R3 (tools pass, 2026-10-25): it opens every idea for this age. Was _en('Something to try today').
+          title: _en('Activities for this age'),
           value: _en("Small play that builds exactly these habits, matched "
               "to your child's age."),
           surfaceId: 'pp_activities',

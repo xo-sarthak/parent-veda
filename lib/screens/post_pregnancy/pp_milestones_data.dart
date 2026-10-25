@@ -86,6 +86,12 @@ class MilestoneObs {
 
 // ---- catalogue --------------------------------------------------------------
 const List<Milestone> kMilestones = [
+  // ⚠️ THE FIRST-YEAR ITEMS BELOW CARRY NO SOURCE (tools pass, Development,
+  // 2026-10-25). The 12 month to 5 year block further down cites CDC/AAP 2022;
+  // these 0-12 month windows and their "discuss" months predate it, and the
+  // gentle check-in now takes its act-early ages from them (CheckInQ.flagFrom).
+  // REQUIRED_REVIEW (paediatrician): check each window and "discuss" month
+  // against CDC/AAP 2022 and IAP. Listed in docs/BEFORE-LAUNCH.md.
   // gross motor
   Milestone(
     id: 'gm_headup', domain: DevDomain.grossMotor, title: 'Lifting the head during tummy time', loMonths: 1, hiMonths: 3,
@@ -576,6 +582,14 @@ class MilestoneStore extends ChangeNotifier {
   /// observed. These are the "you may begin noticing..." skills.
   List<Milestone> get emerging => kMilestones
       .where((m) => !isObserved(m.id) && _ageMonths >= m.loMonths - 1 && _ageMonths <= m.hiMonths)
+      .toList();
+
+  /// The same window as [emerging], seen ones included, so a screen can keep a
+  /// ticked row in place (ticked) instead of losing it the moment it is ticked
+  /// (tools pass, Development, 2026-10-25: the monthly checklist's Undo could
+  /// never run, because the row it would undo had already gone).
+  List<Milestone> get inWindow => kMilestones
+      .where((m) => _ageMonths >= m.loMonths - 1 && _ageMonths <= m.hiMonths)
       .toList();
 
   /// Coming soon = opens after his age, is not already emerging, and is close

@@ -25,7 +25,11 @@ import '../reader/pv_reader_screen.dart';
 import 'doors/pp_door_screen.dart' show PpDoorScreen;
 import 'pp_content.dart' show PpBlock, PpBlockView, PpStep, PpSteps;
 import 'pp_activity_paintings.dart' show ppActivityPainting;
-import 'pp_development_data.dart' show DevActivity, devAreaById;
+import 'pp_development_data.dart' show DevActivity, DevStore, devAreaById;
+import 'pp_child_profile.dart' show ChildProfileStore;
+import 'development_all_activities_screen.dart' show PpTriedTick, ppActivityTriedWhen;
+import '../v2/v2_palette.dart';
+import '../../theme/pv_fonts.dart';
 import 'pp_phases_data.dart' show ppFillChild;
 import 'pp_search.dart' show ppOpenSurface;
 
@@ -66,6 +70,9 @@ PvRead ppActivityAsRead(DevActivity a) {
         heading: _same('How to do it'),
         custom: PpSteps([for (final s in a.steps) PpStep(ppFillChild(s))]),
       ),
+      // "We tried this", per child, right after the steps (tools pass,
+      // Development, 2026-10-25). The same tick as the Activities list.
+      PvReadSection(custom: PpActivityTriedBlock(a)),
       if (a.remember.isNotEmpty)
         PvReadSection(heading: _same('Things to remember'), bullets: [for (final r in a.remember) _fill(r)]),
       if (a.safety.isNotEmpty)
@@ -105,7 +112,9 @@ Widget ppActivityReader(DevActivity a) => PvReaderScreen(
       read: ppActivityAsRead(a),
       // Parenting authors in English (CLAUDE.md, "New work is English").
       lang: AppLanguage.english,
-      customBlock: (context, block) => PpBlockView(block: block as PpBlock, onSurface: ppOpenSurface),
+      customBlock: (context, block) => block is PpActivityTriedBlock
+          ? _TriedRow(activity: block.activity)
+          : PpBlockView(block: block as PpBlock, onSurface: ppOpenSurface),
       openSurface: ppOpenSurface,
     );
 
@@ -115,3 +124,33 @@ Widget ppDevelopmentDoor({String? areaId}) => PpDoorScreen(
       initialTabId: areaId == null ? null : ppDevelopmentTabFor(areaId),
       onSurface: ppOpenSurface,
     );
+
+/// The "We tried this" row an activity's page carries after its steps.
+class PpActivityTriedBlock {
+  const PpActivityTriedBlock(this.activity);
+  final DevActivity activity;
+}
+
+class _TriedRow extends StatelessWidget {
+  const _TriedRow({required this.activity});
+  final DevActivity activity;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Listenable.merge([DevStore.instance, ChildProfileStore.instance]),
+        builder: (context, _) {
+          final p = V2PaletteStore.instance.current;
+          final on = DevStore.instance.triedOn(activity.id);
+          final tried = DevStore.instance.isCompleted(activity.id);
+          return Row(key: const ValueKey('pp_activity_tried_row'), children: [
+            Expanded(
+              child: Text(
+                tried ? (on == null ? 'You have tried this' : 'You tried this ${ppActivityTriedWhen(on)}') : 'We tried this',
+                style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1),
+              ),
+            ),
+            PpTriedTick(activity: activity),
+          ]);
+        },
+      );
+}

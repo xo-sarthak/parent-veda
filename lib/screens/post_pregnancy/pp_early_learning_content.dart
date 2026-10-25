@@ -148,7 +148,8 @@ final PpSection kPpEarlyLearningSection = PpSection(
     // existing activity engine that already reads the child's age. A second
     // activity surface would mean two answers to "what should we do today".
     PpSectionTool(
-      label: 'Something to do today',
+      // R3 (tools pass, 2026-10-25): it opens every idea for this age. Was 'Something to do today'.
+      label: 'Activities for this age',
       blurb: 'The activity picker, already set to your child\'s age. Two '
           'minutes to find one, ten minutes to do it.',
       surfaceId: 'pp_activities',

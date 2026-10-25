@@ -616,9 +616,10 @@ final PpSection kPpDevelopmentSection = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'When rolling is worth a check',
             ),
-            PpLink('Things to do together today',
-                surfaceId: 'pp_development',
-                blurb: 'Activities matched to your baby’s age.'),
+            // R3 (tools pass, 2026-10-25): named for where it lands. Was 'Things to do together today' -> pp_development, which opened the door again.
+            PpLink('Movement activities for this age',
+                surfaceId: 'pp_activities/gross_motor',
+                blurb: 'Floor play matched to your baby’s age.'),
           ],
         ),
 
@@ -759,8 +760,9 @@ final PpSection kPpDevelopmentSection = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'When moving is worth a check',
             ),
-            PpLink('Things to do together today',
-                surfaceId: 'pp_development',
+            // R3 (tools pass, 2026-10-25): named for where it lands. Was 'Things to do together today' -> pp_development, which opened the door again.
+            PpLink('Movement activities for this age',
+                surfaceId: 'pp_activities/gross_motor',
                 blurb: 'Floor play and movement activities for this age.'),
           ],
         ),
@@ -999,7 +1001,7 @@ final PpSection kPpDevelopmentSection = PpSection(
               title: 'When gestures are worth a check',
             ),
             PpLink('Talking activities for this age',
-                surfaceId: 'pp_activities',
+                surfaceId: 'pp_activities/language', // was 'pp_activities' (the top of every area)
                 blurb: 'The language area, with things to try today.'),
           ],
         ),
@@ -1075,7 +1077,7 @@ final PpSection kPpDevelopmentSection = PpSection(
               title: 'When talking is worth a check',
             ),
             PpLink('Talking activities for this age',
-                surfaceId: 'pp_activities',
+                surfaceId: 'pp_activities/language', // was 'pp_activities' (the top of every area)
                 blurb: 'The language area, with things to try today.'),
           ],
         ),
@@ -1228,10 +1230,13 @@ final PpSection kPpDevelopmentSection = PpSection(
               slotId: 'development/play_builds_brain',
               hue: 268,
             ),
-            PpLink('Things to do together today',
-                surfaceId: 'pp_development',
-                blurb: 'Activities matched to your child’s age and to '
-                    'each area of growing.'),
+            // R3 (tools pass, 2026-10-25): the row below opens the same list,
+            // so this one went rather than become a second label for one
+            // answer. Kept for revert:
+            // PpLink('Things to do together today',
+            //     surfaceId: 'pp_development',
+            //     blurb: 'Activities matched to your child’s age and to '
+            //         'each area of growing.'),
             PpLink('More activities, by area',
                 surfaceId: 'pp_activities',
                 blurb: 'The full set, filterable by what you want to work on.'),
@@ -1309,7 +1314,7 @@ final PpSection kPpDevelopmentSection = PpSection(
               title: 'When to mention it',
             ),
             PpLink('Movement activities for this age',
-                surfaceId: 'pp_activities',
+                surfaceId: 'pp_activities/gross_motor', // was 'pp_activities' (the top of every area)
                 blurb: 'What all this strength is building towards.'),
             PpLink('Time tummy time', surfaceId: 'pp_tummy_time',
                 blurb: 'A start-stop timer that adds up the day, gently.'),
@@ -1758,7 +1763,7 @@ final PpSection kPpDevelopmentSection = PpSection(
                 'grows up speaking a grandmother’s language stays close to '
                 'family, and gains nothing at school by losing it.'),
             PpLink('Talking activities in your own languages',
-                surfaceId: 'pp_activities',
+                surfaceId: 'pp_activities/language', // was 'pp_activities' (the top of every area)
                 blurb: 'The language area, with things to try today.'),
           ],
         ),
@@ -1814,7 +1819,7 @@ final PpSection kPpDevelopmentSection = PpSection(
                 'know them in, rather than switching to English rhymes because '
                 'those seem more educational.'),
             PpLink('Talking activities for your child’s age',
-                surfaceId: 'pp_activities',
+                surfaceId: 'pp_activities/language', // was 'pp_activities' (the top of every area)
                 blurb: 'The language area, with things to try today.'),
             PpLink('Books to read together',
                 surfaceId: 'pp_read',
@@ -2376,10 +2381,11 @@ final PpSection kPpDevelopmentSection = PpSection(
       icon: Icons.checklist_rtl_outlined,
     ),
     PpSectionTool(
-      label: 'Things to do together today',
+      // R3 (tools pass, 2026-10-25): named for where it lands. Was 'Things to do together today' -> pp_development, which opened the door again.
+      label: 'Activities for this age',
       blurb: 'Activities matched to your child’s age and to each area of '
           'growing.',
-      surfaceId: 'pp_development',
+      surfaceId: 'pp_activities',
     ),
     PpSectionTool(
       // Was the leaps calendar ('Your baby’s phase calendar', 'Which window

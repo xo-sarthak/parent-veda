@@ -510,6 +510,16 @@ class ChildProfileStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ⚠️ TWO CHILDREN, ONE ID (found 2026-10-25, tools pass). The id was the
+  // clock alone, `child_<microseconds>`, and two children added back to back
+  // (twins at onboarding, or a test) can land on the same tick on a phone
+  // whose clock is coarse: then both are one child to every store, and each
+  // twin's logs, answers and milestones merge. A counter after the clock, as
+  // the feed ids have (`feed_<micros>_<n>`), keeps them apart. Ids already
+  // saved keep their shape: nothing reads the id's parts.
+  static int _childSeq = 0;
+  static String _newChildId() => 'child_${DateTime.now().microsecondsSinceEpoch}_${_childSeq++}';
+
   /// Add a second/third child and make them active.
   Future<Child> addChild({
     required String name,
@@ -524,7 +534,7 @@ class ChildProfileStore extends ChangeNotifier {
     int? bornWeeks,
   }) async {
     final c = Child(
-      id: 'child_${DateTime.now().microsecondsSinceEpoch}',
+      id: _newChildId(), // was 'child_${DateTime.now().microsecondsSinceEpoch}'
       name: name.trim(),
       isBoy: isBoy,
       dob: dob,
@@ -934,7 +944,7 @@ class ChildProfileStore extends ChangeNotifier {
     // Promote the seed (via copyWith, so the shared _seed itself is never
     // mutated - it must stay pristine for the next logged-out/fresh account).
     final c = promoting
-        ? _seed.copyWith(id: 'child_${DateTime.now().microsecondsSinceEpoch}')
+        ? _seed.copyWith(id: _newChildId()) // was 'child_${DateTime.now().microsecondsSinceEpoch}'
         : active;
 
     if (name != null && name.trim().isNotEmpty) c.name = name.trim();

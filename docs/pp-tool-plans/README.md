@@ -13,20 +13,20 @@ One tool at a time; the user says go per tool. Each plan records every decision 
 | 05 | Sleep | `pp_sleep` | COMMITTED (02-07-care-logs.md) | b11b2ec |
 | 06 | Tummy time | `pp_tummy_time` | COMMITTED (02-07-care-logs.md) | b11b2ec |
 | 07 | The last 7 days | `pp_care_history` | COMMITTED (02-07-care-logs.md) | b11b2ec |
-| 08 | Growth | `pp_growth` | BUILT 2026-10-25 (08-16-health.md) | |
-| 09 | Vaccines | `pp_vaccines` | BUILT 2026-10-25 (08-16-health.md) | |
-| 10 | Fever check | `pp_fever_check` | BUILT 2026-10-25 (08-16-health.md) | |
-| 11 | Is my baby OK? | `pp_baby_ok_check` | BUILT 2026-10-25 (08-16-health.md) | |
-| 12 | Something changed? (folded into Is my baby OK?) | `pp_what_changed` | BUILT 2026-10-25 (08-16-health.md) | |
-| 13 | Health record | `pp_health_home` | BUILT 2026-10-25 (08-16-health.md) | |
-| 14 | Emergency card | `pp_emergency_card` | BUILT 2026-10-25 (08-16-health.md) | |
-| 15 | Before you see the doctor | `pp_doctor_visit` | BUILT 2026-10-25 (08-16-health.md) | |
-| 16 | Home remedies | `pp_nuskhe` | BUILT 2026-10-25 (08-16-health.md) | |
-| 17 | This month's checklist | `pp_month_checklist` | | |
-| 18 | Milestones | `pp_milestones` | | |
-| 19 | Gentle check-in | `pp_dev_checkin` | | |
-| 20 | Activities | `pp_activities` | | |
-| 21 | Your child's phases | `pp_leaps` | | |
+| 08 | Growth | `pp_growth` | COMMITTED (08-16-health.md) | 66a1610 |
+| 09 | Vaccines | `pp_vaccines` | COMMITTED (08-16-health.md) | 66a1610 |
+| 10 | Fever check | `pp_fever_check` | COMMITTED (08-16-health.md) | 66a1610 |
+| 11 | Is my baby OK? | `pp_baby_ok_check` | COMMITTED (08-16-health.md) | 66a1610 |
+| 12 | Something changed? (folded into Is my baby OK?) | `pp_what_changed` | COMMITTED (08-16-health.md) | 66a1610 |
+| 13 | Health record | `pp_health_home` | COMMITTED (08-16-health.md) | 66a1610 |
+| 14 | Emergency card | `pp_emergency_card` | COMMITTED (08-16-health.md) | 66a1610 |
+| 15 | Before you see the doctor | `pp_doctor_visit` | COMMITTED (08-16-health.md) | 66a1610 |
+| 16 | Home remedies | `pp_nuskhe` | COMMITTED (08-16-health.md) | 66a1610 |
+| 17 | This month's checklist | `pp_month_checklist` | BUILT 2026-10-25 (17-21-development.md) | |
+| 18 | Milestones | `pp_milestones` | BUILT 2026-10-25 (17-21-development.md) | |
+| 19 | Gentle check-in | `pp_dev_checkin` | BUILT 2026-10-25 (17-21-development.md) | |
+| 20 | Activities | `pp_activities` | BUILT 2026-10-25 (17-21-development.md) | |
+| 21 | Your child's phases | `pp_leaps` | NOT A TOOL: reading, out of the Tools tab (D4); page fixes BUILT 2026-10-25 (17-21-development.md) | |
 | 22 | What to feed at this age | `pp_food_chart` | | |
 | 23 | Can my baby eat this? | `pp_baby_food_check` | | |
 | 24 | Recipes | `pp_food` | | |

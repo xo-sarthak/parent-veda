@@ -76,6 +76,7 @@ import 'pp_community_detail_screen.dart';
 import 'community_screen.dart';
 import '../../data/community_data.dart' show kParentingCommunities;
 import 'development_all_activities_screen.dart';
+import 'pp_development_data.dart' show kDevAreas;
 // import 'on_track_checklist_screen.dart'; // merged into the journey, kept for revert
 import 'development_checkin_screen.dart';
 import 'scripts_library_screen.dart';
@@ -208,6 +209,16 @@ void ppPushSurface(BuildContext context, String surfaceId) {
 }
 
 Widget? ppScreenForSurface(String id) {
+  // `pp_activities/<areaId>` opens Activities on that area's chip (tools pass,
+  // Development, 2026-10-25): "Talking activities for this age" used to land
+  // on the top of every area.
+  const activitiesPrefix = 'pp_activities/';
+  if (id.startsWith(activitiesPrefix)) {
+    final area = id.substring(activitiesPrefix.length);
+    if (!kDevAreas.any((a) => a.id == area)) return const DevelopmentAllActivitiesScreen();
+    return DevelopmentAllActivitiesScreen(area: area);
+  }
+
   // ⚠️ `pp_products/<shelf>` OPENS THAT SHELF (S8c, 2026-10-25). It used to
   // fall through to nothing. An unstocked shelf is caught by
   // `ppSurfaceUnavailable` before this is asked.

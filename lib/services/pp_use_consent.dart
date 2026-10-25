@@ -35,6 +35,9 @@ enum PpUseKind {
   // Tools pass, Health family (2026-10-25).
   nappies,
   changes,
+  // Tools pass, Development family (2026-10-25): milestones seen and the
+  // gentle check-in's answers, for Before you see the doctor.
+  development,
 }
 
 enum PpUseAnswer { unasked, yes, no }
@@ -45,6 +48,7 @@ extension PpUseKindText on PpUseKind {
         PpUseKind.feeds => 'Your feed log',
         PpUseKind.nappies => 'Your nappy log',
         PpUseKind.changes => 'What you tell Is my baby OK?',
+        PpUseKind.development => 'Milestones and check-in answers',
       };
 
   /// What a yes changes, in one line. Shown on the ask card and in You.
@@ -56,6 +60,9 @@ extension PpUseKindText on PpUseKind {
             'for you, so you only confirm the count.',
         PpUseKind.changes => 'We remember it for three weeks and move pages and '
             'activities about it up on your home.',
+        PpUseKind.development => 'We add the milestones you have seen, and anything '
+            'the check-in marked "not yet", to Before you see the doctor, '
+            'so the questions are ready when you go.',
       };
 }
 

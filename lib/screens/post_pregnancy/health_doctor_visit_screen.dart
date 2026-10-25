@@ -44,6 +44,8 @@ import 'pp_growth_data.dart';
 import 'pp_health_data.dart';
 import 'pp_sleep_data.dart' show SleepStore;
 import 'pp_vaccine_data.dart';
+import 'pp_milestones_data.dart' show MilestoneStore;
+import '../../services/pp_use_consent.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The words under the summary, on screen and in the shared text.
@@ -130,6 +132,20 @@ String _historyLine() {
   return list.isEmpty ? 'None recorded' : list.take(3).map((x) => '${x.name} (${x.date})').join(' · ');
 }
 
+/// Milestones seen in the last three months, only with her yes to
+/// "Milestones and check-in answers" (tools pass, Development, 2026-10-25).
+/// Null without it: the row is then not shown, and the screen says how to
+/// add it. The check-in's "not yet" answers reach the visit as questions,
+/// added from the check-in itself.
+String? ppDoctorVisitDevelopmentLine({DateTime? now}) {
+  if (!PpUseConsent.instance.allows(PpUseKind.development)) return null;
+  final ms = MilestoneStore.instance;
+  final since = (now ?? DateTime.now()).subtract(const Duration(days: 92));
+  final recent = ms.achieved.where((m) => ms.observation(m.id)!.date.isAfter(since)).toList();
+  if (recent.isEmpty) return 'No milestones ticked in the last 3 months';
+  return 'Seen lately: ${recent.take(5).map((m) => m.title).join(' · ')}';
+}
+
 String _reportsLine() =>
     _s.reports.isEmpty ? 'None recorded' : _s.reports.take(3).map((r) => '${r.name} (${r.date})').join(' · ');
 
@@ -175,6 +191,7 @@ String ppDoctorVisitShareText({List<PpCareDay>? days}) {
     ..writeln('Allergies: ${_allergyLine()}')
     ..writeln('Recent history: ${_historyLine()}')
     ..writeln('Recent reports: ${_reportsLine()}')
+    ..write(ppDoctorVisitDevelopmentLine() == null ? '' : 'Development: ${ppDoctorVisitDevelopmentLine()}\n')
     ..writeln('')
     ..writeln('THE LAST 7 DAYS')
     ..writeln(PpCareHistory.doctorSummary(week, childName: c.name, ageLabel: c.ageLabel));
@@ -223,6 +240,8 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
           FeedingStore.instance,
           SleepStore.instance,
           NappyStore.instance,
+          MilestoneStore.instance,
+          PpUseConsent.instance,
         ]),
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
@@ -256,6 +275,8 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
                   _fact(p, 'Allergies', _allergyLine()),
                   _fact(p, 'Recent symptoms', _historyLine()),
                   _fact(p, 'Recent reports', _reportsLine()),
+                  if (ppDoctorVisitDevelopmentLine() case final dev?)
+                    _fact(p, 'Development', dev, key: const ValueKey('pp_doctor_visit_development')),
                   _fact(p, 'The last 7 days', ppLast7DaysLine(week),
                       key: const ValueKey('pp_doctor_visit_last7'), last: true),
                 ]),
