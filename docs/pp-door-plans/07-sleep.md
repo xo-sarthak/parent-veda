@@ -172,6 +172,25 @@ One per page, and never on SIDS, bed-sharing or the red-flag page.
 - grep call sites
 - phone walk only on your word
 
+## SL10. Sick nights, head bumps and side sleeping (the demand re-check)
+- **A new short page** "When he's sick, or after a bump on the head". Area: the night-waking area. Bands: 6 months and up.
+  - It links Health's fever rail and first aid, and Safety `safety_falls`.
+  - Its red-flag list sits first and never sinks (S10).
+- **`safe_sleep`'s first line** names the side.
+
+### What parents actually ask (the demand re-check, 2026-10-25)
+From `research/questions/ranked_parenting.csv`. SL1 to SL9 stand. Two questions have no page (SL10).
+
+| Question | Hits | Where it is answered |
+|---|---|---|
+| how long a toddler, a 1, 3 or 5 year old, a newborn sleeps | ≈480 | `how_much` |
+| should 3 and 4 year olds nap | 146 | `dropping_naps` |
+| is it ok for a newborn to sleep on its side; on its stomach | 102 | `safe_sleep`, but "side" is never named. SL10 |
+| should I let my toddler sleep when sick | 52 | **No page.** SL10 |
+| should a toddler sleep after hitting his head | 47 | **Nowhere in the app.** SL10 |
+| can a newborn sleep with a pacifier | 35 | `dummy_soother` |
+| pillow, blanket | 70 | safe sleep after one (SL7) |
+
 ## Decisions
 | # | Question | We recommended | Your answer |
 |---|---|---|---|
@@ -184,3 +203,4 @@ One per page, and never on SIDS, bed-sharing or the red-flag page.
 | SL7 | New pages: jhula safety, safe sleep after one, hot nights and power cuts; fix vague links | Yes | **Yes** (2026-10-24) |
 | SL8 | A door intro film | Yes | **Yes** (2026-10-24) |
 | SL9 | Names never cut at large text size, every door | Yes | **Yes** (2026-10-24), the user: "option 1 but make sure of tab width..". So the card keeps its width (150, a fifth of the third card still showing) and grows only in height; at build every tab name in every door is checked to fit two lines at that width at a large text size, and a name that doesn't is shortened, not squeezed |
+| SL10 | A new page "When he's sick, or after a bump on the head", and "not on his side" named on `safe_sleep` | 52 + 47 + 78 hits with no answer | **Yes**, chosen and recorded. Copy in `07-sleep-content.md` §R. Added by the demand re-check, 2026-10-25 |

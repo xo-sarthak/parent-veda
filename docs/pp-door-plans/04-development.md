@@ -157,6 +157,16 @@ Reuse:
 - Wiring gate: grep the call sites.
 - Phone walk only on the user's word.
 
+### What parents actually ask (the demand re-check, 2026-10-25)
+From `research/questions/ranked_parenting.csv`. DV1 stands: Play today first, milestones one tab away.
+
+| Question | Hits | Where it is answered |
+|---|---|---|
+| what are baby milestones | 127 | Sit, crawl, walk, and the milestone pages |
+| speech: what delays it, when toddlers talk, when to worry, does he need therapy, what it costs | ≈400 | `dev_speech_by_age`, `dev_speech_flags`, now linked onward (DV10) |
+| can a 5 year old sit in the front seat; a booster seat | 50 | Safety SF3 |
+| autistic toddlers not responding to their name | 11 | the M-CHAT line (DV8) |
+
 ## Decisions (answered by the user 2026-10-24: "yes to all")
 | # | Question | We recommended | Your answer |
 |---|---|---|---|
@@ -169,3 +179,4 @@ Reuse:
 | DV7 | Specialist rows per tab, the Special needs roster, courses by id, a paediatric physio category owed? | Yes | **Yes** (2026-10-24) |
 | DV8 | A new movement-signs page, the M-CHAT line, the phases rewrite? | Yes | **Yes** (2026-10-24) |
 | DV9 | Rename "When will my baby..." so it is never cut off? | "Sit, crawl, walk", then "Sit, crawl, walk" | **Asked for by the user** (2026-10-24, on the DV2 look). "Sit, crawl, walk" was offered; the user: "swap the name ... something that is understandable in the very first glance and does not get the dotted situation". Now "Sit, crawl, walk" (mockup v3, built in `pp_door_development.dart`). Rule for every door: a tab or card name is complete, never ends in "...", and fits the tool card in two lines (about 14 characters) |
+| DV10 | Link `dev_speech_by_age` and `dev_speech_flags` to Special care's "Not talking yet" and "Speech therapy and the other therapies, explained" (SC2), and Early learning's "Help him talk" (EL1), by page (M4) | Speech is this topic's biggest worry (≈400), and the next steps live in two other doors | **Yes**, chosen and recorded. Added by the demand re-check, 2026-10-25 |

@@ -78,3 +78,40 @@ Myth versus evidence, never mocking. REQUIRED_REVIEW.
 - NHM guidelines for JSY and JSSK; Ministry of Women and Child Development, PMMVY guidelines (PMMVY 2.0).
 - Tele-MANAS, MoHFW (14416).
 - RCOG/NICE postnatal care guidance (mobility, bathing, wound care after a caesarean).
+
+## The demand re-check (2026-10-25)
+Every line here is REQUIRED_REVIEW by the paediatrician who reviews this door.
+
+### R1. `f40_nappy_poop`, a new part: "After the first weeks, and after solids" (FD13, Potty PT11, Health H8)
+Bands: 0–12 months.
+- **Colours:**
+  - yellow, green and brown are all normal
+  - green often just means faster digestion, or iron
+- **How often:**
+  - breastfed babies may poo after every feed, or, after about six weeks, only once in several days
+  - both can be normal if he's feeding well, gaining weight and the poo is soft
+- **After solids:**
+  - poo gets thicker, browner and smellier
+  - bits of food in it are normal
+- **Watery and frequent:** many more poos than usual, or very watery, is diarrhoea. Watch for fewer wet nappies. Link: Health's diarrhoea and ORS page.
+- **Call the doctor the same day for:**
+  - red or bloody poo
+  - black poo after the first few days
+  - white, grey or very pale poo
+  - a hard, swollen tummy with vomiting
+
+### R2. A Day by day card: "What he can see" (FD11)
+Bands: weeks 1–6.
+- He sees best at about 20 to 30 cm, the distance to your face while he feeds.
+- Faces and bold black-and-white shapes hold his eyes first. Colours come over the next few months.
+- Eyes that wander or cross now and then are normal in the first weeks.
+- **See a doctor if:**
+  - one eye turns in or out all the time after 3 to 4 months
+  - a pupil looks white in photos or in light
+  - he doesn't look at your face at all by about 2 months
+
+### R3. The oil, one source (FD12)
+- **`f40_which_oil`, the mustard row's "Watch out for":** "Best kept off a newborn's skin: it can irritate it and weaken its barrier in the first weeks. Many families keep it for the mother's massage." This matches Traditions TR3. The old text is commented out, "kept for revert".
+- **The coconut row** stays "the safest default". A sunflower row is added: "Plain, cold-pressed, fragrance-free. Studies found it gentle on newborn skin."
+- **The FD5 toast** becomes: "We haven't picked oils yet. A plain, fragrance-free coconut or sunflower oil from your kitchen is fine. See 'Which massage oil?'."
+- **Traditions TR3's** "Malish and the oil" keeps its short version and links "Which massage oil?" → `f40_which_oil` (note in `10-traditions-content.md` §2).

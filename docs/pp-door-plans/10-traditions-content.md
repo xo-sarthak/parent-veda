@@ -96,3 +96,6 @@ Pages for an age already passed fold under "Earlier", which is already shell beh
 - AIIMS and IAP guidance on Holi colour eye injuries.
 - Reports on manja injuries during Sankranti (state advisories).
 - Guidance on fasting during Ramadan while breastfeeding (NHS, and the Islamic Medical Association's guidance).
+
+## Added by the demand re-check (2026-10-25)
+**§2, Malish and the oil:** it gains a link, "Which massage oil?" → First 40 `f40_which_oil`, the one source for the comparison (First 40 FD12). That page's mustard row now says what §2 says.

@@ -344,6 +344,19 @@ The next band always shows open as "Coming up next". So a 5-month-old's parent s
 - `GLOBAL-CHANGES.md` #15: Parenting Feeding done.
 - `BEFORE-LAUNCH.md`: the bottle and steriliser IMS Act check, and the clinical read.
 
+### What parents actually ask (the demand re-check, 2026-10-25)
+From `research/questions/ranked_parenting.csv`. Nothing here contradicts D1 to D6.
+
+| Question | Hits | Where it is answered |
+|---|---|---|
+| my toddler is not eating, and three more like it | ≈370 | `picky_*` pages, which lead for toddlers (D1 "Eating and growing") |
+| how much baby food at 6, 5 and 4 months | 182 | Feeding's first-food and amount pages |
+| can a 6 month old drink water | 71 | Feeding, first foods |
+| how much milk at 1 year | 64 | Feeding, milk after one |
+| when to start weaning; baby-led weaning | 55 + 83 | Feeding, first foods |
+| why breastfeeding is painful | 52 | Feeding's latch and pain pages |
+| baby food pouches on a plane | 44 | Left out: a Western question |
+
 ## 9. Decisions (answered by the user 2026-10-23)
 
 The user's own words, where recorded: D2, *"yes, D2 approved, go for Health"*, after asking for a plain phone-mockup look instead of a design canvas.
@@ -356,6 +369,7 @@ The user's own words, where recorded: D2, *"yes, D2 approved, go for Health"*, a
 | D4 | Allergen tracker that remembers | **Yes, as its own later step** (store + `pp_allergen_intros` table, RLS, local-first) |
 | D5 | Missing offerings | **Yes, researched for India, every age:** `01-feeding-content.md` Part A. That covers the IMS Act rule, 26 products, and 8 classes/workshops/courses plus a new feeding therapist. No prices invented. |
 | D6 | Health drinks page, daycare and festival sections | **Yes, fully.** Copy is written in `01-feeding-content.md` Part B, ready to go into the code. |
+| D7 | Re-checked against what parents search: no change | Every top question has a page, and not eating leads for toddlers | **No change.** Added by the demand re-check, 2026-10-25 |
 
 ## 10. Costs
 None. No paid API or service is used. The films are owed content, and their cost is quoted when they are briefed (USD + INR).

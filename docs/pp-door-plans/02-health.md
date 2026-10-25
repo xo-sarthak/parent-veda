@@ -443,6 +443,20 @@ Hand-offs (not Health's to write):
   - the forehead thermometer and emollient claims check
   - the H4 no-medicine rule
 
+### What parents actually ask (the demand re-check, 2026-10-25)
+From `research/questions/ranked_parenting.csv`. H1 to H7 stand. One link is added (H8).
+
+| Question | Hits | Where it is answered |
+|---|---|---|
+| why baby not gaining weight | 342 | `Growth that needs a doctor` and Feeding's weight pages |
+| colic: what causes it, when it stops, how to relieve it | 351 | `tummy_colic`, on the newborn shelf (`hb_nb`); Behaviour links to it |
+| fever: what counts, how high, how long | ≈240 | the Fever rail |
+| teething: when, fever, diarrhoea, what to do | ≈420 | the teething pages |
+| can vaccination be delayed | 63 | the catch-up page |
+| baby massage: which oil, how, how many days | ≈276 | First 40's `f40_which_oil` and massage pages; Sleep's `malish` (FD12) |
+| why is baby poop green; how often; what it should look like | ≈250 | `f40_nappy_poop`, widened to 0–12 months (Potty PT11); linked here (H8) |
+| is vaccination covered by insurance | 24 | Papers PM3 |
+
 ## 9. Decisions (answered by the user 2026-10-23: "h1-h7 yes on all as u suggested")
 
 Every row was recommended Yes, and the user answered Yes.
@@ -456,6 +470,7 @@ Every row was recommended Yes, and the user answered Yes.
 | H5 | Add the 7 owed specialist categories with an invitation state, so pages can point at them before real profiles exist? | **Yes** |
 | H6 | Write the 15 new India pages (§5b) in full now, the way Feeding's new copy was written (`02-health-content.md`), before the build? | **Yes. Done 2026-10-23:** `02-health-content.md`. |
 | H7 | Make Health's choking page the one source and point Feeding at it (§5c)? | **Yes** |
+| H8 | Link `f40_nappy_poop` ("What his poo tells you") from the tummy rail on Something's wrong | "Why is baby poop green" and its kin (≈250) have only a newborn page, in another door | **Yes**, chosen and recorded. Added by the demand re-check, 2026-10-25 |
 
 ## 10. Costs
 None now. The films and the paediatrician's review are owed and quoted when briefed (USD + INR). No paid API or service is used.

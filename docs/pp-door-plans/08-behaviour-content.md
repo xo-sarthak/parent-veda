@@ -130,3 +130,6 @@ Each keeps its title and existing steps. The additions:
 - Tele-MANAS, MoHFW (14416).
 - WHO and NCDC guidance on animal bites and rabies post-exposure care.
 - Research on pica and iron deficiency, at the paediatric reviewer's choice.
+
+## Added by the demand re-check (2026-10-25)
+**§3a, the colic card on `crying_normal`:** it links "What helps, and when to worry" → Health `tummy_colic`, the one clinical page (no gripe water or janam ghutti; the red flags). The timeline in §3a is checked against that page's REQUIRED_REVIEW figures at build, so the two doors give the same numbers.

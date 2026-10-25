@@ -84,3 +84,38 @@ Area: safe_sleep. Bands: all. Format: SHORT ARTICLE. REQUIRED_REVIEW.
 - NHS and Lullaby Trust safer-sleep guidance (room temperature, overheating, bed-sharing harm reduction).
 - IAP guidance on infant sleep, and the National Sleep Foundation and AASM sleep-duration ranges by age.
 - AAP on parasomnias (sleepwalking, night terrors).
+
+## R. The demand re-check (2026-10-25), SL10
+REQUIRED_REVIEW by the paediatrician who reviews this door (NHS and AAP head-injury guidance, and AAP safe sleep).
+
+### `safe_sleep`, the first line
+> On his back, for every sleep, day and night. Not on his side and not on his tummy: babies put on their side roll onto their tummy.
+
+### New page: "When he's sick, or after a bump on the head"
+Bands: 6 months and up. Format: CARDS.
+
+**Call 112 or go to hospital now if, after a bump on the head:**
+- he's hard to wake, or very sleepy at times he'd usually be awake
+- he's vomited more than once
+- he's had a fit, or passed out
+- there's clear fluid or blood from his nose or ears
+- he's not himself: confused, unsteady, or crying in a way you don't recognise
+- he's under 1 and has a swelling or a soft spot on his head
+
+**After a bump: can he sleep?**
+- **Yes, if he's acted normally since the bump:** cried, then calmed, talked or played as usual. The old advice to keep a child awake is outdated.
+- **For the first night,** check on him, and wake him gently once or twice. He should stir and settle as he usually does.
+- **For two days,** watch for the signs above.
+- Link: "Falls from beds, stairs and balconies" → Safety `safety_falls`.
+
+**When he's sick**
+- **Let him sleep more.** Rest helps him get better, and a sick child often sleeps longer and naps again.
+- **Keep the fluids going:** offer milk or water when he wakes. Wake him for medicine only if the doctor said a set time.
+- **His routine will slip for a few nights.** Comfort him, and go back to the usual bedtime once he's well. Old habits come back within a week.
+- **Raising his head:** for a cold, a little saline before sleep helps more than pillows. No pillow under 1.
+- **See a doctor the same day if:**
+  - he's very hard to wake
+  - his breathing is fast or noisy
+  - he has fewer wet nappies
+  - his fever lasts more than two days
+- Link: Health's fever rail.

@@ -221,6 +221,17 @@ Reuse:
 - `PARENTING-DOORS-REVIEW.md`
 - the README row
 
+### What parents actually ask (the demand re-check, 2026-10-25)
+From `research/questions/ranked_parenting.csv`. Her own topic is small (102 hits); the postpartum questions sit under First 40's topic.
+
+| Question | Hits | Where it is answered |
+|---|---|---|
+| when should postpartum hair loss stop | 54 | You, Maa, Body |
+| how long postpartum depression lasts; why it happens; how it feels | 96 | You, Maa, Mind, with Tele-MANAS first (M5) |
+| when should postpartum bleeding stop | 28 | You, Maa, Body |
+| should I take postpartum vitamins | 18 | the iron pages |
+| when should you wear a postpartum belt | 16 | You, Maa, Moving |
+
 ## Decisions (answered by the user 2026-10-24: "yes for all")
 
 | # | Question | We recommended | Your answer |
@@ -234,6 +245,7 @@ Reuse:
 | M7 | 8 new pages for Indian mothers, written now in `03-you-maa-content.md`? | Yes | **Yes** (2026-10-24) |
 | M8 | Shop links only to stocked items; copy stops promising the rest? | Yes | **Yes** (2026-10-24), and: *"if some action is not able to take place due to unavailability like here product situation, then make sure user gets a toast notification, so that the user can understand why a tap didn't work"*. That became shell rule S8 (§12). |
 | M9 | One naming scheme for video ids, plus a door intro and 6 exercise demo films? | Yes | **Yes** (2026-10-24) |
+| M10 | Re-checked against what parents search: no change | Every top question has a page | **No change.** Added by the demand re-check, 2026-10-25 |
 
 Note: the plan as a whole was accepted earlier on 2026-10-24, but M1–M9 were only marked answered after the user answered them one by one ("yes for all").
 

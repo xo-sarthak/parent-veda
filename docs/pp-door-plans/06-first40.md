@@ -162,6 +162,18 @@ With no date of birth saved, the Day card says "Tell us when he was born to see 
 - **Wiring gate:** grep call sites.
 - A phone walk only on your word.
 
+### What parents actually ask (the demand re-check, 2026-10-25)
+From `research/questions/ranked_parenting.csv`. FD1 to FD10 stand. Three additions.
+
+| Question | Hits | Where it is answered |
+|---|---|---|
+| why 40 days after delivery | 164 | answered (the forty days, explained) |
+| when can a newborn see; can newborns see colour | 69 | **No page.** FD11 |
+| which baby massage oil is good | 65 (491 across the pool) | `f40_which_oil`, made the one source (FD12) |
+| why newborns get jaundice; how it's treated | 40 | the jaundice pages |
+| how many newborn clothes | 20 | a shop question |
+| newborn poop | see Potty PT11 | `f40_nappy_poop`, widened (§R1) |
+
 ## Decisions
 | # | Question | We recommended | Your answer |
 |---|---|---|---|
@@ -174,3 +186,6 @@ With no date of birth saved, the Day card says "Tell us when he was born to see 
 | FD7 | With no birth date, ask for it instead of showing "Day 1" forever | Yes | **Yes** (2026-10-24) |
 | FD8 | New bits: register the birth, birth vaccines, government money she may be owed, the old rules for the mother | Yes | **Yes** (2026-10-24) |
 | FD9 | A door intro film, plus the recovery film back | Yes | **Yes** (2026-10-24) |
+| FD11 | A "What he can see" card on Day by day | "When can a newborn see" (55) and "can newborns see colour" (14) have no page anywhere | **Yes**, chosen and recorded. Copy in `06-first40-content.md` §R2. Added by the demand re-check, 2026-10-25 |
+| FD12 | `f40_which_oil` is the one source for the oil; its mustard row and the FD5 toast match Traditions TR3 | Three doors would have given three answers to a top question | **Yes**, chosen and recorded. Copy in §R3. Added by the demand re-check, 2026-10-25 |
+| FD13 | `f40_nappy_poop` widened to 0–12 months, linked from Potty and Health | Potty PT11, Health H8 | **Yes**, chosen and recorded. Copy in §R1. Added by the demand re-check, 2026-10-25 |

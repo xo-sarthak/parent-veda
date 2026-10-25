@@ -174,6 +174,20 @@ All tab names already pass `door_names_fit_test`. The new activity names are kep
 - **Wiring gate:** grep the call sites.
 - A phone walk only on your word.
 
+## PT11. What his poo tells you (the demand re-check)
+The su-su tab (0–1) gets a link: "What his poo tells you" → First 40 `f40_nappy_poop` (M4 pageId). That page is widened and tagged 0–12 months (copy in `06-first40-content.md` §R1). One page, linked from Potty, Health (H8) and First 40.
+
+### What parents actually ask (the demand re-check, 2026-10-25)
+From `research/questions/ranked_parenting.csv`. PT1 to PT10 stand. The poo questions are about babies' nappies, not training (PT11).
+
+| Question | Hits | Where it is answered |
+|---|---|---|
+| when should potty training start | 107 | Starting out, readiness |
+| why is baby poop green; does it smell; how many times a day; what it should look like; watery; colour | ≈290 | **Only a newborn page** (`f40_nappy_poop`). PT11 |
+| should 3 year olds be potty trained | 31 | Starting out |
+| regression | 18 | Accidents |
+| which potty training pants is best | 20 | PT4, products next to the step |
+
 ## Decisions
 | # | Question | We recommended | Your answer |
 |---|---|---|---|
@@ -186,3 +200,4 @@ All tab names already pass `door_names_fit_test`. The new activity names are kep
 | PT7 | A door intro film and 3 demo films, and the ledger fixed? | Yes | **Yes** (2026-10-24) |
 | PT8 | A tab locked for her age never opens from a link (new shell rule S9 for all doors)? | Yes | **Yes** (2026-10-24). Reshaped by PT10: no tab is locked, so a link opens the later-age tab with the "for later" line |
 | PT10 | Should tabs for a later age stay locked? (raised by the user: "should we lock the content???") | Unlock, every door | **Unlock, every door** (2026-10-24): later-age tabs open, sit last, carry "For later, usually from …"; outgrown tabs still drop |
+| PT11 | Widen First 40's `f40_nappy_poop` to 0–12 months with "After the first weeks, and after solids", and link it from the su-su tab | "Why is baby poop green" (87), "how many times should a baby poop" (59) and the rest have no page after 40 days | **Yes**, chosen and recorded. Copy in `06-first40-content.md` §R1. Added by the demand re-check, 2026-10-25 |
