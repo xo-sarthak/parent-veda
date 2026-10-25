@@ -17,7 +17,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 | 8 | Behaviour | `08-behaviour.md` + `08-behaviour-content.md` | BH1–BH8 all yes 2026-10-25, recommendations checked against what parents search (colic, hitting, tantrums, screens). Plan final; build waits on step 0 |
 | 9 | Early learning | `09-early-learning.md` + `09-early-learning-content.md` | EL1–EL9 yes 2026-10-25; obvious ones chosen and recorded without a question (the user's call). Hindi rhymes in English letters, folk rhymes only. Plan final; build waits on step 0 |
 | 10 | Traditions | `10-traditions.md` + `10-traditions-content.md` | TR1–TR6 chosen and recorded 2026-10-25 (jhula fixed to match Sleep SL7; malish and which oil, the top search). TR-Q (tone of two pages) approved with two small changes. Plan final; build waits on step 0. Owed to the shop list: baby massage oil is not stocked |
-| 11 | Safety | — | |
+| 11 | Safety | `11-safety.md` + `11-safety-content.md` | SF1–SF8 chosen and recorded 2026-10-25: emergency call strip on every tab, CPR for baby and child, flights and front seat (the top search). Plan final; build waits on step 0. Owed to the shop list: gates, socket covers, corner guards, cabinet locks, child helmets. Owed: a first aid and CPR class |
 | 12 | Special care | — | |
 | 13 | Family | — | |
 | 14 | Papers and money | — | |
