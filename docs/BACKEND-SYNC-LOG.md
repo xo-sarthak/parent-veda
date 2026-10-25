@@ -1320,7 +1320,7 @@ comments). `sync_reset_coverage_test` also passes.
 
 **Date:** 2026-10-25 (STAGE-TRANSITIONS R1; the user: "let them take control of it and delete it permanently if
 they want tht, why decide for them?", and "lets keep it 90 days for now"). **Migration:** `0114_pregnancies.sql`
-(the user runs it). **Commit:** owed.
+(the user runs it). **Commit:** `656bbb3`.
 
 ### Why
 A pregnancy was not a thing the database could name: one due date, one stage and one loss flag per person. So a
@@ -1395,7 +1395,7 @@ pregnancy overwrote the first's mood; and there was no way to look back at an ea
 - On his phone, before she has run the update, he derives records of his own from her due date. Once hers arrive,
   his are what his windows use.
 
-**User ran:** 0114: owed.
+**User ran:** 0114 on 2026-10-25.
 
 **Files:**
 - New: `supabase/migrations/0114_pregnancies.sql`, `lib/services/pregnancy_records.dart`,
