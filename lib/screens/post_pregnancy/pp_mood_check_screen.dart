@@ -33,7 +33,8 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart' show PvChoiceTile;
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
-import '../mind_mood/mm_crisis_path.dart' show MmCrisisPathScreen;
+// import '../mind_mood/mm_crisis_path.dart' show MmCrisisPathScreen; // kept for revert
+import 'pp_crisis_path_screen.dart' show PpCrisisPathScreen;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvSecondary, kPvInk, pvStorePalette;
 
@@ -67,9 +68,18 @@ class _PpMoodCheckScreenState extends State<PpMoodCheckScreen> {
   bool get _done => !_answers.contains(null);
   bool get _anyYes => _answers.contains(true);
 
+  // ⚠️ ONE CRISIS SCREEN FOR HER (door 3, §5, 2026-10-25). This opened the
+  // pregnancy `MmCrisisPathScreen` under a pregnancy route name, while every
+  // crisis link on her door opens `PpCrisisPathScreen` through the router.
+  // Two screens for one emergency drift. The pregnancy screen is untouched.
+  // Was, kept for revert:
+  // void _crisis() => Navigator.of(context).push(MaterialPageRoute<void>(
+  //       settings: const RouteSettings(name: 'mind/crisis'),
+  //       builder: (_) => const MmCrisisPathScreen(),
+  //     ));
   void _crisis() => Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: const RouteSettings(name: 'mind/crisis'),
-        builder: (_) => const MmCrisisPathScreen(),
+        settings: const RouteSettings(name: 'pp_crisis_path'),
+        builder: (_) => const PpCrisisPathScreen(),
       ));
 
   @override

@@ -140,6 +140,9 @@ read it. The field and the chip go in with the first door film. Every parenting
 door plan names its film (for example `family/door_intro`).
 Health's is `health/door_intro` (a real paediatrician), owed as
 `DOOR-CONTENT-OWED` HD5; still no chip (door 2 build, 2026-10-25).
+You, Maa's is `you_maa/door_intro` (a real perinatal counsellor or
+gynaecologist), owed as `DOOR-CONTENT-OWED` YM13; still no chip (door 3 build,
+2026-10-25).
 
 ### 6 · Real products — WAITING (user's product master sheet)
 
@@ -281,7 +284,14 @@ and Get help now is always second (the plan's exception to "most pages"); the
 calm tabs follow his age. The first card is Fever check every time, and the
 first rail is picked for his age. `test/pp_health_door_test.dart` holds the
 first view at 3 weeks, 7 months, 2 years and 4 years.
-**OWED:** Skilling action doors; parenting doors 3 to 14, each in its own build.
+**You, Maa, 2026-10-25 (door 3 build):** How are you today opens at every band
+(the frightening-thoughts route is pinned on it); the tabs after it follow her
+weeks since the birth, on her youngest child's clock. Its second card is an
+action, "10 minutes for you today", which opens the one session for her week.
+Body and Moving open on a shelf for her week. `test/pp_you_maa_door_test.dart`
+("door 3: the plan, held") holds the first view at 3 weeks, 7 weeks, 4 months
+and 8 months.
+**OWED:** Skilling action doors; parenting doors 4 to 14, each in its own build.
 
 ---
 

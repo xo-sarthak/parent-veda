@@ -311,7 +311,14 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
   /// "For later. This usually starts from 1 year." The one line a tab for a
   /// later age opens with (S9).
-  String _laterLine(int months) {
+  String _laterLine(PpDoorTab tab, int months) {
+    // Her bands are in weeks (You, Maa M2): Going back opens at six weeks,
+    // which in months read "about 1 months".
+    final weeks = _unlockWeeks(tab);
+    if (door.aboutHer && weeks != null && weeks < 13) {
+      return 'For later. This usually starts about ${weeks.round()} weeks '
+          'after the birth.';
+    }
     if (door.aboutHer) {
       final when = months % 12 == 0
           ? '${months ~/ 12} ${months == 12 ? 'year' : 'years'}'
@@ -321,20 +328,60 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     return 'For later. This usually starts ${_lockLabel(months).replaceFirst('From', 'from')}.';
   }
 
-  /// The month a locked tab opens, or null when it is open now.
+  /// The month a locked tab opens, or null when it is open now. Rounded from
+  /// [_unlockWeeks], which decides.
   int? _unlockMonths(PpDoorTab t) {
+    final w = _unlockWeeks(t);
+    return w == null ? null : (w / 4.345).round();
+  }
+
+  /// ⚠️ THE WEEK A TAB FOR LATER OPENS, ON THE SECTION'S OWN CLOCK (You, Maa
+  /// M2, 2026-10-25). It read the selected child's months, so on You, Maa
+  /// a mother of a toddler and a newborn had Going back open as if she were
+  /// years past the birth, and six weeks rounded to a month. For a months
+  /// set nothing changes: `fromMonths > floor(weeks / 4.345)` is the same
+  /// test as `fromMonths * 4.345 > weeks`. Was, kept for revert:
+  // int? _unlockMonths(PpDoorTab t) {
+  //   if (t.areaIds.isEmpty) return null;
+  //   final age = ChildProfileStore.instance.ageInMonths;
+  //   final starts = <int>[];
+  //   for (final id in t.areaIds) {
+  //     for (final a in section.areas.where((a) => a.id == id)) {
+  //       if (a.inBand(_band)) return null;
+  //       starts.add(_areaFrom(a));
+  //     }
+  //   }
+  //   if (starts.isEmpty) return null;
+  //   final from = starts.reduce((x, y) => x < y ? x : y);
+  //   return from > age ? from : null;
+  // }
+  double? _unlockWeeks(PpDoorTab t) {
     if (t.areaIds.isEmpty) return null;
-    final age = ChildProfileStore.instance.ageInMonths;
-    final starts = <int>[];
+    final age =
+        section.bandSet?.clockWeeks ?? ChildProfileStore.instance.ageInWeeks;
+    final starts = <double>[];
     for (final id in t.areaIds) {
       for (final a in section.areas.where((a) => a.id == id)) {
         if (a.inBand(_band)) return null;
-        starts.add(_areaFrom(a));
+        starts.add(_areaFromWeeks(a));
       }
     }
     if (starts.isEmpty) return null;
     final from = starts.reduce((x, y) => x < y ? x : y);
     return from > age ? from : null;
+  }
+
+  /// Where an area's earliest band starts, in weeks. No bands: every age.
+  double _areaFromWeeks(PpArea a) {
+    final set = section.bandSet;
+    if (a.bands.isEmpty || set == null) return 0;
+    double? from;
+    for (final b in set.bands) {
+      if (a.bands.contains(b.id) && (from == null || b.startWeeks < from)) {
+        from = b.startWeeks;
+      }
+    }
+    return from ?? 0;
   }
 
   _Lock _lockFor(PpDoorTab t) {
@@ -348,17 +395,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     return open ? _Lock.open : _Lock.past;
   }
 
-  /// Where an area's earliest band starts, in months. An area with no bands
-  /// is for every age.
-  int _areaFrom(PpArea a) {
-    final set = section.bandSet;
-    if (a.bands.isEmpty || set == null) return 0;
-    var from = 1 << 20;
-    for (final b in set.bands) {
-      if (a.bands.contains(b.id) && b.fromMonths < from) from = b.fromMonths;
-    }
-    return from == 1 << 20 ? 0 : from;
-  }
+  // Where an area's earliest band starts, in months. An area with no bands
+  // is for every age. Replaced by [_areaFromWeeks] (You, Maa M2), kept for
+  // revert:
+  // int _areaFrom(PpArea a) {
+  //   final set = section.bandSet;
+  //   if (a.bands.isEmpty || set == null) return 0;
+  //   var from = 1 << 20;
+  //   for (final b in set.bands) {
+  //     if (a.bands.contains(b.id) && b.fromMonths < from) from = b.fromMonths;
+  //   }
+  //   return from == 1 << 20 ? 0 : from;
+  // }
 
   /// "From 1 year", "From 6 months": the card's second line while locked.
   String _lockLabel(int months) => months % 12 == 0
@@ -416,6 +464,17 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   bool _forHerAge(PpPage x, String band) {
     final n = section.bandSet?.bands.length ?? 0;
     return x.bands.contains(band) && x.bands.length * 2 <= n;
+  }
+
+  /// "3 weeks after the birth", "4 months after the birth": her time on her
+  /// own clock (You, Maa M2), under her age rail.
+  String _herWeeksLine() {
+    final w = (section.bandSet?.clockWeeks ??
+            ChildProfileStore.instance.youngestAgeInWeeks)
+        .floor();
+    if (w < 13) return '$w ${w == 1 ? 'week' : 'weeks'} after the birth';
+    final m = (w / 4.345).round();
+    return '$m months after the birth';
   }
 
   /// The tab's age rail for the band it shows (`PpDoorTab.ageRail`): its
@@ -544,8 +603,11 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
           PpArea(
               id: kPpAgeRailId,
               title: age.$1.title,
-              blurb: 'Picked for ${ChildProfileStore.instance.nameMid}, '
-                  '${ChildProfileStore.instance.ageLabel}'),
+              // On You, Maa the rail is picked for her week, not his age.
+              blurb: door.aboutHer
+                  ? 'Picked for you, ${_herWeeksLine()}'
+                  : 'Picked for ${ChildProfileStore.instance.nameMid}, '
+                      '${ChildProfileStore.instance.ageLabel}'),
           age.$2,
         ),
     ];
@@ -775,7 +837,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                     //   const SizedBox(height: kPvDoorBlockGap),
                     // ] else ...[
                     if (_unlockMonths(tab) case final m?) ...[
-                      ppDoorPad(Text(_laterLine(m),
+                      ppDoorPad(Text(_laterLine(tab, m),
                           key: const ValueKey('pp_door_later_line'),
                           style: pvManrope(
                               fontSize: 13.5,

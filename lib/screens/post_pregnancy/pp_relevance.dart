@@ -39,7 +39,11 @@ enum PpSignal {
   cSection('After a C-section', ['c-section', 'caesarean', 'cesarean']),
   formula('On formula', ['formula', 'bottle']),
   breastfeeding('Breastfeeding', ['breast', 'latch', 'nipple', 'milk supply', 'pumping']),
-  twins('For twins', ['twin']);
+  twins('For twins', ['twin']),
+  // Door 3 (You, Maa, 2026-10-25), from her pregnancy record: the after-GDM
+  // and after-BP pages lead for the mothers who had them, in the first year.
+  sugarInPregnancy('After sugar in pregnancy', ['sugar in pregnancy']),
+  bpInPregnancy('After high BP in pregnancy', ['high bp in pregnancy']);
 
   const PpSignal(this.why, this.words);
 
@@ -97,6 +101,12 @@ class PpSituation {
           (useLog && feeds.breastMilkLast24h))
         PpSignal.breastfeeding,
       if (fam.multiple) PpSignal.twins,
+      if (fam.hasPregCondition(PregCondition.gestationalDiabetes) &&
+          child.ageInMonths < 12)
+        PpSignal.sugarInPregnancy,
+      if (fam.hasPregCondition(PregCondition.hypertension) &&
+          child.ageInMonths < 12)
+        PpSignal.bpInPregnancy,
     };
     return PpSituation(
       ageMonths: child.ageInMonths,

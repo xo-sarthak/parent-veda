@@ -9,6 +9,9 @@
 //  measuring her. She already has a weighing scale, a pad count, a feed log and
 //  a household with opinions. `tools: const []` at the foot of this file is the
 //  whole implementation of that rule, and it is deliberate rather than unfinished.
+//  The DOOR has tools (pp_door_you_maa.dart): the unscored check-in, Kegel
+//  Care, the classes, the "Can I...?" lookup. None scores her mood or her
+//  body; Kegel Care keeps a practice history of its own, with no streaks.
 //
 //  ⚠️ THE "BOUNCE BACK" NARRATIVE IS REJECTED EVERYWHERE IN THIS FILE. No weight
 //  loss framing, no before and after, no "get your body back". Her body did not
@@ -31,6 +34,7 @@
 // =============================================================================
 
 import 'pp_age_bands.dart';
+import '../../data/mind_mood_data.dart' show kCrisisHelplineName, kCrisisHelplineNumber;
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
 import 'pp_section_screen.dart';
@@ -57,16 +61,12 @@ const List<String> _later = [_b2, _b3];
 // -----------------------------------------------------------------------------
 //  ⚠️ THE CRISIS ROUTE.
 //
-//  `pp_crisis_path` is NOT yet in pp_surface_router.dart. It needs one line
-//  pointing at `MmCrisisPathScreen` (lib/screens/mind_mood/mm_crisis_path.dart),
-//  which already ships for pregnancy and already carries the helpline, the "tell
-//  someone in the room" line, and the rule that nothing is ever sold on it.
-//  Reused rather than rebuilt, per the spec's "build once, reuse (same pattern as
-//  pregnancy Mind & Mood)".
-//
-//  Until that router line exists, the link renders honestly as SOON, so every
-//  crisis callout in this file also carries the instruction in its own words. A
-//  page that only works once someone wires a link is not safe enough for this.
+//  `pp_crisis_path` is routed (pp_surface_router.dart) to `PpCrisisPathScreen`,
+//  and since door 3 (2026-10-25) the mood check opens the same screen, not the
+//  pregnancy one. Every crisis callout in this file still carries the
+//  instruction in its own words: a page that only works once a link opens is
+//  not safe enough for this. (This said the route was "NOT yet" wired until
+//  door 3's build.)
 //
 //  // REQUIRED_TO_CONFIRM: the helpline itself. This file never prints a phone
 //  number. The name, number and hours live in ONE place,
@@ -77,6 +77,13 @@ const List<String> _later = [_b2, _b3];
 // -----------------------------------------------------------------------------
 const String _crisis = 'pp_crisis_path';
 
+// ⚠️ FREE HELP SITS ABOVE ANY PAID CARD ON A MIND PAGE (door 3, M5,
+// 2026-10-25). Built from the one helpline constant, so this file still
+// never types a number of its own.
+const String _kFreeNow = 'If you need someone right now, '
+    '$kCrisisHelplineName on $kCrisisHelplineNumber is free, any hour, in '
+    'Indian languages.';
+
 /// Not yet routed. Named here so the report and the router agree on the id.
 // ⚠️ THE TWO DEAD ENDS, WIRED (the You brief, 2026-09-13). "Around eight
 // in-page links go nowhere ... these are the missing shop. Point them at the
@@ -86,7 +93,18 @@ const String _crisis = 'pp_crisis_path';
 // const String? _circleSurface = null; // pp_circle_4th_trimester, notReady
 // const String? _shopSurface = null; // pp_postpartum_products, notReady
 const String _circleSurface = 'pp_community/mothers_4th_trimester';
-const String _shopSurface = 'pp_products';
+// const String _shopSurface = 'pp_products'; // the whole shop; kept for revert
+
+// ⚠️ ONLY SHELVES THAT ARE STOCKED (door 3, M8, 2026-10-25). Every shop link
+// opened the whole store, and five of them promised belts, a sitz bath, scar
+// sheets and cooler bags that it does not carry. Each link now opens the one
+// shelf it names; the unstocked promises are commented out and owed
+// (DOOR-CONTENT-OWED). Never on a mind or crisis page.
+const String _shopPads = 'pp_products/pvs_graded_flow_maternity_pads';
+const String _shopPeri = 'pp_products/pvs_ergonomic_peri_bottles';
+const String _shopBras = 'pp_products/pvs_wireless_nursing_bras';
+const String _shopPumps = 'pp_products/pvs_electric_breast_pumps';
+const String _shopLounge = 'pp_products/pvs_postpartum_loungewear_sets';
 
 final PpSection kPpYouMaaSection = PpSection(
   id: 'parenting_maternal', // MUST match the hub's bracketId
@@ -140,10 +158,10 @@ final PpSection kPpYouMaaSection = PpSection(
 //  ⚠️ AND THE ROUTES ARE THEMSELVES BANDED, so a mother five months in is never
 //  offered "I am still bleeding" as a description of her day.
 //
-//  KNOWN LIMITATION, REPORTED: `PpLink` can only open a router surface, not
-//  another page inside this section. So a route page does its own first aid and
-//  then names the door to open, rather than jumping there. If `PpLink` ever gains
-//  a `pageId`, these seven pages become one tap shorter.
+//  ⚠️ ONE TAP TO THE PAGE (door 3, M4, 2026-10-25). This said `PpLink` could
+//  only open a router surface. It gained `pageId` for Potty and nobody came
+//  back here, so each route named a door in prose and stopped. Each route now
+//  ends on a link to the page itself.
 // =============================================================================
 
 final PpArea _howAreYou = PpArea(
@@ -168,7 +186,7 @@ final PpArea _howAreYou = PpArea(
           title: 'When it is more than tiredness',
           subtitle: 'A counsellor on the difference between the baby blues and something that needs help, said without alarm.',
           minutes: '6 MIN',
-          slotId: 'you/more_than_tired',
+          slotId: 'you_maa/more_than_tired', // was 'you/more_than_tired' (door 3, M9)
         ),
         PpIntro('You opened the right thing. Nothing you are about to read is '
             'going to judge you, and nothing here is going to tell you that you '
@@ -226,6 +244,9 @@ final PpArea _howAreYou = PpArea(
         PpLink('Watch and read: mothers on feeling low',
             surfaceId: 'pp_watch',
             blurb: 'Short, honest, no advice you have already heard.'),
+        PpLink('The baby blues, or something more',
+            pageId: 'mind_blues_vs_ppd',
+            blurb: 'How to tell the two apart, and when to ask for help.'),
       ],
     ),
     PpPage(
@@ -262,6 +283,15 @@ final PpArea _howAreYou = PpArea(
         PpIndiaNote('Sitting cross legged on the floor to feed, then to eat, '
             'then to fold clothes, means a lot of getting up and down on a '
             'healing body. A low stool and a cushion is not laziness.'),
+        PpLink('The bleeding, and what is normal',
+            pageId: 'body_lochia',
+            blurb: 'How long, how much, and what colour.'),
+        PpLink('Stitches, and sitting down again',
+            pageId: 'body_perineum',
+            blurb: 'After a vaginal birth.'),
+        PpLink('After a C-section, the first weeks',
+            pageId: 'body_csection_early',
+            blurb: 'The wound, getting up, and what to avoid.'),
       ],
     ),
     PpPage(
@@ -286,13 +316,22 @@ final PpArea _howAreYou = PpArea(
           'or bulging feeling, see a pelvic floor physiotherapist rather than '
           'doing more exercises harder. That page tells you when.',
         ]),
+        // One tap to the page itself (M4), where the prose names a door.
+        PpLink('Belly breathing, the foundation',
+            pageId: 'pf_ex_breathing',
+            blurb: 'Safe from the first days, including after a caesarean.'),
+        PpLink('When to see a physio',
+            pageId: 'pf_physio_when',
+            blurb: 'The signs that more exercise is not the answer.'),
       ],
     ),
     PpPage(
       id: 'you_route_stiff',
       title: 'I am stiff and I want to move again',
       format: 'ROUTE',
-      bands: _cleared,
+      // Every band since door 3 (§4): in the first six weeks it routes to the
+      // first-weeks page. Was `bands: _cleared`, kept for revert.
+      bands: _allBands,
       blocks: [
         PpIntro('Wanting to move is a good sign and it is not vanity. Movement '
             'after birth is for your back, your mood and your sleep, in that '
@@ -309,6 +348,12 @@ final PpArea _howAreYou = PpArea(
           'If you had a C-section, there is a page written only for that, with '
           'what to avoid and for how long.',
         ]),
+        PpLink('Moving in the first six weeks',
+            pageId: 'move_first_weeks',
+            blurb: 'If your baby is under six weeks old, start here.'),
+        PpLink('Waking up your deep core',
+            pageId: 'move_core_reconnect',
+            blurb: 'After your six-week check. The one everything else needs.'),
         PpLink('Follow along: postpartum classes',
             surfaceId: 'pp_yoga',
             blurb: 'Gentle recovery and postnatal sessions from the library.'),
@@ -339,9 +384,17 @@ final PpArea _howAreYou = PpArea(
           'fenugreek laddoo and the warm harira drink. It also has one handed meals for the days '
           'when you have exactly one free hand and eleven minutes.',
         ]),
+        // ⚠️ `pp_food` is the BABY's recipe library (§5, M4). Her own recipes
+        // are the healing kitchen's pages. Kept for revert:
+        // PpLink('Recipes for you, not the baby',
+        //     surfaceId: 'pp_food',
+        //     blurb: 'The full recipe library, if you want to browse wider.'),
         PpLink('Recipes for you, not the baby',
-            surfaceId: 'pp_food',
-            blurb: 'The full recipe library, if you want to browse wider.'),
+            pageId: 'kitchen_one_handed',
+            blurb: 'One-handed meals for the days with eleven free minutes.'),
+        PpLink('Iron, from your own kitchen',
+            pageId: 'kitchen_iron_foods',
+            blurb: 'Dates, jaggery, greens: the foods that refill you.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpCards(heading: 'Burnout, and sharing the load', [
           PpCard('The signs', 'Exhausted even after rest, short-tempered, '
@@ -379,13 +432,18 @@ final PpArea _howAreYou = PpArea(
             'not wanting to talk, or feeling nothing at all, read "I do not feel '
             'like myself" instead. That is a different thing and it has '
             'different help.'),
+        PpLink('Lonely in a full house',
+            pageId: 'mind_lonely',
+            blurb: 'Why it happens, and the two kinds of help.'),
       ],
     ),
     PpPage(
       id: 'you_route_work',
       title: 'I am going back to work soon',
       format: 'ROUTE',
-      bands: _later,
+      // From six weeks since door 3 (§4): the Going back tab opens then. Was
+      // `bands: _later`, kept for revert.
+      bands: _cleared,
       blocks: [
         PpIntro('The last few weeks of maternity leave are their own kind of '
             'hard. There is a lot to arrange and a lot to feel, and the two get '
@@ -403,6 +461,12 @@ final PpArea _howAreYou = PpArea(
             'four weeks before your return date, not in the last week. Mothers '
             'who found it manageable almost always started earlier than they '
             'thought they needed to.'),
+        PpLink('Planning your return',
+            pageId: 'work_planning',
+            blurb: 'What to arrange, starting about four weeks out.'),
+        PpLink('Building a milk stash',
+            pageId: 'work_milk_stash',
+            blurb: 'How much, how early, and how to store it.'),
       ],
     ),
   ],
@@ -446,7 +510,7 @@ final PpArea _yourBody = PpArea(
           title: 'What your body is doing, week by week',
           subtitle: 'Bleeding, stitches, the first period, and the things nobody warned you about.',
           minutes: '7 MIN',
-          slotId: 'you/body_recovery',
+          slotId: 'you_maa/body_recovery', // was 'you/body_recovery' (door 3, M9)
         ),
         PpIntro('Almost everything you will feel after birth is ordinary '
             'healing. A small number of things are not, and every one of them is '
@@ -566,7 +630,7 @@ final PpArea _yourBody = PpArea(
             'damp. Disposable maternity pads for the first two weeks are worth '
             'the money for infection reasons alone.'),
         PpLink('Maternity pads and cotton postpartum underwear',
-            surfaceId: _shopSurface,
+            surfaceId: _shopPads, // was _shopSurface (M8)
             blurb: 'What to buy, and how many. Honest picks, no brands pushed.'),
       ],
     ),
@@ -617,9 +681,14 @@ final PpArea _yourBody = PpArea(
             'If your home has one, a low stool to hold and push up from helps a '
             'lot. At the hospital, ask for a western commode if you have a '
             'choice.'),
-        PpLink('Perineal care: spray, sitz bath and cushions',
-            surfaceId: _shopSurface,
-            blurb: 'The three things that really help, and what to skip.'),
+        // M8: the sitz bath and cushions are not stocked; the copy stops
+        // promising them (DOOR-CONTENT-OWED). Kept for revert:
+        // PpLink('Perineal care: spray, sitz bath and cushions',
+        //     surfaceId: _shopSurface,
+        //     blurb: 'The three things that really help, and what to skip.'),
+        PpLink('A peri bottle, for the first weeks',
+            surfaceId: _shopPeri,
+            blurb: 'Rinse instead of wiping. The one thing worth buying.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpSteps(heading: 'A sitz bath', [
           PpStep('Use a clean basin or a tub with a few inches of warm water',
@@ -712,9 +781,13 @@ final PpArea _yourBody = PpArea(
             'though you did not really give birth, or took the easy route. You '
             'had surgery to deliver your child, and that is giving birth. Nothing '
             'about an operating theatre is easy.'),
-        PpLink('C-section recovery: belts, cushions and scar care',
-            surfaceId: _shopSurface,
-            blurb: 'A binder helps early. Scar care starts later. Both explained.'),
+        // M8: belts and binders are not stocked. Kept for revert:
+        // PpLink('C-section recovery: belts, cushions and scar care',
+        //     surfaceId: _shopSurface,
+        //     blurb: 'A binder helps early. Scar care starts later. Both explained.'),
+        PpLink('Soft clothes that sit above the wound',
+            surfaceId: _shopLounge,
+            blurb: 'High-waisted, loose and easy to feed in.'),
             // Added 2026-10-02 from the parenting gap analysis (P2/P3).
             PpSteps(heading: 'Breastfeeding after a caesarean', [
               PpStep('Start as soon as you can', 'Often in the recovery room. '
@@ -760,6 +833,14 @@ final PpArea _yourBody = PpArea(
           ], heading: 'What helps', hue: 12),
         PpWhenLine('Strongest in the first two to three days, mostly gone by '
             'the end of the first week.'),
+        // Part B (door 3).
+        PpIndiaNote('Older women at home may give ajwain water or a hot drink '
+            'for the cramps. A warm drink is fine. If anyone suggests a tight '
+            'belt or binding to "push the womb back", it does not make the '
+            'uterus shrink faster.'),
+        PpLink('Signs after birth that mean go now',
+            pageId: 'body_red_flags',
+            blurb: 'The short list. Worth knowing by heart.'),
         PpCallout(
           'Cramping that keeps getting worse after the first week, or comes with '
           'fever, heavy bleeding or a bad smell, is not afterpains. Get it '
@@ -866,7 +947,7 @@ final PpArea _yourBody = PpArea(
             'first thick yellow milk is the most concentrated feed your baby will '
             'ever get, and tight binding causes blocked ducts.'),
         PpLink('Nursing bras, pads and nipple cream',
-            surfaceId: _shopSurface,
+            surfaceId: _shopBras, // was _shopSurface (M8)
             blurb: 'Two bras is enough. Which cream is safe for the baby.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpCards(heading: 'Leaking, and the colour of your milk', [
@@ -927,8 +1008,12 @@ final PpArea _yourBody = PpArea(
             'kept off your feet, got this right long before anyone measured it. '
             'Where families still do it, take it. Where they have stopped, this '
             'is the part worth keeping.'),
+        // Was `surfaceId: null`, a dead link (§5). Kept for revert:
+        // PpLink('Your first 40 days',
+        //     surfaceId: null,
+        //     blurb: 'The whole tradition, day by day, in its own section.'),
         PpLink('Your first 40 days',
-            surfaceId: null,
+            surfaceId: 'pp_section/parenting_first_40',
             blurb: 'The whole tradition, day by day, in its own section.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpCards(heading: 'Everyday questions in the first weeks', [
@@ -997,9 +1082,11 @@ final PpArea _yourBody = PpArea(
         PpIndiaNote('Turmeric paste and hot oil straight onto a new scar is '
             'common advice and a bad idea in the first weeks. Once it is closed '
             'and you are massaging, plain oil is fine and does the job.'),
-        PpLink('Scar care creams and sheets, compared',
-            surfaceId: _shopSurface,
-            blurb: 'What silicone sheets do, what they cost, and who needs them.'),
+        // M8: scar sheets and creams are not stocked; the page explains
+        // them in its own words. Kept for revert:
+        // PpLink('Scar care creams and sheets, compared',
+        //     surfaceId: _shopSurface,
+        //     blurb: 'What silicone sheets do, what they cost, and who needs them.'),
       ],
     ),
     PpPage(
@@ -1008,6 +1095,14 @@ final PpArea _yourBody = PpArea(
       format: 'ARTICLE',
       bands: _cleared,
       blocks: [
+        // M9: a demo film, owed (DOOR-CONTENT-OWED). Placeholder until
+        // filmed; a tap says so (S8).
+        PpVideoSlot(
+          title: 'Your back, and how you hold and feed',
+          subtitle: 'Three changes to how you sit, lift and stand.',
+          minutes: '4 MIN',
+          slotId: 'you_maa/demo_back_posture',
+        ),
         PpIntro('Back pain after birth is so common it gets treated as a joke. '
             'It is almost always mechanical, which means it is almost always '
             'fixable by changing what you do all day.'),
@@ -1074,8 +1169,18 @@ final PpArea _yourBody = PpArea(
       id: 'body_wrist_neck',
       title: 'Wrist, thumb and neck pain from feeding',
       format: 'SHORT ARTICLE',
-      bands: [_b1, _b2],
+      // Six weeks on, with no end (door 3, §4): she lifts and feeds past six
+      // months too. Was `[_b1, _b2]`, kept for revert.
+      bands: _cleared,
       blocks: [
+        // M9: a demo film, owed (DOOR-CONTENT-OWED). Placeholder until
+        // filmed; a tap says so (S8).
+        PpVideoSlot(
+          title: 'Holds that rest your wrist and neck',
+          subtitle: 'The baby-holding positions that stop the thumb pain.',
+          minutes: '3 MIN',
+          slotId: 'you_maa/demo_wrist_neck',
+        ),
         PpIntro('A sharp pain at the base of your thumb, or a wrist that hurts '
             'to lift with. It has a name, it is caused by holding a baby, and it '
             'settles once you change the hold.'),
@@ -1118,7 +1223,9 @@ final PpArea _yourBody = PpArea(
       id: 'body_hair_fall',
       title: 'My hair is coming out in handfuls',
       format: 'SHORT ARTICLE',
-      bands: [_b1, _b2],
+      // Six weeks on, with no end (door 3, §4): the shedding often peaks at
+      // four months and runs past six. Was `[_b1, _b2]`, kept for revert.
+      bands: _cleared,
       blocks: [
         PpIntro('Hair in the drain, hair on the pillow, hair wrapped round the '
             'baby\'s fingers. Around three months after birth this frightens '
@@ -1233,9 +1340,13 @@ final PpArea _yourBody = PpArea(
           'not control.',
           kind: PpCalloutKind.myth,
         ),
-        PpLink('Postpartum belts and binders, compared',
-            surfaceId: _shopSurface,
-            blurb: 'Useful early and for support. Not a treatment. Here is why.'),
+        // M8: belts and binders are not stocked. Kept for revert:
+        // PpLink('Postpartum belts and binders, compared',
+        //     surfaceId: _shopSurface,
+        //     blurb: 'Useful early and for support. Not a treatment. Here is why.'),
+        PpLink('Diastasis Recovery 1:1',
+            surfaceId: 'pp_yoga/co_1to1',
+            blurb: 'A physio checks the gap first, then builds your plan.'),
       ],
     ),
     PpPage(
@@ -1417,11 +1528,105 @@ final PpArea _yourBody = PpArea(
               'Your vision changes, your eye hurts, or you have a severe '
                   'headache: that is not a pushing mark.'),
         ]),
+        // M6: the gynaecologist, the one category with real people, next to
+        // the worry. One pitch on this page.
+        PpConsult(
+          title: 'Talk it through with a gynaecologist',
+          whoFor: 'For the thing that still does not feel right months on, '
+              'and you are not sure whether it is worth a visit.',
+          surfaceId: 'pp_experts',
+          role: 'gynaecologist',
+        ),
       ],
     ),
     // ⚠️ [NEW], a scaffold. "Postpartum thyroid trouble is common and often
     // missed, and it mimics depression, fatigue and hair loss. A mother
     // searching 'thyroid after delivery' will not find it." Copy supplied.
+    // =========================================================================
+    //  DOOR 3's NEW PAGES (2026-10-25, `03-you-maa-content.md` Part A, M7).
+    //  Every clinical, legal and scheme line is REQUIRED_REVIEW: a
+    //  gynaecologist reads them, and the scheme lines are checked against the
+    //  current government text before release (BEFORE-LAUNCH). Never a dose.
+    // =========================================================================
+    PpPage(
+      id: 'body_contraception',
+      title: 'Not ready for another baby yet? Your choices after birth',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('You can get pregnant again before your periods come back. '
+            'Many mothers in India find this out the hard way. You do not have '
+            'to decide anything today, but it helps to know your choices '
+            'before you need one.'),
+        // REQUIRED_REVIEW: all three paragraphs.
+        PpArticle([
+          'Your body can release an egg about three to six weeks after birth, '
+              'before you see a single period. If you are not breastfeeding, '
+              'this can happen even sooner. So "my periods have not started" '
+              'does not mean "I cannot get pregnant".',
+          'Breastfeeding protects you, but only under three conditions, all at '
+              'once. Your baby is under six months. Your baby has nothing but '
+              'breast milk, day and night, with no long gaps. Your periods have '
+              'not come back. When any one of these stops being true, the '
+              'protection stops too. Doctors call this LAM, the lactational '
+              'amenorrhoea method.',
+          'Most choices are safe while breastfeeding. The one family to avoid '
+              'in the first months of feeding is the combined pill, which can '
+              'reduce milk. Your doctor will steer you.',
+        ]),
+        // REQUIRED_REVIEW: every card.
+        PpCards(heading: 'The choices, in plain words', [
+          PpCard('Copper-T (IUCD)',
+              'A small device placed in the uterus by a doctor or trained '
+                  'nurse. It can go in within 48 hours of birth, even during a '
+                  'caesarean (called PPIUCD), or from six weeks after. Lasts 5 '
+                  'or 10 years depending on the type, and comes out whenever '
+                  'you want. Free at government hospitals.'),
+          PpCard('Antara, the injection',
+              'One injection every three months, given at a health centre. '
+                  'Safe while breastfeeding, usually from six weeks after '
+                  'birth. Free at government facilities. Periods often become '
+                  'irregular or stop while you use it; that is expected.'),
+          PpCard('Chhaya, the non-hormonal pill',
+              'A pill taken twice a week at first and then once a week, as '
+                  'your health worker explains. Safe while breastfeeding. Free '
+                  'at government '
+                  'facilities and through ASHA workers.'),
+          PpCard('The progestogen-only pill',
+              'A daily pill made for breastfeeding mothers. It needs to be '
+                  'taken at the same time every day.'),
+          PpCard('Condoms',
+              'Work from day one, with no effect on milk. Free through ASHA '
+                  'workers and health centres.'),
+          PpCard('Sterilisation',
+              'Permanent. For you, a tubectomy can be done within seven days '
+                  'of birth or from six weeks after. For your husband, a '
+                  'no-scalpel vasectomy is simpler, quicker to recover from and '
+                  'just as effective. Government hospitals do both free, and '
+                  'the scheme pays a small amount towards the cost of the '
+                  'day.'),
+        ]),
+        PpWhenLine('Have this conversation at your six-week check, or before '
+            'you leave hospital if you already know you want a Copper-T.'),
+        PpIndiaNote('Your ASHA worker can bring condoms and Chhaya home, and '
+            'can take you to the health centre for Antara or a Copper-T. Nobody '
+            'in the family needs to give permission. This is your health and '
+            'your decision, made with your doctor.'),
+        PpCallout('Your doctor will ask about your health, your birth and '
+            'whether you are feeding before suggesting a choice. If a method '
+            'does not suit you, you can always switch. Go back quickly if you '
+            'have heavy bleeding, fever or bad belly pain after a Copper-T is '
+            'placed.',
+            kind: PpCalloutKind.doctor),
+        PpConsult(
+          title: 'Talk it through with a gynaecologist',
+          whoFor: 'For the choice itself: what suits your body, your feeding '
+              'and your plans. On video, a woman doctor if you prefer.',
+          surfaceId: 'pp_experts',
+          role: 'gynaecologist',
+        ),
+      ],
+    ),
     PpPage(
       id: 'body_thyroid',
       title: 'Your thyroid after birth',
@@ -1453,6 +1658,162 @@ final PpArea _yourBody = PpArea(
         PpCallout('Ask your doctor for a simple thyroid blood test (TSH) if you feel '
             'any of these, especially low mood or exhaustion that is not lifting.',
             kind: PpCalloutKind.doctor),
+        // Part B (door 3): the when-line and the India note.
+        // REQUIRED_REVIEW: the phase timings.
+        PpWhenLine('The overactive phase usually comes one to four months after '
+            'birth; the underactive phase four to eight months after.'),
+        PpIndiaNote('Thyroid problems are common in Indian women. A TSH test '
+            'costs little at most labs and is free at many government '
+            'hospitals.'),
+        // M6: the gynaecologist, the one category with real people, next to
+        // the worry. One pitch on this page.
+        PpConsult(
+          title: 'Talk it through with a gynaecologist',
+          whoFor: 'For the tiredness or low mood you cannot '
+              'explain, so a doctor can decide whether to test.',
+          surfaceId: 'pp_experts',
+          role: 'gynaecologist',
+        ),
+      ],
+    ),
+    PpPage(
+      id: 'body_after_gdm',
+      title: 'You had sugar in pregnancy: the test after birth',
+      format: 'ARTICLE',
+      bands: _cleared,
+      blocks: [
+        PpIntro('If your sugar was high in pregnancy, it most likely went back '
+            'to normal the day your baby was born. One test, a few weeks from '
+            'now, tells you whether it really did. It is the most skipped test '
+            'after birth in India, and one of the most useful.'),
+        // REQUIRED_REVIEW: paragraphs one to three.
+        PpArticle([
+          'Diabetes in pregnancy (gestational diabetes, GDM) usually goes away '
+              'after birth. But it is a signal: women who had it are much more '
+              'likely to develop type 2 diabetes in the years after, and Indian '
+              'women carry a higher risk than most.',
+          'The test is a two-hour sugar test (a glucose tolerance test), done '
+              'six to twelve weeks after birth. You drink a sweet drink and give '
+              'blood twice. A fasting sugar alone can miss it.',
+          'If the result is normal, a sugar test once a year (or as your doctor '
+              'says) is enough. If it is not, catching it now means simple '
+              'changes can make a big difference.',
+          'Breastfeeding for longer, moving every day and eating regular meals '
+              'all lower the risk. None of this is about losing weight; it is '
+              'about how your body handles sugar.',
+        ]),
+        PpWhenLine('Six to twelve weeks after birth, then once a year.'),
+        PpIndiaNote('The test is available at government hospitals and most '
+            'labs. Ask for it by name ("a glucose tolerance test after GDM"), '
+            'because it often is not offered unless you ask.'),
+        PpCallout('Book the test with your doctor and take your pregnancy '
+            'reports along. If you are very thirsty, passing a lot of urine or '
+            'very tired in a way that does not lift, tell them sooner.',
+            kind: PpCalloutKind.doctor),
+        PpConsult(
+          title: 'Talk it through with a gynaecologist',
+          whoFor: 'For booking the test and reading the result, with your '
+              'pregnancy reports beside you.',
+          surfaceId: 'pp_experts',
+          role: 'gynaecologist',
+        ),
+      ],
+    ),
+    PpPage(
+      id: 'body_after_bp',
+      title: 'High BP in pregnancy: what to watch after birth',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('High blood pressure in pregnancy, or pre-eclampsia, does not '
+            'always end with the birth. It can rise again, or appear for the '
+            'first time, in the first weeks after. Most mothers are fine. '
+            'Knowing the signs makes sure you are one of them.'),
+        // REQUIRED_REVIEW: all three paragraphs.
+        PpArticle([
+          'Blood pressure is often highest three to six days after birth. '
+              'Pre-eclampsia can appear up to six weeks after birth, even in a '
+              'mother whose pregnancy BP was normal.',
+          'If you had high BP, get it checked within the first week after you '
+              'go home, and again at your six-week visit. Do not stop or change '
+              'a BP medicine on your own. Your doctor adjusts it as your body '
+              'settles.',
+          'High BP in pregnancy is also an early warning for your heart years '
+              'later. A BP check once a year from now on is a small habit worth '
+              'keeping.',
+        ]),
+        // REQUIRED_REVIEW: the go-now list. Nothing is sold next to it; the
+        // consult comes after it, with the reader's safety line, and the home
+        // BP monitor is owed (DOOR-CONTENT-OWED), never beside these cards.
+        PpCards(heading: 'Go to hospital today if you have any of these', [
+          PpCard('A bad headache', 'That does not go with rest or a painkiller.'),
+          PpCard('Blurred vision', 'Flashing lights or spots.'),
+          PpCard('Pain under your ribs on the right', 'Or in the upper belly.'),
+          PpCard('Sudden swelling', 'Of the face, hands or feet.'),
+          PpCard('Breathlessness', 'Or a racing heart.'),
+          PpCard('A fit, or feeling confused', 'Call 108 or 112.'),
+        ], hue: 12),
+        PpWhenLine('Most important in the first six weeks. Then once a year.'),
+        PpIndiaNote('Government health centres and ASHA workers can check your '
+            'BP free at home or nearby. If you have a home BP machine, write '
+            'the readings down with the date and take them to your visit.'),
+        PpCallout('If you had pre-eclampsia, ask your doctor what BP reading '
+            'should make you call, and save that number in your phone.',
+            kind: PpCalloutKind.doctor),
+        PpConsult(
+          title: 'Not on this list, still worried? A gynaecologist',
+          whoFor: 'For the readings and the medicine questions that are not an '
+              'emergency. For anything on the list above, go to hospital.',
+          surfaceId: 'pp_experts',
+          role: 'gynaecologist',
+        ),
+      ],
+    ),
+    PpPage(
+      id: 'body_screening',
+      title: 'Three checks for you, not the baby',
+      format: 'CARDS',
+      bands: _cleared,
+      blocks: [
+        PpIntro('In the year after a baby, every check-up is about the baby. '
+            'These three are about you. Each takes a few minutes and can be '
+            'done at your six-week visit or soon after.'),
+        // REQUIRED_REVIEW: every card.
+        PpCards([
+          PpCard('Your haemoglobin (Hb)',
+              'Many Indian mothers are anaemic after birth, especially after '
+                  'heavy bleeding. Tiredness, breathlessness on the stairs and '
+                  'hair fall can all be anaemia. One blood test tells you. If it '
+                  'is low, your doctor decides the iron.'),
+          PpCard('A cervical screening test (Pap smear or VIA)',
+              'It checks for early changes in the cervix that can be treated '
+                  'long before they become cancer. Recommended every few years '
+                  'from your late twenties or thirty onwards. Usually done from '
+                  'about three months after birth, once things have healed. '
+                  'Government health centres offer VIA screening free to women '
+                  'from 30.'),
+          PpCard('Breast awareness',
+              'Feeding breasts are lumpy and change daily, which makes a new '
+                  'lump easy to dismiss. Get to know how yours usually feel. A '
+                  'lump that is still there after a feed, and after a week, '
+                  'needs a doctor to see it. Most are blocked ducts or milk '
+                  'cysts; the check is still worth it.'),
+        ]),
+        PpWhenLine('Hb at your six-week visit. Cervical screening from about '
+            'three months after birth if it is due. Breast awareness always.'),
+        PpIndiaNote('These checks are part of the free NCD screening at '
+            'government health centres and Ayushman Arogya Mandirs for women '
+            'over 30. Ask the ASHA or ANM when the next screening day is.'),
+        PpCallout('Ask your doctor at the six-week visit which of these are due '
+            'for you.',
+            kind: PpCalloutKind.doctor),
+        PpConsult(
+          title: 'Talk it through with a gynaecologist',
+          whoFor: 'For the checks that are due for you, and a lump or result '
+              'you want a doctor to look at.',
+          surfaceId: 'pp_experts',
+          role: 'gynaecologist',
+        ),
       ],
     ),
     PpPage(
@@ -1553,8 +1914,12 @@ final PpArea _yourBody = PpArea(
             'from what is left. Six months of that is a nutritional deficit no '
             'amount of resting fixes. If this is your house, eating a proper '
             'plate first is not selfish. It is how you keep going.'),
+        // Was `surfaceId: null`, a dead link (§5). Kept for revert:
+        // PpLink('Iron and recovery, in detail',
+        //     surfaceId: null,
+        //     blurb: 'On the "Have you eaten today?" pages.'),
         PpLink('Iron and recovery, in detail',
-            surfaceId: null,
+            pageId: 'eat_iron',
             blurb: 'On the "Have you eaten today?" pages.'),
       ],
     ),
@@ -1797,7 +2162,8 @@ final PpArea _yourMind = PpArea(
           'Talk to a doctor today, not in two weeks, if any of these are true. '
           'You cannot look after yourself or the baby. You feel you would be '
           'better off gone. You are thinking about harming yourself or your '
-          'baby. You are hearing or believing things others around you do not.',
+          'baby. You are hearing or believing things others around you do not. '
+          '$_kFreeNow', // the free line (M5), added 2026-10-25
           kind: PpCalloutKind.doctor,
           title: 'Do not wait for these',
         ),
@@ -1882,7 +2248,7 @@ final PpArea _yourMind = PpArea(
           'See a doctor if the anxiety is stopping you eating, sleeping or '
           'leaving the house. See a doctor too for panic attacks, or if it has '
           'lasted more than a few weeks. It treats well, often with talking '
-          'therapy alone.',
+          'therapy alone. $_kFreeNow', // the free line (M5), 2026-10-25
           kind: PpCalloutKind.doctor,
         ),
         PpIndiaNote('If your house is full of people offering opinions on every '
@@ -1914,7 +2280,7 @@ final PpArea _yourMind = PpArea(
           'thing. Thoughts that start to feel reasonable, or urges you are afraid '
           'you might act on, are a different thing and need a doctor today. If '
           'you are not sure which you have, that is exactly what to say to the '
-          'doctor.',
+          'doctor. $_kFreeNow', // the free line (M5), 2026-10-25
           kind: PpCalloutKind.doctor,
           title: 'The one distinction to know',
         ),
@@ -2075,6 +2441,11 @@ final PpArea _yourMind = PpArea(
             'getting heavier, or starting to feel like who you are now? Then '
             'talk to somebody. Many mothers wait until it is unbearable, and '
             'there is no need to.'),
+        // ⚠️ M5: the free line above the paid card. The reader draws the
+        // page's consult right under its first doctor box (Feeding D2), so
+        // the free route is that box.
+        PpCallout(_kFreeNow,
+            kind: PpCalloutKind.doctor, title: 'Free help, any hour'),
         PpConsult(
           title: 'Talk to a maternal mental health counsellor',
           whoFor: 'For the mother who cannot say this at home because of what '
@@ -2230,6 +2601,11 @@ final PpArea _yourMind = PpArea(
             surfaceId: _circleSurface,
             blurb: 'Mothers grouped by how far along you are. Moderated, private, '
                 'free.'),
+        // ⚠️ M5: the free line above the paid card. The reader draws the
+        // page's consult right under its first doctor box (Feeding D2), so
+        // the free route is that box.
+        PpCallout(_kFreeNow,
+            kind: PpCalloutKind.doctor, title: 'Free help, any hour'),
         PpConsult(
           title: 'A facilitated postpartum support circle',
           whoFor: 'A small paid group session with a counsellor and five or six '
@@ -2313,6 +2689,15 @@ final PpArea _yourMind = PpArea(
             'own family: that is not first year strain. Tell your '
             'doctor privately at your next visit. They are trained to ask and to '
             'help.'),
+        // Door 3: the page for exactly that, with 181 and 112 (no pitch on it).
+        PpLink('If you are not safe at home',
+            pageId: 'people_safe_at_home',
+            blurb: 'Free help you can reach today, and the law on your side.'),
+        // ⚠️ M5: the free line above the paid card. The reader draws the
+        // page's consult right under its first doctor box (Feeding D2), so
+        // the free route is that box.
+        PpCallout(_kFreeNow,
+            kind: PpCalloutKind.doctor, title: 'Free help, any hour'),
         PpConsult(
           title: 'Talk to a counsellor, together or on your own',
           whoFor: 'For couples stuck in the same fight every week. Or for you, '
@@ -2436,6 +2821,16 @@ final PpArea _yourMind = PpArea(
                 'You do not have to be at the worst point to be allowed help. '
                 'Earlier is easier.'),
           ], heading: 'What is not true', hue: 268),
+        // ⚠️ M5: the free line above the paid card. The reader draws the
+        // page's consult right under its first doctor box (Feeding D2), so
+        // the free route is that box.
+        PpCallout(_kFreeNow,
+            kind: PpCalloutKind.doctor, title: 'Free help, any hour'),
+        // M5: the crisis tile leads the foot, above both paid ones. It was
+        // last; kept for revert at the old place below.
+        PpLink('Get help now',
+            surfaceId: _crisis,
+            blurb: 'If today is worse than that, start here instead.'),
         PpConsult(
           title: 'Maternal mental health counselling, one to one',
           whoFor: 'For you, if you want to talk to a trained person about how '
@@ -2452,9 +2847,10 @@ final PpArea _yourMind = PpArea(
           surfaceId: 'pp_experts',
           role: 'group_mental_health',
         ),
-        PpLink('Get help now',
-            surfaceId: _crisis,
-            blurb: 'If today is worse than that, start here instead.'),
+        // Moved above the consults (M5). Kept for revert:
+        // PpLink('Get help now',
+        //     surfaceId: _crisis,
+        //     blurb: 'If today is worse than that, start here instead.'),
       ],
     ),
     // Added 2026-10-02 from the parenting gap analysis (P2/P3).
@@ -2489,9 +2885,28 @@ final PpArea _yourMind = PpArea(
           PpStep('Tell your partner what you need',
               'They may not know how frightening it was for you.'),
         ]),
+        // Part B (door 3). REQUIRED_REVIEW: the one-in-three figure.
+        PpArticle([
+          'Up to one in three mothers describe their birth as traumatic. A '
+              'smaller number go on to have symptoms that last. It is not about '
+              'how the birth "should" have gone: two mothers can have the same '
+              'birth and feel completely differently about it.',
+        ]),
+        PpIndiaNote('Families often say "the baby is healthy, forget it". You '
+            'are allowed to not forget it yet. Asking the hospital for your '
+            'notes is your right.'),
+        // M5: the free line stays first; the paid card goes below it.
         PpCallout('If you feel unsafe, or have thoughts of harming yourself, '
             'get help today: call Tele-MANAS on 14416, free and any time.',
             kind: PpCalloutKind.doctor),
+        PpConsult(
+          title: 'Talk to a perinatal counsellor about the birth',
+          whoFor: 'For the birth that keeps replaying, when you want a trained '
+              'person to go through it with you. On video, no family in the '
+              'room.',
+          surfaceId: 'pp_experts',
+          role: 'maternal_mental_health',
+        ),
       ],
     ),
   ],
@@ -3021,6 +3436,9 @@ final PpArea _pelvicFloor = PpArea(
         PpLink('Do them with a guide: Kegel Care',
             surfaceId: 'pp_kegel',
             blurb: 'A gentle timed routine that stays light, and logs each day.'),
+        PpLink('Pelvic-Floor Daily Ten',
+            surfaceId: 'pp_yoga/co_pelvic_rec',
+            blurb: 'A recorded ten minutes, after your six-week check.'),
       ],
     ),
     PpPage(
@@ -3138,6 +3556,14 @@ final PpArea _pelvicFloor = PpArea(
       format: 'ACTIVITY',
       bands: _later,
       blocks: [
+        // M9: a demo film, owed (DOOR-CONTENT-OWED). Placeholder until
+        // filmed; a tap says so (S8).
+        PpVideoSlot(
+          title: 'Lift, cough, carry: the pelvic floor at work',
+          subtitle: 'A physio shows the brace before the load.',
+          minutes: '4 MIN',
+          slotId: 'you_maa/demo_pf_functional',
+        ),
         PpIntro('You do not leak while lying on the bed doing kegels. You leak '
             'while lifting a toddler off the floor with a cough coming. This is '
             'the exercise that closes that gap, and most mothers are never told '
@@ -3278,6 +3704,14 @@ const PpArea _movement = PpArea(
       format: 'ACTIVITY',
       bands: [_b0],
       blocks: [
+        // M9: a demo film, owed (DOOR-CONTENT-OWED). Placeholder until
+        // filmed; a tap says so (S8).
+        PpVideoSlot(
+          title: 'The first six weeks, shown',
+          subtitle: 'Breathing, getting out of bed and the first short walk, done slowly.',
+          minutes: '4 MIN',
+          slotId: 'you_maa/demo_first_weeks',
+        ),
         PpIntro('You are not exercising yet. You are keeping your circulation '
             'going, your chest clear and your body from stiffening, which after '
             'a birth is a real medical job and not a small one.'),
@@ -3355,6 +3789,11 @@ const PpArea _movement = PpArea(
           PpCard('Ride pillion on a two-wheeler', 'Wait until stitches have '
               'healed and you can sit comfortably, and never with the baby.'),
         ]),
+        // §6: the free recorded class, not an after-check one (first band).
+        PpLink('Gentle Return to Movement',
+            surfaceId: 'pp_yoga/po_gentle_rec',
+            blurb: 'Free, recorded, 20 minutes. For when your doctor says you '
+                'can begin.'),
       ],
     ),
     PpPage(
@@ -3483,9 +3922,12 @@ const PpArea _movement = PpArea(
           subtitle: 'How to carry your baby, how long to go, and when to turn '
               'back.',
           minutes: '6 MIN',
-          slotId: 'youmaa/move_first_walk',
+          slotId: 'you_maa/move_first_walk', // was 'youmaa/move_first_walk' (door 3, M9)
           hue: 152,
         ),
+        PpLink('Gentle Return to Movement',
+            surfaceId: 'pp_yoga/po_gentle_rec',
+            blurb: 'Free, recorded, 20 minutes, beside the cot.'),
       ],
     ),
     PpPage(
@@ -3554,7 +3996,7 @@ const PpArea _movement = PpArea(
           subtitle: 'A physiotherapist shows where to put your hands, what '
               'should move, and what a correct one feels like.',
           minutes: '8 MIN',
-          slotId: 'youmaa/move_core_reconnect',
+          slotId: 'you_maa/move_core_reconnect', // was 'youmaa/move_core_reconnect' (door 3, M9)
           hue: 152,
         ),
         PpCallout(
@@ -3563,6 +4005,9 @@ const PpArea _movement = PpArea(
           'tells you something, and that is exactly what an assessment is for.',
           kind: PpCalloutKind.doctor,
         ),
+        PpLink('Core and Pelvic-Floor Rebuild',
+            surfaceId: 'pp_yoga/co_group',
+            blurb: 'A live group with a pelvic-floor physio, after your check.'),
       ],
     ),
     PpPage(
@@ -3571,6 +4016,14 @@ const PpArea _movement = PpArea(
       format: 'ACTIVITY',
       bands: _cleared,
       blocks: [
+        // M9: a demo film, owed (DOOR-CONTENT-OWED). Placeholder until
+        // filmed; a tap says so (S8).
+        PpVideoSlot(
+          title: 'Training with a gap, shown by a physio',
+          subtitle: 'The order to do it in, and what to stop.',
+          minutes: '6 MIN',
+          slotId: 'you_maa/demo_diastasis_training',
+        ),
         PpIntro('Most mothers still have some separation at six weeks. It is not '
             'a reason to avoid exercise. It is a reason to choose the exercises '
             'in a particular order, which is what this page is.'),
@@ -3633,6 +4086,9 @@ const PpArea _movement = PpArea(
         PpWhenLine('Three to six months of consistent gentle work is the usual '
             'timeline for function to come back. Not six weeks, and not by '
             'working harder.'),
+        PpLink('Diastasis Recovery 1:1',
+            surfaceId: 'pp_yoga/co_1to1',
+            blurb: 'A physio checks the gap first, then builds your plan.'),
       ],
     ),
     PpPage(
@@ -3702,7 +4158,7 @@ const PpArea _movement = PpArea(
           subtitle: 'A gentle scar aware session with a physiotherapist. Nothing '
               'on your stomach that you are not ready for.',
           minutes: '20 MIN',
-          slotId: 'youmaa/move_csection_followalong',
+          slotId: 'you_maa/move_csection_followalong', // was 'youmaa/move_csection_followalong' (door 3, M9)
           hue: 152,
         ),
         PpConsult(
@@ -3724,9 +4180,20 @@ const PpArea _movement = PpArea(
           surfaceId: 'pp_experts',
           role: 'group_physio',
         ),
-        PpLink('The recovery programme, on demand',
-            surfaceId: 'pp_courses',
-            blurb: 'The recorded course, if a live group does not fit your day.'),
+        // The "recovery programme" did not exist (§5); the recorded classes
+        // do. Kept for revert:
+        // PpLink('The recovery programme, on demand',
+        //     surfaceId: 'pp_courses',
+        //     blurb: 'The recorded course, if a live group does not fit your day.'),
+        PpLink('Gentle Return to Movement, on demand',
+            surfaceId: 'pp_yoga/po_gentle_rec',
+            blurb: 'Free and recorded, once your doctor says you can start.'),
+        PpLink('Deep-Core Foundations, when you are ready for more',
+            surfaceId: 'pp_yoga/co_deepcore_rec',
+            blurb: 'Recorded, after your six-week check.'),
+        PpLink('Postnatal Recovery 1:1',
+            surfaceId: 'pp_yoga/po_1to1',
+            blurb: 'Live, one to one, planned around your scar.'),
       ],
     ),
     PpPage(
@@ -3735,6 +4202,14 @@ const PpArea _movement = PpArea(
       format: 'ACTIVITY',
       bands: _later,
       blocks: [
+        // M9: a demo film, owed (DOOR-CONTENT-OWED). Placeholder until
+        // filmed; a tap says so (S8).
+        PpVideoSlot(
+          title: 'Getting stronger, a follow-along',
+          subtitle: 'Squats, lifts and carries for a body that holds a baby all day.',
+          minutes: '10 MIN',
+          slotId: 'you_maa/demo_getting_stronger',
+        ),
         PpIntro('Few people talk about this stage, because it is not dramatic. '
             'You are not recovering any more. You are building a body that can '
             'carry a growing child without aching.'),
@@ -3796,9 +4271,10 @@ const PpArea _movement = PpArea(
         PpLink('Follow along sessions',
             surfaceId: 'pp_yoga',
             blurb: 'Postnatal strength and mobility from the class library.'),
-        PpLink('Postpartum belts, and when they stop helping',
-            surfaceId: _shopSurface,
-            blurb: 'Useful for support early on. Not a substitute for this.'),
+        // M8: belts are not stocked. Kept for revert:
+        // PpLink('Postpartum belts, and when they stop helping',
+        //     surfaceId: _shopSurface,
+        //     blurb: 'Useful for support early on. Not a substitute for this.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpCards(heading: 'Sport and exercise while breastfeeding', [
           PpCard('Walking, yoga, swimming, cycling',
@@ -3817,7 +4293,12 @@ const PpArea _movement = PpArea(
       id: 'move_running',
       title: 'Going back to running, or anything that bounces',
       format: 'ARTICLE',
-      bands: [_b3],
+      // From three months (door 3, §4), after a physio's or doctor's OK: the
+      // page says so. Was `[_b3]`, which hid it until six months although
+      // its own words say "not before three". Kept for revert.
+      // REQUIRED_REVIEW: the UK return-to-running guidance is "not before 12
+      // weeks"; a pelvic health physio confirms the band and the copy.
+      bands: _later,
       blocks: [
         PpIntro('Running is not banned and it is not the enemy. It is the '
             'highest load you can put through a healing pelvic floor, so it '
@@ -3870,8 +4351,9 @@ const PpArea _movement = PpArea(
               'A system that is not recovering between sessions.'),
         ], heading: 'Signs to stop and get checked', hue: 12),
         PpWhenLine('Not before three months, ideally not before six, and only '
-            'after passing the test above. A good sports bra matters more than '
-            'you expect while feeding.'),
+            'after passing the test above and after your physio or doctor\'s '
+            'OK. A good sports bra matters more than you expect while '
+            'feeding.'),
       ],
     ),
   ],
@@ -3919,7 +4401,7 @@ const PpArea _feedingYourself = PpArea(
           title: 'Eating when you have no hands free',
           subtitle: 'What really helps recovery and supply, and how to eat it one-handed.',
           minutes: '5 MIN',
-          slotId: 'you/eating_postpartum',
+          slotId: 'you_maa/eating_postpartum', // was 'you/eating_postpartum' (door 3, M9)
         ),
         PpIntro('You are healing a wound the size of a plate inside you and '
             'replacing lost blood. If you are breastfeeding, you are also making '
@@ -3977,10 +4459,15 @@ const PpArea _feedingYourself = PpArea(
         PpIndiaNote('If your family is cooking for you during the forty days, eating well '
             'will never be easier. Say out loud what you want. Ask for dal, '
             'curd and an egg as often as you ask for sweets.'),
+        // `pp_food` is the baby's library (§5, M4). Kept for revert:
+        // PpLink('Recipes for you, not the baby',
+        //     surfaceId: 'pp_food',
+        //     blurb: 'The forty-day foods, the laddoos and the one handed meals live '
+        //         'in "The healing kitchen". This opens the wider library.'),
         PpLink('Recipes for you, not the baby',
-            surfaceId: 'pp_food',
-            blurb: 'The forty-day foods, the laddoos and the one handed meals live '
-                'in "The healing kitchen". This opens the wider library.'),
+            pageId: 'kitchen_jaapa',
+            blurb: 'The forty-day foods, the laddoos and the one handed meals, '
+                'in "The healing kitchen".'),
       ],
     ),
     PpPage(
@@ -4115,10 +4602,14 @@ const PpArea _feedingYourself = PpArea(
         PpWhenLine('Worth checking at the six week visit, and again any time '
             'the exhaustion is not improving. Correcting stores takes about '
             'three months of consistent treatment, not two weeks.'),
+        // `pp_food` is the baby's library (§5, M4). Kept for revert:
+        // PpLink('The iron rich cooking',
+        //     surfaceId: 'pp_food',
+        //     blurb: 'Dates, beetroot, spinach and jaggery are written up as recipes in '
+        //         '"The healing kitchen". This opens the wider library.'),
         PpLink('The iron rich cooking',
-            surfaceId: 'pp_food',
-            blurb: 'Dates, beetroot, spinach and jaggery are written up as recipes in '
-                '"The healing kitchen". This opens the wider library.'),
+            pageId: 'kitchen_iron_foods',
+            blurb: 'Dates, beetroot, spinach and jaggery, written up as recipes.'),
       ],
     ),
     PpPage(
@@ -4237,10 +4728,14 @@ const PpArea _feedingYourself = PpArea(
             'in forty degree heat with a fan and no cooler, you lose more fluid '
             'than you realise. Lemon water with a pinch of salt really helps on '
             'those days.'),
+        // `pp_food` is the baby's library (§5, M4). Kept for revert:
+        // PpLink('The drinks, as recipes',
+        //     surfaceId: 'pp_food',
+        //     blurb: 'Cumin water, fennel water, carom seed water and the herbal kadha are in '
+        //         '"The healing kitchen". This opens the wider library.'),
         PpLink('The drinks, as recipes',
-            surfaceId: 'pp_food',
-            blurb: 'Cumin water, fennel water, carom seed water and the herbal kadha are in '
-                '"The healing kitchen". This opens the wider library.'),
+            pageId: 'kitchen_drinks',
+            blurb: 'Cumin water, fennel water, carom seed water and the herbal kadha.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpCards(heading: 'Drinks that count', [
           PpCard('Water', 'A glass at every feed.'),
@@ -4546,7 +5041,7 @@ const PpArea _healingKitchen = PpArea(
           subtitle: 'Including what the gum should look like when it is '
               'properly puffed, which is the step everyone gets wrong.',
           minutes: '9 MIN',
-          slotId: 'youmaa/recipe_gond_laddoo',
+          slotId: 'you_maa/recipe_gond_laddoo', // was 'youmaa/recipe_gond_laddoo' (door 3, M9)
           hue: 42,
         ),
         PpIndiaNote('Every family has its own version and yours is probably '
@@ -4638,7 +5133,7 @@ const PpArea _healingKitchen = PpArea(
           subtitle: 'The soaking step, the roasting temperature, and how to know '
               'when the raw smell has gone.',
           minutes: '8 MIN',
-          slotId: 'youmaa/recipe_methi_laddoo',
+          slotId: 'you_maa/recipe_methi_laddoo', // was 'youmaa/recipe_methi_laddoo' (door 3, M9)
           hue: 42,
         ),
       ],
@@ -4714,7 +5209,7 @@ const PpArea _healingKitchen = PpArea(
           title: 'The flour mix and the warm drink, both in one go',
           subtitle: 'Made in the same pan, in about twenty minutes.',
           minutes: '11 MIN',
-          slotId: 'youmaa/recipe_panjiri_harira',
+          slotId: 'you_maa/recipe_panjiri_harira', // was 'youmaa/recipe_panjiri_harira' (door 3, M9)
           hue: 42,
         ),
         PpIndiaNote('In Punjab it is panjiri, in the south it is a different '
@@ -4787,7 +5282,7 @@ const PpArea _healingKitchen = PpArea(
           title: 'The three waters and the herbal drink',
           subtitle: 'Made once, kept in a flask, drunk all day.',
           minutes: '6 MIN',
-          slotId: 'youmaa/recipe_kadha',
+          slotId: 'you_maa/recipe_kadha', // was 'youmaa/recipe_kadha' (door 3, M9)
           hue: 42,
         ),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
@@ -4875,7 +5370,7 @@ const PpArea _healingKitchen = PpArea(
           subtitle: 'Five ingredients, one mixer, fifteen minutes, and they keep '
               'for three weeks.',
           minutes: '7 MIN',
-          slotId: 'youmaa/recipe_khajoor_laddoo',
+          slotId: 'you_maa/recipe_khajoor_laddoo', // was 'youmaa/recipe_khajoor_laddoo' (door 3, M9)
           hue: 42,
         ),
       ],
@@ -4948,7 +5443,7 @@ const PpArea _healingKitchen = PpArea(
           subtitle: 'Khichdi, dalia and a sattu drink, cooked once for three '
               'days.',
           minutes: '12 MIN',
-          slotId: 'youmaa/recipe_one_handed',
+          slotId: 'you_maa/recipe_one_handed', // was 'youmaa/recipe_one_handed' (door 3, M9)
           hue: 42,
         ),
         PpIndiaNote('If you have help at home, this is the highest value thing '
@@ -5191,7 +5686,7 @@ const PpArea _thePeopleAroundYou = PpArea(
           title: 'Visitors, and how to have fewer of them',
           subtitle: 'The sentences that work on family without a fight.',
           minutes: '4 MIN',
-          slotId: 'you/visitors',
+          slotId: 'you_maa/visitors', // was 'you/visitors' (door 3, M9)
         ),
         PpIntro('A newborn in an Indian family means a stream of people at the '
             'door, and every one of them is happy for you. It is also, right '
@@ -5503,6 +5998,60 @@ const PpArea _thePeopleAroundYou = PpArea(
         ),
       ],
     ),
+    // Door 3's new page (M7). REQUIRED_REVIEW: the one-in-ten figure.
+    PpPage(
+      id: 'people_partner_low',
+      title: 'When he is struggling too',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Fathers can get depressed after a baby too. About one in ten '
+            'do, and it is even less likely to be named in an Indian home than '
+            'yours. If he seems far away, angry or always out, this may be part '
+            'of it.'),
+        // REQUIRED_REVIEW: the first paragraph and the one-in-ten figure above
+        // (paternal postnatal depression, about 8-10%; secondary source).
+        PpArticle([
+          'Fathers\' low mood often shows up differently. Less crying, more '
+              'irritability, working late, drinking more, going quiet, or being '
+              'on the phone all evening. It often begins a few months in, and it '
+              'is more likely if the mother is struggling too.',
+          'It is not a competition about who has it harder. Two tired people '
+              'who both feel unseen can quietly blame each other. Naming it ("I '
+              'think we are both not okay") often helps more than an argument '
+              'about who does what.',
+          'Help is the same kind of help: talking to someone, sleep, time '
+              'outside, and a doctor if it lasts more than two weeks.',
+        ]),
+        PpSteps(heading: 'Something to try this week', [
+          PpStep('Pick a calm time, not 2am',
+              'Say what you see, not what he is doing wrong.'),
+          PpStep('Give him one job that is fully his',
+              'Like the bath or the evening walk with the baby. Fathers who '
+                  'have a job of their own often feel less shut out.'),
+          PpStep('Each of you gets one stretch of sleep',
+              'In turns, protected by the other.'),
+          PpStep('Point him to the same free help', 'You would use.'),
+        ]),
+        PpIndiaNote('$kCrisisHelplineName ($kCrisisHelplineNumber) is for him '
+            'too. It is free, any time, in Indian languages, and nobody needs '
+            'to know he called.'),
+        // M5: the free line is the first doctor box, so the paid card the
+        // reader draws under it sits below the free help.
+        PpCallout('If either of you has thoughts of not wanting to be here, call '
+            '$kCrisisHelplineName on $kCrisisHelplineNumber today. If his mood '
+            'has been low for more than two weeks, or he is drinking to cope, '
+            'his own doctor is the right first step.',
+            kind: PpCalloutKind.doctor, title: 'Free help first'),
+        PpConsult(
+          title: 'A counsellor who sees fathers and couples too',
+          whoFor: 'For the two of you, or for him on his own. On video, and he '
+              'does not need anyone\'s permission to book.',
+          surfaceId: 'pp_experts',
+          role: 'maternal_mental_health',
+        ),
+      ],
+    ),
     PpPage(
       id: 'people_advice',
       title: 'Advice you did not ask for',
@@ -5641,6 +6190,49 @@ const PpArea _thePeopleAroundYou = PpArea(
         PpIndiaNote('"What will people say?" has its own page in this area. If that is '
             'the real reason a no feels impossible, that is the page to read '
             'rather than this one.'),
+      ],
+    ),
+    // Door 3's new page (M7). ⚠️ NO CONSULT, NO PRODUCT, NO CLASS on this
+    // page (M5 and the house rule). REQUIRED_REVIEW: every number and the law.
+    PpPage(
+      id: 'people_safe_at_home',
+      title: 'If you are not safe at home',
+      format: 'ROUTE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Pregnancy and the first year after birth are when violence at '
+            'home often begins or gets worse. If someone in your home hurts '
+            'you, threatens you, controls your money or your phone, or stops '
+            'you from seeing your family or a doctor, it is not your fault, and '
+            'you do not have to keep it secret.'),
+        // REQUIRED_REVIEW: 181, 112, One Stop Centres and the 2005 Act.
+        PpCards(heading: 'Help you can reach today', [
+          PpCard('181, the Women Helpline',
+              'Free, any hour. They listen, and can connect you to the police, '
+                  'a shelter, legal help or counselling.'),
+          PpCard('112, emergency', 'If you are in danger right now.'),
+          PpCard('One Stop Centre (Sakhi)',
+              'In every district: medical help, police help, legal advice and a '
+                  'safe place to stay for a few days, all in one place. 181 can '
+                  'tell you the nearest one.'),
+          PpCard('The law is on your side',
+              'The Protection of Women from Domestic Violence Act covers '
+                  'violence from a husband and from his family, including '
+                  'in-laws. It includes the right to stay in your shared home.'),
+        ]),
+        PpSteps(heading: 'If you are not ready to leave', [
+          PpStep('Keep a few things in one place',
+              'Your Aadhaar, some money, your phone charger, the baby\'s '
+                  'papers.'),
+          PpStep('Save one number under an ordinary name'),
+          PpStep('Tell one person you trust', 'What is happening.'),
+          PpStep('Know which room has a way out',
+              'And stay away from the kitchen in an argument.'),
+        ]),
+        PpIndiaNote('Your doctor, nurse or ASHA worker can help quietly. You can '
+            'tell them during a check-up when no one else is in the room.'),
+        PpCallout('If you or your baby are in danger right now, call 112.',
+            kind: PpCalloutKind.safety),
       ],
     ),
     PpPage(
@@ -5800,7 +6392,10 @@ const PpArea _thePeopleAroundYou = PpArea(
       id: 'people_intimacy',
       title: 'Sex, contraception, and the two of you',
       format: 'ARTICLE',
-      bands: _cleared,
+      // Every band (door 3, §4): she can release an egg before six weeks,
+      // so contraception cannot wait for the "cleared" bands. Was
+      // `_cleared`, kept for revert.
+      bands: _allBands,
       blocks: [
         PpIntro('Nobody discusses this and everybody has questions about it. '
             'Here it is plainly, including the part that catches out more '
@@ -5903,9 +6498,69 @@ const PpArea _thePeopleAroundYou = PpArea(
         PpCallout('Pain during sex that does not ease, or low mood underneath '
             'the low desire, is worth raising with your gynaecologist.',
             kind: PpCalloutKind.doctor),
+        // Door 3: the choices themselves, on their own page.
+        PpLink('Not ready for another baby yet? Your choices',
+            pageId: 'body_contraception',
+            blurb: 'Copper-T, Antara, Chhaya and the rest, in plain words.'),
+        // M6: the gynaecologist, the one category with real people, next to
+        // the worry. One pitch on this page.
+        PpConsult(
+          title: 'Talk it through with a gynaecologist',
+          whoFor: 'For the questions about contraception, pain or '
+              'desire you would rather not ask at home. On video, a woman doctor '
+              'if you prefer.',
+          surfaceId: 'pp_experts',
+          role: 'gynaecologist',
+        ),
       ],
     ),
     // Added 2026-10-02 from the parenting gap analysis (P2/P3).
+    // Door 3's new page (M7). TTC is named in words only: no stage switch.
+    PpPage(
+      id: 'people_spacing',
+      title: 'The next baby, when you are ready',
+      format: 'ARTICLE',
+      bands: _later,
+      blocks: [
+        PpIntro('Sooner or later, someone will ask when the next one is coming. '
+            'The answer is yours to give, and there is no right one. Here is '
+            'what helps you decide, and what helps your body.'),
+        // REQUIRED_REVIEW: paragraphs one and two.
+        PpArticle([
+          'Doctors suggest waiting at least two years from this birth before '
+              'the next pregnancy, so about 33 months between the two births. A '
+              'shorter gap is linked with more anaemia, early birth and small '
+              'babies, because your body has not finished refilling its stores '
+              'of iron and folate.',
+          'After a caesarean, the gap matters more, because it gives the scar '
+              'time to become strong. Ask your doctor what they suggest for you.',
+          'If you are older or worried about time, say so to your doctor. The '
+              'advice can change for you, and that is a conversation, not a '
+              'rule.',
+          'Whenever you start trying, start folic acid three months before, as '
+              'your doctor advises. When you do, ParentVeda has a whole part '
+              'for trying to conceive.',
+        ]),
+        PpIndiaNote('Spacing is a choice you make with your husband, not for '
+            'the family. If you are being pressured for a son or for another '
+            'baby soon, that pressure is something you can name to your '
+            'doctor.'),
+        PpLink('Not ready yet? Your choices after birth',
+            pageId: 'body_contraception',
+            blurb: 'Copper-T, Antara, Chhaya and the rest, in plain words.'),
+        PpCallout('Before you try again, a check-up looks at your Hb, sugar, BP, '
+            'thyroid and scar, so your next pregnancy starts on the strongest '
+            'footing.',
+            kind: PpCalloutKind.doctor),
+        PpConsult(
+          title: 'Talk it through with a gynaecologist',
+          whoFor: 'For the timing that is right for your body, and the check-up '
+              'before you try again.',
+          surfaceId: 'pp_experts',
+          role: 'gynaecologist',
+        ),
+      ],
+    ),
     PpPage(
       id: 'people_separated',
       title: 'Parenting apart: separation, divorce and new families',
@@ -5935,6 +6590,22 @@ const PpArea _thePeopleAroundYou = PpArea(
                   'partner.'),
           PpStep('Time alone with your child', 'Still matters most.'),
         ]),
+        // Part B (door 3). REQUIRED_REVIEW: the registrar and legal-aid lines.
+        PpSteps(
+            heading: 'If you are bringing up your baby on your own, from the '
+                'start',
+            [
+              PpStep('Let one person be your back-up',
+                  'For the nights you are ill.'),
+              PpStep('Make the birth certificate correct early',
+                  'The father\'s name can be added later through the '
+                      'registrar.'),
+              PpStep('Maintenance for you and the child is a legal right',
+                  'And free legal aid exists: NALSA, 15100.'),
+            ]),
+        PpLink('If you are not safe at home',
+            pageId: 'people_safe_at_home',
+            blurb: 'Free help you can reach today, and the law on your side.'),
         PpCallout('If you feel unsafe with a former partner, or there are '
             'court matters about custody, get legal advice. The women\'s '
             'helpline 181 can guide you.',
@@ -5962,6 +6633,10 @@ const PpArea _canIFeeding = PpArea(
       title: 'Search 330+ "Can I...?" questions',
       subtitle: 'Chai, medicines, fasting, mehendi, the gym, travel',
       format: 'CARDS',
+      // Door 3 (§3): the "Can I eat or take this?" tool on Moving and eating
+      // replaces this card. linkedOnly, not commented out, so a link to it
+      // still opens.
+      linkedOnly: true,
       toolSurfaceId: 'pp_maa_can_i',
       blocks: [],
     ),
@@ -5982,6 +6657,11 @@ const PpArea _canIFeeding = PpArea(
               'seems unusually jittery or wakeful, cut down for a few days and '
               'see.',
         ]),
+        // Part B (door 3).
+        PpIndiaNote('A cup of masala chai has less caffeine than a cup of '
+            'filter coffee. Strong "kadak" chai brewed long has more.'),
+        PpWhenLine('Newborns clear caffeine slowly; by three to six months most '
+            'babies are not bothered.'),
       ],
     ),
     PpPage(
@@ -6001,6 +6681,9 @@ const PpArea _canIFeeding = PpArea(
               'next feed. Feed just before drinking if you can. Never share a '
               'bed or sofa with the baby after drinking.',
         ]),
+        // Part B (door 3).
+        PpIndiaNote('Ayurvedic tonics and some "jaapa" preparations made with '
+            'alcohol count as alcohol too.'),
         PpCallout('Regular drinking while breastfeeding can affect your baby\'s '
             'sleep, feeding and development. If cutting down is hard, talk to '
             'your doctor.',
@@ -6034,6 +6717,8 @@ const PpArea _canIFeeding = PpArea(
           PpCard('Some migraine, epilepsy and mental health medicines',
               'Often still possible, with the right choice.'),
           PpCard('Herbal and Ayurvedic tonics', 'Not tested; ask first.'),
+          // Part B (door 3).
+          PpCard('Weight-loss and "fat-burner" pills', 'Not while feeding.'),
         ]),
         PpCallout('Never stop a medicine you need, or stop breastfeeding, '
             'without talking to your doctor. There is usually a safe option '
@@ -6042,6 +6727,9 @@ const PpArea _canIFeeding = PpArea(
         PpLink('Search more Can I...? questions',
             surfaceId: 'pp_maa_can_i',
             blurb: 'Over 330 quick answers, including medicines A to Z.'),
+        PpLink('Contraception that is safe while feeding',
+            pageId: 'body_contraception',
+            blurb: 'Most choices are; the page says which to avoid.'),
       ],
     ),
     PpPage(
@@ -6066,6 +6754,11 @@ const PpArea _canIFeeding = PpArea(
             'cancer treatments. If you are very unwell, ask your doctor which '
             'medicines are compatible with feeding.',
             kind: PpCalloutKind.doctor),
+        // Part B (door 3).
+        PpWhenLine('Most illnesses: keep feeding through them. Stomach bugs: '
+            'drink extra; your milk is fine.'),
+        PpIndiaNote('Dengue, typhoid and malaria are not reasons to stop '
+            'feeding. Ask your doctor about the medicines.'),
       ],
     ),
     PpPage(
@@ -6091,6 +6784,10 @@ const PpArea _canIFeeding = PpArea(
           PpStep('Rest more, and keep feeding on demand'),
           PpStep('Break the fast if you feel unwell', 'Faith allows for it.'),
         ]),
+        // Part B (door 3). REQUIRED_REVIEW.
+        PpIndiaNote('Many priests and maulvis will tell you breastfeeding '
+            'mothers are exempt. If you are being pressured to keep a '
+            'waterless fast, you can say your doctor has advised against it.'),
         PpCallout('Stop fasting and drink if you feel dizzy, faint or very '
             'thirsty, or have dark urine or a headache. Stop too if the baby '
             'has fewer wet nappies or seems unsettled and hungry.',
@@ -6119,6 +6816,11 @@ const PpArea _canIFeeding = PpArea(
           PpCard('Secondhand smoke', 'Not fine for either of you. Keep the '
               'home smoke-free.'),
         ]),
+        // Part B (door 3).
+        PpCallout('Tell anyone giving you a scan, a treatment or a beauty '
+            'procedure that you are breastfeeding, and ask if they recommend '
+            'anything different.',
+            kind: PpCalloutKind.doctor),
       ],
     ),
     PpPage(
@@ -6140,7 +6842,15 @@ const PpArea _canIFeeding = PpArea(
               'the shade and well fed.'),
           PpCard('Pumped milk when travelling', 'An insulated bag with ice '
               'packs keeps it for up to 24 hours.'),
+          // Part B (door 3).
+          PpCard('Your own milk and medicines in hand luggage',
+              'Allowed on flights; tell security.'),
         ]),
+        PpIndiaNote('Indian Railways and most airports now have feeding rooms. '
+            'You can ask the station master or airport staff.'),
+        PpCallout('Under six weeks, check with your doctor before a long '
+            'journey, and after a caesarean before a long drive.',
+            kind: PpCalloutKind.doctor),
       ],
     ),
   ],
@@ -6341,6 +7051,49 @@ const PpArea _backToWork = PpArea(
         ]),
       ],
     ),
+    // Door 3's new page (M7). REQUIRED_REVIEW: every amount and rule; they
+    // change, and are checked against the current scheme text before release.
+    PpPage(
+      id: 'work_schemes',
+      title: 'Money the government gives mothers',
+      format: 'CARDS',
+      bands: _allBands,
+      blocks: [
+        PpIntro('Two government schemes pay mothers directly, and many families '
+            'never claim them. They do not depend on your job.'),
+        // REQUIRED_REVIEW: PMMVY (2022 revision) and JSY amounts and rules.
+        PpCards([
+          PpCard('Pradhan Mantri Matru Vandana Yojana (PMMVY)',
+              '₹5,000 for your first child, paid into your bank account. For a '
+                  'second child, ₹6,000 if the baby is a girl, paid after the '
+                  'birth. Register through your anganwadi worker, ASHA or the '
+                  'PMMVY website. You need Aadhaar, a bank account, and the MCP '
+                  'card from your pregnancy visits.'),
+          PpCard('Janani Suraksha Yojana (JSY)',
+              'A cash amount for giving birth in a government or accredited '
+                  'hospital. It is bigger in some states and in rural areas, and '
+                  'is usually paid at or soon after discharge. Ask the hospital '
+                  'or your ASHA if you have not received it.'),
+          PpCard('Your state\'s own scheme',
+              'Many states add their own payment or kit for mothers or girl '
+                  'children. Your anganwadi worker knows yours.'),
+          PpCard('Maternity leave and pay from your employer',
+              'A separate thing, by law. See "What your maternity leave '
+                  'entitles you to".'),
+        ]),
+        PpWhenLine('PMMVY registration is best done in pregnancy, but it can '
+            'still be done after the birth. Ask now if you have not.'),
+        PpIndiaNote('The anganwadi worker in your area is the person who files '
+            'these. Visiting with your documents is often faster than doing it '
+            'online.'),
+        PpLink('What your maternity leave entitles you to',
+            pageId: 'work_your_entitlement',
+            blurb: 'The Maternity Benefit Act, on its own page.'),
+        PpLink('Papers and money, for the baby',
+            surfaceId: 'pp_section/parenting_papers',
+            blurb: 'Birth certificate, Aadhaar, insurance and the rest.'),
+      ],
+    ),
     PpPage(
       id: 'work_milk_stash',
       title: 'Building a milk stash before you go back',
@@ -6397,9 +7150,13 @@ const PpArea _backToWork = PpArea(
           surfaceId: 'pp_experts',
           role: 'lactation',
         ),
-        PpLink('Pumps, bags and cooler bags, compared',
-            surfaceId: _shopSurface,
-            blurb: 'Which pump, and what you really need alongside it.'),
+        // M8: cooler bags are not stocked. Kept for revert:
+        // PpLink('Pumps, bags and cooler bags, compared',
+        //     surfaceId: _shopSurface,
+        //     blurb: 'Which pump, and what you really need alongside it.'),
+        PpLink('Breast pumps, compared',
+            surfaceId: _shopPumps,
+            blurb: 'Which pump, and whether you need one at all.'),
         PpWhenLine('Start about four weeks before your return. Aim for two or '
             'three days of feeds stored, not a freezer full.'),
         // REQUIRED_REVIEW: the "two or three days of feeds" target, the thirty
@@ -6707,7 +7464,7 @@ const PpArea _backToWork = PpArea(
           subtitle: 'A software engineer, a teacher and a doctor, on what '
               'really happened and what they would do differently.',
           minutes: '12 MIN',
-          slotId: 'youmaa/work_mother_story',
+          slotId: 'you_maa/work_mother_story', // was 'youmaa/work_mother_story' (door 3, M9)
           hue: 186,
         ),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
@@ -6825,7 +7582,7 @@ const PpArea _backToWork = PpArea(
           subtitle: 'A conversation about identity after birth, and why it takes '
               'longer than the physical recovery does.',
           minutes: '15 MIN',
-          slotId: 'youmaa/work_finding_self',
+          slotId: 'you_maa/work_finding_self', // was 'youmaa/work_finding_self' (door 3, M9)
           hue: 186,
         ),
         PpLink('Something for you, not for the baby',
@@ -6891,7 +7648,7 @@ const PpArea _theCircle = PpArea(
           title: 'Other mothers, at the same point',
           subtitle: 'What the circle is, and what happens in it.',
           minutes: '3 MIN',
-          slotId: 'you/the_circle',
+          slotId: 'you_maa/the_circle', // was 'you/the_circle' (door 3, M9)
         ),
         PpIntro('A small, moderated group of mothers whose babies are roughly '
             'the age of yours. Not a forum, not a feed, and not a place anyone '

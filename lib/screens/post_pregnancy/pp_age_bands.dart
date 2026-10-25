@@ -41,6 +41,8 @@ class PpBand {
     required this.fromMonths,
     required this.toMonths,
     this.blurb,
+    this.fromWeeks,
+    this.toWeeks,
   });
 
   /// Stable slug, used by `PpPage.bands`. Not derived from the label.
@@ -60,13 +62,55 @@ class PpBand {
 
   final String? blurb;
 
+  /// ⚠️ A BAND MEASURED IN WEEKS, WHEN SET (You, Maa plan M2, 2026-10-25).
+  /// Her recovery moves in weeks: "the first six weeks" written as months 0
+  /// to 2 ran to week 8.7, so a mother at week 7 was still shown how to care
+  /// for stitches, and "6 weeks to 3 months" lasted four weeks. Inclusive
+  /// lower, exclusive upper, as the months are. When set, these decide;
+  /// [fromMonths] / [toMonths] stay as the rough months for anything that
+  /// still reads them.
+  final int? fromWeeks;
+  final int? toWeeks;
+
   bool contains(int months) => months >= fromMonths && months < toMonths;
+
+  /// The band test on the weeks clock. A band without weeks reads the months
+  /// the way `ChildProfileStore.ageInMonths` makes them, so for every
+  /// months-only set this is exactly [contains] of today's age.
+  bool containsWeeks(double weeks) {
+    if (fromWeeks != null && toWeeks != null) {
+      return weeks >= fromWeeks! && weeks < toWeeks!;
+    }
+    return contains((weeks / 4.345).floor());
+  }
+
+  /// Where the band starts, in weeks.
+  double get startWeeks => fromWeeks?.toDouble() ?? fromMonths * 4.345;
 }
 
 /// A section's ordered bands.
 class PpBandSet {
-  const PpBandSet(this.bands);
+  const PpBandSet(this.bands, {this.youngestClock = false});
   final List<PpBand> bands;
+
+  /// ⚠️ THE CLOCK FOLLOWS HER LATEST BIRTH, NOT THE CHILD ON SCREEN (You,
+  /// Maa M2). True for the mother's bands only: her recovery is measured
+  /// from the youngest child's birth (`ChildProfileStore.youngestAgeInWeeks`).
+  /// Every child's set keeps the selected child.
+  final bool youngestClock;
+
+  /// The weeks this set measures today.
+  double get clockWeeks => youngestClock
+      ? ChildProfileStore.instance.youngestAgeInWeeks
+      : ChildProfileStore.instance.ageInWeeks;
+
+  /// The band for an age in weeks. Same fallbacks as [bandFor].
+  PpBand bandForWeeks(double weeks) {
+    for (final b in bands) {
+      if (b.containsWeeks(weeks)) return b;
+    }
+    return weeks < bands.first.startWeeks ? bands.first : bands.last;
+  }
 
   /// The band this child is in.
   ///
@@ -83,7 +127,12 @@ class PpBandSet {
   }
 
   /// The band for the child currently active in `ChildProfileStore`.
-  PpBand get active => bandFor(ChildProfileStore.instance.ageInMonths);
+  ///
+  /// On the weeks clock (M2): for a months-only set this is the same band as
+  /// `bandFor(ageInMonths)` was, since `containsWeeks` floors the same way.
+  /// Was, kept for revert:
+  /// `PpBand get active => bandFor(ChildProfileStore.instance.ageInMonths);`
+  PpBand get active => bandForWeeks(clockWeeks);
 
   /// The bands in the order they should be shown: the child's own first, then
   /// the rest in their natural order.
@@ -170,12 +219,19 @@ const PpBandSet kPpSleepBands = PpBandSet([
 /// for her, because the moment someone reuses `kPpChildBands` for her recovery,
 /// a band boundary later moved for a reason about babies silently moves her
 /// six-week check.
-const PpBandSet kPpPostpartumBands = PpBandSet([
+///
+/// ⚠️ IN WEEKS SINCE 2026-10-25 (You, Maa plan M2): 0-6, 6-13, 13-26, 26+,
+/// on her youngest child's clock. The months are the old values, kept for
+/// anything that still reads months; the weeks decide.
+/// `test/pp_postpartum_bands_test.dart` holds the boundaries.
+const PpBandSet kPpPostpartumBands = PpBandSet(youngestClock: true, [
   PpBand(
     id: 'pp_0_6w',
     label: 'The first 6 weeks',
     fromMonths: 0,
     toMonths: 2,
+    fromWeeks: 0,
+    toWeeks: 6,
     blurb: 'Healing, rest, and the things nobody warned you about.',
   ),
   PpBand(
@@ -183,6 +239,8 @@ const PpBandSet kPpPostpartumBands = PpBandSet([
     label: '6 weeks to 3 months',
     fromMonths: 2,
     toMonths: 3,
+    fromWeeks: 6,
+    toWeeks: 13,
     blurb: 'Cleared to move again, and finding out what that feels like.',
   ),
   PpBand(
@@ -190,6 +248,8 @@ const PpBandSet kPpPostpartumBands = PpBandSet([
     label: '3 to 6 months',
     fromMonths: 3,
     toMonths: 6,
+    fromWeeks: 13,
+    toWeeks: 26,
     blurb: 'Strength, sleep debt, and feeling like yourself.',
   ),
   PpBand(
@@ -197,6 +257,8 @@ const PpBandSet kPpPostpartumBands = PpBandSet([
     label: '6 months and beyond',
     fromMonths: 6,
     toMonths: 600,
+    fromWeeks: 26,
+    toWeeks: 1 << 16,
     blurb: 'Going back to work, or choosing not to.',
   ),
 ]);

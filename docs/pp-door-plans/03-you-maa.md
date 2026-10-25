@@ -1,6 +1,6 @@
 # Door 3: You, Maa, the plan
 
-Written 2026-10-24. **Status: final. M1 to M9 answered yes by the user 2026-10-24 (§ Decisions).** The new and deepened page copy is in `03-you-maa-content.md` (M7). Nothing in `lib/` changes until step 0 and the user's go. The master plan is in `README.md`.
+Written 2026-10-24. **Status: final. M1 to M9 answered yes by the user 2026-10-24 (§ Decisions).** **Built 2026-10-25; see §13 As built.** The new and deepened page copy is in `03-you-maa-content.md` (M7). Nothing in `lib/` changes until step 0 and the user's go. The master plan is in `README.md`.
 
 ## Context
 You, Maa is the one door about the mother. It holds 110 pages in 11 areas across 5 tabs, with 31 video slots (all placeholders) and 20 consult blocks.
@@ -258,3 +258,38 @@ Note: the plan as a whole was accepted earlier on 2026-10-24, but M1–M9 were o
 | Every video slot (31 + intro + 6 demos) | Until filmed | "This film is being made. The page has everything in it for now." |
 | After-check classes for a mother under 6 weeks | Her first band | "This class opens after your six-week check. Gentle Return to Movement is free and safe now." |
 | Going back tab, locked under 6 weeks | Her first band | Already says "From 6 weeks"; a tap shows the same words as a toast |
+
+## 13. As built (2026-10-25)
+Held by `test/pp_you_maa_door_test.dart` ("door 3: the plan, held", 18 tests) and `test/pp_postpartum_bands_test.dart` (5): the tab order per band, the "10 minutes" target per band, Body's red flag, both shelves row by row (real pages, in band, six at most), an expert on every tab to the right people, the movement tools, every §4 band tag, no first-band page at week 7, every link landing and none on `pp_food`, no paid card on the four crisis pages and the free line above every paid card on a mind page (read through the reader, where the card is drawn), no shop link on a mind page and none promising an unstocked item, a gynaecologist on eight pages, the seven classes, the after-check notice, the eight new pages in place with `REQUIRED_REVIEW`, one film prefix and the six demos, the mood check's crisis screen, and the first view at 3 weeks, 7 weeks, 4 months and 8 months.
+
+**The shell, new for this door and open to every door:**
+- `PpBand.fromWeeks` / `toWeeks` and `PpBandSet.youngestClock` (M2, `pp_age_bands.dart`). `active` now reads a weeks clock; for a months-only set it is the same band as before (a test walks six years of days to hold that). Her clock is `ChildProfileStore.youngestAgeInWeeks`.
+- The door screen's "for later" timing runs on that clock, in weeks (`_unlockWeeks`), so Going back says "about 6 weeks after the birth", not "about 1 months". The age rail's line on her door reads "Picked for you, 3 weeks after the birth".
+- The router: `pp_yoga/<classId>` opens one class (which also closes the route half of Feeding's FD13); `pp_maa_ten_minutes` opens the session for her band; an after-check class before six weeks says so (S8); a placeholder-only physio or counsellor roster says "joining soon" with a pill to the gynaecologists (`kPpJoiningSoon`), the counsellor line naming Tele-MANAS first.
+- The reader: the after-BP page's consult carries the "not for an emergency" line (`pvReadConsultNote`).
+- Relevance: two signals from her pregnancy record, `sugarInPregnancy` and `bpInPregnancy`, lift the after-GDM and after-BP pages in the first year.
+- `kPpConsultRoleToCategory` gains `gynaecologist`.
+
+**A mechanism worth keeping:** M5 said "free help above the paid card", and the block order already put the crisis link above most consults. It was not enough, because since Feeding's D2 the reader draws a page's consult as a grey card **under the first doctor box**, and turns every link into a foot tile. So the order a mother sees is decided by the reader, not by the list of blocks. The free line had to go *into* that doctor box (three pages) or *be* it (four pages got a "Free help, any hour" box). The general point: when a renderer moves blocks, a rule about order has to be tested on the rendered result, which is what the M5 test does (`ppPageAsRead`, then `pvReadOwnConsultAfter`).
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| §1: "10 minutes" banded with `PpDoorTool.bands` | One card in every band; the router picks the session for her band | Four banded cards of one name would leave three folded at the foot of Today ("Earlier", "Coming up next"), the same card three more times |
+| §3: the Moving shelf pulls `pf_ex_*` in through `extraPageIds` | Through the age rail itself | An age rail resolves any page of the section by id. `extraPageIds` as well would draw the same pages twice on one tab |
+| §3 table plus the content file's additions: shelves of up to 8 | Six a shelf, as the content file's own cap says. 0–6 w: rest and night sweats ride the area rail (after-BP takes a place). 6 w–3 m: hair fall to the rail, the six-week check is on the Moving shelf. 3–6 m: wrist and neck to the rail, after-GDM is on the 6 w–3 m shelf (its window is 6–12 weeks) | The cap |
+| §3: "perineum / C-section early (by birth type if known)" | Both pages on the shelf | The age rail keeps its plan's order on purpose (Health). STILL-OPEN §102.7 |
+| §5 / M4: "`PpLink` gains `pageId`" | Already there (added for Potty), and the reader already opened it. Used, not built | The header comment saying otherwise was stale; corrected |
+| §5: the 2 dead links | "Your first 40 days" opens the First 40 section; "Iron and recovery" opens `eat_iron` | |
+| §5: "recovery programme" → `po_gentle_rec` / `co_deepcore_rec` | Both, as two class links, plus `po_1to1` (§6) | |
+| §6: the gynaecologist offer card "from ₹900 ($11)" | No price | Prices are server-side and no expert is live (as Feeding and Health) |
+| §6: expert row "Pumping at work? A lactation expert" | "Talk to a lactation expert", with "Pumping at work, or a plan for the switch?" as its line | The label/blurb shape every expert row uses |
+| M8 + §12: unstocked items toast "[Item] isn't in the Store yet" | The links that promised them are commented out; the stocked ones open their own shelf | M8's words: "the copy stops promising them". A link whose whole promise is an unstocked item has nothing to say but no. Owed YM14 |
+| §12: the after-check toast "Gentle Return to Movement is free and safe now" | "Breathing and short walks are the right start for now", with a Breathing pill | That class's own description says "once your doctor clears you". Calling it safe at week 2 would contradict it |
+| §12: the Going back tap under six weeks | No toast | Since S9 no tab locks: it opens, with its "For later" line |
+| Part A §8: `work_schemes` "bands all, overrides the area's `_cleared`" | Tagged all; the area stays `_cleared` | The shell reads the area band first. Before six weeks the page still shows, on the Going back tab for later, which opens on the six-week band |
+| §7: door intro video | Not built | S4: no chip until a film exists. Owed YM13 |
+| §10: a Mobbin check and a prototype | Not run | The shelf and expert-row look is Health's approved H2 (v4); nothing new was laid out |
+| The wiring gate (`pp_doors_first_view_test`): every door closing opens a screen | Accepts the "joining soon" answer for a placeholder-only roster, and a new test holds that its pill opens real people | Opening two made-up profiles for a mother asking for help is worse than saying who is coming (§12) |
+
+**Owed, not in this build:** the films YM7 to YM13; the shelves, the BP monitor and the people YM14 to YM17; a gynaecologist's read of every `REQUIRED_REVIEW` line and the scheme and law lines against the current government text (`BEFORE-LAUNCH.md`); First 40's windows into these pages (door 6) and Feeding's links here (STILL-OPEN §102.5); the two crisis screens (§102.4).

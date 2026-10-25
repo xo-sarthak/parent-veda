@@ -449,6 +449,8 @@ const Map<String, String> kPpConsultRoleToCategory = {
   'physio': 'Physiotherapist',
   'group_physio': 'Physiotherapist',
   'maternal_mental_health': 'Maternal mental health',
+  // You, Maa (door 3, M6): the one category for her with real people.
+  'gynaecologist': 'Gynecologist',
   'group_mental_health': 'Maternal mental health',
   'development': 'Development expert',
   'early_learning': 'Early learning expert',

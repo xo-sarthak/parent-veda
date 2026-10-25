@@ -217,9 +217,14 @@ PvReadNextStep? pvReadOwnConsult(PvRead r) {
 /// go-now sign is on screen, so every consult card on a Health page carries
 /// the same quiet line as the door's expert row. Read off the read's id
 /// (`pp_page_<section>_<page>`), so no other door changes.
-String? pvReadConsultNote(PvRead r) => r.id.startsWith('pp_page_parenting_health_')
-    ? 'Not for an emergency. For that, call 112 or go to a hospital.'
-    : null;
+///
+/// You, Maa's after-BP page (door 3, 2026-10-25) carries it too: its consult
+/// follows a go-now list.
+String? pvReadConsultNote(PvRead r) =>
+    r.id.startsWith('pp_page_parenting_health_') ||
+            r.id == 'pp_page_parenting_maternal_body_after_bp'
+        ? 'Not for an emergency. For that, call 112 or go to a hospital.'
+        : null;
 
 /// The section the page's own consult follows: its first doctor box, or the
 /// matcher's slot when the page has none (after the second section, or the

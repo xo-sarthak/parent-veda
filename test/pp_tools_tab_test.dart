@@ -32,6 +32,9 @@ void main() {
     bool allowed(String id) =>
         id == 'pp_recos' || // a shop card, reached from Product guide; not a tool
         id == 'pp_leaps' || // reading in the shared reader, not a tool (tools pass D4, 2026-10-25)
+        // You, Maa's "10 minutes for you today" (door 3, M1): it opens a page
+        // or a class picked for her week, not a tool of its own.
+        id == 'pp_maa_ten_minutes' ||
         id.startsWith('pp_what_changed/'); // the same checker, pre-filtered
     final missing = {
       for (final d in kPpDoors)

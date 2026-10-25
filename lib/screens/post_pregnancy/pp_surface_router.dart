@@ -71,7 +71,10 @@ import 'milestone_journey_screen.dart';
 import 'nuskhe_screen.dart';
 import 'problem_solver_screen.dart';
 import 'products_discovery_screen.dart';
-import 'pp_experts_data.dart' show kFindHelpNeeds;
+import 'pp_experts_data.dart' show kFindHelpNeeds, categoryIsSeededOnly;
+import 'pp_yoga_data.dart' show kYogaClasses, kYogaAfterCheckIds, yogaClassById;
+import 'yoga_class_screen.dart' show YogaClassScreen;
+import '../../data/mind_mood_data.dart' show kCrisisHelplineName, kCrisisHelplineNumber;
 import 'pp_community_detail_screen.dart';
 import 'community_screen.dart';
 import '../../data/community_data.dart' show kParentingCommunities;
@@ -177,12 +180,60 @@ const Map<String, String> kPpShelfNotYet = {
   'Health record folders': 'Not in our shop yet. Any plastic folder works.',
 };
 
+/// ⚠️ A ROSTER OF PLACEHOLDERS ONLY, SAID PLAINLY (You, Maa §12, M6,
+/// 2026-10-25). Her physio and counsellor rows open categories whose people
+/// are all `Expert.seeded` today. Opening them showed made-up profiles to a
+/// mother asking for real help. Until a real person joins, the tap says so
+/// and points at the gynaecologists, who are real. The counsellor line
+/// names the free helpline first, as every mind page does (M5). Category ->
+/// (words, where the pill goes).
+const Map<String, (String, String)> kPpJoiningSoon = {
+  'Physiotherapist': (
+    "Our women's health physios are joining soon. A gynaecologist can help "
+        'today.',
+    'Gynecologist',
+  ),
+  'Maternal mental health': (
+    'Our perinatal counsellors are joining soon. $kCrisisHelplineName on '
+        '$kCrisisHelplineNumber is free, any hour. A gynaecologist can help '
+        'today.',
+    'Gynecologist',
+  ),
+};
+
+/// The card "10 minutes for you today" on You, Maa's Today tab (M1).
+const String kPpMaaTenMinutes = 'pp_maa_ten_minutes';
+
+/// The one session picked for her week (plan §1). Breath and a walk before
+/// her six-week check; the pelvic floor, then the deep core; then strength.
+String ppMaaTenMinutesTarget() =>
+    switch (kPpPostpartumBands.active.id) {
+      'pp_0_6w' => 'pp_page/parenting_maternal/pf_ex_breathing',
+      'pp_6w_3m' => 'pp_yoga/co_pelvic_rec',
+      'pp_3_6m' => 'pp_yoga/co_deepcore_rec',
+      _ => 'pp_page/parenting_maternal/move_getting_stronger',
+    };
+
 /// The words a tap says when its target is not there yet (S8). Null when the
 /// target is there. Pure, so a test can hold every case.
 String? ppSurfaceUnavailable(String id) {
+  // An after-check class for a mother still in her first six weeks (You,
+  // Maa §12). The Yoga hub labels them; a direct link must say it too.
+  const yogaPrefix = 'pp_yoga/';
+  if (id.startsWith(yogaPrefix) &&
+      kYogaAfterCheckIds.contains(id.substring(yogaPrefix.length)) &&
+      kPpPostpartumBands.active.id == 'pp_0_6w') {
+    return 'This class opens after your six-week check. Breathing and short '
+        'walks are the right start for now.';
+  }
+  if (id == kPpMaaTenMinutes) return ppSurfaceUnavailable(ppMaaTenMinutesTarget());
   const expertPrefix = 'pp_experts/';
   if (id.startsWith(expertPrefix)) {
     final category = id.substring(expertPrefix.length);
+    if (kPpJoiningSoon[category] case (final words, _)
+        when categoryIsSeededOnly(category)) {
+      return words;
+    }
     if (kFindHelpNeeds.any((n) => n.category == category)) return null;
     final near = kPpNearestExpert[category] ?? 'Pediatrician';
     final nearLabel = kFindHelpNeeds
@@ -217,7 +268,17 @@ void ppPushSurface(BuildContext context, String surfaceId) {
   final why = ppSurfaceUnavailable(surfaceId);
   if (why != null) {
     const expertPrefix = 'pp_experts/';
-    if (surfaceId.startsWith(expertPrefix)) {
+    if (kPpJoiningSoon[surfaceId.replaceFirst(expertPrefix, '')]
+        case (_, final near) when surfaceId.startsWith(expertPrefix)) {
+      pvToast(context, why,
+          action: 'See one',
+          onAction: () => ppPushSurface(context, '$expertPrefix$near'));
+    } else if (surfaceId.startsWith('pp_yoga/')) {
+      pvToast(context, why,
+          action: 'Breathing',
+          onAction: () => ppPushSurface(
+              context, 'pp_page/parenting_maternal/pf_ex_breathing'));
+    } else if (surfaceId.startsWith(expertPrefix)) {
       final near =
           kPpNearestExpert[surfaceId.substring(expertPrefix.length)] ??
               'Pediatrician';
@@ -308,6 +369,26 @@ Widget? ppScreenForSurface(String id) {
       }
     }
     return null;
+  }
+
+  // ⚠️ `pp_yoga/<classId>` OPENS ONE CLASS (You, Maa §6, 2026-10-25). A
+  // page that says "the Pelvic-Floor Daily Ten" used to open the whole Yoga
+  // hub, and Feeding owed the same route (FD13). An unknown id opens the hub
+  // rather than `yogaClassById`'s silent first class.
+  const yogaPrefix = 'pp_yoga/';
+  if (id.startsWith(yogaPrefix)) {
+    final classId = id.substring(yogaPrefix.length);
+    if (!kYogaClasses.any((c) => c.id == classId)) {
+      return const YogaHomeScreen(backLabel: 'Back');
+    }
+    return YogaClassScreen(cls: yogaClassById(classId));
+  }
+
+  // ⚠️ "10 MINUTES FOR YOU TODAY" OPENS THE SESSION FOR HER WEEK (You, Maa
+  // M1). One card, one target that follows her band, rather than four cards
+  // of the same name of which three would sit folded at the foot.
+  if (id == kPpMaaTenMinutes) {
+    return ppScreenForSurface(ppMaaTenMinutesTarget());
   }
 
   // ⚠️ `pp_community/<roomId>` OPENS ONE ROOM. The You, Maa section's

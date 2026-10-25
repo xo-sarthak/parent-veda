@@ -153,13 +153,42 @@ set the child's age, open Health):
 - [ ] The frightening-thoughts route is pinned in the red-flag treatment,
       eyebrow "READ THIS ONE FIRST". Right weight for a mother in distress,
       or should it be an ordinary first card?
-- [ ] Going back locks with "From 2 months"; the band is called "6 weeks to
-      3 months". Fix the wording per band, or leave?
+- [x] Going back locks with "From 2 months"; the band is called "6 weeks to
+      3 months". Fix the wording per band, or leave? **Fixed by door 3
+      (2026-10-25):** the bands are weeks now (M2), and the tab for later
+      says "This usually starts about 6 weeks after the birth".
 - [ ] YM6: the six healing-kitchen recipes are pages here; the brief wants
       them tagged postpartum in the shared recipe library too. Do it?
 - [ ] The consolidation reached back into First 40 Days (three pages and two
       cards are windows now). Walk that door once more and confirm it still
       reads as her recovery woven in.
+- [ ] A gynaecologist's read of every `REQUIRED_REVIEW` line the door 3
+      build added: the eight new pages (contraception, after GDM, after BP,
+      the three checks, fathers' low mood, not safe at home, spacing, the
+      government schemes) and the thin-page additions.
+
+**Door 3 build (2026-10-25), what to check on the phone** (Developer card,
+set the child's age, open You, Maa):
+- [ ] 3 weeks: How are you today opens; the frightening-thoughts route on
+      top; "How have you been?" and "10 minutes for you today" next; the
+      counsellor row after the first rail with "Free, any hour: Tele-MANAS
+      on 14416" under it. "10 minutes" opens Belly breathing.
+- [ ] 3 weeks, Your body: its own red row ("When to call a doctor, not
+      wait"), then "Right now for you, Picked for you, 3 weeks after the
+      birth": bleeding, stitches, C-section, cramps, breasts, high BP.
+- [ ] 7 weeks: Moving and eating is second; no stitches or lochia page
+      anywhere; "10 minutes" opens the Pelvic-Floor Daily Ten.
+- [ ] 4 months and 8 months: the tab order changes (Going back second at 8
+      months); the shelves change with her.
+- [ ] Two children (a toddler and a newborn): switch to the toddler; the
+      door still says "The first 6 weeks".
+- [ ] A physio or counsellor row: "joining soon", with a pill to the
+      gynaecologists. The gynaecologist row opens three real doctors.
+- [ ] A mind page with a counsellor card ("I am anxious every single
+      minute"): the free line is
+      in the box right above the grey card.
+- [ ] Before six weeks, the Pelvic-Floor Daily Ten from a page: "This class
+      opens after your six-week check."
 
 ## What to buy (§53) — a shop, not a door
 

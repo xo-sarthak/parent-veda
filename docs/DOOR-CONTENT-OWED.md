@@ -352,7 +352,28 @@ coming-soon page is not here.
 | YM3 | `body_breasts` — Sore, rock hard breasts | Copy | Built from data | Judgement call 1: this is now THE breast-health page; First 40 Days' card and Feeding's mastitis flag open it. It covers engorgement and mastitis; cracked nipples and the blocked duct are owed here (First 40 Days' scaffold FF1 is closed into this row). |
 | YM4 | The 11 feeling-films on the shelf | Film · ~55 min | Built from data | "The highest-value video set in the section: a mother needs to hear 'I feel nothing at all' said aloud by someone who has been there. Prioritise filming these." |
 | YM5 | The remaining 20 film slots | Film / animation | Built from data | The five pelvic-floor exercises (and "finding the right muscle" as an animation of the internal muscle, not a filmed body), six movement sessions, six recipes, two work films, one for the frightening thoughts route. |
-| YM6 | The recipes in the shared library | Data | Not done | The six healing-kitchen recipes should also be tagged postpartum in `pp_food`'s recipe library; today they are pages here that link to `pp_food`. |
+| YM6 | The recipes in the shared library | Data | Not done | The six healing-kitchen recipes should also be tagged postpartum in `pp_food`'s recipe library; today they are pages here that link to `pp_food`. **Door 3 (2026-10-25):** the four "food for you" links now open the healing-kitchen pages themselves, since `pp_food` is the baby's library (M4). The tagging is still owed. |
+
+**Added by the door 3 build (2026-10-25, `docs/pp-door-plans/03-you-maa.md` §6, §7, §12).** Films (each slot shows the placeholder and answers a tap, S8a). All 31 older slots moved to the `you_maa/` prefix; their old ids are in comments beside them:
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| YM7 | `you_maa/demo_first_weeks` on `move_first_weeks` | Film · 4 min | Coming soon | Breathing, getting out of bed on her side, the first short walk. Slow, real mother, no gym clothes |
+| YM8 | `you_maa/demo_diastasis_training` on `move_diastasis_training` | Film · 6 min | Coming soon | **Filmed or reviewed by a women's health physio.** The order of the exercises and what to stop |
+| YM9 | `you_maa/demo_getting_stronger` on `move_getting_stronger` | Film · 10 min | Coming soon | A follow-along: squats, lifts, carries, with the baby nearby |
+| YM10 | `you_maa/demo_pf_functional` on `pf_ex_functional` | Film · 4 min | Coming soon | **Filmed or reviewed by a pelvic-floor physio.** The brace before a lift, a cough, a carry |
+| YM11 | `you_maa/demo_back_posture` on `body_back_posture` | Film · 4 min | Coming soon | Three changes to how she sits to feed, lifts and stands |
+| YM12 | `you_maa/demo_wrist_neck` on `body_wrist_neck` | Film · 3 min | Coming soon | Holds that rest the thumb and wrist (de Quervain's), and the neck while feeding |
+| YM13 | `you_maa/door_intro` | Film · 0:50 | Not built | A real perinatal counsellor or gynaecologist: "this door is about you". The chip waits for it (S4, GLOBAL-CHANGES #5) |
+
+Products, people and a device the door would point at, not stocked or not real yet. The links that promised them were commented out (M8), so no tap reaches them today:
+
+| # | Target | Where it would go | Today |
+|---|---|---|---|
+| YM14 | Shelves: postpartum belt or binder, sitz bath, silicone scar sheets, milk cooler bags, more nursing pads | body_perineum, body_csection_early, body_scar_care, body_diastasis, move_getting_stronger, work_milk_stash | Not linked. The pages explain each in their own words. When a shelf is stocked, uncomment its link and point it at the shelf (`pp_products/pvs_…`) |
+| YM15 | A home BP monitor | `body_after_bp`, at the foot only, never beside the go-now cards | Not linked |
+| YM16 | Real people: women's health physios, perinatal counsellors (each category has two `Expert.seeded` placeholders) | Moving and eating, Today and People expert rows; every physio and counsellor consult | "Our … are joining soon." with the free helpline on the counsellor line, and a pill to the gynaecologists (`kPpJoiningSoon`, S8) |
+| YM17 | New categories: an adult postpartum nutritionist; a couples or family counsellor | `body_after_gdm` (nutritionist), the People row (couples) | The gynaecologist and the perinatal counsellors stand in. A category with nobody in it would put an empty need on Find help (`pp_consult_filter_test`) |
 
 ### P10. What to buy — the shop, not a door
 

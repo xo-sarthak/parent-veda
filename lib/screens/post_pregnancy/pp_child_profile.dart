@@ -845,6 +845,21 @@ class ChildProfileStore extends ChangeNotifier {
   int get ageInDays => (ageInWeeks * 7).round();
   int get ageInMonths => (ageInWeeks / 4.345).floor();
 
+  /// ⚠️ HER CLOCK, NOT THE SELECTED CHILD'S (You, Maa plan M2, 2026-10-25).
+  /// Weeks since her most recent birth: the youngest child's age. A mother
+  /// of a 3-year-old and a 3-week-old is three weeks postpartum whichever
+  /// child is on screen, and her recovery pages must not jump to "3 years
+  /// on" when she taps the older one. Twins share a birthday, so the min is
+  /// the same either way. With no saved child, the active (seeded) one.
+  double get youngestAgeInWeeks {
+    if (_children.isEmpty) return ageInWeeks;
+    final latest = _children
+        .map((c) => c.dob)
+        .reduce((a, b) => a.isAfter(b) ? a : b);
+    final w = DateTime.now().difference(latest).inDays / 7.0;
+    return w > 0 ? w : 0;
+  }
+
   // ---- corrected age (2026-10-07) -----------------------------------------
   //  Gap analysis P2 (Behind · Onboarding): "We tell parents to use corrected
   //  age and then show every page by the birthday." For a baby born early with

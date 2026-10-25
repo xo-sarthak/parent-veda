@@ -31,7 +31,9 @@ import 'package:parentveda/screens/post_pregnancy/pp_page_read.dart' show ppPage
 import 'package:parentveda/screens/post_pregnancy/pp_relevance.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_section_registry.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_surface_router.dart'
-    show ppScreenForSurface, ppSurfaceUnavailable;
+    show ppScreenForSurface, ppSurfaceUnavailable, kPpJoiningSoon;
+import 'package:parentveda/screens/post_pregnancy/pp_experts_data.dart'
+    show categoryIsSeededOnly;
 import 'package:parentveda/screens/products/pv_shelf_screen.dart' show PvShelfScreen;
 import 'package:parentveda/screens/reader/pv_read_offer.dart';
 import 'package:parentveda/services/pv_catalog_store.dart';
@@ -221,6 +223,16 @@ void main() {
       expect(ppSurfaceUnavailable('pp_nothing_here'), contains("isn't ready yet"));
     });
 
+    // ⚠️ A ROSTER OF PLACEHOLDERS ANSWERS WITH "JOINING SOON" ON PURPOSE
+    // (You, Maa §12, 2026-10-25): showing made-up people to a mother asking
+    // for help is worse than saying who is coming and who can help today. So
+    // the gate accepts that answer, and the next test holds that its pill
+    // opens a real roster.
+    bool joiningSoon(String id) =>
+        id.startsWith('pp_experts/') &&
+        kPpJoiningSoon.containsKey(id.substring('pp_experts/'.length)) &&
+        ppSurfaceUnavailable(id) != null;
+
     test('every door tool and closing opens a real screen today (wiring gate)', () {
       final missing = <String>[
         for (final door in kPpDoors) ...[
@@ -229,11 +241,24 @@ void main() {
               if (ppSurfaceUnavailable(tool.surfaceId) != null)
                 '${door.sectionId}/${tab.id}: ${tool.surfaceId}',
           if (door.closing case final c?)
-            if (ppSurfaceUnavailable(c.surfaceId) != null)
+            if (ppSurfaceUnavailable(c.surfaceId) != null &&
+                !joiningSoon(c.surfaceId))
               '${door.sectionId} closing: ${c.surfaceId}',
         ],
       ];
       expect(missing, isEmpty, reason: missing.join('\n'));
+    });
+
+    test('a placeholder-only roster says who is coming, and its pill opens real people', () {
+      for (final MapEntry(key: category, value: (words, near))
+          in kPpJoiningSoon.entries) {
+        if (!categoryIsSeededOnly(category)) continue; // real people joined
+        expect(ppSurfaceUnavailable('pp_experts/$category'), words);
+        expect(ppSurfaceUnavailable('pp_experts/$near'), isNull, reason: near);
+        expect(categoryIsSeededOnly(near), isFalse, reason: '$near is real');
+      }
+      expect(kPpJoiningSoon['Maternal mental health']!.$1, contains('14416'),
+          reason: 'free help is named first (M5)');
     });
 
     test('no parenting opener is silent any more', () {

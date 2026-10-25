@@ -11135,3 +11135,23 @@ row and age rail (`docs/pp-door-plans/02-health.md` §2a).
 says why today (S8).
 
 **§102.3 Feeding's** are FD5 to FD13, and its allergen tracker that remembers (D4) is its own later step.
+
+**§102.4 You, Maa: two crisis screens still exist (door 3, 2026-10-25).** Her mood check now opens the
+parenting `PpCrisisPathScreen`, as every crisis link on her door does. The pregnancy `MmCrisisPathScreen`
+stays for pregnancy, untouched. Two screens for one emergency can drift (a helpline changes on one); both read
+the one helpline constant in `mind_mood_data.dart` today. Whether pregnancy should use the parenting screen
+too, or both one shared one, is open.
+
+**§102.5 You, Maa and First 40 Days are not single-source yet.** First 40 keeps its own copies of rest and
+food, the recovery red flags, "not yourself" and folk practices. The plan makes them windows into You, Maa's
+pages in the First 40 build (door 6). Feeding's `bf_diet`, `bf_supply` and `bf_pumping` are to link here as
+the one source; not done in door 1's build.
+
+**§102.6 You, Maa's owed films, shelves and people** are `DOOR-CONTENT-OWED` YM7 to YM17. Her physio and
+counsellor rows say "joining soon" until real people join (`kPpJoiningSoon`); the shelves that were promised
+and are not stocked are no longer linked (M8).
+
+**§102.7 A page has no birth-type tag.** Body's first-six-weeks shelf lists the stitches page and the
+C-section page side by side; the plan asked for "by birth type if known". The C-section signal exists
+(`PpSignal.cSection`) but the age rail keeps its plan's order on purpose, so both show. A page condition tag,
+or letting a signal reorder an age rail, would fix it; either changes Health's rails too.
