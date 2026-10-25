@@ -12,6 +12,10 @@ import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
 
 import 'article_reader_screen.dart';
+import 'askveda_screen.dart';
+import 'pp_articles_data.dart' show kArticles;
+import 'pp_food_safety.dart';
+import 'pp_phases_data.dart' show ppFillChild;
 import 'food_common.dart';
 import 'food_saved_screen.dart';
 import 'food_shopping_screen.dart';
@@ -94,7 +98,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           eyebrow: r.ageTag,
           mark: IntentMark.cookMark,
           title: r.title,
-          intro: ppFill(r.subtitle),
+          intro: _fill(r.subtitle),
           children: [
             pregToolPad(PpCareStats([
               ('${r.prepMin} min', 'prep'),
@@ -126,7 +130,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             const SizedBox(height: 24),
             head('Why it is good'),
             const SizedBox(height: 6),
-            pregToolPad(Text(ppFill(r.why), style: body)),
+            pregToolPad(Text(_fill(r.why), style: body)),
             const SizedBox(height: 24),
             head('Ingredients'),
             const SizedBox(height: 8),
@@ -153,14 +157,14 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                         style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: Text(ppFill(r.steps[i]), style: body)),
+                  Expanded(child: Text(_fill(r.steps[i]), style: body)),
                 ]),
               )),
             if (r.nutrients.isNotEmpty) ...[
               const SizedBox(height: 12),
               head('What is in it'),
               const SizedBox(height: 8),
-              for (final n in r.nutrients) dot('${n.name}, ${n.amount}. ${ppFill(n.note)}'),
+              for (final n in r.nutrients) dot('${n.name}, ${n.amount}. ${_fill(n.note)}'),
             ],
             const SizedBox(height: 18),
             head('Good to know'),
@@ -171,7 +175,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
               const SizedBox(height: 18),
               head('Easy to get wrong'),
               const SizedBox(height: 8),
-              for (final m in r.mistakes) dot(ppFill(m)),
+              for (final m in r.mistakes) dot(_fill(m)),
             ],
             if (r.substitutions.isNotEmpty) ...[
               const SizedBox(height: 18),
@@ -199,7 +203,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             const SizedBox(height: 18),
             _pad(Text(r.title, style: ppFraunces(25, h: 1.15))),
             const SizedBox(height: 6),
-            _pad(Text(ppFill(r.subtitle), style: ppBody(14, h: 1.5))),
+            _pad(Text(_fill(r.subtitle), style: ppBody(14, h: 1.5))),
             const SizedBox(height: 12),
             _pad(_dietServesRow()),
             const SizedBox(height: 18),
@@ -559,7 +563,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ppEyebrow('Why this is good for him', color: ppPurple, spacing: 0.8),
           const SizedBox(height: 10),
-          Text(ppFill(r.why), style: ppBody(14, color: ppInk, h: 1.6)),
+          Text(_fill(r.why), style: ppBody(14, color: ppInk, h: 1.6)),
         ]),
       );
 
@@ -612,7 +616,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   // ---- related (ecosystem) ------------------------------------------------
   Widget _related({String title = 'Connected in ParentVeda'}) {
     final rows = <(IconData, String, String, VoidCallback)>[
-      if (r.relatedArticle != null) (Icons.menu_book_outlined, 'Article', r.relatedArticle!, () => _push(const ArticleReaderScreen())),
+      // Was () => _push(const ArticleReaderScreen()): the sleep piece (2026-10-25).
+      if (r.relatedArticle != null) (Icons.menu_book_outlined, 'Article', _fill(r.relatedArticle!), _openRelatedArticle),
       if (r.relatedVideoId != null)
         (Icons.play_circle_outline, 'Watch', watchVideoById(r.relatedVideoId!).title, () {
           final v = watchVideoById(r.relatedVideoId!);
@@ -693,6 +698,63 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   //  baby on one arm).
   // ===========================================================================
 
+  // ---- the child on the page (tools pass, Food, 2026-10-25) -----------------
+  //  The dish copy says "he" and "his" about eighty times, and `ppFill` only
+  //  fills `{child}`-style placeholders, so a girl's parent read "his iron
+  //  stores". `ppFillChild` turns he/his into she/her, or the name when the
+  //  profile has no sex given; the placeholders still fill first.
+  static String _fill(String s) => ppFillChild(ppFill(s));
+
+  /// The related article, by its title in the archive, through the one reader.
+  /// It opened `ArticleReaderScreen()` with no article, so it always drew the
+  /// default sleep piece under a feeding label.
+  void _openRelatedArticle() {
+    final a = kArticles.where((x) => x.title == r.relatedArticle).firstOrNull;
+    if (a == null) {
+      pvToast(context, 'That article is still being written. Ask Veda can answer it now.');
+      return;
+    }
+    _push(ArticleReaderScreen(article: a));
+  }
+
+  void _askVeda() => Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'pp/ask_veda'),
+        builder: (_) => AskVedaScreen(
+            initialQuery: 'Is ${r.title} right for ${ChildProfileStore.instance.nameMid} at '
+                '${ChildProfileStore.instance.ageLabel}?'),
+      ));
+
+  /// "We made this": the dish joins what you have cooked. Toast with Undo.
+  Widget _madeThis(V2Palette p) => AnimatedBuilder(
+        animation: FoodStore.instance,
+        builder: (context, _) {
+          final made = FoodStore.instance.isCooked(r.id);
+          return PvSecondary(
+            key: const ValueKey('pp_recipe_made'),
+            label: made ? 'You made this' : 'We made this',
+            icon: made ? Icons.check_rounded : null,
+            onTap: () {
+              if (made) {
+                FoodStore.instance.unmarkCooked(r.id);
+                pvToast(context, 'Removed from what you have made',
+                    action: 'Undo', onAction: () => FoodStore.instance.markCooked(r.id));
+              } else {
+                FoodStore.instance.markCooked(r.id);
+                pvToast(context, 'Saved: you made ${r.title}',
+                    action: 'Undo', onAction: () => FoodStore.instance.unmarkCooked(r.id));
+              }
+            },
+          );
+        },
+      );
+
+  /// An allergy on the child's record that this dish touches (D2: always warn).
+  Widget? _allergyCallout() {
+    final a = ppAllergyMatch([r.title, ...r.ingredients]);
+    if (a == null) return null;
+    return PpAllergyCallout(allergy: a, childName: ChildProfileStore.instance.nameMid);
+  }
+
   Widget _buildDocPage(BuildContext context) {
     final p = pvStorePalette;
     return AnimatedBuilder(
@@ -714,15 +776,19 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                 Text(r.title,
                     style: pvFraunces(fontSize: 30, fontWeight: FontWeight.w600, height: 1.12, letterSpacing: -0.3, color: p.ink1)),
                 const SizedBox(height: 8),
-                Text(ppFill(r.subtitle), style: pvManrope(fontSize: 15.5, height: 1.5, color: p.ink2)),
+                Text(_fill(r.subtitle), style: pvManrope(fontSize: 15.5, height: 1.5, color: p.ink2)),
                 const SizedBox(height: 12),
                 _docMetaLine(p),
                 const SizedBox(height: 18),
                 _docFacts(p),
                 const SizedBox(height: 12),
                 _docAgeFit(p),
+                if (_allergyCallout() case final w?) ...[
+                  const SizedBox(height: 12),
+                  w,
+                ],
                 _docSection(p, 'Why this is good for ${ChildProfileStore.instance.them}'),
-                Text(ppFill(r.why), style: _docBody(p)),
+                Text(_fill(r.why), style: _docBody(p)),
                 _docSection(p, 'What you need', side: 'Serves ${r.serves}'),
                 _docIngredients(p),
                 if (r.equipment.isNotEmpty) ...[
@@ -736,6 +802,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                 ],
                 _docSection(p, 'How to make it', sub: '${r.steps.length} steps. Cook step by step reads them one at a time.'),
                 for (var i = 0; i < r.steps.length; i++) _docStep(p, i),
+                const SizedBox(height: 14),
+                _madeThis(p),
                 if (r.nutrients.isNotEmpty) ...[
                   _docSection(p, 'What’s in it'),
                   _docNutrients(p),
@@ -756,6 +824,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                 _docRelated(p),
                 const SizedBox(height: 18),
                 Text('By ParentVeda team', style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
+                const SizedBox(height: 10),
+                const PpFoodDisclaimer(),
                 const SizedBox(height: 28),
               ]),
             ),
@@ -775,7 +845,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   // Same rows and taps as _related, in the house palette.
   Widget _docRelated(V2Palette p) {
     final rows = <(IconData, String, String, VoidCallback)>[
-      if (r.relatedArticle != null) (Icons.menu_book_outlined, 'Article', r.relatedArticle!, () => _push(const ArticleReaderScreen())),
+      // Was () => _push(const ArticleReaderScreen()): the sleep piece (2026-10-25).
+      if (r.relatedArticle != null) (Icons.menu_book_outlined, 'Article', _fill(r.relatedArticle!), _openRelatedArticle),
       if (r.relatedVideoId != null)
         (Icons.play_circle_outline, 'Watch', watchVideoById(r.relatedVideoId!).title, () {
           final v = watchVideoById(r.relatedVideoId!);
@@ -793,7 +864,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                 onOpenNormal: () => _push(ProductDetailScreen(product: productById(r.relatedProductId!))),
               )
         ),
-      (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about feeding at ${foodAgeLabel(r.ageTag)}', () => openPpTab(context, 1)),
+      // Was () => openPpTab(context, 1): Ask Veda with nothing typed (2026-10-25).
+      (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about feeding at ${foodAgeLabel(r.ageTag)}', _askVeda),
     ];
     return Column(
       key: const ValueKey('pp_recipe_doc_related'),
@@ -1039,7 +1111,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
   static final RegExp _minutes = RegExp(r'(about )?\d+(\s*[–-]\s*\d+)?\s*(minutes?|min|hours?)\b');
 
   Widget _docStep(V2Palette p, int i) {
-    final text = ppFill(r.steps[i]);
+    final text = _fill(r.steps[i]);
     final spans = <TextSpan>[];
     var at = 0;
     for (final m in _minutes.allMatches(text)) {
@@ -1088,7 +1160,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                   // Only the first letter is lowered: a doc note can carry
                   // "vitamin-C" or "(tomato/lemon)" later in the line, and
                   // lowering the whole note printed "vitamin-c".
-                  Text('From ${_lowerFirst(ppFill(n.note).replaceAll(RegExp(r'\.$'), ''))}',
+                  Text('From ${_lowerFirst(_fill(n.note).replaceAll(RegExp(r'\.$'), ''))}',
                       style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
                 ]),
               ),
@@ -1129,7 +1201,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           for (final m in r.mistakes)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Text(ppFill(m), style: _docBody(p)),
+              child: Text(_fill(m), style: _docBody(p)),
             ),
         ]),
       );
@@ -1192,7 +1264,7 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
                 settings: RouteSettings(name: 'pp/recipe/${r.id}/cook'),
                 builder: (_) => CookModeScreen.steps(
                   title: r.title,
-                  steps: [for (final s in r.steps) ppFill(s)],
+                  steps: [for (final s in r.steps) _fill(s)],
                   ingredientLines: [
                     for (var i = 0; i < r.ingredients.length; i++)
                       i < r.amounts.length ? '${r.amounts[i]}  ${r.ingredients[i]}' : r.ingredients[i],

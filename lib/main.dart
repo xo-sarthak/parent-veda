@@ -23,6 +23,7 @@ import 'screens/post_pregnancy/pp_feeding_data.dart';
 import 'screens/post_pregnancy/pp_growth_data.dart';
 import 'screens/post_pregnancy/pp_health_data.dart';
 import 'screens/post_pregnancy/pp_milestones_data.dart';
+import 'screens/post_pregnancy/pp_food_tries_store.dart';
 import 'screens/post_pregnancy/pp_sleep_data.dart';
 import 'screens/post_pregnancy/pp_care_log_data.dart';
 import 'screens/post_pregnancy/pp_vaccine_data.dart';
@@ -384,6 +385,8 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     TummyStore.instance.init();
     PpLastPageStore.instance.init(); // the home's Continue reading (2026-10-07)
     MilestoneStore.instance.init();
+    // The foods each child has tried (0115, tools pass Food family 2026-10-25).
+    PpFoodTriesStore.instance.init();
     BabyDocumentsStore.instance.init();
     // PARENTING (light): saved lists, progress and preferences. These sync one
     // JSON blob each into user_state, where own-only RLS is exactly right - a

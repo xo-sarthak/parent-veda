@@ -1409,7 +1409,7 @@ pregnancy overwrote the first's mood; and there was no way to look back at an ea
 ## Step 19: the Development tools: a check-in answer and a "we tried this" belong to one child
 
 **Date:** 2026-10-25 (parenting tools pass, Development family 17-21; the user's rule: "make sure the back ends are
-working well"). **Migration:** none. **Commit:** pending.
+working well"). **Migration:** none. **Commit:** `3e7b8a8`.
 
 ### Why
 `DevStore` (`pp_development`, the step-13 per-item merge) kept the gentle check-in's answers keyed by the question's
@@ -1444,3 +1444,38 @@ after a yes), `cloud_merged_store_test`, `pp_checkin_rename_test`, `pp_use_conse
 
 **Files:** `lib/screens/post_pregnancy/pp_development_data.dart` (`DevStore`, `DevAnswer`), `pp_child_profile.dart`, `pp_reco_data.dart`,
 `health_doctor_visit_screen.dart`, `development_checkin_screen.dart`, `lib/services/pp_use_consent.dart`.
+
+## Step 20: the Food tools: the foods a child has tried, shared with the co-parent
+
+**Date:** 2026-10-25 (parenting tools pass, Food family 22-24; the user's rule: "make sure the back ends are working
+well"). **Migration:** `0115_pp_food_tries.sql` (the user runs it). **Commit:** pending.
+
+### Why
+"Can my baby eat this?" told a parent whether a food suits the child's age, and forgot everything the moment she
+closed it. Nothing anywhere recorded which foods a child had already had, or whether one caused a reaction. The
+user's decision (D1): keep a first-tries log, per child, **and the partner sees it**.
+
+### What changed
+- [x] **A new child table, `pp_food_tries`** (0115): one row per `(child_id, food_id)`, `first_tried`, `reaction`
+  (`none` / `mild` / `doctor`), `note`, born with 0104's clock (`updated_at`, `removed_at`). RLS through
+  `my_child_ids()`, insert only as yourself: the same four policies as `pp_milestone_observations` (0025). On 0100's
+  newer-wins guard and on the purge list (`pv_purge_removed`, redefined from 0114's body with one table added).
+- [x] **`PpFoodTriesStore`** (`lib/screens/post_pregnancy/pp_food_tries_store.dart`): the `MilestoneStore` shape.
+  `PerChild` map in prefs, `ChildLogLedger` keyed by `food_id`, every child pulled (B11's loop), Undo is a soft
+  delete that uploads. The food id is the app's own slug of the catalogue name (`ppFoodId`), so a local row and its
+  cloud copy share one key. Started in `main.dart` beside `MilestoneStore`.
+- [x] **A new consent kind, `foods`** ("Foods tried"), on the same `PpUseConsent` merged store. Readers outside the
+  tool (Recipes' "new food" line, the doctor-visit row) check it; the tool's own list always shows.
+- [x] **Allergies already on the child's record are read, not stored again** (D2, "always warn"):
+  `HealthStore.knownAllergies` is per child since B11, so the checker and Recipes only read it.
+
+**The trade-off.** A `user_state` item (step 19's pattern) would have needed no migration, but `user_state` is one
+row per person and own-only, so the partner could never read it. A child table costs a migration and four policies,
+and buys the one thing the user asked for: whoever feeds lunch knows egg is no longer new. BACKEND-PATTERNS §16rr.
+
+**Verified:** `test/pp_food_tools_test.dart` (twins never share a try; Undo restores exactly; reactions for the
+doctor; works logged out; lenient reaction read; stable ids; the consent kind; every column sent is one 0115
+creates; wired in `main.dart`), `test/sync_guard_contract_test.dart` (guarded), `purge_removed_contract_test`.
+
+**Files:** `supabase/migrations/0115_pp_food_tries.sql`, `lib/screens/post_pregnancy/pp_food_tries_store.dart`,
+`lib/services/pp_use_consent.dart`, `lib/main.dart`.

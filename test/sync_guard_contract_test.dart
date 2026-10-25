@@ -65,6 +65,10 @@ void main() {
     }
   });
 
+  test('the foods a child has tried are guarded (0115)', () {
+    expect(guarded, contains('pp_food_tries'));
+  });
+
   test('the child profile and the name votes are guarded (0105)', () {
     expect(guarded, contains('children'));
     expect(guarded, contains('pp_name_votes'));

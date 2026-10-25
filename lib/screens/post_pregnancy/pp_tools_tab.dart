@@ -45,6 +45,7 @@ import 'pp_common.dart' show PpBottomNav, PpTab;
 import 'pp_feeding_data.dart';
 import 'pp_growth_data.dart';
 import 'pp_search.dart' show openPpAskVeda;
+import 'pp_baby_food_check_screen.dart' show ppBabyFoodCount;
 import 'pp_sleep_data.dart';
 import 'pp_surface_router.dart' show ppPushSurface, ppScreenForSurface, ppSurfaceUnavailable;
 import 'pp_vaccine_data.dart';
@@ -183,7 +184,8 @@ List<PpToolGroup> ppToolGroups() {
     PpToolGroup('Food', 96, [
       PpTool('What to feed at this age', 'Portions and textures for this age, and signs of enough.', 'pp_food_chart', tab: TtcTabMark.sprout,
           IntentMark.plate, words: ['how much', 'portion', 'solids', 'enough']),
-      PpTool('Can my baby eat this?', '289 foods, by age, with the reason.', 'pp_baby_food_check', tab: TtcTabMark.magnifier,
+      // The count read from the list (was '289 foods', 2026-10-25).
+      PpTool('Can my baby eat this?', '$ppBabyFoodCount foods, by age, with the reason.', 'pp_baby_food_check', tab: TtcTabMark.magnifier,
           IntentMark.forkMark, words: ['food', 'honey', 'egg', 'solids']),
       PpTool('Recipes', 'Indian home cooking for each age.', 'pp_food', tool: TtcToolMark.nutrition, IntentMark.cookMark,
           words: ['recipe', 'khichdi', 'meal']),

@@ -31,12 +31,15 @@ import '../doors/pv_list_row.dart';
 import '../doors/pv_shelf_card.dart';
 import '../doors/pv_shelf_spec.dart' show PvShelfKind;
 import '../pregnancy/preg_tool_chrome.dart';
-import '../products/pv_store_chrome.dart' show PvChip, PvCommit, pvStorePalette;
+import '../products/pv_store_chrome.dart' show PvChip, PvCommit, PvSecondary, pvStorePalette;
 import '../v2/v2_palette.dart';
 import '../../services/family_profile.dart' show DietPreference, FamilyProfileStore;
 import 'food_common.dart' show FoodPhoto, FoodPhotoCard, foodAgeLabel, foodDietMark, foodPhotoDisc;
 import 'food_saved_screen.dart';
-import 'pp_baby_food_check_screen.dart' show PpBabyFoodCheckScreen;
+import 'pp_baby_food_check_screen.dart' show PpBabyFoodCheckScreen, ppBabyFoodNameOf;
+import 'pp_food_safety.dart';
+import 'pp_food_tries_store.dart';
+import '../../services/pp_use_consent.dart';
 // import 'pp_baby_ok_check_screen.dart' show PpBabyOkCheckScreen; // kept for revert (tools pass H2)
 import 'what_changed_screen.dart' show WhatChangedScreen;
 import 'pp_common.dart' show ppFill;
@@ -409,8 +412,65 @@ Widget _ppRecipeCard(BuildContext context, FoodRecipe r, {double? width}) => Foo
       recipe: r,
       width: width ?? kPvShelfCardWidth,
       photoHeight: width == null ? kPvShelfPictureHeight : null,
+      note: ppRecipeChildNote(r),
       onTap: () => _ppOpenRecipe(context, r),
     );
+
+/// The card's line for the child on screen (tools pass, Food, 2026-10-25).
+///
+/// * An allergy on the child's health record that the dish touches: always
+///   (D2, safety, no ask).
+/// * Otherwise, with the `foods` yes and at least one first try logged, the
+///   common allergen in the dish the child has not tried yet. Ranking-neutral:
+///   it adds a line, it moves nothing.
+String? ppRecipeChildNote(FoodRecipe r) {
+  final texts = [r.title, ...r.ingredients];
+  if (ppAllergyMatch(texts) != null) return 'On the health record as an allergy';
+  final tries = PpFoodTriesStore.instance;
+  if (!PpUseConsent.instance.allows(PpUseKind.foods) || tries.count == 0) return null;
+  final triedGroups = <String>{
+    for (final e in tries.recent) ...ppAllergensIn([ppBabyFoodNameOf(e.key)]),
+  };
+  final fresh = ppAllergensIn(texts).difference(triedGroups);
+  if (fresh.isEmpty) return null;
+  return 'New for ${ChildProfileStore.instance.nameMid}: ${fresh.first}';
+}
+
+/// A filtered landing for links that name one (tools pass, Food, D6,
+/// 2026-10-25): "Sick day recipes" used to open the top of the screen.
+/// `pp_food/<preset>` reaches it. Returns the chip's label and the dishes, or
+/// null for a preset nobody wrote (the plain screen then, never an error).
+(String, List<FoodRecipe>)? ppRecipePreset(String preset, Iterable<FoodRecipe> pool) {
+  final parts = preset.split('/');
+  switch (parts.first) {
+    case 'age':
+      final m = parts.length > 1 ? int.tryParse(parts[1]) : null;
+      if (m == null) return null;
+      return (
+        'For ${ppRecipeAgeWord(m)}',
+        [for (final r in pool) if (ppRecipeFit(r, m) == PpRecipeFit.now) r],
+      );
+    case 'sick':
+      return ('Sick days', [for (final r in pool) if (r.inCategory('Sick-Day Meals') || r.situations.isNotEmpty) r]);
+    case 'first':
+      return ('First foods', [for (final r in pool) if (r.inCategory('First Foods')) r]);
+    case 'ragi':
+      bool has(FoodRecipe r, String w) =>
+          r.title.toLowerCase().contains(w) || r.ingredients.any((i) => i.toLowerCase().contains(w));
+      return ('Ragi and khichdi', [for (final r in pool) if (has(r, 'ragi') || has(r, 'khichdi')) r]);
+    case 'weight':
+      return (
+        'Energy-rich',
+        [
+          for (final r in pool)
+            if (r.highlight.toLowerCase().contains('energy') ||
+                r.ingredients.any((i) => i.toLowerCase().contains('ghee')))
+              r,
+        ],
+      );
+  }
+  return null;
+}
 
 Widget _ppRecipeGrid(BuildContext context, List<FoodRecipe> items, {Key? key}) => LayoutBuilder(
       key: key,
@@ -458,7 +518,10 @@ Widget _ppRecipeHead(V2Palette p, String eyebrow, String? title, {String? action
     ));
 
 class PpRecipesScreen extends StatefulWidget {
-  const PpRecipesScreen({super.key});
+  const PpRecipesScreen({super.key, this.preset});
+
+  /// A filtered landing, from `pp_food/<preset>` (see [ppRecipePreset]).
+  final String? preset;
 
   @override
   State<PpRecipesScreen> createState() => _PpRecipesScreenState();
@@ -470,6 +533,9 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
 
   /// Null until she taps a chip; until then the family's diet decides.
   String? _diet;
+
+  /// The landing's filter, shown as a removable chip (D6, 2026-10-25).
+  late String? _preset = widget.preset;
 
   @override
   void dispose() {
@@ -517,15 +583,23 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
             : [for (final r in ranked) if (ppRecipeAgeRange(r.ageTag)?.$1 == nextStart) r];
         final pick = ppRecipeTodayPick(now, DateTime.now());
         final q = _query.trim().toLowerCase();
+        bool matches(FoodRecipe r) =>
+            r.title.toLowerCase().contains(q) ||
+            r.tags.any((t) => t.contains(q)) ||
+            r.ingredients.any((i) => i.toLowerCase().contains(q));
         final hits = q.isEmpty
             ? const <FoodRecipe>[]
             : [
                 for (final r in ranked)
-                  if (r.title.toLowerCase().contains(q) ||
-                      r.tags.any((t) => t.contains(q)) ||
-                      r.ingredients.any((i) => i.toLowerCase().contains(q)))
-                    r,
+                  if (matches(r)) r,
               ];
+        // Search looked only inside the diet chip, so "egg" on a vegetarian
+        // profile said "No recipe by that name" with egg dishes in the book.
+        // Now it says where they are (tools pass, Food, 2026-10-25).
+        final elsewhere = q.isEmpty || hits.isNotEmpty || diet == 'all'
+            ? 0
+            : foodCatalog.where((r) => !r.comfortOnly && matches(r)).length;
+        final preset = _preset == null ? null : ppRecipePreset(_preset!, pool);
         // The six meal tiles, the ones with the most dishes for now first.
         final cats = [
           for (final cat in kBrowseCategories)
@@ -597,11 +671,38 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
             )),
             if (q.isNotEmpty) ...[
               const SizedBox(height: 18),
-              if (hits.isEmpty)
+              if (hits.isEmpty && elsewhere > 0)
+                pregToolPad(PvSecondary(
+                  key: const ValueKey('pp_recipes_other_diets'),
+                  label: '$elsewhere ${elsewhere == 1 ? 'dish matches' : 'dishes match'} in another diet. Show ${elsewhere == 1 ? 'it' : 'them'}',
+                  onTap: () => setState(() => _diet = 'all'),
+                ))
+              else if (hits.isEmpty)
                 pregToolPad(Text('No recipe by that name. Try one ingredient, like ragi or dal.',
                     style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
               else
                 _ppRecipeGrid(context, hits, key: const ValueKey('pp_recipes_hits')),
+            ] else if (preset != null) ...[
+              // ---- a link's filtered landing, with a chip to clear it ----------
+              const SizedBox(height: 14),
+              pregToolPad(Align(
+                alignment: Alignment.centerLeft,
+                child: KeyedSubtree(
+                  key: const ValueKey('pp_recipes_preset'),
+                  child: PvChip(
+                    label: '${preset.$1}  ×',
+                    selected: true,
+                    onTap: () => setState(() => _preset = null),
+                  ),
+                ),
+              )),
+              const SizedBox(height: 14),
+              if (preset.$2.isEmpty)
+                pregToolPad(Text('None in this diet yet. Clear the filter to see every dish.',
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
+              else
+                _ppRecipeGrid(context, rank(preset.$2), key: const ValueKey('pp_recipes_preset_hits')),
+              const SizedBox(height: 24),
             ] else ...[
               // ---- first view: today's pick, or "get ready" before solids ----
               if (pick == null) ...[
@@ -705,11 +806,16 @@ class _PpRecipesScreenState extends State<PpRecipesScreen> {
                   leading: PvMarkWell(p: p, hue: 30, size: 40, mark: IntentMark.questionMark),
                   title: 'Can my baby eat this?',
                   line: 'Look up any food and the age it is safe from.',
-                  onTap: () => _push(const PpBabyFoodCheckScreen()),
+                  // Named like every other way in (2026-10-25).
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: 'pp/pp_baby_food_check'),
+                      builder: (_) => const PpBabyFoodCheckScreen())),
                 ),
               ])),
               const SizedBox(height: 24),
             ],
+            pregToolPad(const PpFoodDisclaimer()),
+            const SizedBox(height: 24),
           ],
         );
       },

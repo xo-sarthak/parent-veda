@@ -173,6 +173,8 @@ Catalogue items the door links to that do not exist yet (each tap says why, S8c/
 | FD11 | Classes: Breastfeeding Basics after birth (D3), Back to work: pumping and storage, Baby first aid and choking, Finger foods and self-feeding, The fussy eater workshop, Tiffin and toddler nutrition | bf_latch, bf_supply, bf_pumping, solids_textures, solids_spoon_or_blw, picky_battles, recipes_tiffin_snacks | "This class isn't open yet. Tap Tell me" (S8d) |
 | FD12 | Paediatric feeding therapist (expert category) | picky_not_eating | Names a speech therapist, with a pill (S8b) |
 | FD13 | A link that opens one programme (`co_weaning`, Confident Weaning) | solids_when | Not linked: the router has no per-programme route. The reader's offer card reaches courses by topic instead |
+| FD14 | A week's meal planner | 'Recipes and your shopping list' (was 'Meal plan and shopping list', `pp_feeding_content.dart`) | Renamed to what opens (tools pass, Food, 2026-10-25): Recipes and its shopping list. A planner is not built |
+| FD15 | A "food from three to five" chart page (`age_charts`) | What to feed at this age, past 36 months | An honest "From three years" block on the tool, linking Recipes and the checker. The pages stop at the toddler chart |
 
 **Added by the door 2 build (2026-10-25, `docs/pp-door-plans/02-health.md` §4, §11).** Films (each slot shows the placeholder and answers a tap, S8a; on a go-now page, no pill):
 
@@ -394,6 +396,18 @@ below are the placeholders; `test/pp_what_to_buy_test.dart` holds them.
 | WB8 | `season_born` — Buying for the season she is born in | Guide | Coming soon | Light: a summer baby vs a winter one. |
 | WB9 | Four expert films on the nine guides | Film | Built from data | The card says "still being filmed" honestly; this is sponsored inventory, so a stub is a paid slot over nothing. |
 | WB10 | Three "compare" links with no true shelf | Catalogue | Built from data | Nasal aspirators and cough-and-cold products land on First aid; malish oils on Lotions. Real shelves would make the links honest. |
+
+**Added by the door 4 build (2026-10-25, `docs/pp-door-plans/04-development.md` D5, §12).** Nothing here is a coming-soon card: every item below answers a tap or shows a drawn mark today.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| DV1 | A painting for every activity in the merged pool | Painting | Built from data | The house painting pipeline (`pp_activity_paintings.dart`): drop `assets/activities/<id>.webp`, add the id to `kActivityPaintings`. Until then the Play today card and the Activities row show the area's line mark, never an empty frame |
+| DV2 | Twelve demo films, 30 to 60 s: tummy time x2, reach and grasp, rolling help, sitting play, crawling games, cruising, first steps, pretend play, turn-taking talk, finger rhymes, stacking | Film | Not slotted | No slot is drawn until a film exists (S4). A paediatric physio reviews the movement films, a speech therapist the talking ones |
+| DV3 | `development/door_intro` | Film | Not slotted | S4: no chip until the film exists |
+| DV4 | A paediatric physio (expert category) | Expert | S8b | The Sit, crawl, walk row and `dev_movement_signs` say "We're adding paediatric physios. A paediatrician can check this first." with a pill |
+| DV5 | Real developmental paediatricians (`Development expert` is placeholders only) | Expert | Joining soon | On track's row says they are joining and offers a paediatrician (`kPpJoiningSoon`) |
+| DV6 | Times for the 102 phase-doc activities | Data | Shown without | Their cards read "MOVING", not "5 MIN · MOVING": the docs give no duration and none is invented. The doc owner adds them |
+| DV7 | DV10's speech links: Special care's "Not talking yet" and "Speech therapy and the other therapies, explained" (SC2), Early learning's "Help him talk" (EL1) | Link | Not linked | The target pages are built with doors 12 and 9; the links go in with them |
 
 ### P11. Traditions — `lib/data/doors/pp_door_traditions.dart`
 

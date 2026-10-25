@@ -269,8 +269,13 @@ Widget foodPhotoDisc({required Widget child, double size = 30}) => Container(
 /// right and the diet mark bottom left on the photo, the title in two lines,
 /// then "25 min · 7–8 months". Works in a rail and in the two-column grid.
 class FoodPhotoCard extends StatelessWidget {
-  const FoodPhotoCard({super.key, required this.recipe, required this.onTap, this.width = 196, this.photoHeight});
+  const FoodPhotoCard({super.key, required this.recipe, required this.onTap, this.width = 196, this.photoHeight, this.note});
   final FoodRecipe recipe;
+
+  /// One more line under the time and age, for the child on screen: an
+  /// allergy on the record, or a food new to them (tools pass, Food,
+  /// 2026-10-25). Null draws nothing.
+  final String? note;
   final VoidCallback onTap;
   final double width;
 
@@ -343,6 +348,12 @@ class FoodPhotoCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis),
                 ),
               ]),
+              if (note != null) ...[
+                const SizedBox(height: 4),
+                Text(note!,
+                    key: ValueKey('food_photo_card_note_${r.id}'),
+                    style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, height: 1.35, color: p.ink1)),
+              ],
             ]),
           ),
         )),

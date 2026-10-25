@@ -897,7 +897,11 @@ const List<FoodRecipe> kFoodRecipes = [
     subtitle: 'A comfort food that quietly does more',
     category: 'Snacks',
     slot: 'Evening snack',
-    ageTag: '10 to 12 mo',
+    // ⚠️ 10 to 12 mo until 2026-10-25 (tools pass, Food): instant-noodle
+    // masala is salt, and salt waits until one. Now from one, with the sachet
+    // swapped for jeera. REQUIRED_REVIEW.
+    // ageTag: '10 to 12 mo',
+    ageTag: '12 mo+',
     veg: true,
     prepMin: 5,
     cookMin: 10,
@@ -913,17 +917,21 @@ const List<FoodRecipe> kFoodRecipes = [
       FoodNutrient('Fibre', 'peas + wheat', 'Keeps digestion gentle as he moves from purées to firmer foods.'),
     ],
     frequency: 'Once a week is plenty',
-    ingredients: ['1 pack whole-wheat noodles', '½ carrot, grated', '2 tbsp peas', '½ tsp ghee', 'Half the masala sachet'],
+    // Kept for revert (2026-10-25, the sachet is salt):
+    // ingredients: ['1 pack whole-wheat noodles', '½ carrot, grated', '2 tbsp peas', '½ tsp ghee', 'Half the masala sachet'],
+    ingredients: ['1 pack whole-wheat noodles', '½ carrot, grated', '2 tbsp peas', '½ tsp ghee', 'A pinch of jeera (skip the sachet)'],
     steps: [
-      'Sauté the grated carrot and peas in ghee for two minutes.',
-      'Add the noodles, water and half the masala; simmer.',
+      'Sauté the jeera, grated carrot and peas in ghee for two minutes.',
+      // 'Add the noodles, water and half the masala; simmer.', // kept for revert
+      'Add the noodles and water, leave the masala sachet out, and simmer. The family can season their share after you take his out.',
       'Cook till soft, cool a little, and serve. For a younger baby, chop small or blend to a soft mash.',
     ],
     storage: ['Best fresh; noodles turn stodgy on standing.'],
-    mistakes: ['Using the whole masala sachet, it is still salty; half is plenty.', 'Serving long strands, chop or mash so there are no choking-length pieces.'],
+    // mistakes: ['Using the whole masala sachet, it is still salty; half is plenty.', 'Serving long strands, chop or mash so there are no choking-length pieces.'], // kept for revert
+    mistakes: ['Using the masala sachet in his portion: it is mostly salt.', 'Serving long strands, chop or mash so there are no choking-length pieces.'],
     substitutions: {'masala sachet': 'a pinch of jeera and the vegetables alone', 'whole-wheat noodles': 'millet or ragi noodles'},
     healthierNote:
-        'The packet version is refined noodles and a full, salty masala. Ours halves the masala, folds in carrot and peas for fibre and vitamin A, and finishes with ghee instead of the sachet oil, the same comfort food, quietly doing more.',
+        'The packet version is refined noodles and a full, salty masala. Ours leaves the masala out, folds in carrot and peas for fibre and vitamin A, and finishes with ghee instead of the sachet oil, the same comfort food, quietly doing more.',
     tags: {'fibre', 'vitamin a', 'snack', 'noodles', 'vegetables', 'comfort food'},
     ingredientKeys: {'vegetables'},
     relatedVideoId: 'q_iron',
@@ -1779,9 +1787,12 @@ const List<FoodRecipe> kFoodRecipes = [
     subtitle: 'Spongy and light',
     category: 'Finger Foods',
     slot: 'Evening snack',
-    ageTag: '10 to 12 mo',
+    // ⚠️ Until 2026-10-25 (tools pass, Food): '10 to 12 mo' and vegan. Fruit
+    // salt and soda are sodium, and the batter has curd. REQUIRED_REVIEW.
+    // ageTag: '10 to 12 mo',
+    // vegan: true,
+    ageTag: '12 mo+',
     veg: true,
-    vegan: true,
     prepMin: 10,
     cookMin: 15,
     difficulty: 'Easy',
@@ -5471,6 +5482,22 @@ class FoodStore extends ChangeNotifier with CloudMergedStore {
 
   List<FoodRecipe> get saved => _saved.map(foodRecipeById).toList();
   List<FoodRecipe> get recentlyCooked => _cooked.map(foodRecipeById).toList();
+
+  // ---- "We made this" (tools pass, Food, 2026-10-25) -------------------------
+  //  `_cooked` was only ever loaded and synced: nothing in the app wrote it.
+  //  The recipe page writes it now. Newest first, one entry per dish, and the
+  //  `cooked|<id>` items already sync (step 13), so no migration.
+  bool isCooked(String id) => _cooked.contains(id);
+  void markCooked(String id) {
+    _cooked
+      ..remove(id)
+      ..insert(0, id);
+    notifyListeners();
+  }
+
+  void unmarkCooked(String id) {
+    if (_cooked.remove(id)) notifyListeners();
+  }
 
   Map<String, bool> get shopping => Map.unmodifiable(_shopping);
   int get shoppingCount => _shopping.length;

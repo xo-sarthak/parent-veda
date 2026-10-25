@@ -22,14 +22,14 @@ One tool at a time; the user says go per tool. Each plan records every decision 
 | 14 | Emergency card | `pp_emergency_card` | COMMITTED (08-16-health.md) | 66a1610 |
 | 15 | Before you see the doctor | `pp_doctor_visit` | COMMITTED (08-16-health.md) | 66a1610 |
 | 16 | Home remedies | `pp_nuskhe` | COMMITTED (08-16-health.md) | 66a1610 |
-| 17 | This month's checklist | `pp_month_checklist` | BUILT 2026-10-25 (17-21-development.md) | |
-| 18 | Milestones | `pp_milestones` | BUILT 2026-10-25 (17-21-development.md) | |
-| 19 | Gentle check-in | `pp_dev_checkin` | BUILT 2026-10-25 (17-21-development.md) | |
-| 20 | Activities | `pp_activities` | BUILT 2026-10-25 (17-21-development.md) | |
-| 21 | Your child's phases | `pp_leaps` | NOT A TOOL: reading, out of the Tools tab (D4); page fixes BUILT 2026-10-25 (17-21-development.md) | |
-| 22 | What to feed at this age | `pp_food_chart` | | |
-| 23 | Can my baby eat this? | `pp_baby_food_check` | | |
-| 24 | Recipes | `pp_food` | | |
+| 17 | This month's checklist | `pp_month_checklist` | COMMITTED (17-21-development.md) | 3e7b8a8 |
+| 18 | Milestones | `pp_milestones` | COMMITTED (17-21-development.md) | 3e7b8a8 |
+| 19 | Gentle check-in | `pp_dev_checkin` | COMMITTED (17-21-development.md) | 3e7b8a8 |
+| 20 | Activities | `pp_activities` | COMMITTED (17-21-development.md) | 3e7b8a8 |
+| 21 | Your child's phases | `pp_leaps` | NOT A TOOL: reading, out of the Tools tab (D4); page fixes COMMITTED (17-21-development.md) | 3e7b8a8 |
+| 22 | What to feed at this age | `pp_food_chart` | BUILT 2026-10-25 (22-24-food.md); preset links wait on the router | |
+| 23 | Can my baby eat this? | `pp_baby_food_check` | BUILT 2026-10-25 (22-24-food.md); preset links wait on the router | |
+| 24 | Recipes | `pp_food` | BUILT 2026-10-25 (22-24-food.md); preset links wait on the router | |
 | 25 | How have you been? | `pp_mood_check` | | |
 | 26 | Can I...? | `pp_maa_can_i` | | |
 | 27 | Kegel Care | `pp_kegel` | | |

@@ -11135,6 +11135,9 @@ row and age rail (`docs/pp-door-plans/02-health.md` §2a).
 says why today (S8).
 
 **§102.3 Feeding's** are FD5 to FD13, and its allergen tracker that remembers (D4) is its own later step.
+*2026-10-25, tools pass Food:* the store it needed now exists. `PpFoodTriesStore` (0115, per child, shared with
+the co-parent) is written by "Tried it" in Can my baby eat this?. What is left is the walk-through itself: the
+generic interactive checklist (`pp_interactive_screen.dart`) reading and writing that store for its eight items.
 
 **§102.4 You, Maa: two crisis screens still exist (door 3, 2026-10-25).** Her mood check now opens the
 parenting `PpCrisisPathScreen`, as every crisis link on her door does. The pregnancy `MmCrisisPathScreen`
@@ -11155,3 +11158,9 @@ and are not stocked are no longer linked (M8).
 C-section page side by side; the plan asked for "by birth type if known". The C-section signal exists
 (`PpSignal.cSection`) but the age rail keeps its plan's order on purpose, so both show. A page condition tag,
 or letting a signal reorder an age rail, would fix it; either changes Health's rails too.
+
+**§102.8 Food tools (tools pass 22-24, 2026-10-25): what waits.** The `pp_food/<preset>` route and the eight
+links that use it, and three "What to feed" links that still open Recipes, wait for the router and two content
+files another terminal holds (list in `docs/pp-tool-plans/22-24-food.md`, "Waiting"). The screen side is built
+and tested. **The recipe page is a tool page, not a read (D3):** cook mode, the shopping list and Save; held by
+name in `test/reader_unification_test.dart`.

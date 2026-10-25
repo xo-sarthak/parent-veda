@@ -204,8 +204,12 @@ final PpDoor kPpFeedingDoor = PpDoor(
         // to it and never duplicate a recipe.
         PpDoorTool(
           label: 'Recipes by age',
-          blurb: 'Every baby and toddler recipe in the app, filtered by age, '
-              'texture and what you have in the kitchen.',
+          // Promised texture and pantry filters the screen does not have
+          // (tools pass, Food, 2026-10-25). Kept for revert:
+          // blurb: 'Every baby and toddler recipe in the app, filtered by age, '
+          //     'texture and what you have in the kitchen.',
+          blurb: 'Every baby and toddler recipe in the app, his age first, '
+              'for the way your family eats.',
           surfaceId: 'pp_food',
           icon: Icons.restaurant_menu_outlined,
           bands: ['first_foods', 'm8_12', 'tod', 'big'],

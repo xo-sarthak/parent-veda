@@ -100,6 +100,16 @@ void main() {
     });
   });
 
+  // ⚠️ A TOOL PAGE, NOT A READ (tools pass, Food, D3, 2026-10-25). The user:
+  // keep the recipe page, mark it as a tool. It is cook mode, a shopping list
+  // and Save, things a reader does not do. Named here so it is a decision on
+  // record, not a gap the rule missed; it stays only while it is still a tool.
+  test('the recipe page is a tool page, kept by name (D3)', () {
+    final src = _live('lib/screens/post_pregnancy/food_recipe_screen.dart');
+    expect(src, contains('CookModeScreen'), reason: 'cook mode is why it is a tool');
+    expect(src, contains('addRecipeToShopping'), reason: 'the shopping list is why it is a tool');
+  });
+
   test('the retired page renderers are constructed by no live code', () {
     final files = Directory('lib')
         .listSync(recursive: true)

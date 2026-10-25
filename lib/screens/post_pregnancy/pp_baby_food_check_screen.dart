@@ -43,7 +43,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'pp_age_bands.dart';
+// import 'pp_age_bands.dart'; // ppMonthsSinceBirth, before corrected age (2026-10-25)
 import 'pp_child_profile.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
@@ -56,6 +56,13 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvSecondary;
 import '../doors/pv_list_row.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
+import '../../services/pp_use_consent.dart';
+import 'askveda_screen.dart';
+import 'pp_food_safety.dart';
+import 'pp_food_tries_store.dart';
+import 'pp_health_data.dart';
+import 'pp_use_ask_card.dart';
 
 enum _Verdict { yes, notYet, avoid }
 
@@ -110,14 +117,38 @@ class _Food {
 List<String> ppBabyFoodSearch(String query) {
   final q = query.trim().toLowerCase();
   if (q.length < 2) return const [];
-  return [
-    for (final x in _foods)
-      if (x.name.toLowerCase().contains(q) ||
-          x.aliases.any((a) => a.contains(q) || q.contains(a))) x.name,
-  ];
+  return [for (final x in _ppFoodMatches(q)) x.name];
+}
+
+/// ⚠️ ONE MATCH RULE for the screen and the parenting search (tools pass,
+/// Food, 2026-10-25). It was "name or alias contains, or the query contains
+/// an alias", so "makhana" found Butter (alias "makhan") and "strawberry"
+/// found Ber. Now: the query is inside a name or alias, or an alias is a
+/// whole word of the query ("sahad wala doodh" still finds Honey). Matches
+/// that start a word come first.
+bool _ppWordIn(String text, String word) =>
+    RegExp('(^|[^a-z])${RegExp.escape(word)}([^a-z]|\$)').hasMatch(text);
+
+bool _ppStartsWord(String text, String q) =>
+    RegExp('(^|[^a-z])${RegExp.escape(q)}').hasMatch(text);
+
+List<_Food> _ppFoodMatches(String q) {
+  bool hit(_Food f) =>
+      f.name.toLowerCase().contains(q) ||
+      f.aliases.any((a) => a.contains(q) || (a.length >= 3 && _ppWordIn(q, a)));
+  bool starts(_Food f) =>
+      _ppStartsWord(f.name.toLowerCase(), q) || f.aliases.any((a) => _ppStartsWord(a, q));
+  final hits = [for (final f in _foods) if (hit(f)) f];
+  return [...hits.where(starts), ...hits.where((f) => !starts(f))];
 }
 
 int get ppBabyFoodCount => _foods.length;
+
+/// The verdict for a food by its exact name at [months]: 'yes', 'notYet' or
+/// 'avoid', or null when no food has that name. Read by the safety test
+/// (tools pass, Food, 2026-10-25), which holds every age the plan fixed.
+String? ppBabyFoodVerdict(String name, int months) =>
+    _foods.where((f) => f.name == name).firstOrNull?.verdictAt(months).name;
 
 /// Every food the check answers, with its other names, for the parenting
 /// search (pp_search.dart). The list stays private; search reads names only.
@@ -157,13 +188,30 @@ const List<_Food> _foods = [
     note: 'Take his portion out of the pot before you season the family one.',
     maa: 'Fine for you, in normal amounts. Use iodised salt.',
   ),
+  // ⚠️ ADDED SUGAR WAITS UNTIL TWO (tools pass, Food, 2026-10-25). It said 12,
+  // and the What to feed chart said "salt and sugar can be used lightly" at
+  // one; WHO, AAP and IAP all advise no added sugar before two. A festival
+  // taste after one keeps its own rows (Cake and mithai, Halwa...) as an
+  // occasional thing; this row is the everyday spoon in his food.
+  // REQUIRED_REVIEW. Kept for revert:
+  // _Food(
+  //   name: 'Sugar',
+  //   aliases: ['cheeni', 'chini', 'sweets', 'mithai'],
+  //   fromMonths: 12,
+  //   why: 'Nothing in the first year needs it, and a sweet tooth learned now is '
+  //       'hard to unlearn.',
+  //   note: 'Fruit is sweet enough. Jaggery is still sugar.',
+  //   maa: 'Fine for you in moderation.',
+  // ),
   _Food(
     name: 'Sugar',
     aliases: ['cheeni', 'chini', 'sweets', 'mithai'],
-    fromMonths: 12,
-    why: 'Nothing in the first year needs it, and a sweet tooth learned now is '
-        'hard to unlearn.',
-    note: 'Fruit is sweet enough. Jaggery is still sugar.',
+    fromMonths: 24,
+    why: 'Nothing in the first two years needs added sugar, and a sweet tooth '
+        'learned now is hard to unlearn.',
+    note: 'Fruit is sweet enough. Jaggery is still sugar. A taste of mithai at a '
+        'festival after one is not a problem; a spoon in every meal is the '
+        'habit to skip.',
     maa: 'Fine for you in moderation.',
   ),
   _Food(
@@ -177,10 +225,23 @@ const List<_Food> _foods = [
         'waits until about five.',
     maa: 'Fine, and good for you. Avoiding nuts while breastfeeding does not prevent allergies in him.',
   ),
+  // ⚠️ IT SAID YES FROM BIRTH (tools pass, Food, 2026-10-25). `fromMonths: 0`
+  // read as "now" for a two-month-old, and the name said "Whole" while the
+  // reason said "always quartered". Named for how it is safe, from solids.
+  // Kept for revert:
+  // _Food(
+  //   name: 'Whole grapes',
+  //   aliases: ['grapes', 'angoor'],
+  //   fromMonths: 0,
+  //   why: 'Fine from the start of solids, but always quartered lengthways. Whole '
+  //       'or halved, a grape is the right size and shape to block an airway.',
+  //   note: 'Same for cherry tomatoes and small round sweets.',
+  //   maa: 'Fine for you.',
+  // ),
   _Food(
-    name: 'Whole grapes',
-    aliases: ['grapes', 'angoor'],
-    fromMonths: 0,
+    name: 'Grapes, quartered',
+    aliases: ['grapes', 'angoor', 'whole grapes'],
+    fromMonths: 6,
     why: 'Fine from the start of solids, but always quartered lengthways. Whole '
         'or halved, a grape is the right size and shape to block an airway.',
     note: 'Same for cherry tomatoes and small round sweets.',
@@ -606,7 +667,7 @@ const List<_Food> _foods = [
   ),
   _Food(
     name: 'Suji and dalia',
-    aliases: ['rava', 'semolina', 'broken wheat', 'upma', 'daliya'],
+    aliases: ['rava', 'semolina', 'broken wheat', 'upma', 'daliya', 'suji', 'sooji', 'dalia'],
     fromMonths: 6,
     why: 'Easy porridges. Wheat is fine from six months.',
   ),
@@ -805,9 +866,10 @@ const List<_Food> _foods = [
   _Food(
     name: 'Jaggery',
     aliases: ['gud', 'gur', 'shakkar', 'jaggery'],
-    fromMonths: 12,
-    why: 'It is still sugar, whatever the label says. After one, in small '
-        'amounts.',
+    // 12 until 2026-10-25: added sugar waits until two (see Sugar).
+    fromMonths: 24,
+    why: 'It is still sugar, whatever the label says. Not needed before two; '
+        'a festive taste after one is not a problem.',
     maa: 'Fine. Some iron, but still a sugar.',
   ),
   _Food(
@@ -2108,7 +2170,17 @@ class PpBabyFoodCheckScreen extends StatefulWidget {
 class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
   /// Derived from the profile, and changeable. See the note in the fever check.
   /// His age, read once on open. Never chosen — see the age rule.
-  final int _months = ppMonthsSinceBirth;
+  // final int _months = ppMonthsSinceBirth; // kept for revert
+  // ⚠️ CORRECTED AGE, READ LIVE (tools pass, Food, 2026-10-25). It was the
+  // birthday age, read once, so a baby born early got "Yes" to dal two months
+  // before Recipes did, and switching child kept the first child's answers.
+  int get _months => ChildProfileStore.instance.devAgeInMonths;
+
+  @override
+  void initState() {
+    super.initState();
+    PpFoodTriesStore.instance.init();
+  }
 
   static String _bandLabel(int months) {
     for (final b in kPpChildFoodBands) {
@@ -2125,16 +2197,21 @@ class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
     super.dispose();
   }
 
-  List<_Food> get _results {
-    final q = _query.trim().toLowerCase();
-    if (q.isEmpty) return _foods;
-    return [
-      for (final f in _foods)
-        if (f.name.toLowerCase().contains(q) ||
-            f.aliases.any((a) => a.contains(q) || q.contains(a)))
-          f,
-    ];
-  }
+  // Kept for revert (2026-10-25: one letter matched 275 foods, and "makhana"
+  // found Butter):
+  // List<_Food> get _results {
+  //   final q = _query.trim().toLowerCase();
+  //   if (q.isEmpty) return _foods;
+  //   return [
+  //     for (final f in _foods)
+  //       if (f.name.toLowerCase().contains(q) ||
+  //           f.aliases.any((a) => a.contains(q) || q.contains(a)))
+  //         f,
+  //   ];
+  // }
+  String get _q => _query.trim().toLowerCase();
+  bool get _searching => _q.length >= 2;
+  List<_Food> get _results => _searching ? _ppFoodMatches(_q) : _foods;
 
   // ---- the one ParentVeda look (2026-10-07) ------------------------------------
   //  The shell every TTC and pregnancy tool wears, and each answer as
@@ -2144,12 +2221,20 @@ class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
   bool _all = false;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        // A child switch, a first try, an allergy saved: each changes answers.
+        listenable: Listenable.merge(
+            [ChildProfileStore.instance, PpFoodTriesStore.instance, HealthStore.instance]),
+        builder: (context, _) => _build(context),
+      );
+
+  Widget _build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
     final results = _results;
-    final searching = _query.trim().isNotEmpty;
+    final searching = _searching;
     final shown = searching || _all ? results : results.take(30).toList();
     final c = ChildProfileStore.instance;
+    final tries = PpFoodTriesStore.instance;
     return PregToolScaffold(
       hue: 96,
       eyebrow: 'Food',
@@ -2160,7 +2245,23 @@ class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
       children: [
         pregToolPad(Text('FOR ${c.nameMid.toUpperCase()}  ·  ${_bandLabel(_months).toUpperCase()}',
             style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.action))),
+        // Born early: corrected age decides the answers, and the doctor decides
+        // when solids start. Explain, never decide (clinical ownership).
+        if (c.correctionWeeks != null && _months < 7) ...[
+          const SizedBox(height: 8),
+          pregToolPad(Text(
+              'Answers here use ${c.nameMid}\'s corrected age. For a baby born early, your doctor decides '
+              'when solids start.',
+              key: const ValueKey('pp_food_preterm_note'),
+              style: pvManrope(fontSize: 13, height: 1.55, color: p.ink2))),
+        ],
         const SizedBox(height: 10),
+        // ---- first tries (D1, 2026-10-25) ---------------------------------
+        // Shown before any try as an invitation, never hidden.
+        if (!searching) ...[
+          pregToolPad(_firstTries(context, p, tries)),
+          const SizedBox(height: 14),
+        ],
         pregToolPad(TextField(
           key: const ValueKey('pp_food_field'),
           controller: _queryCtrl,
@@ -2179,11 +2280,22 @@ class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
           ),
         )),
         const SizedBox(height: 16),
-        if (results.isEmpty)
+        if (results.isEmpty) ...[
           pregToolPad(Text(
               'Not in the list yet. If it is an ordinary home-cooked food with no added salt or sugar, it is '
               'almost certainly fine once solids have started. Ask your paediatrician about anything you are unsure of.',
               style: pvManrope(fontSize: 14, height: 1.6, color: p.ink2))),
+          const SizedBox(height: 12),
+          // Not a dead end: the question goes on to Ask Veda, already typed.
+          pregToolPad(PvSecondary(
+            key: const ValueKey('pp_food_ask_veda'),
+            label: 'Ask Veda about ${_query.trim()}',
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                settings: const RouteSettings(name: 'pp/ask_veda'),
+                builder: (_) => AskVedaScreen(
+                    initialQuery: 'Can ${c.nameMid} eat ${_query.trim()} at ${_bandLabel(_months).toLowerCase()}?'))),
+          )),
+        ],
         // ⚠️ ROWS, NOT CARDS (Mobbin audit, 2026-10-07): one row per food,
         // the verdict as a dot and a word on the right, the full answer on a
         // tap; after Yuka's additives list
@@ -2200,12 +2312,61 @@ class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
             label: 'Show all ${results.length} foods',
             onTap: () => setState(() => _all = true),
           )),
+        // What a reaction looks like, and the disclaimer (2026-10-25).
+        const SizedBox(height: 20),
+        pregToolPad(const PpAllergyRedFlags()),
+        const SizedBox(height: 14),
+        pregToolPad(const PpFoodDisclaimer()),
       ],
     );
   }
 
+  /// The child's first tries, newest first, or the invitation to start.
+  Widget _firstTries(BuildContext context, V2Palette p, PpFoodTriesStore tries) {
+    final recent = tries.recent;
+    final head = pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 0.4, color: p.ink2);
+    if (recent.isEmpty) {
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, key: const ValueKey('pp_food_tries_empty'), children: [
+        Text('FIRST TRIES', style: head),
+        const SizedBox(height: 4),
+        Text('Tap a food, then Tried it. ${ChildProfileStore.instance.nameMid}\'s first tries collect here, '
+            'and your partner sees them too.',
+            style: pvManrope(fontSize: 13, height: 1.55, color: p.ink2)),
+      ]);
+    }
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, key: const ValueKey('pp_food_tries'), children: [
+      Text('FIRST TRIES  ·  ${recent.length}', style: head),
+      const SizedBox(height: 8),
+      Wrap(spacing: 8, runSpacing: 8, children: [
+        for (final e in recent)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: e.value.hadReaction ? p.ink1 : p.line),
+            ),
+            child: Text(
+                e.value.hadReaction
+                    ? '${ppBabyFoodNameOf(e.key)} · ${e.value.reaction.label.toLowerCase()}'
+                    : ppBabyFoodNameOf(e.key),
+                style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink1)),
+          ),
+      ]),
+      // Ask once, after the first try she keeps.
+      const SizedBox(height: 12),
+      const PpUseAskCard(
+        kind: PpUseKind.foods,
+        question: 'Use the foods tried in Recipes and Before you see the doctor?',
+      ),
+    ]);
+  }
+
   Widget _foodRow(BuildContext context, V2Palette p, _Food f) {
     final v = f.verdictAt(_months);
+    // An allergy on the child's record wins the line (D2: always warn).
+    final allergy = ppAllergyMatch([f.name, ...f.aliases]);
+    final tried = PpFoodTriesStore.instance.tryOf(ppFoodId(f.name));
     final (verdict, word) = switch (v) {
       _Verdict.yes => (CanIVerdict.safe, 'Yes'),
       _Verdict.notYet => (CanIVerdict.moderation, 'Not yet'),
@@ -2216,7 +2377,14 @@ class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
       p: p,
       leading: PvMarkWell(p: p, hue: 96, size: 40, mark: IntentMark.forkMark),
       title: f.name,
-      line: v == _Verdict.notYet ? _FoodCard.fromLabel(f.fromMonths) : ppFillChild(f.why),
+      // line: v == _Verdict.notYet ? _FoodCard.fromLabel(f.fromMonths) : ppFillChild(f.why), // kept for revert
+      line: allergy != null
+          ? 'On the health record as an allergy. Ask your doctor first.'
+          : tried != null
+              ? 'Tried ${ppDayLabel(tried.date)}${tried.hadReaction ? ' · ${tried.reaction.label.toLowerCase()}' : ''}'
+              : v == _Verdict.notYet
+                  ? _FoodCard.fromLabel(f.fromMonths)
+                  : ppFillChild(f.why),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         Container(
           width: 9,
@@ -2380,6 +2548,7 @@ class _FoodCardV3 extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
     final v = food.verdictAt(months);
+    final allergy = ppAllergyMatch([food.name, ...food.aliases]);
     final (verdict, label) = switch (v) {
       _Verdict.yes => (CanIVerdict.safe, 'Yes, at this age'),
       _Verdict.notYet => (CanIVerdict.moderation, 'Not yet'),
@@ -2414,6 +2583,19 @@ class _FoodCardV3 extends StatelessWidget {
           const SizedBox(height: 8),
           Text(ppFillChild(food.note!), style: pvManrope(fontSize: 13, height: 1.55, color: p.ink2)),
         ],
+        // ---- safety and the first try (tools pass, Food, 2026-10-25) --------
+        if (allergy != null) ...[
+          const SizedBox(height: 12),
+          PpAllergyCallout(allergy: allergy, childName: ChildProfileStore.instance.nameMid),
+        ],
+        if (v != _Verdict.avoid) ...[
+          const SizedBox(height: 12),
+          _TriedAction(food: food),
+        ],
+        if (ppAllergensIn([food.name, ...food.aliases]).isNotEmpty) ...[
+          const SizedBox(height: 12),
+          const PpAllergyRedFlags(),
+        ],
         const SizedBox(height: 10),
         Container(height: 1, color: p.line),
         const SizedBox(height: 10),
@@ -2421,6 +2603,87 @@ class _FoodCardV3 extends StatelessWidget {
         const SizedBox(height: 4),
         Text(ppFillChild(food.maa ?? kPpMaaFoodDefault), style: pvManrope(fontSize: 13, height: 1.55, color: p.ink1)),
       ]),
+    );
+  }
+}
+
+/// A food's display name from its first-tries id (the slug of its name).
+String ppBabyFoodNameOf(String id) =>
+    _foods.where((f) => ppFoodId(f.name) == id).map((f) => f.name).firstOrNull ?? id.replaceAll('_', ' ');
+
+/// "today", "yesterday", or "3 Oct".
+String ppDayLabel(DateTime d) {
+  final now = DateTime.now();
+  final days = DateTime(now.year, now.month, now.day).difference(DateTime(d.year, d.month, d.day)).inDays;
+  if (days <= 0) return 'today';
+  if (days == 1) return 'yesterday';
+  const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return '${d.day} ${m[d.month - 1]}';
+}
+
+/// "Tried it" on a food's sheet: one tap saves today with no reaction (the
+/// common case), then the reaction can be changed. Toast with Undo.
+class _TriedAction extends StatelessWidget {
+  const _TriedAction({required this.food});
+  final _Food food;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = PpFoodTriesStore.instance;
+    final id = ppFoodId(food.name);
+    return ListenableBuilder(
+      listenable: store,
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final t = store.tryOf(id);
+        if (t == null) {
+          return PvSecondary(
+            key: ValueKey('pp_food_tried_${food.name}'),
+            label: 'Tried it',
+            onTap: () {
+              store.markTried(id);
+              pvToast(context, 'Saved: ${food.name}, first tried today',
+                  action: 'Undo', onAction: () => store.unmark(id));
+            },
+          );
+        }
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, key: ValueKey('pp_food_tried_done_${food.name}'), children: [
+          Text('First tried ${ppDayLabel(t.date)}. Any reaction?',
+              style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final r in FoodReaction.values)
+              ChoiceChip(
+                key: ValueKey('pp_food_reaction_${r.name}'),
+                label: Text(r.label),
+                selected: t.reaction == r,
+                showCheckmark: false,
+                selectedColor: p.ink1,
+                backgroundColor: Colors.white,
+                side: BorderSide(color: t.reaction == r ? p.ink1 : p.line),
+                labelStyle: pvManrope(
+                    fontSize: 12.5, fontWeight: FontWeight.w700, color: t.reaction == r ? Colors.white : p.ink1),
+                onSelected: (_) {
+                  if (t.reaction == r) return;
+                  store.markTried(id, date: t.date, reaction: r, note: t.note);
+                  pvToast(context, 'Saved: ${food.name}, ${r.label.toLowerCase()}',
+                      action: 'Undo', onAction: () => store.restore(id, t));
+                },
+              ),
+          ]),
+          const SizedBox(height: 6),
+          TextButton(
+            key: ValueKey('pp_food_untried_${food.name}'),
+            style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: p.ink2),
+            onPressed: () {
+              store.unmark(id);
+              pvToast(context, 'Removed ${food.name} from first tries',
+                  action: 'Undo', onAction: () => store.restore(id, t));
+            },
+            child: Text('Not tried after all', style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink2)),
+          ),
+        ]);
+      },
     );
   }
 }

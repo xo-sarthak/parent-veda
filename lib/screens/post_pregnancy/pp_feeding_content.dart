@@ -2261,9 +2261,16 @@ final PpArea _startingSolids = PpArea(
                     'the lip first, then a small taste, then watch for two '
                     'hours.',
                 'One at a time, morning, tiny first'),
+            // One age table (tools pass, Food, 2026-10-25): whole egg from six
+            // months, not yolk first. Kept for revert:
+            // PpInteractiveItem(
+            //     'Egg, well cooked',
+            //     'Hard-boiled yolk mashed into dal or khichdi. Never runny.',
+            //     'One at a time, morning, tiny first'),
             PpInteractiveItem(
                 'Egg, well cooked',
-                'Hard-boiled yolk mashed into dal or khichdi. Never runny.',
+                'Hard-boiled egg, yolk and white, mashed into dal or khichdi. '
+                    'Never runny.',
                 'One at a time, morning, tiny first'),
             PpInteractiveItem(
                 'Peanut, as a thin paste',
@@ -2712,9 +2719,17 @@ final PpArea _ageCharts = PpArea(
           PpCard('Good first meals this month',
               'Moong dal water, mashed rice with dal water, ragi porridge, '
               'steamed carrot or pumpkin mash, mashed banana, curd.'),
+          // ⚠️ ONE AGE TABLE (tools pass, Food, 2026-10-25): this said yolk
+          // first and whole egg later, while Can my baby eat this? said whole
+          // egg from six months, which is current guidance. The checker's
+          // verdicts are the source now. REQUIRED_REVIEW. Kept for revert:
+          // PpCard('Non-vegetarian addition',
+          //     'Well-cooked egg yolk mashed into rice can start this month. '
+          //     'Introduce it as an allergen, one at a time.'),
           PpCard('Non-vegetarian addition',
-              'Well-cooked egg yolk mashed into rice can start this month. '
-              'Introduce it as an allergen, one at a time.'),
+              'Well-cooked egg, yolk and white together, mashed into rice can '
+              'start this month, and so can soft boneless fish. Bring each in '
+              'as an allergen, one at a time.'),
           PpCard('Not yet',
               'Salt, sugar, honey, cow milk as a drink, whole nuts, and '
               'anything from a packet marked for older children.'),
@@ -2763,9 +2778,13 @@ final PpArea _ageCharts = PpArea(
           PpCard('New this month',
               'Soft khichdi, mashed idli, soft dalia, apple and pear stewed '
               'and mashed, paneer mashed fine, ground til stirred into food.'),
+          // Kept for revert (one age table, 2026-10-25):
+          // PpCard('Non-vegetarian',
+          //     'Whole egg once the yolk is accepted. Well-cooked boneless fish '
+          //     'or chicken mashed very fine, in tiny amounts.'),
           PpCard('Non-vegetarian',
-              'Whole egg once the yolk is accepted. Well-cooked boneless fish '
-              'or chicken mashed very fine, in tiny amounts.'),
+              'Egg, fish and chicken, all well cooked, boneless and mashed very '
+              'fine. More of each as the textures get thicker.'),
           PpCard('Iron matters from now',
               'Iron stored from birth is running low. Dal, ragi, greens, egg '
               'and meat all help. Serve with a little lemon or amla, which '
@@ -2918,9 +2937,16 @@ final PpArea _ageCharts = PpArea(
           PpCard('Ready for',
               'Most family foods, chopped small and made mild. A spoon to '
               'hold and use. An open cup or a straw cup with water.'),
+          // ⚠️ SUGAR WAITS UNTIL TWO (tools pass, Food, 2026-10-25). WHO, AAP
+          // and IAP advise no added sugar before two. REQUIRED_REVIEW. Kept
+          // for revert:
+          // PpCard('At twelve months',
+          //     'Cow milk can become the main milk drink, salt and sugar can be '
+          //     'used lightly, and honey becomes safe.'),
           PpCard('At twelve months',
-              'Cow milk can become the main milk drink, salt and sugar can be '
-              'used lightly, and honey becomes safe.'),
+              'Cow milk can become the main milk drink, a little salt is fine, '
+              'and honey becomes safe. Added sugar can still wait until two; a '
+              'taste at a festival is not a problem.'),
           PpCard('Still not',
               'Whole nuts, whole grapes, hard raw carrot, popcorn, chewing gum, '
               "and anything round and firm the size of a child's windpipe."),
@@ -3010,10 +3036,14 @@ final PpArea _ageCharts = PpArea(
           title: 'Non-vegetarian, when and how',
           subtitle: 'Introduced as allergens, one at a time',
           rows: [
-            ('Egg yolk', 'From 6 months, well cooked and mashed'),
-            ('Whole egg', 'From about 7 months once yolk is accepted'),
-            ('Fish', 'From about 7 months, boneless, checked twice'),
-            ('Chicken', 'From about 7 to 8 months, cooked soft and minced'),
+            // One age table (2026-10-25): the checker's verdicts. Kept for revert:
+            // ('Egg yolk', 'From 6 months, well cooked and mashed'),
+            // ('Whole egg', 'From about 7 months once yolk is accepted'),
+            // ('Fish', 'From about 7 months, boneless, checked twice'),
+            // ('Chicken', 'From about 7 to 8 months, cooked soft and minced'),
+            ('Whole egg', 'From 6 months, yolk and white, well cooked'),
+            ('Fish', 'From 6 months, boneless, checked twice'),
+            ('Chicken', 'From 6 months, cooked soft and minced'),
             ('Mutton and keema', 'From about 9 months, cooked very soft'),
             ('Liver', 'From about 8 months, tiny amounts, very iron rich'),
             ('Shellfish', 'Later, and only after talking to your doctor'),
@@ -3346,10 +3376,18 @@ final PpArea _cooking = PpArea(
             'thawed as finished. A freezer that has warmed and refrozen is the '
             'most common cause of an upset stomach from home-cooked baby '
             'food.'),
+        // ⚠️ THE LABEL PROMISED A MEAL PLAN (tools pass, Food, 2026-10-25).
+        // Recipes has a shopping list and no planner; a week's plan is owed
+        // (DOOR-CONTENT-OWED). Named for what opens. Kept for revert:
+        // PpLink(
+        //   'Meal plan and shopping list',
+        //   surfaceId: 'pp_food',
+        //   blurb: 'Plan the week and turn it into a list you can shop from.',
+        // ),
         PpLink(
-          'Meal plan and shopping list',
+          'Recipes and your shopping list',
           surfaceId: 'pp_food',
-          blurb: 'Plan the week and turn it into a list you can shop from.',
+          blurb: 'Pick the week\'s dishes and add their ingredients to one list you can shop from.',
         ),
         PpLink(
           'Steamers, storage trays and containers',

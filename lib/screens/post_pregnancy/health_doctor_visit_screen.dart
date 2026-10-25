@@ -45,6 +45,8 @@ import 'pp_health_data.dart';
 import 'pp_sleep_data.dart' show SleepStore;
 import 'pp_vaccine_data.dart';
 import 'pp_milestones_data.dart' show MilestoneStore;
+import 'pp_baby_food_check_screen.dart' show ppBabyFoodNameOf, ppDayLabel;
+import 'pp_food_tries_store.dart';
 import '../../services/pp_use_consent.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
@@ -146,6 +148,21 @@ String? ppDoctorVisitDevelopmentLine({DateTime? now}) {
   return 'Seen lately: ${recent.take(5).map((m) => m.title).join(' · ')}';
 }
 
+/// First foods that brought a reaction in the last three months, only with
+/// her yes to "Foods tried" (tools pass, Food, 2026-10-25). Null without it,
+/// or when there is nothing to tell: a doctor needs the reactions, not the
+/// whole list of what went well.
+String? ppDoctorVisitFoodsLine({DateTime? now}) {
+  if (!PpUseConsent.instance.allows(PpUseKind.foods)) return null;
+  final since = (now ?? DateTime.now()).subtract(const Duration(days: 92));
+  final r = PpFoodTriesStore.instance.reactionsSince(since);
+  if (r.isEmpty) return null;
+  return r
+      .take(5)
+      .map((e) => '${ppBabyFoodNameOf(e.key)} (${e.value.reaction.label.toLowerCase()}, ${ppDayLabel(e.value.date)})')
+      .join(' · ');
+}
+
 String _reportsLine() =>
     _s.reports.isEmpty ? 'None recorded' : _s.reports.take(3).map((r) => '${r.name} (${r.date})').join(' · ');
 
@@ -192,6 +209,7 @@ String ppDoctorVisitShareText({List<PpCareDay>? days}) {
     ..writeln('Recent history: ${_historyLine()}')
     ..writeln('Recent reports: ${_reportsLine()}')
     ..write(ppDoctorVisitDevelopmentLine() == null ? '' : 'Development: ${ppDoctorVisitDevelopmentLine()}\n')
+    ..write(ppDoctorVisitFoodsLine() == null ? '' : 'First foods: ${ppDoctorVisitFoodsLine()}\n')
     ..writeln('')
     ..writeln('THE LAST 7 DAYS')
     ..writeln(PpCareHistory.doctorSummary(week, childName: c.name, ageLabel: c.ageLabel));
@@ -241,6 +259,7 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
           SleepStore.instance,
           NappyStore.instance,
           MilestoneStore.instance,
+          PpFoodTriesStore.instance,
           PpUseConsent.instance,
         ]),
         builder: (context, _) {
@@ -277,6 +296,8 @@ class _HealthDoctorVisitScreenState extends State<HealthDoctorVisitScreen> {
                   _fact(p, 'Recent reports', _reportsLine()),
                   if (ppDoctorVisitDevelopmentLine() case final dev?)
                     _fact(p, 'Development', dev, key: const ValueKey('pp_doctor_visit_development')),
+                  if (ppDoctorVisitFoodsLine() case final foods?)
+                    _fact(p, 'First foods', foods, key: const ValueKey('pp_doctor_visit_foods')),
                   _fact(p, 'The last 7 days', ppLast7DaysLine(week),
                       key: const ValueKey('pp_doctor_visit_last7'), last: true),
                 ]),
