@@ -44,6 +44,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart' show PpBottomNav, PpTab;
 import 'pp_feeding_data.dart';
 import 'pp_growth_data.dart';
+import 'pp_names_data.dart' show kBabyNames;
 import 'pp_search.dart' show openPpAskVeda;
 import 'pp_baby_food_check_screen.dart' show ppBabyFoodCount;
 import 'pp_sleep_data.dart';
@@ -206,10 +207,17 @@ List<PpToolGroup> ppToolGroups() {
           words: ['yoga', 'exercise', 'core', 'workout', 'postnatal']),
     ]),
     PpToolGroup('Plan and keep', 268, [
-      PpTool('Baby names', '2,031 names, with meaning, origin and Devanagari.', 'pp_names', tab: TtcTabMark.openBook, IntentMark.pageMark,
-          words: ['name']),
-      PpTool('Product guide', 'What is worth buying, and what to skip.', 'pp_product_guide', tab: TtcTabMark.wallet, IntentMark.bagMark,
-          words: ['buy', 'products']),
+      // PpTool('Baby names', '2,031 names, with meaning, origin and Devanagari.', 'pp_names', tab: TtcTabMark.openBook, IntentMark.pageMark,
+      //     words: ['name']), // kept for revert (tools pass 31): 2,031 was the count of catalogue lines, not names
+      PpTool('Baby names', '${ppThousands(kBabyNames.length)} names, with meaning, origin and Devanagari.', 'pp_names',
+          tab: TtcTabMark.openBook, IntentMark.pageMark, words: ['name']),
+      // PpTool('Product guide', 'What is worth buying, and what to skip.', 'pp_product_guide', tab: TtcTabMark.wallet, IntentMark.bagMark,
+      //     words: ['buy', 'products']), // kept for revert (tools pass 32): it opened the shop, the Products tab again
+      // ⚠️ THE GUIDE OPENS THE GUIDES (tools pass 32, O4). The row promised
+      // "what to skip" and landed on the storefront; the six real "how to
+      // choose" guides were reachable only from the What to buy hub.
+      PpTool('Product guide', 'How to choose a car seat, cot, pram, carrier and more.', 'pp_buying_guides',
+          tab: TtcTabMark.wallet, IntentMark.bagMark, words: ['buy', 'products', 'choose', 'car seat', 'pram', 'cot']),
     ]),
   ];
 }
@@ -357,4 +365,15 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
       )),
     ];
   }
+}
+
+/// 2040 -> "2,040" (tools pass 31): a count worked out, never typed.
+String ppThousands(int n) {
+  final d = '$n';
+  final b = StringBuffer();
+  for (var i = 0; i < d.length; i++) {
+    if (i > 0 && (d.length - i) % 3 == 0) b.write(',');
+    b.write(d[i]);
+  }
+  return b.toString();
 }

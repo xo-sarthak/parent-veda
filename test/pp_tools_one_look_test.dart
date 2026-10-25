@@ -31,11 +31,11 @@ const Set<String> _shared = {
 /// this list then; the test below fails if one wears the shell while still
 /// listed, so the list can only shrink.
 const Set<String> _owedShell = {
-  'pp_sleep_sounds',
+  // 'pp_sleep_sounds', // on the shell since 2026-10-26 (tools pass 30)
   // 'pp_fever_check', // on the shell since 2026-10-25 (tools pass, Health)
   // 'pp_doctor_visit', // on the shell since 2026-10-25 (Wave 3, Health)
   // 'pp_leaps', // not a tool any more: reading, out of the Tools tab (tools pass D4, 2026-10-25)
-  'pp_scripts',
+  // 'pp_scripts', // on the shell since 2026-10-26 (tools pass 29)
   // 'pp_food_chart', // on the shell since 2026-10-25 (tools pass, Food)
 };
 

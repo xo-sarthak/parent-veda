@@ -666,7 +666,7 @@ Anindita|अनिंदिता|g|Hindu|East|Sanskrit|Flawless; beyond reproac
 Anirvan|अनिर्वाण|b|Hindu|East|Sanskrit|Undying; ever bright|R
 Anisa|अनीसा|g|Muslim|Pan-India|Arabic|Friendly; companion|C
 Anisha|अनीशा|g|Hindu|Pan-India|Sanskrit|Unbroken; continuous|C
-Anita|अनीता|g|Christian|Pan-India|Hebrew · Sanskrit|Grace|C
+Anita|अनिता|g|Christian|Pan-India|Hebrew · Sanskrit|Grace|C
 Anjan|अंजन|b|Hindu|East|Sanskrit|Kohl; a mountain|C
 Anjana|अंजना|g|Hindu|Pan-India|Sanskrit|Mother of Hanuman|C
 Anjaneya|आंजनेय|b|Hindu|South|Sanskrit|Lord Hanuman, son of Anjana|C

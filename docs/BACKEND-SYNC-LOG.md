@@ -1532,3 +1532,43 @@ offsets; kind and `none` round-trip; leaving saves; no seeded saves; the cloud i
 - **Seen when.** On resume, at most once a minute (`SyncRegistry.resyncOnResume`). The loss swaps his Today live;
   a stage change re-routes his home at the next launch.
 - **Test.** `test/partner_stage_test.dart`.
+
+## Step 23: the Other tools: a vote she can take back, a chosen name she gives to the child, a timer that outlives a stop
+
+**Date:** 2026-10-26 (parenting tools pass, the Other family 29-33; the user's rule: "make sure the back ends are
+working well"). **Migration:** none. **Commit:** pending.
+
+### Why
+Baby names had a backend that worked and a front end that could not use it. A liked name could not be un-liked
+(the hearts only ever called `like()`), a pass in the deck recorded nothing, Undo left the like in place, and the
+partner matches the database works out (`pp_name_matches`, 0027) were read only by a retired screen. Sleep Sounds'
+timer, which lives in the shared player, was cleared by a stop and started on arrival rather than on play.
+
+### What changed
+- [x] **Un-like is a tombstone, not a delete.** `NameMatchStore.unlike` writes the row as `liked: false` with a
+  newer `updated_at` (the same path as `skip`). A delete would lose to the other phone's older "liked" copy, which
+  a newest-wins merge would then bring back. BACKEND-PATTERNS §16vv.
+- [x] **A pass is a vote.** The deck calls `skip()`, so a pass is synced and the name is not offered again.
+- [x] **Undo forgets the answer on this phone** (`clearVote`). The cloud has no "no vote" row, so the row it holds
+  says `liked: false`; her next answer overwrites it.
+- [x] **The deck leaves out answered names**, fixed at the start of a session (a live list would shrink under her
+  thumb and skip a card).
+- [x] **Matches on a screen.** "You both love" heads the shortlist, read from `NameMatchStore.matches`.
+- [x] **A name the build does not know is dropped** from a list (`babyNameOrNull`), never shown as "Aarav".
+- [x] **The chosen name reaches the child only on her tap.** When a child on record still has the placeholder
+  name, the chosen screen asks "Use Aanya as your baby's name?"; Yes calls `ChildProfileStore.update(name:)`,
+  which already saves and syncs. No new consent kind: the tap is the consent.
+- [x] **The quiz answers are device-local** (`pp_names_taste`). They only order the deck; never synced.
+- [x] **Sleep Sounds' timer: the choice and the countdown are two things.** `RagaAudioStore.armSleepTimer` keeps
+  her choice (a length, or all night) through a stop; the countdown starts on play. Additive: Garbh's players
+  still call `setSleepTimer`. Device-local (§16tt).
+
+**Verified:** `test/pp_other_tools_test.dart` (unlike round-trips as a tombstone and clears the crown; undo
+forgets; unknown names drop; the `pp_name_votes` columns match 0027 and 0105; the deck skips answered names; a
+pass is recorded; the taste is remembered; "You both love" reads the matches; the name offer only for a
+placeholder; the timer counts from play, survives a stop, and keeps "All night"),
+`test/post_pregnancy_names_flow_test.dart` (moved onto the live deck), `test/raga_audio_test.dart`.
+
+**Files:** `lib/screens/post_pregnancy/pp_names_data.dart`, `name_journey_feed_screen.dart`,
+`name_journey_shortlist_screen.dart`, `name_list_screen.dart`, `name_journey_detail_screen.dart`,
+`lib/services/raga_audio_store.dart`, `lib/screens/post_pregnancy/pp_sounds_screen.dart`.

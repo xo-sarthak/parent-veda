@@ -4267,3 +4267,30 @@ held whatever he paired into, so it was confidently wrong rather than visibly br
    decay into a wrong known.
 4. **The follower never writes.** His phone skips pushing either fact, so a stale local value can never overwrite
    hers. One writer per fact is what makes cloud-wins safe.
+
+## 16vv. Taking a vote back: a tombstone row, not a delete (no migration, 2026-10-26)
+
+Baby names keeps one row per parent per name in `pp_name_votes`, merged newest-wins. The tools pass (31) let her
+take a like back, and the obvious way to "remove" a vote is the wrong one.
+
+### 1. A delete cannot win a newest-wins merge
+The merge compares two copies of the same row and keeps the newer. A deleted row has no copy left to compare.
+Her other phone still holds "liked, Tuesday"; on its next sync it sees no row in the cloud, decides the cloud has
+simply never heard of the vote, and uploads it again. The name comes back.
+- *Delete:* less data. **The cost:** any device that was offline resurrects it.
+- *Tombstone (chosen):* the row stays and says `liked: false`, with a newer time. Every device's merge now sees
+  "not liked, Wednesday" beat "liked, Tuesday". **The cost:** a row per name she ever answered, which is tiny.
+
+**The general rule:** in any sync where "newer wins", absence is not a value. To say "no", write a row that says
+no. (The same reason `deleted_at` exists on the per-child tables.)
+
+### 2. "Undo" and "no" are different answers
+Undo in the deck is not "not for us"; it is "forget I answered". The table has no "no answer" state, so this
+phone forgets locally and the cloud row reads `liked: false` until her next answer overwrites it. Writing that
+down matters more than adding a third state: the matches query only ever counts `liked = true`, so the two read
+the same to her partner.
+
+### 3. Who may write a value another store owns
+The chosen name could have "flowed through" to the child's record automatically. It does not: a child's name is
+the child store's fact, written by its own save and sync, and only on her tap. A tool that writes into another
+store's data on its own is how two stores end up disagreeing about one child.

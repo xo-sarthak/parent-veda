@@ -2313,8 +2313,9 @@ final PpArea _gettingToSleep = PpArea(
             PpCarouselCard(
                 'Bring the three things that smell of home: the usual sheet, '
                     'the sleep sack, and the sound your baby sleeps to.',
-                'Download the track before you leave. A train has no '
-                    'network and a wedding has no quiet.'),
+                // 'Download the track before you leave. ...' kept for revert (tools pass 30): nothing downloads
+                'The sounds are in the app and play with no network, on a '
+                    'train or at a wedding.'),
             PpCarouselCard(
                 'At a wedding, one adult owns bedtime, and everyone else '
                     'gets to enjoy the wedding.',
@@ -2338,10 +2339,10 @@ final PpArea _gettingToSleep = PpArea(
             // The page's "download the sound she sleeps to" link, as a slide:
             // swipe up opens the library.
             PpCarouselCard.linked(
-                'Before you go: download the two or three sounds your baby '
-                    'really sleeps to.',
-                'A train has no network and a wedding has no quiet. Swipe up '
-                    'for the library.',
+                // 'Before you go: download the two or three sounds ...' kept for revert (tools pass 30)
+                'Before you go: pick the sound your baby really sleeps to.',
+                'It plays from the app with no network, on a train or at a '
+                    'wedding. Swipe up for the library.',
                 pageId: 'sleep_sounds_library'),
             // Added 2026-10-02 from the parenting gap analysis (P3).
             PpCarouselCard('Jet lag',
@@ -3917,16 +3918,28 @@ final PpPage _soundsLibraryPage = PpPage(
     for (final c in kPpSoundCategories) ...[
       PpArticle(heading: c.label, [c.blurb]),
       for (final t in c.tracks)
-        PpAudioSlot(
-          title: t.title,
-          category: c.label,
-          minutes: t.minutes.toUpperCase(),
-          slotId: t.slotId,
-        ),
+        // ⚠️ THE ONE THAT PLAYS, PLAYS (tools pass 30). Its slot was the same
+        // inert placeholder as the 23 not recorded yet, and its tap said it
+        // was "still being made". A recorded track opens the player.
+        if (t.isLive)
+          PpLink(
+            '${t.title}: plays now',
+            surfaceId: 'pp_sleep_sounds',
+            blurb: 'Opens the player, with the timer on.',
+          )
+        else
+          PpAudioSlot(
+            title: t.title,
+            category: c.label,
+            minutes: t.minutes.toUpperCase(),
+            slotId: t.slotId,
+          ),
     ],
+    // Was "at least two to three feet away" (tools pass 30, O9): the AAP-cited
+    // measurements are at about 2 metres. REQUIRED_REVIEW (paediatrician).
     const PpCallout(
       'Low volume, speaker away from your baby\'s head, timer on. Quieter than a '
-      'normal conversation, at least two to three feet away, never in the '
+      'running shower, across the room at about 2 metres, never in the '
       'cot and never a phone on the pillow. Thirty to forty-five minutes, '
       'then off.',
       title: 'The same safety note, because it matters',
@@ -3934,10 +3947,11 @@ final PpPage _soundsLibraryPage = PpPage(
     const PpWhenLine('Newborns: white noise and womb sounds. Three months and '
         'up: nature and ragas. Eighteen months and up: stories. Lullabies at any '
         'age.'),
-    const PpIndiaNote('Download the two or three you really use before you '
-        'travel. A train, a bus or a grandparent\'s house is exactly where a familiar '
-        'sound earns its place, and exactly where the network will not be '
-        'there.'),
+    // Was "Download the two or three you really use" (tools pass 30): nothing
+    // downloads. The tracks are in the app, which is the better truth.
+    const PpIndiaNote('The sounds are saved in the app, so they play with no '
+        'network. A train, a bus or a grandparent\'s house is exactly where a familiar '
+        'sound earns its place.'),
     const PpLink(
       'Open Sleep Sounds',
       surfaceId: 'pp_sleep_sounds',

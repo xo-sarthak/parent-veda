@@ -224,7 +224,8 @@ const List<PpSoundCategory> kPpSoundCategories = [
       PpSoundTrack(
           id: 'raga_tanpura',
           title: 'Tanpura drone only',
-          minutes: '45 min',
+          // minutes: '45 min', // kept for revert (tools pass 30): a short loop, not a 45-minute track
+          minutes: 'Loops',
           asset: kGarbhRagaAsset),
     ],
   ),

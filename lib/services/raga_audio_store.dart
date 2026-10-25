@@ -137,6 +137,53 @@ class RagaAudioStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ---- the armed choice (Sleep Sounds, tools pass 30, 2026-10-26) ----------
+  //
+  // ⚠️ HER CHOICE OUTLIVES THE PLAYER; THE COUNTDOWN DOES NOT. Sleep Sounds
+  // used [setSleepTimer], which counts from the moment it is called and is
+  // cleared by [stop]. So the timer started when she ARRIVED (browse for
+  // fifteen minutes and a 20-minute timer stops five minutes after play),
+  // pressing stop cleared it (the next play ran all night, the safe default
+  // quietly gone), and "All night" (null) looked the same as "never chosen",
+  // so every visit put 20 minutes back over her "All night".
+  //
+  // The fix separates the two things the one field held: the CHOICE (a
+  // length or all night, kept until she changes it) and the COUNTDOWN (runs
+  // only while something plays). Additive: Garbh's players still call
+  // [setSleepTimer] and behave exactly as before. On this phone only, never
+  // synced: a timer belongs to the phone it rings on (BACKEND-PATTERNS §16tt).
+  Duration? _armed;
+  bool _armedSet = false;
+
+  /// She (or the screen's default) has picked a length, or all night.
+  bool get sleepChoiceMade => _armedSet;
+
+  /// The picked length; null with [sleepChoiceMade] means all night.
+  Duration? get sleepChoice => _armed;
+
+  /// Pick the length. Counts from play: if something is playing it starts now,
+  /// otherwise the next play starts it. Null is all night.
+  void armSleepTimer(Duration? after) {
+    _armed = after;
+    _armedSet = true;
+    if (_playing) {
+      setSleepTimer(after);
+    } else {
+      // Nothing counting down while nothing plays.
+      _sleepTimer?.cancel();
+      _sleepTimer = null;
+      _sleepAfter = null;
+      _sleepStartedAt = null;
+      notifyListeners();
+    }
+  }
+
+  /// Called as playback starts: an armed length with no countdown running
+  /// starts one.
+  void _startArmed() {
+    if (_armedSet && _armed != null && _sleepTimer == null) setSleepTimer(_armed);
+  }
+
   /// True when [candidate] is the asset currently loaded — i.e. when this
   /// caller's controls are the controls for the sound that is audible.
   bool owns(String candidate) => _asset == candidate;
@@ -292,8 +339,10 @@ class RagaAudioStore extends ChangeNotifier {
       if (_playing) {
         await p.pause();
       } else if (_position > Duration.zero) {
+        _startArmed();
         await p.resume();
       } else {
+        _startArmed();
         await p.play(isUrl
             ? UrlSource(asset)
             : isFile
@@ -341,6 +390,8 @@ class RagaAudioStore extends ChangeNotifier {
     _sleepTimer = null;
     _sleepAfter = null;
     _sleepStartedAt = null;
+    _armed = null;
+    _armedSet = false;
     _player = null;
     _asset = null;
     _title = null;

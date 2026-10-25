@@ -67,7 +67,7 @@ import 'remedy_list_screen.dart';
 import '../../data/doors/pp_door_data.dart';
 import 'doors/pp_door_screen.dart';
 
-import '../product_guide/product_guide_hub_screen.dart';
+// import '../product_guide/product_guide_hub_screen.dart'; // kept for revert (tools pass 32): pp_product_guide opens the guides
 import 'baby_naming_home_screen.dart';
 import 'development_home_screen.dart';
 import 'feeding_journey_screen.dart';
@@ -216,8 +216,12 @@ Map<String, String> get kPpNotYetWords => {
           'What to check is on this page: a low potty, and feet flat on the '
           'floor.',
       // There is a book list but no screen for it yet; name two from it.
-      'pp_books/Potty': "We haven't put picture books in the app yet. "
-          '${_bookPair('Potty')} are two that children like.',
+      // 'pp_books/Potty': "We haven't put picture books in the app yet. "
+      //     '${_bookPair('Potty')} are two that children like.', // kept for revert (tools pass 33)
+      // ⚠️ IT SAID "NO PICTURE BOOKS" WHILE 285 SAT ON THE READING SHELF.
+      // There is no potty shelf of its own yet, and that is all it now says.
+      'pp_books/Potty': 'Picture books are on the Reading shelf, under More. '
+          'For potty time, ${_bookPair('Potty')} are two that children like.',
     };
 
 /// Two titles from the book list for a theme: "Once Upon a Potty and Potty
@@ -261,6 +265,24 @@ const Map<String, (String, String)> kPpJoiningSoon = {
 /// "Toys for this age" (Development DV6). `pp_toys/<category>` opens one
 /// kind, by the toy sheet's own category name.
 const String kPpToys = 'pp_toys';
+
+/// ⚠️ "TOYS AND CRAYONS", THE SHELF EARLY LEARNING PROMISED (EL7, built in
+/// the tools pass, 33). `pp_recos` opened the whole Products tab over the
+/// door, with no back button, under a name that promised story boxes nobody
+/// stocks. It keeps its id (the brackets name it) and opens one toy shelf of
+/// the six kinds EL7 named, his age first, the store's own chips for the six.
+const List<String> kPpToysAndCrayonsKinds = [
+  'Montessori', 'Crayons', 'Language & Literacy', 'Play Dough', 'Craft Kits', 'Puzzles',
+];
+
+Widget ppToysAndCrayonsScreen() => PvShelfScreen(
+      categoryId: kSheetToyCategoryId,
+      title: 'Toys and crayons',
+      subIds: {
+        for (final t in kSheetToys)
+          if (kPpToysAndCrayonsKinds.contains(t.category)) sheetToySubId(t),
+      },
+    );
 
 /// The toys the sheet gives an age that fits his (corrected) age. A toy with
 /// no age on the sheet suits every child and is not counted: "toys for this
@@ -315,6 +337,11 @@ String? ppSurfaceUnavailable(String id) {
         'Paediatrician';
     final who = kPpOwedExpertPlural[category] ?? '${category.toLowerCase()}s';
     return "We're adding $who. A ${nearLabel.toLowerCase()} can check this first.";
+  }
+  // A guide not written yet (tools pass 32, S8): says so, never silent.
+  const guidePrefix = 'pp_buying_guides/';
+  if (id.startsWith(guidePrefix) && ppBuyingGuideScreen(id.substring(guidePrefix.length)) == null) {
+    return "We haven't written that guide yet. The others are in the Product guide.";
   }
   const shopPrefix = 'pp_products/';
   if (id.startsWith(shopPrefix)) {
@@ -456,6 +483,22 @@ Widget? ppScreenForSurface(String id) {
   // section, so a cross-section reference needs a surface — and it should
   // land on the PAGE, not on the other door's tab, or the parent reading
   // about choking at the table gets a selector to work through first.
+  // `pp_scripts/<id>` opens What to say on that script (tools pass 29, BH2).
+  // The six Behaviour page links opened the whole tool and left her to find
+  // the one they named. An unknown id opens the tool as it always did.
+  const scriptsPrefix = 'pp_scripts/';
+  if (id.startsWith(scriptsPrefix)) {
+    return ScriptsLibraryScreen(initialScriptId: id.substring(scriptsPrefix.length));
+  }
+
+  // `pp_buying_guides/<key>` opens one "how to choose" guide in the reader,
+  // with its "Shop this" (tools pass 32). Feeding's "Compare breast pumps"
+  // uses it. A guide not written yet is answered by `ppSurfaceUnavailable`.
+  const guidePrefix = 'pp_buying_guides/';
+  if (id.startsWith(guidePrefix)) {
+    return ppBuyingGuideScreen(id.substring(guidePrefix.length));
+  }
+
   const pagePrefix = 'pp_page/';
   if (id.startsWith(pagePrefix)) {
     final rest = id.substring(pagePrefix.length);
@@ -815,8 +858,13 @@ Widget? _ppScreenFor(String id) => switch (id) {
 
       // ---- Commerce ---------------------------------------------------------
       'pp_products' => const ProductsDiscoveryScreen(),
-      'pp_product_guide' => const ProductGuideHubScreen(),
-      'pp_recos' => const ProductsDiscoveryScreen(),
+      // 'pp_product_guide' => const ProductGuideHubScreen(), // kept for revert (tools pass 32): the storefront
+      // ⚠️ THE GUIDE OPENS THE GUIDES (tools pass 32, O4). "What is worth
+      // buying, and what to skip" opened the Products tab again. Pregnancy's
+      // tile keeps its own route (`surface_router.dart`), untouched.
+      'pp_product_guide' => const PpBuyingGuidesScreen(),
+      // 'pp_recos' => const ProductsDiscoveryScreen(), // kept for revert (tools pass 33): the whole store
+      'pp_recos' => ppToysAndCrayonsScreen(),
 
       // ---- People -----------------------------------------------------------
       'pp_experts' => const ProviderResultsScreen(),

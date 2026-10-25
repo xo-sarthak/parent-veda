@@ -23,18 +23,48 @@
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show kPvInk, pvStorePalette;
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
+import 'pp_phases_data.dart' show ppFillChild;
 import 'pp_scripts_data.dart';
+import 'pp_section_registry.dart' show kPpSections;
+import 'pp_surface_router.dart' show ppPushSurface;
 import 'pp_tools_kit.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
+/// Opens the page a script belongs to, wherever it lives (tools pass 29):
+/// most are in Behaviour, but the mealtime script's page is in Feeding and the
+/// bedtime one's in Sleep. Through `pp_page/<section>/<page>`, the router's
+/// one way to open another section's page. False when no section has it.
+bool ppOpenScriptPage(BuildContext context, String pageId) {
+  for (final section in kPpSections) {
+    if (section.pageById(pageId) != null) {
+      ppPushSurface(context, 'pp_page/${section.id}/$pageId');
+      return true;
+    }
+  }
+  return false;
+}
+
 class ScriptsLibraryScreen extends StatefulWidget {
-  const ScriptsLibraryScreen({super.key, this.onOpenPage});
+  const ScriptsLibraryScreen({super.key, this.onOpenPage, this.initialScriptId});
+
+  /// The script a link promised (`pp_scripts/<id>`, tools pass 29), shown
+  /// first. The six Behaviour page links opened the whole tool and left her to
+  /// find the one they named.
+  final String? initialScriptId;
 
   /// Opens the article a script belongs to. Null when the tool is reached from
   /// somewhere that cannot resolve section pages — the link then simply does
   /// not render, rather than rendering and doing nothing.
+  ///
+  /// ⚠️ NULL ON EVERY WAY IN, SO "READ THE WHOLE THING" NEVER SHOWED (tools
+  /// pass 29). The router built the screen with no opener. Null now means the
+  /// screen's own [ppOpenScriptPage]; a caller may still pass its own.
   final void Function(BuildContext, String pageId)? onOpenPage;
 
   @override
@@ -54,12 +84,89 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
     // younger sibling, or simple curiosity are all real reasons to look
     // outside the band.
     _band = _bandForAge(ChildProfileStore.instance.ageInMonths);
+    // The child on screen can change while this is open (the family switch);
+    // the band follows. It was read once (tools pass 29).
+    ChildProfileStore.instance.addListener(_childChanged);
+  }
+
+  void _childChanged() {
+    if (!mounted) return;
+    setState(() => _band = _bandForAge(ChildProfileStore.instance.ageInMonths));
   }
 
   @override
   void dispose() {
+    ChildProfileStore.instance.removeListener(_childChanged);
     _search.dispose();
     super.dispose();
+  }
+
+  void _openPage(BuildContext context, String pageId) {
+    final open = widget.onOpenPage;
+    if (open != null) {
+      open(context, pageId);
+    } else {
+      ppOpenScriptPage(context, pageId);
+    }
+  }
+
+  /// "FOR AANYA · UNDER 1", or "FOR YOUR CHILD · 3 AND UP" with no name: the
+  /// placeholder said "FOR YOUR BABY" to the parent of a four-year-old.
+  String _forLabel() {
+    final c = ChildProfileStore.instance;
+    final who = c.active.name == Child.placeholder
+        ? (_band == 'infant' ? 'your baby' : 'your child')
+        : c.nameMid;
+    return 'FOR ${who.toUpperCase()}  ·  ${_bandLabels[_band]!.toUpperCase()}';
+  }
+
+  String _sentence(String text) {
+    final t = ppFillChild(text);
+    return t.isEmpty ? t : t[0].toUpperCase() + t.substring(1);
+  }
+
+  // ---- on the tools' shell (tools pass 29) -----------------------------------
+  //  It was the one tool in `_owedShell` with its own back that always said
+  //  "Behaviour", even from the Tools tab. The shell's back says nothing it
+  //  cannot keep. Search first (Quo snippets on Mobbin), then his age's
+  //  scripts, the line to say first on every card. `_buildBeforeShell` is the
+  //  page before, kept for revert.
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final searching = _query.trim().isNotEmpty;
+    var results = searching
+        ? ppScriptSearch(_query)
+        : (_band == null ? kPpScripts : ppScriptsForBand(_band!));
+    final pinned = widget.initialScriptId == null || searching
+        ? null
+        : kPpScripts.where((s) => s.id == widget.initialScriptId).firstOrNull;
+    if (pinned != null) results = [pinned, ...results.where((s) => s.id != pinned.id)];
+    return PregToolScaffold(
+      hue: 28,
+      eyebrow: 'The words',
+      title: 'What to say',
+      mark: IntentMark.bookMark,
+      intro: 'Find the moment, get the sentence. Why it works is underneath, '
+          'for when you have time.',
+      children: [
+        pregToolPad(_searchBar()),
+        if (!searching && _band != null) ...[
+          const SizedBox(height: 14),
+          pregToolPad(Text(_forLabel(),
+              key: const ValueKey('pp_scripts_for'),
+              style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: p.ink3))),
+        ],
+        const SizedBox(height: 14),
+        if (results.isEmpty)
+          pregToolPad(KeyedSubtree(key: const ValueKey('pp_scripts_empty'), child: ppEmptyCard(Icons.search_off_rounded,
+              // 'Nothing matches that yet. Try a plainer word — "hitting", '
+              // '"park", "food" — or browse by age above.' // kept for revert: the age chips are gone
+              "Nothing for that yet. Try 'hitting' or 'bedtime'.")))
+        else
+          pregToolPad(Column(children: [for (final s in results) _card(s)])),
+      ],
+    );
   }
 
   static String _bandForAge(int months) {
@@ -79,8 +186,9 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
   Widget _pad(Widget c) =>
       Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  @override
-  Widget build(BuildContext context) {
+  // Kept for revert (tools pass 29): the page before the shell.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final searching = _query.trim().isNotEmpty;
     // Search deliberately ignores the band filter: if she is typing a word, she
     // knows what she is looking for better than his birthday does.
@@ -230,13 +338,29 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: ppHair),
         ),
+        key: ValueKey('pp_script_${s.id}'),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(s.situation, style: ppJakarta(15.5)),
+          Text(_sentence(s.situation), style: ppJakarta(15.5)),
           const SizedBox(height: 13),
+
+          // A safety line rides on the script itself, above the words (BH2:
+          // no honey before one). REQUIRED_REVIEW wherever it is set.
+          if (s.safety case final safety?) ...[
+            Container(
+              key: ValueKey('pp_script_safety_${s.id}'),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF6F6F4),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(safety, style: ppBody(13, color: kPvInk, h: 1.45, w: FontWeight.w700)),
+            ),
+            const SizedBox(height: 12),
+          ],
 
           // SAY THIS — the reason the screen exists, so it gets the weight.
           Text('SAY THIS',
-              style: ppBody(9.5, color: ppPurple, w: FontWeight.w800)),
+              style: ppBody(9.5, color: kPvInk, w: FontWeight.w800)), // was ppPurple (tools pass 29)
           const SizedBox(height: 7),
           for (final line in s.sayThis) ...[
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -245,7 +369,7 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
                 width: 5,
                 height: 5,
                 decoration:
-                    const BoxDecoration(color: ppPurple, shape: BoxShape.circle),
+                    const BoxDecoration(color: kPvInk, shape: BoxShape.circle), // was ppPurple
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -272,20 +396,27 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
           const SizedBox(height: 12),
           Container(height: 1, color: ppHair),
           const SizedBox(height: 11),
-          Text(s.principle, style: ppBody(12.5, color: ppMuted, h: 1.55)),
+          Text(_sentence(s.principle), style: ppBody(12.5, color: ppMuted, h: 1.55)),
 
-          if (s.pageId != null && widget.onOpenPage != null) ...[
+          // if (s.pageId != null && widget.onOpenPage != null) ...[ // kept for revert (tools pass 29)
+          if (s.pageId != null) ...[
             const SizedBox(height: 12),
             PvPress(child: GestureDetector(
-              onTap: () => widget.onOpenPage!(context, s.pageId!),
+              key: ValueKey('pp_script_read_${s.id}'),
+              onTap: () => _openPage(context, s.pageId!),
               behavior: HitTestBehavior.opaque,
-              child: Row(children: [
-                Text('Read the whole thing',
-                    style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
-                const SizedBox(width: 5),
-                const Icon(Icons.arrow_forward_rounded,
-                    size: 14, color: ppPurple),
-              ]),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 40),
+                child: Row(children: [
+                  Flexible(
+                    child: Text('Read the whole thing',
+                        style: ppBody(12.5, color: kPvInk, w: FontWeight.w700)),
+                  ),
+                  const SizedBox(width: 5),
+                  const Icon(Icons.arrow_forward_rounded,
+                      size: 14, color: kPvInk),
+                ]),
+              ),
             )),
           ],
         ]),

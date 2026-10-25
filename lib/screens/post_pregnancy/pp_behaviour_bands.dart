@@ -171,7 +171,7 @@ const PpArea kBehZiddi = PpArea(
             'and elders are usually more persuaded by a calm child a month on '
             'than by an argument today.'),
         PpLink('What to say when he digs in',
-            surfaceId: 'pp_scripts',
+            surfaceId: 'pp_scripts/shoes', // was the whole tool (tools pass 29, BH2)
             blurb: 'The exact words for the shoes, the park and the phone.'),
       ],
     ),
@@ -351,7 +351,7 @@ const PpArea kBehDiscipline = PpArea(
             pageId: 'beh_anger',
             blurb: 'The one explanation the three hitting pages share.'),
         PpLink('What to say instead, situation by situation',
-            surfaceId: 'pp_scripts',
+            surfaceId: 'pp_scripts/hit_friend', // was the whole tool (tools pass 29, BH2)
             blurb: 'The sentences, for the moments this actually comes up.'),
       ],
     ),

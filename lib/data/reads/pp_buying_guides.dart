@@ -31,6 +31,8 @@ class _Guide {
     required this.skip,
     this.india,
     required this.safety,
+    this.shop,
+    this.shopLine,
   });
   final String id;
   final String title;
@@ -41,6 +43,15 @@ class _Guide {
   final List<String> skip;
   final String? india;
   final String safety;
+
+  /// Where "Shop this" lands, at the FOOT of the guide (tools pass 32, Mobbin's
+  /// Shop guide: the advice first, the products after). A `pp_products/<shelf>`
+  /// surface; a shelf with nothing stocked answers with the router's own
+  /// "still choosing" line (S8), so no guide needs to know what is in stock.
+  final String? shop;
+
+  /// One line on why the shelf is worth her time (a next step needs a reason).
+  final String? shopLine;
 }
 
 const List<_Guide> _kGuides = [
@@ -52,8 +63,11 @@ const List<_Guide> _kGuides = [
     hue: 206,
     matters: [
       'Rear-facing for as long as the seat allows, at least until about two years. It protects the head and neck best.',
-      'A safety approval label on the seat, such as ECE R44/04 or R129 (i-Size).',
-      'It fits your car. Try it before you buy: fitted with ISOFIX or the seat belt, it should move less than an inch at the belt path.',
+      // 'A safety approval label on the seat, such as ECE R44/04 or R129 (i-Size).', // kept for revert (tools pass 32)
+      // REQUIRED_REVIEW (child safety): AIS-072 is India's child restraint standard.
+      'A safety approval label on the seat: ECE R44/04 or R129 (i-Size), or AIS-072, the Indian standard.',
+      // 'It fits your car. Try it before you buy: fitted with ISOFIX or the seat belt, it should move less than an inch at the belt path.', // kept for revert: inches
+      'It fits your car. Try it before you buy: fitted with ISOFIX or the seat belt, it should move less than 2.5 cm at the belt path.',
       'A five-point harness that sits at or just below the shoulders when rear-facing.',
       'Easy to fit every time. The safest seat is the one you fit correctly on a busy morning.',
     ],
@@ -64,6 +78,8 @@ const List<_Guide> _kGuides = [
     ],
     india: 'Holding a baby in your lap is not safe in a car, even for a short ride. Never fit a rear-facing seat in a front seat with an airbag.',
     safety: 'Read the seat\'s manual and your car\'s manual together, and fit it before the baby comes home.',
+    shop: 'pp_products/pvs_rear_facing_car_seats',
+    shopLine: 'Rear-facing seats we have picked.',
   ),
   _Guide(
     id: 'cot',
@@ -84,6 +100,8 @@ const List<_Guide> _kGuides = [
     ],
     india: 'A jhula or cradle needs the same rules: flat, firm, baby on the back, nothing soft around the face.',
     safety: 'Every sleep, put your baby on the back, on a firm flat surface, with nothing else in the cot.',
+    shop: 'pp_products/Cots',
+    shopLine: 'Plain, firm cots and mattresses.',
   ),
   _Guide(
     id: 'pram',
@@ -105,6 +123,8 @@ const List<_Guide> _kGuides = [
     ],
     india: 'If you mostly carry your baby or travel by auto, a light, simple stroller or a carrier may serve you better than a large pram.',
     safety: 'Always use the harness and the brakes, and never hang heavy bags on the handle.',
+    shop: 'pp_products/Prams and strollers',
+    shopLine: 'Prams and strollers for the roads you have.',
   ),
   _Guide(
     id: 'carrier',
@@ -124,6 +144,8 @@ const List<_Guide> _kGuides = [
     ],
     india: 'A dupatta or saree sling is a long tradition. If you use one, the same rules apply: upright, face visible, chin off the chest.',
     safety: 'Check often that you can see your baby\'s face and that breathing is easy. Take extra care when bending.',
+    shop: 'pp_products/Baby carriers',
+    shopLine: 'Carriers with a wide seat, in breathable fabric.',
   ),
   _Guide(
     id: 'high_chair',
@@ -144,6 +166,8 @@ const List<_Guide> _kGuides = [
     ],
     india: 'Many families eat together on the floor. Your child can join you sitting upright, with you close by.',
     safety: 'Always use the harness, never leave your child alone in the chair, and keep it away from tables they could push off.',
+    shop: 'pp_products/High chairs',
+    shopLine: 'High chairs with a harness and a wide base.',
   ),
   _Guide(
     id: 'first_shoes',
@@ -165,6 +189,34 @@ const List<_Guide> _kGuides = [
     ],
     india: 'Check size every two or three months. Small feet grow fast, and tight shoes are the most common problem.',
     safety: 'If your child walks only on tiptoe, or limps, mention it to your paediatrician.',
+    shop: 'pp_products/First shoes',
+    shopLine: 'Soft, flexible shoes for outdoors.',
+  ),
+  // ⚠️ THE SEVENTH GUIDE, BECAUSE A LINK PROMISED IT (tools pass 32, O4).
+  // Feeding's "Compare breast pumps: what matters, what to ignore" opened the
+  // shop. REQUIRED_REVIEW (lactation consultant): every line.
+  _Guide(
+    id: 'breast_pump',
+    title: 'Choosing a breast pump',
+    teaser: 'How often you will pump decides the pump, not the price.',
+    short: 'Pump for how often you will use it, and get the flange size right.',
+    hue: 320,
+    matters: [
+      'How often you will pump. Now and then, a manual pump is enough. Every day, or back at work, an electric pump saves time and wrists.',
+      'Single or double. A double electric pump empties both sides at once and halves the time.',
+      'The flange size. A flange that is too small or too large hurts and moves less milk. Measure your nipple across, and choose a flange a few millimetres wider.',
+      'Suction you can adjust, starting low. Pumping should never hurt.',
+      'Parts you can take apart, wash and dry easily, and spare parts you can buy in India.',
+    ],
+    skip: [
+      'A second-hand pump with an open system. Milk can reach the motor, and it cannot be cleaned out. Only closed-system pumps are made to be shared.',
+      'Apps and extras you will not use.',
+      'Buying before the baby comes, unless you know you will need one. Many mothers never do.',
+    ],
+    india: 'Some hospitals rent hospital-grade pumps for the first weeks, which helps if your baby is in the NICU or not latching yet.',
+    safety: 'If pumping hurts, or you see cracked or bleeding nipples, stop and ask a lactation consultant to check the fit.',
+    shop: 'pp_products/pvs_electric_breast_pumps',
+    shopLine: 'Electric pumps we have picked.',
   ),
 ];
 
@@ -198,6 +250,15 @@ PvRead _read(_Guide g) => PvRead(
         if (g.india case final ind?) PvReadSection(heading: _s('In an Indian home'), paragraphs: [_s(ind)]),
       ],
       whenToSeeSomeone: PvCallout(tone: PvCalloutTone.note, title: _s('Safety first'), body: _s(g.safety)),
+      nextSteps: [
+        if (g.shop case final shop?)
+          PvReadNextStep(
+            kind: PvNextKind.product,
+            title: _s('Shop this'),
+            value: _s(g.shopLine ?? 'In our shop.'),
+            surfaceId: shop,
+          ),
+      ],
       faqs: const [],
       readNext: [for (final o in _kGuides) if (o.id != g.id) ppBuyingGuideId(o.id)].take(2).toList(),
     );

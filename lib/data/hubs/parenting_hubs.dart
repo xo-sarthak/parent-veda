@@ -547,13 +547,22 @@ final HubConfig kPpBuying = HubConfig(
       'choose between real options.'),
   needsTitle: _en('What do you need?'),
   needs: [
+    // Kept for revert (tools pass 32, O4): it promised a guide and opened the
+    // shop. The guide is the next row; this one says it is the shop.
+    // HubNeed(
+    //   label: _en('What do I actually need?'),
+    //   blurb: _en('A trust-first guide to what is genuinely worth buying, '
+    //       'and what you can skip.'),
+    //   mark: IntentMark.listMark,
+    //   hue: 12,
+    //   surfaceId: 'pp_product_guide',
+    // ),
     HubNeed(
-      label: _en('What do I actually need?'),
-      blurb: _en('A trust-first guide to what is genuinely worth buying, '
-          'and what you can skip.'),
+      label: _en('Shop for this age'),
+      blurb: _en('Everything in the shop, with picks for this age first.'),
       mark: IntentMark.listMark,
       hue: 12,
-      surfaceId: 'pp_product_guide',
+      surfaceId: 'pp_products',
     ),
     // The buying guides (gap analysis P3, 2026-10-07): how to choose a car
     // seat, cot, pram, carrier, high chair and first shoes. No brands.

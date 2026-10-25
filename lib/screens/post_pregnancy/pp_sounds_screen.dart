@@ -35,6 +35,8 @@ import 'package:flutter/material.dart';
 
 import '../../services/raga_audio_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/preg_tool_chrome.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
 import 'pp_sounds_data.dart';
@@ -57,8 +59,16 @@ class _PpSoundsScreenState extends State<PpSoundsScreen> {
     // ⚠️ THE DEFAULT IS ARMED ON ARRIVAL, not on first play. If it were set when
     // she pressed play, the very first tap would race the arming and the timer
     // she was promised would sometimes not exist.
-    if (_audio.sleepAfter == null) {
-      _audio.setSleepTimer(RagaAudioStore.kDefaultSleepTimer);
+    //
+    // ⚠️ ARMED, NOT STARTED (tools pass 30). It used to START here, so the
+    // countdown ran while she browsed, and a null (her "All night") was taken
+    // for "never set" and overwritten with 20 minutes on every visit. Now the
+    // default is armed only when she has never chosen, and counts from play.
+    // if (_audio.sleepAfter == null) {
+    //   _audio.setSleepTimer(RagaAudioStore.kDefaultSleepTimer);
+    // } // kept for revert
+    if (!_audio.sleepChoiceMade) {
+      _audio.armSleepTimer(RagaAudioStore.kDefaultSleepTimer);
     }
   }
 
@@ -66,9 +76,82 @@ class _PpSoundsScreenState extends State<PpSoundsScreen> {
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: V2PaletteStore.instance,
         builder: (context, _) =>
-            _body(context, V2PaletteStore.instance.current),
+            _shell(context, V2PaletteStore.instance.current),
       );
 
+  // ---- on the tools' shell (tools pass 30) ------------------------------------
+  //  It was one of the two tools in `_owedShell`. Named "Sleep Sounds" as on
+  //  its Tools row and every door (it said "Sounds for sleep" here). The
+  //  now-playing bar stays pinned, in the shell's new `bottom:` slot. The page
+  //  before is `_body`, kept for revert.
+  Widget _shell(BuildContext context, V2Palette p) => AnimatedBuilder(
+        animation: _audio,
+        builder: (context, _) => PregToolScaffold(
+          hue: 206, // the Tools row's group, "Log the day"
+          eyebrow: 'Sleep',
+          title: 'Sleep Sounds',
+          mark: IntentMark.audioMark,
+          intro: 'A tanpura to play tonight, more being recorded. '
+              'Free, and it plays with no network.',
+          bottom: _audio.asset == null
+              ? null
+              : _NowPlaying(
+                  audio: _audio,
+                  onToggle: () => _audio.toggle(_audio.asset!),
+                  onStop: _audio.stop,
+                ),
+          children: [
+            pregToolPad(_safetyNote(p)),
+            const SizedBox(height: 16),
+            pregToolPad(_TimerRow(
+              current: _audio.sleepChoice,
+              onPick: _audio.armSleepTimer,
+            )),
+            const SizedBox(height: 28),
+            pregToolPad(_CategoryBlock(
+              key: const ValueKey('pp_sounds_plays_now'),
+              category: PpSoundCategory(
+                id: 'now',
+                label: 'Plays now',
+                blurb: 'A slow tanpura drone. The rest of the library is being recorded.',
+                tracks: kPpLiveSoundTracks,
+              ),
+              audio: _audio,
+              onPlay: (t) => _play(t, 'now'),
+            )),
+            for (final c in kPpSoundCategories) ...[
+              const SizedBox(height: 28),
+              pregToolPad(_CategoryBlock(
+                category: c,
+                audio: _audio,
+                onPlay: (t) => _play(t, c.id),
+              )),
+            ],
+          ],
+        ),
+      );
+
+  /// ⚠️ WHERE THE SPEAKER GOES, NOT ONLY HOW LOUD (tools pass 30, O9). The line
+  /// said "keep it low" and nothing about distance or the cot; the AAP-cited
+  /// study behind every white-noise rule measured machines at about 2 metres,
+  /// and set the limit at 50 dB. REQUIRED_REVIEW (paediatrician).
+  Widget _safetyNote(V2Palette p) => Container(
+        key: const ValueKey('pp_sounds_safety'),
+        padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
+        decoration: BoxDecoration(
+          color: p.surfaceAlt,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: p.line),
+        ),
+        child: Text(
+            'Keep it low, quieter than a running shower, and the phone across '
+            'the room, about 2 metres away. Never in the cot and never on the '
+            'bed. Quiet enough that you can still hear your baby breathe.',
+            style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.6, color: p.ink1)),
+      );
+
+  // Kept for revert (tools pass 30): the page before the shell.
+  // ignore: unused_element
   Widget _body(BuildContext context, V2Palette p) => Scaffold(
         backgroundColor: p.ground,
         body: SafeArea(
@@ -207,8 +290,10 @@ class _TimerRow extends StatelessWidget {
           Row(children: [
             Icon(Icons.timer_outlined, size: 16, color: p.ink3),
             const SizedBox(width: 8),
-            Text('Stops itself after',
-                style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, height: 1.55, color: p.ink2)),
+            Flexible(
+              child: Text('Stops itself after',
+                  style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, height: 1.55, color: p.ink2)),
+            ),
           ]),
           const SizedBox(height: 10),
           Row(children: [
@@ -257,11 +342,14 @@ class _TimerRow extends StatelessWidget {
           // explicit that abstinence framing gets ignored. Naming it plainly, next
           // to the volume line above, is harm reduction: she chooses it knowing
           // what she chose.
-          if (current == null) ...[
-            const SizedBox(height: 9),
-            Text('It will keep playing until you stop it.',
-                style: pvManrope(fontSize: 12, fontWeight: FontWeight.w500, height: 1.5, color: p.ink3)),
-          ],
+          const SizedBox(height: 9),
+          Text(
+              // if (current == null) 'It will keep playing until you stop it.' // kept for revert
+              current == null
+                  ? 'It will keep playing until you stop it.'
+                  : 'Counts from when you press play, then stops by itself.',
+              key: const ValueKey('pp_sounds_timer_line'),
+              style: pvManrope(fontSize: 12, fontWeight: FontWeight.w500, height: 1.5, color: p.ink3)),
         ],
       );
   }

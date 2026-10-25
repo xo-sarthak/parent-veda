@@ -953,7 +953,7 @@ const PpArea _firstFeelings = PpArea(
         ], heading: 'Three things that make it work', hue: 128),
         PpWhenLine('One to four.'),
         PpLink('The exact words',
-            surfaceId: 'pp_scripts',
+            surfaceId: 'pp_scripts/supermarket', // was the whole tool (tools pass 29, BH2)
             blurb: 'For the supermarket, the park, and the phone.'),
       ],
     ),
@@ -1007,7 +1007,7 @@ const PpArea _firstFeelings = PpArea(
             'Sometimes a new pair of arms is one more input, and it\'s fine '
             'to say "give us five minutes".'),
         PpLink('The words for exactly this',
-            surfaceId: 'pp_scripts'),
+            surfaceId: 'pp_scripts/supermarket'), // was the whole tool (tools pass 29, BH2)
       ],
     ),
   ],

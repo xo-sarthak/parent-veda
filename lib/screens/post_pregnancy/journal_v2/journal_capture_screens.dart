@@ -792,13 +792,17 @@ class _QuickCaptureScreenState extends State<QuickCaptureScreen> {
 
 // ---- Write a Story ----------------------------------------------------------
 class WriteStoryScreen extends StatefulWidget {
-  const WriteStoryScreen({super.key});
+  const WriteStoryScreen({super.key, this.initialTitle});
+
+  /// A title the story opens with, which she can change (tools pass 31): the
+  /// names tool's "Begin Aanya's story" used to open a blank page.
+  final String? initialTitle;
   @override
   State<WriteStoryScreen> createState() => _WriteStoryScreenState();
 }
 
 class _WriteStoryScreenState extends State<WriteStoryScreen> {
-  final _title = TextEditingController();
+  late final _title = TextEditingController(text: widget.initialTitle ?? '');
   final _body = TextEditingController();
   String? _photo;
 

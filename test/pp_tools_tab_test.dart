@@ -30,7 +30,7 @@ void main() {
   test('every door tool is also in the Tools tab', () {
     final listed = {for (final g in ppToolGroups()) for (final t in g.tools) t.surfaceId};
     bool allowed(String id) =>
-        id == 'pp_recos' || // a shop card, reached from Product guide; not a tool
+        id == 'pp_recos' || // a shop card, not a tool: Early learning's "Toys and crayons" shelf (tools pass 33; was "reached from Product guide", which it never was)
         id == 'pp_leaps' || // reading in the shared reader, not a tool (tools pass D4, 2026-10-25)
         // You, Maa's "10 minutes for you today" (door 3, M1): it opens a page
         // or a class picked for her week, not a tool of its own.

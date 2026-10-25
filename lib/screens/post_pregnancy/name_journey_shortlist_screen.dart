@@ -21,10 +21,12 @@ import '../products/pv_store_chrome.dart' show PvCommit, kPvInk, pvStorePalette;
 import '../v2/v2_palette.dart';
 import 'journal_v2/journal_capture_screens.dart';
 import 'name_journey_detail_screen.dart';
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class NameJourneyShortlistScreen extends StatelessWidget {
   const NameJourneyShortlistScreen({super.key});
@@ -44,13 +46,45 @@ class NameJourneyShortlistScreen extends StatelessWidget {
       animation: NameMatchStore.instance,
       builder: (context, _) {
         final store = NameMatchStore.instance;
-        final names = store.liked.map(babyNameByName).toList();
+        // final names = store.liked.map(babyNameByName).toList(); // kept for revert (tools pass 31): an unknown name showed as Aarav
+        final names = [for (final l in store.liked) ?babyNameOrNull(l)];
+        // ⚠️ THE NAMES YOU BOTH LOVE, AT LAST ON A SCREEN (tools pass 31). The
+        // database has worked this out since 0027 (`pp_name_matches`, which
+        // never says whose vote is whose), but only the retired V1 screen read
+        // it, so "the ones you both love" was a promise nothing kept.
+        final both = [for (final m in store.matches) ?babyNameOrNull(m)];
         return PregToolScaffold(
           hue: 268,
           eyebrow: 'Names you love',
           title: 'Your shortlist',
           intro: 'Every name you swiped right on gathers here - no manual saving. Compare them, then choose.',
           children: [
+            pregToolPad(Text('YOU BOTH LOVE',
+                key: const ValueKey('pp_shortlist_both'),
+                style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: p.ink3))),
+            const SizedBox(height: 8),
+            if (both.isEmpty)
+              pregToolPad(Text(
+                  'Names you both like gather here once your partner likes some too.',
+                  key: const ValueKey('pp_shortlist_both_empty'),
+                  style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)))
+            else
+              pregToolPad(PvRowGroup(p: p, children: [
+                for (final n in both)
+                  PvListRow(
+                    key: ValueKey('pp_shortlist_both_${n.name}'),
+                    p: p,
+                    leading: nameLetterWell(p, n),
+                    title: n.name,
+                    line: n.meaningShort,
+                    meta: n.script,
+                    onTap: () => _push(context, NameJourneyDetailScreen(name: n.name)),
+                  ),
+              ])),
+            const SizedBox(height: 22),
+            pregToolPad(Text('YOUR LIKES',
+                style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: p.ink3))),
+            const SizedBox(height: 8),
             if (names.isEmpty)
               pregToolPad(Column(
                 key: const ValueKey('pp_shortlist_empty'),
@@ -73,14 +107,24 @@ class NameJourneyShortlistScreen extends StatelessWidget {
                     line: n.meaningShort,
                     meta: n.script,
                     onTap: () => _push(context, NameJourneyDetailScreen(name: n.name)),
-                    // The crowned name keeps its star, in ink.
-                    trailing: n.name == store.crowned
-                        ? Row(mainAxisSize: MainAxisSize.min, children: [
-                            Icon(Icons.star_rounded, size: 16, color: kPvInk, semanticLabel: 'Your chosen name'),
-                            const SizedBox(width: 4),
-                            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
-                          ])
-                        : null,
+                    // The crowned name keeps its star, in ink. Every row can
+                    // be taken off the list (tools pass 31); it had no remove.
+                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                      if (n.name == store.crowned) ...[
+                        Icon(Icons.star_rounded, size: 16, color: kPvInk, semanticLabel: 'Your chosen name'),
+                        const SizedBox(width: 2),
+                      ],
+                      IconButton(
+                        key: ValueKey('pp_shortlist_remove_${n.name}'),
+                        tooltip: 'Take ${n.name} off your shortlist',
+                        icon: Icon(Icons.close_rounded, size: 18, color: p.ink3),
+                        onPressed: () {
+                          store.unlike(n.name);
+                          pvToast(context, '${n.name} is off your shortlist.',
+                              action: 'Undo', onAction: () => store.like(n.name));
+                        },
+                      ),
+                    ]),
                   ),
               ])),
               if (names.length >= 2) ...[
@@ -462,15 +506,55 @@ class NameChosenScreen extends StatelessWidget {
               key: const ValueKey('pp_name_chosen_story'),
               label: "Begin ${n.name}'s story",
               icon: Icons.edit_note_rounded,
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WriteStoryScreen())),
+              // onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WriteStoryScreen())), // kept for revert: a blank page
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                  builder: (_) => WriteStoryScreen(initialTitle: 'The story behind ${n.name}'))),
             ),
           ]),
         )),
         const SizedBox(height: 16),
-        pregToolPad(PregNote(
-          '${n.name} will gently flow through ParentVeda - Child Profile, Journal, Storybook and Namkaran - so you never enter it again.',
-          icon: Icons.check_circle_outline_rounded,
-        )),
+        // ⚠️ A PROMISE NOTHING KEPT (tools pass 31, O2). Nothing outside this
+        // tool read the crown, so the name never reached the profile, journal
+        // or storybook. Now she is ASKED, once, and only when a child on
+        // record still has no name; her tap is the consent, and the name goes
+        // through the child store's own save and sync.
+        // pregToolPad(PregNote(
+        //   '${n.name} will gently flow through ParentVeda - Child Profile, Journal, Storybook and Namkaran - so you never enter it again.',
+        //   icon: Icons.check_circle_outline_rounded,
+        // )), // kept for revert
+        AnimatedBuilder(
+          animation: ChildProfileStore.instance,
+          builder: (context, _) => ppNameOfferFor(n.name)
+              ? pregToolPad(Container(
+                  key: const ValueKey('pp_name_use_offer'),
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    Text("Use ${n.name} as your baby's name?",
+                        style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w600, height: 1.3, color: p.ink1)),
+                    const SizedBox(height: 6),
+                    Text("It goes on your baby's profile, so pages that say \"your baby\" use it. You can change it there any time.",
+                        style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
+                    const SizedBox(height: 14),
+                    PvCommit(
+                      key: const ValueKey('pp_name_use_yes'),
+                      label: 'Use ${n.name}',
+                      onTap: () {
+                        ChildProfileStore.instance.update(name: n.name);
+                        pvToast(context, "${n.name} is now on your baby's profile.");
+                      },
+                    ),
+                  ]),
+                ))
+              : pregToolPad(PregNote(
+                  '${n.name} stays starred in your shortlist.',
+                  icon: Icons.check_circle_outline_rounded,
+                )),
+        ),
       ],
     );
   }
@@ -540,5 +624,29 @@ class NameChosenScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Offer to put a chosen name on the child (tools pass 31, O2): only when a
+/// child is on record and still carries the placeholder name. Never for a
+/// pregnancy, which has no record to name yet.
+bool ppNameOfferFor(String name) {
+  final store = ChildProfileStore.instance;
+  if (!store.hasRealChild) return false;
+  return store.active.name == Child.placeholder;
+}
+
+/// The heart, everywhere a name has one (tools pass 31): a second tap takes
+/// the name back off (it was a silent tap), and every tap says what changed.
+void ppToggleNameLike(BuildContext context, String name) {
+  final store = NameMatchStore.instance;
+  if (store.isLiked(name)) {
+    store.unlike(name);
+    pvToast(context, '$name is off your shortlist.',
+        action: 'Undo', onAction: () => store.like(name));
+  } else {
+    store.like(name);
+    pvToast(context, '$name is in your shortlist.',
+        action: 'Undo', onAction: () => store.unlike(name));
   }
 }

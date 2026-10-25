@@ -404,10 +404,18 @@ void main() {
     });
 
     test('the collection 7 library IS the player\'s library', () {
-      final slots = _page('sleep_sounds_library').blocks.whereType<PpAudioSlot>().toList();
-      final tracks = [for (final c in kPpSoundCategories) ...c.tracks];
+      final page = _page('sleep_sounds_library');
+      final slots = page.blocks.whereType<PpAudioSlot>().toList();
+      // A recorded track is a link that opens the player, not an inert slot
+      // (tools pass 30, 2026-10-26); the rest are slots, in the player's order.
+      final tracks = [for (final c in kPpSoundCategories) ...c.tracks.where((t) => !t.isLive)];
       expect(slots.map((s) => s.slotId).toList(), tracks.map((t) => t.slotId).toList(),
           reason: 'same tracks, same order, same ids');
+      final live = [for (final c in kPpSoundCategories) ...c.tracks.where((t) => t.isLive)];
+      final links = page.blocks.whereType<PpLink>().where((l) => l.surfaceId == 'pp_sleep_sounds');
+      for (final t in live) {
+        expect(links.any((l) => l.label.startsWith(t.title)), isTrue, reason: '${t.title} plays from the page');
+      }
     });
 
     test('the tanpura drone shares Shravan\'s file', () {

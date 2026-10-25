@@ -45,8 +45,11 @@ final PpDoor kPpEarlyLearningDoor = PpDoor(
       hue: 42,
       areaIds: ['today', 'montessori'],
       tools: [
+        // EL7, built in the tools pass (33, 2026-10-26): named for what the
+        // shelf holds. Nothing called a story box or activity box is stocked.
+        // Was 'Story books, crayons and activity boxes', kept for revert.
         PpDoorTool(
-          label: 'Story books, crayons and activity boxes',
+          label: 'Toys and crayons',
           blurb: 'Only where buying something genuinely helps. Everything on '
               'this door works without any of it.',
           surfaceId: 'pp_recos',

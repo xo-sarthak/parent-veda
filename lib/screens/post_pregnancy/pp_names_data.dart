@@ -115,7 +115,7 @@ const List<BabyName> kBabyNamesAuthored = [
       ('Aarav', 'peaceful'),
       ('Reyansh', 'ray of light'),
     ],
-    mutual: true,
+    // mutual: true, // a leftover fake-match flag (tools pass 31); a match is `NameMatchStore.isMatch` now, kept for revert
   ),
   BabyName(
     name: 'Reyansh',
@@ -138,7 +138,7 @@ const List<BabyName> kBabyNamesAuthored = [
       ('Vihaan', 'dawn'),
       ('Aarush', 'first light'),
     ],
-    mutual: true,
+    // mutual: true, // a leftover fake-match flag (tools pass 31); a match is `NameMatchStore.isMatch` now, kept for revert
   ),
   BabyName(
     name: 'Kabir',
@@ -161,7 +161,7 @@ const List<BabyName> kBabyNamesAuthored = [
       ('Arjun', 'bright'),
       ('Aarav', 'peaceful'),
     ],
-    mutual: true,
+    // mutual: true, // a leftover fake-match flag (tools pass 31); a match is `NameMatchStore.isMatch` now, kept for revert
   ),
   BabyName(
     name: 'Aarush',
@@ -568,6 +568,18 @@ String ppRashiNote(String name) {
 /// Lookup by name (used by detail/similar links). Falls back to Aarav.
 BabyName babyNameByName(String name) =>
     kBabyNames.firstWhere((n) => n.name == name, orElse: () => kBabyNames.first);
+
+/// ⚠️ THE SAFE LOOKUP FOR A LIST OF HER VOTES (tools pass 31, 2026-10-26).
+/// `babyNameByName` falls back to Aarav, which is right for a link that must
+/// land somewhere and wrong for a shortlist: a cloud vote for a name this
+/// build doesn't know (a catalogue line renamed, a newer app's name) showed up
+/// in her shortlist as "Aarav", a name she never picked. A list drops it.
+BabyName? babyNameOrNull(String name) {
+  for (final n in kBabyNames) {
+    if (n.name == name) return n;
+  }
+  return null;
+}
 
 // -----------------------------------------------------------------------------
 //  Filter options + query for the "who are we naming" step.
@@ -996,6 +1008,38 @@ class NameMatchStore extends ChangeNotifier with CloudMergedStore {
     if (_liked.remove(name)) notifyListeners();
     _skipped.add(name);
     // _pushVote(name, false); // kept for revert
+    _vote(name);
+  }
+
+  /// She has said something about this name, either way. The deck leaves these
+  /// out (tools pass 31): every visit used to start again at the first card
+  /// and ask about names she had already answered.
+  bool hasVoted(String name) => _liked.contains(name) || _skipped.contains(name);
+
+  /// The heart, tapped again (tools pass 31). It was a silent tap: the hearts
+  /// only ever called [like], so a liked name could not be taken back.
+  ///
+  /// ⚠️ A TOMBSTONE, NOT A DELETE. This writes the row as `liked: false` with a
+  /// newer time, the same as [skip]. Deleting the row would lose to the other
+  /// phone, whose older copy still says "liked": a newest-wins merge can only
+  /// compare two rows that exist, so a missing row brings the old one back.
+  /// See BACKEND-PATTERNS, "taking a vote back".
+  void unlike(String name) {
+    if (_crowned == name) _crowned = '';
+    skip(name);
+    notifyListeners();
+  }
+
+  /// Undo in the deck (tools pass 31): the card comes back and so does her
+  /// silence about it. Undo used to move the card back and leave the like in
+  /// the shortlist. The cloud has no "no vote" row, so the row it holds says
+  /// `liked: false`; only this phone forgets that she answered, so the card
+  /// is asked again and her next answer overwrites the row.
+  void clearVote(String name) {
+    final was = _liked.remove(name) | _skipped.remove(name);
+    if (!was) return;
+    if (_crowned == name) _crowned = '';
+    notifyListeners();
     _vote(name);
   }
 

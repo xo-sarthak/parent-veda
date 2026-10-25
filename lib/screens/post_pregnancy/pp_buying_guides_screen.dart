@@ -22,6 +22,16 @@ import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show pvStorePalette;
 import '../reader/pv_reader_screen.dart';
+import 'pp_surface_router.dart' show ppPushSurface;
+
+/// One guide, opened in the reader with its "Shop this" working
+/// (`pp_buying_guides/<key>`, tools pass 32). Null for a guide that isn't
+/// written: the router's S8 answers it.
+Widget? ppBuyingGuideScreen(String key) {
+  final r = ppBuyingGuideById(ppBuyingGuideId(key));
+  if (r == null) return null;
+  return PvReaderScreen(read: r, lang: PvType.lang, openSurface: ppPushSurface);
+}
 
 class PpBuyingGuidesScreen extends StatelessWidget {
   const PpBuyingGuidesScreen({super.key});
@@ -34,8 +44,10 @@ class PpBuyingGuidesScreen extends StatelessWidget {
       hue: 12,
       eyebrow: 'What to buy',
       mark: IntentMark.listMark,
-      title: 'How to choose',
-      intro: 'What matters and what you can skip, for the things worth getting right. '
+      // title: 'How to choose', // kept for revert (tools pass 32)
+      // The Tools tab's "Product guide" lands here now; the page is named for it.
+      title: 'Product guide',
+      intro: 'How to choose: what matters and what you can skip, for the things worth getting right. '
           'No brands and no rankings: buy less, and buy safer.',
       children: [
         pregToolPad(PvRowGroup(p: p, children: [
@@ -51,7 +63,8 @@ class PpBuyingGuidesScreen extends StatelessWidget {
                 pvCommitFeedback();
                 Navigator.of(context).push(MaterialPageRoute<void>(
                   settings: RouteSettings(name: 'pp/read/${r.id}'),
-                  builder: (_) => PvReaderScreen(read: r, lang: PvType.lang),
+                  // builder: (_) => PvReaderScreen(read: r, lang: PvType.lang), // kept for revert (tools pass 32): no "Shop this"
+                  builder: (_) => PvReaderScreen(read: r, lang: PvType.lang, openSurface: ppPushSurface),
                 ));
               },
             ),

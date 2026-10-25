@@ -92,7 +92,13 @@ class PregToolScaffold extends StatelessWidget {
     this.variant = 2,
     this.action,
     this.scrollController,
+    this.bottom,
   });
+
+  /// Pinned under the scroll, outside it (tools pass 30): Sleep Sounds' pause
+  /// bar, which must be reachable without scrolling back. Null for every
+  /// other tool, and the page is exactly as before.
+  final Widget? bottom;
 
   /// The hue of the tool's group on the Tools hub, so the field and the row she
   /// tapped are the same colour.
@@ -132,6 +138,7 @@ class PregToolScaffold extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: p.ground,
+      bottomNavigationBar: bottom,
       body: Stack(children: [
         Positioned.fill(
           child: V3HeroField(

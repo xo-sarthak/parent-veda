@@ -1,5 +1,7 @@
 # Door 8: Behaviour, the plan
 
+**Built elsewhere (2026-10-26):** BH2's tool side (the four family scripts, "Read the whole thing", the pages for the three scripts without one, the empty-search line, `pp_scripts/<id>` and the six page links) was built in the tools pass, `docs/pp-tool-plans/29-33-other.md`. This door's build does only the door-side work.
+
 Written 2026-10-25. **Status: final. BH1 to BH8 answered yes by the user 2026-10-25.** The recommendations were then checked against what parents actually search (below), and BH1, BH5 and BH7 were adjusted to match. The new copy is in `08-behaviour-content.md`. Nothing in `lib/` changes until step 0 (S1 to S11) and the user's go.
 
 ## Context

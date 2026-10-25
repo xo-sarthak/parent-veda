@@ -9,8 +9,45 @@
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
+import '../pregnancy/preg_chrome.dart' show PregNote;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../products/pv_store_chrome.dart' show pvStorePalette;
+import '../v2/v2_palette.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
+
+// ⚠️ TRADITION, SAID AS TRADITION (tools pass 31, O7). These pages stated
+// custom as fact: "RULING PLANET", "Auspicious for Aanya", a lucky day, and a
+// paragraph about the CHILD ("a child who likes to do things their own way").
+// A name cannot tell a parent who her child will be, and the app must not
+// sound as if it can. The tiles stay, because families ask for them; every
+// line now says whose belief it is, and the note that says so comes FIRST,
+// not at the foot. The pages also move onto the tools' shell: no lavender, no
+// purple gradient. The pages before are `_buildBeforeShell`, kept for revert.
+const String _kAstroNote = 'A family tradition, not a prediction. A name does not '
+    'decide who your child will be. For a chart, a family astrologer works from '
+    'the exact birth time and place.';
+
+Widget _astroRow(V2Palette p, String label, String value) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label.toUpperCase(),
+            style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: p.ink3)),
+        const SizedBox(height: 4),
+        Text(value, style: pvManrope(fontSize: 15, height: 1.5, color: p.ink1)),
+      ]),
+    );
+
+Widget _astroCard(V2Palette p, List<Widget> rows) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rows),
+    );
 
 class NameAstrologyScreen extends StatelessWidget {
   const NameAstrologyScreen({super.key, required this.name});
@@ -20,6 +57,36 @@ class NameAstrologyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final n = babyNameByName(name);
+    final num = numProfile(n.numerology);
+    final p = pvStorePalette;
+    return PregToolScaffold(
+      hue: 268,
+      eyebrow: 'Astrology · a family tradition',
+      title: 'The stars for ${n.name}',
+      intro: 'What families who follow jyotish link with this name, offered the way an elder might.',
+      children: [
+        pregToolPad(PregNote(_kAstroNote, icon: Icons.info_outline_rounded)),
+        const SizedBox(height: 16),
+        pregToolPad(_astroCard(p, [
+          _astroRow(p, 'Traditionally linked to', '${num.planet}, through name-number ${n.numerology}'),
+          _astroRow(p, 'Nakshatra and sound', n.nakshatra),
+        ])),
+        const SizedBox(height: 16),
+        pregToolPad(Text('Families who follow this say', style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1))),
+        const SizedBox(height: 8),
+        pregToolPad(_astroCard(p, [
+          _astroRow(p, 'Day', num.luckyDay),
+          _astroRow(p, 'Element', num.element),
+          _astroRow(p, 'Colours', num.luckyColour),
+        ])),
+      ],
+    );
+  }
+
+  // Kept for revert (tools pass 31): the page before the shell and the hedged words.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final n = babyNameByName(name);
     final p = numProfile(n.numerology);
     return Scaffold(
@@ -123,6 +190,31 @@ class NameNumerologyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final n = babyNameByName(name);
+    final num = numProfile(n.numerology);
+    final p = pvStorePalette;
+    return PregToolScaffold(
+      hue: 268,
+      eyebrow: 'Numerology · a family tradition',
+      title: "${n.name}'s number is ${n.numerology}",
+      intro: "Worked out from the Chaldean values of the name's letters, added and reduced to one digit.",
+      children: [
+        pregToolPad(PregNote(_kAstroNote, icon: Icons.info_outline_rounded)),
+        const SizedBox(height: 16),
+        // The blurb about the CHILD ("a child who likes to do things their own
+        // way") is not shown: it predicts a person from a name. Kept in the data.
+        pregToolPad(_astroCard(p, [
+          _astroRow(p, 'In numerology, ${n.numerology} is linked with', '${num.vibe} (${num.planet})'),
+          _astroRow(p, 'The words the tradition uses', num.traits),
+          _astroRow(p, 'Day and colours it is linked with', '${num.luckyDay} · ${num.luckyColour}'),
+        ])),
+      ],
+    );
+  }
+
+  // Kept for revert (tools pass 31): the page before the shell and the hedged words.
+  // ignore: unused_element
+  Widget _buildBeforeShell(BuildContext context) {
     final n = babyNameByName(name);
     final p = numProfile(n.numerology);
     return Scaffold(

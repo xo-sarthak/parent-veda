@@ -162,12 +162,21 @@ final PpSection kPpEarlyLearningSection = PpSection(
       surfaceId: 'pp_milestones', // was 'pp_development', which opens the Development door (DV3)
       icon: Icons.timeline_outlined,
     ),
+    // EL7 (tools pass 33): was 'Story books, crayons and activity boxes'.
     PpSectionTool(
-      label: 'Story books, crayons and activity boxes',
+      label: 'Toys and crayons',
       blurb: 'Only where buying something really helps. Everything in this '
           'door works without any of it.',
       surfaceId: 'pp_recos',
       icon: Icons.shopping_bag_outlined,
+    ),
+    // The story books the old name promised are on the Reading shelf: 285,
+    // by age. They were reachable only from More › Read (tools pass 33).
+    PpSectionTool(
+      label: 'Picture books by age',
+      blurb: 'Books to read together, for his age first. Free to browse.',
+      surfaceId: 'pp_read',
+      icon: Icons.menu_book_outlined,
     ),
     PpSectionTool(
       label: 'The early learning masterclass',
@@ -6371,11 +6380,24 @@ const PpArea _school = PpArea(
           surfaceId: 'pp_courses',
           role: 'school_readiness',
         ),
+        // Was one link, 'Bags, boxes, bottles and shoes', to the whole store
+        // (tools pass 33). Kept for revert. Now the tiffin shelf and the
+        // first shoes guide, which exist.
+        // PpLink(
+        //   'Bags, boxes, bottles and shoes',
+        //   surfaceId: 'pp_recos',
+        //   blurb: 'Only the few things that really matter, and what makes one '
+        //       'lunch box easier for a four-year-old to open than another.',
+        // ),
         PpLink(
-          'Bags, boxes, bottles and shoes',
-          surfaceId: 'pp_recos',
-          blurb: 'Only the few things that really matter, and what makes one '
-              'lunch box easier for a four-year-old to open than another.',
+          'Lunch boxes and bottles',
+          surfaceId: 'pp_products/Tiffin boxes',
+          blurb: 'Ones a four-year-old can open on her own.',
+        ),
+        PpLink(
+          'Choosing first shoes',
+          surfaceId: 'pp_buying_guides/first_shoes',
+          blurb: 'Soft, flexible and roomy, and barefoot at home.',
         ),
       ],
     ),

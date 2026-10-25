@@ -650,7 +650,8 @@ final PpArea _breastfeeding = PpArea(
         ),
         PpLink(
           'Compare breast pumps',
-          surfaceId: 'pp_product_guide',
+          // surfaceId: 'pp_product_guide', // kept for revert (tools pass 32): it opened the shop
+          surfaceId: 'pp_buying_guides/breast_pump',
           blurb: 'What matters, what to ignore, and the mistake most people '
               'make when choosing one.',
         ),

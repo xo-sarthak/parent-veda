@@ -10,10 +10,12 @@
 //  option opens a no-swipe browsable list. Match celebration is gentle.
 // =============================================================================
 
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../pregnancy/preg_chrome.dart' show PregNote;
@@ -33,8 +35,18 @@ const Color _feelBg = Color(0xFFEDE6F5);
 enum _Phase { quiz, primer, swipe }
 
 class NameJourneyFeedScreen extends StatefulWidget {
-  const NameJourneyFeedScreen({super.key, this.collection});
+  const NameJourneyFeedScreen({super.key, this.collection, this.startAtQuiz = false});
   final NameCollection? collection;
+
+  /// Open on the taste quiz even when her taste is remembered: the home's
+  /// "Change what you see" row (tools pass 31).
+  final bool startAtQuiz;
+
+  /// Her quiz answers, on this phone only (tools pass 31). They tune what
+  /// comes first and nothing else, so they are a convenience, not her data:
+  /// never synced. Kept so a second visit goes straight to the names; it used
+  /// to take four taps to the first card on every visit.
+  static const String tasteKey = 'pp_names_taste';
 
   @override
   State<NameJourneyFeedScreen> createState() => _NameJourneyFeedScreenState();
@@ -73,9 +85,36 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
   String? _pending;
   static const double _threshold = 96;
 
+  Future<void> _loadTaste() async {
+    if (widget.startAtQuiz || widget.collection != null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(NameJourneyFeedScreen.tasteKey);
+      if (raw == null || !mounted || _phase != _Phase.quiz) return;
+      final m = jsonDecode(raw) as Map<String, dynamic>;
+      _who = ((m['who'] as num?) ?? 2).toInt().clamp(0, _genders.length - 1);
+      _vibes
+        ..clear()
+        ..addAll(((m['vibes'] as List?) ?? const []).map((e) => e.toString()));
+      _community = (m['community'] ?? 'Any').toString();
+      _region = (m['region'] ?? 'Any').toString();
+      _startSwiping();
+    } catch (_) {/* ask the quiz again */}
+  }
+
+  Future<void> _saveTaste() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          NameJourneyFeedScreen.tasteKey,
+          jsonEncode({'who': _who, 'vibes': _vibes.toList(), 'community': _community, 'region': _region}));
+    } catch (_) {}
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadTaste();
     _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 260))
       ..addListener(() => setState(() => _drag = Offset.lerp(_animFrom, _animTo, Curves.easeOut.transform(_ctrl.value))!))
       ..addStatusListener((s) {
@@ -86,7 +125,8 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
         if (pending == 'like') {
           _commitLike();
         } else if (pending == 'pass') {
-          _next();
+          // _next(); // kept for revert (tools pass 31): a pass recorded nothing
+          _commitPass();
         } else {
           setState(() {});
         }
@@ -121,7 +161,19 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
     super.dispose();
   }
 
-  List<BabyName> get _deck {
+  /// The deck she is swiping, fixed when the swiping starts (tools pass 31).
+  /// It leaves out every name she has already answered, so a second visit
+  /// carries on instead of starting again at the first card. Fixed, not live:
+  /// a live list would shrink under her thumb with each like and skip a card.
+  List<BabyName>? _frozen;
+
+  /// The names she answered in this deck, in order, so Undo can take back
+  /// the last answer and not just move the card.
+  final List<String> _answered = [];
+
+  List<BabyName> get _deck => _frozen ?? _fullDeck;
+
+  List<BabyName> get _fullDeck {
     // A passed collection (legacy) wins; otherwise the deck honours the quiz.
     if (widget.collection != null) {
       final c = widget.collection!.names;
@@ -140,6 +192,14 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
   BabyName? get _current => _done ? null : _deck[_index];
 
   void _startSwiping() {
+    final all = _fullDeck;
+    final fresh = [for (final n in all) if (!_store.hasVoted(n.name)) n];
+    // Everything answered already: show the whole deck again rather than an
+    // end card she never swiped towards.
+    _frozen = fresh.isEmpty ? all : fresh;
+    _index = 0;
+    _answered.clear();
+    if (widget.collection == null) _saveTaste();
     setState(() => _phase = _Phase.swipe);
     _hint.forward(from: 0); // one gentle nudge so the first card looks movable
   }
@@ -154,15 +214,31 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
         if (_index > 0) {
           _index--;
           if (_interactions > 0) _interactions--;
+          // The answer goes with the card (tools pass 31). Undo used to bring
+          // the card back and leave the like in her shortlist.
+          if (_answered.isNotEmpty) _store.clearVote(_answered.removeLast());
         }
       });
+
+  /// "Not for us" (tools pass 31). A pass used to move on and record nothing,
+  /// so the same names came back on every visit.
+  void _commitPass() {
+    final n = _current;
+    if (n != null) {
+      _store.skip(n.name);
+      _answered.add(n.name);
+    }
+    _next();
+  }
 
   void _commitLike() {
     final n = _current;
     if (n == null) return;
     _store.like(n.name);
+    _answered.add(n.name);
     _interactions++;
-    if (n.mutual) {
+    // if (n.mutual) { // a fake-match flag on three names; kept for revert (tools pass 31)
+    if (_store.isMatch(n.name)) {
       setState(() {
         _matched = n;
         _showMatch = true;
@@ -640,7 +716,8 @@ class _NameJourneyFeedScreenState extends State<NameJourneyFeedScreen> with Tick
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     const Icon(Icons.favorite, size: 30, color: ppCoral),
                     const SizedBox(height: 12),
-                    Text('You loved', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink2)),
+                    // Text('You loved', ...) // kept for revert (tools pass 31): it opens only on a real match now
+                    Text('You both love', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink2)),
                     const SizedBox(height: 4),
                     Text(n.name, textAlign: TextAlign.center,
                         style: pvFraunces(fontSize: 34, fontWeight: FontWeight.w600, height: 1.05, color: p.ink1)),

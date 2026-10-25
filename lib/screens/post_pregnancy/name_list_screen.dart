@@ -224,10 +224,11 @@ class _NameListScreenState extends State<NameListScreen> {
       // A large, labelled like target: no gesture required.
       trailing: Semantics(
         button: true,
-        label: liked ? '${n.name} is in your shortlist' : 'Add ${n.name} to shortlist',
+        label: liked ? 'Take ${n.name} off your shortlist' : 'Add ${n.name} to shortlist',
         excludeSemantics: true,
         child: InkWell(
-          onTap: () => NameMatchStore.instance.like(n.name),
+          // onTap: () => NameMatchStore.instance.like(n.name), // kept for revert (tools pass 31): a liked heart did nothing
+          onTap: () => ppToggleNameLike(context, n.name),
           borderRadius: BorderRadius.circular(999),
           child: SizedBox(
             width: 48,

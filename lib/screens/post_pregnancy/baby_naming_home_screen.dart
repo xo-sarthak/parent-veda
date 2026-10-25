@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'name_finder_screen.dart';
 import 'name_journey_feed_screen.dart';
 import 'name_journey_shortlist_screen.dart';
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
@@ -48,14 +49,21 @@ class BabyNamingHomeScreen extends StatelessWidget {
     final all = kBabyNames;
     final picks = [for (var i = 0; i < 3 && all.isNotEmpty; i++) all[(day * 7 + i * 131) % all.length]];
     return AnimatedBuilder(
-      animation: NameMatchStore.instance,
+      animation: Listenable.merge([NameMatchStore.instance, ChildProfileStore.instance]),
       builder: (context, _) => PregToolScaffold(
         hue: 268,
         eyebrow: 'Plan and keep',
         mark: IntentMark.pageMark,
         title: 'Baby names',
-        intro: '${all.length} Indian names with their meaning, origin and Devanagari. Swipe through them '
-            'together; the ones you both love gather in one shortlist.',
+        // intro: '${all.length} Indian names with their meaning, origin and Devanagari. Swipe through them '
+        //     'together; the ones you both love gather in one shortlist.', // kept for revert (tools pass 31)
+        // ⚠️ "BOTH" IS TRUE NOW, AND SAID WHERE IT LIVES (tools pass 31). The
+        // names you both love lead the shortlist, read from the database's
+        // own intersection. And once a child has a name, the tool is for the
+        // next baby, so it says so: offered at every age, never hidden.
+        intro: '${ppNamesHasNamedChild() ? 'Naming your next baby. ' : ''}'
+            '${all.length} Indian names with their meaning, origin and Devanagari. Swipe through them '
+            'on your own or with your partner; names you both love come first in your shortlist.',
         children: [
           for (final n in picks) ...[
             pregToolPad(Container(
@@ -87,6 +95,16 @@ class BabyNamingHomeScreen extends StatelessWidget {
           )),
           const SizedBox(height: 22),
           pregToolPad(PvRowGroup(p: p, children: [
+            // The quiz and the primer are asked once (tools pass 31); a later
+            // visit goes straight to the names, and this row changes the taste.
+            PvListRow(
+              key: const ValueKey('pp_names_taste'),
+              p: p,
+              leading: PvMarkWell(p: p, hue: 40, size: 40, icon: Icons.tune_rounded),
+              title: 'Change what you see',
+              line: 'Boy or girl, the feeling, and your community.',
+              onTap: () => _push(context, const NameJourneyFeedScreen(startAtQuiz: true)),
+            ),
             PvListRow(
               key: const ValueKey('pp_names_loved'),
               p: p,
@@ -293,3 +311,8 @@ class BabyNamingHomeScreen extends StatelessWidget {
     ];
   }
 }
+
+/// A child with a real name is on record (tools pass 31), so the names tool
+/// is for the next baby. Shared with pregnancy, where it means an older child.
+bool ppNamesHasNamedChild() => ChildProfileStore.instance.children
+    .any((c) => c.name.trim().isNotEmpty && c.name != Child.placeholder);

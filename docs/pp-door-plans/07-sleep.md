@@ -1,5 +1,7 @@
 # Door 7: Sleep, the plan
 
+**Also (2026-10-26):** the tools pass (`docs/pp-tool-plans/29-33-other.md`) moved Sleep Sounds onto the tool shell, made its timer count from play and survive a stop, put the 2-metre white-noise line on the player and the library page, and made the library's tanpura play.
+
 Written 2026-10-24. **Status: built 2026-10-25, see §12.** SL1 to SL9 answered yes by the user 2026-10-24 (SL9 with "make sure of tab width"), SL10 chosen and recorded 2026-10-25. The new copy is in `07-sleep-content.md`. Proposed shell rule S11 (names never cut at a large text size), built at step 0; its measured test was built with this door.
 
 ## Context

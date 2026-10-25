@@ -143,7 +143,7 @@ const PpArea kBehSpecific = PpArea(
             'immediately comes from that rather than from him. A mat under the '
             'chair settles more arguments than any technique.'),
         PpLink('What to say when it happens',
-            surfaceId: 'pp_scripts',
+            surfaceId: 'pp_scripts/throwing_food', // was the whole tool (tools pass 29, BH2)
             blurb: 'The mealtime lines, ready to use.'),
       ],
     ),
@@ -493,8 +493,8 @@ const PpArea kBehScreens = PpArea(
           ),
         ], heading: 'Words to use'),
         PpWhenLine('Eighteen months and up.'),
-        PpLink('The words, for this and eleven other moments',
-            surfaceId: 'pp_scripts'),
+        PpLink('The words for this, and the other moments',
+            surfaceId: 'pp_scripts/screen_off'), // was the whole tool (tools pass 29, BH2)
       ],
     ),
     PpPage(

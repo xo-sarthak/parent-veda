@@ -39,10 +39,23 @@ class PpScript {
     required this.notThis,
     required this.principle,
     this.pageId,
+    this.words = const [],
+    this.safety,
   });
 
-  /// Stable slug — routing and saved items, never derived from the title.
+  /// Stable slug: routing (`pp_scripts/<id>`), never derived from the title.
+  /// (Was "routing and saved items"; nothing saves a script.)
   final String id;
+
+  /// The words a parent types that are in no line of the script (tools pass
+  /// 29). The Tools row sold "tantrums", and a search for "tantrum" or
+  /// "bedtime" found nothing, because those words were only in page ids and
+  /// comments. Search reads these too; they are never shown.
+  final List<String> words;
+
+  /// A safety line shown on the script itself, above the words (BH2: no honey
+  /// before one). REQUIRED_REVIEW wherever it is set.
+  final String? safety;
 
   /// Phrased as the moment, not as the behaviour: "He won't leave the park",
   /// not "Transitions". A parent searches for what is happening to her.
@@ -67,10 +80,77 @@ class PpScript {
 }
 
 const List<PpScript> kPpScripts = [
+  // ------------------------------------------- the family, under one -----
+  // ⚠️ FOR ANSWERING THE FAMILY, NOT THE BABY (Behaviour BH2, built in the
+  // tools pass, 2026-10-26). The baby tab promised lines for "you are spoiling
+  // him" and "let him cry", and a baby's parent found one script, about
+  // throwing food. Copy: docs/pp-door-plans/08-behaviour-content.md §1.
+  PpScript(
+    id: 'family_spoiling',
+    situation: '"You\'re spoiling him, putting him down is better"',
+    bands: ['infant'],
+    sayThis: [
+      "He's too little to be spoiled. Babies who get picked up when they cry "
+          "end up crying less, not more. I'd rather he learns that someone comes.",
+    ],
+    notThis: ['You did it wrong with your children.'],
+    principle: 'That line turns a care question into a fight about the past. '
+        'One calm sentence about the baby keeps it about the baby.',
+    pageId: 'cant_spoil',
+    words: ['spoil', 'spoiling', 'family', 'mother-in-law', 'saas', 'dadi', 'nani', 'pick up', 'crying'],
+  ),
+  // REQUIRED_REVIEW (child psychologist): the lungs line.
+  PpScript(
+    id: 'family_let_cry',
+    situation: '"Let him cry, it\'s good for his lungs"',
+    bands: ['infant'],
+    sayThis: [
+      "Crying doesn't make his lungs stronger. It just tires him out. I'll try "
+          "to calm him, and if he keeps going, we'll try the next thing together.",
+    ],
+    notThis: ['(a lecture)'],
+    principle: 'One line and a calm pick-up says more than an argument, and it '
+        'invites the family in rather than shutting them out.',
+    pageId: 'crying_normal',
+    words: ['cry', 'crying', 'lungs', 'family', 'let him cry'],
+  ),
+  // REQUIRED_REVIEW (paediatrician, lactation): crying and hunger.
+  PpScript(
+    id: 'family_milk',
+    situation: '"Your milk isn\'t enough, that\'s why he cries"',
+    bands: ['infant'],
+    sayThis: [
+      "Crying isn't a sign of hunger on its own. The doctor checks his weight, "
+          "and that tells us if he's getting enough. I'll ask at his next visit.",
+    ],
+    notThis: ['(anything about how you feed him)'],
+    principle: 'The worry is real, and the weight check answers it. She does '
+        'not have to defend how she feeds to anyone.',
+    pageId: 'bf_how_often',
+    words: ['milk', 'enough', 'hungry', 'feeding', 'breastfeeding', 'family', 'crying'],
+  ),
+  // REQUIRED_REVIEW (paediatrician): no honey before one, janam ghutti.
+  PpScript(
+    id: 'family_honey',
+    situation: '"Give him a little honey, or gripe water"',
+    bands: ['infant'],
+    safety: 'No honey, in any amount, before 1 year. This includes janam '
+        'ghutti made with honey.',
+    sayThis: [
+      "Not honey before his first birthday. The doctor says it can make babies "
+          "very ill. For the crying, I'd rather ask the doctor before giving him anything.",
+    ],
+    notThis: ['That the old ways are wrong.'],
+    principle: 'Say what the doctor says, then stop. It keeps the elders on '
+        'your side and the baby safe.',
+    pageId: 'crying_doctor',
+    words: ['honey', 'gripe water', 'janam ghutti', 'ghutti', 'colic', 'family', 'crying'],
+  ),
+
   // ---------------------------------------------------------- hitting -----
   PpScript(
     id: 'hit_friend',
-    situation: 'She hit another child',
+    situation: 'He hit another child', // was 'She hit another child'; ppFillChild makes it hers (tools pass 29)
     bands: ['toddler_1', 'toddler_2'],
     sayThis: [
       'I will not let you hit. Hitting hurts.',
@@ -150,7 +230,9 @@ const List<PpScript> kPpScripts = [
         'The meltdown is the ambush, not the leaving. A warning plus a choice '
         'inside the boundary gives him somewhere to put his will, and walking '
         'away as a threat frightens him without teaching anything.',
-    pageId: null, // no transitions page yet; see D7
+    // pageId: null, // no transitions page yet; see D7 (kept for revert)
+    pageId: 'beh_tantrum_steps', // the closest page (BH2, tools pass 29)
+    words: ['leaving', 'transition', 'tantrum', 'meltdown', 'time to go'],
   ),
   PpScript(
     id: 'screen_off',
@@ -173,10 +255,11 @@ const List<PpScript> kPpScripts = [
     // Repointed when screen time became its own door. The old `screens` page
     // was retired into `kBehScreens`.
     pageId: 'beh_screen_ending',
+    words: ['tantrum', 'screen', 'tv', 'mobile', 'tablet'],
   ),
   PpScript(
     id: 'shoes',
-    situation: 'She will not put her shoes on',
+    situation: 'He will not put his shoes on', // was 'She will not put her shoes on'
     bands: ['toddler_1', 'toddler_2'],
     sayThis: [
       'Red shoes or blue shoes?',
@@ -215,10 +298,11 @@ const List<PpScript> kPpScripts = [
         'yet — presence is the whole intervention. Giving in to end it works '
         'once and costs you every future shop.',
     pageId: 'first_tantrums',
+    words: ['tantrum', 'meltdown', 'shop', 'supermarket', 'public', 'crying'],
   ),
   PpScript(
     id: 'i_hate_you',
-    situation: 'She said "I hate you"',
+    situation: 'He said "I hate you"', // was 'She said ...'
     bands: ['toddler_2', 'preschool'],
     sayThis: [
       'You are really angry with me. I can hear that.',
@@ -235,6 +319,7 @@ const List<PpScript> kPpScripts = [
         'strongest word she owns. Answering the feeling rather than the word '
         'is what stops it becoming the sentence she reaches for every time.',
     pageId: 'beh_big_feelings',
+    words: ['anger', 'angry', 'feelings', 'rude'],
   ),
 
   // ------------------------------------------------------------ mealtimes -
@@ -263,7 +348,7 @@ const List<PpScript> kPpScripts = [
   ),
   PpScript(
     id: 'refuses_food',
-    situation: 'She refuses to eat what everyone else is eating',
+    situation: 'He refuses to eat what everyone else is eating', // was 'She refuses ...'
     bands: ['toddler_1', 'toddler_2', 'preschool'],
     sayThis: [
       'This is what there is tonight. You can eat it or leave it.',
@@ -279,13 +364,15 @@ const List<PpScript> kPpScripts = [
         'Appetite is one of the very few things she fully controls, so a fight '
         'about food is a fight she can always win. Deciding WHAT is offered and '
         'leaving WHETHER to her ends the fight without ending the meal.',
-    pageId: null, // no mealtime-behaviour page yet; see D7
+    // pageId: null, // no mealtime-behaviour page yet; see D7 (kept for revert)
+    pageId: 'picky_battles', // Feeding's "Mealtime battles" (BH2, tools pass 29)
+    words: ['picky', 'fussy', 'eating', 'meal', 'dinner', 'lunch'],
   ),
 
   // ---------------------------------------------------------- sharing -----
   PpScript(
     id: 'wont_share',
-    situation: 'She will not share at a playdate',
+    situation: 'He will not share at a playdate', // was 'She will not share ...'
     bands: ['toddler_1', 'toddler_2'],
     sayThis: [
       'She is using it right now. You can have a turn when she is finished.',
@@ -326,7 +413,9 @@ const List<PpScript> kPpScripts = [
         'get up again. Boring, calm and identical fifteen times beats one '
         'stern conversation, and threats about the door add fear to a room he '
         'has to sleep in.',
-    pageId: null, // bedtime limits live in Sleep; see D7
+    // pageId: null, // bedtime limits live in Sleep; see D7 (kept for revert)
+    pageId: 'bedtime_routine', // Sleep's "A calming bedtime routine" (BH2, tools pass 29)
+    words: ['bedtime', 'bed', 'sleep', 'night', 'getting up'],
   ),
 ];
 
@@ -343,6 +432,7 @@ List<PpScript> ppScriptSearch(String query) {
   return [
     for (final s in kPpScripts)
       if (s.situation.toLowerCase().contains(q) ||
+          s.words.any((w) => w.contains(q) || q.contains(w)) ||
           s.principle.toLowerCase().contains(q) ||
           s.sayThis.any((l) => l.toLowerCase().contains(q)) ||
           s.notThis.any((l) => l.toLowerCase().contains(q)))

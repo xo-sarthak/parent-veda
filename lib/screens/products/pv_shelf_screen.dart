@@ -74,9 +74,19 @@ class PvShelfFilters {
 }
 
 class PvShelfScreen extends StatefulWidget {
-  const PvShelfScreen({super.key, required this.categoryId, this.subId});
+  const PvShelfScreen({super.key, required this.categoryId, this.subId, this.subIds, this.title});
   final String categoryId;
   final String? subId;
+
+  /// A shelf of SEVERAL kinds out of one category (tools pass 33, Early
+  /// learning EL7): "Toys and crayons" is Montessori, crayons, language, play
+  /// dough, craft and puzzles, not all 281 toys and not one kind. The chips
+  /// show only these kinds and "All" means all of them. Null: the whole
+  /// category, as before.
+  final Set<String>? subIds;
+
+  /// The shelf's name when it is not the category's (with [subIds]).
+  final String? title;
 
   @override
   State<PvShelfScreen> createState() => _PvShelfScreenState();
@@ -98,8 +108,10 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
       );
 
   List<PvProduct> _results() {
+    final only = widget.subIds;
     final list = PvCatalogStore.instance
         .inCategory(widget.categoryId, subId: _sub)
+        .where((p) => only == null || only.contains(p.subId))
         .where(_f.pass)
         .toList();
     switch (_sort) {
@@ -190,7 +202,7 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
                 ),
               ),
               Text(
-                cat.name,
+                widget.title ?? cat.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: pvFraunces(
@@ -230,7 +242,8 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
           selected: _sub == null,
           onTap: () => setState(() => _sub = null),
         ),
-        for (final s in cat.subs) ...[
+        for (final s in cat.subs)
+          if (widget.subIds == null || widget.subIds!.contains(s.id)) ...[
           const SizedBox(width: 6),
           PvChip(
             label: s.shortName,

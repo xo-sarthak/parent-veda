@@ -15,7 +15,9 @@ import 'package:parentveda/screens/reader/pv_reader_screen.dart';
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  test('six guides: car seat, cot, pram, carrier, high chair, first shoes', () {
+  // Seven since the tools pass (32, 2026-10-26): Feeding's "Compare breast
+  // pumps" promised a guide and opened the shop.
+  test('seven guides: car seat, cot, pram, carrier, high chair, first shoes, breast pump', () {
     expect(kPpBuyingGuides.map((r) => r.title.en), [
       'Choosing a car seat',
       'Choosing a cot and mattress',
@@ -23,6 +25,7 @@ void main() {
       'Choosing a baby carrier',
       'Choosing a high chair',
       'Choosing first shoes',
+      'Choosing a breast pump',
     ]);
   });
 

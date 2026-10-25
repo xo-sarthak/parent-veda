@@ -7,15 +7,19 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:parentveda/screens/post_pregnancy/pp_behaviour_content.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_section_registry.dart' show kPpSections;
+// import 'package:parentveda/screens/post_pregnancy/pp_behaviour_content.dart'; // kept for revert (tools pass 29): the page check reads every section now
 import 'package:parentveda/screens/post_pregnancy/pp_scripts_data.dart';
 
 void main() {
-  test('every script page link resolves to a real behaviour page', () {
+  // Was "a real behaviour page" (tools pass 29): the mealtime script's page is
+  // Feeding's and the bedtime one's is Sleep's, and the screen opens any
+  // section's page through `pp_page/<section>/<page>` (`ppOpenScriptPage`).
+  test('every script page link resolves to a real page in some section', () {
     for (final s in kPpScripts) {
       final id = s.pageId;
       if (id == null) continue;
-      expect(kPpBehaviourSection.pageById(id), isNotNull,
+      expect(kPpSections.any((sec) => sec.pageById(id) != null), isTrue,
           reason: 'Script "${s.situation}" links to "$id", which is not a page '
               'in the behaviour section. `_openPageById` does NOTHING for an '
               'unknown id rather than throwing, so this fails silently on a '

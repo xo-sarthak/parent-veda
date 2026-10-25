@@ -11183,3 +11183,18 @@ recipe page is a tool page, not a read (D3):** cook mode, the shopping list and 
   not a field. Harmless as written ("after a caesarean, ...").
 - *Kegel Care and the Can I search field keep Material icons* (`PregNote`, `PregFoldRow`, the field's glyph).
   They come from pregnancy's shared tool chrome; changing them is a shell change. No drawn search mark exists.
+
+**§102.10 Other tools (tools pass 29-33, 2026-10-26; `docs/pp-tool-plans/29-33-other.md`).**
+- *Pregnancy's product guide tile* (`tools_hub_screen.dart:615`, `surface_router.dart:93`) still opens the store
+  facade with no on-screen back. Parenting's `pp_product_guide` opens the guides now; pregnancy's is its own.
+- *The retired guide screens and `ProductGuideVotes`* (`pg_votes`) still sync with no live writer. Kept for revert.
+- *23 of 24 sleep sounds are not recorded,* and their library slots keep the shared audio placeholder, whose toast
+  says "the words are written on this page". The player's own rows say "still being recorded" (SL4).
+- *A crowned name is not cleared when a new pregnancy starts;* one shortlist per person, and the crown moves only
+  when she chooses another. Naming a pregnancy waits on `pregnancies` (0114) carrying a name.
+- *No potty buying guide* (`pp_product_guide/Potties` keeps its named toast) and no story or activity boxes in
+  stock; Early learning's shop is "Toys and crayons".
+- *Shelves the guides point at that are not stocked* (cots, prams, carriers, high chairs, first shoes) answer with
+  the router's "still choosing" line.
+- *The names detail page* is recoloured to ink and white, not moved onto the shared shell (it has its own sticky
+  bar). The swipe deck's match overlay fires only on a real match, which needs the partner's vote first.

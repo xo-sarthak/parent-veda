@@ -1,5 +1,7 @@
 # Door 9: Early learning, the plan
 
+**Built elsewhere (2026-10-26):** EL7's tool side ("Toys and crayons", one toy shelf of the six kinds, the tiffin shelf and first shoes guide instead of "Bags, boxes, bottles and shoes", and "Picture books by age") was built in the tools pass, `docs/pp-tool-plans/29-33-other.md`. This door's build does only the door-side work.
+
 Written 2026-10-25. **Status: final. EL1 to EL9 are all yes (the user, 2026-10-25).** The user's call: obvious recommendations need no question. I choose them, write the choice down here, and ask only what is genuinely the user's. The one real question was EL3's script for Hindi rhymes. The new copy is in `09-early-learning-content.md`. Nothing in `lib/` changes until step 0 (S1 to S11) and the user's go.
 
 ## Context
