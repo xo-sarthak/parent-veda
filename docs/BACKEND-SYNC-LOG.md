@@ -1448,7 +1448,7 @@ after a yes), `cloud_merged_store_test`, `pp_checkin_rename_test`, `pp_use_conse
 ## Step 20: the Food tools: the foods a child has tried, shared with the co-parent
 
 **Date:** 2026-10-25 (parenting tools pass, Food family 22-24; the user's rule: "make sure the back ends are working
-well"). **Migration:** `0115_pp_food_tries.sql` (the user runs it). **Commit:** pending.
+well"). **Migration:** `0115_pp_food_tries.sql` (the user runs it). **Commit:** `03976a1`.
 
 ### Why
 "Can my baby eat this?" told a parent whether a food suits the child's age, and forgot everything the moment she
