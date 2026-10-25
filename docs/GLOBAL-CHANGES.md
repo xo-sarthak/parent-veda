@@ -134,6 +134,11 @@ Artifacts: `claude.ai/artifact/4hEyPYTGgcXcPLhTx7VgaG` (door) and
 `SkDoor`, `TtcFocusPage` (reuse its commented-out `heroVideoSlot`); the chip
 in each door hero; one video per door listed in `DOOR-CONTENT-OWED.md`.
 
+**Parenting, checked 2026-10-25 (step 0, S4):** nothing to build yet. With no
+chip until the video exists and no door film made, a field would have nothing to
+read it. The field and the chip go in with the first door film. Every parenting
+door plan names its film (for example `family/door_intro`).
+
 ### 6 · Real products — WAITING (user's product master sheet)
 
 When the sheet arrives: a converter like `pv_sheet_products.dart`, with week
@@ -260,7 +265,11 @@ quote cost in USD and INR first).
 Move door opens on "Move today" (session, all videos and classes, Kegel);
 Getting Ready opens on the name finder; TTC Mind & body headings are actions
 (12 rewritten). Held by `test/action_doors_first_test.dart`.
-**OWED:** the same audit on Parenting and Skilling action doors.
+**Parenting, 2026-10-25 (fbb6fae):** `test/pp_doors_first_view_test.dart` opens every
+door at every age, at 1x and 1.5x text, and holds no lock, no overflow, and no
+silent tap. Which tab each door opens on comes from its plan's `tabOrder`, set in
+that door's build, and the action-first check for that door is added then.
+**OWED:** Skilling action doors.
 
 ---
 
