@@ -529,8 +529,16 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                     : (him ? 'An estimate until her due date is added' : 'An estimate · Add your due date'),
                 onAddDueDate: pregnancy.isDueDateSet || him ? null : () => openPregDueDate(context, pregnancy),
                 // "Has your baby arrived?" from week 37, today's week.
+                // From 42 weeks it names what to do (R7, 2026-10-25): today's
+                // days past the due date, never the selected day's. Kept for
+                // revert: ? PregArrivalCard(p: p)
                 footer: PregArrivalPrompt.instance.showsFor(pregnancy.currentWeek)
-                    ? PregArrivalCard(p: p)
+                    ? PregArrivalCard(
+                        p: p,
+                        daysPastDue: pregnancy.isDueDateSet ? -_daysToDue(_today) : 0,
+                        forPartner: him,
+                        onDueDate: him ? null : () => openPregDueDate(context, pregnancy),
+                      )
                     : null,
                 onAvatar: () => openPvYou(context, stage: LifeStage.pregnancy),
                 onSaved: () => Navigator.of(context).push(MaterialPageRoute<void>(

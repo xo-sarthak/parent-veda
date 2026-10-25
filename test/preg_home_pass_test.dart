@@ -216,7 +216,9 @@ void main() {
     //   expect(src, contains('timeLeft: pregTimeLeft('));
     expect(src, contains(': pregTimeLeft(_daysToDue(_selected))'));
     expect(src, contains('pastDueCount: pregPastDueCount('));
-    expect(src, contains('PregArrivalCard(p: p)'));
+    // The card is told today's days past the due date since R7 (2026-10-25).
+    // Kept for revert: expect(src, contains('PregArrivalCard(p: p)'));
+    expect(src, contains('PregArrivalCard(\n                        p: p,'));
     expect(src, contains('case PregInsightGo.scanWindow:'));
   });
 }

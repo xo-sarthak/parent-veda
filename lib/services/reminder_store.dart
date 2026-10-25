@@ -27,6 +27,23 @@ class ReminderStore extends ChangeNotifier {
   final List<Reminder> _items = [];
   bool _loaded = false;
 
+  // ---- after a loss (2026-10-25, STAGE-TRANSITIONS R4) ------------------------
+  //
+  // The loss page promises "the week reminders" stop, and the pregnancy
+  // messages did, but her own pregnancy reminders kept buzzing: "Is your
+  // hospital bag ready?" every evening after she had told us. These two kinds
+  // only make sense while she is pregnant, so a loss pauses them and the undo
+  // brings back exactly the ones it paused (never one she had switched off
+  // herself). Everything else is hers and stays as she set it: water, kegels,
+  // her own reminders, and above all her medicines, which a clinician may
+  // have prescribed for exactly this time.
+  static const Set<String> kPregnancyOnlyCategories = {'bag', 'symptoms'};
+  static const _pausedKey = 'reminders_paused_for_loss';
+  final List<String> _pausedForLoss = [];
+
+  /// The reminders a loss paused, for the undo (and the tests).
+  List<String> get pausedForLoss => List.unmodifiable(_pausedForLoss);
+
   /// Newer-wins sync for her reminders (2026-10-20, sync log step 8, 0106).
   final OwnRowLedger _sync = OwnRowLedger('reminders', 'reminders_sync');
 
@@ -51,6 +68,9 @@ class ReminderStore extends ChangeNotifier {
           ..addAll(list.map(
               (e) => Reminder.fromJson(Map<String, dynamic>.from(e as Map))));
       }
+      _pausedForLoss
+        ..clear()
+        ..addAll(prefs.getStringList(_pausedKey) ?? const []);
     } catch (_) {/* start empty */}
     await _sync.load();
     SyncRegistry.registerPending(() => hasPending);
@@ -115,6 +135,7 @@ class ReminderStore extends ChangeNotifier {
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
     _items.clear();
+    _pausedForLoss.clear();
     _sync
       ..clear()
       ..save();
@@ -342,6 +363,62 @@ class ReminderStore extends ChangeNotifier {
     if (updated.enabled) _scheduleOs(updated);
     _persistNotify();
     _cloudPush(updated); // sync the toggled state to cloud
+  }
+
+  /// A loss: switch off her pregnancy-only reminders that are on, and
+  /// remember which, so [resumeAfterLossUndo] restores exactly those. Each
+  /// one syncs as switched off, so her other phone stops too. Returns how
+  /// many it paused.
+  int pauseForLoss() {
+    var n = 0;
+    for (var i = 0; i < _items.length; i++) {
+      final r = _items[i];
+      if (!r.enabled || !kPregnancyOnlyCategories.contains(r.category)) continue;
+      final off = r.copyWith(enabled: false);
+      _items[i] = off;
+      _cancelOs(off);
+      _cloudPush(off);
+      if (!_pausedForLoss.contains(r.id)) _pausedForLoss.add(r.id);
+      n++;
+    }
+    if (n > 0) _persistNotify();
+    _persistPaused();
+    return n;
+  }
+
+  /// The loss was undone: switch back on the reminders the loss paused, if
+  /// they still exist and are still off. One she removed stays removed.
+  void resumeAfterLossUndo() {
+    var any = false;
+    for (final id in _pausedForLoss) {
+      final i = _items.indexWhere((r) => r.id == id);
+      if (i < 0 || _items[i].enabled) continue;
+      final on = _items[i].copyWith(enabled: true);
+      _items[i] = on;
+      _cancelOs(on);
+      _scheduleOs(on);
+      _cloudPush(on);
+      any = true;
+    }
+    _pausedForLoss.clear();
+    if (any) _persistNotify();
+    _persistPaused();
+  }
+
+  Future<void> _persistPaused() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_pausedKey, _pausedForLoss);
+    } catch (_) {/* best-effort */}
+  }
+
+  @visibleForTesting
+  void debugSeed(List<Reminder> items) {
+    _items
+      ..clear()
+      ..addAll(items);
+    _pausedForLoss.clear();
+    _loaded = true;
   }
 
   void _persistNotify() {

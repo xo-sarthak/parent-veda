@@ -11084,11 +11084,13 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
   respects it is not true yet. BEFORE-LAUNCH.
 - **§101.3 (R3) After a loss, still in pregnancy:** Learn, Tools and More still speak in weeks, and the Ask Veda
   context still sends her week. The Ask Veda part is a change in the service repo.
-- **§101.4 (R4)** Her own reminders (ReminderStore) are not paused after a loss.
+- **§101.4 (R4)** Her own reminders (ReminderStore) are not paused after a loss. BUILT 2026-10-25: the hospital bag and
+  evening check-in reminders pause with the loss and return with its undo; medicines and her own stay on.
 - **§101.5 (R5)** `FamilyProfileStore`'s stage is set only by onboarding (skilling as parenting) and drifts after
   that. Nothing reads it today.
 - **§101.6 (R6)** "Replay onboarding" (developer) rewrites the stage and the stores.
-- **§101.7 (R7)** Nothing prompts past 42 weeks; the arrival card from week 37 is the only nudge.
+- **§101.7 (R7)** Nothing prompts past 42 weeks; the arrival card from week 37 is the only nudge. BUILT 2026-10-25: from
+  42 weeks the card names the three cases (here, wrong date, still pregnant: call the doctor today).
 - **§101.8 (R8)** The Pregnancy door from TTC shows the week-20 placeholder (a preview). Whether to guard it is the
   user's call.
 - **§101.9 (B9) Cloud ids collide across users.** `journey_timeline`, `ttc_cycles` and `ttc_cycle_signals` key rows

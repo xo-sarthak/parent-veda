@@ -23,6 +23,8 @@ import 'dear_baby_vault_store.dart';
 import 'family_timeline.dart';
 import 'life_stage_store.dart';
 import 'pregnancy_controller.dart';
+import 'pregnancy_ended_store.dart';
+import 'reminder_store.dart';
 
 /// Weeks of pregnancy at birth when the baby came early (before 37 weeks),
 /// read from the due date we already hold. Null when on time, with no real due
@@ -85,6 +87,24 @@ Future<void> recordBirth({
     childId: childId,
     name: name,
   );
+}
+
+/// A loss, as she tells us on "If your pregnancy has ended" (STAGE-TRANSITIONS
+/// R4, 2026-10-25). The flag stops the weeks, the tip and the pregnancy
+/// messages, as before; now her own pregnancy-only reminders pause too (the
+/// hospital bag, the evening check-in), because the page promises the week
+/// reminders stop. Her medicines and everything else she set stay on. The
+/// stage stays pregnancy: moving on is her own later step.
+Future<void> recordLoss() async {
+  await PregnancyEndedStore.instance.markEnded();
+  ReminderStore.instance.pauseForLoss();
+}
+
+/// "Go back to my pregnancy view": the loss undone, and the reminders the
+/// loss paused switched back on (never one she had turned off herself).
+Future<void> undoLoss() async {
+  await PregnancyEndedStore.instance.undo();
+  ReminderStore.instance.resumeAfterLossUndo();
 }
 
 /// After a loss, "I'm ready. Move to trying to conceive" (STAGE-TRANSITIONS

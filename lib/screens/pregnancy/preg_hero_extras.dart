@@ -18,6 +18,16 @@
 //
 //  Past the due date the hero keeps counting ("40 weeks and 3 days") and
 //  offers "Past your due date: what happens now", the labour door's own read.
+//
+//  ⚠️ FROM 42 WEEKS THE CARD SAYS MORE (2026-10-25, STAGE-TRANSITIONS R7).
+//  Nothing prompted past 42 weeks: the same "Has your baby arrived?" sat there
+//  for as long as the app thought she was pregnant. Two weeks past the due
+//  date, one of three things is true, and the card now names all three:
+//  the baby is here (tell us), the date was wrong (change it: the likeliest,
+//  a scan moved it and nobody updated the app), or she is still pregnant,
+//  and then the one thing we say is to call her doctor or hospital today.
+//  Not a diagnosis, and no advice on what the doctor will do. "Not yet" rests
+//  it for a day instead of three.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -36,6 +46,14 @@ import 'preg_chrome.dart' show pregFilledStyle;
 
 /// The read "Past your due date" opens (the Labour door's own).
 const String kPregPastDueReadId = 'preg_labour_read_past_due';
+
+/// Days past the due date from which the arrival card says more: 42 weeks
+/// and 0 days (R7).
+const int kPregPostTermDays = 14;
+
+/// True from 42 weeks: [daysPastDue] is how many days the due date has passed
+/// (0 or less before it).
+bool pregIsPostTerm(int daysPastDue) => daysPastDue >= kPregPostTermDays;
 
 /// The line under "Day N": how long is left, from [daysToDue] (negative once
 /// the date has passed).
@@ -147,6 +165,9 @@ class PregArrivalPrompt extends ChangeNotifier with CloudMergedStore {
   /// How long "Not yet" rests the card.
   static const Duration rest = Duration(days: 3);
 
+  /// From 42 weeks a day is long enough (R7).
+  static const Duration postTermRest = Duration(days: 1);
+
   DateTime? _until;
   bool _loaded = false;
 
@@ -196,8 +217,8 @@ class PregArrivalPrompt extends ChangeNotifier with CloudMergedStore {
     return u == null || !(now ?? DateTime.now()).isBefore(u);
   }
 
-  Future<void> notYet({DateTime? now}) async {
-    _until = (now ?? DateTime.now()).add(rest);
+  Future<void> notYet({DateTime? now, bool postTerm = false}) async {
+    _until = (now ?? DateTime.now()).add(postTerm ? postTermRest : rest);
     notifyListeners();
     try {
       await (await SharedPreferences.getInstance()).setString(kSnoozeKey, _until!.toIso8601String());
@@ -221,8 +242,23 @@ class PregArrivalPrompt extends ChangeNotifier with CloudMergedStore {
 
 /// The card at the foot of the hero.
 class PregArrivalCard extends StatelessWidget {
-  const PregArrivalCard({super.key, required this.p});
+  const PregArrivalCard({
+    super.key,
+    required this.p,
+    this.daysPastDue = 0,
+    this.forPartner = false,
+    this.onDueDate,
+  });
   final V2Palette p;
+
+  /// How many days the due date has passed today (0 or less before it).
+  final int daysPastDue;
+
+  /// His side: the words speak of her, and he cannot change her date.
+  final bool forPartner;
+
+  /// Opens her due date (R7's "My due date changed"); null on his side.
+  final VoidCallback? onDueDate;
 
   Future<void> _yes(BuildContext context) async {
     pvCommitFeedback();
@@ -235,7 +271,10 @@ class PregArrivalCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final late = pregIsPostTerm(daysPastDue);
+    final weeksPast = daysPastDue ~/ 7;
+    return Container(
         key: const ValueKey('preg_arrival_card'),
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
         decoration: BoxDecoration(
@@ -246,8 +285,20 @@ class PregArrivalCard extends StatelessWidget {
           Text('Has your baby arrived?',
               style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w600, color: p.ink1)),
           const SizedBox(height: 4),
-          Text('Tell us when you are ready. Nothing from your pregnancy is deleted.',
-              style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2)),
+          // Kept for revert, the only line before R7:
+          //   'Tell us when you are ready. Nothing from your pregnancy is deleted.'
+          if (!late)
+            Text('Tell us when you are ready. Nothing from your pregnancy is deleted.',
+                style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2))
+          else
+            Text(
+                key: const ValueKey('preg_arrival_post_term'),
+                forPartner
+                    ? 'Her due date was $weeksPast weeks ago. If your baby is here, tell us when you are ready. '
+                        'If she is still pregnant, she should call her doctor or hospital today.'
+                    : 'Your due date was $weeksPast weeks ago. If your baby is here, tell us when you are ready. '
+                        'If you are still pregnant, call your doctor or hospital today.',
+                style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2)),
           const SizedBox(height: 10),
           Wrap(spacing: 8, runSpacing: 6, children: [
             FilledButton(
@@ -257,11 +308,22 @@ class PregArrivalCard extends StatelessWidget {
               child: Text('Yes, tell ParentVeda',
                   style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
+            // From 42 weeks the date may simply be wrong (R7).
+            if (late && onDueDate != null)
+              TextButton(
+                key: const ValueKey('preg_arrival_due_date'),
+                onPressed: () {
+                  pvCommitFeedback();
+                  onDueDate!();
+                },
+                child: Text('My due date changed',
+                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink1)),
+              ),
             TextButton(
               key: const ValueKey('preg_arrival_not_yet'),
               onPressed: () {
                 pvCommitFeedback();
-                PregArrivalPrompt.instance.notYet();
+                PregArrivalPrompt.instance.notYet(postTerm: late);
               },
               child: Text('Not yet',
                   style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink2)),
@@ -269,4 +331,5 @@ class PregArrivalCard extends StatelessWidget {
           ]),
         ]),
       );
+  }
 }

@@ -132,10 +132,14 @@ const String kPregEndedRowSub =
 const String kPregEndedTitle = "We're so sorry.";
 const List<String> kPregEndedBody = [
   "You don't have to explain anything, and you don't have to do this now.",
+  // R4 (2026-10-25): the reminders it pauses are named, and the ones it
+  // keeps. Kept for revert, the paragraph ended at "your body and your heart."
   "If you'd like, ParentVeda can stop the weekly baby updates, the daily tip "
       "and the week reminders, and your partner's side will stop showing the "
       "week too. In their place there will be a quiet page with help for "
-      "your body and your heart.",
+      "your body and your heart. Your hospital bag and evening check-in "
+      "reminders pause too; reminders for your medicines, and any you set "
+      "yourself, stay as they are.",
   "Nothing you saved is deleted. Your notes, photos, reports and bookmarks "
       "stay just as they are, and you can go back to the weekly view whenever "
       "you want, from this same place.",
@@ -148,9 +152,12 @@ const String kPregEndedUndoTitle = 'Go back to your pregnancy view?';
 const List<String> kPregEndedUndoBody = [
   "You told ParentVeda your pregnancy had ended. If that was a mistake, or "
       "you'd like the weekly view back, you can have it again now.",
+  // R4 (2026-10-25). Kept for revert: "... the week reminders will start
+  // again, and your partner's side will show the week too. Nothing you saved
+  // has changed."
   "The weekly updates, the daily tip and the week reminders will start "
-      "again, and your partner's side will show the week too. Nothing you "
-      "saved has changed.",
+      "again, the reminders we paused come back on, and your partner's side "
+      "will show the week too. Nothing you saved has changed.",
 ];
 const String kPregEndedUndoConfirm = 'Go back to my pregnancy view';
 const String kPregEndedUndoCancel = 'Stay as it is';

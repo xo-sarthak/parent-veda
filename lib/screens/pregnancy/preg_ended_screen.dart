@@ -89,11 +89,15 @@ class PregEndedConfirmScreen extends StatelessWidget {
                     label: ended ? kPregEndedUndoConfirm : kPregEndedConfirm,
                     filled: true,
                     onTap: () async {
+                      // Through stage_moves (R4, 2026-10-25), so the reminders
+                      // follow the loss and its undo. Kept for revert:
+                      //   await PregnancyEndedStore.instance.undo();
+                      //   await PregnancyEndedStore.instance.markEnded();
                       if (ended) {
-                        await PregnancyEndedStore.instance.undo();
+                        await undoLoss();
                         if (context.mounted) Navigator.of(context).maybePop();
                       } else {
-                        await PregnancyEndedStore.instance.markEnded();
+                        await recordLoss();
                         if (context.mounted) {
                           Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
                             settings: const RouteSettings(name: 'pregnancy/ended_done'),
