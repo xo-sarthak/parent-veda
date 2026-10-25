@@ -30,6 +30,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/post_pregnancy/pp_child_profile.dart';
 import 'life_stage_store.dart';
+import 'pregnancy_records.dart';
 import 'remote/cloud_merged_store.dart';
 // import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
@@ -61,8 +62,21 @@ class DearBabyVaultStore extends ChangeNotifier with CloudMergedStore {
 
   /// The letters open on the birth: the arrival sheet's record, or, for a
   /// family that reached parenting another way, the stage itself.
-  bool get unlocked =>
-      _bornOn != null || LifeStageStore.instance.stage == LifeStage.parenting;
+  ///
+  /// ⚠️ A BIRTH BEFORE THIS PREGNANCY DOES NOT COUNT (STAGE-TRANSITIONS F2,
+  /// 2026-10-25). Expecting again, `_bornOn` is the older child's birthday,
+  /// and the letters she writes to the new baby would read as opened. The
+  /// same rule as a loss before a new pregnancy (B1b): an event counts only
+  /// on or after the current pregnancy began. The next birth opens them.
+  /// Kept for revert:
+  ///   _bornOn != null || LifeStageStore.instance.stage == LifeStage.parenting;
+  bool get unlocked {
+    if (LifeStageStore.instance.stage == LifeStage.parenting) return true;
+    final born = _bornOn;
+    if (born == null) return false;
+    final cur = PregnancyRecords.instance.current;
+    return cur == null || !born.isBefore(cur.startedOn);
+  }
 
   bool get opened => _openedAt != null;
 

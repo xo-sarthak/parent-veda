@@ -4076,3 +4076,43 @@ doctor-visit list. Hiding the data is recoverable; misattributing it is not.
 Once the store synced, that fake state went up to the server as hers, and the recommendations read it as an interest
 she had shown. **A store's initial value is what a new user's data is.** It should be empty, and the empty state is
 the screen's job ("a feature is never hidden": the screen invites the first one).
+
+## 16qq. Move into a state the system already knows, and let the undo remember where it came from (no migration, 2026-10-25)
+
+STAGE-TRANSITIONS F2: a parent in Parenting adds a new pregnancy. No new table, no sync step. The interesting part
+is what was *not* built.
+
+### 1. Reuse a tested state rather than invent a parallel one
+
+Two ways to show "a pregnancy beside her children":
+- *A new state:* stay in `parenting` and read the pregnancy from `PregnancyRecords.current`. Then every reader that
+  decides something from the stage (the splash, the message ledger, the WhatsApp guide's SQL, Ask Veda's context,
+  the loss path, the arrival card) would need to learn a second way of being pregnant. Each one it misses is a
+  silent bug.
+- *An existing state (chosen):* move the stage to `pregnancy`. "Pregnant with older children" already exists (the
+  pregnancy You adds a child; the child's home opens over the pregnancy home), and every reader above is already
+  tested against it.
+
+**The trade-off.** The existing state brings its own rules along. Here that means the app opens on the pregnancy
+home at launch rather than on the last profile she looked at, which is an owed task (F6) and not a new bug. The
+general rule: before adding a mode, check whether a state you already have means the same thing. A mode costs one
+branch in every reader, forever.
+
+### 2. An event counts only after the current episode began
+
+The Dear Baby letters opened on "a birth is recorded" (`_bornOn != null`). Expecting again, that birth is the older
+child's, so the new baby's letters read as already opened. The fix is the rule the loss flag already uses (B1b):
+an event counts only on or after the current pregnancy's start. **A boolean that was true once is not the same as
+"true for this episode".** Whenever a lifecycle can repeat, each "has X happened?" needs an "...since when?".
+
+### 3. An undo that remembers where it came from, and can work it out when it can't
+
+"The test was wrong" used to mean "back to trying", because TTC was the only way into a pregnancy. Now there are
+two, so the undo needs to know which one was used. The move writes three local keys: the stage, its `enteredAt`,
+and the story entry's id. The undo goes back exactly there, so the child's stage still dates from the birthday,
+not from the undo. On a phone without the keys, it is derived: she has a child, and TTC's confirmation is not on
+or after this pregnancy's start. The keys are cleared when the pregnancy ends (birth, or a loss then trying), so a
+later TTC pregnancy is never mistaken for a family one.
+
+**The trade-off.** The keys are local, not synced. That is cheap and right for a phone action like undo. It costs
+an exact answer on her second phone, which the derivation covers for the common case.

@@ -584,6 +584,11 @@ void main() {
           contains('recordBirth('));
       expect(_code('lib/screens/auth/onboarding/onboarding_flow.dart'),
           contains('recordBirth('));
+      // F2 (2026-10-25): a pregnancy added from the family, and its undo.
+      expect(_code('lib/screens/v2/pv_add_pregnancy.dart'),
+          contains('startPregnancyFromFamily('));
+      expect(_code('lib/screens/profile/pv_you_content.dart'),
+          contains('undoPregnancyFromFamily()'));
     });
 
     test('M40 nothing else sets the stage (an allow-list)', () {

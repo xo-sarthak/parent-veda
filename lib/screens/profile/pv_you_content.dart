@@ -32,6 +32,8 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/pv_order_store.dart';
 import '../../services/saved_store.dart';
 import '../../services/stage_gateway.dart';
+import '../../services/stage_moves.dart' show pregnancyCameFromFamily, undoPregnancyFromFamily;
+import '../v2/pv_add_pregnancy.dart' show addPregnancyOffered, openAddPregnancy, openFamilyHomeAfterUndo, kExpectingAgainTitle;
 import '../../ttc/ttc_content_prefs.dart' show TtcContentPrefs;
 // Kept for revert (2026-09-28, journal out of TTC):
 // import '../../ttc/ttc_journal_store.dart' show TtcJournalStore;
@@ -569,6 +571,19 @@ PvYouThing _keptPregnancies() => PvYouThing(
   },
 );
 
+/// "Expecting again?" (STAGE-TRANSITIONS F2, 2026-10-25): a new pregnancy
+/// beside her children. Hers only, and only while no pregnancy is going; the
+/// family sheet has the same row as "Add a pregnancy".
+PvYouThing _expectingAgain() => PvYouThing(
+  icon: Icons.add_circle_outline_rounded,
+  art: ttcArtTab(TtcTabMark.bigSmallHearts),
+  title: kExpectingAgainTitle,
+  subtitle: "Add a pregnancy. Your children's homes stay as they are",
+  listen: PregnancyRecords.instance,
+  shown: addPregnancyOffered,
+  open: openAddPregnancy,
+);
+
 /// ⚠️ "NOT PREGNANT AFTER ALL?" (2026-10-10, the user: "not always a positive
 /// test means pregnant ... sometimes it's a false positive ... we need to tackle
 /// those edge cases"). The transition's undo lived only on the screen right
@@ -586,6 +601,19 @@ PvYouThing _notPregnant() => PvYouThing(
 
 Future<void> _openNotPregnant(BuildContext c) async {
   final p = V2PaletteStore.instance.current;
+  // A pregnancy added from the family goes back to her children, not to
+  // trying (F2, 2026-10-25).
+  final family = await pregnancyCameFromFamily();
+  if (!c.mounted) return;
+  final kids = ChildProfileStore.instance.children
+      .where((k) => k.name != Child.placeholder)
+      .map((k) => k.name)
+      .toList();
+  final wrongLabel = !family
+      ? 'The test was wrong. Go back to trying'
+      : kids.length == 1
+          ? 'The test was wrong. Go back to ${kids.first}'
+          : 'The test was wrong. Go back to your children';
   final choice = await showModalBottomSheet<String>(
     context: c,
     backgroundColor: p.surface,
@@ -608,8 +636,9 @@ Future<void> _openNotPregnant(BuildContext c) async {
               style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2),
             ),
             const SizedBox(height: 18),
-            for (final (id, label, filled) in const [
-              ('wrong', 'The test was wrong. Go back to trying', true),
+            // Kept for revert: `const [('wrong', 'The test was wrong. Go back to trying', true), ...]`.
+            for (final (id, label, filled) in [
+              ('wrong', wrongLabel, true),
               ('ended', 'My pregnancy ended', false),
               ('cancel', 'Not now', false),
             ]) ...[
@@ -638,6 +667,11 @@ Future<void> _openNotPregnant(BuildContext c) async {
   );
   if (!c.mounted) return;
   switch (choice) {
+    case 'wrong' when family:
+      await undoPregnancyFromFamily();
+      if (!c.mounted) return;
+      pvToast(c, 'Taken off. Everything else is still here.', kind: PvToastKind.done);
+      openFamilyHomeAfterUndo(c);
     case 'wrong':
       // Told before it happens (the sheet), confirmed after (the snackbar).
       await const TtcTransitionEngine().undo();
@@ -1384,7 +1418,8 @@ final PvYouStageContent _parenting = PvYouStageContent(
   setupThings: [_ppPersonalize(), _ppCareCircle(), _ppInvite(), _ppInvestments(), _ppAstrology()],
   // Her letters from pregnancy, opened at birth (2026-10-15).
   keepsakeThings: [_dearBabyLetters()],
-  journeyThings: [_keptPregnancies()],
+  // journeyThings: [_keptPregnancies()], // kept for revert (F2 adds Expecting again)
+  journeyThings: [_expectingAgain(), _keptPregnancies()],
   childrenInvitation: 'Add your child and their page appears here.',
   whatWeStore: [
     'Your name, phone and email, and the partner you paired with.',

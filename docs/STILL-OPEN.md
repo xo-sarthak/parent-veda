@@ -11087,6 +11087,10 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
   **Per-pregnancy records BUILT 2026-10-25** (sync step 18): a pregnancy after a loss starts clean, the old one is
   "Kept for you" (family sheet and You) to look at or delete. The user's call: never decide for her, never ask at
   the moment of the loss; delete is the 90-day soft delete. The moves themselves wait on F2.
+  **Pregnant again from Parenting BUILT 2026-10-25 (F2):** "Add a pregnancy" in the family sheet, Parenting You
+  ("Expecting again?") and the drawer moves the stage to pregnancy with her children kept as their own profiles;
+  "the test was wrong" goes back to the child. Still open here: a parent TRYING again (the drawer's ovulation door
+  still says coming soon), and parenting → skilling as a move (F5 offers the learning space per child instead).
 - **§101.2 (R2) The partner's phone never sees her stage change or her loss.** `fetchMyProfile` reads his own
   profile row; only the due date falls back to hers. The comment in `pregnancy_ended_store.dart` saying his app
   respects it is not true yet. BEFORE-LAUNCH.

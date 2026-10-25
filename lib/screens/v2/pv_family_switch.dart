@@ -19,12 +19,14 @@
 //  chevron that opens a list of one is a control that does nothing. Adding a
 //  child stays in You; the moment there are two, the name appears.
 //
-//  ⚠️ PHASE 1 READS ONLY WHAT EXISTS TODAY. The stage's own profile is the
-//  root of the navigator; every other profile's home is pushed over it, the
-//  same move `openStageDoor` already makes (no stage change). What phase 1
-//  does NOT do, because the data cannot say it yet (no record marks a
-//  pregnancy as over, so a second one cannot sit beside a child in
-//  parenting): "Add a pregnancy" from parenting. That is R1, then phase 2.
+//  ⚠️ THE STAGE'S OWN PROFILE IS THE ROOT of the navigator; every other
+//  profile's home is pushed over it, the same move `openStageDoor` already
+//  makes (no stage change). "Add a pregnancy" (F2, 2026-10-25, after R1
+//  made pregnancies records) is the one row here that moves the stage: to
+//  pregnancy, so the new pregnancy is the root and the children open over it
+//  (pv_add_pregnancy.dart, `startPregnancyFromFamily`). Kept for revert, the
+//  phase 1 note: "What phase 1 does NOT do ... 'Add a pregnancy' from
+//  parenting. That is R1, then phase 2."
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -43,6 +45,7 @@ import '../profile/pv_you_sheets.dart' show showPvAddChildSheet;
 import '../skilling/sk_bands.dart' show kSkAgeFloor;
 import '../skilling/sk_child_store.dart';
 import '../skilling/skilling_preview_screen.dart';
+import 'pv_add_pregnancy.dart' show addPregnancyOffered, openAddPregnancy, kAddPregnancyTitle;
 import 'v2_palette.dart';
 
 /// Which home is on screen. The caller says so; the switch never guesses
@@ -373,6 +376,27 @@ Future<void> showPvFamilySheet(BuildContext context,
                 showPvAddChildSheet(context);
               },
             ),
+            // ---- ADD A PREGNANCY (F2, 2026-10-25) ----
+            // Right under Add a child, where What to Expect and theAsianparent
+            // put it. Hers only, and only while no pregnancy is going.
+            if (addPregnancyOffered())
+              ListTile(
+                key: const ValueKey('pv_family_switch_add_pregnancy'),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                leading: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: p.ground,
+                  child: Icon(Icons.add_rounded, color: p.ink2),
+                ),
+                title: Text(kAddPregnancyTitle,
+                    style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+                subtitle: Text('Its own weeks, beside your children',
+                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink2)),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  openAddPregnancy(context);
+                },
+              ),
             // ---- KEPT FOR YOU (R1, 2026-10-25) ----
             // A pregnancy that has ended, quietly at the foot: never a
             // switchable profile and never in the header (the user's word),

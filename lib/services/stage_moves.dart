@@ -18,6 +18,7 @@
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../screens/post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
 import '../ttc/ttc_store.dart';
 import 'dear_baby_vault_store.dart';
 import 'family_timeline.dart';
@@ -79,6 +80,7 @@ Future<void> recordBirth({
       .end(PregnancyOutcome.birth, on: day, childId: childId)
       .catchError((_) {});
   LifeStageStore.instance.setStage(LifeStage.parenting, at: day);
+  await _forgetFamilyMove(); // this pregnancy is over; no undo goes back from it
   final title = name.trim().isEmpty ? 'Baby was born' : '${name.trim()} was born';
   FamilyTimeline.instance.add(
     id: babyBornIdFor(day),
@@ -149,4 +151,159 @@ Future<void> moveToTtcAfterLoss() async {
     } catch (_) {/* local-first: a storage failure never blocks the move */}
   }
   LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
+  // The next positive test is TTC's own move, not a return to her children.
+  await _forgetFamilyMove();
+}
+
+// ---- "Add a pregnancy" from the family (STAGE-TRANSITIONS F2, 2026-10-25) ---
+
+/// Where the family move came from, so its undo can go back exactly there.
+/// Local only: the undo is a phone action, and a phone without these keys
+/// works it out instead (see [pregnancyCameFromFamily]).
+const String kPregnancyFromStageKey = 'pv_pregnancy_from_stage';
+const String kPregnancyFromAtKey = 'pv_pregnancy_from_at';
+const String kPregnancyFromTimelineKey = 'pv_pregnancy_from_timeline';
+
+/// A parent (Parenting or the learning space) is expecting again.
+///
+/// ⚠️ THE STAGE MOVES TO PREGNANCY; HER CHILDREN STAY WHERE THEY ARE. A
+/// pregnant mother with older children is a state the app already knows: the
+/// pregnancy home is the root and each child's home opens over it from the
+/// family switch. Moving into that state, rather than inventing a "parenting
+/// with a pregnancy on the side", means the splash, the messages (B5 counts
+/// from the stage's `enteredAt`), the WhatsApp guide, the loss path and the
+/// arrival card all work unchanged.
+///
+/// The order is `confirmPregnancy`'s, for the same reason: the new record
+/// first (it seals the last pregnancy's bag and birth plan, and setting the
+/// due date re-dates whatever record is current), then the date, then the
+/// stage, then the story.
+Future<PregnancyRecord?> startPregnancyFromFamily({
+  required DateTime due,
+  required DueDateSource source,
+  DateTime? today,
+}) async {
+  final now = today ?? DateTime.now();
+  final day = DateTime(now.year, now.month, now.day);
+  final dueDay = DateTime(due.year, due.month, due.day);
+  final from = LifeStageStore.instance.stage ?? LifeStage.parenting;
+  final fromAt = LifeStageStore.instance.enteredAt;
+
+  final made = await PregnancyRecords.instance
+      .startNew(due: dueDay, dueDateSource: source.name, today: day)
+      .then<PregnancyRecord?>((r) => r)
+      .catchError((_) => null);
+
+  final ctrl = PregnancyController.current;
+  if (ctrl != null) {
+    await ctrl.setDueDate(dueDay, source: source);
+  } else {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(PregnancyController.kDueDateKey, dueDay.toIso8601String());
+      await prefs.setString(PregnancyController.kDueDateSourceKey, source.name);
+    } catch (_) {/* local-first */}
+  }
+
+  LifeStageStore.instance.setStage(LifeStage.pregnancy, at: day);
+
+  // A dated id once any pregnancy has begun before (B3): `add` ignores an id
+  // it already holds, so a fixed one would keep this pregnancy out of the story.
+  final timelineId = FamilyTimeline.instance.byId('pregnancy_started') == null
+      ? 'pregnancy_started'
+      : 'pregnancy_started:${day.toIso8601String().substring(0, 10)}';
+  FamilyTimeline.instance.add(
+    id: timelineId,
+    stage: LifeStage.pregnancy,
+    kind: TimelineKind.milestone,
+    titleEn: 'Pregnancy began',
+    titleHi: 'Pregnancy began',
+    detailEn: source.clinicOwned
+        ? 'Dated by your clinic.'
+        : 'Counted the way every pregnancy is, from about two weeks before conception.',
+    on: dueDay.subtract(const Duration(days: 280)),
+  );
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(kPregnancyFromStageKey, from.name);
+    if (fromAt != null) {
+      await prefs.setString(kPregnancyFromAtKey, fromAt.toIso8601String());
+    } else {
+      await prefs.remove(kPregnancyFromAtKey);
+    }
+    await prefs.setString(kPregnancyFromTimelineKey, timelineId);
+  } catch (_) {/* local-first: the undo then works it out */}
+  return made;
+}
+
+/// Did the pregnancy on screen come from the family move (and so its "the
+/// test was wrong" goes back to her children, not to trying)?
+///
+/// The key says so on the phone that made the move. Elsewhere it is derived:
+/// she has a child, and TTC did not confirm THIS pregnancy (a confirmation
+/// on or after the record's start is TTC's own move).
+Future<bool> pregnancyCameFromFamily() async {
+  if (LifeStageStore.instance.stage != LifeStage.pregnancy) return false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString(kPregnancyFromStageKey) != null) return true;
+  } catch (_) {}
+  if (!ChildProfileStore.instance.hasRealChild) return false;
+  final cur = PregnancyRecords.instance.current;
+  final confirmed = TtcStore.instance.pregnancyConfirmedOn;
+  if (cur == null) return false;
+  return confirmed == null || confirmed.isBefore(cur.startedOn);
+}
+
+/// "The test was wrong": the family move undone. The new record goes and
+/// the pregnancy before it gets its bag and birth plan back, its due date
+/// returns (it is what "born early" was measured from), and the stage goes
+/// back to where it was, dated as it was (the child's birthday, not today).
+Future<void> undoPregnancyFromFamily() async {
+  LifeStage back = LifeStage.parenting;
+  DateTime? at;
+  String? timelineId;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final s = prefs.getString(kPregnancyFromStageKey);
+    if (s == LifeStage.skilling.name) back = LifeStage.skilling;
+    at = DateTime.tryParse(prefs.getString(kPregnancyFromAtKey) ?? '');
+    timelineId = prefs.getString(kPregnancyFromTimelineKey);
+  } catch (_) {}
+
+  if (timelineId != null) FamilyTimeline.instance.remove(timelineId);
+
+  final made = PregnancyRecords.instance.current;
+  if (made != null) {
+    await PregnancyRecords.instance.undoStart(made).catchError((_) {});
+  }
+  final prev = PregnancyRecords.instance.latest;
+  // Without the key, the stage dates from the last birth, as recordBirth did.
+  at ??= prev?.endedOn;
+
+  final ctrl = PregnancyController.current;
+  final prevDue = prev?.dueDate;
+  if (ctrl != null) {
+    if (prevDue != null) {
+      final src = DueDateSource.values.firstWhere(
+          (v) => v.name == prev?.dueDateSource,
+          orElse: () => DueDateSource.unknown);
+      await ctrl.setDueDate(prevDue, source: src);
+    } else {
+      await ctrl.clearDueDate();
+    }
+  }
+
+  LifeStageStore.instance.setStage(back, at: at);
+  await _forgetFamilyMove();
+}
+
+Future<void> _forgetFamilyMove() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(kPregnancyFromStageKey);
+    await prefs.remove(kPregnancyFromAtKey);
+    await prefs.remove(kPregnancyFromTimelineKey);
+  } catch (_) {/* local-first */}
 }
