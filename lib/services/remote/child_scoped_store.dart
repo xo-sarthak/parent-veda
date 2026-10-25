@@ -261,6 +261,28 @@ class ChildLogLedger {
     return merged;
   }
 
+  /// ⚠️ EVERY CHILD, NOT ONLY THE ONE ON SCREEN (B11, 2026-10-25). [pull]
+  /// fetches one child, and every store passed the active child, so a feed
+  /// the other parent logged for the twin not on screen never reached this
+  /// phone until that twin happened to be open at a sync. This pulls each of
+  /// [childIds] in turn into one list: [apply] leaves rows of other children
+  /// as they are, so the merges do not disturb each other. One fetch per
+  /// child is the cost; families have one to three.
+  Future<List<T>> pullEvery<T>({
+    required Iterable<String> childIds,
+    required List<T> local,
+    required String Function(T) idOf,
+    required T Function(Map<String, dynamic>) fromRow,
+    String orderBy = 'created_at',
+  }) async {
+    var merged = local;
+    for (final c in childIds) {
+      merged = await pull<T>(
+          childId: c, local: merged, idOf: idOf, fromRow: fromRow, orderBy: orderBy);
+    }
+    return merged;
+  }
+
   /// Pure: what uploading book id [id] sends, from the rows held now ([live],
   /// by the store's key, for [fallbackChildId]'s rows) or the row's last
   /// known columns. Null when there is nothing to send yet (no columns, or no
@@ -459,5 +481,78 @@ class ChildSync {
     try {
       await SupabaseRepo.deleteChildRow(table, childId, column, value);
     } catch (_) {}
+  }
+}
+
+// =============================================================================
+//  PerChild: one value per child, for the stores keyed by something that is
+//  not a row id (B11, 2026-10-25)
+// -----------------------------------------------------------------------------
+//  A list store can filter at read time (`ChildLogLedger.belongsTo`) because
+//  each row has its own id. A milestone ticked, a dose given or the emergency
+//  card is keyed by the milestone, the dose or the child: twins share the key,
+//  so one flat map cannot hold both. These stores keep one bucket per child.
+//
+//  BEFORE B11 those stores held ONE value for the whole family. On the first
+//  load after the update it sits in the [legacy] bucket and joins the child on
+//  screen the first time that child is read: the same child the uploader
+//  already filed it under (`uploadFor`'s fallback), so the screen and the
+//  cloud agree. Writes made before any child exists wait there too.
+// =============================================================================
+
+class PerChild<T> {
+  PerChild([this._make]);
+  final T Function()? _make;
+
+  /// child id (or [legacy]) -> the value.
+  final Map<String, T> byChild = {};
+
+  /// The bucket for values that predate B11, or that were saved before a
+  /// child existed.
+  static const legacy = '';
+
+  void _adopt(String? childId, String? activeId) {
+    if (childId == null || childId != activeId) return;
+    if (byChild.containsKey(childId) || !byChild.containsKey(legacy)) return;
+    byChild[childId] = byChild.remove(legacy) as T;
+  }
+
+  /// [childId]'s value, or null. [activeId] is the child on screen: only it
+  /// takes the legacy value.
+  T? peek(String? childId, String? activeId) {
+    _adopt(childId, activeId);
+    return byChild[childId ?? legacy];
+  }
+
+  /// [childId]'s value, made empty on first use (needs the maker).
+  T of(String? childId, String? activeId) {
+    _adopt(childId, activeId);
+    return byChild.putIfAbsent(childId ?? legacy, _make!);
+  }
+
+  /// Sets [childId]'s value; null removes it.
+  void put(String? childId, String? activeId, T? value) {
+    _adopt(childId, activeId);
+    final k = childId ?? legacy;
+    if (value == null) {
+      byChild.remove(k);
+    } else {
+      byChild[k] = value;
+    }
+  }
+
+  void clear() => byChild.clear();
+
+  Map<String, Object?> toJson(Object? Function(T) encode) =>
+      {for (final e in byChild.entries) e.key: encode(e.value)};
+
+  /// Reads what [toJson] wrote; entries [decode] cannot read are skipped.
+  void loadJson(Object? raw, T? Function(Object?) decode) {
+    byChild.clear();
+    if (raw is! Map) return;
+    for (final e in raw.entries) {
+      final v = decode(e.value);
+      if (v != null) byChild[e.key.toString()] = v;
+    }
   }
 }

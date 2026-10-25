@@ -124,6 +124,8 @@ class GrowthStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     await _sync.load();
     SyncRegistry.registerPending(_hasPending);
+    // Switching child changes what every read below returns (B11).
+    ChildProfileStore.instance.addListener(notifyListeners);
     _loaded = true;
     notifyListeners();
     try {
@@ -147,6 +149,13 @@ class GrowthStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Test-only: empty, for every child, and loaded, so nothing reads prefs (B11).
+  @visibleForTesting
+  void debugReset() {
+    _resetLocal();
+    _loaded = true;
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
@@ -163,8 +172,10 @@ class GrowthStore extends ChangeNotifier {
       // fromRow: _fromRow,
       // orderBy: 'date',
       // );
-      final merged = await _sync.pull<GrowthMeasurement>(
-        childId: childId,
+      // Every child, not only the one on screen (B11, 2026-10-25). Kept for revert:
+      // final merged = await _sync.pull<GrowthMeasurement>(childId: childId, ...)
+      final merged = await _sync.pullEvery<GrowthMeasurement>(
+        childIds: ChildProfileStore.instance.childIds,
         local: _items,
         idOf: (m) => m.id,
         fromRow: _fromRow,
@@ -209,23 +220,31 @@ class GrowthStore extends ChangeNotifier {
   String get name => _child.name;
 
   // ---- reads --------------------------------------------------------------
+  /// ⚠️ THE CHILD ON SCREEN'S MEASUREMENTS ONLY (B11, 2026-10-25). The list
+  /// holds every child's rows; every read below goes through this, so twins'
+  /// curves no longer blend. The rule is the ledger's (`belongsTo`), the one
+  /// the care logs use (BACKEND-PATTERNS 16ll).
+  List<GrowthMeasurement> get _mine =>
+      [for (final m in _items) if (_sync.belongsTo(m.id, _childId)) m];
+
   /// Newest first.
   List<GrowthMeasurement> get all {
-    final list = [..._items]..sort((a, b) => b.date.compareTo(a.date));
+    // final list = [..._items]..sort((a, b) => b.date.compareTo(a.date)); // kept for revert
+    final list = _mine..sort((a, b) => b.date.compareTo(a.date));
     return List.unmodifiable(list);
   }
 
   /// Oldest first (chart order).
   List<GrowthMeasurement> get chronological {
-    final list = [..._items]..sort((a, b) => a.date.compareTo(b.date));
+    final list = _mine..sort((a, b) => a.date.compareTo(b.date));
     return List.unmodifiable(list);
   }
 
   GrowthMeasurement? get latest => all.isEmpty ? null : all.first;
   GrowthMeasurement? get previous => all.length < 2 ? null : all[1];
 
-  bool get isEmpty => _items.isEmpty;
-  bool get hasHead => _items.any((m) => m.headCm != null);
+  bool get isEmpty => _mine.isEmpty;
+  bool get hasHead => _mine.any((m) => m.headCm != null);
 
   // ---- percentile (approximate, transparent) ------------------------------
   /// The percentile (1–99) for [value] of [metric] at [ageMonths] for this
@@ -306,7 +325,7 @@ class GrowthStore extends ChangeNotifier {
   /// The emotional headline for the hero — never "65th percentile".
   String get headline {
     if (isEmpty) return 'Add a measurement to begin';
-    if (_items.length < 2) return 'A first point on the curve';
+    if (_mine.length < 2) return 'A first point on the curve';
     final trend = _weightTrendPoints();
     if (trend.abs() <= 10) return 'Growing consistently';
     return trend > 0 ? 'Following his own rising curve' : 'Tracking along steadily';
@@ -317,7 +336,7 @@ class GrowthStore extends ChangeNotifier {
     if (isEmpty) {
       return 'Once you add a measurement or two, this space explains what the numbers mean for $name — in plain, reassuring language.';
     }
-    if (_items.length < 2) {
+    if (_mine.length < 2) {
       return 'This is $name\'s first recorded point. A single measurement is just a snapshot — it\'s the pattern over time that tells the real story, so keep adding as you go.';
     }
     final trend = _weightTrendPoints();

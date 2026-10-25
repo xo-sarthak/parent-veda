@@ -387,7 +387,14 @@ class MilestoneStore extends ChangeNotifier {
   MilestoneStore._();
   static final MilestoneStore instance = MilestoneStore._();
 
-  final Map<String, MilestoneObs> _observed = {};
+  // final Map<String, MilestoneObs> _observed = {}; // kept for revert
+  // ⚠️ ONE SET OF TICKS PER CHILD (B11, 2026-10-25). It was one map for the
+  // family, keyed by milestone, so twin A's first smile showed as twin B's.
+  // Every read and write below goes through [_observed], the child on
+  // screen's map; ticks saved before B11 join that child (PerChild).
+  final PerChild<Map<String, MilestoneObs>> _obsBy =
+      PerChild<Map<String, MilestoneObs>>(() => {});
+  Map<String, MilestoneObs> get _observed => _obsBy.of(_childId, _childId);
 
   bool _loaded = false;
   static const _prefsKey = 'pp_milestones';
@@ -407,17 +414,27 @@ class MilestoneStore extends ChangeNotifier {
       final raw = prefs.getString(_prefsKey);
       if (raw != null) {
         final j = Map<String, dynamic>.from(jsonDecode(raw));
-        j.forEach((id, v) {
-          final m = Map<String, dynamic>.from(v);
-          _observed[id] = MilestoneObs(
-            date: SupabaseRepo.parseDbTime(m['date']),
-            note: m['note']?.toString(),
-          );
-        });
+        // Per child since B11 ({'byChild': {child: {milestone: obs}}}); a
+        // blob from before is one flat map, which waits in the legacy bucket.
+        if (j['byChild'] is Map) {
+          _obsBy.loadJson(j['byChild'], (v) => v is Map ? _obsMapFrom(v) : null);
+        } else {
+          _obsBy.byChild[PerChild.legacy] = _obsMapFrom(j);
+        }
+        // Kept for revert:
+        // j.forEach((id, v) {
+        //   final m = Map<String, dynamic>.from(v);
+        //   _observed[id] = MilestoneObs(
+        //     date: SupabaseRepo.parseDbTime(m['date']),
+        //     note: m['note']?.toString(),
+        //   );
+        // });
       }
     } catch (_) {/* start empty */}
     await _sync.load();
     SyncRegistry.registerPending(_hasPending);
+    // Switching child changes what every read returns (B11).
+    ChildProfileStore.instance.addListener(notifyListeners);
     _loaded = true;
     notifyListeners();
     try {
@@ -428,9 +445,17 @@ class MilestoneStore extends ChangeNotifier {
   /// A sign-out, or another account signing in (2026-10-17): this store
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
-    _observed.clear();
+    // _observed.clear(); // kept for revert
+    _obsBy.clear();
     _sync.clear();
     notifyListeners();
+  }
+
+  /// Test-only: empty, for every child, and loaded, so nothing reads prefs (B11).
+  @visibleForTesting
+  void debugReset() {
+    _resetLocal();
+    _loaded = true;
   }
 
   Future<void> _syncFromCloud() async {
@@ -456,21 +481,26 @@ class MilestoneStore extends ChangeNotifier {
       //   if (cloudIds.contains(entry.key)) continue;
       //   await _push(entry.key, entry.value);
       // }
-      final merged = await _sync.pull<MapEntry<String, MilestoneObs>>(
-        childId: childId,
-        local: _observed.entries.toList(),
-        idOf: (e) => e.key,
-        fromRow: (r) => MapEntry(
-          (r['milestone_id'] ?? '').toString(),
-          MilestoneObs(
-            date: SupabaseRepo.parseDbTime(r['observed_on']),
-            note: r['note']?.toString(),
+      // Every child, the one on screen first so ticks saved before B11 join
+      // it (B11, 2026-10-25). The one-child pull is the loop's body.
+      for (final c in [childId, ...ChildProfileStore.instance.childIds.where((x) => x != childId)]) {
+        final held = _obsBy.of(c, childId);
+        final merged = await _sync.pull<MapEntry<String, MilestoneObs>>(
+          childId: c,
+          local: held.entries.toList(),
+          idOf: (e) => e.key,
+          fromRow: (r) => MapEntry(
+            (r['milestone_id'] ?? '').toString(),
+            MilestoneObs(
+              date: SupabaseRepo.parseDbTime(r['observed_on']),
+              note: r['note']?.toString(),
+            ),
           ),
-        ),
-      );
-      _observed
-        ..clear()
-        ..addEntries(merged);
+        );
+        held
+          ..clear()
+          ..addEntries(merged);
+      }
       await _persist();
       notifyListeners();
       await _pushWaiting();
@@ -509,13 +539,27 @@ class MilestoneStore extends ChangeNotifier {
   Future<void> _persist() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // Kept for revert (one flat map):
+      // jsonEncode(_observed.map((id, o) => MapEntry(
+      //     id, {'date': SupabaseRepo.dbTime(o.date), 'note': o.note}))),
       await prefs.setString(
         _prefsKey,
-        jsonEncode(_observed.map((id, o) => MapEntry(
-            id, {'date': SupabaseRepo.dbTime(o.date), 'note': o.note}))),
+        jsonEncode({
+          'byChild': _obsBy.toJson((m) => m.map((id, o) => MapEntry(
+              id, {'date': SupabaseRepo.dbTime(o.date), 'note': o.note}))),
+        }),
       );
     } catch (_) {}
   }
+
+  static Map<String, MilestoneObs> _obsMapFrom(Map j) => {
+        for (final e in j.entries)
+          if (e.value is Map)
+            e.key.toString(): MilestoneObs(
+              date: SupabaseRepo.parseDbTime((e.value as Map)['date']),
+              note: (e.value as Map)['note']?.toString(),
+            ),
+      };
 
   // Corrected age for a baby born early (2026-10-07).
   int get _ageMonths => ChildProfileStore.instance.devAgeInMonths;

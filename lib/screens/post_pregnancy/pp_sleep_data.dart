@@ -129,8 +129,10 @@ class SleepStore extends ChangeNotifier {
       // fromRow: _fromRow,
       // orderBy: 'start_at',
       // );
-      final merged = await _sync.pull<SleepLog>(
-        childId: childId,
+      // Every child, not only the one on screen (B11, 2026-10-25). Kept for revert:
+      // final merged = await _sync.pull<SleepLog>(childId: childId, ...)
+      final merged = await _sync.pullEvery<SleepLog>(
+        childIds: ChildProfileStore.instance.childIds,
         local: _logs,
         idOf: (s) => s.id,
         fromRow: _fromRow,

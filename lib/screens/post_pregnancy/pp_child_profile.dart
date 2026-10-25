@@ -465,6 +465,10 @@ class ChildProfileStore extends ChangeNotifier {
   /// `child_id` every other parenting store keys its rows to.
   String? get activeChildId => _children.isEmpty ? null : active.id;
 
+  /// Every saved child's id (B11, 2026-10-25): a sync pulls each of them,
+  /// not only the one on screen.
+  List<String> get childIds => [for (final c in _children) c.id];
+
   /// Test-only: drop back to the seeded placeholder. The store is a singleton,
   /// so a test that saves a child leaks it into everything that runs after -
   /// including a 6.4 kg weight, since logging growth also writes the child's

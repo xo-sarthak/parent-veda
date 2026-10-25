@@ -62,10 +62,14 @@ void main() {
       expect(fam[1].sexGiven && !fam[1].isBoy, isTrue);
     });
 
-    test('vaccine visits ride only with the active child (one shared vaccine record, B11)', () async {
+    // Before B11 the vaccine record was one for the family, so only the open
+    // child had visits. Kept for revert:
+    //   expect(fam[0].visits, isEmpty, reason: 'Aarav is not open');
+    //   expect(fam[1].visits, isNotEmpty, reason: 'Kiara is open and has visits ahead');
+    test('every child has their own vaccine visits, open or not (B11)', () async {
       await store.switchTo(kiara.id);
       final fam = PpMessageFacts.familyFromStores();
-      expect(fam[0].visits, isEmpty, reason: 'Aarav is not open');
+      expect(fam[0].visits, isNotEmpty, reason: 'Aarav is not open, and still has his own');
       expect(fam[1].visits, isNotEmpty, reason: 'Kiara is open and has visits ahead');
     });
 

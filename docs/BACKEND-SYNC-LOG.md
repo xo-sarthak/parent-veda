@@ -1228,3 +1228,74 @@ keeps the id), `cloud_merged_store_test`, `pp_logs_merge_test`, `sync_guard_cont
 
 **Files:** `lib/screens/post_pregnancy/pp_feeding_data.dart`, `lib/services/pp_use_consent.dart` (new),
 `lib/main.dart`, `test/pp_use_consent_sync_test.dart` (new), `test/pp_feed_tool_test.dart` (new).
+
+## Step 16: every child's records read per child (B11)
+
+**Date:** 2026-10-25 (STAGE-TRANSITIONS B11, found building F3; the user: "do b11 as its holding incomplete").
+**Migration:** none. **Commit:** owed.
+
+### Why
+Step 15 made the five care logs read per child. The other five child stores did not: growth, documents and the
+health records kept every child's rows in one list and their getters never asked whose a row was, and milestones,
+vaccines and the emergency card were one value for the family, keyed by the milestone, the dose or the child. With
+twins or two children, one child's weight, papers, medicines, ticks and doses showed on the other's page, and the
+emergency card (blood group, allergies) was one card for both. Uploads were already right: the ledger records each
+row's child when it is written.
+
+A second gap, found on the way: every pull fetched only the child on screen. A feed or dose the other parent logged
+for the twin not on screen reached this phone only if that twin happened to be open at a sync.
+
+### What changed
+- [x] **List stores read through the ledger.** `GrowthStore`, `BabyDocumentsStore` and the six `HealthStore` record
+  lists (and the doctor questions) keep only rows `belongsTo` the child on screen. The index-based edits now take
+  an index into what the screen shows and find the row behind it (`_at`), so editing row 0 on Meera's page never
+  edits Aarav's.
+- [x] **Keyed records are kept per child.** `PerChild<T>` (`child_scoped_store.dart`) holds one value per child:
+  milestone ticks (`MilestoneStore`), the four vaccine collections (`_VaxChild` in `VaxStore`), the emergency card
+  and Health's two "entered" flags. The old fields became getters onto the child on screen's value, so no read or
+  write in those classes changed. The prefs blobs gain a `byChild` shape. Health also keeps writing its old flat
+  keys, so an older build still reads something.
+- [x] **A value from before B11 joins the child on screen.** It has no child, so it waits in the legacy bucket and
+  goes to the first child read as the one on screen. That is the child the uploader already filed it under
+  (`uploadFor`'s fallback), so screen and cloud agree.
+- [x] **Every child is pulled.** `ChildLogLedger.pullEvery` pulls each child in turn into one list (`apply` leaves
+  other children's rows alone); the five care stores, growth, documents and health use it. Milestones and vaccines
+  loop per child into that child's bucket. The child on screen goes first, so legacy values join it before the
+  others merge.
+- [x] **Each child's dose alarm is its own.** `vaxAlarmIdFor(visitId, childId:, firstChildId:)`: the first child
+  keeps the bare id an older build armed (so it can still be cancelled), and any other child's id names the child.
+  `vaxReminderText(child:)` speaks of that child and that child's date.
+- [x] **The messages remind every child of their own visits** (`VaxStore.isDoneFor`), not only the one on screen
+  (F3 had held that back until this).
+- [x] **Found on the way:**
+  - `HealthStore._after` awaited the save before the cloud step recorded the row's child, so a switch of child in
+    that gap filed the row under the wrong child. The cloud step now starts first.
+  - Health said "No measurements yet" over measurements the other parent had logged, because the flag was set only
+    by a local add. `growthEntered` and `vaxEntered` now also read the real records.
+  - `SkTurningSixPrompt` (F4) registered no sign-out reset.
+- [x] Each store redraws on a child switch (`ChildProfileStore.instance.addListener(notifyListeners)`).
+
+**Verified:** `test/pp_child_records_test.dart` (new, 11) covers:
+- twins isolated in growth, documents, health, the card, milestones and doses
+- an edit by on-screen index reaching the right row
+- the legacy bucket rules
+- the alarm ids and words
+- every child's visits in the messages
+- every store pulling every child (source scan)
+
+`pp_records_merge_test` and `pp_messages_family_test` were updated to the per-child rule (the old lines kept as
+comments). `sync_reset_coverage_test` also passes.
+
+**Known limits:**
+- A record saved before B11 is one value for the family, so it goes to whichever child is on screen at the first
+  load. With one child that is always right. With twins logged before this, the earlier blended ticks land on the
+  child on screen, as the uploader already filed them.
+- If the first child is removed, the next child's alarms take the bare ids. An alarm armed under the old id can
+  fire once more.
+- One fetch per child per table on each sync: about 14 per child (fine for one to three children).
+
+**Files:** `lib/services/remote/child_scoped_store.dart`, `lib/screens/post_pregnancy/pp_child_profile.dart`,
+`pp_growth_data.dart`, `pp_documents_data.dart`, `pp_health_data.dart`, `pp_milestones_data.dart`,
+`pp_vaccine_data.dart`, `pp_care_log_data.dart`, `pp_feeding_data.dart`, `pp_sleep_data.dart`,
+`lib/services/pp_messages_store.dart`, `lib/screens/skilling/sk_turning_six.dart`,
+`test/pp_child_records_test.dart` (new), `test/pp_records_merge_test.dart`, `test/pp_messages_family_test.dart`.

@@ -3829,6 +3829,50 @@ every reader calls `allows(kind)`.
 is that a kind is added together with its readers, in the same tool plan, and the plan's wiring gate greps each
 `allows(` call site.
 
+## 16mm. One value per child, and pull every owner (no migration, 2026-10-25)
+
+Sync step 16 (B11). Two lessons that travel beyond twins.
+
+### 1. Filtering at read time works only when a row has its own id
+
+16ll filtered a list by owner when it is read. That works for feeds because every feed has its own id, so the
+ledger can say whose it is. A milestone tick is keyed by the *milestone*. The cloud row is
+`(child_id, milestone_id)`, and two children share `soc_smile`. A flat `Map<milestoneId, obs>` on the phone can
+hold only one of them, so no filter can recover the other. The local shape has to carry the owner the way the
+cloud key does.
+
+**Two shapes, and the one we chose.**
+- *Key the map by `"child|milestone"`:* this is exactly the ledger's book id. But every read and write in the class
+  changes, and so does every screen helper that passes a milestone id.
+- *One bucket per child behind a getter (chosen):* `PerChild<T>` holds `childId -> value`, and the old field becomes
+  `Map get _observed => _obsBy.of(_childId, _childId)`. Every method in the class keeps its code. The trade-off is a
+  getter that reads like a field and does a lookup each time. That is cheap, but someone reading the class must know
+  `_observed` is no longer one map.
+
+**The general fact.** The local cache's key must be at least as specific as the server's primary key. If the
+server key is `(child_id, milestone_id)` and the phone keys by `milestone_id`, two server rows fold into one phone
+row. That is the same kind of bug as step 14's `(user_id, id)`, one level down.
+
+**Data from before the split.** The old flat value has no owner. It waits in a legacy bucket and joins the first
+child read as the one on screen, which is the same fallback the uploader used, so the phone and the cloud agree.
+This is a lazy, read-time migration: no one-off conversion, and nothing is lost if the app is killed halfway.
+
+### 2. A pull scoped to "what is on screen" is a sync hole
+
+Every child store pulled `activeChildId` only, so the twin not on screen was never fetched. The bug is invisible
+with one child, and with two it shows only after the other parent logs something. **Pull by ownership, not by
+view:** fetch every child the family has (`ChildLogLedger.pullEvery`) and let the read filter decide what shows.
+It costs one request per child per table. In return the phone is complete whichever child is open, and switching
+child never waits on the network.
+
+### 3. Start the bookkeeping before you await
+
+`HealthStore._after` awaited the prefs save, then let the cloud step record whose the new row was. Dart runs an
+`async` function synchronously up to its first `await`, so any state an `await` sits in front of can change before
+the code after it runs. Here a child switch landed in that gap. The fix is to call the step that captures the
+owner first (`final pushed = cloud(); await _persist(); await pushed;`). **Capture the owner when the record
+starts, not when it is saved**, the same rule as the breastfeed timer in 16ll.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

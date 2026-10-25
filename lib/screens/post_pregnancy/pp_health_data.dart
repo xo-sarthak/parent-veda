@@ -21,6 +21,7 @@ import 'pp_attachments.dart';
 import 'pp_child_profile.dart';
 // Cyclic with pp_vaccine_data (which imports this file) - fine in Dart, and it
 // keeps the timeline honest: doses she marked are part of her health story.
+import 'pp_growth_data.dart' show GrowthStore;
 import 'pp_vaccine_data.dart';
 import '../../services/remote/child_scoped_store.dart';
 
@@ -474,6 +475,31 @@ class HealthStore extends ChangeNotifier {
   // rows key to a child_id, and BOTH paired parents read and write them.
   String? get _childId => ChildProfileStore.instance.activeChildId;
 
+  // ⚠️ READS FOLLOW THE CHILD (B11, 2026-10-25). Every list below holds every
+  // child's rows (the ledger knows whose each one is), and every public read
+  // keeps only the child on screen's, so one twin's medicines, allergies or
+  // reports no longer show on the other's page. The index-based edits take an
+  // index into what the screen shows, and [_at] finds the row behind it.
+  bool _mine(String table, String id) =>
+      _ledgers[table]!.belongsTo(id, _childId);
+
+  List<T> _shown<T>(String table, List<T> all, String Function(T) id) =>
+      [for (final x in all) if (_mine(table, id(x))) x];
+
+  /// Where the [i]th row on screen of [table] sits in [all], or -1.
+  int _at<T>(String table, List<T> all, int i, String Function(T) id) {
+    final shown = _shown(table, all, id);
+    if (i < 0 || i >= shown.length) return -1;
+    return all.indexOf(shown[i]);
+  }
+
+  /// Every child, the one on screen first: a value saved before B11 joins the
+  /// child on screen, so that child is merged first.
+  List<String> get _childOrder {
+    final a = _childId;
+    return [?a, ...ChildProfileStore.instance.childIds.where((c) => c != a)];
+  }
+
   static String _newId(String prefix) =>
       '${prefix}_${DateTime.now().microsecondsSinceEpoch}';
 
@@ -555,6 +581,8 @@ class HealthStore extends ChangeNotifier {
       await l.load();
     }
     SyncRegistry.registerPending(_hasPending);
+    // Switching child changes what every read returns (B11).
+    ChildProfileStore.instance.addListener(notifyListeners);
     _loaded = true;
     notifyListeners();
 
@@ -591,9 +619,23 @@ class HealthStore extends ChangeNotifier {
     fill('symptoms', _symptoms, _symptomFrom);
     fill('reports', _reports, _reportFrom);
     fill('visits', _visits, _visitFrom);
-    _growthEntered = j['growthEntered'] == true;
-    _vaxEntered = j['vaxEntered'] == true;
-    _emergencyFrom(j['emergency']);
+    // Per child since B11; a blob from before holds one value for the family,
+    // which joins the child on screen (PerChild).
+    if (j['growthEnteredBy'] is Map) {
+      _growthBy.loadJson(j['growthEnteredBy'], (v) => v == true ? true : null);
+    } else {
+      _growthEntered = j['growthEntered'] == true;
+    }
+    if (j['vaxEnteredBy'] is Map) {
+      _vaxBy.loadJson(j['vaxEnteredBy'], (v) => v == true ? true : null);
+    } else {
+      _vaxEntered = j['vaxEntered'] == true;
+    }
+    if (j['emergencyBy'] is Map) {
+      _emergencyBy.loadJson(j['emergencyBy'], _cardFrom);
+    } else {
+      _emergencyFrom(j['emergency']);
+    }
   }
 
   Future<void> _persist() async {
@@ -613,6 +655,10 @@ class HealthStore extends ChangeNotifier {
           'growthEntered': _growthEntered,
           'vaxEntered': _vaxEntered,
           'emergency': _emergencyJson(),
+          // Per child (B11); the three above stay for an older build.
+          'growthEnteredBy': _growthBy.toJson((b) => b),
+          'vaxEnteredBy': _vaxBy.toJson((b) => b),
+          'emergencyBy': _emergencyBy.toJson(_cardJson),
         }),
       );
     } catch (_) {}
@@ -634,10 +680,18 @@ class HealthStore extends ChangeNotifier {
     _symptoms.clear();
     _reports.clear();
     _visits.clear();
-    _growthEntered = false;
-    _vaxEntered = false;
-    _emergency = null;
+    // _growthEntered = false; _vaxEntered = false; _emergency = null; // kept for revert
+    _growthBy.clear();
+    _vaxBy.clear();
+    _emergencyBy.clear();
     notifyListeners();
+  }
+
+  /// Test-only: empty, for every child, and loaded, so nothing reads prefs (B11).
+  @visibleForTesting
+  void debugReset() {
+    _resetLocal();
+    _loaded = true;
   }
 
   Future<void> _syncFromCloud() async {
@@ -662,10 +716,16 @@ class HealthStore extends ChangeNotifier {
       await _pullTable('pp_symptoms', childId, _symptoms, _symptomFrom, (s) => s.id);
       await _pullTable('pp_reports', childId, _reports, _reportFrom, (r) => r.id);
       await _pullTable('pp_doctor_visits', childId, _visits, _visitFrom, (v) => v.id);
-      await _pullQuestions(childId);
+      // await _pullQuestions(childId); // kept for revert: the child on screen only
+      for (final c in _childOrder) {
+        await _pullQuestions(c);
+      }
       try {
         // await _mergeEmergency(childId); // kept for revert: cloud always won
-        await _pullEmergency(childId);
+        // await _pullEmergency(childId); // kept for revert: the child on screen only
+        for (final c in _childOrder) {
+          await _pullEmergency(c);
+        }
       } catch (_) {/* table not there yet (0095): keep the local card */}
       await _persist();
       notifyListeners();
@@ -683,8 +743,11 @@ class HealthStore extends ChangeNotifier {
     T Function(Map<String, dynamic>) fromRow,
     String Function(T) idOf,
   ) async {
-    final merged = await _ledgers[table]!.pull<T>(
-        childId: childId, local: local, idOf: idOf, fromRow: fromRow);
+    // Every child, not only the one on screen (B11). Kept for revert:
+    // final merged = await _ledgers[table]!.pull<T>(
+    //     childId: childId, local: local, idOf: idOf, fromRow: fromRow);
+    final merged = await _ledgers[table]!.pullEvery<T>(
+        childIds: _childOrder, local: local, idOf: idOf, fromRow: fromRow);
     local
       ..clear()
       ..addAll(merged);
@@ -730,7 +793,9 @@ class HealthStore extends ChangeNotifier {
   /// (0104; the user, 2026-10-17).
   Future<void> _pullEmergency(String childId) async {
     final ledger = _ledgers['pp_emergency_cards']!;
-    final card = _emergencyJson();
+    // final card = _emergencyJson(); // kept for revert: the card on screen
+    final held = _emergencyBy.peek(childId, _childId);
+    final card = held == null ? null : _cardJson(held);
     final merged = await ledger.pull<MapEntry<String, Object?>>(
       childId: childId,
       local: [if (card != null) MapEntry(childId, card)],
@@ -739,9 +804,12 @@ class HealthStore extends ChangeNotifier {
       orderBy: 'updated_at',
     );
     if (merged.isEmpty) {
-      _emergency = null;
+      // _emergency = null; // kept for revert
+      _emergencyBy.put(childId, _childId, null);
     } else {
-      _emergencyFrom(merged.first.value);
+      // _emergencyFrom(merged.first.value); // kept for revert
+      final c = _cardFrom(merged.first.value);
+      if (c != null) _emergencyBy.put(childId, _childId, c);
     }
   }
 
@@ -825,9 +893,18 @@ class HealthStore extends ChangeNotifier {
   }
 
   /// Saves locally, then pushes - the shape every mutation below shares.
+  ///
+  /// ⚠️ THE CLOUD STEP STARTS FIRST (B11, 2026-10-25). It begins by telling
+  /// the ledger whose the row is (`touch(id, _childId)`). Awaiting the save
+  /// first left a gap in which a switch of child filed the row under the
+  /// child switched TO. Starting it first records the child before anything
+  /// waits; the save still completes before this returns. Kept for revert:
+  ///   await _persist();
+  ///   await cloud();
   Future<void> _after(Future<void> Function() cloud) async {
+    final pushed = cloud();
     await _persist();
-    await cloud();
+    await pushed;
   }
 
   // ---- camelCase model <-> snake_case columns ------------------------------
@@ -1009,11 +1086,23 @@ class HealthStore extends ChangeNotifier {
   //  is for these to be derived from real rows instead of local writes - no
   //  screen has to change. See docs/PERSONALIZATION.md section 3 for why the
   //  empty state is an invitation and never a hidden section.
-  bool _growthEntered = false;
-  bool _vaxEntered = false;
+  // bool _growthEntered = false; // kept for revert
+  // bool _vaxEntered = false;
+  // Per child (B11, 2026-10-25): twin A's first weight is not twin B's.
+  final PerChild<bool> _growthBy = PerChild<bool>();
+  final PerChild<bool> _vaxBy = PerChild<bool>();
+  bool get _growthEntered => _growthBy.peek(_childId, _childId) ?? false;
+  set _growthEntered(bool v) => _growthBy.put(_childId, _childId, v ? true : null);
+  bool get _vaxEntered => _vaxBy.peek(_childId, _childId) ?? false;
+  set _vaxEntered(bool v) => _vaxBy.put(_childId, _childId, v ? true : null);
 
-  bool get growthEntered => _growthEntered;
-  bool get vaxEntered => _vaxEntered;
+  // bool get growthEntered => _growthEntered; // kept for revert
+  // bool get vaxEntered => _vaxEntered;
+  // The flag, or a record that is really there: a measurement or dose the
+  // other parent logged arrives by sync and never set the flag on this phone,
+  // so Health said "No measurements yet" over real ones (found in B11).
+  bool get growthEntered => _growthEntered || GrowthStore.instance.latest != null;
+  bool get vaxEntered => _vaxEntered || !VaxStore.instance.nothingRecorded;
 
   /// True once she has told us ANYTHING - the cue for the snapshot to be
   /// meaningful rather than a restatement of our own seed data.
@@ -1023,14 +1112,14 @@ class HealthStore extends ChangeNotifier {
   /// anything" always said yes. The collections now start empty, so it finally
   /// answers the question it was written for.
   bool get hasAnyEntry =>
-      _growthEntered ||
-      _vaxEntered ||
-      _visits.isNotEmpty ||
-      _reports.isNotEmpty ||
-      _medications.isNotEmpty ||
-      _prescriptions.isNotEmpty ||
-      _allergies.isNotEmpty ||
-      _symptoms.isNotEmpty;
+      growthEntered ||
+      vaxEntered ||
+      visits.isNotEmpty ||
+      reports.isNotEmpty ||
+      medications.isNotEmpty ||
+      prescriptions.isNotEmpty ||
+      allergies.isNotEmpty ||
+      symptoms.isNotEmpty;
 
   void markGrowthEntered() {
     if (_growthEntered) return;
@@ -1043,8 +1132,8 @@ class HealthStore extends ChangeNotifier {
   /// put it back or it leaks into whatever runs next.
   @visibleForTesting
   void resetEnteredForTest() {
-    _growthEntered = false;
-    _vaxEntered = false;
+    _growthBy.clear();
+    _vaxBy.clear();
     notifyListeners();
   }
 
@@ -1060,7 +1149,12 @@ class HealthStore extends ChangeNotifier {
   // id, which is what separates a parent's row from our seed content.
 
   // ---- doctor-visit questions ----
-  List<String> get questions => List.unmodifiable(_questions);
+  // List<String> get questions => List.unmodifiable(_questions); // kept for revert
+  List<String> get questions => List.unmodifiable([
+        for (var i = 0; i < _questions.length; i++)
+          if (_mine('pp_doctor_questions', _qid(i))) _questions[i],
+      ]);
+  String _qid(int i) => i < _questionIds.length ? _questionIds[i] : '';
   void addQuestion(String q) {
     final t = q.trim();
     if (t.isEmpty) return;
@@ -1082,7 +1176,13 @@ class HealthStore extends ChangeNotifier {
   }
 
   void removeQuestion(int i) {
-    if (i < 0 || i >= _questions.length) return;
+    // i is the index on screen (B11): find the question behind it.
+    final shown = [
+      for (var k = 0; k < _questions.length; k++)
+        if (_mine('pp_doctor_questions', _qid(k))) k,
+    ];
+    if (i < 0 || i >= shown.length) return;
+    i = shown[i];
     final q = _questions.removeAt(i);
     final id = i < _questionIds.length ? _questionIds.removeAt(i) : '';
     notifyListeners();
@@ -1110,7 +1210,8 @@ class HealthStore extends ChangeNotifier {
   }
 
   // ---- medications (also covers prescriptions) ----
-  List<Medication> get medications => List.unmodifiable(_medications);
+  // List<Medication> get medications => List.unmodifiable(_medications); // kept for revert
+  List<Medication> get medications => List.unmodifiable(_shown('pp_medications', _medications, (x) => x.id));
   void addMedication(Medication m) {
     final row = m.id.isEmpty ? m.withId(_newId('med')) : m;
     _medications.insert(0, row);
@@ -1119,7 +1220,8 @@ class HealthStore extends ChangeNotifier {
   }
 
   void updateMedication(int i, Medication m) {
-    if (i < 0 || i >= _medications.length) return;
+    i = _at('pp_medications', _medications, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = m.id.isEmpty ? m.withId(_medications[i].id) : m;
     _medications[i] = row;
     notifyListeners();
@@ -1127,14 +1229,16 @@ class HealthStore extends ChangeNotifier {
   }
 
   void removeMedication(int i) {
-    if (i < 0 || i >= _medications.length) return;
+    i = _at('pp_medications', _medications, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = _medications.removeAt(i);
     notifyListeners();
     _after(() => _remove('pp_medications', row.id, _medRow(row)));
   }
 
   // ---- prescriptions (the script itself; may carry image/PDF attachments) ----
-  List<Prescription> get prescriptions => List.unmodifiable(_prescriptions);
+  // List<Prescription> get prescriptions => List.unmodifiable(_prescriptions); // kept for revert
+  List<Prescription> get prescriptions => List.unmodifiable(_shown('pp_prescriptions', _prescriptions, (x) => x.id));
   void addPrescription(Prescription p) {
     final row = p.id.isEmpty ? p.withId(_newId('pres')) : p;
     _prescriptions.insert(0, row);
@@ -1143,7 +1247,8 @@ class HealthStore extends ChangeNotifier {
   }
 
   void updatePrescription(int i, Prescription p) {
-    if (i < 0 || i >= _prescriptions.length) return;
+    i = _at('pp_prescriptions', _prescriptions, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = p.id.isEmpty ? p.withId(_prescriptions[i].id) : p;
     _prescriptions[i] = row;
     notifyListeners();
@@ -1151,15 +1256,17 @@ class HealthStore extends ChangeNotifier {
   }
 
   void removePrescription(int i) {
-    if (i < 0 || i >= _prescriptions.length) return;
+    i = _at('pp_prescriptions', _prescriptions, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = _prescriptions.removeAt(i);
     notifyListeners();
     _after(() => _remove('pp_prescriptions', row.id, _presRow(row)));
   }
 
   // ---- allergies ----
-  List<Allergy> get allergies => List.unmodifiable(_allergies);
-  List<Allergy> get knownAllergies => _allergies.where((a) => a.status == AllergyStatus.known).toList();
+  // List<Allergy> get allergies => List.unmodifiable(_allergies); // kept for revert
+  List<Allergy> get allergies => List.unmodifiable(_shown('pp_allergies', _allergies, (x) => x.id));
+  List<Allergy> get knownAllergies => allergies.where((a) => a.status == AllergyStatus.known).toList();
   void addAllergy(Allergy a) {
     final row = a.id.isEmpty ? a.withId(_newId('alg')) : a;
     _allergies.insert(0, row);
@@ -1168,7 +1275,8 @@ class HealthStore extends ChangeNotifier {
   }
 
   void updateAllergy(int i, Allergy a) {
-    if (i < 0 || i >= _allergies.length) return;
+    i = _at('pp_allergies', _allergies, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = a.id.isEmpty ? a.withId(_allergies[i].id) : a;
     _allergies[i] = row;
     notifyListeners();
@@ -1176,14 +1284,16 @@ class HealthStore extends ChangeNotifier {
   }
 
   void removeAllergy(int i) {
-    if (i < 0 || i >= _allergies.length) return;
+    i = _at('pp_allergies', _allergies, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = _allergies.removeAt(i);
     notifyListeners();
     _after(() => _remove('pp_allergies', row.id, _allergyRow(row)));
   }
 
   // ---- symptoms ----
-  List<SymptomEntry> get symptoms => List.unmodifiable(_symptoms);
+  // List<SymptomEntry> get symptoms => List.unmodifiable(_symptoms); // kept for revert
+  List<SymptomEntry> get symptoms => List.unmodifiable(_shown('pp_symptoms', _symptoms, (x) => x.id));
   void addSymptom(SymptomEntry s) {
     final row = s.id.isEmpty ? s.withId(_newId('sym')) : s;
     _symptoms.insert(0, row);
@@ -1192,7 +1302,8 @@ class HealthStore extends ChangeNotifier {
   }
 
   void updateSymptom(int i, SymptomEntry s) {
-    if (i < 0 || i >= _symptoms.length) return;
+    i = _at('pp_symptoms', _symptoms, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = s.id.isEmpty ? s.withId(_symptoms[i].id) : s;
     _symptoms[i] = row;
     notifyListeners();
@@ -1200,14 +1311,16 @@ class HealthStore extends ChangeNotifier {
   }
 
   void removeSymptom(int i) {
-    if (i < 0 || i >= _symptoms.length) return;
+    i = _at('pp_symptoms', _symptoms, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = _symptoms.removeAt(i);
     notifyListeners();
     _after(() => _remove('pp_symptoms', row.id, _symptomRow(row)));
   }
 
   // ---- reports (manual records; may carry image/PDF attachments) ----
-  List<MedicalReport> get reports => List.unmodifiable(_reports);
+  // List<MedicalReport> get reports => List.unmodifiable(_reports); // kept for revert
+  List<MedicalReport> get reports => List.unmodifiable(_shown('pp_reports', _reports, (x) => x.id));
   void addReport(MedicalReport r) {
     final row = r.id.isEmpty ? r.withId(_newId('rep')) : r;
     _reports.insert(0, row);
@@ -1216,7 +1329,8 @@ class HealthStore extends ChangeNotifier {
   }
 
   void updateReport(int i, MedicalReport r) {
-    if (i < 0 || i >= _reports.length) return;
+    i = _at('pp_reports', _reports, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = r.id.isEmpty ? r.withId(_reports[i].id) : r;
     _reports[i] = row;
     notifyListeners();
@@ -1224,14 +1338,16 @@ class HealthStore extends ChangeNotifier {
   }
 
   void removeReport(int i) {
-    if (i < 0 || i >= _reports.length) return;
+    i = _at('pp_reports', _reports, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = _reports.removeAt(i);
     notifyListeners();
     _after(() => _remove('pp_reports', row.id, _reportRow(row)));
   }
 
   // ---- doctor visits (parent-added; the seeded ones stay in the timeline) ----
-  List<HealthEvent> get visits => List.unmodifiable(_visits);
+  // List<HealthEvent> get visits => List.unmodifiable(_visits); // kept for revert
+  List<HealthEvent> get visits => List.unmodifiable(_shown('pp_doctor_visits', _visits, (x) => x.id));
   void addVisit(HealthEvent v) {
     _visits.insert(0, v);
     notifyListeners();
@@ -1239,14 +1355,16 @@ class HealthStore extends ChangeNotifier {
   }
 
   void updateVisit(int i, HealthEvent v) {
-    if (i < 0 || i >= _visits.length) return;
+    i = _at('pp_doctor_visits', _visits, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     _visits[i] = v;
     notifyListeners();
     _after(() => _push('pp_doctor_visits', v.id, _visitRow(v)));
   }
 
   void removeVisit(int i) {
-    if (i < 0 || i >= _visits.length) return;
+    i = _at('pp_doctor_visits', _visits, i, (x) => x.id); // i is the index on screen (B11)
+    if (i < 0) return;
     final row = _visits.removeAt(i);
     notifyListeners();
     _after(() => _remove('pp_doctor_visits', row.id, _visitRow(row)));
@@ -1259,7 +1377,12 @@ class HealthStore extends ChangeNotifier {
   // someone else to act on, so a plausible-looking wrong blood group here is
   // the most dangerous fabricated data in the app. The screen already has a
   // "No emergency card yet" state that invites her to create it.
-  EmergencyProfile? _emergency;
+  // EmergencyProfile? _emergency; // kept for revert: one card for the family
+  // One card per child (B11, 2026-10-25): twin A's blood group must never be
+  // what someone reads off twin B's card.
+  final PerChild<EmergencyProfile> _emergencyBy = PerChild<EmergencyProfile>();
+  EmergencyProfile? get _emergency => _emergencyBy.peek(_childId, _childId);
+  set _emergency(EmergencyProfile? e) => _emergencyBy.put(_childId, _childId, e);
   EmergencyProfile? get emergency => _emergency;
   void setEmergency(EmergencyProfile e) {
     _emergency = e;
@@ -1322,6 +1445,10 @@ class HealthStore extends ChangeNotifier {
   Map<String, dynamic>? _emergencyJson() {
     final e = _emergency;
     if (e == null) return null;
+    return _cardJson(e);
+  }
+
+  static Map<String, dynamic> _cardJson(EmergencyProfile e) {
     return {
       'name': e.name,
       'dob': e.dob,
@@ -1337,9 +1464,14 @@ class HealthStore extends ChangeNotifier {
   }
 
   void _emergencyFrom(Object? v) {
-    if (v is! Map) return;
+    final c = _cardFrom(v);
+    if (c != null) _emergency = c;
+  }
+
+  static EmergencyProfile? _cardFrom(Object? v) {
+    if (v is! Map) return null;
     final raw = v['contacts'];
-    _emergency = EmergencyProfile(
+    return EmergencyProfile(
       name: (v['name'] ?? '').toString(),
       dob: (v['dob'] ?? '').toString(),
       weight: (v['weight'] ?? '').toString(),

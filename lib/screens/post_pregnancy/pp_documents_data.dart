@@ -80,7 +80,20 @@ class BabyDocumentsStore extends ChangeNotifier {
 
   String? get _childId => ChildProfileStore.instance.activeChildId;
 
-  List<BabyDocument> get documents => List.unmodifiable(_docs);
+  // List<BabyDocument> get documents => List.unmodifiable(_docs); // kept for revert
+  /// ⚠️ THE CHILD ON SCREEN'S DOCUMENTS ONLY (B11, 2026-10-25). The list holds
+  /// every child's papers; this is what every screen reads, so one twin's
+  /// birth certificate no longer shows on the other's page. The indexes the
+  /// edit and remove calls take are indexes into this list.
+  List<BabyDocument> get documents => List.unmodifiable(
+      [for (final d in _docs) if (_sync.belongsTo(d.id, _childId)) d]);
+
+  /// Where the [i]th document on screen sits in the whole list, or -1.
+  int _at(int i) {
+    final shown = documents;
+    if (i < 0 || i >= shown.length) return -1;
+    return _docs.indexWhere((d) => d.id == shown[i].id);
+  }
 
   // ---- persistence (local-first, then cloud) -------------------------------
   //  ⚠️ CLOSED 2026-10-07: the add sheet sends files through uploadAttachments
@@ -107,6 +120,8 @@ class BabyDocumentsStore extends ChangeNotifier {
     } catch (_) {/* start empty */}
     await _sync.load();
     SyncRegistry.registerPending(_hasPending);
+    // Switching child changes what [documents] returns (B11).
+    ChildProfileStore.instance.addListener(notifyListeners);
     _loaded = true;
     notifyListeners();
     try {
@@ -130,6 +145,13 @@ class BabyDocumentsStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Test-only: empty, for every child, and loaded, so nothing reads prefs (B11).
+  @visibleForTesting
+  void debugReset() {
+    _resetLocal();
+    _loaded = true;
+  }
+
   Future<void> _syncFromCloud() async {
     SyncRegistry.register(_syncFromCloud);
     SyncRegistry.registerReset(_resetLocal);
@@ -145,8 +167,10 @@ class BabyDocumentsStore extends ChangeNotifier {
       //   toRow: _toRow,
       //   fromRow: _fromRow,
       // );
-      final merged = await _sync.pull<BabyDocument>(
-        childId: childId,
+      // Every child, not only the one on screen (B11, 2026-10-25). Kept for revert:
+      // final merged = await _sync.pull<BabyDocument>(childId: childId, ...)
+      final merged = await _sync.pullEvery<BabyDocument>(
+        childIds: ChildProfileStore.instance.childIds,
         local: _docs,
         idOf: (d) => d.id,
         fromRow: _fromRow,
@@ -209,18 +233,22 @@ class BabyDocumentsStore extends ChangeNotifier {
     _pushWaiting();
   }
 
-  void updateDocument(int i, BabyDocument d) {
-    if (i < 0 || i >= _docs.length) return;
+  void updateDocument(int shownIndex, BabyDocument d) {
+    // if (i < 0 || i >= _docs.length) return; // kept for revert
+    final i = _at(shownIndex);
+    if (i < 0) return;
     _docs[i] = d;
     notifyListeners();
     _persist();
     // ChildSync.push(_table, _childId, d.id, _toRow(d)); // kept for revert
-    _sync.touch(d.id, _childId);
+    _sync.touch(d.id, _sync.childOf[d.id] ?? _childId);
     _pushWaiting();
   }
 
-  void removeDocument(int i) {
-    if (i < 0 || i >= _docs.length) return;
+  void removeDocument(int shownIndex) {
+    // if (i < 0 || i >= _docs.length) return; // kept for revert
+    final i = _at(shownIndex);
+    if (i < 0) return;
     final row = _docs.removeAt(i);
     notifyListeners();
     _persist();

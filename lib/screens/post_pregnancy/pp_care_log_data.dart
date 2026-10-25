@@ -189,8 +189,10 @@ class NappyStore extends ChangeNotifier {
       // fromRow: fromRow,
       // orderBy: 'time',
       // );
-      final merged = await _sync.pull<NappyLog>(
-        childId: childId,
+      // Every child, not only the one on screen (B11, 2026-10-25). Kept for revert:
+      // final merged = await _sync.pull<NappyLog>(childId: childId, ...)
+      final merged = await _sync.pullEvery<NappyLog>(
+        childIds: ChildProfileStore.instance.childIds,
         local: _logs,
         idOf: (n) => n.id,
         fromRow: fromRow,
@@ -409,8 +411,10 @@ class PumpStore extends ChangeNotifier {
       // fromRow: fromRow,
       // orderBy: 'time',
       // );
-      final merged = await _sync.pull<PumpLog>(
-        childId: childId,
+      // Every child, not only the one on screen (B11, 2026-10-25). Kept for revert:
+      // final merged = await _sync.pull<PumpLog>(childId: childId, ...)
+      final merged = await _sync.pullEvery<PumpLog>(
+        childIds: ChildProfileStore.instance.childIds,
         local: _logs,
         idOf: (p) => p.id,
         fromRow: fromRow,
@@ -982,8 +986,10 @@ class TummyStore extends ChangeNotifier {
       // fromRow: fromRow,
       // orderBy: 'time',
       // );
-      final merged = await _sync.pull<TummyLog>(
-        childId: childId,
+      // Every child, not only the one on screen (B11, 2026-10-25). Kept for revert:
+      // final merged = await _sync.pull<TummyLog>(childId: childId, ...)
+      final merged = await _sync.pullEvery<TummyLog>(
+        childIds: ChildProfileStore.instance.childIds,
         local: _logs,
         idOf: (t) => t.id,
         fromRow: fromRow,

@@ -39,6 +39,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/remote/sync_registry.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../post_pregnancy/phase_map_screen.dart' show PhasePainting;
@@ -80,6 +81,10 @@ class SkTurningSixPrompt extends ChangeNotifier {
     await SkChildStore.instance.load();
     if (_loaded) return;
     _loaded = true;
+    // A sign-out, or another account signing in: the rests are about this
+    // family's children, so they go with the person (found by
+    // sync_reset_coverage_test during B11).
+    SyncRegistry.registerReset(_resetLocal);
     try {
       final raw = (await SharedPreferences.getInstance()).getString(kKey);
       if (raw != null) {
@@ -118,6 +123,11 @@ class SkTurningSixPrompt extends ChangeNotifier {
               e.key: {'count': e.value.count, 'until': e.value.until.toIso8601String()},
           }));
     } catch (_) {}
+  }
+
+  void _resetLocal() {
+    _rest.clear();
+    notifyListeners();
   }
 
   @visibleForTesting

@@ -138,8 +138,10 @@ class FeedingStore extends ChangeNotifier {
       // fromRow: _fromRow,
       // orderBy: 'time',
       // );
-      final merged = await _sync.pull<FeedLog>(
-        childId: childId,
+      // Every child, not only the one on screen (B11, 2026-10-25). Kept for revert:
+      // final merged = await _sync.pull<FeedLog>(childId: childId, ...)
+      final merged = await _sync.pullEvery<FeedLog>(
+        childIds: ChildProfileStore.instance.childIds,
         local: _logs,
         idOf: (f) => f.id,
         fromRow: _fromRow,

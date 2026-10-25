@@ -517,6 +517,16 @@ class VaxDoseRow {
 /// an alarm armed by an older version can still be cancelled.
 int vaxAlarmId(String visitId) => visitId.hashCode & 0x7fffffff;
 
+/// The alarm id for [visitId] of [childId] (B11, 2026-10-25). Twins share
+/// every visit id, so one id each would have one twin's reminder replace the
+/// other's. The first child keeps the bare id an older version armed, so its
+/// alarms can still be cancelled; every other child's id names the child.
+/// The same rule as the message ids (`ppMessageIdPrefix`).
+int vaxAlarmIdFor(String visitId, {String? childId, String? firstChildId}) =>
+    childId == null || childId == firstChildId
+        ? vaxAlarmId(visitId)
+        : '$childId|$visitId'.hashCode & 0x7fffffff;
+
 /// Pure: which alarms this phone must arm and which it must cancel, going
 /// from [before] to [after] (visit id -> fire time). An alarm whose time has
 /// passed is never armed. Unit-tested in `test/pp_records_merge_test.dart`.
@@ -542,23 +552,37 @@ int vaxAlarmId(String visitId) => visitId.hashCode & 0x7fffffff;
 /// The alarm's words, built from the visit and the moment it fires, so the
 /// other parent's phone writes the same reminder (moved here from the two
 /// vaccine screens on 2026-10-17).
-({String title, String body}) vaxReminderText(VaxVisit v, DateTime at) {
-  final due = vaxVisitDate(v) ?? vaxDueDate();
+/// [child] is whose dose it is (B11): an alarm armed for the twin not on
+/// screen speaks of that twin and that twin's date. Null: the child on screen.
+({String title, String body}) vaxReminderText(VaxVisit v, DateTime at, {Child? child}) {
+  // final due = vaxVisitDate(v) ?? vaxDueDate(); // kept for revert
+  final due = child == null
+      ? vaxVisitDate(v) ?? vaxDueDate()
+      : DateTime(child.dob.year, child.dob.month, child.dob.day, 9)
+          .add(Duration(days: v.ageDays));
   final daysBefore = DateTime(due.year, due.month, due.day)
       .difference(DateTime(at.year, at.month, at.day))
       .inDays;
-  final name = ChildProfileStore.instance.name;
+  // final name = ChildProfileStore.instance.name; // kept for revert
+  final name = child?.name ?? ChildProfileStore.instance.name;
   final shot = v.lead.shortName;
   return (
     title: 'Vaccine reminder - $shot',
     body: daysBefore <= 0
         ? "$name's $shot (${v.ageLabel}) is due today."
-        : "$name's $shot (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${VaxStore.instance.dateLabelFor(v)}.",
+        : "$name's $shot (${v.ageLabel}) is due ${daysBefore == 1 ? 'tomorrow' : 'in $daysBefore days'} - ${vaxDateLabel(due)}.",
   );
 }
 
 /// When the reminder for the next visit should fire: that visit's date for
 /// THIS child, at 9am. Falls back to tomorrow morning when nothing is left.
+/// "8 Mar 2026".
+String vaxDateLabel(DateTime d) {
+  const m = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+    'Sep', 'Oct', 'Nov', 'Dec'];
+  return '${d.day} ${m[d.month]} ${d.year}';
+}
+
 DateTime vaxDueDate() {
   final next = VaxStore.instance.nextVisit;
   if (next != null) return vaxVisitDate(next)!;
@@ -615,18 +639,37 @@ class VaxStore extends ChangeNotifier {
   // three doses already ticked - our demo child's history presented as hers.
   // A dose is "done" only when SHE marks it. See statusOf() for how the
   // schedule's own status is now read honestly.
-  final Set<String> _done = {};
-  final Set<String> _reminders = {};
+  // ⚠️ ONE RECORD PER CHILD (B11, 2026-10-25). These four were one set for
+  // the family, keyed by visit, so twin A's 6-week dose read as done for twin
+  // B, and B's reminder was A's. They now live in [_VaxChild], one per child,
+  // and the getters below are the child on screen's, so every read and write
+  // in this class is unchanged. A record saved before B11 joins that child
+  // (PerChild). Kept for revert:
+  //   final Set<String> _done = {};
+  //   final Set<String> _reminders = {};
+  //   final Map<String, DateTime> _givenOn = {};
+  //   final Map<String, DateTime> _reminderAt = {};
+  final PerChild<_VaxChild> _vaxBy = PerChild<_VaxChild>(_VaxChild.new);
+  _VaxChild get _st => _vaxBy.of(_childId, _childId);
+  _VaxChild _of(String childId) => _vaxBy.of(childId, _childId);
+  Set<String> get _done => _st.done;
+  Set<String> get _reminders => _st.reminders;
+  Map<String, DateTime> get _givenOn => _st.givenOn;
+  Map<String, DateTime> get _reminderAt => _st.reminderAt;
 
-  // The day each dose was given, when the parent said (2026-10-07, gap
-  // analysis P1: "a dose can be ticked but not dated"). Syncs to the
+  /// Whether [visitId] is recorded as given for [childId] (B11): the messages
+  /// remind every child of their own visits, not only the one on screen.
+  bool isDoneFor(String childId, String visitId) =>
+      _of(childId).done.contains(visitId);
+
+  // _givenOn: the day each dose was given, when the parent said (2026-10-07,
+  // gap analysis P1: "a dose can be ticked but not dated"). Syncs to the
   // `done_at` column 0023 already has. Missing = ticked without a date.
-  final Map<String, DateTime> _givenOn = {};
-
-  // When each reminder fires (2026-10-17, 0104). Reminders are SHARED: the
-  // time syncs, and each parent's phone arms its own alarm from it (the user:
-  // both phones should buzz). The alarm itself never syncs; it is derived here.
-  final Map<String, DateTime> _reminderAt = {};
+  //
+  // _reminderAt: when each reminder fires (2026-10-17, 0104). Reminders are
+  // SHARED: the time syncs, and each parent's phone arms its own alarm from
+  // it (the user: both phones should buzz). The alarm itself never syncs; it
+  // is derived here.
 
   bool _loaded = false;
   static const _prefsKey = 'pp_vax';
@@ -649,30 +692,40 @@ class VaxStore extends ChangeNotifier {
       final raw = prefs.getString(_prefsKey);
       if (raw != null) {
         final j = Map<String, dynamic>.from(jsonDecode(raw));
-        for (final e in (j['done'] as List? ?? [])) {
-          _done.add(e.toString());
+        // Per child since B11; a blob from before is the family's one record
+        // (the same shape), which waits in the legacy bucket.
+        if (j['byChild'] is Map) {
+          _vaxBy.loadJson(j['byChild'], (v) => v is Map ? _VaxChild.fromJson(v) : null);
+        } else {
+          _vaxBy.byChild[PerChild.legacy] = _VaxChild.fromJson(j);
         }
-        for (final e in (j['reminders'] as List? ?? [])) {
-          _reminders.add(e.toString());
-        }
-        final given = j['givenOn'];
-        if (given is Map) {
-          given.forEach((k, v) {
-            final d = DateTime.tryParse(v.toString());
-            if (d != null) _givenOn[k.toString()] = d;
-          });
-        }
-        final at = j['reminderAt'];
-        if (at is Map) {
-          at.forEach((k, v) {
-            final d = DateTime.tryParse(v.toString());
-            if (d != null) _reminderAt[k.toString()] = d;
-          });
-        }
+        // The one-record read, kept for revert:
+        // for (final e in (j['done'] as List? ?? [])) {
+        //   _done.add(e.toString());
+        // }
+        // for (final e in (j['reminders'] as List? ?? [])) {
+        //   _reminders.add(e.toString());
+        // }
+        // final given = j['givenOn'];
+        // if (given is Map) {
+        //   given.forEach((k, v) {
+        //     final d = DateTime.tryParse(v.toString());
+        //     if (d != null) _givenOn[k.toString()] = d;
+        //   });
+        // }
+        // final at = j['reminderAt'];
+        // if (at is Map) {
+        //   at.forEach((k, v) {
+        //     final d = DateTime.tryParse(v.toString());
+        //     if (d != null) _reminderAt[k.toString()] = d;
+        //   });
+        // }
       }
     } catch (_) {/* keep the schedule defaults */}
     await _sync.load();
     SyncRegistry.registerPending(_hasPending);
+    // Switching child changes what every read returns (B11).
+    ChildProfileStore.instance.addListener(notifyListeners);
     _loaded = true;
     notifyListeners();
     try {
@@ -683,12 +736,17 @@ class VaxStore extends ChangeNotifier {
   /// A sign-out, or another account signing in (2026-10-17): this store
   /// forgets the person in memory; the cloud keeps it.
   void _resetLocal() {
-    _done.clear();
-    _reminders.clear();
-    _givenOn.clear();
-    _reminderAt.clear();
+    // _done.clear(); _reminders.clear(); _givenOn.clear(); _reminderAt.clear(); // kept for revert
+    _vaxBy.clear();
     _sync.clear();
     notifyListeners();
+  }
+
+  /// Test-only: empty, for every child, and loaded, so nothing reads prefs (B11).
+  @visibleForTesting
+  void debugReset() {
+    _resetLocal();
+    _loaded = true;
   }
 
   Future<void> _syncFromCloud() async {
@@ -697,26 +755,31 @@ class VaxStore extends ChangeNotifier {
     final childId = _childId;
     if (!SupabaseRepo.isLoggedIn || childId == null) return;
     try {
-      final before = _alarms();
-      final merged = await _sync.pull<VaxDoseRow>(
-        childId: childId,
-        local: _rowsFor(childId),
-        idOf: (d) => d.id,
-        fromRow: VaxDoseRow.fromCloud,
-      );
-      _done.clear();
-      _reminders.clear();
-      _givenOn.clear();
-      _reminderAt.clear();
-      for (final d in merged) {
-        if (d.done) _done.add(d.id);
-        if (d.givenOn != null) _givenOn[d.id] = d.givenOn!;
-        if (d.reminder) _reminders.add(d.id);
-        if (d.reminderAt != null) _reminderAt[d.id] = d.reminderAt!;
+      // Every child, the one on screen first so a record saved before B11
+      // joins it (B11, 2026-10-25). The loop's body is the one-child pull.
+      for (final c in [childId, ...ChildProfileStore.instance.childIds.where((x) => x != childId)]) {
+        final s = _of(c);
+        final before = _alarms(s);
+        final merged = await _sync.pull<VaxDoseRow>(
+          childId: c,
+          local: _rowsFor(c),
+          idOf: (d) => d.id,
+          fromRow: VaxDoseRow.fromCloud,
+        );
+        s.done.clear();
+        s.reminders.clear();
+        s.givenOn.clear();
+        s.reminderAt.clear();
+        for (final d in merged) {
+          if (d.done) s.done.add(d.id);
+          if (d.givenOn != null) s.givenOn[d.id] = d.givenOn!;
+          if (d.reminder) s.reminders.add(d.id);
+          if (d.reminderAt != null) s.reminderAt[d.id] = d.reminderAt!;
+        }
+        _applyAlarmChanges(vaxAlarmChanges(before, _alarms(s), DateTime.now()), c);
       }
       await _persist();
       notifyListeners();
-      _applyAlarmChanges(vaxAlarmChanges(before, _alarms(), DateTime.now()));
       await _pushWaiting();
     } catch (_) {/* offline - keep local */}
   }
@@ -750,18 +813,24 @@ class VaxStore extends ChangeNotifier {
 
   /// Every dose this phone has any state for: ticked, reminded, or changed
   /// here and remembered by the book (so an un-tick still merges).
-  List<VaxDoseRow> _rowsFor(String childId) => [
-        for (final id in {..._done, ..._reminders, ..._sync.keysFor(childId)})
-          _rowOf(id),
-      ];
+  List<VaxDoseRow> _rowsFor(String childId) {
+    final s = _of(childId);
+    return [
+      for (final id in {...s.done, ...s.reminders, ..._sync.keysFor(childId)})
+        _rowOf(id, s),
+    ];
+  }
 
-  VaxDoseRow _rowOf(String id) => VaxDoseRow(
-        id: id,
-        done: _done.contains(id),
-        givenOn: _givenOn[id],
-        reminder: _reminders.contains(id),
-        reminderAt: _reminderAt[id],
-      );
+  VaxDoseRow _rowOf(String id, [_VaxChild? of]) {
+    final s = of ?? _st;
+    return VaxDoseRow(
+      id: id,
+      done: s.done.contains(id),
+      givenOn: s.givenOn[id],
+      reminder: s.reminders.contains(id),
+      reminderAt: s.reminderAt[id],
+    );
+  }
 
   /// Uploads whatever the cloud has not confirmed (0104).
   Future<void> _pushWaiting() {
@@ -785,18 +854,33 @@ class VaxStore extends ChangeNotifier {
 
   /// Each dose's alarm as this phone should hold it: reminded, not yet given,
   /// with a time.
-  Map<String, DateTime> _alarms() => {
-        for (final id in _reminders)
-          if (!_done.contains(id) && _reminderAt[id] != null)
-            id: _reminderAt[id]!,
-      };
+  /// [of] is one child's record; null: the child on screen's.
+  Map<String, DateTime> _alarms([_VaxChild? of]) {
+    final s = of ?? _st;
+    return {
+      for (final id in s.reminders)
+        if (!s.done.contains(id) && s.reminderAt[id] != null)
+          id: s.reminderAt[id]!,
+    };
+  }
 
-  void _applyAlarmChanges(({Map<String, DateTime> arm, Set<String> cancel}) c) {
+  /// The phone's id for [childId]'s alarm of [visitId] (B11).
+  int _alarmId(String visitId, String? childId) {
+    final kids = ChildProfileStore.instance.children;
+    return vaxAlarmIdFor(visitId,
+        childId: childId, firstChildId: kids.isEmpty ? null : kids.first.id);
+  }
+
+  /// [childId] is whose alarms these are; null: the child on screen.
+  void _applyAlarmChanges(({Map<String, DateTime> arm, Set<String> cancel}) c,
+      [String? childId]) {
+    final child = childId ?? _childId;
     for (final id in c.cancel) {
-      NotificationService.instance.cancel(vaxAlarmId(id));
+      // NotificationService.instance.cancel(vaxAlarmId(id)); // kept for revert
+      NotificationService.instance.cancel(_alarmId(id, child));
     }
     for (final e in c.arm.entries) {
-      _arm(e.key, e.value);
+      _arm(e.key, e.value, child);
     }
   }
 
@@ -810,10 +894,16 @@ class VaxStore extends ChangeNotifier {
     ));
   }
 
-  void _arm(String visitId, DateTime at) {
-    final text = vaxReminderText(vaxVisitById(visitId), at);
+  void _arm(String visitId, DateTime at, [String? childId]) {
+    // final text = vaxReminderText(vaxVisitById(visitId), at); // kept for revert
+    Child? kid;
+    for (final k in ChildProfileStore.instance.children) {
+      if (k.id == childId) kid = k;
+    }
+    final text = vaxReminderText(vaxVisitById(visitId), at, child: kid);
     NotificationService.instance.scheduleOneOff(
-      id: vaxAlarmId(visitId),
+      // id: vaxAlarmId(visitId), // kept for revert
+      id: _alarmId(visitId, childId),
       title: text.title,
       body: text.body,
       when: at,
@@ -842,12 +932,14 @@ class VaxStore extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(
         _prefsKey,
-        jsonEncode({
-          'done': _done.toList(),
-          'reminders': _reminders.toList(),
-          'givenOn': {for (final e in _givenOn.entries) e.key: e.value.toIso8601String()},
-          'reminderAt': {for (final e in _reminderAt.entries) e.key: e.value.toIso8601String()},
-        }),
+        // Kept for revert (one record for the family):
+        // jsonEncode({
+        //   'done': _done.toList(),
+        //   'reminders': _reminders.toList(),
+        //   'givenOn': {for (final e in _givenOn.entries) e.key: e.value.toIso8601String()},
+        //   'reminderAt': {for (final e in _reminderAt.entries) e.key: e.value.toIso8601String()},
+        // }),
+        jsonEncode({'byChild': _vaxBy.toJson((s) => s.toJson())}),
       );
     } catch (_) {}
   }
@@ -1039,5 +1131,41 @@ class VaxStore extends ChangeNotifier {
     final reminded = kVaxVisits.where((v) => _reminders.contains(v.id)).toList()
       ..sort((a, b) => a.ageDays.compareTo(b.ageDays));
     return reminded.isEmpty ? null : '${reminded.first.lead.shortName} · ${reminded.first.date}';
+  }
+}
+/// One child's vaccine record (B11, 2026-10-25): which doses are given and
+/// when, and which carry a reminder and when it fires.
+class _VaxChild {
+  final Set<String> done = {};
+  final Set<String> reminders = {};
+  final Map<String, DateTime> givenOn = {};
+  final Map<String, DateTime> reminderAt = {};
+
+  Map<String, Object?> toJson() => {
+        'done': done.toList(),
+        'reminders': reminders.toList(),
+        'givenOn': {for (final e in givenOn.entries) e.key: e.value.toIso8601String()},
+        'reminderAt': {for (final e in reminderAt.entries) e.key: e.value.toIso8601String()},
+      };
+
+  /// Reads [toJson], and the one-record blob from before B11 (same shape).
+  static _VaxChild fromJson(Map j) {
+    final s = _VaxChild();
+    for (final e in (j['done'] as List? ?? [])) {
+      s.done.add(e.toString());
+    }
+    for (final e in (j['reminders'] as List? ?? [])) {
+      s.reminders.add(e.toString());
+    }
+    void dates(Object? m, Map<String, DateTime> into) {
+      if (m is! Map) return;
+      m.forEach((k, v) {
+        final d = DateTime.tryParse(v.toString());
+        if (d != null) into[k.toString()] = d;
+      });
+    }
+    dates(j['givenOn'], s.givenOn);
+    dates(j['reminderAt'], s.reminderAt);
+    return s;
   }
 }

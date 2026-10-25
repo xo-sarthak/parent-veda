@@ -316,8 +316,11 @@ void main() {
     // ChildSync.pushKeyed survives only inside the kept-for-revert helpers.
     final health = live('$dir/pp_health_data.dart');
     expect(RegExp(r'await _pullTable\(').allMatches(health).length, 6);
-    expect(health, contains('await _pullQuestions(childId)'));
-    expect(health, contains('await _pullEmergency(childId)'));
+    // expect(health, contains('await _pullQuestions(childId)')); // before B11
+    // Every child since B11 (2026-10-25), the one on screen first.
+    expect(health, contains('await _pullQuestions(c)'));
+    // expect(health, contains('await _pullEmergency(childId)')); // before B11
+    expect(health, contains('await _pullEmergency(c)'));
     expect(RegExp(r"_after\(\(\) => _remove\('pp_\w+', row\.id, _\w+Row\(row\)\)\)")
             .allMatches(health)
             .length,

@@ -215,9 +215,12 @@ class PpMessageFacts {
   static List<PpMessageFacts> familyFromStores() {
     final c = ChildProfileStore.instance;
     if (!c.hasRealChild) return [_forChild(null, withVisits: false)];
-    final active = c.activeChildId;
+    // Every child's own visits since B11 (2026-10-25): the vaccine record is
+    // kept per child now. Kept for revert (the child on screen only):
+    //   final active = c.activeChildId;
+    //   for (final k in c.children) _forChild(k, withVisits: k.id == active),
     return [
-      for (final k in c.children) _forChild(k, withVisits: k.id == active),
+      for (final k in c.children) _forChild(k, withVisits: true),
     ];
   }
 
@@ -243,7 +246,9 @@ class PpMessageFacts {
           ? const []
           : [
               for (final v in kVaxVisits)
-                if (vax.statusOf(v) != VaxStatus.done && !vax.isOptionalVisit(v))
+                // if (vax.statusOf(v) != VaxStatus.done && !vax.isOptionalVisit(v)) // kept for revert
+                if (!(k == null ? vax.statusOf(v) == VaxStatus.done : vax.isDoneFor(k.id, v.id)) &&
+                    !vax.isOptionalVisit(v))
                   (
                     id: v.id,
                     label: v.ageLabel,
