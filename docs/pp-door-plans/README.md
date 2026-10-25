@@ -19,7 +19,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 | 10 | Traditions | `10-traditions.md` + `10-traditions-content.md` | TR1–TR6 chosen and recorded 2026-10-25 (jhula fixed to match Sleep SL7; malish and which oil, the top search). TR-Q (tone of two pages) approved with two small changes. Plan final; build waits on step 0. Owed to the shop list: baby massage oil is not stocked |
 | 11 | Safety | `11-safety.md` + `11-safety-content.md` | SF1–SF8 chosen and recorded 2026-10-25: emergency call strip on every tab, CPR for baby and child, flights and front seat (the top search). Plan final; build waits on step 0. Owed to the shop list: gates, socket covers, corner guards, cabinet locks, child helmets. Owed: a first aid and CPR class |
 | 12 | Special care | `12-special-care.md` + `12-special-care-content.md` | SC1–SC7 chosen and recorded 2026-10-25: 1–6 open on Extra support; new speech, therapies (with costs), hearing and diagnosis-from-birth pages (speech is the top search); Help in India as steps. Plan final; build waits on step 0. Owed: developmental paediatrician and speech therapist experts |
-| 13 | Family | — | |
+| 13 | Family | `13-family.md` + `13-family-content.md` | FM1–FM5 chosen and recorded 2026-10-25: babies open on Grandparents; the section goes from 0 links to linking every page; new back-to-work, you-two and on-your-own pages; "Care while you work". Plan final; build waits on step 0 |
 | 14 | Papers and money | — | |
 | — | Thin and missing doors | `00-MASTER.md` § Thin and missing | after the doors |
 | — | Home "Today" strip | — | after the doors |
