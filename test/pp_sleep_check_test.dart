@@ -117,8 +117,11 @@ void main() {
               // An owed shelf or class a door plan names on purpose is not
               // dead: the one opener says why (S8; the same rule as
               // pp_doors_sanity_test, Feeding door build 2026-10-25).
+              // A target named with its own words (`kPpNotYetWords`, Potty
+              // PT4) passes the same way, listed by id.
               final owed = (id.startsWith('pp_products/') ||
-                      id.startsWith('pp_class/')) &&
+                          id.startsWith('pp_class/') ||
+                          kPpNotYetWords.containsKey(id)) &&
                   ppSurfaceUnavailable(id) != null;
               if (ppScreenForSurface(id) == null && !owed) {
                 bad.add('${s.id}/${p.id} -> $id');

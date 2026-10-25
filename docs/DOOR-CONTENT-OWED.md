@@ -212,7 +212,7 @@ Catalogue items and people the door points at that do not exist yet (each tap sa
 | Health (parenting) | 6 | 3 | – | 3 | 1 (dosing table sign-off) |
 | Development (parenting) | 4 | 1 | – | 3 | – (DV2 is a data job, logged) |
 | Behaviour (parenting) | 15 | 11 | – | 4 | – |
-| Potty (parenting) | 6 | 4 | – | 2 | – |
+| Potty (parenting) | 13 | – (PT1–PT4 written 2026-10-02) | – | 3 | – (PT7–PT13 answer a tap; see the door 5 table) |
 | Early Learning (parenting) | 4 | 2 | – | 2 | – |
 | First 40 Days (parenting) | 11 | 3 | – | 4 | 1 (the day spine, FF10); FF1–FF2 closed into You |
 | You, Maa (parenting) | 6 | 2 | – | 3 | – |
@@ -297,12 +297,24 @@ pieces as coming-soon cards, copy "written on your go"; one film.
 
 | # | Card | Kind | Outcome | Owed |
 |---|---|---|---|---|
-| PT1 | `no_star_charts` — Why there are no star charts here | Short article | Coming soon | Brand-defining: the words to hold the line when the family is pushing stickers and sweets. Same shape as Sleep's "where we stand". |
-| PT2 | `three_day_method` — The three-day method, done safely | Article | Coming soon | Judgement call 2, the user's call: teach it. Who it suits, the shape, and the one risk built in (a child who starts holding it in). |
-| PT3 | `pull_ups` — Do pull-ups help or hurt? | Cards | Coming soon | One honest card. |
-| PT4 | `taking_longer` — If she is taking much longer than her friends | Cards | Coming soon | A calm pointer to Development and a paediatrician, without alarm. |
+| PT1 | `no_star_charts` — Why there are no star charts here | Short article | Written 2026-10-02 | Brand-defining: the words to hold the line when the family is pushing stickers and sweets. Since door 5 (2026-10-25) it is the one source; three pages link to it. `REQUIRED_REVIEW`. |
+| PT2 | `three_day_method` — The three-day method, done safely | Article | Written 2026-10-02 | Who it suits, the shape, and the one risk built in (a child who starts holding it in). Banded from 2 years (door 5, PT2). `REQUIRED_REVIEW`. |
+| PT3 | `pull_ups` — Pull-ups, cloth pants or a chaddi? (was "Do pull-ups help or hurt?") | Cards | Written 2026-10-02, rewritten 2026-10-25 | Door 5 PT6: chaddi and towel, cloth trainer pants, pull-ups for nights and travel. `REQUIRED_REVIEW`. |
+| PT4 | `taking_longer` — If it is taking your child a long time | Cards | Written 2026-10-02 | A calm pointer to Development and a paediatrician, now with a consult (door 5, PT5). `REQUIRED_REVIEW`. |
 | PT5 | `indian_toilet` — The Indian toilet, and going out | Film · 6 min | Built from data | Slot `potty/indian_toilet`: the supported squat, the balance, the bucket-and-mug, front to back. "The clearest missing video in the section." The wiping page points here. |
-| PT6 | The seven films the brief marks | Film | Built from data | Every `potty/*` slot is a placeholder: the timeline, cueing, readiness, the routine, accidents, the activities, dry nights. |
+| PT6 | The eight films the brief marks | Film | Built from data | Every `potty/*` slot is a placeholder: the timeline, cueing, readiness, the routine, the Indian toilet (PT5), accidents, the activities, dry nights. (Was "seven"; there are eight slots, corrected 2026-10-25.) |
+
+**Added by the door 5 build (2026-10-25, `docs/pp-door-plans/05-potty.md` PT3 to PT7, §12).** Nothing here is a coming-soon card: every item answers a tap with a notice, or shows a drawn mark.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| PT7 | Three shelf demos: `potty/after_waking_sit`, `potty/hand_washing_low_tap`, `potty/seat_and_stool` | Film · 1–2 min | Slotted | On `after_waking_sit`, `wash_low_tap` and `introducing_potty`. A tap says the film is coming (S8a) |
+| PT8 | `potty/door_intro` | Film · 30–45 s, AI scenes | Not slotted | S4: no chip until the film exists |
+| PT9 | A painting for each of the 16 Try this today cards | Painting | Built from data | Each card shows a line icon on the activity tint until then (`_kPottyActivityIcons`) |
+| PT10 | A "Potty and toilet" shop subcategory: potty, seat insert, step stool, travel potty, cloth trainer pants | Catalogue | S8c | `pp_products/Potties` and `pp_products/Travel potties` answer with the page's tip (`kPpShelfNotYet`). Also in `BEFORE-LAUNCH.md` |
+| PT11 | A potty buying guide | Guide | S8c | `pp_product_guide/Potties`: "We haven't written the potty guide yet. What to check is on this page" (`kPpNotYetWords`) |
+| PT12 | The short potty masterclass (one fortnight, step by step) | Class | S8d | `pp_class/potty_masterclass`: "This class isn't open yet. Tap Tell me". Its paid wording is commented out until it exists |
+| PT13 | A screen for the picture books (`kKidsBooks` has 9 potty books and no screen) | Screen | Notice | `pp_books/Potty` names two titles from the list. When the screen exists, the link opens it filtered to the theme |
 
 ### P7. Early Learning — `lib/data/doors/pp_door_early_learning.dart`
 

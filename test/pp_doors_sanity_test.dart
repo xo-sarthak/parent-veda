@@ -55,8 +55,11 @@ void main() {
       // are named on purpose by a door plan, and the one opener answers the
       // tap with why ("We're still choosing...", "This class isn't open
       // yet"). Only those two kinds pass; a typo anywhere else still fails.
+      // So does a target named with its own words (`kPpNotYetWords`, Potty
+      // PT4: the potty guide, the picture books), which is listed by id.
       final owed = (surface.startsWith('pp_products/') ||
-              surface.startsWith('pp_class/')) &&
+                  surface.startsWith('pp_class/') ||
+                  kPpNotYetWords.containsKey(surface)) &&
           ppSurfaceUnavailable(surface) != null;
       if (ppScreenForSurface(surface) == null && !owed) {
         bad.add('$where -> $surface');

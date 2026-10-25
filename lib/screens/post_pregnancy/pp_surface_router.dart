@@ -84,6 +84,7 @@ import '../../data/mind_mood_data.dart' show kCrisisHelplineName, kCrisisHelplin
 import 'pp_community_detail_screen.dart';
 import 'community_screen.dart';
 import '../../data/community_data.dart' show kParentingCommunities;
+import '../../data/kids_books.dart' show KidsBookRank, kKidsBooks;
 import 'development_all_activities_screen.dart';
 import 'pp_development_data.dart' show kDevAreas;
 // import 'on_track_checklist_screen.dart'; // merged into the journey, kept for revert
@@ -187,7 +188,34 @@ const Map<String, String> kPpShelfNotYet = {
   'Lice combs': 'Not in our shop yet. A chemist will have one.',
   'Sun hats and sunscreen': 'Not in our shop yet. A chemist will have one.',
   'Health record folders': 'Not in our shop yet. Any plastic folder works.',
+  // Potty (PT4): the shop has no potty yet, so the tap carries the page's tip.
+  'Potties': "We haven't picked potties yet. Look for a wide, stable base, "
+      'feet flat on the floor, and no splash-guard edge that pinches.',
+  'Travel potties': "We haven't picked travel potties yet. A folding one that "
+      'fits a bag, and a stool for the squat, are the two to look for.',
 };
+
+/// ⚠️ A TARGET WE HAVE NOT BUILT, NAMED FOR WHAT IT IS (Potty PT4). The
+/// generic "This isn't ready yet" is true and useless; these say what is
+/// missing and where the help is meanwhile. Surface id -> the words.
+Map<String, String> get kPpNotYetWords => {
+      'pp_product_guide/Potties': "We haven't written the potty guide yet. "
+          'What to check is on this page: a low potty, and feet flat on the '
+          'floor.',
+      // There is a book list but no screen for it yet; name two from it.
+      'pp_books/Potty': "We haven't put picture books in the app yet. "
+          '${_bookPair('Potty')} are two that children like.',
+    };
+
+/// Two titles from the book list for a theme: "Once Upon a Potty and Potty
+/// for Me!". The list is the source, so a title is never invented.
+String _bookPair(String theme) {
+  final titles = [
+    for (final b in kKidsBooks)
+      if (b.theme == theme && b.rank == KidsBookRank.essential) b.title,
+  ];
+  return titles.length < 2 ? 'The ones in any bookshop' : '${titles[0]} and ${titles[1]}';
+}
 
 /// ⚠️ A ROSTER OF PLACEHOLDERS ONLY, SAID PLAINLY (You, Maa §12, M6,
 /// 2026-10-25). Her physio and counsellor rows open categories whose people
@@ -306,6 +334,7 @@ String? ppSurfaceUnavailable(String id) {
   if (id.startsWith(classPrefix)) {
     return "This class isn't open yet. Tap Tell me and we'll let you know.";
   }
+  if (kPpNotYetWords[id] case final words?) return words;
   if (ppScreenForSurface(id) == null) {
     return "This isn't ready yet. We're adding it to ParentVeda soon.";
   }

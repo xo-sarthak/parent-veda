@@ -1,6 +1,6 @@
 # Door 5: Potty, the plan
 
-Written 2026-10-24. **Status: final. PT1 to PT8 and PT10 answered by the user 2026-10-24 (PT5 and PT6 after plain-words re-asks; PT10 raised by the user).** The new copy is in `05-potty-content.md`. Nothing in `lib/` changes until step 0 and the user's go. Shell rule S8 (no silent tap) is in `00-MASTER.md`; this plan proposes S9.
+Written 2026-10-24. **Status: final. PT1 to PT8 and PT10 answered by the user 2026-10-24 (PT5 and PT6 after plain-words re-asks; PT10 raised by the user).** **Door built 2026-10-25; what differs from this plan, and why, is in §12.** The new copy is in `05-potty-content.md`. Nothing in `lib/` changes until step 0 and the user's go. Shell rule S8 (no silent tap) is in `00-MASTER.md`; this plan proposes S9.
 
 ## Context
 Potty is an action door, but it opens like a lecture.
@@ -201,3 +201,33 @@ From `research/questions/ranked_parenting.csv`. PT1 to PT10 stand. The poo quest
 | PT8 | A tab locked for her age never opens from a link (new shell rule S9 for all doors)? | Yes | **Yes** (2026-10-24). Reshaped by PT10: no tab is locked, so a link opens the later-age tab with the "for later" line |
 | PT10 | Should tabs for a later age stay locked? (raised by the user: "should we lock the content???") | Unlock, every door | **Unlock, every door** (2026-10-24): later-age tabs open, sit last, carry "For later, usually from …"; outgrown tabs still drop |
 | PT11 | Widen First 40's `f40_nappy_poop` to 0–12 months with "After the first weeks, and after solids", and link it from the su-su tab | "Why is baby poop green" (87), "how many times should a baby poop" (59) and the rest have no page after 40 days | **Yes**, chosen and recorded. Copy in `06-first40-content.md` §R1. Added by the demand re-check, 2026-10-25 |
+
+## 12. As built (2026-10-25)
+Held by `test/pp_potty_door_test.dart` (23 tests, "door 5: the plan, held" among them): five bands that meet and the three page bands, the tab order per band, the shelf for each band (its cards exactly, 3 to 6, each timed, an `ACTIVITY` with one when-line and nothing to tick, the same order all day, no store behind it), the shelf on the opening tab and nowhere else, the expert rows and that each opens, a consult on every doctor-flag page and no shop link on any of them, one product a page and no unfiltered shop or Learn home, the masterclass as a class by id without the paid wording, the parents' room, the four buy links and their notices, every PT6 change with its `REQUIRED_REVIEW` marker, the eleven film slots, the poo pointer, and the first view at 2, 15, 30, 40 and 54 months (the opening tab, the shelf, each card drawn once, no lock).
+
+**The shell, new for this door and open to every door:**
+- `ppDoorInlinePageIds` (`doors/pp_door_inline_tools.dart`): an inline tool that draws pages of the tab's own areas names them, and the rails skip them the way they skip an age rail's pages; an area left empty drops. Try this today is the first such tool. Without it a two-year-old's Starting out would show the same six activities as a shelf and again as a rail.
+- `_ShelfCard`: Play today's card, made shared, so the two shelves cannot drift apart.
+
+**The router:** `kPpNotYetWords`, a target we have not built, named for what it is: "We haven't written the potty guide yet. What to check is on this page", and for the picture books two titles taken from `kKidsBooks` (the list exists; no screen shows it yet). The two link gates (`pp_doors_sanity_test`, `pp_sleep_check_test`) accept an id listed there, as they accept an unstocked shelf or a closed class; a typo still fails. `kPpShelfNotYet` gains Potties and Travel potties, each with the page's tip.
+
+**A mechanism worth keeping:** the first build gave the activities area no bands ("every stage has a shelf"). That made Starting out an open tab for a four-month-old, because a tab is "for later" only when none of its areas is in her band, and an area with no bands is in every band. So the baby's two activities moved into the su-su area, the activities area is from one year, and the shelf finds its cards by page id rather than by area. The general point: in this shell an area's bands decide when its whole tab opens, not only which pages show, so "tag it for everyone" is never neutral.
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| PT3: "4 to 6 activity cards for his stage" | 3 for a baby, 4 from one to two and from three, 6 from two to three | The content file's Part A table, written after the plan, gives these. Every card for his stage is shown; the date only orders them |
+| PT3: the cards "show a picture" | A line icon on the activity tint per card | No paintings exist; never an empty frame (D5's rule). Owed PT9 |
+| PT1: 2 to 3 opens Starting out "day by day first" | An age rail for 2 to 3 holding the whole day-by-day area, so readiness follows | The age rail is the shell's way to put one rail first for one band (H-M1); the area rail it empties drops |
+| PT5: Dry nights row "S8b points to a paediatrician" for a paediatric urologist | The row opens paediatricians directly | Health's rule: a worried parent reaches a person, not a notice. No urologist category is added |
+| PT5: the parents' room "at the foot of Accidents" | A link at the foot of `accidents_are_normal` | A tab has no link slot of its own; the page is the tab's first |
+| PT4: one link per page | `introducing_potty` has the potty link and the guide link | The plan's own table puts both there. The guide sells nothing |
+| PT4: `diaper_free_time`'s "A potty, a basin and a floor mat" (not in the table) | Points at the stocked dry-sheet shelf as "A waterproof mat for floor time" | It opened the unfiltered shop with no potty in it; the mat is the one thing it asks for that we stock |
+| PT6: the travel warning "becomes a doctor callout" | The home-care callout stays; a doctor callout follows it | The first says what to do at home, the second when to stop |
+| PT7: three demos "for the shelf", the third the Indian toilet seat-and-stool | `after_waking_sit` and `wash_low_tap` carry two; the seat-and-stool demo is on `introducing_potty` | `indian_toilet` already opens on its own film; two films would stack at its top. "A seat and a step stool" is that page's link |
+| PT7: door intro `potty/door_intro` | Not slotted | S4: no chip until a film exists. Owed PT8 |
+| PT11: `f40_nappy_poop` widened to 0 to 12 months | The pointer page `su_su_poo` is built; the widening is not | That page is First 40's, and its copy (`06-first40-content.md` §R1) is door 6's build. The pointer opens it today |
+| §Verification: an S9 test in `pp_doors_first_view_test` | In `pp_potty_door_test` ("PT8: a link into a later tab opens it with the for later line") | Each built door holds its own first view |
+| §Verification: a Mobbin check | Not run | The shelf is the approved D2 look reused, as the plan says |
+
+**Owed, not in this build:** the films and paintings (`DOOR-CONTENT-OWED` PT7 to PT9), the potty shop subcategory, the buying guide, the masterclass and a books screen (PT10 to PT13), First 40's widening of `f40_nappy_poop` (door 6), and a paediatrician's read of every `REQUIRED_REVIEW` line (`BEFORE-LAUNCH.md`).

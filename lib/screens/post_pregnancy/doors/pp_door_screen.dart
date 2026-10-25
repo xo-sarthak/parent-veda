@@ -542,6 +542,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     final shown = {
       for (final r in _bandRailsFor(tab)) for (final x in r.$2) x.id,
       for (final x in _extraPagesFor(tab)) x.id,
+      // On the shelf already (Potty's Teach the toy is two stages').
+      ..._inlinePageIds(tab),
     };
     // A page whose title is already on her rails, or is a tool's name there
     // ("Sleep at this age" is both a chart and a page), is not shown twice.
@@ -595,9 +597,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   /// brain orders). The age rail leads when the tab has one for her band,
   /// and the area rails skip its pages (H-M1); an area left empty by that
   /// drops, which is what "nothing shows twice" costs.
+  ///
+  /// ⚠️ AND THEY SKIP WHAT AN INLINE TOOL DRAWS (Potty PT3, 2026-10-25), by
+  /// the same rule: Try this today is pages of Starting out's own activities
+  /// area, so from one to three the rail of them would be the shelf twice.
+  /// For every other age the area is a rail as before.
   List<(PpArea, List<PpPage>)> _bandRailsFor(PpDoorTab tab) {
     final age = _ageRailFor(tab);
-    final onAge = {for (final x in age?.$2 ?? const <PpPage>[]) x.id};
+    final onInline = _inlinePageIds(tab);
+    final onAge = {
+      for (final x in age?.$2 ?? const <PpPage>[]) x.id,
+      ...onInline,
+    };
     final out = <(PpArea, List<PpPage>)>[
       if (age != null)
         (
@@ -630,6 +641,11 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     }
     return out;
   }
+
+  /// The pages a tab's inline tool draws in place (`ppDoorInlinePageIds`).
+  Set<String> _inlinePageIds(PpDoorTab tab) => tab.inlineSurfaceId == null
+      ? const {}
+      : ppDoorInlinePageIds(tab.inlineSurfaceId!);
   // Before the age rail (H-M1), kept for revert:
   // List<(PpArea, List<PpPage>)> _bandRailsFor(PpDoorTab tab) => [
   //       for (final id in tab.areaIds)

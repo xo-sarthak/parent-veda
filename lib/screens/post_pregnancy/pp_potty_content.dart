@@ -68,8 +68,28 @@ import 'pp_section_screen.dart';
 //  Inclusive lower, exclusive upper, per `PpBand`. A 36-month-old is in the
 //  night-dryness band, which is correct: that is exactly when it starts being
 //  her question.
+//
+//  ⚠️ FIVE BANDS NOW, NOT THREE (door plan `docs/pp-door-plans/05-potty.md`,
+//  PT2, the user's yes 2026-10-24). One band ran from 12 to 36 months, so a
+//  13-month-old was shown the three-day method and "starting out, day by
+//  day" while the pages themselves said "from about 18 months" and "usually
+//  over two and a half", and a three-year-old met "Bedwetting at five and
+//  older". The two splits follow the stages the pages already name: getting
+//  ready (1 to 2) and learning (2 to 3); a first year of staying dry (3 to
+//  4) and the bedwetting years (4 to 6). Where a page names an age in its
+//  own text, it carries its own bands. No band id is persisted anywhere
+//  (checked at build), so the old ids are gone; kept for revert below.
 // =============================================================================
 
+// The three bands, kept for revert:
+// const PpBandSet kPpPottyBands = PpBandSet([
+//   PpBand(id: 'su_su', label: 'Baby, 0 to 12 months', fromMonths: 0, toMonths: 12,
+//       blurb: "The wee cue. Learning your baby's timing, and fewer nappies to wash."),
+//   PpBand(id: 'learning', label: '1 to 3 years', fromMonths: 12, toMonths: 36,
+//       blurb: "Learning to use the potty, at your child's pace, with accidents along the way."),
+//   PpBand(id: 'dry', label: '3 to 6 years', fromMonths: 36, toMonths: 72,
+//       blurb: 'Dry nights, wiping without help, and managing a toilet away from home.'),
+// ]);
 const PpBandSet kPpPottyBands = PpBandSet([
   PpBand(
     id: 'su_su',
@@ -79,20 +99,62 @@ const PpBandSet kPpPottyBands = PpBandSet([
     blurb: "The wee cue. Learning your baby's timing, and fewer nappies to wash.",
   ),
   PpBand(
-    id: 'learning',
-    label: '1 to 3 years',
+    id: 'pt_1_2',
+    label: '1 to 2 years',
     fromMonths: 12,
+    toMonths: 24,
+    blurb: 'Getting ready: the words, the potty as furniture, and the first signs.',
+  ),
+  PpBand(
+    id: 'pt_2_3',
+    label: '2 to 3 years',
+    fromMonths: 24,
     toMonths: 36,
     blurb: "Learning to use the potty, at your child's pace, with accidents along the way.",
   ),
   PpBand(
-    id: 'dry',
-    label: '3 to 6 years',
+    id: 'pt_3_4',
+    label: '3 to 4 years',
     fromMonths: 36,
+    toMonths: 48,
+    blurb: 'Mostly dry days, wiping with help, and the first school toilet.',
+  ),
+  PpBand(
+    id: 'pt_4_6',
+    label: '4 to 6 years',
+    fromMonths: 48,
     toMonths: 72,
     blurb: 'Dry nights, wiping without help, and managing a toilet away from home.',
   ),
 ]);
+
+/// Every band from one year on: the areas that were "learning" and "dry"
+/// (readiness, starting out, accidents), widened on purpose. See the areas.
+const List<String> _kFromOne = ['pt_1_2', 'pt_2_3', 'pt_3_4', 'pt_4_6'];
+
+/// ⚠️ THE "TRY THIS TODAY" SHELF'S TIMES (PT3). Page id → what the card says
+/// it takes. An activity is something to try today, not something to finish:
+/// the card shows a time and never a tick, a count or a "done". Read by the
+/// shelf (`doors/pp_door_inline_tools.dart`); a test holds that every
+/// activity has one.
+const Map<String, String> kPpPottyActivityTimes = {
+  'cue_at_waking': '3 min',
+  'nappy_off_time': '10 min',
+  'say_it_as_it_happens': '1 min',
+  'choose_the_potty': '10 min',
+  'pants_down_up': '5 min',
+  'flush_and_wave': '1 min',
+  'after_waking_sit': '3 min',
+  'wash_low_tap': '3 min',
+  'big_kid_pants_day': 'All day',
+  'routine_chart': '30 min',
+  'sit_and_read': '5 min',
+  'teach_the_toy': '2 min',
+  'wiping_practice': '5 min',
+  'last_wee_before_bed': '2 min',
+  'spare_clothes_bag': '5 min',
+  'public_toilet_run': '15 min',
+};
 
 // =============================================================================
 //  THE SECTION
@@ -278,11 +340,21 @@ final PpSection kPpPottySection = PpSection(
             PpWhenLine('Any time from a few weeks old. Most families find it '
                 'easiest between 3 and 9 months, before crawling away '
                 'mid-hold begins.'),
+            // The "read next" was a sentence; it is a link now (PT6). Kept
+            // for revert:
+            // PpIndiaNote('In a joint family this is often easier, not harder. '
+            //     'More arms means more chances to catch the moment, and someone '
+            //     'in the house has almost certainly done it before. Agree on '
+            //     'the sound early. Read next in this area: '
+            //     'how to read your baby\'s signals.'),
             PpIndiaNote('In a joint family this is often easier, not harder. '
                 'More arms means more chances to catch the moment, and someone '
                 'in the house has almost certainly done it before. Agree on '
-                'the sound early. Read next in this area: '
-                'how to read your baby\'s signals.'),
+                'the sound early.'),
+            PpLink("How to read your baby's signals",
+                pageId: 'reading_signals',
+                blurb: 'The small signs before a wee, and what to do when you '
+                    'see one.'),
             PpVideoSlot(
               title: 'Cue-based holding, shown properly',
               subtitle: 'A supported squat, the "sss" sound, and the moments '
@@ -543,10 +615,92 @@ final PpSection kPpPottySection = PpSection(
             PpLink('Something new with the skin or tummy?',
                 surfaceId: 'pp_what_changed',
                 blurb: 'Nappy rash, and the tummy signs worth checking.'),
-            PpLink('A potty, a basin and a floor mat',
-                surfaceId: 'pp_products',
-                blurb: 'What is worth buying now, and what can wait a year.'),
+            // ⚠️ THE UNFILTERED SHOP HAD NO POTTY IN IT (PT4). The potty
+            // link lives on "Introducing the potty", the step that needs it;
+            // here, the one thing the page asks for that the shop has.
+            // Kept for revert:
+            // PpLink('A potty, a basin and a floor mat',
+            //     surfaceId: 'pp_products',
+            //     blurb: 'What is worth buying now, and what can wait a year.'),
+            PpLink('A waterproof mat for floor time',
+                surfaceId: 'pp_products/Baby Dry Sheets',
+                blurb: 'Under a cotton sheet, it saves the floor and the '
+                    'mattress.'),
           ],
+        ),
+        // ⚠️ THE BABY'S TWO ACTIVITIES LIVE HERE, NOT IN "THINGS TO DO"
+        // (PT3). That area is from one year: an area for every age would
+        // make Starting out open for a baby instead of "for later". The
+        // su-su tab's shelf draws them, and its rail skips them.
+        PpPage(
+          id: 'cue_at_waking',
+          title: 'Cue at waking',
+          subtitle: 'The su-su way, at the easiest moment',
+          format: 'ACTIVITY',
+          bands: ['su_su'],
+          blocks: [
+            PpIntro('Babies often wee within a few minutes of waking. Holding '
+                'him over a potty or a bowl at that moment, with the same soft '
+                'sound each time, is the whole of the su-su way.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Pick him up as he wakes', 'Before the nappy goes back on.'),
+                PpStep('Hold him securely over a small potty or bowl', 'Or the '
+                    'bathroom floor drain, his back against your tummy.'),
+                PpStep('Make the sound your family uses', '"Ssss", or "su-su". '
+                    'The same one every time.'),
+                PpStep('Wait a minute, no more', 'A long hold is hard on his '
+                    'hips and teaches nothing.'),
+                PpStep("If nothing comes, that's fine", 'Nappy on, and try '
+                    'again after the next nap.'),
+              ],
+            ),
+            PpCallout('A miss is not a failure. You are teaching a sound and a '
+                'place, slowly, over months.'),
+            PpWhenLine('From a few weeks old. Easiest before he crawls.'),
+          ],
+        ),
+        PpPage(
+          id: 'nappy_off_time',
+          title: 'Nappy-off time on the floor',
+          subtitle: 'Air for his skin, and a look at his signals',
+          format: 'ACTIVITY',
+          bands: ['su_su'],
+          blocks: [
+            PpIntro('A few minutes on a towel with no nappy lets air reach his '
+                'skin, and lets you see what his face does just before a wee.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Lay a thick towel or a waterproof sheet on the floor',
+                    'In a warm room, away from a draught.'),
+                PpStep('Let him kick for ten minutes', 'On his back, or on his '
+                    'tummy while he is awake and you are with him.'),
+                PpStep('Watch his face and body before a wee', 'A pause, a '
+                    'grunt, a stillness.'),
+                PpStep('Say the word as it happens', 'Calmly, the same word '
+                    'everyone uses.'),
+              ],
+            ),
+            PpCallout('On a warm day this is also the best thing for nappy '
+                'rash.'),
+            PpWhenLine('From the first weeks. Worth starting again every '
+                'summer.'),
+          ],
+        ),
+        // ⚠️ ONE PAGE, LINKED FROM THREE DOORS (PT11, the demand re-check
+        // 2026-10-25). "Why is baby poop green", "how many times a day" and
+        // the rest have about 290 searches and one page, First 40's. Health's
+        // tummy rail points at it the same way (`tummy_poo`); this is the
+        // potty side's window, a pointer that opens the page itself.
+        PpPage(
+          id: 'su_su_poo',
+          title: 'What his poo tells you',
+          bands: ['su_su'],
+          format: 'ARTICLE',
+          toolSurfaceId: 'pp_page/parenting_first_40/f40_nappy_poop',
+          blocks: [],
         ),
       ],
     ),
@@ -565,7 +719,8 @@ final PpSection kPpPottySection = PpSection(
       blurb: "The real signs, and why there's no prize for early.",
       hue: 268,
       // bands: ['learning'], // widened, see the area note
-      bands: ['learning', 'dry'],
+      // bands: ['learning', 'dry'], // the three bands (PT2), kept for revert
+      bands: _kFromOne,
       pages: [
         PpPage(
           id: 'readiness_signs',
@@ -773,11 +928,21 @@ final PpSection kPpPottySection = PpSection(
             PpIndiaNote('If a helper or a grandparent is with your child most of the '
                 'day, the method has to be theirs too. A plan the person doing '
                 "the hours didn't agree to isn't a plan."),
+            // ⚠️ THE CLASS DOES NOT EXIST YET (PT5). `pp_courses` opened the
+            // Learn home, which has no potty class, under words that called
+            // it paid. It is a class by id now, so the tap says "This class
+            // isn't open yet. Tap Tell me" (S8d), and the paid wording waits
+            // for the class. Kept for revert:
+            // PpLink('Short potty masterclass',
+            //     surfaceId: 'pp_courses',
+            //     blurb: 'A paid 40-minute walkthrough of one full fortnight, '
+            //         'step by step, if you would rather be shown than read. '
+            //         'Everything in this section stays free.'),
             PpLink('Short potty masterclass',
-                surfaceId: 'pp_courses',
-                blurb: 'A paid 40-minute walkthrough of one full fortnight, '
-                    'step by step, if you would rather be shown than read. '
-                    'Everything in this section stays free.'),
+                surfaceId: 'pp_class/potty_masterclass',
+                blurb: 'One full fortnight, step by step, if you would rather '
+                    'be shown than read. Everything in this section stays '
+                    'free.'),
           ],
         ),
         // ⚠️ [NEW], a scaffold. "The section refuses reward charts
@@ -833,7 +998,8 @@ final PpSection kPpPottySection = PpSection(
       blurb: 'The potty, the routine, the words, and the Indian toilet.',
       hue: 88,
       // bands: ['learning'], // widened, see the area note
-      bands: ['learning', 'dry'],
+      // bands: ['learning', 'dry'], // the three bands (PT2), kept for revert
+      bands: _kFromOne,
       pages: [
         PpPage(
           id: 'introducing_potty',
@@ -873,10 +1039,29 @@ final PpSection kPpPottySection = PpSection(
                 'the floor works better than a seat on the big toilet. It is '
                 'also closer to the squat your child will use later anyway. '
                 'Feet flat matters more than the design.'),
-            PpLink('Which potty, and which seat',
-                surfaceId: 'pp_product_guide',
-                blurb: 'Compare the low potty, the toilet seat insert and the '
-                    'Indian-style squat trainer before you spend.'),
+            // ⚠️ TWO DEAD ENDS, MADE HONEST (PT4). The guide hub has no potty
+            // guide, and the shop has no potty. Each tap now says so and
+            // points back at the tip above (S8c). Kept for revert:
+            // PpLink('Which potty, and which seat',
+            //     surfaceId: 'pp_product_guide',
+            //     blurb: 'Compare the low potty, the toilet seat insert and the '
+            //         'Indian-style squat trainer before you spend.'),
+            PpLink('How to choose a potty',
+                surfaceId: 'pp_product_guide/Potties',
+                blurb: 'The low potty, the toilet seat insert, or the '
+                    'Indian-style squat trainer.'),
+            PpLink('A potty, or a seat and a step stool',
+                surfaceId: 'pp_products/Potties',
+                blurb: 'Feet flat on the floor or the stool, whichever you '
+                    'pick.'),
+            // PT7: one of the shelf's three demos.
+            PpVideoSlot(
+              title: 'The seat and the stool, set up',
+              subtitle: 'A seat insert on a Western toilet, a step stool '
+                  'under the feet, and a low potty beside an Indian one.',
+              minutes: '2 MIN',
+              slotId: 'potty/seat_and_stool',
+            ),
           ],
         ),
         PpPage(
@@ -920,11 +1105,16 @@ final PpSection kPpPottySection = PpSection(
                     'and it comes down in time.',
               ],
             ),
-            PpCallout(
-              'A calm "you did it" is plenty. Big celebrations, clapping and '
-              'sweets make the potty high-stakes. Then a day with nothing to '
-              'show feels, to your child, like letting you down.',
-            ),
+            // ⚠️ ONE SOURCE FOR THE NO-STARS MESSAGE (PT6). It was said four
+            // times; it lives in full on `no_star_charts`. Kept for revert:
+            // PpCallout(
+            //   'A calm "you did it" is plenty. Big celebrations, clapping and '
+            //   'sweets make the potty high-stakes. Then a day with nothing to '
+            //   'show feels, to your child, like letting you down.',
+            // ),
+            PpLink('Why we skip stars and stickers',
+                pageId: 'no_star_charts',
+                blurb: 'A calm "you did it" is plenty.'),
             PpWhenLine('Run the five moments for two to six weeks. Longer is '
                 'completely normal.'),
             PpIndiaNote('Write the five moments on a paper and stick it in the '
@@ -1050,8 +1240,14 @@ final PpSection kPpPottySection = PpSection(
                         'stand. Balance is the whole problem.'),
                 PpStep('Stand close, every time, at first', 'A slip into an Indian toilet is frightening and '
                         'it can end the cooperation for weeks.'),
-                PpStep('Teach the mug before the wiping', 'Left hand, water, then rinse. Start with you '
-                        "pouring and your child's hand guided."),
+                // Kept for revert (PT6 names all three washing tools):
+                // PpStep('Teach the mug before the wiping', 'Left hand, water, then rinse. Start with you '
+                //         "pouring and your child's hand guided."),
+                PpStep('Teach the water before the wiping', 'A mug and bucket, a '
+                        'lota, or the health faucet (the hand spray beside the '
+                        'toilet). Left hand, water, then rinse. Start with you '
+                        "pouring and your child's hand guided. Show him how "
+                        'gently to press a health faucet before he tries.'),
                 PpStep('Then the wash basin, properly, every single time', 'Soap and twenty seconds. This is the part that '
                         'keeps your child well.'),
               ],
@@ -1086,13 +1282,28 @@ final PpSection kPpPottySection = PpSection(
               'then a child who is frightened of pooing at all. Water, fruit '
               'and a relaxed attitude are the whole plan.',
             ),
+            // ⚠️ THE TRAVEL WARNING GAINS ITS DOCTOR LINE (PT6). It was a
+            // plain callout, and a child three days without a poo needs a
+            // person, not more water. REQUIRED_REVIEW.
+            PpCallout(
+              "If he hasn't done a poo in three days on a trip, or it hurts "
+              'when he goes, see a doctor. Don\'t give a laxative without '
+              'asking.',
+              kind: PpCalloutKind.doctor,
+              title: 'When travel constipation needs a doctor',
+            ),
             PpWhenLine('Start the squat practice from about 2 years, alongside '
                 'the potty. Before any long trip.'),
             PpIndiaNote('Bucket and mug washing is a skill for life, and '
                 "it's easier to learn at three than later. "
                 'Teach the left hand and the soap together, from the start.'),
-            PpLink('A step stool, and a travel potty',
-                surfaceId: 'pp_products',
+            // The unfiltered shop had neither (PT4). Kept for revert:
+            // PpLink('A step stool, and a travel potty',
+            //     surfaceId: 'pp_products',
+            //     blurb: 'The two purchases that make Indian bathrooms and long '
+            //         'journeys easier.'),
+            PpLink('A travel potty and a step stool',
+                surfaceId: 'pp_products/Travel potties',
                 blurb: 'The two purchases that make Indian bathrooms and long '
                     'journeys easier.'),
           ],
@@ -1147,7 +1358,8 @@ final PpSection kPpPottySection = PpSection(
           title: 'The three-day method, done safely',
           subtitle: 'Who it suits, and the one risk to watch for',
           format: 'ARTICLE',
-          
+          // PT2: its own text says "usually over two and a half".
+          bands: ['pt_2_3', 'pt_3_4', 'pt_4_6'],
           blocks: [
             // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
             // REQUIRED_REVIEW.
@@ -1186,27 +1398,64 @@ final PpSection kPpPottySection = PpSection(
                 kind: PpCalloutKind.doctor),
           ],
         ),
+        // ⚠️ REWRITTEN (PT6): the 2026-10-02 version was four short cards,
+        // about 570 characters, for "which potty training pants is best"
+        // (20 searches). It is kept below for revert. REQUIRED_REVIEW.
+        // PpPage(
+        //   id: 'pull_ups',
+        //   title: 'Do pull-ups help or hurt?',
+        //   format: 'CARDS',
+        //   blocks: [
+        //     PpIntro('Pull-ups are useful for some families, at some times. They '
+        //         "aren't a training method on their own."),
+        //     PpCards([
+        //       PpCard('Where they help', 'Nights, long journeys, and outings while your child '
+        //           'is still learning. They save a lot of washing.'),
+        //       PpCard('Where they get in the way', 'In the day at home. A pull-up feels '
+        //           'like a nappy, so the wet feeling never comes through. That '
+        //           'feeling is how children learn.'),
+        //       PpCard('What works better in the day', 'Cotton underwear or no bottoms at '
+        //           'home, and accept some puddles for a few weeks.'),
+        //       PpCard('No shame either way', "Using pull-ups isn't failing, and nor is "
+        //           'taking them off. Do what suits your family.'),
+        //     ]),
+        //   ],
+        // ),
         PpPage(
           id: 'pull_ups',
-          title: 'Do pull-ups help or hurt?',
+          // Kept for revert: title: 'Do pull-ups help or hurt?',
+          title: 'Pull-ups, cloth pants or a chaddi?',
+          subtitle: 'Three ways through the day, and when each one helps',
           format: 'CARDS',
-          
           blocks: [
-            // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
-            // REQUIRED_REVIEW.
-            PpIntro('Pull-ups are useful for some families, at some times. They '
-                "aren't a training method on their own."),
-            PpCards([
-              PpCard('Where they help', 'Nights, long journeys, and outings while your child '
-                  'is still learning. They save a lot of washing.'),
-              PpCard('Where they get in the way', 'In the day at home. A pull-up feels '
-                  'like a nappy, so the wet feeling never comes through. That '
-                  'feeling is how children learn.'),
-              PpCard('What works better in the day', 'Cotton underwear or no bottoms at '
-                  'home, and accept some puddles for a few weeks.'),
-              PpCard('No shame either way', "Using pull-ups isn't failing, and nor is "
-                  'taking them off. Do what suits your family.'),
-            ]),
+            PpIntro('Pull-ups feel like a nappy to a child, which is why they '
+                'are useful at night and on long journeys, and less useful '
+                "while he's learning by day."),
+            PpCards(
+              heading: 'The three, honestly',
+              hue: 88,
+              [
+                PpCard('Cotton chaddi and a towel',
+                    'The cheapest way, and the way most Indian families have '
+                    'always done it. He feels wet at once, and that is the '
+                    'lesson. Best at home.'),
+                PpCard('Cloth trainer pants',
+                    'A padded chaddi that holds a small wee. Less mess on the '
+                    'floor, and he still feels wet. Good for outings in the '
+                    'first weeks.'),
+                PpCard('Pull-ups',
+                    'Disposable and absorbent. Use them for the night, long '
+                    'car or train journeys, and weddings. During the day they '
+                    "can slow learning, because he can't feel the difference."),
+                PpCard('Going back and forth is fine',
+                    'A pull-up for the train is not a step backwards. Using '
+                    "them isn't failing, and nor is taking them off."),
+              ],
+            ),
+            PpWhenLine('From the first day out of nappies. Pull-ups for nights '
+                'can stay until the dry mornings come.'),
+            PpIndiaNote('Washing chaddis is work. Five or six is enough for '
+                'most homes, and dried in the sun they stay fresh.'),
           ],
         ),
       ],
@@ -1226,7 +1475,8 @@ final PpSection kPpPottySection = PpSection(
       blurb: 'All of it normal. What to do, and the two things worth a doctor.',
       hue: 32,
       // bands: ['learning'], // widened, see the area note
-      bands: ['learning', 'dry'],
+      // bands: ['learning', 'dry'], // the three bands (PT2), kept for revert
+      bands: _kFromOne,
       pages: [
         PpPage(
           id: 'accidents_are_normal',
@@ -1319,6 +1569,23 @@ final PpSection kPpPottySection = PpSection(
               minutes: '5 MIN',
               slotId: 'potty/calm_through_accidents',
             ),
+            // PT5: a consult on each doctor-flag page that lacked one. One
+            // pitch, and no product on the page.
+            PpConsult(
+              title: 'A short call when accidents change',
+              whoFor: 'For a child who was dry and has started wetting again '
+                  'with no reason you can find, or whose accidents come with '
+                  'pain, thirst or constant dribbling. A paediatrician checks '
+                  "for an infection and tells you whether anything is needed. "
+                  "You won't need it for the ordinary accidents above.",
+              surfaceId: 'pp_experts',
+              role: 'pediatrician',
+            ),
+            // PT5: the parents' room, at the foot of Accidents.
+            PpLink('Parents in the middle of this',
+                surfaceId: 'pp_community/potty',
+                blurb: 'The potty room: what worked, and surviving the '
+                    'accidents.'),
           ],
         ),
         PpPage(
@@ -1420,9 +1687,16 @@ final PpSection kPpPottySection = PpSection(
                 '2 to 6 weeks.'),
             // The triggers are shared ground: a new baby, starting school,
             // a leap. Cross-linked, not rewritten.
-            PpLink('A new baby, starting school: the behaviour side',
-                surfaceId: 'pp_section/parenting_behaviour',
-                blurb: 'Clinginess, going backwards, and the words to use.'),
+            // ⚠️ THE WHOLE BEHAVIOUR DOOR WAS THE TARGET (PT6). The most
+            // common trigger is a new baby, and Family has the page for it.
+            // Kept for revert:
+            // PpLink('A new baby, starting school: the behaviour side',
+            //     surfaceId: 'pp_section/parenting_behaviour',
+            //     blurb: 'Clinginess, going backwards, and the words to use.'),
+            PpLink('When a new baby arrives',
+                surfaceId: 'pp_page/parenting_family/fam_sibling_jealousy',
+                blurb: 'Going backwards, clinginess, and the words to use with '
+                    'the older one.'),
             // The leaps read is retired (2026-10-14). Kept for revert:
             // PpLink('Is this a leap?',
             //     surfaceId: 'pp_page/parenting_development/dev_leaps_lens',
@@ -1457,6 +1731,18 @@ final PpSection kPpPottySection = PpSection(
                     'on the bladder. Day wetting and constipation turn up '
                     'together far more often than most parents are told.',
               ],
+            ),
+            // PT6: soiling named, so it is never read as naughtiness.
+            // REQUIRED_REVIEW.
+            PpCallout(
+              'When a child holds poo for a long time, a hard lump forms and '
+              'soft poo leaks around it into his pants. It looks like he '
+              "isn't trying, or is being dirty, and it is neither. He often "
+              "can't feel it. Doctors call this soiling, or encopresis, and "
+              'they treat the constipation underneath. Never scold for it. '
+              'See a doctor.',
+              kind: PpCalloutKind.doctor,
+              title: 'Leaks in his pants can be constipation',
             ),
             PpCards(
               heading: 'What withholding looks like',
@@ -1591,6 +1877,15 @@ final PpSection kPpPottySection = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'When the fear is really pain',
             ),
+            PpConsult(
+              title: 'A short call when the fear is really pain',
+              whoFor: 'For a child whose refusal comes with painful poos, blood '
+                  'or days without going. A paediatrician treats the pain '
+                  'first, so the gentle steps above can work. For a fear of '
+                  'the flush alone, the steps are enough.',
+              surfaceId: 'pp_experts',
+              role: 'pediatrician',
+            ),
             PpWhenLine('Most common between 2 and 3.5 years. Give any fix two '
                 'to three weeks before changing tack.'),
           ],
@@ -1603,6 +1898,8 @@ final PpSection kPpPottySection = PpSection(
           title: 'If it is taking your child a long time',
           subtitle: 'A calm pointer, not a verdict',
           format: 'CARDS',
+          // PT2: its own doctor line is "not dry in the day by about four".
+          bands: ['pt_3_4', 'pt_4_6'],
 
           blocks: [
             // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
@@ -1625,6 +1922,15 @@ final PpSection kPpPottySection = PpSection(
                 'about four, or was dry and has started wetting again. Talk to them '
                 'too if there is pain, or dribbling all the time.',
                 kind: PpCalloutKind.doctor),
+            PpConsult(
+              title: 'A paediatrician, when it is taking a long time',
+              whoFor: 'For a child not dry in the day by about four, one who '
+                  'was dry and has started again, or one whose speech and '
+                  'play are slow too. A calm look at the whole child, never a '
+                  'verdict.',
+              surfaceId: 'pp_experts',
+              role: 'pediatrician',
+            ),
             PpLink('What most children do at this age',
                 surfaceId: 'pp_page/parenting_development/dev_age_3_5'),
           ],
@@ -1646,15 +1952,20 @@ final PpSection kPpPottySection = PpSection(
       id: 'things_to_do',
       mark: IntentMark.blocksMark,
       title: 'Things to do together',
-      blurb: 'Three small activities that make the bathroom easier.',
+      // Kept for revert: blurb: 'Three small activities that make the bathroom easier.',
+      blurb: 'Small things to try today, for his stage. Nothing to tick off.',
       hue: 174,
-      bands: ['learning'],
+      // bands: ['learning'], // kept for revert
+      // PT3: from one year. The baby's activities are in the su-su area.
+      bands: _kFromOne,
       pages: [
         PpPage(
           id: 'routine_chart',
           title: 'Draw the potty steps',
           subtitle: 'A picture on the wall, not a scoreboard',
           format: 'ACTIVITY',
+          // PT3: "from about 2 years", in its own when-line.
+          bands: ['pt_2_3'],
           blocks: [
         // ⚠️ ADDED IN THE S06 PASS — this area had no video, and the
         // feedback asks that video, tools and expert booking all get the
@@ -1701,12 +2012,18 @@ final PpSection kPpPottySection = PpSection(
                         "whenever it isn't needed any more."),
               ],
             ),
-            PpCallout(
-              'No stars, no ticks, no counting days. A chart that records '
-              'success turns a wet afternoon into a visible '
-              'failure on the wall. Toilet learning needs no '
-              'score attached.',
-            ),
+            // One source for the no-stars message (PT6). Kept for revert:
+            // PpCallout(
+            //   'No stars, no ticks, no counting days. A chart that records '
+            //   'success turns a wet afternoon into a visible '
+            //   'failure on the wall. Toilet learning needs no '
+            //   'score attached.',
+            // ),
+            PpCallout('No stars, no ticks, no counting days. The pictures '
+                'show the steps, never who got them right.'),
+            PpLink('Why we skip stars and stickers',
+                pageId: 'no_star_charts',
+                blurb: 'The words for when the family is pushing them.'),
             PpWhenLine('From about 2 years, once sitting is willing. '
                 'Useful for a few months.'),
             PpIndiaNote("If the bathroom is shared and you can't stick "
@@ -1719,6 +2036,7 @@ final PpSection kPpPottySection = PpSection(
           title: 'Sit-and-read potty time',
           subtitle: 'Two books by the potty',
           format: 'ACTIVITY',
+          bands: ['pt_2_3'],
           blocks: [
             PpIntro('The easiest thing on this list. Keep two or three '
                 'board books next to the potty and read one during each sit. '
@@ -1760,8 +2078,12 @@ final PpSection kPpPottySection = PpSection(
             PpIndiaNote('If books by an Indian toilet are impractical, a couple '
                 'of picture cards in a plastic sleeve do the same job and wipe '
                 'clean.'),
-            PpLink('Board books that survive a bathroom',
-                surfaceId: 'pp_products',
+            // The unfiltered shop has no books (PT4). Kept for revert:
+            // PpLink('Board books that survive a bathroom',
+            //     surfaceId: 'pp_products',
+            //     blurb: 'Cheap, wipeable and short. That is all they need to be.'),
+            PpLink('Potty picture books',
+                surfaceId: 'pp_books/Potty',
                 blurb: 'Cheap, wipeable and short. That is all they need to be.'),
           ],
         ),
@@ -1770,6 +2092,8 @@ final PpSection kPpPottySection = PpSection(
           title: 'Teach the toy',
           subtitle: 'Your child explains it to a doll',
           format: 'ACTIVITY',
+          // "From about 2.5 years", so not the 1 to 2 shelf.
+          bands: ['pt_2_3', 'pt_3_4'],
           blocks: [
             PpIntro('Hand your child a doll or a soft toy, and ask for a '
                 'lesson on how the potty works. A child being taught is being '
@@ -1814,6 +2138,326 @@ final PpSection kPpPottySection = PpSection(
                 'short sentences.'),
           ],
         ),
+
+        // =====================================================================
+        //  THE NEW ACTIVITIES (door plan 05, PT3, copy in `05-potty-content.md`
+        //  Part A). Each one is something to try today, never something to
+        //  finish: no tick, no count, no "done". They are the "Try this today"
+        //  shelf's cards, each tagged for the stages it suits.
+        // =====================================================================
+        PpPage(
+          id: 'say_it_as_it_happens',
+          title: 'Say it as it happens',
+          subtitle: 'The words for wee and poo, without fuss',
+          format: 'ACTIVITY',
+          bands: ['su_su', 'pt_1_2'],
+          blocks: [
+            PpIntro('Children learn the words for wee and poo the same way they '
+                'learn "dog" and "milk": by hearing them at the right moment, '
+                'without fuss.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep("Pick your family's words", 'And everyone uses the same '
+                    'ones.'),
+                PpStep('Say them when you see a wet or dirty nappy', '"That\'s '
+                    'a wee. Wee goes in the potty."'),
+                PpStep('No face, no "chhee", no "dirty"', 'Just the word, in '
+                    'the voice you use for "milk".'),
+              ],
+            ),
+            PpCallout('Grandparents\' words count. If Dadi says "su-su", let '
+                'that be the word.'),
+            PpWhenLine('Any age. It pays off from about 18 months, when he '
+                'starts telling you.'),
+          ],
+        ),
+        PpPage(
+          id: 'choose_the_potty',
+          title: 'Let him choose the potty',
+          subtitle: 'A potty he picked is a potty he sits on',
+          format: 'ACTIVITY',
+          bands: ['pt_1_2'],
+          blocks: [
+            PpIntro('A potty he picked is a potty he sits on. Let him choose '
+                'the colour, or the corner of the bathroom it lives in.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Offer two choices, not ten', 'Two colours, or two '
+                    'corners. More is a decision too big for him.'),
+                PpStep('Put it where he can see it every day', 'So it becomes '
+                    'furniture.'),
+                PpStep('Let him sit on it in his clothes first', 'For a story '
+                    'or a song.'),
+                PpStep('Ask nothing of him yet', 'No "do a wee". Sitting is '
+                    'the whole step.'),
+              ],
+            ),
+            PpCallout('Fully clothed sitting is a real step. It takes the '
+                'strangeness out.'),
+            PpWhenLine('From about 15 months, or when he starts watching you in '
+                'the bathroom.'),
+          ],
+        ),
+        PpPage(
+          id: 'pants_down_up',
+          title: 'Pants down, pants up',
+          subtitle: 'Dressing practice, away from the potty',
+          format: 'ACTIVITY',
+          bands: ['pt_1_2'],
+          blocks: [
+            PpIntro('A lot of early accidents are not about the bladder at all. '
+                "He just can't get his pants down in time. Practise it as a "
+                'game, away from the potty.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Use loose, elastic-waist shorts or a chaddi', 'Nothing '
+                    'with a button.'),
+                PpStep('Push down to the knees, pull up again', 'Slowly at '
+                    'first, with your hands over his.'),
+                PpStep('Make it a race against a song, or against Teddy', 'He '
+                    'is racing the song, never you.'),
+                PpStep('Praise the trying, not the speed', '"You pulled them '
+                    'all the way up."'),
+              ],
+            ),
+            PpCallout('Skip buttons, belts, dungarees and tight jeans until he '
+                'is dry.'),
+            PpWhenLine('From about 18 months.'),
+          ],
+        ),
+        PpPage(
+          id: 'flush_and_wave',
+          title: 'Flush and wave bye-bye',
+          subtitle: 'Taking the fear out of the flush',
+          format: 'ACTIVITY',
+          bands: ['pt_1_2'],
+          blocks: [
+            PpIntro('Many children are frightened of the flush, or sad to see '
+                'something of theirs disappear. Waving it off turns it into a '
+                'goodbye.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep("Tip what's in the nappy or potty into the toilet",
+                    'Together, without a face.'),
+                PpStep('Let him press the flush if he wants to', 'Or stand '
+                    "back if he doesn't."),
+                PpStep('Wave and say "bye-bye, poo"', 'That is the whole game.'),
+              ],
+            ),
+            PpCallout('If the flush scares him, flush after he leaves the room. '
+                'Fear of the flush is common and passes.'),
+            PpWhenLine('From about 18 months.'),
+          ],
+        ),
+        PpPage(
+          id: 'after_waking_sit',
+          title: 'The after-waking sit',
+          subtitle: 'The easiest wee of the day',
+          format: 'ACTIVITY',
+          bands: ['pt_2_3'],
+          blocks: [
+            // PT7: one of the shelf's three demos.
+            PpVideoSlot(
+              title: 'The after-waking sit',
+              subtitle: 'Bed, potty, a song, hands washed, and on with the '
+                  'day. One ordinary morning.',
+              minutes: '1 MIN',
+              slotId: 'potty/after_waking_sit',
+            ),
+            PpIntro('The easiest wee of the day is the one just after he wakes. '
+                'A short, calm sit then is the start of a routine he can feel, '
+                'not one you have to remember.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Straight from bed to the potty', 'Before milk.'),
+                PpStep('Sit for two or three minutes', 'With a book or a '
+                    'song.'),
+                PpStep('Whatever happens, he gets up and washes hands', 'And '
+                    'the day goes on.'),
+                PpStep('Add a sit after meals once this one is easy', 'One new '
+                    'moment at a time.'),
+              ],
+            ),
+            PpCallout('Never hold him on the potty. If he wants to get up, he '
+                'gets up.'),
+            PpWhenLine('From about 2 years.'),
+          ],
+        ),
+        PpPage(
+          id: 'wash_low_tap',
+          title: 'Wash at the low tap',
+          subtitle: 'The step he can do alone first',
+          format: 'ACTIVITY',
+          bands: ['pt_2_3'],
+          blocks: [
+            // PT7: one of the shelf's three demos.
+            PpVideoSlot(
+              title: 'Washing hands at a low tap',
+              subtitle: 'A stool, a mug, soap he can reach, and one short song.',
+              minutes: '1 MIN',
+              slotId: 'potty/hand_washing_low_tap',
+            ),
+            PpIntro('Washing hands is the last step of every trip, and it is '
+                'the one he can do on his own first. A stool, a mug and soap he '
+                'can reach make it his.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('A steady stool at the basin', 'Or a bucket and mug at '
+                    'his height.'),
+                PpStep('Wet, soap, rub while you sing, rinse', 'One short song '
+                    'is about twenty seconds.'),
+                PpStep('A small towel on a hook he can reach', 'So drying is '
+                    'his too.'),
+              ],
+            ),
+            PpCallout('If he uses an Indian toilet, keep the mug and bucket for '
+                'washing hands separate from the ones for washing his bottom, '
+                'and keep both clean.'),
+            PpWhenLine('From about 2 years.'),
+          ],
+        ),
+        PpPage(
+          id: 'big_kid_pants_day',
+          title: 'Big-kid pants day',
+          subtitle: 'A calm day at home in cotton chaddis',
+          format: 'ACTIVITY',
+          bands: ['pt_2_3'],
+          blocks: [
+            PpIntro('A day at home in cotton chaddis, not a nappy, so he feels '
+                'what wet means. Choose a calm day with nowhere to go.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Let him pick the chaddis', 'It is his day.'),
+                PpStep('Offer the potty at the easy moments', 'After waking, '
+                    'after meals, and before going out.'),
+                PpStep('Expect accidents', 'Say "wee goes in the potty" '
+                    'without a sigh.'),
+                PpStep('Keep a towel, a mop and three changes ready', 'So you '
+                    'can stay calm.'),
+                PpStep('A nappy for the nap and the night', 'With no fuss.'),
+              ],
+            ),
+            PpCallout("If by the evening there's no sign he noticed being wet, "
+                "he isn't ready yet. Put it away for a few weeks. That's "
+                'information, not failure.'),
+            PpWhenLine('Once you see two or three readiness signs.'),
+          ],
+        ),
+        PpPage(
+          id: 'wiping_practice',
+          title: 'Wiping practice with a doll',
+          subtitle: 'A game instead of an inspection',
+          format: 'ACTIVITY',
+          bands: ['pt_3_4', 'pt_4_6'],
+          blocks: [
+            PpIntro('Wiping well is hard, and most children need help with it '
+                'until five or six. Practising on a doll makes it a game '
+                'instead of an inspection.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Show front to back on a doll, slowly', 'Say each step '
+                    'out loud.'),
+                PpStep('Let him do it on the doll', 'Wrong steps and all.'),
+                PpStep('For water, show the mug or the health faucet', 'The '
+                    'left hand, then soap and wash.'),
+                PpStep('Then let him try on himself', 'While you stand close.'),
+              ],
+            ),
+            // REQUIRED_REVIEW.
+            PpCallout('Girls wipe or wash front to back, every time. It keeps '
+                'urine infections away.'),
+            PpWhenLine('From about 3 years.'),
+          ],
+        ),
+        PpPage(
+          id: 'last_wee_before_bed',
+          title: 'Last wee before bed, together',
+          subtitle: 'The one habit that helps dry nights most',
+          format: 'ACTIVITY',
+          bands: ['pt_3_4', 'pt_4_6'],
+          blocks: [
+            PpIntro('A wee just before sleep is the one habit that helps dry '
+                'nights most, and it costs nothing.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Make it part of brushing teeth', 'The same order every '
+                    'night.'),
+                PpStep('Keep water normal through the day', 'Fewer big drinks '
+                    'in the last hour, never none.'),
+                PpStep('Leave a night light on the way to the bathroom', 'So '
+                    'getting there in the dark is not frightening.'),
+              ],
+            ),
+            PpCallout("Dry nights come from his body's own clock, not from "
+                'practice. This only gives it a fair chance.'),
+            PpWhenLine('From about 3 years, once days are dry.'),
+          ],
+        ),
+        PpPage(
+          id: 'spare_clothes_bag',
+          title: 'Pack the spare-clothes bag',
+          subtitle: "His bag, so it's his plan",
+          format: 'ACTIVITY',
+          bands: ['pt_3_4', 'pt_4_6'],
+          blocks: [
+            PpIntro('Children who pack their own spare clothes worry less about '
+                "accidents at playschool and on outings. It's his bag, so it's "
+                'his plan.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('One chaddi, one pair of shorts or a frock', 'And one '
+                    'plastic bag for wet things.'),
+                PpStep('He packs, you check', 'Without redoing it.'),
+                PpStep('Show him where it lives in his school bag', 'So he '
+                    'knows it is there.'),
+              ],
+            ),
+            PpCallout('Tell the teacher the bag is there. Most accidents at '
+                "school happen because he didn't want to ask."),
+            PpWhenLine('From about 3 years, and before playschool starts.'),
+          ],
+        ),
+        PpPage(
+          id: 'public_toilet_run',
+          title: 'Public toilet practice run',
+          subtitle: 'A calm visit before the day it matters',
+          format: 'ACTIVITY',
+          bands: ['pt_4_6'],
+          blocks: [
+            PpIntro('Loud hand dryers, tall seats and unfamiliar Indian or '
+                'Western toilets can scare a child into holding. A practice '
+                'visit on a calm day helps.'),
+            PpSteps(
+              heading: 'How to do it',
+              [
+                PpStep('Pick a clean toilet', "At a mall, a restaurant or a "
+                    "relative's house."),
+                PpStep('Look around together first', 'Where to sit or squat, '
+                    'where to wash, the flush, the dryer.'),
+                PpStep('Let him try, or just look', 'Looking counts.'),
+                PpStep('Carry a folding seat or a travel potty', 'If he needs '
+                    'one.'),
+              ],
+            ),
+            // REQUIRED_REVIEW.
+            PpCallout('Holding all day at school or on journeys is how '
+                "constipation starts. If he won't use any toilet but home's, "
+                'tell your doctor.',
+                kind: PpCalloutKind.doctor,
+                title: 'When he holds it all day'),
+            PpWhenLine('From about 4 years, or before travel.'),
+          ],
+        ),
       ],
     ),
 
@@ -1826,7 +2470,8 @@ final PpSection kPpPottySection = PpSection(
       title: 'Dry nights, and doing it alone',
       blurb: 'Night dryness, wiping, and toilets away from home.',
       hue: 232,
-      bands: ['dry'],
+      // bands: ['dry'], // the three bands (PT2), kept for revert
+      bands: ['pt_3_4', 'pt_4_6'],
       pages: [
         PpPage(
           id: 'night_dryness',
@@ -1858,20 +2503,26 @@ final PpSection kPpPottySection = PpSection(
                     'same position.',
               ],
             ),
-            PpChartCard(
-              title: 'When dry nights usually arrive',
-              hue: 232,
-              rows: [
-                ('Dry days are reliable', 'About 3 years'),
-                ('Some dry nights start appearing', 'About 3 to 4 years'),
-                ('Dry most nights', 'About 4 to 5 years'),
-                ('Still wet at night at 5', 'Around 1 child in 5'),
-                ('Still wet at night at 7', 'Around 1 child in 20'),
-              ],
-              note: 'The gap between dry days and dry nights is commonly one '
-                  'to three years. It runs in families, so if a parent was '
-                  'dry at night later, your child may be too.',
-            ),
+            // ⚠️ ONE SOURCE FOR THE TIMELINE (PT6): it lives on
+            // `honest_timeline`. Kept for revert:
+            // PpChartCard(
+            //   title: 'When dry nights usually arrive',
+            //   hue: 232,
+            //   rows: [
+            //     ('Dry days are reliable', 'About 3 years'),
+            //     ('Some dry nights start appearing', 'About 3 to 4 years'),
+            //     ('Dry most nights', 'About 4 to 5 years'),
+            //     ('Still wet at night at 5', 'Around 1 child in 5'),
+            //     ('Still wet at night at 7', 'Around 1 child in 20'),
+            //   ],
+            //   note: 'The gap between dry days and dry nights is commonly one '
+            //       'to three years. It runs in families, so if a parent was '
+            //       'dry at night later, your child may be too.',
+            // ),
+            PpLink('How long dry nights take, by age',
+                pageId: 'honest_timeline',
+                blurb: 'The whole shape, from the first caught wee to dry '
+                    'nights. It runs in families.'),
             PpSteps(
               heading: 'What really helps',
               [
@@ -1901,9 +2552,11 @@ final PpSection kPpPottySection = PpSection(
                 PpCard('Cutting fluids in the evening',
                     'Beyond a mild shift, this means a thirsty child, and it '
                     "doesn't fix a hormone."),
-                PpCard('Any kind of reward or chart',
-                    "This isn't a choice. A reward for something outside "
-                    'anyone\'s control only says "you are failing".'),
+                // One source for the no-stars message (PT6): the link below.
+                // Kept for revert:
+                // PpCard('Any kind of reward or chart',
+                //     "This isn't a choice. A reward for something outside "
+                //     'anyone\'s control only says "you are failing".'),
                 PpCard('Punishment, or washing the sheets as a '
                     'consequence',
                     'This is the fastest way to a child who hides wet '
@@ -1913,10 +2566,27 @@ final PpSection kPpPottySection = PpSection(
                     'effort.'),
               ],
             ),
+            PpLink('Why we skip stars and stickers',
+                pageId: 'no_star_charts',
+                blurb: 'A reward for something nobody controls only says "you '
+                    'are failing".'),
             PpCallout(
               'It happens during sleep. Your child is not choosing any of '
               'it, so there is nothing here to be blamed for.',
             ),
+            // PT6: the page had no doctor line. REQUIRED_REVIEW.
+            PpCallout(
+              'See a doctor if he was dry at night for six months and has '
+              'started wetting again, if a wee hurts or burns, if he is very '
+              'thirsty or weeing far more than usual, or if he snores loudly '
+              'and seems tired in the day.',
+              kind: PpCalloutKind.doctor,
+              title: 'When wet nights need a doctor',
+            ),
+            PpLink('Bedwetting at five and older',
+                pageId: 'bedwetting',
+                blurb: 'What is going on, and what a doctor might suggest '
+                    'after six.'),
             PpWhenLine('Dry nights any time from 3 to 6 years, and later is '
                 'still within normal.'),
             PpIndiaNote('In a shared bed or on a floor mattress, a waterproof '
@@ -1930,8 +2600,12 @@ final PpSection kPpPottySection = PpSection(
               minutes: '7 MIN',
               slotId: 'potty/night_dryness',
             ),
-            PpLink('Waterproof sheets and night pants',
-                surfaceId: 'pp_products',
+            // The unfiltered shop, kept for revert (PT4):
+            // PpLink('Waterproof sheets and night pants',
+            //     surfaceId: 'pp_products',
+            //     blurb: 'What is worth having while you wait it out.'),
+            PpLink('Waterproof sheets',
+                surfaceId: 'pp_products/Baby Dry Sheets',
                 blurb: 'What is worth having while you wait it out.'),
           ],
         ),
@@ -1940,6 +2614,8 @@ final PpSection kPpPottySection = PpSection(
           title: 'Bedwetting at five and older',
           subtitle: 'Common, not a character flaw, and treatable',
           format: 'ARTICLE',
+          // PT2: it showed to a three-year-old's parent.
+          bands: ['pt_4_6'],
           blocks: [
             PpIntro('If your child is five or six and still wet most nights, '
                 "you aren't alone, and nothing is wrong with your child. "
@@ -1948,6 +2624,10 @@ final PpSection kPpPottySection = PpSection(
             PpArticle(
               heading: 'What is going on',
               [
+                // PT6, REQUIRED_REVIEW.
+                'Doctors call it enuresis. It is common: about one child in '
+                    'six still wets some nights at five, and most grow out of '
+                    'it on their own.',
                 'Bedwetting past five is usually one of three things. The body '
                     'still makes too much urine at night, the bladder holds '
                     'less than a night\'s worth, or sleep is too deep to '
@@ -1998,6 +2678,23 @@ final PpSection kPpPottySection = PpSection(
               'specific nights. None of it starts with blame.',
               kind: PpCalloutKind.doctor,
               title: 'When bedwetting is worth a doctor',
+            ),
+            // PT6: what the options actually are. REQUIRED_REVIEW throughout.
+            PpSteps(
+              heading: 'What a doctor might suggest, after six',
+              [
+                PpStep('A bedwetting alarm', 'A small sensor in his pants that '
+                    'buzzes at the first drop, so his brain learns to wake. It '
+                    'takes weeks, and works best when the child wants to try. '
+                    'A doctor can tell you if it suits him.'),
+                PpStep('A medicine, desmopressin', 'It makes the body make less '
+                    "urine at night. It is a doctor's choice, used for camps "
+                    'and sleepovers or for a while. Never start it from a '
+                    "chemist or on a friend's advice."),
+                PpStep('Neither, for now', 'Neither is needed before six, and '
+                    'neither is a cure for something wrong. Most of the time, '
+                    'waiting is the treatment.'),
+              ],
             ),
             PpConsult(
               title: 'A consult about bedwetting past five',
@@ -2063,6 +2760,25 @@ final PpSection kPpPottySection = PpSection(
               'that is worth ruling out.',
               kind: PpCalloutKind.doctor,
               title: 'When soreness needs checking',
+            ),
+            // PT6: pinworms named. REQUIRED_REVIEW.
+            PpCallout(
+              'It may be pinworms (threadworms), small white worms you might '
+              'see in his poo or around his bottom at night. They are common '
+              'in children and easy to treat, but the whole family usually '
+              'takes the medicine together. See a doctor. Short nails and '
+              'hand-washing after the toilet help stop them coming back.',
+              kind: PpCalloutKind.doctor,
+              title: 'Itching at night around his bottom?',
+            ),
+            PpConsult(
+              title: 'A short call about soreness or itching',
+              whoFor: 'For redness, a discharge, night itching or urine '
+                  'infections that keep coming back. A paediatrician finds '
+                  'the cause and treats it. For a child still learning to '
+                  'wipe, the steps above are enough.',
+              surfaceId: 'pp_experts',
+              role: 'pediatrician',
             ),
             PpWhenLine('Start teaching from about 3 years. Reliable without help '
                 'usually between 4 and 5.'),
@@ -2133,13 +2849,27 @@ final PpSection kPpPottySection = PpSection(
         PpCards(heading: 'Accidents at daycare or preschool', [
           PpCard('Expect some', 'A new place, busy play and shy asking all '
               'lead to accidents in the first weeks.'),
-          PpCard('Send two sets of spare clothes', 'In a labelled bag.'),
+          // The spare clothes are said in the article above (PT6). Kept for
+          // revert:
+          // PpCard('Send two sets of spare clothes', 'In a labelled bag.'),
           PpCard('Teach the words', 'And how the school toilet works, '
               'before the first day.'),
           PpCard('Ask the teacher for reminders', 'Before play and after '
               'meals.'),
           PpCard('Never shame', 'Keep it matter-of-fact at home and school.'),
         ]),
+            // PT6: the admission question, answered.
+            PpCards(heading: 'When the nursery asks "is he toilet trained?"', [
+              PpCard('Say honestly where he is', 'Many playschools ask at '
+                  'admission. "Dry most days at home, still learning to ask" '
+                  'is a good answer.'),
+              PpCard('Ask how they handle accidents', 'And how often they take '
+                  'children to the toilet. A school with a plan for accidents '
+                  'is a good sign.'),
+              PpCard('A close deadline is not a reason to push', "If he isn't "
+                  "ready, a few weeks' delay is better than pushing him into "
+                  'fear.'),
+            ]),
           ],
         ),
       ],
