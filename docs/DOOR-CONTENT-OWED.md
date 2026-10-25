@@ -214,7 +214,7 @@ Catalogue items and people the door points at that do not exist yet (each tap sa
 | Behaviour (parenting) | 15 | 11 | – | 4 | – |
 | Potty (parenting) | 13 | – (PT1–PT4 written 2026-10-02) | – | 3 | – (PT7–PT13 answer a tap; see the door 5 table) |
 | Early Learning (parenting) | 4 | 2 | – | 2 | – |
-| First 40 Days (parenting) | 11 | 3 | – | 4 | 1 (the day spine, FF10); FF1–FF2 closed into You |
+| First 40 Days (parenting) | 18 | – (FF3–FF5 filled 2026-10-02) | – | 5 | 1 (the day spine, FF10); FF1–FF2 closed into You; FF12–FF18 answer a tap, see the door 6 table |
 | You, Maa (parenting) | 6 | 2 | – | 3 | – |
 | What to buy (parenting) | 10 | 8 | – | 2 | – (call 2: shelves owned as they are) |
 | Traditions (parenting) | 10 | 8 | – | 2 | – (two sensitive pages, tone to sign off) |
@@ -350,6 +350,18 @@ drawn strip; the photographs for the skin slides.
 | FF9 | `f40_jaundice` — how far the yellow has spread | Illustration | Not built | "A small picture (face, chest, palms) would help; light touch." Not drawn yet. |
 | FF10 | The day-by-day spine | Build | Not built | Judgement call 1: the real "you are on day 12" screen. Four fixed day-range pages stand in. See PARENTING-DOORS-REVIEW.md. |
 | FF11 | The eleven films the brief marks | Film | Built from data | `first40/*` slots are placeholders; latch, malish, swaddle and settling now share Feeding's and Sleep's slots, so four fewer to shoot. |
+
+**Added by the door 6 build (2026-10-25, `docs/pp-door-plans/06-first40.md` FD1 to FD9, §12).** Nothing here is a coming-soon card: every item answers a tap with a notice, or shows a drawn mark. (FF3 to FF5 above were filled 2026-10-02; the test holds that.)
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| FF12 | `first40/door_intro` | Film · 30–45 s | Not slotted | S4: no chip until the film exists |
+| FF13 | `first40/recovery_basics`, "Your body in the first weeks" | Film · 9 min | Slotted | Back on Your recovery, on `f40_rest_and_food` (FD9). A tap says the film is being made (S8a). Reviewed by a gynaecologist or midwife |
+| FF14 | The 13 newborn slots: `first40/welcome_intro`, `red_flags`, `cord_care`, `first_bath`, `jhula_demo`, `quick_check`, `common_questions`, `course_preview`, `essentials`, and the four shared with Feeding and Sleep | Film | Slotted | FD9: the baby-care demos are reviewed by a paediatric nurse or midwife before they ship |
+| FF15 | Baby massage oil on the shop | Catalogue | S8c | `pp_products/Baby massage oils`: "We haven't picked oils yet. A plain, fragrance-free coconut or sunflower oil from your kitchen is fine" (`kPpShelfNotYet`). Traditions owes the same |
+| FF16 | A plain cradle; a postpartum binder | Catalogue | S8c / partial | "A cradle or bassinet" opens the Smart Cribs and Bassinets shelf, mostly smart bassinets. `pp_products/Postpartum belts` says "Not in our shop yet. Ask your doctor first after a C-section" |
+| FF17 | An underarm digital thermometer | Catalogue | S8c | `what_you_need` links it, as Health does; the stocked shelf is infrared forehead ones |
+| FF18 | A painting for each of the 11 Try this today cards | Painting | Built from data | Each card shows a line icon on the Day by day tint until then (`_kFirst40CardIcons`) |
 
 ### P9. You, Maa — `lib/data/doors/pp_door_you_maa.dart`
 

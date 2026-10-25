@@ -469,7 +469,9 @@ final HubConfig kPpFirst40 = HubConfig(
   // day-by-day recovery reads as selling into exhaustion. The section's own
   // `PpConsult` blocks already offer a lactation consultant on the pages about
   // feeding and a doctor on the pages about jaundice — at the moment the need
-  // is real, which is the only time this bracket should ask.
+  // is real, which is the only time this bracket should ask. (The jaundice
+  // consult was claimed here before it existed; door plan 06, FD6, added it,
+  // 2026-10-25.)
 
 );
 

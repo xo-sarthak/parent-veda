@@ -1,7 +1,16 @@
 // =============================================================================
 //  Jaapa: Your First 40 Days — the section's content
 // -----------------------------------------------------------------------------
-//  Built from docs/../pp_specs/08-first-40-days.md. Ten areas plus four tools.
+//  Built from docs/../pp_specs/08-first-40-days.md. Ten areas plus four
+//  section tools; the door shows three of them on its feeding tab and the
+//  quick check and Ask Veda as pages (`pp_door_first40.dart`).
+//
+//  Door plan 06 (`docs/pp-door-plans/06-first40.md`, built 2026-10-25) added:
+//  the two warning lists pinned (FD2), links that land where they say (FD4),
+//  shop rows to stocked shelves (FD5), the jaundice consult and the real
+//  masterclass (FD6), the India cards (FD8), "What your baby can see" (FD11),
+//  one source for the oil (FD12) and the nappy page widened to the first
+//  year (FD13). Copy: `06-first40-content.md`.
 //
 //  ⚠️ THIS SECTION LANDS ON THE PEAK-FEAR MOMENT OF THE WHOLE PRODUCT. The spec
 //  says it plainly: "a scared parent at day 3". So every page here is written
@@ -194,11 +203,32 @@ final PpSection kPpFirst40Section = PpSection(
               "Some things in a newborn can't wait. Trouble breathing, a "
               'fever, refusing feeds, far fewer wet nappies, deepening '
               'jaundice, or a baby who is floppy or hard to wake means a '
-              'doctor today. The full list is in "When to Rush to the '
-              'Doctor" on the section home.',
+              // Was 'doctor today. The full list is in "When to Rush to the '
+              // 'Doctor" on the section home.' The section home is gone; the
+              // list is the first card of When to rush (FD4). Kept for revert.
+              'doctor today. The full list is "Go now", the first card on '
+              'When to rush.',
               kind: PpCalloutKind.doctor,
               title: 'The few things that need a doctor now',
             ),
+            // FD8. REQUIRED_REVIEW (paediatrician): the three birth doses,
+            // where each is given, the BCG bump and scar, the 6-week next
+            // doses (MoHFW Universal Immunisation Programme).
+            PpArticle([
+              'Three vaccines are given at birth, usually before you leave '
+              'hospital. BCG goes in the left upper arm; a small bump, and '
+              'later a tiny scar, is normal. OPV-0 is polio drops by mouth. '
+              'Hepatitis B is an injection in the thigh.',
+              "Check your baby's card says all three. If you delivered at "
+              'home or left early, any government health centre gives them '
+              'free. The next ones are at 6 weeks.',
+            ], heading: 'The first vaccines'),
+            PpLink('The vaccine schedule',
+                surfaceId: 'pp_vaccines',
+                blurb: "What's due next, with a reminder."),
+            PpLink('Go now: the full list',
+                pageId: 'f40_red_flags',
+                blurb: 'The signs that need a doctor today.'),
           ],
         ),
         PpPage(
@@ -257,6 +287,21 @@ final PpSection kPpFirst40Section = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'Jaundice that needs checking',
             ),
+            // FD8. REQUIRED_REVIEW (legal): the 21-day window and that it is
+            // free in it (Registration of Births and Deaths Act, 1969, as
+            // amended 2023), and the documents that ask for the certificate.
+            PpArticle([
+              'A birth must be registered within 21 days, and it is free in '
+              'that time. Most hospitals register it for you. Ask before '
+              'discharge, and ask when the certificate will be ready.',
+              'If your baby was born at home, the family registers it at the '
+              'municipality or gram panchayat office. You will need the '
+              'certificate for Aadhaar, a passport and school admission, so '
+              'keep a few copies.',
+            ], heading: 'Register the birth'),
+            PpLink('Papers for your baby',
+                surfaceId: 'pp_section/parenting_papers',
+                blurb: 'The birth certificate, Aadhaar and the rest, in order.'),
           ],
         ),
         PpPage(
@@ -360,6 +405,47 @@ final PpSection kPpFirst40Section = PpSection(
                 'for your baby, and for you.'),
           ],
         ),
+        // FD11 (the demand re-check, 2026-10-25): "when can a newborn see"
+        // and "can newborns see colour" had no page anywhere. The first
+        // weeks, so the first-month and forty-day bands.
+        // REQUIRED_REVIEW (paediatrician): the 20 to 30 cm focus, colour over
+        // the next months, and the three see-a-doctor signs.
+        PpPage(
+          id: 'f40_what_he_sees',
+          title: 'What your baby can see',
+          subtitle: 'Your face first, at feeding distance.',
+          format: 'SHORT ARTICLE',
+          bands: ['jaapa_first_month', 'jaapa_forty'],
+          blocks: [
+            PpIntro('Your baby sees best at about 20 to 30 cm, the distance '
+                'to your face while feeding. That is the picture this week is '
+                'built around.'),
+            PpArticle([
+              'Faces and bold black-and-white shapes hold the eyes first. '
+              'Colours come over the next few months.',
+              'Eyes that wander or cross now and then are normal in the first '
+              'weeks. They line up as the muscles learn to work together.',
+            ]),
+            PpCards([
+              PpCard('Feed and talk', 'Your face at feeding distance is the '
+                  'best thing there is to look at.'),
+              PpCard('Hold up a simple picture', 'Stripes, a face, a bold '
+                  'shape, a little to one side. Watch the eyes find it.'),
+              PpCard('Move slowly', 'A face moving slowly side to side is '
+                  'easier to follow than a quick one.'),
+            ], heading: 'Easy things to try', hue: 26),
+            PpCallout(
+              'See a doctor if one eye turns in or out all the time after 3 '
+              'to 4 months, or a pupil looks white in photos or in light. The '
+              'same if your baby does not look at your face at all by about '
+              '2 months.',
+              kind: PpCalloutKind.doctor,
+              title: 'Eyes to show a doctor',
+            ),
+            PpWhenLine('Weeks 1 to 6. Colour and distance come over the '
+                'following months.'),
+          ],
+        ),
         PpPage(
           id: 'f40_forty_mark',
           title: 'You made it to 40 days. What now?',
@@ -387,8 +473,10 @@ final PpSection kPpFirst40Section = PpSection(
             PpCallout('If one thing carries forward from these forty days, let it be '
                 "this. You're allowed to be looked after even when you no "
                 'longer look unwell.'),
+            // FD4: her recovery pages (You, Maa's Body tab), not the door
+            // home. Was `surfaceId: 'pp_you_maa'`, kept for revert.
             PpLink('You, the mother: your longer recovery',
-                surfaceId: 'pp_you_maa',
+                surfaceId: 'pp_section/parenting_maternal/your_body',
                 blurb: 'Pelvic floor, mood, strength, going back to work, and '
                     'the parts that take months.'),
             // "His first vaccinations: point to Health's shots tool, not a
@@ -558,6 +646,13 @@ final PpSection kPpFirst40Section = PpSection(
                   notThis: 'You are sick, stay away.',
                   why: 'Kind, and still a clear no.'),
             ]),
+            // FD4: the ceremonies in full are Traditions'.
+            PpLink('Chhathi, in full',
+                surfaceId: 'pp_page/parenting_traditional/chatti',
+                blurb: 'The sixth-day welcome, and keeping it gentle.'),
+            PpLink('Naamkaran, in full',
+                surfaceId: 'pp_page/parenting_traditional/namkaran',
+                blurb: 'The naming ceremony, and a crowd around a newborn.'),
           ],
         ),
       ],
@@ -584,6 +679,8 @@ final PpSection kPpFirst40Section = PpSection(
       pages: [
         PpPage(
           id: 'f40_red_flags',
+          // FD2 / S10: first on When to rush, even after she has read it.
+          pinned: true,
           title: 'When to rush to the doctor',
           subtitle: 'Newborn danger signs, and what to do about each one.',
           format: 'FLAGGED QUICK-REFERENCE',
@@ -1065,8 +1162,10 @@ final PpSection kPpFirst40Section = PpSection(
                   'A plain zinc or petroleum jelly layer. Not talcum powder, '
                   'which babies can breathe in.'),
             ], heading: 'Changing your baby'),
-            PpWhenLine('This pattern holds through the first 6 weeks. Colours '
-                'settle after that.'),
+            // Was 'This pattern holds through the first 6 weeks. Colours
+            // settle after that.' The page covers the first year now (R1).
+            PpWhenLine('The day-by-day pattern is the first 6 weeks. The part '
+                'after it holds through the first year.'),
             PpCallout(
               'See a doctor for any of these. No wet nappy for many hours, '
               'or a sudden drop in wet nappies. Blood in the stool, or stool '
@@ -1076,6 +1175,31 @@ final PpSection kPpFirst40Section = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'Nappy signs that need a doctor',
             ),
+            // R1 / FD13 (Potty PT11, Health H8, the demand re-check
+            // 2026-10-25): about 290 searches on baby poo, and only this
+            // newborn page. Potty's su-su tab and Health's tummy rail open it.
+            // REQUIRED_REVIEW (paediatrician): every line of this part.
+            PpArticle([
+              'Yellow, green and brown are all normal. Green often just means '
+              'faster digestion, or iron.',
+              'A breastfed baby may poo after every feed or, after about six '
+              'weeks, only once in several days. Both can be normal if your '
+              'baby is feeding well, gaining weight and the poo is soft.',
+              'After solids, poo gets thicker, browner and smellier. Bits of '
+              'food in it are normal.',
+              'Many more poos than usual, or very watery ones, is diarrhoea. '
+              'Watch for fewer wet nappies.',
+            ], heading: 'After the first weeks, and after solids'),
+            PpCallout(
+              'Call the doctor the same day for red or bloody poo, black poo '
+              'after the first few days, or white, grey or very pale poo. The '
+              'same for a hard, swollen tummy with vomiting.',
+              kind: PpCalloutKind.doctor,
+              title: 'At any age in the first year',
+            ),
+            PpLink('Loose motions, and ORS',
+                surfaceId: 'pp_page/parenting_health/tummy_diarrhoea',
+                blurb: 'What to give, and when it needs a doctor.'),
             PpIndiaNote('Cloth nappies (langots) are perfectly fine and often kinder '
                 "in the heat. They need changing sooner, because you can't "
                 'tell how wet they are. With cloth, count wet nappies by '
@@ -1172,6 +1296,10 @@ final PpSection kPpFirst40Section = PpSection(
                 "arms out is often all a baby can bear, and that's fine. A "
                 'sweaty, flushed, hot-necked baby is over-wrapped, whatever '
                 'the elders say about catching cold.'),
+            // FD4: the longer story is Sleep's.
+            PpLink('When to stop swaddling',
+                surfaceId: 'pp_page/parenting_sleep/swaddling',
+                blurb: 'The first roll, and what to use instead.'),
           ],
         ),
         PpPage(
@@ -1449,6 +1577,22 @@ final PpSection kPpFirst40Section = PpSection(
                 'your baby looks. Jaundice is treated against a blood level '
                 "and the baby's age in hours, and only a doctor can set "
                 'that.'),
+            // FD6: a paediatrician, after the doctor box (the reader draws
+            // it there). Not a go-now page: the go-now signs send her to a
+            // hospital in the box above it.
+            PpConsult(
+              title: 'Talk to a paediatrician',
+              whoFor: 'For yellow that is not fading, or a question about a '
+                  'bilirubin result. On video, usually the same day. Not for '
+                  'a baby who is very sleepy or not feeding: that is a '
+                  'hospital, today.',
+              surfaceId: 'pp_experts',
+              role: 'pediatrician',
+            ),
+            // FD4.
+            PpLink('Jaundice after the first weeks',
+                surfaceId: 'pp_page/parenting_health/ill_jaundice',
+                blurb: 'Yellow that lasts, and what the tests mean.'),
           ],
         ),
         PpPage(
@@ -1666,8 +1810,11 @@ final PpSection kPpFirst40Section = PpSection(
                 'the 5am shift, say yes. The one thing to hold firm on is '
                 "where and how your baby sleeps, because safe sleep doesn't "
                 'change with who is holding the baby.'),
-            PpLink('Newborn sleep, in full',
-                surfaceId: 'pp_sleep',
+            // FD4: Sleep's safe-sleep page, not the sleep tracker. Kept for
+            // revert: PpLink('Newborn sleep, in full', surfaceId: 'pp_sleep',
+            //     blurb: "What's normal at every age, and gentle settling."),
+            PpLink('The full safe-sleep guide',
+                surfaceId: 'pp_page/parenting_sleep/back_to_sleep',
                 blurb: "What's normal at every age, and gentle settling."),
           ],
         ),
@@ -1737,8 +1884,9 @@ final PpSection kPpFirst40Section = PpSection(
                 "room. What isn't fine is a deep hammock shape that curls "
                 'the chin onto the chest, or a baby left swinging while '
                 'everyone is outside.'),
-            PpLink('The full safe sleep guide',
-                surfaceId: 'pp_sleep',
+            // FD4: was surfaceId 'pp_sleep', the tracker. Kept for revert.
+            PpLink('The full safe-sleep guide',
+                surfaceId: 'pp_page/parenting_sleep/back_to_sleep',
                 blurb: 'Cots, sharing a bed, naps, and everything after the '
                     'newborn weeks.'),
           ],
@@ -1850,6 +1998,10 @@ final PpSection kPpFirst40Section = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'If something has already been used',
             ),
+            // FD4: the longer story is Traditions'.
+            PpLink('More family customs, checked',
+                surfaceId: 'pp_page/parenting_traditional/newborn_customs',
+                blurb: 'Kohl, honey and the cord, with what to keep.'),
           ],
         ),
         // ⚠️ [NEW], a scaffold. "A premature, low-birth-weight, or
@@ -2038,6 +2190,11 @@ final PpSection kPpFirst40Section = PpSection(
               surfaceId: 'pp_experts',
               role: 'lactation',
             ),
+            // FD4: First 40 keeps its newborn version; the longer one is
+            // Feeding's.
+            PpLink('Feeding as your baby grows',
+                surfaceId: 'pp_page/parenting_feeding/bf_latch',
+                blurb: 'The latch at every age, and what changes.'),
           ],
         ),
         PpPage(
@@ -2284,8 +2441,10 @@ final PpSection kPpFirst40Section = PpSection(
                 'later.'),
             PpWhenLine('Applies to the first 6 to 8 weeks. Longer stretches '
                 'usually appear between 6 and 12 weeks.'),
-            PpLink('Sleep, all the way through',
-                surfaceId: 'pp_sleep',
+            // FD4: was 'Sleep, all the way through' on 'pp_sleep', the
+            // tracker. Kept for revert.
+            PpLink('The full safe-sleep guide',
+                surfaceId: 'pp_page/parenting_sleep/back_to_sleep',
                 blurb: 'Safe sleep, gentle settling, naps and every age after '
                     'this one.'),
             PpCallout(
@@ -2425,8 +2584,16 @@ final PpSection kPpFirst40Section = PpSection(
                 "head-shaping parts to be skipped. A calm baby means it's "
                 'being done right; a screaming one means too hard, whatever '
                 'anyone says about getting used to it.'),
-            PpLink('Massage oils and what to look for',
-                surfaceId: 'pp_products',
+            // FD4: the longer story is Sleep's.
+            PpLink('Malish after the first month',
+                surfaceId: 'pp_page/parenting_sleep/malish',
+                blurb: 'Massage as part of the bedtime routine.'),
+            // FD5: no oil is stocked, so the tap says so and names the page
+            // (`kPpShelfNotYet`). Was the unfiltered shop, kept for revert:
+            // PpLink('Massage oils and what to look for',
+            //     surfaceId: 'pp_products', ...),
+            PpLink('Massage oil',
+                surfaceId: 'pp_products/Baby massage oils',
                 blurb: 'Cold-pressed, edible grade, no fragrance. What '
                     'matters on the label.'),
           ],
@@ -2808,15 +2975,18 @@ final PpSection kPpFirst40Section = PpSection(
             PpCallout('Logging is off by default and stays off unless you turn '
                 'it on. Nothing in this app will tell you off for a gap in a '
                 'log, and no chart here is a report card.'),
-            PpConsult(
-              title: 'Talk to a Newborn Expert',
-              whoFor: "For slow weight gain, feeding that isn't working, or "
-                  "a sleepy baby you have to wake for every feed. If you've "
-                  'kept a feed log, share it before the call, so the expert '
-                  'starts with the facts, not your memory of a hard week.',
-              surfaceId: 'pp_experts',
-              role: 'lactation',
-            ),
+            // FD6: When to rush stays free of any pitch, and this page sits on
+            // it. The lactation expert is the feeding tab's row now. Kept for
+            // revert:
+            // PpConsult(
+            //   title: 'Talk to a Newborn Expert',
+            //   whoFor: "For slow weight gain, feeding that isn't working, or "
+            //       "a sleepy baby you have to wake for every feed. If you've "
+            //       'kept a feed log, share it before the call, so the expert '
+            //       'starts with the facts, not your memory of a hard week.',
+            //   surfaceId: 'pp_experts',
+            //   role: 'lactation',
+            // ),
           ],
         ),
       ],
@@ -3078,6 +3248,15 @@ final PpSection kPpFirst40Section = PpSection(
             PpIntro('The food of the forty days is one of the things our families get most '
                 'right. Warm, easy, filling meals cooked by someone else are '
                 "exactly what you need when you're feeding every two hours."),
+            // FD9: the recovery film, back on Your recovery. Its old home,
+            // the bleeding page, is a window into You, Maa now.
+            PpVideoSlot(
+              title: 'Your body in the first weeks',
+              subtitle: 'Bleeding, stitches, the caesarean scar, and what '
+                  'rest is for.',
+              minutes: '9 MIN',
+              slotId: 'first40/recovery_basics',
+            ),
             PpArticle([
               'Breastfeeding costs you roughly a small extra meal a day in '
               'energy, and it makes you thirsty like nothing else. Eating '
@@ -3149,13 +3328,70 @@ final PpSection kPpFirst40Section = PpSection(
             // PpLink('Food and recipes',
             //     surfaceId: 'pp_food',
             //     blurb: 'Warm, simple, one-handed meals and recipes for the forty days.'),
+            // FD8. Myth versus evidence, never mocking. REQUIRED_REVIEW
+            // (gynaecologist): bathing after a normal birth and a caesarean,
+            // the binder, early walking and clots (RCOG / NICE postnatal care).
+            PpCarousel(
+              eyebrow: 'Myth or evidence',
+              coverTitle: 'The old rules for you',
+              coverBlurb: 'Four you will hear, and what holds up.',
+              hue: 330,
+              cards: [
+                PpCarouselCard.myth('"No cold water, no washing your hair for forty days."',
+                    'A warm bath or wash is safe once you feel steady on your '
+                    'feet, after a normal delivery or a C-section. Keep a '
+                    'C-section wound dry and pat it gently. Warm water is '
+                    'comfort, not a rule.'),
+                PpCarouselCard.myth('"Tie your belly tight with a belt or a cloth."',
+                    'A soft binder can make moving feel easier after a '
+                    "C-section, and some women like it. It doesn't flatten "
+                    "the tummy or close the muscles, and tight binding for "
+                    "long hours isn't helpful. Ask your doctor first after a "
+                    'C-section.'),
+                PpCarouselCard.myth('"Stay in bed for forty days."',
+                    'Rest is treatment, but short walks around the house from '
+                    'the first days help prevent clots and constipation. Lie '
+                    'down as much as you need, and get up a little each day.'),
+                PpCarouselCard.myth('"Only certain foods, no water."',
+                    'Jaapa foods like gond, ajwain and ghee are fine in '
+                    'sensible amounts. Drink water freely, especially while '
+                    'feeding.'),
+              ],
+            ),
+            // FD8. REQUIRED_REVIEW: the scheme names and what each pays or
+            // covers, checked against the current NHM (JSY, JSSK) and WCD
+            // (PMMVY 2.0) pages before release. No amounts on purpose: they
+            // vary by state and change.
+            PpCards([
+              PpCard('JSY (Janani Suraksha Yojana)',
+                  'A cash amount for a delivery in a government or accredited '
+                  'hospital, larger in some states. Your ASHA can help you '
+                  'claim it.'),
+              PpCard('JSSK (Janani Shishu Suraksha Karyakram)',
+                  'Free delivery, medicines, food, tests and transport in '
+                  'government hospitals, and free care for the baby in the '
+                  'first year.'),
+              PpCard('PMMVY (Pradhan Mantri Matru Vandana Yojana)',
+                  'Money paid to your bank account for your first child, and '
+                  'for a second child if she is a girl, after registration '
+                  'and the birth vaccines.'),
+            ], heading: 'Money you may be owed', hue: 330),
+            PpLink('How to claim, step by step',
+                surfaceId: 'pp_section/parenting_papers',
+                blurb: 'The forms, the offices, and what to carry.'),
             PpLink('Food and recipes',
                 surfaceId: 'pp_page/parenting_maternal/kitchen_one_handed',
                 blurb: 'Warm, simple, one-handed meals and recipes for the forty days.'),
+            // FD5: not stocked, so the tap says so (`kPpShelfNotYet`).
+            PpLink('A postpartum belt',
+                surfaceId: 'pp_products/Postpartum belts',
+                blurb: 'What a soft binder does, and when to ask first.'),
           ],
         ),
         PpPage(
           id: 'f40_recovery_red_flags',
+          // FD2 / S10: first on Your recovery, even after she has read it.
+          pinned: true,
           title: 'When to call your own doctor',
           subtitle: 'The signs in you that are more than tiredness.',
           format: 'FLAGGED QUICK-REFERENCE',
@@ -3315,13 +3551,26 @@ final PpSection kPpFirst40Section = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'Get help today if',
             ),
+            // FD4. Free help, above any paid help (You, Maa M5). This page
+            // carries no paid block, as decided. REQUIRED_REVIEW: Tele-MANAS
+            // 14416 (MoHFW).
+            PpCallout(
+              "The government's mental health line. Trained counsellors, in "
+              'your language, free. You can call for yourself, or someone can '
+              'call for you.',
+              kind: PpCalloutKind.doctor,
+              title: 'Free, any hour: Tele-MANAS, 14416',
+            ),
             PpIndiaNote('You may hear that everyone goes through this, and '
                 "that it's only weakness or the evil eye. Neither is true. If your "
                 "family won't take it seriously, tell your own doctor at the "
                 'next visit, or ask your husband to book the appointment for '
                 'you. One appointment is usually all it takes to start.'),
-            PpLink('You, the mother: your mind in the first year',
-                surfaceId: 'pp_you_maa',
+            // FD4: You, Maa's baby-blues page, not its door home. Kept for
+            // revert: PpLink('You, the mother: your mind in the first year',
+            //     surfaceId: 'pp_you_maa', ...),
+            PpLink('Baby blues or something more?',
+                surfaceId: 'pp_page/parenting_maternal/mind_blues_vs_ppd',
                 blurb: 'Mood, identity, anger, therapy and what helps. The '
                     'deeper part of this lives there.'),
             PpLink('Find someone to talk to',
@@ -3470,10 +3719,18 @@ final PpSection kPpFirst40Section = PpSection(
           minutes: '3 MIN',
           slotId: 'first40/course_preview',
         ),
-            PpIntro('A digital version of the traditional forty days: the whole first forty days taught in '
-                'order, by people who do this for a living. Most families '
-                "can't find a well-informed postnatal helper, and those who can "
-                'often get the folk practices along with the good parts.'),
+            // FD6: the real class is `mc_first40`, an 80-minute recorded
+            // masterclass at Rs 1,199. The page promised a course at Rs 1,499
+            // (usually 2,999), in Hindi and English, with a free first
+            // lesson; none of that is true of it. Kept for revert:
+            // PpIntro('A digital version of the traditional forty days: the whole first forty days taught in '
+            //     'order, by people who do this for a living. Most families '
+            //     "can't find a well-informed postnatal helper, and those who can "
+            //     'often get the folk practices along with the good parts.'),
+            PpIntro('The first forty days, as a short class. An 80-minute '
+                'recorded masterclass: feeding, sleep, the cord, the bath, '
+                'your own recovery, and the signs that need a doctor, from '
+                'people who do this every day. Rs 1,199 (\$14).'),
             PpCards([
               PpCard('Newborn care, dos and don\'ts',
                   'Cord, bath, nappies, skin, sleep and safety, with the myths '
@@ -3496,14 +3753,26 @@ final PpSection kPpFirst40Section = PpSection(
                   'Visitors, advice, joint family negotiations and the scripts '
                   'that end an argument politely.'),
             ], heading: "What's inside", hue: 86),
+            // FD6: the wrong price and the Hindi promise, kept for revert:
+            // PpChartCard(
+            //   title: 'What it costs',
+            //   rows: [
+            //     ('The course', 'Rs 1,499'),
+            //     ('Usual price', 'Rs 2,999'),
+            //     ('A live-in postnatal helper, 40 days', 'Rs 20,000 to 35,000'),
+            //     ('Access', 'Yours to keep, watch in any order'),
+            //     ('Language', 'Hindi and English'),
+            //   ],
+            //   note: 'Priced against what it replaces, not against other apps.',
+            //   hue: 86,
+            // ),
             PpChartCard(
               title: 'What it costs',
               rows: [
-                ('The course', 'Rs 1,499'),
-                ('Usual price', 'Rs 2,999'),
+                ('The class', 'Rs 1,199 (\$14)'),
+                ('Length', '80 minutes, recorded'),
                 ('A live-in postnatal helper, 40 days', 'Rs 20,000 to 35,000'),
-                ('Access', 'Yours to keep, watch in any order'),
-                ('Language', 'Hindi and English'),
+                ('Language', 'English'),
               ],
               note: 'Priced against what it replaces, not against other apps.',
               hue: 86,
@@ -3513,9 +3782,12 @@ final PpSection kPpFirst40Section = PpSection(
                 'trackers and the reading are never behind a payment. The '
                 'course is the same material taught in order, on video, with '
                 'the parts nobody writes down.'),
-            PpLink('See the course',
-                surfaceId: 'pp_courses',
-                blurb: 'Watch the free first lesson before you decide.'),
+            // FD6: the class by its id, not Learn home. Kept for revert:
+            // PpLink('See the course', surfaceId: 'pp_courses',
+            //     blurb: 'Watch the free first lesson before you decide.'),
+            PpLink('See the class',
+                surfaceId: 'pp_learn/mc_first40',
+                blurb: "What's in it, and what it costs."),
             PpWhenLine('Most useful in the last weeks of pregnancy or the first '
                 'fortnight after birth. It stays available afterwards.'),
             PpIndiaNote('If a postnatal helper is already coming, the course helps '
@@ -3625,9 +3897,31 @@ final PpSection kPpFirst40Section = PpSection(
                 'be the pillows and the powder. Accept graciously and put '
                 "the unsafe things away. You don't have to use a gift to "
                 'have loved it.'),
-            PpLink('Newborn and first 40 days essentials',
-                surfaceId: 'pp_products',
-                blurb: 'The short list, with what to look for on each label.'),
+            // FD5: one row a thing, each to its own shelf. The thermometer
+            // goes to the underarm one Health recommends for a newborn,
+            // which says honestly that it isn't picked yet. Was the
+            // unfiltered shop, kept for revert:
+            // PpLink('Newborn and first 40 days essentials',
+            //     surfaceId: 'pp_products',
+            //     blurb: 'The short list, with what to look for on each label.'),
+            PpLink('Muslin swaddles',
+                surfaceId: 'pp_products/pvs_muslin_swaddle_cloths',
+                blurb: 'Light and breathable, for the heat.'),
+            PpLink('Maternity pads',
+                surfaceId: 'pp_products/pvs_graded_flow_maternity_pads',
+                blurb: 'The thing most mothers under-buy.'),
+            PpLink('Breast pads',
+                surfaceId: 'pp_products/pvs_absorbent_breast_pads',
+                blurb: 'For the leaking weeks.'),
+            PpLink('A thermometer',
+                surfaceId: 'pp_products/Underarm thermometers',
+                blurb: 'A digital one, used under the arm.'),
+            PpLink('A cradle or bassinet',
+                surfaceId: 'pp_products/pvs_smart_cribs_and_bassinets',
+                blurb: 'A firm, flat surface. Nothing soft inside.'),
+            PpLink('A peri bottle',
+                surfaceId: 'pp_products/pvs_ergonomic_peri_bottles',
+                blurb: 'Rinsing stitches without wiping.'),
           ],
         ),
         PpPage(
@@ -3650,16 +3944,28 @@ final PpSection kPpFirst40Section = PpSection(
                   'default',
                   'Solidifies in winter. Warm it in your palms',
                 ],
+                // R3: added with the one-source pass. REQUIRED_REVIEW.
+                [
+                  'Sunflower',
+                  'Plain, cold-pressed, fragrance-free. Studies found it gentle '
+                  'on newborn skin',
+                  'Buy cold-pressed, not refined cooking oil with additives',
+                ],
                 [
                   'Sesame or til',
                   'Winter, the traditional warming choice, good absorption',
                   'Buy cold-pressed and edible grade. Strong smell',
                 ],
+                // R3 / FD12: matches Traditions TR3. Was 'Can irritate or
+                // burn newborn skin. Patch test, never warm it hot, avoid on
+                // premature or very young babies', kept for revert.
+                // REQUIRED_REVIEW.
                 [
                   'Mustard',
                   'Cold north Indian winters, deeply traditional',
-                  'Can irritate or burn newborn skin. Patch test, never warm '
-                  'it hot, avoid on premature or very young babies',
+                  "Best kept off a newborn's skin: it can irritate it and "
+                  'weaken its barrier in the first weeks. Many families keep '
+                  "it for the mother's massage",
                 ],
                 [
                   'Almond',
@@ -3782,9 +4088,14 @@ final PpSection kPpFirst40Section = PpSection(
                 'that nothing has a long tie or a loose end that can reach '
                 'the face.'),
             // [fix] carries its shelf, so the tray arrives loaded.
-            PpLink('Compare swaddles',
-                surfaceId: 'pp_compare/Sleepwear & sacks',
-                blurb: 'Fabric, sizing, hip room and price, side by side.'),
+            // FD5: the compare shelf holds no swaddle, so the tray opened
+            // empty of them. Kept for revert:
+            // PpLink('Compare swaddles',
+            //     surfaceId: 'pp_compare/Sleepwear & sacks',
+            //     blurb: 'Fabric, sizing, hip room and price, side by side.'),
+            PpLink('Muslin swaddles',
+                surfaceId: 'pp_products/pvs_muslin_swaddle_cloths',
+                blurb: 'Fabric, sizing, hip room and price.'),
           ],
         ),
       ],

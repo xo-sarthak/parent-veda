@@ -16,7 +16,9 @@
 //  ⚠️ THE MOTHER IS THIRD, NOT SEVENTH. "A whole area is her recovery,
 //  sitting alongside the baby areas because in these weeks nobody in the
 //  house asks how she is." The brief's judgement call 2: lift her area up,
-//  right after the two baby-emergency areas. Done by the tab order.
+//  right after the two baby-emergency areas. Done by the tab order. From two
+//  months she is FIRST (door plan 06, FD3): her recovery runs for months,
+//  and the newborn pages stay one tab away.
 //
 //  ⚠️ NO RED STRIP AND NO CLOSING OFFER, BOTH DELIBERATE. "No red strip on
 //  the front, so people do not learn to scroll past it"; "no closing 'book
@@ -24,14 +26,36 @@
 //  consults instead fire on the pages where the need is real)". So the
 //  go-now list is the first card of its tab, not a pinned strip, and this
 //  door has no `closing`.
+//
+//  ⚠️ AND THE GO-NOW LIST STAYS FIRST (FD2, step 0 · S10). A page she has
+//  read sinks to the end of its rail, so after one read "Go now" stopped
+//  being first. Both warning lists are `pinned` in the content, which the
+//  shell reads as "lead the rail, read or not" (`ppIsRedFlagPage`).
+//
+//  ⚠️ EXPERTS ON THREE TABS, NONE ON WHEN TO RUSH (FD6). A paediatrician
+//  after the first rail of Understanding your newborn, a gynaecologist on
+//  Your recovery, the lactation expert on the feeding tab. When to rush
+//  stays free of any pitch: its only links are free.
+//
+//  Door plan: `docs/pp-door-plans/06-first40.md`, built 2026-10-25.
 // =============================================================================
 
 import 'package:flutter/material.dart' show Icons;
 
 import 'pp_door_data.dart';
 
+/// "Try this today" by week (FD1), drawn in place on Day by day. It also
+/// holds the birthday ask (FD7) and the after-forty line (FD3):
+/// `PpFirst40TodayShelf` in `doors/pp_door_inline_tools.dart`.
+const String kPpFirst40TodayShelf = 'pp_f40_today';
+
 final PpDoor kPpFirst40Door = PpDoor(
   sectionId: 'parenting_first_40',
+  // FD3: from two months the door opens on her recovery. The first month and
+  // the forty-day mark keep the door's own order, Day by day first.
+  tabOrder: const {
+    'jaapa_after': ['maa'],
+  },
   // Unsplash, free. A newborn's feet, tiny, in a white wrap: the first
   // weeks, and no sleep position in the frame for the safe-sleep page to
   // argue with (most "sleeping newborn" photographs show a side or a front).
@@ -46,6 +70,7 @@ final PpDoor kPpFirst40Door = PpDoor(
       areaIds: ['din_by_din'],
       note: 'Only this tab changes with the day. Everything else on the door '
           'is written for the whole forty days and stays put.',
+      inlineSurfaceId: kPpFirst40TodayShelf,
     ),
     PpDoorTab(
       id: 'rush',
@@ -58,6 +83,7 @@ final PpDoor kPpFirst40Door = PpDoor(
       // ("The quick daily check") opens that tool; a Tool card beside it
       // would be the same thing twice on one tab. Same for Ask Veda on the
       // last tab: the "Ask anything, at any hour" page is its card.
+      // ⚠️ NO EXPERT ROW, ON PURPOSE (FD6). An emergency goes to a hospital.
     ),
     PpDoorTab(
       id: 'maa',
@@ -67,6 +93,12 @@ final PpDoor kPpFirst40Door = PpDoor(
       areaIds: ['maa_ki_dekhbhaal'],
       footer: 'Rest is treatment, not laziness. You do not need to enjoy '
           'this week.',
+      // FD6.
+      expert: PpDoorClosing(
+        label: 'Talk to a gynaecologist',
+        blurb: 'Stitches, a scar, bleeding, or the six-week check?',
+        surfaceId: 'pp_experts/Gynecologist',
+      ),
     ),
     PpDoorTab(
       id: 'samjho',
@@ -74,6 +106,13 @@ final PpDoor kPpFirst40Door = PpDoor(
       icon: Icons.child_care_outlined,
       hue: 44,
       areaIds: ['samjho', 'malish_jhula'],
+      // FD6. The old hub comment said jaundice had a paediatrician; nothing
+      // on the door did until this row.
+      expert: PpDoorClosing(
+        label: 'Ask a paediatrician',
+        blurb: 'Jaundice, the cord, his skin?',
+        surfaceId: 'pp_experts/Pediatrician',
+      ),
     ),
     PpDoorTab(
       id: 'feeding_rest',
@@ -81,6 +120,13 @@ final PpDoor kPpFirst40Door = PpDoor(
       icon: Icons.nightlight_outlined,
       hue: 206,
       areaIds: ['feeding_sleep_early', 'puchho', 'jaapa_course', 'jaapa_essentials'],
+      // FD6: the lactation help moves up, after the tools. Its three page
+      // consults (latch, getting enough, the escalate cards) stay.
+      expert: PpDoorClosing(
+        label: 'Talk to a lactation expert',
+        blurb: 'A latch that hurts, or worry about supply?',
+        surfaceId: 'pp_experts/Lactation expert',
+      ),
       tools: [
         PpDoorTool(
           label: 'Log a feed',

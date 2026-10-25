@@ -30,6 +30,11 @@ Future<void> showMultiChildSheet(BuildContext context) => showModalBottomSheet<v
       builder: (_) => const MultiChildSheet(),
     );
 
+/// Straight to the add-a-child form, name and birthday (First 40 FD7: "Tell
+/// us his birthday"). The same form the switcher's Add button opens.
+Future<void> showAddChildForm(BuildContext context) =>
+    const MultiChildSheet()._addChild(context, fromSheet: false);
+
 class MultiChildSheet extends StatelessWidget {
   const MultiChildSheet({super.key});
 
@@ -51,7 +56,7 @@ class MultiChildSheet extends StatelessWidget {
   /// Birth weight is the one that genuinely belongs here: it is a fixed fact
   /// about the child that never changes, a parent knows it on the day, and
   /// asking later means asking someone to remember it.
-  Future<void> _addChild(BuildContext context) async {
+  Future<void> _addChild(BuildContext context, {bool fromSheet = true}) async {
     final nameCtl = TextEditingController();
     // Optional, per the review. Empty stays empty — _num() returns 0 and the
     // store treats 0 as "not recorded" rather than as a measurement of zero.
@@ -185,7 +190,9 @@ class MultiChildSheet extends StatelessWidget {
       heightCm: _num(htCtl.text),
     );
     if (!context.mounted) return;
-    Navigator.of(context).maybePop();
+    // Closes the switcher it was opened from; from a door there is no sheet
+    // to close, and popping would close the door.
+    if (fromSheet) Navigator.of(context).maybePop();
     pvToast(context, '${nameCtl.text.trim()} added', kind: PvToastKind.done);
   }
 

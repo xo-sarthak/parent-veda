@@ -42,7 +42,7 @@ Held by `test/pp_doors_first_view_test.dart` (28 checks: every door at every age
 | S7 | `test/pp_doors_first_view_test.dart` | |
 | S8 | **One opener, `ppPushSurface`** (`pp_surface_router.dart`), with `ppSurfaceUnavailable` saying why | Nine parenting openers ended `if (screen == null) return;`: a link to anything not built did nothing. All call the one opener now. S8a: films and recordings not made yet answer a tap (`PvVideoPlaceholder`, `PvAudioPlaceholder`, every stage). S8b: an expert type we don't have names the nearest, with a pill. S8c: `pp_products/<shelf>` opens that shelf, or says we're still choosing. S8d: `pp_class/<name>` says it isn't open, with Tell me. S8e: six bare "Coming soon" notices say why and what's next; the other two (health guide, remedy detail) were already commented out by the other terminal |
 | S9 | No lock anywhere. A later tab sits last, says "For later", opens on the first band where it has pages, with "For later. This usually starts from 1 year." | The lock panel is kept for revert |
-| S10 | `alwaysFirst` on `ppRelevanceOrder`; `ppIsRedFlagPage` (RED FLAG, FLAGGED, pinned) | A read red-flag list stays first, ahead of anything a signal lifts |
+| S10 | `alwaysFirst` on `ppRelevanceOrder`; `ppIsRedFlagPage` (RED FLAG, FLAGGED, pinned) | A read red-flag list stays first, ahead of anything a signal lifts Door 6 found the match is exact: First 40's two lists are `FLAGGED QUICK-REFERENCE` and were not covered. They are `pinned` instead (the "any page a door pins" clause), so the shared format test and every other door's order stay as they are (`06-first40.md` §12) |
 | S11 | `PvDoorRail.heightFor`: the card grows with the text size, two lines always, width 150 | Shared with the pregnancy doors, so both stages got it. The card is keyed by its height so a text-size change never animates it shorter than its words |
 
 **Reuse:**
@@ -101,7 +101,7 @@ Held by `test/pp_doors_first_view_test.dart` (28 checks: every door at every age
 | 3 | You, Maa | Action (movement) | Exercises are buried in tab 2 and tab 3, with no demos. 20 consults. |
 | 4 | Development | Action | Opens on checklists. "What to do" is tab 4 with 5 pages. The activities are hidden behind a tool. |
 | 5 | Potty | Action | Opens on one chart card. No tools. |
-| 6 | First 40 Days | Action | Only Day by day changes with age; the other 4 tabs (41 of 46 pages) are the same on day 3 and at 3 months. "Your recovery" is 5 windows into You, Maa plus 3 real pages. (Corrected 2026-10-24 by the door audit.) |
+| 6 | First 40 Days | Action | Only Day by day changes with age; the other 4 tabs (41 of 46 pages) are the same on day 3 and at 3 months. "Your recovery" is 5 windows into You, Maa plus 3 real pages. (Corrected 2026-10-24 by the door audit.) **Built 2026-10-25** (`06-first40.md` §12): a week shelf on Day by day, Your recovery first from two months. |
 | 7 | Sleep | Routine | Safe sleep and waking framed for infants, shown to toddlers |
 | 8 | Behaviour | Mixed | Calming activities are in tab 5. Dead code. Thin pages. |
 | 9 | Early learning | Action | Best fit already. Needs activity demos and rhymes. |

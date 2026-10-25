@@ -96,6 +96,8 @@ List<PpPage> ppDinOrder(List<PpPage> pages, {int? day}) {
 /// Today's card for the Din by din tab, or null outside it or after day 40.
 ({int day, String line})? ppDinToday(String tabId, {int? day}) {
   if (tabId != kPpDinTabId) return null;
+  // No birthday saved: no day to count (FD7). The tab's shelf asks for it.
+  if (day == null && !ppDinKnown()) return null;
   final d = day ?? ppDinDay();
   if (d < 1 || d > kPpDinLines.length) return null;
   return (day: d, line: kPpDinLines[d - 1]);
@@ -122,6 +124,110 @@ class PpDinTodayCard extends StatelessWidget {
               style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.action)),
           const SizedBox(height: 6),
           Text(line, style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w500, height: 1.35, color: p.ink1)),
+        ]),
+      );
+}
+
+// =============================================================================
+//  No birthday yet, and after the forty days (door plan 06, FD7 and FD3)
+// =============================================================================
+
+/// ⚠️ A DAY WE CAN ACTUALLY COUNT (FD7). With no child saved, the seeded
+/// date of birth is today, so the card said "Day 1 of 40" for ever. A day
+/// count needs a real birthday; until then the tab asks for one.
+bool ppDinKnown([ChildProfileStore? c]) => (c ?? ChildProfileStore.instance).hasRealChild;
+
+/// True on the Day by day tab once the forty days are done (FD3).
+bool ppDinAfter(String tabId, {int? day}) =>
+    tabId == kPpDinTabId && (day ?? ppDinDay()) > kPpDinLines.length;
+
+/// The doors the after-forty line points on to (FD3): name -> surface.
+/// Each opens on its own first tab for his age.
+const List<(String, String)> kPpDinOnward = [
+  ('Feeding', 'pp_section/parenting_feeding'),
+  ('Sleep', 'pp_section/parenting_sleep'),
+  ('Development', 'pp_section/parenting_development'),
+];
+
+/// "Your forty days start the day he's born", and a button to add him.
+class PpDinNoBirthdayCard extends StatelessWidget {
+  const PpDinNoBirthdayCard({super.key, required this.p, required this.onAdd});
+  final V2Palette p;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    final kid = ChildProfileStore.instance;
+    return Container(
+      key: const ValueKey('pp_din_no_birthday'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text("Your forty days start the day ${kid.they}'s born.",
+            style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w500, height: 1.35, color: p.ink1)),
+        const SizedBox(height: 6),
+        Text('Tell us ${kid.their} birthday and this page follows you day by day.',
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 12),
+        FilledButton(
+          key: const ValueKey('pp_din_add_birthday'),
+          onPressed: onAdd,
+          style: FilledButton.styleFrom(
+            backgroundColor: p.ink1,
+            foregroundColor: Colors.white,
+            shape: const StadiumBorder(),
+          ),
+          child: Text('Add ${kid.their} birthday',
+              style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+        ),
+      ]),
+    );
+  }
+}
+
+/// "Your forty days are done", with the three doors as links (FD3).
+class PpDinAfterCard extends StatelessWidget {
+  const PpDinAfterCard({super.key, required this.p, required this.onSurface});
+  final V2Palette p;
+  final void Function(String surfaceId) onSurface;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: const ValueKey('pp_din_after'),
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: p.line),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Your forty days are done.',
+              style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w500, height: 1.35, color: p.ink1)),
+          const SizedBox(height: 6),
+          Text('What comes next lives in three places. Your own recovery carries '
+              'on, on the Your recovery tab.',
+              style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+          const SizedBox(height: 10),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final (name, surface) in kPpDinOnward)
+              OutlinedButton(
+                key: ValueKey('pp_din_onward_$name'),
+                onPressed: () => onSurface(surface),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: p.ink1,
+                  side: BorderSide(color: p.line),
+                  shape: const StadiumBorder(),
+                ),
+                child: Text(name,
+                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink1)),
+              ),
+          ]),
         ]),
       );
 }

@@ -6,9 +6,10 @@
 //  thing a tab is for is a door in front of a door. Each one lays out its own
 //  gutter (`kPvDoorSelfPaddedTools`'s rule) so its rail runs edge to edge.
 //
-//  Two so far: Development's Play today shelf (door plan 04, D2, look
-//  approved 2026-10-24, `claude.ai/artifact/1bsFmZ4i5SRg8oiQFyeHHR`), and
-//  Potty's "Try this today" (door plan 05, PT3), which reuses that look.
+//  Three so far: Development's Play today shelf (door plan 04, D2, look
+//  approved 2026-10-24, `claude.ai/artifact/1bsFmZ4i5SRg8oiQFyeHHR`),
+//  Potty's "Try this today" (door plan 05, PT3), which reuses that look, and
+//  First 40's "Try this today" by week (door plan 06, FD1, the same look).
 //
 //  ⚠️ THIS FILE NEVER IMPORTS THE ROUTER, as the door screen doesn't. A tap
 //  that leaves the shelf goes through the door's own `onSurface`; an activity
@@ -20,6 +21,7 @@ import 'dart:math' show Random;
 import 'package:flutter/material.dart';
 
 import '../../../data/doors/pp_door_development.dart' show kPpPlayTodayShelf;
+import '../../../data/doors/pp_door_first40.dart' show kPpFirst40TodayShelf;
 import '../../../data/doors/pp_door_potty.dart'
     show kPpPottyDoor, kPpPottyTodayShelf;
 import '../../../theme/pv_fonts.dart';
@@ -31,7 +33,10 @@ import '../pp_activity_paintings.dart' show ppActivityPainting;
 import '../pp_activity_read.dart' show ppActivityReader;
 import '../pp_child_profile.dart';
 import '../pp_content.dart' show PpPage;
+import '../multichild_sheet.dart' show showAddChildForm;
 import '../pp_development_data.dart';
+import '../pp_din_by_din.dart';
+import '../pp_first40_content.dart' show kPpFirst40Section;
 import '../pp_phases_data.dart' show ppFillChild;
 import '../pp_potty_content.dart';
 import '../pp_section_screen.dart' show ppOpenPage;
@@ -45,6 +50,7 @@ Widget? ppDoorInlineToolFor(
 }) =>
     switch (surfaceId) {
       kPpPlayTodayShelf => PpPlayTodayShelf(p: p, onSurface: onSurface),
+      kPpFirst40TodayShelf => PpFirst40TodayShelf(p: p, onSurface: onSurface),
       _ when ppPottyShelfShows(surfaceId) =>
         PpPottyTodayShelf(p: p, onSurface: onSurface),
       _ => null,
@@ -53,6 +59,8 @@ Widget? ppDoorInlineToolFor(
 /// How many things an inline tool shows, for the tab card's count.
 int ppDoorInlineCount(String surfaceId) => switch (surfaceId) {
       kPpPlayTodayShelf => ppPlayTodayPicks().length,
+      kPpFirst40TodayShelf => ppFirst40TodayPicks().length +
+          (ppDinKnown() && ppDinAfter(kPpDinTabId) ? 1 : 0),
       _ when ppPottyShelfShows(surfaceId) => ppPottyTodayPicks().length,
       _ => 0,
     };
@@ -64,6 +72,173 @@ int ppDoorInlineCount(String surfaceId) => switch (surfaceId) {
 Set<String> ppDoorInlinePageIds(String surfaceId) => ppPottyShelfShows(surfaceId)
     ? {for (final x in ppPottyTodayPicks()) x.id}
     : const {};
+
+// =============================================================================
+//  First 40 Days: "Try this today", by week (FD1)
+// =============================================================================
+
+/// ⚠️ THE HOW-TOS FOR HER WEEK, ALL PAGES THAT ALREADY EXIST (FD1, the user's
+/// yes 2026-10-24 after the rows mockup). Cord care, the bath, malish and
+/// the latch were step-lists spread over three tabs, and Day by day opened
+/// on a line and an article. (last day, page ids), in the plan's order; not
+/// shuffled, because the first week's skin to skin and latch matter more
+/// than its burping.
+const List<(int, List<String>)> kPpFirst40WeekCards = [
+  (7, ['f40_skin_to_skin', 'f40_latch', 'f40_cord_care', 'f40_nappy_poop', 'f40_burping']),
+  (20, ['f40_first_bath', 'f40_swaddle', 'f40_soothing', 'f40_day_night', 'f40_burping']),
+  (40, ['f40_malish', 'f40_jhula', 'f40_soothing', 'f40_skin_to_skin', 'f40_first_bath']),
+];
+
+/// After the forty days: two pages, then a card on to Development's Play
+/// today (`kPpFirst40PlayToday`), where the next months' things to do live.
+const List<String> kPpFirst40AfterCards = ['f40_malish', 'f40_soothing'];
+const String kPpFirst40PlayToday = 'pp_section/parenting_development';
+
+/// The card names. The page titles are sentences ("Nappies, and what newborn
+/// poop should look like") and a shelf card holds a name, whole.
+const Map<String, String> kPpFirst40CardNames = {
+  'f40_skin_to_skin': 'Skin to skin',
+  'f40_latch': 'The latch',
+  'f40_cord_care': 'Cord care',
+  'f40_nappy_poop': "Nappies: what's normal",
+  'f40_burping': 'Burping',
+  'f40_first_bath': 'The first bath',
+  'f40_swaddle': 'Swaddling',
+  'f40_soothing': 'Soothing',
+  'f40_day_night': 'Day and night',
+  'f40_malish': 'Malish',
+  'f40_jhula': 'The jhula',
+};
+
+const Map<String, IconData> _kFirst40CardIcons = {
+  'f40_skin_to_skin': Icons.favorite_border_rounded,
+  'f40_latch': Icons.water_drop_outlined,
+  'f40_cord_care': Icons.healing_outlined,
+  'f40_nappy_poop': Icons.baby_changing_station_outlined,
+  'f40_burping': Icons.air_outlined,
+  'f40_first_bath': Icons.bathtub_outlined,
+  'f40_swaddle': Icons.crib_outlined,
+  'f40_soothing': Icons.spa_outlined,
+  'f40_day_night': Icons.wb_twilight_outlined,
+  'f40_malish': Icons.back_hand_outlined,
+  'f40_jhula': Icons.bedroom_baby_outlined,
+};
+
+/// The pages for her day. Empty with no birthday saved (FD7: the shelf
+/// appears once the date is). Pure for a given [day], so a test can hold
+/// every week.
+List<PpPage> ppFirst40TodayPicks({int? day}) {
+  if (day == null && !ppDinKnown()) return const [];
+  final d = day ?? ppDinDay();
+  final ids = d > kPpDinLines.length
+      ? kPpFirst40AfterCards
+      : kPpFirst40WeekCards.firstWhere((w) => d <= w.$1).$2;
+  return [for (final id in ids) ?kPpFirst40Section.pageById(id)];
+}
+
+/// Day by day's own block: the birthday ask with none saved (FD7), the
+/// after-forty line past day 40 (FD3), and the week's how-tos (FD1).
+///
+/// ⚠️ ALL THREE LIVE HERE, NOT IN THE DOOR SCREEN, so the shared screen
+/// keeps one line for this door (the Day card, `ppDinToday`), and the
+/// first-forty logic stays in the two First 40 files.
+class PpFirst40TodayShelf extends StatelessWidget {
+  const PpFirst40TodayShelf({super.key, required this.p, required this.onSurface});
+
+  final V2Palette p;
+  final void Function(String surfaceId) onSurface;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!ppDinKnown()) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+        child: PpDinNoBirthdayCard(p: p, onAdd: () => showAddChildForm(context)),
+      );
+    }
+    final kid = ChildProfileStore.instance;
+    final day = ppDinDay();
+    final after = ppDinAfter(kPpDinTabId);
+    final picks = ppFirst40TodayPicks();
+    final ts = MediaQuery.textScalerOf(context);
+    final height = 104 + ts.scale(118);
+    final accent = HSLColor.fromAHSL(1, 26, 0.55, 0.45).toColor();
+    Widget picture(IconData icon) => Container(
+          color: Color.alphaBlend(accent.withValues(alpha: 0.16), p.surface),
+          alignment: Alignment.center,
+          child: Icon(icon, size: 40, color: accent),
+        );
+    final cards = <Widget>[
+      for (final page in picks)
+        _ShelfCard(
+          key: ValueKey('pp_f40_today_card_${page.id}'),
+          p: p,
+          height: height,
+          meta: [
+            page.format == 'VIDEO' ? 'Watch' : 'How to',
+            after ? 'Now' : 'This week',
+          ].join('  ·  ').toUpperCase(),
+          title: kPpFirst40CardNames[page.id] ?? page.title,
+          picture: picture(_kFirst40CardIcons[page.id] ?? Icons.spa_outlined),
+          onTap: () => ppOpenPage(context, kPpFirst40Section, page,
+              onSurface: (_, id) => onSurface(id)),
+        ),
+      if (after)
+        _ShelfCard(
+          key: const ValueKey('pp_f40_today_play'),
+          p: p,
+          height: height,
+          meta: 'DEVELOPMENT',
+          title: 'Play with ${kid.them} today',
+          picture: picture(Icons.toys_outlined),
+          onTap: () => onSurface(kPpFirst40PlayToday),
+        ),
+    ];
+    return Column(
+      key: const ValueKey('pp_f40_today_shelf'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (after) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+            child: PpDinAfterCard(p: p, onSurface: onSurface),
+          ),
+          const SizedBox(height: kPvDoorHeadingGap * 2),
+        ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Try this today',
+                style: pvFraunces(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: -0.45,
+                    color: p.ink1)),
+            const SizedBox(height: 2),
+            Text(
+                after
+                    ? 'For ${kid.nameMid}, ${kid.ageLabel}  ·  nothing to tick off'
+                    : 'For ${kid.nameMid}, day $day  ·  nothing to tick off',
+                style: pvManrope(
+                    fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
+          ]),
+        ),
+        const SizedBox(height: kPvDoorHeadingGap),
+        SizedBox(
+          height: height,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+            itemCount: cards.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (_, i) => cards[i],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 // =============================================================================
 //  Potty: "Try this today" (PT3)

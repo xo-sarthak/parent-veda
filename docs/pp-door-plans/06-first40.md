@@ -1,6 +1,6 @@
 # Door 6: First 40 Days, the plan
 
-Written 2026-10-24. **Status: final. FD1 to FD9 answered yes by the user 2026-10-24 (FD1 after the rows mockup).** The new copy is in `06-first40-content.md`. Nothing in `lib/` changes until step 0 and the user's go. Proposes shell rule S10 (red-flag pages never sink).
+Written 2026-10-24. **Status: built 2026-10-25** (§12). FD1 to FD9 answered yes by the user 2026-10-24 (FD1 after the rows mockup). The new copy is in `06-first40-content.md`. Proposed shell rule S10 (red-flag pages never sink).
 
 ## Context
 - **Files:** the door is `lib/data/doors/pp_door_first40.dart`. The content is `pp_first40_content.dart`: 46 pages, warm and very India-aware (jaapa, chhathi, kohl, janam ghutti, the sunlight myth).
@@ -189,3 +189,37 @@ From `research/questions/ranked_parenting.csv`. FD1 to FD10 stand. Three additio
 | FD11 | A "What he can see" card on Day by day | "When can a newborn see" (55) and "can newborns see colour" (14) have no page anywhere | **Yes**, chosen and recorded. Copy in `06-first40-content.md` §R2. Added by the demand re-check, 2026-10-25 |
 | FD12 | `f40_which_oil` is the one source for the oil; its mustard row and the FD5 toast match Traditions TR3 | Three doors would have given three answers to a top question | **Yes**, chosen and recorded. Copy in §R3. Added by the demand re-check, 2026-10-25 |
 | FD13 | `f40_nappy_poop` widened to 0–12 months, linked from Potty and Health | Potty PT11, Health H8 | **Yes**, chosen and recorded. Copy in §R1. Added by the demand re-check, 2026-10-25 |
+
+## 12. As built (2026-10-25)
+Held by `test/pp_first40_door_test.dart` ("door 6: the plan, held", 11 new tests, 20 in the file): the week shelf for every day range and after forty (real pages, 4 to 6 a week, names whole), the shelf on Day by day and nowhere else, both warning lists pinned and Go now still first after it has been read (rendered), Your recovery opening from two months, the after-forty line and its three doors, the birthday ask with no child saved (no "OF 40", the pages still readable), every FD4 link landing, no safe-sleep link on the tracker, Tele-MANAS and no paid block on the mood page, the six shop rows and that the stocked ones are stocked, the two honest notices word for word, no unfiltered shop or Learn home anywhere in the section, no product near a red-flag page, the three expert rows and none on When to rush, no consult on any When to rush page, the jaundice consult, the course page against `mc_first40`, and every FD8 / FD11 / R1 / R3 change with its `REQUIRED_REVIEW` marker in the source.
+
+**The shell: nothing new in the shared door screen.** Everything for this door lives in its own files:
+- `PpFirst40TodayShelf` (`doors/pp_door_inline_tools.dart`), the inline tool `pp_f40_today` on Day by day. It holds three states: no birthday saved (the FD7 ask), the week's how-tos (FD1, the D2 card look, shared `_ShelfCard`), and after day 40 the FD3 line above the shelf, with Play today as the shelf's last card.
+- `pp_din_by_din.dart`: `ppDinKnown` (a real child is saved), `ppDinAfter`, `kPpDinOnward`, and the two cards. `ppDinToday` returns null with no birthday, so "Day 1 of 40" no longer shows for ever.
+- `showAddChildForm` (`multichild_sheet.dart`): the switcher's add-a-child form, opened straight from the door. It no longer pops the screen behind it when it is not inside the switcher (it would have closed the door).
+- The router's `kPpShelfNotYet` gains Baby massage oils and Postpartum belts.
+
+**A mechanism worth keeping.** S10 was built at step 0 as "format is `RED FLAG` or `FLAGGED`, or the page is pinned". First 40's two lists are `FLAGGED QUICK-REFERENCE`, so neither was covered, and Go now still sank after one read. An exact match on a free-text label quietly misses its variants (there are six spellings of a flag format across the parenting content). The fix is the clause that was built for this: both pages are `pinned`, which the shell already reads as "lead the rail, read or not". Widening the format match instead would have reordered every door that uses `FLAGGED CALLOUT`, including four already built.
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| FD2: "Go now stays first ... her own warning signs do the same" | Both pinned. Her warning signs now lead Your recovery on the first view too (they were fifth) | A pinned page leads its rail; that is what "stays the first card, always" asks for |
+| FD7: the ask in the Day card's place | In Day by day's own block, under the tab's note | The shared door screen holds another terminal's open edit (the door intro chip); keeping First 40's logic in its own two files means one commit never carries the other's work. The button opens the add-a-child form (name and birthday): with no child saved there is no profile to edit |
+| FD3: "one line with three links" | A card, the line and three door buttons, above Try this today | Three tappable names in a sentence are small targets; the buttons are the same words |
+| FD4: the forty-day mark "links You, Maa's recovery pages" | `pp_section/parenting_maternal/your_body`, You, Maa's Body tab | The tab that holds the recovery pages, not one page of them |
+| FD5: a thermometer to the stocked shelf | `pp_products/Underarm thermometers`, which says "we haven't picked one yet. Any digital one with a flexible tip works" | The stocked shelf is infrared forehead thermometers, and Health's own page says a digital underarm reading for a newborn. Linking the shelf would contradict the Health door |
+| FD5: "a cradle" | The Smart Cribs and Bassinets shelf | The only shelf with a cradle in it. Most of it is smart bassinets; a plain cradle shelf is owed (FF16) |
+| FD6: the class "opening soon", a tap shows "This class isn't open yet" + Tell me | The link opens the class's own page (`pp_learn/mc_first40`); the copy gives the price and length, not "opening soon" | In the data the class is a finished recording with a "Buy recorded" button, not opening soon. The page says what it is; a Tell me notice would have been untrue |
+| FD6: "When to rush stays free of any pitch" | Also: the lactation consult on "When to start logging properly" (on When to rush) is commented out, kept for revert | Found on the way. The lactation expert is the feeding tab's row now |
+| FD8: "The old rules for you" on `after_csection` and `rest_and_food` | On `rest_and_food` only, as a myth carousel | `after_csection` is a window into You, Maa's C-section page and has no blocks of its own. A carousel of four myths mid-page has a precedent (Health's `fever_bringing_down`) |
+| FD8 copy "his card", "he was born" | "your baby" | The voice of the pages the cards sit on |
+| FD9: restore `first40/recovery_basics` | Slotted on `rest_and_food`, after its intro | Its old page, the bleeding page, is a window into You, Maa now |
+| FD9: door intro `first40/door_intro` | Not slotted | S4: no chip until a film exists (GLOBAL-CHANGES #5). Owed FF12 |
+| FD11: a Day by day card "What he can see" | A page, "What your baby can see", on the Day by day rail, first-month and forty-day bands | The plan's "card" is a page of the area; the shelf is for how-tos |
+| R1 / FD13: "tagged 0 to 12 months" | No tag change: the page had no bands, which in this section is every band | The widening is the copy (the new part, its doctor box, the diarrhoea link). Potty's and Health's pointer pages already open it |
+| R3: Traditions TR3 links "Which massage oil?" | Not here | Door 10's build |
+| Housekeeping: "eight times" | Not found in First 40's files | The phrase is CLAUDE.md's `.en` / `.now` note. The four-tools header, the hub's jaundice comment and the course's Hindi promise are corrected |
+| Verification: a Mobbin check | Not run | The shelf is the approved D2 look, seen on the rows mockup before FD1 was answered |
+
+**Owed, not in this build:** the films (FF12 to FF14) and the shelf paintings (FF18), the oil, the belt and a plain cradle on the shop (FF15 to FF17), Traditions' link to the one oil page (door 10), and a paediatrician's, gynaecologist's and lawyer's read of every `REQUIRED_REVIEW` line, the scheme lines against the current government pages first (`BEFORE-LAUNCH.md`). The new page and the new copy reach Ask Veda through the incremental ingest, which the user runs.

@@ -47,7 +47,10 @@ void main() {
           for (final l in _links(s))
             if (l.surfaceId != null && l.surfaceId!.startsWith('pp_compare')) l,
       ];
-      expect(compares, hasLength(7), reason: 'the seven the brief counts');
+      // Six since First 40's door 6 (FD5, 2026-10-25): "Compare swaddles"
+      // opened a tray with no swaddle in it and now opens the muslin swaddle
+      // shelf. Was `hasLength(7)`, 'the seven the brief counts'.
+      expect(compares, hasLength(6), reason: 'the brief\'s seven, less the swaddle one');
       for (final l in compares) {
         expect(l.surfaceId, startsWith('pp_compare/'), reason: l.label);
         final shelf = l.surfaceId!.substring('pp_compare/'.length);
