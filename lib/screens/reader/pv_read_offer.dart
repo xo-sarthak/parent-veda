@@ -85,6 +85,33 @@ const Map<String, List<String>> kPvOfferAliases = {
   'close': ['psychologist', 'couple'],
   // body aches -> the physiotherapist
   'back': ['physiotherapist'], 'pelvic': ['physiotherapist'], 'pain': ['physiotherapist'],
+  // ⚠️ PARENTING (step 0 · S6, 2026-10-25). A door page never said the words
+  // its course is named by, so a talking page reached nothing. Parenting has
+  // no consult in the catalogue yet (its experts are gated until Directus
+  // serves them), so these name the course or class that fits: talking ->
+  // Language and Communication, naps -> the sleep courses, first foods ->
+  // weaning, crawling -> Motor Skills, autism -> the special needs course,
+  // hazards -> baby-proofing, colic -> the fussy stretches. When paediatric
+  // consults arrive, add 'paediatrician', 'lactation', 'speech' and 'child
+  // psychologist' to the right words here; nothing else changes.
+  'talk': ['language'], 'talking': ['language'], 'words': ['language'],
+  'speech': ['language'], 'stammer': ['language'], 'babble': ['language'],
+  'nap': ['sleep'], 'naps': ['sleep'], 'night': ['sleep'], 'nights': ['sleep'],
+  'waking': ['sleep'], 'bedtime': ['sleep'], 'regression': ['sleep'],
+  'solids': ['weaning', 'solids'], 'puree': ['weaning'], 'purees': ['weaning'],
+  'spoon': ['weaning'], 'gagging': ['weaning'], 'finger': ['weaning'],
+  'crawl': ['motor'], 'crawling': ['motor'], 'walk': ['motor'],
+  'walking': ['motor'], 'sit': ['motor'], 'sitting': ['motor'], 'tummy': ['motor'],
+  'play': ['play'], 'playing': ['play'], 'toys': ['play'],
+  // Not 'delay': a late talker is not an autism course. Not 'safe': a
+  // safe-sleep page is not baby-proofing.
+  'autism': ['special', 'needs'],
+  'therapy': ['special', 'needs'], 'diagnosis': ['special', 'needs'],
+  'safety': ['proofing'], 'falls': ['proofing'],
+  'poisons': ['proofing'], 'burns': ['proofing'], 'choking': ['proofing'],
+  'colic': ['fussy'], 'crying': ['fussy'], 'fussy': ['fussy'],
+  'recovery': ['recovery'], 'diastasis': ['diastasis'],
+  'overwhelmed': ['calm'], 'calmer': ['calm'],
 };
 
 /// When nothing more specific fits, the stage's own doctor - a clinical read
@@ -120,6 +147,15 @@ PvOfferingView? pvReadOfferFor(PvRead r, {List<PvOfferingView>? catalog}) {
   final read = _words('${r.title.en} ${r.kicker.en} ${r.teaser.en}');
   if (read.any(_kQuiet.contains)) return null;
   if (r.sections.any((s) => s.callout?.tone == PvCalloutTone.urgent)) {
+    return null;
+  }
+  // ⚠️ ONE PITCH PER PAGE (step 0 · S6). A parenting page that already
+  // carries its own consult or course at the foot (a `PpConsult`) gets no
+  // second offer mid-page. Parenting only: a pregnancy or TTC read's foot
+  // tiles are its next steps, and the global pass gives each one a service.
+  if (stage == LifeStage.parenting &&
+      r.nextSteps.any(
+      (n) => n.kind == PvNextKind.consult || n.kind == PvNextKind.course)) {
     return null;
   }
   final topics = {

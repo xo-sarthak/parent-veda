@@ -19,7 +19,9 @@ class MyChildJournalScreen extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // S8e (step 0, 2026-10-25): says why, and what happens next. Was 'Coming soon'.
+  void _soon(BuildContext context) => pvToast(context,
+      'Quick entries are not ready yet. You can write the same thing in a journal entry now.');
   // Kept for revert — the floating Material SnackBar:
   // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
   //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),

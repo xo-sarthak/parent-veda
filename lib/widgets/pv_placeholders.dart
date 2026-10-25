@@ -28,6 +28,14 @@
 //  tappable and does nothing teaches her that taps do nothing — everywhere in
 //  the app, not just here.
 //
+//  ⚠️ AND IT ANSWERS A TAP (parenting step 0 · S8a, 2026-10-25, the user's
+//  "no silent tap" rule). It still does not LOOK tappable: no press, no play
+//  label. But a mother who taps it anyway gets one quiet notice, "This film
+//  is still being made. The steps are written just below.", instead of
+//  nothing. The rule is now "must not look tappable, and answers a tap
+//  honestly". [pendingNote] changes the words (a go-now page says "follow the
+//  steps below now").
+//
 //  ⚠️ ENGLISH ONLY FOR NOW.
 // =============================================================================
 
@@ -36,6 +44,15 @@ import 'package:flutter/material.dart';
 import '../screens/v2/v2_palette.dart';
 import '../theme/pv_fonts.dart';
 import 'pv_feedback.dart' show PvPress;
+import 'pv_toast.dart';
+
+/// What a not-yet-made film says when tapped (S8a).
+const String kPvFilmPendingNote =
+    'This film is still being made. The steps are written just below.';
+
+/// What a not-yet-made recording says when tapped (S8a).
+const String kPvAudioPendingNote =
+    'This recording is still being made. The words are written on this page.';
 
 /// A video, at the size and shape the real one will be.
 class PvVideoPlaceholder extends StatelessWidget {
@@ -47,6 +64,7 @@ class PvVideoPlaceholder extends StatelessWidget {
     this.hue = 268,
     this.slotId,
     this.onTap,
+    this.pendingNote,
     this.episodeCount = 1,
     this.listBelow = false,
     this.flat = false,
@@ -126,6 +144,10 @@ class PvVideoPlaceholder extends StatelessWidget {
   /// Non-null only once a real video exists.
   final VoidCallback? onTap;
 
+  /// The notice a tap shows while there is no film (S8a). Null says
+  /// [kPvFilmPendingNote].
+  final String? pendingNote;
+
   /// How many films this slot holds. 1 renders a single video; more than 1
   /// renders the series treatment.
   ///
@@ -159,7 +181,10 @@ class PvVideoPlaceholder extends StatelessWidget {
     return Semantics(
       label: _live ? 'Video: $title' : 'Video coming soon: $title',
       child: PvPress(enabled: onTap != null, child: GestureDetector(
-        onTap: onTap,
+        // A film not made yet answers a tap with a notice (S8a); the card
+        // still does not press. Was `onTap: onTap`.
+        onTap: onTap ??
+            () => pvToast(context, pendingNote ?? kPvFilmPendingNote),
         child: Container(
           // ⚠️ NO BORDER, AND THE SHADOW DEFINES THE EDGE INSTEAD.
           //
@@ -455,6 +480,7 @@ class PvAudioPlaceholder extends StatelessWidget {
     this.hue = 268,
     this.slotId,
     this.onTap,
+    this.pendingNote,
   });
 
   final String title;
@@ -465,6 +491,9 @@ class PvAudioPlaceholder extends StatelessWidget {
   /// The id a real file gets mapped to later.
   final String? slotId;
   final VoidCallback? onTap;
+
+  /// The notice a tap shows while there is no recording (S8a).
+  final String? pendingNote;
 
   bool get _live => onTap != null;
 
@@ -480,7 +509,9 @@ class PvAudioPlaceholder extends StatelessWidget {
     return Semantics(
       label: _live ? 'Play $title' : 'Audio coming soon: $title',
       child: PvPress(enabled: onTap != null, child: GestureDetector(
-        onTap: onTap,
+        // Answers a tap while there is no file (S8a). Was `onTap: onTap`.
+        onTap: onTap ??
+            () => pvToast(context, pendingNote ?? kPvAudioPendingNote),
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(

@@ -164,6 +164,9 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     final i = _tabs.indexWhere((t) => t.id == id);
     return i < 0 ? 0 : i;
   }();
+  // The opening tab is index 0 of [_tabs], which is now ordered for his age
+  // (S1, 2026-10-25): see [_tabs]. So 0 is still right, and still the first
+  // card on the rail.
 
   PpDoor get door => widget.door;
 
@@ -211,18 +214,108 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   /// and she knows to come back; what is behind him is simply gone. A tab
   /// of tools alone (no areas at all, like Development's leaps) is always
   /// open, since a tool has no band.
-  List<PpDoorTab> get _tabs => [
-        for (final t in door.tabs)
-          if (_lockFor(t) != _Lock.past) t,
-      ]..sort((a, b) {
-          // Open first, then locked by the age they open. A stable sort:
-          // ties keep the door's own order.
-          final la = _unlockMonths(a), lb = _unlockMonths(b);
-          if (la == null && lb == null) return 0;
-          if (la == null) return -1;
-          if (lb == null) return 1;
-          return la.compareTo(lb);
+  ///
+  /// ⚠️ NO TAB IS LOCKED ANY MORE (step 0 · S9, the user 2026-10-24: "should
+  /// we lock the content???", answered "Unlock, every door"). A tab for a
+  /// later age opens, sits last, and starts with one line: "For later. This
+  /// usually starts from 1 year." Parents read ahead, and stage follows age
+  /// loosely. What is behind him still drops. The lock panel and the misted
+  /// card are kept below, unused, for revert.
+  ///
+  /// ⚠️ AND AGE PICKS THE OPENING TAB (S1, 2026-10-25). The tabs for her band
+  /// come first, in `door.tabOrder[band]` where the door gives one, else in
+  /// the door's own order. Index 0 is where she lands.
+  ///
+  /// The master plan's guess, "open on the tab with the most pages for her
+  /// band", is not used: every door plan now names its order by age, and the
+  /// guess moved action doors off their action tab (First 40 at day 12 left
+  /// Day by day; Potty left its timeline). It is kept below for revert.
+  List<PpDoorTab> get _tabs {
+    final kept = [
+      for (final t in door.tabs)
+        if (_lockFor(t) != _Lock.past) t,
+    ];
+    final now = [for (final t in kept) if (_unlockMonths(t) == null) t];
+    final later = [for (final t in kept) if (_unlockMonths(t) != null) t]
+      // Stable: ties keep the door's own order.
+      ..sort((a, b) => _unlockMonths(a)!.compareTo(_unlockMonths(b)!));
+    final order = door.tabOrder[_band];
+    if (order != null) {
+      int rank(PpDoorTab t) {
+        final i = order.indexOf(t.id);
+        return i < 0 ? order.length : i;
+      }
+
+      final indexed = [for (var i = 0; i < now.length; i++) (i, now[i])]
+        ..sort((a, b) {
+          final r = rank(a.$2).compareTo(rank(b.$2));
+          return r != 0 ? r : a.$1.compareTo(b.$1);
         });
+      return [for (final e in indexed) e.$2, ...later];
+    }
+    // The most-pages guess, kept for revert (see above):
+    // if (now.length > 1) {
+    //   var best = 0, most = -1;
+    //   for (var i = 0; i < now.length; i++) {
+    //     final n = _thingsFor(now[i]);
+    //     if (n > most) {
+    //       most = n;
+    //       best = i;
+    //     }
+    //   }
+    //   if (best != 0) now.insert(0, now.removeAt(best));
+    // }
+    return [...now, ...later];
+  }
+  // Kept for revert (S9): open first, then locked by the age they open.
+  // List<PpDoorTab> get _tabs => [
+  //       for (final t in door.tabs)
+  //         if (_lockFor(t) != _Lock.past) t,
+  //     ]..sort((a, b) {
+  //         final la = _unlockMonths(a), lb = _unlockMonths(b);
+  //         if (la == null && lb == null) return 0;
+  //         if (la == null) return -1;
+  //         if (lb == null) return 1;
+  //         return la.compareTo(lb);
+  //       });
+
+  // How much a tab holds for her band, for the most-pages guess (kept for
+  // revert with it):
+  // int _thingsFor(PpDoorTab tab) =>
+  //     tab.tools.length +
+  //     _bandRailsFor(tab).fold<int>(0, (t, r) => t + r.$2.length) +
+  //     (tab.redFlagPageId != null ? 1 : 0);
+
+  /// The band a tab shows. Her own, or, for a tab for later (S9), the first
+  /// band after hers that the tab has PAGES for, so it opens on what it will
+  /// hold rather than empty. Pages, not areas: You, Maa's Going back area
+  /// opens at six weeks but its pages at thirteen.
+  String _bandOf(PpDoorTab tab) {
+    if (_unlockMonths(tab) == null) return _band;
+    final set = section.bandSet;
+    if (set == null) return _band;
+    final at = set.bands.indexWhere((b) => b.id == _band);
+    for (var j = at + 1; j < set.bands.length; j++) {
+      final b = set.bands[j];
+      if (tab.areaIds.any((id) => section.areas.any((a) =>
+          a.id == id && a.inBand(b.id) && a.pagesFor(b.id).isNotEmpty))) {
+        return b.id;
+      }
+    }
+    return _band;
+  }
+
+  /// "For later. This usually starts from 1 year." The one line a tab for a
+  /// later age opens with (S9).
+  String _laterLine(int months) {
+    if (door.aboutHer) {
+      final when = months % 12 == 0
+          ? '${months ~/ 12} ${months == 12 ? 'year' : 'years'}'
+          : '$months months';
+      return 'For later. This usually starts about $when after the birth.';
+    }
+    return 'For later. This usually starts ${_lockLabel(months).replaceFirst('From', 'from')}.';
+  }
 
   /// The month a locked tab opens, or null when it is open now.
   int? _unlockMonths(PpDoorTab t) {
@@ -269,7 +362,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
       : 'From $months months';
 
   /// The card's second line while locked: "Locked · From 1 year".
-  String _lockLine(int months) => 'Locked  ·  ${_lockLabel(months)}';
+  // Unused since S9 (no lock), kept for revert:
+  // String _lockLine(int months) => 'Locked  ·  ${_lockLabel(months)}';
   PpSection get section => ppSectionFor(door.sectionId)!;
 
   String get _band => section.bandSet?.active.id ?? '';
@@ -294,7 +388,10 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
           area.id == kPpDinTabId
               ? pages
               : ppRelevanceOrder(pages,
-                  situation: sit, text: (x) => x.title, readId: _readIdOf),
+                  situation: sit,
+                  text: (x) => x.title,
+                  readId: _readIdOf,
+                  alwaysFirst: ppIsRedFlagPage),
         ),
     ];
     return ppRelevanceOrder(rails,
@@ -314,7 +411,9 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     final set = section.bandSet;
     if (set == null) return const [];
     final active = set.active;
-    final at = set.bands.indexWhere((b) => b.id == active.id);
+    // Measured from the band the tab shows: for a tab for later (S9) that is
+    // its own first band, so the one after it is "Coming up next".
+    final at = set.bands.indexWhere((b) => b.id == _bandOf(tab));
     final shown = {for (final r in _bandRailsFor(tab)) for (final x in r.$2) x.id};
     // A page whose title is already on her rails, or is a tool's name there
     // ("Sleep at this age" is both a chart and a page), is not shown twice.
@@ -325,7 +424,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     final out = <(PpBand, List<PpPage>, PpBandDistance)>[];
     for (var j = 0; j < set.bands.length; j++) {
       final b = set.bands[j];
-      if (b.id == active.id) continue;
+      // A tab for later shows its own band's rails already (S9).
+      if (b.id == active.id || b.id == _bandOf(tab)) continue;
       final seen = <String>{};
       final pages = [
         for (final id in tab.areaIds)
@@ -358,18 +458,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   List<(PpArea, List<PpPage>)> _bandRailsFor(PpDoorTab tab) => [
         for (final id in tab.areaIds)
           for (final area in section.areas.where((a) => a.id == id))
-            if (area.inBand(_band))
+            if (area.inBand(_bandOf(tab)))
               (
                 area,
                 // First 40 days: her day range first (2026-10-07,
                 // pp_din_by_din.dart). Every other area is untouched.
                 area.id == kPpDinTabId
                     ? ppDinOrder([
-                        for (final p in area.pagesFor(_band))
+                        for (final p in area.pagesFor(_bandOf(tab)))
                           if (p.id != tab.redFlagPageId) p,
                       ])
                     : [
-                        for (final p in area.pagesFor(_band))
+                        for (final p in area.pagesFor(_bandOf(tab)))
                           if (p.id != tab.redFlagPageId) p,
                       ],
               ),
@@ -378,13 +478,19 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   /// The second line on a tab's card. Counted, never typed — or, while the
   /// tab is locked, the age it opens.
   String _countFor(PpDoorTab tab) {
-    if (_unlockMonths(tab) case final m?) return _lockLine(m);
+    // A tab for later says so on its card (S9). Was the lock line, kept for
+    // revert: `if (_unlockMonths(tab) case final m?) return _lockLine(m);`
+    if (_unlockMonths(tab) != null) return 'For later';
     final n = tab.tools.length +
         _railsFor(tab).fold(0, (t, r) => t + r.$2.length) +
         (tab.redFlagPageId != null ? 1 : 0);
     if (n == 0) return '';
     return n == 1 ? '1 thing' : '$n things';
   }
+
+  double _railHeight(BuildContext context, List<PpDoorTab> tabs) =>
+      PvDoorRail.heightOf(context,
+          later: [for (final t in tabs) _unlockMonths(t) != null]);
 
   _CardSpec _toolSpec(BuildContext context, PpDoorTool tool) => _CardSpec(
         title: tool.label,
@@ -499,16 +605,22 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                     ..._liveRecall(p)
                   else ...[
                     // ---- the rail, across the seam (the pregnancy door's) --
+                    // The card grows at a large text size (S11), so the
+                    // seat reads the rail's own height. Was
+                    // `PvDoorRail.cardHeight` in all three places.
                     SizedBox(
-                      height: PvDoorRail.cardHeight - PvDoorRail.overlap,
+                      height: _railHeight(context, tabs) - PvDoorRail.overlap,
                       child: OverflowBox(
                         alignment: Alignment.bottomCenter,
-                        minHeight: PvDoorRail.cardHeight,
-                        maxHeight: PvDoorRail.cardHeight,
+                        minHeight: _railHeight(context, tabs),
+                        maxHeight: _railHeight(context, tabs),
                         child: PvDoorRail(
                           groups: [for (final t in tabs) _groupOf(t)],
                           counts: [for (final t in tabs) _countFor(t)],
-                          locked: [for (final t in tabs) _unlockMonths(t) != null],
+                          // No lock on any card (S9): a tab for later carries
+                          // "For later" as its count line instead. Kept for
+                          // revert: `[for (final t in tabs) _unlockMonths(t) != null]`.
+                          later: [for (final t in tabs) _unlockMonths(t) != null],
                           selected: _tab,
                           p: p,
                           onPick: (i) => setState(() => _tab = i),
@@ -518,15 +630,24 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                     const SizedBox(height: 4),
                     const SizedBox(height: kPvDoorBlockGap),
 
+                    // A tab for later opens (S9): one line, then its rails.
+                    // The lock panel it showed instead, kept for revert:
+                    // if (_unlockMonths(tab) case final m?) ...[
+                    //   ppDoorPad(_LockedPanel(months: m, label: _lockLabel(m),
+                    //       aboutHer: door.aboutHer, p: p)),
+                    //   const SizedBox(height: kPvDoorBlockGap),
+                    // ] else ...[
                     if (_unlockMonths(tab) case final m?) ...[
-                      ppDoorPad(_LockedPanel(
-                        months: m,
-                        label: _lockLabel(m),
-                        aboutHer: door.aboutHer,
-                        p: p,
-                      )),
+                      ppDoorPad(Text(_laterLine(m),
+                          key: const ValueKey('pp_door_later_line'),
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              height: 1.5,
+                              color: p.ink2))),
                       const SizedBox(height: kPvDoorBlockGap),
-                    ] else ...[
+                    ],
+                    ...[
                       // Din by din: "Day N of 40" and today's line.
                       if (ppDinToday(tab.id) case final today?) ...[
                         ppDoorPad(PpDinTodayCard(day: today.day, line: today.line, p: p)),
@@ -701,12 +822,32 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                         ),
                       )),
                       const SizedBox(height: kPvDoorBlockGap),
+                    ] else if (door.closing case final c?) ...[
+                      // ⚠️ THE CONSULT CARD IS BACK (step 0 · S3, approved
+                      // 2026-10-23, after Wave 2 took it out on 2026-10-21):
+                      // help sits next to the worry, and the door's own
+                      // closing names the right person ("Talk to a sleep
+                      // expert") instead of every door saying the same doctor
+                      // sentence. Each door's plan places a second one early
+                      // on its help tab. With no expert live yet the tap opens
+                      // "Our first experts are joining" (S8), never nothing.
+                      ppDoorPad(PpDoorRow(
+                        key: const ValueKey('pp_door_closing_card'),
+                        p: p,
+                        hue: hue,
+                        icon: Icons.chat_bubble_outline_rounded,
+                        chip: 'Consult',
+                        title: c.label,
+                        blurb: c.blurb,
+                        onTap: () => widget.onSurface(context, c.surfaceId),
+                      )),
+                      const SizedBox(height: kPvDoorBlockGap),
                     ] else ...[
-                      // The pregnancy and TTC doors end on a sentence, not a
-                      // sales card; and pitching paid help is on hold (the
-                      // user, 2026-10-21, Wave 2: every door "ends in an old
-                      // Talk to an expert row"). The consult card, kept for
-                      // revert:
+                      // A door with no closing (First 40, Traditions, Papers)
+                      // ends on a sentence, as the pregnancy and TTC doors
+                      // do. The Wave 2 note (2026-10-21: every door "ends in
+                      // an old Talk to an expert row") and the card it
+                      // replaced, kept for revert:
                       // ] else if (door.closing case final c?) ...[
                       //   ppDoorPad(PpDoorRow(
                       //     p: p,
@@ -1643,6 +1784,13 @@ class _TabNote extends StatelessWidget {
     'CEREMONY' => (kind: PvShelfKind.read, word: 'Ceremony', fact: minutes),
     _ => (kind: PvShelfKind.read, word: null, fact: minutes),
   };
+}
+
+/// A page that leads its rail even once read (step 0 · S10): a red-flag list,
+/// or a page the door pins.
+bool ppIsRedFlagPage(PpPage page) {
+  final f = (page.format ?? '').toUpperCase();
+  return f == 'RED FLAG' || f == 'FLAGGED' || page.pinned;
 }
 
 ({PvShelfKind kind, String? word, String? fact}) ppShelfSpecForTool() =>

@@ -32,7 +32,8 @@ class ArticleReaderScreen extends StatelessWidget {
         child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
       ));
 
-  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // S8e (step 0, 2026-10-25): says why, and what happens next. Was 'Coming soon'.
+  void _soon(BuildContext context, String why) => pvToast(context, why);
   // Kept for revert — the floating Material SnackBar:
   // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
   //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
@@ -82,9 +83,11 @@ class ArticleReaderScreen extends StatelessWidget {
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                     _circleBtn(Icons.arrow_back, () => Navigator.of(context).maybePop()),
                     Row(children: [
-                      _circleBtn(Icons.ios_share_rounded, () => _soon(context)),
+                      _circleBtn(Icons.ios_share_rounded, () => _soon(context,
+                          'Sharing an article is not ready yet. It is coming in an update.')),
                       const SizedBox(width: 8),
-                      _circleBtn(Icons.favorite_border, () => _soon(context)),
+                      _circleBtn(Icons.favorite_border, () => _soon(context,
+                          'Saving from here is not ready yet. It is coming in an update.')),
                     ]),
                   ]),
                 ),

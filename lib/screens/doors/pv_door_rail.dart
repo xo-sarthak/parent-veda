@@ -47,7 +47,33 @@ class PvDoorRail extends StatefulWidget {
     required this.p,
     required this.onPick,
     this.locked = const [],
+    this.later = const [],
   });
+
+  /// ⚠️ A TAB FOR LATER, NOT A LOCKED ONE (parenting step 0 · S9,
+  /// 2026-10-25). No lock and no mist: the card keeps its chevron and adds
+  /// its count line ("For later"), and it opens. Parenting passes this
+  /// instead of [locked], which stays for revert.
+  final List<bool> later;
+
+  /// ⚠️ THE CARD GROWS, THE NAME NEVER SHRINKS (step 0 · S11, the user on
+  /// Sleep SL9, 2026-10-24: "make sure of tab width"). At a large phone text
+  /// size the name used to drop to one line with dots ("Getting to…"). Now
+  /// the width stays 150 and the height is whatever the mark (28 on a card
+  /// with a count line), two lines of name and that line need at this text
+  /// size, never under [cardHeight]. The rail and the screens that seat it
+  /// read this one number, so the seam over the hero stays where it is.
+  static double heightFor(TextScaler scaler, {bool withLine = false}) {
+    final name = scaler.scale(14) * 1.2 * 2;
+    final line = withLine ? 3 + scaler.scale(12) * 1.4 : 0.0;
+    final mark = withLine ? 28.0 : markSize;
+    final need = 24 + 2 + mark + 6 + name + line;
+    return need > cardHeight ? need.ceilToDouble() : cardHeight;
+  }
+
+  /// [heightFor] for a rail whose cards are [later].
+  static double heightOf(BuildContext context, {List<bool> later = const []}) =>
+      heightFor(MediaQuery.textScalerOf(context), withLine: later.contains(true));
 
   final List<PvDoorGroup> groups;
   final List<String> counts;
@@ -113,9 +139,10 @@ class _PvDoorRailState extends State<PvDoorRail> {
   @override
   Widget build(BuildContext context) {
     final p = widget.p;
+    final height = PvDoorRail.heightOf(context, later: widget.later);
     return SizedBox(
       key: kPvDoorRailKey,
-      height: PvDoorRail.cardHeight,
+      height: height, // was PvDoorRail.cardHeight (S11)
       // A plain scrolling Row, not a lazy list: five cards are cheap, and every
       // card existing lets the rail scroll a chosen one into place (and a
       // test reach any tab) on a narrow screen.
@@ -127,19 +154,20 @@ class _PvDoorRailState extends State<PvDoorRail> {
         child: Row(children: [
           for (var i = 0; i < widget.groups.length; i++) ...[
             if (i > 0) const SizedBox(width: 10),
-            _card(i, p),
+            _card(i, p, height),
           ],
         ]),
       ),
     );
   }
 
-  Widget _card(int i, V2Palette p) {
+  Widget _card(int i, V2Palette p, double height) {
     final g = widget.groups[i];
     final on = i == widget.selected;
     final tint = v2BlockTint(g.hue % 360, p);
     final count = i < widget.counts.length ? widget.counts[i] : '';
     final isLocked = i < widget.locked.length && widget.locked[i];
+    final isLater = i < widget.later.length && widget.later[i];
     return Opacity(
       opacity: isLocked && !on ? 0.62 : 1,
       child: PvPress(
@@ -152,10 +180,15 @@ class _PvDoorRailState extends State<PvDoorRail> {
           widget.onPick(i);
         },
         child: AnimatedContainer(
+          // ⚠️ KEYED BY ITS HEIGHT (S11). The height follows the text size and
+          // must not animate: a card part-way through 160ms is shorter than
+          // its own words. A new height is a new card; picking a tab still
+          // animates its ring as before.
+          key: ValueKey(height),
           duration: const Duration(milliseconds: 160),
           curve: Curves.easeOut,
           width: PvDoorRail.cardWidth,
-          height: PvDoorRail.cardHeight,
+          height: height, // was PvDoorRail.cardHeight (S11)
           // TTC's door card (2026-10-02). Kept for revert: padding
           // fromLTRB(16, 14, 14, 14), radius 24, a 1.2 ring when chosen, and a
           // shadow of 0.10 at blur 18, offset 6.
@@ -184,8 +217,8 @@ class _PvDoorRailState extends State<PvDoorRail> {
                   // A locked card carries one more line (the age it opens),
                   // so its mark is smaller: at 1.5x text the 38 mark, a label
                   // and that line were 6pt over the 112 card.
-                  width: isLocked ? 28 : PvDoorRail.markSize,
-                  height: isLocked ? 28 : PvDoorRail.markSize,
+                  width: isLocked || isLater ? 28 : PvDoorRail.markSize,
+                  height: isLocked || isLater ? 28 : PvDoorRail.markSize,
                   // The TTC family's object where there is one (2026-10-02),
                   // else the tab's own mark, as before.
                   child: ttcFamilyMarkForIntent(g.mark, tint, forDoor: true) ??
@@ -218,11 +251,15 @@ class _PvDoorRailState extends State<PvDoorRail> {
                       // at 1.5x is 2pt more than it has. The label ellipsizes
                       // rather than the card clip it. Kept for revert:
                       // `maxLines: 2` always.
+                      // ⚠️ TWO LINES AT EVERY TEXT SIZE NOW (S11, 2026-10-25):
+                      // the card grows instead (`heightFor`). The one-line
+                      // rule above, kept for revert:
+                      // maxLines: isLocked ||
+                      //         MediaQuery.textScalerOf(context).scale(10) > 13
+                      //     ? 1
+                      //     : 2,
                       Text(g.label,
-                          maxLines: isLocked ||
-                                  MediaQuery.textScalerOf(context).scale(10) > 13
-                              ? 1
-                              : 2,
+                          maxLines: isLocked ? 1 : 2,
                           overflow: TextOverflow.ellipsis,
                           style: pvManrope(
                               fontSize: 14,
@@ -236,7 +273,7 @@ class _PvDoorRailState extends State<PvDoorRail> {
                       // A locked tab keeps its one line, the age it opens
                       // ("Locked · From 1 year"): that IS what she needs to
                       // know about it (parenting, 2026-10-07).
-                      if ((!kPvDoorRailQuiet || isLocked) && count.isNotEmpty) ...[
+                      if ((!kPvDoorRailQuiet || isLocked || isLater) && count.isNotEmpty) ...[
                         const SizedBox(height: 3),
                         Text(count,
                             maxLines: 1,

@@ -75,7 +75,16 @@ class PpDoor {
     this.closing,
     this.closingLine,
     this.disclaimer,
+    this.tabOrder = const {},
   });
+
+  /// ⚠️ THE TAB ORDER FOR HIS AGE (step 0 · S1, 2026-10-25). Band id → tab
+  /// ids, first one opens. Age used to only remove or lock tabs; it never
+  /// picked where she lands, so a mother of a 2-month-old opened Family on
+  /// "A second baby". A band with no entry here keeps the door's own order.
+  /// Tabs the list leaves out keep the door's own order after the named ones. Each door's plan
+  /// (`docs/pp-door-plans/`) gives its orders.
+  final Map<String, List<String>> tabOrder;
 
   /// ⚠️ THE CLOSING AS ONE QUIET SENTENCE, NOT A CARD. The pregnancy door's
   /// `closingLine`: a line under whatever tab is open, tappable as a whole

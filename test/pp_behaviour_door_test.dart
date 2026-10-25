@@ -163,7 +163,9 @@ void main() {
   group('the age rule', () {
     test('the section auto-scopes', () => expect(_beh.autoScope, isTrue));
 
-    testWidgets('an infant parent sees one open tab and four locked; a four-year-old\'s sees four, without Crying', (tester) async {
+    // Step 0 · S9 (2026-10-25): no tab locks. The toddler tabs are on the
+    // selector for an infant's parent as "For later", and open.
+    testWidgets('an infant parent sees one tab for now and four for later; a four-year-old\'s sees four, without Crying', (tester) async {
       tester.view.physicalSize = const Size(1200, 7000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
@@ -172,20 +174,22 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Crying, the first year'), findsWidgets);
       expect(find.text('When the crying is too much'), findsOneWidget);
-      // The toddler tabs are on the selector, locked, with the age they open.
+      // The toddler tabs are on the selector, for later, with no lock.
       // 2026-10-07: tab label now English (was 'Tantrums and the ziddi years').
       expect(find.text('Tantrums'), findsWidgets);
       expect(find.text('Scared, shy or clingy'), findsWidgets);
-      expect(find.textContaining('From 1 year'), findsNWidgets(4));
-      expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(4), reason: 'one lock per locked card (the quiet rail, 2026-10-07)');
-      // Landing on a locked tab shows the panel, not its rails.
+      expect(find.text('For later'), findsNWidgets(4), reason: 'one line per later card');
+      expect(find.byIcon(Icons.lock_outline_rounded), findsNothing, reason: 'no tab locks (S9)');
+      // Landing on a later tab opens it: one line, then its pages. Was the
+      // lock panel, with the pages hidden.
       await tester.pumpWidget(MaterialApp(
-          home: PpDoorScreen(key: const ValueKey('locked'), door: door, onSurface: (_, _) {}, initialTabId: 'tantrums')));
+          home: PpDoorScreen(key: const ValueKey('later'), door: door, onSurface: (_, _) {}, initialTabId: 'tantrums')));
       await tester.pumpAndSettle();
-      expect(find.textContaining('This opens when'), findsOneWidget);
+      expect(find.byKey(const ValueKey('pp_door_later_line')), findsOneWidget);
+      expect(find.textContaining('This usually starts from 1 year'), findsOneWidget);
       // 2026-10-07: page title now English (was 'How to handle a ziddi bachcha').
-      expect(find.text('How to handle a stubborn child'), findsNothing);
-      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget, reason: 'the closing still draws'); // was 'Talk to a child psychologist', the consult card (2026-10-21)
+      expect(find.text('How to handle a stubborn child'), findsWidgets);
+      expect(find.byKey(const ValueKey('pp_door_closing_card')), findsOneWidget); // the consult card again (step 0 · S3, 2026-10-25); was the closing line (2026-10-21)
 
       _ageMonths(48);
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(48), door: door, onSurface: (_, _) {})));
@@ -196,7 +200,7 @@ void main() {
         expect(find.text(t.label), findsWidgets, reason: t.id);
       }
       expect(find.text('What to say'), findsOneWidget);
-      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a child psychologist', the consult card (2026-10-21)
+      expect(find.byKey(const ValueKey('pp_door_closing_card')), findsOneWidget); // the consult card again (step 0 · S3, 2026-10-25); was the closing line (2026-10-21)
     });
 
     testWidgets('the scripts tool opens on his band with no chooser', (tester) async {

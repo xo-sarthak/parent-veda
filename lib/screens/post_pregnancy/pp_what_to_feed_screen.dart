@@ -54,14 +54,10 @@ class PpWhatToFeedScreen extends StatelessWidget {
       'Appetite swings wildly from day to day and week to week. What matters '
       'is the pattern over a fortnight, not what he ate at lunch.';
 
-  void _open(BuildContext context, String surfaceId) {
-    final screen = ppScreenForSurface(surfaceId);
-    if (screen == null) return;
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      settings: RouteSettings(name: surfaceId),
-      builder: (_) => screen,
-    ));
-  }
+  // Opens a link, or says why it can't (S8, 2026-10-25). Was a silent
+  // `if (screen == null) return;`.
+  void _open(BuildContext context, String surfaceId) =>
+      ppPushSurface(context, surfaceId);
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(

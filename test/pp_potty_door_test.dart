@@ -134,7 +134,8 @@ void main() {
   group('the age rule', () {
     test('the section auto-scopes', () => expect(_potty.autoScope, isTrue));
 
-    testWidgets('a baby\'s parent: two tabs open, three locked; a two-year-old\'s: su-su gone, dry nights locked', (tester) async {
+    // Step 0 · S9 (2026-10-25): no tab locks; later tabs say "For later".
+    testWidgets('a baby\'s parent: two tabs for now, three for later; a two-year-old\'s: su-su gone, dry nights for later', (tester) async {
       tester.view.physicalSize = const Size(1200, 7000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
@@ -143,9 +144,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('How long this actually takes'), findsOneWidget, reason: 'the pinned timeline, for every stage');
       expect(find.text('Signs your child is ready'), findsNothing, reason: 'readiness is 1 to 6, locked with Starting out');
-      expect(find.textContaining('From 1 year'), findsNWidgets(2), reason: 'Starting out, Accidents');
-      expect(find.textContaining('From 3 years'), findsOneWidget, reason: 'Dry nights');
-      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a paediatrician about it', the consult card (2026-10-21)
+      expect(find.text('For later'), findsNWidgets(3), reason: 'Starting out, Accidents, Dry nights (was "From 1 year" twice and "From 3 years")');
+      expect(find.byIcon(Icons.lock_outline_rounded), findsNothing);
+      expect(find.byKey(const ValueKey('pp_door_closing_card')), findsOneWidget); // the consult card again (step 0 · S3, 2026-10-25); was the closing line (2026-10-21)
 
       _ageMonths(24);
       await tester.pumpWidget(MaterialApp(
@@ -154,7 +155,7 @@ void main() {
       // 2026-10-07: tab label now English (was 'Catching the su-su').
       expect(find.text('Catching the wee early'), findsNothing, reason: 'grown past');
       expect(find.text('Signs your child is ready'), findsOneWidget, reason: 'readiness leads Starting out');
-      expect(find.textContaining('From 3 years'), findsOneWidget);
+      expect(find.text('For later'), findsOneWidget, reason: 'Dry nights (was "From 3 years")');
 
       _ageMonths(50);
       await tester.pumpWidget(MaterialApp(

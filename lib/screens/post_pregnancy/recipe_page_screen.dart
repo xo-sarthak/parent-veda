@@ -32,7 +32,9 @@ class RecipePageScreen extends StatelessWidget {
         child: SizedBox(height: 1, child: ColoredBox(color: ppLine)),
       ));
 
-  void _soon(BuildContext context) => pvToast(context, 'Coming soon');
+  // S8e (step 0, 2026-10-25): says why, and what happens next. Was 'Coming soon'.
+  void _soon(BuildContext context) => pvToast(context,
+      'This recipe film is still being made. The steps are written just below.');
   // Kept for revert — the floating Material SnackBar:
   // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
   //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),

@@ -486,13 +486,15 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                             // A slot `overlap` shorter than the rail, with the rail
                             // painted upward out of it (clip none on the sheet), is
                             // what puts the cards' top half over the photograph.
+                            // The card grows at a large text size (S11,
+                            // 2026-10-25); was `PvDoorRail.cardHeight` here.
                             SizedBox(
-                              height:
-                                  PvDoorRail.cardHeight - PvDoorRail.overlap,
+                              height: PvDoorRail.heightOf(context) -
+                                  PvDoorRail.overlap,
                               child: OverflowBox(
                                 alignment: Alignment.bottomCenter,
-                                minHeight: PvDoorRail.cardHeight,
-                                maxHeight: PvDoorRail.cardHeight,
+                                minHeight: PvDoorRail.heightOf(context),
+                                maxHeight: PvDoorRail.heightOf(context),
                                 child: PvDoorRail(
                                   groups: groups,
                                   counts: [

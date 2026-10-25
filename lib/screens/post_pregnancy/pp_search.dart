@@ -220,15 +220,11 @@ List<PpSearchHit> ppSearch(String query, {String? sectionId, int limit = 60}) {
   return hits.take(limit).toList();
 }
 
-/// Opens a surface the way every parenting screen does, by its route name.
-void ppOpenSurface(BuildContext context, String surfaceId) {
-  final screen = ppScreenForSurface(surfaceId);
-  if (screen == null) return;
-  Navigator.of(context).push(MaterialPageRoute<void>(
-    settings: RouteSettings(name: surfaceId),
-    builder: (_) => screen,
-  ));
-}
+/// Opens a surface the way every parenting screen does, by its route name,
+/// or says why it can't (S8, 2026-10-25: `ppPushSurface`). Was a silent
+/// `if (screen == null) return;`.
+void ppOpenSurface(BuildContext context, String surfaceId) =>
+    ppPushSurface(context, surfaceId);
 
 /// Opens a hit, and remembers what she typed when it led somewhere.
 /// ⚠️ NOT USED: superseded by the hand-matched kPpTipLinks (pp_tip_links.dart),

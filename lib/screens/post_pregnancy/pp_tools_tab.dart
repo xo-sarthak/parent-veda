@@ -45,7 +45,7 @@ import 'pp_feeding_data.dart';
 import 'pp_growth_data.dart';
 import 'pp_search.dart' show openPpAskVeda;
 import 'pp_sleep_data.dart';
-import 'pp_surface_router.dart' show ppScreenForSurface;
+import 'pp_surface_router.dart' show ppPushSurface, ppScreenForSurface, ppSurfaceUnavailable;
 import 'pp_vaccine_data.dart';
 
 class PpTool {
@@ -207,8 +207,13 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   }
 
   void _open(PpTool t) {
-    final screen = ppScreenForSurface(t.surfaceId);
-    if (screen == null) return;
+    // A tool not built yet says so (S8, 2026-10-25). Was a silent
+    // `if (screen == null) return;`.
+    if (ppSurfaceUnavailable(t.surfaceId) != null) {
+      ppPushSurface(context, t.surfaceId);
+      return;
+    }
+    final screen = ppScreenForSurface(t.surfaceId)!;
     pvCommitFeedback();
     Navigator.of(context).push(MaterialPageRoute<void>(
       settings: RouteSettings(name: t.surfaceId),

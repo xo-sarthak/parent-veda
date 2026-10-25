@@ -1812,14 +1812,10 @@ class _PpHomeV3State extends State<PpHomeV3> {
     );
   }
 
-  void _openSurface(BuildContext context, String surfaceId) {
-    final screen = ppScreenForSurface(surfaceId);
-    if (screen == null) return;
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      settings: RouteSettings(name: surfaceId),
-      builder: (_) => screen,
-    ));
-  }
+  // Opens a door's link, or says why it can't (S8, 2026-10-25). Was a silent
+  // `if (screen == null) return;`.
+  void _openSurface(BuildContext context, String surfaceId) =>
+      ppPushSurface(context, surfaceId);
 }
 
 // -----------------------------------------------------------------------------

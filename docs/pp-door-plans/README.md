@@ -5,7 +5,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 
 | # | Door | Plan | Status |
 |---|---|---|---|
-| 0 | Shared shell fixes (S1–S11) | `00-MASTER.md` | Approved 2026-10-23, not built (waits for the other terminal's Wave 8 commit) |
+| 0 | Shared shell fixes (S1–S11) | `00-MASTER.md` § Step 0, as built | **Built 2026-10-25**, uncommitted. S4 waits for the first door film (the approved design shows no chip until one exists); S5 kept as it is. Held by `test/pp_doors_first_view_test.dart`. The door builds can start |
 | 1 | Feeding | `01-feeding.md` + `01-feeding-content.md` (offerings and new copy) | All decisions D1–D6 answered 2026-10-23 (D2 look: `claude.ai/artifact/6Kgs3uNdKsbyKybfbdzdRB`). Plan final; build waits on step 0 |
 | 2 | Health | `02-health.md` + `02-health-content.md` (15 new pages) | H1–H7 all yes 2026-10-23. H2 look approved 2026-10-24 (`claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q`, v4). Plan final; build waits on step 0 |
 | 3 | You, Maa | `03-you-maa.md` + `03-you-maa-content.md` (8 new pages, 11 deepened) | M1–M9 all yes 2026-10-24. Plan final; build waits on step 0 |
@@ -24,7 +24,17 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 | — | Thin and missing doors | `00-MASTER.md` § Thin and missing | after the doors |
 | — | Home "Today" strip | — | after the doors |
 
-**Owed after all fourteen plans (the user, 2026-10-25):** re-check the plans for doors 1 to 7 against what parents actually search (`research/questions/ranked_parenting.csv`), as doors 8 and 9 were. Change only a recommendation the numbers contradict.
+**Done 2026-10-25 (was owed after all fourteen plans):** re-checked the plans for doors 1 to 7 against what parents actually search (`research/questions/ranked_parenting.csv`), as doors 8 and 9 were. Change only a recommendation the numbers contradict.
+- No approved decision was contradicted. Each plan now has a "What parents actually ask" table.
+- **Feeding** D7 and **You, Maa** M10: no change.
+- **Health** H8: the tummy rail links `f40_nappy_poop`.
+- **Development** DV10: the speech pages link Special care and Early learning.
+- **Potty** PT11 and **First 40** FD13: `f40_nappy_poop` widened to 0–12 months (≈290 hits on baby poo, only a newborn page).
+- **First 40** FD11 "What he can see" (69, no page) and FD12: one source for the oil, matching Traditions TR3.
+- **Sleep** SL10: "When he's sick, or after a bump on the head" (99, no page), and "not on his side" named.
+- **Behaviour** §3a links Health `tummy_colic`.
+
+**Doors are guides, not FAQs (the user, 2026-10-25):** search demand decides what a door covers, never how it reads. A gap becomes part of the door's topic, written as guidance in its voice: situational titles ("Sleep when he's unwell"), never question titles or Q&A blocks. A door covers everything its name promises, searched or not. The "What parents actually ask" tables are planning evidence and never reach the UI. **Ask Veda covers the same ground:** every new door page reaches the service through the incremental ingest (the user runs it). Turning the question pool into an Ask Veda answer check needs the service repo, so it is a handover, not done here.
 
 **How decisions are asked from door 9 on (the user, 2026-10-25):** obvious recommendations are chosen and recorded in the plan without a question. Only what is genuinely the user's gets asked.
 

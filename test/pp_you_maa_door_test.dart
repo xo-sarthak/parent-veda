@@ -164,13 +164,17 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Read this one first'), findsOneWidget);
       expect(find.text('I am having thoughts that frighten me'), findsOneWidget);
-      expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(1), reason: 'Going back, one lock on its card (the quiet rail, 2026-10-07)');
-      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to someone about your own recovery', the consult card (2026-10-21)
+      // Step 0 · S9: no lock; Going back says "For later" on its card.
+      expect(find.byIcon(Icons.lock_outline_rounded), findsNothing);
+      expect(find.text('For later'), findsOneWidget, reason: 'Going back');
+      expect(find.byKey(const ValueKey('pp_door_closing_card')), findsOneWidget); // the consult card again (step 0 · S3, 2026-10-25); was the closing line (2026-10-21)
       expect(find.textContaining('For you  '), findsOneWidget, reason: 'the hero speaks to her, not about the baby');
       await tester.pumpWidget(MaterialApp(
           home: PpDoorScreen(key: const ValueKey('locked'), door: door, onSurface: (_, _) {}, initialTabId: 'going_back')));
       await tester.pumpAndSettle();
-      expect(find.text('This opens when you are 2 months in.'), findsOneWidget);
+      // Was the lock panel, 'This opens when you are 2 months in.'
+      expect(find.byKey(const ValueKey('pp_door_later_line')), findsOneWidget);
+      expect(find.text('Planning your return, starting about four weeks out'), findsWidgets, reason: 'a tab for later opens on its pages');
 
       _ageDays(100);
       await tester.pumpWidget(MaterialApp(

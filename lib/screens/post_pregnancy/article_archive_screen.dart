@@ -28,7 +28,9 @@ class _ArticleArchiveScreenState extends State<ArticleArchiveScreen> {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon() => pvToast(context, 'Coming soon');
+  // S8e (step 0, 2026-10-25): says why, and what happens next. Was 'Coming soon'.
+  void _soon() => pvToast(context,
+      'Search here is not ready yet. The search at the top of each door finds every article.');
   // Kept for revert — the floating Material SnackBar:
   // void _soon() => ScaffoldMessenger.of(context).showSnackBar(
   //       const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),

@@ -123,10 +123,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Peekaboo'), findsOneWidget, reason: 'a baby activity on the rail');
       expect(find.text('Playing sabzi shop'), findsNothing, reason: 'a two-year-old\'s');
-      expect(find.textContaining('From 1 year'), findsOneWidget, reason: 'Good habits');
-      expect(find.textContaining('From 2 years'), findsOneWidget, reason: 'Before letters and numbers');
-      expect(find.textContaining('From 3 years'), findsOneWidget, reason: 'Starting school');
-      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to an early learning expert', the consult card (2026-10-21)
+      // Step 0 · S9: no lock; the three later tabs say "For later" (was
+      // "From 1 year", "From 2 years", "From 3 years" with a lock).
+      expect(find.text('For later'), findsNWidgets(3), reason: 'Good habits, Before letters and numbers, Starting school');
+      expect(find.byIcon(Icons.lock_outline_rounded), findsNothing);
+      expect(find.byKey(const ValueKey('pp_door_closing_card')), findsOneWidget); // the consult card again (step 0 · S3, 2026-10-25); was the closing line (2026-10-21)
 
       _ageMonths(40);
       await tester.pumpWidget(MaterialApp(

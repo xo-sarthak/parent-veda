@@ -28,6 +28,23 @@ These need one shell fix each, not 14 separate fixes.
 | S10 | A page she has read sinks to the end of its row (`pp_relevance.dart:175`), so a red-flag list ("Go now") stops being the first card after one read. | `ppRelevanceOrder` | Red-flag pages (format RED FLAG or FLAGGED, and any page a door pins) are exempt from read-sinking in every door. Proposed by the First 40 plan; the user answered FD2 "Yes, always first" 2026-10-24. Test: a read red-flag page is still first. |
 | S11 | At a large phone text size the tab card cuts every name to one line with dots ("Getting to…"), in every door of every stage. | `pv_door_rail.dart:222-228` | Keep 2 lines at every text size and let the card grow, not the name shrink; the one-line rule is commented out, "kept for revert". `door_names_fit_test` gains a large-text render check. The width stays 150 (user, SL9: "make sure of tab width"): only the height grows, and a name that won't fit two lines at that width at large text is renamed. Answered yes 2026-10-24. |
 
+### Step 0, as built (2026-10-25)
+Held by `test/pp_doors_first_view_test.dart` (28 checks: every door at every age, at 1x and 1.5x text, on a 360dp phone).
+
+| # | Built as | Note |
+|---|---|---|
+| S1 | `PpDoor.tabOrder`: band id → tab ids, first one opens | **The "most pages" guess is not used.** Every door plan now names its order by age, and the guess moved action doors off their action tab (First 40 at day 12 left Day by day; Potty left its timeline). With no order the door's own order stands. Each door's build fills `tabOrder` from its plan |
+| S2 | Per door, as planned | No shell change |
+| S3 | The consult card at the foot of every door with a `closing` (key `pp_door_closing_card`) | Doors without one (First 40, Traditions, Papers) keep the doctor sentence. The early placement on help tabs comes with each door's build |
+| S4 | **Not built, on purpose** | The approved design (GLOBAL-CHANGES #5, Option A) is "no chip until the video exists", and no door film exists yet, so a field would have no reader. Built with the first film |
+| S5 | **Kept as it is** | A film page with no film already shows as an Article with its reading time (gap analysis P1: a Video chip on a page with no film is an untruth). Says Video when its film lands |
+| S6 | Parenting words in `kPvOfferAliases`, pointing at the courses Parenting has (sleep, weaning, language, motor, play, special needs, baby-proofing, the fussy stretches); one pitch per parenting page | Parenting has no consults in the catalogue yet (experts gated until Directus), so words point at courses. "delay" and "safe" left out: a late talker is not an autism course, a safe-sleep page is not baby-proofing. When paediatric consults arrive, add them to the same words |
+| S7 | `test/pp_doors_first_view_test.dart` | |
+| S8 | **One opener, `ppPushSurface`** (`pp_surface_router.dart`), with `ppSurfaceUnavailable` saying why | Nine parenting openers ended `if (screen == null) return;`: a link to anything not built did nothing. All call the one opener now. S8a: films and recordings not made yet answer a tap (`PvVideoPlaceholder`, `PvAudioPlaceholder`, every stage). S8b: an expert type we don't have names the nearest, with a pill. S8c: `pp_products/<shelf>` opens that shelf, or says we're still choosing. S8d: `pp_class/<name>` says it isn't open, with Tell me. S8e: six bare "Coming soon" notices say why and what's next; the other two (health guide, remedy detail) were already commented out by the other terminal |
+| S9 | No lock anywhere. A later tab sits last, says "For later", opens on the first band where it has pages, with "For later. This usually starts from 1 year." | The lock panel is kept for revert |
+| S10 | `alwaysFirst` on `ppRelevanceOrder`; `ppIsRedFlagPage` (RED FLAG, FLAGGED, pinned) | A read red-flag list stays first, ahead of anything a signal lifts |
+| S11 | `PvDoorRail.heightFor`: the card grows with the text size, two lines always, width 150 | Shared with the pregnancy doors, so both stages got it. The card is keyed by its height so a text-size change never animates it shorter than its words |
+
 **Reuse:**
 - `ppRelevanceOrder` (`pp_relevance.dart:160`)
 - `PvVideoSlot` / `PvVideoPlaceholder`

@@ -487,7 +487,7 @@ void main() {
       expect(find.text('Track and understand sleep'), findsOneWidget);
       expect(find.text('Sleep at this age'), findsOneWidget, reason: 'one chart, hers');
       // Representation B on this door: a sentence with the label in it.
-      expect(find.byKey(const ValueKey('pp_door_closing_line')), findsOneWidget); // was 'Talk to a sleep expert', the consult card (2026-10-21)
+      expect(find.byKey(const ValueKey('pp_door_closing_card')), findsOneWidget); // the consult card again (step 0 · S3, 2026-10-25); was the closing line (2026-10-21)
       expect(find.textContaining('For your baby'), findsOneWidget, reason: 'the age line');
       for (final b in kPpSleepBands.bands) {
         expect(find.widgetWithText(GestureDetector, b.label), findsNothing,

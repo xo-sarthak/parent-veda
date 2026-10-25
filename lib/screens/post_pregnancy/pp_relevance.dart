@@ -161,8 +161,16 @@ const int kPpSavedLift = 5;
 /// Already finished reads sink below the ones she has not read.
 const int kPpFinishedSink = 30;
 
+/// ⚠️ A WARNING LIST NEVER SINKS (step 0 · S10, the user on First 40 FD2,
+/// 2026-10-24: "Yes, always first"). A red-flag page she has read is still
+/// the first card, ahead of anything a signal lifts: "Go now" is not a read
+/// she finishes. Far below any other score, so these lead in their own order.
+const int kPpAlwaysFirst = -100000;
+
 /// Orders [items] for this child. Stable: equal scores keep their input order,
 /// so the writers' order survives wherever the brain has nothing to say.
+///
+/// [alwaysFirst] marks the red-flag items that lead whatever else is true (S10).
 ///
 /// [text] is what the item is about (its title, plus a summary if it has one).
 /// [band] says how far its age band is from the child's; omit it when the list
@@ -174,9 +182,11 @@ List<T> ppRelevanceOrder<T>(
   PpBandDistance Function(T)? band,
   String? Function(T)? readId,
   bool Function(T)? saved,
+  bool Function(T)? alwaysFirst,
   bool commerce = false,
 }) {
   int score(T it) {
+    if (alwaysFirst?.call(it) ?? false) return kPpAlwaysFirst;
     var s = band?.call(it).score ?? 0;
     if (situation.signalFor(text(it)) != null) s -= kPpSignalLift;
     if (situation.changeFor(text(it), commerce: commerce) != null) s -= kPpChangeLift;

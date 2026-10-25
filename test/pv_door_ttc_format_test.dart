@@ -321,7 +321,8 @@ void main() {
       expect(src, contains('PvShelfCard('));
       expect(src, contains('kPvDoorHeroQuiet ? _quiet(context)'));
       final rail = _code('lib/screens/doors/pv_door_rail.dart');
-      expect(rail, contains('(!kPvDoorRailQuiet || isLocked) && count.isNotEmpty'));
+      // A tab for later carries its line too (parenting S9, 2026-10-25).
+      expect(rail, contains('(!kPvDoorRailQuiet || isLocked || isLater) && count.isNotEmpty'));
     });
 
     test('the warning signs are folded into one row that opens the whole '

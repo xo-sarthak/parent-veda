@@ -51,6 +51,8 @@ import 'products_compare_screen.dart';
 // import 'pp_products_data.dart' show ppPreloadCompare; // kept for revert
 import '../../data/products/pv_catalog_adapters.dart' show pvSlug;
 import '../../services/pv_catalog_store.dart';
+import '../../widgets/pv_toast.dart';
+import '../products/pv_shelf_screen.dart' show PvShelfScreen;
 import '../../services/pv_compare_store.dart';
 import 'pp_sounds_screen.dart';
 import 'pp_wake_windows_screen.dart';
@@ -102,7 +104,121 @@ import '../tools/kegel_care_screen.dart' show KegelCareScreen;
 /// The section screen needs to open surfaces itself (its links and tools point
 /// at real screens), so it is handed this same function. That recursion is fine
 /// and bounded: a section never contains another section.
+// =============================================================================
+//  ⚠️ NO SILENT TAP (step 0 · S8, 2026-10-25). The user: "if some action is
+//  not able to take place due to unavailability ... make sure user gets a
+//  toast notification, so that the user can understand why a tap didn't
+//  work." Every parenting opener used to end `if (screen == null) return;`,
+//  so a link to something not built yet did nothing at all. They all call
+//  this now: it pushes the screen, or says in plain words why it can't and
+//  what happens next.
+//
+//  Three cases are decided before the router is asked, because the router
+//  would answer them with the wrong screen rather than none:
+//    S8b  an expert type we don't have yet (`pp_experts/<category>` that is
+//         not in `kFindHelpNeeds`): the router's unfiltered roster would be
+//         the wrong list. The notice names the nearest one we do have, with
+//         a pill to it.
+//    S8c  a shop shelf (`pp_products/<shelf>`): opens that shelf when it has
+//         products, else says we're still choosing.
+//    S8d  a class or course by id (`pp_class/<name>`) that isn't open: says
+//         so, with Tell me.
+// =============================================================================
+
+/// Where an expert type we don't have yet sends her instead (S8b). The
+/// master plan's nearest map.
+const Map<String, String> kPpNearestExpert = {
+  'Dentist': 'Pediatrician',
+  'Paediatric dentist': 'Pediatrician',
+  'Eye': 'Pediatrician',
+  'Ophthalmologist': 'Pediatrician',
+  'ENT': 'Pediatrician',
+  'Audiologist': 'Pediatrician',
+  'Allergist': 'Pediatrician',
+  'Chest': 'Pediatrician',
+  'Hormone': 'Pediatrician',
+  'Developmental paediatrician': 'Pediatrician',
+  'Feeding therapist': 'Speech therapist',
+  'Occupational therapist': 'Special needs expert',
+  'Paediatric physio': 'Physiotherapist',
+};
+
+/// The words a tap says when its target is not there yet (S8). Null when the
+/// target is there. Pure, so a test can hold every case.
+String? ppSurfaceUnavailable(String id) {
+  const expertPrefix = 'pp_experts/';
+  if (id.startsWith(expertPrefix)) {
+    final category = id.substring(expertPrefix.length);
+    if (kFindHelpNeeds.any((n) => n.category == category)) return null;
+    final near = kPpNearestExpert[category] ?? 'Pediatrician';
+    final nearLabel = kFindHelpNeeds
+            .where((n) => n.category == near)
+            .map((n) => n.label)
+            .firstOrNull ??
+        'Paediatrician';
+    return "We're adding ${category.toLowerCase()}s. A ${nearLabel.toLowerCase()} can check this first.";
+  }
+  const shopPrefix = 'pp_products/';
+  if (id.startsWith(shopPrefix)) {
+    final shelf = id.substring(shopPrefix.length);
+    final subId = pvSlug(shelf);
+    final stocked = PvCatalogStore.instance.all.any((p) => p.subId == subId);
+    return stocked
+        ? null
+        : "We're still choosing good ${shelf.toLowerCase()}. They'll be in the Store soon.";
+  }
+  const classPrefix = 'pp_class/';
+  if (id.startsWith(classPrefix)) {
+    return "This class isn't open yet. Tap Tell me and we'll let you know.";
+  }
+  if (ppScreenForSurface(id) == null) {
+    return "This isn't ready yet. We're adding it to ParentVeda soon.";
+  }
+  return null;
+}
+
+/// Opens a parenting surface, or says why it can't (S8). The one opener.
+void ppPushSurface(BuildContext context, String surfaceId) {
+  final why = ppSurfaceUnavailable(surfaceId);
+  if (why != null) {
+    const expertPrefix = 'pp_experts/';
+    if (surfaceId.startsWith(expertPrefix)) {
+      final near =
+          kPpNearestExpert[surfaceId.substring(expertPrefix.length)] ??
+              'Pediatrician';
+      pvToast(context, why,
+          action: 'See them',
+          onAction: () => ppPushSurface(context, '$expertPrefix$near'));
+    } else if (surfaceId.startsWith('pp_class/')) {
+      pvToast(context, why,
+          action: 'Tell me',
+          onAction: () => pvToast(context, "We'll let you know when it opens.",
+              kind: PvToastKind.done));
+    } else {
+      pvToast(context, why);
+    }
+    return;
+  }
+  final screen = ppScreenForSurface(surfaceId);
+  if (screen == null) return; // unreachable: ppSurfaceUnavailable said so
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: RouteSettings(name: surfaceId),
+    builder: (_) => screen,
+  ));
+}
+
 Widget? ppScreenForSurface(String id) {
+  // ⚠️ `pp_products/<shelf>` OPENS THAT SHELF (S8c, 2026-10-25). It used to
+  // fall through to nothing. An unstocked shelf is caught by
+  // `ppSurfaceUnavailable` before this is asked.
+  const shopPrefix = 'pp_products/';
+  if (id.startsWith(shopPrefix)) {
+    final subId = pvSlug(id.substring(shopPrefix.length));
+    final hit = PvCatalogStore.instance.all.where((p) => p.subId == subId).firstOrNull;
+    if (hit == null) return null;
+    return PvShelfScreen(categoryId: hit.categoryId, subId: subId);
+  }
+
   // ⚠️ `pp_experts/<category>` OPENS THE ROSTER ALREADY FILTERED.
   //
   // Feedback: "Talk to a lactation expert should land user to 1 on 1 call with
@@ -143,14 +259,7 @@ Widget? ppScreenForSurface(String id) {
       final page = section?.pageById(rest.substring(slash + 1));
       if (section != null && page != null) {
         if (page.toolSurfaceId case final tool?) return ppScreenForSurface(tool);
-        return ppPageScreen(section, page, onSurface: (context, surfaceId) {
-          final screen = ppScreenForSurface(surfaceId);
-          if (screen == null) return;
-          Navigator.of(context).push(MaterialPageRoute<void>(
-            settings: RouteSettings(name: surfaceId),
-            builder: (_) => screen,
-          ));
-        });
+        return ppPageScreen(section, page, onSurface: ppPushSurface); // was a silent opener (S8)
       }
     }
     return null;
@@ -226,14 +335,7 @@ Widget? ppScreenForSurface(String id) {
       return PpDoorScreen(
         door: door,
         initialTabId: area == null ? null : door.tabFor(area)?.id,
-        onSurface: (context, surfaceId) {
-          final screen = ppScreenForSurface(surfaceId);
-          if (screen == null) return;
-          Navigator.of(context).push(MaterialPageRoute<void>(
-            settings: RouteSettings(name: surfaceId),
-            builder: (_) => screen,
-          ));
-        },
+        onSurface: ppPushSurface, // was a silent opener (S8)
       );
     }
   }
@@ -257,14 +359,7 @@ Widget? ppScreenForSurface(String id) {
           // rather than hoisted, because hoisting it would mean a top-level
           // function that pushes routes, and the two call sites are twelve
           // lines apart.
-          onSurface: (context, surfaceId) {
-            final screen = ppScreenForSurface(surfaceId);
-            if (screen == null) return;
-            Navigator.of(context).push(MaterialPageRoute<void>(
-              settings: RouteSettings(name: surfaceId),
-              builder: (_) => screen,
-            ));
-          },
+          onSurface: ppPushSurface, // was a silent opener (S8)
           initialAreaId: rest.substring(slash + 1),
         );
       }
@@ -275,14 +370,7 @@ Widget? ppScreenForSurface(String id) {
     if (section == null) return null;
     return PpSectionScreen(
       section: section,
-      onSurface: (context, surfaceId) {
-        final screen = ppScreenForSurface(surfaceId);
-        if (screen == null) return;
-        Navigator.of(context).push(MaterialPageRoute<void>(
-          settings: RouteSettings(name: surfaceId),
-          builder: (_) => screen,
-        ));
-      },
+      onSurface: ppPushSurface, // was a silent opener (S8)
     );
   }
   return _ppScreenFor(id);
