@@ -6,13 +6,13 @@ One tool at a time; the user says go per tool. Each plan records every decision 
 | # | Tool | Surface | Status | Commit |
 |---|---|---|---|---|
 | C1 | Door tools listed in the Tools tab + test | — | COMMITTED | 2cd29c4 |
-| 01 | Log a feed (+ T0 consent seam) | `pp_feeding` | BUILT 2026-10-25, tests green | |
-| 02 | Breastfeed timer | `pp_feed_timer` | BUILT 2026-10-25 (02-07-care-logs.md) | |
-| 03 | Nappies | `pp_nappies` | BUILT 2026-10-25 (02-07-care-logs.md) | |
-| 04 | Pumping | `pp_pump` | BUILT 2026-10-25 (02-07-care-logs.md) | |
-| 05 | Sleep | `pp_sleep` | BUILT 2026-10-25 (02-07-care-logs.md) | |
-| 06 | Tummy time | `pp_tummy_time` | BUILT 2026-10-25 (02-07-care-logs.md) | |
-| 07 | The last 7 days | `pp_care_history` | BUILT 2026-10-25 (02-07-care-logs.md) | |
+| 01 | Log a feed (+ T0 consent seam) | `pp_feeding` | COMMITTED | b11b2ec |
+| 02 | Breastfeed timer | `pp_feed_timer` | COMMITTED (02-07-care-logs.md) | b11b2ec |
+| 03 | Nappies | `pp_nappies` | COMMITTED (02-07-care-logs.md) | b11b2ec |
+| 04 | Pumping | `pp_pump` | COMMITTED (02-07-care-logs.md) | b11b2ec |
+| 05 | Sleep | `pp_sleep` | COMMITTED (02-07-care-logs.md) | b11b2ec |
+| 06 | Tummy time | `pp_tummy_time` | COMMITTED (02-07-care-logs.md) | b11b2ec |
+| 07 | The last 7 days | `pp_care_history` | COMMITTED (02-07-care-logs.md) | b11b2ec |
 | 08 | Growth | `pp_growth` | | |
 | 09 | Vaccines | `pp_vaccines` | | |
 | 10 | Fever check | `pp_fever_check` | | |

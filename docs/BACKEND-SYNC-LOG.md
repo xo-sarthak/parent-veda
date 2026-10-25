@@ -1201,7 +1201,7 @@ ttc_cycles where id = 'ttcc_<that day>'` returns two rows.
 ## Step 15: the parenting tools pass: feed reads follow the child, and "ask once" answers sync
 
 **Date:** 2026-10-25 (parenting tools pass, tool 01 and shared piece T0; the user: "make sure the back ends are
-working well ... sinking the consent answers"). **Migration:** none. **Commit:** pending.
+working well ... sinking the consent answers"). **Migration:** none. **Commit:** `b11b2ec`.
 
 ### What changed
 - [x] **Feeds are read per child.** `FeedingStore.all` keeps only rows whose `ChildLogLedger.childOf` is the
