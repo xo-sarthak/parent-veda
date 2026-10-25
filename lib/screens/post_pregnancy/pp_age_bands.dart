@@ -225,7 +225,12 @@ const PpBandSet kPpSleepBands = PpBandSet([
   PpBand(id: 'nb', label: 'Newborn, 0 to 3 months', fromMonths: 0, toMonths: 3),
   PpBand(id: 'm3_6', label: '3 to 6 months', fromMonths: 3, toMonths: 6),
   PpBand(id: 'm6_12', label: '6 to 12 months', fromMonths: 6, toMonths: 12),
-  PpBand(id: 'tod', label: 'Toddler, 1 to 3 years', fromMonths: 12, toMonths: 36),
+  // ⚠️ SPLIT AT TWO (Sleep door plan SL2, the user's yes 2026-10-24): a
+  // 13-month-old on two naps and a 35-month-old dropping the last one saw
+  // the same pages. The same split as Potty. Kept for revert:
+  // PpBand(id: 'tod', label: 'Toddler, 1 to 3 years', fromMonths: 12, toMonths: 36),
+  PpBand(id: 'tod_1_2', label: '1 to 2 years', fromMonths: 12, toMonths: 24),
+  PpBand(id: 'tod_2_3', label: '2 to 3 years', fromMonths: 24, toMonths: 36),
   PpBand(
       id: 'pre', label: 'Preschooler, 3 to 5 years', fromMonths: 36, toMonths: 72),
 ]);

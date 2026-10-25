@@ -107,7 +107,9 @@ class PpSoundTrack {
 const List<PpSoundCategory> kPpSoundCategories = [
   PpSoundCategory(
     id: 'lori',
-    label: 'Lullabies', // was 'Lullabies and lori' (2026-10-07)
+    // SL4 (Sleep door plan, 2026-10-24): the word "lori" comes back.
+    // label: 'Lullabies', // was 'Lullabies and lori' (2026-10-07), kept for revert
+    label: 'Lullabies and lori',
     blurb: 'The songs Indian families have always sung babies down with.',
     hue: 268,
     tracks: [
@@ -263,4 +265,22 @@ PpSoundCategory? ppSoundCategory(String id) {
     if (c.id == id) return c;
   }
   return null;
+}
+
+/// ⚠️ THE TRACKS THAT PLAY TODAY, FIRST (Sleep door plan SL4). One of the
+/// library's tracks has a file (the tanpura drone); every link that offers
+/// sounds names it first, and the player leads with it, so a parent at 2am
+/// finds the one that plays before the ones that don't.
+List<PpSoundTrack> get kPpLiveSoundTracks =>
+    [for (final c in kPpSoundCategories) ...c.tracks.where((t) => t.isLive)];
+
+/// What a tap on a track that is not recorded yet says (S8a), by its
+/// category, and where it points: the tanpura, which plays now.
+String ppSoundNotYetLine(String categoryId) {
+  final what = switch (categoryId) {
+    'lori' => 'This lullaby',
+    'stories' => 'This story',
+    _ => 'This sound',
+  };
+  return '$what is still being recorded. The tanpura plays now.';
 }

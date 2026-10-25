@@ -2545,9 +2545,11 @@ final PpArea _tummy = PpArea(
             'amount is dangerous for a baby, and unlabelled herbal drops have caused '
             'real harm. Massage, a sling and a walk are the safe versions of '
             'the same instinct.'),
+        // Sleep door plan SL7: the page itself, not Sleep's first tab. Was
+        // `surfaceId: 'pp_section/parenting_sleep'`, kept for revert.
         PpLink(
           'Gentle settling, in more detail',
-          surfaceId: 'pp_section/parenting_sleep',
+          surfaceId: 'pp_page/parenting_sleep/gentle_settling',
           blurb: 'The Sleep section on evening crying and contact settling.',
         ),
       ],

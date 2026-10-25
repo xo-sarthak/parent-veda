@@ -115,8 +115,11 @@ final PpSection kPpSleepSection = PpSection(
     */
     PpSectionTool(
       label: 'Sleep Sounds',
-      blurb: 'Lullabies, white noise, rain, soft ragas and bedtime stories, '
-          'with a timer that switches itself off.',
+      // SL4: the tanpura first, the one that plays. Was: 'Lullabies, white
+      // noise, rain, soft ragas and bedtime stories, with a timer that
+      // switches itself off.'
+      blurb: 'A tanpura drone to play tonight, with a timer that switches '
+          'itself off. Lori, rain and stories are being recorded.',
       surfaceId: 'pp_sleep_sounds',
       icon: Icons.music_note_outlined,
     ),
@@ -131,8 +134,9 @@ const String _kRangeReassurance =
     'for now.';
 
 /// The `(fromMonths, toMonths)` spans behind every age-arc table in this
-/// file, so "her row" is decided from one list rather than five. Matches
-/// `kPpSleepBands` exactly.
+/// file, so "her row" is decided from one list rather than five. Matched
+/// `kPpSleepBands` exactly until SL2 split the toddler band at two
+/// (2026-10-25); the tables keep one 1-to-3 row, which both halves land on.
 const List<(int, int)> _kArc = [(0, 3), (3, 6), (6, 12), (12, 36), (36, 72)];
 
 // =============================================================================
@@ -288,7 +292,7 @@ final PpArea _howMuch = PpArea(
       title: 'Sleep at this age',
       subtitle: 'Toddler, 1 to 3 years',
       format: 'CHART',
-      bands: ['tod'],
+      bands: ['tod_1_2', 'tod_2_3'],
       blocks: [
         PpIntro('One long night and one afternoon nap is where most toddlers '
             'land. The biggest change in these two years is the morning nap '
@@ -700,6 +704,8 @@ final PpArea _nightWaking = PpArea(
     PpPage(
       id: 'gentle_settling',
       title: 'Gentle ways to settle your baby',
+      // SL2: the first year (dream feeds, contact settling).
+      bands: ['nb', 'm3_6', 'm6_12'],
       // [reformat: was step-list] -> VIDEO. "Physical skill: patting, shushing,
       // upright hold, the transfer, on a real baby. Step-list becomes the
       // companion." The slot below is hoisted to the top by the renderer; the
@@ -827,6 +833,8 @@ final PpArea _nightWaking = PpArea(
       title: 'What to do at 3am',
       subtitle: 'The short version, for when you cannot read',
       format: 'INTERACTIVE',
+      // SL2: the first year ("under six months, offer a feed").
+      bands: ['nb', 'm3_6', 'm6_12'],
       // ⚠️ THIS PAGE IS ITS BLOCK. A Carousel card opens the slides, an
       // Interactive card opens the step-through; there is no page between
       // the tap and the thing, exactly as on the TTC doors. Decided on a
@@ -980,6 +988,82 @@ final PpArea _nightWaking = PpArea(
         ),
       ],
     ),
+    // ⚠️ SL10, THE DEMAND RE-CHECK (door plan 07, 2026-10-25): "should I let
+    // my toddler sleep when sick" (52) and "should a toddler sleep after
+    // hitting his head" (47) had no answer anywhere in the app. A guide, not
+    // a Q&A: the go-now list first, then the two nights. PINNED, so the list
+    // leads the rail and never sinks once read (S10's "any page a door pins"
+    // clause; a second pin, after the stance, because this one is a warning).
+    // REQUIRED_REVIEW: NHS and AAP head-injury guidance, AAP safe sleep.
+    PpPage(
+      id: 'sick_or_head_bump',
+      title: "When he's sick, or after a bump on the head",
+      subtitle: 'Sleep, rest, and the signs that mean go now',
+      format: 'CARDS',
+      pinned: true,
+      bands: ['m6_12', 'tod_1_2', 'tod_2_3', 'pre'],
+      blocks: [
+        PpIntro('Sleep is usually the right thing for a child who is unwell or '
+            'has had a bump. First, the few signs that mean go now.'),
+        PpCallout(
+          'Your child is hard to wake, or very sleepy at a time they\'d '
+              'usually be awake. They\'ve vomited more than once. They\'ve had '
+              'a fit, or passed out. There\'s clear fluid or blood from the '
+              'nose or ears. They\'re not themselves: confused, unsteady, or '
+              'crying in a way you don\'t recognise. They\'re under one and '
+              'have a swelling or a soft spot on the head.',
+          kind: PpCalloutKind.doctor,
+          title: 'Call 112 or go to hospital now if, after a bump on the head',
+        ),
+        PpCards(heading: 'After a bump: can your child sleep?', [
+          PpCard('Yes, if your child has acted normally since the bump',
+              'Cried, then calmed, talked or played as usual. The old advice '
+                  'to keep a child awake is outdated.'),
+          PpCard('For the first night',
+              'Check on your child, and wake them gently once or twice. They '
+                  'should stir and settle as they usually do.'),
+          PpCard('For two days',
+              'Watch for the signs above. Any one of them, at any point, means '
+                  'go now.'),
+        ], hue: 344),
+        PpLink(
+          'Falls from beds, stairs and balconies',
+          surfaceId: 'pp_page/parenting_safety/safety_falls',
+          blurb: 'The commonest injury, and the easiest to plan for.',
+        ),
+        PpLink(
+          'A bump on the head, first aid',
+          surfaceId: 'pp_page/parenting_health/ill_head_bump',
+          blurb: 'What to do in the first minutes.',
+        ),
+        PpCards(heading: 'When your child is sick', [
+          PpCard('Let your child sleep more',
+              'Rest helps them get better, and a sick child often sleeps '
+                  'longer and naps again.'),
+          PpCard('Keep the fluids going',
+              'Offer milk or water when they wake. Wake them for medicine only '
+                  'if the doctor said a set time.'),
+          PpCard('The routine will slip for a few nights',
+              'Comfort your child, and go back to the usual bedtime once '
+                  'they\'re well. Old habits come back within a week.'),
+          PpCard('Raising the head',
+              'For a cold, a little saline before sleep helps more than '
+                  'pillows. No pillow under one.'),
+        ], hue: 206),
+        PpCallout(
+          'Your child is very hard to wake. The breathing is fast or noisy. '
+              'There are fewer wet nappies. The fever lasts more than two '
+              'days.',
+          kind: PpCalloutKind.doctor,
+          title: 'See a doctor the same day if',
+        ),
+        PpLink(
+          'Fever, in the Health door',
+          surfaceId: 'pp_section/parenting_health/fever',
+          blurb: 'The number, the reading, and bringing it down.',
+        ),
+      ],
+    ),
   ],
 );
 
@@ -1070,6 +1154,13 @@ final PpArea _regressions = PpArea(
           surfaceId: 'pp_experts',
           role: 'sleep',
         ),
+        // SL6: the course next to the question, by id.
+        PpLink(
+          'Sleep Bootcamp',
+          surfaceId: 'pp_learn/co_sleep',
+          blurb: 'A plan built around your baby, with a sleep consultant and '
+              'parents at your stage.',
+        ),
       ],
     ),
     PpPage(
@@ -1151,6 +1242,12 @@ final PpArea _regressions = PpArea(
             'baby up for sleep". It does not work, and before six months it is '
             'not recommended. Ask your doctor before starting solids for '
             'sleep.'),
+        // SL6: the course next to the question, by id.
+        PpLink(
+          'The 4-Month Sleep Regression, Solved',
+          surfaceId: 'pp_learn/mc_sleepreg',
+          blurb: 'One evening that gives you a gentle plan for these weeks.',
+        ),
       ],
     ),
     PpPage(
@@ -1240,7 +1337,7 @@ final PpArea _regressions = PpArea(
       title: 'The toddler sleep wobbles, 18 months and 2 years',
       // Surfaces at its age: 18 months and 2 years are the toddler band.
       format: 'ARTICLE',
-      bands: ['tod'],
+      bands: ['tod_1_2', 'tod_2_3'],
       blocks: [
         PpIntro('Toddler sleep goes wrong for different reasons than baby '
             'sleep. It is less about the body and more about having '
@@ -1340,7 +1437,7 @@ final PpArea _regressions = PpArea(
       // the brief's "shows from ~6mo, only once the doctor is happy with her
       // weight, a slow no-battle taper" is exactly what this page already said.
       format: 'ARTICLE',
-      bands: ['m6_12', 'tod'],
+      bands: ['m6_12', 'tod_1_2', 'tod_2_3'],
       blocks: [
         PpIntro('If you want to stop feeding at night, it can be done slowly, '
             'with no crying it out. And if you don\'t want to stop, you '
@@ -1427,6 +1524,10 @@ final PpArea _gettingToSleep = PpArea(
       subtitle: 'Gentle first, and the words for when family disagrees',
       format: 'VIDEO',
       pinned: true,
+      // SL2 (door plan 07): from six months, where the question is asked.
+      // Under six the answer is the gentle settling page, and this page's
+      // own rule is "never before six months".
+      bands: ['m6_12', 'tod_1_2', 'tod_2_3', 'pre'],
       blocks: [
         PpVideoSlot(
           title: 'Where we stand on sleep training',
@@ -1489,8 +1590,10 @@ final PpArea _gettingToSleep = PpArea(
         PpCallout('You never have to defend responding to your baby. If '
             'someone in the house needs a reason, "because it is working for '
             'us" is a complete one.'),
-        PpWhenLine('This page is for any age. The six-month line is the one '
-            'thing in it that is a rule rather than a view.'),
+        // Was "This page is for any age." Shown from six months now (SL2).
+        PpWhenLine('From six months, when the question usually comes up. The '
+            'six-month line is the one thing in it that is a rule rather than '
+            'a view.'),
         PpIndiaNote('"Let the baby cry, or it becomes a habit" comes from love, and from a '
             'generation that had less help and more babies. Advice can be '
             'kindly meant and still not be what you do.'),
@@ -1515,6 +1618,13 @@ final PpArea _gettingToSleep = PpArea(
           PpCard('Whatever you choose', 'Not before about six months, only if '
               'it suits your family, and only when your baby is well.'),
         ]),
+        // SL6: the course next to the question, by id. Unpublished, it opens
+        // its own "Tell me" page (`ppProgramIsPlaceholder`).
+        PpLink(
+          'Baby Sleep, Understood',
+          surfaceId: 'pp_learn/rc_sleep',
+          blurb: 'A calm, no-cry course through how baby sleep works.',
+        ),
       ],
     ),
     // ⚠️ [reuse] [merge] VIDEO. "Already video + step-list. Absorb 'The hour
@@ -1610,10 +1720,11 @@ final PpArea _gettingToSleep = PpArea(
           slotId: 'sleep/bedtime_malish_followalong',
           hue: 26,
         ),
+        // SL4: the tanpura first. Was 'Put on a lullaby or some white noise'.
         PpLink(
-          'Put on a lullaby or some white noise',
+          'Put on the tanpura',
           surfaceId: 'pp_sleep_sounds',
-          blurb: 'Low volume, timer on. Use the same track every night.',
+          blurb: 'Low volume, timer on. Use the same sound every night.',
         ),
       ],
     ),
@@ -1683,6 +1794,8 @@ final PpArea _gettingToSleep = PpArea(
       id: 'malish',
       title: 'Massage before sleep',
       format: 'VIDEO',
+      // SL2: the first year (it opens "once the cord has healed").
+      bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
         PpVideoSlot(
           title: 'Massage before sleep, demonstrated',
@@ -1754,6 +1867,12 @@ final PpArea _gettingToSleep = PpArea(
             'upside down, and oil in the nose or ears are all still done. '
             'Say no to all of them. Firm, slow, gentle strokes are the '
             'whole technique.'),
+        // SL7: First 40 links back here (FD4); this is the other half.
+        PpLink(
+          'In the first weeks',
+          surfaceId: 'pp_page/parenting_first_40/f40_malish',
+          blurb: 'Malish in the first forty days, from the First 40 door.',
+        ),
         // ⚠️ NO PpLink BACK TO THE ROUTINE PAGE, deliberately. `PpLink` resolves
         // through the router, so it can only point at a SURFACE, not at a
         // sibling page in this section. A link with a null surfaceId renders
@@ -1765,6 +1884,8 @@ final PpArea _gettingToSleep = PpArea(
       id: 'feeding_to_sleep',
       title: 'Only falls asleep on the feed',
       format: 'ARTICLE', // [reuse] "Sleep-association angle. Links to Feeding."
+      // SL2: the first year.
+      bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
         PpIntro('You have probably been told this is a bad habit you will '
             'regret. It helps to know what is true, because the guilt '
@@ -1818,11 +1939,19 @@ final PpArea _gettingToSleep = PpArea(
             'of homes. It is not one. If it is working for you and your baby '
             'is growing well, you have nothing to defend.'),
         // Link out, do not own: feed-to-sleep and the dream feed are Feeding's.
+        // SL7: the exact page, not the whole section. Feeding has no page of
+        // night feeds; how often a baby feeds is the one that answers "is he
+        // waking from hunger". Kept for revert:
+        // PpLink(
+        //   'Feeding, the whole section',
+        //   surfaceId: 'pp_section/parenting_feeding',
+        //   blurb: 'Night feeds, the dream feed, and when feeding is the '
+        //       'question rather than sleep.',
+        // ),
         PpLink(
-          'Feeding, the whole section',
-          surfaceId: 'pp_section/parenting_feeding',
-          blurb: 'Night feeds, the dream feed, and when feeding is the '
-              'question rather than sleep.',
+          'How often, and how much',
+          surfaceId: 'pp_page/parenting_feeding/bf_how_often',
+          blurb: 'How often a baby feeds, so you can tell hunger from habit.',
         ),
       ],
     ),
@@ -1875,6 +2004,69 @@ final PpArea _gettingToSleep = PpArea(
             'starts when the room goes quiet, not when the clock says so. Pick '
             'the time your home really settles and keep to it, instead of '
             'fighting for 8pm.'),
+        // SL7: First 40's day-and-night page links here (FD4).
+        PpLink(
+          'In the first weeks',
+          surfaceId: 'pp_page/parenting_first_40/f40_day_night',
+          blurb: 'Day and night in the first forty days, from the First 40 '
+              'door.',
+        ),
+      ],
+    ),
+    // ⚠️ SL7, NEW (door plan 07, the user's yes 2026-10-24). The jhula
+    // rocks Indian babies to sleep and the section never named it, while the
+    // shop sells carry nests under Sleep. Soothing in it, yes; sleeping in
+    // it, flat and firm instead. Traditions' "as good a place to sleep as an
+    // imported cot" goes to the same reviewer (door 10, TR). REQUIRED_REVIEW
+    // (AAP 2022 safe sleep: no inclined sleepers, nests or swings for sleep).
+    PpPage(
+      id: 'jhula_safety',
+      // The plan's "Jhula, cradle or saree swing?", in the house form: English
+      // first and the Indian name in brackets (`pp_doors_english_test`), and a
+      // situational title, not a question (doors are guides, 2026-10-25).
+      title: 'The cradle and the saree swing (jhula)',
+      subtitle: 'What is for soothing, and what is for sleep',
+      format: 'ARTICLE',
+      bands: ['nb', 'm3_6', 'm6_12'],
+      blocks: [
+        PpIntro('The jhula has rocked Indian babies to sleep for generations, '
+            'and the rocking really does calm them. The question is only '
+            'where your baby stays once asleep.'),
+        PpArticle(heading: 'For soothing, yes', [
+          'Rock your baby in the jhula, the cradle or your arms until drowsy '
+              'or asleep, while you are right there.',
+        ]),
+        PpArticle(heading: 'For sleeping, flat and firm', [
+          'Once your baby is asleep, move them onto a flat, firm surface, on '
+              'their back: a cot, a bassinet, or a firm mattress on the '
+              'floor.',
+          'In a saree swing or a deep cloth cradle, the chin can drop to the '
+              'chest. That can narrow the airway without a sound.',
+        ]),
+        PpArticle(heading: 'If your baby only sleeps in the jhula', [
+          'Stay in the room, keep the head and back in a straight line, and '
+              'keep nothing loose near the face. Move your baby across as '
+              'soon as they are deeply asleep.',
+        ]),
+        PpCallout('Nests, swings, bouncers and inclined sleepers are for '
+            'awake time, watched. They are not for sleep.'),
+        PpCallout(
+          'If your baby seems to breathe noisily or struggle in any sleeping '
+              'position, see a doctor.',
+          kind: PpCalloutKind.doctor,
+        ),
+        PpLink(
+          "Your baby's sleep space, checked",
+          pageId: 'sleep_surface',
+          blurb: 'The flat, firm surface, step by step.',
+        ),
+        // SL5: the flat surface the page asks for, from a stocked shelf (10).
+        // The plan put it on `sleep_surface`, which is only its checklist.
+        PpLink(
+          'Cribs and bassinets',
+          surfaceId: 'pp_products/pvs_smart_cribs_and_bassinets',
+          blurb: 'A flat, firm place for the sleep itself.',
+        ),
       ],
     ),
     PpPage(
@@ -2020,7 +2212,7 @@ final PpArea _gettingToSleep = PpArea(
       // rewritten: "India-aware. No right age, family decides; what actually
       // eases the move from your bed to her cot" is what it already says.
       format: 'ARTICLE',
-      bands: ['m6_12', 'tod', 'pre'],
+      bands: ['m6_12', 'tod_1_2', 'tod_2_3', 'pre'],
       blocks: [
         PpIntro('There is no age at which this has to happen. When you do want '
             'to do it, going slowly and at a calm time makes almost all the '
@@ -2212,6 +2404,8 @@ final PpArea _safeSleep = PpArea(
       title: 'Safer bed-sharing',
       subtitle: 'How to share a bed with fewer risks',
       format: 'ILLUSTRATION',
+      // SL2: the infant safe-sleep rules, the first year.
+      bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
         PpIntro('Most Indian families sleep with their baby, and an app will '
             'not change that. So here is the useful version. One picture of a '
@@ -2366,8 +2560,19 @@ final PpArea _safeSleep = PpArea(
       id: 'back_to_sleep',
       title: 'On the back, every sleep',
       format: 'ILLUSTRATION',
+      // SL2: the infant safe-sleep rules, the first year.
+      bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
-        PpIntro('This is the most effective piece of safe sleep advice '
+        // ⚠️ SL10: THE SIDE, NAMED IN THE FIRST LINE. "Is it ok for a newborn
+        // to sleep on its side" (102 searches) was answered only in a label
+        // on the picture. REQUIRED_REVIEW (AAP safe sleep). Was, kept for
+        // revert:
+        // PpIntro('This is the most effective piece of safe sleep advice '
+        //     'there is. Putting babies on their backs to sleep cut cot deaths '
+        //     'by more than half in every country that ran the campaign.'),
+        PpIntro('On the back, for every sleep, day and night. Not on the side '
+            'and not on the tummy: babies put on their side roll onto their '
+            'tummy. This is the most effective piece of safe sleep advice '
             'there is. Putting babies on their backs to sleep cut cot deaths '
             'by more than half in every country that ran the campaign.'),
         PpIllustration(
@@ -2496,6 +2701,19 @@ final PpArea _safeSleep = PpArea(
         PpIndiaNote('The traditional tight wrap, with the legs straightened '
             'and the cloth pulled firm, is the version to avoid. Snug arms, '
             'loose hips is the change, and it is a small one.'),
+        // SL5: the one thing the step needs, from a stocked shelf (10).
+        PpLink(
+          'Muslin swaddles',
+          surfaceId: 'pp_products/pvs_muslin_swaddle_cloths',
+          blurb: 'Thin, breathable cloths, big enough for the diamond fold.',
+        ),
+        // SL7: First 40's swaddle page links here (FD4); this is the other
+        // half.
+        PpLink(
+          'In the first weeks',
+          surfaceId: 'pp_page/parenting_first_40/f40_swaddle',
+          blurb: 'Swaddling in the first forty days, from the First 40 door.',
+        ),
       ],
     ),
     // ⚠️ [reuse] as INTERACTIVE. "An interactive tap-through checklist.
@@ -2506,6 +2724,8 @@ final PpArea _safeSleep = PpArea(
       id: 'sleep_surface',
       title: 'Your baby\'s sleep space, checked',
       format: 'INTERACTIVE',
+      // SL2: the infant safe-sleep rules, the first year.
+      bands: ['nb', 'm3_6', 'm6_12'],
       // ⚠️ THIS PAGE IS ITS BLOCK. A Carousel card opens the slides, an
       // Interactive card opens the step-through; there is no page between
       // the tap and the thing, exactly as on the TTC doors. Decided on a
@@ -2540,6 +2760,12 @@ final PpArea _safeSleep = PpArea(
                 'No wedge, no propping the mattress up, no sleeping in a car '
                     'seat, bouncer or rocker. A baby can slump forward and '
                     'block the airway.',
+                'The surface'),
+            // SL7: the shop sells carry nests and swings under Sleep, so the
+            // section says plainly what they are for. REQUIRED_REVIEW.
+            PpInteractiveItem('Not a nest, a swing or a bouncer',
+                'Nests, swings, bouncers and inclined sleepers are not for '
+                    'sleep. Move your baby to a flat surface once asleep.',
                 'The surface'),
             PpInteractiveItem('A separate space in your room',
                 'Same room as you for the first six to twelve months. Own '
@@ -2636,6 +2862,8 @@ final PpArea _safeSleep = PpArea(
       id: 'overheating',
       title: 'Too warm, and how to tell',
       format: 'ARTICLE', // [reuse]
+      // SL2: the infant safe-sleep rules, the first year.
+      bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
         PpIntro('In Indian homes overheating is far more common than cold, '
             'and it matters, because being too warm is one of the known '
@@ -2694,12 +2922,20 @@ final PpArea _safeSleep = PpArea(
             'advice in a lot of families, and it comes from real love. The '
             'gentlest way through it is the neck check, done together, once. '
             'It is hard to argue with a sweaty neck.'),
+        // SL5: the light sleeping bag the chart names, from a stocked shelf.
+        PpLink(
+          'Sleep sacks and bags',
+          surfaceId: 'pp_products/sleepwear_and_sacks',
+          blurb: 'A wearable layer instead of a loose blanket.',
+        ),
       ],
     ),
     PpPage(
       id: 'sids_calmly',
       title: 'SIDS, explained calmly',
       format: 'ARTICLE', // [reuse] "Sensitive; text stays. Links to Health."
+      // SL2: the infant safe-sleep rules, the first year.
+      bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
         PpIntro('You may have heard the term and been frightened by it, '
             'perhaps at 2am on the internet. Here is the honest picture: it '
@@ -2760,11 +2996,103 @@ final PpArea _safeSleep = PpArea(
         PpIndiaNote('Being in the same room as you, which most Indian families '
             'do anyway, is on the protective side of this list. So is '
             'breastfeeding. A lot of what your family already does is right.'),
+        // SL7: the exact page. Kept for revert:
+        // PpLink(
+        //   'Health, the whole section',
+        //   surfaceId: 'pp_section/parenting_health',
+        //   blurb: 'For the depth on this, and for anything that is a health '
+        //       'question rather than a sleep one.',
+        // ),
         PpLink(
-          'Health, the whole section',
-          surfaceId: 'pp_section/parenting_health',
-          blurb: 'For the depth on this, and for anything that is a health '
-              'question rather than a sleep one.',
+          'Go to a hospital now: the signs',
+          surfaceId: 'pp_page/parenting_health/health_go_now',
+          blurb: 'Breathing, colour, and the other signs that mean go, on one '
+              'page.',
+        ),
+      ],
+    ),
+    // ⚠️ SL7, NEW: TODDLERS HAD NOTHING ON THIS TAB. Every page above is the
+    // first year's, and a one-year-old's parent saw SIDS and back-to-sleep.
+    // From one, the risks change from breathing to falls. REQUIRED_REVIEW.
+    PpPage(
+      id: 'safe_sleep_after_one',
+      title: 'Safe sleep after one',
+      subtitle: 'Cot to bed, pillows, falls and the room',
+      format: 'CARDS',
+      bands: ['tod_1_2', 'tod_2_3', 'pre'],
+      blocks: [
+        PpIntro('After the first year, the rules for the sleep space loosen. '
+            'What matters now is falls, and what your child can reach.'),
+        PpCards([
+          PpCard('A pillow and a light blanket are fine now',
+              'Use them from about 12 to 18 months, when your child can move '
+                  'freely and push things off the face.'),
+          PpCard('Cot to bed',
+              'Move when your child starts climbing out, or at about 2 to 3 '
+                  'years. A mattress on the floor, or a low bed with a rail, '
+                  'is safest at first.'),
+          PpCard('Falls',
+              "Keep the bed away from windows, and never under a ceiling "
+                  "fan's hanging chain or a shelf. Put a soft rug on the "
+                  'floor.'),
+          PpCard('Sharing your bed',
+              'After one, the SIDS risk is gone. What remains is a fall from '
+                  'a high bed, and a squeeze between the bed and the wall.'),
+          PpCard('The room at night',
+              'Keep cords out of reach and furniture fixed to the wall. No '
+                  'mosquito coil, agarbatti or smoke.'),
+        ], hue: 152),
+        // SL5: not stocked; the tap says so, with the tip (S8c).
+        PpLink(
+          'A mosquito net for the bed',
+          surfaceId: 'pp_products/Mosquito nets',
+          blurb: 'Instead of a coil in the room.',
+        ),
+      ],
+    ),
+    // ⚠️ SL7, NEW: HEAT AND POWER CUTS, every age. The section said "a fan is
+    // safe" and nothing about the night the fan stops. REQUIRED_REVIEW
+    // (NHS and Lullaby Trust on overheating).
+    PpPage(
+      id: 'hot_nights',
+      title: 'Hot nights and power cuts',
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('Hot Indian summers and a sudden power cut can wake anyone. '
+            'Babies get too hot faster than adults.'),
+        PpCards([
+          PpCard('One thin cotton layer',
+              'Or just a nappy on the hottest nights. Feel the chest or the '
+                  'back of the neck, not the hands or feet. Hot and sweaty '
+                  'means take a layer off.'),
+          PpCard('A fan or AC',
+              'Air should move around your child, not blow straight at them. '
+                  'Aim for a room that feels comfortable to you in light '
+                  'clothes.'),
+          PpCard('Without power',
+              'Open a window with a net on it, hang a damp cloth near your '
+                  'child (never on them), and keep a small battery or '
+                  'rechargeable fan.'),
+          PpCard('No mosquito coil or agarbatti where your child sleeps',
+              'The smoke irritates small lungs. Use a mosquito net over the '
+                  'cot instead.'),
+        ], hue: 152),
+        PpCallout(
+          'See a doctor if your child is very hot and floppy, unusually '
+              'sleepy and hard to wake, or not feeding. Overheating can make a '
+              'baby unwell.',
+          kind: PpCalloutKind.doctor,
+        ),
+        PpLink(
+          'Too warm, and how to tell',
+          pageId: 'overheating',
+          blurb: 'What to dress your baby in, by room temperature.',
+        ),
+        // SL5: not stocked; the tap says so, with the tip (S8c).
+        PpLink(
+          'A room thermometer',
+          surfaceId: 'pp_products/Room thermometers',
+          blurb: 'So you know the room, not guess it.',
         ),
       ],
     ),
@@ -3055,6 +3383,12 @@ final PpArea _worries = PpArea(
             'temple bell or school, your child will wake with it. Darkness and '
             'steady sound do the most here, because you are not going '
             'to move the household.'),
+        // SL5: the darkness the page asks for, from a stocked shelf.
+        PpLink(
+          'Blackout curtains',
+          surfaceId: 'pp_products/bedding_and_blackout',
+          blurb: 'For a room that stays dark after sunrise.',
+        ),
       ],
     ),
     PpPage(
@@ -3188,11 +3522,19 @@ final PpArea _worries = PpArea(
         PpIndiaNote('Mosquito coils, closed rooms and winter smoke make '
             'snuffly babies snufflier. A mesh screen and a mosquito net are '
             'better than a coil burning in the room where your baby sleeps.'),
+        // SL7: the exact page. Health has no snoring page; tonsils and the
+        // operation question, where loud snoring is answered, is it. Kept for
+        // revert:
+        // PpLink(
+        //   'Health, the whole section',
+        //   surfaceId: 'pp_section/parenting_health',
+        //   blurb: 'Tonsils, adenoids, reflux and the rest of what noisy '
+        //       'breathing can be.',
+        // ),
         PpLink(
-          'Health, the whole section',
-          surfaceId: 'pp_section/parenting_health',
-          blurb: 'Tonsils, adenoids, reflux and the rest of what noisy '
-              'breathing can be.',
+          'Sore throat and tonsils',
+          surfaceId: 'pp_page/parenting_health/ill_throat',
+          blurb: 'Large tonsils, snoring, and the operation question.',
         ),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpCallout('Loud snoring most nights, pauses in breathing or gasping, '
@@ -3274,7 +3616,7 @@ final PpArea _worries = PpArea(
       id: 'night_fears',
       title: 'Nightmares and night terrors',
       subtitle: 'Two very different things',
-      bands: ['tod', 'pre'],
+      bands: ['tod_1_2', 'tod_2_3', 'pre'],
       format: 'CARDS',
       blocks: [
         PpIntro('Waking up screaming in the night is frightening for both of '
@@ -3300,28 +3642,66 @@ final PpArea _worries = PpArea(
             'a long time. The same goes if they come with jerking, stiffness '
             'or breathing pauses, which can look like a fit.',
             kind: PpCalloutKind.doctor),
+        // SL5: the night light the nightmare card names. Not stocked; the
+        // tap says so, with the tip (S8c).
+        PpLink(
+          'A night light',
+          surfaceId: 'pp_products/Night lights',
+          blurb: 'Dim and warm, for a child who wakes scared.',
+        ),
       ],
     ),
     PpPage(
       id: 'sleep_talk_walk',
       title: 'Sleep talking and sleepwalking',
       subtitle: 'Common, mostly harmless, and outgrown',
-      bands: ['tod', 'pre'],
+      bands: ['tod_1_2', 'tod_2_3', 'pre'],
       format: 'ARTICLE',
+      // ⚠️ REWRITTEN (SL7, door plan 07 content §5): the thinnest page in the
+      // section. The title stays. REQUIRED_REVIEW (AAP on parasomnias). The
+      // old blocks, kept for revert:
+      // PpIntro('Many young children talk, laugh or even walk in their '
+      //     'sleep. It runs in families, gets worse with tiredness, and '
+      //     'nearly always fades by the teens.'),
+      // PpArticle([
+      //   'Sleep talking needs nothing at all. Sleepwalking needs a safe home: '
+      //       'gate the stairs, lock doors and windows, keep the balcony shut, '
+      //       'and clear the floor. Guide your child gently back to bed, '
+      //       'without waking.',
+      //   'An earlier, steady bedtime and a calm hour before bed reduce both.',
+      // ]),
+      // PpCallout('See your doctor if sleepwalking happens most nights, if '
+      //     'there are injuries, or if there is snoring or gasping in sleep.',
+      //     kind: PpCalloutKind.doctor),
       blocks: [
-        PpIntro('Many young children talk, laugh or even walk in their '
-            'sleep. It runs in families, gets worse with tiredness, and '
-            'nearly always fades by the teens.'),
-        PpArticle([
-          'Sleep talking needs nothing at all. Sleepwalking needs a safe home: '
-              'gate the stairs, lock doors and windows, keep the balcony shut, '
-              'and clear the floor. Guide your child gently back to bed, '
-              'without waking.',
-          'An earlier, steady bedtime and a calm hour before bed reduce both.',
-        ]),
-        PpCallout('See your doctor if sleepwalking happens most nights, if '
-            'there are injuries, or if there is snoring or gasping in sleep.',
+        PpIntro('Sleep talking and sleepwalking are common between about 3 and '
+            '7 years, often run in families, and usually stop on their own.'),
+        PpCards([
+          PpCard('During a sleepwalk',
+              'Guide your child gently back to bed. Don\'t wake or shake them, '
+                  'since they may be confused or upset.'),
+          PpCard('Make the house safe',
+              'Lock outside doors, put a gate at the stairs, keep the balcony '
+                  'shut, and clear the floor of toys.'),
+          PpCard('Sleep talk',
+              'It is just sleep. There is nothing to do.'),
+          PpCard('What helps most',
+              'A regular bedtime and enough sleep. Overtired children '
+                  'sleepwalk more.'),
+          PpCard('Night terrors versus nightmares',
+              'In a night terror your child screams but isn\'t awake and '
+                  'won\'t remember it. Stay close, keep them safe, and don\'t '
+                  'try to wake them.'),
+        ], hue: 188),
+        PpCallout('See your doctor if it happens several times a week, if your '
+            'child gets hurt, if there is jerking or stiffness, or if there is '
+            'loud snoring with pauses in the breathing.',
             kind: PpCalloutKind.doctor),
+        PpLink(
+          'Nightmares and night terrors',
+          pageId: 'night_fears',
+          blurb: 'Two very different things, and what to do for each.',
+        ),
       ],
     ),
   ],
@@ -3363,7 +3743,7 @@ final PpArea _worries = PpArea(
 final PpArea _music = PpArea(
   id: 'music',
   mark: IntentMark.stepsMark,
-  title: 'Music, lullabies and sleep sounds',
+  title: 'Music, lori and sleep sounds', // was 'Music, lullabies and sleep sounds' (SL4: "lori" back)
   blurb: 'What helps, what is myth, and the tracks to play tonight.',
   hue: 96,
   pages: [
@@ -3486,11 +3866,19 @@ final PpArea _music = PpArea(
         //
         // The page loses nothing. Its job is the honest answer to "does music
         // actually help?", and the link right below opens the whole library.
+        // SL4: the tanpura first. Was: 'Lullabies, white noise, rain, soft
+        // ragas and stories. Timer on by default.'
         PpLink(
           'Open Sleep Sounds',
           surfaceId: 'pp_sleep_sounds',
-          blurb: 'Lullabies, white noise, rain, soft ragas and stories. '
-              'Timer on by default.',
+          blurb: 'The tanpura plays now, timer on by default. Lori, white '
+              'noise and stories are being recorded.',
+        ),
+        // SL5: a soother for the steady sound, from a stocked shelf (4).
+        PpLink(
+          'White-noise soothers',
+          surfaceId: 'pp_products/soothers_and_white_noise',
+          blurb: 'A small speaker for steady sound, away from the cot.',
         ),
       ],
     ),
@@ -3553,7 +3941,9 @@ final PpPage _soundsLibraryPage = PpPage(
     const PpLink(
       'Open Sleep Sounds',
       surfaceId: 'pp_sleep_sounds',
-      blurb: 'Pick a track, set the timer, and put the phone face down.',
+      // SL4. Was 'Pick a track, set the timer, and put the phone face down.'
+      blurb: 'Start with the tanpura, the one that plays now. Set the timer, '
+          'and put the phone face down.',
     ),
   ],
 );
@@ -3772,7 +4162,10 @@ final PpPage _soundsLibraryPage = PpPage(
         PpLink(
           'Open Sleep Sounds',
           surfaceId: 'pp_sleep_sounds',
-          blurb: 'Pick a track, set the timer, and put the phone face down.',
+          // SL4. Was 'Pick a track, set the timer, and put the phone face
+          // down.'
+          blurb: 'Start with the tanpura, the one that plays now. Set the '
+              'timer, and put the phone face down.',
         ),
       ],
     ),

@@ -146,6 +146,19 @@ here, under this heading, from its own STILL-OPEN entries — nothing is
 transcribed on its behalf. Sleep (STILL-OPEN §39.3) and Feeding are its first
 two.
 
+### P1. Sleep — `lib/data/doors/pp_door_sleep.dart`
+
+**Added by the door 7 build (2026-10-25, `docs/pp-door-plans/07-sleep.md` SL1 to SL10, §12).** Nothing here is a coming-soon card: every item answers a tap with a notice, or shows a drawn mark.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| SLO1 | `sleep/door_intro` | Film · 30–45 s | Not slotted | S4: no chip until the film exists (SL8) |
+| SLO2 | The 11 sleep slots: `sleep/needs_by_age`, `real_parents_night_waking`, `settling_demo`, `regressions_explainer`, `where_we_stand`, `bedtime_malish_followalong`, `malish_demo`, `safe_sleep_setup`, `swaddle_demo`, `drowsy_transfer`, `sound_volume` | Film | Slotted | A tap says the film is being made (S8a). The swaddle, malish and settling demos are shared with First 40, so one shoot each. Reviewed by a paediatrician or paediatric nurse |
+| SLO3 | 23 of the 24 Sleep Sounds tracks | Audio | Rows, honest | Only the tanpura plays (Shravan's file). A tap on any other says "This lullaby (sound, story) is still being recorded. The tanpura plays now." with a Play it pill (SL4). The lullabies are to be recorded as real lori, in Hindi, Tamil and Bengali |
+| SLO4 | Night lights, room thermometers, mosquito nets on the shop | Catalogue | S8c | `pp_products/Night lights` and `Room thermometers` carry the page's tip (`kPpShelfNotYet`); `Mosquito nets` says a chemist has one |
+| SLO5 | A painting for each Tonight card (14 across the bands) | Painting | Built from data | Each card shows a line icon on the night-blue tint until then (`kPpSleepTonightCards`) |
+| SLO6 | Shorter names for 18 tab names that take three lines, or break a word, on the rail card at normal or large text | Names | Listed | `test/door_names_fit_test.dart` `_kOwedShorterNames`, a proposal for each. Three are cut at the normal size today: Potty "Accidents and going backwards", First 40 "Understanding your newborn", Family "Who looks after your child". The words are the user's call, door by door |
+
 ### P2. Feeding — `lib/data/doors/pp_door_feeding.dart`
 
 | # | Card | Kind | Outcome | Owed |
@@ -208,6 +221,7 @@ Catalogue items and people the door points at that do not exist yet (each tap sa
 | Labour prep | 6 | 6 | – | – | – |
 | Mind & mood | 6 | 4 (M1, M4–M6) | 1 | 1 | – |
 | Garbh Sanskar | 12 | – | – | – | all twelve closed; owed now = recordings (manifest entries) and R2 hosting (nine URLs) |
+| Sleep (parenting) | 6 | – | – | 1 | 1 (the 18 tab names, SLO6); SLO1–SLO5 answer a tap, see the door 7 table |
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
 | Health (parenting) | 6 | 3 | – | 3 | 1 (dosing table sign-off) |
 | Development (parenting) | 4 | 1 | – | 3 | – (DV2 is a data job, logged) |

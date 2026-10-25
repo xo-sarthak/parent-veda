@@ -24,6 +24,8 @@ import '../../../data/doors/pp_door_development.dart' show kPpPlayTodayShelf;
 import '../../../data/doors/pp_door_first40.dart' show kPpFirst40TodayShelf;
 import '../../../data/doors/pp_door_potty.dart'
     show kPpPottyDoor, kPpPottyTodayShelf;
+import '../../../data/doors/pp_door_sleep.dart'
+    show kPpSleepDoor, kPpSleepTonightCards, kPpSleepTonightShelf, PpSleepTonightCard;
 import '../../../theme/pv_fonts.dart';
 import '../../doors/pv_door_chrome.dart' show kPvDoorGutter;
 import '../../doors/pv_door_screen.dart' show kPvDoorHeadingGap;
@@ -40,6 +42,8 @@ import '../pp_first40_content.dart' show kPpFirst40Section;
 import '../pp_phases_data.dart' show ppFillChild;
 import '../pp_potty_content.dart';
 import '../pp_section_screen.dart' show ppOpenPage;
+import '../pp_sleep_content.dart' show kPpSleepSection;
+import '../pp_age_bands.dart' show kPpSleepBands;
 
 /// The inline tool for [surfaceId], or null when there is none (the tab then
 /// opens on its rails, as every other tab does).
@@ -53,6 +57,8 @@ Widget? ppDoorInlineToolFor(
       kPpFirst40TodayShelf => PpFirst40TodayShelf(p: p, onSurface: onSurface),
       _ when ppPottyShelfShows(surfaceId) =>
         PpPottyTodayShelf(p: p, onSurface: onSurface),
+      _ when ppSleepShelfShows(surfaceId) =>
+        PpSleepTonightShelf(p: p, onSurface: onSurface),
       _ => null,
     };
 
@@ -62,6 +68,7 @@ int ppDoorInlineCount(String surfaceId) => switch (surfaceId) {
       kPpFirst40TodayShelf => ppFirst40TodayPicks().length +
           (ppDinKnown() && ppDinAfter(kPpDinTabId) ? 1 : 0),
       _ when ppPottyShelfShows(surfaceId) => ppPottyTodayPicks().length,
+      _ when ppSleepShelfShows(surfaceId) => ppSleepTonightPicks().length,
       _ => 0,
     };
 
@@ -69,9 +76,125 @@ int ppDoorInlineCount(String surfaceId) => switch (surfaceId) {
 /// Potty's shelf is pages of the tab's own area; the rails skip them the way
 /// they skip an age rail's, and an area left empty drops. Empty for a tool
 /// that is not pages (Play today's activities are not section pages).
+/// Sleep's Tonight row is the same (SL1): a newborn's Safe sleep tab does not
+/// show the sleep-space check and the swaddle twice. Its cards from another
+/// tab (Gentle settling on Waking) are not on this tab's rails anyway.
 Set<String> ppDoorInlinePageIds(String surfaceId) => ppPottyShelfShows(surfaceId)
     ? {for (final x in ppPottyTodayPicks()) x.id}
-    : const {};
+    : ppSleepShelfShows(surfaceId)
+        ? {for (final c in ppSleepTonightPicks()) ?c.pageId}
+        : const {};
+    // Before Sleep's row (SL1), kept for revert:
+    // : const {};
+
+// =============================================================================
+//  Sleep: "Tonight" (SL1)
+// =============================================================================
+
+/// ⚠️ ONE ROW, ON THE TAB THAT OPENS FOR HER BAND. Two tabs can host it
+/// (`kPpSleepTonightShelf/<tab id>`): Safe sleep for a newborn, Getting to
+/// sleep after that. It draws only where `tabOrder` lands her, so a
+/// four-month-old's Safe sleep tab is pages, not the same row twice.
+bool ppSleepShelfShows(String surfaceId, {String? band}) {
+  const prefix = '$kPpSleepTonightShelf/';
+  if (!surfaceId.startsWith(prefix)) return false;
+  final b = band ?? kPpSleepBands.active.id;
+  return kPpSleepDoor.tabOrder[b]?.first == surfaceId.substring(prefix.length);
+}
+
+/// The cards for her band, in the plan's order, and all of them (four or
+/// five). A page card is dropped only if its page is missing or not for her
+/// band, so a later retag can never put a newborn page on a toddler's row.
+/// Pure, so a test can hold any band.
+List<PpSleepTonightCard> ppSleepTonightPicks({String? band}) {
+  final b = band ?? kPpSleepBands.active.id;
+  return [
+    for (final c in kPpSleepTonightCards[b] ?? const <PpSleepTonightCard>[])
+      if (c.pageId == null ||
+          (kPpSleepSection.pageById(c.pageId!)?.inBand(b) ?? false))
+        c,
+  ];
+}
+
+/// The card's meta word: what a tap does.
+String _sleepTonightMeta(PpSleepTonightCard c) {
+  if (c.surfaceId == 'pp_sleep_sounds') return 'Listen';
+  if (c.surfaceId == 'pp_wake_windows') return 'Tool';
+  if (c.surfaceId != null) return 'Stories';
+  final page = kPpSleepSection.pageById(c.pageId!);
+  return page?.format == 'VIDEO' ? 'Watch' : 'How to';
+}
+
+/// "Tonight": the heading, its line, and the cards for her band.
+class PpSleepTonightShelf extends StatelessWidget {
+  const PpSleepTonightShelf({super.key, required this.p, required this.onSurface});
+
+  final V2Palette p;
+  final void Function(String surfaceId) onSurface;
+
+  @override
+  Widget build(BuildContext context) {
+    final kid = ChildProfileStore.instance;
+    final picks = ppSleepTonightPicks();
+    final ts = MediaQuery.textScalerOf(context);
+    final height = 104 + ts.scale(118);
+    // The Sleep door's night blue (the Waking tab's hue).
+    final accent = HSLColor.fromAHSL(1, 232, 0.38, 0.42).toColor();
+    return Column(
+      key: const ValueKey('pp_sleep_tonight_shelf'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Tonight',
+                style: pvFraunces(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: -0.45,
+                    color: p.ink1)),
+            const SizedBox(height: 2),
+            Text('For ${kid.nameMid}, ${kid.ageLabel}  ·  nothing to tick off',
+                style: pvManrope(
+                    fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
+          ]),
+        ),
+        const SizedBox(height: kPvDoorHeadingGap),
+        SizedBox(
+          height: height,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+            itemCount: picks.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final c = picks[i];
+              final page =
+                  c.pageId == null ? null : kPpSleepSection.pageById(c.pageId!);
+              return _ShelfCard(
+                key: ValueKey('pp_sleep_tonight_card_${c.pageId ?? c.surfaceId}'),
+                p: p,
+                height: height,
+                meta: '${_sleepTonightMeta(c)}  ·  Tonight'.toUpperCase(),
+                title: c.name,
+                picture: Container(
+                  color: Color.alphaBlend(accent.withValues(alpha: 0.16), p.surface),
+                  alignment: Alignment.center,
+                  child: Icon(c.icon, size: 40, color: accent),
+                ),
+                onTap: () => page != null
+                    ? ppOpenPage(context, kPpSleepSection, page,
+                        onSurface: (_, id) => onSurface(id))
+                    : onSurface(c.surfaceId!),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 // =============================================================================
 //  First 40 Days: "Try this today", by week (FD1)

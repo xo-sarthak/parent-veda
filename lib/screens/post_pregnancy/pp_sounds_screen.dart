@@ -39,6 +39,7 @@ import '../v2/v2_palette.dart';
 import 'pp_content.dart';
 import 'pp_sounds_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart';
 
 class PpSoundsScreen extends StatefulWidget {
   const PpSoundsScreen({super.key});
@@ -121,12 +122,28 @@ class _PpSoundsScreenState extends State<PpSoundsScreen> {
                       onPick: _audio.setSleepTimer,
                     ),
 
+                    // ⚠️ WHAT PLAYS NOW, FIRST (SL4). The tanpura sat fourth in
+                    // the fourth category, under twenty rows that said COMING
+                    // SOON. It leads now, and the library follows in full.
                     const SizedBox(height: 30),
+                    _CategoryBlock(
+                      key: const ValueKey('pp_sounds_plays_now'),
+                      category: PpSoundCategory(
+                        id: 'now',
+                        label: 'Plays now',
+                        blurb: 'A slow tanpura drone. The rest of the library '
+                            'is being recorded.',
+                        tracks: kPpLiveSoundTracks,
+                      ),
+                      audio: _audio,
+                      onPlay: (t) => _play(t, 'now'),
+                    ),
+                    const SizedBox(height: 28),
                     for (final c in kPpSoundCategories) ...[
                       _CategoryBlock(
                         category: c,
                         audio: _audio,
-                        onPlay: _play,
+                        onPlay: (t) => _play(t, c.id),
                       ),
                       const SizedBox(height: 28),
                     ],
@@ -149,11 +166,19 @@ class _PpSoundsScreenState extends State<PpSoundsScreen> {
         ),
       );
 
-  void _play(PpSoundTrack t) {
+  void _play(PpSoundTrack t, String categoryId) {
     final asset = t.asset;
     // A track with no file does nothing, visibly — the row already says COMING
     // SOON rather than offering a play button.
-    if (asset == null) return;
+    // ⚠️ AND NOW SAYS WHY (SL4, S8a): a tap that does nothing teaches her
+    // that taps do nothing. It names what is missing and plays what isn't.
+    if (asset == null) {
+      final live = kPpLiveSoundTracks.firstOrNull;
+      pvToast(context, ppSoundNotYetLine(categoryId),
+          action: live == null ? null : 'Play it',
+          onAction: live == null ? null : () => _play(live, 'now'));
+      return;
+    }
     _audio.toggle(asset, title: t.title);
   }
 }
@@ -243,7 +268,7 @@ class _TimerRow extends StatelessWidget {
 }
 class _CategoryBlock extends StatelessWidget {
   const _CategoryBlock(
-      {required this.category, required this.audio, required this.onPlay});
+      {super.key, required this.category, required this.audio, required this.onPlay});
 
   final PpSoundCategory category;
   final RagaAudioStore audio;
@@ -290,7 +315,9 @@ class _TrackRow extends StatelessWidget {
     final p = V2PaletteStore.instance.current;
     final live = track.isLive;
     return InkWell(
-      onTap: live ? onTap : null,
+      // Was `live ? onTap : null`: a silent tap on a track not recorded yet.
+      // The screen's `_play` answers it now (SL4).
+      onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(10),

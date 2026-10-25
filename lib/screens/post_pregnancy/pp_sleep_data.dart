@@ -247,7 +247,45 @@ class SleepStore extends ChangeNotifier {
   }
 
   /// Age-appropriate ranges for the "Age context" card.
+  ///
+  /// ⚠️ THE SAME RANGES AS THE DOOR'S OWN CHARTS (Sleep door plan SL3, the
+  /// user's yes 2026-10-24). From ten months this card said "12–15h, 2 naps"
+  /// for every child up to five, while the door's toddler chart said 11 to 14
+  /// hours: a baby's numbers shown to every toddler's parent. The total and
+  /// the naps now follow the chart for her band (`pp_sleep_content.dart`),
+  /// the wake window follows the wake-windows tool (`kPpWakeWindows`), and
+  /// `test/pp_sleep_door_test.dart` holds all three at every month to five.
+  /// REQUIRED_REVIEW. The first-year card it replaced is kept below.
   SleepAgeContext get ageContext {
+    final m = ChildProfileStore.instance.ageInMonths;
+    final (total, naps) = switch (m) {
+      < 1 => ('14–17h', 'many short'),
+      < 3 => ('14–17h', '4–5 naps'),
+      < 6 => ('12–16h', '3–4 naps'),
+      < 12 => ('12–16h', '2–3 naps'),
+      < 24 => ('11–14h', '1–2 naps'),
+      < 36 => ('11–14h', '1 nap'),
+      _ => ('10–13h', '0–1 naps'),
+    };
+    final (wake, blurb) = switch (m) {
+      < 1 => ('45–60 min',
+          'Newborn sleep is scattered across the whole day — that is exactly as it should be.'),
+      < 4 => ('60–90 min',
+          'Day and night are still sorting themselves out — longer night stretches come with time.'),
+      < 7 => ('1.5–2.5h',
+          'Naps begin to find a shape, though days still vary widely and that is normal.'),
+      < 10 => ('2–3h', 'Many babies settle toward two naps around now, at their own pace.'),
+      < 15 => ('3–4h', 'Two naps, moving toward one. The morning nap is the one that goes.'),
+      < 24 => ('4–5.5h', 'One afternoon nap for most, and long stretches awake either side of it.'),
+      < 36 => ('5–6.5h', 'One nap after lunch. A nap that runs late moves bedtime later with it.'),
+      _ => ('6–12h', 'The nap goes somewhere in here. Quiet rest after lunch is a fair middle step.'),
+    };
+    return SleepAgeContext(total, naps, wake, blurb);
+  }
+
+  /* kept for revert: the first-year card, which gave every child from ten
+     months to five the same "12–15h, 2 naps, 3–4h" (SL3).
+  SleepAgeContext get ageContextBefore {
     final m = ChildProfileStore.instance.ageInMonths;
     if (m < 1) {
       return const SleepAgeContext('14–17h', 'many short', '45–60 min',
@@ -268,6 +306,7 @@ class SleepStore extends ChangeNotifier {
     return const SleepAgeContext('12–15h', '2 naps', '3–4h',
         'Longer wake windows and two naps are common by the end of the first year.');
   }
+  */
 
   /// Plain-language pattern observations.
   List<String> get patterns {

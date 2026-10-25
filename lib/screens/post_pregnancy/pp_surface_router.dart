@@ -200,6 +200,12 @@ const Map<String, String> kPpShelfNotYet = {
       "massage oil?'.",
   'Postpartum belts': 'Not in our shop yet. Ask your doctor first after a '
       'C-section.',
+  // Sleep (SL5): none stocked, so the tap carries the page's tip.
+  'Night lights': "We haven't picked night lights yet. A dim, warm-coloured "
+      'one, low down and out of reach, is the kind to look for.',
+  'Room thermometers': "We haven't picked room thermometers yet. Any simple "
+      'digital one works. A room comfortable for you in light clothes is '
+      'about right.',
 };
 
 /// ⚠️ A TARGET WE HAVE NOT BUILT, NAMED FOR WHAT IT IS (Potty PT4). The

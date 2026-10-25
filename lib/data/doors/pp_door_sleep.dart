@@ -26,14 +26,115 @@
 //  ⚠️ THE RED FLAG IS THE DOCTOR PAGE, PINNED. "When night waking needs a
 //  doctor" was the last card of a rail; the door shape has a place for it
 //  above the rail, coral, and the brief's own format for it is "Red flag".
+//
+//  ⚠️ EACH AGE OPENS ON WHAT FITS, WITH "TONIGHT" FIRST (door plan
+//  `docs/pp-door-plans/07-sleep.md`, SL1, the user's yes 2026-10-24). Every
+//  age landed on How much sleep: two tracker rows and a chart, nothing to do
+//  tonight. Now a newborn's parent lands on Safe sleep, and every other age on
+//  Getting to sleep, and the opening tab starts with a row of things to try
+//  tonight, nothing to tick. How much sleep, the tracker and the chart stay
+//  one tab away.
 // =============================================================================
 
-import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/material.dart' show IconData, Icons;
 
 import 'pp_door_data.dart';
 
+/// "Tonight" (SL1), drawn in place on the tab that opens for her band. One id
+/// per tab that can host it (`kPpSleepTonightShelf/<tab id>`); the row draws
+/// itself only on the tab `tabOrder` opens for her band.
+const String kPpSleepTonightShelf = 'pp_sleep_tonight';
+
+/// One card of the Tonight row: a Sleep page by id, or a surface that is not
+/// a page (the tanpura, Early Learning's bedtime tales).
+class PpSleepTonightCard {
+  const PpSleepTonightCard(this.name, this.icon, {this.pageId, this.surfaceId});
+
+  /// The card's name, whole (a page title is a sentence; a card holds a name).
+  final String name;
+  final IconData icon;
+  final String? pageId;
+  final String? surfaceId;
+}
+
+/// ⚠️ THE CARDS, BY AGE, IN THE PLAN'S ORDER (SL1's table). Not shuffled: the
+/// first card is the one that matters most tonight (a safe space for a
+/// newborn, the routine after that). The tanpura is last on every row, and it
+/// is the sound that plays (SL4). "Night fears" is for three and up, so the
+/// one-to-three rows have four cards.
+const Map<String, List<PpSleepTonightCard>> kPpSleepTonightCards = {
+  'nb': [
+    PpSleepTonightCard('Set up a safe sleep space', Icons.crib_outlined,
+        pageId: 'sleep_surface'),
+    PpSleepTonightCard('Swaddling', Icons.child_friendly_outlined,
+        pageId: 'swaddling'),
+    PpSleepTonightCard('Day and night', Icons.wb_twilight_outlined,
+        pageId: 'day_night_confusion'),
+    PpSleepTonightCard('Gentle settling', Icons.spa_outlined,
+        pageId: 'gentle_settling'),
+    _kTanpura,
+  ],
+  'm3_6': _kBabyTonight,
+  'm6_12': _kBabyTonight,
+  'tod_1_2': _kToddlerTonight,
+  'tod_2_3': _kToddlerTonight,
+  // Night fears joins from three (SL1: "Night fears (3+)").
+  'pre': [
+    PpSleepTonightCard('The bedtime routine', Icons.bedtime_outlined,
+        pageId: 'bedtime_routine'),
+    _kStoryOn,
+    PpSleepTonightCard('Night fears', Icons.nights_stay_outlined,
+        pageId: 'night_fears'),
+    PpSleepTonightCard('Dropping naps', Icons.wb_sunny_outlined,
+        pageId: 'dropping_naps'),
+    _kTanpura,
+  ],
+};
+
+const PpSleepTonightCard _kTanpura = PpSleepTonightCard(
+    'Tanpura to sleep', Icons.music_note_outlined,
+    surfaceId: 'pp_sleep_sounds');
+
+const List<PpSleepTonightCard> _kBabyTonight = [
+  PpSleepTonightCard('The bedtime routine', Icons.bedtime_outlined,
+      pageId: 'bedtime_routine'),
+  PpSleepTonightCard('Wake windows', Icons.timelapse_outlined,
+      surfaceId: 'pp_wake_windows'),
+  PpSleepTonightCard('Malish before bed', Icons.back_hand_outlined,
+      pageId: 'malish'),
+  PpSleepTonightCard('Gentle settling', Icons.spa_outlined,
+      pageId: 'gentle_settling'),
+  _kTanpura,
+];
+
+/// Early Learning's "Little bedtime tales": ten very short, very calm stories
+/// for the last ten minutes of the day, from about one year.
+const PpSleepTonightCard _kStoryOn = PpSleepTonightCard(
+    'Screens off, story on', Icons.menu_book_outlined,
+    surfaceId: 'pp_section/parenting_early_learning/bedtime_tales');
+
+/// One to three: four cards (night fears waits for three).
+const List<PpSleepTonightCard> _kToddlerTonight = [
+  PpSleepTonightCard('The bedtime routine', Icons.bedtime_outlined,
+      pageId: 'bedtime_routine'),
+  _kStoryOn,
+  PpSleepTonightCard('Dropping naps', Icons.wb_sunny_outlined,
+      pageId: 'dropping_naps'),
+  _kTanpura,
+];
+
 final PpDoor kPpSleepDoor = PpDoor(
   sectionId: 'parenting_sleep',
+  // SL1: safe sleep first for a newborn, bedtime after that; the worries
+  // before the numbers from one.
+  tabOrder: const {
+    'nb': ['safe', 'how_much', 'waking', 'getting', 'worries'],
+    'm3_6': ['getting', 'waking', 'how_much', 'safe', 'worries'],
+    'm6_12': ['getting', 'waking', 'how_much', 'safe', 'worries'],
+    'tod_1_2': ['getting', 'waking', 'worries', 'how_much', 'safe'],
+    'tod_2_3': ['getting', 'waking', 'worries', 'how_much', 'safe'],
+    'pre': ['getting', 'waking', 'worries', 'how_much', 'safe'],
+  },
   // Hu Chen, Unsplash. A sleeping face and a curled fist, close enough that
   // neither the position nor the bedding is in frame — see
   // `PpDoor.heroImageUrl` for why that is the requirement here.
@@ -76,6 +177,14 @@ final PpDoor kPpSleepDoor = PpDoor(
       hue: 268,
       areaIds: ['night_waking', 'regressions'],
       redFlagPageId: 'waking_doctor',
+      // SL6: help next to the worry, after the first rail, never stacked
+      // with the pinned red flag above it. No sleep expert is live yet, so a
+      // tap opens "Our first experts are joining" (S8).
+      expert: PpDoorClosing(
+        label: 'A sleep expert',
+        blurb: 'Nights wearing you down?',
+        surfaceId: 'pp_experts/Sleep expert',
+      ),
     ),
     PpDoorTab(
       id: 'getting',
@@ -83,6 +192,8 @@ final PpDoor kPpSleepDoor = PpDoor(
       icon: Icons.self_improvement_outlined,
       hue: 26,
       areaIds: ['getting_to_sleep'],
+      // SL1: Tonight, from three months on.
+      inlineSurfaceId: '$kPpSleepTonightShelf/getting',
     ),
     PpDoorTab(
       id: 'safe',
@@ -90,10 +201,15 @@ final PpDoor kPpSleepDoor = PpDoor(
       icon: Icons.shield_outlined,
       hue: 152,
       areaIds: ['safe_sleep'],
+      // SL1: Tonight, for a newborn.
+      inlineSurfaceId: '$kPpSleepTonightShelf/safe',
     ),
     PpDoorTab(
       id: 'worries',
-      label: 'Worries and sounds',
+      // SL9: three lines on the card at a large text size (measured in
+      // Manrope at the card's width, `door_names_fit_test`). Was 'Worries and
+      // sounds', kept for revert.
+      label: 'Worries, sounds',
       icon: Icons.music_note_outlined,
       hue: 188,
       areaIds: ['worries', 'music'],
@@ -103,8 +219,11 @@ final PpDoor kPpSleepDoor = PpDoor(
         // same data.
         PpDoorTool(
           label: 'Sleep Sounds',
-          blurb: 'Lullabies, white noise, rain, soft ragas and bedtime stories, '
-              'with a timer that switches itself off.',
+          // SL4: the tanpura first, the one that plays. Was: 'Lullabies, white
+          // noise, rain, soft ragas and bedtime stories, with a timer that
+          // switches itself off.'
+          blurb: 'A tanpura drone to play tonight, with a timer that switches '
+              'itself off. Lori, rain and stories are being recorded.',
           surfaceId: 'pp_sleep_sounds',
           icon: Icons.music_note_outlined,
           chip: 'Audio',
