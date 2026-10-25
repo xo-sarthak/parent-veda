@@ -342,9 +342,11 @@ void main() {
 
     test('the parent can delete the journal and cannot read it; withdrawing consent forgets it', () {
       final src = File('lib/screens/skilling/sk_grown_up_screen.dart').readAsStringSync();
-      expect(src.contains('Delete her journal'), isTrue);
+      // Her name and her pages only since F5 (2026-10-25); were
+      // 'Delete her journal' and 'SkJournalStore.instance.forgetAll()'.
+      expect(src.contains(r"'Delete $her journal'"), isTrue);
       expect(src.contains('you can delete it, not read it'), isTrue);
-      expect(src.contains('SkJournalStore.instance.forgetAll()'), isTrue);
+      expect(src.contains('SkJournalStore.instance.forgetChild('), isTrue);
       expect(src.contains('SkJournalStore.instance.read('), isFalse, reason: 'no parent reader');
       expect(src.contains('SkJournalStore.instance.entriesFor'), isFalse,
           reason: 'the parent screen does not list her pages');

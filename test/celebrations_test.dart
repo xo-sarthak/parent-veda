@@ -140,7 +140,8 @@ void main() {
       await prompt.notNow(six, now: now.add(const Duration(days: 7)));
       expect(prompt.showsFor(six, now: now.add(const Duration(days: 20))), isFalse);
       expect(prompt.showsFor(six, now: now.add(const Duration(days: 21))), isTrue);
-      SkChildStore.instance.debugSetAgeYears(6, name: 'Myra');
+      // Her own yes (F5): the space is keyed by her id.
+      SkChildStore.instance.debugSetAgeYears(6, name: 'Myra', childId: 'c6');
       expect(prompt.showsFor(six, now: now.add(const Duration(days: 60))), isFalse,
           reason: 'the space is open');
     });
@@ -170,7 +171,9 @@ void main() {
       expect(fam(false).single.home, FamilyHome.parenting);
       expect(fam(false).single.line, '6 years · Parenting · learning space ready');
       expect(fam(true).single.home, FamilyHome.learning);
-      expect(_code('lib/screens/v2/pv_family_switch.dart'), contains('learningOpen: SkChildStore.instance.consented'));
+      // Per child since F5 (2026-10-25); was
+      // contains('learningOpen: SkChildStore.instance.consented').
+      expect(_code('lib/screens/v2/pv_family_switch.dart'), contains('learningOpenIds: SkChildStore.instance.consentedIds'));
     });
 
     test('the sixth birthday message says the space is ready', () {

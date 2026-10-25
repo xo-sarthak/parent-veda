@@ -619,6 +619,8 @@ class _Settings extends StatelessWidget {
     final s = SkChildStore.instance;
     final band = s.band;
     final years = s.ageYears;
+    // Her name in the actions (F5): which child's space this is.
+    final her = s.name.isEmpty ? 'her' : "${s.name}'s";
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -700,23 +702,38 @@ class _Settings extends StatelessWidget {
               () => _askPin(context)),
           if (s.hasPin)
             _action(context, 'Use the sum instead', () => s.setPin(null)),
+          // ⚠️ THIS CHILD'S, NOT EVERY CHILD'S (F5, 2026-10-25). With two
+          // children of six or more, "forget her" used to forget both spaces.
+          // Each action now names her and touches only her space. Kept for
+          // revert: the `forgetAll()` calls and the "her" labels.
           if (journal)
             // ⚠️ DELETE, NEVER READ. The one parental power over the
-            // journal besides consent. Files, index and key all go.
-            _action(context, 'Delete her journal', () => SkJournalStore.instance.forgetAll(),
+            // journal besides consent. Files and index go; the key goes
+            // with the last page on the phone.
+            _action(context, 'Delete $her journal',
+                () => SkJournalStore.instance.forgetChild(s.openId ?? SkChildStore.kLegacyId),
                 quiet: true),
           if (portfolio)
-            _action(context, 'Delete her photos', () => SkPortfolioStore.instance.forgetAll(), quiet: true),
-          _action(context, 'Withdraw consent and forget her', () {
-            SkPracticeStore.instance.forgetAll();
-            SkVoiceStore.instance.forgetAll();
-            SkJournalStore.instance.forgetAll();
-            SkPortfolioStore.instance.forgetAll();
+            _action(context, 'Delete $her photos',
+                () => SkPortfolioStore.instance.forgetChild(s.openId ?? SkChildStore.kLegacyId),
+                quiet: true),
+          _action(context, s.name.isEmpty ? 'Withdraw consent and forget her' : "Withdraw consent and forget ${s.name}'s space", () {
+            final id = s.openId ?? SkChildStore.kLegacyId;
+            SkPracticeStore.instance.forgetChild(id);
+            SkVoiceStore.instance.forgetChild(id);
+            SkJournalStore.instance.forgetChild(id);
+            SkPortfolioStore.instance.forgetChild(id);
             s.forget();
             // Back to the skilling preview, not the app's first route — seen
-            // on a phone (2026-09-14) landing on the pregnancy home.
-            Navigator.of(context).popUntil(
-                (r) => r.settings.name == 'skilling/preview' || r.isFirst);
+            // on a phone (2026-09-14) landing on the pregnancy home. With
+            // another child's space left, to the family's home instead, so
+            // the next child's space never opens in her place (F5).
+            if (s.consentedIds.isNotEmpty) {
+              Navigator.of(context).popUntil((r) => r.isFirst);
+            } else {
+              Navigator.of(context).popUntil(
+                  (r) => r.settings.name == 'skilling/preview' || r.isFirst);
+            }
           }, quiet: true),
         ]),
         const SizedBox(height: 12),

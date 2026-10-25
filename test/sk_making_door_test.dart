@@ -205,8 +205,10 @@ void main() {
       final src = File('lib/screens/skilling/sk_grown_up_screen.dart').readAsStringSync();
       expect(src.contains("Key('sk-photos-switch')"), isTrue);
       expect(src.contains('Let her keep photos of what she made'), isTrue);
-      expect(src.contains('Delete her photos'), isTrue);
-      expect(src.contains('SkPortfolioStore.instance.forgetAll()'), isTrue);
+      // Her name and her photos only since F5 (2026-10-25); were
+      // 'Delete her photos' and 'SkPortfolioStore.instance.forgetAll()'.
+      expect(src.contains(r"'Delete $her photos'"), isTrue);
+      expect(src.contains('SkPortfolioStore.instance.forgetChild('), isTrue);
       // Never a parent-side judgement of the work either.
       expect(src.contains('SkPortfolioStore.instance.photosFor'), isFalse, reason: 'the grown-up screen does not browse her gallery');
     });

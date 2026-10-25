@@ -57,9 +57,17 @@ class SkVoiceClip {
     required this.path,
     required this.at,
     this.itemId,
+    this.child,
   });
   final String id;
   final String doorId;
+
+  /// Whose space it was recorded in (F5, 2026-10-25). Null on clips from
+  /// before: those are the one space's, `SkChildStore.ownerOf`.
+  final String? child;
+
+  SkVoiceClip _forChild(String? c) => SkVoiceClip(
+      id: id, doorId: doorId, title: title, path: path, at: at, itemId: itemId, child: c);
 
   /// What she recorded: the activity's title, or "Something I wanted to say".
   final String title;
@@ -76,6 +84,7 @@ class SkVoiceClip {
         'path': path,
         'at': at.toIso8601String(),
         'item': itemId,
+        if (child != null) 'child': child,
       };
 
   static SkVoiceClip? fromJson(Map<String, dynamic> j) {
@@ -88,6 +97,7 @@ class SkVoiceClip {
       path: (j['path'] ?? '') as String,
       at: at,
       itemId: j['item'] as String?,
+      child: j['child'] as String?,
     );
   }
 }
@@ -95,6 +105,8 @@ class SkVoiceClip {
 class SkVoiceStore extends ChangeNotifier {
   SkVoiceStore._() {
     SyncRegistry.registerReset(_resetForAccount);
+    // Switching child redraws whatever reads this (F5).
+    SkChildStore.instance.addListener(notifyListeners);
   }
   static final SkVoiceStore instance = SkVoiceStore._();
 
@@ -103,14 +115,18 @@ class SkVoiceStore extends ChangeNotifier {
   final List<SkVoiceClip> _clips = [];
   bool _loaded = false;
 
+  /// The open child's clips only (F5).
+  Iterable<SkVoiceClip> get _mine =>
+      _clips.where((c) => SkChildStore.instance.isOpen(c.child));
+
   /// Her clips for a door, newest first.
   List<SkVoiceClip> clipsFor(String doorId) {
-    final list = [for (final c in _clips) if (c.doorId == doorId) c]
+    final list = [for (final c in _mine) if (c.doorId == doorId) c]
       ..sort((a, b) => b.at.compareTo(a.at));
     return list;
   }
 
-  bool hasClips(String doorId) => _clips.any((c) => c.doorId == doorId);
+  bool hasClips(String doorId) => _mine.any((c) => c.doorId == doorId);
 
   /// Where clips live. One folder, so forget-all is one directory.
   static Future<Directory> folder() async {
@@ -121,7 +137,8 @@ class SkVoiceStore extends ChangeNotifier {
   }
 
   void add(SkVoiceClip clip) {
-    _clips.add(clip);
+    // Stamped with the open child (F5), unless the caller already said whose.
+    _clips.add(clip.child == null ? clip._forChild(SkChildStore.instance.openId) : clip);
     _save();
     notifyListeners();
   }
@@ -134,6 +151,23 @@ class SkVoiceStore extends ChangeNotifier {
       final f = File(c.path);
       if (f.existsSync()) await f.delete();
     } catch (_) {}
+    _save();
+    notifyListeners();
+  }
+
+  /// One child's consent withdrawn (F5): her clips and their files go.
+  Future<void> forgetChild(String childId) async {
+    final hers = [
+      for (final c in _clips)
+        if (SkChildStore.instance.ownerOf(c.child) == childId) c,
+    ];
+    for (final c in hers) {
+      try {
+        final f = File(c.path);
+        if (f.existsSync()) await f.delete();
+      } catch (_) {}
+    }
+    _clips.removeWhere(hers.contains);
     _save();
     notifyListeners();
   }

@@ -137,11 +137,16 @@ class SkJournalEntry {
     required this.at,
     required this.path,
     this.promptId,
+    this.child,
   });
   final String id;
   final String doorId;
   final DateTime at;
   final String path;
+
+  /// Whose page it is (F5, 2026-10-25). Null on pages from before: those
+  /// are the one space's, `SkChildStore.ownerOf`.
+  final String? child;
 
   /// The prompt she wrote from, when she did.
   final String? promptId;
@@ -152,6 +157,7 @@ class SkJournalEntry {
         'at': at.toIso8601String(),
         'path': path,
         'prompt': promptId,
+        if (child != null) 'child': child,
       };
 
   static SkJournalEntry? fromJson(Map<String, dynamic> j) {
@@ -163,6 +169,7 @@ class SkJournalEntry {
       at: at,
       path: (j['path'] ?? '') as String,
       promptId: j['prompt'] as String?,
+      child: j['child'] as String?,
     );
   }
 }
@@ -170,6 +177,8 @@ class SkJournalEntry {
 class SkJournalStore extends ChangeNotifier {
   SkJournalStore._() {
     SyncRegistry.registerReset(_resetForAccount);
+    // Switching child redraws whatever reads this (F5).
+    SkChildStore.instance.addListener(notifyListeners);
   }
   static final SkJournalStore instance = SkJournalStore._();
 
@@ -184,12 +193,17 @@ class SkJournalStore extends ChangeNotifier {
   /// Newest first. Dates and ids only; the text stays in its file until
   /// she opens the page.
   List<SkJournalEntry> entriesFor(String doorId) {
-    final list = [for (final e in _entries) if (e.doorId == doorId) e]
+    final list = [for (final e in _mine) if (e.doorId == doorId) e]
       ..sort((a, b) => b.at.compareTo(a.at));
     return list;
   }
 
-  bool hasEntries(String doorId) => _entries.any((e) => e.doorId == doorId);
+  bool hasEntries(String doorId) => _mine.any((e) => e.doorId == doorId);
+
+  /// ⚠️ HER PAGES ONLY (F5). A brother's journal is not hers to see: every
+  /// read, including [read], goes through the open child.
+  Iterable<SkJournalEntry> get _mine =>
+      _entries.where((e) => SkChildStore.instance.isOpen(e.child));
 
   static Future<Directory> folder() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -210,7 +224,8 @@ class SkJournalStore extends ChangeNotifier {
       final f = File('${(await folder()).path}/$id.enc');
       await f.writeAsBytes((await _cipher()).seal(trimmed), flush: true);
       final e = SkJournalEntry(
-          id: id, doorId: doorId, at: DateTime.now(), path: f.path, promptId: promptId);
+          id: id, doorId: doorId, at: DateTime.now(), path: f.path, promptId: promptId,
+          child: SkChildStore.instance.openId);
       _entries.add(e);
       await _save();
       notifyListeners();
@@ -223,7 +238,7 @@ class SkJournalStore extends ChangeNotifier {
   /// Her page, for her. The only reader.
   Future<String?> read(String id) async {
     final i = _entries.indexWhere((e) => e.id == id);
-    if (i < 0) return null;
+    if (i < 0 || !SkChildStore.instance.isOpen(_entries[i].child)) return null;
     try {
       final f = File(_entries[i].path);
       if (!f.existsSync()) return null;
@@ -242,6 +257,29 @@ class SkJournalStore extends ChangeNotifier {
       if (f.existsSync()) await f.delete();
     } catch (_) {}
     await _save();
+    notifyListeners();
+  }
+
+  /// One child's journal deleted (F5): her pages and their files. The key
+  /// is one per phone, so it goes only when no page is left.
+  Future<void> forgetChild(String childId) async {
+    final hers = [
+      for (final e in _entries)
+        if (SkChildStore.instance.ownerOf(e.child) == childId) e,
+    ];
+    for (final e in hers) {
+      try {
+        final f = File(e.path);
+        if (f.existsSync()) await f.delete();
+      } catch (_) {}
+    }
+    _entries.removeWhere(hers.contains);
+    await _save();
+    if (_entries.isEmpty) {
+      try {
+        await keyStore.forget();
+      } catch (_) {}
+    }
     notifyListeners();
   }
 

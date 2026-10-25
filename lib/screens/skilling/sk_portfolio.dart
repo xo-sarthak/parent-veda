@@ -65,10 +65,15 @@ class SkPortfolioPhoto {
     required this.at,
     this.caption = '',
     this.itemId,
+    this.child,
   });
   final String id;
   final String doorId;
   final String path;
+
+  /// Whose space it was kept in (F5, 2026-10-25). Null on photos from
+  /// before: those are the one space's, `SkChildStore.ownerOf`.
+  final String? child;
   final DateTime at;
 
   /// Her words for it — "a tiger", "the fort we made" — or nothing.
@@ -84,6 +89,7 @@ class SkPortfolioPhoto {
         'at': at.toIso8601String(),
         'caption': caption,
         'item': itemId,
+        if (child != null) 'child': child,
       };
 
   static SkPortfolioPhoto? fromJson(Map<String, dynamic> j) {
@@ -96,6 +102,7 @@ class SkPortfolioPhoto {
       at: at,
       caption: (j['caption'] ?? '') as String,
       itemId: j['item'] as String?,
+      child: j['child'] as String?,
     );
   }
 }
@@ -103,6 +110,8 @@ class SkPortfolioPhoto {
 class SkPortfolioStore extends ChangeNotifier {
   SkPortfolioStore._() {
     SyncRegistry.registerReset(_resetForAccount);
+    // Switching child redraws whatever reads this (F5).
+    SkChildStore.instance.addListener(notifyListeners);
   }
   static final SkPortfolioStore instance = SkPortfolioStore._();
 
@@ -111,14 +120,18 @@ class SkPortfolioStore extends ChangeNotifier {
   final List<SkPortfolioPhoto> _photos = [];
   bool _loaded = false;
 
+  /// The open child's photos only (F5).
+  Iterable<SkPortfolioPhoto> get _mine =>
+      _photos.where((p) => SkChildStore.instance.isOpen(p.child));
+
   /// Newest first.
   List<SkPortfolioPhoto> photosFor(String doorId) {
-    final list = [for (final p in _photos) if (p.doorId == doorId) p]
+    final list = [for (final p in _mine) if (p.doorId == doorId) p]
       ..sort((a, b) => b.at.compareTo(a.at));
     return list;
   }
 
-  bool hasPhotos(String doorId) => _photos.any((p) => p.doorId == doorId);
+  bool hasPhotos(String doorId) => _mine.any((p) => p.doorId == doorId);
 
   static Future<Directory> folder() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -138,7 +151,8 @@ class SkPortfolioStore extends ChangeNotifier {
       final dst = File('${(await folder()).path}/$id.$ext');
       await src.copy(dst.path);
       final p = SkPortfolioPhoto(
-          id: id, doorId: doorId, path: dst.path, at: DateTime.now(), caption: caption, itemId: itemId);
+          id: id, doorId: doorId, path: dst.path, at: DateTime.now(), caption: caption, itemId: itemId,
+          child: SkChildStore.instance.openId);
       _photos.add(p);
       await _save();
       notifyListeners();
@@ -156,6 +170,23 @@ class SkPortfolioStore extends ChangeNotifier {
       final f = File(p.path);
       if (f.existsSync()) await f.delete();
     } catch (_) {}
+    await _save();
+    notifyListeners();
+  }
+
+  /// One child's consent withdrawn (F5): her photos and their files go.
+  Future<void> forgetChild(String childId) async {
+    final hers = [
+      for (final p in _photos)
+        if (SkChildStore.instance.ownerOf(p.child) == childId) p,
+    ];
+    for (final p in hers) {
+      try {
+        final f = File(p.path);
+        if (f.existsSync()) await f.delete();
+      } catch (_) {}
+    }
+    _photos.removeWhere(hers.contains);
     await _save();
     notifyListeners();
   }

@@ -105,7 +105,10 @@ class SkTurningSixPrompt extends ChangeNotifier {
     final t = now ?? DateTime.now();
     if (child.name == Child.placeholder && child.id.isEmpty) return false;
     if (skYearsOn(child.dob, t) < kSkAgeFloor) return false;
-    if (SkChildStore.instance.consented) return false;
+    // This child's yes, not anyone's (F5): a brother's space does not
+    // answer for her. Kept for revert:
+    //   if (SkChildStore.instance.consented) return false;
+    if (SkChildStore.instance.consentedFor(child.id)) return false;
     final r = _rest[child.id];
     return r == null || !t.isBefore(r.until);
   }
@@ -182,7 +185,9 @@ Future<void> openTurningSix(BuildContext context, Child child) async {
       primary: words.primary,
       onPrimary: (c) => Navigator.of(c).pushReplacement(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'skilling/gate'),
+        // For THIS child (F5): the gate fills in her, and her space opens.
         builder: (_) => SkParentGateScreen(
+          child: child,
           onDone: (g) => Navigator.of(g).pushReplacement(MaterialPageRoute<void>(
             settings: const RouteSettings(name: 'skilling'),
             builder: (_) => SkillingPreviewScreen(

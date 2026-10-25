@@ -4116,3 +4116,67 @@ later TTC pregnancy is never mistaken for a family one.
 
 **The trade-off.** The keys are local, not synced. That is cheap and right for a phone action like undo. It costs
 an exact answer on her second phone, which the derivation covers for the common case.
+
+## 16rr. Who needs to see a record decides its table (0115, 2026-10-25)
+
+Sync step 20, the parenting tools pass (Food, `docs/pp-tool-plans/22-24-food.md`).
+
+Two records from one week of this pass look alike. A gentle check-in answer and a first try of egg are both small,
+both per child, both written from one tool. Step 19 put the check-in answer in `user_state` with the child in the
+item key (16pp). Step 20 gave the first try a table of its own. The difference is not the data. It is **who has to
+read it**.
+
+- `user_state` is **one row per person**, own-only by RLS. Anything in it is visible to the person who wrote it and
+  nobody else. That is exactly right for a preference, a reading position, a consent answer, or a check-in she does
+  for herself before a visit.
+- A child table (`pp_milestone_observations`, `pp_food_tries`) is **one row per child per thing**, readable by every
+  adult in `my_child_ids()`. That is right for a fact about the child that the other parent acts on. Papa giving the
+  first egg at lunch is a fact Maa needs at dinner.
+
+So the question to ask before choosing is not "is it per child?" but "**who has to see it to do the right thing?**"
+If the answer includes the co-parent, it is a child table, and the migration is the price.
+
+**The trade-off, named.** The `user_state` route costs nothing: no migration, no policies, any key. The table costs a
+migration, four RLS policies, a place on the newer-wins guard and on the purge list, and a contract test. It buys
+sharing that RLS enforces, rather than sharing the app would have to fake. Choosing the cheap route for a shared fact
+fails silently: nothing errors, the partner just never sees it.
+
+**The shape, reused, not reinvented.** `pp_food_tries` copies `pp_milestone_observations` column for column where it
+can (`child_id`, a natural key, `user_id`, a date, a note, `updated_at`, `removed_at`). Because the shape matches, the
+store reuses `ChildLogLedger(keyColumn: 'food_id')` and the B11 pull loop unchanged. A new table that matches an old
+one costs one migration; a new table with a new shape costs a new sync path.
+
+## 16rr. Keep the singleton, key the records, point at one (no migration, 2026-10-25)
+
+STAGE-TRANSITIONS F5: the learning space held one child, so a second child of six or more walked into the first
+child's space. It is phone-only by decision, so this is a local data-shape change, not sync work.
+
+### 1. An "open" pointer keeps every reader as it was
+
+Twenty-one files read `SkChildStore.instance.name`, `.band`, `.consented` and so on. There were two ways to make it
+per child:
+- *One instance per child:* every reader would need to be told which child, and every listener re-wired.
+- *One store, a map of records, and an open id (chosen):* every existing getter means "the open child's". Only the
+  places that *choose* a child change (the switch, the turning-six card, the gate, the per-child page). A
+  reader that must ask about a *specific* child uses the `...For(id)` form.
+
+**The trade-off.** The pointer is hidden state. A screen that shows the wrong child is now a bug in whoever opened
+it, not in the screen, so the openers are pinned by a source test. One trap the tests caught: "nobody opened yet,
+so fall back to the first child with a space" is right at launch and wrong after an explicit `open`. An opened
+child with no space must stay open and read empty, or her page shows her brother's space.
+
+### 2. Adopt an orphan only when its owner is provable
+
+16pp said: an entry with no owner is kept, and read only where it can have one owner. Here the old entries *can*
+be given an owner, because before this change there was exactly one space. So the old record is matched to the
+child with its birthday (and name, if two share one), and every untagged entry reads as that child's (`ownerOf`).
+Nothing is rewritten: the tag is derived on read, so a wrong match could be undone without data surgery.
+
+**The general rule:** guessing an owner is a misattribution waiting to happen; *proving* one (there was only one
+place it could have come from) is just a migration done lazily.
+
+### 3. Version the saved shape, and keep the old reader
+
+`sk_child` went from one child's fields to `{v: 2, open, children: {...}}`. The loader reads both shapes, and the
+first save writes v2. The key name is unchanged, so the sign-out wipe list and its test did not move. A new
+shape under the same key is safe only while the old reader stays.

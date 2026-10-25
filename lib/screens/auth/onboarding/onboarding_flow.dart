@@ -3841,13 +3841,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       // before (kept for revert as the only path).
       final dob = _skDob ??
           DateTime(_today().year - _childAge!, _today().month, _today().day);
-      SkChildStore.instance.update(name: _childName.text, dob: dob);
-      await ChildProfileStore.instance.addChild(
+      // The parenting child first, so her learning space is keyed by her id
+      // (F5, 2026-10-25). Kept for revert, the order before:
+      //   SkChildStore.instance.update(name: _childName.text, dob: dob);
+      //   await ChildProfileStore.instance.addChild(...);
+      final skChild = await ChildProfileStore.instance.addChild(
         name: _childName.text,
         isBoy: _childIsBoy ?? true,
         sexGiven: _childIsBoy != null,
         dob: dob,
       );
+      SkChildStore.instance.update(name: _childName.text, dob: dob, childId: skChild.id);
     }
 
     // 4. Reminders — the OS prompt, only because she flipped the switch; and

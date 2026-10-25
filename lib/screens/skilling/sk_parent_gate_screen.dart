@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../post_pregnancy/pp_child_profile.dart' show Child;
 import '../v2/v2_palette.dart';
 import 'sk_bands.dart';
 import 'sk_child_store.dart';
@@ -35,7 +36,11 @@ import 'sk_consent_verifier.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 class SkParentGateScreen extends StatefulWidget {
-  const SkParentGateScreen({super.key, this.onDone});
+  const SkParentGateScreen({super.key, this.onDone, this.child});
+
+  /// The parenting child this space is for (F5, 2026-10-25): the gate fills
+  /// her in and the consent is hers. Null: the open child's space, as before.
+  final Child? child;
 
   /// What to do after consent — usually open the door that was tapped.
   /// Null pops.
@@ -58,11 +63,17 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
   void initState() {
     super.initState();
     final s = SkChildStore.instance;
-    // Editing an existing record, or adopting the parenting child.
-    if (s.dob != null) {
-      _child.text = s.name;
-      _dob = s.dob;
-    } else if (s.suggestion case final sug?) {
+    final c = widget.child;
+    // Editing an existing record, or adopting the parenting child: the
+    // tapped child's, never "the first child of six" (F5). Read by id, not
+    // by opening her space here: opening notifies listeners mid-build. The
+    // consent below opens it.
+    final hadDob = c == null ? s.dob : s.dobFor(c.id);
+    final sugFor = c == null ? s.suggestion : s.suggestionFor(c);
+    if (hadDob != null) {
+      _child.text = c == null ? s.name : s.nameFor(c.id);
+      _dob = hadDob;
+    } else if (sugFor case final sug?) {
       _child.text = sug.name;
       _dob = sug.dob;
       _fromParenting = true;
@@ -121,6 +132,7 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
       name: _child.text.trim(),
       dob: _dob!,
       verification: v,
+      childId: widget.child?.id,
     );
     final pin = _pin.text.trim();
     if (pin.length == 4 && int.tryParse(pin) != null) {

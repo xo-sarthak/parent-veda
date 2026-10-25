@@ -109,6 +109,9 @@ List<FamilyProfile> familyProfilesFrom({
   required String skillingName,
   required DateTime now,
   bool learningOpen = true,
+  // Per child (F5, 2026-10-25): the children whose own space has a yes.
+  // When given, it decides, and [learningOpen] is ignored.
+  Set<String>? learningOpenIds,
 }) {
   final out = <FamilyProfile>[];
   if (stage == LifeStage.tryingToConceive) {
@@ -134,7 +137,7 @@ List<FamilyProfile> familyProfilesFrom({
     // card asks. Kept for revert:
     //   final learning = familyYears(c.dob, now) >= kSkAgeFloor;
     final six = familyYears(c.dob, now) >= kSkAgeFloor;
-    final learning = six && learningOpen;
+    final learning = six && (learningOpenIds?.contains(c.id) ?? learningOpen);
     out.add(FamilyProfile(
         id: c.id,
         kind: FamilyProfileKind.child,
@@ -168,9 +171,13 @@ List<FamilyProfile> familyProfiles() {
         ? PregnancyController.current!.currentWeek
         : null,
     children: kids.hasRealChild ? kids.children : const [],
-    skillingName: SkChildStore.instance.name,
+    // Only a record no parenting child matches gets its own row (F5): the
+    // child onboarding added at the learning space no longer shows twice.
+    // Kept for revert: skillingName: SkChildStore.instance.name,
+    skillingName: SkChildStore.instance.unmatchedName,
     now: DateTime.now(),
-    learningOpen: SkChildStore.instance.consented,
+    // Kept for revert: learningOpen: SkChildStore.instance.consented,
+    learningOpenIds: SkChildStore.instance.consentedIds,
   );
 }
 
@@ -204,6 +211,9 @@ void openFamilyProfile(BuildContext context, FamilyProfile to, FamilyHome here) 
   if (to.kind == FamilyProfileKind.child && to.id != 'skilling') {
     ChildProfileStore.instance.switchTo(to.id);
   }
+  // Her own learning space (F5): opened before the home is drawn, so the
+  // space shows her, and switching between two learning children redraws.
+  if (to.home == FamilyHome.learning) SkChildStore.instance.open(to.id);
   if (to.home == here) return; // the same home redraws for the new child
   if (to.home == _rootHome()) {
     // Back to the stage's own home, which is already underneath.

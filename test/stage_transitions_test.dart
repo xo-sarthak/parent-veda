@@ -467,7 +467,9 @@ void main() {
       expect(LifeStageCopy.fromId('skilling'), LifeStage.skilling,
           reason: 'the faf0f04 relaunch fix');
       expect(finish, contains("if (stage == 'skilling' && _childAge != null) {"));
-      expect(finish, contains('SkChildStore.instance.update(name: _childName.text, dob: dob)'));
+      // Keyed by the parenting child onboarding adds (F5, 2026-10-25); was
+      // 'SkChildStore.instance.update(name: _childName.text, dob: dob)'.
+      expect(finish, contains('SkChildStore.instance.update(name: _childName.text, dob: dob, childId: skChild.id)'));
     });
 
     test('M26 a pregnancy: the dating method decides who owns the date', () {

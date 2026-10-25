@@ -42,6 +42,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/sync_registry.dart';
+import 'sk_child_store.dart';
 
 /// What she did. The only three verbs the keepsake knows.
 enum SkPractice { tried, practisedAgain, made }
@@ -62,7 +63,12 @@ class SkPracticeEntry {
     required this.title,
     required this.kind,
     required this.at,
+    this.child,
   });
+
+  /// Whose space it was done in (F5, 2026-10-25). Null on entries written
+  /// before: those are the one space's, `SkChildStore.ownerOf`.
+  final String? child;
 
   final String doorId;
   final String itemId;
@@ -80,6 +86,7 @@ class SkPracticeEntry {
         'title': title,
         'kind': kind.name,
         'at': at.toIso8601String(),
+        if (child != null) 'child': child,
       };
 
   static SkPracticeEntry? fromJson(Map<String, dynamic> j) {
@@ -94,6 +101,7 @@ class SkPracticeEntry {
       title: (j['title'] ?? '') as String,
       kind: kind,
       at: at,
+      child: j['child'] as String?,
     );
   }
 }
@@ -116,6 +124,8 @@ class SkKeepsakeLine {
 class SkPracticeStore extends ChangeNotifier {
   SkPracticeStore._() {
     SyncRegistry.registerReset(_resetForAccount);
+    // Switching child redraws whatever reads this (F5).
+    SkChildStore.instance.addListener(notifyListeners);
   }
   static final SkPracticeStore instance = SkPracticeStore._();
 
@@ -124,10 +134,14 @@ class SkPracticeStore extends ChangeNotifier {
   final List<SkPracticeEntry> _entries = [];
   bool _loaded = false;
 
+  /// The open child's entries only (F5): a child sees her own practice.
+  Iterable<SkPracticeEntry> get _mine =>
+      _entries.where((e) => SkChildStore.instance.isOpen(e.child));
+
   /// The furthest word for one item, or '' when she has not touched it.
   String wordFor(String doorId, String itemId) {
     SkPractice? furthest;
-    for (final e in _entries) {
+    for (final e in _mine) {
       if (e.doorId != doorId || e.itemId != itemId) continue;
       if (furthest == null || e.kind.index > furthest.index) furthest = e.kind;
     }
@@ -137,7 +151,7 @@ class SkPracticeStore extends ChangeNotifier {
   /// The keepsake list for a door, most recent first. One line per item.
   List<SkKeepsakeLine> entriesFor(String doorId) {
     final byItem = <String, SkKeepsakeLine>{};
-    for (final e in _entries.where((e) => e.doorId == doorId)) {
+    for (final e in _mine.where((e) => e.doorId == doorId)) {
       final have = byItem[e.itemId];
       byItem[e.itemId] = SkKeepsakeLine(
         itemId: e.itemId,
@@ -152,7 +166,7 @@ class SkPracticeStore extends ChangeNotifier {
   }
 
   /// For the compass: a point lights when a skill has been practised at all.
-  bool hasPractised(String doorId) => _entries.any((e) => e.doorId == doorId);
+  bool hasPractised(String doorId) => _mine.any((e) => e.doorId == doorId);
 
   /// The one write. Append-only.
   void record({
@@ -167,7 +181,15 @@ class SkPracticeStore extends ChangeNotifier {
       title: title,
       kind: kind,
       at: DateTime.now(),
+      child: SkChildStore.instance.openId,
     ));
+    _save();
+    notifyListeners();
+  }
+
+  /// One child's consent withdrawn (F5): her entries go, the others stay.
+  void forgetChild(String childId) {
+    _entries.removeWhere((e) => SkChildStore.instance.ownerOf(e.child) == childId);
     _save();
     notifyListeners();
   }
@@ -210,7 +232,8 @@ class SkPracticeStore extends ChangeNotifier {
             x.doorId == e.doorId &&
             x.itemId == e.itemId &&
             x.kind == e.kind &&
-            x.at == e.at);
+            x.at == e.at &&
+            x.child == e.child);
         if (!dup) _entries.add(e);
       }
     } catch (_) {}

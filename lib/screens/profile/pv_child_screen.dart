@@ -449,15 +449,24 @@ class _PvChildScreenState extends State<PvChildScreen> {
                         icon: Icons.lock_outline_rounded,
                         title: 'Grown-up gate',
                         value: sk.hasPin ? 'PIN set' : 'A sum in words',
+                        // This child's consent and space (F5), not the open
+                        // one's. Kept for revert: sk.consented, and the tap
+                        // without `sk.open(c.id)`.
                         subtitle:
-                            'Consent: ${sk.consented ? 'given' : 'not yet'}',
-                        onTap: () => showPvKeepsakesSheet(context),
+                            'Consent: ${sk.consentedFor(c.id) ? 'given' : 'not yet'}',
+                        onTap: () {
+                          sk.open(c.id);
+                          showPvKeepsakesSheet(context);
+                        },
                       ),
                       PvYouRow(
                         icon: Icons.auto_awesome_outlined,
                         title: 'Her keepsakes',
                         subtitle: 'Journal, photos, voice — on this phone only',
-                        onTap: () => showPvKeepsakesSheet(context),
+                        onTap: () {
+                          sk.open(c.id);
+                          showPvKeepsakesSheet(context);
+                        },
                       ),
                     ],
                   ),
