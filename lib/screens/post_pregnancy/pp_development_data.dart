@@ -10,6 +10,7 @@
 // =============================================================================
 
 import 'pp_grow_activities.dart';
+import 'pp_phase_doc_activities.dart' show kPhaseDocActivities;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -764,6 +765,24 @@ List<DevActivity> activitiesForArea(String areaId) => kDevActivities.where((a) =
   return (lo: lo, hi: hi);
 }
 
+/// ⚠️ ONE POOL, EVERY AGE (Development DV3, 2026-10-25). The 102 activities
+/// of the phase docs (`kPhaseDocActivities`) reached the home's Today and
+/// the Brain tab but never this list, so a 2-to-3-year-old's Activities
+/// screen held four. They join here, after the two older stores, and a
+/// phase-doc activity with the same title and area as one already in the
+/// pool is dropped: the older one has a time and a difficulty, and two cards
+/// of one activity is a list padding itself. `test/pp_development_door_test`
+/// holds at least 12 for every age band and no title twice.
+final List<DevActivity> kDevActivityPool = () {
+  String key(DevActivity a) =>
+      '${a.title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim()}|${a.areaId}';
+  final seen = <String>{};
+  return [
+    for (final a in [...kDevActivities, ...kGrowExtraActivities, ...kPhaseDocActivities])
+      if (seen.add(key(a))) a,
+  ];
+}();
+
 /// Activities that fit a child of [months].
 ///
 /// ⚠️ AN UNPARSEABLE TAG IS INCLUDED, NOT EXCLUDED. A typo in a range must
@@ -806,7 +825,8 @@ List<DevActivity> activitiesForAge(int months) {
   // shaped — a library that stops dead at exactly twelve months is a filter
   // artefact, not an editorial decision.
   final out = <DevActivity>[];
-  for (final a in [...kDevActivities, ...kGrowExtraActivities]) {
+  // Was `[...kDevActivities, ...kGrowExtraActivities]`, kept for revert.
+  for (final a in kDevActivityPool) {
     final r = devAgeRange(a.ageTag);
     if (r == null) {
       out.add(a); // fail open: a bad tag must not hide real content

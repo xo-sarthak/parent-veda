@@ -45,6 +45,7 @@ import '../pp_section_registry.dart';
 import '../pp_section_screen.dart';
 import 'pp_door_carousel.dart';
 import 'pp_door_chrome.dart';
+import 'pp_door_inline_tools.dart';
 import '../../../data/doors/pv_door_data.dart' show PvDoorGroup;
 import '../../../services/pv_search_store.dart';
 import '../../../widgets/pv_feedback.dart';
@@ -666,6 +667,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     //     _railsFor(tab).fold(0, (t, r) => t + r.$2.length) +
     //     (tab.redFlagPageId != null ? 1 : 0);
     final n = _toolsFor(tab).length +
+        // An inline tool's own things: Play today's six (Development D2).
+        (tab.inlineSurfaceId == null ? 0 : ppDoorInlineCount(tab.inlineSurfaceId!)) +
         _extraPagesFor(tab).length +
         _railsFor(tab).fold(0, (t, r) => t + r.$2.length) +
         (_redFlagFor(tab) != null ? 1 : 0);
@@ -726,6 +729,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     final set = section.bandSet;
     if (set == null) return null;
     final band = set.active.label;
+    // ⚠️ A BABY BORN EARLY: SAY WHICH AGE THE DOOR IS READING (Development
+    // DV4). Its bands are on his corrected age, so the hero says so, or a
+    // mother of a four-month-old would wonder why she sees the newborn shelf.
+    final kid = ChildProfileStore.instance;
+    if (set.correctedClock && kid.correctionWeeks != null) {
+      final m = kid.devAgeInMonths;
+      final w = kid.devAgeInWeeks.floor();
+      final age = m < 1
+          ? '$w ${w == 1 ? 'week' : 'weeks'}'
+          : '$m ${m == 1 ? 'month' : 'months'}';
+      return 'Using ${kid.their} corrected age, $age';
+    }
     return door.aboutHer
         ? 'For you  ·  $band'
         : 'For ${ChildProfileStore.instance.nameMid}  ·  $band';
@@ -892,6 +907,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                                 fontSize: 13.5, height: 1.5, color: p.ink2))),
                         const SizedBox(height: kPvDoorBlockGap),
                       ],
+                      // ⚠️ THE TAB'S TOOL, DRAWN IN PLACE (Development D2):
+                      // Play today opens on six activities, not on a card
+                      // that opens them. It pads itself, so it is not
+                      // wrapped in ppDoorPad and its rail runs edge to edge.
+                      if (tab.inlineSurfaceId case final surface?)
+                        if (ppDoorInlineToolFor(surface,
+                                p: p,
+                                onSurface: (id) => widget.onSurface(context, id))
+                            case final tool?) ...[
+                          tool,
+                          const SizedBox(height: kPvDoorBlockGap),
+                        ],
                       for (final (ri, (area, pages)) in rails.indexed) ...[
                         ppDoorPad(Text(area.title,
                             style: pvFraunces(
@@ -1018,6 +1045,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                               fontWeight: FontWeight.w500,
                               height: 1.5,
                               color: p.ink2))),
+                      const SizedBox(height: kPvDoorBlockGap),
+                    ],
+
+                    // The tab's one shop card, after every free thing, its
+                    // copy first (Development D6, PpDoorTab.shop).
+                    if (tab.shop case final shop?) ...[
+                      ppDoorPad(_ShopCard(
+                        key: const ValueKey('pp_door_tab_shop'),
+                        p: p,
+                        shop: shop,
+                        onTap: () => widget.onSurface(context, shop.surfaceId),
+                      )),
                       const SizedBox(height: kPvDoorBlockGap),
                     ],
 
@@ -2165,6 +2204,57 @@ class _ExpertRow extends StatelessWidget {
               ),
               Icon(Icons.chevron_right_rounded, color: p.ink1),
             ]),
+          ),
+        ),
+      );
+}
+
+/// A tab's shop card (`PpDoorTab.shop`): the copy, then the label. An
+/// outlined aside, never the grey offer card, so it does not read as a
+/// second consult.
+class _ShopCard extends StatelessWidget {
+  const _ShopCard({
+    super.key,
+    required this.p,
+    required this.shop,
+    required this.onTap,
+  });
+  final V2Palette p;
+  final PpDoorClosing shop;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: p.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: p.line),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(shop.blurb,
+                      style: pvManrope(
+                          fontSize: 13.5, height: 1.45, color: p.ink2)),
+                  const SizedBox(height: 6),
+                  Row(children: [
+                    Icon(Icons.card_giftcard_outlined, size: 18, color: p.ink1),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(shop.label,
+                          style: pvManrope(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w800,
+                              color: p.ink1)),
+                    ),
+                    Icon(Icons.chevron_right_rounded, color: p.ink1),
+                  ]),
+                ]),
           ),
         ),
       );

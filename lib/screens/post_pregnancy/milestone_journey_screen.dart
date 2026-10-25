@@ -17,7 +17,8 @@ import 'pp_child_profile.dart';
 import '../v2/v3_dev_mark.dart' show DevMark, V3DevMark;
 import '../../brand/brand_models.dart';
 import '../../brand/presented_by.dart';
-import 'development_area_screen.dart';
+// import 'development_area_screen.dart'; // kept for revert with the Look closer tap
+import 'development_all_activities_screen.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_milestones_data.dart';
@@ -773,7 +774,15 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
     return PvPress(child: GestureDetector(
       onTap: () {
         Navigator.of(ctx).pop();
-        Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => DevelopmentAreaScreen(area: area)));
+        // ⚠️ WAS THE AREA SCREEN, WHICH SINCE WAVE 5B IS THE WHOLE
+        // DEVELOPMENT DOOR: Milestones is opened from that door, so the tap
+        // stacked the door on itself (door plan 04, D3). It opens this
+        // area's activities now, the "small things that help" the line
+        // promises. Kept for revert:
+        // Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => DevelopmentAreaScreen(area: area)));
+        Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: RouteSettings(name: 'pp_activities/${area.id}'),
+            builder: (_) => DevelopmentAllActivitiesScreen(area: area.id)));
       },
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -784,7 +793,9 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Look closer at ${area.name.toLowerCase()}', style: ppJakarta(14)),
               const SizedBox(height: 3),
-              Text('Skills in this area so far, what is coming, and small things that help.', style: ppBody(12, color: ppMuted, h: 1.4)),
+              // Was 'Skills in this area so far, what is coming, and small
+              // things that help.' (the door's area page).
+              Text('Small things to do together for this area, at this age.', style: ppBody(12, color: ppMuted, h: 1.4)),
             ]),
           ),
           const SizedBox(width: 8),

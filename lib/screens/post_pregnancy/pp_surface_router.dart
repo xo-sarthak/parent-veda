@@ -50,6 +50,12 @@ import 'pp_chart_browser_screen.dart';
 import 'products_compare_screen.dart';
 // import 'pp_products_data.dart' show ppPreloadCompare; // kept for revert
 import '../../data/products/pv_catalog_adapters.dart' show pvSlug;
+import '../../data/products/pv_sheet_products.dart'
+    show SheetToy, kSheetToyCategoryId, sheetToySubId;
+import '../../data/products/sheet/toys.dart' show kSheetToys;
+import 'learning_detail_screen.dart' show LearningDetailScreen;
+import 'pp_child_profile.dart' show ChildProfileStore;
+import 'pp_learning_data.dart' show kLearningPrograms, programById;
 import '../../services/pv_catalog_store.dart';
 import '../../widgets/pv_toast.dart';
 import '../products/pv_shelf_screen.dart' show PvShelfScreen;
@@ -144,7 +150,8 @@ const Map<String, String> kPpNearestExpert = {
   'Developmental paediatrician': 'Pediatrician',
   'Feeding therapist': 'Speech therapist',
   'Occupational therapist': 'Special needs expert',
-  'Paediatric physio': 'Physiotherapist',
+  // Was 'Physiotherapist': her postnatal physios, never a baby's (DV7).
+  'Paediatric physio': 'Pediatrician',
 };
 
 /// ⚠️ THE OWED SPECIALISTS, IN WORDS A PARENT READS (Health H5, 2026-10-25).
@@ -162,6 +169,8 @@ const Map<String, String> kPpOwedExpertPlural = {
   'Allergist': "children's allergy doctors",
   'Chest': "children's chest doctors",
   'Hormone': "children's hormone doctors",
+  // Development's Sit, crawl, walk row and the movement-signs page (DV7).
+  'Paediatric physio': 'paediatric physios',
 };
 
 /// ⚠️ A SHELF THAT IS NOT OURS TO STOCK YET, SAID PLAINLY (Health §11). For
@@ -199,7 +208,29 @@ const Map<String, (String, String)> kPpJoiningSoon = {
         'today.',
     'Gynecologist',
   ),
+  // Development's On track row (DV7): the developmental paediatricians are
+  // placeholder profiles until real people join.
+  'Development expert': (
+    'Our developmental paediatricians are joining soon. A paediatrician can '
+        'check this first.',
+    'Pediatrician',
+  ),
 };
+
+/// "Toys for this age" (Development DV6). `pp_toys/<category>` opens one
+/// kind, by the toy sheet's own category name.
+const String kPpToys = 'pp_toys';
+
+/// The toys the sheet gives an age that fits his (corrected) age. A toy with
+/// no age on the sheet suits every child and is not counted: "toys for this
+/// age" must mean toys someone picked for it.
+List<SheetToy> ppToysForAge([int? months]) {
+  final m = months ?? ChildProfileStore.instance.devAgeInMonths;
+  return [
+    for (final t in kSheetToys)
+      if (t.ageMin != null && t.ageMax != null && m >= t.ageMin! && m <= t.ageMax!) t,
+  ];
+}
 
 /// The card "10 minutes for you today" on You, Maa's Today tab (M1).
 const String kPpMaaTenMinutes = 'pp_maa_ten_minutes';
@@ -252,6 +283,24 @@ String? ppSurfaceUnavailable(String id) {
     if (stocked) return null;
     return kPpShelfNotYet[shelf] ??
         "We're still choosing good ${shelf.toLowerCase()}. They'll be in the Store soon.";
+  }
+  // Toys for his age (Development DV6, S8c). An age with no toy picked says
+  // so, and points at the house instead of an empty shelf.
+  if (id == kPpToys && ppToysForAge().isEmpty) {
+    return "We're still choosing toys for this age. Everyday things at home "
+        'work just as well.';
+  }
+  const toysPrefix = '$kPpToys/';
+  if (id.startsWith(toysPrefix) &&
+      !kSheetToys.any((t) => t.category == id.substring(toysPrefix.length))) {
+    return "We're still choosing toys for this age. Everyday things at home "
+        'work just as well.';
+  }
+  // A course by id (S8d): one that does not exist says so.
+  const learnPrefix = 'pp_learn/';
+  if (id.startsWith(learnPrefix) &&
+      !kLearningPrograms.any((p) => p.id == id.substring(learnPrefix.length))) {
+    return "This course isn't open yet. We're adding it to ParentVeda soon.";
   }
   const classPrefix = 'pp_class/';
   if (id.startsWith(classPrefix)) {
@@ -382,6 +431,29 @@ Widget? ppScreenForSurface(String id) {
       return const YogaHomeScreen(backLabel: 'Back');
     }
     return YogaClassScreen(cls: yogaClassById(classId));
+  }
+
+  // ⚠️ `pp_toys` OPENS THE TOY SHELF, `pp_toys/<category>` ONE KIND OF TOY
+  // (Development DV6, 2026-10-25). The shop ranks his age first; an age or
+  // a kind with nothing picked is answered by `ppSurfaceUnavailable` (S8c).
+  if (id == kPpToys) {
+    return const PvShelfScreen(categoryId: kSheetToyCategoryId);
+  }
+  if (id.startsWith('$kPpToys/')) {
+    final kind = id.substring(kPpToys.length + 1);
+    final toy = kSheetToys.where((t) => t.category == kind).firstOrNull;
+    if (toy == null) return null;
+    return PvShelfScreen(categoryId: kSheetToyCategoryId, subId: sheetToySubId(toy));
+  }
+
+  // ⚠️ `pp_learn/<programId>` OPENS ONE COURSE (Development DV7). "Play and
+  // Brain" opened the whole Learn home; a course that is opening soon opens
+  // its own page, which says so and offers Reserve.
+  const learnPrefix = 'pp_learn/';
+  if (id.startsWith(learnPrefix)) {
+    final pid = id.substring(learnPrefix.length);
+    if (!kLearningPrograms.any((p) => p.id == pid)) return null;
+    return LearningDetailScreen(program: programById(pid));
   }
 
   // ⚠️ "10 MINUTES FOR YOU TODAY" OPENS THE SESSION FOR HER WEEK (You, Maa

@@ -83,9 +83,13 @@ void main() {
   });
 
   group('fix 3: the skip link', () {
-    test('"things worth skipping" opens the guides, where skipping lives', () {
-      final l = _links('parenting_development').firstWhere((l) => l.label.contains('worth skipping'));
-      expect(l.surfaceId, 'pp_product_guide');
+    // ⚠️ REPLACED BY DEVELOPMENT DV6 (door plan 04, 2026-10-25): the walking
+    // page's one buying link opens the toys for moving, and still says the
+    // skip in its own words. Was: "things worth skipping" -> pp_product_guide.
+    test('the walking page\'s buying link opens the moving toys and still says skip the walker', () {
+      final l = _links('parenting_development').firstWhere((l) => l.label.contains('not walkers'));
+      expect(l.surfaceId, 'pp_toys/Gross Motor');
+      expect(l.blurb, contains('seated walker does not'));
     });
   });
 

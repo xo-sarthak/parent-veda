@@ -1,6 +1,6 @@
 # Door 4: Development, the plan
 
-Written 2026-10-24. **Status: final. DV1 to DV8 answered yes by the user 2026-10-24. DV2's look approved 2026-10-24 (`claude.ai/artifact/1bsFmZ4i5SRg8oiQFyeHHR`, v2), with one change: the tab "When will my baby..." is renamed "Sit, crawl, walk", which says at a glance what the tab holds and is never cut off (DV9). Built 2026-10-24 with the other cut-off names.** The new page copy is in `04-development-content.md`. Nothing in `lib/` changes until step 0 and the user's go. Shell rule S8 (no silent tap) is in `00-MASTER.md`.
+Written 2026-10-24. **Status: final. DV1 to DV8 answered yes by the user 2026-10-24. DV2's look approved 2026-10-24 (`claude.ai/artifact/1bsFmZ4i5SRg8oiQFyeHHR`, v2), with one change: the tab "When will my baby..." is renamed "Sit, crawl, walk", which says at a glance what the tab holds and is never cut off (DV9). Built 2026-10-24 with the other cut-off names.** **Door built 2026-10-25; what differs from this plan, and why, is in §12.** The new page copy is in `04-development-content.md`. Nothing in `lib/` changes until step 0 and the user's go. Shell rule S8 (no silent tap) is in `00-MASTER.md`.
 
 ## Context
 Development is an action door, but it opens like a test. The door definition is `lib/data/doors/pp_door_development.dart` and its content is `pp_development_content.dart`, with 33 pages, none thin and all tagged. The age groups are `kPpDevelopmentBands`: 0–6 months, 6–12 months, 1–2 years, 2–3 years and 3–5 years.
@@ -180,3 +180,33 @@ From `research/questions/ranked_parenting.csv`. DV1 stands: Play today first, mi
 | DV8 | A new movement-signs page, the M-CHAT line, the phases rewrite? | Yes | **Yes** (2026-10-24) |
 | DV9 | Rename "When will my baby..." so it is never cut off? | "Sit, crawl, walk", then "Sit, crawl, walk" | **Asked for by the user** (2026-10-24, on the DV2 look). "Sit, crawl, walk" was offered; the user: "swap the name ... something that is understandable in the very first glance and does not get the dotted situation". Now "Sit, crawl, walk" (mockup v3, built in `pp_door_development.dart`). Rule for every door: a tab or card name is complete, never ends in "...", and fits the tool card in two lines (about 14 characters) |
 | DV10 | Link `dev_speech_by_age` and `dev_speech_flags` to Special care's "Not talking yet" and "Speech therapy and the other therapies, explained" (SC2), and Early learning's "Help him talk" (EL1), by page (M4) | Speech is this topic's biggest worry (≈400), and the next steps live in two other doors | **Yes**, chosen and recorded. Added by the demand re-check, 2026-10-25 |
+
+## 12. As built (2026-10-25)
+Held by `test/pp_development_door_test.dart` (23 tests, "door 4: the plan, held" among them): the four tabs and their order per band, every area placed, On track's reads and tools in order, the shelf on Play today, tummy time for the first year, an expert or class on every tab and each one answered, the toy links (three pages, one each, never on a worry page), the movement-signs page and its order (doctor box, then the specialist), the M-CHAT line, the phases rewrite with no "leap" in it, no link that reopens the door, the NICU papers on the records page, 12 or more activities per band and a full shelf every month, today's six (his age only, the same all day, new tomorrow), corrected age, and the first view at 1, 7, 15, 30 and 48 months.
+
+**The shell, new for this door and open to every door:**
+- `PpDoorTab.inlineSurfaceId` draws a tool in place as the tab's first block, resolved by `ppDoorInlineToolFor` (`doors/pp_door_inline_tools.dart`, the parenting twin of the pregnancy door's). It pads itself, so its rail runs edge to edge. The tab card's count includes its things (`ppDoorInlineCount`).
+- `PpDoorTab.shop` is the tab's one shop card, at the foot after every free thing, copy first, in an outlined card so it never reads as a second consult.
+- `PpBandSet.correctedClock` (DV4): a band set that reads `ChildProfileStore.devAgeInWeeks`. Development's set only; vaccines, growth and every other section stay on the birthday. The hero reads "Using his corrected age, 3 months" when it applies.
+
+**The router:** `pp_toys` and `pp_toys/<sheet category>` open the toy shelf ranked for his age (S8c says "We're still choosing toys for this age. Everyday things at home work just as well." for an age or kind with nothing picked; `ppToysForAge` counts only toys the sheet gave an age). `pp_learn/<programId>` opens one course (S8d for an unknown id; an opening-soon course opens its own Reserve page). `Development expert` joins `kPpJoiningSoon` (placeholders only, pill to a paediatrician), and a `Paediatric physio` now points at a paediatrician, not her postnatal physio, with its own plural.
+
+**The pool (DV3):** `kDevActivityPool` is the three stores in one list, a phase-doc activity with the same title and area as an older one dropped. `activitiesForAge` reads it, so the Activities screen and the shelf share it.
+
+**A bug found and fixed on the way:** Milestones' "Look closer at ..." pushed `DevelopmentAreaScreen`, which since Wave 5b is the whole Development door, and Milestones is opened from that door. So the tap stacked the door on itself. The general point: a facade that turns an old screen into a new one is right for every caller except one that the new screen itself opens. It opens that area's activities now.
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| D1: On track holds "Something has changed (the tool, plus the orphan area)" | The tool only | The area was not orphaned: the user deleted it as a duplicate of the tool ("please delete, it is anyways there as tool"), and it is commented out in the content file. Bringing it back would undo that call |
+| D3: milestones "Explore by area" opens On track | It opens that area's activities | Milestones is opened from On track, so On track would still be the door opening itself. The button's own line promises "small things that help" |
+| D3: "every age group has at least 12" | Every band has 12 or more; every month has at least 7, so the six-card shelf is always full | Month 14 has 10. The rule is per age group, and the test holds both |
+| D2 mockup note: "the build adds a time to each" phase-doc activity | Shown without a time ("MOVING") | The docs give no duration, and the pool's rule is that nothing is invented. Owed DV6 |
+| D5: a painting for every activity, 12 demo films, a door intro | None made; logged as owed DV1 to DV3 | Paintings are the user's pipeline; films show no slot until one exists (S4). The cards show the area's line mark meanwhile |
+| D7: the developmental paediatrician row | "Joining soon", pill to a paediatrician | Placeholder profiles only, the You, Maa rule (M6) |
+| DV10: speech pages link Special care and Early learning by page | Not linked; owed DV7 | Those pages are built with doors 12 and 9 and do not exist yet. A link now would land on a notice |
+| D9: S8b toast "See one" | The router's "See them" pill | One words list for every owed expert |
+| §10 / D11: a Mobbin check and a prototype | Not run again | The DV2 look (v2, renamed v3) is the approved layout; nothing was laid out beyond it |
+| D11: Play today checks in `pp_doors_first_view_test` | In `pp_development_door_test` | Each built door holds its own first view, as Feeding, Health and You, Maa do |
+
+**Owed, not in this build:** the paintings and films (DOOR-CONTENT-OWED DV1 to DV3), the two people (DV4, DV5), phase-doc times (DV6), the DV10 links (DV7), and a developmental paediatrician's or paediatric physio's read of every `REQUIRED_REVIEW` line (`BEFORE-LAUNCH.md`).

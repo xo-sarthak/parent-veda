@@ -164,7 +164,24 @@ class PpDoorTab {
     this.ageRail = const {},
     this.closing,
     this.dueLine,
+    this.inlineSurfaceId,
+    this.shop,
   });
+
+  /// ⚠️ A TOOL DRAWN IN PLACE, AS THE TAB'S FIRST BLOCK (Development D2,
+  /// look approved 2026-10-24). Play today opens on six activities for his
+  /// age, not on a card that opens a list of them: a card in front of the
+  /// thing the tab is for is a door in front of a door (the pregnancy
+  /// door's `inlineSurfaceId`, same reasoning). The door screen resolves the
+  /// id (`ppDoorInlineToolFor`); the tool lays out its own gutter so its
+  /// rail runs edge to edge. Null: the tab opens on its rails.
+  final String? inlineSurfaceId;
+
+  /// ⚠️ THE TAB'S ONE SHOP CARD, COPY FIRST (Development D6). Drawn at the
+  /// foot, after every free thing, with `note` above the label: "You don't
+  /// need to buy anything." A shelf card in a rail would read as one more
+  /// thing to do; this reads as an aside. Null: no shop on the tab.
+  final PpDoorClosing? shop;
 
   /// ⚠️ A FIRST RAIL PICKED FOR HIS AGE (Health plan H-M1 / H2, look approved
   /// 2026-10-24). Band id → the pages a parent of that age needs first. The

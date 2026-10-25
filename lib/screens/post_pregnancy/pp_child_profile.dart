@@ -884,6 +884,15 @@ class ChildProfileStore extends ChangeNotifier {
     return weeks <= 0 ? 0 : (weeks / 4.345).floor();
   }
 
+  /// [devAgeInMonths] in weeks, for a band set on the corrected clock
+  /// (`PpBandSet.correctedClock`, Development DV4).
+  double get devAgeInWeeks {
+    final c = correctionWeeks;
+    if (c == null) return ageInWeeks;
+    final w = ageInWeeks - c;
+    return w > 0 ? w : 0;
+  }
+
   /// "8 months (6 months corrected)", or the plain label.
   String get ageLabelWithCorrection =>
       correctionWeeks == null ? ageLabel : '$ageLabel ($devAgeInMonths months corrected)';

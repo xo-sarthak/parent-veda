@@ -104,7 +104,9 @@ const PpBandSet kPpDevelopmentBands = PpBandSet([
     toMonths: 72,
     blurb: 'Stories, questions, friendships, and getting understood.',
   ),
-]);
+  // Corrected age for a baby born early, under two (DV4, 2026-10-25): the
+  // door's bands now agree with his milestones and checklist.
+], correctedClock: true);
 
 /// Every band. Written once so a page that genuinely belongs everywhere says so
 /// by name instead of by an empty list that could equally mean "not tagged yet".
@@ -269,7 +271,8 @@ final PpSection kPpDevelopmentSection = PpSection(
                 surfaceId: 'pp_milestones',
                 blurb: 'Everything emerging now, grouped by area.'),
             PpLink('Small things you can do for each area',
-                surfaceId: 'pp_development',
+                // Was 'pp_development', which opens this door again (DV3).
+                surfaceId: 'pp_activities',
                 blurb: 'Matched to where your child is today.'),
           ],
         ),
@@ -376,6 +379,91 @@ final PpSection kPpDevelopmentSection = PpSection(
                   'It’s a way to find the children who would gain from help '
                   'early. Ask your paediatrician for one.',
             ]),
+            // DV7 (2026-10-25): the therapists next to the worry, and the
+            // free route in India. One source: Special care's page, by id.
+            PpLink('Therapists who work with young children',
+                surfaceId: 'pp_experts/Special needs expert',
+                blurb: 'Occupational therapists and special educators, by '
+                    'video call.'),
+            PpLink('Free help in India: RBSK and early intervention centres',
+                surfaceId: 'pp_page/parenting_special_care/sc_help_india',
+                blurb: 'What the government programme offers, and how to be '
+                    'referred.'),
+          ],
+        ),
+
+        // ---------------------------------------------------------------------
+        // DV8 (2026-10-25), copy from `04-development-content.md` §1. Every
+        // clinical line is REQUIRED_REVIEW: a developmental paediatrician or
+        // a paediatric physio reads them before release (BEFORE-LAUNCH).
+        // Never a diagnosis; no product and no class on this page.
+        PpPage(
+          id: 'dev_movement_signs',
+          title: 'Movement signs worth showing a doctor',
+          subtitle: 'Stiff or floppy, fisted hands, one side, a lost skill',
+          format: 'FLAGGED CALLOUT',
+          bands: _all,
+          blocks: [
+            PpIntro('Babies move in their own time, and the range is wide. A '
+                'few signs are worth showing a doctor early, not because '
+                'something is wrong, but because if help is needed, starting '
+                'sooner makes a real difference. If he was born early, count '
+                'from his due date, not his birthday.'),
+            // REQUIRED_REVIEW: the ages below.
+            PpCards([
+              PpCard('His body feels very stiff, or very floppy',
+                  'He stiffens and arches when you pick him up, or slips '
+                      'through your hands like a rag doll.'),
+              PpCard('His hands stay tightly fisted after 4 months',
+                  'Most of the time, even when he is calm.'),
+              PpCard('He uses one side much more than the other before his '
+                  'first birthday',
+                  'He always reaches with the same hand, or one arm or leg '
+                      'moves much less. Babies don’t pick a favourite hand '
+                      'this early.'),
+              PpCard('He isn’t sitting on his own by 9 months',
+                  'Or isn’t bearing weight on his legs when held standing by '
+                      '12 months.'),
+              PpCard('He isn’t walking by 18 months', 'Mention it at the next '
+                  'visit, or book one sooner.'),
+              PpCard('He loses a skill he had',
+                  'He could roll or sit, and now he can’t. This one is worth a '
+                      'doctor this week, at any age.'),
+            ], heading: 'Show your doctor if you notice', hue: 160),
+            PpArticle([
+              // REQUIRED_REVIEW
+              'Most babies who are slow on one of these catch up, and many '
+                  'simply move in their own way. The doctor’s job is to look '
+                  'properly. Yours is only to notice and mention it.',
+              'If the doctor wants a closer look, they may ask a paediatric '
+                  'physiotherapist or a developmental paediatrician to see '
+                  'him. Physiotherapy for babies is play: a physio shows you '
+                  'games that help, and you do them at home.',
+              'Bring a short phone video of what worries you. It shows the '
+                  'doctor in ten seconds what is hard to describe.',
+            ]),
+            PpIndiaNote('Under the RBSK programme, District Early Intervention '
+                'Centres (DEICs) at district hospitals check and support '
+                'children from birth to 6 years, free. Your paediatrician, '
+                'ASHA or anganwadi worker can refer you.'),
+            PpCallout(
+              'If you have noticed any of these, mention it at the next visit, '
+                  'or book one sooner. If he has lost a skill, see a doctor '
+                  'this week.',
+              kind: PpCalloutKind.doctor,
+            ),
+            // The specialist row, after the doctor box. No paediatric physio
+            // category yet: the tap says so and offers a paediatrician (S8b).
+            PpConsult(
+              title: 'A paediatric physio can show you games that help',
+              whoFor: 'Video call. For a parent whose doctor has suggested '
+                  'physiotherapy, or who wants to know which games help.',
+              surfaceId: 'pp_experts/Paediatric physio',
+            ),
+            PpLink('Free help in India',
+                surfaceId: 'pp_page/parenting_special_care/sc_help_india',
+                blurb: 'RBSK and the District Early Intervention Centres.'),
+            PpLink('If your baby was born early', pageId: 'dev_born_early'),
           ],
         ),
 
@@ -425,7 +513,8 @@ final PpSection kPpDevelopmentSection = PpSection(
                 'It’s plain arithmetic, the same arithmetic the charts were '
                 'built on.'),
             PpLink('Keep the NICU papers and follow-up notes together',
-                surfaceId: 'pp_health',
+                // Was 'pp_health', which opens What changed (DV3).
+                surfaceId: 'pp_page/parenting_health/rec_wallet',
                 blurb: 'Health records hold the discharge summary and visit '
                     'notes.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
@@ -764,6 +853,10 @@ final PpSection kPpDevelopmentSection = PpSection(
             PpLink('Movement activities for this age',
                 surfaceId: 'pp_activities/gross_motor',
                 blurb: 'Floor play and movement activities for this age.'),
+            // DV7: the course, by id.
+            PpLink('Motor Skills, a short course',
+                surfaceId: 'pp_learn/rc_motor',
+                blurb: 'From tummy time to first steps.'),
           ],
         ),
 
@@ -926,10 +1019,19 @@ final PpSection kPpDevelopmentSection = PpSection(
               title: 'When walking is worth a check',
             ),
             // [fix] "skip this" lives behind the guides door, not the grid.
-            PpLink('Things worth buying, and things worth skipping',
-                // surfaceId: 'pp_recos',
-                surfaceId: 'pp_product_guide',
-                blurb: 'A push toy is on the list. A seated walker is not.'),
+            // The generic guide, replaced by the toys for moving (DV6).
+            // Kept for revert:
+            // PpLink('Things worth buying, and things worth skipping',
+            //     // surfaceId: 'pp_recos',
+            //     surfaceId: 'pp_product_guide',
+            //     blurb: 'A push toy is on the list. A seated walker is not.'),
+            PpLink('Toys for moving: push toys, not walkers',
+                surfaceId: 'pp_toys/Gross Motor',
+                blurb: 'A push toy helps. A seated walker does not.'),
+            // DV7: the course, by id.
+            PpLink('Motor Skills, a short course',
+                surfaceId: 'pp_learn/rc_motor',
+                blurb: 'From tummy time to first steps.'),
           ],
         ),
 
@@ -1241,7 +1343,8 @@ final PpSection kPpDevelopmentSection = PpSection(
                 surfaceId: 'pp_activities',
                 blurb: 'The full set, filterable by what you want to work on.'),
             PpLink('A masterclass on play and early development',
-                surfaceId: 'pp_courses',
+                // By id (DV7): was 'pp_courses', the whole Learn home.
+                surfaceId: 'pp_learn/rc_playbrain',
                 blurb: 'The same ideas, taught properly, if you want to go '
                     'deeper than a page.'),
           ],
@@ -1374,10 +1477,12 @@ final PpSection kPpDevelopmentSection = PpSection(
                 'Household objects have an advantage besides price: they '
                 'are the real things children see adults using, which is '
                 'exactly why they want them.'),
-            PpLink('Something new to try this week',
-                surfaceId: 'pp_development',
-                blurb: 'The app picks activities for your child’s age, '
-                    'and changes them with each new stage.'),
+            // Opened this door again (DV3). Today's pick is the Play today
+            // shelf; the link below opens every activity. Kept for revert:
+            // PpLink('Something new to try this week',
+            //     surfaceId: 'pp_development',
+            //     blurb: 'The app picks activities for your child’s age, '
+            //         'and changes them with each new stage.'),
             PpLink('The full activity list, by area',
                 surfaceId: 'pp_activities',
                 blurb: 'Movement, hands, talking, thinking, feelings, and '
@@ -1449,6 +1554,9 @@ final PpSection kPpDevelopmentSection = PpSection(
             PpLink('More activities like these',
                 surfaceId: 'pp_activities',
                 blurb: 'Sorted by what they build.'),
+            PpLink('Sensory toys for this age',
+                surfaceId: 'pp_toys/Sensory Play',
+                blurb: 'Only if you want one. A bowl of rice does the same.'),
           ],
         ),
 
@@ -1529,6 +1637,38 @@ final PpSection kPpDevelopmentSection = PpSection(
           ],
         ),
         */
+        // ⚠️ REWRITTEN AS PHASES (DV8, 2026-10-25), copy from
+        // `04-development-content.md` §3. Same id, so old links land. The
+        // leaps text above stays commented out; this one names no leap, no
+        // week and no calendar. REQUIRED_REVIEW
+        PpPage(
+          id: 'dev_leaps_lens',
+          title: 'Fussy patches and new skills',
+          format: 'SHORT ARTICLE',
+          bands: _firstTwoYears,
+          blocks: [
+            PpIntro('Many parents notice that a few days of clinginess, poor '
+                'sleep and crying come just before he does something new. '
+                'ParentVeda shows these as phases on his phase map: a stretch '
+                'of change, not a fixed date on a calendar.'),
+            PpArticle([
+              'Babies don’t follow a timetable. A fussy patch might come a '
+                  'week earlier or later than another baby’s, or not show at '
+                  'all, and both are normal.',
+              'In a fussy patch: more holding, more feeding, an earlier '
+                  'bedtime, and less going out. It passes.',
+            ]),
+            PpCallout(
+              'If the crying is new and comes with fever, poor feeding, '
+                  'vomiting or a change in how he moves, that’s not a phase. '
+                  'See a doctor.',
+              kind: PpCalloutKind.doctor,
+            ),
+            PpLink('Your child’s phases',
+                surfaceId: 'pp_leaps',
+                blurb: 'The phase map, birth to five.'),
+          ],
+        ),
       ],
     ),
 
@@ -1824,6 +1964,15 @@ final PpSection kPpDevelopmentSection = PpSection(
             PpLink('Books to read together',
                 surfaceId: 'pp_read',
                 blurb: 'Reading picks in ParentVeda Learn.'),
+            PpLink('Picture books and word toys for this age',
+                surfaceId: 'pp_toys/Language & Literacy',
+                blurb: 'Board books with real pictures are the best talking '
+                    'toy there is.'),
+            // DV7: the course, by id.
+            PpLink('Language and Communication, a short course',
+                surfaceId: 'pp_learn/rc_language',
+                blurb: 'Narration, back-and-forth and songs, months before '
+                    'the first word.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
             PpCards(heading: 'Baby signs', [
               PpCard('What they are', 'Simple hand signs, like more, milk, all '
@@ -2075,6 +2224,14 @@ final PpSection kPpDevelopmentSection = PpSection(
                 ],
               ],
             ),
+            // DV8 (2026-10-25). REQUIRED_REVIEW
+            PpArticle([
+              'At 18 and 24 months your doctor may ask a short set of '
+                  'questions about his play, pointing and talking. It is '
+                  'often called M-CHAT. It is a routine check for every '
+                  'child, not a test he can pass or fail, and most children '
+                  'need nothing more.',
+            ]),
             PpCallout('If your child loses words or skills that were there '
                 'before, at any age, tell your paediatrician soon. That’s '
                 'always worth a check, and never something to wait out.',

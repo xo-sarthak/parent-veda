@@ -90,8 +90,18 @@ class PpBand {
 
 /// A section's ordered bands.
 class PpBandSet {
-  const PpBandSet(this.bands, {this.youngestClock = false});
+  const PpBandSet(this.bands,
+      {this.youngestClock = false, this.correctedClock = false});
   final List<PpBand> bands;
+
+  /// ⚠️ A BABY BORN EARLY IS BANDED BY HIS CORRECTED AGE (Development DV4,
+  /// 2026-10-25). The milestones, the checklist and the check-in already
+  /// read `ChildProfileStore.devAgeInMonths`; the door's own bands read his
+  /// birthday, so a baby born at 32 weeks was on the 6-to-12-month shelf at
+  /// four months while his milestones said two. True for Development's set
+  /// only: vaccines, growth and every other section stay on the birthday,
+  /// as paediatricians do.
+  final bool correctedClock;
 
   /// ⚠️ THE CLOCK FOLLOWS HER LATEST BIRTH, NOT THE CHILD ON SCREEN (You,
   /// Maa M2). True for the mother's bands only: her recovery is measured
@@ -102,7 +112,9 @@ class PpBandSet {
   /// The weeks this set measures today.
   double get clockWeeks => youngestClock
       ? ChildProfileStore.instance.youngestAgeInWeeks
-      : ChildProfileStore.instance.ageInWeeks;
+      : correctedClock
+          ? ChildProfileStore.instance.devAgeInWeeks
+          : ChildProfileStore.instance.ageInWeeks;
 
   /// The band for an age in weeks. Same fallbacks as [bandFor].
   PpBand bandForWeeks(double weeks) {

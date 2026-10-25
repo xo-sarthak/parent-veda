@@ -159,7 +159,7 @@ final PpSection kPpEarlyLearningSection = PpSection(
       label: 'Where your child is right now',
       blurb: 'Milestones, speech and what usually comes next. Kept in one '
           'place so nothing here has to guess.',
-      surfaceId: 'pp_development',
+      surfaceId: 'pp_milestones', // was 'pp_development', which opens the Development door (DV3)
       icon: Icons.timeline_outlined,
     ),
     PpSectionTool(
@@ -2046,7 +2046,7 @@ const PpArea _montessori = PpArea(
             'and most intense between one and three.'),
         PpLink(
           'What is developing at your child\'s age right now',
-          surfaceId: 'pp_development',
+          surfaceId: 'pp_milestones', // was 'pp_development', which opens the Development door (DV3)
           blurb: 'Milestones and leaps, which often explain the current phase.',
         ),
         PpConsult(
@@ -6172,7 +6172,7 @@ const PpArea _school = PpArea(
         ),
         PpLink(
           'Where your child is developmentally',
-          surfaceId: 'pp_development',
+          surfaceId: 'pp_milestones', // was 'pp_development', which opens the Development door (DV3)
           blurb: 'Milestones and speech, kept in one place.',
         ),
       ],
