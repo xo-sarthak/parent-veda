@@ -1536,7 +1536,7 @@ offsets; kind and `none` round-trip; leaving saves; no seeded saves; the cloud i
 ## Step 23: the Other tools: a vote she can take back, a chosen name she gives to the child, a timer that outlives a stop
 
 **Date:** 2026-10-26 (parenting tools pass, the Other family 29-33; the user's rule: "make sure the back ends are
-working well"). **Migration:** none. **Commit:** pending.
+working well"). **Migration:** none. **Commit:** `a224492`.
 
 ### Why
 Baby names had a backend that worked and a front end that could not use it. A liked name could not be un-liked

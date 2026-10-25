@@ -18,7 +18,7 @@ The user asked (2026-10-25) for the last family to be done the same way as the o
   - 23 silent taps
   - a sleep timer that a stop quietly clears
 
-**Status: BUILT 2026-10-26, see "As built" at the foot.**
+**Status: BUILT 2026-10-26, committed `a224492`, see "As built" at the foot.**
 
 **Door check.** No built door has fixed any of these yet. Three approved but unbuilt door decisions cover parts of them: Behaviour **BH2**, Sleep **SL4** and Early learning **EL7**. The user chose (2026-10-25) to **build those tool-side pieces now**. The door builds later do only the door-side work, and each door plan gets a line saying so.
 

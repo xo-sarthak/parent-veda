@@ -34,8 +34,8 @@ One tool at a time; the user says go per tool. Each plan records every decision 
 | 26 | Can I...? | `pp_maa_can_i` | COMMITTED (25-28-you-maa.md) | 96eef2d |
 | 27 | Kegel Care | `pp_kegel` | COMMITTED (25-28-you-maa.md) | 96eef2d |
 | 28 | Yoga & fitness | `pp_yoga` | COMMITTED (25-28-you-maa.md) | 96eef2d |
-| 29 | What to say | `pp_scripts` | BUILT (29-33-other.md); BH2's tool side built here | pending |
-| 30 | Sleep Sounds | `pp_sleep_sounds` | BUILT (29-33-other.md); SL4 built by the Sleep door f471dd4 | pending |
-| 31 | Baby names | `pp_names` | BUILT (29-33-other.md) | pending |
-| 32 | Product guide | `pp_product_guide`, opens the guides | BUILT (29-33-other.md) | pending |
-| 33 | Toys and crayons (was Story books and boxes) | `pp_recos` | BUILT (29-33-other.md); EL7's tool side built here | pending |
+| 29 | What to say | `pp_scripts` | BUILT (29-33-other.md); BH2's tool side built here | a224492 |
+| 30 | Sleep Sounds | `pp_sleep_sounds` | BUILT (29-33-other.md); SL4 built by the Sleep door f471dd4 | a224492 |
+| 31 | Baby names | `pp_names` | BUILT (29-33-other.md) | a224492 |
+| 32 | Product guide | `pp_product_guide`, opens the guides | BUILT (29-33-other.md) | a224492 |
+| 33 | Toys and crayons (was Story books and boxes) | `pp_recos` | BUILT (29-33-other.md); EL7's tool side built here | a224492 |
