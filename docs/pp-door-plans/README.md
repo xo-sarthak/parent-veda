@@ -15,7 +15,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 | 6 | First 40 Days | `06-first40.md` + `06-first40-content.md` | FD1–FD9 all yes 2026-10-24 (rows mockup `claude.ai/artifact/2BEwbvkimGDbUpNSe987fh`). Plan final; build waits on step 0 |
 | 7 | Sleep | `07-sleep.md` + `07-sleep-content.md` | SL1–SL9 all yes 2026-10-24 (SL9: keep the tab width). Plan final; build waits on step 0. Owed to BEFORE-LAUNCH: the shop sells nests and swings under Sleep |
 | 8 | Behaviour | `08-behaviour.md` + `08-behaviour-content.md` | BH1–BH8 all yes 2026-10-25, recommendations checked against what parents search (colic, hitting, tantrums, screens). Plan final; build waits on step 0 |
-| 9 | Early learning | — | |
+| 9 | Early learning | `09-early-learning.md` + `09-early-learning-content.md` | EL1–EL9 yes 2026-10-25; obvious ones chosen and recorded without a question (the user's call). Hindi rhymes in English letters, folk rhymes only. Plan final; build waits on step 0 |
 | 10 | Traditions | — | |
 | 11 | Safety | — | |
 | 12 | Special care | — | |
@@ -23,6 +23,10 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 | 14 | Papers and money | — | |
 | — | Thin and missing doors | `00-MASTER.md` § Thin and missing | after the doors |
 | — | Home "Today" strip | — | after the doors |
+
+**Owed after all fourteen plans (the user, 2026-10-25):** re-check the plans for doors 1 to 7 against what parents actually search (`research/questions/ranked_parenting.csv`), as doors 8 and 9 were. Change only a recommendation the numbers contradict.
+
+**How decisions are asked from door 9 on (the user, 2026-10-25):** obvious recommendations are chosen and recorded in the plan without a question. Only what is genuinely the user's gets asked.
 
 Update the Status column in the same change that moves a door.
 
