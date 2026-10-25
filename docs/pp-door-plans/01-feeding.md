@@ -1,6 +1,6 @@
 # Door 1: Feeding, the plan
 
-**Status:** plan written 2026-10-23. Not approved, not built.
+**Status:** plan written 2026-10-23, decisions D1–D7 answered. **Built 2026-10-25** (see §12, "As built", for what differs from the plan and why).
 **Master plan:** `00-MASTER.md`. Build only after the master plan's step 0 (the shell fixes) lands, and after the user says go.
 **Files this door touches:**
 - `lib/data/doors/pp_door_feeding.dart` (the door map)
@@ -392,3 +392,31 @@ Shell rule S8 in `00-MASTER.md`: no tap is silent. Every target below is unavail
 | Feeding therapist | picky_not_eating | category missing | S8b → Speech therapist (3) |
 | Allergen tracker (D4) | solids_allergens | not built | On close: "Not saved yet. Remembering what he's tried is coming soon." |
 | Every consult (lactation, nutritionist, paediatrician) | across the door | roster gated | the existing opening-soon page; no toast needed |
+
+## 12. As built (2026-10-25)
+Held by `test/pp_feeding_door_test.dart` ("door 1: the plan, held"): the tab order per band, every page's tags (the §2d table as data, and a new page fails until it has a row), tool ages and places, both pins on Starting solids, the expert rows, consults on problem pages and never on urgent ones, the D2 card under the doctor box, the IMS Act scan, the shelves, the D6 copy, the four demo slots, and the first view at 2, 7, 10, 18 and 30 months.
+
+**The shell (`pp_door_data.dart`, `pp_door_screen.dart`), new for this door and open to every door:**
+- `PpDoorTool.bands`. A tool outside her band leaves the first rail and rides in the first band block at the foot it fits ("Earlier · 0 to 6 months" for the feed timer at 18 months). Reachable, never deleted.
+- `PpDoorTab.expert`. The grey row after the first rail, in the reader's offer-card look. A tab with one ends on the doctor sentence instead of the closing card, as the approved mockup does, so a tab never pitches twice.
+- `PpDoorTab.extraPageIds`. A page from another tab on the first rail, after the tools, for her band.
+- The pinned red flag shows only when its page is in her band. An untagged flag (every other door today) is unchanged.
+- The tab card's count reads what she sees: her band's tools, pages, extra pages and the flag.
+
+**The reader (D2), for every parenting page:** a page's own `PpConsult` is also drawn as the grey card right under its first doctor box (`pvReadOwnConsult`, `PvReadConsultCard` in `pv_read_offer.dart`). The foot tile stays, and the matcher's offer never shows as well (S6). Health and You, Maa plan the same pattern, so it went in once.
+
+**A bug found and fixed on the way:** since the one reader (2026-09-17), `ppPageAsRead` passed a consult's raw `surfaceId` (`pp_experts`), not `PpConsult.surface`, which applies the role. So every parenting consult tile opened the whole roster, the lactation consult included. It reads `b.surface` now (`pp_page_read.dart`). The mechanism is worth keeping: a getter that exists to fix a field does nothing for a caller that reads the field.
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| §3a: a nutritionist consult on `solids_allergens` | Not added | The page is an interactive tracker whose one block is the page (test: "a carousel or interactive page is only its block"), and its closing page is the allergic-reaction page, which is urgent and not sold to. The nutritionist sits on the Starting solids tab row instead |
+| §5: First 40's latch card becomes a reference to `bf_latch` | Not done | First 40's FD4, approved later (2026-10-24), says "First 40 keeps its own newborn version" and adds an "As he grows" link to `bf_latch`. That link is door 6's build. Both pages already share one film slot |
+| §3c / §11: link `co_weaning` from `solids_when` | Not linked | No route opens a single programme, and the router is in another terminal's open work. Owed as `DOOR-CONTENT-OWED` FD13 |
+| §11: a per-page buying tip in the "still choosing" toast | The router's one sentence ("We're still choosing good high chairs. They'll be in the Store soon.") | The toast words live in `pp_surface_router.dart`, held by another terminal. The page's own text carries the tip |
+| §4: door intro video | Not built | S4: no chip until a film exists. Owed as FD9 |
+| §6.6: Mobbin check | Not run | The expert row and its place were approved on the D2 mockup, the user's look call; the tool-on-two-tabs pattern needs no new layout |
+| §6.7: prototype of the 7- and 18-month views | Not made | The D2 mockup is the approved layout; no new layout was introduced beyond it |
+| Expert row "1:1, video" with a price | No price on the row | Prices are server-side and no expert is live; the tap opens "Our first experts are joining" |
+
+**Owed, not in this build:** D4 allergen persistence (its own step); the 26 products and 8 classes of `01-feeding-content.md` A2/A3 (catalogue entries; `DOOR-CONTENT-OWED` FD10–FD12); the clinical read of every `REQUIRED_REVIEW` line; the bottle and steriliser IMS Act read (`BEFORE-LAUNCH.md`).

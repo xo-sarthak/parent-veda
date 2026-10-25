@@ -401,6 +401,34 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
         text: (r) => [r.$1.title, for (final x in r.$2) x.title].join(' '));
   }
 
+  /// The tab's tools for the band it shows (`PpDoorTool.bands`, Feeding plan
+  /// §2c). The rest sit in the band blocks at the foot ([_otherBands]).
+  List<PpDoorTool> _toolsFor(PpDoorTab tab) => [
+        for (final t in tab.tools)
+          if (t.inBand(_bandOf(tab))) t,
+      ];
+
+  /// Pages from another tab drawn on this one (`PpDoorTab.extraPageIds`),
+  /// for the band it shows. Never the tab's own red flag.
+  List<PpPage> _extraPagesFor(PpDoorTab tab) => [
+        for (final id in tab.extraPageIds)
+          if (section.pageById(id) case final x?)
+            if (x.id != tab.redFlagPageId && x.inBand(_bandOf(tab))) x,
+      ];
+
+  /// The tab's pinned red flag, when the page is for the band it shows.
+  /// Mastitis is pinned on Milk feeds while she may still be feeding (to two
+  /// years); for a three-year-old it would be a warning about nothing she
+  /// does (Feeding plan §2d). An untagged page is for every band, so a door
+  /// whose flag has no bands is unchanged.
+  PpPage? _redFlagFor(PpDoorTab tab) {
+    final id = tab.redFlagPageId;
+    if (id == null) return null;
+    final page = section.pageById(id);
+    if (page == null || !page.inBand(_bandOf(tab))) return null;
+    return page;
+  }
+
   /// The other bands of this tab, each with the pages not already shown: the
   /// next band first, then earlier ones, then later ones.
   ///
@@ -409,21 +437,29 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   /// Her band still leads and is the only one open; the next follows open as
   /// "Coming up next"; the rest fold at the foot (PpBandSet.ordered's rule:
   /// reordered, not filtered).
-  List<(PpBand, List<PpPage>, PpBandDistance)> _otherBands(PpDoorTab tab) {
+  ///
+  /// ⚠️ A TOOL OUTSIDE HER BAND GOES TO THE FIRST BLOCK IT FITS (Feeding plan
+  /// §2c, 2026-10-25), so the newborn feed timer is folded under "Earlier"
+  /// for a toddler instead of leading his first rail, and is never gone.
+  List<(PpBand, List<PpPage>, PpBandDistance, List<PpDoorTool>)> _otherBands(
+      PpDoorTab tab) {
     final set = section.bandSet;
     if (set == null) return const [];
     final active = set.active;
     // Measured from the band the tab shows: for a tab for later (S9) that is
     // its own first band, so the one after it is "Coming up next".
     final at = set.bands.indexWhere((b) => b.id == _bandOf(tab));
-    final shown = {for (final r in _bandRailsFor(tab)) for (final x in r.$2) x.id};
+    final shown = {
+      for (final r in _bandRailsFor(tab)) for (final x in r.$2) x.id,
+      for (final x in _extraPagesFor(tab)) x.id,
+    };
     // A page whose title is already on her rails, or is a tool's name there
     // ("Sleep at this age" is both a chart and a page), is not shown twice.
     final shownTitles = {
       for (final r in _bandRailsFor(tab)) for (final x in r.$2) x.title,
       for (final tool in tab.tools) tool.label,
     };
-    final out = <(PpBand, List<PpPage>, PpBandDistance)>[];
+    final blocks = <(PpBand, List<PpPage>, PpBandDistance)>[];
     for (var j = 0; j < set.bands.length; j++) {
       final b = set.bands[j];
       // A tab for later shows its own band's rails already (S9).
@@ -440,8 +476,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                     seen.add(x.id))
                   x,
       ];
-      if (pages.isEmpty) continue;
-      out.add((
+      blocks.add((
         b,
         pages,
         j == at + 1
@@ -451,7 +486,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                 : PpBandDistance.further,
       ));
     }
-    out.sort((a, b) => a.$3.score.compareTo(b.$3.score));
+    blocks.sort((a, b) => a.$3.score.compareTo(b.$3.score));
+    final placed = <PpDoorTool>{..._toolsFor(tab)};
+    final out = <(PpBand, List<PpPage>, PpBandDistance, List<PpDoorTool>)>[];
+    for (final (b, pages, dist) in blocks) {
+      final tools = [
+        for (final t in tab.tools)
+          if (!placed.contains(t) && t.inBand(b.id)) t,
+      ];
+      placed.addAll(tools);
+      if (pages.isEmpty && tools.isEmpty) continue;
+      out.add((b, pages, dist, tools));
+    }
     return out;
   }
 
@@ -483,9 +529,16 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     // A tab for later says so on its card (S9). Was the lock line, kept for
     // revert: `if (_unlockMonths(tab) case final m?) return _lockLine(m);`
     if (_unlockMonths(tab) != null) return 'For later';
-    final n = tab.tools.length +
+    // What she sees on the tab for her band: its tools, its pages, the pages
+    // from another tab, the pinned flag (Feeding plan §2c). Was every tool
+    // and the flag whatever his age, kept for revert:
+    // final n = tab.tools.length +
+    //     _railsFor(tab).fold(0, (t, r) => t + r.$2.length) +
+    //     (tab.redFlagPageId != null ? 1 : 0);
+    final n = _toolsFor(tab).length +
+        _extraPagesFor(tab).length +
         _railsFor(tab).fold(0, (t, r) => t + r.$2.length) +
-        (tab.redFlagPageId != null ? 1 : 0);
+        (_redFlagFor(tab) != null ? 1 : 0);
     if (n == 0) return '';
     return n == 1 ? '1 thing' : '$n things';
   }
@@ -554,12 +607,16 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     final hue = bracket?.hue ?? tabs.first.hue;
     final tint = v2BlockTint(hue, p);
     final tab = tabs[_tab.clamp(0, tabs.length - 1)];
-    final rails = _railsFor(tab).isNotEmpty || tab.tools.isEmpty
+    final tools = _toolsFor(tab);
+    final extras = _extraPagesFor(tab);
+    final rails = _railsFor(tab).isNotEmpty || (tools.isEmpty && extras.isEmpty)
         ? _railsFor(tab)
         : [(PpArea(id: tab.id, title: tab.label, blurb: ''), const <PpPage>[])];
-    final redFlag = tab.redFlagPageId == null
-        ? null
-        : section.pageById(tab.redFlagPageId!);
+    // In her band only (Feeding plan §2d). Was, kept for revert:
+    // final redFlag = tab.redFlagPageId == null
+    //     ? null
+    //     : section.pageById(tab.redFlagPageId!);
+    final redFlag = _redFlagFor(tab);
 
     return PvLiveSearchScope(
       search: _search,
@@ -704,33 +761,53 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                                 letterSpacing: -0.45,
                                 color: p.ink1))),
                         const SizedBox(height: kPvDoorHeadingGap),
+                        // Her band's tools only (PpDoorTool.bands); the rest
+                        // wait in the band blocks below. Was `tab.tools`.
                         _shelf(context, p, [
                           if (ri == 0)
-                            for (final tool in tab.tools)
+                            for (final tool in tools)
                               if (!tool.atEnd &&
                                   (tool.afterPageId == null ||
                                       !pages.any((x) => x.id == tool.afterPageId)))
                                 _ShelfItem.tool(tool),
+                          // A page from another tab, after the tools
+                          // (PpDoorTab.extraPageIds).
+                          if (ri == 0)
+                            for (final x in extras) _ShelfItem.page(x),
                           for (final page in [
                             ...pages.where((x) => x.pinned),
                             ...pages.where((x) => !x.pinned),
                           ]) ...[
                             _ShelfItem.page(page),
                             if (ri == 0)
-                              for (final tool in tab.tools)
+                              for (final tool in tools)
                                 if (tool.afterPageId == page.id)
                                   _ShelfItem.tool(tool),
                           ],
                           // A shop card comes last (PpDoorTool.atEnd).
                           if (ri == 0)
-                            for (final tool in tab.tools)
+                            for (final tool in tools)
                               if (tool.atEnd) _ShelfItem.tool(tool),
                         ], area.hue),
                         const SizedBox(height: kPvDoorBlockGap),
+                        // The tab's expert, on the first scroll (Feeding D2,
+                        // approved 2026-10-23): the grey row after the first
+                        // rail, the reader's offer card in look.
+                        if (ri == 0 && tab.expert != null) ...[
+                          ppDoorPad(_ExpertRow(
+                            key: const ValueKey('pp_door_tab_expert'),
+                            p: p,
+                            expert: tab.expert!,
+                            onTap: () => widget.onSurface(
+                                context, tab.expert!.surfaceId),
+                          )),
+                          const SizedBox(height: kPvDoorBlockGap),
+                        ],
                       ],
                       // The other bands (2026-10-21, Wave 4): the next one
-                      // open as "Coming up next", the rest folded.
-                      for (final (band, pages, dist) in _otherBands(tab)) ...[
+                      // open as "Coming up next", the rest folded. A tool
+                      // for another age rides in the first block it fits.
+                      for (final (band, pages, dist, bandTools) in _otherBands(tab)) ...[
                         if (dist == PpBandDistance.next || _openBands.contains(band.id)) ...[
                           ppDoorPad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text(dist == PpBandDistance.next ? 'Coming up next' : band.label,
@@ -748,7 +825,10 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                             ],
                           ])),
                           const SizedBox(height: kPvDoorHeadingGap),
-                          _shelf(context, p, [for (final x in pages) _ShelfItem.page(x)], hue),
+                          _shelf(context, p, [
+                            for (final t in bandTools) _ShelfItem.tool(t),
+                            for (final x in pages) _ShelfItem.page(x),
+                          ], hue),
                           const SizedBox(height: kPvDoorBlockGap),
                         ] else ...[
                           ppDoorPad(InkWell(
@@ -770,7 +850,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                                       style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
                                 ),
                                 const SizedBox(width: 8),
-                                Text('${pages.length}',
+                                Text('${pages.length + bandTools.length}',
                                     style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink3)),
                                 Icon(Icons.expand_more_rounded, size: 20, color: p.ink3),
                               ]),
@@ -824,7 +904,11 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                         ),
                       )),
                       const SizedBox(height: kPvDoorBlockGap),
-                    ] else if (door.closing case final c?) ...[
+                    ] else if (door.closing != null && tab.expert == null) ...[
+                      // Was `door.closing case final c?`: a tab with its own
+                      // expert row (Feeding D2) ends on the sentence below,
+                      // as the approved mockup does, so one tab never pitches
+                      // twice.
                       // ⚠️ THE CONSULT CARD IS BACK (step 0 · S3, approved
                       // 2026-10-23, after Wave 2 took it out on 2026-10-21):
                       // help sits next to the worry, and the door's own
@@ -839,9 +923,10 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                         hue: hue,
                         icon: Icons.chat_bubble_outline_rounded,
                         chip: 'Consult',
-                        title: c.label,
-                        blurb: c.blurb,
-                        onTap: () => widget.onSurface(context, c.surfaceId),
+                        title: door.closing!.label,
+                        blurb: door.closing!.blurb,
+                        onTap: () =>
+                            widget.onSurface(context, door.closing!.surfaceId),
                       )),
                       const SizedBox(height: kPvDoorBlockGap),
                     ] else ...[
@@ -1864,6 +1949,54 @@ IntentMark ppTabMarkFor(IconData icon) {
   if (any([Icons.man_outlined])) return IntentMark.stepsMark;
   if (any([Icons.work_outline])) return IntentMark.compassMark;
   return IntentMark.pageMark;
+}
+
+/// A tab's expert (`PpDoorTab.expert`, Feeding D2): the reader's grey offer
+/// card in look (`PvReadOfferCard`), so the consult on the door and the one
+/// in the page read as the same calm thing. No price: what an expert costs is
+/// decided server-side, and none is live yet.
+class _ExpertRow extends StatelessWidget {
+  const _ExpertRow({
+    super.key,
+    required this.p,
+    required this.expert,
+    required this.onTap,
+  });
+  final V2Palette p;
+  final PpDoorClosing expert;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: const Color(0xFFF3F3F4),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Row(children: [
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(expert.blurb,
+                          style: pvManrope(
+                              fontSize: 12.5, height: 1.35, color: p.ink3)),
+                      const SizedBox(height: 3),
+                      Text(expert.label,
+                          style: pvManrope(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w800,
+                              height: 1.3,
+                              color: p.ink1)),
+                    ]),
+              ),
+              Icon(Icons.chevron_right_rounded, color: p.ink1),
+            ]),
+          ),
+        ),
+      );
 }
 
 class _ShelfItem {

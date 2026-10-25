@@ -297,6 +297,12 @@ final PpArea _breastfeeding = PpArea(
               'can show you. A nipple shield is sometimes used for a short '
               "time, with the counsellor's guidance.",
         ]),
+        // The postnatal Breastfeeding Basics (D3). Not in the catalogue yet:
+        // the tap says it isn't open, with Tell me (S8d).
+        PpLink('Breastfeeding Basics, after birth',
+            surfaceId: 'pp_class/Breastfeeding Basics, after birth',
+            blurb: 'A live class for the first weeks: latch, supply, night '
+                'feeds, and when to call.'),
       ],
     ),
     PpPage(
@@ -350,7 +356,8 @@ final PpArea _breastfeeding = PpArea(
             "the nipple before you start, so you're not hunching down."),
         PpLink(
           'Nursing pillows and feeding chairs',
-          surfaceId: 'pp_products',
+          // The shelf it names (Feeding door build, S8c). Was 'pp_products'.
+          surfaceId: 'pp_products/pvs_nursing_feeding_pillows',
           blurb: "What's worth buying, and what a cushion already does.",
         ),
       ],
@@ -358,6 +365,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_how_often',
       title: 'How often, and how much',
+      bands: ['milk', 'first_foods'],
       format: 'ARTICLE',
       blocks: [
         PpIntro("Most worries here come from not seeing how much went in. A "
@@ -429,6 +437,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_supply',
       title: 'Making enough milk, and keeping it',
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('Milk supply runs on one rule: milk removed is milk made. '
@@ -492,11 +501,24 @@ final PpArea _breastfeeding = PpArea(
         ]),
         PpWhenLine('For colostrum in the first days, hand expression often '
             'works better than a pump. It is free and always with you.'),
+        // Feeding door build (plan §3a): a consult on the worry itself.
+        PpConsult(
+          title: 'Lactation consultation',
+          whoFor: 'If the feeling that you are not making enough will not go, '
+              'and you want someone to watch a feed and weigh the evidence '
+              'with you.',
+          surfaceId: 'pp_experts',
+          role: 'lactation',
+        ),
+        PpLink('Breastfeeding Basics, after birth',
+            surfaceId: 'pp_class/Breastfeeding Basics, after birth',
+            blurb: 'A live class for the first weeks.'),
       ],
     ),
     PpPage(
       id: 'bf_diet',
       title: "What you eat while you're breastfeeding",
+      bands: ['milk', 'first_foods', 'm8_12', 'tod'],
       format: 'CARDS',
       blocks: [
         PpIntro('The list of foods a nursing mother must avoid is much shorter '
@@ -554,6 +576,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_pumping',
       title: 'Pumping when you go back to work',
+      bands: ['milk', 'first_foods', 'm8_12', 'tod'],
       format: 'ARTICLE',
       blocks: [
         PpIntro("Going back to work doesn't have to end breastfeeding. It "
@@ -614,8 +637,11 @@ final PpArea _breastfeeding = PpArea(
           slotId: 'feeding/pumping_demo',
         ),
         PpLink(
-          'Pumps, storage bags and nursing bras',
-          surfaceId: 'pp_products',
+          // Was 'Pumps, storage bags and nursing bras', to the whole shop.
+          // Storage bags and bras have their own links below and on
+          // bf_cracked (S8c).
+          'Breast pumps',
+          surfaceId: 'pp_products/pvs_electric_breast_pumps',
           blurb: 'Manual or electric, flange size, and what you can skip.',
         ),
         PpLink(
@@ -650,11 +676,50 @@ final PpArea _breastfeeding = PpArea(
           PpStep('Throw away mouldy tubing', 'And check the parts for dark '
               'spots.'),
         ]),
+        // Feeding door build, D6 (01-feeding-content.md B2).
+        PpArticle(heading: 'Milk at the daycare, or with a nanny', [
+          'Label every bag or bottle with your child\'s name, the date and the '
+              'time you expressed. Carry it in an insulated bag with ice '
+              'packs, and ask the daycare where it will be kept. It should go '
+              'in a fridge, not on a shelf.',
+          // REQUIRED_REVIEW: thaw window.
+          'Frozen milk thawed in the fridge is good for about 24 hours. '
+              "Don't refreeze it. Warm it by standing the container in a bowl "
+              'of warm water, never in a microwave, which heats unevenly and '
+              'can burn.',
+          // REQUIRED_REVIEW: volume per hour.
+          'Show whoever feeds your baby how to go slowly. With a paladai or a '
+              'small cup, a baby sips at their own pace. With a bottle, hold '
+              'it nearly level and pause often, so your baby isn\'t flooded. '
+              'Many babies take about 25 to 30 ml for each hour you are away, '
+              'but follow your baby rather than the number.',
+          'Ask them to hold the last feed if you are due back soon, so you '
+              'can feed when you walk in. That feed protects your supply.',
+        ]),
+        PpCards(heading: 'Your rights at work', [
+          // REQUIRED_REVIEW: Maternity Benefit (Amendment) Act 2017, s.11A.
+          PpCard('Creche at work',
+              'Places with 50 or more employees must have a creche, and you '
+                  'may visit it four times a day, breaks included.'),
+          PpCard('Time to pump',
+              'Ask for a clean, private place and short breaks. Write it '
+                  'down with HR before your first day back.'),
+        ]),
+        PpIndiaNote('The paladai, the small spouted cup many grandmothers '
+            'used, works well for expressed milk and needs no bottle at all.'),
+        PpLink('Milk storage bags and a cooler bag',
+            surfaceId: 'pp_products/Milk storage bags',
+            blurb: 'For carrying milk home from work in the heat.'),
+        PpLink('Back to work: pumping and storage',
+            surfaceId: 'pp_class/Back to work: pumping and storage',
+            blurb: 'A live class: pump choice, a schedule to build up, '
+                'storage, the daycare handover and your rights.'),
       ],
     ),
     PpPage(
       id: 'bf_low_supply',
       title: "It feels like I'm not making enough",
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'ARTICLE', // [reuse] "links to the feed tracker"
       blocks: [
         PpIntro('This is the most common reason mothers stop feeding. Most of '
@@ -737,6 +802,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_oversupply',
       title: 'Too much milk, and a baby who splutters',
+      bands: ['milk', 'first_foods'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('Too much milk gets little sympathy, and it can be miserable. '
@@ -783,6 +849,10 @@ final PpArea _breastfeeding = PpArea(
           surfaceId: 'pp_experts',
           role: 'lactation',
         ),
+        PpLink('Washable breast pads',
+            surfaceId: 'pp_products/pvs_absorbent_breast_pads',
+            blurb: 'Leaks in the heat: washable pads breathe better than '
+                'disposable ones.'),
       ],
     ),
     PpPage(
@@ -792,6 +862,7 @@ final PpArea _breastfeeding = PpArea(
       // [reuse] "Add a same-day red-flag: mastitis with fever needs a doctor
       // today." The doctor callout below is that flag, and the door pins
       // this page as the Milk tab's red flag so it sits above the rails.
+      bands: ['milk', 'first_foods', 'm8_12', 'tod'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('A blocked duct is a sore lump. Mastitis is that lump plus '
@@ -857,6 +928,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_cracked',
       title: 'Sore and cracked nipples',
+      bands: ['milk', 'first_foods'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('Nipple pain is the most common reason feeding stops '
@@ -901,7 +973,8 @@ final PpArea _breastfeeding = PpArea(
         ),
         PpLink(
           'Nipple cream and nursing pads',
-          surfaceId: 'pp_products',
+          // Was 'pp_products' (S8c).
+          surfaceId: 'pp_products/pvs_natural_nipple_balms',
           blurb: 'Purified lanolin, plain ointments, and what the difference '
               'really is.',
         ),
@@ -928,13 +1001,16 @@ final PpArea _breastfeeding = PpArea(
                   'compresses before feeds and feeding often usually clear it. '
                   "Don't pick it with a needle. Ask your doctor."),
         ]),
+        PpLink('Nursing bras',
+            surfaceId: 'pp_products/pvs_wireless_nursing_bras',
+            blurb: 'Soft, wire-free, sized after your milk comes in.'),
       ],
     ),
     PpPage(
       id: 'bf_biting',
       title: 'My baby has started biting',
       format: 'ARTICLE',
-      bands: ['m8_12', 'tod', 'big'],
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       blocks: [
         PpIntro('The first bite is a shock and usually makes you yelp, which '
             "many babies find very funny. It's a phase, it has causes, and it "
@@ -971,6 +1047,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_refusing',
       title: 'My baby is refusing the breast',
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('A baby who suddenly refuses to feed is frightening. It is '
@@ -1046,12 +1123,21 @@ final PpArea _breastfeeding = PpArea(
               'feed, overall.'),
           PpCard('Easy and free', 'Always ready, at the right temperature.'),
         ]),
+        // Deepened in the Feeding door build (plan §5).
+        PpCallout('Every one of these is a reason to try, never a reason to '
+            'feel you failed. Some mothers cannot feed, some stop, some mix, '
+            'and their babies grow up healthy and close. Breastfeeding is one '
+            'good way to feed a baby, not the measure of a mother.',
+            title: 'Without the guilt'),
+        PpLink('Fed is fine, and it is the whole answer',
+            pageId: 'formula_fed_is_fine'),
       ],
     ),
     PpPage(
       id: 'bf_lactation_help',
       title: 'Getting breastfeeding help: counsellors and groups',
       subtitle: 'Who can help, and when to ask',
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'STEPS',
       blocks: [
         PpIntro("Breastfeeding is natural, but it's also a skill you both "
@@ -1073,8 +1159,39 @@ final PpArea _breastfeeding = PpArea(
             'Call too for cracked or bleeding nipples, or if you feel unsure '
             'and worried.',
             kind: PpCalloutKind.doctor),
-        PpLink('Book a lactation consultation',
-            surfaceId: 'pp_experts/Lactation expert'),
+        // Was a plain link, kept for revert:
+        // PpLink('Book a lactation consultation',
+        //     surfaceId: 'pp_experts/Lactation expert'),
+        PpArticle(heading: 'Who is who', [
+          'An IBCLC (International Board Certified Lactation Consultant) has '
+              'the longest training and sits an international exam. She '
+              'handles the hard cases: a baby not gaining, pain that will not '
+              'settle, a premature baby, exclusive pumping.',
+          'A lactation counsellor has a shorter course, often run in India by '
+              'BPNI or a hospital. Counsellors are very good at the everyday '
+              'things: latch, positions, how often, and confidence.',
+          'Your paediatrician and gynaecologist are doctors, and they are who '
+              'you need for weight loss in the baby, tongue tie, infection, '
+              'fever or medicines. A good consultant will send you to them '
+              'when it is their job.',
+        ]),
+        // REQUIRED_REVIEW: price range, Indian cities, 2026.
+        PpArticle(heading: 'What a session costs', [
+          'In most Indian cities a session with a certified consultant costs '
+              'about \u20b91,000 to \u20b93,000 (roughly \$12 to \$36), by '
+              'video or at home. Many government and medical college '
+              'hospitals have a counsellor on the postnatal ward for free: '
+              'ask before you go home.',
+          'One session with a real feed watched is usually worth more than a '
+              'week of reading. Ask for a written plan before she leaves.',
+        ]),
+        PpConsult(
+          title: 'Lactation consultation',
+          whoFor: 'If feeds hurt, your baby is not gaining, or you want a '
+              'trained eye on a real feed before a small problem grows.',
+          surfaceId: 'pp_experts',
+          role: 'lactation',
+        ),
       ],
     ),
     PpPage(
@@ -1104,12 +1221,37 @@ final PpArea _breastfeeding = PpArea(
               'A story, a cuddle, a cup of milk at bedtime.'),
           PpStep('Go slowly to avoid sore, full breasts'),
         ]),
+        // Deepened in the Feeding door build (plan §5).
+        PpArticle(heading: 'Night feeds after one', [
+          'Many toddlers still wake to feed, and that is common rather than a '
+              'problem to fix. If nights are wearing you down, you can shorten '
+              'night feeds a minute at a time, or let your partner settle him '
+              'for one waking so he learns comfort comes another way too.',
+          'Feeding to sleep does not harm his teeth on its own, but milk '
+              'sitting on teeth all night can. Wipe or brush his teeth before '
+              'the last feed, and see a dentist by his first birthday.',
+        ]),
+        PpScript(heading: 'When relatives have opinions', [
+          PpScriptLine(
+              say: "It's working for us, and the doctor is happy with it.",
+              why: 'Calm and closed. Nobody needs to be convinced.'),
+          PpScriptLine(
+              say: "We'll stop when it's right for both of us.",
+              notThis: "You don't understand, the WHO says...",
+              why: 'A decision stated is harder to argue with than a case '
+                  'made.'),
+        ]),
+        PpCallout('If stopping is quick or forced, your breasts can become '
+            'full and sore. Express a little for comfort only, and see a '
+            'doctor for a hot, red, painful area or a fever.',
+            kind: PpCalloutKind.doctor),
       ],
     ),
     PpPage(
       id: 'bf_relactation',
       title: 'Restarting breastfeeding, or bringing in milk for an adopted baby',
       subtitle: 'Relactation and induced lactation',
+      bands: ['milk', 'first_foods'],
       format: 'ARTICLE',
       blocks: [
         PpIntro("If you stopped breastfeeding and wish you hadn't, or you're "
@@ -1131,6 +1273,35 @@ final PpArea _breastfeeding = PpArea(
             'make a plan and decide if any medicine is right for you. '
             "Don't take supplements or galactagogues without advice.",
             kind: PpCalloutKind.doctor),
+        // Deepened in the Feeding door build (plan §5).
+        PpSteps(heading: 'How it usually goes', [
+          PpStep('Skin to skin, every day',
+              'Hold your baby against you as often as you can. It raises the '
+                  'hormones that make milk.'),
+          PpStep('Offer the breast often',
+              'Before every top-up, and whenever your baby is sleepy or '
+                  'calm. Short tries count.'),
+          PpStep('Pump or hand express eight or more times a day',
+              'Including once at night, for 10 to 15 minutes each time.'),
+          PpStep('Keep the top-ups going',
+              'Through a supplementer, a paladai or a cup, so your baby is '
+                  'fed while your milk builds.'),
+          PpStep('Cut top-ups slowly, with your doctor',
+              'Only while wet nappies and weight stay good.'),
+        ]),
+        // REQUIRED_REVIEW: timescales.
+        PpWhenLine('Drops of milk often return within one to two weeks, and '
+            'a fuller supply can take a month or more. Some mothers reach a '
+            'full supply and some a partial one. Both are real '
+            'breastfeeding.'),
+        PpConsult(
+          title: 'Lactation consultation',
+          whoFor: 'Relactation goes far better with a plan. If you want to '
+              'bring your milk back, start with someone who has done it '
+              'before.',
+          surfaceId: 'pp_experts',
+          role: 'lactation',
+        ),
       ],
     ),
     PpPage(
@@ -1156,12 +1327,43 @@ final PpArea _breastfeeding = PpArea(
         PpCallout('A sudden drop in supply, pain, or a hard red lump needs a '
             'lactation consultant or doctor.',
             kind: PpCalloutKind.doctor),
+        // Deepened in the Feeding door build (plan §5).
+        // REQUIRED_REVIEW: session counts by age.
+        PpSteps(heading: 'A rough schedule by age', [
+          PpStep('First 6 weeks: 8 to 10 times a day',
+              'About every two to three hours, one session at night.'),
+          PpStep('6 weeks to 3 months: 7 or 8 times',
+              'Once your supply is steady, a longer night gap is often fine.'),
+          PpStep('3 to 6 months: 5 to 7 times',
+              'Drop one session at a time and watch the daily total for a '
+                  'week.'),
+          PpStep('From 6 months: what keeps your total steady',
+              'As solids start, many mothers pump four or five times.'),
+        ]),
+        PpArticle(heading: 'Keeping your supply up', [
+          'The daily total matters more than any one session. If it drops, '
+              'add a session back for a few days before anything else.',
+          'Pumping both sides at once, and massaging while you pump, '
+              'empties the breast better. Check the flange size every few '
+              'months: it can change.',
+        ]),
+        PpConsult(
+          title: 'Lactation consultation',
+          whoFor: 'If your total is falling, pumping hurts, or you want a '
+              'schedule built around your work and your baby.',
+          surfaceId: 'pp_experts',
+          role: 'lactation',
+        ),
+        PpLink('Breast pumps',
+            surfaceId: 'pp_products/pvs_electric_breast_pumps',
+            blurb: 'A double electric pump saves hours a week.'),
       ],
     ),
     PpPage(
       id: 'bf_special_situations',
       title: 'Donor milk, and feeding after breast surgery or cancer',
       subtitle: 'Less common questions, answered',
+      bands: ['milk', 'first_foods'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('Some mothers face situations most guides skip. Here are two '
@@ -1174,6 +1376,19 @@ final PpArea _breastfeeding = PpArea(
           "Informal milk sharing between friends isn't screened and carries "
               'a risk of infection. Talk to your doctor first.',
         ]),
+        // Deepened in the Feeding door build (plan §5).
+        // REQUIRED_REVIEW: milk bank guidance, 2026.
+        PpArticle(heading: 'Finding a milk bank in India', [
+          'Most human milk banks are inside large government, medical college '
+              'and private hospitals with a NICU, and are often called '
+              'Comprehensive Lactation Management Centres. Donor milk is '
+              'given first to premature and sick babies, on a doctor\'s '
+              'advice.',
+          'If your baby is in a NICU and your own milk is not yet enough, ask '
+              'the team whether donor milk is available. If you have more '
+              'milk than your baby needs, the same bank may welcome you as a '
+              'donor after a simple screening.',
+        ]),
         PpArticle(heading: 'After breast surgery or breast cancer', [
           'Many women breastfeed after breast surgery, though supply may be '
               'lower on that side. After breast cancer, feeding from the '
@@ -1184,6 +1399,23 @@ final PpArea _breastfeeding = PpArea(
             "consultant before you start. They'll check your medicines and "
             'make a plan.',
             kind: PpCalloutKind.doctor),
+        PpSteps(heading: 'What to ask your surgeon or oncologist', [
+          PpStep('Were the milk ducts or the nerve near the nipple cut?',
+              'This decides most of what that side can do.'),
+          PpStep('Are my medicines safe while feeding?',
+              'Ask about each one by name, including painkillers.'),
+          PpStep('How long after treatment can I feed?',
+              'And from which side.'),
+          PpStep('Who should I see for a feeding plan?',
+              'A lactation consultant who works with your team.'),
+        ]),
+        PpConsult(
+          title: 'Lactation consultation',
+          whoFor: 'After surgery or treatment, a plan made with your doctors '
+              'and someone who knows feeding.',
+          surfaceId: 'pp_experts',
+          role: 'lactation',
+        ),
       ],
     ),
   ],
@@ -1216,6 +1448,7 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_fed_is_fine',
       title: 'Fed is fine, and it is the whole answer',
+      bands: ['milk', 'first_foods'],
       format: 'ARTICLE',
       blocks: [
         PpIntro("If you're reading this at 2am feeling like you failed, start "
@@ -1267,6 +1500,7 @@ final PpArea _formula = PpArea(
       id: 'formula_choose',
       title: 'Choosing a formula',
       subtitle: 'Review only, and we sell none of it',
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('Formulas differ far less than the packs suggest. Infant '
@@ -1329,6 +1563,7 @@ final PpArea _formula = PpArea(
       // [reformat: was step-list] -> VIDEO. "Safety-critical (water temp,
       // sterilising, ratio, timing). Demonstrated + a glanceable checklist."
       // The slot is hoisted; the cards are the glance; the steps stay.
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'VIDEO',
       blocks: [
         PpIntro('This page matters for safety. Powdered formula is not '
@@ -1423,6 +1658,7 @@ final PpArea _formula = PpArea(
       id: 'formula_brands',
       title: 'Indian formula, compared honestly',
       subtitle: 'Review only. Nothing here is sponsored or sold.',
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'TABLE',
       blocks: [
         PpIntro('This is here because honest information is hard to find, '
@@ -1509,6 +1745,7 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_switching',
       title: 'Switching brands',
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('People switch formula far more often than they need to, '
@@ -1544,8 +1781,17 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_mixed',
       title: 'Doing both, breast and bottle',
+      bands: ['milk', 'first_foods'],
       format: 'ARTICLE',
       blocks: [
+        // Feeding door build (plan §4): owed in DOOR-CONTENT-OWED.
+        PpVideoSlot(
+          title: 'Paced bottle feeding, shown',
+          subtitle: 'Bottle nearly level, pauses every few sips, so a baby '
+              'who also breastfeeds is never flooded.',
+          minutes: '3 MIN',
+          slotId: 'feeding/paced_bottle_demo',
+        ),
         PpIntro('A great many Indian families feed with both breast and '
             'formula, and almost nothing is written for them. This page is.'),
         PpArticle([
@@ -1605,6 +1851,7 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_bottle_refusal',
       title: "My baby won't take the bottle",
+      bands: ['milk', 'first_foods', 'm8_12'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('This often shows up about ten days before you go back to '
@@ -1641,8 +1888,17 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_weaning',
       title: "Stopping breastfeeding when you're ready",
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'ARTICLE',
       blocks: [
+        // Feeding door build (plan §4): owed in DOOR-CONTENT-OWED.
+        PpVideoSlot(
+          title: 'Moving to an open cup',
+          subtitle: 'Small sips from a steel cup or a paladai, and the mess '
+              'that is part of learning.',
+          minutes: '2 MIN',
+          slotId: 'feeding/open_cup_demo',
+        ),
         PpIntro("Whenever you stop, it's the right time if it's your "
             'decision. This page is about doing it comfortably, not about '
             'whether you should.'),
@@ -1763,11 +2019,13 @@ final PpArea _startingSolids = PpArea(
   mark: IntentMark.blocksMark,
   title: 'Starting solids',
   blurb: 'When to begin, what first, and both ways of doing it.',
+  bands: ['first_foods', 'm8_12', 'tod'],
   hue: 96,
   pages: [
     PpPage(
       id: 'solids_when',
       title: 'When to start, and how to begin',
+      bands: ['first_foods'],
       format: 'ARTICLE',
       blocks: [
         PpIntro("Six months is the answer, and it's worth knowing why, "
@@ -1832,6 +2090,7 @@ final PpArea _startingSolids = PpArea(
     PpPage(
       id: 'solids_first_foods',
       title: 'The first foods',
+      bands: ['first_foods', 'm8_12'],
       format: 'CARDS',
       blocks: [
         PpIntro("There's no special first food and no set order. Anything "
@@ -1877,12 +2136,16 @@ final PpArea _startingSolids = PpArea(
           surfaceId: 'pp_baby_food_check',
           blurb: 'Type any food, get a clear answer.',
         ),
+        PpLink('First spoons',
+            surfaceId: 'pp_products/weaning',
+            blurb: 'Soft, shallow tips for new gums.'),
       ],
     ),
     PpPage(
       id: 'solids_spoon_or_blw',
       title: 'Spoon-feeding or self-feeding',
       subtitle: 'Both work. Most families do a bit of each.',
+      bands: ['first_foods', 'm8_12'],
       format: 'TABLE',
       blocks: [
         PpIntro("You'll read that one of these is the modern way and the "
@@ -1960,6 +2223,10 @@ final PpArea _startingSolids = PpArea(
           blurb: 'What to cut, how to cut it, and what gagging really looks '
               'like.',
         ),
+        PpLink('Finger foods and self-feeding, safely',
+            surfaceId: 'pp_class/Finger foods and self-feeding',
+            blurb: 'A live class: cutting, shapes, and the move to family '
+                'food.'),
       ],
     ),
     // ⚠️ [reformat: was step-list] -> INTERACTIVE. "An allergen tracker: tick
@@ -1977,6 +2244,7 @@ final PpArea _startingSolids = PpArea(
     PpPage(
       id: 'solids_allergens',
       title: 'Introducing allergens safely',
+      bands: ['first_foods', 'm8_12', 'tod'],
       format: 'INTERACTIVE',
       blocks: [
         PpInteractive(
@@ -2103,8 +2371,17 @@ final PpArea _startingSolids = PpArea(
       // [reformat: was chart-card] -> ILLUSTRATION. "Show what each texture
       // actually looks like (puree -> mash -> soft finger food -> chopped)."
       // Four katoris, drawn; the chart card is kept below for revert.
+      bands: ['first_foods', 'm8_12', 'tod'],
       format: 'ILLUSTRATION',
       blocks: [
+        // Feeding door build (plan §4): owed in DOOR-CONTENT-OWED.
+        PpVideoSlot(
+          title: 'Finger foods at 9 months, cut and served',
+          subtitle: 'Soft sticks, flattened peas, quartered grapes: how big, '
+              'how soft, and how to tell.',
+          minutes: '3 MIN',
+          slotId: 'feeding/finger_foods_9m_demo',
+        ),
         PpIntro('Texture matters more than most parents are told. Babies who '
             'stay on smooth puree too long often refuse lumps at a year. That '
             'is much harder to fix than a bit of gagging at eight months.'),
@@ -2177,11 +2454,16 @@ final PpArea _startingSolids = PpArea(
           minutes: '10 MIN',
           slotId: 'feeding/safe_textures_demo',
         ),
+        PpLink('Baby first aid and choking',
+            surfaceId: 'pp_class/Baby first aid and choking',
+            blurb: 'A live class: back blows, chest thrusts and CPR, practised '
+                'on a doll.'),
       ],
     ),
     PpPage(
       id: 'solids_annaprashan',
       title: 'The first rice feeding (annaprashan), the first bite',
+      bands: ['first_foods'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('The first grain is a ceremony in most Indian families. It is '
@@ -2231,7 +2513,7 @@ final PpArea _startingSolids = PpArea(
       title: 'Setting up for solids',
       subtitle: 'Sitting, the chair, and one calm mealtime',
       format: 'ARTICLE',
-      bands: ['milk', 'first_foods'],
+      bands: ['first_foods'],
       blocks: [
         PpIntro('Before the first spoon, three small things make every meal '
             'easier: your baby can sit, has somewhere to sit, and gets one '
@@ -2270,6 +2552,12 @@ final PpArea _startingSolids = PpArea(
           pageId: 'solids_when',
           blurb: 'The signs your baby is ready, and the first week.',
         ),
+        PpLink('First spoons',
+            surfaceId: 'pp_products/weaning',
+            blurb: 'Soft, shallow tips for new gums.'),
+        PpLink('High chairs and floor booster seats',
+            surfaceId: 'pp_products/High chairs',
+            blurb: 'Upright, feet supported, at the table or on the floor.'),
       ],
     ),
     // ⚠️ [new] ARTICLE. "why it happens, water/fibre, when to see the
@@ -2793,11 +3081,13 @@ final PpArea _cooking = PpArea(
   mark: IntentMark.stepsMark,
   title: 'Cooking for your child',
   blurb: 'What to make, by age, by staple, and by what your child needs.',
+  bands: ['first_foods', 'm8_12', 'tod', 'big'],
   hue: 44,
   pages: [
     PpPage(
       id: 'recipes_by_age',
       title: "Recipes for your child's age",
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'CARDS',
       blocks: [
         PpIntro('The whole recipe collection is free and easy to filter. This '
@@ -2836,8 +3126,17 @@ final PpArea _cooking = PpArea(
     PpPage(
       id: 'recipes_staples',
       title: 'Ragi, khichdi, dalia and the rest',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'CARDS',
       blocks: [
+        // Feeding door build (plan §4): owed in DOOR-CONTENT-OWED.
+        PpVideoSlot(
+          title: 'Ragi porridge, three textures',
+          subtitle: 'Smooth at six months, thicker at eight, with lumps at '
+              'ten: one pot, three bowls.',
+          minutes: '4 MIN',
+          slotId: 'feeding/ragi_porridge_textures',
+        ),
         PpIntro('Six Indian staples do most of the work of feeding a baby. '
             'Learn these and you rarely need a recipe again.'),
         PpCards([
@@ -2888,6 +3187,7 @@ final PpArea _cooking = PpArea(
     PpPage(
       id: 'recipes_by_need',
       title: 'Cooking for weight, iron or immunity',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'CARDS',
       blocks: [
         PpIntro("Sometimes you aren't cooking for a stage. You're cooking for "
@@ -2935,6 +3235,7 @@ final PpArea _cooking = PpArea(
     PpPage(
       id: 'recipes_sick_days',
       title: 'What to feed when your child is unwell',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'ARTICLE',
       blocks: [
         PpIntro("Appetite disappears when a child is ill, and that's normal. "
@@ -3000,6 +3301,7 @@ final PpArea _cooking = PpArea(
     PpPage(
       id: 'recipes_batch',
       title: 'Cooking once, feeding all week',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'STEPS',
       blocks: [
         PpIntro('Nobody cooks a fresh baby meal five times a day for a year. '
@@ -3051,7 +3353,9 @@ final PpArea _cooking = PpArea(
         ),
         PpLink(
           'Steamers, storage trays and containers',
-          surfaceId: 'pp_products',
+          // Not stocked yet: the tap says we are still choosing (S8c). Was
+          // 'pp_products', which opened the whole shop.
+          surfaceId: 'pp_products/Steamers and freezer trays',
           blurb: "What's worth buying for batch cooking, and what isn't.",
         ),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
@@ -3069,6 +3373,40 @@ final PpArea _cooking = PpArea(
               'Store in the fridge for two days and turn them into tomorrow\'s '
                   'paratha, cutlets or soup.'),
         ]),
+        // Feeding door build, D6 (01-feeding-content.md B3).
+        PpArticle(heading: 'Packing food for daycare', [
+          // REQUIRED_REVIEW: 2 h / 1 h above 32 °C.
+          'Hot food goes in an insulated jar, filled straight from the stove. '
+              "Cold food goes with an ice pack. Cooked food shouldn't sit at "
+              'room temperature for more than two hours, and in Indian summer '
+              'heat, an hour.',
+          'Cut it the way you would at home. Grapes quartered lengthwise, no '
+              'whole nuts, no popcorn, no hard raw carrot rounds. Daycares get '
+              'busy, so send food that is already safe.',
+          "Label the box with your child's name. If your child has an "
+              'allergy, give the daycare a written note with what to avoid and '
+              'what to do, and ask who has read it.',
+          'Ask for one line a day: what was eaten, roughly how much, and what '
+              'came back. A full lunch box twice is information, not a '
+              'crisis.',
+        ]),
+        PpCards(heading: 'Five questions to ask the daycare', [
+          PpCard('Who feeds the younger ones?',
+              'One adult per few babies, sitting with them, not walking past.'),
+          PpCard('Do they make children finish?',
+              "They shouldn't. Ask what they say when a child stops."),
+          PpCard('What do they serve, if they cook?',
+              "Ask for the week's menu, and how they handle sugar and fried "
+                  'snacks.'),
+          PpCard("What's the allergy policy?",
+              'Nut-free tables, how sharing is handled, and who is trained in '
+                  'first aid.'),
+          PpCard('Where do children wash hands?',
+              'Before every meal, with soap, not a wipe.'),
+        ]),
+        PpLink('Insulated food jars and lunch boxes',
+            surfaceId: 'pp_products/Insulated food jars',
+            blurb: 'Hot food stays hot until lunch.'),
       ],
     ),
     // Added 2026-10-02 from the parenting gap analysis (P2/P3).
@@ -3076,6 +3414,7 @@ final PpArea _cooking = PpArea(
       id: 'recipes_meal_ideas',
       title: 'Easy meal ideas, from first foods to two and up',
       subtitle: 'Indian dishes that work for little ones',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'TABLE',
       blocks: [
         PpIntro("You don't need special baby recipes. Most Indian home "
@@ -3104,6 +3443,41 @@ final PpArea _cooking = PpArea(
                 'whole-wheat pasta with vegetable sauce.'],
           ],
         ),
+        // Feeding door build, D6 (01-feeding-content.md B4).
+        PpArticle(heading: 'Festivals, fasts and the prasad plate', [
+          "Small children don't need to fast. If the family is eating vrat "
+              'food, sabudana khichdi, rajgira, kuttu or singhara rotis, they '
+              'can share it as an ordinary meal. Sabudana is sticky, so serve '
+              'it soft and in small spoonfuls, and crush the peanuts in it to '
+              'a powder for children under five.',
+          // REQUIRED_REVIEW.
+          'Panchamrit and charnamrit are often made with honey, and honey is '
+              'not safe before the first birthday. Skip it, or ask for a drop '
+              'without honey.',
+          'Prasad often comes as whole nuts, roasted chana, mishri crystals or '
+              'hard sweets, which are the shapes young children choke on. Take '
+              'the prasad, crush it or keep it for later, and offer a soft '
+              'piece instead. Nobody minds.',
+          'Before one, skip mithai and added sugar. After one, a small taste '
+              'of the festival sweet is part of the festival. Payasam, kheer '
+              'and halwa in a small katori are fine; a third laddoo from a '
+              'third aunty is where to step in.',
+          'Iftar dates: take the stone out and cut them lengthwise into thin '
+              'pieces. Christmas plum cake is often soaked in rum, so give '
+              'young children a plain slice of something else.',
+        ]),
+        PpScript(heading: 'When everyone wants to feed her', [
+          PpScriptLine(
+              say: "She's had her share, we'll save the rest for tomorrow."),
+          PpScriptLine(
+              say: "Let's give it to her with dinner, she'll eat it better "
+                  'then.'),
+        ]),
+        PpIndiaNote("Festivals are when children learn the family's food. A "
+            'late, rich, happy meal once in a while undoes nothing. Go back to '
+            'the usual rhythm the next day.'),
+        PpLink('Can my baby eat this?', surfaceId: 'pp_baby_food_check'),
+        PpLink('Choking, and how to cut food', pageId: 'safety_choking'),
         PpWhenLine('Offer three meals and two snacks a day from about a year. '
             'Your child decides how much.'),
         PpLink('Recipes, step by step', surfaceId: 'pp_food',
@@ -3135,6 +3509,22 @@ final PpArea _cooking = PpArea(
           PpCard('Idli or dosa rolls', 'With a little podi or chutney.'),
           PpCard('Pulao or curd rice', 'In a spill-proof box.'),
           PpCard('Cut fruit', 'In a separate small box.'),
+          // Five more, Feeding door build (plan §5): ten in all.
+          PpCard('Besan or moong chilla strips', 'Rolled, with a little curd.'),
+          PpCard('Vegetable upma or poha', 'Soft, with peas and carrot.'),
+          PpCard('Mini uttapam', 'Topped with grated vegetables.'),
+          PpCard('Boiled egg, cut in quarters', 'With a pinch of pepper.'),
+          PpCard('Sweet potato or paneer cubes', 'Steamed, lightly spiced.'),
+        ]),
+        PpArticle(heading: 'Reading a snack packet', [
+          'Turn the packet over. Ingredients are listed from most to least, so '
+              'if sugar, maida or palm oil is in the first three, it is a '
+              'treat, whatever the front says.',
+          '"Multigrain", "baked" and "no added preservatives" are claims, not '
+              'nutrition. Look at sugar and sodium per 100 g instead, and '
+              'compare two packets side by side.',
+          'Packaged snacks are fine now and then. The aim is that most days, '
+              'the tiffin is food from your kitchen.',
         ]),
         PpCards(heading: 'Drinks', [
           PpCard('Water', 'The main drink, always.'),
@@ -3146,6 +3536,12 @@ final PpArea _cooking = PpArea(
         PpCallout('Keep shapes safe until four: no whole nuts, whole grapes '
             'or hard round sweets in the tiffin.',
             kind: PpCalloutKind.safety),
+        PpLink('Steel tiffin boxes',
+            surfaceId: 'pp_products/Tiffin boxes',
+            blurb: 'Two or three compartments, easy for small hands to open.'),
+        PpLink('Tiffin and toddler nutrition',
+            surfaceId: 'pp_class/Tiffin and toddler nutrition',
+            blurb: 'A live class: a week of tiffins, snacks and labels.'),
       ],
     ),
   ],
@@ -3174,6 +3570,7 @@ final PpArea _weightGain = PpArea(
     PpPage(
       id: 'weight_foods',
       title: 'Foods that help with weight gain',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'CARDS',
       blocks: [
         PpIntro('Adding weight is about energy in each spoon, not quantity. A '
@@ -3225,6 +3622,7 @@ final PpArea _weightGain = PpArea(
     PpPage(
       id: 'weight_fats',
       title: 'Ghee, nuts and the fats a baby needs',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'ARTICLE',
       blocks: [
         PpIntro("Fat gets a bad name it doesn't deserve in the first two "
@@ -3431,11 +3829,13 @@ final PpArea _notEating = PpArea(
   mark: IntentMark.compassMark,
   title: 'Baby not eating food',
   blurb: 'Refusal, food jags, mealtime battles, and what calms them down.',
+  bands: ['m8_12', 'tod', 'big'],
   hue: 288,
   pages: [
     PpPage(
       id: 'picky_not_eating',
       title: "My child isn't eating anything",
+      bands: ['m8_12', 'tod', 'big'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('This is the most searched feeding worry in India. It wears '
@@ -3504,11 +3904,26 @@ final PpArea _notEating = PpArea(
             "genes. It isn't your cooking or your parenting, and it often eases "
             'slowly through the school years. Keep offering, without '
             'pressure.'),
+        // Feeding door build (plan §3a, §11).
+        PpConsult(
+          title: 'Paediatric nutrition consultation',
+          whoFor: 'If meals have become a fight, or he eats very few foods, '
+              'and you want a plan for your table, not a lecture.',
+          surfaceId: 'pp_experts',
+          role: 'nutrition',
+        ),
+        // A feeding therapist is a category we don't have yet: the tap names
+        // the nearest one (S8b).
+        PpLink('A feeding therapist',
+            surfaceId: 'pp_experts/Feeding therapist',
+            blurb: 'For gagging past one, refusing every texture, or eating '
+                'only a handful of foods.'),
       ],
     ),
     PpPage(
       id: 'picky_who_decides',
       title: 'Who decides what, and who decides how much',
+      bands: ['m8_12', 'tod', 'big'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('One idea sorts out more mealtimes than any recipe. You decide '
@@ -3573,6 +3988,7 @@ final PpArea _notEating = PpArea(
     PpPage(
       id: 'picky_food_jags',
       title: 'Loved it last week, hates it now',
+      bands: ['tod', 'big'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('Food jags are one of the oddest parts of toddlerhood. The '
@@ -3619,6 +4035,7 @@ final PpArea _notEating = PpArea(
     PpPage(
       id: 'picky_battles',
       title: 'Mealtime battles, and why force-feeding backfires',
+      bands: ['m8_12', 'tod', 'big'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('If dinner has become the worst half hour of your day, this '
@@ -3684,6 +4101,10 @@ final PpArea _notEating = PpArea(
               'talk about the day, not the food. Appetite usually comes back '
               'as life settles.',
         ]),
+        PpLink('The fussy eater workshop',
+            surfaceId: 'pp_class/The fussy eater workshop',
+            blurb: 'Who decides what, food jags, no force-feeding, and the '
+                'relatives.'),
       ],
     ),
     PpPage(
@@ -3724,6 +4145,92 @@ final PpArea _notEating = PpArea(
             'rule is about how often, not about purity.'),
       ],
     ),
+    // Feeding door build, D6 (01-feeding-content.md B1): the big Indian
+    // marketing pressure on toddler parents had no page at all.
+    PpPage(
+      id: 'picky_health_drinks',
+      title: 'Do I need a health drink in his milk?',
+      subtitle: 'The malt and chocolate powders, honestly',
+      bands: ['tod', 'big'],
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('The ads promise taller, stronger, sharper. Grandparents swear '
+            'by them. For most children they are mainly a way to add sugar to '
+            'milk, and milk was already doing the work.'),
+        PpArticle([
+          // REQUIRED_REVIEW: dates and wording.
+          '"Health drink" is not a food category in Indian law. In April 2024 '
+              'the government told shopping sites to stop listing malt and '
+              "chocolate drink powders under that name, and India's food "
+              'regulator told them not to call dairy, cereal or malt drinks '
+              '"health" or "energy" drinks. The powders did not change; only '
+              'the label had been doing the selling.',
+          // REQUIRED_REVIEW: avoid exact figures unless confirmed per brand.
+          'Look at the back of the jar. On most of these powders, sugar is one '
+              'of the first ingredients, and often a large share of the jar. '
+              'Maltodextrin, liquid glucose, malt extract and cocoa solids with '
+              'sugar add more. A spoonful or two in each cup of milk, twice a '
+              'day, adds up to a lot of sugar in a small child.',
+          'The vitamins on the label are real, but a child eating dal, roti or '
+              'rice, vegetables, curd and fruit is already getting them. '
+              'Nothing in a jar makes a healthy child taller. Height comes '
+              'mostly from genes, from enough food overall, and from sleep.',
+          // REQUIRED_REVIEW: daily milk limit against IAP.
+          'They can make a fussy eater fussier. A big cup of sweet milk before '
+              'a meal fills a small stomach, so the dal goes uneaten, and the '
+              'cup gets bigger the next day. Most toddlers need no more than '
+              'about two to three small cups of milk a day; more than that '
+              'crowds out food and iron.',
+        ]),
+        PpCards(heading: "What's worth it, and what isn't", [
+          PpCard('Plain milk', 'Warm or cold, in a cup. This is the whole drink.'),
+          PpCard('Haldi doodh, a pinch',
+              'Fine from one, no sugar needed. A little cardamom makes it '
+                  'sweet enough.'),
+          PpCard('Home-made dry fruit powder',
+              'Almonds, cashews and pistachios ground very fine, a teaspoon in '
+                  'milk. Never whole nuts under five.'),
+          PpCard('Ragi malt made at home',
+              'Sprouted ragi flour cooked in milk or water. Keep jaggery '
+                  'small, because jaggery is sugar too.'),
+          PpCard('Malt and chocolate powders',
+              'A treat now and then, not a daily need. A small spoon, not a '
+                  'heaped one.'),
+          PpCard('Doctor-prescribed nutrition drinks',
+              'Different thing. If your doctor prescribes one for weight, '
+                  'follow their plan.'),
+        ]),
+        // REQUIRED_REVIEW: under-two sugar line, WHO/IAP.
+        PpCallout('No added sugar before two is the simplest rule. After two, '
+            'keep it small, and keep it with meals rather than in a bottle or '
+            'sippy cup through the day, where it sits on new teeth.'),
+        PpScript(heading: 'When a relative brings a jar', [
+          PpScriptLine(
+              say: "Thank you. We're keeping her milk plain for now, the "
+                  'doctor said so.'),
+          PpScriptLine(say: "She gets a little on Sundays, it's our treat day."),
+        ]),
+        PpWhenLine('Read the label once, decide once, and stop thinking about '
+            'it every morning.'),
+        PpIndiaNote('Many of us grew up on these drinks, and that is part of '
+            'their pull. It is fine to keep one as a treat. It is not a gap in '
+            "your child's diet if you don't."),
+        PpCallout('If you are reaching for a powder because you are worried '
+            'about weight, check the growth chart with your paediatrician '
+            'first. A child growing along their own curve does not need extra.',
+            kind: PpCalloutKind.doctor,
+            title: "When it's not a drink question"),
+        PpLink('Is my baby too thin?', pageId: 'weight_too_thin'),
+        PpLink('Track growth', surfaceId: 'pp_growth'),
+        PpLink('Only wants biscuits and chips', pageId: 'picky_sweet_packet'),
+        PpConsult(
+          title: 'Paediatric nutrition consultation',
+          whoFor: 'If milk has become most of what your child takes, and you '
+              'want a plan that brings food back without a fight.',
+          surfaceId: 'pp_experts/Nutritionist',
+        ),
+      ],
+    ),
   ],
 );
 
@@ -3757,6 +4264,7 @@ final PpArea _safety = PpArea(
       // choking-prevention page." The picture carries the cutting; the two
       // safety callouts, the doctor callout and the film stay. Gagging vs
       // choking moved to its own carousel. Prose kept below for revert.
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Read this before finger foods start, not after. Most choking '
@@ -3861,6 +4369,7 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_avoid_under_one',
       title: 'Foods to avoid before the first birthday',
+      bands: ['first_foods', 'm8_12'],
       format: 'CARDS',
       blocks: [
         PpIntro('A short list, and every item on it has a real reason. After '
@@ -3922,6 +4431,7 @@ final PpArea _safety = PpArea(
       // + a clear call-now block for breathing/face. Red-flag." The picture
       // splits mild from call-now; the doctor callout is the block; three
       // cards keep what the picture cannot show. Prose kept for revert.
+      bands: ['first_foods', 'm8_12', 'tod'],
       format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Most reactions to food are mild and settle. A few are '
@@ -4012,6 +4522,7 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_iron',
       title: 'Iron and the nutrients that matter',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'CARDS',
       blocks: [
         PpIntro("Low iron is common in Indian babies, and you can't see it "
@@ -4094,6 +4605,7 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_water',
       title: 'When to start water',
+      bands: ['milk', 'first_foods', 'm8_12', 'tod'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('Not before six months, whatever the weather. After that, '
@@ -4158,6 +4670,10 @@ final PpArea _safety = PpArea(
                   'last.'),
           PpStep('Milk in a cup from one', 'And never a bottle in bed.'),
         ]),
+        PpLink('Open cups and straw cups',
+            surfaceId: 'pp_products/Open cups',
+            blurb: 'An open cup with meals from six months, a straw cup '
+                'after.'),
       ],
     ),
     // ⚠️ [new] VIDEO, and the Safe tab's red flag. "The missing response:
@@ -4177,6 +4693,7 @@ final PpArea _safety = PpArea(
       id: 'safety_choking_response',
       title: 'If your child chokes: what to do',
       subtitle: 'Back blows and chest thrusts, in Health',
+      bands: ['first_foods', 'm8_12', 'tod', 'big'],
       format: 'VIDEO',
       toolSurfaceId: 'pp_page/parenting_health/health_choking_response',
       blocks: [],
@@ -4259,6 +4776,7 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_gagging',
       title: 'Gagging vs choking',
+      bands: ['first_foods', 'm8_12', 'tod'],
       format: 'CAROUSEL',
       blocks: [
         PpCarousel(
@@ -4310,6 +4828,7 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_vitamin_d',
       title: 'Vitamin D and supplements',
+      bands: ['milk', 'first_foods', 'm8_12', 'tod'],
       format: 'ARTICLE',
       blocks: [
         PpIntro('India has plenty of sun, and still a lot of low vitamin D, '

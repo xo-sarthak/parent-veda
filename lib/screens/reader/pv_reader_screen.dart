@@ -218,6 +218,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
 
   /// The one service that fits this read, worked out once (2026-10-21).
   late final PvOfferingView? _offer = pvReadOfferFor(widget.read);
+  late final PvReadNextStep? _ownConsult = pvReadOwnConsult(widget.read);
   AppLanguage get _lang => widget.lang;
   PvReadStore get _store => PvReadStore.instance;
 
@@ -587,6 +588,19 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                     if (_offer != null &&
                         i == (a.sections.length >= 3 ? 1 : a.sections.length - 1)) ...[
                       _pad(PvReadOfferCard(offering: _offer)),
+                      const SizedBox(height: 26),
+                    ],
+                    // A parenting page's own consult, under its first doctor
+                    // box (Feeding D2). Never with the matcher's card: S6
+                    // already gives such a page no `_offer`.
+                    if (_offer == null &&
+                        _ownConsult != null &&
+                        i == pvReadOwnConsultAfter(a)) ...[
+                      _pad(PvReadConsultCard(
+                        step: _ownConsult,
+                        onTap: () => widget.openSurface
+                            ?.call(context, _ownConsult.surfaceId!),
+                      )),
                       const SizedBox(height: 26),
                     ],
                   ],

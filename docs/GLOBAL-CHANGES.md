@@ -269,7 +269,12 @@ Getting Ready opens on the name finder; TTC Mind & body headings are actions
 door at every age, at 1x and 1.5x text, and holds no lock, no overflow, and no
 silent tap. Which tab each door opens on comes from its plan's `tabOrder`, set in
 that door's build, and the action-first check for that door is added then.
-**OWED:** Skilling action doors.
+**Feeding, 2026-10-25 (door 1 build):** `tabOrder` by band (Milk feeds to 6
+months, Starting solids 6 to 12, Cooking from one), tools with ages, and
+`test/pp_feeding_door_test.dart` holds the first view at 2, 7, 10, 18 and 30
+months: the opening tab, the first card (an action every time: the feed timer,
+then "What to feed at this age"), and the expert row.
+**OWED:** Skilling action doors; parenting doors 2 to 14, each in its own build.
 
 ---
 

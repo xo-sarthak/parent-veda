@@ -114,7 +114,13 @@ void main() {
                       ? b.surfaceId
                       : null;
               if (id == null) continue;
-              if (ppScreenForSurface(id) == null) {
+              // An owed shelf or class a door plan names on purpose is not
+              // dead: the one opener says why (S8; the same rule as
+              // pp_doors_sanity_test, Feeding door build 2026-10-25).
+              final owed = (id.startsWith('pp_products/') ||
+                      id.startsWith('pp_class/')) &&
+                  ppSurfaceUnavailable(id) != null;
+              if (ppScreenForSurface(id) == null && !owed) {
                 bad.add('${s.id}/${p.id} -> $id');
               }
             }

@@ -153,7 +153,26 @@ two.
 | FD1 | `feeding/positions_demo` | Film · 8 min | Coming soon | Film for the new slot ("Positions that actually work"). |
 | FD2 | `feeding/back_blows_demo` | Film · 5 min | Coming soon | Film for the new slot ("If he chokes: what to do"). The page's steps stand until it lands. |
 | FD3 | Textures / cut-it-this-way / allergic reaction | Illustration | Built from data | Drawn in code (`pp_content_art.dart`); artwork can replace each painter via `PpIllustration.asset` without touching the pages. |
-| FD4 | Introducing allergens safely (`solids_allergens`) | Interactive tracker | Built from data | The brief says "an allergen tracker: tick egg, peanut…". Built as a walk-through (introduced / not yet) that forgets on close. A tracker that REMEMBERS is a backend job: a `ChangeNotifier` store, a `pp_allergen_intros` table (child-scoped, RLS like `pp_sleep_logs`), local-first with `ChildSync.merge`, and the screen reading it. Decide, then build; the screen is already its front. |
+| FD4 | Introducing allergens safely (`solids_allergens`) | Interactive tracker | Built from data | The brief says "an allergen tracker: tick egg, peanut…". Built as a walk-through (introduced / not yet) that forgets on close. A tracker that REMEMBERS is a backend job: a `ChangeNotifier` store, a `pp_allergen_intros` table (child-scoped, RLS like `pp_sleep_logs`), local-first with `ChildSync.merge`, and the screen reading it. Decide, then build; the screen is already its front. **D4 (2026-10-23): yes, as its own later step.** |
+
+**Added by the door 1 build (2026-10-25, `docs/pp-door-plans/01-feeding.md` §4, §11).** Films (each slot shows the placeholder and answers a tap, S8a):
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| FD5 | `feeding/paced_bottle_demo` on `formula_mixed` | Film · 3 min | Coming soon | Bottle held nearly level, a pause every few sips, a baby who also breastfeeds never flooded. A real parent and baby, no brand visible (IMS Act). |
+| FD6 | `feeding/finger_foods_9m_demo` on `solids_textures` | Film · 3 min | Coming soon | Soft sticks, flattened peas, quartered grapes: the size, the squish test between finger and thumb, a nine-month-old eating them. |
+| FD7 | `feeding/open_cup_demo` on `formula_weaning` | Film · 2 min | Coming soon | Small sips from a steel cup or a paladai at six to nine months, and the spills that are part of it. |
+| FD8 | `feeding/ragi_porridge_textures` on `recipes_staples` | Film · 4 min | Coming soon | One pot of sprouted ragi porridge in an Indian kitchen, ladled into three bowls: smooth (6m), thicker (8m), lumpy (10m). |
+| FD9 | `feeding/door_intro` | Film · 0:50 | Not built | The door intro chip (GLOBAL-CHANGES #5) waits for its first film; this is Feeding's. "How this door works": the five tabs, which one opens for his age. |
+
+Catalogue items the door links to that do not exist yet (each tap says why, S8c/S8d; a catalogue entry, its price and coach are server-side decisions):
+
+| # | Target | Where | Today's tap |
+|---|---|---|---|
+| FD10 | Shelves: `High chairs` (and floor boosters), `Steamers and freezer trays`, `Insulated food jars`, `Tiffin boxes`, `Open cups`, `Milk storage bags` | solids_setup, recipes_batch, recipes_tiffin_snacks, safety_water, bf_pumping | "We're still choosing good …" (S8c). The other 20 product rows of `01-feeding-content.md` A2 are owed with them. |
+| FD11 | Classes: Breastfeeding Basics after birth (D3), Back to work: pumping and storage, Baby first aid and choking, Finger foods and self-feeding, The fussy eater workshop, Tiffin and toddler nutrition | bf_latch, bf_supply, bf_pumping, solids_textures, solids_spoon_or_blw, picky_battles, recipes_tiffin_snacks | "This class isn't open yet. Tap Tell me" (S8d) |
+| FD12 | Paediatric feeding therapist (expert category) | picky_not_eating | Names a speech therapist, with a pill (S8b) |
+| FD13 | A link that opens one programme (`co_weaning`, Confident Weaning) | solids_when | Not linked: the router has no per-programme route. The reader's offer card reaches courses by topic instead |
 
 ---
 

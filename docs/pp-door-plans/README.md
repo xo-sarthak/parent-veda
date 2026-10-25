@@ -6,7 +6,7 @@ Read `00-MASTER.md` first. It holds the shared shell fixes (step 0 · S1–S9) t
 | # | Door | Plan | Status |
 |---|---|---|---|
 | 0 | Shared shell fixes (S1–S11) | `00-MASTER.md` § Step 0, as built | **Built 2026-10-25**, uncommitted. S4 waits for the first door film (the approved design shows no chip until one exists); S5 kept as it is. Held by `test/pp_doors_first_view_test.dart`. The door builds can start |
-| 1 | Feeding | `01-feeding.md` + `01-feeding-content.md` (offerings and new copy) | All decisions D1–D6 answered 2026-10-23 (D2 look: `claude.ai/artifact/6Kgs3uNdKsbyKybfbdzdRB`). Plan final; build waits on step 0 |
+| 1 | Feeding | `01-feeding.md` + `01-feeding-content.md` (offerings and new copy) | All decisions D1–D7 answered 2026-10-23 (D2 look: `claude.ai/artifact/6Kgs3uNdKsbyKybfbdzdRB`). **Built 2026-10-25**, uncommitted: tab order by age, tools with ages, an expert row per help tab, the choking response and gagging on Starting solids, every page tagged, the D2 consult card in the reader (all parenting pages), the D6 copy, 7 pages deepened, 4 demo slots. Differences from the plan in `01-feeding.md` §12. Held by `test/pp_feeding_door_test.dart` |
 | 2 | Health | `02-health.md` + `02-health-content.md` (15 new pages) | H1–H7 all yes 2026-10-23. H2 look approved 2026-10-24 (`claude.ai/artifact/1fMmpwSHeQwwaUjEWjQ89Q`, v4). Plan final; build waits on step 0 |
 | 3 | You, Maa | `03-you-maa.md` + `03-you-maa-content.md` (8 new pages, 11 deepened) | M1–M9 all yes 2026-10-24. Plan final; build waits on step 0 |
 | 4 | Development | `04-development.md` + `04-development-content.md` | DV1–DV8 all yes 2026-10-24; DV2 look approved (…1bsFmZ4i5SRg8oiQFyeHHR, v2) with the tab renamed "Sit, crawl, walk" (DV9). Plan final; build waits on step 0 |

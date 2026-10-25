@@ -50,7 +50,17 @@ void main() {
     final bad = <String>[];
     void check(String where, String? surface) {
       if (surface == null) return;
-      if (ppScreenForSurface(surface) == null) bad.add('$where -> $surface');
+      // ⚠️ AN OWED TARGET IS NOT A DEAD ONE (S8, Feeding door build
+      // 2026-10-25). A shelf we haven't stocked and a class that isn't open
+      // are named on purpose by a door plan, and the one opener answers the
+      // tap with why ("We're still choosing...", "This class isn't open
+      // yet"). Only those two kinds pass; a typo anywhere else still fails.
+      final owed = (surface.startsWith('pp_products/') ||
+              surface.startsWith('pp_class/')) &&
+          ppSurfaceUnavailable(surface) != null;
+      if (ppScreenForSurface(surface) == null && !owed) {
+        bad.add('$where -> $surface');
+      }
     }
     for (final d in kPpDoors) {
       for (final t in d.tabs) {

@@ -190,6 +190,89 @@ PvOfferingView? pvReadOfferFor(PvRead r, {List<PvOfferingView>? catalog}) {
       }]});
 }
 
+/// ⚠️ THE PAGE'S OWN CONSULT, NEXT TO THE WORRY (Feeding D2, approved
+/// 2026-10-23 on claude.ai/artifact/6Kgs3uNdKsbyKybfbdzdRB; Health and You,
+/// Maa use the same pattern). A parenting page that carries a `PpConsult`
+/// had it only as the last tile, so a mother who read "see your doctor if
+/// he isn't gaining" had to scroll the whole piece to find the person who
+/// could help. Now the same consult also sits as the calm grey card right
+/// under the page's first doctor box. It is the page's own offer, so S6's
+/// rule still holds: one pitch per page, never the matcher's as well.
+///
+/// The 2026-09-18 rule ("a consult is a foot tile, not a purple button
+/// mid-piece") was about the purple button, and that is not coming back:
+/// this is the reader's own quiet card, and the foot tile stays.
+PvReadNextStep? pvReadOwnConsult(PvRead r) {
+  if (_stageOf(r) != LifeStage.parenting) return null;
+  final read = _words('${r.title.en} ${r.kicker.en} ${r.teaser.en}');
+  if (read.any(_kQuiet.contains)) return null;
+  for (final n in r.nextSteps) {
+    if (n.kind == PvNextKind.consult && n.surfaceId != null) return n;
+  }
+  return null;
+}
+
+/// The section the page's own consult follows: its first doctor box, or the
+/// matcher's slot when the page has none (after the second section, or the
+/// last on a short read).
+int pvReadOwnConsultAfter(PvRead r) {
+  final i = r.sections.indexWhere((s) => s.callout?.tone == PvCalloutTone.urgent);
+  if (i >= 0) return i;
+  return r.sections.length >= 3 ? 1 : r.sections.length - 1;
+}
+
+/// The page's own consult, drawn as the offer card is: one line of why, the
+/// expert, who it is for, a chevron. No price, because none is live.
+class PvReadConsultCard extends StatelessWidget {
+  const PvReadConsultCard({super.key, required this.step, required this.onTap});
+  final PvReadNextStep step;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const ink = Color(0xFF2F2C30);
+    return Material(
+      color: const Color(0xFFF3F3F4),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        key: const ValueKey('pv_read_own_consult'),
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+          child: Row(children: [
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Want an expert to look at this with you?',
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            color: const Color(0xFF69636C),
+                            height: 1.35)),
+                    const SizedBox(height: 3),
+                    Text(step.title.en,
+                        style: pvManrope(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
+                            color: ink,
+                            height: 1.3)),
+                    if (step.value.en.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(step.value.en,
+                          style: pvManrope(
+                              fontSize: 12.5, color: ink, height: 1.35)),
+                    ],
+                  ]),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: ink),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
 /// The card: quiet, one line of why, the price, a chevron.
 class PvReadOfferCard extends StatelessWidget {
   const PvReadOfferCard({super.key, required this.offering});

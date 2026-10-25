@@ -48,13 +48,32 @@ brief is missing, and every deliberate deviation is a line in this file.
 
 ## Feeding (§41)
 
-- [ ] FD4: the allergen walk-through forgets on close. Build the persistence
-      (a store + `pp_allergen_intros` table) or leave it a walk-through?
-- [ ] Clinical read of the choking sequence and the formula-amounts chart.
+- [x] FD4: the allergen walk-through forgets on close. **D4 (2026-10-23):
+      yes, persist it, as its own later step** (store + `pp_allergen_intros`,
+      RLS, local-first). Not built in the door 1 build.
+- [ ] Clinical read of the choking sequence and the formula-amounts chart,
+      and now of every `REQUIRED_REVIEW` line the door 1 build added (the
+      health-drinks page, daycare thaw times and volumes, food at room
+      temperature, the creche rule, consultant costs, pumping schedules,
+      relactation timescales, milk banks).
 - [ ] `PpChartBrowserScreen` (the old chooser for the food chart) is kept
       and routed only for Sleep's dead `pp_sleep_check`. Retire with it?
-- [ ] Two pages the brief's map did not name are kept: "He only wants
-      biscuits and chips" (`picky_sweet_packet`) and `bf_biting`. Keep?
+- [x] Two pages the brief's map did not name are kept: "He only wants
+      biscuits and chips" (`picky_sweet_packet`) and `bf_biting`. **Kept**
+      (plan §5), now tagged to the right ages.
+
+**Door 1 build (2026-10-25), what to check on the phone** (Developer card,
+set the child's age, open Feeding):
+- [ ] 2 months: Milk feeds opens; the feed timer leads; the mastitis row;
+      the grey "Talk to a lactation expert" row after the first rail.
+- [ ] 7 and 10 months: Starting solids opens; "If your child chokes" pinned;
+      the gagging carousel on the first rail; a nutritionist row.
+- [ ] 18 months: Cooking opens on "What to feed at this age"; on Milk feeds
+      the newborn tools are under "Earlier", and mastitis is still pinned.
+- [ ] 3 years: no Starting solids tab; no mastitis row.
+- [ ] A page with a consult (e.g. "It feels like I'm not making enough"):
+      the grey card sits right under the doctor box, the foot tile stays,
+      and both open the lactation list, not every expert.
 
 ## Health (§42)
 

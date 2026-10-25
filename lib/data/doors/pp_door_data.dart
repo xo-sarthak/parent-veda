@@ -159,7 +159,25 @@ class PpDoorTab {
     this.note,
     this.footer,
     this.toMonths,
+    this.expert,
+    this.extraPageIds = const [],
   });
+
+  /// ⚠️ THE EXPERT FOR THIS TAB, AFTER ITS FIRST RAIL (Feeding D2, approved
+  /// 2026-10-23). The door's `closing` sits at the foot, under every tab, and
+  /// a consult at the foot is one most parents never reach. This puts the
+  /// right person on the first scroll: a lactation expert on Milk feeds, a
+  /// child nutritionist on the food tabs. A tab that has one ends on the
+  /// doctor sentence instead of the closing card, so one tab never pitches
+  /// twice. Null keeps the door's closing as the only consult.
+  final PpDoorClosing? expert;
+
+  /// ⚠️ A PAGE FROM ANOTHER TAB, ON THIS ONE TOO. Feeding's gagging carousel
+  /// lives in Keeping it safe, and a parent opening Starting solids at seven
+  /// months meets the first gag before she ever reaches tab three. One page,
+  /// two ways in, never a second copy: the id is resolved against the
+  /// section and drawn in the first rail after the tools, for her band only.
+  final List<String> extraPageIds;
 
   /// ⚠️ A TAB THAT DROPS AWAY WITH AGE. Development's "When will my baby..."
   /// is scoped to the first two years and the brief is explicit that it
@@ -212,8 +230,19 @@ class PpDoorTool {
     this.chip = 'Tool',
     this.afterPageId,
     this.atEnd = false,
+    this.bands,
   });
   final String label;
+
+  /// ⚠️ THE AGES A TOOL IS FOR (Feeding plan §2c, 2026-10-23). Band ids of
+  /// the door's section; null means every band. A tool had no age, so a
+  /// toddler's parent met the newborn feed timer, nappies and pumping before
+  /// any help. Outside its bands a tool leaves the first rail and sits in
+  /// the band block it fits at the foot of the tab: still reachable, never
+  /// deleted.
+  final List<String>? bands;
+
+  bool inBand(String band) => bands == null || bands!.contains(band);
 
   /// Drawn after every page on the first rail instead of before them. For a
   /// shop card that should never come before the free things (gap analysis

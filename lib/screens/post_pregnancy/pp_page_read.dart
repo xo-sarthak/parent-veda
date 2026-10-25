@@ -213,12 +213,17 @@ PvRead ppPageAsRead(PpSection section, PpPage page) {
       // talk to someone with a purple button." The offer belongs where every
       // other next thing lives: the tiles at the foot, in the consult type's
       // own well.
-      case PpConsult(:final title, :final whoFor, :final surfaceId):
+      // ⚠️ `surface`, NOT `surfaceId` (found 2026-10-25, Feeding build): the
+      // role picks the expert. The old renderer read `b.surface`
+      // (pp_content.dart); this adapter took the raw id, so since the one
+      // reader every parenting consult opened the whole roster, the
+      // lactation consult included. Was `:final surfaceId` / `surfaceId:`.
+      case PpConsult(:final title, :final whoFor):
         next.add(PvReadNextStep(
           kind: PvNextKind.consult,
           title: _same(title),
           value: _same(whoFor),
-          surfaceId: surfaceId,
+          surfaceId: b.surface,
         ));
       case PpLink(:final label, :final blurb, :final surfaceId, :final pageId):
         if (surfaceId != null) {
