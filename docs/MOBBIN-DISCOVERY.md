@@ -1338,3 +1338,34 @@ button) in our look. Each pregnancy as its own record confirms R1 (the `pregnanc
 **Declined.** WHOOP's reset on switching: our moves never wipe anything.
 
 **Owed.** Say what changes before it changes (Clue, Flo) when the real moves are built (STAGE-TRANSITIONS R1).
+
+## 36. Skilling doors 1 to 3 in the house look (2026-10-25)
+
+**Why.** The user: "skilling right now doesn't look like it's from the ParentVeda app". The skilling shell
+predated the house passes (violet eyebrows and buttons, pink and purple tabs, a 3D coverflow selector, tinted cards
+with text on colour, grey boxes behind text). Mobbin set the UX; the other stages' doors set the look.
+
+**Queries.** Screens "kids learning app skill topic overview screen with lessons by age", "learning app single activity
+lesson screen with steps and done button", "parental gate screen in kids app", "Headspace course detail screen with
+sessions list", "learning app progress collection screen showing completed activities without scores".
+
+**Found.** Headspace's course page and Related shelf (https://mobbin.com/screens/3107561f-a33b-4e3f-bf65-2cd58ff0e99e,
+https://mobbin.com/screens/c2893ded-d3e0-4c42-b7c3-571bc5ea8aea, https://mobbin.com/screens/3a435349-e9c8-4a37-8759-6abf32039ed9);
+Duolingo ABC's level card and "Hi, grown ups!" gate (https://mobbin.com/screens/b06fe8bf-e3b9-44d2-9c7f-68f550e65b4d,
+https://mobbin.com/screens/e6128e52-cdb4-42ed-9f4a-b489881650c2); Tiimo's lesson with one ink commit
+(https://mobbin.com/screens/8e1d32ac-9eef-4110-8a22-37d8c0f2eaa5); Mindvalley's task list
+(https://mobbin.com/screens/562375df-75dd-4056-8e47-e24192d1ad78); Quizlet's numbered steps
+(https://mobbin.com/screens/0205337f-dbee-4a2e-aa43-43668ad2cdb7); Babbel's learning plan, colour in the picture
+only (https://mobbin.com/screens/832f5742-a189-409a-8bb1-06f5ed82bb60); Amazon Alexa and Meta parental consent
+(https://mobbin.com/screens/3f28566d-9464-4e52-a705-1c996b59f231, https://mobbin.com/screens/dd94dbd9-2e7f-4bfe-a54e-0b2779aeb112);
+Greenlight's parent view (https://mobbin.com/screens/c7930268-5663-4943-b06c-867b37a7cd01); Bloom's day list
+(https://mobbin.com/screens/a0fdac30-b299-4cea-9cbc-56148bf0956f).
+
+**Adopted.** The flat tab rail and shelf card the other doors use (mirrored by value in `sk_door_chrome.dart`); one
+ink commit per screen; numbered steps as ink rings; lists as rows on hairlines; consent as plain lines with ink ticks;
+colour only in the picture and the mark's disc. Prototype: `claude.ai/artifact/GQdX4MLR4aCv4tSmqBVncb`.
+
+**Declined.** Cartoon level maps, coins and streak counters (Kit, Duolingo, Mimo): skilling never scores a child.
+Spotify Kids' dark purple ground.
+
+**Owed.** The skilling home, next, at the user's word.

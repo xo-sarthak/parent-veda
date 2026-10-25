@@ -182,7 +182,7 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.3,
-                    color: p.action)),
+                    color: p.ink3)), // was p.action (house look, 2026-10-25)
             const SizedBox(height: 8),
             Text('Set up and consent',
                 style: pvFraunces(
@@ -258,12 +258,11 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
             const SizedBox(height: 22),
 
             _label('What is kept', p),
-            Container(
-              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-              decoration: BoxDecoration(
-                color: p.surfaceAlt,
-                borderRadius: BorderRadius.circular(14),
-              ),
+            // Plain lines with ink ticks, not a grey box (house look,
+            // 2026-10-25). Was padding 14/12, BoxDecoration(color:
+            // p.surfaceAlt, borderRadius: 14).
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 for (final line in const [
                   'Her name and date of birth, so the screens can speak to '
@@ -277,7 +276,7 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
                       'anywhere, and no ad is ever shown to her.',
                 ]) ...[
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Icon(Icons.check_rounded, size: 15, color: p.action),
+                    Icon(Icons.check_rounded, size: 15, color: p.ink1), // was p.action
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(line,
@@ -302,7 +301,7 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
                           ? Icons.check_box_rounded
                           : Icons.check_box_outline_blank_rounded,
                       size: 24,
-                      color: _consent ? p.action : p.ink3),
+                      color: _consent ? p.ink1 : p.ink3), // was p.action
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -342,11 +341,11 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
               child: FilledButton(
                 key: const Key('sk-gate-continue'),
                 onPressed: _ready ? _continue : null,
+                // The one ink pill. Was violet p.action, radius 14.
                 style: FilledButton.styleFrom(
-                    backgroundColor: p.action,
+                    backgroundColor: p.ink1,
                     disabledBackgroundColor: p.surfaceAlt,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14))),
+                    shape: const StadiumBorder()),
                 child: Text('Continue',
                     style: pvManrope(
                         fontSize: 15,

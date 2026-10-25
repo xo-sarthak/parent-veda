@@ -307,7 +307,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: SkDoorScreen(door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('sk-door-age-line')), findsOneWidget);
-      expect(find.textContaining('FOR MEERA  ·  BLOCKS  ·  8 TO 11'), findsOneWidget);
+      expect(find.textContaining('For Meera  ·  Blocks  ·  8 to 11'), findsOneWidget);
       expect(find.byIcon(Icons.lock_outline_rounded), findsOneWidget, reason: 'only the closing card\'s lock');
       expect(find.byKey(const Key('sk-door-locked-panel')), findsNothing);
       expect(find.text('One thing to try today'), findsOneWidget);
@@ -334,12 +334,16 @@ void main() {
       SkChildStore.instance.debugSetAgeYears(5, name: 'Kabir');
       await tester.pumpWidget(MaterialApp(home: SkDoorScreen(door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.textContaining('From 6 years'), findsNWidgets(5), reason: 'every child tab is locked');
+      // Five tab cards and the hero's own age line (house look, 2026-10-25:
+      // the band line is sentence case now, so it says "From 6 years" too).
+      expect(find.textContaining('From 6 years'), findsNWidgets(6), reason: 'every child tab is locked');
       expect(find.byKey(const Key('sk-door-locked-panel')), findsOneWidget);
       expect(find.text('This opens when Kabir turns 6.'), findsOneWidget);
       expect(find.text('One thing to try today'), findsNothing);
       expect(find.text('For the grown-up'), findsOneWidget, reason: 'the parent side stays open');
-      expect(find.textContaining('FROM 6 YEARS'), findsWidgets);
+      // The panel's 'FROM 6 YEARS' eyebrow went with the house look (2026-10-25);
+      // the tab cards and the panel's sentence say the age instead.
+      expect(find.textContaining('turns 6'), findsWidgets);
     });
 
     test('bands: inclusive lower, exclusive upper, floor at six, ceiling reads the top band', () {

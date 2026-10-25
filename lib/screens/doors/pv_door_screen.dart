@@ -58,6 +58,7 @@ import '../../services/pv_door_strip_store.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_door_intro_chip.dart';
 // import '../../data/reads/read_images.dart'; // kept for revert — rows asked the table directly; `pvDoorTilePhoto` asks now
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
@@ -1272,6 +1273,10 @@ class _Hero extends StatelessWidget {
                 ).copyWith(shadows: onPhoto ? shadow : null),
               ),
             ),
+            const SizedBox(height: 14),
+            // GLOBAL-CHANGES #5: the door's intro video, "Coming soon" until
+            // its film exists (the user, 2026-10-25: "all stages").
+            PvDoorIntroChip(p: p, onPhoto: onPhoto),
           ],
         ),
       ),

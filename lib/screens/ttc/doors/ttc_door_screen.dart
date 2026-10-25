@@ -115,6 +115,7 @@ import '../../../ttc/ttc_practice_data.dart'
     show TtcPractice, TtcPracticeKind, ttcPracticeById;
 import '../../../ttc/ttc_videos_data.dart' show ttcVideoBySlot;
 import '../../../widgets/pv_feedback.dart';
+import '../../../widgets/pv_door_intro_chip.dart';
 import '../../brackets/hub/hub_intent_art.dart';
 import '../../doors/pv_door_chrome.dart';
 import '../../doors/pv_live_search.dart';
@@ -2028,6 +2029,10 @@ class _Hero extends StatelessWidget {
             ).copyWith(shadows: light ? null : shadow),
           ),
         ),
+        const SizedBox(height: 14),
+        // GLOBAL-CHANGES #5: the door's intro video, "Coming soon" until its
+        // film exists (the user, 2026-10-25: "all stages").
+        PvDoorIntroChip(p: p, onPhoto: !light),
       ],
     );
 

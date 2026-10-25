@@ -334,7 +334,7 @@ void main() {
       SkChildStore.instance.debugSetAgeYears(6, name: 'Anaya');
       await tester.pumpWidget(MaterialApp(home: SkDoorScreen(door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.textContaining('FOR ANAYA  ·  SAY IT OUT LOUD  ·  6 TO 8'), findsOneWidget);
+      expect(find.textContaining('For Anaya  ·  Say it out loud  ·  6 to 8'), findsOneWidget);
       expect(find.textContaining('From 8 years'), findsOneWidget);
       expect(find.textContaining('From 11 years'), findsOneWidget);
       expect(find.text('Clarity'), findsOneWidget, reason: 'her band\'s first rail');
@@ -355,7 +355,7 @@ void main() {
       SkChildStore.instance.debugSetAgeYears(12, name: 'Vihaan');
       await tester.pumpWidget(MaterialApp(home: SkDoorScreen(door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.textContaining('SAY WHAT YOU THINK  ·  11 TO 14'), findsOneWidget);
+      expect(find.textContaining('Say what you think  ·  11 to 14'), findsOneWidget);
       expect(find.text('Say it out loud'), findsNothing, reason: 'grown past, dropped');
       expect(find.text('Tell it and explain it'), findsNothing);
       expect(find.byIcon(Icons.lock_outline_rounded), findsOneWidget, reason: 'only the closing card');
@@ -369,7 +369,8 @@ void main() {
       SkChildStore.instance.debugSetAgeYears(5, name: 'Zoya');
       await tester.pumpWidget(MaterialApp(home: SkDoorScreen(door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.textContaining('From 6 years'), findsNWidgets(5));
+      // Five tab cards and the hero's age line (house look, 2026-10-25).
+      expect(find.textContaining('From 6 years'), findsNWidgets(6));
       expect(find.text('For the grown-up'), findsOneWidget);
     });
   });

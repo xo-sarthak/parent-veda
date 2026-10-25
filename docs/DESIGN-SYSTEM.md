@@ -653,6 +653,23 @@ coloured rims, no illustration. The three stage decks (`pv_door_carousel`,
 geometry and this card. A chip row (`PvDoorChips`) exists behind
 `kPvDoorChipDoors` for any door that turns out to need a flat selector.
 
+## 4.0h The door intro chip — BUILT 2026-10-25
+
+One pill in every door's header, all four stages: `PvDoorIntroChip`
+(`lib/widgets/pv_door_intro_chip.dart`). White at 94% on a photograph (the
+surface with the hairline on plain art), 36 tall as a floor, a 26 ink disc
+with a white play mark, "How this door works" in Manrope 13/w700 ink, then a
+COMING SOON tag (9.5/w800 on `surfaceAlt`) until the film exists, the length
+after. Under the title and blurb, 14 above search. It grows rather than
+overflows at a large text size. GLOBAL-CHANGES #5.
+
+**Skilling mirrors the door by value.** The skilling shell cannot import
+`PvDoorRail` or `PvShelfCard` (both read the pregnancy door data, and the
+stages are kept apart), so `sk_door_chrome.dart` carries `SkDoorRail` and
+`SkShelfCard`, number for number; `test/sk_house_look_test.dart` holds the
+two equal. Skilling tabs paint from the house hue set (`skHouseHues`), never
+250–350.
+
 ## 4.0e Search — a bar in every door, one screen behind it — SETTLED 2026-09-18
 
 Every door carries `PvSearchBar` under its hero blurb (Flo's spot): white,

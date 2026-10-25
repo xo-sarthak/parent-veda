@@ -335,7 +335,7 @@ void main() {
       SkChildStore.instance.debugSetAgeYears(7, name: 'Ira');
       await tester.pumpWidget(MaterialApp(home: SkDoorScreen(door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.textContaining('FOR IRA  ·  USE YOUR VOICE  ·  6 TO 8'), findsOneWidget);
+      expect(find.textContaining('For Ira  ·  Use your voice  ·  6 to 8'), findsOneWidget);
       expect(find.textContaining('From 8 years'), findsOneWidget);
       expect(find.textContaining('From 11 years'), findsOneWidget);
       expect(find.text('Speaking up'), findsOneWidget);
@@ -351,7 +351,7 @@ void main() {
       SkChildStore.instance.debugSetAgeYears(13, name: 'Dev');
       await tester.pumpWidget(MaterialApp(home: SkDoorScreen(door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.textContaining('GIVE A REAL TALK  ·  11 TO 14'), findsOneWidget);
+      expect(find.textContaining('Give a real talk  ·  11 to 14'), findsOneWidget);
       expect(find.text('Use your voice'), findsNothing);
       expect(find.text('Stand up and say it'), findsNothing);
       expect(find.text('Hear yourself back'), findsWidgets);

@@ -29,6 +29,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'sk_child_store.dart';
@@ -85,6 +86,10 @@ class _GateSheetState extends State<_GateSheet> {
   final _ctl = TextEditingController();
   bool _wrong = false;
 
+  /// The red line under the field. Separate from [_wrong], which counts the
+  /// one retry: the line clears as she types, the count does not.
+  bool _showWrong = false;
+
   @override
   void dispose() {
     _ctl.dispose();
@@ -106,6 +111,7 @@ class _GateSheetState extends State<_GateSheet> {
       }
       setState(() {
         _wrong = true;
+        _showWrong = true;
         _ctl.clear();
       });
     }
@@ -134,14 +140,14 @@ class _GateSheetState extends State<_GateSheet> {
               ),
               const SizedBox(height: 18),
               Row(children: [
-                Icon(Icons.lock_outline_rounded, size: 18, color: p.action),
+                Icon(Icons.lock_outline_rounded, size: 18, color: p.ink1), // was p.action
                 const SizedBox(width: 8),
                 Text('ASK A GROWN-UP',
                     style: pvManrope(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.2,
-                        color: p.action)),
+                        color: p.ink3)), // was p.action (house look, 2026-10-25)
               ]),
               const SizedBox(height: 10),
               Text(
@@ -155,14 +161,12 @@ class _GateSheetState extends State<_GateSheet> {
                       height: 1.2,
                       color: p.ink1)),
               const SizedBox(height: 6),
-              Text(
-                  _wrong
-                      ? 'Not quite. One more try.'
-                      : 'This part is for a parent.',
-                  style: pvManrope(
-                      fontSize: 13.5,
-                      height: 1.5,
-                      color: _wrong ? p.action : p.ink2)),
+              // ⚠️ THE HOUSE ERROR RULE (DESIGN-SYSTEM §4.13): a wrong answer
+              // is red text under the field and the field's border in red,
+              // cleared the moment she types. Was this line swapped to
+              // "Not quite. One more try." in violet p.action.
+              Text('This part is for a parent.',
+                  style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
               const SizedBox(height: 16),
               TextField(
                 key: const Key('sk-gate-answer'),
@@ -173,6 +177,9 @@ class _GateSheetState extends State<_GateSheet> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 maxLength: widget.usePin ? 4 : 2,
                 onSubmitted: (_) => _submit(),
+                onChanged: (_) {
+                  if (_showWrong) setState(() => _showWrong = false);
+                },
                 style: pvManrope(
                     fontSize: 20, fontWeight: FontWeight.w700, color: p.ink1),
                 decoration: InputDecoration(
@@ -185,9 +192,23 @@ class _GateSheetState extends State<_GateSheet> {
                       borderSide: BorderSide(color: p.line)),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: p.line)),
+                      borderSide: BorderSide(
+                          color: _showWrong ? AppTheme.danger : p.line)),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(
+                          color: _showWrong ? AppTheme.danger : p.ink1, width: 1.5)),
                 ),
               ),
+              if (_showWrong) ...[
+                const SizedBox(height: 6),
+                Text('Not quite. One more try.',
+                    key: const Key('sk-gate-wrong'),
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.danger)),
+              ],
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
@@ -195,10 +216,10 @@ class _GateSheetState extends State<_GateSheet> {
                 child: FilledButton(
                   key: const Key('sk-gate-submit'),
                   onPressed: _submit,
+                  // The one ink pill. Was violet p.action, radius 14.
                   style: FilledButton.styleFrom(
-                      backgroundColor: p.action,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14))),
+                      backgroundColor: p.ink1,
+                      shape: const StadiumBorder()),
                   child: Text('Open',
                       style: pvManrope(
                           fontSize: 15,

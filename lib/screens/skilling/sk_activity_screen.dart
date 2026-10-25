@@ -86,7 +86,7 @@ class SkActivityScreen extends StatelessWidget {
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
-                      color: p.action)),
+                      color: p.ink3)), // was p.action (house look, 2026-10-25)
             const SizedBox(height: 8),
             Text(a.title,
                 style: pvFraunces(
@@ -225,10 +225,13 @@ class SkActivityScreen extends StatelessWidget {
               const SizedBox(height: 14),
               Container(
                 key: const Key('sk-what-you-practised'),
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+                // A hairline above, plain words below: never text on a tint
+                // (house look, 2026-10-25). Was a sage panel:
+                // padding 18/16/18/18, BoxDecoration(color: v2BlockTint(128, p),
+                // borderRadius: 18).
+                padding: const EdgeInsets.only(top: 16),
                 decoration: BoxDecoration(
-                  color: v2BlockTint(128, p),
-                  borderRadius: BorderRadius.circular(18),
+                  border: Border(top: BorderSide(color: p.line)),
                 ),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,8 +296,10 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        // A tag, outlined (house look, 2026-10-25). Was filled p.surfaceAlt.
         decoration: BoxDecoration(
-          color: p.surfaceAlt,
+          color: p.surface,
+          border: Border.all(color: p.line),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text.rich(
@@ -347,7 +352,7 @@ class _WordButton extends StatelessWidget {
               border: Border.all(color: p.line),
             ),
             child: Row(children: [
-              Icon(icon, size: 22, color: p.action),
+              Icon(icon, size: 22, color: p.ink1), // was p.action
               const SizedBox(width: 12),
               Text(label,
                   style: pvManrope(

@@ -86,7 +86,7 @@ class _SkAccessScreenState extends State<SkAccessScreen> {
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
-                    color: p.action)),
+                    color: p.ink3)), // was p.action (house look, 2026-10-25)
             const SizedBox(height: 8),
             Text('Free tools to set up',
                 style: pvFraunces(
@@ -109,18 +109,20 @@ class _SkAccessScreenState extends State<SkAccessScreen> {
                     height: 1.55,
                     color: p.ink2)),
             const SizedBox(height: 22),
-            for (final t in tools) ...[
-              _ToolRow(tool: t, p: p),
-              const SizedBox(height: 10),
-            ],
+            // Rows on hairlines (house look, 2026-10-25; were bordered cards
+            // 10 apart).
+            for (final t in tools) _ToolRow(tool: t, p: p),
             if (tools.isEmpty)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                    color: p.surfaceAlt, borderRadius: BorderRadius.circular(16)),
-                child: Text('This band needs nothing bought or installed.',
-                    style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
-              ),
+              // One grey line with an info mark, not a grey box. Was
+              // Container(padding: 16, color: p.surfaceAlt, radius 16).
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Icon(Icons.info_outline_rounded, size: 15, color: p.ink3),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('This band needs nothing bought or installed.',
+                      style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+                ),
+              ]),
           ],
         ),
       ),
@@ -152,11 +154,10 @@ class _ToolRow extends StatelessWidget {
       borderRadius: BorderRadius.circular(18),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        // A hairline row. Was a bordered card, padding 16, radius 18.
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: p.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: p.line),
+          border: Border(bottom: BorderSide(color: p.line)),
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Container(

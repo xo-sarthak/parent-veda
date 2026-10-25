@@ -142,7 +142,7 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
-                    color: p.action)),
+                    color: p.ink3)), // was p.action (house look, 2026-10-25)
             const SizedBox(height: 8),
             Text('For the grown-up',
                 style: pvFraunces(
@@ -362,7 +362,7 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
                         fontSize: 10.5,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.2,
-                        color: p.action)),
+                        color: p.ink3)), // was p.action
                 const SizedBox(height: 6),
                 Text(title,
                     style: pvFraunces(
@@ -425,11 +425,11 @@ class _Doing extends StatelessWidget {
       for (final l in lines.take(6)) ...[
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 13),
+          // A hairline row (house look, 2026-10-25). Was a bordered card,
+          // padding 14/12/14/13, radius 16, 8 apart.
+          padding: const EdgeInsets.fromLTRB(0, 12, 0, 13),
           decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: p.line),
+            border: Border(bottom: BorderSide(color: p.line)),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(l.title,
@@ -450,7 +450,6 @@ class _Doing extends StatelessWidget {
               ],
           ]),
         ),
-        const SizedBox(height: 8),
       ],
     ]);
   }
@@ -467,15 +466,14 @@ class _SoonCard extends StatelessWidget {
   final String line;
   final IconData icon;
   @override
+  // Plain words with a quiet mark, no grey box: still shown, never hidden
+  // (house look, 2026-10-25). Was padding 16/15, BoxDecoration(color:
+  // p.surfaceAlt, borderRadius: 16).
   Widget build(BuildContext context) => Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(16, 15, 16, 15),
-        decoration: BoxDecoration(
-          color: p.surfaceAlt,
-          borderRadius: BorderRadius.circular(16),
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, size: 18, color: p.ink2),
+          Icon(icon, size: 18, color: p.ink3),
           const SizedBox(width: 10),
           Expanded(
             child:
@@ -524,11 +522,11 @@ class _ShelfRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          // A hairline row (house look, 2026-10-25). Was a bordered card,
+          // padding 16, radius 18.
+          padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: p.line),
+            border: Border(bottom: BorderSide(color: p.line)),
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Container(
@@ -621,13 +619,14 @@ class _Settings extends StatelessWidget {
     final years = s.ageYears;
     // Her name in the actions (F5): which child's space this is.
     final her = s.name.isEmpty ? 'her' : "${s.name}'s";
+    // On the page under a hairline, not in a bordered card (house look,
+    // 2026-10-25). Was padding 16, BoxDecoration(color: p.surface,
+    // borderRadius: 18, border: Border.all(color: p.line)).
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(top: 12),
       decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: p.line),
+        border: Border(top: BorderSide(color: p.line)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _kv('Child', s.name.isEmpty ? 'No name' : s.name, p),
@@ -780,11 +779,12 @@ class _Settings extends StatelessWidget {
           {bool quiet = false}) =>
       OutlinedButton(
         onPressed: onTap,
+        // Ink outline pill, the house secondary (2026-10-25). Was violet
+        // p.action text on a hairline, radius 12.
         style: OutlinedButton.styleFrom(
-          foregroundColor: quiet ? p.ink2 : p.action,
-          side: BorderSide(color: p.line),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          foregroundColor: quiet ? p.ink2 : p.ink1,
+          side: BorderSide(color: quiet ? p.line : p.ink1),
+          shape: const StadiumBorder(),
         ),
         child: Text(label,
             style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800)),

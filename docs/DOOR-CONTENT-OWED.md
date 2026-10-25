@@ -459,6 +459,15 @@ on any skill door is not here.
 Rows carry an `S` prefix per door: S1… for Coding, then the next door's
 letters after it.
 
+**Door intro videos (2026-10-25, GLOBAL-CHANGES #5).** Every skilling door's
+header now shows "How this door works" with a Coming soon tag; a tap says the
+video is being made. One film per built door is owed, slot `<door>/door_intro`:
+**S-V1** Coding, **S-V2** Communication, **S-V3** Confidence, **S-V4** Thinking,
+**S-V5** Stillness, **S-V6** Feelings (clinical review first, like the door's
+content), **S-V7** Making. Who is on camera (AI scenes, a real teacher, or
+both) is the user's call per `video-plan-rules`. When a film lands, the door
+passes its length and player to `PvDoorIntroChip` and the tag becomes "0:50".
+
 ### S. Coding & AI literacy — `lib/data/doors/sk_door_coding.dart`
 
 Built to `ParentVeda_Coding_structure_v2.pdf` (11 Sep 2026), the first

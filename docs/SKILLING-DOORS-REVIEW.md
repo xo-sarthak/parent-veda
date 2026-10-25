@@ -739,6 +739,48 @@ doors themselves were the last gate.
       Honest while five doors are plan sheets; say if it should drop the
       word now that the stage opens.
 
+## House look, doors 1 to 3 — 2026-10-25
+
+The user: "skilling right now doesn't look like it's from the ParentVeda
+app". Mobbin pass (MOBBIN-DISCOVERY §36), then a tap-through prototype the
+user approved (`claude.ai/artifact/GQdX4MLR4aCv4tSmqBVncb`), then the build. Doors 1 to 3 first; the
+shell is shared, so Thinking, Stillness, Feelings and Making pick up the new
+door page too. Their own one-off screens (journal, portfolio) were not
+touched. The skilling home is next, at the user's word.
+
+What changed, everywhere a door 1 to 3 screen reaches:
+
+- **Door page.** The house header: title 28, the blurb at 14.5, the age line
+  in sentence case ("For Aarav · Unplugged · 6 to 8", was uppercase violet
+  on plain art), the intro video chip with Coming soon, and the house search
+  field (results from this door, her band). The coverflow deck became
+  `SkDoorRail`, the flat rail across the seam; the tinted 142×176 cards
+  became `SkShelfCard` (picture, kind badge, title, one grey line). Tabs
+  paint from the house hues: 288 and 344 tabs moved (Coding's AI, explained;
+  Communication's Say what you think; Confidence's Use your voice and Give a
+  real talk). The door data keeps its numbers for revert; the paint maps.
+  Each tab has a drawn mark from the TTC family (`skTabMarkFor`). The locked
+  panel and the tab note are plain words, no box.
+- **Activity.** Grey eyebrow, ink read-aloud, steps numbered in ink rings,
+  the three word buttons with ink marks, "What you practised" under a
+  hairline instead of a sage panel, the grown-up row on hairlines.
+- **Recorder and keepsakes.** The record button is ink with a coral ring
+  while it records; "Keep it" is the ink pill; the notice is a line with an
+  ink rule; clips, "What you tried" and keepsake lines are hairline rows.
+- **Gates.** The grown-up sum and the parent consent: ink lock, ink ticks,
+  ink pill. A wrong sum is red text under the field and a red border that
+  clears as she types (DESIGN-SYSTEM §4.13); the one-retry rule is unchanged.
+- **For the grown-up and the access screen.** Hairline rows, "coming soon"
+  notes as a grey line with a mark, ink outline buttons.
+
+Nothing else moved: copy, data, gates, consent, routes, tab order. Kept for
+revert: the old door body and hero as comments in `sk_door_screen.dart`, the
+carousel file, every replaced decoration as a note beside its replacement.
+Held by `test/sk_house_look_test.dart` (no violet or SnackBar in the source,
+the mirrored numbers, house hues, the rail, cards, chip and search on all
+three doors). The age-line tests in the seven door tests moved to sentence
+case.
+
 ## Cross-door windows
 
 `sk_page/<door>/<page>` as a `toolSurfaceId` on a page with no blocks —

@@ -26,7 +26,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 2 | Every article links to a service | LIVE for Pregnancy + TTC (aa1fe9e); Parenting OWED | Phase 2 |
 | 3 | Universal search + Ask Veda mark | ON HOLD (user, 2026-10-24): mark built as Aurora (COMMITTED c237e83, final design H vs K still open); search placement study done, choice on hold | Phase 4 |
 | 4 | "Films" → "Videos" | LIVE (faf0f04) | Phase 0 |
-| 5 | Door intro video (Option A chip) | OWED — design approved | Phase 3 |
+| 5 | Door intro video (Option A chip) | Chip LIVE in all four stages, "Coming soon" (2026-10-25); films OWED | Phase 3 |
 | 6 | Real products replace dummy products | WAITING — product master sheet | Phase 7 |
 | 7 | Store and services follow her week / child's age | Store LIVE (aa1fe9e); services OWED | Phase 2 |
 | 8 | Expert onboarding feed | Half LIVE (faf0f04: domain read); feed OWED | Phase 7 |
@@ -143,6 +143,19 @@ Health's is `health/door_intro` (a real paediatrician), owed as
 You, Maa's is `you_maa/door_intro` (a real perinatal counsellor or
 gynaecologist), owed as `DOOR-CONTENT-OWED` YM13; still no chip (door 3 build,
 2026-10-25).
+
+**2026-10-25, the user changed the rule: the chip shows before its film.** On
+the skilling prototype: "you can provide the button, and it may say coming
+soon", then "yes all stages". `lib/widgets/pv_door_intro_chip.dart` is one
+widget in every door header (pregnancy `pv_door_screen`, TTC
+`ttc_door_screen`, parenting `pp_door_screen`, skilling `sk_door_screen`),
+under the title and blurb, above search: "▶ How this door works" with a
+COMING SOON tag, and a tap shows a toast saying the video is being made (no
+silent tap). When a door's film exists it passes `length` and `onPlay`; the
+tag becomes the length. Still owed: the `introVideoSlot` field per door
+model, the first-open pop-up and the NEW state, all with the first film.
+Skilling's films are listed as S-V1 to S-V7 in `DOOR-CONTENT-OWED.md`; each
+parenting door plan already names its own.
 
 ### 6 · Real products — WAITING (user's product master sheet)
 

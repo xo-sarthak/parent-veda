@@ -411,7 +411,7 @@ class _RecordSheetState extends State<_RecordSheet> {
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
-                    color: p.action)),
+                    color: p.ink3)), // was p.action (house look, 2026-10-25)
             const SizedBox(height: 6),
             Text(widget.title ?? 'Say it in your voice',
                 style: pvFraunces(
@@ -434,8 +434,14 @@ class _RecordSheetState extends State<_RecordSheet> {
             const SizedBox(height: 22),
             Center(
               child: Material(
-                color: _recording ? const Color(0xFFFF5A79) : p.action,
-                shape: const CircleBorder(),
+                // Ink, always; while it records, a coral ring says "live"
+                // (the house's urgent coral). Was coral fill while recording,
+                // violet p.action at rest (house look, 2026-10-25).
+                color: p.ink1,
+                shape: _recording
+                    ? const CircleBorder(
+                        side: BorderSide(color: Color(0xFFFF5A79), width: 5))
+                    : const CircleBorder(),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   key: const Key('sk-voice-record'),
@@ -491,10 +497,12 @@ class _RecordSheetState extends State<_RecordSheet> {
                 const SizedBox(height: 12),
                 Container(
                   key: const Key('sk-voice-notice'),
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                  // A quiet line with an ink rule, not a grey box (house look,
+                  // 2026-10-25). Was padding 14/12, BoxDecoration(color:
+                  // p.surfaceAlt, borderRadius: 14).
+                  padding: const EdgeInsets.fromLTRB(12, 2, 0, 2),
                   decoration: BoxDecoration(
-                    color: p.surfaceAlt,
-                    borderRadius: BorderRadius.circular(14),
+                    border: Border(left: BorderSide(color: p.ink1, width: 2)),
                   ),
                   child: Text(
                       'Notice one thing you did. Just for you — nothing is '
@@ -510,10 +518,11 @@ class _RecordSheetState extends State<_RecordSheet> {
                 child: FilledButton(
                   key: const Key('sk-voice-save'),
                   onPressed: _save,
+                  // The one ink pill (house look, 2026-10-25). Was violet
+                  // p.action with a 14 radius.
                   style: FilledButton.styleFrom(
-                      backgroundColor: p.action,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14))),
+                      backgroundColor: p.ink1,
+                      shape: const StadiumBorder()),
                   child: Text('Keep it',
                       style: pvManrope(
                           fontSize: 16,
@@ -574,7 +583,7 @@ class _Button extends StatelessWidget {
               border: Border.all(color: p.line),
             ),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(icon, size: 20, color: p.action),
+              Icon(icon, size: 20, color: p.ink1), // was p.action
               const SizedBox(width: 8),
               Text(label,
                   style: pvManrope(
@@ -680,7 +689,7 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
-                      color: p.action)),
+                      color: p.ink3)), // was p.action
             const SizedBox(height: 8),
             Text(content?.voiceTitle ?? 'Your voice, saved',
                 style: pvFraunces(
@@ -702,11 +711,10 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
             if (!SkChildStore.instance.voiceAllowed)
               Container(
                 key: const Key('sk-voice-off'),
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: p.surfaceAlt,
-                  borderRadius: BorderRadius.circular(18),
-                ),
+                // Plain words on the page, no grey box (house look,
+                // 2026-10-25). Was padding 18, BoxDecoration(color:
+                // p.surfaceAlt, borderRadius: 18).
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Icon(Icons.lock_outline_rounded, size: 20, color: p.ink2),
                   const SizedBox(height: 10),
@@ -744,7 +752,7 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                   border: Border.all(color: p.line),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Icon(Icons.mic_none_rounded, size: 22, color: p.action),
+                  Icon(Icons.mic_none_rounded, size: 22, color: p.ink1),
                   const SizedBox(height: 10),
                   Text('Nothing recorded yet, and that is fine.',
                       style: pvFraunces(
@@ -766,7 +774,7 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                   onPlay: () => _play(c),
                   onDelete: () => SkVoiceStore.instance.remove(c.id),
                 ),
-                const SizedBox(height: 10),
+                // Hairline rows sit flush (was 10 apart as cards).
               ],
             if (lines.isNotEmpty) ...[
               const SizedBox(height: 22),
@@ -779,11 +787,11 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
               const SizedBox(height: 12),
               for (final l in lines) ...[
                 Container(
-                  padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+                  // A hairline row (house look, 2026-10-25). Was a bordered
+                  // card, padding 14/13, radius 16.
+                  padding: const EdgeInsets.fromLTRB(0, 13, 0, 13),
                   decoration: BoxDecoration(
-                    color: p.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: p.line),
+                    border: Border(bottom: BorderSide(color: p.line)),
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(l.title,
@@ -797,7 +805,6 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                         style: pvManrope(fontSize: 13, height: 1.4, color: p.ink2)),
                   ]),
                 ),
-                const SizedBox(height: 10),
               ],
             ],
           ],
@@ -830,15 +837,16 @@ class _ClipRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final d = clip.at;
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+      // A hairline row (house look, 2026-10-25). Was a bordered card,
+      // padding 12, radius 16.
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
       decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: p.line),
+        border: Border(bottom: BorderSide(color: p.line)),
       ),
       child: Row(children: [
         Material(
-          color: playing ? p.action : v2BlockTint(26, p),
+          // Ink while it plays; a pale peach disc at rest (colour in a well).
+          color: playing ? p.ink1 : v2BlockTint(26, p), // was p.action
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
           child: InkWell(

@@ -63,7 +63,7 @@ class SkKeepsakeScreen extends StatelessWidget {
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
-                      color: p.action)),
+                      color: p.ink3)), // was p.action (house look, 2026-10-25)
             const SizedBox(height: 8),
             Text(_content?.keepsakeTitle ?? "What I've made and tried",
                 style: pvFraunces(
@@ -92,7 +92,7 @@ class SkKeepsakeScreen extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       height: 1.5,
-                      color: p.action)),
+                      color: p.ink1)), // was p.action
             ],
             const SizedBox(height: 26),
             if (lines.isEmpty)
@@ -107,7 +107,7 @@ class SkKeepsakeScreen extends StatelessWidget {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.auto_awesome_outlined, size: 22, color: p.action),
+                      Icon(Icons.auto_awesome_outlined, size: 22, color: p.ink1),
                       const SizedBox(height: 10),
                       Text('Nothing here yet, and that is fine.',
                           style: pvFraunces(
@@ -125,10 +125,9 @@ class SkKeepsakeScreen extends StatelessWidget {
                     ]),
               )
             else
-              for (final l in lines) ...[
-                _Line(line: l, p: p),
-                const SizedBox(height: 10),
-              ],
+              // Rows on hairlines, not boxed cards (house look, 2026-10-25).
+              // Was each _Line in its own bordered card, 10 apart.
+              for (final l in lines) _Line(line: l, p: p),
           ],
         ),
       ),
@@ -156,11 +155,12 @@ class _Line extends StatelessWidget {
       _ => Icons.check_rounded,
     };
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+      padding: const EdgeInsets.fromLTRB(0, 14, 0, 14),
+      // A hairline row (house look, 2026-10-25). Was a bordered card:
+      // padding 14/13, BoxDecoration(color: p.surface, borderRadius: 16,
+      // border: Border.all(color: p.line)).
       decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: p.line),
+        border: Border(bottom: BorderSide(color: p.line)),
       ),
       child: Row(children: [
         Container(

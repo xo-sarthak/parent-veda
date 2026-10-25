@@ -49,6 +49,7 @@ import 'pp_door_inline_tools.dart';
 import '../../../data/doors/pv_door_data.dart' show PvDoorGroup;
 import '../../../services/pv_search_store.dart';
 import '../../../widgets/pv_feedback.dart';
+import '../../../widgets/pv_door_intro_chip.dart';
 import '../../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../../doors/pv_door_chrome.dart' show PvDoorSheet, kPvDoorGutter;
 import '../../doors/pv_door_rail.dart';
@@ -2470,6 +2471,10 @@ class _QuietHero extends StatelessWidget {
                     color: onPhoto ? Colors.white : p.ink1,
                   ).copyWith(shadows: onPhoto ? shadow : null)),
             ],
+            const SizedBox(height: 14),
+            // GLOBAL-CHANGES #5: the door's intro video, "Coming soon" until
+            // its film exists (the user, 2026-10-25: "all stages").
+            PvDoorIntroChip(p: p, onPhoto: onPhoto),
           ],
         ),
       ),

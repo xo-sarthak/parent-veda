@@ -405,7 +405,7 @@ class SkReadAloud extends StatelessWidget {
           final v = BabyVoiceService.instance;
           final playing = v.playingKey == cardKey;
           return Material(
-            color: playing ? p.action : p.surface,
+            color: playing ? p.ink1 : p.surface, // was p.action (house look, 2026-10-25)
             shape: CircleBorder(side: BorderSide(color: p.line)),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
@@ -588,7 +588,7 @@ class SkBlockView extends StatelessWidget {
               builder: (context, s) => PvBreathingCircle(
                 pattern: b.pattern,
                 elapsed: s,
-                tint: p.action.withValues(alpha: 0.18),
+                tint: p.surfaceAlt, // was p.action at 0.18 (house look, 2026-10-25)
                 ink: p.ink1,
                 size: 220,
               ),
@@ -667,7 +667,10 @@ class SkBlockView extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
               decoration: BoxDecoration(
-                color: v2BlockTint((b.hue + i * 22) % 360, p),
+                // House look (2026-10-25): white with the hairline, never
+                // text on a tint. Was: v2BlockTint((b.hue + i * 22) % 360, p).
+                color: p.surface,
+                border: Border.all(color: p.line),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -741,7 +744,7 @@ class SkBlockView extends StatelessWidget {
                   ? Icons.open_in_new_rounded
                   : Icons.arrow_forward_rounded,
               size: 18,
-              color: dead ? p.ink3 : p.action),
+              color: dead ? p.ink3 : p.ink1), // was p.action
           const SizedBox(width: 10),
           Expanded(
             child:
@@ -800,15 +803,17 @@ Widget skStepRow(int i, String title, String? detail, V2Palette p,
         height: kidVoice ? 32 : 26,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: p.action.withValues(alpha: 0.10),
+          // Ink ring, ink numeral (house look, 2026-10-25). Was a violet
+          // disc: p.action at 0.10, numeral p.action.
           shape: BoxShape.circle,
+          border: Border.all(color: p.ink1, width: 1.5),
         ),
         child: Text('${i + 1}',
             style: pvManrope(
                 fontSize: kidVoice ? 14 : 12,
                 fontWeight: FontWeight.w800,
                 height: 1.5,
-                color: p.action)),
+                color: p.ink1)),
       ),
       const SizedBox(width: 12),
       Expanded(
@@ -850,13 +855,15 @@ class SkGrownUpButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: Container(
         constraints: const BoxConstraints(minHeight: kSkTap),
-        padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+        padding: const EdgeInsets.fromLTRB(2, 14, 2, 14),
+        // A hairline row, not a grey box (house look, 2026-10-25). Was:
+        // BoxDecoration(color: p.surfaceAlt, borderRadius: 14).
         decoration: BoxDecoration(
-          color: p.surfaceAlt,
-          borderRadius: BorderRadius.circular(14),
+          border: Border(
+              top: BorderSide(color: p.line), bottom: BorderSide(color: p.line)),
         ),
         child: Row(children: [
-          Icon(Icons.lock_outline_rounded, size: 18, color: p.ink2),
+          Icon(Icons.lock_outline_rounded, size: 18, color: p.ink1),
           const SizedBox(width: 10),
           Expanded(
             child: Text(label,
@@ -901,7 +908,7 @@ void skShowGrownUpSheet(BuildContext context,
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.2,
-                  color: p.action)),
+                  color: p.ink3)), // was p.action
           const SizedBox(height: 8),
           Text(body.isEmpty ? 'The note for this one is still being written.' : body,
               style: pvManrope(fontSize: 14.5, height: 1.6, color: p.ink1)),
