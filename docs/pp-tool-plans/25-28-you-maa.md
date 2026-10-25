@@ -20,7 +20,7 @@ The four tools:
 | 27 | Kegel Care | `pp_kegel` | `lib/screens/tools/kegel_care_screen.dart`, **shared with pregnancy**, so changes stay additive behind `_kgPostpartum` |
 | 28 | Yoga & fitness | `pp_yoga` | `yoga_home_screen.dart`, `yoga_class_screen.dart`, `pp_yoga_data.dart`, and via `booking_catalog.dart` / `pv_learn_*` |
 
-Approved plan: `C:\Users\sarth\.claude\plans\continue-the-parenting-tools-effervescent-sundae.md` (copied here). **Built 2026-10-25; see "As built" at the foot.**
+Approved plan: `C:\Users\sarth\.claude\plans\continue-the-parenting-tools-effervescent-sundae.md` (copied here). **Built 2026-10-25, committed `96eef2d`; see "As built" at the foot.** The two held blocks below are now in STILL-OPEN §102.9 and BEFORE-LAUNCH.
 
 ## Out of scope, said plainly
 - **App-wide search does not index Can I answers.** `ppSearch` lives in another file. Recorded in STILL-OPEN.

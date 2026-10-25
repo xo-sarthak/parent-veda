@@ -30,10 +30,10 @@ One tool at a time; the user says go per tool. Each plan records every decision 
 | 22 | What to feed at this age | `pp_food_chart` | COMMITTED (22-24-food.md); preset landings in the follow-up | 03976a1 |
 | 23 | Can my baby eat this? | `pp_baby_food_check` | COMMITTED (22-24-food.md); preset landings in the follow-up | 03976a1 |
 | 24 | Recipes | `pp_food` | COMMITTED (22-24-food.md); preset landings in the follow-up | 03976a1 |
-| 25 | How have you been? | `pp_mood_check` | BUILT (25-28-you-maa.md), commit pending | |
-| 26 | Can I...? | `pp_maa_can_i` | BUILT (25-28-you-maa.md), commit pending | |
-| 27 | Kegel Care | `pp_kegel` | BUILT (25-28-you-maa.md), commit pending | |
-| 28 | Yoga & fitness | `pp_yoga` | BUILT (25-28-you-maa.md), commit pending | |
+| 25 | How have you been? | `pp_mood_check` | COMMITTED (25-28-you-maa.md) | 96eef2d |
+| 26 | Can I...? | `pp_maa_can_i` | COMMITTED (25-28-you-maa.md) | 96eef2d |
+| 27 | Kegel Care | `pp_kegel` | COMMITTED (25-28-you-maa.md) | 96eef2d |
+| 28 | Yoga & fitness | `pp_yoga` | COMMITTED (25-28-you-maa.md) | 96eef2d |
 | 29 | What to say | `pp_scripts` | | |
 | 30 | Sleep Sounds | `pp_sleep_sounds` | | |
 | 31 | Baby names | `pp_names` | | |

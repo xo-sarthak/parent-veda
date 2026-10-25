@@ -1483,7 +1483,7 @@ creates; wired in `main.dart`), `test/sync_guard_contract_test.dart` (guarded), 
 ## Step 21: the You, Maa tools: a kind on each Kegel session, no seeded yoga saves, a bought-once recorded class
 
 **Date:** 2026-10-25 (parenting tools pass, You, Maa family 25-28; the user's rule: "make sure the back ends are
-working well"). **Migration:** none. **Commit:** pending.
+working well"). **Migration:** none. **Commit:** `96eef2d`.
 
 ### Why
 Four tools, two with stores. Kegel Care's history could not tell a breathing session from a squeeze session, so

@@ -11163,3 +11163,18 @@ or letting a signal reorder an age rail, would fix it; either changes Health's r
 (closed the same day, once the Development door was committed; `docs/pp-tool-plans/22-24-food.md`). **The
 recipe page is a tool page, not a read (D3):** cook mode, the shopping list and Save; held by name in
 `test/reader_unification_test.dart`.
+
+**§102.9 You, Maa tools (tools pass 25-28, 2026-10-25, `96eef2d`; `docs/pp-tool-plans/25-28-you-maa.md`).**
+- *App-wide search does not reach Can I...?'s answers.* The tool's own search is fixed, but the parenting search
+  index (`ppSearch`) does not include the 340 answers, so "crocin" typed in the app's search misses them.
+- *Three copies of "Can I" can drift:* pregnancy's `lib/data/can_i_data.dart`, TTC's `ttc_can_i_screen.dart`, and
+  the mother's `pp_maa_can_i_screen.dart` (plus the door's `cani_*` pages). Fasting, alcohol and hair had drifted
+  between this tool and the door; those three now agree. One shared source is a cross-stage job.
+- *Words shared by different questions keep different verdicts on purpose* ("fever" while breastfeeding: Yes; a
+  fever after the birth: See a doctor today). Only the names of things she takes are held to one verdict
+  (`test/pp_maa_safety_test.dart`). Listed for the clinical review: contraception, crying, navratri, kajal,
+  nazar, malaria, zumba, phone, mall.
+- *Caesarean notes inside Can I answers show to every mother.* They are sentences inside about a dozen answers,
+  not a field. Harmless as written ("after a caesarean, ...").
+- *Kegel Care and the Can I search field keep Material icons* (`PregNote`, `PregFoldRow`, the field's glyph).
+  They come from pregnancy's shared tool chrome; changing them is a shell change. No drawn search mark exists.
