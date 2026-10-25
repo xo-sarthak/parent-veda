@@ -8,7 +8,9 @@ Written 2026-10-25. This goes into `pp_family_content.dart` at build. The house 
 
 ---
 
-## 1. New page: "Going back to work"
+## 1. ~~New page: "Going back to work"~~ WITHDRAWN 2026-10-25 (FM6)
+Not built. You, Maa's `back_to_work` area already says all of this; Family links to it instead. Kept for the record.
+
 Area: `childcare` (tab "Care while you work"). Bands: 0–12 months. Format: STEP-LIST.
 
 **Intro.** Going back to work with a small baby is hard on both of you, and it gets easier. A little planning in the weeks before makes the first days calmer.
@@ -16,7 +18,7 @@ Area: `childcare` (tab "Care while you work"). Bands: 0–12 months. Format: STE
    - Under the Maternity Benefit Act, most women working in establishments with 10 or more employees get **26 weeks of paid maternity leave** for the first two children.
    - Workplaces with **50 or more employees** must provide a creche, or access to one, and **four creche visits a day**, counting the nursing breaks.
    - Many employers allow work from home after the leave. Ask.
-   - Link: Papers.
+   - ~~Link: Papers.~~ (FM6: the leave rules are You, Maa `work_your_entitlement`.)
 2. **Start the bottle or cup two to three weeks before.**
    - Someone else offers it, once a day, when he's calm and a little hungry, not starving.
    - Expressed milk first.

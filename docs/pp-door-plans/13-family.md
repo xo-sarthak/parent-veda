@@ -1,6 +1,6 @@
 # Door 13: Family, the plan
 
-Written 2026-10-25. **Status: final. The plan was accepted 2026-10-25, and FM1 to FM5 are chosen and recorded under the user's rule (obvious decisions aren't asked).** The new copy is in `13-family-content.md`. Nothing in `lib/` changes until step 0 (S1 to S11) and the user's go.
+Written 2026-10-25. **Status: final. The plan was accepted 2026-10-25, and FM1 to FM5 are chosen and recorded under the user's rule (obvious decisions aren't asked). FM6 (2026-10-25, found by the Papers audit) withdraws the back-to-work page in favour of links to You, Maa.** The new copy is in `13-family-content.md`. Nothing in `lib/` changes until step 0 (S1 to S11) and the user's go.
 
 ## Context
 **Where it lives.**
@@ -20,7 +20,7 @@ From `research/questions/ranked_parenting.csv`:
 | Topic | Hits | Top questions | What it means |
 |---|---|---|---|
 | Daycare and creche, settling in | 34 | how much crying is too much at daycare; will this get better | `fam_settling_in` covers it, but links nothing |
-| Back to work | 4, but specific | "I have to join office, she won't take a bottle"; how do working mothers keep breastfeeding | **No page.** It's the most concrete Indian question here |
+| Back to work | 4, but specific | "I have to join office, she won't take a bottle"; how do working mothers keep breastfeeding | No page in Family. **Corrected 2026-10-25:** You, Maa's `back_to_work` area (7 pages) already answers it, so Family links there (FM6) |
 | Fathers | 38 (noisy) | — | Covered |
 | Siblings, second baby | 23 | toddler hitting a sibling | Covered; link Behaviour |
 | Grandparents, MIL | 5 | how to tell my MIL you can't spoil a newborn | Covered; link Behaviour's scripts (BH2) |
@@ -37,7 +37,7 @@ From `research/questions/ranked_parenting.csv`:
    - Grandparents doesn't reach Behaviour's "When elders discipline differently" or the "What to say" scripts.
    - Fathers' low mood has no helpline.
 3. **Missing:**
-   - going back to work: the bottle, pumping at work, the 26-week maternity leave, the creche rule
+   - ~~going back to work~~: corrected 2026-10-25, You, Maa has it (FM6); the gap was the missing link
    - you two after the baby
    - a single parent
 4. **"Who looks after your child"** (26 characters) runs to three lines on its card.
@@ -64,13 +64,13 @@ From `research/questions/ranked_parenting.csv`:
 | `fam_telling_toddler`, `fam_getting_ready` | new-sibling picture books (kids library), Behaviour `separation` |
 | `fam_tandem_feeding`, `fam_dad_breastfeeding` | Feeding's latch and supply pages |
 | `fam_dad_depression` | **Tele-MANAS 14416** added to its callout; You, Maa `mind_rage` |
-| `fam_dad_leave` | Papers' leave and benefits page |
+| `fam_dad_leave` | You, Maa `work_your_entitlement` (it covers paternity and child care leave too). Corrected 2026-10-25: Papers has no leave page and doesn't add one (Papers PM2) |
 | `fam_grandparents_help` | Behaviour `beh_elders`, the "What to say" family scripts (BH2), Traditions `family_pressure` |
 | `fam_couple_on_same_page` | the new "You two" page (FM3) |
 | `fam_settling_in` | Behaviour `separation`; Health vaccines (a creche asks for the card) |
 
-## FM3. Three short pages where the need is real (copy in `13-family-content.md`; REQUIRED_REVIEW)
-- **"Going back to work"** (0–12 months), on Care while you work:
+## FM3. Two short pages where the need is real (copy in `13-family-content.md`; REQUIRED_REVIEW)
+- ~~**"Going back to work"** (0–12 months), on Care while you work~~ **Withdrawn 2026-10-25 (FM6).** It repeated You, Maa's `back_to_work` area. Kept below for the record:
   - getting him used to a bottle or cup, two to three weeks before
   - pumping and storing milk at work
   - the right to 26 weeks of paid maternity leave and a creche, under the Maternity Benefit Act
@@ -91,6 +91,18 @@ From `research/questions/ranked_parenting.csv`:
   - looking after yourself
   - the free helpline
 
+## FM6. Back to work: link to You, Maa, don't repeat it (2026-10-25)
+The Papers audit found that You, Maa's `back_to_work` area (`pp_you_maa_content.dart:6176`) already has seven pages: planning the return four weeks out, including the bottle given by someone else; the leave entitlement; the milk stash; pumping with no room; childcare; the guilt; and the first week back. A second page in Family would be two answers to one question, and they would drift apart.
+
+So the Care while you work tab gets a link group, "Going back to work", on `fam_choosing_care`, linking to:
+- `work_planning`
+- `work_your_entitlement`
+- `work_milk_stash`
+- `work_pumping_no_room`
+- `work_first_week`
+
+They are linked by page (M4), so a father or a grandparent finds them too. The copy in `13-family-content.md` §1 is withdrawn. Its one extra, "many babies refuse the bottle from their mother", is already in `work_planning`.
+
 ## FM4. Names
 - "Who looks after your child" becomes "Care while you work". The old label stays commented out.
 - **"For fathers" stays.** "Fathers, and on your own" fits two lines at normal text but runs to three at a large text size (S11). The new page's own title carries "on your own", and the tab blurb mentions it.
@@ -110,7 +122,7 @@ From `research/questions/ranked_parenting.csv`:
 ## Build order (after step 0 and your go)
 1. Tags and tab order
 2. Links
-3. The three pages
+3. The two pages, and the FM6 links
 4. Names
 5. Closing, film and hero
 
@@ -125,7 +137,7 @@ From `research/questions/ranked_parenting.csv`:
 - `test/pp_gap_doors_test.dart` for this door:
   - the opening tab at 0–12 months and 1–6 years
   - every link resolves
-  - the three new pages are reachable
+  - the two new pages are reachable, and the Care tab's links reach You, Maa's work pages
   - the dad-depression callout carries 14416
 - `door_names_fit_test`
 - `flutter analyze` on touched files
@@ -142,3 +154,4 @@ These stay here on purpose. When a problem turns up later, check this table firs
 | FM3 | Back to work, you two, and on your own | Real Indian questions (the bottle before office) with no page | **Yes**, chosen and recorded (2026-10-25) |
 | FM4 | "Care while you work" | The old name runs to three lines | **Yes**, chosen and recorded (2026-10-25) |
 | FM5 | Closing drawn, intro film, hero | Plain fixes | **Yes**, chosen and recorded (2026-10-25) |
+| FM6 | Withdraw the back-to-work page; link the Care tab to You, Maa's seven work pages | One answer per question; the Papers audit found the duplicate | **Yes**, chosen and recorded (2026-10-25) |
