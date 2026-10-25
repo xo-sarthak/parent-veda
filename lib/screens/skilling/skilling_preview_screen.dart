@@ -70,7 +70,10 @@ import '../v2/v3_skill_art.dart';
 import '../../data/doors/sk_door_data.dart';
 import '../profile/pv_you_screen.dart';
 import '../saved_screen.dart';
-import '../v2/v3_hero_chrome.dart';
+// Kept for revert: the header chrome before the one header (2026-10-25).
+// import '../v2/v3_hero_chrome.dart';
+import '../v2/pv_family_switch.dart' show FamilyHome, PvFamilyTitle;
+import '../post_pregnancy/pp_surface_router.dart' show ppScreenForSurface;
 import 'sk_child_store.dart';
 import 'sk_first_activity.dart';
 import 'sk_practice_store.dart';
@@ -281,31 +284,100 @@ class _Hero extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Saved and the avatar, as on the other three homes. The
-                // avatar is the one door to You (2026-09-19): the parent's
-                // profile, with her keepsakes and consent reachable from it.
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: AnimatedBuilder(
-                    animation: SkChildStore.instance,
-                    builder: (context, _) => V3HeroChrome(
-                      tone: V3HeroTone.onField,
-                      p: p,
-                      initial: SkChildStore.instance.name.isEmpty
-                          ? ''
-                          : SkChildStore.instance.name[0],
-                      onSaved: () =>
-                          Navigator.of(context).push(MaterialPageRoute<void>(
-                              settings: const RouteSettings(name: 'saved'),
-                              builder: (_) => const SavedScreen(stage: 'skilling'))),
-                      onProfile: () =>
-                          openPvYou(context, stage: LifeStage.skilling),
-                      // Without this the chrome falls back to the three-stage
-                      // menu (v3_hero_chrome.dart), so the avatar never reached
-                      // You despite the note above (2026-10-24, STAGE-TRANSITIONS B10).
-                      avatarOpensProfile: true,
-                    ),
-                  ),
+                // ⚠️ ONE HEADER ON EVERY HOME (2026-10-25, the user: "unify the
+                // header"). The same three slots as TTC, Pregnancy and
+                // Parenting: avatar and Talk on the left, the family switch
+                // over the date in the centre, Saved on the right. No Calendar
+                // here until the learning space has one (decided 2026-10-25).
+                // Kept for revert, Saved and the avatar on the right in the
+                // photo-hero chrome:
+                // Align(
+                //   alignment: Alignment.centerRight,
+                //   child: AnimatedBuilder(
+                //     animation: SkChildStore.instance,
+                //     builder: (context, _) => V3HeroChrome(
+                //       tone: V3HeroTone.onField,
+                //       p: p,
+                //       initial: SkChildStore.instance.name.isEmpty
+                //           ? ''
+                //           : SkChildStore.instance.name[0],
+                //       onSaved: () =>
+                //           Navigator.of(context).push(MaterialPageRoute<void>(
+                //               settings: const RouteSettings(name: 'saved'),
+                //               builder: (_) => const SavedScreen(stage: 'skilling'))),
+                //       onProfile: () =>
+                //           openPvYou(context, stage: LifeStage.skilling),
+                //       avatarOpensProfile: true,
+                //     ),
+                //   ),
+                // ),
+                AnimatedBuilder(
+                  animation: SkChildStore.instance,
+                  builder: (context, _) {
+                    const side = 84.0; // 38 + 8 + 38, as on the other homes
+                    final name = SkChildStore.instance.name;
+                    final today = DateTime.now();
+                    final date = '${today.day} ${_kSkMonths[today.month - 1]}';
+                    return Row(children: [
+                      SizedBox(
+                        width: side,
+                        child: Row(children: [
+                          // The avatar is the one door to You (2026-09-19, B10).
+                          _SkRound(
+                            p: p,
+                            semantic: 'Profile',
+                            onTap: () => openPvYou(context, stage: LifeStage.skilling),
+                            child: name.isEmpty
+                                ? Icon(Icons.person_outline_rounded, size: 18, color: p.ink2)
+                                : Text(name[0].toUpperCase(),
+                                    style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+                          ),
+                          const SizedBox(width: 8),
+                          _SkRound(
+                            p: p,
+                            semantic: 'Talk to an expert',
+                            onTap: () {
+                              final screen = ppScreenForSurface('pp_experts');
+                              if (screen == null) return;
+                              Navigator.of(context).push(MaterialPageRoute<void>(
+                                  settings: const RouteSettings(name: 'pp_experts'),
+                                  builder: (_) => screen));
+                            },
+                            child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
+                          ),
+                        ]),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: PvFamilyTitle(
+                            p: p,
+                            here: FamilyHome.learning,
+                            dateText: date,
+                            date: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(date,
+                                  style: pvManrope(
+                                      fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.1, color: p.ink1)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: side,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: _SkRound(
+                            p: p,
+                            semantic: 'Saved',
+                            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                                settings: const RouteSettings(name: 'saved'),
+                                builder: (_) => const SavedScreen(stage: 'skilling'))),
+                            child: Icon(Icons.bookmark_border_rounded, size: 18, color: p.ink2),
+                          ),
+                        ),
+                      ),
+                    ]);
+                  },
                 ),
                 const Spacer(),
                 // ink2 on the tinted field, as everywhere else — a grey
@@ -347,6 +419,36 @@ class _Hero extends StatelessWidget {
                         fontSize: 13.5, height: 1.45, color: p.ink2)),
               ],
             ),
+          ),
+        ),
+      );
+}
+
+const _kSkMonths = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/// The header's round button, the other homes' shape (white at 0.62 on the
+/// field, 38 across).
+class _SkRound extends StatelessWidget {
+  const _SkRound({required this.p, required this.child, required this.onTap, required this.semantic});
+  final V2Palette p;
+  final Widget child;
+  final VoidCallback onTap;
+  final String semantic;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: semantic,
+        child: Material(
+          color: Colors.white.withValues(alpha: 0.62),
+          shape: const CircleBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: SizedBox(width: 38, height: 38, child: Center(child: child)),
           ),
         ),
       );

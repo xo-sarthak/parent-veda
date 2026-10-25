@@ -99,6 +99,7 @@ import '../../ttc/ttc_symptom_data.dart';
 import '../brackets/bracket_screen.dart';
 import '../v2/v2_block_grid.dart';
 import '../v2/v2_palette.dart';
+import '../v2/pv_family_switch.dart' show FamilyHome, PvFamilyTitle;
 import '../v2/v3_bracket_art.dart';
 // V3JournalSection is in the commented-out journal block. Kept for revert.
 // ignore: unused_import
@@ -1597,19 +1598,29 @@ class _CycleHeader extends StatelessWidget {
             // The year appears only when the selection leaves the current one,
             // because "30 August" is unambiguous in August and actively
             // misleading the following January.
+            // ⚠️ THE FAMILY SWITCH (2026-10-25, STAGE-TRANSITIONS "Switching
+            // profiles"): with two or more profiles the centre says whose home
+            // this is, "Trying ▾", over the date; with one it is the date alone,
+            // exactly as before (pv_family_switch.dart).
             Expanded(
               child: Center(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                      '${selected.day} ${_months[selected.month - 1]}'
+                child: PvFamilyTitle(
+                  p: p,
+                  here: FamilyHome.trying,
+                  dateText: '${selected.day} ${_months[selected.month - 1]}'
                       '${selected.year == now.year ? '' : ' ${selected.year}'}',
-                      maxLines: 1,
-                      style: pvManrope(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.1,
-                          color: p.ink1)),
+                  date: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                        '${selected.day} ${_months[selected.month - 1]}'
+                        '${selected.year == now.year ? '' : ' ${selected.year}'}',
+                        maxLines: 1,
+                        style: pvManrope(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.1,
+                            color: p.ink1)),
+                  ),
                 ),
               ),
             ),

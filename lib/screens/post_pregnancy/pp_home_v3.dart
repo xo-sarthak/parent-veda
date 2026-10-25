@@ -130,7 +130,12 @@ import '../doors/pv_shelf_card.dart';
 import '../doors/pv_list_row.dart';
 import 'pp_tile_order.dart';
 import '../../services/family_profile.dart';
+// The kept-for-revert _Hero still draws the child switch; the live header
+// uses pv_family_switch.dart.
 import 'pp_child_switch.dart';
+import '../../services/pp_messages_store.dart' show PpMessagesStore;
+import '../v2/pv_family_switch.dart' show FamilyHome, PvFamilyTitle;
+import 'pp_messages_screen.dart' show openPpMessages;
 import 'pp_visit_card.dart';
 // import 'video/pv_video_config.dart' show pvResolveVideoUrl; // the film pick moved to pp_home_reads.dart (2026-10-21)
 import 'pp_tip_links.dart';
@@ -238,6 +243,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
         PpLastPageStore.instance, // Continue reading (2026-10-07)
         FamilyProfileStore.instance, // tile order by her priorities (2026-10-07)
         PpChangesStore.instance, // what she told us (2026-10-23, Wave 8)
+        PpMessagesStore.instance, // the header's inbox count (2026-10-25)
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -344,6 +350,16 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   onProfile: () => openPvYou(context, stage: LifeStage.parenting),
                   // Talk to someone, from the header (2026-10-14).
                   onTalk: () => _openSurface(context, 'pp_experts'),
+                  // ⚠️ ONE HEADER ON EVERY HOME (2026-10-25, the user: "unify
+                  // the header as in parenting its a bit missing"). TTC and
+                  // Pregnancy carry Messages and Calendar on the right; so does
+                  // Parenting now. The inbox was reachable only from Settings
+                  // and More. The calendar opens the vaccines until a child
+                  // calendar exists (decided 2026-10-25, owed). Saved moved to
+                  // You, as Pregnancy's did on 2026-10-10.
+                  onMessages: () => openPpMessages(context),
+                  onCalendar: () => _openSurface(context, 'pp_vaccines'),
+                  unreadMessages: PpMessagesStore.instance.unreadCount,
                 )),
                 _Sheet(p: p, children: [
                 const SizedBox(height: 22),
@@ -1837,7 +1853,7 @@ const _kHeroMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'S
 /// The header's round button: Pregnancy's `_Round` (v3_preg_hero.dart), so the
 /// three homes share one button.
 class _HeroRound extends StatelessWidget {
-  const _HeroRound({required this.p, required this.child, required this.onTap, required this.semantic});
+  const _HeroRound({super.key, required this.p, required this.child, required this.onTap, required this.semantic});
   final V2Palette p;
   final Widget child;
   final VoidCallback onTap;
@@ -4302,6 +4318,9 @@ class _PaintedHero extends StatelessWidget {
     required this.onSaved,
     required this.onProfile,
     required this.onTalk,
+    required this.onMessages,
+    required this.onCalendar,
+    this.unreadMessages = 0,
   });
 
   final AgePhase phase;
@@ -4312,6 +4331,9 @@ class _PaintedHero extends StatelessWidget {
   final VoidCallback onSaved;
   final VoidCallback onProfile;
   final VoidCallback onTalk;
+  final VoidCallback onMessages;
+  final VoidCallback onCalendar;
+  final int unreadMessages;
 
   @override
   Widget build(BuildContext context) {
@@ -4373,6 +4395,9 @@ class _PaintedHero extends StatelessWidget {
                     ]),
                   ),
                 ),
+                // The family switch (2026-10-25): "Aarav ▾" over the date
+                // with two or more profiles, in the same pill that keeps the
+                // date readable on the painting; the date alone otherwise.
                 Expanded(
                   child: Center(
                     child: Container(
@@ -4381,24 +4406,72 @@ class _PaintedHero extends StatelessWidget {
                         color: p.surface.withValues(alpha: 0.88),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text('${today.day} ${_kHeroMonths[today.month - 1]}',
-                            style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
+                      child: PvFamilyTitle(
+                        p: p,
+                        here: FamilyHome.parenting,
+                        dateText: '${today.day} ${_kHeroMonths[today.month - 1]}',
+                        date: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text('${today.day} ${_kHeroMonths[today.month - 1]}',
+                              style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
+                        ),
                       ),
                     ),
                   ),
                 ),
+                // Messages and Calendar, as on TTC and Pregnancy (2026-10-25).
+                // Kept for revert, the Saved button that stood here:
+                // SizedBox(
+                //   width: side,
+                //   child: Align(
+                //     alignment: Alignment.centerRight,
+                //     child: _HeroRound(
+                //       p: p,
+                //       semantic: 'Saved',
+                //       onTap: onSaved,
+                //       child: Icon(Icons.bookmark_border_rounded, size: 18, color: p.ink2),
+                //     ),
+                //   ),
+                // ),
                 SizedBox(
                   width: side,
                   child: Align(
                     alignment: Alignment.centerRight,
-                    child: _HeroRound(
-                      p: p,
-                      semantic: 'Saved',
-                      onTap: onSaved,
-                      child: Icon(Icons.bookmark_border_rounded, size: 18, color: p.ink2),
-                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Stack(clipBehavior: Clip.none, children: [
+                        _HeroRound(
+                          key: const ValueKey('pp_hero_messages'),
+                          p: p,
+                          semantic: unreadMessages > 0 ? 'Messages, $unreadMessages unread' : 'Messages',
+                          onTap: onMessages,
+                          child: Icon(Icons.mail_outline_rounded, size: 18, color: p.ink2),
+                        ),
+                        if (unreadMessages > 0)
+                          Positioned(
+                            top: -3,
+                            right: -3,
+                            child: IgnorePointer(
+                              child: Container(
+                                key: const ValueKey('pp_hero_messages_count'),
+                                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                alignment: Alignment.center,
+                                decoration: const BoxDecoration(color: Color(0xFF2F2C30), shape: BoxShape.circle),
+                                child: Text(unreadMessages > 9 ? '9+' : '$unreadMessages',
+                                    style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white)),
+                              ),
+                            ),
+                          ),
+                      ]),
+                      const SizedBox(width: 8),
+                      _HeroRound(
+                        key: const ValueKey('pp_hero_calendar'),
+                        p: p,
+                        semantic: 'Calendar',
+                        onTap: onCalendar,
+                        child: Icon(Icons.calendar_today_rounded, size: 17, color: p.ink2),
+                      ),
+                    ]),
                   ),
                 ),
               ]),
@@ -4408,7 +4481,10 @@ class _PaintedHero extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            PpChildSwitch(p: p),
+            // The child switch moved into the header's centre (2026-10-25,
+            // pv_family_switch.dart), so a second "Aarav ▾" here would be
+            // two controls for one thing. Kept for revert:
+            // PpChildSwitch(p: p),
             Text(_ageSentence(child),
                 key: const ValueKey('pp_hero_age'),
                 style: pvFraunces(

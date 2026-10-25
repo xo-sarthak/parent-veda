@@ -52,6 +52,7 @@ import 'package:flutter/material.dart';
 import '../../services/stage_gateway.dart' show showStageDoorMenu;
 import '../../theme/pv_fonts.dart';
 import 'pv_day_strip.dart';
+import 'pv_family_switch.dart' show FamilyHome, PvFamilyTitle;
 import 'v2_palette.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../widgets/pv_home_arrival.dart';
@@ -318,14 +319,23 @@ class _V3PregHeroState extends State<V3PregHero> {
                   ]),
                 ),
               ),
+              // The family switch (2026-10-25): "Baby-to-be ▾" over the date
+              // when there is a child too; the date alone otherwise
+              // (pv_family_switch.dart).
               Expanded(
                 child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                        '${sel.day} ${V3PregHero._months[sel.month - 1]}'
+                  child: PvFamilyTitle(
+                    p: p,
+                    here: FamilyHome.pregnancy,
+                    dateText: '${sel.day} ${V3PregHero._months[sel.month - 1]}'
                         '${sel.year == now.year ? '' : ' ${sel.year}'}',
-                        style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.1, color: p.ink1)),
+                    date: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                          '${sel.day} ${V3PregHero._months[sel.month - 1]}'
+                          '${sel.year == now.year ? '' : ' ${sel.year}'}',
+                          style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.1, color: p.ink1)),
+                    ),
                   ),
                 ),
               ),
