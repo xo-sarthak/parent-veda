@@ -88,7 +88,10 @@ final List<PpSurface> kPpSurfaces = [
   PpSurface('pp_find_help', _t(en: 'Find help', hi: 'मदद ढूँढिए')),
 
   // ---- Mother --------------------------------------------------------------
-  PpSurface('pp_yoga', _t(en: 'Yoga & recovery', hi: 'योग और रिकवरी')),
+  // One name for one surface (tools 25-28, D8, 2026-10-25): the Tools tab and
+  // Explore say "Yoga & fitness". The Hindi follows the English it pairs.
+  // Kept for revert: _t(en: 'Yoga & recovery', hi: 'योग और रिकवरी')
+  PpSurface('pp_yoga', _t(en: 'Yoga & fitness', hi: 'योग और फ़िटनेस')),
 
   // ---- Tradition -----------------------------------------------------------
   PpSurface('pp_nuskhe', _t(en: 'Home remedies', hi: 'दादी–नानी के नुस्ख़े')),

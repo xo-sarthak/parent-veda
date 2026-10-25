@@ -224,7 +224,26 @@ class BookingCatalog {
   static Offering? _fromYoga(YogaClass y) {
     switch (y.mode) {
       case YogaMode.recorded:
-        return null; // plays, not booked
+        // ⚠️ A PRICED RECORDED CLASS IS BOUGHT ONCE (tools 25-28, D3,
+        // 2026-10-25). Five recorded classes showed ₹299 and played with no
+        // buy step, because a recorded class had no offering and the commit
+        // bar plays whatever has none. Now a priced one is a bought-once
+        // offering (the engine's masterclass kind: "live or recorded, bought
+        // once"), with no slots; a free one still just plays. The money is
+        // the server's, as for every offering, once payments are live.
+        // Kept for revert: return null; // plays, not booked
+        if (_minor(y.price) == 0) return null; // free: plays, not booked
+        return Offering(
+          id: 'off_${y.id}',
+          stage: _yogaStage(y),
+          kind: OfferingKind.masterclass,
+          format: SessionFormat.recorded,
+          catalogId: y.id,
+          title: y.title,
+          expertId: _slug(y.instructorName),
+          priceMinor: _minor(y.price),
+          grant: const EntitlementGrant(recordingAccess: true), // a pure recording: 0 credits
+        );
       case YogaMode.liveGroup:
         return Offering(
           id: 'off_${y.id}',
@@ -445,6 +464,9 @@ class BookingCatalog {
   // ---------------------------------------------------------------------------
 
   static List<Slot> _generate(Offering o, DateTime at) {
+    // A recorded offering has no times to pick (2026-10-25): it is bought and
+    // watched, never reserved.
+    if (o.format == SessionFormat.recorded) return const [];
     final seed = o.catalogId.hashCode & 0x7fffffff;
     switch (o.kind) {
       case OfferingKind.classPack:

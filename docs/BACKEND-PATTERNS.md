@@ -4218,3 +4218,39 @@ A notification tap that launches the app arrives while the splash is up; pushed 
 `pushReplacement` replaced it. So the message openers now wait for `LastProfile.homeShown`, which the restore
 raises in a `finally`: if the restore throws, taps still open. The existing app-live flag was not reused because
 only two of the four homes raise it; a flag that some roots never set is a hang, not a signal.
+
+## 16tt. What is never synced, and a JSON blob's lenient read as its migration (no migration, 2026-10-25)
+
+The You, Maa tools (25-28) added two small pieces of state. Each one turned on a question this doc has not asked
+directly before: *should this leave the phone at all?*
+
+### 1. A device-local record is a choice, not an omission
+
+"Remind me in two weeks" on How have you been? keeps one thing: the date. Everything else in the app is
+local-first *and then synced*, so the default reflex is to give it a cloud row. Ask instead who the record is for.
+- *Synced:* her other phone would ring too. But the family shares a cloud, and a co-parent's phone that learns
+  "she asked to be reminded about her mood" has learned something she did not tell him.
+- *Device-local (chosen):* the reminder rings on the phone she set it on, and nowhere else. **The cost:** a new
+  phone forgets it. For a nudge she can set again in one tap, that is cheap; for her data it would not be.
+
+**The general rule:** sync is for facts the person would expect to find again on another device, or that someone
+else in the family needs. A reminder belongs to the phone it rings on. Write the decision down, so a later pass
+does not "fix" the missing cloud row.
+
+### 2. A field added to a JSON blob needs a default, not a migration
+
+Kegel history is a list of JSON maps in `user_state`. Adding `kind` (breath or squeeze) needed no `ALTER TABLE`,
+because the server never looks inside the blob. What it needs instead is a **lenient read**: a record written
+before the field existed has no `kind`, and `fromJson` must answer for it. Here the answer is easy and exact: the
+only sessions before this change were squeeze sessions, so a missing `kind` *is* `kegel`.
+
+**The general rule:** with a schemaless blob, the reader carries the schema history. Pick a default that is
+*true* for every old record, not merely convenient, and pin it with a test that reads an old record. If no true
+default exists, the field needs a version number instead.
+
+### 3. Free versus priced is a property of the offer, not of the screen
+
+Five recorded yoga classes showed ₹299 and played with no buy step, because "recorded" had been mapped to "no
+offering", and the commit bar plays whatever has none. The fix was not on the class screen: a priced recorded
+class became an offering of the existing bought-once kind with no slots, and the engine's own `ownsRecording`
+decides play versus buy. One rule for every paid thing means one place for the server to take the money later.

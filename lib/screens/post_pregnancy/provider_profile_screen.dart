@@ -609,10 +609,9 @@ class ProviderProfileScreen extends StatelessWidget {
   // from her profile closed the profile and showed the first one. This screen
   // is reachable from anywhere, so there is no "back" it can assume.
   Widget _yogaRow(BuildContext context, YogaClass c, {bool top = false}) => PvPress(child: GestureDetector(
-        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-          settings: RouteSettings(name: 'pp/yoga/class/${c.id}'),
-          builder: (_) => YogaClassScreen(cls: c),
-        )),
+        // The six-week check on the way in (2026-10-25, D7). Was a bare push.
+        onTap: () =>
+            openYogaClass(context, c, routeName: 'pp/yoga/class/${c.id}'),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),

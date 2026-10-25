@@ -191,13 +191,16 @@ List<PpToolGroup> ppToolGroups() {
           words: ['recipe', 'khichdi', 'meal']),
     ]),
     PpToolGroup('For you', 288, [
-      PpTool('Can I...?', 'Quick answers while you breastfeed.', 'pp_maa_can_i', tool: TtcToolMark.canI, IntentMark.lotusMark,
+      PpTool('Can I...?', 'Quick answers for after the birth.', // was 'Quick answers while you breastfeed.' (2026-10-25: not every mother does)
+           'pp_maa_can_i', tool: TtcToolMark.canI, IntentMark.lotusMark,
           words: ['medicine', 'chai', 'fasting']),
-      PpTool('How have you been?', 'Two questions. No score, nothing saved.', 'pp_mood_check', tab: TtcTabMark.heartHand,
+      PpTool('How have you been?', 'Four questions. No score, nothing saved.', // was 'Two questions.' (D1, 2026-10-25)
+           'pp_mood_check', tab: TtcTabMark.heartHand,
           IntentMark.cuppedHands, words: ['mood', 'sad', 'low', 'anxious']),
       // Her own body after birth (2026-10-17: the user looked for Kegel Care
       // here and it was only inside the yoga hub and a pelvic floor page).
-      PpTool('Kegel Care', 'Breathing first, then kegels after your check.', 'pp_kegel', tab: TtcTabMark.tulip, IntentMark.spineMark,
+      PpTool('Kegel Care', 'Breathing first, then kegels from six weeks.', // was 'after your check': the date decides (2026-10-25)
+           'pp_kegel', tab: TtcTabMark.tulip, IntentMark.spineMark,
           words: ['kegel', 'pelvic floor', 'leak', 'exercise']),
       PpTool('Yoga & fitness', 'Recovery classes, core and calm.', 'pp_yoga', tab: TtcTabMark.lotus, IntentMark.lotusMark,
           words: ['yoga', 'exercise', 'core', 'workout', 'postnatal']),

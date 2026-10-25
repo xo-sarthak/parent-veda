@@ -352,8 +352,8 @@ class PvMoveTodayScreen extends StatelessWidget {
     final when = c.mode == YogaMode.recorded ? c.durationLabel : c.schedule.replaceFirst(RegExp(r'^Live\s*·\s*'), '');
     return InkWell(
       key: ValueKey('move_today_class_${c.id}'),
-      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-          settings: RouteSettings(name: 'move/yoga/class/${c.id}'), builder: (_) => YogaClassScreen(cls: c))),
+      // One gate for every way into a class (2026-10-25, D7).
+      onTap: () => openYogaClass(context, c, routeName: 'move/yoga/class/${c.id}'),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Row(children: [

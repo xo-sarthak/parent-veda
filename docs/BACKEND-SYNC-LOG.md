@@ -1479,3 +1479,41 @@ creates; wired in `main.dart`), `test/sync_guard_contract_test.dart` (guarded), 
 
 **Files:** `supabase/migrations/0115_pp_food_tries.sql`, `lib/screens/post_pregnancy/pp_food_tries_store.dart`,
 `lib/services/pp_use_consent.dart`, `lib/main.dart`.
+
+## Step 21: the You, Maa tools: a kind on each Kegel session, no seeded yoga saves, a bought-once recorded class
+
+**Date:** 2026-10-25 (parenting tools pass, You, Maa family 25-28; the user's rule: "make sure the back ends are
+working well"). **Migration:** none. **Commit:** pending.
+
+### Why
+Four tools, two with stores. Kegel Care's history could not tell a breathing session from a squeeze session, so
+"Easy" on a breath in the first six weeks moved the squeeze routine she would start at six weeks. The Yoga store
+started every new mother with two saves she never made, and the first sync wrote them to her account. Five
+recorded classes showed ₹299 and played without any purchase.
+
+### What changed
+- [x] **`KegelRecord.kind`** (`kegel` | `breath`) in the `tool_kegel_history` blob. A record from before reads
+  as `kegel` (the only kind there was): for a JSON blob, the lenient read is the migration. A breath session
+  never nudges `_kegelHoldAdjust` / `_kegelRepAdjust`. A finished session left by the back arrow is saved with
+  feeling `none`, and the journey shows no feeling tag for it.
+- [x] **`YogaStore` starts empty.** The seeded `{'pn_group', 'md_sleep_rec'}` is commented out. Saves already
+  synced are untouched: the merge only ever sees what an account holds.
+- [x] **A priced recorded yoga class is an offering** (`BookingCatalog._fromYoga`): the masterclass kind ("live
+  or recorded, bought once"), format `recorded`, `recordingAccess`, no credits and no slots. The commit bar's
+  existing `buyThenPlay` and `ownsRecording` do the rest. No migration: the offering catalogue lives in Dart
+  (0066), and money is the server's once payments are live.
+- [x] **The mood check's reminder is device-local.** One prefs key, `pp_mood_remind_at` (a date), and one
+  scheduled notification. Never synced, never her answers.
+
+**The trade-off (the reminder).** Syncing it would let a second phone of hers know too, and would also let the
+co-parent's phone, signed into the same family, learn that she asked to be reminded about her mood. A reminder
+belongs to the phone it rings on. BACKEND-PATTERNS §16tt.
+
+**Verified:** `test/pp_maa_tools_test.dart` (an old record reads as a squeeze; a breath "easy" leaves the
+offsets; kind and `none` round-trip; leaving saves; no seeded saves; the cloud item shape `saved|<id>` /
+`booked|<id>`; every priced recorded class has a slotless offering, a free one has none),
+`test/pp_mood_check_test.dart` (one prefs write, the date; cancel clears it).
+
+**Files:** `lib/services/tools_store.dart`, `lib/screens/tools/kegel_care_screen.dart`,
+`lib/screens/post_pregnancy/pp_yoga_data.dart`, `lib/booking/booking_catalog.dart`,
+`lib/screens/post_pregnancy/pp_mood_check_screen.dart`.

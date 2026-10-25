@@ -193,6 +193,13 @@ const Map<String, String> kPpShelfNotYet = {
       'feet flat on the floor, and no splash-guard edge that pinches.',
   'Travel potties': "We haven't picked travel potties yet. A folding one that "
       'fits a bag, and a stool for the squat, are the two to look for.',
+  // First 40 (FD5, FD12): no oil and no belt are stocked. The oil words
+  // match the page they point to (`f40_which_oil`, the one source).
+  'Baby massage oils': "We haven't picked oils yet. A plain, fragrance-free "
+      "coconut or sunflower oil from your kitchen is fine. See 'Which "
+      "massage oil?'.",
+  'Postpartum belts': 'Not in our shop yet. Ask your doctor first after a '
+      'C-section.',
 };
 
 /// ⚠️ A TARGET WE HAVE NOT BUILT, NAMED FOR WHAT IT IS (Potty PT4). The
@@ -456,6 +463,17 @@ Widget? ppScreenForSurface(String id) {
       }
     }
     return null;
+  }
+
+  // `pp_maa_can_i/<category>` opens Can I...? on one chip (tools 25-28,
+  // 2026-10-25), beside `pp_food/<preset>`. The door's medicines page said
+  // "Search more" and landed on all 340 answers. An unknown category opens
+  // the plain screen.
+  const canIPrefix = 'pp_maa_can_i/';
+  if (id.startsWith(canIPrefix)) {
+    final cat = id.substring(canIPrefix.length);
+    return PpMaaCanIScreen(
+        initialCategory: kPpMaaCanICategories.contains(cat) ? cat : null);
   }
 
   // ⚠️ `pp_yoga/<classId>` OPENS ONE CLASS (You, Maa §6, 2026-10-25). A

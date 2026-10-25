@@ -434,8 +434,9 @@ void main() {
     ) async {
       FamilyProfileStore.instance.setBirthDetails(mode: BirthMode.cSection);
       await pumpPp(t, 20);
+      // Was a fragment, "As your doctor advises after a caesarean." (2026-10-25).
       expect(
-        find.textContaining('As your doctor advises after a caesarean.'),
+        find.textContaining('After a caesarean, keep to what your doctor has advised'),
         findsOneWidget,
       );
       await done(t);

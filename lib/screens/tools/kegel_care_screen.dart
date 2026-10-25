@@ -60,14 +60,15 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_toast.dart';
-import '../post_pregnancy/pp_age_bands.dart' show ppDaysSinceBirth;
+import '../post_pregnancy/pp_age_bands.dart' show ppMotherDaysSinceBirth;
 import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_door_chrome.dart' show kPvUrgentInk;
 import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
-import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../post_pregnancy/pp_surface_router.dart' show ppPushSurface;
+import '../products/pv_store_chrome.dart' show PvSecondary, kPvInk, kPvLine, pvStorePalette;
 
 /// The Tools tab's "Track" hue, so the marks here match the row she tapped.
 const double _kKegelHue = 206;
@@ -126,7 +127,12 @@ bool _kgPostpartum(PregnancyController? c) =>
 /// The first six weeks after birth: breathing only, no squeeze and no hold,
 /// matching `pf_ex_breathing` (every band) and `pf_ex_kegels` (from `_b1`).
 bool _kgBreatheFirst(PregnancyController? c) =>
-    _kgPostpartum(c) && ppDaysSinceBirth < 42;
+    _kgPostpartum(c) && _kgDays < 42;
+
+/// HER days since birth: the youngest child's (tools 25-28, 2026-10-25).
+/// Was `ppDaysSinceBirth`, the selected child's, so a mother with the toddler
+/// selected got full kegels three weeks after a new birth.
+int get _kgDays => ppMotherDaysSinceBirth;
 
 bool get _kgAfterCaesarean =>
     FamilyProfileStore.instance.birthMode == BirthMode.cSection;
@@ -139,25 +145,29 @@ String _kgStageKegels(S _) => 'Kegels, done properly';
 /// is nothing to make harder. After six weeks it starts at stage-1 numbers and
 /// never passes stage 2 (5 s x 10), whatever the offsets say.
 _Routine _ppRecommended() {
-  if (ppDaysSinceBirth < 42) {
+  // ⚠️ THE NUMBERS FOLLOW HER PAGES (2026-10-25). `pf_ex_breathing` says ten
+  // slow breaths and `pf_ex_kegels` says "hold for three seconds, release
+  // fully for six"; this said five rounds and a relax equal to the hold. One
+  // source: the pages. Was, kept for revert: reps 5; relax: hold.
+  if (_kgDays < 42) {
     return (
       stage: _kgStageBreathe,
       hold: 4,
       relax: 6,
-      reps: 5,
-      minutes: _minutesFor(4, 6, 5),
+      reps: 10,
+      minutes: _minutesFor(4, 6, 10),
     );
   }
-  final early = ppDaysSinceBirth < 84; // six to twelve weeks: start lower
+  final early = _kgDays < 84; // six to twelve weeks: start lower
   final store = ToolsStore.instance;
   final hold = ((early ? 3 : 5) + store.kegelHoldAdjust).clamp(3, 5);
   final reps = ((early ? 8 : 10) + store.kegelRepAdjust).clamp(8, 10);
   return (
     stage: _kgStageKegels,
     hold: hold,
-    relax: hold,
+    relax: hold * 2,
     reps: reps,
-    minutes: _minutesFor(hold, hold, reps),
+    minutes: _minutesFor(hold, hold * 2, reps),
   );
 }
 
@@ -171,7 +181,20 @@ _Routine _recommendedNow(PregnancyController? c) =>
 _Routine _routineNow(PregnancyController? c) {
   if (_kgPostpartum(c)) {
     if (_kgBreatheFirst(c)) return _ppRecommended();
-    return _withCustom(_ppRecommended());
+    // ⚠️ After birth a custom routine is capped at stage 2 (2026-10-25). The
+    // cap promised above held only for the recommended routine; a custom one
+    // (even one left from pregnancy, 10 s x 15) went straight through.
+    final r = _withCustom(_ppRecommended());
+    final hold = r.hold.clamp(2, 5);
+    final reps = r.reps.clamp(5, 10);
+    final relax = r.relax.clamp(2, 10);
+    return (
+      stage: r.stage,
+      hold: hold,
+      relax: relax,
+      reps: reps,
+      minutes: _minutesFor(hold, relax, reps),
+    );
   }
   return _routineFor(c!.currentWeek);
 }
@@ -318,7 +341,9 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
         final r = _routineNow(widget.controller);
         return PregToolScaffold(
           hue: _kKegelHue,
-          eyebrow: 'Track',
+          // After birth she came from You, Maa, not the pregnancy Track tab
+          // (2026-10-25). Kept for revert: 'Track' for both.
+          eyebrow: _pp ? 'For you' : 'Track',
           title: s.kegelToolTitle,
           mark: IntentMark.lotusMark,
           // Kept for revert: the pregnancy line alone. After birth it says so.
@@ -343,6 +368,16 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                       'physio, not more kegels.',
                       key: const ValueKey('kg_pp_physio'),
                       icon: Icons.info_outline_rounded,
+                    ),
+                    // The note said "see a physio" with nothing to tap
+                    // (2026-10-25). The router answers a placeholder-only
+                    // roster with "joining soon" and a gynaecologist pill.
+                    const SizedBox(height: 8),
+                    PvSecondary(
+                      key: const ValueKey('kg_pp_physio_pill'),
+                      label: "See a women's health physio",
+                      onTap: () =>
+                          ppPushSurface(context, 'pp_experts/Physiotherapist'),
                     ),
                   ],
                   const SizedBox(height: 14),
@@ -481,17 +516,44 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                     keyPrefix: 'kg_fold',
                     fold: 'how',
                     icon: Icons.self_improvement_rounded,
-                    title: S.now.uiHowDoKegel,
+                    // In her first six weeks the fold is the breath, never the
+                    // squeeze (2026-10-25): it showed "Squeeze and hold"
+                    // beside "No squeezing or holding yet".
+                    title: _breathe ? 'How to do the breath' : S.now.uiHowDoKegel,
                     body: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(s.kegelHowBody, style: _bodyStyle()),
+                        Text(
+                            _breathe
+                                ? 'Lie or sit comfortably. Breathe in slowly through '
+                                    'your nose and let your belly and the base of '
+                                    'your body soften and widen. Breathe out gently '
+                                    'through your mouth and let everything settle. '
+                                    'No squeezing and no holding.'
+                                : s.kegelHowBody,
+                            key: const ValueKey('kg_how_body'),
+                            style: _bodyStyle()),
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
-                          child: PregNote(
-                            S.now.uiAnimatedGuideComingSoon,
-                            icon: Icons.play_circle_outline_rounded,
-                          ),
+                          // After birth the page has the steps and the film
+                          // slot, so the fold links there (2026-10-25).
+                          // Pregnancy keeps its "coming soon" line.
+                          child: _pp
+                              ? PvSecondary(
+                                  key: const ValueKey('kg_how_page'),
+                                  label: _breathe
+                                      ? 'Read: Breathing first'
+                                      : 'Read: Finding the right muscle',
+                                  onTap: () => ppPushSurface(
+                                      context,
+                                      _breathe
+                                          ? 'pp_page/parenting_maternal/pf_ex_breathing'
+                                          : 'pp_page/parenting_maternal/pf_ex_kegels'),
+                                )
+                              : PregNote(
+                                  S.now.uiAnimatedGuideComingSoon,
+                                  icon: Icons.play_circle_outline_rounded,
+                                ),
                         ),
                       ],
                     ),
@@ -704,14 +766,27 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                 color: p.ink2,
               ),
             ),
+            // After six weeks the caesarean line was gone (2026-10-25).
+            if (!_breathe && _kgAfterCaesarean) ...[
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Text(
+                  'After a caesarean, start gently and stop if your scar pulls '
+                  'or hurts.',
+                  key: const ValueKey('kg_csection_note'),
+                  style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
+                ),
+              ),
+            ],
             if (_breathe) ...[
               const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: Text(
-                  'A slow belly breath, a few rounds, only when comfortable. '
+                  'A slow belly breath, ten rounds, only when comfortable. '
                   'No squeezing or holding yet.'
-                  '${_kgAfterCaesarean ? ' As your doctor advises after a caesarean.' : ''}',
+                  '${_kgAfterCaesarean ? ' After a caesarean, keep to what your doctor has advised for your wound.' : ''}',
                   key: const ValueKey('kg_breathe_note'),
                   style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
                 ),
@@ -1377,27 +1452,80 @@ class _SessionScreenState extends State<_SessionScreen>
     if (!_sound) _tts.stop();
   }
 
+  // Kept for revert (2026-10-25): the save that only ran from a feeling
+  // button, so back or Exit after a finished session lost it.
+  // Future<void> _saveFeedback(String feedback) async {
+  //   const kMinRepsToSave = 3;
+  //   if (_completedReps < kMinRepsToSave) {
+  //     if (mounted) Navigator.of(context).pop();
+  //     return;
+  //   }
+  //   await ToolsStore.instance.recordKegelSession(holdSeconds: widget.hold,
+  //       relaxSeconds: widget.relax, repetitions: _completedReps,
+  //       feedback: feedback);
+  //   if (mounted) {
+  //     pvToast(context, 'Logged for today', kind: PvToastKind.done);
+  //     Navigator.of(context).pop();
+  //   }
+  // }
+
+  /// True once this session is saved (or judged too short to save), so the
+  /// feeling button and the back gesture never save it twice.
+  bool _settled = false;
+
   Future<void> _saveFeedback(String feedback) async {
-    // HISTORY SAVE RULE: only persist a session to Care Journey history if the
-    // user actually completed at least 3 repetitions (full hold+relax cycles).
-    // Shorter attempts are discarded silently so history stays meaningful.
-    const kMinRepsToSave = 3;
-    if (_completedReps < kMinRepsToSave) {
-      if (mounted) Navigator.of(context).pop();
-      return;
+    final nav = Navigator.of(context);
+    final words = await _record(feedback);
+    if (mounted) nav.pop();
+    if (words != null && nav.mounted) {
+      pvToast(nav.context, words, kind: PvToastKind.done);
     }
+  }
+
+  /// Saves the session and returns what the save changed, in words; null when
+  /// nothing was saved.
+  ///
+  /// HISTORY SAVE RULE: only persist a session to Care Journey history if the
+  /// user actually completed at least 3 repetitions (full hold+relax cycles).
+  /// Shorter attempts are discarded silently so history stays meaningful.
+  ///
+  /// ⚠️ "FINISH EARLIER" (tools 25-28, 2026-10-25, after stoic.): back or Exit
+  /// with three or more rounds done saves what was done, feeling 'none'. Before,
+  /// only a feeling button saved, so a finished session left by the back arrow
+  /// was lost without a word.
+  Future<String?> _record(String feedback) async {
+    if (_settled) return null;
+    _settled = true;
+    const kMinRepsToSave = 3;
+    if (_completedReps < kMinRepsToSave) return null;
     await ToolsStore.instance.recordKegelSession(
       holdSeconds: widget.hold,
       relaxSeconds: widget.relax,
       repetitions: _completedReps, // record actual completed reps, not planned
       feedback: feedback,
+      kind: widget.breathe ? kKegelKindBreath : kKegelKindSqueeze,
     );
-    // The save says it landed (DESIGN-SYSTEM 4.0g). The close above confirms
-    // she finished; this is the one notice that it was logged, raised once.
-    if (mounted) {
-      pvToast(context, 'Logged for today', kind: PvToastKind.done);
-      Navigator.of(context).pop();
+    // The save says what it changed (the app must explain itself). A feeling
+    // moves the next routine; say so, or it changes behind her back.
+    if (widget.breathe) return 'Logged: $_completedReps slow breaths';
+    final next = _routineNow(widget.controller);
+    if (next.hold != widget.hold) {
+      return 'Logged. Next time: hold ${next.hold} seconds';
     }
+    if (next.reps != widget.reps) {
+      return 'Logged. Next time: ${next.reps} squeezes';
+    }
+    return 'Logged for today';
+  }
+
+  void _saveOnLeave() {
+    if (_settled) return;
+    final nav = Navigator.of(context);
+    _record('none').then((words) {
+      if (words != null && nav.mounted) {
+        pvToast(nav.context, words, kind: PvToastKind.done);
+      }
+    });
   }
 
   @override
@@ -1408,7 +1536,11 @@ class _SessionScreenState extends State<_SessionScreen>
     // neutral500. The ink holds, the grey rests.
     final color = _holding ? kPvInk : p.ink3;
 
-    return Scaffold(
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _saveOnLeave();
+      },
+      child: Scaffold(
       appBar: AppBar(
         title: Text(s.kegelToolTitle),
         // One ParentVeda, rule 7: this page is pushed from Kegel Care, so its
@@ -1571,6 +1703,7 @@ class _SessionScreenState extends State<_SessionScreen>
                 ),
               ),
       ),
+    ),
     );
   }
 
@@ -1871,6 +2004,8 @@ class _CareJourneyScreen extends StatelessWidget {
     final fb = switch (rec.feedback) {
       'easy' => s.feedbackEasy,
       'difficult' => s.feedbackDifficult,
+      // Left without a feeling (2026-10-25): no tag, rather than a made-up one.
+      'none' => null,
       _ => s.feedbackComfortable,
     };
     return Padding(
@@ -1891,14 +2026,17 @@ class _CareJourneyScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${rec.holdSeconds}${s.secShort} · ${rec.repetitions} ${s.repsLabel.toLowerCase()}',
+                  // A breathing session is breaths, not holds (2026-10-25).
+                  rec.isBreath
+                      ? 'Breathing · ${rec.repetitions} breaths'
+                      : '${rec.holdSeconds}${s.secShort} · ${rec.repetitions} ${s.repsLabel.toLowerCase()}',
                   style: pvManrope(fontSize: 12.5, color: p.ink3),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 10),
-          _tag(fb),
+          if (fb != null) _tag(fb),
         ],
       ),
     );

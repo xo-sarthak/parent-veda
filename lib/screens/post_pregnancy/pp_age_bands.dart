@@ -174,6 +174,14 @@ int get ppDaysSinceBirth => ChildProfileStore.instance.ageInDays;
 
 int get ppMonthsSinceBirth => ChildProfileStore.instance.ageInMonths;
 
+/// HER days since birth: the youngest child's, whichever child is on screen
+/// (You, Maa tools, 2026-10-25). [ppDaysSinceBirth] follows the selected
+/// child, which is right for the baby's own pages and wrong for the mother's
+/// recovery: a mother of a toddler and a 3-week-old is three weeks after a
+/// birth even with the toddler selected. Same clock as `youngestClock` (M2).
+int get ppMotherDaysSinceBirth =>
+    (ChildProfileStore.instance.youngestAgeInWeeks * 7).round();
+
 // =============================================================================
 //  THE SHARED BAND SETS
 // -----------------------------------------------------------------------------

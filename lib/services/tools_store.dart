@@ -156,6 +156,7 @@ class KegelRecord {
     required this.relaxSeconds,
     required this.repetitions,
     required this.feedback,
+    this.kind = kKegelKindSqueeze,
   });
 
   final String dateIso;
@@ -163,8 +164,20 @@ class KegelRecord {
   final int relaxSeconds;
   final int repetitions;
 
-  /// 'easy' | 'comfortable' | 'difficult'
+  /// 'easy' | 'comfortable' | 'difficult', or 'none' when she closed the
+  /// finished session without picking one (You, Maa tools, 2026-10-25).
   final String feedback;
+
+  /// What kind of session this was: [kKegelKindSqueeze] (holds and relaxes,
+  /// pregnancy and from six weeks after birth) or [kKegelKindBreath] (the
+  /// first six weeks after birth: slow breaths, no squeeze).
+  ///
+  /// ⚠️ A JSON blob has no schema to migrate. A record saved before this field
+  /// existed has no `kind`, and the lenient read below says squeeze, which is
+  /// the only kind there was. The lenient read IS the migration.
+  final String kind;
+
+  bool get isBreath => kind == kKegelKindBreath;
 
   Map<String, dynamic> toJson() => {
         'dateIso': dateIso,
@@ -172,6 +185,7 @@ class KegelRecord {
         'relaxSeconds': relaxSeconds,
         'repetitions': repetitions,
         'feedback': feedback,
+        'kind': kind,
       };
 
   factory KegelRecord.fromJson(Map<String, dynamic> j) => KegelRecord(
@@ -180,8 +194,13 @@ class KegelRecord {
         relaxSeconds: (j['relaxSeconds'] is int) ? j['relaxSeconds'] : 5,
         repetitions: (j['repetitions'] is int) ? j['repetitions'] : 10,
         feedback: (j['feedback'] ?? 'comfortable').toString(),
+        kind: j['kind'] == kKegelKindBreath ? kKegelKindBreath : kKegelKindSqueeze,
       );
 }
+
+/// [KegelRecord.kind] values.
+const String kKegelKindSqueeze = 'kegel';
+const String kKegelKindBreath = 'breath';
 
 /// A baby-movement tracking session (one sitting). Starts when the mother taps
 /// "Start Session"; ends when she taps "End Session" or leaves the screen / the
@@ -1064,6 +1083,7 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
     required int relaxSeconds,
     required int repetitions,
     required String feedback,
+    String kind = kKegelKindSqueeze,
   }) async {
     final now = DateTime.now();
     _kegelSessions += 1;
@@ -1075,10 +1095,16 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
       relaxSeconds: relaxSeconds,
       repetitions: repetitions,
       feedback: feedback,
+      kind: kind,
     ));
 
     // Adaptive progression: nudge difficulty by feedback.
-    if (feedback == 'easy') {
+    // ⚠️ Only a squeeze session moves the squeeze routine (2026-10-25). A
+    // breathing session's "easy" said nothing about her holds, yet five of
+    // them used to push the six-week hold from 3 s to its cap.
+    if (kind == kKegelKindBreath) {
+      // no nudge
+    } else if (feedback == 'easy') {
       if (_kegelHoldAdjust < 5) {
         _kegelHoldAdjust += 1;
       } else {

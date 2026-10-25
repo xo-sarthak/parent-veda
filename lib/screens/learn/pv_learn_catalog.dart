@@ -436,11 +436,33 @@ class PvLearnCatalog {
           : const [],
       rhythm: kind == PvLearnKind.classPack ? [y.schedule] : const [],
       durationLabel: y.durationLabel,
-      rating: y.rating > 0 ? y.rating : null,
-      reviewsLabel: y.reviewsCount > 0 ? '${y.reviewsCount} parents' : '',
-      reviews: [
-        for (final r in y.reviews)
-          PvLearnReview(name: r.author, who: r.note, quote: '', stars: r.stars),
+      // ⚠️ NO SEEDED RATINGS ON A CLASS PAGE (tools 25-28, 2026-10-25). The
+      // hub took its stars off because no real reviews stand behind them, and
+      // the class page still said "4.9 · 214 parents" from seed data. They
+      // come back when real reviews do. Kept for revert:
+      // rating: y.rating > 0 ? y.rating : null,
+      // reviewsLabel: y.reviewsCount > 0 ? '${y.reviewsCount} parents' : '',
+      // reviews: [
+      //   for (final r in y.reviews)
+      //     PvLearnReview(name: r.author, who: r.note, quote: '', stars: r.stars),
+      // ],
+      rating: null,
+      reviewsLabel: '',
+      reviews: const [],
+      // The stop signs and the disclaimer on every class page (tools 25-28,
+      // 2026-10-25). The page carried neither; only the Classic page, which
+      // nothing opens, had a disclaimer.
+      faqs: [
+        PvLearnFaq(
+          'When should I stop?',
+          stage == LifeStage.pregnancy
+              ? 'Stop and call your doctor if you have bleeding, pain, fluid '
+                  'leaking, dizziness or fewer movements. '
+                  '$kYogaClassDisclaimer'
+              : 'Stop and call your doctor if you have heavy bleeding, pain, '
+                  'leaking that is getting worse, or a feeling of heaviness. '
+                  '$kYogaClassDisclaimer',
+        ),
       ],
       prepare: const [
         'A mat and a little floor space',
@@ -793,3 +815,8 @@ class PvLearnCatalog {
 bool pvLearnHasNoNamedPerson(PvOfferingView v) =>
     v.stage == LifeStage.tryingToConceive &&
     RegExp(r'^An? ').hasMatch(v.expert.name);
+
+/// The line under every class's stop signs (2026-10-25).
+const String kYogaClassDisclaimer =
+    "A class is general guidance, not medical advice. Your doctor's advice "
+    'comes first.';

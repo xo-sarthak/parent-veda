@@ -23,11 +23,34 @@ import '../learn/pv_learn_catalog.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
 import '../saved_toast.dart';
+import '../../services/life_stage_store.dart';
+import 'pp_surface_router.dart' show ppPushSurface, ppSurfaceUnavailable;
 
 // ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
 // name and constructor so every push of it lands on the unified learn
 // screens; the body below is kept, byte for byte, as `YogaClassScreenClassic` for
 // revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+/// Opens one class, or says why not yet (tools 25-28, D7, 2026-10-25).
+///
+/// ⚠️ ONE RULE FOR EVERY WAY IN. The six-week gate lived on the router only
+/// (`pp_yoga/<id>`), so a tap in the hub, on a teacher's profile, in Move
+/// today or in Prenatal yoga opened an after-check class at week 1, under its
+/// own "After your six-week check" label. Every push site now asks here, and
+/// here asks the router's own check, so the rule is written once. Only in
+/// Parenting: a pregnant mother has no birth to count from.
+void openYogaClass(BuildContext context, YogaClass c, {String? routeName}) {
+  final id = 'pp_yoga/${c.id}';
+  if (LifeStageStore.instance.stage == LifeStage.parenting &&
+      ppSurfaceUnavailable(id) != null) {
+    ppPushSurface(context, id); // the S8 words, with the Breathing pill
+    return;
+  }
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: routeName == null ? null : RouteSettings(name: routeName),
+    builder: (_) => YogaClassScreen(cls: c),
+  ));
+}
+
 class YogaClassScreen extends StatelessWidget {
   const YogaClassScreen({super.key, required this.cls});
   final YogaClass cls;

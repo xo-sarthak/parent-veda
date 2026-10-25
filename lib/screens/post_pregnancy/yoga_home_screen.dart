@@ -68,11 +68,13 @@ import '../v2/v2_palette.dart';
 import '../v2/v3_film_screen.dart';
 import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_common.dart';
-import 'pp_age_bands.dart' show ppDaysSinceBirth;
+import 'pp_age_bands.dart' show kPpPostpartumBands, ppMotherDaysSinceBirth;
+import 'pp_surface_router.dart' show ppPushSurface;
 import 'pp_child_profile.dart' show ChildProfileStore;
 import 'pp_section_extras.dart';
 import 'pp_yoga_data.dart';
 import 'yoga_class_screen.dart';
+import '../saved_toast.dart' show pvSaveToast;
 import 'yoga_common.dart';
 
 class YogaHomeScreen extends StatefulWidget {
@@ -152,9 +154,11 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
 
   Widget _pad(Widget c) =>
       Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
-  void _open(YogaClass c) => Navigator.of(
-    context,
-  ).push(MaterialPageRoute<void>(builder: (_) => YogaClassScreen(cls: c)));
+  // Kept for revert (2026-10-25): the push with no six-week check.
+  // void _open(YogaClass c) => Navigator.of(
+  //   context,
+  // ).push(MaterialPageRoute<void>(builder: (_) => YogaClassScreen(cls: c)));
+  void _open(YogaClass c) => openYogaClass(context, c);
   // ===========================================================================
   //  The hub (2026-10-16)
   // ===========================================================================
@@ -437,7 +441,8 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
   String? get _afterBirthNote {
     final kids = ChildProfileStore.instance;
     if (!kids.hasRealChild) return null;
-    final days = ppDaysSinceBirth;
+    // Her clock, the youngest child's (2026-10-25). Was the selected child's.
+    final days = ppMotherDaysSinceBirth;
     if (days >= 84) return null;
     final w = days ~/ 7;
     final when = w == 0
@@ -468,9 +473,20 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
           ),
         ),
       ],
-      ..._rail(p, 'Recovery', _classesIn('postnatal'), chip: 'postnatal'),
-      ..._rail(p, 'Core and pelvic floor', _classesIn('core'), chip: 'core'),
-      ..._rail(p, 'Breathe and calm', _calm, chip: 'breathing'),
+      // ⚠️ THE RAILS FOLLOW HER WEEK (tools 25-28, 2026-10-25). The same
+      // three rails stood in the same order at week 1 and week 20, with the
+      // core rail (mostly after-check classes) second. Now the order follows
+      // her band, the same steps as "10 minutes for you today": breath first
+      // before six weeks, the pelvic floor and deep core next, then the rest.
+      // Nothing is hidden; only the order moves. Kept for revert: Recovery,
+      // Core and pelvic floor, Breathe and calm, in every band.
+      for (final rail in ppYogaRailOrder(kPpPostpartumBands.active.id))
+        ...switch (rail) {
+          'breathing' => _rail(p, 'Breathe and calm', _calm, chip: 'breathing'),
+          'core' => _rail(p, 'Core and pelvic floor', _classesIn('core'),
+              chip: 'core'),
+          _ => _rail(p, 'Recovery', _classesIn('postnatal'), chip: 'postnatal'),
+        },
       ..._tools(p, [
         _ToolRow(
           key: const ValueKey('move_tool_kegel'),
@@ -478,10 +494,23 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
           mark: IntentMark.spineMark,
           hue: 330,
           title: 'Kegel Care',
-          line: 'Breathing first, then kegels after your check',
+          // Was "kegels after your check": the date decides, so say the date.
+          line: 'Breathing first, then kegels from six weeks',
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => const KegelCareScreen()),
           ),
+        ),
+        // The stop signs after birth (2026-10-25). Pregnancy's For you had
+        // its "When to stop" row; hers had none. Her door's red-flag page.
+        _ToolRow(
+          key: const ValueKey('move_tool_when_to_stop_pp'),
+          p: p,
+          mark: IntentMark.cuppedHands,
+          hue: 10,
+          title: 'When to stop and call your doctor',
+          line: 'Bleeding, pain, leaking or heaviness: stop and get checked',
+          onTap: () => ppPushSurface(
+              context, 'pp_page/parenting_maternal/body_red_flags'),
         ),
       ]),
     ];
@@ -554,15 +583,43 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
       mark: _catMark(i.chip == 'fertility' ? 'postivf' : i.chip),
       showStage: showStage,
       saved: c != null && store.isSaved(c.id),
-      onSave: c == null ? null : () => store.toggleSave(c.id),
+      // The save says so, with Undo, and View opens the Saved chip
+      // (2026-10-25). It used to fill the bookmark into a list nobody could
+      // open. Kept for revert: onSave: () => store.toggleSave(c.id).
+      onSave: c == null ? null : () => _toggleSave(c.id),
       onTap: () => _openItem(i),
+    );
+  }
+
+  void _toggleSave(String id) {
+    final store = YogaStore.instance;
+    store.toggleSave(id);
+    pvSaveToast(
+      context,
+      nowSaved: store.isSaved(id),
+      where: 'Saved to your classes',
+      undo: () => store.toggleSave(id),
+      onView: () => setState(() {
+        _forYou = false;
+        _chip = kYogaSavedChip;
+      }),
     );
   }
 
   // ---- All -------------------------------------------------------------------
 
   List<Widget> _allView(V2Palette p) {
-    final items = pvMoveFiltered(chip: _chip, modes: _modes);
+    // The Saved chip (2026-10-25, after Future Pro): every class she saved,
+    // across kinds. Saving wrote to `YogaStore` and nothing ever read it.
+    final saved = _chip == kYogaSavedChip;
+    final items = saved
+        ? [
+            for (final i in pvMoveFiltered(chip: 'all', modes: _modes))
+              if (i.yogaClass != null &&
+                  YogaStore.instance.isSaved(i.yogaClass!.id))
+                i,
+          ]
+        : pvMoveFiltered(chip: _chip, modes: _modes);
     final noun = items.length == 1 ? 'item' : 'items';
     return [
       const SizedBox(height: 14),
@@ -583,6 +640,14 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
               ),
               const SizedBox(width: 8),
             ],
+            KeyedSubtree(
+              key: const ValueKey('move_chip_$kYogaSavedChip'),
+              child: PvChip(
+                label: 'Saved',
+                selected: saved,
+                onTap: () => setState(() => _chip = kYogaSavedChip),
+              ),
+            ),
           ],
         ),
       ),
@@ -630,7 +695,17 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
           ],
         ),
       ),
-      if (items.isEmpty) ...[
+      if (items.isEmpty && saved) ...[
+        // Never hidden: the empty Saved chip says how to fill it.
+        const SizedBox(height: 18),
+        pregToolPad(
+          Text(
+            'Tap the bookmark on any class to keep it here.',
+            key: const ValueKey('move_saved_empty'),
+            style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2),
+          ),
+        ),
+      ] else if (items.isEmpty) ...[
         const SizedBox(height: 18),
         pregToolPad(
           Text(
@@ -754,7 +829,10 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
       ),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheet) {
-          final n = pvMoveFiltered(chip: _chip, modes: picked).length;
+          // The Saved chip is not a kind; the sheet counts across kinds.
+          final n = pvMoveFiltered(
+                  chip: _chip == kYogaSavedChip ? 'all' : _chip, modes: picked)
+              .length;
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
@@ -1295,19 +1373,37 @@ Widget _classMeta(V2Palette p, YogaClass cls) => yogaInstructorLine(
 
 /// A drawn picture: the category's mark on its own soft tint, as the doors'
 /// shelf cards draw one (no photo exists for a class yet).
-Widget _classPicture(double hue, IntentMark mark) => ColoredBox(
-  color: HSLColor.fromAHSL(1, hue % 360, 0.52, 0.9).toColor(),
-  child: Center(
-    child: FractionallySizedBox(
-      widthFactor: 0.5,
-      heightFactor: 0.5,
-      child: HubIntentArt(
-        mark: mark,
-        tint: HSLColor.fromAHSL(1, hue % 360, 0.6, 0.8).toColor(),
+///
+/// ⚠️ NO LAVENDER GROUND (tools 25-28, 2026-10-25; the house rule: white and
+/// plain neutral grey). Meditation (250) and the default (280) came out
+/// lavender at this lightness; those hues draw on plain grey now. The other
+/// kinds keep their soft tint. Kept for revert: saturation 0.52 / 0.6 for
+/// every hue.
+Widget _classPicture(double hue, IntentMark mark) {
+  final h = hue % 360;
+  final lavender = h >= 235 && h <= 310;
+  return ColoredBox(
+    color: HSLColor.fromAHSL(1, h, lavender ? 0 : 0.52, lavender ? 0.93 : 0.9)
+        .toColor(),
+    child: Center(
+      child: FractionallySizedBox(
+        widthFactor: 0.5,
+        heightFactor: 0.5,
+        child: HubIntentArt(
+          mark: mark,
+          tint: HSLColor.fromAHSL(1, h, lavender ? 0 : 0.6, lavender ? 0.72 : 0.8)
+              .toColor(),
+        ),
       ),
     ),
-  ),
-);
+  );
+}
+
+/// True for a hue that reads lavender on a soft ground. For the test.
+bool yogaHueIsLavender(double hue) {
+  final h = hue % 360;
+  return h >= 235 && h <= 310;
+}
 
 class _ClassCard extends StatelessWidget {
   const _ClassCard({
@@ -1951,3 +2047,14 @@ class _ToolRow extends StatelessWidget {
     ),
   );
 }
+
+/// The hub's Saved chip id (not a kind of class, so not in `kPvMoveChips`).
+const String kYogaSavedChip = 'saved';
+
+/// The order of her For you rails for her band (tools 25-28, 2026-10-25).
+/// Pure, so a test holds every band.
+List<String> ppYogaRailOrder(String bandId) => switch (bandId) {
+      'pp_0_6w' => const ['breathing', 'postnatal', 'core'],
+      'pp_6w_3m' || 'pp_3_6m' => const ['core', 'postnatal', 'breathing'],
+      _ => const ['postnatal', 'core', 'breathing'],
+    };

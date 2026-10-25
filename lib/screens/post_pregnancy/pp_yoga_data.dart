@@ -524,7 +524,10 @@ const List<YogaClass> kYogaClasses = [
     level: 'Beginner',
     tagline: 'Your very first steps back, whenever you are ready.',
     about:
-        'The gentlest possible re-entry - breath, pelvic-floor awareness and soft mobility you can start once your doctor clears you. No crunches, no pressure, no rush.',
+        // REQUIRED_REVIEW (2026-10-25): this is the class her first weeks are
+        // sent to, and it said to wait "once your doctor clears you". Was:
+        // '...soft mobility you can start once your doctor clears you. ...'
+        'The gentlest possible re-entry - breath, pelvic-floor awareness and soft mobility, gentle enough for the first weeks. After a caesarean or a hard birth, ask your doctor first. No crunches, no pressure, no rush.',
     reviews: [
       YogaReview(
         author: 'Simran K.',
@@ -1078,7 +1081,12 @@ class YogaStore extends ChangeNotifier with CloudMergedStore {
   YogaStore._();
   static final YogaStore instance = YogaStore._();
 
-  final Set<String> _saved = {'pn_group', 'md_sleep_rec'};
+  // ⚠️ A NEW MOTHER STARTS WITH NOTHING SAVED (tools 25-28, 2026-10-25). Two
+  // demo saves she never made were seeded here, and the first sync wrote them
+  // to her account as if she had. Saves already synced are untouched; only the
+  // starting state changed. Kept for revert:
+  // final Set<String> _saved = {'pn_group', 'md_sleep_rec'};
+  final Set<String> _saved = {};
   final Set<String> _booked = {};
 
   // ---- persistence (user_state KV; own-only, a personal preference) --------

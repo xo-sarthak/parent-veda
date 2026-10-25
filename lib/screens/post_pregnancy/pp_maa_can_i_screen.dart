@@ -35,8 +35,19 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, PvSecondary;
 import '../doors/pv_list_row.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../services/family_profile.dart';
+import 'askveda_screen.dart';
+import 'pp_age_bands.dart' show ppMotherDaysSinceBirth;
+import 'pp_crisis_path_screen.dart' show PpCrisisPathScreen;
+import 'pp_phases_data.dart' show ppFillChild;
+import 'pp_surface_router.dart' show ppPushSurface;
 
-enum _Ans { yes, care, ask, avoid }
+// `urgent` (tools 25-28, D5, 2026-10-25): "See a doctor today". The red-flag
+// rows (fever, heavy bleeding, a bad headache, one swollen leg) wore the same
+// grey "Ask your doctor first" as an allergy tablet, so a sign that needs a
+// doctor the same day read like a pharmacy question. Kept for revert:
+// enum _Ans { yes, care, ask, avoid }
+enum _Ans { yes, care, ask, avoid, urgent }
 
 enum _Cat { food, health, medicines, body, beauty, home, exercise, travel, customs }
 
@@ -56,7 +67,10 @@ extension on _Cat {
 
 class _Q {
   const _Q(this.cat, this.question, this.ans, this.answer,
-      {this.aliases = const [], this.firstWeeks});
+      {this.aliases = const [],
+      this.firstWeeks,
+      this.crisis = false,
+      this.readPageId});
   final _Cat cat;
   final String question;
   final _Ans ans;
@@ -65,19 +79,91 @@ class _Q {
 
   /// What changes in the first six weeks after birth, where something does.
   final String? firstWeeks;
+
+  /// The one row whose answer is the crisis path: its sheet opens
+  /// `PpCrisisPathScreen`, not the emergency card.
+  final bool crisis;
+
+  /// The door page that says more, where one does (2026-10-25). A category
+  /// default fills the rest: see [_readPageFor].
+  final String? readPageId;
+}
+
+/// The door page behind an answer: its own, else its category's.
+String? _readPageFor(_Q q) =>
+    q.readPageId ??
+    switch (q.cat) {
+      _Cat.medicines => 'cani_medicines',
+      _Cat.travel => 'cani_travel',
+      _Cat.beauty => 'cani_scans_beauty',
+      _ => null,
+    };
+
+/// The verdict as a dot colour and the words under the question.
+(CanIVerdict, String) _verdictOf(_Ans a) => switch (a) {
+      _Ans.yes => (CanIVerdict.safe, 'Yes'),
+      _Ans.care => (CanIVerdict.moderation, 'Yes, with care'),
+      _Ans.ask => (CanIVerdict.askDoctor, 'Ask your doctor first'),
+      _Ans.avoid => (CanIVerdict.avoid, 'Best avoided'),
+      _Ans.urgent => (CanIVerdict.avoid, 'See a doctor today'),
+    };
+
+/// The category ids `pp_maa_can_i/<id>` opens on (the enum names).
+const List<String> kPpMaaCanICategories = [
+  'food', 'health', 'medicines', 'body', 'beauty', 'home', 'exercise',
+  'travel', 'customs',
+];
+
+/// Does [x] answer [query]? (tools 25-28, 2026-10-25)
+///
+/// ⚠️ WHOLE WORDS, NOT SUBSTRINGS EITHER WAY. This was
+/// `alias.contains(q) || q.contains(alias)`, and the second half matched any
+/// short alias hiding inside what she typed: "infant" found the AC ("fan"),
+/// "pillow" the pill, "until" til laddoo, "hair wash" the ash pad, "horse
+/// riding" ORS. Now: a word of the question or an alias STARTS with what she
+/// typed ("cro" finds Crocin), or an alias appears in her words as a WHOLE
+/// word ("crocin 650" finds Crocin). Two characters at least.
+bool _canIMatches(_Q x, String query) {
+  final q = query.trim().toLowerCase();
+  if (q.length < 2) return false;
+  bool startsAWord(String text) =>
+      RegExp('(^|[^a-z0-9])${RegExp.escape(q)}').hasMatch(text.toLowerCase());
+  if (startsAWord(x.question)) return true;
+  for (final a in x.aliases) {
+    if (startsAWord(a)) return true;
+    if (a.length >= 3 &&
+        RegExp('(^|[^a-z0-9])${RegExp.escape(a)}(\$|[^a-z0-9])').hasMatch(q)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /// How many questions the lookup answers. Read by its test.
 /// The matching questions, for the parenting search. Same rule as the screen.
 List<String> ppMaaCanISearch(String query) {
-  final q = query.trim().toLowerCase();
-  if (q.length < 2) return const [];
+  // One matcher for the screen and for this (2026-10-25). Kept for revert:
+  // x.question.toLowerCase().contains(q) ||
+  //     x.aliases.any((a) => a.contains(q) || q.contains(a))
   return [
     for (final x in _questions)
-      if (x.question.toLowerCase().contains(q) ||
-          x.aliases.any((a) => a.contains(q) || q.contains(a))) x.question,
+      if (_canIMatches(x, query)) x.question,
   ];
 }
+
+/// The verdict word for one question, by its exact text. For tests.
+String? ppMaaCanIVerdictFor(String question) {
+  for (final x in _questions) {
+    if (x.question == question) return _verdictOf(x.ans).$2;
+  }
+  return null;
+}
+
+/// Every (alias, verdict word) pair, so a test can hold one verdict per word.
+List<(String, String)> ppMaaCanIAliasVerdicts() => [
+      for (final x in _questions)
+        for (final a in x.aliases) (a, _verdictOf(x.ans).$2),
+    ];
 
 int get ppMaaCanICount => _questions.length;
 
@@ -116,9 +202,12 @@ const List<_Q> _questions = [
   _Q(_Cat.food, 'Take shatavari or other herbal milk boosters', _Ans.ask,
       'Ask your doctor first. Herbal galactagogues are not well tested for safety, and products vary in what they contain.',
       aliases: ['shatavari', 'galactagogue', 'lactation powder', 'herbal']),
-  _Q(_Cat.food, 'Drink alcohol', _Ans.care,
-      'Best avoided. If you have a drink on an occasion, wait at least two to three hours before feeding, and never share a bed with the baby after drinking.',
-      aliases: ['daru', 'beer', 'wine', 'alcohol', 'liquor']),
+  // The label said "Yes, with care" over "Best avoided", and the door says
+  // "Not drinking is the safest choice" (2026-10-25). REQUIRED_REVIEW.
+  _Q(_Cat.food, 'Drink alcohol', _Ans.avoid,
+      'Not drinking is the safest choice. If you do have a drink on an occasion, wait at least two to three hours before feeding, and never share a bed with the baby after drinking.',
+      aliases: ['daru', 'beer', 'wine', 'alcohol', 'liquor'],
+      readPageId: 'cani_alcohol'),
   _Q(_Cat.food, 'Smoke or chew tobacco', _Ans.avoid,
       'Best avoided. Nicotine passes into milk and smoke harms his lungs. Help to quit is available; ask your doctor.',
       aliases: ['cigarette', 'bidi', 'gutka', 'tobacco', 'paan masala', 'khaini']),
@@ -144,10 +233,13 @@ const List<_Q> _questions = [
       'Gently, after about two months, and not by more than about half a kilo a week. Crash diets can lower milk supply.',
       aliases: ['diet', 'weight loss', 'dieting'],
       firstWeeks: 'Not yet. Eat to heal and feed.'),
+  // Follows the door's fasting page (2026-10-25): no full or waterless fast
+  // while the baby lives on milk alone. REQUIRED_REVIEW.
   _Q(_Cat.food, 'Fast for religious days', _Ans.care,
-      'Many faiths excuse breastfeeding mothers. If you fast, drink and eat well in the allowed hours, and break it if you feel dizzy or the baby has fewer wet nappies.',
+      'Many faiths excuse breastfeeding mothers. Under six months, while your milk is all the baby has, a full or waterless fast is not advised; a partial fast with water is easier. If you fast, drink and eat well in the allowed hours, and break it if you feel dizzy or the baby has fewer wet nappies.',
       aliases: ['vrat', 'roza', 'ramadan', 'navratri', 'karva chauth', 'ekadashi', 'fasting'],
-      firstWeeks: 'Fasting is not advised in the first weeks.'),
+      firstWeeks: 'Fasting is not advised in the first weeks.',
+      readPageId: 'cani_fasting'),
   _Q(_Cat.food, 'Eat jaggery and dry fruits', _Ans.yes,
       'Yes. Good energy and iron in jaggery, and healthy fats in nuts.',
       aliases: ['gud', 'badam', 'kaju', 'dry fruits']),
@@ -183,25 +275,28 @@ const List<_Q> _questions = [
       aliases: ['brufen', 'combiflam', 'ibuprofen']),
   _Q(_Cat.health, 'Take antibiotics', _Ans.care,
       'Most common antibiotics are fine. Tell the doctor you are breastfeeding so they choose one.',
-      aliases: ['antibiotic', 'amoxicillin', 'azithromycin']),
+      aliases: ['antibiotic']), // the drug names: their own rows (D4, 2026-10-25)
   _Q(_Cat.health, 'Take cough and cold syrups', _Ans.ask,
       'Ask first. Some decongestants can reduce milk, and codeine is not advised.',
-      aliases: ['cough syrup', 'cold medicine', 'decongestant', 'benadryl']),
+      // 'benadryl' left for the drowsy-antihistamine row (D4, 2026-10-25).
+      aliases: ['cough syrup', 'cold medicine', 'decongestant']),
   _Q(_Cat.health, 'Take allergy tablets', _Ans.care,
       'Non-drowsy antihistamines like cetirizine are usually fine. Ask about the drowsy ones.',
-      aliases: ['cetirizine', 'allergy', 'antihistamine']),
+      aliases: ['allergy', 'antihistamine']), // 'cetirizine': its own row (D4)
   _Q(_Cat.health, 'Use an asthma inhaler', _Ans.yes,
       'Yes. Inhalers are safe while breastfeeding.',
       aliases: ['inhaler', 'asthma']),
   _Q(_Cat.health, 'Take thyroid medicine', _Ans.yes,
       'Yes. Keep taking it; your dose may need checking after birth.',
       aliases: ['thyroxine', 'thyronorm', 'eltroxin', 'thyroid']),
+  // metformin, insulin and 'bp tablets' have their own rows under Medicines,
+  // with their own verdicts; one word, one verdict (D4, 2026-10-25).
   _Q(_Cat.health, 'Take diabetes or blood pressure medicine', _Ans.ask,
       'Ask your doctor. Many are compatible, and some need changing after birth.',
-      aliases: ['metformin', 'bp tablets', 'insulin', 'diabetes']),
+      aliases: ['diabetes', 'sugar medicine', 'blood pressure medicine']),
   _Q(_Cat.health, 'Take antidepressants', _Ans.ask,
       'Often yes. Many are compatible with breastfeeding. Never stop suddenly; talk to your doctor.',
-      aliases: ['antidepressant', 'sertraline', 'depression medicine']),
+      aliases: ['antidepressant', 'depression medicine']), // 'sertraline': its own row (D4)
   _Q(_Cat.health, 'Take the contraceptive pill', _Ans.care,
       'The progesterone-only pill is preferred while breastfeeding. Combined pills can lower supply early on.',
       aliases: ['pill', 'contraception', 'birth control'],
@@ -379,7 +474,8 @@ const List<_Q> _questions = [
       aliases: ['sex', 'intimacy', 'physical relation'],
       firstWeeks: 'Wait until your doctor has checked you.'),
   _Q(_Cat.home, 'Cry and feel low sometimes', _Ans.yes,
-      'Yes, and it is common. If it lasts more than two weeks or feels hopeless, tell your doctor.',
+      // The helpline, as every mind page has it (2026-10-25).
+      'Yes, and it is common. If it lasts more than two weeks or feels hopeless, tell your doctor. If you have thoughts of harming yourself or the baby, call Tele-MANAS on 14416, free, any hour, or 112.',
       aliases: ['crying', 'sad', 'low mood']),
   _Q(_Cat.home, 'Ask for help', _Ans.yes,
       'Always. Asking for help is part of looking after the baby.',
@@ -391,9 +487,15 @@ const List<_Q> _questions = [
       'Gentle yoga from about six weeks, longer after a caesarean. Avoid deep twists and inversions until cleared.',
       aliases: ['yoga', 'asana'],
       firstWeeks: 'Breathing and gentle stretches only.'),
-  _Q(_Cat.exercise, 'Do pelvic floor exercises', _Ans.yes,
-      'Yes, from the first days, as long as they are comfortable.',
-      aliases: ['kegel', 'pelvic floor']),
+  // ⚠️ ONE ANSWER WITH KEGEL CARE (D6, 2026-10-25). This said "Yes, from
+  // the first days" while Kegel Care and the door's pf_ex_kegels hold
+  // squeezes to six weeks. The tool and the page decide; the clinical review
+  // decides the date (pf_ex_kegels REQUIRED_REVIEW). Kept for revert:
+  // _Ans.yes, 'Yes, from the first days, as long as they are comfortable.'
+  _Q(_Cat.exercise, 'Do pelvic floor exercises', _Ans.care,
+      'Yes, gently. Breathing first; squeezes and holds from about six weeks, or sooner if your doctor or physio says so. Kegel Care guides both.',
+      aliases: ['kegel', 'pelvic floor'],
+      firstWeeks: 'The breathing only, no squeezing yet.'),
   _Q(_Cat.exercise, 'Run or jog', _Ans.care,
       'Usually from about three months, once your pelvic floor feels strong and there is no leaking or heaviness.',
       aliases: ['running', 'jogging'],
@@ -437,7 +539,8 @@ const List<_Q> _questions = [
       aliases: ['driving', 'car'],
       firstWeeks: 'Not yet after a caesarean.'),
   _Q(_Cat.travel, 'Ride a two-wheeler', _Ans.care,
-      'As a rider or pillion, once healed and comfortable. Never carry a baby under nine months on a two-wheeler.',
+      // Implied a baby over nine months was fine on a two-wheeler (2026-10-25).
+      'As a rider or pillion, once healed and comfortable. A baby is not safe on a two-wheeler at any age; there are no proper seats or helmets for one.',
       aliases: ['scooty', 'bike', 'two wheeler', 'motorcycle']),
   _Q(_Cat.travel, 'Take an auto or cab with the baby', _Ans.care,
       'Hold him facing you, never between you and the seat in front. A car seat in a cab is safest.',
@@ -461,8 +564,9 @@ const List<_Q> _questions = [
       'Rest is good, and avoiding crowds protects the baby. Short walks and daylight help your mood and healing.',
       aliases: ['jaapa', 'confinement', 'sava mahina', '40 days'],
       firstWeeks: 'A short walk is good for you.'),
-  _Q(_Cat.customs, 'Avoid bathing after the birth', _Ans.avoid,
-      'Not needed. Warm baths keep stitches clean and help you feel better.',
+  // "Can I avoid bathing? Best avoided" read as a double negative (2026-10-25).
+  _Q(_Cat.customs, 'Skip bathing after the birth, as some customs say', _Ans.avoid,
+      'There is no need to. Warm baths keep stitches clean and help you feel better.',
       aliases: ['no bath', 'nahana mana']),
   _Q(_Cat.customs, 'Wrap my head and ears', _Ans.yes,
       'Yes, if it feels comfortable. It does no harm.',
@@ -561,7 +665,7 @@ const List<_Q> _questions = [
       aliases: ['vegetarian', 'vegan', 'b12']),
   _Q(_Cat.food, 'Drink packaged lactation drinks', _Ans.care,
       'Fine, but they are mostly sugar and protein. A balanced meal does the same.',
-      aliases: ['lactation drink', 'shatavari powder']),
+      aliases: ['lactation drink']), // 'shatavari powder': the shatavari row (D4)
   _Q(_Cat.food, 'Drink less milk to reduce gas in the baby', _Ans.avoid,
       'No need. Your milk intake does not cause gas in the baby. Only cut dairy if a doctor suspects cow\'s milk allergy.',
       aliases: ['dairy', 'milk']),
@@ -583,18 +687,36 @@ const List<_Q> _questions = [
   _Q(_Cat.health, 'Take laxatives for constipation', _Ans.yes,
       'Gentle stool softeners are fine. More water, fruit and fibre help most.',
       aliases: ['constipation', 'laxative', 'isabgol']),
-  _Q(_Cat.health, 'Wait out a fever after birth', _Ans.ask,
+  // ⚠️ THE RED FLAGS ARE URGENT (D5, 2026-10-25). They were _Ans.ask.
+  _Q(_Cat.health, 'Wait out a fever after birth', _Ans.urgent,
       'See a doctor the same day. A fever after birth can mean an infection that needs treatment.',
       aliases: ['fever', 'bukhar']),
-  _Q(_Cat.health, 'Wait out heavy bleeding after the first weeks', _Ans.ask,
-      'Soaking a pad in an hour, big clots or a bad smell need a doctor straight away.',
+  // At ANY time (2026-10-25): it said "after the first weeks", as if heavy
+  // bleeding early were expected. Soaking a pad an hour is urgent always.
+  _Q(_Cat.health, 'Wait out heavy bleeding', _Ans.urgent,
+      'No, at any time after the birth. Soaking a pad in an hour, big clots or a bad smell need a doctor straight away.',
       aliases: ['bleeding', 'lochia', 'clots']),
-  _Q(_Cat.health, 'Rest off a bad headache or blurred vision', _Ans.ask,
+  _Q(_Cat.health, 'Rest off a bad headache or blurred vision', _Ans.urgent,
       'Go to hospital the same day; blood pressure can rise after birth.',
       aliases: ['headache', 'blurred vision', 'bp']),
-  _Q(_Cat.health, 'Ignore pain or swelling in one leg', _Ans.ask,
+  _Q(_Cat.health, 'Ignore pain or swelling in one leg', _Ans.urgent,
       'See a doctor today. It can be a blood clot.',
       aliases: ['leg pain', 'swelling', 'clot']),
+  // Three red flags the list lacked (2026-10-25). REQUIRED_REVIEW.
+  _Q(_Cat.health, 'Ignore chest pain or breathlessness', _Ans.urgent,
+      'No. Call 108 or 112 now. After a birth this can be a clot in the lung.',
+      aliases: ['chest pain', 'breathless', 'breathlessness', 'short of breath']),
+  _Q(_Cat.health, 'Ignore a red, hot or oozing wound', _Ans.urgent,
+      'See a doctor today. Redness, pus, a bad smell or a wound opening, from a caesarean or stitches, can be an infection.',
+      aliases: ['wound', 'pus', 'stitches infection', 'scar red', 'wound opening']),
+  _Q(_Cat.health, 'Keep thoughts of harming myself or the baby to myself', _Ans.urgent,
+      'No. Call Tele-MANAS on 14416, free, any hour, or 112. These thoughts are a symptom, they are common, and they get better with help.',
+      aliases: ['harm', 'hurt myself', 'hurt the baby', 'suicide', 'end my life', 'scary thoughts'],
+      crisis: true),
+  // REQUIRED_REVIEW (obstetrician, paediatrician): the chickenpox line.
+  _Q(_Cat.health, 'Keep breastfeeding if I had chickenpox near the birth', _Ans.ask,
+      'Ask your doctor today. If the rash started shortly before or after the birth, the baby may need an injection to protect them. Breastfeeding usually carries on.',
+      aliases: ['chickenpox', 'chicken pox', 'varicella']),
   _Q(_Cat.health, 'Use a menstrual cup or tampons', _Ans.care,
       'After your six-week check and once bleeding has stopped. Use pads until then.',
       aliases: ['menstrual cup', 'tampon'],
@@ -831,7 +953,7 @@ const List<_Q> _questions = [
       aliases: ['sinarest', 'd cold', 'cold tablet', 'phenylephrine']),
   _Q(_Cat.medicines, 'Take cough syrup with dextromethorphan', _Ans.care,
       'Occasional use is generally fine. Honey-lemon water helps too.',
-      aliases: ['dextromethorphan', 'cough syrup']),
+      aliases: ['dextromethorphan']), // 'cough syrup': the Health row (D4)
   _Q(_Cat.medicines, 'Take ambroxol or other mucolytics', _Ans.care,
       'Generally considered compatible for short use.',
       aliases: ['ambroxol', 'mucolite', 'bromhexine']),
@@ -915,7 +1037,16 @@ const List<_Q> _questions = [
       aliases: ['insulin', 'mixtard', 'lantus']),
   _Q(_Cat.medicines, 'Take blood pressure medicines (labetalol, nifedipine, amlodipine)', _Ans.yes,
       'Many are compatible. Your doctor will choose one that is.',
-      aliases: ['labetalol', 'nifedipine', 'amlodipine', 'bp tablets', 'telmisartan']),
+      aliases: ['labetalol', 'nifedipine', 'amlodipine', 'bp tablets']),
+  // Telmisartan was an alias of the Yes row above (2026-10-25). The ARBs are
+  // not first choices while breastfeeding. REQUIRED_REVIEW (pharmacist).
+  _Q(_Cat.medicines, 'Take telmisartan or losartan for blood pressure', _Ans.ask,
+      'Ask your doctor. These are not usually the first choice while breastfeeding, especially for a newborn or a baby born early; there are well-tested options.',
+      aliases: ['telmisartan', 'losartan', 'telma', 'arb']),
+  // Two answers the door page names and this list lacked (2026-10-25).
+  _Q(_Cat.medicines, 'Take weight-loss or fat-burner pills', _Ans.avoid,
+      'Best avoided. Many contain stimulants or herbs that pass into milk, and none is tested for breastfeeding. Steady, regular meals do more.',
+      aliases: ['fat burner', 'slimming pill', 'weight loss pill', 'diet pill']),
   _Q(_Cat.medicines, 'Take enalapril for blood pressure', _Ans.care,
       'Often used after birth and generally compatible; ask about others in the same group.',
       aliases: ['enalapril', 'envas']),
@@ -992,7 +1123,8 @@ const List<_Q> _questions = [
       firstWeeks: 'Not yet.'),
   _Q(_Cat.exercise, 'Do strength training at home', _Ans.yes,
       'Bodyweight exercises after your six-week check, building slowly.',
-      aliases: ['home workout', 'strength']),
+      aliases: ['home workout', 'strength'],
+      firstWeeks: 'Not yet.'), // it said Yes at week one (2026-10-25)
   _Q(_Cat.exercise, 'Ride a horse', _Ans.care,
       'Wait until you are fully healed, usually after three months.',
       aliases: ['horse riding']),
@@ -1095,7 +1227,7 @@ const List<_Q> _questions = [
       aliases: ['stop breastfeeding', 'weaning']),
   _Q(_Cat.body, 'Breastfeed after drinking a glass of wine', _Ans.care,
       'Wait two to three hours per drink before feeding.',
-      aliases: ['wine', 'beer']),
+      aliases: ['after a drink']), // 'wine', 'beer': Drink alcohol (D4, 2026-10-25)
   _Q(_Cat.body, 'Breastfeed when I am angry or upset', _Ans.yes,
       'Yes. Your milk does not turn bad from emotions. Take a breath first if you can.',
       aliases: ['angry', 'stress', 'upset']),
@@ -1132,11 +1264,15 @@ const List<_Q> _questions = [
 ];
 
 class PpMaaCanIScreen extends StatefulWidget {
-  const PpMaaCanIScreen({super.key, this.initialQuery});
+  const PpMaaCanIScreen({super.key, this.initialQuery, this.initialCategory});
 
   /// Pre-filled by the parenting search (2026-10-02), so a result lands on
   /// the answer rather than an empty box.
   final String? initialQuery;
+
+  /// `pp_maa_can_i/<category>` opens on that chip (2026-10-25), so the door's
+  /// "Search more" on its medicines page lands on medicines.
+  final String? initialCategory;
 
   @override
   State<PpMaaCanIScreen> createState() => _PpMaaCanIScreenState();
@@ -1151,19 +1287,35 @@ class _PpMaaCanIScreenState extends State<PpMaaCanIScreen> {
     _queryCtrl.dispose();
     super.dispose();
   }
-  _Cat? _cat;
+  late _Cat? _cat = _Cat.values
+      .where((c) => c.name == widget.initialCategory)
+      .firstOrNull;
 
   List<_Q> get _results {
     final q = _query.trim().toLowerCase();
+    // One matcher (2026-10-25). Kept for revert: question.contains(q) ||
+    // aliases.any((a) => a.contains(q) || q.contains(a)).
     return [
       for (final x in _questions)
         if ((_cat == null || x.cat == _cat) &&
-            (q.isEmpty ||
-                x.question.toLowerCase().contains(q) ||
-                x.aliases.any((a) => a.contains(q) || q.contains(a))))
+            (q.isEmpty || _canIMatches(x, q)))
           x,
     ];
   }
+
+  /// She is not breastfeeding: the milk half of an answer is not about her.
+  bool get _notBreastfeeding {
+    final f = FamilyProfileStore.instance.feedings;
+    return f.isNotEmpty &&
+        !f.contains(FeedingMethod.breastfeeding) &&
+        !f.contains(FeedingMethod.mixed) &&
+        !f.contains(FeedingMethod.expressed);
+  }
+
+  void _askVeda(String question) => Navigator.of(context).push(
+      MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'pp/ask_veda'),
+          builder: (_) => AskVedaScreen(initialQuery: question)));
 
   // ---- the shared look (2026-10-07) ------------------------------------------
   //  Gap analysis P2 (You, Maa): "Can I...? while feeding", restyled to the
@@ -1180,9 +1332,17 @@ class _PpMaaCanIScreenState extends State<PpMaaCanIScreen> {
       eyebrow: 'You, the mother', // was 'You, Maa' (English only, 2026-10-07)
       mark: IntentMark.questionMark,
       title: 'Can I...?',
-      intro: 'Quick, honest answers while you breastfeed and in the months after birth. '
-          'Type in English or Hindi.',
+      // "Type in English or Hindi" promised a search no Devanagari reaches;
+      // the aliases are romanised (2026-10-25).
+      intro: 'Quick, honest answers while you breastfeed and in the months after birth.',
       children: [
+        if (_notBreastfeeding) ...[
+          pregToolPad(Text(
+              'You are not breastfeeding, so where an answer talks about milk, that part is not about you.',
+              key: const ValueKey('pp_maa_can_i_not_bf'),
+              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2))),
+          const SizedBox(height: 12),
+        ],
         pregToolPad(TextField(
           key: const ValueKey('pp_maa_can_i_field'),
           controller: _queryCtrl,
@@ -1213,11 +1373,23 @@ class _PpMaaCanIScreenState extends State<PpMaaCanIScreen> {
           ]),
         ),
         const SizedBox(height: 16),
-        if (results.isEmpty)
+        if (results.isEmpty) ...[
           pregToolPad(Text(
               'Not in the list yet. Most everyday things are fine while breastfeeding. '
               'For any medicine, or anything about your own health, ask your doctor.',
               style: pvManrope(fontSize: 14, height: 1.6, color: p.ink2))),
+          // Not a dead end (2026-10-25): the question goes on to Ask Veda,
+          // already typed, as Can my baby eat this? does.
+          if (_query.trim().length >= 2) ...[
+            const SizedBox(height: 12),
+            pregToolPad(PvSecondary(
+              key: const ValueKey('pp_maa_can_i_ask_veda'),
+              label: 'Ask Veda about ${_query.trim()}',
+              onTap: () => _askVeda(
+                  'Can I ${_query.trim()} while breastfeeding, after the birth?'),
+            )),
+          ],
+        ],
         // ⚠️ ROWS, NOT CARDS (Mobbin audit, 2026-10-07): the question as the
         // title, the verdict as a dot and a word under it, the full answer on
         // a tap; after Yuka's ingredient list
@@ -1239,6 +1411,14 @@ class _PpMaaCanIScreenState extends State<PpMaaCanIScreen> {
         pregToolPad(Text(
             'General guidance, not advice about you. Always tell your doctor and chemist that you are breastfeeding.',
             style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink3))),
+        // The sources, after Clue's numbered sources (2026-10-25).
+        // REQUIRED_REVIEW: every answer against these, by a pharmacist, a
+        // lactation consultant and an obstetrician (BEFORE-LAUNCH).
+        const SizedBox(height: 6),
+        pregToolPad(Text(
+            kPpMaaCanISources,
+            key: const ValueKey('pp_maa_can_i_sources'),
+            style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3))),
       ],
     );
   }
@@ -1246,17 +1426,17 @@ class _PpMaaCanIScreenState extends State<PpMaaCanIScreen> {
   bool _all = false;
 
   Widget _qRow(BuildContext context, V2Palette p, _Q q) {
-    final (verdict, label) = switch (q.ans) {
-      _Ans.yes => (CanIVerdict.safe, 'Yes'),
-      _Ans.care => (CanIVerdict.moderation, 'Yes, with care'),
-      _Ans.ask => (CanIVerdict.askDoctor, 'Ask your doctor first'),
-      _Ans.avoid => (CanIVerdict.avoid, 'Best avoided'),
-    };
+    final (verdict, label) = _verdictOf(q.ans);
     return PvListRow(
       key: ValueKey('pp_maa_can_i_row_${q.question}'),
       p: p,
-      leading: PvMarkWell(p: p, hue: 288, size: 40, mark: IntentMark.questionMark),
-      title: 'Can I ${q.question[0].toLowerCase()}${q.question.substring(1)}?',
+      // A red flag wears the urgent mark, not the question well (D5).
+      leading: PvMarkWell(
+          p: p,
+          hue: q.ans == _Ans.urgent ? 10 : 288,
+          size: 40,
+          mark: q.ans == _Ans.urgent ? IntentMark.cuppedHands : IntentMark.questionMark),
+      title: ppFillChild('Can I ${q.question[0].toLowerCase()}${q.question.substring(1)}?'),
       line: label,
       lineMaxLines: 1,
       trailing: Container(
@@ -1273,7 +1453,43 @@ class _PpMaaCanIScreenState extends State<PpMaaCanIScreen> {
           top: false,
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-            child: _QCardV3(q: q),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              _QCardV3(q: q),
+              // What to do next, under the answer (2026-10-25).
+              if (q.crisis) ...[
+                const SizedBox(height: 12),
+                PvSecondary(
+                  key: const ValueKey('pp_maa_can_i_crisis'),
+                  label: 'The numbers to call now',
+                  onTap: () => Navigator.of(ctx).push(MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: 'pp_crisis_path'),
+                    builder: (_) => const PpCrisisPathScreen(),
+                  )),
+                ),
+              ] else if (q.ans == _Ans.urgent) ...[
+                const SizedBox(height: 12),
+                PvSecondary(
+                  key: const ValueKey('pp_maa_can_i_emergency'),
+                  label: 'Your emergency numbers',
+                  onTap: () => ppPushSurface(ctx, 'pp_emergency_card'),
+                ),
+              ],
+              if (_readPageFor(q) case final page?) ...[
+                const SizedBox(height: 10),
+                PvSecondary(
+                  key: const ValueKey('pp_maa_can_i_read'),
+                  label: 'Read more about this',
+                  onTap: () => ppPushSurface(ctx, 'pp_page/parenting_maternal/$page'),
+                ),
+              ],
+              const SizedBox(height: 10),
+              PvSecondary(
+                key: const ValueKey('pp_maa_can_i_sheet_veda'),
+                label: 'Ask Veda a follow-up',
+                onTap: () => _askVeda(ppFillChild(
+                    'Can I ${q.question[0].toLowerCase()}${q.question.substring(1)} while breastfeeding?')),
+              ),
+            ]),
           ),
         ),
       ),
@@ -1420,12 +1636,10 @@ class _QCardV3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    final (verdict, label) = switch (q.ans) {
-      _Ans.yes => (CanIVerdict.safe, 'Yes'),
-      _Ans.care => (CanIVerdict.moderation, 'Yes, with care'),
-      _Ans.ask => (CanIVerdict.askDoctor, 'Ask your doctor first'),
-      _Ans.avoid => (CanIVerdict.avoid, 'Best avoided'),
-    };
+    final (verdict, label) = _verdictOf(q.ans);
+    // Her first six weeks only (2026-10-25): "In the first six weeks:" was
+    // shown to a mother ten months on.
+    final early = ppMotherDaysSinceBirth < 42;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       decoration: BoxDecoration(
@@ -1434,7 +1648,7 @@ class _QCardV3 extends StatelessWidget {
         border: Border.all(color: p.line),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Can I ${q.question[0].toLowerCase()}${q.question.substring(1)}?',
+        Text(ppFillChild('Can I ${q.question[0].toLowerCase()}${q.question.substring(1)}?'),
             style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1)),
         const SizedBox(height: 8),
         Row(children: [
@@ -1447,8 +1661,11 @@ class _QCardV3 extends StatelessWidget {
           Flexible(child: Text(label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1))),
         ]),
         const SizedBox(height: 6),
-        Text(q.answer, style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink1)),
-        if (q.firstWeeks != null) ...[
+        // The baby's he/his follow the child (2026-10-25).
+        Text(ppFillChild(q.answer),
+            key: const ValueKey('pp_maa_can_i_answer'),
+            style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink1)),
+        if (q.firstWeeks != null && early) ...[
           const SizedBox(height: 9),
           Text('In the first six weeks: ${q.firstWeeks}',
               style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, height: 1.55, color: p.ink2)),
@@ -1486,7 +1703,7 @@ class _QCard extends StatelessWidget {
           'ASK YOUR DOCTOR FIRST',
           Icons.medical_services_outlined
         ),
-      _Ans.avoid => (
+      _Ans.avoid || _Ans.urgent => (
           ppAlertTint(p),
           ppAlertInk(p).withValues(alpha: 0.4),
           'BEST AVOIDED',
@@ -1578,3 +1795,8 @@ class _CatChip extends StatelessWidget {
     ));
   }
 }
+
+/// The sources line under the list (2026-10-25).
+const String kPpMaaCanISources =
+    'Sources: LactMed (US National Library of Medicine), the NHS, and FOGSI '
+    'and IAP guidance. Checked against them; your own doctor knows you best.';

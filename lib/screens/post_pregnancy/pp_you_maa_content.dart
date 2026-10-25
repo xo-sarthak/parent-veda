@@ -6724,8 +6724,10 @@ const PpArea _canIFeeding = PpArea(
             'without talking to your doctor. There is usually a safe option '
             'that lets you do both.',
             kind: PpCalloutKind.doctor),
+        // Lands on the medicines chip, where this page is (2026-10-25).
+        // Was: surfaceId: 'pp_maa_can_i'.
         PpLink('Search more Can I...? questions',
-            surfaceId: 'pp_maa_can_i',
+            surfaceId: 'pp_maa_can_i/medicines',
             blurb: 'Over 330 quick answers, including medicines A to Z.'),
         PpLink('Contraception that is safe while feeding',
             pageId: 'body_contraception',
@@ -6808,8 +6810,12 @@ const PpArea _canIFeeding = PpArea(
           PpCard('Dental work and local anaesthetic', 'Fine. Tell the dentist '
               'you are feeding.'),
           PpCard('Vaccines and injections', 'Almost all are fine.'),
+          // Follows Can I...?'s keratin caution (2026-10-25). Was: 'Hair
+          // colour, straightening and waxing', 'Fine. Ventilate the room for
+          // strong chemicals.'
           PpCard('Hair colour, straightening and waxing', 'Fine. Ventilate the '
-              'room for strong chemicals.'),
+              'room for strong chemicals. Some keratin straightening releases '
+              'formaldehyde fumes, so choose a well-ventilated salon.'),
           PpCard('Facials, threading, manicures', 'Fine.'),
           PpCard('Laser and chemical peels', 'Usually fine; check the '
               'products with the clinic.'),
