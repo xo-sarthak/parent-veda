@@ -15,6 +15,7 @@ import 'package:parentveda/screens/profile/pv_you_content.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 import 'package:parentveda/services/pregnancy_ended_store.dart';
+import 'package:parentveda/services/pregnancy_records.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +25,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     PregnancyEndedStore.instance.resetForTest();
     await PregnancyEndedStore.instance.load();
-    pregnancy = PregnancyController(dueDate: DateTime.now().add(const Duration(days: 140)));
+    PregnancyRecords.instance.debugReset();
+    pregnancy =PregnancyController(dueDate: DateTime.now().add(const Duration(days: 140)));
     await pregnancy.load();
   });
 

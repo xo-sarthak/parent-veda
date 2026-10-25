@@ -293,11 +293,13 @@ class _PregnancyKeptScreenState extends State<PregnancyKeptScreen> {
                       crossAxisSpacing: 8,
                       children: [
                         for (final ph in photos)
-                          GestureDetector(
-                            onTap: () => _viewPhoto(ph.imageUrl, 'Week ${ph.weekNumber}'),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: _image(ph.imageUrl, p),
+                          PvPress(
+                            child: GestureDetector(
+                              onTap: () => _viewPhoto(ph.imageUrl, 'Week ${ph.weekNumber}'),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: _image(ph.imageUrl, p),
+                              ),
                             ),
                           ),
                       ],

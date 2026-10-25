@@ -40,6 +40,7 @@ import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 import '../v2/v2_palette.dart';
 import '../v2/v3_dev_mark.dart' show V3DevMark, devMarkFor;
+import '../../widgets/pv_feedback.dart' show PvPress;
 
 class DevelopmentAllActivitiesScreen extends StatelessWidget {
   const DevelopmentAllActivitiesScreen({super.key, this.area});
@@ -336,7 +337,7 @@ class PpTriedTick extends StatelessWidget {
       checked: tried,
       label: tried ? 'Tried. Tap to undo' : 'We tried this',
       excludeSemantics: true,
-      child: GestureDetector(
+      child: PvPress(child: GestureDetector(
         key: ValueKey('pp_activity_tried_${activity.id}'),
         behavior: HitTestBehavior.opaque,
         onTap: () {
@@ -367,7 +368,7 @@ class PpTriedTick extends StatelessWidget {
             ),
           ),
         ),
-      ),
+      )),
     );
   }
 }

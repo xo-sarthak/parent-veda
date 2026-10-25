@@ -30,6 +30,22 @@ const _expected = {
   'father_journal_entries',
 };
 
+/// Tables a later migration CREATES already keyed per person (0114's
+/// `pregnancies`, R1): nothing to re-key, so 0113 rightly does not list them.
+Set<String> _bornKeyed() {
+  final out = <String>{};
+  final table = RegExp(
+      r'create table if not exists public\.(\w+) \(([^;]*?)\);',
+      dotAll: true);
+  for (final f in Directory('supabase/migrations').listSync().whereType<File>()) {
+    if (!f.path.endsWith('.sql')) continue;
+    for (final m in table.allMatches(f.readAsStringSync())) {
+      if (m.group(2)!.contains('primary key (user_id, id)')) out.add(m.group(1)!);
+    }
+  }
+  return out;
+}
+
 /// A file's code with whole-line comments removed.
 String _code(String path) => File(path)
     .readAsStringSync()
@@ -65,7 +81,7 @@ void main() {
         }
       }
       expect(tables, isNotEmpty);
-      expect(tables.difference(_expected), isEmpty,
+      expect(tables.difference(_expected).difference(_bornKeyed()), isEmpty,
           reason: 'a ledger table on `id` that 0113 does not re-key: its '
               'upserts would conflict on a key that does not exist');
     });

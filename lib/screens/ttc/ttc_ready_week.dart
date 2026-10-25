@@ -150,13 +150,15 @@ class _HabitRow extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(
-              child: GestureDetector(
-                onTap: habit.surfaceId == null
-                    ? null
-                    : () => openTtcSurface(context, habit.surfaceId!),
-                child: Text(small ? habit.minimum : habit.title,
-                    style: ttcBody(14.5,
-                        color: ttcTitleInk, w: FontWeight.w800, h: 1.3)),
+              child: PvPress(
+                child: GestureDetector(
+                  onTap: habit.surfaceId == null
+                      ? null
+                      : () => openTtcSurface(context, habit.surfaceId!),
+                  child: Text(small ? habit.minimum : habit.title,
+                      style: ttcBody(14.5,
+                          color: ttcTitleInk, w: FontWeight.w800, h: 1.3)),
+                ),
               ),
             ),
             const SizedBox(width: 8),

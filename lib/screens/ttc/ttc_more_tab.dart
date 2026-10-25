@@ -158,6 +158,9 @@ const Map<String, (TtcRowHome, String)> kTtcFormerYouRows = {
   'Your answers': (TtcRowHome.profile, 'YOUR ANSWERS'),
   "I'm pregnant": (TtcRowHome.profile, "I'm pregnant"), // was 'I got a positive test' (2026-10-10)
   'Your partner': (TtcRowHome.profile, 'Your partner'),
+  // R1 (2026-10-25): an ended pregnancy, kept for her. Shown only once
+  // there is one, so the page tests see it only with a kept record.
+  'Your pregnancies': (TtcRowHome.profile, 'Your pregnancies'),
   // Settings: how the app behaves for her, her account, help.
   'Messages': (TtcRowHome.settings, 'Messages'),
   'What you see': (TtcRowHome.settings, 'What you see'),

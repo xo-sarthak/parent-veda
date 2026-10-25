@@ -392,7 +392,9 @@ final HubConfig kPpEarlyLearning = HubConfig(
   needs: [
     HubNeed(
       // R3 (tools pass, 2026-10-25): it opens every idea for this age. Was _en('Something to do today').
-      label: _en('Activities for this age'),
+      // "Activities" is an inventory word, which §2.1 bars from a door
+      // (test/problem_hub_test.dart). Kept for revert: _en('Activities for this age').
+      label: _en('Play ideas for this age'),
       blurb: _en("A small activity matched to your child's age: playful, "
           'and never a worksheet.'),
       mark: IntentMark.blocksMark,

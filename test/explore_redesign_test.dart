@@ -440,7 +440,9 @@ void main() {
   group('all four are reachable, and nothing was deleted', () {
     test('Explore opens the redesigned screens', () {
       for (final s in [
-        'const RecipesExploreScreen()',
+        // The one recipes page since 2026-10-21 (277fefe); was
+        // 'const RecipesExploreScreen()', still on disk for revert.
+        'const PpRecipesScreen()',
         'const RecoExploreScreen()',
         'const ReadExploreScreen()',
         'const CoursesExploreScreen()',

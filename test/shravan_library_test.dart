@@ -173,7 +173,8 @@ void main() {
       'startup', () {
     final door = pvDoorPageFor('pregnancy_garbh')!;
     final titles = door.sectionsOf(kGarbhTabListen).map((s) => s.heading);
-    expect(titles, contains('Where these sounds come from'));
+    // Renamed 2026-10-22 (8c16171); was 'Where these sounds come from'.
+    expect(titles, contains('About these recordings'));
     expect(pvDoorSurfaceResolves(kGarbhSurfaceCredits), isTrue);
     final main = File('lib/main.dart').readAsStringSync();
     expect(main, contains('ShravanLibrary.instance.init()'));

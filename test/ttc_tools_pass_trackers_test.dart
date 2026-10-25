@@ -93,8 +93,13 @@ void main() {
       await pumpTall(tester, const TtcCalendarScreen());
       // The next period may fall in next month; look there if not here.
       if (find.byKey(const ValueKey('ttc_cal_due_mark')).evaluate().isEmpty) {
-        await tester.tap(find.byIcon(Icons.chevron_right_rounded).first);
-        await tester.pump(const Duration(milliseconds: 300));
+        // The month change animates: a 300 ms pump stopped before the next
+        // month was drawn, so this passed only in months where the period
+        // fell in the month already shown (failed 2026-10-25). Kept for
+        // revert: tap(find.byIcon(Icons.chevron_right_rounded).first) and
+        // pump(const Duration(milliseconds: 300)).
+        await tester.tap(find.bySemanticsLabel('Next month').first);
+        await tester.pumpAndSettle();
       }
       expect(find.byKey(const ValueKey('ttc_cal_due_mark')), findsOneWidget);
     });

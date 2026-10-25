@@ -40,6 +40,7 @@ import 'package:parentveda/screens/ttc/ttc_home_version.dart';
 import 'package:parentveda/screens/ttc/ttc_more_tab.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/services/life_stage_store.dart';
+import 'package:parentveda/services/pregnancy_records.dart';
 import 'package:parentveda/services/pv_order_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
@@ -769,6 +770,12 @@ void main() {
 
     testWidgets('each is on its home and on neither of the other two',
         (tester) async {
+      // "Your pregnancies" draws only once one is kept (R1): keep one.
+      PregnancyRecords.instance.debugReset(rows: [
+        PregnancyRecord(id: 'preg_2025-01-01', startedOn: DateTime(2025, 1, 1),
+            endedOn: DateTime(2025, 3, 1), outcome: PregnancyOutcome.loss),
+      ]);
+      addTearDown(PregnancyRecords.instance.debugReset);
       await pump(tester, _profile);
       final profile = texts(tester);
       await openSettings(tester);
