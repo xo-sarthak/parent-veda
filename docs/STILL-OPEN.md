@@ -11105,3 +11105,17 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
   by `id` alone, and the app's ids are a date or a fixed name. BUILT 2026-10-24 as sync log step 14: migration 0113
   keys 17 tables on `(user_id, id)` and the app conflicts on the same pair. 0113 RUN 2026-10-25 (check query: 17 rows of `user_id,id`); left: install the next
   build (an older build's writes to those tables wait on the phone until then).
+- **§101.10 (R10) Milestones: one place to find and celebrate (the user, 2026-10-25).** Today they are hidden (no
+  Home or tab entry; Tools → "Growing and learning", Brain activities → "The wider view", the Development door's
+  "On track" tab, search) and named like a checklist ("This month's checklist", "On track", "A gentle check-in",
+  "Tap the circle if you have seen it", "A box you have not ticked"). Five screens, four lists:
+  `milestone_journey_screen.dart` and `pp_month_checklist_screen.dart` write `MilestoneStore`
+  (`pp_milestones_data.dart`, 18 milestones); `development_checkin_screen.dart` writes `DevStore`;
+  `development_map_screen.dart` hard-codes its own skills and its "you are here" (`_current = 1`);
+  `health_doctor_visit_screen.dart` reads. The lists `kMilestones`, `DevArea` skills (DOOR-CONTENT-OWED DV2),
+  `AgePhase.milestones` (Home's "How {name} is growing") and the Map's are not joined; journal "Milestones" and
+  `GuidedMemoryScreen` ("A first") are separate again. A seen milestone holds a date and a note only.
+  Direction (STAGE-TRANSITIONS R10): one Milestones place per child one tap from the parenting home, one list (DV2),
+  saving one as a celebrated moment with an optional photo and one journal memory, gentle "might appear soon"
+  language, the checklist words renamed, Mobbin and a prototype first. Already decided and kept: one tracker, no
+  score, D3, DV1 (whose tab order the door data never set: "On track" still opens first).
