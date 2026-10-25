@@ -140,9 +140,13 @@ const List<String> kPregEndedBody = [
       "your body and your heart. Your hospital bag and evening check-in "
       "reminders pause too; reminders for your medicines, and any you set "
       "yourself, stay as they are.",
+  // R1 (2026-10-25): where her pregnancy is kept, said once, never asked.
+  // Kept for revert, the paragraph ended at "from this same place."
   "Nothing you saved is deleted. Your notes, photos, reports and bookmarks "
       "stay just as they are, and you can go back to the weekly view whenever "
-      "you want, from this same place.",
+      "you want, from this same place. Everything from this pregnancy stays "
+      "kept for you in You, under Your pregnancies, to look at or delete "
+      "whenever you choose.",
 ];
 const String kPregEndedConfirm = 'Stop the weekly updates';
 const String kPregEndedCancel = 'Not now';

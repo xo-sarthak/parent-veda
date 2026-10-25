@@ -3873,47 +3873,6 @@ the code after it runs. Here a child switch landed in that gap. The fix is to ca
 owner first (`final pushed = cloud(); await _persist(); await pushed;`). **Capture the owner when the record
 starts, not when it is saved**, the same rule as the breastfeed timer in 16ll.
 
-## 16nn. Windows instead of a foreign key, and seal what has no date (0114, 2026-10-25)
-
-Sync step 17 (R1). A pregnancy became a row, and every pregnancy record had to learn which pregnancy it belongs to.
-
-### 1. A foreign key is exact; a window is free
-
-The textbook answer is a `pregnancy_id` column on every record table. That means a migration on about twenty
-shipped tables, a backfill guessing the id for every existing row, and a change to every writer. Every one of
-those records already carries a date, though. So the pregnancies sort by start, and each one owns the time from
-its start to the next one's start. That is a **partition**: no record is in two pregnancies and none is in none.
-"Whose is this photo?" becomes "which window holds its date?", and nothing about the photo table changes.
-
-**The trade-off.**
-- *Foreign key:* exact, and enforced by the database. It is also the most expensive change you can make to shipped
-  data.
-- *Window (chosen):* no migration and no backfill on the record tables. It costs a rule the database can't enforce,
-  so it must live in one place (`PregnancyRecords.inCurrent`), with a test that every reader calls it. It is right
-  as long as the dates are, and the app writes those dates itself.
-
-A detail that matters: a **removed** pregnancy still bounds the windows. If it didn't, its neighbour's window would
-widen, and any record the delete couldn't remove (her partner's journal, which is his) would slide into the next
-pregnancy.
-
-### 2. What has no date is sealed, not filtered
-
-A hospital-bag list, a birth plan, a scan ticked by its catalogue id, or a mood keyed by "day 120" has no date to
-place it. These are **copied into the old pregnancy's `archive` and reset** when the next pregnancy begins. The
-reset is her edit (`CloudMergedStore.replaceItemsAsEdit`), not a merge's quiet write, so it is stamped and her other
-phones follow. Undo copies them back.
-
-**The general fact:** a time-scoped container needs a rule for both kinds of data. Data with a timestamp can be
-*viewed* through a window. Data without one has to be *moved* when the container closes.
-
-### 3. Two stores, one cache key
-
-`MemoryStore` and `JournalStore` both wrote `journal_entries` to prefs. Each decoder accepted the other's shape,
-so each silently adopted the other's entries, and whichever wrote last won on the phone. Nothing crashed, because
-the cloud kept each in its own table. Keys are a namespace with no compiler, so `pregnancy_records_test` now scans
-every `static const *Key = '...'` and fails on a duplicate. The split runs once and tells the shapes apart by a
-field only one of them writes.
-
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -4026,3 +3985,44 @@ Two small patterns from the parenting tools pass, Health family (`docs/pp-tool-p
 
 
 48. `PpChangesStore.active()` → `walletAllergies()` (`pp_wallet_data.dart`): gate where every reader already passes; read, don't copy (§16nn).
+
+## 16oo. Windows instead of a foreign key, and seal what has no date (0114, 2026-10-25)
+
+Sync step 18 (R1). A pregnancy became a row, and every pregnancy record had to learn which pregnancy it belongs to.
+
+### 1. A foreign key is exact; a window is free
+
+The textbook answer is a `pregnancy_id` column on every record table. That means a migration on about twenty
+shipped tables, a backfill guessing the id for every existing row, and a change to every writer. Every one of
+those records already carries a date, though. So the pregnancies sort by start, and each one owns the time from
+its start to the next one's start. That is a **partition**: no record is in two pregnancies and none is in none.
+"Whose is this photo?" becomes "which window holds its date?", and nothing about the photo table changes.
+
+**The trade-off.**
+- *Foreign key:* exact, and enforced by the database. It is also the most expensive change you can make to shipped
+  data.
+- *Window (chosen):* no migration and no backfill on the record tables. It costs a rule the database can't enforce,
+  so it must live in one place (`PregnancyRecords.inCurrent`), with a test that every reader calls it. It is right
+  as long as the dates are, and the app writes those dates itself.
+
+A detail that matters: a **removed** pregnancy still bounds the windows. If it didn't, its neighbour's window would
+widen, and any record the delete couldn't remove (her partner's journal, which is his) would slide into the next
+pregnancy.
+
+### 2. What has no date is sealed, not filtered
+
+A hospital-bag list, a birth plan, a scan ticked by its catalogue id, or a mood keyed by "day 120" has no date to
+place it. These are **copied into the old pregnancy's `archive` and reset** when the next pregnancy begins. The
+reset is her edit (`CloudMergedStore.replaceItemsAsEdit`), not a merge's quiet write, so it is stamped and her other
+phones follow. Undo copies them back.
+
+**The general fact:** a time-scoped container needs a rule for both kinds of data. Data with a timestamp can be
+*viewed* through a window. Data without one has to be *moved* when the container closes.
+
+### 3. Two stores, one cache key
+
+`MemoryStore` and `JournalStore` both wrote `journal_entries` to prefs. Each decoder accepted the other's shape,
+so each silently adopted the other's entries, and whichever wrote last won on the phone. Nothing crashed, because
+the cloud kept each in its own table. Keys are a namespace with no compiler, so `pregnancy_records_test` now scans
+every `static const *Key = '...'` and fails on a duplicate. The split runs once and tells the shapes apart by a
+field only one of them writes.

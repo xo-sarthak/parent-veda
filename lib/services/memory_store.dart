@@ -17,16 +17,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/memory_models.dart';
 import 'remote/own_row_ledger.dart';
+import 'journal_key_split.dart';
+import 'pregnancy_records.dart';
 import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 import 'remote/sync_row_book.dart';
 
-class MemoryStore extends ChangeNotifier {
+class MemoryStore extends ChangeNotifier implements PregnancyScopedStore {
   MemoryStore._();
   static final MemoryStore instance = MemoryStore._();
 
-  static const _journalKey = 'journal_entries';
+  // static const _journalKey = 'journal_entries'; // kept for revert
+  // ⚠️ ITS OWN KEY (R1 step 0, 2026-10-25): 'journal_entries' was the
+  // pregnancy journal's key too, and each store overwrote the other's
+  // entries on this phone (journal_key_split.dart).
+  static const _journalKey = kWeeklyNotesKey;
   static const _photoKey = 'photo_memories';
 
   final List<JournalEntry> _journal = [];
@@ -52,9 +58,38 @@ class MemoryStore extends ChangeNotifier {
         }
       });
 
+  /// ⚠️ THIS PREGNANCY'S NOTES ONLY (R1, 2026-10-25). A note is keyed by its
+  /// pregnancy week, and every pregnancy has a week 12: without this a
+  /// second pregnancy's week 12 opened on (and then overwrote) the first's.
+  /// A note belongs to the pregnancy whose window holds its date.
+  List<JournalEntry> get _mine =>
+      [for (final e in _journal) if (PregnancyRecords.instance.inCurrent(_dayOf(e))) e];
+
+  static DateTime _dayOf(JournalEntry e) =>
+      DateTime.tryParse(e.dateIso) ??
+      DateTime.fromMicrosecondsSinceEpoch(int.tryParse(e.id) ?? 0);
+
+  /// [w]'s notes, by week (the "Kept for you" page).
+  List<JournalEntry> notesIn(PregnancyWindow w) =>
+      [for (final e in _journal) if (w.holds(_dayOf(e))) e]
+        ..sort((a, b) => a.week.compareTo(b.week));
+
+  @override
+  int countIn(PregnancyWindow w) => notesIn(w).length;
+
+  @override
+  Future<int> removeIn(PregnancyWindow w) async {
+    final ids = [for (final e in notesIn(w)) e.id];
+    for (final id in ids) {
+      await deleteJournal(id);
+    }
+    return ids.length;
+  }
+
   /// Journal entries, newest first.
   List<JournalEntry> get journal {
-    final list = [..._journal];
+    // final list = [..._journal]; // kept for revert
+    final list = [..._mine];
     list.sort((a, b) => b.id.compareTo(a.id));
     return list;
   }
@@ -66,12 +101,13 @@ class MemoryStore extends ChangeNotifier {
     return list;
   }
 
-  bool get hasMemories => _journal.isNotEmpty || _photos.isNotEmpty;
+  bool get hasMemories => _mine.isNotEmpty || _photos.isNotEmpty;
 
   /// The single journal entry for [week], or null if none exists. Each week now
   /// holds at most one entry (see the migration in [init]).
   JournalEntry? journalForWeek(int week) {
-    for (final e in _journal) {
+    // for (final e in _journal) { // kept for revert
+    for (final e in _mine) {
       if (e.week == week) return e;
     }
     return null;
@@ -81,6 +117,7 @@ class MemoryStore extends ChangeNotifier {
     if (_loaded) return;
     try {
       final prefs = await SharedPreferences.getInstance();
+      await splitSharedJournalKey(prefs);
       final j = prefs.getString(_journalKey);
       if (j != null) {
         for (final e in (jsonDecode(j) as List)) {
@@ -225,9 +262,31 @@ class MemoryStore extends ChangeNotifier {
   /// entry - newest text first (blank texts dropped), keeping up to two photos -
   /// so nothing the mother wrote or photographed is lost.
   Future<void> _migrateToOnePerWeek() async {
-    final byWeek = <int, List<JournalEntry>>{};
+    // ⚠️ ONE PER WEEK OF ONE PREGNANCY (R1, 2026-10-25). Grouping by week
+    // alone fused two pregnancies' week-12 notes into one. A week's notes
+    // more than 60 days apart are different pregnancies' and stay apart.
+    // Kept for revert:
+    //   final byWeek = <int, List<JournalEntry>>{};
+    //   for (final e in _journal) {
+    //     byWeek.putIfAbsent(e.week, () => []).add(e);
+    //   }
+    final weeks = <int, List<JournalEntry>>{};
     for (final e in _journal) {
-      byWeek.putIfAbsent(e.week, () => []).add(e);
+      weeks.putIfAbsent(e.week, () => []).add(e);
+    }
+    final byWeek = <String, List<JournalEntry>>{};
+    for (final w in weeks.entries) {
+      final list = [...w.value]..sort((a, b) => _dayOf(a).compareTo(_dayOf(b)));
+      var n = 0;
+      DateTime? first;
+      for (final e in list) {
+        final d = _dayOf(e);
+        if (first == null || d.difference(first).inDays > 60) {
+          n++;
+          first = d;
+        }
+        byWeek.putIfAbsent('${w.key}|$n', () => []).add(e);
+      }
     }
     final needsMigration = byWeek.values.any((list) => list.length > 1);
     if (!needsMigration) return;
@@ -255,7 +314,8 @@ class MemoryStore extends ChangeNotifier {
       await _deleteFiles(photos.skip(2).toList());
       merged.add(JournalEntry(
         id: newest.id,
-        week: entry.key,
+        // week: entry.key, // kept for revert
+        week: newest.week,
         dateIso: newest.dateIso,
         source: newest.source,
         prompt: newest.prompt,

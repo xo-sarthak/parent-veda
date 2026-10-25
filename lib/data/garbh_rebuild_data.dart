@@ -47,6 +47,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
 import '../services/remote/cloud_merged_store.dart';
+import '../services/pregnancy_records.dart';
 import '../services/remote/own_row_ledger.dart';
 import '../services/remote/storage_service.dart';
 import '../services/remote/supabase_repo.dart';
@@ -338,7 +339,9 @@ class GarbhJournalEntry {
 ///   * the rituals, pins, the "asked" mark and today's japa are ITEMS in a
 ///     per-item merged store (CloudMergedStore): `ritual|<id>`, `pin|<id>`,
 ///     `asked`, `japa`.
-class GarbhJournalStore extends ChangeNotifier with CloudMergedStore {
+class GarbhJournalStore extends ChangeNotifier
+    with CloudMergedStore
+    implements PregnancyScopedStore {
   GarbhJournalStore._() {
     SyncRegistry.registerReset(_resetForAccount);
   }
@@ -485,13 +488,43 @@ class GarbhJournalStore extends ChangeNotifier with CloudMergedStore {
   int _japa = 0;
   String _japaDate = '';
 
+  /// ⚠️ THIS PREGNANCY'S RECORDINGS (R1, 2026-10-25). An entry's week is
+  /// stamped at creation, and every pregnancy has a week 22: without this a
+  /// second pregnancy's album opened on the first's voices. An entry belongs
+  /// to the pregnancy whose window holds the moment it was made. Her rituals
+  /// and pins are her practice, not a pregnancy's, and carry on.
+  static DateTime _at(GarbhJournalEntry e) =>
+      DateTime.fromMillisecondsSinceEpoch(e.tsMs);
+
+  List<GarbhJournalEntry> get _mine =>
+      [for (final e in _entries) if (PregnancyRecords.instance.inCurrent(_at(e))) e];
+
+  /// [w]'s entries, newest first (the "Kept for you" page).
+  List<GarbhJournalEntry> entriesIn(PregnancyWindow w) =>
+      [for (final e in _entries) if (w.holds(_at(e))) e]
+        ..sort((a, b) => b.tsMs.compareTo(a.tsMs));
+
+  @override
+  int countIn(PregnancyWindow w) => entriesIn(w).length;
+
+  /// Each the way [remove] does, audio file included.
+  @override
+  Future<int> removeIn(PregnancyWindow w) async {
+    final ids = [for (final e in entriesIn(w)) e.id];
+    for (final id in ids) {
+      await remove(id);
+    }
+    return ids.length;
+  }
+
   /// Newest first.
   List<GarbhJournalEntry> get entries {
-    final l = [..._entries]..sort((a, b) => b.tsMs.compareTo(a.tsMs));
+    // final l = [..._entries]..sort((a, b) => b.tsMs.compareTo(a.tsMs)); // kept for revert
+    final l = _mine..sort((a, b) => b.tsMs.compareTo(a.tsMs));
     return List.unmodifiable(l);
   }
 
-  bool get isEmpty => _entries.isEmpty;
+  bool get isEmpty => _mine.isEmpty;
 
   /// Grouped by the week they were made in, newest week first.
   Map<int, List<GarbhJournalEntry>> get byWeek {
@@ -509,15 +542,15 @@ class GarbhJournalStore extends ChangeNotifier with CloudMergedStore {
   /// it would be mostly ragas, and a mother reading "4 hours of your voice"
   /// when most of it is a music track has been flattered rather than told
   /// something. Family recordings are counted separately for the same reason.
-  int get myVoiceSeconds => _entries
+  int get myVoiceSeconds => _mine
       .where((e) => e.kind == GarbhEntryKind.myVoice)
       .fold(0, (a, e) => a + e.seconds);
 
   int get myVoiceCount =>
-      _entries.where((e) => e.kind == GarbhEntryKind.myVoice).length;
+      _mine.where((e) => e.kind == GarbhEntryKind.myVoice).length;
 
   int get familyCount =>
-      _entries.where((e) => e.kind == GarbhEntryKind.familyVoice).length;
+      _mine.where((e) => e.kind == GarbhEntryKind.familyVoice).length;
 
   /// What she added this week, for the strip on the daily card.
   List<GarbhJournalEntry> thisWeek(int week) =>

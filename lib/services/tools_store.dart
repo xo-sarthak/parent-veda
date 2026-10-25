@@ -16,6 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'remote/own_row_ledger.dart';
+import 'pregnancy_records.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 import 'remote/sync_row_book.dart';
@@ -231,7 +232,7 @@ typedef MovementSessionRecord = ({
 //  Store
 // ---------------------------------------------------------------------------
 
-class ToolsStore extends ChangeNotifier {
+class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
   ToolsStore._();
   static final ToolsStore instance = ToolsStore._();
 
@@ -365,7 +366,8 @@ class ToolsStore extends ChangeNotifier {
   /// its ordinal within its calendar day (e.g. "Session 2" on 20 June).
   List<MovementSessionRecord> get movementSessionHistory {
     final ended = _movementSessions
-        .where((s) => !s.isActive && s.times.isNotEmpty)
+        // This pregnancy's sessions only (R1, 2026-10-25).
+        .where((s) => !s.isActive && s.times.isNotEmpty && _now(_moveDay(s)))
         .toList()
       ..sort((a, b) => a.startIso.compareTo(b.startIso)); // oldest first
 
@@ -399,7 +401,10 @@ class ToolsStore extends ChangeNotifier {
   /// Weight entries, newest first (by full timestamp, so same-day entries keep
   /// their order).
   List<WeightEntry> get weightEntries {
-    final list = [..._weightEntries];
+    // final list = [..._weightEntries]; // kept for revert
+    // This pregnancy's weights only (R1, 2026-10-25): a second pregnancy's
+    // chart starts clean, the first one's kept with it.
+    final list = [for (final e in _weightEntries) if (_now(_weightDay(e))) e];
     list.sort((a, b) => b.timeIso.compareTo(a.timeIso));
     return list;
   }
@@ -469,7 +474,8 @@ class ToolsStore extends ChangeNotifier {
   // ---- Contraction getters --------------------------------------------------
 
   List<ContractionSession> get contractionSessions {
-    final list = [..._contractionSessions];
+    // final list = [..._contractionSessions]; // kept for revert
+    final list = [for (final s in _contractionSessions) if (_now(_ctDay(s))) s];
     list.sort((a, b) => b.dateIso.compareTo(a.dateIso));
     return list;
   }
@@ -1149,6 +1155,63 @@ class ToolsStore extends ChangeNotifier {
           'voiceOn': _kegelVoiceOn,
           'thisWeek': _kegelThisWeek,
         }));
+  }
+
+  // ---- Whose pregnancy (R1, 2026-10-25) --------------------------------------
+  // Weights, kick sessions and contraction sessions are dated, so each
+  // belongs to the pregnancy whose window holds its date
+  // (pregnancy_records.dart). Kegels and the weight profile are hers, not a
+  // pregnancy's.
+
+  static bool _now(DateTime d) => PregnancyRecords.instance.inCurrent(d);
+  static DateTime _weightDay(WeightEntry e) =>
+      DateTime.tryParse(e.dateIso) ?? DateTime.tryParse(e.timeIso) ?? DateTime.now();
+  static DateTime _moveDay(MovementSession s) =>
+      DateTime.tryParse(s.startIso) ?? (s.times.isEmpty ? DateTime.now() : s.times.first);
+  static DateTime _ctDay(ContractionSession s) =>
+      DateTime.tryParse(s.dateIso) ?? DateTime.now();
+
+  /// Weights, kick sessions and contraction sessions in [w]
+  /// (the "Kept for you" page).
+  ({int weights, int kicks, int contractions}) countsIn(PregnancyWindow w) => (
+        weights: _weightEntries.where((e) => w.holds(_weightDay(e))).length,
+        kicks: _movementSessions.where((s) => w.holds(_moveDay(s))).length,
+        contractions:
+            _contractionSessions.where((s) => w.holds(_ctDay(s))).length,
+      );
+
+  @override
+  int countIn(PregnancyWindow w) {
+    final c = countsIn(w);
+    return c.weights + c.kicks + c.contractions;
+  }
+
+  /// Soft deletes that travel, as [deleteWeightEntry] does.
+  @override
+  Future<int> removeIn(PregnancyWindow w) async {
+    final weights = [for (final e in _weightEntries) if (w.holds(_weightDay(e))) e];
+    final moves = [for (final s in _movementSessions) if (w.holds(_moveDay(s))) s];
+    final cts = [for (final s in _contractionSessions) if (w.holds(_ctDay(s))) s];
+    for (final e in weights) {
+      _weightSync.remove(e.id, _weightEntryToRow(e));
+    }
+    for (final s in moves) {
+      _moveSync.remove(s.id, _movementToRow(s));
+    }
+    for (final s in cts) {
+      _ctSync.remove(s.id, _contractionToRow(s));
+    }
+    _weightEntries.removeWhere(weights.contains);
+    _movementSessions.removeWhere(moves.contains);
+    _contractionSessions.removeWhere(cts.contains);
+    notifyListeners();
+    await _persist(_weightEntriesKey,
+        jsonEncode(_weightEntries.map((e) => e.toJson()).toList()));
+    await _persistMovementSessions();
+    await _persist(_contractionKey,
+        jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()));
+    await _pushAll();
+    return weights.length + moves.length + cts.length;
   }
 
   // ---- Contraction mutations ------------------------------------------------

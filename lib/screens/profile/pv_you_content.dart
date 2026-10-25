@@ -88,6 +88,8 @@ import 'pv_details_screen.dart';
 import 'pv_doctor_notes_screen.dart';
 import 'pv_you_sheets.dart';
 import '../../widgets/pv_toast.dart';
+import '../../services/pregnancy_records.dart';
+import '../pregnancy/pregnancy_kept_screen.dart' show openPregnancyKept, showPvKeptPregnanciesSheet;
 
 /// One row under "Your details": a label, the fact (or `--`), and how to edit.
 class PvYouDetail {
@@ -497,7 +499,9 @@ PvYouThing _dearBabyLetters() => PvYouThing(
   },
   dot: () => DearBabyVaultStore.instance.unlocked && !DearBabyVaultStore.instance.opened,
   listen: Listenable.merge([DearBabyVaultStore.instance, DailyStore.instance]),
-  shown: () => DailyStore.instance.talkEntries.isNotEmpty,
+  // shown: () => DailyStore.instance.talkEntries.isNotEmpty, // kept for revert
+  // The vault's own letters (R1): a later pregnancy does not hide them.
+  shown: () => dearBabyLetters().isNotEmpty,
   open: (c) => _push(c,
       DearBabyVaultScreen(controller: PregnancyController.current), 'dear_baby'),
 );
@@ -540,6 +544,28 @@ PvYouThing _pregEnded() => PvYouThing(
   open: (c) {
     final ctl = PregnancyController.current;
     if (ctl != null) openPregEnded(c, ctl);
+  },
+);
+
+/// "Your pregnancies" (R1, 2026-10-25): every pregnancy that has ended, kept
+/// for her to look at or delete. A quiet row, shown only once there is one,
+/// in every stage she can be in afterwards (trying again, pregnant again,
+/// parenting). Never in the header switch beside her children.
+PvYouThing _keptPregnancies() => PvYouThing(
+  icon: Icons.auto_stories_outlined,
+  art: ttcArtTab(TtcTabMark.lotus),
+  title: 'Your pregnancies',
+  subtitle: 'Kept for you, to look at or delete',
+  count: () => PregnancyRecords.instance.kept.length,
+  listen: PregnancyRecords.instance,
+  shown: () => PregnancyRecords.instance.kept.isNotEmpty,
+  open: (c) {
+    final kept = PregnancyRecords.instance.kept;
+    if (kept.length == 1) {
+      openPregnancyKept(c, kept.single);
+    } else if (kept.isNotEmpty) {
+      showPvKeptPregnanciesSheet(c);
+    }
   },
 );
 
@@ -1090,7 +1116,8 @@ final PvYouStageContent _trying = PvYouStageContent(
   // sits on the journey's tile, under the chapters.
   // The journey map left More and Tools' moved list on 2026-09-30 (the
   // user). Kept for revert: journeyThings: [_movedThing('map')],
-  journeyThings: const [],
+  // journeyThings: const [], // kept for revert (R1 adds the kept pregnancies)
+  journeyThings: [_keptPregnancies()],
   journeyCaption:
       'Where you are across the four chapters, the "I\'m pregnant" button, and your journey map with its family timeline',
   // What Saved holds on this stage since 2026-09-30 (kTtcSavedKinds). Kept
@@ -1258,7 +1285,8 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
   // last and quiet; Messages and Find help moved into Settings.
   shortProfile: true,
   keepsakeThings: [_dearBabyVault(), _pregJournal(), _bumpJourney()],
-  journeyThings: [_pregEnded()],
+  // journeyThings: [_pregEnded()], // kept for revert
+  journeyThings: [_pregEnded(), _keptPregnancies()],
   profileThings: [
     _doctorNotes(LifeStage.pregnancy, art: ttcArtTab(TtcTabMark.doctorChat)),
   ],
@@ -1356,6 +1384,7 @@ final PvYouStageContent _parenting = PvYouStageContent(
   setupThings: [_ppPersonalize(), _ppCareCircle(), _ppInvite(), _ppInvestments(), _ppAstrology()],
   // Her letters from pregnancy, opened at birth (2026-10-15).
   keepsakeThings: [_dearBabyLetters()],
+  journeyThings: [_keptPregnancies()],
   childrenInvitation: 'Add your child and their page appears here.',
   whatWeStore: [
     'Your name, phone and email, and the partner you paired with.',

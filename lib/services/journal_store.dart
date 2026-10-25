@@ -24,6 +24,8 @@ import 'remote/storage_service.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 import 'journal_sync.dart';
+import 'journal_key_split.dart';
+import 'pregnancy_records.dart';
 import 'tools_store.dart';
 
 /// Tags that mark a parenting memory in this journal: whose it is, and which
@@ -35,7 +37,7 @@ const String kPpKindTag = 'pp_kind:';
 /// True for a memory written about a born child (the parenting journal).
 bool isChildMemory(JournalEntry e) => e.tags.any((t) => t.startsWith(kPpChildTag));
 
-class JournalStore extends ChangeNotifier {
+class JournalStore extends ChangeNotifier implements PregnancyScopedStore {
   JournalStore._();
   static final JournalStore instance = JournalStore._();
 
@@ -125,6 +127,8 @@ class JournalStore extends ChangeNotifier {
     if (_loaded) return;
     try {
       final prefs = await SharedPreferences.getInstance();
+      // Weekly notes shared this key until 2026-10-25 (journal_key_split.dart).
+      await splitSharedJournalKey(prefs);
       final raw = prefs.getString(_key);
       if (raw != null) {
         for (final e in (jsonDecode(raw) as List)) {
@@ -314,6 +318,29 @@ class JournalStore extends ChangeNotifier {
 
   List<JournalEntry> get manualEntries => List.unmodifiable(_manual);
 
+  /// Her pregnancy entries in [w], newest first (the "Kept for you" page).
+  /// Child memories are the child's, never a pregnancy's.
+  List<JournalEntry> entriesIn(PregnancyWindow w) =>
+      [for (final e in _manual) if (!isChildMemory(e) && w.holds(e.date)) e]
+        ..sort((a, b) => b.date.compareTo(a.date));
+
+  /// Her partner's entries in [w], read only: they are his to keep.
+  List<JournalEntry> partnerEntriesIn(PregnancyWindow w) =>
+      [for (final e in _partner) if (w.holds(e.date)) e];
+
+  @override
+  int countIn(PregnancyWindow w) => entriesIn(w).length;
+
+  /// Each the way [deleteEntry] does (this table hard-deletes, 0009).
+  @override
+  Future<int> removeIn(PregnancyWindow w) async {
+    final ids = [for (final e in entriesIn(w)) e.id];
+    for (final id in ids) {
+      await deleteEntry(id);
+    }
+    return ids.length;
+  }
+
   bool get hasManualEntries => _manual.isNotEmpty;
 
   Future<void> addEntry(JournalEntry e) async {
@@ -444,8 +471,15 @@ class JournalStore extends ChangeNotifier {
     final s = S(p.language);
     // A parenting memory (tagged with its child, see jv2_store.dart) is not
     // a pregnancy week's entry; left out so it is not filed under week 40.
-    final list = <JournalEntry>[..._manual.where((e) => !isChildMemory(e))];
-    if (showPartnerEntries) list.addAll(_partner);
+    // ⚠️ AND ONLY THIS PREGNANCY'S (R1, 2026-10-25): an entry belongs to the
+    // pregnancy whose window holds its date. Kept for revert:
+    //   final list = <JournalEntry>[..._manual.where((e) => !isChildMemory(e))];
+    //   if (showPartnerEntries) list.addAll(_partner);
+    bool now(JournalEntry e) => PregnancyRecords.instance.inCurrent(e.date);
+    final list = <JournalEntry>[
+      ..._manual.where((e) => !isChildMemory(e) && now(e)),
+    ];
+    if (showPartnerEntries) list.addAll(_partner.where(now));
     list.addAll(_autoMilestones(p));
     list.addAll(_autoHealth(p, s));
     list.sort((a, b) => b.date.compareTo(a.date));

@@ -7922,6 +7922,11 @@ is the shape: a row per pregnancy (start, dating method, due date, outcome,
 column. Also where a loss is recorded, so the app can stop pushing pregnancy
 content afterwards (personalisation reads `outcome`). Not built.
 
+**BUILT 2026-10-25 (R1, sync step 18, `0114_pregnancies.sql`).** `PregnancyRecords`
+(`lib/services/pregnancy_records.dart`): start, due date and `DueDateSource`, end, outcome (`ongoing`, `loss`,
+`birth`, `ended`), `child_id`, and an archive of the undated records. Derived on first run from what the install
+already holds, never asked. Personalisation reading `outcome` is still owed.
+
 ### 61.2 One product catalogue across stages — BUILT 2026-09-17
 
 The user's own words: three product sections, one per stage, "makes no
@@ -11079,6 +11084,9 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
   `pregnancies` table is owed (FAMILY-MODEL). The user's answer, 2026-10-24: guard now, build later. The guard (G1) turned out
   to have no door to sit on: every home's avatar opens You, so no parent reaches Pregnancy from Parenting except
   through the Developer stage chips (BEFORE-LAUNCH §6). The "Expecting again?" page waits as the front of R1.
+  **Per-pregnancy records BUILT 2026-10-25** (sync step 18): a pregnancy after a loss starts clean, the old one is
+  "Kept for you" (family sheet and You) to look at or delete. The user's call: never decide for her, never ask at
+  the moment of the loss; delete is the 90-day soft delete. The moves themselves wait on F2.
 - **§101.2 (R2) The partner's phone never sees her stage change or her loss.** `fetchMyProfile` reads his own
   profile row; only the due date falls back to hers. The comment in `pregnancy_ended_store.dart` saying his app
   respects it is not true yet. BEFORE-LAUNCH.

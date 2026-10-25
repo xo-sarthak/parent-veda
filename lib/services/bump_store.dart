@@ -19,11 +19,12 @@ import '../models/journal_entry.dart';
 import 'journal_store.dart';
 import 'remote/own_row_ledger.dart';
 import 'remote/storage_service.dart';
+import 'pregnancy_records.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 import 'remote/sync_row_book.dart';
 
-class BumpStore extends ChangeNotifier {
+class BumpStore extends ChangeNotifier implements PregnancyScopedStore {
   BumpStore._();
   static final BumpStore instance = BumpStore._();
 
@@ -185,9 +186,21 @@ class BumpStore extends ChangeNotifier {
         isFavorite: r['is_favorite'] == true,
       );
 
-  /// Photos in chronological order (by week, then date).
-  List<BumpPhoto> get photos {
-    final list = [..._photos];
+  /// ⚠️ THIS PREGNANCY'S PHOTOS ONLY (R1, 2026-10-25). The list holds every
+  /// pregnancy's; a photo belongs to the pregnancy whose window holds its
+  /// date (pregnancy_records.dart). Every read below goes through this, so a
+  /// pregnancy after a loss never opens on the lost one's bump.
+  List<BumpPhoto> get _mine => [
+        for (final p in _photos)
+          if (PregnancyRecords.instance.inCurrent(p.date)) p,
+      ];
+
+  /// [w]'s photos, oldest first: the "Kept for you" page.
+  List<BumpPhoto> photosIn(PregnancyWindow w) =>
+      [for (final p in _byWeek(_photos)) if (w.holds(p.date)) p];
+
+  static List<BumpPhoto> _byWeek(List<BumpPhoto> from) {
+    final list = [...from];
     list.sort((a, b) {
       final w = a.weekNumber.compareTo(b.weekNumber);
       return w != 0 ? w : a.date.compareTo(b.date);
@@ -195,18 +208,43 @@ class BumpStore extends ChangeNotifier {
     return list;
   }
 
-  int get count => _photos.length;
-  bool get isEmpty => _photos.isEmpty;
+  @override
+  int countIn(PregnancyWindow w) => _photos.where((p) => w.holds(p.date)).length;
+
+  /// Deletes [w]'s photos the way [delete] does, files and journal mirror
+  /// included (the "Kept for you" delete).
+  @override
+  Future<int> removeIn(PregnancyWindow w) async {
+    final ids = [for (final p in _photos) if (w.holds(p.date)) p.id];
+    for (final id in ids) {
+      await delete(id);
+    }
+    return ids.length;
+  }
+
+  /// Photos in chronological order (by week, then date).
+  List<BumpPhoto> get photos {
+    // final list = [..._photos]; // kept for revert
+    final list = [..._mine];
+    list.sort((a, b) {
+      final w = a.weekNumber.compareTo(b.weekNumber);
+      return w != 0 ? w : a.date.compareTo(b.date);
+    });
+    return list;
+  }
+
+  int get count => _mine.length;
+  bool get isEmpty => _mine.isEmpty;
   BumpPhoto? get first => photos.isEmpty ? null : photos.first;
   BumpPhoto? get latest => photos.isEmpty ? null : photos.last;
-  bool hasWeek(int week) => _photos.any((p) => p.weekNumber == week);
+  bool hasWeek(int week) => _mine.any((p) => p.weekNumber == week);
 
   /// One week's photos, cover first, then in the order she added them
   /// (2026-10-22, week rows). The cover is the photo she favourited, else the
   /// earliest she added. Derived on read rather than stored: there is no
   /// "cover" column, so there is nothing to drift out of step with the photos.
   List<BumpPhoto> photosForWeek(int week) {
-    final list = _photos.where((p) => p.weekNumber == week).toList()
+    final list = _mine.where((p) => p.weekNumber == week).toList()
       ..sort((a, b) => a.date.compareTo(b.date));
     final fav = list.indexWhere((p) => p.isFavorite);
     if (fav > 0) list.insert(0, list.removeAt(fav));
@@ -272,7 +310,9 @@ class BumpStore extends ChangeNotifier {
       final week = _photos[i].weekNumber;
       for (var j = 0; j < _photos.length; j++) {
         final o = _photos[j];
-        if (j != i && o.weekNumber == week && o.isFavorite) {
+        // Only this pregnancy's week (R1): the old pregnancy keeps its cover.
+        if (j != i && o.weekNumber == week && o.isFavorite &&
+            PregnancyRecords.instance.inCurrent(o.date)) {
           _photos[j] = o.copyWith(isFavorite: false);
           _sync.touch(o.id);
         }

@@ -29,6 +29,7 @@ import 'screens/post_pregnancy/pp_vaccine_data.dart';
 import 'screens/post_pregnancy/pp_journeys_data.dart';
 import 'booking/server_slots.dart';
 import 'services/pregnancy_ended_store.dart';
+import 'services/pregnancy_records.dart';
 import 'services/pp_messages_store.dart';
 import 'screens/post_pregnancy/pp_home_reads.dart' show PpLastPageStore;
 import 'screens/post_pregnancy/pp_messages_screen.dart' show ppOpenMessageFromPhone;
@@ -358,6 +359,10 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // PARENTING: load the child profile(s). The keystone of the post-pregnancy
     // side - every other parenting feature keys its rows to a child from here.
     ChildProfileStore.instance.init();
+    // One record per pregnancy (R1, 2026-10-25): which pregnancy every dated
+    // record belongs to, and what is kept for her. It waits for the child
+    // profiles, the story and the stage before deriving anything.
+    PregnancyRecords.instance.load();
     // PARENTING: the child's health record (medications, prescriptions,
     // allergies, symptoms, reports, doctor visits). Child-scoped and
     // co-parented - both paired parents read and write the same rows.

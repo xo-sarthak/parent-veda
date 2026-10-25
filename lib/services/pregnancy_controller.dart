@@ -22,6 +22,7 @@ import '../localization/app_language.dart';
 import '../models/week_content.dart';
 import 'auth/pending_profile.dart';
 import 'remote/supabase_repo.dart';
+import 'pregnancy_records.dart';
 
 /// How the due date was arrived at.
 ///
@@ -545,6 +546,11 @@ class PregnancyController extends ChangeNotifier {
     _dueDateSource = source;
     _selectedWeek = currentWeek;
     notifyListeners();
+    // The current pregnancy's record moves with its date (R1, 2026-10-25).
+    // Never starts one: a new pregnancy comes through startNew.
+    PregnancyRecords.instance
+        .dueDateSet(_dueDate, source.name)
+        .catchError((_) {});
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(kDueDateKey, _dueDate.toIso8601String());

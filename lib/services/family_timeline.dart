@@ -123,8 +123,13 @@ class TimelineEvent {
 
 class FamilyTimeline extends ChangeNotifier with TtcSyncedStore {
   FamilyTimeline._() {
-    _load();
+    // _load(); // kept for revert
+    ready = _load();
   }
+
+  /// Done once the phone's copy is read (R1, 2026-10-25): the pregnancy
+  /// records are derived from it on first run and must not read it empty.
+  late final Future<void> ready;
   static final FamilyTimeline instance = FamilyTimeline._();
 
   static const _key = 'pv_family_timeline';

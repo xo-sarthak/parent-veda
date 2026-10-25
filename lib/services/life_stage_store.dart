@@ -101,8 +101,12 @@ extension LifeStageCopy on LifeStage {
 
 class LifeStageStore extends ChangeNotifier with TtcSyncedStore {
   LifeStageStore._() {
-    _load();
+    // _load(); // kept for revert
+    ready = _load();
   }
+
+  /// Done once the stored stage is read (R1, 2026-10-25; see FamilyTimeline).
+  late final Future<void> ready;
   static final LifeStageStore instance = LifeStageStore._();
 
   /// Public because the splash reads it directly, alongside the auth flag and

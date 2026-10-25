@@ -1301,7 +1301,22 @@ comments). `sync_reset_coverage_test` also passes.
 `test/pp_child_records_test.dart` (new), `test/pp_records_merge_test.dart`, `test/pp_messages_family_test.dart`.
 
 
-## Step 17: one record per pregnancy (R1)
+## Step 17: the Health tools: ask once covers what she tells the symptom tool, and edits keep their ids
+
+**Date:** 2026-10-25 (parenting tools pass, Health family; the user's rule: "make sure the back ends are working well").
+**Migration:** none. **Commit:** pending.
+
+### What changed
+- [x] **Two new consent kinds,** `nappies` and `changes`, ride the same `PpUseConsent` merged store as `feeds` (step 15). They need no new key: one item per kind under `pp_use_consent`.
+- [x] **Saved changes are read only after a yes.** `PpChangesStore.active()` returns nothing without `allows(changes)`. Every reader (home "You told us", the relevance brain) comes through it, so one check covers them. The rows themselves still sync as before (the step-13 merge); a no stops them being used, not stored. Changes she already had stay.
+- [x] **`GrowthStore.update`** replaces a measurement in place and `touch`es the same id, so an edit reaches the other phone as an edit (newer wins), not as a removal plus a new row.
+- [x] **The emergency card has one source:** allergies and medicines from the child's health record, birth date from the profile, weight from the growth log. The card's own copies of those fields are no longer shown or edited (the columns stay, kept for revert).
+
+**Verified:** `test/pp_symptom_tool_test.dart` (ask once before keeping; a no means saved changes are never read), `pp_wave8_test`, `pp_use_consent_sync_test`, `pp_child_records_test`, `pp_records_merge_test`, `sync_guard_contract_test`: all pass within the 665 run.
+
+**Files:** `lib/services/pp_use_consent.dart`, `lib/screens/post_pregnancy/pp_changes_store.dart`, `pp_growth_data.dart`, `pp_wallet_data.dart`.
+
+## Step 18: one record per pregnancy (R1)
 
 **Date:** 2026-10-25 (STAGE-TRANSITIONS R1; the user: "let them take control of it and delete it permanently if
 they want tht, why decide for them?", and "lets keep it 90 days for now"). **Migration:** `0114_pregnancies.sql`
@@ -1390,18 +1405,3 @@ pregnancy overwrote the first's mood; and there was no way to look back at an ea
   `cloud_merged_store.dart`, `family_timeline.dart` and `life_stage_store.dart` (`ready`), `main.dart`,
   `pv_family_switch.dart`, `pv_you_content.dart`, `pv_you_screen.dart`, `dear_baby_vault_screen.dart`,
   `pv_door_after_loss.dart`.
-## Step 17: the Health tools: ask once covers what she tells the symptom tool, and edits keep their ids
-
-**Date:** 2026-10-25 (parenting tools pass, Health family; the user's rule: "make sure the back ends are working well").
-**Migration:** none. **Commit:** pending.
-
-### What changed
-- [x] **Two new consent kinds,** `nappies` and `changes`, ride the same `PpUseConsent` merged store as `feeds` (step 15). They need no new key: one item per kind under `pp_use_consent`.
-- [x] **Saved changes are read only after a yes.** `PpChangesStore.active()` returns nothing without `allows(changes)`. Every reader (home "You told us", the relevance brain) comes through it, so one check covers them. The rows themselves still sync as before (the step-13 merge); a no stops them being used, not stored. Changes she already had stay.
-- [x] **`GrowthStore.update`** replaces a measurement in place and `touch`es the same id, so an edit reaches the other phone as an edit (newer wins), not as a removal plus a new row.
-- [x] **The emergency card has one source:** allergies and medicines from the child's health record, birth date from the profile, weight from the growth log. The card's own copies of those fields are no longer shown or edited (the columns stay, kept for revert).
-
-**Verified:** `test/pp_symptom_tool_test.dart` (ask once before keeping; a no means saved changes are never read), `pp_wave8_test`, `pp_use_consent_sync_test`, `pp_child_records_test`, `pp_records_merge_test`, `sync_guard_contract_test`: all pass within the 665 run.
-
-**Files:** `lib/services/pp_use_consent.dart`, `lib/screens/post_pregnancy/pp_changes_store.dart`, `pp_growth_data.dart`, `pp_wallet_data.dart`.
-

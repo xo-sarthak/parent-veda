@@ -24,6 +24,7 @@ import 'family_timeline.dart';
 import 'life_stage_store.dart';
 import 'pregnancy_controller.dart';
 import 'pregnancy_ended_store.dart';
+import 'pregnancy_records.dart';
 import 'reminder_store.dart';
 
 /// Weeks of pregnancy at birth when the baby came early (before 37 weeks),
@@ -71,6 +72,12 @@ Future<void> recordBirth({
   String? childId,
 }) async {
   final day = DateTime(dob.year, dob.month, dob.day);
+  // The pregnancy's record ends in this child (R1, 2026-10-25). Before the
+  // stage moves, so a phone that has never made its record yet makes it as
+  // the pregnancy it still is.
+  await PregnancyRecords.instance
+      .end(PregnancyOutcome.birth, on: day, childId: childId)
+      .catchError((_) {});
   LifeStageStore.instance.setStage(LifeStage.parenting, at: day);
   final title = name.trim().isEmpty ? 'Baby was born' : '${name.trim()} was born';
   FamilyTimeline.instance.add(
@@ -98,6 +105,11 @@ Future<void> recordBirth({
 Future<void> recordLoss() async {
   await PregnancyEndedStore.instance.markEnded();
   ReminderStore.instance.pauseForLoss();
+  // Her pregnancy's record ends here (R1). Nothing of it is removed: it is
+  // kept for her, to look at or delete when she chooses, never asked now.
+  await PregnancyRecords.instance
+      .end(PregnancyOutcome.loss, on: PregnancyEndedStore.instance.endedAt)
+      .catchError((_) {});
 }
 
 /// "Go back to my pregnancy view": the loss undone, and the reminders the
@@ -105,6 +117,7 @@ Future<void> recordLoss() async {
 Future<void> undoLoss() async {
   await PregnancyEndedStore.instance.undo();
   ReminderStore.instance.resumeAfterLossUndo();
+  await PregnancyRecords.instance.undoEnd().catchError((_) {});
 }
 
 /// After a loss, "I'm ready. Move to trying to conceive" (STAGE-TRANSITIONS

@@ -37,6 +37,8 @@ import '../../services/stage_gateway.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../post_pregnancy/pp_child_profile.dart';
+import '../../services/pregnancy_records.dart';
+import '../pregnancy/pregnancy_kept_screen.dart' show openPregnancyKept, pregnancyKeptTitle;
 import '../profile/pv_you_sheets.dart' show showPvAddChildSheet;
 import '../skilling/sk_bands.dart' show kSkAgeFloor;
 import '../skilling/sk_child_store.dart';
@@ -334,9 +336,12 @@ Future<void> showPvFamilySheet(BuildContext context,
           );
       final own = all.where((x) => x.kind != FamilyProfileKind.child).toList();
       final kids = all.where((x) => x.kind == FamilyProfileKind.child).toList();
+      final kept = PregnancyRecords.instance.kept;
       return SafeArea(
         top: false,
-        child: Padding(
+        // Scrolls once the family (and what is kept) is taller than the sheet.
+        child: SingleChildScrollView(
+         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
             Padding(
@@ -368,7 +373,34 @@ Future<void> showPvFamilySheet(BuildContext context,
                 showPvAddChildSheet(context);
               },
             ),
+            // ---- KEPT FOR YOU (R1, 2026-10-25) ----
+            // A pregnancy that has ended, quietly at the foot: never a
+            // switchable profile and never in the header (the user's word),
+            // so she goes to it rather than running into it.
+            if (kept.isNotEmpty) ...[
+              group('Kept for you'),
+              for (final r in kept)
+                ListTile(
+                  key: ValueKey('pv_family_kept_${r.id}'),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  leading: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: p.ground,
+                    child: Icon(Icons.auto_stories_outlined, size: 20, color: p.ink2),
+                  ),
+                  title: Text(pregnancyKeptTitle(r),
+                      style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+                  subtitle: Text('To look at, or delete if you want to',
+                      style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink2)),
+                  trailing: Icon(Icons.chevron_right_rounded, color: p.ink3),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    openPregnancyKept(context, r);
+                  },
+                ),
+            ],
           ]),
+         ),
         ),
       );
     },

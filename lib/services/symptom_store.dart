@@ -15,12 +15,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/journal_entry.dart';
 import '../models/symptom.dart';
 import 'journal_store.dart';
+import 'pregnancy_records.dart';
 import 'remote/own_row_ledger.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 import 'remote/sync_row_book.dart';
 
-class SymptomStore extends ChangeNotifier {
+class SymptomStore extends ChangeNotifier implements PregnancyScopedStore {
   SymptomStore._();
   static final SymptomStore instance = SymptomStore._();
 
@@ -150,7 +151,31 @@ class SymptomStore extends ChangeNotifier {
       '${d.month.toString().padLeft(2, '0')}-'
       '${d.day.toString().padLeft(2, '0')}';
 
-  List<SymptomLog> get logs => List.unmodifiable(_logs);
+  // List<SymptomLog> get logs => List.unmodifiable(_logs); // kept for revert
+  /// This pregnancy's logs (R1, 2026-10-25). The day reads below need no
+  /// filter: a day belongs to one pregnancy's window.
+  List<SymptomLog> get logs => List.unmodifiable(
+      [for (final l in _logs) if (PregnancyRecords.instance.inCurrent(_dayOf(l))) l]);
+
+  static DateTime _dayOf(SymptomLog l) =>
+      DateTime.tryParse(l.dateKey) ?? DateTime.tryParse(l.createdAtIso) ?? DateTime.now();
+
+  @override
+  int countIn(PregnancyWindow w) => _logs.where((l) => w.holds(_dayOf(l))).length;
+
+  @override
+  Future<int> removeIn(PregnancyWindow w) async {
+    final gone = [for (final l in _logs) if (w.holds(_dayOf(l))) l];
+    if (gone.isEmpty) return 0;
+    _logs.removeWhere(gone.contains);
+    for (final l in gone) {
+      _sync.remove(l.id, _toRow(l));
+    }
+    notifyListeners();
+    await _persist();
+    await _sync.push(_live);
+    return gone.length;
+  }
 
   /// How many times this symptom was logged in the last 7 days.
   int countThisWeek(String symptomId) {

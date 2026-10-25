@@ -834,7 +834,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
         // for revert: rows: () => _journeyRows(p, stage, content, stepper: true),
         rows: () => [
           ..._journeyRows(p, stage, content, stepper: true),
-          for (final t in content.journeyThings) _thingRow(p, t),
+          for (final t in content.journeyThings)
+            if (t.shown?.call() ?? true) _thingRow(p, t),
         ],
       ),
       _tile(
@@ -2398,11 +2399,16 @@ class _PvYouScreenState extends State<PvYouScreen> {
       // Settings and without a heading: found when looked for, never a
       // feature to advertise. Hers only; TTC leaves `journeyThings` empty, so
       // this draws nothing there.
-      if (!him && content.journeyThings.isNotEmpty)
+      // Only what is shown (R1, 2026-10-25: "Your pregnancies" waits until
+      // there is one). Kept for revert:
+      //   if (!him && content.journeyThings.isNotEmpty)
+      //     ... for (final t in content.journeyThings) _profileThingRow(p, t),
+      if (!him && content.journeyThings.any((t) => t.shown?.call() ?? true))
         PvProfileGroup(
           key: const ValueKey('pv_profile_quiet'),
           children: [
-            for (final t in content.journeyThings) _profileThingRow(p, t),
+            for (final t in content.journeyThings)
+              if (t.shown?.call() ?? true) _profileThingRow(p, t),
           ],
         ),
       // ONE Settings row, apart from the groups (Airbnb's "Account settings"

@@ -58,6 +58,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/family_timeline.dart';
 import '../services/life_stage_store.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/pregnancy_records.dart';
 import 'cycle_store.dart';
 // Kept for revert (2026-09-28, the user: no journal in trying to conceive).
 // import 'ttc_journal_store.dart';
@@ -341,6 +342,22 @@ class TtcTransitionEngine {
 
     TtcStore.instance.confirmPregnancy(on: today);
 
+    // ⚠️ A NEW PREGNANCY'S RECORD, BEFORE THE DUE DATE MOVES (R1,
+    // 2026-10-25). The one before it is sealed: its undated things (the bag,
+    // the birth plan, scans ticked) are kept with it and this one starts
+    // clean. First, because setting the due date re-dates the current record,
+    // and until this runs that is still the old pregnancy's.
+    await PregnancyRecords.instance
+        .startNew(
+            due: due,
+            dueDateSource: (source ??
+                    (given == null && lmp != null
+                        ? DueDateSource.lastPeriod
+                        : DueDateSource.unknown))
+                .name,
+            today: today)
+        .catchError((_) => PregnancyRecord(id: '', startedOn: today));
+
     // ⚠️ THROUGH THE RUNNING CONTROLLER, NOT AROUND IT (2026-10-22). The user:
     // "Yes, I'm pregnant", then the button "landed me on preg week 20". This
     // wrote the date to storage only, but the pregnancy controller had read
@@ -483,6 +500,11 @@ class TtcTransitionEngine {
     LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
     FamilyTimeline.instance.remove(ids.positive);
     FamilyTimeline.instance.remove(ids.started);
+    // Its record goes, and the pregnancy before it gets its things back (R1).
+    final made = PregnancyRecords.instance.current;
+    if (made != null) {
+      await PregnancyRecords.instance.undoStart(made).catchError((_) {});
+    }
     // The date goes everywhere it went (2026-10-22): memory, storage and the
     // cloud, or a mis-tap undone here comes back on the next launch or the
     // other phone. Storage only, as before, when there is no controller.

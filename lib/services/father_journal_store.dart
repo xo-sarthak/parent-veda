@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/journal_entry.dart';
 import 'remote/storage_service.dart';
 import 'journal_sync.dart';
+import 'pregnancy_records.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 
@@ -180,11 +181,18 @@ class FatherJournalStore extends ChangeNotifier {
   //     );
   //   }
 
-  bool get hasEntries => _manual.isNotEmpty;
+  // bool get hasEntries => _manual.isNotEmpty; // kept for revert
+  bool get hasEntries => entries.isNotEmpty;
 
   /// All entries, newest first.
   List<JournalEntry> get entries {
-    final list = [..._manual];
+    // final list = [..._manual]; // kept for revert
+    // This pregnancy's (R1, 2026-10-25): on his phone the windows are hers
+    // (PregnancyRecords reads her records through the partner read, 0114).
+    final list = [
+      for (final e in _manual)
+        if (PregnancyRecords.instance.inCurrent(e.date)) e,
+    ];
     list.sort((a, b) => b.date.compareTo(a.date));
     return List.unmodifiable(list);
   }

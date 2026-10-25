@@ -15,12 +15,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/journal_entry.dart';
 import '../models/scan_appointment.dart';
 import 'journal_store.dart';
+import 'pregnancy_records.dart';
 import 'remote/own_row_ledger.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 import 'remote/sync_row_book.dart';
 
-class ScansStore extends ChangeNotifier {
+class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
   ScansStore._();
   static final ScansStore instance = ScansStore._();
 
@@ -303,18 +304,93 @@ class ScansStore extends ChangeNotifier {
 
   // ---- completed scans ------------------------------------------------------
   // Done if EITHER partner marked it (own rows OR the partner's, read-only).
+  // ⚠️ THIS PREGNANCY'S (R1, 2026-10-25). A scan is keyed by its catalogue id,
+  // so the dating scan done in a lost pregnancy read as done in the next. Her
+  // own marks move into the old pregnancy's archive when the next begins
+  // ([takeCompletedForNewPregnancy]); the partner's are read by date.
+  // Kept for revert:
+  //   bool isCompleted(String scanId) =>
+  //       _completed.any((c) => c.scanId == scanId) ||
+  //       _partnerCompleted.any((c) => c.scanId == scanId);
+  static bool _now(CompletedScan c) => PregnancyRecords.instance
+      .inCurrent(DateTime.tryParse(c.dateIso) ?? DateTime.now());
+
   bool isCompleted(String scanId) =>
-      _completed.any((c) => c.scanId == scanId) ||
-      _partnerCompleted.any((c) => c.scanId == scanId);
+      _completed.any((c) => c.scanId == scanId && _now(c)) ||
+      _partnerCompleted.any((c) => c.scanId == scanId && _now(c));
 
   CompletedScan? completedOf(String scanId) {
     for (final c in _completed) {
-      if (c.scanId == scanId) return c;
+      if (c.scanId == scanId && _now(c)) return c;
     }
     for (final c in _partnerCompleted) {
-      if (c.scanId == scanId) return c;
+      if (c.scanId == scanId && _now(c)) return c;
     }
     return null;
+  }
+
+  /// The journal entry a completed scan writes. The first pregnancy keeps
+  /// `scan_<id>`; a later pregnancy's scan of the same kind gets the day it
+  /// was done in its id, or it would overwrite the first one's entry (R1).
+  static String scanJournalId(String scanId, DateTime doneOn) {
+    final base = 'scan_$scanId';
+    final recs = PregnancyRecords.instance;
+    for (final e in JournalStore.instance.manualEntries) {
+      if (e.id != base) continue;
+      final same = recs.all.isEmpty ||
+          recs.all.any((r) => recs.windowOf(r).holds(e.date) && recs.windowOf(r).holds(doneOn));
+      if (same) return base;
+      final d = doneOn.toIso8601String().substring(0, 10);
+      return '${base}_$d';
+    }
+    return base;
+  }
+
+  /// Copies her completed scans and clears them: a new pregnancy starts with
+  /// none done (pregnancy_archive.dart). The journal entries they wrote stay
+  /// in the journal, dated in the old pregnancy.
+  Future<List<Object?>> takeCompletedForNewPregnancy() async {
+    final copy = [for (final c in _completed) c.toJson()];
+    for (final c in _completed) {
+      _scanSync.remove(c.scanId, _toScanRow(c));
+    }
+    _completed.clear();
+    notifyListeners();
+    await _persistCompleted();
+    await _scanSync.push(_scanRows);
+    return copy;
+  }
+
+  /// Puts them back (the undo of a new pregnancy).
+  Future<void> restoreCompleted(Object? copy) async {
+    if (copy is! List) return;
+    for (final e in copy) {
+      if (e is! Map) continue;
+      final c = CompletedScan.fromJson(Map<String, dynamic>.from(e));
+      _completed.removeWhere((x) => x.scanId == c.scanId);
+      _completed.add(c);
+      _scanSync.touch(c.scanId);
+    }
+    notifyListeners();
+    await _persistCompleted();
+    await _scanSync.push(_scanRows);
+  }
+
+  /// Her appointments in [w] (the "Kept for you" page).
+  List<Appointment> appointmentsIn(PregnancyWindow w) =>
+      [for (final a in _appts) if (w.holds(a.date)) a]
+        ..sort((a, b) => a.date.compareTo(b.date));
+
+  @override
+  int countIn(PregnancyWindow w) => appointmentsIn(w).length;
+
+  @override
+  Future<int> removeIn(PregnancyWindow w) async {
+    final ids = [for (final a in appointmentsIn(w)) a.id];
+    for (final id in ids) {
+      await deleteAppointment(id);
+    }
+    return ids.length;
   }
 
   List<CompletedScan> get completed => List.unmodifiable(_completed);
@@ -340,7 +416,8 @@ class ScansStore extends ChangeNotifier {
     // }
     await _scanSync.push(_scanRows);
     await JournalStore.instance.addEntry(JournalEntry(
-      id: 'scan_$scanId',
+      // id: 'scan_$scanId', // kept for revert
+      id: scanJournalId(scanId, now),
       type: JournalEntryType.scan,
       title: journalTitle,
       date: now,
@@ -349,6 +426,11 @@ class ScansStore extends ChangeNotifier {
   }
 
   Future<void> unmarkCompleted(String scanId) async {
+    // Which journal entry it wrote (R1): the day it was done picks the id.
+    final was = _completed.where((c) => c.scanId == scanId).firstOrNull;
+    final journalId = was == null
+        ? 'scan_$scanId'
+        : scanJournalId(scanId, DateTime.tryParse(was.dateIso) ?? DateTime.now());
     // A soft delete that travels (step 9).
     for (final c in _completed.where((c) => c.scanId == scanId)) {
       _scanSync.remove(scanId, _toScanRow(c));
@@ -363,15 +445,22 @@ class ScansStore extends ChangeNotifier {
     //   } catch (_) {}
     // }
     await _scanSync.push(_scanRows);
-    await JournalStore.instance.deleteEntry('scan_$scanId');
+    // await JournalStore.instance.deleteEntry('scan_$scanId'); // kept for revert
+    await JournalStore.instance.deleteEntry(journalId);
   }
 
   // ---- appointments ---------------------------------------------------------
   List<Appointment> get appointments {
     // Union of own + the partner's appointments (keyed by id), soonest first.
-    final byId = {for (final a in _appts) a.id: a};
+    // This pregnancy's only (R1, 2026-10-25). Kept for revert:
+    //   final byId = {for (final a in _appts) a.id: a};
+    //   for (final a in _partnerAppts) {
+    //     byId.putIfAbsent(a.id, () => a);
+    //   }
+    bool now(Appointment a) => PregnancyRecords.instance.inCurrent(a.date);
+    final byId = {for (final a in _appts) if (now(a)) a.id: a};
     for (final a in _partnerAppts) {
-      byId.putIfAbsent(a.id, () => a);
+      if (now(a)) byId.putIfAbsent(a.id, () => a);
     }
     final list = byId.values.toList();
     list.sort((a, b) => a.date.compareTo(b.date));

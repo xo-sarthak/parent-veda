@@ -61,6 +61,23 @@ import '../widgets/pv_toast.dart';
 import 'dear_baby_opening_screen.dart';
 import 'home_detail_screens.dart' show TalkComposerScreen;
 import 'v2/v2_palette.dart';
+import '../services/pregnancy_records.dart';
+
+/// The letters this vault holds (R1, 2026-10-25). Once the baby is born,
+/// the letters of the pregnancy that became them, even after a later
+/// pregnancy starts (whose letters are its own); before the birth, the
+/// pregnancy going on now.
+List<TalkEntry> dearBabyLetters() {
+  final born = DearBabyVaultStore.instance.bornOn;
+  if (born == null) return DailyStore.instance.talkEntries;
+  final recs = PregnancyRecords.instance;
+  final before = born.subtract(const Duration(days: 1));
+  for (final r in recs.all) {
+    final w = recs.windowOf(r);
+    if (w.holds(before)) return DailyStore.instance.talkEntriesIn(w);
+  }
+  return DailyStore.instance.talkEntries;
+}
 
 /// The paper the letters are written on: a warm off-white, one step from the
 /// page ground, so a letter reads as an object on the page.
@@ -157,7 +174,8 @@ class _DearBabyVaultScreenState extends State<DearBabyVaultScreen> {
     super.dispose();
   }
 
-  List<TalkEntry> get _entries => [...DailyStore.instance.talkEntries]
+  // List<TalkEntry> get _entries => [...DailyStore.instance.talkEntries] // kept for revert
+  List<TalkEntry> get _entries => [...dearBabyLetters()]
     ..sort((a, b) {
       final d = a.dateIso.compareTo(b.dateIso);
       return d != 0 ? d : a.week.compareTo(b.week);
@@ -1082,7 +1100,8 @@ class DearBabyLettersReadyCard extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([v, DailyStore.instance]),
       builder: (context, _) {
-        final n = DailyStore.instance.talkEntries.length;
+        // final n = DailyStore.instance.talkEntries.length; // kept for revert
+        final n = dearBabyLetters().length;
         if (!v.unlocked || v.opened || n == 0) return const SizedBox.shrink();
         return Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 22),

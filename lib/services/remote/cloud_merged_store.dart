@@ -449,6 +449,19 @@ mixin CloudMergedStore on ChangeNotifier {
     super.notifyListeners();
   }
 
+  /// Replaces the store's whole state with [items] AS HER EDIT (R1,
+  /// 2026-10-25): a new pregnancy starting clean, or an undo putting the old
+  /// pregnancy's things back. Unlike [applyCloudItems] (the merge's own
+  /// write, never stamped), this is stamped like any change she makes, so
+  /// her other phones follow. A store that has not started yet starts first,
+  /// or the change could not be stamped and the next merge would undo it.
+  Future<void> replaceItemsAsEdit(Map<String, Object?> items) async {
+    if (!_ready) await syncMergedFromCloud();
+    applyCloudItems(items);
+    await persistLocalCache();
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _timer?.cancel();

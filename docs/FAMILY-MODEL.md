@@ -66,13 +66,17 @@ never left the phone.
   (content and order, never structure), and the `pregnancies.outcome` column
   is where it reads from.
 - **Twins** are two `children` rows from one pregnancy.
+  **Built 2026-10-25 (R1, 0114).** A record carrying a date belongs to the pregnancy whose window [start, next
+  start) holds it, so no record table gained a column; the bag, the birth plan and other undated records are
+  sealed into the old pregnancy's `archive` when the next begins. An ended pregnancy is kept for her ("Kept for
+  you"), never a switchable profile.
 
 ## 4. Where a person can join, and what happens
 
 | Joins at | Asked (onboarding) | Created | Home |
 |---|---|---|---|
 | Trying | stage | nothing else; the TTC intro flow runs on the TTC home | TTC V3 |
-| Pregnant | stage · date + method | `due_date`, `DueDateSource` (→ `pregnancies` row when that lands) | Pregnancy V3 |
+| Pregnant | stage · date + method | `due_date`, `DueDateSource`, and since 2026-10-25 a `pregnancies` row (0114, `PregnancyRecords`) | Pregnancy V3 |
 | Parent 0–5 | stage · baby's name + birthday | one `children` row | Parenting V3 |
 | Skilling 6+ | stage · child's name + age | one `children` row (age-derived dob) + `SkChildStore` | `SkillingPreviewScreen` for now |
 | Partner, any stage | *Partner* + her code | `partner_id` both ways | Father shell; her stage decides its content |

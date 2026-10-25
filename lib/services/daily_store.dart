@@ -17,6 +17,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'remote/own_row_ledger.dart';
+import 'pregnancy_records.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 import 'remote/sync_row_book.dart';
@@ -66,7 +67,7 @@ class TalkEntry {
       );
 }
 
-class DailyStore extends ChangeNotifier {
+class DailyStore extends ChangeNotifier implements PregnancyScopedStore {
   DailyStore._();
   static final DailyStore instance = DailyStore._();
 
@@ -135,9 +136,109 @@ class DailyStore extends ChangeNotifier {
   /// The mood chosen for [day], or null if not answered.
   String? moodForDay(int day) => _moods[day];
 
+  /// ⚠️ THIS PREGNANCY'S LETTERS (R1, 2026-10-25). A letter belongs to the
+  /// pregnancy whose window holds its date; the letters of a pregnancy that
+  /// became a child are read through [talkEntriesIn] by the vault.
+  static DateTime _talkDay(TalkEntry e) =>
+      DateTime.tryParse(e.dateIso) ??
+      DateTime.fromMicrosecondsSinceEpoch(int.tryParse(e.id) ?? 0);
+
+  bool _isMine(TalkEntry e) => PregnancyRecords.instance.inCurrent(_talkDay(e));
+
+  /// [w]'s letters, newest first.
+  List<TalkEntry> talkEntriesIn(PregnancyWindow w) =>
+      [for (final e in _talk) if (w.holds(_talkDay(e))) e]
+        ..sort((a, b) => b.id.compareTo(a.id));
+
+  @override
+  int countIn(PregnancyWindow w) => talkEntriesIn(w).length;
+
+  /// Soft deletes that travel (step 8). Moods and the rest are keyed by
+  /// pregnancy day and live in the sealed pregnancy's archive instead.
+  @override
+  Future<int> removeIn(PregnancyWindow w) async {
+    final gone = talkEntriesIn(w);
+    if (gone.isEmpty) return 0;
+    _talk.removeWhere(gone.contains);
+    for (final e in gone) {
+      _talkSync.remove(e.id, _talkToRow(e));
+    }
+    notifyListeners();
+    await _persist(_talkKey, jsonEncode(_talk.map((e) => e.toJson()).toList()));
+    await _talkSync.push(_talkRows);
+    return gone.length;
+  }
+
+  // ---- A new pregnancy starts clean (R1, 2026-10-25) ------------------------
+  // Moods, the father's missions and the movement answers are keyed by the
+  // pregnancy DAY, so day 120 of a second pregnancy would land on the first's.
+  // When the next pregnancy begins they are copied into the old one's archive
+  // (pregnancy_archive.dart) and cleared here, the way her own clearing
+  // travels. Movement answers are state with no removal (0106), so they are
+  // set to '' (no answer).
+
+  /// Copies the day-keyed records and clears them.
+  Future<Map<String, Object?>> takeDaysForNewPregnancy() async {
+    final copy = <String, Object?>{
+      'moods': {for (final e in _moods.entries) '${e.key}': e.value},
+      'missions': [..._missionsDone],
+      'movement': {
+        for (final e in _movement.entries)
+          if (e.value.isNotEmpty) '${e.key}': e.value,
+      },
+    };
+    for (final e in _moods.entries) {
+      _moodSync.remove('${e.key}', {'day': e.key, 'mood_id': e.value});
+    }
+    for (final d in _missionsDone) {
+      _missionSync.remove('$d', {'day': d});
+    }
+    for (final day in _movement.keys.toList()) {
+      if (_movement[day]!.isEmpty) continue;
+      _movement[day] = '';
+      _moveSync.touch('$day', columns: {'day': day, 'response': ''});
+    }
+    _moods.clear();
+    _missionsDone.clear();
+    notifyListeners();
+    await _persist(_moodKey, jsonEncode({}));
+    await _persist(_missionKey, jsonEncode([]));
+    await _persist(_movementKey,
+        jsonEncode(_movement.map((k, v) => MapEntry(k.toString(), v))));
+    await _pushAll();
+    return copy;
+  }
+
+  /// Puts [copy] back (the undo of a new pregnancy: "the test was wrong").
+  Future<void> restoreDays(Object? copy) async {
+    if (copy is! Map) return;
+    final moods = copy['moods'];
+    if (moods is Map) {
+      for (final e in moods.entries) {
+        final day = int.tryParse('${e.key}');
+        if (day != null) await setMood(day, '${e.value}');
+      }
+    }
+    final missions = copy['missions'];
+    if (missions is List) {
+      for (final d in missions) {
+        final day = int.tryParse('$d');
+        if (day != null && !_missionsDone.contains(day)) await toggleMissionDone(day);
+      }
+    }
+    final movement = copy['movement'];
+    if (movement is Map) {
+      for (final e in movement.entries) {
+        final day = int.tryParse('${e.key}');
+        if (day != null) await setMovement(day, '${e.value}');
+      }
+    }
+  }
+
   /// Talk-To-Baby entries, newest first.
   List<TalkEntry> get talkEntries {
-    final list = [..._talk];
+    // final list = [..._talk]; // kept for revert
+    final list = [for (final e in _talk) if (_isMine(e)) e];
     list.sort((a, b) => b.id.compareTo(a.id));
     return list;
   }
@@ -145,7 +246,12 @@ class DailyStore extends ChangeNotifier {
   bool isKept(String text) => _kept.contains(text.trim());
 
   /// Movement response for [day]: 'yes', 'not_yet', or null.
-  String? movementForDay(int day) => _movement[day];
+  // String? movementForDay(int day) => _movement[day]; // kept for revert
+  /// '' is "no answer": a new pregnancy clears the old one's (R1).
+  String? movementForDay(int day) {
+    final r = _movement[day];
+    return r == null || r.isEmpty ? null : r;
+  }
 
   /// Whether the Father Mode mission for [day] is marked done.
   bool isMissionDone(int day) => _missionsDone.contains(day);
@@ -472,7 +578,10 @@ class DailyStore extends ChangeNotifier {
     // used to be deleted and re-inserted under a new id on every save, so two
     // phones each held a different "today" and both came back.
     final old = talkForDay(day);
-    _talk.removeWhere((e) => e.day == day);
+    // _talk.removeWhere((e) => e.day == day); // kept for revert
+    // Only this pregnancy's letter for the day (R1): an earlier pregnancy's
+    // day-N letter is hers too and stays.
+    _talk.removeWhere((e) => e.day == day && _isMine(e));
     final entry = TalkEntry(
       id: old?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
       day: day,
@@ -500,7 +609,8 @@ class DailyStore extends ChangeNotifier {
 
   TalkEntry? talkForDay(int day) {
     for (final e in _talk) {
-      if (e.day == day) return e;
+      // if (e.day == day) return e; // kept for revert
+      if (e.day == day && _isMine(e)) return e;
     }
     return null;
   }
