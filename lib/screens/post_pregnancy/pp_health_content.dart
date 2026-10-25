@@ -5145,7 +5145,7 @@ final PpArea _preventionAll = PpArea(
             'number, and it falls every year on its own.'),
         PpLink(
           'Iron rich meals your child will eat',
-          surfaceId: 'pp_food',
+          surfaceId: 'pp_food/iron', // was 'pp_food' (tools pass, Food, D6, 2026-10-25)
           blurb: 'Recipes from the Food companion, sorted by age.',
         ),
       ],

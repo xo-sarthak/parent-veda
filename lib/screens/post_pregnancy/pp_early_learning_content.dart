@@ -5143,7 +5143,8 @@ const PpArea _habits = PpArea(
             'from about eighteen months to two years.'),
         PpLink(
           'What your child can eat at this age',
-          surfaceId: 'pp_food',
+          // Was 'pp_food' (Recipes), tools pass, Food, 2026-10-25.
+          surfaceId: 'pp_food_chart',
           blurb: 'Meals, portions and recipes by age.',
         ),
       ],

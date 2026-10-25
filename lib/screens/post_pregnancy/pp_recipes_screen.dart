@@ -438,7 +438,8 @@ String? ppRecipeChildNote(FoodRecipe r) {
 
 /// A filtered landing for links that name one (tools pass, Food, D6,
 /// 2026-10-25): "Sick day recipes" used to open the top of the screen.
-/// `pp_food/<preset>` reaches it. Returns the chip's label and the dishes, or
+/// `pp_food/<preset>` reaches it (`age/<months>`, `sick`, `first`, `ragi`,
+/// `iron`, `weight`). Returns the chip's label and the dishes, or
 /// null for a preset nobody wrote (the plain screen then, never an error).
 (String, List<FoodRecipe>)? ppRecipePreset(String preset, Iterable<FoodRecipe> pool) {
   final parts = preset.split('/');
@@ -458,6 +459,8 @@ String? ppRecipeChildNote(FoodRecipe r) {
       bool has(FoodRecipe r, String w) =>
           r.title.toLowerCase().contains(w) || r.ingredients.any((i) => i.toLowerCase().contains(w));
       return ('Ragi and khichdi', [for (final r in pool) if (has(r, 'ragi') || has(r, 'khichdi')) r]);
+    case 'iron':
+      return ('Iron-rich', [for (final r in pool) if (r.highlight.toLowerCase().contains('iron')) r]);
     case 'weight':
       return (
         'Energy-rich',

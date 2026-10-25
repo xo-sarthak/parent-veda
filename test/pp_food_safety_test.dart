@@ -22,6 +22,7 @@ import 'package:parentveda/screens/post_pregnancy/pp_food_safety.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_food_tries_store.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_health_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_recipes_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_surface_router.dart' show ppScreenForSurface;
 import 'package:parentveda/screens/post_pregnancy/pp_what_to_feed_screen.dart';
 import 'package:parentveda/services/pp_use_consent.dart';
 
@@ -121,7 +122,7 @@ void main() {
 
   group('recipe landings (D6)', () {
     test('each preset lands on dishes, and an unknown one falls back', () {
-      for (final preset in ['sick', 'first', 'ragi', 'weight', 'age/9', 'age/6']) {
+      for (final preset in ['sick', 'first', 'ragi', 'iron', 'weight', 'age/9', 'age/6']) {
         final r = ppRecipePreset(preset, foodCatalog);
         expect(r, isNotNull, reason: preset);
         expect(r!.$2, isNotEmpty, reason: preset);
@@ -130,6 +131,25 @@ void main() {
         expect(ppRecipeFit(r, 9), PpRecipeFit.now, reason: r.id);
       }
       expect(ppRecipePreset('nope', foodCatalog), isNull);
+    });
+
+    test('every pp_food/<preset> link in the app lands on a written preset', () {
+      final links = <String>[];
+      for (final f in Directory('lib').listSync(recursive: true)) {
+        if (f is! File || !f.path.endsWith('.dart')) continue;
+        for (final line in _live(f.path)) {
+          for (final m in RegExp(r"'pp_food/([a-z0-9/]+)'").allMatches(line)) {
+            links.add(m.group(1)!);
+          }
+        }
+      }
+      expect(links, isNotEmpty);
+      for (final p in links) {
+        expect(ppRecipePreset(p, foodCatalog), isNotNull, reason: 'pp_food/$p');
+      }
+      expect(ppScreenForSurface('pp_food/sick'), isA<PpRecipesScreen>());
+      // First 40's "Food and recipes" is her food, the healing kitchen, not the baby's library.
+      expect(ppScreenForSurface('pp_page/parenting_maternal/kitchen_one_handed'), isNotNull);
     });
 
     testWidgets('a preset shows as a chip, and the chip clears it', (t) async {

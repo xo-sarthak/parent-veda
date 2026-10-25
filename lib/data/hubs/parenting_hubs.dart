@@ -164,7 +164,9 @@ final HubConfig kPpFeeding = HubConfig(
           'actually make.'),
       mark: IntentMark.feedMark,
       hue: 104,
-      surfaceId: 'pp_food',
+      // Was 'pp_food' (Recipes). The need leads with what to feed and when
+      // to start; that tool links on to Recipes (tools pass, Food, 2026-10-25).
+      surfaceId: 'pp_food_chart',
     ),
   ],
   closing: HubClosing(

@@ -190,8 +190,12 @@ final PpSection kPpFeedingSection = PpSection(
     ),
     PpSectionTool(
       label: 'Recipes for your child',
-      blurb: 'Every baby and toddler recipe in the app, sorted by age, '
-          'texture and what you have in the kitchen.',
+      // Promised texture and pantry filters Recipes does not have (tools pass,
+      // Food, 2026-10-25). Kept for revert:
+      // blurb: 'Every baby and toddler recipe in the app, sorted by age, '
+      //     'texture and what you have in the kitchen.',
+      blurb: 'Every baby and toddler recipe in the app, his age first, '
+          'for the way your family eats.',
       surfaceId: 'pp_food',
       icon: Icons.restaurant_outlined,
     ),
@@ -2082,7 +2086,8 @@ final PpArea _startingSolids = PpArea(
         ),
         PpLink(
           'Recipes for a six month old',
-          surfaceId: 'pp_food',
+          // Was 'pp_food', the top of Recipes (tools pass, Food, D6, 2026-10-25).
+          surfaceId: 'pp_food/age/6',
           blurb: "Purees, dal water and first mashes, sorted for your baby's age.",
         ),
       ],
@@ -2903,7 +2908,7 @@ final PpArea _ageCharts = PpArea(
             'happy.'),
         PpLink(
           'Recipes for 9 to 12 months',
-          surfaceId: 'pp_food',
+          surfaceId: 'pp_food/age/9', // was 'pp_food' (D6, 2026-10-25)
           blurb: 'Mashes, finger foods and first family meals.',
         ),
       ],
@@ -2961,7 +2966,7 @@ final PpArea _ageCharts = PpArea(
             'Useful the first time you go out with your baby for a full day.'),
         PpLink(
           'Recipes for 9 to 12 months',
-          surfaceId: 'pp_food',
+          surfaceId: 'pp_food/age/9', // was 'pp_food' (D6, 2026-10-25)
           blurb: 'Finger foods and family meals, sorted by age.',
         ),
       ],
@@ -3148,8 +3153,10 @@ final PpArea _cooking = PpArea(
         PpLink(
           'Open the recipe collection',
           surfaceId: 'pp_food',
-          blurb: "Filter by age, meal, texture, veg or non-veg, and what's in "
-              'the kitchen.',
+          // Kept for revert (no texture or pantry filter exists, 2026-10-25):
+          // blurb: "Filter by age, meal, texture, veg or non-veg, and what's in "
+          //     'the kitchen.',
+          blurb: 'By age, by meal, and veg, egg or non-veg.',
         ),
       ],
     ),
@@ -3207,10 +3214,17 @@ final PpArea _cooking = PpArea(
           minutes: '11 MIN',
           slotId: 'feeding/cookalong_khichdi',
         ),
+        // Kept for revert (D6, 2026-10-25: it opened the top, and nothing sorts
+        // by texture):
+        // PpLink(
+        //   'Ragi and khichdi recipes',
+        //   surfaceId: 'pp_food',
+        //   blurb: 'Every version in the app, sorted by texture.',
+        // ),
         PpLink(
           'Ragi and khichdi recipes',
-          surfaceId: 'pp_food',
-          blurb: 'Every version in the app, sorted by texture.',
+          surfaceId: 'pp_food/ragi',
+          blurb: 'Every ragi and khichdi dish in the app, for his age first.',
         ),
       ],
     ),
@@ -3255,10 +3269,17 @@ final PpArea _cooking = PpArea(
           pageId: 'weight_foods',
           blurb: 'The full page, with what to add to what.',
         ),
+        // Kept for revert (D6, 2026-10-25: there are no need filters; the one
+        // that exists is energy):
+        // PpLink(
+        //   'Filter recipes by need',
+        //   surfaceId: 'pp_food',
+        //   blurb: 'Weight gain, iron rich and immunity, as recipe filters.',
+        // ),
         PpLink(
-          'Filter recipes by need',
-          surfaceId: 'pp_food',
-          blurb: 'Weight gain, iron rich and immunity, as recipe filters.',
+          'Energy-rich recipes',
+          surfaceId: 'pp_food/weight',
+          blurb: 'Dishes that fit more energy into a small bowl.',
         ),
       ],
     ),
@@ -3308,10 +3329,16 @@ final PpArea _cooking = PpArea(
           kind: PpCalloutKind.doctor,
           title: 'When an illness stops being a food question',
         ),
+        // Kept for revert (D6, 2026-10-25):
+        // PpLink(
+        //   'Sick day recipes',
+        //   surfaceId: 'pp_food',
+        //   blurb: 'Recipes grouped by fever, loose motion, cough and cold.',
+        // ),
         PpLink(
           'Sick day recipes',
-          surfaceId: 'pp_food',
-          blurb: 'Recipes grouped by fever, loose motion, cough and cold.',
+          surfaceId: 'pp_food/sick',
+          blurb: 'Gentle dishes for fever, loose motions, cough and cold.',
         ),
         PpLink(
           'What changed with my child',
@@ -3652,7 +3679,7 @@ final PpArea _weightGain = PpArea(
             'and skip them all before a year.'),
         PpLink(
           'Weight gain recipes',
-          surfaceId: 'pp_food',
+          surfaceId: 'pp_food/weight', // was 'pp_food' (D6, 2026-10-25)
           blurb: 'Every energy-rich recipe in the app, by age.',
         ),
       ],

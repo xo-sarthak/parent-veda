@@ -27,9 +27,9 @@ One tool at a time; the user says go per tool. Each plan records every decision 
 | 19 | Gentle check-in | `pp_dev_checkin` | COMMITTED (17-21-development.md) | 3e7b8a8 |
 | 20 | Activities | `pp_activities` | COMMITTED (17-21-development.md) | 3e7b8a8 |
 | 21 | Your child's phases | `pp_leaps` | NOT A TOOL: reading, out of the Tools tab (D4); page fixes COMMITTED (17-21-development.md) | 3e7b8a8 |
-| 22 | What to feed at this age | `pp_food_chart` | COMMITTED (22-24-food.md); preset links wait on the router | 03976a1 |
-| 23 | Can my baby eat this? | `pp_baby_food_check` | COMMITTED (22-24-food.md); preset links wait on the router | 03976a1 |
-| 24 | Recipes | `pp_food` | COMMITTED (22-24-food.md); preset links wait on the router | 03976a1 |
+| 22 | What to feed at this age | `pp_food_chart` | COMMITTED (22-24-food.md); preset landings in the follow-up | 03976a1 |
+| 23 | Can my baby eat this? | `pp_baby_food_check` | COMMITTED (22-24-food.md); preset landings in the follow-up | 03976a1 |
+| 24 | Recipes | `pp_food` | COMMITTED (22-24-food.md); preset landings in the follow-up | 03976a1 |
 | 25 | How have you been? | `pp_mood_check` | | |
 | 26 | Can I...? | `pp_maa_can_i` | | |
 | 27 | Kegel Care | `pp_kegel` | | |

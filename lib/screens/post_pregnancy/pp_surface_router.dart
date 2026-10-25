@@ -363,6 +363,15 @@ Widget? ppScreenForSurface(String id) {
     return DevelopmentAllActivitiesScreen(area: area);
   }
 
+  // ⚠️ `pp_food/<preset>` LANDS ON THAT FILTER (tools pass, Food, D6,
+  // 2026-10-25). "Sick day recipes" and "Recipes for 9 to 12 months" opened
+  // the top of Recipes. The preset shows as a chip she can clear; one nobody
+  // wrote falls back to the plain screen (`ppRecipePreset` returns null).
+  const foodPrefix = 'pp_food/';
+  if (id.startsWith(foodPrefix)) {
+    return PpRecipesScreen(preset: id.substring(foodPrefix.length));
+  }
+
   // ⚠️ `pp_products/<shelf>` OPENS THAT SHELF (S8c, 2026-10-25). It used to
   // fall through to nothing. An unstocked shelf is caught by
   // `ppSurfaceUnavailable` before this is asked.

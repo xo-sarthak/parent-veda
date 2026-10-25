@@ -1241,8 +1241,10 @@ final PpSection kPpDevelopmentSection = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'When feeding is worth a check',
             ),
+            // Was 'pp_food' (Recipes): the label is the What to feed tool
+            // (tools pass, Food, 2026-10-25).
             PpLink('What to feed, and how much',
-                surfaceId: 'pp_food',
+                surfaceId: 'pp_food_chart',
                 blurb: 'Recipes and age-wise food, in the Food companion.'),
           ],
         ),

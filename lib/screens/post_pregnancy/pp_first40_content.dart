@@ -3142,8 +3142,15 @@ final PpSection kPpFirst40Section = PpSection(
                 "from sleeping, the food isn't the part that's failing. Rest "
                 "is the harder half of the forty days to ask for, and it's the half "
                 'that decides how the next month feels.'),
+            // ⚠️ HER FOOD, NOT THE BABY'S (tools pass, Food, 2026-10-25). `pp_food`
+            // is the baby's recipe library; her meals are You, Maa's healing
+            // kitchen, where You, Maa's own "Recipes for you" link lands too.
+            // Kept for revert:
+            // PpLink('Food and recipes',
+            //     surfaceId: 'pp_food',
+            //     blurb: 'Warm, simple, one-handed meals and recipes for the forty days.'),
             PpLink('Food and recipes',
-                surfaceId: 'pp_food',
+                surfaceId: 'pp_page/parenting_maternal/kitchen_one_handed',
                 blurb: 'Warm, simple, one-handed meals and recipes for the forty days.'),
           ],
         ),

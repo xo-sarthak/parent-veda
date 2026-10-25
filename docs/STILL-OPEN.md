@@ -11159,8 +11159,7 @@ C-section page side by side; the plan asked for "by birth type if known". The C-
 (`PpSignal.cSection`) but the age rail keeps its plan's order on purpose, so both show. A page condition tag,
 or letting a signal reorder an age rail, would fix it; either changes Health's rails too.
 
-**§102.8 Food tools (tools pass 22-24, 2026-10-25): what waits.** The `pp_food/<preset>` route and the eight
-links that use it, and three "What to feed" links that still open Recipes, wait for the router and two content
-files another terminal holds (list in `docs/pp-tool-plans/22-24-food.md`, "Waiting"). The screen side is built
-and tested. **The recipe page is a tool page, not a read (D3):** cook mode, the shopping list and Save; held by
-name in `test/reader_unification_test.dart`.
+**§102.8 Food tools (tools pass 22-24, 2026-10-25).** The `pp_food/<preset>` landings are built and linked
+(closed the same day, once the Development door was committed; `docs/pp-tool-plans/22-24-food.md`). **The
+recipe page is a tool page, not a read (D3):** cook mode, the shopping list and Save; held by name in
+`test/reader_unification_test.dart`.
