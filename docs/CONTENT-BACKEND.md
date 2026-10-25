@@ -444,3 +444,23 @@ for every question anyone had already asked.
 `preg_diet_read_food_myths`. Ask Veda answers from the ingested corpus, so
 until the next incremental ingest runs from `C:\Projects\parentveda-askveda`
 it can still quote the old wording. Nothing in the wire body changed.
+
+## Ask Veda answers for the profile on screen, and after a loss (2026-10-25)
+
+STAGE-TRANSITIONS F8 and R3. Two app fields, landed in both repos at once (the wire body is a two-repo contract;
+the service's wire-contract test lists both):
+
+- **`pregnancy_ended`** replaces `week` on the pregnancy screen after a loss. The service frames the answer with no
+  weeks, no baby growing and no birth to get ready for, and caches it in its own bucket (`pl:s1`). A cached week-14
+  answer speaks of a baby growing; a separate bucket is the only way to make sure it never reaches her.
+- **`family_stage`** ('pregnancy' | 'trying') rides with the parenting screen's child age when her own stage is not
+  parenting. The child's age alone made the service assert "She is NO LONGER PREGNANT", false for a mother who is
+  pregnant again. Cache keys gain `:fp` / `:ft`.
+
+And the app picks WHICH Ask Veda by the home on top (`askHomeOnTop` in `global_ask_fab.dart`), not by a home
+anywhere in the stack.
+
+**Two lessons.** A context note that states a fact about her ("no longer pregnant") is a claim, and needs every case
+that can make it false; a child's age is evidence of one birth, not of no pregnancy. And a cache key is part of the
+answer's meaning: two people who must hear different things can never share an entry, so every fact that changes
+the answer has to be in the key.

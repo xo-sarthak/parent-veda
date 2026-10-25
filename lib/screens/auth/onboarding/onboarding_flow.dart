@@ -231,7 +231,15 @@ class OnboardingFlow extends StatefulWidget {
     this.onDoctor,
     this.startAt = ObStep.welcome,
     this.startName = '',
+    this.replay = false,
   });
+
+  /// The developer's "Replay onboarding" (R6, 2026-10-25): every screen runs,
+  /// and finishing writes NOTHING (no stage, no profile, no stores, no
+  /// flags) before [onDone]. Before this the replay's own comment said
+  /// "nothing it writes is kept" while `_finish` rewrote her stage and her
+  /// answers on a phone with real data.
+  final bool replay;
 
   final PregnancyController pregnancy;
 
@@ -815,6 +823,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   /// Shared since 2026-10-01 by the first-screen link and by the sign-in at
   /// the end of the questions, when that account turns out to exist already.
   Future<void> _enterExistingAccount() async {
+    if (widget.replay) {
+      widget.onDone(null, false); // R6: no flags written on a replay
+      return;
+    }
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(kAuthCompletedKey, true);
@@ -1789,6 +1801,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   void _partner() {
+    // R6: pairing links this phone to a real account, so a replay says why it
+    // stops here instead of doing it (never a silent tap).
+    if (widget.replay) {
+      _say('Pairing is skipped in a replay: it would link this phone to a partner.');
+      return;
+    }
     // The pairing branch is the old screen's, unchanged and already positioned.
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -3706,6 +3724,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     final stage = _stage ?? 'pregnancy';
     // A father: the partner on his own, or "Who are you to the baby? Father".
     final isFather = _isPartner || _careRole == CareRole.father;
+    if (widget.replay) {
+      // A look, not a move (R6): nothing below runs.
+      widget.onDone(stage, isFather);
+      return;
+    }
     final profile = FamilyProfileStore.instance;
 
     // 1. Stage — locally first, before any network, exactly as the old flow.

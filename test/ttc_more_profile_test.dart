@@ -30,6 +30,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/screens/v2/pv_try_again.dart' show TryAgainUndo;
+import 'package:parentveda/services/stage_moves.dart' show kTryingFromStageKey;
 import 'package:parentveda/screens/profile/pv_settings_screen.dart';
 import 'package:parentveda/screens/profile/pv_you_chrome.dart'
     show PvProfileRow, PvProfileTile, PvYouRow;
@@ -776,6 +778,16 @@ void main() {
             endedOn: DateTime(2025, 3, 1), outcome: PregnancyOutcome.loss),
       ]);
       addTearDown(PregnancyRecords.instance.debugReset);
+      // "Not trying after all?" draws only on the phone that made the
+      // trying-again move (R1, 2026-10-25): make it this one.
+      final prefs = await SharedPreferences.getInstance();
+      LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
+      await prefs.setString(kTryingFromStageKey, 'parenting');
+      await TryAgainUndo.instance.refresh();
+      addTearDown(() async {
+        await prefs.remove(kTryingFromStageKey);
+        await TryAgainUndo.instance.refresh();
+      });
       await pump(tester, _profile);
       final profile = texts(tester);
       await openSettings(tester);

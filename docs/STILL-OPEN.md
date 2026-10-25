@@ -11093,18 +11093,23 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
   still says coming soon), and parenting → skilling as a move (F5 offers the learning space per child instead).
 - **§101.2 (R2) The partner's phone never sees her stage change or her loss.** `fetchMyProfile` reads his own
   profile row; only the due date falls back to hers. The comment in `pregnancy_ended_store.dart` saying his app
-  respects it is not true yet. BEFORE-LAUNCH.
+  respects it is not true yet. BEFORE-LAUNCH. BUILT 2026-10-25 (STAGE-TRANSITIONS R2): no migration, 0009 already
+  lets him read her row; `PartnerSide.readStageRow` (his phone, paired) reads hers for the stage and the loss, and
+  his phone never writes either.
 - **§101.3 (R3) After a loss, still in pregnancy:** Learn, Tools and More still speak in weeks, and the Ask Veda
-  context still sends her week. The Ask Veda part is a change in the service repo.
+  context still sends her week. The Ask Veda part is a change in the service repo. APP SIDE BUILT 2026-10-25
+  (STAGE-TRANSITIONS R3); the Ask Veda part goes with F8.
 - **§101.4 (R4)** Her own reminders (ReminderStore) are not paused after a loss. BUILT 2026-10-25: the hospital bag and
   evening check-in reminders pause with the loss and return with its undo; medicines and her own stay on.
 - **§101.5 (R5)** `FamilyProfileStore`'s stage is set only by onboarding (skilling as parenting) and drifts after
-  that. Nothing reads it today.
-- **§101.6 (R6)** "Replay onboarding" (developer) rewrites the stage and the stores.
+  that. Nothing reads it today. BUILT 2026-10-25: it reads `LifeStageStore` now, so it cannot drift.
+- **§101.6 (R6)** "Replay onboarding" (developer) rewrites the stage and the stores. BUILT 2026-10-25: `replay: true`
+  writes nothing; pairing is skipped with a notice.
 - **§101.7 (R7)** Nothing prompts past 42 weeks; the arrival card from week 37 is the only nudge. BUILT 2026-10-25: from
   42 weeks the card names the three cases (here, wrong date, still pregnant: call the doctor today).
 - **§101.8 (R8)** The Pregnancy door from TTC shows the week-20 placeholder (a preview). Whether to guard it is the
-  user's call.
+  user's call. DECIDED + BUILT 2026-10-25 (the user: "ask them the relevant info that other apps also do"): the
+  chip runs the positive-test page from trying and Add a pregnancy from parenting, never the stage alone.
 - **§101.9 (B9) Cloud ids collide across users.** `journey_timeline`, `ttc_cycles` and `ttc_cycle_signals` key rows
   by `id` alone, and the app's ids are a date or a fixed name. BUILT 2026-10-24 as sync log step 14: migration 0113
   keys 17 tables on `(user_id, id)` and the app conflicts on the same pair. 0113 RUN 2026-10-25 (check query: 17 rows of `user_id,id`); left: install the next

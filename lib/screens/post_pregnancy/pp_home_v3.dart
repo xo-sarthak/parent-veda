@@ -46,6 +46,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'calendar/pp_child_calendar_screen.dart' show openPpChildCalendar;
 import '../brackets/hub/journey_screen.dart';
 import '../../data/journeys/journey_registry.dart';
 import 'reading_home_screen.dart';
@@ -359,7 +360,10 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   // calendar exists (decided 2026-10-25, owed). Saved moved to
                   // You, as Pregnancy's did on 2026-10-10.
                   onMessages: () => openPpMessages(context),
-                  onCalendar: () => _openSurface(context, 'pp_vaccines'),
+                  // The child's own calendar now (F7, 2026-10-25): vaccines,
+                  // check-ups and appointments. Kept for revert:
+                  //   onCalendar: () => _openSurface(context, 'pp_vaccines'),
+                  onCalendar: () => openPpChildCalendar(context),
                   unreadMessages: PpMessagesStore.instance.unreadCount,
                 )),
                 _Sheet(p: p, children: [

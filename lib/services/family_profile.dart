@@ -34,6 +34,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
 import '../screens/post_pregnancy/pp_child_profile.dart';
+import 'life_stage_store.dart';
 import 'profile_analytics.dart';
 import 'ready_birth_context_store.dart';
 import 'remote/cloud_merged_store.dart';
@@ -614,7 +615,21 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   /// it is a pregnancy screen and asks for the pregnancy vocabulary directly.
   /// It exists for the AI context layer and for trying-to-conceive, which has no
   /// derivable marker at all. Defaults to pregnancy, the app's entry journey.
-  JourneyStage get stage => _declaredStage ?? JourneyStage.pregnancy;
+  //
+  // ⚠️ READ FROM THE ONE STAGE, NOT KEPT AS A SECOND COPY (R5, 2026-10-25).
+  // Only onboarding wrote `_declaredStage`, so it went stale at every move
+  // after it (a birth, a loss, trying again, a pregnancy added from the
+  // family). A copy that every move must remember to update is how two
+  // answers to "which stage" disagree. The stored value stays only for a
+  // phone whose stage is not known yet. Skilling reads as parenting, as
+  // onboarding mapped it (M31). Kept for revert:
+  //   JourneyStage get stage => _declaredStage ?? JourneyStage.pregnancy;
+  JourneyStage get stage => switch (LifeStageStore.instance.stage) {
+        LifeStage.tryingToConceive => JourneyStage.tryingToConceive,
+        LifeStage.pregnancy => JourneyStage.pregnancy,
+        LifeStage.parenting || LifeStage.skilling => JourneyStage.parenting,
+        null => _declaredStage ?? JourneyStage.pregnancy,
+      };
 
   bool get isPregnancy => stage == JourneyStage.pregnancy;
   bool get isParenting => stage == JourneyStage.parenting;
@@ -1168,7 +1183,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
         'parity': _parity?.name,
         'gentle': _gentle,
         'fatherHelp': _fatherHelp,
-        'stage': _declaredStage?.name,
+        // The current stage, so a saved copy is never stale (R5).
+        'stage': (LifeStageStore.instance.stage == null ? _declaredStage : stage)?.name,
         // ⚠️ DATE ONLY, NO TIME, NO ZONE. `toIso8601String()` on a local
         // DateTime would carry a time that means nothing here and would shift a
         // birthday across a zone change. Ten characters, unambiguous.

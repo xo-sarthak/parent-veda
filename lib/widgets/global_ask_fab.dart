@@ -176,6 +176,13 @@ class FabState extends ChangeNotifier {
   bool get inParenting => _inParenting;
   bool get inTtc => _inTtc;
 
+  /// Which home is on top of the stack (F8, 2026-10-25): the highest of the
+  /// TTC home, a parenting home or the learning space, else the pregnancy
+  /// shell at the root. Unlike [inTtc] and [inParenting], which are true for a
+  /// home ANYWHERE in the stack, this is the one she is looking at.
+  AskHome get homeOnTop => _homeOnTop;
+  AskHome _homeOnTop = AskHome.pregnancy;
+
   /// Called from the app shell's initState — the FAB only shows once a real
   /// screen (not the splash) is up.
   void markAppLive() {
@@ -195,8 +202,12 @@ class FabState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _update({bool? inParenting, bool? inTtc, bool? suppressed}) {
+  void _update({bool? inParenting, bool? inTtc, bool? suppressed, AskHome? homeOnTop}) {
     var changed = false;
+    if (homeOnTop != null && homeOnTop != _homeOnTop) {
+      _homeOnTop = homeOnTop;
+      changed = true;
+    }
     if (inParenting != null && inParenting != _inParenting) {
       _inParenting = inParenting;
       changed = true;
@@ -211,6 +222,27 @@ class FabState extends ChangeNotifier {
     }
     if (changed) notifyListeners();
   }
+}
+
+/// The four homes, as Ask Veda chooses between them.
+enum AskHome { trying, pregnancy, parenting, learning }
+
+/// Which home is on top, from the route names bottom first (F8). The highest
+/// home route wins, whatever pages are over it; none at all is the pregnancy
+/// shell, whose root route carries no name.
+@visibleForTesting
+AskHome askHomeOnTop(List<String?> names) {
+  for (var i = names.length - 1; i >= 0; i--) {
+    switch (names[i]) {
+      case kTtcRootRoute:
+        return AskHome.trying;
+      case kParentingRootRoute:
+        return AskHome.parenting;
+      case 'skilling':
+        return AskHome.learning;
+    }
+  }
+  return AskHome.pregnancy;
 }
 
 /// Tracks the route stack so the FAB knows where it is and whether to hide.
@@ -290,8 +322,11 @@ class FabRouteObserver extends NavigatorObserver {
             name.startsWith('ttc_chat/') ||
             name.contains('/story/') ||
             name.contains('/interactive/'));
-    FabState.instance
-        ._update(inParenting: inParenting, inTtc: inTtc, suppressed: suppressed);
+    FabState.instance._update(
+        inParenting: inParenting,
+        inTtc: inTtc,
+        suppressed: suppressed,
+        homeOnTop: askHomeOnTop([for (final r in _stack) r.settings.name]));
   }
 
   @override
@@ -336,10 +371,15 @@ final FabRouteObserver fabRouteObserver = FabRouteObserver();
 void openAskVeda(PregnancyController pregnancy) {
   final nav = appNavigatorKey.currentState;
   if (nav == null) return;
-  // Three-way: TTC first (it is the innermost stage stack), then parenting,
-  // then pregnancy as the default.
-  final ttc = FabState.instance.inTtc;
-  final parenting = FabState.instance.inParenting;
+  // ⚠️ THE HOME ON TOP DECIDES (F8, 2026-10-25). This was "TTC first, then
+  // parenting", read from homes ANYWHERE in the stack: a mother trying with
+  // her toddler's home open got the TTC Ask Veda answering about her cycle.
+  // The open profile's home answers now. Kept for revert:
+  //   final ttc = FabState.instance.inTtc;
+  //   final parenting = FabState.instance.inParenting;
+  final top = FabState.instance.homeOnTop;
+  final ttc = top == AskHome.trying;
+  final parenting = top == AskHome.parenting;
   nav.push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: kAskVedaRoute),
     builder: (_) => ttc

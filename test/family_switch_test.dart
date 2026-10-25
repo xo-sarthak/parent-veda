@@ -187,8 +187,9 @@ void main() {
       expect(code, contains("ValueKey('pp_hero_messages')"));
       expect(code, contains("ValueKey('pp_hero_calendar')"));
       expect(code, contains('onMessages: () => openPpMessages(context)'));
-      // The vaccines until a child calendar exists (decided 2026-10-25).
-      expect(code, contains("onCalendar: () => _openSurface(context, 'pp_vaccines')"));
+      // The child's own calendar since F7 (2026-10-25); the vaccines were the
+      // stand-in until it existed.
+      expect(code, contains('onCalendar: () => openPpChildCalendar(context)'));
       // The child switch under the age would be a second control for one thing.
       final painted = code.substring(code.indexOf('class _PaintedHero'));
       expect(painted, isNot(contains('PpChildSwitch(p: p)')));

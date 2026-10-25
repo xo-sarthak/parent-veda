@@ -191,7 +191,7 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [x] **DECIDE** · Per-pregnancy records (the `pregnancies` table): a pregnancy after a loss shows the lost pregnancy's bump photos, scans and bag · user · STAGE-TRANSITIONS R1, STILL-OPEN §101.1 · added 2026-10-24 · DECIDED and BUILT 2026-10-25 (kept for her, view or delete; sync step 18, 656bbb3)
 - [x] **RUN** · Migration `0114_pregnancies.sql` (one row per pregnancy, partner read, on the purge list), then install the next build · user · BACKEND-SYNC-LOG step 18 · added 2026-10-25 · run 2026-10-25; next build still to install
 - [x] **RUN** · Migration `0115_pp_food_tries.sql` (the foods a child has tried, shared with the co-parent; guarded; on the purge list), then install the next build. Until it runs, first tries stay on the phone and the push is refused quietly · user · BACKEND-SYNC-LOG step 20 · added 2026-10-25 · run 2026-10-25
-- [ ] **LAUNCH** · The partner's phone never sees her stage change or her loss (it reads his own profile row) · dev · STAGE-TRANSITIONS R2, STILL-OPEN §101.2 · added 2026-10-24
+- [x] **LAUNCH** · The partner's phone never sees her stage change or her loss (it reads his own profile row) · dev · STAGE-TRANSITIONS R2, STILL-OPEN §101.2 · added 2026-10-24 · DONE 2026-10-25: no migration (0009 already lets him read her row); sync log step 22, BACKEND-PATTERNS 16uu
 
 **Sponsors** (STILL-OPEN line 21: §11.6 blocks the sponsor programme):
 - [ ] **DECIDE** · An email provider (Resend, SES or Postmark), so activation codes have a sender · user · STILL-OPEN §11.6 · added 2026-10-17

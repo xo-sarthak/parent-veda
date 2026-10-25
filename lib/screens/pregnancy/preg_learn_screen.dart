@@ -83,6 +83,7 @@ import '../v2/v3_bracket_art.dart';
 import '../v2/v3_film_screen.dart';
 import '../v2/v3_week_film.dart';
 import 'preg_ended_screen.dart' show openAfterLossDoor;
+import '../../services/pregnancy_ended_store.dart';
 import 'preg_chrome.dart';
 
 /// The Learn tab's route name, for anything that needs to detect it.
@@ -226,7 +227,16 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
   /// Twins and more leads once she has said she is carrying more than one
   /// (2026-09-30, gap analysis P2). Ranking only: every topic is still here, once.
   // Kept for revert: `late final _topics = pregLearnTopics();`
-  List<PregLearnTopic> get _topics => pregExpectingTwins
+  List<PregLearnTopic> get _topics => PregnancyEndedStore.instance.ended
+      // ⚠️ AFTER A LOSS, AFTER A LOSS LEADS (R3, 2026-10-25), the twins
+      // pattern: ranking only, every door still here once.
+      ? [
+          for (final t in _baseTopics)
+            if (t.bracket.id == kPregAfterLossBracket.id) t,
+          for (final t in _baseTopics)
+            if (t.bracket.id != kPregAfterLossBracket.id) t,
+        ]
+      : pregExpectingTwins
       ? [
           for (final t in _baseTopics)
             if (t.bracket.id == kPregTwinsBracket.id) t,
@@ -335,6 +345,8 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
         PvSearchStore.instance,
         // Twins and more leads when she says so (preg_twins.dart).
         ReadyBirthContextStore.instance,
+        // After a loss leads once she has told us (R3).
+        PregnancyEndedStore.instance,
       ]),
       builder: (context, _) {
         final p = pvStorePalette;
@@ -402,8 +414,15 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
         const SizedBox(height: 22),
         _topicRow(p),
         _yourReading(p),
-        _startHere(p),
-        _films(p),
+        // ⚠️ THE WEEK'S VIDEOS AND PREGNANCY 101 STEP ASIDE AFTER A LOSS (R3,
+        // 2026-10-25). "Videos for week 14" and a course from the first test
+        // to the signs of labour, on the tab she opens to read about what
+        // happened, spoke as if nothing had. Every read is still found by
+        // search and in its door; the undo brings both back.
+        if (!PregnancyEndedStore.instance.ended) ...[
+          _startHere(p),
+          _films(p),
+        ],
         for (final t in _topics)
           if (t.pieces.isNotEmpty) _shelf(p, t),
         _coursesRail(p),

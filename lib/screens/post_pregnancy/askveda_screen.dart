@@ -28,6 +28,8 @@ import '../../widgets/mic_dictation_button.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
+import '../../services/life_stage_store.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/remote/ask_veda_service.dart';
 import '../../ask_veda/pp_veda_corpus.dart' show openPpVedaDoc;
 import 'pp_phase_faqs.dart' show phaseFaqs;
@@ -182,10 +184,17 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
 
     final res = await AskVedaService.ask(
       t,
+      // The open child: the family switch makes the child on screen the
+      // active one (F1), so this is the open profile's age (F8).
       childAgeMonths: ChildProfileStore.instance.ageInMonths,
       // Scopes the answer and its cards to parenting content (the service's
       // `scope_domain`, 2026-10-10), so every card is one this screen opens.
       stage: 'parenting',
+      // Her own stage when it is not parenting (F8, 2026-10-25): pregnant
+      // again, or trying again, so the answer never tells her she is not
+      // pregnant.
+      familyStage: askVedaFamilyStage(
+          LifeStageStore.instance.stage, PregnancyEndedStore.instance.ended),
     );
     if (!mounted || _query != t) return; // ignore stale / superseded replies
     if (res != null) HapticFeedback.lightImpact(); // the answer has landed

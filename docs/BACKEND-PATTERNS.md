@@ -4254,3 +4254,16 @@ Five recorded yoga classes showed ₹299 and played with no buy step, because "r
 offering", and the commit bar plays whatever has none. The fix was not on the class screen: a priced recorded
 class became an offering of the existing bought-once kind with no slots, and the engine's own `ownsRecording`
 decides play versus buy. One rule for every paid thing means one place for the server to take the money later.
+
+## 16uu. A fact belongs to a person, so read it from that person's row (no migration, 2026-10-25)
+STAGE-TRANSITIONS R2. The stage and "the pregnancy ended" are hers. His phone read them from his own row, which
+held whatever he paired into, so it was confidently wrong rather than visibly broken.
+1. **The policy already allowed it.** 0009 lets a partner SELECT her row. A missing feature is not always a missing
+   permission; check what the database already permits before writing a migration.
+2. **Symmetric links need an asymmetric rule.** Both rows carry `partner_id`. "Paired, so follow the partner" would
+   have made each phone follow the other. The role breaks the tie: the father's phone follows; hers never does.
+3. **"Couldn't read" is not "isn't there".** If her row cannot be read (offline), the store keeps what it holds. A
+   fallback to his own row would quietly restore the stale value the change exists to remove. Unknown must not
+   decay into a wrong known.
+4. **The follower never writes.** His phone skips pushing either fact, so a stale local value can never overwrite
+   hers. One writer per fact is what makes cloud-wins safe.

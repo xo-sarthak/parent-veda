@@ -1517,3 +1517,18 @@ offsets; kind and `none` round-trip; leaving saves; no seeded saves; the cloud i
 **Files:** `lib/services/tools_store.dart`, `lib/screens/tools/kegel_care_screen.dart`,
 `lib/screens/post_pregnancy/pp_yoga_data.dart`, `lib/booking/booking_catalog.dart`,
 `lib/screens/post_pregnancy/pp_mood_check_screen.dart`.
+
+## Step 22: his phone follows her stage and her loss (R2, no migration)
+- **What was wrong.** His paired phone read his own `profiles` row for `life_stage`, `life_stage_at` and
+  `pregnancy_ended_at`, three facts that are hers. After her birth, her loss or her move to trying his app went on
+  showing the pregnancy he paired into.
+- **What changed.** `lib/services/partner_side.dart`: `PartnerSide.readStageRow(columns)` reads her row
+  (`SupabaseRepo.fetchProfileOf(partner_id, ...)`) on the father phone while paired, else this person's own.
+  `LifeStageStore.pullFromCloud` and `PregnancyEndedStore.syncFromCloud` read through it; on his side neither ever
+  writes (`PartnerSide.following` skips the stage push; the loss seeding is skipped).
+- **No migration.** 0009's policy "view own or partner profile" already allows the read.
+- **Edges.** Pairing is symmetric (both rows hold `partner_id`), so the rule uses the role: her phone never
+  follows his. Her row unreadable returns no row and the stores keep what they hold; it never falls back to his row.
+- **Seen when.** On resume, at most once a minute (`SyncRegistry.resyncOnResume`). The loss swaps his Today live;
+  a stage change re-routes his home at the next launch.
+- **Test.** `test/partner_stage_test.dart`.

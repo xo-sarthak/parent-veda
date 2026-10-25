@@ -302,6 +302,24 @@ class SupabaseRepo {
     }
   }
 
+  /// Read [columns] from [id]'s profile row: the paired partner's, which 0009's
+  /// "view own or partner profile" policy allows and nothing else does. Null
+  /// when logged out, unreadable or on any failure, the same contract as
+  /// [fetchMyProfile] (STAGE-TRANSITIONS R2, 2026-10-25).
+  static Future<Map<String, dynamic>?> fetchProfileOf(String id, String columns) async {
+    if (userId == null) return null;
+    try {
+      final row = await _client
+          .from('profiles')
+          .select(columns)
+          .eq('id', id)
+          .maybeSingle();
+      return row == null ? null : Map<String, dynamic>.from(row);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Update columns on the current user's profile row. Best-effort.
   static Future<void> updateMyProfile(Map<String, dynamic> changes) async {
     final uid = userId;

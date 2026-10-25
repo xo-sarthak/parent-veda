@@ -23,6 +23,7 @@ import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/pregnancy/preg_hero_extras.dart';
 import 'package:parentveda/services/dear_baby_vault_store.dart';
 import 'package:parentveda/services/family_timeline.dart';
+import 'package:parentveda/services/family_profile.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/services/pp_messages_store.dart';
 import 'package:parentveda/services/preg_messages_store.dart';
@@ -489,6 +490,34 @@ void main() {
     test('M31 the family profile maps skilling to parenting (pinned, R5)', () {
       expect(finish, contains('_ => JourneyStage.parenting'));
     });
+
+    test('M52 R6: replaying onboarding writes nothing', () {
+      final flow = _code('lib/screens/auth/onboarding/onboarding_flow.dart');
+      final fin = flow.substring(flow.indexOf('Future<void> _finish() async {'));
+      final guard = fin.indexOf('if (widget.replay) {');
+      expect(guard, greaterThan(-1));
+      // Before the first write of the finish.
+      expect(guard, lessThan(fin.indexOf('setStage(')));
+      final enter = flow.substring(flow.indexOf('Future<void> _enterExistingAccount() async {'));
+      expect(enter.indexOf('if (widget.replay) {'), lessThan(enter.indexOf('setBool(kAuthCompletedKey')));
+      final partner = flow.substring(flow.indexOf('void _partner() {'));
+      expect(partner.indexOf('if (widget.replay) {'), lessThan(partner.indexOf('AuthFlowScreen(')));
+      // The developer row turns it on; the two real ways in do not.
+      expect(_code('lib/screens/profile/pv_you_screen.dart'), contains('replay: true,'));
+      expect(_code('lib/screens/splash_screen.dart'), isNot(contains('replay:')));
+      expect(_code('lib/screens/profile/pv_account_actions.dart'), isNot(contains('replay:')));
+    });
+
+    test('M51 R5: the family profile reads the one stage, so it cannot drift', () {
+      LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
+      expect(FamilyProfileStore.instance.stage, JourneyStage.tryingToConceive);
+      LifeStageStore.instance.setStage(LifeStage.pregnancy);
+      expect(FamilyProfileStore.instance.stage, JourneyStage.pregnancy);
+      LifeStageStore.instance.setStage(LifeStage.parenting);
+      expect(FamilyProfileStore.instance.isParenting, isTrue);
+      LifeStageStore.instance.setStage(LifeStage.skilling);
+      expect(FamilyProfileStore.instance.stage, JourneyStage.parenting);
+    });
   });
 
   // ===========================================================================
@@ -507,6 +536,18 @@ void main() {
         expect(body, isNot(contains(w)),
             reason: 'a real move must not hide behind the developer switch');
       }
+    });
+
+    test('M50 R8: the Pregnancy chip never lands on week 20; it asks for the date first', () {
+      final src = _code('lib/screens/profile/pv_you_screen.dart');
+      final fn = src.substring(src.indexOf('void _switchStage('));
+      final body = fn.substring(0, fn.indexOf('\n  }\n'));
+      // The real moves run before the stage is touched, and return.
+      final guard = body.indexOf('if (d == StageDoor.pregnancy && from != LifeStage.pregnancy)');
+      expect(guard, greaterThan(-1));
+      expect(guard, lessThan(body.indexOf('setStage(')));
+      expect(body, contains('recordPositiveTest(context);\n        return;'));
+      expect(body, contains('openAddPregnancy(context);\n        return;'));
     });
   });
 

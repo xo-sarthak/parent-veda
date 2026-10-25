@@ -13,6 +13,7 @@ import '../ask_veda/ask_veda_mark.dart';
 import '../localization/app_language.dart';
 import '../services/family_profile.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/pregnancy_ended_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../widgets/profile_ask_strip.dart';
@@ -150,15 +151,26 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   // HIS SIDE (2026-10-13): her trackers, her due date and her journal and
   // bump photos are hers; he gets getting ready, read to baby, Ask Veda and
   // his own journal. Same hub, less on it.
+  //
+  // ⚠️ AFTER A LOSS (R3, 2026-10-25): "Get ready" (the bag, the birth plan,
+  // contractions, the due date, what to buy) and the two trackers that only
+  // mean something while she is pregnant (kicks, the pregnancy weight range)
+  // step aside. What looks after her stays: medicines, readings, pelvic
+  // floor, reminders, the journal, her bump photos, Ask Veda. The undo brings
+  // every one back.
+  bool get _ended => PregnancyEndedStore.instance.ended;
+
   List<_ToolGroup> _groups(S s) => [
         if (!FatherPreview.instance.on)
         _ToolGroup('Track', 206, [
+          if (!_ended)
           _Tool(s.babyMovementTracker, Icons.favorite_border_rounded,
               AppTheme.secondary500,
               () => _open('tools/movement', () => BabyMovementScreen(controller: controller)),
               line: "Count kicks and get to know your baby's pattern",
               mark: IntentMark.stepsMark,
               priority: PregPriority.babyDevelopment),
+          if (!_ended)
           _Tool(s.toolWeightTitle, Icons.monitor_weight_outlined,
               AppTheme.tertiary500,
               () => _open('tools/weight', () => WeightTrackerScreen(controller: controller)),
@@ -202,6 +214,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               line: 'What we remind you about, and when',
               mark: IntentMark.nextStep),
         ]),
+        if (!_ended)
         _ToolGroup('Get ready', 28, [
           _Tool(s.hbName, Icons.luggage_outlined, AppTheme.tertiary400,
               () => _open('tools/hospital_bag', () => ReadyForBirthScreen(controller: controller)),
@@ -307,7 +320,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
     // Listens to the profile as well as the controller, so re-ordering takes
     // effect the moment she changes what she wants help with.
     return AnimatedBuilder(
-      animation: Listenable.merge([controller, FamilyProfileStore.instance, _search]),
+      animation: Listenable.merge(
+          [controller, FamilyProfileStore.instance, _search, PregnancyEndedStore.instance]),
       builder: (context, _) {
         final p = pvStorePalette;
         final s = S(controller.language);
@@ -333,8 +347,12 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                     // Kept for revert: s.toolsIntro ("Helpful companions for
                     // your journey - more arriving soon").
                     child: Text(
-                        'Tools to track your pregnancy, get ready for the birth and '
-                        'keep what matters. Tap one to open it. None of them are required.',
+                        _ended
+                            // R3: no birth to get ready for.
+                            ? 'Tools to look after your health and keep what matters. '
+                                'Tap one to open it. None of them are required.'
+                            : 'Tools to track your pregnancy, get ready for the birth and '
+                                'keep what matters. Tap one to open it. None of them are required.',
                         style: ttcTabRootIntroStyle()),
                   ),
                   below: PvLiveSearchField(search: _search, p: p, hint: 'Find a tool'),

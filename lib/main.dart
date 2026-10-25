@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'brand/brand_store.dart';
 import 'localization/app_language.dart';
 import 'screens/post_pregnancy/pp_child_profile.dart';
+import 'screens/post_pregnancy/calendar/pp_cal_data.dart' show PpApptReminders;
 import 'screens/post_pregnancy/pp_changes_store.dart';
 import 'screens/post_pregnancy/pp_development_data.dart';
 import 'screens/post_pregnancy/daily_tip_popup.dart';
@@ -335,6 +336,9 @@ class _ParentVedaAppState extends State<ParentVedaApp>
         // And the appointments' "remind me the evening before" (2026-09-27),
         // which the same cancelAll() would otherwise wipe on every launch.
         .then((_) => TtcAppointmentsStore.instance.rearmAfterStartup())
+        // A child's appointments' evening-before reminders (F7, 2026-10-25),
+        // which the same wipe would otherwise clear on every launch.
+        .then((_) => PpApptReminders.instance.rearmAfterStartup())
         // The Ready-to-Try plan's notes (2026-10-21): the monthly ones and
         // her habit reminders, which the same wipe cleared on every launch.
         // The habits store also stops them once her month has come.

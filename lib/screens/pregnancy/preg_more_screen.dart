@@ -35,6 +35,8 @@
 //  Settings read as one set, as they do in trying to conceive.
 // =============================================================================
 
+import '../../services/pregnancy_ended_store.dart';
+import 'preg_ended_screen.dart' show openAfterLossDoor;
 import 'package:flutter/material.dart';
 
 import '../../data/learn/pv_learn_view.dart';
@@ -225,7 +227,8 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
   Widget build(BuildContext context) {
     final p = pvStorePalette;
     return ListenableBuilder(
-      listenable: PregMessagesStore.instance,
+      // PregnancyEndedStore too: Your journey changes after a loss (R3).
+      listenable: Listenable.merge([PregMessagesStore.instance, PregnancyEndedStore.instance]),
       builder: (context, _) => Container(
         color: p.ground,
         child: ListView(
@@ -301,7 +304,11 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
               // What the app said first (2026-09-30): the weekly note and the
               // moments that matter, kept so a missed one is not gone.
               _row('preg_more_messages', IntentMark.nextStep, 268, 'Messages',
-                  'Your weekly note, and the moments worth remembering',
+                  // After a loss the weekly notes are paused (M18): the inbox
+                  // keeps what was sent, and says so (R3).
+                  PregnancyEndedStore.instance.ended
+                      ? 'What we sent you before'
+                      : 'Your weekly note, and the moments worth remembering',
                   () {
                 pvCommitFeedback();
                 openPregMessages(context, _c);
@@ -317,12 +324,21 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
                       ? 'Her appointments and what is coming up, to see'
                       : 'Your appointments, scans and what is coming up',
                   () => _push('calendar', () => CalendarScreen(controller: _c))),
+              // ⚠️ AFTER A LOSS (R3, 2026-10-25): "this week and every week"
+              // and "what comes next" step aside for the After a loss door.
+              // The undo brings both back.
+              if (PregnancyEndedStore.instance.ended)
+                _row('preg_more_after_loss', IntentMark.cuppedHands, 344, 'After a loss',
+                    'Your body, what happened, support, and trying again when you are ready',
+                    () => openAfterLossDoor(context, _c))
+              else ...[
               _row('preg_more_journey_map', IntentMark.timelineRail, 104, 'Journey map',
                   'Where you are this month, and what comes next',
                   () => _push('journey_map', () => JourneyMapScreen(controller: _c))),
               _row('preg_more_week', IntentMark.bodyMark, 24, 'Week by week',
                   'Your baby and your body, this week and every week',
                   () => _push('pregnancy/week', () => PregWeekScreen(pregnancy: _c, week: _c.currentWeek))),
+              ],
               // HIS SIDE (2026-10-13): his week, reading to the baby and the
               // partner guide, where her calendar was.
               if (FatherPreview.instance.on) ...[

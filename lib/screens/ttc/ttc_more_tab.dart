@@ -161,6 +161,9 @@ const Map<String, (TtcRowHome, String)> kTtcFormerYouRows = {
   // R1 (2026-10-25): an ended pregnancy, kept for her. Shown only once
   // there is one, so the page tests see it only with a kept record.
   'Your pregnancies': (TtcRowHome.profile, 'Your pregnancies'),
+  // Trying again from the family (R1, 2026-10-25): its undo, beside the
+  // journey. Shown only on the phone that made the move.
+  'Not trying after all?': (TtcRowHome.profile, 'Not trying after all?'),
   // Settings: how the app behaves for her, her account, help.
   'Messages': (TtcRowHome.settings, 'Messages'),
   'What you see': (TtcRowHome.settings, 'What you see'),

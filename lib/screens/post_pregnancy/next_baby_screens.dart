@@ -34,6 +34,7 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../v2/pv_add_pregnancy.dart' show addPregnancyOffered, openAddPregnancy;
+import '../v2/pv_try_again.dart' show openTryAgain, tryingAgainOffered;
 
 /// Which door was opened. The copy differs; the shape does not.
 enum NextBabyIntent { dueDate, ovulation }
@@ -114,12 +115,15 @@ class NextBabyScreen extends StatelessWidget {
 
   Widget _primary(BuildContext context) => PvPress(child: GestureDetector(
         // "Yes, I am pregnant" adds the pregnancy (STAGE-TRANSITIONS F2,
-        // 2026-10-25). Trying again from parenting is not built, so the
-        // ovulation door still says so. Kept for revert:
+        // 2026-10-25); "Yes, we are trying" opens trying again (R1, the same
+        // day). The coming-soon sheet is left only for the partner's side,
+        // where neither move is his to make. Kept for revert:
         //   onTap: () => _showComingSoon(context),
         onTap: () {
           if (intent == NextBabyIntent.dueDate && addPregnancyOffered()) {
             openAddPregnancy(context, replace: true);
+          } else if (intent == NextBabyIntent.ovulation && tryingAgainOffered()) {
+            openTryAgain(context, replace: true);
           } else {
             _showComingSoon(context);
           }

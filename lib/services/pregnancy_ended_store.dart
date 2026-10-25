@@ -30,6 +30,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'auth/pending_profile.dart';
 import 'life_stage_store.dart';
+import 'partner_side.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 
@@ -66,9 +67,23 @@ class PregnancyEndedStore extends ChangeNotifier {
     try {
       final pending = await PendingProfile.load();
       if (pending != null && pending.containsKey(kColumn)) return;
-      final row = await SupabaseRepo.fetchMyProfile(kColumn);
+      // ⚠️ ON HIS PAIRED PHONE, HER ROW (R2, 2026-10-25): it is her loss,
+      // told on her phone. His Today swaps on it, and his phone never sends
+      // the column (the seeding below is skipped). Kept for revert:
+      //   final row = await SupabaseRepo.fetchMyProfile(kColumn);
+      final read = await PartnerSide.readStageRow(kColumn);
+      final row = read.row;
       if (row == null) return; // offline or unreadable: keep what we have
       final prefs = await SharedPreferences.getInstance();
+      if (read.hers) {
+        final at = row[kColumn] == null ? null : SupabaseRepo.parseDbTime(row[kColumn]);
+        if ((at != null) == _ended && at == _endedAt) return;
+        _ended = at != null;
+        _endedAt = at;
+        notifyListeners();
+        await _persist();
+        return;
+      }
       final cloudAt = row[kColumn] == null
           ? null
           : SupabaseRepo.parseDbTime(row[kColumn]);

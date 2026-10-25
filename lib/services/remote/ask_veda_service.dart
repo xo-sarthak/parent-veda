@@ -7,6 +7,7 @@
 //  state instead of the retired offline answer.
 // =============================================================================
 
+import '../life_stage_store.dart';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -88,6 +89,15 @@ class AskVedaResult {
       .toList();
 }
 
+/// The parenting side's `family_stage` (F8, 2026-10-25): her own stage when
+/// it is not parenting, else null. A pregnancy that has ended is not one she
+/// is in, so it sends nothing. Pure, for the tests.
+String? askVedaFamilyStage(LifeStage? stage, bool pregnancyEnded) => switch (stage) {
+      LifeStage.pregnancy => pregnancyEnded ? null : 'pregnancy',
+      LifeStage.tryingToConceive => 'trying',
+      _ => null,
+    };
+
 class AskVedaService {
   AskVedaService._();
 
@@ -145,6 +155,20 @@ class AskVedaService {
     String? lang,
     String? domain, // optional retrieval hint; normally left null (no gating)
     String? userKey,
+
+    /// She has told the app her pregnancy has ended (STAGE-TRANSITIONS R3,
+    /// 2026-10-25). Send it INSTEAD of [week]: the service then frames the
+    /// answer with no weeks, no baby growing and no birth to get ready for,
+    /// and keeps its cache entries apart. Two-repo field, landed in both
+    /// (parentveda-askveda `pregnancy_ended`, tests/test_family_and_loss.py).
+    bool? pregnancyEnded,
+
+    /// On the parenting side, HER OWN stage when it is not parenting:
+    /// 'pregnancy' (pregnant again) or 'trying' (trying for another baby).
+    /// The child's age alone made the service say "she is no longer
+    /// pregnant" (STAGE-TRANSITIONS F8, 2026-10-25). Two-repo field, landed in
+    /// both (`family_stage`).
+    String? familyStage,
   }) async {
     if (!AskVedaConfig.enabled) return null;
     final q = question.trim();
@@ -181,6 +205,8 @@ class AskVedaService {
               if (monthsTrying != null) 'months_trying': monthsTrying,
               if (lang != null) 'lang': lang,
               if (domain != null) 'domain': domain,
+              if (pregnancyEnded == true) 'pregnancy_ended': true,
+              'family_stage': ?familyStage,
             }),
           )
           .timeout(const Duration(seconds: 25));

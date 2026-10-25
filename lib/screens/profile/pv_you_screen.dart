@@ -58,6 +58,8 @@ import '../../services/remote/supabase_repo.dart';
 import '../../services/saved_store.dart';
 import '../../services/scans_store.dart';
 import '../../services/stage_gateway.dart';
+import '../ttc/ttc_transition_screen.dart' show recordPositiveTest;
+import '../v2/pv_add_pregnancy.dart' show addPregnancyOffered, openAddPregnancy;
 import '../../services/whatsapp_prefs.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_nav_bar.dart' show pvNavClearance;
@@ -2785,6 +2787,9 @@ class _PvYouScreenState extends State<PvYouScreen> {
                 settings: const RouteSettings(name: 'dev/onboarding'),
                 builder: (ctx) => OnboardingFlow(
                   pregnancy: ctl,
+                  // R6 (2026-10-25): finishing writes nothing, as the note
+                  // above always promised.
+                  replay: true,
                   onDone: (_, _) => Navigator.of(ctx).maybePop(),
                   onDoctor: (_) => Navigator.of(ctx).maybePop(),
                 ),
@@ -2828,6 +2833,26 @@ class _PvYouScreenState extends State<PvYouScreen> {
   /// pregnancy shell is not registered (a widget test), so the message is
   /// the genuinely-stuck path, not the ordinary one.
   void _switchStage(StageDoor d) {
+    // ⚠️ PREGNANCY IS NEVER REACHED WITHOUT A DATE (R8, 2026-10-25, the user:
+    // "why will someone wanna land on week 20, ask them the relevant info
+    // that other apps also do"). This chip ships in every build, and setting
+    // the stage alone opened the pregnancy home on the week-20 placeholder.
+    // From any other stage it now runs the real move, which asks how to date
+    // the pregnancy (last period, due date, weeks, a clinic transfer) before
+    // anything changes, as Apple Health, Flo and Clue do: from trying, the
+    // positive-test page; from parenting or the learning space, Add a
+    // pregnancy (F2). Backing out of either leaves the stage as it was.
+    final from = LifeStageStore.instance.stage;
+    if (d == StageDoor.pregnancy && from != LifeStage.pregnancy) {
+      if (from == LifeStage.tryingToConceive) {
+        recordPositiveTest(context);
+        return;
+      }
+      if (addPregnancyOffered()) {
+        openAddPregnancy(context);
+        return;
+      }
+    }
     LifeStageStore.instance.setStage(switch (d) {
       StageDoor.tryingToConceive => LifeStage.tryingToConceive,
       StageDoor.pregnancy => LifeStage.pregnancy,

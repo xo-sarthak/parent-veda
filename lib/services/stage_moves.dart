@@ -19,6 +19,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
+import '../screens/ttc/ttc_intro_flow.dart' show TtcIntroGate;
 import '../ttc/ttc_store.dart';
 import 'dear_baby_vault_store.dart';
 import 'family_timeline.dart';
@@ -81,6 +82,7 @@ Future<void> recordBirth({
       .catchError((_) {});
   LifeStageStore.instance.setStage(LifeStage.parenting, at: day);
   await _forgetFamilyMove(); // this pregnancy is over; no undo goes back from it
+  await _forgetTryingMove(); // nor to the trying that came before it
   final title = name.trim().isEmpty ? 'Baby was born' : '${name.trim()} was born';
   FamilyTimeline.instance.add(
     id: babyBornIdFor(day),
@@ -305,5 +307,133 @@ Future<void> _forgetFamilyMove() async {
     await prefs.remove(kPregnancyFromStageKey);
     await prefs.remove(kPregnancyFromAtKey);
     await prefs.remove(kPregnancyFromTimelineKey);
+  } catch (_) {/* local-first */}
+}
+
+// ---- "Trying again" from the family (STAGE-TRANSITIONS R1, 2026-10-25) -------
+
+/// Where the move came from, so its undo goes back exactly there. Local, as
+/// F2's keys are.
+const String kTryingFromStageKey = 'pv_trying_from_stage';
+const String kTryingFromAtKey = 'pv_trying_from_at';
+const String kTryingFromTimelineKey = 'pv_trying_from_timeline';
+const String kTryingFromConfirmedKey = 'pv_trying_from_confirmed';
+const String kTryingFromIntroSeenKey = 'pv_trying_from_intro_seen';
+
+/// Pure, so the tests read it: whether "Trying again" is offered. Her side,
+/// in Parenting or the learning space. A pregnancy going is its own stage,
+/// and trying is already trying.
+bool tryingAgainOfferedFor({required LifeStage? stage, required bool father}) =>
+    !father && (stage == LifeStage.parenting || stage == LifeStage.skilling);
+
+/// A parent is trying for another baby.
+///
+/// ⚠️ THE STAGE MOVES TO TRYING; HER CHILDREN STAY WHERE THEY ARE. A trying
+/// mother with a child is a state the app already knows (the family switch
+/// lists Trying first, then the children), so the TTC home becomes the root
+/// and each child's home opens over it. Nothing about the children changes.
+///
+/// Three things the stage alone would get wrong, the after-loss move's lesson
+/// (B2):
+///  * the TTC side's "pregnant" mark from the pregnancy that brought her first
+///    child is cleared, or the TTC home opens on "A new beginning";
+///  * the TTC introduction is owed again, so she is asked her last period,
+///    how long and whether a clinic is involved, instead of the app counting
+///    a cycle from a period logged years ago;
+///  * the story gets the day.
+/// The due date stays: it is what "born early" is measured from (M16).
+Future<void> startTryingFromFamily({DateTime? today}) async {
+  final now = today ?? DateTime.now();
+  final day = DateTime(now.year, now.month, now.day);
+  final from = LifeStageStore.instance.stage ?? LifeStage.parenting;
+  final fromAt = LifeStageStore.instance.enteredAt;
+  final confirmed = TtcStore.instance.pregnancyConfirmedOn;
+  final introSeen = await TtcIntroGate.seen().catchError((_) => false);
+
+  TtcStore.instance.clearPregnancyConfirmation();
+  await TtcIntroGate.oweAgain().catchError((_) {});
+  LifeStageStore.instance.setStage(LifeStage.tryingToConceive, at: day);
+
+  final timelineId = 'trying_again:${day.toIso8601String().substring(0, 10)}';
+  FamilyTimeline.instance.add(
+    id: timelineId,
+    stage: LifeStage.tryingToConceive,
+    kind: TimelineKind.milestone,
+    titleEn: 'Started trying again',
+    titleHi: 'Started trying again',
+    on: day,
+  );
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(kTryingFromStageKey, from.name);
+    if (fromAt != null) {
+      await prefs.setString(kTryingFromAtKey, fromAt.toIso8601String());
+    } else {
+      await prefs.remove(kTryingFromAtKey);
+    }
+    await prefs.setString(kTryingFromTimelineKey, timelineId);
+    if (confirmed != null) {
+      await prefs.setString(kTryingFromConfirmedKey, confirmed.toIso8601String());
+    } else {
+      await prefs.remove(kTryingFromConfirmedKey);
+    }
+    await prefs.setBool(kTryingFromIntroSeenKey, introSeen);
+  } catch (_) {/* local-first: the undo then goes back to parenting */}
+}
+
+/// Did the trying on screen come from the family move (so its undo goes back
+/// to her children)? Only the phone that made it knows; elsewhere the row is
+/// not offered, and trying carries on as any trying does.
+Future<bool> tryingCameFromFamily() async {
+  if (LifeStageStore.instance.stage != LifeStage.tryingToConceive) return false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(kTryingFromStageKey) != null;
+  } catch (_) {
+    return false;
+  }
+}
+
+/// "Not trying after all": back to where she came from, dated as it was,
+/// with the TTC mark and the introduction as they were. Whatever she logged
+/// in between (a period, a test) is kept: a move never deletes what she told
+/// us.
+Future<void> undoTryingFromFamily() async {
+  var back = LifeStage.parenting;
+  DateTime? at;
+  String? timelineId;
+  DateTime? confirmed;
+  var introSeen = false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString(kTryingFromStageKey) == LifeStage.skilling.name) {
+      back = LifeStage.skilling;
+    }
+    at = DateTime.tryParse(prefs.getString(kTryingFromAtKey) ?? '');
+    timelineId = prefs.getString(kTryingFromTimelineKey);
+    confirmed = DateTime.tryParse(prefs.getString(kTryingFromConfirmedKey) ?? '');
+    introSeen = prefs.getBool(kTryingFromIntroSeenKey) ?? false;
+  } catch (_) {}
+
+  if (timelineId != null) FamilyTimeline.instance.remove(timelineId);
+  if (confirmed != null) TtcStore.instance.confirmPregnancy(on: confirmed);
+  if (introSeen) await TtcIntroGate.markSeen().catchError((_) {});
+  LifeStageStore.instance.setStage(back, at: at);
+  await _forgetTryingMove();
+}
+
+Future<void> _forgetTryingMove() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    for (final k in [
+      kTryingFromStageKey,
+      kTryingFromAtKey,
+      kTryingFromTimelineKey,
+      kTryingFromConfirmedKey,
+      kTryingFromIntroSeenKey,
+    ]) {
+      await prefs.remove(k);
+    }
   } catch (_) {/* local-first */}
 }

@@ -106,6 +106,17 @@ class TtcIntroGate {
     await p.setBool(_key, true);
   }
 
+  /// Whether it has been seen, for an undo that must put it back as it was.
+  static Future<bool> seen() async => !(await owed());
+
+  /// Owed again: a parent trying for another baby is asked her last period,
+  /// how long and whether a clinic is involved, not shown a cycle logged
+  /// years ago (STAGE-TRANSITIONS R1, trying again, 2026-10-25).
+  static Future<void> oweAgain() async {
+    final p = await SharedPreferences.getInstance();
+    await p.remove(_key);
+  }
+
   /// Testing only — the same shape every other TTC store exposes.
   static Future<void> resetForTest() async {
     final p = await SharedPreferences.getInstance();

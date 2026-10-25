@@ -22,6 +22,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ttc/ttc_sync.dart';
+import 'partner_side.dart';
 import 'remote/supabase_repo.dart';
 
 /// The stages of the ParentVeda journey, in order.
@@ -194,7 +195,11 @@ class LifeStageStore extends ChangeNotifier with TtcSyncedStore {
     // and the push right after sends her declaration. BACKEND-PATTERNS
     // §16ii-q. Kept for revert: no guard.
     if (hasPendingPush) return;
-    final row = await SupabaseRepo.fetchMyProfile('life_stage, life_stage_at');
+    // ⚠️ ON HIS PAIRED PHONE, HER ROW (R2, 2026-10-25): her stage is hers,
+    // and his row held whatever he paired into. partner_side.dart. Kept for
+    // revert:
+    //   final row = await SupabaseRepo.fetchMyProfile('life_stage, life_stage_at');
+    final row = (await PartnerSide.readStageRow('life_stage, life_stage_at')).row;
     if (row == null) return;
     final stage = LifeStageCopy.fromId(row['life_stage'] as String?);
     if (stage == null) return; // never declared in the cloud - keep local
@@ -207,6 +212,8 @@ class LifeStageStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pushToCloud() async {
     final s = _stage;
     if (s == null) return; // nothing declared - do not write a null over a value
+    // His paired phone follows hers and never writes the stage (R2).
+    if (PartnerSide.following) return;
     // Confirmed and remembered (sync log step 11); it was
     // `SupabaseRepo.updateMyProfile`, which swallowed a refusal. Kept for
     // revert.

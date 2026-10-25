@@ -50,6 +50,7 @@ import 'ready_for_birth_screen.dart';
 import 'kegel_care_screen.dart';
 import 'weight_tracker_screen.dart';
 import '../../ask_veda/pv_veda_links.dart' show openPvVedaDoc;
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/remote/ask_veda_service.dart';
 import '../search/pv_search_screen.dart'
     show PvSearchHit, openPvSearchHit, pvSearch, pvSearchIndex;
@@ -194,9 +195,15 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     // this side of the app from any other. The wire body is a contract across
     // two repos: `app/answer.py` `scope_domain` and `app/cache.py`
     // `stage_key_for` read this field. Kept for revert: no `stage:`.
+    // ⚠️ AFTER A LOSS, NO WEEK (R3, 2026-10-25): she is not at week 14 any
+    // more, and an answer framed for it speaks of a baby growing. The flag
+    // goes instead, and the service frames and caches for it. Kept for revert:
+    //   week: p.currentWeek,
+    final ended = PregnancyEndedStore.instance.ended;
     final res = await AskVedaService.ask(
       t,
-      week: p.currentWeek,
+      week: ended ? null : p.currentWeek,
+      pregnancyEnded: ended,
       stage: 'pregnancy',
       lang: p.language.isHindi ? 'hi' : 'en',
     );

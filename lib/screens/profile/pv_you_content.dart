@@ -63,6 +63,8 @@ import '../../services/preg_messages_store.dart' show PregMessagesStore;
 import '../../services/pp_messages_store.dart' show PpMessagesStore;
 import '../post_pregnancy/pp_messages_screen.dart' show openPpMessages;
 import '../v2/pv_celebration.dart' show openBirthCelebration;
+import '../v2/pv_try_again.dart'
+    show TryAgainUndo, kTryAgainTitle, openTryAgain, tryingAgainOffered, undoTryAgainFromYou;
 import '../../data/doors/pv_door_after_loss.dart' show kPregEndedRowTitle, kPregEndedRowSub;
 import '../../services/pregnancy_ended_store.dart';
 import '../products/pv_orders_screen.dart';
@@ -582,6 +584,30 @@ PvYouThing _expectingAgain() => PvYouThing(
   listen: PregnancyRecords.instance,
   shown: addPregnancyOffered,
   open: openAddPregnancy,
+);
+
+/// "Trying for another baby?" (STAGE-TRANSITIONS R1, trying again,
+/// 2026-10-25): the step before "Expecting again?". Hers only; the family
+/// sheet has the same row as "Start trying again".
+PvYouThing _tryingAgain() => PvYouThing(
+  icon: Icons.favorite_border_rounded,
+  art: ttcArtTab(TtcTabMark.windowRing),
+  title: kTryAgainTitle,
+  subtitle: "Open trying to conceive. Your children's homes stay as they are",
+  listen: LifeStageStore.instance,
+  shown: tryingAgainOffered,
+  open: openTryAgain,
+);
+
+/// "Not trying after all?": the trying-again move undone, offered only on the
+/// phone that made it.
+PvYouThing _notTryingAfterAll() => PvYouThing(
+  icon: Icons.undo_rounded,
+  title: 'Not trying after all?',
+  subtitle: 'Go back to your family as it was. Nothing you logged is removed.',
+  listen: TryAgainUndo.instance,
+  shown: () => TryAgainUndo.instance.offered,
+  open: (c) => undoTryAgainFromYou(c),
 );
 
 /// ⚠️ "NOT PREGNANT AFTER ALL?" (2026-10-10, the user: "not always a positive
@@ -1151,7 +1177,8 @@ final PvYouStageContent _trying = PvYouStageContent(
   // The journey map left More and Tools' moved list on 2026-09-30 (the
   // user). Kept for revert: journeyThings: [_movedThing('map')],
   // journeyThings: const [], // kept for revert (R1 adds the kept pregnancies)
-  journeyThings: [_keptPregnancies()],
+  // journeyThings: [_keptPregnancies()], // kept for revert (trying again adds its undo)
+  journeyThings: [_notTryingAfterAll(), _keptPregnancies()],
   journeyCaption:
       'Where you are across the four chapters, the "I\'m pregnant" button, and your journey map with its family timeline',
   // What Saved holds on this stage since 2026-09-30 (kTtcSavedKinds). Kept
@@ -1419,7 +1446,8 @@ final PvYouStageContent _parenting = PvYouStageContent(
   // Her letters from pregnancy, opened at birth (2026-10-15).
   keepsakeThings: [_dearBabyLetters()],
   // journeyThings: [_keptPregnancies()], // kept for revert (F2 adds Expecting again)
-  journeyThings: [_expectingAgain(), _keptPregnancies()],
+  // journeyThings: [_expectingAgain(), _keptPregnancies()], // kept for revert (R1 adds trying again)
+  journeyThings: [_expectingAgain(), _tryingAgain(), _keptPregnancies()],
   childrenInvitation: 'Add your child and their page appears here.',
   whatWeStore: [
     'Your name, phone and email, and the partner you paired with.',

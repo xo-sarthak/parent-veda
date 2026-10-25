@@ -46,6 +46,7 @@ import '../skilling/sk_bands.dart' show kSkAgeFloor;
 import '../skilling/sk_child_store.dart';
 import '../skilling/skilling_preview_screen.dart';
 import 'pv_add_pregnancy.dart' show addPregnancyOffered, openAddPregnancy, kAddPregnancyTitle;
+import 'pv_try_again.dart' show kTryAgainSheetTitle, openTryAgain, tryingAgainOffered;
 import 'v2_palette.dart';
 
 /// Which home is on screen. The caller says so; the switch never guesses
@@ -406,6 +407,27 @@ Future<void> showPvFamilySheet(BuildContext context,
                 onTap: () {
                   Navigator.of(ctx).pop();
                   openAddPregnancy(context);
+                },
+              ),
+            // ---- START TRYING AGAIN (R1, trying again, 2026-10-25) ----
+            // Under Add a pregnancy: the step before it. Hers only, from
+            // Parenting or the learning space.
+            if (tryingAgainOffered())
+              ListTile(
+                key: const ValueKey('pv_family_switch_try_again'),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                leading: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: p.ground,
+                  child: Icon(Icons.add_rounded, color: p.ink2),
+                ),
+                title: Text(kTryAgainSheetTitle,
+                    style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+                subtitle: Text('Trying to conceive, beside your children',
+                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink2)),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  openTryAgain(context);
                 },
               ),
             // ---- KEPT FOR YOU (R1, 2026-10-25) ----
