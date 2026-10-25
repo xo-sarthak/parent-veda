@@ -248,8 +248,10 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
       final indexed = [for (var i = 0; i < now.length; i++) (i, now[i])]
         ..sort((a, b) {
-          final r = rank(a.$2).compareTo(rank(b.$2));
-          return r != 0 ? r : a.$1.compareTo(b.$1);
+          final (ia, ta) = a;
+          final (ib, tb) = b;
+          final r = rank(ta).compareTo(rank(tb));
+          return r != 0 ? r : ia.compareTo(ib);
         });
       return [for (final e in indexed) e.$2, ...later];
     }
