@@ -232,6 +232,7 @@ Catalogue items and people the door points at that do not exist yet (each tap sa
 | You, Maa (parenting) | 6 | 2 | – | 3 | – |
 | What to buy (parenting) | 10 | 8 | – | 2 | – (call 2: shelves owned as they are) |
 | Traditions (parenting) | 13 | – (TR1–TR8 written 2026-10-02) | – | 2 | – (two sensitive pages, the user's phone read); TRO1–TRO3 wait on a film or the shop, see the door 10 table |
+| Safety (parenting) | 4 | – | – | – | – ; SFO1–SFO4 answer a tap or link nothing, see the door 11 table |
 | Coding (skilling) | 9 | 4 (33 slots: 12 lessons, 6 AI cards, 6 courses, 9 products, 1 note — the 36 activities are filled) | – | 2 (the consent adapter, the access rail) | 1 generic (resume marker — `SKILLING-DOOR-BUILD.md` §9) |
 | Communication (skilling) | 10 | 5 (29 slots: 27 lessons, 12 courses, 12 products, 2 notes — the 36 activities are filled; the 11–14 twelve are repo-written copy owed a task-author review) | – | 1 (the voice keepsake) | 1 (cloud copy of recordings, behind a real consent) |
 | Confidence (skilling) | 11 | 5 (36 slots: 18 lessons, 6 courses, 9 products, 2 notes, 1 coach — the 36 activities are filled) | – | 1 (the breath page) | 1 (the coach onboarded, then the booking wiring) |
@@ -503,6 +504,17 @@ TR1 to TR8 were written 2026-10-02 (parenting gap analysis); `skip_it` and `moth
 | TRO1 | `traditions/door_intro` | Film · 30–45 s | Not slotted | S4: no chip until the film exists (TR6) |
 | TRO2 | Baby massage oil on the shop | Catalogue | Not linked | The most searched item in this door (491 on massage and oil). Traditions links First 40's "Which massage oil?" instead of a shelf; the shelf notice is FF15's (`kPpShelfNotYet`) |
 | TRO3 | A ceremony shelf (thali sets, silver spoon and bowl sets, ceremony outfits) | Catalogue | Links removed | Two links opened the whole shop and promised these; the catalogue has none, so both are commented out (TR4). Naamkaran keeps one link, to the clothes shelf. Add a shelf only if the shop decides to stock ceremony items |
+
+### Safety (parenting), door 11
+
+**Added by the door 11 build (2026-10-26, `docs/pp-door-plans/11-safety.md` SF1 to SF8, "As built").** Nothing here is a coming-soon card; every row answers a tap or links nothing. (The `SFO` ids are this door's; Skilling's Confidence rows above use `SF`.)
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| SFO1 | Films: `safety/child_cpr` on `safety_cpr` (child CPR, 3 min), and `safety/door_intro` | Film | Child CPR: built from data, a tap says the film is being made (S8a). Intro: not slotted (S4) | **Real people only**, by the CPR instructor, on a mannequin; never animated or AI-generated. The baby CPR film on the same page is Health's slot `health/infant_cpr` (HD4): one film, two places, shoot it once. Choking is Health's `feeding/back_blows_demo`, linked |
+| SFO2 | Shop: baby gates, socket covers, corner guards, cabinet and drawer locks, child helmets; and forward-facing seats and boosters | Catalogue | Not linked | The catalogue has none. The pages say what to look for instead ("Sockets, boards and chargers", "What to look for in a gate"), with no dead link. The car seat page links the one stocked shelf, rear-facing seats (`pp_products/pvs_rear_facing_car_seats`), so an older child has no seat to buy yet |
+| SFO3 | A first aid and CPR class | Class | "Tell me" | The class this door most needs. It is HD9's "Baby first aid and CPR": Health's Get help now ends on it, and now First aid does too (its tab closing). One class, two ways in |
+| SFO4 | Line drawings: CPR hands for a baby (two fingers) and a child (heel of the hand); the choking holds (baby along the forearm, back blows) | Illustration | Not drawn | Until they exist the steps stay as numbered text. The choking drawing belongs on Health's `health_choking_response` too |
 
 ---
 
