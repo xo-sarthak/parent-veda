@@ -36,6 +36,7 @@ import '../skilling/skilling_preview_screen.dart';
 import '../ttc/ttc_common.dart' show ttcHomeRoute;
 import '../ttc/ttc_home_version.dart' show TtcHomeScreen;
 import 'pv_celebration.dart';
+import 'pv_moment_paintings.dart';
 
 const String kPvTryAgainRoute = 'family/try_again';
 
@@ -82,7 +83,9 @@ void openTryAgain(BuildContext context, {bool replace = false}) {
   final route = MaterialPageRoute<void>(
     settings: const RouteSettings(name: kPvTryAgainRoute),
     builder: (_) => PvCelebrationScreen(
-      painting: PhasePainting(phase: kPhases.first),
+      // Its own painting once the file lands; the phase painting until then
+      // (2026-10-26). Kept for revert: painting: PhasePainting(phase: kPhases.first),
+      painting: PvMomentPainting(moment: PvMoment.tryAgain, fallback: PhasePainting(phase: kPhases.first)),
       title: w.title,
       line: w.line,
       changes: w.changes,

@@ -46,6 +46,7 @@ import 'pp_pick_photo.dart';
 import 'pp_tools_kit.dart' show ppShortDate, ppToolTextField;
 import 'pp_use_ask_card.dart';
 import 'health_doctor_visit_screen.dart';
+import '../v2/pv_moment_paintings.dart';
 
 /// The route name of the moment page after a save, so a test or the last-
 /// profile observer can tell it apart from the stage-move celebration.
@@ -763,9 +764,11 @@ Future<void> openMilestoneSave(BuildContext context,
   await Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: kPpMilestoneMomentRoute),
     builder: (_) => PvCelebrationScreen(
-      // A dedicated "a milestone" painting is owed (DOOR-CONTENT-OWED); the
-      // child's phase painting stands in.
-      painting: PhasePainting(phase: currentPhase(kid)),
+      // The "a milestone" painting (prompt in docs/MOMENT-PAINTING-PROMPTS.md,
+      // landed 2026-10-26); the child's phase painting is the fallback.
+      // Its own painting once the file lands; the phase painting until then
+      // (2026-10-26). Kept for revert: painting: PhasePainting(phase: currentPhase(kid)),
+      painting: PvMomentPainting(moment: PvMoment.milestone, fallback: PhasePainting(phase: currentPhase(kid))),
       title: title,
       line: '${_longDate(when)}, ${msAgeWords(months)}. One for $childName\'s story.',
       changes: changes,

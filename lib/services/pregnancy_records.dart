@@ -50,6 +50,11 @@ import 'remote/sync_row_book.dart';
 enum PregnancyOutcome { ongoing, loss, birth, ended }
 
 DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
+
+/// How long After a loss leads the trying-to-conceive home once a loss has
+/// closed (2026-10-26): about three cycles, the time most mothers are told to
+/// wait or watch. Then the door goes back to its own place; it never goes.
+const int kAfterLossLeadDays = 90;
 String _iso(DateTime d) => _day(d).toIso8601String().substring(0, 10);
 DateTime? _parse(Object? v) {
   final d = v == null ? null : DateTime.tryParse(v.toString());
@@ -281,6 +286,50 @@ class PregnancyRecords extends ChangeNotifier {
         for (final r in all.reversed)
           if (r.outcome != PregnancyOutcome.ongoing) r,
       ];
+
+  // ---- how the last one ended (personalisation, STILL-OPEN §61.1) ----------
+  //
+  // ⚠️ `ended` IS NEVER A LOSS. It means the app was not told how a pregnancy
+  // ended (the enum's own rule), so nothing below lifts loss content for it.
+
+  /// The newest pregnancy that has ended, or null.
+  PregnancyRecord? get lastEnded {
+    final k = kept;
+    return k.isEmpty ? null : k.first;
+  }
+
+  /// The pregnancy that ended just before the one going on now, or null.
+  PregnancyRecord? get beforeCurrent {
+    final cur = current;
+    if (cur == null) return null;
+    final l = all;
+    final i = l.indexWhere((r) => r.id == cur.id);
+    return i > 0 ? l[i - 1] : null;
+  }
+
+  /// Pregnant now, and the pregnancy before this one was a loss. Lifts the
+  /// pages written for a pregnancy after a loss; never hides anything.
+  bool get pregnantAfterLoss =>
+      beforeCurrent?.outcome == PregnancyOutcome.loss;
+
+  /// The pregnancy going on, or the one about to start (the positive test,
+  /// before `startNew`), comes after a loss. One answer across that moment,
+  /// so a page built before the record and rebuilt after it says the same.
+  bool get followsLoss => current != null
+      ? pregnantAfterLoss
+      : lastEnded?.outcome == PregnancyOutcome.loss;
+
+  /// Not pregnant, the last pregnancy was a loss, and it ended within
+  /// [kAfterLossLeadDays]: the TTC home leads with After a loss.
+  bool lossRecentlyClosed({DateTime? now}) {
+    if (current != null) return false;
+    final last = lastEnded;
+    if (last == null || last.outcome != PregnancyOutcome.loss) return false;
+    final on = last.endedOn;
+    if (on == null) return false;
+    final days = _day(now ?? DateTime.now()).difference(on).inDays;
+    return days >= 0 && days < kAfterLossLeadDays;
+  }
 
   PregnancyWindow windowOf(PregnancyRecord r) =>
       pregnancyWindowOf(r, _windowSource);

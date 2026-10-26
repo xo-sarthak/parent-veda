@@ -225,6 +225,8 @@ final PvDoorPage kFirstWeeksDoor = PvDoorPage(
     PvDoorSection(
       group: kFirstTabVisit,
       heading: 'After IVF or a loss',
+      // Leads the Visit tab when her last pregnancy was a loss (2026-10-26).
+      forAfterLoss: true,
       tiles: [
         PvDoorGuideTile(
           title: 'Your first visit after IVF or a loss',

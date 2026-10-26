@@ -1355,6 +1355,13 @@ class TtcS {
 
   String get transitionTitle =>
       _p('A beautiful new chapter begins', 'Ek khoobsurat naya chapter shuru hota hai');
+  // After a loss she told us about (`PregnancyRecords.followsLoss`,
+  // 2026-10-26): no "beautiful", and room for the worry that comes with it.
+  // English only (CLAUDE.md, new work is English).
+  String get transitionTitleAfterLoss => 'A new pregnancy';
+  String get transitionSubtitleAfterLoss =>
+      "After everything, hope and worry can sit together. We'll take it one "
+      'week at a time, and everything you added here comes with you.';
   String get transitionSubtitle => _p(
       "Nothing starts over. Everything you've added is already where it should be.",
       'Yahan kuch phir se shuru nahi hota. Aapne jo banaya wo pehle se apni jagah par hai.');

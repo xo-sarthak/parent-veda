@@ -51,6 +51,7 @@ import 'sk_bands.dart' show kSkAgeFloor;
 import 'sk_child_store.dart';
 import 'sk_parent_gate_screen.dart';
 import 'skilling_preview_screen.dart';
+import '../v2/pv_moment_paintings.dart';
 
 /// Whole years on [now].
 int skYearsOn(DateTime dob, DateTime now) {
@@ -178,7 +179,9 @@ Future<void> openTurningSix(BuildContext context, Child child) async {
   await Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: kPvCelebrationRoute),
     builder: (_) => PvCelebrationScreen(
-      painting: PhasePainting(phase: kPhases.last),
+      // Its own painting once the file lands; the phase painting until then
+      // (2026-10-26). Kept for revert: painting: PhasePainting(phase: kPhases.last),
+      painting: PvMomentPainting(moment: PvMoment.turningSix, fallback: PhasePainting(phase: kPhases.last)),
       title: words.title,
       line: words.line,
       changes: words.changes,

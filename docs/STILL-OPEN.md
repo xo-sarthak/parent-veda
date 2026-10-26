@@ -7927,6 +7927,30 @@ content afterwards (personalisation reads `outcome`). Not built.
 `birth`, `ended`), `child_id`, and an archive of the undated records. Derived on first run from what the install
 already holds, never asked. Personalisation reading `outcome` is still owed.
 
+**Personalisation reading `outcome` BUILT 2026-10-26.** Order only, and every lift says why on screen (the user,
+2026-10-26: "make sure the personalization actually gets used", never a reorder she cannot explain). Read through
+`PregnancyRecords.lastEnded / beforeCurrent / pregnantAfterLoss / followsLoss / lossRecentlyClosed`; `ended` (no
+reason told) is never a loss.
+- TTC home: `ttc_after_loss` leads for `kAfterLossLeadDays` (90) after a loss, IVF one row down; the line under
+  "Explore by topic" says why.
+- First weeks: the "After IVF or a loss" section leads Visit when the last pregnancy was a loss, or when she
+  answered "A past loss" in onboarding (`gentleAboutLoss`, an answer that until now only quietened the home); the
+  line under the heading names which.
+- The older-child reads (`preg_ready_read_older_child`) lead their rail with a child at home ("With Meera at home,
+  this comes first"), and go last when she said this is her first pregnancy (`Parity.first`). "Been pregnant
+  before" with no child moves nothing: it may be a loss.
+- Parenting: `PpSignal.babyOnTheWay` lifts the sibling pages for a child whose mother has a pregnancy going on; the
+  card shows "A baby on the way". The child's age bands still follow the child.
+- Words: the positive test after a loss reads "A new pregnancy" with room for worry; Add a pregnancy's line does the
+  same and only promises a kept pregnancy when one is kept.
+
+**Owed, cross-repo (Ask Veda), not built:** framing for a pregnancy after a loss. The app sends nothing new, so
+nothing is silently dropped. Handover for `C:\Projects\parentveda-askveda`: a field `previous_loss` (bool, true only
+when `PregnancyRecords.pregnantAfterLoss` or `gentleAboutLoss`; never for `ended`), and a framing rule: no
+"congratulations" tone, room for anxiety, reassurance grounded in the care reads (`preg_loss_read_next_pregnancy_care`),
+never a recurrence probability. Note the 2026-10-17 rule that the onboarding `gentle` answer stays in the app and is
+not sent to Ask Veda: the field may only come from the recorded loss unless the user lifts that rule.
+
 ### 61.2 One product catalogue across stages — BUILT 2026-09-17
 
 The user's own words: three product sections, one per stage, "makes no

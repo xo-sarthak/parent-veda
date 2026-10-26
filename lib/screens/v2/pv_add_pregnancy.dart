@@ -44,6 +44,7 @@ import '../tools/due_date_calculator_screen.dart' show DdcMethod, ddcComputeEdd,
 import '../ttc/ttc_common.dart' show leaveTtcForPregnancy;
 import 'pv_celebration.dart';
 import 'v2_palette.dart';
+import 'pv_moment_paintings.dart';
 
 const String kPvAddPregnancyRoute = 'family/add_pregnancy';
 
@@ -120,12 +121,21 @@ String? addPregnancyRefusal({
   required int week,
   required bool sureOfDate,
   required List<String> childNames,
+  // How the last pregnancy ended (STILL-OPEN §61.1, 2026-10-26). [lastKept]:
+  // one is kept to look back on, so the line promising it is true.
+  // [afterLoss]: it was a loss, so the line makes room for the worry.
+  bool lastKept = true,
+  bool afterLoss = false,
 }) {
   final one = childNames.length == 1 ? childNames.first : null;
   return (
     title: 'A new pregnancy',
+    // Kept for revert: the sure-of-date line for everyone,
+    //   'Week $week. Take it one day at a time.'
     line: sureOfDate
-        ? 'Week $week. Take it one day at a time.'
+        ? (afterLoss
+            ? 'Week $week. After everything, hope and worry can sit together. One day at a time.'
+            : 'Week $week. Take it one day at a time.')
         : 'About week $week for now. Add the date from your scan when you have it.',
     changes: [
       'This pregnancy starts clean: its own weeks, bag and birth plan',
@@ -133,7 +143,7 @@ String? addPregnancyRefusal({
         "$one's home stays exactly as it is. Switch from the name at the top"
       else if (childNames.length > 1)
         "Your children's homes stay exactly as they are. Switch from the name at the top",
-      'Your last pregnancy is kept for you, under Your pregnancies',
+      if (lastKept) 'Your last pregnancy is kept for you, under Your pregnancies',
     ],
     primary: 'Open my pregnancy',
   );
@@ -251,6 +261,9 @@ class _PvAddPregnancyScreenState extends State<PvAddPregnancyScreen> {
         for (final c in ChildProfileStore.instance.children)
           if (c.name != Child.placeholder) c.name,
       ],
+      // Read after the move: the record before this one is the last one.
+      lastKept: PregnancyRecords.instance.beforeCurrent != null,
+      afterLoss: PregnancyRecords.instance.pregnantAfterLoss,
     );
     var done = false;
     void open(BuildContext c) {
@@ -275,7 +288,9 @@ class _PvAddPregnancyScreenState extends State<PvAddPregnancyScreen> {
           if (!didPop) open(page);
         },
         child: PvCelebrationScreen(
-          painting: PhasePainting(phase: kPhases.first),
+          // Its own painting once the file lands; the phase painting until then
+      // (2026-10-26). Kept for revert: painting: PhasePainting(phase: kPhases.first),
+      painting: PvMomentPainting(moment: PvMoment.newPregnancy, fallback: PhasePainting(phase: kPhases.first)),
           title: words.title,
           line: words.line,
           changes: words.changes,

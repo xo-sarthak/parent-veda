@@ -27,6 +27,7 @@
 import '../../services/family_profile.dart';
 import '../../services/pp_use_consent.dart';
 import '../../services/pv_read_store.dart';
+import '../../services/pregnancy_records.dart' show PregnancyRecords;
 import 'pp_changes_store.dart';
 import 'pp_child_profile.dart';
 import 'pp_feeding_data.dart';
@@ -43,7 +44,18 @@ enum PpSignal {
   // Door 3 (You, Maa, 2026-10-25), from her pregnancy record: the after-GDM
   // and after-BP pages lead for the mothers who had them, in the first year.
   sugarInPregnancy('After sugar in pregnancy', ['sugar in pregnancy']),
-  bpInPregnancy('After high BP in pregnancy', ['high bp in pregnancy']);
+  bpInPregnancy('After high BP in pregnancy', ['high bp in pregnancy']),
+  // From her pregnancy record (2026-10-26, STILL-OPEN §61.1): she added a
+  // pregnancy, so this child is about to be an older sibling and the pages
+  // about a new brother or sister lead. Never "new baby": newborn pages say it.
+  babyOnTheWay('A baby on the way', [
+    'sibling',
+    'second baby',
+    'older child',
+    'big brother',
+    'big sister',
+    'baby on the way',
+  ]);
 
   const PpSignal(this.why, this.words);
 
@@ -107,6 +119,8 @@ class PpSituation {
       if (fam.hasPregCondition(PregCondition.hypertension) &&
           child.ageInMonths < 12)
         PpSignal.bpInPregnancy,
+      if (child.hasRealChild && PregnancyRecords.instance.current != null)
+        PpSignal.babyOnTheWay,
     };
     return PpSituation(
       ageMonths: child.ageInMonths,

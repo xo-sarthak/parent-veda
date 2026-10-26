@@ -674,7 +674,13 @@ class PvDoorSection {
     this.railMax,
     this.weeks,
     this.tilesByWeek = false,
+    this.forAfterLoss = false,
   }) : inlineSurfaceId = null;
+
+  /// Written for a pregnancy after a loss ("After IVF or a loss" on First
+  /// weeks). It leads its tab when her last pregnancy was a loss she told us
+  /// about ([PregHistory.afterLoss]), and says so under its heading.
+  final bool forAfterLoss;
 
   /// The weeks this section is about ("Last three months" = 28 to 42), or
   /// null for a section that fits any week. A banded section leads its tab
@@ -724,7 +730,8 @@ class PvDoorSection {
         strip = false,
         lead = null,
         weeks = null,
-        tilesByWeek = false;
+        tilesByWeek = false,
+        forAfterLoss = false;
 
   final String heading;
   final List<PvDoorTile> tiles;
@@ -776,10 +783,19 @@ class PvDoorSection {
   /// With [tilesByWeek] and a [weekKnown] week, the rail is then ordered by
   /// each tile's printed week range (2026-10-23). [weekKnown] is false on the
   /// week-20 placeholder, so nothing moves for a woman with no due date.
-  List<PvDoorTile> tilesFor(int week, {bool weekKnown = true}) {
+  ///
+  /// [history] then puts the older-child reads first or last
+  /// ([pregOlderChildOrder]). Its default moves nothing.
+  List<PvDoorTile> tilesFor(
+    int week, {
+    bool weekKnown = true,
+    PregHistory history = PregHistory.none,
+  }) {
     final led = _leadFor(week);
-    if (!tilesByWeek || !weekKnown) return led;
-    return pregRelevanceOrder(led, (t) => PregBand.parse(t.meta), week);
+    final byWeek = !tilesByWeek || !weekKnown
+        ? led
+        : pregRelevanceOrder(led, (t) => PregBand.parse(t.meta), week);
+    return pregOlderChildOrder(byWeek, history);
   }
 
   List<PvDoorTile> _leadFor(int week) {
@@ -1043,8 +1059,103 @@ class PvDoorPage {
   /// The same sections, hers first: at [week] a banded section she is in
   /// leads, upcoming ones follow, past ones sink (2026-10-23, `PregBand`).
   /// A null [week] (no real due date) is [sectionsOf], untouched.
-  List<PvDoorSection> sectionsFor(String groupId, int? week) =>
-      pregRelevanceOrder(sectionsOf(groupId), (s) => s.weeks, week);
+  ///
+  /// With [PregHistory.afterLoss], the sections written for a pregnancy after
+  /// a loss then lead (2026-10-26). Its default moves nothing.
+  List<PvDoorSection> sectionsFor(
+    String groupId,
+    int? week, {
+    PregHistory history = PregHistory.none,
+  }) {
+    final byWeek =
+        pregRelevanceOrder(sectionsOf(groupId), (s) => s.weeks, week);
+    if (!history.afterLoss) return byWeek;
+    return [
+      for (final s in byWeek)
+        if (s.forAfterLoss) s,
+      for (final s in byWeek)
+        if (!s.forAfterLoss) s,
+    ];
+  }
+}
+
+// -----------------------------------------------------------------------------
+//  Her history, read from what she did (STILL-OPEN §61.1, 2026-10-26)
+// -----------------------------------------------------------------------------
+
+/// What the doors know about her past pregnancies and children.
+///
+/// ⚠️ NEVER ASKED. Every fact here comes from a move she made herself (telling
+/// us of a loss, adding a child, adding this pregnancy), so each lift can name
+/// that move on screen ([pvDoorSectionWhy]). Door data stays store-free: the
+/// screen builds this and hands it in.
+class PregHistory {
+  const PregHistory({
+    this.afterLoss = false,
+    this.lossToldInOnboarding = false,
+    this.hasChild,
+    this.childName,
+  });
+
+  /// Nothing known: nothing moves.
+  static const none = PregHistory();
+
+  /// The pregnancy before this one was a loss
+  /// (`PregnancyRecords.pregnantAfterLoss`). `ended`, with no reason told,
+  /// never sets it.
+  final bool afterLoss;
+
+  /// [afterLoss] came from her onboarding answer ("Anything we should be
+  /// gentle about? A past loss"), not a loss recorded here, so the line names
+  /// that answer.
+  final bool lossToldInOnboarding;
+
+  /// She has a child at home. Null: not known, and the rails keep the
+  /// writers' order.
+  final bool? hasChild;
+
+  /// That child's name, for the line that explains the move. Null while it is
+  /// still the placeholder.
+  final String? childName;
+}
+
+/// The reads written for a mother who already has a child ("Telling an older
+/// child", "Getting an older child ready"). One read, two doors.
+const Set<String> kPregOlderChildReads = {'preg_ready_read_older_child'};
+
+bool _isOlderChildTile(PvDoorTile t) =>
+    t is PvDoorGuideTile && kPregOlderChildReads.contains(t.readId);
+
+/// [tiles] with the older-child reads first when she has a child, and last
+/// when she has none. ORDER ONLY: every tile stays. A first-time mother can
+/// still open it; it is just not where her eye lands.
+List<PvDoorTile> pregOlderChildOrder(List<PvDoorTile> tiles, PregHistory h) {
+  final has = h.hasChild;
+  if (has == null || !tiles.any(_isOlderChildTile)) return tiles;
+  final them = [for (final t in tiles) if (_isOlderChildTile(t)) t];
+  final rest = [for (final t in tiles) if (!_isOlderChildTile(t)) t];
+  return has ? [...them, ...rest] : [...rest, ...them];
+}
+
+/// The quiet line under a section's heading when her history moved it, or
+/// null.
+///
+/// ⚠️ THE APP EXPLAINS ITSELF. A lift she cannot see the reason for reads as
+/// the app being random, so every lift that comes from her history names the
+/// part of it that moved the section. A section that sank says nothing.
+String? pvDoorSectionWhy(PvDoorSection s, PregHistory h) {
+  if (s.forAfterLoss && h.afterLoss) {
+    return h.lossToldInOnboarding
+        ? 'First here, because you told us about a past loss'
+        : 'First here, after your last pregnancy';
+  }
+  if (h.hasChild == true && s.tiles.any(_isOlderChildTile)) {
+    final n = h.childName;
+    return n == null
+        ? 'With your little one at home, this comes first'
+        : 'With $n at home, this comes first';
+  }
+  return null;
 }
 
 // -----------------------------------------------------------------------------

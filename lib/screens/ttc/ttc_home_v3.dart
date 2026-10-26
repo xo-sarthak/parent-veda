@@ -120,6 +120,7 @@ import '../../services/pv_read_store.dart';
 import '../../ttc/ttc_content_prefs.dart';
 import '../../ttc/ttc_home_prefs.dart';
 import '../../ttc/ttc_home_situation.dart';
+import '../../services/pregnancy_records.dart' show PregnancyRecords;
 import '../../ttc/ttc_day_context.dart';
 import '../../ttc/ttc_fertility_help_store.dart';
 import '../../ttc/ttc_messages_store.dart';
@@ -607,6 +608,25 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                       eyebrow: '',
                       title: hinglish ? 'Kahin se bhi shuru karein' : 'Explore by topic',
                       p: p)),
+                  // Why After a loss leads (2026-10-26, STILL-OPEN §61.1):
+                  // the app explains itself, so a moved door names the loss
+                  // she recorded instead of looking random.
+                  if (doorIds.isNotEmpty &&
+                      doorIds.first == kTtcDoorAfterLoss &&
+                      PregnancyRecords.instance.lossRecentlyClosed())
+                    _pad(Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        'After a loss is first for now, after your last '
+                        'pregnancy. It goes back to its place in a few months.',
+                        key: const ValueKey('ttc_home_after_loss_why'),
+                        style: pvManrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink2,
+                            height: 1.45),
+                      ),
+                    )),
                   const SizedBox(height: 14),
                   // ⚠️ ORDERED BY HER SITUATION, NEVER FILTERED (2026-09-26,
                   // gap analysis P2). A clinic pathway leads with IVF & IUI,

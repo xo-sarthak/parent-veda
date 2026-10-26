@@ -52,6 +52,9 @@ import '../../ask_veda/ask_veda_mark.dart';
 import '../../data/doors/pv_door_data.dart';
 import '../../models/bracket.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/family_profile.dart' show FamilyProfileStore, Parity;
+import '../../services/pregnancy_records.dart' show PregnancyRecords;
+import '../post_pregnancy/pp_child_profile.dart' show Child, ChildProfileStore;
 import '../../data/conditions_data.dart' show ConditionsStore;
 import '../../services/scan_reports_store.dart';
 import '../../services/pv_door_strip_store.dart';
@@ -310,6 +313,30 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
   int? get _knownWeek => widget.pregnancy.isDueDateSet
       ? widget.pregnancy.currentWeek
       : null;
+
+  /// What her own moves tell the door (STILL-OPEN §61.1, 2026-10-26): a loss
+  /// before this pregnancy, recorded in the app or told to us in onboarding
+  /// ("Anything we should be gentle about? A past loss"), and whether a child
+  /// is at home. Never asked here; every lift it causes says why on screen.
+  PregHistory get _history {
+    final kid = ChildProfileStore.instance;
+    final fam = FamilyProfileStore.instance;
+    final hasChild = kid.hasRealChild
+        ? true
+        // "Is this your first pregnancy? Yes" means no older child. "No"
+        // could be a loss, so it moves nothing.
+        : (fam.parity == Parity.first ? false : null);
+    return PregHistory(
+      afterLoss:
+          PregnancyRecords.instance.pregnantAfterLoss || fam.gentleAboutLoss,
+      lossToldInOnboarding:
+          fam.gentleAboutLoss && !PregnancyRecords.instance.pregnantAfterLoss,
+      hasChild: hasChild,
+      childName: kid.hasRealChild && kid.name != Child.placeholder
+          ? kid.name
+          : null,
+    );
+  }
 
   late int _group = () {
     final id = widget.initialGroup;
@@ -715,9 +742,12 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                           // Hers first (2026-10-23): a section banded to her
                           // weeks leads the tab; past ones sink, nothing hides.
                           // Kept for revert: `page.sectionsOf(group.id)`.
+                          // And her history (2026-10-26): after a loss, the
+                          // sections written for that lead; each says why.
                           for (final section in page.sectionsFor(
                             group.id,
                             _knownWeek,
+                            history: _history,
                           ))
                             for (final tiles in [
                               // A capped rail (PvDoorSection.railMax): the rest is
@@ -726,11 +756,13 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                                   ? section.tilesFor(
                                       widget.pregnancy.currentWeek,
                                       weekKnown: _knownWeek != null,
+                                      history: _history,
                                     )
                                   : section
                                         .tilesFor(
                                           widget.pregnancy.currentWeek,
                                           weekKnown: _knownWeek != null,
+                                          history: _history,
                                         )
                                         .take(section.railMax!)
                                         .toList(),
@@ -858,6 +890,27 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                                 ),
                               // 12 (2026-10-02, TTC's heading gap). Kept for
                               // revert: 13.
+                              // Why her history moved this section, in her
+                              // terms (2026-10-26). The app explains itself:
+                              // a lift with no reason reads as random.
+                              if (pvDoorSectionWhy(section, _history)
+                                  case final why?)
+                                pvDoorPad(
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      why,
+                                      key: ValueKey(
+                                        'pv_door_why_${section.heading}',
+                                      ),
+                                      style: pvManrope(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: p.ink2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               const SizedBox(height: kPvDoorHeadingGap),
                               // ⚠️ EVERY SECTION IS A RAIL. ONE TILE, TWO TILES, A TOOL
                               // TAB — A RAIL. Decided by the user on the phone,

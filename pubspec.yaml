@@ -267,6 +267,11 @@ flutter:
     # My Child phase paintings, one per phase (phase_01..20.webp), from the
     # prompts in docs/PHASE-PAINTING-PROMPTS.md; a missing one shows its number.
     - assets/phases/
+    # Celebration-page paintings, one per moment (birth, try_again,
+    # new_pregnancy, turning_six, milestone .webp), from the prompts in
+    # docs/MOMENT-PAINTING-PROMPTS.md; a moment shows its painting only once it
+    # is in kMomentPaintings (pv_moment_paintings.dart), else its phase painting.
+    - assets/moments/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

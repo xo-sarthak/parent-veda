@@ -207,6 +207,10 @@ needed for those, they match by name / category.
 - **B9 BUILT 2026-10-24** (sync log step 14): 0113 keys 17 tables per
   person. 0113 RUN 2026-10-25 (check query: 17 rows of `user_id,id`). WAITING: the next build; the user's call on the Developer chips
   (BEFORE-LAUNCH §6).
+- **BUILT 2026-10-26:** personalisation reads how a pregnancy ended (STILL-OPEN
+  §61.1), each lift explained on screen; every celebration page has its own
+  painting (all five landed, prompts in `docs/MOMENT-PAINTING-PROMPTS.md`),
+  the phase painting kept as the fallback.
 - **OWED:** celebration pages for birth → parenting and parenting → skilling
   mirroring the TTC new-chapter page (a loss path stays quiet, never
   celebratory); hand-off to the item-1 video. Prototype first (R9).

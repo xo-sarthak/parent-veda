@@ -27,6 +27,7 @@ import '../post_pregnancy/phase_map_screen.dart' show PhasePainting;
 import '../post_pregnancy/pp_child_profile.dart';
 import '../post_pregnancy/pp_phases_data.dart' show kPhases;
 import 'v2_palette.dart';
+import 'pv_moment_paintings.dart';
 
 const String kPvCelebrationRoute = 'celebration';
 
@@ -198,7 +199,9 @@ Future<void> openBirthCelebration(BuildContext context, {required void Function(
   await Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: kPvCelebrationRoute),
     builder: (_) => PvCelebrationScreen(
-      painting: PhasePainting(phase: kPhases.first),
+      // Its own painting once the file lands; the phase painting until then
+      // (2026-10-26). Kept for revert: painting: PhasePainting(phase: kPhases.first),
+      painting: PvMomentPainting(moment: PvMoment.birth, fallback: PhasePainting(phase: kPhases.first)),
       title: words.title,
       line: words.line,
       changes: words.changes,

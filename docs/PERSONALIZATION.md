@@ -136,7 +136,12 @@ One store, stage-scoped vocabularies. Different questions, same engine.
 | Conditions | later | gestational diabetes, low-lying placenta, anemia, thyroid, hypertension, high-risk | eczema, CMPA, food allergy, reflux, colic, tongue tie, asthma, low birth weight, developmental delay, hearing, vision *(built)* |
 | Priorities | later | nutrition, sleep, anxiety, birth prep, fitness, baby development, symptoms | sleep, feeding, development, nutrition, behaviour, learning, milestones, brain, play, health *(built)* |
 | Diet | shared | veg / non-veg / egg / Jain / vegan | shared |
-| Parity | shared | first baby / subsequent | shared |
+| Parity | shared | first baby / subsequent (2026-10-26: "first" sinks the older-child reads on the pregnancy doors) | shared |
+| How the last pregnancy ended (`PregnancyRecords`, derived from her moves, never asked) | a loss within 90 days: After a loss leads the home | after a loss: First weeks' "After IVF or a loss" leads Visit; the positive test reads gently | a pregnancy going on: `PpSignal.babyOnTheWay` lifts the sibling pages |
+| Gentle about (onboarding, after "pregnant before") | — | "A past loss": also leads "After IVF or a loss" (2026-10-26) | — |
+
+Every lift from these rows says why on screen (2026-10-26): a line under the moved section or grid, or the card's
+`ppRelevanceWhy` words. A personalisation she cannot see the reason for reads as the app being random.
 | Learning style | shared | shared | *(built — journey-agnostic, reuse)* |
 | Notify topics | shared | shared | *(built — journey-agnostic, reuse)* |
 

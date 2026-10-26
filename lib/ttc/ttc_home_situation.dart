@@ -32,6 +32,7 @@
 //    on a day she chose to look at, stated as a condition, never as a hope.
 // =============================================================================
 
+import '../services/pregnancy_records.dart' show PregnancyRecords;
 import 'ttc_ready_plan_store.dart' show TtcReadyPlanStore;
 import 'cycle_store.dart';
 // Kept for revert: only the old phase code below read it.
@@ -321,6 +322,7 @@ const String kTtcDoorFertileWindow = 'ttc_conceiving';
 const String kTtcDoorIvf = 'ttc_infertility';
 const String kTtcDoorNotYet = 'ttc_not_yet';
 const String kTtcDoorGettingReady = 'ttc_preconception_health';
+const String kTtcDoorAfterLoss = 'ttc_after_loss';
 
 /// [ids] reordered for her situation. ORDER ONLY: every id that comes in goes
 /// out, once, and nothing is added (a lead door that is not in [ids], such as
@@ -331,14 +333,20 @@ const String kTtcDoorGettingReady = 'ttc_preconception_health';
 /// days put the fertile window (which holds waiting and testing) next. The
 /// rest keep their own order. Getting ready (2026-10-18), with her month
 /// still ahead, puts "Getting ready" first: that is the stage she is in.
+///
+/// [afterLoss] (2026-10-26, STILL-OPEN §61.1): trying again within
+/// `kAfterLossLeadDays` of a loss puts "After a loss" first of all. Her clinic
+/// keeps its door, one row down. An `ended` pregnancy never sets it.
 List<String> ttcHomeDoorOrder(
   List<String> ids, {
   required bool clinicPathway,
   required bool tryingLong,
   required TtcDayPhase phase,
   bool gettingReady = false,
+  bool afterLoss = false,
 }) {
   final leaders = <String>[
+    if (afterLoss) kTtcDoorAfterLoss,
     if (gettingReady && !clinicPathway) kTtcDoorGettingReady,
     if (clinicPathway) kTtcDoorIvf,
     if (tryingLong) kTtcDoorNotYet,
@@ -365,6 +373,7 @@ List<String> ttcHomeDoorOrderNow(List<String> ids, {DateTime? now}) {
     phase: ttcHomePhaseOn(at),
     gettingReady:
         TtcReadyPlanStore.instance.gettingReadyFor(now: at) != null,
+    afterLoss: PregnancyRecords.instance.lossRecentlyClosed(now: at),
   );
 }
 

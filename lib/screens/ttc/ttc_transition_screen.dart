@@ -30,6 +30,7 @@ import 'ttc_treatment_round_screens.dart'
         ttcDueDateText,
         TtcRoundOption;
 import '../../services/pregnancy_controller.dart' show DueDateSource;
+import '../../services/pregnancy_records.dart' show PregnancyRecords;
 import '../../theme/pv_fonts.dart';
 import 'ttc_tool_chrome.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
@@ -186,6 +187,7 @@ class _TtcTransitionScreenState extends State<TtcTransitionScreen> {
       builder: (context, _) {
         final t = TtcS.current();
         final check = _check;
+        final afterLoss = PregnancyRecords.instance.followsLoss;
         final carried = <String>[
           if (_r.cyclesLogged > 0) t.transitionCycles(_r.cyclesLogged),
           if (_r.supplements > 0) t.transitionSupplements(_r.supplements),
@@ -208,11 +210,20 @@ class _TtcTransitionScreenState extends State<TtcTransitionScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.transitionTitle,
+                        // After a loss she recorded, the gentler pair
+                        // (2026-10-26). Kept for revert: t.transitionTitle
+                        // and t.transitionSubtitle for everyone.
+                        Text(
+                            afterLoss
+                                ? t.transitionTitleAfterLoss
+                                : t.transitionTitle,
                             style: ttcFraunces(30,
                                 w: FontWeight.w600, color: ttcInk)),
                         const SizedBox(height: 10),
-                        Text(t.transitionSubtitle,
+                        Text(
+                            afterLoss
+                                ? t.transitionSubtitleAfterLoss
+                                : t.transitionSubtitle,
                             style: ttcBody(14, color: ttcInk, h: 1.55)),
                       ]),
                 ),
