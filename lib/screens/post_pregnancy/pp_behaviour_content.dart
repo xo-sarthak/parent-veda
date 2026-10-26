@@ -1234,6 +1234,10 @@ const PpArea _theNoYear = PpArea(
           title: 'When to ask',
         ),
         PpWhenLine('Turn-taking from about 2. Real sharing from about 4.'),
+        // Early learning EL6: the twin pages link each other.
+        PpLink('Sharing as a daily habit',
+            surfaceId: 'pp_page/parenting_early_learning/hab_sharing',
+            blurb: 'The Early learning side: small turns, every day.'),
       ],
     ),
   ],

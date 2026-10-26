@@ -1836,6 +1836,10 @@ final PpSection kPpDevelopmentSection = PpSection(
                 surfaceId: 'pp_milestones',
                 blurb: 'Language, alongside the other five areas of '
                     'growing.'),
+            // DV10, with Early learning's door 9 build (EL1), by page.
+            PpLink('Help him talk',
+                surfaceId: 'pp_page/parenting_early_learning/skills_language',
+                blurb: 'Five minutes a day that make the biggest difference.'),
           ],
         ),
 
@@ -2088,6 +2092,12 @@ final PpSection kPpDevelopmentSection = PpSection(
               'A speech therapist can assess this and help. It needs '
                   'specific, frequent therapy, so ask early.',
             ]),
+            // DV10, with Early learning's door 9 build (EL1): what to do at
+            // home meanwhile, by page. Special care's two pages wait for
+            // door 12 (DOOR-CONTENT-OWED DV7).
+            PpLink('Help him talk',
+                surfaceId: 'pp_page/parenting_early_learning/skills_language',
+                blurb: 'Five minutes a day at home, alongside any check.'),
           ],
         ),
       ],

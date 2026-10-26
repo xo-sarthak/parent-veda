@@ -157,7 +157,7 @@ two.
 | SLO3 | 23 of the 24 Sleep Sounds tracks | Audio | Rows, honest | Only the tanpura plays (Shravan's file). A tap on any other says "This lullaby (sound, story) is still being recorded. The tanpura plays now." with a Play it pill (SL4). The lullabies are to be recorded as real lori, in Hindi, Tamil and Bengali |
 | SLO4 | Night lights, room thermometers, mosquito nets on the shop | Catalogue | S8c | `pp_products/Night lights` and `Room thermometers` carry the page's tip (`kPpShelfNotYet`); `Mosquito nets` says a chemist has one |
 | SLO5 | A painting for each Tonight card (14 across the bands) | Painting | Built from data | Each card shows a line icon on the night-blue tint until then (`kPpSleepTonightCards`) |
-| SLO6 | Shorter names for 18 tab names (17 since Behaviour's, BHO8, 2026-10-26) that take three lines, or break a word, on the rail card at normal or large text | Names | Listed | `test/door_names_fit_test.dart` `_kOwedShorterNames`, a proposal for each. Three are cut at the normal size today: Potty "Accidents and going backwards", First 40 "Understanding your newborn", Family "Who looks after your child". The words are the user's call, door by door |
+| SLO6 | Shorter names for 18 tab names (17 since Behaviour's, BHO8, 2026-10-26; 15 since Early learning's two, ELO7, 2026-10-26) that take three lines, or break a word, on the rail card at normal or large text | Names | Listed | `test/door_names_fit_test.dart` `_kOwedShorterNames`, a proposal for each. Three are cut at the normal size today: Potty "Accidents and going backwards", First 40 "Understanding your newborn", Family "Who looks after your child". The words are the user's call, door by door |
 
 ### P2. Feeding — `lib/data/doors/pp_door_feeding.dart`
 
@@ -221,13 +221,13 @@ Catalogue items and people the door points at that do not exist yet (each tap sa
 | Labour prep | 6 | 6 | – | – | – |
 | Mind & mood | 6 | 4 (M1, M4–M6) | 1 | 1 | – |
 | Garbh Sanskar | 12 | – | – | – | all twelve closed; owed now = recordings (manifest entries) and R2 hosting (nine URLs) |
-| Sleep (parenting) | 6 | – | – | 1 | 1 (the tab names, 17 left, SLO6); SLO1–SLO5 answer a tap, see the door 7 table |
+| Sleep (parenting) | 6 | – | – | 1 | 1 (the tab names, 15 left, SLO6); SLO1–SLO5 answer a tap, see the door 7 table |
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
 | Health (parenting) | 6 | 3 | – | 3 | 1 (dosing table sign-off) |
 | Development (parenting) | 4 | 1 | – | 3 | – (DV2 is a data job, logged) |
 | Behaviour (parenting) | 23 | – (BH1–BH11 filled 2026-10-02, corrected 2026-10-26) | – | 6 | – (the tab name, BHO8, done 2026-10-26); BHO1–BHO7 answer a tap or wait on data, see the door 8 table |
 | Potty (parenting) | 13 | – (PT1–PT4 written 2026-10-02) | – | 3 | – (PT7–PT13 answer a tap; see the door 5 table) |
-| Early Learning (parenting) | 4 | 2 | – | 2 | – |
+| Early Learning (parenting) | 12 | – (EL1 filled 2026-10-26, EL2 2026-10-02) | – | 2 | – (the two tab names, ELO7, done 2026-10-26); ELO1–ELO6 answer a tap or wait on review, see the door 9 table |
 | First 40 Days (parenting) | 18 | – (FF3–FF5 filled 2026-10-02) | – | 5 | 1 (the day spine, FF10); FF1–FF2 closed into You; FF12–FF18 answer a tap, see the door 6 table |
 | You, Maa (parenting) | 6 | 2 | – | 3 | – |
 | What to buy (parenting) | 10 | 8 | – | 2 | – (call 2: shelves owned as they are) |
@@ -311,7 +311,7 @@ places. `test/pp_behaviour_door_test.dart` fails if one is not in this table.
 | BHO1 | `behaviour/door_intro` | Film · 30–45 s | Not slotted | S4: no chip until the film exists (BH8) |
 | BHO2 | A painting for each Right now card (20 across the four bands) | Painting | Built from data | Each card shows a line icon on the door's rose tint until then (`kPpBehRightNowCards`) |
 | BHO3 | Picture books about feelings, for `beh_name_the_feeling` (BH5) | Data | Not linked | The kids list has no feelings book worth naming: the one "Emotions" goal entry is a placeholder, "Emotions Candidate Book 203" (`kids_books_list.dart`). Worry and new-baby books are linked; feelings waits for a real title in the list |
-| BHO4 | A books screen, so `pp_books/Worry` and `pp_books/New sibling` open a shelf | Screen | S8, honest | Until then the tap names two essential titles from the list and says the Reading shelf has the rest (`kPpNotYetWords`). Shared with Potty's `pp_books/Potty` (PT13) |
+| BHO4 | ~~A books screen, so `pp_books/Worry` and `pp_books/New sibling` open a shelf~~ | Screen | **Done 2026-10-26** (door 9 build) | `pp_books/<name>` opens `PpKidsBooksScreen`: the children's picture books on their own screen, that goal's chip chosen, every age, each book's age on its row (`ppKidsBooksScreenFor`, `pp_kids_books_shelf.dart`). The toasts are commented out. Shared with Potty's `pp_books/Potty` (PT13) |
 | BHO5 | Calm-down items on the shop: feelings cards, a visual timer, a calm-down kit | Catalogue | Not linked | None is stocked, so no page links one (BH5). For the shop list |
 | BHO6 | A behaviour class or course | Class | Not linked | None exists; nothing is linked or invented (BH5) |
 | BHO7 | A real child psychologist on Find help | People | S8e | The He keeps doing this row and the closing card open "Our first experts are joining" until one joins (BH4) |
@@ -343,7 +343,7 @@ pieces as coming-soon cards, copy "written on your go"; one film.
 | PT10 | A "Potty and toilet" shop subcategory: potty, seat insert, step stool, travel potty, cloth trainer pants | Catalogue | S8c | `pp_products/Potties` and `pp_products/Travel potties` answer with the page's tip (`kPpShelfNotYet`). Also in `BEFORE-LAUNCH.md` |
 | PT11 | A potty buying guide | Guide | S8c | `pp_product_guide/Potties`: "We haven't written the potty guide yet. What to check is on this page" (`kPpNotYetWords`) |
 | PT12 | The short potty masterclass (one fortnight, step by step) | Class | S8d | `pp_class/potty_masterclass`: "This class isn't open yet. Tap Tell me". Its paid wording is commented out until it exists |
-| PT13 | A screen for the picture books (`kKidsBooks` has 9 potty books and no screen) | Screen | Notice | `pp_books/Potty` names two titles from the list. When the screen exists, the link opens it filtered to the theme |
+| PT13 | ~~A screen for the picture books (`kKidsBooks` has 9 potty books and no screen)~~ | Screen | **Done 2026-10-26** (door 9 build, BHO4) | `pp_books/Potty` opens the shelf on the list's "Potty Training" goal, all nine books, every age |
 
 ### P7. Early Learning — `lib/data/doors/pp_door_early_learning.dart`
 
@@ -354,10 +354,22 @@ here.
 
 | # | Card | Kind | Outcome | Owed |
 |---|---|---|---|---|
-| EL1 | `rhymes_collection` — Rhymes and songs | Audio library | Coming soon | A whole collection, audio-first like the stories: Hindi, English and regional action rhymes, original or public-domain only, never copyrighted lyrics. Pairs with "Clapping and dancing to a song". |
-| EL2 | `skills_language` — English or the mother tongue, and when to start letters | Article | Coming soon | The words to hold the line when the pressure to start ABCs at two starts. Copy supplied. |
+| EL1 | `rhymes_collection` — Rhymes and songs | Audio library | **Filled 2026-10-26** (door 9 build, EL3): "Rhymes to say together", ten rhymes written out with actions; the recording is ELO2 | A whole collection, audio-first like the stories: Hindi, English and regional action rhymes, original or public-domain only, never copyrighted lyrics. Pairs with "Clapping and dancing to a song". |
+| EL2 | `skills_language` — English or the mother tongue, and when to start letters | Article | **Filled 2026-10-02**; now "Help him talk" (door 9 build, EL1) | The words to hold the line when the pressure to start ABCs at two starts. Copy supplied. |
 | EL3 | The 58 story audios | Audio | Built from data | Every story has a "listen" button and no recording. "A story library with no narration is half-built, so recording the story audio is the first job." |
-| EL4 | The 15 films | Film | Built from data | Every `early_learning/*` slot is a placeholder: tummy-time reach, pouring, spooning dal, the strokes before letters, brushing teeth, the Montessori corner, telling a story with no book, the six read-alouds, readiness, what comes before writing. |
+| EL4 | The 15 films | Film | Built from data | Every `early_learning/*` slot is a placeholder: tummy-time reach, pouring, spooning dal, the strokes before letters, brushing teeth, the Montessori corner, telling a story with no book, the six read-alouds, readiness, what comes before writing. Since the door 9 build every id has the one `early_learning/` prefix (seven were `learning/...`), and a tap says the film is being made (S8a) |
+
+**Added by the door 9 build (2026-10-26, `docs/pp-door-plans/09-early-learning.md` EL1 to EL9, §12).** Nothing here is a coming-soon card: every item answers a tap with a notice, or waits on a review.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| ELO1 | `early_learning/door_intro` | Film · 30–45 s | Not slotted | S4: no chip until the film exists (EL9) |
+| ELO2 | Recordings: the 58 stories and the rhymes page | Audio | S8a | A story row says "This story is still being recorded. You can read it aloud now; it works even better in your voice" (`kPpStoryAudioNote`); the rhymes row says the recording is being made. Demand is low (about 6 searches), so not now (EL3). The Hindi rhymes are in English letters, so the phone's hi-IN voice cannot read them meanwhile |
+| ELO3 | An early learning class or course | Class | Not linked | None exists. The two "masterclass" cards and the section tool are now "Talk to an early learning expert" (EL7); nothing invents a class |
+| ELO4 | A real early learning expert on Find help | People | S8e | Both "Early learning expert" profiles are seeded placeholders; the closing card, the two consult cards and the section tool open the roster until one joins |
+| ELO5 | A dough activity and a puzzle activity, for EL7's one item a page | Content | Placed nearby | No activity page is about play dough or puzzles. Play dough sits on "What comes before writing" (whose hand step is kneading dough), puzzles on "Matching lids to their containers" (the same shape-and-size problem); crayons are on the prewriting activity as planned |
+| ELO6 | The exact folk words of "Ek, do, teen, chaar" | Copy | Written plainly | The content file asked for the folk words to be checked at build. No version could be confirmed, so the card says the numbers one to ten on fingers, nothing invented. REQUIRED_REVIEW with the other rhymes |
+| ELO7 | ~~Shorter names for "Do something today" and "Before letters and numbers"~~ | Name | **Done 2026-10-26** | The user's word: "Ideas for today" and "Letters, numbers". Off `_kOwedShorterNames`; SLO6 is now 15 names |
 
 ### P8. First 40 Days — `lib/data/doors/pp_door_first40.dart`
 
@@ -460,7 +472,7 @@ below are the placeholders; `test/pp_what_to_buy_test.dart` holds them.
 | DV4 | A paediatric physio (expert category) | Expert | S8b | The Sit, crawl, walk row and `dev_movement_signs` say "We're adding paediatric physios. A paediatrician can check this first." with a pill |
 | DV5 | Real developmental paediatricians (`Development expert` is placeholders only) | Expert | Joining soon | On track's row says they are joining and offers a paediatrician (`kPpJoiningSoon`) |
 | DV6 | Times for the 102 phase-doc activities | Data | Shown without | Their cards read "MOVING", not "5 MIN · MOVING": the docs give no duration and none is invented. The doc owner adds them |
-| DV7 | DV10's speech links: Special care's "Not talking yet" and "Speech therapy and the other therapies, explained" (SC2), Early learning's "Help him talk" (EL1) | Link | Not linked | The target pages are built with doors 12 and 9; the links go in with them |
+| DV7 | DV10's speech links: Special care's "Not talking yet" and "Speech therapy and the other therapies, explained" (SC2), Early learning's "Help him talk" (EL1) | Link | Half done | **Early learning's half is in (door 9 build, 2026-10-26):** `dev_speech_by_age` and `dev_speech_flags` link `skills_language`. Special care's two wait for door 12 |
 
 ### P11. Traditions — `lib/data/doors/pp_door_traditions.dart`
 

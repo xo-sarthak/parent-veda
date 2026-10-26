@@ -5954,6 +5954,11 @@ final PpArea _teethEyesEars = PpArea(
           minutes: '1 MIN',
           slotId: 'health/first_teeth_brushing',
         ),
+        // Early learning EL6: the twin pages link each other.
+        PpLink('Brushing as a daily habit',
+            surfaceId: 'pp_page/parenting_early_learning/hab_brushing',
+            blurb: 'The Early learning side: from two minutes of fuss to a '
+                'routine.'),
       ],
     ),
     PpPage(

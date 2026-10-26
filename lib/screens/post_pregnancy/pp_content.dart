@@ -330,11 +330,17 @@ class PpAudioSlot extends PpBlock {
     required this.slotId,
     this.category,
     this.minutes,
+    this.pendingNote,
   });
   final String title;
   final String? category;
   final String? minutes;
   final String slotId;
+
+  /// What a tap says while there is no recording (S8a). Null keeps the
+  /// placeholder's own words. Early learning's stories say "read it aloud
+  /// now" (EL3), which is truer there than "the words are on this page".
+  final String? pendingNote;
 }
 
 /// A soft link across to a tool or another page — "links to the related tool".
@@ -1502,6 +1508,7 @@ class PpBlockView extends StatelessWidget {
         category: b.category,
         length: b.minutes,
         slotId: b.slotId,
+        pendingNote: b.pendingNote,
       );
 
   /// The carousel's launch card: a tinted panel that says what it is, how long

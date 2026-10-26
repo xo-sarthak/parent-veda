@@ -285,8 +285,11 @@ void main() {
       expect(ppSurfaceUnavailable('pp_products/Potties'), contains('wide, stable base'));
       expect(ppSurfaceUnavailable('pp_products/Travel potties'), contains('folding'));
       expect(ppSurfaceUnavailable('pp_product_guide/Potties'), contains('on this page'));
-      // The books are named from the list, never invented.
-      expect(ppSurfaceUnavailable('pp_books/Potty'), contains('Once Upon a Potty'));
+      // PT13 (door 9 build): the books open on their own shelf. Was the toast
+      // naming two from the list, kept for revert:
+      // expect(ppSurfaceUnavailable('pp_books/Potty'), contains('Once Upon a Potty'));
+      expect(ppSurfaceUnavailable('pp_books/Potty'), isNull);
+      expect(ppScreenForSurface('pp_books/Potty'), isNotNull);
     });
 
     test('PT6: the content changes', () {

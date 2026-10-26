@@ -22,30 +22,50 @@ import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show HubIntentArt, IntentMark;
 import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_chrome.dart' show PregSectionHeading;
-import '../pregnancy/preg_tool_chrome.dart' show pregToolPad;
+import '../pregnancy/preg_tool_chrome.dart' show pregToolPad, PregToolScaffold;
 import '../products/pv_store_chrome.dart' show PvChip;
 import '../v2/v2_palette.dart';
 import 'pp_child_profile.dart';
 import 'pp_phases_data.dart' show ppFillChild;
 
 class PpKidsBooksShelf extends StatefulWidget {
-  const PpKidsBooksShelf({super.key, required this.p});
+  const PpKidsBooksShelf({
+    super.key,
+    required this.p,
+    this.goal,
+    this.allAges = false,
+    this.heading = true,
+  });
   final V2Palette p;
+
+  /// The goal chip chosen when the shelf opens (`pp_books/<goal>`, BHO4).
+  /// Null opens on All, as the Reading home always has.
+  final String? goal;
+
+  /// ⚠️ EVERY AGE, NOT HIS (BHO4). On the Reading home the shelf is his age,
+  /// which is right for browsing. A page link is not browsing: the worry
+  /// books are 3 to 5 and Behaviour's Scared page starts at 1, so the link
+  /// would have opened on nothing. Each row already says its own age.
+  final bool allAges;
+
+  /// Off on the shelf's own screen, whose title already says it.
+  final bool heading;
 
   @override
   State<PpKidsBooksShelf> createState() => _PpKidsBooksShelfState();
 }
 
 class _PpKidsBooksShelfState extends State<PpKidsBooksShelf> {
-  String? _goal;
-  bool _all = false;
+  late String? _goal = widget.goal;
+  // A goal opened from a page shows all its books; the home keeps six first.
+  late bool _all = widget.goal != null;
   static const int _first = 6;
 
   @override
   Widget build(BuildContext context) {
     final p = widget.p;
     final child = ChildProfileStore.instance;
-    final months = child.hasRealChild ? child.ageInMonths : null;
+    final months = widget.allAges || !child.hasRealChild ? null : child.ageInMonths;
     final books = kidsBooksFor(months);
     final goals = kidsBookGoals(books);
     final shown = [for (final b in books) if (_goal == null || b.goals.contains(_goal)) b];
@@ -55,13 +75,23 @@ class _PpKidsBooksShelfState extends State<PpKidsBooksShelf> {
       key: const ValueKey('pp_kids_books_shelf'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        pregToolPad(PregSectionHeading(
-          'Books to read with your child',
-          lead: months == null
-              ? 'Picture books and first readers, the team\'s essentials first.'
-              : ppFillChild('Picture books and first readers for his age, the team\'s essentials first.'),
-        )),
-        const SizedBox(height: 12),
+        if (widget.heading) ...[
+          pregToolPad(PregSectionHeading(
+            'Books to read with your child',
+            lead: months == null
+                ? 'Picture books and first readers, the team\'s essentials first.'
+                : ppFillChild('Picture books and first readers for his age, the team\'s essentials first.'),
+          )),
+          const SizedBox(height: 12),
+        ],
+        // Before BHO4, kept for revert:
+        // pregToolPad(PregSectionHeading(
+        //   'Books to read with your child',
+        //   lead: months == null
+        //       ? 'Picture books and first readers, the team\'s essentials first.'
+        //       : ppFillChild('Picture books and first readers for his age, the team\'s essentials first.'),
+        // )),
+        // const SizedBox(height: 12),
         SizedBox(
           height: (scaler.scale(13) * 1.4 + 18).clamp(36.0, 60.0),
           child: ListView.separated(
@@ -157,6 +187,59 @@ class _PpKidsBooksShelfState extends State<PpKidsBooksShelf> {
           ]),
         ),
       ),
+    );
+  }
+}
+
+// =============================================================================
+//  The shelf on its own screen, on one goal (BHO4, built in the door 9 build)
+// -----------------------------------------------------------------------------
+//  `pp_books/<name>` opened a toast naming two titles, because the shelf sat
+//  far down the Reading home and nothing could land on it. Now a page's
+//  "picture books for this" opens the shelf by itself, that goal's chip
+//  already chosen, every age, each book's age on its row.
+// =============================================================================
+
+/// A page link's name -> (the list's goal, the screen's title). The names
+/// are the ones the pages already use; the goals are the sheet's own words,
+/// so nothing here renames a book or invents a goal.
+const Map<String, (String, String)> kPpBookGoals = {
+  'Worry': ('Anxiety', 'Picture books for worries'),
+  'New sibling': ('New Sibling', 'Picture books for a new baby'),
+  'Potty': ('Potty Training', 'Picture books for potty time'),
+};
+
+/// The shelf for `pp_books/<name>`: a page name above, or a goal the list
+/// already has. Null for anything else, so a typo fails the link gate
+/// instead of opening a shelf on nothing.
+Widget? ppKidsBooksScreenFor(String name) {
+  if (kPpBookGoals[name] case (final goal, final title)) {
+    return PpKidsBooksScreen(goal: goal, title: title);
+  }
+  if (kidsBookGoals(kKidsBooks).contains(name)) {
+    return PpKidsBooksScreen(goal: name, title: 'Picture books: $name');
+  }
+  return null;
+}
+
+class PpKidsBooksScreen extends StatelessWidget {
+  const PpKidsBooksScreen({super.key, required this.goal, required this.title});
+
+  /// The list's goal, chosen on open.
+  final String goal;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return PregToolScaffold(
+      hue: 206,
+      eyebrow: 'Books to read together',
+      title: title,
+      intro: 'Every age is here, and each book says its own on its row. '
+          'The team\'s essentials come first.',
+      mark: IntentMark.bookMark,
+      children: [PpKidsBooksShelf(p: p, goal: goal, allAges: true, heading: false)],
     );
   }
 }

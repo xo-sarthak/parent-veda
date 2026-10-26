@@ -132,8 +132,6 @@ const Map<String, String> _kOwedShorterNames = {
   'parenting_potty/bumpy': 'Accidents', // 3 lines at 1.0
   'parenting_first_40/samjho': 'Your newborn', // 3 lines at 1.0
   'parenting_family/care': 'Childcare', // 3 lines at 1.0
-  'parenting_early_learning/today': 'Ideas for today',
-  'parenting_early_learning/before_letters': 'Letters, numbers',
   'parenting_feeding/cooking': 'Family cooking',
   'parenting_first_40/feeding_rest': 'Feeding and sleep',
   'parenting_papers/schemes': 'Schemes',

@@ -400,9 +400,11 @@ void main() {
           expect(w, isA<ReadingReaderScreen>(), reason: s);
           expect((w as ReadingReaderScreen).article.id, s.substring('pp_book/'.length), reason: s);
         } else {
-          // No books screen yet: the tap names two real titles from the list.
-          final words = kPpNotYetWords[s]!;
-          expect(words, isNot(contains('any bookshop')), reason: s);
+          // BHO4 (door 9 build): the shelf opens on its goal. Was a toast
+          // naming two titles (`kPpNotYetWords[s]`), kept for revert. The
+          // books it shows are held in pp_early_learning_door_test.
+          expect(ppSurfaceUnavailable(s), isNull, reason: s);
+          expect(ppScreenForSurface(s), isNotNull, reason: s);
         }
       }
       // A typo never opens the reader's fallback article.

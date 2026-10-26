@@ -164,10 +164,15 @@ void main() {
       expect(shelf.subIds, hasLength(kPpToysAndCrayonsKinds.length));
     });
 
-    test('the potty books toast no longer says there are no books', () {
-      final words = kPpNotYetWords['pp_books/Potty']!;
-      expect(words, isNot(contains("haven't put picture books")));
-      expect(words, contains('Reading shelf'));
+    // BHO4 / PT13 (door 9 build): no toast at all now; the shelf opens on
+    // its goal. Was the toast's words checked, kept for revert:
+    // final words = kPpNotYetWords['pp_books/Potty']!;
+    // expect(words, isNot(contains("haven't put picture books")));
+    // expect(words, contains('Reading shelf'));
+    test('the potty books link opens the picture books, not a toast', () {
+      expect(kPpNotYetWords['pp_books/Potty'], isNull);
+      expect(ppSurfaceUnavailable('pp_books/Potty'), isNull);
+      expect(ppScreenForSurface('pp_books/Potty'), isNotNull);
     });
   });
 }

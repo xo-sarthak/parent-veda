@@ -5,8 +5,9 @@
 //  docs/PP-SECTION-PATTERN.md. The review said "Don't like what we have", and
 //  what it did not like was emptiness: the shell existed and had nothing in it.
 //  So this file is deliberately the largest section in the parenting stage.
-//  Twelve areas, and the story library is real pages with real stories in them
-//  rather than a list of titles that open nothing.
+//  Thirteen areas (twelve until the rhymes), and the story library is real
+//  pages with real stories in them rather than a list of titles that open
+//  nothing.
 //
 //  THIS FILE IS DATA. No layout, no Scaffold, no TextStyle. `PpSectionScreen`
 //  renders the landing and `PpContentPage` renders every page.
@@ -106,11 +107,19 @@ const PpBandSet kPpEarlyLearningBands = PpBandSet([
   ),
 ]);
 
+/// ⚠️ WHAT A STORY'S "LISTEN" ROW SAYS UNTIL IT IS RECORDED (door plan 09,
+/// EL3, S8a). The 58 rows answered a tap with the generic "the words are
+/// written on this page", which is true and misses the point: the story is
+/// for reading aloud, and her voice is the better one anyway.
+const String kPpStoryAudioNote = 'This story is still being recorded. You can '
+    'read it aloud now; it works even better in your voice.';
+
 /// Band groups, named once so a retag is one edit rather than forty.
 const List<String> _fromOne = ['one', 'two', 'three', 'four'];
 const List<String> _fromTwo = ['two', 'three', 'four'];
 const List<String> _fromThree = ['three', 'four'];
-const List<String> _earlyYears = ['one', 'two', 'three'];
+// Unused since the bedtime tales run to five (EL2), kept for revert:
+// const List<String> _earlyYears = ['one', 'two', 'three'];
 
 // =============================================================================
 //  THE SECTION
@@ -178,11 +187,13 @@ final PpSection kPpEarlyLearningSection = PpSection(
       surfaceId: 'pp_read',
       icon: Icons.menu_book_outlined,
     ),
+    // EL7: the same promise of a class that does not exist. Was 'The
+    // early learning masterclass' on `pp_courses`, kept for revert.
     PpSectionTool(
-      label: 'The early learning masterclass',
-      blurb: 'A short course on learning through play at home, and what school '
+      label: 'Talk to an early learning expert',
+      blurb: 'A 1:1 about learning through play at home, and what school '
           'readiness really asks of a child.',
-      surfaceId: 'pp_courses',
+      surfaceId: 'pp_experts/Early learning expert',
       icon: Icons.school_outlined,
     ),
   ],
@@ -265,7 +276,7 @@ const PpArea _today = PpArea(
           subtitle: 'Where the arms go, and the rolled-cloth trick for a baby '
               'who hates it.',
           minutes: '4 MIN',
-          slotId: 'learning/act/tummy_reach',
+          slotId: 'early_learning/act_tummy_reach', // EL8: was 'learning/act/tummy_reach'
         ),
       ],
     ),
@@ -743,7 +754,7 @@ const PpArea _today = PpArea(
           subtitle: 'How much water to start with, and where to sit so you do '
               'not take over.',
           minutes: '3 MIN',
-          slotId: 'learning/act/water_pouring',
+          slotId: 'early_learning/act_water_pouring', // EL8: was 'learning/act/water_pouring'
         ),
       ],
     ),
@@ -922,7 +933,7 @@ const PpArea _today = PpArea(
           subtitle: 'Spooning, pouring and scooping, set up with ordinary '
               'utensils.',
           minutes: '5 MIN',
-          slotId: 'learning/act/spooning_dal',
+          slotId: 'early_learning/act_spooning_dal', // EL8: was 'learning/act/spooning_dal'
         ),
       ],
     ),
@@ -1000,6 +1011,12 @@ const PpArea _today = PpArea(
         ], heading: 'What it builds'),
         PpWhenLine('From about two years for press-on lids, closer to three for '
             'screw tops.'),
+        // EL7: the same shape-and-size problem, once the lids are easy.
+        PpLink(
+          'A first wooden puzzle, when the lids are easy',
+          surfaceId: 'pp_toys/Puzzles',
+          blurb: 'Optional. Big pieces with knobs.',
+        ),
       ],
     ),
     PpPage(
@@ -1286,7 +1303,7 @@ const PpArea _today = PpArea(
           title: 'The strokes that come before letters',
           subtitle: 'The six shapes, shown big in a tray of flour and on paper.',
           minutes: '6 MIN',
-          slotId: 'learning/act/prewriting_lines',
+          slotId: 'early_learning/act_prewriting_lines', // EL8: was 'learning/act/prewriting_lines'
         ),
         PpCallout(
           'If a preschool sends home writing worksheets for a three-year-old, '
@@ -1294,6 +1311,12 @@ const PpArea _today = PpArea(
           'formal writing, and plenty shows it puts children off.',
           kind: PpCalloutKind.myth,
           title: 'Earlier is not better',
+        ),
+        // EL7: the one item on this page, after the free things.
+        PpLink(
+          'Fat crayons, if you want them',
+          surfaceId: 'pp_toys/Crayons',
+          blurb: 'Optional. Chunky ones a small fist can hold.',
         ),
       ],
     ),
@@ -1902,7 +1925,7 @@ const PpArea _montessori = PpArea(
           subtitle: 'Set up in a normal flat, with a low shelf, three trays and '
               'nothing bought.',
           minutes: '8 MIN',
-          slotId: 'learning/mont/setup_walkthrough',
+          slotId: 'early_learning/mont_setup_walkthrough', // EL8: was 'learning/mont/setup_walkthrough'
         ),
       ],
     ),
@@ -2058,12 +2081,15 @@ const PpArea _montessori = PpArea(
           surfaceId: 'pp_milestones', // was 'pp_development', which opens the Development door (DV3)
           blurb: 'Milestones and leaps, which often explain the current phase.',
         ),
+        // EL7: no class exists, so the card no longer promises one; the
+        // role already opened the experts. Was 'The early learning
+        // masterclass' with `surfaceId: 'pp_courses'`, kept for revert.
         PpConsult(
-          title: 'The early learning masterclass',
-          whoFor: 'For a parent who wants the whole picture in one sitting. '
+          title: 'Talk to an early learning expert',
+          whoFor: 'For a parent who wants the whole picture in one sitting: '
               'how learning through play works at home, and how to answer '
               'relatives who think a child must be writing by now.',
-          surfaceId: 'pp_courses',
+          surfaceId: 'pp_experts/Early learning expert',
           role: 'early_learning',
         ),
       ],
@@ -2260,7 +2286,8 @@ const PpArea _bedtimeTales = PpArea(
   blurb: 'Ten very short, very calm stories for the last ten minutes of the '
       'day. From about one year.',
   hue: 232,
-  bands: _earlyYears,
+  // EL2: they run to five; one of them says "right up to four". Was _earlyYears, kept for revert.
+  bands: _fromOne,
   pages: [
     PpPage(
       id: 'st_bed_sleepy_elephant',
@@ -2305,6 +2332,7 @@ const PpArea _bedtimeTales = PpArea(
         PpWhenLine('From about one year. It works right up to four.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_sleepy_elephant',
@@ -2345,6 +2373,7 @@ const PpArea _bedtimeTales = PpArea(
             'routine by two.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_goodnight_house',
@@ -2356,6 +2385,8 @@ const PpArea _bedtimeTales = PpArea(
       title: 'The moon that followed us home',
       subtitle: 'Little bedtime tales',
       format: 'STORY',
+      // EL2: "From about two years", so not on the one-to-two shelf.
+      bands: _fromTwo,
       blocks: [
         PpIntro('A story about the thing every child notices from a moving car '
             'or a scooter, and finds a little bit wonderful.'),
@@ -2368,10 +2399,19 @@ const PpArea _bedtimeTales = PpArea(
           'came past the vegetable market as well.',
           'The boy said, Papa, the moon is following us. And his father said, '
           'yes, it does that. It walks people home.',
+          // EL8 (door 9 build): the walk home three times, because the
+          // repeating is what a two-year-old loves.
+          'At the red light they stopped, and the moon peeked out between two '
+          'tall buildings, as if it was waiting for the light to change too. '
+          'When the light went green, off they went, and off went the moon.',
+          'Past the temple they went, and the moon hid for a moment behind the '
+          'temple tower. The boy held his breath. Then out it came on the '
+          'other side, round and white, still walking them home.',
           'When they stopped at their own gate, the moon stopped too, resting '
           'just above the water tank. The boy waved at it. And when he lay down '
           'in his bed, he could still see it through the window, waiting there '
           'until he fell asleep.',
+          'Goodnight, moon, he whispered. Thank you for walking me home.',
         ]),
         PpCards([
           PpCard('The gentle idea in it',
@@ -2385,6 +2425,7 @@ const PpArea _bedtimeTales = PpArea(
             'moon.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_moon_follows',
@@ -2396,6 +2437,8 @@ const PpArea _bedtimeTales = PpArea(
       title: 'The little sparrow who came home',
       subtitle: 'Little bedtime tales',
       format: 'STORY',
+      // EL2: "From about two years", so not on the one-to-two shelf.
+      bands: _fromTwo,
       blocks: [
         PpIntro('A story about a small bird, a big day, and a nest waiting at '
             'the end of it.'),
@@ -2425,6 +2468,7 @@ const PpArea _bedtimeTales = PpArea(
         PpWhenLine('From about two years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_sparrow_nest',
@@ -2464,6 +2508,7 @@ const PpArea _bedtimeTales = PpArea(
         PpWhenLine('From about eighteen months.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_puppy_blanket',
@@ -2475,6 +2520,8 @@ const PpArea _bedtimeTales = PpArea(
       title: 'The cat who wanted one more story',
       subtitle: 'Little bedtime tales',
       format: 'STORY',
+      // EL2: "From about two years", so not on the one-to-two shelf.
+      bands: _fromTwo,
       blocks: [
         PpIntro('A story about the exact thing your child is about to ask for, '
             'which is why it works so well.'),
@@ -2504,6 +2551,7 @@ const PpArea _bedtimeTales = PpArea(
             'who negotiates at bedtime.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_one_more_story',
@@ -2515,6 +2563,8 @@ const PpArea _bedtimeTales = PpArea(
       title: 'The tired little auto',
       subtitle: 'Little bedtime tales',
       format: 'STORY',
+      // EL2: "From about two years", so not on the one-to-two shelf.
+      bands: _fromTwo,
       blocks: [
         PpIntro('For the child who loves anything with wheels. A busy day, and '
             'then a quiet parking spot.'),
@@ -2545,6 +2595,7 @@ const PpArea _bedtimeTales = PpArea(
         PpWhenLine('From about two years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_tired_auto',
@@ -2583,6 +2634,7 @@ const PpArea _bedtimeTales = PpArea(
             'as a settling routine.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_ten_toes',
@@ -2623,6 +2675,7 @@ const PpArea _bedtimeTales = PpArea(
             'night.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_rain_on_roof',
@@ -2662,6 +2715,7 @@ const PpArea _bedtimeTales = PpArea(
         PpWhenLine('From about one year.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Bedtime tale',
           minutes: '2 MIN',
           slotId: 'learning/story/bed_star_waited',
@@ -2688,7 +2742,8 @@ const PpArea _panchatantra = PpArea(
   blurb: 'Twelve of the best known, told plainly. Cleverness, friendship and '
       'the cost of greed. From about two and a half.',
   hue: 28,
-  bands: _fromTwo,
+  // EL2: its stories say three to four and a half, never two. Was _fromTwo, kept for revert.
+  bands: _fromThree,
   pages: [
     PpPage(
       id: 'st_pan_monkey_crocodile',
@@ -2740,6 +2795,7 @@ const PpArea _panchatantra = PpArea(
             'river-and-animals story without the betrayal registering.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_monkey_crocodile',
@@ -2780,6 +2836,7 @@ const PpArea _panchatantra = PpArea(
         PpWhenLine('From about three years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_lion_rabbit',
@@ -2822,6 +2879,7 @@ const PpArea _panchatantra = PpArea(
             'picture to draw afterwards.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_blue_jackal',
@@ -2866,6 +2924,7 @@ const PpArea _panchatantra = PpArea(
             'is a lot to hold before that.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '5 MIN',
           slotId: 'learning/story/pan_four_friends',
@@ -2907,6 +2966,7 @@ const PpArea _panchatantra = PpArea(
         PpWhenLine('From about three years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_talkative_tortoise',
@@ -2918,6 +2978,8 @@ const PpArea _panchatantra = PpArea(
       title: 'The man, the goat and the three tricksters',
       subtitle: 'Panchatantra',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('Three men tell one man the same lie, one after another, and he '
             'ends up believing them over his own eyes.'),
@@ -2949,6 +3011,7 @@ const PpArea _panchatantra = PpArea(
             'knowing more than the character does.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_three_tricksters',
@@ -2960,6 +3023,8 @@ const PpArea _panchatantra = PpArea(
       title: 'The crows and the snake',
       subtitle: 'Panchatantra',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('Two small birds cannot fight a snake, so they arrange for '
             'somebody much larger to do it for them.'),
@@ -2990,6 +3055,7 @@ const PpArea _panchatantra = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_crows_snake',
@@ -3001,6 +3067,8 @@ const PpArea _panchatantra = PpArea(
       title: 'The mice that ate the iron scales',
       subtitle: 'Panchatantra',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('A merchant tells a ridiculous lie, and gets an equally '
             'ridiculous lie straight back. Children find this one very funny.'),
@@ -3032,6 +3100,7 @@ const PpArea _panchatantra = PpArea(
             'hold both halves of it.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_iron_scales',
@@ -3043,6 +3112,8 @@ const PpArea _panchatantra = PpArea(
       title: 'The hare and the elephants',
       subtitle: 'Panchatantra',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('A herd of elephants is trampling the hares. One small hare '
             'talks them into leaving, using nothing but the moon.'),
@@ -3073,6 +3144,7 @@ const PpArea _panchatantra = PpArea(
             'bucket of water afterwards.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_hare_elephants',
@@ -3084,6 +3156,8 @@ const PpArea _panchatantra = PpArea(
       title: 'The bird with two heads',
       subtitle: 'Panchatantra',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('One body, two heads, and a quarrel that neither of them can '
             'win. A short story with a very clear point.'),
@@ -3112,6 +3186,7 @@ const PpArea _panchatantra = PpArea(
             'are refusing to share.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '3 MIN',
           slotId: 'learning/story/pan_two_headed_bird',
@@ -3135,6 +3210,15 @@ const PpArea _panchatantra = PpArea(
           'green fields near the village. The farmers saw a tiger among their '
           'crops and ran, and the donkey ate his fill of young barley every '
           'night and grew fat and glossy.',
+          // EL8 (door 9 build): the middle, told in full.
+          'Every evening the washerman tied the skin on, and every morning, '
+          'before the sun was up, he led the donkey home and hid the skin under '
+          'his washing. In the village, people talked of nothing but the tiger '
+          'in the barley. Children were kept indoors. The farmers watched from '
+          'the edges of their fields, and none of them dared go near.',
+          'The donkey loved it. Nobody shouted at him, nobody chased him, and '
+          'nobody loaded him with heavy bundles of clothes at night. For the '
+          'first time in his life he was never hungry.',
           'This went on happily for weeks. Then one night, from a nearby field, '
           'the donkey heard a she-donkey braying.',
           'He forgot everything. He lifted his head and brayed back at the top '
@@ -3145,7 +3229,8 @@ const PpArea _panchatantra = PpArea(
         PpCards([
           PpCard('What it teaches',
               'A disguise only lasts until you behave like yourself, so it is '
-              'simpler not to pretend.'),
+              'simpler not to pretend. Being yourself is safer than '
+              'pretending.'),
           PpCard('Talk about it',
               'The donkey knew he had to be silent. Why do you think he brayed '
               'anyway?'),
@@ -3153,6 +3238,7 @@ const PpArea _panchatantra = PpArea(
         PpWhenLine('From about three and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_donkey_tiger_skin',
@@ -3164,6 +3250,8 @@ const PpArea _panchatantra = PpArea(
       title: 'The three fishes',
       subtitle: 'Panchatantra',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('Three fish hear the same warning. One acts, one waits, one '
             'refuses to believe it. A story about not putting things off.'),
@@ -3194,6 +3282,7 @@ const PpArea _panchatantra = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Panchatantra',
           minutes: '4 MIN',
           slotId: 'learning/story/pan_three_fishes',
@@ -3220,7 +3309,8 @@ const PpArea _jataka = PpArea(
   blurb: 'Ten animal stories about kindness, courage and keeping a promise. '
       'The gentlest of the older collections.',
   hue: 100,
-  bands: _fromTwo,
+  // EL2: its stories say four to five. Was _fromTwo, kept for revert.
+  bands: ['four'],
   pages: [
     PpPage(
       id: 'st_jat_monkey_bridge',
@@ -3269,6 +3359,7 @@ const PpArea _jataka = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '4 MIN',
           slotId: 'learning/story/jat_monkey_bridge',
@@ -3312,6 +3403,7 @@ const PpArea _jataka = PpArea(
             'starting to understand promises.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '4 MIN',
           slotId: 'learning/story/jat_deer_river',
@@ -3354,6 +3446,7 @@ const PpArea _jataka = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '3 MIN',
           slotId: 'learning/story/jat_quail_fire',
@@ -3362,7 +3455,8 @@ const PpArea _jataka = PpArea(
     ),
     PpPage(
       id: 'st_jat_banyan_deer',
-      title: 'The deer who took another deer place',
+      // EL8: was 'The deer who took another deer place', kept for revert.
+      title: "The deer who took another deer's place",
       subtitle: 'Jataka tales',
       format: 'STORY',
       blocks: [
@@ -3397,6 +3491,7 @@ const PpArea _jataka = PpArea(
             'best with a child who can sit with it.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '5 MIN',
           slotId: 'learning/story/jat_banyan_deer',
@@ -3438,6 +3533,7 @@ const PpArea _jataka = PpArea(
         PpWhenLine('From about three and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '4 MIN',
           slotId: 'learning/story/jat_elephant_dog',
@@ -3479,6 +3575,7 @@ const PpArea _jataka = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '4 MIN',
           slotId: 'learning/story/jat_ox_kind_words',
@@ -3519,6 +3616,7 @@ const PpArea _jataka = PpArea(
         PpWhenLine('From about four and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '4 MIN',
           slotId: 'learning/story/jat_hare_moon',
@@ -3560,6 +3658,7 @@ const PpArea _jataka = PpArea(
         PpWhenLine('From about four and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '4 MIN',
           slotId: 'learning/story/jat_woodpecker_lion',
@@ -3602,6 +3701,7 @@ const PpArea _jataka = PpArea(
         PpWhenLine('From about four and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '4 MIN',
           slotId: 'learning/story/jat_crane_crab',
@@ -3643,6 +3743,7 @@ const PpArea _jataka = PpArea(
             'grandparents.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Jataka tales',
           minutes: '4 MIN',
           slotId: 'learning/story/jat_parrot_tree',
@@ -3668,7 +3769,8 @@ const PpArea _birbal = PpArea(
   blurb: 'Ten stories about a clever answer arriving just in time. Wit, '
       'fairness, and not being fooled. From about three and a half.',
   hue: 300,
-  bands: _fromThree,
+  // EL2: its stories say four to five. Was _fromThree, kept for revert.
+  bands: ['four'],
   pages: [
     PpPage(
       id: 'st_bir_shorter_line',
@@ -3714,6 +3816,7 @@ const PpArea _birbal = PpArea(
             'you tell it.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '2 MIN',
           slotId: 'learning/story/bir_shorter_line',
@@ -3751,6 +3854,7 @@ const PpArea _birbal = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '3 MIN',
           slotId: 'learning/story/bir_crows',
@@ -3792,6 +3896,7 @@ const PpArea _birbal = PpArea(
         PpWhenLine('From about five years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '3 MIN',
           slotId: 'learning/story/bir_well_water',
@@ -3830,6 +3935,7 @@ const PpArea _birbal = PpArea(
         PpWhenLine('From about four and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '3 MIN',
           slotId: 'learning/story/bir_pot_baby',
@@ -3873,6 +3979,7 @@ const PpArea _birbal = PpArea(
         PpWhenLine('From about five years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '4 MIN',
           slotId: 'learning/story/bir_khichdi',
@@ -3912,6 +4019,7 @@ const PpArea _birbal = PpArea(
         PpWhenLine('From about five years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '3 MIN',
           slotId: 'learning/story/bir_brinjal',
@@ -3949,6 +4057,7 @@ const PpArea _birbal = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '3 MIN',
           slotId: 'learning/story/bir_beautiful_child',
@@ -3988,6 +4097,7 @@ const PpArea _birbal = PpArea(
         PpWhenLine('From about five years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '3 MIN',
           slotId: 'learning/story/bir_parrot',
@@ -4029,6 +4139,7 @@ const PpArea _birbal = PpArea(
             'because the child works it out one beat before the ending.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '3 MIN',
           slotId: 'learning/story/bir_magic_stick',
@@ -4069,6 +4180,7 @@ const PpArea _birbal = PpArea(
         PpWhenLine('From about five years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Akbar and Birbal',
           minutes: '4 MIN',
           slotId: 'learning/story/bir_barber_dream',
@@ -4096,7 +4208,8 @@ const PpArea _tenali = PpArea(
   blurb: 'Six tales from the court at Vijayanagara. Quick thinking, and a poet '
       'who was never quite as foolish as he looked.',
   hue: 12,
-  bands: _fromThree,
+  // EL2: its stories say four to five. Was _fromThree, kept for revert.
+  bands: ['four'],
   pages: [
     PpPage(
       id: 'st_ten_thieves_garden',
@@ -4142,6 +4255,7 @@ const PpArea _tenali = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Tenali Rama',
           minutes: '3 MIN',
           slotId: 'learning/story/ten_thieves_garden',
@@ -4150,7 +4264,8 @@ const PpArea _tenali = PpArea(
     ),
     PpPage(
       id: 'st_ten_cats_milk',
-      title: 'The king cats and the milk',
+      // EL8: was 'The king cats and the milk', kept for revert.
+      title: "The king's cats and the milk",
       subtitle: 'Tenali Rama',
       format: 'STORY',
       blocks: [
@@ -4183,6 +4298,7 @@ const PpArea _tenali = PpArea(
         PpWhenLine('From about four and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Tenali Rama',
           minutes: '4 MIN',
           slotId: 'learning/story/ten_cats_milk',
@@ -4222,6 +4338,7 @@ const PpArea _tenali = PpArea(
         PpWhenLine('From about four and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Tenali Rama',
           minutes: '3 MIN',
           slotId: 'learning/story/ten_smell_and_sound',
@@ -4261,6 +4378,7 @@ const PpArea _tenali = PpArea(
         PpWhenLine('From about five years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Tenali Rama',
           minutes: '3 MIN',
           slotId: 'learning/story/ten_half_portrait',
@@ -4305,6 +4423,7 @@ const PpArea _tenali = PpArea(
             'who is not simply good.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Tenali Rama',
           minutes: '4 MIN',
           slotId: 'learning/story/ten_horse',
@@ -4347,6 +4466,7 @@ const PpArea _tenali = PpArea(
         PpWhenLine('From about five years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'Tenali Rama',
           minutes: '4 MIN',
           slotId: 'learning/story/ten_bag_of_gold',
@@ -4372,7 +4492,8 @@ const PpArea _worldTales = PpArea(
   blurb: 'Ten short tales other countries tell their children, about sharing, '
       'courage and sticking at things.',
   hue: 190,
-  bands: _fromTwo,
+  // EL2: from two and a half (the lion and the mouse) to four and a half. Was _fromTwo, kept for revert.
+  bands: _fromThree,
   pages: [
     PpPage(
       id: 'st_world_lion_mouse',
@@ -4417,6 +4538,7 @@ const PpArea _worldTales = PpArea(
             'story a child really follows.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '3 MIN',
           slotId: 'learning/story/world_lion_mouse',
@@ -4456,6 +4578,7 @@ const PpArea _worldTales = PpArea(
         PpWhenLine('From about three and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '3 MIN',
           slotId: 'learning/story/world_cried_wolf',
@@ -4494,6 +4617,7 @@ const PpArea _worldTales = PpArea(
         PpWhenLine('From about three years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '3 MIN',
           slotId: 'learning/story/world_tortoise_hare',
@@ -4505,6 +4629,8 @@ const PpArea _worldTales = PpArea(
       title: 'The ant and the grasshopper',
       subtitle: 'Stories from around the world',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('One works all summer, one sings all summer. A story about '
             'doing the boring thing before you need it.'),
@@ -4533,6 +4659,7 @@ const PpArea _worldTales = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '3 MIN',
           slotId: 'learning/story/world_ant_grasshopper',
@@ -4573,6 +4700,7 @@ const PpArea _worldTales = PpArea(
             'from four.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '3 MIN',
           slotId: 'learning/story/world_crow_pitcher',
@@ -4584,6 +4712,8 @@ const PpArea _worldTales = PpArea(
       title: 'The north wind and the sun',
       subtitle: 'Stories from around the world',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('A competition about who is stronger, settled by a man walking '
             'along a road in a coat.'),
@@ -4613,6 +4743,7 @@ const PpArea _worldTales = PpArea(
             'trying to shout less.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '3 MIN',
           slotId: 'learning/story/world_wind_and_sun',
@@ -4624,6 +4755,8 @@ const PpArea _worldTales = PpArea(
       title: 'Stone soup',
       subtitle: 'Stories from around the world',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('A whole village that has nothing to spare ends up making '
             'dinner together, one ingredient at a time.'),
@@ -4655,6 +4788,7 @@ const PpArea _worldTales = PpArea(
             'while you are cooking.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '4 MIN',
           slotId: 'learning/story/world_stone_soup',
@@ -4666,6 +4800,8 @@ const PpArea _worldTales = PpArea(
       title: 'The bundle of sticks',
       subtitle: 'Stories from around the world',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('An old man, four quarrelling sons, and a demonstration that '
             'needs no words at all. Good for a house with siblings.'),
@@ -4694,6 +4830,7 @@ const PpArea _worldTales = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '3 MIN',
           slotId: 'learning/story/world_bundle_sticks',
@@ -4705,6 +4842,8 @@ const PpArea _worldTales = PpArea(
       title: 'The honest woodcutter',
       subtitle: 'Stories from around the world',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('A man loses the only thing he owns, and is offered two much '
             'better ones. What he says next is the story.'),
@@ -4735,6 +4874,7 @@ const PpArea _worldTales = PpArea(
         PpWhenLine('From about four years.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '3 MIN',
           slotId: 'learning/story/world_honest_woodcutter',
@@ -4746,6 +4886,8 @@ const PpArea _worldTales = PpArea(
       title: 'The two brothers and the sacks of rice',
       subtitle: 'Stories from around the world',
       format: 'STORY',
+      // EL2: "From about four", so not for a three-year-old.
+      bands: ['four'],
       blocks: [
         PpIntro('Two brothers each secretly try to give the other more, and '
             'neither can work out why it is not working.'),
@@ -4777,6 +4919,7 @@ const PpArea _worldTales = PpArea(
         PpWhenLine('From about four and a half.'),
         PpAudioSlot(
           title: 'Listen to this story',
+          pendingNote: kPpStoryAudioNote,
           category: 'World tales',
           minutes: '4 MIN',
           slotId: 'learning/story/world_two_brothers_rice',
@@ -4873,7 +5016,7 @@ const PpArea _habits = PpArea(
           subtitle: 'How to hold your toddler, where to stand, and what to do '
               'when the mouth clamps shut.',
           minutes: '5 MIN',
-          slotId: 'learning/habit/brushing',
+          slotId: 'early_learning/habit_brushing', // EL8: was 'learning/habit/brushing'
         ),
         PpCallout(
           'Brown or black marks on a tooth, a hole you can see, or pain when '
@@ -5255,8 +5398,10 @@ const PpArea _habits = PpArea(
         PpWhenLine('From about one year for a fixed routine. It stays useful '
             'through primary school.'),
         PpLink(
-          'Everything about sleep at this age',
-          surfaceId: 'pp_section/parenting_sleep',
+          // EL6: the page, not the whole Sleep door. Was 'Everything about
+          // sleep at this age', `pp_section/parenting_sleep`, kept for revert.
+          'A calming bedtime routine',
+          surfaceId: 'pp_page/parenting_sleep/bedtime_routine',
           blurb: 'How much sleep your child needs, night waking, and settling.',
         ),
       ],
@@ -5531,6 +5676,22 @@ const PpArea _habits = PpArea(
               'A show that never ends by itself makes you the ending every '
               'time. Choose the episodes in advance.'),
         ], heading: 'What to avoid', hue: 344),
+        // EL6 (door 9 build): the top screen question gets an answer here.
+        // REQUIRED_REVIEW. Ranges from WHO (2019).
+        PpArticle([
+          'Under two: no screen time, apart from video calls with family. '
+          'From two to five: up to an hour a day, and less is better.',
+          'Small children learn words far better from a person than from a '
+          'screen, even a good one. Use "learning" apps and videos as a '
+          'treat, not a teacher.',
+        ], heading: 'YouTube, cartoons and "learning" apps'),
+        PpCards([
+          PpCard('Watch with him', 'And talk about it while it is on.'),
+          PpCard('The same few shows', 'Rather than whatever plays next.'),
+          PpCard('Turn off autoplay', 'In YouTube, so a show can end by '
+              'itself.'),
+          PpCard('YouTube Kids with a timer', 'If he watches YouTube at all.'),
+        ], heading: 'What makes screen time better', hue: 206),
         PpCallout('Try this together. Make a Two Card: two paper tickets a day, '
             'each worth one show. Your child hands one over to start. Holding '
             'the ending in a small hand changes the whole feeling of it.'),
@@ -5542,6 +5703,12 @@ const PpArea _habits = PpArea(
           // surfaceId: 'pp_section/parenting_behaviour',
           surfaceId: 'pp_page/parenting_behaviour/beh_screen_ending',
           blurb: 'The Behaviour side: ending it without a meltdown.',
+        ),
+        // EL6: the how-much question, Behaviour's page.
+        PpLink(
+          'How much is too much',
+          surfaceId: 'pp_page/parenting_behaviour/beh_screen_limits',
+          blurb: 'Screen limits by age, from Behaviour.',
         ),
       ],
     ),
@@ -5674,7 +5841,8 @@ const PpArea _earlySkills = PpArea(
   blurb: 'What really comes before letters and numbers, and why the '
       'worksheets can wait.',
   hue: 268,
-  bands: _fromTwo,
+  // EL1: "Help him talk" is for one-year-olds too, and a page is never tagged outside its area. Every other page here is tagged from two. Was _fromTwo, kept for revert.
+  bands: _fromOne,
   pages: [
     PpPage(
       id: 'skills_prewriting',
@@ -5751,6 +5919,12 @@ const PpArea _earlySkills = PpArea(
           'And the one before it',
           pageId: 'act_mark_making',
           blurb: 'Scribbling with fat crayons, from two years.',
+        ),
+        // EL7: kneading is the page's own hand-strength step.
+        PpLink(
+          'Play dough, if you want it',
+          surfaceId: 'pp_toys/Play Dough',
+          blurb: 'Optional. Dough from the kitchen does the same job.',
         ),
       ],
     ),
@@ -5948,18 +6122,47 @@ const PpArea _earlySkills = PpArea(
     // language." Copy supplied, not generated.
     PpPage(
       id: 'skills_language',
-      title: 'English or the mother tongue, and when to start letters',
-      subtitle: 'The words to hold the line when the pressure starts at two',
+      // EL1: the first card for one to three, "Help him talk". Was
+      // 'English or the mother tongue, and when to start letters' with
+      // 'The words to hold the line when the pressure starts at two', kept
+      // for revert. The English question is still here, after the talking.
+      title: 'Help him talk',
+      subtitle: 'Five minutes a day that make the biggest difference, and the '
+          'English question',
       format: 'ARTICLE',
       bands: _fromOne,
 
       blocks: [
             // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
             // REQUIRED_REVIEW.
-            PpIntro('From about two, the pressure starts: ABC classes, English '
-                'worksheets, flash cards. Here is the honest picture, and the '
-                'words to hold the line when the family worries it is getting '
-                'late.'),
+            // EL1 (door 9 build): the intro now opens on talking. Was:
+            // PpIntro('From about two, the pressure starts: ABC classes, English '
+            //     'worksheets, flash cards. Here is the honest picture, and the '
+            //     'words to hold the line when the family worries it is getting '
+            //     'late.'),
+            PpIntro('Talking is the biggest thing you can help with at this '
+                'age, and it takes five minutes a day of what you already do. '
+                'Then, from about two, the pressure starts: ABC classes, '
+                'English worksheets, flash cards. Here is the honest picture '
+                'on that too.'),
+            // EL1, REQUIRED_REVIEW (developmental paediatrician or
+            // early-years specialist).
+            PpSteps([
+              PpStep('Talk about what he is looking at',
+                  '"Ball. Red ball. You threw the red ball." Short, and about '
+                      'now.'),
+              PpStep('Add one word',
+                  'If he says "car", you say "big car" or "car going".'),
+              PpStep('Wait',
+                  'Count to five in your head after a question. Children need '
+                      'time to answer.'),
+              PpStep('Any language is fine',
+                  'Speak the one you think and feel in. Two languages do not '
+                      'cause late talking.'),
+              PpStep('Turn the TV off in the background',
+                  'Children hear far fewer words when a screen is on, even if '
+                      'nobody is watching it.'),
+            ], heading: 'Five minutes a day'),
             PpArticle(heading: 'Your mother tongue is an advantage', [
               'Children who are fluent in their home language learn English, and '
                   'reading, more easily, not less. The thinking and vocabulary '
@@ -5991,7 +6194,67 @@ const PpArea _earlySkills = PpArea(
                   why: 'Talking first, letters later, is what the evidence '
                       'shows.'),
             ]),
+            // EL1/EL6: the two Development pages this one leans on.
+            PpLink('Speech by age, and when to check',
+                surfaceId: 'pp_page/parenting_development/dev_speech_by_age',
+                blurb: 'What most children say at each age, and the signs '
+                    'worth a word with your doctor.'),
+            PpLink('Two languages at home',
+                surfaceId: 'pp_page/parenting_development/dev_two_languages',
+                blurb: 'Why two languages never cause late talking.'),
           ],
+    ),
+    // EL4 (door 9 build). REQUIRED_REVIEW (developmental paediatrician or
+    // early-years specialist): every range, and the reading line. Sources:
+    // CDC "Learn the Signs. Act Early." (2022) and IAP guidance.
+    PpPage(
+      id: 'skills_can_do_3_4_5',
+      title: 'What most children can do at 3, 4 and 5',
+      subtitle: 'Wide ranges, not a test',
+      format: 'CARDS',
+      bands: _fromTwo,
+      blocks: [
+        PpIntro('These are wide ranges, not a test. Children get to each one '
+            'at their own pace, and being early or late on one does not '
+            'predict school.'),
+        PpCards([
+          PpCard('Around 3',
+              'Talking: three-word sentences, and strangers understand some of '
+              'it. Drawing: copies a circle and scribbles with control. '
+              'Letters: enjoys books, and may know a letter or two. Counting: '
+              'counts one to three things. Colours: names a few.'),
+          PpCard('Around 4',
+              'Talking: tells a simple story and asks "why" a lot. Drawing: a '
+              'person with a head and a few parts. Letters: may write a few, '
+              "often the ones in his name. Counting: about ten. Colours: names "
+              'most of the common ones.'),
+          PpCard('Around 5',
+              'Talking: talks clearly, with "because" and "if". Drawing: a '
+              'person with a body, and copies a triangle. Letters: may write '
+              'his name and know some letter sounds. Counting: ten or more, '
+              'and knows "more" and "less". Colours: names colours and '
+              'shapes.'),
+        ], heading: 'What most children can do', hue: 206),
+        PpCallout('Reading at 5 is not expected. Loving books is. Most '
+            'children begin to read at 6 or 7.',
+            title: 'Reading can wait'),
+        PpWhenLine('From about three. Use it to see what comes next, never as '
+            'a list to tick.'),
+        PpCallout(
+          'If he is losing words or skills he had, or is not speaking in '
+          'sentences by three, talk to your paediatrician. A wide range is '
+          'normal; losing ground is worth a look, and asking early costs '
+          'nothing.',
+          kind: PpCalloutKind.doctor,
+          title: 'When to ask your doctor',
+        ),
+        PpLink('His milestones',
+            surfaceId: 'pp_milestones',
+            blurb: 'Milestones and speech, kept in one place.'),
+        PpLink('Speech by age',
+            surfaceId: 'pp_page/parenting_development/dev_speech_by_age',
+            blurb: 'What most children say at each age.'),
+      ],
     ),
   ],
 );
@@ -6034,13 +6297,93 @@ const PpArea _rhymes = PpArea(
       'home, to listen to and do together.',
   hue: 42,
   pages: [
+    // EL3 (door 9 build): written out, no longer a coming-soon card. Was
+    // `title: 'Rhymes and songs'`, `subtitle: 'Clapping, actions and the tunes
+    // the house already knows'`, `format: 'AUDIO LIBRARY'`, `comingSoon:
+    // true`, `blocks: []`, kept for revert.
+    //
+    // ⚠️ HINDI RHYMES IN ENGLISH LETTERS, ON PURPOSE AND ONLY HERE (the
+    // user, 2026-10-25: "it's not necessary to keep it Devanagari script...
+    // written in English, but it's Hindi... for the time being"). A narrow
+    // exception to CLAUDE.md's rule against Hindi in Latin script, for rhyme
+    // lyrics only. The cost: the phone's hi-IN voice cannot read them, which
+    // is acceptable while the recordings are owed anyway.
+    //
+    // Traditional folk rhymes only. "Lakdi ki kaathi", "Nani teri morni" and
+    // "Chanda mama door ke" are film songs, still under copyright, and are
+    // left out. REQUIRED_REVIEW: the lyrics, and that each rhyme is out of
+    // copyright.
     PpPage(
       id: 'rhymes_collection',
-      title: 'Rhymes and songs',
-      subtitle: 'Clapping, actions and the tunes the house already knows',
-      format: 'AUDIO LIBRARY',
-      comingSoon: true,
-      blocks: [],
+      title: 'Rhymes to say together',
+      subtitle: 'Ten to sing, with the actions, in English and Hindi',
+      format: 'CARDS',
+      blocks: [
+        PpIntro('Rhymes are the easiest way to help a small child talk. The '
+            'beat, the repeating and the actions make words stick. Sing them '
+            "badly; he won't mind."),
+        PpCards([
+          PpCard('Twinkle, twinkle, little star',
+              'Actions: open and close your hands like a star. Helps with: '
+              'slow, clear sounds.'),
+          PpCard('Baa, baa, black sheep',
+              'Actions: hold up three fingers for "three bags full". Helps '
+              'with: counting.'),
+          PpCard('Row, row, row your boat',
+              'Actions: sit face to face, hold hands and rock. Helps with: '
+              'rhythm and taking turns.'),
+          PpCard('Incy wincy spider',
+              'Actions: fingers climb up, then the rain comes down. Helps '
+              'with: small finger movements, and a story with a beginning and '
+              'an end.'),
+          PpCard('Head, shoulders, knees and toes',
+              'Actions: touch each one, getting faster each time. Helps with: '
+              'words for the body.'),
+          PpCard('Pat-a-cake',
+              'Actions: clap together, then roll it and mark it. Helps with: '
+              'coordination.'),
+        ], heading: 'In English', hue: 42),
+        PpCards([
+          PpCard('The fish is queen of the water (Machli jal ki rani hai)',
+              'Words: "Machli jal ki rani hai, jeevan uska paani hai. Haath '
+              'lagao darr jaayegi, bahar nikalo mar jaayegi." It means: the '
+              'fish is queen of the water, and water is her life. Actions: '
+              'hands swim like a fish.'),
+          PpCard('Little potato, where did you go? (Aloo kachaloo)',
+              'Words: "Aloo kachaloo beta kahan gaye the? Baingan ki tokri '
+              'mein so rahe the. Baingan ne laat maari, ro rahe the. Mummy ne '
+              'pyaar kiya, hans rahe the." It means: little potato slept in '
+              'the brinjal basket, cried when it kicked him, and laughed when '
+              'Mummy cuddled him. Actions: sleepy, crying, then laughing '
+              'faces.'),
+          PpCard('King elephant, where are you going? (Hathi raja kahan chale)',
+              'Words: "Hathi raja kahan chale? Soond hila kar kahan chale? '
+              'Mere ghar bhi aao na, halwa puri khao na." It means: where are '
+              'you going, king elephant, swinging your trunk? Come to my house '
+              'for halwa puri. Actions: one arm swings like a trunk.'),
+          PpCard('Counting on fingers (Ek, do, teen, chaar)',
+              'Words: "Ek, do, teen, chaar, paanch, chhe, saat, aath, nau, '
+              'das." The numbers one to ten, one finger each, slowly, then '
+              'fast. Helps with: numbers, in the language of home.'),
+        ], heading: 'In Hindi, in English letters', hue: 26),
+        PpArticle([
+          'A rhyme says the same words in the same order every time, so a '
+          'child can join in long before he can talk in sentences. First he '
+          'does the action, then he says the last word of the line, then the '
+          'whole thing.',
+          'Rhymes also split words into their sounds ("star" and "are"), '
+          'which is the skill reading leans on years later. Any language '
+          'does this, so the rhymes of your own home count as much as the '
+          'English ones.',
+        ], heading: 'Why rhymes help talking'),
+        PpWhenLine('From birth for listening. From about one for the actions, '
+            'and from about two for joining in with the words.'),
+        PpAudioSlot(
+          title: 'Listen to the rhymes',
+          category: 'Rhymes',
+          slotId: 'early_learning/rhymes',
+        ),
+      ],
     ),
   ],
 );
@@ -6052,7 +6395,8 @@ const PpArea _school = PpArea(
   blurb: 'What readiness really means, how to choose a place, and how to '
       'get through the first week.',
   hue: 206,
-  bands: _fromThree,
+  // EL4/EL5: choosing a preschool and admission come before playgroup starts. Every older page here keeps its own tag. Was _fromThree, kept for revert.
+  bands: _fromTwo,
   pages: [
     PpPage(
       id: 'school_what_readiness',
@@ -6113,7 +6457,7 @@ const PpArea _school = PpArea(
           subtitle: 'A preschool teacher on which children settle well, and '
               'what teachers wish parents had practised instead of letters.',
           minutes: '7 MIN',
-          slotId: 'learning/school/readiness_explainer',
+          slotId: 'early_learning/school_readiness_explainer', // EL8: was 'learning/school/readiness_explainer'
         ),
       ],
     ),
@@ -6185,13 +6529,20 @@ const PpArea _school = PpArea(
           surfaceId: 'pp_milestones', // was 'pp_development', which opens the Development door (DV3)
           blurb: 'Milestones and speech, kept in one place.',
         ),
+        // EL6: "Toilet alone" is first on the list; Potty has the page.
+        PpLink(
+          'School toilets, and toilets out in the world',
+          surfaceId: 'pp_page/parenting_potty/school_and_public',
+          blurb: 'Asking, holding, and not holding all day.',
+        ),
       ],
     ),
     PpPage(
       id: 'school_choosing',
       title: 'Choosing a preschool',
       format: 'ARTICLE',
-      bands: _fromThree,
+      // EL4: from two, before playgroup has started. Was _fromThree.
+      bands: _fromTwo,
       blocks: [
         PpIntro('The building matters far less than what happens inside it. '
             'Spend your visit watching the children, not the marketing '
@@ -6254,6 +6605,60 @@ const PpArea _school = PpArea(
             PpCallout('Ask how much screen time and how many apps the '
                 'preschool uses. Young children learn best through play, '
                 'talk and hands-on activity; tablets add little at this age.'),
+      ],
+    ),
+    // EL5 (door 9 build). REQUIRED_REVIEW (legal): every rule here is
+    // checked against the current state notices before release. Sources: RTE
+    // Act 2009 s.12(1)(c) and s.13; NEP 2020 on Class 1 at six; ICDS.
+    PpPage(
+      id: 'school_admission',
+      title: 'Nursery admission, step by step',
+      subtitle: 'The age cut-off, the forms, the free seats, and no interviews',
+      format: 'STEPS',
+      bands: _fromTwo,
+      blocks: [
+        PpIntro('Nursery admission in India has its own calendar and its own '
+            'rules, and both vary by state. Here is the order to do it in, '
+            'and what the law already says on your side.'),
+        PpSteps([
+          PpStep('Check the age cut-off for your state and board',
+              'Many cities take nursery at three years by a set date, often 31 '
+                  'March. Class 1 is now usually six years. The rules change, '
+                  "so check the school's own notice."),
+          PpStep('Know when the forms open',
+              'In many cities nursery forms open between October and January '
+                  'for the session starting in April.'),
+          PpStep('Keep these ready',
+              'His birth certificate, his Aadhaar if he has one, your address '
+                  'proof, passport photos, and his vaccination card, which some '
+                  'schools ask for.'),
+          PpStep('Free seats in private schools (RTE)',
+              'Under the Right to Education Act, private unaided schools keep '
+                  '25% of entry-class seats free for children from '
+                  'economically weaker and disadvantaged families. You usually '
+                  "apply on the state's online portal, and seats go by "
+                  'lottery.'),
+          PpStep('No test, no interview',
+              'The RTE Act bars schools from screening children or parents for '
+                  'these seats, and many states apply it to all nursery '
+                  'admissions. A school that "interviews" your three-year-old '
+                  'is worth asking about.'),
+          PpStep('Your local preschool centre is free, and it counts '
+              '(anganwadi)',
+              'The anganwadi runs free preschool, with meals and health '
+                  'checks, from age three.'),
+        ], heading: 'In this order'),
+        PpCallout('The right preschool is near home, kind, and full of play. '
+            'You do not need the most famous one.',
+            title: 'The one thing to remember'),
+        PpWhenLine('Start looking when he is about two and a half; the forms '
+            'usually open the autumn before he turns three.'),
+        PpLink('Papers for your child',
+            surfaceId: 'pp_section/parenting_papers',
+            blurb: 'The birth certificate and Aadhaar, and how to get them.'),
+        PpLink('Choosing a preschool',
+            pageId: 'school_choosing',
+            blurb: 'What to look for when you visit.'),
       ],
     ),
     PpPage(
@@ -6322,7 +6727,9 @@ const PpArea _school = PpArea(
         ),
         PpLink(
           'Separation anxiety in general',
-          surfaceId: 'pp_section/parenting_behaviour',
+          // EL6: the page, not the whole Behaviour door. Was
+          // `pp_section/parenting_behaviour`, kept for revert.
+          surfaceId: 'pp_page/parenting_behaviour/separation',
           blurb: 'The Behaviour section covers clinginess beyond the school '
               'gate.',
         ),
@@ -6372,12 +6779,14 @@ const PpArea _school = PpArea(
           blurb: 'Talking to the family for one minute, which is where public '
               'speaking begins.',
         ),
+        // EL7: as above. Was 'The school readiness masterclass' with
+        // `surfaceId: 'pp_courses'`, kept for revert.
         PpConsult(
-          title: 'The school readiness masterclass',
+          title: 'Talk to an early learning expert',
           whoFor: 'For a parent choosing a preschool this year, or preparing a '
-              'child who has never been away from home. Covers what to look '
-              'for, the six months before, and the first fortnight.',
-          surfaceId: 'pp_courses',
+              'child who has never been away from home: what to look for, the '
+              'six months before, and the first fortnight.',
+          surfaceId: 'pp_experts/Early learning expert',
           role: 'school_readiness',
         ),
         // Was one link, 'Bags, boxes, bottles and shoes', to the whole store

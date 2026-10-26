@@ -802,6 +802,10 @@ const PpArea kBehOlderChild = PpArea(
           title: 'When to ask',
         ),
         PpWhenLine('Three to six.'),
+        // Early learning EL6: the twin pages link each other.
+        PpLink('Telling the truth, as a habit',
+            surfaceId: 'pp_page/parenting_early_learning/hab_truth',
+            blurb: 'The Early learning side: making honesty easy at home.'),
       ],
     ),
   ],

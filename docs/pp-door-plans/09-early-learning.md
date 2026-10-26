@@ -2,7 +2,7 @@
 
 **Built elsewhere (2026-10-26):** EL7's tool side ("Toys and crayons", one toy shelf of the six kinds, the tiffin shelf and first shoes guide instead of "Bags, boxes, bottles and shoes", and "Picture books by age") was built in the tools pass, `docs/pp-tool-plans/29-33-other.md`. This door's build does only the door-side work.
 
-Written 2026-10-25. **Status: final. EL1 to EL9 are all yes (the user, 2026-10-25).** The user's call: obvious recommendations need no question. I choose them, write the choice down here, and ask only what is genuinely the user's. The one real question was EL3's script for Hindi rhymes. The new copy is in `09-early-learning-content.md`. Nothing in `lib/` changes until step 0 (S1 to S11) and the user's go.
+Written 2026-10-25. **Status: built 2026-10-26 (§12, As built).** **EL1 to EL9 are all yes (the user, 2026-10-25).** The user's call: obvious recommendations need no question. I choose them, write the choice down here, and ask only what is genuinely the user's. The one real question was EL3's script for Hindi rhymes. The new copy is in `09-early-learning-content.md`. Nothing in `lib/` changes until step 0 (S1 to S11) and the user's go.
 
 ## Context
 **Where it lives.**
@@ -188,3 +188,49 @@ These stay here on purpose. When a problem turns up later, check this table firs
 | EL9 | A door intro film | Every door gets one | **Yes**, chosen and recorded (2026-10-25) |
 
 The user, 2026-10-25: "all these are like the legitimate representations or recommendations so you can have them. You don't have to ask again and again. Just keep noting down what you are choosing."
+
+## 12. As built (2026-10-26)
+Held by `test/pp_early_learning_door_test.dart` ("door 9: the plan, held", 15 tests, and "BHO4", 4): Talking first at one to three with Help him talk first (data, and on screen at 18 and 40 months), no story below the age it says (all 61 story and how-to pages, every band), under three the Stories tab is the how-to and the bedtime tales, no page tagged outside its own area's ages, the rhymes (ten, folk only), every story audio row and every film answering a tap (the 58 rows' words, both taps on screen), the two new pages, every EL6 link landing on its page and the twins linking back, no masterclass anywhere, the three shop items, the titles and the two thin stories, the DV10 links; and the books shelf below. The parenting stage, 129 files, 1,470 tests, passes.
+
+**EL7's tool side was built in the tools pass** (`docs/pp-tool-plans/29-33-other.md`, a224492): "Toys and crayons" on the toy shelf of six kinds, the tiffin shelf and first-shoes guide, "Picture books by age". This build does the door side.
+
+**What was built, by decision:**
+- **EL1.** An age rail on Ideas for today, "Talking first", for one to two and two to three only (`PpDoorTab.ageRail`, Health's H2 mechanism): Help him talk, the rhymes, and two of that age's talking activities, which the area rail then skips. `skills_language` is retitled "Help him talk" and opens on a five-step group, then the English question it already held, then Development's speech-by-age and two-languages pages.
+- **EL2.** The collections at their stories' ages: Panchatantra and world tales from three, Jataka, Birbal and Tenali from four, bedtime tales one to six. Sixteen stories that say "from about two" or "from about four" are tagged so they never show a band too early.
+- **EL3.** "Rhymes to say together": six English and four Hindi rhymes (Hindi in English letters, English title first, the Hindi in brackets), actions, and why rhymes help. The 58 "Listen to this story" rows say "This story is still being recorded. You can read it aloud now; it works even better in your voice" (`kPpStoryAudioNote`, through a new optional `PpAudioSlot.pendingNote`).
+- **EL4.** "What most children can do at 3, 4 and 5" on Letters, numbers (two to six), with the reading line and a doctor line naming the paediatrician; choosing a preschool from two.
+- **EL5.** "Nursery admission, step by step" on Starting school (two to six), linking the Papers door and choosing a preschool.
+- **EL6.** The habit page's YouTube, cartoons and learning apps part, and "How much is too much"; the bedtime, first-day and toilet links land on Sleep's `bedtime_routine`, Behaviour's `separation` and Potty's `school_and_public`; the Behaviour, Health and Sleep twins link back.
+- **EL7.** Both consult cards and the section tool read "Talk to an early learning expert"; crayons, play dough and a puzzle, one a page, each after the free things.
+- **EL8.** The two apostrophes, the film ids on one prefix, the door comment (13 areas, 127 pages), the two thin stories told in full.
+- **EL9.** Every film answers a tap with "still being made" (the placeholder's own S8a); the intro is not slotted.
+
+**BHO4 and PT13, closed in this build.** `pp_books/<name>` opens `PpKidsBooksScreen`: the Reading home's picture-book shelf on its own screen, that goal's chip already chosen, every age, all of the goal's books, each row with its age (`pp_kids_books_shelf.dart`, `ppKidsBooksScreenFor`). Worry is the list's "Anxiety" goal, New sibling "New Sibling", Potty "Potty Training"; a goal the list already has works too, and anything else is null, so a typo fails the link gate. The shelf gained three optional arguments (`goal`, `allAges`, `heading`) and the Reading home is unchanged. The three toasts are commented out, because `ppSurfaceUnavailable` reads `kPpNotYetWords` before the screen and a toast would have won. The test pumps each screen at 14 months and checks the books it shows, by id, with their ages, and that another goal's book is absent.
+
+**A mechanism worth keeping.** The shelf filtered by the child's age, which is right on the Reading home (browsing for him) and wrong behind a page link (a parent asking about one worry). The worry books are 3 to 5 and Behaviour's Scared page starts at one, so the same widget, reached from the link, would have opened on an empty list with no error. The general point: a filter that is right for a screen's own entry can be wrong for a deep link into it, so the link has to say which filters it brings.
+
+**A second one, about tags and a card from another area.** "Help him talk" had to be the first card at one, but its page lives in Before letters, whose area started at two, and a page must never be tagged outside its area's ages (door 8). The page's existing tag already said one, so it was a dead tag: the rail reads the area first and never showed it. The fix widens the area to one (every other page in it is tagged from two, so nothing else moves) and puts the page on Today through the age rail, which reads the page's own tag. The test now holds the area rule for the whole section.
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| EL1: "the first card on Do something today is Help him talk" | An age rail, "Talking first", of four cards, Help him talk first | One card alone reads as a mistake; the rail is the shell's own way to put a page for this age first, and the rhymes and talking activities are the same need |
+| EL1: "the language page's tag moves to 1; the card carries it" | The area widens to one; the page keeps its tag | A page tagged outside its area is the door 8 bug. Every other page in the area is tagged from two, so the Letters tab at one shows only this page |
+| EL1: card "Help him talk" with "Five minutes a day…" | The page is retitled "Help him talk", subtitle "Five minutes a day that make the biggest difference, and the English question" | A rail card shows its page's title; the old title is commented out. The English question stays on the page |
+| EL2: "bedtime tales run to 5" | One to six (the band is 4–6) | The section's bands |
+| EL2: collections open at the age "their stories say" | Also sixteen stories tagged on their own | Panchatantra and world tales each hold stories that say "from four"; four bedtime tales say "from two" |
+| EL3: "Ek do teen chaar", "check the exact folk words at build" | The numbers one to ten, said on fingers | No version could be confirmed; nothing invented. Owed ELO6 |
+| EL3: rhymes audio "shows the S8a message below" | The placeholder's own words, "the words are written on this page" | True for the rhymes page; the story words are for stories |
+| EL4: doctor line "talk to your doctor" | "talk to your paediatrician" | `pp_section_test`: a doctor line names someone to go to |
+| EL5: STEPS, closing line | As written, and a when line ("start looking at about two and a half") | Every page carries its when line |
+| EL6: "twin pages link each other" | Both directions for sharing, truth, brushing and bedtime | The four already linked one way, except bedtime, which opened the whole Sleep door |
+| EL7: two masterclass cards renamed | Both, and the section tool "The early learning masterclass" too | The same promise of a class that does not exist (it opened Learn's home) |
+| EL7: play dough "on the dough activity", puzzles "on the puzzle activity" | Play dough on "What comes before writing", puzzles on "Matching lids to their containers" | No activity page is about either. Owed ELO5 |
+| EL7: the tracker card "His milestones" | "Milestones" | The tools pass's R3 holds every tracker card to the tool's name, one name in every door (`pp_development_screens_test`); the stage suite caught it. The new page's link says "His milestones" |
+| EL8: "three film ids use an old prefix" | Seven moved to `early_learning/` | Seven used `learning/...`; the only other reference was `docs/EARLY-LEARNING-DOOR-MAP.html` |
+| EL9: the intro `early_learning/door_intro` | Not slotted | S4: no chip until a film exists. Owed ELO1 |
+| S11 names | "Ideas for today", "Letters, numbers" | The user's words, 2026-10-26; off `_kOwedShorterNames` |
+| DV10 (door 4): Development's speech pages link Help him talk | Done here | The target page is this door's; Special care's half waits for door 12 |
+| Verification: a Mobbin check | Not run | The age rail is the approved Health look, reused |
+
+**Owed, not in this build:** the films (`DOOR-CONTENT-OWED` EL4, ELO1), the recordings (ELO2), a class (ELO3), a real early learning expert (ELO4), a dough and a puzzle activity (ELO5), the counting rhyme's folk words (ELO6). On `BEFORE-LAUNCH.md`: a developmental paediatrician's or early-years specialist's read of every `REQUIRED_REVIEW` line (Help him talk, the 3-4-5 page, screens, the rhymes and their copyright), and a legal check of the admission page against current state notices. The new pages and parts reach Ask Veda through the incremental ingest, which the user runs after all the doors.

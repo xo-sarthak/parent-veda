@@ -85,7 +85,8 @@ import '../../data/mind_mood_data.dart' show kCrisisHelplineName, kCrisisHelplin
 import 'pp_community_detail_screen.dart';
 import 'community_screen.dart';
 import '../../data/community_data.dart' show kParentingCommunities;
-import '../../data/kids_books.dart' show KidsBookRank, kKidsBooks;
+// import '../../data/kids_books.dart' show KidsBookRank, kKidsBooks; // the toasts' helpers (BHO4), kept for revert
+import 'pp_kids_books_shelf.dart' show ppKidsBooksScreenFor;
 import 'development_all_activities_screen.dart';
 import 'pp_development_data.dart' show kDevAreas;
 // import 'on_track_checklist_screen.dart'; // merged into the journey, kept for revert
@@ -224,36 +225,41 @@ Map<String, String> get kPpNotYetWords => {
       //     '${_bookPair('Potty')} are two that children like.', // kept for revert (tools pass 33)
       // ⚠️ IT SAID "NO PICTURE BOOKS" WHILE 285 SAT ON THE READING SHELF.
       // There is no potty shelf of its own yet, and that is all it now says.
-      'pp_books/Potty': 'Picture books are on the Reading shelf, under More. '
-          'For potty time, ${_bookPair('Potty')} are two that children like.',
-      // Behaviour BH5: the kids library, by its goal, in the same words.
-      'pp_books/Worry': 'Picture books are on the Reading shelf, under More. '
-          'For worries, ${_bookPairForGoal('Anxiety')} are two that children '
-          'like.',
-      'pp_books/New sibling': 'Picture books are on the Reading shelf, under '
-          'More. For a new baby, ${_bookPairForGoal('New Sibling')} are two '
-          'that children like.',
+      // ⚠️ AND NOW THE SHELF EXISTS (BHO4 / PT13, door 9 build): the three
+      // `pp_books/` links open it (`ppKidsBooksScreenFor`), so a toast here
+      // would win over the screen. The words, kept for revert:
+      // 'pp_books/Potty': 'Picture books are on the Reading shelf, under More. '
+      //     'For potty time, ${_bookPair('Potty')} are two that children like.',
+      // // Behaviour BH5: the kids library, by its goal, in the same words.
+      // 'pp_books/Worry': 'Picture books are on the Reading shelf, under More. '
+      //     'For worries, ${_bookPairForGoal('Anxiety')} are two that children '
+      //     'like.',
+      // 'pp_books/New sibling': 'Picture books are on the Reading shelf, under '
+      //     'More. For a new baby, ${_bookPairForGoal('New Sibling')} are two '
+      //     'that children like.',
     };
 
-/// The same as [_bookPair], by the list's goal rather than its theme: the
-/// worry books are themed "Emotions" or "Connection" but share one goal.
-String _bookPairForGoal(String goal) {
-  final titles = [
-    for (final b in kKidsBooks)
-      if (b.goals.contains(goal) && b.rank == KidsBookRank.essential) b.title,
-  ];
-  return titles.length < 2 ? 'The ones in any bookshop' : '${titles[0]} and ${titles[1]}';
-}
-
-/// Two titles from the book list for a theme: "Once Upon a Potty and Potty
-/// for Me!". The list is the source, so a title is never invented.
-String _bookPair(String theme) {
-  final titles = [
-    for (final b in kKidsBooks)
-      if (b.theme == theme && b.rank == KidsBookRank.essential) b.title,
-  ];
-  return titles.length < 2 ? 'The ones in any bookshop' : '${titles[0]} and ${titles[1]}';
-}
+// The two-title helpers the toasts read, unused since the shelf opens
+// (BHO4). Kept for revert:
+// /// The same as [_bookPair], by the list's goal rather than its theme: the
+// /// worry books are themed "Emotions" or "Connection" but share one goal.
+// String _bookPairForGoal(String goal) {
+//   final titles = [
+//     for (final b in kKidsBooks)
+//       if (b.goals.contains(goal) && b.rank == KidsBookRank.essential) b.title,
+//   ];
+//   return titles.length < 2 ? 'The ones in any bookshop' : '${titles[0]} and ${titles[1]}';
+// }
+//
+// /// Two titles from the book list for a theme: "Once Upon a Potty and Potty
+// /// for Me!". The list is the source, so a title is never invented.
+// String _bookPair(String theme) {
+//   final titles = [
+//     for (final b in kKidsBooks)
+//       if (b.theme == theme && b.rank == KidsBookRank.essential) b.title,
+//   ];
+//   return titles.length < 2 ? 'The ones in any bookshop' : '${titles[0]} and ${titles[1]}';
+// }
 
 /// ⚠️ A ROSTER OF PLACEHOLDERS ONLY, SAID PLAINLY (You, Maa §12, M6,
 /// 2026-10-25). Her physio and counsellor rows open categories whose people
@@ -536,6 +542,15 @@ Widget? ppScreenForSurface(String id) {
     return readCatalog.any((a) => a.id == shelfId)
         ? ReadingReaderScreen(article: readArticleById(shelfId))
         : null;
+  }
+
+  // `pp_books/<name>` opens the children's picture books on their own
+  // screen, that goal's chip chosen, every age (BHO4, built in the door 9
+  // build). Behaviour's worry and new-baby links and Potty's potty-time link
+  // land here. An unknown name is null, so a typo fails the link gate.
+  const booksPrefix = 'pp_books/';
+  if (id.startsWith(booksPrefix)) {
+    return ppKidsBooksScreenFor(id.substring(booksPrefix.length));
   }
 
   const pagePrefix = 'pp_page/';

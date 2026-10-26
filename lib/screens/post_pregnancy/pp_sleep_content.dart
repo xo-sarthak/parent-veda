@@ -1726,6 +1726,12 @@ final PpArea _gettingToSleep = PpArea(
           surfaceId: 'pp_sleep_sounds',
           blurb: 'Low volume, timer on. Use the same sound every night.',
         ),
+        // Early learning EL6: the twin pages link each other.
+        PpLink(
+          'Going to bed on time, as a habit',
+          surfaceId: 'pp_page/parenting_early_learning/hab_bedtime',
+          blurb: 'The Early learning side: the four-picture card.',
+        ),
       ],
     ),
     /* ⚠️ [merge] KEPT FOR REVERT. 'The hour before bed' is folded into the
