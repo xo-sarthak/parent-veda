@@ -11128,6 +11128,20 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
   saving one as a celebrated moment with an optional photo and one journal memory, gentle "might appear soon"
   language, the checklist words renamed, Mobbin and a prototype first. Already decided and kept: one tracker, no
   score, D3, DV1 (whose tab order the door data never set: "On track" still opens first).
+  **BUILT 2026-10-26** (STAGE-TRANSITIONS R10 has what was decided). DV1 was not a bug after all:
+  `pp_door_development.dart` sets `tabOrder`, Play today first in every band. Left open by the build:
+  (a) a removed milestone's photo stays in Storage, because Undo puts the same record back and a
+  deleted object cannot return; a sweep of orphaned `milestones/` objects is owed. (b) A third caregiver
+  on the child sees a milestone and its day but not its photo: the media bucket lets only the uploader
+  and the paired partner read (0013, 0014). (c) The moment page uses the child's phase painting; a
+  dedicated one is owed (DOOR-CONTENT-OWED DV2). (d) The `DevArea` stage pages are not drawn on any
+  reachable screen, so `kDevStageMilestone` joins them as data only; the day they return they read and
+  save the one record. (e) The check-in stays its own instrument (yes / not yet answers keyed by
+  question text, not dated milestones); only its name changed. (f) `pp_surface_router.dart` still says
+  `MilestoneJourneyScreen` for `pp_milestones` and `pp_on_track`; that screen's build returns the new
+  one. Pointing the router straight at `PpMilestonesScreen` is a one-line follow-up once the other
+  terminal's edit there is in. (g) The three new milestones' windows join the first-year
+  REQUIRED_REVIEW for a paediatrician.
 
 ## 102.0 Parenting doors, door by door: what the builds left open — 2026-10-25
 

@@ -98,6 +98,10 @@ import 'pp_age_page_parts.dart';
 import 'pp_month_notes.dart';
 import 'journal_v2/pp_journal_screen.dart';
 import 'journal_v2/journal_capture_screens.dart';
+import 'pp_milestones_data.dart' show MilestoneStore, kSnapshotMilestone;
+import 'pp_milestones_screen.dart' show PpMilestonesScreen;
+import 'pp_tools_kit.dart' show ppShortDate;
+import '../../widgets/storage_image.dart';
 import 'reading_reader_screen.dart';
 import 'development_activity_screen.dart';
 import 'watch_player_screen.dart';
@@ -246,6 +250,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
         FamilyProfileStore.instance, // tile order by her priorities (2026-10-07)
         PpChangesStore.instance, // what she told us (2026-10-23, Wave 8)
         PpMessagesStore.instance, // the header's inbox count (2026-10-25)
+        MilestoneStore.instance, // the Milestones row (R10, 2026-10-26)
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -446,6 +451,18 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   ))),
                   const SizedBox(height: 26),
                 ],
+                // ---- MILESTONES, ONE TAP FROM HOME (R10, 2026-10-26) --------
+                // The user: milestones were "hidden" (three taps, through
+                // Tools or the Development door). The approved prototype puts
+                // the way in under Today, naming the newest one. Drawn with
+                // none saved too: the empty line is the invitation (a feature
+                // is never hidden).
+                _pad(PvRowGroup(
+                  key: const ValueKey('pp_home_milestones'),
+                  p: p,
+                  children: [_milestonesRow(context, p)],
+                )),
+                const SizedBox(height: 26),
                 // Search first, then the last feed and sleep for an under-one
                 // (gap analysis P1, 2026-10-07; pp_home_quick.dart).
                 // A paired father's week, first (gap analysis P1, Behind · Partner).
@@ -683,7 +700,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
                               : PpDomainMark(c.snapshot!.domain),
                           title: c.title,
                           line: c.snapshot == null ? c.notice : ppFillChild(c.snapshot!.line),
-                          meta: c.category,
+                          // A snapshot that is one of the milestones shows
+                          // the day she saved it (R10, one list).
+                          meta: _seenMeta(c.snapshot?.title) ?? c.category,
                           lineMaxLines: 2,
                           onTap: () => switch ((c.doc, c.milestonePage)) {
                                 (final doc?, final page?) => ppOpenMilestoneRead(context, doc, page),
@@ -942,16 +961,27 @@ class _PpHomeV3State extends State<PpHomeV3> {
                         hue: 42,
                         label: 'Add a\nmemory',
                         onTap: () => showAddMemorySheet(context)),
+                    // "A first" IS THE ONE MILESTONE SAVE (R10, 2026-10-26):
+                    // it lands in Milestones and, switch on, in the journal
+                    // as one memory. One word everywhere, so it says
+                    // milestone. The guided prompts, kept for revert:
+                    //   label: 'A\nfirst',
+                    //   onTap: () => Navigator.of(context).push(
+                    //       MaterialPageRoute<void>(
+                    //           settings: const RouteSettings(
+                    //               name: 'pp/journal/guided'),
+                    //           builder: (_) => const GuidedMemoryScreen()))),
                     V3QuickAction(
                         icon: Icons.star_outline_rounded,
                         mark: V3DailyMark.first,
                         hue: 18,
-                        label: 'A\nfirst',
+                        label: 'A\nmilestone',
                         onTap: () => Navigator.of(context).push(
                             MaterialPageRoute<void>(
                                 settings: const RouteSettings(
-                                    name: 'pp/journal/guided'),
-                                builder: (_) => const GuidedMemoryScreen()))),
+                                    name: 'pp_milestones'),
+                                builder: (_) => const PpMilestonesScreen(
+                                    startSave: true)))),
                     V3QuickAction(
                         icon: Icons.photo_camera_outlined,
                         mark: V3DailyMark.photo,
@@ -1039,7 +1069,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
 
                 _ResourceRail(p: p, items: [
                   _Resource(
-                      label: "This month's checklist",
+                      label: 'This month', // was "This month's checklist" (R10)
                       hue: 28,
                       icon: Icons.checklist_rtl_outlined,
                       mark: TtcTabMark.checklist,
@@ -1818,6 +1848,33 @@ class _PpHomeV3State extends State<PpHomeV3> {
 
   // Opens a door's link, or says why it can't (S8, 2026-10-25). Was a silent
   // `if (screen == null) return;`.
+  /// The Milestones row under Today (R10): the newest one by name, with its
+  /// photo when it has one.
+  Widget _milestonesRow(BuildContext context, V2Palette p) {
+    final newest = MilestoneStore.instance.newest;
+    final ph = newest?.obs.photo;
+    return PvListRow(
+      key: const ValueKey('pp_home_milestones_row'),
+      p: p,
+      leading: ph != null && ph.isNotEmpty
+          ? StorageImage(ph, width: 40, height: 40, borderRadius: BorderRadius.circular(12))
+          : TtcMarkLeading(tab: TtcTabMark.sprout, tint: v2BlockTint(28, p), size: 40),
+      title: 'Milestones',
+      line: newest == null
+          ? 'When you see something new, save it here'
+          : 'Newest: ${newest.title} · ${ppShortDate(newest.obs.date)}',
+      lineMaxLines: 2,
+      onTap: () => _openSurface(context, 'pp_milestones'),
+    );
+  }
+
+  /// "Seen 2 Aug" for a snapshot that is a milestone she saved, else null.
+  String? _seenMeta(String? snapshotTitle) {
+    final id = snapshotTitle == null ? null : kSnapshotMilestone[snapshotTitle];
+    final obs = id == null ? null : MilestoneStore.instance.observation(id);
+    return obs == null ? null : 'Seen ${ppShortDate(obs.date)}';
+  }
+
   void _openSurface(BuildContext context, String surfaceId) =>
       ppPushSurface(context, surfaceId);
 }

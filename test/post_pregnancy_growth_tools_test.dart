@@ -92,31 +92,22 @@ void main() {
     // screen did not get worse; the test was reading a viewport artefact as a
     // fact about the widget tree. Any `findsOneWidget` over a scrollable is
     // making the same bet.
-    expect(find.text('Emerging now'), findsWidgets);
+    // R10 (2026-10-26): the journey hands off to the one Milestones place,
+    // whose "Might appear soon" replaced "Emerging now" and the flip cards.
+    // The flip-then-open steps, kept for revert, were: tap 'Rolling over',
+    // expect 'What this looks like', tap 'Learn more', expect 'Why it matters'.
+    // expect(find.text('Emerging now'), findsWidgets);
+    expect(find.text('Might appear soon'), findsOneWidget);
 
-    // Scroll an emerging milestone card into view and tap it to open the detail
+    // Scroll an emerging milestone into view and tap it to open the detail
     // sheet; confirm its "Why it matters" section renders.
     final scrollable = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(find.text('Rolling over'), 220, scrollable: scrollable, maxScrolls: 30);
-    // ensureVisible: nothing is pre-observed now, so the emerging list sits
-    // differently and the card can be only partly on screen when tapped.
     await tester.ensureVisible(find.text('Rolling over'));
     await tester.pumpAndSettle();
-    // ⚠️ TAPPING A CARD NOW FLIPS IT INSTEAD OF OPENING THE SHEET, which is
-    // the parenting feedback's ask: "as user clicks it flips with details
-    // about it". The detail sheet is still there, one step further in, behind
-    // "Learn more" on the back face.
-    //
-    // Written as flip-then-open rather than jumping straight to the sheet,
-    // because the two-step IS the behaviour under test. A test that reached
-    // the sheet another way would pass while the flip was broken.
     await tester.tap(find.text('Rolling over'));
     await tester.pumpAndSettle();
-    expect(find.text('What this looks like'), findsOneWidget,
-        reason: 'the card did not turn over');
-
-    await tester.tap(find.text('Learn more').first);
-    await tester.pumpAndSettle();
-    expect(find.text('Why it matters'), findsOneWidget);
+    expect(find.text('WHY IT MATTERS'), findsOneWidget);
+    expect(find.text('I saw it'), findsWidgets);
   });
 }

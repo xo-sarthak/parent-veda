@@ -22,6 +22,7 @@ import 'development_all_activities_screen.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 import 'pp_milestones_data.dart';
+import 'pp_milestones_screen.dart';
 import 'pp_tools_kit.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
@@ -70,8 +71,17 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   //  DECLINED: the progress bars and "3/7" counts of Finch
   //  (mobbin.com/screens/2180f7a4-b1a4-4615-8e1d-4d97d458de9b) and Peloton.
   //  This page promises no score; a count of milestones is one.
+  //
+  // ⚠️ R10 (2026-10-26): THIS SCREEN NOW SHOWS THE ONE MILESTONES PLACE.
+  // `pp_milestones` and `pp_on_track` resolve here (pp_surface_router.dart),
+  // and the router is being edited in another terminal today, so the hand-
+  // off happens in this build rather than there. The journey below is kept
+  // for revert as `_buildJourney`.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => const PpMilestonesScreen();
+
+  // ignore: unused_element
+  Widget _buildJourney(BuildContext context) {
     final p = pvStorePalette;
     Widget lead(String t) => pregToolPad(Text(t, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)));
     return AnimatedBuilder(

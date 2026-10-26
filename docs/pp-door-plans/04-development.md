@@ -209,4 +209,6 @@ Held by `test/pp_development_door_test.dart` (23 tests, "door 4: the plan, held"
 | §10 / D11: a Mobbin check and a prototype | Not run again | The DV2 look (v2, renamed v3) is the approved layout; nothing was laid out beyond it |
 | D11: Play today checks in `pp_doors_first_view_test` | In `pp_development_door_test` | Each built door holds its own first view, as Feeding, Health and You, Maa do |
 
+**Later, 2026-10-26 (STAGE-TRANSITIONS R10):** the On track tab is named "Milestones" (its id stays `on_track`), "This month's checklist" is "This month", "A gentle check-in" is "Questions for this age", the footer says "A milestone you have not saved", and `pp_milestones` opens the one Milestones place (`pp_milestones_screen.dart`). DV2 is built: one list behind every screen.
+
 **Owed, not in this build:** the paintings and films (DOOR-CONTENT-OWED DV1 to DV3), the two people (DV4, DV5), phase-doc times (DV6), the DV10 links (DV7), and a developmental paediatrician's or paediatric physio's read of every `REQUIRED_REVIEW` line (`BEFORE-LAUNCH.md`).

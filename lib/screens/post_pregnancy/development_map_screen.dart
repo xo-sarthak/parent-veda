@@ -9,7 +9,11 @@
 
 import 'package:flutter/material.dart';
 
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
+import 'pp_milestones_data.dart';
+import 'pp_milestones_screen.dart' show openMilestoneSave;
+import 'pp_tools_kit.dart' show ppShortDate;
 import 'pp_care_parts.dart' show ppCareHeading;
 import 'pp_phases_data.dart' show ppFillChild;
 import '../../theme/pv_fonts.dart';
@@ -18,6 +22,19 @@ import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, pvStorePalette;
 import '../v2/v2_palette.dart' show V2Palette;
 import '../../widgets/pv_feedback.dart' show PvPress;
+
+/// Each band's months, [lo, hi), in the order of `_bands` (R10).
+const List<(int, int)> kDevMapBandMonths = [
+  (0, 3), (3, 6), (6, 9), (9, 12), (12, 24), (24, 36), (36, 48), (48, 1000),
+];
+
+/// The band a child of [months] is in: the "you are here".
+int devMapBandFor(int months) {
+  for (var i = 0; i < kDevMapBandMonths.length; i++) {
+    if (months < kDevMapBandMonths[i].$2) return i;
+  }
+  return kDevMapBandMonths.length - 1;
+}
 
 class DevelopmentMapScreen extends StatelessWidget {
   const DevelopmentMapScreen({super.key});
@@ -34,7 +51,21 @@ class DevelopmentMapScreen extends StatelessWidget {
     ('4–5 years', 'Ready for the world', 'Rich stories, real conversations, and school-ready skills.', ['Complex talk', 'Cooperative play', 'Early letters', 'Self-reliance']),
   ];
 
-  static const int _current = 1; // ${ChildProfileStore.instance.name} ~4 months → the 3–6 band
+  // ⚠️ "YOU ARE HERE" WAS A CONSTANT (R10, 2026-10-26): `_current = 1`
+  // marked 3–6 months for every child, while the Brain tab promised "where
+  // he is on it". It follows the child's corrected age now. Kept for revert:
+  // static const int _current = 1;
+  int get _current => devMapBandFor(ChildProfileStore.instance.devAgeInMonths);
+
+  // ⚠️ ONE LIST (R10, DV2). Each band's skills were four hard-coded words
+  // (`_bands`' last field, kept for the page before the shell). They are the
+  // milestones whose window opens in the band now, so a milestone saved in
+  // Milestones shows here as seen, and here saves there.
+  List<Milestone> _skills(int i) {
+    final (lo, hi) = kDevMapBandMonths[i];
+    return kMilestones.where((m) => m.loMonths >= lo && m.loMonths < hi).toList()
+      ..sort((a, b) => a.loMonths.compareTo(b.loMonths));
+  }
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
@@ -45,7 +76,12 @@ class DevelopmentMapScreen extends StatelessWidget {
   //  quieter. Same bands, same sheet on tap. `_buildBeforeShell` is the page
   //  before, kept for revert.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: Listenable.merge([MilestoneStore.instance, ChildProfileStore.instance]),
+        builder: (context, _) => _buildShell(context),
+      );
+
+  Widget _buildShell(BuildContext context) {
     final p = pvStorePalette;
     return PregToolScaffold(
       hue: 285,
@@ -147,15 +183,23 @@ class DevelopmentMapScreen extends StatelessWidget {
                         overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 10),
                     Wrap(spacing: 6, runSpacing: 6, children: [
-                      for (final s in b.$4.take(3))
+                      for (final m in _skills(i).take(3))
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(999),
                               border: Border.all(color: p.line)),
-                          child: Text(s,
-                              style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            if (MilestoneStore.instance.isObserved(m.id)) ...[
+                              Icon(Icons.check_rounded, size: 13, color: p.ink1),
+                              const SizedBox(width: 4),
+                            ],
+                            Flexible(
+                              child: Text(m.title,
+                                  style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                            ),
+                          ]),
                         ),
                     ]),
                   ]),
@@ -199,24 +243,45 @@ class DevelopmentMapScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ppCareHeading('What tends to blossom'),
             const SizedBox(height: 12),
-            for (final s in b.$4)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 9),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 7, right: 12),
-                    child: Container(
-                        width: 5, height: 5, decoration: BoxDecoration(color: p.ink1, shape: BoxShape.circle)),
-                  ),
-                  Expanded(child: Text(s, style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1))),
-                ]),
-              ),
+            // The band's milestones from the one list, each saving to
+            // Milestones (R10). The four words before, kept for revert:
+            // for (final s in b.$4) ... a dot and Text(s)
+            AnimatedBuilder(
+              animation: MilestoneStore.instance,
+              builder: (ctx, _) => Column(children: [
+                for (final m in _skills(i)) _skillRow(context, ctx, p, m),
+              ]),
+            ),
             const SizedBox(height: 12),
             Text('Many children grow into these across this window - some sooner, some later, and all of it normal.',
                 style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3)),
           ]),
         ),
       ),
+    );
+  }
+
+  Widget _skillRow(BuildContext context, BuildContext sheet, V2Palette p, Milestone m) {
+    final obs = MilestoneStore.instance.observation(m.id);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 9),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Expanded(child: Text(m.title, style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1))),
+        const SizedBox(width: 10),
+        PvPress(child: GestureDetector(
+          key: ValueKey('devmap_ms_${m.id}'),
+          onTap: () {
+            Navigator.of(sheet).pop();
+            openMilestoneSave(context, milestoneId: m.id);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: p.line)),
+            child: Text(obs == null ? 'I saw it' : 'Seen ${ppShortDate(obs.date)}',
+                style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, color: p.ink1)),
+          ),
+        )),
+      ]),
     );
   }
 

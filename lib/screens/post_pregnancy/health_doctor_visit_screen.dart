@@ -143,8 +143,12 @@ String? ppDoctorVisitDevelopmentLine({DateTime? now}) {
   if (!PpUseConsent.instance.allows(PpUseKind.development)) return null;
   final ms = MilestoneStore.instance;
   final since = (now ?? DateTime.now()).subtract(const Duration(days: 92));
-  final recent = ms.achieved.where((m) => ms.observation(m.id)!.date.isAfter(since)).toList();
-  if (recent.isEmpty) return 'No milestones ticked in the last 3 months';
+  // `seen`, not `achieved`, since R10: a milestone of her own counts too.
+  // Kept for revert:
+  // final recent = ms.achieved.where((m) => ms.observation(m.id)!.date.isAfter(since)).toList();
+  // if (recent.isEmpty) return 'No milestones ticked in the last 3 months';
+  final recent = ms.seen.where((s) => s.obs.date.isAfter(since)).toList();
+  if (recent.isEmpty) return 'No milestones saved in the last 3 months';
   return 'Seen lately: ${recent.take(5).map((m) => m.title).join(' · ')}';
 }
 

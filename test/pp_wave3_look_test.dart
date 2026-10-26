@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/post_pregnancy/health_home_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/milestone_journey_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_milestones_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_common.dart';
 import 'package:parentveda/screens/post_pregnancy/wallet_v2_screens.dart';
@@ -104,7 +105,9 @@ void main() {
 
   testWidgets('Milestones: the cards and the page carry no old colour', (t) async {
     await _pump(t, const MilestoneJourneyScreen());
-    expect(find.byType(MilestoneFlipCard), findsWidgets);
+    // The flip cards went with R10 (2026-10-26); the journey is the one
+    // Milestones place now. Was: find.byType(MilestoneFlipCard), findsWidgets.
+    expect(find.byType(PpMilestonesScreen), findsOneWidget);
     expect(_oldLook(t), isEmpty);
     expect(t.takeException(), isNull);
   });

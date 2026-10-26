@@ -13,11 +13,14 @@
 // =============================================================================
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/child_scoped_store.dart';
+import '../../services/remote/storage_service.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
 
@@ -46,6 +49,25 @@ const Map<DevDomain, DomainMeta> kDomainMeta = {
   DevDomain.social: DomainMeta('Social & emotional', 'Feelings', Icons.favorite_border_rounded, Color(0xFFFBEAF0), Color(0xFFB83A63)),
   DevDomain.selfCare: DomainMeta('Self-care', 'Everyday', Icons.spa_outlined, Color(0xFFEAF6F6), Color(0xFF2A7B7B)),
 };
+
+/// The four areas the Milestones screen groups by (R10, 2026-10-26, the
+/// approved prototype): derived from [DevDomain], never stored, so a domain
+/// can move between areas without touching a saved row.
+enum MsArea { moving, hands, talking, feelingsPlay }
+
+const Map<MsArea, String> kMsAreaLabel = {
+  MsArea.moving: 'Moving',
+  MsArea.hands: 'Hands',
+  MsArea.talking: 'Talking',
+  MsArea.feelingsPlay: 'Feelings and play',
+};
+
+MsArea msAreaOf(DevDomain d) => switch (d) {
+      DevDomain.grossMotor => MsArea.moving,
+      DevDomain.fineMotor || DevDomain.selfCare => MsArea.hands,
+      DevDomain.language => MsArea.talking,
+      DevDomain.cognitive || DevDomain.social => MsArea.feelingsPlay,
+    };
 
 /// One milestone. [loMonths]/[hiMonths] are the *typical* range - always shown
 /// as a range, never a due date.
@@ -78,11 +100,35 @@ class Milestone {
 }
 
 /// One recorded observation - a milestone becomes a memory, not a checkbox.
+///
+/// [photo] and [title] arrived with R10 (2026-10-26, migration 0116).
+/// [photo] is a Storage object path, or a local path until it uploads (the
+/// journal's rule). [title] is set only on a milestone of her own (an id
+/// starting `own_`), which has no catalogue entry to take a title from.
 class MilestoneObs {
-  MilestoneObs({required this.date, this.note});
+  MilestoneObs({required this.date, this.note, this.photo, this.title});
   final DateTime date;
   final String? note;
+  final String? photo;
+  final String? title;
 }
+
+/// A milestone she has seen, from the catalogue or her own, with its record:
+/// what every "seen" list draws (R10).
+class SeenMilestone {
+  const SeenMilestone(this.id, this.title, this.domain, this.obs);
+  final String id;
+  final String title;
+
+  /// Null for one of her own: it sits under All, never under an area.
+  final DevDomain? domain;
+  final MilestoneObs obs;
+  bool get isOwn => domain == null;
+  MsArea? get area => domain == null ? null : msAreaOf(domain!);
+}
+
+/// Her own milestone ids start with this, and the app makes them (R10).
+const String kOwnMilestonePrefix = 'own_';
 
 // ---- catalogue --------------------------------------------------------------
 const List<Milestone> kMilestones = [
@@ -382,7 +428,129 @@ const List<Milestone> kMilestones = [
     variation: 'Daytime dryness anywhere from two to four is normal. Night dryness can come years later.',
     discuss: 'Mention it if there is no daytime control at all by about four, or a child who was dry starts wetting again.',
   ),
+  // ---- added with R10 (2026-10-26): the gaps the four-list merge found ------
+  // Three skills the check-in, the phase docs and the Development Map all
+  // named but this list did not, so a parent who saw them had nowhere to save
+  // them. New ids at the end; nothing above moves. The same REQUIRED_REVIEW
+  // as the first-year block applies to their windows.
+  Milestone(
+    id: 'lang_voice', domain: DevDomain.language, title: 'Turning toward your voice', loMonths: 0, hiMonths: 4,
+    desc: 'Your baby starts to turn their head or eyes toward you when you talk, as if looking for where the voice came from.',
+    why: 'Finding a sound is hearing and attention working together, and your voice is the first one they learn.',
+    encourage: ['Talk to them from one side, then the other', 'Use a soft, sing-song voice close by', 'Pause and let them find you'],
+    variation: 'Some babies turn quickly; others just go still and listen at first. Both are hearing at work.',
+    discuss: 'If your baby never seems to react to voices or loud sounds by around 4 months, ask for a hearing check at your next visit.',
+  ),
+  Milestone(
+    id: 'gm_pullup', domain: DevDomain.grossMotor, title: 'Pulling up to stand and cruising', loMonths: 8, hiMonths: 13,
+    desc: 'Holding on to furniture or your hands, your baby pulls up to stand, then shuffles sideways along the sofa.',
+    why: 'Standing and cruising build the balance and leg strength that first steps need.',
+    encourage: ['A low, steady sofa or table to hold', 'Bare feet on a safe floor for grip', 'A toy placed a little way along the furniture'],
+    variation: 'Some babies pull up early and cruise for months; others crawl for a long time and stand later. Both are common.',
+    discuss: 'If, by around 12 months, there is no pulling up or bearing weight on the legs at all, mention it at your next visit.',
+  ),
+  Milestone(
+    id: 'soc_point', domain: DevDomain.social, title: 'Pointing to show you something', loMonths: 9, hiMonths: 14,
+    desc: 'Your baby points at a dog, a light or a bird, then looks back at you to check you saw it too.',
+    why: 'Pointing to share is one of the first ways a baby says "look with me", and it comes before many words.',
+    encourage: ['Point and name things on a walk', 'Follow their point and talk about what they found', 'Wave, clap and copy little gestures together'],
+    variation: 'Some babies wave and clap long before they point. Pointing to ask for something often comes before pointing to share.',
+    discuss: 'If there is no pointing or other gestures to share interest by around 16 months, it is worth a gentle mention.',
+  ),
 ];
+
+/// The phase docs' snapshot titles (Home's "How {name} is growing") that are
+/// one of the milestones above, by title (R10, DV2). Clear matches only: a
+/// snapshot about feeding cues or "Saying No With Conviction" is a phase note,
+/// not a milestone, and stays unmapped. The docs are shipped copy and are not
+/// rewritten; this map is how they point at the one list.
+const Map<String, String> kSnapshotMilestone = {
+  'Early Head Control': 'gm_headup',
+  'Lifting Head Briefly': 'gm_headup',
+  'Holding Head Higher': 'gm_headup',
+  'Responding to Voices': 'lang_voice',
+  'Turning Toward Sound': 'lang_voice',
+  'Focusing on Faces': 'cog_track',
+  'Following Faces and Movement': 'cog_track',
+  'Tracking Faces And Objects': 'cog_track',
+  'Early Cooing Sounds': 'lang_coo',
+  'Back-And-Forth Cooing': 'lang_coo',
+  'First Social Smile': 'soc_smile',
+  'Smiling In Response': 'soc_smile',
+  'Reaching with Intention': 'fm_grasp',
+  'Trying Out New Sounds': 'lang_babble',
+  'Repeating Sounds Playfully': 'lang_babble',
+  'Babbling With Consonants': 'lang_babble',
+  'Mixing Babbling Sounds': 'lang_babble',
+  'Laughing Out Loud': 'soc_laugh',
+  'Beginning to Roll': 'gm_roll',
+  'Making Objects Meet': 'cog_cause',
+  'Sitting With Support': 'gm_sit',
+  'Beginning to Sit Independently': 'gm_sit',
+  'Exploring First Foods': 'self_solids',
+  'Watching Objects Disappear': 'cog_permanence',
+  'Searching for Hidden Toys': 'cog_permanence',
+  'Exploring Self-Feeding': 'self_finger',
+  'Exploring New Ways to Move': 'gm_crawl',
+  'Responding to Their Name': 'lang_understand',
+  'Following Simple Instructions': 'lang_understand',
+  'Noticing Unfamiliar Faces': 'soc_separation',
+  'Seeking You When Apart': 'soc_separation',
+  'Pulling Up to Stand': 'gm_pullup',
+  'Cruising Along Furniture': 'gm_pullup',
+  'Pointing to Show Interest': 'soc_point',
+  'Taking Assisted Steps': 'gm_walk',
+  'Taking First Steps': 'gm_walk',
+  'Using a First Word': 'lang_words',
+  'Trying Pretend Play': 'cog_pretend',
+  'Playing Out a Sequence': 'cog_pretend',
+  'Climbing Onto Furniture': 'gm_run_climb',
+  'Running With Growing Confidence': 'gm_run_climb',
+  'Climbing With Alternating Feet': 'gm_run_climb',
+  'Sorting Similar Objects': 'cog_sort_count',
+  'Combining Two Words': 'lang_two_words',
+  'Following a Story': 'lang_story',
+  'Jumping With Both Feet': 'gm_jump_pedal',
+  'Pedalling a Tricycle': 'gm_jump_pedal',
+  'Speaking in Short Sentences': 'lang_sentences',
+  'Asking Why': 'lang_sentences',
+  'Asking Big Questions': 'lang_sentences',
+  'Playing With Other Children': 'soc_play_with',
+  'Naming a Favourite Friend': 'soc_play_with',
+  'Hopping on One Foot': 'gm_hop_catch',
+};
+
+/// The `DevArea` stages (pp_development_data.dart) that are one of the
+/// milestones above, keyed `<area id>|<stage name>` (R10, DV2: "one list, one
+/// store, both screens reading it"). A stage has no id of its own, so the
+/// name is the key; test/pp_milestones_one_place_test.dart fails if a stage
+/// is renamed out from under this map. Stages that are a way of being
+/// ("Borrowing your calm", "Sensory delight") are not milestones and stay
+/// unmapped. Their pages are not drawn on any reachable screen today; the
+/// map is here so the day they are, they read and save the one record.
+const Map<String, String> kDevStageMilestone = {
+  'cognitive|Follows a moving toy': 'cog_track',
+  'cognitive|Cause & effect': 'cog_cause',
+  'cognitive|Object permanence': 'cog_permanence',
+  'language|Cooing': 'lang_coo',
+  'language|Musical babble': 'lang_babble',
+  'language|Babble with consonants': 'lang_babble',
+  'language|First words': 'lang_words',
+  'gross_motor|Head control': 'gm_headup',
+  'gross_motor|Pushes up on forearms': 'gm_headup',
+  'gross_motor|Rolling': 'gm_roll',
+  'gross_motor|Sitting with support': 'gm_sit',
+  'gross_motor|Crawling': 'gm_crawl',
+  'gross_motor|Standing & walking': 'gm_walk',
+  'fine_motor|Reaching & grasping': 'fm_grasp',
+  'fine_motor|Transfers hand to hand': 'fm_transfer',
+  'fine_motor|Pincer grasp': 'fm_pincer',
+  'emotional|Social smile': 'soc_smile',
+  'emotional|Expressing delight': 'soc_laugh',
+  'social|Stranger awareness': 'soc_separation',
+  'creativity|Cause-and-effect play': 'cog_cause',
+  'selfcare|Finger foods': 'self_finger',
+};
 
 // ---- store ------------------------------------------------------------------
 class MilestoneStore extends ChangeNotifier {
@@ -500,6 +668,8 @@ class MilestoneStore extends ChangeNotifier {
             MilestoneObs(
               date: SupabaseRepo.parseDbTime(r['observed_on']),
               note: r['note']?.toString(),
+              photo: r['photo_path']?.toString(),
+              title: r['title']?.toString(),
             ),
           ),
         );
@@ -509,18 +679,53 @@ class MilestoneStore extends ChangeNotifier {
       }
       await _persist();
       notifyListeners();
+      await _backfillPhotos();
       await _pushWaiting();
     } catch (_) {/* offline - keep local */}
+  }
+
+  /// A photo saved offline is a local path; once signed in it uploads and
+  /// the row is touched so the cloud learns the Storage path (R10).
+  Future<void> _backfillPhotos() async {
+    var moved = false;
+    for (final e in _observed.entries.toList()) {
+      final ph = e.value.photo;
+      if (ph == null || ph.isEmpty) continue;
+      final up = await StorageService.backfill(ph, 'milestones');
+      if (up == ph) continue;
+      final next = MilestoneObs(
+          date: e.value.date, note: e.value.note, photo: up, title: e.value.title);
+      _observed[e.key] = next;
+      _sync.touch(e.key, _childId, columns: _cols(e.key, next));
+      moved = true;
+    }
+    if (moved) await _persist();
   }
 
   bool _hasPending() => _sync.hasPending;
 
   /// The row's own columns (0104).
+  ///
+  /// ⚠️ `photo_path` AND `title` ARE SENT ONLY WHEN SET (R10, 0116). A client
+  /// that sends a column the server does not have fails the WHOLE row, and
+  /// cloud writes here are fire-and-forget, so it would fail silently: every
+  /// milestone, photo or not, would stop syncing until 0116 is run. Leaving
+  /// the key out when it is null keeps a photo-less row valid before and
+  /// after the migration. It also keeps an older build harmless: PostgREST
+  /// updates only the columns it is sent, so a row written without the key
+  /// never wipes a photo another phone saved. Pinned in
+  /// test/pp_milestones_one_place_test.dart.
   static Map<String, dynamic> _cols(String id, MilestoneObs obs) => {
         'milestone_id': id,
         'observed_on': SupabaseRepo.dbTime(obs.date),
         'note': obs.note,
+        if (obs.photo != null) 'photo_path': obs.photo,
+        if (obs.title != null) 'title': obs.title,
       };
+
+  @visibleForTesting
+  static Map<String, dynamic> debugCols(String id, MilestoneObs obs) =>
+      _cols(id, obs);
 
   /// Uploads whatever the cloud has not confirmed (0104).
   Future<void> _pushWaiting() => _sync.push(
@@ -551,8 +756,12 @@ class MilestoneStore extends ChangeNotifier {
       await prefs.setString(
         _prefsKey,
         jsonEncode({
-          'byChild': _obsBy.toJson((m) => m.map((id, o) => MapEntry(
-              id, {'date': SupabaseRepo.dbTime(o.date), 'note': o.note}))),
+          'byChild': _obsBy.toJson((m) => m.map((id, o) => MapEntry(id, {
+                'date': SupabaseRepo.dbTime(o.date),
+                'note': o.note,
+                if (o.photo != null) 'photo': o.photo,
+                if (o.title != null) 'title': o.title,
+              }))),
         }),
       );
     } catch (_) {}
@@ -564,6 +773,8 @@ class MilestoneStore extends ChangeNotifier {
             e.key.toString(): MilestoneObs(
               date: SupabaseRepo.parseDbTime((e.value as Map)['date']),
               note: (e.value as Map)['note']?.toString(),
+              photo: (e.value as Map)['photo']?.toString(),
+              title: (e.value as Map)['title']?.toString(),
             ),
       };
 
@@ -575,6 +786,15 @@ class MilestoneStore extends ChangeNotifier {
   MilestoneObs? observation(String id) => _observed[id];
 
   Milestone byId(String id) => kMilestones.firstWhere((m) => m.id == id);
+
+  /// The catalogue entry, or null for one of her own (or an id a newer build
+  /// added that this one does not know).
+  Milestone? find(String id) {
+    for (final m in kMilestones) {
+      if (m.id == id) return m;
+    }
+    return null;
+  }
 
   List<Milestone> inDomain(DevDomain d) => kMilestones.where((m) => m.domain == d).toList();
 
@@ -628,9 +848,15 @@ class MilestoneStore extends ChangeNotifier {
   List<Milestone> get foundations =>
       kMilestones.where((m) => m.hiMonths < _ageMonths && !isObserved(m.id)).toList();
 
-  /// Observed, most recent first — the celebrated memories.
+  /// Observed, most recent first — the celebrated memories. Catalogue ones
+  /// only: her own have no [Milestone]; [seen] has both.
   List<Milestone> get achieved {
-    final list = _observed.keys.map(byId).toList();
+    // Kept for revert; it threw on an own_ id (R10):
+    // final list = _observed.keys.map(byId).toList();
+    final list = [
+      for (final id in _observed.keys)
+        if (find(id) != null) find(id)!,
+    ];
     list.sort((a, b) => _observed[b.id]!.date.compareTo(_observed[a.id]!.date));
     return list;
   }
@@ -638,6 +864,32 @@ class MilestoneStore extends ChangeNotifier {
   Milestone? get recentlyAchieved => achieved.isEmpty ? null : achieved.first;
 
   int get observedCount => _observed.length;
+
+  /// Everything she has seen, ours and her own, newest first (R10): the
+  /// Milestones screen's grid, the home row, the doctor visit.
+  List<SeenMilestone> get seen {
+    final out = <SeenMilestone>[];
+    _observed.forEach((id, obs) {
+      final m = find(id);
+      if (m != null) {
+        out.add(SeenMilestone(id, m.title, m.domain, obs));
+      } else if (id.startsWith(kOwnMilestonePrefix)) {
+        out.add(SeenMilestone(id, obs.title ?? 'A milestone', null, obs));
+      }
+    });
+    out.sort((a, b) => b.obs.date.compareTo(a.obs.date));
+    return out;
+  }
+
+  SeenMilestone? get newest {
+    final s = seen;
+    return s.isEmpty ? null : s.first;
+  }
+
+  /// How many she has seen in [area] (null = all). A count, never a score:
+  /// there is no "of N" anywhere (R10).
+  int seenIn(MsArea? area) =>
+      area == null ? seen.length : seen.where((s) => s.area == area).length;
 
   /// A warm, human stage label from the age.
   String get stageLabel {
@@ -665,8 +917,13 @@ class MilestoneStore extends ChangeNotifier {
   }
 
   // ---- writes -------------------------------------------------------------
-  void markObserved(String id, {DateTime? date, String? note}) {
-    final obs = MilestoneObs(date: date ?? DateTime.now(), note: note);
+  void markObserved(String id,
+      {DateTime? date, String? note, String? photo, String? title}) {
+    final obs = MilestoneObs(
+        date: date ?? DateTime.now(), note: note, photo: photo, title: title);
+    // A replaced photo leaves Storage (the journal's copy is its own).
+    final old = _observed[id]?.photo;
+    if (old != null && old.isNotEmpty && old != photo) StorageService.remove(old);
     _observed[id] = obs;
     notifyListeners();
     _persist();
@@ -675,8 +932,38 @@ class MilestoneStore extends ChangeNotifier {
     _pushWaiting();
   }
 
+  /// A milestone of her own (R10): the app makes the id, so the phone's row
+  /// and its cloud copy share one identity.
+  String markOwn(String title, {DateTime? date, String? note, String? photo}) {
+    final id = '$kOwnMilestonePrefix${DateTime.now().microsecondsSinceEpoch}';
+    markObserved(id, date: date, note: note, photo: photo, title: title.trim());
+    return id;
+  }
+
+  /// Copies a picked photo into the app's documents and uploads it to
+  /// `media/<uid>/milestones/`; the result is what [MilestoneObs.photo]
+  /// keeps (the Storage path, or the local copy until it can upload).
+  static Future<String> savePhoto(String sourcePath) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final mdir = Directory('${dir.path}/milestones');
+      if (!mdir.existsSync()) mdir.createSync(recursive: true);
+      final ext = sourcePath.contains('.') ? sourcePath.split('.').last : 'jpg';
+      final dest =
+          '${mdir.path}/ms_${DateTime.now().microsecondsSinceEpoch}.$ext';
+      await File(sourcePath).copy(dest);
+      return StorageService.upload(dest, 'milestones');
+    } catch (_) {
+      return sourcePath;
+    }
+  }
+
   void unobserve(String id) {
     final was = _observed.remove(id);
+    // Its photo is NOT deleted from Storage here: the Undo toast puts the
+    // same record back, photo path and all, and a deleted object cannot
+    // come back. The cost is an orphaned file per removed milestone
+    // (STILL-OPEN §101.10).
     notifyListeners();
     _persist();
     // A hard delete fired once, lost offline; kept for revert. Un-ticking is

@@ -51,7 +51,8 @@ void main() {
     expect(pp, contains('V3JournalSection('));
     expect(pp.contains('_pad(_JournalInvite('), isFalse, reason: 'the parenting-only card is retired');
     // Every tile reaches the page it names.
-    for (final s in ['showAddMemorySheet(context)', 'GuidedMemoryScreen()', "'A photo from today'", 'LetterScreen()']) {
+    // "A first" opens the one Milestones save since R10 (2026-10-26); was 'GuidedMemoryScreen()'.
+    for (final s in ['showAddMemorySheet(context)', 'PpMilestonesScreen(', "'A photo from today'", 'LetterScreen()']) {
       expect(pp, contains(s), reason: s);
     }
     expect(preg, contains("RouteSettings(name: 'journal')"), reason: 'the pregnancy journal is named');

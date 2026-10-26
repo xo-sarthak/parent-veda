@@ -40,6 +40,9 @@ import '../../../services/journal_store.dart';
 import '../pp_child_profile.dart';
 import 'jv2_data.dart' show JvKind;
 
+/// Ties a journal memory to the milestone it keeps (R10).
+const String kPpMilestoneTag = 'pp_milestone:';
+
 class PpJournalEntry {
   PpJournalEntry({
     required this.id,
@@ -136,6 +139,60 @@ class PpJournalStore extends ChangeNotifier {
       tags: ['$kPpChildTag$_childId', '$kPpKindTag${kind.name}'],
     ));
     return true;
+  }
+
+  /// A saved milestone's one journal memory (R10, 2026-10-26).
+  ///
+  /// Milestones are the one save; with "Also keep it in the journal" on,
+  /// this keeps the memory. The tag `pp_milestone:<id>` ties the memory to
+  /// its milestone, so saving the milestone again (a new photo, a date
+  /// fixed) updates its memory instead of adding a second one.
+  ///
+  /// ⚠️ THE PHOTO IS A SEPARATE COPY OF THE ONE MILESTONES KEEPS.
+  /// `JournalStore.deleteEntry` deletes an entry's images from Storage, so if
+  /// both pointed at one object, deleting the memory would erase the
+  /// milestone's photo too. Two files cost storage; they buy two records
+  /// that can each be deleted without touching the other.
+  Future<void> keepMilestone({
+    required String milestoneId,
+    required String title,
+    required DateTime date,
+    String body = '',
+    String? pickedPhotoPath,
+  }) async {
+    final tag = '$kPpMilestoneTag$milestoneId';
+    final child = '$kPpChildTag$_childId';
+    JournalEntry? had;
+    for (final e in _journal.manualEntries) {
+      if (e.tags.contains(tag) && e.tags.contains(child)) had = e;
+    }
+    final photo = pickedPhotoPath == null
+        ? null
+        : await JournalStore.saveImage(pickedPhotoPath);
+    final images = photo != null ? [photo] : (had?.images ?? const <String>[]);
+    final entry = JournalEntry(
+      id: had?.id ?? 'jv_${DateTime.now().microsecondsSinceEpoch}_${_seq++}',
+      type: JournalEntryType.memory,
+      title: title.trim(),
+      description: body.trim(),
+      date: date,
+      imageUrls: images.isEmpty ? null : images,
+      tags: [child, '$kPpKindTag${JvKind.guided.name}', tag],
+      createdAt: had?.createdAt,
+    );
+    if (had == null) {
+      await _journal.addEntry(entry);
+    } else {
+      await _journal.updateEntry(entry);
+    }
+  }
+
+  /// True when this child's milestone already has its journal memory.
+  bool hasMilestone(String milestoneId) {
+    final tag = '$kPpMilestoneTag$milestoneId';
+    final child = '$kPpChildTag$_childId';
+    return _journal.manualEntries
+        .any((e) => e.tags.contains(tag) && e.tags.contains(child));
   }
 
   Future<void> remove(String id) => _journal.deleteEntry(id);

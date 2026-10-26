@@ -73,7 +73,7 @@ class DevelopmentCheckinScreen extends StatelessWidget {
           hue: 28,
           eyebrow: 'Development',
           mark: IntentMark.stepsMark,
-          title: 'A gentle check-in',
+          title: 'Questions for this age', // was 'A gentle check-in' (R10)
           intro: 'A few questions for ${c.nameMid}\'s age. No scores and no comparing: just a clearer picture.',
           children: [
             if (questions.isEmpty)

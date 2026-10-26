@@ -1572,3 +1572,44 @@ placeholder; the timer counts from play, survives a stop, and keeps "All night")
 **Files:** `lib/screens/post_pregnancy/pp_names_data.dart`, `name_journey_feed_screen.dart`,
 `name_journey_shortlist_screen.dart`, `name_list_screen.dart`, `name_journey_detail_screen.dart`,
 `lib/services/raga_audio_store.dart`, `lib/screens/post_pregnancy/pp_sounds_screen.dart`.
+
+## Step 24: a milestone carries a photo, and one of her own carries its words (R10)
+
+**Date:** 2026-10-26 (STAGE-TRANSITIONS R10, the user's go for "that migration and its sync step").
+**Migration:** `0116_pp_milestone_photo.sql`, run by the user. **Commit:** pending.
+
+### Why
+R10 makes Milestones one place per child, where saving one is a moment: a date, an optional photo and a line,
+and, with the switch on, one journal memory. A saved milestone held a date and a note only. The user also chose
+that a parent may save a milestone of her own ("First time at Nani's"), which has no catalogue entry to take a
+title from, so its words have to travel with the row.
+
+### What changed
+- [x] **Two nullable columns** on `pp_milestone_observations`: `photo_path` (the Storage object path in the
+  private `media` bucket, `<uid>/milestones/<file>`, the journal's rule) and `title` (only on an `own_` id,
+  which the app makes). No RLS change: 0025's `my_child_ids()` policies cover every column, so both parents
+  read and write them.
+- [x] **The app sends the two keys only when they are set** (`MilestoneStore._cols`). A client that sends a
+  column the server lacks fails the whole row, and these writes are fire-and-forget, so before 0116 ran,
+  every milestone (photo or not) would have stopped syncing without a sound. Leaving the key out keeps a
+  photo-less row valid before and after the migration, and keeps an older build from wiping a photo
+  (PostgREST updates only the columns it is sent). BACKEND-PATTERNS §16ww.
+- [x] **The photo uploads like the journal's**: copied into the app's documents, `StorageService.upload(dest,
+  'milestones')`, and a local path left by an offline save is back-filled on the next sync, which touches the
+  row so the cloud learns the Storage path.
+- [x] **The journal memory keeps its own copy of the photo.** `JournalStore.deleteEntry` deletes an entry's
+  images from Storage, so a shared object would let deleting the memory erase the milestone's photo. The memory
+  is tied to its milestone by the tag `pp_milestone:<id>` (no new table), so a re-save updates it.
+- [x] **Removing a milestone keeps its photo object**, because the Undo toast puts the same record back and a
+  deleted object cannot return. The cost is an orphaned file per removed milestone (STILL-OPEN §101.10).
+- [x] **`achieved` no longer maps every id through the catalogue** (it threw on an `own_` id); `seen` lists both.
+
+**Verified:** `test/pp_milestones_one_place_test.dart` (the two keys only when set; 0116 adds exactly those
+columns; `fromRow` reads them; her own milestone round-trips; one journal memory however often it is saved; the
+doctor visit lists her own), `test/pp_records_merge_test.dart`, `test/pp_child_records_test.dart`.
+
+**Files:** `supabase/migrations/0116_pp_milestone_photo.sql`, `lib/screens/post_pregnancy/pp_milestones_data.dart`,
+`lib/screens/post_pregnancy/journal_v2/jv2_store.dart`.
+
+**Known limit:** the media bucket lets the uploader and the paired partner read a photo (0013, 0014). A third
+caregiver on the child sees the milestone and its day, not its photo.

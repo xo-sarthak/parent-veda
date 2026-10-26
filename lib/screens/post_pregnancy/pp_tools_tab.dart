@@ -159,11 +159,12 @@ List<PpToolGroup> ppToolGroups() {
           IntentMark.spoonMark, words: ['nuskhe', 'gharelu', 'remedy', 'ajwain']),
     ]),
     PpToolGroup('Growing and learning', 28, [
-      PpTool("This month's checklist", 'What usually comes next, and what to try.', 'pp_month_checklist', tab: TtcTabMark.checklist,
+      // Was "This month's checklist" and 'A gentle check-in' (R10, 2026-10-26).
+      PpTool('This month', 'What usually comes next, and what to try.', 'pp_month_checklist', tab: TtcTabMark.checklist,
           IntentMark.calendarDay, words: ['month']),
       PpTool('Milestones', 'Where your baby is right now, without a score.', 'pp_milestones', tab: TtcTabMark.flagPath, IntentMark.stepsMark,
           words: ['development', 'rolling', 'walking']),
-      PpTool('A gentle check-in', 'A few questions, and when to ask your paediatrician.', 'pp_dev_checkin', tab: TtcTabMark.sunrise,
+      PpTool('Questions for this age', 'A few questions, and when to ask your paediatrician.', 'pp_dev_checkin', tab: TtcTabMark.sunrise,
           IntentMark.lampMark, words: ['delay', 'worry']),
       // Named for where it lands: every activity for this age, not today's pick.
       // The door's "Things to do together today" now says the same (R3 settled 2026-10-25).

@@ -33,10 +33,12 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../v2/v2_palette.dart';
 import '../../theme/pv_fonts.dart';
-import '../../widgets/pv_feedback.dart';
+// import '../../widgets/pv_feedback.dart'; // kept for revert with the tick's pvCommitFeedback (R10)
 import 'pp_care_parts.dart';
 import 'pp_child_profile.dart';
 import 'pp_milestones_data.dart';
+import 'pp_milestones_screen.dart' show openMilestoneSave;
+import 'pp_tools_kit.dart' show ppShortDate;
 import 'pp_month_notes.dart';
 import 'pp_phases_data.dart';
 import 'pp_vaccine_data.dart';
@@ -106,7 +108,9 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
           hue: 28,
           eyebrow: note?.label ?? phase.ageLabel,
           mark: IntentMark.listMark,
-          title: 'This month\'s checklist',
+          // Was 'This month\'s checklist' (R10, 2026-10-26: the checklist
+          // words go; a month with a child is not a list to finish).
+          title: 'This month',
           intro: 'Everything for ${c.nameMid}\'s age on one page: what is new, what to watch for, and what is due.',
           children: [
             if (note != null)
@@ -120,30 +124,24 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
               ]))
             else
               section('What is new', Text(phase.summary, style: body)),
+            // Was 'Skills coming in now', with a circle to tick on each row
+            // (R10, 2026-10-26). Each row is "I saw it" now, and the tap is
+            // the one Milestones save (date, photo, a line, the journal), so
+            // a milestone saved here is the same record everywhere. The tick
+            // and its toggle, kept for revert:
+            //   _TickRow(label: m.title, ticked: ms.isObserved(m.id),
+            //       onTap: () { ms.isObserved ? ms.unobserve : ms.markObserved ... })
             section(
-              'Skills coming in now',
+              'Might appear soon',
               emerging.isEmpty
-                  ? Text('Nothing new on the list for this age. Keep playing and talking; it all counts.', style: body)
+                  ? Text('Nothing new expected for this age. Keep playing and talking; it all counts.', style: body)
                   : Column(children: [
                       for (final m in emerging.take(shown))
-                        _TickRow(
+                        _SeenRow(
                           key: ValueKey('pp_checklist_ms_${m.id}'),
                           label: m.title,
-                          ticked: ms.isObserved(m.id),
-                          onTap: () {
-                            pvCommitFeedback();
-                            if (ms.isObserved(m.id)) {
-                              final was = ms.observation(m.id);
-                              ms.unobserve(m.id);
-                              ppCareSaved(context, '"${m.title}" taken off Milestones.',
-                                  undo: () => ms.markObserved(m.id, date: was?.date, note: was?.note));
-                            } else {
-                              ms.markObserved(m.id);
-                              // Was 'saved to the milestone journey.': the tool is Milestones now.
-                              ppCareSaved(context, '"${m.title}" saved to Milestones, seen today.',
-                                  undo: () => ms.unobserve(m.id));
-                            }
-                          },
+                          seenOn: ms.observation(m.id)?.date,
+                          onTap: () => openMilestoneSave(context, milestoneId: m.id),
                         ),
                       const SizedBox(height: 4),
                       // Was plain text naming "the milestone journey". Now a
@@ -154,9 +152,11 @@ class _PpMonthChecklistScreenState extends State<PpMonthChecklistScreen> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           child: Text(
+                            // Was 'See all N in Milestones' / 'Ticks go to
+                            // Milestones' (R10).
                             emerging.length > shown
-                                ? 'See all ${emerging.length} in Milestones  →'
-                                : 'Ticks go to Milestones  →',
+                                ? 'See all of ${c.nameMid}\'s milestones  →'
+                                : 'What you save lands in Milestones  →',
                             style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1),
                           ),
                         ),
@@ -243,7 +243,46 @@ List<Milestone> _byAreaInTurn(List<Milestone> ms) {
   return out;
 }
 
+/// One milestone in the month: its name, and "I saw it" or the day it was
+/// seen (R10). Nothing to tick.
+class _SeenRow extends StatelessWidget {
+  const _SeenRow({super.key, required this.label, required this.seenOn, required this.onTap});
+  final String label;
+  final DateTime? seenOn;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Semantics(
+      button: true,
+      label: seenOn == null ? '$label. I saw it' : '$label. Seen ${ppShortDate(seenOn!)}',
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 11),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.line))),
+          child: Row(children: [
+            Expanded(child: Text(label, style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w600, color: p.ink1))),
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: p.line)),
+              child: Text(seenOn == null ? 'I saw it' : 'Seen ${ppShortDate(seenOn!)}',
+                  style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, color: p.ink1)),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+// Kept for revert (R10): the round tick each row had.
+// ignore: unused_element
 class _TickRow extends StatelessWidget {
+  // ignore: unused_element_parameter
   const _TickRow({super.key, required this.label, required this.ticked, required this.onTap});
   final String label;
   final bool ticked;

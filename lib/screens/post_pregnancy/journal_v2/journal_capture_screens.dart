@@ -23,6 +23,7 @@ import '../../../widgets/journal/journal_keepsake.dart';
 import 'jv2_common.dart';
 import 'jv2_data.dart';
 import 'jv2_store.dart';
+import '../pp_milestones_screen.dart' show PpMilestonesScreen;
 import '../../../widgets/pv_feedback.dart' show PvPress;
 import '../../../widgets/pv_toast.dart';
 
@@ -107,8 +108,14 @@ void showAddMemorySheet(BuildContext context) {
           const SizedBox(height: 6),
           Text("Add to $jvChild's story", style: pvFraunces(fontSize: 26, height: 1.2, letterSpacing: -0.3, color: p.ink1)),
           const SizedBox(height: 10),
-          _paperAddRow(p, const ValueKey('jv_add_guided'), V3DailyMark.first, 18, 'A first',
-              'A milestone, with a question to help', () => go(const GuidedMemoryScreen(), 'pp/journal/guided')),
+          // "A first" IS THE ONE MILESTONE SAVE (R10, 2026-10-26): it lands in
+          // Milestones and, switch on, here as one memory. The guided prompts,
+          // kept for revert:
+          //   'A first', 'A milestone, with a question to help',
+          //   () => go(const GuidedMemoryScreen(), 'pp/journal/guided')
+          _paperAddRow(p, const ValueKey('jv_add_guided'), V3DailyMark.first, 18, 'A milestone',
+              'Saved to Milestones, with its day and a photo',
+              () => go(const PpMilestonesScreen(startSave: true), 'pp_milestones')),
           _paperAddRow(p, const ValueKey('jv_add_quick'), V3DailyMark.photo, 200, 'Quick capture',
               'A photo and a line or two', () => go(const QuickCaptureScreen(), 'pp/journal/capture')),
           _paperAddRow(p, const ValueKey('jv_add_story'), V3DailyMark.memory, 268, 'Write a story',

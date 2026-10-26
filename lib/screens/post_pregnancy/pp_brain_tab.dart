@@ -152,7 +152,7 @@ class _PpBrainTabScreenState extends State<PpBrainTabScreen> {
                       PvListRow(
                         p: p,
                         leading: PvMarkWell(p: p, hue: 160, size: 40, icon: Icons.checklist_rounded),
-                        title: 'A gentle check-in',
+                        title: 'Questions for this age', // was 'A gentle check-in' (R10)
                         line: 'A few questions, and when to ask your paediatrician.',
                         onTap: () => _push(const DevelopmentCheckinScreen(), 'pp_dev_checkin'),
                       ),

@@ -43,7 +43,10 @@ void main() {
     await t.pumpAndSettle();
   }
 
-  testWidgets('checklist: a ticked skill stays, ticked, and Undo takes it back', (t) async {
+  // R10 (2026-10-26): the month's rows are "I saw it" now, and the tap is the
+  // one Milestones save; the row stays with its day, and taking it off has
+  // an Undo. Was a round tick toggled in place.
+  testWidgets('this month: a saved skill stays, with its day, and Undo takes a removal back', (t) async {
     ChildProfileStore.instance.debugSetDob(DateTime.now().subtract(const Duration(days: 185)));
     await pump(t, const PpMonthChecklistScreen(), h: 4200);
     final ms = MilestoneStore.instance;
@@ -52,15 +55,29 @@ void main() {
       if (ms.isObserved(m.id)) ms.unobserve(m.id);
     }
     await t.pumpAndSettle();
+    expect(find.text('This month'), findsOneWidget);
+    expect(find.text('Might appear soon'), findsOneWidget);
     final row = find.byKey(ValueKey('pp_checklist_ms_${first.id}'));
     await t.ensureVisible(row);
     await t.tap(row);
     await t.pumpAndSettle();
+    // Off: the journal is not under test here.
+    await t.tap(find.byKey(const ValueKey('pp_ms_save_journal')));
+    await t.tap(find.byKey(const ValueKey('pp_ms_save')));
+    await t.pumpAndSettle();
     expect(ms.isObserved(first.id), isTrue);
-    expect(row, findsOneWidget, reason: 'the row stays, ticked');
-    await t.tap(find.text('Undo'));
+    // The moment page, then back.
+    await t.tap(find.text('Back to Milestones'));
+    await t.pumpAndSettle();
+    expect(row, findsOneWidget, reason: 'the row stays, with its day');
+    await t.tap(row);
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const ValueKey('pp_ms_remove')));
     await t.pumpAndSettle();
     expect(ms.isObserved(first.id), isFalse);
+    await t.tap(find.text('Undo'));
+    await t.pumpAndSettle();
+    expect(ms.isObserved(first.id), isTrue);
     expect(find.byKey(const ValueKey('pp_checklist_not_a_diagnosis')), findsOneWidget);
   });
 

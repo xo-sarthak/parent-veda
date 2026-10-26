@@ -24,6 +24,7 @@ import 'package:parentveda/screens/post_pregnancy/doors/pp_door_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/learning_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/leap_calendar_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/milestone_journey_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_milestones_data.dart';
 import 'package:parentveda/screens/post_pregnancy/phase_map_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_content.dart';
@@ -80,7 +81,8 @@ void main() {
       expect([for (final t in door.tabs) t.id],
           ['what_to_do', 'on_track', 'when_will', 'talking']);
       expect([for (final t in door.tabs) t.label],
-          ['Play today', 'On track', 'Sit, crawl, walk', 'Talking']);
+          // 'On track' became 'Milestones' (R10, 2026-10-26); the id stays.
+          ['Play today', 'Milestones', 'Sit, crawl, walk', 'Talking']);
       final placed = [for (final t in door.tabs) ...t.areaIds];
       expect({...placed, ...door.hiddenAreaIds}, {for (final a in _dev.areas) a.id});
       expect(placed, hasLength(placed.toSet().length));
@@ -394,13 +396,16 @@ void main() {
 
     testWidgets('on track: read, tool, read, tool, then the new page and the born-early read', (t) async {
       await _pump(t, door, 12, tab: 'on_track');
-      expect(find.text('Milestones'), findsOneWidget);
+      // Twice since R10: the tab is named Milestones too, so the tool card
+      // is the last of the two.
+      expect(find.text('Milestones'), findsNWidgets(2));
       expect(find.byKey(const ValueKey('pp_door_tab_expert')), findsOneWidget);
-      double x(String s) => t.getTopLeft(find.text(s).first).dx;
+      double x(String s) => t.getTopLeft(find.text(s).last).dx;
       expect(x('The normal range is much wider than you think'), lessThan(x('Milestones')));
       expect(x('Milestones'), lessThan(x('When something is worth checking')));
-      expect(x('When something is worth checking'), lessThan(x('A gentle check-in')));
-      expect(x('A gentle check-in'), lessThan(x('Movement signs worth showing a doctor')));
+      // 'A gentle check-in' became 'Questions for this age' (R10).
+      expect(x('When something is worth checking'), lessThan(x('Questions for this age')));
+      expect(x('Questions for this age'), lessThan(x('Movement signs worth showing a doctor')));
       // The phases and What changed come last on this rail (atEnd); a long
       // horizontal rail builds lazily, so they are held as data above.
     });
@@ -413,18 +418,26 @@ void main() {
       expect(find.text('Talking'), findsWidgets);
     });
 
-    testWidgets('the journey shows the settled group and the closer look', (tester) async {
+    // R10 (2026-10-26): "Usually settled by now ... Tap the circle" became
+    // "Earlier milestones", folded, and the closer look moved into each
+    // milestone's sheet ("Play ideas for this"). Was: 'Usually settled by
+    // now', 'not a row he has missed', tap 'Thinking', 'Look closer at'.
+    testWidgets('Milestones shows the earlier ones, folded, and the play ideas', (tester) async {
       _ageMonths(10);
       tester.view.physicalSize = const Size(1200, 9000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(const MaterialApp(home: MilestoneJourneyScreen()));
       await tester.pumpAndSettle();
-      expect(find.text('Usually settled by now'), findsOneWidget);
-      expect(find.textContaining('not a row he has missed'), findsOneWidget);
-      await tester.tap(find.text('Thinking'));
+      expect(find.text('Earlier milestones'), findsOneWidget);
+      expect(find.textContaining('not one he has missed'), findsOneWidget);
+      expect(find.textContaining('Tap the circle'), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('pp_milestones_earlier')));
       await tester.pumpAndSettle();
-      expect(find.textContaining('Look closer at'), findsOneWidget);
+      final first = MilestoneStore.instance.foundations.first;
+      await tester.tap(find.byKey(ValueKey('pp_ms_soon_${first.id}')));
+      await tester.pumpAndSettle();
+      expect(find.text('Play ideas for this, at this age'), findsOneWidget);
     });
 
     testWidgets('the calendar leads with the caveat and an age, not a date', (tester) async {

@@ -109,7 +109,9 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'on_track',
-      label: 'On track',
+      // Was 'On track' (R10, 2026-10-26: the checklist words go). The id
+      // stays: links and tests open the tab by it.
+      label: 'Milestones',
       icon: Icons.checklist_rtl_outlined,
       hue: 160,
       // `something_changed` stays out: the user removed that area as a
@@ -121,7 +123,7 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
         // milestones, play, sleep, feeding, safety, vaccines and the doctor
         // lines for this age, on one page.
         PpDoorTool(
-          label: "This month's checklist",
+          label: 'This month', // was "This month's checklist" (R10)
           blurb: 'Everything for this age on one page: what is new, skills '
               'coming in, what is due, and when to call the doctor.',
           surfaceId: 'pp_month_checklist',
@@ -147,7 +149,7 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
           afterPageId: 'dev_range_is_wide',
         ),
         PpDoorTool(
-          label: 'A gentle check-in',
+          label: 'Questions for this age', // was 'A gentle check-in' (R10)
           blurb: 'A few soft yes or not-yet questions for his age. No score, '
               'and it never says "all fine".',
           surfaceId: 'pp_dev_checkin',
@@ -182,7 +184,8 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
         blurb: 'Something worrying you?',
         surfaceId: 'pp_experts/Development expert',
       ),
-      footer: 'A box you have not ticked is not one your child has missed. One baby '
+      // Was 'A box you have not ticked is not one your child has missed.' (R10)
+      footer: 'A milestone you have not saved is not one your child has missed. One baby '
           'is not a range.',
     ),
     PpDoorTab(

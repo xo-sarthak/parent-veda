@@ -4294,3 +4294,30 @@ the same to her partner.
 The chosen name could have "flowed through" to the child's record automatically. It does not: a child's name is
 the child store's fact, written by its own save and sync, and only on her tap. A tool that writes into another
 store's data on its own is how two stores end up disagreeing about one child.
+
+## 16ww. Ship the column-optional write before the migration (0116, 2026-10-26)
+
+R10 put a photo on a milestone: a new `photo_path` column on `pp_milestone_observations`, and a `title` for a
+milestone of her own. The migration and the app ship separately, and the user runs migrations by hand, so for a
+while the app is newer than the database.
+
+### 1. One unknown column fails the whole row
+PostgREST rejects an insert or upsert that names a column the table does not have. It does not drop the unknown
+key and save the rest. Our cloud writes are fire-and-forget, so the rejection is silent: the row stays pending,
+nothing on screen changes, and every milestone (with a photo or without) would have stopped syncing until 0116
+ran. The bug would have looked like "sync is flaky", not "a column is missing".
+
+### 2. So the write names the column only when it has a value
+`MilestoneStore._cols` adds `photo_path` and `title` only when they are non-null. A milestone without a photo is
+then exactly the row the old schema accepts, so it syncs before the migration and after it. Only a row that
+really has a photo waits for 0116, and it is the only row that needs it.
+
+### 3. The same rule protects the other direction
+An older build never sends the key. On an upsert PostgREST updates only the columns it is given, so the old
+build's write leaves the photo another phone saved where it is. Had the new client sent `photo_path: null` on
+every write, it would have wiped a photo whenever a phone without it touched the row.
+
+The trade-off: a column that is "absent" and a column that is "null" now mean different things on the wire, so
+the app cannot clear a photo by sending null. Clearing one is a later edit that sends a value (an empty photo is
+not offered today). For an additive, nullable column this is the right default: the migration becomes safe to
+run at any time, and no ordering between the app release and the SQL has to be remembered.
