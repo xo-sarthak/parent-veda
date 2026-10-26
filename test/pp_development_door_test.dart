@@ -25,6 +25,7 @@ import 'package:parentveda/screens/post_pregnancy/learning_detail_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/leap_calendar_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/milestone_journey_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_milestones_data.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_milestones_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/phase_map_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_content.dart';
@@ -159,8 +160,9 @@ void main() {
 
   group('single source', () {
     test('one tracker: both ids open the journey', () {
-      expect(ppScreenForSurface('pp_on_track'), isA<MilestoneJourneyScreen>());
-      expect(ppScreenForSurface('pp_milestones'), isA<MilestoneJourneyScreen>());
+      // The one Milestones place since R10 (2026-10-26); was the journey.
+      expect(ppScreenForSurface('pp_on_track'), isA<PpMilestonesScreen>());
+      expect(ppScreenForSurface('pp_milestones'), isA<PpMilestonesScreen>());
       expect(ppScreenForSurface('pp_dev_checkin'), isNotNull);
       expect(_dev.tools.where((t) => t.surfaceId == 'pp_on_track'), isEmpty);
     });

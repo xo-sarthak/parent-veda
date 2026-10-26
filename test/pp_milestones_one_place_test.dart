@@ -258,9 +258,13 @@ void main() {
       expect(home, contains("_openSurface(context, 'pp_milestones')"));
       expect(home, contains('PpMilestonesScreen(\n                                    startSave: true)'),
           reason: "the journal's quick action is the one save");
+      final router = live('lib/screens/post_pregnancy/pp_surface_router.dart');
+      expect(router, contains("'pp_milestones' => const PpMilestonesScreen(),"));
+      expect(router, contains("'pp_on_track' => const PpMilestonesScreen(),"));
+      expect(live('lib/screens/post_pregnancy/pp_brain_tab.dart'), contains('_push(const PpMilestonesScreen()'));
+      // An old link that still builds the journey lands on the same place.
       expect(live('lib/screens/post_pregnancy/milestone_journey_screen.dart'),
-          contains('Widget build(BuildContext context) => const PpMilestonesScreen();'),
-          reason: 'pp_milestones and pp_on_track resolve to the journey, which hands off');
+          contains('Widget build(BuildContext context) => const PpMilestonesScreen();'));
       expect(live('lib/screens/post_pregnancy/pp_month_checklist_screen.dart'), contains('openMilestoneSave('));
       expect(live('lib/screens/post_pregnancy/development_map_screen.dart'), contains('openMilestoneSave('));
     });

@@ -73,7 +73,8 @@ import 'development_home_screen.dart';
 import 'feeding_journey_screen.dart';
 import 'growth_journey_screen.dart';
 import 'learning_home_screen.dart';
-import 'milestone_journey_screen.dart';
+// import 'milestone_journey_screen.dart'; // kept for revert with the two lines above (R10)
+import 'pp_milestones_screen.dart' show PpMilestonesScreen;
 import 'nuskhe_screen.dart';
 import 'problem_solver_screen.dart';
 import 'products_discovery_screen.dart';
@@ -851,7 +852,9 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // being complained about. Repointing this id would have turned those six
       // links into a section that opens itself.
       'pp_development' => const DevelopmentHomeScreen(),
-      'pp_milestones' => const MilestoneJourneyScreen(),
+      // The one Milestones place (R10, 2026-10-26). Kept for revert:
+      // 'pp_milestones' => const MilestoneJourneyScreen(),
+      'pp_milestones' => const PpMilestonesScreen(),
       // ⚠️ THE CHECKLIST THE AREA'S TITLE PROMISES. "Is my child on track?"
       // opened four articles; this is the answer. Separate from
       // `pp_milestones` on purpose — that screen is about noticing and
@@ -863,7 +866,8 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // one had and this one lacked the flip-cards and the search. The id
       // stays so every link into it still lands. Kept for revert.
       // 'pp_on_track' => const OnTrackChecklistScreen(),
-      'pp_on_track' => const MilestoneJourneyScreen(),
+      // 'pp_on_track' => const MilestoneJourneyScreen(), // kept for revert (R10)
+      'pp_on_track' => const PpMilestonesScreen(),
       // The gentle check-in had no surface of its own; the hub pushed it
       // directly. The door needs one.
       'pp_dev_checkin' => const DevelopmentCheckinScreen(),

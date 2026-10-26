@@ -11140,7 +11140,8 @@ for what is left. What follows is the recorded-not-built half (R1–R8), so it c
   question text, not dated milestones); only its name changed. (f) `pp_surface_router.dart` still says
   `MilestoneJourneyScreen` for `pp_milestones` and `pp_on_track`; that screen's build returns the new
   one. Pointing the router straight at `PpMilestonesScreen` is a one-line follow-up once the other
-  terminal's edit there is in. (g) The three new milestones' windows join the first-year
+  terminal's edit there is in. *Done 2026-10-26:* the router and the Brain tab open `PpMilestonesScreen`;
+  the journey's hand-off stays for any old link. (g) The three new milestones' windows join the first-year
   REQUIRED_REVIEW for a paediatrician.
 
 ## 102.0 Parenting doors, door by door: what the builds left open — 2026-10-25

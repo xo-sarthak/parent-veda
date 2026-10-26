@@ -580,7 +580,11 @@ final HubConfig kPpBuying = HubConfig(
           'not guesswork.'),
       mark: IntentMark.compareMark,
       hue: 42,
-      surfaceId: 'pp_products',
+      // The compare screen its line promises (2026-10-26). It opened the
+      // shop, the same as "Shop for this age" above once tools pass 32 made
+      // that row the shop, and journey_test holds one door per surface.
+      // Kept for revert: surfaceId: 'pp_products',
+      surfaceId: 'pp_compare',
     ),
   ],
 );

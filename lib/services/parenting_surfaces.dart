@@ -98,6 +98,9 @@ final List<PpSurface> kPpSurfaces = [
   // What to buy > How to choose (2026-10-07). English only, by policy: Hindi
   // is owed, so `hi` repeats the English until a translation is asked for.
   PpSurface('pp_buying_guides', _t(en: 'How to choose', hi: 'How to choose')),
+  // What to buy > Compare & choose (2026-10-26): the compare screen the row
+  // promises, which the router always had. English only, as above.
+  PpSurface('pp_compare', _t(en: 'Compare', hi: 'Compare')),
   PpSurface('pp_names', _t(en: 'Baby names', hi: 'बच्चे के नाम')),
 ];
 

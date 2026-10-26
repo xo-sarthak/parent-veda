@@ -35,7 +35,8 @@ import '../v2/v2_palette.dart';
 import 'development_checkin_screen.dart';
 import 'development_map_screen.dart';
 import 'grow_v2_screens.dart' show GrowActivityScreen;
-import 'milestone_journey_screen.dart';
+// import 'milestone_journey_screen.dart'; // kept for revert (R10)
+import 'pp_milestones_screen.dart' show PpMilestonesScreen;
 import 'pp_child_profile.dart';
 import 'pp_common.dart' show PpBottomNav, PpTab;
 import 'pp_development_data.dart' show DevActivity;
@@ -147,7 +148,8 @@ class _PpBrainTabScreenState extends State<PpBrainTabScreen> {
                         leading: PvMarkWell(p: p, hue: 28, size: 40, icon: Icons.flag_outlined),
                         title: 'Milestones',
                         line: 'What is emerging now, without a score.',
-                        onTap: () => _push(const MilestoneJourneyScreen(), 'pp_milestones'),
+                        // The one Milestones place (R10). Was MilestoneJourneyScreen().
+                        onTap: () => _push(const PpMilestonesScreen(), 'pp_milestones'),
                       ),
                       PvListRow(
                         p: p,
