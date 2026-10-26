@@ -516,6 +516,18 @@ TR1 to TR8 were written 2026-10-02 (parenting gap analysis); `skip_it` and `moth
 | SFO3 | A first aid and CPR class | Class | "Tell me" | The class this door most needs. It is HD9's "Baby first aid and CPR": Health's Get help now ends on it, and now First aid does too (its tab closing). One class, two ways in |
 | SFO4 | Line drawings: CPR hands for a baby (two fingers) and a child (heel of the hand); the choking holds (baby along the forearm, back blows) | Illustration | Not drawn | Until they exist the steps stay as numbered text. The choking drawing belongs on Health's `health_choking_response` too |
 
+### Special care (parenting), door 12
+
+**Added by the door 12 build (2026-10-26, `docs/pp-door-plans/12-special-care.md` SC1 to SC7, "As built").** Nothing here is a coming-soon card; every row answers a tap or links nothing. (The `SPO` ids are this door's; Skilling's Communication rows above use `SC`.)
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| SPO1 | Films: `special_care/speech_session` on `sc_therapies` ("What a speech therapy session looks like"), `special_care/kangaroo_care` on `sc_nicu` ("Kangaroo care in the NICU"), and `special_care/door_intro` | Film | The two: built from data, a tap says the film is being made (S8a). Intro: not slotted (S4) | **Real people only**: an RCI-registered speech therapist with a real child and parent in the room; a NICU nurse with a parent doing kangaroo care (with the family's consent for a NICU baby on film). The intro from a developmental paediatrician. Never animated or AI-generated |
+| SPO2 | A real developmental paediatrician | Expert | "Joining" | `pp_experts/Development expert` is two `Expert.seeded` placeholders, so the Extra support row and the diagnosis-from-birth consult say "Our developmental paediatricians are joining soon" and offer a paediatrician (`kPpJoiningSoon`). The same category as Development's On track row (DV7) |
+| SPO3 | Real speech therapists | Expert | Opens the speech therapist list | `pp_experts/Speech therapist` (the "Not talking yet" consult) opens its own filtered list. The three profiles there are not flagged seeded but are not signed people either; owed real RCI-registered therapists before launch, ideally ones who take a family's home programme seriously (the page's own test of a good one) |
+| SPO4 | Real child psychologists | Expert | Opens the child psychologist list | `pp_experts/Child psychologist` (the attention page's consult) opens its own filtered list. The same owed people as Behaviour's BHO7 |
+| SPO5 | A therapy shelf (picture cards, chewy tools, sensory toys) | Catalogue | Not promised | No page links a shop: the therapies page says to ask the centre for a home programme, which costs nothing. Add a shelf only if a therapist picks what goes on it |
+
 ---
 
 ## Skilling

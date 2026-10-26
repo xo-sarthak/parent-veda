@@ -6119,6 +6119,9 @@ final PpArea _teethEyesEars = PpArea(
           PpCard('By 24 months', 'Uses about 50 words and puts two together.'),
         ]),
         PpIndiaNote("Putting warm oil or garlic oil in the ear is a common home habit. It doesn't help hearing, can cause infection, and hides wax a doctor needs to see."),
+        // Special care (door 12, SC5): where to get tested, the way back.
+        PpLink('Hearing checks: where to get tested',
+            surfaceId: 'pp_page/parenting_special_care/sc_hearing'),
       ],
     ),
   ],

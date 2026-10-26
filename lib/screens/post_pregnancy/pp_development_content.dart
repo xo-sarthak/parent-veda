@@ -1840,6 +1840,10 @@ final PpSection kPpDevelopmentSection = PpSection(
             PpLink('Help him talk',
                 surfaceId: 'pp_page/parenting_early_learning/skills_language',
                 blurb: 'Five minutes a day that make the biggest difference.'),
+            // DV10, Special care's half (door 12, SC5).
+            PpLink('Not talking yet: what to do next',
+                surfaceId: 'pp_page/parenting_special_care/sc_not_talking',
+                blurb: 'The hearing check, a speech assessment, and where to go.'),
           ],
         ),
 
@@ -2098,6 +2102,10 @@ final PpSection kPpDevelopmentSection = PpSection(
             PpLink('Help him talk',
                 surfaceId: 'pp_page/parenting_early_learning/skills_language',
                 blurb: 'Five minutes a day at home, alongside any check.'),
+            // DV10, Special care's half (door 12, SC5).
+            PpLink('Not talking yet: what to do next',
+                surfaceId: 'pp_page/parenting_special_care/sc_not_talking',
+                blurb: 'The hearing check, a speech assessment, and where to go.'),
           ],
         ),
       ],
