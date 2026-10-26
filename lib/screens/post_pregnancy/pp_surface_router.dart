@@ -95,8 +95,8 @@ import 'find_help_triage_screen.dart';
 import 'provider_results_screen.dart';
 import 'reading_home_screen.dart';
 import 'reading_reader_screen.dart' show ReadingReaderScreen;
-import 'pp_reading_data.dart' show readArticleById;
-import '../../data/book_companions.dart' show kBookDocsByShelfId;
+import 'pp_reading_data.dart' show readArticleById, readCatalog;
+// import '../../data/book_companions.dart' show kBookDocsByShelfId; // kept for revert (door 8 review)
 import 'sleep_journey_screen.dart';
 import 'vax_tracker_screen.dart';
 import 'watch_home_screen.dart';
@@ -524,10 +524,16 @@ Widget? ppScreenForSurface(String id) {
   // reader, which hands a book to its companion (Behaviour BH5). An unknown
   // id is null, never the reader's fallback article, so a typo fails the
   // link gate instead of opening the wrong book.
+  //
+  // ⚠️ THE GUARD READS THE LIST THE LOOKUP READS (door 8 review). It checked
+  // `kBookDocsByShelfId`, every book companion, while `readArticleById`
+  // searches `readCatalog`, which leaves out the pregnancy books. So
+  // `pp_book/book_expecting_better` passed the guard and opened the first
+  // article. Was `kBookDocsByShelfId.containsKey(shelfId)`, kept for revert.
   const bookPrefix = 'pp_book/';
   if (id.startsWith(bookPrefix)) {
     final shelfId = id.substring(bookPrefix.length);
-    return kBookDocsByShelfId.containsKey(shelfId)
+    return readCatalog.any((a) => a.id == shelfId)
         ? ReadingReaderScreen(article: readArticleById(shelfId))
         : null;
   }

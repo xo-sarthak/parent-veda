@@ -412,13 +412,20 @@ const PpArea kBehDiscipline = PpArea(
               'Hunger, no sleep, the same fight every evening. Change one of '
               'those first.'),
         ], heading: 'If it\'s most days'),
+        // ⚠️ TWO BOXES, NOT ONE (door 8 review). The helpline rode at the end
+        // of this doctor box, which BH4 rule c forbids: never stacked with the
+        // page's own warning. Was the doctor line + `$kBehTooMuchForYou` in one
+        // callout, kept for revert.
         PpCallout(
           'If you\'re frightened of your own anger, or it\'s turning into '
-          'hitting, talk to your doctor or a counsellor. $kBehTooMuchForYou',
+          'hitting, talk to your doctor or a counsellor.',
           kind: PpCalloutKind.doctor,
           title: 'When to get help',
         ),
         PpWhenLine('From about one, for as long as you are a parent.'),
+        // BH4, as on `beh_no_hitting`: its own card, a block away from the
+        // doctor box. REQUIRED_REVIEW (child psychologist; Tele-MANAS, MoHFW).
+        PpCallout(kBehTooMuchForYou, title: 'When it\'s too much for you'),
         PpLink('When the anger is yours',
             surfaceId: 'pp_page/parenting_maternal/mind_rage',
             blurb: 'In You, Maa: where it comes from, and what helps.'),

@@ -48,7 +48,11 @@ const String kPpSleepTonightShelf = 'pp_sleep_tonight';
 /// One card of the Tonight row: a Sleep page by id, or a surface that is not
 /// a page (the tanpura, Early Learning's bedtime tales).
 class PpSleepTonightCard {
-  const PpSleepTonightCard(this.name, this.icon, {this.pageId, this.surfaceId});
+  /// ⚠️ ONE OR THE OTHER (door 8 review, the same trap as Behaviour's card):
+  /// the shelf reads `pageId!` or `surfaceId!`.
+  const PpSleepTonightCard(this.name, this.icon, {this.pageId, this.surfaceId})
+      : assert(pageId != null || surfaceId != null,
+            'a Tonight card opens a page or a surface');
 
   /// The card's name, whole (a page title is a sentence; a card holds a name).
   final String name;

@@ -49,7 +49,12 @@ const String kPpBehRightNowShelf = 'pp_beh_right_now';
 /// One card of the Right now row: a Behaviour page by id, or a surface that
 /// is not a page (the What to say tool).
 class PpBehRightNowCard {
-  const PpBehRightNowCard(this.name, this.icon, {this.pageId, this.surfaceId});
+  /// ⚠️ ONE OR THE OTHER (door 8 review): the shelf's tap and its meta line
+  /// read `pageId!` or `surfaceId!`, so a card with neither would crash.
+  /// Const data, so this fails when the map is compiled.
+  const PpBehRightNowCard(this.name, this.icon, {this.pageId, this.surfaceId})
+      : assert(pageId != null || surfaceId != null,
+            'a Right now card opens a page or a surface');
 
   /// The card's name, whole (a page title is a sentence; a card holds a name).
   final String name;

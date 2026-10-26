@@ -28,6 +28,7 @@ import 'package:parentveda/screens/post_pregnancy/pp_section_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_surface_router.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_scripts_data.dart' show kPpScripts, ppScriptsForBand;
 import 'package:parentveda/screens/post_pregnancy/reading_reader_screen.dart' show ReadingReaderScreen;
+import 'package:parentveda/screens/post_pregnancy/pp_book_docs.dart' show kPpBookArticles;
 import 'package:parentveda/screens/post_pregnancy/scripts_library_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/what_changed_screen.dart';
 
@@ -340,17 +341,25 @@ void main() {
       expect(help, greaterThanOrEqualTo(0));
       expect(steps[help].title, contains(kCrisisHelplineName));
       expect(shake - help, greaterThan(1), reason: 'not next to the warning');
+      // ⚠️ PER CALLOUT, NOT THE PAGE'S TEXT JOINED (door 8 review). Joined,
+      // this passed while the helpline rode inside the doctor box on
+      // "After you've shouted". Now: its own card, no warning or doctor box
+      // carries it, and it sits more than a block away from each.
       for (final id in ['beh_no_hitting', 'beh_after_shouting']) {
         final blocks = _page(id).blocks;
-        final text = [for (final b in blocks) if (b is PpCallout) b.text].join(' ');
-        expect(text, contains('$kCrisisHelplineName, $kCrisisHelplineNumber'), reason: id);
+        final card = blocks.indexWhere((b) => b is PpCallout && b.text == kBehTooMuchForYou);
+        expect(card, greaterThanOrEqualTo(0), reason: '$id: the card, on its own');
+        expect((blocks[card] as PpCallout).kind, PpCalloutKind.key, reason: id);
+        expect(kBehTooMuchForYou, contains('$kCrisisHelplineName, $kCrisisHelplineNumber'));
+        for (final (i, b) in blocks.indexed) {
+          if (b is! PpCallout || i == card) continue;
+          if (b.kind != PpCalloutKind.safety && b.kind != PpCalloutKind.doctor) continue;
+          expect(b.text, isNot(contains(kCrisisHelplineNumber)), reason: '$id: inside a warning box');
+          expect((card - i).abs(), greaterThan(1), reason: '$id: rule c, never stacked with the warning');
+        }
         expect(blocks.whereType<PpLink>().any((l) => l.surfaceId == 'pp_page/parenting_maternal/mind_rage'),
             isTrue, reason: id);
       }
-      final noHit = _page('beh_no_hitting').blocks;
-      final card = noHit.indexWhere((b) => b is PpCallout && b.text == kBehTooMuchForYou);
-      final warn = noHit.indexWhere((b) => b is PpCallout && b.kind == PpCalloutKind.safety);
-      expect((card - warn).abs(), greaterThan(1), reason: 'rule c: never stacked with the warning');
       // The source never types the number: one constant (mind_mood_data.dart).
       for (final f in ['pp_behaviour_content.dart', 'pp_behaviour_bands.dart', 'pp_behaviour_more.dart']) {
         expect(File('lib/screens/post_pregnancy/$f').readAsStringSync().contains('14416'), isFalse, reason: f);
@@ -385,7 +394,11 @@ void main() {
       });
       for (final s in books.values) {
         if (s.startsWith('pp_book/')) {
-          expect(ppScreenForSurface(s), isA<ReadingReaderScreen>(), reason: s);
+          // The book it names, not just a reader (door 8 review: a reader on
+          // the fallback article passed `isA` too).
+          final w = ppScreenForSurface(s);
+          expect(w, isA<ReadingReaderScreen>(), reason: s);
+          expect((w as ReadingReaderScreen).article.id, s.substring('pp_book/'.length), reason: s);
         } else {
           // No books screen yet: the tap names two real titles from the list.
           final words = kPpNotYetWords[s]!;
@@ -394,6 +407,14 @@ void main() {
       }
       // A typo never opens the reader's fallback article.
       expect(ppScreenForSurface('pp_book/book_not_a_book'), isNull);
+      // A real book the parenting shelf does not carry fails too: the guard
+      // reads the lookup's own list (door 8 review). It passed before.
+      expect(ppScreenForSurface('pp_book/book_expecting_better'), isNull);
+      // And every pp_book id that does open, opens itself.
+      for (final a in kPpBookArticles) {
+        final w = ppScreenForSurface('pp_book/${a.id}');
+        expect((w as ReadingReaderScreen).article.id, a.id, reason: a.id);
+      }
     });
 
     test('BH6: links land on the page they name', () {
