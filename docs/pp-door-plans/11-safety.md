@@ -210,3 +210,65 @@ These stay here on purpose. When a problem turns up later, check this table firs
 | SF6 | Car seats linked; babyproofing class linked; missing stock and a CPR class owed | Things that exist get used; things that don't get listed | **Yes**, chosen and recorded (2026-10-25) |
 | SF7 | Closing drawn; cross-door links | Plain fixes | **Yes**, chosen and recorded (2026-10-25) |
 | SF8 | "Travel and heat"; a test that guards the emergency | A safety line must never silently disappear | **Yes**, chosen and recorded (2026-10-25) |
+
+## As built (2026-10-26)
+Held by `test/pp_safety_door_test.dart` (16 tests): the strip on every tab at 3, 18, 30 and 48 months, with all three call buttons, the numbers written out, the pin on First aid only and the heading everywhere else (one callout, never two); each button dialling its own number (the dial swapped in the test); the dial wired in the source; no emergency number typed in the door or its content (the four constants only); every page's age, and none outside its area's; the tab order per band; the first view at 3 and 48 months, and no baby page leading a four-year-old's tab; CPR's two halves in the right order at 6, 18 and 48 months; flights and the front seat, with the two-wheeler rule agreeing with the car seat page; the gaps; heat stroke, dengue and choking linked to Health's pages, not rewritten; the two CPR films and a film's tap; the one shop link, exactly, and stocked; the guide, the babyproofing class and the CPR class; every link landing, the four whole-door links now naming a page; the closing; the tab names. `door_names_fit_test` measures "Travel and heat" (fits at 1.0 and 1.3; off `_kOwedShorterNames`). The parenting stage (`test/pp_*`, `post_pregnancy*`, `phases_test`, `door_names_fit_test`: 129 files, 1,416 tests) passes, and so do the ten tests outside it that read the dial, the constants or the reader (172 tests).
+
+**The shell, new for this door and open to every door:**
+- **`PpDoor.emergency`** (`PpDoorEmergency`, `pp_door_data.dart`): a strip drawn by the shared door screen at the top of every tab, above a tab-for-later's line too, at every age. It has the buttons (`PpDoorCall`), the numbers line (`SelectableText`, for a phone that cannot dial), rows to the steps (`PpDoorEmergencyLink`), and an optional pin (`PpDoorEmergencyPin`) that leads the same block on one tab in place of the "In an emergency" heading. A row to a page the tab already shows on its rails is not drawn on that tab (the CPR row on First aid). A door that sets nothing draws nothing, so doors 1 to 10 are unchanged.
+- **`ppDialNumber`** (`pp_crisis_path_screen.dart`): the crisis path's own `_dial`, lifted out as the one parenting dial; the crisis screen now calls it. The strip calls it through `ppDoorDial`, a test seam. `TtcDoorCallButton` was not reused: it is a TTC widget (its ink is `ttcTitleInk`), it draws two full-width pills, and the parenting shell deliberately imports nothing from another stage's door engine (the header of `pp_door_data.dart`). The dial is the shared part; the pill is drawn in the strip.
+- **`PpPage.ageLead`** (`PpAgeLead`, `pp_content.dart`): from an age on the active child's clock, `orderedBlocks` moves one headed step group to where the first headed step group stood. The authored list is untouched.
+- **Two constants** (`mind_mood_data.dart`, beside 112 and 108): `kMotherBabyAmbulanceNumber` (102) and `kPoisonsHelplineNumber` (AIIMS), both REQUIRED_TO_CONFIRM.
+
+**What was built, by decision:**
+- **SF1.** The strip: Call 112 (filled), Ambulance 108 and Poison help (outlined), "Emergency 112 · Ambulance 108 or 102 · Poison line 1800-116-117 (AIIMS)", then "Choking: what to do now" (Health's `health_choking_response`) and "CPR: baby or child". On First aid, "Get help now" (Health's `health_go_now`) leads the block; the grey note is commented out, kept for revert.
+- **SF2.** Six pages tagged (table below); the tab order per band as the plan's table; CPR's child half first from 12 months.
+- **SF3.** "Flying with a baby or toddler" (six cards, links to Papers' birth certificate and passport pages) and "The front seat" (three cards, link to the car seat page) on `safety_travel`. The old "By plane" card is commented out.
+- **SF4.** Two CPR films on `safety_cpr`: the baby one is Health's slot `health/infant_cpr` (the same film, the same title), the child one `safety/child_cpr`; choking links Health's page and its film. Hero photo: Unsplash, free (ONUR KURT), a toddler walking on a pavement holding an adult's hand, checked by eye. No intro film slotted (S4).
+- **SF5.** Sockets, boards, chargers and gates on room by room; "After an electric shock" on burns; cords and loops on tip-overs; makhana, whole nuts and jelly cubes on small things; the poisons by the names on Indian shelves; the diya at puja and hot tea over a child's head; 102 on the first aid kit; motion sickness written out (about 600 to 1,090 characters). Every number in the content now reads its constant.
+- **SF6.** The car seat guide (`pp_buying_guides/car_seat`) and the one stocked shelf (`pp_products/pvs_rear_facing_car_seats`) on the car seat page; "Baby-proofing for joint families" (`pp_learn/mc_babyproof`) on room by room; the first aid and CPR class as First aid's closing.
+- **SF7.** The closing card "Talk to a paediatrician" was already drawn by the shell since step 0 (S3); its tap opens "Our first experts are joining". Falls link Health's `ill_head_bump`, room by room Sleep's `sleep_surface`, poisons Traditions' `newborn_customs`, heat Health's `ill_dengue`. Health's two and Development's two whole-door links now open `safety_room_by_room` or `safety_falls`.
+- **SF8.** "Travel and heat", the old label commented out; the test above.
+
+**Ages (SF2), as built:**
+| Page | Plan | Built |
+|---|---|---|
+| `safety_walkers` | under 1 | under 1 (was 0 to 2) |
+| `safety_bath` | under 1 | under 1 |
+| `safety_motion_sickness` | from 2 | from 2 (was from 1) |
+| `safety_crowds` | from 3 | from 3 |
+| `safety_road_sense` | from 3 | **from 1** |
+| `safety_screens_online` | from 3 | **from 2**, as it was |
+| `safety_tip_overs`, `safety_poisons`, `safety_choking_objects` | from 1 | **every age** |
+| `safety_bunk_quake`, `safety_festivals` | from 3 | **every age** |
+| the rest | every age | every age |
+
+**A mechanism worth keeping: a Wrap wraps between its children, never inside one.** The call pills sat in a `Wrap` so they would flow to a second line on a small phone, and at 360 points and 1.5x text one pill still ran 21 points off the card. A `Row(mainAxisSize: min)` reports its whole label as its minimum width; the Wrap can move it to a new run but cannot make it narrower than that. The label inside each pill is `Flexible` now, so it wraps inside the pill. The shell-wide overflow tests (`pp_door_ttc_format_test`, `pp_doors_first_view_test`) caught it, not this door's test, which runs wide.
+
+**A second one: two gates, two meanings of "lands".** A page link to the CPR class (`pp_class/...`) passes the door's own rule (the router answers it with "Tell me" before any screen) and fails `pp_gap_doors_test`, which asks every page link for a screen. Health met the same thing and put the class on Get help now as the tab's closing, which asks the router's notice first. So the class is First aid's closing here too, and the page link is commented out. The general point: when two checks guard the same link with different definitions of success, the link belongs where both definitions hold, not where one can be argued around.
+
+**And a trade-off, named.** CPR's order could have been two pages (baby first, child first) or one page with a rule. Two pages are twins that drift, and every link to "the CPR page" would have to pick one. The rule costs something too: the same page reads in a different order for two parents, and anything that reads `orderedBlocks` (the reader, the Ask Veda corpus export) gets the active child's order. The words are identical either way, so for search it is harmless; for a reviewer it means the authored list (`blocks`) is the one to read.
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| SF2: tip-overs, poisons, small things "1 and up" | Every age | Mouthing and swallowing peak in the second half of the first year, and pulling up on furniture starts about nine months. The app's own 3- and 9-month tips (`m3_mouthing`, `m9_coins`, `m9_furniture`) open these pages. Tagged 1+, a nine-month-old's parent would meet them under "1 to 2 years" |
+| SF2: bunk beds, kites and rooftops "3 and up" | Every age | Each sits on a mixed page: the bunk bed cards share a page with the earthquake plan and the emergency bag ("your baby held close"), the kites with Diwali and Holi; Traditions' baby's-first-festivals page links the festivals page |
+| SF2: road sense "3 and up" | From 1 | Reversing cars and the lane outside the gate are a walking toddler's risk; the year-two tip (`y2_road`) opens this page |
+| SF2: screens online "3 and up" | From 2, unchanged | The page's own when line speaks to "two to five" |
+| SF1: buttons through `TtcDoorCallButton` | The crisis path's dial, lifted to `ppDialNumber`; pills drawn in the strip | See the shell above: TTC styling, two full-width pills, and no cross-stage import |
+| SF1: "On First aid, the pin takes the strip's place" | The pin takes the strip's heading; the buttons and numbers stay under it | First aid is where the numbers matter most. One block, never two stacked |
+| SF4: a third film slot for choking | Linked, not slotted | Health's `health_choking_response` holds the film (`feeding/back_blows_demo`); a slot here would be one film twice |
+| SF5: mosquitoes and dengue as a new card group, page renamed "Heat, sun and mosquitoes" | A link to Health's `ill_dengue`; the page keeps its name | Health's page already has the nets, the standing water, repellents by age and the fever signs (single source, the user's brief) |
+| SF5: heat stroke "named on the heat page" | A link titled "Heat stroke: the signs, and what to do" to Health's `prev_heat` | The same: Health's page owns the signs and what to do |
+| SF5: "how to cut each one" | Makhana, nuts and jelly cubes added to the list; the cutting stays on Feeding's page, already linked | Feeding's `safety_choking` owns the shapes (grapes quartered, nuts ground) |
+| SF5: 102 on `safety_cpr` | On the first aid kit and in the strip, not in the CPR callout | The CPR callout is the one block read with hands full; the strip above it on every tab already shows 102 |
+| SF5 copy: "he", "him" | "your child", "your baby" | The section's own voice |
+| SF6: the babyproofing class "with the real price in INR and USD" | The link opens the course's page, which carries the price | Prices are server-side (every door so far); an unpublished course says "Tell me" |
+| SF6: the CPR class "owed" | Owed, and drawn as First aid's closing ("Tell me") | Health's Get help now already ends on the same class; one class, two ways in. The mechanism above |
+| SF6: car seats "filtered by age" | The guide, and the rear-facing shelf for the first years | The shop holds rear-facing seats only (SFO2) |
+| SF7: `parenting_hubs.dart:636` to an exact page | Unchanged | It is the home tile's one need, and it opens the door itself, which is right |
+| SF4: line drawings | Owed (SFO4); the steps stay numbered text | As the plan says |
+| Verification: a phone walk | Not run | Only on the user's word; on `BEFORE-LAUNCH.md` as a CHECK |
+
+**Owed, not in this build:** the child CPR film and the intro (`DOOR-CONTENT-OWED` SFO1; the baby film is HD4), the shop's gates, socket covers, corner guards, cabinet locks, child helmets and older children's seats (SFO2), the first aid and CPR class (SFO3, HD9), the drawings (SFO4). On `BEFORE-LAUNCH.md`: a paediatrician's read of every new line, the CPR page read by a certified paediatric CPR and first aid instructor against IAP and AHA, the airline and road rules, the two new numbers; and a phone check that a call button opens the dialler. The new parts reach Ask Veda through the incremental ingest, which the user runs after all the doors.

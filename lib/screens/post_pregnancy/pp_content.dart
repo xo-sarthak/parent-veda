@@ -815,7 +815,18 @@ class PpPage {
     this.linkedOnly = false,
     this.pinned = false,
     this.comingSoon = false,
+    this.ageLead,
   });
+
+  /// ⚠️ THE OLDER CHILD'S HALF FIRST, FROM AN AGE (Safety SF2, 2026-10-26).
+  /// CPR has two step groups, "For a baby under one" and "For a child over
+  /// one", and always showed the baby's first, so a four-year-old's parent
+  /// read the two-finger presses before the heel of the hand. From
+  /// [PpAgeLead.fromMonths] on the active child's clock, `orderedBlocks`
+  /// moves the group headed [PpAgeLead.olderHeading] to where the first
+  /// headed step group stood. No copy changes, and no second page. Null: the
+  /// authored order.
+  final PpAgeLead? ageLead;
 
   /// ⚠️ A CARD THAT HOLDS ITS PLACE AND DOES NOT TAP. The pregnancy doors'
   /// rule for a brief that names a piece and says the copy will be supplied
@@ -879,10 +890,34 @@ class PpPage {
   /// lists in any guaranteed way — two partitions are.
   List<PpBlock> get orderedBlocks {
     final video = [for (final b in blocks) if (b is PpVideoSlot) b];
-    if (video.isEmpty) return blocks;
+    // Was `if (video.isEmpty) return blocks;` and the list below, before the
+    // age lead (Safety SF2); kept for revert in the two lines that follow.
+    final hoisted = video.isEmpty
+        ? blocks
+        : [
+            ...video,
+            for (final b in blocks) if (b is! PpVideoSlot) b,
+          ];
+    return _ledByAge(hoisted);
+  }
+
+  /// [ageLead] applied: the older group moved up to the first headed step
+  /// group's place, when the active child has reached its age.
+  List<PpBlock> _ledByAge(List<PpBlock> list) {
+    final lead = ageLead;
+    if (lead == null) return list;
+    // The same clock the door's bands read, so the page and the tab agree.
+    if (ChildProfileStore.instance.ageInMonths < lead.fromMonths) return list;
+    final older = list.indexWhere(
+        (b) => b is PpSteps && b.heading == lead.olderHeading);
+    final first =
+        list.indexWhere((b) => b is PpSteps && b.heading != null);
+    if (older < 0 || first < 0 || first >= older) return list;
     return [
-      ...video,
-      for (final b in blocks) if (b is! PpVideoSlot) b,
+      ...list.sublist(0, first),
+      list[older],
+      for (final (i, b) in list.indexed)
+        if (i >= first && i != older) b,
     ];
   }
 
@@ -905,6 +940,14 @@ class PpPage {
   final String? format;
 
   bool inBand(String band) => bands.isEmpty || bands.contains(band);
+}
+
+/// `PpPage.ageLead`: from [fromMonths], the step group headed [olderHeading]
+/// leads the page's step groups.
+class PpAgeLead {
+  const PpAgeLead({required this.fromMonths, required this.olderHeading});
+  final int fromMonths;
+  final String olderHeading;
 }
 
 // =============================================================================

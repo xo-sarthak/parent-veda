@@ -702,8 +702,10 @@ final PpArea _emergency = PpArea(
             'stays shut, red or watery, vision seems different, or there\'s '
             'blood in the eye.',
             kind: PpCalloutKind.doctor),
+        // Safety SF7 (door 11): the exact page, not the whole door. Was
+        // surfaceId: 'pp_section/parenting_safety', kept for revert.
         PpLink('How to stop most of these happening',
-            surfaceId: 'pp_section/parenting_safety',
+            surfaceId: 'pp_page/parenting_safety/safety_room_by_room',
             blurb: 'The Keeping your child safe door, room by room.'),
       ],
     ),
@@ -818,8 +820,10 @@ final PpArea _emergency = PpArea(
             kind: PpCalloutKind.doctor, title: 'Even if he seems fine'),
         PpLink('Go to a hospital now', pageId: 'health_go_now'),
         PpLink('Common accidents, fast', pageId: 'health_accidents'),
+        // Safety SF7 (door 11): was 'pp_section/parenting_safety', kept for
+        // revert.
         PpLink('How to stop most falls happening',
-            surfaceId: 'pp_section/parenting_safety'),
+            surfaceId: 'pp_page/parenting_safety/safety_falls'),
       ],
     ),
     /* ⚠️ REMOVED FROM THIS AREA BY FEEDBACK, KEPT FOR REVERT.

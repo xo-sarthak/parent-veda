@@ -76,7 +76,15 @@ class PpDoor {
     this.closingLine,
     this.disclaimer,
     this.tabOrder = const {},
+    this.emergency,
   });
+
+  /// ⚠️ THE EMERGENCY, ONE TAP FROM EVERY TAB (Safety SF1, 2026-10-26). Built
+  /// in the shared shell, open to every door: a strip at the top of every
+  /// tab, at every age, with call buttons and the numbers written out. Null:
+  /// no strip. `test/pp_safety_door_test.dart` fails if it goes missing on
+  /// any tab of a door that sets it.
+  final PpDoorEmergency? emergency;
 
   /// ⚠️ THE TAB ORDER FOR HIS AGE (step 0 · S1, 2026-10-25). Band id → tab
   /// ids, first one opens. Age used to only remove or lock tabs; it never
@@ -321,6 +329,71 @@ class PpDoorClosing {
   /// shares a tab with the emergency row: "Not for an emergency. For that,
   /// Get help now." (plan §3a).
   final String? note;
+}
+
+/// The emergency strip (`PpDoor.emergency`, Safety SF1).
+///
+/// ⚠️ A STRIP, NOT A SECOND EMERGENCY LIST. Health's Get help now stays the
+/// one list of signs in the app; the strip holds only what nobody reads in
+/// the bad moment: the numbers, as buttons, and a link or two to the steps.
+///
+/// ⚠️ THE NUMBERS ARE WRITTEN, NOT ONLY DIALLED. A call link may do nothing
+/// on a tablet or a phone without a SIM; [numbersLine] stays on screen,
+/// selectable, for exactly that case.
+class PpDoorEmergency {
+  const PpDoorEmergency({
+    required this.calls,
+    required this.numbersLine,
+    this.links = const [],
+    this.pin,
+  });
+
+  /// The buttons, first one filled. Numbers come from their one constant
+  /// each (`mind_mood_data.dart`), never typed here.
+  final List<PpDoorCall> calls;
+
+  /// "112 · 108 or 102 · 1800-116-117 (AIIMS)", under the buttons.
+  final String numbersLine;
+
+  /// Rows under the numbers ("Choking: what to do now"). A link to a page
+  /// the tab already shows on its rails is not drawn twice on that tab.
+  final List<PpDoorEmergencyLink> links;
+
+  /// ⚠️ ONE CALLOUT, NEVER TWO STACKED (rule c). On [PpDoorEmergencyPin.tabId]
+  /// the pinned row takes the strip's heading: the same block, the same
+  /// buttons, led by the pin instead of "In an emergency".
+  final PpDoorEmergencyPin? pin;
+}
+
+/// One call button on the strip.
+class PpDoorCall {
+  const PpDoorCall(this.label, this.number);
+
+  /// "Call 112", "Poison help".
+  final String label;
+  final String number;
+}
+
+/// One row under the strip's numbers.
+class PpDoorEmergencyLink {
+  const PpDoorEmergencyLink(this.label, this.surfaceId);
+  final String label;
+  final String surfaceId;
+}
+
+/// The pinned row that leads the strip on one tab (Safety: Get help now on
+/// First aid, the way Health pins it).
+class PpDoorEmergencyPin {
+  const PpDoorEmergencyPin({
+    required this.tabId,
+    required this.title,
+    required this.line,
+    required this.surfaceId,
+  });
+  final String tabId;
+  final String title;
+  final String line;
+  final String surfaceId;
 }
 
 /// A tab's first rail for one age (`PpDoorTab.ageRail`).

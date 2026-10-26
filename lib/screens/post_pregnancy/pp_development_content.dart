@@ -2264,8 +2264,10 @@ final PpSection kPpDevelopmentSection = PpSection(
               PpCard('Vaccines',
                   'Several boosters fall due in this year. Check the vaccine card.'),
             ]),
+            // Safety SF7 (door 11): the exact page, not the whole door. Was
+            // surfaceId: 'pp_section/parenting_safety', kept for revert.
             PpLink('Keeping your child safe at home',
-                surfaceId: 'pp_section/parenting_safety'),
+                surfaceId: 'pp_page/parenting_safety/safety_room_by_room'),
             PpLink('Your child’s vaccine card', surfaceId: 'pp_vaccines'),
             PpIndiaNote('Children in homes with two or three languages often '
                 'start speaking a little later, and catch up. Count words in '
@@ -2518,8 +2520,10 @@ final PpSection kPpDevelopmentSection = PpSection(
             PpCallout('If your baby loses sounds or skills that were there '
                 'before, at any age, tell your paediatrician soon.',
                 kind: PpCalloutKind.doctor),
+            // Safety SF7 (door 11): the exact page, not the whole door. Was
+            // surfaceId: 'pp_section/parenting_safety', kept for revert.
             PpLink('Keeping your child safe at home',
-                surfaceId: 'pp_section/parenting_safety'),
+                surfaceId: 'pp_page/parenting_safety/safety_room_by_room'),
           ],
         ),
 

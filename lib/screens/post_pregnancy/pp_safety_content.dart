@@ -23,8 +23,23 @@
 //  Five areas, one per door tab. Every page is open to every band: a safety
 //  rule a parent meets early is not wasted, and a crawling hazard listed for
 //  the wrong month is still a hazard in the house.
+//
+//  ⚠️ DOOR 11 (2026-10-26, `docs/pp-door-plans/11-safety.md`). Six pages now
+//  carry an age, where the page itself is for one (the bath, walkers, crowds,
+//  roads, screens, motion sickness); the rest stay for every age. The areas
+//  stay untagged, so no tag sits outside its area's ages. The numbers come
+//  from their one constant each (`mind_mood_data.dart`), never typed: the
+//  door's emergency strip reads the same constants. Every new line is
+//  REQUIRED_REVIEW by a paediatrician (first aid against current IAP and AHA
+//  guidance; the road and airline rules checked before release).
 // =============================================================================
 
+import '../../data/mind_mood_data.dart'
+    show
+        kAmbulanceNumber,
+        kEmergencyNumber,
+        kMotherBabyAmbulanceNumber,
+        kPoisonsHelplineNumber;
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_age_bands.dart';
 import 'pp_content.dart';
@@ -123,6 +138,34 @@ final PpSection kPpSafetySection = PpSection(
                   'or a mild cleaner, not phenyl.'),
               PpCard('Watch rugs and wet floors', 'They cause slips once pulling up begins.'),
             ]),
+            // SF5 (door 11): electricity. REQUIRED_REVIEW. The shop has no
+            // socket covers, gates, corner guards or cabinet locks yet
+            // (DOOR-CONTENT-OWED SFO2), so the page says what to look for
+            // and links nothing.
+            PpCards(heading: 'Sockets, boards and chargers', [
+              PpCard('Sockets at your child\'s height',
+                  'Socket covers that sit flat and need an adult\'s fingers to '
+                  'pull out, or heavy furniture pushed in front.'),
+              PpCard('Extension boards off the floor',
+                  'Fixed to the wall or up on a shelf, and switched off when '
+                  'not in use.'),
+              PpCard('No charger left in a socket by the bed',
+                  'A hanging charger is a cord to pull and a live end to '
+                  'chew. Unplug it once the phone is charged.'),
+              PpCard('What to look for in a gate',
+                  'One that screws into the wall at the top of the stairs; a '
+                  'pressure gate only at the bottom or a doorway. Gaps narrower '
+                  'than your child\'s head.'),
+            ]),
+            PpLink('Your baby\'s sleep space, checked',
+                surfaceId: 'pp_page/parenting_sleep/sleep_surface',
+                blurb: 'The cot or bed, on the Sleep door.'),
+            // SF6: the class, by its id. The course page carries the price
+            // (prices are server-side), and says "Tell me" if it isn't open.
+            PpLink('Baby-proofing for joint families',
+                surfaceId: 'pp_learn/mc_babyproof',
+                blurb: 'A recorded class: the room-by-room plan for a shared '
+                    'home, and getting everyone on the same page.'),
           ],
         ),
         PpPage(
@@ -151,6 +194,16 @@ final PpSection kPpSafetySection = PpSection(
                   'climbing.'),
               PpCard('Drawer stops',
                   'Child locks keep drawers from turning into a ladder.'),
+            ]),
+            // SF5 (door 11): cords. REQUIRED_REVIEW.
+            PpCards(heading: 'Cords and loops', [
+              PpCard('Curtain and blind cords up high',
+                  'Tie them up out of reach, or cut a loop into two ends. A '
+                  'loop can wrap around a small neck.'),
+              PpCard('Nothing to sleep or climb on under a corded window',
+                  'No cot, bed or sofa where a cord hangs within reach.'),
+              PpCard('Phone and laptop chargers are cords too',
+                  'Unplug them and put them away, not left dangling.'),
             ]),
             PpCallout('If anything heavy has fallen on your child, see a '
                 'doctor, even if everything seems fine afterwards.',
@@ -189,8 +242,18 @@ final PpSection kPpSafetySection = PpSection(
                   'hospital now.'),
               PpCard('Mosquito repellent refills', 'Liquid vaporiser bottles.'),
               PpCard('Naphthalene balls', 'In the clothes cupboard.'),
-              PpCard('Detergent pods and toilet cleaner',
-                  'Bright colours look like sweets.'),
+              // SF5 (door 11): by the names on Indian shelves. Was
+              // PpCard('Detergent pods and toilet cleaner', 'Bright colours
+              // look like sweets.'), kept for revert.
+              PpCard('Toilet cleaner, phenyl and floor cleaners',
+                  'Harpic and the like, the phenyl bottle, the floor cleaner. '
+                  'They burn the mouth and throat.'),
+              PpCard('Detergent pods', 'Bright colours look like sweets.'),
+              PpCard('Kerosene and lamp oil',
+                  'In its own can, never a water or cold drink bottle.'),
+              PpCard('Iron and paracetamol syrups',
+                  'Sweet, so a child may drink the bottle. Up high, in the '
+                  'medicine box.'),
             ]),
             PpSteps(heading: 'If your child has swallowed something', [
               PpStep('Take it out of the mouth and stay calm'),
@@ -204,12 +267,16 @@ final PpSection kPpSafetySection = PpSection(
                   'fit, or if it was a battery, magnet, kapoor or acid.'),
             ]),
             PpCallout('The National Poisons Information Centre at AIIMS '
-                'answers on 1800-116-117. Save it in your phone today. In an '
-                'emergency, call 112 or go to the hospital.',
+                'answers on $kPoisonsHelplineNumber. Save it in your phone '
+                'today. In an emergency, call $kEmergencyNumber or go to the '
+                'hospital.',
                 kind: PpCalloutKind.doctor),
             PpLink('Is this an emergency?',
                 surfaceId: 'pp_page/parenting_health/health_go_now',
                 blurb: 'The signs that mean go now.'),
+            PpLink('Kajal, surma and lead',
+                surfaceId: 'pp_page/parenting_traditional/newborn_customs',
+                blurb: 'Why lead in some kajal is a poison too.'),
           ],
         ),
         PpPage(
@@ -235,9 +302,15 @@ final PpSection kPpSafetySection = PpSection(
                   'Check the floor after everyone dresses up for a function.'),
               PpCard('Older siblings\' toys',
                   'Lego, marbles, small car wheels, pen caps.'),
+              // SF5 (door 11): whole nuts, makhana and jelly cubes join the
+              // list. Was 'Whole peanuts, chana, whole grapes, popcorn and
+              // hard sweets until at least four.', kept for revert.
               PpCard('Hard foods',
-                  'Whole peanuts, chana, whole grapes, popcorn and hard '
-                  'sweets until at least four.'),
+                  'Whole nuts and peanuts, whole chana, dry makhana (fox '
+                  'nuts), whole grapes, popcorn, hard sweets and jelly cubes, '
+                  'until at least four.'),
+              PpCard('Never while running, lying down or crying',
+                  'Food goes in sitting up, with you there.'),
             ]),
             PpLink('How to cut food so it doesn\'t cause choking',
                 surfaceId: 'pp_page/parenting_feeding/safety_choking'),
@@ -250,7 +323,8 @@ final PpSection kPpSafetySection = PpSection(
           id: 'safety_walkers',
           title: 'Are baby walkers safe?',
           subtitle: 'Why doctors say skip it',
-          bands: ['infant', 'toddler_1'],
+          // SF2: under one. Was ['infant', 'toddler_1'], kept for revert.
+          bands: ['infant'],
           format: 'ARTICLE',
           blocks: [
             PpIntro('Almost every family is gifted a walker, and babies love '
@@ -314,8 +388,11 @@ final PpSection kPpSafetySection = PpSection(
               PpCard('The roof terrace',
                   'Never unsupervised, and especially not in kite season.'),
             ]),
+            // SF7 (door 11): the head-injury signs page, not the accidents
+            // list. Was surfaceId: 'pp_page/parenting_health/health_accidents',
+            // kept for revert.
             PpLink('After a fall or a bump on the head',
-                surfaceId: 'pp_page/parenting_health/health_accidents',
+                surfaceId: 'pp_page/parenting_health/ill_head_bump',
                 blurb: 'What to watch for, and when to go now.'),
           ],
         ),
@@ -334,18 +411,40 @@ final PpSection kPpSafetySection = PpSection(
                   'Put the cup down out of reach first. Tea can badly scald '
                       'a baby\'s skin even ten minutes after it\'s '
                       'made.'),
+              // SF5 (door 11).
+              PpCard('Hot tea and dal never pass over a child\'s head',
+                  'Hand them round behind, or put them down and slide them '
+                      'across.'),
               PpCard('No hot cups on low tables',
                   'Or on a tablecloth that small hands can pull.'),
               PpCard('The iron and the hair straightener',
                   'Unplug them and put them up high to cool, cords and all.'),
-              PpCard('Oil lamps, incense sticks and mosquito coils',
-                  'Place them high, away from curtains and little hands. Never '
-                      'leave a lit lamp anywhere a baby can crawl.'),
+              // SF5 (door 11): the diya at puja and festivals. Was 'Oil
+              // lamps, incense sticks and mosquito coils' / 'Place them high,
+              // away from curtains and little hands. Never leave a lit lamp
+              // anywhere a baby can crawl.', kept for revert.
+              PpCard('Oil lamps (diya), incense and mosquito coils',
+                  'During puja and festivals too: up on a stand, away from '
+                      'curtains and little hands. Never a lit lamp at floor '
+                      'level, where a baby can crawl.'),
               PpCard('Bath and geyser water',
                   'Cold first, then hot. Test with your elbow every time.'),
               PpCard('Room heaters and coal stoves',
                   'Keep a guard around them. Never use a coal stove in a '
                       'closed room: it gives off a gas that can kill silently.'),
+            ]),
+            // SF5 (door 11): after a shock. REQUIRED_REVIEW (first aid).
+            PpSteps(heading: 'After an electric shock', [
+              PpStep('Switch off the mains first',
+                  'Don\'t touch your child while they may still be on the '
+                      'current. Move the wire with something dry and wooden.'),
+              PpStep('Check the breathing',
+                  'If your child is not breathing, start CPR and call '
+                      '$kEmergencyNumber.'),
+              PpStep('See a doctor the same day',
+                  'Every electric shock needs a check, even if your child '
+                      'seems fine. Go now for a burn, or if your child is '
+                      'not themselves.'),
             ]),
             PpLink('If your child is burned: the first 20 minutes',
                 surfaceId: 'pp_page/parenting_health/health_accidents'),
@@ -412,7 +511,7 @@ final PpSection kPpSafetySection = PpSection(
                   'formula or food, water, a torch, copies of documents and a '
                   'phone charger.'),
               PpCard('Know your way out', 'And a place to meet outside.'),
-              PpCard('Numbers saved', '112 for any emergency.'),
+              PpCard('Numbers saved', '$kEmergencyNumber for any emergency.'),
             ]),
           ],
         ),
@@ -433,6 +532,7 @@ final PpSection kPpSafetySection = PpSection(
           id: 'safety_bath',
           title: 'Bath time, safely',
           subtitle: 'From the baby tub to the bucket bath',
+          bands: ['infant'], // SF2: the baby tub and bath ring
           format: 'STEP-LIST',
           blocks: [
             PpIntro('Bath time can be the nicest part of the day. It needs '
@@ -498,7 +598,7 @@ final PpSection kPpSafetySection = PpSection(
             PpCallout('If your child has been pulled from water, take your '
                 'child to a hospital to be checked, even after coughing and '
                 'seeming fine. Problems can show up hours later. If your '
-                'child is not breathing, start CPR and call 112.',
+                'child is not breathing, start CPR and call $kEmergencyNumber.',
                 kind: PpCalloutKind.doctor),
             PpLink('CPR for babies and toddlers',
                 surfaceId: 'pp_page/parenting_safety/safety_cpr'),
@@ -559,6 +659,16 @@ final PpSection kPpSafetySection = PpSection(
             PpIndiaNote('In an auto or taxi with no seat belts, hold your '
                 'child facing you, never squeezed between you and the front '
                 'seat. Choose a car with a car seat whenever you can.'),
+            // SF6 (door 11): the guide (AIS-072, the tools pass) and the one
+            // stocked shelf. The shop holds rear-facing seats only, so the
+            // shelf says so; no helmet is stocked (SFO2).
+            PpLink('Choosing a car seat',
+                surfaceId: 'pp_buying_guides/car_seat',
+                blurb: 'The labels to look for, and fitting it in an Indian '
+                    'car.'),
+            PpLink('Rear-facing car seats',
+                surfaceId: 'pp_products/pvs_rear_facing_car_seats',
+                blurb: 'For the first years. Read the guide first.'),
           ],
         ),
         PpPage(
@@ -582,7 +692,7 @@ final PpSection kPpSafetySection = PpSection(
                   'And the keys out of reach. Children climb into parked '
                   'cars while playing and can\'t get out.'),
               PpCard('If you see a child alone in a car',
-                  'Call 112 straight away.'),
+                  'Call $kEmergencyNumber straight away.'),
             ]),
             PpCallout('If a child has been in a hot car and is drowsy, '
                 'floppy, very hot or not sweating, cool the child with water. '
@@ -617,12 +727,22 @@ final PpSection kPpSafetySection = PpSection(
                 'unusually drowsy or very hot to touch. The same goes for '
                 'fewer wet nappies, a dry mouth, vomiting, or a fit.',
                 kind: PpCalloutKind.doctor),
+            // SF5 (door 11): heat stroke and dengue live on Health's pages
+            // (`prev_heat`, `ill_dengue`); linked, never written twice.
+            PpLink('Heat stroke: the signs, and what to do',
+                surfaceId: 'pp_page/parenting_health/prev_heat',
+                blurb: 'Hot, dry skin, floppy or very sleepy: an emergency.'),
+            PpLink('Mosquitoes and dengue',
+                surfaceId: 'pp_page/parenting_health/ill_dengue',
+                blurb: 'Nets for day naps, standing water, repellents by age, '
+                    'and the fever signs to call about.'),
           ],
         ),
         PpPage(
           id: 'safety_crowds',
           title: 'Fairs, malls and stations: if your child gets lost',
           subtitle: 'A plan you make before you leave home',
+          bands: ['preschool'], // SF2: from three
           format: 'STEP-LIST',
           blocks: [
             PpIntro('Losing sight of your child in a crowd is every parent\'s '
@@ -651,7 +771,7 @@ final PpSection kPpSafetySection = PpSection(
             ]),
             PpCallout('If your child is missing, tell the nearest police '
                 'officer, security guard or announcement desk at once, and '
-                'call 112. Don\'t wait to search on your own first.',
+                'call $kEmergencyNumber. Don\'t wait to search on your own first.',
                 kind: PpCalloutKind.safety),
           ],
         ),
@@ -659,6 +779,10 @@ final PpSection kPpSafetySection = PpSection(
           id: 'safety_road_sense',
           title: 'Roads, parking and the school van',
           subtitle: 'Small children can\'t judge traffic yet',
+          // SF2 says three; from one here, because reversing cars and the
+          // lane outside the gate are a walking toddler's risk, and the app's
+          // own year-two tip (`y2_road`) opens this page.
+          bands: ['toddler_1', 'toddler_2', 'preschool'],
           format: 'CARDS',
           blocks: [
             PpIntro('Until about eight or nine, children can\'t judge how fast '
@@ -741,7 +865,9 @@ final PpSection kPpSafetySection = PpSection(
         PpPage(
           id: 'safety_travel',
           title: 'Travelling with a baby or toddler',
-          subtitle: 'Car, train and plane, and what to pack',
+          // SF3: was 'Car, train and plane, and what to pack', kept for
+          // revert.
+          subtitle: 'Car, train and plane: tickets, seats and what to pack',
           format: 'CARDS',
           blocks: [
             PpIntro('Travel with a little one takes more planning, not more '
@@ -762,11 +888,58 @@ final PpSection kPpSafetySection = PpSection(
                   'and windows shaded.'),
               PpCard('By train', 'A lower berth if you can, and a sheet to keep '
                   'your child off the floor.'),
-              PpCard('By plane', 'Feed or give a drink during take-off and '
-                  'landing to ease the ears.'),
+              // SF3: flying has its own part below. Kept for revert:
+              // PpCard('By plane', 'Feed or give a drink during take-off and '
+              //     'landing to ease the ears.'),
               PpCard('Abroad', 'A passport for your child, travel insurance '
                   'that covers your child, and a vaccine check with your doctor.'),
             ]),
+            // SF3 (door 11): flights, the top travel question.
+            // REQUIRED_REVIEW (DGCA and airline rules, checked before release).
+            PpCards(heading: 'Flying with a baby or toddler', [
+              PpCard('How young',
+                  'Most Indian airlines take babies from about 7 to 14 days '
+                      'old. Ask your airline, and ask your doctor first if '
+                      'your baby was born early or has a heart or breathing '
+                      'condition.'),
+              PpCard('A ticket',
+                  'Under two, your baby usually flies on your lap on an '
+                      'infant ticket, for a fraction of the fare. From two, '
+                      'your child needs a seat of their own.'),
+              PpCard('Ears at take-off and landing',
+                  'Feed, or give a dummy, or sips of water from six months. '
+                      'Swallowing eases the pressure.'),
+              PpCard('Papers',
+                  'Your baby\'s birth certificate for flights in India (some '
+                      'airlines ask for it), and a passport of their own to '
+                      'fly abroad.'),
+              PpCard('A car seat on board',
+                  'Many airlines allow an approved car seat when your child '
+                      'has a seat of their own. It is the safest way to fly.'),
+              PpCard('A cold or sore ears',
+                  'If your child\'s ears or chest are bad, ask your doctor '
+                      'before flying.'),
+            ]),
+            PpLink('The birth certificate',
+                surfaceId: 'pp_page/parenting_papers/pm_birth_certificate'),
+            PpLink('Your child\'s passport',
+                surfaceId: 'pp_page/parenting_papers/pm_passport'),
+            // SF3: the front seat. REQUIRED_REVIEW (the two-wheeler rule says
+            // what `safety_car_seat` says: CMV Rules 2022, in force 2023).
+            PpCards(heading: 'The front seat', [
+              PpCard('The back seat, until about 12',
+                  'Or until the seat belt fits properly across the shoulder '
+                      'and the hips.'),
+              PpCard('Never a rear-facing seat in front of an airbag',
+                  'An airbag opening can seriously hurt a baby.'),
+              PpCard('On a two-wheeler',
+                  'From nine months to four years, the law asks for a crash '
+                      'helmet that fits, a harness that ties your child to the '
+                      'rider, and no more than 40 km/h. A baby under nine '
+                      'months should not ride at all.'),
+            ]),
+            PpLink('Car seats, and children on two-wheelers',
+                surfaceId: 'pp_page/parenting_safety/safety_car_seat'),
             PpWhenLine('Keep the routine loosely: naps and meals at roughly '
                 'the usual times make arrival far easier.'),
           ],
@@ -802,22 +975,45 @@ final PpSection kPpSafetySection = PpSection(
           id: 'safety_motion_sickness',
           title: 'Car sickness and motion sickness',
           subtitle: 'Common from about two years',
-          bands: ['toddler_1', 'toddler_2', 'preschool'],
+          // SF2: from two, as its own words say. Was ['toddler_1',
+          // 'toddler_2', 'preschool'], kept for revert.
+          bands: ['toddler_2', 'preschool'],
           format: 'STEP-LIST',
           blocks: [
             PpIntro('Motion sickness is uncommon in babies and more common '
                 'from about two, especially on winding hill roads. A few '
                 'tricks help many children.'),
             PpSteps([
-              PpStep('A light meal before, not a big one'),
+              PpStep('A light snack before, not an empty or a full tummy',
+                  'A dry biscuit or a little fruit half an hour before.'),
               PpStep('Looking out of the front window', 'At the horizon, '
                   'not at a phone or book.'),
-              PpStep('Fresh air', 'A window open a little.'),
-              PpStep('Frequent stops', 'On ghat and hill roads especially.'),
-              PpStep('Keep a bag and a change of clothes handy'),
+              PpStep('Fresh air', 'A window open a little, and no strong '
+                  'smells in the car.'),
+              PpStep('A stop every hour', 'On ghat and hill roads '
+                  'especially, a few minutes walking about.'),
+              PpStep('Keep a bag and a change of clothes handy',
+                  'Within reach of the seat, not in the boot.'),
             ]),
+            // SF5 (door 11). REQUIRED_REVIEW.
+            PpCards(heading: 'Ginger, and medicines', [
+              PpCard('Ginger',
+                  'Many families use a little ginger in food from about two. '
+                      'It is gentle, and fine to try.'),
+              PpCard('Medicines wait for the doctor',
+                  'Travel-sickness medicines, even the ones sold over the '
+                      'counter, are not for under two, and not without your '
+                      'doctor at any age.'),
+              PpCard('It usually eases',
+                  'Many children grow out of it, and a calm trip helps more '
+                      'than worrying about the next one.'),
+            ]),
+            // Was 'Ask your doctor before giving any motion sickness
+            // medicine; many aren't suitable for young children.', kept for
+            // revert.
             PpCallout('Ask your doctor before giving any motion sickness '
-                'medicine; many aren\'t suitable for young children.',
+                'medicine, and see the doctor if your child is sick on short '
+                'trips too, or has a headache or earache with it.',
                 kind: PpCalloutKind.doctor),
           ],
         ),
@@ -839,14 +1035,35 @@ final PpSection kPpSafetySection = PpSection(
           title: 'CPR for babies and toddlers',
           subtitle: 'Read it once on a calm day',
           format: 'STEP-LIST',
+          // SF2: from one, the child's half comes first. No new copy.
+          ageLead: PpAgeLead(
+              fromMonths: 12, olderHeading: 'For a child over one'),
           blocks: [
             PpIntro('We hope you never need this. Reading it once now, '
                 'calmly, means your hands will remember more than you think '
                 'if the day ever comes. A short in-person class is even '
                 'better, and many hospitals run them.'),
+            // SF4 (door 11): the baby film is Health's slot, the same film
+            // in a second place; the child film is new. Real people only, an
+            // instructor on a mannequin (DOOR-CONTENT-OWED HD4, SFO1).
+            PpVideoSlot(
+              title: 'Baby CPR, shown by an instructor',
+              subtitle: 'For a baby who stops breathing: the steps, on a '
+                  'mannequin.',
+              minutes: '3 MIN',
+              slotId: 'health/infant_cpr',
+            ),
+            PpVideoSlot(
+              title: 'Child CPR, shown by an instructor',
+              subtitle: 'For a child over one who stops breathing: the '
+                  'steps, on a mannequin.',
+              minutes: '3 MIN',
+              slotId: 'safety/child_cpr',
+            ),
             PpCallout('Use this only if your child is not responding and not '
                 'breathing normally. Shout for help, and get someone to call '
-                '112 or 108 while you start. If you are alone, put your phone '
+                '$kEmergencyNumber or $kAmbulanceNumber while you start. If you are '
+                'alone, put your phone '
                 'on speaker and call as you begin.',
                 kind: PpCalloutKind.doctor),
             PpSteps(heading: 'For a baby under one', [
@@ -874,6 +1091,16 @@ final PpSection kPpSafetySection = PpSection(
             PpWhenLine('Don\'t stop to check unless your child moves, coughs '
                 'or starts breathing. Then roll your child onto one side and '
                 'stay close until help arrives.'),
+            // SF4: the choking film is Health's, on its page.
+            PpLink('If your child is choking',
+                surfaceId: 'pp_page/parenting_health/health_choking_response',
+                blurb: 'Back blows and chest thrusts, with the film.'),
+            // SF6: the class this door most needs is owed (SFO3). It is the
+            // First aid tab's closing now (`PpDoorTab.closing`), as on
+            // Health's Get help now: a class not open has no screen, so a page
+            // link to it fails the link gate. Kept for revert:
+            // PpLink('Learn it on a calm day: baby first aid and CPR',
+            //     surfaceId: 'pp_class/Baby first aid and CPR'),
           ],
         ),
         PpPage(
@@ -955,7 +1182,7 @@ final PpSection kPpSafetySection = PpSection(
                   'Like a fracture. Remove rings, anklets and tight clothes.'),
               PpStep('Go to the nearest hospital with anti-venom now',
                   'Government hospitals and primary health centres stock it. '
-                      'Call 108 or 112.'),
+                      'Call $kAmbulanceNumber or $kEmergencyNumber.'),
             ]),
             PpCallout('Don\'t cut the bite, suck it, tie a tight band above '
                 'it, put ice or herbs on it, or go to a faith healer first. '
@@ -997,7 +1224,10 @@ final PpSection kPpSafetySection = PpSection(
               PpCard('Blunt-tipped scissors and tweezers', 'For splinters and cutting tape.'),
               PpCard('A list of numbers on the lid',
                   'Your paediatrician, the nearest children\'s emergency, '
-                      '112, 108, and the AIIMS poison line 1800-116-117.'),
+                      '$kEmergencyNumber, $kAmbulanceNumber (or '
+                      '$kMotherBabyAmbulanceNumber, in many states the free '
+                      'ambulance for pregnant women and babies), and the AIIMS '
+                      'poison line $kPoisonsHelplineNumber.'),
             ]),
             PpCallout('Keep the kit out of children\'s reach, and check expiry '
                 'dates every few months.'),
@@ -1049,7 +1279,7 @@ final PpSection kPpSafetySection = PpSection(
                   'harmless; see a doctor if pain spreads, the bite blisters or '
                   'darkens, or your child feels unwell.'),
               PpCard('Go now if', 'There\'s swelling of the face or lips, '
-                  'trouble breathing, or faintness: call 112.'),
+                  'trouble breathing, or faintness: call $kEmergencyNumber.'),
             ]),
             PpCards(heading: 'Something stuck in the nose or ear', [
               PpCard('Don\'t poke at it', 'You may push it further in.'),

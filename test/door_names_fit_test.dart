@@ -136,7 +136,7 @@ const Map<String, String> _kOwedShorterNames = {
   'parenting_first_40/feeding_rest': 'Feeding and sleep',
   'parenting_papers/schemes': 'Schemes',
   'parenting_potty/su_su': 'Early wees', // never "su-su" on a tab
-  'parenting_safety/road': 'Road and heat',
+  // 'parenting_safety/road': 'Road and heat', // door 11 (SF8): 'Travel and heat'
   'parenting_special_care/early': 'Born early',
   'parenting_special_care/you': 'Caring for you',
   'parenting_maternal/people': 'Your people',

@@ -87,20 +87,27 @@ const List<_Line> _lines = [
   ),
 ];
 
+/// ⚠️ THE PARENTING DIAL, ONE COPY (lifted out of this screen 2026-10-26 for
+/// the doors' emergency strip, Safety SF1). Opens the dialler with the number
+/// filled in; it does not place the call. She presses the green button,
+/// which keeps the last step hers. Dashes come out ("1800-116-117").
+Future<void> ppDialNumber(String number) async {
+  final uri = Uri(scheme: 'tel', path: number.replaceAll('-', ''));
+  try {
+    await launchUrl(uri);
+  } catch (_) {
+    // A failed launch must never be a crash on a screen like this one. Every
+    // caller prints the number in full beside its button for exactly this
+    // case.
+  }
+}
+
 class PpCrisisPathScreen extends StatelessWidget {
   const PpCrisisPathScreen({super.key});
 
-  Future<void> _dial(String number) async {
-    // Opens the dialler with the number filled in; it does not place the call.
-    // She presses the green button, which keeps the last step hers.
-    final uri = Uri(scheme: 'tel', path: number.replaceAll('-', ''));
-    try {
-      await launchUrl(uri);
-    } catch (_) {
-      // A failed launch must never be a crash on this screen of all screens.
-      // The number is printed in full above the button for exactly this case.
-    }
-  }
+  // The dial is `ppDialNumber` below now, shared with the doors' emergency
+  // strip (Safety SF1, 2026-10-26). Kept as the one name this screen calls.
+  Future<void> _dial(String number) => ppDialNumber(number);
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(

@@ -28,7 +28,7 @@
 //  the first tab is where somebody arriving should land.
 // =============================================================================
 
-import 'package:flutter/foundation.dart' show ValueListenable;
+import 'package:flutter/foundation.dart' show ValueListenable, visibleForTesting;
 import 'package:flutter/material.dart';
 import '../../../ask_veda/ask_veda_mark.dart';
 
@@ -41,6 +41,7 @@ import '../../v2/v3_bracket_art.dart';
 import '../../v2/v3_hero_field.dart';
 import '../pp_child_profile.dart';
 import '../pp_content.dart';
+import '../pp_crisis_path_screen.dart' show ppDialNumber;
 import '../pp_section_registry.dart';
 import '../pp_section_screen.dart';
 import 'pp_door_carousel.dart';
@@ -683,6 +684,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   //             ),
   //     ];
 
+  /// True when [surfaceId] opens a page of this door that the tab already
+  /// draws on its rails for the band it shows: the strip's "CPR" row on
+  /// First aid, where the CPR page is the first card (Behaviour's lesson,
+  /// two cards for one thing a thumb apart).
+  bool _shownOnTab(PpDoorTab tab, String surfaceId) {
+    final prefix = 'pp_page/${door.sectionId}/';
+    if (!surfaceId.startsWith(prefix)) return false;
+    final id = surfaceId.substring(prefix.length);
+    return _railsFor(tab).any((r) => r.$2.any((x) => x.id == id)) ||
+        _extraPagesFor(tab).any((x) => x.id == id);
+  }
+
   /// The offer a tab ends on: its own (`PpDoorTab.closing`), else the door's.
   PpDoorClosing? _closingOf(PpDoorTab tab) => tab.closing ?? door.closing;
 
@@ -878,6 +891,24 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                     const SizedBox(height: 4),
                     const SizedBox(height: kPvDoorBlockGap),
 
+                    // ⚠️ THE EMERGENCY, FIRST ON EVERY TAB (PpDoor.emergency,
+                    // Safety SF1, 2026-10-26). Above a tab for later's line
+                    // too, so no tab at no age is without it. On the pin's
+                    // tab the pin leads the same block (one callout, rule c).
+                    if (door.emergency case final e?) ...[
+                      ppDoorPad(_EmergencyStrip(
+                        key: const ValueKey('pp_door_emergency'),
+                        p: p,
+                        emergency: e,
+                        pin: e.pin?.tabId == tab.id ? e.pin : null,
+                        links: [
+                          for (final l in e.links)
+                            if (!_shownOnTab(tab, l.surfaceId)) l,
+                        ],
+                        onSurface: (id) => widget.onSurface(context, id),
+                      )),
+                      const SizedBox(height: kPvDoorBlockGap),
+                    ],
                     // A tab for later opens (S9): one line, then its rails.
                     // The lock panel it showed instead, kept for revert:
                     // if (_unlockMonths(tab) case final m?) ...[
@@ -2396,6 +2427,200 @@ class _FlagRow extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      );
+}
+
+/// The key on a strip's call button.
+Key ppDoorCallKey(String number) => ValueKey('pp_door_call_$number');
+
+/// The dial the strip calls: `ppDialNumber`, the crisis path's own (one copy
+/// in the parenting stage). A test swaps it to see which number a tap dials.
+@visibleForTesting
+Future<void> Function(String number) ppDoorDial = ppDialNumber;
+
+/// The emergency strip (`PpDoor.emergency`, Safety SF1): a heading or the
+/// pinned row, the call buttons, the numbers written out, and the rows to
+/// the steps. One white block in the flag row's look, so it reads as the
+/// same kind of thing as a pinned red flag and never as a second one.
+class _EmergencyStrip extends StatelessWidget {
+  const _EmergencyStrip({
+    super.key,
+    required this.p,
+    required this.emergency,
+    required this.pin,
+    required this.links,
+    required this.onSurface,
+  });
+  final V2Palette p;
+  final PpDoorEmergency emergency;
+  final PpDoorEmergencyPin? pin;
+  final List<PpDoorEmergencyLink> links;
+  final void Function(String surfaceId) onSurface;
+
+  Widget _mark() => SizedBox(
+        width: 26,
+        height: 26,
+        child: Stack(clipBehavior: Clip.none, children: [
+          Icon(Icons.local_hospital_outlined, size: 22, color: p.ink1),
+          Positioned(
+            right: -1,
+            top: -1,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE5484D),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+            ),
+          ),
+        ]),
+      );
+
+  Widget _head() {
+    final pinned = pin;
+    if (pinned == null) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+        child: Row(children: [
+          _mark(),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text('In an emergency',
+                key: const ValueKey('pp_door_emergency_head'),
+                style: pvManrope(
+                    fontSize: 14.5, fontWeight: FontWeight.w800, height: 1.3, color: p.ink1)),
+          ),
+        ]),
+      );
+    }
+    return Semantics(
+      button: true,
+      label: '${pinned.title}. ${pinned.line}',
+      excludeSemantics: true,
+      child: InkWell(
+        key: const ValueKey('pp_door_emergency_pin'),
+        onTap: () {
+          pvCommitFeedback();
+          onSurface(pinned.surfaceId);
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 10, 4),
+          child: Row(children: [
+            _mark(),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(pinned.title,
+                      style: pvManrope(
+                          fontSize: 14.5, fontWeight: FontWeight.w800, height: 1.3, color: p.ink1)),
+                  const SizedBox(height: 2),
+                  Text(pinned.line,
+                      style: pvManrope(fontSize: 12.5, height: 1.35, color: p.ink2)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _call(PpDoorCall c, {required bool first}) => Semantics(
+        button: true,
+        label: '${c.label}, ${c.number}',
+        excludeSemantics: true,
+        child: Material(
+          key: ppDoorCallKey(c.number),
+          color: first ? p.ink1 : Colors.white,
+          shape: StadiumBorder(
+              side: BorderSide(color: p.ink1, width: first ? 0 : 1.2)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () {
+              pvCommitFeedback();
+              ppDoorDial(c.number);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.call_rounded,
+                    size: 16, color: first ? Colors.white : p.ink1),
+                const SizedBox(width: 6),
+                // Flexible: at 1.5x on a 360 phone a label wraps inside its
+                // pill instead of running off it.
+                Flexible(
+                  child: Text(c.label,
+                      style: pvManrope(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: first ? Colors.white : p.ink1)),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: p.line),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _head(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+              child: Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final (i, c) in emergency.calls.indexed)
+                  _call(c, first: i == 0),
+              ]),
+            ),
+            // Written out, selectable: a call link may do nothing on some
+            // phones, and a number on screen can still be copied or read out.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+              child: SelectableText(emergency.numbersLine,
+                  key: const ValueKey('pp_door_emergency_numbers'),
+                  style: pvManrope(
+                      fontSize: 12.5, fontWeight: FontWeight.w600, height: 1.4, color: p.ink2)),
+            ),
+            for (final l in links) ...[
+              Divider(height: 1, thickness: 1, color: p.line),
+              InkWell(
+                key: ValueKey('pp_door_emergency_link_${l.surfaceId}'),
+                onTap: () {
+                  pvCommitFeedback();
+                  onSurface(l.surfaceId);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
+                  child: Row(children: [
+                    Expanded(
+                      child: Text(l.label,
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              height: 1.3,
+                              color: p.ink1)),
+                    ),
+                    Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
+                  ]),
+                ),
+              ),
+            ],
+          ],
         ),
       );
 }

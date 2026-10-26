@@ -115,6 +115,18 @@ const String kEmergencyNumber = '112';
 /// hospital today" sheet, the Get help page), never on its own.
 const String kAmbulanceNumber = '108';
 
+/// The free ambulance for pregnant women and babies in many states
+/// (2026-10-26, Safety door SF5). Written beside [kAmbulanceNumber], never
+/// instead of it: 108 is the emergency ambulance almost everywhere, 102 is
+/// the scheme's transport and not in every state. REQUIRED_TO_CONFIRM.
+const String kMotherBabyAmbulanceNumber = '102';
+
+/// The National Poisons Information Centre at AIIMS, New Delhi (Safety door
+/// SF1, 2026-10-26). Toll-free. One constant, so the strip, the pages and the
+/// first aid kit's list cannot disagree. REQUIRED_TO_CONFIRM.
+const String kPoisonsHelplineNumber = '1800-116-117';
+const String kPoisonsHelplineName = 'the AIIMS poison line';
+
 // =============================================================================
 //  Feel - breathing
 // =============================================================================
