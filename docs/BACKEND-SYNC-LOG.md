@@ -1576,7 +1576,7 @@ placeholder; the timer counts from play, survives a stop, and keeps "All night")
 ## Step 24: a milestone carries a photo, and one of her own carries its words (R10)
 
 **Date:** 2026-10-26 (STAGE-TRANSITIONS R10, the user's go for "that migration and its sync step").
-**Migration:** `0116_pp_milestone_photo.sql`, run by the user. **Commit:** pending.
+**Migration:** `0116_pp_milestone_photo.sql`, run by the user. **Commit:** `5824b08`.
 
 ### Why
 R10 makes Milestones one place per child, where saving one is a moment: a date, an optional photo and a line,

@@ -192,7 +192,7 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [x] **DECIDE** · Per-pregnancy records (the `pregnancies` table): a pregnancy after a loss shows the lost pregnancy's bump photos, scans and bag · user · STAGE-TRANSITIONS R1, STILL-OPEN §101.1 · added 2026-10-24 · DECIDED and BUILT 2026-10-25 (kept for her, view or delete; sync step 18, 656bbb3)
 - [x] **RUN** · Migration `0114_pregnancies.sql` (one row per pregnancy, partner read, on the purge list), then install the next build · user · BACKEND-SYNC-LOG step 18 · added 2026-10-25 · run 2026-10-25; next build still to install
 - [x] **RUN** · Migration `0115_pp_food_tries.sql` (the foods a child has tried, shared with the co-parent; guarded; on the purge list), then install the next build. Until it runs, first tries stay on the phone and the push is refused quietly · user · BACKEND-SYNC-LOG step 20 · added 2026-10-25 · run 2026-10-25
-- [ ] **RUN** · Migration `0116_pp_milestone_photo.sql` (a photo and, for her own milestones, a title on `pp_milestone_observations`), then install the next build. Until it runs, a milestone with a photo or one of her own stays on the phone; every other milestone syncs as before · user · BACKEND-SYNC-LOG step 24 · added 2026-10-26
+- [x] **RUN** · Migration `0116_pp_milestone_photo.sql` (a photo and, for her own milestones, a title on `pp_milestone_observations`), then install the next build. Until it runs, a milestone with a photo or one of her own stays on the phone; every other milestone syncs as before · user · BACKEND-SYNC-LOG step 24 · added 2026-10-26 · run 2026-10-26; next build still to install
 - [x] **LAUNCH** · The partner's phone never sees her stage change or her loss (it reads his own profile row) · dev · STAGE-TRANSITIONS R2, STILL-OPEN §101.2 · added 2026-10-24 · DONE 2026-10-25: no migration (0009 already lets him read her row); sync log step 22, BACKEND-PATTERNS 16uu
 
 **Sponsors** (STILL-OPEN line 21: §11.6 blocks the sponsor programme):
@@ -259,3 +259,4 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - 2026-10-21 · Migration 0106 (Pregnancy part 1: clock, soft delete, guard, the father_missions UPDATE policy) run and checked by the user, 9 of 9 tables · §1
 - 2026-10-21 · Migration 0107 (Pregnancy part 2: clock, soft delete, guard, medications.alarms, symptom severity 'strong') run and checked by the user, 10 of 10 tables · §1
 - 2026-10-21 · Migration 0108 (affiliate fields on products: asin, price_checked_at, ext_rating, ext_review_count) run by the user · §1
+- 2026-10-26 · Migration 0116 (a photo, and a title for her own milestones, on pp_milestone_observations) run by the user · §1
