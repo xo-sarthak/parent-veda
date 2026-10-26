@@ -276,6 +276,16 @@ const PpArea kBehSpecific = PpArea(
         PpLink('Calm-down corner',
             pageId: 'beh_calm_corner',
             blurb: 'A place to go, set up before it is needed.'),
+        // BH3: the moment itself, for any age. "Hitting, biting" is tagged
+        // one to three again, so from three this is its way in.
+        PpLink('He hit, bit or pulled hair: the moment',
+            pageId: 'hitting_biting',
+            blurb: 'What to do in the next minute.'),
+        // BH5: one book for her, at the foot.
+        PpLink('The book: The Whole-Brain Child',
+            surfaceId: 'pp_book/book_whole_brain',
+            blurb: 'Why a small child cannot think while upset, as a short '
+                'summary.'),
       ],
     ),
 
@@ -325,6 +335,10 @@ const PpArea kBehSpecific = PpArea(
             'different instructions at once, and ignoring all of them is a '
             'reasonable response. Agreeing who is asking, in the moment, does '
             'more than any technique.'),
+        // BH5: one book for her, at the foot.
+        PpLink('The book: How to Talk So Kids Will Listen',
+            surfaceId: 'pp_book/book_how_to_talk_so_kids_will_listen_listen_s',
+            blurb: 'The classic on asking so it lands, as a short summary.'),
       ],
     ),
 
@@ -435,6 +449,10 @@ const PpArea kBehScreens = PpArea(
             'not a moral failing. Changing one meal a day is a realistic goal; '
             'changing all of them at once is how a plan gets abandoned by '
             'Thursday.'),
+        // BH6: the screen pages point at each other.
+        PpLink('Ending it without a meltdown',
+            pageId: 'beh_screen_ending',
+            blurb: 'The warning, the timer, and what comes next.'),
       ],
     ),
     PpPage(
@@ -495,6 +513,10 @@ const PpArea kBehScreens = PpArea(
         PpWhenLine('Eighteen months and up.'),
         PpLink('The words for this, and the other moments',
             surfaceId: 'pp_scripts/screen_off'), // was the whole tool (tools pass 29, BH2)
+        // BH6: the screen pages point at each other.
+        PpLink('When everyone in the house has a phone',
+            pageId: 'beh_screens_family',
+            blurb: 'The phone at meals, and the grandparents.'),
       ],
     ),
     PpPage(
@@ -532,6 +554,23 @@ const PpArea kBehScreens = PpArea(
               'At Grandma\'s house it is different. Children handle that far better '
               'than they handle their parents fighting about it.'),
         ], heading: 'What tends to work'),
+        // BH7, section 5 of 08-behaviour-content.md: the phone at meals had
+        // two mentions in the door. REQUIRED_REVIEW (child psychologist).
+        PpArticle(heading: 'The phone at meals', [
+          'It is so common because it works: with a cartoon on, he eats '
+              'without a fight, and in a busy house that feels like a win.',
+          'What it costs is that he stops noticing when he is full, and often '
+              'eats less of the food he would choose himself. Then a meal '
+              'without the phone becomes a battle.',
+        ]),
+        PpSteps([
+          PpStep('Come off it slowly',
+              'First the sound off, then the screen face-down, then one meal a '
+              'day with no phone. Talk to him, or sing, while he eats.'),
+          PpStep('Bring the grandparents in',
+              '"We\'re trying meals without the phone this week. Can you help '
+              'me with lunch?" It makes them part of the change.'),
+        ]),
         PpWhenLine('Any age, and easiest to set before he can ask.'),
         PpIndiaNote('If a helper is with him most of the day, the conversation '
             'has to be with her, specifically, and it has to come with an '
@@ -540,6 +579,14 @@ const PpArea kBehScreens = PpArea(
         PpLink('When elders do it differently',
             pageId: 'beh_elders',
             blurb: 'The wider version of this conversation.'),
+        // Section 5: the fussy-eating side of the phone at meals.
+        PpLink('Mealtime battles',
+            surfaceId: 'pp_page/parenting_feeding/picky_battles',
+            blurb: 'In the Feeding door: picky eating without the fight.'),
+        // BH6: the screen pages point at each other.
+        PpLink('How much is too much, honestly',
+            pageId: 'beh_screen_limits',
+            blurb: 'The guidance by age, without the panic.'),
       ],
     ),
   ],
@@ -700,6 +747,18 @@ const PpArea kBehCalm = PpArea(
           PpStep('Let him shake it as hard as he likes',
               'The shaking is part of it.'),
         ], heading: 'How to make and use it'),
+        // BH7, section 6: the thin page written out.
+        PpSteps([
+          PpStep('A clear plastic bottle, never glass',
+              'Warm water, two spoons of glitter glue and some glitter. Seal '
+              'the lid with glue.'),
+          PpStep('He chooses the colour',
+              'Then it is his, and he reaches for it.'),
+          PpStep('The words that go with it',
+              '"Shake it, and watch until the glitter settles. Your body '
+              'settles too." It is for calming down together, never a '
+              'punishment.'),
+        ], heading: 'Making it his'),
         PpWhenLine('Two and a half years and up.'),
       ],
     ),
@@ -764,6 +823,17 @@ const PpArea kBehCalm = PpArea(
           PpStep('Accept nothing as an answer',
               '"Do not want to" is fine. Asking again tomorrow is the habit.'),
         ], heading: 'How to do it'),
+        // BH7, section 6: the thin page written out.
+        PpSteps([
+          PpStep('Faces, for a small child',
+              '"Which face are you today?" with three to five faces drawn on '
+              'a card. Pointing is an answer.'),
+          PpStep('Go first, with a real one',
+              '"I felt cross in the traffic, then happy when I saw you."'),
+          PpStep('No fixing',
+              'Listen, name the feeling, and stop. "You felt left out. That\'s '
+              'hard."'),
+        ], heading: 'Making it work'),
         PpWhenLine('Three years and up.'),
         PpLink('Big feelings at this age',
             pageId: 'beh_big_feelings',

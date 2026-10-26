@@ -55,6 +55,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart' show Icons;
+import '../../data/mind_mood_data.dart' show kCrisisHelplineName, kCrisisHelplineNumber;
 import 'pp_age_bands.dart';
 import 'pp_behaviour_bands.dart';
 import 'pp_behaviour_more.dart';
@@ -89,7 +90,11 @@ const PpArea _crying = PpArea(
     // ---- A1 ----------------------------------------------------------------
     PpPage(
       id: 'crying_normal',
-      title: "Is my baby's crying normal?",
+      // BH7 (door plan 08): colic is named here, and it is the most-searched
+      // crying word (654 hits) that the door never used. Was "Is my baby's
+      // crying normal?", kept for revert.
+      // title: "Is my baby's crying normal?",
+      title: 'Colic, or normal crying?',
       subtitle: 'The curve almost every baby follows.',
       format: 'ARTICLE',
       bands: ['infant'],
@@ -115,6 +120,23 @@ const PpArea _crying = PpArea(
                 'between about 5pm and 10pm is so common that most families '
                 'have a name for it. It passes on its own, without anything '
                 'being done about it.',
+          ],
+        ),
+        // BH7, §3a of 08-behaviour-content.md. REQUIRED_REVIEW (paediatrician):
+        // the rule of threes and the timeline, held to Health's `tummy_colic`
+        // figures (from two to three weeks, worst around six, eased by three
+        // to four months) so the two doors give the same numbers.
+        PpArticle(
+          heading: 'Is it colic?',
+          [
+            'Doctors use "colic" for a healthy baby who cries for more than '
+                'three hours a day, on more than three days a week, for more '
+                'than three weeks. It often starts at two to three weeks, is '
+                'worst at around six weeks, and usually eases by three to four '
+                'months.',
+            'Colic isn\'t an illness, and it isn\'t something you did. The '
+                'doctor box below still holds: any of those signs is a call, '
+                'colic or not.',
           ],
         ),
         PpSteps(
@@ -179,9 +201,17 @@ const PpArea _crying = PpArea(
         PpCallout('If the crying has stopped feeling survivable, read "When the '
             'crying is too much" in this same door before the next hard '
             'evening, not during it.'),
+        // §3a: the one clinical colic page, with what helps and the red flags
+        // (no gripe water, no janam ghutti).
+        PpLink('Colic: what helps, and when to worry',
+            surfaceId: 'pp_page/parenting_health/tummy_colic',
+            blurb: 'The Health door\'s colic page.'),
+        // BH6: the Sleep door's settling page, not the sleep tracker (the
+        // journey screen).
         PpLink('Sleep and settling at this age',
-            surfaceId: 'pp_sleep',
-            blurb: 'Naps, night waking, and what is normal right now.'),
+            // surfaceId: 'pp_sleep', // kept for revert
+            surfaceId: 'pp_page/parenting_sleep/gentle_settling',
+            blurb: 'Gentle settling, in the Sleep door.'),
       ],
     ),
 
@@ -256,9 +286,12 @@ const PpArea _crying = PpArea(
         PpLink('Something has changed in sleeping or crying',
             surfaceId: 'pp_what_changed',
             blurb: 'Look up the change and see what it usually means.'),
+        // BH6: the settling page itself, not the journey screen under a label
+        // that promised the door.
         PpLink('Settling, naps and night waking',
-            surfaceId: 'pp_sleep',
-            blurb: 'The full sleep door for your baby\'s age.'),
+            // surfaceId: 'pp_sleep', // kept for revert
+            surfaceId: 'pp_page/parenting_sleep/gentle_settling',
+            blurb: 'Gentle settling, in the Sleep door.'),
         PpLink('Comfort feeding and feeding to sleep',
             surfaceId: 'pp_feeding',
             blurb: 'Whether it is a problem, and when it is not.'),
@@ -441,6 +474,16 @@ const PpArea _crying = PpArea(
                 'Your partner, your mother, your sister, a friend, a '
                     'neighbour. Say the true sentence: I am finding this very '
                     'hard right now.'),
+            // BH4, "When it's too much for you" (08-behaviour-content.md §2).
+            // This page is its one step-through, so the card is a step of it,
+            // next to the call it widens and two steps away from the
+            // never-shake warning. Built from the one helpline constant.
+            // REQUIRED_REVIEW (child psychologist; Tele-MANAS, MoHFW).
+            PpInteractiveItem(
+                'Free, any hour: $kCrisisHelplineName, $kCrisisHelplineNumber',
+                'If there is nobody to call, or you would rather talk to a '
+                    'stranger. The government\'s mental health line: trained '
+                    'counsellors, in your language, free.'),
             PpInteractiveItem('Go back when your hands feel steady',
                 'Then hand the baby over if there is anyone to hand over to. '
                     'Twenty-minute shifts through the worst evenings is a normal '
@@ -674,6 +717,15 @@ const PpArea _firstFeelings = PpArea(
               'can\'t hear you yet. The thinking part of the brain is offline '
               'until the feeling passes.',
         ], heading: 'Why they do it'),
+        // BH7, §3b: "when do tantrums stop" is a top tantrum search and no
+        // page answered it. REQUIRED_REVIEW (child psychologist).
+        PpArticle([
+          'They\'re most common between about 18 months and 3 years, when '
+              'your child wants a lot and has few words to say it. They ease '
+              'as the words grow, and most children have far fewer by 4 or 5.',
+          'If they\'re getting longer, more violent or more frequent after 4, '
+              'or your child gets hurt in them, mention it to your doctor.',
+        ], heading: 'When do tantrums stop?'),
         PpSteps([
           PpStep('Get down to your child\'s level',
               'Standing over a small person having a big feeling makes it '
@@ -728,6 +780,10 @@ const PpArea _firstFeelings = PpArea(
         PpIndiaNote('In a joint family a tantrum has an audience, and half the '
             'pressure you feel comes from them. It\'s fair to pick your '
             'child up and go to another room, for both your sakes.'),
+        // BH5: one book for her, at the foot, never in a row.
+        PpLink('The book: No Bad Kids',
+            surfaceId: 'pp_book/book_no_bad_kids',
+            blurb: 'Calm, respectful limits for toddlers, as a short summary.'),
       ],
     ),
     PpPage(
@@ -735,7 +791,11 @@ const PpArea _firstFeelings = PpArea(
       title: 'Hitting, biting and pulling hair',
       subtitle: 'Almost always communication, not aggression.',
       format: 'ARTICLE',
-      bands: _toddlerAndUp,
+      // BH3: back to one to three. Tagged three to six, it showed at that age
+      // only under "Earlier", because its area is one to three; the anger
+      // page links here for an older child. Kept for revert:
+      // bands: _toddlerAndUp,
+      bands: _toddler,
       blocks: [
         PpIntro('It is shocking the first time, and it is extremely common. A '
             'child who bites at this age is not a child who will grow up '
@@ -1000,6 +1060,33 @@ const PpArea _firstFeelings = PpArea(
           PpCard('Don\'t apologise to onlookers',
               'Your child hears it, and it\'s the sentence that stays.'),
         ], heading: 'What not to do', hue: 128),
+        // BH7, §3: guests, weddings and festivals, as a part of this page (15
+        // searches, too few for a page of its own). REQUIRED_REVIEW (child
+        // psychologist).
+        PpArticle(heading: 'At functions and festivals', [
+          'A house full of relatives, a wedding till midnight, crackers at '
+              'Diwali. Every child gets overwhelmed at some point. It isn\'t '
+              'bad behaviour, it\'s too much at once.',
+        ]),
+        PpSteps([
+          PpStep('Before you go',
+              'A nap if you can, a snack in your bag, and one line about what '
+              'will happen: "There will be lots of people and loud music. We '
+              'can sit outside if it\'s too loud."'),
+          PpStep('Find a quiet corner early',
+              'A car, a balcony or a back room. Go there before the meltdown, '
+              'not after.'),
+          PpStep('When a relative says "so naughty"',
+              '"He\'s tired, it\'s a long day for a small person." Then take '
+              'your child for a walk. You don\'t owe anyone a performance.'),
+          PpStep('Hugs and cheek-pinching',
+              'Your child doesn\'t have to be kissed or held by everyone. '
+              '"We\'ll say namaste from here" protects your child and keeps '
+              'the peace.'),
+          PpStep('Leaving early is allowed',
+              'A tired child going home is not a failure, for your child or '
+              'for you.'),
+        ]),
         PpWhenLine('One to four.'),
         PpIndiaNote('At a wedding or a family function there will be advice, and '
             'somebody will offer to take your child. Sometimes handing over '
@@ -1310,41 +1397,72 @@ const PpArea _rulesAndOthers = PpArea(
     // `siblings` moved out to `_siblings` below: it is reslotted into
     // Three to six.
     // Added 2026-10-02 from the parenting gap analysis (P2/P3).
-    PpPage(
-      id: 'beh_words_that_hurt',
-      title: 'Everyday phrases that hurt more than we mean, and what to say instead',
-      subtitle: 'Small changes in words, big changes in how your child feels',
-      format: 'ARTICLE',
-      blocks: [
-        PpIntro('Every parent says things in frustration they didn\'t mean. Some '
-            'everyday phrases, said often, can teach a child that feelings '
-            'are wrong or that love depends on behaving. Small swaps make a '
-            'big difference over time.'),
-        PpScript(heading: 'Swaps worth trying', [
-          PpScriptLine(say: 'You are upset. I am here.',
-              notThis: 'Stop crying, it is nothing.',
-              why: 'Those feelings are real to your child.'),
-          PpScriptLine(say: 'I love you. I do not like that behaviour.',
-              notThis: 'You are a bad boy.',
-              why: 'Your child is more than the behaviour.'),
-          PpScriptLine(say: 'Let us do it together.',
-              notThis: 'Why can\'t you be like your cousin?',
-              why: 'Comparisons breed shame, not effort.'),
-          PpScriptLine(say: 'We are leaving in five minutes.',
-              notThis: 'I will leave you here.',
-              why: 'Threats of leaving frighten young children deeply.'),
-          PpScriptLine(say: 'Boys and girls can both cry.',
-              notThis: 'Boys don\'t cry.',
-              why: 'Every child needs to express sadness.'),
-        ]),
-        PpCallout('If you said something you regret, a simple "I was angry '
-            'and I should not have said that. I love you" repairs more than '
-            'you think.'),
-      ],
-    ),
+    _wordsThatHurt, // moved to a const of its own (BH3)
   ],
 );
 
+
+// =============================================================================
+//  MOVED: "Everyday phrases that hurt", into Guiding without hitting
+// -----------------------------------------------------------------------------
+//  ⚠️ WRITTEN, AND WITH NO WAY IN (door plan 08, BH3). It was added to
+//  `_rulesAndOthers` on 2026-10-02, after that area had been dissolved, so no
+//  tab ever drew it. It rides on Guiding without hitting now (`_discipline`
+//  below); the dissolved area still names it, for revert.
+// =============================================================================
+
+const PpPage _wordsThatHurt = PpPage(
+  id: 'beh_words_that_hurt',
+  title: 'Everyday phrases that hurt more than we mean, and what to say instead',
+  subtitle: 'Small changes in words, big changes in how your child feels',
+  format: 'ARTICLE',
+  // BH3: one to six. It had no bands, which in this section reads as
+  // every band, the first year included.
+  bands: _toddlerAndUp,
+  blocks: [
+    PpIntro('Every parent says things in frustration they didn\'t mean. Some '
+        'everyday phrases, said often, can teach a child that feelings '
+        'are wrong or that love depends on behaving. Small swaps make a '
+        'big difference over time.'),
+    PpScript(heading: 'Swaps worth trying', [
+      PpScriptLine(say: 'You are upset. I am here.',
+          notThis: 'Stop crying, it is nothing.',
+          why: 'Those feelings are real to your child.'),
+      PpScriptLine(say: 'I love you. I do not like that behaviour.',
+          notThis: 'You are a bad boy.',
+          why: 'Your child is more than the behaviour.'),
+      PpScriptLine(say: 'Let us do it together.',
+          notThis: 'Why can\'t you be like your cousin?',
+          why: 'Comparisons breed shame, not effort.'),
+      PpScriptLine(say: 'We are leaving in five minutes.',
+          notThis: 'I will leave you here.',
+          why: 'Threats of leaving frighten young children deeply.'),
+      PpScriptLine(say: 'Boys and girls can both cry.',
+          notThis: 'Boys don\'t cry.',
+          why: 'Every child needs to express sadness.'),
+    ]),
+    PpCallout('If you said something you regret, a simple "I was angry '
+        'and I should not have said that. I love you" repairs more than '
+        'you think.'),
+    PpLink('After you\'ve shouted',
+        pageId: 'beh_after_shouting',
+        blurb: 'The repair, in three lines.'),
+  ],
+);
+
+/// Guiding without hitting, with the phrases page that had no way in (BH3).
+/// `kBehDiscipline` (pp_behaviour_bands.dart) stays const; this is the same
+/// area with one page added, assembled here because the page lives in this
+/// file, as `_olderChild` is.
+final PpArea _discipline = PpArea(
+  id: kBehDiscipline.id,
+  mark: kBehDiscipline.mark,
+  title: kBehDiscipline.title,
+  blurb: kBehDiscipline.blurb,
+  hue: kBehDiscipline.hue,
+  bands: kBehDiscipline.bands,
+  pages: [...kBehDiscipline.pages, _wordsThatHurt],
+);
 
 // =============================================================================
 //  RESLOT — the sibling page, out of the dissolved area
@@ -1402,6 +1520,14 @@ const PpPage _siblings = PpPage(
       surfaceId: 'pp_experts',
       role: 'psychologist',
     ),
+    // BH6: the jealousy side of this lives in Family.
+    PpLink('When a new baby makes him jealous',
+        surfaceId: 'pp_page/parenting_family/fam_sibling_jealousy',
+        blurb: 'In the Family door.'),
+    // BH5: picture books to read with him.
+    PpLink('Picture books about a new baby',
+        surfaceId: 'pp_books/New sibling',
+        blurb: 'To read together, from about two.'),
   ],
 );
 
@@ -1558,6 +1684,11 @@ const PpArea _scared = PpArea(
         ]),
         PpLink('When fear is worth checking',
             surfaceId: 'pp_page/parenting_behaviour/beh_fear_worth_checking'),
+        // BH5: picture books to read with him, from the kids library (the
+        // router names two from the list; there is no books screen yet).
+        PpLink('Picture books about worries',
+            surfaceId: 'pp_books/Worry',
+            blurb: 'To read together, from about three.'),
       ],
     ),
     PpPage(
@@ -1645,9 +1776,21 @@ const PpArea _scared = PpArea(
               'soon."'),
           PpStep('Teach safe rules for dogs', 'Never touch a street dog, or '
               'any dog that is eating or sleeping.'),
+          // BH7, §6: the thin page written out.
+          PpStep('Picture books and play first', 'A toy dog, a book about '
+              'dogs, then a real one far away.'),
+          PpStep('Lifts and crackers', 'Count down together ("three, two, '
+              'one, doors close"), and keep ear protection for Diwali.'),
         ]),
         PpCallout('A healthy wariness of street dogs keeps your child safe. Keep '
             'that part.'),
+        // REQUIRED_REVIEW (paediatrician): bite first aid and rabies
+        // (WHO and NCDC post-exposure guidance).
+        PpCallout('Wash the wound with soap and running water for 15 minutes, '
+            'then see a doctor the same day about rabies vaccination, even if '
+            'it is only a scratch and even if the dog looked well.',
+            kind: PpCalloutKind.doctor,
+            title: 'If any dog bites or scratches your child'),
       ],
     ),
     PpPage(
@@ -1719,6 +1862,9 @@ const PpArea _scared = PpArea(
       title: 'The blanket, the soft toy: comfort objects',
       subtitle: 'A healthy way to feel safe',
       format: 'SHORT ARTICLE',
+      // BH3: from one year. It had no bands, which here reads as every band,
+      // and its own step says no soft objects in the cot under a year.
+      bands: _toddlerAndUp,
       blocks: [
         PpIntro('Many babies and toddlers fall in love with a blanket, a '
             'soft toy or even your old dupatta. It helps them feel safe when '
@@ -1731,6 +1877,16 @@ const PpArea _scared = PpArea(
           PpStep('No loose objects in the cot under a year',
               'From about a year, one small soft toy is fine.'),
         ]),
+        // BH7, §6: the thin page written out.
+        PpSteps(heading: 'Later on', [
+          PpStep('When it gets lost', 'Stay calm, look together, and offer the '
+              'spare. A new one can take a week to be loved.'),
+          PpStep('At nursery or school', 'Most allow a small comfort toy at '
+              'first. Ask the teacher.'),
+          PpStep('Letting go', 'Almost all children drop it on their own '
+              'between 3 and 6. There\'s no need to take it away.'),
+        ]),
+        PpWhenLine('From about one, and often until five or six.'),
       ],
     ),
   ],
@@ -1804,6 +1960,10 @@ const PpArea _habits = PpArea(
             'during the day, or other delays in talking or play. The same '
             'goes if it started after your child was developing normally.',
             kind: PpCalloutKind.doctor),
+        // BH6: the signpost the doctor line points at.
+        PpLink('Signs worth checking in development',
+            surfaceId: 'pp_page/parenting_special_care/dev_autism_signs',
+            blurb: 'In Special care: what is worth a closer look, calmly.'),
       ],
     ),
     PpPage(
@@ -1861,6 +2021,17 @@ const PpArea _habits = PpArea(
           PpStep('Praise the gaps, ignore the biting', 'Scolding makes it '
               'more of a habit.'),
         ]),
+        // BH7, §6: the thin page written out.
+        PpArticle(heading: 'What not to do', [
+          'Bitter polish, slapping hands away and shaming usually make it '
+              'worse, because the habit is a way of calming down.',
+        ]),
+        // REQUIRED_REVIEW (child psychologist).
+        PpCallout('Mention it to your doctor if he pulls hair out until there '
+            'are bald patches, if fingers bleed or get infected, or if a habit '
+            'grows when something at home or school has changed.',
+            kind: PpCalloutKind.doctor,
+            title: 'When to check'),
       ],
     ),
     // The brief's judgement call 3, included on the user's call
@@ -1946,6 +2117,8 @@ const PpArea _habits = PpArea(
       title: 'Eating mud, chalk or paper',
       subtitle: 'Exploring, or something to check',
       format: 'SHORT ARTICLE',
+      // BH3: from one year (it had no bands, so it showed to every age).
+      bands: _toddlerAndUp,
       blocks: [
         PpIntro('Babies and young toddlers put everything in their mouths, '
             'and the occasional bit of mud is part of exploring. When a '
@@ -1959,10 +2132,23 @@ const PpArea _habits = PpArea(
               'dangerous if a child swallows paint flakes, which may contain '
               'lead, or things that can block the gut.',
         ]),
+        // BH7, §6: the thin page written out. REQUIRED_REVIEW
+        // (paediatrician): pica and iron.
+        PpSteps(heading: 'What to do now', [
+          PpStep('Keep it out of reach', 'Chalk, paint flakes, wall plaster '
+              'and small objects, and offer something safe to chew.'),
+          PpStep('Iron-rich food', 'Ragi, dal, green leafy vegetables, eggs or '
+              'meat if your family eats them, with vitamin C (lemon, amla) to '
+              'help absorb it.'),
+        ]),
         PpCallout('Talk to your paediatrician if your child keeps eating non-food '
             'things after about two, or eats anything harmful. A simple '
             'blood test for iron and lead may help.',
             kind: PpCalloutKind.doctor),
+        // BH6.
+        PpLink('Signs worth checking in development',
+            surfaceId: 'pp_page/parenting_special_care/dev_autism_signs',
+            blurb: 'In Special care: what is worth a closer look, calmly.'),
       ],
     ),
   ],
@@ -2005,7 +2191,8 @@ final PpSection kPpBehaviourSection = PpSection(
     // _rulesAndOthers, // B3 — lying, siblings
     kBehSpecific, // B3 — the "he keeps doing this" lookup door
     kBehScreens, // B4 — screens as its own door, per the prompt
-    kBehDiscipline, // B5 — previously absent
+    // kBehDiscipline, // B5 — previously absent (kept for revert)
+    _discipline, // B5, plus "Everyday phrases that hurt" (door plan 08, BH3)
     kBehCalm, // the regulation activities
     _olderChild, // Band C — kBehOlderChild plus the reslot and the new page
     _scared, // [NEW AREA] the missing half of the section

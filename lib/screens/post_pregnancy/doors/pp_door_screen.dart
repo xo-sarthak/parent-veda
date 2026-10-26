@@ -494,10 +494,21 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
   /// The tab's tools for the band it shows (`PpDoorTool.bands`, Feeding plan
   /// §2c). The rest sit in the band blocks at the foot ([_otherBands]).
+  ///
+  /// ⚠️ NOT A TOOL THE INLINE ROW ALREADY SHOWS (Behaviour BH1). The Right now
+  /// row ends on What to say, and the Crying and Tantrums tabs carry the same
+  /// tool as a row: two cards for one tool, a thumb apart. Where the row is
+  /// drawn, it is the way in; on the same tab for another age (no row), the
+  /// tool row is back. Was every tool in her band, kept for revert:
+  /// `for (final t in tab.tools) if (t.inBand(_bandOf(tab))) t`.
   List<PpDoorTool> _toolsFor(PpDoorTab tab) => [
         for (final t in tab.tools)
-          if (t.inBand(_bandOf(tab))) t,
+          if (t.inBand(_bandOf(tab)) && !_onInlineRow(tab, t)) t,
       ];
+
+  bool _onInlineRow(PpDoorTab tab, PpDoorTool t) =>
+      tab.inlineSurfaceId != null &&
+      ppDoorInlineSurfaceIds(tab.inlineSurfaceId!).contains(t.surfaceId);
 
   /// Pages from another tab drawn on this one (`PpDoorTab.extraPageIds`),
   /// for the band it shows. Never the tab's own red flag.
@@ -580,7 +591,13 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
       ));
     }
     blocks.sort((a, b) => a.$3.score.compareTo(b.$3.score));
-    final placed = <PpDoorTool>{..._toolsFor(tab)};
+    // A tool the inline row shows is placed too, so it does not drop to a
+    // band block at the foot instead (BH1).
+    final placed = <PpDoorTool>{
+      ..._toolsFor(tab),
+      for (final t in tab.tools)
+        if (_onInlineRow(tab, t)) t,
+    };
     final out = <(PpBand, List<PpPage>, PpBandDistance, List<PpDoorTool>)>[];
     for (final (b, pages, dist) in blocks) {
       final tools = [

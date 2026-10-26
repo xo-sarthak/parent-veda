@@ -157,7 +157,7 @@ two.
 | SLO3 | 23 of the 24 Sleep Sounds tracks | Audio | Rows, honest | Only the tanpura plays (Shravan's file). A tap on any other says "This lullaby (sound, story) is still being recorded. The tanpura plays now." with a Play it pill (SL4). The lullabies are to be recorded as real lori, in Hindi, Tamil and Bengali |
 | SLO4 | Night lights, room thermometers, mosquito nets on the shop | Catalogue | S8c | `pp_products/Night lights` and `Room thermometers` carry the page's tip (`kPpShelfNotYet`); `Mosquito nets` says a chemist has one |
 | SLO5 | A painting for each Tonight card (14 across the bands) | Painting | Built from data | Each card shows a line icon on the night-blue tint until then (`kPpSleepTonightCards`) |
-| SLO6 | Shorter names for 18 tab names that take three lines, or break a word, on the rail card at normal or large text | Names | Listed | `test/door_names_fit_test.dart` `_kOwedShorterNames`, a proposal for each. Three are cut at the normal size today: Potty "Accidents and going backwards", First 40 "Understanding your newborn", Family "Who looks after your child". The words are the user's call, door by door |
+| SLO6 | Shorter names for 18 tab names (17 since Behaviour's, BHO8, 2026-10-26) that take three lines, or break a word, on the rail card at normal or large text | Names | Listed | `test/door_names_fit_test.dart` `_kOwedShorterNames`, a proposal for each. Three are cut at the normal size today: Potty "Accidents and going backwards", First 40 "Understanding your newborn", Family "Who looks after your child". The words are the user's call, door by door |
 
 ### P2. Feeding — `lib/data/doors/pp_door_feeding.dart`
 
@@ -221,11 +221,11 @@ Catalogue items and people the door points at that do not exist yet (each tap sa
 | Labour prep | 6 | 6 | – | – | – |
 | Mind & mood | 6 | 4 (M1, M4–M6) | 1 | 1 | – |
 | Garbh Sanskar | 12 | – | – | – | all twelve closed; owed now = recordings (manifest entries) and R2 hosting (nine URLs) |
-| Sleep (parenting) | 6 | – | – | 1 | 1 (the 18 tab names, SLO6); SLO1–SLO5 answer a tap, see the door 7 table |
+| Sleep (parenting) | 6 | – | – | 1 | 1 (the tab names, 17 left, SLO6); SLO1–SLO5 answer a tap, see the door 7 table |
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
 | Health (parenting) | 6 | 3 | – | 3 | 1 (dosing table sign-off) |
 | Development (parenting) | 4 | 1 | – | 3 | – (DV2 is a data job, logged) |
-| Behaviour (parenting) | 15 | 11 | – | 4 | – |
+| Behaviour (parenting) | 23 | – (BH1–BH11 filled 2026-10-02, corrected 2026-10-26) | – | 6 | – (the tab name, BHO8, done 2026-10-26); BHO1–BHO7 answer a tap or wait on data, see the door 8 table |
 | Potty (parenting) | 13 | – (PT1–PT4 written 2026-10-02) | – | 3 | – (PT7–PT13 answer a tap; see the door 5 table) |
 | Early Learning (parenting) | 4 | 2 | – | 2 | – |
 | First 40 Days (parenting) | 18 | – (FF3–FF5 filled 2026-10-02) | – | 5 | 1 (the day spine, FF10); FF1–FF2 closed into You; FF12–FF18 answer a tap, see the door 6 table |
@@ -272,7 +272,7 @@ reslot or merge; the owed pieces are one write and one data job.
 | # | Card | Kind | Outcome | Owed |
 |---|---|---|---|---|
 | DV1 | `dev_feelings_activities` — Activities for feelings and getting on with others | Article | Coming soon | Copy: co-regulation, connection, face-to-face, naming-feelings play, matched to his age. "That corner of the app is blank today." Supplied for drop-in, not auto-written. |
-| DV2 | The four areas of growing as "a closer look inside the tracker" | Data | Built from data | The brief assumes one milestone list behind the tracker and the area pages. There are two: `MilestoneStore` (18 milestones, six domains) behind the tracker and `DevArea` skills (`pp_development_data.dart`) behind Brain / Physical / Language / Emotional. The join is a hand map (`_kAreaForDomain` in `milestone_journey_screen.dart`). Making them one dataset — so ticking a skill in either place updates both — is a data job: one list, one store, both screens reading it. |
+| DV2 | The four areas of growing as "a closer look inside the tracker" | Data | **Built 2026-10-26 (R10)**; a dedicated "a milestone" painting for the save's moment page is still owed (the child's phase painting stands in) | **R10 made it one list:** `kMilestones` (37 with the three R10 added) is the identity; the phase snapshots (`kSnapshotMilestone`), the area stages (`kDevStageMilestone`) and the Development Map point at its ids, and every save is `openMilestoneSave`. Before: the brief assumes one milestone list behind the tracker and the area pages. There are two: `MilestoneStore` (34 milestones, not 18 as written here first; six domains) behind the tracker and `DevArea` skills (`pp_development_data.dart`) behind Brain / Physical / Language / Emotional. The join is a hand map (`_kAreaForDomain` in `milestone_journey_screen.dart`). Making them one dataset — so ticking a skill in either place updates both — is a data job: one list, one store, both screens reading it. |
 | DV3 | `dev_tummy_time` — Tummy time without the tears | Film · 4 min | Built from data | Reformatted step-list > video; slot `development/tummy_time` needs the film. The steps stay under it. |
 | DV4 | The "done together" activity films | Film | Built from data | Every activity page's video is a placeholder today. The brief: "the thing to actually shoot, the 'doing it together' activity clips first." Seven explainer films on the reads likewise (`development/*` slots). |
 
@@ -286,21 +286,36 @@ places. `test/pp_behaviour_door_test.dart` fails if one is not in this table.
 
 | # | Card | Kind | Outcome | Owed |
 |---|---|---|---|---|
-| BH1 | `beh_scared_everything` — Why he is suddenly scared of everything | Article | Coming soon | Copy, house voice. |
-| BH2 | `beh_fear_dark` — Fear of the dark, and the monster under the bed | Article | Coming soon | Copy; cross-link Sleep's bedtime pages. |
-| BH3 | `beh_fear_doctor` — The doctor, the injection, the haircut | Step-list | Coming soon | Copy. |
-| BH4 | `beh_fear_dogs` — Scared of dogs, lifts and loud noises | Short article | Coming soon | Copy. |
-| BH5 | `beh_shy_child` — The shy child, and "say hello, beta" | Article | Coming soon | Copy. |
-| BH6 | `beh_fear_worth_checking` — When fear or clinginess is worth checking | Flagged callout | Coming soon | Copy; calm, routes to a person. |
-| BH7 | `beh_thumb_sucking` — Thumb-sucking, and when to just leave it | Article | Coming soon | Copy. |
-| BH8 | `beh_head_banging` — Head-banging and rocking | Article | Coming soon | Copy. |
-| BH9 | `beh_breath_holding` — Breath-holding spells | Article + flagged callout | Coming soon | Copy: "the reassurance parents need" plus the one doctor line. |
-| BH10 | `beh_nail_biting` — Nail-biting and the other little habits | Short article | Coming soon | Copy. |
-| BH11 | `beh_self_touching` — Touching himself, and what to do about it | Article | Coming soon | The brief's judgement call 3, included on the user's call (2026-09-13). Copy: normal, do not shame, redirect gently, when to actually mention it. |
+| BH1 | `beh_scared_everything` — Why he is suddenly scared of everything | Article | **Filled 2026-10-02** | Copy, house voice. |
+| BH2 | `beh_fear_dark` — Fear of the dark, and the monster under the bed | Article | **Filled 2026-10-02** | Copy; cross-link Sleep's bedtime pages. |
+| BH3 | `beh_fear_doctor` — The doctor, the injection, the haircut | Step-list | **Filled 2026-10-02** | Copy. |
+| BH4 | `beh_fear_dogs` — Scared of dogs, lifts and loud noises | Short article | **Filled 2026-10-02** | Copy. |
+| BH5 | `beh_shy_child` — The shy child, and "say hello, beta" | Article | **Filled 2026-10-02** | Copy. |
+| BH6 | `beh_fear_worth_checking` — When fear or clinginess is worth checking | Flagged callout | **Filled 2026-10-02** | Copy; calm, routes to a person. |
+| BH7 | `beh_thumb_sucking` — Thumb-sucking, and when to just leave it | Article | **Filled 2026-10-02** | Copy. |
+| BH8 | `beh_head_banging` — Head-banging and rocking | Article | **Filled 2026-10-02** | Copy. |
+| BH9 | `beh_breath_holding` — Breath-holding spells | Article + flagged callout | **Filled 2026-10-02** | Copy: "the reassurance parents need" plus the one doctor line. |
+| BH10 | `beh_nail_biting` — Nail-biting and the other little habits | Short article | **Filled 2026-10-02** | Copy. |
+| BH11 | `beh_self_touching` — Touching himself, and what to do about it | Article | **Filled 2026-10-02** | The brief's judgement call 3, included on the user's call (2026-09-13). Copy: normal, do not shame, redirect gently, when to actually mention it. |
 | BH12 | `beh_calm_jar` — A calm jar | Film · 3 min | Built from data | Reformatted Activity > Video; slot `behaviour/calm_jar` needs the make-and-use film. Steps stay. |
 | BH13 | `crying_too_much` — When the crying is too much | Interactive | Built from data | Rebuilt as the dark one-step-at-a-time story (Sleep's 3am pattern); the article is in a comment. Worth a clinical read of the eight screens. |
 | BH14 | `beh_balloon_breathing` — Balloon breathing | Animation | Built from data | The shared breathing circle on a 3-in / 5-out pattern (`kPpBalloonBreath`). No asset owed. |
-| BH15 | The fourteen films the brief marks | Film | Built from data | Every `behaviour/*` slot is a placeholder: ziddi, tantrums, five steps, no-year, throwing, anger, screens ×2, calm corner, filling the tank, no-hitting, big feelings, lying, crying curve. |
+| BH15 | The fifteen films the brief marks (was "fourteen"; the calm jar, BH12, is the fifteenth) | Film | Built from data | Every `behaviour/*` slot is a placeholder: ziddi, tantrums, five steps, no-year, throwing, anger, screens ×2, calm corner, calm jar, filling the tank, no-hitting, big feelings, lying, crying curve. A tap says the film is being made (S8a). |
+
+**Corrected by the door 8 build (2026-10-26):** BH1 to BH11 said "Coming soon", but their copy was written on 2026-10-02 (the parenting gap analysis) and every one renders. The rows stay as the record; the outcome is now "Filled".
+
+**Added by the door 8 build (2026-10-26, `docs/pp-door-plans/08-behaviour.md` BH1 to BH8, §12).** Nothing here is a coming-soon card: every item answers a tap with a notice, or shows a drawn mark.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| BHO1 | `behaviour/door_intro` | Film · 30–45 s | Not slotted | S4: no chip until the film exists (BH8) |
+| BHO2 | A painting for each Right now card (20 across the four bands) | Painting | Built from data | Each card shows a line icon on the door's rose tint until then (`kPpBehRightNowCards`) |
+| BHO3 | Picture books about feelings, for `beh_name_the_feeling` (BH5) | Data | Not linked | The kids list has no feelings book worth naming: the one "Emotions" goal entry is a placeholder, "Emotions Candidate Book 203" (`kids_books_list.dart`). Worry and new-baby books are linked; feelings waits for a real title in the list |
+| BHO4 | A books screen, so `pp_books/Worry` and `pp_books/New sibling` open a shelf | Screen | S8, honest | Until then the tap names two essential titles from the list and says the Reading shelf has the rest (`kPpNotYetWords`). Shared with Potty's `pp_books/Potty` (PT13) |
+| BHO5 | Calm-down items on the shop: feelings cards, a visual timer, a calm-down kit | Catalogue | Not linked | None is stocked, so no page links one (BH5). For the shop list |
+| BHO6 | A behaviour class or course | Class | Not linked | None exists; nothing is linked or invented (BH5) |
+| BHO7 | A real child psychologist on Find help | People | S8e | The He keeps doing this row and the closing card open "Our first experts are joining" until one joins (BH4) |
+| BHO8 | ~~A shorter name for "Scared, shy or clingy"~~ | Name | **Done 2026-10-26** | The user's word: "Shy and clingy". Off `_kOwedShorterNames`; fits two lines at 1.0 and 1.3. SLO6 is now 17 names |
 
 ### P6. Potty — `lib/data/doors/pp_door_potty.dart`
 

@@ -2,7 +2,7 @@
 
 **Built elsewhere (2026-10-26):** BH2's tool side (the four family scripts, "Read the whole thing", the pages for the three scripts without one, the empty-search line, `pp_scripts/<id>` and the six page links) was built in the tools pass, `docs/pp-tool-plans/29-33-other.md`. This door's build does only the door-side work.
 
-Written 2026-10-25. **Status: final. BH1 to BH8 answered yes by the user 2026-10-25.** The recommendations were then checked against what parents actually search (below), and BH1, BH5 and BH7 were adjusted to match. The new copy is in `08-behaviour-content.md`. Nothing in `lib/` changes until step 0 (S1 to S11) and the user's go.
+Written 2026-10-25. **Status: built 2026-10-26 (§12, As built).** **BH1 to BH8 answered yes by the user 2026-10-25.** The recommendations were then checked against what parents actually search (below), and BH1, BH5 and BH7 were adjusted to match. The new copy is in `08-behaviour-content.md`. Nothing in `lib/` changes until step 0 (S1 to S11) and the user's go.
 
 ## Context
 **Where it lives.**
@@ -236,3 +236,41 @@ These questions stay here on purpose (the user, 2026-10-25). When a problem turn
 | BH8 | A door intro film | Yes | **Yes** (2026-10-25) |
 
 The user, 2026-10-25: "I would say all yes, but what you recommend all yes? Just make sure your recommendation is based upon what people are actually wanting out of those sections and what will benefit them ... do keep those questions that you asked ... so that whenever we find an issue then maybe that would be covered in one of those questions answers so it can be fixed quickly."
+
+## 12. As built (2026-10-26)
+Held by `test/pp_behaviour_door_test.dart` ("door 8: the plan, held", 11 tests, and "door 8: on screen", 2; 26 in the file): the tab order for every band, the Right now cards for each band exactly (pages in band, What to say opening the tool), the row on the opening tab and nowhere else, the family scripts the baby's tab promises and every script link landing, the fixed ages and that no page sits outside its own area's ages, the psychologist row and each consult's specialist, Tele-MANAS from the one constant and never next to a page's warning, the nine book links exactly (one a page, none on a page with a warning, a typo opens nothing), every link landing on its page, the colic, tantrum, functions and phone-at-meals parts, the new page, the six thin pages past 700 characters, the dog-bite doctor line, the review marks, the fifteen film slots, and the first view at 4, 18, 30 and 48 months (the opening tab, the row, each card once, the tool not drawn twice). The parenting stage, 129 files, 1,383 tests, passes.
+
+**BH2's tool side was built in the tools pass** (`docs/pp-tool-plans/29-33-other.md`, committed a224492): the four family scripts, "Read the whole thing", pages for the three scripts without one, the empty-search line, `pp_scripts/<id>` and the six page links. This build holds that the door's promise is kept (BH2 test) and does the door side.
+
+**The shell, new for this door and open to every door:**
+- `PpBehRightNowShelf` (`doors/pp_door_inline_tools.dart`), the fifth inline tool, on the same `_ShelfCard` as Tonight, Play today and the two Try this today rows. Its cards are data in the door file (`kPpBehRightNowCards`): a page by id, or a surface (What to say). `ppDoorInlinePageIds` returns the row's pages, so the Crying tab's rail does not draw the colic page twice.
+- `ppDoorInlineSurfaceIds` and the door screen's `_onInlineRow`: a tool the inline row already opens is not drawn as a tool row on the same tab. What to say is the last Right now card and also a tool on Crying and Tantrums; the first view test caught the two cards a thumb apart. On the same tab for another age (no row), the tool row is back, and it never drops to a band block at the foot.
+- The router: `pp_book/<shelf id>` opens one book summary in the Reading shelf's own reader (which hands a book to its companion), and an unknown id is null; `pp_books/Worry` and `pp_books/New sibling` name two essential titles from the kids list by its goal (`_bookPairForGoal`), in the Potty notice's words.
+
+**A mechanism worth keeping.** `readArticleById` falls back to the first article for an id it does not know, which is right for the reader (it must always open something) and wrong for a link: `pp_book/book_the_whole_brain_child` would have opened an unrelated article with no error. The book's shelf id is `book_whole_brain` (a pregnancy-shelf id kept so saved progress carries over), and the route found it only because it checks `kBookDocsByShelfId` first and returns null otherwise, which the link gates fail on. The general point: a lookup that never fails is safe for a screen and unsafe for a link, so a route in front of it has to do the failing.
+
+**A second one, about tags.** In this section an untagged page reads as every band. Comfort objects and eating mud were untagged, so a three-month-old's parent could reach a page that says "no soft toys in the cot under a year". "Hitting, biting" was tagged three to six inside an area that is one to three, so at three it showed only under "Earlier". The test now holds both directions for every page: tagged, and never outside its own area's ages.
+
+**Differences from the plan, and why:**
+| Plan | Built | Why |
+|---|---|---|
+| BH4: "When it's too much for you" as a card on `crying_too_much` "after the steps" | A step of its step-through, after "Call someone before you go back in", two steps before never-shake; no "When the anger is yours" link there | The page is its one interactive block (an existing test: "a carousel or interactive page is only its block"). Next to the call it widens is where a parent at 2am needs it. The anger link is on `beh_no_hitting` and the new page |
+| BH4: the two consult cards "open the right specialist" | Already true: the crying consult opens paediatricians and the siblings one child psychologists. Held by the BH4 test | Feeding's build fixed `ppPageAsRead` to read `PpConsult.surface` (01-feeding.md §12); the audit predates it |
+| BH4: the closing card "stays" | It stays on every tab but He keeps doing this, where the psychologist row replaces it | The shell rule from Feeding D2: a tab with an expert row ends on the doctor sentence, so it never pitches twice |
+| BH5: picture books "from the kids library" for worries, new baby and feelings | Worries and new baby; no feelings link | The list's one feelings-goal entry is a placeholder title ("Emotions Candidate Book 203"). Owed BHO3 |
+| BH5: "if no route opens one book summary, add `pp_book/<id>`" | Added; seven books link | The Reading shelf had no single-book route |
+| BH5: "never on a page with a warning" | Not on a page that is flagged, pinned or carries a safety callout. Four of the plan's pages carry an ordinary "When to ask" doctor line, and keep their book | The plan's own table puts books on them; a doctor line is on almost every page and is not a warning |
+| BH6: "Sleep door opens the Sleep door at the night-fears or settling page" | Both infant links open `gentle_settling`; the fear-of-the-dark page already opened `night_fears` | The two links were on crying and settling pages |
+| BH6: signposts | Also the stubborn page to `dev_speech_flags` | Its doctor line names "no words at all by around two" |
+| BH7: functions as "a step group" | An article (the intro) and five steps, no heading on the steps | The intro is the reframe ("too much at once"), worth keeping |
+| BH7: "After you've shouted", when to get help "See above" | Its own help line, with Tele-MANAS from the constant and a doctor or counsellor named | `pp_section_test`: a page with a doctor line names someone to go to |
+| BH7: phone at meals links "Feeding's fussy-eating page" | `picky_battles`, "Mealtime battles" | The page that answers the fight at meals |
+| BH7: dog bite "in a doctor callout" | A doctor callout titled "If any dog bites or scratches your child" | As written; the page had no doctor line before |
+| BH3: "the duplicate Listening and cooperation card goes" | `beh_cooperation` commented out, kept for revert | As planned; the listening page is first on He keeps doing this from three |
+| BH3: "Everyday phrases that hurt" into Guiding without hitting | A const of its own (`_wordsThatHurt`), on `_discipline`, assembled in the content file like `_olderChild`; tagged one to six | The page lives in the content file and `kBehDiscipline` is const in the bands file; the dissolved area still names it, for revert |
+| BH1: "the other four last, For later" at 0 to 12 months | As planned; the shell (S9) does it | — |
+| BH8: door intro `behaviour/door_intro` | Not slotted | S4: no chip until a film exists. Owed BHO1 |
+| S11: "all five tab names fit" | "Scared, shy or clingy" is "Shy and clingy" (the old name commented out, kept for revert) | It took three lines at 1.3, found by SL9's measured check after this plan was written. The user's word, 2026-10-26; off `_kOwedShorterNames` |
+| Verification: a Mobbin check | Not run | The row is the approved D2 shelf look, reused, as Sleep's was |
+
+**Owed, not in this build:** the films (`DOOR-CONTENT-OWED` BH15, BHO1), the card paintings (BHO2), a feelings picture book in the list (BHO3), a books screen (BHO4), calm-down items on the shop (BHO5), a behaviour class (BHO6), a real child psychologist (BHO7); and a child psychologist's and a paediatrician's read of every `REQUIRED_REVIEW` line. **Owed to `BEFORE-LAUNCH.md`, not written there because the file holds another terminal's uncommitted line (migration 0116):** the clinical read of Behaviour's new and changed lines: the colic part (paediatrician, against Health's `tummy_colic`), when tantrums ease, the functions part, the phone at meals, "After you've shouted", Tele-MANAS on three pages (and its number, `kCrisisHelplineNumber`, REQUIRED_TO_CONFIRM), the dog-bite and rabies line, pica and iron, nail-biting and hair-pulling. The new page and the new parts reach Ask Veda through the incremental ingest, which the user runs.

@@ -93,6 +93,9 @@ import 'scripts_library_screen.dart';
 import 'find_help_triage_screen.dart';
 import 'provider_results_screen.dart';
 import 'reading_home_screen.dart';
+import 'reading_reader_screen.dart' show ReadingReaderScreen;
+import 'pp_reading_data.dart' show readArticleById;
+import '../../data/book_companions.dart' show kBookDocsByShelfId;
 import 'sleep_journey_screen.dart';
 import 'vax_tracker_screen.dart';
 import 'watch_home_screen.dart';
@@ -222,7 +225,24 @@ Map<String, String> get kPpNotYetWords => {
       // There is no potty shelf of its own yet, and that is all it now says.
       'pp_books/Potty': 'Picture books are on the Reading shelf, under More. '
           'For potty time, ${_bookPair('Potty')} are two that children like.',
+      // Behaviour BH5: the kids library, by its goal, in the same words.
+      'pp_books/Worry': 'Picture books are on the Reading shelf, under More. '
+          'For worries, ${_bookPairForGoal('Anxiety')} are two that children '
+          'like.',
+      'pp_books/New sibling': 'Picture books are on the Reading shelf, under '
+          'More. For a new baby, ${_bookPairForGoal('New Sibling')} are two '
+          'that children like.',
     };
+
+/// The same as [_bookPair], by the list's goal rather than its theme: the
+/// worry books are themed "Emotions" or "Connection" but share one goal.
+String _bookPairForGoal(String goal) {
+  final titles = [
+    for (final b in kKidsBooks)
+      if (b.goals.contains(goal) && b.rank == KidsBookRank.essential) b.title,
+  ];
+  return titles.length < 2 ? 'The ones in any bookshop' : '${titles[0]} and ${titles[1]}';
+}
 
 /// Two titles from the book list for a theme: "Once Upon a Potty and Potty
 /// for Me!". The list is the source, so a title is never invented.
@@ -497,6 +517,18 @@ Widget? ppScreenForSurface(String id) {
   const guidePrefix = 'pp_buying_guides/';
   if (id.startsWith(guidePrefix)) {
     return ppBuyingGuideScreen(id.substring(guidePrefix.length));
+  }
+
+  // `pp_book/<shelf id>` opens one book summary in the Reading shelf's own
+  // reader, which hands a book to its companion (Behaviour BH5). An unknown
+  // id is null, never the reader's fallback article, so a typo fails the
+  // link gate instead of opening the wrong book.
+  const bookPrefix = 'pp_book/';
+  if (id.startsWith(bookPrefix)) {
+    final shelfId = id.substring(bookPrefix.length);
+    return kBookDocsByShelfId.containsKey(shelfId)
+        ? ReadingReaderScreen(article: readArticleById(shelfId))
+        : null;
   }
 
   const pagePrefix = 'pp_page/';

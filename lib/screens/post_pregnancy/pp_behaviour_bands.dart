@@ -39,9 +39,21 @@
 //  English only for now, plain `String`, per the standing instruction.
 // =============================================================================
 
+import '../../data/mind_mood_data.dart' show kCrisisHelplineName, kCrisisHelplineNumber;
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
 import 'pp_section_screen.dart';
+
+/// ⚠️ HELP FOR HER, NOT ONLY FOR HIM (door plan 08, BH4). The door talks
+/// about shouting and hitting and had no line for the parent at the edge. One
+/// sentence, from the one helpline constant, so this file never types a
+/// number of its own; the number is always written out, because a call link
+/// may do nothing on some phones. REQUIRED_REVIEW (child psychologist).
+const String kBehTooMuchForYou = 'Everyone who looks after a small child '
+    'reaches the edge sometimes. If you\'re there, put him somewhere safe, '
+    'step out for a few minutes, and breathe. Free, any hour: '
+    '$kCrisisHelplineName, $kCrisisHelplineNumber. The government\'s mental '
+    'health line: trained counsellors, in your language, free.';
 
 // Band B is toddler_1 + toddler_2; Band C is preschool. Matches
 // `kPpChildBands`, so behaviour's boundaries stay in step with every other
@@ -173,6 +185,12 @@ const PpArea kBehZiddi = PpArea(
         PpLink('What to say when he digs in',
             surfaceId: 'pp_scripts/shoes', // was the whole tool (tools pass 29, BH2)
             blurb: 'The exact words for the shoes, the park and the phone.'),
+        // BH6: the doctor line names "no words at all by around two"; this is
+        // where that is answered. "Why is my 3 year old not talking yet" is a
+        // top search.
+        PpLink('When talking is worth checking',
+            surfaceId: 'pp_page/parenting_development/dev_speech_flags',
+            blurb: 'In the Development door: the speech signs, by age.'),
       ],
     ),
     PpPage(
@@ -323,6 +341,14 @@ const PpArea kBehDiscipline = PpArea(
           PpStep('Be the same tomorrow',
               'Consistency is doing more work here than severity ever could.'),
         ], heading: 'What to do instead'),
+        // BH4, "When it's too much for you" (08-behaviour-content.md §2):
+        // after the steps and away from this page's own warning below (rule
+        // c), never stacked with it. Built from the one helpline constant.
+        // REQUIRED_REVIEW (child psychologist; Tele-MANAS, MoHFW).
+        PpCallout(kBehTooMuchForYou, title: 'When it\'s too much for you'),
+        PpLink('When the anger is yours',
+            surfaceId: 'pp_page/parenting_maternal/mind_rage',
+            blurb: 'In You, Maa: where it comes from, and what helps.'),
         PpCards([
           PpCard('Not a lecture',
               'A two-year-old has stopped listening by your second sentence.'),
@@ -353,6 +379,52 @@ const PpArea kBehDiscipline = PpArea(
         PpLink('What to say instead, situation by situation',
             surfaceId: 'pp_scripts/hit_friend', // was the whole tool (tools pass 29, BH2)
             blurb: 'The sentences, for the moments this actually comes up.'),
+      ],
+    ),
+    // ⚠️ NEW (door plan 08, BH7, §4 of 08-behaviour-content.md): nothing in
+    // the door was for a parent after she has shouted. Repair first, then the
+    // pattern, then help. REQUIRED_REVIEW (child psychologist).
+    PpPage(
+      id: 'beh_after_shouting',
+      title: 'After you\'ve shouted',
+      subtitle: 'What to do next matters more than the shout.',
+      format: 'SHORT ARTICLE',
+      bands: _bandBC,
+      blocks: [
+        PpIntro('You shouted. Maybe louder than you meant to, maybe at the end '
+            'of a very long day. Most parents do this sometimes. What matters '
+            'more is what you do next.'),
+        PpSteps([
+          PpStep('Get down to his level',
+              'Close and quiet, once you have both calmed down.'),
+          PpStep('Say it in three lines',
+              '"I shouted. That wasn\'t okay. I was upset, and I\'m sorry." '
+              'No "but you..." after it.'),
+        ], heading: 'Repair'),
+        PpArticle(heading: 'Why it works', [
+          'He learns that people who love each other can mend things. That '
+              'lesson lasts longer than one bad evening.',
+          'One bad evening doesn\'t undo him. Children are shaped by the '
+              'pattern, not by the worst moment.',
+        ]),
+        PpSteps([
+          PpStep('Notice when it happens',
+              'Hunger, no sleep, the same fight every evening. Change one of '
+              'those first.'),
+        ], heading: 'If it\'s most days'),
+        PpCallout(
+          'If you\'re frightened of your own anger, or it\'s turning into '
+          'hitting, talk to your doctor or a counsellor. $kBehTooMuchForYou',
+          kind: PpCalloutKind.doctor,
+          title: 'When to get help',
+        ),
+        PpWhenLine('From about one, for as long as you are a parent.'),
+        PpLink('When the anger is yours',
+            surfaceId: 'pp_page/parenting_maternal/mind_rage',
+            blurb: 'In You, Maa: where it comes from, and what helps.'),
+        PpLink('Why hitting does not do what it looks like it does',
+            pageId: 'beh_no_hitting',
+            blurb: 'And the repair, if a hand has already gone up.'),
       ],
     ),
     PpPage(
@@ -391,6 +463,10 @@ const PpArea kBehDiscipline = PpArea(
               'out in anger is a mood, not a method.'),
         ], heading: 'Where it goes wrong', hue: 268),
         PpWhenLine('One to six years, with the tools shifting as he does.'),
+        // BH5: one book for her, at the foot.
+        PpLink('The book: No-Drama Discipline',
+            surfaceId: 'pp_book/book_no_drama_discipline',
+            blurb: 'Connect first, then redirect, as a short summary.'),
       ],
     ),
     PpPage(
@@ -420,6 +496,10 @@ const PpArea kBehDiscipline = PpArea(
               'It ends with reconnection, not with him creeping back in.'),
         ], heading: 'Lines not to cross', hue: 268),
         PpWhenLine('Three years and up. Below that, redirect instead.'),
+        // BH5: one book for her, at the foot.
+        PpLink('The book: Positive Discipline',
+            surfaceId: 'pp_book/book_positive_discipline',
+            blurb: 'Kind and firm at once, as a short summary.'),
       ],
     ),
     PpPage(
@@ -464,6 +544,10 @@ const PpArea kBehDiscipline = PpArea(
             'nanny rather than family, the same approach applies and the '
             'conversation is usually easier, but it has to actually happen, '
             'and be specific.'),
+        // BH5: one book for her, at the foot.
+        PpLink('The book: Punishment-Free Parenting',
+            surfaceId: 'pp_book/book_punishment_free_parenting',
+            blurb: 'Discipline without smacking, as a short summary.'),
       ],
     ),
   ],
@@ -550,8 +634,17 @@ const PpArea kBehOlderChild = PpArea(
           title: 'When to ask',
         ),
         PpWhenLine('Three to six, and the naming habit lasts far longer.'),
+        // BH5: one book for her, at the foot.
+        PpLink('The book: Good Inside',
+            surfaceId: 'pp_book/book_good_inside',
+            blurb: 'Feelings first, behaviour second, as a short summary.'),
       ],
     ),
+    // ⚠️ THE DOUBLED CARD, OFF (door plan 08, BH3). From three this card and
+    // the page it opens ("He does not listen to anything I say") were two
+    // cards on two tabs for one page. The listening page is on He keeps
+    // doing this, first at that age. Kept for revert:
+    /*
     PpPage(
       id: 'beh_cooperation',
       title: 'Listening and cooperation',
@@ -566,6 +659,7 @@ const PpArea kBehOlderChild = PpArea(
       toolSurfaceId: 'pp_page/parenting_behaviour/beh_not_listening',
       blocks: [],
     ),
+    */
     /* kept for revert: the second listening page
     PpPage(
       id: 'beh_cooperation_copy',

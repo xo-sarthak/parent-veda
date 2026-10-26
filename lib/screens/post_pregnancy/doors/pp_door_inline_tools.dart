@@ -10,6 +10,8 @@
 //  approved 2026-10-24, `claude.ai/artifact/1bsFmZ4i5SRg8oiQFyeHHR`),
 //  Potty's "Try this today" (door plan 05, PT3), which reuses that look, and
 //  First 40's "Try this today" by week (door plan 06, FD1, the same look).
+//  Then Sleep's "Tonight" (door plan 07, SL1) and Behaviour's "Right now"
+//  (door plan 08, BH1), both on the same card.
 //
 //  ⚠️ THIS FILE NEVER IMPORTS THE ROUTER, as the door screen doesn't. A tap
 //  that leaves the shelf goes through the door's own `onSurface`; an activity
@@ -20,6 +22,8 @@ import 'dart:math' show Random;
 
 import 'package:flutter/material.dart';
 
+import '../../../data/doors/pp_door_behaviour.dart'
+    show kPpBehaviourDoor, kPpBehRightNowCards, kPpBehRightNowShelf, PpBehRightNowCard;
 import '../../../data/doors/pp_door_development.dart' show kPpPlayTodayShelf;
 import '../../../data/doors/pp_door_first40.dart' show kPpFirst40TodayShelf;
 import '../../../data/doors/pp_door_potty.dart'
@@ -33,6 +37,7 @@ import '../../v2/v2_palette.dart';
 import '../../v2/v3_dev_mark.dart' show V3DevMark, devMarkFor;
 import '../pp_activity_paintings.dart' show ppActivityPainting;
 import '../pp_activity_read.dart' show ppActivityReader;
+import '../pp_behaviour_content.dart' show kPpBehaviourSection;
 import '../pp_child_profile.dart';
 import '../pp_content.dart' show PpPage;
 import '../multichild_sheet.dart' show showAddChildForm;
@@ -43,7 +48,7 @@ import '../pp_phases_data.dart' show ppFillChild;
 import '../pp_potty_content.dart';
 import '../pp_section_screen.dart' show ppOpenPage;
 import '../pp_sleep_content.dart' show kPpSleepSection;
-import '../pp_age_bands.dart' show kPpSleepBands;
+import '../pp_age_bands.dart' show kPpChildBands, kPpSleepBands;
 
 /// The inline tool for [surfaceId], or null when there is none (the tab then
 /// opens on its rails, as every other tab does).
@@ -59,6 +64,8 @@ Widget? ppDoorInlineToolFor(
         PpPottyTodayShelf(p: p, onSurface: onSurface),
       _ when ppSleepShelfShows(surfaceId) =>
         PpSleepTonightShelf(p: p, onSurface: onSurface),
+      _ when ppBehShelfShows(surfaceId) =>
+        PpBehRightNowShelf(p: p, onSurface: onSurface),
       _ => null,
     };
 
@@ -69,6 +76,7 @@ int ppDoorInlineCount(String surfaceId) => switch (surfaceId) {
           (ppDinKnown() && ppDinAfter(kPpDinTabId) ? 1 : 0),
       _ when ppPottyShelfShows(surfaceId) => ppPottyTodayPicks().length,
       _ when ppSleepShelfShows(surfaceId) => ppSleepTonightPicks().length,
+      _ when ppBehShelfShows(surfaceId) => ppBehRightNowPicks().length,
       _ => 0,
     };
 
@@ -79,13 +87,29 @@ int ppDoorInlineCount(String surfaceId) => switch (surfaceId) {
 /// Sleep's Tonight row is the same (SL1): a newborn's Safe sleep tab does not
 /// show the sleep-space check and the swaddle twice. Its cards from another
 /// tab (Gentle settling on Waking) are not on this tab's rails anyway.
+/// Behaviour's Right now row likewise (BH1): the crying pages on it are not
+/// drawn again on the Crying tab's rail.
 Set<String> ppDoorInlinePageIds(String surfaceId) => ppPottyShelfShows(surfaceId)
     ? {for (final x in ppPottyTodayPicks()) x.id}
     : ppSleepShelfShows(surfaceId)
         ? {for (final c in ppSleepTonightPicks()) ?c.pageId}
-        : const {};
+        : ppBehShelfShows(surfaceId)
+            ? {for (final c in ppBehRightNowPicks()) ?c.pageId}
+            : const {};
     // Before Sleep's row (SL1), kept for revert:
     // : const {};
+    // Before Behaviour's row (BH1), kept for revert:
+    //     : const {};
+
+/// ⚠️ THE SURFACES AN INLINE ROW OPENS, SO THE TAB DOES NOT DRAW THEIR TOOL
+/// ROWS AGAIN (Behaviour BH1). Right now ends on What to say, which is also a
+/// tool on the Crying and Tantrums tabs. Empty when the row is not drawn for
+/// her band, so the same tab for another age keeps its tool row.
+Set<String> ppDoorInlineSurfaceIds(String surfaceId) => ppBehShelfShows(surfaceId)
+    ? {for (final c in ppBehRightNowPicks()) ?c.surfaceId}
+    : ppSleepShelfShows(surfaceId)
+        ? {for (final c in ppSleepTonightPicks()) ?c.surfaceId}
+        : const {};
 
 // =============================================================================
 //  Sleep: "Tonight" (SL1)
@@ -185,6 +209,119 @@ class PpSleepTonightShelf extends StatelessWidget {
                 ),
                 onTap: () => page != null
                     ? ppOpenPage(context, kPpSleepSection, page,
+                        onSurface: (_, id) => onSurface(id))
+                    : onSurface(c.surfaceId!),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+//  Behaviour: "Right now" (BH1)
+// =============================================================================
+
+/// ⚠️ ONE ROW, ON THE TAB THAT OPENS FOR HER BAND, as Sleep's Tonight is.
+/// Three tabs can host it (`kPpBehRightNowShelf/<tab id>`): Crying for a baby,
+/// Tantrums from one to three, He keeps doing this from three. It draws only
+/// where `tabOrder` lands her, so a two-year-old's He keeps doing this tab is
+/// pages, not the row twice.
+bool ppBehShelfShows(String surfaceId, {String? band}) {
+  const prefix = '$kPpBehRightNowShelf/';
+  if (!surfaceId.startsWith(prefix)) return false;
+  final b = band ?? kPpChildBands.active.id;
+  return kPpBehaviourDoor.tabOrder[b]?.first == surfaceId.substring(prefix.length);
+}
+
+/// The cards for her band, in the plan's order, all five. A page card drops
+/// only if its page is missing or not for her band, so a later retag can
+/// never put a toddler page on a baby's row. Pure, so a test can hold any
+/// band.
+List<PpBehRightNowCard> ppBehRightNowPicks({String? band}) {
+  final b = band ?? kPpChildBands.active.id;
+  return [
+    for (final c in kPpBehRightNowCards[b] ?? const <PpBehRightNowCard>[])
+      if (c.pageId == null ||
+          (kPpBehaviourSection.pageById(c.pageId!)?.inBand(b) ?? false))
+        c,
+  ];
+}
+
+/// The card's meta word: what a tap does.
+String _behRightNowMeta(PpBehRightNowCard c) {
+  if (c.surfaceId != null) return 'The words';
+  final page = kPpBehaviourSection.pageById(c.pageId!);
+  return switch (page?.format) {
+    'STEP-LIST' || 'INTERACTIVE' => 'Steps',
+    'ACTIVITY' => 'Try this',
+    _ => 'Read',
+  };
+}
+
+/// "Right now": the heading, its line, and the cards for her band.
+class PpBehRightNowShelf extends StatelessWidget {
+  const PpBehRightNowShelf({super.key, required this.p, required this.onSurface});
+
+  final V2Palette p;
+  final void Function(String surfaceId) onSurface;
+
+  @override
+  Widget build(BuildContext context) {
+    final kid = ChildProfileStore.instance;
+    final picks = ppBehRightNowPicks();
+    final ts = MediaQuery.textScalerOf(context);
+    final height = 104 + ts.scale(118);
+    // The Tantrums tab's rose, the door's own colour.
+    final accent = HSLColor.fromAHSL(1, 344, 0.42, 0.46).toColor();
+    return Column(
+      key: const ValueKey('pp_beh_right_now_shelf'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Right now',
+                style: pvFraunces(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: -0.45,
+                    color: p.ink1)),
+            const SizedBox(height: 2),
+            Text('For ${kid.nameMid}, ${kid.ageLabel}  ·  nothing to tick off',
+                style: pvManrope(
+                    fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
+          ]),
+        ),
+        const SizedBox(height: kPvDoorHeadingGap),
+        SizedBox(
+          height: height,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+            itemCount: picks.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final c = picks[i];
+              final page = c.pageId == null
+                  ? null
+                  : kPpBehaviourSection.pageById(c.pageId!);
+              return _ShelfCard(
+                key: ValueKey('pp_beh_right_now_card_${c.pageId ?? c.surfaceId}'),
+                p: p,
+                height: height,
+                meta: _behRightNowMeta(c).toUpperCase(),
+                title: c.name,
+                picture: Container(
+                  color: Color.alphaBlend(accent.withValues(alpha: 0.14), p.surface),
+                  alignment: Alignment.center,
+                  child: Icon(c.icon, size: 40, color: accent),
+                ),
+                onTap: () => page != null
+                    ? ppOpenPage(context, kPpBehaviourSection, page,
                         onSurface: (_, id) => onSurface(id))
                     : onSurface(c.surfaceId!),
               );
