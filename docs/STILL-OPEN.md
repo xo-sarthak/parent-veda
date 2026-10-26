@@ -7944,8 +7944,11 @@ reason told) is never a loss.
 - Words: the positive test after a loss reads "A new pregnancy" with room for worry; Add a pregnancy's line does the
   same and only promises a kept pregnancy when one is kept.
 
-**Owed, cross-repo (Ask Veda), not built:** framing for a pregnancy after a loss. The app sends nothing new, so
-nothing is silently dropped. Handover for `C:\Projects\parentveda-askveda`: a field `previous_loss` (bool, true only
+**Ask Veda half BUILT 2026-10-26, both repos** (the user gave access the same day): the app sends `previous_loss: true`
+(`ask_veda_service.dart`) from the pregnancy screen when `pregnantAfterLoss` and from the TTC screen when
+`followsLoss` (never from his phone); the service adds the gentle line on top of her stage note
+(`prompt.with_previous_loss`) and caches under `:al` (`tests/test_previous_loss.py`). Inert until the service is
+deployed to Railway, like 073dc26. The handover as written before the build, kept: Handover for `C:\Projects\parentveda-askveda`: a field `previous_loss` (bool, true only
 when `PregnancyRecords.pregnantAfterLoss` or `gentleAboutLoss`; never for `ended`), and a framing rule: no
 "congratulations" tone, room for anxiety, reassurance grounded in the care reads (`preg_loss_read_next_pregnancy_care`),
 never a recurrence probability. Note the 2026-10-17 rule that the onboarding `gentle` answer stays in the app and is

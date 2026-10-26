@@ -169,6 +169,15 @@ class AskVedaService {
     /// pregnant" (STAGE-TRANSITIONS F8, 2026-10-25). Two-repo field, landed in
     /// both (`family_stage`).
     String? familyStage,
+
+    /// She is pregnant again, or trying again, after a pregnancy loss she
+    /// RECORDED here (`PregnancyRecords`, STILL-OPEN §61.1, 2026-10-26). The
+    /// service keeps her week or cycle note and adds gentle framing (no
+    /// congratulations, room for worry, never a probability), with cache
+    /// entries of its own. ⚠️ Never from her onboarding "gentle" answer: that
+    /// stays in the app (the user, 2026-10-17). Two-repo field, landed in both
+    /// (parentveda-askveda `previous_loss`, tests/test_previous_loss.py).
+    bool? previousLoss,
   }) async {
     if (!AskVedaConfig.enabled) return null;
     final q = question.trim();
@@ -207,6 +216,7 @@ class AskVedaService {
               if (domain != null) 'domain': domain,
               if (pregnancyEnded == true) 'pregnancy_ended': true,
               'family_stage': ?familyStage,
+              if (previousLoss == true) 'previous_loss': true,
             }),
           )
           .timeout(const Duration(seconds: 25));

@@ -48,6 +48,7 @@ import 'ttc_surface_router.dart';
 import 'ttc_stage_search.dart';
 import 'ttc_tests_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../services/pregnancy_records.dart' show PregnancyRecords;
 
 /// What these lists have to clear at the bottom: the pinned composer, and
 /// nothing else.
@@ -165,6 +166,11 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       cycleDay: widget.partnerMode ? null : s.today.cycleDay,
       // Show her the cards in the language she's reading the app in.
       lang: TtcS.current().hinglish ? 'hi' : 'en',
+      // Trying again after a loss she recorded (2026-10-26): gentle framing,
+      // never a chance. Hers: not sent from the partner's device.
+      previousLoss: widget.partnerMode
+          ? null
+          : PregnancyRecords.instance.followsLoss,
     );
     if (!mounted || _query != t) return;
     if (res != null) HapticFeedback.lightImpact(); // the answer has landed

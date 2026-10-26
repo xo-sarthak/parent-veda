@@ -196,6 +196,27 @@ void main() {
     });
   });
 
+  group('Ask Veda: previous_loss, both repos (2026-10-26)', () {
+    test('sent only when true, from the recorded loss, never on his phone', () {
+      final svc = _code('lib/services/remote/ask_veda_service.dart');
+      expect(svc, contains("if (previousLoss == true) 'previous_loss': true,"));
+      expect(_code('lib/screens/tools/ask_veda_screen.dart'),
+          contains('previousLoss: !ended && PregnancyRecords.instance.pregnantAfterLoss'));
+      final ttc = _code('lib/screens/ttc/ttc_askveda_screen.dart');
+      expect(ttc, contains('PregnancyRecords.instance.followsLoss'));
+      expect(ttc, contains('previousLoss: widget.partnerMode'));
+    });
+    test("the onboarding 'gentle' answer never reaches the service", () {
+      for (final f in [
+        'lib/services/remote/ask_veda_service.dart',
+        'lib/screens/tools/ask_veda_screen.dart',
+        'lib/screens/ttc/ttc_askveda_screen.dart',
+      ]) {
+        expect(_code(f), isNot(contains('gentleAboutLoss')), reason: f);
+      }
+    });
+  });
+
   group('parenting: a baby on the way', () {
     test('the sibling pages lead, and the card says why', () {
       final pages = [

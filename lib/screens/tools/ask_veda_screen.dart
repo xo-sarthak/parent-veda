@@ -59,6 +59,7 @@ import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
+import '../../services/pregnancy_records.dart' show PregnancyRecords;
 
 // ⚠️ ONE PARENTVEDA (2026-09-30, the pregnancy restyle): the trying-to-conceive
 // Ask Veda's shape, in the pregnancy pieces. A back arrow and "Ask Veda" in
@@ -204,6 +205,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       t,
       week: ended ? null : p.currentWeek,
       pregnancyEnded: ended,
+      // Pregnant again after a loss she recorded (2026-10-26): gentler framing
+      // on top of her week. Not while the pregnancy that ended is on screen.
+      previousLoss: !ended && PregnancyRecords.instance.pregnantAfterLoss,
       stage: 'pregnancy',
       lang: p.language.isHindi ? 'hi' : 'en',
     );
