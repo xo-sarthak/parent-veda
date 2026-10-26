@@ -30,6 +30,8 @@
 //    sk_grown_up/<door>               the parent side (gated)
 //    sk_courses/<door>                the parent side, on the course shelf
 //    sk_products/<door>               the parent side, on the product shelf
+//    sk_settings/<door>               the parent side, on set up and consent
+//                                     (the home's More tab, 2026-10-26)
 //    sk_page/<door>/<page>            one page, by id
 //    sk_activity/<door>/<activity>    one activity, by id
 // =============================================================================
@@ -115,6 +117,11 @@ Widget? skScreenForSurface(String id) {
     case 'sk_products':
       if (door == null || skDoorContentFor(door) == null) return null;
       return SkGrownUpScreen(doorId: door, section: SkGrownUpSection.products);
+    case 'sk_settings':
+      // The child's record, the recording switch and the PIN: the More
+      // tab's rows. The screen asks the grown-up check itself.
+      if (door == null || skDoorContentFor(door) == null) return null;
+      return SkGrownUpScreen(doorId: door, section: SkGrownUpSection.settings);
     case 'sk_page':
       final c = door == null ? null : skDoorContentFor(door);
       final page = c == null || rest == null ? null : c.pageById(rest);

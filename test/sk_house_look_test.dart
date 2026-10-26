@@ -21,6 +21,11 @@ import 'package:parentveda/screens/doors/pv_shelf_card.dart';
 import 'package:parentveda/screens/skilling/doors/sk_door_chrome.dart';
 import 'package:parentveda/screens/skilling/doors/sk_door_screen.dart';
 import 'package:parentveda/screens/skilling/sk_child_store.dart';
+import 'package:parentveda/screens/skilling/sk_practice_store.dart';
+import 'package:parentveda/screens/skilling/sk_surface_router.dart';
+import 'package:parentveda/screens/skilling/skilling_preview_screen.dart';
+import 'package:parentveda/services/bracket_resolver.dart';
+import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/widgets/pv_door_intro_chip.dart';
 
 /// The source of a file with its comments removed, so a revert note that
@@ -169,6 +174,157 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text(kPvDoorIntroSoonLine), findsOneWidget);
       await tester.pump(const Duration(seconds: 6));
+    });
+  });
+
+  // ===========================================================================
+  //  THE HOME (2026-10-26, prototype 1wkwCdtNts4X1z9FYi4tek)
+  // ===========================================================================
+  group('the home', () {
+    const home = 'lib/screens/skilling/skilling_preview_screen.dart';
+
+    test('the house sections, not the design preview', () {
+      final c = _code(home);
+      for (final want in [
+        "'My daily insights'",
+        "'Explore by topic'",
+        "'Right now'",
+        "'For the grown-up'",
+        'PvInsightRail(',
+        'PvRowGroup(',
+        'PvNavBar(',
+        "meta: skDoorFor(b.id) == null ? 'Soon' : null",
+        'v2BlockTint(skHouseHue(b.hue), p)',
+        'v3FieldChroma(186)',
+      ]) {
+        expect(c.contains(want), isTrue, reason: want);
+      }
+      for (final gone in [
+        'DESIGN PREVIEW',
+        '_PreviewBanner(p: p)',
+        '_CompassCard(p: p',
+        "'Two things settled first'",
+        'PLANNED  ·  NONE OF IT BUILT',
+        'v3FieldChroma(258)',
+      ]) {
+        expect(c.contains(gone), isFalse, reason: gone);
+      }
+    });
+
+    test('the bar has the five tabs, in order', () {
+      final c = _code(home);
+      var at = 0;
+      for (final (icon, label) in [
+        ('home_outlined', 'Today'),
+        ('menu_book_outlined', 'Learn'),
+        ('shopping_basket_outlined', 'Products'),
+        ('handyman_outlined', 'Tools'),
+        ('grid_view_outlined', 'More'),
+      ]) {
+        final i = c.indexOf("PvNavItem(Icons.$icon, '$label')", at);
+        expect(i, greaterThan(-1), reason: label);
+        at = i;
+      }
+    });
+
+    test('no tile is violet, purple or pink, and no tile matches its neighbour', () {
+      expect(skHouseHue(344), 56);
+      expect(skHouseHue(268), 128);
+      expect(skHouseHue(288), 146);
+      expect(skHouseHue(320), 80);
+      final hues = [for (final b in bracketsFor(LifeStage.skilling)) skHouseHue(b.hue)];
+      expect(hues, hasLength(12));
+      for (final h in hues) {
+        expect(h >= 250 && h <= 350, isFalse, reason: '$h');
+      }
+      // Four to a row on the grid.
+      for (var i = 0; i < hues.length; i++) {
+        if (i % 4 != 3) expect(hues[i], isNot(hues[i + 1]), reason: 'tile $i');
+        if (i + 4 < hues.length) expect(hues[i], isNot(hues[i + 4]), reason: 'tile $i');
+      }
+    });
+
+    test('every row the tab pages open is a route that exists', () {
+      for (final id in [
+        'sk_settings/skilling_coding',
+        'sk_record/skilling_confidence',
+        'sk_voice/skilling_communication',
+        'sk_keepsake/skilling_coding',
+        'sk_lessons/skilling_coding',
+        'sk_products/skilling_coding',
+        'sk_grown_up/skilling_confidence',
+      ]) {
+        expect(skRouterKnows(id), isTrue, reason: id);
+      }
+    });
+
+    group('on screen', () {
+      setUp(() {
+        SharedPreferences.setMockInitialValues({});
+        SkChildStore.instance.debugReset();
+        SkPracticeStore.instance.debugReset();
+      });
+
+      Future<void> pumpHome(WidgetTester tester) async {
+        tester.view.physicalSize = const Size(412, 3200);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+        SkChildStore.instance.debugSetAgeYears(7, name: 'Aarav');
+        await tester.pumpWidget(const MaterialApp(home: SkillingPreviewScreen()));
+        await tester.pump(const Duration(seconds: 2));
+      }
+
+      testWidgets('hero, today, the grid with Soon, the empty line, the grown-up rows', (tester) async {
+        await pumpHome(tester);
+        expect(find.text("Aarav's learning space"), findsOneWidget);
+        expect(find.text('Age 7 · twelve skills to practise, nothing scored'), findsOneWidget);
+        expect(find.text('MY DAILY INSIGHTS'), findsOneWidget);
+        expect(find.text('Explore by topic'), findsOneWidget);
+        for (final d in ['skilling_coding', 'skilling_communication', 'skilling_confidence']) {
+          expect(find.byKey(ValueKey('sk_today_$d')), findsOneWidget, reason: d);
+          expect(find.byKey(ValueKey('sk_grown_up_$d')), findsOneWidget, reason: d);
+        }
+        expect(find.text('Soon'), findsNWidgets(5));
+        expect(find.byKey(const ValueKey('sk_tried_empty')), findsOneWidget);
+        expect(find.text('What Aarav tried lately'), findsOneWidget);
+        expect(find.text('Help Aarav at home'), findsOneWidget);
+        expect(find.byKey(const ValueKey('sk_nav_bar')), findsOneWidget);
+      });
+
+      testWidgets('something tried shows as a row, in words', (tester) async {
+        SkChildStore.instance.debugSetAgeYears(7, name: 'Aarav');
+        SkPracticeStore.instance.record(
+            doorId: 'skilling_coding', itemId: 'x1', title: 'Be My Robot', kind: SkPractice.tried);
+        await pumpHome(tester);
+        expect(find.byKey(const ValueKey('sk_tried_empty')), findsNothing);
+        expect(find.text('Be My Robot'), findsOneWidget);
+      });
+
+      testWidgets('an unbuilt skill opens its plan sheet', (tester) async {
+        await pumpHome(tester);
+        await tester.tap(find.text('Focus'));
+        await tester.pump(const Duration(seconds: 1));
+        expect(find.text('COMING SOON'), findsOneWidget);
+        expect(find.text('What it will hold'), findsOneWidget);
+      });
+
+      testWidgets('the bar opens the four tab pages', (tester) async {
+        await pumpHome(tester);
+        final bar = find.byKey(const ValueKey('sk_nav_bar'));
+        for (final (tab, title) in [
+          ('Learn', 'Lessons for Aarav'),
+          ('Products', 'Things that help'),
+          ('Tools', 'Tools for practice'),
+          ('More', "Aarav's space"),
+        ]) {
+          await tester.tap(find.descendant(of: bar, matching: find.text(tab)));
+          await tester.pump(const Duration(milliseconds: 500));
+          expect(find.text(title), findsOneWidget, reason: tab);
+        }
+        await tester.tap(find.descendant(of: bar, matching: find.text('Today')));
+        await tester.pump(const Duration(milliseconds: 500));
+        expect(find.text("Aarav's learning space"), findsOneWidget);
+      });
     });
   });
 }

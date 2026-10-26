@@ -1368,4 +1368,23 @@ colour only in the picture and the mark's disc. Prototype: `claude.ai/artifact/G
 **Declined.** Cartoon level maps, coins and streak counters (Kit, Duolingo, Mimo): skilling never scores a child.
 Spotify Kids' dark purple ground.
 
-**Owed.** The skilling home, next, at the user's word.
+**Owed.** The skilling home: built 2026-10-26, §37.
+
+## 37. The skilling home and its bottom bar (2026-10-26)
+
+**Why.** After doors 1 to 3 (§36), the home still read as a design preview: "SKILLING · DESIGN PREVIEW", a grey
+banner, a compass card, two "Decided" cards, a violet field and four pink or purple tiles. The other three homes share
+one shape: a hero about the person now, "My daily insights", "Explore by topic", rows.
+
+**Found.** Babbel's Today home, today's card first (https://mobbin.com/screens/0fed600b-7bf0-4fe7-bcfd-d614d8a27c51);
+Blinkist's daily shelf (https://mobbin.com/screens/e90fec6c-888d-458d-ab1b-984e0398127d); Atoms' daily lesson, then
+the topic list (https://mobbin.com/screens/709913b3-cb23-4aa0-96b8-26dd73a932c7); GoHenry's Learn grid of topics for
+a child (https://mobbin.com/screens/9bcd500f-f446-492e-8af1-1a50702b6db5).
+
+**Adopted.** Today first, one thing per open door; the topic grid second with unbuilt topics labelled rather than
+hidden; recent activity as plain rows; a five-tab bar whose thin tabs say what is coming and link to what exists.
+Prototype: `claude.ai/artifact/1wkwCdtNts4X1z9FYi4tek`. As built: SKILLING-DOORS-REVIEW "The home and its bar".
+
+**Declined.** Coins, streaks and XP (Duolingo, Nibble, Brilliant): skilling never scores a child.
+
+**Owed.** Learn, Products and Tools with their own content (they point into the doors for now).

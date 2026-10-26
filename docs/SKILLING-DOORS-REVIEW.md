@@ -746,7 +746,7 @@ app". Mobbin pass (MOBBIN-DISCOVERY §36), then a tap-through prototype the
 user approved (`claude.ai/artifact/GQdX4MLR4aCv4tSmqBVncb`), then the build. Doors 1 to 3 first; the
 shell is shared, so Thinking, Stillness, Feelings and Making pick up the new
 door page too. Their own one-off screens (journal, portfolio) were not
-touched. The skilling home is next, at the user's word.
+touched. The skilling home followed on 2026-10-26 (below).
 
 What changed, everywhere a door 1 to 3 screen reaches:
 
@@ -780,6 +780,77 @@ Held by `test/sk_house_look_test.dart` (no violet or SnackBar in the source,
 the mirrored numbers, house hues, the rail, cards, chip and search on all
 three doors). The age-line tests in the seven door tests moved to sentence
 case.
+
+## The home and its bar — 2026-10-26
+
+Second half of the house look. Mobbin pass (MOBBIN-DISCOVERY §37), then a
+tap-through prototype the user approved
+(`claude.ai/artifact/1wkwCdtNts4X1z9FYi4tek`), then the build, in
+`lib/screens/skilling/skilling_preview_screen.dart`. The class keeps its name
+(`SkillingPreviewScreen`): routes, the last-profile observer and five tests
+read it, and a rename buys nothing.
+
+What the home is now, top to bottom:
+
+- **Header, unchanged.** Avatar to You, Talk to an expert, the family switch
+  over the date, Saved; no Calendar. It moved into `_SkHeader` so the tab
+  pages wear the same one (family_switch_test still reads the slots between
+  `class _Hero` and `class _SkRound`).
+- **Hero about the child.** "Aarav's learning space" (Newsreader 28) and
+  "Age 7 · twelve skills to practise, nothing scored". The field moved from
+  violet 258 to the house teal 186. With no name: "The learning space"; with
+  no age, the line drops it rather than guessing.
+- **My daily insights / Today.** The shared `PvInsightRail`, clean tiles
+  (`showArt: false`, `centreValue`), one per door whose activities are real
+  task fills (today Coding, Communication, Confidence; derived from the
+  data, so a door that gets fills joins without an edit). Each tile is that
+  door's own `todayFor(band)`, so the home and the door agree on today's
+  thing. The onboarding pick ("Picked for Aarav") leads the rail until the
+  child has tried anything; its tap opens a sheet with the whole title,
+  since it has no screen of its own. A child card before consent goes
+  through the door's gate first (`_openGated`).
+- **Explore by topic.** The same 4-column grid, tints through `skHouseHue`.
+  Four hues moved, picked by eye from the rendered marks so no tile repeats
+  its neighbour: Confidence 344 to 56, Thinking 268 to 128, Feelings 288 to
+  146, Memory 320 to 80 (`kSkBracketHouseHues` in `sk_door_chrome.dart`).
+  The door hero field reads the same map, so a door's field matches its
+  tile. The five unbuilt skills say "Soon" under the label and still open
+  the plan sheet; `if (!skOpenDoor(context, b.id)) _showPlan(context, b, p);`
+  is unchanged.
+- **Right now / What Aarav tried lately.** The keepsake across every door,
+  newest first, three rows (title, the word and the skill). Empty: one grey
+  line, "Nothing yet. Try one thing above and it shows here, in words, never
+  a score."
+- **For the grown-up / Help Aarav at home.** One row per open door with a
+  lock, into `sk_grown_up/<door>`, which asks the grown-up check itself, so
+  no row can skip it. Under it, the old "Decided" card as one quiet line:
+  "Nothing here scores a child."
+- **Plan sheet.** Title, a COMING SOON pill, the blurb, then "What it will
+  hold" as hairline rows (the workbook's words, verbatim), and a grey line:
+  "Not built yet. The tile stays so you can see what is coming."
+- **Bottom bar.** The shared `PvNavBar`, brand violet like pregnancy and TTC:
+  Today, Learn, Products, Tools, More. The four tab pages each say what the
+  tab will hold and point into what already exists, so no tab is a dead end:
+  Learn opens each open door on Lessons; Products lists each door's first
+  product for the child's band and opens its shelf (gated); Tools opens the
+  recorder (Confidence), Your voice, saved (Communication) and the keepsake
+  (Coding); More opens set up and consent, the recording switch and the PIN,
+  all through a new route `sk_settings/<door>` (the grown-up screen on its
+  settings section, gated).
+
+Kept for revert, as comments: the preview banner, the compass, the two
+"Decided" cards, the design-preview hero, the old plan sheet, the old
+first-activity card. Held by `test/sk_house_look_test.dart`, group "the
+home" (the sections and the bar in the source, no preview wording, the tile
+hues, every tab-page route exists, and the home pumped on screen: hero,
+rail, Soon, empty line, tried row, plan sheet, all four tab pages).
+
+**Not in this pass, said plainly.** The tab pages point into the doors rather
+than holding their own content; a real Learn list, shop and tools page are a
+later build. The "PREVIEW" pill on the pregnancy home's skilling shelf and
+"Skilling (preview)" in the parenting drawer live in other stages' files and
+were not touched (skilling_doorway_test pins the first on purpose). The Ask
+Veda button stays hidden on the child's home.
 
 ## Cross-door windows
 

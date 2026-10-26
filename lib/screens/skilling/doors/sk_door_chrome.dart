@@ -67,8 +67,20 @@ List<double> skHouseHues(List<double> hues) {
   ];
 }
 
-/// One hue, alone (a bracket's, a closing row's).
-double skHouseHue(double h) => _offHouse(h) ? 186 : h % 360;
+/// The four skills written in violet, purple or pink, and the house hue each
+/// one paints instead (2026-10-26, the skilling home prototype
+/// 1wkwCdtNts4X1z9FYi4tek). Picked by eye from the rendered marks so no tile
+/// on the home's 4-column grid repeats its neighbour: Confidence olive,
+/// Thinking green, Feelings mint, Memory lime. The bracket data keeps its
+/// own numbers (kept for revert); only the paint moves.
+const Map<int, double> kSkBracketHouseHues = {344: 56, 268: 128, 288: 146, 320: 80};
+
+/// One hue, alone (a bracket's, a closing row's). A bracket hue in
+/// [kSkBracketHouseHues] takes its picked hue; any other off-house hue falls
+/// back to teal. Kept for revert:
+///   double skHouseHue(double h) => _offHouse(h) ? 186 : h % 360;
+double skHouseHue(double h) =>
+    _offHouse(h) ? (kSkBracketHouseHues[(h % 360).round()] ?? 186) : h % 360;
 
 /// The drawn mark for a skilling tab: the TTC family's objects, the same
 /// marks the parenting and pregnancy rails draw. Keyed on the tab's id, with
