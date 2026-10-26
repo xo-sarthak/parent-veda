@@ -80,7 +80,7 @@ From `research/questions/ranked_parenting.csv`:
 - **"Speech therapy and the other therapies, explained"**
   - speech therapy, OT, physiotherapy and a special educator: what each does and a session in plain words
   - how often, and that home practice is what counts
-  - **what it costs in India:** a range per session in INR and USD, private versus free at a DEIC or government hospital
+  - **what it costs in India:** a range per session in rupees only (the user, 2026-10-26), private versus free at a DEIC or government hospital
   - **how to find a good one:** RCI-registered, works with you in the room, sets goals you can see
   - a caution on centres promising a "cure"
 

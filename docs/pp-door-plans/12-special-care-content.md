@@ -6,7 +6,7 @@ Written 2026-10-25. This goes into `pp_special_care_content.dart` at build. The 
 - Early help is never wasted.
 - No blame.
 - English only. No emoji.
-- Every clinical, legal and money line is REQUIRED_REVIEW, read by a developmental paediatrician (clinical) and checked against current government pages (schemes, tax, amounts) before release. Costs are ranges, dated, in INR and USD.
+- Every clinical, legal and money line is REQUIRED_REVIEW, read by a developmental paediatrician (clinical) and checked against current government pages (schemes, tax, amounts) before release. Costs are ranges, dated, in rupees only (the user, 2026-10-26: "right now keep only rupees").
 
 ---
 
@@ -54,7 +54,7 @@ Area: `additional_needs`. Bands: 1 year and up. Format: CARDS, then STEPS. REQUI
 
 **What it costs in India** (ranges, checked 2026; vary by city):
 - **Free:** at a DEIC under RBSK, and at many government hospitals and medical colleges
-- **Private, per session:** about ₹500 to ₹1,500 ($6 to $18) in most cities, and more in metros
+- **Private, per session:** about ₹500 to ₹1,500 in most cities, and more in metros
 - **Ask:** whether the centre offers a home programme, so you need fewer paid sessions
 
 **How to find a good one:**
