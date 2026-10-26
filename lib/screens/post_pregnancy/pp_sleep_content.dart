@@ -2073,6 +2073,20 @@ final PpArea _gettingToSleep = PpArea(
           surfaceId: 'pp_products/pvs_smart_cribs_and_bassinets',
           blurb: 'A flat, firm place for the sleep itself.',
         ),
+        // Traditions TR2 / TR4 (door 10): the three jhula pages link each
+        // other, and Traditions now says what this page says.
+        PpLink(
+          'The cradle ceremony',
+          surfaceId: 'pp_page/parenting_traditional/jhula',
+          blurb: 'The day your baby first goes into the cradle, from the '
+              'Traditions door.',
+        ),
+        PpLink(
+          'The jhula in the first weeks',
+          surfaceId: 'pp_page/parenting_first_40/f40_jhula',
+          blurb: 'Carrying your baby, and the cloth swing, from the First 40 '
+              'door.',
+        ),
       ],
     ),
     PpPage(

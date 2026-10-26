@@ -231,7 +231,7 @@ Catalogue items and people the door points at that do not exist yet (each tap sa
 | First 40 Days (parenting) | 18 | – (FF3–FF5 filled 2026-10-02) | – | 5 | 1 (the day spine, FF10); FF1–FF2 closed into You; FF12–FF18 answer a tap, see the door 6 table |
 | You, Maa (parenting) | 6 | 2 | – | 3 | – |
 | What to buy (parenting) | 10 | 8 | – | 2 | – (call 2: shelves owned as they are) |
-| Traditions (parenting) | 10 | 8 | – | 2 | – (two sensitive pages, tone to sign off) |
+| Traditions (parenting) | 13 | – (TR1–TR8 written 2026-10-02) | – | 2 | – (two sensitive pages, the user's phone read); TRO1–TRO3 wait on a film or the shop, see the door 10 table |
 | Coding (skilling) | 9 | 4 (33 slots: 12 lessons, 6 AI cards, 6 courses, 9 products, 1 note — the 36 activities are filled) | – | 2 (the consent adapter, the access rail) | 1 generic (resume marker — `SKILLING-DOOR-BUILD.md` §9) |
 | Communication (skilling) | 10 | 5 (29 slots: 27 lessons, 12 courses, 12 products, 2 notes — the 36 activities are filled; the 11–14 twelve are repo-written copy owed a task-author review) | – | 1 (the voice keepsake) | 1 (cloud copy of recordings, behind a real consent) |
 | Confidence (skilling) | 11 | 5 (36 slots: 18 lessons, 6 courses, 9 products, 2 notes, 1 coach — the 36 activities are filled) | – | 1 (the breath page) | 1 (the coach onboarded, then the booking wiring) |
@@ -492,7 +492,17 @@ one drawn illustration, and seventeen films none of which is shot.
 | TR7 | `interfaith_far_from_home` — Interfaith families, and doing this far from home | Article | Coming soon | Two traditions in one house; no pandit, agiary or gurdwara nearby. |
 | TR8 | `mother_kept_apart` — When the mother is kept apart | Article | Coming soon | The most sensitive (call 1): jaapa seclusion and the not-to-be-touched custom. Us-not-shame; tone signed off by the user before it ships. |
 | TR9 | `newborn_customs` — the four visual customs | Illustration | Built from data | Drawn in code (`newbornCustoms`): the kajal dot on the sole, the bare cord, the frog-leg swaddle, the unbound head. Artwork can replace via `PpIllustration.asset`. |
-| TR10 | Seventeen films, 88 minutes | Film | Built from data | In the order worth shooting: kajal-honey-cord (watch with a grandmother), jhula, mundan, annaprashan, karnavedha, tahneek; the ceremony walk-throughs after. |
+| TR10 | Seventeen films, 88 minutes | Film | Built from data | In the order worth shooting: kajal-honey-cord (watch with a grandmother), jhula, mundan, annaprashan, karnavedha, tahneek; the ceremony walk-throughs after. A tap says the film is being made (S8a, held by the door 10 test). |
+
+TR1 to TR8 were written 2026-10-02 (parenting gap analysis); `skip_it` and `mother_kept_apart` were approved as text 2026-10-25 with two changes, made in the door 10 build, and wait on the user's read on the phone (BEFORE-LAUNCH).
+
+**Added by the door 10 build (2026-10-26, `docs/pp-door-plans/10-traditions.md` TR1 to TR6, "As built").** Nothing here is a coming-soon card.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| TRO1 | `traditions/door_intro` | Film · 30–45 s | Not slotted | S4: no chip until the film exists (TR6) |
+| TRO2 | Baby massage oil on the shop | Catalogue | Not linked | The most searched item in this door (491 on massage and oil). Traditions links First 40's "Which massage oil?" instead of a shelf; the shelf notice is FF15's (`kPpShelfNotYet`) |
+| TRO3 | A ceremony shelf (thali sets, silver spoon and bowl sets, ceremony outfits) | Catalogue | Links removed | Two links opened the whole shop and promised these; the catalogue has none, so both are commented out (TR4). Naamkaran keeps one link, to the clothes shelf. Add a shelf only if the shop decides to stock ceremony items |
 
 ---
 

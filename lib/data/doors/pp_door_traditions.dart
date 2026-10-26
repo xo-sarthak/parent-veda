@@ -8,15 +8,22 @@
 //  call (2026-09-14):
 //
 //    Coming up now        her stage's chart first, and how the date and name get chosen
-//    Welcoming her home   chatti, namkaran, the cradle, the first outing
-//    The first years      the first meal, hair, ears, the birthday, the letters
-//    In every faith       Muslim, Christian, Sikh, Jain and Parsi welcomes, and interfaith
+//    Welcoming baby home  chatti, namkaran, the cradle, the first outing
+//    The big firsts       the first meal, hair, ears, the birthday, the letters
+//    In every faith       Muslim, Christian, Sikh, Jain, Parsi and Buddhist welcomes, and interfaith
 //    Small, safe, honest  the costs, keeping it small, the words, the not-safe customs, first festivals
 //
-//  ⚠️ ONLY THE FIRST TAB CHANGES WITH HER AGE. "Which ceremony is coming up
-//  now?" is the one band-tagged area — four charts, one per stage — and it
-//  opens the right one on its own; every other area is for every age and
-//  shows in full. So no tab here ever locks or drops.
+//  (Door 10, TR6: the comment said "Welcoming her home"; the label has
+//  read "Welcoming baby home" since the English pass.)
+//
+//  ⚠️ EACH AGE SEES ITS OWN CEREMONIES FIRST (door 10, TR1, 2026-10-26).
+//  "Which ceremony is coming up now?" still opens the right chart on its
+//  own, and now every ceremony page carries its age too, so one passed
+//  folds under "Earlier" on its tab and one ahead waits under "Coming up
+//  next". Nothing is hidden. The areas stay for every age, so no tab here
+//  ever locks or drops, and the tab order below puts her age's tabs first.
+//  Was "ONLY THE FIRST TAB CHANGES WITH HER AGE ... every other area is for
+//  every age and shows in full", kept for revert.
 //
 //  ⚠️ NO RED FLAG AND NO CLOSING. "The genuine flags live on the pages that
 //  earn them, by design." "There is no 'book an expert' offer, and that is
@@ -29,6 +36,15 @@ import 'pp_door_data.dart';
 
 final PpDoor kPpTraditionsDoor = PpDoor(
   sectionId: 'parenting_traditional',
+  // TR1 (10-traditions.md): Coming up now always opens; then her age's
+  // ceremonies, and the newborn welcomes last once they have passed. From
+  // three, the festivals and the money page come before the ceremonies.
+  tabOrder: const {
+    'newborn': ['coming_up', 'welcome', 'faiths', 'first_years', 'small_safe'],
+    'half_year': ['coming_up', 'first_years', 'small_safe', 'faiths', 'welcome'],
+    'first_years': ['coming_up', 'first_years', 'small_safe', 'faiths', 'welcome'],
+    'older': ['coming_up', 'small_safe', 'first_years', 'faiths', 'welcome'],
+  },
   // Unsplash, free. A family on the floor before a decorated wall, marigolds,
   // a toddler between the parents: a ceremony as this door describes them,
   // small and at home. Nothing on it a page argues with.
@@ -62,7 +78,9 @@ final PpDoor kPpTraditionsDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'first_years',
-      label: 'The first years',
+      // The user's word, 2026-10-26: the old name said nothing about the
+      // first food. Was 'The first years', kept for revert.
+      label: 'The big firsts',
       icon: Icons.cake_outlined,
       hue: 344,
       areaIds: ['first_meal', 'milestones'],
@@ -82,7 +100,9 @@ final PpDoor kPpTraditionsDoor = PpDoor(
       areaIds: ['keep_it_small', 'not_safe', 'first_festivals'],
       tools: [
         PpDoorTool(
-          label: 'Home remedies from the elders, checked',
+          // TR6: was 'Home remedies from the elders, checked' (38
+          // characters, cut on the card), kept for revert.
+          label: 'Home remedies, checked',
           blurb: 'The home remedies every family passes down, with an honest '
               'note on which ones are safe and which are not.',
           surfaceId: 'pp_nuskhe',

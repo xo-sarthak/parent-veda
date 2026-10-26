@@ -2769,6 +2769,16 @@ final PpSection kPpFirst40Section = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'Signs to act on at once',
             ),
+            // Traditions TR2 / TR4 (door 10): the three jhula pages link
+            // each other. Sleep's page owns the sleep rule.
+            PpLink('The cradle and the saree swing, for sleep',
+                surfaceId: 'pp_page/parenting_sleep/jhula_safety',
+                blurb: 'What is for soothing, and what is for sleep, from the '
+                    'Sleep door.'),
+            PpLink('The cradle ceremony',
+                surfaceId: 'pp_page/parenting_traditional/jhula',
+                blurb: 'The day your baby first goes into the cradle, from the '
+                    'Traditions door.'),
           ],
         ),
         PpPage(

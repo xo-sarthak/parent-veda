@@ -2,7 +2,9 @@
 //  Traditions: Ceremonies & Milestones — the section's content
 // -----------------------------------------------------------------------------
 //  Built from pp_specs/11-traditions.md, against the mechanism in
-//  docs/PP-SECTION-PATTERN.md. Seven areas, twenty four pages.
+//  docs/PP-SECTION-PATTERN.md. Eight areas, thirty two pages (door 10,
+//  2026-10-26; was "Seven areas, twenty four pages", before the festivals
+//  area and the eight new pages).
 //
 //  ⚠️ THIS FILE IS DATA. No layout in it. `PpSectionScreen` renders the landing
 //  and `PpContentPage` renders every page. See pp_content.dart's header.
@@ -42,11 +44,20 @@
 //  declare its religion to the app before it can read. If a real toggle is
 //  wanted later it belongs in `pp_section_screen.dart`, once, for all sections.
 //
-//  ⚠️ AGE AWARENESS IS THE BAND SET, AND CEREMONIES STAY BROWSABLE. Only the
-//  four "what is coming up now" pages in Area 1 carry band tags. Every ceremony
-//  page is untagged on purpose: a mundan page is still wanted by a parent whose
-//  child is four, and a namkaran page is still read by someone helping a sister.
-//  Bands narrow what LEADS, never what exists.
+//  ⚠️ AGE AWARENESS IS THE BAND SET, AND CEREMONIES STAY BROWSABLE. Bands
+//  narrow what LEADS, never what exists.
+//
+//  Door 10, TR1 (2026-10-26): every ceremony page now carries its own age,
+//  so a four-year-old's parent no longer opens on the sixth-night welcome.
+//  A page for an age already passed folds under "Earlier" on its tab (the
+//  door's band blocks), so a mundan page is still there for a parent whose
+//  child is four, and a namkaran page for someone helping a sister. The
+//  areas stay untagged, so every page's tag sits inside its area's ages
+//  (the door 8 rule) and no tab ever goes "for later". The faith pages that
+//  are not newborn welcomes, the money, family and safety pages, and the
+//  festivals stay for every age. Was: "Only the four 'what is coming up
+//  now' pages in Area 1 carry band tags. Every ceremony page is untagged on
+//  purpose", kept for revert.
 //
 //  English only for now, plain `String`, per the standing instruction. Ceremony
 //  names stay in the Hinglish a family actually says: namkaran, annaprashan,
@@ -55,6 +66,7 @@
 
 import 'package:flutter/material.dart' show Icons;
 
+import '../../data/mind_mood_data.dart' show kCrisisHelplineName, kCrisisHelplineNumber;
 import 'pp_age_bands.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
@@ -144,7 +156,9 @@ final PpSection kPpTraditionsSection = PpSection(
       icon: Icons.auto_awesome_outlined,
     ),
     PpSectionTool(
-      label: 'Home remedies from the elders, checked',
+      // TR6: was 'Home remedies from the elders, checked' (38 characters, cut
+      // on the card), kept for revert.
+      label: 'Home remedies, checked',
       blurb: 'The home remedies every family passes down, with an honest note '
           'on which ones are safe and which are not.',
       surfaceId: 'pp_nuskhe',
@@ -245,8 +259,10 @@ final PpArea _whatsNow = PpArea(
         PpLink('The first rice feeding (annaprashan)', pageId: 'annaprashan'),
         PpLink('What to feed, on the day and after',
             pageId: 'annaprashan_food'),
+        // TR4: Feeding's first-foods page, not the whole Feeding door (was
+        // surfaceId: 'pp_feeding', kept for revert).
         PpLink('Starting solids, step by step',
-            surfaceId: 'pp_feeding',
+            surfaceId: 'pp_page/parenting_feeding/solids_first_foods',
             blurb: 'The feeding guide, with textures, portions and first '
                 'foods.'),
       ],
@@ -298,11 +314,15 @@ final PpArea _whatsNow = PpArea(
             ('2 to 5 years', 'The first letters (aksharabhyasam)'),
             ('Often at Vijayadashami', 'The traditional day for it'),
             ('Year 3, if not done at 1', 'The head shaving, for families who waited'),
-            ('7 to 11 years', 'The Parsi initiation (Navjote)'),
-            ('Around 11 years', 'The first turban (Dastar Bandi), in Sikh families'),
+            // TR1 / TR5: both fall past this door's ages, so they leave the
+            // chart for the line in the note. Kept for revert:
+            // ('7 to 11 years', 'The Parsi initiation (Navjote)'),
+            // ('Around 11 years', 'The first turban (Dastar Bandi), in Sikh families'),
           ],
-          note: 'If a ceremony on this list has already passed for your child, '
-              'nothing is owed, and there\'s nothing to make up.',
+          note: 'Later, at about 7 to 11: Navjote for Parsi children, Dastar '
+              'Bandi for Sikh boys. If a ceremony on this list has already '
+              'passed for your child, nothing is owed, and there\'s nothing to '
+              'make up.',
           hue: 200,
         ),
         PpCallout('The first letters ceremony marks a beginning. It isn\'t a test. Many '
@@ -346,6 +366,13 @@ final PpArea _whatsNow = PpArea(
           'For the first rice feeding, wait until your baby is about six months and ready '
               'for food. An earlier date can still be kept, with a symbolic touch '
               'of kheer to the lips and no solids fed.',
+        ]),
+        // TR5: the regions the section does not cover, said once.
+        PpArticle(heading: 'Your region\'s own version', [
+          'Families from Odisha, Assam, Kashmir, Sindh, the Konkan coast and '
+              'many other places have their own versions of these ceremonies '
+              'and dates. This door doesn\'t list every one. Ask the elder who '
+              'does it in your family.',
         ]),
         PpScript(heading: 'Words for the conversation', [
           PpScriptLine(
@@ -409,6 +436,8 @@ final PpArea _welcome = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'chatti',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['newborn'],
       title: 'The sixth-day welcome (chatti)',
       subtitle: 'The first welcome, usually at home',
       format: 'CEREMONY',
@@ -528,6 +557,11 @@ final PpArea _welcome = PpArea(
           slotId: 'traditions/chatti',
         ),
         PpLink('The naming ceremony, if the name is being said tonight', pageId: 'namkaran'),
+        // TR4: First 40's twin, which links back here (FD4).
+        PpLink('The ceremonies in your first forty days',
+            surfaceId: 'pp_page/parenting_first_40/f40_ceremonies',
+            blurb: 'Crowds, kisses, and when it is safe, from the First 40 '
+                'door.'),
         PpLink('Customs done with love that are not safe',
             pageId: 'newborn_customs'),
         // [single-source] The short line above stays word for word; the full
@@ -545,6 +579,8 @@ final PpArea _welcome = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'namkaran',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['newborn'],
       title: 'The naming ceremony (namkaran)',
       subtitle: 'The day your baby\'s name is said out loud',
       format: 'CEREMONY',
@@ -660,6 +696,11 @@ final PpArea _welcome = PpArea(
           'it varies by state.',
           title: 'The birth certificate is separate',
         ),
+        // TR4: the callout names the birth certificate; Papers holds the
+        // steps. A link, not inside the callout, so the reader keeps it whole.
+        PpLink('The birth certificate, step by step',
+            surfaceId: 'pp_page/parenting_papers/pm_birth_certificate',
+            blurb: 'Register within 21 days, free, and add the name later.'),
         // REQUIRED_REVIEW: newborn gathering precautions, same claim as chatti.
         PpCallout(
           'Your baby is still very new. Keep the room airy and the group small, '
@@ -688,10 +729,19 @@ final PpArea _welcome = PpArea(
         PpLink('Make a naming announcement card',
             surfaceId: 'pp_memories',
             blurb: 'Pick a template, add the name and a photo, share it.'),
-        PpLink('Ceremony essentials, if you are buying',
-            surfaceId: 'pp_products',
-            blurb: 'Silver spoon sets, outfits, thali sets. Compare before you '
-                'buy.'),
+        // TR4: the clothes shelf, for the "something new to wear" card. The
+        // shop has no spoon or thali sets, so the link no longer promises
+        // them. Was 'Ceremony essentials, if you are buying' to the whole
+        // shop ('pp_products'), "Silver spoon sets, outfits, thali sets.
+        // Compare before you buy.", kept for revert.
+        PpLink('Soft cotton clothes for the day',
+            surfaceId: 'pp_products/pvs_organic_cotton_onesies',
+            blurb: 'Something new and soft to wear. Wash it once before the '
+                'day.'),
+        PpLink('The naming in your first forty days',
+            surfaceId: 'pp_page/parenting_first_40/f40_ceremonies',
+            blurb: 'Crowds, kisses, and when it is safe, from the First 40 '
+                'door.'),
         PpLink('How to keep it small', pageId: 'keeping_it_small'),
         // [single-source] The short line above stays word for word; the full
         // newborn-gathering block lives once, on "On the day: blades,
@@ -708,6 +758,8 @@ final PpArea _welcome = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'jhula',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['newborn'],
       title: 'The cradle ceremony (jhula)',
       subtitle: 'The day your baby first goes into the cradle',
       format: 'CEREMONY',
@@ -810,10 +862,25 @@ final PpArea _welcome = PpArea(
           kind: PpCalloutKind.safety,
           title: 'Gently, always',
         ),
-        PpIndiaNote('A cloth swing cradle tied to a beam is what most of India uses, '
-            'and it works. The safety points are the same as any cot: firm '
-            'surface, baby on the back, nothing loose. A cloth swing is as good a '
-            'place to sleep as an imported cot.'),
+        // TR2 (follows Sleep's SL7): the jhula is for rocking and watched
+        // naps; sleep without you is flat, on the back. It says what Sleep's
+        // `jhula_safety` says, and links it rather than restating it. Copy
+        // from 10-traditions-content.md §1, in this page's "your baby" voice.
+        // REQUIRED_REVIEW: the same paediatrician who reads Sleep's jhula
+        // page (AAP Safe Sleep 2022, suspended and inclined sleepers).
+        // Was, kept for revert:
+        // PpIndiaNote('A cloth swing cradle tied to a beam is what most of India uses, '
+        //     'and it works. The safety points are the same as any cot: firm '
+        //     'surface, baby on the back, nothing loose. A cloth swing is as good a '
+        //     'place to sleep as an imported cot.'),
+        PpIndiaNote('The cloth jhula tied to a beam is how most of India has '
+            'rocked its babies, and the rocking really does calm them. Use it '
+            'for soothing and for naps while someone is right there. Once your '
+            'baby is deeply asleep and you\'re leaving the room, move your baby '
+            'onto a flat, firm surface, on the back: a cot, a bassinet or a '
+            'firm mattress on the floor. In a deep cloth swing the chin can '
+            'drop to the chest, and that can narrow the airway without a '
+            'sound.'),
         PpVideoSlot(
           title: 'The cradle ceremony, and setting the cloth swing up safely',
           subtitle: 'How it\'s done, and the three checks before your baby goes in.',
@@ -821,6 +888,15 @@ final PpArea _welcome = PpArea(
           slotId: 'traditions/jhula',
         ),
         PpLink('The naming ceremony, if you are doing both together', pageId: 'namkaran'),
+        // TR2 / TR4: the three jhula pages link each other.
+        PpLink('The cradle and the saree swing, for sleep',
+            surfaceId: 'pp_page/parenting_sleep/jhula_safety',
+            blurb: 'What is for soothing, and what is for sleep, from the '
+                'Sleep door.'),
+        PpLink('The jhula in the first weeks',
+            surfaceId: 'pp_page/parenting_first_40/f40_jhula',
+            blurb: 'Carrying your baby, and the cloth swing, from the First 40 '
+                'door.'),
         PpLink('Lullabies and sleep sounds',
             surfaceId: 'pp_sleep_sounds',
             blurb: 'Lullabies, white noise and soft ragas, with a timer.'),
@@ -832,6 +908,8 @@ final PpArea _welcome = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'nishkramana',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['newborn'],
       title: 'The first outing (nishkramana)',
       subtitle: 'Your baby\'s first time out of the house',
       format: 'CEREMONY',
@@ -977,6 +1055,8 @@ final PpArea _firstMeal = PpArea(
   pages: [
     PpPage(
       id: 'annaprashan',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['half_year'],
       title: 'The first rice feeding (annaprashan)',
       subtitle: 'The first grain, usually around six months',
       format: 'CEREMONY',
@@ -1123,20 +1203,25 @@ final PpArea _firstMeal = PpArea(
         ),
         PpLink('What to feed, on the day and after',
             pageId: 'annaprashan_food'),
+        // TR4: Feeding's first-foods page (was 'pp_feeding', kept for revert).
         PpLink('Starting solids, step by step',
-            surfaceId: 'pp_feeding',
+            surfaceId: 'pp_page/parenting_feeding/solids_first_foods',
             blurb: 'Textures, portions, first foods and how the first month '
                 'of solids usually goes.'),
         PpLink('Recipes for the first year',
             surfaceId: 'pp_food',
             blurb: 'Age matched Indian recipes, with textures.'),
-        PpLink('Thali sets, silver spoons and outfits',
-            surfaceId: 'pp_products',
-            blurb: 'Ceremony essentials, compared before you buy.'),
+        // TR4: dropped. It opened the whole shop, which has no thali sets or
+        // silver spoons. Kept for revert:
+        // PpLink('Thali sets, silver spoons and outfits',
+        //     surfaceId: 'pp_products',
+        //     blurb: 'Ceremony essentials, compared before you buy.'),
       ],
     ),
     PpPage(
       id: 'annaprashan_food',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['half_year'],
       title: 'What to feed, on the day and after',
       subtitle: 'The ceremony food, and the real food that follows it',
       format: 'CARDS',
@@ -1224,7 +1309,9 @@ final PpArea _firstMeal = PpArea(
             'ask for the baby\'s portion to be lifted out before the sugar and '
             'honey go in. It\'s an easy thing to ask in advance, and an awkward '
             'one to say in front of everyone on the day.'),
-        PpLink('Starting solids, step by step', surfaceId: 'pp_feeding'),
+        // TR4: Feeding's first-foods page (was 'pp_feeding', kept for revert).
+        PpLink('Starting solids, step by step',
+            surfaceId: 'pp_page/parenting_feeding/solids_first_foods'),
         PpLink('Recipes matched to your baby\'s age', surfaceId: 'pp_food'),
         PpLink('The first rice feeding, the ceremony itself', pageId: 'annaprashan'),
       ],
@@ -1248,6 +1335,8 @@ final PpArea _milestones = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'mundan',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['half_year', 'first_years'],
       title: 'The first head shaving (mundan)',
       subtitle: 'Usually in the first or third year',
       format: 'CEREMONY',
@@ -1392,6 +1481,8 @@ final PpArea _milestones = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'karnavedha',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['half_year', 'first_years'],
       title: 'Ear piercing (karnavedha)',
       subtitle: 'For girls and, in many families, for boys',
       format: 'CEREMONY',
@@ -1532,6 +1623,8 @@ final PpArea _milestones = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'first_birthday',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['half_year', 'first_years'],
       title: 'The first birthday',
       subtitle: 'The modern milestone, and how to keep it about your child',
       format: 'CEREMONY',
@@ -1639,6 +1732,8 @@ final PpArea _milestones = PpArea(
     // -------------------------------------------------------------------------
     PpPage(
       id: 'aksharabhyasam',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['first_years', 'older'],
       title: 'The first letters (aksharabhyasam)',
       subtitle: 'The start of learning, usually between two and five',
       format: 'CEREMONY',
@@ -1762,6 +1857,8 @@ final PpArea _otherFaiths = PpArea(
   pages: [
     PpPage(
       id: 'aqiqah',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['newborn'],
       title: 'Aqiqah, and naming in a Muslim family',
       subtitle: 'Usually around the seventh day',
       format: 'CEREMONY',
@@ -1867,6 +1964,8 @@ final PpArea _otherFaiths = PpArea(
     ),
     PpPage(
       id: 'tahneek',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['newborn'],
       title: 'Tahneek, the first sweet taste',
       subtitle: 'In the first days after birth',
       format: 'CEREMONY',
@@ -1953,6 +2052,8 @@ final PpArea _otherFaiths = PpArea(
     ),
     PpPage(
       id: 'christening',
+      // TR1: its own age; passed, it folds under "Earlier".
+      bands: ['newborn'],
       title: 'Baptism, christening and dedication',
       subtitle: 'In Christian families',
       format: 'CEREMONY',
@@ -2166,13 +2267,18 @@ final PpArea _otherFaiths = PpArea(
     ),
     PpPage(
       id: 'jain_parsi',
-      title: 'Welcomes in Jain and Parsi families',
+      // TR5: Buddhist families had no page. Was 'Welcomes in Jain and Parsi
+      // families', kept for revert.
+      title: 'Jain, Parsi and Buddhist welcomes',
       subtitle: 'Naming, and the ceremonies that come later',
       format: 'CEREMONY',
       blocks: [
-        PpIntro('Jain and Parsi families each have their own welcome for a new '
-            'baby, and both are quieter than the ceremonies around them. Here '
-            'is what each usually involves.'),
+        // Was 'Jain and Parsi families each have their own welcome for a new
+        // baby, and both are quieter than the ceremonies around them. Here is
+        // what each usually involves.', kept for revert.
+        PpIntro('Jain, Parsi and Buddhist families each have their own welcome '
+            'for a new baby, and all three are quieter than the ceremonies '
+            'around them. Here is what each usually involves.'),
         PpArticle(
           heading: 'In a Jain family',
           [
@@ -2199,6 +2305,20 @@ final PpArea _otherFaiths = PpArea(
             'when the child receives the sudreh and kusti. This, rather than '
             'the first birthday, is the milestone families save and plan '
             'for.',
+          ],
+        ),
+        // TR5: a short Buddhist welcome (10-traditions-content.md §4).
+        // REQUIRED_REVIEW by a member of the community: the monastery or
+        // vihara visit, the white thread, the monk or elder helping with the
+        // name. The thread line follows the newborn customs page.
+        PpArticle(
+          heading: 'A Buddhist welcome',
+          [
+            'Many Buddhist families take the baby to a monastery or vihara in '
+            'the first months. A monk or elder offers blessings, sometimes '
+            'ties a white thread on the wrist, and may help choose a name.',
+            'As with any thread, keep it loose and take it off for sleep. The '
+            'newborn customs page says why.',
           ],
         ),
         PpWhenLine('Jain naming: usually day ten to twelve. Parsi naming: in '
@@ -2381,10 +2501,12 @@ final PpArea _keepItSmall = PpArea(
         PpLink('How to keep it small', pageId: 'keeping_it_small'),
         PpLink('What to say when family wants it bigger',
             pageId: 'family_pressure'),
-        PpLink('Ceremony essentials, compared',
-            surfaceId: 'pp_products',
-            blurb: 'Thali sets, spoons and outfits, side by side before you '
-                'buy.'),
+        // TR4: dropped. It opened the whole shop, which has no thali sets or
+        // spoons. Kept for revert:
+        // PpLink('Ceremony essentials, compared',
+        //     surfaceId: 'pp_products',
+        //     blurb: 'Thali sets, spoons and outfits, side by side before you '
+        //         'buy.'),
       ],
     ),
     PpPage(
@@ -2590,6 +2712,9 @@ final PpArea _keepItSmall = PpArea(
         // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
         // REQUIRED_REVIEW.
         // ⚠️ THE BRIEF ASKS FOR THE USER'S SIGN-OFF ON TONE BEFORE THIS SHIPS.
+        // TR-Q (door 10): the text was approved 2026-10-25 ("Fine, with your
+        // two changes", both on mother_kept_apart, made). The read on the
+        // phone is still owed (BEFORE-LAUNCH.md). Keep this marker until then.
         PpIntro('Some families choose not to hold a naming, head shaving or other '
             'ceremony, for reasons of faith, money, health, distance or plain '
             'preference. Yes, that is alright. A ceremony that doesn\'t happen '
@@ -2635,6 +2760,35 @@ final PpArea _keepItSmall = PpArea(
           PpCard('Holding the new baby', 'Wash your hands first, and wait to be '
               'offered.'),
         ]),
+        // TR6: written out (10-traditions-content.md §5); the four cards above
+        // stay. REQUIRED_REVIEW: nothing but milk before six months, honey
+        // before one year, smoke near young babies.
+        PpCards(heading: 'If you\'re bringing your own baby', [
+          PpCard('Before you go', 'Feed your baby before you leave, and carry a '
+              'muslin and a change of clothes.'),
+          PpCard('When you get there', 'Find a quiet room early. It\'s fine to '
+              'keep your baby in your arms rather than passed around.'),
+        ]),
+        PpCards(heading: 'Feeding the new baby', [
+          PpCard('Offer nothing to eat or drink', 'Not even water or a sweet. '
+              'That\'s the parents\' call, and before six months only milk is '
+              'safe.'),
+          PpCard('If someone else does', 'A quiet "I\'ll leave the honey for '
+              'later" helps.'),
+        ]),
+        PpCards(heading: 'Smoke, crackers and the fire ritual (havan)', [
+          PpCard('Sit away from it', 'Keep away from the havan smoke and the '
+              'crackers, and step outside with your baby if it gets thick.'),
+        ]),
+        PpCards(heading: 'Leaving', [
+          PpCard('Before anyone is overtired', 'Say your blessing and go before '
+              'the new baby, or yours, gets overtired. That\'s the kind '
+              'thing.'),
+        ]),
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kisses on the face, and the '
+                'fever that means a doctor today.'),
       ],
     ),
     PpPage(
@@ -2870,6 +3024,48 @@ final PpArea _notSafe = PpArea(
                 'is very treatable when picked up early.'),
           ],
         ),
+        // TR3, "Malish and the oil" (10-traditions-content.md §2), the most
+        // searched question in this door (491). The comparison lives once, on
+        // First 40's `f40_which_oil` (FD12), whose mustard row says what this
+        // says; the steps live on Sleep's `malish`.
+        // REQUIRED_REVIEW (paediatrician): mustard oil and the newborn skin
+        // barrier (Darmstadt et al.; the Indian neonatal trials), sunflower
+        // and cold-pressed coconut as gentler choices (WHO newborn skin
+        // care), the patch test, nothing in ears, nose or eyes, oil off the
+        // cord until healed, warming in the palms.
+        PpCards(
+          heading: 'Malish and the oil',
+          hue: 24,
+          [
+            PpCard('Malish is good for your baby',
+                'For closeness, calm and sleep. Warm hands matter more than the '
+                'oil.'),
+            PpCard('Mustard oil is best kept off a newborn\'s skin',
+                'It\'s traditional and warming, but it can irritate young skin. '
+                'Studies in India found it can weaken the skin\'s barrier in '
+                'the first weeks. Many families keep it for the mother\'s own '
+                'massage.'),
+            PpCard('What to use instead',
+                'A plain, fragrance-free oil, like cold-pressed coconut or '
+                'sunflower oil. Test a little on your baby\'s leg first and '
+                'wait a day.'),
+            PpCard('Never in the ears, nose or eyes',
+                'And keep oil off the cord until it has dropped off and '
+                'healed.'),
+            PpCard('Warm, never hot',
+                'Warm it between your palms, never on the stove. Test it on '
+                'your wrist.'),
+          ],
+        ),
+        PpLink('Which massage oil?',
+            surfaceId: 'pp_page/parenting_first_40/f40_which_oil',
+            blurb: 'Every usual oil compared, from the First 40 door.'),
+        PpLink('How to do malish, step by step',
+            surfaceId: 'pp_page/parenting_sleep/malish',
+            blurb: 'Massage before sleep, from the Sleep door.'),
+        PpLink('Malish in the first forty days',
+            surfaceId: 'pp_page/parenting_first_40/f40_malish',
+            blurb: 'Which oil, how warm, which order, how long.'),
         PpCallout(
           'One rule covers most of this list. In the first six months, '
           'nothing goes into a baby\'s mouth, eyes, ears, nose or navel except '
@@ -2887,11 +3083,19 @@ final PpArea _notSafe = PpArea(
           kind: PpCalloutKind.doctor,
           title: 'If something on this page has already been done',
         ),
-        PpIndiaNote('Most of the old ways are still good. Massage with warm '
-            'oil, being carried a lot, cosleeping, the cloth swing, carom seed water for '
-            'the mother, ghee in food from six months. This page is a short '
-            'list of exceptions. It says nothing about how well your family '
-            'raises children.'),
+        // TR2: the jhula as Sleep says it (for rocking, while you're there),
+        // and co-sleeping off the list: Sleep's bed-sharing page owns it, with
+        // its harm-reduction steps. Was, kept for revert:
+        // PpIndiaNote('Most of the old ways are still good. Massage with warm '
+        //     'oil, being carried a lot, cosleeping, the cloth swing, carom seed water for '
+        //     'the mother, ghee in food from six months. This page is a short '
+        //     'list of exceptions. It says nothing about how well your family '
+        //     'raises children.'),
+        PpIndiaNote('Most of the old ways are still good. Malish, being carried '
+            'a lot, rocking in the jhula while you\'re with your baby, carom '
+            'seed water for the mother, ghee in food from six months. This page '
+            'is a short list of exceptions. It says nothing about how well your '
+            'family raises children.'),
         PpVideoSlot(
           title: 'Kohl, honey and the cord, explained calmly',
           subtitle: 'The five minute version to watch together with a '
@@ -2903,6 +3107,10 @@ final PpArea _notSafe = PpArea(
             surfaceId: 'pp_nuskhe',
             blurb: 'The home remedies, with an honest note on each.'),
         PpLink('What to say, without a fight', pageId: 'family_pressure'),
+        // TR4: First 40's twin, which links back here.
+        PpLink('The old practices in the first forty days',
+            surfaceId: 'pp_page/parenting_first_40/f40_folk_practices',
+            blurb: 'Which help and which harm, from the First 40 door.'),
       ],
     ),
     PpPage(
@@ -3033,6 +3241,9 @@ final PpArea _notSafe = PpArea(
         // Written 2026-10-02 (parenting gap analysis), filling the scaffold.
         // REQUIRED_REVIEW.
         // ⚠️ THE BRIEF ASKS FOR THE USER'S SIGN-OFF ON TONE BEFORE THIS SHIPS.
+        // TR-Q (door 10): the text was approved 2026-10-25 ("Fine, with your
+        // two changes", both on mother_kept_apart, made). The read on the
+        // phone is still owed (BEFORE-LAUNCH.md). Keep this marker until then.
         PpIntro('In some families, a new mother is kept apart for a time after '
             'birth. She may not enter the kitchen or the puja room, touch '
             'certain things, or rest with the family. For some mothers this rest '
@@ -3051,15 +3262,25 @@ final PpArea _notSafe = PpArea(
               'without being cut off.',
         ]),
         PpScript(heading: 'Words that keep the peace', [
+          // TR-Q, the user's change (2026-10-25). Was 'Can my husband sit with
+          // me and the baby in the evenings?', kept for revert.
           PpScriptLine(
-              say: 'I love that you want me to rest. Can my husband sit with me and '
-                  'the baby in the evenings?',
+              say: 'I love that you want me to rest. Can my husband or my mother '
+                  'sit with me and the baby in the evenings?',
               why: 'Keeps the care, eases the isolation.'),
         ]),
         PpCallout('If feeling apart is leaving you low, tearful or anxious most '
             'days, talk to your doctor. The custom matters less here than how '
             'you are feeling.',
             kind: PpCalloutKind.doctor),
+        // TR-Q, the user's second change (2026-10-25): "the doctor note adds
+        // Tele-MANAS 14416". Its own card, after the doctor box, never inside
+        // it (BH4 rule c, the door 8 review). From the one helpline constant.
+        // REQUIRED_REVIEW (Tele-MANAS, MoHFW; the number is
+        // REQUIRED_TO_CONFIRM at the constant).
+        PpCallout('Free, any hour: $kCrisisHelplineName, '
+            '$kCrisisHelplineNumber. Trained counsellors, in your language.',
+            title: 'If there is nobody to talk to'),
       ],
     ),
   ],
@@ -3099,16 +3320,36 @@ const PpArea _firstFestivals = PpArea(
           PpCard('Diwali', 'Oil lamps out of reach, a lit lamp never on the floor, and '
               'the baby indoors and far from crackers. Loud crackers can harm small '
               'ears, and smoke is hard on small lungs.'),
-          PpCard('Holi', 'Natural colours, gently, away from the face. Keep your '
-              'baby indoors when colours and water balloons are flying.'),
+          // TR5 (10-traditions-content.md §3). REQUIRED_REVIEW: Holi colour
+          // in the eyes (AIIMS and IAP guidance), manja injuries (state
+          // advisories), bonfire distance, fasting in Ramzan while
+          // breastfeeding (NHS; Islamic Medical Association guidance).
+          // Was 'Natural colours, gently, away from the face. Keep your baby
+          // indoors when colours and water balloons are flying.', kept for
+          // revert.
+          PpCard('Holi', 'Use dry, skin-safe colours, keep them away from your '
+              'baby\'s face, and oil the skin and hair first. If colour gets in '
+              'the eyes, rinse with clean running water for several minutes. '
+              'See a doctor if the eye stays red or painful.'),
+          PpCard('Makar Sankranti and kites', 'Manja, the glass-coated kite '
+              'string, cuts. Keep small children off rooftops while kites fly. '
+              'Put a guard on the scooter, or a scarf at the neck, if your '
+              'child rides in front.'),
+          PpCard('Lohri and bonfires', 'Keep your baby well back and held. Watch '
+              'loose dupattas and synthetic clothes near the flames.'),
           PpCard('Eid and big family meals', 'Lots of hands want a cuddle. Wash '
               'hands, and no sweets or honey before one.'),
           PpCard('Christmas and New Year', 'Small decorations, tinsel and batteries '
               'out of reach.'),
           PpCard('Raksha Bandhan', 'A soft thread on the wrist, loose, and taken '
               'off for sleep.'),
-          PpCard('If you are fasting while breastfeeding', 'Eat and drink well in '
-              'the hours you can, and break the fast if you feel dizzy.'),
+          // TR5: was 'If you are fasting while breastfeeding', "Eat and drink
+          // well in the hours you can, and break the fast if you feel
+          // dizzy.", kept for revert.
+          PpCard('Ramzan while breastfeeding', 'Many mothers fast, and many are '
+              'exempt. Talk to your doctor first. Drink plenty of water between '
+              'iftar and sehri. Stop if you feel dizzy, or if your milk or your '
+              'baby\'s wet nappies drop.'),
         ]),
         PpLink('Diwali, Holi and kite season, safely',
             surfaceId: 'pp_page/parenting_safety/safety_festivals'),
