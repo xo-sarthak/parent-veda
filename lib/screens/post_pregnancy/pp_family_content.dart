@@ -14,8 +14,19 @@
 //  ⚠️ NO BANDS ON MOST PAGES. A second pregnancy, a father's low mood or a
 //  grandmother's advice is not tied to the child's age. Where a page plainly
 //  is (tandem feeding, settling into a creche), it says so.
+//
+//  Door 13 (2026-10-26, `docs/pp-door-plans/13-family.md`): the fathers'
+//  newborn pages tagged to the first year, tandem feeding from one (FM1);
+//  every page linked to the door that answers the next question (FM2); two
+//  short pages, "You two, after the baby" and "Doing it on your own", that
+//  hold only what You, Maa's people pages do not (FM3); the Care tab links
+//  You, Maa's back-to-work pages and writes none of its own (FM6). Five areas,
+//  18 pages. Tele-MANAS is always its own card, read from the constant.
+//  `test/pp_family_door_test.dart` holds it.
 // =============================================================================
 
+import '../../data/mind_mood_data.dart'
+    show kCrisisHelplineName, kCrisisHelplineNumber, kEmergencyNumber;
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_age_bands.dart';
 import 'pp_content.dart';
@@ -85,6 +96,11 @@ final PpSection kPpFamilySection = PpSection(
             PpIndiaNote('Grandparents sometimes tease, "Now no one will love '
                 'you." It\'s meant as a joke and lands as a fear. A gentle '
                 'word with them in advance saves a lot of tears.'),
+            // FM2: the kids shelf on its own screen, New Sibling chosen
+            // (BHO4). Never the whole library.
+            PpLink('Picture books about a new baby',
+                surfaceId: 'pp_books/New sibling',
+                blurb: 'Books to read together, while you wait.'),
           ],
         ),
         PpPage(
@@ -115,6 +131,13 @@ final PpSection kPpFamilySection = PpSection(
             ]),
             PpWhenLine('Start a month or two before your due date. Keep the '
                 'favourite routines exactly the same through the change.'),
+            // FM2: the days in hospital are often the first time apart.
+            // Behaviour owns separation.
+            PpLink('My child cries every time I leave',
+                surfaceId: 'pp_page/parenting_behaviour/separation',
+                blurb: 'If the days you are in hospital worry you.'),
+            PpLink('Picture books about a new baby',
+                surfaceId: 'pp_books/New sibling'),
           ],
         ),
         PpPage(
@@ -201,6 +224,8 @@ final PpSection kPpFamilySection = PpSection(
           id: 'fam_tandem_feeding',
           title: 'Breastfeeding while pregnant, and feeding two',
           subtitle: 'Tandem feeding, honestly',
+          // FM1: an older child still feeding is one or more.
+          bands: ['toddler_1', 'toddler_2', 'preschool'],
           format: 'ARTICLE',
           blocks: [
             PpIntro('Some mothers are still breastfeeding when they find '
@@ -230,6 +255,12 @@ final PpSection kPpFamilySection = PpSection(
                 'miscarriage or early labour before, bleeding or pain in '
                 'this pregnancy, or if you are carrying twins.',
                 kind: PpCalloutKind.doctor),
+            // FM2: Feeding owns the latch and the supply.
+            PpLink('Getting the latch right',
+                surfaceId: 'pp_page/parenting_feeding/bf_latch',
+                blurb: 'For the newborn, from the first feed.'),
+            PpLink('Making enough milk, and keeping it',
+                surfaceId: 'pp_page/parenting_feeding/bf_supply'),
           ],
         ),
       ],
@@ -242,7 +273,11 @@ final PpSection kPpFamilySection = PpSection(
       id: 'fathers',
       mark: IntentMark.compassMark,
       title: 'For fathers',
-      blurb: 'Your own feelings, and how to support your partner and the baby.',
+      // FM4: the tab keeps its name; the blurb names parents on their own.
+      // Kept for revert:
+      // blurb: 'Your own feelings, and how to support your partner and the baby.',
+      blurb: 'Your own feelings, how to support your partner and the baby, and '
+          'parents on their own.',
       hue: 206,
       pages: [
         PpPage(
@@ -281,10 +316,28 @@ final PpSection kPpFamilySection = PpSection(
                   'Talking therapy works well, and medicine helps when it\'s '
                       'needed.'),
             ]),
+            // FM2 / BH4 rule c: the helpline is its own card, never inside
+            // the doctor box. Kept for revert:
+            // PpCallout('If you have thoughts of harming yourself or anyone '
+            //     'else, get help today: call Tele-MANAS on 14416, free and any '
+            //     'time, or go to a hospital.',
+            //     kind: PpCalloutKind.doctor),
             PpCallout('If you have thoughts of harming yourself or anyone '
-                'else, get help today: call Tele-MANAS on 14416, free and any '
-                'time, or go to a hospital.',
+                'else, get help today: see a doctor, or go to a hospital. If '
+                'you have felt low for more than two weeks, your own doctor is '
+                'the right first step.',
                 kind: PpCalloutKind.doctor),
+            // REQUIRED_REVIEW (Tele-MANAS, MoHFW; the number is
+            // REQUIRED_TO_CONFIRM at the constant).
+            PpCallout('Free, any hour: $kCrisisHelplineName, '
+                '$kCrisisHelplineNumber. Fathers call too. Trained counsellors, '
+                'in your language.',
+                title: 'If there is nobody to talk to'),
+            // FM2: You, Maa owns the anger.
+            PpLink('The anger nobody warned me about',
+                surfaceId: 'pp_page/parenting_maternal/mind_rage',
+                blurb: 'Written for mothers. The snapping and the shame read '
+                    'the same for fathers.'),
           ],
         ),
         PpPage(
@@ -292,6 +345,7 @@ final PpSection kPpFamilySection = PpSection(
           title: 'How you can help with breastfeeding',
           subtitle: 'You can\'t breastfeed, but you can do almost everything '
               'else',
+          bands: ['infant'], // FM1: the fathers' newborn pages
           format: 'CARDS',
           blocks: [
             PpIntro('Breastfeeding goes better with a partner on the same '
@@ -321,6 +375,15 @@ final PpSection kPpFamilySection = PpSection(
                   'jobs that are yours. Closeness between you returns as '
                   'sleep returns.',
             ]),
+            // FM2: Feeding owns the latch and the supply; Behaviour's What to
+            // say owns the words for the relatives ("Stand together" above).
+            PpLink('Getting the latch right',
+                surfaceId: 'pp_page/parenting_feeding/bf_latch'),
+            PpLink('Making enough milk, and keeping it',
+                surfaceId: 'pp_page/parenting_feeding/bf_supply'),
+            PpLink('When they say "your milk isn\'t enough"',
+                surfaceId: 'pp_scripts/family_milk',
+                blurb: 'The words that back her up, without a fight.'),
           ],
         ),
         // The father strand (2026-10-07, gap analysis P1, Behind · Partner):
@@ -349,12 +412,18 @@ final PpSection kPpFamilySection = PpSection(
               PpStep('Learn the baby\'s care yourself: nappies, bath, settling.'),
               PpStep('Take one night shift each night you are home.'),
             ]),
+            // FM2: You, Maa owns the leave rules, paternity and child care
+            // leave included (Papers has no leave page, PM2).
+            PpLink('What your maternity leave entitles you to',
+                surfaceId: 'pp_page/parenting_maternal/work_your_entitlement',
+                blurb: 'Paternity leave and child care leave are on it too.'),
           ],
         ),
         PpPage(
           id: 'fam_dad_night_shift',
           title: 'The night shift',
           subtitle: 'Splitting the nights so both of you sleep',
+          bands: ['infant'], // FM1: the fathers' newborn pages
           format: 'CARDS',
           blocks: [
             PpIntro('Broken sleep is the hardest part of the early months. '
@@ -382,6 +451,7 @@ final PpSection kPpFamilySection = PpSection(
           id: 'fam_dad_bonding',
           title: 'Getting close to your baby',
           subtitle: 'The bond grows from small, everyday care',
+          bands: ['infant'], // FM1: the fathers' newborn pages
           format: 'SHORT ARTICLE',
           blocks: [
             PpIntro('Many fathers do not feel a rush of love on day one. That '
@@ -451,11 +521,80 @@ final PpSection kPpFamilySection = PpSection(
                   'Too many voices saying what she is doing wrong feeds the '
                       'worry. Be the calm one.'),
             ]),
+            // Door 13, fixed in passing (BH4 rule c): the helpline was typed
+            // inside the doctor box. Kept for revert:
+            // PpCallout('Get help today if your partner talks about self-harm or '
+            //     'harming the baby, or seems confused or not at all herself. '
+            //     'Call her doctor, go to a hospital, or call Tele-MANAS on '
+            //     '14416, free and any time.',
+            //     kind: PpCalloutKind.doctor),
             PpCallout('Get help today if your partner talks about self-harm or '
                 'harming the baby, or seems confused or not at all herself. '
-                'Call her doctor, go to a hospital, or call Tele-MANAS on '
-                '14416, free and any time.',
+                'Call her doctor, or go to a hospital.',
                 kind: PpCalloutKind.doctor),
+            // REQUIRED_REVIEW (Tele-MANAS; the number is REQUIRED_TO_CONFIRM
+            // at the constant).
+            PpCallout('Free, any hour: $kCrisisHelplineName, '
+                '$kCrisisHelplineNumber. For her, or for you. Trained '
+                'counsellors, in your language.',
+                title: 'If there is nobody to talk to'),
+          ],
+        ),
+        // FM3: "Doing it on your own". You, Maa already owns asking for help
+        // (`people_asking_for_help`) and maintenance, legal aid and the
+        // birth certificate for a mother on her own (`people_separated`), so
+        // this page holds only what those do not: a father on his own too,
+        // the small circle, the papers a single parent signs alone, one thing
+        // that's yours, and losing a partner. REQUIRED_REVIEW (legal: step 3;
+        // clinical: the doctor line).
+        PpPage(
+          id: 'fam_on_your_own',
+          title: 'Doing it on your own',
+          subtitle: 'For a single mother or father',
+          format: 'STEP-LIST',
+          blocks: [
+            PpIntro('Whether you\'re a single mother or a single father, '
+                'through choice, separation or loss, you\'re doing two '
+                'people\'s work. This page is for you.'),
+            PpSteps([
+              PpStep('Ask for help, and name it',
+                  '"Can you take the baby from 5 to 7 on Saturday" works far '
+                      'better than "let me know if I can help".'),
+              PpStep('Build a small circle',
+                  'One or two people who can come at short notice, a '
+                      'neighbour, and a parent group, online or near you.'),
+              PpStep('The papers are yours to sign',
+                  'A single parent can apply for the birth certificate, the '
+                      'child\'s Aadhaar and the passport on their own. Name a '
+                      'guardian in a will, in case anything happens to you.'),
+              PpStep('Keep one thing that\'s yours',
+                  'A walk, a call with a friend, an hour on Sunday. It is not '
+                      'a luxury; it is what keeps you going.'),
+              PpStep('If you have lost your partner',
+                  'Grief and a baby together are a lot to carry. It\'s all '
+                      'right to need help, and to take it for as long as you '
+                      'need it.'),
+            ]),
+            PpLink('Asking for help without apologising for it',
+                surfaceId: 'pp_page/parenting_maternal/people_asking_for_help'),
+            PpLink('Parenting apart: separation, divorce and new families',
+                surfaceId: 'pp_page/parenting_maternal/people_separated',
+                blurb: 'Maintenance, free legal aid, and the birth certificate '
+                    'if you are on your own from the start.'),
+            PpLink('The birth certificate: the first and most important',
+                surfaceId: 'pp_page/parenting_papers/pm_birth_certificate'),
+            PpLink('Nominees, a will, and who would care for your child',
+                surfaceId: 'pp_page/parenting_papers/pm_planning_ahead'),
+            PpCallout('If you feel low most days, can\'t sleep or eat, or '
+                'can\'t cope, talk to your doctor. It is treatable, and asking '
+                'is not failing.',
+                kind: PpCalloutKind.doctor),
+            // REQUIRED_REVIEW (Tele-MANAS; the number is REQUIRED_TO_CONFIRM
+            // at the constant).
+            PpCallout('Free, any hour: $kCrisisHelplineName, '
+                '$kCrisisHelplineNumber. Trained counsellors, in your '
+                'language.',
+                title: 'If there is nobody to talk to'),
           ],
         ),
       ],
@@ -516,6 +655,20 @@ final PpSection kPpFamilySection = PpSection(
                   why: 'Asking for help with something else makes room to '
                       'hold firm on safety.'),
             ]),
+            // FM2: Behaviour owns discipline across generations and the
+            // family scripts (BH2); Traditions owns the pressure over
+            // ceremonies.
+            PpLink('When elders discipline differently',
+                surfaceId: 'pp_page/parenting_behaviour/beh_elders'),
+            PpLink('When they say you\'re spoiling the baby',
+                surfaceId: 'pp_scripts/family_spoiling',
+                blurb: 'What to say, word for word.'),
+            PpLink('When they offer honey or gripe water',
+                surfaceId: 'pp_scripts/family_honey',
+                blurb: 'Holding firm on safety, kindly.'),
+            PpLink('What to say when family wants it bigger',
+                surfaceId: 'pp_page/parenting_traditional/family_pressure',
+                blurb: 'When the ceremonies grow past what you want.'),
           ],
         ),
         PpPage(
@@ -546,6 +699,62 @@ final PpSection kPpFamilySection = PpSection(
                 'difference. Talk to someone you trust, or call the women\'s '
                 'helpline on 181.',
                 kind: PpCalloutKind.safety),
+            // FM2: the next page, for the two of you.
+            PpLink('You two, after the baby',
+                surfaceId: 'pp_page/parenting_family/fam_you_two'),
+          ],
+        ),
+        // FM3: "You two, after the baby". You, Maa already owns dividing the
+        // work and the ten minutes a day (`people_partner`), sex, closeness
+        // and contraception (`people_intimacy`), and safety at home
+        // (`people_safe_at_home`). This page holds only what those do not:
+        // that more arguing in the first year is common, how to argue less
+        // and make up, written to both of you; and it links the rest.
+        PpPage(
+          id: 'fam_you_two',
+          title: 'You two, after the baby',
+          subtitle: 'More arguments, less time, and finding your way back',
+          format: 'CARDS',
+          blocks: [
+            PpIntro('A baby changes a couple more than almost anything. Less '
+                'sleep, less time, and two tired people. Arguing more in the '
+                'first year is very common, and so is finding your way back.'),
+            PpCards(heading: 'The fights', [
+              PpCard('Most are about three things',
+                  'Sleep, chores and the in-laws. Knowing that makes them '
+                      'feel less personal.'),
+              PpCard('One thing at a time, at a calm moment',
+                  'Not at 3am and not in front of the family. Pick one '
+                      'problem and agree one change.'),
+              PpCard('Say what you need, not what they did',
+                  '"I need two hours to sleep on Sunday" lands better than '
+                      '"you never help".'),
+              PpCard('Make up out loud',
+                  'A "sorry, I was exhausted" closes a fight. Children who see '
+                      'you make up learn that love survives an argument.'),
+            ]),
+            // REQUIRED_REVIEW (clinical: low desire while breastfeeding).
+            PpCards(heading: 'Closeness', [
+              PpCard('There is no deadline for sex',
+                  'Low desire is very common in the first year, especially '
+                      'while breastfeeding, from hormones and tiredness. '
+                      'Closeness that is not sex counts, and usually comes '
+                      'back first.'),
+            ]),
+            PpLink('Your partner, and the work that goes unseen',
+                surfaceId: 'pp_page/parenting_maternal/people_partner',
+                blurb: 'Dividing the jobs out loud, and ten minutes a day for '
+                    'the two of you.'),
+            PpLink('Sex, contraception, and the two of you',
+                surfaceId: 'pp_page/parenting_maternal/people_intimacy',
+                blurb: 'When, what helps, and why you can get pregnant before '
+                    'your period returns.'),
+            PpCallout('If there is shouting, fear, control, or anyone is '
+                'hurt, that isn\'t a normal rough patch. Call the women\'s '
+                'helpline on 181, or $kEmergencyNumber in an emergency.',
+                kind: PpCalloutKind.safety),
+            PpLink('If you are not safe at home',
+                surfaceId: 'pp_page/parenting_maternal/people_safe_at_home'),
           ],
         ),
       ],
@@ -595,6 +804,16 @@ final PpSection kPpFamilySection = PpSection(
                       'stamp our feet instead.',
                   why: 'The feeling is allowed; the hitting is not.'),
             ]),
+            // FM2: Behaviour owns the fighting and the anger, Potty the
+            // going backwards. All three link back here.
+            PpLink('The fighting between them',
+                surfaceId: 'pp_page/parenting_behaviour/siblings'),
+            PpLink('Anger, and hurting out of it',
+                surfaceId: 'pp_page/parenting_behaviour/beh_anger',
+                blurb: 'When the jealousy comes out as hitting or biting.'),
+            PpLink('It was going so well, and now it isn\'t',
+                surfaceId: 'pp_page/parenting_potty/regressions',
+                blurb: 'Accidents again after the new baby.'),
           ],
         ),
       ],
@@ -646,6 +865,24 @@ final PpSection kPpFamilySection = PpSection(
             PpIndiaNote('Under the Maternity Benefit Act, an employer with 50 '
                 'or more employees must provide a creche, and you can visit '
                 'your child there during the day. Ask your HR.'),
+            // FM6: going back to work is You, Maa's (`back_to_work`). Linked
+            // by page, so a father or a grandparent finds them too; Family
+            // writes none of its own.
+            PpArticle(heading: 'Going back to work', [
+              'Planning the return, your leave, the milk and the first week '
+                  'each have a page of their own.',
+            ]),
+            PpLink('Planning your return, starting about four weeks out',
+                surfaceId: 'pp_page/parenting_maternal/work_planning',
+                blurb: 'Including the bottle, offered by someone else.'),
+            PpLink('What your maternity leave entitles you to',
+                surfaceId: 'pp_page/parenting_maternal/work_your_entitlement'),
+            PpLink('Building a milk stash before you go back',
+                surfaceId: 'pp_page/parenting_maternal/work_milk_stash'),
+            PpLink('Pumping at work when there is no room to pump in',
+                surfaceId: 'pp_page/parenting_maternal/work_pumping_no_room'),
+            PpLink('The first week back',
+                surfaceId: 'pp_page/parenting_maternal/work_first_week'),
           ],
         ),
         PpPage(
@@ -665,6 +902,10 @@ final PpSection kPpFamilySection = PpSection(
                       'without you, building up.'),
               PpStep('Send something from home',
                   'A soft toy, or a cloth that smells of you.'),
+              // FM2 (§4 of the content file).
+              PpStep('Keep the vaccination card ready',
+                  'Most creches ask for your child\'s vaccination card before '
+                      'the first day.'),
               PpStep('Make goodbyes short and warm',
                   'A hug, "I will come after your nap", and leave. Sneaking '
                       'away makes the next goodbye harder.'),
@@ -679,6 +920,12 @@ final PpSection kPpFamilySection = PpSection(
                 'person, take it seriously. Talk to the carer and your '
                 'paediatrician.',
                 kind: PpCalloutKind.doctor),
+            // FM2: Behaviour owns separation; Health the vaccine record.
+            PpLink('My child cries every time I leave',
+                surfaceId: 'pp_page/parenting_behaviour/separation'),
+            PpLink('U-WIN: his vaccines, on the government record',
+                surfaceId: 'pp_page/parenting_health/vax_uwin',
+                blurb: 'The certificate a creche asks for, downloaded.'),
           ],
         ),
       ],

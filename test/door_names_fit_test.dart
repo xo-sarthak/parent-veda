@@ -131,7 +131,7 @@ const double kLargeText = 1.3;
 const Map<String, String> _kOwedShorterNames = {
   'parenting_potty/bumpy': 'Accidents', // 3 lines at 1.0
   'parenting_first_40/samjho': 'Your newborn', // 3 lines at 1.0
-  'parenting_family/care': 'Childcare', // 3 lines at 1.0
+  // 'parenting_family/care': 'Childcare', // door 13 (FM4): 'Care while you work'
   'parenting_feeding/cooking': 'Family cooking',
   'parenting_first_40/feeding_rest': 'Feeding and sleep',
   'parenting_papers/schemes': 'Schemes',
@@ -144,7 +144,7 @@ const Map<String, String> _kOwedShorterNames = {
   'parenting_papers/docs': 'Documents',
   // One word wider than the line at 1.3, broken mid-word.
   'parenting_health/wrong': 'Feeling unwell', // was "Something's wrong"
-  'parenting_family/grand': 'Grandma, grandpa', // was "Grandparents"
+  // 'parenting_family/grand': 'Grandma, grandpa', // door 13: 'Grandma, grandpa' (the user's word)
 };
 
 /// Manrope 700's advance widths for ASCII 32 to 126, in font units (2000 to

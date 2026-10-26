@@ -528,6 +528,17 @@ TR1 to TR8 were written 2026-10-02 (parenting gap analysis); `skip_it` and `moth
 | SPO4 | Real child psychologists | Expert | Opens the child psychologist list | `pp_experts/Child psychologist` (the attention page's consult) opens its own filtered list. The same owed people as Behaviour's BHO7 |
 | SPO5 | A therapy shelf (picture cards, chewy tools, sensory toys) | Catalogue | Not promised | No page links a shop: the therapies page says to ask the centre for a home programme, which costs nothing. Add a shelf only if a therapist picks what goes on it |
 
+### Family (parenting), door 13
+
+**Added by the door 13 build (2026-10-26, `docs/pp-door-plans/13-family.md` FM1 to FM6, "As built").** Nothing here is a coming-soon card; every row answers a tap or links nothing. (`FMO` is this door's prefix; no Skilling door uses `FM`.)
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| FMO1 | The door intro film `family/door_intro` | Film | Not slotted (S4) | **Real people only**: a child psychologist, or a real family (an older child meeting the new baby, a father on the night shift), with consent. Never animated or AI-generated. Slot it on the door when it exists |
+| FMO2 | Real child psychologists | Expert | Opens the child psychologist list | The door's closing card ("Talk to a child psychologist", `pp_experts/Child psychologist`) opens its own filtered list. The same owed people as Behaviour's BHO7 and Special care's SPO4: one set of people, three doors |
+
+No book, shop or class is promised: the one book link is the kids shelf (`pp_books/New sibling`, ten books, built), and no page links a shop or a class.
+
 ---
 
 ## Skilling
