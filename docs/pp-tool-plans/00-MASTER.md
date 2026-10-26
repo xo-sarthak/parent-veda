@@ -111,6 +111,11 @@ A finding is settled at that tool's turn, as one plan decision. **C1** (the 8 To
   | What to feed at this age `pp_food_chart` | 22 |
 - Not a fault: Sleep Sounds arms the shared player's 20-minute sleep timer on arrival, and it is meant to outlive the screen.
 
+### A 34th row, from Papers door 14 (2026-10-26)
+- The Papers door offers **Document vault** (`pp_baby_documents`, `BabyDocumentsScreen`; until now only Health home opened it), so C1 put it on the Tools tab, under Plan and keep. Its mark is the drawn form card (`TtcToolMark.pcosCheck`), the nearest drawn object to a paper; the folder is Health record's. Owed art: a folder with a lock.
+- **Found by listing it:** it does not wear the tool shell (on `_owedShell`, its own turn when the user says), and its "Add another document" button overflowed by 111px at 360dp and 1.5x (`baby_documents_screen.dart`, a label in a Row with no `Flexible`). The overflow is fixed; the shell is not.
+- **Backend:** the store (`BabyDocumentsStore`) was not audited here. The backend-done rule applies at its turn.
+
 ### T0 built (2026-10-25, with tool 01)
 `PpUseConsent` (`lib/services/pp_use_consent.dart`), `PpUseAskCard` (`lib/screens/post_pregnancy/pp_use_ask_card.dart`) and the "What ParentVeda uses" section in You › Data and privacy. First kind: `feeds`. Each later tool adds its kind to `PpUseKind` (with a `label` and a `why`), shows the card on its own screen after the first save, and gates every reader with `allows(kind)`. Answers stay on this phone until consent sync is approved.
 

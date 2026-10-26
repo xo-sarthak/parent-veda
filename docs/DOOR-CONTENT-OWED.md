@@ -539,6 +539,17 @@ TR1 to TR8 were written 2026-10-02 (parenting gap analysis); `skip_it` and `moth
 
 No book, shop or class is promised: the one book link is the kids shelf (`pp_books/New sibling`, ten books, built), and no page links a shop or a class.
 
+### Papers and money (parenting), door 14
+
+**Added by the door 14 build (2026-10-26, `docs/pp-door-plans/14-papers.md` PM1 to PM7, "As built").** Nothing here is a coming-soon card; every row answers a tap or links nothing. (`PMO` is this door's prefix; no other stage or Skilling door uses `PM`.)
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| PMO1 | The door intro film `papers/door_intro` | Film | Not slotted (S4) | **Real people only**: a parent at a municipal office or an Aadhaar centre with a baby, or someone who helps families with these forms (an anganwadi or ASHA worker), with consent. Never animated or AI-generated. Slot it on the door when it exists |
+| PMO2 | A closer hero photo | Photo | Built with a stand-in (a child on an elder's lap at home, Unsplash `awkngZALcVw`) | The plan's picture: a parent at a table with a folder of papers and a baby on their lap. Unsplash's free search found only a tablet advert, a dark desk and passports with no family. Commission or license one, Indian, warm, no brand or screen in frame |
+
+No adviser, product or class is promised: the pages send her to a fee-only adviser, her insurer or the TPA, and the government offices, none of which the app sells. The vault (`pp_baby_documents`) and the Aadhaar reminder are built.
+
 ---
 
 ## Skilling

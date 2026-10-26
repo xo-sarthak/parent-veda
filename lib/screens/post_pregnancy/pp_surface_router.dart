@@ -32,6 +32,7 @@ import 'health_doctor_visit_screen.dart';
 import 'wallet_v2_screens.dart' show WalletEmergencyCardScreen;
 import 'pp_mood_check_screen.dart';
 import 'health_home_screen.dart';
+import 'baby_documents_screen.dart';
 import 'pp_baby_food_check_screen.dart';
 import 'pp_maa_can_i_screen.dart';
 import 'pp_search.dart';
@@ -810,6 +811,9 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // What to buy › How to choose (2026-10-07).
       'pp_buying_guides' => const PpBuyingGuidesScreen(),
       'pp_doctor_visit' => const HealthDoctorVisitScreen(),
+      // Papers door 14 (PM5, 2026-10-26): the document vault, which only
+      // Health home opened. "Document vault" on the Documents tab lands here.
+      'pp_baby_documents' => const BabyDocumentsScreen(),
       'pp_fever_check' => const PpFeverCheckScreen(),
       'pp_baby_food_check' => const PpBabyFoodCheckScreen(),
       // The mother's "Can I...? while feeding" (fork 2026-10-02, taken 2026-10-07).

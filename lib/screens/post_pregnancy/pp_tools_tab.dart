@@ -219,6 +219,13 @@ List<PpToolGroup> ppToolGroups() {
       // choose" guides were reachable only from the What to buy hub.
       PpTool('Product guide', 'How to choose a car seat, cot, pram, carrier and more.', 'pp_buying_guides',
           tab: TtcTabMark.wallet, IntentMark.bagMark, words: ['buy', 'products', 'choose', 'car seat', 'pram', 'cot']),
+      // Papers door 14 (PM5, 2026-10-26): the door offers the vault, so the
+      // Tools tab lists it too (C1). The form card is the drawn mark nearest
+      // a paper; the folder is Health record's. Owed art: a folder with a
+      // lock, one day.
+      PpTool('Document vault', 'A photo or PDF of the birth certificate, Aadhaar, passport and policy.', 'pp_baby_documents',
+          tool: TtcToolMark.pcosCheck, IntentMark.reportPage,
+          words: ['documents', 'papers', 'birth certificate', 'aadhaar', 'passport', 'insurance']),
     ]),
   ];
 }

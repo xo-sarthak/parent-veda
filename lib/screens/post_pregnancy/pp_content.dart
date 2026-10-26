@@ -55,6 +55,7 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
+import 'pp_aadhaar_reminder.dart' show PpAadhaarReminderView;
 import 'pp_child_profile.dart';
 import 'pp_content_art.dart';
 import 'pp_interactive_screen.dart';
@@ -373,6 +374,15 @@ class PpLink extends PpBlock {
   /// cycle at all. An id resolved at render time can, and a bad id is catchable:
   /// `test/pp_section_test.dart` asserts every `pageId` exists in its own section.
   final String? pageId;
+}
+
+/// "Remind me before your child turns five" on the Baal Aadhaar page (Papers
+/// door 14, PM5). The date is derived from the child's profile; the logic and
+/// the words live in `pp_aadhaar_reminder.dart`. A block of its own rather
+/// than a link, because the tap sets something instead of opening a screen.
+/// The reader carries it as a custom section and draws it here.
+class PpAadhaarReminder extends PpBlock {
+  const PpAadhaarReminder();
 }
 
 /// The paid human-help offer, where a spec says to surface it.
@@ -1124,6 +1134,7 @@ class PpBlockView extends StatelessWidget {
     }
     if (b is PpLink) return _link(context, b, p);
     if (b is PpConsult) return _consult(context, b, p);
+    if (b is PpAadhaarReminder) return const PpAadhaarReminderView();
     return const SizedBox.shrink();
   }
 

@@ -37,6 +37,9 @@ const Set<String> _owedShell = {
   // 'pp_leaps', // not a tool any more: reading, out of the Tools tab (tools pass D4, 2026-10-25)
   // 'pp_scripts', // on the shell since 2026-10-26 (tools pass 29)
   // 'pp_food_chart', // on the shell since 2026-10-25 (tools pass, Food)
+  // Door-only until Papers door 14 (2026-10-26) listed it on the Tools tab
+  // (C1). Its own chrome since it was built; the shell is its own turn.
+  'pp_baby_documents',
 };
 
 void main() {

@@ -113,7 +113,10 @@ class _BabyDocumentsScreenState extends State<BabyDocumentsScreen> {
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Icon(Icons.add_rounded, size: 18, color: ppPurple),
             const SizedBox(width: 8),
-            Text(label, style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+            // Papers door 14: wraps at 360dp and 1.5x instead of running off
+            // the button (found when the vault joined the Tools tab). Was a
+            // bare Text in the Row.
+            Flexible(child: Text(label, textAlign: TextAlign.center, style: ppBody(13, color: ppPurple, w: FontWeight.w700))),
           ]),
         ),
       ));

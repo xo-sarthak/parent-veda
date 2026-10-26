@@ -134,14 +134,14 @@ const Map<String, String> _kOwedShorterNames = {
   // 'parenting_family/care': 'Childcare', // door 13 (FM4): 'Care while you work'
   'parenting_feeding/cooking': 'Family cooking',
   'parenting_first_40/feeding_rest': 'Feeding and sleep',
-  'parenting_papers/schemes': 'Schemes',
+  // 'parenting_papers/schemes': 'Schemes', // door 14: 'Schemes to claim' (the user's word)
   'parenting_potty/su_su': 'Early wees', // never "su-su" on a tab
   // 'parenting_safety/road': 'Road and heat', // door 11 (SF8): 'Travel and heat'
   // 'parenting_special_care/early': 'Born early', // door 12 (SC7): 'Preemies and NICU'
   // 'parenting_special_care/you': 'Caring for you', // door 12 (SC7): 'Looking after you'
   'parenting_maternal/people': 'Your people',
   'parenting_health/records': 'Records and checks',
-  'parenting_papers/docs': 'Documents',
+  // 'parenting_papers/docs': 'Documents', // door 14: "Child's documents" ("Documents" breaks mid-word at 1.3)
   // One word wider than the line at 1.3, broken mid-word.
   'parenting_health/wrong': 'Feeling unwell', // was "Something's wrong"
   // 'parenting_family/grand': 'Grandma, grandpa', // door 13: 'Grandma, grandpa' (the user's word)
