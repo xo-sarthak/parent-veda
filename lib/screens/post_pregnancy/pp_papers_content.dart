@@ -265,13 +265,12 @@ final PpSection kPpPapersSection = PpSection(
           id: 'pm_schemes',
           title: 'Schemes for mothers and young children',
           subtitle: 'PMMVY, anganwadi services, free vaccines and more',
-          // Door 14: a CARDS page opens as the story deck, and the deck
-          // drops every link to another door (`ppCardsAsSlides` keeps only a
-          // same-section page link), so the four PM2 links would never be
-          // seen. The reader shows the same cards and the links. Kept for
-          // revert:
-          // format: 'CARDS',
-          format: 'ARTICLE',
+          // Door 14 opened this in the reader because the story deck dropped
+          // every link to another door. The deck keeps every link now
+          // (2026-10-27, BEFORE-LAUNCH option A), so it is a story again.
+          // Kept for revert:
+          // format: 'ARTICLE',
+          format: 'CARDS',
           blocks: [
             PpIntro('Many families don\'t claim help they are entitled to, '
                 'only because no one told them. These are the main central '

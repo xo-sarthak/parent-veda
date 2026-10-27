@@ -52,6 +52,7 @@ class PpStoryScreen extends StatefulWidget {
     this.coverTitle,
     this.coverBlurb,
     this.onPage,
+    this.onSurface,
     this.dim = false,
   });
 
@@ -70,6 +71,16 @@ class PpStoryScreen extends StatefulWidget {
   /// How a linked slide opens its page. Injected, like every other navigation
   /// in `pp_content.dart`, so the screen knows nothing about the section.
   final void Function(BuildContext context, String pageId)? onPage;
+
+  /// How a slide that links anywhere else opens it: another door's page, a
+  /// tool, a shelf (`PpCarouselCard.surfaceId`). The same router callback the
+  /// reader gets, so a link behaves the same in both (2026-10-27).
+  final void Function(BuildContext context, String surfaceId)? onSurface;
+
+  /// Whether [card]'s swipe-up has somewhere to go on this screen.
+  bool opens(PpCarouselCard card) =>
+      (card.pageId != null && onPage != null) ||
+      (card.surfaceId != null && onSurface != null);
 
   @override
   State<PpStoryScreen> createState() => _PpStoryScreenState();
@@ -109,9 +120,11 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
 
   void _openLinked(BuildContext context) {
     final card = _slides[_index];
-    final id = card.pageId;
-    if (id == null || widget.onPage == null) return;
-    widget.onPage!(context, id);
+    if (card.pageId case final id? when widget.onPage != null) {
+      widget.onPage!(context, id);
+    } else if (card.surfaceId case final id? when widget.onSurface != null) {
+      widget.onSurface!(context, id);
+    }
   }
 
   double _hueFor(int i) => (widget.hue + i * 23) % 360;
@@ -127,7 +140,7 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
         ? PpStoryScreen.dimGround
         : v2BlockTint(_hueFor(_index), p);
     final card = _slides[_index];
-    final linked = card.pageId != null && widget.onPage != null;
+    final linked = widget.opens(card);
     final ink1 = widget.dim ? Colors.white : p.ink1;
     final ink2 = widget.dim ? Colors.white.withValues(alpha: 0.7) : p.ink2;
 
@@ -206,7 +219,7 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                       isCover: _hasCover && i == 0,
                       position: _hasCover ? i : i + 1,
                       count: widget.cards.length,
-                      linked: _slides[i].pageId != null && widget.onPage != null,
+                      linked: widget.opens(_slides[i]),
                     ),
                   ),
 
@@ -254,8 +267,9 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                   // test in `test/pp_sleep_door_test.dart`.
                   if (linked)
                     Positioned(
-                      left: 0,
-                      right: 0,
+                      // Side room, so a two-line label never runs edge to edge.
+                      left: 24,
+                      right: 24,
                       bottom: 18,
                       child: Center(
                         child: PvPress(child: GestureDetector(
@@ -273,11 +287,20 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                               Icon(Icons.keyboard_arrow_up_rounded,
                                   size: 18, color: p.action),
                               const SizedBox(width: 4),
-                              Text('Swipe up for the full page',
-                                  style: pvManrope(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w800,
-                                      color: p.ink1)),
+                              // A link riding on a card names where it goes;
+                              // a slide that IS the link already says so.
+                              Flexible(
+                                child: Text(
+                                    card.linkLabel == null
+                                        ? 'Swipe up for the full page'
+                                        : 'Swipe up: ${card.linkLabel}',
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                    style: pvManrope(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: p.ink1)),
+                              ),
                             ]),
                           ),
                         )),

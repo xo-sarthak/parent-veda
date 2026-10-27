@@ -313,7 +313,8 @@ final PpSection kPpSafetySection = PpSection(
                   'Food goes in sitting up, with you there.'),
             ]),
             PpLink('How to cut food so it doesn\'t cause choking',
-                surfaceId: 'pp_page/parenting_feeding/safety_choking'),
+                surfaceId: 'pp_page/parenting_feeding/safety_choking',
+                slide: 'Hard foods'),
             PpLink('If your child is choking right now',
                 surfaceId: 'pp_page/parenting_health/health_choking_response',
                 blurb: 'What to do in the first minute.'),
@@ -923,7 +924,8 @@ final PpSection kPpSafetySection = PpSection(
             PpLink('The birth certificate',
                 surfaceId: 'pp_page/parenting_papers/pm_birth_certificate'),
             PpLink('Your child\'s passport',
-                surfaceId: 'pp_page/parenting_papers/pm_passport'),
+                surfaceId: 'pp_page/parenting_papers/pm_passport',
+                slide: 'Papers'),
             // SF3: the front seat. REQUIRED_REVIEW (the two-wheeler rule says
             // what `safety_car_seat` says: CMV Rules 2022, in force 2023).
             PpCards(heading: 'The front seat', [
@@ -939,7 +941,8 @@ final PpSection kPpSafetySection = PpSection(
                       'months should not ride at all.'),
             ]),
             PpLink('Car seats, and children on two-wheelers',
-                surfaceId: 'pp_page/parenting_safety/safety_car_seat'),
+                surfaceId: 'pp_page/parenting_safety/safety_car_seat',
+                slide: 'The back seat, until about 12'),
             PpWhenLine('Keep the routine loosely: naps and meals at roughly '
                 'the usual times make arrival far easier.'),
           ],

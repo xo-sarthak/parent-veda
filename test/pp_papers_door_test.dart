@@ -183,12 +183,18 @@ void main() {
       }
     });
 
-    test('pm_schemes opens in the reader, so its links are seen', () {
-      // A CARDS page is the story deck, and the deck keeps no link to
-      // another door.
-      expect(_page('pm_schemes').format, isNot('CARDS'));
-      expect(ppCardsAsSlides(_page('pm_schemes')), isNotNull,
-          reason: 'still a story if it ever goes back; the format decides');
+    test('pm_schemes is a story again, and every link is on a slide', () {
+      // Door 14 opened it in the reader because the deck dropped links to
+      // other doors. The deck keeps every link now (2026-10-27, option A).
+      expect(_page('pm_schemes').format, 'CARDS');
+      final slides = ppCardsAsSlides(_page('pm_schemes'))!;
+      final onSlides = {
+        for (final s in slides) ?s.surfaceId,
+        for (final s in slides) ?s.pageId,
+      };
+      for (final s in _surfaces(_page('pm_schemes')).nonNulls) {
+        expect(onSlides, contains(s), reason: 'a link the story drops');
+      }
     });
 
     test('the pages that link here still do', () {

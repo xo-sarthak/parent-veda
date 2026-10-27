@@ -1035,6 +1035,7 @@ final PpArea _nightWaking = PpArea(
           'A bump on the head, first aid',
           surfaceId: 'pp_page/parenting_health/ill_head_bump',
           blurb: 'What to do in the first minutes.',
+          slide: 'Call 112 or go to hospital now if, after a bump on the head',
         ),
         PpCards(heading: 'When your child is sick', [
           PpCard('Let your child sleep more',

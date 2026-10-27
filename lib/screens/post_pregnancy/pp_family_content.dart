@@ -378,7 +378,8 @@ final PpSection kPpFamilySection = PpSection(
             // FM2: Feeding owns the latch and the supply; Behaviour's What to
             // say owns the words for the relatives ("Stand together" above).
             PpLink('Getting the latch right',
-                surfaceId: 'pp_page/parenting_feeding/bf_latch'),
+                surfaceId: 'pp_page/parenting_feeding/bf_latch',
+                slide: 'Learn the latch together'),
             PpLink('Making enough milk, and keeping it',
                 surfaceId: 'pp_page/parenting_feeding/bf_supply'),
             PpLink('When they say "your milk isn\'t enough"',
@@ -748,13 +749,15 @@ final PpSection kPpFamilySection = PpSection(
             PpLink('Sex, contraception, and the two of you',
                 surfaceId: 'pp_page/parenting_maternal/people_intimacy',
                 blurb: 'When, what helps, and why you can get pregnant before '
-                    'your period returns.'),
+                    'your period returns.',
+                slide: 'There is no deadline for sex'),
             PpCallout('If there is shouting, fear, control, or anyone is '
                 'hurt, that isn\'t a normal rough patch. Call the women\'s '
                 'helpline on 181, or $kEmergencyNumber in an emergency.',
                 kind: PpCalloutKind.safety),
             PpLink('If you are not safe at home',
-                surfaceId: 'pp_page/parenting_maternal/people_safe_at_home'),
+                surfaceId: 'pp_page/parenting_maternal/people_safe_at_home',
+                slide: 'For safety'),
           ],
         ),
       ],

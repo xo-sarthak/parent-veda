@@ -126,6 +126,9 @@ Widget ppPageScreen(
           coverTitle: page.title,
           coverBlurb: page.subtitle ?? intro?.text,
           onPage: openById,
+          // Links to another door, a tool or a shelf, opened as the reader
+          // opens them (2026-10-27).
+          onSurface: onSurface,
         ),
         'story',
       );

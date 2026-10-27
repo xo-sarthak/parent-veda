@@ -350,10 +350,20 @@ class PpAudioSlot extends PpBlock {
 /// findable by test rather than by tapping. A `null` surfaceId is a link that is
 /// honestly not built yet and renders as such instead of as a dead tap.
 class PpLink extends PpBlock {
-  const PpLink(this.label, {this.surfaceId, this.pageId, this.blurb});
+  const PpLink(this.label, {this.surfaceId, this.pageId, this.blurb, this.slide});
   final String label;
   final String? blurb;
   final String? surfaceId;
+
+  /// ⚠️ ON A STORY PAGE, THE SLIDE THIS LINK BELONGS TO — the exact title of
+  /// a card or callout on the same page (2026-10-27, BEFORE-LAUNCH option A).
+  /// The story deck puts the link on that slide as its swipe-up. A link that
+  /// names no slide becomes a slide of its own where it is written. Either
+  /// way no link is dropped, which the deck used to do to every link that
+  /// was not a same-section page. Ignored by the reader, which lists links.
+  /// `test/pp_story_links_test.dart` fails on a name that matches no slide,
+  /// and on two links naming one slide.
+  final String? slide;
 
   /// ⚠️ A LINK TO ANOTHER PAGE IN THE SAME SECTION.
   ///
@@ -531,22 +541,31 @@ class PpCarouselCard {
     this.title, [
     this.body = '',
   ]) : pageId = null,
+       surfaceId = null,
+       linkLabel = null,
        myth = false,
        fromMonths = null,
        toMonths = null;
 
-  /// A slide that opens a fuller page on swipe-up.
+  /// A slide that opens a fuller page on swipe-up: a sibling page by
+  /// [pageId], or anything else (another door's page, a tool, a shelf) by
+  /// [surfaceId]. One of the two.
   const PpCarouselCard.linked(
     this.title,
     this.body, {
-    required this.pageId,
+    this.pageId,
+    this.surfaceId,
+    this.linkLabel,
     this.fromMonths,
     this.toMonths,
-  }) : myth = false;
+  }) : assert(pageId != null || surfaceId != null),
+       myth = false;
 
   /// A myth stated, then what is true. The slide draws the two halves apart.
   const PpCarouselCard.myth(this.title, this.body)
       : pageId = null,
+        surfaceId = null,
+        linkLabel = null,
         myth = true,
         fromMonths = null,
         toMonths = null;
@@ -562,6 +581,16 @@ class PpCarouselCard {
 
   /// A sibling page this slide summarises.
   final String? pageId;
+
+  /// Where else the slide's swipe-up goes: a router surface id, such as
+  /// `pp_page/<section>/<page>` for another door's page.
+  final String? surfaceId;
+
+  /// What the swipe-up opens, when that is not the slide itself: the pill
+  /// reads "Swipe up: " and this label. Null on a slide that IS the link.
+  final String? linkLabel;
+
+  bool get isLinked => pageId != null || surfaceId != null;
 
   /// Title is the myth, body is the truth.
   final bool myth;
@@ -652,7 +681,9 @@ List<PpCarouselCard> ppInteractiveAsSlides(PpInteractive b) => [
 ///   · the cover is the page title and its subtitle or intro;
 ///   · every `PpCard` is a slide; a callout is a slide under its own title;
 ///     the doctor line is a slide called "When to see a doctor";
-///   · a page link becomes the linked closing slide ("Swipe up for …");
+///   · every link is a swipe-up: on the slide its `slide:` names (the pill
+///     reads "Swipe up: " and the link's label), or else a slide of its own where it is
+///     written. Same-door pages and other doors alike (2026-10-27);
 ///   · an India note rides as a slide too.
 ///
 /// Returns null when the page carries a block the deck cannot hold — a
@@ -660,7 +691,8 @@ List<PpCarouselCard> ppInteractiveAsSlides(PpInteractive b) => [
 /// reader with its cards listed, rather than losing anything.
 List<PpCarouselCard>? ppCardsAsSlides(PpPage page) {
   final slides = <PpCarouselCard>[];
-  PpCarouselCard? closing;
+  // Links that name their slide, attached once every slide exists.
+  final named = <PpLink>[];
   for (final b in page.blocks) {
     switch (b) {
       case PpIntro():
@@ -670,15 +702,7 @@ List<PpCarouselCard>? ppCardsAsSlides(PpPage page) {
           slides.add(PpCarouselCard(c.title, c.line));
         }
       case PpCallout(:final title, :final text, :final kind):
-        slides.add(PpCarouselCard(
-            title ??
-                switch (kind) {
-                  PpCalloutKind.key => 'Worth remembering',
-                  PpCalloutKind.doctor => 'Worth raising with a doctor',
-                  PpCalloutKind.myth => 'A common belief, checked',
-                  PpCalloutKind.safety => 'For safety',
-                },
-            text));
+        slides.add(PpCarouselCard(title ?? ppCalloutSlideTitle(kind), text));
       case PpWhenLine(:final text):
         slides.add(PpCarouselCard('When to see a doctor', text));
       case PpIndiaNote(:final text):
@@ -688,19 +712,45 @@ List<PpCarouselCard>? ppCardsAsSlides(PpPage page) {
         slides.addAll(b.cards);
       case PpArticle(:final heading, :final paragraphs):
         slides.add(PpCarouselCard(heading ?? page.title, paragraphs.join('\n\n')));
-      case PpLink(:final label, :final blurb, :final pageId):
-        if (pageId != null && closing == null) {
-          closing = PpCarouselCard.linked(label, blurb ?? 'Swipe up for the page',
-              pageId: pageId);
+      case PpLink(:final label, :final blurb, :final pageId, :final surfaceId):
+        // ⚠️ EVERY LINK REACHES THE DECK (2026-10-27, option A). It used to
+        // keep only the first same-section `pageId` as a closing slide, and
+        // dropped every link to another door: about fifty links on the
+        // story pages were never seen.
+        if (pageId == null && surfaceId == null) break; // nowhere to go
+        if (b.slide != null) {
+          named.add(b);
+        } else {
+          slides.add(PpCarouselCard.linked(label, blurb ?? 'Swipe up for the page',
+              pageId: pageId, surfaceId: surfaceId));
         }
       default:
         return null; // a table, a chart, a film — the deck cannot hold it
     }
   }
+  for (final l in named) {
+    final i = slides.indexWhere((s) => s.title == l.slide && !s.isLinked);
+    if (i < 0) {
+      // A name that matches no free slide still never drops the link; the
+      // test fails on it, so this is only ever a safety net.
+      slides.add(PpCarouselCard.linked(l.label, l.blurb ?? 'Swipe up for the page',
+          pageId: l.pageId, surfaceId: l.surfaceId));
+      continue;
+    }
+    slides[i] = PpCarouselCard.linked(slides[i].title, slides[i].body,
+        pageId: l.pageId, surfaceId: l.surfaceId, linkLabel: l.label);
+  }
   if (slides.isEmpty) return null;
-  if (closing != null) slides.add(closing);
   return slides;
 }
+
+/// A titleless callout's slide title, by kind.
+String ppCalloutSlideTitle(PpCalloutKind kind) => switch (kind) {
+      PpCalloutKind.key => 'Worth remembering',
+      PpCalloutKind.doctor => 'Worth raising with a doctor',
+      PpCalloutKind.myth => 'A common belief, checked',
+      PpCalloutKind.safety => 'For safety',
+    };
 
 class PpInteractiveItem {
   const PpInteractiveItem(this.title, [this.detail, this.group]);

@@ -3218,13 +3218,14 @@ final PpArea _notSafe = PpArea(
             'about the blade on the phone, tell the priest softly that the baby '
             'needs a feed first, and pick the quiet room yourself. The ceremony '
             'runs as everyone expects, and your baby is fine.'),
-        PpLink('The head shaving, in full', pageId: 'mundan'),
-        PpLink('Ear piercing (karnavedha), in full', pageId: 'karnavedha'),
+        PpLink('The head shaving, in full', pageId: 'mundan', slide: 'One fresh sealed blade, opened in front of you'),
+        PpLink('Ear piercing (karnavedha), in full', pageId: 'karnavedha', slide: 'Sterile single use needle, or a sealed sterile cartridge'),
         PpLink('What to say, without a fight', pageId: 'family_pressure'),
         // The fever line here is Health's go-now list's; one list, cross-linked.
         PpLink('The signs that mean a doctor now, in full',
             surfaceId: 'pp_page/parenting_health/health_go_now',
-            blurb: 'The canonical list, kept in Health.'),
+            blurb: 'The canonical list, kept in Health.',
+            slide: 'When to leave the ceremony and go'),
       ],
     ),
     // ⚠️ [NEW], the sensitive one (call 1, the user's call): the mother
