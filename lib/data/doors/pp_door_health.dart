@@ -252,7 +252,9 @@ final PpDoor kPpHealthDoor = PpDoor(
       hue: 268,
       areaIds: ['records', 'newborn_checks'],
       expert: PpDoorClosing(
-        label: 'Book his next check-up',
+        // Unisex, the user's word (2026-10-27). Kept for revert:
+        // label: 'Book his next check-up',
+        label: 'Book the next check-up',
         blurb: 'A paediatrician, 1:1, on video.',
         surfaceId: _kPaed,
       ),

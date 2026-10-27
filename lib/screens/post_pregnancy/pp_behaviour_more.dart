@@ -55,7 +55,8 @@ const PpArea kBehSpecific = PpArea(
   // this section. `compareMark` because this door is a lookup: a parent
   // arrives knowing the behaviour and is matching it against a list.
   mark: IntentMark.compareMark,
-  title: 'He keeps doing this one thing',
+  // Unisex (2026-10-27). Kept for revert: title: 'He keeps doing this one thing',
+  title: 'Keeps doing this one thing',
   blurb: 'Throwing, screaming, hitting out, ignoring you, whining. What each '
       'one usually means, and what to do with it tonight.',
   hue: 42,

@@ -11,7 +11,7 @@
 //
 //    Crying · the first year        the one infant area
 //    Tantrums and the ziddi years   ziddi, first tantrums and hitting, no
-//    He keeps doing this            the lookup door, screens, the habits
+//    Keeps doing this               the lookup door, screens, the habits
 //    Scared, shy or clingy          the missing half, one new area
 //    Calm and guidance              the six practices, no hitting, three to six
 //
@@ -122,7 +122,7 @@ const PpBehRightNowCard _kWhatToSay = PpBehRightNowCard(
 final PpDoor kPpBehaviourDoor = PpDoor(
   sectionId: 'parenting_behaviour',
   // BH1: a baby opens on Crying (the other four sit after it, for later);
-  // one to three on Tantrums; three to six on He keeps doing this.
+  // one to three on Tantrums; three to six on Keeps doing this.
   tabOrder: const {
     'infant': ['crying', 'tantrums', 'this_one_thing', 'scared', 'calm'],
     'toddler_1': ['tantrums', 'calm', 'scared', 'this_one_thing', 'crying'],
@@ -179,7 +179,9 @@ final PpDoor kPpBehaviourDoor = PpDoor(
     ),
     PpDoorTab(
       id: 'this_one_thing',
-      label: 'He keeps doing this',
+      // Unisex, the user's word (2026-10-27): a girl's parent read "He". Kept
+      // for revert: label: 'He keeps doing this',
+      label: 'Keeps doing this',
       icon: Icons.repeat_rounded,
       hue: 42,
       areaIds: ['specific_behaviours', 'screen_time', 'habits'],

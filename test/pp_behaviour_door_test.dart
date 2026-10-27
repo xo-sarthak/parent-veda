@@ -215,7 +215,7 @@ void main() {
         expect(find.text(t.label), findsWidgets, reason: t.id);
       }
       expect(find.text('What to say'), findsOneWidget);
-      // Door 8 (BH4): a four-year-old opens on He keeps doing this, whose
+      // Door 8 (BH4): a four-year-old opens on Keeps doing this, whose
       // child psychologist row replaces the closing card, so the tab never
       // pitches twice. Was the closing card (step 0 · S3).
       expect(find.byKey(const ValueKey('pp_door_tab_expert')), findsOneWidget);
@@ -324,7 +324,7 @@ void main() {
       }
     });
 
-    test('BH4: a child psychologist on He keeps doing this, the right specialist on each consult', () {
+    test('BH4: a child psychologist on Keeps doing this, the right specialist on each consult', () {
       final keeps = door.tabs.firstWhere((t) => t.id == 'this_one_thing');
       expect(keeps.expert!.surfaceId, 'pp_experts/Child psychologist');
       expect(door.closing!.surfaceId, 'pp_experts/Child psychologist', reason: 'the closing card stays');

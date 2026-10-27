@@ -227,8 +227,8 @@ class PpSleepTonightShelf extends StatelessWidget {
 
 /// ⚠️ ONE ROW, ON THE TAB THAT OPENS FOR HER BAND, as Sleep's Tonight is.
 /// Three tabs can host it (`kPpBehRightNowShelf/<tab id>`): Crying for a baby,
-/// Tantrums from one to three, He keeps doing this from three. It draws only
-/// where `tabOrder` lands her, so a two-year-old's He keeps doing this tab is
+/// Tantrums from one to three, Keeps doing this from three. It draws only
+/// where `tabOrder` lands her, so a two-year-old's Keeps doing this tab is
 /// pages, not the row twice.
 bool ppBehShelfShows(String surfaceId, {String? band}) {
   const prefix = '$kPpBehRightNowShelf/';
