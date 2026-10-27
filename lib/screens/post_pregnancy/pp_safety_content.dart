@@ -1147,10 +1147,46 @@ final PpSection kPpSafetySection = PpSection(
         ),
         PpPage(
           id: 'safety_dog_bites',
-          title: 'If a dog, cat or monkey bites your child',
-          subtitle: 'Wash it well, and see a doctor the same day',
+          // ⚠️ FINAL REVIEW ITEM 5 (2026-10-27): the first aid was written
+          // here and in Health's `ill_bites`, with no link either way, so the
+          // two would drift. Health owns the first aid; this page keeps the
+          // prevention and opens Health's page first. Was "If a dog, cat or
+          // monkey bites your child" / "Wash it well, and see a doctor the
+          // same day"; the first-aid blocks are kept below for revert.
+          title: 'Dog, cat and monkey bites',
+          subtitle: 'Keeping them away, and the first aid if one happens',
           format: 'STEP-LIST',
           blocks: [
+            PpIntro('Animal bites and scratches are common in Indian '
+                'neighbourhoods, and most can be prevented. If one has '
+                'already happened, the first aid comes first.'),
+            PpLink('Bitten or scratched? The first aid',
+                surfaceId: 'pp_page/parenting_health/ill_bites',
+                blurb: 'Wash for 15 minutes, then a hospital the same day '
+                    'for the rabies vaccine.'),
+            // REQUIRED_REVIEW (paediatrician): the prevention lines.
+            PpSteps(heading: 'Keeping bites away', [
+              PpStep('Teach your child to leave street dogs alone',
+                  'No touching, feeding or chasing, and never a dog that is '
+                      'eating, sleeping or with puppies.'),
+              PpStep('If a dog comes close, stand still',
+                  'Arms in, eyes down, like a tree. Running makes a dog '
+                      'chase.'),
+              PpStep('No food in hand where monkeys are',
+                  'Keep snacks in a closed bag, and balcony doors shut in '
+                      'monkey areas.'),
+              PpStep('A pet stays vaccinated',
+                  'Rabies vaccine for your dog or cat every year, and a '
+                      'grown-up nearby when a small child plays with it.'),
+              PpStep('Make it safe to tell you',
+                  'Children hide a bite for fear of a scolding or an '
+                      'injection. Ask gently after any play with animals.'),
+            ]),
+            PpCallout('Any bite or scratch that broke the skin, or a lick on '
+                'broken skin, needs the rabies vaccine the same day. '
+                'Government hospitals give it free.',
+                kind: PpCalloutKind.doctor),
+            /* The first aid, kept for revert (Health's ill_bites owns it now).
             PpIntro('Animal bites and scratches are common in Indian '
                 'neighbourhoods, and most heal well. What matters is washing '
                 'the wound properly and getting the rabies vaccine in time. '
@@ -1172,21 +1208,53 @@ final PpSection kPpSafetySection = PpSection(
                 'almost always preventable before. Go the same day; '
                 'government hospitals give the vaccine free.',
                 kind: PpCalloutKind.doctor),
+            */
+            // The street-dog sentence moved into the steps above (item 5).
             PpIndiaNote('Don\'t put chilli, oil, turmeric or lime on a bite. '
-                'Teach children not to touch street dogs, or any dog that is '
-                'eating, sleeping or with puppies.'),
+                'They don\'t stop rabies and they can infect the wound.'),
           ],
         ),
         PpPage(
           id: 'safety_snake_scorpion',
+          // ⚠️ FINAL REVIEW ITEM 5 (2026-10-27): as `safety_dog_bites`,
+          // Health's `ill_bites` owns the first aid and this page keeps the
+          // prevention. Was subtitled "Keep your child still and get to a
+          // hospital"; the first-aid blocks are kept below for revert.
           title: 'Snake and scorpion bites',
-          subtitle: 'Keep your child still and get to a hospital',
+          subtitle: 'Keeping them away, and the first aid if one happens',
           format: 'STEP-LIST',
           blocks: [
             PpIntro('Snake and scorpion bites are a real risk in many parts of '
                 'India, especially in the monsoon and in villages, farms and '
-                'new colonies. Most bites are treatable, and the hospital '
-                'matters far more than anything done at home.'),
+                'new colonies. Most can be prevented. If one has already '
+                'happened, the first aid comes first.'),
+            PpLink('Bitten or stung? The first aid',
+                surfaceId: 'pp_page/parenting_health/ill_bites',
+                blurb: 'Keep your child still, and go to a hospital now.'),
+            // REQUIRED_REVIEW (paediatrician): the prevention lines.
+            PpSteps(heading: 'Keeping them away', [
+              PpStep('Shake out shoes and clothes left outside',
+                  'Scorpions hide in them overnight.'),
+              PpStep('A torch at night, outdoors',
+                  'And no bare feet on paths and in fields after dark.'),
+              PpStep('Clear around the house',
+                  'Rubbish, long grass, woodpiles and bricks near the door '
+                      'are where snakes and scorpions shelter.'),
+              PpStep('Sleep off the floor, under a tucked-in net',
+                  'Where snakes are common, a raised bed and a net tucked '
+                      'under the mattress keep night bites away.'),
+              PpStep('No hands in dark corners',
+                  'Teach children not to reach under stones, into holes or '
+                      'behind stored things.'),
+              PpStep('Know your nearest hospital with anti-venom',
+                  'Before the monsoon. Government hospitals and primary '
+                      'health centres stock it.'),
+            ]),
+            PpCallout('Any snake bite, or a scorpion sting in a child, needs a '
+                'hospital now, even if your child seems fine at first. Call '
+                '$kAmbulanceNumber or $kEmergencyNumber.',
+                kind: PpCalloutKind.doctor),
+            /* The first aid, kept for revert (Health's ill_bites owns it now).
             PpSteps(heading: 'If a snake bites your child', [
               PpStep('Keep your child calm and still',
                   'Movement spreads venom faster. Carry your child.'),
@@ -1214,6 +1282,7 @@ final PpSection kPpSafetySection = PpSection(
             PpIndiaNote('Shake out shoes and clothes left outside, use a torch '
                 'at night, and keep the area around the house clear of '
                 'rubbish and long grass.'),
+            */
           ],
         ),
         PpPage(

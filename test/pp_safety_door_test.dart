@@ -275,6 +275,21 @@ void main() {
           contains('Keeping the mosquito away'));
     });
 
+    // Final review item 5 (2026-10-27): the bite first aid was written here
+    // and in Health's ill_bites, with no link either way.
+    test('single source: bite first aid is Health\'s ill_bites, opened first; Safety keeps prevention', () {
+      for (final id in ['safety_dog_bites', 'safety_snake_scorpion']) {
+        final p = _page(id);
+        expect(p.blocks[1], isA<PpLink>(), reason: '$id: the first aid, straight after the intro');
+        expect((p.blocks[1] as PpLink).surfaceId, 'pp_page/parenting_health/ill_bites', reason: id);
+        final headings = p.blocks.whereType<PpSteps>().map((s) => s.heading).toList();
+        expect(headings, hasLength(1), reason: '$id: one prevention list, no first-aid steps');
+        expect(headings.single, startsWith('Keeping'), reason: id);
+      }
+      expect(ppSectionFor('parenting_health')!.pageById('ill_bites')!.blocks.whereType<PpSteps>(),
+          hasLength(greaterThanOrEqualTo(3)), reason: 'Health keeps dog, snake and scorpion');
+    });
+
     test('SF4: two CPR films, the baby one Health\'s own slot; a tap says still being made', () {
       final films = [for (final p in _sf.allPages) ...p.blocks.whereType<PpVideoSlot>()];
       expect(films.map((f) => f.slotId), ['health/infant_cpr', 'safety/child_cpr']);

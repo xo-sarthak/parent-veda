@@ -323,9 +323,11 @@ void main() {
           'pp_page/parenting_feeding/bf_special_situations',
           'pp_page/parenting_first_40/f40_small_or_early',
         ],
+        // Final review item 5: the pumping link went with the blocks that
+        // repeated First 40; sc_nicu still has it.
         'sc_preemie_home': [
           'pp_page/parenting_first_40/f40_small_or_early',
-          'pp_page/parenting_feeding/bf_exclusive_pumping',
+          'pp_page/parenting_development/dev_born_early',
         ],
         'sc_parent_wellbeing': [
           'pp_page/parenting_maternal/mind_rage',
@@ -353,7 +355,11 @@ void main() {
       }
       // First 40's small-baby page still links the way in.
       expect(_surfaces(ppSectionFor('parenting_first_40')!.pageById('f40_small_or_early')!),
-          contains('pp_page/parenting_special_care/sc_preemie_home'));
+          containsAll([
+            'pp_page/parenting_special_care/sc_preemie_home',
+            // Final review item 5: the NICU link opens the NICU page.
+            'pp_page/parenting_special_care/sc_nicu',
+          ]));
     });
 
     test('Tele-MANAS is its own card, from the constant, never in a doctor box', () {

@@ -123,11 +123,57 @@ final PpSection kPpSpecialCareSection = PpSection(
         ),
         PpPage(
           id: 'sc_preemie_home',
-          title: 'Bringing a premature baby home',
-          subtitle: 'Feeds, warmth, infections and corrected age',
+          // ⚠️ FINAL REVIEW ITEM 5 (2026-10-27): warmth, feeds, infections
+          // and the go-now signs were First 40's `f40_small_or_early` written
+          // again, and First 40's NICU link opened this copy of itself. That
+          // page owns the first weeks at home; this one keeps what runs for
+          // months after a NICU stay: the eye checks and corrected age. Was
+          // "Bringing a premature baby home" / "Feeds, warmth, infections and
+          // corrected age"; the old blocks are kept below for revert.
+          title: 'After the NICU: eye checks and corrected age',
+          subtitle: 'The two things that carry on for months',
           bands: ['infant', 'toddler_1'],
           format: 'STEP-LIST',
           blocks: [
+            PpIntro('Warmth, feeds and keeping infections away in the first '
+                'weeks are on First 40\'s page for small and early babies. '
+                'Two things carry on long after a NICU stay, and this page is '
+                'about them.'),
+            // REQUIRED_REVIEW (paediatrician or neonatologist): the ROP
+            // timing, and vaccines by birth date.
+            PpSteps(heading: 'Eye checks (ROP screening)', [
+              PpStep('Babies born early or small get their eyes checked',
+                  'For ROP, retinopathy of prematurity, an eye condition of '
+                      'babies born early. The first check is usually in the '
+                      'first month, often before you leave the NICU.'),
+              PpStep('Keep every repeat check',
+                  'Until the eye doctor says the eyes have finished '
+                      'developing. Treatment works when it is given in time, '
+                      'and that window is short.'),
+              PpStep('Hearing and growth checks too',
+                  'The NICU team sets the dates. Write them on the card.'),
+            ]),
+            PpSteps(heading: 'Corrected age', [
+              PpStep('Count milestones from the due date',
+                  'A baby born two months early is, at six months, doing what '
+                      'a four-month-old does. That is on track.'),
+              PpStep('Until about two years',
+                  'By then most children born early have caught up, and you '
+                      'use the real age.'),
+              PpStep('Vaccines go by the birth date',
+                  'Not the corrected age, unless your doctor says otherwise.'),
+            ]),
+            PpCallout('If no eye check date was given at discharge, ask the '
+                'NICU or your paediatrician this week. It is easy to miss in '
+                'the rush of going home.',
+                kind: PpCalloutKind.doctor),
+            PpLink('Milestones for babies born early',
+                surfaceId: 'pp_page/parenting_development/dev_born_early',
+                blurb: 'Working out corrected age, and reading the charts.'),
+            // SC5: First 40's page links here; this is the way back.
+            PpLink('Warmth, feeds and kangaroo care at home',
+                surfaceId: 'pp_page/parenting_first_40/f40_small_or_early'),
+            /* The old page, kept for revert (final review item 5).
             PpIntro('Going home is a big step, and leaving the monitors '
                 'behind can feel scary. The NICU team only sends a baby home '
                 'when ready. These are the things that matter most in the '
@@ -161,6 +207,7 @@ final PpSection kPpSpecialCareSection = PpSection(
                 surfaceId: 'pp_page/parenting_first_40/f40_small_or_early'),
             PpLink('Pumping when your baby can\'t feed yet',
                 surfaceId: 'pp_page/parenting_feeding/bf_exclusive_pumping'),
+            */
           ],
         ),
       ],

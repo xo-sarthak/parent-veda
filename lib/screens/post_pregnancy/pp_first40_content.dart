@@ -2055,7 +2055,12 @@ final PpSection kPpFirst40Section = PpSection(
                 'breathing or pauses in breathing, turning blue, or being '
                 'unusually floppy or sleepy.',
                 kind: PpCalloutKind.doctor),
+            // Final review item 5: was sc_preemie_home, which repeated this
+            // page. The NICU link opens the NICU page; the eye checks and
+            // corrected age have their own link.
             PpLink('If your baby went to the NICU',
+                surfaceId: 'pp_page/parenting_special_care/sc_nicu'),
+            PpLink('After the NICU: eye checks and corrected age',
                 surfaceId: 'pp_page/parenting_special_care/sc_preemie_home'),
           ],
         ),
