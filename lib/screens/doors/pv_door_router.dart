@@ -40,6 +40,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/doors/pv_door_data.dart';
+import '../../widgets/pv_toast.dart' show pvToast, PvToastKind;
 import '../../data/reads/nutrition_reads.dart';
 import '../../data/reads/read_images.dart' show readImageFor;
 import '../../data/nutrition/nutrition_photos.dart' show nutritionRecipePhoto;
@@ -649,7 +650,14 @@ void openPvDoorTile(
   // that way. This is the second gate rather than the first: the honest
   // treatment is on the card, and this exists so a route can never be reached
   // by a stray semantics tap or a test driving the tile directly.
-  if (tile.comingSoon) return;
+  // Kept for revert: if (tile.comingSoon) return;
+  // Now it says why (S8, Batch 2, 2026-10-27): the card answers its tap.
+  if (tile.comingSoon) {
+    pvToast(context,
+        "This one is still being made. It will open here when it's ready.",
+        kind: PvToastKind.info);
+    return;
+  }
 
   switch (tile) {
     case PvDoorToolTile(:final surfaceId):

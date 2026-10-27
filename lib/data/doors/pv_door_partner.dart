@@ -111,6 +111,14 @@ final PvDoorPage kPartnerDoor = PvDoorPage(
       'looking after yourself too.',
   closingLine: 'ParentVeda explains and reminds. Her doctor decides, and her '
       'doctor knows her. If anything feels wrong, call them or go in.',
+  // ---- Which tab opens at his partner's week (relevance Batch 2) ----------
+  //   * to 35: Your week, which already follows her week.
+  //   * 36 on: Labour and birth. NICE NG201's 36-week appointment is where
+  //     preparing for labour and birth, and the birth partner's role, are
+  //     covered.
+  openingGroupFor: (week) =>
+      week >= 36 ? kPartnerTabBirth : kPartnerTabWeek,
+
   groups: [
     PvDoorGroup(
       id: kPartnerTabWeek,

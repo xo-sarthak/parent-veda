@@ -93,6 +93,20 @@ final PvDoorPage kGettingReadyDoor = PvDoorPage(
   closingLine: 'Take what fits your family and leave the rest. ParentVeda '
       'explains and reminds. Your doctor decides.',
 
+  // ---- Which tab opens at her week (relevance Batch 2, 2026-10-27) --------
+  //   * to 19: Baby names, the action this door leads with (GLOBAL #15).
+  //   * 20 to 31: What to buy. The NHS ("Pregnancy: what you'll need for your
+  //     baby") suggests buying in the middle months, after the anomaly scan
+  //     and before the last weeks get tiring.
+  //   * 32 on: Home and help, where "The last months" lives. The NHS advises
+  //     the hospital bag packed by about 36 weeks (earlier with twins), and
+  //     help after the birth arranged before it.
+  openingGroupFor: (week) => week >= 32
+      ? kReadyTabHome
+      : week >= 20
+          ? kReadyTabBuy
+          : kReadyTabNames,
+
   groups: [
     PvDoorGroup(
       id: kReadyTabNames,

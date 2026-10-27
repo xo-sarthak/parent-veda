@@ -125,6 +125,15 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
   closingLine: 'This helps you understand what your doctor is managing. It '
       'does not replace them.',
 
+  // ---- Which tab opens at her week (relevance Batch 2, 2026-10-27) --------
+  //  An INFORMATION door (GLOBAL #16): a frightening subject opens on the calm
+  //  explanation for where she is, not on a search box. By month, whose
+  //  sections are tagged by trimester, so hers leads (early bleeding and
+  //  sickness; then the 24-28 week glucose window; then pre-eclampsia,
+  //  movements and itching: NICE NG201, NICE NG133, RCOG GTG 43). Find a
+  //  condition stays the first tab in order, one tap away.
+  openingGroupFor: (_) => kCondTabWhen,
+
   groups: [
     // -------------------------------------------------------------------------
     //  1. Find a condition — the search screen, inline

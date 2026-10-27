@@ -273,6 +273,12 @@ quote cost in USD and INR first).
   - Test: `test/ttc_door_phase_rank_test.dart`. Not walked on a device.
 - **OWED:** tag more pregnancy doors as content is reviewed (Symptoms, Labour,
   Partner "Week by week").
+- **BUILT 2026-10-27 (relevance Batch 2):** Pregnancy doors also OPEN on her
+  week (`PvDoorPage.openingGroupFor`): Labour, Getting ready, Complications,
+  Work and money, Twins, Partner, each citing its clinical source. New tags:
+  Itching, Telling work, Maternity leave, Twins Finding out. Learn shelves
+  follow the tags. Symptoms stays untagged until its content is by trimester.
+  Test: `test/preg_door_first_view_test.dart`.
 
 ### 14 · Nutrition door pitches — LIVE (7df4711)
 

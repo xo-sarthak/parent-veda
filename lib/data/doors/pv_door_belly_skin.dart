@@ -63,6 +63,7 @@ import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import '../belly_skin_data.dart';
+import 'preg_band.dart';
 import 'pv_door_data.dart';
 
 /// Surfaces this door opens. Constants because each becomes a route NAME.
@@ -214,6 +215,7 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
     PvDoorSection(
       group: kBsTabSkin,
       heading: 'Itching',
+      weeks: PregBand(28, 42), // obstetric cholestasis is usually a third-trimester itch (RCOG GTG 43, 2022); it leads from 28 (Batch 2)
       tiles: [
         PvDoorToolTile(
           title: 'Itchy skin in pregnancy, explained',

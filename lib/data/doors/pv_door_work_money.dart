@@ -41,6 +41,7 @@ import 'package:flutter/material.dart' show Icons;
 
 import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../reads/read_images.dart' show readImageFor;
+import 'preg_band.dart';
 import 'pv_door_data.dart';
 
 /// Tab ids. Constants for the reason `pv_door_scans.dart` gives: a typo in a
@@ -66,6 +67,15 @@ final PvDoorPage kWorkMoneyDoor = PvDoorPage(
   closingLine: 'Laws, schemes and prices change. Check the details with your '
       'HR team, your insurer or your health centre, and anything about your '
       'health with your doctor.',
+
+  // ---- Which tab opens at her week (relevance Batch 2, 2026-10-27) --------
+  //   * to 27: Work, getting through the day and telling work.
+  //   * 28 on: Leave and rights. India's Maternity Benefit (Amendment) Act
+  //     2017 gives 26 weeks of paid leave, up to 8 weeks of it before the
+  //     expected delivery, so leave can begin from about week 32 and is
+  //     planned in the weeks before.
+  openingGroupFor: (week) =>
+      week >= 28 ? kWorkMoneyTabLeave : kWorkMoneyTabWork,
 
   groups: [
     PvDoorGroup(
@@ -125,6 +135,7 @@ final PvDoorPage kWorkMoneyDoor = PvDoorPage(
     PvDoorSection(
       group: kWorkMoneyTabWork,
       heading: 'Telling work, and planning your leave',
+      weeks: PregBand(12, 27), // most tell work after the 12-week scan; leave is planned before the third trimester (Batch 2)
       tiles: [
         PvDoorGuideTile(
           title: "Telling your boss you're pregnant",
@@ -145,6 +156,7 @@ final PvDoorPage kWorkMoneyDoor = PvDoorPage(
     PvDoorSection(
       group: kWorkMoneyTabLeave,
       heading: 'Your maternity leave',
+      weeks: PregBand(28, 42), // leave can start up to 8 weeks before the due date (Maternity Benefit Act) (Batch 2)
       tiles: [
         PvDoorGuideTile(
           title: 'Maternity leave: your 26 weeks',

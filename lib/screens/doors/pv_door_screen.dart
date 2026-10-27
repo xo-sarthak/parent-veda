@@ -338,8 +338,14 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
     );
   }
 
+  // A named tab wins; otherwise her week picks the opening tab when the door
+  // has a rule for it (relevance Batch 2, 2026-10-27). Kept for revert:
+  //   final id = widget.initialGroup;
+  //   if (id == null) return 0;
   late int _group = () {
-    final id = widget.initialGroup;
+    final week = _knownWeek;
+    final id = widget.initialGroup ??
+        (week == null ? null : widget.page.openingGroupFor?.call(week));
     if (id == null) return 0;
     final i = widget.page.groups.indexWhere((g) => g.id == id);
     return i < 0 ? 0 : i;

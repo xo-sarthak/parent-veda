@@ -791,7 +791,11 @@ class PvDoorSection {
     bool weekKnown = true,
     PregHistory history = PregHistory.none,
   }) {
-    final led = _leadFor(week);
+    // The lead hoist reads the week too, so it waits for a real one (Batch 2,
+    // 2026-10-27, PREG fault 2): Nutrition pulled "Food by trimester" to the
+    // second-trimester card on the week-20 stand-in. Kept for revert:
+    //   final led = _leadFor(week);
+    final led = weekKnown ? _leadFor(week) : tiles;
     final byWeek = !tilesByWeek || !weekKnown
         ? led
         : pregRelevanceOrder(led, (t) => PregBand.parse(t.meta), week);
@@ -1003,7 +1007,19 @@ class PvDoorPage {
     required this.sections,
     this.heroImageUrl,
     this.closingLine,
+    this.openingGroupFor,
   });
+
+  /// The tab the door opens on at her week, when nothing named a tab
+  /// (2026-10-27, relevance Batch 2; Parenting's `PpDoor.tabOrder` shape).
+  ///
+  /// ⚠️ OPENING ONLY, NEVER ORDER. The tabs keep their order and nothing is
+  /// hidden; a named tab (a link, a home card) still wins. Read only with a
+  /// REAL week: the week-20 stand-in opens [groups] first, as before. Each
+  /// door's function cites the clinical guidance its weeks come from, because
+  /// "which week is this for" is a medical fact, not a design choice. Null:
+  /// the first tab, always.
+  final String Function(int week)? openingGroupFor;
 
   /// Which bracket tile opens this. Matches a `Bracket.id`.
   final String bracketId;

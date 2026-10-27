@@ -24,6 +24,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/pv_door_intro_chip.dart' show PvDoorIntroChip;
 import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../services/bracket_resolver.dart';
@@ -268,6 +270,11 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
                           ),
                         ),
                       ),
+                      // GLOBAL-CHANGES #5, the one door without it (Batch 2,
+                      // 2026-10-27, PREG fault 18): the intro video chip, in
+                      // the place every other door's hero puts it.
+                      const SizedBox(height: 14),
+                      PvDoorIntroChip(p: p, onPhoto: onPhoto),
                     ],
                   ),
                 ),

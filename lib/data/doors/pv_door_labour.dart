@@ -158,6 +158,24 @@ final PvDoorPage kLabourDoor = PvDoorPage(
 
   closingLine: kLabourAreaNote,
 
+  // ---- Which tab opens at her week (relevance Batch 2, 2026-10-27) --------
+  //  Labour is an INFORMATION door before term and an ACTION door at term
+  //  (GLOBAL-CHANGES #16). The contraction timer at week 6 was a tool for a
+  //  moment months away.
+  //   * to 27: Understand the birth, what happens and the choices to make.
+  //     NICE NG201 (antenatal care, 2021) gives information on labour and
+  //     birth planning through the third trimester.
+  //   * 28 to 36: Signs and stages. Third-trimester danger signs and the signs
+  //     of preterm labour (WHO antenatal care 2016; NICE NG25 preterm labour);
+  //     NICE NG201 covers "how to recognise labour" by the 36-week visit.
+  //   * 37 on: the Contraction timer. Term begins at 37+0 (ACOG Committee
+  //     Opinion 579; WHO), when timing contractions is the thing to do.
+  openingGroupFor: (week) => week >= 37
+      ? kLabourTabTimer
+      : week >= 28
+          ? kLabourTabSigns
+          : kLabourTabBirth,
+
   groups: [
     // -------------------------------------------------------------------------
     //  1. Contraction timer — the tool, inline, and the default

@@ -52,6 +52,7 @@ import '../../models/bracket.dart';
 import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../../services/life_stage_store.dart';
 import '../reads/read_images.dart' show readImageFor;
+import 'preg_band.dart';
 import 'pv_door_data.dart';
 
 /// Tab ids. Constants for the reason `pv_door_scans.dart` gives: a typo in a
@@ -123,6 +124,19 @@ final PvDoorPage kTwinsDoor = PvDoorPage(
   heroImageUrl: readImageFor('finding_twin_pregnancy'),
   closingLine: 'ParentVeda explains and reminds. Your doctor decides, and '
       'your doctor knows your twins. If anything feels wrong, call them.',
+
+  // ---- Which tab opens at her week (relevance Batch 2, 2026-10-27) --------
+  //  NICE NG137 (twin and triplet pregnancy, 2019):
+  //   * to 19: Carrying twins, finding out and the type of twins.
+  //   * 20 to 31: Your care. Scans every 2 to 4 weeks from about 16-20 weeks
+  //     depending on chorionicity.
+  //   * 32 on: The birth. Mode and timing of birth discussed by 32 weeks;
+  //     planned birth from 36+0 (one placenta) or 37+0 (two).
+  openingGroupFor: (week) => week >= 32
+      ? kTwinsTabBirth
+      : week >= 20
+          ? kTwinsTabCare
+          : kTwinsTabCarrying,
 
   groups: [
     // -------------------------------------------------------------------------
@@ -206,6 +220,7 @@ final PvDoorPage kTwinsDoor = PvDoorPage(
     PvDoorSection(
       group: kTwinsTabCarrying,
       heading: 'Finding out',
+      weeks: PregBand.firstTrimester, // twins are usually found at the dating scan (NICE NG137) (Batch 2)
       tiles: [
         PvDoorGuideTile(
           title: "Finding out it's twins",

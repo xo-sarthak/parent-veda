@@ -133,12 +133,19 @@ bool pregLearnIsWritten(PvDoorTile t) =>
     !t.comingSoon && _kWritten.contains(t.format);
 
 /// Every door's written pieces, once each, in the door's own order.
-List<PregLearnPiece> pregLearnPiecesOf(PvDoorPage page) {
+///
+/// With her real [week], each tab's sections and tiles come in the door's own
+/// order FOR HER (relevance Batch 2, 2026-10-27, PREG fault 6): the shelf
+/// read `sectionsOf`, so at week 34 the Scans shelf led with the first three
+/// months while the door itself put the last three first. Null (no due date)
+/// is the plain order, as before. Kept for revert:
+///   for (final s in page.sectionsOf(g.id)) { for (final t in s.tiles) {
+List<PregLearnPiece> pregLearnPiecesOf(PvDoorPage page, {int? week}) {
   final seen = <String>{};
   final out = <PregLearnPiece>[];
   for (final g in page.groups) {
-    for (final s in page.sectionsOf(g.id)) {
-      for (final t in s.tiles) {
+    for (final s in page.sectionsFor(g.id, week)) {
+      for (final t in week == null ? s.tiles : s.tilesFor(week)) {
         if (!pregLearnIsWritten(t)) continue;
         final key = switch (t) {
           PvDoorGuideTile(:final readId) => 'r:$readId',
@@ -156,7 +163,7 @@ List<PregLearnPiece> pregLearnPiecesOf(PvDoorPage page) {
 
 /// Every door, the home's tiles first (in the home's order), then the two
 /// doors reached from inside others (After a loss, Twins).
-List<PregLearnTopic> pregLearnTopics() {
+List<PregLearnTopic> pregLearnTopics({int? week}) {
   final out = <PregLearnTopic>[];
   final brackets = [...kPregnancyBrackets, kPregTwinsBracket, kPregAfterLossBracket];
   for (final b in brackets) {
@@ -166,7 +173,7 @@ List<PregLearnTopic> pregLearnTopics() {
             ? kTwinsDoor
             : pvDoorPageFor(b.id);
     if (page == null && b.id != kPregIsItSafeBracketId) continue;
-    out.add(PregLearnTopic(b, page, page == null ? const [] : pregLearnPiecesOf(page)));
+    out.add(PregLearnTopic(b, page, page == null ? const [] : pregLearnPiecesOf(page, week: week)));
   }
   return out;
 }
@@ -222,7 +229,10 @@ class _PregLearnScreenState extends State<PregLearnScreen> {
   final Set<String> _expanded = {};
   final Set<int> _openFaq = {};
 
-  late final List<PregLearnTopic> _baseTopics = pregLearnTopics();
+  // Her real week orders each shelf as its door does (Batch 2). Kept for
+  // revert: late final List<PregLearnTopic> _baseTopics = pregLearnTopics();
+  late final List<PregLearnTopic> _baseTopics =
+      pregLearnTopics(week: _c.isDueDateSet ? _c.currentWeek : null);
 
   /// Twins and more leads once she has said she is carrying more than one
   /// (2026-09-30, gap analysis P2). Ranking only: every topic is still here, once.

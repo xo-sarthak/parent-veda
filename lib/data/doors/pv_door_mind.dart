@@ -193,6 +193,7 @@ PvDoorPage mindDoorVisiblePage(PvDoorPage page, {required bool hideIntimate}) {
     heroBlurb: page.heroBlurb,
     heroImageUrl: page.heroImageUrl,
     closingLine: page.closingLine,
+    openingGroupFor: page.openingGroupFor,
     groups: [
       for (final g in page.groups)
         if (g.id != kMindTabCloseness) g,
@@ -212,6 +213,13 @@ PvDoorPage mindDoorVisiblePage(PvDoorPage page, {required bool hideIntimate}) {
               strip: s.strip,
               moreSurfaceId: s.moreSurfaceId,
               railMax: s.railMax,
+              // Every field carried (Batch 2, 2026-10-27, PREG fault 17): the
+              // copy dropped the week tags and the after-loss lift, the bug
+              // GLOBAL-CHANGES #13 found in TTC's copies. Mind has none yet;
+              // the first tag added would have silently vanished here.
+              weeks: s.weeks,
+              tilesByWeek: s.tilesByWeek,
+              forAfterLoss: s.forAfterLoss,
             ),
     ],
   );

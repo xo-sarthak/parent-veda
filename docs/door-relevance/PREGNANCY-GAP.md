@@ -170,10 +170,10 @@ Already covered: back pain (1), side sleeping (35).
 
 **Wrong**
 2. **PART DONE (Batch 1, 2026-10-27):** the due date is now required: the home opens a locked due-date page (`pregNeedsDueDate`, `preg_due_date_screen.dart`) once loading has settled, never for him; developer builds keep a close button. The Store header names no week without a date. The other surfaces below become developer-only guards, fixed as their batches touch them. Was: Week 20 is treated as real on the home rails, scan card, Scans timeline, Ask Veda, Learn videos, Nutrition `lead`, the Move session, the Store header and the You screen. *Fix:* make the due date required (decision); pass `isDueDateSet ? week : null` everywhere as a guard.
-3. Doors always open on tab 0. *Fix:* add a `tabOrder` by week, like Parenting's.
-4. Labour opens on the contraction timer at weeks 6 to 24. *Fix:* signs and stages until 36, timer from 37.
-5. Getting ready opens on the name finder at week 34. *Fix:* What to buy / Home and help from week 28.
-6. Learn's door shelves ignore week tags (`preg_learn_screen.dart:140`). *Fix:* use `sectionsFor(g.id, knownWeek)`.
+3. ~~Doors always open on tab 0.~~ **DONE (Batch 2, 2026-10-27):** `PvDoorPage.openingGroupFor(week)`, read by `pv_door_screen.dart` only with a real week; a named tab still wins. Was: *Fix:* add a `tabOrder` by week, like Parenting's.
+4. ~~Labour opens on the contraction timer at weeks 6 to 24.~~ **DONE (Batch 2, 2026-10-27):** Understand the birth to 27, Signs and stages 28-36, the timer from 37 (NICE NG201, NICE NG25, WHO, ACOG CO 579). Was: *Fix:* signs and stages until 36, timer from 37.
+5. ~~Getting ready opens on the name finder at week 34.~~ **DONE (Batch 2, 2026-10-27):** names to 19, What to buy 20-31, Home and help from 32 (NHS). Also by week now: Complications always opens on By month (information door); Work and money on Leave and rights from 28 (Maternity Benefit Act); Twins on Your care 20-31 and The birth from 32 (NICE NG137); Partner on Labour and birth from 36 (NICE NG201). Scans already opened right. Was: *Fix:* What to buy / Home and help from week 28.
+6. ~~Learn's door shelves ignore week tags~~ **DONE (Batch 2, 2026-10-27):** `pregLearnPiecesOf(page, week:)` uses `sectionsFor` and `tilesFor`. Was: (`preg_learn_screen.dart:140`). *Fix:* use `sectionsFor(g.id, knownWeek)`.
 7. Past 40 weeks the hero says 41 but the rails say 40, and More > Week by week opens week 40. *Fix:* use `pregPastDueWeek` / `_pageWeek` in both.
 8. The Tools tab has the kick counter first at week 8 (`tools_hub_screen.dart:170`). *Fix:* order by week (kicks, Get ready and the timer from 28). Order only; rows stay with Terminal B.
 9. ~~"Yes I'm pregnant" accepts an old logged period without checking.~~ **ALREADY DONE (found in Batch 1):** `ttcDatingCheck` (`ttc_transition.dart:146-156`, 2026-10-22) asks when the period is over 70 days old (`stale`) or missing (`guessed`). The helper misread it. *Fix:* if that period is more than ~10 weeks old, ask for the date.
@@ -185,13 +185,13 @@ Already covered: back pain (1), side sleeping (35).
 13. The "update your due date" prompt is only in Tools. *Fix:* also show it on the home hero from week 14.
 14. Late-pregnancy products all "fit". *Fix:* rank by closeness to `weekFrom`; add `weekTo` to the sheet.
 15. No search ranks by week. *Fix:* when text scores tie, put items for her week first.
-16. Belly and skin, Work and money, and Twins are untagged. *Fix:* tag them as their content is reviewed.
-17. Mind's copy drops tags (latent). *Fix:* use `withTiles`.
-18. Is it safe? has no intro chip. *Fix:* add the chip.
+16. **PART DONE (Batch 2, 2026-10-27):** tagged Itching 28-42 (RCOG GTG 43), Telling work 12-27, Your maternity leave 28-42, Twins Finding out 1-13. **Symptoms not tagged on purpose:** its sections are by body area, not time; trimester-specific symptom guidance is content (Batch 6). Labour and Partner now open by week instead. Was: Belly and skin, Work and money, and Twins are untagged. *Fix:* tag them as their content is reviewed.
+17. ~~Mind's copy drops tags~~ **DONE (Batch 2, 2026-10-27):** `mindDoorVisiblePage` carries weeks, tilesByWeek, forAfterLoss and openingGroupFor. Was: *Fix:* use `withTiles`.
+18. ~~Is it safe? has no intro chip.~~ **DONE (Batch 2, 2026-10-27):** `PvDoorIntroChip` in the `CanIScreen` hero. Was: *Fix:* add the chip.
 19. **KEPT ON PURPOSE (Batch 1):** the developer chips are the one place the week-20 stand-in is allowed (decision §0); in a store build the home now asks for the date anyway. Was: The developer chips can enter Pregnancy with no date. *Fix:* route those cases to the dating page.
 
 **Polish**
-20. "Coming soon" video tiles are silent taps. *Fix:* the same toast as the intro chip.
+20. **PART DONE (Batch 2, 2026-10-27):** a dimmed door card now answers its tap with a toast (`pv_door_chrome.dart`, `openPvDoorTile`). Still silent: `PvShelfCard` (Learn and other shelves, 14 callers across stages) — left for Batch 4 because a shared card change needs every caller checked. Was: "Coming soon" video tiles are silent taps. *Fix:* the same toast as the intro chip.
 21. Tab names are probably cut off. *Fix:* two lines plus a label-fit test like TTC's.
 22. "Tools for this week" shows over her own history. *Fix:* change the title when it shows history.
 23. The week page has a stale lock comment and no estimate notice. *Fix:* correct the comment; add the notice (only a guard once the date is required).

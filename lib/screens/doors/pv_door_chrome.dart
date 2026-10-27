@@ -364,8 +364,13 @@ class PvDoorRailCard extends StatelessWidget {
         .toColor();
     final onPhoto = imageUrl != null && imageUrl!.isNotEmpty;
 
+    // ⚠️ A DIMMED CARD STILL ANSWERS A TAP (S8 "no silent tap", Batch 2,
+    // 2026-10-27, PREG fault 20): the tap reaches `openPvDoorTile`, which
+    // says the piece is being made. Dimming is the honest look; silence was
+    // not. Only the pregnancy door passes dimmed: true. Kept for revert:
+    //   onTap: dimmed ? null : onTap,
     return InkWell(
-      onTap: dimmed ? null : onTap,
+      onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Opacity(
         opacity: dimmed ? 0.62 : 1,
