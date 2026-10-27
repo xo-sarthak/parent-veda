@@ -2,7 +2,7 @@
 
 **What this is:** making the whole app follow where she is: her pregnancy week, her cycle phase or clinic step, or her child's age. A user at week 20 never sees week-1 material. Irrelevant things never crowd out what she needs now.
 
-**Status (update this line every time a batch lands):** analysis 395ee74, plan 52aa2d2. **Batch 1 COMMITTED fe1a831 for Pregnancy and TTC (2026-10-27)** (Parenting parked by the user until the very end). **Batch 2 COMMITTED ab21531 (Pregnancy doors open on her week).** **Batch 3 BUILT 2026-10-27 (TTC doors open on the right kind; two long explainers).** **Next: Batch 4 (homes and other screens).** Terminal B: week-dependent tool builds are unblocked once Batch 1 is committed.
+**Status (update this line every time a batch lands):** analysis 395ee74, plan 52aa2d2. **Batch 1 COMMITTED fe1a831 for Pregnancy and TTC (2026-10-27)** (Parenting parked by the user until the very end). **Batch 2 COMMITTED ab21531 (Pregnancy doors open on her week).** **Batch 3 COMMITTED 0b5823e (TTC doors open on the right kind; two long explainers).** **Next: Batch 4 (homes and other screens).** Terminal B: week-dependent tool builds are unblocked once Batch 1 is committed.
 
 ## How to resume (any new session)
 1. Read `CLAUDE.md`, then this file, then the gap file for the stage you're working on:
