@@ -1006,12 +1006,15 @@ final PpArea _nightWaking = PpArea(
         PpIntro('Sleep is usually the right thing for a child who is unwell or '
             'has had a bump. First, the few signs that mean go now.'),
         PpCallout(
-          'Your child is hard to wake, or very sleepy at a time they\'d '
-              'usually be awake. They\'ve vomited more than once. They\'ve had '
-              'a fit, or passed out. There\'s clear fluid or blood from the '
-              'nose or ears. They\'re not themselves: confused, unsteady, or '
-              'crying in a way you don\'t recognise. They\'re under one and '
-              'have a swelling or a soft spot on the head.',
+          // Final review 4w: Health's ill_head_bump list and its 24 hours.
+          'Your child was knocked out, even for a moment. They\'ve vomited '
+              'more than once. They are unusually sleepy, hard to wake, '
+              'confused or not themselves. They\'ve had a fit. There\'s clear '
+              'fluid or blood from the nose or ears. It was a big fall, from '
+              'more than their own height or down stairs. They\'re under one '
+              'with any swelling on the side or back of the head. They '
+              'can\'t walk, talk or use an arm or leg as usual. Or you\'re '
+              'worried: that alone is enough.',
           kind: PpCalloutKind.doctor,
           title: 'Call 112 or go to hospital now if, after a bump on the head',
         ),
@@ -1019,12 +1022,10 @@ final PpArea _nightWaking = PpArea(
           PpCard('Yes, if your child has acted normally since the bump',
               'Cried, then calmed, talked or played as usual. The old advice '
                   'to keep a child awake is outdated.'),
-          PpCard('For the first night',
-              'Check on your child, and wake them gently once or twice. They '
-                  'should stir and settle as they usually do.'),
-          PpCard('For two days',
-              'Watch for the signs above. Any one of them, at any point, means '
-                  'go now.'),
+          PpCard('For the first 24 hours',
+              'Watch closely. Wake your child the way you normally would, to '
+                  'check they wake properly and know you. Any sign above, at '
+                  'any point, means go now.'),
         ], hue: 344),
         PpLink(
           'Falls from beds, stairs and balconies',
@@ -3858,8 +3859,8 @@ final PpArea _music = PpArea(
         */
         PpCallout(
           'Keep the volume low, use the timer, and keep the speaker away from '
-              'your baby\'s head. As a rule: quieter than a normal conversation, '
-              'at least two to three feet away, never in the cot, and never a '
+              'your baby\'s head. As a rule: quieter than a running shower, '
+              'across the room at about 2 metres, never in the cot, and never a '
               'phone on the pillow. Loud sound played close to a baby all '
               'night has been linked to hearing damage. Continuous sound all '
               'night also leaves nothing to listen for as hearing matures. Set '
@@ -3966,7 +3967,7 @@ final PpPage _soundsLibraryPage = PpPage(
       title: 'The same safety note, because it matters',
     ),
     const PpWhenLine('Newborns: white noise and womb sounds. Three months and '
-        'up: nature and ragas. Eighteen months and up: stories. Lullabies at any '
+        'up: nature and ragas. From about one: stories. Lullabies at any '
         'age.'),
     // Was "Download the two or three you really use" (tools pass 30): nothing
     // downloads. The tracks are in the app, which is the better truth.
@@ -4145,7 +4146,7 @@ final PpPage _soundsLibraryPage = PpPage(
           slotId: 'sleep_sounds/bansuri_slow',
         ),
         PpArticle(heading: 'Bedtime stories', [
-          'For older babies and toddlers, from about 18 months. Read slowly, '
+          'For older babies and toddlers, from about one. Read slowly, '
               'with nothing exciting in them and no loud voices. A story is '
               'the last step of a routine, not a way to get a child to sleep '
               'alone.',
@@ -4188,7 +4189,7 @@ final PpPage _soundsLibraryPage = PpPage(
           title: 'The same safety note, because it matters',
         ),
         PpWhenLine('Newborns: white noise and womb sounds. Three months and up: '
-            'nature and ragas. Eighteen months and up: stories. Lullabies at any '
+            'nature and ragas. From about one: stories. Lullabies at any '
             'age.'),
         PpIndiaNote('Download the two or three you really use before you '
             'travel. A train, a bus or nani\'s house is exactly where a '

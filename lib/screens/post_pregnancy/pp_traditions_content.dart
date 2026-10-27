@@ -2947,7 +2947,7 @@ final PpArea _notSafe = PpArea(
             PpCard('What to do instead',
                 'Nothing on it at all. Keep it clean, dry and open to air, and '
                 'fold the nappy down below it. It falls off on its own, '
-                'usually within one to three weeks.'),
+                'usually between day 5 and day 15.'),
             PpCard('When to see a doctor',
                 'Redness spreading onto the tummy, swelling, pus, a bad smell, '
                 'bleeding that does not stop, or a fever. Any of these needs a '

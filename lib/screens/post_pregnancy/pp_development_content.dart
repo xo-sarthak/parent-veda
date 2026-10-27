@@ -1155,7 +1155,7 @@ final PpSection kPpDevelopmentSection = PpSection(
                       'step further, never a correction.'),
             ], heading: 'How to help, gently'),
             PpWhenLine.doctor('Most babies say a first word between 10 and 15 months. '
-                'No words at all by about 16 months is worth a check.'),
+                'No words at all by about 16 to 18 months is worth a check.'),
             PpIndiaNote('If your home runs on two or three languages, your '
                 'baby isn’t confused and isn’t falling short. First words may '
                 'be spread across languages, and the right way to count is to '
@@ -1171,7 +1171,7 @@ final PpSection kPpDevelopmentSection = PpSection(
             ),
             PpCallout(
               'Worth asking your paediatrician if your baby isn’t babbling by '
-                  'about 9 months, or has no words by about 16 months. Ask too '
+                  'about 9 months, or has no words by about 16 to 18 months. Ask too '
                   'if two words aren’t joined by about 2 years, or words that '
                   'used to be there have gone. Ask for a hearing test as part '
                   'of the visit, every time.',
@@ -2520,11 +2520,16 @@ final PpSection kPpDevelopmentSection = PpSection(
             PpCards(heading: 'The rest of life at this age', [
               PpCard('Feeding', 'Solids from about six months, two then three '
                   'meals a day, with milk. Common allergens early.'),
-              PpCard('Sleep', 'About 12 to 15 hours in 24, usually two naps.'),
+              // Final review 4q: Sleep's chart (sleep_6_12) is the source.
+              PpCard('Sleep', 'About 12 to 16 hours in 24, with two or three '
+                  'naps.'),
               PpCard('Safety', 'Babyproof before crawling starts: gates, socket '
                   'covers, small things off the floor.'),
               PpCard('Vaccines', 'MMR at about nine months. Check the vaccine card.'),
             ]),
+            PpLink('Sleep from 6 to 12 months',
+                surfaceId: 'pp_page/parenting_sleep/sleep_6_12',
+                blurb: 'Naps, nights and the full chart, in the Sleep door.'),
             PpCallout('If your baby loses sounds or skills that were there '
                 'before, at any age, tell your paediatrician soon.',
                 kind: PpCalloutKind.doctor),

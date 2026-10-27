@@ -264,7 +264,8 @@ final PpSection kPpSafetySection = PpSection(
                   'The doctor needs to know exactly what and how much.'),
               PpStep('Call your doctor or go to the nearest hospital',
                   'Go straight away for drowsiness, trouble breathing or a '
-                  'fit, or if it was a battery, magnet, kapoor or acid.'),
+                  'fit, or if it was a battery, magnet, kapoor, acid or '
+                  'medicine.'),
             ]),
             PpCallout('The National Poisons Information Centre at AIIMS '
                 'answers on $kPoisonsHelplineNumber. Save it in your phone '
@@ -274,6 +275,10 @@ final PpSection kPpSafetySection = PpSection(
             PpLink('Is this an emergency?',
                 surfaceId: 'pp_page/parenting_health/health_go_now',
                 blurb: 'The signs that mean go now.'),
+            // Final review 4k.
+            PpLink('Common accidents, fast',
+                surfaceId: 'pp_page/parenting_health/health_accidents',
+                blurb: 'Swallowed, burned, fallen: the first minutes.'),
             PpLink('Kajal, surma and lead',
                 surfaceId: 'pp_page/parenting_traditional/newborn_customs',
                 blurb: 'Why lead in some kajal is a poison too.'),
@@ -695,10 +700,14 @@ final PpSection kPpSafetySection = PpSection(
               PpCard('If you see a child alone in a car',
                   'Call $kEmergencyNumber straight away.'),
             ]),
+            // Final review 4l: Health's order, go first and cool on the way.
             PpCallout('If a child has been in a hot car and is drowsy, '
-                'floppy, very hot or not sweating, cool the child with water. '
-                'Then go to the nearest hospital now.',
+                'floppy, very hot or not sweating, go to the nearest hospital '
+                'now. Cool the child with wet cloths and a fan on the way.',
                 kind: PpCalloutKind.doctor),
+            PpLink('Heat stroke: the signs, and what to do',
+                surfaceId: 'pp_page/parenting_health/prev_heat',
+                blurb: 'In the Health door.'),
           ],
         ),
         PpPage(
@@ -1193,10 +1202,11 @@ final PpSection kPpSafetySection = PpSection(
                 kind: PpCalloutKind.safety),
             PpSteps(heading: 'If a scorpion stings your child', [
               PpStep('Wash the area and hold something cold on it'),
-              PpStep('Go to a hospital the same day',
-                  'In small children, some scorpion stings affect the heart. '
-                      'Go now for sweating, vomiting, great restlessness or '
-                      'fast breathing.'),
+              // Was "Go to a hospital the same day" (final review 4j).
+              PpStep('Go to a hospital now',
+                  'In small children, some scorpion stings affect the heart: '
+                      'sweating, vomiting, great restlessness or fast '
+                      'breathing can follow within hours.'),
             ]),
             PpCallout('Any snake bite, or a scorpion sting in a child, needs a '
                 'hospital, even if your child seems fine at first.',

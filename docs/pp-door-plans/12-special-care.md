@@ -236,3 +236,5 @@ Held by `test/pp_special_care_door_test.dart` (20 tests): the tab order for ever
 | Verification: a phone walk | Not run | Only on the user's word |
 
 **Owed, not in this build:** the two films and the intro (`DOOR-CONTENT-OWED` SPO1), real developmental paediatricians (SPO2), speech therapists (SPO3) and child psychologists (SPO4), a therapy shelf only if a therapist picks it (SPO5). On `BEFORE-LAUNCH.md`: a developmental paediatrician's read of every clinical line, a speech therapist's of the speech and therapy pages, the costs dated, and every scheme and its steps checked against current government notices. The new pages reach Ask Veda through the incremental ingest, which the user runs after all the doors.
+
+**Final review, item 4 (2026-10-27): one figure per fact.** Twin pumping gives Feeding's storage figures (four hours in a cool room, two on a hot day) and links `bf_pumping` (4m). Held by `test/pp_one_figure_test.dart`; the figures are on the BEFORE-LAUNCH clinical read.

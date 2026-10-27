@@ -16,6 +16,17 @@
 //  three copies; nothing was dropped, so it is the union of what each said.
 // =============================================================================
 
+/// The no-urine dehydration sign: one figure for the go-now list and every
+/// page that names it (final review 4a, 2026-10-27). Was 12 hours here, 8 on
+/// the Health pages and 6 in Feeding. Health's figure won. REQUIRED_REVIEW
+/// (paediatrician), on the clinical read in BEFORE-LAUNCH.
+const String kPpNoUrineHours = 'eight hours';
+
+/// The youngest age we name for an insect repellent on a child's skin (final
+/// review 4i). Was two months on two Health pages and six on a third. Six
+/// until the paediatrician read sets the floor; change it here only.
+const String kPpRepellentAge = 'six months';
+
 /// Each line is one sign, phrased so it reads alone on a gate and reads
 /// joined in a callout.
 const List<String> kPpGoNowSigns = [
@@ -26,7 +37,8 @@ const List<String> kPpGoNowSigns = [
   'Floppy, or you cannot wake him properly',
   'A fever of 100.4 F or 38 C in a baby under three months',
   'A rash that does not fade when you press a clear glass on it',
-  'No urine for twelve hours, or no tears when crying',
+  // Was 'No urine for twelve hours, ...' (final review 4a), kept for revert.
+  'No urine for $kPpNoUrineHours, or no tears when crying',
   'A bulging or sunken soft spot',
   'Cold, mottled or blue hands and feet',
   'Green or yellow vomit with a swollen, tender belly',

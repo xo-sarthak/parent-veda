@@ -238,9 +238,10 @@ final PpSection kPpSpecialCareSection = PpSection(
               PpStep('Aim for a full supply by two weeks',
                   'Around 750 ml to 1 litre a day for two, though it varies.'),
               PpStep('Store milk safely',
-                  'Label each container. Fresh milk is fine for about four '
-                      'hours out on the counter. In the fridge, it keeps up to '
-                      'four days.'),
+                  // Final review 4m: Feeding's storage chart is the source.
+                  'Label each container. Fresh milk keeps up to four hours '
+                      'in a cool room, and two on a hot day. In the fridge, it '
+                      'keeps up to four days.'),
             ]),
             PpWhenLine('Milk can be slow to come in after twins, especially '
                 'after a caesarean or an early birth. Keep pumping. It often '
@@ -251,6 +252,10 @@ final PpSection kPpSpecialCareSection = PpSection(
                 'needs a doctor the same day. If your supply is still low '
                 'after two weeks, a lactation consultant can help.',
                 kind: PpCalloutKind.doctor),
+            // Final review 4m.
+            PpLink('How long expressed milk keeps',
+                surfaceId: 'pp_page/parenting_feeding/bf_pumping',
+                blurb: 'The full storage chart, in the Feeding door.'),
           ],
         ),
         PpPage(

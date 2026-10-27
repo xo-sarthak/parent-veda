@@ -259,9 +259,11 @@ final PpArea _howAreYou = PpArea(
             'things that are not, and it is worth knowing them by heart so you '
             'never have to wonder at 2am.'),
         PpCallout(
-          'Call your doctor now if you have any of these. Do not wait for the '
-          'next visit. Bleeding that soaks a maternity pad in an hour. A clot '
-          'bigger than a lemon. Fever. A red, hot, painful patch on one breast '
+          // Final review 4h: heavy bleeding is go-now, as in First 40.
+          'Go to hospital now for bleeding that soaks a maternity pad in an '
+          'hour, or a clot bigger than a lemon. Call your doctor now for any '
+          'of these. Do not wait for the next visit. Fever. A red, hot, '
+          'painful patch on one breast '
           'with flu like aching. Pain or swelling in one calf. A bad headache '
           'with blurred vision. A wound that is oozing or opening. Burning urine '
           'with fever. Pain that is getting worse each day instead of better.',
@@ -517,10 +519,12 @@ final PpArea _yourBody = PpArea(
             'much easier to treat early. This page exists so you never have to '
             'decide at 2am whether you are overreacting.'),
         PpCallout(
-          'Call your doctor or go in today if any of these happen. You are not '
-          'wasting anyone\'s time. Bleeding that soaks a maternity pad in an '
-          'hour, or that suddenly gets heavier again after slowing down. A clot '
-          'bigger than a lemon. Fever, or feeling shivery and flu like. Pain, '
+          // Final review 4h: heavy bleeding is go-now, as in First 40.
+          'Go to hospital now for bleeding that soaks a maternity pad in an '
+          'hour, or a clot bigger than a lemon. Call your doctor or go in '
+          'today if any of these happen. You are not wasting anyone\'s time. '
+          'Bleeding that suddenly gets heavier again after slowing down. '
+          'Fever, or feeling shivery and flu like. Pain, '
           'swelling, redness or heat in one calf. A bad headache that will not '
           'shift, especially with blurred vision, flashing lights or pain under '
           'your ribs. A breast with a red hot painful patch plus fever. A wound '
@@ -617,9 +621,11 @@ final PpArea _yourBody = PpArea(
             'down. Sit and rest.',
           ], heading: 'What helps'),
         PpCallout(
-          'Call your doctor if you soak a maternity pad in an hour, or pass a '
-          'clot bigger than a lemon. Call too if the bleeding suddenly gets '
-          'heavier again after it had slowed, smells bad, or comes with fever.',
+          // Final review 4h: was "Call your doctor if you soak a pad".
+          'Go to hospital now if you soak a maternity pad in an hour, or pass '
+          'a clot bigger than a lemon. That is postpartum haemorrhage, an '
+          'emergency. Call your doctor if the bleeding suddenly gets heavier '
+          'again after it had slowed, smells bad, or comes with fever.',
           kind: PpCalloutKind.doctor,
           title: 'Not normal',
         ),

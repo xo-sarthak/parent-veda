@@ -6223,21 +6223,26 @@ const PpArea _earlySkills = PpArea(
               'it. Drawing: copies a circle and scribbles with control. '
               'Letters: enjoys books, and may know a letter or two. Counting: '
               'counts one to three things. Colours: names a few.'),
+          // Final review 4r: the story, counting to ten and writing letters
+          // moved from 4 to 5, to match Development's dev_age_3_5 (CDC 2022).
           PpCard('Around 4',
-              'Talking: tells a simple story and asks "why" a lot. Drawing: a '
-              'person with a head and a few parts. Letters: may write a few, '
-              "often the ones in his name. Counting: about ten. Colours: names "
-              'most of the common ones.'),
+              'Talking: longer sentences, and asks "why" a lot. Drawing: a '
+              'person with a head and a few parts. Letters: knows a few. '
+              'Counting: counts a few things. Colours: names most of the '
+              'common ones.'),
           PpCard('Around 5',
-              'Talking: talks clearly, with "because" and "if". Drawing: a '
-              'person with a body, and copies a triangle. Letters: may write '
-              'his name and know some letter sounds. Counting: ten or more, '
-              'and knows "more" and "less". Colours: names colours and '
-              'shapes.'),
+              'Talking: tells a simple story with a beginning and an end, '
+              'with "because" and "if". Drawing: a person with a body, and '
+              'copies a triangle. Letters: writes a few, often the ones in '
+              'his name. Counting: to ten, and knows "more" and "less". '
+              'Colours: names colours and shapes.'),
         ], heading: 'What most children can do', hue: 206),
         PpCallout('Reading at 5 is not expected. Loving books is. Most '
             'children begin to read at 6 or 7.',
             title: 'Reading can wait'),
+        PpLink('Ages 3 to 5, in the Development door',
+            surfaceId: 'pp_page/parenting_development/dev_age_3_5',
+            blurb: 'The same years: what most children do, and what is worth a check.'),
         PpWhenLine('From about three. Use it to see what comes next, never as '
             'a list to tick.'),
         PpCallout(

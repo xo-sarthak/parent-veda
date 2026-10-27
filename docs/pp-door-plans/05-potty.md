@@ -231,3 +231,5 @@ Held by `test/pp_potty_door_test.dart` (23 tests, "door 5: the plan, held" among
 | §Verification: a Mobbin check | Not run | The shelf is the approved D2 look reused, as the plan says |
 
 **Owed, not in this build:** the films and paintings (`DOOR-CONTENT-OWED` PT7 to PT9), the potty shop subcategory, the buying guide, the masterclass and a books screen (PT10 to PT13), First 40's widening of `f40_nappy_poop` (door 6), and a paediatrician's read of every `REQUIRED_REVIEW` line (`BEFORE-LAUNCH.md`).
+
+**Final review, item 4 (2026-10-27): one figure per fact.** Bedwetting at five is one in six on both pages (4s). Held by `test/pp_one_figure_test.dart`; the figures are on the BEFORE-LAUNCH clinical read.

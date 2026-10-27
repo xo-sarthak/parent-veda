@@ -2496,7 +2496,7 @@ final PpSection kPpPottySection = PpSection(
                     'year and still be wet every single night. Nothing has '
                     "gone wrong. The night part just hasn't switched on "
                     'yet.',
-                'Roughly one in five five-year-olds still wets the bed, and '
+                'Roughly one in six five-year-olds still wets the bed, and '
                     'it becomes less common every year after that with no '
                     'treatment at all. It is common enough at five that there '
                     'is very likely another child in the same class in the '

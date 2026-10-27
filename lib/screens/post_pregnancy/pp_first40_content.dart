@@ -622,15 +622,15 @@ final PpSection kPpFirst40Section = PpSection(
             PpWhenLine('A short outing to a calm place, like a walk or a '
                 'family home, is fine from the first weeks. Crowded places '
                 'such as markets, malls and big gatherings are better after '
-                'the first vaccines at six weeks.'),
+                'the six-week vaccines.'),
             PpCallout('Any fever of 38 C (100.4 F) or more in a baby under '
-                'three months needs a doctor the same day, even if your baby '
+                'three months means going to a hospital now, even if your baby '
                 'seems well. Also call if your baby is feeding poorly, '
                 'unusually sleepy, or breathing fast.',
                 kind: PpCalloutKind.doctor),
             PpIndiaNote('If an elder insists on kohl, a kiss or passing the '
                 'baby round, a kind line works: "The doctor asked us to be '
-                'careful until the first vaccines. You can hold the baby as '
+                'careful until the six-week vaccines. You can hold the baby as '
                 'soon as you\'ve washed your hands." Most families are happy '
                 'to help once they know why.'),
             // Added 2026-10-02 from the parenting gap analysis (P2/P3).
@@ -780,7 +780,7 @@ final PpSection kPpFirst40Section = PpSection(
               //     months. Confirm the measurement site we state (we do not
               //     name one here on purpose) and whether an axillary figure
               //     should be lower.
-              //   * Too cold: below 97.5 F / 36.5 C.
+              //   * Too cold: below 97.7 F / 36.5 C.
               //   * Breathing too fast: more than 60 breaths a minute at rest,
               //     counted for a full minute while settled.
               //   * Breathing pause: longer than 15 to 20 seconds, or any pause
@@ -789,7 +789,7 @@ final PpSection kPpFirst40Section = PpSection(
               //   * Weight: more than 10 percent below birth weight.
               rows: [
                 ('Fever', '100.4 F or 38 C and above'),
-                ('Too cold', 'Below 97.5 F or 36.5 C'),
+                ('Too cold', 'Below 97.7 F or 36.5 C'),
                 ('Breathing too fast', 'More than 60 breaths a minute at rest'),
                 ('Breathing pause', 'Longer than 15 to 20 seconds'),
                 ('Wet nappies, day 5 onward', 'Fewer than 6 in 24 hours'),
@@ -1314,12 +1314,14 @@ final PpSection kPpFirst40Section = PpSection(
                 'cold baby.'),
             PpChartCard(
               title: 'What to dress your baby in',
-              // REQUIRED_REVIEW: room temperature of 26 to 28 C, the "one layer
+              // REQUIRED_REVIEW: room temperature of 20 to 24 C for sleep
+              // (was 26 to 28 C until final review 4f; Sleep's range), the "one layer
               // more than an adult" rule, and both temperature figures quoted
               // in the doctor callout below.
               rows: [
                 ('The rule', "One layer more than you're comfortable in"),
-                ('Room, ideally', '26 to 28 C'),
+                ('Room, for sleep', '20 to 24 C, if you can control it'),
+                ('Room, awake', 'Warmer is fine while you are with your baby'),
                 ('Summer, no AC', "A thin cotton vest and nappy. That's all"),
                 ('In AC', 'Full sleeve cotton, socks, a thin sheet'),
                 ('Winter, north India', 'Vest, full sleeves, socks, cap, one '
@@ -1328,7 +1330,9 @@ final PpSection kPpFirst40Section = PpSection(
                     'folds'),
               ],
               note: 'Check the back of the neck or the tummy, not the hands. '
-                  'Cold hands and feet are normal in a warm baby.',
+                  'Cold hands and feet are normal in a warm baby. Sleep is '
+                  'cooler because overheating while asleep is a risk; awake, '
+                  'you can see and fix it.',
               hue: 44,
             ),
             PpCards([
@@ -1351,8 +1355,8 @@ final PpSection kPpFirst40Section = PpSection(
                 'most in the first two weeks.'),
             PpCallout(
               'A temperature in a baby under 3 months is urgent either way. '
-              '100.4 F or 38 C and above, or below 97.5 F or 36.5 C after '
-              "warming, needs a doctor the same day. Don't give paracetamol "
+              '100.4 F or 38 C and above, or below 97.7 F or 36.5 C after '
+              "warming, means going to a hospital now. Don't give paracetamol "
               'or any fever medicine to a newborn unless a doctor has told '
               'you the dose.',
               kind: PpCalloutKind.doctor,
@@ -1590,9 +1594,11 @@ final PpSection kPpFirst40Section = PpSection(
               role: 'pediatrician',
             ),
             // FD4.
-            PpLink('Jaundice after the first weeks',
+            // Was "Jaundice after the first weeks" (final review 4d): the
+            // Health page is the same newborn jaundice, not a later one.
+            PpLink('Newborn jaundice, in the Health door',
                 surfaceId: 'pp_page/parenting_health/ill_jaundice',
-                blurb: 'Yellow that lasts, and what the tests mean.'),
+                blurb: 'The same signs, and how the light treatment works.'),
           ],
         ),
         PpPage(
@@ -1878,12 +1884,13 @@ final PpSection kPpFirst40Section = PpSection(
             PpWhenLine('These rules matter most in the first 6 months, and '
                 'the back-to-sleep rule holds until your baby rolls '
                 'confidently without help.'),
+            // Was "both fine for supervised naps" (final review 4g): Sleep's
+            // jhula_safety rule is the one rule.
             PpIndiaNote('The cloth swing (jhula) and the metal cradle (palna) are both fine '
-                'for supervised naps. Your baby should lie flat on a firm '
-                'base with nothing padded underneath, with someone in the '
-                "room. What isn't fine is a deep hammock shape that curls "
-                'the chin onto the chest, or a baby left swinging while '
-                'everyone is outside.'),
+                'for rocking your baby to sleep while you are right there. '
+                'Once your baby is asleep, move them onto a flat, firm '
+                'surface, on their back. A deep hammock shape can curl the '
+                'chin onto the chest without a sound.'),
             // FD4: was surfaceId 'pp_sleep', the tracker. Kept for revert.
             PpLink('The full safe-sleep guide',
                 surfaceId: 'pp_page/parenting_sleep/back_to_sleep',
@@ -2741,10 +2748,10 @@ final PpSection kPpFirst40Section = PpSection(
               PpCard('A ring sling',
                   'Good for quick ups and downs and for feeding on the move. '
                   'One shoulder, so less comfortable for long stretches.'),
+              // Final review 4g: Sleep's rule.
               PpCard('The traditional cloth swing',
-                  'Fine for supervised naps if your baby lies flat on a firm '
-                  'base with nothing padded underneath. Not for unattended '
-                  'sleep and not in a deep hammock curl.'),
+                  'Good for rocking your baby to sleep while you are there. '
+                  'Once asleep, move your baby onto a flat, firm surface.'),
               PpCard('Skip narrow-based hanging carriers',
                   'The kind where the legs dangle straight down with no '
                   'thigh support. Bad for the hips and bad for the back.'),
@@ -2756,10 +2763,10 @@ final PpSection kPpFirst40Section = PpSection(
                 'through the first year. Front carrying only until your baby '
                 'can hold the head steady.'),
             PpIndiaNote('The cloth swing and the cradle are good at settling a baby. '
-                "The risk is never the swinging; it's the shape and the "
-                'padding. Firm flat base, nothing soft underneath, no '
-                'pillow, and someone in the room. Never tie a sheet hammock '
-                'between two points and leave your baby in it.'),
+                "The risk is never the swinging; it's where your baby sleeps "
+                'afterwards. Rock until asleep, then move your baby onto a '
+                'flat, firm surface. Never tie a sheet hammock between two '
+                'points and leave your baby in it.'),
             PpCallout(
               'Take your baby out of the carrier at once if the '
               'lips or face look dusky, or breathing sounds strained or '

@@ -776,7 +776,8 @@ const PpArea _firstFeelings = PpArea(
           kind: PpCalloutKind.doctor,
           title: 'When to ask',
         ),
-        PpWhenLine('From about 12 months, peaking through the second year.'),
+        PpWhenLine('From about 12 months, most common from 18 months to 3 '
+            'years.'),
         PpIndiaNote('In a joint family a tantrum has an audience, and half the '
             'pressure you feel comes from them. It\'s fair to pick your '
             'child up and go to another room, for both your sakes.'),

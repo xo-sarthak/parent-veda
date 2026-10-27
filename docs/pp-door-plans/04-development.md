@@ -212,3 +212,5 @@ Held by `test/pp_development_door_test.dart` (23 tests, "door 4: the plan, held"
 **Later, 2026-10-26 (STAGE-TRANSITIONS R10):** the On track tab is named "Milestones" (its id stays `on_track`), "This month's checklist" is "This month", "A gentle check-in" is "Questions for this age", the footer says "A milestone you have not saved", and `pp_milestones` opens the one Milestones place (`pp_milestones_screen.dart`). DV2 is built: one list behind every screen.
 
 **Owed, not in this build:** the paintings and films (DOOR-CONTENT-OWED DV1 to DV3), the two people (DV4, DV5), phase-doc times (DV6), the DV10 links (DV7), and a developmental paediatrician's or paediatric physio's read of every `REQUIRED_REVIEW` line (`BEFORE-LAUNCH.md`).
+
+**Final review, item 4 (2026-10-27): one figure per fact.** No words by about 16 to 18 months on `dev_first_words`, from `dev_speech_flags` (4n). The 6 to 12 month card gives Sleep's figures and links `sleep_6_12` (4q). Held by `test/pp_one_figure_test.dart`; the figures are on the BEFORE-LAUNCH clinical read.

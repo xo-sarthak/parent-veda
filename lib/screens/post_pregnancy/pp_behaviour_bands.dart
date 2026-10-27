@@ -168,7 +168,7 @@ const PpArea kBehZiddi = PpArea(
         ], heading: 'Words to use'),
         PpCallout(
           'Worth mentioning to your paediatrician: aggression that regularly '
-          'injures someone, no words at all by around two, or a rigidity so '
+          'injures someone, no words at all by about 16 to 18 months, or a rigidity so '
           'extreme that ordinary daily changes cause distress every time. Not '
           'because stubbornness is a problem, but because these are separate '
           'things worth a proper look.',
@@ -185,7 +185,8 @@ const PpArea kBehZiddi = PpArea(
         PpLink('What to say when he digs in',
             surfaceId: 'pp_scripts/shoes', // was the whole tool (tools pass 29, BH2)
             blurb: 'The exact words for the shoes, the park and the phone.'),
-        // BH6: the doctor line names "no words at all by around two"; this is
+        // BH6: the doctor line names "no words at all by about 16 to 18
+        // months" (was "around two" until final review 4n); this is
         // where that is answered. "Why is my 3 year old not talking yet" is a
         // top search.
         PpLink('When talking is worth checking',

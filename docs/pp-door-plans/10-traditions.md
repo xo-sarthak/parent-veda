@@ -210,3 +210,5 @@ Held by `test/pp_traditions_door_test.dart` ("door 10: the plan, held", 11 tests
 | Tab names unchanged | "The first years" is "The big firsts" (old name commented out, kept for revert); "Small, safe and honest" stays | The user's words, 2026-10-26: "I just need tabs to have relevant names". The old name said nothing about the first food. Both measured to fit at 1.0 and 1.3 |
 
 **Owed, not in this build:** the 17 films and the door intro (`DOOR-CONTENT-OWED` TR10, TRO1), baby massage oil on the shop (FF15, TRO2), a ceremony shelf (TRO3), and the reads: a paediatrician on the jhula note (the same one as Sleep's SL7 page), the malish cards, the festival cards and the someone-else's-ceremony cards; a member of the community on the Buddhist welcome; the user's phone read of `skip_it` and `mother_kept_apart` (`BEFORE-LAUNCH.md`). The new parts reach Ask Veda through the incremental ingest, which the user runs after all the doors.
+
+**Final review, item 4 (2026-10-27): one figure per fact.** The cord falls off between day 5 and day 15, First 40's window (4o). Held by `test/pp_one_figure_test.dart`; the figures are on the BEFORE-LAUNCH clinical read.

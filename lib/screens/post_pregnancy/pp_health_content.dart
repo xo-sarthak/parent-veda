@@ -268,7 +268,8 @@ final PpArea _emergency = PpArea(
         //   * "Ribs sucking in, nostrils flaring, grunting" as the breathing
         //     signs we name, and whether head bobbing should be added.
         //   * A rash that does not fade under glass pressure.
-        //   * No urine for 12 hours in a baby, 8 hours if he is also vomiting.
+        //   * No urine for kPpNoUrineHours (eight hours; was 12, or 8 with
+        //     vomiting, until final review 4a made it one figure).
         //   * Any fit or seizure, including a first febrile fit.
         //   * Green or yellow vomit, and a swollen tender belly.
         PpCallout(
@@ -990,14 +991,16 @@ final PpArea _fever = PpArea(
           title: 'Reading the number',
           subtitle: 'Measured under the arm, on a digital thermometer',
           // REQUIRED_REVIEW: EVERY ROW. Confirm with a paediatrician:
-          //   * Normal range 97.5 F to 99.5 F (36.4 C to 37.5 C) axillary.
+          //   * Normal range 97.7 F to 99.5 F (36.5 C to 37.5 C) axillary.
           //   * Fever defined at 100.4 F / 38.0 C, and whether an axillary
           //     reading should use a lower cutoff than a rectal one.
           //   * "High" at 102.2 F / 39 C and the statement that height alone
           //     does not decide severity.
           //   * 106 F / 41 C as the point at which the number itself matters.
           rows: [
-            ('Normal', '97.5 F to 99.5 F, or 36.4 C to 37.5 C'),
+            // Was 97.5 F / 36.4 C (final review 4c): one floor, 36.5 C, on
+            // the normal row and every "too cold" line.
+            ('Normal', '97.7 F to 99.5 F, or 36.5 C to 37.5 C'),
             ('Warm, not yet a fever', '99.5 F to 100.4 F, or 37.5 C to 38 C'),
             ('Fever', '100.4 F or 38 C and above'),
             ('High fever', '102.2 F or 39 C and above'),
@@ -1012,8 +1015,8 @@ final PpArea _fever = PpArea(
             'is why families panic at a number, and it isn\'t true of ordinary '
             'infection fevers.'),
         PpCallout(
-          'Under three months, any fever at all is a same day hospital visit, '
-          'however well your baby looks. A newborn with an infection can look '
+          'Under three months, any fever at all means going to a hospital '
+          'now, however well your baby looks. A newborn with an infection can look '
           'almost well, and then suddenly not.',
           kind: PpCalloutKind.doctor,
           title: 'The one age where the number decides on its own',
@@ -1159,18 +1162,20 @@ final PpArea _fever = PpArea(
         // temperature is equally significant at this age.
         PpCallout(
           'A temperature of 100.4 F or 38 C or above in a baby under three '
-          'months means being seen by a doctor today, not tomorrow. That '
-          'holds however well your baby seems. Go to the hospital, or call '
-          'your paediatrician on the way. This rule has no exceptions.',
+          'months means going to a hospital now. That holds however well '
+          'your baby seems. Call your paediatrician on the way. This rule has '
+          'no exceptions.',
           kind: PpCalloutKind.doctor,
-          title: 'Any fever, any time, seen today',
+          // Was "seen today, not tomorrow" (final review 4b): the go-now list
+          // says go now, so this says it too.
+          title: 'Any fever, any time: go now',
         ),
         PpCards([
           PpCard('Don\'t give paracetamol first',
               'Bringing the temperature down before the doctor sees your baby '
               'hides what the doctor needs to see. Go as you are.'),
           PpCard('A low temperature counts too',
-              'A newborn who is unusually cold, below 97.5 F or 36.5 C, matters '
+              'A newborn who is unusually cold, below 97.7 F or 36.5 C, matters '
               'as much as one who is hot.'),
           PpCard('Give your baby\'s age in days or weeks',
               'A newborn is a different patient at day 5 and day 50, and it '
@@ -1430,8 +1435,8 @@ final PpArea _fever = PpArea(
         ),
         PpCallout(
           'And for a fever, call or go if your baby is under three months with '
-          'any fever. Call or go too if no urine has passed in eight to '
-          'twelve hours, or your child is very drowsy or very hard to '
+          'any fever. Call or go too if no urine has passed in '
+          '$kPpNoUrineHours, or your child is very drowsy or very hard to '
           'console. The same goes for a fever past five days, a stiff neck or '
           'a dislike of light. And go if your child looks wrong to you in a '
           'way you can\'t explain.',
@@ -2112,8 +2117,8 @@ final PpArea _tummy = PpArea(
         ], heading: 'Four things that help', hue: 140),
         PpCallout(
           'Go to a doctor for blood or mucus in the stool, or vomiting '
-          'everything with no ORS staying down. Go too for no urine in eight '
-          'hours, drowsiness or floppiness, or a swollen, tender belly. And '
+          'everything with no ORS staying down. Go too for no urine in '
+          '$kPpNoUrineHours, drowsiness or floppiness, or a swollen, tender belly. And '
           'go if your baby is under six months.',
           kind: PpCalloutKind.doctor,
         ),
@@ -2191,7 +2196,7 @@ final PpArea _tummy = PpArea(
         PpCallout(
           'If the ORS comes straight back up, wait ten minutes and start again, '
           'a teaspoon at a time. If nothing stays down for more than a few '
-          'hours, or no urine has passed in eight hours, your child needs a '
+          'hours, or no urine has passed in $kPpNoUrineHours, your child needs a '
           'doctor and possibly a drip.',
           kind: PpCalloutKind.doctor,
         ),
@@ -2262,7 +2267,7 @@ final PpArea _tummy = PpArea(
             'child can look fairly alright, then suddenly not. That\'s why the '
             'count is worth more than an impression.'),
         PpCallout(
-          'These all mean going to a hospital now: no urine in eight hours, a '
+          'These all mean going to a hospital now: no urine in $kPpNoUrineHours, a '
           'sunken soft spot, or a child too drowsy to drink. So do sunken '
           'eyes, cold hands and feet, or fast breathing. Don\'t keep trying '
           'more ORS at home.',
@@ -2309,7 +2314,7 @@ final PpArea _tummy = PpArea(
           'vomit. Go too for vomiting with a swollen hard belly, or after a '
           'fall or a knock to the head. In a baby under three months, go for '
           'forceful vomiting that shoots across the room. And go for no urine '
-          'in eight hours, or vomiting everything for more than eight hours.',
+          'in $kPpNoUrineHours, or vomiting everything for more than eight hours.',
           kind: PpCalloutKind.doctor,
         ),
         PpCallout(
@@ -2766,7 +2771,7 @@ final PpArea _skin = PpArea(
               'families.'),
         ], heading: 'Getting through the week', hue: 340),
         PpCallout(
-          'See a doctor for no urine in eight hours, refusing all drinks, great '
+          'See a doctor for no urine in $kPpNoUrineHours, refusing all drinks, great '
           'drowsiness, or a fever past five days. See one too if blisters '
           'turn into large red swollen areas. Dehydration from a sore mouth '
           'is the only common complication, and it\'s preventable.',
@@ -3015,9 +3020,11 @@ final PpArea _skin = PpArea(
           PpCard('Nets', 'Over the cot and pram, day and night.'),
           PpCard('Long, light sleeves and pants', 'At dawn and dusk.'),
           // REQUIRED_REVIEW.
+          // Was "Ask your doctor before any repellent under two months"
+          // (final review 4i).
           PpCard('Repellents made for children',
-              "Ask your doctor before any repellent under two months. For older "
-                  "babies and children, follow the label's age limit, put it on "
+              "Under $kPpRepellentAge, nets and full sleeves rather than any "
+                  "repellent. For older babies and children, follow the label's age limit, put it on "
                   'clothes more than skin, and never on hands that go to the '
                   'mouth.'),
           PpCard('Check bedding', 'For bedbugs, if bites appear in lines every '
@@ -3082,7 +3089,7 @@ final PpArea _skin = PpArea(
           'or a rash with a fever at this age. The same goes for yellowing of '
           'the skin or the whites of the eyes. And any rash that doesn\'t fade '
           'under a pressed glass. In a baby under three months, a rash with a '
-          'fever is a same day visit.',
+          'fever means going to a hospital now.',
           kind: PpCalloutKind.doctor,
         ),
         // REQUIRED_REVIEW: every timeline in the cards, and the newborn rash
@@ -3400,9 +3407,11 @@ final PpArea _otherIllness = PpArea(
           PpCard('Long, light sleeves', 'In the evening and morning.'),
           PpCard('Empty standing water weekly', 'Including the cooler.'),
           // REQUIRED_REVIEW.
-          PpCard('Repellents by age', 'Ask your doctor before any repellent '
-              'under two months. For older babies, one made for children, on '
-              'clothes more than skin.'),
+          // Was "Ask your doctor before any repellent under two months"
+          // (final review 4i).
+          PpCard('Repellents by age', 'Under $kPpRepellentAge, nets and full '
+              'sleeves rather than any repellent. After that, one made for '
+              'children, on clothes more than skin.'),
         ]),
         PpLink(
           'A cot and pram mosquito net',
@@ -3500,11 +3509,12 @@ final PpArea _otherIllness = PpArea(
             'timing and how far down the body the yellow reaches.'),
         PpArticle([
           'Ordinary newborn jaundice appears around day two or three, peaks '
-          'around day four or five, and fades over the next week. It happens '
+          'around day four or five, and fades by day 10 to 14. It happens '
           'because a newborn\'s liver is still learning to clear bilirubin, a '
           'normal breakdown product. It usually starts at the face and moves '
-          'down as it rises. Yellow that has reached the chest, belly, legs, '
-          'or palms and soles is worth a same day check.',
+          'down as it rises. Yellow on the chest and tummy means more and is '
+          'worth watching closely. Yellow on the palms and soles is a same '
+          'day check.',
           'Check your baby in daylight, not under a tube light, which makes '
           'everything look yellow. Press a finger gently on the tip of the '
           'nose or the forehead for a second, and look at the skin as you '
@@ -3517,7 +3527,7 @@ final PpArea _otherIllness = PpArea(
         ]),
         PpCallout(
           'Go the same day if: the yellow appears in the first 24 hours of '
-          'life, reaches the legs, palms or soles, or is still there after '
+          'life, reaches the palms or soles, or is still there after '
           'two weeks. Go the same day too for a very sleepy baby, poor '
           'feeding, few wet nappies, pale or chalky white stools, or dark '
           'urine. Jaundice in the first day and jaundice past two weeks '
@@ -4640,7 +4650,9 @@ final PpArea _growth = PpArea(
           PpCard('Dals, rajma, chana and sprouts', 'Every day if you can.'),
           PpCard('Green leaves', 'Palak, methi, bathua and drumstick leaves, '
               'cooked into dal or roti.'),
-          PpCard('Ragi, bajra and jaggery ladoos', 'From one year.'),
+          // Final review 4p: was 'From one year.'
+          PpCard('Ragi, bajra and jaggery ladoos',
+              'A festival taste from one, an everyday food from two.'),
           PpCard('Eggs, fish and meat', 'If your family eats them: the '
               'best-absorbed iron.'),
           PpCard('Add vitamin C', 'A squeeze of lemon on dal, or amla or orange '
@@ -5254,7 +5266,7 @@ final PpArea _preventionAll = PpArea(
     // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpCards(heading: 'Repellents, water and floods', [
           PpCard('Mosquito repellents',
-              'For babies under six months, use nets and full sleeves rather '
+              'For babies under $kPpRepellentAge, use nets and full sleeves rather '
                   'than creams. After that, a repellent made for children, on '
                   'clothes and exposed skin only, never on the hands or face. '
                   'Keep vaporiser refills and coils out of reach.'),
@@ -6181,7 +6193,7 @@ final PpArea _newbornChecks = PpArea(
       blocks: [
         PpIntro('The first visit after going home, usually within the first '
             'week, checks that feeding is working and your baby is getting '
-            'back to birth weight. The six-week visit brings the first '
+            'back to birth weight. The six-week visit brings the six-week '
             'vaccines and a full check.'),
         PpSteps([
           PpStep('Weight', 'Back to birth weight by about two weeks.'),
@@ -6193,12 +6205,12 @@ final PpArea _newbornChecks = PpArea(
               'Bring your questions too.'),
         ]),
         PpCallout('Don\'t wait for the visit if your baby is feeding poorly, '
-            'very sleepy, or yellow on the tummy or legs. The same goes for a '
+            'very sleepy, or yellow on the palms or soles. The same goes for a '
             'fever, or fewer than six wet nappies a day after day five.',
             kind: PpCalloutKind.doctor),
         // §5a (REQUIRED_REVIEW).
         PpSteps(heading: 'At 6 weeks, and what to bring', [
-          PpStep('The first vaccines', 'And a check of weight, length and head size.'),
+          PpStep('The six-week vaccines', 'And a check of weight, length and head size.'),
           PpStep('A full check', 'Hips, heart, eyes, and how he follows your face.'),
           PpStep('Bring', 'The discharge summary, the vaccination card, and your questions written down.'),
         ]),

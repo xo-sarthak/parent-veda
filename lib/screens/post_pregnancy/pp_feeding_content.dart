@@ -81,6 +81,7 @@ import 'pp_age_bands.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
 import 'pp_section_screen.dart';
+import 'pp_health_red_flags.dart' show kPpNoUrineHours;
 
 // =============================================================================
 //  THE BANDS
@@ -2895,8 +2896,8 @@ final PpArea _ageCharts = PpArea(
               'Chicken and fish in small chopped pieces, egg in most forms, '
               'small amounts of mutton keema cooked very soft.'),
           PpCard('Iron-rich every day',
-              'Ragi, dal, spinach, egg, chicken liver in tiny amounts, and jaggery '
-              'only after one year.'),
+              'Ragi, dal, spinach, egg, chicken liver in tiny amounts. Jaggery '
+              'waits: a festival taste after one, an everyday food from two.'),
         ], heading: 'What changes this month', hue: 186),
         PpCallout('Offer solids before milk now, the reverse of six months. '
             'Food does real work at this age, and a full milk feed just before '
@@ -3077,7 +3078,8 @@ final PpArea _ageCharts = PpArea(
         PpWhenLine('From 6 months onwards. Introduce each new protein one at '
             'a time, and watch for two hours the first time.'),
         PpIndiaNote('In a vegetarian home, iron needs a little more attention: '
-            'ragi, dal, spinach, sesame, and jaggery after one year. Add a source '
+            'ragi, dal, spinach and sesame, and jaggery as an everyday food '
+            'from two. Add a source '
             'of vitamin C at the same meal so the iron absorbs.'),
         PpVideoSlot(
           title: 'A day of food, walked through by age',
@@ -3245,7 +3247,7 @@ final PpArea _cooking = PpArea(
               'are introduced.'),
           PpCard('For iron',
               'Ragi, moong and masoor dal, spinach dal, egg, chicken and fish, '
-              'jaggery after one year. Serve with amla, lemon, orange or '
+              'and jaggery from two. Serve with amla, lemon, orange or '
               'tomato at the same meal so the iron absorbs.'),
           PpCard('For immunity',
               'Curd and curd rice, turmeric milk after one year, tomato and '
@@ -3259,8 +3261,9 @@ final PpArea _cooking = PpArea(
         PpCallout('Energy in each spoon beats volume every time. A small bowl '
             'with ghee in it feeds your child better than a big bowl of '
             "thin soup that doesn't get finished."),
-        PpWhenLine('Weight-gain foods from 7 months, iron from 6, jaggery and '
-            'honey only after 12 months.'),
+        PpWhenLine('Weight-gain foods from 7 months, iron from 6, honey after '
+            '12 months, and jaggery as a festival taste after one, an '
+            'everyday food from two.'),
         PpIndiaNote('Edible gum, dry fruit powders and saffron are traditional weight '
             'foods. They really are useful once nuts have been introduced, as '
             'a fine powder, not pieces. Never whole nuts, at any age under '
@@ -3323,7 +3326,8 @@ final PpArea _cooking = PpArea(
         // REQUIRED_REVIEW: the home ORS recipe above, and the dehydration
         // signs in the callout below.
         PpCallout(
-          'See a doctor for no wet nappy in six hours, a dry mouth, no tears '
+          // Was "no wet nappy in six hours" (final review 4a).
+          'See a doctor for no wet nappy in $kPpNoUrineHours, a dry mouth, no tears '
           'when crying, or a sunken soft spot. Go too for blood in the stool, '
           'vomiting that keeps on, or unusual drowsiness. Dehydration in a '
           'small child moves fast, and a hospital is the right place for it.',
@@ -3665,15 +3669,18 @@ final PpArea _weightGain = PpArea(
           PpCard('Egg, chicken and fish',
               'Protein and iron in a small volume, exactly what a baby who '
               "isn't gaining needs."),
-          PpCard('Dates and jaggery, after one year',
-              'Date and banana kheer is the classic. Both are iron rich, and '
-              'both wait until the first birthday.'),
+          // Final review 4p: was "Dates and jaggery, after one year".
+          PpCard('Dates after one, jaggery from two',
+              'Date and banana kheer is the classic, sweet from the fruit '
+              'alone. Both are iron rich. Jaggery is sugar too, so it is a '
+              'festival taste after one and an everyday food from two.'),
         ], heading: 'Eight that really add weight', hue: 12),
         PpCallout('Add energy to the food your child already eats, instead of '
             'pushing for more of it. A spoon of ghee in the same bowl beats '
             'a fight over a second bowl.'),
         PpWhenLine('Ghee from about 7 months, nut powders once allergens are '
-            'introduced, jaggery and honey only after 12 months.'),
+            'introduced, honey after 12 months, and jaggery as an everyday '
+            'food from two.'),
         PpIndiaNote('Roasted flour mix (panjiri), edible gum laddoos and dry fruit powders are '
             'traditional weight foods, and they work for children over one, in '
             'small amounts and finely ground. Skip the sugar-heavy versions, '
@@ -4597,8 +4604,8 @@ final PpArea _safety = PpArea(
           PpCard('Iron, from about 6 months',
               'Iron stored from birth runs out around six months, one reason '
               'solids start then. Ragi, moong and masoor dal, spinach, egg yolk, '
-              'chicken, fish, liver in tiny amounts, and jaggery after one '
-              'year.'),
+              'chicken, fish, liver in tiny amounts. Jaggery can wait until '
+              'two.'),
           PpCard('Vitamin C alongside it',
               'Lemon on the dal, amla, tomato, orange, guava. Vitamin C at the '
               'same meal can multiply the iron absorbed from plant foods. '
