@@ -41,6 +41,7 @@ import '../../v2/v3_bracket_art.dart';
 import '../../v2/v3_hero_field.dart';
 import '../pp_child_profile.dart';
 import '../pp_content.dart';
+import '../pp_page_fill.dart' show ppPageTitle;
 import '../pp_crisis_path_screen.dart' show ppDialNumber;
 import '../pp_section_registry.dart';
 import '../pp_section_screen.dart';
@@ -1487,7 +1488,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                       ...pages.where((x) => !x.pinned),
                     ]) ...[
                       _CardSpec(
-                        title: page.title,
+                        title: ppPageTitle(page),
                         meta: page.subtitle,
                         chip: page.comingSoon
                             ? 'Coming soon'
@@ -2060,7 +2061,7 @@ class _PinnedRedFlag extends StatelessWidget {
                           letterSpacing: 1.1,
                           color: kPpUrgentInk)),
                   const SizedBox(height: 5),
-                  Text(page.title,
+                  Text(ppPageTitle(page),
                       style: pvFraunces(
                           fontSize: 16.5,
                           fontWeight: FontWeight.w600,

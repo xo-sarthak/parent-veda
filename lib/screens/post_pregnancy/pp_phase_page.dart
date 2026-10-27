@@ -59,6 +59,7 @@ import 'pp_search.dart' show ppOpenSurface;
 import 'pp_section_registry.dart' show kPpSections;
 import 'pp_section_screen.dart' show ppOpenPage, PpSection;
 import 'pp_content.dart' show PpPage;
+import 'pp_page_fill.dart' show ppPageTitle;
 import 'product_detail_screen.dart' show ProductDetailScreen;
 import 'video/pv_video_player.dart' show PvVideoPlayer;
 
@@ -574,7 +575,7 @@ class _Offers extends StatelessWidget {
                 key: ValueKey('pp_phase_read_${r.page.id}'),
                 p: p,
                 leading: TtcMarkLeading(tab: TtcTabMark.openBook, tint: tint, size: 40),
-                title: r.page.title,
+                title: ppPageTitle(r.page),
                 line: r.section.title,
                 onTap: () => ppOpenPage(context, r.section, r.page, onSurface: ppOpenSurface),
               ),

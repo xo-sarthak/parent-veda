@@ -45,6 +45,7 @@ import '../v2/v2_palette.dart';
 import 'askveda_screen.dart';
 import 'pp_baby_food_check_screen.dart';
 import 'pp_content.dart';
+import 'pp_page_fill.dart' show ppPageTitle;
 import 'pp_section_registry.dart';
 import 'pp_section_screen.dart';
 import 'pp_surface_router.dart';
@@ -134,7 +135,7 @@ List<_Doc> _build() {
         out.add(_Doc(
           PpSearchHit(
             kind: p.toolSurfaceId != null ? PpSearchKind.tool : PpSearchKind.page,
-            title: p.title,
+            title: ppPageTitle(p),
             blurb: firstLine,
             meta: '$door · ${a.title}',
             score: 0,

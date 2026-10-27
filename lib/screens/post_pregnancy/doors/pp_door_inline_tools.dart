@@ -40,6 +40,7 @@ import '../pp_activity_read.dart' show ppActivityReader;
 import '../pp_behaviour_content.dart' show kPpBehaviourSection;
 import '../pp_child_profile.dart';
 import '../pp_content.dart' show PpPage;
+import '../pp_page_fill.dart' show ppPageTitle;
 import '../multichild_sheet.dart' show showAddChildForm;
 import '../pp_development_data.dart';
 import '../pp_din_by_din.dart';
@@ -438,7 +439,7 @@ class PpFirst40TodayShelf extends StatelessWidget {
             page.format == 'VIDEO' ? 'Watch' : 'How to',
             after ? 'Now' : 'This week',
           ].join('  ·  ').toUpperCase(),
-          title: kPpFirst40CardNames[page.id] ?? page.title,
+          title: kPpFirst40CardNames[page.id] ?? ppPageTitle(page),
           picture: picture(_kFirst40CardIcons[page.id] ?? Icons.spa_outlined),
           onTap: () => ppOpenPage(context, kPpFirst40Section, page,
               onSurface: (_, id) => onSurface(id)),
@@ -605,7 +606,7 @@ class PpPottyTodayShelf extends StatelessWidget {
                   ?kPpPottyActivityTimes[page.id],
                   'Try today',
                 ].join('  ·  ').toUpperCase(),
-                title: page.title,
+                title: ppPageTitle(page),
                 picture: Container(
                   color: Color.alphaBlend(accent.withValues(alpha: 0.16), p.surface),
                   alignment: Alignment.center,

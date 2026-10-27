@@ -42,6 +42,7 @@ import 'pp_age_bands.dart';
 import 'pp_child_profile.dart';
 import 'pp_content.dart';
 import 'pp_page_read.dart';
+import 'pp_page_fill.dart';
 import 'pp_story_screen.dart';
 import 'pp_home_reads.dart' show PpLastPageStore;
 import '../../widgets/pv_feedback.dart' show PvPress;
@@ -91,6 +92,10 @@ Widget ppPageScreen(
 }) {
   // "Continue reading" on the home (2026-10-07): every door page opens here.
   PpLastPageStore.instance.opened(section.id, page.id);
+  // ⚠️ THE PAGE, ABOUT THIS CHILD (2026-10-27): he/him/his become she/her
+  // or the child's name before any renderer sees the words. See
+  // `pp_page_fill.dart`; stories and pages about an adult keep theirs.
+  page = ppFillPage(page);
   void openById(BuildContext ctx, String id) {
     final target = section.pageById(id);
     if (target == null) return;
@@ -902,7 +907,7 @@ class _AreaScreen extends StatelessWidget {
                     for (final (i, page)
                         in pages.where((p) => !p.pinned).toList().indexed)
                       _PpCoverCard(
-                        title: page.title,
+                        title: ppPageTitle(page),
                         meta: page.format,
                         hue: (area.hue + i * 17) % 360,
                         mark: area.mark,
@@ -1240,7 +1245,7 @@ class _PinnedPageCard extends StatelessWidget {
                                 color: p.action)
                             .copyWith(letterSpacing: 1.1)),
                     const SizedBox(height: 6),
-                    Text(page.title,
+                    Text(ppPageTitle(page),
                         style: pvFraunces(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,

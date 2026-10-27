@@ -464,3 +464,10 @@ anywhere in the stack.
 that can make it false; a child's age is evidence of one birth, not of no pregnancy. And a cache key is part of the
 answer's meaning: two people who must hear different things can never share an entry, so every fact that changes
 the answer has to be in the key.
+
+## Author once, adapt at display: the door pages' "he" and "When" (2026-10-27)
+
+The final review of the fourteen parenting doors found two content bugs with one shape: the data was right and the place it was drawn decided its meaning wrongly.
+
+- **A label is part of the meaning.** `PpWhenLine` was written as the page's "when / how much / what age" line, but three renderers (the reader, the story deck, the Ask Veda export) each titled it "When to see a doctor". 500 of 533 lines were ages and timings. The fix was not to rewrite 500 lines but to make the data say which kind it is (`PpWhenLine.doctor`) and have all three renderers ask one function for the title (`ppWhenLineTitle`). The general lesson: when several renderers label the same field, give them one source for the label, or they drift one at a time. The export change only reaches Ask Veda after the next ingest.
+- **Personalise at the edge, not in the data.** Door pages say "he" for the child. Filling it per child at display (`ppFillPage`) keeps one authored copy: the content tests, the Ask Veda corpus and the reviewers all read the same text, and a girl's parent still reads "she". The cost is a copy of the page per open (a few dozen strings). The alternative, a stored copy per child, would multiply every content edit. The exceptions are explicit data, not guesses: a story keeps its characters by format, and a page about an adult says so (`PpPage.aboutAdult`).

@@ -5829,6 +5829,8 @@ const PpArea _thePeopleAroundYou = PpArea(
     ),
     PpPage(
       id: 'people_mother_in_law',
+      // "He" on this page is her husband and his mother, not the child (2026-10-27).
+      aboutAdult: true,
       title: 'You and your mother in law',
       format: 'ARTICLE',
       bands: _allBands,
@@ -5919,6 +5921,8 @@ const PpArea _thePeopleAroundYou = PpArea(
     ),
     PpPage(
       id: 'people_partner',
+      // "He" on this page is her partner, not the child (2026-10-27).
+      aboutAdult: true,
       title: 'Your partner, and the work that goes unseen',
       format: 'ARTICLE',
       bands: _allBands,
@@ -6001,6 +6005,8 @@ const PpArea _thePeopleAroundYou = PpArea(
     // Door 3's new page (M7). REQUIRED_REVIEW: the one-in-ten figure.
     PpPage(
       id: 'people_partner_low',
+      // "He" on this page is her partner, not the child (2026-10-27).
+      aboutAdult: true,
       title: 'When he is struggling too',
       format: 'ARTICLE',
       bands: _allBands,
@@ -6196,6 +6202,8 @@ const PpArea _thePeopleAroundYou = PpArea(
     // page (M5 and the house rule). REQUIRED_REVIEW: every number and the law.
     PpPage(
       id: 'people_safe_at_home',
+      // "He" on this page is her husband, not the child (2026-10-27).
+      aboutAdult: true,
       title: 'If you are not safe at home',
       format: 'ROUTE',
       bands: _allBands,

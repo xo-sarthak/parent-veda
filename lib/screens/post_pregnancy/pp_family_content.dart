@@ -674,6 +674,8 @@ final PpSection kPpFamilySection = PpSection(
         ),
         PpPage(
           id: 'fam_couple_on_same_page',
+          // "He" on this page is her husband, as a son, not the child (2026-10-27).
+          aboutAdult: true,
           title: 'When you and your husband disagree about the baby',
           subtitle: 'Agree in private, speak as one',
           format: 'STEP-LIST',

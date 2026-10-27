@@ -154,6 +154,7 @@ import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading;
 import '../v2/pv_insight_rail.dart';
 import '../reader/pv_reader_screen.dart';
 import '../../widgets/pv_home_arrival.dart';
+import 'pp_page_fill.dart' show ppPageTitle;
 
 // ---- One type scale for the whole home (2026-10-07) ------------------------
 //
@@ -774,7 +775,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                     key: const ValueKey('pp_home_continue'),
                     p: p,
                     leading: PvMarkWell(p: p, hue: 268, size: 44, mark: ppTabMarkFor(Icons.menu_book_outlined)),
-                    title: last.page.title,
+                    title: ppPageTitle(last.page),
                     line: last.section.title,
                     onTap: () => ppOpenPage(context, last.section, last.page,
                         onSurface: (ctx, id) => _openSurface(ctx, id)),
@@ -819,7 +820,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                           kind: spec.kind,
                           kindWord: spec.word,
                           fact: spec.fact,
-                          title: r.page.title,
+                          title: ppPageTitle(r.page),
                           onTap: () => ppOpenPage(context, r.section, r.page,
                               onSurface: (ctx, id) => _openSurface(ctx, id)),
                         );
@@ -2364,7 +2365,7 @@ class _DoorReadRow extends StatelessWidget {
           const SizedBox(width: 13),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(read.page.title,
+              Text(ppPageTitle(read.page),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: pvFraunces(

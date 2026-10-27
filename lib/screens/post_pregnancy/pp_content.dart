@@ -579,6 +579,18 @@ class PpCarouselCard {
   }) : assert(pageId != null || surfaceId != null),
        myth = false;
 
+  /// Every field at once, for a copy with its words changed (`ppFillPage`).
+  const PpCarouselCard.all({
+    required this.title,
+    this.body = '',
+    this.pageId,
+    this.surfaceId,
+    this.linkLabel,
+    this.myth = false,
+    this.fromMonths,
+    this.toMonths,
+  });
+
   /// A myth stated, then what is true. The slide draws the two halves apart.
   const PpCarouselCard.myth(this.title, this.body)
       : pageId = null,
@@ -894,7 +906,17 @@ class PpPage {
     this.pinned = false,
     this.comingSoon = false,
     this.ageLead,
+    this.aboutAdult = false,
   });
+
+  /// ⚠️ "HE" HERE IS AN ADULT, NOT THE CHILD (final review, 2026-10-27).
+  /// Door pages are written with "he" for the child, and `ppFillPage` turns
+  /// it into she or the child's name at display, as the phase pages always
+  /// did. A page whose "he" is her husband or partner ("When he is
+  /// struggling too") must not become "When she is struggling too", so it
+  /// says so here and keeps its words. Story pages need no flag: their
+  /// characters are kept by format.
+  final bool aboutAdult;
 
   /// ⚠️ THE OLDER CHILD'S HALF FIRST, FROM AN AGE (Safety SF2, 2026-10-26).
   /// CPR has two step groups, "For a baby under one" and "For a child over
