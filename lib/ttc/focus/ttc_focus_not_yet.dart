@@ -92,27 +92,10 @@ const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
     // =========================================================================
     //  1 — Is it time?
     // =========================================================================
-    TtcFocusSection(
-      // Kept for revert (2026-09-28, explicit names): heading: 'How long is usual?',
-      heading: 'How long does trying usually take?',
-      group: 'time',
-      tiles: [
-        TtcArticleTile(
-          // Kept for revert (2026-09-28, explicit names): title: 'How long it usually takes',
-          title: 'How long getting pregnant usually takes',
-          id: 'ttc_tile_how_long_getting_pregnant_usually_takes',
-          blurb: "What's normal, and what can slow it down.",
-          readId: 'ttc_read_how_long_it_takes',
-        ),
-        TtcArticleTile(
-          title: 'Trying after 35',
-          id: 'ttc_tile_trying_after_35',
-          blurb: 'Why the usual advice is to ask after six months.',
-          readId: 'ttc_read_age_after_35',
-        ),
-      ],
-    ),
-
+    // ⚠️ THE CHECK FIRST (relevance Batch 3, 2026-10-27, TTC fault 7). An
+    // action door opens on the thing to do: the short "Should we see a doctor
+    // now?" questions, then how long trying usually takes. Kept for revert:
+    // the two sections were in the other order.
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'Should we see someone now?',
       heading: 'Should we see a doctor now?',
@@ -140,6 +123,27 @@ const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
               'apply.',
           slotId: 'ttc_vid_when_to_seek_help',
           duration: '5 MIN',
+        ),
+      ],
+    ),
+
+    TtcFocusSection(
+      // Kept for revert (2026-09-28, explicit names): heading: 'How long is usual?',
+      heading: 'How long does trying usually take?',
+      group: 'time',
+      tiles: [
+        TtcArticleTile(
+          // Kept for revert (2026-09-28, explicit names): title: 'How long it usually takes',
+          title: 'How long getting pregnant usually takes',
+          id: 'ttc_tile_how_long_getting_pregnant_usually_takes',
+          blurb: "What's normal, and what can slow it down.",
+          readId: 'ttc_read_how_long_it_takes',
+        ),
+        TtcArticleTile(
+          title: 'Trying after 35',
+          id: 'ttc_tile_trying_after_35',
+          blurb: 'Why the usual advice is to ask after six months.',
+          readId: 'ttc_read_age_after_35',
         ),
       ],
     ),

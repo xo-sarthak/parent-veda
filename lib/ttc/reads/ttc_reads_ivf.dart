@@ -2530,4 +2530,359 @@ final List<PvRead> kTtcReadsIvf = [
     readNext: ['ttc_read_ivf_injections'],
   ),
 
+  // ===========================================================================
+  //  IVF AND IUI, FROM THE VERY BEGINNING (relevance Batch 3, 2026-10-27)
+  // ===========================================================================
+  //  GLOBAL-CHANGES #16, in the user's words: an information door teaches
+  //  first. Many couples meet this door without knowing what the letters stand
+  //  for, so "What IUI and IVF involve" (step by step) began one step too far
+  //  in. This is the step before it: what each treatment is, which part of
+  //  conception it helps with, and why it works. It leads the door's
+  //  Understand tab, which is now the door's first tab outside a round.
+  //  Written from NICE CG156, ASRM, ESHRE and HFEA patient information; signed
+  //  by the team until a clinician signs it off (ttc_expert_signoff.dart).
+  PvRead(
+    id: 'ttc_read_ivf_iui_beginning',
+    hue: 206,
+    // An existing licensed photo from the read library (CC BY-SA 2.0,
+    // Wikimedia Commons, credited in read_images.dart under
+    // ttc_tile_talk_to_a_fertility_doctor): a consultation, for a piece that
+    // prepares the first conversation. It is on no IVF card, so the door
+    // never shows the same picture on two unrelated cards.
+    imageUrl:
+        'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_tile_talk_to_a_fertility_doctor.jpg',
+    kicker: _en('IVF & IUI'),
+    title: _en('IVF and IUI, from the very beginning'),
+    teaser: _en("What the letters stand for, which part of getting pregnant "
+        "each one helps with, and why it works, in plain words before any of "
+        "the clinic's vocabulary."),
+    shortAnswer: _en("IUI places washed sperm inside the womb around the time "
+        "you ovulate, so more of them start closer to the egg. IVF goes "
+        "further: eggs are collected, they meet sperm in a laboratory, and an "
+        "embryo is placed back in the womb a few days later. Both are help "
+        "with one or more steps your body usually does on its own, not a "
+        "different way of making a baby."),
+    scaleSetter: _en("If someone has just said 'IVF' or 'IUI' to you and you "
+        "nodded without being sure what it meant, you are in good company. "
+        "Most people only learn this when they need it. Nothing here commits "
+        "you to anything. It is the map, so the next conversation with a "
+        "doctor makes sense."),
+    author: _en('ParentVeda team'),
+    authorRole: _en('Written from the sources listed at the end'),
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en("Before the treatments, it helps to remember what usually "
+              "happens without any help, because each treatment is simply "
+              "help with one part of it. Once you can see the parts, IUI and "
+              "IVF stop sounding like mysteries and start sounding like what "
+              "they are: practical answers to specific problems."),
+          _en("This piece goes in order. First the words, then the natural "
+              "journey, then what IUI does, what IVF does, how a clinic "
+              "chooses between them, and what to ask at a first appointment."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What do the letters actually stand for?'),
+        paragraphs: [
+          _en("IUI stands for intrauterine insemination. 'Intrauterine' means "
+              "inside the uterus, which is the womb. 'Insemination' means "
+              "placing sperm. So IUI is, quite literally, placing sperm inside "
+              "the womb."),
+          _en("IVF stands for in vitro fertilisation. 'In vitro' is Latin for "
+              "'in glass', an old way of saying 'in a laboratory dish'. "
+              "'Fertilisation' is the moment a sperm and an egg join. So IVF "
+              "means the egg and sperm meet in a laboratory instead of inside "
+              "the body."),
+          _en("That single difference, inside the body or outside it, explains "
+              "almost everything else about the two: how long they take, what "
+              "they ask of you, what they cost, and which problems each one "
+              "can solve."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What has to happen for a pregnancy to begin?'),
+        paragraphs: [
+          _en("Every month, several things have to line up. An egg has to "
+              "ripen in one of the ovaries and be released. That is "
+              "ovulation, and the egg lives for about a day afterwards."),
+          _en("The egg is picked up by a fallopian tube, the narrow passage "
+              "between the ovary and the womb. Meanwhile sperm have to swim "
+              "from the vagina, through the cervix and the womb, and up into "
+              "that same tube. Only a small fraction of the millions released "
+              "get that far."),
+          _en("If a sperm meets the egg in the tube, they join. The fertilised "
+              "egg, now an embryo, divides as it travels down the tube for "
+              "four to five days, then settles into the lining of the womb. "
+              "That settling is implantation, and it is when a pregnancy "
+              "truly begins."),
+        ],
+        bullets: [
+          _en('An egg must be released (ovulation).'),
+          _en('The tube must be open, so egg and sperm can meet.'),
+          _en('Enough healthy sperm must reach the tube at the right time.'),
+          _en('The embryo must develop and implant in the womb.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('So where can it get stuck?'),
+        paragraphs: [
+          _en("Fertility treatment is easiest to understand as help with "
+              "whichever of those steps is not happening reliably. Doctors "
+              "usually look at a few broad areas."),
+          _en("Ovulation may be irregular or not happen, which is common with "
+              "PCOS. Tubes may be blocked or damaged, after an infection, "
+              "endometriosis or surgery. Sperm may be fewer, slower or "
+              "differently shaped than usual. Sometimes the timing simply "
+              "keeps missing. And for about a quarter of couples, every test "
+              "comes back normal and the reason stays unexplained, which is "
+              "frustrating but does not mean treatment cannot help."),
+          _en("Often more than one thing plays a part, and often both "
+              "partners are involved. That is why a good clinic tests both of "
+              "you before choosing a treatment."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('How does IUI help?'),
+        paragraphs: [
+          _en("IUI helps with the journey of the sperm and with the timing. "
+              "On the day you ovulate, a sample of sperm is washed in the "
+              "laboratory, which concentrates the strongest swimmers and "
+              "removes the fluid around them. A doctor then passes a very "
+              "thin, soft tube through the cervix and places them straight "
+              "into the womb. It takes a few minutes, usually feels like a "
+              "smear test, and needs no anaesthetic."),
+          _en("From there, everything happens naturally. The sperm still have "
+              "to swim up the tube and meet the egg on their own. So IUI only "
+              "makes sense when at least one tube is open and an egg is "
+              "being released, sometimes with the help of tablets or a few "
+              "injections that ripen one or two eggs and make the timing "
+              "predictable."),
+          _en("IUI is often suggested for mild sperm problems, for couples "
+              "where sex is difficult or painful, for some unexplained "
+              "infertility, and for anyone using donor sperm. It is gentler "
+              "and cheaper than IVF, and each round works less often, so "
+              "clinics usually plan for a few rounds rather than one."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('How does IVF help?'),
+        paragraphs: [
+          _en("IVF moves the meeting point out of the body, which means it "
+              "can step around problems IUI cannot. Blocked tubes no longer "
+              "matter, because the egg never needs to travel down one. Low "
+              "sperm numbers matter much less, because the sperm only need to "
+              "cross a dish, not the whole reproductive tract."),
+          _en("To make that worthwhile, IVF tries to collect several eggs at "
+              "once. For about ten to twelve days you take hormone injections "
+              "at home that encourage more follicles to grow. Scans and blood "
+              "tests check how they are doing. When they are ready, a final "
+              "'trigger' injection matures the eggs, and about a day and a "
+              "half later they are collected in a short procedure under "
+              "sedation, using a fine needle guided by ultrasound."),
+          _en("In the laboratory, the eggs are placed with sperm. If the sperm "
+              "need help, a single sperm can be injected into each egg, which "
+              "is called ICSI. Over the next three to five days the "
+              "embryologists watch which embryos grow well. Usually one "
+              "embryo is placed back in the womb through a thin tube, much "
+              "like IUI, and any other good embryos can be frozen for later."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('IUI or IVF: how is the choice made?'),
+        paragraphs: [
+          _en("A clinic does not pick a treatment from a menu. It looks at "
+              "your tests, your ages, how long you have been trying, and what "
+              "has already been tried, and then suggests the simplest step "
+              "that is likely to help. These are the usual patterns."),
+        ],
+        bullets: [
+          _en("Both tubes blocked, or severe sperm problems: IVF, often with "
+              "ICSI, because IUI relies on the tube and on enough sperm."),
+          _en("Ovulation is the main problem, as with many women with PCOS: "
+              "tablets to bring on ovulation are usually tried first, before "
+              "either IUI or IVF."),
+          _en("Mild sperm problems, donor sperm, or sex that is difficult: "
+              "IUI is often a reasonable first step."),
+          _en("Unexplained infertility: approaches differ. NICE advises "
+              "moving to IVF after two years of trying, while many clinics "
+              "offer a few rounds of IUI first. It is worth asking why your "
+              "clinic suggests what it does."),
+          _en("Age matters too. Because egg numbers fall with age, clinics "
+              "often move to IVF sooner for women in their late thirties and "
+              "forties."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What does a round feel like, from the outside?'),
+        paragraphs: [
+          _en("An IUI round fits inside one menstrual cycle. There are two or "
+              "three scans to time it, sometimes tablets or a few injections, "
+              "the insemination itself, and then a wait of about two weeks "
+              "before a pregnancy test. Most people carry on working "
+              "throughout."),
+          _en("An IVF round takes about four to six weeks from the first "
+              "injection to the pregnancy test, after tests that come first. "
+              "The injections are given at home with a small pen, and most "
+              "people learn them in one visit. There are several early-morning "
+              "scans, one day off for egg collection, a transfer a few days "
+              "later that feels much like a smear test, and then the wait."),
+          _en("The hardest part for many couples is not the needles. It is "
+              "the waiting and the uncertainty between each step. Knowing "
+              "that is normal, and planning for it, helps."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Words you will hear at the clinic'),
+        collapsible: true,
+        summary: _en('Stimulation, follicle, trigger, ICSI, blastocyst, '
+            'frozen transfer and the beta test, each in one line.'),
+        bullets: [
+          _en("Stimulation: the injections that help several eggs grow at "
+              "once."),
+          _en("Follicle: the small fluid-filled sac in the ovary that holds "
+              "one egg. Scans count and measure them."),
+          _en("Trigger: the last injection, timed to the hour, that matures "
+              "the eggs before collection or insemination."),
+          _en("Egg collection, or retrieval: lifting the eggs out of the "
+              "follicles under sedation."),
+          _en("ICSI: injecting one sperm directly into each egg."),
+          _en("Embryo: a fertilised egg that has started to divide."),
+          _en("Blastocyst: an embryo grown for five or six days, which is "
+              "often the stage chosen for transfer."),
+          _en("Transfer: placing an embryo in the womb."),
+          _en("Frozen transfer: using an embryo frozen earlier, in a later "
+              "cycle. It is now very common and works as well as a fresh "
+              "transfer for many people."),
+          _en("Beta: the blood test for pregnancy hormone, about two weeks "
+              "after a transfer or insemination."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What can these treatments promise, and what can they not?'),
+        paragraphs: [
+          _en("Neither treatment works every time, and a round that does not "
+              "work is common rather than a sign that it never will. Many "
+              "couples need more than one attempt, which is why clinics talk "
+              "about plans over several rounds rather than single tries."),
+          _en("How often treatment works depends most of all on the woman's "
+              "age and on the cause, and clinics publish figures that are "
+              "easy to misread. The piece on reading a clinic's success rate "
+              "explains which numbers matter. Your own doctor is the only "
+              "person who can talk about your situation."),
+        ],
+        callout: PvCallout(
+          tone: PvCalloutTone.reassure,
+          title: _en('Three things that are not true'),
+          body: _en("IVF babies are not different from other babies, and most "
+              "grow up exactly like their friends. IVF does not use up your "
+              "eggs or bring an early menopause: it rescues eggs your body "
+              "would have let go that month anyway. And twins are not "
+              "inevitable: putting back one embryo at a time is now standard "
+              "practice."),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('Questions worth taking to a first appointment'),
+        bullets: [
+          _en('Which of our test results points towards IUI or IVF, and why?'),
+          _en('What would you suggest trying first, and for how many rounds?'),
+          _en('Does he need tests or treatment too?'),
+          _en('How many embryos would you put back, and why?'),
+          _en('What does a full round cost here, and what is not in the package?'),
+          _en('Who do we call between appointments if something feels wrong?'),
+        ],
+        tip: PvReadTip(
+          title: _en('Take notes, or take each other'),
+          body: _en("First appointments carry a lot of new words. Going "
+              "together, or writing down the answers, means neither of you "
+              "has to remember everything alone."),
+        ),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When to ask about fertility help'),
+      body: _en("See a doctor if you have been trying for a year without a "
+          "pregnancy, or after six months if you are 35 or older. Go straight "
+          "away, without waiting, if you are 40 or older, have periods that "
+          "are very irregular or absent, have had two or more miscarriages, "
+          "or know of a condition that affects fertility, in either of you. "
+          "During a treatment round, call your own clinic at once for severe "
+          "tummy pain, a lot of bloating, breathlessness or passing much less "
+          "urine. Nothing here is advice about your own treatment, which is "
+          "your clinic's to plan."),
+    ),
+
+    faqs: [
+      PvReadFaq(
+        question: _en('Is IVF the last resort?'),
+        answer: _en("No. For blocked tubes or severe sperm problems it is "
+            "often the first and most sensible treatment. Clinics suggest the "
+            "simplest step likely to help, which is sometimes IUI and "
+            "sometimes straight to IVF."),
+      ),
+      PvReadFaq(
+        // Kept for revert: 'Does IUI hurt?' (asked already in the IUI-day
+        // read; the no-repetition test holds one answer per question).
+        question: _en('Will we need time off work?'),
+        answer: _en("For IUI, usually only an hour or two for the procedure "
+            "and a couple of early scans. For IVF, plan for several "
+            "early-morning scans, the day of egg collection off, and an easy "
+            "day after it. Many people tell their manager only that they have "
+            "a few medical appointments coming up."),
+      ),
+      PvReadFaq(
+        question: _en('Do we have to decide between IUI and IVF ourselves?'),
+        answer: _en("No. Your clinic suggests a plan from your tests and your "
+            "history. Your part is to understand it, ask why, and say what "
+            "matters to you, including cost and time."),
+      ),
+    ],
+
+    evidence: _en('How conception works and where it can stop, the use of '
+        'IUI and IVF, ICSI, single embryo transfer, and the timing of seeing '
+        'a doctor follow NICE CG156 (Fertility problems, updated 2017), the '
+        'ASRM patient guides and committee opinions, ESHRE good practice '
+        'recommendations, and HFEA patient information. Indian practice and '
+        'regulation: the ART (Regulation) Act 2021. Sources checked October '
+        '2026. Nothing here describes your own treatment plan, which your '
+        'clinic sets.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('What IUI and IVF involve, step by step'),
+        value: _en('The next level of detail: each step in order, and what '
+            'it asks of you.'),
+        surfaceId: 'ttc_read/ttc_read_ivf_explained',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en("Reading a clinic's success rate"),
+        value: _en('Which numbers matter, and which ones flatter a clinic.'),
+        surfaceId: 'ttc_read/ttc_read_ivf_success_rates',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en("Track a round you're already in"),
+        value: _en('Injections, trigger, collection, transfer and the test '
+            'date, in one place.'),
+        surfaceId: 'ttc_treatment',
+      ),
+    ],
+  ),
+
 ];

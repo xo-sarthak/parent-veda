@@ -333,6 +333,11 @@ doors have little that explains them").
 - Each door's recommended kind is in `docs/door-relevance/PREGNANCY-GAP.md`
   §4 and `TTC-GAP.md` §4. Parenting doors were given their kind in their own
   plans.
+- **BUILT for Pregnancy (Batch 2) and TTC (Batch 3), 2026-10-27.** TTC: IVF
+  opens on "IVF and IUI, from the very beginning" outside a round; Body and
+  cycle on "Reading your cycle, phase by phase"; Getting ready on its
+  checklist; Not yet on the doctor check; Mind and body headings open
+  practices. Test: `test/relevance_batch3_test.dart`.
 
 ---
 

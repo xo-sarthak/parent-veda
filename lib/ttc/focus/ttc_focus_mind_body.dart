@@ -438,6 +438,22 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       heading: 'Start a daily practice', // was 'What is a daily practice for?' (action headings, 2026-10-23)
       group: 'understand',
       tiles: [
+        // ⚠️ THE PRACTICE FIRST (relevance Batch 3, 2026-10-27, TTC fault 9).
+        // An action heading has to open an action: "Start a daily practice"
+        // led with an essay about what a practice is for. It now opens the
+        // door's own daily practice, Today's practice, which picks one for
+        // her day; the reasons follow for anyone who wants them.
+        // A "do" card, not a Tool tile: this door's brief has no tools or
+        // trackers (ttc_mind_body_test), and a practice is neither.
+        TtcDoTile(
+          title: "Start today's practice",
+          // A licensed photo already in the table (Wikimedia, CC BY-SA, on
+          // the PCOS door only), so this card has a picture without
+          // repeating one on this door.
+          id: 'ttc_tile_yoga_and_your_mood',
+          blurb: 'A few minutes, picked for your day. Start with one.',
+          surfaceId: 'ttc_mind_today',
+        ),
         TtcGuideTile(
           title: 'What a daily practice is for',
           id: 'ttc_tile_what_a_daily_practice_is_for',
@@ -627,6 +643,15 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       heading: 'Sleep better while trying', // was 'How do you sleep better while trying?' (action headings, 2026-10-23)
       group: 'ready',
       tiles: [
+        // ⚠️ THE PRACTICE FIRST (Batch 3, 2026-10-27, TTC fault 9): the action
+        // heading opens a one-minute breath, then the two reads.
+        TtcDoTile(
+          title: 'A calming breath for bedtime',
+          id: 'ttc_tile_a_calming_breath_for_bedtime',
+          blurb: 'One minute, sitting or lying. Breathing out for longer than '
+              'you breathe in is what does the work.',
+          surfaceId: 'ttc_practice/mb_longout',
+        ),
         TtcGuideTile(
           title: "Why sleep matters when you're trying",
           id: 'ttc_tile_why_sleep_matters_when_you_re_trying',
@@ -651,13 +676,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         //   readId: _kStress,
         //   atHeading: 'So what is a daily practice for?',
         // ),
-        TtcDoTile(
-          title: 'A calming breath for bedtime',
-          id: 'ttc_tile_a_calming_breath_for_bedtime',
-          blurb: 'One minute, sitting or lying. Breathing out for longer than '
-              'you breathe in is what does the work.',
-          surfaceId: 'ttc_practice/mb_longout',
-        ),
+        // The calming breath moved to the front (Batch 3, 2026-10-27).
       ],
     ),
 

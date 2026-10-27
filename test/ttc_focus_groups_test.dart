@@ -119,9 +119,14 @@ void main() {
       // 'Going through it', 'Track'.
       // 2026-10-22: 'Step by step' leads, the door's first tab (the user:
       // "make sure that the user understands ... what happens at each step").
+      // 2026-10-27 (relevance Batch 3, GLOBAL-CHANGES #16): Understand
+      // leads outside a round, opening on "IVF and IUI, from the very
+      // beginning"; a running round still puts Step by step first
+      // (`ttcDoorOrderedGroups`, held in relevance_batch3_test.dart).
+      // Kept for revert: 'Step by step', 'Understand treatment', ...
       expect([for (final g in ivf.groups!) g.label], [
-        'Step by step',
         'Understand treatment',
+        'Step by step',
         'Should I get help?',
         'Age and second baby',
         'Money and clinics',

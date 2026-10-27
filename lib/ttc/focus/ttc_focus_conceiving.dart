@@ -182,7 +182,12 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         TtcToolTile(
           title: 'Your best days this month',
           id: 'ttc_tile_your_best_days_this_month',
-          blurb: 'Your own dates, from the period you logged.',
+          // True on both kinds of cycle (Batch 3, 2026-10-27, TTC fault 3):
+          // on a clinic cycle the tool shows the clinic's dates, and this line
+          // said "your own dates" over it. Kept for revert:
+          //   blurb: 'Your own dates, from the period you logged.',
+          blurb: "Your own dates from the period you logged, or your clinic's "
+              'dates when a clinic is guiding this cycle.',
           surfaceId: 'ttc_window',
         ),
         // ⚠️ THE TRIAL FOR THE PICTURE-LED ARTICLE. One tile, one image,

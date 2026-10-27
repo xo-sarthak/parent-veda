@@ -143,15 +143,15 @@ Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5
 **Wrong**
 1. ~~Ask Veda suggests fertile-window questions while a clinic runs the cycle~~ **DONE (Batch 1, 2026-10-27):** `ttcScreenChapter` (`ttc_home_situation.dart`) follows the round step; held day by day in `ttc_date_consistency_test.dart`. Was: (`ttc_askveda_screen.dart:334`). *Fix:* when `ownership != parentveda`, pick suggestions by round step.
 2. ~~A "Your period came" card shows on her first period after a loss~~ **DONE (Batch 1, 2026-10-27):** counts `currentPeriodStarts`. Was: (`ttc_home_situation.dart:93`). *Fix:* count from `currentPeriodStarts`.
-3. Conceiving opens a clinic-cycle user on "Your own dates, from the period you logged" (`ttc_focus_conceiving.dart:185`). *Fix:* clinic-aware copy, or tag a clinic-safe tab with round steps.
+3. ~~Conceiving opens a clinic-cycle user on "Your own dates"~~ **DONE (Batch 3, 2026-10-27):** the card line is true on both kinds of cycle ("or your clinic's dates when a clinic is guiding this cycle"). Was: (`ttc_focus_conceiving.dart:185`). *Fix:* clinic-aware copy, or tag a clinic-safe tab with round steps.
 4. The Store puts ovulation kits and a pregnancy test first during an IVF-type round and after a loss (`pv_store_screen.dart:672-703`). *Fix:* move those needs down when `ttcHomeHidesQuickRow` or `lossRecentlyClosed` is true.
-5. The IVF door opens on the journey, not on what IVF and IUI are. *Fix:* an explainer first (decision, section 0).
+5. ~~The IVF door opens on the journey, not on what IVF and IUI are.~~ **DONE (Batch 3, 2026-10-27):** outside a round it opens on Understand treatment, led by the new read "IVF and IUI, from the very beginning" (`ttc_read_ivf_iui_beginning`, about 1,560 words: what the letters mean, the natural journey, where it gets stuck, how each helps, how a clinic chooses, the words, what they can promise, questions to ask). During a round Step by step still leads (the 2026-10-22 decision). Video for it still owed. Was: *Fix:* an explainer first (decision, section 0).
 
 **Weak**
 6. **MOVED TO BATCH 4 (decided in Batch 1):** confirmed it counts months only (`ttcTryingLongReached`, `ttc_messages_store.dart:526`; 6 or 12 by age). Its words are about months, and the losses input is changing in the tools terminal (losses to be worked out, not asked), so it is wired after that lands, with a reason-based line. Was: The home's "Time for a check" card may count months only (`ttcTryingLongReached`). *Fix:* if so, read `firedRules` (`ttc_fertility_help_rules.dart:420`). The rules engine itself and the "losses asked rather than worked out" gap are Terminal B's.
-7. Getting ready and Not yet bury their tool. *Fix:* the checklist / doctor check as the first card.
-8. Body and cycle opens on trackers. *Fix:* a "how your cycle works" explainer first.
-9. Mind and body's action headings open articles. *Fix:* a practice first; tighten the test.
+7. ~~Getting ready and Not yet bury their tool.~~ **DONE (Batch 3, 2026-10-27):** Getting ready's checklist is the first tab; Not yet opens on "Should we see a doctor now?". Was: *Fix:* the checklist / doctor check as the first card.
+8. ~~Body and cycle opens on trackers.~~ **DONE (Batch 3, 2026-10-27):** its Your cycle tab opens on the new read "Reading your cycle, phase by phase" (`ttc_read_cycle_phase_by_phase`, about 1,330 words), which also answers demand #1 (the luteal phase), cervical mucus, morning temperature and what an ovulation test can and cannot tell you. Was: *Fix:* a "how your cycle works" explainer first.
+9. ~~Mind and body's action headings open articles.~~ **DONE (Batch 3, 2026-10-27):** "Start a daily practice" opens Today's practice; "Sleep better while trying" opens the calming breath. Other headings that open guidance ("Handle family questions and news") are guidance by nature and stay. Was: *Fix:* a practice first; tighten the test.
 10. The Tools tab leads with Ovulation tests / Fertile window on a clinic cycle (`ttc_tools_screen.dart:1302`). *Fix:* when a clinic owns the cycle, lift Treatment, Medication and Appointments. Order only; rows stay with Terminal B.
 11. ~~Sanskar follows the chapter~~ **DONE (Batch 1, 2026-10-27):** the home's chapter is `ttcScreenChapter(today.chapter)`. Was: (`ttc_home_v3.dart:767`). *Fix:* use the round step or phase; stay general when `any`.
 12. Day one shows four "start" prompts. *Fix:* one lead card until she has logged a period.
@@ -162,7 +162,7 @@ Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5
 17. Yoga ignores the round step and the after-loss state (`yoga_home_screen.dart:360`). *Fix:* a gentle line and no "Fertility yoga" rail during a round.
 18. No search ranks by phase. *Fix:* when text scores tie, put items for her moment first.
 19. ~~Window messages restart straight after a loss.~~ **ALREADY DONE (found in Batch 1):** `lastPeriodStart` is null after a loss until her first new period (`cycle_store.dart:161-166`, 2026-10-24), so the window and its message stay quiet. The helper misread it. *Fix:* hold them until the first period after the loss.
-20. The demand gaps in section 4. *Fix:* one section each in the door that owns it.
+20. **PART DONE (Batch 3, 2026-10-27):** the cycle read covers ranks 1, 10/23/49, 13/18/29/36 and 17/19/28/40. Still owed (Batch 6): low AMH, IVF twins, IUI or IVF failure, conceiving after 35, sperm and age. Was: The demand gaps in section 4. *Fix:* one section each in the door that owns it.
 
 **Polish**
 21. `ttcDoorVideosFirst` drops tags. *Fix:* use `s.withTiles`.

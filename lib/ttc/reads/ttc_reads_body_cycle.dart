@@ -1759,4 +1759,318 @@ final List<PvRead> kTtcReadsBodyCycle = [
       'ttc_read_bleeding_kinds',
     ],
   ),
+  // ===========================================================================
+  //  READING YOUR CYCLE, PHASE BY PHASE (relevance Batch 3, 2026-10-27)
+  // ===========================================================================
+  //  GLOBAL-CHANGES #16: Body and cycle is an information door ("is this
+  //  normal?"), so it opens on an explanation before its trackers. This is
+  //  that explanation, and it answers the top TTC questions no door covered
+  //  (research/questions/ranked_ttc.csv): when the luteal phase is (#1),
+  //  cervical mucus as a sign (#10, 23, 49), basal body temperature (#13, 18,
+  //  29, 36), and what an ovulation test can and cannot say (#17, 19, 28, 40).
+  //  It links to the existing deeper reads rather than restating them.
+  PvRead(
+    id: 'ttc_read_cycle_phase_by_phase',
+    hue: 172,
+    // A calendar, because the piece is about which days (the picture "How
+    // conception works" carries on the Conceiving door, not on this one).
+    imageUrl:
+        'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop',
+    kicker: _en('Body and cycle'),
+    title: _en('Reading your cycle, phase by phase'),
+    teaser: _en("The four phases of a cycle, when each one happens, what the "
+        "luteal phase is, and the signs that tell you where you are."),
+    shortAnswer: _en("A cycle runs from the first day of one period to the day "
+        "before the next. It has four phases: your period, the follicular "
+        "phase while an egg ripens, ovulation, and the luteal phase, which "
+        "lasts from ovulation until your next period, usually about 12 to 14 "
+        "days. Cervical mucus, a small rise in morning temperature, and "
+        "ovulation tests are three ways to see where you are."),
+    scaleSetter: _en("You do not need to track any of this to get pregnant. "
+        "Sex every two or three days covers the days that matter. But if "
+        "your cycle has always felt like a black box, knowing its four parts "
+        "can turn guesswork into something that makes sense, and makes a "
+        "late or early period less frightening."),
+    author: _en('ParentVeda team'),
+    authorRole: _en('Written from the sources listed at the end'),
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        heading: _en('Where does a cycle start, and how long is normal?'),
+        paragraphs: [
+          _en("Day one of a cycle is the first day of real bleeding, not "
+              "spotting. The cycle ends the day before your next period "
+              "starts. Count those days and you have the length of that "
+              "cycle."),
+          _en("For adults, anything from 21 to 35 days is considered normal, "
+              "and the textbook 28 days is simply an average. It is also "
+              "normal for your own cycles to vary by a few days from month to "
+              "month. What matters more than any one number is your usual "
+              "pattern."),
+        ],
+        tip: PvReadTip(
+          title: _en('Your usual length'),
+          body: _en("Add up your last three or four cycle lengths and divide "
+              "by how many there are. That is a better guide to you than any "
+              "average."),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('Phase one: your period'),
+        paragraphs: [
+          _en("If no pregnancy began last cycle, hormone levels fall and the "
+              "lining of the womb is shed. That is your period. It usually "
+              "lasts two to seven days, and the first day or two are often "
+              "the heaviest."),
+          _en("While you bleed, the next cycle is already starting. Hormones "
+              "from the brain are signalling the ovaries to wake a new group "
+              "of follicles, each holding an egg."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Phase two: the follicular phase'),
+        paragraphs: [
+          _en("The follicular phase runs from day one until ovulation. Over "
+              "these days one follicle grows ahead of the rest, making "
+              "oestrogen as it grows. Oestrogen rebuilds the lining of the "
+              "womb and, nearer ovulation, changes the mucus at your cervix."),
+          _en("This is the flexible part of the cycle. It can be ten days or "
+              "twenty, and stress, illness, travel or poor sleep can stretch "
+              "it. So when a cycle is longer or shorter than usual, it is "
+              "almost always this phase that changed, which also means "
+              "ovulation came later or earlier that month."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Phase three: ovulation'),
+        paragraphs: [
+          _en("When the leading follicle is ready, a surge of luteinising "
+              "hormone, called LH, makes it release its egg. That is "
+              "ovulation. The egg lives for about 12 to 24 hours."),
+          _en("Sperm can survive in the body for up to five days. That is why "
+              "the fertile window is about six days long: the five days "
+              "before ovulation and the day itself. The two or three days "
+              "just before ovulation are the most fertile of all."),
+          _en("In a 28-day cycle ovulation is often around day 14, but in "
+              "real cycles it moves. A useful rule of thumb is that "
+              "ovulation tends to happen about two weeks before the next "
+              "period, not two weeks after the last one."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Phase four: the luteal phase'),
+        paragraphs: [
+          _en("The luteal phase is the second half of the cycle. It starts "
+              "the day after ovulation and ends the day before your next "
+              "period. Its name comes from the corpus luteum, the empty "
+              "follicle left behind, which turns into a small gland and makes "
+              "progesterone."),
+          _en("Progesterone gets the lining of the womb ready for an embryo. "
+              "It also raises your resting temperature slightly and is "
+              "behind many of the familiar feelings before a period: tender "
+              "breasts, bloating, tiredness, mood changes."),
+          _en("Unlike the first half, the luteal phase is fairly steady, "
+              "usually about 12 to 14 days, and anything from about 10 to 16 "
+              "days is common. If an embryo implants, around six to ten days "
+              "after ovulation, it starts making the pregnancy hormone hCG, "
+              "which keeps progesterone going and stops the period. If not, "
+              "progesterone falls and the next period begins."),
+        ],
+        callout: PvCallout(
+          tone: PvCalloutTone.note,
+          title: _en("If you've read about a 'short luteal phase'"),
+          body: _en("A slightly short second half on one cycle is common and "
+              "rarely means anything. Doctors no longer rely on a single "
+              "measurement to diagnose a problem here. If your period "
+              "regularly comes less than ten days after ovulation, or you "
+              "often spot for days beforehand, it is worth mentioning to a "
+              "gynaecologist rather than treating yourself."),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('How can you tell which phase you are in?'),
+        paragraphs: [
+          _en("Your body gives three signs that are worth knowing. None is "
+              "perfect on its own, and you do not need all three."),
+        ],
+        bullets: [
+          _en("Cervical mucus. After your period it is usually dry or "
+              "sticky. As ovulation nears it becomes wetter, clear and "
+              "stretchy, rather like raw egg white. That slippery mucus "
+              "helps sperm swim and is one of the best everyday signs that "
+              "your fertile days have arrived. After ovulation it turns thick "
+              "or dry again."),
+          _en("Morning temperature. Progesterone raises your resting "
+              "temperature by about 0.2 to 0.5 degrees Celsius after "
+              "ovulation, and it stays up until your period. Taken every "
+              "morning before you get up, it shows that ovulation has "
+              "already happened, which is useful for learning your pattern "
+              "but too late to time sex in that same cycle."),
+          _en("Ovulation tests. These urine tests detect the LH surge, which "
+              "usually comes 24 to 36 hours before ovulation. A positive "
+              "result means the next day or two are your best days."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What an ovulation test can and cannot tell you'),
+        paragraphs: [
+          _en("Start testing a few days before you expect to ovulate. A "
+              "simple way to choose the day is to subtract 17 from your usual "
+              "cycle length: for a 30-day cycle, start on day 13. Test at the "
+              "same time each day, and avoid drinking a lot beforehand, which "
+              "dilutes the result."),
+          _en("A positive test shows the LH surge. It does not prove that an "
+              "egg was released, and some women, especially with PCOS, see "
+              "several positives in one cycle or a positive with no "
+              "ovulation."),
+          _en("An ovulation test is not a pregnancy test. The pregnancy "
+              "hormone can make some ovulation tests turn positive, but they "
+              "are not designed or reliable for that. If your period is late, "
+              "use a pregnancy test."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('One cycle, drawn out: a 30-day example'),
+        paragraphs: [
+          _en("Numbers are easier to picture in a real month. Imagine a "
+              "cycle that is usually 30 days long."),
+          _en("Days 1 to 5 are the period. Around day 6 the bleeding has "
+              "stopped and mucus is dry or sticky. Over the next week one "
+              "follicle pulls ahead, oestrogen rises, and by about day 12 the "
+              "mucus turns wetter and clearer. If she uses ovulation tests, "
+              "she starts on day 13, because 30 minus 17 is 13."),
+          _en("Around day 15 the test turns positive, and the mucus is at its "
+              "most slippery. Ovulation follows about a day later, around day "
+              "16. Her fertile window ran from roughly day 11 to day 16, and "
+              "the best days for sex were days 14, 15 and 16."),
+          _en("From day 17 her morning temperature sits a little higher and "
+              "the mucus dries up again. This is the luteal phase, and it "
+              "lasts about two weeks, to day 30. If a pregnancy has begun, a "
+              "home test may show it from around the day her period is due. "
+              "If not, her period arrives on about day 31, which is day 1 of "
+              "the next cycle."),
+          _en("In a 26-day cycle, everything before ovulation simply happens "
+              "about four days sooner. In a 35-day cycle, it happens about "
+              "five days later. The second half stays roughly the same."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What can shift a cycle?'),
+        paragraphs: [
+          _en("Because the first half of the cycle is the flexible one, "
+              "anything that affects the brain's signals to the ovaries can "
+              "delay ovulation and lengthen that month. Most of these are "
+              "temporary, and a cycle usually settles once the cause passes."),
+        ],
+        bullets: [
+          _en("Stress, illness, travel across time zones, or a run of poor "
+              "sleep."),
+          _en("A big change in weight, very intense exercise, or eating much "
+              "less than the body needs."),
+          _en("Thyroid problems, raised prolactin, and PCOS, which are worth "
+              "testing for if cycles are often long or irregular."),
+          _en("Breastfeeding, and the months after a pregnancy or a loss, "
+              "when cycles take time to return to their pattern."),
+          _en("Stopping hormonal contraception. Cycles often come back within "
+              "a month or two, and occasionally take a few months longer."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en("What is normal, and what is worth a doctor's look?"),
+        paragraphs: [
+          _en("Most variation is ordinary. A cycle that is four days longer "
+              "than usual after a stressful month, a little spotting around "
+              "ovulation, or a period that is heavier one month and lighter "
+              "the next are all common."),
+          _en("A few patterns are worth showing a gynaecologist, not because "
+              "they are emergencies, but because they can affect ovulation "
+              "and are often easy to look into."),
+        ],
+        bullets: [
+          _en('Cycles that are regularly shorter than 21 days or longer than 35.'),
+          _en('No period for three months, when you are not pregnant.'),
+          _en('Bleeding between periods or after sex.'),
+          _en('Periods so heavy you soak through protection every hour or two.'),
+          _en('Period pain that stops you from doing ordinary things.'),
+        ],
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When to see a doctor'),
+      body: _en("See a doctor if your cycles are regularly shorter than 21 "
+          "days or longer than 35, if you have gone three months without a "
+          "period and are not pregnant, if you bleed between periods or after "
+          "sex, or if periods are very heavy or painful. Go urgently for "
+          "sudden severe pain low in your tummy, especially with a positive "
+          "pregnancy test or a missed period. And see a doctor about trying "
+          "to conceive after a year without a pregnancy, after six months if "
+          "you are 35 or older, or straight away at 40 or older."),
+    ),
+
+    faqs: [
+      PvReadFaq(
+        question: _en('Does a shorter cycle mean I ovulate earlier?'),
+        answer: _en("Usually, yes. Because the second half of the cycle is "
+            "fairly steady, a shorter cycle mostly means a shorter first half "
+            "and an earlier ovulation. In a 24-day cycle, ovulation is often "
+            "around day 10."),
+      ),
+      PvReadFaq(
+        question: _en('Can I get pregnant during my period?'),
+        answer: _en("It is unlikely but possible, mainly with short cycles. "
+            "Sperm can live up to five days, so sex at the end of a period "
+            "can overlap with an early ovulation."),
+      ),
+      PvReadFaq(
+        question: _en('My ovulation test was positive but my period came. What happened?'),
+        answer: _en("That is very common. A positive test shows the hormone "
+            "surge that comes before ovulation, but timing, sperm and "
+            "implantation all have to line up too, and for healthy couples "
+            "that happens in some cycles and not others. One cycle tells you "
+            "very little on its own."),
+      ),
+    ],
+
+    evidence: _en('Normal cycle length and the menstrual cycle as a sign of '
+        'health: ACOG Committee Opinion 651. The six-day fertile window and '
+        'survival of egg and sperm: Wilcox et al., NEJM 1995, and NICE CG156. '
+        'The luteal phase and the limits of diagnosing a short one: ASRM '
+        'Practice Committee opinion on the clinical relevance of luteal phase '
+        'deficiency (2021). Cervical mucus, basal body temperature and LH '
+        'testing: NICE CG156 and the WHO family planning handbook. Sources '
+        'checked October 2026.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('See your fertile days'),
+        value: _en('Your own window, worked out from the periods you log.'),
+        surfaceId: 'ttc_window',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('Ovulation kits, honestly'),
+        value: _en('Which kits are worth it, and how to read them.'),
+        surfaceId: 'ttc_read/ttc_read_ovulation_kits',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('Taking your morning temperature'),
+        value: _en('How to chart it, and when it is fine to stop.'),
+        surfaceId: 'ttc_read/ttc_read_morning_temperature',
+      ),
+    ],
+  ),
+
 ];

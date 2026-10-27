@@ -80,6 +80,24 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
     // =========================================================================
     //  The two tools first, as on Fertile window: what she logs is what makes
     //  every read below easier to act on, and easier to show a doctor.
+    // ⚠️ THE EXPLANATION FIRST (relevance Batch 3, 2026-10-27, TTC fault
+    // 8). Body and cycle is an INFORMATION door ("is this normal?"), so it
+    // opens on how a cycle works, including the luteal phase, the top TTC
+    // question nothing answered, before the trackers below.
+    TtcFocusSection(
+      heading: 'How does your cycle work?',
+      group: 'cycle',
+      tiles: [
+        TtcArticleTile(
+          title: 'Reading your cycle, phase by phase',
+          id: 'ttc_tile_reading_your_cycle_phase_by_phase',
+          blurb: 'The four phases, the luteal phase, and the signs that show '
+              'where you are.',
+          readId: 'ttc_read_cycle_phase_by_phase',
+        ),
+      ],
+    ),
+
     TtcFocusSection(
       // Kept for revert (2026-09-28, explicit names): heading: 'How do you keep track of it?',
       heading: 'How do you keep track of your cycle?',

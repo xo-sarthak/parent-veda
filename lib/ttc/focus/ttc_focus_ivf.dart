@@ -132,6 +132,20 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     // on top. Its body is the inline tool `ttc_treatment_journey`
     // (lib/screens/ttc/doors/ttc_treatment_journey.dart); the reads for each
     // step sit under it.
+    // ⚠️ UNDERSTAND FIRST, OUTSIDE A ROUND (relevance Batch 3, 2026-10-27;
+    // GLOBAL-CHANGES #16, the user's own example: "When the doors like IVF
+    // and IUI open up ... we should be educating them first ... what is it,
+    // how it is like that, why it works"). It opens on "IVF and IUI, from the
+    // very beginning", then the step-by-step read and its film. While a round
+    // is planned or running, `ttcDoorOrderedGroups` still puts Step by step
+    // first, so the 2026-10-22 decision holds where it matters most. Kept for
+    // revert: Step by step was listed first, Understand second.
+    TtcFocusGroup(
+        id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
+        // Kept for revert (2026-09-28, explicit names): label: 'Understand',
+        label: 'Understand treatment',
+        icon: Icons.menu_book_outlined,
+        hue: 206),
     TtcFocusGroup(
         id: kTtcIvfStepsGroupId, mark: IntentMark.timelineRail, tabMark: TtcTabMark.flagPath,
         label: 'Step by step',
@@ -139,12 +153,6 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         hue: 206,
         inlineSurfaceId: 'ttc_treatment_journey',
         inlineLabel: 'Every step, in order'),
-    TtcFocusGroup(
-        id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
-        // Kept for revert (2026-09-28, explicit names): label: 'Understand',
-        label: 'Understand treatment',
-        icon: Icons.menu_book_outlined,
-        hue: 206),
     TtcFocusGroup(
         id: 'help', mark: IntentMark.questionMark, tabMark: TtcTabMark.signpost,
         label: 'Should I get help?',
@@ -245,6 +253,22 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     // -------------------------------------------------------------------------
     //  Understand
     // -------------------------------------------------------------------------
+    // The plain beginning, before any process (Batch 3, 2026-10-27): what
+    // the letters stand for, which step of conception each helps, and why.
+    TtcFocusSection(
+      heading: 'What are IVF and IUI?',
+      group: 'understand',
+      tiles: [
+        TtcArticleTile(
+          title: 'IVF and IUI, from the very beginning',
+          id: 'ttc_tile_ivf_and_iui_from_the_beginning',
+          blurb: 'What the letters mean, what each one helps with, and why '
+              'it works.',
+          readId: 'ttc_read_ivf_iui_beginning',
+        ),
+      ],
+    ),
+
     TtcFocusSection(
       heading: 'What do the treatments involve?',
       group: 'understand',

@@ -107,6 +107,15 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
   // Habits and first steps. Every piece stays, in the same order; only the
   // tab it sits under moved. The two retired tabs are kept for revert.
   groups: [
+    // ⚠️ THE CHECKLIST FIRST (relevance Batch 3, 2026-10-27, TTC fault 7).
+    // Getting ready is an ACTION door (GLOBAL-CHANGES #15/#16): it opens on
+    // her Ready-to-Try plan, not on an article about food. Kept for revert:
+    // this tab was the last of the four.
+    TtcFocusGroup(
+        id: 'checklist', mark: IntentMark.checkMark, tabMark: TtcTabMark.checklist,
+        label: 'Your checklist',
+        icon: Icons.checklist_rtl_rounded,
+        hue: 160),
     // Kept for revert (2026-09-28): label: 'Diet and supplements',
     TtcFocusGroup(
         id: 'diet', mark: IntentMark.plate, tabMark: TtcTabMark.jarLeaf,
@@ -138,11 +147,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     //     label: 'Before you start',
     //     icon: Icons.event_note_outlined,
     //     hue: 344),
-    TtcFocusGroup(
-        id: 'checklist', mark: IntentMark.checkMark, tabMark: TtcTabMark.checklist,
-        label: 'Your checklist',
-        icon: Icons.checklist_rtl_rounded,
-        hue: 160),
+    // Your checklist moved to the front (Batch 3, 2026-10-27).
   ],
 
   // ⚠️ POPULATED BUT NOT DRAWN, as on the other three pages. The paid

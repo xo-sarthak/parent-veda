@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/reads/read_images.dart' show pvFilmStillFor;
 import 'package:parentveda/screens/ttc/doors/ttc_door_screen.dart'
-    show ttcDoorVideosFirst, kTtcIvfBracketId;
+    show ttcDoorVideosFirst, ttcDoorOrderedGroups, kTtcIvfBracketId;
 import 'package:parentveda/screens/ttc/doors/ttc_treatment_journey.dart';
 import 'package:parentveda/screens/ttc/ttc_surface_router.dart'
     show ttcInlineToolFor;
@@ -97,8 +97,13 @@ void main() {
   });
 
   group('the door', () {
-    test('Step by step is the first tab, and its body resolves', () {
-      final first = kTtcIvfFocus.groups!.first;
+    // 2026-10-27 (relevance Batch 3): Understand leads outside a round, and
+    // Step by step leads while a round runs. Kept for revert: the test read
+    // `kTtcIvfFocus.groups!.first` and expected the steps tab.
+    test('Step by step leads a running round, and its body resolves', () {
+      final first = ttcDoorOrderedGroups(kTtcIvfFocus.groups!,
+              bracketId: kTtcIvfBracketId, ageBand: null, roundRunning: true)
+          .first;
       expect(first.id, kTtcIvfStepsGroupId);
       expect(first.inlineSurfaceId, kTtcTreatmentJourneySurface);
       expect(ttcInlineToolFor(first.inlineSurfaceId!), isNotNull,
