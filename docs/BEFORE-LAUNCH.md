@@ -186,6 +186,8 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **DECIDE** · Every pregnancy read is `reviewed: false`, and Ask Veda grounds answers in them; decide whether that can ship · user · PREGNANCY-ASKVEDA-HANDOFF · added 2026-10-17
 - [ ] **LAUNCH** · Father copy is a working draft ("mine, not yours") · user · STILL-OPEN §10.1–§10.2 · added 2026-10-17
 - [ ] **LAUNCH** · Six parenting "Ask Veda" rows open Brain, not Ask Veda (quick action, two recipe rows, three watch screens, a reco row); route them to `openPpAskVeda` · dev · STILL-OPEN §100.2 · added 2026-10-24
+- [ ] **CHECK** · TTC doctor check (tools pass T1, 2026-10-27): after a pregnancy loss, "how long have you been trying" counts every month spent trying and leaves out the months she was pregnant (the user's option A; she can change what it counts from). Confirm this is the right default for the six- and twelve-month doctor check · clinician · docs/preg-ttc-tool-plans/T1-doctor-check.md · added 2026-10-28
+- [ ] **CHECK** · TTC doctor check's loss wording (tools pass T1, 2026-10-27). One loss: "You've had one pregnancy loss. One loss on its own isn't a sign that anything is wrong, and it's always fine to talk to a doctor about it." (`kIvfOneLossLine`). Two or more: "It's worth talking to someone now… because you've had two or more pregnancy losses." (`lib/ttc/ttc_ivf_readiness.dart`) · clinician · docs/preg-ttc-tool-plans/T1-doctor-check.md · added 2026-10-28
 
 ---
 

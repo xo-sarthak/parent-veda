@@ -1613,3 +1613,32 @@ doctor visit lists her own), `test/pp_records_merge_test.dart`, `test/pp_child_r
 
 **Known limit:** the media bucket lets the uploader and the paired partner read a photo (0013, 0014). A third
 caregiver on the child sees the milestone and its day, not its photo.
+
+## Step 25: how long she has been trying, a fact and a basis (T1)
+
+**Date:** 2026-10-27 (Pregnancy and TTC tools pass, T1, the user's word on 2026-10-28).
+**Migration:** `0117_ttc_trying_count.sql`, run by the user 2026-10-28. **Commit:** `00b3cc5`.
+
+### Why
+After a pregnancy loss she comes back to trying, and the doctor check (six months at 35 or over, twelve under)
+kept counting from her old start, so the months she was pregnant counted as trying. Five readers also worked the
+number out five ways, and his phone never read her start at all. The push sent `_journeyStart ?? enteredAt` and
+the pull wrote that back as her stated start, so after one sync her onboarding answer stopped counting.
+
+### What changed
+- [x] **One count**, `TtcStore.tryingTime` (pure `lib/ttc/ttc_trying_time.dart`): her ended pregnancies are left
+  out, clipped and merged; every reader (messages, Ask Veda, You, the checklist notes, the doctor check) uses it.
+- [x] **Her "Change" pick is stored as a basis** (`trying_count_from`, `trying_count_date`), never a rewritten
+  `journey_start`. The stored fact stays as she gave it, and the number is derived on read, so changing her mind
+  back loses nothing. BACKEND-PATTERNS §16xx.
+- [x] **`trying_effective_start` is published for his phone**: the derived start, not its inputs, so her
+  pregnancy dates never leave her row. His phone falls back to her `journey_start`.
+- [x] **The push sends only the start she gave**, which ends the write-back loop above.
+- [x] **The 0117 keys go only when set**, or as an explicit null when the cloud holds a value to clear (tracked
+  by `_cloudHasCount` / `_cloudHasEffective`). A column the server lacks fails the whole row silently, so before
+  0117 ran the row kept syncing (§16ww).
+
+**Verified:** `test/ttc_trying_time_test.dart`, `test/ttc_schema_contract_test.dart` (0044 and 0117 columns
+pinned, checked per statement).
+
+**Files:** `supabase/migrations/0117_ttc_trying_count.sql`, `lib/ttc/ttc_store.dart`, `lib/ttc/ttc_trying_time.dart`.
