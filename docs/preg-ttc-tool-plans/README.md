@@ -12,7 +12,7 @@ The user says go per family. Each plan records every decision with the user's an
 | P3 | Her week | waits on A's foundation commit | — |
 | P4 | Birth prep | waits on A's foundation commit | — |
 | P5 | Daily check-ins | waiting | — |
-| T1 | TTC: the doctor check (TT1, TT2, TC3, TC5) | BUILT (T1-doctor-check.md); 0117 to run | — |
+| T1 | TTC: the doctor check (TT1, TT2, TC3, TC5) | COMMITTED (T1-doctor-check.md); 0117 run 10-28 | 00b3cc5 |
 | T2 | TTC: cycle tools | waits on A | — |
 | T3 | TTC: getting ready | waiting | — |
 | T4 | TTC: treatment and records | waiting | — |

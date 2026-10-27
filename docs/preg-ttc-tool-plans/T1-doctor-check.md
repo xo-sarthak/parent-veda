@@ -46,7 +46,7 @@
 - `flutter analyze` on every touched file: clean apart from an existing info at `ttc_askveda_screen.dart:1067`.
 
 ## Owed
-- **Run migration 0117** (the user). Until it runs, the row keeps syncing (§16xx), but a basis or a pregnancy-adjusted start waits to upload.
+- **Run migration 0117** (the user): DONE 2026-10-28.
 - **BEFORE-LAUNCH lines** (that file has another terminal's edits open; text handed to the user): the after-loss default, the one-loss and two-loss wording, running 0117.
 - **Sync log step and STILL-OPEN-BACKEND row:** on the user's word (text ready).
 - A phone walk, on the user's word.
