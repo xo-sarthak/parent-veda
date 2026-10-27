@@ -392,7 +392,10 @@ class _TtcHomeV3State extends State<TtcHomeV3>
       builder: (context, _) {
         final hinglish = TtcLang.instance.hinglish;
         final today = TtcStore.instance.today;
-        final chapter = today.chapter;
+        // The clinic's step on a clinic cycle (TTC fault 11, 2026-10-27): the
+        // Sanskar block and the accent no longer follow a fertile window the
+        // clinic owns. Kept for revert: final chapter = today.chapter;
+        final chapter = ttcScreenChapter(today.chapter);
         final accent = v2BlockTint(_chapterHue(chapter), p);
 
         // ---- where she is, once per build (ttc_home_situation.dart) --------

@@ -37,12 +37,28 @@ import '../tools/due_date_calculator_screen.dart' show DdcMethod, ddcComputeEdd,
 
 const String kPregDueDateRoute = 'pregnancy/due_date';
 
-void openPregDueDate(BuildContext context, PregnancyController c) {
+void openPregDueDate(BuildContext context, PregnancyController c,
+    {bool required = false}) {
   Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: kPregDueDateRoute),
-    builder: (_) => PregDueDateScreen(pregnancy: c),
+    builder: (_) => PregDueDateScreen(pregnancy: c, required: required),
   ));
 }
+
+// ⚠️ THE DUE DATE IS REQUIRED TO BE IN PREGNANCY (user, 2026-10-26;
+// docs/door-relevance/PREGNANCY-GAP.md §0). Every page in this stage is
+// written for a week, so there is no honest pregnancy without one. Onboarding
+// already insists (its Continue waits for a date); this catches everyone who
+// arrived another way, or before that rule, and still has the week-20
+// stand-in. The stand-in stays only for developers: the stage chips land on
+// it, and a developer build can close this page.
+//
+// Waits for `hasLoaded` (her account may bring the date down) and never asks
+// him: the date is hers, and his comes from her when they link.
+
+/// True when Pregnancy must ask for her due date before anything else.
+bool pregNeedsDueDate(PregnancyController c, {bool father = false}) =>
+    c.hasLoaded && !c.isDueDateSet && !father;
 
 /// The four ways, in onboarding's words: the pill, and what the date field asks.
 const Map<DdcMethod, (String, String)> kPregDueDateWays = {
@@ -74,8 +90,12 @@ bool pregDueDateOverridesClinic(DueDateSource current, DdcMethod method) =>
     current.clinicOwned && !ddcSourceFor(method).clinicOwned;
 
 class PregDueDateScreen extends StatefulWidget {
-  const PregDueDateScreen({super.key, required this.pregnancy});
+  const PregDueDateScreen({super.key, required this.pregnancy, this.required = false});
   final PregnancyController pregnancy;
+
+  /// Opened because she has no date yet ([pregNeedsDueDate]): no back arrow
+  /// and no back gesture until a date is saved.
+  final bool required;
 
   @override
   State<PregDueDateScreen> createState() => _PregDueDateScreenState();
@@ -138,7 +158,13 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
     pvCommitFeedback();
     await _c.setDueDate(edd, source: ddcSourceFor(_method));
     if (!mounted) return;
-    Navigator.of(context).maybePop();
+    // `maybePop` asks the PopScope, which was built locked; the save itself is
+    // the way out of a required page, so it pops directly.
+    if (widget.required) {
+      Navigator.of(context).pop();
+    } else {
+      Navigator.of(context).maybePop();
+    }
     pvSnack(context, 'Saved. Your weeks now follow this date.');
   }
 
@@ -163,9 +189,16 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
     final edd = _edd;
     final ok = edd != null && _plausible(edd);
     final warnClinic = pregDueDateOverridesClinic(_c.dueDateSource, _method);
-    return Scaffold(
+    final locked = widget.required && !_c.isDueDateSet;
+    return PopScope(
+      canPop: !locked,
+      child: Scaffold(
       backgroundColor: p.ground,
-      appBar: AppBar(backgroundColor: p.ground, elevation: 0, foregroundColor: p.ink1),
+      appBar: AppBar(
+          backgroundColor: p.ground,
+          elevation: 0,
+          foregroundColor: p.ink1,
+          automaticallyImplyLeading: !locked),
       body: SafeArea(
         top: false,
         child: ListView(
@@ -177,7 +210,11 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
             Text(
                 _c.isDueDateSet
                     ? 'Now ${_long(_c.dueDate)}${from.isEmpty ? '' : ', from $from'}.'
-                    : 'No date saved yet. Add one and every week in the app follows it.',
+                    : widget.required
+                        ? 'Every week in the app follows your due date, so we '
+                            'need it to begin. A rough date is fine: you can '
+                            'change it after your scan.'
+                        : 'No date saved yet. Add one and every week in the app follows it.',
                 style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
             const SizedBox(height: 22),
             _eyebrow(p, 'How do you know it?'),
@@ -287,6 +324,7 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
                 style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3)),
           ],
         ),
+      ),
       ),
     );
   }

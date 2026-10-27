@@ -164,7 +164,11 @@ class PvCatalogStore extends ChangeNotifier {
   String clockLabel(LifeStage stage) {
     switch (stage.shopStage) {
       case LifeStage.pregnancy:
-        final w = PregnancyController.current?.currentWeek;
+        // No real due date = no week to name: the week-20 stand-in is not
+        // her week (2026-10-27, PREG fault 2). Kept for revert:
+        //   final w = PregnancyController.current?.currentWeek;
+        final c = PregnancyController.current;
+        final w = (c == null || !c.isDueDateSet) ? null : c.currentWeek;
         return w == null ? '' : 'Week $w';
       case LifeStage.parenting:
         // No saved child = no age to name ("0 weeks" on a fresh phone is a

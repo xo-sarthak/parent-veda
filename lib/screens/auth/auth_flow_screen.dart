@@ -270,7 +270,18 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
     // and BEFORE the network call, because a mother who declared her stage must
     // keep it even if the profile write fails. The matching `life_stage` column
     // lands with the TTC migrations in Phase 8; until then this is device-local.
-    LifeStageStore.instance.setStageId(_stage);
+    //
+    // ⚠️ ONLY WHEN SHE HAS NO STAGE YET (2026-10-27, docs/door-relevance PREG
+    // fault 25). This screen is also the "Sign in" prompt reached from My
+    // Bookings and the old Profile, by a woman already in a stage. Her answer
+    // here used to overwrite it, so a sign-in could move her into Pregnancy
+    // with no due date, or into Parenting with no child. A stage changes only
+    // through the stage moves (lib/services/stage_moves.dart), which ask for
+    // the date that stage needs. Kept for revert:
+    //   LifeStageStore.instance.setStageId(_stage);
+    if (LifeStageStore.instance.stage == null) {
+      LifeStageStore.instance.setStageId(_stage);
+    }
 
     final client = Supabase.instance.client;
     final userId = client.auth.currentUser?.id;

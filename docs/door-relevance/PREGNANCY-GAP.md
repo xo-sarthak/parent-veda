@@ -166,17 +166,17 @@ Already covered: back pain (1), side sleeping (35).
 ## 5. Faults by severity
 
 **Broken**
-1. Her week stops moving after launch (`pregnancy_controller.dart:111`). *Fix:* work out `currentWeek`, `daysToDueDate` and `currentDay` from `DateTime.now()`.
+1. ~~Her week stops moving after launch~~ **DONE (Batch 1, 2026-10-27):** `_now` is a getter; the shell calls `refreshClock()` on resume so screens repaint on a new day. Was: (`pregnancy_controller.dart:111`). *Fix:* work out `currentWeek`, `daysToDueDate` and `currentDay` from `DateTime.now()`.
 
 **Wrong**
-2. Week 20 is treated as real on the home rails, scan card, Scans timeline, Ask Veda, Learn videos, Nutrition `lead`, the Move session, the Store header and the You screen. *Fix:* make the due date required (decision); pass `isDueDateSet ? week : null` everywhere as a guard.
+2. **PART DONE (Batch 1, 2026-10-27):** the due date is now required: the home opens a locked due-date page (`pregNeedsDueDate`, `preg_due_date_screen.dart`) once loading has settled, never for him; developer builds keep a close button. The Store header names no week without a date. The other surfaces below become developer-only guards, fixed as their batches touch them. Was: Week 20 is treated as real on the home rails, scan card, Scans timeline, Ask Veda, Learn videos, Nutrition `lead`, the Move session, the Store header and the You screen. *Fix:* make the due date required (decision); pass `isDueDateSet ? week : null` everywhere as a guard.
 3. Doors always open on tab 0. *Fix:* add a `tabOrder` by week, like Parenting's.
 4. Labour opens on the contraction timer at weeks 6 to 24. *Fix:* signs and stages until 36, timer from 37.
 5. Getting ready opens on the name finder at week 34. *Fix:* What to buy / Home and help from week 28.
 6. Learn's door shelves ignore week tags (`preg_learn_screen.dart:140`). *Fix:* use `sectionsFor(g.id, knownWeek)`.
 7. Past 40 weeks the hero says 41 but the rails say 40, and More > Week by week opens week 40. *Fix:* use `pregPastDueWeek` / `_pageWeek` in both.
 8. The Tools tab has the kick counter first at week 8 (`tools_hub_screen.dart:170`). *Fix:* order by week (kicks, Get ready and the timer from 28). Order only; rows stay with Terminal B.
-9. "Yes I'm pregnant" accepts an old logged period without checking. *Fix:* if that period is more than ~10 weeks old, ask for the date.
+9. ~~"Yes I'm pregnant" accepts an old logged period without checking.~~ **ALREADY DONE (found in Batch 1):** `ttcDatingCheck` (`ttc_transition.dart:146-156`, 2026-10-22) asks when the period is over 70 days old (`stale`) or missing (`guessed`). The helper misread it. *Fix:* if that period is more than ~10 weeks old, ask for the date.
 
 **Weak**
 10. The home never lifts "Your first weeks" (up to 13) or "Getting ready" (from 28). *Fix:* add both to `pregTrimesterLeads`.
@@ -188,7 +188,7 @@ Already covered: back pain (1), side sleeping (35).
 16. Belly and skin, Work and money, and Twins are untagged. *Fix:* tag them as their content is reviewed.
 17. Mind's copy drops tags (latent). *Fix:* use `withTiles`.
 18. Is it safe? has no intro chip. *Fix:* add the chip.
-19. The developer chips can enter Pregnancy with no date. *Fix:* route those cases to the dating page.
+19. **KEPT ON PURPOSE (Batch 1):** the developer chips are the one place the week-20 stand-in is allowed (decision §0); in a store build the home now asks for the date anyway. Was: The developer chips can enter Pregnancy with no date. *Fix:* route those cases to the dating page.
 
 **Polish**
 20. "Coming soon" video tiles are silent taps. *Fix:* the same toast as the intro chip.
@@ -196,7 +196,7 @@ Already covered: back pain (1), side sleeping (35).
 22. "Tools for this week" shows over her own history. *Fix:* change the title when it shows history.
 23. The week page has a stale lock comment and no estimate notice. *Fix:* correct the comment; add the notice (only a guard once the date is required).
 24. "Reads for week N" pads with other weeks when fewer than 3 fit. *Fix:* pad with reads that suit any week.
-25. The old sign-in can change her stage. *Fix:* never set the stage from a sign-in prompt.
+25. ~~The old sign-in can change her stage.~~ **DONE (Batch 1, 2026-10-27):** it records a stage only when she has none (`auth_flow_screen.dart`). *Fix:* never set the stage from a sign-in prompt.
 
 **Ownership note (agreed with Terminal B 2026-10-27):** the Move today session picking for week 20 (`pv_door_router.dart:487`) is **this terminal's**, as part of fault 2.
 

@@ -75,7 +75,8 @@ class PregnancyController extends ChangeNotifier {
   static PregnancyController? current;
 
   PregnancyController({DateTime? dueDate, DateTime? now})
-      : _now = now ?? DateTime.now(),
+      : _fixedNow = now,
+        _clockDay = _dateOnly(now ?? DateTime.now()),
         _dueDate = dueDate ?? _placeholderDueDate(now ?? DateTime.now());
 
   static const String _assetPath = 'lib/data/weekContent.json';
@@ -108,7 +109,28 @@ class PregnancyController extends ChangeNotifier {
   static const int _termWeeks = 40;
 
   // --- mutable state ---------------------------------------------------------
-  final DateTime _now;
+  // "Now" is READ, never stored (2026-10-27, docs/door-relevance PREG fault 1).
+  // It used to be `final DateTime _now`, set once in the constructor: an app
+  // left in memory past a Monday kept answering last week from every reader of
+  // currentWeek while the home, which reads DateTime.now() itself, moved on.
+  // Tests still pin the clock by passing `now:`; the app passes nothing.
+  // Kept for revert: final DateTime _now;
+  final DateTime? _fixedNow;
+  DateTime get _now => _fixedNow ?? DateTime.now();
+
+  /// The day [refreshClock] last saw. Reading [_now] live fixes every getter,
+  /// but a screen only re-reads when something rebuilds it, so the stage
+  /// shell calls [refreshClock] on resume and listeners repaint on a new day.
+  DateTime _clockDay;
+
+  /// Tells listeners the date moved since last time; a no-op on the same day,
+  /// so calling it on every resume costs nothing.
+  void refreshClock() {
+    final today = _dateOnly(_now);
+    if (_clockDay == today) return;
+    _clockDay = today;
+    notifyListeners();
+  }
   DateTime _dueDate;
 
   /// True once the mother has a REAL due date (set via the Due Date Calculator
@@ -407,9 +429,17 @@ class PregnancyController extends ChangeNotifier {
       _weeks = const [];
     } finally {
       _isLoading = false;
+      _hasLoaded = true;
       notifyListeners();
     }
   }
+
+  /// True once [load] has finished at least once, including its cloud read,
+  /// so "no due date" is settled rather than "not fetched yet". The required
+  /// due-date step (`pregNeedsDueDate`) waits on it: asking a mother for a
+  /// date her account brings down a second later would be asking twice.
+  bool get hasLoaded => _hasLoaded;
+  bool _hasLoaded = false;
 
   /// Fetches the logged-in user's profile name + role (and the paired partner's
   /// name, readable via the pairing RLS) so the UI shows real names instead of

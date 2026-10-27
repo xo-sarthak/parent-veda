@@ -1166,6 +1166,17 @@ void main() {
                 TtcTreatmentStore.instance.cycle, today);
             expect(step.isRunning, isTrue, reason: why);
             expect(ttcHomeRoundPhaseOn(today), step, reason: why);
+            // The chapter a screen shows follows the clinic, never her
+            // fertile window (TTC faults 1 and 11, 2026-10-27): Ask Veda's
+            // suggestions and the Sanskar block read it.
+            final shown =
+                ttcScreenChapter(TtcStore.instance.today.chapter, on: today);
+            expect(shown, isNot(TtcChapter.tryingTogether), reason: why);
+            expect(shown, isNot(TtcChapter.knowingYourRhythm), reason: why);
+            if (step == TtcRoundPhase.waiting ||
+                step == TtcRoundPhase.testDay) {
+              expect(shown, TtcChapter.theWaitingDays, reason: why);
+            }
             expect(kTtcRoundHeroStates, contains(ttcHomeHeroLine().state),
                 reason: '$why: hero ${ttcHomeHeroLine().state.name}');
             // The daily card and the reads follow the step.

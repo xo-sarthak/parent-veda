@@ -141,19 +141,19 @@ Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5
 **Broken:** none found.
 
 **Wrong**
-1. Ask Veda suggests fertile-window questions while a clinic runs the cycle (`ttc_askveda_screen.dart:334`). *Fix:* when `ownership != parentveda`, pick suggestions by round step.
-2. A "Your period came" card shows on her first period after a loss (`ttc_home_situation.dart:93`). *Fix:* count from `currentPeriodStarts`.
+1. ~~Ask Veda suggests fertile-window questions while a clinic runs the cycle~~ **DONE (Batch 1, 2026-10-27):** `ttcScreenChapter` (`ttc_home_situation.dart`) follows the round step; held day by day in `ttc_date_consistency_test.dart`. Was: (`ttc_askveda_screen.dart:334`). *Fix:* when `ownership != parentveda`, pick suggestions by round step.
+2. ~~A "Your period came" card shows on her first period after a loss~~ **DONE (Batch 1, 2026-10-27):** counts `currentPeriodStarts`. Was: (`ttc_home_situation.dart:93`). *Fix:* count from `currentPeriodStarts`.
 3. Conceiving opens a clinic-cycle user on "Your own dates, from the period you logged" (`ttc_focus_conceiving.dart:185`). *Fix:* clinic-aware copy, or tag a clinic-safe tab with round steps.
 4. The Store puts ovulation kits and a pregnancy test first during an IVF-type round and after a loss (`pv_store_screen.dart:672-703`). *Fix:* move those needs down when `ttcHomeHidesQuickRow` or `lossRecentlyClosed` is true.
 5. The IVF door opens on the journey, not on what IVF and IUI are. *Fix:* an explainer first (decision, section 0).
 
 **Weak**
-6. The home's "Time for a check" card may count months only (`ttcTryingLongReached`). *Fix:* if so, read `firedRules` (`ttc_fertility_help_rules.dart:420`). The rules engine itself and the "losses asked rather than worked out" gap are Terminal B's.
+6. **MOVED TO BATCH 4 (decided in Batch 1):** confirmed it counts months only (`ttcTryingLongReached`, `ttc_messages_store.dart:526`; 6 or 12 by age). Its words are about months, and the losses input is changing in the tools terminal (losses to be worked out, not asked), so it is wired after that lands, with a reason-based line. Was: The home's "Time for a check" card may count months only (`ttcTryingLongReached`). *Fix:* if so, read `firedRules` (`ttc_fertility_help_rules.dart:420`). The rules engine itself and the "losses asked rather than worked out" gap are Terminal B's.
 7. Getting ready and Not yet bury their tool. *Fix:* the checklist / doctor check as the first card.
 8. Body and cycle opens on trackers. *Fix:* a "how your cycle works" explainer first.
 9. Mind and body's action headings open articles. *Fix:* a practice first; tighten the test.
 10. The Tools tab leads with Ovulation tests / Fertile window on a clinic cycle (`ttc_tools_screen.dart:1302`). *Fix:* when a clinic owns the cycle, lift Treatment, Medication and Appointments. Order only; rows stay with Terminal B.
-11. Sanskar follows the chapter (`ttc_home_v3.dart:767`). *Fix:* use the round step or phase; stay general when `any`.
+11. ~~Sanskar follows the chapter~~ **DONE (Batch 1, 2026-10-27):** the home's chapter is `ttcScreenChapter(today.chapter)`. Was: (`ttc_home_v3.dart:767`). *Fix:* use the round step or phase; stay general when `any`.
 12. Day one shows four "start" prompts. *Fix:* one lead card until she has logged a period.
 13. Learn ignores her moment (`ttc_learn_screen.dart:332`). *Fix:* order topics with `ttcHomeDoorOrderNow`.
 14. The report card shows on clinic cycles. *Fix:* hide it when the clinic owns the cycle, as the message already does.
@@ -161,7 +161,7 @@ Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5
 16. On test day the panel's main button is "See plan" (`ttc_treatment_round_screens.dart:2444`). *Fix:* "Tell result" is the main button on `testDay`.
 17. Yoga ignores the round step and the after-loss state (`yoga_home_screen.dart:360`). *Fix:* a gentle line and no "Fertility yoga" rail during a round.
 18. No search ranks by phase. *Fix:* when text scores tie, put items for her moment first.
-19. Window messages restart straight after a loss. *Fix:* hold them until the first period after the loss.
+19. ~~Window messages restart straight after a loss.~~ **ALREADY DONE (found in Batch 1):** `lastPeriodStart` is null after a loss until her first new period (`cycle_store.dart:161-166`, 2026-10-24), so the window and its message stay quiet. The helper misread it. *Fix:* hold them until the first period after the loss.
 20. The demand gaps in section 4. *Fix:* one section each in the door that owns it.
 
 **Polish**

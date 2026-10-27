@@ -153,6 +153,8 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ContentRegistry.refreshAll();
+      // A new day since she last looked moves her week; repaint every reader.
+      widget.pregnancy.refreshClock();
       // And ask whether a doctor has written a prescription since she last
       // looked. This is the only moment the app finds out: `prescriptions` is
       // polled, not pushed, and before this the answer only ever surfaced to a

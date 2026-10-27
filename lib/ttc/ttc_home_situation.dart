@@ -39,6 +39,7 @@ import 'cycle_store.dart';
 // import 'ttc_care_pathway.dart' show TimingOwnership;
 // Back since 2026-09-26, for the round's switch and the treatment label.
 import 'ttc_care_pathway.dart' show TimingOwnership, TtcPath;
+import 'ttc_chapter.dart' show TtcChapter;
 import 'ttc_treatment_content.dart';
 import 'ttc_treatment_round.dart';
 import 'ttc_treatment_store.dart';
@@ -91,7 +92,13 @@ TtcTestAdvice? ttcHomeLateAdvice({DateTime? now, TtcMessageFacts? facts}) {
 /// to someone who has just arrived). The same rule as the "period came"
 /// message.
 bool ttcIsNewPeriodDayOne(DateTime day, {List<DateTime>? starts}) {
-  final all = [...(starts ?? CycleStore.instance.periodStarts).map(_day)]
+  // `currentPeriodStarts`, not every period ever logged (2026-10-27, TTC
+  // fault 2): after a loss the cycle restarts, and her first period after it
+  // is not "your period came" on a cycle of trying. The day logic and the
+  // messages already count this way; this card was the one copy that didn't.
+  // Kept for revert:
+  //   final all = [...(starts ?? CycleStore.instance.periodStarts).map(_day)]
+  final all = [...(starts ?? CycleStore.instance.currentPeriodStarts).map(_day)]
     ..sort();
   if (all.length < 2) return false;
   return all.last == _day(day);
@@ -242,6 +249,33 @@ TtcRoundPhase? ttcHomeRoundPhaseOn(DateTime day) {
   return p == TtcRoundPhase.result || p == TtcRoundPhase.betweenRounds
       ? p
       : null;
+}
+
+/// The chapter a SCREEN shows: the engine's, except while a clinic owns the
+/// cycle (2026-10-27, docs/door-relevance TTC faults 1 and 11).
+///
+/// ⚠️ THE ENGINE KEEPS ITS CHAPTER ON A CLINIC CYCLE ON PURPOSE
+/// (`ttc_chapter.dart`, "the waiting days are just as real during an IVF
+/// cycle"), so it places her from a raw ovulation estimate. Fine inside the
+/// engine; wrong on a screen. On stimulation day Ask Veda offered "How often
+/// should we try during the fertile window?", and the Sanskar block was the
+/// fertile window's. Here the clinic's round step decides instead, the same
+/// switch the doors and reads already follow (`ttcHomeRoundPhaseOn`):
+///   * the wait after a transfer or insemination, and test day → The Waiting
+///     Days (that stretch is real for her, as the engine says);
+///   * every other clinic step, or a clinic cycle with no step logged →
+///     Preparing Together (routines, care, experts: true at any step).
+/// Her own cycle, a positive test, and a partner reading her published
+/// chapter are unchanged.
+TtcChapter ttcScreenChapter(TtcChapter engine, {DateTime? on}) {
+  if (engine == TtcChapter.aNewBeginning) return engine;
+  if (TtcStore.instance.ownership == TimingOwnership.parentveda) return engine;
+  final step = ttcHomeRoundPhaseOn(on ?? DateTime.now());
+  if (step == TtcRoundPhase.waiting || step == TtcRoundPhase.testDay) {
+    return TtcChapter.theWaitingDays;
+  }
+  if (step == null && engine == TtcChapter.theWaitingDays) return engine;
+  return TtcChapter.preparingTogether;
 }
 
 /// Whether the home hides the one-tap Sex and Test row on [day] (§3e): while

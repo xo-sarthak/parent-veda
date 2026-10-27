@@ -28,6 +28,7 @@
 //  commented out and what was assumed is recorded in docs/STILL-OPEN.md §58.
 // =============================================================================
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 // import 'mind_mood/mind_mood_home_screen.dart'; // retired 2026-09-12 — the door
 import '../data/doors/pv_door_mind.dart' show kMindTabFeel, kMindTabTrack;
@@ -133,7 +134,7 @@ import '../services/family_profile.dart' show FamilyProfileStore;
 import '../services/ready_birth_context_store.dart' show ReadyBirthContextStore;
 import '../services/preg_messages_store.dart' show PregMessagesStore;
 import 'pregnancy/preg_messages_screen.dart' show openPregMessages;
-import 'pregnancy/preg_due_date_screen.dart' show openPregDueDate;
+import 'pregnancy/preg_due_date_screen.dart' show openPregDueDate, pregNeedsDueDate;
 import 'pregnancy/preg_myth_sheet.dart' show showPregMythSheet;
 import 'pregnancy/preg_twins.dart' show pregSizeLineFor;
 import '../services/preg_tile_order.dart';
@@ -283,6 +284,20 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
     return 'Early days.';
   }
 
+  /// Opens the required due-date page once, the first build that knows she
+  /// has none (see `pregNeedsDueDate`). A developer build keeps the close
+  /// button, so the stage chips' week-20 stand-in still works for testing.
+  bool _dueAskQueued = false;
+  void _maybeAskDueDate() {
+    if (_dueAskQueued) return;
+    _dueAskQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      openPregDueDate(context, pregnancy,
+          required: !(kDebugMode || kPvDevBuild));
+    });
+  }
+
   void _maybeShowTip(String line, int week, int day, V2Palette p) {
     if (_tipQueued || line.trim().isEmpty) return;
     _tipQueued = true;
@@ -401,7 +416,14 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
     // the week's own data (lib/data/preg_daily_tips.dart). Kept for revert:
     //   _maybeShowTip(insight, week, ((activeDay - 1) % 7) + 1, p);
     final dayInWeek = ((activeDay - 1) % 7) + 1;
-    _maybeShowTip(pregDailyTipFor(week, dayInWeek), week, dayInWeek, p);
+    // No due date: ask for it first, and no tip for a week we don't know
+    // (2026-10-27, docs/door-relevance PREG fault 2). Kept for revert:
+    //   _maybeShowTip(pregDailyTipFor(week, dayInWeek), week, dayInWeek, p);
+    if (pregNeedsDueDate(pregnancy, father: him)) {
+      _maybeAskDueDate();
+    } else {
+      _maybeShowTip(pregDailyTipFor(week, dayInWeek), week, dayInWeek, p);
+    }
 
     // The field's hue: the trimester's — the arrival green of the first, the
     // warm second, the deep third. One colour decision, shared with the sheet.

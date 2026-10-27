@@ -331,7 +331,10 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
 
   // ---- initial view : suggestions from the couple's current chapter --------
   Widget _initialScroll(TtcS t) {
-    final chapter = TtcStore.instance.displayChapter;
+    // The clinic's step, not the fertile window, on a clinic cycle (TTC fault
+    // 1, 2026-10-27). Kept for revert:
+    //   final chapter = TtcStore.instance.displayChapter;
+    final chapter = ttcScreenChapter(TtcStore.instance.displayChapter);
     final content = ttcChapterContent[chapter];
     final questions = content?.askVeda(t.hinglish) ?? const <String>[];
     return ListView(
