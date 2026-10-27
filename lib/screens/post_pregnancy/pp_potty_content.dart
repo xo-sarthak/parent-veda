@@ -2708,7 +2708,7 @@ final PpSection kPpPottySection = PpSection(
               surfaceId: 'pp_experts',
               role: 'pediatrician',
             ),
-            PpWhenLine('Worth a doctor from about 5 years, or sooner if a dry '
+            PpWhenLine.doctor('Worth a doctor from about 5 years, or sooner if a dry '
                 'child starts wetting again.'),
           ],
         ),

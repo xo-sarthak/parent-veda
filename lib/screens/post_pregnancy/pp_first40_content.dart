@@ -1569,7 +1569,7 @@ final PpSection kPpFirst40Section = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'Jaundice that needs a doctor',
             ),
-            PpWhenLine('Watch daily from day 2 to about day 14. Any jaundice '
+            PpWhenLine.doctor('Watch daily from day 2 to about day 14. Any jaundice '
                 'starting on day 1, or lasting past two weeks, is checked '
                 'regardless of how mild it looks.'),
             PpIndiaNote('Home light treatment kits are sold and rented in '
@@ -3091,7 +3091,7 @@ final PpSection kPpFirst40Section = PpSection(
             // soaked in an hour or less, two pads in two hours, and clots
             // larger than a lemon. Obstetrician to confirm the wording and the
             // clot size comparison we use.
-            PpWhenLine('Bleeding normally lasts 4 to 6 weeks and reduces the '
+            PpWhenLine.doctor('Bleeding normally lasts 4 to 6 weeks and reduces the '
                 'whole way through. Anything that increases needs a call.'),
             PpIndiaNote('Cloth is still often used instead of pads. If you '
                 'use cloth, it must be clean, dried in full sunlight and '
@@ -3547,7 +3547,7 @@ final PpSection kPpFirst40Section = PpSection(
                   "Some options work alongside breastfeeding. That's a "
                   'conversation, not a barrier.'),
             ], heading: 'What to watch for in yourself', hue: 330),
-            PpWhenLine('The early tearful days pass within two weeks. Anything '
+            PpWhenLine.doctor('The early tearful days pass within two weeks. Anything '
                 'still there after that, or getting heavier, is worth telling '
                 'someone about.'),
             PpCallout(

@@ -1147,7 +1147,7 @@ final PpArea _yourBody = PpArea(
           'broken coccyx from delivery.',
           kind: PpCalloutKind.doctor,
         ),
-        PpWhenLine('Most mechanical back pain improves within four to eight '
+        PpWhenLine.doctor('Most mechanical back pain improves within four to eight '
             'weeks of changing positions and starting core work. Longer than '
             'three months, see a physiotherapist.'),
         PpIndiaNote('The traditional strong oil massage on the back during the forty days '
@@ -1606,7 +1606,7 @@ final PpArea _yourBody = PpArea(
                   'the scheme pays a small amount towards the cost of the '
                   'day.'),
         ]),
-        PpWhenLine('Have this conversation at your six-week check, or before '
+        PpWhenLine.doctor('Have this conversation at your six-week check, or before '
             'you leave hospital if you already know you want a Copper-T.'),
         PpIndiaNote('Your ASHA worker can bring condoms and Chhaya home, and '
             'can take you to the health centre for Antara or a Copper-T. Nobody '
@@ -1799,7 +1799,7 @@ final PpArea _yourBody = PpArea(
                   'needs a doctor to see it. Most are blocked ducts or milk '
                   'cysts; the check is still worth it.'),
         ]),
-        PpWhenLine('Hb at your six-week visit. Cervical screening from about '
+        PpWhenLine.doctor('Hb at your six-week visit. Cervical screening from about '
             'three months after birth if it is due. Breast awareness always.'),
         PpIndiaNote('These checks are part of the free NCD screening at '
             'government health centres and Ayushman Arogya Mandirs for women '
@@ -3096,7 +3096,7 @@ final PpArea _pelvicFloor = PpArea(
         // health physiotherapist and a gynaecologist should both confirm, since
         // this page has to reassure without ever discouraging a mother from being
         // examined.
-        PpWhenLine('Often improves over the first six to twelve months. Get it '
+        PpWhenLine.doctor('Often improves over the first six to twelve months. Get it '
             'assessed once rather than monitoring it yourself for a year.'),
         PpConsult(
           title: 'Pelvic floor physiotherapy assessment',
@@ -3853,7 +3853,7 @@ const PpArea _movement = PpArea(
             'weeks and skip the check entirely, or send a photo of the wound on '
             'WhatsApp instead. Go. It is one appointment and it is the one that '
             'decides the next six months.'),
-        PpWhenLine('At about six weeks after birth, sooner if anything is '
+        PpWhenLine.doctor('At about six weeks after birth, sooner if anything is '
             'worrying you. Do not wait for the appointment to report a symptom.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpSteps(heading: 'Getting ready for your check-up', [
@@ -4599,7 +4599,7 @@ const PpArea _feedingYourself = PpArea(
               'Ask your doctor for a different form or a stool softener '
               'alongside. Stopping trades a small problem for a bigger one.'),
         ], heading: 'How to get more iron in'),
-        PpWhenLine('Worth checking at the six week visit, and again any time '
+        PpWhenLine.doctor('Worth checking at the six week visit, and again any time '
             'the exhaustion is not improving. Correcting stores takes about '
             'three months of consistent treatment, not two weeks.'),
         // `pp_food` is the baby's library (§5, M4). Kept for revert:

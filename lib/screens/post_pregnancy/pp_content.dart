@@ -290,10 +290,28 @@ class PpScriptLine {
 }
 
 /// The mandatory "when / how much / what age" practical line.
+///
+/// ⚠️ MOST OF THESE ARE NOT DOCTOR LINES (final review, 2026-10-27). The
+/// block was written as the page's practical line ("Three to six.", "From
+/// about four months"), but the reader, the story deck and the Ask Veda
+/// export all titled every one "When to see a doctor", so a parent read her
+/// toddler's age range in the urgent doctor box: 452 of 560 lines. Now the
+/// plain line is a quiet "When" note where it is written, and only
+/// [PpWhenLine.doctor] is the urgent doctor line. A page with no doctor line
+/// ends on the reader's shared short-piece note, as it was designed to.
+/// `test/pp_when_line_test.dart` holds the split both ways.
 class PpWhenLine extends PpBlock {
-  const PpWhenLine(this.text);
+  const PpWhenLine(this.text) : doctor = false;
+
+  /// A line that sends her to a doctor, a hospital or a helpline.
+  const PpWhenLine.doctor(this.text) : doctor = true;
+
   final String text;
+  final bool doctor;
 }
+
+/// The title a when-line carries in the reader, the deck and Ask Veda.
+String ppWhenLineTitle(PpWhenLine b) => b.doctor ? 'When to see a doctor' : 'When';
 
 /// The India-home adaptation note — joint family, shared room, no nursery,
 /// Indian climate, malish, lori. Its own type so a reviewer can see at a glance
@@ -704,7 +722,7 @@ List<PpCarouselCard>? ppCardsAsSlides(PpPage page) {
       case PpCallout(:final title, :final text, :final kind):
         slides.add(PpCarouselCard(title ?? ppCalloutSlideTitle(kind), text));
       case PpWhenLine(:final text):
-        slides.add(PpCarouselCard('When to see a doctor', text));
+        slides.add(PpCarouselCard(ppWhenLineTitle(b), text));
       case PpIndiaNote(:final text):
         slides.add(PpCarouselCard('In India', text));
       case PpCarousel():

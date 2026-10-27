@@ -35,9 +35,11 @@
 //    · sections, in `orderedBlocks` order (video hoisted, as the page rule
 //                says): article → section; callout → section with a callout;
 //                everything else → custom.
-//    · whenToSeeSomeone = the first `PpWhenLine` (urgent tone — that is
-//                exactly what it is), else the shared short-piece line.
-//                Further when-lines become note callouts in place.
+//    · whenToSeeSomeone = the first `PpWhenLine.doctor` (urgent tone — that
+//                is exactly what it is), else the shared short-piece line.
+//                Further doctor lines become note callouts in place. A
+//                plain `PpWhenLine` (the when / how much / what age line)
+//                is a "When" note in place, never the doctor slot.
 //    · nextSteps = the page's links. A surface link is a tool tile; a page
 //                link opens the sibling page through `openAction`.
 //    · byline  = the desk, no verified mark (`reviewed: false`) — no named
@@ -87,7 +89,7 @@ bool Function(PpBlock)? _leadKind(String? format) => switch (format?.toUpperCase
       // A red-flag page opens on the flags. Its callouts and doctor lines
       // lead; the foot keeps the shared note so nothing is said twice.
       'RED FLAG' || 'FLAGGED CALLOUT' =>
-        (b) => b is PpCallout || b is PpWhenLine,
+        (b) => b is PpCallout || (b is PpWhenLine && b.doctor),
       _ => null,
     };
 
@@ -185,6 +187,15 @@ PvRead ppPageAsRead(PpSection section, PpPage page) {
         ));
       case PpCallout():
         sections.add(PvReadSection(callout: _callout(b)));
+      case PpWhenLine(:final text, doctor: false):
+        // The page's when / how much / what age line: a quiet note where it
+        // is written, never the urgent doctor box (2026-10-27).
+        sections.add(PvReadSection(
+          callout: PvCallout(
+              tone: PvCalloutTone.note,
+              title: _same(ppWhenLineTitle(b)),
+              body: _same(text)),
+        ));
       case PpWhenLine(:final text):
         if (_flagsLead(page.format)) {
           // On a red-flag page the doctor line is the content, up top.

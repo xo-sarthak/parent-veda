@@ -1899,7 +1899,7 @@ final PpArea _coughCold = PpArea(
           kind: PpCalloutKind.safety,
           title: 'The hidden paracetamol',
         ),
-        PpWhenLine('A cough that\'s slowly improving needs nothing. A cough '
+        PpWhenLine.doctor('A cough that\'s slowly improving needs nothing. A cough '
             'getting worse after five days, or with fast breathing, needs a '
             'doctor, not a syrup.'),
         PpIndiaNote('A chemist will sell you any of these without a '
@@ -2120,7 +2120,7 @@ final PpArea _tummy = PpArea(
         // REQUIRED_REVIEW: the 3 to 7 day duration, zinc as standard adjunct
         // therapy in India and whether we should state a dose range at all, the
         // "no urine for eight hours" figure, and the "under six months" cutoff.
-        PpWhenLine('Most settle within a week. Anything past seven days, or a '
+        PpWhenLine.doctor('Most settle within a week. Anything past seven days, or a '
             'child losing weight, needs a doctor\'s look.'),
         PpIndiaNote('Boiled and cooled water, home cooked food, and no street '
             'food or cut fruit during the illness. In summer and monsoon, '
@@ -2321,7 +2321,7 @@ final PpArea _tummy = PpArea(
         // REQUIRED_REVIEW: the teaspoon-every-two-minutes rehydration rate,
         // green or bile stained vomit as a red flag, projectile vomiting under
         // three months as a red flag, and the eight hour limits.
-        PpWhenLine('The vomiting part of a tummy bug is usually over within a '
+        PpWhenLine.doctor('The vomiting part of a tummy bug is usually over within a '
             'day. Longer than that needs a doctor.'),
         PpIndiaNote('Stop the ghee, fried food and heavy milk sweets while the '
             'stomach settles. Then come back to normal home food within a day '
@@ -2478,7 +2478,7 @@ final PpArea _tummy = PpArea(
           PpCard('Wash fruit and vegetables well', 'Peel where you can.'),
           PpCard('Clean drinking water', 'Boiled or filtered.'),
         ]),
-        PpWhenLine("Missed both deworming days this year? Ask your paediatrician "
+        PpWhenLine.doctor("Missed both deworming days this year? Ask your paediatrician "
             "at the next visit; don't buy a dose yourself."),
         PpIndiaNote("Sweets don't cause worms, and grinding teeth at night is not "
             "a sign of them. Teeth grinding is common and usually harmless."),
@@ -3028,7 +3028,7 @@ final PpArea _skin = PpArea(
           surfaceId: 'pp_products/Mosquito nets',
           blurb: 'Day and night.',
         ),
-        PpWhenLine('Itchy bumps that keep coming back all monsoon: a skin doctor '
+        PpWhenLine.doctor('Itchy bumps that keep coming back all monsoon: a skin doctor '
             'can confirm papular urticaria and help with the itch.'),
         PpIndiaNote('Coils, liquid vaporisers and smoke inside a closed room are '
             'hard on small lungs. Use them only in a room that is aired out, or '
@@ -3388,7 +3388,7 @@ final PpArea _otherIllness = PpArea(
             "juice, goat milk and kiwi do not raise platelets in a way that "
             "changes the outcome. They can be comforting, but they are not "
             "treatment.", title: 'About platelets'),
-        PpWhenLine('Fever with body ache in the monsoon or after it: see a '
+        PpWhenLine.doctor('Fever with body ache in the monsoon or after it: see a '
             'doctor on day two or three, not day six.'),
         PpIndiaNote('Dengue mosquitoes bite in the daytime and breed in clean '
             'standing water: coolers, flower pots, tyres, the tray under the '
@@ -3761,7 +3761,7 @@ final PpArea _otherIllness = PpArea(
           PpCard('Snoring with pauses', 'Sleep apnoea is worth a visit even '
               'without infections.'),
         ]),
-        PpWhenLine('A sore throat with a high fever and no cold: see a doctor '
+        PpWhenLine.doctor('A sore throat with a high fever and no cold: see a doctor '
             'in a day or two. Most others can wait a week.'),
         PpIndiaNote("Cold water, curd and ice cream don't cause a sore throat. A "
             "cold drink is often the most comforting thing a child with a "
@@ -3817,7 +3817,7 @@ final PpArea _otherIllness = PpArea(
           PpCard('Short nails', 'And a gentle word about picking.'),
           PpCard('Saline drops', 'When the nose is crusty from a cold.'),
         ]),
-        PpWhenLine('More than one nosebleed a week for a few weeks: mention it '
+        PpWhenLine.doctor('More than one nosebleed a week for a few weeks: mention it '
             'at the next visit.'),
         PpIndiaNote("Holding his arms up, or putting cold water on his head, "
             "doesn't stop a nosebleed. The pinch does."),
@@ -5186,7 +5186,7 @@ final PpArea _preventionAll = PpArea(
           PpCard('Write it down', "On the vaccination card, or in the app's "
               "health record, so the next one isn't missed."),
         ]),
-        PpWhenLine('It has been more than six months since the last dose and he '
+        PpWhenLine.doctor('It has been more than six months since the last dose and he '
             'is under five? Ask at the next health-centre visit.'),
         PpIndiaNote('Night blindness (not seeing well at dusk) and dry, wrinkled '
             'whites of the eyes were once common signs of low Vitamin A in '
@@ -6031,7 +6031,7 @@ final PpArea _teethEyesEars = PpArea(
               'child for wearing them, and make them part of getting dressed. '
               'Most children wear them happily once they see better.',
         ]),
-        PpWhenLine('Ask for an eye check at routine visits, and a full eye test '
+        PpWhenLine.doctor('Ask for an eye check at routine visits, and a full eye test '
             'before school starts, around three to four years.'),
         PpConsult(
           title: "Talk to a children's eye doctor",
@@ -6245,7 +6245,7 @@ final PpArea _newbornChecks = PpArea(
             'back in, and your baby is vomiting or crying non-stop, that is an '
             'emergency. Go to hospital now.',
             kind: PpCalloutKind.safety),
-        PpWhenLine("Bring any of these to the 6-week check, unless there's pain, "
+        PpWhenLine.doctor("Bring any of these to the 6-week check, unless there's pain, "
             'redness or vomiting. Then go the same day.'),
         PpIndiaNote("Don't apply oil, kajal or ash to the cord area or the "
             "genitals, and don't massage a swelling to make it go back. Gentle "

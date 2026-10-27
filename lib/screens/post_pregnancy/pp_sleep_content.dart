@@ -685,9 +685,9 @@ final PpArea _nightWaking = PpArea(
         PpCallout('There is no age at which zero wakings is the target. Even '
             'adults surface four to six times a night. The only difference is '
             'that you do not remember it.'),
-        PpWhenLine('Use this as a floor, not a goal. Is your child waking more '
+        PpWhenLine.doctor('Use this as a floor, not a goal. Is your child waking more '
             'often than this row for over two or three weeks? With no leap or '
-            'illness to explain it, it is worth a conversation.'),
+            'illness to explain it, it is worth a conversation with your doctor.'),
         PpIndiaNote('Where the baby sleeps beside the mother, families tend to '
             'report more brief wakings but less distress at each one. A feed '
             'or a hand comes before the baby is properly awake.'),
@@ -979,7 +979,7 @@ final PpArea _nightWaking = PpArea(
         PpCallout('Bring your sleep log to the appointment. It saves the '
             'first half of the visit. Times, feeds and what you tried say '
             'more than any description.'),
-        PpWhenLine('This page is for any age. Under three months, the bar for '
+        PpWhenLine.doctor('This page is for any age. Under three months, the bar for '
             'calling is deliberately lower. Call.'),
         PpLink(
           'Open the sleep log to take with you',
@@ -1132,7 +1132,7 @@ final PpArea _regressions = PpArea(
         PpCallout('Start nothing new during a regression. Hold your '
             'routine, add help rather than remove it, and change nothing until '
             'the fortnight is over.'),
-        PpWhenLine('Expect two to six weeks each time. Bad nights past six '
+        PpWhenLine.doctor('Expect two to six weeks each time. Bad nights past six '
             'weeks, with no leap to point at, may be something else. Read the '
             'doctor page in the night waking area.'),
         PpIndiaNote('In a joint family a regression is often read as "too '
@@ -3538,9 +3538,9 @@ final PpArea _worries = PpArea(
         PpCallout('Noisy is usually fine. Effortful is not. Working hard to '
             'breathe, or changing colour, is the line, and you don\'t need '
             'to be sure before you call.'),
-        PpWhenLine('Snuffly breathing is most common in the first three '
+        PpWhenLine.doctor('Snuffly breathing is most common in the first three '
             'months. Habitual snoring is more of a toddler and preschool '
-            'thing, and that is when to ask about tonsils.'),
+            'thing, and that is when to ask your doctor about tonsils.'),
         PpIndiaNote('Mosquito coils, closed rooms and winter smoke make '
             'snuffly babies snufflier. A mesh screen and a mosquito net are '
             'better than a coil burning in the room where your baby sleeps.'),

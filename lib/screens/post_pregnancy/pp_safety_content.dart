@@ -1132,7 +1132,7 @@ final PpSection kPpSafetySection = PpSection(
                 kind: PpCalloutKind.doctor),
             PpIndiaNote('Don\'t put turmeric, coffee powder, mud or ash on a '
                 'cut. They don\'t stop bleeding and can cause infection.'),
-            PpWhenLine('For a dirty or rusty wound, check the vaccination '
+            PpWhenLine.doctor('For a dirty or rusty wound, check the vaccination '
                 'card for tetanus and ask the doctor.'),
           ],
         ),

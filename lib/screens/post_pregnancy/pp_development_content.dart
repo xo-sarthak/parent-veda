@@ -347,7 +347,7 @@ final PpSection kPpDevelopmentSection = PpSection(
               PpCard('Cognitive', 'Working things out. Worth raising with your paediatrician if your baby doesn’t follow a moving object with the eyes by about 3 months. Or shows no interest in a toy that has just been hidden by about 12 months. Mention it too if, by about 2 years, everyday objects aren’t used the way they’re meant, such as holding a phone to the ear.'),
               PpCard('Self-care', 'Doing it alone. Worth raising with your paediatrician if your baby can’t bring food to the mouth by about 12 months. Or isn’t trying to help with simple things, like pushing an arm through a sleeve, by about 2 years. Feeding that is hard again and again, with coughing or choking, belongs in the same conversation.'),
             ], heading: 'By area, worth mentioning at the next visit', hue: 160),
-            PpWhenLine('Bring any of these to your child’s next routine '
+            PpWhenLine.doctor('Bring any of these to your child’s next routine '
                 'visit, or sooner if it’s the lost-skill line above.'),
             PpIndiaNote('Your paediatrician is the right first door. If they '
                 'want a closer look, many district hospitals now run an early '
@@ -826,9 +826,9 @@ final PpSection kPpDevelopmentSection = PpSection(
                       'phenyl and cleaning bottles, and tie up dangling wires. '
                       'A baby who can cross a room will.'),
             ], heading: 'How to help, gently'),
-            PpWhenLine('Most babies are moving somehow between 6 and 10 '
+            PpWhenLine.doctor('Most babies are moving somehow between 6 and 10 '
                 'months. Not crawling by 12 months, with no other way of '
-                'moving, is worth a mention.'),
+                'moving, is worth a mention to your doctor.'),
             PpIndiaNote('Indian floors help here. A wiped floor with a cotton rug '
                 'or a sheet over it beats a mattress for crawling. A firm '
                 'surface gives the knees and hands something to push against. '
@@ -992,7 +992,7 @@ final PpSection kPpDevelopmentSection = PpSection(
               kind: PpCalloutKind.myth,
               title: 'Baby walkers: the one clear no',
             ),
-            PpWhenLine('Most babies take first steps between 9 and 15 months. '
+            PpWhenLine.doctor('Most babies take first steps between 9 and 15 months. '
                 'Not walking at all by 18 months is worth a check.'),
             PpIndiaNote('Two things worth naming. First, walkers and jumpers '
                 'are still sold and gifted widely here, and refusing one is a '
@@ -1084,8 +1084,8 @@ final PpSection kPpDevelopmentSection = PpSection(
               PpStep('Play games with hands in them', 'Clapping, peekaboo, and the old hand rhymes. Copying '
                       'hands is the skill underneath all of these.'),
             ], heading: 'How to help, gently'),
-            PpWhenLine('Most babies wave and point between 9 and 14 months. No '
-                'gestures at all by 12 to 15 months is worth mentioning.'),
+            PpWhenLine.doctor('Most babies wave and point between 9 and 14 months. No '
+                'gestures at all by 12 to 15 months is worth mentioning to your doctor.'),
             PpIndiaNote('The traditional hand games do this job perfectly. '
                 'Clap-clap games, a namaste at the door, hands on the head, and '
                 'the rhymes a grandmother already knows. You don’t need '
@@ -1154,7 +1154,7 @@ final PpSection kPpDevelopmentSection = PpSection(
               PpStep('Add one word to whatever your baby says', 'Your baby says "milk", you say "warm milk". One '
                       'step further, never a correction.'),
             ], heading: 'How to help, gently'),
-            PpWhenLine('Most babies say a first word between 10 and 15 months. '
+            PpWhenLine.doctor('Most babies say a first word between 10 and 15 months. '
                 'No words at all by about 16 months is worth a check.'),
             PpIndiaNote('If your home runs on two or three languages, your '
                 'baby isn’t confused and isn’t falling short. First words may '
@@ -2061,7 +2061,7 @@ final PpSection kPpDevelopmentSection = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'Around 3 years',
             ),
-            PpWhenLine('Bring these to a paediatrician first, and ask for a '
+            PpWhenLine.doctor('Bring these to a paediatrician first, and ask for a '
                 'hearing test alongside. A speech therapist is the next step '
                 'if one is needed.'),
             PpIndiaNote('Speech therapy is widely available in Indian cities '

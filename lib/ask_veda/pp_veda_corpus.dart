@@ -118,7 +118,9 @@ String ppVedaBlockText(PpBlock b) => switch (b) {
               if (l.why != null) 'Why: ${l.why}',
             ], sep: ' | '),
         ]),
-      PpWhenLine x => 'When to see a doctor: ${x.text}',
+      // Only a doctor line says "see a doctor" (2026-10-27); the rest are
+      // the page's when / how much / what age line.
+      PpWhenLine x => '${ppWhenLineTitle(x)}: ${x.text}',
       PpIndiaNote x => 'In an Indian home: ${x.text}',
       PpConsult x => 'Someone to talk to: ${_join([x.title, x.whoFor], sep: ', ')}',
       PpCarousel x => _lines([

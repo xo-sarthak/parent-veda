@@ -781,7 +781,7 @@ final PpSection kPpSpecialCareSection = PpSection(
                       'schools. Ask your therapist or hospital for a group.'),
             ]),
             // REQUIRED_REVIEW: scheme names and coverage, as of 2026-10.
-            PpWhenLine('Ask at the first sign of a concern. You don\'t need a '
+            PpWhenLine.doctor('Ask at the first sign of a concern. You don\'t need a '
                 'diagnosis to get an assessment at a DEIC.'),
           ],
         ),
