@@ -337,7 +337,7 @@ doors have little that explains them").
 | WhatsApp weekly guide kept going after a loss / early birth (read `due_date` only) | Migration `0111_wa_weekly_guide_stage.sql` RUN by the user 2026-10-24. It misses a loss (stage stays pregnancy): 0112, RUN 2026-10-24, see `docs/STAGE-TRANSITIONS.md` B1 |
 | 4 test failures already on main: `explore_redesign`, `shravan_library`, `tap_feedback_guard`, `ttc_tools_pass_trackers` | PARKED by the user 2026-10-23 |
 | STILL-OPEN entry for this pass | OWED — `docs/STILL-OPEN.md` was held by the other terminal; point it here |
-| Relevance gap analysis, every stage (2026-10-27): does each screen follow her week, her phase or the child's age? | Written, read-only: `docs/door-relevance/PREGNANCY-GAP.md`, `TTC-GAP.md`, `PARENTING-GAP.md` (Parenting without the doors). Faults by severity, order of work, decisions. Found two Broken: Pregnancy's week stops moving after launch; Parenting's activities don't follow a child switch. Decided 2026-10-26: due date and child's date of birth required (stand-in for developers only); after a loss the "trying a while" count does not restart, and two losses also trigger the doctor check |
+| Relevance gap analysis, every stage (2026-10-27): does each screen follow her week, her phase or the child's age? | Written, read-only: `docs/door-relevance/PREGNANCY-GAP.md`, `TTC-GAP.md`, `PARENTING-GAP.md` (Parenting without the doors). Faults by severity, order of work, decisions. Found two Broken: Pregnancy's week stops moving after launch; Parenting's activities don't follow a child switch. Decided 2026-10-26: due date and child's date of birth required (stand-in for developers only); after a loss the "trying a while" count does not restart (rule in `ttc_fertility_help_rules.dart:420-440`). **Build plan, ownership and seams with the tools terminal: `docs/door-relevance/README.md`** |
 
 ## Decisions log
 
@@ -345,7 +345,7 @@ doors have little that explains them").
 |---|---|
 | 2026-10-26 | Information doors explain first (#16); action doors open on the activity |
 | 2026-10-26 | Due date required to enter Pregnancy, child's date of birth required to enter Parenting; the stand-ins are for developer mode only |
-| 2026-10-26 | After a loss the "trying a while" count does not restart; a doctor check fires at the earliest of 12 months under 35, 6 months at 35+, straight away at 40+, or two losses |
+| 2026-10-26 | After a loss the "trying a while" count does not restart. The doctor-check rule already lives in `lib/ttc/ttc_fertility_help_rules.dart:420-440` (`firedRules`); that file is the source of truth |
 | 2026-10-23 | Pop-ups appear only when the real video exists |
 | 2026-10-23 | Door intro = Option A, header chip (after a Mobbin pass) |
 | 2026-10-23 | "Talk to someone": labels only, crisis prose stays |

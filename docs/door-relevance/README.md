@@ -1,0 +1,62 @@
+# Relevance pass: read this first
+
+**What this is:** making the whole app follow where she is: her pregnancy week, her cycle phase or clinic step, or her child's age. A user at week 20 never sees week-1 material. Irrelevant things never crowd out what she needs now.
+
+**Status (update this line every time a batch lands):** analysis COMMITTED 395ee74 (2026-10-27). No code changed yet. **Next: Batch 1.**
+
+## How to resume (any new session)
+1. Read `CLAUDE.md`, then this file, then the gap file for the stage you're working on:
+   - `PREGNANCY-GAP.md`: the whole stage, including the 15 doors
+   - `TTC-GAP.md`: the whole stage, including the 9 doors
+   - `PARENTING-GAP.md`: everything except the doors (they were rebuilt in `docs/pp-door-plans/`)
+2. Run `git status` before any edit. Other terminals share the tree; never touch their uncommitted files.
+3. **Re-check a fault at its cited line before fixing it.** The gap files cite `file:line` as of 395ee74, and code moves. If a fault is already fixed, or the line has moved, correct the gap file in the same change.
+4. Work one batch at a time. Explain the reasoning as you build (`CLAUDE.md`, Working agreements). The user runs git.
+
+## Decisions already made (don't re-ask)
+
+| Date | Decision | Where |
+|---|---|---|
+| 2026-10-26 | **Information doors explain first; action doors open on the activity.** IVF/IUI teaches what it is, how and why (video slot plus a simple read) before the journey. A yoga door opens on yoga, never on an article about yoga | GLOBAL-CHANGES #16 |
+| 2026-10-26 | **Due date required** to be in Pregnancy; **child's date of birth required** to be in Parenting. The week-20 and born-today stand-ins are for developer mode only | Gap files §0 |
+| 2026-10-26 | After a loss, the "trying a while" count does not restart. The doctor-check rule is in `lib/ttc/ttc_fertility_help_rules.dart:420-440`, which is the source of truth | TTC-GAP §0 |
+| 2026-10-26 | Development content uses **corrected age** under 24 months; vaccines, growth and messages keep birthday age, and the screen says which | PARENTING-GAP §0 |
+| 2026-10-26 | Labour changes kind at week 37: explain before, timer from 37 | PREGNANCY-GAP §0 |
+| 2026-10-27 | Consent is **not** a blocker: `PpUseConsent` already covers feeds, nappies, development, foods and changes. New uses call `allows(kind)` | PARENTING-GAP §0 |
+
+## Who owns what: the relevance terminal and the tools terminal
+
+Agreed 2026-10-27. The **relevance terminal** owns *where she is and what shows first*. The **tools terminal** owns *what happens inside each tool*.
+
+| Seam | Relevance terminal | Tools terminal |
+|---|---|---|
+| Her week, due date, chapter vs clinic, child's age | **Owns it, and lands it first (Batch 1).** | Audits meanwhile; **holds any tool build that depends on her week** until Batch 1 is committed |
+| Tools tab (`tools_hub_screen.dart`, `ttc_tools_screen.dart`, `pp_tools_tab.dart`) | Owns the **order**, written as a **rule on each row** (a week from which it lifts, or a lift on a clinic cycle), never fixed positions, so new rows slot in without another edit | Owns **which rows** show (C1), and adds rows after the order lands. **One terminal edits a tools-tab file at a time;** say so before touching it |
+| Door tabs that open on a tool (Labour timer, TTC Getting ready checklist, Not yet doctor check) | Owns which tab or card opens first | Owns the tool. If it renames a tool or changes a surface id, it hands over the door row instead of editing door files |
+| TTC doctor-check rules (`ttc_fertility_help_rules.dart`) | Only reads `firedRules` (e.g. the home "Time for a check" card) | Owns the engine and its gaps: losses asked rather than worked out from her record, the "under 36" label, the trying-again start date |
+| Parenting activities per child | Takes the fix (Batch 1), recorded against Parenting tool 20 | — |
+| Parenting tools hidden after 12 months (`pp_tools_tab.dart:117`) | — | Owns it (which rows show); the user is deciding |
+| Report card on clinic cycles; "Your best days" copy; Move today at week 20 | **Relevance terminal's** (moved from "left to the tools terminal" on 2026-10-27) | — |
+
+**A two-repo change:** anything new sent to Ask Veda (Parenting family context, any new field) needs the service repo `C:\Projects\parentveda-askveda`. Ask the user for access first. Never ship one side alone without writing down what the other side still needs.
+
+## The build plan
+
+Each batch: re-check the faults, fix them, add or extend tests, `flutter analyze` clean, run the touched stage's tests, update the gap file (strike the fault and add the commit), update this status line and GLOBAL-CHANGES, then give the user the git commands. **Grep the call site before calling anything done** (wiring gate).
+
+| Batch | What | Faults | Notes / risks | Status |
+|---|---|---|---|---|
+| **1 · Foundation** | **Pregnancy:** `currentWeek` / `daysToDueDate` / `currentDay` worked out from today, not the frozen `_now` (`pregnancy_controller.dart:111`). Due date required on every way in: TTC "Yes I'm pregnant" asks for the date when the logged period is more than ~10 weeks old or missing; the developer chips' fall-through goes to the dating page; the old sign-in never sets the stage; an existing user with no date gets a required due-date sheet on open. "No week" passed wherever a stand-in could still appear. **TTC:** `TtcChapter` gives way to the round step when a clinic owns the cycle (Ask Veda suggestions, Sanskar); `ttcIsNewPeriodDayOne` counts from `currentPeriodStarts`; window messages held until the first period after a loss; the home check card reads `firedRules`. **Parenting:** activities keyed by child id plus age band; the developer chip and old "New parent" ask for a child | PREG 1, 2, 9, 19, 25 · TTC 1, 2, 6, 11, 19 · PP 1, 10 | **Riskiest batch: it touches every Pregnancy reader of the week.** The tests that hold dating (`pregnancy_dating_test.dart`, `stage_transitions_test.dart`, `preg_door_relevance_test.dart`) must stay green. Inject the clock (`now:`) instead of reading `DateTime.now()` directly, so tests can move time. The tools terminal waits on this commit | OWED |
+| **2 · Pregnancy doors** | `tabOrder` by week for Labour, Getting ready, Complications and Scans (copy Parenting's `PpDoor.tabOrder` shape); Learn uses `sectionsFor`; tags for Belly and skin, Work and money, Twins (and Symptoms, Labour, Partner, owed in #13); Nutrition `lead` checks weekKnown; Mind uses `withTiles`; Is it safe? intro chip; "coming soon" tiles toast | PREG 3-6, 16-18, 20 | Extend `action_doors_first_test.dart` with information doors too; add a first-view test at weeks 6/14/24/34/40 like `pp_doors_first_view_test.dart` | OWED |
+| **3 · TTC doors** | IVF opens on a "what IVF and IUI are" explainer; Getting ready opens on the checklist; Not yet opens on the doctor check; Body and cycle opens on "how your cycle works"; Mind and body headings open practices; Conceiving made clinic-aware; `ttcDoorVideosFirst` uses `withTiles` | TTC 3, 5, 7-9, 21 | The explainer *content* may not exist yet: write it as a `PvRead`, or list it in `DOOR-CONTENT-OWED.md` (the "stop and list it" rule) | OWED |
+| **4 · Homes and other screens** | Tools tab order rules (Pregnancy by week; TTC on a clinic cycle), **after telling the tools terminal**; past-40 week on rails and in More; home tile lifts; due-date prompt on home; "Is it safe?" card by trimester; TTC Store needs during a round or after a loss; round panel main button; report card; Learn order; one start card on TTC day one; Parenting: one age for content, products rail from `PvCatalogStore`, Brain tab matches home; search ties broken by position | PREG 7, 8, 10, 12-15 · TTC 4, 10, 12-18 · PP 2, 3, 5, 12 | Order only: never hide a row (a feature is never hidden) | OWED |
+| **5 · Parenting Today strip and signals** | The Today strip in PARENTING-GAP §2; "Something changed?" moves activities behind `allows(changes)`; Ask Veda family context (**two-repo**) | PP 4, 6, 7, 8, 9 | Prototype first (Artifact) per the house rule for flow changes | OWED |
+| **6 · Content** | Demand gaps in each gap file §4: guidance in the door's voice, never Q&A; each new section also goes to the Ask Veda ingest | PREG §4 · TTC 20 | Write as `PvRead`s | OWED |
+| **7 · Notifications** | Folded into GLOBAL-CHANGES #12 Phase 6: Pregnancy weeks 4-10, glucose test, growth scan; TTC after loss; Parenting double vaccine reminder | PREG 11 · TTC 19 · PP 11, 16 | Mobbin pass first, per #12 | OWED |
+
+Polish items not named above ride along with the batch that touches the same file.
+
+## Keeping this plan honest
+- **This file goes stale as code changes.** When a batch lands, or another terminal's commit changes something here (a moved line, a fault fixed elsewhere, a changed ownership), update this file and the gap file in the same change. A stale plan is worse than none, because the next session trusts it.
+- If you find a new fault while building, add it to the stage's gap file with severity, `file:line` and a one-line fix. Don't park it only in chat.
+- Changes in ownership go in the seams table with a date.

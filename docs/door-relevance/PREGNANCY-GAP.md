@@ -198,7 +198,7 @@ Already covered: back pain (1), side sleeping (35).
 24. "Reads for week N" pads with other weeks when fewer than 3 fit. *Fix:* pad with reads that suit any week.
 25. The old sign-in can change her stage. *Fix:* never set the stage from a sign-in prompt.
 
-**Tools (left to Terminal B, one line):** the Move today session picks for week 20 when there is no due date. It is the same guard as fault 2.
+**Ownership note (agreed with Terminal B 2026-10-27):** the Move today session picking for week 20 (`pv_door_router.dart:487`) is **this terminal's**, as part of fault 2.
 
 ---
 

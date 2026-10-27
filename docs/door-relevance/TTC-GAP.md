@@ -15,7 +15,7 @@ Siblings: `PREGNANCY-GAP.md`, `PARENTING-GAP.md`.
 | Question | Decision |
 |---|---|
 | Information door vs action door | **Confirmed.** An information door teaches first, in simple terms: what it is, how it happens, why it works. A video can lead each rail. Only then does it go into detail. Action doors open on the activity itself. **The IVF door is the worked example.** Many couples don't know what IVF or IUI stand for, so the door opens on a plain explainer (a video slot plus a simple read), not on the step-by-step journey. |
-| After a loss, does the "trying a while" count restart? | **No, by medical guidance.** Total time trying stays the count, because that is what a doctor asks. A separate "worth talking to a doctor" check fires on whichever comes **first**: 12 months trying under 35; 6 months at 35 or older; straight away at 40 or older, or with a known condition (ACOG/ASRM Committee Opinion 781; ASRM 2023); **two pregnancy losses**, consecutive or not (ASRM and ESHRE count two; RCOG 2011 counted three; we take the earlier, gentler route to care). It is worded as a suggestion, never a diagnosis. It is a clinical rule in code, not a setting. No source says a loss restarts the count. |
+| After a loss, does the "trying a while" count restart? | **No.** The rule **already exists in code**: `lib/ttc/ttc_fertility_help_rules.dart:420-440` (`firedRules`). Its triggers include 12 months under 35, 6 months at 35 or older, 40 or older, two miscarriages and a known condition, and the count does not restart after a loss (confirmed by Terminal B 2026-10-27; matches ACOG/ASRM Committee Opinion 781, ASRM 2023 and ESHRE). That file is the source of truth, so don't restate the rule elsewhere. Terminal B owns its open tool gaps: losses are asked rather than worked out from her record, the "under 36" label, and checking that the trying-again path doesn't reset the start date. |
 
 ---
 
@@ -35,7 +35,7 @@ Siblings: `PREGNANCY-GAP.md`, `PARENTING-GAP.md`.
 3. **`ttcIvfRoundLeads`** reads the round store directly (`ttc_treatment_round_screens.dart:2395`), not the round step. A *planned* round moves the IVF tabs and nothing else. NEW, minor
 4. **Learn** uses a fixed order of topics (`ttc_learn_screen.dart:332-344`), not the home's door order. NEW
 5. **Store:** `fitsNow` returns null for TTC on purpose (`pv_catalog_store.dart:89-102`, `:130-147`). REC
-6. **After a loss, "trying a while"** counts from the old `journeyStart` (`stage_moves.dart:143-158`, `ttc_store.dart:91-96`). Per the decision above, the count itself is right. The two-losses trigger is what's missing. NEW
+6. **After a loss, "trying a while"** counts from the old `journeyStart` (`stage_moves.dart:143-158`, `ttc_store.dart:91-96`). That is correct per `ttc_fertility_help_rules.dart`. *Check during the build:* does the home's "Time for a check" card (`ttcTryingLongReached`, `ttc_home_v3.dart:571`) read `firedRules`, or only months? If only months, it should read the engine.
 
 PERSONALIZATION.md layers: ordering is wired (`ttcAgeOrder`, `ttc_phase_rank`). There is no TTC profile vocabulary yet (PERSONALIZATION §9).
 
@@ -101,7 +101,7 @@ Tags exist (`TtcFocusSection.phases` / `.steps`, read by `ttc_phase_rank.dart`).
 | PCOS (untagged on purpose) | INFORMATION | Understand > video (sinks while unmade) > article (`ttc_focus_pcos.dart:159-186`) | — | The same at every moment | — | Fine. Check the possible lavender hero (hue 288, `ttc_brackets.dart`) on a device |
 | His side (on purpose) | INFORMATION | Understand > article (`ttc_focus_his_side.dart:178-202`) | — | The same | — | Fine |
 | **Getting ready** (on purpose) | **ACTION** | Food > article (`ttc_focus_getting_ready.dart:164-184`); **the checklist is the last tab** (`:596-617`) | — | The same | Not action-first, unlike Pregnancy's Getting Ready | Open on the checklist / ready plan |
-| **Not yet** (on purpose) | **ACTION** | Articles first (`ttc_focus_not_yet.dart:95-110`); the "Should we see a doctor now?" check is section 2 (`:121`) | — | The same | — | Lead with the doctor check (it will carry the new doctor rule in section 0) |
+| **Not yet** (on purpose) | **ACTION** | Articles first (`ttc_focus_not_yet.dart:95-110`); the "Should we see a doctor now?" check is section 2 (`:121`) | — | The same | — | Lead with the doctor check (the tool and its rules are Terminal B's) |
 | After loss (on purpose) | INFORMATION | Your body > article (`ttc_focus_after_loss.dart:149-195`) | — | The same | — | Fine |
 
 ### Global changes across the doors
@@ -115,7 +115,7 @@ Tags exist (`TtcFocusSection.phases` / `.steps`, read by `ttc_phase_rank.dart`).
 - `ttcDoorVideosFirst` rebuilds sections without their tags (`ttc_door_screen.dart:714-726`). It runs after ranking, so nothing breaks today, but it is the same kind of bug #13 fixed. Polish.
 - No silent taps found in the door code. Cut-off names and lavender tab tints need a device walk. A label-fit test already exists (`ttc_doors_explicit_names_test.dart:160`).
 
-**Tools (left to Terminal B, one line each):** the cycle report card shows on clinic cycles; the "Your best days" card copy isn't clinic-aware; the fertile-window tool for IVF couples (REC STILL-OPEN:2152).
+**Ownership note (agreed with Terminal B 2026-10-27):** the report card on clinic cycles (fault 14) and the "Your best days" copy (`ttc_focus_conceiving.dart:185`, fault 3) are **this terminal's**: they are about where she is, not tool internals. The IVF fertile-window item (STILL-OPEN:2152) was closed on 2026-07-27 with a guard in the engine; Terminal B will check the tool in its audit.
 
 ### What women ask that we don't cover well (`research/questions/ranked_ttc.csv`, top 50)
 The fix is guidance in each door's own voice, never a Q&A list.
@@ -148,7 +148,7 @@ Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5
 5. The IVF door opens on the journey, not on what IVF and IUI are. *Fix:* an explainer first (decision, section 0).
 
 **Weak**
-6. No two-losses trigger for "worth talking to a doctor". *Fix:* add it to `ttcTryingLongReached` and the Not yet check, per section 0.
+6. The home's "Time for a check" card may count months only (`ttcTryingLongReached`). *Fix:* if so, read `firedRules` (`ttc_fertility_help_rules.dart:420`). The rules engine itself and the "losses asked rather than worked out" gap are Terminal B's.
 7. Getting ready and Not yet bury their tool. *Fix:* the checklist / doctor check as the first card.
 8. Body and cycle opens on trackers. *Fix:* a "how your cycle works" explainer first.
 9. Mind and body's action headings open articles. *Fix:* a practice first; tighten the test.
@@ -174,7 +174,7 @@ Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5
 ---
 
 ## 6. Order of work
-1. **Foundation (this terminal, first):** the chapter gives way to the clinic step (1, 11); the period count after a loss (2); messages after a loss (19); the two-losses doctor trigger (6).
+1. **Foundation (this terminal, first):** the chapter gives way to the clinic step (1, 11); the period count after a loss (2); messages after a loss (19); the home check card reads the rules engine (6).
 2. **Doors:** IVF teaches first (5); Getting ready, Not yet and Body and cycle open on the right kind (7, 8); Mind and body practices (9); Conceiving made clinic-aware (3).
 3. **Other screens:** Store needs during a round or after a loss (4); Tools order on a clinic cycle (10, coordinated with Terminal B: one terminal edits the file at a time); round panel (16); report card (14); Learn order (13).
 4. **Content:** the demand gaps (20), each also sent to Ask Veda's ingest.

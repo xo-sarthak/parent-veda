@@ -19,7 +19,7 @@ Siblings: `PREGNANCY-GAP.md`, `TTC-GAP.md`.
 | No child saved | **The child's date of birth is required**, matching the Pregnancy due-date rule. The stand-in child born today (`pp_child_profile.dart:434-442`) is for developer mode only |
 | Which age drives content for a baby born early | Chosen and recorded: **corrected age for every development and content choice under 24 months**. Birthday age stays for vaccines, growth and messages, and the screen says which age it is using |
 | Activities per child | This terminal takes it, recorded against Parenting tool 20 (agreed with the tools terminal) |
-| Consent first | Anything that uses tool data somewhere new waits until the consent model is decided across stages, then calls `allows(kind)` from the start. That covers signals sent to Ask Veda and "Something changed?" moving activities |
+| Consent | **Not blocking** (Terminal B, 2026-10-27). `PpUseConsent` already has feeds, nappies, development, foods and changes. Any new use of tool data calls `PpUseConsent.allows(kind)` from the start. That covers signals sent to Ask Veda and "Something changed?" moving activities |
 
 ---
 
@@ -129,7 +129,7 @@ The switch works and most stores follow it. **Today's activities do not** (Broke
 | **Store** | Products tab is `PvStoreScreen` (`products_discovery_screen.dart:632`); `fitsNow` / `_hersFirst` use birthday age (`pv_catalog_store.dart:89-112`). **The home rail uses a separate catalogue** (`kPpProducts` → `ProductDetailScreen`, `pp_home_v3.dart:885-893`), so the home's products and the Store's differ. NEW |
 | **Article → service (#2)** | Already wired for Parenting through the `pp_` id prefix (`pv_read_offer.dart:139,156`; `pv_reader_screen.dart:220`). GLOBAL-CHANGES #2 still says OWED (stale). The offer ignores age, so a newborn masterclass can show on a 5-year-old's read. NEW |
 | **Notifications** (`pp_messages_store.dart:312-403`) | Per real child: "X weeks old" weekly to 8 weeks at 9am, then monthly to 36 months, then quarterly to 72 months. Vaccines 3 days before at 10am. New phase at 6pm (corrected age, active child only, `:252`). Monday activity at 10am. **No signals, no limit on how many, no quiet hours, no offers** (REC #12). The opt-in vaccine alarms (`pp_vaccine_data.dart:893-912`) can repeat the automatic 3-day reminder for the same visit. NEW. The header comment (`:50-56`) says vaccines go to the active child only, but the code covers every child (`:229-231`) |
-| Tools tab (one line, tools pass done) | Fixed order with feeds and nappies first at every age; two tools hidden after 12 months, against "a feature is never hidden" (`pp_tools_tab.dart:115-131`). This is ordering, so it is this terminal's |
+| Tools tab | Fixed order with feeds and nappies first at every age (ordering is this terminal's). Two tools are hidden after 12 months (`pp_tools_tab.dart:117`). That is about **which rows show**, so it is Terminal B's, and the user is deciding |
 
 ---
 
@@ -141,9 +141,9 @@ The switch works and most stores follow it. **Today's activities do not** (Broke
 **Wrong**
 2. **Two ages on one screen** for a baby born early. *Fix:* use corrected age for development and content under 24 months; keep birthday age for vaccines, growth and messages, and say which on screen (decision, section 0).
 3. **A 5-year-old's "Useful at this age" pads with baby products** (`pp_home_v3.dart:1378-1389`, **checked**: the rail fills up with items that don't suit the age). *Fix:* show only items that fit; if fewer than 6, fill from the next band, or show an empty state that invites her to the Store.
-4. **What she told us doesn't move activities, and only reshuffles reads.** *Fix:* feed `PpSituation.changes` into the activity picker and lift matching pages into the read set. **This waits for the consent model** (section 0).
+4. **What she told us doesn't move activities, and only reshuffles reads.** *Fix:* feed `PpSituation.changes` into the activity picker and lift matching pages into the read set, gated on `PpUseConsent.allows(changes)`.
 5. **The home and the Store use different product catalogues.** *Fix:* build the home rail from `PvCatalogStore.forYou(parenting)`.
-6. **Ask Veda gets no family context.** *Fix:* call `FamilyProfileStore.aiContext()` plus `PpSituation` signals in `AskVedaService.ask`. **This waits for consent, and it is a two-repo change:** the Ask Veda service must declare the new fields, or they are silently dropped (CLAUDE.md, "The wire body is a contract").
+6. **Ask Veda gets no family context.** *Fix:* call `FamilyProfileStore.aiContext()` plus `PpSituation` signals in `AskVedaService.ask`, each gated on `PpUseConsent.allows(kind)`. **It is a two-repo change:** the Ask Veda service (`C:\Projects\parentveda-askveda`) must declare the new fields, or they are silently dropped (CLAUDE.md, "The wire body is a contract"). Ask the user for access first.
 
 **Weak**
 7. **No single lead action, especially after 12 months.** *Fix:* the Today strip in section 2, with the activity first.
@@ -152,7 +152,7 @@ The switch works and most stores follow it. **Today's activities do not** (Broke
 10. **With no child saved, the home serves newborn content.** *Fix:* the date of birth is required (decision); the stand-in child becomes developer-only; the developer chip and the old "New parent" path ask for a child.
 11. **Messages have no situation awareness, no limit, no quiet hours and no offers** (#12). *Fix:* Phase 6a as planned.
 12. **The Brain tab's pick and the home's three disagree.** *Fix:* the Brain tab shows `PpHomeActivitiesStore.todays()[0]`.
-13. **Tools hides two tools after 12 months.** *Fix:* move them to the end with an "earlier" label instead of hiding them.
+13. ~~Tools hides two tools after 12 months.~~ Moved to Terminal B (it is about which rows show); the user is deciding.
 
 **Polish**
 14. Stale comments: "OFF BY DEFAULT" (`pp_home_v3.dart:1258`, but the flag is true) and the vaccines header (`pp_messages_store.dart:50-56`). *Fix:* correct both.
@@ -165,10 +165,9 @@ The switch works and most stores follow it. **Today's activities do not** (Broke
 ## 5. Order of work
 1. **Foundation (this terminal, first):** activities per child (1); one age for development content (2); the date of birth required (10); the products rail (3, 5).
 2. **The Today strip** (7), after the door rebuild finishes. All 14 doors are committed as of 613c631, so it is unblocked.
-3. **After the consent model is decided:** "Something changed?" moves activities (4); Ask Veda family context (6, two-repo).
-4. **Rankings:** Learn and offers by age (8); tile reason line (9); Brain tab (12); Tools order (13).
+3. **Signals, behind `PpUseConsent.allows`:** "Something changed?" moves activities (4); Ask Veda family context (6, two-repo, needs access to the service repo).
+4. **Rankings:** Learn and offers by age (8); tile reason line (9); Brain tab (12).
 5. **Notifications** (11, 16) with GLOBAL-CHANGES #12 Phase 6. Doc and comment cleanup (14, 15) rides along with any of the above.
 
 ## 6. Decisions still yours
-- **The consent model across stages.** It is being shaped in the tools terminal ("keep what you chose before, or change"). Faults 4 and 6 wait on it.
-- Nothing else is blocking.
+- Nothing blocking. Consent is not a blocker (section 0). The hidden-tools question is with the user via Terminal B.
