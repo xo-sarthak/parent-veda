@@ -295,3 +295,5 @@ Held by `test/pp_you_maa_door_test.dart` ("door 3: the plan, held", 18 tests) an
 **Owed, not in this build:** the films YM7 to YM13; the shelves, the BP monitor and the people YM14 to YM17; a gynaecologist's read of every `REQUIRED_REVIEW` line and the scheme and law lines against the current government text (`BEFORE-LAUNCH.md`); First 40's windows into these pages (door 6) and Feeding's links here (STILL-OPEN §102.5); the two crisis screens (§102.4).
 
 **Final review, item 4 (2026-10-27): one figure per fact.** Soaking a pad in an hour or a clot bigger than a lemon is go-now on `body_lochia` and both red-flag pages, as First 40's table says (4h). Held by `test/pp_one_figure_test.dart`; the figures are on the BEFORE-LAUNCH clinical read.
+
+**Final review, item 6 (2026-10-27): no link opens a whole door.** `work_schemes` opens `pm_schemes` (was the whole Papers door); `body_rest` opens First 40's `f40_rest_and_food` (was the whole First 40 door). Held across every door by `test/pp_no_whole_door_links_test.dart`.

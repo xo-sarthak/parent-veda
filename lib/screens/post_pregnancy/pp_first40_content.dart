@@ -299,9 +299,11 @@ final PpSection kPpFirst40Section = PpSection(
               'certificate for Aadhaar, a passport and school admission, so '
               'keep a few copies.',
             ], heading: 'Register the birth'),
-            PpLink('Papers for your baby',
-                surfaceId: 'pp_section/parenting_papers',
-                blurb: 'The birth certificate, Aadhaar and the rest, in order.'),
+            // Final review item 6: was the whole Papers door
+            // ('pp_section/parenting_papers'), kept for revert.
+            PpLink('Getting the birth certificate',
+                surfaceId: 'pp_page/parenting_papers/pm_birth_certificate',
+                blurb: 'The form, the office, and the 21-day window.'),
           ],
         ),
         PpPage(
@@ -824,10 +826,12 @@ final PpSection kPpFirst40Section = PpSection(
               "any of it. It's a list of moments to hand over to a doctor.",
             ),
             // ⚠️ FREE LINK, NOT A SELL. See the area note above.
+            // Final review item 6: was the whole roster ('pp_experts'), kept
+            // for revert. Most newborn worries short of a red flag are feeds.
             PpLink("Not an emergency, but you're not sure",
-                surfaceId: 'pp_experts',
-                blurb: 'Talk to a newborn nurse or a lactation expert instead '
-                    'of guessing at 2am.'),
+                surfaceId: 'pp_experts/Lactation expert',
+                blurb: 'Talk to a lactation expert about feeds, weight and '
+                    'nappies instead of guessing at 2am.'),
             PpLink('Find help near you',
                 surfaceId: 'pp_find_help',
                 blurb: 'Paediatricians, lactation support and night help.'),
@@ -3398,8 +3402,10 @@ final PpSection kPpFirst40Section = PpSection(
                   'for a second child if she is a girl, after registration '
                   'and the birth vaccines.'),
             ], heading: 'Money you may be owed', hue: 330),
+            // Final review item 6: was the whole Papers door
+            // ('pp_section/parenting_papers'), kept for revert.
             PpLink('How to claim, step by step',
-                surfaceId: 'pp_section/parenting_papers',
+                surfaceId: 'pp_page/parenting_papers/pm_schemes',
                 blurb: 'The forms, the offices, and what to carry.'),
             PpLink('Food and recipes',
                 surfaceId: 'pp_page/parenting_maternal/kitchen_one_handed',

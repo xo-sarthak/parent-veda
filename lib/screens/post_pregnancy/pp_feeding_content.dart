@@ -2623,10 +2623,12 @@ final PpArea _startingSolids = PpArea(
         PpIndiaNote("Ghee in the dal really helps. It's one of the traditional "
             'answers that holds up. Honey, jaggery water and a drop of oil in '
             "the bottom are the ones that don't."),
+        // Final review item 6: was the whole Health door
+        // ('pp_section/parenting_health'), kept for revert.
         PpLink(
-          'Health, the whole section',
-          surfaceId: 'pp_section/parenting_health',
-          blurb: 'Tummy trouble, reflux, and when a stool needs looking at.',
+          'Constipation, in the Health door',
+          surfaceId: 'pp_page/parenting_health/tummy_constipation',
+          blurb: 'When a hard stool needs looking at.',
         ),
       ],
     ),
@@ -3352,11 +3354,12 @@ final PpArea _cooking = PpArea(
         ),
         // Link out, do not own: "when he is unwell" depth and Sick mode are
         // Health's.
+        // Final review item 6: was the whole Health door
+        // ('pp_section/parenting_health'), kept for revert.
         PpLink(
-          'Health, the whole section',
-          surfaceId: 'pp_section/parenting_health',
-          blurb: 'Fever, vomiting, dehydration, and when a sick day needs a '
-              'doctor.',
+          'Dehydration, and how to give ORS',
+          surfaceId: 'pp_page/parenting_health/tummy_dehydration',
+          blurb: 'The signs to count, and when a sick day needs a doctor.',
         ),
       ],
     ),

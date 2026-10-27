@@ -4601,11 +4601,13 @@ final PpArea _growth = PpArea(
         PpIndiaNote('Anaemia is common in Indian toddlers and shows up as '
             'tiredness, pallor and poor appetite, not a dramatic symptom. Ask '
             'about it at the one year visit; a simple blood test answers it.'),
+        // Final review item 6: was the whole Development door
+        // ('pp_section/parenting_development'), kept for revert.
         PpLink(
-          'Developmental milestones live in Development',
-          surfaceId: 'pp_section/parenting_development',
-          blurb: 'Sitting, walking, talking and playing are tracked there, not '
-              'here.',
+          'Milestones worth checking',
+          surfaceId: 'pp_page/parenting_development/dev_worth_checking',
+          blurb: 'Sitting, walking, talking and playing live in Development, '
+              'not here.',
         ),
       ],
     ),
@@ -4987,7 +4989,9 @@ final PpArea _records = PpArea(
         PpLink('Health record and papers', surfaceId: 'pp_health_home'),
         PpLink('Open the emergency card', surfaceId: 'pp_emergency_card'),
         PpLink('U-WIN: the government vaccine record', pageId: 'vax_uwin', slide: 'Vaccination card'),
-        PpLink('Papers and money', surfaceId: 'pp_section/parenting_papers'),
+        // Final review item 6: was the whole Papers door, kept for revert.
+        PpLink('Health insurance for your child',
+            surfaceId: 'pp_page/parenting_papers/pm_health_insurance'),
         PpLink(
           'A health record folder',
           surfaceId: 'pp_products/Health record folders',

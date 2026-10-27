@@ -397,7 +397,7 @@ void main() {
       expect(words('f40_days_1_7'), allOf(contains('BCG'), contains('OPV-0'), contains('Hepatitis B')));
       expect(links('f40_days_1_7').map((l) => l.surfaceId), contains('pp_vaccines'));
       expect(words('f40_days_8_15'), allOf(contains('Register the birth'), contains('21 days')));
-      expect(links('f40_days_8_15').map((l) => l.surfaceId), contains('pp_section/parenting_papers'));
+      expect(links('f40_days_8_15').map((l) => l.surfaceId), contains('pp_page/parenting_papers/pm_birth_certificate')); // final review item 6
       final rest = _page('f40_rest_and_food');
       expect(words('f40_rest_and_food'), allOf(contains('JSY'), contains('JSSK'), contains('PMMVY')));
       final rules = rest.blocks.whereType<PpCarousel>().single;

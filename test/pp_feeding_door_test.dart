@@ -89,8 +89,8 @@ void main() {
       expect(_feeding.pageById(i.closingPageId!), isNotNull);
       expect(_page('solids_setup').format, 'ARTICLE');
       expect(_page('solids_constipation').blocks.whereType<PpLink>()
-          .any((l) => l.surfaceId == 'pp_section/parenting_health'), isTrue,
-          reason: 'constipation links to Health');
+          .any((l) => l.surfaceId == 'pp_page/parenting_health/tummy_constipation'), isTrue,
+          reason: 'constipation links to the Health constipation page (final review item 6)');
     });
 
     test('the growth-chart read is a reference into the Growth journey', () {

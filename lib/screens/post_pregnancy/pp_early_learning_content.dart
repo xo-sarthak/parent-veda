@@ -6658,9 +6658,11 @@ const PpArea _school = PpArea(
             title: 'The one thing to remember'),
         PpWhenLine('Start looking when he is about two and a half; the forms '
             'usually open the autumn before he turns three.'),
-        PpLink('Papers for your child',
-            surfaceId: 'pp_section/parenting_papers',
-            blurb: 'The birth certificate and Aadhaar, and how to get them.'),
+        // Final review item 6: was the whole Papers door
+        // ('pp_section/parenting_papers'), kept for revert.
+        PpLink('The birth certificate schools ask for',
+            surfaceId: 'pp_page/parenting_papers/pm_birth_certificate',
+            blurb: 'How to get it, or a late one if it was missed.'),
         PpLink('Choosing a preschool',
             pageId: 'school_choosing',
             blurb: 'What to look for when you visit.'),

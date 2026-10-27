@@ -312,7 +312,8 @@ void main() {
         expect(text, contains(must));
       }
       final papers = p.blocks.whereType<PpLink>().firstWhere((l) => l.surfaceId != null).surfaceId!;
-      expect(papers, 'pp_section/parenting_papers');
+      // Final review item 6: the page, not the whole Papers door.
+      expect(papers, 'pp_page/parenting_papers/pm_birth_certificate');
       expect(ppScreenForSurface(papers), isNotNull);
     });
 

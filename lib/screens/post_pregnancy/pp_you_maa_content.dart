@@ -1018,9 +1018,11 @@ final PpArea _yourBody = PpArea(
         // PpLink('Your first 40 days',
         //     surfaceId: null,
         //     blurb: 'The whole tradition, day by day, in its own section.'),
-        PpLink('Your first 40 days',
-            surfaceId: 'pp_section/parenting_first_40',
-            blurb: 'The whole tradition, day by day, in its own section.'),
+        // Final review item 6: was the whole First 40 door
+        // ('pp_section/parenting_first_40'), kept for revert.
+        PpLink('Rest, water and the food of the forty days',
+            surfaceId: 'pp_page/parenting_first_40/f40_rest_and_food',
+            blurb: 'The jaapa tradition, in the First 40 door.'),
         // Added 2026-10-02 from the parenting gap analysis (P2/P3).
         PpCards(heading: 'Everyday questions in the first weeks', [
           PpCard('Housework', 'Light tasks are fine. Nothing heavier than '
@@ -7110,9 +7112,12 @@ const PpArea _backToWork = PpArea(
             pageId: 'work_your_entitlement',
             blurb: 'The Maternity Benefit Act, on its own page.',
             slide: 'Maternity leave and pay from your employer'),
-        PpLink('Papers and money, for the baby',
-            surfaceId: 'pp_section/parenting_papers',
-            blurb: 'Birth certificate, Aadhaar, insurance and the rest.'),
+        // Final review item 6: was the whole Papers door
+        // ('pp_section/parenting_papers'), kept for revert.
+        PpLink('Government money for mothers and babies',
+            surfaceId: 'pp_page/parenting_papers/pm_schemes',
+            blurb: 'PMMVY, anganwadi services and your state schemes, and how '
+                'to claim.'),
       ],
     ),
     PpPage(
