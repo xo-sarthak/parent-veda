@@ -20,7 +20,9 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/family_profile.dart' show FamilyProfileStore;
+import '../screens/ttc/ttc_strings.dart' show TtcPartnerMode;
 import '../services/life_stage_store.dart';
+import '../services/pregnancy_records.dart';
 import '../services/remote/supabase_repo.dart';
 import 'cycle_store.dart';
 import 'ttc_chapter.dart';
@@ -28,6 +30,7 @@ import 'ttc_ready_plan_store.dart';
 import 'ttc_sync.dart';
 import 'ttc_treatment_round.dart';
 import 'ttc_treatment_store.dart';
+import 'ttc_trying_time.dart';
 
 class TtcStore extends ChangeNotifier with TtcSyncedStore {
   TtcStore._() {
@@ -52,6 +55,9 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   static const _monitorsKey = 'ttc_clinic_monitors';
   static const _medicatedKey = 'ttc_medicated_cycle';
   static const _statedLengthKey = 'ttc_stated_cycle_length';
+  // T1 (2026-10-27): her "Change" pick under "How long have you been trying?".
+  static const _countFromKey = 'ttc_trying_count_from';
+  static const _countDateKey = 'ttc_trying_count_date';
 
   static const _engine = TtcChapterEngine();
 
@@ -63,6 +69,13 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   DateTime? _pregnancyConfirmedOn;
   bool _partnerJoined = false;
   bool _loaded = false;
+  TtcTryingBasis? _countFrom;
+  DateTime? _countDate;
+  DateTime? _partnerTryingStart;
+  // Whether her cloud row holds a 0117 value, so a cleared pick is sent as a
+  // clear rather than left out (see [pushToCloud]).
+  bool _cloudHasCount = false;
+  bool _cloudHasEffective = false;
 
   bool get isLoaded => _loaded;
 
@@ -94,6 +107,96 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
       ttcStartFromAnswer(FamilyProfileStore.instance.otherFor('ttc_duration'),
           LifeStageStore.instance.enteredAt) ??
       LifeStageStore.instance.enteredAt;
+
+  /// The same chain as [journeyStart], saying which link answered, so the
+  /// "time trying" line can say where its date came from (T1, 2026-10-27).
+  ({DateTime date, TtcTryingSource source})? get _startWithSource {
+    final planned = TtcReadyPlanStore.instance.plannedStart;
+    if (planned != null) return (date: planned, source: TtcTryingSource.stated);
+    final stated = _journeyStart;
+    if (stated != null) return (date: stated, source: TtcTryingSource.stated);
+    final fromAnswer = ttcStartFromAnswer(
+        FamilyProfileStore.instance.otherFor('ttc_duration'),
+        LifeStageStore.instance.enteredAt);
+    if (fromAnswer != null) {
+      return (date: fromAnswer, source: TtcTryingSource.answer);
+    }
+    final joined = LifeStageStore.instance.enteredAt;
+    return joined == null
+        ? null
+        : (date: joined, source: TtcTryingSource.joined);
+  }
+
+  /// ⚠️ THE ONE "HOW LONG HAVE YOU BEEN TRYING" (T1, 2026-10-27; spec in
+  /// docs/preg-ttc-tool-plans/00-MASTER.md, TT1). Every screen, rule, message
+  /// and Ask Veda field reads this or [daysTrying], so the number agrees
+  /// everywhere.
+  ///
+  /// Her own pregnancies are left out of the count (the user's option A):
+  /// the months she was pregnant were not months of trying. A pregnancy she
+  /// deleted is not counted (the user, 2026-10-27: "respect the delete"). On
+  /// his phone it is the start her phone published, so the couple sees one
+  /// number and her pregnancy dates never leave her row.
+  TtcTryingTime? get tryingTime {
+    final now = DateTime.now();
+    final hers = _partnerTryingStart;
+    if (TtcPartnerMode.instance.on && hers != null) {
+      return ttcTryingTime(
+          now: now, defaultStart: hers, defaultSource: TtcTryingSource.partner);
+    }
+    return tryingTimeFor(_countFrom, date: _countDate, now: now);
+  }
+
+  /// What a "Change" pick would count, without saving it: the sheet shows
+  /// each option's months before she picks.
+  TtcTryingTime? tryingTimeFor(TtcTryingBasis? basis,
+      {DateTime? date, DateTime? now}) {
+    final base = _startWithSource;
+    if (base == null) return null;
+    return ttcTryingTime(
+      now: now ?? DateTime.now(),
+      defaultStart: base.date,
+      defaultSource: base.source,
+      basis: basis,
+      basisDate: date,
+      pregnancies: [
+        for (final r in PregnancyRecords.instance.all)
+          if (r.outcome != PregnancyOutcome.ongoing)
+            (from: r.startedOn, to: r.endedOn),
+      ],
+    );
+  }
+
+  /// Her "Change" pick; null is the default (since she first started).
+  TtcTryingBasis? get tryingBasis => _countFrom;
+  DateTime? get tryingBasisDate => _countDate;
+
+  /// The day she started trying again: her "again" pick, else the end of her
+  /// latest ended pregnancy. Null when there is neither, and then "Since I
+  /// started again" is not offered.
+  DateTime? get tryingAgainSince {
+    if (_countFrom == TtcTryingBasis.again && _countDate != null) {
+      return _countDate;
+    }
+    DateTime? out;
+    for (final r in PregnancyRecords.instance.all) {
+      final e = r.endedOn;
+      if (r.outcome == PregnancyOutcome.ongoing || e == null) continue;
+      if (out == null || e.isAfter(out)) out = e;
+    }
+    return out;
+  }
+
+  /// Her "Change" pick. [TtcTryingBasis.first] (or null) is the default.
+  /// Saved on the phone and synced with the journey row.
+  void setTryingBasis(TtcTryingBasis? basis, {DateTime? date}) {
+    _countFrom = basis == TtcTryingBasis.first ? null : basis;
+    _countDate = _countFrom == null || date == null
+        ? null
+        : DateTime(date.year, date.month, date.day);
+    _persist();
+    notifyListeners();
+  }
 
   /// Which medical pathway they are on. Never forced, always changeable.
   ///
@@ -244,12 +347,14 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   bool get partnerJoined => _partnerJoined;
 
   /// How long they have been trying, in whole days.
-  int? get daysTrying {
-    final s = journeyStart;
-    if (s == null) return null;
-    final d = DateTime.now().difference(DateTime(s.year, s.month, s.day)).inDays;
-    return d < 0 ? 0 : d;
-  }
+  ///
+  /// ⚠️ FROM [tryingTime] SINCE 2026-10-27 (T1): her pregnancies are left
+  /// out and her "Change" pick is honoured. Kept for revert:
+  ///   final s = journeyStart;
+  ///   if (s == null) return null;
+  ///   final d = DateTime.now().difference(DateTime(s.year, s.month, s.day)).inDays;
+  ///   return d < 0 ? 0 : d;
+  int? get daysTrying => tryingTime?.days;
 
   /// THE call every TTC screen makes. Chapter, cycle day, ovulation estimate,
   /// confidence and fertility level, resolved together and consistently.
@@ -373,6 +478,11 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
     _pregnancyConfirmedOn = null;
     _partnerJoined = false;
     _partnerChapter = null;
+    _countFrom = null;
+    _countDate = null;
+    _partnerTryingStart = null;
+    _cloudHasCount = false;
+    _cloudHasEffective = false;
     _loaded = true;
     // The planned month is part of [journeyStart] now (2026-10-17).
     TtcReadyPlanStore.instance.resetForTest();
@@ -394,6 +504,8 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
       _clinicMonitors = p.getBool(_monitorsKey);
       _medicated = p.getBool(_medicatedKey);
       _statedLength = p.getInt(_statedLengthKey);
+      _countFrom = _basisFrom(p.getString(_countFromKey));
+      _countDate = DateTime.tryParse(p.getString(_countDateKey) ?? '');
       final raw = p.getString(_pathKey);
       _path = TtcPath.values.firstWhere(
         (e) => e.name == raw,
@@ -431,12 +543,24 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
           (e) => e.name == row['path'],
           orElse: () => TtcPath.natural,
         );
+        // T1 (2026-10-27): her "Change" pick, so it follows her to a new phone.
+        _countFrom = _basisFrom(row['trying_count_from'] as String?);
+        _countDate = TtcSyncUtil.parseDate(row['trying_count_date']);
+        _cloudHasCount = row['trying_count_from'] != null;
+        _cloudHasEffective = row['trying_effective_start'] != null;
       } else {
         // The partner's published chapter - the only thing we read from their
         // row, and the reason her cycle never has to be shared.
         _partnerChapter = TtcChapter.values
             .where((c) => c.name == row['current_chapter'])
             .firstOrNull;
+        // And her worked-out "trying since" (T1, 2026-10-27): one number for
+        // the couple, without her pregnancy dates ever leaving her row.
+        // Sent only when it differs from her stated start, so her
+        // `journey_start` is the fallback.
+        _partnerTryingStart =
+            TtcSyncUtil.parseDate(row['trying_effective_start']) ??
+                TtcSyncUtil.parseDate(row['journey_start']);
       }
     }
   }
@@ -445,7 +569,24 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pushToCloud() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
-    final start = _journeyStart ?? LifeStageStore.instance.enteredAt;
+    // ⚠️ ONLY THE START SHE GAVE (T1, 2026-10-27). It pushed
+    // `_journeyStart ?? enteredAt`, and the pull wrote that back as her stated
+    // start, so after one sync the app forgot she had never given one: her
+    // onboarding answer stopped counting, and "the date you told us" became
+    // the day she joined. The fallbacks are worked out on the phone instead.
+    // Kept for revert:
+    //   final start = _journeyStart ?? LifeStageStore.instance.enteredAt;
+    final start = _journeyStart;
+    // Published for his phone; never on his own row (his phone shows hers).
+    final trying = TtcPartnerMode.instance.on ? null : tryingTime;
+    // ⚠️ THE 0117 KEYS ONLY WHEN THEY CARRY SOMETHING (BACKEND-PATTERNS
+    // §16ww): a column the server lacks fails the whole row, silently. Her
+    // worked-out start is sent only when it differs from the start she gave,
+    // because his phone falls back to her `journey_start`.
+    final effective =
+        trying == null || trying.plannedAhead ? null : trying.effectiveStart;
+    final sendEffective = effective != null &&
+        (start == null || TtcSyncUtil.date(effective) != TtcSyncUtil.date(start));
     // Confirmed and remembered (sync log step 11); it was
     // `SupabaseRepo.upsertRow`, which swallowed a refusal. Kept for revert.
     await sendTracked(() => SupabaseRepo.upsertRowConfirmed(
@@ -453,6 +594,17 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
       {
         'user_id': uid,
         'journey_start': start == null ? null : TtcSyncUtil.date(start),
+        // T1 (2026-10-27, migration 0117), each only when set, or when the
+        // cloud holds a value that must now be cleared (an upsert updates only
+        // the columns it is sent, so a left-out key would keep the old pick).
+        if (_countFrom != null || _cloudHasCount)
+          'trying_count_from': _countFrom?.name,
+        if (_countFrom != null || _cloudHasCount)
+          'trying_count_date':
+              _countDate == null ? null : TtcSyncUtil.date(_countDate!),
+        if (sendEffective || _cloudHasEffective)
+          'trying_effective_start':
+              sendEffective ? TtcSyncUtil.date(effective) : null,
         'path': _path.name,
         'pregnancy_confirmed_on': _pregnancyConfirmedOn == null
             ? null
@@ -470,6 +622,8 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
       },
       onConflict: 'user_id',
     ));
+    _cloudHasCount = _countFrom != null;
+    _cloudHasEffective = sendEffective;
   }
 
   @override
@@ -511,8 +665,21 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
       } else {
         await p.setInt(_statedLengthKey, _statedLength!);
       }
+      if (_countFrom == null) {
+        await p.remove(_countFromKey);
+        await p.remove(_countDateKey);
+      } else {
+        await p.setString(_countFromKey, _countFrom!.name);
+        final d = _countDate;
+        d == null
+            ? await p.remove(_countDateKey)
+            : await p.setString(_countDateKey, d.toIso8601String());
+      }
     } catch (_) {/* best-effort */}
   }
+
+  static TtcTryingBasis? _basisFrom(String? raw) =>
+      TtcTryingBasis.values.where((b) => b.name == raw).firstOrNull;
 }
 
 // TtcPathCopy moved to ttc_care_pathway.dart alongside the pathway itself.

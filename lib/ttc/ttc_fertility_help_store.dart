@@ -24,6 +24,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/pregnancy_records.dart';
 import '../services/remote/cloud_merged_store.dart';
 // import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
@@ -158,10 +159,36 @@ class TtcFertilityHelpStore extends ChangeNotifier with CloudMergedStore {
     await answer('conditions', current.join(','));
   }
 
+  /// ⚠️ 'miscarriage' IS NOT A CONDITION SINCE 2026-10-27 (T1/TT2): a saved
+  /// tick from before is counted as a loss in [priorLosses] instead, so it no
+  /// longer fires `known_condition`. Kept for revert: no `s != 'miscarriage'`.
   Set<String> get selectedConditions => (_answers['conditions'] ?? '')
       .split(',')
-      .where((s) => s.isNotEmpty && s != 'none')
+      .where((s) => s.isNotEmpty && s != 'none' && s != 'miscarriage')
       .toSet();
+
+  /// Losses she recorded in ParentVeda: her pregnancy records ending in a
+  /// loss. A record she deleted is not counted (the user, 2026-10-27:
+  /// "respect the delete"); an undone loss is ongoing again.
+  int get recordedLosses => PregnancyRecords.instance.all
+      .where((r) => r.outcome == PregnancyOutcome.loss)
+      .length;
+
+  /// Every loss we know of (T1/TT2, 2026-10-27): derived first, asked only
+  /// for the time before ParentVeda.
+  ///
+  /// `losses_before_app` (the live check's question) adds to her records.
+  /// Answers from before it existed may already include a recorded loss (the
+  /// retired screen's `miscarriages` count, or the retired 'miscarriage'
+  /// tick), so they are read as "at least this many", never added.
+  int get priorLosses {
+    final before = int.tryParse(_answers['losses_before_app'] ?? '');
+    if (before != null) return recordedLosses + before;
+    final oldCount = int.tryParse(_answers['miscarriages'] ?? '') ?? 0;
+    final oldTick = (_answers['conditions'] ?? '').split(',').contains('miscarriage') ? 1 : 0;
+    final told = oldCount > oldTick ? oldCount : oldTick;
+    return told > recordedLosses ? told : recordedLosses;
+  }
 
   Future<void> complete() async {
     _completedAt = DateTime.now();
@@ -231,7 +258,10 @@ class TtcFertilityHelpStore extends ChangeNotifier with CloudMergedStore {
         _ => FertilityCarePathway.notStarted,
       },
       knownConditions: selectedConditions,
-      priorMiscarriages: int.tryParse(_answers['miscarriages'] ?? '') ?? 0,
+      // From her records plus the time before ParentVeda (T1/TT2,
+      // 2026-10-27). Kept for revert:
+      //   priorMiscarriages: int.tryParse(_answers['miscarriages'] ?? '') ?? 0,
+      priorMiscarriages: priorLosses,
       partnerConcern: _answers['partner'] == 'yes',
       cancerTreatmentPlanned: _answers['cancer'] == 'yes',
       painfulOrHeavyPeriods: _answers['pain'] == 'yes',

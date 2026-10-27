@@ -21,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
 import '../screens/ttc/ttc_intro_flow.dart' show TtcIntroGate;
 import '../ttc/ttc_store.dart';
+import '../ttc/ttc_trying_time.dart' show TtcTryingBasis;
 import 'dear_baby_vault_store.dart';
 import 'family_timeline.dart';
 import 'life_stage_store.dart';
@@ -319,6 +320,9 @@ const String kTryingFromAtKey = 'pv_trying_from_at';
 const String kTryingFromTimelineKey = 'pv_trying_from_timeline';
 const String kTryingFromConfirmedKey = 'pv_trying_from_confirmed';
 const String kTryingFromIntroSeenKey = 'pv_trying_from_intro_seen';
+// T1/TC5 (2026-10-27): her "how long" pick before the move, for the undo.
+const String kTryingFromBasisKey = 'pv_trying_from_basis';
+const String kTryingFromBasisDateKey = 'pv_trying_from_basis_date';
 
 /// Pure, so the tests read it: whether "Trying again" is offered. Her side,
 /// in Parenting or the learning space. A pregnancy going is its own stage,
@@ -349,10 +353,17 @@ Future<void> startTryingFromFamily({DateTime? today}) async {
   final fromAt = LifeStageStore.instance.enteredAt;
   final confirmed = TtcStore.instance.pregnancyConfirmedOn;
   final introSeen = await TtcIntroGate.seen().catchError((_) => false);
+  final basis = TtcStore.instance.tryingBasis;
+  final basisDate = TtcStore.instance.tryingBasisDate;
 
   TtcStore.instance.clearPregnancyConfirmation();
   await TtcIntroGate.oweAgain().catchError((_) {});
   LifeStageStore.instance.setStage(LifeStage.tryingToConceive, at: day);
+  // ⚠️ TRYING AGAIN COUNTS FROM TODAY (TC5, 2026-10-27). The intro no longer
+  // asks "how long" (film only since 2026-10), so her old start stayed and
+  // the doctor check counted the years with her child as years of trying.
+  // She can change it ("How long have you been trying?" > Change).
+  TtcStore.instance.setTryingBasis(TtcTryingBasis.again, date: day);
 
   final timelineId = 'trying_again:${day.toIso8601String().substring(0, 10)}';
   FamilyTimeline.instance.add(
@@ -379,6 +390,16 @@ Future<void> startTryingFromFamily({DateTime? today}) async {
       await prefs.remove(kTryingFromConfirmedKey);
     }
     await prefs.setBool(kTryingFromIntroSeenKey, introSeen);
+    if (basis != null) {
+      await prefs.setString(kTryingFromBasisKey, basis.name);
+    } else {
+      await prefs.remove(kTryingFromBasisKey);
+    }
+    if (basisDate != null) {
+      await prefs.setString(kTryingFromBasisDateKey, basisDate.toIso8601String());
+    } else {
+      await prefs.remove(kTryingFromBasisDateKey);
+    }
   } catch (_) {/* local-first: the undo then goes back to parenting */}
 }
 
@@ -405,8 +426,13 @@ Future<void> undoTryingFromFamily() async {
   String? timelineId;
   DateTime? confirmed;
   var introSeen = false;
+  TtcTryingBasis? basis;
+  DateTime? basisDate;
   try {
     final prefs = await SharedPreferences.getInstance();
+    final b = prefs.getString(kTryingFromBasisKey);
+    basis = TtcTryingBasis.values.where((v) => v.name == b).firstOrNull;
+    basisDate = DateTime.tryParse(prefs.getString(kTryingFromBasisDateKey) ?? '');
     if (prefs.getString(kTryingFromStageKey) == LifeStage.skilling.name) {
       back = LifeStage.skilling;
     }
@@ -419,6 +445,8 @@ Future<void> undoTryingFromFamily() async {
   if (timelineId != null) FamilyTimeline.instance.remove(timelineId);
   if (confirmed != null) TtcStore.instance.confirmPregnancy(on: confirmed);
   if (introSeen) await TtcIntroGate.markSeen().catchError((_) {});
+  // Her "how long" pick as it was before the move (TC5, 2026-10-27).
+  TtcStore.instance.setTryingBasis(basis, date: basisDate);
   LifeStageStore.instance.setStage(back, at: at);
   await _forgetTryingMove();
 }
@@ -432,6 +460,8 @@ Future<void> _forgetTryingMove() async {
       kTryingFromTimelineKey,
       kTryingFromConfirmedKey,
       kTryingFromIntroSeenKey,
+      kTryingFromBasisKey,
+      kTryingFromBasisDateKey,
     ]) {
       await prefs.remove(k);
     }

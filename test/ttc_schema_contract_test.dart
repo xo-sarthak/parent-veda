@@ -33,6 +33,10 @@ const Map<String, List<String>> written = {
   TtcTables.journeys: [
     'user_id', 'journey_start', 'path', 'pregnancy_confirmed_on',
     'partner_joined', 'current_chapter', 'updated_at',
+    // 0044 (written since 2026-09, pinned 2026-10-27).
+    'clinic_monitors', 'medication_controls', 'timing_ownership',
+    // 0117 (T1, 2026-10-27): her "how long" pick and the start his phone shows.
+    'trying_count_from', 'trying_count_date', 'trying_effective_start',
   ],
   // 0097 (2026-10-17): the merge clock, the soft delete and the bleed days.
   // Kept for revert: cycles ['id', 'user_id', 'started_on']; signals without
@@ -136,11 +140,21 @@ void main() {
     File('supabase/migrations/0097_ttc_cycle_sync_clock.sql'),
     File('supabase/migrations/0098_ttc_records_ritual_sync_clock.sql'),
     File('supabase/migrations/0099_ttc_supplements_timeline_sync_clock.sql'),
+    File('supabase/migrations/0044_ttc_care_pathway.sql'),
+    File('supabase/migrations/0117_ttc_trying_count.sql'),
   ].map((f) => f.readAsStringSync()).join('\n').replaceAll('\r\n', '\n');
-  bool addedLater(String table, String column) => RegExp(
-          'alter table public\\.$table\\s+add column if not exists '
-          '$column\\s')
-      .hasMatch(altered);
+  // ⚠️ PER STATEMENT, NOT PER LINE (2026-10-27). The regex matched only the
+  // first column after each `alter table`, so 0044's three-column alter could
+  // never be pinned. Kept for revert:
+  //   bool addedLater(String table, String column) => RegExp(
+  //           'alter table public\\.$table\\s+add column if not exists '
+  //           '$column\\s')
+  //       .hasMatch(altered);
+  bool addedLater(String table, String column) => altered
+      .split(';')
+      .where((st) => RegExp('alter table public\\.$table\\s').hasMatch(st))
+      .any((st) =>
+          RegExp('add column if not exists $column\\s').hasMatch('$st '));
 
   /// The body of one `create table public.<name> ( ... )` block.
   String tableBody(String table) {

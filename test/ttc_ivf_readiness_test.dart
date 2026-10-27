@@ -147,7 +147,10 @@ void main() {
       expect(verdictOf(safe()..semen = IvfSemen.issue), IvfVerdict.flagged);
     });
 
-    for (final id in ['pcos', 'endo', 'miscarriage', 'pelvic']) {
+    // 'miscarriage' left this list on 2026-10-27 (T1/TT2): one loss is not a
+    // flag; two or more are (the group below). Kept for revert:
+    //   for (final id in ['pcos', 'endo', 'miscarriage', 'pelvic']) {
+    for (final id in ['pcos', 'endo', 'pelvic']) {
       test('a known $id', () {
         final a = safe()..conditions = {id};
         expect(verdictOf(a), IvfVerdict.flagged);

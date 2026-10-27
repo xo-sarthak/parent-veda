@@ -42,6 +42,7 @@ import '../../ttc/ttc_ready_plan.dart' show readyMonthLabel;
 import '../../ttc/ttc_ready_plan_store.dart';
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
+import '../../ttc/ttc_store.dart' show TtcStore;
 import '../auth/onboarding/onboarding_questions.dart';
 import '../belly_skin/bump_ritual_screen.dart';
 import '../dear_baby_vault_screen.dart';
@@ -72,6 +73,7 @@ import '../saved_screen.dart';
 import '../skilling/sk_child_store.dart';
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_more_marks.dart';
+import '../ttc/ttc_trying_change_sheet.dart' show showTtcTryingChange;
 import '../ttc/ttc_content_prefs_sheet.dart'
     show showTtcContentPrefsSheet, kTtcWhatYouSee, kTtcHideIntimate;
 import '../ttc/ttc_get_help_screen.dart'
@@ -870,6 +872,12 @@ final PvYouStageContent _trying = PvYouStageContent(
         planned == null
             ? 'Getting ready to try'
             : 'Getting ready to try · from ${readyMonthLabel(planned)}'
+      // The one count (T1, 2026-10-27): her pregnancies left out, the same
+      // months the doctor check uses. Her answer only until that loads.
+      // Kept for revert:
+      //   d == '--' ? 'Trying' : 'Trying · ${d.toLowerCase()}',
+      else if (TtcStore.instance.tryingTime case final t? when !t.plannedAhead)
+        'Trying · ${t.label}'
       else
         d == '--' ? 'Trying' : 'Trying · ${d.toLowerCase()}',
       // Only a real answer; "cycles not sure" read as a slip.
@@ -894,8 +902,15 @@ final PvYouStageContent _trying = PvYouStageContent(
     PvYouDetail(
       label: 'Trying for',
       art: ttcArtTab(TtcTabMark.clock),
-      value: () => _answer('trying', 'ttc_duration'),
-      edit: (c) => _editQuestion(c, 'trying', 'ttc_duration'),
+      // The one count, with what it counted from (T1, 2026-10-27). Kept for
+      // revert: value: () => _answer('trying', 'ttc_duration'),
+      value: () => switch (TtcStore.instance.tryingTime) {
+            final t? when !t.plannedAhead => '${t.heading}. ${t.line}',
+            _ => _answer('trying', 'ttc_duration'),
+          },
+      // Change opens the count's own sheet, so the line and its edit agree
+      // (T1). Kept for revert: edit: (c) => _editQuestion(c, 'trying', 'ttc_duration'),
+      edit: (c) => showTtcTryingChange(c),
     ),
     PvYouDetail(
       label: 'Cycles',

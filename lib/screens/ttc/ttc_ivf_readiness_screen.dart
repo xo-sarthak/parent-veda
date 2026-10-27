@@ -57,6 +57,7 @@ import 'ttc_common.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
+import 'ttc_trying_change_sheet.dart';
 
 /// IVF & IUI is 206 on the controlled wheel — a tool opened from that door
 /// keeps the door's colour.
@@ -94,7 +95,18 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
   /// already assembles how long she has been trying (`TtcStore`), her cycle
   /// spread (`CycleStore`) and what her PCOS check found. Asking any of that
   /// again would make this the fourth questionnaire in a stage that has three.
-  late final FertilityHelpContext _ctx = TtcFertilityHelpStore.instance.context;
+  //
+  // Not final since 2026-10-27 (T1): changing how long she has been trying
+  // re-reads it, so the answer uses the new count. Kept for revert:
+  //   late final FertilityHelpContext _ctx = TtcFertilityHelpStore.instance.context;
+  late FertilityHelpContext _ctx = TtcFertilityHelpStore.instance.context;
+
+  /// She changed what "how long" counts from: the count, the band and the
+  /// answer all follow (T1, 2026-10-27).
+  void _tryingChanged() => setState(() {
+        _ctx = TtcFertilityHelpStore.instance.context;
+        _a.trying = _tryingFromLogs();
+      });
 
   @override
   void initState() {
@@ -128,6 +140,11 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
       s.trying = derivedTrying;
     }
     s.cycles ??= _a.cycles;
+    // Losses (T1/TT2, 2026-10-27): her records always win; a saved
+    // "A previous miscarriage" tick becomes one loss before ParentVeda.
+    s.recordedLosses = _a.recordedLosses;
+    s.lossesBefore ??= _a.lossesBefore;
+    s.absorbLegacyMiscarriage();
     _a = s;
   }
 
@@ -180,6 +197,12 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
     // 40" on the IVF door's tab order and unanswered here. Selected and
     // changeable, like the two above.
     _a.age = _ctx.ageBand;
+    // ⚠️ A FOURTH, AND IT IS NOT A PREFILL BUT A FACT (T1/TT2, 2026-10-27):
+    // the losses she recorded in ParentVeda are counted, never asked. Only the
+    // time before ParentVeda is a question.
+    final help = TtcFertilityHelpStore.instance;
+    _a.recordedLosses = help.recordedLosses;
+    _a.lossesBefore = ivfLossesBeforeFrom(help.answerFor('losses_before_app'));
   }
 
   /// How long she has been trying, from `TtcStore`, mapped onto the bands.
@@ -229,6 +252,7 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         _a.trying,
         _a.cycles,
         _a.conditionsChecked ? true : null,
+        _a.lossesBefore,
         _a.semen,
         _a.check,
       ].where((v) => v != null).length;
@@ -249,14 +273,16 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
       //   eyebrow: 'See a specialist?',
       //   title: 'Is it worth talking\nto someone yet?',
       eyebrow: kTtcFertilityHelpName,
-      title: 'Six questions,\nthen a plain answer.',
+      // Seven since 2026-10-27 (T1/TT2: losses before ParentVeda). Kept for
+      // revert: title: 'Six questions,\nthen a plain answer.',
+      title: 'Seven questions,\nthen a plain answer.',
       // ⚠️ THE SKIP IS SAID UP FRONT (tools pass, 2026-09-27). A few of these
       // are personal (a miscarriage, his test), and "you can leave any blank"
       // used to sit under the button, after she had met them. Kept for
       // revert: "Six short questions. There's no score and no verdict. This
       // only tells you whether it's worth talking to someone. Only a
       // specialist can tell you more."
-      intro: "Six short questions to see if it's time to talk to a fertility "
+      intro: "Seven short questions to see if it's time to talk to a fertility "
           "doctor. A few are personal. Skip any you'd rather not answer. "
           "There's no score and no verdict.",
       children: [
@@ -277,7 +303,7 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           const SizedBox(height: 18),
         ],
 
-        ttcToolPad(TtcToolProgress(done: _answered, total: 6)),
+        ttcToolPad(TtcToolProgress(done: _answered, total: 7)),
         const SizedBox(height: 18),
 
         ttcToolPad(TtcToolQuestion(
@@ -312,11 +338,20 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
               ? null
               : "Filled in from what you've logged. Change it if that looks "
                   'wrong.',
-          child: TtcToolChoice<IvfTrying>(
-            value: _a.trying,
-            hue: kIvfHue,
-            options: {for (final v in IvfTrying.values) v: v.label},
-            onTap: (v) => _set(() => _a.trying = v),
+          // The count behind the prefill, and its Change (T1, 2026-10-27).
+          // Kept for revert: the TtcToolChoice on its own.
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TtcToolChoice<IvfTrying>(
+                value: _a.trying,
+                hue: kIvfHue,
+                options: {for (final v in IvfTrying.values) v: v.label},
+                onTap: (v) => _set(() => _a.trying = v),
+              ),
+              const SizedBox(height: 10),
+              TtcTryingLine(onChanged: _tryingChanged),
+            ],
           ),
         )),
 
@@ -388,8 +423,35 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           ),
         )),
 
+        // ⚠️ LOSSES (T1/TT2, 2026-10-27). The ones she recorded are counted
+        // from her pregnancy records; this asks only about the time before
+        // ParentVeda, which the app cannot know. Two or more (ASRM, ESHRE)
+        // is a reason to talk to a doctor now.
         ttcToolPad(TtcToolQuestion(
+          key: const ValueKey('ttc_ivf_losses'),
           n: 5,
+          hue: kIvfHue,
+          title: _a.recordedLosses == 0
+              ? 'Have you had a pregnancy loss before?'
+              : 'Any pregnancy losses before you used ParentVeda?',
+          note: _a.recordedLosses == 0
+              ? "Only the number matters here. Skip it if you'd rather not say."
+              : 'We have ${_a.recordedLosses == 1 ? '1 loss' : '${_a.recordedLosses} losses'} '
+                  "on record, so you don't need to count "
+                  "${_a.recordedLosses == 1 ? 'it' : 'them'} here.",
+          child: TtcToolChoice<IvfLossesBefore>(
+            value: _a.lossesBefore,
+            hue: kIvfHue,
+            options: {
+              for (final v in IvfLossesBefore.values)
+                v: v.label(onRecord: _a.recordedLosses > 0)
+            },
+            onTap: (v) => _set(() => _a.lossesBefore = v),
+          ),
+        )),
+
+        ttcToolPad(TtcToolQuestion(
+          n: 6,
           hue: kIvfHue,
           // Kept for revert: 'Has he had a semen test?' (tools pass,
           // 2026-09-27: names who, in one read).
@@ -415,7 +477,7 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         )),
 
         ttcToolPad(TtcToolQuestion(
-          n: 6,
+          n: 7,
           hue: kIvfHue,
           title: 'Have you had a fertility check before?',
           child: TtcToolChoice<IvfCheck>(

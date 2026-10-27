@@ -40,6 +40,7 @@ import '../products/pv_store_chrome.dart' show pvSnack;
 import 'ttc_appointments_screen.dart' show ttcApptDay;
 import '../../ttc/ttc_precheck_rules.dart';
 import '../../ttc/ttc_precheck_store.dart';
+import '../../ttc/ttc_store.dart' show TtcStore;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart' show TtcSectionHeading, ttcLine;
 import 'ttc_practice_card_parts.dart' show TtcInkPill;
@@ -392,7 +393,12 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
       buf.writeln('Cycles logged in app: ${c.loggedCycles}');
     }
     if (c.daysTrying != null) {
-      buf.writeln('Trying for: about ${(c.daysTrying! / 30).round()} months');
+      // The one count's words (T1, 2026-10-27). Kept for revert:
+      //   buf.writeln('Trying for: about ${(c.daysTrying! / 30).round()} months');
+      final t = TtcStore.instance.tryingTime;
+      buf.writeln(t == null
+          ? 'Trying for: about ${(c.daysTrying! / 30.44).round()} months'
+          : 'Trying for: ${t.label} (${t.line})');
     }
     if (c.medicineCount > 0) {
       buf.writeln('Medicines saved in app: ${c.medicineCount} '

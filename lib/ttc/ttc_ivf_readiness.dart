@@ -138,9 +138,52 @@ const List<({String id, String label, bool flag})> kIvfKnownConditions = [
   (id: 'pcos', label: 'PCOS', flag: true),
   (id: 'endo', label: 'Endometriosis', flag: true),
   (id: 'thyroid', label: 'A thyroid problem', flag: false),
-  (id: 'miscarriage', label: 'A previous miscarriage', flag: true),
+  // ⚠️ A LOSS IS NOT A CONDITION ANY MORE (T1/TT2, 2026-10-27). One tick here
+  // fired the specialist branch on ONE miscarriage, with a broken sentence
+  // ("because a previous miscarriage"), while the two-loss rule could never
+  // fire. Losses are counted now: from her pregnancy records, plus the ones
+  // before ParentVeda ([IvfLossesBefore]). Kept for revert:
+  // (id: 'miscarriage', label: 'A previous miscarriage', flag: true),
   (id: 'pelvic', label: 'Pelvic surgery or infection', flag: true),
 ];
+
+/// How each red-flag condition reads inside "because ..." (2026-10-27: it was
+/// the label lowercased, so "because pcos").
+const Map<String, String> kIvfFlagReason = {
+  'pcos': 'you have PCOS',
+  'endo': 'you have endometriosis',
+  'pelvic': "you've had pelvic surgery or an infection",
+};
+
+/// Pregnancy losses from before she used ParentVeda: the one thing about her
+/// losses the app cannot know. The ones she recorded here are counted from
+/// her pregnancy records and never asked about (derive, never ask).
+enum IvfLossesBefore { none, one, twoOrMore }
+
+extension IvfLossesBeforeCopy on IvfLossesBefore {
+  int get count => switch (this) {
+        IvfLossesBefore.none => 0,
+        IvfLossesBefore.one => 1,
+        IvfLossesBefore.twoOrMore => 2,
+      };
+
+  /// The chip, worded for whether the app already has losses on record.
+  String label({required bool onRecord}) => switch (this) {
+        IvfLossesBefore.none => 'None',
+        IvfLossesBefore.one => onRecord ? 'One more' : 'One',
+        IvfLossesBefore.twoOrMore => 'Two or more',
+      };
+
+  /// The value saved under `losses_before_app`.
+  String get stored => '$count';
+}
+
+IvfLossesBefore? ivfLossesBeforeFrom(String? stored) => switch (stored) {
+      '0' => IvfLossesBefore.none,
+      '1' => IvfLossesBefore.one,
+      '2' => IvfLossesBefore.twoOrMore,
+      _ => null,
+    };
 
 class IvfReadinessAnswers {
   FertilityAgeBand? age;
@@ -158,6 +201,26 @@ class IvfReadinessAnswers {
   IvfSemen? semen;
   IvfCheck? check;
 
+  /// Losses she recorded in ParentVeda (her pregnancy records). Filled in by
+  /// the screen, never asked.
+  int recordedLosses = 0;
+
+  /// Losses from before ParentVeda. Null = not answered.
+  IvfLossesBefore? lossesBefore;
+
+  /// Every loss we know of.
+  int get totalLosses => recordedLosses + (lossesBefore?.count ?? 0);
+
+  /// A form saved before 2026-10-27 may hold the retired 'miscarriage'
+  /// condition. It is not dropped: she told us of a loss, so it becomes one
+  /// loss before ParentVeda, unless her records already hold one.
+  void absorbLegacyMiscarriage() {
+    if (!conditions.remove('miscarriage')) return;
+    if (lossesBefore == null && recordedLosses == 0) {
+      lossesBefore = IvfLossesBefore.one;
+    }
+  }
+
   /// Which red flags are present, as plain labels for the output.
   List<String> get flags {
     final out = <String>[];
@@ -167,9 +230,12 @@ class IvfReadinessAnswers {
     }
     for (final c in kIvfKnownConditions) {
       if (c.flag && conditions.contains(c.id)) {
-        out.add(c.label.toLowerCase());
+        // Kept for revert: out.add(c.label.toLowerCase());
+        out.add(kIvfFlagReason[c.id] ?? c.label.toLowerCase());
       }
     }
+    // Two or more losses (ASRM and ESHRE: recurrent pregnancy loss).
+    if (totalLosses >= 2) out.add("you've had two or more pregnancy losses");
     if (semen == IvfSemen.issue) out.add('his semen test showed an issue');
     return out;
   }
@@ -226,6 +292,11 @@ class IvfReadinessAnswers {
           'conditions', conditions.isEmpty ? 'none' : conditions.join(','));
     }
 
+    // Only what she answered, like everything above.
+    if (lossesBefore != null) {
+      await store.answer('losses_before_app', lossesBefore!.stored);
+    }
+
     // ⚠️ ONLY A FOUND ISSUE BECOMES "YES". `notDone` and `notSure` are not
     // "no" — they are the absence of a test — and the store's `partnerConcern`
     // is read as a red flag. A "no" here would quietly clear a flag on the
@@ -251,7 +322,10 @@ class IvfReadinessAnswers {
       !conditionsUnsure &&
       semen != null &&
       semen != IvfSemen.notSure &&
-      check != null;
+      check != null &&
+      // ⚠️ ONE LOSS ON RECORD AND THE EARLIER ONES UNANSWERED: a second loss
+      // may be the one we were not told of, so this does not reassure.
+      !(recordedLosses == 1 && lossesBefore == null);
 }
 
 // -----------------------------------------------------------------------------
@@ -319,6 +393,11 @@ const String kIvfAlwaysLine =
     'This is not a diagnosis. Only a specialist who looks at your full '
     'history can tell you for sure.';
 
+/// One loss, said kindly. A doctor reads it before launch (BEFORE-LAUNCH).
+const String kIvfOneLossLine =
+    "You've had one pregnancy loss. One loss on its own isn't a sign that "
+    "anything is wrong, and it's always fine to talk to a doctor about it.";
+
 const String kIvfChecklistDisclaimer =
     'These are my notes for my appointment. They are not a diagnosis.';
 
@@ -360,6 +439,9 @@ IvfReadinessResult ivfBuildReadiness(
       IvfCycles.longGaps => " You've had long gaps without a period.",
     };
   }
+  // One loss is said kindly and changes nothing (T1/TT2, 2026-10-27). The
+  // wording waits on a doctor's read: docs/BEFORE-LAUNCH.md.
+  if (a.totalLosses == 1) where += ' $kIvfOneLossLine';
 
   // ---- Block 2: the routing, first match wins -----------------------------
   //
@@ -477,13 +559,11 @@ IvfReadinessResult ivfBuildReadiness(
             ? 'Not answered'
             : a.conditionsUnsure
             ? 'Not sure'
-            : a.conditions.isEmpty
+            : _known(a).isEmpty
                 ? 'Nothing so far'
-                : kIvfKnownConditions
-                    .where((c) => a.conditions.contains(c.id))
-                    .map((c) => c.label)
-                    .join(', ')
+                : _known(a).join(', ')
       ),
+      (label: 'Pregnancy losses', value: ivfLossesLine(a)),
       (
         label: 'His semen test',
         value: switch (a.semen) {
@@ -500,6 +580,34 @@ IvfReadinessResult ivfBuildReadiness(
       ),
     ],
   );
+}
+
+/// The conditions she named, as labels. The retired 'miscarriage' id is not
+/// one of them, so a form saved before 2026-10-27 never prints an empty line.
+List<String> _known(IvfReadinessAnswers a) => [
+      for (final c in kIvfKnownConditions)
+        if (a.conditions.contains(c.id)) c.label,
+    ];
+
+/// Her notes' "Pregnancy losses" line: what is on record, and what she said
+/// about the time before ParentVeda.
+String ivfLossesLine(IvfReadinessAnswers a) {
+  final r = a.recordedLosses;
+  final b = a.lossesBefore;
+  final rec = r == 1 ? '1 on record' : '$r on record';
+  if (b == null) return r == 0 ? 'Not answered' : '$rec, any earlier ones not answered';
+  if (r == 0) {
+    return switch (b) {
+      IvfLossesBefore.none => 'None',
+      IvfLossesBefore.one => '1',
+      IvfLossesBefore.twoOrMore => 'Two or more',
+    };
+  }
+  return switch (b) {
+    IvfLossesBefore.none => '$r ($rec)',
+    IvfLossesBefore.one => '${r + 1} ($rec, 1 before)',
+    IvfLossesBefore.twoOrMore => '$rec, and two or more before',
+  };
 }
 
 /// "a, b and c" — so a list of reasons reads as a sentence.

@@ -397,7 +397,11 @@ final List<FertilityHelpRule> kFertilityHelpRules = [
   ),
   FertilityHelpRule(
     id: 'twelve_months',
-    trigger: 'Twelve months of trying, under 36',
+    // ⚠️ UNDER 35 (TC3, 2026-10-27): the rule fires only below
+    // `refersAtPresentation`, which is 35, since the 2026-09-27 one-age-rule
+    // change; the trigger still said 36. Kept for revert:
+    //   trigger: 'Twelve months of trying, under 36',
+    trigger: 'Twelve months of trying, under 35',
     requiredContext: ['daysTrying', 'ageBand'],
     resultState: FertilityHelpState.maySeeSpecialist,
     article: 'How long should you try first? (twelve months)',

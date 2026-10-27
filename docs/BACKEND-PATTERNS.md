@@ -4321,3 +4321,43 @@ The trade-off: a column that is "absent" and a column that is "null" now mean di
 the app cannot clear a photo by sending null. Clearing one is a later edit that sends a value (an empty photo is
 not offered today). For an additive, nullable column this is the right default: the migration becomes safe to
 run at any time, and no ordering between the app release and the SQL has to be remembered.
+
+## 16xx. A fact and a basis: the shown number is derived, the override is a basis (0117, 2026-10-27)
+
+T1 (`docs/preg-ttc-tool-plans/00-MASTER.md`, TT1). "How long have you been trying" counted the months she was
+pregnant as months of trying, and seven screens each worked the number out their own way. The fix is a pattern
+worth naming, because the tempting fix is wrong.
+
+### 1. Do not rewrite the fact
+The tempting fix is to move `journey_start` forward by the length of her pregnancy, or to overwrite it with the
+day she started again. Both lose information: the day she changes her mind, January is gone, and nothing can
+say *why* the date moved. So `journey_start` stays exactly as she gave it.
+
+### 2. Store the override as a basis
+What she picks under "Change" is stored as a **basis**: `trying_count_from` (`again` | `own`, null = the
+default) plus `trying_count_date`. The number is derived on read from the fact, the basis and her pregnancy
+records (`lib/ttc/ttc_trying_time.dart`, a pure function). A basis can be undone, explained ("Counted from
+January 2025, leaving out April to June 2025, when you were pregnant") and changed again, because nothing was
+thrown away.
+
+### 3. One derivation, every reader
+`TtcStore.tryingTime` is the only place the count is made; `daysTrying` reads it. The message facts get its
+`effectiveStart` (the start that gives the same days with nothing left out), so a reader that counts calendar
+months still agrees. A source test (`test/ttc_trying_time_test.dart`) fails if a reader goes back to its own
+arithmetic.
+
+### 4. Publish the derived value, never the inputs
+His phone needs the same number but must not learn her pregnancy dates. So her phone publishes the derived
+`trying_effective_start` on her row, the same move as `current_chapter`: the partner reads the answer, never the
+data it came from.
+
+### 5. Optional keys, and clearing one (extends 16ww)
+The three 0117 keys are sent only when they carry something, so the row keeps syncing before 0117 runs. But 16ww
+noted the cost: a left-out key keeps the cloud's old value. A cleared pick would come back on the next pull. The
+store remembers whether her cloud row holds a value (`_cloudHasCount`, `_cloudHasEffective`, set on pull and
+after a push) and, when it does, sends an explicit null. So "absent" means "nothing to say" and "null" means
+"clear it", and each is used on purpose.
+
+The trade-off: the derived number costs a little work on every read (a loop over her pregnancy records), against
+a stored number that would have to be recomputed and re-synced whenever a record, a basis or the date changed.
+Deriving on read cannot go stale; a cached count can.

@@ -445,7 +445,15 @@ class TtcMessageFacts {
       historyLooksOff: engine.hasUnreliableHistory(state),
       windowOpens: current ? w.opensOn : null,
       windowCloses: current ? w.closesOn : null,
-      journeyStart: store.journeyStart,
+      // ⚠️ THE WORKED-OUT START (T1, 2026-10-27): her pregnancies left out and
+      // her "Change" pick honoured, so the "trying a while" message and the
+      // home check card count the same months as the doctor check. A month
+      // still ahead stays the planned month. Kept for revert:
+      //   journeyStart: store.journeyStart,
+      journeyStart: switch (store.tryingTime) {
+        final t? when !t.plannedAhead => t.effectiveStart,
+        _ => store.journeyStart,
+      },
       ageBand: ctx.ageBand,
       cyclesVaryOrPcos: ctx.cyclesIrregular || ctx.pcosPatternFound,
       alreadyInCare: pathway == 'current' || pathway == 'done',

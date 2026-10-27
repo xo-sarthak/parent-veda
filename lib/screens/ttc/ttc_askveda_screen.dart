@@ -161,7 +161,10 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       // nothing. Needs the service half to do anything: see
       // docs/ASKVEDA-CHECKLIST-HANDOVER.md.
       ttcChecklist: widget.partnerMode ? null : ttcPrecheckAskVedaContext(),
-      monthsTrying: days == null ? null : (days / 30).floor(),
+      // The same months every other screen shows (T1, 2026-10-27): the one
+      // count, rounded like its "about N months". Kept for revert:
+      //   monthsTrying: days == null ? null : (days / 30).floor(),
+      monthsTrying: days == null ? null : s.tryingTime?.months,
       // PRIVACY: her cycle day never leaves the partner's device. See the header.
       cycleDay: widget.partnerMode ? null : s.today.cycleDay,
       // Show her the cards in the language she's reading the app in.
