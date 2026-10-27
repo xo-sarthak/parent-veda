@@ -26,6 +26,7 @@ Done as one family on 2026-10-25, because they share one data file (`pp_care_log
 |---|---|---|---|
 | CL1 | Sleep: live "Asleep now" button? | Yes | **Yes, add Asleep now** (2026-10-25) |
 | — | Twins fix, timer child, edits, 24 h counts, empty-share toast | Defects, or the F1 call already made: chosen and recorded, not asked | — |
+| CL2 | Breastfeed timer and Tummy time disappeared from Tools after 12 months (`pp_tools_tab.dart`, `if (under1)`). Keep hiding? | Show the timer to 24 months, hide Tummy time after 12 | **"dont hide tools tbh.. no need for that, let them stay."** Both always listed; guards commented out, held by `test/pp_tools_tab_test.dart` › "no tool is hidden by the child's age" (2026-10-27) |
 
 ## Built (2026-10-25)
 - **`ChildLogLedger.belongsTo(key, childId)`** (`lib/services/remote/child_scoped_store.dart`): one ownership check on the ledger, used by `all` in Feeding, Nappies, Pumping, Tummy time and Sleep. A row the book never saw counts as the active child's (the uploader's fallback).

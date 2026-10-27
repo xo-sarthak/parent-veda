@@ -113,7 +113,10 @@ String? _growth() {
 
 /// The groups, in the order a parent of a young baby reaches for them.
 List<PpToolGroup> ppToolGroups() {
-  final under1 = ChildProfileStore.instance.ageInMonths < 12;
+  // 2026-10-27, the user: "dont hide tools tbh.. no need for that, let them
+  // stay." A Tools row is never hidden by age; relevance only changes order.
+  // Kept for revert:
+  //   final under1 = ChildProfileStore.instance.ageInMonths < 12;
   return [
     PpToolGroup('Log the day', 206, [
       PpTool('Feeding', 'Breast, bottle or solids, in one tap.', 'pp_feeding', tab: TtcTabMark.hotBottle, IntentMark.forkMark,
@@ -124,12 +127,12 @@ List<PpToolGroup> ppToolGroups() {
           words: ['white noise', 'lullaby', 'lori']),
       PpTool('Nappies', 'Wet and dirty, the clearest sign milk is going in.', 'pp_nappies', tab: TtcTabMark.cycleDrops, IntentMark.checkMark,
           live: _nappies, words: ['diaper', 'poo', 'wee']),
-      if (under1)
+      // if (under1) (kept for revert, 2026-10-27: never hidden by age)
         PpTool('Breastfeed timer', 'Time each side, and see which side is next.', 'pp_feed_timer', tool: TtcToolMark.stopwatch,
             IntentMark.timelineRail, words: ['side', 'latch']),
       PpTool('Pumping', 'How much, from which side, and when.', 'pp_pump', tab: TtcTabMark.testStrip, IntentMark.listMark,
           live: _lastPump, words: ['express', 'pump']),
-      if (under1)
+      // if (under1) (kept for revert, 2026-10-27: never hidden by age)
         PpTool('Tummy time', 'A few minutes, a few times a day.', 'pp_tummy_time', tab: TtcTabMark.bigSmallHearts, IntentMark.bodyMark),
       PpTool('The last 7 days', 'Feeds, sleep and nappies, to share with your doctor.', 'pp_care_history', tab: TtcTabMark.chartLine,
           IntentMark.chartLog, words: ['history', 'report', 'week']),

@@ -134,3 +134,5 @@ A finding is settled at that tool's turn, as one plan decision. **C1** (the 8 To
 - **One drawn mark per Tools row** (the user: "make sure the tools section the UI is consistent with marks/glyphs"). Every `PpTool` names its own `tab:`/`tool:` mark, none shared and none falling back to an icon; `test/pp_tools_tab_test.dart` holds it. Later tools keep to it: a new row picks a mark no other row wears.
 - New consent kind `development` (milestones and check-in answers, for the doctor visit).
 
+### No Tools row is hidden by age (the user, 2026-10-27)
+"dont hide tools tbh.. no need for that, let them stay." Breastfeed timer and Tummy time no longer leave the Tools tab at 12 months (02-07-care-logs.md CL2). Rule for every stage: a Tools row is never hidden by age, week or phase. Relevance changes the **order** only, and the order belongs to Terminal A (the relevance pass).

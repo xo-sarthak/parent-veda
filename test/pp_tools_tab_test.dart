@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/doors/pp_door_data.dart';
 import 'package:parentveda/screens/doors/pv_list_row.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_surface_router.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_tools_tab.dart';
 import 'package:parentveda/screens/ttc/ttc_tab_root_header.dart';
@@ -98,5 +99,17 @@ void main() {
     await t.enterText(find.byType(TextField).first, 'diaper');
     await t.pumpAndSettle();
     expect(find.text('Nappies'), findsOneWidget);
+  });
+
+  // 2026-10-27, the user: "dont hide tools tbh.. let them stay." No Tools row
+  // disappears with age; Breastfeed timer and Tummy time used to vanish at 12
+  // months.
+  test("no tool is hidden by the child's age", () {
+    for (final months in [2, 24, 60]) {
+      ChildProfileStore.instance.debugSetDob(
+          DateTime.now().subtract(Duration(days: (months * 30.44).round() + 3)));
+      final ids = [for (final g in ppToolGroups()) for (final t in g.tools) t.surfaceId];
+      expect(ids, containsAll(['pp_feed_timer', 'pp_tummy_time']), reason: '$months months');
+    }
   });
 }
