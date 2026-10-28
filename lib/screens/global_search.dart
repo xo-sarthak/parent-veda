@@ -10,13 +10,15 @@ import 'package:flutter/material.dart';
 import '../ask_veda/ask_veda_mark.dart';
 
 import '../data/can_i_data.dart';
-import '../data/product_data.dart';
+// Kept for revert (seed search retired 2026-10-28): import '../data/product_data.dart';
 import '../data/read_next_data.dart';
 import '../data/symptom_data.dart';
 import '../localization/app_language.dart';
 import '../models/can_i_entry.dart';
 import '../models/symptom.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/pv_catalog_store.dart';
+import 'products/pv_product_screen.dart';
 import '../theme/app_theme.dart';
 import 'belly_skin/bump_ritual_screen.dart';
 import 'calendar_screen.dart';
@@ -26,6 +28,7 @@ import 'community/community_chrome.dart' show openCommunity;
 import 'garbh_screen.dart';
 import 'journal_screen.dart';
 import 'journey_map_screen.dart';
+import 'nutrition/door/shopping_list_screen.dart';
 import 'products_screen.dart';
 import 'read_next_screen.dart';
 // Old "Understanding Your Report" screen - merged into TestsScansReportsScreen.
@@ -103,8 +106,13 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             Icons.map_rounded, (c) => JourneyMapScreen(controller: c)),
         _Dest(s.navProducts, const ['product', 'shop', 'buy', 'store'],
             Icons.shopping_bag_rounded, (c) => ProductsScreen(controller: c)),
-        _Dest(s.pclTitle, const ['checklist', 'product checklist', 'shopping'],
+        // P4 S4 (2026-10-28): "shopping" found the baby Product checklist; it
+        // means the food list now. Kept for revert:
+        //   _Dest(s.pclTitle, const ['checklist', 'product checklist', 'shopping'], ...
+        _Dest(s.pclTitle, const ['checklist', 'product checklist', 'baby things', 'what to buy'],
             Icons.checklist_rounded, (c) => ProductChecklistScreen(controller: c)),
+        _Dest('Shopping list', const ['shopping', 'shopping list', 'grocery', 'groceries', 'ingredients'],
+            Icons.shopping_basket_rounded, (_) => const ShoppingListScreen()),
         _Dest(s.bumpTitle, const ['bump', 'belly', 'photo', 'journey'],
             Icons.pregnant_woman_rounded, (c) => BumpRitualScreen(controller: c)),
         _Dest(s.jrTitle, const ['journal', 'memory', 'diary', 'note'],
@@ -122,7 +130,8 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             Icons.auto_awesome_rounded, (c) => AskVedaScreen(controller: c)),
         _Dest(s.babyMovementTracker, const ['kick', 'movement', 'counter'],
             Icons.favorite_rounded, (c) => BabyMovementScreen(controller: c)),
-        _Dest(s.hbName, const ['hospital', 'bag', 'pack', 'labour'],
+        // One name per tool (P4): "Hospital bag". Kept for revert: s.hbName.
+        _Dest('Hospital bag', const ['hospital', 'bag', 'pack', 'labour'],
             Icons.luggage_rounded, (c) => ReadyForBirthScreen(controller: c)),
         // ONE ENTRY (P1, 2026-10-28): the library was listed twice under one
         // title, so search showed it twice. Both keyword lists now sit on the
@@ -163,7 +172,15 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             d.keys.any((k) => k.contains(lc)))
         .take(8)
         .toList();
-    final products = productSearch(q).take(6).toList();
+    // The live store, not the seed (2026-10-28, the user: "no fake
+    // situations"). Real products first; a Coming soon card only when
+    // nothing real matches. Kept for revert:
+    //   final products = productSearch(q).take(6).toList();
+    final hits = PvCatalogStore.instance.search(q).all;
+    final products = [
+      ...hits.where((p) => !p.comingSoon),
+      ...hits.where((p) => p.comingSoon),
+    ].take(6).toList();
     final reads = readSearch(q).take(6).toList();
     final foods = _canISearch(lc, lang).take(5).toList();
     final symptoms = _symptomSearch(lc, lang).take(5).toList();
@@ -197,14 +214,19 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         ],
         if (products.isNotEmpty) ...[
           _header(s.searchProducts),
+          // Kept for revert: the seed row (emoji, invented price, the old
+          // ProductDetailScreen facade).
           for (final p in products)
             ListTile(
-              leading: _leadEmoji(p.emoji),
-              title: Text(p.name.now),
-              subtitle: Text('${p.price} · ${p.summary}',
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
-              onTap: () => _go(
-                  context, ProductDetailScreen(product: p, controller: controller)),
+              leading: _leadIcon(Icons.shopping_bag_outlined),
+              title: Text(p.name),
+              subtitle: Text(
+                  p.comingSoon
+                      ? 'Coming soon'
+                      : [p.brand, p.summary].where((t) => t.isNotEmpty).join(' · '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+              onTap: () => _go(context, PvProductScreen(productId: p.id)),
             ),
         ],
         if (reads.isNotEmpty) ...[

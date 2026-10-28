@@ -44,10 +44,12 @@ import 'package:share_plus/share_plus.dart';
 import '../../data/birth_plan_data.dart';
 import '../../services/birth_plan_store.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_chrome.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'preg_tool_chrome.dart' show PregToolScaffold, pregToolPad;
+import 'preg_after_loss_note.dart' show PregAfterLossNote, kAfterLossBirthPlan;
 import '../../services/father_preview.dart';
 import '../../services/partner_side.dart';
 import '../../services/pp_use_consent.dart' show PpUseKind;
@@ -114,10 +116,15 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
         animation: Listenable.merge([
           BirthPlanStore.instance,
           V2PaletteStore.instance,
+          PregnancyEndedStore.instance,
         ]),
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
           final store = BirthPlanStore.instance;
+          // P4 D4 (2026-10-28): after a loss the plan stays as she wrote it,
+          // with a note at the top; nothing on the page speaks of the day
+          // still coming, and nothing asks her to add to it.
+          final ended = PregnancyEndedStore.instance.ended;
 
           // P2 W2 (2026-10-28): the shared tool look, as every Tools row.
           // Kept for revert: `PvDoorToolScaffold(... eyebrow: 'Labour prep'`,
@@ -127,13 +134,18 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
             eyebrow: 'Get ready',
             title: 'Your birth plan',
             mark: IntentMark.reportPage,
-            intro: 'One page your hospital can read at 3am. '
-                '$kBirthPlanVoice',
+            // Kept for revert (P4 D4): the one intro, whatever happened.
+            intro: ended
+                ? 'Your plan, as you left it.'
+                : 'One page your hospital can read at 3am. '
+                    '$kBirthPlanVoice',
             // The share bar sits pinned under the scroll: the shared look's
             // `action` is the one round control opposite Back, not a bar.
             // Kept for revert: `action: store.isEmpty ? null : _ShareBar(...)`.
             bottom: store.isEmpty ? null : _ShareBar(p: p, onTap: _share),
             children: [
+              // Draws nothing unless the pregnancy has ended.
+              pregToolPad(const PregAfterLossNote(kAfterLossBirthPlan)),
               for (final s in kBirthPlanSections) ...[
                 pregToolPad(_SectionCard(
                   section: s,
@@ -153,15 +165,21 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
               // reads as broken. One line says where it went.
               if (store.isEmpty)
                 pregToolPad(Text(
-                    "Answer whatever you've thought about. Even two answers is "
-                    "a plan. A share button appears once there's something "
-                    'to send.',
+                    ended
+                        // P4 D4: no invitation to plan a birth after a loss.
+                        ? "There's nothing on this plan. It stays here, and "
+                            'nothing will ask you to fill it in.'
+                        : "Answer whatever you've thought about. Even two answers is "
+                            "a plan. A share button appears once there's something "
+                            'to send.',
                     // Kept for revert: fontSize 12.5.
                     style: pvManrope(
                         fontSize: kBpLead, height: 1.55, color: p.ink3))),
               // P2 O1 (2026-10-28): asked once, after there is a plan. The
               // card hides itself once she answers.
-              if (!store.isEmpty) ...[
+              // P4 D4: not after a loss; a summary for the doctor is about a
+              // birth still to come. Kept for revert: if (!store.isEmpty) ...[
+              if (!store.isEmpty && !ended) ...[
                 pregToolPad(const PpUseAskCard(
                     kind: PpUseKind.pregBirthPlan,
                     question:
@@ -181,9 +199,13 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
               const SizedBox(height: 22),
               pregToolPad(PvDoorDisclaimer(
                   p: p,
-                  text: "This records what you'd prefer. It isn't medical "
-                      'advice, and your hospital may do things differently '
-                      'on the day. Your doctor knows your pregnancy.')),
+                  // P4 D4: after a loss, no "on the day", no "your pregnancy".
+                  text: ended
+                      ? "This keeps what you wrote. It isn't medical advice. "
+                          'Your doctor is there for any question you have.'
+                      : "This records what you'd prefer. It isn't medical "
+                          'advice, and your hospital may do things differently '
+                          'on the day. Your doctor knows your pregnancy.')),
               if (!store.isEmpty) const SizedBox(height: 64),
             ],
           );

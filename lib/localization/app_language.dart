@@ -1594,8 +1594,10 @@ class S {
       'अपना पूरा सफ़र देखिए, हफ़्ते-दर-हफ़्ते।');
   String get toolWeightTitle => _p('Weight Tracker', 'वज़न ट्रैकर');
   String get toolKickTitle => _p('Kick Counter', 'हलचल काउंटर');
+  // Kept for revert (P4 C8, one name per tool):
+  // _p('Contraction Timer', 'संकुचन टाइमर');
   String get toolContractionTitle =>
-      _p('Contraction Timer', 'संकुचन टाइमर');
+      _p('Contraction timer', 'संकुचन टाइमर');
   String get toolHospitalBagTitle =>
       _p('Hospital Bag Planner', 'अस्पताल बैग प्लानर');
   String get toolKegelTitle => _p('Kegel Care', 'Kegel Care');
@@ -2362,8 +2364,9 @@ class S {
   // ===========================================================================
   //  TOOLS - Contraction Tracker
   // ===========================================================================
-  String get contractionToolTitle =>
-      _p('Contraction Tracker', 'संकुचन ट्रैकर');
+  // Kept for revert (P4 C8): _p('Contraction Tracker', 'संकुचन ट्रैकर').
+  // One name per tool: the screen's title is the Tools row's.
+  String get contractionToolTitle => toolContractionTitle;
   String get contractionIntro => _p(
       'Record contraction timing and patterns that may be useful when speaking with your healthcare provider. Always follow your provider\'s advice.',
       'संकुचन का समय और पैटर्न दर्ज कीजिए जो डॉक्टर से बात करते वक़्त काम आ सकते हैं। हमेशा अपने डॉक्टर की सलाह मानें।');
@@ -2844,7 +2847,9 @@ class S {
   String get doctorSummaryTitle => _p('Doctor summary', 'डॉक्टर के लिए ब्योरा');
   String get lastHourLabel => _p('Last hour', 'पिछला घंटा');
   String get copySummaryCta => _p('Copy summary', 'ब्योरा कॉपी करें');
-  String get summaryCopied => _p('Summary copied 💜', 'ब्योरा कॉपी हो गया 💜');
+  // Kept for revert (P4 C8, no decorative emoji):
+  // _p('Summary copied 💜', 'ब्योरा कॉपी हो गया 💜');
+  String get summaryCopied => _p('Summary copied', 'ब्योरा कॉपी हो गया');
   String get consultProvider => _p(
       'Please consult your healthcare provider for interpretation.',
       'व्याख्या के लिए अपने डॉक्टर से संपर्क कीजिए।');
@@ -2889,25 +2894,47 @@ class S {
       'आपके हाल के संकुचन नियमित और तेज़ पैटर्न दिखाते हैं जो अक्सर सक्रिय प्रसव में होता है। आप कैसा महसूस कर रही हैं?');
   String get laborYes => _p('Yes, I think so', 'हाँ, लगता है');
   String get laborNo => _p('Not yet', 'अभी नहीं');
+  // Kept for revert (P4 C8, no decorative emoji):
+  // _p('Saved to this session 💜', 'इस सेशन में सेव हो गया 💜');
   String get laborSavedNote =>
-      _p('Saved to this session 💜', 'इस सेशन में सेव हो गया 💜');
+      _p('Saved to this session', 'इस सेशन में सेव हो गया');
+  // P4 C8: in father preview the prompt asks about her, not "you".
+  String get laborPromptBodyPartner =>
+      'These contractions show a regular, strong pattern. How is she feeling?';
   String feltInLabour(bool yes) => yes
       ? _p('Felt like labour', 'प्रसव जैसा लगा')
       : _p('Not labour yet', 'अभी प्रसव नहीं');
   // Two-layer assessment (pattern classification + medical override)
+  // ⚠️ THE LEVELS SAY WHAT TO DO, NOT WHAT IT IS (P4 C8 + clinical calls,
+  // 2026-10-28). "Active labour likely" was a diagnosis from a stopwatch. The
+  // titles below are actions, and they are English only: the Hindi beside the
+  // old titles said the same diagnosis, so it is kept as a revert comment
+  // rather than left on screen under a new English meaning (English in the
+  // Hindi build is the expected state, CLAUDE.md "New work is English").
   String assessTitle(String level) {
     switch (level) {
       case 'emergency':
         return _p('Please seek medical advice', 'कृपया मेडिकल सलाह लीजिए');
+      case 'callNow':
+        return 'Call your maternity unit now';
+      case 'callNowLoss':
+        return 'Call your doctor or hospital now';
       case 'preterm':
-        return _p('Before 37 weeks - please check in',
-            '37 हफ़्ते से पहले — कृपया संपर्क कीजिए');
+        // Kept for revert (P4 C1): _p('Before 37 weeks - please check in',
+        //     '37 हफ़्ते से पहले — कृपया संपर्क कीजिए');
+        return 'Before 37 weeks: call your maternity unit now';
       case 'active':
-        return _p('Active labour likely', 'सक्रिय प्रसव की संभावना');
+      case 'activeLater':
+        // Kept for revert (P4 C8): _p('Active labour likely', 'सक्रिय प्रसव की संभावना');
+        return 'This is the pattern hospitals ask you to call about';
       case 'likely':
-        return _p('Labour pattern likely', 'प्रसव पैटर्न की संभावना');
+        // Kept for revert (P4 C8): _p('Labour pattern likely', 'प्रसव पैटर्न की संभावना');
+        return 'Getting closer: keep timing, and get ready to call';
       case 'early':
-        return _p('Possible early labour', 'संभावित शुरुआती प्रसव');
+        // Kept for revert (P4 C8): _p('Possible early labour', 'संभावित शुरुआती प्रसव');
+        return 'A pattern may be starting';
+      case 'timingOnly':
+        return 'Your timings are kept here';
       case 'noPattern':
         return _p('No clear pattern yet', 'अभी कोई साफ़ पैटर्न नहीं');
       default:
@@ -2921,22 +2948,34 @@ class S {
         return _p(
             "Some symptoms you've reported may require prompt medical assessment. Contact your healthcare provider, maternity unit, or emergency services immediately.",
             'आपके बताए कुछ लक्षणों के लिए तुरंत मेडिकल जाँच ज़रूरी हो सकती है। अपने डॉक्टर, मैटरनिटी यूनिट या इमरजेंसी सेवा से तुरंत संपर्क कीजिए।');
+      case 'callNow':
+        return "What you've told us is a reason to call straight away, whatever your contractions are doing. Tell them what you noticed. You don't need to wait for a pattern.";
+      case 'callNowLoss':
+        return "What you've told us is a reason to call straight away. Tell them what you noticed.";
       case 'preterm':
-        return _p(
-            'Regular contractions before 37 weeks may require medical assessment. Contact your healthcare provider promptly.',
-            '37 हफ़्ते से पहले नियमित संकुचन के लिए मेडिकल जाँच ज़रूरी हो सकती है। अपने डॉक्टर से जल्दी संपर्क कीजिए।');
+        // Kept for revert (P4 C1): _p(
+        //     'Regular contractions before 37 weeks may require medical assessment. Contact your healthcare provider promptly.',
+        //     '37 हफ़्ते से पहले नियमित संकुचन के लिए मेडिकल जाँच ज़रूरी हो सकती है। अपने डॉक्टर से जल्दी संपर्क कीजिए।');
+        return "Contractions before 37 weeks: call your maternity unit now. You don't need to wait for a pattern.";
       case 'active':
-        return _p(
-            'Your contractions are frequent, longer, and fairly regular - a pattern often seen in active labour. Even so, strong contractions can sometimes be a false alarm, so this is NOT a confirmation. Please contact your healthcare provider, or follow your birth plan.',
-            'आपके संकुचन बार-बार, लंबे और काफ़ी नियमित हैं — ऐसा पैटर्न अक्सर सक्रिय प्रसव में दिखता है। फिर भी, तेज़ संकुचन कभी-कभी झूठा संकेत भी हो सकते हैं, इसलिए यह पक्का नहीं है। कृपया अपने डॉक्टर से संपर्क कीजिए, या अपने बर्थ प्लान का पालन कीजिए।');
+        // Kept for revert (P4 C8): _p(
+        //     'Your contractions are frequent, longer, and fairly regular - a pattern often seen in active labour. Even so, strong contractions can sometimes be a false alarm, so this is NOT a confirmation. Please contact your healthcare provider, or follow your birth plan.',
+        //     'आपके संकुचन बार-बार, लंबे और काफ़ी नियमित हैं — ऐसा पैटर्न अक्सर सक्रिय प्रसव में दिखता है। फिर भी, तेज़ संकुचन कभी-कभी झूठा संकेत भी हो सकते हैं, इसलिए यह पक्का नहीं है। कृपया अपने डॉक्टर से संपर्क कीजिए, या अपने बर्थ प्लान का पालन कीजिए।');
+        return 'For the last hour your contractions have come about every 5 minutes and lasted about a minute. This is when most hospitals ask you to call. Call your maternity unit, or follow your birth plan. Timing alone cannot confirm labour.';
+      case 'activeLater':
+        return "Your contractions are coming about every 5 minutes and lasting about a minute. As this isn't your first baby, most hospitals ask you to call now, without waiting an hour. Call your maternity unit, or follow your birth plan.";
       case 'likely':
-        return _p(
-            'A steady, labour-like pattern seems to be forming. It might be early labour, or it might still settle - timing alone cannot tell for sure. Consider contacting your healthcare provider for guidance.',
-            'एक नियमित, प्रसव जैसा पैटर्न बनता दिख रहा है। यह शुरुआती प्रसव हो सकता है, या अभी शांत भी पड़ सकता है — सिर्फ़ समय से पक्का नहीं कहा जा सकता। मार्गदर्शन के लिए अपने डॉक्टर से संपर्क करने पर विचार कीजिए।');
+        // Kept for revert (P4 C8): _p(
+        //     'A steady, labour-like pattern seems to be forming. It might be early labour, or it might still settle - timing alone cannot tell for sure. Consider contacting your healthcare provider for guidance.',
+        //     'एक नियमित, प्रसव जैसा पैटर्न बनता दिख रहा है। यह शुरुआती प्रसव हो सकता है, या अभी शांत भी पड़ सकता है — सिर्फ़ समय से पक्का नहीं कहा जा सकता। मार्गदर्शन के लिए अपने डॉक्टर से संपर्क करने पर विचार कीजिए।');
+        return "A steady pattern is forming over the last hour. Keep timing, and have your bag and your hospital's number to hand. Call if you're unsure, or if anything feels different.";
       case 'early':
-        return _p(
-            'Contractions may be showing an early labor pattern. Continue monitoring frequency and duration.',
-            'संकुचन शुरुआती प्रसव का पैटर्न दिखा सकते हैं। बार-बार होने और अवधि पर नज़र रखिए।');
+        // Kept for revert (P4 C8): _p(
+        //     'Contractions may be showing an early labor pattern. Continue monitoring frequency and duration.',
+        //     'संकुचन शुरुआती प्रसव का पैटर्न दिखा सकते हैं। बार-बार होने और अवधि पर नज़र रखिए।');
+        return 'Your contractions may be settling into a pattern. Rest, drink water and keep timing.';
+      case 'timingOnly':
+        return "This timer records your contractions; it can't tell you what they mean. Follow what your doctor asked you to watch for. Pain, bleeding or a fever: call your doctor or hospital.";
       case 'noPattern':
         return _p(
             'Current recordings do not show a clear labor pattern. Continue tracking additional contractions.',
@@ -2972,6 +3011,42 @@ class S {
   String get timeColumn => _p('Time', 'समय');
   String get durationColumn => _p('Duration', 'अवधि');
   String get intervalColumn => _p('Interval', 'अंतराल');
+
+  // ---- Contraction timer, P4 birth prep (2026-10-28). English only. -------
+  String get ctPretermLine =>
+      "Contractions before 37 weeks: call your maternity unit now. You don't need to wait for a pattern.";
+  String get ctFollowHospital =>
+      'Your hospital may have told you something different. Follow them.';
+  String get ctCallEarlier =>
+      'Call earlier if you are having twins, have had a caesarean before, have group B strep, or have a fever.';
+  String get ctCallEarlierLink => 'When to go in';
+  String get ctFirstBabyRule =>
+      'For a first baby, most hospitals ask you to call when contractions come about every 5 minutes, last about a minute, and have done so for an hour.';
+  String get ctLaterBabyRule =>
+      "As this isn't your first baby, most hospitals ask you to call once contractions come about every 5 minutes and last about a minute, without waiting an hour.";
+  String get ctTakeBackCta => 'Take back the last one';
+  String get ctTookBack => 'Took back the last contraction';
+  String get ctUnderMinimum => "That was under 5 seconds, so we didn't keep it";
+  String get ctPickedUp => 'Picked up where you left off';
+  String get ctSavedToHistory => 'Saved to your history';
+  String get ctDeleteSessionCta => 'Delete this session';
+  String get ctSessionDeleted => 'Session deleted';
+  String get ctUndo => 'Undo';
+  String get ctSoundOn => 'Sound on';
+  String get ctSoundOff => 'Sound off';
+  String get qWatersColour => 'What colour are the waters?';
+  String get watersClear => 'Clear or pale';
+  String get watersDark => 'Green or brown';
+  String get ctSummaryWeek => 'Week of pregnancy';
+  String get ctSummarySymptoms => 'Symptoms reported';
+  String get ctSummaryNoSymptoms => 'None reported';
+  String get ctSymWaters => 'Waters may have broken';
+  String get ctSymWatersDark => 'Waters green or brown';
+  String get ctSymBleedLight => 'Light bleeding';
+  String get ctSymBleedHeavy => 'Heavy bleeding';
+  String get ctSymMovement => 'Baby moving less (or not sure)';
+  String get ctSymPain => 'Severe constant pain between contractions';
+
   String get noContractionSessions => _p(
       'No sessions yet. Your tracked contractions will appear here.',
       'अभी कोई सेशन नहीं। आपके दर्ज संकुचन यहाँ दिखेंगे।');

@@ -18,6 +18,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/kids_books.dart';
+import 'package:parentveda/data/products/pv_catalog_adapters.dart'
+    show kPvShowSeedProducts;
 import 'package:parentveda/data/products/pv_sheet_products.dart';
 import 'package:parentveda/data/products/sheet/catalogue.dart';
 import 'package:parentveda/data/products/sheet/toys.dart';
@@ -90,6 +92,14 @@ void main() {
     test('sheet picks lead a shared category; the older products follow', () {
       final list = store.inCategory('pregnancy_pillow')..sort(pvShortlistFirst);
       final firstOld = list.indexWhere((p) => !p.shortlist);
+      // The older products on this shelf were the invented seed, retired
+      // 2026-10-28 (the user: no fake products); with them gone the shelf is
+      // the sheet's alone. Kept for revert: the two lines below, without
+      // the seed check.
+      if (!kPvShowSeedProducts) {
+        expect(firstOld, -1, reason: 'only the sheet is on this shelf now');
+        return;
+      }
       expect(firstOld, greaterThan(0), reason: 'both kinds are on this shelf');
       expect(list.skip(firstOld).any((p) => p.shortlist), isFalse);
     });

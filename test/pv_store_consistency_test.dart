@@ -338,9 +338,31 @@ void main() {
 
   // ===========================================================================
   group('5. the product page', () {
-    PvProduct soldHere() => PvCatalogStore.instance.all.firstWhere(
-      (p) => p.soldHere && !p.reviewOnly && p.variants.isEmpty,
-    );
+    // Every "sold here" product was an invented seed, retired 2026-10-28
+    // (the user: no fake products). The sticky bar is still the store's
+    // code, so a test row stands in for the first real one, laid over the
+    // catalogue the way the sheet's rows are, and taken off after. Kept for
+    // revert: the bare firstWhere below.
+    PvProduct soldHere() {
+      final s = PvCatalogStore.instance;
+      final have = s.all
+          .where((p) => p.soldHere && !p.reviewOnly && p.variants.isEmpty)
+          .firstOrNull;
+      if (have != null) return have;
+      s.applyStoreRows([
+        {
+          'source_key': 'pvs_test_sold_here',
+          'stage': ['pregnancy'],
+          'category': 'pregnancy_pillow',
+          'name': 'Test pillow',
+          'brand': 'Test',
+          'price_inr': 1499,
+          'sold_here': true,
+        },
+      ]);
+      addTearDown(() => s.applyStoreRows(const []));
+      return s.byId('pvs_test_sold_here')!;
+    }
 
     // 2026-10-02, the user: Buy now back beside Add to cart. Still ONE ink
     // (Buy now); Add to cart is the outlined one.

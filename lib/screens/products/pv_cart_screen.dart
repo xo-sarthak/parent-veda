@@ -12,11 +12,13 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/products/pv_catalog_adapters.dart' show pvIsRetiredSeedId;
 import '../../models/pv_product.dart';
 import '../../services/cart_store.dart';
 import '../../services/pv_catalog_store.dart';
 import '../../services/pv_order_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_toast.dart';
 import '../v2/v2_palette.dart';
 import 'pv_checkout_screen.dart';
 import 'pv_store_chrome.dart';
@@ -31,6 +33,7 @@ class PvCartScreen extends StatelessWidget {
     // screen's commit button; the bag IS the confirmation, so clear it.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (context.mounted) ScaffoldMessenger.of(context).clearSnackBars();
+      if (context.mounted) _dropRetiredSeed(context);
     });
     return ListenableBuilder(
       listenable: CartStore.instance,
@@ -189,6 +192,32 @@ class PvCartScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  /// ⚠️ NO FAKE PRODUCTS IN THE CART (2026-10-28, the user: "no need to have
+  /// fake situations in the app... show whatever we have"). Twelve invented
+  /// pregnancy products were "sold here", so a cart from before could hold
+  /// one, priced from seed and headed for a preview "order placed". They are
+  /// out of the catalogue (pv_catalog_adapters.dart), so such a line is
+  /// taken out when she opens the cart, and a notice says which and why.
+  /// Only the fixed list of retired seed ids is touched: a real product the
+  /// cloud rows have not reached yet is never dropped.
+  static void _dropRetiredSeed(BuildContext context) {
+    final cart = CartStore.instance;
+    final gone = [
+      for (final l in cart.items(kProductsCartId))
+        if (pvIsRetiredSeedId(l.productId)) l,
+    ];
+    if (gone.isEmpty) return;
+    for (final l in gone) {
+      cart.remove(kProductsCartId, l.lineId);
+    }
+    pvToast(
+      context,
+      gone.length == 1
+          ? '${gone.first.name} is no longer listed, so it was taken out of your cart.'
+          : '${gone.length} products are no longer listed, so they were taken out of your cart.',
     );
   }
 

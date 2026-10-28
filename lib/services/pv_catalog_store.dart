@@ -26,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/products/pv_affiliate.dart' show pvGuardRetailerPrice;
 import '../data/products/pv_catalog_adapters.dart';
+import '../data/products/pv_coming_soon.dart';
 import '../data/products/pv_product_rows.dart';
 import 'remote/supabase_repo.dart';
 import '../models/pv_product.dart';
@@ -108,8 +109,11 @@ class PvCatalogStore extends ChangeNotifier {
     final read = [
       for (final r in rows) ?pvProductFromStoreRow(r, categoryIds: cats),
     ];
+    // The step-aside rule runs again after the merge (2026-10-28): a sheet
+    // row that lands on a "Coming soon" shelf retires its place-holder.
+    // Kept for revert: for (final p in pvMergeStoreRows(buildPvCatalog(), read))
     _all = [
-      for (final p in pvMergeStoreRows(buildPvCatalog(), read))
+      for (final p in pvPlaceComingSoon(pvMergeStoreRows(buildPvCatalog(), read)))
         pvGuardRetailerPrice(p),
     ];
     notifyListeners();
@@ -137,10 +141,18 @@ class PvCatalogStore extends ChangeNotifier {
   List<PvProduct> forStage(LifeStage stage) =>
       [for (final p in all) if (p.stage == stage.shopStage) p];
 
-  List<PvProduct> inCategory(String categoryId, {String? subId}) => _hersFirst([
+  // "Coming soon" place-holders after every real product (2026-10-28).
+  // Kept for revert: => _hersFirst([...]) without pvComingSoonLast.
+  List<PvProduct> inCategory(String categoryId, {String? subId}) =>
+      pvComingSoonLast(_hersFirst([
         for (final p in all)
           if (p.categoryId == categoryId && (subId == null || p.subId == subId)) p
-      ]);
+      ]));
+
+  /// What a rail may carry: real products only. A "Coming soon" place-holder
+  /// is a gap on a shelf, never a recommendation (2026-10-28).
+  List<PvProduct> _railable(LifeStage stage) =>
+      [for (final p in forStage(stage)) if (!p.comingSoon) p];
 
   /// Does [p] fit where she is NOW: her real pregnancy week, or her child's
   /// real age? Null when there is no clock to read (no due date yet, no child
@@ -184,7 +196,8 @@ class PvCatalogStore extends ChangeNotifier {
 
   /// The ParentVeda-recommends rail: only the top two bands, strongest first.
   List<PvProduct> recommended(LifeStage stage, {int limit = 8}) {
-    final list = [for (final p in forStage(stage)) if (p.recommends) p]
+    // Kept for revert: for (final p in forStage(stage)).
+    final list = [for (final p in _railable(stage)) if (p.recommends) p]
       ..sort((a, b) => a.reco!.band.rank.compareTo(b.reco!.band.rank));
     // Hers first (2026-10-23); kept for revert: `list.take(limit)`.
     return _hersFirst(list).take(limit).toList();
@@ -192,7 +205,8 @@ class PvCatalogStore extends ChangeNotifier {
 
   /// Bestsellers / most reviewed — the "what other parents buy" rail.
   List<PvProduct> popular(LifeStage stage, {int limit = 8}) {
-    final list = forStage(stage).where((p) => !p.reviewOnly).toList()
+    // Kept for revert: forStage(stage).where(...).
+    final list = _railable(stage).where((p) => !p.reviewOnly).toList()
       ..sort((a, b) => b.reviewCount.compareTo(a.reviewCount));
     // Hers first (2026-10-23); kept for revert: `list.take(limit)`.
     return _hersFirst(list).take(limit).toList();
@@ -203,7 +217,8 @@ class PvCatalogStore extends ChangeNotifier {
   /// (nothing about her cycle reaches a shelf, by design).
   List<PvProduct> forYou(LifeStage stage, {int limit = 6}) {
     final s = stage.shopStage;
-    Iterable<PvProduct> list = forStage(s).where((p) => !p.reviewOnly);
+    // Kept for revert: forStage(s).where(...).
+    Iterable<PvProduct> list = _railable(s).where((p) => !p.reviewOnly);
     switch (s) {
       case LifeStage.pregnancy:
         // Only a REAL week filters (2026-10-23). Kept for revert:
@@ -274,7 +289,8 @@ class PvCatalogStore extends ChangeNotifier {
       for (final id in p.relatedIds)
         if (byId(id) != null && id != p.id) byId(id)!,
     ];
-    final others = forStage(p.stage).where((o) => o.categoryId != p.categoryId && !o.reviewOnly).toList()
+    // Kept for revert: forStage(p.stage).where(...).
+    final others = _railable(p.stage).where((o) => o.categoryId != p.categoryId && !o.reviewOnly).toList()
       ..sort((a, b) {
         final ra = a.reco?.band.rank ?? 9;
         final rb = b.reco?.band.rank ?? 9;
@@ -313,7 +329,9 @@ class PvCatalogStore extends ChangeNotifier {
       return terms.every(hay.contains);
     }
 
-    final hits = [for (final p in all) if (hit(p)) p];
+    // Place-holders after every real hit (2026-10-28). Kept for revert:
+    //   final hits = [for (final p in all) if (hit(p)) p];
+    final hits = pvComingSoonLast([for (final p in all) if (hit(p)) p]);
     final by = <LifeStage, List<PvProduct>>{};
     for (final p in hits) {
       (by[p.stage] ??= []).add(p);

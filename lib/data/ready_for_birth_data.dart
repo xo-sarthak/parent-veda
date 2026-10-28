@@ -31,6 +31,9 @@ enum ReadyCategory { mom, baby, documents, partnerExtras }
 /// so at runtime the difference is nothing.
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
+/// New copy since 2026-08-27 is English only; the Hindi build shows it as is.
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+
 class ReadyCatMeta {
   const ReadyCatMeta(this.label, this.blurb, this.icon, this.color);
   final LocalizedText label;
@@ -68,6 +71,36 @@ final Map<ReadyCategory, ReadyCatMeta> kReadyCatMeta = {
       AppTheme.neutral300),
 };
 
+/// A category's blurb for whoever is reading. In the father preview the Mom
+/// category is hers, not his ("For you" read as if he were giving birth), and
+/// the partner category is his (P4 H5, 2026-10-28).
+String readyCatBlurb(ReadyCategory c, {required bool father}) {
+  if (father && c == ReadyCategory.mom) {
+    return 'For her: labour, recovery and comfort';
+  }
+  if (father && c == ReadyCategory.partnerExtras) {
+    return 'For you, and the nice-to-haves';
+  }
+  return kReadyCatMeta[c]!.blurb.now;
+}
+
+/// A category from a door tile's name (`initialCategory`). 'partner' is the
+/// Labour door's "What to pack for whoever comes with you". Null when unknown.
+ReadyCategory? readyCategoryFromName(String? name) {
+  switch (name) {
+    case 'partner':
+    case 'partnerExtras':
+      return ReadyCategory.partnerExtras;
+    case 'mom':
+      return ReadyCategory.mom;
+    case 'baby':
+      return ReadyCategory.baby;
+    case 'documents':
+      return ReadyCategory.documents;
+  }
+  return null;
+}
+
 /// Collapse the six bag sections into the four readiness categories.
 ReadyCategory readyCategoryOfBag(BagCategory c) {
   switch (c) {
@@ -86,6 +119,13 @@ ReadyCategory readyCategoryOfBag(BagCategory c) {
 }
 
 ReadyCategory readyCategoryOf(BagItem i) => readyCategoryOfBag(i.category);
+
+/// The categories she sees. After a loss the Baby category steps aside (D4):
+/// her things, the papers and the partner's things stay.
+List<ReadyCategory> readyOrderFor({required bool afterLoss}) => [
+      for (final c in kReadyOrder)
+        if (!afterLoss || c != ReadyCategory.baby) c,
+    ];
 
 /// The display order of the four categories (Documents first — quickest win).
 const List<ReadyCategory> kReadyOrder = [
@@ -118,14 +158,21 @@ final Map<String, LocalizedText> kWhyPack = {
   'after_slippers': _t('Easy to slip on for slow walks down the ward.', 'वार्ड में धीमे टहलने के लिए झट से पहनने लायक़।'),
   'after_binder': _t('Gentle support after a C-section, only if your doctor advises it.', 'C-section के बाद हल्का सहारा — सिर्फ़ तब, जब डॉक्टर कहें।'),
   'baby_bodysuits': _t('A few soft changes. Newborns go through them fast.', 'कुछ नरम जोड़े — नवजात इन्हें बहुत जल्दी गंदा करते हैं।'),
-  'baby_swaddle': _t('Keeps your baby snug, warm and calm.', 'शिशु को लिपटा हुआ, गर्म और शांत रखता है।'),
+  // Kept for revert (P4 H5, safe sleep): the line had no swaddling rule.
+  // 'baby_swaddle': _t('Keeps your baby snug, warm and calm.', 'शिशु को लिपटा हुआ, गर्म और शांत रखता है।'),
+  'baby_swaddle': _same('Keeps your baby snug, warm and calm. Swaddle loosely '
+      'at the hips, and never once your baby can roll.'),
   'baby_mittens': _t('Warm hands, and no accidental face scratches.', 'हाथ गर्म रहें, और चेहरे पर अनजाने में खरोंच न लगे।'),
-  'baby_cap': _t('Newborns lose heat from the head, and a cap keeps them warm.', 'नवजात सिर से गर्मी खोते हैं — टोपी उन्हें गर्म रखती है।'),
+  // Kept for revert (P4 H5, safe sleep): a cap is not for sleep indoors.
+  // 'baby_cap': _t('Newborns lose heat from the head, and a cap keeps them warm.', 'नवजात सिर से गर्मी खोते हैं — टोपी उन्हें गर्म रखती है।'),
+  'baby_cap': _same('For the ride home, not for sleep indoors.'),
   'baby_diapers': _t('For the very first changes. Your hospital may give you some.', 'सबसे पहली नैपियों के लिए — कुछ आपका अस्पताल भी दे सकता है।'),
   'baby_wipes': _t('Gentle, water-based, for brand-new skin.', 'बिलकुल नई त्वचा के लिए, हल्के और पानी वाले।'),
   'baby_blanket': _t('A soft cover for the cot and the ride home.', 'पालने के लिए और घर लौटते वक़्त एक नरम ओढ़नी।'),
   'baby_towel': _t('A hooded towel keeps your baby warm after the first bath.', 'टोपी वाला तौलिया पहले स्नान के बाद शिशु को गर्म रखता है।'),
-  'baby_lotion': _t('A mild moisturiser for delicate newborn skin.', 'नाज़ुक नवजात त्वचा के लिए हल्का मॉइस्चराइज़र।'),
+  // Kept for revert (P4 H2): the NHS advises nothing on newborn skin for the
+  // first month, plain water only. The item left the bag too.
+  // 'baby_lotion': _t('A mild moisturiser for delicate newborn skin.', 'नाज़ुक नवजात त्वचा के लिए हल्का मॉइस्चराइज़र।'),
   'baby_homeoutfit': _t('The going-home outfit, and those first photos.', 'घर लौटने वाला जोड़ा — और वही पहली तस्वीरें।'),
   'partner_clothes': _t('A change of clothes, for a stay that can run long.', 'कपड़ों का एक जोड़ा, क्योंकि रुकना लंबा खिंच सकता है।'),
   'partner_snacks': _t('Keeps your partner fuelled and steady beside you.', 'आपके साथी को भूखा नहीं रहने देते, ताकि वे साथ टिके रहें।'),
@@ -138,6 +185,11 @@ final Map<String, LocalizedText> kWhyPack = {
   'docs_records': _t('Your scan reports and medical file, for the team.', 'आपकी स्कैन रिपोर्ट और मेडिकल फ़ाइल, टीम के लिए।'),
   'docs_birthplan': _t("If you've written one, keep a copy handy.", 'अगर आपने लिखा है, तो एक प्रति पास रखिए।'),
   'docs_contacts': _t("Your doctor's number, saved and on paper.", 'आपके डॉक्टर का नंबर — सेव भी, और काग़ज़ पर भी।'),
+  // The India documents (P4 H5, 2026-10-28).
+  'docs_mcp': _same('The record of your check-ups, tests and vaccines. The team will ask for it.'),
+  'docs_bloodgroup': _same('So the team knows your blood group straight away.'),
+  'docs_preauth': _same("If you're insured, ask your hospital about cashless approval before your due date. Most hospitals also ask for a deposit at admission."),
+  'docs_partner_id': _same("Hospitals often ask for the ID of whoever comes with you."),
   'comfort_pillow': _t('Your own pillow makes a strange bed feel like home.', 'अपना तकिया एक अजनबी बिस्तर को घर जैसा बना देता है।'),
   'comfort_eyemask': _t('Blocks bright ward lights so you can rest.', 'वार्ड की तेज़ रोशनी रोकता है, ताकि आप आराम कर सकें।'),
   'comfort_scent': _t('A familiar scent is grounding when things feel intense.', 'जानी-पहचानी ख़ुशबू तब सहारा देती है जब सब कुछ भारी लगे।'),
@@ -212,8 +264,23 @@ List<ReadyInsight> readyInsights({
   required Season season,
   required bool twins,
   required Set<String> hospitalProvides,
+  bool afterLoss = false,
 }) {
   final out = <ReadyInsight>[];
+
+  // After a loss (D4) the week, the baby, the twins, the newborn kit and the
+  // cot all step aside; only what is about her stay is left.
+  if (afterLoss) {
+    if (delivery == DeliveryType.csection) {
+      out.add(ReadyInsight(Icons.checkroom_rounded,
+          'Loose, high-waisted clothes are usually more comfortable after a caesarean.'));
+    }
+    if (season == Season.monsoon) {
+      out.add(ReadyInsight(Icons.umbrella_rounded,
+          'A waterproof cover for the bag and a spare dry set are worth packing.'));
+    }
+    return out;
+  }
 
   // Timing (week-aware, never pressuring).
   if (week >= 38) {
@@ -299,6 +366,61 @@ final List<GrabItem> kEmergencyGrab = [
   GrabItem(Icons.water_drop_outlined, _t('Water bottle', 'पानी की बोतल'),
       _t('For the ride there', 'वहाँ तक के सफ़र के लिए')),
 ];
+
+// ---- when to call now (P4 H1, 2026-10-28) -----------------------------------
+//  "You have time." was the page's promise, with no red flags, no number and
+//  no call button. Some labours do not wait, and a page a woman opens in that
+//  moment must say what means "now". NHS / RCOG signs; each on a BEFORE-LAUNCH
+//  clinician check line. English only (a safety line beats a missing
+//  translation).
+
+/// The first line on the emergency page.
+const String kLabourCallLine =
+    "Call your hospital now and tell them what's happening.";
+
+/// Said once, under the call line.
+const String kLabourCallFirst =
+    "If you have your hospital's number saved, call them first.";
+
+/// The heading over the red flags.
+// Both numbers (the user, 2026-10-28). Kept for revert:
+// const String kLabourRedFlagsHeading = 'Call your hospital or 108 now if you have';
+const String kLabourRedFlagsHeading =
+    'Call your hospital, 108 or 102 now if you have';
+
+/// The signs that mean now, whatever else the page says.
+const List<String> kLabourRedFlags = [
+  'Heavy bleeding',
+  'Waters that are green, brown or smelly',
+  'Your baby moving less than usual',
+  'Constant, severe pain',
+  'A fever, or feeling very unwell',
+  'Contractions very close together, or an urge to push',
+];
+
+/// After a loss the page is about her (D4): no baby, no labour.
+const String kAfterLossCallLine = 'Call your doctor or hospital.';
+// Kept for revert: 'Call your doctor or hospital, or 108, now if you have'
+const String kAfterLossRedFlagsHeading =
+    'Call your doctor or hospital, 108 or 102, now if you have';
+const List<String> kAfterLossRedFlags = [
+  'Heavy bleeding',
+  'A fever',
+  'Severe pain',
+  'Feeling very unwell',
+];
+
+/// The national emergency number the call button dials.
+const String kEmergencyNumber = '108';
+
+/// The free ambulance for pregnant women and mothers (Janani Shishu Suraksha
+/// Karyakram). Run by each state, so the number is a BEFORE-LAUNCH check.
+const String kMaternityAmbulanceNumber = '102';
+
+/// What each number is for, said under the two buttons.
+const String kAmbulanceNumbersLine =
+    '108 is the emergency ambulance. 102 is the free ambulance for pregnant '
+    'women and new mothers in most states.';
 
 // ---- guided packing order ---------------------------------------------------
 //  Documents first (fastest win), then Mom, Baby, Partner & extras.

@@ -45,13 +45,27 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late PregnancyController c;
   late S s;
+  // P4 (2026-10-28): the timer reads `contractionClock`, and a contraction
+  // under 5 seconds is not kept, so the taps below step a fake clock with
+  // the pump instead of timing ~0 s on the wall clock.
+  var now = DateTime(2026, 10, 2, 3, 0);
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    now = DateTime(2026, 10, 2, 3, 0);
+    contractionClock = () => now;
     c = PregnancyController(dueDate: DateTime.now().add(const Duration(days: 20)));
     await c.load();
     s = S(c.language);
   });
+
+  tearDown(() => contractionClock = DateTime.now);
+
+  /// Let [secs] pass, on the timer's clock and the test's.
+  Future<void> wait(WidgetTester t, int secs) async {
+    now = now.add(Duration(seconds: secs));
+    await t.pump(Duration(seconds: secs));
+  }
 
   Future<void> pump(WidgetTester t, {double scale = 1.0}) async {
     t.view.physicalSize = const Size(900, 2600);
@@ -141,7 +155,8 @@ void main() {
         (t) async {
       await pump(t);
       await t.tap(find.byKey(const ValueKey('ct_disc_home')));
-      await t.pump(const Duration(seconds: 3));
+      // Kept for revert (P4 C5, the 5-second minimum): 3 s on the wall clock.
+      await wait(t, 30);
       await t.tap(find.byKey(const ValueKey('ct_disc_active')));
       await t.pump();
       await t.pump(const Duration(milliseconds: 200));
@@ -163,7 +178,7 @@ void main() {
     testWidgets('a calm reading is one line that opens its wording', (t) async {
       await pump(t);
       await t.tap(find.byKey(const ValueKey('ct_disc_home')));
-      await t.pump(const Duration(seconds: 1));
+      await wait(t, 30);
       await t.tap(find.byKey(const ValueKey('ct_disc_active')));
       await t.pump(const Duration(milliseconds: 300));
       final chip = find.byKey(const ValueKey('ct_assess_chip'));
@@ -185,9 +200,9 @@ void main() {
         await t.tap(find.byKey(const ValueKey('ct_disc_home')).evaluate().isNotEmpty
             ? find.byKey(const ValueKey('ct_disc_home'))
             : find.byKey(const ValueKey('ct_disc_rest')));
-        await t.pump(const Duration(seconds: 1));
+        await wait(t, 30);
         await t.tap(find.byKey(const ValueKey('ct_disc_active')));
-        await t.pump(const Duration(milliseconds: 300));
+        await wait(t, 200);
       }
       await t.ensureVisible(find.text(s.viewSummaryCta));
       expect(find.text(s.viewSummaryCta), findsOneWidget);
@@ -200,7 +215,7 @@ void main() {
     testWidgets('holds at 1.5x text while resting', (t) async {
       await pump(t, scale: 1.5);
       await t.tap(find.byKey(const ValueKey('ct_disc_home')));
-      await t.pump(const Duration(seconds: 1));
+      await wait(t, 30);
       await t.tap(find.byKey(const ValueKey('ct_disc_active')));
       await t.pump(const Duration(milliseconds: 300));
       expect(t.takeException(), isNull);
@@ -215,8 +230,12 @@ void main() {
       await t.ensureVisible(find.text(s.safetyUpdate));
       await t.tap(find.text(s.safetyUpdate));
       await t.pumpAndSettle();
-      // "Has your water broken?" Yes: the first "Yes" in the sheet.
-      await t.tap(find.text(s.optYes).first);
+      // Kept for revert (P4 C2): "Has your water broken?" Yes, the first
+      // "Yes" in the sheet, read as the emergency. Waters are "call your
+      // maternity unit now" since P4 (test/preg_birth_prep_contractions_test);
+      // heavy bleeding is the emergency.
+      // await t.tap(find.text(s.optYes).first);
+      await t.tap(find.text(s.bleedHeavy));
       await t.pump();
       await t.tap(find.text(s.doneWord));
       await t.pumpAndSettle();
@@ -238,9 +257,19 @@ void main() {
           classifyContractions(
               [_c(0, 25, 0), _c(1200, 25, 1200), _c(2400, 25, 1200)]),
           LaborState.noPattern);
-      // Eight long, close and even over a while: active labour likely.
-      final steady = [
+      // Kept for revert (P4 C3): eight long, close and even contractions read
+      // as the call pattern through the `n >= 8` shortcut, in 34 minutes.
+      // final steady = [
+      //   for (var i = 0; i < 8; i++) _c(i * 280, 70, i == 0 ? 0 : 280),
+      // ];
+      final eight = [
         for (var i = 0; i < 8; i++) _c(i * 280, 70, i == 0 ? 0 : 280),
+      ];
+      expect(classifyContractions(eight), LaborState.laborLikely,
+          reason: 'a first baby holds the pattern for an hour (P4 C3)');
+      // Fourteen, over an hour: the pattern hospitals ask her to call about.
+      final steady = [
+        for (var i = 0; i < 14; i++) _c(i * 280, 70, i == 0 ? 0 : 280),
       ];
       expect(classifyContractions(steady), LaborState.activeLabor);
       // Before 37 weeks a labour-like pattern is "preterm", not "active".
@@ -248,10 +277,16 @@ void main() {
           AssessLevel.preterm);
       expect(assessContractions(steady, 39, const ContractionSymptoms()),
           AssessLevel.activeLabor);
-      // A reported symptom overrides everything.
+      // A reported symptom overrides everything. Kept for revert (P4 C2):
+      // waters 'yes' was the emergency; it is "call now", and heavy bleeding
+      // is the emergency.
       expect(
           assessContractions(
               steady, 39, const ContractionSymptoms(waterBroken: 'yes')),
+          AssessLevel.callNow);
+      expect(
+          assessContractions(
+              steady, 39, const ContractionSymptoms(bleeding: 'heavy')),
           AssessLevel.emergency);
     });
   });

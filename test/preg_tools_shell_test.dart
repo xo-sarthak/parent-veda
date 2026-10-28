@@ -61,7 +61,9 @@ void main() {
   test('P2: Baby names is a Tools row (C1)', () {
     final hub = _code('lib/screens/tools_hub_screen.dart');
     expect(hub, contains("_Tool('Baby names'"));
-    expect(hub, contains('BabyNamingHomeScreen()'));
+    // P4: the Pregnancy row passes the after-loss note flag. Kept for revert:
+    // expect(hub, contains('BabyNamingHomeScreen()'));
+    expect(hub, contains('BabyNamingHomeScreen(afterLossNote: true)'));
   });
 
   testWidgets('the shell shows the mark, the title and the sentence, with a back button',

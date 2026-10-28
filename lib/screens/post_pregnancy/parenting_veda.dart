@@ -23,6 +23,10 @@ import 'pp_experts_data.dart';
 import 'pp_products_data.dart';
 import 'pp_recipes_data.dart';
 
+/// Whether the invented seed products are documents here: the define behind
+/// `kPvShowSeedProducts` (pv_catalog_adapters.dart), off by default.
+const bool _kSeedProducts = bool.fromEnvironment('PV_SEED_PRODUCTS');
+
 // A parenting VedaDoc is just a core VedaDoc stamped with the parenting tag.
 VedaDoc _pdoc({
   required String id,
@@ -164,7 +168,15 @@ List<VedaDoc> parentingCorpus() {
   }
 
   // --- Products ---
-  for (final pr in productCatalog) {
+  // ⚠️ NO SEED PRODUCTS (2026-10-28, the user: "no need to have fake
+  // situations in the app... show whatever we have"). `productCatalog` is
+  // the 23 invented parenting products, now out of the store; as documents
+  // here one could become the whole answer to an FAQ ("Dozy White-Noise
+  // Soother..."). Left out unless a demo build turns the seed back on, read
+  // from the same define as `kPvShowSeedProducts` (pv_catalog_adapters.dart),
+  // restated so this file keeps importing parenting data only.
+  // Kept for revert: for (final pr in productCatalog) {
+  for (final pr in _kSeedProducts ? productCatalog : const <PpProduct>[]) {
     docs.add(_pdoc(
       id: 'ppprod_${pr.id}',
       kind: VedaKind.product,

@@ -51,13 +51,19 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../localization/app_language.dart';
+import '../../services/father_preview.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/tools_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart';
+import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
+import '../pregnancy/preg_after_loss_note.dart' show PregAfterLossNote, kAfterLossContractions;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../pregnancy/preg_tool_parts.dart' show PregFoldRow;
@@ -77,6 +83,15 @@ const Color _kUrgentOrange = Color(0xFFD9822B);
 const double _kContractionHue = 28;
 
 enum _Phase { home, active, rest }
+
+/// The timer after a loss (P4 wave 2, the user's 10-28 rule): it stays, and
+/// says once what it is for now. Passed to `PregAfterLossNote`.
+// One copy for every after-loss note (preg_after_loss_note.dart).
+const String kCtAfterLossNote = kAfterLossContractions;
+
+/// The Labour door's "when to go in" read, which the "call earlier if" line
+/// opens (P4 C3). `labour_prep_test` and the door wiring tests pin the id.
+const String kCtWhenToGoReadId = 'preg_labour_read_when_to_go';
 
 // ---- shared pieces (private: the stages stay code-isolated) -----------------
 
@@ -131,6 +146,10 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   DateTime? _lastEnd;
   int _pendingInterval = 0;
 
+  /// Set by "End session", so leaving the page does not write the running
+  /// session back to the phone (P4 C4).
+  bool _sessionClosed = false;
+
   /// The mother's answer to the gentle labour prompt this session ('yes'/'no').
   String? _laborResponse;
   bool _askedLabor = false;
@@ -157,6 +176,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     super.initState();
     ToolsStore.instance.init();
     _initTts();
+    _restoreLive();
   }
 
   @override
@@ -164,7 +184,113 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     _tick?.cancel();
     // Stop any in-flight speech as the screen goes away.
     unawaited(_tts.stop());
+    _keepAwake(false);
     super.dispose();
+  }
+
+  // ---- P4 (2026-10-28): what the screen derives, never asks ----------------
+
+  /// The week she is in, from the due date (the controller's own clock).
+  int get _week => widget.controller.currentWeek;
+
+  /// After a loss the timer still works; the baby wording goes.
+  bool get _afterLoss => PregnancyEndedStore.instance.ended;
+
+  /// A child already on her profile means this is not her first labour, so
+  /// the 5-1 pattern is read without the hour's wait (P4 C3). Derived, never
+  /// asked. A birth not on the profile reads as a first baby: the slower
+  /// rule, with "follow your hospital" under every reading.
+  bool get _laterBaby => ChildProfileStore.instance.hasRealChild;
+
+  AssessLevel get _level => assessContractions(
+    _current,
+    _week,
+    _symptoms,
+    laterBaby: _laterBaby,
+    afterLoss: _afterLoss,
+  );
+
+  String _keyOf(AssessLevel l) =>
+      _levelKey(l, laterBaby: _laterBaby, afterLoss: _afterLoss);
+
+  /// The screen stays awake while a session runs (P4 C8): she is timing with
+  /// the phone on a table, not holding it.
+  void _keepAwake(bool on) {
+    try {
+      (on ? WakelockPlus.enable() : WakelockPlus.disable()).catchError(
+        (Object _) {},
+      );
+    } catch (_) {
+      /* a phone without the plugin just sleeps as before */
+    }
+  }
+
+  // ---- P4 C4: the running session survives leaving --------------------------
+
+  /// On open: a session touched within [kCtResumeWindow] is picked up where
+  /// she left it, a contraction in progress included; an older one is let go
+  /// (its finished contractions are already in history).
+  Future<void> _restoreLive() async {
+    final store = ToolsStore.instance;
+    final live = await store.loadLiveContraction();
+    if (live == null || !mounted) return;
+    final at = live.lastActivity;
+    final now = contractionClock();
+    if (at == null || now.difference(at) > kCtResumeWindow) {
+      await store.clearLiveContraction();
+      return;
+    }
+    final active = DateTime.tryParse(live.activeStartIso ?? '');
+    setState(() {
+      _sessionId = live.sessionId;
+      _current
+        ..clear()
+        ..addAll(live.contractions);
+      _laborResponse = live.laborResponse;
+      _askedLabor = live.askedLabor;
+      _symptoms = ContractionSymptoms.fromMap(live.symptoms);
+      if (_current.isNotEmpty) {
+        _lastStart = DateTime.tryParse(_current.last.startIso);
+        _lastEnd = DateTime.tryParse(_current.last.endIso);
+      }
+      if (active != null) {
+        _activeStart = active;
+        _pendingInterval = _lastStart == null
+            ? 0
+            : active.difference(_lastStart!).inSeconds;
+        _phase = _Phase.active;
+      } else {
+        _phase = _current.isEmpty ? _Phase.home : _Phase.rest;
+      }
+    });
+    if (_phase != _Phase.home) {
+      _ensureTick();
+      _keepAwake(true);
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) pvToast(context, _s.ctPickedUp, kind: PvToastKind.done);
+    });
+  }
+
+  /// Write the running session to the phone; called on every change.
+  Future<void> _saveLive() async {
+    final id = _sessionId;
+    if (id == null || (_current.isEmpty && _activeStart == null)) {
+      await ToolsStore.instance.clearLiveContraction();
+      return;
+    }
+    await ToolsStore.instance.saveLiveContraction(
+      LiveContractionState(
+        sessionId: id,
+        contractions: List.of(_current),
+        activeStartIso: _phase == _Phase.active
+            ? _activeStart?.toIso8601String()
+            : null,
+        laborResponse: _laborResponse,
+        askedLabor: _askedLabor,
+        symptoms: _symptoms.toMap(),
+      ),
+    );
   }
 
   Future<void> _initTts() async {
@@ -189,9 +315,9 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   /// from the last sentence we spoke (so a steady reading is never repeated).
   Future<void> _speakInterpretation() async {
     if (_voiceMuted) return;
-    final level = assessContractions(
-        _current, widget.controller.currentWeek, _symptoms);
-    final key = _levelKey(level);
+    // Kept for revert (P4): assessContractions(_current, currentWeek, _symptoms)
+    // and _levelKey(level). The spoken words follow the new levels.
+    final key = _keyOf(_level);
     final text = '${_s.assessTitle(key)}. ${_s.assessSummary(key)}';
     if (text.trim().isEmpty || text == _lastSpoken) return;
     _lastSpoken = text;
@@ -225,7 +351,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   }
 
   void _startContraction() {
-    final now = DateTime.now();
+    final now = contractionClock();
     _sessionId ??= now.microsecondsSinceEpoch.toString();
     _pendingInterval =
         _lastStart == null ? 0 : now.difference(_lastStart!).inSeconds;
@@ -233,26 +359,99 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     HapticFeedback.lightImpact();
     setState(() => _phase = _Phase.active);
     _ensureTick();
+    _keepAwake(true);
+    // A contraction in progress is on the phone now (P4 C4): Back, or the
+    // app closing, no longer drops it.
+    _saveLive();
   }
 
   void _endContraction() {
-    final now = DateTime.now();
+    final now = contractionClock();
     final start = _activeStart!;
+    final seconds = now.difference(start).inSeconds;
+    // P4 C5: a press under the minimum is a mis-tap. It is not kept, and she
+    // is told so; the previous contraction stays the one intervals count from.
+    if (seconds < kCtMinContractionSeconds) {
+      _activeStart = null;
+      HapticFeedback.lightImpact();
+      setState(() => _phase = _current.isEmpty ? _Phase.home : _Phase.rest);
+      _saveLive();
+      pvToast(context, _s.ctUnderMinimum, kind: PvToastKind.info);
+      return;
+    }
     _current.add(Contraction(
       startIso: start.toIso8601String(),
       endIso: now.toIso8601String(),
-      durationSeconds: now.difference(start).inSeconds,
+        durationSeconds: seconds,
       intervalSeconds: _pendingInterval,
     ));
     _lastStart = start;
     _lastEnd = now;
+    _activeStart = null;
     HapticFeedback.lightImpact();
     setState(() => _phase = _Phase.rest);
     _ensureTick();
     _save();
+    _saveLive();
     // A new contraction may have shifted the interpretation - speak it if so.
     _speakInterpretation();
     _maybePromptLabor();
+  }
+
+  /// "Take back the last one" (P4 C5): the newest contraction comes off, with
+  /// Undo. The session row follows: shorter, or (if that was the only one)
+  /// deleted as a soft delete that travels, and put back on Undo.
+  Future<void> _takeBackLast() async {
+    if (_current.isEmpty) return;
+    final gone = _current.removeLast();
+    ContractionSession? removedSession;
+    setState(() {
+      if (_current.isEmpty) {
+        _lastStart = null;
+        _lastEnd = null;
+        _phase = _Phase.home;
+      } else {
+        _lastStart = DateTime.tryParse(_current.last.startIso);
+        _lastEnd = DateTime.tryParse(_current.last.endIso);
+      }
+    });
+    if (_current.isEmpty) {
+      _keepAwake(false);
+      if (_sessionId != null) {
+        removedSession = await ToolsStore.instance.deleteContractionSession(
+          _sessionId!,
+        );
+      }
+    } else {
+      await _save();
+    }
+    await _saveLive();
+    _lastSpoken = null;
+    if (!mounted) return;
+    pvToast(
+      context,
+      _s.ctTookBack,
+      kind: PvToastKind.done,
+      action: _s.ctUndo,
+      onAction: () => _undoTakeBack(gone, removedSession),
+    );
+  }
+
+  Future<void> _undoTakeBack(Contraction c, ContractionSession? session) async {
+    if (!mounted) return;
+    setState(() {
+      _current.add(c);
+      _lastStart = DateTime.tryParse(c.startIso);
+      _lastEnd = DateTime.tryParse(c.endIso);
+      if (_phase == _Phase.home) _phase = _Phase.rest;
+    });
+    _ensureTick();
+    _keepAwake(true);
+    if (session != null) {
+      await ToolsStore.instance.restoreContractionSession(session);
+    }
+    await _save();
+    await _saveLive();
   }
 
   Future<void> _save() async {
@@ -271,9 +470,17 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   void _maybePromptLabor() {
     if (_askedLabor) return;
     // Don't stack the gentle "feels like labour?" ask on top of an emergency.
-    if (_symptoms.isEmergency) return;
-    if (classifyContractions(_current) != LaborState.activeLabor) return;
+    // Kept for revert (P4 C2): if (_symptoms.isEmergency) return;
+    if (_symptoms.urgentAt(_week, afterLoss: _afterLoss)) return;
+    // After a loss nothing reads the pattern as labour (P4 wave 2).
+    if (_afterLoss) return;
+    // Kept for revert (P4 C3): classifyContractions(_current)
+    if (classifyContractions(_current, laterBaby: _laterBaby) !=
+        LaborState.activeLabor) {
+      return;
+    }
     _askedLabor = true;
+    _saveLive();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _showLaborPrompt();
     });
@@ -294,7 +501,12 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(s.laborPromptBody,
+              // P4 C8: in father preview it asks about her.
+              // Kept for revert: Text(s.laborPromptBody, ...).
+              Text(
+                FatherPreview.instance.on
+                    ? s.laborPromptBodyPartner
+                    : s.laborPromptBody,
                     style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink1)),
                 const SizedBox(height: 12),
                 Text(s.consultProvider,
@@ -324,6 +536,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   void _setLabor(String response) {
     setState(() => _laborResponse = response);
     _save();
+    _saveLive();
     if (mounted) {
       pvToast(context, _s.laborSavedNote, kind: PvToastKind.done);
     }
@@ -332,7 +545,40 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   Future<void> _endSession() async {
     await _save();
     _tick?.cancel();
-    if (mounted) Navigator.of(context).pop();
+    _keepAwake(false);
+    // The session is over: nothing to pick up on the next open (P4 C4).
+    _sessionClosed = true;
+    await ToolsStore.instance.clearLiveContraction();
+    if (!mounted) return;
+    // P4 C8: no silent end. Kept for revert: the pop alone.
+    final nav = Navigator.of(context);
+    final s = _s;
+    nav.pop();
+    pvToast(nav.context, s.ctSavedToHistory, kind: PvToastKind.done);
+  }
+
+  /// History, from the live page or home. A session deleted there that was
+  /// the one running here is let go, so the next save cannot bring it back.
+  Future<void> _openHistory() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            _ContractionHistoryScreen(controller: widget.controller),
+      ),
+    );
+    if (!mounted || _sessionId == null || _current.isEmpty) return;
+    if (ToolsStore.instance.hasContractionSession(_sessionId!)) return;
+    setState(() {
+      _current.clear();
+      _sessionId = null;
+      _lastStart = null;
+      _lastEnd = null;
+      _laborResponse = null;
+      _askedLabor = false;
+      if (_phase == _Phase.rest) _phase = _Phase.home;
+    });
+    if (_phase == _Phase.home) _keepAwake(false);
+    await _saveLive();
   }
 
   // ---- stats ----------------------------------------------------------------
@@ -355,7 +601,13 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     final s = _s;
     return PopScope(
       canPop: true,
-      onPopInvokedWithResult: (didPop, _) => _save(),
+      // Leaving keeps the running session on the phone (P4 C4): it was
+      // written on every change, so a reopen within the window resumes it.
+      onPopInvokedWithResult: (didPop, _) {
+        _save();
+        // "End session" has let it go already; only a plain Back keeps it.
+        if (!_sessionClosed) _saveLive();
+      },
       child: _phase == _Phase.home
           // The front page wears the shared shell (2026-09-30, Tools audit). The
           // live phases below keep their app bar: a running timer is an
@@ -372,8 +624,10 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
           title: Text(s.contractionToolTitle),
           actions: [
             IconButton(
+                    // Kept for revert (P4 C7, Hinglish in Latin script):
+                    // ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
               tooltip: widget.controller.language.isHinglish
-                  ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
+                        ? (_voiceMuted ? s.ctSoundOn : s.ctSoundOff)
                   : (_voiceMuted ? 'Turn voice guidance on' : 'Mute voice guidance'),
               icon: Icon(_voiceMuted
                   ? Icons.volume_off_rounded
@@ -388,17 +642,18 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
               tooltip: s.safetyCheckTitle,
               icon: Icon(
                 Icons.health_and_safety_outlined,
-                color: _symptoms.isEmergency ? _kUrgentRed : null,
+                      // Kept for revert (P4 C2): _symptoms.isEmergency
+                      color: _symptoms.urgentAt(_week, afterLoss: _afterLoss)
+                          ? _kUrgentRed
+                          : null,
               ),
               onPressed: _showSafetySheet,
             ),
             IconButton(
               tooltip: s.historyLabel,
               icon: const Icon(Icons.history_rounded),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) =>
-                    _ContractionHistoryScreen(controller: widget.controller),
-              )),
+                    // Kept for revert: a plain push of _ContractionHistoryScreen.
+                    onPressed: _openHistory,
             ),
           ],
         ),
@@ -418,9 +673,12 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   Widget _homeViewV2(BuildContext context) {
     final s = _s;
     final hi = widget.controller.language.isHinglish;
+    final afterLoss = _afterLoss;
     return PregToolScaffold(
       hue: _kContractionHue,
-      eyebrow: 'Get ready',
+      // After a loss there is nothing to "get ready" for (P4 wave 2); the
+      // timer is a record. Kept for revert: eyebrow: 'Get ready',
+      eyebrow: afterLoss ? 'Track' : 'Get ready',
       title: s.contractionToolTitle,
       intro: s.contractionEmpty,
       mark: IntentMark.timelineRail,
@@ -431,10 +689,8 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
           message: s.historyLabel,
           child: InkWell(
             key: const ValueKey('ct_history'),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) =>
-                  _ContractionHistoryScreen(controller: widget.controller),
-            )),
+            // Kept for revert: a plain push of _ContractionHistoryScreen.
+            onTap: _openHistory,
             borderRadius: BorderRadius.circular(999),
             child: Container(
               width: 38,
@@ -449,8 +705,13 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
       ),
       children: [
         pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          if (_symptoms.isEmergency) ...[
+              const PregAfterLossNote(kCtAfterLossNote),
+              // Kept for revert (P4 C2): if (_symptoms.isEmergency) ...[
+              if (_symptoms.urgentAt(_week, afterLoss: afterLoss)) ...[
             _assessBanner(s),
+                const SizedBox(height: 16),
+              ] else if (_showPretermLine) ...[
+                _pretermLine(s),
             const SizedBox(height: 16),
           ],
           Center(
@@ -476,6 +737,50 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
           const SizedBox(height: 10),
           _safetyCard(s),
           const SizedBox(height: 10),
+              // P4 C3: when to call, by her history, and who should call sooner.
+              // Not after a loss: it is about going in to have a baby.
+              if (!afterLoss) ...[
+                _FoldRow(
+                  fold: 'when_call',
+                  icon: Icons.call_outlined,
+                  title: s.eduWhenCall,
+                  body: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _laterBaby ? s.ctLaterBabyRule : s.ctFirstBabyRule,
+                        style: pvManrope(
+                          fontSize: 13,
+                          height: 1.5,
+                          color: pvStorePalette.ink2,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        s.eduWhenCallBody,
+                        style: pvManrope(
+                          fontSize: 13,
+                          height: 1.5,
+                          color: pvStorePalette.ink2,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        s.ctFollowHospital,
+                        style: pvManrope(
+                          fontSize: 13,
+                          height: 1.5,
+                          fontWeight: FontWeight.w700,
+                          color: pvStorePalette.ink1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _callEarlierLine(s),
+                const SizedBox(height: 10),
+              ],
           _FoldRow(
             fold: 'about',
             icon: Icons.info_outline_rounded,
@@ -493,8 +798,10 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                   _voiceMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
                   size: 16),
               label: Text(
+                    // Kept for revert (P4 C7, Hinglish in Latin script):
+                    // ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
                   hi
-                      ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
+                        ? (_voiceMuted ? s.ctSoundOn : s.ctSoundOff)
                       : (_voiceMuted ? 'Turn voice guidance on' : 'Mute voice guidance'),
                   style: pvManrope(
                       fontSize: 12.5,
@@ -513,25 +820,40 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     final s = _s;
     final p = pvStorePalette;
     final active = _phase == _Phase.active;
-    final now = DateTime.now();
+    final now = contractionClock();
     final elapsed = active
         ? (_activeStart == null ? 0 : now.difference(_activeStart!).inSeconds)
         : (_lastEnd == null ? 0 : now.difference(_lastEnd!).inSeconds);
-    final level = assessContractions(
-        _current, widget.controller.currentWeek, _symptoms);
-    final urgent =
-        level == AssessLevel.emergency || level == AssessLevel.preterm;
+    // Kept for revert (P4): assessContractions(_current, currentWeek, _symptoms)
+    // and urgent = emergency || preterm.
+    final level = _level;
+    final urgent = _isUrgent(level);
     final last = _current.isNotEmpty ? _current.last : null;
+    final afterLoss = _afterLoss;
     return ListView(
       key: const ValueKey('ct_live'),
       padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
       children: [
+        const PregAfterLossNote(kCtAfterLossNote, bottom: 14),
+        // P4 C1: before 37 weeks the line stands while she times, even mid-
+        // contraction, unless the urgent card already says it.
+        if (_showPretermLine && (active || !urgent)) ...[
+          _pretermLine(s),
+          const SizedBox(height: 14),
+        ],
         if (!active) ...[
           // An urgent reading is the full red card, always. A calm one is a line.
           if (urgent) _assessBanner(s) else _assessChip(s, level),
+          if (!urgent) ...[
+            const SizedBox(height: 8),
+            // P4 C3: under every reading, her hospital's word wins.
+            _followHospitalLine(s),
+          ],
           const SizedBox(height: 14),
         ],
-        if (_symptoms.anyReported && !_symptoms.isEmergency) ...[
+        // Kept for revert (P4 C2): && !_symptoms.isEmergency
+        if (_symptoms.anyReported &&
+            !_symptoms.urgentAt(_week, afterLoss: afterLoss)) ...[
           _safetyCard(s),
           const SizedBox(height: 14),
         ],
@@ -611,20 +933,149 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                 builder: (_) => _SummaryScreen(
                   controller: widget.controller,
                   contractions: List.of(_current),
+                    symptoms: _symptoms,
+                    laterBaby: _laterBaby,
+                    afterLoss: afterLoss,
                 ),
               )),
               icon: const Icon(Icons.insights_rounded, size: 18),
               label: Text(s.viewSummaryCta,
                   style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700)),
             ),
+          if (!afterLoss && _current.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            _callEarlierLine(s),
+          ],
           const SizedBox(height: 6),
+          // P4 C5: the undo for a mis-timed contraction, with its own Undo.
+          if (_current.isNotEmpty)
+            TextButton.icon(
+              key: const ValueKey('ct_take_back'),
+              style: TextButton.styleFrom(foregroundColor: p.ink2),
+              onPressed: _takeBackLast,
+              icon: const Icon(Icons.undo_rounded, size: 17),
+              label: Text(
+                s.ctTakeBackCta,
+                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700),
+              ),
+            ),
           TextButton(
+            key: const ValueKey('ct_end_session'),
               style: TextButton.styleFrom(foregroundColor: p.ink2),
               onPressed: _endSession,
               child: Text(s.endSessionCta,
                   style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700))),
         ],
       ],
+    );
+  }
+
+  // ---- P4 lines (2026-10-28) -------------------------------------------------
+
+  /// The standing preterm line shows before [kCtPretermBeforeWeek], never
+  /// after a loss.
+  bool get _showPretermLine => !_afterLoss && _week < kCtPretermBeforeWeek;
+
+  /// "Contractions before 37 weeks: call your maternity unit now." (P4 C1)
+  /// Not folded and not a chip: it holds whatever the pattern says.
+  Widget _pretermLine(S s) {
+    final p = pvStorePalette;
+    return Container(
+      key: const ValueKey('ct_preterm_line'),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _kUrgentOrange, width: 1.5),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.priority_high_rounded,
+            size: 20,
+            color: _kUrgentOrange,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              s.ctPretermLine,
+              style: pvManrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                height: 1.45,
+                color: p.ink1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// "Your hospital may have told you something different. Follow them."
+  Widget _followHospitalLine(S s) {
+    final p = pvStorePalette;
+    return Row(
+      key: const ValueKey('ct_follow_hospital'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.local_hospital_outlined, size: 15, color: p.ink3),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            s.ctFollowHospital,
+            style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// "Call earlier if: twins, a previous caesarean, group B strep, or a
+  /// fever", opening the Labour door's "when to go in" read (P4 C3).
+  Widget _callEarlierLine(S s) {
+    final p = pvStorePalette;
+    return InkWell(
+      key: const ValueKey('ct_call_earlier'),
+      borderRadius: BorderRadius.circular(14),
+      onTap: () =>
+          openPvDoorRead(context, kCtWhenToGoReadId, widget.controller),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: kPvLine),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.call_outlined, size: 18, color: p.ink2),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    s.ctCallEarlier,
+                    style: pvManrope(fontSize: 13, height: 1.45, color: p.ink1),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    s.ctCallEarlierLink,
+                    style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: kPvInk,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+          ],
+        ),
+      ),
     );
   }
 
@@ -635,7 +1086,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     final style = _levelStyle(level);
     return Semantics(
       button: true,
-      label: s.assessTitle(_levelKey(level)),
+      label: s.assessTitle(_keyOf(level)),
       excludeSemantics: true,
       child: InkWell(
         key: const ValueKey('ct_assess_chip'),
@@ -653,7 +1104,8 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
             Icon(style.icon, color: style.color, size: 20),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(s.assessTitle(_levelKey(level)),
+                child: Text(
+                  s.assessTitle(_keyOf(level)),
                   style: pvManrope(
                       fontSize: 14.5, fontWeight: FontWeight.w800, height: 1.3, color: p.ink1)),
             ),
@@ -672,7 +1124,7 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   /// doctor. The same words the banner carried.
   Future<void> _showAssessSheet(S s, AssessLevel level) {
     final p = pvStorePalette;
-    final key = _levelKey(level);
+    final key = _keyOf(level);
     return showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -697,7 +1149,19 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                 child: Text(s.ctAlwaysConsult,
                     style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
               ),
-            ]),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // P4 C3: on every reading.
+            Text(
+              s.ctFollowHospital,
+              style: pvManrope(
+                fontSize: 13,
+                height: 1.5,
+                fontWeight: FontWeight.w700,
+                color: p.ink1,
+              ),
+            ),
           ],
         ),
       ),
@@ -787,8 +1251,10 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                   _voiceMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
                   size: 16),
               label: Text(
+                  // Kept for revert (P4 C7, Hinglish in Latin script):
+                  // ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
                   hi
-                      ? (_voiceMuted ? 'Awaaz on karein' : 'Awaaz band karein')
+                      ? (_voiceMuted ? s.ctSoundOn : s.ctSoundOff)
                       : (_voiceMuted ? 'Turn voice guidance on' : 'Mute voice guidance'),
                   style: pvManrope(
                       fontSize: 12.5,
@@ -910,6 +1376,10 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
     switch (l) {
       case AssessLevel.emergency:
         return (color: _kUrgentRed, icon: Icons.warning_amber_rounded);
+      case AssessLevel.callNow:
+        return (color: _kUrgentOrange, icon: Icons.call_outlined);
+      case AssessLevel.timingOnly:
+        return (color: p.ink2, icon: Icons.timelapse_rounded);
       case AssessLevel.preterm:
         return (color: _kUrgentOrange, icon: Icons.priority_high_rounded);
       case AssessLevel.activeLabor:
@@ -932,12 +1402,12 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   /// orange) edge, glyph and title, so it still stands out from a calm one.
   Widget _assessBanner(S s) {
     final p = pvStorePalette;
-    final level = assessContractions(
-        _current, widget.controller.currentWeek, _symptoms);
+    // Kept for revert (P4): assessContractions(_current, currentWeek,
+    // _symptoms), _levelKey(level), urgent = emergency || preterm.
+    final level = _level;
     final style = _levelStyle(level);
-    final key = _levelKey(level);
-    final urgent =
-        level == AssessLevel.emergency || level == AssessLevel.preterm;
+    final key = _keyOf(level);
+    final urgent = _isUrgent(level);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -977,6 +1447,17 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
             ),
           ]),
         ],
+          // P4 C3: on every reading, urgent ones included.
+          const SizedBox(height: 10),
+          Text(
+            s.ctFollowHospital,
+            style: pvManrope(
+              fontSize: 12.5,
+              height: 1.45,
+              fontWeight: FontWeight.w700,
+              color: p.ink1,
+            ),
+          ),
       ]),
     );
   }
@@ -1033,7 +1514,8 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
   Widget _safetyCard(S s) {
     final p = pvStorePalette;
     final reported = _symptoms.anyReported;
-    final emergency = _symptoms.isEmergency;
+    // Kept for revert (P4 C2): final emergency = _symptoms.isEmergency;
+    final emergency = _symptoms.urgentAt(_week, afterLoss: _afterLoss);
     final color = emergency
         ? _kUrgentRed
         : (reported ? _kUrgentOrange : p.ink2);
@@ -1121,17 +1603,37 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                       (s.optYes, 'yes'),
                       (s.optNotSure, 'unsure'),
                     ], sym.waterBroken, (v) => sym = sym.copyWith(waterBroken: v)),
+                    // P4 C2: once the waters may have gone, their colour
+                    // (green or brown is urgent, and the unit asks).
+                    if (sym.waterBroken != 'no')
+                      q(
+                        s.qWatersColour,
+                        [
+                          (s.watersClear, 'clear'),
+                          (s.watersDark, 'dark'),
+                          (s.optNotSure, 'unknown'),
+                        ],
+                        sym.watersColour,
+                        (v) => sym = sym.copyWith(watersColour: v),
+                      ),
                     q(s.qBleeding, [
                       (s.bleedNone, 'none'),
                       (s.bleedLight, 'light'),
                       (s.bleedHeavy, 'heavy'),
                     ], sym.bleeding, (v) => sym = sym.copyWith(bleeding: v)),
-                    q(s.qMovementReduced, [
-                      (s.optNo, 'no'),
-                      (s.optYes, 'yes'),
-                      (s.optNotSure, 'unsure'),
-                    ], sym.movementReduced,
-                        (v) => sym = sym.copyWith(movementReduced: v)),
+                    // After a loss there is no baby's movement to ask about
+                    // (P4 wave 2). Kept for revert: always asked.
+                    if (!_afterLoss)
+                      q(
+                        s.qMovementReduced,
+                        [
+                          (s.optNo, 'no'),
+                          (s.optYes, 'yes'),
+                          (s.optNotSure, 'unsure'),
+                        ],
+                        sym.movementReduced,
+                        (v) => sym = sym.copyWith(movementReduced: v),
+                      ),
                     q(s.qSeverePain, [
                       (s.optNo, 'no'),
                       (s.optYes, 'yes'),
@@ -1147,6 +1649,8 @@ class _ContractionTrackerScreenState extends State<ContractionTrackerScreen> {
                         onPressed: () {
                           setState(() => _symptoms = sym);
                           Navigator.of(ctx).pop();
+                          // Kept on the phone with the session (P4 C4).
+                          _saveLive();
                           // Symptoms can override the reading (e.g. emergency).
                           _speakInterpretation();
                         },
@@ -1622,29 +2126,114 @@ enum AssessLevel {
   earlyLabor,
   laborLikely,
   activeLabor,
+
+  /// After a loss (P4 wave 2): the timer records, and reads nothing about a
+  /// baby or labour into the pattern.
+  timingOnly,
   preterm,
+
+  /// A symptom that means "call your maternity unit now" (P4 C2): urgent,
+  /// but not the emergency wording.
+  callNow,
   emergency,
 }
+
+// ---------------------------------------------------------------------------
+//  The clinical numbers (P4, 2026-10-28; docs/preg-ttc-tool-plans/P4-birth-prep.md
+//  "Clinical calls"). Each one is a BEFORE-LAUNCH clinician CHECK.
+// ---------------------------------------------------------------------------
+
+/// BEFORE-LAUNCH clinician CHECK: before this week, any contractions are a
+/// reason to call (preterm).
+const int kCtPretermBeforeWeek = 37;
+
+/// BEFORE-LAUNCH clinician CHECK: ACOG's preterm frequency, 4 contractions
+/// within 20 minutes (by start times), whatever the pattern.
+const int kCtPretermShortCount = 4;
+const Duration kCtPretermShortWindow = Duration(minutes: 20);
+
+/// BEFORE-LAUNCH clinician CHECK: ACOG's preterm frequency, 8 contractions
+/// within 60 minutes (by start times), whatever the pattern.
+const int kCtPretermLongCount = 8;
+const Duration kCtPretermLongWindow = Duration(minutes: 60);
+
+/// BEFORE-LAUNCH clinician CHECK: the pattern is read from the last hour of
+/// timing only, never the whole session's averages (P4 C3).
+const Duration kCtReadWindow = Duration(minutes: 60);
+
+/// BEFORE-LAUNCH clinician CHECK: 5-1-1. About every 5 minutes (average
+/// start-to-start), about a minute long (average), fairly even, and for a
+/// first baby kept up for an hour.
+const int kCtCallIntervalSeconds = 300;
+const int kCtCallDurationSeconds = 60;
+const double kCtCallRegularity = 0.80;
+const int kCtCallHourSeconds = 3600;
+
+/// BEFORE-LAUNCH clinician CHECK: a later baby is read at the 5-1 pattern as
+/// soon as this many contractions in the last hour show it (no hour's wait).
+const int kCtLaterBabyMinCount = 4;
+
+/// BEFORE-LAUNCH clinician CHECK (app behaviour, not clinical): a press
+/// shorter than this is a mis-tap and is not kept (P4 C5).
+const int kCtMinContractionSeconds = 5;
+
+/// A running session is picked up again if she comes back within this long
+/// of its last contraction (P4 C4).
+const Duration kCtResumeWindow = Duration(hours: 2);
+
+/// The clock the timer reads. Tests swap it to step time on purpose; the
+/// app always reads the wall clock.
+@visibleForTesting
+DateTime Function() contractionClock = DateTime.now;
 
 /// The mother's reported symptoms (Layer 2 inputs). Defaults are the "all-clear"
 /// values; gestational age comes from her profile, not here.
 class ContractionSymptoms {
   const ContractionSymptoms({
     this.waterBroken = 'no', // no | yes | unsure
+    this.watersColour = 'unknown', // unknown | clear | dark (green or brown)
     this.bleeding = 'none', // none | light | heavy
     this.movementReduced = 'no', // no | yes | unsure
     this.severePain = 'no', // no | yes
   });
   final String waterBroken;
+
+  /// Asked only once the waters may have gone (P4 C2). 'dark' is green or
+  /// brown, which is urgent.
+  final String watersColour;
   final String bleeding;
   final String movementReduced;
   final String severePain;
 
-  bool get isEmergency =>
-      waterBroken == 'yes' ||
-      bleeding == 'heavy' ||
-      movementReduced == 'yes' ||
-      severePain == 'yes';
+  // Kept for revert (P4 C2):
+  // bool get isEmergency =>
+  //     waterBroken == 'yes' ||
+  //     bleeding == 'heavy' ||
+  //     movementReduced == 'yes' ||
+  //     severePain == 'yes';
+
+  /// The emergency wording: heavy bleeding, or severe constant pain.
+  bool get isEmergency => bleeding == 'heavy' || severePain == 'yes';
+
+  bool get _watersMaybe => waterBroken == 'yes' || waterBroken == 'unsure';
+
+  /// "Call your maternity unit now" (P4 C2, NHS: not sure counts as yes).
+  /// Waters gone or maybe gone, green or brown waters, baby moving less or
+  /// not sure, or any bleeding before [kCtPretermBeforeWeek]. After a loss
+  /// the baby's movements and the week no longer apply.
+  ///
+  /// Green or brown waters are already inside "waters gone" here; the colour
+  /// is asked so the copied summary can tell the unit (they ask first).
+  bool callNowAt(int week, {bool afterLoss = false}) =>
+      _watersMaybe ||
+      (!afterLoss &&
+          (movementReduced == 'yes' ||
+              movementReduced == 'unsure' ||
+              (bleeding == 'light' && week < kCtPretermBeforeWeek)));
+
+  /// Anything that means act now, whichever wording.
+  bool urgentAt(int week, {bool afterLoss = false}) =>
+      isEmergency || callNowAt(week, afterLoss: afterLoss);
 
   bool get anyReported =>
       waterBroken != 'no' ||
@@ -1654,15 +2243,35 @@ class ContractionSymptoms {
 
   ContractionSymptoms copyWith({
     String? waterBroken,
+    String? watersColour,
     String? bleeding,
     String? movementReduced,
     String? severePain,
   }) =>
       ContractionSymptoms(
         waterBroken: waterBroken ?? this.waterBroken,
+    watersColour: watersColour ?? this.watersColour,
         bleeding: bleeding ?? this.bleeding,
         movementReduced: movementReduced ?? this.movementReduced,
         severePain: severePain ?? this.severePain,
+      );
+
+  /// For the running session kept on the phone (P4 C4).
+  Map<String, String> toMap() => {
+    'waterBroken': waterBroken,
+    'watersColour': watersColour,
+    'bleeding': bleeding,
+    'movementReduced': movementReduced,
+    'severePain': severePain,
+  };
+
+  factory ContractionSymptoms.fromMap(Map<String, String> m) =>
+      ContractionSymptoms(
+        waterBroken: m['waterBroken'] ?? 'no',
+        watersColour: m['watersColour'] ?? 'unknown',
+        bleeding: m['bleeding'] ?? 'none',
+        movementReduced: m['movementReduced'] ?? 'no',
+        severePain: m['severePain'] ?? 'no',
       );
 }
 
@@ -1708,8 +2317,59 @@ int _trackingSeconds(List<Contraction> cs) {
   return end.difference(start).inSeconds;
 }
 
+/// The contractions that started in the last [kCtReadWindow] before the end
+/// of the latest one (P4 C3). The reading and the copied summary use only
+/// these, so an early, scattered hour no longer waters down a regular one.
+List<Contraction> contractionsInLastHour(List<Contraction> cs) {
+  if (cs.isEmpty) return cs;
+  final anchor =
+      DateTime.tryParse(cs.last.endIso) ?? DateTime.tryParse(cs.last.startIso);
+  if (anchor == null) return cs;
+  final from = anchor.subtract(kCtReadWindow);
+  return [
+    for (final c in cs)
+      if (!(DateTime.tryParse(c.startIso)?.isBefore(from) ?? false)) c,
+  ];
+}
+
+/// True when the session has covered [kCtReadWindow] or more, first start to
+/// last end.
+bool contractionsSpanAnHour(List<Contraction> cs) =>
+    _trackingSeconds(cs) >= kCtReadWindow.inSeconds;
+
+/// ACOG's preterm frequency (P4 C1): ANY stretch of the session holding
+/// [kCtPretermShortCount] starts within [kCtPretermShortWindow], or
+/// [kCtPretermLongCount] within [kCtPretermLongWindow]. Read from start
+/// times, whatever the pattern or how long each lasted.
+bool pretermFrequencyMet(List<Contraction> cs) {
+  final starts = [
+    for (final c in cs) DateTime.tryParse(c.startIso),
+  ].whereType<DateTime>().toList()..sort();
+  bool within(int count, Duration window) {
+    for (var i = 0; i + count - 1 < starts.length; i++) {
+      if (starts[i + count - 1].difference(starts[i]) <= window) return true;
+    }
+    return false;
+  }
+
+  return within(kCtPretermShortCount, kCtPretermShortWindow) ||
+      within(kCtPretermLongCount, kCtPretermLongWindow);
+}
+
 /// Layer 1 - classify the pattern from the contractions alone.
-LaborState classifyContractions(List<Contraction> cs) {
+///
+/// ⚠️ THE LAST HOUR, NOT THE SESSION (P4 C3, 2026-10-28). Every average below
+/// is over [contractionsInLastHour]; the whole session decides only whether
+/// she has timed for an hour. A first baby needs the 5-1-1 pattern held for
+/// that hour; a later baby ([laterBaby], derived from a child already on her
+/// profile, never asked) is read at the 5-1 pattern once
+/// [kCtLaterBabyMinCount] contractions show it.
+LaborState classifyContractions(
+  List<Contraction> all, {
+  bool laterBaby = false,
+}) {
+  // Kept for revert (P4 C3): every line below read `cs` as the whole session.
+  final cs = contractionsInLastHour(all);
   final n = cs.length;
   if (n < 3) return LaborState.insufficient;
 
@@ -1720,13 +2380,26 @@ LaborState classifyContractions(List<Contraction> cs) {
   final avgIntSec = ints.isEmpty ? double.infinity : _mean(ints);
   final avgIntMin = avgIntSec / 60;
   final reg = _regularity(ints);
-  final tracking = _trackingSeconds(cs);
+  // Has she timed for an hour? The whole session, first start to last end.
+  final tracking = _trackingSeconds(all);
 
-  // State 4 - Active labour likely.
-  if (avgIntSec <= 300 &&
-      avgDur >= 60 &&
-      reg >= 0.80 &&
-      (tracking >= 3600 || n >= 8)) {
+  // Kept for revert (P4 C3): `n >= 8` stood in for the hour, so eight
+  // contractions in 40 minutes read as the hour-long pattern.
+  // if (avgIntSec <= 300 &&
+  //     avgDur >= 60 &&
+  //     reg >= 0.80 &&
+  //     (tracking >= 3600 || n >= 8)) {
+  //   return LaborState.activeLabor;
+  // }
+  // State 4 - the pattern hospitals ask her to call about.
+  final callPattern =
+      avgIntSec <= kCtCallIntervalSeconds &&
+      avgDur >= kCtCallDurationSeconds &&
+      reg >= kCtCallRegularity;
+  if (callPattern &&
+      (laterBaby
+          ? n >= kCtLaterBabyMinCount
+          : tracking >= kCtCallHourSeconds)) {
     return LaborState.activeLabor;
   }
   // State 3 - Labour pattern likely.
@@ -1748,44 +2421,129 @@ LaborState classifyContractions(List<Contraction> cs) {
 }
 
 /// Layer 2 over Layer 1, applying the override priority order.
+///
+/// P4 (2026-10-28): before [kCtPretermBeforeWeek] the reading is preterm on
+/// a labour-like pattern OR on ACOG's frequency ([pretermFrequencyMet]); a
+/// "call now" symptom ([ContractionSymptoms.callNowAt]) sits between the
+/// emergency and everything else; after a loss ([afterLoss]) nothing is read
+/// into the pattern about a baby or labour.
 AssessLevel assessContractions(
-    List<Contraction> cs, int gestationWeeks, ContractionSymptoms sym) {
+  List<Contraction> cs,
+  int gestationWeeks,
+  ContractionSymptoms sym, {
+  bool laterBaby = false,
+  bool afterLoss = false,
+}) {
   if (sym.isEmergency) return AssessLevel.emergency;
-  final state = classifyContractions(cs);
+  if (sym.callNowAt(gestationWeeks, afterLoss: afterLoss)) {
+    return AssessLevel.callNow;
+  }
+  if (afterLoss) {
+    return cs.isEmpty ? AssessLevel.insufficient : AssessLevel.timingOnly;
+  }
+  final state = classifyContractions(cs, laterBaby: laterBaby);
   final laborish = state == LaborState.earlyLabor ||
       state == LaborState.laborLikely ||
       state == LaborState.activeLabor;
-  if (gestationWeeks < 37 && laborish) return AssessLevel.preterm;
-  return switch (state) {
-    LaborState.activeLabor => AssessLevel.activeLabor,
-    LaborState.laborLikely => AssessLevel.laborLikely,
-    LaborState.earlyLabor => AssessLevel.earlyLabor,
-    LaborState.noPattern => AssessLevel.noPattern,
-    LaborState.insufficient => AssessLevel.insufficient,
-  };
+  // Kept for revert (P4 C1): if (gestationWeeks < 37 && laborish) return AssessLevel.preterm;
+  if (gestationWeeks < kCtPretermBeforeWeek &&
+      (laborish || pretermFrequencyMet(cs))) {
+    return AssessLevel.preterm;
+  }
+  return _levelOf(state);
 }
 
-String _levelKey(AssessLevel l) => switch (l) {
+AssessLevel _levelOf(LaborState state) => switch (state) {
+  LaborState.activeLabor => AssessLevel.activeLabor,
+  LaborState.laborLikely => AssessLevel.laborLikely,
+  LaborState.earlyLabor => AssessLevel.earlyLabor,
+  LaborState.noPattern => AssessLevel.noPattern,
+  LaborState.insufficient => AssessLevel.insufficient,
+};
+
+/// An urgent reading: the whole card, never folded (red stays for NOW).
+bool _isUrgent(AssessLevel l) =>
+    l == AssessLevel.emergency ||
+    l == AssessLevel.callNow ||
+    l == AssessLevel.preterm;
+
+/// The string key of a reading. A later baby's call reading names why it
+/// came sooner; after a loss "call now" says doctor or hospital.
+String _levelKey(
+  AssessLevel l, {
+  bool laterBaby = false,
+  bool afterLoss = false,
+}) => switch (l) {
       AssessLevel.emergency => 'emergency',
+  AssessLevel.callNow => afterLoss ? 'callNowLoss' : 'callNow',
       AssessLevel.preterm => 'preterm',
-      AssessLevel.activeLabor => 'active',
+  AssessLevel.activeLabor => laterBaby ? 'activeLater' : 'active',
       AssessLevel.laborLikely => 'likely',
       AssessLevel.earlyLabor => 'early',
+  AssessLevel.timingOnly => 'timingOnly',
       AssessLevel.noPattern => 'noPattern',
       AssessLevel.insufficient => 'insufficient',
     };
 
 /// The pattern summary line (Layer 1 only) for the static summary screen.
-String contractionPattern(S s, List<Contraction> cs) {
-  final state = classifyContractions(cs);
-  final level = switch (state) {
-    LaborState.activeLabor => AssessLevel.activeLabor,
-    LaborState.laborLikely => AssessLevel.laborLikely,
-    LaborState.earlyLabor => AssessLevel.earlyLabor,
-    LaborState.noPattern => AssessLevel.noPattern,
-    LaborState.insufficient => AssessLevel.insufficient,
-  };
-  return s.assessSummary(_levelKey(level));
+String contractionPattern(
+  S s,
+  List<Contraction> cs, {
+  bool laterBaby = false,
+  bool afterLoss = false,
+}) {
+  if (afterLoss) {
+    return s.assessSummary(cs.isEmpty ? 'insufficient' : 'timingOnly');
+  }
+  final level = _levelOf(classifyContractions(cs, laterBaby: laterBaby));
+  return s.assessSummary(_levelKey(level, laterBaby: laterBaby));
+}
+
+/// The text "Copy summary" puts on the clipboard (P4 C6, 2026-10-28).
+///
+/// Kept for revert: it was headed "Last hour" over the WHOLE session's
+/// numbers. Now a session of an hour or more is cut to its last hour, and a
+/// shorter one is headed "This session"; her week (not after a loss) and the
+/// symptoms she reported go with it, which is what a maternity unit asks
+/// first on the phone.
+String contractionSummaryText(
+  S s,
+  List<Contraction> all, {
+  int? week,
+  ContractionSymptoms symptoms = const ContractionSymptoms(),
+  bool laterBaby = false,
+  bool afterLoss = false,
+}) {
+  final hour = contractionsSpanAnHour(all);
+  final cs = hour ? contractionsInLastHour(all) : all;
+  final durations = cs.map((c) => c.durationSeconds).toList();
+  final intervals = cs
+      .where((c) => c.intervalSeconds > 0)
+      .map((c) => c.intervalSeconds)
+      .toList();
+  final avgDur = durations.isEmpty ? 0 : _mean(durations).round();
+  final avgIntSec = intervals.isEmpty ? 0 : _mean(intervals).round();
+  final longest = durations.isEmpty ? 0 : durations.reduce(math.max);
+  final shortestIntSec = intervals.isEmpty ? 0 : intervals.reduce(math.min);
+  final reported = <String>[
+    if (symptoms.waterBroken != 'no')
+      symptoms.watersColour == 'dark' ? s.ctSymWatersDark : s.ctSymWaters,
+    if (symptoms.bleeding == 'light') s.ctSymBleedLight,
+    if (symptoms.bleeding == 'heavy') s.ctSymBleedHeavy,
+    if (!afterLoss && symptoms.movementReduced != 'no') s.ctSymMovement,
+    if (symptoms.severePain == 'yes') s.ctSymPain,
+  ];
+  return '${hour ? s.lastHourLabel : s.thisSessionContractions}:\n'
+      '${cs.length} ${s.contractionsLoggedLabel.toLowerCase()}.\n'
+      '${s.avgDurationLabel}: ${s.minSecLabel(avgDur)}.\n'
+      '${s.avgIntervalLabel}: ${s.minSecLabel(avgIntSec)}.\n'
+      '${s.longestDurationLabel}: ${s.minSecLabel(longest)}.\n'
+      '${s.shortestIntervalLabel}: ${s.minSecLabel(shortestIntSec)}.\n'
+      '${(week != null && !afterLoss) ? '${s.ctSummaryWeek}: $week.\n' : ''}'
+      '${s.ctSummarySymptoms}: '
+      '${reported.isEmpty ? s.ctSummaryNoSymptoms : reported.join(', ')}.\n'
+      '${contractionPattern(s, all, laterBaby: laterBaby, afterLoss: afterLoss)}\n'
+      '${s.consultProvider}';
 }
 
 
@@ -1794,9 +2552,18 @@ String contractionPattern(S s, List<Contraction> cs) {
 // ---------------------------------------------------------------------------
 
 class _SummaryScreen extends StatelessWidget {
-  const _SummaryScreen({required this.controller, required this.contractions});
+  const _SummaryScreen({
+    required this.controller,
+    required this.contractions,
+    this.symptoms = const ContractionSymptoms(),
+    this.laterBaby = false,
+    this.afterLoss = false,
+  });
   final PregnancyController controller;
   final List<Contraction> contractions;
+  final ContractionSymptoms symptoms;
+  final bool laterBaby;
+  final bool afterLoss;
 
   @override
   Widget build(BuildContext context) {
@@ -1813,17 +2580,28 @@ class _SummaryScreen extends StatelessWidget {
         ? 0
         : (intervals.reduce((a, b) => a + b) / intervals.length).round();
     final longest = durations.isEmpty ? 0 : durations.reduce((a, b) => a > b ? a : b);
-    final shortestIntSec =
-        intervals.isEmpty ? 0 : intervals.reduce((a, b) => a < b ? a : b);
+    // Kept for revert (P4 C6): the shortest interval is in the copied text
+    // only, now built by `contractionSummaryText`.
+    // final shortestIntSec =
+    //     intervals.isEmpty ? 0 : intervals.reduce((a, b) => a < b ? a : b);
 
-    String summaryText() => '${s.lastHourLabel}:\n'
-        '${cs.length} ${s.contractionsLoggedLabel.toLowerCase()}.\n'
-        '${s.avgDurationLabel}: ${s.minSecLabel(avgDur)}.\n'
-        '${s.avgIntervalLabel}: ${s.minSecLabel(avgIntSec)}.\n'
-        '${s.longestDurationLabel}: ${s.minSecLabel(longest)}.\n'
-        '${s.shortestIntervalLabel}: ${s.minSecLabel(shortestIntSec)}.\n'
-        '${contractionPattern(s, cs)}\n'
-        '${s.consultProvider}';
+    // Kept for revert (P4 C6): "Last hour" over the whole session.
+    // String summaryText() => '${s.lastHourLabel}:\n'
+    //     '${cs.length} ${s.contractionsLoggedLabel.toLowerCase()}.\n'
+    //     '${s.avgDurationLabel}: ${s.minSecLabel(avgDur)}.\n'
+    //     '${s.avgIntervalLabel}: ${s.minSecLabel(avgIntSec)}.\n'
+    //     '${s.longestDurationLabel}: ${s.minSecLabel(longest)}.\n'
+    //     '${s.shortestIntervalLabel}: ${s.minSecLabel(shortestIntSec)}.\n'
+    //     '${contractionPattern(s, cs)}\n'
+    //     '${s.consultProvider}';
+    String summaryText() => contractionSummaryText(
+      s,
+      cs,
+      week: controller.currentWeek,
+      symptoms: symptoms,
+      laterBaby: laterBaby,
+      afterLoss: afterLoss,
+    );
 
     return Scaffold(
       // Kept for revert: appBar: AppBar(title: Text(s.sessionSummaryTitle)).
@@ -1866,7 +2644,13 @@ class _SummaryScreen extends StatelessWidget {
             width: double.infinity,
             child: PregCard(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(contractionPattern(s, cs),
+                  Text(
+                    contractionPattern(
+                      s,
+                      cs,
+                      laterBaby: laterBaby,
+                      afterLoss: afterLoss,
+                    ),
                     style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink1)),
                 const SizedBox(height: 8),
                 Text(s.consultProvider,
@@ -2015,6 +2799,21 @@ class _SessionDetailScreen extends StatelessWidget {
   final PregnancyController controller;
   final ContractionSession session;
 
+  /// "Delete this session" (P4 C5): a soft delete that travels, said with
+  /// Undo, and the page closes on the history it came from.
+  Future<void> _delete(BuildContext context, S s) async {
+    final nav = Navigator.of(context);
+    final gone = await ToolsStore.instance.deleteContractionSession(session.id);
+    if (gone == null) return;
+    nav.pop();
+    // pvToast checks mounted itself and falls back to the app navigator.
+    // ignore: use_build_context_synchronously
+    pvToast(nav.context, s.ctSessionDeleted,
+        kind: PvToastKind.done,
+        action: s.ctUndo,
+        onAction: () => ToolsStore.instance.restoreContractionSession(gone));
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
@@ -2065,6 +2864,19 @@ class _SessionDetailScreen extends StatelessWidget {
                   ]),
                 ),
             ]),
+          ),
+          const SizedBox(height: 18),
+          Center(
+            child: TextButton.icon(
+              key: const ValueKey('ct_delete_session'),
+              style: TextButton.styleFrom(foregroundColor: pvStorePalette.ink2),
+              onPressed: () => _delete(context, s),
+              icon: const Icon(Icons.delete_outline_rounded, size: 18),
+              label: Text(
+                s.ctDeleteSessionCta,
+                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700),
+              ),
+            ),
           ),
         ],
       ),

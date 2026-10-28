@@ -19,6 +19,7 @@ import '../../widgets/pv_nav_bar.dart';
 import '../../theme/app_theme.dart';
 
 import '../../ask_veda/veda_core.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvIsRetiredSeedId;
 import '../product_guide/product_guide_chooser.dart';
 import 'askveda_screen.dart';
 // import 'grow_home_screen.dart'; // kept for revert with the GrowHomeScreen line
@@ -758,9 +759,22 @@ Widget ppCircleBack(BuildContext context, {String? eyebrow, Widget? trailing}) =
 // "why it helps here" line and is always the caller's.
 Widget ppProductRow(BuildContext context, String title, String desc, String price,
     {bool top = false, bool bottom = false, String? productId}) {
-  final product = productId != null ? productById(productId) : null;
-  final shownTitle = product?.name ?? title;
-  final shownPrice = product?.priceLabel ?? price;
+  // ⚠️ NO SEED PRODUCTS (2026-10-28, the user: "no need to have fake
+  // situations in the app... show whatever we have"). Every [productId] a
+  // caller passes is an invented parenting seed product ('dozy',
+  // 'hushcurtains'...), now out of the store (pv_catalog_adapters.dart). The
+  // row reads as the kind of thing ("Soothers & white noise", the seed's own
+  // sub-shelf) with the caller's "why it helps" line; the invented name,
+  // photo and price (the seed's and the caller's) go, and it opens the store.
+  // A demo build with PV_SEED_PRODUCTS on is unchanged. Kept for revert:
+  //   final product = productId != null ? productById(productId) : null;
+  //   final shownTitle = product?.name ?? title;
+  //   final shownPrice = product?.priceLabel ?? price;
+  final retired = productId != null && pvIsRetiredSeedId(productId);
+  final product = productId != null && !retired ? productById(productId) : null;
+  final shownTitle =
+      retired ? productById(productId).sub : (product?.name ?? title);
+  final shownPrice = retired ? '' : (product?.priceLabel ?? price);
   return PvPress(child: GestureDetector(
     onTap: () {
       if (product != null) {

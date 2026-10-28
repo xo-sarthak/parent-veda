@@ -26,12 +26,21 @@ import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
+import '../pregnancy/preg_after_loss_note.dart' show PregAfterLossNote, kAfterLossNames;
 import '../products/pv_store_chrome.dart' show PvCommit, pvStorePalette;
 import 'name_list_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 class BabyNamingHomeScreen extends StatelessWidget {
-  const BabyNamingHomeScreen({super.key});
+  // Kept for revert (P4): const BabyNamingHomeScreen({super.key});
+  const BabyNamingHomeScreen({super.key, this.afterLossNote = false});
+
+  /// ⚠️ PREGNANCY'S CALLERS ONLY (P4 D4, 2026-10-28). Parenting opens this
+  /// same screen, and there a past pregnancy's loss is not what the page is
+  /// about. So the after-loss note is asked for by the caller (the Tools row,
+  /// the Getting ready door), never decided here; it then shows only while
+  /// `PregnancyEndedStore.ended`. False: the screen is exactly as before.
+  final bool afterLossNote;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -65,6 +74,8 @@ class BabyNamingHomeScreen extends StatelessWidget {
             '${all.length} Indian names with their meaning, origin and Devanagari. Swipe through them '
             'on your own or with your partner; names you both love come first in your shortlist.',
         children: [
+          // Draws nothing unless the pregnancy has ended.
+          if (afterLossNote) pregToolPad(const PregAfterLossNote(kAfterLossNames)),
           for (final n in picks) ...[
             pregToolPad(Container(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),

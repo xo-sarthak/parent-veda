@@ -26,27 +26,83 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../brand/outbound.dart';
 import '../../data/hospital_bag_catalog.dart';
 import '../../data/hospital_bag_seed.dart';
 import '../../data/ready_for_birth_data.dart';
 import '../../localization/app_language.dart';
+import '../../services/father_preview.dart';
 import '../../services/hospital_bag_store.dart';
 import '../../services/hospital_bag_v2_store.dart';
+import '../../services/life_stage_store.dart' show LifeStage;
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
+import '../../services/pv_catalog_store.dart';
 import '../../services/ready_birth_context_store.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_door_chrome.dart' show kPvUrgentInk;
 import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_after_loss_note.dart';
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
-import '../product_guide/product_guide_chooser.dart';
+// Kept for revert (P4 D1): the invented picks opened their guide first.
+// import '../product_guide/product_guide_chooser.dart';
+import '../products/pv_search_screen.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
+
+// ---- P4 words (2026-10-28), English only ------------------------------------
+
+/// One name for the tool everywhere (P4 H5): the tile, the hub and this page
+/// say "Hospital bag". Kept for revert: S.now.uiReadyBirth ("Ready for Birth").
+const String kHospitalBagTitle = 'Hospital bag';
+
+/// The after-loss note at the top of the bag (D4).
+// One copy for every after-loss note (preg_after_loss_note.dart).
+const String kBagAfterLossNote = kAfterLossBag;
+
+/// The bottom bar after a loss: no labour, no baby.
+const String _kGoingInNow = 'Going into hospital now?';
+
+/// "See it in the store" (P4 D1), on "Need one?".
+const String _kSeeInStore = 'See it in the store';
+
+/// Opens the live store for a bag item by the shared rule
+/// ([getReadyStoreRoute]): the store's search on its words when the store has
+/// any, else a tagged Amazon search. A bag item is not a store product, so
+/// there is no product id to try first. A failed link says why.
+Future<void> _openInStore(BuildContext context, BagItem item) async {
+  final storeWords = bagStoreQuery(item.id, item.name.en);
+  final route = getReadyStoreRoute(
+    query: storeWords,
+    storeHasId: (id) => PvCatalogStore.instance.byId(id) != null,
+    storeSearchHits: (q) => PvCatalogStore.instance.search(q).all.isNotEmpty,
+  );
+  switch (route) {
+    case GetReadyStoreRoute.productPage:
+    // Not reached: a bag item has no product id to try first.
+    case GetReadyStoreRoute.storeSearch:
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) =>
+            PvSearchScreen(stage: LifeStage.pregnancy, initialQuery: storeWords),
+        settings: const RouteSettings(name: 'store/search'),
+      ));
+      return;
+    case GetReadyStoreRoute.amazonSearch:
+      // .en: the search leaves the app, and Amazon India lists in English.
+      final ok = await openOutbound(amazonSearchUrlFor(bagAmazonQuery(item.name.en)));
+      if (!ok && context.mounted) {
+        pvToast(context,
+            "Couldn't open Amazon. Check your connection and try again.");
+      }
+      return;
+  }
+}
 
 /// The Tools tab's "Get ready" hue, so the marks here match the row she tapped.
 const double _kReadyHue = 28;
@@ -100,15 +156,21 @@ BagCategory _bagCatFor(ReadyCategory c) => switch (c) {
 
 // ---- readiness maths (a thin view over the two stores) ----------------------
 class _Readiness {
-  _Readiness(this.bag, this.ctx);
+  _Readiness(this.bag, this.ctx, {this.afterLoss = false});
   final HospitalBagV2Store bag;
   final ReadyBirthContextStore ctx;
 
+  /// After a loss the Baby category steps aside, and is not counted (D4).
+  final bool afterLoss;
+
   late final Set<String> _provided = providedItemIds(ctx.hospitalProvides);
 
-  /// Everything still in the bag, minus what the hospital provides.
-  List<BagItem> get applicable =>
-      bag.active.where((i) => !_provided.contains(i.id)).toList();
+  /// Everything still in the bag, minus what the hospital provides (and,
+  /// after a loss, minus the baby's things).
+  List<BagItem> get applicable => bag.active
+      .where((i) => !_provided.contains(i.id))
+      .where((i) => !afterLoss || readyCategoryOf(i) != ReadyCategory.baby)
+      .toList();
 
   List<BagItem> inCat(ReadyCategory c) =>
       applicable.where((i) => readyCategoryOf(i) == c).toList();
@@ -125,7 +187,7 @@ class _Readiness {
 
   /// The single next step for the hero.
   String focusLine() {
-    final left = kGuidedOrder.where((c) => remainingIn(c) > 0).toList();
+    final left = guidedOrder.where((c) => remainingIn(c) > 0).toList();
     if (left.isEmpty) return S.now.rfbFullyPacked;
     // Lowercasing is an English habit — Devanagari has no case, and the
     // category name reads correctly as-is in Hindi.
@@ -134,15 +196,36 @@ class _Readiness {
         ? S.now.rfbOnlyLeft(name.now, name.en.toLowerCase())
         : S.now.rfbNextUp(name.now, name.en.toLowerCase());
   }
+
+  /// The guided order she walks: no Baby step after a loss.
+  List<ReadyCategory> get guidedOrder => [
+        for (final c in kGuidedOrder)
+          if (!afterLoss || c != ReadyCategory.baby) c,
+      ];
 }
+
+/// Whether her pregnancy has ended (the after-loss state, D4).
+bool get _ended => PregnancyEndedStore.instance.ended;
+
+/// The listenables every page here repaints on.
+Listenable _watch(HospitalBagV2Store bag, ReadyBirthContextStore ctx) =>
+    Listenable.merge(
+        [bag, ctx, PregnancyEndedStore.instance, FatherPreview.instance]);
 
 
 // ===========================================================================
 //  Dashboard
 // ===========================================================================
 class ReadyForBirthScreen extends StatefulWidget {
-  const ReadyForBirthScreen({super.key, required this.controller});
+  const ReadyForBirthScreen(
+      {super.key, required this.controller, this.initialCategory});
   final PregnancyController controller;
+
+  /// Opens straight into one category once the bag is ready: 'partner' for
+  /// the Labour door's "What to pack for whoever comes with you" (P4, for
+  /// Terminal A's tile). Also 'mom', 'baby', 'documents'. Null opens the
+  /// dashboard as before.
+  final String? initialCategory;
 
   @override
   State<ReadyForBirthScreen> createState() => _ReadyForBirthScreenState();
@@ -173,8 +256,23 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
       try {
         await _bag.createBag(generateDefaultBag(_ctx.delivery), _ctx.delivery);
       } catch (_) {/* best-effort */}
+    } else {
+      // A bag made before P4 (2026-10-28) gains the India documents, and the
+      // baby lotion leaves it unless she packed it. Additive, every tick kept;
+      // idempotent, so it costs nothing on later opens.
+      try {
+        await _bag.syncDefaults(
+          wanted: bagSeedItems(kAddedBagIds),
+          dropIfUnpacked: kRetiredBagIds,
+        );
+      } catch (_) {/* best-effort */}
     }
     if (mounted) setState(() => _booting = false);
+    final start = readyCategoryFromName(widget.initialCategory);
+    if (start != null && mounted && !(_ended && start == ReadyCategory.baby)) {
+      _push(context,
+          _CategoryScreen(controller: widget.controller, category: start));
+    }
   }
 
   @override
@@ -192,13 +290,15 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
       backgroundColor: pvStorePalette.ground,
       bottomNavigationBar: _booting ? null : _labourBar(),
       body: AnimatedBuilder(
-        animation: Listenable.merge([_bag, _ctx]),
+        // Kept for revert: animation: Listenable.merge([_bag, _ctx]).
+        animation: _watch(_bag, _ctx),
         builder: (context, _) {
-          final r = _booting ? null : _Readiness(_bag, _ctx);
+          final r = _booting ? null : _Readiness(_bag, _ctx, afterLoss: _ended);
           return PregToolScaffold(
             hue: _kReadyHue,
             eyebrow: 'Get ready',
-            title: S.now.uiReadyBirth,
+            // Kept for revert (P4 H5, one name): title: S.now.uiReadyBirth.
+            title: kHospitalBagTitle,
             intro: 'What to take to the hospital, packed in small steps.',
             mark: IntentMark.bagMark,
             action: _booting
@@ -226,6 +326,9 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
                 ? const [Padding(padding: EdgeInsets.all(40), child: Center(child: CircularProgressIndicator()))]
                 : [
                     pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                      // After a loss (D4): one calm line, and the page is
+                      // about her stay. Draws nothing otherwise.
+                      const PregAfterLossNote(kBagAfterLossNote),
                       _hero(r),
                       const SizedBox(height: 12),
                       _packTogetherButton(r),
@@ -234,14 +337,18 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
                       const SizedBox(height: 20),
                       // Kept for revert: Text(uiFourSimpleParts, titleMedium) with
                       // uiTapAnyOneContinue in bodySmall under it.
-                      PregSectionHeading(S.now.uiFourSimpleParts,
+                      // After a loss the Baby part steps aside, so three.
+                      PregSectionHeading(
+                          r.afterLoss ? 'Three simple parts' : S.now.uiFourSimpleParts,
                           lead: S.now.uiTapAnyOneContinue),
                       const SizedBox(height: 12),
                       // Kept for revert: one outlined card per category with its
                       // icon in `meta.color`. They open somewhere, so they are
                       // rows with drawn marks in one white card.
+                      // Kept for revert: for (final c in kReadyOrder).
                       PregRowCard(children: [
-                        for (final c in kReadyOrder) _categoryRow(r, c),
+                        for (final c in readyOrderFor(afterLoss: r.afterLoss))
+                          _categoryRow(r, c),
                       ]),
                       const SizedBox(height: 8),
                       _startAgainLink(),
@@ -272,7 +379,10 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
   Widget _hero(_Readiness r) {
     final p = pvStorePalette;
     final w = widget.controller.currentWeek;
-    final due = widget.controller.isDueDateSet ? widget.controller.daysToDueDate : null;
+    // After a loss the week and the days to the due date step aside (D4).
+    final due = widget.controller.isDueDateSet && !r.afterLoss
+        ? widget.controller.daysToDueDate
+        : null;
     final dueLine = due == null
         ? null
         : (due > 0
@@ -281,14 +391,19 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     return PregCard(
       padding: const EdgeInsets.all(18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(S.now.rfbWeekCaps(w).toUpperCase(), style: pregGroupLabelStyle()),
-        const SizedBox(height: 10),
+        if (!r.afterLoss) ...[
+          Text(S.now.rfbWeekCaps(w).toUpperCase(), style: pregGroupLabelStyle()),
+          const SizedBox(height: 10),
+        ],
         Row(children: [
           _ring(r.percent, r.isReady),
           const SizedBox(width: 18),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(r.isReady ? S.now.rfbReadyForBirth : S.now.rfbGettingReady,
+              Text(
+                  r.isReady
+                      ? (r.afterLoss ? 'All packed' : S.now.rfbReadyForBirth)
+                      : S.now.rfbGettingReady,
                   style: pvFraunces(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
@@ -367,7 +482,11 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
             const Icon(Icons.check_circle_rounded, color: kPvInk),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(S.now.uiEverythingPackedIfBaby,
+              // "If your baby comes tonight" steps aside after a loss (D4).
+              child: Text(
+                  r.afterLoss
+                      ? 'Everything is packed.'
+                      : S.now.uiEverythingPackedIfBaby,
                   style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1)),
             ),
           ]),
@@ -404,9 +523,14 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
     final insights = readyInsights(
       week: widget.controller.currentWeek,
       delivery: _ctx.delivery,
-      season: _ctx.season,
+      // Kept for revert (P4 H3): season: _ctx.season (today's month).
+      season: _ctx.seasonFor(
+          dueDate: widget.controller.isDueDateSet
+              ? widget.controller.dueDate
+              : null),
       twins: _ctx.twins,
       hospitalProvides: _ctx.hospitalProvides,
+      afterLoss: r.afterLoss,
     ).take(3).toList();
     if (insights.isEmpty) return const [];
     return [
@@ -492,8 +616,9 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Icon(Icons.notifications_active_outlined, size: 19, color: kPvUrgentInk),
             const SizedBox(width: 10),
+            // After a loss there is no labour to ask about (D4).
             Flexible(
-                child: Text(S.now.uiLabourStarted,
+                child: Text(_ended ? _kGoingInNow : S.now.uiLabourStarted,
                     textAlign: TextAlign.center, style: _buttonText())),
           ]),
         ),
@@ -538,7 +663,15 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
         isScrollControlled: true,
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
-        builder: (_) => _PersonalizeSheet(ctx: ctx),
+        builder: (_) => _PersonalizeSheet(
+          ctx: ctx,
+          // The season "Auto" reads (P4 H3): the due date's month.
+          autoSeason: seasonForMonth((widget.controller.isDueDateSet
+                  ? widget.controller.dueDate
+                  : DateTime.now())
+              .month),
+          dueDateSet: widget.controller.isDueDateSet,
+        ),
       );
 }
 
@@ -546,18 +679,32 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
 //  Shared: an editorial item card (used by Category + Guided flows).
 // ===========================================================================
 class _ItemCard extends StatelessWidget {
-  const _ItemCard({required this.item, required this.lang, required this.onToggle, this.onNeedOne, this.onNotNeeded});
+  const _ItemCard(
+      {required this.item,
+      required this.lang,
+      required this.onToggle,
+      this.onNeedOne,
+      this.onNotNeeded,
+      this.onRename,
+      this.onRemove});
   final BagItem item;
   final AppLanguage lang;
   final VoidCallback onToggle;
   final VoidCallback? onNeedOne;
   final VoidCallback? onNotNeeded;
 
+  /// Her own items only (P4 H5): rename, and remove with Undo.
+  final VoidCallback? onRename;
+  final VoidCallback? onRemove;
+
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
     final packed = item.packed;
-    final showActions = !packed && (onNeedOne != null || onNotNeeded != null);
+    // Her own item can be renamed or removed whether packed or not.
+    final ownActions = onRename != null || onRemove != null;
+    final showActions =
+        ownActions || (!packed && (onNeedOne != null || onNotNeeded != null));
     // Kept for revert: a packed card took a brown edge (tertiary200).
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -577,7 +724,7 @@ class _ItemCard extends StatelessWidget {
               if (showActions) ...[
                 const SizedBox(height: 10),
                 Wrap(spacing: 16, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
-                  if (onNeedOne != null)
+                  if (onNeedOne != null && !packed)
                     InkWell(
                       onTap: onNeedOne,
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -587,10 +734,24 @@ class _ItemCard extends StatelessWidget {
                         Icon(Icons.chevron_right_rounded, size: 16, color: p.ink1),
                       ]),
                     ),
-                  if (onNotNeeded != null)
+                  if (onNotNeeded != null && !packed && !ownActions)
                     InkWell(
                       onTap: onNotNeeded,
                       child: Text(S.now.uiIDonTNeed,
+                          style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
+                    ),
+                  if (onRename != null)
+                    InkWell(
+                      key: ValueKey('rfb_rename_${item.id}'),
+                      onTap: onRename,
+                      child: Text('Rename',
+                          style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: p.ink1)),
+                    ),
+                  if (onRemove != null)
+                    InkWell(
+                      key: ValueKey('rfb_remove_${item.id}'),
+                      onTap: onRemove,
+                      child: Text('Remove',
                           style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink3)),
                     ),
                 ]),
@@ -655,9 +816,10 @@ class _CategoryScreenState extends State<_CategoryScreen> {
       // Kept for revert: appBar: AppBar(title: Text(meta.label.now)).
       appBar: AppBar(),
       body: AnimatedBuilder(
-        animation: Listenable.merge([_bag, _ctx]),
+        // Kept for revert: animation: Listenable.merge([_bag, _ctx]).
+        animation: _watch(_bag, _ctx),
         builder: (context, _) {
-          final r = _Readiness(_bag, _ctx);
+          final r = _Readiness(_bag, _ctx, afterLoss: _ended);
           final items = r.inCat(widget.category);
           final packed = items.where((i) => i.packed).length;
           final provided = _bag.active
@@ -675,7 +837,10 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                 Expanded(child: _pageTitle(meta.label.now)),
               ]),
               const SizedBox(height: 12),
-              Text(meta.blurb.now, style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
+              // Kept for revert: Text(meta.blurb.now, ...). The father preview
+              // reads "For her" on her things (P4 H5).
+              Text(readyCatBlurb(widget.category, father: FatherPreview.instance.on),
+                  style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
               const SizedBox(height: 2),
               Text(S.now.rfbPackedOf(packed, items.length),
                   style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
@@ -684,11 +849,16 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                 _ItemCard(
                   item: i,
                   lang: widget.controller.language,
+                  // Pack and unpack stay silent: the tick itself shows it.
                   onToggle: () => _bag.togglePacked(i.id),
                   onNeedOne: bagIsSellable(i.id, isCustom: i.isCustom)
                       ? () => _push(context, _BagOptionsScreen(controller: widget.controller, itemId: i.id))
                       : null,
-                  onNotNeeded: () => _bag.moveToMaybeLater(i.id),
+                  // Kept for revert (P4 H5, a silent save):
+                  // onNotNeeded: () => _bag.moveToMaybeLater(i.id),
+                  onNotNeeded: () => _setAside(i),
+                  onRename: i.isCustom ? () => _rename(i) : null,
+                  onRemove: i.isCustom ? () => _remove(i) : null,
                 ),
               if (notNeeded.isNotEmpty) ...[
                 const SizedBox(height: 14),
@@ -710,7 +880,9 @@ class _CategoryScreenState extends State<_CategoryScreen> {
                             Expanded(child: Text(notNeeded[k].name.of(widget.controller.language),
                                 style: pvManrope(fontSize: 13.5, color: p.ink2))),
                             TextButton(
-                              onPressed: () => _bag.restore(notNeeded[k].id),
+                              // Kept for revert (P4 H5, a silent save):
+                              // onPressed: () => _bag.restore(notNeeded[k].id),
+                              onPressed: () => _addBack(notNeeded[k]),
                               // Kept for revert: foregroundColor: AppTheme.primary.
                               style: TextButton.styleFrom(foregroundColor: kPvInk, visualDensity: VisualDensity.compact),
                               child: Text(S.now.uiAddBack,
@@ -785,10 +957,21 @@ class _CategoryScreenState extends State<_CategoryScreen> {
               ),
               const SizedBox(height: 14),
               FilledButton(
+                // Kept for revert (P4 H5): an empty name closed the sheet and
+                // saved nothing, silently; a name saved without a word.
+                //   final name = ctrl.text.trim();
+                //   if (name.isNotEmpty) _bag.addCustomItem(name, _bagCatFor(widget.category));
+                //   Navigator.of(ctx).pop();
                 onPressed: () {
                   final name = ctrl.text.trim();
-                  if (name.isNotEmpty) _bag.addCustomItem(name, _bagCatFor(widget.category));
+                  if (name.isEmpty) {
+                    pvToast(ctx, 'Add a name first.');
+                    return;
+                  }
+                  _bag.addCustomItem(name, _bagCatFor(widget.category));
                   Navigator.of(ctx).pop();
+                  pvToast(context, 'Added $name to your bag.',
+                      kind: PvToastKind.done);
                 },
                 // Kept for revert: backgroundColor: AppTheme.primary.
                 style: _filled(height: 50),
@@ -797,6 +980,73 @@ class _CategoryScreenState extends State<_CategoryScreen> {
             ]),
           ),
         ),
+      ),
+    );
+  }
+
+  // ---- every save says what it changed (P4 H5, 2026-10-28) -----------------
+
+  /// "I don't need this": set aside, said, and one tap to take it back.
+  void _setAside(BagItem i) {
+    _bag.moveToMaybeLater(i.id);
+    pvToast(context, '${i.name.of(widget.controller.language)} set aside. It no longer counts.',
+        kind: PvToastKind.undo,
+        action: 'Undo',
+        onAction: () => _bag.restore(i.id));
+  }
+
+  /// "Add back" from Not for us.
+  void _addBack(BagItem i) {
+    _bag.restore(i.id);
+    pvToast(context, '${i.name.of(widget.controller.language)} is back on your list.',
+        kind: PvToastKind.done);
+  }
+
+  /// Removes one of her own items, with Undo putting it back in its place.
+  void _remove(BagItem i) {
+    final at = _bag.indexOf(i.id);
+    _bag.removeItem(i.id);
+    pvToast(context, '${i.name.en} removed from your bag.',
+        kind: PvToastKind.undo,
+        action: 'Undo',
+        onAction: () => _bag.restoreItemAt(i, at));
+  }
+
+  /// Renames one of her own items.
+  void _rename(BagItem i) {
+    final ctrl = TextEditingController(text: i.name.en);
+    showDialog<void>(
+      context: context,
+      builder: (dctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text('Rename', style: _sheetTitleStyle()),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+        ),
+        actions: [
+          TextButton(
+              style: TextButton.styleFrom(foregroundColor: pvStorePalette.ink1),
+              onPressed: () => Navigator.of(dctx).pop(),
+              child: Text(S.now.uiCancel3)),
+          FilledButton(
+            style: pregFilledStyle(),
+            onPressed: () async {
+              final name = ctrl.text.trim();
+              if (name.isEmpty) {
+                pvToast(dctx, 'Add a name first.');
+                return;
+              }
+              Navigator.of(dctx).pop();
+              await _bag.renameCustomItem(i.id, name);
+              if (mounted) {
+                pvToast(context, 'Renamed to $name.', kind: PvToastKind.done);
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }
@@ -821,8 +1071,11 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
   Widget build(BuildContext context) {
     final p = pvStorePalette;
     // Only the categories that still have something to do.
-    final r0 = _Readiness(_bag, _ctx);
-    final steps = kGuidedOrder.where((c) => r0.totalIn(c) > 0).toList();
+    // After a loss there is no Baby step (D4). Kept for revert:
+    //   final r0 = _Readiness(_bag, _ctx);
+    //   final steps = kGuidedOrder.where((c) => r0.totalIn(c) > 0).toList();
+    final r0 = _Readiness(_bag, _ctx, afterLoss: _ended);
+    final steps = r0.guidedOrder.where((c) => r0.totalIn(c) > 0).toList();
     if (steps.isEmpty || _step >= steps.length) return _done();
 
     final cat = steps[_step];
@@ -836,7 +1089,7 @@ class _GuidedPackingScreenState extends State<_GuidedPackingScreen> {
       body: AnimatedBuilder(
         animation: _bag,
         builder: (context, _) {
-          final r = _Readiness(_bag, _ctx);
+          final r = _Readiness(_bag, _ctx, afterLoss: _ended);
           final items = r.inCat(cat);
           final remaining = items.where((i) => !i.packed).length;
           return Column(children: [
@@ -942,6 +1195,7 @@ class _EmergencyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
+    final afterLoss = _ended;
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       // Kept for revert: appBar: AppBar(title: Text(S.now.uiLabourStarted)).
@@ -949,7 +1203,8 @@ class _EmergencyScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
         children: [
-          _pageTitle(S.now.uiLabourStarted),
+          // After a loss the page is about her, not labour (D4).
+          _pageTitle(afterLoss ? _kGoingInNow : S.now.uiLabourStarted),
           const SizedBox(height: 16),
           // Kept for revert: these two lines sat on a coral block
           // (secondary50 / secondary100, radius 22) in secondary900. The same
@@ -958,8 +1213,69 @@ class _EmergencyScreen extends StatelessWidget {
               style: pvFraunces(
                   fontSize: 21, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1)),
           const SizedBox(height: 8),
-          Text(S.now.uiHaveTimeCallDoctor,
-              style: pvManrope(fontSize: 15, height: 1.5, fontWeight: FontWeight.w600, color: p.ink1)),
+          // ⚠️ P4 H1 (2026-10-28): "You have time." promised what no page can
+          // know, with no red flags and no number to call. Kept for revert:
+          // Text(S.now.uiHaveTimeCallDoctor, ...).
+          Text(afterLoss ? kAfterLossCallLine : kLabourCallLine,
+              key: const ValueKey('rfb_call_line'),
+              style: pvManrope(fontSize: 15, height: 1.5, fontWeight: FontWeight.w700, color: p.ink1)),
+          const SizedBox(height: 4),
+          Text(kLabourCallFirst,
+              style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
+          const SizedBox(height: 18),
+          // The signs that mean now. A white card with the hairline; the one
+          // urgent rose is the mark, not a block behind the words.
+          PregCard(
+            key: const ValueKey('rfb_red_flags'),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Icon(Icons.warning_amber_rounded, size: 20, color: kPvUrgentInk),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(afterLoss ? kAfterLossRedFlagsHeading : kLabourRedFlagsHeading,
+                      style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800, height: 1.35, color: p.ink1)),
+                ),
+              ]),
+              const SizedBox(height: 10),
+              for (final f in afterLoss ? kAfterLossRedFlags : kLabourRedFlags)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6, left: 4),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('•  ', style: pvManrope(fontSize: 14, color: p.ink1)),
+                    Expanded(child: Text(f,
+                        style: pvManrope(fontSize: 14, height: 1.4, color: p.ink1))),
+                  ]),
+                ),
+              const SizedBox(height: 8),
+              FilledButton.icon(
+                key: const ValueKey('rfb_call_108'),
+                onPressed: () => _call108(context),
+                style: _filled(height: 50),
+                icon: const Icon(Icons.call_rounded, size: 19),
+                label: Text('Call $kEmergencyNumber', style: _buttonText()),
+              ),
+              // Both numbers (the user, 2026-10-28): 108 for any emergency, 102
+              // the free maternity ambulance most states run.
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                key: const ValueKey('rfb_call_102'),
+                onPressed: () => _callNumber(context, kMaternityAmbulanceNumber),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                  foregroundColor: p.ink1,
+                  side: BorderSide(color: p.ink1),
+                  shape: const StadiumBorder(),
+                ),
+                icon: const Icon(Icons.call_outlined, size: 19),
+                label: Text('Call $kMaternityAmbulanceNumber',
+                    style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+              ),
+              const SizedBox(height: 8),
+              Text(kAmbulanceNumbersLine,
+                  style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
+            ]),
+          ),
           const SizedBox(height: 26),
           // Kept for revert: Text(uiTakeTheseFirst, titleMedium).
           PregSectionHeading(S.now.uiTakeTheseFirst),
@@ -996,12 +1312,30 @@ class _EmergencyScreen extends StatelessWidget {
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(Icons.directions_car_outlined, size: 22, color: p.ink1),
             const SizedBox(width: 12),
-            Expanded(child: Text(S.now.uiThenLeaveHospitalVe,
+            // "You're ready" is a birth line; after a loss, just the going.
+            Expanded(child: Text(
+                afterLoss ? 'Then leave for the hospital.' : S.now.uiThenLeaveHospitalVe,
                 style: pvManrope(fontSize: 15, height: 1.45, fontWeight: FontWeight.w700, color: p.ink1))),
           ]),
         ],
       ),
     );
+  }
+
+  /// Dials 108. A phone that cannot dial says so and gives the number.
+  Future<void> _call108(BuildContext context) =>
+      _callNumber(context, kEmergencyNumber);
+
+  /// Dials [number]; a phone that cannot dial says so and gives the number.
+  Future<void> _callNumber(BuildContext context, String number) async {
+    var ok = false;
+    try {
+      ok = await launchUrl(Uri(scheme: 'tel', path: number));
+    } catch (_) {/* said below */}
+    if (!ok && context.mounted) {
+      pvToast(context,
+          "This phone couldn't start the call. Dial $number yourself.");
+    }
   }
 }
 
@@ -1009,8 +1343,13 @@ class _EmergencyScreen extends StatelessWidget {
 //  Personalise sheet
 // ===========================================================================
 class _PersonalizeSheet extends StatefulWidget {
-  const _PersonalizeSheet({required this.ctx});
+  const _PersonalizeSheet(
+      {required this.ctx, required this.autoSeason, required this.dueDateSet});
   final ReadyBirthContextStore ctx;
+
+  /// What "Auto" means for her: the due date's season (P4 H3).
+  final Season autoSeason;
+  final bool dueDateSet;
   @override
   State<_PersonalizeSheet> createState() => _PersonalizeSheetState();
 }
@@ -1033,39 +1372,64 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
           Text(S.now.uiFewDetailsMakeSuggestions, style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
           const SizedBox(height: 20),
 
+          // Kept for revert (P4 H5): each pick was a silent `_set(() =>
+          // _ctx.setDelivery(..))`, and the bag kept the old delivery's items.
           _label(S.now.rfbDeliveryType),
           Row(children: [
-            _pick(S.now.rfbNotSure, _ctx.delivery == DeliveryType.unsure, () => _set(() => _ctx.setDelivery(DeliveryType.unsure))),
+            _pick(S.now.rfbNotSure, _ctx.delivery == DeliveryType.unsure, () => _setDelivery(DeliveryType.unsure, S.now.rfbNotSure)),
             const SizedBox(width: 8),
-            _pick('Vaginal', _ctx.delivery == DeliveryType.vaginal, () => _set(() => _ctx.setDelivery(DeliveryType.vaginal))),
+            _pick('Vaginal', _ctx.delivery == DeliveryType.vaginal, () => _setDelivery(DeliveryType.vaginal, 'Vaginal')),
             const SizedBox(width: 8),
-            _pick('C-section', _ctx.delivery == DeliveryType.csection, () => _set(() => _ctx.setDelivery(DeliveryType.csection))),
+            _pick('C-section', _ctx.delivery == DeliveryType.csection, () => _setDelivery(DeliveryType.csection, 'C-section')),
           ]),
           const SizedBox(height: 18),
 
           _label(S.now.rfbSeasonOfDue),
           Wrap(spacing: 8, runSpacing: 8, children: [
-            _pick('Auto', _ctx.seasonOverride == null, () => _set(() => _ctx.setSeasonOverride(null)), expand: false),
+            _pick('Auto', _ctx.seasonOverride == null, () => _set(() => _ctx.setSeasonOverride(null),
+                    said: 'Season follows ${widget.dueDateSet ? 'your due date' : 'the month'}: ${seasonLabel(widget.autoSeason)}.'),
+                expand: false),
             for (final s in Season.values)
-              _pick(seasonLabel(s), _ctx.seasonOverride == s, () => _set(() => _ctx.setSeasonOverride(s)), expand: false),
+              _pick(seasonLabel(s), _ctx.seasonOverride == s,
+                  () => _set(() => _ctx.setSeasonOverride(s), said: 'Season set to ${seasonLabel(s)}.'),
+                  expand: false),
           ]),
+          const SizedBox(height: 6),
+          // What "Auto" reads, so the choice explains itself (P4 H3).
+          Text(
+              widget.dueDateSet
+                  ? 'Auto uses your due date: ${seasonLabel(widget.autoSeason)}.'
+                  : 'Auto uses this month until you add a due date: ${seasonLabel(widget.autoSeason)}.',
+              style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
           const SizedBox(height: 18),
 
-          Row(children: [
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(S.now.uiExpectingTwins,
-                  style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
-              Text(S.now.uiWeLlSuggestFew, style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
-            ])),
-            Switch(value: _ctx.twins, onChanged: (v) => _set(() => _ctx.setTwins(v))), // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: AppTheme.primary
-          ]),
-          const SizedBox(height: 8),
+          // After a loss the twins question steps aside (D4), and so does
+          // what the hospital provides (every one of them is a baby thing).
+          if (!_ended) ...[
+            Row(children: [
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(S.now.uiExpectingTwins,
+                    style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+                Text(S.now.uiWeLlSuggestFew, style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
+              ])),
+              Switch(
+                  value: _ctx.twins,
+                  onChanged: (v) => _set(() => _ctx.setTwins(v),
+                      said: v ? "Twins on. We'll suggest a few extras." : 'Twins off.')), // Kept for revert (2026-09-28, one black switch app-wide): activeThumbColor: AppTheme.primary
+            ]),
+            const SizedBox(height: 8),
 
-          _label(S.now.rfbHospitalProvides),
-          Wrap(spacing: 8, runSpacing: 8, children: [
-            for (final e in kHospitalProvidableLabel.entries)
-              _pick(e.value.now, _ctx.providesFor(e.key), () => _set(() => _ctx.toggleProvides(e.key)), expand: false),
-          ]),
+            _label(S.now.rfbHospitalProvides),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final e in kHospitalProvidableLabel.entries)
+                _pick(e.value.now, _ctx.providesFor(e.key),
+                    () => _set(() => _ctx.toggleProvides(e.key),
+                        said: _ctx.providesFor(e.key)
+                            ? '${e.value.en} are back on your list.'
+                            : '${e.value.en}: your hospital provides them, so they\'re off your list.'),
+                    expand: false),
+            ]),
+          ],
           const SizedBox(height: 22),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -1078,7 +1442,45 @@ class _PersonalizeSheetState extends State<_PersonalizeSheet> {
     );
   }
 
-  void _set(VoidCallback f) { f(); setState(() {}); }
+  // Kept for revert (P4 H5, every save silent):
+  //   void _set(VoidCallback f) { f(); setState(() {}); }
+  /// Applies a change and says what it changed (the app explains itself).
+  void _set(VoidCallback f, {String? said}) {
+    f();
+    setState(() {});
+    if (said != null) pvToast(context, said, kind: PvToastKind.done);
+  }
+
+  /// A new delivery type changes her bag ADDITIVELY (P4 H5): the items only
+  /// that delivery needs come in unticked, the ones it does not need go out
+  /// unless she packed them, and every other tick stays. It used to change
+  /// nothing until "Start again", which cleared every tick.
+  Future<void> _setDelivery(DeliveryType d, String label) async {
+    if (_ctx.delivery == d) return;
+    await _ctx.setDelivery(d);
+    final only = bagDeliveryOnlyIds();
+    final wanted = [
+      for (final i in generateDefaultBag(d))
+        if (only.contains(i.id)) i,
+    ];
+    final r = await HospitalBagV2Store.instance.syncDefaults(
+      wanted: wanted,
+      dropIfUnpacked: only.difference({for (final w in wanted) w.id}),
+      delivery: d,
+    );
+    if (!mounted) return;
+    setState(() {});
+    final changes = [
+      if (r.added > 0) 'added ${r.added} item${r.added == 1 ? '' : 's'} for after a caesarean',
+      if (r.removed > 0) 'took out ${r.removed} caesarean item${r.removed == 1 ? '' : 's'}',
+    ];
+    pvToast(
+        context,
+        changes.isEmpty
+            ? 'Delivery type: $label.'
+            : 'Delivery type: $label. We ${changes.join(' and ')}; your ticks are kept.',
+        kind: PvToastKind.done);
+  }
 
   Widget _label(String s) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
@@ -1162,12 +1564,30 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
                     Text(S.now.uiHowChoose,
                         style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1)),
                     const SizedBox(height: 6),
-                    Text(S.now.rfbWhyThenPicks(whyPack(item)),
+                    // Kept for revert (P4 H4): S.now.rfbWhyThenPicks(whyPack(item)),
+                    // which promised "our picks below"; there are none now.
+                    Text(whyPack(item),
                         style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
                   ]),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 18),
+              // P4 D1 (2026-10-28): the live store, never an invented pick or
+              // a price no one read. The store's search on the item, else a
+              // tagged Amazon search.
+              FilledButton.icon(
+                key: const ValueKey('rfb_see_in_store'),
+                onPressed: () => _openInStore(context, item),
+                style: _filled(height: 50),
+                icon: const Icon(Icons.storefront_outlined, size: 19),
+                label: Text(_kSeeInStore, style: _buttonText()),
+              ),
+              const SizedBox(height: 8),
+              Text(kPvCommissionLine,
+                  style: pvManrope(fontSize: 11.5, height: 1.4, color: p.ink3)),
+              const SizedBox(height: 18),
+              // Kept for revert (P4 H4): the picks and the retailer cards.
+              // bagProductsFor returns nothing now, so both stay hidden.
               if (picks.isNotEmpty) ...[
                 // Kept for revert: Text(uiOurPicks, titleMedium).
                 PregSectionHeading(S.now.uiOurPicks),
@@ -1190,18 +1610,28 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
               // secondaryContainer on a pregnancy screen). The second action is
               // the outlined ink stadium.
               OutlinedButton(
+                // Kept for revert (P4 H5, a silent save): setStatus then pop.
                 onPressed: () {
+                  final label = item.name.of(_lang);
                   _bag.setStatus(item.id, BagItemStatus.have);
                   Navigator.of(context).pop();
+                  pvToast(context, "$label marked as got. Pack it when you're ready.",
+                      kind: PvToastKind.done);
                 },
                 style: _outlined(height: 50),
                 child: Text(S.now.uiIVeAlreadyGot, style: _buttonText()),
               ),
               const SizedBox(height: 10),
               TextButton(
+                // Kept for revert (P4 H5, a silent save): moveToMaybeLater then pop.
                 onPressed: () {
+                  final label = item.name.of(_lang);
                   _bag.moveToMaybeLater(item.id);
                   Navigator.of(context).pop();
+                  pvToast(context, '$label set aside. It no longer counts.',
+                      kind: PvToastKind.undo,
+                      action: 'Undo',
+                      onAction: () => _bag.restore(item.id));
                 },
                 style: TextButton.styleFrom(foregroundColor: p.ink2),
                 child: Text(S.now.uiIDonTNeed,
@@ -1234,12 +1664,14 @@ class _BagOptionsScreenState extends State<_BagOptionsScreen> {
           //
           // Old line kept for revert:
           // launchUrl(Uri.parse(p.link), mode: LaunchMode.externalApplication);
-          openProductWithGuideCheck(
-            context,
-            id: p.id,
-            name: p.name.now,
-            onOpenNormal: () => openOutbound(p.link, productId: p.id),
-          );
+          // Kept for revert (P4 D1; nothing reaches this card now):
+          // openProductWithGuideCheck(
+          //   context,
+          //   id: p.id,
+          //   name: p.name.now,
+          //   onOpenNormal: () => openOutbound(p.link, productId: p.id),
+          // );
+          openOutbound(p.link, productId: p.id);
         }
       } else {
         _bag.chooseVedaProduct(item.id, productId: p.id, price: p.price);

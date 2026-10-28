@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvIsRetiredSeedId;
 
 import 'development_activity_screen.dart';
 import 'pp_child_profile.dart';
@@ -243,7 +244,12 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
     );
   }
 
-  bool get _hasLinks => it.relatedArticleId != null || it.relatedVideoId != null || it.relatedActivityId != null || it.relatedProductId != null;
+  // Kept for revert (seed retired 2026-10-28): `|| it.relatedProductId != null`.
+  bool get _hasLinks => it.relatedArticleId != null || it.relatedVideoId != null || it.relatedActivityId != null || _hasProductLink;
+
+  /// A related product that is real: a retired seed id is not one.
+  bool get _hasProductLink =>
+      it.relatedProductId != null && !pvIsRetiredSeedId(it.relatedProductId!);
 
   List<Widget> _linkRows() {
     final rows = <Widget>[];
@@ -259,7 +265,12 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
       final act = devActivityById(it.relatedActivityId!);
       rows.add(_linkRow(Icons.extension_outlined, 'Try', act.title, () => _push(DevelopmentActivityScreen(activity: act))));
     }
-    if (it.relatedProductId != null) {
+    // ⚠️ NO SEED PRODUCTS (2026-10-28, the user: "no need to have fake
+    // situations in the app... show whatever we have"). Every related
+    // product here is an invented seed ('dozy', 'playgym'), out of the store
+    // now (pv_catalog_adapters.dart); the row shows only while the seed is on
+    // (a demo build). Kept for revert: if (it.relatedProductId != null) {
+    if (_hasProductLink) {
       final p = productById(it.relatedProductId!);
       rows.add(_linkRow(Icons.shopping_bag_outlined, 'Shop', p.name, () => _push(ProductDetailScreen(product: p))));
     }

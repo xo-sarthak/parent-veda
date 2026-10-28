@@ -55,6 +55,7 @@ import '../screens/doors/pv_door_router.dart'
 import '../screens/reader/pv_reader_screen.dart' show PvReaderScreen;
 import '../screens/doors/pv_door_screen.dart' show PvDoorScreen;
 import '../screens/journal_screen.dart';
+import '../screens/nutrition/door/shopping_list_screen.dart';
 import '../screens/pregnancy/birth_plan_screen.dart';
 import '../screens/reminders_screen.dart';
 import '../screens/tools/baby_movement_screen.dart';
@@ -70,7 +71,7 @@ import '../screens/tools/weight_tracker_screen.dart';
 import '../services/bracket_resolver.dart' show bracketById;
 import '../services/father_preview.dart';
 import '../services/pregnancy_controller.dart';
-import '../services/pregnancy_ended_store.dart';
+// import '../services/pregnancy_ended_store.dart'; // kept for revert (P4 D4): only the after-loss set read it
 import '../widgets/pv_toast.dart';
 
 const String kPvVedaReadPrefix = 'pvread_';
@@ -165,6 +166,13 @@ final List<PvVedaTool> kPvVedaTools = [
       'Log the numbers your doctor asked for, and share them', 'tools/readings',
       (c) => ReadingsLogScreen(controller: c),
       keywords: const ['bp', 'blood pressure', 'blood sugar', 'glucose']),
+  // P4 S4 (2026-10-28): "shopping list" opened the baby Product checklist.
+  // The food list is its own tool now, a Track row on Tools. Takes effect in
+  // Ask Veda at the next corpus export and ingest.
+  PvVedaTool('shopping_list', (_) => 'Shopping list',
+      'What the recipes and diet chart days you picked need', 'nutrition/list',
+      (_) => const ShoppingListScreen(),
+      keywords: const ['shopping list', 'grocery', 'groceries', 'ingredients']),
   PvVedaTool('kegel', (s) => s.toolKegelTitle,
       'A few minutes a day for your pelvic floor', 'tools/kegel',
       (c) => KegelCareScreen(controller: c),
@@ -172,7 +180,8 @@ final List<PvVedaTool> kPvVedaTools = [
   PvVedaTool('reminders', (s) => s.rmdTitle,
       'What we remind you about, and when', 'tools/reminders',
       (c) => RemindersScreen(controller: c)),
-  PvVedaTool('hospital_bag', (s) => s.hbName,
+  // One name per tool (P4): as the Tools row. Kept for revert: (s) => s.hbName.
+  PvVedaTool('hospital_bag', (_) => 'Hospital bag',
       'What to pack for you, your baby and your partner', 'tools/hospital_bag',
       (c) => ReadyForBirthScreen(controller: c),
       keywords: const ['packing', 'labour bag', 'delivery bag']),
@@ -180,7 +189,9 @@ final List<PvVedaTool> kPvVedaTools = [
       'What you would like on the day, to share with your doctor',
       kLabourSurfaceBirthPlan, (c) => BirthPlanScreen(pregnancy: c),
       keywords: const ['delivery preferences']),
-  PvVedaTool('contractions', (s) => s.toolContractionTitle,
+  // One name per tool (P4): as the Tools row. Kept for revert:
+  // (s) => s.toolContractionTitle.
+  PvVedaTool('contractions', (_) => 'Contraction timer',
       'Time your contractions and see when to go in', 'tools/contractions',
       (c) => ContractionTrackerScreen(controller: c),
       keywords: const ['labour pains', 'timer', 'when to go to hospital']),
@@ -191,7 +202,9 @@ final List<PvVedaTool> kPvVedaTools = [
   PvVedaTool('product_checklist', (s) => s.pclTitle,
       'What you really need before the baby comes', 'tools/product_checklist',
       (c) => ProductChecklistScreen(controller: c),
-      keywords: const ['shopping list', 'baby things']),
+      // P4 S4: "shopping list" is the food list's now. Kept for revert:
+      //   keywords: const ['shopping list', 'baby things']
+      keywords: const ['baby things', 'what to buy', 'baby shopping']),
   PvVedaTool('journal', (s) => s.jrTitle, 'Write to yourself, or to your baby',
       'journal', (c) => JournalScreen(controller: c),
       keywords: const ['diary', 'letters']),
@@ -211,19 +224,22 @@ final List<PvVedaTool> kPvVedaTools = [
 ];
 
 /// Why a tool link does not open right now, or null when it does: the same
-/// two rules as the Tools hub. Her bump photos are hers in the partner
-/// preview, and Get ready steps aside after a loss (R3).
+/// rules as the Tools hub. Her bump photos are hers in the partner preview.
+///
+/// P4 D4 (2026-10-28): Get ready no longer steps aside after a loss, on Tools
+/// or here; each tool says what has changed at its top. (`due_date` was
+/// already stale in this set since P3 brought it back.) Kept for revert:
+///   const getReady = {
+///     'hospital_bag', 'birth_plan', 'contractions', 'due_date',
+///     'product_checklist',
+///   };
+///   if (getReady.contains(id) && PregnancyEndedStore.instance.ended) {
+///     return 'This steps aside after a loss. It comes back if you go back to '
+///         'your pregnancy view.';
+///   }
 String? pvVedaToolStepsAside(String id) {
   if (id == 'bump' && FatherPreview.instance.on) {
     return 'Her bump photos are hers. Your own journal is on your Tools tab.';
-  }
-  const getReady = {
-    'hospital_bag', 'birth_plan', 'contractions', 'due_date',
-    'product_checklist',
-  };
-  if (getReady.contains(id) && PregnancyEndedStore.instance.ended) {
-    return 'This steps aside after a loss. It comes back if you go back to '
-        'your pregnancy view.';
   }
   return null;
 }

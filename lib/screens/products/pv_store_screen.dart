@@ -19,6 +19,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/products/pv_coming_soon.dart' show pvComingSoonLast;
 import '../../models/pv_product.dart';
 import '../../services/cart_store.dart';
 import '../../services/life_stage_store.dart';
@@ -607,13 +608,16 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
         ),
       );
     }
-    final sorted = [...items]
+    // "Coming soon" place-holders after every real product (2026-10-28);
+    // Dart's sort is not stable, so the order is re-stated after it.
+    // Kept for revert: final sorted = [...items]..sort(...);
+    final sorted = pvComingSoonLast([...items]
       ..sort((a, b) {
         final ra = a.reco?.band.rank ?? 9;
         final rb = b.reco?.band.rank ?? 9;
         if (ra != rb) return ra.compareTo(rb);
         return b.reviewCount.compareTo(a.reviewCount);
-      });
+      }));
     return Padding(
       padding: const EdgeInsets.only(top: 18),
       child: Column(

@@ -81,6 +81,8 @@ import 'pv_checkout_screen.dart';
 import 'pv_compare_screen.dart';
 import 'pv_gallery_screen.dart';
 import 'pv_review_block.dart';
+import 'pv_shelf_screen.dart';
+import '../../data/products/pv_coming_soon.dart' show kPvComingSoonLine;
 import 'pv_reviews_screen.dart';
 import 'pv_store_chrome.dart';
 import 'pv_store_marks.dart' show kPvStoreMarkHue;
@@ -529,6 +531,9 @@ class _PvProductScreenState extends State<PvProductScreen>
     final p = pvStorePalette;
     final product = _product;
     if (product == null) return _gone(p);
+    // A "Coming soon" place-holder (2026-10-28, pv_coming_soon.dart): no
+    // price, no buy bar, nothing invented.
+    if (product.comingSoon) return _comingSoon(p, product);
     // A shortlisted book that has a full ParentVeda companion opens the
     // companion, not a thin product page (2026-10-13).
     if (sheetBookCompanionFor(product) case final d?) {
@@ -620,6 +625,88 @@ class _PvProductScreenState extends State<PvProductScreen>
             listenable: CartStore.instance,
             builder: (context, _) => _stickyBar(p, product),
           ),
+        ],
+      ),
+    );
+  }
+
+  /// ⚠️ A GAP, NOT A PRODUCT (2026-10-28, the user: "wherever a product or
+  /// category is essential and the sheet does not cover it, have it, but
+  /// say Coming soon on it"). The shelf's cover, the plain name, the pill,
+  /// what belongs here, and one calm line. No brand, price, rating, review,
+  /// spec or buy bar: there is no product behind it yet. The heart stays
+  /// (saving it costs nothing), and the shelf it stands on is one tap away.
+  Widget _comingSoon(V2Palette p, PvProduct product) {
+    final cat = PvCatalogStore.instance.category(product.categoryId);
+    return Scaffold(
+      backgroundColor: p.ground,
+      body: Stack(
+        children: [
+          CustomScrollView(
+            controller: _scroll,
+            slivers: [
+              SliverToBoxAdapter(child: _gallery(p, product)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.name,
+                        style: pvFraunces(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w500,
+                          height: 1.15,
+                          color: p.ink1,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const PvComingSoonPill(size: 15),
+                      if (product.summary.isNotEmpty) ...[
+                        const SizedBox(height: 14),
+                        Text(
+                          product.summary,
+                          style: pvManrope(
+                            fontSize: 14.5,
+                            height: 1.5,
+                            color: p.ink1,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+                      Text(
+                        kPvComingSoonLine,
+                        key: const ValueKey('pv_coming_soon_line'),
+                        style: pvManrope(
+                          fontSize: 14,
+                          height: 1.5,
+                          color: p.ink2,
+                        ),
+                      ),
+                      if (cat != null) ...[
+                        const SizedBox(height: 18),
+                        PvSecondary(
+                          label: 'See the ${cat.name} shelf',
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) =>
+                                  PvShelfScreen(categoryId: cat.id),
+                              settings: RouteSettings(
+                                name: 'store/shelf/${cat.id}',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 120)),
+            ],
+          ),
+          _topButtons(product),
         ],
       ),
     );

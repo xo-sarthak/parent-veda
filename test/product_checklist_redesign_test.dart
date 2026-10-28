@@ -139,8 +139,11 @@ void main() {
         expect(find.byKey(ValueKey('pcl_tick_${it.id}')), findsOneWidget);
       }
       expect(find.byType(Checkbox), findsNothing);
-      expect(find.byKey(const ValueKey('pcl_cart_bar')), findsOneWidget);
-      expect(find.text("Add what's left to cart (3)"), findsOneWidget);
+      // P4 D1 (2026-10-28): the preview cart left this tool; "See it in the
+      // store" is on each item's menu. Kept for revert:
+      //   expect(find.byKey(const ValueKey('pcl_cart_bar')), findsOneWidget);
+      //   expect(find.text("Add what's left to cart (3)"), findsOneWidget);
+      expect(find.byKey(const ValueKey('pcl_cart_bar')), findsNothing);
       // "Save list" saved nothing; it is gone, and the page says it saves.
       expect(find.text(s.pclSaveList), findsNothing);
       expect(find.byKey(const ValueKey('pcl_saved_auto')), findsOneWidget);
@@ -160,19 +163,21 @@ void main() {
       expect(find.text(s.pclGotPromptTitle), findsNothing);
       expect(store.byId(id)!.items.first.checked, isTrue);
       // It says what it did and offers Undo.
-      expect(find.text("Ticked off. It won't go in your cart."), findsOneWidget);
+      // Kept for revert (P4 D1): "Ticked off. It won't go in your cart."
+      expect(find.text('Ticked off. It moves to Got.'), findsOneWidget);
       expect(find.text('Undo'), findsOneWidget);
       // The ticked item sank into the Got group; the foot shows what is left.
       expect(find.byKey(const ValueKey('pcl_got_heading')), findsOneWidget);
       expect(find.text('GOT · 1'), findsOneWidget);
-      expect(find.text("Add what's left to cart (2)"), findsOneWidget);
+      // Kept for revert (P4 D1): "Add what's left to cart (2)".
       expect(find.text('1 of 3 ticked off'), findsOneWidget);
       await t.tap(find.text('Undo'));
       await t.pump();
       await t.pump(const Duration(milliseconds: 300));
       expect(store.byId(id)!.items.first.checked, isFalse);
       expect(find.byKey(const ValueKey('pcl_got_heading')), findsNothing);
-      expect(find.text("Add what's left to cart (3)"), findsOneWidget);
+      // Kept for revert (P4 D1): "Add what's left to cart (3)".
+      expect(find.text('0 of 3 ticked off'), findsOneWidget);
     });
 
     testWidgets('everything ticked: a calm line, and no foot', (t) async {
@@ -189,7 +194,10 @@ void main() {
 
     testWidgets('an item with no note invites one, in plain words', (t) async {
       final id = store.createChecklist('Mine');
-      store.addItem(id, kCuratedChecklists.first.items.first.productId);
+      // Starter items are named things now, no product id (seed retired
+      // 2026-10-28). Kept for revert:
+      //   store.addItem(id, kCuratedChecklists.first.items.first.productId);
+      store.addCustomItem(id, name: kCuratedChecklists.first.items.first.name);
       await pump(t);
       await t.tap(find.text('Mine'));
       await t.pump();
@@ -223,7 +231,10 @@ void main() {
       expect(find.text('Done'), findsOneWidget);
       expect(find.text('Add your own item'), findsOneWidget);
       // Adding one updates the count on the button.
-      store.addItem(id, kCuratedChecklists.first.items.first.productId);
+      // Starter items are named things now, no product id (seed retired
+      // 2026-10-28). Kept for revert:
+      //   store.addItem(id, kCuratedChecklists.first.items.first.productId);
+      store.addCustomItem(id, name: kCuratedChecklists.first.items.first.name);
       await t.pump();
       expect(find.text('Done · 1'), findsOneWidget);
       await t.tap(find.byKey(const ValueKey('pcl_picker_done')));

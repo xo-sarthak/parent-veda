@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvIsRetiredSeedId;
 
 import 'article_reader_screen.dart';
 import 'askveda_screen.dart';
@@ -854,7 +855,14 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
           final v = watchVideoById(r.relatedVideoId!);
           _push(v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v));
         }),
-      if (r.relatedProductId != null)
+      // ⚠️ NO SEED PRODUCTS (2026-10-28, the user: "no need to have fake
+      // situations in the app... show whatever we have"). Every recipe's
+      // product is the invented 'spoons' seed, out of the store now
+      // (pv_catalog_adapters.dart): its row named an invented product and
+      // opened "no longer listed". It shows only while the seed is on (a demo
+      // build); the article, film and Ask Veda rows stay. Kept for revert:
+      //   if (r.relatedProductId != null)
+      if (r.relatedProductId != null && !pvIsRetiredSeedId(r.relatedProductId!))
         (
           Icons.shopping_bag_outlined,
           'Product',

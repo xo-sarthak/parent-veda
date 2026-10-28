@@ -38,6 +38,32 @@ const String kAfterLossScans =
     'Since your loss nothing here is coming up. The scans you had are '
     'kept, with their dates and notes.';
 
+// ---- P4, Get ready after a loss (D4, 2026-10-28) -----------------------------
+//  Every Get ready tool stays after a loss; each says what has changed. One
+//  home for the words, so the screens and the tests read the same line.
+
+/// The hospital bag after a loss.
+const String kAfterLossBag =
+    "If you're going into hospital, this is what to take for you.";
+
+/// The contraction timer after a loss.
+const String kAfterLossContractions =
+    'If your doctor has asked you to time contractions, this still works. '
+    'Pain, bleeding or a fever: call your doctor or hospital.';
+
+/// The product checklist after a loss.
+const String kAfterLossChecklist =
+    "Your lists and what you've bought are kept here.";
+
+/// The birth plan after a loss.
+const String kAfterLossBirthPlan =
+    'Since your loss, this plan is kept as you left it. You can read it, '
+    'share it or clear it, and nothing will remind you about it.';
+
+/// Baby names after a loss (Pregnancy's callers only: `afterLossNote`).
+const String kAfterLossNames =
+    'Your shortlist is kept. Nothing here will ask you to choose a name.';
+
 class PregAfterLossNote extends StatelessWidget {
   const PregAfterLossNote(this.text, {super.key, this.bottom = 16});
   final String text;

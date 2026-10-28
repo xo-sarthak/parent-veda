@@ -26,6 +26,7 @@ import 'referral/invite_nudge_card.dart';
 
 import '../data/garbh_data.dart';
 import '../data/product_data.dart';
+import '../data/products/pv_catalog_adapters.dart' show kPvShowSeedProducts;
 import '../data/scan_schedule.dart';
 import '../localization/app_language.dart';
 import '../models/home_day.dart';
@@ -956,7 +957,16 @@ class HomeScreenB extends StatelessWidget {
     final s = S(lang);
     final cd = pregnancy.currentDay;
     final picks = <Product>[];
-    for (final c in recommendedCategories(week)) {
+    // ⚠️ NO SEED PRODUCTS (2026-10-28, the user: "no need to have fake
+    // situations in the app... show whatever we have"). Every pick here is
+    // one of the 24 invented pregnancy products, now out of the store
+    // (pv_catalog_adapters.dart), so the carousel takes its existing "no
+    // picks" path unless a demo build turns the seed back on. This classic
+    // home is reached only from Developer switches (V3 is the default).
+    // Kept for revert: the loop below ran unconditionally.
+    for (final c in kPvShowSeedProducts
+        ? recommendedCategories(week)
+        : const <ProductCategory>[]) {
       final ps = productsForCategory(c.id);
       if (ps.isNotEmpty) picks.add(ps[cd % ps.length]);
       if (picks.length >= 8) break;

@@ -147,6 +147,74 @@ class ContractionSession {
       );
 }
 
+/// The contraction timer's running session, kept on the phone so closing the
+/// screen (or the app) mid-session does not lose it (P4 C4, 2026-10-28).
+///
+/// ⚠️ PHONE ONLY, ON PURPOSE. A running timer is one sitting on one phone;
+/// the finished contractions already travel as the session row
+/// ([ContractionSession]), so the cloud never needs the half-made state. What
+/// this adds is the contraction still IN PROGRESS and the answers she gave
+/// (symptoms, the labour prompt), so a reopen picks up exactly where she was.
+@immutable
+class LiveContractionState {
+  const LiveContractionState({
+    required this.sessionId,
+    required this.contractions,
+    this.activeStartIso,
+    this.laborResponse,
+    this.askedLabor = false,
+    this.symptoms = const {},
+  });
+
+  final String sessionId;
+  final List<Contraction> contractions;
+
+  /// The start of a contraction still running when she left, or null.
+  final String? activeStartIso;
+  final String? laborResponse;
+  final bool askedLabor;
+
+  /// The safety check's answers, by question ('waterBroken' -> 'unsure').
+  final Map<String, String> symptoms;
+
+  /// The moment the session was last touched: the running contraction's
+  /// start, else the last contraction's end. The 2-hour resume window counts
+  /// from here.
+  DateTime? get lastActivity {
+    final active = DateTime.tryParse(activeStartIso ?? '');
+    if (active != null) return active;
+    if (contractions.isEmpty) return null;
+    return DateTime.tryParse(contractions.last.endIso) ??
+        DateTime.tryParse(contractions.last.startIso);
+  }
+
+  Map<String, dynamic> toJson() => {
+    'sessionId': sessionId,
+    'contractions': contractions.map((c) => c.toJson()).toList(),
+    'activeStartIso': activeStartIso,
+    'laborResponse': laborResponse,
+    'askedLabor': askedLabor,
+    'symptoms': symptoms,
+  };
+
+  factory LiveContractionState.fromJson(Map<String, dynamic> j) =>
+      LiveContractionState(
+        sessionId: (j['sessionId'] ?? '').toString(),
+        contractions: ((j['contractions'] as List?) ?? [])
+            .map(
+              (e) => Contraction.fromJson(Map<String, dynamic>.from(e as Map)),
+            )
+            .toList(),
+        activeStartIso: j['activeStartIso']?.toString(),
+        laborResponse: j['laborResponse']?.toString(),
+        askedLabor: j['askedLabor'] == true,
+        symptoms: {
+          for (final e in ((j['symptoms'] as Map?) ?? const {}).entries)
+            e.key.toString(): e.value.toString(),
+        },
+      );
+}
+
 /// One Kegel session record.
 @immutable
 class KegelRecord {
@@ -263,6 +331,9 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
   static const _kegelKey = 'tool_kegel'; // {progress + offsets}
   static const _kegelHistKey = 'tool_kegel_history'; // [KegelRecord]
   static const _contractionKey = 'tool_contractions'; // [ContractionSession]
+
+  /// The running session (P4 C4): [LiveContractionState], phone only.
+  static const contractionLiveKey = 'tool_contraction_live';
 
   // Movement (session-based)
   final List<MovementSession> _movementSessions = [];
@@ -514,9 +585,19 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
   List<ContractionSession> get contractionSessions {
     // final list = [..._contractionSessions]; // kept for revert
     final list = [for (final s in _contractionSessions) if (_now(_ctDay(s))) s];
-    list.sort((a, b) => b.dateIso.compareTo(a.dateIso));
+    // Kept for revert (P4 C9): list.sort((a, b) => b.dateIso.compareTo(a.dateIso));
+    // A row back from the cloud carried only "yyyy-MM-dd" while a local one
+    // holds the full time, and a string compare puts "2026-10-02" before
+    // "2026-10-02T03:00" whatever the hour. Sorted by the moment the first
+    // contraction started, newest first.
+    list.sort((a, b) => _ctStart(b).compareTo(_ctStart(a)));
     return list;
   }
+
+  /// Whether a session with this id is kept (any pregnancy), for the timer
+  /// to tell a session deleted from history from one still running.
+  bool hasContractionSession(String id) =>
+      _contractionSessions.any((s) => s.id == id);
 
   // ---- Load -----------------------------------------------------------------
 
@@ -635,6 +716,9 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
     _kegelCustomReps = null;
     _kegelVoiceOn = true;
     _contractionSessions.clear();
+    // The running timer is hers too (P4 C4): another account must not
+    // reopen onto her half-timed session.
+    clearLiveContraction();
     for (final l in _ledgers) {
       l
         ..clear()
@@ -953,22 +1037,45 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
             .toList(),
       );
 
+  // ⚠️ `date_iso` IS A `date` COLUMN (0003:103), P4 C9 (2026-10-28). The full
+  // ISO went up and Postgres cut the time off, so a session pulled back on a
+  // second phone sorted by midnight. The row now sends the date it can hold;
+  // the time was never lost, because every contraction carries its own
+  // start. `test/preg_contraction_schema_contract_test.dart` holds both.
+  // Kept for revert: 'date_iso': s.dateIso.isEmpty ? null : s.dateIso,
   Map<String, dynamic> _contractionToRow(ContractionSession s) => {
         'id': s.id,
-        'date_iso': s.dateIso.isEmpty ? null : s.dateIso,
+    'date_iso': contractionRowDate(s.dateIso),
         'contractions': s.contractions.map((c) => c.toJson()).toList(),
         'labor_response': s.laborResponse,
       };
 
-  ContractionSession _contractionFromRow(Map<String, dynamic> r) =>
-      ContractionSession(
-        id: (r['id'] ?? '').toString(),
-        dateIso: (r['date_iso'] ?? '').toString(),
-        contractions: ((r['contractions'] as List?) ?? [])
-            .map((e) => Contraction.fromJson(Map<String, dynamic>.from(e as Map)))
-            .toList(),
-        laborResponse: r['labor_response']?.toString(),
-      );
+  /// The date part ("yyyy-MM-dd") of a session's ISO, for the `date` column;
+  /// null when it is empty or not a date.
+  @visibleForTesting
+  static String? contractionRowDate(String iso) {
+    if (iso.isEmpty) return null;
+    final d = DateTime.tryParse(iso);
+    return d == null ? null : _isoDate(d);
+  }
+
+  ContractionSession _contractionFromRow(Map<String, dynamic> r) {
+    final contractions = ((r['contractions'] as List?) ?? [])
+        .map((e) => Contraction.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+    // Kept for revert (P4 C9): dateIso: (r['date_iso'] ?? '').toString(),
+    // The column holds the date only; a local session's dateIso is its first
+    // contraction's start, so that start puts the time back.
+    final first = contractions.isEmpty ? '' : contractions.first.startIso;
+    return ContractionSession(
+      id: (r['id'] ?? '').toString(),
+      dateIso: DateTime.tryParse(first) != null
+          ? first
+          : (r['date_iso'] ?? '').toString(),
+      contractions: contractions,
+      laborResponse: r['labor_response']?.toString(),
+    );
+  }
 
   // ---- Movement mutations ---------------------------------------------------
 
@@ -1250,8 +1357,17 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
       DateTime.tryParse(e.dateIso) ?? DateTime.tryParse(e.timeIso) ?? DateTime.now();
   static DateTime _moveDay(MovementSession s) =>
       DateTime.tryParse(s.startIso) ?? (s.times.isEmpty ? DateTime.now() : s.times.first);
-  static DateTime _ctDay(ContractionSession s) =>
-      DateTime.tryParse(s.dateIso) ?? DateTime.now();
+  // Kept for revert (P4 C9): DateTime.tryParse(s.dateIso) ?? DateTime.now();
+  static DateTime _ctDay(ContractionSession s) => _ctStart(s);
+
+  /// When a session began: its first contraction's start, else its date.
+  static DateTime _ctStart(ContractionSession s) {
+    if (s.contractions.isNotEmpty) {
+      final d = DateTime.tryParse(s.contractions.first.startIso);
+      if (d != null) return d;
+    }
+    return DateTime.tryParse(s.dateIso) ?? DateTime.now();
+  }
 
   /// Weights, kick sessions and contraction sessions in [w]
   /// (the "Kept for you" page).
@@ -1313,6 +1429,68 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
     //   } catch (_) {}
     // }
     await _ctSync.push(_ctRows);
+  }
+
+  /// Delete one session, as a soft delete that travels (step 9), the way a
+  /// kick session goes (P4 C5, 2026-10-28). Returns the session so the
+  /// caller can offer Undo with [restoreContractionSession]. If it is the
+  /// session still running on the timer, the running copy goes too, so a
+  /// reopen cannot bring it back.
+  Future<ContractionSession?> deleteContractionSession(String id) async {
+    final i = _contractionSessions.indexWhere((s) => s.id == id);
+    if (i < 0) return null;
+    final gone = _contractionSessions.removeAt(i);
+    _ctSync.remove(id, _contractionToRow(gone));
+    notifyListeners();
+    await _persist(
+      _contractionKey,
+      jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()),
+    );
+    final live = await loadLiveContraction();
+    if (live != null && live.sessionId == id) await clearLiveContraction();
+    await _ctSync.push(_ctRows);
+    return gone;
+  }
+
+  /// Put a deleted session back (Undo). Same id, so the cloud row is revived,
+  /// not duplicated.
+  Future<void> restoreContractionSession(ContractionSession s) async {
+    if (_contractionSessions.any((x) => x.id == s.id)) return;
+    _contractionSessions.add(s);
+    _ctSync.touch(s.id);
+    notifyListeners();
+    await _persist(
+      _contractionKey,
+      jsonEncode(_contractionSessions.map((s) => s.toJson()).toList()),
+    );
+    await _ctSync.push(_ctRows);
+  }
+
+  /// The running session on this phone, or null (P4 C4).
+  Future<LiveContractionState?> loadLiveContraction() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(contractionLiveKey);
+      if (raw == null) return null;
+      final live = LiveContractionState.fromJson(
+        Map<String, dynamic>.from(jsonDecode(raw) as Map),
+      );
+      return live.sessionId.isEmpty ? null : live;
+    } catch (_) {
+      return null; // a broken blob starts a fresh session, never a crash
+    }
+  }
+
+  Future<void> saveLiveContraction(LiveContractionState live) =>
+      _persist(contractionLiveKey, jsonEncode(live.toJson()));
+
+  Future<void> clearLiveContraction() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(contractionLiveKey);
+    } catch (_) {
+      /* best-effort */
+    }
   }
 
   // ---- Helpers --------------------------------------------------------------

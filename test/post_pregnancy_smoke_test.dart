@@ -98,6 +98,8 @@ import 'package:parentveda/screens/reader/pv_reader_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/post_pregnancy_home.dart';
 import 'package:parentveda/screens/post_pregnancy/problem_solver_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/product_detail_screen.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_products_data.dart'
+    as pp_products show productById;
 import 'package:parentveda/screens/post_pregnancy/products_category_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/products_compare_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/products_discovery_screen.dart';
@@ -849,14 +851,25 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: GrowthActivityScreen()));
     await tester.pumpAndSettle();
 
-    // the row shows the real catalogue product (name comes from the catalog now)
-    await tester.scrollUntilVisible(find.text('Peekaboo Cloth Book'), 250,
+    // ⚠️ 'clothbook' was an invented seed product, retired 2026-10-28 (the
+    // user: no fake products). The row reads as its kind of thing (the
+    // seed's sub-shelf), with no seed name or price, and opens the store.
+    // Kept for revert:
+    //   await tester.scrollUntilVisible(find.text('Peekaboo Cloth Book'), ...);
+    //   await tester.tap(find.text('Peekaboo Cloth Book'));
+    //   await tester.pumpAndSettle();
+    //   expect(find.byType(ProductDetailScreen), findsOneWidget);
+    //   expect(find.text('Peekaboo Cloth Book'), findsWidgets);
+    final kind = pp_products.productById('clothbook').sub;
+    await tester.scrollUntilVisible(find.text(kind), 250,
         scrollable: find.byType(Scrollable).first, maxScrolls: 30);
-    await tester.tap(find.text('Peekaboo Cloth Book'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(ProductDetailScreen), findsOneWidget);
-    expect(find.text('Peekaboo Cloth Book'), findsWidgets);
+    expect(find.text('Peekaboo Cloth Book'), findsNothing);
+    expect(find.text('₹399'), findsNothing);
+    await tester.tap(find.text(kind).first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byType(ProductDetailScreen), findsNothing);
+    expect(find.byType(ProductsDiscoveryScreen), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

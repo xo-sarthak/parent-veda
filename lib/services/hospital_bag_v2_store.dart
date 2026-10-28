@@ -337,6 +337,73 @@ class HospitalBagV2Store extends ChangeNotifier with CloudMergedStore {
     await _save();
   }
 
+  /// Where an item sits in her bag, or -1. The screen keeps it for Undo.
+  int indexOf(String id) => _items.indexWhere((i) => i.id == id);
+
+  /// Undo for [removeItem]: the same item back at the same place (P4 H5).
+  Future<void> restoreItemAt(BagItem item, int index) async {
+    if (byId(item.id) != null) return;
+    _items.insert(index.clamp(0, _items.length), item);
+    await _save();
+  }
+
+  /// Renames one of HER items (P4 H5). Catalogue names are ours, so only a
+  /// custom item can be renamed. [BagItem.name] is final, so the item is
+  /// rebuilt with everything else kept.
+  Future<bool> renameCustomItem(String id, String name) async {
+    final clean = name.trim();
+    final at = indexOf(id);
+    if (clean.isEmpty || at < 0 || !_items[at].isCustom) return false;
+    final i = _items[at];
+    _items[at] = BagItem(
+      id: i.id,
+      category: i.category,
+      name: LocalizedText(en: clean, hi: clean),
+      isCustom: true,
+      recommendation: i.recommendation,
+      status: i.status,
+      packed: i.packed,
+      purchased: i.purchased,
+      favourite: i.favourite,
+      store: i.store,
+      link: i.link,
+      price: i.price,
+      notes: i.notes,
+      selectedProductId: i.selectedProductId,
+    );
+    await _save();
+    return true;
+  }
+
+  /// ADDITIVE, never a rebuild (P4 H5, 2026-10-28). Adds each of [wanted]
+  /// that her bag does not hold yet, unticked, and takes out each id in
+  /// [dropIfUnpacked] that she has not packed (a packed item is hers to keep).
+  /// Nothing else moves: every tick, choice and set-aside stays. Changing the
+  /// delivery type used to leave the caesarean items as they were until she
+  /// pressed "Start again", which wiped every tick; this is what it calls now.
+  /// Returns how many were added and removed, so the screen can say so.
+  Future<({int added, int removed})> syncDefaults({
+    List<BagItem> wanted = const [],
+    Set<String> dropIfUnpacked = const {},
+    DeliveryType? delivery,
+  }) async {
+    var added = 0, removed = 0;
+    for (final w in wanted) {
+      if (byId(w.id) != null) continue;
+      _items.add(w);
+      added++;
+    }
+    _items.removeWhere((i) {
+      final go = !i.isCustom && !i.packed && dropIfUnpacked.contains(i.id);
+      if (go) removed++;
+      return go;
+    });
+    final deliveryChanged = delivery != null && delivery != _delivery;
+    if (delivery != null) _delivery = delivery;
+    if (added > 0 || removed > 0 || deliveryChanged) await _save();
+    return (added: added, removed: removed);
+  }
+
   /// Mirror BoughtStore → mark any chosen-from-ParentVeda item as purchased
   /// once its product id is bought (so the journey advances automatically).
   void markBoughtFromBought() {

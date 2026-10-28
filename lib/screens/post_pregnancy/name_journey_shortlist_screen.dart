@@ -27,6 +27,15 @@ import 'pp_names_data.dart';
 import 'pp_names_v2_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
+import '../../services/life_stage_store.dart';
+import '../../services/pregnancy_ended_store.dart';
+
+/// After a loss, in Pregnancy (P4 D4, 2026-10-28): the chosen-name page stops
+/// offering to start the baby's story. Parenting reaches this screen too and
+/// keeps it exactly as before, so the stage is checked as well as the loss.
+bool namesAfterLossInPregnancy() =>
+    PregnancyEndedStore.instance.ended &&
+    LifeStageStore.instance.stage != LifeStage.parenting;
 
 class NameJourneyShortlistScreen extends StatelessWidget {
   const NameJourneyShortlistScreen({super.key});
@@ -488,7 +497,11 @@ class NameChosenScreen extends StatelessWidget {
       children: [
         pregToolPad(Text(n.script, style: pvFraunces(fontSize: 26, fontWeight: FontWeight.w600, color: p.ink3))),
         const SizedBox(height: 20),
+        // P4 D4: "Chapter One of her journal" and "Begin her story" step
+        // aside after a loss in Pregnancy; the name stays starred below.
+        if (!namesAfterLossInPregnancy())
         pregToolPad(Container(
+          key: const ValueKey('pp_name_story_card'),
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: Colors.white,

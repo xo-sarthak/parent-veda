@@ -34,6 +34,7 @@ import '../../services/life_stage_store.dart';
 import '../../ttc/ttc_products_data.dart' as ttc;
 import '../product_data.dart' as preg_data;
 import 'pv_affiliate.dart';
+import 'pv_coming_soon.dart';
 import 'pv_product_extras.dart';
 import 'pv_sheet_products.dart';
 
@@ -453,16 +454,114 @@ PvProduct _enrich(PvProduct p) {
 /// The whole catalogue, every stage, enriched. Built once by the store.
 /// Every product passes the retailer price guard last (2026-10-28), so no
 /// source, seed or sheet, can put a hand-typed Amazon price on screen.
+///
+/// ⚠️ NO FAKE PRODUCTS (2026-10-28, the user: "no need to have fake
+/// situations in the app... show whatever we have"). The 24 pregnancy seed
+/// products (`product_data.dart`) and the 23 parenting ones
+/// (`pp_products_data.dart`) carried invented names, seed prices, seed
+/// reviews and, for twelve, an in-app cart ending in a preview "order
+/// placed"; none had a real link. They are out of the catalogue unless a
+/// demo build passes `--dart-define=PV_SEED_PRODUCTS=true`. What stays is
+/// real: the TTC seed (real brands, real links) and the team's sheet, with
+/// the live store rows laid over it. Anything keyed off a retired id now
+/// resolves to nothing, and every reader of `byId` already has an honest
+/// "no longer listed" path.
 List<PvProduct> buildPvCatalog() => [
-      for (final p in [
+      for (final p in pvPlaceComingSoon([
         for (final p in ttc.ttcProducts) _enrich(_fromTtc(p)),
-        for (final p in preg_data.kProducts) _enrich(_fromPreg(p)),
-        for (final p in pp.productCatalog) _enrich(_fromPp(p)),
+        // Kept for revert (seed retired 2026-10-28, the user: no fake products):
+        // for (final p in preg_data.kProducts) _enrich(_fromPreg(p)),
+        // for (final p in pp.productCatalog) _enrich(_fromPp(p)),
+        if (kPvShowSeedProducts) ...[
+          for (final p in preg_data.kProducts) _enrich(_fromPreg(p)),
+          for (final p in pp.productCatalog) _enrich(_fromPp(p)),
+        ],
         // The team's product sheets, as ParentVeda's shortlist (2026-10-13).
         ...sheetProducts(),
-      ])
+        // An essential the sheet does not cover yet: one "Coming soon"
+        // place-holder each, stepping aside when its shelf gets a real
+        // product (2026-10-28, pv_coming_soon.dart).
+        ...pvComingSoonProducts(),
+      ]))
         pvGuardRetailerPrice(p),
     ];
+
+/// The place-holders, each on its retired seed's shelf: the seed's stage,
+/// shelf, sub-shelf, week and age, and nothing else of it (no name, brand,
+/// price, photo, link, review or spec).
+List<PvProduct> pvComingSoonProducts() => [
+      for (final e in kPvComingSoon)
+        if (_seedShapeFor(e.seedId) case final s?)
+          PvProduct(
+            id: e.id,
+            stage: s.stage,
+            categoryId: s.categoryId,
+            subId: s.subId,
+            name: e.name,
+            brand: '',
+            summary: e.line,
+            images: const [],
+            price: 0,
+            hue: s.hue,
+            weekFrom: s.weekFrom,
+            weekTo: s.weekTo,
+            ageMinMonths: s.ageMinMonths,
+            ageMaxMonths: s.ageMaxMonths,
+          ),
+    ];
+
+/// A retired seed product in the unified shape, read from the bundled lists
+/// (never the live parenting catalogue), for its shelf and its clock only.
+PvProduct? _seedShapeFor(String seedId) {
+  for (final p in preg_data.kProducts) {
+    if (p.id == seedId) return _fromPreg(p);
+  }
+  for (final p in pp.kPpProducts) {
+    if (p.id == seedId) return _fromPp(p);
+  }
+  return null;
+}
+
+/// Whether the 47 invented seed products (24 pregnancy, 23 parenting) are in
+/// the catalogue. Off: the store shows only real products (2026-10-28). A
+/// demo build can turn them back on with `--dart-define=PV_SEED_PRODUCTS=true`.
+const bool kPvShowSeedProducts = bool.fromEnvironment('PV_SEED_PRODUCTS');
+
+/// The retired seed products' ids, fixed: the 24 pregnancy ones and the 23
+/// parenting ones. Read from the bundled lists, never the live parenting
+/// catalogue, so a cloud row can never make a real id look retired.
+final Set<String> kPvRetiredSeedIds = {
+  for (final p in preg_data.kProducts) p.id,
+  for (final p in pp.kPpProducts) p.id,
+};
+
+/// Whether [id] is a retired seed product that the catalogue no longer holds.
+/// False when a demo build has the seed switched back on.
+bool pvIsRetiredSeedId(String id) =>
+    !kPvShowSeedProducts && kPvRetiredSeedIds.contains(id);
+
+/// The plain name of a retired PREGNANCY seed product's group, by id prefix
+/// ("Nursing bra" for `nb_overall`): what a list that saved one shows in its
+/// place, with no brand, price, rating or image, and what the store is
+/// searched for when she asks to see it. Null for any other id.
+String? pvSeedGenericName(String id) {
+  const byPrefix = {
+    'pp_': 'Pregnancy pillow',
+    // Not "Stretch-mark cream or oil": the store's search wants every word,
+    // and that phrase found nothing; this one finds the real creams.
+    'sc_': 'Stretch mark cream',
+    'mw_': 'Maternity wear',
+    'bb_': 'Belly support band',
+    'cs_': 'Compression socks',
+    'nb_': 'Nursing bra',
+    'bp_': 'Breast pump',
+    'sw_': 'Swaddle',
+  };
+  for (final e in byPrefix.entries) {
+    if (id.startsWith(e.key)) return e.value;
+  }
+  return null;
+}
 
 /// Ask Veda's TTC deep links carry the old id (`ttcprod_folic` → `folic`).
 String pvIdForTtc(String oldId) => 'ttc_$oldId';

@@ -36,6 +36,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../data/products/pv_category_images.dart';
+import '../../data/products/pv_coming_soon.dart' show kPvComingSoonLabel;
 import '../../models/pv_product.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
@@ -466,6 +467,9 @@ class PvPriceLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
+    // A place-holder has no price to show: the pill says what it is
+    // (2026-10-28, pv_coming_soon.dart).
+    if (product.comingSoon) return PvComingSoonPill(size: size);
     final shown = price ?? product.price;
     if (shown <= 0) {
       return Text(
@@ -519,6 +523,35 @@ class PvPriceLine extends StatelessWidget {
       ],
     );
   }
+}
+
+/// "Coming soon": the ink-outline pill a place-holder wears where a real
+/// product's price sits (2026-10-28, the user: "say Coming soon on it, like
+/// marketplace apps do"). Words in ink on white, the house's one outline;
+/// no emoji, no tint.
+class PvComingSoonPill extends StatelessWidget {
+  const PvComingSoonPill({super.key, this.size = 14.5});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    key: const ValueKey('pv_coming_soon_pill'),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(999),
+      border: Border.all(color: kPvInk, width: 1.2),
+    ),
+    child: Text(
+      kPvComingSoonLabel,
+      maxLines: 1,
+      style: pvManrope(
+        fontSize: size - 3,
+        fontWeight: FontWeight.w800,
+        color: kPvInk,
+      ),
+    ),
+  );
 }
 
 /// The ParentVeda mark: verified tick in the brand violet + the band word.
@@ -1154,7 +1187,9 @@ class PvProductCard extends StatelessWidget {
               ),
             const SizedBox(height: 3),
             if (!product.reviewOnly) PvPriceLine(product: product, size: 14.5),
-            if (compare) ...[
+            // Nothing to compare on a place-holder (2026-10-28). Kept for
+            // revert: `if (compare) ...[`.
+            if (compare && !product.comingSoon) ...[
               const SizedBox(height: 4),
               PvCompareTick(product: product),
             ],

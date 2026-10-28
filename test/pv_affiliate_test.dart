@@ -24,12 +24,22 @@ void main() {
   });
 
   test('a product sold here, or with nowhere to check, has no note', () {
-    final here = buildPvCatalog().firstWhere((p) => p.soldHere && p.hasPrice);
-    expect(pvAffiliatePriceNote(here), isNull);
-    final nowhere = buildPvCatalog().firstWhere((p) =>
-        !p.soldHere && !p.reviewOnly && p.hasPrice && (p.buyUrl ?? '').isEmpty,
-        orElse: () => here);
-    expect(pvAffiliatePriceNote(nowhere), isNull);
+    // Every "sold here" product was an invented seed, retired 2026-10-28
+    // (the user: no fake products), so there may be none to check. Kept
+    // for revert: the two lookups below without `orElse` / the null checks.
+    //   final here = buildPvCatalog().firstWhere((p) => p.soldHere && p.hasPrice);
+    final here = buildPvCatalog()
+        .where((p) => p.soldHere && p.hasPrice)
+        .firstOrNull;
+    if (here != null) expect(pvAffiliatePriceNote(here), isNull);
+    final nowhere = buildPvCatalog()
+        .where((p) =>
+            !p.soldHere &&
+            !p.reviewOnly &&
+            p.hasPrice &&
+            (p.buyUrl ?? '').isEmpty)
+        .firstOrNull;
+    if (nowhere != null) expect(pvAffiliatePriceNote(nowhere), isNull);
   });
 
   test('a checked listing wins: exact link, its price, its date, its stars',

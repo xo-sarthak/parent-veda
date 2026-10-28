@@ -85,15 +85,22 @@ void main() {
 
     test('TTC ids carry the prefix so `thermometer` cannot collide', () {
       expect(store.byId('ttc_thermometer'), isNotNull);
-      expect(store.byId('thermometer'), isNotNull);
+      // The parenting `thermometer` was an invented seed product, retired
+      // 2026-10-28 (the user: no fake products). Kept for revert:
+      //   expect(store.byId('thermometer'), isNotNull);
+      //   expect(store.byId('thermometer')!.stage, LifeStage.parenting);
+      expect(store.byId('thermometer'), kPvShowSeedProducts ? isNotNull : isNull);
       expect(store.byId('ttc_thermometer')!.stage, LifeStage.tryingToConceive);
-      expect(store.byId('thermometer')!.stage, LifeStage.parenting);
       expect(pvIdForTtc('folic'), 'ttc_folic');
     });
 
     test('the overlay names only products that exist', () {
       final ids = store.all.map((p) => p.id).toSet();
+      // The overlay still carries the retired seed products' entries (kept
+      // for a demo build with PV_SEED_PRODUCTS); those are skipped
+      // (2026-10-28). Without it every key had to exist.
       for (final k in kPvProductPhotos.keys) {
+        if (pvIsRetiredSeedId(k)) continue;
         expect(
           ids,
           contains(k),
@@ -101,6 +108,7 @@ void main() {
         );
       }
       for (final k in kPvProductExtras.keys) {
+        if (pvIsRetiredSeedId(k)) continue;
         expect(
           ids,
           contains(k),
@@ -117,7 +125,10 @@ void main() {
           expect(u.startsWith('https://'), isTrue, reason: '${p.id}: $u');
         }
       }
-      expect(store.all.where((p) => p.hasImage).length, greaterThan(40));
+      // Most photos were the seed's stock pictures; with the seed retired
+      // (2026-10-28) the real products' own photos remain. Kept for revert:
+      //   expect(store.all.where((p) => p.hasImage).length, greaterThan(40));
+      expect(store.all.where((p) => p.hasImage).length, greaterThan(5));
     });
 
     test('stage narrows what leads, never what exists', () {
@@ -150,7 +161,9 @@ void main() {
   group('the honesty rules', () {
     test('ParentVeda recommends is on SOME products, not all', () {
       final n = store.all.where((p) => p.recommends).length;
-      expect(n, greaterThan(5));
+      // Kept for revert (most marks were on seed products, retired
+      // 2026-10-28): expect(n, greaterThan(5));
+      expect(n, greaterThan(0));
       expect(n, lessThan(store.all.length));
     });
 
@@ -186,12 +199,18 @@ void main() {
       'percentages are measured or null — never derived from the star rating',
       () {
         // A product with a rating but no source figure must have NO percentage.
-        final lull = store.byId('lull')!;
-        // Parenting seed ratings are hidden since 2026-10-07 (gap analysis P1),
-        // the TTC rule; the percentages must stay null either way.
-        expect(lull.rating, kPpShowSeedReviews ? greaterThan(0) : 0);
-        expect(lull.parentsPct, isNull);
-        expect(lull.expertsPct, isNull);
+        // `lull` was an invented parenting seed product, retired 2026-10-28
+        // (the user: no fake products); it is checked only in a demo build.
+        // Kept for revert: final lull = store.byId('lull')!; and the three
+        // expects below, unconditional.
+        final lull = store.byId('lull');
+        if (lull != null) {
+          // Parenting seed ratings are hidden since 2026-10-07 (gap analysis
+          // P1), the TTC rule; the percentages must stay null either way.
+          expect(lull.rating, kPpShowSeedReviews ? greaterThan(0) : 0);
+          expect(lull.parentsPct, isNull);
+          expect(lull.expertsPct, isNull);
+        }
         // TTC's zeros become null, not 0%.
         for (final p in store.forStage(LifeStage.tryingToConceive)) {
           expect(p.parentsPct, isNot(0));
@@ -213,7 +232,11 @@ void main() {
 
     test('IMS Act: a review-only product has no buy path anywhere', () {
       final ro = store.all.where((p) => p.reviewOnly).toList();
-      expect(ro, isNotEmpty);
+      // The review-only products were the parenting seed's bottle and
+      // steriliser, retired 2026-10-28; none is a "Coming soon" either (IMS
+      // Act). The rule still holds for any that comes back. Kept for revert:
+      //   expect(ro, isNotEmpty);
+      if (kPvShowSeedProducts) expect(ro, isNotEmpty);
       for (final p in ro) {
         expect(p.canBuy, isFalse, reason: p.id);
       }
@@ -233,7 +256,11 @@ void main() {
         final affiliate = store.all.where((p) => !p.soldHere && p.canBuy);
         final own = store.all.where((p) => p.soldHere);
         expect(affiliate, isNotEmpty);
-        expect(own, isNotEmpty);
+        // Every "sold here" product was an invented seed with a preview
+        // cart, retired 2026-10-28 (the user: no fake products). Nothing is
+        // sold here until a real one is. Kept for revert:
+        //   expect(own, isNotEmpty);
+        expect(own, kPvShowSeedProducts ? isNotEmpty : isEmpty);
         for (final p in affiliate) {
           expect(p.buyUrl, isNotNull, reason: p.id);
         }
@@ -261,7 +288,10 @@ void main() {
     test('search is cross-stage with per-stage counts', () {
       final r = store.search('thermometer');
       expect(r.count(LifeStage.tryingToConceive), greaterThan(0));
-      expect(r.count(LifeStage.parenting), greaterThan(0));
+      // The parenting thermometer was a retired seed (2026-10-28); the
+      // sheet's sits on a pregnancy shelf. Kept for revert:
+      //   expect(r.count(LifeStage.parenting), greaterThan(0));
+      expect(r.byStage.length, greaterThan(1), reason: 'cross-stage');
       expect(r.all.length, r.byStage.values.fold(0, (a, l) => a + l.length));
       expect(store.search('   ').all, isEmpty);
       expect(store.search('folic').all.first.stage, LifeStage.tryingToConceive);
@@ -286,13 +316,18 @@ void main() {
   group('compare tray', () {
     test('two at a time, one category, refusal explained', () {
       final tray = PvCompareStore.instance..clear();
-      final sleep = store.inCategory('sleep').take(3).toList();
+      // The parenting 'sleep' shelf and 'stroller' were seed, retired
+      // 2026-10-28; a sheet shelf and another sheet shelf's first product
+      // stand in. Kept for revert:
+      //   final sleep = store.inCategory('sleep').take(3).toList();
+      //   final stroller = store.byId('stroller')!;
+      final sleep = store.inCategory('pvs_sleep_and_bedding').take(3).toList();
       expect(sleep.length, 3);
       expect(tray.toggle(sleep[0]), PvCompareResult.added);
       expect(tray.toggle(sleep[1]), PvCompareResult.added);
       expect(tray.toggle(sleep[2]), PvCompareResult.replaced);
       expect(tray.items.map((p) => p.id), [sleep[1].id, sleep[2].id]);
-      final stroller = store.byId('stroller')!;
+      final stroller = store.inCategory('pregnancy_pillow').first;
       expect(tray.toggle(stroller), PvCompareResult.wrongCategory);
       expect(tray.toggle(sleep[2]), PvCompareResult.removed);
       tray.clear();
@@ -370,10 +405,13 @@ void main() {
       'brand, price, rating and the two ParentVeda switches narrow the shelf',
       () {
         final f = PvShelfFilters();
-        final sleep = store.inCategory('sleep');
+        // Kept for revert (the seed 'sleep' shelf and its 'Dozy', retired
+        // 2026-10-28): store.inCategory('sleep') and brand 'Dozy'.
+        final sleep = store.inCategory('pvs_sleep_and_bedding');
+        final brand = sleep.firstWhere((p) => p.brand.isNotEmpty).brand;
         expect(sleep.where(f.pass).length, sleep.length);
-        f.brands.add('Dozy');
-        expect(sleep.where(f.pass).every((p) => p.brand == 'Dozy'), isTrue);
+        f.brands.add(brand);
+        expect(sleep.where(f.pass).every((p) => p.brand == brand), isTrue);
         expect(sleep.where(f.pass), isNotEmpty);
         f.clear();
         f.priceMax = 1000;
@@ -399,10 +437,10 @@ void main() {
         addTearDown(tester.view.reset);
         await tester.pumpWidget(
           const MaterialApp(
-            home: PvShelfScreen(
-              categoryId: 'sleep',
-              subId: 'soothers_and_white_noise',
-            ),
+            // Kept for revert (that sub-shelf held seed products, retired
+            // 2026-10-28; it now holds a "Coming soon", which has no
+            // Compare): categoryId: 'sleep', subId: 'soothers_and_white_noise',
+            home: PvShelfScreen(categoryId: 'pvs_sleep_and_bedding'),
           ),
         );
         await tester.pump();

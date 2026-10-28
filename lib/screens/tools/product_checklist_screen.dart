@@ -36,27 +36,56 @@
 //      starters" is "Starter lists", "ticked" is "ticked off". English only; the
 //      shipped Hindi is untouched (`_Copy` returns it unchanged in Hindi).
 //  The old pieces are kept below, commented, for revert.
+//
+//  ⚠️ P4 (2026-10-28, docs/preg-ttc-tool-plans/P4-birth-prep.md):
+//    · D1 THE LIVE STORE. "Buy now" opened the preview checkout (an "order
+//      placed" with no payment) and "Add to cart" fed it; "Buy on Amazon"
+//      skipped openOutbound, so the link went out untagged. All three are
+//      commented out for one "See it in the store": the product page when the
+//      store knows the id, else the store's search, else a tagged Amazon
+//      search (`getReadyStoreRoute`, hospital_bag_catalog.dart). Her own links
+//      go through openOutbound too, with https:// added when she left it off.
+//    · P3 the count is "owned" (ticked or bought), the rule the Got group uses.
+//    · P5 every save says what it changed; deletes offer Undo; the starter
+//      list due soonest for her week comes first; after a loss the newborn
+//      starter steps aside and a calm note says her lists are kept.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
-import 'package:url_launcher/url_launcher.dart';
+// Kept for revert (P4 D1): every link out goes through openOutbound now.
+// import 'package:url_launcher/url_launcher.dart';
 
+import '../../brand/outbound.dart';
+import '../../data/hospital_bag_catalog.dart'
+    show GetReadyStoreRoute, amazonSearchUrlFor, getReadyStoreRoute, normaliseOutboundLink;
 import '../../data/product_data.dart';
+import '../../data/products/pv_catalog_adapters.dart'
+    show kPvShowSeedProducts, pvIsRetiredSeedId, pvSeedGenericName;
 import '../../localization/app_language.dart';
 import '../../models/product_models.dart';
+import '../../models/pv_product.dart';
 import '../../services/bought_store.dart';
 import '../../services/cart_store.dart';
+import '../../services/life_stage_store.dart' show LifeStage;
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/product_checklist_store.dart';
+import '../../services/pv_catalog_store.dart';
 import '../../widgets/mic_dictation_button.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../cart_screen.dart';
 // Kept for revert (2026-10-02, the wells are the TTC family marks now): import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../pregnancy/preg_after_loss_note.dart';
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
-import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
-import '../products_screen.dart';
+import '../products/pv_product_screen.dart';
+import '../products/pv_search_screen.dart';
+import '../products/pv_store_chrome.dart'
+    show PvChip, kPvInk, kPvLine, kPvProductRoutePrefix, pvStorePalette;
+// Kept for revert (P4 D1): ProductDetailScreen and showSingleItemBuyNow, the
+// preview checkout. The live store's product page replaces both.
+// import '../products_screen.dart';
 import '../../theme/pv_fonts.dart';
 import '../ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
@@ -89,6 +118,8 @@ Widget _tabMark(TtcTabMark m, {double size = 44}) =>
 /// `kCuratedChecklists`). Replaces the emoji and the old hub marks.
 Widget _curatedLeading(CuratedList c, {double size = 44}) => _tabMark(
       switch (c.name) {
+        // P4 P5: the starter was renamed; the old name kept for revert.
+        kFeedingStarterName => TtcTabMark.heartHand,
         'Newborn essentials' => TtcTabMark.heartHand,
         'Bump comfort' => TtcTabMark.lotus,
         'Skin & body' => TtcTabMark.jarLeaf,
@@ -99,7 +130,10 @@ Widget _curatedLeading(CuratedList c, {double size = 44}) => _tabMark(
 
 /// A product's picture: its own photo, or the family's bag mark in a quiet
 /// well. Never an emoji and never a stock photo.
-Widget _thumb(Product? p, double size) {
+///
+/// [photoUrl] is a live-store product's photo (2026-10-28, the seed retired):
+/// used when there is no old-model [p].
+Widget _thumb(Product? p, double size, {String? photoUrl}) {
   final pal = pvStorePalette;
   Widget mark() => Container(
         width: size,
@@ -110,7 +144,10 @@ Widget _thumb(Product? p, double size) {
         child: TtcMarkLeading(
             tool: TtcToolMark.hospitalBag, tint: _tint(), size: size * 0.74),
       );
-  final photo = p == null ? null : _realImage(p);
+  // Kept for revert: final photo = p == null ? null : _realImage(p);
+  final photo = p == null
+      ? ((photoUrl == null || photoUrl.isEmpty) ? null : photoUrl)
+      : _realImage(p);
   if (photo == null) return mark();
   return ClipRRect(
     borderRadius: BorderRadius.circular(12),
@@ -161,8 +198,9 @@ class _Copy {
   String get customTag => hi ? s.pclCustomTag : 'Added by you';
   String get boughtTag => hi ? s.pclBoughtTag : 'Bought';
   String gotHeading(int n) => hi ? 'Got · $n' : 'Got · $n';
-  String get gotSnack =>
-      hi ? s.pclGotPromptBody : "Ticked off. It won't go in your cart.";
+  // Kept for revert (P4 D1, the cart left this tool):
+  //   hi ? s.pclGotPromptBody : "Ticked off. It won't go in your cart.";
+  String get gotSnack => hi ? s.pclGotPromptBody : 'Ticked off. It moves to Got.';
   String get undo => hi ? 'Undo' : 'Undo';
   String get savedAuto => hi ? '' : 'Saved as you go';
   String get allDone => hi ? '' : 'Everything on this list is ticked off.';
@@ -174,6 +212,7 @@ class _Copy {
 // Kept for revert (2026-10-02): the old hub marks; `_curatedLeading` replaced it.
 // ignore: unused_element
 IntentMark _curatedMark(CuratedList c) => switch (c.name) {
+      kFeedingStarterName => IntentMark.feedMark,
       'Newborn essentials' => IntentMark.feedMark,
       'Bump comfort' => IntentMark.lotusMark,
       'Skin & body' => IntentMark.bodyMark,
@@ -257,21 +296,121 @@ const List<String> _kTopFilters = [
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
 
-void _openUrl(String url) {
-  final uri = Uri.tryParse(url.trim());
-  if (uri != null && url.trim().isNotEmpty) {
-    launchUrl(uri, mode: LaunchMode.externalApplication);
+// Kept for revert (P4 D1): a bare launchUrl, untagged, and a link typed
+// without https:// failed silently.
+// void _openUrl(String url) {
+//   final uri = Uri.tryParse(url.trim());
+//   if (uri != null && url.trim().isNotEmpty) {
+//     launchUrl(uri, mode: LaunchMode.externalApplication);
+//   }
+// }
+
+/// The words "See it in the store" (P4 D1).
+const String _kSeeInStore = 'See it in the store';
+
+/// The after-loss note at the top of the tool (D4).
+// One copy for every after-loss note (preg_after_loss_note.dart).
+const String kChecklistAfterLossNote = kAfterLossChecklist;
+
+/// Her own link, out through openOutbound (tagged when it is a retailer we
+/// have a tag for). A link with no scheme gets https://; a failure says why.
+Future<void> _openLink(BuildContext context, String raw) async {
+  final url = normaliseOutboundLink(raw);
+  final ok = url.isNotEmpty && await openOutbound(url);
+  if (!ok && context.mounted) {
+    pvToast(context, "Couldn't open that link. Check it, or your connection.");
   }
 }
 
+/// The checklist's one way to the shop (P4 D1): the product's page when the
+/// live store knows its id, else the store's search on its name, else a
+/// tagged Amazon search. The checklist's product ids are the store's ids
+/// (pv_catalog_adapters.dart keeps `id: p.id`).
+Future<void> _openInStore(BuildContext context,
+    {String? productId, required String name}) async {
+  final store = PvCatalogStore.instance;
+  final route = getReadyStoreRoute(
+    productId: productId,
+    query: name,
+    storeHasId: (id) => store.byId(id) != null,
+    storeSearchHits: (q) => store.search(q).all.isNotEmpty,
+  );
+  switch (route) {
+    case GetReadyStoreRoute.productPage:
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => PvProductScreen(productId: productId!),
+        settings: RouteSettings(name: '$kPvProductRoutePrefix$productId'),
+      ));
+    case GetReadyStoreRoute.storeSearch:
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) =>
+            PvSearchScreen(stage: LifeStage.pregnancy, initialQuery: name.trim()),
+        settings: const RouteSettings(name: 'store/search'),
+      ));
+    case GetReadyStoreRoute.amazonSearch:
+      final ok = await openOutbound(amazonSearchUrlFor(name));
+      if (!ok && context.mounted) {
+        pvToast(context,
+            "Couldn't open Amazon. Check your connection and try again.");
+      }
+  }
+}
+
+/// The store search words for an item: the catalogue product's English name
+/// (it leaves the app, and the store lists in English), or her own name.
+// Kept for revert (seed retired 2026-10-28):
+// String _storeName(ChecklistItem i) =>
+//     _itemProduct(i)?.name.en ?? (i.name.isEmpty ? 'Item' : i.name);
+String _storeName(ChecklistItem i) =>
+    _itemProduct(i)?.name.en ??
+    _itemStoreProduct(i)?.name ??
+    _retiredName(i) ??
+    (i.name.isEmpty ? 'Item' : i.name);
+
 // --- resolve a checklist item (catalog product OR custom) to display fields ---
+//
+// ⚠️ NO SEED PRODUCTS (2026-10-28, the user: "no need to have fake situations
+// in the app... show whatever we have"). The old pregnancy products behind
+// `productById` are invented (names, prices, ratings, photos) and are out of
+// the store. An item she saved on one now reads as the plain name of its
+// group ("Nursing bra"), with no brand, price, rating or photo; its tick,
+// note and bought state stay, and "See it in the store" searches the store
+// for that name. An item added from the live store resolves through
+// `PvCatalogStore`. Kept for revert:
+//   Product? _itemProduct(ChecklistItem i) =>
+//       i.isCustom ? null : productById(i.productId);
 Product? _itemProduct(ChecklistItem i) =>
-    i.isCustom ? null : productById(i.productId);
+    i.isCustom || pvIsRetiredSeedId(i.productId)
+        ? null
+        : productById(i.productId);
+
+/// A live-store product on her list (added from the picker), or null.
+PvProduct? _itemStoreProduct(ChecklistItem i) => i.isCustom
+    ? null
+    : PvCatalogStore.instance.byId(i.productId);
+
+/// The group name a retired seed item reads as, or null for anything else.
+String? _retiredName(ChecklistItem i) => !i.isCustom &&
+        pvIsRetiredSeedId(i.productId)
+    ? (pvSeedGenericName(i.productId) ?? 'Item')
+    : null;
+
 // Display only - the card keys off product.id, not this. Resolved here so
 // the ternary does not infer Object from a LocalizedText and a String.
+// Kept for revert (seed retired 2026-10-28):
+// String _itemName(ChecklistItem i) =>
+//     _itemProduct(i)?.name.now ?? (i.name.isEmpty ? 'Item' : i.name);
+// String _itemPrice(ChecklistItem i) => _itemProduct(i)?.price ?? i.price;
 String _itemName(ChecklistItem i) =>
-    _itemProduct(i)?.name.now ?? (i.name.isEmpty ? 'Item' : i.name);
-String _itemPrice(ChecklistItem i) => _itemProduct(i)?.price ?? i.price;
+    _itemProduct(i)?.name.now ??
+    _itemStoreProduct(i)?.name ??
+    _retiredName(i) ??
+    (i.name.isEmpty ? 'Item' : i.name);
+
+/// Her own price, or the old product's. A retired seed item and a live-store
+/// product show none here: the store page carries the real one.
+String _itemPrice(ChecklistItem i) =>
+    _itemProduct(i)?.price ?? (i.isCustom ? i.price : '');
 // Kept for revert (2026-10-02, no emoji anywhere): `_itemEmoji` returned the
 // product's emoji for the picture; `_thumb` draws the photo or the family mark.
 // String _itemEmoji(ChecklistItem i) => _itemProduct(i)?.emoji ?? '🛍️';
@@ -478,7 +617,9 @@ class ProductChecklistScreen extends StatelessWidget {
     // Scaffold(appBar: _pregAppBar(), body: ListView with the serif title, the
     // pclIntro line, and a Row of PregSectionHeading + a TextButton.icon "add").
     return AnimatedBuilder(
-      animation: ProductChecklistStore.instance,
+      // Kept for revert: animation: ProductChecklistStore.instance.
+      animation: Listenable.merge(
+          [ProductChecklistStore.instance, PregnancyEndedStore.instance]),
       builder: (context, _) {
         final store = ProductChecklistStore.instance;
         final lists = store.checklists;
@@ -517,6 +658,8 @@ class ProductChecklistScreen extends StatelessWidget {
             pregToolPad(Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // After a loss (D4): her lists stay; one calm line says so.
+                  const PregAfterLossNote(kChecklistAfterLossNote),
                   PregSectionHeading(s.pclYourLists),
                   const SizedBox(height: 4),
                   if (lists.isEmpty)
@@ -530,8 +673,11 @@ class ProductChecklistScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   // One white card of rows with drawn marks. Kept for revert:
                   // `_curatedCard` per list, a bordered card with the emoji.
+                  // Kept for revert: for (final l in kCuratedChecklists).
+                  // P4 P5: due soonest for her week first; after a loss the
+                  // newborn starter steps aside (D4).
                   PregRowCard(children: [
-                    for (final l in kCuratedChecklists) _curatedRow(context, s, c, l),
+                    for (final l in _startersForHer()) _curatedRow(context, s, c, l),
                   ]),
                 ])),
           ],
@@ -539,6 +685,18 @@ class ProductChecklistScreen extends StatelessWidget {
       },
     );
   }
+
+  /// The starter lists in her order (P4 P5): with a real week, the list
+  /// whose items are due soonest first; no week, the authored order.
+  List<CuratedList> _startersForHer() => curatedForHer(
+        kCuratedChecklists,
+        week: controller.isDueDateSet ? controller.currentWeek : null,
+        afterLoss: PregnancyEndedStore.instance.ended,
+        tierOf: (id, week) {
+          final p = PvCatalogStore.instance.byId(id);
+          return p == null ? 1 : pvWeekTier(p, week);
+        },
+      );
 
   void _newChecklist(BuildContext context, S s) async {
     final name = await _promptText(context, s, s.pclNewChecklist, s.pclNamePrompt);
@@ -575,7 +733,8 @@ class ProductChecklistScreen extends StatelessWidget {
   Widget _checklistCard(BuildContext context, S s, _Copy c, ProductChecklist l) {
     final pal = pvStorePalette;
     final total = l.items.length;
-    final got = l.gotCount;
+    // Kept for revert (P4 P3): final got = l.gotCount; (ticked only).
+    final got = l.ownedCount(_isBought);
     final pct = total == 0 ? 0.0 : got / total;
     // Swipe-left to delete (with confirm); the ⋮ menu offers it too.
     return Dismissible(
@@ -684,8 +843,10 @@ class ProductChecklistScreen extends StatelessWidget {
   }
 
   void _deleteList(BuildContext context, S s, ProductChecklist l) {
-    ProductChecklistStore.instance.deleteChecklist(l.id);
-    pvToast(context, s.pclDeleted, kind: PvToastKind.done);
+    // Kept for revert (P4 P5): a done toast with no way back.
+    //   ProductChecklistStore.instance.deleteChecklist(l.id);
+    //   pvToast(context, s.pclDeleted, kind: PvToastKind.done);
+    _deleteWithUndo(context, l);
   }
 
   Widget _curatedRow(BuildContext context, S s, _Copy c, CuratedList l) => PregOfferRow(
@@ -709,10 +870,12 @@ class ProductChecklistScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (sheetCtx) {
-        final products = [
-          for (final it in c.items)
-            (product: productById(it.productId), note: it.note)
-        ].where((e) => e.product != null).toList();
+        // Kept for revert (seed retired 2026-10-28): each row was a seed
+        // product, with its invented name, price and photo.
+        //   final products = [
+        //     for (final it in c.items)
+        //       (product: productById(it.productId), note: it.note)
+        //   ].where((e) => e.product != null).toList();
         return SafeArea(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             const SizedBox(height: 10),
@@ -745,21 +908,28 @@ class ProductChecklistScreen extends StatelessWidget {
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 children: [
-                  for (final e in products)
+                  // Kept for revert (seed retired 2026-10-28):
+                  //   for (final e in products)
+                  //     ListTile(
+                  //       leading: _thumb(e.product, 40),
+                  //       title: Text(e.product!.name.now, ...),
+                  //       subtitle: Text(e.note.isEmpty
+                  //           ? e.product!.price
+                  //           : '${e.note} · ${e.product!.price}', ...),
+                  //     ),
+                  // The thing itself and when: no brand, price or photo.
+                  for (final e in c.items)
                     ListTile(
-                      // The photo or the family mark. Kept for revert:
-                      // Text(e.product!.emoji, style: const TextStyle(fontSize: 24)).
-                      leading: _thumb(e.product, 40),
-                      title: Text(e.product!.name.now,
+                      leading: _thumb(null, 40),
+                      title: Text(e.name,
                           style: pvManrope(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: pal.ink1)),
-                      subtitle: Text(
-                          e.note.isEmpty
-                              ? e.product!.price
-                              : '${e.note} · ${e.product!.price}',
-                          style: pvManrope(fontSize: 12, color: pal.ink3)),
+                      subtitle: e.note.isEmpty
+                          ? null
+                          : Text(e.note,
+                              style: pvManrope(fontSize: 12, color: pal.ink3)),
                     ),
                 ],
               ),
@@ -778,6 +948,9 @@ class ProductChecklistScreen extends StatelessWidget {
                         context,
                         _ChecklistDetailScreen(
                             controller: controller, checklistId: id));
+                    // P4 P5: say what it made.
+                    pvToast(context, '${c.name} added to your lists.',
+                        kind: PvToastKind.done);
                   },
                   child: Text(cp.adopt,
                       style: pvManrope(fontWeight: FontWeight.w800)),
@@ -886,13 +1059,16 @@ class _ChecklistDetailScreen extends StatelessWidget {
           );
         }
         final total = list.items.length;
-        final got = list.gotCount;
         final c = _Copy(s, controller.language.isHindi);
-        bool owned(ChecklistItem it) {
-          final pr = _itemProduct(it);
-          return it.checked ||
-              (pr != null && BoughtStore.instance.isBought(pr.id));
-        }
+        // Kept for revert (seed retired 2026-10-28; bought is read off the
+        // item's id now, so a retired seed item she bought stays got):
+        //   final pr = _itemProduct(it);
+        //   return it.checked ||
+        //       (pr != null && BoughtStore.instance.isBought(pr.id));
+        bool owned(ChecklistItem it) => it.checked || _isBought(it);
+        // P4 P3: the count is the Got group's own rule (ticked or bought).
+        // Kept for revert: final got = list.gotCount; (ticked only).
+        final got = list.ownedCount(_isBought);
 
         final todo = [for (final it in list.items) if (!owned(it)) it];
         final gotItems = [for (final it in list.items) if (owned(it)) it];
@@ -908,7 +1084,18 @@ class _ChecklistDetailScreen extends StatelessWidget {
                   final name = await _promptText(
                       context, s, s.pclRename, s.pclNamePrompt,
                       initial: list.name);
-                  if (name != null) store.renameChecklist(list.id, name);
+                  // Kept for revert (P4 P5, silent):
+                  // if (name != null) store.renameChecklist(list.id, name);
+                  if (name == null) return;
+                  if (name.trim().isEmpty) {
+                    if (context.mounted) pvToast(context, 'Add a name first.');
+                    return;
+                  }
+                  store.renameChecklist(list.id, name);
+                  if (context.mounted) {
+                    pvToast(context, 'Renamed to ${name.trim()}.',
+                        kind: PvToastKind.done);
+                  }
                 } else if (v == 'delete') {
                   final ok = await showDialog<bool>(
                     context: context,
@@ -927,9 +1114,13 @@ class _ChecklistDetailScreen extends StatelessWidget {
                       ],
                     ),
                   );
-                  if (ok == true) {
-                    store.deleteChecklist(list.id);
-                    if (context.mounted) Navigator.of(context).pop();
+                  // Kept for revert (P4 P5, silent and final):
+                  //   store.deleteChecklist(list.id);
+                  //   if (context.mounted) Navigator.of(context).pop();
+                  if (ok == true && context.mounted) {
+                    final nav = Navigator.of(context);
+                    _deleteWithUndo(context, list);
+                    nav.pop();
                   }
                 }
               },
@@ -1102,7 +1293,8 @@ class _ChecklistDetailScreen extends StatelessWidget {
           // ONE ACTION (2026-10-02): add what is left to the cart, with how many.
           // Not drawn when nothing is left to add. Kept for revert: the two-button
           // `_bottomBar` (Save list and Add remaining to cart).
-          bottomNavigationBar: _cartBar(context, s, c, list),
+          // Kept for revert (P4 D1): the preview cart is gone from this tool.
+          // bottomNavigationBar: _cartBar(context, s, c, list),
         );
       },
     );
@@ -1124,6 +1316,8 @@ class _ChecklistDetailScreen extends StatelessWidget {
     return out;
   }
 
+  // Kept for revert (P4 D1): nothing draws the cart bar now.
+  // ignore: unused_element
   Widget? _cartBar(BuildContext context, S s, _Copy c, ProductChecklist list) {
     final n = _cartable(list).length;
     if (n == 0) return null;
@@ -1383,12 +1577,15 @@ class _ChecklistDetailScreen extends StatelessWidget {
     final pal = pvStorePalette;
     final c = _Copy(s, controller.language.isHindi);
     final product = _itemProduct(item);
+    final storeProduct = product == null ? _itemStoreProduct(item) : null;
     final done = item.checked;
     final name = _itemName(item);
     final price = _itemPrice(item);
     final affiliate = product != null && productIsAffiliate(product);
     // Bought via our preview checkout: shown as owned, nothing left to buy.
-    final bought = product != null && BoughtStore.instance.isBought(product.id);
+    // Kept for revert (seed retired 2026-10-28):
+    //   final bought = product != null && BoughtStore.instance.isBought(product.id);
+    final bought = _isBought(item);
     final owned = done || bought;
     return Padding(
       key: ValueKey('pcl_item_${item.id}'),
@@ -1398,18 +1595,38 @@ class _ChecklistDetailScreen extends StatelessWidget {
         Expanded(
           child: PvPress(child: GestureDetector(
             behavior: HitTestBehavior.opaque,
+            // Kept for revert (P4 D1): a product opened ProductDetailScreen
+            // (with the preview checkout); her link went out untagged.
+            //   if (product != null) {
+            //     _push(context, ProductDetailScreen(product: product, controller: controller));
+            //   } else if (item.link.isNotEmpty) {
+            //     _openUrl(item.link);
+            //   }
+            // A live-store product, a retired seed item (its group name) or a
+            // starter's named thing opens the store too (2026-10-28): none of
+            // them may be a silent tap. Kept for revert:
+            //   if (product != null) {
+            //     _openInStore(context, productId: product.id, name: _storeName(item));
+            //   } else if (item.link.isNotEmpty) {
+            //     _openLink(context, item.link);
+            //   }
             onTap: () {
               if (product != null) {
-                _push(
-                    context,
-                    ProductDetailScreen(
-                        product: product, controller: controller));
+                _openInStore(context, productId: product.id, name: _storeName(item));
               } else if (item.link.isNotEmpty) {
-                _openUrl(item.link);
+                _openLink(context, item.link);
+              } else if (!item.isCustom || item.isStarter) {
+                _openInStore(context,
+                    productId: item.isCustom ? null : item.productId,
+                    name: _storeName(item));
               }
             },
             child: Row(children: [
-              _thumb(product, 44),
+              // Kept for revert: _thumb(product, 44),
+              _thumb(product, 44,
+                  photoUrl: storeProduct == null || storeProduct.images.isEmpty
+                      ? null
+                      : storeProduct.images.first),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -1434,7 +1651,9 @@ class _ChecklistDetailScreen extends StatelessWidget {
                         ] else if (affiliate) ...[
                           const SizedBox(width: 6),
                           _miniTag(c.affiliate),
-                        ] else if (item.isCustom) ...[
+                        // A starter's named thing is not hers (2026-10-28).
+                        // Kept for revert: ] else if (item.isCustom) ...[
+                        ] else if (item.isCustom && !item.isStarter) ...[
                           const SizedBox(width: 6),
                           _miniTag(c.customTag),
                         ],
@@ -1477,38 +1696,38 @@ class _ChecklistDetailScreen extends StatelessWidget {
         ),
         PopupMenuButton<String>(
           icon: Icon(Icons.more_vert_rounded, color: pal.ink3),
+          // Kept for revert (P4 D1): 'cart' (_cartSingle), 'buynow'
+          // (showSingleItemBuyNow, the preview checkout) and 'amazon'
+          // (_openUrl(amazonSearchUrl(product)), untagged). One way to the
+          // shop now, 'store'.
           onSelected: (v) {
             switch (v) {
-              case 'cart':
-                if (product != null) _cartSingle(context, s, product);
-                break;
-              case 'buynow':
-                if (product != null) {
-                  showSingleItemBuyNow(context, controller, product);
-                }
-                break;
-              case 'amazon':
-                if (product != null) _openUrl(amazonSearchUrl(product));
+              case 'store':
+                // A live-store id opens its page; a retired seed id finds
+                // nothing there and falls to the search on its group name
+                // (2026-10-28). Kept for revert: productId: product?.id,
+                _openInStore(context,
+                    productId: product?.id ??
+                        (item.isCustom ? null : item.productId),
+                    name: _storeName(item));
                 break;
               case 'link':
-                _openUrl(item.link);
+                _openLink(context, item.link);
                 break;
               case 'note':
                 _editNote(context, s, store, listId, item);
                 break;
               case 'remove':
-                store.removeItem(listId, item.id);
+                // Kept for revert (P4 P5, silent): store.removeItem(listId, item.id);
+                _removeItem(context, store, listId, item);
                 break;
             }
           },
-          // Buy actions only on items she doesn't have yet (got/bought = none).
+          // The shop only on items she doesn't have yet (got/bought = none).
+          // Kept for revert: cartAddToCart / cartBuyNow / prBuyOnAmazon.
           itemBuilder: (c) => [
-            if (!owned && product != null && !affiliate) ...[
-              PopupMenuItem(value: 'cart', child: Text(s.cartAddToCart)),
-              PopupMenuItem(value: 'buynow', child: Text(s.cartBuyNow)),
-            ],
-            if (!owned && affiliate)
-              PopupMenuItem(value: 'amazon', child: Text(s.prBuyOnAmazon)),
+            if (!owned && !(item.isCustom && item.link.isNotEmpty))
+              const PopupMenuItem(value: 'store', child: Text(_kSeeInStore)),
             if (!done && item.isCustom && item.link.isNotEmpty)
               PopupMenuItem(value: 'link', child: Text(s.pclOpenLink)),
             PopupMenuItem(value: 'note', child: Text(s.pclEditNote)),
@@ -1599,6 +1818,8 @@ class _ChecklistDetailScreen extends StatelessWidget {
     if (yes == true) store.toggleChecked(listId, item.id);
   }
 
+  // Kept for revert (P4 D1): nothing adds to the preview cart from here now.
+  // ignore: unused_element
   void _cartSingle(BuildContext context, S s, Product p) {
     final inCart = CartStore.instance.contains(kProductsCartId, p.id);
     if (!inCart) {
@@ -1626,8 +1847,46 @@ class _ChecklistDetailScreen extends StatelessWidget {
     final note = await _promptText(context, s, s.pclEditNote,
         _Copy(s, controller.language.isHindi).notePrompt,
         initial: item.note);
-    if (note != null) store.setNote(listId, item.id, note);
+    // Kept for revert (P4 P5, silent): if (note != null) store.setNote(...).
+    if (note == null || note.trim() == item.note) return;
+    store.setNote(listId, item.id, note);
+    if (context.mounted) {
+      pvToast(context, note.trim().isEmpty ? 'Note cleared.' : 'Note saved.',
+          kind: PvToastKind.done);
+    }
   }
+
+  /// Removes one item, said, with Undo putting it back in its place (P4 P5).
+  void _removeItem(BuildContext context, ProductChecklistStore store,
+      String listId, ChecklistItem item) {
+    final at = store.byId(listId)?.items.indexWhere((i) => i.id == item.id) ?? -1;
+    final name = _itemName(item);
+    store.removeItem(listId, item.id);
+    pvToast(context, '$name removed from this list.',
+        kind: PvToastKind.undo,
+        action: 'Undo',
+        onAction: () => store.restoreItem(listId, item, at < 0 ? 0 : at));
+  }
+}
+
+/// Bought through the old preview checkout: still counts as owned.
+///
+/// Read off the item's own id (2026-10-28), so a retired seed item she
+/// bought stays bought. Kept for revert:
+///   final pr = _itemProduct(it);
+///   return pr != null && BoughtStore.instance.isBought(pr.id);
+bool _isBought(ChecklistItem it) =>
+    !it.isCustom && BoughtStore.instance.isBought(it.productId);
+
+/// Deletes a whole list, said, with Undo bringing it back whole (P4 P5).
+void _deleteWithUndo(BuildContext context, ProductChecklist l) {
+  final store = ProductChecklistStore.instance;
+  final at = store.listIndexOf(l.id);
+  store.deleteChecklist(l.id);
+  pvToast(context, '${l.name} deleted.',
+      kind: PvToastKind.undo,
+      action: 'Undo',
+      onAction: () => store.restoreChecklist(l, at < 0 ? 0 : at));
 }
 
 // ===========================================================================
@@ -1702,14 +1961,23 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
           ),
         ),
         // Section 12: top filter chips (audience / stage) ABOVE the existing
-        // category-grouped browse below.
-        _topFilterChips(),
+        // category-grouped browse below. They read the old seed model's
+        // categories, so they go with it (2026-10-28). Kept for revert:
+        //   _topFilterChips(),
+        if (kPvShowSeedProducts) _topFilterChips(),
         const SizedBox(height: 4),
         Expanded(
           child: AnimatedBuilder(
-            animation: ProductChecklistStore.instance,
+            // Kept for revert: animation: ProductChecklistStore.instance,
+            animation: Listenable.merge(
+                [ProductChecklistStore.instance, PvCatalogStore.instance]),
             builder: (context, _) {
               final q = _query.trim();
+              // ⚠️ THE REAL STORE, NOT THE SEED (2026-10-28, the user: "no
+              // need to have fake situations in the app... show whatever we
+              // have"). The browse below lists the 24 invented pregnancy
+              // products; the live store's own products are listed instead.
+              if (!kPvShowSeedProducts) return _liveBrowse(s, q);
               if (q.isNotEmpty) {
                 final results = productSearch(q)
                     .where((p) => _productMatchesTopFilter(p, _topFilter))
@@ -1762,6 +2030,136 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
     );
   }
 
+  // --- The live store's products (2026-10-28, the seed retired) -------------
+
+  /// Browse: the store's pregnancy shelves, in the store's order, one label
+  /// per shelf. Search: the whole store, every stage (the store's own rule:
+  /// stage narrows what leads, never what exists). Built lazily: the sheet
+  /// alone is a few hundred products.
+  Widget _liveBrowse(S s, String q) {
+    final pal = pvStorePalette;
+    final cat = PvCatalogStore.instance;
+    final rows = <Object>[]; // a shelf's name (String) or a PvProduct
+    if (q.isNotEmpty) {
+      rows.addAll(cat.search(q).all);
+    } else {
+      final mine = cat.forStage(LifeStage.pregnancy);
+      for (final c in cat.categoriesFor(LifeStage.pregnancy)) {
+        final prods = [for (final p in mine) if (p.categoryId == c.id) p];
+        if (prods.isEmpty) continue;
+        rows
+          ..add(c.name)
+          ..addAll(prods);
+      }
+    }
+    if (rows.isEmpty) {
+      return Center(
+        child: Text(s.pclNoResults, style: pvManrope(color: pal.ink3)),
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+      itemCount: rows.length,
+      itemBuilder: (_, i) {
+        final r = rows[i];
+        if (r is PvProduct) return _storeCard(s, r);
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
+          child: Text((r as String).toUpperCase(), style: pregGroupLabelStyle()),
+        );
+      },
+    );
+  }
+
+  /// A live-store product: its photo, name and brand, and the one add
+  /// toggle. No price and no score here: the store page carries the real
+  /// price, and a score belongs to the product page that explains it.
+  Widget _storeCard(S s, PvProduct p) {
+    final pal = pvStorePalette;
+    final store = ProductChecklistStore.instance;
+    final added = store.isInChecklist(widget.checklistId, p.id);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: PregCard(
+        padding: const EdgeInsets.all(10),
+        onTap: () => _openInStore(context, productId: p.id, name: p.name),
+        child: Row(children: [
+          _thumb(null, 62, photoUrl: p.images.isEmpty ? null : p.images.first),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(p.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          height: 1.3,
+                          color: pal.ink1)),
+                  if (p.brand.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(p.brand,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: pal.ink3)),
+                  ],
+                ]),
+          ),
+          const SizedBox(width: 8),
+          Semantics(
+            button: true,
+            child: PvPress(child: GestureDetector(
+              onTap: () {
+                final listName =
+                    store.byId(widget.checklistId)?.name ?? 'your list';
+                if (added) {
+                  final list = store.byId(widget.checklistId);
+                  final at =
+                      list?.items.indexWhere((i) => i.productId == p.id) ?? -1;
+                  final old = at >= 0 ? list!.items[at] : null;
+                  store.removeItem(widget.checklistId, p.id);
+                  pvToast(context, '${p.name} removed from $listName.',
+                      kind: PvToastKind.undo,
+                      action: 'Undo',
+                      onAction: old == null
+                          ? null
+                          : () => store.restoreItem(widget.checklistId, old, at));
+                } else {
+                  store.addItem(widget.checklistId, p.id);
+                  pvToast(context, '${p.name} added to $listName.',
+                      kind: PvToastKind.done);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+                decoration: BoxDecoration(
+                  color: added ? Colors.white : kPvInk,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: added ? kPvLine : kPvInk),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(added ? Icons.check_rounded : Icons.add_rounded,
+                      size: 16, color: added ? kPvInk : Colors.white),
+                  const SizedBox(width: 4),
+                  Text(added ? s.pclAdded : s.pclAdd,
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: added ? kPvInk : Colors.white)),
+                ]),
+              ),
+            )),
+          ),
+        ]),
+      ),
+    );
+  }
+
   // --- Top filter chips row (Section 12) ------------------------------------
   Widget _topFilterChips() => SizedBox(
         height: 38,
@@ -1807,10 +2205,9 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
       padding: const EdgeInsets.only(bottom: 10),
       child: PregCard(
         padding: const EdgeInsets.all(10),
-        onTap: () => _push(
-            context,
-            ProductDetailScreen(
-                product: p, controller: widget.controller)),
+        // Kept for revert (P4 D1): onTap: () => _push(context,
+        //   ProductDetailScreen(product: p, controller: widget.controller)).
+        onTap: () => _openInStore(context, productId: p.id, name: p.name.en),
         child: Row(children: [
           // The product's own photo, or the family's bag mark in a quiet well
           // (2026-10-02). Kept for revert: its emoji in a neutral well.
@@ -1853,11 +2250,27 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
           Semantics(
             button: true,
             child: PvPress(child: GestureDetector(
+              // Kept for revert (P4 P5, silent):
+              //   if (added) { store.removeItem(widget.checklistId, p.id); }
+              //   else { store.addItem(widget.checklistId, p.id); }
               onTap: () {
+                final listName =
+                    store.byId(widget.checklistId)?.name ?? 'your list';
                 if (added) {
+                  final list = store.byId(widget.checklistId);
+                  final at = list?.items.indexWhere((i) => i.productId == p.id) ?? -1;
+                  final old = at >= 0 ? list!.items[at] : null;
                   store.removeItem(widget.checklistId, p.id);
+                  pvToast(context, '${p.name.now} removed from $listName.',
+                      kind: PvToastKind.undo,
+                      action: 'Undo',
+                      onAction: old == null
+                          ? null
+                          : () => store.restoreItem(widget.checklistId, old, at));
                 } else {
                   store.addItem(widget.checklistId, p.id);
+                  pvToast(context, '${p.name.now} added to $listName.',
+                      kind: PvToastKind.done);
                 }
               },
               child: Container(
@@ -2070,7 +2483,11 @@ class _AddProductsScreenState extends State<_AddProductsScreen> {
                       style: _filledStyle(),
                       onPressed: () {
                         final name = nameC.text.trim();
-                        if (name.isEmpty) return;
+                        // Kept for revert (P4 P5): if (name.isEmpty) return; (silent).
+                        if (name.isEmpty) {
+                          pvToast(sheetCtx, 'Add a name first.');
+                          return;
+                        }
                         ProductChecklistStore.instance.addCustomItem(
                           widget.checklistId,
                           name: name,

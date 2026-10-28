@@ -19,6 +19,7 @@ import 'pp_common.dart';
 import 'pp_expert_link.dart';
 import 'pp_leaps_data.dart';
 import 'pp_products_data.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvIsRetiredSeedId;
 import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
 import 'product_detail_screen.dart';
@@ -66,7 +67,16 @@ class LeapDefinitionScreen extends StatelessWidget {
     // final end = leap.endDate(child.dob);
 
     final articles = leap.articleIds.map(readArticleById).toList();
-    final products = leap.productIds.map(productById).toList();
+    // ⚠️ NO SEED PRODUCTS (2026-10-28, the user: "no need to have fake
+    // situations in the app... show whatever we have"). The leaps name the
+    // invented 'dozy' seed, out of the store now (pv_catalog_adapters.dart);
+    // a retired id drops out and the section shows its own empty note
+    // ("Picks for this phase are on the way."). Kept for revert:
+    //   final products = leap.productIds.map(productById).toList();
+    final products = [
+      for (final id in leap.productIds)
+        if (!pvIsRetiredSeedId(id)) productById(id),
+    ];
     final video = leap.videoId != null ? watchVideoById(leap.videoId!) : null;
 
     return Scaffold(

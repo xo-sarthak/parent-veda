@@ -20,7 +20,17 @@ void main() {
       expect(has('when do i start solids'), isTrue); // starting solids
       expect(has('how to do tummy time'), isTrue); // activity
       expect(has('soft khichdi recipe'), isTrue); // recipe
-      expect(has('white noise soother'), isTrue); // product
+      // The product documents were the invented parenting seed, retired
+      // 2026-10-28 (the user: no fake products); they are in the corpus only
+      // in a demo build. Kept for revert:
+      //   expect(has('white noise soother'), isTrue); // product
+      if (const bool.fromEnvironment('PV_SEED_PRODUCTS')) {
+        expect(has('white noise soother'), isTrue); // product
+      }
+      expect(
+        parentingCorpus().where((d) => d.kind == VedaKind.product),
+        const bool.fromEnvironment('PV_SEED_PRODUCTS') ? isNotEmpty : isEmpty,
+      );
     });
 
     test('every hit stays inside the parenting domain (no cross-leak)', () {

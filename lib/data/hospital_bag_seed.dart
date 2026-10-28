@@ -120,7 +120,11 @@ final List<_Seed> _seed = [
   _Seed('baby_wipes', BagCategory.baby, _same('Baby wipes')),
   _Seed('baby_blanket', BagCategory.baby, _t('Soft baby blanket', 'नरम शिशु कंबल')),
   _Seed('baby_towel', BagCategory.baby, _t('Baby towel', 'शिशु का तौलिया')),
-  _Seed('baby_lotion', BagCategory.baby, _t('Mild baby lotion / oil', 'हल्का baby lotion / तेल')),
+  // Kept for revert (P4 H2, 2026-10-28): the NHS advises nothing on a
+  // newborn's skin for the first month, plain water only, so the bag no
+  // longer suggests a lotion. Existing bags drop it unless it is packed
+  // ([kRetiredBagIds]).
+  // _Seed('baby_lotion', BagCategory.baby, _t('Mild baby lotion / oil', 'हल्का baby lotion / तेल')),
   _Seed('baby_homeoutfit', BagCategory.baby, _t('Going-home outfit', 'घर जाने के कपड़े')),
 
   // For Partner -------------------------------------------------------------
@@ -137,6 +141,14 @@ final List<_Seed> _seed = [
   _Seed('docs_records', BagCategory.documents, _t('Medical records & scan reports', 'इलाज के काग़ज़ और scan reports')),
   _Seed('docs_birthplan', BagCategory.documents, _t('Birth plan (if you have one)', 'Birth plan (अगर बनाया हो)')),
   _Seed('docs_contacts', BagCategory.documents, _t("Doctor's contact number", 'डॉक्टर का नंबर')),
+  // The papers an Indian hospital asks for (P4 H5, 2026-10-28). English only:
+  // new copy is English (CLAUDE.md, 2026-08-27).
+  _Seed('docs_mcp', BagCategory.documents,
+      _same('Mother and child health card (MCP card) and antenatal file')),
+  _Seed('docs_bloodgroup', BagCategory.documents, _same('Blood group report')),
+  _Seed('docs_preauth', BagCategory.documents,
+      _same('Cashless pre-approval papers, and money for the deposit')),
+  _Seed('docs_partner_id', BagCategory.documents, _same("Your partner's ID")),
 
   // Optional Comfort Items --------------------------------------------------
   _Seed('comfort_pillow', BagCategory.comfort, _t('Your own pillow', 'अपना तकिया')),
@@ -171,6 +183,29 @@ List<BagItem> generateDefaultBag(DeliveryType delivery) => [
       for (final s in _seed)
         if (s.onlyFor == null || s.onlyFor == delivery) _itemFromSeed(s),
     ];
+
+/// The ids that only belong in some delivery types (the caesarean items).
+/// Changing her delivery type adds or removes only these (P4 H5).
+Set<String> bagDeliveryOnlyIds() =>
+    {for (final s in _seed) if (s.onlyFor != null) s.id};
+
+/// Items the bag no longer suggests. An existing bag drops them unless she
+/// has already packed them (P4 H2: the NHS says nothing on newborn skin in
+/// the first month).
+const Set<String> kRetiredBagIds = {'baby_lotion'};
+
+/// Items added to the default bag after bags already existed (P4 H5, the
+/// India documents). An existing bag gains them once, unticked.
+const Set<String> kAddedBagIds = {
+  'docs_mcp',
+  'docs_bloodgroup',
+  'docs_preauth',
+  'docs_partner_id',
+};
+
+/// Fresh default-bag items for [ids], in seed order.
+List<BagItem> bagSeedItems(Set<String> ids) =>
+    [for (final s in _seed) if (ids.contains(s.id)) _itemFromSeed(s)];
 
 /// The optional suggested-essentials a mother can tap to add.
 List<BagItem> suggestedEssentials() =>

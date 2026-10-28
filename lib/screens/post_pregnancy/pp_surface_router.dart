@@ -686,8 +686,11 @@ Widget? ppScreenForSurface(String id) {
     // sub's display name ('Soothers & white noise'); the unified ids are its
     // slug. Kept for revert: ppPreloadCompare(shelf).
     final subId = pvSlug(shelf);
-    PvCompareStore.instance.preload(
-        PvCatalogStore.instance.all.where((p) => p.subId == subId));
+    // A "Coming soon" place-holder has nothing to compare (2026-10-28,
+    // pv_coming_soon.dart); a shelf of only those keeps the empty state.
+    // Kept for revert: .where((p) => p.subId == subId)
+    PvCompareStore.instance.preload(PvCatalogStore.instance.all
+        .where((p) => p.subId == subId && !p.comingSoon));
     return const ProductsCompareScreen();
   }
   // ⚠️ `pp_nuskhe/<category>` OPENS THE REMEDIES ALREADY FILTERED. The Health

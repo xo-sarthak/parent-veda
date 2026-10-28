@@ -31,6 +31,7 @@
 //  simply not hungry today.
 // =============================================================================
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -83,6 +84,15 @@ class CravingLog {
   final String kind;
 }
 
+/// The group her own typed items sit under on the list (P4 S5, 2026-10-28).
+/// A recipe id, as far as the store and the sync key are concerned:
+/// `shop|own|<name>`. A recipe id never holds a bar, and this one does not.
+const String kOwnListId = 'own';
+
+/// A line taken off the list, with where it sat, so an Undo puts it back in
+/// the same place (P4 S5).
+typedef ShoppingLine = ({ShoppingItem item, int order});
+
 /// One line on the shopping list.
 class ShoppingItem {
   ShoppingItem({required this.recipeId, required this.name, this.done = false});
@@ -128,8 +138,43 @@ class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
   NutritionDay day(DateTime d) => _days.putIfAbsent(plateDateKey(d), NutritionDay.new);
   NutritionDay get today => day(DateTime.now());
 
-  Future<void> init() async {
-    if (_loaded) return;
+  // ⚠️ NOTHING IS WRITTEN BEFORE THE CACHE IS READ (P4 S2, 2026-10-28).
+  // Every mutation saves the WHOLE local blob (`persistLocalCache`). Only the
+  // Nutrition door and the Today body called `init`, so a recipe's "Add to my
+  // list" opened another way changed an empty store and saved it, writing
+  // over `nutrition_day_v1`: her water, ticks and list went, for good when
+  // logged out (nothing in the cloud to bring them back).
+  //
+  // The fix, and its trade-off: before the cache is read, a mutation is held
+  // (`_waiting`), the read is started, and the held edits are replayed on top
+  // of what was read. The other way was to make every mutator `async` and
+  // await `init` first: the same result, but every caller (sync taps in a
+  // dozen screens) would change shape. Replaying costs one thing: an edit made
+  // in the few milliseconds before the read lands shows when the read lands,
+  // not at the tap. A late tick is better than a lost day. Removals that
+  // return what they took return nothing in that window, which is right:
+  // before the read there is nothing on screen to remove.
+  bool _cacheRead = false;
+  final List<VoidCallback> _waiting = [];
+  Future<void>? _starting;
+
+  // Kept for revert (P4 S2): the old init, which a second caller returned
+  // from before the first had read anything.
+  // Future<void> init() async {
+  //   if (_loaded) return;
+  //   _loaded = true;
+  //   _prefs = await SharedPreferences.getInstance();
+  //   ...
+  // }
+  /// Reads the cache and starts the sync. Safe to call from every screen;
+  /// every caller waits for the same read.
+  Future<void> init() {
+    if (_starting case final f?) return f;
+    if (_loaded) return Future.value();
+    return _starting = _start();
+  }
+
+  Future<void> _start() async {
     _loaded = true;
     _prefs = await SharedPreferences.getInstance();
     final raw = _prefs?.getString(_key);
@@ -138,34 +183,52 @@ class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
         _fromBlob(jsonDecode(raw));
       } catch (_) {/* a bad cache is an empty one */}
     }
+    _cacheRead = true;
+    if (_waiting.isNotEmpty) {
+      final held = List.of(_waiting);
+      _waiting.clear();
+      for (final edit in held) {
+        edit();
+      }
+      _prune();
+      await persistLocalCache();
+    }
     notifyListeners();
     // await syncStateFromCloud(); // kept for revert (step 13)
     await syncMergedFromCloud();
   }
 
+  /// Every mutation goes through here: applied and saved now, or held until
+  /// the cache is read (see above).
+  void _change(VoidCallback edit) {
+    if (_cacheRead) {
+      edit();
+      _save();
+      return;
+    }
+    _waiting.add(edit);
+    unawaited(init());
+  }
+
   // ---- water ------------------------------------------------------------------
 
-  void setWater(DateTime d, int glasses) {
-    day(d).water = glasses.clamp(0, kGlasses);
-    _save();
-  }
+  void setWater(DateTime d, int glasses) =>
+      _change(() => day(d).water = glasses.clamp(0, kGlasses));
 
-  void tapGlass(DateTime d, int index) {
-    final t = day(d);
-    // Tapping the last filled glass empties it; tapping ahead fills up to it.
-    t.water = (index + 1 == t.water) ? index : index + 1;
-    _save();
-  }
+  void tapGlass(DateTime d, int index) => _change(() {
+        final t = day(d);
+        // Tapping the last filled glass empties it; tapping ahead fills up to it.
+        t.water = (index + 1 == t.water) ? index : index + 1;
+      });
 
   // ---- ticks ------------------------------------------------------------------
 
   bool ticked(DateTime d, String need) => day(d).ticks.contains(need);
 
-  void toggleTick(DateTime d, String need) {
-    final t = day(d).ticks;
-    if (!t.remove(need)) t.add(need);
-    _save();
-  }
+  void toggleTick(DateTime d, String need) => _change(() {
+        final t = day(d).ticks;
+        if (!t.remove(need)) t.add(need);
+      });
 
   /// How many of the last seven days carry this tick — for one warm line.
   int daysTicked(String need, {DateTime? now}) {
@@ -182,31 +245,31 @@ class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
 
   String? swapFor(DateTime d, String slotKey) => day(d).swaps[slotKey];
 
-  void setSwap(DateTime d, String slotKey, String? meal) {
-    final t = day(d);
-    if (meal == null) {
-      t.swaps.remove(slotKey);
-    } else {
-      t.swaps[slotKey] = meal;
-      t.skipped.remove(slotKey);
-    }
-    _save();
-  }
+  void setSwap(DateTime d, String slotKey, String? meal) => _change(() {
+        final t = day(d);
+        if (meal == null) {
+          t.swaps.remove(slotKey);
+        } else {
+          t.swaps[slotKey] = meal;
+          t.skipped.remove(slotKey);
+        }
+      });
 
   bool isSkipped(DateTime d, String slotKey) => day(d).skipped.contains(slotKey);
 
-  void toggleSkip(DateTime d, String slotKey) {
-    final t = day(d).skipped;
-    if (!t.remove(slotKey)) t.add(slotKey);
-    _save();
-  }
+  void toggleSkip(DateTime d, String slotKey) => _change(() {
+        final t = day(d).skipped;
+        if (!t.remove(slotKey)) t.add(slotKey);
+      });
 
   // ---- cravings ---------------------------------------------------------------
 
   void logCraving(String kind) {
-    _cravings.insert(0, CravingLog(at: DateTime.now(), kind: kind));
-    if (_cravings.length > 100) _cravings.removeRange(100, _cravings.length);
-    _save();
+    final at = DateTime.now();
+    _change(() {
+      _cravings.insert(0, CravingLog(at: at, kind: kind));
+      if (_cravings.length > 100) _cravings.removeRange(100, _cravings.length);
+    });
   }
 
   /// The kind she has reached for most in the last seven days, if any.
@@ -225,14 +288,27 @@ class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
   // ---- shopping ---------------------------------------------------------------
 
   void addToList(String recipeId, Iterable<String> names) {
-    for (final n in names) {
-      if (!_shopping.any((s) => s.recipeId == recipeId && s.name == n)) {
-        final item = ShoppingItem(recipeId: recipeId, name: n);
-        _shopping.add(item);
-        _shopOrder[item.key] = _nextOrder();
+    final list = names.toList();
+    _change(() {
+      for (final n in list) {
+        if (!_shopping.any((s) => s.recipeId == recipeId && s.name == n)) {
+          final item = ShoppingItem(recipeId: recipeId, name: n);
+          _shopping.add(item);
+          _shopOrder[item.key] = _nextOrder();
+        }
       }
-    }
-    _save();
+    });
+  }
+
+  /// Something she typed herself (P4 S5): under "Your own", synced per item
+  /// like every other line (`shop|own|<name>`). False when it is empty or
+  /// already on her own list.
+  bool addOwnItem(String name) {
+    final n = name.trim();
+    if (n.isEmpty) return false;
+    if (_cacheRead && itemOnList(kOwnListId, n)) return false;
+    addToList(kOwnListId, [n]);
+    return true;
   }
 
   bool onList(String recipeId) => _shopping.any((s) => s.recipeId == recipeId);
@@ -245,49 +321,80 @@ class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
   /// not make her delete them afterwards (2026-09-22 — Blinkit puts an ADD on
   /// every ingredient, and per-item is the half of that worth copying: the
   /// half that is a shopping list, not a shop).
-  void toggleItem(String recipeId, String name) {
-    final i = _shopping.indexWhere((s) => s.recipeId == recipeId && s.name == name);
-    if (i == -1) {
-      final item = ShoppingItem(recipeId: recipeId, name: name);
-      _shopping.add(item);
-      _shopOrder[item.key] = _nextOrder();
-    } else {
-      _shopping.removeAt(i);
-    }
-    _save();
+  void toggleItem(String recipeId, String name) => _change(() {
+        final i = _shopping.indexWhere((s) => s.recipeId == recipeId && s.name == name);
+        if (i == -1) {
+          final item = ShoppingItem(recipeId: recipeId, name: name);
+          _shopping.add(item);
+          _shopOrder[item.key] = _nextOrder();
+        } else {
+          _shopping.removeAt(i);
+        }
+      });
+
+  // By key, not by the object (P4 S2): a held edit replays after the read,
+  // when the list holds new objects for the same lines. Kept for revert:
+  //   item.done = !item.done; _save();
+  void toggleBought(ShoppingItem item) => _change(() {
+        for (final s in _shopping) {
+          if (s.key == item.key) s.done = !s.done;
+        }
+      });
+
+  // P4 S5 (2026-10-28): the removals hand back what they took, so the screen
+  // can say so and offer Undo. Kept for revert: each was
+  //   `_shopping.removeWhere(...); _save();` returning nothing.
+
+  /// Takes a whole group off. Returns the lines removed.
+  List<ShoppingLine> removeRecipeFromList(String recipeId) =>
+      _removeWhere((s) => s.recipeId == recipeId);
+
+  /// Takes the ticked lines off. Returns the lines removed.
+  List<ShoppingLine> clearBought() => _removeWhere((s) => s.done);
+
+  /// Takes one line off. Returns it, or null if it was not there.
+  ShoppingLine? removeItem(ShoppingItem item) =>
+      _removeWhere((s) => s.key == item.key).firstOrNull;
+
+  List<ShoppingLine> _removeWhere(bool Function(ShoppingItem s) test) {
+    var gone = <ShoppingLine>[];
+    _change(() {
+      gone = [
+        for (final s in _shopping)
+          if (test(s)) (item: s, order: _orderOf(s)),
+      ];
+      _shopping.removeWhere(test);
+    });
+    return gone;
   }
 
-  void toggleBought(ShoppingItem item) {
-    item.done = !item.done;
-    _save();
-  }
-
-  void removeRecipeFromList(String recipeId) {
-    _shopping.removeWhere((s) => s.recipeId == recipeId);
-    _save();
-  }
-
-  void clearBought() {
-    _shopping.removeWhere((s) => s.done);
-    _save();
+  /// Undo for a removal: the lines back where they were, ticks as they were.
+  /// A line already back on the list is left alone.
+  void restoreLines(List<ShoppingLine> lines) {
+    if (lines.isEmpty) return;
+    _change(() {
+      for (final l in lines) {
+        if (_shopping.any((s) => s.key == l.item.key)) continue;
+        _shopping.add(ShoppingItem(
+            recipeId: l.item.recipeId, name: l.item.name, done: l.item.done));
+        _shopOrder[l.item.key] = l.order;
+      }
+      // The list is always in order of adding (`_shopOrder`), as a load
+      // leaves it; a restored line goes back to its own place.
+      _shopping.sort((a, b) {
+        final c = _orderOf(a).compareTo(_orderOf(b));
+        return c != 0 ? c : a.key.compareTo(b.key);
+      });
+    });
   }
 
   // ---- preferences ------------------------------------------------------------
 
-  void setRegion(ChartRegion? r) {
-    _region = r;
-    _save();
-  }
+  void setRegion(ChartRegion? r) => _change(() => _region = r);
 
-  void setReminder(bool on) {
-    _reminder = on;
-    _save();
-  }
+  void setReminder(bool on) => _change(() => _reminder = on);
 
-  void setPinnedChart(String? chartId) {
-    _pinnedChartId = chartId;
-    _save();
-  }
+  void setPinnedChart(String? chartId) => _change(() => _pinnedChartId = chartId);
 
   // ---- persistence ------------------------------------------------------------
 
@@ -446,6 +553,8 @@ class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
       if (s.order > _lastOrder) _lastOrder = s.order;
     }
     _loaded = true;
+    // The whole state was just handed over: nothing left to read first.
+    _cacheRead = true;
   }
 
   void _fromBlob(Object? data) {
@@ -499,8 +608,12 @@ class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
     await p.setString(_key, jsonEncode(_blob()));
   }
 
+  /// A reset store counts as read (empty), so a test's edits apply at once,
+  /// as they always have.
   @visibleForTesting
   void resetForTest() {
+    _cacheRead = true;
+    _waiting.clear();
     _days.clear();
     _cravings.clear();
     _shopping.clear();
@@ -508,5 +621,16 @@ class NutritionDayStore extends ChangeNotifier with CloudMergedStore {
     _region = null;
     _reminder = false;
     _pinnedChartId = null;
+  }
+
+  /// As a phone that has not read its cache yet (P4 S2's test): the next
+  /// edit is held, and `init` reads the saved blob.
+  @visibleForTesting
+  void resetUnreadForTest() {
+    resetForTest();
+    _cacheRead = false;
+    _loaded = false;
+    _starting = null;
+    _prefs = null;
   }
 }

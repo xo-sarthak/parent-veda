@@ -34,8 +34,11 @@ List<PvProduct> ppCatalogProducts(int months,
     {int limit = 6, PpSituation? situation}) {
   final cat = PvCatalogStore.instance;
   final fit = [
+    // A "Coming soon" place-holder is a gap, never a pick for her child
+    // (2026-10-28, pv_coming_soon.dart), the same rule as the Store's rails.
+    // Kept for revert: if (!p.reviewOnly && p.suitsAge(months)) p
     for (final p in cat.forStage(LifeStage.parenting))
-      if (!p.reviewOnly && p.suitsAge(months)) p
+      if (!p.reviewOnly && !p.comingSoon && p.suitsAge(months)) p
   ]..sort((a, b) {
       // The same order as `PvCatalogStore.forYou`.
       final ra = a.reco?.band.rank ?? 9;

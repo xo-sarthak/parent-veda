@@ -13,6 +13,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/data/products/pv_catalog_adapters.dart'
+    show kPvShowSeedProducts;
 import 'package:parentveda/services/pv_compare_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,11 +66,18 @@ void main() {
       // returned is the facade over `PvCompareScreen`. Kept for revert:
       //   PpCompareStore.instance.selected / .count
       PvCompareStore.instance.clear();
+      // Those two shelves held invented seed products, retired 2026-10-28
+      // (the user: no fake products); a "Coming soon" place-holder never
+      // enters the tray, so they open on the empty state until the sheet
+      // fills them. Kept for revert (the seed expectations):
+      //   expect(PvCompareStore.instance.items.map((p) => p.subId).toSet(), {'sleepwear_and_sacks'});
+      //   expect(PvCompareStore.instance.items.length, 2, reason: 'that shelf holds two; the tray takes two');
+      //   (after 'Rash creams') expect(PvCompareStore.instance.items.length, 1, ...);
       expect(ppScreenForSurface('pp_compare/Sleepwear & sacks'), isA<ProductsCompareScreen>());
-      expect(PvCompareStore.instance.items.map((p) => p.subId).toSet(), {'sleepwear_and_sacks'});
-      expect(PvCompareStore.instance.items.length, 2, reason: 'that shelf holds two; the tray takes two');
+      expect(PvCompareStore.instance.items.where((p) => p.comingSoon), isEmpty);
+      expect(PvCompareStore.instance.items.length, kPvShowSeedProducts ? 2 : 0);
       expect(ppScreenForSurface('pp_compare/Rash creams'), isA<ProductsCompareScreen>());
-      expect(PvCompareStore.instance.items.length, 1, reason: 'a one-product shelf: the "one" state, not empty');
+      expect(PvCompareStore.instance.items.length, kPvShowSeedProducts ? 1 : 0);
       PvCompareStore.instance.clear();
       expect(ppScreenForSurface('pp_compare'), isA<ProductsCompareScreen>());
       expect(PpCompareStore.instance.count, 0);

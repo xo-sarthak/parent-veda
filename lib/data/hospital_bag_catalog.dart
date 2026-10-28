@@ -1,5 +1,16 @@
 // =============================================================================
 import '../localization/app_language.dart';
+//  ⚠️ P4 H4 + D1 (2026-10-28): NO INVENTED PRODUCTS, NO PRICE WE DID NOT READ.
+//  The "ParentVeda ..." picks, their derived "Everyday ..." value picks and the
+//  Amazon / FirstCry prices below (the pick's price x1.05 and x0.95) were made
+//  up: there is no ParentVeda birthing gown, and no one read those prices off
+//  a retailer. They are commented out, kept for revert (P4 H4), and
+//  [bagProductsFor] returns nothing. "Need one?" now goes to the live store
+//  (Store Track A, 6c80dd86 / 62250cba) through [getReadyStoreRoute]: a product
+//  the store knows opens its product page, else the store's search, else a
+//  tagged Amazon search through openOutbound. The rule is pure and lives at the
+//  foot of this file so both Get ready tools share it and a test holds it.
+//
 //  Hospital bag product catalogue (English-first, placeholder prices)
 // -----------------------------------------------------------------------------
 //  Each *sellable* bag item is really a product CATEGORY: tapping it shows a
@@ -12,13 +23,14 @@ import '../localization/app_language.dart';
 //  changes.
 // =============================================================================
 
-LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
-
-/// Identical in both languages BY NATURE - a brand, a drug name printed on
-/// a packet, an acronym a mother reads in Latin either way. Distinct from
-/// `_en()`, which means 'English for now, Hindi owed'. This one is finished
-/// work, and saying so is what keeps tool/hindi_audit.py honest.
-LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
+// Kept for revert (P4 H4): only the invented catalogue below used these.
+// LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+//
+// /// Identical in both languages BY NATURE - a brand, a drug name printed on
+// /// a packet, an acronym a mother reads in Latin either way. Distinct from
+// /// `_en()`, which means 'English for now, Hindi owed'. This one is finished
+// /// work, and saying so is what keeps tool/hindi_audit.py honest.
+// LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
 /// A purchasable product option shown under a sellable bag item.
 class BagProduct {
@@ -52,6 +64,9 @@ class BagProduct {
   final String store; // 'Amazon' | 'FirstCry' (affiliate only)
   final String link; // external URL (affiliate only)
 }
+
+/* Kept for revert (P4 H4, 2026-10-28): the invented ParentVeda picks and their
+   made-up prices. Nothing reads them; uncomment with bagProductsFor's old body.
 
 /// A best-overall product spec for a sellable item (the value option is derived).
 class _Cat {
@@ -161,6 +176,7 @@ final Map<String, _Cat> _catalog = {
   'sugg_handfan': _Cat('🌬️', 299, _t('ParentVeda Mini Fan', 'ParentVeda छोटा पंखा'),
       why: [_t('Cooling relief during labour', 'प्रसव के दौरान ठंडक'), _t('USB-rechargeable', 'USB से चार्ज होने वाला')]),
 };
+end of the kept-for-revert catalogue (P4 H4) */
 
 /// Items that are genuinely not products (no marketplace / no recommendation).
 final Set<String> _nonSellable = {
@@ -176,6 +192,9 @@ final Set<String> _nonSellable = {
 /// layer). Custom and explicitly non-sellable items return false.
 bool bagIsSellable(String itemId, {bool isCustom = false}) =>
     !isCustom && !_nonSellable.contains(itemId) && itemId.isNotEmpty;
+
+/* Kept for revert (P4 H4, 2026-10-28): the old body built the invented picks
+   and the made-up retailer prices. bagProductsFor now returns nothing.
 
 /// Derives the budget option's name from the ParentVeda one.
 ///
@@ -262,9 +281,114 @@ BagProduct _affiliate(String itemId, String key, String store, int price,
     link: url,
   );
 }
+end of the kept-for-revert builders (P4 H4) */
+
+/// The product options for a sellable item. EMPTY since P4 H4 (2026-10-28):
+/// every option it used to return was invented (see the header). Callers fall
+/// back to their no-products path; the live screen sends "Need one?" to the
+/// store through [getReadyStoreRoute] instead.
+List<BagProduct> bagProductsFor(String itemId, {bool isCustom = false}) =>
+    const [];
 
 /// The ParentVeda best-overall product for an item (or null if non-sellable).
 BagProduct? bagBestProduct(String itemId, {bool isCustom = false}) {
   final ps = bagProductsFor(itemId, isCustom: isCustom);
   return ps.isEmpty ? null : ps.first;
 }
+
+// =============================================================================
+//  Get ready store routing (P4 D1, 2026-10-28)
+// -----------------------------------------------------------------------------
+//  One rule for the Hospital bag and the Product checklist, the user's answer
+//  to D1: "go for the store the product hub was updated with".
+//    1. a product the live store knows (PvCatalogStore.byId) opens its product
+//       page, which shows the honest price, the tagged link and the reviews;
+//    2. else, when the store's search finds anything for the item's name, the
+//       store's search opens on that name;
+//    3. else a tagged Amazon search, through openOutbound.
+//  Pure: the two lookups are passed in, so a test runs it without the store.
+// =============================================================================
+
+/// Where "See it in the store" goes.
+enum GetReadyStoreRoute { productPage, storeSearch, amazonSearch }
+
+GetReadyStoreRoute getReadyStoreRoute({
+  String? productId,
+  required String query,
+  required bool Function(String id) storeHasId,
+  required bool Function(String query) storeSearchHits,
+}) {
+  if (productId != null && productId.isNotEmpty && storeHasId(productId)) {
+    return GetReadyStoreRoute.productPage;
+  }
+  if (query.trim().isNotEmpty && storeSearchHits(query.trim())) {
+    return GetReadyStoreRoute.storeSearch;
+  }
+  return GetReadyStoreRoute.amazonSearch;
+}
+
+/// An Amazon India search for [query]. Untagged here: openOutbound adds the
+/// partner tag (`tagged()` in lib/brand/outbound.dart) as it opens it.
+String amazonSearchUrlFor(String query) =>
+    'https://www.amazon.in/s?k=${Uri.encodeComponent(query.trim())}';
+
+/// A link she typed, made openable: "amazon.in/dp/x" has no scheme, and
+/// openOutbound refuses a url without one, so https:// goes in front. Empty
+/// stays empty.
+String normaliseOutboundLink(String raw) {
+  final t = raw.trim();
+  if (t.isEmpty) return '';
+  final uri = Uri.tryParse(t);
+  if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) return t;
+  return 'https://$t';
+}
+
+/// The few words the store's search matches a bag item on. The store's
+/// search wants every word to appear, so these are short; Amazon gets the
+/// item's full name instead ([bagAmazonQuery]).
+const Map<String, String> kBagStoreQuery = {
+  'labour_gown': 'gown',
+  'labour_socks': 'socks',
+  'labour_lipbalm': 'lip balm',
+  'labour_hairties': 'hair ties',
+  'labour_water': 'bottle',
+  'labour_snacks': 'snacks',
+  'after_pads': 'maternity pads',
+  'after_underwear': 'maternity underwear',
+  'after_nursingbra': 'nursing bra',
+  'after_breastpads': 'breast pads',
+  'after_nipplecream': 'nipple cream',
+  'after_outfit': 'maternity wear',
+  'after_toiletries': 'toiletries',
+  'after_towel': 'towel',
+  'after_slippers': 'slippers',
+  'after_binder': 'belly binder',
+  'baby_bodysuits': 'bodysuit',
+  'baby_swaddle': 'swaddle',
+  'baby_mittens': 'mittens',
+  'baby_cap': 'cap',
+  'baby_diapers': 'diapers',
+  'baby_wipes': 'wipes',
+  'baby_blanket': 'blanket',
+  'baby_towel': 'hooded towel',
+  'baby_homeoutfit': 'newborn outfit',
+  'partner_snacks': 'snacks',
+  'partner_charger': 'power bank',
+  'partner_toiletries': 'toiletries',
+  'comfort_eyemask': 'eye mask',
+  'comfort_affirm': 'affirmation cards',
+  'sugg_nursingpillow': 'nursing pillow',
+  'sugg_extraoutfit': 'newborn outfit',
+  'sugg_compsocks': 'compression socks',
+  'sugg_handfan': 'fan',
+};
+
+/// The store search words for a bag item: its short words, else its name
+/// before any bracket or slash.
+String bagStoreQuery(String itemId, String nameEn) =>
+    kBagStoreQuery[itemId] ?? bagAmazonQuery(nameEn);
+
+/// The item's name as a search: "Loose nightwear / birthing gown" reads as
+/// "Loose nightwear"; "Glasses (if you wear them)" as "Glasses".
+String bagAmazonQuery(String nameEn) =>
+    nameEn.split('(').first.split('/').first.trim();

@@ -49,7 +49,9 @@ void main() {
   testWidgets('Dashboard boots with the four readiness categories', (tester) async {
     await boot(tester);
     expect(tester.takeException(), isNull);
-    expect(find.text('Ready for Birth'), findsOneWidget); // app bar
+    // P4 H5 (2026-10-28), one name. Kept for revert:
+    // expect(find.text('Ready for Birth'), findsOneWidget); // app bar
+    expect(find.text('Hospital bag'), findsOneWidget);
     expect(find.text("Let's pack together"), findsWidgets); // primary CTA
     expect(find.text('Labour started?'), findsOneWidget); // persistent action
     final scrollable = find.byType(Scrollable).first;
@@ -61,6 +63,10 @@ void main() {
     await boot(tester);
     await tester.tap(find.text('Labour started?'));
     await tester.pumpAndSettle();
+    // P4 H1 (2026-10-28): the red flags and the 108 button come first, so
+    // the grab-list sits below the fold.
+    await tester.scrollUntilVisible(find.text('Your hospital bag'), 200,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
     expect(find.text('Take these first'), findsOneWidget);
     expect(find.text('Your hospital bag'), findsOneWidget);
   });
@@ -94,7 +100,10 @@ void main() {
     await tester.tap(needOne);
     await tester.pumpAndSettle();
     expect(find.text('How to choose'), findsOneWidget);
-    expect(find.text('Our picks'), findsWidgets);
+    // P4 H4 + D1 (2026-10-28): no invented picks; the live store instead.
+    // Kept for revert: expect(find.text('Our picks'), findsWidgets);
+    expect(find.text('Our picks'), findsNothing);
+    expect(find.text('See it in the store'), findsOneWidget);
   });
 
   testWidgets("'Start again' asks for confirmation", (tester) async {

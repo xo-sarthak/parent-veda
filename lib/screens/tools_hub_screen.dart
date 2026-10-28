@@ -81,6 +81,7 @@ import '../services/preg_tool_order.dart';
 import '../data/doors/pv_door_getting_ready.dart' show kReadySurfaceNames;
 import '../widgets/pv_toast.dart';
 import 'post_pregnancy/baby_naming_home_screen.dart' show BabyNamingHomeScreen;
+import 'nutrition/door/shopping_list_screen.dart' show ShoppingListScreen;
 // Kept for revert (PregSectionHeading, 2026-10-02): import 'pregnancy/preg_chrome.dart';
 
 // =============================================================================
@@ -182,9 +183,13 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   // ⚠️ P3 D5 (user, 2026-10-28): "everything stays, with the baby wording
   // dropped... we don't need to hide anything." Movement, Weight and the due
   // date are back after a loss; each one that needs a pregnancy says so at its
-  // top (`PregAfterLossNote`). The rest of Get ready follows in P4, the family
-  // that owns those tools and their wording, so they keep `if (!_ended)` row
-  // by row until then.
+  // top (`PregAfterLossNote`).
+  //
+  // ⚠️ P4 D4 (user, 2026-10-28) finished it: every Get ready row stays after a
+  // loss (the bag, the birth plan, the timer, what to buy, baby names). Each
+  // row's line drops the baby wording when `_ended`, and each tool says what
+  // has changed at its top. Only the Garbh Sanskar row in Keep still steps
+  // aside (P4 D2): a practice for the baby, not her data.
   bool get _ended => PregnancyEndedStore.instance.ended;
 
   /// Her real week, or null on the week-20 stand-in (nothing then moves).
@@ -239,6 +244,15 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               line: 'Log the numbers your doctor asked for, and share them',
               mark: IntentMark.chartLog,
               priority: PregPriority.symptoms),
+          // P4 S3 / D3 (2026-10-28): the food shopping list was reached from
+          // the Nutrition door only. Track, beside Weight and the readings;
+          // the door's own route name, so the Ask button reads it the same.
+          // The bowl: the checklist mark is the Product checklist's.
+          _Tool('Shopping list', Icons.shopping_basket_outlined, const Color(0xFF5E8A4A),
+              () => _open('nutrition/list', () => const ShoppingListScreen()),
+              line: 'What the recipes and diet chart days you picked need',
+              mark: IntentMark.forkMark,
+              priority: PregPriority.nutrition),
           _Tool(s.toolKegelTitle, Icons.self_improvement_rounded,
               AppTheme.secondary400,
               () => _open('tools/kegel', () => KegelCareScreen(controller: controller)),
@@ -258,27 +272,38 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
         ]),
         // if (!_ended) // kept for revert (P3 D5): the group stays for the due
         // date; its other rows step aside one by one until P4.
+        // P4 D4 (2026-10-28): none step aside now; every row stays.
         // Leads the tab from week 28 (Batch 4, PREG 8). The 28 before it is
         // the group's hue, not a week.
         _ToolGroup('Get ready', 28, leadsFromWeek: kPregToolsThirdTrimesterFrom, [
-          if (!_ended)
-          _Tool(s.hbName, Icons.luggage_outlined, AppTheme.tertiary400,
+          // if (!_ended) // kept for revert (P4 D4)
+          // One name per tool (P4): "Hospital bag". Kept for revert: s.hbName
+          // ("My Hospital Bag").
+          _Tool('Hospital bag', Icons.luggage_outlined, AppTheme.tertiary400,
               () => _open('tools/hospital_bag', () => ReadyForBirthScreen(controller: controller)),
-              line: 'What to pack for you, your baby and your partner',
+              line: _ended
+                  ? 'What to take for you, if you go into hospital'
+                  : 'What to pack for you, your baby and your partner',
               mark: IntentMark.bagMark,
               priority: PregPriority.birthPrep),
           // Added by the gap analysis: the birth plan was built for the Labour
           // door and never listed here.
-          if (!_ended)
+          // if (!_ended) // kept for revert (P4 D4)
           _Tool('Birth plan', Icons.edit_note_rounded, const Color(0xFFB0654A),
               () => _open(kLabourSurfaceBirthPlan, () => BirthPlanScreen(pregnancy: controller)),
-              line: 'What you would like on the day, to share with your doctor',
+              line: _ended
+                  ? 'Your plan, kept as you left it'
+                  : 'What you would like on the day, to share with your doctor',
               mark: IntentMark.reportPage,
               priority: PregPriority.birthPrep),
-          if (!_ended)
-          _Tool(s.toolContractionTitle, Icons.timer_outlined, AppTheme.neutral500,
+          // if (!_ended) // kept for revert (P4 D4)
+          // One name per tool (P4): "Contraction timer". Kept for revert:
+          // s.toolContractionTitle ("Contraction Timer").
+          _Tool('Contraction timer', Icons.timer_outlined, AppTheme.neutral500,
               () => _open('tools/contractions', () => ContractionTrackerScreen(controller: controller)),
-              line: 'Time your contractions and see when to go in',
+              line: _ended
+                  ? 'Time contractions, if your doctor has asked you to'
+                  : 'Time your contractions and see when to go in',
               mark: IntentMark.timelineRail,
               priority: PregPriority.birthPrep,
               // First in Get ready from 37, as the Labour door (Batch 4).
@@ -289,19 +314,26 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               line: 'Work out your due date, or update it after a scan',
               mark: IntentMark.calendarDay,
               staleDueDate: controller.dueDateMayBeStale),
-          if (!_ended)
+          // if (!_ended) // kept for revert (P4 D4)
           _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
               () => _open('tools/product_checklist', () => ProductChecklistScreen(controller: controller)),
-              line: 'What you really need before the baby comes',
+              line: _ended
+                  ? "Your lists, and what you've bought"
+                  : 'What you really need before the baby comes',
               mark: IntentMark.listMark,
               priority: PregPriority.birthPrep),
           // P2 N1 (2026-10-28): Baby names was offered by the Getting ready
           // door only (C1). The screen is the one Parenting opens; a name she
           // chooses now is offered at the birth.
-          if (!_ended)
+          // if (!_ended) // kept for revert (P4 D4)
+          // `afterLossNote`: the screen is Parenting's too, so the note is
+          // asked for by Pregnancy's callers only (P4). Kept for revert:
+          // () => const BabyNamingHomeScreen()
           _Tool('Baby names', Icons.badge_outlined, const Color(0xFF4F7A8A),
-              () => _open(kReadySurfaceNames, () => const BabyNamingHomeScreen()),
-              line: 'Find names you both love, and keep a shortlist',
+              () => _open(kReadySurfaceNames, () => const BabyNamingHomeScreen(afterLossNote: true)),
+              line: _ended
+                  ? 'Your shortlist, kept'
+                  : 'Find names you both love, and keep a shortlist',
               mark: IntentMark.pageMark,
               priority: PregPriority.birthPrep),
         ]),
@@ -326,6 +358,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
           // door (today's practice is there); if the door cannot be built it
           // says so, never the retired pillar menu. Steps aside after a loss
           // with Get ready (R3): it only means something while she is pregnant.
+          // ⚠️ STILL HIDDEN AFTER A LOSS (P4 D2, user 2026-10-28): Get ready
+          // came back, this did not. A practice for the baby, not her data.
           if (!_ended)
           _Tool(s.garbhToolTitle, Icons.spa_outlined, const Color(0xFFBE9C4E),
               _openGarbh,

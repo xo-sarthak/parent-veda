@@ -240,6 +240,9 @@ class PvCategory {
       (subId == null ? null : subGuidance[subId]) ?? guidance;
 }
 
+/// The id prefix of a "Coming soon" place-holder product (2026-10-28).
+const String kPvComingSoonPrefix = 'pvsoon_';
+
 @immutable
 class PvProduct {
   const PvProduct({
@@ -414,6 +417,14 @@ class PvProduct {
   // ---- derived -------------------------------------------------------------
 
   bool get hasImage => images.isNotEmpty;
+
+  /// A "Coming soon" place-holder for an essential the team's sheet does not
+  /// cover yet (2026-10-28; lib/data/products/pv_coming_soon.dart). Read off
+  /// the id, not a field: every copy of a product (the overlay, the store-row
+  /// merge, the retailer price guard) keeps its id, so the mark can never be
+  /// dropped by a copy that forgot a field. Trade-off: the id carries a
+  /// meaning, accepted because these ids are ours and never come from a row.
+  bool get comingSoon => id.startsWith(kPvComingSoonPrefix);
   bool get canBuy => !reviewOnly && (soldHere || (buyUrl?.isNotEmpty ?? false));
   bool get recommends => reco?.band.recommends ?? false;
   bool get hasPrice => price > 0;

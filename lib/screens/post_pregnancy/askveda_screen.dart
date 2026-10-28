@@ -17,6 +17,7 @@ import '../../ask_veda/ask_veda_mark.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../ask_veda/pv_veda_reveal.dart';
+import '../../data/products/pv_catalog_adapters.dart' show kPvShowSeedProducts;
 import '../../theme/pv_fonts.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
 // import 'package:google_fonts/google_fonts.dart'; // fonts go through theme/pv_fonts.dart since 2026-09-17
@@ -778,6 +779,14 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       ]);
 
   PpProduct? _matchProduct(String label) {
+    // ⚠️ NO SEED PRODUCTS (2026-10-28, the user: "no need to have fake
+    // situations in the app... show whatever we have"). Every product this
+    // matched against is an invented parenting seed, out of the store now
+    // (pv_catalog_adapters.dart); a match drew its seed price and opened a
+    // "no longer listed" page. The card shows the answer's own title and
+    // opens the store instead. A demo build with PV_SEED_PRODUCTS on is
+    // unchanged.
+    if (!kPvShowSeedProducts) return null;
     final l = label.toLowerCase();
     for (final pr in productCatalog) {
       final n = pr.name.toLowerCase();

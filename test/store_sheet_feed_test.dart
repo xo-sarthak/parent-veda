@@ -60,8 +60,13 @@ void main() {
   // a link lands on the product (keeping its category and notes) instead of
   // a duplicate. This is the list it matches against.
   test('the converter\'s catalogue index is the app\'s catalogue', () {
+    // "Coming soon" place-holders are gaps, not products: the converter must
+    // never match a sheet pick onto one (it would inherit the place-holder's
+    // id and read as "Coming soon"), so they stay out of the index
+    // (2026-10-28). Kept for revert: for (final p in buildPvCatalog())
     final want = [
       for (final p in buildPvCatalog())
+        if (!p.comingSoon)
         {
           'id': p.id,
           'brand': p.brand,

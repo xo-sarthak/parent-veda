@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/products/pv_coming_soon.dart' show pvComingSoonLast;
 import '../../data/products/pv_sheet_products.dart' show pvShortlistFirst;
 import '../../models/pv_product.dart';
 import '../../services/cart_store.dart';
@@ -135,7 +136,10 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
       case PvSort.priceHigh:
         list.sort((a, b) => b.price.compareTo(a.price));
     }
-    return list;
+    // "Coming soon" place-holders after every real product, whatever the
+    // sort (2026-10-28; priced 0, "price low" would have led with them).
+    // Kept for revert: return list;
+    return pvComingSoonLast(list);
   }
 
   @override
@@ -444,7 +448,29 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
     ),
   );
 
-  Widget _empty(V2Palette p) => Padding(
+  /// ⚠️ A SHELF WITH NOTHING ON IT IS NOT A FILTER MISS (2026-10-28). With
+  /// the invented seed products out of the store (pv_catalog_adapters.dart),
+  /// a few shelves have no real product yet. "Nothing matches those
+  /// filters" with "Clear filters" said she had filtered when she had not,
+  /// and the link cleared nothing. A shelf that is empty before any filter
+  /// says so, in the storefront's own words.
+  Widget _empty(V2Palette p) =>
+      _f.count == 0 && PvCatalogStore.instance.inCategory(widget.categoryId).isEmpty
+          ? _emptyShelf(p)
+          : _emptyFiltered(p);
+
+  Widget _emptyShelf(V2Palette p) => Padding(
+    padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+    child: PvCard(
+      child: Text(
+        'Nothing on this shelf yet. When it fills, it lands here first.',
+        key: const ValueKey('pv_shelf_empty_yet'),
+        style: pvManrope(fontSize: 14.5, height: 1.45, color: p.ink1),
+      ),
+    ),
+  );
+
+  Widget _emptyFiltered(V2Palette p) => Padding(
     padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
     // A white card, not a slab (2026-09-29). Kept for revert: PvWell.
     child: PvCard(

@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/ready_for_birth_data.dart';
 import 'hospital_bag_store.dart' show DeliveryType;
+import 'pregnancy_controller.dart';
 import 'remote/cloud_merged_store.dart';
 // import 'remote/cloud_synced_store.dart'; // kept for revert (step 13)
 
@@ -42,7 +43,22 @@ class ReadyBirthContextStore extends ChangeNotifier with CloudMergedStore {
   Season? get seasonOverride => _seasonOverride;
 
   /// The effective season: the mother's override, else derived from the month.
-  Season get season => _seasonOverride ?? seasonForMonth(DateTime.now().month);
+  /// Kept for revert (P4 H3): this read TODAY's month, so a mother due in
+  /// December was told to pack for the monsoon in August.
+  /// Season get season => _seasonOverride ?? seasonForMonth(DateTime.now().month);
+  ///
+  /// Now the month of her due date (P4 H3, 2026-10-28), read from the live
+  /// pregnancy when it has a real one; today's month only when it does not.
+  Season get season {
+    final c = PregnancyController.current;
+    return seasonFor(dueDate: c != null && c.isDueDateSet ? c.dueDate : null);
+  }
+
+  /// The season for a due date: her override first, then the due date's
+  /// month, then [today]'s (no due date yet). Pure apart from the override.
+  Season seasonFor({DateTime? dueDate, DateTime? today}) =>
+      _seasonOverride ??
+      seasonForMonth((dueDate ?? today ?? DateTime.now()).month);
 
   bool providesFor(String token) => _hospitalProvides.contains(token);
 

@@ -53,7 +53,9 @@ void main() {
       // Get ready stays for the due date; its birth rows step aside until P4.
       // Kept for revert: expect(text('GET READY'), findsNothing);
       expect(text('GET READY'), findsOneWidget);
-      expect(text('Birth plan'), findsNothing);
+      // P4 D4 (2026-10-28): the birth rows stay too, their lines without the
+      // baby. Kept for revert: expect(text('Birth plan'), findsNothing);
+      expect(text('Birth plan'), findsOneWidget);
       expect(find.textContaining('get ready for the birth', skipOffstage: false), findsNothing);
       expect(find.textContaining('look after your health', skipOffstage: false), findsOneWidget);
       for (final h in ['TRACK', 'KEEP', 'ASK']) {
