@@ -76,12 +76,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../services/bracket_resolver.dart' show bracketById;
+// import '../../services/bracket_resolver.dart' show bracketById; // kept for revert: only the retired door push read it (2026-10-28)
 import '../../theme/pv_fonts.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_cycle_report.dart';
-import '../../ttc/ttc_focus_data.dart' show ttcFocusPageFor;
+// import '../../ttc/ttc_focus_data.dart' show ttcFocusPageFor; // kept for revert: only the retired door push read it (2026-10-28)
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_logging_extras.dart';
 import '../../ttc/ttc_reads_data.dart' show ttcReadById;
@@ -96,7 +96,8 @@ import 'ttc_common.dart';
 import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_edit_categories_screen.dart';
-import 'ttc_focus_screen.dart' show TtcFocusScreen;
+// import 'ttc_focus_screen.dart' show TtcFocusScreen; // kept for revert: the retired door (2026-10-28)
+import 'doors/ttc_door_screen.dart' show openTtcDoor;
 import 'ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
 import 'ttc_symptom_mark.dart';
 import 'ttc_strings.dart';
@@ -495,14 +496,18 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
       openTtcSurface(context, '$kTtcReadPrefix$kTtcHardThoughtsReadId');
       return;
     }
-    // Same wiring gate as `openTtcFocusTile`: an unknown bracket opens nothing.
-    final page = ttcFocusPageFor(kTtcMindBodyBracket);
-    final bracket = bracketById(kTtcMindBodyBracket);
-    if (page == null || bracket == null) return;
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      settings: const RouteSettings(name: 'ttc/focus/$kTtcMindBodyBracket'),
-      builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
-    ));
+    // The door every other way in opens (`TtcDoorScreen`, 2026-09-26), on
+    // its Hard days tab; this line was the last push of the retired
+    // `TtcFocusScreen` (relevance pass, 2026-10-28). Same route name, same
+    // wiring gate: an unknown bracket opens nothing. Kept for revert:
+    //   final page = ttcFocusPageFor(kTtcMindBodyBracket);
+    //   final bracket = bracketById(kTtcMindBodyBracket);
+    //   if (page == null || bracket == null) return;
+    //   Navigator.of(context).push(MaterialPageRoute<void>(
+    //     settings: const RouteSettings(name: 'ttc/focus/$kTtcMindBodyBracket'),
+    //     builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
+    //   ));
+    openTtcDoor(context, kTtcMindBodyBracket, initialGroup: 'hard');
   }
 
   /// The faint-line read in `ttc_reads_waiting.dart`, through the router.
