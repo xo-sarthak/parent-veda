@@ -264,6 +264,7 @@ class PvProduct {
     this.priceCheckedAt,
     this.extRating = 0,
     this.extReviewCount = 0,
+    this.extFeatures = const [],
     this.reco,
     this.evidence,
     this.goods = const [],
@@ -342,6 +343,11 @@ class PvProduct {
   final double extRating;
   final int extReviewCount;
 
+  /// The retailer's own "About this item" bullets, read by affiliate-refresh
+  /// from Amazon's API (0120) and shown labelled as Amazon's. Never typed
+  /// in by hand, for the same reason as the price.
+  final List<String> extFeatures;
+
   final PvRecommend? reco;
   final PvEvidence? evidence;
 
@@ -419,6 +425,67 @@ class PvProduct {
   }
 
   String get priceLabel => hasPrice ? '₹${groupRupees(price)}' : priceNote;
+
+  /// This product with no number of ours on it: price, MRP, variant prices
+  /// and the retailer's stars cleared, and [note] in the price's place. Used
+  /// by `pvGuardRetailerPrice` (pv_affiliate.dart) for a listing whose price
+  /// may only come from the retailer's own API.
+  PvProduct withPriceLeftToRetailer(String note) => PvProduct(
+    id: id,
+    stage: stage,
+    categoryId: categoryId,
+    name: name,
+    subId: subId,
+    brand: brand,
+    summary: summary,
+    images: images,
+    price: 0,
+    mrp: null,
+    priceNote: note,
+    retailer: retailer,
+    buyUrl: buyUrl,
+    soldHere: soldHere,
+    reviewOnly: reviewOnly,
+    rating: rating,
+    reviewCount: reviewCount,
+    asin: asin,
+    priceCheckedAt: null,
+    extRating: 0,
+    extReviewCount: 0,
+    extFeatures: const [],
+    reco: reco,
+    evidence: evidence,
+    goods: goods,
+    watchOuts: watchOuts,
+    bestFor: bestFor,
+    specs: specs,
+    // The sizes stay (the pack beside the price is useful); their prices
+    // would be ours, so they go to 0 and the price line shows [note].
+    variants: [
+      for (final v in variants) PvVariant(id: v.id, label: v.label, price: 0),
+    ],
+    reviews: reviews,
+    experts: experts,
+    parentsPct: parentsPct,
+    expertsPct: expertsPct,
+    ingredients: ingredients,
+    studies: studies,
+    weekFrom: weekFrom,
+    weekTo: weekTo,
+    ageMinMonths: ageMinMonths,
+    ageMaxMonths: ageMaxMonths,
+    forPartner: forPartner,
+    badge: badge,
+    bestseller: bestseller,
+    hue: hue,
+    relatedIds: relatedIds,
+    compare: compare,
+    shortlist: shortlist,
+    score: score,
+    confidence: confidence,
+    scoreParts: scoreParts,
+    skills: skills,
+  );
   String get mrpLabel => mrp == null ? '' : '₹${groupRupees(mrp!)}';
   String get ratingLabel => rating <= 0 ? '' : rating.toStringAsFixed(1);
 

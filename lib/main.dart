@@ -70,6 +70,9 @@ import 'services/programme_store.dart';
 import 'services/read_store.dart';
 import 'services/recipe_store.dart';
 import 'services/bought_store.dart';
+import 'services/pv_review_store.dart';
+import 'services/pv_catalog_store.dart';
+import 'services/pv_list_store.dart';
 import 'services/bump_store.dart';
 import 'services/calendar_store.dart';
 import 'services/can_i_store.dart';
@@ -283,6 +286,12 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     CartStore.instance.init();
     // Load "bought" products (drives Already-bought markers on checklists).
     BoughtStore.instance.init();
+    // Load her own product reviews and resend any the cloud never took.
+    PvReviewStore.instance.init();
+    // Her own named product lists ("Hospital bag", "Baby's room").
+    PvListStore.instance.init();
+    // The product sheet's rows (0120), cache first, then the cloud.
+    PvCatalogStore.instance.loadFromCloud();
     // Load Read Next saved/reading/completed states.
     ReadNextStore.instance.init();
     // Load My Journal entries.

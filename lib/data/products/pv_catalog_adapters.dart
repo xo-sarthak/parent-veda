@@ -397,7 +397,10 @@ PvProduct _enrich(PvProduct p) {
     brand: x?.brand ?? p.brand,
     summary: p.summary,
     images: p.images.isNotEmpty ? [...p.images, ...photos] : photos,
-    price: f?.price ?? x?.price ?? p.price,
+    // ⚠️ The hand map's price and stars are no longer used (2026-10-28):
+    // Amazon allows only numbers read from its API (pv_affiliate.dart,
+    // pvGuardRetailerPrice). Kept for revert: price: f?.price ?? x?.price ?? p.price,
+    price: x?.price ?? p.price,
     mrp: x?.mrp ?? p.mrp,
     priceNote: p.priceNote,
     retailer: f != null ? 'Amazon' : (x?.retailer ?? p.retailer),
@@ -415,9 +418,12 @@ PvProduct _enrich(PvProduct p) {
     rating: seedOk ? (x?.rating ?? p.rating) : p.rating,
     reviewCount: seedOk ? (x?.reviewCount ?? p.reviewCount) : p.reviewCount,
     asin: f?.asin ?? p.asin,
-    priceCheckedAt: f?.checkedAt ?? p.priceCheckedAt,
-    extRating: f?.rating ?? p.extRating,
-    extReviewCount: f?.reviewCount ?? p.extReviewCount,
+    // Kept for revert: priceCheckedAt: f?.checkedAt ?? p.priceCheckedAt,
+    // extRating: f?.rating ?? p.extRating,
+    // extReviewCount: f?.reviewCount ?? p.extReviewCount,
+    priceCheckedAt: p.priceCheckedAt,
+    extRating: p.extRating,
+    extReviewCount: p.extReviewCount,
     reco: x?.reco ?? p.reco,
     evidence: p.evidence,
     goods: p.goods,
@@ -445,12 +451,17 @@ PvProduct _enrich(PvProduct p) {
 }
 
 /// The whole catalogue, every stage, enriched. Built once by the store.
+/// Every product passes the retailer price guard last (2026-10-28), so no
+/// source, seed or sheet, can put a hand-typed Amazon price on screen.
 List<PvProduct> buildPvCatalog() => [
-      for (final p in ttc.ttcProducts) _enrich(_fromTtc(p)),
-      for (final p in preg_data.kProducts) _enrich(_fromPreg(p)),
-      for (final p in pp.productCatalog) _enrich(_fromPp(p)),
-      // The team's product sheets, as ParentVeda's shortlist (2026-10-13).
-      ...sheetProducts(),
+      for (final p in [
+        for (final p in ttc.ttcProducts) _enrich(_fromTtc(p)),
+        for (final p in preg_data.kProducts) _enrich(_fromPreg(p)),
+        for (final p in pp.productCatalog) _enrich(_fromPp(p)),
+        // The team's product sheets, as ParentVeda's shortlist (2026-10-13).
+        ...sheetProducts(),
+      ])
+        pvGuardRetailerPrice(p),
     ];
 
 /// Ask Veda's TTC deep links carry the old id (`ttcprod_folic` → `folic`).

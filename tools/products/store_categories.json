@@ -1,0 +1,157 @@
+[
+  {
+    "id": "ttc_supplements",
+    "stage": "ttc",
+    "name": "Supplements"
+  },
+  {
+    "id": "ttc_kits",
+    "stage": "ttc",
+    "name": "Ovulation kits"
+  },
+  {
+    "id": "ttc_tests",
+    "stage": "ttc",
+    "name": "Pregnancy tests"
+  },
+  {
+    "id": "ttc_books",
+    "stage": "ttc",
+    "name": "Books"
+  },
+  {
+    "id": "ttc_wellness",
+    "stage": "ttc",
+    "name": "Wellness"
+  },
+  {
+    "id": "pregnancy_pillow",
+    "stage": "pregnancy",
+    "name": "Pregnancy Pillow"
+  },
+  {
+    "id": "stretch_care",
+    "stage": "pregnancy",
+    "name": "Stretch Mark Care"
+  },
+  {
+    "id": "maternity_wear",
+    "stage": "pregnancy",
+    "name": "Maternity Wear"
+  },
+  {
+    "id": "belly_band",
+    "stage": "pregnancy",
+    "name": "Belly Support Band"
+  },
+  {
+    "id": "compression_socks",
+    "stage": "pregnancy",
+    "name": "Compression Socks"
+  },
+  {
+    "id": "nursing_bra",
+    "stage": "pregnancy",
+    "name": "Nursing Bra"
+  },
+  {
+    "id": "breast_pump",
+    "stage": "pregnancy",
+    "name": "Breast Pump"
+  },
+  {
+    "id": "swaddle",
+    "stage": "pregnancy",
+    "name": "Swaddles"
+  },
+  {
+    "id": "pvs_sleep_and_posture",
+    "stage": "pregnancy",
+    "name": "Sleep & Posture"
+  },
+  {
+    "id": "pvs_skincare_and_hygiene",
+    "stage": "pregnancy",
+    "name": "Skincare & Hygiene"
+  },
+  {
+    "id": "pvs_memory_keeping",
+    "stage": "pregnancy",
+    "name": "Memory Keeping"
+  },
+  {
+    "id": "pvs_master_library",
+    "stage": "pregnancy",
+    "name": "Master Library"
+  },
+  {
+    "id": "pvs_apparel_and_wardrobe",
+    "stage": "pregnancy",
+    "name": "Apparel & Wardrobe"
+  },
+  {
+    "id": "pvs_father_s_corner",
+    "stage": "pregnancy",
+    "name": "Father's Corner"
+  },
+  {
+    "id": "pvs_maternal_recovery",
+    "stage": "pregnancy",
+    "name": "Maternal Recovery"
+  },
+  {
+    "id": "pvs_lactation_support",
+    "stage": "pregnancy",
+    "name": "Lactation Support"
+  },
+  {
+    "id": "pvs_sleep_and_bedding",
+    "stage": "pregnancy",
+    "name": "Sleep & Bedding"
+  },
+  {
+    "id": "pvs_clothing_and_apparel",
+    "stage": "pregnancy",
+    "name": "Clothing & Apparel"
+  },
+  {
+    "id": "pvs_health_and_climate",
+    "stage": "pregnancy",
+    "name": "Health & Climate"
+  },
+  {
+    "id": "pvs_mobility_and_soothing",
+    "stage": "pregnancy",
+    "name": "Mobility & Soothing"
+  },
+  {
+    "id": "sleep",
+    "stage": "parenting",
+    "name": "Sleep"
+  },
+  {
+    "id": "skincare",
+    "stage": "parenting",
+    "name": "Skincare"
+  },
+  {
+    "id": "feeding",
+    "stage": "parenting",
+    "name": "Feeding"
+  },
+  {
+    "id": "play_and_development",
+    "stage": "parenting",
+    "name": "Play & Development"
+  },
+  {
+    "id": "health_and_safety",
+    "stage": "parenting",
+    "name": "Health & Safety"
+  },
+  {
+    "id": "on_the_move",
+    "stage": "parenting",
+    "name": "On the move"
+  }
+]

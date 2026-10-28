@@ -55,7 +55,8 @@
 import 'package:flutter/material.dart';
 // import 'package:url_launcher/url_launcher.dart'; // kept for revert: the buy link now goes through openOutbound
 
-import '../../data/products/pv_affiliate.dart' show pvAffiliatePriceNote;
+import '../../data/products/pv_affiliate.dart'
+    show pvAffiliatePriceNote, pvApiPricedRetailer;
 import '../../data/products/pv_product_extras.dart' show kPvIllustrativePhotoIds;
 import '../../data/book_companions.dart' show bookReadItem;
 import '../../data/products/pv_sheet_products.dart' show sheetBookCompanionFor;
@@ -68,6 +69,10 @@ import '../../services/cart_store.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
 import '../../services/pv_compare_store.dart';
+import '../../services/bought_store.dart';
+import '../../services/pv_review_store.dart';
+import '../../services/pv_list_store.dart';
+import 'pv_list_sheet.dart';
 import '../../services/saved_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
@@ -134,7 +139,8 @@ class PvProductScreen extends StatefulWidget {
   State<PvProductScreen> createState() => _PvProductScreenState();
 }
 
-class _PvProductScreenState extends State<PvProductScreen> {
+class _PvProductScreenState extends State<PvProductScreen>
+    with WidgetsBindingObserver {
   final PageController _pages = PageController();
   final ScrollController _scroll = ScrollController();
   bool _pastGallery = false;
@@ -143,6 +149,11 @@ class _PvProductScreenState extends State<PvProductScreen> {
   @override
   void initState() {
     super.initState();
+    // "Did you buy it?" is asked when she comes BACK from the retailer, so
+    // the screen listens for the app returning to the foreground.
+    WidgetsBinding.instance.addObserver(this);
+    // Other parents' approved reviews of this product (0119).
+    PvReviewStore.instance.loadFor(widget.productId);
     _scroll.addListener(() {
       final past =
           _scroll.offset > MediaQuery.of(context).size.width * 1.05 - 120;
@@ -155,6 +166,7 @@ class _PvProductScreenState extends State<PvProductScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pages.dispose();
     _scroll.dispose();
     super.dispose();
@@ -318,6 +330,196 @@ class _PvProductScreenState extends State<PvProductScreen> {
     if (!ok && mounted) {
       pvSnack(context, 'Could not open ${p.retailer}. Please try again.');
     }
+    // Asked once she is back (didChangeAppLifecycleState), and only if she
+    // has not already told us.
+    if (ok && !BoughtStore.instance.isBought(p.id)) _awaitingBuy = p.id;
+  }
+
+  // ---- "Did you buy it?" and her review (store Track A, 2026-10-28) ---------
+  //
+  // The launch store is affiliate only, so the purchase happens on Amazon or
+  // Flipkart and we never see it. When she comes back we ask, once. A yes
+  // marks it bought (BoughtStore: her checklists show it as got) and offers
+  // a rating. Her word is all we have, so the review says so: "Bought on
+  // Amazon, says the parent", never "Verified purchase".
+
+  /// The product whose retailer page she went to, until we have asked.
+  String? _awaitingBuy;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    final id = _awaitingBuy;
+    _awaitingBuy = null;
+    if (id == null || !mounted) return;
+    final p = PvCatalogStore.instance.byId(id);
+    if (p != null) _askBought(p);
+  }
+
+  String _shopOf(PvProduct p) => p.retailer.isNotEmpty
+      ? p.retailer.replaceAll('.in', '')
+      : (pvApiPricedRetailer(p) ?? 'the retailer');
+
+  Future<void> _askBought(PvProduct p) async {
+    final pal = pvStorePalette;
+    final shop = _shopOf(p);
+    final yes = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: pal.ground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+          child: Column(
+            key: const ValueKey('pv_product_did_you_buy'),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Did you buy it on $shop?',
+                style: pvFraunces(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w500,
+                  color: pal.ink1,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'If you did, we will mark it as bought in your lists, so you '
+                'do not buy it twice. You can rate it for other parents too.',
+                style: pvManrope(fontSize: 14, height: 1.5, color: pal.ink2),
+              ),
+              const SizedBox(height: 16),
+              PvCommit(
+                label: 'Yes, I bought it',
+                onTap: () => Navigator.of(context).pop(true),
+              ),
+              const SizedBox(height: 8),
+              PvSecondary(
+                label: 'Not yet',
+                onTap: () => Navigator.of(context).pop(false),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (yes != true || !mounted) return;
+    BoughtStore.instance.markBought(p.id);
+    await _rate(p);
+  }
+
+  /// Stars in one tap, a few words if she wants. Also opened by the "Rate
+  /// it" link under Ratings from parents, which is her saying she bought it.
+  Future<void> _rate(PvProduct p) async {
+    final pal = pvStorePalette;
+    final shop = p.soldHere ? '' : _shopOf(p);
+    final mine = PvReviewStore.instance.mineFor(p.id);
+    var stars = mine?.rating ?? 0;
+    final words = TextEditingController(text: mine?.body ?? '');
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: pal.ground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheet) => StatefulBuilder(
+        builder: (sheet, setSheet) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(sheet).viewInsets.bottom,
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+              child: Column(
+                key: const ValueKey('pv_product_rate_sheet'),
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    mine == null ? 'How was it?' : 'Edit your review',
+                    style: pvFraunces(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w500,
+                      color: pal.ink1,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Only rate what you bought and used. Other parents see '
+                    'your review once we have checked it.',
+                    style: pvManrope(
+                      fontSize: 13.5,
+                      height: 1.45,
+                      color: pal.ink2,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Wrap(
+                    children: [
+                      for (var i = 1; i <= 5; i++)
+                        IconButton(
+                          key: ValueKey('pv_rate_star_$i'),
+                          tooltip: '$i out of 5',
+                          onPressed: () => setSheet(() => stars = i),
+                          icon: Icon(
+                            i <= stars
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
+                            size: 34,
+                            color: kPvStar,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: words,
+                    maxLines: 4,
+                    minLines: 2,
+                    maxLength: 2000,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      hintText: 'What should another parent know? (optional)',
+                      hintStyle: pvManrope(fontSize: 14, color: pal.ink3),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    style: pvManrope(fontSize: 14.5, color: pal.ink1),
+                  ),
+                  const SizedBox(height: 10),
+                  PvCommit(
+                    label: stars == 0 ? 'Tap a star to rate' : 'Save review',
+                    onTap: stars == 0
+                        ? null
+                        : () => Navigator.of(sheet).pop(true),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    final body = words.text;
+    words.dispose();
+    if (saved != true || !mounted) return;
+    BoughtStore.instance.markBought(p.id);
+    await PvReviewStore.instance.save(
+      productId: p.id,
+      rating: stars,
+      body: body,
+      boughtAt: shop,
+    );
+    if (!mounted) return;
+    pvSnack(
+      context,
+      'Thank you. You can see your review now; other parents will once it is checked.',
+    );
   }
 
   // ---- build ---------------------------------------------------------------------
@@ -384,8 +586,19 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 ),
               if (product.bestFor.isNotEmpty)
                 SliverToBoxAdapter(child: _bestFor(p, product)),
+              // Amazon's own "About this item", only from its API (0120),
+              // labelled as Amazon's (store Track A, 2026-10-28).
+              if (product.extFeatures.isNotEmpty)
+                SliverToBoxAdapter(child: _extFeatures(p, product)),
               SliverToBoxAdapter(child: _accordions(p, product)),
-              SliverToBoxAdapter(child: _ratings(p, product)),
+              // Listens to the review store so her own review lands the
+              // moment she saves it. Kept for revert: child: _ratings(p, product).
+              SliverToBoxAdapter(
+                child: ListenableBuilder(
+                  listenable: PvReviewStore.instance,
+                  builder: (_, _) => _ratings(p, product),
+                ),
+              ),
               if (product.experts.isNotEmpty || product.expertsPct != null)
                 SliverToBoxAdapter(child: _experts(p, product)),
               // The safety note before the rails, so related products are
@@ -805,10 +1018,95 @@ class _PvProductScreenState extends State<PvProductScreen> {
               ),
             ],
           ),
+          // Her own named lists, Amazon's "Add to List" (2026-10-28). On
+          // every product, so the flow is the same everywhere; says which
+          // lists already hold it.
+          ListenableBuilder(
+            listenable: PvListStore.instance,
+            builder: (context, _) {
+              final inLists = PvListStore.instance.listsWith(product.id);
+              return InkWell(
+                key: const ValueKey('pv_product_add_to_list'),
+                onTap: () => showPvAddToListSheet(context, product),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    children: [
+                      Icon(
+                        inLists.isEmpty
+                            ? Icons.playlist_add_rounded
+                            : Icons.playlist_add_check_rounded,
+                        size: 18,
+                        color: kPvInk,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          inLists.isEmpty
+                              ? 'Save to a list'
+                              : inLists.length == 1
+                              ? 'In your list "${inLists.first.name}" · change'
+                              : 'In ${inLists.length} of your lists · change',
+                          style: pvManrope(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: kPvInk,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
   }
+
+  Widget _extFeatures(V2Palette p, PvProduct product) => Padding(
+    key: const ValueKey('pv_product_ext_features'),
+    padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PvSectionHead(title: 'About this item, from ${product.retailer}'),
+        const SizedBox(height: 10),
+        for (final f in product.extFeatures)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, right: 10),
+                  child: Container(
+                    width: 4,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: p.ink3,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    f,
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (product.priceCheckedAt case final at?)
+          Text(
+            'As listed on ${product.retailer}, ${at.day}/${at.month}/${at.year}',
+            style: pvManrope(fontSize: 12, color: p.ink3),
+          ),
+      ],
+    ),
+  );
 
   Widget _variants(V2Palette p, PvProduct product) => Padding(
     padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
@@ -1588,7 +1886,28 @@ class _PvProductScreenState extends State<PvProductScreen> {
   );
 
   Widget _ratings(V2Palette p, PvProduct product) {
-    final has = product.rating > 0 || product.reviews.isNotEmpty;
+    // Parents' own reviews from the app (0119): hers whatever its status,
+    // other parents' once approved. Kept for revert: the line without
+    // `live`, `has` from the seed alone.
+    final live = PvReviewStore.instance.shownFor(product.id);
+    final mine = PvReviewStore.instance.mineFor(product.id);
+    final has =
+        product.rating > 0 || product.reviews.isNotEmpty || live.isNotEmpty;
+    // The headline when the seed has no number: the plain mean of the
+    // reviews held, labelled with how few there are, never a measured-looking
+    // figure on its own.
+    final liveMean = live.isEmpty
+        ? 0.0
+        : live.map((r) => r.rating).reduce((a, b) => a + b) / live.length;
+    final headline = product.rating > 0 ? product.rating : liveMean;
+    final countLine = product.reviewCount > 0
+        ? '${product.reviewCount} ratings'
+        : live.isNotEmpty
+        ? '${live.length} ${live.length == 1 ? 'parent' : 'parents'} on ParentVeda'
+        : '${product.reviews.length} reviews';
+    // Rate it: an affiliate item she can buy elsewhere. A sold-here item
+    // waits for a delivered order (Track B), so it gets no link yet.
+    final canRate = product.canBuy && !product.soldHere;
     // ⚠️ THE PADDING MOVED INSIDE. This section used to wrap everything in
     // one 20pt gutter, which was right while it held only text and boxes and
     // wrong the moment it grew a rail: a horizontal list inside a gutter
@@ -1622,9 +1941,9 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    if (product.rating > 0)
+                    if (headline > 0)
                       Text(
-                        product.rating.toStringAsFixed(1),
+                        headline.toStringAsFixed(1),
                         style: pvFraunces(
                           fontSize: 44,
                           fontWeight: FontWeight.w500,
@@ -1636,12 +1955,12 @@ class _PvProductScreenState extends State<PvProductScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (product.rating > 0)
+                        if (headline > 0)
                           Row(
                             children: [
                               for (var i = 1; i <= 5; i++)
                                 Icon(
-                                  i <= product.rating.round()
+                                  i <= headline.round()
                                       ? Icons.star_rounded
                                       : Icons.star_outline_rounded,
                                   size: 18,
@@ -1649,10 +1968,10 @@ class _PvProductScreenState extends State<PvProductScreen> {
                                 ),
                             ],
                           ),
+                        // Kept for revert: the two-way count without
+                        // the app's own reviews.
                         Text(
-                          product.reviewCount > 0
-                              ? '${product.reviewCount} ratings'
-                              : '${product.reviews.length} reviews',
+                          countLine,
                           style: pvManrope(fontSize: 12.5, color: p.ink3),
                         ),
                       ],
@@ -1683,13 +2002,33 @@ class _PvProductScreenState extends State<PvProductScreen> {
                 // ours would only repeat the two lists above, truncated. Dropped
                 // on the phone walk. Kept for revert: _prosCon(...).
               ],
+              if (canRate) ...[
+                const SizedBox(height: 12),
+                InkWell(
+                  key: const ValueKey('pv_product_rate_link'),
+                  onTap: () => _rate(product),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Text(
+                      mine == null
+                          ? 'Bought this? Rate it for other parents'
+                          : 'Edit your review',
+                      style: pvManrope(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: kPvInk,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
         // The words, on the rail every other review section in the app now
         // uses. Kept for revert, the stack this replaced:
         //   for (final r in product.reviews.take(2)) PvReviewCard(review: r),
-        if (has && product.reviews.isNotEmpty)
+        if (has && (product.reviews.isNotEmpty || live.isNotEmpty))
           Padding(
             padding: const EdgeInsets.only(top: 14),
             // The store's one hue, not the violet (2026-09-29). Kept for
@@ -1697,6 +2036,22 @@ class _PvProductScreenState extends State<PvProductScreen> {
             child: PvReviewRail(
               hue: kPvStoreMarkHue,
               voices: [
+                // The app's own first: hers, then approved ones (0119).
+                for (final r in live)
+                  PvReviewVoice(
+                    name: r.id == mine?.id
+                        ? 'You'
+                        : (r.authorLabel.isEmpty
+                              ? 'A ParentVeda parent'
+                              : r.authorLabel),
+                    context: r.id == mine?.id && !r.approved
+                        ? '${pvReviewSourceLine(r)} · only you see this until it is checked'
+                        : pvReviewSourceLine(r),
+                    quote: r.body.isEmpty
+                        ? 'Rated it ${r.rating} out of 5.'
+                        : r.body,
+                    stars: r.rating,
+                  ),
                 for (final r in product.reviews.take(6))
                   PvReviewVoice(
                     name: r.author,

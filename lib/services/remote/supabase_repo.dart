@@ -139,6 +139,48 @@ class SupabaseRepo {
     return List<Map<String, dynamic>>.from(rows);
   }
 
+  /// Rows of [table] where [column] equals [value], whoever wrote them — RLS
+  /// decides what comes back (product_reviews: your own plus everyone's
+  /// approved ones, 0119). Empty on any failure or when logged out.
+  static Future<List<Map<String, dynamic>>> selectWhere(
+    String table,
+    String column,
+    Object value, {
+    String orderBy = 'created_at',
+    bool ascending = false,
+  }) async {
+    if (userId == null) return const [];
+    try {
+      final rows = await _client
+          .from(table)
+          .select()
+          .eq(column, value)
+          .order(orderBy, ascending: ascending);
+      return List<Map<String, dynamic>>.from(rows);
+    } catch (e) {
+      debugPrint('[repo] select $table where $column failed: $e');
+      return const [];
+    }
+  }
+
+  /// Public catalogue rows of [table] where [column] equals [value], readable
+  /// logged out (products, 0049: anyone may read published rows). Null when
+  /// the server did not answer, so a caller keeps its cache instead of
+  /// mistaking "offline" for "the sheet is empty".
+  static Future<List<Map<String, dynamic>>?> selectPublicWhere(
+    String table,
+    String column,
+    Object value,
+  ) async {
+    try {
+      final rows = await _client.from(table).select().eq(column, value);
+      return List<Map<String, dynamic>>.from(rows);
+    } catch (e) {
+      debugPrint('[repo] public select $table failed: $e');
+      return null;
+    }
+  }
+
   /// Update row [id] in a co-parented [table] — NO user_id filter, so a parent
   /// can correct an entry their partner logged. RLS still blocks any row whose
   /// child isn't theirs. No-op if logged out.

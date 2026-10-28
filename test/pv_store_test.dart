@@ -243,7 +243,12 @@ void main() {
     test(
       'a variant price is absolute so the cart line carries the number she saw',
       () {
-        for (final p in store.all.where((p) => p.variants.isNotEmpty)) {
+        // Only what goes into OUR cart (2026-10-28): an Amazon or Flipkart
+        // item's sizes carry no price of ours (pvGuardRetailerPrice). Kept
+        // for revert: store.all.where((p) => p.variants.isNotEmpty).
+        for (final p in store.all.where(
+          (p) => p.variants.isNotEmpty && p.soldHere,
+        )) {
           for (final v in p.variants) {
             expect(v.price, greaterThan(0), reason: '${p.id}/${v.id}');
           }

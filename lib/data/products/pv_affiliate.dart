@@ -72,6 +72,42 @@ const _kMonths = [
   'Dec',
 ];
 
+// =============================================================================
+//  ⚠️ AMAZON AND FLIPKART PRICES COME ONLY FROM THEIR OWN API (2026-10-28)
+// -----------------------------------------------------------------------------
+//  The Amazon Associates Operating Agreement allows a price (and stars) on our
+//  page only when it was read from Amazon's API and is kept fresh; a number
+//  typed in by hand, however carefully, is not allowed and can close the
+//  account. Flipkart's affiliate terms say the same of its feed. So for these
+//  two the rule is binary: a price stamped `priceCheckedAt` by the server
+//  (`affiliate-refresh` writes it, and nothing else does) shows with its
+//  "as of" date; anything else is cleared and the page says "See price on
+//  Amazon". Brand networks (FirstCry, Hopscotch via INRDeals / Cuelinks)
+//  have no such rule, so their hand-checked guide price stays.
+//
+//  This is why the hand map above no longer feeds price or stars into the
+//  catalogue (pv_catalog_adapters.dart `_enrich`): only its ASIN is used.
+// =============================================================================
+
+/// The retailer whose terms forbid a price we did not read from its API, or
+/// null. Matched on the name and on the link, because seed rows spell the
+/// retailer three ways ('Amazon', 'Amazon.in', a bare amazon.in link).
+String? pvApiPricedRetailer(PvProduct p) {
+  if (p.soldHere || p.reviewOnly) return null;
+  final hay = '${p.retailer} ${p.buyUrl ?? ''}'.toLowerCase();
+  if (hay.contains('amazon') || hay.contains('amzn.')) return 'Amazon';
+  if (hay.contains('flipkart') || hay.contains('fkrt.')) return 'Flipkart';
+  return null;
+}
+
+/// [p] as the catalogue may show it: unchanged, or with its price left to
+/// Amazon / Flipkart when that price did not come from their API.
+PvProduct pvGuardRetailerPrice(PvProduct p) {
+  final shop = pvApiPricedRetailer(p);
+  if (shop == null || p.priceCheckedAt != null) return p;
+  return p.withPriceLeftToRetailer('See price on $shop');
+}
+
 /// The line under an affiliate price saying whose number it is, or null
 /// when the price is ours (sold here), there is none, or it is info only.
 String? pvAffiliatePriceNote(PvProduct p) {

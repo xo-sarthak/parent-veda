@@ -127,6 +127,11 @@ serve(async (req) => {
           "offersV2.listings.price",
           "customerReviews.starRating",
           "customerReviews.count",
+          // The listing itself (0120): title, "About this item", main photo.
+          // Amazon allows these on our page only from this API.
+          "itemInfo.title",
+          "itemInfo.features",
+          "images.primary.large",
         ],
       }),
     });
@@ -149,6 +154,18 @@ serve(async (req) => {
       };
       if (typeof star === "number") patch.ext_rating = star;
       if (typeof count === "number") patch.ext_review_count = count;
+      // The listing's own words and photo (0120). Each is written only when
+      // it read cleanly; a missing field leaves the last good value alone.
+      const title = at(item, ["itemInfo", "title", "displayValue"]);
+      if (typeof title === "string" && title) patch.ext_title = title;
+      const feats = at(item, ["itemInfo", "features", "displayValues"]);
+      if (Array.isArray(feats)) {
+        patch.ext_features = feats.filter((f) => typeof f === "string").slice(0, 8);
+      }
+      const img = at(item, ["images", "primary", "large", "url"]);
+      if (typeof img === "string" && img.startsWith("https://")) {
+        patch.ext_image = img;
+      }
       const { error: e } = await db
         .from("products")
         .update(patch)

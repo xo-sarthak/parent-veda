@@ -19,9 +19,15 @@
 //  `PregnancyController.current`, child age from `ChildProfileStore`.
 // =============================================================================
 
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../data/products/pv_affiliate.dart' show pvGuardRetailerPrice;
 import '../data/products/pv_catalog_adapters.dart';
+import '../data/products/pv_product_rows.dart';
+import 'remote/supabase_repo.dart';
 import '../models/pv_product.dart';
 import '../screens/post_pregnancy/pp_child_profile.dart';
 import 'life_stage_store.dart';
@@ -48,7 +54,64 @@ class PvCatalogStore extends ChangeNotifier {
   /// migration exists; the push is the user's. Kept so the seam is real.
   void applyRows(List<PvProduct> rows) {
     if (rows.isEmpty) return;
-    _all = rows;
+    // Server rows pass the same Amazon / Flipkart price guard as the seed.
+    // Kept for revert: _all = rows;
+    _all = [for (final r in rows) pvGuardRetailerPrice(r)];
+    notifyListeners();
+  }
+
+  // ---- the product sheet, from the cloud (store Track A, 2026-10-28) ------
+  //
+  // PLUG AND PLAY: the sheet importer writes `products` rows with
+  // domain = 'store' (0120); they are laid over the built-in catalogue here,
+  // so a new product or a changed link needs no app release.
+  //
+  // Local-first: the last rows read are kept on the phone and applied
+  // before any network, so the shelf is the same offline. A failed read
+  // keeps the cache; only an answer from the server replaces it.
+
+  static const _rowsCacheKey = 'pv_store_sheet_rows';
+  Future<void>? _loading;
+
+  Future<void> loadFromCloud() => _loading ??= _loadFromCloud();
+
+  Future<void> _loadFromCloud() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cached = prefs.getString(_rowsCacheKey);
+      if (cached != null) {
+        applyStoreRows(
+          List<Map<String, dynamic>>.from(
+            (jsonDecode(cached) as List).map(
+              (e) => Map<String, dynamic>.from(e as Map),
+            ),
+          ),
+        );
+      }
+      final fresh = await SupabaseRepo.selectPublicWhere(
+        'products',
+        'domain',
+        'store',
+      );
+      if (fresh == null) return; // no answer: the cache stands
+      await prefs.setString(_rowsCacheKey, jsonEncode(fresh));
+      applyStoreRows(fresh);
+    } catch (e) {
+      debugPrint('[catalog] sheet rows not loaded: $e');
+    }
+  }
+
+  /// Lays the sheet's [rows] over the built-in catalogue. Unreadable rows
+  /// are skipped (pvProductFromStoreRow); everything passes the price guard.
+  void applyStoreRows(List<Map<String, dynamic>> rows) {
+    final cats = {for (final c in categories) c.id};
+    final read = [
+      for (final r in rows) ?pvProductFromStoreRow(r, categoryIds: cats),
+    ];
+    _all = [
+      for (final p in pvMergeStoreRows(buildPvCatalog(), read))
+        pvGuardRetailerPrice(p),
+    ];
     notifyListeners();
   }
 
