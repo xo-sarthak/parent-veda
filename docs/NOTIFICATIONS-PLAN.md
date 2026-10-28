@@ -1,7 +1,7 @@
 # Notifications, Phase 6a: the market's set, sent only when we have it
 
 GLOBAL-CHANGES #12, Phase 6a. Written 2026-10-28, after relevance Batch 7
-(475d2c57) filled the date gaps. Status: **BUILT 2026-10-28 for Pregnancy and TTC (commit owed).** The user liked the
+(475d2c57) filled the date gaps. Status: **COMMITTED 0a38f4dd (2026-10-28) for Pregnancy and TTC.** The user liked the
 prototype and said build it, with one note: too few pregnancy messages.
 
 ## Out of scope
