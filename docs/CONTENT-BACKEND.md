@@ -477,6 +477,40 @@ were the exception: they are adapted, not in `kPregnancyReads`, so `pv_veda_link
    right while what it was built from is unchanged: an AMH or discharge question answered before the ingest
    (including a "no answer" or a web answer) would otherwise keep being served.
 
+### Every Pregnancy library card exports its whole page (PREGNANCY-GAP 27, 2026-10-28)
+
+The gap Batch 6 left: scans, conditions, report findings, the five nutrition libraries (nutrients, diet by
+trimester, diet for a condition, diet questions, fasting), belly and skin, and Mind's reads still went to Ask Veda
+as their blurbs. On the doors that is 138 cards, about 9,000 characters of blurb standing in for about 168,000
+of page. `pvVedaEntryRead` (`pv_veda_corpus.dart`) now builds each entry's page with the same adapter its screen
+uses, and the page rides under the card's existing id, as the symptoms did. Recipes and diet charts keep their
+blurbs: one opens a cook screen and the other a meal plan, neither a page to read.
+
+Three things a straight "call the adapter" would have got wrong, and each is a pattern worth keeping:
+- **Build the page the way the screen builds it, not with the adapter's defaults.** The scan screen hands
+  `pvReadFromScan` that scan's red flags (`kScanRedFlags`); the default is a generic "your doctor reads your
+  report". Exporting with the default would have dropped every scan's "call your gynaecologist if" list.
+- **A drawn block can sit inside a section that also has words.** `pvVedaReadBody` used to skip a whole section
+  when it held a custom block, which lost each scan's "What the report will say" paragraph and its parameters
+  table. It now skips only the block, and writes the parameters table out as text (name, what it measures,
+  typical range, what low or high can mean). No section in `kPregnancyReads` had both, so no existing document
+  changed.
+- **One page, one document, across doors.** Eight entries sit on two doors (ectopic and hyperemesis on
+  Complications and Your first weeks; six Mind reads on Mind and Your first weeks). The exporter's duplicate
+  check was per door, so each page would have been indexed twice, and a question would match two copies of
+  the same words. The first card in door order carries the page (door order puts each library's own door
+  first); a later card keeps its blurb and where to find it.
+
+**Checked for double sending:** the older exporter (`tool/export_veda_corpus.dart`, through `VedaIndex.corpus`)
+holds none of these libraries. Its six `scan_m_*` scan guides cover some of the same scans with different words
+from different data (`kScanGuides`), so they stay. None of these libraries is editor-owned
+(`content_ownership.dart`), so the bundled copy is the truth and the export overwrites no editor.
+
+**No service change** (same kind, same ids, longer bodies; the corpus grows by about a tenth). **The user runs**
+the same four steps as the Batch 6 entry above, once for both: export, import with `--prune-prefix pv`, the
+incremental ingest ($0 / ₹0, embedded on the laptop), then clear the pregnancy answer cache. Test:
+`test/relevance_preg27_test.dart`.
+
 ## Ask Veda answers for the profile on screen, and after a loss (2026-10-25)
 
 STAGE-TRANSITIONS F8 and R3. Two app fields, landed in both repos at once (the wire body is a two-repo contract;

@@ -32,8 +32,38 @@
 //  for). The older pregnancy corpus keeps its own Hindi twins untouched.
 // =============================================================================
 
+import '../data/belly_skin_data.dart' show kBsPages;
+import '../data/conditions_data.dart' show kAllConditions;
 import '../data/doors/pv_door_data.dart';
+import '../data/mind_mood_data.dart' show mmArticleById;
+import '../data/mind_mood_extras.dart' show kMmPartnerArticle;
+import '../data/nutrition_data.dart'
+    show
+        kConditionGuides,
+        kFastingByOccasion,
+        kFastingGeneral,
+        kNutrientGuides,
+        kNutritionPracticalCards,
+        kTrimesterGuides;
+import '../data/reads/nutrition_reads.dart'
+    show
+        pvReadFromDietCondition,
+        pvReadFromDietQuestion,
+        pvReadFromFasting,
+        pvReadFromNutrient,
+        pvReadFromStage;
 import '../data/reads/pregnancy_reads.dart' show kPregnancyReads;
+import '../data/reads/read_adapters.dart'
+    show
+        PvScanParametersBlock,
+        pvReadFromBs,
+        pvReadFromCondition,
+        pvReadFromFinding,
+        pvReadFromMm,
+        pvReadFromScan;
+import '../data/report_findings_data.dart' show kReportFindings;
+import '../data/scan_extras.dart' show kScanRedFlags;
+import '../data/tests_scans_reports_data.dart' show ReportParameter, kTestsScans;
 import '../localization/app_language.dart';
 import '../models/pv_read.dart';
 import '../services/bracket_resolver.dart' show bracketById;
@@ -55,16 +85,93 @@ import 'pv_veda_links.dart';
 /// rides under the card's existing id, so the card she taps still opens the
 /// same page and the resolver needs no change.
 ///
-/// Symptom pages only for now. Scans, conditions, findings and the nutrition
-/// libraries are the same shape, and are recorded as owed in PREGNANCY-GAP.
+/// Every library that opens a written page does so now (PREGNANCY-GAP 27,
+/// 2026-10-28): scans, conditions, report findings, the five nutrition
+/// libraries, belly and skin, and Mind's reads. Kept for revert, the first
+/// build, symptoms only:
+///   if (t.library == PvDoorLibrary.symptom) { ...pvReadFromSymptom... }
 String? pvVedaEntryPageBody(PvDoorTile t) {
   if (t is! PvDoorEntryTile) return null;
-  if (t.library == PvDoorLibrary.symptom) {
-    final s = symptomById(t.entryId);
-    return s == null ? null : pvVedaReadBody(pvReadFromSymptom(s));
-  }
-  return null;
+  final r = pvVedaEntryRead(t.library, t.entryId);
+  return r == null ? null : pvVedaReadBody(r);
 }
+
+/// The page a library entry opens, built the way its screen builds it
+/// (`pvDoorEntryScreen` in the router names each one), or null when the
+/// entry does not open a page of words.
+///
+/// ⚠️ THE SCREEN'S ARGUMENTS, NOT THE ADAPTER'S DEFAULTS. The scan screen
+/// hands the adapter that scan's red flags; without them the urgent line
+/// falls back to "your report is read by your doctor", and Ask Veda would
+/// lose every "call your gynaecologist if" list the page shows her. The
+/// other screens only add drawn blocks and buttons, which have no words.
+///
+/// Recipes and diet charts return null on purpose: one is a cook screen and
+/// the other a meal plan, not a page to read, so their cards keep the blurb.
+PvRead? pvVedaEntryRead(PvDoorLibrary library, String id) {
+  T? find<T>(Iterable<T> xs, bool Function(T) hit) {
+    for (final x in xs) {
+      if (hit(x)) return x;
+    }
+    return null;
+  }
+
+  switch (library) {
+    case PvDoorLibrary.scan:
+      final s = find(kTestsScans, (x) => x.id == id);
+      return s == null ? null : pvReadFromScan(s, redFlags: kScanRedFlags[s.id] ?? const []);
+    case PvDoorLibrary.condition:
+      final c = find(kAllConditions, (x) => x.id == id);
+      return c == null ? null : pvReadFromCondition(c);
+    case PvDoorLibrary.finding:
+      final f = find(kReportFindings, (x) => x.id == id);
+      return f == null ? null : pvReadFromFinding(f);
+    case PvDoorLibrary.nutrient:
+      final n = find(kNutrientGuides, (x) => x.id == id);
+      return n == null ? null : pvReadFromNutrient(n);
+    case PvDoorLibrary.dietStage:
+      final g = find(kTrimesterGuides, (x) => x.id == id);
+      return g == null ? null : pvReadFromStage(g);
+    case PvDoorLibrary.dietCondition:
+      final g = find(kConditionGuides, (x) => x.id == id);
+      return g == null ? null : pvReadFromDietCondition(g);
+    case PvDoorLibrary.fasting:
+      final f = find([...kFastingByOccasion, ...kFastingGeneral], (x) => x.id == id);
+      return f == null ? null : pvReadFromFasting(f);
+    case PvDoorLibrary.dietQuestion:
+      final q = find(kNutritionPracticalCards, (x) => x.id == id);
+      return q == null ? null : pvReadFromDietQuestion(q);
+    case PvDoorLibrary.bellySkin:
+      final p = find(kBsPages, (x) => x.id == id);
+      return p == null ? null : pvReadFromBs(p);
+    case PvDoorLibrary.mindRead:
+      final a = id == kMmPartnerArticle.id ? kMmPartnerArticle : mmArticleById(id);
+      return a == null ? null : pvReadFromMm(a);
+    case PvDoorLibrary.symptom:
+      final s = symptomById(id);
+      return s == null ? null : pvReadFromSymptom(s);
+    case PvDoorLibrary.symptomNormal:
+      // Each answer is already its own document (`pvread_normal_<id>`).
+      return null;
+    case PvDoorLibrary.recipe:
+    case PvDoorLibrary.dietChart:
+      return null;
+  }
+}
+
+/// A scan's "What the report will say" table, in words: the table is a
+/// drawn block, so without this the export saw only its heading.
+String pvVedaScanParametersText(List<ReportParameter> ps) => _join([
+      for (final p in ps)
+        _join([
+          '${_l(p.name)}: ${_l(p.measures)}',
+          _l(p.whyImportant),
+          if (p.typicalRange != null) 'Typical range: ${_l(p.typicalRange)}',
+          if (p.ifLow != null) 'If low: ${_l(p.ifLow)}',
+          if (p.ifHigh != null) 'If high: ${_l(p.ifHigh)}',
+          if (p.note != null) _l(p.note),
+        ], sep: '\n'),
+    ]);
 
 /// What the Symptoms door's own document says about its "Is this normal?"
 /// tab: the questions only (relevance Batch 6, 2026-10-28). Each answer is
@@ -98,8 +205,12 @@ String pvVedaReadBody(PvRead r) => _join([
       _l(r.scaleSetter),
       _l(r.teaser),
       for (final s in r.sections)
-        // A custom block (a drawing, a calculator) has no words to embed.
-        if (s.custom == null)
+        // A custom block (a drawing, a calculator) has no words to embed, but
+        // the section around it can: a scan's "What the report will say"
+        // carries its paragraph AND the parameters table, and skipping the
+        // whole section lost both (PREGNANCY-GAP 27). Only the block is
+        // skipped now, except the one block whose data is words. Kept for
+        // revert: if (s.custom == null)
           _join([
             _l(s.heading),
             _l(s.summary),
@@ -109,6 +220,8 @@ String pvVedaReadBody(PvRead r) => _join([
             if (s.mythFact != null)
               _join(['Myth: ${_l(s.mythFact!.myth)}', 'Fact: ${_l(s.mythFact!.fact)}']),
             if (s.callout != null) _join([_l(s.callout!.title), _l(s.callout!.body)]),
+            if (s.custom case PvScanParametersBlock(:final parameters))
+              pvVedaScanParametersText(parameters),
           ]),
       // Each FAQ is its own document (below), so it is not repeated here.
       _join([_l(r.whenToSeeSomeone.title), _l(r.whenToSeeSomeone.body)]),
@@ -225,6 +338,14 @@ List<Map<String, dynamic>> buildPregnancyVedaCorpus() {
   }
 
   // ---- doors ------------------------------------------------------------------------
+  // ⚠️ ONE PAGE, ONE DOCUMENT, ACROSS DOORS (PREGNANCY-GAP 27). Eight entries
+  // sit on two doors (ectopic and hyperemesis on Complications and Your
+  // first weeks; six Mind reads on Mind and Your first weeks). `seen` below
+  // is per door, so each page would go out twice and a question would match
+  // two copies of the same words. The first card in door order carries the
+  // page, and door order puts each library's own door first; a later card
+  // keeps its blurb and where to find it.
+  final paged = <String>{};
   for (final page in kPvDoorPages) {
     final bracket = bracketById(page.bracketId);
     final doorName = bracket?.label.en ?? page.heroTitle;
@@ -272,7 +393,8 @@ List<Map<String, dynamic>> buildPregnancyVedaCorpus() {
             if (t.meta != null) t.meta,
             'Find it in the app: $doorName, ${tabLabel(section.group)}'
                 '${section.heading.isEmpty ? '' : ', ${section.heading}'}.',
-            pvVedaEntryPageBody(t),
+            if (t is PvDoorEntryTile && paged.add('${t.library.name}:${t.entryId}'))
+              pvVedaEntryPageBody(t),
           ]),
           keywords: t.keywords,
         ));
