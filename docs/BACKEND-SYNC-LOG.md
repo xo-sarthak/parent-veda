@@ -1663,3 +1663,34 @@ The birth plan lived only on her phone, and the partner's phone showed his own e
 
 **Files:** `supabase/migrations/0118_user_state_partner_birth_plan.sql`, `lib/services/remote/supabase_repo.dart`,
 `lib/services/birth_plan_store.dart`, `lib/screens/pregnancy/birth_plan_screen.dart`.
+
+---
+
+## Step 27: a checklist that merges per item, a date that stays a date, an edit that waits for the load (P4)
+
+**Date:** 2026-10-28 (Pregnancy and TTC tools pass, P4, the user's word). **Migration:** none; `pv_state_merge`
+(0110) already merges any store key. **Commit:** `17238591`.
+
+### Why
+- The product checklist synced as one blob, so two phones (or her and her partner) overwrote each other's ticks.
+- `contraction_sessions.date_iso` is a `date`; the app sent a full timestamp, Postgres kept only the day, and the
+  history re-sorted after a pull.
+- `NutritionDayStore.addToList`, reached from a recipe opened by search before any screen had loaded the store,
+  saved the near-empty in-memory copy over her real one: water, ticks and the shopping list, gone when logged out.
+
+### What changed
+- [x] **`ProductChecklistStore` on `CloudMergedStore`:** keys `list|<id>`, `item|<listId>|<itemId>`, `order`;
+  deletions travel as soft-delete tombstones; `legacyBlobKey` reads the old blob once on each phone's first merge,
+  so nobody's lists are lost. The old mixin code is kept as comments.
+- [x] **Contraction date:** `contractionRowDate` sends `yyyy-MM-dd`; on pull the time comes from the first
+  contraction's start; history sorts by that start. `test/preg_contraction_schema_contract_test.dart` pins the
+  columns and the `date` type.
+- [x] **Nutrition edit before load:** every mutator goes through `_change`; before the read, edits are held,
+  `init()` starts, and they replay on top of what was read. `init()` is one shared future.
+- [x] Pattern written up: BACKEND-PATTERNS §16zze.
+
+### Verify
+- Two phones tick different checklist items offline, then both sync: both ticks survive.
+- A session started at 23:50 keeps its time after sign-out and sign-in.
+- Logged out, open a recipe from search, add to list, then open the Nutrition door: water and earlier ticks are
+  still there.
