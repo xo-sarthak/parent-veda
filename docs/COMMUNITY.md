@@ -203,7 +203,7 @@ Cost: Supabase plan as is; photos in Storage at launch volume ≈ $0 (₹0).
 
 - **Phase 1:** committed `9b9dabb9`; the "one place on More" follow-up (decision 11) is in a second commit.
 - **The user's steps** are in "What the user must do" above. Done on 2026-10-28: the migrations, the moderator row, and the grievance officer named (Deepti Sekhri). The officer's contact is in the app. Still open: the takedown process, the helplines, and the phone walk.
-- **Next is phase 2** (below). Start it in plan mode: a fresh Mobbin pass for each new screen, a prototype before Flutter, and the decision table.
+- **Phase 2 is planned (2026-10-28).** Plan `C:\Users\sarth\.claude\plans\sparkling-floating-seahorse.md` (approved). Its decisions are in "Phase 2: plan and decisions" below. Mobbin pass: MOBBIN-DISCOVERY §38. Prototype: https://claude.ai/artifact/2NZoJdbk7CJqdBxuT6bhBY, **waiting for the user's sign-off; no Flutter or SQL before it.** After sign-off: write migration 0123 and widen the tests, then build steps 1 to 7 in order.
 - **Order suggested:** (1) course and cohort threads with verified experts, (2) birth clubs and follow, (3) search, editing within 15 minutes, and editorial prompt posts.
 - **Read first:** this file, `docs/BACKEND-PATTERNS.md` §16zzd, `supabase/migrations/0121_community.sql`, `lib/services/pv_community_store.dart` and `lib/screens/community/community_chrome.dart`. Don't re-read the 8 superseded screens.
 - **The rules that hold:**
@@ -211,6 +211,47 @@ Cost: Supabase plan as is; photos in Storage at launch volume ≈ $0 (₹0).
   - every new read is a security-definer function that returns `is_mine`, never `user_id`;
   - every write returns its outcome;
   - the safety word lists change in SQL and Dart together, and the parity test enforces it.
+
+---
+
+## Phase 2: plan and decisions (2026-10-28)
+
+### Out of scope for phase 2, said plainly
+
+- **Crisis posts routed to experts (the second half of W20).** The user, 2026-10-28: "keep it only till moderators for now". This widens once the app is mature. Crisis posts stay in the moderator crisis queue. The expert queue holds only questions a member asked for. "Ask an expert to look" on a crisis post answers "A moderator is already looking at this, and the helplines are on your post."
+- **Editing replies.** Posts only for now.
+- **Per-batch threads, push, realtime, video.** Phases 3 and 4.
+
+### What the code decided before anyone asked
+
+- **A thread opens on a booking, not a purchase.**
+  - `EntitlementGrant.discussionThread` exists only on the phone and in the `user_state` blob.
+  - The server's one record of a seat is `booking_bookings`, written only by the definer `book_slot()`.
+  - So a recording-only buyer's thread stays locked until she books a seat. A client's claim is never an access check.
+- **The expert badge comes from a person's `expert_accounts` row whose `expert_profiles` row is published.**
+  - It does not come from `my_expert_ids()`, which also hands a hospital login every clinician under it.
+  - It shows on named posts only, because a badge on an anonymous post would unmask one of very few people.
+- **The app passes the due month for the birth club, the same way it already passes the stage.** The server copy of the due date can lag behind the phone and outlives a loss.
+- **The phase 1 tests read `0121` by a fixed path.** They are widened to 0121 + 0122 + 0123 before any 0123 function is called.
+
+### Decisions
+
+| # | Question | Recommended | User's answer (2026-10-28) |
+|---|---|---|---|
+| P2.1 | What opens a course thread | A non-cancelled booking for the offering, the offering's expert, or a moderator | Plan approved |
+| P2.2 | Thread per offering or per batch | Per offering (no batch concept on the server) | Plan approved |
+| P2.3 | Default face in a course thread | First name; the community name one tap away | Plan approved (open on the prototype) |
+| P2.4 | The expert badge | `expert_accounts` + published profile, on named posts and replies only, with a footer: "General guidance from a verified expert, not a diagnosis. For your own care, ask your doctor." | Plan approved (footer wording open on the prototype) |
+| P2.5 | Who may ask an expert | The post's author, once per post | Plan approved |
+| P2.6 | Which experts see crisis posts (W20) | Every verified expert | **Moderators only for now; widen later** |
+| P2.7 | Birth club after a loss | Leave automatically, with one quiet line | **Ask her: a Stay / Leave sheet, once, and nothing changes until she taps** |
+| P2.8 | Following | "My rooms" becomes "Following" (joined rooms + followed tags + followed people) | As recommended |
+| P2.9 | Following a person | One face, they are not told, no counts anywhere | Plan approved |
+| P2.10 | Search | Postgres full-text search on live posts (`english`, `websearch_to_tsquery`) plus rooms and #tags | Plan approved |
+| P2.11 | Editing | Posts only, title and body, 15 minutes, online only; the safety check runs again | **Posts only** |
+| P2.12 | Editorial prompts | A moderator-only function posting as "ParentVeda team", pinned 0 to 14 days, an audit row, cannot be blocked | Plan approved |
+| P2.13 | Over-35 room (STILL-OPEN §79.5) | Seed `preg_over_35` in 0123 | Plan approved |
+| P2.14 | Migrations | One `0123_community_phase2.sql` | Plan approved |
 
 ---
 

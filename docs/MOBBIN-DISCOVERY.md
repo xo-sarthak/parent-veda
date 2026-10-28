@@ -1388,3 +1388,47 @@ Prototype: `claude.ai/artifact/1wkwCdtNts4X1z9FYi4tek`. As built: SKILLING-DOORS
 **Declined.** Coins, streaks and XP (Duolingo, Nibble, Brilliant): skilling never scores a child.
 
 **Owed.** Learn, Products and Tools with their own content (they point into the doors for now).
+
+## 38. Community phase 2: course threads, experts, clubs, follow, search, edit (2026-10-28)
+
+**Why.** Phase 2 of the shared community (docs/COMMUNITY.md) adds six kinds of new screen. Each one got its own pass
+before the prototype, as the user asked.
+
+**Found.**
+- Course discussion: Mindvalley's Lesson | Discussions (https://mobbin.com/screens/806fc721-30b8-4192-b2fd-3c119bc40cf9);
+  Skillshare's Discussions tab with a "Teacher" chip (https://mobbin.com/screens/c1f386bf-79ba-41ee-9065-49f2767e0a87);
+  Insight Timer's classroom, pills Popular / Recent / Teacher / Mine (https://mobbin.com/screens/d91ab634-be71-4edc-b5eb-1a2761261869);
+  Coursera's week discussion (https://mobbin.com/screens/36db9592-bedb-47b6-a4ee-78fe6f0fd84c).
+- Expert answers: Target Q&A's "Brand expert" label (https://mobbin.com/screens/ab9ac914-bc7d-4f5d-8a03-1164fb04b624);
+  Glassdoor's verified experts with Follow (https://mobbin.com/screens/ae6eebc7-3d3c-4be9-897b-56021d9f3f49).
+- Group home and pinning: Glassdoor bowl, "Pinned posts" by Community Manager (https://mobbin.com/screens/4e7dbf15-8b9c-4950-9b62-b113ba04497d);
+  X community, "Pinned" + "Mod" (https://mobbin.com/screens/0b7b7816-4142-4321-a2bb-e308daa94dde);
+  Facebook group header (https://mobbin.com/screens/dacad4a7-9963-400f-bdac-8f554720042a).
+- Search: Reddit, All / Posts / Communities (https://mobbin.com/screens/8b4f72b2-d985-47f6-ba6d-a5ecb50b8a3f);
+  Substack tabs (https://mobbin.com/screens/89691b4d-093e-4d14-a9cf-ced9700c9f2a); Discord results under their channel
+  (https://mobbin.com/screens/4dfb0dfb-190e-45b1-913a-8110ef30c525).
+- Follow and tags: LinkedIn's "+ Follow" pill (https://mobbin.com/screens/bd65622e-bc46-4eaa-ae9a-3006dd712f62);
+  X's For you | Following (https://mobbin.com/screens/e3317114-4647-4231-8e02-398721f55c94).
+- Edit: Reddit's composer, action top right (https://mobbin.com/screens/5d123450-99e1-45d3-b296-5adcbd8c91bc);
+  Discord's inline "(edited)" (https://mobbin.com/screens/27ca5295-09b4-4eee-8674-27d0156fad77).
+- Expert queue: Linear's inbox rows (https://mobbin.com/screens/f688fc71-2060-49c2-be67-bc6ab5e53bee).
+
+**Adopted.**
+- An Experts pill beside Top / Newest / Mine (Insight Timer's Teacher pill).
+- A seal on the expert's own name rather than a separate chip.
+- The discussion at the bottom of the course page, above the Book bar, locked with a blurred preview until she books.
+- "Pinned" above a team post.
+- Search in the community app bar, with tabs All / Posts / Rooms / Tags.
+- An outlined Follow pill.
+- "Following" replaces "My rooms".
+- The composer reused for editing, with Save top right.
+- The doctor queue as plain rows with Claim.
+
+Prototype: https://claude.ai/artifact/2NZoJdbk7CJqdBxuT6bhBY.
+
+**Declined.**
+- Follower counts (Glassdoor, LinkedIn): no vanity numbers.
+- Leaderboards (Digg).
+- A shared team login: the team speaks through a moderator-only function, with an audit row.
+
+**Owed.** Nothing yet. The build follows the prototype's sign-off.
