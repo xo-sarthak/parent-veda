@@ -112,7 +112,8 @@ All six waves, one session, after the user's "(a), start now".
 **Wave 6, tests:** `test/p2_keep_test.dart` (15): the Garbh mapping and the weekly fold, the Journal never writing Garbh data, plan Undo, one wording on both phones, O1 consent wiring, the 0118 policy text (select only, one key), the `bump_photos` and `garbh_journal_entries` column contracts, and the wiring of every fix.
 
 **Not done, and why**
-- **N4, her chosen name offered at the birth sheet:** `lib/screens/profile/pv_you_sheets.dart` is held by another terminal. Owed; build after its commit.
+- **N4, her chosen name offered at the birth sheet: BUILT 2026-10-28** once `pv_you_sheets.dart` was free. The arrival sheet offers the name she chose (or up to three from her shortlist) as chips under the Name field, and fills the field only on a tap; "See more names" or, with none kept, "Still deciding? Find a name" opens Baby names. Adding an older child offers nothing. Tests in `test/pv_add_child_sheet_test.dart`.
+- **Twins (O3): closed.** Each baby has its own profile with one name (the user, 2026-10-28).
 - `global_search.dart` still lists Bump for the partner and opens the retired `GarbhScreen`. It is reached only from the classic home (`HomeScreenB`), so it is left as is and noted.
 - Twins in Baby names: parked (O3), STILL-OPEN line in the ready text.
 - `JournalScreenClassic` (`journal_screen.dart`) also reads `timeline()`, so it now shows Garbh rows too; it is the revert screen and not opened.

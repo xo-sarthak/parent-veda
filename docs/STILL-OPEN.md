@@ -11277,3 +11277,19 @@ Plan `wise-singing-shamir.md` (the user's Claude plans folder); PERSONALIZATION 
   delay answer; splitting it per condition waits for a page per condition (there is no vision page).
 - *The birth sheet adds one child.* A mother of twins who arrives through the sheet gets the twins flag carried over,
   but adds the second baby from the family profile.
+
+## 105.0 Pregnancy tools P2, keep: what the build left open — 2026-10-28
+
+`docs/preg-ttc-tool-plans/P2-keep.md` (commit `01f33b1`; migration 0118 run 2026-10-28).
+
+- *Twins in Baby names: decided, nothing owed.* Each baby has its own child profile, and each profile carries one
+  name, so one chosen name per profile is the right shape (the user, 2026-10-28). Revisit only if the app ever
+  models twins as one record.
+- *The classic home's search still lists Bump for her partner and opens the old Garbh menu*
+  (`global_search.dart`). Only the retired classic home reaches it.
+- *Spiritual reading's new Ask Veda keywords* take effect at the next corpus export and ingest.
+- *Bump's photo delete has no Undo* on purpose: the cloud deletes the file once it confirms, and the confirm
+  already says so.
+- *N4, her chosen name at the birth sheet: built 2026-10-28* after `pv_you_sheets.dart` was free. The sheet
+  offers the name she chose (or up to three from her shortlist) and never fills it in for her; with none kept,
+  it offers "Still deciding? Find a name".

@@ -4418,3 +4418,34 @@ explicit key for the cases you cannot afford to miss; when you can only test
 one, test the explicit one. The same trade shows up in search (keyword vs
 tagged), in routing (prefix match vs a route table) and in permissions (a role
 pattern vs a named grant).
+
+## 16zza. Share one row of a key-value table, not the table (P2, 0118, 2026-10-28)
+
+`user_state` is a key-value table: one row per person and store (`user_id`, `store_key`), and it holds every
+store a person has, from her journal settings to her birth plan. The usual partner policy,
+`user_id = public.my_partner_id()`, would therefore share all of it, which is not what "he can read her birth
+plan" means.
+
+So the policy names the key as well as the owner:
+
+```sql
+create policy "user_state partner birth plan select"
+  on public.user_state for select
+  using (store_key = 'birth_plan' and user_id = public.my_partner_id());
+```
+
+Two facts make this safe:
+
+- **It is added beside her own policy, not in place of it.** Permissive policies for the same command are
+  OR-ed: a row is visible if any one of them allows it. Her `user_id = auth.uid()` policy still lets her read
+  every row of her own; his new one adds exactly one row of hers.
+- **No write policy is added.** Without an INSERT or UPDATE policy that matches, his phone cannot change her
+  plan, so read-only is enforced by the database rather than by the app hiding a button.
+
+The client side follows the same shape: `SupabaseRepo.loadPartnerState(partnerId, 'birth_plan')` reads the one
+row on his phone, shows it, and never stores or writes it. If the row is missing, the policy refuses, or the
+network fails, the screen says which and offers Try again; nothing crashes.
+
+**The general fact:** in a key-value table, row-level security is also key-level security, so the key belongs
+in the policy. The trade-off: each new store a partner should see needs its own policy line (or an allow-list
+of keys), which is more migrations, and in return nothing becomes shared just because it was added to the table.

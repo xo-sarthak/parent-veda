@@ -8,7 +8,7 @@ The user says go per family. Each plan records every decision with the user's an
 |---|---|---|---|
 | 0 | Step 0: inventory, C1, repeats, look (both stages) | DONE, read-only (2026-10-27) | — |
 | P1 | Look-ups and records | COMMITTED 2026-10-28 (P1-lookups-records.md) | 305b5c6 |
-| P2 | Keep | BUILT 2026-10-28 (P2-keep.md); 0118 for the user to run | hash owed |
+| P2 | Keep | BUILT 2026-10-28 (P2-keep.md); 0118 run 2026-10-28 | 01f33b1 |
 | P3 | Her week | waits on A's foundation commit | — |
 | P4 | Birth prep | waits on A's foundation commit | — |
 | P5 | Daily check-ins | waiting | — |

@@ -11,6 +11,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../screens/post_pregnancy/pp_child_profile.dart';
+import '../../screens/post_pregnancy/baby_naming_home_screen.dart';
+import '../../screens/post_pregnancy/pp_names_data.dart' show NameMatchStore;
 // import '../../services/dear_baby_vault_store.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
 // import '../../services/family_timeline.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
 // import '../../services/life_stage_store.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
@@ -135,6 +137,20 @@ Future<bool> showPvAddChildSheet(
                       style: pvManrope(fontSize: 15, color: p.ink1),
                       decoration: _dec(p, 'Name'),
                     ),
+                    // P2 N4 (2026-10-28): the names she kept in Baby names,
+                    // offered, never filled in for her. A tap puts one in the
+                    // field, which stays hers to change.
+                    if (arrival)
+                      _BirthNameOffer(
+                        current: name.text.trim(),
+                        onPick: (n) => setSheet(() {
+                          name.text = n;
+                          name.selection = TextSelection.collapsed(
+                            offset: n.length,
+                          );
+                        }),
+                        onBack: () => setSheet(() {}),
+                      ),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
@@ -691,4 +707,83 @@ Future<void> showPvRemovedChildrenSheet(
       },
     ),
   );
+}
+
+/// P2 N4 (2026-10-28): the birth sheet offers the name she chose in Baby
+/// names (or up to three from her shortlist), and a way to look for one if
+/// she has not. Only an offer: the field stays empty until she taps.
+class _BirthNameOffer extends StatelessWidget {
+  const _BirthNameOffer({
+    required this.current,
+    required this.onPick,
+    required this.onBack,
+  });
+  final String current;
+  final ValueChanged<String> onPick;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final store = NameMatchStore.instance;
+    final crowned = store.crowned;
+    final names = crowned.isNotEmpty
+        ? [crowned]
+        : store.liked.take(3).toList();
+    return Padding(
+      key: const ValueKey('pv_birth_name_offer'),
+      padding: const EdgeInsets.only(top: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (names.isNotEmpty) ...[
+            Text(
+              crowned.isNotEmpty
+                  ? 'The name you chose. Use it, or write another.'
+                  : 'From your shortlist. Use one, or write another.',
+              style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final n in names)
+                  PvChip(
+                    key: ValueKey('pv_birth_name_$n'),
+                    label: n,
+                    selected: current == n,
+                    onTap: () => onPick(n),
+                  ),
+              ],
+            ),
+          ],
+          TextButton(
+            key: const ValueKey('pv_birth_find_name'),
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              foregroundColor: p.ink1,
+            ),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'you/birth/baby_names'),
+                  builder: (_) => const BabyNamingHomeScreen(),
+                ),
+              );
+              onBack();
+            },
+            child: Text(
+              names.isEmpty ? 'Still deciding? Find a name' : 'See more names',
+              style: pvManrope(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: p.ink1,
+              ).copyWith(decoration: TextDecoration.underline),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

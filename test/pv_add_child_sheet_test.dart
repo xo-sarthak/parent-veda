@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/screens/post_pregnancy/pp_names_data.dart' show NameMatchStore;
 import 'package:parentveda/screens/profile/pv_you_sheets.dart';
 
 void main() {
@@ -78,5 +79,43 @@ void main() {
     await t.pumpAndSettle();
     await t.pump(const Duration(milliseconds: 700));
     expect(t.takeException(), isNull);
+  });
+
+  // P2 N4 (2026-10-28): the birth sheet offers her chosen name, never fills
+  // it in for her, and points to Baby names when she has none.
+  group('the name she kept in Baby names', () {
+    tearDown(() {
+      for (final n in NameMatchStore.instance.liked.toList()) {
+        NameMatchStore.instance.clearVote(n);
+      }
+    });
+
+    testWidgets('her chosen name is offered, and only a tap uses it',
+        (t) async {
+      NameMatchStore.instance.crown('Inaya');
+      await open(t, arrival: true);
+      expect(find.text('The name you chose. Use it, or write another.'),
+          findsOneWidget);
+      final field = t.widget<TextField>(find.byType(TextField));
+      expect(field.controller!.text, isEmpty);
+      await t.tap(find.byKey(const ValueKey('pv_birth_name_Inaya')));
+      await t.pump();
+      expect(field.controller!.text, 'Inaya');
+      expect(find.text('See more names'), findsOneWidget);
+    });
+
+    testWidgets('with no name kept, she is shown where to find one',
+        (t) async {
+      await open(t, arrival: true);
+      expect(find.byKey(const ValueKey('pv_birth_find_name')), findsOneWidget);
+      expect(find.text('Still deciding? Find a name'), findsOneWidget);
+    });
+
+    testWidgets('adding an older child does not offer a newborn name',
+        (t) async {
+      NameMatchStore.instance.crown('Inaya');
+      await open(t);
+      expect(find.byKey(const ValueKey('pv_birth_name_offer')), findsNothing);
+    });
   });
 }

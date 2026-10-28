@@ -1642,3 +1642,24 @@ the pull wrote that back as her stated start, so after one sync her onboarding a
 pinned, checked per statement).
 
 **Files:** `supabase/migrations/0117_ttc_trying_count.sql`, `lib/ttc/ttc_store.dart`, `lib/ttc/ttc_trying_time.dart`.
+
+## Step 26: her partner reads her birth plan (P2, 0118)
+
+**Date:** 2026-10-28 (Pregnancy and TTC tools pass, P2, the user's word). **Migration:**
+`0118_user_state_partner_birth_plan.sql`, run by the user 2026-10-28. **Commit:** `01f33b1`.
+
+### Why
+The birth plan lived only on her phone, and the partner's phone showed his own empty plan. A partner rule on
+`user_state` as a whole would have shared every store she has.
+
+### What changed
+- [x] **One SELECT policy** on `user_state` for `store_key = 'birth_plan'` and her as the owner; beside her own
+  policy, not replacing it, and no write policy, so he reads and never writes. BACKEND-PATTERNS §16zza.
+- [x] **`SupabaseRepo.loadPartnerState`** reads that one row on his phone; `BirthPlanStore.partnerPlan()` unwraps
+  the per-item book (skipping removed items) and shows it as "Her birth plan". Nothing is stored or synced back.
+- [x] **Four states on screen**: her plan, an empty plan, not linked, cannot reach (with Try again).
+
+**Verified:** `test/p2_keep_test.dart`.
+
+**Files:** `supabase/migrations/0118_user_state_partner_birth_plan.sql`, `lib/services/remote/supabase_repo.dart`,
+`lib/services/birth_plan_store.dart`, `lib/screens/pregnancy/birth_plan_screen.dart`.
