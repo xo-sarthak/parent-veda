@@ -17,4 +17,4 @@ The user says go per family. Each plan records every decision with the user's an
 | T3 | TTC: getting ready | waiting | — |
 | T4 | TTC: treatment and records | waiting | — |
 | T5 | TTC: body checks | waiting | — |
-| C1 | Pregnancy and TTC Tools rows + tests | after A's Tools-tab order commit | — |
+| C1 | Pregnancy and TTC Tools rows + tests; plus from P3: the father preview (X5) and Weight and Kegel missing from search (X4), one shared "booked" match for the Calendar and the Scans timeline (today matched by title two ways), the second twin from Add a child marked as a multiple birth (check git status on the family-profile files first) | after A's Tools-tab order commit | — |
