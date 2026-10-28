@@ -2946,6 +2946,145 @@ final PpArea _yourMind = PpArea(
         ),
       ],
     ),
+    // ⚠️ HER HISTORY, TWO PAGES (final review item 12, 2026-10-28). The
+    // doors had nothing for a mother whose baby came after a loss, or after
+    // years of trying, so lifting pages for her had nothing written for her
+    // to lift. Each leads this area when her record says so (PpSignal
+    // afterLoss / afterTreatment, pp_relevance.dart). REQUIRED_REVIEW: both
+    // pages, by a perinatal counsellor, before launch (BEFORE-LAUNCH).
+    PpPage(
+      id: 'mind_after_loss',
+      title: 'Loving this baby after a loss',
+      subtitle: 'When joy and fear arrive together',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('If you lost a pregnancy or a baby before this one, loving '
+            'this child can come with fear, and with grief that returns at '
+            'odd moments. Both can be true at once. Nothing is wrong with '
+            'you.'),
+        PpCards(heading: 'What many mothers feel', [
+          PpCard('Waiting for something to go wrong', 'Checking the '
+              'breathing again and again. Finding it hard to believe this '
+              'baby is staying.'),
+          PpCard('Guilt at being happy', 'As if enjoying this baby lets go '
+              'of the one before. It does not.'),
+          PpCard('Grief on certain days', 'The old due date, the date of the '
+              'loss, a festival, a scan room on the television.'),
+          PpCard('Holding a little back', 'Afraid to love fully, in case. For '
+              'most mothers this eases as the weeks pass.'),
+        ]),
+        PpSteps(heading: 'What helps', [
+          PpStep('Say the name, or the date, if you want to',
+              'Remembering the baby before is not unhealthy. Many mothers '
+                  'feel lighter once it is allowed at home.'),
+          // REQUIRED_REVIEW: the safe-sleep line.
+          PpStep('Let the safe-sleep steps hold the watch',
+              'On the back, in a clear cot, in your room. These are what keep '
+                  'a baby safe. Checking again and again adds worry, not '
+                  'safety.'),
+          PpStep('Tell your doctor about the loss',
+              'At each check-up, so a worry is answered properly and not '
+                  'waved away.'),
+          PpStep('Hand the watching over for an hour',
+              'To your partner, your mother, anyone you trust, while you '
+                  'sleep or step outside.'),
+        ]),
+        // REQUIRED_REVIEW: no figure on purpose; the counsellor may add one.
+        PpArticle([
+          'Worry after a loss is common, and it is not a sign that something '
+              'is wrong with this baby. When it fills most of the day, it has '
+              'a name, anxiety, and it is treatable.',
+        ]),
+        PpIndiaNote('Families sometimes say "do not talk about it, you have '
+            'this baby now". You can love this baby completely and still miss '
+            'the one before.'),
+        // The free line first, then the doctor box, as every mind page (M5,
+        // final review item 8).
+        PpCallout('Free, any hour: $kCrisisHelplineName, '
+            '$kCrisisHelplineNumber. Trained counsellors, in your language.',
+            title: 'If there is nobody to talk to'),
+        PpCallout('If the worry fills most of the day, or you cannot sleep '
+            'even when the baby sleeps, talk to your doctor.',
+            kind: PpCalloutKind.doctor),
+        PpLink('I am anxious every single minute',
+            pageId: 'mind_anxiety',
+            blurb: 'What anxiety after the birth looks like, and what helps.'),
+        PpLink('How to get help, in India',
+            pageId: 'mind_getting_help',
+            blurb: 'Who to call, what it costs, and what to say.'),
+        PpConsult(
+          title: 'Talk to a perinatal counsellor',
+          whoFor: 'For the fear and the grief together, with someone trained '
+              'in both. On video, no family in the room.',
+          surfaceId: 'pp_experts',
+          role: 'maternal_mental_health',
+        ),
+      ],
+    ),
+    PpPage(
+      id: 'mind_after_trying',
+      title: 'After years of trying',
+      subtitle: 'A longed-for baby, and still allowed to find it hard',
+      format: 'ARTICLE',
+      bands: _allBands,
+      blocks: [
+        PpIntro('If this baby came after years of trying, after treatment, or '
+            'both, people may expect you to feel only grateful. You can be '
+            'grateful and still be tired, low or unsure. That is allowed here '
+            'too.'),
+        PpCards(heading: 'What many mothers say', [
+          PpCard('"I am not allowed to complain"', 'After wanting this so '
+              'much, a hard night can feel like something you cannot say out '
+              'loud.'),
+          PpCard('"It does not feel real yet"', 'After so many tests and '
+              'waits, it can take time to believe the baby is here.'),
+          PpCard('"My body went through a lot"', 'Injections, procedures and '
+              'a closely watched pregnancy. Your recovery may take longer, and '
+              'that is not failing.'),
+          PpCard('"The questions have started again"', 'Now it is "when is '
+              'the next one?"'),
+        ]),
+        PpSteps(heading: 'What helps', [
+          PpStep('Let the clinic chapter close',
+              'The tracking and the counting can stop. This baby is the '
+                  'answer, not the next test.'),
+          PpStep('Say the hard part to one person',
+              'Your partner, a friend, a counsellor. Saying it does not '
+                  'make you less thankful.'),
+          PpStep('Leave the next baby for later',
+              'You decide when to think about it, with your doctor, and not '
+                  'before you are ready.'),
+        ]),
+        PpIndiaNote('Relatives may ask how the baby came, or when the next one '
+            'will. You do not owe anyone the story. "We are just enjoying '
+            'this one" is a full answer.'),
+        PpCallout('Free, any hour: $kCrisisHelplineName, '
+            '$kCrisisHelplineNumber. Trained counsellors, in your language.',
+            title: 'If there is nobody to talk to'),
+        // REQUIRED_REVIEW: the two-week line, as on the other mind pages.
+        PpCallout('If you feel low most days for more than two weeks, talk to '
+            'your doctor. Low mood after the birth can follow a longed-for '
+            'baby too, and it is treatable.',
+            kind: PpCalloutKind.doctor),
+        PpLink('Who am I now?',
+            pageId: 'mind_identity',
+            blurb: 'When life before the baby feels far away.'),
+        PpLink('The next baby, when you are ready',
+            pageId: 'people_spacing',
+            blurb: 'Spacing, your body, and your doctor\'s view.'),
+        PpLink('How to get help, in India',
+            pageId: 'mind_getting_help',
+            blurb: 'Who to call, what it costs, and what to say.'),
+        PpConsult(
+          title: 'Talk to a perinatal counsellor',
+          whoFor: 'For the feelings a longed-for baby can bring, with someone '
+              'who has heard them before. On video, no family in the room.',
+          surfaceId: 'pp_experts',
+          role: 'maternal_mental_health',
+        ),
+      ],
+    ),
   ],
 );
 

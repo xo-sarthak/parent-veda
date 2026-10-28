@@ -236,7 +236,10 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   /// band", is not used: every door plan now names its order by age, and the
   /// guess moved action doors off their action tab (First 40 at day 12 left
   /// Day by day; Potty left its timeline). It is kept below for revert.
-  List<PpDoorTab> get _tabs {
+  List<PpDoorTab> get _tabs => _herTabFirst(_ageTabs);
+
+  /// The tabs in age order, before her history picks one (item 12).
+  List<PpDoorTab> get _ageTabs {
     final kept = [
       for (final t in door.tabs)
         if (_lockFor(t) != _Lock.past) t,
@@ -274,6 +277,36 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
     //   if (best != 0) now.insert(0, now.removeAt(best));
     // }
     return [...now, ...later];
+  }
+
+  /// ⚠️ HER HISTORY PICKS THE OPENING TAB, AFTER AGE (final review item 12,
+  /// 2026-10-28). A twins mother lands on Twins, a mother after a C-section on
+  /// Your body. Order only: the tab is one the door already shows her, open
+  /// for her band; a tab for later stays later and nothing is added or
+  /// removed. With no signal the age order above is untouched.
+  List<PpDoorTab> _herTabFirst(List<PpDoorTab> tabs) {
+    final lead = _leadTab;
+    if (lead == null) return tabs;
+    final i = tabs.indexWhere((t) => t.id == lead.$2);
+    if (i <= 0 || _unlockMonths(tabs[i]) != null) return tabs;
+    return [tabs[i], for (var j = 0; j < tabs.length; j++) if (j != i) tabs[j]];
+  }
+
+  /// The signal that would lead a tab in this door, as (signal, tab id).
+  (PpSignal, String)? get _leadTab =>
+      PpSituation.now().leadTabFor(door.sectionId);
+
+  /// "First here, because you have twins": said on the tab her history moved
+  /// to the front, so the app explains itself (the personalisation-visible
+  /// rule), in the pregnancy door's words (`pvDoorSectionWhy`).
+  String? _whyFirst(PpDoorTab tab, List<PpDoorTab> tabs) {
+    final lead = _leadTab;
+    // Only when her history moved it: a tab that leads by age anyway (Special
+    // care's NICU tab for a newborn) needs no reason.
+    if (lead == null || lead.$2 != tab.id || tabs.first.id != tab.id) return null;
+    if (_ageTabs.first.id == tab.id) return null;
+    final because = lead.$1.because;
+    return because == null ? null : 'First here, because $because';
   }
   // Kept for revert (S9): open first, then locked by the age they open.
   // List<PpDoorTab> get _tabs => [
@@ -450,14 +483,16 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                   text: (x) => x.title,
                   readId: _readIdOf,
                   alwaysFirst: ppIsRedFlagPage,
-                  forHerAge: (x) => _forHerAge(x, band)),
+                  forHerAge: (x) => _forHerAge(x, band),
+                  ids: (x) => [x.id]),
         ),
     ];
     return ppRelevanceOrder(rails,
         situation: sit,
         text: (r) => [r.$1.title, for (final x in r.$2) x.title].join(' '),
         // The age rail is the first rail, whatever a signal lifts.
-        alwaysFirst: (r) => r.$1.id == kPpAgeRailId);
+        alwaysFirst: (r) => r.$1.id == kPpAgeRailId,
+        ids: (r) => [for (final x in r.$2) x.id]);
   }
 
   /// A page written for her age rather than every age (H-M2): tagged with her
@@ -927,6 +962,17 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                               color: p.ink2))),
                       const SizedBox(height: kPvDoorBlockGap),
                     ],
+                    // Item 12: why her history put this tab first.
+                    if (_whyFirst(tab, tabs) case final why?) ...[
+                      ppDoorPad(Text(why,
+                          key: const ValueKey('pp_door_why_first'),
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              height: 1.5,
+                              color: p.ink2))),
+                      const SizedBox(height: kPvDoorBlockGap),
+                    ],
                     ...[
                       // Din by din: "Day N of 40" and today's line.
                       if (ppDinToday(tab.id) case final today?) ...[
@@ -1260,7 +1306,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
         itemBuilder: (context, i) {
           final it = items[i];
           final spec = it.page != null ? ppShelfSpecFor(it.page!) : ppShelfSpecForTool();
-          final why = it.page == null ? null : ppRelevanceWhy(sit, it.page!.title);
+          final why = it.page == null ? null : ppRelevanceWhy(sit, it.page!.title, it.page!.id);
           return PvShelfCard(
             p: p,
             hue: (hue + i * 22) % 360,

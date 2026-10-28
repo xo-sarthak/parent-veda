@@ -797,7 +797,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                         _DoorReadRow(
                           read: r,
                           p: p,
-                          why: ppRelevanceWhy(sit, r.page.title),
+                          why: ppRelevanceWhy(sit, r.page.title, r.page.id),
                           onTap: () => ppOpenPage(context, r.section, r.page,
                               onSurface: (ctx, id) => _openSurface(ctx, id)),
                         ),

@@ -515,3 +515,43 @@ the active ones into the brain (`pp_relevance.dart`):
 The trade-off: storing it costs one more synced store and a "Not now" on the
 result; it buys a home that answers what she just told us. Forgetting by
 default would have been simpler and never wrong, and never useful.
+
+## 13. Parenting: her own history (final review item 12, 2026-10-28)
+
+The doors read where she came from, not only the child's age. Four new
+`PpSignal`s, each derived from a store and never asked:
+
+| Signal | From | For |
+|---|---|---|
+| `afterLoss` | `PregnancyRecords.lossBefore(childId)` (the pregnancy before this child's was a loss) or her "be gentle about a loss" answer | first two years |
+| `afterTreatment` | this child's pregnancy dated by an IVF transfer (`dueDateSourceFor`), or a TTC path that is not natural | first year |
+| `twoAtHome` | the child on screen is the youngest, an older one was born before (twins are not this) | first six months |
+| `extraSupport` | a delay, hearing or vision answer in the family profile | any age |
+
+**Ids as well as words.** Each signal now carries `pageIds`, matched alongside
+its title words. Words cost nothing to keep up but missed pages titled another
+way ("Bringing home a small or early baby" never matched "born early"); an id
+list is exact and `test/pp_history_lift_test.dart` checks every id exists. The
+price: a new page joins the list by hand. Both stay: a page moves if either
+says so.
+
+**A tab can lead, in two doors only.** `leadTabs` puts one of the door's own
+tabs first: Special care opens on Twins, Preemies and NICU or Extra support;
+Family on A second baby. You, Maa (its check-in) and First 40 (its days) open
+where they do on purpose, so their signals lift pages inside the rails and do
+not move a tab. The moved tab starts with "First here, because you have twins";
+a tab that leads by age anyway says nothing.
+
+**Two pages written for it.** You, Maa's `mind_after_loss` ("Loving this baby
+after a loss") and `mind_after_trying` ("After years of trying"), so the
+rainbow-baby and after-treatment mothers have a page written for them.
+
+**The birth sheet feeds it.** The pregnancy-to-birth sheet now carries her
+pregnancy's twins answer over, and asks two optional rows (how the baby was
+born, a NICU stay). Before, a mother who came through pregnancy in the app
+gave the doors fewer facts than one who joined at parenting.
+
+**Not covered, and why:** single parent (nothing stores it; no partner linked
+is not the same thing), a child who died (no state for it; needs its own
+design), donor, surrogacy and adoption (not stored), and sinking pages for a
+situation (this pass only lifts). STILL-OPEN §104.0.

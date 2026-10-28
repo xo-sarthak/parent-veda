@@ -4398,3 +4398,23 @@ The doctor-visit summary shows a section per kind whatever her answer: her data 
 leave these out" after a no, and, when she has data but was never asked, a line pointing at the tool where she
 is asked. Treating "unasked" as "no" silently would hide a feature; treating it as "yes" would use data she
 never agreed to. Three states, three renders.
+
+## 16zz. Match by name or by id: words for breadth, ids for what must move (item 12, 2026-10-28)
+
+The parenting relevance brain decided "is this page about her situation?" by
+looking for words in the page title (`PpSignal.words`). That is a fuzzy key:
+no list to maintain, and a new page about twins joins by saying "twin". Its
+failure is silent in both directions: a page titled another way never moves
+("Bringing home a small or early baby" is not "born early"), and a stray title
+can move when it should not.
+
+An explicit id list (`PpSignal.pageIds`) is the exact key: it says precisely
+which pages move, and a test can hold every id to a real page, so a renamed or
+deleted page fails the build instead of silently dropping out. Its cost is
+upkeep: a new page joins by hand.
+
+Kept both, as an OR. The general fact: a fuzzy match is good for recall and an
+explicit key for the cases you cannot afford to miss; when you can only test
+one, test the explicit one. The same trade shows up in search (keyword vs
+tagged), in routing (prefix match vs a route table) and in permissions (a role
+pattern vs a named grant).

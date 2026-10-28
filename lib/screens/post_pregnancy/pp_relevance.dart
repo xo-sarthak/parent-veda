@@ -27,24 +27,79 @@
 import '../../services/family_profile.dart';
 import '../../services/pp_use_consent.dart';
 import '../../services/pv_read_store.dart';
+import '../../services/pregnancy_controller.dart' show DueDateSource;
 import '../../services/pregnancy_records.dart' show PregnancyRecords;
+import '../../ttc/ttc_care_pathway.dart' show TtcPath;
+import '../../ttc/ttc_store.dart' show TtcStore;
 import 'pp_changes_store.dart';
 import 'pp_child_profile.dart';
 import 'pp_feeding_data.dart';
 import 'pp_what_changed_data.dart' show WcTone;
 
 /// A situation the brain can lift content for. Each has the words that mark a
-/// page as being about it, and the few words shown on a card that moved.
+/// page as being about it, the few words shown on a card that moved, and,
+/// since final review item 12 (2026-10-28), the pages and tabs it lifts by id.
+///
+/// ⚠️ WORDS FOR BREADTH, IDS FOR THE PAGES THAT MUST MOVE (item 12). Matching
+/// only on title words cost nothing to keep up, but it missed pages whose
+/// title says it another way ("Bringing home a small or early baby" is not
+/// "born early"). An id list is exact and a test can hold it; its price is
+/// that a new page joins it by hand. Both are kept: a page moves if either
+/// says so.
 enum PpSignal {
-  bornEarly('Born early', ['born early', 'premature', 'preterm', 'corrected age', 'nicu']),
-  cSection('After a C-section', ['c-section', 'caesarean', 'cesarean']),
+  bornEarly(
+    'Born early',
+    ['born early', 'premature', 'preterm', 'corrected age', 'nicu'],
+    because: 'your baby was born early',
+    pageIds: {
+      'sc_nicu',
+      'sc_preemie_home',
+      'f40_small_or_early',
+      'dev_born_early',
+      'bf_exclusive_pumping',
+    },
+    leadTabs: {'parenting_special_care': 'early'},
+  ),
+  cSection(
+    'After a C-section',
+    ['c-section', 'caesarean', 'cesarean'],
+    pageIds: {
+      'body_csection_early',
+      'body_scar_care',
+      'body_core_recovery',
+      'move_after_csection',
+      'f40_after_csection',
+    },
+    // No tab lead (nor for the sugar, BP, loss and treatment signals): You,
+    // Maa opens on How are you today? and First 40 on Day by day, by design
+    // (S1). Their rails still lift these pages.
+  ),
   formula('On formula', ['formula', 'bottle']),
   breastfeeding('Breastfeeding', ['breast', 'latch', 'nipple', 'milk supply', 'pumping']),
-  twins('For twins', ['twin']),
+  twins(
+    'For twins',
+    ['twin'],
+    because: 'you have twins',
+    pageIds: {
+      'sc_twins_breastfeeding',
+      'sc_twins_pumping',
+      'sc_twins_daily_life',
+      'twins_adopted_second',
+    },
+    leadTabs: {'parenting_special_care': 'twins'},
+  ),
   // Door 3 (You, Maa, 2026-10-25), from her pregnancy record: the after-GDM
   // and after-BP pages lead for the mothers who had them, in the first year.
-  sugarInPregnancy('After sugar in pregnancy', ['sugar in pregnancy']),
-  bpInPregnancy('After high BP in pregnancy', ['high bp in pregnancy']),
+  sugarInPregnancy(
+    'After sugar in pregnancy',
+    ['sugar in pregnancy'],
+    pageIds: {'body_after_gdm'},
+  ),
+  bpInPregnancy(
+    'After high BP in pregnancy',
+    ['high bp in pregnancy'],
+    pageIds: {'body_after_bp', 'body_red_flags'},
+  ),
   // From her pregnancy record (2026-10-26, STILL-OPEN §61.1): she added a
   // pregnancy, so this child is about to be an older sibling and the pages
   // about a new brother or sister lead. Never "new baby": newborn pages say it.
@@ -55,9 +110,60 @@ enum PpSignal {
     'big brother',
     'big sister',
     'baby on the way',
-  ]);
+  ]),
+  // ---- her own history (final review item 12, 2026-10-28) ------------------
+  // A pregnancy lost before this child: the rainbow-baby mother. From her
+  // pregnancy record or her own "be gentle about a loss" answer. Lifts only;
+  // no celebration page is pushed down (out of scope, said in the plan).
+  afterLoss(
+    'After a loss',
+    ['after a loss'],
+    pageIds: {
+      'mind_after_loss',
+      'mind_anxiety',
+      'mind_love_but_not_okay',
+      'mind_birth_trauma',
+      'mind_getting_help',
+    },
+  ),
+  // This child came after fertility treatment: from the pregnancy dated by an
+  // IVF transfer, or her TTC treatment path.
+  afterTreatment(
+    'After treatment',
+    ['years of trying'],
+    pageIds: {'mind_after_trying', 'mind_identity', 'mind_anxiety'},
+  ),
+  // A newborn with an older brother or sister at home.
+  twoAtHome(
+    'With two at home',
+    ['with two'],
+    because: 'you have two at home',
+    pageIds: {'fam_first_weeks_two', 'fam_sibling_jealousy', 'siblings'},
+    leadTabs: {'parenting_family': 'second'},
+  ),
+  // A delay, hearing or vision answer in the family profile.
+  extraSupport(
+    'Extra support',
+    [],
+    because: 'of what you noted in the family profile',
+    pageIds: {
+      'sc_late_bloomer',
+      'sc_not_talking',
+      'sc_hearing',
+      'sc_therapies',
+      'sc_help_india',
+      'sc_parent_wellbeing',
+    },
+    leadTabs: {'parenting_special_care': 'more'},
+  );
 
-  const PpSignal(this.why, this.words);
+  const PpSignal(
+    this.why,
+    this.words, {
+    this.because,
+    this.pageIds = const {},
+    this.leadTabs = const {},
+  });
 
   /// The few words a moved card shows ("On formula").
   final String why;
@@ -65,7 +171,19 @@ enum PpSignal {
   /// Lower-case phrases that mark a page as being about this situation.
   final List<String> words;
 
-  bool matches(String text) {
+  /// The end of "First here, because ..." over a tab this signal moved to the
+  /// front. Null for a signal that leads no tab.
+  final String? because;
+
+  /// Pages about this situation, matched by id as well as by [words].
+  final Set<String> pageIds;
+
+  /// Door section id -> the tab this signal puts first in that door. Order
+  /// only: the tab already exists and stays; it just opens first.
+  final Map<String, String> leadTabs;
+
+  bool matches(String text, [Iterable<String> ids = const []]) {
+    if (ids.any(pageIds.contains)) return true;
     final t = text.toLowerCase();
     return words.any(t.contains);
   }
@@ -121,6 +239,18 @@ class PpSituation {
         PpSignal.bpInPregnancy,
       if (child.hasRealChild && PregnancyRecords.instance.current != null)
         PpSignal.babyOnTheWay,
+      // Item 12: her own history. Each is derived; nothing here is asked.
+      if (child.ageInMonths < 24 &&
+          (fam.gentleAboutLoss ||
+              PregnancyRecords.instance.lossBefore(child.activeChildId)))
+        PpSignal.afterLoss,
+      if (child.ageInMonths < 12 && _afterTreatment(child.activeChildId))
+        PpSignal.afterTreatment,
+      if (child.ageInMonths < 6 && _olderChildAtHome(child)) PpSignal.twoAtHome,
+      if (fam.hasCondition(HealthCondition.devDelay) ||
+          fam.hasCondition(HealthCondition.hearing) ||
+          fam.hasCondition(HealthCondition.vision))
+        PpSignal.extraSupport,
     };
     return PpSituation(
       ageMonths: child.ageInMonths,
@@ -130,6 +260,30 @@ class PpSituation {
       // What she told us in "Something changed?" (2026-10-23, Wave 8).
       changes: PpChangesStore.instance.active(),
     );
+  }
+
+  /// This child's pregnancy was dated from an IVF transfer, or her TTC path
+  /// was a treatment. Defensive: a store that never loaded is "no".
+  static bool _afterTreatment(String? childId) {
+    try {
+      if (PregnancyRecords.instance.dueDateSourceFor(childId) ==
+          DueDateSource.ivfTransfer.name) {
+        return true;
+      }
+      return TtcStore.instance.path != TtcPath.natural;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// The child on screen is the youngest, and an older one was born before
+  /// (twins share a birthday, so they are not "two at home" here).
+  static bool _olderChildAtHome(ChildProfileStore child) {
+    final kids = child.children;
+    if (kids.length < 2) return false;
+    final dob = child.active.dob;
+    return kids.every((c) => !c.dob.isAfter(dob)) &&
+        kids.any((c) => c.dob.isBefore(dob.subtract(const Duration(days: 1))));
   }
 
   final int ageMonths;
@@ -152,10 +306,21 @@ class PpSituation {
     return null;
   }
 
-  /// The first of her signals this text is about, or null.
-  PpSignal? signalFor(String text) {
+  /// The first of her signals this text (or one of these page [ids]) is
+  /// about, or null.
+  PpSignal? signalFor(String text, [Iterable<String> ids = const []]) {
     for (final s in PpSignal.values) {
-      if (signals.contains(s) && s.matches(text)) return s;
+      if (signals.contains(s) && s.matches(text, ids)) return s;
+    }
+    return null;
+  }
+
+  /// The first of her signals that puts a tab of this door first, as
+  /// (signal, tab id), or null (item 12).
+  (PpSignal, String)? leadTabFor(String sectionId) {
+    for (final s in PpSignal.values) {
+      final tab = s.leadTabs[sectionId];
+      if (tab != null && signals.contains(s)) return (s, tab);
     }
     return null;
   }
@@ -207,6 +372,8 @@ const int kPpForHerAgeLift = 10;
 /// ([kPpForHerAgeLift]).
 ///
 /// [text] is what the item is about (its title, plus a summary if it has one).
+/// [ids] are the page ids it carries, matched against each signal's
+/// [PpSignal.pageIds] (item 12).
 /// [band] says how far its age band is from the child's; omit it when the list
 /// is already one band. [readId] lets a finished read sink; [saved] lifts.
 List<T> ppRelevanceOrder<T>(
@@ -218,13 +385,16 @@ List<T> ppRelevanceOrder<T>(
   bool Function(T)? saved,
   bool Function(T)? alwaysFirst,
   bool Function(T)? forHerAge,
+  Iterable<String> Function(T)? ids,
   bool commerce = false,
 }) {
   int score(T it) {
     if (alwaysFirst?.call(it) ?? false) return kPpAlwaysFirst;
     var s = band?.call(it).score ?? 0;
     if (forHerAge?.call(it) ?? false) s -= kPpForHerAgeLift;
-    if (situation.signalFor(text(it)) != null) s -= kPpSignalLift;
+    if (situation.signalFor(text(it), ids?.call(it) ?? const []) != null) {
+      s -= kPpSignalLift;
+    }
     if (situation.changeFor(text(it), commerce: commerce) != null) s -= kPpChangeLift;
     if (saved?.call(it) ?? false) s -= kPpSavedLift;
     final rid = readId?.call(it);
@@ -240,5 +410,8 @@ List<T> ppRelevanceOrder<T>(
 /// The few words a card shows when the brain moved it ("On formula"), so the
 /// app explains itself. Null when nothing about her situation moved it.
 // String? ppRelevanceWhy(PpSituation situation, String text) => situation.signalFor(text)?.why; // kept for revert (Wave 8)
-String? ppRelevanceWhy(PpSituation situation, String text) =>
-    situation.changeFor(text)?.why ?? situation.signalFor(text)?.why;
+// String? ppRelevanceWhy(PpSituation situation, String text) =>
+//     situation.changeFor(text)?.why ?? situation.signalFor(text)?.why; // kept for revert (item 12)
+String? ppRelevanceWhy(PpSituation situation, String text, [String? id]) =>
+    situation.changeFor(text)?.why ??
+    situation.signalFor(text, [?id])?.why;

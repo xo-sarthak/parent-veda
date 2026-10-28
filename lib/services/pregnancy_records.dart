@@ -319,6 +319,27 @@ class PregnancyRecords extends ChangeNotifier {
       ? pregnantAfterLoss
       : lastEnded?.outcome == PregnancyOutcome.loss;
 
+  /// The pregnancy that ended in this child's birth came straight after a
+  /// loss: the rainbow baby (parenting doors, final review item 12,
+  /// 2026-10-28). False without a record for the child, which is every
+  /// mother who joined at parenting; her own "be gentle" answer covers some.
+  bool lossBefore(String? childId) {
+    if (childId == null) return false;
+    final l = all;
+    final i = l.indexWhere((r) => r.childId == childId);
+    return i > 0 && l[i - 1].outcome == PregnancyOutcome.loss;
+  }
+
+  /// How the pregnancy that ended in this child's birth was dated (a
+  /// `DueDateSource` name), or null. `ivfTransfer` means treatment (item 12).
+  String? dueDateSourceFor(String? childId) {
+    if (childId == null) return null;
+    for (final r in all) {
+      if (r.childId == childId) return r.dueDateSource;
+    }
+    return null;
+  }
+
   /// Not pregnant, the last pregnancy was a loss, and it ended within
   /// [kAfterLossLeadDays]: the TTC home leads with After a loss.
   bool lossRecentlyClosed({DateTime? now}) {

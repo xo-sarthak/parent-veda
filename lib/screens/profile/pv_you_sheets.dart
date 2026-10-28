@@ -15,6 +15,7 @@ import '../../screens/post_pregnancy/pp_child_profile.dart';
 // import '../../services/family_timeline.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
 // import '../../services/life_stage_store.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
 // import '../../services/pregnancy_controller.dart'; // unused since the birth moved to stage_moves.dart (2026-10-24), kept for revert
+import '../../services/family_profile.dart';
 import '../../services/pv_order_store.dart';
 import '../../services/stage_moves.dart';
 import '../../theme/pv_fonts.dart';
@@ -68,6 +69,9 @@ Future<bool> showPvAddChildSheet(
   final name = TextEditingController();
   bool? isBoy;
   DateTime? dob;
+  // The birth's two optional answers (final review item 12, 2026-10-28).
+  BirthMode? mode;
+  bool? nicu;
   final added = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -83,164 +87,262 @@ Future<bool> showPvAddChildSheet(
             bottom: MediaQuery.of(ctx).viewInsets.bottom,
           ),
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          arrival ? 'Welcome to the world' : 'Add a child',
-                          style: pvFraunces(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            color: p.ink1,
-                          ),
-                        ),
-                      ),
-                      PvRoundIcon(
-                        icon: Icons.close_rounded,
-                        size: 34,
-                        onTap: () => Navigator.of(ctx).pop(false),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    arrival
-                        ? 'Three things and the parenting home opens. Everything from the pregnancy stays yours.'
-                        : 'Their own page, their own records. Nothing about anyone else moves.',
-                    style: pvManrope(
-                      fontSize: 13.5,
-                      height: 1.45,
-                      color: p.ink2,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: name,
-                    autofocus: true,
-                    textCapitalization: TextCapitalization.words,
-                    onChanged: (_) => setSheet(() {}),
-                    style: pvManrope(fontSize: 15, color: p.ink1),
-                    decoration: _dec(p, 'Name'),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      PvChip(
-                        label: 'Girl',
-                        selected: isBoy == false,
-                        onTap: () => setSheet(() => isBoy = false),
-                      ),
-                      PvChip(
-                        label: 'Boy',
-                        selected: isBoy == true,
-                        onTap: () => setSheet(() => isBoy = true),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  InkWell(
-                    onTap: () async {
-                      final now = DateTime.now();
-                      final d = await showDatePicker(
-                        context: ctx,
-                        initialDate: dob ?? now,
-                        // A birth just happened: the last two years, not
-                        // eighteen (2026-10-23). An older child keeps the
-                        // wide range.
-                        firstDate: arrival
-                            ? DateTime(now.year - 2, now.month, now.day)
-                            : DateTime(now.year - 18),
-                        lastDate: now,
-                      );
-                      if (d != null) setSheet(() => dob = d);
-                    },
-                    borderRadius: BorderRadius.circular(14),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: kPvLine),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.cake_outlined, size: 18, color: p.ink2),
-                          const SizedBox(width: 10),
-                          // ⚠️ FLEXIBLE (2026-10-02, found while reproducing
-                          // the add-child red screen): "Date of birth (or the
-                          // closest you know)" is about 266 wide at 14.5 and
-                          // the row has 264 on a 360dp phone, so it ran off
-                          // the sheet, and further at a larger text size. It
-                          // wraps to a second line instead. Kept for revert:
-                          // the same Text without the Expanded.
-                          Expanded(
-                            child: Text(
-                              dob == null
-                                  ? (arrival
-                                        ? 'Date of birth'
-                                        : 'Date of birth (or the closest you know)')
-                                  : _date(dob!),
-                              style: pvManrope(
-                                fontSize: 14.5,
-                                color: dob == null ? p.ink3 : p.ink1,
-                              ),
+            // Scrolls since the birth's two optional rows (item 12), so the
+            // sheet never runs off a small phone with the keyboard up.
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            arrival ? 'Welcome to the world' : 'Add a child',
+                            style: pvFraunces(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
+                              color: p.ink1,
                             ),
                           ),
-                        ],
+                        ),
+                        PvRoundIcon(
+                          icon: Icons.close_rounded,
+                          size: 34,
+                          onTap: () => Navigator.of(ctx).pop(false),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      arrival
+                          ? 'Three things and the parenting home opens. Everything from the pregnancy stays yours.'
+                          : 'Their own page, their own records. Nothing about anyone else moves.',
+                      style: pvManrope(
+                        fontSize: 13.5,
+                        height: 1.45,
+                        color: p.ink2,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 18),
-                  PvCommit(
-                    // Change 5 (2026-09-28), right for every stage. Kept for
-                    // revert: 'Add'.
-                    label: arrival ? 'Open the parenting home' : 'Add child',
-                    onTap: ok
-                        ? () async {
-                            final child = await ChildProfileStore.instance.addChild(
-                              name: name.text.trim(),
-                              // A skipped "Boy or girl" is NOT a boy - the
-                              // same fix onboarding has had since 2026-10-07
-                              // (here 2026-10-23). Kept for revert:
-                              // `isBoy: isBoy ?? true,` alone.
-                              isBoy: isBoy ?? true,
-                              sexGiven: isBoy != null,
-                              dob: dob!,
-                              bornWeeks: arrival ? bornWeeksFor(dob!) : null,
-                            );
-                            // The birth: stage on the birthday, the story,
-                            // and the Dear Baby letters (STILL-OPEN §83.2),
-                            // in one move shared with onboarding
-                            // (stage_moves.dart, 2026-10-24). Only the
-                            // arrival does: an older child added later is
-                            // not this baby. Kept for revert:
-                            //   if (arrival) _recordBirth(dob!, child.name);
-                            //   if (arrival) {
-                            //     await DearBabyVaultStore.instance.markBorn(
-                            //       dob: dob!,
-                            //       childId: child.id,
-                            //       name: child.name,
-                            //     );
-                            //   }
-                            if (arrival) {
-                              await recordBirth(
-                                  dob: dob!, name: child.name, childId: child.id);
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: name,
+                      autofocus: true,
+                      textCapitalization: TextCapitalization.words,
+                      onChanged: (_) => setSheet(() {}),
+                      style: pvManrope(fontSize: 15, color: p.ink1),
+                      decoration: _dec(p, 'Name'),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        PvChip(
+                          label: 'Girl',
+                          selected: isBoy == false,
+                          onTap: () => setSheet(() => isBoy = false),
+                        ),
+                        PvChip(
+                          label: 'Boy',
+                          selected: isBoy == true,
+                          onTap: () => setSheet(() => isBoy = true),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final d = await showDatePicker(
+                          context: ctx,
+                          initialDate: dob ?? now,
+                          // A birth just happened: the last two years, not
+                          // eighteen (2026-10-23). An older child keeps the
+                          // wide range.
+                          firstDate: arrival
+                              ? DateTime(now.year - 2, now.month, now.day)
+                              : DateTime(now.year - 18),
+                          lastDate: now,
+                        );
+                        if (d != null) setSheet(() => dob = d);
+                      },
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: kPvLine),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.cake_outlined, size: 18, color: p.ink2),
+                            const SizedBox(width: 10),
+                            // ⚠️ FLEXIBLE (2026-10-02, found while reproducing
+                            // the add-child red screen): "Date of birth (or the
+                            // closest you know)" is about 266 wide at 14.5 and
+                            // the row has 264 on a 360dp phone, so it ran off
+                            // the sheet, and further at a larger text size. It
+                            // wraps to a second line instead. Kept for revert:
+                            // the same Text without the Expanded.
+                            Expanded(
+                              child: Text(
+                                dob == null
+                                    ? (arrival
+                                          ? 'Date of birth'
+                                          : 'Date of birth (or the closest you know)')
+                                    : _date(dob!),
+                                style: pvManrope(
+                                  fontSize: 14.5,
+                                  color: dob == null ? p.ink3 : p.ink1,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // ⚠️ THE BIRTH, TWO OPTIONAL ROWS (final review item 12,
+                    // 2026-10-28). The sheet saved name, sex and date only, so a
+                    // mother who came through pregnancy in the app never told
+                    // the doors about a C-section or a NICU stay, and never got
+                    // the pages that move up for them. Optional, and the line
+                    // under them says what the answers change. Skipping saves
+                    // nothing.
+                    if (arrival) ...[
+                      const SizedBox(height: 18),
+                      Text(
+                        'How was your baby born?',
+                        style: pvManrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: p.ink1,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final (m, label) in [
+                            (BirthMode.normal, 'Normal'),
+                            (BirthMode.cSection, 'C-section'),
+                            (BirthMode.notSaid, 'Rather not say'),
+                          ])
+                            PvChip(
+                              key: ValueKey('pv_birth_mode_${m.name}'),
+                              label: label,
+                              selected: mode == m,
+                              onTap: () =>
+                                  setSheet(() => mode = mode == m ? null : m),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        'Did your baby need the NICU?',
+                        style: pvManrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: p.ink1,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          for (final (v, label) in [
+                            (true, 'Yes'),
+                            (false, 'No'),
+                          ])
+                            PvChip(
+                              key: ValueKey('pv_birth_nicu_$v'),
+                              label: label,
+                              selected: nicu == v,
+                              onTap: () =>
+                                  setSheet(() => nicu = nicu == v ? null : v),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Both optional. They bring the recovery and NICU '
+                        'pages forward for you.',
+                        style: pvManrope(
+                          fontSize: 12.5,
+                          height: 1.45,
+                          color: p.ink2,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 18),
+                    PvCommit(
+                      // Change 5 (2026-09-28), right for every stage. Kept for
+                      // revert: 'Add'.
+                      label: arrival ? 'Open the parenting home' : 'Add child',
+                      onTap: ok
+                          ? () async {
+                              final child = await ChildProfileStore.instance
+                                  .addChild(
+                                    name: name.text.trim(),
+                                    // A skipped "Boy or girl" is NOT a boy - the
+                                    // same fix onboarding has had since 2026-10-07
+                                    // (here 2026-10-23). Kept for revert:
+                                    // `isBoy: isBoy ?? true,` alone.
+                                    isBoy: isBoy ?? true,
+                                    sexGiven: isBoy != null,
+                                    dob: dob!,
+                                    bornWeeks: arrival
+                                        ? bornWeeksFor(dob!)
+                                        : null,
+                                    birthMode: arrival ? mode?.name : null,
+                                  );
+                              // Item 12: the birth's answers on this child, as
+                              // onboarding saves them, and the twins she told
+                              // pregnancy about, carried over (derived, never
+                              // asked again).
+                              if (arrival) {
+                                final fam = FamilyProfileStore.instance;
+                                if (mode != null) {
+                                  fam.setBirthDetails(mode: mode);
+                                }
+                                if (nicu != null) fam.setBirth(nicu: nicu);
+                                if (fam.expectingTwins) {
+                                  fam.setBirth(multiple: true);
+                                }
+                              }
+                              // The birth: stage on the birthday, the story,
+                              // and the Dear Baby letters (STILL-OPEN §83.2),
+                              // in one move shared with onboarding
+                              // (stage_moves.dart, 2026-10-24). Only the
+                              // arrival does: an older child added later is
+                              // not this baby. Kept for revert:
+                              //   if (arrival) _recordBirth(dob!, child.name);
+                              //   if (arrival) {
+                              //     await DearBabyVaultStore.instance.markBorn(
+                              //       dob: dob!,
+                              //       childId: child.id,
+                              //       name: child.name,
+                              //     );
+                              //   }
+                              if (arrival) {
+                                await recordBirth(
+                                  dob: dob!,
+                                  name: child.name,
+                                  childId: child.id,
+                                );
+                              }
+                              if (ctx.mounted) Navigator.of(ctx).pop(true);
                             }
-                            if (ctx.mounted) Navigator.of(ctx).pop(true);
-                          }
-                        : null,
-                  ),
-                ],
+                          : null,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -573,7 +675,10 @@ Future<void> showPvRemovedChildrenSheet(
                           '${c.name} is back, with their records.',
                           kind: PvToastKind.done,
                         );
-                        if (ChildProfileStore.instance.removedChildren.isEmpty) {
+                        if (ChildProfileStore
+                            .instance
+                            .removedChildren
+                            .isEmpty) {
                           Navigator.of(ctx).pop();
                         }
                       },

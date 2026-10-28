@@ -11261,3 +11261,19 @@ recipe page is a tool page, not a read (D3):** cook mode, the shopping list and 
   (`home_v3_screen.dart:1759`), handed over and waiting on the P1 commit.
 - *Is it safe? keeps "Through the trimesters" on an answer after a loss*; only the "For your weeks" shelf and
   the "For you" trimester line step aside. The trimester list is a fact about pregnancy, not about her.
+
+## 104.0 Parenting doors by her history: what item 12 did not cover — 2026-10-28
+
+Plan `wise-singing-shamir.md` (the user's Claude plans folder); PERSONALIZATION §13.
+
+- *Single parent.* Nothing stores it, and "no partner linked" is not the same fact. Deriving it would guess; asking
+  it needs a reason on screen. Until then Family's `fam_on_your_own` stays under "For fathers" and is not lifted.
+- *A child who died.* `Child` has no state for it; only removal. It needs its own design (what the home, reminders
+  and the doors do), not a lift.
+- *Donor, surrogacy and adoption.* Not stored anywhere; the words exist only in content.
+- *Sinking pages for a situation.* This pass only lifts. Lowering, for example, breastfeeding-benefit pages for a
+  mother fully on formula, or celebration pages after a loss, is a question for the user, not done.
+- *"Extra support" is one signal for three answers.* A hearing answer lifts the same six Special care pages as a
+  delay answer; splitting it per condition waits for a page per condition (there is no vision page).
+- *The birth sheet adds one child.* A mother of twins who arrives through the sheet gets the twins flag carried over,
+  but adds the second baby from the family profile.

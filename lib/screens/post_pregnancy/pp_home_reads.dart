@@ -96,14 +96,16 @@ List<PpHomeRead> ppHomeDoorReads(int n, {int? day, PpSituation? situation}) {
     [
       for (final door in tagged)
         for (final r in door)
-          if (sit.signalFor(r.page.title) != null && !out.any((o) => o.page.id == r.page.id)) r,
+          if (sit.signalFor(r.page.title, [r.page.id]) != null && !out.any((o) => o.page.id == r.page.id)) r,
     ],
     situation: sit,
     text: (r) => r.page.title,
+    ids: (r) => [r.page.id],
     readId: rid,
   ).where((r) => !PvReadStore.instance.isFinished(rid(r))).take(2);
   final merged = [...lifted, ...out].take(n).toList();
-  return ppRelevanceOrder(merged, situation: sit, text: (r) => r.page.title, readId: rid);
+  return ppRelevanceOrder(merged,
+      situation: sit, text: (r) => r.page.title, ids: (r) => [r.page.id], readId: rid);
 }
 
 // =============================================================================
