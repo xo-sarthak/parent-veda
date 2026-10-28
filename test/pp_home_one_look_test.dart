@@ -150,6 +150,10 @@ void main() {
         w is PvInsightTile && w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('pp_insight_'));
     expect(tiles, findsWidgets);
     pushed.clear();
+    // Under one, "Growing now" joins Feed and Sleep ahead of the tips (PP 7,
+    // 2026-10-28), so the first tip starts off a 360 screen: scroll to it.
+    await t.ensureVisible(tiles.first);
+    await t.pump();
     await t.tap(tiles.first);
     await t.pump(const Duration(milliseconds: 600));
     expect(pushed, isNotEmpty, reason: 'the card opened nothing');

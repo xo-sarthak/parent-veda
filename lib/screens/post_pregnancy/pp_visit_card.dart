@@ -55,7 +55,13 @@ VaxVisit? ppVisitCardFor({DateTime? now}) {
   if (v == null || !kPpVisitNotes.containsKey(v.id)) return null;
   final when = ChildProfileStore.instance.dob.add(Duration(days: v.ageDays));
   final days = when.difference(now ?? DateTime.now()).inDays;
-  return days <= 21 ? v : null;
+  // ⚠️ NEVER LONG OVERDUE (relevance PP 7, 2026-10-28). With nothing ticked,
+  // every past visit reads "due", so a two-year-old whose vaccines were never
+  // recorded here showed "DUE NOW: the birth visit" on every open. The Health
+  // door made the same call in plan H1. A visit stays for a week after its
+  // date, in case it has not happened yet; the vaccines page keeps the rest.
+  // Kept for revert: return days <= 21 ? v : null;
+  return days <= 21 && days >= -7 ? v : null;
 }
 
 class PpVisitCard extends StatelessWidget {

@@ -95,7 +95,8 @@ void main() {
     expect(src, contains('child: _PaintedHero('));
     expect(src, contains('onSpine: () => ppOpenPhasePage(context)'));
     // Order: the visit card, then Explore by topic, then the three activities.
-    final visit = src.indexOf('ppVisitCardFor()');
+    // The clock is injected since PP 7 (2026-10-28). Was: 'ppVisitCardFor()'.
+    final visit = src.indexOf('ppVisitCardFor(now: now)');
     final explore = src.indexOf("title: 'Explore by topic'");
     final acts = src.indexOf('_ActivityRows(');
     final changes = src.indexOf("title: 'How \${child.nameMid} is growing'");

@@ -196,6 +196,35 @@ List<PpHomeInsight> ppHomeInsights({int n = 5, DateTime? on}) {
   return out;
 }
 
+/// One tip from the child's age pool that matches her situation, with the
+/// reason as its eyebrow ("Breastfeeding"), or null when none matches
+/// (relevance PP 7, 2026-10-28). Never today's tip, which the rail already
+/// carries. Searched in the rail's own rotation order, so it is stable all day.
+/// Corrected age, like the rest of the rail (PP 2).
+PpHomeInsight? ppHomeSituationTip(PpSituation situation, {DateTime? on}) {
+  final child = ChildProfileStore.instance;
+  if (!child.hasRealChild) return null;
+  final pool = ageTipsFor(child.devAgeInWeeks.floor());
+  if (pool.length < 2) return null;
+  final now = on ?? DateTime.now();
+  final start = now.difference(DateTime(now.year)).inDays % pool.length;
+  for (var i = 1; i < pool.length; i++) {
+    final t = pool[(start + i) % pool.length];
+    final why = ppRelevanceWhy(situation, '${t.tip.title} ${t.tip.body}', t.key);
+    if (why == null) continue;
+    final raw = kPpTipLinks[t.key];
+    return (
+      id: t.id,
+      eyebrow: why,
+      value: ppFillChild(t.tip.title),
+      hue: 188,
+      tip: t.tip,
+      link: raw != null && ppPageTitleForSurface(raw) != null ? raw : null,
+    );
+  }
+  return null;
+}
+
 LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
 /// A tip with no door page, as a short piece in the one reader (CLAUDE.md,

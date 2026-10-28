@@ -148,6 +148,8 @@ import '../v2/pv_family_switch.dart' show FamilyHome, PvFamilyTitle;
 import 'pp_messages_screen.dart' show openPpMessages;
 import '../skilling/sk_turning_six.dart' show PpLearningSpaceCard;
 import 'pp_visit_card.dart';
+import 'pp_home_today.dart';
+import 'problem_solver_screen.dart';
 // import 'video/pv_video_config.dart' show pvResolveVideoUrl; // the film pick moved to pp_home_reads.dart (2026-10-21)
 import 'pp_tip_links.dart';
 // import 'pp_phase_film.dart'; // the film moved onto the phase page (2026-10-22)
@@ -327,6 +329,22 @@ class _PpHomeV3State extends State<PpHomeV3> {
             .toList();
         final next = nextPhase(child);
         final insights = ppHomeInsights();
+        // ⚠️ TODAY, WHAT COMES FIRST (relevance PP 7, 2026-10-28;
+        // pp_home_today.dart). An urgent answer she gave in the last week
+        // sits above the rail; a visit within a week, then the first of the
+        // three raised, open today's block under the grid.
+        final now = DateTime.now();
+        final urgent = ppUrgentFollowUp(now: now);
+        final visitLead = ppVisitLead(now: now);
+        // Under one the rail is Feed, Sleep, what is growing now, a tip that
+        // matches her (only when one does, its reason as the eyebrow), then
+        // today's tip: five at most. Over one it stays today's tip and four
+        // more, because "This month" and its "Try this" sit right under it.
+        final careTiles = ppHomeShowCareTiles();
+        final growingNow = careTiles && changes.isNotEmpty ? changes.first : null;
+        final railTips = careTiles
+            ? [?ppHomeSituationTip(sit, on: now), ...insights.take(1)]
+            : insights;
 
         return Scaffold(
           backgroundColor: p.ground,
@@ -440,9 +458,38 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 // pregnancy's settings. The cards are this child's age tips
                 // (pp_home_reads.dart `ppHomeInsights`); each opens its linked
                 // door page, or the tip itself in the reader.
-                if (insights.isNotEmpty) ...[
+                // The heading also shows for an urgent answer alone (PP 7).
+                // Was: if (insights.isNotEmpty) ...[
+                if (insights.isNotEmpty || urgent != null) ...[
                   _pad(_Head(eyebrow: 'My daily insights', title: 'Today', p: p)),
                   const SizedBox(height: 12),
+                  // ---- SOMETHING URGENT SHE TOLD US (PP 7) -------------------
+                  // Where her "You told us" rows sit, and above them: the one
+                  // answer whose check said to see a doctor, for a week. It
+                  // repeats what the check said and routes to a doctor; it never
+                  // guesses. Its own row below steps aside meanwhile.
+                  if (urgent case final u?) ...[
+                    _pad(PpUrgentFollowUpCard(
+                      change: u,
+                      childName: child.nameMid,
+                      p: p,
+                      now: now,
+                      onOpen: () => switch (u.concern) {
+                            final wc? => Navigator.of(context)
+                                .push(MaterialPageRoute<void>(builder: (_) => WcFlowScreen(concern: wc))),
+                            null => _openSurface(context, 'pp_what_changed'),
+                          },
+                      onBetter: () {
+                        PpChangesStore.instance.clear(u.concernId);
+                        pvToast(context, 'Glad it is better. Your home is back to usual.');
+                      },
+                      onWorried: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                          settings: const RouteSettings(name: 'pp/find_help'),
+                          builder: (_) => const ProblemSolverScreen())),
+                    )),
+                    const SizedBox(height: 14),
+                  ],
+                  if (insights.isNotEmpty) ...[
                   // ⚠️ TEXT SCALE CLAMPED AT 1.3 FOR THIS RAIL ONLY. The tile is
                   // a fixed 100 x 112 (shared; three fit on a 360dp phone) and
                   // a tip title is longer than pregnancy's values ("Back to
@@ -482,7 +529,25 @@ class _PpHomeV3State extends State<PpHomeV3> {
                           onTap: () => _openSurface(context, 'pp_sleep'),
                         ),
                       ],
-                      for (final c in insights)
+                      // What is growing now, under one (PP 7): the first line
+                      // of "How {name} is growing", which is far down the page.
+                      if (growingNow case final g?)
+                        PvInsightTile(
+                          key: const ValueKey('pp_home_growing_now'),
+                          eyebrow: 'Growing now',
+                          value: g.title,
+                          hue: 104,
+                          art: PvInsightArt.note,
+                          showArt: false,
+                          centreValue: true,
+                          p: p,
+                          onTap: () => switch ((g.doc, g.milestonePage)) {
+                                (final doc?, final page?) => ppOpenMilestoneRead(context, doc, page),
+                                _ => _showChangeSheet(context, g, child, p),
+                              },
+                        ),
+                      // Was: for (final c in insights) (PP 7, 2026-10-28).
+                      for (final c in railTips)
                         PvInsightTile(
                           key: ValueKey('pp_insight_${c.id}'),
                           eyebrow: c.eyebrow,
@@ -496,6 +561,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                         ),
                     ]),
                   ))),
+                  ],
                   const SizedBox(height: 26),
                 ],
                 // ---- MILESTONES, ONE TAP FROM HOME (R10, 2026-10-26) --------
@@ -533,7 +599,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 ],
                 // The next well-baby visit, when it is due or close (gap
                 // analysis P2, 2026-10-07; pp_visit_card.dart).
-                if (ppVisitCardFor() case final visit?) ...[
+                // Within a week it leads today's block under the grid instead
+                // (PP 7), so it is not said twice. Was: if (ppVisitCardFor() case final visit?) ...[
+                if (ppVisitCardFor(now: now) case final visit? when visitLead == null) ...[
                   const SizedBox(height: 22),
                   _pad(PpVisitCard(visit: visit, p: p, onOpen: () => _openSurface(context, 'pp_vaccines'))),
                 ],
@@ -541,7 +609,13 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 // "Something changed?" answer, only while active, each with its
                 // own "Better now". The reads and activities below move up for
                 // it and say why (pp_relevance.dart).
-                if (PpChangesStore.instance.active() case final told when told.isNotEmpty) ...[
+                // The urgent one is the card at the top for its first week
+                // (PP 7); the rest stay here. Was:
+                //   if (PpChangesStore.instance.active() case final told when told.isNotEmpty) ...[
+                if ([
+                  for (final c in PpChangesStore.instance.active(now: now))
+                    if (c.concernId != urgent?.concernId) c
+                ] case final told when told.isNotEmpty) ...[
                   const SizedBox(height: 22),
                   _pad(PvRowGroup(
                     key: const ValueKey('pp_home_told'),
@@ -632,11 +706,24 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 // the reader; a press and hold swaps it, and the line under the
                 // rows says so. The three cards with Done and Change are kept
                 // below for revert.
+                // ---- TODAY'S BLOCK, UNDER THE GRID (PP 7, 2026-10-28) ---------
+                // Where Pregnancy keeps its daily practice and TTC its
+                // "Recommended" (the user: "so that app symmetry is
+                // maintained"). A visit within a week comes first and says why.
+                if (visitLead case final v?) ...[
+                  _pad(PpVisitLeadCard(
+                    visit: v,
+                    days: ppDaysToVisit(v, now: now),
+                    p: p,
+                    onOpen: () => _openSurface(context, 'pp_vaccines'),
+                  )),
+                  const SizedBox(height: 22),
+                ],
                 _pad(_Head(
                     eyebrow: 'Together',
                     title: 'Three things to do with ${child.nameMid} today',
                     p: p)),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 if (activities.isEmpty)
                   _pad(_EmptyInvite(
                       p: p,
@@ -645,8 +732,33 @@ class _PpHomeV3State extends State<PpHomeV3> {
                       cta: 'Browse every activity',
                       onTap: () => _openSurface(context, 'pp_activities')))
                 else ...[
+                  // THE FIRST, RAISED (PP 7): one of the three stands out so
+                  // the eye lands on one thing to do. It IS activity one, not a
+                  // copy, so its tick is the only tick. The rows hold the rest.
+                  // Was: activities: activities, in the rows below.
+                  _pad(PpFirstActivityCard(
+                    activity: activities.first,
+                    leading: PpActivityThumb(
+                      activityId: activities.first.id,
+                      size: 56,
+                      fallback: _activityMark(activities.first, p, 56),
+                    ),
+                    done: PpHomeActivitiesStore.instance.isDone(activities.first.id),
+                    p: p,
+                    onOpen: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: RouteSettings(name: 'pp/activity/${activities.first.id}'),
+                        builder: (_) => DevelopmentActivityScreen(activity: activities.first))),
+                    onDone: () => PpHomeActivitiesStore.instance.markDone(activities.first.id),
+                    onSwap: () {
+                      PpHomeActivitiesStore.instance.swap(activities.first.id, child.devAgeInMonths,
+                          childId: child.activeChildId);
+                      pvToast(context, 'Swapped for another activity.');
+                    },
+                  )),
+                  if (activities.length > 1) ...[
+                  const SizedBox(height: 10),
                   _pad(_ActivityRows(
-                    activities: activities,
+                    activities: activities.skip(1).toList(),
                     p: p,
                     onOpen: (a) => Navigator.of(context).push(MaterialPageRoute<void>(
                         settings: RouteSettings(name: 'pp/activity/${a.id}'),
@@ -655,6 +767,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                         a.id, child.devAgeInMonths,
                         childId: child.activeChildId),
                   )),
+                  ],
                   const SizedBox(height: 10),
                   _pad(Text(
                       PpHomeActivitiesStore.instance.allDone
@@ -4687,6 +4800,19 @@ class _PaintedHero extends StatelessWidget {
     );
   }
 }
+
+/// An activity's drawn mark in a tinted circle, until it has a painting: the
+/// raised first card's fallback (PP 7), the same mark the rows draw.
+Widget _activityMark(DevActivity a, V2Palette p, double size) => switch (devMarkFor(a.areaId)) {
+      final m? => Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: v2BlockTint(38, p), shape: BoxShape.circle),
+          child: V3DevMark(mark: m, accent: devAreaById(a.areaId).accent, size: size * 0.7),
+        ),
+      null => TtcMarkLeading(tab: TtcTabMark.sprout, tint: v2BlockTint(38, p), size: size),
+    };
 
 /// Today's three activities as rows: the area's drawn mark, the title, one
 /// line, a round check for done. A press and hold swaps one.
