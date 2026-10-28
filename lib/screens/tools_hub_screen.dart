@@ -77,6 +77,9 @@ import 'pregnancy/birth_plan_screen.dart';
 import 'products/pv_store_chrome.dart' show pvStorePalette;
 import 'v2/v2_palette.dart';
 import '../services/preg_tool_order.dart';
+import '../data/doors/pv_door_getting_ready.dart' show kReadySurfaceNames;
+import '../widgets/pv_toast.dart';
+import 'post_pregnancy/baby_naming_home_screen.dart' show BabyNamingHomeScreen;
 // Kept for revert (PregSectionHeading, 2026-10-02): import 'pregnancy/preg_chrome.dart';
 
 // =============================================================================
@@ -151,6 +154,17 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
       settings: RouteSettings(name: route),
       builder: (_) => b(),
     ));
+  }
+
+  /// The Garbh Sanskar row (M7): the door, or a toast saying why not.
+  void _openGarbh() {
+    final w = screenForSurface('garbh_daily', controller, controller.language);
+    if (w == null) {
+      pvToast(context,
+          'Garbh Sanskar could not open just now. Its card on your home opens it too.');
+      return;
+    }
+    _open('garbh_daily', () => w);
   }
 
   // HIS SIDE (2026-10-13): her trackers, her due date and her journal and
@@ -258,6 +272,14 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               line: 'What you really need before the baby comes',
               mark: IntentMark.listMark,
               priority: PregPriority.birthPrep),
+          // P2 N1 (2026-10-28): Baby names was offered by the Getting ready
+          // door only (C1). The screen is the one Parenting opens; a name she
+          // chooses now is offered at the birth.
+          _Tool('Baby names', Icons.badge_outlined, const Color(0xFF4F7A8A),
+              () => _open(kReadySurfaceNames, () => const BabyNamingHomeScreen()),
+              line: 'Find names you both love, and keep a shortlist',
+              mark: IntentMark.pageMark,
+              priority: PregPriority.birthPrep),
         ]),
         _ToolGroup('Keep', 330, [
           if (FatherPreview.instance.on)
@@ -275,6 +297,17 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open('tools/bump', () => BumpRitualScreen(controller: controller)),
               line: 'A photo of your bump, week by week',
               mark: IntentMark.bodyMark),
+          // ⚠️ BACK ON TOOLS (M7, the user 2026-10-27), a named exception to M6:
+          // a practice, not her data, but where she looks for it. It opens the
+          // door (today's practice is there); if the door cannot be built it
+          // says so, never the retired pillar menu. Steps aside after a loss
+          // with Get ready (R3): it only means something while she is pregnant.
+          if (!_ended)
+          _Tool(s.garbhToolTitle, Icons.spa_outlined, const Color(0xFFBE9C4E),
+              _openGarbh,
+              line: 'The Garbh Sanskar door: a story, a sound, a quiet minute',
+              mark: IntentMark.cuppedHands,
+              priority: PregPriority.anxiety),
           // REDUNDANT (2026-09-30, Tools audit): the Garbh Sanskar tile on the home opens the door that holds today's practice. Kept for revert:
           // _Tool(s.garbhToolTitle, Icons.spa_outlined, const Color(0xFFBE9C4E),
           // () => _open('garbh_daily', () =>
@@ -284,7 +317,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
           // priority: PregPriority.anxiety),
           _Tool(s.sprToolTitle, Icons.auto_stories_outlined, const Color(0xFF2F2C30),
               () => _open('tools/spiritual_reading', () => SpiritualReadingScreen(controller: controller)),
-              line: 'Short readings to hear, or to read aloud',
+              // P2 S2 (2026-10-28): there is no audio. Kept for revert:
+              // line: 'Short readings to hear, or to read aloud',
+              line: 'Short readings from six faiths, for a quiet moment',
               mark: IntentMark.lampMark,
               priority: PregPriority.anxiety),
         ]),

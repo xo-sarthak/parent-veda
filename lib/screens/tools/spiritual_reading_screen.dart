@@ -20,6 +20,10 @@ import '../../data/spiritual_reading_data.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/spiritual_prefs_store.dart';
+import '../../data/reads/read_adapters.dart'
+    show PvSpiritualPrefsBlock, pvReadFromSpiritual;
+import '../reader/pv_reader_screen.dart' show PvReaderScreen;
+import '../../widgets/pv_toast.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_chrome.dart';
@@ -86,11 +90,27 @@ List<SpiritualRead> _sortedReads(SpiritualTradition t) {
   return [for (final e in indexed) e.r];
 }
 
+// P2 S1 (2026-10-28): the one reader, not a private one. The Interested /
+// Not interested marks ride as a custom block. Kept for revert:
+//   Navigator.of(context).push(MaterialPageRoute(builder: (_) =>
+//       _SpiritualReadScreen(controller: c, tradition: t, read: r)));
 void _openRead(BuildContext context, PregnancyController c,
         SpiritualTradition t, SpiritualRead r) =>
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) =>
-            _SpiritualReadScreen(controller: c, tradition: t, read: r)));
+        settings: const RouteSettings(name: 'tools/spiritual_reading/read'),
+        builder: (_) => PvReaderScreen(
+              read: pvReadFromSpiritual(t, r,
+                  footnote: S(c.language).sprFootnote),
+              lang: c.language,
+              // The faith's own drawn mark stays with the read (2026-10-02:
+              // marks, not emoji), in the reader's hero slot.
+              hero: Center(child: spiritualMark(t.id, size: 72)),
+              customBlock: (context, block) => block is PvSpiritualPrefsBlock
+                  ? SpiritualPrefsRow(
+                      readTitleEn: block.readTitleEn,
+                      hindi: c.language.isHinglish)
+                  : const SizedBox.shrink(),
+            )));
 
 class SpiritualReadingScreen extends StatefulWidget {
   const SpiritualReadingScreen({super.key, required this.controller});
@@ -494,6 +514,64 @@ class _TraditionDetailScreen extends StatelessWidget {
 // ===========================================================================
 //  Single read (with Interested / Not-interested controls)
 // ===========================================================================
+/// Interested / Not interested, for one reading (moved out of the private
+/// reader below for the one reader, P2 S1). Each tap says what it changed.
+class SpiritualPrefsRow extends StatelessWidget {
+  const SpiritualPrefsRow(
+      {super.key, required this.readTitleEn, this.hindi = false});
+  final String readTitleEn;
+  final bool hindi;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    return AnimatedBuilder(
+      animation: SpiritualPrefsStore.instance,
+      builder: (context, _) {
+        final store = SpiritualPrefsStore.instance;
+        final interested = store.isInterested(readTitleEn);
+        final notInterested = store.isNotInterested(readTitleEn);
+        Widget pill(bool on, IconData onIcon, IconData offIcon, String label,
+                VoidCallback tap) =>
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: tap,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: on ? Colors.white : p.ink1,
+                  backgroundColor: on ? _accent : Colors.transparent,
+                  side: BorderSide(color: on ? _accent : kPvLine),
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                ),
+                icon: Icon(on ? onIcon : offIcon, size: 17),
+                label: Text(label,
+                    style: const TextStyle(fontWeight: FontWeight.w800)),
+              ),
+            );
+        return Row(children: [
+          pill(interested, Icons.favorite_rounded,
+              Icons.favorite_border_rounded,
+              hindi ? 'पसंद है' : 'Interested', () {
+            store.toggleInterested(readTitleEn);
+            pvToast(context,
+                interested ? 'Unmarked.' : 'Marked as interested.');
+          }),
+          const SizedBox(width: 10),
+          pill(notInterested, Icons.not_interested_rounded,
+              Icons.block_outlined,
+              hindi ? 'पसंद नहीं' : 'Not interested', () {
+            store.toggleNotInterested(readTitleEn);
+            pvToast(context,
+                notInterested ? 'Unmarked.' : 'Marked as not for you.');
+          }),
+        ]);
+      },
+    );
+  }
+}
+
+// Kept for revert (P2 S1): the private reader the one reader replaced.
+// ignore: unused_element
 class _SpiritualReadScreen extends StatelessWidget {
   const _SpiritualReadScreen(
       {required this.controller, required this.tradition, required this.read});

@@ -37,6 +37,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/birth_plan_data.dart';
 import 'remote/cloud_merged_store.dart';
+import 'remote/supabase_repo.dart';
 // import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 // ⚠️ IN THE CLOUD SINCE STEP 13 (2026-10-22, sync log). It was phone-only, so a
@@ -44,6 +45,34 @@ import 'remote/cloud_merged_store.dart';
 // kept as history. Items: `c|<question>|<choice>` (true) per chosen choice,
 // `t|<question>` (the text) per filled text field, `d|<section>` (true) per
 // discussed section, and `updated` (epoch ms).
+/// What her partner's phone found when it asked for her plan (P2 O2).
+class PartnerBirthPlan {
+  const PartnerBirthPlan.plan(String this.text) : state = PartnerPlanState.plan;
+  const PartnerBirthPlan.empty()
+      : text = null,
+        state = PartnerPlanState.empty;
+  const PartnerBirthPlan.notLinked()
+      : text = null,
+        state = PartnerPlanState.notLinked;
+  const PartnerBirthPlan.unreachable()
+      : text = null,
+        state = PartnerPlanState.unreachable;
+  final String? text;
+  final PartnerPlanState state;
+}
+
+enum PartnerPlanState { plan, empty, notLinked, unreachable }
+
+/// A copy of the plan held for an Undo. Only the store can make or read one.
+class BirthPlanSnapshot {
+  const BirthPlanSnapshot._(
+      this.choices, this.texts, this.discussed, this.updatedAt);
+  final Map<String, Set<String>> choices;
+  final Map<String, String> texts;
+  final Set<String> discussed;
+  final DateTime? updatedAt;
+}
+
 class BirthPlanStore extends ChangeNotifier with CloudMergedStore {
   BirthPlanStore._();
   // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
@@ -151,6 +180,30 @@ class BirthPlanStore extends ChangeNotifier with CloudMergedStore {
     await _save();
   }
 
+  /// The whole plan, copied, so "Start again" can be undone (P2, 2026-10-28).
+  BirthPlanSnapshot snapshot() => BirthPlanSnapshot._(
+        {for (final e in _choices.entries) e.key: {...e.value}},
+        {..._texts},
+        {..._discussed},
+        _updatedAt,
+      );
+
+  /// Puts a [snapshot] back, as an edit (it syncs like any other change).
+  Future<void> restore(BirthPlanSnapshot s) async {
+    _choices
+      ..clear()
+      ..addAll({for (final e in s.choices.entries) e.key: {...e.value}});
+    _texts
+      ..clear()
+      ..addAll(s.texts);
+    _discussed
+      ..clear()
+      ..addAll(s.discussed);
+    _updatedAt = DateTime.now();
+    notifyListeners();
+    await _save();
+  }
+
   Future<void> clear() async {
     if (isEmpty) return;
     _choices.clear();
@@ -173,10 +226,23 @@ class BirthPlanStore extends ChangeNotifier with CloudMergedStore {
   /// ⚠️ AND IT LEADS WITH THE VOICE LINE. The first thing the reader sees is
   /// that this is a preference, not a set of instructions — which is what
   /// makes a hospital team willing to read the rest.
-  String summary() {
-    final out = <String>['My birth plan', kBirthPlanVoice];
+  String summary() => summaryFrom(_choices, _texts, _discussed);
+
+  /// The summary from a plan's three parts. One function, so her phone and
+  /// her partner's (P2 O2, [partnerPlan]) can never word a plan differently.
+  /// Kept for revert: the same body, inline in [summary], reading the
+  /// instance through hasAnswers / isDiscussed / text / isChosen.
+  static String summaryFrom(Map<String, Set<String>> choices,
+      Map<String, String> texts, Set<String> discussed,
+      {String heading = 'My birth plan'}) {
+    String text(String id) => texts[id] ?? '';
+    bool chosen(String q, String c) => choices[q]?.contains(c) ?? false;
+    bool answered(BpSection s) => s.questions.any((q) => q.kind == BpKind.text
+        ? text(q.id).trim().isNotEmpty
+        : (choices[q.id]?.isNotEmpty ?? false));
+    final out = <String>[heading, kBirthPlanVoice];
     for (final s in kBirthPlanSections) {
-      if (!hasAnswers(s) && !isDiscussed(s.id)) continue;
+      if (!answered(s) && !discussed.contains(s.id)) continue;
       out.add('');
       out.add(s.title.toUpperCase());
       for (final q in s.questions) {
@@ -185,14 +251,78 @@ class BirthPlanStore extends ChangeNotifier with CloudMergedStore {
           if (t.isNotEmpty) out.add(t);
           continue;
         }
-        final picked = q.choices.where((c) => isChosen(q.id, c.id));
+        final picked = q.choices.where((c) => chosen(q.id, c.id));
         for (final c in picked) {
           out.add('• ${c.label}');
         }
       }
-      if (isDiscussed(s.id)) out.add('(Talked this through with my doctor.)');
+      if (discussed.contains(s.id)) {
+        out.add('(Talked this through with my doctor.)');
+      }
     }
     return out.join('\n');
+  }
+
+  // ---- her partner's phone (P2 O2, 2026-10-28) ------------------------------
+
+  /// Her plan as her partner's phone reads it: never stored on his phone,
+  /// never written. 0118 lets a paired partner read this one `user_state` row.
+  ///
+  /// The row is pv_state_merge's per-item book, `{key: {v, t, d?}}`; a removed
+  /// item (`d`) is left out, exactly as her own phone reads it.
+  static Future<PartnerBirthPlan> partnerPlan() async {
+    try {
+      final partnerId = await SupabaseRepo.myPartnerId();
+      if (partnerId == null) return const PartnerBirthPlan.notLinked();
+      final data = await SupabaseRepo.loadPartnerState(partnerId, 'birth_plan');
+      final items = <String, Object?>{};
+      if (data is Map) {
+        for (final e in data.entries) {
+          if (MergedItems.removedOf(e.value)) continue;
+          final v = e.value;
+          if (v is Map) items['${e.key}'] = v['v'];
+        }
+      }
+      final p = parseItems(items);
+      if (p.choices.values.every((s) => s.isEmpty) &&
+          p.texts.values.every((t) => t.trim().isEmpty) &&
+          p.discussed.isEmpty) {
+        return const PartnerBirthPlan.empty();
+      }
+      return PartnerBirthPlan.plan(
+          summaryFrom(p.choices, p.texts, p.discussed, heading: 'Her birth plan'));
+    } catch (_) {
+      return const PartnerBirthPlan.unreachable();
+    }
+  }
+
+  /// The plan's three parts from its cloud items. [applyCloudItems] reads the
+  /// same keys into the singleton.
+  static ({
+    Map<String, Set<String>> choices,
+    Map<String, String> texts,
+    Set<String> discussed,
+  }) parseItems(Map<String, Object?> items) {
+    final choices = <String, Set<String>>{};
+    final texts = <String, String>{};
+    final discussed = <String>{};
+    for (final e in items.entries) {
+      final k = e.key;
+      if (k.startsWith('c|')) {
+        final rest = k.substring(2);
+        final bar = rest.indexOf('|');
+        if (bar <= 0) continue;
+        choices
+            .putIfAbsent(rest.substring(0, bar), () => <String>{})
+            .add(rest.substring(bar + 1));
+      } else if (k.startsWith('t|')) {
+        final v = e.value;
+        if (v is String) texts[k.substring(2)] = v;
+      } else if (k.startsWith('d|')) {
+        discussed.add(k.substring(2));
+      }
+    }
+    return (choices: choices, texts: texts, discussed: discussed);
   }
 
   // ---- persistence ----------------------------------------------------------

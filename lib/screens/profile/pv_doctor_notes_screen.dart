@@ -32,6 +32,9 @@ import '../../services/medicine_store.dart';
 import '../../services/pp_use_consent.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/readings_store.dart';
+import '../../services/birth_plan_store.dart';
+import '../../data/doors/pv_door_labour.dart' show kLabourSurfaceBirthPlan;
+import '../pregnancy/birth_plan_screen.dart' show BirthPlanScreen;
 import '../../services/scan_reports_store.dart';
 import '../../services/tools_store.dart';
 import '../../theme/pv_fonts.dart';
@@ -95,6 +98,7 @@ class _PvDoctorNotesScreenState extends State<PvDoctorNotesScreen> {
         ScanReportsStore.instance.load(),
         ConditionsStore.instance.init(),
         CanIActivityStore.instance.init(),
+        BirthPlanStore.instance.init(),
       ]).then((_) {
         if (mounted) setState(() {});
       }).catchError((_) {});
@@ -287,6 +291,26 @@ class _PvDoctorNotesScreenState extends State<PvDoctorNotesScreen> {
         tool: null,
       );
       out.add(('What your doctor said', dLines, dEmpty, dEdit));
+
+      // ---- P2 O1 (2026-10-28): her birth plan, only after her yes ----------
+      // The summary's own text, less its title; it already leads with the
+      // "preferences, not instructions" line.
+      final plan = BirthPlanStore.instance;
+      final (bLines, bEmpty, bEdit) = _consented(
+        PpUseKind.pregBirthPlan,
+        plan.isEmpty
+            ? const <String>[]
+            : [
+                for (final l in plan.summary().split('\n').skip(1))
+                  if (l.trim().isNotEmpty) l,
+              ],
+        empty: 'No birth plan yet. Birth plan is under Tools, in Get ready.',
+        tool: c == null
+            ? null
+            : _Edit('Open birth plan', kLabourSurfaceBirthPlan,
+                () => BirthPlanScreen(pregnancy: c)),
+      );
+      out.add(('Birth preferences', bLines, bEmpty, bEdit));
     }
 
     if (s == LifeStage.parenting) {

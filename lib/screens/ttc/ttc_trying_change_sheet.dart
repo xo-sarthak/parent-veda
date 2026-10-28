@@ -13,6 +13,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/pv_feedback.dart' show PvPress;
+
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_trying_time.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
@@ -51,7 +53,7 @@ class TtcTryingLine extends StatelessWidget {
               Text(t.line, style: ttcBody(12.5, color: ttcSoft)),
               if (canChange) ...[
                 const SizedBox(height: 8),
-                GestureDetector(
+                PvPress(child: GestureDetector(
                   key: const ValueKey('ttc_trying_change'),
                   behavior: HitTestBehavior.opaque,
                   onTap: () async {
@@ -69,7 +71,7 @@ class TtcTryingLine extends StatelessWidget {
                         style: ttcBody(13,
                             color: ttcTitleInk, w: FontWeight.w800)),
                   ),
-                ),
+                )),
               ],
             ],
           ),
@@ -232,7 +234,7 @@ class _TryingSheetState extends State<_TryingSheet> {
                 style: ttcBody(12, color: ttcSoft),
               ),
               const SizedBox(height: 16),
-              GestureDetector(
+              PvPress(child: GestureDetector(
                 key: const ValueKey('ttc_trying_save'),
                 onTap: _save,
                 behavior: HitTestBehavior.opaque,
@@ -246,7 +248,7 @@ class _TryingSheetState extends State<_TryingSheet> {
                       style: ttcBody(14,
                           color: Colors.white, w: FontWeight.w800)),
                 ),
-              ),
+              )),
             ],
           ),
         ),
@@ -271,7 +273,7 @@ class _Option extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PvPress(child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -301,6 +303,6 @@ class _Option extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }

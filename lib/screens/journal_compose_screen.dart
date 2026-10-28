@@ -261,7 +261,18 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
     }
 
     if (!mounted) return;
-    Navigator.of(context).pop();
+    // P2 J3 (2026-10-28): every save says what it changed. Kept for revert:
+    // the pop alone.
+    final nav = Navigator.of(context);
+    final week = widget.pregnancy.currentWeek;
+    nav.pop();
+    pvToast(
+        nav.context,
+        edit != null
+            ? 'Memory updated.'
+            : (week >= 1 && week <= 42
+                ? 'Kept in your journal, under week $week.'
+                : 'Kept in your journal.'));
   }
 
   /// Empty means "no place", not an empty string on the entry.

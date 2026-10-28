@@ -661,7 +661,8 @@ class S {
   // ===========================================================================
   //  MY BUMP JOURNEY - the visual pregnancy timeline
   // ===========================================================================
-  String get bumpTitle => _p('My Bump Journey', 'मेरा बंप सफ़र');
+  // P2 U6 (2026-10-28): one spelling, the screen's. Was 'My Bump Journey'.
+  String get bumpTitle => _p('My bump journey', 'मेरा बंप सफ़र');
   String get bumpSubtitle =>
       _p('Your bump, week by week', 'आपका बंप, हफ़्ते-दर-हफ़्ते');
   String get bumpEmptyTitle => _p('Your bump journey begins here.',

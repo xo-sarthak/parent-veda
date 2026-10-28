@@ -49,6 +49,8 @@ enum PpUseKind {
   pregConditions,
   pregReports,
   pregDoctorCalls,
+  // P2, Pregnancy keep tools (O1, 2026-10-28): her birth plan in the summary.
+  pregBirthPlan,
 }
 
 enum PpUseAnswer { unasked, yes, no }
@@ -65,6 +67,7 @@ extension PpUseKindText on PpUseKind {
         PpUseKind.pregConditions => 'The conditions you follow',
         PpUseKind.pregReports => 'Your saved reports',
         PpUseKind.pregDoctorCalls => 'What your doctor said in Is it safe?',
+        PpUseKind.pregBirthPlan => 'Your birth plan',
       };
 
   /// The stage whose tools collect it. You lists each kind under its stage.
@@ -80,7 +83,8 @@ extension PpUseKindText on PpUseKind {
         PpUseKind.pregReadings ||
         PpUseKind.pregConditions ||
         PpUseKind.pregReports ||
-        PpUseKind.pregDoctorCalls =>
+        PpUseKind.pregDoctorCalls ||
+        PpUseKind.pregBirthPlan =>
           LifeStage.pregnancy,
       };
 
@@ -116,6 +120,8 @@ extension PpUseKindText on PpUseKind {
             'in the summary you can show your doctor.',
         PpUseKind.pregDoctorCalls => 'We add what your doctor told you to the '
             'summary, so the next doctor sees it too.',
+        PpUseKind.pregBirthPlan => 'We add your birth preferences to the '
+            'summary you can show your doctor, as preferences to talk through.',
       };
 }
 

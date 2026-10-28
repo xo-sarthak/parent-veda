@@ -41,6 +41,7 @@ import 'package:flutter/material.dart';
 
 import '../data/garbh_rebuild_data.dart';
 import '../localization/app_language.dart';
+import '../services/pregnancy_controller.dart';
 import '../services/raga_audio_store.dart';
 import '../theme/pv_fonts.dart';
 // Kept for revert (2026-10-02, the tall rail cards became shelf cards):
@@ -434,7 +435,47 @@ Future<void> _writeLetter(BuildContext context) async {
         hi: text.length > 60 ? '${text.substring(0, 60)}...' : text),
     text: text,
   ));
+  // P2 G3: a save says what it changed.
+  if (context.mounted) pvToast(context, 'Letter kept under week $week.');
 }
+
+/// P2 G1 (2026-10-28): a letter's body was stored and never shown; the row
+/// held two lines and had no tap. It opens here, whole.
+Future<void> _readLetter(BuildContext context, GarbhJournalEntry entry) =>
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        margin: const EdgeInsets.all(12),
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.8),
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('A letter to your baby',
+                  style: pvFraunces(
+                      fontSize: 19, fontWeight: FontWeight.w600, color: _ink)),
+              const SizedBox(height: 6),
+              Text('Kept under week ${entry.week}',
+                  style: pvManrope(fontSize: 12.5, color: _muted)),
+              const SizedBox(height: 16),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Text(entry.text ?? entry.title.en,
+                      key: const ValueKey('garbh_letter_body'),
+                      style: pvManrope(fontSize: 15, height: 1.6, color: _ink)),
+                ),
+              ),
+            ]),
+      ),
+    );
 
 /// ⚠️ READ FROM THE MOST RECENT ENTRY, NOT FROM A CONTROLLER.
 ///
@@ -444,7 +485,20 @@ Future<void> _writeLetter(BuildContext context) async {
 /// last added, and falls back to 1 for an empty album. Threading a controller
 /// in just for this would break the property that makes the birth handover
 /// free.
+///
+/// ⚠️ SUPERSEDED (P2 G2, 2026-10-28): "the week of whatever she last added"
+/// filed a week-30 letter under week 22, or under week 1 in an empty album.
+/// The screen still takes no controller; it READS the live one when a
+/// pregnancy is dated and in range, and keeps the old fallback only for the
+/// after-birth case the note above protects. Kept for revert:
+///   final e = GarbhJournalStore.instance.entries;
+///   return e.isEmpty ? 1 : e.first.week;
 int _currentWeekForLetter() {
+  final p = PregnancyController.current;
+  if (p != null && p.isDueDateSet) {
+    final w = p.currentWeek;
+    if (w >= 1 && w <= 42) return w;
+  }
   final e = GarbhJournalStore.instance.entries;
   return e.isEmpty ? 1 : e.first.week;
 }
@@ -556,8 +610,12 @@ class _EntryRow extends StatelessWidget {
             // audio; making the whole row tappable anyway would teach her that
             // taps sometimes do nothing, which is worse than a row that
             // plainly is not a button.
+            // P2 G1: a letter has something to read, so it is a button too.
+            // Kept for revert: `onTap: path == null ? null : () => ...`
             onTap: path == null
-                ? null
+                ? (entry.kind == GarbhEntryKind.letter
+                    ? () => _readLetter(context, entry)
+                    : null)
                 : () => audio.toggle(path,
                     title: entry.title.en,
                     // Her own voice, and her family's, must not loop.

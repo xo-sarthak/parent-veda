@@ -439,6 +439,21 @@ class SupabaseRepo {
     return row?['data'];
   }
 
+  /// Her partner's blob for [storeKey], read-only. RLS decides which keys a
+  /// partner may read (0118: `birth_plan` only); any other key comes back
+  /// null, the same as a row that does not exist.
+  static Future<dynamic> loadPartnerState(
+      String partnerId, String storeKey) async {
+    if (userId == null) return null;
+    final row = await _client
+        .from('user_state')
+        .select('data')
+        .eq('user_id', partnerId)
+        .eq('store_key', storeKey)
+        .maybeSingle();
+    return row?['data'];
+  }
+
   /// Save this user's blob for [storeKey] (upsert on user_id+store_key).
   /// No-op if logged out. [data] is any json-encodable structure (Map/List).
   static Future<void> saveState(String storeKey, Object data) async {

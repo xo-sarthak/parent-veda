@@ -41,9 +41,11 @@ import '../../data/journal_prompts.dart';
 import '../../data/preg_size_sets.dart' show pregSizeOrFallback;
 import '../../data/reads/read_images.dart' show readImageFor;
 import '../../models/journal_entry.dart';
+import '../../data/garbh_rebuild_data.dart' show GarbhJournalStore;
 import '../../services/bump_store.dart';
 import '../../services/journal_store.dart';
 import '../../services/preg_size_set_store.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/remote/storage_service.dart';
 import '../../services/tools_store.dart';
@@ -52,7 +54,9 @@ import '../../widgets/journal/journal_create.dart'
     show editJournalEntry, openJournalRecordVoice;
 import '../../widgets/journal/journal_keepsake.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
 import '../../widgets/storage_image.dart';
+import '../garbh_journal_screen.dart' show GarbhJournalScreen;
 import '../journal_compose_screen.dart' show openJournalCompose;
 import '../journal_screen.dart' show JournalScreenClassic;
 import '../v2/v2_palette.dart';
@@ -264,6 +268,7 @@ class _JournalScreenState extends State<JournalScreen>
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: Listenable.merge([
           JournalStore.instance,
+          GarbhJournalStore.instance, // P2 D1: her Garbh entries show here
           ToolsStore.instance,
           BumpStore.instance,
           V2PaletteStore.instance,
@@ -447,11 +452,12 @@ class _JournalScreenState extends State<JournalScreen>
                     background: _Cover(
                       pal: pal,
                       photo: cover,
-                      trimester: p.currentWeek <= 13
+                      trimester: _weekNow(p) <= 13
                           ? 1
-                          : (p.currentWeek <= 27 ? 2 : 3),
+                          : (_weekNow(p) <= 27 ? 2 : 3),
                       name: p.myName,
-                      week: p.currentWeek,
+                      week: _weekNow(p),
+                      ended: pregnancyEndWeek(p) != null,
                     ),
                   ),
           ),
@@ -463,20 +469,26 @@ class _JournalScreenState extends State<JournalScreen>
                   const SizedBox(height: 22),
                   _FortyWeeks(
                     pal: pal,
-                    current: p.currentWeek,
+                    current: _weekNow(p),
                     kept: kept,
                     open: _open,
+                    ended: pregnancyEndWeek(p) != null,
                   ),
                   const SizedBox(height: 26),
-                  _QuestionCard(
-                    pal: pal,
-                    week: p.currentWeek,
-                    skip: _skip,
-                    onWrite: (q) => _addMemory(prompt: q),
-                    onSay: _addVoice,
-                    onAnother: () => setState(() => _skip++),
-                  ),
-                  const SizedBox(height: 30),
+                  // P2 J1: after a loss the weekly question (written to a
+                  // growing baby, with its size line) steps aside; adding a
+                  // memory stays one tap on the button.
+                  if (pregnancyEndWeek(p) == null) ...[
+                    _QuestionCard(
+                      pal: pal,
+                      week: p.currentWeek,
+                      skip: _skip,
+                      onWrite: (q) => _addMemory(prompt: q),
+                      onSay: _addVoice,
+                      onAnother: () => setState(() => _skip++),
+                    ),
+                    const SizedBox(height: 30),
+                  ],
                 ],
                 _Filters(
                   pal: pal,
@@ -537,6 +549,15 @@ class _JournalScreenState extends State<JournalScreen>
       );
 
   void _openEntry(JournalEntry e) {
+    // P2 D1: a Garbh entry opens where it lives, with its own play, read and
+    // delete-with-Undo. This side never writes it.
+    if (e.fromGarbh) {
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'garbh/journal'),
+        builder: (_) => const GarbhJournalScreen(),
+      ));
+      return;
+    }
     if (journalIsEmpty(e) && !e.isAutomatic && !e.isPartner) {
       // Nothing to read yet — straight to filling it.
       journalEdit(context, p, e);
@@ -626,6 +647,9 @@ class _Rise extends StatelessWidget {
 //  The cover
 // =============================================================================
 
+/// Her week now, or the week it ended after a loss.
+int _weekNow(PregnancyController p) => pregnancyEndWeek(p) ?? p.currentWeek;
+
 class _Cover extends StatelessWidget {
   const _Cover({
     required this.pal,
@@ -633,6 +657,7 @@ class _Cover extends StatelessWidget {
     required this.trimester,
     required this.name,
     required this.week,
+    this.ended = false,
   });
 
   final V2Palette pal;
@@ -640,6 +665,7 @@ class _Cover extends StatelessWidget {
   final int trimester;
   final String? name;
   final int week;
+  final bool ended;
 
   // A painting for the trimester when she has no photograph: the user's own
   // artwork once it is in the table (`journal_cover_t1..3`), the drawn sky
@@ -647,6 +673,21 @@ class _Cover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final who = (name ?? '').trim();
+    // P2 J1 (2026-10-28): after a loss the cover stops writing to the baby
+    // and stops counting weeks (the user, 10-27: baby wording drops).
+    if (ended) {
+      return JournalCover(
+        pal: pal,
+        photo: photo,
+        painting: readImageFor('journal_cover_t$trimester'),
+        artVariant: trimester + 2,
+        eyebrow: 'MY JOURNAL',
+        salutation: 'What I kept,',
+        signoff: who.isEmpty
+            ? 'Here whenever I want it.'
+            : 'Here whenever I want it.  — $who',
+      );
+    }
     return JournalCover(
       pal: pal,
       photo: photo,
@@ -671,17 +712,36 @@ class _FortyWeeks extends StatelessWidget {
     required this.current,
     required this.kept,
     required this.open,
+    this.ended = false,
   });
 
   final V2Palette pal;
   final int current;
   final Set<int> kept;
   final Animation<double> open;
+  final bool ended;
 
   // Two rows of twenty, drawn by the shared JournalDotStrip since 2026-10-17;
   // the parenting journal draws a child's twelve months with it.
   @override
   Widget build(BuildContext context) {
+    // P2 J1: after a loss, no countdown to a meeting. [current] is the week
+    // it ended, so the weeks she kept something in still light up.
+    if (ended) {
+      return JournalDotStrip(
+        pal: pal,
+        count: 40,
+        perRow: 20,
+        current: current,
+        kept: kept,
+        open: open,
+        headline: 'Your weeks',
+        headlineMuted: '',
+        right: '',
+        keptLegend: 'A week you kept something in',
+        nowLegend: 'The last week',
+      );
+    }
     final left = (40 - current).clamp(0, 40);
     return JournalDotStrip(
       pal: pal,
@@ -869,7 +929,10 @@ class _WeekSection extends StatelessWidget {
                 (current ? '  ·  THIS WEEK' : ''),
             summary: _summary,
             photo: photo,
-            subtitle: size?.line.replaceFirst('About', 'Baby, about'),
+            // P2 J1: no baby-size line after a loss.
+            subtitle: PregnancyEndedStore.instance.ended
+                ? null
+                : size?.line.replaceFirst('About', 'Baby, about'),
           ),
           const SizedBox(height: 4),
           if (entries.isEmpty)
@@ -939,6 +1002,7 @@ class JournalEntryRow extends StatelessWidget {
       journalKind(e).toUpperCase(),
       if (!e.isAutomatic && _hasTime(d)) _clock(d).toUpperCase(),
       if (e.isPartner) 'FROM YOUR PARTNER',
+      if (e.fromGarbh) 'FROM GARBH SANSKAR',
     ].join(' · ');
 
     // The row itself is the shared JournalPageRow since 2026-10-17; what is
@@ -1209,8 +1273,26 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
       ),
     );
     if (ok != true || !mounted) return;
-    await JournalStore.instance.deleteEntry(widget.entry.id);
-    if (mounted) Navigator.of(context).pop();
+    // P2 J2 (2026-10-28): a delete said nothing and could not be undone, and
+    // the files went at once. Now the row goes, an Undo is offered, and the
+    // photos and voice notes go only once the Undo has passed. Kept for revert:
+    //   await JournalStore.instance.deleteEntry(widget.entry.id);
+    //   if (mounted) Navigator.of(context).pop();
+    final store = JournalStore.instance;
+    final entry = widget.entry;
+    final nav = Navigator.of(context);
+    await store.deleteEntry(entry.id, keepFiles: true);
+    if (!mounted) return;
+    nav.pop();
+    var undone = false;
+    final notice = pvToast(nav.context, 'Memory deleted.',
+        kind: PvToastKind.undo,
+        action: 'Undo', onAction: () {
+      undone = true;
+      store.restoreEntry(entry);
+    });
+    await notice.closed;
+    if (!undone) await store.discardFiles(entry);
   }
 
   @override

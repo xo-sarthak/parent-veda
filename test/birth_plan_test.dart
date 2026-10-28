@@ -13,6 +13,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/screens/post_pregnancy/pp_use_ask_card.dart';
 import 'package:parentveda/data/birth_plan_data.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/data/reads/pregnancy_reads.dart';
@@ -245,13 +246,22 @@ void main() {
       await tester.tap(chip);
       await tester.pumpAndSettle();
 
-      final chrome = {'LABOUR PREP', 'Your birth plan'};
+      // 'GET READY' since P2 W2 (2026-10-28): the shared tool look's eyebrow.
+      final chrome = {'LABOUR PREP', 'GET READY', 'Get ready', 'Your birth plan'};
       var checked = 0;
+      // The consent ask card (P2 O1) is the shared PpUseAskCard, at its own
+      // size everywhere it appears, so its words are not this screen's.
+      final askCard = tester
+          .widgetList<Text>(find.descendant(
+              of: find.byType(PpUseAskCard, skipOffstage: false),
+              matching: find.byType(Text, skipOffstage: false)))
+          .toSet();
       for (final w in tester.widgetList<Text>(find.byType(Text, skipOffstage: false))) {
         final text = w.data ?? w.textSpan?.toPlainText() ?? '';
         if (chrome.contains(text) ||
             text.startsWith('One page your hospital') ||
-            text.startsWith("This records what you'd prefer")) {
+            text.startsWith("This records what you'd prefer") ||
+            askCard.contains(w)) {
           continue;
         }
         final size = w.style?.fontSize;

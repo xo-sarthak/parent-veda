@@ -52,6 +52,7 @@ import '../belly_skin_data.dart';
 import '../conditions_data.dart';
 import '../mind_mood_data.dart';
 import '../nutrition_data.dart';
+import '../spiritual_reading_data.dart';
 import '../tests_scans_reports_data.dart';
 
 LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
@@ -635,6 +636,63 @@ PvRead pvReadFromArticle(Article a) {
             ]),
           ]
         : const [],
+    whenToSeeSomeone: kPvShortPieceCallout,
+    faqs: const [],
+  );
+}
+
+// -----------------------------------------------------------------------------
+//  Spiritual reading (P2 S1, 2026-10-28)
+// -----------------------------------------------------------------------------
+
+/// The "Interested / Not interested" marks under a spiritual reading. The
+/// reader does not model them, so they ride as a custom block and
+/// `SpiritualReadingScreen` renders them.
+class PvSpiritualPrefsBlock {
+  const PvSpiritualPrefsBlock(this.readTitleEn);
+
+  /// The read's English title: the mark's IDENTITY (persisted), never `.now`.
+  final String readTitleEn;
+}
+
+/// A spiritual reading as a [PvRead]. It used to open in a private reader,
+/// against the one-reader rule. [footnote] is the screen's own closing note.
+PvRead pvReadFromSpiritual(
+  SpiritualTradition t,
+  SpiritualRead r, {
+  required String footnote,
+}) {
+  final paras = [
+    for (final p in r.body.en.split(RegExp(r'\n\s*\n')))
+      if (p.trim().isNotEmpty) p.trim(),
+  ];
+  final hiParas = r.body.hi.split(RegExp(r'\n\s*\n'));
+  return PvRead(
+    id: 'spiritual/${t.id}/${r.title.en.toLowerCase().replaceAll(RegExp('[^a-z0-9]+'), '_')}',
+    kicker: t.name,
+    title: r.title,
+    teaser: const LocalizedText(en: '', hi: ''),
+    scaleSetter: const LocalizedText(en: '', hi: ''),
+    author: _desk,
+    authorRole: const LocalizedText(en: 'Spiritual reading', hi: 'Spiritual reading'),
+    reviewed: false,
+    hue: 40,
+    sections: [
+      PvReadSection(paragraphs: [
+        // One paragraph per blank line; the Hindi side keeps its own split
+        // when it has as many, else the whole body.
+        for (var i = 0; i < paras.length; i++)
+          LocalizedText(
+              en: paras[i],
+              hi: hiParas.length == paras.length ? hiParas[i].trim() : (i == 0 ? r.body.hi : '')),
+      ]),
+      PvReadSection(custom: PvSpiritualPrefsBlock(r.title.en)),
+      PvReadSection(
+          callout: PvCallout(
+              tone: PvCalloutTone.note,
+              title: const LocalizedText(en: 'A note', hi: 'A note'),
+              body: LocalizedText(en: footnote, hi: footnote))),
+    ],
     whenToSeeSomeone: kPvShortPieceCallout,
     faqs: const [],
   );

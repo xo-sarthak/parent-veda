@@ -75,6 +75,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../models/bump_photo.dart';
 import '../../services/bump_store.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/storage_image.dart';
 import '../bump_book_screen.dart';
@@ -215,16 +216,22 @@ class BumpRitualScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: BumpStore.instance,
     builder: (context, _) {
-      final week = controller.currentWeek;
+      // P2 U1 (2026-10-28): after a loss the week clock stops at the week it
+      // ended. Kept for revert: `final week = controller.currentWeek;`
+      final endWeek = pregnancyEndWeek(controller);
+      final week = endWeek ?? controller.currentWeek;
       final store = BumpStore.instance;
-      final showAdd = store.photos.isNotEmpty && store.hasWeek(week);
+      final showAdd =
+          endWeek == null && store.photos.isNotEmpty && store.hasWeek(week);
       return PregToolScaffold(
         hue: 330,
         eyebrow: 'Keep',
         title: 'My bump journey',
-        intro:
-            'One photo a week, in the same spot. By week 40 you will have a '
-            'book to flip through, and later, to show your child.',
+        // P2 U1: no "by week 40" or "show your child" after a loss.
+        intro: endWeek != null
+            ? 'Every photo you kept stays here, in your book.'
+            : 'One photo a week, in the same spot. By week 40 you will have a '
+                'book to flip through, and later, to show your child.',
         mark: IntentMark.bodyMark,
         action: showAdd ? _AddAction(week: week, controller: controller) : null,
         children: [
@@ -300,7 +307,9 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
     builder: (context, _) {
       final p = V2PaletteStore.instance.current;
       final store = BumpStore.instance;
-      final week = c.currentWeek;
+      // P2 U1: frozen at the week it ended, after a loss.
+      final endWeek = pregnancyEndWeek(c);
+      final week = endWeek ?? c.currentWeek;
       final photos = store.photos.reversed.toList(); // newest first
       final thisWeekIn = store.hasWeek(week);
 
@@ -329,7 +338,10 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
 
       final first = photos.last.weekNumber;
       final latest = photos.first.weekNumber;
-      final ahead = kBumpMoments.where((m) => m.week > week).toList();
+      // P2 U1: nothing is "still ahead" after a loss.
+      final ahead = endWeek != null
+          ? const <({int week, String ahead, String passedTitle, String passedLine})>[]
+          : kBumpMoments.where((m) => m.week > week).toList();
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,13 +353,19 @@ class _BumpRitualBodyState extends State<BumpRitualBody> {
             p: p,
             latest: photos.first,
             week: week,
-            status: thisWeekIn
+            status: endWeek != null
+                ? (first == latest
+                    ? 'Week $first is in your book.'
+                    : 'Your book runs from week $first to week $latest.')
+                : thisWeekIn
                 ? 'Week $week is in your book.'
                 : first == latest
                 ? "It has week $first in it. This week isn't in it yet."
                 : "It runs from week $first to week $latest. This "
                       "week isn't in it yet.",
-            onAdd: thisWeekIn ? null : () => _startAddPhoto(context, p, week),
+            onAdd: thisWeekIn || endWeek != null
+                ? null
+                : () => _startAddPhoto(context, p, week),
             onOpen: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
                 settings: const RouteSettings(name: 'bump_journey/photo'),
@@ -629,6 +647,11 @@ Future<void> _startAddPhoto(
     caption: caption,
     journalLabel: 'Bump, week $chosen',
   );
+  // P2 U3 (2026-10-28): the save was silent, and it also copies into her
+  // Journal without saying so. Now it says both.
+  if (context.mounted) {
+    pvToast(context, 'Added to week $chosen, and to your journal.');
+  }
 }
 
 /// The one line a week ahead says when tapped, in the strip or on a row.
@@ -2321,6 +2344,10 @@ class _PhotoScreenState extends State<_PhotoScreen> {
                                 _draft.text.trim(),
                               );
                               if (mounted) setState(() => _editing = false);
+                              // P2 U4: a save says what it changed.
+                              if (context.mounted) {
+                                pvToast(context, 'Caption saved.');
+                              }
                             },
                           ),
                         ),
@@ -2409,10 +2436,16 @@ class _PhotoScreenState extends State<_PhotoScreen> {
                             strong: true,
                             color: kPvUrgentInk,
                             onTap: () async {
+                              // P2 U4: the delete said nothing. No Undo: the
+                              // cloud removes the file once it confirms, and
+                              // the confirm above already says so.
+                              final nav = Navigator.of(context);
                               await BumpStore.instance.delete(photo.id);
-                              if (context.mounted) {
-                                Navigator.of(context).maybePop();
-                              }
+                              await nav.maybePop();
+                              if (!nav.mounted) return;
+                              // ignore: use_build_context_synchronously
+                              pvToast(nav.context,
+                                  'Photo deleted from your book and your journal.');
                             },
                           ),
                         ),

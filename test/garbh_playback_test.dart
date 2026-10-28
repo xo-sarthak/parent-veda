@@ -73,13 +73,16 @@ void main() {
       expect(tappable.onTap, isNotNull);
     });
 
-    testWidgets('an entry with no audio is not a button', (t) async {
+    // P2 G1 (2026-10-28): the case was a letter, which now opens to be read.
+    // The rule it held still stands for an entry with nothing to play or
+    // read; that is "heard" with no file.
+    testWidgets('an entry with nothing to play or read is not a button', (t) async {
       GarbhJournalStore.instance.add(GarbhJournalEntry(
-        id: 'l1',
-        kind: GarbhEntryKind.letter,
+        id: 'h1',
+        kind: GarbhEntryKind.heard,
         week: 22,
         tsMs: DateTime(2026, 3, 4).millisecondsSinceEpoch,
-        title: const LocalizedText(en: 'A letter', hi: 'A letter'),
+        title: const LocalizedText(en: 'Raga Yaman', hi: 'Raga Yaman'),
       ));
       await _pump(t, const GarbhJournalScreen());
 
@@ -87,9 +90,27 @@ void main() {
       // which costs more than the row not being tappable.
       expect(find.byIcon(Icons.play_circle_outline_rounded), findsNothing);
       final row = t.widget<InkWell>(
-          find.ancestor(of: find.text('A letter'), matching: find.byType(InkWell))
+          find.ancestor(of: find.text('Raga Yaman'), matching: find.byType(InkWell))
               .first);
       expect(row.onTap, isNull);
+    });
+
+    testWidgets('a letter opens, and shows the whole of it (P2 G1)', (t) async {
+      GarbhJournalStore.instance.add(GarbhJournalEntry(
+        id: 'l1',
+        kind: GarbhEntryKind.letter,
+        week: 22,
+        tsMs: DateTime(2026, 3, 4).millisecondsSinceEpoch,
+        title: const LocalizedText(en: 'A letter', hi: 'A letter'),
+        text: 'A letter, and everything after the first line.',
+      ));
+      await _pump(t, const GarbhJournalScreen());
+      expect(find.byIcon(Icons.play_circle_outline_rounded), findsNothing);
+      await t.tap(find.text('A letter').first);
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('garbh_letter_body')), findsOneWidget);
+      expect(find.text('A letter, and everything after the first line.'),
+          findsOneWidget);
     });
   });
 

@@ -775,10 +775,16 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                     color: _accentDeep),
               ),
               const SizedBox(height: 10),
+              // P2 U2 (2026-10-28): "we will let you know" promised a
+              // notification nothing records. The plan stays in the words;
+              // the promise goes. The bilingual pair is kept for revert.
+              //   _t('We are crafting ... but we will let you know the moment it is.',
+              //      'हम आपके बंप सफ़र की किताब ... तैयार होते ही हम आपको बता देंगे।'),
               Text(
-                _t(
-                    'We are crafting a beautiful lay-flat hardcover of your Bump Journey Book - printed on thick matte paper and delivered to your door. It is not quite ready yet, but we will let you know the moment it is.',
-                    'हम आपके बंप सफ़र की किताब का एक सुंदर हार्डकवर तैयार कर रहे हैं - मोटे मैट पेपर पर छपा हुआ, और सीधे आपके घर तक। अभी बस थोड़ा वक़्त और, तैयार होते ही हम आपको बता देंगे।'),
+                'We are crafting a beautiful lay-flat hardcover of your Bump '
+                'Journey Book - printed on thick matte paper and delivered to '
+                'your door. It is not ready yet. Until then, Download PDF '
+                'keeps a copy you can print anywhere.',
                 style: pvManrope(
                     fontSize: 13.5, height: 1.55, color: _ink),
               ),
@@ -787,21 +793,20 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
                 width: double.infinity,
                 child: FilledButton.icon(
                   // Intentionally disabled - no real commerce yet.
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    pvToast(
-                        context,
-                        _t('We will notify you when printed copies are ready.',
-                            'छपी हुई कॉपी तैयार होते ही हम आपको बता देंगे।'));
-                  },
+                  // P2 U2: no promise of a notification. Kept for revert:
+                  //   pvToast(context, _t('We will notify you when printed
+                  //     copies are ready.', 'छपी हुई कॉपी तैयार होते ही हम आपको बता देंगे।'));
+                  onPressed: () => Navigator.pop(ctx),
                   style: FilledButton.styleFrom(
                     backgroundColor: _accentDeep,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
                   ),
-                  icon: const Icon(Icons.notifications_active_rounded, size: 18),
-                  label: Text(_t('Notify me', 'मुझे बता दीजिए'),
+                  // Kept for revert: Icons.notifications_active_rounded,
+                  //   _t('Notify me', 'मुझे बता दीजिए')
+                  icon: const Icon(Icons.check_rounded, size: 18),
+                  label: Text('Got it',
                       style: pvManrope(fontWeight: FontWeight.w700)),
                 ),
               ),

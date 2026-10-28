@@ -46,6 +46,7 @@ class JournalEntry {
     this.tags = const [],
     this.isAutomatic = false,
     this.isPartner = false,
+    this.fromGarbh = false,
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : imageUrl = imageUrl,
@@ -89,6 +90,11 @@ class JournalEntry {
   /// TRANSIENT (never serialized): true when this entry belongs to the paired
   /// partner (the father), surfaced read-only in the mother's merged timeline.
   final bool isPartner;
+
+  /// TRANSIENT (never serialized), P2 D1 (2026-10-28): a Garbh Sanskar
+  /// journal entry shown read-through in this timeline. It lives in
+  /// `GarbhJournalStore`; opening it goes there, and this side never writes it.
+  final bool fromGarbh;
   final DateTime createdAt;
   final DateTime updatedAt;
 

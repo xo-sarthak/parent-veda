@@ -46,9 +46,16 @@ import '../../services/birth_plan_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_chrome.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import 'preg_tool_chrome.dart' show PregToolScaffold, pregToolPad;
+import '../../services/father_preview.dart';
+import '../../services/partner_side.dart';
+import '../../services/pp_use_consent.dart' show PpUseKind;
+import '../post_pregnancy/pp_use_ask_card.dart' show PpUseAskCard;
 import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../v2/v2_palette.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
+import '../../widgets/pv_toast.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The Labour prep door's hue. Passed as a default rather than read from the
@@ -96,8 +103,14 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
     await Share.share(store.summary());
   }
 
+  /// P2 O2 (2026-10-28): on her partner's phone this is HER plan, read-only
+  /// (0118). He used to open an empty plan of his own on his own account.
+  bool get _partnerSide => PartnerSide.following || FatherPreview.instance.on;
+
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
+  Widget build(BuildContext context) => _partnerSide
+      ? _PartnerPlanView(hue: widget.hue)
+      : AnimatedBuilder(
         animation: Listenable.merge([
           BirthPlanStore.instance,
           V2PaletteStore.instance,
@@ -106,16 +119,23 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
           final p = V2PaletteStore.instance.current;
           final store = BirthPlanStore.instance;
 
-          return PvDoorToolScaffold(
+          // P2 W2 (2026-10-28): the shared tool look, as every Tools row.
+          // Kept for revert: `PvDoorToolScaffold(... eyebrow: 'Labour prep'`,
+          // and `pvDoorPad` for `pregToolPad` below.
+          return PregToolScaffold(
             hue: widget.hue,
-            eyebrow: 'Labour prep',
+            eyebrow: 'Get ready',
             title: 'Your birth plan',
+            mark: IntentMark.reportPage,
             intro: 'One page your hospital can read at 3am. '
                 '$kBirthPlanVoice',
-            action: store.isEmpty ? null : _ShareBar(p: p, onTap: _share),
+            // The share bar sits pinned under the scroll: the shared look's
+            // `action` is the one round control opposite Back, not a bar.
+            // Kept for revert: `action: store.isEmpty ? null : _ShareBar(...)`.
+            bottom: store.isEmpty ? null : _ShareBar(p: p, onTap: _share),
             children: [
               for (final s in kBirthPlanSections) ...[
-                pvDoorPad(_SectionCard(
+                pregToolPad(_SectionCard(
                   section: s,
                   hue: widget.hue,
                   p: p,
@@ -132,15 +152,24 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
               // bar is absent, and a screen whose only action has vanished
               // reads as broken. One line says where it went.
               if (store.isEmpty)
-                pvDoorPad(Text(
+                pregToolPad(Text(
                     "Answer whatever you've thought about. Even two answers is "
                     "a plan. A share button appears once there's something "
                     'to send.',
                     // Kept for revert: fontSize 12.5.
                     style: pvManrope(
                         fontSize: kBpLead, height: 1.55, color: p.ink3))),
+              // P2 O1 (2026-10-28): asked once, after there is a plan. The
+              // card hides itself once she answers.
+              if (!store.isEmpty) ...[
+                pregToolPad(const PpUseAskCard(
+                    kind: PpUseKind.pregBirthPlan,
+                    question:
+                        'Add your birth plan to the summary you can show your doctor?')),
+                const SizedBox(height: 18),
+              ],
               if (!store.isEmpty)
-                pvDoorPad(PvPress(child: GestureDetector(
+                pregToolPad(PvPress(child: GestureDetector(
                   onTap: () => _confirmClear(context, p),
                   behavior: HitTestBehavior.opaque,
                   child: Text('Start again',
@@ -150,7 +179,7 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
                           color: p.ink3)),
                 ))),
               const SizedBox(height: 22),
-              pvDoorPad(PvDoorDisclaimer(
+              pregToolPad(PvDoorDisclaimer(
                   p: p,
                   text: "This records what you'd prefer. It isn't medical "
                       'advice, and your hospital may do things differently '
@@ -189,7 +218,17 @@ class _BirthPlanScreenState extends State<BirthPlanScreen> {
         ],
       ),
     );
-    if (yes == true) await BirthPlanStore.instance.clear();
+    // P2 (2026-10-28): clearing a whole plan said nothing and could not be
+    // undone. Kept for revert: `if (yes == true) await ...clear();`
+    if (yes != true) return;
+    final store = BirthPlanStore.instance;
+    final before = store.snapshot();
+    await store.clear();
+    if (!context.mounted) return;
+    pvToast(context, 'Plan cleared.',
+        kind: PvToastKind.undo,
+        action: 'Undo',
+        onAction: () => store.restore(before));
   }
 }
 
@@ -481,4 +520,78 @@ class _ShareBar extends StatelessWidget {
           ),
         )),
       );
+}
+
+// -----------------------------------------------------------------------------
+//  Her partner's phone: her plan, read-only (P2 O2, 2026-10-28)
+// -----------------------------------------------------------------------------
+
+class _PartnerPlanView extends StatefulWidget {
+  const _PartnerPlanView({required this.hue});
+  final double hue;
+
+  @override
+  State<_PartnerPlanView> createState() => _PartnerPlanViewState();
+}
+
+class _PartnerPlanViewState extends State<_PartnerPlanView> {
+  late Future<PartnerBirthPlan> _plan = BirthPlanStore.partnerPlan();
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return FutureBuilder<PartnerBirthPlan>(
+      future: _plan,
+      builder: (context, snap) {
+        final plan = snap.data;
+        final text = plan?.text;
+        final note = switch (plan?.state) {
+          null => 'Loading her plan.',
+          PartnerPlanState.plan => null,
+          PartnerPlanState.empty =>
+            "She hasn't started her birth plan yet. When she does, it shows "
+                'here for you to read.',
+          PartnerPlanState.notLinked =>
+            'Link your app with hers to read her birth plan here.',
+          PartnerPlanState.unreachable =>
+            "Her plan couldn't be loaded just now. Check your connection and "
+                'try again.',
+        };
+        return PregToolScaffold(
+          hue: widget.hue,
+          eyebrow: 'Get ready',
+          title: 'Her birth plan',
+          mark: IntentMark.reportPage,
+          intro: 'What she would like on the day. It is hers to change; you '
+              'can read it and talk it through together.',
+          bottom: text == null
+              ? null
+              : _ShareBar(p: p, onTap: () => Share.share(text)),
+          children: [
+            if (note != null)
+              pregToolPad(Text(note,
+                  style: pvManrope(
+                      fontSize: kBpLead, height: 1.55, color: p.ink3))),
+            if (plan?.state == PartnerPlanState.unreachable)
+              pregToolPad(TextButton(
+                  onPressed: () =>
+                      setState(() => _plan = BirthPlanStore.partnerPlan()),
+                  child: const Text('Try again'))),
+            if (text != null)
+              pregToolPad(SelectableText(text,
+                  key: const ValueKey('partner_birth_plan'),
+                  style: pvManrope(
+                      fontSize: kBpBody, height: 1.6, color: p.ink1))),
+            const SizedBox(height: 22),
+            pregToolPad(PvDoorDisclaimer(
+                p: p,
+                text: "This records what she'd prefer. It isn't medical "
+                    'advice, and the hospital may do things differently on '
+                    'the day. Her doctor knows her pregnancy.')),
+            const SizedBox(height: 64),
+          ],
+        );
+      },
+    );
+  }
 }

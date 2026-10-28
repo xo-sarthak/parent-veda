@@ -28,6 +28,7 @@ import '../../services/dear_baby_vault_store.dart';
 import '../../services/family_profile.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/bump_store.dart';
+import '../../services/father_preview.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/pv_order_store.dart';
 import '../../services/saved_store.dart';
@@ -516,9 +517,15 @@ PvYouThing _pregJournal() => PvYouThing(
   icon: Icons.edit_note_rounded,
   art: ttcArtTab(TtcTabMark.openBook),
   title: 'Journal',
+  // P2 J4 (2026-10-28): with no pregnancy loaded the tap did nothing.
+  // Kept for revert: `if (ctl != null) _push(...);` alone.
   open: (c) {
     final ctl = PregnancyController.current;
-    if (ctl != null) _push(c, JournalScreen(controller: ctl), 'journal');
+    if (ctl == null) {
+      pvToast(c, 'Your journal opens once your pregnancy has loaded. Try again in a moment.');
+      return;
+    }
+    _push(c, JournalScreen(controller: ctl), 'journal');
   },
 );
 
@@ -528,9 +535,19 @@ PvYouThing _bumpJourney() => PvYouThing(
   title: 'Bump journey',
   subtitle: 'One photo a week, kept in order',
   count: () => BumpStore.instance.count,
+  // P2 U7 (2026-10-28): the hub keeps her bump photos hers in the partner
+  // preview; this way in did not. And no silent tap (J4).
   open: (c) {
+    if (FatherPreview.instance.on) {
+      pvToast(c, 'Her bump photos are hers. Your own journal is on your Tools tab.');
+      return;
+    }
     final ctl = PregnancyController.current;
-    if (ctl != null) _push(c, BumpRitualScreen(controller: ctl), 'bump');
+    if (ctl == null) {
+      pvToast(c, 'Your bump book opens once your pregnancy has loaded. Try again in a moment.');
+      return;
+    }
+    _push(c, BumpRitualScreen(controller: ctl), 'bump');
   },
 );
 

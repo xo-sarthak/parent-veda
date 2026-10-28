@@ -344,7 +344,10 @@ class _NameListScreenState extends State<NameListScreen> {
         ),
         // large, labelled like target - no gesture required
         PvPress(child: GestureDetector(
-          onTap: () => NameMatchStore.instance.like(n.name),
+          // P2 W4 (2026-10-28): it could only like, silently; a second tap did
+          // nothing. The shared toggle unlikes too and says which. Kept for
+          // revert: `onTap: () => NameMatchStore.instance.like(n.name),`
+          onTap: () => ppToggleNameLike(context, n.name),
           behavior: HitTestBehavior.opaque,
           child: Semantics(
             button: true,

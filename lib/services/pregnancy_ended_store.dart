@@ -31,6 +31,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'auth/pending_profile.dart';
 import 'life_stage_store.dart';
 import 'partner_side.dart';
+import 'pregnancy_controller.dart';
 import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 
@@ -210,4 +211,16 @@ class PregnancyEndedStore extends ChangeNotifier {
     _ended = false;
     _endedAt = null;
   }
+}
+
+/// The week the pregnancy ended, or null while it goes on (P2, 2026-10-28).
+/// Worked out from the due date, the same way every week is, so the Journal
+/// and Bump stop their week clocks at the same place.
+int? pregnancyEndWeek(PregnancyController p) {
+  final store = PregnancyEndedStore.instance;
+  final at = store.ended ? store.endedAt : null;
+  if (at == null) return null;
+  final start =
+      p.dueDate.subtract(const Duration(days: PregnancyController.termDays));
+  return (at.difference(start).inDays ~/ 7 + 1).clamp(1, 42);
 }

@@ -66,7 +66,10 @@ import '../screens/tools/ready_for_birth_screen.dart';
 import '../screens/tools/spiritual_reading_screen.dart';
 import '../screens/tools/weight_tracker_screen.dart';
 import '../services/bracket_resolver.dart' show bracketById;
+import '../services/father_preview.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/pregnancy_ended_store.dart';
+import '../widgets/pv_toast.dart';
 
 const String kPvVedaReadPrefix = 'pvread_';
 const String kPvVedaFaqPrefix = 'pvfaq_';
@@ -192,11 +195,35 @@ final List<PvVedaTool> kPvVedaTools = [
   PvVedaTool('bump', (s) => s.bumpTitle, 'A photo of your bump, week by week',
       'tools/bump', (c) => BumpRitualScreen(controller: c),
       keywords: const ['bump photo']),
+  // P2 S2/W5 (2026-10-28): no audio, so no "to hear"; and "garbh sanskar" /
+  // "mantra" belong to the Garbh door, which quotes no scripture here.
+  // Takes effect in Ask Veda at the next corpus export and ingest. Kept for
+  // revert: 'Short readings to hear, or to read aloud',
+  //   keywords: const ['garbh sanskar', 'mantra', 'stories']
   PvVedaTool('spiritual_reading', (s) => s.sprToolTitle,
-      'Short readings to hear, or to read aloud', 'tools/spiritual_reading',
+      'Short readings from six faiths, for a quiet moment',
+      'tools/spiritual_reading',
       (c) => SpiritualReadingScreen(controller: c),
-      keywords: const ['garbh sanskar', 'mantra', 'stories']),
+      keywords: const ['prayer', 'faith', 'stories']),
 ];
+
+/// Why a tool link does not open right now, or null when it does: the same
+/// two rules as the Tools hub. Her bump photos are hers in the partner
+/// preview, and Get ready steps aside after a loss (R3).
+String? pvVedaToolStepsAside(String id) {
+  if (id == 'bump' && FatherPreview.instance.on) {
+    return 'Her bump photos are hers. Your own journal is on your Tools tab.';
+  }
+  const getReady = {
+    'hospital_bag', 'birth_plan', 'contractions', 'due_date',
+    'product_checklist',
+  };
+  if (getReady.contains(id) && PregnancyEndedStore.instance.ended) {
+    return 'This steps aside after a loss. It comes back if you go back to '
+        'your pregnancy view.';
+  }
+  return null;
+}
 
 PvVedaTool? pvVedaToolById(String id) {
   for (final t in kPvVedaTools) {
@@ -295,6 +322,12 @@ bool openPvVedaDoc(BuildContext context, String docId, PregnancyController c) {
             PvDoorScreen(page: t.page!, bracket: bracket, pregnancy: c),
       ));
     case _Kind.tool:
+      // P2 W3 (2026-10-28): the hub's own rules hold here too, said in words
+      // rather than a silent tap.
+      if (pvVedaToolStepsAside(t.tool!.id) case final why?) {
+        pvToast(context, why);
+        return true;
+      }
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: RouteSettings(name: t.tool!.route),
         builder: (_) => t.tool!.build(c),

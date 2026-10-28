@@ -55,13 +55,16 @@ void main() {
   });
 
   group('D5: Pregnancy consent kinds live in PpUseConsent', () {
-    test('four Pregnancy kinds, each with a label, a why and a stage', () {
+    // Five since P2 O1 (2026-10-28): pregBirthPlan, the birth plan in the
+    // doctor-visit summary.
+    test('five Pregnancy kinds, each with a label, a why and a stage', () {
       final preg = PpUseKind.values.where((k) => k.stage == LifeStage.pregnancy);
       expect(preg.map((k) => k.name), [
         'pregReadings',
         'pregConditions',
         'pregReports',
         'pregDoctorCalls',
+        'pregBirthPlan',
       ]);
       for (final k in preg) {
         expect(k.label, isNotEmpty);

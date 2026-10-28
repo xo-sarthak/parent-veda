@@ -15,6 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/garbh_rebuild_data.dart';
 import '../data/journey_milestones.dart';
 import '../localization/app_language.dart';
 import '../models/journal_entry.dart';
@@ -25,6 +26,7 @@ import 'remote/supabase_repo.dart';
 import 'remote/sync_registry.dart';
 import 'journal_sync.dart';
 import 'journal_key_split.dart';
+import 'pregnancy_ended_store.dart';
 import 'pregnancy_records.dart';
 import 'tools_store.dart';
 
@@ -369,15 +371,14 @@ class JournalStore extends ChangeNotifier implements PregnancyScopedStore {
     notifyListeners();
   }
 
-  Future<void> deleteEntry(String id) async {
-    for (final x in _manual.where((x) => x.id == id)) {
-      for (final p in [...x.images, ...x.audios]) {
-        if (p.isEmpty) continue;
-        try {
-          final f = File(p);
-          if (f.existsSync()) f.deleteSync();
-        } catch (_) {}
-        await StorageService.remove(p);
+  ///
+  /// [keepFiles] (P2 J2, 2026-10-28): the screen offers Undo, so the photos
+  /// and voice notes must outlive the row until the Undo is gone; it then
+  /// calls [discardFiles]. Same order as `garbhDeleteJournalEntry`.
+  Future<void> deleteEntry(String id, {bool keepFiles = false}) async {
+    if (!keepFiles) {
+      for (final x in _manual.where((x) => x.id == id)) {
+        await discardFiles(x);
       }
     }
     _manual.removeWhere((x) => x.id == id);
@@ -393,6 +394,25 @@ class JournalStore extends ChangeNotifier implements PregnancyScopedStore {
         await _persist();
       } catch (_) {/* offline — the tombstone finishes it on the next sync */}
     }
+  }
+
+  /// The files behind a deleted entry, on this phone and in Storage.
+  Future<void> discardFiles(JournalEntry x) async {
+    for (final p in [...x.images, ...x.audios]) {
+      if (p.isEmpty) continue;
+      try {
+        final f = File(p);
+        if (f.existsSync()) f.deleteSync();
+      } catch (_) {}
+      await StorageService.remove(p);
+    }
+  }
+
+  /// Undo of a delete: the same id comes back, so its tombstone must go
+  /// first, or the next sync would delete it again.
+  Future<void> restoreEntry(JournalEntry e) async {
+    _tombstones.remove(e.id);
+    await addEntry(e);
   }
 
   /// Replace a manual entry (same id) with an edited copy.
@@ -482,6 +502,7 @@ class JournalStore extends ChangeNotifier implements PregnancyScopedStore {
     if (showPartnerEntries) list.addAll(_partner.where(now));
     list.addAll(_autoMilestones(p));
     list.addAll(_autoHealth(p, s));
+    list.addAll(journalFromGarbh());
     list.sort((a, b) => b.date.compareTo(a.date));
     return list;
   }
@@ -499,6 +520,82 @@ class JournalStore extends ChangeNotifier implements PregnancyScopedStore {
   // the journal and the Pregnancy Map stay in sync. Medical scans and
   // feature-unlock nodes are intentionally excluded (scans fill from real logs
   // later; the spec forbids feature/product achievements in the journal).
+  /// P2 D1 (c), 2026-10-28: ONE JOURNAL TO LOOK IN, NO DATA MOVED.
+  ///
+  /// Garbh Sanskar keeps its own store and table (her voice, family voices,
+  /// letters, what the baby heard); before this, nothing she made there showed
+  /// in "My Journal", though both carry that name. They come in read-through,
+  /// the fifth source beside hers, the partner's and the two automatic ones,
+  /// already scoped to this pregnancy by `GarbhJournalStore.entries`.
+  ///
+  /// ⚠️ "HEARD" FOLDS TO ONE ROW A WEEK. One is written per finished daily
+  /// listen (`garbh_shravan_surfaces.dart`), so one row each would bury her
+  /// own memories under a playlist.
+  ///
+  /// The trade-off: this timeline now depends on the Garbh entry's shape.
+  /// `test/journal_garbh_merge_test.dart` pins the mapping.
+  @visibleForTesting
+  List<JournalEntry> journalFromGarbh() {
+    final out = <JournalEntry>[];
+    final heard = <int, List<GarbhJournalEntry>>{};
+    for (final g in GarbhJournalStore.instance.entries) {
+      final at = DateTime.fromMillisecondsSinceEpoch(g.tsMs);
+      final path = g.path;
+      switch (g.kind) {
+        case GarbhEntryKind.heard:
+          heard.putIfAbsent(g.week, () => []).add(g);
+        case GarbhEntryKind.myVoice || GarbhEntryKind.familyVoice:
+          out.add(JournalEntry(
+            id: 'garbh_${g.id}',
+            type: JournalEntryType.voice,
+            title: g.title.en,
+            description: g.relationship ?? '',
+            date: at,
+            weekNumber: g.week,
+            audioUrls: path == null ? const [] : [path],
+            fromGarbh: true,
+          ));
+        case GarbhEntryKind.letter:
+          out.add(JournalEntry(
+            id: 'garbh_${g.id}',
+            type: JournalEntryType.noteForBaby,
+            title: 'A letter',
+            description: g.text ?? g.title.en,
+            date: at,
+            weekNumber: g.week,
+            fromGarbh: true,
+          ));
+        case GarbhEntryKind.photo:
+          out.add(JournalEntry(
+            id: 'garbh_${g.id}',
+            type: JournalEntryType.photo,
+            title: g.title.en,
+            date: at,
+            weekNumber: g.week,
+            imageUrls: path == null ? const [] : [path],
+            fromGarbh: true,
+          ));
+      }
+    }
+    for (final e in heard.entries) {
+      final list = e.value..sort((a, b) => b.tsMs.compareTo(a.tsMs));
+      final names = {for (final g in list) g.title.en}.toList();
+      out.add(JournalEntry(
+        id: 'garbh_heard_w${e.key}',
+        type: JournalEntryType.custom,
+        customTag: 'Garbh Sanskar',
+        title: list.length == 1
+            ? 'Played: ${names.first}'
+            : '${list.length} pieces played this week',
+        description: names.join(', '),
+        date: DateTime.fromMillisecondsSinceEpoch(list.first.tsMs),
+        weekNumber: e.key,
+        fromGarbh: true,
+      ));
+    }
+    return out;
+  }
+
   List<JournalEntry> _autoMilestones(PregnancyController p) {
     final lang = p.language;
     final currentDay = p.currentDay;
@@ -515,6 +612,12 @@ class JournalStore extends ChangeNotifier implements PregnancyScopedStore {
       if (m.posDay > currentDay) continue;
       var date = p.dueDate.subtract(
           Duration(days: (PregnancyController.termDays - m.posDay).round()));
+      // P2 J1 (2026-10-28): after a loss the baby's milestones stop at the
+      // day it ended; they kept arriving week after week.
+      final endedAt = PregnancyEndedStore.instance.ended
+          ? PregnancyEndedStore.instance.endedAt
+          : null;
+      if (endedAt != null && date.isAfter(endedAt)) continue;
       if (date.isAfter(now)) date = now;
       var desc = '';
       for (final sec in m.sections) {
