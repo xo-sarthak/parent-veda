@@ -31,6 +31,7 @@ import '../../ttc/ttc_care_pathway.dart' show TimingOwnership;
 import '../../ttc/ttc_store.dart' show TtcStore;
 import '../../theme/pv_fonts.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
 import '../learn/pv_offering_screen.dart' show pvOpenOffering;
 
 /// Topic words a read and an offering can share. Lower case, whole words.
@@ -162,6 +163,18 @@ bool pvReadClinicOwnsCycleNow() {
   }
 }
 
+/// The child's age for a Parenting offer, in months: corrected age, the
+/// content rule (PARENTING-GAP §0). Null with no real child saved, or when
+/// the store cannot say (local-first: then no age filter, as before).
+int? pvReadChildMonthsNow() {
+  try {
+    final c = ChildProfileStore.instance;
+    return c.hasRealChild ? c.devAgeInMonths : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 /// The one offering that fits [r], or null.
 ///
 /// ⚠️ NO DOCTOR PITCH MID-ROUND (relevance Batch 4, TTC 15, 2026-10-28). With
@@ -170,8 +183,13 @@ bool pvReadClinicOwnsCycleNow() {
 /// fallback. A psychologist, a nutrition consult or a course (an IVF course
 /// included: it helps her prepare) still can, because they sit beside her
 /// clinic rather than in its place.
+///
+/// ⚠️ NOT FOR ANOTHER AGE (relevance PP 8, 2026-10-28). With [childMonths] a
+/// Parenting read never offers a programme made for a different age: "The
+/// First 40 Days" on a toddler's read is the pitch that does not fit, and
+/// no card is better than that one. A programme with no age set still can.
 PvOfferingView? pvReadOfferFor(PvRead r,
-    {List<PvOfferingView>? catalog, bool clinicOwnsCycle = false}) {
+    {List<PvOfferingView>? catalog, bool clinicOwnsCycle = false, int? childMonths}) {
   final stage = _stageOf(r);
   if (stage == null) return null;
   final read = _words('${r.title.en} ${r.kicker.en} ${r.teaser.en}');
@@ -197,6 +215,9 @@ PvOfferingView? pvReadOfferFor(PvRead r,
     all = catalog ?? PvLearnCatalog.instance.all(stage: stage);
   } catch (_) {
     return null; // local-first: a catalogue that is not ready is no card
+  }
+  if (childMonths != null && stage == LifeStage.parenting) {
+    all = [for (final v in all) if (v.fitsAge(childMonths)) v];
   }
   if (clinicOwnsCycle && stage == LifeStage.tryingToConceive) {
     all = [

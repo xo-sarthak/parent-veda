@@ -84,3 +84,53 @@ List<String> ppTileOrder(
   });
   return [for (final x in indexed) x.$2];
 }
+
+/// Why the grid is not in the age order (relevance PP 9, 2026-10-28): one
+/// line for the highest tile HER answers lifted, in item 12's words. Null
+/// when only age moved tiles: every child that age sees that order, so there
+/// is nothing about her to explain. [label] names a door id on screen.
+///
+/// A tile can only rise through its own bonus (every bonus is positive), so a
+/// tile that sits earlier than it would by age alone was lifted by her.
+String? ppTileWhy(
+  List<String> ids, {
+  required int ageInDays,
+  required String Function(String id) label,
+  Set<Priority> priorities = const {},
+  BirthMode? birthMode,
+  Set<PpSignal> signals = const {},
+}) {
+  final hers = ppTileOrder(ids,
+      ageInDays: ageInDays, priorities: priorities, birthMode: birthMode, signals: signals);
+  final byAge = ppTileOrder(ids, ageInDays: ageInDays);
+  for (var i = 0; i < hers.length; i++) {
+    final id = hers[i];
+    if (i >= byAge.indexOf(id)) continue;
+    final because = _tileBecause(id, ageInDays, priorities, birthMode, signals);
+    if (because == null) continue;
+    // A grid has no single "here", so the tile is named: item 12's words with
+    // the door in front ("Sleep is first here, because ...").
+    return i == 0
+        ? '${label(id)} is first here, because $because.'
+        : '${label(id)} moved up, because $because.';
+  }
+  return null;
+}
+
+String? _tileBecause(String id, int days, Set<Priority> priorities, BirthMode? birthMode, Set<PpSignal> signals) {
+  for (final p in priorities) {
+    if (_kPriorityDoor[p] == id) return 'you chose ${p.label.toLowerCase()} in your family setup';
+  }
+  if (id == 'parenting_maternal' && birthMode == BirthMode.cSection && days < 90) {
+    return 'you are recovering from a C-section';
+  }
+  if (id == 'parenting_development' && signals.contains(PpSignal.bornEarly)) {
+    return 'your baby was born early';
+  }
+  if (id == 'parenting_feeding' &&
+      days < 365 &&
+      (signals.contains(PpSignal.formula) || signals.contains(PpSignal.breastfeeding))) {
+    return 'of how your baby feeds';
+  }
+  return null;
+}

@@ -58,15 +58,54 @@ class PpChange {
     ];
   }
 
-  bool matches(String text) {
-    final t = text.toLowerCase();
-    return words.any(t.contains);
-  }
+  // Kept for revert (relevance PP 19, 2026-10-28):
+  // bool matches(String text) {
+  //   final t = text.toLowerCase();
+  //   return words.any(t.contains);
+  // }
+
+  /// ⚠️ WHOLE WORDS, NOT ANY SUBSTRING (relevance PP 19, 2026-10-28). Was
+  /// `text.contains(word)`, so fever's "hot" matched "vaccine shots", "ear"
+  /// matched "year" and "early", and "red" matched "bored". A concern's own
+  /// keywords now match whole words or phrases; an area word is a STEM
+  /// ("settl", "wak", "constipat") and matches the start of a word.
+  bool matches(String text) => ppMatchesWords(text, keywords: keywords, stems: stems);
+
+  /// The concern's own keywords: the precise words. With [keywordsOnly] a
+  /// match must come from these, which is what lifts a page INTO a set
+  /// (pp_home_reads.dart): the area's broad stems would let "babbling less"
+  /// lift a walking page through Development's "walk".
+  bool matchesKeyword(String text) => ppMatchesWords(text, keywords: keywords);
+
+  List<String> get keywords => [...?concern?.keywords.map((k) => k.toLowerCase())];
+  List<String> get stems => [...?kPpChangeAreaWords[concern?.category]];
+
+  /// How the change is named on a card. A fever saved by Fever check may be
+  /// 39.4 C, so it is "a fever", not the list's "warm / low-grade fever".
+  String get name => kPpChangeShortName[concernId] ?? (concern?.label ?? concernId).toLowerCase();
 
   /// The words a moved card shows: "Because you said: waking every 2 hours".
-  String get why => 'Because you said: ${(concern?.label ?? concernId).toLowerCase()}';
+  // Kept for revert: String get why => 'Because you said: ${(concern?.label ?? concernId).toLowerCase()}';
+  String get why => 'Because you said: $name';
 
   Map<String, Object?> toJson() => {'at': at.toIso8601String(), 'tone': tone.name};
+}
+
+/// A card's name for a change whose list label would be wrong there.
+const Map<String, String> kPpChangeShortName = {'low_fever': 'a fever'};
+
+/// True when [text] holds one of [keywords] as a whole word or phrase, or a
+/// word that starts with one of [stems]. Lower-case inputs.
+bool ppMatchesWords(String text, {List<String> keywords = const [], List<String> stems = const []}) {
+  final t = ' ${text.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), ' ')} ';
+  for (final k in keywords) {
+    final w = k.replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
+    if (w.isNotEmpty && t.contains(' $w ')) return true;
+  }
+  for (final s in stems) {
+    if (s.isNotEmpty && t.contains(' $s')) return true;
+  }
+  return false;
 }
 
 /// The words of each What changed area, as they appear in page titles. Short
@@ -77,7 +116,10 @@ const Map<String, List<String>> kPpChangeAreaWords = {
   'Illness': ['fever', 'cough', 'cold', 'unwell', 'sick', 'temperature'],
   'Mood': ['cry', 'fuss', 'calm', 'colic', 'clingy', 'soothe'],
   'Skin': ['rash', 'skin', 'eczema', 'nappy'],
-  'Tummy': ['tummy', 'poo', 'constipat', 'vomit', 'reflux', 'wind', 'gas'],
+  // Not 'wind' (PP 19): as a stem it matches "window". The gassy concern
+  // keeps it as a whole-word keyword. Kept for revert:
+  // 'Tummy': ['tummy', 'poo', 'constipat', 'vomit', 'reflux', 'wind', 'gas'],
+  'Tummy': ['tummy', 'poo', 'constipat', 'vomit', 'reflux', 'gas'],
   'Teething': ['teeth', 'teething', 'gum'],
   'Behaviour': ['tantrum', 'behaviour', 'hitting', 'biting'],
   'Development': ['milestone', 'development', 'crawl', 'walk', 'talk'],

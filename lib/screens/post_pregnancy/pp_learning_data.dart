@@ -93,6 +93,8 @@ class LearningProgram {
     this.takeaways = const [],
     this.featured = false,
     this.recency = 0,
+    this.ageFromMonths,
+    this.ageToMonths,
   });
 
   final String id;
@@ -129,6 +131,17 @@ class LearningProgram {
 
   final bool featured; // pinned to the top of the grid
   final int recency; // higher = newer; ties broken by list order
+
+  /// The child's ages it is for, in months, both ends included (relevance
+  /// PP 8, 2026-10-28). Null on both = every age, like an expert. A published
+  /// programme carries it as `age_from_months` / `age_to_months` (0124).
+  final int? ageFromMonths;
+  final int? ageToMonths;
+
+  /// Suits a child of [months]. True when no window is set.
+  bool fitsAge(int months) =>
+      (ageFromMonths == null || months >= ageFromMonths!) &&
+      (ageToMonths == null || months <= ageToMonths!);
 
   // --- derived -----------------------------------------------------------
   Expert get instructor => expertById(instructorId);
@@ -276,6 +289,8 @@ const List<LearningProgram> kLearningPrograms = [
   // ===== LIVE MASTERCLASS (the featured live event) =======================
   LearningProgram(
     id: 'mc_sleepreg',
+    ageFromMonths: 3, // PP 8: the ages it is for
+    ageToMonths: 6,
     kind: LearningKind.masterclass,
     instructorId: 'ananya',
     title: 'The 4-Month Sleep Regression, Solved',
@@ -324,6 +339,8 @@ const List<LearningProgram> kLearningPrograms = [
   // ===== LIVE COHORT (featured) ===========================================
   LearningProgram(
     id: 'co_sleep',
+    ageFromMonths: 4, // PP 8: the ages it is for
+    ageToMonths: 24,
     kind: LearningKind.liveCohort,
     instructorId: 'meher',
     title: 'Sleep Bootcamp',
@@ -375,6 +392,8 @@ const List<LearningProgram> kLearningPrograms = [
   // ===== MORE LIVE COHORTS ================================================
   LearningProgram(
     id: 'co_weaning',
+    ageFromMonths: 5, // PP 8: the ages it is for
+    ageToMonths: 12,
     kind: LearningKind.liveCohort,
     instructorId: 'ritu',
     title: 'Confident Weaning',
@@ -396,6 +415,8 @@ const List<LearningProgram> kLearningPrograms = [
   ),
   LearningProgram(
     id: 'co_calm',
+    ageFromMonths: 0, // PP 8: the ages it is for
+    ageToMonths: 3,
     kind: LearningKind.liveCohort,
     instructorId: 'kabir',
     title: 'Calm Parent, Calm Baby',
@@ -418,6 +439,8 @@ const List<LearningProgram> kLearningPrograms = [
   // an in-progress cohort - demonstrates the locked "Cohort in progress" CTA
   LearningProgram(
     id: 'co_gentlenights',
+    ageFromMonths: 4, // PP 8: the ages it is for
+    ageToMonths: 24,
     kind: LearningKind.liveCohort,
     instructorId: 'meher',
     title: 'Gentle Nights · July cohort',
@@ -440,6 +463,8 @@ const List<LearningProgram> kLearningPrograms = [
   // ===== RECORDED MASTERCLASSES ==========================================
   LearningProgram(
     id: 'mc_solids',
+    ageFromMonths: 5, // PP 8: the ages it is for
+    ageToMonths: 12,
     kind: LearningKind.masterclass,
     instructorId: 'ritu',
     title: 'Starting solids without the stress',
@@ -463,6 +488,8 @@ const List<LearningProgram> kLearningPrograms = [
   ),
   LearningProgram(
     id: 'mc_wonderweeks',
+    ageFromMonths: 0, // PP 8: the ages it is for
+    ageToMonths: 20,
     kind: LearningKind.masterclass,
     instructorId: 'kabir',
     title: 'Understanding the fussy stretches',
@@ -486,6 +513,8 @@ const List<LearningProgram> kLearningPrograms = [
   ),
   LearningProgram(
     id: 'mc_babyproof',
+    ageFromMonths: 5, // PP 8: the ages it is for
+    ageToMonths: 36,
     kind: LearningKind.masterclass,
     instructorId: 'meera',
     title: 'Baby-proofing for joint families',
@@ -510,6 +539,8 @@ const List<LearningProgram> kLearningPrograms = [
   // a completed recorded masterclass - demonstrates the "Buy recorded" CTA
   LearningProgram(
     id: 'mc_first40',
+    ageFromMonths: 0, // PP 8: the ages it is for
+    ageToMonths: 2,
     kind: LearningKind.masterclass,
     instructorId: 'neha',
     title: 'The First 40 Days',
@@ -535,6 +566,8 @@ const List<LearningProgram> kLearningPrograms = [
   // ===== RECORDED FOCUSED COURSES (wrap the old Course model) =============
   LearningProgram(
     id: 'rc_playbrain',
+    ageFromMonths: 3, // PP 8: the ages it is for
+    ageToMonths: 6,
     kind: LearningKind.recordedCourse,
     instructorId: 'ananya',
     title: 'Play & Brain',
@@ -553,6 +586,8 @@ const List<LearningProgram> kLearningPrograms = [
   ),
   LearningProgram(
     id: 'rc_motor',
+    ageFromMonths: 2, // PP 8: the ages it is for
+    ageToMonths: 12,
     kind: LearningKind.recordedCourse,
     instructorId: 'meher',
     title: 'Motor Skills',
@@ -571,6 +606,8 @@ const List<LearningProgram> kLearningPrograms = [
   ),
   LearningProgram(
     id: 'rc_language',
+    ageFromMonths: 3, // PP 8: the ages it is for
+    ageToMonths: 12,
     kind: LearningKind.recordedCourse,
     instructorId: 'kabir',
     title: 'Language & Communication',
@@ -589,6 +626,8 @@ const List<LearningProgram> kLearningPrograms = [
   ),
   LearningProgram(
     id: 'rc_sleep',
+    ageFromMonths: 3, // PP 8: the ages it is for
+    ageToMonths: 6,
     kind: LearningKind.recordedCourse,
     instructorId: 'meher',
     title: 'Baby Sleep, Understood',

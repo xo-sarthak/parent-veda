@@ -199,6 +199,8 @@ class PvOfferingView {
     this.recordingIncluded = false,
     this.featured = false,
     this.recency = 0,
+    this.ageFromMonths,
+    this.ageToMonths,
   });
 
   /// The catalogue id — what facades look up by, and what `Offering.catalogId`
@@ -249,6 +251,19 @@ class PvOfferingView {
   final bool recordingIncluded;
   final bool featured;
   final int recency;
+
+  /// The child's ages it is for, in months, both ends included (relevance
+  /// PP 8). Null on both = every age: experts, and anything not yet given one.
+  final int? ageFromMonths;
+  final int? ageToMonths;
+
+  /// Suits a child of [months]. True when no window is set.
+  bool fitsAge(int months) =>
+      (ageFromMonths == null || months >= ageFromMonths!) &&
+      (ageToMonths == null || months <= ageToMonths!);
+
+  /// Has a window at all.
+  bool get hasAgeWindow => ageFromMonths != null || ageToMonths != null;
 
   bool get isFree => priceMinor <= 0;
   bool get isLive =>

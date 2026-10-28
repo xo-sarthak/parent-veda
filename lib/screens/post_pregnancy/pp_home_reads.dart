@@ -96,7 +96,15 @@ List<PpHomeRead> ppHomeDoorReads(int n, {int? day, PpSituation? situation}) {
     [
       for (final door in tagged)
         for (final r in door)
-          if (sit.signalFor(r.page.title, [r.page.id]) != null && !out.any((o) => o.page.id == r.page.id)) r,
+          // What she told us lifts too (PP 4, 2026-10-28): was signals only,
+          // so an answer reordered the three but never brought its page in.
+          // Matched on the concern's own keywords, not its area's stems.
+          // Kept for revert:
+          // if (sit.signalFor(r.page.title, [r.page.id]) != null && !out.any((o) => o.page.id == r.page.id)) r,
+          if ((sit.signalFor(r.page.title, [r.page.id]) != null ||
+                  sit.changes.any((c) => c.matchesKeyword(r.page.title))) &&
+              !out.any((o) => o.page.id == r.page.id))
+            r,
     ],
     situation: sit,
     text: (r) => r.page.title,

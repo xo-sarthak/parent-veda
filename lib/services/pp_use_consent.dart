@@ -60,7 +60,9 @@ extension PpUseKindText on PpUseKind {
   String get label => switch (this) {
         PpUseKind.feeds => 'Your feed log',
         PpUseKind.nappies => 'Your nappy log',
-        PpUseKind.changes => 'What you tell Is my baby OK?',
+        // Fever check keeps a "see a doctor" answer under the same yes (Step 3b).
+        // Kept for revert: PpUseKind.changes => 'What you tell Is my baby OK?',
+        PpUseKind.changes => 'What you tell Is my baby OK? and Fever check',
         PpUseKind.development => 'Milestones and check-in answers',
         PpUseKind.foods => 'Foods tried',
         PpUseKind.pregReadings => 'Your blood pressure and sugar readings',
@@ -105,8 +107,11 @@ extension PpUseKindText on PpUseKind {
             'and to fill in the newborn feeding check for you.',
         PpUseKind.nappies => 'We use it to fill in the newborn feeding check '
             'for you, so you only confirm the count.',
-        PpUseKind.changes => 'We remember it for three weeks and move pages and '
-            'activities about it up on your home.',
+        // PP 4 (2026-10-28): activities move only when one fits. Kept for
+        // revert: 'We remember it for three weeks and move pages and '
+        //     'activities about it up on your home.',
+        PpUseKind.changes => 'We remember it for three weeks and move pages '
+            'about it up on your home, and activities too when one fits.',
         PpUseKind.development => 'We add the milestones you have seen, and anything '
             'the check-in marked "not yet", to Before you see the doctor, '
             'so the questions are ready when you go.',

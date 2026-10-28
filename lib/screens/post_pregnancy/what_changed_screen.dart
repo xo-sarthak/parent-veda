@@ -504,7 +504,9 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
               const SizedBox(height: 2),
               Text(
                   _kept
-                      ? 'Pages and activities about it move up on your home. Clear it any time.'
+                      // PP 4: activities move only when one fits the concern.
+                      // Kept for revert: 'Pages and activities about it move up on your home. Clear it any time.'
+                      ? 'Pages about it move up on your home, and activities too when one fits. Clear it any time.'
                       : 'Your home stays as it was.',
                   style: pvManrope(fontSize: 12, height: 1.45, color: p.ink2)),
             ]),

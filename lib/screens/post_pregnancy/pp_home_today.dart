@@ -163,7 +163,8 @@ class PpUrgentFollowUpCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final alert = ppAlertInk(p);
-    final what = (change.concern?.label ?? change.concernId).toLowerCase();
+    // Kept for revert: final what = (change.concern?.label ?? change.concernId).toLowerCase();
+    final what = change.name;
     final name = childName.isEmpty ? 'your baby' : childName;
     return Material(
       key: const ValueKey('pp_home_urgent'),
@@ -297,9 +298,13 @@ class PpFirstActivityCard extends StatelessWidget {
     required this.onOpen,
     required this.onDone,
     required this.onSwap,
+    this.why,
   });
 
   final DevActivity activity;
+
+  /// "Because you said: ..." when what she told us raised it (PP 4).
+  final String? why;
   final Widget leading;
   final bool done;
   final V2Palette p;
@@ -334,6 +339,10 @@ class PpFirstActivityCard extends StatelessWidget {
                           fontSize: 17, fontWeight: FontWeight.w600, height: 1.2, color: done ? p.ink2 : p.ink1)),
                   const SizedBox(height: 2),
                   Text(a.metaLine, style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),
+                  if (why case final w?) ...[
+                    const SizedBox(height: 4),
+                    KeyedSubtree(key: ValueKey('pp_home_activity_why_${a.id}'), child: _why(w, p)),
+                  ],
                 ]),
               ),
               Semantics(

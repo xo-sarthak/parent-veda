@@ -257,6 +257,9 @@ class PvLearnCatalog {
       recordingIncluded: kind == PvLearnKind.masterclass && !live,
       featured: p.featured,
       recency: p.recency,
+      // The child's ages it is for (relevance PP 8, 2026-10-28).
+      ageFromMonths: p.ageFromMonths,
+      ageToMonths: p.ageToMonths,
     );
   }
 

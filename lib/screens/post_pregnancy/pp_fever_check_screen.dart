@@ -34,8 +34,24 @@
 //  including a normal one. Asking for the number first would let a reassuring
 //  reading answer a question the number cannot answer.
 //
-//  ⚠️ NOTHING IS SAVED, and there is no history. A record of past fevers invites
-//  comparison, and comparison is not how this decision is made.
+//  ⚠️ NO TEMPERATURE IS SAVED, and there is no history. A record of past fevers
+//  invites comparison, and comparison is not how this decision is made.
+//
+//  ⚠️ ONE THING IS, WITH HER YES (relevance Step 3b, the user, 2026-10-28):
+//  that this check told her to see a doctor. Without it a fever never reached
+//  the home, so the home could not ask "Has he been seen?" the way it does
+//  after an urgent "Is my baby OK?" answer. What is kept is the same record
+//  that tool keeps: the concern (`low_fever`), the day and the tone (urgent).
+//  Never the reading, so the reason above still holds.
+//    * Asked only under "see someone today". Under "Go now" nothing is asked:
+//      she should be leaving, not answering (the same reason the temperature
+//      is not asked after a red flag). With a yes given before, it is kept
+//      quietly there too, and one line says so.
+//    * Only for the child on screen: if she picked another age group, it may
+//      be another child, and nothing is kept.
+//    * If she corrects the reading and the answer drops to "watch at home",
+//      what this visit kept is cleared again.
+//  Was: "NOTHING IS SAVED". Kept for revert in git history only as prose.
 //
 //  ⚠️ EVERY THRESHOLD IS REQUIRED_REVIEW. A paediatrician signs these off before
 //  this ships. A wrong cutoff here is the most consequential single number in the
@@ -46,7 +62,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../../services/pp_use_consent.dart';
 import 'pp_age_bands.dart';
+import 'pp_changes_store.dart';
+import 'pp_child_profile.dart';
+import 'pp_use_ask_card.dart';
+import 'pp_what_changed_data.dart' show WcTone, kWcConcerns;
 import 'pp_health_red_flags.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart' show PvChoiceTile, kPvChoiceInk, PvPress;
@@ -101,7 +122,11 @@ const List<String> _redFlags = [
 */
 
 class PpFeverCheckScreen extends StatefulWidget {
-  const PpFeverCheckScreen({super.key});
+  const PpFeverCheckScreen({super.key, this.now});
+
+  /// The clock, injected so a test can set the day a fever is kept. Null in
+  /// the app: the real time.
+  final DateTime? now;
 
   @override
   State<PpFeverCheckScreen> createState() => _PpFeverCheckScreenState();
@@ -118,6 +143,82 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
   bool? _anyRedFlag;
 
   double? _temp;
+
+  /// True once this visit kept the fever, so a corrected reading can clear it.
+  bool _keptHere = false;
+
+  DateTime get _now => widget.now ?? DateTime.now();
+
+  /// The age group picked is the child on screen's (not a grandmother checking
+  /// another child), and a real child is saved.
+  bool get _isThisChild =>
+      ChildProfileStore.instance.hasRealChild && _bandOf(_months) == _bandOf(ppMonthsSinceBirth);
+
+  /// The answer told her to see a doctor, for the child on screen.
+  bool get _seeADoctor {
+    final a = _answer;
+    return a != null && a.urgency != _Urgency.home && (_anyRedFlag == true || _isThisChild);
+  }
+
+  /// An answer changed: keep the fever with her yes, or clear what this visit
+  /// kept if the answer is no longer "see a doctor".
+  void _set(VoidCallback change) {
+    setState(change);
+    if (_seeADoctor) {
+      if (PpUseConsent.instance.allows(PpUseKind.changes)) _keep();
+    } else if (_keptHere) {
+      PpChangesStore.instance.clear('low_fever');
+      setState(() => _keptHere = false);
+    }
+  }
+
+  void _keep() {
+    PpChangesStore.instance.note(kWcConcerns.firstWhere((c) => c.id == 'low_fever'), WcTone.urgent, at: _now);
+    if (!_keptHere) setState(() => _keptHere = true);
+  }
+
+  /// Under the answer: the ask while unasked (never under "Go now"), the kept
+  /// line after a yes, nothing after a no.
+  Widget _keepOrAsk(V2Palette p, _Answer a) {
+    if (!_seeADoctor) return const SizedBox.shrink();
+    final consent = PpUseConsent.instance;
+    if (consent.unasked(PpUseKind.changes)) {
+      if (a.urgency == _Urgency.now) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.only(top: 14),
+        child: PpUseAskCard(
+          kind: PpUseKind.changes,
+          question: ppFillChild('Remember this, so your home can check this week if he has been seen?'),
+          onAnswer: (yes) {
+            if (yes) _keep();
+          },
+        ),
+      );
+    }
+    if (!_keptHere) return const SizedBox.shrink();
+    return Padding(
+      key: const ValueKey('pp_fever_kept'),
+      padding: const EdgeInsets.only(top: 14),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(
+          child: Text(
+              ppFillChild('Kept for this week: your home will ask if he has been seen. '
+                  'The temperature itself is not saved.'),
+              style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
+        ),
+        PvPress(
+          child: TextButton(
+            key: const ValueKey('pp_fever_kept_clear'),
+            onPressed: () {
+              PpChangesStore.instance.clear('low_fever');
+              setState(() => _keptHere = false);
+            },
+            child: Text('Not now', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+          ),
+        ),
+      ]),
+    );
+  }
 
   _Answer? get _answer {
     // ⚠️ RED FLAGS FIRST, AND THEY SHORT-CIRCUIT THE TEMPERATURE ENTIRELY.
@@ -278,8 +379,10 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
       eyebrow: 'Health',
       mark: IntentMark.thermoMark,
       title: 'Fever check',
-      intro: ppFillChild('His age and his temperature. Nothing is saved, and this does '
-          'not replace a doctor looking at him.'),
+      // Kept for revert: 'His age and his temperature. Nothing is saved, and this does '
+      //     'not replace a doctor looking at him.'
+      intro: ppFillChild('His age and his temperature. Nothing is kept without your yes, '
+          'and the reading never is. This does not replace a doctor looking at him.'),
       children: [
         pregToolPad(Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -343,7 +446,7 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
                   label: 'None of these',
                   selected: _anyRedFlag == false,
                   concern: false,
-                  onTap: () => setState(() => _anyRedFlag = false),
+                  onTap: () => _set(() => _anyRedFlag = false),
                 ),
               ),
               const SizedBox(width: 9),
@@ -352,7 +455,7 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
                   label: 'Yes, one of these',
                   selected: _anyRedFlag == true,
                   concern: true,
-                  onTap: () => setState(() => _anyRedFlag = true),
+                  onTap: () => _set(() => _anyRedFlag = true),
                 ),
               ),
             ]),
@@ -375,7 +478,7 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
                       label: label,
                       selected: _bandOf(_months) == _bandOf(m),
                       concern: false,
-                      onTap: () => setState(() => _months = m),
+                      onTap: () => _set(() => _months = m),
                     ),
                   ),
                   if (label != 'Over 6 months') const SizedBox(width: 7),
@@ -405,7 +508,7 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
                   selected: _temp == c,
                   concern: false,
                   wide: true,
-                  onTap: () => setState(() => _temp = c),
+                  onTap: () => _set(() => _temp = c),
                 ),
                 const SizedBox(height: 8),
               ],
@@ -414,6 +517,7 @@ class _PpFeverCheckScreenState extends State<PpFeverCheckScreen> {
             if (a != null) ...[
               const SizedBox(height: 28),
               _AnswerCard(answer: a),
+              _keepOrAsk(p, a),
             ],
 
             const SizedBox(height: 22),

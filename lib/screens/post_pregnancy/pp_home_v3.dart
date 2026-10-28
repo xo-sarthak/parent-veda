@@ -53,6 +53,7 @@ import '../../data/journeys/journey_registry.dart';
 import 'reading_home_screen.dart';
 import 'pp_activity_paintings.dart' show PpActivityThumb;
 import 'pp_changes_store.dart';
+import 'pp_what_changed_data.dart' show kWcHandOff;
 import 'what_changed_screen.dart';
 import '../../data/hubs/parenting_hubs.dart';
 import '../brackets/hub/hub_owed_screen.dart';
@@ -474,11 +475,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
                       childName: child.nameMid,
                       p: p,
                       now: now,
-                      onOpen: () => switch (u.concern) {
-                            final wc? => Navigator.of(context)
-                                .push(MaterialPageRoute<void>(builder: (_) => WcFlowScreen(concern: wc))),
-                            null => _openSurface(context, 'pp_what_changed'),
-                          },
+                      // Kept for revert (PP 20): a switch on u.concern that
+                      // pushed WcFlowScreen, skipping the fever hand-off.
+                      onOpen: () => _openChange(context, u),
                       onBetter: () {
                         PpChangesStore.instance.clear(u.concernId);
                         pvToast(context, 'Glad it is better. Your home is back to usual.');
@@ -626,7 +625,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                           key: ValueKey('pp_home_told_${c.concernId}'),
                           p: p,
                           leading: TtcMarkLeading(tab: TtcTabMark.twoBubbles, tint: v2BlockTint(20, p), size: 40),
-                          title: 'You told us: ${(c.concern?.label ?? c.concernId).toLowerCase()}',
+                          title: 'You told us: ${c.name}', // was c.concern?.label lower-cased (PP 20)
                           line: _toldAgo(c.at),
                           trailing: PvPress(
                             child: OutlinedButton(
@@ -643,11 +642,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
                               child: const Text('Better now'),
                             ),
                           ),
-                          onTap: () => switch (c.concern) {
-                                final wc? => Navigator.of(context)
-                                    .push(MaterialPageRoute<void>(builder: (_) => WcFlowScreen(concern: wc))),
-                                null => _openSurface(context, 'pp_what_changed'),
-                              }),
+                          // Kept for revert (PP 20): a switch on c.concern that
+                          // pushed WcFlowScreen, skipping the fever hand-off.
+                          onTap: () => _openChange(context, c)),
                     ],
                   )),
                 ],
@@ -682,6 +679,14 @@ class _PpHomeV3State extends State<PpHomeV3> {
                       ),
                   ],
                 )),
+                // WHY THE TILES MOVED (relevance PP 9, 2026-10-28): one line
+                // when her own answers moved a tile, never for age alone.
+                if (_tilesWhy(bracketsFor(LifeStage.parenting), lang) case final why?) ...[
+                  const SizedBox(height: 10),
+                  _pad(Text(why,
+                      key: const ValueKey('pp_home_tiles_why'),
+                      style: pvManrope(fontSize: _kMeta, height: 1.45, color: p.ink3))),
+                ],
                 const SizedBox(height: 32),
 
                 // ---- ACTIVITIES TO DO TODAY ---------------------------------
@@ -738,6 +743,8 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   // Was: activities: activities, in the rows below.
                   _pad(PpFirstActivityCard(
                     activity: activities.first,
+                    // What she told us raised it (PP 4): the card says so.
+                    why: ppActivityWhy(activities.first, PpChangesStore.instance.active(now: now)),
                     leading: PpActivityThumb(
                       activityId: activities.first.id,
                       size: 56,
@@ -760,6 +767,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   _pad(_ActivityRows(
                     activities: activities.skip(1).toList(),
                     p: p,
+                    why: (a) => ppActivityWhy(a, PpChangesStore.instance.active(now: now)),
                     onOpen: (a) => Navigator.of(context).push(MaterialPageRoute<void>(
                         settings: RouteSettings(name: 'pp/activity/${a.id}'),
                         builder: (_) => DevelopmentActivityScreen(activity: a))),
@@ -1443,10 +1451,10 @@ class _PpHomeV3State extends State<PpHomeV3> {
   // Every tile stays; only the order moves. Kept for revert:
   // static List<Bracket> _tilesOrder(List<Bracket> all) => all;
   static List<Bracket> _tilesOrder(List<Bracket> all) {
-    // ⚠️ OFF BY DEFAULT: the user decided on 2026-09-18 (on the phone) that
-    // "the door positioning should be like the way it was", registry order,
-    // Sleep first. The gap analysis asks for age and priority order; that is
-    // the user's call, so it waits behind kPpTileOrderByAge (pp_tile_order.dart).
+    // ON since 2026-10-07 (kPpTileOrderByAge, pp_tile_order.dart): by age, her
+    // priorities and her signals. Was "OFF BY DEFAULT", stale since that day
+    // (relevance PP 14). Kept for revert: the user's 2026-09-18 call was
+    // registry order, Sleep first; flipping the flag restores it.
     if (!kPpTileOrderByAge) return all;
     final f = FamilyProfileStore.instance;
     final order = ppTileOrder([for (final b in all) b.id],
@@ -1457,6 +1465,20 @@ class _PpHomeV3State extends State<PpHomeV3> {
         signals: PpSituation.now().signals);
     final byId = {for (final b in all) b.id: b};
     return [for (final id in order) byId[id]!];
+  }
+
+  /// The line under the grid when her answers moved a tile (PP 9), from the
+  /// same inputs as [_tilesOrder]. Null with the flag off or for age alone.
+  static String? _tilesWhy(List<Bracket> all, AppLanguage lang) {
+    if (!kPpTileOrderByAge) return null;
+    final f = FamilyProfileStore.instance;
+    final byId = {for (final b in all) b.id: b};
+    return ppTileWhy([for (final b in all) b.id],
+        ageInDays: ChildProfileStore.instance.ageInDays,
+        label: (id) => byId[id]?.label.of(lang) ?? id,
+        priorities: f.priorities,
+        birthMode: f.birthMode,
+        signals: PpSituation.now().signals);
   }
 
   // The single day-rotated pick. Superseded by PpHomeActivitiesStore, which
@@ -2067,6 +2089,20 @@ class _PpHomeV3State extends State<PpHomeV3> {
 
   void _openSurface(BuildContext context, String surfaceId) =>
       ppPushSurface(context, surfaceId);
+
+  /// Opens what she told us, the way the "Is my baby OK?" list does (PP 20,
+  /// 2026-10-28): a fever goes to Fever check, the one fever judge (H1), and
+  /// the newborn feeding check to its own screen (`kWcHandOff`). Was a push of
+  /// `WcFlowScreen` from both home cards, so a fever saved by Fever check
+  /// opened the old fever questions instead.
+  void _openChange(BuildContext context, PpChange c) {
+    final handOff = kWcHandOff[c.concernId];
+    final wc = c.concern;
+    if (handOff != null) return _openSurface(context, handOff);
+    if (wc == null) return _openSurface(context, 'pp_what_changed');
+    Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'pp_what_changed'), builder: (_) => WcFlowScreen(concern: wc)));
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -4817,11 +4853,15 @@ Widget _activityMark(DevActivity a, V2Palette p, double size) => switch (devMark
 /// Today's three activities as rows: the area's drawn mark, the title, one
 /// line, a round check for done. A press and hold swaps one.
 class _ActivityRows extends StatelessWidget {
-  const _ActivityRows({required this.activities, required this.p, required this.onOpen, required this.onSwap});
+  const _ActivityRows({required this.activities, required this.p, required this.onOpen, required this.onSwap, required this.why});
   final List<DevActivity> activities;
   final V2Palette p;
   final ValueChanged<DevActivity> onOpen;
   final ValueChanged<DevActivity> onSwap;
+
+  /// "Because you said: ..." for a row what she told us raised (PP 4); the
+  /// row shows it in place of its meta line.
+  final String? Function(DevActivity) why;
 
   @override
   Widget build(BuildContext context) {
@@ -4852,7 +4892,8 @@ class _ActivityRows extends StatelessWidget {
               },
             ),
             title: ppFillChild(a.title),
-            line: a.metaLine,
+            // Kept for revert: line: a.metaLine,
+            line: why(a) ?? a.metaLine,
             trailing: Semantics(
               button: true,
               label: store.isDone(a.id) ? 'Done' : 'Mark as done',

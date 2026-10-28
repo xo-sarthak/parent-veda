@@ -125,6 +125,10 @@ class ProgrammeStore extends ContentStore<LearningProgram> {
       seatsLeft: (row['seats_left'] as num?)?.toInt(),
       // Newest first among things starting at the same time.
       recency: first?.millisecondsSinceEpoch ?? 0,
+      // The child's ages it is for (0124, relevance PP 8). Absent before 0124
+      // is run, or left empty by the editor: every age.
+      ageFromMonths: (row['age_from_months'] as num?)?.toInt(),
+      ageToMonths: (row['age_to_months'] as num?)?.toInt(),
     );
   }
 
@@ -151,6 +155,9 @@ class ProgrammeStore extends ContentStore<LearningProgram> {
         'first_session_utc': null,
         'last_session_utc': null,
         'seats_left': p.seatsLeft,
+        // PP 8: an offline open keeps the ages it is for.
+        'age_from_months': p.ageFromMonths,
+        'age_to_months': p.ageToMonths,
       };
 
   /// The inverse of [_price], for the cache only. Imperfect by design: a cached

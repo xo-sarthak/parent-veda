@@ -219,8 +219,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   /// The one service that fits this read, worked out once (2026-10-21).
   // No clinician offered while a clinic runs her cycle (Batch 4, TTC 15).
   // Kept for revert: pvReadOfferFor(widget.read);
+  // Not for another age on a Parenting read (PP 8, 2026-10-28).
   late final PvOfferingView? _offer = pvReadOfferFor(widget.read,
-      clinicOwnsCycle: widget.read.id.startsWith('ttc_') && pvReadClinicOwnsCycleNow());
+      clinicOwnsCycle: widget.read.id.startsWith('ttc_') && pvReadClinicOwnsCycleNow(),
+      childMonths: widget.read.id.startsWith('pp_') ? pvReadChildMonthsNow() : null);
   late final PvReadNextStep? _ownConsult = pvReadOwnConsult(widget.read);
   AppLanguage get _lang => widget.lang;
   PvReadStore get _store => PvReadStore.instance;

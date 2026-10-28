@@ -40,6 +40,21 @@
 //  The fortnight history stays shared across children: twins sharing it just
 //  get different cards, which is variety, not a fault.
 //
+//  ⚠️ WHAT SHE TOLD US MOVES THEM (relevance PP 4, 2026-10-28). The app
+//  promised "pages and activities about it move up on your home" and only the
+//  pages did. Now an answer to "Is my baby OK?" lifts activities from the
+//  development area that fits it (`kPpChangeActivityAreas`): babbling less
+//  lifts language games, clingy lifts emotional and social ones. A fixed list,
+//  not word matching: activities are filed by developmental area, and most
+//  concerns (sleep, feeds, tummy, skin, illness) have no activity that fits,
+//  so they move pages only. An urgent answer moves none: a worry that needs a
+//  doctor never puts play first. Read through `PpChangesStore.active()`, so it
+//  happens only with her yes, and the Brain tab and the home agree.
+//
+//  Today's three re-pick when what she told us changes, but only while the
+//  slot is untouched. Once she has ticked or swapped one, the change shows
+//  tomorrow: a ticked card never disappears from under her.
+//
 //  PERSISTENCE. Local only, in shared_preferences, one JSON blob. Not cloud
 //  synced: what a parent was shown on a given day is a device fact, and the
 //  completion itself already syncs through GrowStore. If the pick history ever
@@ -52,12 +67,40 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'pp_changes_store.dart';
 import 'pp_development_data.dart';
 import 'pp_grow_data.dart';
 import 'pp_phase_doc_activities.dart';
+import 'pp_what_changed_data.dart' show WcTone;
 
 /// How many activities the home shows each day. The brief says "at least 3".
 const int kPpHomeActivityCount = 3;
+
+/// Concern id -> the development areas whose activities it lifts (PP 4).
+/// Only concerns an activity can actually help with; the rest move pages only.
+const Map<String, Set<String>> kPpChangeActivityAreas = {
+  'gone_quiet': {'language'},
+  'shy_new_people': {'social', 'emotional'},
+  'separation_upset': {'emotional', 'social'},
+  'extra_clingy': {'emotional', 'social'},
+  'sudden_tantrums': {'emotional'},
+  'biting_hitting': {'emotional'},
+};
+
+/// The changes that lift activities: not urgent, and on the list above.
+List<PpChange> ppActivityChanges(List<PpChange> changes) => [
+      for (final c in changes)
+        if (c.tone != WcTone.urgent && kPpChangeActivityAreas.containsKey(c.concernId)) c,
+    ];
+
+/// "Because you said: suddenly very clingy" when [a] is up because of what
+/// she told us, else null. The card says why it moved.
+String? ppActivityWhy(DevActivity a, List<PpChange> changes) {
+  for (final c in ppActivityChanges(changes)) {
+    if (kPpChangeActivityAreas[c.concernId]!.contains(a.areaId)) return c.why;
+  }
+  return null;
+}
 
 /// How many days an activity stays out of rotation after it was shown or
 /// sent away. Fourteen is `_kFortnight` in pp_grow_data — the same promise:
@@ -162,6 +205,7 @@ class PpHomeActivitiesStore extends ChangeNotifier {
         if (v is! Map || v['picks'] is! List) continue;
         final slot = _slots.putIfAbsent(e.key.toString(), _Slot.empty);
         slot.picks = [for (final p in v['picks'] as List) p.toString()];
+        slot.lift = '${v['lift'] ?? ''}';
         final done = v['done'], swapped = v['swapped'];
         if (done is List) slot.done.addAll(done.map((x) => x.toString()));
         if (swapped is List) {
@@ -181,6 +225,7 @@ class PpHomeActivitiesStore extends ChangeNotifier {
               'picks': e.value.picks,
               'done': e.value.done.toList(),
               'swapped': e.value.swapped.toList(),
+              'lift': e.value.lift,
             },
         },
         'lastSeen': _lastSeen,
@@ -240,7 +285,7 @@ class PpHomeActivitiesStore extends ChangeNotifier {
   /// cooldown moved to the back rather than dropped — a small pool must still
   /// fill three cards.
   List<DevActivity> _ranked(int ageMonths, String day,
-      {Set<String> exclude = const {}}) {
+      {Set<String> exclude = const {}, Set<String> lift = const {}}) {
     final pool = growActivitiesForAge(ageMonths)
         .where((a) => !exclude.contains(a.id))
         .toList();
@@ -254,6 +299,11 @@ class PpHomeActivitiesStore extends ChangeNotifier {
     int cmp(DevActivity a, DevActivity b) {
       final ca = _onCooldown(a.id), cb = _onCooldown(b.id);
       if (ca != cb) return ca ? 1 : -1; // fresh before on-cooldown
+      // What she told us (PP 4), but only a card that fits the age exactly:
+      // a lift never brings in a card from the widened band.
+      final la = lift.contains(a.areaId) && growSuitsAge(a, ageMonths);
+      final lb = lift.contains(b.areaId) && growSuitsAge(b, ageMonths);
+      if (la != lb) return la ? -1 : 1;
       // The child's own phase doc first (the user, 2026-10-13: "into
       // Today, this phase first"), then any exact fit, then the band.
       final pa = ppIsOwnPhaseDocActivity(a, ageMonths), pb = ppIsOwnPhaseDocActivity(b, ageMonths);
@@ -277,13 +327,22 @@ class PpHomeActivitiesStore extends ChangeNotifier {
       _day = today;
       _slots.clear();
     }
+    final lift = _liftAreas();
+    final liftKey = (lift.toList()..sort()).join(',');
     final have = _slots[_current];
-    if (have != null && have.picks.length >= kPpHomeActivityCount) return;
-    final fresh = _ranked(ageMonths, today)
+    // Kept for revert: if (have != null && have.picks.length >= kPpHomeActivityCount) return;
+    if (have != null &&
+        have.picks.length >= kPpHomeActivityCount &&
+        (have.lift == liftKey || have.done.isNotEmpty || have.swapped.isNotEmpty)) {
+      return;
+    }
+    final fresh = _ranked(ageMonths, today, lift: lift)
         .take(kPpHomeActivityCount)
         .map((a) => a.id)
         .toList();
-    _slots[_current] = _Slot.empty()..picks = fresh;
+    _slots[_current] = _Slot.empty()
+      ..picks = fresh
+      ..lift = liftKey;
     // History is only stamped once the cache is in; a pre-load pick is a
     // guess that may be replaced the moment the history lands, and a guess
     // must not go on cooldown as if it had been shown.
@@ -294,6 +353,20 @@ class PpHomeActivitiesStore extends ChangeNotifier {
       // No notify here: this runs inside a read during build, and the result
       // is a pure function of (date, history), so every listener agrees.
       _persist();
+    }
+  }
+
+  /// The areas what she told us lifts today. Empty without her yes, because
+  /// `active()` is empty then. Defensive: a store that cannot answer lifts
+  /// nothing.
+  Set<String> _liftAreas() {
+    try {
+      return {
+        for (final c in ppActivityChanges(PpChangesStore.instance.active(now: now())))
+          ...kPpChangeActivityAreas[c.concernId]!,
+      };
+    } catch (_) {
+      return const {};
     }
   }
 
@@ -337,7 +410,7 @@ class PpHomeActivitiesStore extends ChangeNotifier {
     final today = _todayKey();
     _lastSeen[id] = today;
     final candidates =
-        _ranked(ageMonths, '$today#${_swappedIn.length}', exclude: {..._picks});
+        _ranked(ageMonths, '$today#${_swappedIn.length}', exclude: {..._picks}, lift: _liftAreas());
     if (candidates.isEmpty) return; // the pool has nothing else; keep the card
     final next = candidates.first;
     _slot.picks = [..._picks]..[i] = next.id;
@@ -360,6 +433,10 @@ class PpHomeActivitiesStore extends ChangeNotifier {
 class _Slot {
   _Slot.empty();
   List<String> picks = const [];
+
+  /// The lift areas the picks were made with (PP 4), so a new answer can
+  /// re-pick an untouched slot.
+  String lift = '';
   final Set<String> done = {};
   final Set<String> swapped = {};
 }

@@ -37,7 +37,9 @@ import '../ttc/ttc_tab_root_header.dart' show TtcTabRootHeader, kTtcTabRootGutte
 import '../v2/v2_palette.dart';
 import 'journal_v2/pp_journal_screen.dart';
 import 'pp_common.dart' show PpBottomNav, PpTab;
+import 'pp_child_profile.dart';
 import 'pp_expert_honesty.dart' show ppProgramIsPlaceholder;
+import 'pp_learning_data.dart' show programmeListenable;
 import 'pp_messages_screen.dart' show openPpMessages;
 import 'pp_more_sheet.dart' show ppMoreSheetEntries;
 import 'problem_solver_screen.dart';
@@ -76,6 +78,27 @@ const Set<String> kPpMovedToProfile = {
   'My Bookings',
 };
 
+/// Offerings for a child of [months], those made for that age first, then the
+/// ones for every age, then the rest (relevance PP 8, 2026-10-28). Order
+/// only: nothing is dropped. Stable, so catalogue order holds within each.
+List<PvOfferingView> ppRankByAge(List<PvOfferingView> all, int months) {
+  int rank(PvOfferingView v) => !v.hasAgeWindow ? 1 : (v.fitsAge(months) ? 0 : 2);
+  final indexed = [for (var i = 0; i < all.length; i++) (i, all[i])];
+  indexed.sort((a, b) {
+    final d = rank(a.$2).compareTo(rank(b.$2));
+    return d != 0 ? d : a.$1.compareTo(b.$1);
+  });
+  return [for (final x in indexed) x.$2];
+}
+
+/// "For Aarav's age first." under a section whose order the age moved, so it
+/// says why (PP 8). Null when nothing in [shown] was made for this age.
+String? ppAgeFirstLine(List<PvOfferingView> shown, int months, String childName) {
+  if (!shown.any((v) => v.hasAgeWindow && v.fitsAge(months))) return null;
+  final who = childName.isEmpty ? "your child's" : "$childName's";
+  return 'Those made for $who age come first.';
+}
+
 class PpMoreScreen extends StatefulWidget {
   const PpMoreScreen({super.key});
 
@@ -95,10 +118,26 @@ class _PpMoreScreenState extends State<PpMoreScreen> {
     }
   }
 
-  late final List<PvOfferingView> _consults = _of({PvLearnKind.consult});
-  late final List<PvOfferingView> _courses =
-      _of({PvLearnKind.course, PvLearnKind.masterclass, PvLearnKind.classPack});
-  late final List<PvOfferingView> _groups = _of({PvLearnKind.cohort});
+  // Kept for revert (PP 8): built once, in catalogue order, so a child
+  // switch never reordered them.
+  // late final List<PvOfferingView> _consults = _of({PvLearnKind.consult});
+  // late final List<PvOfferingView> _courses =
+  //     _of({PvLearnKind.course, PvLearnKind.masterclass, PvLearnKind.classPack});
+  // late final List<PvOfferingView> _groups = _of({PvLearnKind.cohort});
+  /// By the child's age at every build (PP 8). Corrected age, the content
+  /// rule (PARENTING-GAP §0).
+  int get _months => ChildProfileStore.instance.devAgeInMonths;
+  List<PvOfferingView> get _consults => ppRankByAge(_of({PvLearnKind.consult}), _months);
+  List<PvOfferingView> get _courses => ppRankByAge(
+      _of({PvLearnKind.course, PvLearnKind.masterclass, PvLearnKind.classPack}), _months);
+  List<PvOfferingView> get _groups => ppRankByAge(_of({PvLearnKind.cohort}), _months);
+
+  /// [lead], plus "Those made for Aarav's age come first." when they do.
+  String _withAgeLine(String lead, List<PvOfferingView> shown) {
+    final c = ChildProfileStore.instance;
+    final line = ppAgeFirstLine(shown, _months, c.hasRealChild ? c.nameMid : '');
+    return line == null ? lead : '$lead. $line';
+  }
 
   void _push(String route, Widget Function() b) {
     pvCommitFeedback();
@@ -177,8 +216,10 @@ class _PpMoreScreenState extends State<PpMoreScreen> {
       for (final e in ppMoreSheetEntries())
         if (!_kNamedHere.contains(e.title) && !kPpMovedToProfile.contains(e.title)) e
     ];
+    // The child too (PP 8): switching child reorders the offerings by age.
+    // Kept for revert: listenable: PpMessagesStore.instance,
     return ListenableBuilder(
-      listenable: PpMessagesStore.instance,
+      listenable: Listenable.merge([PpMessagesStore.instance, ChildProfileStore.instance, programmeListenable]),
       builder: (context, _) => Scaffold(
         backgroundColor: p.ground,
         body: Stack(children: [
@@ -199,10 +240,11 @@ class _PpMoreScreenState extends State<PpMoreScreen> {
                   lead: 'Private video calls with a specialist',
                   empty: 'No experts listed yet. New ones are added as they join.'),
               _section('courses', 'Courses and masterclasses', [for (final v in _courses.take(6)) _offeringRow(v, 240)],
-                  lead: 'Learn at your own pace, or live with an expert',
+                  // Says why when the age moved the order (PP 8).
+                  lead: _withAgeLine('Learn at your own pace, or live with an expert', _courses.take(6).toList()),
                   empty: 'Nothing open yet. New courses are added here as they open.'),
               _section('groups', 'Groups', [for (final v in _groups.take(6)) _offeringRow(v, 160)],
-                  lead: 'A few weeks of live calls in a small group',
+                  lead: _withAgeLine('A few weeks of live calls in a small group', _groups.take(6).toList()),
                   empty: 'Nothing scheduled yet. Groups appear here when a date is set.'),
               _section('read_watch', 'Read and watch', [
                 _row('pp_more_reads', IntentMark.pageMark, 212, 'All reads', 'Every read, by topic and by age',
