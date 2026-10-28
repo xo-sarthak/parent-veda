@@ -366,8 +366,12 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
             ]),
 
             // ---- community (re-enabled 2026-10-28 for the new community) --------
+            // ⚠️ ONE PLACE IN EVERY STAGE (user, 2026-10-28): its own Community
+            // section on More, after the journey rows, with the same row in all
+            // three stages, so the way in never moves when her stage changes.
+            // Kept for revert, the old title: 'Talk to other mothers'.
             _section('community', 'Community', [
-              _row('preg_more_open_community', IntentMark.cuppedHands, 20, 'Talk to other mothers',
+              _row('preg_more_open_community', IntentMark.cuppedHands, 20, 'Community',
                   'Rooms for your stage, to read or to talk', () {
                 pvCommitFeedback();
                 openCommunity(context);

@@ -22,6 +22,22 @@ void main() {
     }
   });
 
+  // One place in every stage (user, 2026-10-28): each More screen has its own
+  // Community section with the same row, and TTC's You no longer carries one.
+  test('Community sits in the same place on every More screen', () {
+    for (final f in [
+      'lib/screens/pregnancy/preg_more_screen.dart',
+      'lib/screens/ttc/ttc_more_tab.dart',
+      'lib/screens/post_pregnancy/pp_more_screen.dart',
+    ]) {
+      final src = _live(_read(f)).join('\n');
+      expect(src, contains("'Rooms for your stage, to read or to talk'"), reason: f);
+      expect(src, contains("'Kind, moderated rooms for every stage'"), reason: f);
+      expect(src, contains('openCommunity('), reason: f);
+    }
+    expect(_live(_read('lib/screens/profile/pv_you_content.dart')).join('\n'), isNot(contains('_ttcCommunity()')));
+  });
+
   test('the app loads the new store, not the old one', () {
     final main = _live(_read('lib/main.dart')).join('\n');
     expect(main, contains('PvCommunityStore.instance.init()'));

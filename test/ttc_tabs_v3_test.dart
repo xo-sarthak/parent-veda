@@ -235,10 +235,10 @@ void main() {
 
   // ===========================================================================
   group('You holds what More held', () {
-    // Community joined 2026-10-28 (the new, shared community). Kept for
-    // revert, the old title: 'the TTC rows are in the content table,
-    // Community is not'.
-    test('the TTC rows are in the content table, Community too', () {
+    // Community is on More in every stage, not on You (user, 2026-10-28:
+    // one place in every stage). Kept for revert, the interim title: 'the
+    // TTC rows are in the content table, Community too'.
+    test('the TTC rows are in the content table, Community is not', () {
       final titles = [
         for (final t in pvYouContentFor(LifeStage.tryingToConceive).things)
           t.title
@@ -254,8 +254,10 @@ void main() {
       }
       // Kept for revert: expect(titles.any((t) => t.toLowerCase().contains('community')), isFalse,
       //     reason: 'Community is held back');
-      expect(titles, contains('Community'),
-          reason: 'the new community has a row on You');
+      // Kept for revert: expect(titles, contains('Community'),
+      //     reason: 'the new community has a row on You');
+      expect(titles, isNot(contains('Community')),
+          reason: 'Community lives on More, the same place in every stage');
       expect(
           [
             for (final t in pvYouContentFor(LifeStage.tryingToConceive).tiles)

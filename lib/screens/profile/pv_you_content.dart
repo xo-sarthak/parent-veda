@@ -206,15 +206,15 @@ PvYouThing _movedThing(String id) {
   );
 }
 
-/// The community from trying to conceive (re-enabled 2026-10-28 for the new,
-/// shared community). Data, not a screen: 'ttc_community' routes through
-/// `openTtcSurface` to `openCommunity`, the one way in from this stage.
-PvYouThing _ttcCommunity() => PvYouThing(
-      icon: Icons.forum_outlined,
-      title: 'Community',
-      subtitle: 'Rooms of people trying too, to read or to talk',
-      open: (c) => openTtcSurface(c, 'ttc_community'),
-    );
+// The community from trying to conceive, as a You row (2026-10-28). Off You
+// the same day: the user put Community in one place in every stage, its own
+// section on More (ttc_more_tab.dart). Kept for revert:
+// PvYouThing _ttcCommunity() => PvYouThing(
+//       icon: Icons.forum_outlined,
+//       title: 'Community',
+//       subtitle: 'Rooms of people trying too, to read or to talk',
+//       open: (c) => openTtcSurface(c, 'ttc_community'),
+//     );
 
 /// The one forward action of a stage.
 class PvYouAction {
@@ -1007,7 +1007,8 @@ final PvYouStageContent _trying = PvYouStageContent(
   // the fertility window and the unscoped programmes list (Journal was
   // already a tile; Profile is this screen). Community was held back on
   // purpose, the user's call; re-enabled 2026-10-28 for the new community
-  // (lib/screens/community). `test/ttc_tabs_v3_test.dart` pins every row.
+  // (lib/screens/community), on More, not here: one place in every stage.
+  // `test/ttc_tabs_v3_test.dart` pins every row.
   //
   // The doctor's note leads (Flo's "Report for a doctor" sits first under
   // the identity card): it says the app is for her and her clinician.
@@ -1031,8 +1032,8 @@ final PvYouStageContent _trying = PvYouStageContent(
       listen: TtcMessagesStore.instance,
       open: (c) => openTtcSurface(c, 'ttc_messages'),
     ),
-    // Re-enabled 2026-10-28 for the new community.
-    _ttcCommunity(),
+    // Community lives on More in every stage (user, 2026-10-28), not here.
+    // Kept for revert: _ttcCommunity(),
     // Y3: the line says whether hiding is on, so she can see it without
     // opening the sheet (the Settings value pattern). Kept for revert:
     //   subtitle: kTtcHideIntimate,

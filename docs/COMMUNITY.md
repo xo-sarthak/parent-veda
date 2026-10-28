@@ -50,6 +50,7 @@ helps, buttons where people's thumbs expect them.
 | 8 | Replies inbox content | Replies only, no likes | Accepted |
 | 9 | Room member counts | Shown from 50 members | Accepted |
 | 10 | Post button placement | Top right (Reddit/X/Threads habit; the keyboard covers the bottom) | "If it's at the top right, it's fine" |
+| 11 | Where the More entry sits | (asked by the user after commit 9b9dabb9) | **One place in every stage:** its own "Community" section on More, after the journey rows, the same row ("Community" / "Rooms for your stage, to read or to talk", the twoFigures mark) in Pregnancy, Trying and Parenting. Off Trying's You. The home card stays on all three homes. Pinned by `test/community_reachability_test.dart`. |
 
 ---
 
@@ -189,6 +190,21 @@ while typing, a thread).
    on" in the composer → A blocks B → sign out and reopen (cache + invitation).
 
 Cost: Supabase plan as is; photos in Storage at launch volume ≈ $0 (₹0).
+
+---
+
+## RESUME HERE (for a fresh session)
+
+- **Phase 1:** committed `9b9dabb9`; the "one place on More" follow-up (decision 11) is in a second commit.
+- **The user's steps** are in "What the user must do" above. Ask which are done before relying on the live database: the migrations, the moderator row, the helplines, the grievance officer.
+- **Next is phase 2** (below). Start it in plan mode: a fresh Mobbin pass for each new screen, a prototype before Flutter, and the decision table.
+- **Order suggested:** (1) course and cohort threads with verified experts, (2) birth clubs and follow, (3) search, editing within 15 minutes, and editorial prompt posts.
+- **Read first:** this file, `docs/BACKEND-PATTERNS.md` §16zzd, `supabase/migrations/0121_community.sql`, `lib/services/pv_community_store.dart` and `lib/screens/community/community_chrome.dart`. Don't re-read the 8 superseded screens.
+- **The rules that hold:**
+  - the app never gets a select on a community table;
+  - every new read is a security-definer function that returns `is_mine`, never `user_id`;
+  - every write returns its outcome;
+  - the safety word lists change in SQL and Dart together, and the parity test enforces it.
 
 ---
 

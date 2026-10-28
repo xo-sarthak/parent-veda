@@ -223,7 +223,9 @@ void main() {
       }
       expect(find.text('Calendar', skipOffstage: false), findsOneWidget);
       // Kept for revert: expect(find.text('Community', skipOffstage: false), findsNothing);
-      expect(find.text('Community', skipOffstage: false), findsOneWidget);
+      // The heading and the row both say Community since 2026-10-28 (one
+      // place, one row, in every stage). Kept for revert: findsOneWidget.
+      expect(find.text('Community', skipOffstage: false), findsNWidgets(2));
       expect(find.byKey(const ValueKey('preg_more_open_community'), skipOffstage: false), findsOneWidget);
     });
   });

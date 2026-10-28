@@ -225,13 +225,24 @@ class _PpMoreScreenState extends State<PpMoreScreen> {
                 _row('pp_more_find_help', IntentMark.askDoctor, 176, 'Find help',
                     'Lactation, paediatrics and night help near you',
                     () => _push('pp/find_help', () => const ProblemSolverScreen()), art: ttcArtTab(TtcTabMark.doctorChat)),
-                // Re-enabled 2026-10-28 for the new community.
+                // Moved to its own section below (2026-10-28). Kept for revert:
+                // _row('pp_more_community', IntentMark.cuppedHands, 20, 'Community',
+                //     'Other parents at your stage, to read or to talk', () {
+                //   pvCommitFeedback();
+                //   openCommunity(context);
+                // }, art: ttcArtTab(TtcTabMark.twoFigures)),
+              ]),
+              // ⚠️ ONE PLACE IN EVERY STAGE (user, 2026-10-28): its own
+              // Community section on More, after the journey rows, with the
+              // same row as Pregnancy and Trying, so the way in never moves
+              // when her stage changes.
+              _section('community', 'Community', [
                 _row('pp_more_community', IntentMark.cuppedHands, 20, 'Community',
-                    'Other parents at your stage, to read or to talk', () {
+                    'Rooms for your stage, to read or to talk', () {
                   pvCommitFeedback();
                   openCommunity(context);
                 }, art: ttcArtTab(TtcTabMark.twoFigures)),
-              ]),
+              ], lead: 'Kind, moderated rooms for every stage'),
               if (rest.isNotEmpty)
                 _section('rest', 'Everything else', [
                   for (final e in rest)

@@ -559,16 +559,22 @@ List<TtcMoreSection> ttcMoreSections({required bool partner}) {
     // ⚠️ COMMUNITY, RE-ENABLED 2026-10-28 for the new, shared community
     // (lib/screens/community). It was held back for launch (TTC gap plan
     // §7.1). An offering, not something about her, so More, not the profile.
+    // ⚠️ ONE PLACE IN EVERY STAGE (user, 2026-10-28): the same section and
+    // row as Pregnancy and Parenting More, so the way in never moves when her
+    // stage changes, and no longer a row on You. Kept for revert:
+    //   hue: 268, title: 'Talk to others trying',
+    //   line: 'Kind, moderated rooms for every part of trying',
     TtcMoreSection(
       id: 'community',
       title: kTtcMoreCommunityHeading,
-      hue: 268,
+      lead: 'Kind, moderated rooms for every stage',
+      hue: 20,
       rows: [
         TtcMoreRow(
           id: 'community',
           art: ttcArtTab(TtcTabMark.twoFigures),
-          title: 'Talk to others trying',
-          line: 'Kind, moderated rooms for every part of trying',
+          title: 'Community',
+          line: 'Rooms for your stage, to read or to talk',
           open: (c) => openCommunity(c),
         ),
       ],
