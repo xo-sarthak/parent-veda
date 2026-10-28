@@ -6202,6 +6202,10 @@ const PpArea _earlySkills = PpArea(
             PpLink('Two languages at home',
                 surfaceId: 'pp_page/parenting_development/dev_two_languages',
                 blurb: 'Why two languages never cause late talking.'),
+            // Final review item 7.
+            PpLink('How to help your child talk',
+                surfaceId: 'pp_page/parenting_development/dev_help_talk',
+                blurb: 'What helps at each age, and when to check.'),
           ],
     ),
     // EL4 (door 9 build). REQUIRED_REVIEW (developmental paediatrician or

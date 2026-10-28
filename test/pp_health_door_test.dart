@@ -242,7 +242,9 @@ void main() {
 
     test('§2c: tools have ages and their places', () {
       expect(tab('well').tools.single.bands, [i, t, c], reason: 'no home remedy under three months');
-      expect(tab('help').tools.single.surfaceId, 'pp_emergency_card');
+      // Final review item 7: CPR, Safety's page, joins the card.
+      expect([for (final t in tab('help').tools) t.surfaceId],
+          ['pp_emergency_card', 'pp_page/parenting_safety/safety_cpr']);
       expect([for (final x in tab('records').tools) x.surfaceId], ['pp_health_home', 'pp_doctor_visit']);
       final visit = tab('wrong').tools.firstWhere((x) => x.surfaceId == 'pp_doctor_visit');
       expect(visit.atEnd, isTrue, reason: 'a sick-day visit, after the pages');

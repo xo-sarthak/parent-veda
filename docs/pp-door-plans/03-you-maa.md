@@ -297,3 +297,5 @@ Held by `test/pp_you_maa_door_test.dart` ("door 3: the plan, held", 18 tests) an
 **Final review, item 4 (2026-10-27): one figure per fact.** Soaking a pad in an hour or a clot bigger than a lemon is go-now on `body_lochia` and both red-flag pages, as First 40's table says (4h). Held by `test/pp_one_figure_test.dart`; the figures are on the BEFORE-LAUNCH clinical read.
 
 **Final review, item 6 (2026-10-27): no link opens a whole door.** `work_schemes` opens `pm_schemes` (was the whole Papers door); `body_rest` opens First 40's `f40_rest_and_food` (was the whole First 40 door). Held across every door by `test/pp_no_whole_door_links_test.dart`.
+
+**Final review, item 7 (2026-10-27): twin pages link each other.** You, Maa had no link into Family. Now `people_spacing`, `work_childcare`, `people_partner_low`, `people_mother_in_law`, `mind_relationship` and `mind_anxiety` each link their Family twin. Held by `test/pp_twin_links_test.dart`.

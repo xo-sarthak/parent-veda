@@ -3354,6 +3354,10 @@ const PpArea _firstFestivals = PpArea(
         ]),
         PpLink('Diwali, Holi and kite season, safely',
             surfaceId: 'pp_page/parenting_safety/safety_festivals'),
+        // Final review item 7.
+        PpLink('Fasting while breastfeeding',
+            surfaceId: 'pp_page/parenting_maternal/cani_fasting',
+            blurb: 'In You, Maa: Navratri, Karva Chauth and Ramzan.'),
       ],
     ),
   ],

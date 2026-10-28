@@ -198,9 +198,13 @@ final PpSection kPpFamilySection = PpSection(
                   'your body time to rebuild iron and other stores. It also '
                   'lowers the chance of an early birth or a low birth weight '
                   'baby next time.',
-              'After a caesarean, many doctors also advise waiting at least '
-                  'eighteen months before the next pregnancy, to let the scar '
-                  'heal well. Your own doctor knows your history best.',
+              // Final review item 7: was "many doctors also advise waiting at
+              // least eighteen months", which read as a shorter wait than the
+              // two years above. Kept for revert.
+              'After a caesarean, the two-year wait matters even more, because '
+                  'it gives the scar time to become strong. Eighteen months is '
+                  'the shortest gap most doctors accept, not a target. Your '
+                  'own doctor knows your history best.',
             ]),
             PpCards(heading: 'What families tell us', [
               PpCard('Close together, under two years',
@@ -218,6 +222,10 @@ final PpSection kPpFamilySection = PpSection(
                 'protection once periods return or the baby starts other '
                 'food.',
                 kind: PpCalloutKind.doctor),
+            // Final review item 7.
+            PpLink('The next baby, when you are ready',
+                surfaceId: 'pp_page/parenting_maternal/people_spacing',
+                blurb: 'In You, Maa: what doctors advise, and the check-up before.'),
           ],
         ),
         PpPage(
@@ -282,6 +290,10 @@ final PpSection kPpFamilySection = PpSection(
       pages: [
         PpPage(
           id: 'fam_dad_depression',
+          // Written to the father in "you", with no he/him/his; its link to
+          // You, Maa says "When he is struggling too", where "he" is him, not
+          // the child (final review item 7).
+          aboutAdult: true,
           title: 'When fathers feel low after a baby',
           subtitle: 'It happens to dads too, and it\'s treatable',
           format: 'ARTICLE',
@@ -338,6 +350,10 @@ final PpSection kPpFamilySection = PpSection(
                 surfaceId: 'pp_page/parenting_maternal/mind_rage',
                 blurb: 'Written for mothers. The snapping and the shame read '
                     'the same for fathers.'),
+            // Final review item 7.
+            PpLink('When he is struggling too',
+                surfaceId: 'pp_page/parenting_maternal/people_partner_low',
+                blurb: 'In You, Maa: the same weeks, from her side.'),
           ],
         ),
         PpPage(
@@ -539,6 +555,10 @@ final PpSection kPpFamilySection = PpSection(
                 '$kCrisisHelplineNumber. For her, or for you. Trained '
                 'counsellors, in your language.',
                 title: 'If there is nobody to talk to'),
+            // Final review item 7.
+            PpLink('I am anxious every single minute',
+                surfaceId: 'pp_page/parenting_maternal/mind_anxiety',
+                blurb: 'In You, Maa: what it feels like, and what helps.'),
           ],
         ),
         // FM3: "Doing it on your own". You, Maa already owns asking for help
@@ -670,6 +690,10 @@ final PpSection kPpFamilySection = PpSection(
             PpLink('What to say when family wants it bigger',
                 surfaceId: 'pp_page/parenting_traditional/family_pressure',
                 blurb: 'When the ceremonies grow past what you want.'),
+            // Final review item 7.
+            PpLink('You and your mother in law',
+                surfaceId: 'pp_page/parenting_maternal/people_mother_in_law',
+                blurb: 'In You, Maa: your side of it.'),
           ],
         ),
         PpPage(
@@ -760,6 +784,10 @@ final PpSection kPpFamilySection = PpSection(
             PpLink('If you are not safe at home',
                 surfaceId: 'pp_page/parenting_maternal/people_safe_at_home',
                 slide: 'For safety'),
+            // Final review item 7.
+            PpLink('You and your partner, after',
+                surfaceId: 'pp_page/parenting_maternal/mind_relationship',
+                blurb: 'In You, Maa: your side of it.'),
           ],
         ),
       ],
@@ -888,6 +916,10 @@ final PpSection kPpFamilySection = PpSection(
                 surfaceId: 'pp_page/parenting_maternal/work_pumping_no_room'),
             PpLink('The first week back',
                 surfaceId: 'pp_page/parenting_maternal/work_first_week'),
+            // Final review item 7.
+            PpLink('Who will hold your baby at ten in the morning',
+                surfaceId: 'pp_page/parenting_maternal/work_childcare',
+                blurb: 'In You, Maa: the plan around your job.'),
           ],
         ),
         PpPage(

@@ -142,6 +142,14 @@ final PpDoor kPpHealthDoor = PpDoor(
           surfaceId: 'pp_emergency_card',
           icon: Icons.badge_outlined,
         ),
+        // Final review item 7: Safety owns CPR; Get help now reaches it in one
+        // tap, as Safety's own emergency strip does.
+        PpDoorTool(
+          label: 'CPR: baby or child',
+          blurb: 'If your child goes limp or stops breathing. The steps, by age.',
+          surfaceId: 'pp_page/parenting_safety/safety_cpr',
+          icon: Icons.monitor_heart_outlined,
+        ),
       ],
       footer: 'If your child seems wrong to you and a screen says otherwise, believe '
           'yourself.',

@@ -36,7 +36,10 @@ void main() {
         // You, Maa's "10 minutes for you today" (door 3, M1): it opens a page
         // or a class picked for her week, not a tool of its own.
         id == 'pp_maa_ten_minutes' ||
-        id.startsWith('pp_what_changed/'); // the same checker, pre-filtered
+        id.startsWith('pp_what_changed/') || // the same checker, pre-filtered
+        // A page in the reader, not a tool: Health's Get help now row to
+        // Safety's CPR page (final review item 7).
+        id.startsWith('pp_page/');
     final missing = {
       for (final d in kPpDoors)
         for (final tab in d.tabs)

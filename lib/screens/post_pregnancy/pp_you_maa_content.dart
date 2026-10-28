@@ -2271,6 +2271,10 @@ final PpArea _yourMind = PpArea(
           surfaceId: 'pp_experts',
           role: 'maternal_mental_health',
         ),
+        // Final review item 7.
+        PpLink('When your partner is anxious, not only tired',
+            surfaceId: 'pp_page/parenting_family/people_partner_anxiety',
+            blurb: 'In Family: what your partner can do to help.'),
       ],
     ),
     PpPage(
@@ -2727,6 +2731,10 @@ final PpArea _yourMind = PpArea(
           PpCard('Thank each other', 'For the night feed, the dishes, the '
               'patience.'),
         ]),
+        // Final review item 7.
+        PpLink('You two, after the baby',
+            surfaceId: 'pp_page/parenting_family/fam_you_two',
+            blurb: 'In Family: for both of you, to read together.'),
       ],
     ),
     PpPage(
@@ -5925,6 +5933,10 @@ const PpArea _thePeopleAroundYou = PpArea(
           'the strongest drivers of postpartum depression in Indian studies. '
           'Name it rather than absorbing it.',
         ),
+        // Final review item 7.
+        PpLink('Raising your child with grandparents close by',
+            surfaceId: 'pp_page/parenting_family/fam_grandparents_help',
+            blurb: 'In Family: making it work for everyone.'),
       ],
     ),
     PpPage(
@@ -6064,6 +6076,10 @@ const PpArea _thePeopleAroundYou = PpArea(
           surfaceId: 'pp_experts',
           role: 'maternal_mental_health',
         ),
+        // Final review item 7.
+        PpLink('When fathers feel low after a baby',
+            surfaceId: 'pp_page/parenting_family/fam_dad_depression',
+            blurb: 'In Family: written for him, to share.'),
       ],
     ),
     PpPage(
@@ -6575,6 +6591,10 @@ const PpArea _thePeopleAroundYou = PpArea(
           surfaceId: 'pp_experts',
           role: 'gynaecologist',
         ),
+        // Final review item 7.
+        PpLink('Is there a best age gap between children?',
+            surfaceId: 'pp_page/parenting_family/fam_age_gap',
+            blurb: 'In Family: what each gap is like for the children.'),
       ],
     ),
     PpPage(
@@ -7369,6 +7389,10 @@ const PpArea _backToWork = PpArea(
             'when they need a break, and say the non negotiables kindly and '
             'once, at the start. Assuming it will be fine because it is family '
             'is how it goes wrong six months later.'),
+        // Final review item 7.
+        PpLink('Choosing care: grandparents, a nanny or a creche',
+            surfaceId: 'pp_page/parenting_family/fam_choosing_childcare',
+            blurb: 'In Family: how to choose, and settling in.'),
       ],
     ),
     PpPage(

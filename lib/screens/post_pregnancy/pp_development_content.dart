@@ -1992,6 +1992,10 @@ final PpSection kPpDevelopmentSection = PpSection(
               PpCard('How', 'Say the word and make the sign every time, from '
                   'about six to eight months.'),
             ]),
+            // Final review item 7.
+            PpLink('Help him talk',
+                surfaceId: 'pp_page/parenting_early_learning/skills_language',
+                blurb: 'Games and everyday chat that grow words, by age.'),
           ],
         ),
 
@@ -2106,6 +2110,10 @@ final PpSection kPpDevelopmentSection = PpSection(
             PpLink('Not talking yet: what to do next',
                 surfaceId: 'pp_page/parenting_special_care/sc_not_talking',
                 blurb: 'The hearing check, a speech assessment, and where to go.'),
+            // Final review item 7.
+            PpLink('Speech therapy and the other therapies, explained',
+                surfaceId: 'pp_page/parenting_special_care/sc_therapies',
+                blurb: 'In Special care: what a therapist does, and how to find one.'),
           ],
         ),
       ],

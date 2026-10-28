@@ -238,3 +238,5 @@ Held by `test/pp_early_learning_door_test.dart` ("door 9: the plan, held", 15 te
 **Final review, item 4 (2026-10-27): one figure per fact.** `skills_can_do_3_4_5` moves the story, counting to ten and writing letters to 5, as Development's `dev_age_3_5` (CDC 2022) has them, and links that page (4r). Held by `test/pp_one_figure_test.dart`; the figures are on the BEFORE-LAUNCH clinical read.
 
 **Final review, item 6 (2026-10-27): no link opens a whole door.** `school_admission` opens `pm_birth_certificate` (was the whole Papers door). Held across every door by `test/pp_no_whole_door_links_test.dart`.
+
+**Final review, item 7 (2026-10-27): twin pages link each other.** `skills_language` ("Help him talk") links Development's `dev_help_talk`, both ways. Held by `test/pp_twin_links_test.dart`.

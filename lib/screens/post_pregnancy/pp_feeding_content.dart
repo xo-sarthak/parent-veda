@@ -2092,6 +2092,10 @@ final PpArea _startingSolids = PpArea(
           surfaceId: 'pp_food/age/6',
           blurb: "Purees, dal water and first mashes, sorted for your baby's age.",
         ),
+        // Final review item 7.
+        PpLink('Confident Weaning, the course',
+            surfaceId: 'pp_learn/co_weaning',
+            blurb: 'Four weeks from first tastes to family meals, Indian-first.'),
       ],
     ),
     PpPage(

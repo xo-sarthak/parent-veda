@@ -500,6 +500,10 @@ final PpArea _emergency = PpArea(
           minutes: '3 MIN',
           slotId: 'health/infant_cpr',
         ),
+        // Final review item 7.
+        PpLink('CPR for babies and toddlers',
+            surfaceId: 'pp_page/parenting_safety/safety_cpr',
+            blurb: 'In Safety: the steps, if your child goes limp.'),
       ],
     ),
     // ⚠️ [new] SCAFFOLD. "If he has a fit: on his side, nothing in the mouth,

@@ -69,7 +69,9 @@ const _exact = <String, List<String>>{
   'fam_telling_toddler': ['pp_books/New sibling'],
   'fam_getting_ready': ['pp_page/parenting_behaviour/separation', 'pp_books/New sibling'],
   'fam_tandem_feeding': ['pp_page/parenting_feeding/bf_latch', 'pp_page/parenting_feeding/bf_supply'],
-  'fam_dad_depression': ['${_maa}mind_rage'],
+  // Final review item 7: the six You, Maa twins, appended to each page.
+  'fam_age_gap': ['${_maa}people_spacing'],
+  'fam_dad_depression': ['${_maa}mind_rage', '${_maa}people_partner_low'],
   'fam_dad_breastfeeding': [
     'pp_page/parenting_feeding/bf_latch',
     'pp_page/parenting_feeding/bf_supply',
@@ -87,9 +89,15 @@ const _exact = <String, List<String>>{
     'pp_scripts/family_spoiling',
     'pp_scripts/family_honey',
     'pp_page/parenting_traditional/family_pressure',
+    '${_maa}people_mother_in_law',
   ],
   'fam_couple_on_same_page': ['pp_page/parenting_family/fam_you_two'],
-  'fam_you_two': ['${_maa}people_partner', '${_maa}people_intimacy', '${_maa}people_safe_at_home'],
+  'fam_you_two': [
+    '${_maa}people_partner',
+    '${_maa}people_intimacy',
+    '${_maa}people_safe_at_home',
+    '${_maa}mind_relationship',
+  ],
   'fam_sibling_jealousy': [
     'pp_page/parenting_behaviour/siblings',
     'pp_page/parenting_behaviour/beh_anger',
@@ -101,8 +109,10 @@ const _exact = <String, List<String>>{
     '${_maa}work_milk_stash',
     '${_maa}work_pumping_no_room',
     '${_maa}work_first_week',
+    '${_maa}work_childcare',
   ],
   'fam_settling_in': ['pp_page/parenting_behaviour/separation', 'pp_page/parenting_health/vax_uwin'],
+  'people_partner_anxiety': ['${_maa}mind_anxiety'],
 };
 
 void main() {
