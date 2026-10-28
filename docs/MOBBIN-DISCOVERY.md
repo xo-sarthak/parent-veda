@@ -1432,3 +1432,66 @@ Prototype: https://claude.ai/artifact/2NZoJdbk7CJqdBxuT6bhBY.
 - A shared team login: the team speaks through a moderator-only function, with an audit row.
 
 **Owed.** Nothing yet. The build follows the prototype's sign-off.
+
+## 39. Learning architecture: course page, lesson player, timetable, waiting room, replay, host tools (2026-10-28)
+
+**Why.** The learning audit (docs/LEARNING-ARCHITECTURE.md) fixes how courses, masterclasses and cohorts are sold,
+run, recorded and discussed. Before any new screen is drawn, eight intents were queried, one per query. Course
+discussion tabs were already covered in §38 and were not re-queried.
+
+**Found.**
+- Course page: Mindvalley groups lessons by week (https://mobbin.com/screens/824bcc2e-26c9-4e0d-878b-b581d82191b4);
+  Udemy's "14 sections · 88 lectures · 26h" line (https://mobbin.com/screens/045c215d-6e08-432c-9bb6-3ddd4495fc69);
+  MasterClass chapters that fold (https://mobbin.com/screens/72dcf33e-58e8-486f-a178-583a2d411f67);
+  Coursera's syllabus by module (https://mobbin.com/screens/892a87da-07cf-43c4-a782-b5c124ad2583).
+- Lesson player with a thread: Mindvalley's Lesson | Discussions under the video, with a Write button
+  (https://mobbin.com/screens/507e309a-acd7-4e3f-992b-089fd230766f); Skillshare's Lessons / Projects / Discussions
+  (https://mobbin.com/screens/15e380f4-c72f-4706-b9d0-240ed6ba5ded); YouTube comments pinned to a timestamp
+  (https://mobbin.com/screens/88be550f-83cd-4fc3-bd54-e8c44873fcaa).
+- Timetable: Mindvalley's Live classes, Upcoming | Past, with a lock on past replays
+  (https://mobbin.com/screens/dd296d58-2ce4-48c6-85de-595a2f4e58b0); Insight Timer's date-badge rows
+  (https://mobbin.com/screens/84e7aed6-5380-4981-99cf-99a98f43f561); Tempo's "Remind me"
+  (https://mobbin.com/screens/bec1b67c-579a-49f7-ab07-9c7c21c33553).
+- Waiting room: Preply's "… is not here · Lesson starts in 6 minutes"
+  (https://mobbin.com/screens/22130eee-101c-472c-b253-06f6f6676940); Fanatics' countdown with Save and Notify
+  (https://mobbin.com/screens/da25284b-3046-4ec2-9f41-32dea0aa6f9b).
+- Host controls: Brave Talk's participant list, "Moderator" label and Mute All
+  (https://mobbin.com/screens/aea1f236-3dba-4b92-ab7c-8334b25f4854).
+- Replay: MasterClass's player with Up next (https://mobbin.com/screens/7573a36c-5c13-4c61-923b-573ea443f84c);
+  Udemy's lecture list under the player (https://mobbin.com/screens/49a75f85-dc70-43e0-b66e-09f1f6c7c69b).
+- Host dashboard: only YouTube Studio's tabs Dashboard / Content / Comments / Earn
+  (https://mobbin.com/screens/c89640af-21d0-4882-8400-b70f5cd46b7c).
+- Pinned notice: BFF's "Pinned by …" with an Owner badge
+  (https://mobbin.com/screens/179d62a6-6aae-426e-a980-29f339d71a2f); Believe's Pins sheet with MOD
+  (https://mobbin.com/screens/f1455a7b-2690-43b6-a3d5-fd688f737c53); Telegram's "Scheduled Video Chat · starts
+  tomorrow · Notify me" banner at the top of a group (https://mobbin.com/screens/fa4d7b65-d5d2-48ec-8d44-05f24fd70df5).
+
+**Adopted.**
+- Lessons grouped by week or module, with a count and total-length line.
+- Lesson | Discussion tabs under the player; the discussion tab shows only that lesson's posts (decision L.2).
+- The timetable as Upcoming | Past with date badges. A past session with its recording opens as a lesson.
+- The waiting room's host-not-here state at +10 minutes (decision L.14), with a calm line that the team has been told.
+- A "Next session" banner at the top of the course discussion (Telegram), above the pinned team notice.
+- The host's participant list with a Moderator label, matched to what `livekit-moderate` already does.
+
+**Declined.**
+- Attendee counts ("103 going"): no vanity numbers, as in §38.
+- Comments pinned to a timestamp: parked (LEARNING-ARCHITECTURE LA-26).
+
+**Owed.** The library has no good mobile instructor dashboard. "Your offerings" on the doctor app is drawn from
+YouTube Studio's Comments tab plus §38's Linear-style queue rows. Record that gap if another audit needs one.
+
+**Addendum 2026-10-29: Your bookings as the one history.** The user asked that what she has booked and bought be
+kept as one history, the same in every stage. The screen already exists (`PvMyLearningScreen`, Profile › Your
+bookings in all four stages, rows stage-tagged), so this pass only looked for the payments half. One query,
+"purchase history list with receipt and refunded status".
+- Found: Booking.com Transactions, with a Paid or "Refund processing" chip and how long a refund takes
+  (https://mobbin.com/screens/bf3f15af-8b61-4240-a9c3-93dd8be7a9eb); App Store Purchase history grouped by date
+  (https://mobbin.com/screens/e2da3da0-9db9-472c-8564-608e992f9108); Walmart's "Refund issued" banner over the list
+  (https://mobbin.com/screens/f57358e1-8a1b-4c60-8fb9-a42414fe7cdd); Turo's receipt with "You paid" and the card
+  (https://mobbin.com/screens/f20f38f0-cd9a-446a-affb-fa6be3199be8).
+- Adopted: a Payments section in Your bookings, grouped by month, each row with amount and one status word (Paid,
+  Refund on its way, Refunded, Free); a refund in progress as a banner on top with its arrival date; a row opens
+  the receipt the refund screen already draws.
+- Declined: filter chips (Walmart, GoPay), since one family's history is a few rows a year; promotional banners
+  inside the history (GoPay); card brand logos, since Razorpay methods vary and the payment id is enough.
