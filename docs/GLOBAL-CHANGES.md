@@ -349,7 +349,7 @@ doors have little that explains them").
   pitches step aside, and test day leads with "Tell result"; kits and
   tests go last in a round or after a loss; Learn and search follow the
   home's door order; yoga is gentle in a round or after a loss; one start
-  card on day one. Test: `test/relevance_batch4_test.dart`.
+  card on day one. Test: `test/relevance_batch4_test.dart`. Commit 2eb7a77.
 
 ---
 
