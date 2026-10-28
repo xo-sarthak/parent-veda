@@ -34,6 +34,7 @@
 // =============================================================================
 
 import '../data/can_i_data.dart';
+import '../data/can_i_groups.dart' show canIForTrimester;
 import '../data/reads/pregnancy_reads.dart' show pregnancyReadById;
 import '../data/doors/pv_door_data.dart' show PvDoorEntryTile, PvDoorLibrary;
 import '../data/doors/pv_door_scans.dart' show kScansDoor;
@@ -89,6 +90,9 @@ enum PregInsightGo {
 
   /// One of the Move door's reads (2026-09-30).
   move,
+
+  /// The due-date page, to use a dating scan's date (relevance Batch 4).
+  dueDate,
 }
 
 /// One card on the pregnancy rail.
@@ -216,6 +220,7 @@ List<PregInsight> pregInsightsFor({
   required HomeDay? homeDay,
   required WeekContent? weekContent,
   required List<ReadItem> reads,
+  bool dueDateMayBeStale = false,
 }) {
   final cards = <PregInsight>[];
   final isToday = date == today;
@@ -378,13 +383,47 @@ List<PregInsight> pregInsightsFor({
     }
   }
 
+  // ---- 5b. A dating scan's date, if she has had one ------------------------
+  //
+  // ⚠️ RELEVANCE BATCH 4, PREG 13 (2026-10-28). `dueDateMayBeStale` (week 14
+  // on, a date we counted from her period, not a clinic's) was only read on
+  // the Tools tab, so a mother who had her dating scan never heard that its
+  // date is the better one unless she went looking. It is a card on the rail,
+  // not a line in the hero: the hero's line would replace her countdown for as
+  // long as the flag holds, and a card needs no "not now" to store.
+  //
+  // Today only (it is about her date, not the day she is browsing) and up to
+  // week 27: dating uses the early scan (crown-rump length to 13+6, head
+  // circumference up to 20 weeks, NICE NG201); later scans measure growth and
+  // do not re-date, so asking then invites a wrong change. It
+  // offers, never asserts — `TruthSource` puts a clinician's date above ours.
+  if (dueDateMayBeStale && isToday && week < 28) {
+    cards.add(const PregInsight(
+      id: 'due_date_scan',
+      eyebrow: 'Your due date',
+      value: 'Had a dating scan? Use its date',
+      hue: 206,
+      art: PvInsightArt.scan,
+      go: PregInsightGo.dueDate,
+    ));
+  }
+
   // ---- 6. Is it safe? — one a day, stable ----------------------------------
   //
   // The "myth" slot, with data we actually have: hundreds of things people
   // ask whether they can eat, drink, take or do. Picked by the day of the
   // year, so yesterday's card is genuinely yesterday's.
+  //
+  // ⚠️ FROM THE ENTRIES WITH A NOTE FOR HER TRIMESTER (relevance Batch 4,
+  // PREG 12, 2026-10-28). The pick ran over all of them, so at week 34 the
+  // card could ask about something whose only advice was for the first weeks.
+  // `canIForTrimester` is the door's own "For your weeks" rail, so the card and
+  // the door agree on what is hers; the whole list stays the fallback. Kept for
+  // revert: `ttcPickForToday(kCanIEntries, now: date, offset: 5)`.
+  final safePool = canIForTrimester(week);
   if (kCanIEntries.isNotEmpty) {
-    final e = ttcPickForToday(kCanIEntries, now: date, offset: 5);
+    final e = ttcPickForToday(safePool.isEmpty ? kCanIEntries : safePool,
+        now: date, offset: 5);
     cards.add(PregInsight(
       id: 'safe_${e.id}',
       eyebrow: 'Is it safe?',

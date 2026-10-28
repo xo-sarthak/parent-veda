@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import '../../services/bracket_resolver.dart';
 import '../../ttc/ttc_can_i_data.dart';
 import '../../ttc/ttc_focus_data.dart';
+import '../../ttc/ttc_home_situation.dart' show ttcHomeDoorOrderNow;
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_reads_data.dart';
 import 'ttc_all_videos_screen.dart' show ttcAllFilms;
@@ -66,7 +67,12 @@ class TtcStageHit {
     required this.line,
     required this.open,
     required this.score,
+    this.door,
   });
+
+  /// The label of the door it belongs to, when it has one (articles, films,
+  /// doors), for the tie-break in [ttcStageSearch].
+  final String? door;
 
   final TtcStageHitKind kind;
   final String title;
@@ -96,18 +102,41 @@ int _score(List<String> q, String title, String more) {
 /// Everything on the trying-to-conceive side that matches [query], best
 /// first within each kind, at most [perKind] of each. Nothing for a query
 /// under two letters. [him]: his side (his tools, his films).
+///
+/// ⚠️ TIES GO TO HER MOMENT (relevance Batch 4, TTC 18, 2026-10-28). Two hits
+/// with the same text score now come in the order of their doors on her home
+/// ([order], the home's `ttcHomeDoorOrderNow` unless a test passes another),
+/// so mid-round the IVF door's pieces come before the fertile window's. Text
+/// still decides first, and the sort is stable: Dart's `sort` is not, so equal
+/// hits keep the order they were listed in by index, not by chance.
 List<TtcStageHit> ttcStageSearch(
   String query, {
   bool him = false,
   int perKind = 4,
+  List<String> Function(List<String>)? order,
 }) {
   final q = _words(query);
   if (query.trim().length < 2 || q.isEmpty) return const [];
   final out = <TtcStageHit>[];
 
+  final rankOf = <String, int>{};
+  final ids = (order ?? ttcHomeDoorOrderNow)(
+      [for (final page in kTtcFocusPages) page.bracketId]);
+  for (var i = 0; i < ids.length; i++) {
+    if (bracketById(ids[i]) case final b?) rankOf[b.label.en] = i;
+  }
+  int rank(TtcStageHit h) => rankOf[h.door] ?? ids.length;
+
+  // Kept for revert: hits.sort((a, b) => b.score.compareTo(a.score));
   void addAll(List<TtcStageHit> hits) {
-    hits.sort((a, b) => b.score.compareTo(a.score));
-    out.addAll(hits.take(perKind));
+    final indexed = [for (var i = 0; i < hits.length; i++) (at: i, hit: hits[i])]
+      ..sort((a, b) {
+        final s = b.hit.score.compareTo(a.hit.score);
+        if (s != 0) return s;
+        final r = rank(a.hit).compareTo(rank(b.hit));
+        return r != 0 ? r : a.at.compareTo(b.at);
+      });
+    out.addAll(indexed.map((x) => x.hit).take(perKind));
   }
 
   // Tools: the Tools hub's own matcher, so the two searches agree.
@@ -132,6 +161,7 @@ List<TtcStageHit> ttcStageSearch(
           line: r.teaser.en,
           open: (c) => openTtcArticle(c, r.id, hue: 206),
           score: s,
+          door: r.kicker.en,
         ),
   ]);
 
@@ -145,6 +175,7 @@ List<TtcStageHit> ttcStageSearch(
           line: f.live ? f.doorLabel : '${f.doorLabel} · coming soon',
           open: (c) => openTtcFocusTile(c, f.tile, f.hue),
           score: s,
+          door: f.doorLabel,
         ),
   ]);
 
@@ -176,6 +207,7 @@ List<TtcStageHit> ttcStageSearch(
             line: page.heroTitle ?? page.intro,
             open: (c) => openTtcSurface(c, 'ttc_door/${page.bracketId}'),
             score: s,
+            door: b.label.en,
           ),
   ]);
 

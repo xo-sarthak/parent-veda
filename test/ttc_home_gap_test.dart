@@ -553,7 +553,12 @@ void main() {
       final card = find.byKey(const ValueKey('ttc_home_check_card'));
       expect(card, findsOneWidget);
       // Kept for revert (2026-09-28): "It's been about a year".
-      expect(find.text('About a year of trying'), findsOneWidget);
+      // The card says what the doctor check says (relevance Batch 4, TTC 6,
+      // 2026-10-28): its headline, and the twelve-month reason under it.
+      // Kept for revert: expect(find.text('About a year of trying'), findsOneWidget);
+      expect(find.text('It may be a good time to talk to an expert'), findsOneWidget);
+      expect(find.textContaining("which is when the usual advice says it's worth"),
+          findsOneWidget);
       final notNow = find.byKey(const ValueKey('ttc_home_check_not_now'));
       await tester.ensureVisible(notNow);
       await tester.tap(notNow);

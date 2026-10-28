@@ -777,9 +777,23 @@ List<ReadItem> dailyArticleReads(int week, int day, {int count = 3}) {
       .toList()
     ..sort((a, b) => _rank(a).compareTo(_rank(b)));
   final pool = <ReadItem>[...relevant];
+  // ⚠️ PADDED WITH THE NEAREST WEEKS, NOT THE TOP OF THE LIST (relevance
+  // Batch 4, PREG 24, 2026-10-28). With fewer than [count] for her week the
+  // rail filled from the whole list in file order, so a week-36 "Reads for
+  // week 36" could carry a week-6 piece. Now the padding is the reads whose
+  // range is closest to her week. Kept for revert:
+  //   pool.addAll(kReadItems
+  //       .where((r) => r.type == ReadType.article && !pool.contains(r)));
   if (pool.length < count) {
-    pool.addAll(kReadItems
-        .where((r) => r.type == ReadType.article && !pool.contains(r)));
+    int gap(ReadItem r) => week < r.weekStart
+        ? r.weekStart - week
+        : (week > r.weekEnd ? week - r.weekEnd : 0);
+    final rest = [
+      for (var i = 0; i < kReadItems.length; i++)
+        if (kReadItems[i].type == ReadType.article && !pool.contains(kReadItems[i]))
+          (gap(kReadItems[i]), i, kReadItems[i]),
+    ]..sort((a, b) => a.$1 != b.$1 ? a.$1.compareTo(b.$1) : a.$2.compareTo(b.$2));
+    pool.addAll(rest.take(count - pool.length).map((x) => x.$3));
   }
   if (pool.isEmpty) return const [];
   final n = pool.length;

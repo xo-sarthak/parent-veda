@@ -59,6 +59,7 @@ import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_learn_screen.dart' show openPvLearn;
 import '../learn/pv_offering_screen.dart' show pvOpenOffering;
 import '../preg_week_screen.dart';
+import 'preg_hero_extras.dart' show pregPastDueWeek;
 import '../prepare/consultations_screen.dart';
 // import '../prepare/prepare_hub_screen.dart'; // kept for revert (2026-10-17)
 import '../brackets/hub/hub_intent_art.dart';
@@ -335,9 +336,16 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
               _row('preg_more_journey_map', IntentMark.timelineRail, 104, 'Journey map',
                   'Where you are this month, and what comes next',
                   () => _push('journey_map', () => JourneyMapScreen(controller: _c))),
+              // ⚠️ PAST 40, THE PAGE THE HERO OPENS (relevance Batch 4, PREG 7,
+              // 2026-10-28): week 41 or 42 once she is a full week past her date,
+              // by the one rule (`pregPastDueWeek`); `currentWeek` stops at 40,
+              // so this opened week 40 while the hero said 41. Kept for revert:
+              //   PregWeekScreen(pregnancy: _c, week: _c.currentWeek)
               _row('preg_more_week', IntentMark.bodyMark, 24, 'Week by week',
                   'Your baby and your body, this week and every week',
-                  () => _push('pregnancy/week', () => PregWeekScreen(pregnancy: _c, week: _c.currentWeek))),
+                  () => _push('pregnancy/week', () => PregWeekScreen(
+                      pregnancy: _c,
+                      week: pregPastDueWeek(-_c.daysPastDue) ?? _c.currentWeek))),
               ],
               // HIS SIDE (2026-10-13): his week, reading to the baby and the
               // partner guide, where her calendar was.

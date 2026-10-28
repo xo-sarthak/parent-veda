@@ -84,8 +84,17 @@ void main() {
       expect(ttcPrecheckNextStep(), isNull);
     });
 
+    // One start at a time (relevance Batch 4, TTC 12, 2026-10-28): the step
+    // waits for her first logged period, while the hero asks for it.
+    testWidgets('no next-step card before her first period', (tester) async {
+      await pumpHome(tester);
+      expect(find.text('YOUR NEXT STEP', skipOffstage: false), findsNothing);
+    });
+
     testWidgets('the rail has a "Your next step" card, and it opens the list',
         (tester) async {
+      final now = DateTime.now();
+      CycleStore.instance.logPeriodStart(DateTime(now.year, now.month, now.day - 10));
       await pumpHome(tester);
       final card = find.text('YOUR NEXT STEP', skipOffstage: false);
       await scrollRailTo(tester, card);

@@ -38,6 +38,8 @@ import 'pv_shelf_screen.dart';
 import '../v2/v2_palette.dart';
 import 'pv_store_chrome.dart';
 import 'pv_store_marks.dart';
+import '../../services/pregnancy_records.dart' show PregnancyRecords;
+import '../../ttc/ttc_home_situation.dart' show ttcHomeHidesQuickRow;
 // The TTC tab root's shared header (2026-09-29); only the TTC chrome uses it.
 import '../ttc/ttc_tab_root_header.dart'
     show
@@ -756,10 +758,17 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
   // Kept for revert: a Container (white, radius 16, kPvLine border) holding
   // InkWell rows split by inset Dividers, each with a 38pt surfaceAlt well.
   Widget _ttcNeeds(V2Palette p) {
-    final needs = [
-      for (final n in _kTtcNeeds)
-        if (ttcNeedResolves(n.$4)) n,
-    ];
+    // Quieter during an IVF-shaped round or after a loss (Batch 4, TTC 4).
+    // Kept for revert: the list below without ttcNeedsInOrder.
+    final needs = pvTtcNeedsInOrder(
+      [
+        for (final n in _kTtcNeeds)
+          if (ttcNeedResolves(n.$4)) n,
+      ],
+      (n) => n.$4,
+      quieter: ttcHomeHidesQuickRow(DateTime.now()) ||
+          PregnancyRecords.instance.lossRecentlyClosed(),
+    );
     return Padding(
       padding: EdgeInsets.fromLTRB(_g, 22, _g, 0),
       child: Column(
@@ -847,3 +856,23 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
     ),
   );
 }
+
+/// The two needs that are about her own signals: finding fertile days and
+/// testing at home.
+const Set<String> kPvTtcSelfTestNeeds = {'shelf:ttc_kits', 'shelf:ttc_tests'};
+
+/// The needs in the order she sees them (relevance Batch 4, TTC 4,
+/// 2026-10-28). With [quieter] (an IVF-shaped round is running, or a loss
+/// closed recently) the ovulation kits and the pregnancy test go to the end.
+/// The home already hides its own Test row in such a round, because a home
+/// test before the clinic's blood test can mislead (`ttcHomeHidesQuickRow`),
+/// and after a loss a test kit at the top of the shop is the last thing she
+/// should meet first. Order only: every row stays.
+List<T> pvTtcNeedsInOrder<T>(List<T> needs, String Function(T) target,
+        {required bool quieter}) =>
+    !quieter
+        ? needs
+        : [
+            for (final n in needs) if (!kPvTtcSelfTestNeeds.contains(target(n))) n,
+            for (final n in needs) if (kPvTtcSelfTestNeeds.contains(target(n))) n,
+          ];

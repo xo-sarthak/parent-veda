@@ -243,12 +243,19 @@ final PvDoorPage kBellySkinDoor = PvDoorPage(
 
     PvDoorSection(
       group: kBsTabSafe,
-      heading: 'Check any product',
+      // ⚠️ INGREDIENTS, NOT PRODUCTS (handed over by the tools terminal, P1
+      // audit; relevance Batch 4, 2026-10-28): the checker searches
+      // ingredients only, so "any product" and "a product or ingredient"
+      // promised a search it does not do. Kept for revert:
+      //   heading: 'Check any product',
+      //   blurb: 'Free. Search a product or ingredient and get a clear Safe, '
+      //       'Limit or Avoid answer.',
+      heading: 'Check an ingredient',
       tiles: [
         PvDoorToolTile(
           title: 'Ingredient Safety Checker',
-          blurb: 'Free. Search a product or ingredient and get a clear Safe, '
-              'Limit or Avoid answer.',
+          blurb: 'Free. Search an ingredient from the label and get a clear '
+              'Safe, Limit or Avoid answer.',
           surfaceId: kBsSurfaceChecker,
         ),
       ],

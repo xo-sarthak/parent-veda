@@ -56,23 +56,43 @@ const Map<PregPriority, String> kPregPriorityDoor = {
 /// From this week the birth is close enough that Labour prep leads.
 const int kPregLabourLeadsFromWeek = 32;
 
+/// From this week getting ready for the baby leads: the third trimester, when
+/// the NHS suggests starting on the bag and the things at home.
+const int kPregGettingReadyLeadsFromWeek = 28;
+
 /// The last week of the first trimester.
 const int kPregFirstTrimesterEnd = 13;
 
 /// Doors the trimester puts forward, in the order they lead.
 ///
 /// The PDF names the first trimester (Symptoms, Is it safe?, Scans) and the
-/// third from week 32 (Labour prep). The second trimester, and weeks 28 to 31,
-/// name nothing, so they lead with nothing: the table's own order stands.
+/// third from week 32 (Labour prep). The second trimester names nothing, so it
+/// leads with nothing: the table's own order stands.
+///
+/// ⚠️ THE TWO DOORS WRITTEN FOR A STRETCH OF WEEKS LEAD IN IT (relevance
+/// Batch 4, PREG 10, 2026-10-28). "Your first weeks" and "Getting ready for
+/// baby" are the only doors whose whole subject is a time, and they sat 11th
+/// and 12th of 13 in the table, so the mother each was written for scrolled
+/// past nine doors to reach it. First weeks leads up to week 13; Getting ready
+/// leads from week 28, behind Labour from 32. Kept for revert:
+///   first trimester: ['pregnancy_symptoms', 'pregnancy_is_it_safe',
+///       'pregnancy_scans_tests'];
+///   from 32: ['pregnancy_labour']; weeks 28 to 31: [].
 List<String> pregTrimesterLeads(int week) {
   if (week <= kPregFirstTrimesterEnd) {
     return const [
+      'pregnancy_first_weeks',
       'pregnancy_symptoms',
       'pregnancy_is_it_safe',
       'pregnancy_scans_tests',
     ];
   }
-  if (week >= kPregLabourLeadsFromWeek) return const ['pregnancy_labour'];
+  if (week >= kPregLabourLeadsFromWeek) {
+    return const ['pregnancy_labour', 'pregnancy_getting_ready'];
+  }
+  if (week >= kPregGettingReadyLeadsFromWeek) {
+    return const ['pregnancy_getting_ready'];
+  }
   return const [];
 }
 

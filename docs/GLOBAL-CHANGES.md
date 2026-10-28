@@ -338,6 +338,18 @@ doors have little that explains them").
   cycle on "Reading your cycle, phase by phase"; Getting ready on its
   checklist; Not yet on the doctor check; Mind and body headings open
   practices. Test: `test/relevance_batch3_test.dart`.
+- **BUILT 2026-10-28 (relevance Batch 4, Pregnancy and TTC): the homes and
+  other screens follow her too.** Pregnancy: the home lifts First weeks to
+  week 13 and Getting ready from 28; the Tools tab orders by her week (a
+  rule per row); "Is it safe?" is picked for her trimester; a dating-scan
+  card from week 14; products nearest her week first; past 40 the labels
+  follow the hero; search ties go to her week. TTC: the check card reads
+  the doctor check (two losses, over 40, not only months); on a clinic
+  cycle the Tools tab leads with treatment, the report card and doctor
+  pitches step aside, and test day leads with "Tell result"; kits and
+  tests go last in a round or after a loss; Learn and search follow the
+  home's door order; yoga is gentle in a round or after a loss; one start
+  card on day one. Test: `test/relevance_batch4_test.dart`.
 
 ---
 

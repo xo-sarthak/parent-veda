@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../data/doors/pv_door_data.dart';
+import '../../data/doors/preg_band.dart' show PregBand;
 import '../../models/bracket.dart';
 import '../../services/bracket_resolver.dart';
 import '../../services/pregnancy_controller.dart';
@@ -111,7 +112,12 @@ class PvSearchHit {
     required this.bracket,
     this.tile,
     this.open,
+    this.weeks,
   });
+
+  /// The weeks the tile's section is written for, or null for any week. Only
+  /// a tie-break (relevance Batch 4, PREG 15): never a filter.
+  final PregBand? weeks;
 
   /// For a hit that is not a tile — a report finding, a report parameter —
   /// how it opens. Null means "the tile" or "the door".
@@ -264,13 +270,23 @@ List<PvSearchHit> _indexOf(PvDoorPage page, Bracket b) {
               page: page,
               bracket: b,
               tile: t,
+              weeks: s.weeks,
             ),
   ];
 }
 
+/// Her week when it is real, for [pvSearch]'s tie-break; null on the week-20
+/// stand-in, so a made-up week never reorders anything.
+int? pvSearchWeekOf(PregnancyController c) => c.isDueDateSet ? c.currentWeek : null;
+
 /// Rank: every word of the query must appear; a title that starts with the
 /// query outranks one that contains it, which outranks a blurb match.
-List<PvSearchHit> pvSearch(String query, List<PvSearchHit> index) {
+///
+/// ⚠️ TIES GO TO HER WEEK (relevance Batch 4, PREG 15, 2026-10-28). With a
+/// real [week], two hits of the same text rank put the one from a section
+/// written for her weeks first; then the index order, as before. Text still
+/// decides first: a better match is never pushed down for being off-week.
+List<PvSearchHit> pvSearch(String query, List<PvSearchHit> index, {int? week}) {
   final q = query.trim().toLowerCase();
   if (q.isEmpty) return const [];
   final words = q.split(RegExp(r'\s+'));
@@ -288,9 +304,13 @@ List<PvSearchHit> pvSearch(String query, List<PvSearchHit> index) {
                 : 3;
     scored.add((rank, i, h));
   }
+  int forHer(PvSearchHit h) =>
+      week != null && (h.weeks?.contains(week) ?? false) ? 0 : 1;
   scored.sort((a, b) {
     final r = a.$1.compareTo(b.$1);
-    return r != 0 ? r : a.$2.compareTo(b.$2);
+    if (r != 0) return r;
+    final w = forHer(a.$3).compareTo(forHer(b.$3));
+    return w != 0 ? w : a.$2.compareTo(b.$2);
   });
   return [for (final s in scored) s.$3];
 }
@@ -373,7 +393,9 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
     final q = _ctl.text.trim();
-    final hits = q.isEmpty ? const <PvSearchHit>[] : pvSearch(q, _index);
+    final hits = q.isEmpty
+        ? const <PvSearchHit>[]
+        : pvSearch(q, _index, week: pvSearchWeekOf(widget.pregnancy));
     return Scaffold(
       backgroundColor: p.surface,
       body: SafeArea(
@@ -462,7 +484,8 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
     );
   }
 
-  List<PvSearchHit> hits({required String q}) => pvSearch(q, _index);
+  List<PvSearchHit> hits({required String q}) =>
+      pvSearch(q, _index, week: pvSearchWeekOf(widget.pregnancy));
 
   // ---- scope: this door, or everywhere ------------------------------------
 

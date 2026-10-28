@@ -36,6 +36,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../v2/v2_palette.dart';
 import 'pv_shelf_spec.dart' show PvShelfKind;
@@ -285,7 +286,15 @@ class PvShelfCard extends StatelessWidget {
         child: PvPress(
           child: InkWell(
             key: pvShelfCardKey(title),
-            onTap: comingSoon ? null : onTap,
+            // ⚠️ A COMING-SOON CARD ANSWERS ITS TAP (relevance Batch 4, PREG
+            // 20, 2026-10-28; "no silent tap"): the same words a door's
+            // coming-soon tile says (`pv_door_router.dart`, Batch 2), never
+            // [onTap]. Kept for revert: onTap: comingSoon ? null : onTap,
+            onTap: comingSoon
+                ? () => pvToast(context,
+                    "This one is still being made. It will open here when it's ready.",
+                    kind: PvToastKind.info)
+                : onTap,
             borderRadius: BorderRadius.circular(14),
             child: SizedBox(
               width: width,

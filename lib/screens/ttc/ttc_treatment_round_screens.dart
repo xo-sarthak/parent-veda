@@ -2441,10 +2441,23 @@ class TtcIvfRoundPanel extends StatelessWidget {
           line: next == null
               ? kTtcPanelNoNext
               : ttcPanelNextLine(next.$1, next.$2, today, kind),
-          primary: (kTtcPanelSeePlan, () => openTtcTreatment(context)),
-          secondary: phase == TtcRoundPhase.testDay
+          // ⚠️ TEST DAY LEADS WITH THE RESULT (relevance Batch 4, TTC 16,
+          // 2026-10-28). On the day of her blood test the one thing to do is
+          // tell us how it went, and it was the second button under "See the
+          // whole plan". The plan is the second button that day. On other
+          // days "Update dates" opened the same screen as the main button, so
+          // it goes (TTC 25): two buttons to one place read as two choices.
+          // Kept for revert:
+          //   primary: (kTtcPanelSeePlan, () => openTtcTreatment(context)),
+          //   secondary: phase == TtcRoundPhase.testDay
+          //       ? (kTtcRoundTellResult, () => openTtcTreatmentResult(context))
+          //       : (kTtcPanelUpdateDates, () => openTtcTreatment(context)),
+          primary: phase == TtcRoundPhase.testDay
               ? (kTtcRoundTellResult, () => openTtcTreatmentResult(context))
-              : (kTtcPanelUpdateDates, () => openTtcTreatment(context)),
+              : (kTtcPanelSeePlan, () => openTtcTreatment(context)),
+          secondary: phase == TtcRoundPhase.testDay
+              ? (kTtcPanelSeePlan, () => openTtcTreatment(context))
+              : null,
         );
       case TtcIvfPanel.between:
         final negative = t.lastClosed?.outcome == TtcRoundOutcome.negative;

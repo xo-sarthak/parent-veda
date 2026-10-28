@@ -134,6 +134,7 @@ import '../services/family_profile.dart' show FamilyProfileStore;
 import '../services/ready_birth_context_store.dart' show ReadyBirthContextStore;
 import '../services/preg_messages_store.dart' show PregMessagesStore;
 import 'pregnancy/preg_messages_screen.dart' show openPregMessages;
+import '../widgets/pv_toast.dart';
 import 'pregnancy/preg_due_date_screen.dart' show openPregDueDate, pregNeedsDueDate;
 import 'pregnancy/preg_myth_sheet.dart' show showPregMythSheet;
 import 'pregnancy/preg_twins.dart' show pregSizeLineFor;
@@ -707,6 +708,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                   homeDay: day,
                   weekContent: weekContent,
                   reads: reads,
+                  // Batch 4, PREG 13: her dating scan's date, on the rail.
+                  dueDateMayBeStale: pregnancy.dueDateMayBeStale,
                 )))
                   PvInsightTile(
                     key: ValueKey('preg_insight_${c.id}'),
@@ -861,7 +864,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
               //   Text('Why this matters now: ${video.reason.en}', ...)
               // Layout per Mobbin (Insight Timer, Video Spotlight): title,
               // then one plain line saying what the film covers.
-              Text('Your baby in week $week',
+              // Past 40 the line follows the hero's week, 41 or 42 (relevance
+              // Batch 4, PREG 7, 2026-10-28); the film stays week 40's, the last
+              // there is. Kept for revert: 'Your baby in week $week'.
+              Text('Your baby in week ${_pageWeek(week)}',
                   style: pvFraunces(
                       fontSize: 17,
                       letterSpacing: -0.43,
@@ -1076,7 +1082,21 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                             .where((x) => x.isNotEmpty)
                             .join(' · '),
                         taken: store.isTakenToday(m.id),
-                        onToggle: () => store.toggleToday(m.id),
+                        // ⚠️ SAYS WHAT CHANGED (handed over by the tools
+                        // terminal, P1 audit, Medication; relevance Batch 4,
+                        // 2026-10-28): the tick flipped with no word, and
+                        // "every save says what it changed". Kept for revert:
+                        //   onToggle: () => store.toggleToday(m.id),
+                        onToggle: () {
+                          final was = store.isTakenToday(m.id);
+                          store.toggleToday(m.id);
+                          pvToast(
+                              context,
+                              was
+                                  ? '${m.name}: not taken today'
+                                  : '${m.name}: taken today',
+                              kind: was ? PvToastKind.info : PvToastKind.done);
+                        },
                       ),
                   ],
                   onManage: () => Navigator.of(context).push(MaterialPageRoute(
@@ -1264,7 +1284,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                   // the heading names the week instead. Was 'Recommended
                   // Reads' over 'Research-backed articles'.
                   eyebrow: 'Recommended reads',
-                  title: 'Reads for week $week',
+                  // Past 40: the hero's week (Batch 4, PREG 7). Was 'Reads for week $week'.
+                  title: 'Reads for week ${_pageWeek(week)}',
                   p: p),
               const SizedBox(height: 8),
               for (final r in reads.take(3))
@@ -1297,7 +1318,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                   // Was 'Recommended Products' over 'Crafted for Week $week of
                   // Pregnancy' (2026-09-29, docs/PREG-VOICE.md).
                   eyebrow: 'Recommended products',
-                  title: 'Picked for week $week',
+                  // Past 40: the hero's week (Batch 4, PREG 7). Was 'Picked for week $week'.
+                  title: 'Picked for week ${_pageWeek(week)}',
                   p: p),
               const SizedBox(height: 12),
               // A RAIL, NOT A LIST — and the difference is the point.
@@ -1753,11 +1775,18 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
       case kPgActBirthClass:
         _openSurfaceScreen(context, 'birthing_classes');
 
-      // Sugar, blood pressure and weight all live in the existing trackers.
-      // Weight is the one that exists as its own screen today; the others are
-      // reached from it. Not a new tracker — §11 forbids one.
+      // ⚠️ THE READINGS LOG (handed over by the tools terminal, P1, 305b5c6;
+      // relevance Batch 4, 2026-10-28). Blood pressure and sugar have their own
+      // log now, `ReadingsLogScreen` at the 'readings' surface, so "track your
+      // readings" opened Weight, which records neither. Kept for revert (its
+      // comment was no longer true):
+      //   // Sugar, blood pressure and weight all live in the existing trackers.
+      //   // Weight is the one that exists as its own screen today; the others are
+      //   // reached from it. Not a new tracker — §11 forbids one.
+      //   case kPgActTrackReadings:
+      //     _openSurfaceScreen(context, 'weight');
       case kPgActTrackReadings:
-        _openSurfaceScreen(context, 'weight');
+        _openSurfaceScreen(context, 'readings');
 
       // ⚠️ THE CONDITION LIBRARY, AND THIS LINE NEVER RAN UNTIL 2026-08-21.
       //
@@ -1886,6 +1915,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
       //   openSymptomDetail(context, s, pregnancy);
       case PregInsightGo.scan:
         _openBracket(context, 'pregnancy_scans_tests');
+      // The same page the hero's "Add your due date" opens (Batch 4, PREG 13).
+      case PregInsightGo.dueDate:
+        openPregDueDate(context, pregnancy);
       // The timeline, where each scan has "Add the date" (2026-09-30).
       case PregInsightGo.scanWindow:
         openPvDoorSurface(context, kScansSurfaceTimeline, pregnancy);
@@ -2334,7 +2366,12 @@ class _ToolsRow extends StatelessWidget {
           V3SectionHead(
               eyebrow: 'Use these tools',
               // Was 'Count, track, time' (2026-09-29, docs/PREG-VOICE.md).
-              title: 'Tools for this week',
+              // ⚠️ SAYS WHOSE ROW IT IS (relevance Batch 4, PREG 22,
+              // 2026-10-28): when the tiles are her own most-used tools, "for
+              // this week" claimed a reason that did not pick them. The design's
+              // one short title stays for the week's picks. Kept for revert:
+              //   title: 'Tools for this week',
+              title: store.hasHistory ? 'Your tools' : 'Tools for this week',
               p: p),
           const SizedBox(height: 12),
           Row(

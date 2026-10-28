@@ -49,7 +49,9 @@ import '../../services/family_profile.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
-import '../../ttc/ttc_home_situation.dart' show ttcHomePhaseOn;
+import '../../ttc/ttc_home_situation.dart' show ttcHomePhaseOn, ttcHomeRoundPhaseOn;
+import '../../services/pregnancy_records.dart' show PregnancyRecords;
+import '../../ttc/ttc_treatment_round.dart';
 import '../../ttc/ttc_mind_today.dart' show ttcTodaysMove, ttcPracticeAsTip;
 import '../../ttc/ttc_phase.dart';
 import '../../widgets/pv_feedback.dart';
@@ -357,16 +359,31 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
   ];
 
   List<Widget> _forYouTtc(V2Palette p) {
-    final phase = ttcHomePhaseOn(DateTime.now());
+    final now = DateTime.now();
+    // ⚠️ A ROUND, OR A RECENT LOSS, IS A GENTLE TIME (relevance Batch 4,
+    // TTC 17, 2026-10-28). During a clinic round the phase is `any`, so she got
+    // "A short practice for today" and a "Fertility yoga" rail, a rail about
+    // helping her own cycle along, while the clinic runs it; after a loss the
+    // same. Now both take the gentle practice of the waiting days, say why,
+    // and leave the fertility rail out. Gentle yoga and Breathe and calm stay,
+    // and every practice is still in the library and its search.
+    final inRound = ttcHomeRoundPhaseOn(now)?.isRunning ?? false;
+    final afterLoss = PregnancyRecords.instance.lossRecentlyClosed(now: now);
+    final gentle = inRound || afterLoss;
+    final phase = gentle ? TtcDayPhase.waiting : ttcHomePhaseOn(now);
     final today = pvMoveFromPractice(ttcTodaysMove(phase: phase));
-    final line = switch (phase) {
+    final line = afterLoss
+        ? 'Gentle, for now. Go at your own pace.'
+        : inRound
+            ? 'Gentle, while your clinic runs this cycle.'
+            : switch (phase) {
       TtcDayPhase.period => 'Gentle, for your period days.',
       TtcDayPhase.beforeWindow || TtcDayPhase.window =>
         'A little more active, for this part of your cycle.',
       TtcDayPhase.waiting ||
       TtcDayPhase.late => 'Gentle, for the days of waiting.',
       TtcDayPhase.any => 'A short practice for today.',
-    };
+            };
     final fertility = pvMoveFiltered(
       chip: 'fertility',
     ).where((i) => i.id != today.id).toList();
@@ -382,7 +399,8 @@ class _YogaHomeScreenState extends State<YogaHomeScreen> {
           onTap: () => _openItem(today),
         ),
       ),
-      ..._rail(p, 'Fertility yoga', fertility, chip: 'fertility'),
+      // Not during a round or after a loss (Batch 4, TTC 17).
+      if (!gentle) ..._rail(p, 'Fertility yoga', fertility, chip: 'fertility'),
       ..._rail(p, 'Gentle yoga', _classesIn('yoga'), chip: 'yoga'),
       ..._rail(p, 'Breathe and calm', _calm, chip: 'breathing'),
     ];

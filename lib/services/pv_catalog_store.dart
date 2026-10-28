@@ -101,6 +101,11 @@ class PvCatalogStore extends ChangeNotifier {
     }
   }
 
+  int? _realPregWeek() {
+    final c = PregnancyController.current;
+    return c == null || !c.isDueDateSet ? null : c.currentWeek;
+  }
+
   /// Stable: what fits her week or her child's age first, the rest after in
   /// their own order. Ranking, never a filter - every product stays on the
   /// shelf (the user, 2026-10-23: "a week-20 mother should see week-20
@@ -148,8 +153,22 @@ class PvCatalogStore extends ChangeNotifier {
       case LifeStage.skilling:
         break;
     }
+    // ⚠️ IN LATE PREGNANCY EVERYTHING "FITS" (relevance Batch 4, PREG 14,
+    // 2026-10-28). Sheet picks carry one week, the week to have it by, and
+    // `suitsWeek` reads that as "from two weeks before, for ever", so at week
+    // 36 the whole catalogue fits and the rail fell back to ratings: a pillow
+    // for week 20 beside the hospital bag. Now a closeness tier comes first:
+    // due about now, then what is useful any week, then what she could have
+    // had earlier. We rank instead of inventing an end week for each pick:
+    // the sheet gives one week, and an end week we made up would be a claim we
+    // cannot stand behind.
+    final week = s == LifeStage.pregnancy ? _realPregWeek() : null;
     final out = list.toList()
       ..sort((a, b) {
+        if (week != null) {
+          final ta = pvWeekTier(a, week), tb = pvWeekTier(b, week);
+          if (ta != tb) return ta.compareTo(tb);
+        }
         final ra = a.reco?.band.rank ?? 9;
         final rb = b.reco?.band.rank ?? 9;
         if (ra != rb) return ra.compareTo(rb);
@@ -235,4 +254,16 @@ class PvCatalogStore extends ChangeNotifier {
     }
     return PvSearchResult(hits, by);
   }
+}
+
+/// How close [p] is to pregnancy week [week], for ranking (relevance Batch 4,
+/// PREG 14): 0 when its "have it by" week is within [kPvDueSoonWeeks] either
+/// side, 1 when it names no week (useful at any), 2 when that week is further
+/// off. A pure function so the rule is tested without a store.
+const int kPvDueSoonWeeks = 4;
+
+int pvWeekTier(PvProduct p, int week) {
+  final from = p.weekFrom;
+  if (from == null) return 1;
+  return (from - week).abs() <= kPvDueSoonWeeks ? 0 : 2;
 }

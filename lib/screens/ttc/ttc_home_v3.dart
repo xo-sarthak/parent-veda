@@ -120,6 +120,7 @@ import '../../services/pv_read_store.dart';
 import '../../ttc/ttc_content_prefs.dart';
 import '../../ttc/ttc_home_prefs.dart';
 import '../../ttc/ttc_home_situation.dart';
+import '../products/pv_store_screen.dart' show pvTtcNeedsInOrder;
 import '../../services/pregnancy_records.dart' show PregnancyRecords;
 import '../../ttc/ttc_day_context.dart';
 import '../../ttc/ttc_fertility_help_store.dart';
@@ -408,9 +409,14 @@ class _TtcHomeV3State extends State<TtcHomeV3>
         // His side of the same home (2026-10-10, ttc_partner_home.dart).
         final him = TtcPartnerMode.instance.on;
         final phase = ttcHomePhaseOn(_selected);
-        final checkMonths = TtcHomePrefs.instance.checkDismissed
+        // The doctor check's answer, not a month count (Batch 4, TTC 6).
+        // Kept for revert:
+        //   final checkMonths = TtcHomePrefs.instance.checkDismissed
+        //       ? null
+        //       : ttcHomeCheckMonths();
+        final check = TtcHomePrefs.instance.checkDismissed
             ? null
-            : ttcHomeCheckMonths();
+            : ttcHomeCheckNow();
         final doorIds = ttcHisDoorsFirst(
             ttcHomeDoorOrderNow([
               for (final b in bracketsFor(LifeStage.tryingToConceive)) b.id,
@@ -571,8 +577,10 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // for a while" message so the two agree. "Not now" is
                   // remembered. Above the doors because it is the one thing on
                   // this page that is about her, this month, and not a menu.
-                  if (!him && checkMonths != null) ...[
-                    _pad(TtcCheckCard(p: p, months: checkMonths)),
+                  // Kept for revert: if (!him && checkMonths != null) ...[
+                  //   _pad(TtcCheckCard(p: p, months: checkMonths)),
+                  if (!him && check != null) ...[
+                    _pad(TtcCheckCard(p: p, title: check.$1, body: check.$2)),
                     const SizedBox(height: 26),
                   ],
 
@@ -592,7 +600,13 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                     // nothing once they are linked, or offline.
                     TtcHisLinkCard(p: p),
                   ],
-                  if (!him && TtcHomePrefs.instance.offer101) ...[
+                  // Waits while the intro film card is still showing: both
+                  // say "new to this? start here" (Batch 4, TTC 12). The
+                  // course is always in Learn. Kept for revert:
+                  //   if (!him && TtcHomePrefs.instance.offer101) ...[
+                  if (!him &&
+                      TtcHomePrefs.instance.offer101 &&
+                      !TtcIntroGate.cardShowing()) ...[
                     _pad(Ttc101Card(
                         p: p, onAllSteps: () => openTtcLearn101(context))),
                     const SizedBox(height: 26),
@@ -869,11 +883,20 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                       //       .forYou(LifeStage.tryingToConceive);
                       final pickId =
                           pvIdForTtc(ttcHomeTodaysPick(_selected).id);
-                      final picks = [
-                        for (final x in PvCatalogStore.instance
-                            .forYou(LifeStage.tryingToConceive))
-                          if (x.id != pickId) x,
-                      ];
+                      // Kits and tests go last during an IVF-shaped round or
+                      // after a loss, as on the Store's needs (relevance Batch
+                      // 4, TTC 23, `pvTtcNeedsInOrder`). Kept for revert: the
+                      // list without pvTtcNeedsInOrder.
+                      final picks = pvTtcNeedsInOrder(
+                        [
+                          for (final x in PvCatalogStore.instance
+                              .forYou(LifeStage.tryingToConceive))
+                            if (x.id != pickId) x,
+                        ],
+                        (x) => 'shelf:${x.categoryId}',
+                        quieter: ttcHomeHidesQuickRow(_selected) ||
+                            PregnancyRecords.instance.lossRecentlyClosed(),
+                      );
                       return picks.isEmpty
                           ? _ProductRail(p: p, hinglish: hinglish)
                           // ONE PRODUCT CARD FOR ALL THREE HOMES (2026-10-23):
@@ -4242,6 +4265,13 @@ class _InsightRail extends StatelessWidget {
         art: TtcInsightArt.ring,
         go: TtcInsightGo.cycle,
       ),
+      // ⚠️ NOT WHILE A CLINIC OWNS THE CYCLE (relevance Batch 4, TTC 14,
+      // 2026-10-28). The report reads her own cycle's pattern, and the cycle
+      // report message is already held back on a clinic cycle
+      // (`ttc_messages_store.dart`: periodCame and cycleReport are off then);
+      // the card still showed. The report itself stays one tap away in the
+      // Cycle Companion. Kept for revert: unconditional.
+      if (TtcStore.instance.ownership == TimingOwnership.parentveda)
       TtcInsightCard(
         id: 'report',
         eyebrow: t.reportShort,
@@ -4272,9 +4302,15 @@ class _InsightRail extends StatelessWidget {
           art: TtcInsightArt.note,
           go: TtcInsightGo.readyPlan,
         )
+      // ⚠️ ONE START AT A TIME (relevance Batch 4, TTC 12, 2026-10-28): on
+      // day one the hero asks for her period, the intro film card explains
+      // the stage, and this card and the 101 course card asked two more
+      // things. The checklist step waits for her first logged period; the
+      // checklist itself is always on the Tools tab.
       else if (selected == today &&
           readyFor == null &&
           !todayState.clinicInvolved &&
+          todayState.noEstimate != TtcNoEstimate.noPeriodLogged &&
           nextStep != null)
         TtcInsightCard(
           id: 'precheck',

@@ -217,7 +217,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   PvRead get a => widget.read;
 
   /// The one service that fits this read, worked out once (2026-10-21).
-  late final PvOfferingView? _offer = pvReadOfferFor(widget.read);
+  // No clinician offered while a clinic runs her cycle (Batch 4, TTC 15).
+  // Kept for revert: pvReadOfferFor(widget.read);
+  late final PvOfferingView? _offer = pvReadOfferFor(widget.read,
+      clinicOwnsCycle: widget.read.id.startsWith('ttc_') && pvReadClinicOwnsCycleNow());
   late final PvReadNextStep? _ownConsult = pvReadOwnConsult(widget.read);
   AppLanguage get _lang => widget.lang;
   PvReadStore get _store => PvReadStore.instance;

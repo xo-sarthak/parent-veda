@@ -616,9 +616,19 @@ Product? bestOverallFor(String categoryId) {
 }
 
 /// Categories relevant at [week], soonest-starting first.
+/// ⚠️ NEAREST TO HER WEEK FIRST (relevance Batch 4, PREG 14, 2026-10-28). A
+/// category stays relevant from two weeks before its start to 40, so late in
+/// pregnancy nearly all of them are, and sorting by start week put the week-12
+/// categories at the head of "Picked for week 36". Now the one whose start is
+/// closest to her week leads; ties keep the earlier start. Every relevant
+/// category is still returned. Kept for revert:
+///   list.sort((a, b) => a.fromWeek.compareTo(b.fromWeek));
 List<ProductCategory> recommendedCategories(int week) {
   final list = kProductCategories.where((c) => c.relevantAt(week)).toList();
-  list.sort((a, b) => a.fromWeek.compareTo(b.fromWeek));
+  list.sort((a, b) {
+    final d = (a.fromWeek - week).abs().compareTo((b.fromWeek - week).abs());
+    return d != 0 ? d : a.fromWeek.compareTo(b.fromWeek);
+  });
   return list;
 }
 

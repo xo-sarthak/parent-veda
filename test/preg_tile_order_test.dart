@@ -21,22 +21,23 @@ void main() {
       expect(_ids(20), table);
     });
 
-    test('first trimester leads with Symptoms, Is it safe?, Scans & tests', () {
-      expect(_ids(8).take(3), ['pregnancy_symptoms', 'pregnancy_is_it_safe', 'pregnancy_scans_tests']);
-      expect(_ids(13).take(3), ['pregnancy_symptoms', 'pregnancy_is_it_safe', 'pregnancy_scans_tests']);
+    test('first trimester leads with First weeks, Symptoms, Is it safe?, Scans & tests', () {
+      const lead = ['pregnancy_first_weeks', 'pregnancy_symptoms', 'pregnancy_is_it_safe', 'pregnancy_scans_tests'];
+      expect(_ids(8).take(4), lead);
+      expect(_ids(13).take(4), lead);
       // …and the rest keep the table's order behind them.
-      final rest = _ids(8).skip(3).toList();
-      expect(rest, [
-        for (final id in table)
-          if (!{'pregnancy_symptoms', 'pregnancy_is_it_safe', 'pregnancy_scans_tests'}.contains(id)) id,
-      ]);
+      final rest = _ids(8).skip(4).toList();
+      expect(rest, [for (final id in table) if (!lead.contains(id)) id]);
     });
 
-    test('Labour prep leads from week 32, and not before', () {
-      expect(_ids(32).first, 'pregnancy_labour');
-      expect(_ids(40).first, 'pregnancy_labour');
-      expect(_ids(31), table, reason: 'the PDF names nothing for weeks 14 to 31');
-      expect(_ids(28), table);
+    // Relevance Batch 4, PREG 10 (2026-10-28).
+    test('Getting ready leads from 28; Labour then Getting ready from 32', () {
+      expect(_ids(28).first, 'pregnancy_getting_ready');
+      expect(_ids(31).first, 'pregnancy_getting_ready');
+      expect(_ids(32).take(2), ['pregnancy_labour', 'pregnancy_getting_ready']);
+      expect(_ids(40).take(2), ['pregnancy_labour', 'pregnancy_getting_ready']);
+      expect(_ids(27), table, reason: 'the second trimester leads with nothing');
+      expect(_ids(14), table);
     });
 
     test('her onboarding choices come before the trimester', () {
@@ -44,7 +45,8 @@ void main() {
       final o = _ids(8, {PregPriority.nutrition, PregPriority.anxiety});
       expect(o.take(2), ['pregnancy_nutrition', 'pregnancy_mental_health'],
           reason: 'her choices lead, in the table order between themselves');
-      expect(o.skip(2).take(3), ['pregnancy_symptoms', 'pregnancy_is_it_safe', 'pregnancy_scans_tests']);
+      expect(o.skip(2).take(4),
+          ['pregnancy_first_weeks', 'pregnancy_symptoms', 'pregnancy_is_it_safe', 'pregnancy_scans_tests']);
     });
 
     test('a chosen door that is also the trimester lead sits once, in her tier', () {

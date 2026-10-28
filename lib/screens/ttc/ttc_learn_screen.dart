@@ -72,6 +72,7 @@
 // =============================================================================
 
 import 'dart:math' as math;
+import '../../ttc/ttc_home_situation.dart' show ttcHomeDoorOrderNow;
 import '../../ttc/ttc_age_rank.dart' show ttcAgeOrder;
 import '../../ttc/ttc_fertility_help_store.dart' show TtcFertilityHelpStore;
 import 'ttc_intro_flow.dart' show openTtcIntroFilm, ttcIntroVideoSlotId;
@@ -329,11 +330,24 @@ class TtcLearnTopic {
 /// as Flo for Partners gives him the pieces about her body too.
 const List<String> kTtcHisLearnFirst = ['ttc_male_fertility', 'ttc_mind_body'];
 
-List<TtcLearnTopic> ttcLearnTopics({bool? hideIntimate, bool? him}) {
+///
+/// ⚠️ HER SIDE FOLLOWS THE HOME'S DOOR ORDER (relevance Batch 4, TTC 13,
+/// 2026-10-28). The topics were always the table's order, so on a clinic
+/// round, after a loss or a year into trying, Learn led with what the home had
+/// already moved down. Now they come in the order of [order], which is the
+/// home's `ttcHomeDoorOrderNow` unless a caller (a test) passes another: one
+/// rule for "what comes first for her", read in both places. Order only;
+/// every door is still a topic. Kept for revert: `? kTtcBrackets`.
+List<TtcLearnTopic> ttcLearnTopics(
+    {bool? hideIntimate, bool? him, List<String> Function(List<String>)? order}) {
   final hide = hideIntimate ?? TtcContentPrefs.instance.hideIntimate;
   final forHim = him ?? TtcPartnerMode.instance.on;
   final brackets = !forHim
-      ? kTtcBrackets
+      ? [
+          for (final id in (order ?? ttcHomeDoorOrderNow)(
+              [for (final b in kTtcBrackets) b.id]))
+            ?_bracketById(id),
+        ]
       : [
           for (final id in kTtcHisLearnFirst) ?_bracketById(id),
           for (final b in kTtcBrackets)

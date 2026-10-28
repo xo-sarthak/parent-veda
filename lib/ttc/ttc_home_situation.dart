@@ -39,6 +39,8 @@ import 'cycle_store.dart';
 // import 'ttc_care_pathway.dart' show TimingOwnership;
 // Back since 2026-09-26, for the round's switch and the treatment label.
 import 'ttc_care_pathway.dart' show TimingOwnership, TtcPath;
+import 'ttc_fertility_help_rules.dart' show FertilityHelpResult, FertilityHelpState;
+import 'ttc_fertility_help_store.dart' show TtcFertilityHelpStore;
 import 'ttc_chapter.dart' show TtcChapter;
 import 'ttc_treatment_content.dart';
 import 'ttc_treatment_round.dart';
@@ -423,6 +425,49 @@ int? ttcHomeCheckMonths({DateTime? now, TtcMessageFacts? facts}) {
   return ttcTryingLongReached(f, now ?? DateTime.now())
       ? f.monthsBeforeCheck
       : null;
+}
+
+/// The check card's title and line, when the doctor check says a check is due
+/// ("may see someone" or "don't wait"), else null.
+///
+/// ⚠️ THE CARD READS THE DOCTOR CHECK, NOT A MONTH COUNT (relevance Batch 4,
+/// TTC 6, 2026-10-28). It used to show only on months of trying
+/// ([ttcHomeCheckMonths]), so two losses, being over 40, or cycles that vary
+/// a lot (each a "don't wait" in `ttc_fertility_help_rules.dart`) never
+/// brought it up, while the doctor check behind it said "talk to a doctor
+/// sooner". The months are still in the engine (`twelve_months`,
+/// `age_at_presentation`), counted from the start the tools terminal works
+/// out (T1, 00b3cc5), so nothing the old card caught is lost. The words are
+/// the engine's: its headline, and its first reason, which says which fact
+/// it is.
+///
+/// Same gates as before: never when she is pregnant, never once she is in
+/// someone's care, never while a clinic owns the cycle (the clinic is the
+/// check). Pure, so a test can hand it any result.
+(String, String)? ttcHomeCheckFrom(
+  FertilityHelpResult r, {
+  required bool ownCycle,
+  required bool inCare,
+  required bool pregnant,
+}) {
+  if (pregnant || inCare || !ownCycle) return null;
+  if (r.state != FertilityHelpState.maySeeSpecialist &&
+      r.state != FertilityHelpState.dontWait) {
+    return null;
+  }
+  if (r.reasons.isEmpty) return null;
+  return (r.headline.en, r.reasons.first.text.en);
+}
+
+/// [ttcHomeCheckFrom] for today, from the stores.
+(String, String)? ttcHomeCheckNow() {
+  final f = TtcMessageFacts.fromStores();
+  return ttcHomeCheckFrom(
+    TtcFertilityHelpStore.instance.result,
+    ownCycle: f.ownership == TimingOwnership.parentveda,
+    inCare: f.alreadyInCare,
+    pregnant: f.pregnancyConfirmed,
+  );
 }
 
 // =============================================================================

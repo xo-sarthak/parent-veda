@@ -1136,6 +1136,12 @@ const Map<String, String> kReadImageUrls = {
   // Letrozole, metformin and the usual order
   'ttc_read_pcos_meds':
       'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Alprazolam_orally_disintegrating_tablets%2C_blister_packs.jpg/1280px-Alprazolam_orally_disintegrating_tablets%2C_blister_packs.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Reading your cycle, phase by phase (relevance Batch 4, 2026-10-28): an
+  // open month planner on a desk, the days the read is about. Picked by eye
+  // from Commons' Calendars (object); it borrowed "How conception works"'s
+  // calendar before, and All articles drew that photo twice.
+  'ttc_read_cycle_phase_by_phase':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Giulia_Bertelli_2016_%28Unsplash%29.jpg/1280px-Giulia_Bertelli_2016_%28Unsplash%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
   // Cycle Companion
   'ttc_tile_cycle_companion':
       'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Manual_scrollable_wooden_wall_calendar.jpg/1280px-Manual_scrollable_wooden_wall_calendar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
@@ -2599,6 +2605,7 @@ const Map<String, String> kReadImageCredits = {
   'ttc_tile_the_pcos_treatments_your_doctor_may_offer': 'CC BY-SA 4.0 · Wikimedia Commons · Jacek Halicki',
   'ttc_read_pcos_treatment': 'CC0 · StockSnap · Jamie Hamel-Smith',
   'ttc_read_pcos_meds': 'CC0 · Wikimedia Commons · Tmeers91',
+  'ttc_read_cycle_phase_by_phase': 'CC0 · Wikimedia Commons · Giulia Bertelli',
   'ttc_tile_cycle_companion': 'CC0 · Wikimedia Commons · Amitbalani',
   'ttc_tile_log_your_symptoms': 'CC0 · StockSnap · Cathryn Lavery',
   'ttc_tile_what_your_cycle_shows': 'CC0 · StockSnap · Shotstash.com',

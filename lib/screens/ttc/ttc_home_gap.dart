@@ -376,10 +376,17 @@ class TtcMessagesButton extends StatelessWidget {
 /// `p.surface`, radius 20, a hairline, and `medical_information_outlined` in
 /// `p.action` beside the title.
 class TtcCheckCard extends StatelessWidget {
-  const TtcCheckCard({super.key, required this.p, required this.months});
+  // ⚠️ TITLE AND LINE, NOT MONTHS (relevance Batch 4, TTC 6, 2026-10-28):
+  // the card now says what the doctor check says (`ttcHomeCheckNow`), which
+  // may be two losses or age, not only time. [ttcCheckTitle] and
+  // [ttcCheckBody] stay for revert. Kept for revert:
+  //   const TtcCheckCard({super.key, required this.p, required this.months});
+  //   final int months;
+  const TtcCheckCard({super.key, required this.p, required this.title, required this.body});
 
   final V2Palette p;
-  final int months;
+  final String title;
+  final String body;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -397,7 +404,7 @@ class TtcCheckCard extends StatelessWidget {
                   letterSpacing: 1.4,
                   color: p.action)),
           const SizedBox(height: 6),
-          Text(ttcCheckTitle(months),
+          Text(title, // was ttcCheckTitle(months)
               style: pvFraunces(
                   fontSize: 19,
                   fontWeight: FontWeight.w600,
@@ -405,7 +412,7 @@ class TtcCheckCard extends StatelessWidget {
                   letterSpacing: -0.3,
                   color: p.ink1)),
           const SizedBox(height: 6),
-          Text(ttcCheckBody(months),
+          Text(body, // was ttcCheckBody(months)
               style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
           const SizedBox(height: 4),
           Wrap(spacing: 4, runSpacing: 0, children: [

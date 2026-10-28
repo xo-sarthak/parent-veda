@@ -1772,10 +1772,13 @@ final List<PvRead> kTtcReadsBodyCycle = [
   PvRead(
     id: 'ttc_read_cycle_phase_by_phase',
     hue: 172,
-    // A calendar, because the piece is about which days (the picture "How
-    // conception works" carries on the Conceiving door, not on this one).
-    imageUrl:
-        'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop',
+    // ⚠️ NO BORROWED PICTURE (relevance Batch 4, 2026-10-28). Batch 3 gave
+    // this read the calendar photo "How conception works" already wears, and
+    // the All articles screen then drew it twice (ttc_no_repetition_test). Its
+    // own picture, chosen by eye, is in `read_images.dart` under its id, as
+    // the other reads in this file keep theirs. Kept for revert:
+    //   imageUrl:
+    //       'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop',
     kicker: _en('Body and cycle'),
     title: _en('Reading your cycle, phase by phase'),
     teaser: _en("The four phases of a cycle, when each one happens, what the "

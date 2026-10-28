@@ -1118,7 +1118,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
   /// two ways on — everywhere, and Ask Veda.
   List<Widget> _liveResults(V2Palette p) {
     final q = _search.query;
-    final hits = pvSearch(q, pvSearchIndexOf(page));
+    final hits = pvSearch(q, pvSearchIndexOf(page), week: _knownWeek);
     final label = bracket.label.of(widget.pregnancy.language);
     return [
       const SizedBox(height: 22),
@@ -1347,7 +1347,8 @@ class _Hero extends StatelessWidget {
       p: p,
       hint: 'Search $eyebrow',
       onSubmitted: (q) {
-        final hits = pvSearch(q.trim(), pvSearchIndexOf(page));
+        final hits = pvSearch(q.trim(), pvSearchIndexOf(page),
+                        week: pvSearchWeekOf(pregnancy));
         if (hits.isNotEmpty) {
           openPvSearchHit(context, hits.first, pregnancy, query: q);
         } else if (q.trim().isNotEmpty) {
@@ -1703,7 +1704,8 @@ class _Hero extends StatelessWidget {
                   p: p,
                   hint: 'Search $eyebrow',
                   onSubmitted: (q) {
-                    final hits = pvSearch(q.trim(), pvSearchIndexOf(page));
+                    final hits = pvSearch(q.trim(), pvSearchIndexOf(page),
+                        week: pvSearchWeekOf(pregnancy));
                     if (hits.isNotEmpty) {
                       openPvSearchHit(context, hits.first, pregnancy, query: q);
                     } else if (q.trim().isNotEmpty) {

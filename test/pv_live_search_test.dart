@@ -174,7 +174,9 @@ void main() {
 
     test('the door searches its own index and hands "everywhere" to the search screen', () {
       final door = read('lib/screens/doors/pv_door_screen.dart');
-      expect(door, contains('pvSearch(q, pvSearchIndexOf(page))'));
+      // Now with her week for the tie-break (relevance Batch 4, PREG 15).
+      // Kept for revert: contains('pvSearch(q, pvSearchIndexOf(page))').
+      expect(door, contains('pvSearch(q, pvSearchIndexOf(page), week: _knownWeek)'));
       expect(door, contains('PvSearchHitRow('));
       expect(door, contains("Search everywhere for"));
       expect(door, contains("Ask Veda about"));

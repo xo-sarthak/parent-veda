@@ -76,6 +76,7 @@ import 'doors/pv_live_search.dart';
 import 'pregnancy/birth_plan_screen.dart';
 import 'products/pv_store_chrome.dart' show pvStorePalette;
 import 'v2/v2_palette.dart';
+import '../services/preg_tool_order.dart';
 // Kept for revert (PregSectionHeading, 2026-10-02): import 'pregnancy/preg_chrome.dart';
 
 // =============================================================================
@@ -113,10 +114,14 @@ import 'v2/v2_palette.dart';
 
 /// One group of tools: an eyebrow, a tint, and its rows.
 class _ToolGroup {
-  const _ToolGroup(this.title, this.hue, this.tools);
+  const _ToolGroup(this.title, this.hue, this.tools, {this.leadsFromWeek});
   final String title;
   final double hue;
   final List<_Tool> tools;
+
+  /// The week from which this group leads the tab (relevance Batch 4,
+  /// `preg_tool_order.dart`). Null: it keeps its place.
+  final int? leadsFromWeek;
 }
 
 class ToolsHubScreen extends StatefulWidget {
@@ -160,6 +165,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   // every one back.
   bool get _ended => PregnancyEndedStore.instance.ended;
 
+  /// Her real week, or null on the week-20 stand-in (nothing then moves).
+  int? get _week => controller.isDueDateSet ? controller.currentWeek : null;
+
   List<_ToolGroup> _groups(S s) => [
         if (!FatherPreview.instance.on)
         _ToolGroup('Track', 206, [
@@ -169,7 +177,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open('tools/movement', () => BabyMovementScreen(controller: controller)),
               line: "Count kicks and get to know your baby's pattern",
               mark: IntentMark.stepsMark,
-              priority: PregPriority.babyDevelopment),
+              priority: PregPriority.babyDevelopment,
+              // First in Track from 28, after the rest before it (Batch 4).
+              fromWeek: kPregToolsThirdTrimesterFrom),
           if (!_ended)
           _Tool(s.toolWeightTitle, Icons.monitor_weight_outlined,
               AppTheme.tertiary500,
@@ -215,7 +225,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               mark: IntentMark.nextStep),
         ]),
         if (!_ended)
-        _ToolGroup('Get ready', 28, [
+        // Leads the tab from week 28 (Batch 4, PREG 8). The 28 before it is
+        // the group's hue, not a week.
+        _ToolGroup('Get ready', 28, leadsFromWeek: kPregToolsThirdTrimesterFrom, [
           _Tool(s.hbName, Icons.luggage_outlined, AppTheme.tertiary400,
               () => _open('tools/hospital_bag', () => ReadyForBirthScreen(controller: controller)),
               line: 'What to pack for you, your baby and your partner',
@@ -232,7 +244,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open('tools/contractions', () => ContractionTrackerScreen(controller: controller)),
               line: 'Time your contractions and see when to go in',
               mark: IntentMark.timelineRail,
-              priority: PregPriority.birthPrep),
+              priority: PregPriority.birthPrep,
+              // First in Get ready from 37, as the Labour door (Batch 4).
+              fromWeek: kPregToolsTimerFrom),
           if (!FatherPreview.instance.on)
           _Tool(s.ddcToolTitle, Icons.calendar_month_outlined, AppTheme.neutral900,
               () => _open('tools/due_date', () => DueDateCalculatorScreen(controller: controller)),
@@ -364,7 +378,11 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                 if (_search.searching)
                   ..._results(p, groups)
                 else ...[
-                  for (final g in groups) ..._group(p, g),
+                  // By her week (Batch 4, PREG 8); groups only lift. Kept
+                  // for revert: for (final g in groups) ..._group(p, g),
+                  for (final g in orderPregToolsByWeek(groups, (g) => g.leadsFromWeek,
+                      week: _week, liftOnly: true))
+                    ..._group(p, g),
                   // Progressive profiling, kept: whatever she picks re-sorts the
                   // rows inside each group. Under the list now, so the list leads.
                   const SizedBox(height: 22),
@@ -397,9 +415,16 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
         const SizedBox(height: 6),
         _pad(PvRowGroup(p: p, children: [
           // LEVEL 3 personalisation, inside the group: a stable sort, every
-          // tool returned, the ones serving a priority she chose first.
-          for (final t in FamilyProfileStore.instance
-              .orderByPregPriority(g.tools, (t) => t.priority))
+          // tool returned, the ones serving a priority she chose first. Then
+          // her week (relevance Batch 4, PREG 8): a row in its time leads, a
+          // row before its time waits behind the rest. Kept for revert:
+          //   for (final t in FamilyProfileStore.instance
+          //       .orderByPregPriority(g.tools, (t) => t.priority))
+          for (final t in orderPregToolsByWeek(
+              FamilyProfileStore.instance
+                  .orderByPregPriority(g.tools, (t) => t.priority),
+              (t) => t.fromWeek,
+              week: _week))
             _row(p, t, g.hue),
         ])),
       ];
@@ -1000,8 +1025,14 @@ class _Tool {
     this.line,
     this.mark,
     this.leading,
+    this.fromWeek,
   });
   final String title;
+
+  /// The week from which this row is in its time: it leads its group from
+  /// then and waits behind the rows with no week before then (relevance
+  /// Batch 4, `preg_tool_order.dart`). Null: it keeps its place.
+  final int? fromWeek;
 
   /// A ready-made leading widget that wins over [mark] and [icon]: the Ask Veda
   /// tile passes `AskVedaMark` (2026-10-24).

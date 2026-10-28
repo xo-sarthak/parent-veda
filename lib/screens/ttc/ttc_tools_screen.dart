@@ -104,6 +104,8 @@ import '../../services/medicine_store.dart';
 import '../../ttc/ttc_supplements_store.dart';
 import '../../ttc/ttc_trackers_data.dart';
 import '../../ttc/ttc_treatment_store.dart';
+import '../../ttc/ttc_store.dart' show TtcStore;
+import '../../ttc/ttc_care_pathway.dart' show TimingOwnership;
 import 'ttc_appointments_screen.dart';
 import 'ttc_can_i_screen.dart';
 import 'ttc_ivf_readiness_screen.dart' show kTtcFertilityHelpName;
@@ -176,11 +178,16 @@ class TtcToolGroup {
     required this.titleHi,
     required this.tools,
     this.hue = 268,
+    this.leadsOnClinicCycle = false,
   });
 
   final String titleEn;
   final String titleHi;
   final List<TtcTool> tools;
+
+  /// Leads the tab while a clinic owns her cycle (relevance Batch 4, TTC 10,
+  /// [ttcToolsInOrder]). A rule on the group, never a position.
+  final bool leadsOnClinicCycle;
 
   /// The tint of every well in the group (T3). Each is the hue of the door
   /// that holds the same subject (`kTtcBrackets`), so a colour keeps one
@@ -437,6 +444,8 @@ final List<TtcToolGroup> ttcToolGroups = [
     titleHi: 'Dekhbhaal aur dawaiyan',
     // IVF and IUI's hue, the clinic door (T6: ttc_tool_hues.dart). Was: 206.
     hue: kTtcToolHueCare,
+    // First while a clinic runs the cycle (Batch 4, TTC 10).
+    leadsOnClinicCycle: true,
     tools: [
       // ⚠️ TALK TO AN EXPERT LEFT THE BAR — 2026-09-26. The V3 bar became
       // Today · Learn · Products · Tools · You, and the consults it opened
@@ -992,12 +1001,55 @@ List<TtcToolGroup> ttcToolGroupsFor({required bool him}) => !him
               titleEn: kTtcHisGroupTitles[g.titleEn] ?? g.titleEn,
               titleHi: kTtcHisGroupTitles[g.titleEn] ?? g.titleHi,
               hue: g.hue,
+              leadsOnClinicCycle: g.leadsOnClinicCycle,
               tools: [
                 for (final t in g.tools)
                   if (kTtcHisToolIds.contains(t.id)) t,
               ],
             ),
       ];
+
+/// The tools that lead the Care and medicines group on a clinic cycle, in
+/// the order of her day there: the round itself, what she takes, where she
+/// goes. A list of ids rather than positions, so the group's own order stands
+/// for everything else and a new row slots in untouched.
+const List<String> kTtcClinicCycleLeadIds = ['treatment', 'medication', 'appointments'];
+
+/// The Tools tab in the order she sees it (relevance Batch 4, TTC 10,
+/// 2026-10-28). On her own cycle: the list as written. While a clinic owns the
+/// cycle (`TtcStore.ownership` is not `parentveda`): the groups marked
+/// [TtcToolGroup.leadsOnClinicCycle] first, and inside them
+/// [kTtcClinicCycleLeadIds] first. Was: Cycle, Ovulation tests and Fertile
+/// window as rows 1 to 3 in the middle of an IVF round, the predictions the
+/// home already holds back there, with Treatment cycle the last row of the
+/// third group. Order only: every group and every row comes back once.
+List<TtcToolGroup> ttcToolsInOrder({required bool him, required bool clinicCycle}) {
+  final groups = ttcToolGroupsFor(him: him);
+  if (!clinicCycle) return groups;
+  int rank(TtcTool t) {
+    final i = kTtcClinicCycleLeadIds.indexOf(t.id);
+    return i < 0 ? kTtcClinicCycleLeadIds.length : i;
+  }
+
+  TtcToolGroup lifted(TtcToolGroup g) {
+    if (!g.leadsOnClinicCycle) return g;
+    final tools = [
+      for (var i = 0; i < g.tools.length; i++) (rank(g.tools[i]), i, g.tools[i])
+    ]..sort((a, b) => a.$1 != b.$1 ? a.$1.compareTo(b.$1) : a.$2.compareTo(b.$2));
+    return TtcToolGroup(
+      titleEn: g.titleEn,
+      titleHi: g.titleHi,
+      hue: g.hue,
+      leadsOnClinicCycle: true,
+      tools: [for (final t in tools) t.$3],
+    );
+  }
+
+  return [
+    for (final g in groups) if (g.leadsOnClinicCycle) lifted(g),
+    for (final g in groups) if (!g.leadsOnClinicCycle) g,
+  ];
+}
 
 TtcTool? ttcToolById(String id) {
   for (final g in ttcToolGroups) {
@@ -1118,6 +1170,8 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
         TtcToolRecents.instance,
         TtcHomeVersionStore.instance,
         TtcPartnerMode.instance,
+        // Who owns the cycle orders the groups (Batch 4, TTC 10).
+        TtcStore.instance,
       ]),
       builder: (context, _) {
         final p = pvStorePalette;
@@ -1299,7 +1353,11 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
       //     ],
       //   ]),
       // )),
-      for (final group in ttcToolGroupsFor(him: _him)) ...[
+      // By who runs her cycle (Batch 4, TTC 10). Kept for revert:
+      //   for (final group in ttcToolGroupsFor(him: _him)) ...[
+      for (final group in ttcToolsInOrder(
+          him: _him,
+          clinicCycle: TtcStore.instance.ownership != TimingOwnership.parentveda)) ...[
         const SizedBox(height: 28),
         _pad(_eyebrow(p, group.title(hi))),
         const SizedBox(height: 6),
