@@ -8,8 +8,13 @@
 //  V1 had six doors and none of them answered "where did I put that report?" —
 //  which is the question most likely to make someone open this section twice.
 //  The other two doors are read; this one leaves something behind, and what it
-//  leaves makes both of the others better: a stored report is what the decoder
-//  reads from, and what she carries to the next appointment.
+//  leaves makes both of the others better: a stored report is what she
+//  carries to the next appointment.
+//
+//  ⚠️ CORRECTED (P1, 2026-10-28): this used to say "a stored report is what
+//  the decoder reads from". The decoder (`report_screen.dart`) never reads
+//  ScanReportsStore; it looks up the line she types. Wiring the two is a
+//  feature, recorded in STILL-OPEN, not a fact about the code.
 //
 //  ⚠️ NO NEW UPLOAD ENGINE — prompt §11. `showAttachmentPicker` already does
 //  camera / gallery / PDF and ships today; `uploadAttachments` handles
@@ -31,11 +36,12 @@
 //  comment describing work that has not happened reads as a decision somebody
 //  is tracking.** Nobody was tracking any of them.
 //
-//  KNOWN STYLING DEBT: the picker sheet is styled with `pp_common` (the
-//  parenting palette), so it arrives purple inside a V3 screen. Reusing it is
-//  still right — a second picker would be exactly the duplication the
-//  reconciliation forbids — but it is on the list in
-//  docs/SCANS-HUB-RECONCILIATION.md.
+//  STYLING (checked P1, 2026-10-28): the picker sheet is `pp_attachments.dart`
+//  (the parenting palette). The house-look sweep made its marks ink; one PDF
+//  icon there is still `ppPurple` (pp_attachments.dart:140, a Parenting file).
+//  Reusing it is still right — a second picker would be exactly the
+//  duplication the reconciliation forbids. Was: "so it arrives purple inside a
+//  V3 screen", no longer true.
 //
 //  ⚠️ ENGLISH ONLY FOR NOW.
 // =============================================================================
@@ -44,14 +50,16 @@ import 'package:flutter/material.dart';
 
 import '../../data/tests_scans_reports_data.dart';
 import '../../localization/app_language.dart';
+import '../../services/pp_use_consent.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/scan_reports_store.dart';
+import '../post_pregnancy/pp_use_ask_card.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../widgets/storage_image.dart';
 import '../post_pregnancy/pp_attachments.dart';
 import '../v2/v2_palette.dart';
-import '../doors/pv_door_chrome.dart' show PvDoorRailCard, PvDoorSingleRail, PvDoorToolScaffold, PvDoorDisclaimer;
+import '../doors/pv_door_chrome.dart' show PvDoorRailCard, PvDoorSingleRail, PvDoorToolScaffold, PvDoorDisclaimer, pvDoorPad;
 import 'hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
 import 'scan_report_viewer_screen.dart';
 import '../../widgets/pv_toast.dart';
@@ -77,22 +85,16 @@ class ScanReportsScreen extends StatelessWidget {
     return AnimatedBuilder(
       animation: V2PaletteStore.instance,
       builder: (context, _) {
-        final p = V2PaletteStore.instance.current;
-        return Scaffold(
-          backgroundColor: p.ground,
-          appBar: AppBar(
-            backgroundColor: p.ground,
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
-            foregroundColor: p.ink1,
-            title: Text(_en('My reports').of(lang),
-                style: pvManrope(
-                    fontSize: 16, fontWeight: FontWeight.w700, color: p.ink1)),
-          ),
-          body: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 8, 18, 40),
-            children: [ScanReportsBody(pregnancy: pregnancy)],
-          ),
+        // ⚠️ ONE SHELL (P1, 2026-10-28): the standalone locker wore a plain
+        // Scaffold + AppBar while "All reports", one tap in, wore the door
+        // tool shell. Kept for revert: Scaffold(appBar: AppBar(title:
+        // 'My reports'), body: ListView(padding 18/8/18/40, [body])).
+        return PvDoorToolScaffold(
+          hue: 206,
+          eyebrow: 'Scans & tests',
+          title: _en('My reports').of(lang),
+          intro: 'Keep every report in one place, ready for the next doctor who asks.',
+          children: [pvDoorPad(ScanReportsBody(pregnancy: pregnancy))],
         );
       },
     );
@@ -172,6 +174,15 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
               // search, the scan pills and the month groups are one tap in
               // (`ScanReportsAllScreen`). The newest-five list is kept for
               // revert in `_grouped`.
+              // D4 (P1, 2026-10-28): asked once, after her first report. The
+              // card hides itself once she answers.
+              if (reports.isNotEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: PpUseAskCard(
+                      kind: PpUseKind.pregReports,
+                      question: 'List your reports in the summary you can show your doctor?'),
+                ),
               _YourReportsRow(
                 reports: reports,
                 p: p,
@@ -467,7 +478,15 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
         ],
       ),
     );
-    if (yes == true) await ScanReportsStore.instance.remove(r.id);
+    // P1 (2026-10-28): the remove says so, with Undo (the same report, its
+    // id and its files). Kept for revert:
+    // if (yes == true) await ScanReportsStore.instance.remove(r.id);
+    if (yes != true) return;
+    await ScanReportsStore.instance.remove(r.id);
+    if (context.mounted) {
+      pvToast(context, 'Removed · ${r.title}',
+          kind: PvToastKind.done, action: 'Undo', onAction: () => ScanReportsStore.instance.add(r));
+    }
   }
 }
 

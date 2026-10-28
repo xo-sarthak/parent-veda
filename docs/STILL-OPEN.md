@@ -11240,3 +11240,24 @@ recipe page is a tool page, not a read (D3):** cook mode, the shopping list and 
   the router's "still choosing" line.
 - *The names detail page* is recoloured to ink and white, not moved onto the shared shell (it has its own sticky
   bar). The swipe deck's match overlay fires only on a real match, which needs the partner's vote first.
+
+## 103.0 Pregnancy tools P1, look-ups and records: what the build left open — 2026-10-28
+
+`docs/preg-ttc-tool-plans/P1-lookups-records.md`. Clinician lines are in BEFORE-LAUNCH §4.
+
+- *Medicines and conditions already feed Ask Veda and the doctor summary without asking.* The summary's
+  Medicines section (`pv_doctor_notes_screen.dart`) and Ask Veda's context (`veda_context.dart:63-123`) read
+  `MedicineStore` and the profile's conditions today. Putting live features behind consent changes how they
+  behave, so it is a decision for the user, not a fix.
+- *The report decoder never reads her stored reports.* The locker's header said it did (corrected). Opening
+  the decoder on a stored report's type is a feature, not built.
+- *Three test and report libraries repeat the same findings* (`tests_scans_reports_data.dart`,
+  `report_findings_data.dart`, the scans data). Content work; only the AFI range and one heading changed.
+- *Parenting's health-wallet reminders (`hw_` ids) show on the Pregnancy Reminders screen* when she has a child
+  and is pregnant again. They are real reminders that fire, so they stay; a per-stage filter would hide them.
+- *The "added while trying" medicine answers are kept on this phone only*, per pregnancy. A second phone asks
+  again once. The medicines themselves sync as ever.
+- *Three lines in Terminal A's files*: the home's "Track my readings" fallback to `'readings'`
+  (`home_v3_screen.dart:1759`), handed over and waiting on the P1 commit.
+- *Is it safe? keeps "Through the trimesters" on an answer after a loss*; only the "For your weeks" shelf and
+  the "For you" trimester line step aside. The trimester list is a fact about pregnancy, not about her.

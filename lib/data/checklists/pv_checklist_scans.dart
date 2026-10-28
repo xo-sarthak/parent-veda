@@ -82,6 +82,11 @@ final PvChecklist kScanQuestionsChecklist = PvChecklist(
   subjectTitle: (s) => 'What to ask at your $s',
   subjectIntro: (s) => 'Tick what matters to you and take the list in with '
       'you. Your doctor answers these about the $s every day.',
+  // P1 D8 and D2 (2026-10-28).
+  ticksPerSubject: true,
+  afterLossTitle: 'Questions to take to your doctor',
+  afterLossIntro: 'Tick what you want to ask and take the list in with you. '
+      'Any question is a good one.',
   groups: [
   PvChecklistGroup('Before the day', [
     PvChecklistItem('prep_fast',

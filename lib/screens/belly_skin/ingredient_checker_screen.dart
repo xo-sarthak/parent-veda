@@ -19,8 +19,15 @@ import 'package:flutter/material.dart';
 
 import '../../data/belly_skin_data.dart';
 import '../../localization/app_language.dart';
+import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
-import '../brackets/hub/hub_solution_cards.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+// Kept for revert with the "coming soon" product card (P1 D11, 2026-10-28):
+// import '../brackets/hub/hub_solution_cards.dart';
+import '../can_i_screen.dart';
+import '../doors/pv_door_chrome.dart' show PvDoorDisclaimer;
+import '../pregnancy/preg_tool_chrome.dart';
+import '../tools/ask_veda_screen.dart';
 import '../v2/v2_palette.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
@@ -80,25 +87,19 @@ class IngredientCheckerScreen extends StatelessWidget {
     final sorted = [...kBsIngredients]
       ..sort((a, b) => a.name.en.compareTo(b.name.en));
 
-    return Scaffold(
-      backgroundColor: p.ground,
-      appBar: AppBar(
-        backgroundColor: p.ground,
-        elevation: 0,
-        foregroundColor: p.ink1,
-        title: Text('Ingredient Safety Checker',
-            style: pvJakarta(
-                fontSize: 16.5, fontWeight: FontWeight.w700, color: p.ink1)),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
-        children: [
-          Text(
-              'Not sure if a cream, serum or salon treatment is okay in '
-              'pregnancy? Search an ingredient for a clear answer. It is '
-              'free, every time.',
-              style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
-          const SizedBox(height: 16),
+    // ⚠️ THE SHARED TOOL LOOK (P1, 2026-10-28). Was a plain Scaffold + AppBar
+    // titled "Ingredient Safety Checker" over a padded ListView; kept for
+    // revert in git. The hero now carries the title and the intro, the same
+    // shell every Pregnancy tool wears.
+    return PregToolScaffold(
+      hue: 344,
+      eyebrow: 'Check',
+      title: 'Ingredient checker',
+      mark: IntentMark.skinMark,
+      intro: 'Not sure if a cream, serum or salon treatment is okay in '
+          'pregnancy? Search an ingredient for a clear answer.',
+      children: [
+        pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           PvPress(child: GestureDetector(
             onTap: () => _search(context),
             child: Container(
@@ -112,7 +113,9 @@ class IngredientCheckerScreen extends StatelessWidget {
                 Icon(Icons.search_rounded, color: p.ink3),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text('Type a product or ingredient',
+                  // P1 (2026-10-28): the search matches ingredients only, so
+                  // the hint promises only that. Was 'Type a product or ingredient'.
+                  child: Text('Type an ingredient, like retinol',
                       style: pvManrope(fontSize: 14.5, color: p.ink3)),
                 ),
               ]),
@@ -134,7 +137,6 @@ class IngredientCheckerScreen extends StatelessWidget {
                   final i = bsIngredientById(chip.id);
                   if (i == null) return const SizedBox.shrink();
                   return _Chip(
-                    emoji: chip.emoji,
                     label: i.name.of(_lang),
                     p: p,
                     onTap: () => _openIngredient(context, i),
@@ -153,15 +155,19 @@ class IngredientCheckerScreen extends StatelessWidget {
             _IngredientRow(ingredient: i, p: p, onTap: () => _openIngredient(context, i)),
             if (i != sorted.last) const SizedBox(height: 9),
           ],
-        ],
-      ),
+          // P1 (2026-10-28): the disclaimer was on the verdict page only.
+          const SizedBox(height: 22),
+          PvDoorDisclaimer(p: p),
+        ])),
+      ],
     );
   }
 }
 
+// ⚠️ NO EMOJI (P1, 2026-10-28; "no decorative emoji in chrome"). The data
+// keeps `chip.emoji` for revert; the chip draws the words only.
 class _Chip extends StatelessWidget {
-  const _Chip({required this.emoji, required this.label, required this.p, required this.onTap});
-  final String emoji;
+  const _Chip({required this.label, required this.p, required this.onTap});
   final String label;
   final V2Palette p;
   final VoidCallback onTap;
@@ -178,8 +184,8 @@ class _Chip extends StatelessWidget {
           border: Border.all(color: p.line),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text(emoji, style: const TextStyle(fontSize: 15)),
-          const SizedBox(width: 8),
+          // Kept for revert: Text(emoji, style: const TextStyle(fontSize: 15)),
+          // const SizedBox(width: 8),
           Text(label,
               style: pvManrope(
                   fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
@@ -304,17 +310,20 @@ class BsIngredientAnswerScreen extends StatelessWidget {
               ]),
             ),
           ],
-          if (ingredient.alternativeProduct != null) ...[
-            const SizedBox(height: 14),
-            SolutionCard(
-              type: SolutionType.product,
-              title: ingredient.alternativeProduct!.title,
-              value: ingredient.alternativeProduct!.blurb,
-              p: p,
-              lang: _lang,
-              comingSoon: true,
-            ),
-          ],
+          // ⚠️ THE "COMING SOON" PRODUCT CARD IS OFF (P1 D11, 2026-10-28): a
+          // promise with no tap behind it. The alternative's name above says
+          // what to reach for. Kept for revert:
+          // if (ingredient.alternativeProduct != null) ...[
+          //   const SizedBox(height: 14),
+          //   SolutionCard(
+          //     type: SolutionType.product,
+          //     title: ingredient.alternativeProduct!.title,
+          //     value: ingredient.alternativeProduct!.blurb,
+          //     p: p,
+          //     lang: _lang,
+          //     comingSoon: true,
+          //   ),
+          // ],
           const SizedBox(height: 22),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(Icons.info_outline_rounded, size: 14, color: p.ink3),
@@ -363,12 +372,32 @@ class _BsSearchDelegate extends SearchDelegate<BsIngredient?> {
     if (query.trim().isEmpty) return const SizedBox.shrink();
     final matches = bsIngredientSearch(query);
     if (matches.isEmpty) {
+      // ⚠️ A WAY ON, NOT A DEAD END (P1, 2026-10-28). Mobbin: BitePal's "I
+      // couldn't spot any food" with one next step. Ask Veda can answer an
+      // ingredient we have not checked, and Is it safe? covers products and
+      // treatments. Both need her controller; without one the line stands.
+      final c = PregnancyController.current;
+      final q = query.trim();
+      Widget link(String label, Key key, Widget Function(PregnancyController) to) => TextButton(
+            key: key,
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => to(c!))),
+            child: Text(label, style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+          );
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(36),
-          child: Text('No match yet. Try a shorter or different word.',
-              textAlign: TextAlign.center,
-              style: pvManrope(fontSize: 14, color: p.ink3)),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text("We haven't checked \"$q\" yet. Try a shorter word, or the name on the label's ingredient list.",
+                key: const ValueKey('bs_no_match'),
+                textAlign: TextAlign.center,
+                style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+            if (c != null) ...[
+              const SizedBox(height: 14),
+              link('Ask Veda about $q', const ValueKey('bs_no_match_veda'),
+                  (c) => AskVedaScreen(controller: c, initialQuery: 'Is $q safe to use on my skin in pregnancy?')),
+              link('Look it up in Is it safe?', const ValueKey('bs_no_match_can_i'), (c) => CanIScreen(controller: c)),
+            ],
+          ]),
         ),
       );
     }

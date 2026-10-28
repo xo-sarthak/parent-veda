@@ -40,6 +40,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../data/tests_scans_reports_data.dart';
@@ -261,7 +262,12 @@ class ScanReportViewerScreen extends StatelessWidget {
     );
     if (yes != true || !context.mounted) return;
     await ScanReportsStore.instance.remove(r.id);
-    if (context.mounted) Navigator.of(context).pop();
+    // P1 (2026-10-28): says so, with Undo, before the page closes.
+    if (context.mounted) {
+      pvToast(context, 'Removed · ${r.title}',
+          kind: PvToastKind.done, action: 'Undo', onAction: () => ScanReportsStore.instance.add(r));
+      Navigator.of(context).pop();
+    }
   }
 
   static String _fmt(DateTime d) {

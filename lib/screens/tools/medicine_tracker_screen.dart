@@ -19,9 +19,11 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../localization/app_language.dart';
 import '../../models/medication.dart';
+import '../../services/life_stage_store.dart';
 import '../../services/medicine_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/app_theme.dart';
@@ -45,6 +47,44 @@ class MedicineTrackerScreen extends StatefulWidget {
 class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
   int _tab = 0; // 0 Daily · 1 Weekly
   PregnancyController get p => widget.controller;
+
+  // ---- added while trying (P1 D3, 2026-10-28) -------------------------------
+  // The medicines she started while trying carry into pregnancy unchanged. The
+  // user's call: one gentle card, "Check these with your doctor. Keep each or
+  // stop it." Nothing stops by itself. Her answers are kept per pregnancy
+  // (keyed by the day it began) and on this phone only: a scratch of which
+  // rows she has looked at, not a fact about her medicines, which sync as ever.
+  Set<String> _tryingAnswered = {};
+  DateTime? get _pregStart => LifeStageStore.instance.stage == LifeStage.pregnancy
+      ? LifeStageStore.instance.enteredAt
+      : null;
+  String _tryingKey(DateTime start) => 'med_trying_answered_${start.millisecondsSinceEpoch}';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTryingAnswered();
+  }
+
+  Future<void> _loadTryingAnswered() async {
+    final start = _pregStart;
+    if (start == null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final ids = prefs.getStringList(_tryingKey(start)) ?? const [];
+      if (mounted) setState(() => _tryingAnswered = ids.toSet());
+    } catch (_) {/* start unanswered */}
+  }
+
+  Future<void> _answerTrying(String id) async {
+    final start = _pregStart;
+    if (start == null) return;
+    setState(() => _tryingAnswered = {..._tryingAnswered, id});
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_tryingKey(start), _tryingAnswered.toList());
+    } catch (_) {}
+  }
 
   // Hairlines, not shadows (2026-09-30). Kept for revert:
   // static const List<BoxShadow> _soft = [
@@ -245,6 +285,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
     return pregToolPad(Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        ..._tryingCard(store),
         _segmented(s),
         const SizedBox(height: 14),
         if (_tab == 0) ..._daily(s, store) else ..._weekly(s, store),
@@ -252,6 +293,70 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
         _disclaimer(s),
       ],
     ));
+  }
+
+  List<Widget> _tryingCard(MedicineStore store) {
+    final start = _pregStart;
+    if (start == null) return const [];
+    final rows = [for (final m in store.addedBefore(start)) if (!_tryingAnswered.contains(m.id)) m];
+    if (rows.isEmpty) return const [];
+    final ink = pvStorePalette;
+    Widget pill(String label, Key key, VoidCallback onTap, {bool filled = false}) => PvPress(
+          child: GestureDetector(
+            key: key,
+            onTap: onTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: filled ? kPvInk : Colors.white,
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(color: kPvInk, width: 1.2),
+              ),
+              child: Text(label,
+                  style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: filled ? Colors.white : kPvInk)),
+            ),
+          ),
+        );
+    return [
+      PregCard(
+        key: const ValueKey('med_trying_card'),
+        padding: const EdgeInsets.all(18),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Added while you were trying',
+              style: pvJakarta(fontSize: 16, fontWeight: FontWeight.w700, color: ink.ink1)),
+          const SizedBox(height: 6),
+          Text('Check these with your doctor now that you are pregnant. Keep each one or stop it. '
+              'Nothing changes until you choose.',
+              style: pvManrope(fontSize: 13, height: 1.5, color: ink.ink2)),
+          const SizedBox(height: 10),
+          for (final m in rows)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(children: [
+                Expanded(
+                  child: Text(m.name,
+                      style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: ink.ink1)),
+                ),
+                pill('Keep', ValueKey('med_trying_keep_${m.id}'), () {
+                  _answerTrying(m.id);
+                  _snack('Kept: ${m.name}. It stays on your list.');
+                }),
+                const SizedBox(width: 8),
+                pill('Stop', ValueKey('med_trying_stop_${m.id}'), () {
+                  store.updateMed(m.copyWith(isActive: false));
+                  _answerTrying(m.id);
+                  if (!mounted) return;
+                  pvToast(context, 'Stopped: ${m.name}. Its reminders are off too.',
+                      kind: PvToastKind.done,
+                      action: 'Undo',
+                      onAction: () => store.updateMed(m.copyWith(isActive: true)));
+                }, filled: true),
+              ]),
+            ),
+        ]),
+      ),
+      const SizedBox(height: 14),
+    ];
   }
 
   Widget _segmented(S s) {
@@ -376,7 +481,9 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                 onTap: () {
                   final wasTaken = taken;
                   store.toggleToday(m.id);
-                  if (!wasTaken) _snack(s.medLogged(m.name));
+                  // P1 (2026-10-28): the untick says so too. Kept for revert:
+                  // if (!wasTaken) _snack(s.medLogged(m.name));
+                  _snack(wasTaken ? 'Unticked ${m.name} for today.' : s.medLogged(m.name));
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 160),
@@ -453,6 +560,10 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                       .map((x) => x.id == a.id ? x.copyWith(enabled: v) : x)
                       .toList();
                   store.updateMed(m.copyWith(alarms: updated));
+                  // P1 (2026-10-28): the switch says what it did.
+                  _snack(v
+                      ? 'Reminder on for ${m.name}: ${_alarmSummary(a)}.'
+                      : 'Reminder off for ${m.name}. The medicine stays on your list.');
                 },
               ),
             ),
@@ -495,6 +606,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                         color: ink.ink1)),
               ]),
             ),
+            // P1 (2026-10-28): a day she forgot can be put right, the way TTC's
+            // page already allows (`toggleOn`). Past days and today only.
+            // Mobbin: Apple Health's medication week strip.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+              child: _weekStrip(store, meds[i]),
+            ),
           ],
         ]),
       ),
@@ -507,6 +625,51 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
             style: pvManrope(fontSize: 13, height: 1.5, color: ink.ink1)),
       ),
     ];
+  }
+
+  Widget _weekStrip(MedicineStore store, Medication m) {
+    final today = DateTime.now();
+    final days = [for (int i = 6; i >= 0; i--) DateTime(today.year, today.month, today.day).subtract(Duration(days: i))];
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      for (final d in days)
+        Builder(builder: (context) {
+          final key = MedicineStore.dateKey(d);
+          final taken = store.isTakenOn(m.id, key);
+          final label = '${_wdFull[d.weekday - 1]} ${d.day} ${_wdMonth[d.month - 1]}';
+          return Semantics(
+            button: true,
+            checked: taken,
+            label: '${m.name}, $label',
+            child: PvPress(
+              child: GestureDetector(
+                key: ValueKey('med_day_${m.id}_$key'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  store.toggleOn(m.id, d);
+                  _snack(taken ? 'Unmarked ${m.name} on $label.' : 'Marked ${m.name} as taken on $label.');
+                },
+                child: Column(children: [
+                  Text(_wdShort[d.weekday - 1], style: pvManrope(fontSize: 11, color: pvStorePalette.ink3)),
+                  const SizedBox(height: 4),
+                  Container(
+                    width: 30,
+                    height: 30,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: taken ? kPvInk : Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: taken ? kPvInk : kPvLine, width: 1.4),
+                    ),
+                    child: taken
+                        ? const Icon(Icons.check_rounded, size: 15, color: Colors.white)
+                        : Text('${d.day}', style: pvManrope(fontSize: 11.5, color: pvStorePalette.ink2)),
+                  ),
+                ]),
+              ),
+            ),
+          );
+        }),
+    ]);
   }
 
   // The quiet note (2026-09-30). Kept for revert: a Row of an
@@ -578,6 +741,7 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
     final notesCtrl = TextEditingController(text: existing?.notes ?? '');
     // Working copy of the alarm list - mutated in place, refreshed via setSheet.
     final alarms = <MedAlarm>[...?existing?.alarms];
+    String? nameError;
 
     Widget field(String hint, TextEditingController c, {int max = 1}) => Padding(
           padding: const EdgeInsets.only(bottom: 10),
@@ -630,6 +794,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                           color: AppTheme.neutral900)),
                   const SizedBox(height: 14),
                   field(s.medName, nameCtrl),
+                  if (nameError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Text(nameError!,
+                          key: const ValueKey('med_name_error'),
+                          style: pvManrope(fontSize: 13, color: pvStorePalette.ink2)),
+                    ),
                   field(s.medDose, doseCtrl),
                   field(s.medTime, timeCtrl),
                   field(s.medFrequency, freqCtrl),
@@ -647,8 +818,10 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                       style: pregFilledStyle(),
                       onPressed: () {
                         final name = nameCtrl.text.trim();
+                        // P1 (2026-10-28): it used to close without a word.
+                        // Kept for revert: Navigator.pop(ctx); return;
                         if (name.isEmpty) {
-                          Navigator.pop(ctx);
+                          setSheet(() => nameError = 'Add a name to save this, like "Iron" or "Folic acid".');
                           return;
                         }
                         if (existing != null) {
@@ -677,6 +850,9 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
                           ));
                         }
                         Navigator.pop(ctx);
+                        _snack(existing != null
+                            ? 'Saved changes to $name.'
+                            : 'Added $name. Tick it each day you take it.');
                       },
                       child: Text(s.saveCta),
                     ),
@@ -1266,8 +1442,13 @@ class _MedicineTrackerScreenState extends State<MedicineTrackerScreen> {
               onPressed: () => Navigator.pop(ctx), child: Text(s.cancel)),
           TextButton(
             onPressed: () {
+              final logs = store.logsFor(m.id);
               store.deleteMed(m.id);
               Navigator.pop(ctx);
+              // P1 (2026-10-28): says so, with Undo (the medicine and its days).
+              if (!mounted) return;
+              pvToast(context, 'Removed ${m.name}.',
+                  kind: PvToastKind.done, action: 'Undo', onAction: () => store.restoreMed(m, logs));
             },
             child: Text(s.delete,
                 style: const TextStyle(color: AppTheme.danger)),

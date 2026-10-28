@@ -21,7 +21,7 @@ import '../theme/app_theme.dart';
 import '../widgets/pv_feedback.dart';
 import '../widgets/pv_placeholders.dart';
 import 'brackets/hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
-import 'doors/pv_door_chrome.dart' show PvDoorRow, PvDoorToolScaffold, pvDoorPad;
+import 'doors/pv_door_chrome.dart' show PvDoorDisclaimer, PvDoorRow, PvDoorToolScaffold, pvDoorPad;
 import 'pregnancy/preg_chrome.dart' show PregCard, PregSectionHeading, pregSectionHeadingStyle;
 import 'products/pv_store_chrome.dart' show kPvInk, kPvLine;
 import 'tools/ask_veda_screen.dart';
@@ -397,6 +397,10 @@ class _ReportScreenState extends State<ReportScreen> {
       intro: s.rSubtitle,
       children: [
         for (final w in body.skip(2)) pvDoorPad(w),
+        // P1 (2026-10-28): the list carried no disclaimer; only each finding
+        // did. (Embedded, the Scans door draws its own.)
+        const SizedBox(height: 22),
+        pvDoorPad(PvDoorDisclaimer(p: V2PaletteStore.instance.current)),
       ],
     );
   }

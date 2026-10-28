@@ -279,6 +279,23 @@ class MedicineStore extends ChangeNotifier {
       '${d.day.toString().padLeft(2, '0')}';
 
   bool get isEmpty => _meds.isEmpty;
+
+  /// Her day logs for one medicine, for an Undo that brings them back.
+  List<MedicationLog> logsFor(String medId) =>
+      [for (final l in _logs) if (l.medicationId == medId) l];
+
+  /// Puts back a deleted medicine with its own id and logs (the Undo on a
+  /// delete, P1 2026-10-28). The same ids, so the merge sees the rows return.
+  Future<void> restoreMed(Medication m, List<MedicationLog> logs) async {
+    if (_meds.any((x) => x.id == m.id)) return;
+    for (final l in logs) {
+      if (_logs.any((x) => x.id == l.id)) continue;
+      _logs.add(l);
+      _logSync.touch(l.id);
+    }
+    await _persistLogs();
+    await addMed(m);
+  }
   List<Medication> get all => List.unmodifiable(_meds);
   List<Medication> get activeMeds =>
       _meds.where((m) => m.isActive).toList();
@@ -481,6 +498,31 @@ class MedicineStore extends ChangeNotifier {
     }
     return n;
   }
+
+  // --- moving into pregnancy (P1 D3, 2026-10-28) -----------------------------
+
+  /// When a medicine was added, read from its id. Both trackers mint
+  /// `<prefix>_<microseconds>` (`med_` here, `ttcm_` on the TTC page); an id
+  /// in any other shape answers null, never a guess.
+  static DateTime? addedAt(Medication m) {
+    final bar = m.id.lastIndexOf('_');
+    if (bar < 0) return null;
+    final us = int.tryParse(m.id.substring(bar + 1));
+    return us == null ? null : DateTime.fromMicrosecondsSinceEpoch(us);
+  }
+
+  /// ⚠️ DERIVED FROM THE ID, NOT A NEW COLUMN. The medicines she added while
+  /// trying (letrozole, progesterone, folic acid) and still has on. A TTC id
+  /// (`ttcm_`) says it on its own; any other counts when it was made before
+  /// [pregnancyStart]. No stage column and no migration: the id already holds
+  /// the moment it was made. The cost, named: the meaning is tied to the id
+  /// format, so an id that does not parse is "not known" and is left out.
+  List<Medication> addedBefore(DateTime pregnancyStart) => [
+        for (final m in activeMeds)
+          if (m.id.startsWith('ttcm_') ||
+              (addedAt(m)?.isBefore(pregnancyStart) ?? false))
+            m,
+      ];
 
   Future<void> _persistMeds() async {
     try {

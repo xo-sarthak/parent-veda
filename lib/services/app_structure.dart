@@ -124,7 +124,8 @@ const List<AppSurface> kAppSurfaces = [
   AppSurface('movement', AppHome.tools, 'Baby movement'),
   AppSurface('tests_scans', AppHome.tools, 'Tests & scans'),
   AppSurface('hospital_bag', AppHome.tools, 'Ready for birth'),
-  AppSurface('can_i', AppHome.tools, 'Can I…?'),
+  // One name per tool (P1, 2026-10-28): the hero says "Is it safe?". Was 'Can I…?'.
+  AppSurface('can_i', AppHome.tools, 'Is it safe?'),
   AppSurface('product_guide', AppHome.tools, 'Product guide'),
   // ---- Added for the bracket model -----------------------------------------
   // Four tools that ship today and were never declared here. Found by building
@@ -137,7 +138,12 @@ const List<AppSurface> kAppSurfaces = [
   // without appearing here and nothing complains.
   AppSurface('symptoms', AppHome.tools, 'Symptoms'),
   AppSurface('due_date', AppHome.tools, 'Due date'),
-  AppSurface('reports', AppHome.tools, 'Reports'),
+  // P1 item 4 (2026-10-28, the user via the relevance terminal): "My reports",
+  // the locker it opens on the home. Was 'Reports'.
+  AppSurface('reports', AppHome.tools, 'My reports'),
+  // P1 (2026-10-28): the ids Wave 1 added to screenForSurface.
+  AppSurface('report_decoder', AppHome.tools, 'Report decoder'),
+  AppSurface('readings', AppHome.tools, 'Blood pressure & sugar'),
 
   // ---- Community --------------------------------------------------------------
   AppSurface('rooms', AppHome.community, 'Rooms'),

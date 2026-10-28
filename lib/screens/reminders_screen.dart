@@ -2,9 +2,10 @@
 //  RemindersScreen - customizable local reminders
 // -----------------------------------------------------------------------------
 //  The mother creates gentle nudges (Kegel session, prenatal vitamin, read to
-//  baby, water, or her own) at a time + repeat she chooses. This is the full
-//  management UX + persistence; the actual OS notification firing plugs in via
-//  NotificationService once flutter_local_notifications is installed.
+//  baby, water, or her own) at a time + repeat she chooses. The OS
+//  notifications fire through NotificationService (flutter_local_notifications).
+//  After a loss (P1 D2, 2026-10-28) the baby presets step aside and the
+//  reminders the loss paused are shown as paused, with the reason.
 //
 //  ⚠️ ONE PARENTVEDA (2026-09-30, the structural restyle). Shaped like trying
 //  to conceive's Messages and Appointments (read for shape only, never
@@ -22,6 +23,7 @@ import '../localization/app_language.dart';
 import '../models/reminder.dart';
 import '../services/notification_service.dart';
 import '../services/pregnancy_controller.dart';
+import '../services/pregnancy_ended_store.dart';
 import '../services/reminder_store.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
@@ -48,6 +50,12 @@ const List<_Preset> _presets = [
   (title: _water, category: 'water', hour: 12, minute: 0),
   (title: _calm, category: 'custom', hour: 7, minute: 30),
 ];
+
+/// After a loss (P1 D2, 2026-10-28) the baby presets step aside: "Take your
+/// prenatal vitamin" and "Read to your baby". The rest look after her.
+List<_Preset> _presetsFor({required bool ended}) => ended
+    ? [for (final p in _presets) if (p.title != _vitamin && p.title != _read) p]
+    : _presets;
 
 String _kegel(S s) => s.rmdSugKegel;
 String _vitamin(S s) => s.rmdSugVitamin;
@@ -171,15 +179,29 @@ IconData _categoryIcon(String c) {
   }
 }
 
-class RemindersScreen extends StatelessWidget {
+class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key, required this.controller});
   final PregnancyController controller;
+
+  @override
+  State<RemindersScreen> createState() => _RemindersScreenState();
+}
+
+class _RemindersScreenState extends State<RemindersScreen> {
+  PregnancyController get controller => widget.controller;
+
+  // P1 (2026-10-28): once, here, not on every build. Kept for revert: the
+  // StatelessWidget called `store.init()` at the top of build.
+  @override
+  void initState() {
+    super.initState();
+    ReminderStore.instance.init();
+  }
 
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
     final store = ReminderStore.instance;
-    store.init();
     // ⚠️ THE FRONT PAGE WEARS THE TOOLS SHELL (2026-09-30, Tools audit).
     // WH: she opens this to stop holding things in her head (vitamin, water,
     // Kegels, "read to baby"), usually once at setup and then to tick one off
@@ -199,9 +221,19 @@ class RemindersScreen extends StatelessWidget {
     // and PregNote(s.rmdScheduleNote) at the top of the ListView (the intro
     // now says the same thing once).
     return AnimatedBuilder(
-      animation: store,
+      animation: Listenable.merge([store, PregnancyEndedStore.instance]),
       builder: (context, _) {
-        final items = store.all;
+        // ⚠️ PAUSED AFTER A LOSS (P1 D2, 2026-10-28). The loss confirm screen
+        // names the reminders it pauses (pv_door_after_loss.dart, R4), but this
+        // screen never read `pausedForLoss`, so they looked switched off by
+        // her. They now sit in their own section that says why, and how they
+        // come back. Kept for revert: final items = store.all;
+        final paused = {
+          for (final id in store.pausedForLoss) id,
+        };
+        final pausedItems = [for (final r in store.all) if (paused.contains(r.id) && !r.enabled) r];
+        final items = [for (final r in store.all) if (!pausedItems.contains(r)) r];
+        final ended = PregnancyEndedStore.instance.ended;
         return PregToolScaffold(
           hue: 206,
           eyebrow: 'Track',
@@ -234,13 +266,27 @@ class RemindersScreen extends StatelessWidget {
                 PregRowCard(children: [
                   for (final r in items) _reminderRow(context, s, store, r),
                 ]),
+              // Mobbin: Perplexity's "Paused" divider over greyed tasks, and
+              // Finch's one calm line. No switch: they come back with the
+              // pregnancy view, not with a tap here.
+              if (pausedItems.isNotEmpty) ...[
+                const SizedBox(height: 30),
+                const PregSectionHeading('Paused after your loss',
+                    lead: 'We paused these when you told us. They come back on '
+                        'if you go back to your pregnancy view.'),
+                const SizedBox(height: 12),
+                PregRowCard(
+                  key: const ValueKey('reminders_paused'),
+                  children: [for (final r in pausedItems) _pausedRow(context, s, r)],
+                ),
+              ],
               // Quick ideas: the one-tap way to make a first (or next) reminder,
               // so they sit straight under her list, not below the fold.
               const SizedBox(height: 30),
               PregSectionHeading(s.rmdSuggestions),
               const SizedBox(height: 12),
               Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final p in _presets) _presetChip(context, s, store, p),
+                for (final p in _presetsFor(ended: ended)) _presetChip(context, s, store, p),
               ]),
               // ---- From ParentVeda (2026-09-30) -----------------------------
               // The messages the app sends on its own, from her dates. The
@@ -360,12 +406,49 @@ class RemindersScreen extends StatelessWidget {
             const SizedBox(width: 4),
             Switch(
               value: r.enabled,
-              onChanged: (_) => store.toggle(r.id),
+              // P1 (2026-10-28): the switch says what it did. Kept for revert:
+              // onChanged: (_) => store.toggle(r.id),
+              onChanged: (_) {
+                store.toggle(r.id);
+                pvToast(
+                    context,
+                    r.enabled
+                        ? 'Off: ${r.title}. It stays here until you switch it back on.'
+                        : 'On: ${r.title}. ${reminderSummary(s, r, context)}.',
+                    kind: PvToastKind.done);
+              },
               trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
             ),
           ]),
         ),
       ),
+    );
+  }
+
+  /// A reminder a loss paused: faded, no switch, the reason under the title.
+  Widget _pausedRow(BuildContext context, S s, Reminder r) {
+    final pal = pvStorePalette;
+    return Padding(
+      key: ValueKey('reminder_paused_${r.id}'),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      child: Row(children: [
+        Opacity(
+          opacity: 0.45,
+          child: PvMarkWell(p: pal, hue: _categoryHue(r.category), size: 44, mark: _categoryMark(r.category)),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(r.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: pal.ink3)),
+            const SizedBox(height: 2),
+            Text('Paused · ${reminderSummary(s, r, context)}',
+                style: pvManrope(fontSize: 12.5, height: 1.35, color: pal.ink3)),
+          ]),
+        ),
+      ]),
     );
   }
 
@@ -572,7 +655,13 @@ class _ReminderEditorState extends State<_ReminderEditor> {
     super.dispose();
   }
 
-  bool get _canSave => _titleCtrl.text.trim().isNotEmpty;
+  // Kept for revert (P1, 2026-10-28): the save button is always live now and
+  // says why when the name is empty.
+  // bool get _canSave => _titleCtrl.text.trim().isNotEmpty;
+
+  /// Shown under the title after a save with no name (P1, 2026-10-28: the
+  /// button used to be greyed and silent).
+  String? _titleError;
 
   Future<void> _pickTimeAt(int i) async {
     final picked =
@@ -589,7 +678,10 @@ class _ReminderEditorState extends State<_ReminderEditor> {
 
   void _save(S s) {
     final t = _titleCtrl.text.trim();
-    if (t.isEmpty) return;
+    if (t.isEmpty) {
+      setState(() => _titleError = 'Add a name to save this, like "Evening walk".');
+      return;
+    }
     final store = ReminderStore.instance;
     // Ask for notification permission the moment she commits to a reminder.
     NotificationService.instance.requestPermission();
@@ -619,10 +711,15 @@ class _ReminderEditorState extends State<_ReminderEditor> {
   }
 
   void _delete(S s) {
-    final id = widget.existing?.id;
-    if (id != null) ReminderStore.instance.remove(id);
+    final gone = widget.existing;
+    if (gone != null) ReminderStore.instance.remove(gone.id);
     Navigator.of(context).pop();
-    pvToast(context, s.rmdRemoved, kind: PvToastKind.done);
+    // P1 (2026-10-28): "Removed" can be undone. Kept for revert:
+    // pvToast(context, s.rmdRemoved, kind: PvToastKind.done);
+    pvToast(context, s.rmdRemoved,
+        kind: PvToastKind.done,
+        action: gone == null ? null : 'Undo',
+        onAction: gone == null ? null : () => ReminderStore.instance.upsert(gone));
   }
 
   @override
@@ -656,9 +753,18 @@ class _ReminderEditorState extends State<_ReminderEditor> {
             controller: _titleCtrl,
             autofocus: !editing,
             textCapitalization: TextCapitalization.sentences,
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() => _titleError = null),
             decoration: _fieldDecoration(label: s.rmdWhatLabel, hint: s.rmdWhatHint),
           ),
+          if (_titleError != null) ...[
+            const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(_titleError!,
+                  key: const ValueKey('reminder_title_error'),
+                  style: pvManrope(fontSize: 13, color: pvStorePalette.ink2)),
+            ),
+          ],
           const SizedBox(height: 16),
           // Repeat (Once / Daily / Weekly / Custom-specific-days)
           _groupLabel(s.rmdRepeat),
@@ -738,7 +844,8 @@ class _ReminderEditorState extends State<_ReminderEditor> {
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: _canSave ? () => _save(s) : null,
+              // Kept for revert: onPressed: _canSave ? () => _save(s) : null,
+              onPressed: () => _save(s),
               style: pregFilledStyle().copyWith(
                   padding: const WidgetStatePropertyAll(
                       EdgeInsets.symmetric(vertical: 14))),
@@ -1114,9 +1221,19 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
           if (editing) ...[
             const SizedBox(height: 6),
             TextButton.icon(
+              // P1 (2026-10-28): says so, with Undo. Kept for revert:
+              // onPressed: () {
+              //   ReminderStore.instance.remove(widget.existing!.id);
+              //   Navigator.of(context).pop();
+              // },
               onPressed: () {
-                ReminderStore.instance.remove(widget.existing!.id);
+                final gone = widget.existing!;
+                ReminderStore.instance.remove(gone.id);
                 Navigator.of(context).pop();
+                pvToast(context, 'Removed: ${gone.title}.',
+                    kind: PvToastKind.done,
+                    action: 'Undo',
+                    onAction: () => ReminderStore.instance.upsert(gone));
               },
               icon: const Icon(Icons.delete_outline_rounded,
                   size: 18, color: AppTheme.secondary600),

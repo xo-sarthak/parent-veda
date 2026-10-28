@@ -120,15 +120,19 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             Icons.favorite_rounded, (c) => BabyMovementScreen(controller: c)),
         _Dest(s.hbName, const ['hospital', 'bag', 'pack', 'labour'],
             Icons.luggage_rounded, (c) => ReadyForBirthScreen(controller: c)),
-        _Dest(s.tsrTitle, const ['scan', 'ultrasound', 'nt', 'anomaly', 'growth', 'doppler'],
+        // ONE ENTRY (P1, 2026-10-28): the library was listed twice under one
+        // title, so search showed it twice. Both keyword lists now sit on the
+        // one row. Kept for revert: a second _Dest(s.tsrTitle, ['report',
+        // 'test', 'result', 'blood', 'finding', 'condition'],
+        // Icons.description_rounded, ...) below the medicines row.
+        _Dest(s.tsrTitle, const ['scan', 'ultrasound', 'nt', 'anomaly', 'growth', 'doppler',
+            'report', 'test', 'result', 'blood', 'finding', 'condition'],
             Icons.fact_check_rounded, (c) => TestsScansReportsScreen(controller: c)),
         _Dest(s.ddcToolTitle, const ['due date', 'calculator', 'edd'],
             Icons.calendar_month_rounded,
             (c) => DueDateCalculatorScreen(controller: c)),
         _Dest(s.medTitle, const ['medicine', 'medication', 'supplement', 'pill'],
             Icons.medication_rounded, (c) => MedicineTrackerScreen(controller: c)),
-        _Dest(s.tsrTitle, const ['report', 'test', 'result', 'blood', 'finding', 'condition'],
-            Icons.description_rounded, (c) => TestsScansReportsScreen(controller: c)),
         _Dest(s.tabCalendar, const ['calendar', 'date', 'event', 'reminder'],
             Icons.calendar_today_rounded, (c) => CalendarScreen(controller: c)),
         // Held back with the community (2026-09-29, pregnancy gap analysis:

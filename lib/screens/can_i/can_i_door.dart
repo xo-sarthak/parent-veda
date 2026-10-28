@@ -36,6 +36,7 @@ import '../../models/can_i_entry.dart';
 import '../../services/can_i_activity_store.dart';
 import '../../services/can_i_store.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskVedaRoute;
 import '../../widgets/pv_feedback.dart';
@@ -574,7 +575,11 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
 
   List<Widget> _welcome(V2Palette p) {
     final c = widget.controller;
-    final week = c.isDueDateSet ? c.currentWeek : null;
+    // ⚠️ AFTER A LOSS (P1 D2, 2026-10-28): no "For your weeks" shelf. The tool
+    // stays and every answer stays; only the shelf that speaks to a pregnancy
+    // still going steps aside. The undo brings it back.
+    final ended = PregnancyEndedStore.instance.ended;
+    final week = (!ended && c.isDueDateSet) ? c.currentWeek : null;
     final forHer = week == null ? const <CanIEntry>[] : canIForTrimester(week);
     final saved = [for (final id in CanIStore.instance.savedIds) ?canIById(id)];
     return [
@@ -646,18 +651,20 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
       const SizedBox(height: 26),
 
       // ---- FOR HER WEEKS -------------------------------------------------
-      pvDoorPad(
-        canIHeading(
-          p,
-          week == null ? 'For your trimester' : 'For your weeks · ${_trimesterWord(week)}',
-          sub: week == null
-              ? 'Set your due date and this shelf fills with what changes for your trimester.'
-              : "Answers that change with the trimester you're in.",
+      if (!ended) ...[
+        pvDoorPad(
+          canIHeading(
+            p,
+            week == null ? 'For your trimester' : 'For your weeks · ${_trimesterWord(week)}',
+            sub: week == null
+                ? 'Set your due date and this shelf fills with what changes for your trimester.'
+                : "Answers that change with the trimester you're in.",
+          ),
         ),
-      ),
-      const SizedBox(height: 14),
-      if (forHer.isNotEmpty) _rail(forHer.take(12).toList(), p),
-      const SizedBox(height: 26),
+        const SizedBox(height: 14),
+        if (forHer.isNotEmpty) _rail(forHer.take(12).toList(), p),
+        const SizedBox(height: 26),
+      ],
 
       // ---- SAVED, ONE ROW ------------------------------------------------
       // Woolworths' "Buy Again": a single row with a meaning line, not a

@@ -732,9 +732,14 @@ final List<TestScanInfo> kTestsScans = [
         whyImportant:
             _t('The fluid cushions your baby and reflects their wellbeing '
                'and kidney function.', 'यह पानी शिशु को गद्दी देता है और उसकी सेहत तथा गुर्दों के काम को दर्शाता है।'),
+        // ⚠️ P1 D9 (2026-10-28): 8-18 cm was narrower than the 5-25 cm most
+        // Indian reports print, so a normal report read as outside the range.
+        // On a BEFORE-LAUNCH clinician line. Only the number changed on the
+        // Hindi side. Kept for revert: '...roughly 8-18 cm...' (both).
         typicalRange:
-            _t('An AFI of roughly 8-18 cm is usually thought of as normal in '
-               'the second half of pregnancy.', 'गर्भावस्था के दूसरे आधे हिस्से में लगभग 8-18 cm का AFI आमतौर पर सामान्य माना जाता है।'),
+            _t('An AFI of roughly 5 to 25 cm is usually thought of as normal in '
+               'the second half of pregnancy. The range printed on your report is '
+               'the one your doctor reads.', 'गर्भावस्था के दूसरे आधे हिस्से में लगभग 5-25 cm का AFI आमतौर पर सामान्य माना जाता है।'),
         ifLow:
             _t('A lower level (oligohydramnios) may mean drinking more '
                'fluids and closer checks.', 'स्तर कम (oligohydramnios) हो तो ज़्यादा पानी पीने और नज़दीकी निगरानी की सलाह मिल सकती है।'),
@@ -909,8 +914,10 @@ final List<TestScanInfo> kTestsScans = [
         name: _same('AFI / Liquor'),
         measures: _t('How much fluid there is around your baby.', 'आपके शिशु के आसपास पानी की मात्रा।'),
         whyImportant: _t("Reflects your baby's wellbeing and kidney function.", 'यह सेहत और गुर्दों के काम को दर्शाता है।'),
-        typicalRange: _t('An AFI of roughly 8-18 cm is usually thought of as '
-                         'normal.', 'लगभग 8-18 cm का AFI आमतौर पर सामान्य माना जाता है।'),
+        // P1 D9 (2026-10-28), as above. Kept for revert: 8-18 cm (both).
+        typicalRange: _t('An AFI of roughly 5 to 25 cm is usually thought of as '
+                         'normal. The range printed on your report is the one '
+                         'your doctor reads.', 'लगभग 5-25 cm का AFI आमतौर पर सामान्य माना जाता है।'),
         ifLow: _t('A lower level may mean drinking more fluids and closer '
                   'checks.', 'स्तर कम हो तो ज़्यादा पानी पीने और नज़दीकी निगरानी की सलाह मिल सकती है।'),
         ifHigh: _t('A higher level is often mild and just followed up.', 'स्तर ज़्यादा हो तो अक्सर यह हल्का होता है और बस उस पर नज़र रखी जाती है।'),

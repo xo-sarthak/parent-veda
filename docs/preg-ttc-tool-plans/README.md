@@ -7,7 +7,7 @@ The user says go per family. Each plan records every decision with the user's an
 | # | Family | Status | Commit |
 |---|---|---|---|
 | 0 | Step 0: inventory, C1, repeats, look (both stages) | DONE, read-only (2026-10-27) | — |
-| P1 | Look-ups and records | audited (2026-10-27); plan next | — |
+| P1 | Look-ups and records | BUILT 2026-10-28 (P1-lookups-records.md), commit owed | — |
 | P2 | Keep | waiting | — |
 | P3 | Her week | waits on A's foundation commit | — |
 | P4 | Birth prep | waits on A's foundation commit | — |

@@ -2798,15 +2798,18 @@ class S {
     return _p(en[i], hi[i]);
   }
 
-  // Suggested reminder presets.
-  String get rmdSugKegel => _p('Time for your Kegels 🌸', 'Kegel का समय 🌸');
+  // Suggested reminder presets. P1 (2026-10-28): no decorative emoji; a
+  // preset becomes her reminder's title, so the emoji was stored with it.
+  // Titles she already saved keep theirs. Kept for revert, each with its
+  // trailing emoji: 🌸 💊 📖 💧 🕊️ (both languages).
+  String get rmdSugKegel => _p('Time for your Kegels', 'Kegel का समय');
   String get rmdSugVitamin =>
-      _p('Take your prenatal vitamin 💊', 'अपना prenatal vitamin लीजिए 💊');
+      _p('Take your prenatal vitamin', 'अपना prenatal vitamin लीजिए');
   String get rmdSugRead =>
-      _p('Read to your baby 📖', 'अपने शिशु को पढ़िए 📖');
-  String get rmdSugWater => _p('Sip some water 💧', 'थोड़ा पानी पीजिए 💧');
+      _p('Read to your baby', 'अपने शिशु को पढ़िए');
+  String get rmdSugWater => _p('Sip some water', 'थोड़ा पानी पीजिए');
   String get rmdSugCalm =>
-      _p('A calm moment for you 🕊️', 'आपके लिए एक शांत पल 🕊️');
+      _p('A calm moment for you', 'आपके लिए एक शांत पल');
 
   // ---- Trimester chart (Home) ----------------------------------------------
   String get tcTitle => _p('Trimester chart', 'तिमाही चार्ट');

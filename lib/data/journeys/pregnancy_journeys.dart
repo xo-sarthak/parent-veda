@@ -101,7 +101,10 @@ final JourneyConfig kPgUnderstandCondition = JourneyConfig(
           type: SolutionType.read,
           title: _en('The words on your report'),
           value: _en('Look up a term you did not recognise, in plain language.'),
-          surfaceId: 'reports',
+          // P1 D7 (2026-10-28): the decoder by name; bare 'reports' opens the
+          // Scans door's Reports tab from the home. Kept for revert:
+          // surfaceId: 'reports',
+          surfaceId: 'report_decoder',
         ),
       ],
     ),
@@ -248,7 +251,9 @@ final JourneyConfig kPgTrackReadings = JourneyConfig(
           title: _en('Log it now'),
           value: _en('Takes a few seconds, and builds the record your doctor '
               'will ask for.'),
-          surfaceId: 'weight',
+          // PG1 (P1, 2026-10-28): this opened the Weight tracker. Kept for
+          // revert: surfaceId: 'weight',
+          surfaceId: 'readings',
         ),
       ],
     ),

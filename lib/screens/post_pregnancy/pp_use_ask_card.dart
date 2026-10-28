@@ -57,7 +57,7 @@ class PpUseAskCard extends StatelessWidget {
               onTap: () {
                 consent.set(kind, true);
                 onAnswer?.call(true);
-                ppCareSaved(context, 'Thank you. ${kind.label} now helps choose what you see first.');
+                ppCareSaved(context, kind.saidYes);
               },
             ),
             const SizedBox(height: 8),
@@ -67,7 +67,7 @@ class PpUseAskCard extends StatelessWidget {
               onTap: () {
                 consent.set(kind, false);
                 onAnswer?.call(false);
-                ppCareSaved(context, 'Okay. ${kind.label} stays in this tool only.');
+                ppCareSaved(context, kind.saidNo);
               },
             ),
           ]),

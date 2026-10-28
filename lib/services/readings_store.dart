@@ -30,6 +30,18 @@
 //  row and its cloud copy are one identity and a sync is an idempotent merge.
 //  Units: sugar is mg/dL, what an Indian glucometer prints. mmol/L is not offered;
 //  a second unit is a second way to be wrong by a factor of 18.
+//
+//  ⚠️ ONE EXCEPTION, ON THE USER'S WORD (P1 D1, 2026-10-27): A SAFETY PROMPT.
+//  "Keeps numbers, never judges them" stays true for the page: no colour, no
+//  label, no "high". But a reading in the range where obstetric guidance says
+//  "call today" now gets one calm sheet after the save (`readingConcern`). It
+//  is a fixed red-flag line, like the same-day signs, not a verdict on her:
+//  it never names a condition, never colours the number, and says the same
+//  thing to every woman. Two rules keep it from competing with her doctor:
+//    · if her doctor set a pressure target and the reading is inside it, the
+//      "call today" tier stays quiet (a woman with chronic hypertension may
+//      have been given a higher line); only the "call now" tier remains;
+//    · the thresholds and the words wait on a clinician (BEFORE-LAUNCH).
 // =============================================================================
 
 import 'dart:convert';
@@ -133,6 +145,41 @@ class Reading {
       context: SugarContext.values.where((c) => c.name == j['ctx']).firstOrNull,
       note: j['note'] is String ? j['note'] as String : '',
     );
+  }
+}
+
+/// Whether a reading should prompt a call to her doctor (P1 D1). Never shown
+/// as a label: it only decides whether the after-save sheet opens, and which
+/// of its two sentences it leads with.
+enum ReadingConcern { none, sameDay, urgent }
+
+// ⚠️ PROPOSED THRESHOLDS, ON A BEFORE-LAUNCH CLINICIAN LINE (2026-10-28).
+// 140/90 is the pregnancy line for "tell your doctor today" (ACOG, FOGSI);
+// 160/110 the severe range, "call now". Sugar: under 70 is low enough to
+// treat at once; 200 and above, at any time of day, is far past every
+// pregnancy target. Change them here and nowhere else.
+const int kConcernSys = 140, kConcernDia = 90;
+const int kUrgentSys = 160, kUrgentDia = 110;
+const int kSugarLow = 70, kSugarVeryHigh = 200;
+
+ReadingConcern readingConcern(Reading r, {ReadingTargets targets = const ReadingTargets()}) {
+  if (!r.plausible) return ReadingConcern.none;
+  switch (r.kind) {
+    case ReadingKind.bloodPressure:
+      final sys = r.systolic!, dia = r.diastolic!;
+      if (sys >= kUrgentSys || dia >= kUrgentDia) return ReadingConcern.urgent;
+      if (sys >= kConcernSys || dia >= kConcernDia) {
+        // Her doctor's line wins when she has one and the reading is inside it.
+        final hasTarget = targets.sysUnder != null || targets.diaUnder != null;
+        final inside = (targets.sysUnder == null || sys < targets.sysUnder!) &&
+            (targets.diaUnder == null || dia < targets.diaUnder!);
+        if (hasTarget && inside) return ReadingConcern.none;
+        return ReadingConcern.sameDay;
+      }
+      return ReadingConcern.none;
+    case ReadingKind.sugar:
+      final v = r.mgdl!;
+      return (v < kSugarLow || v >= kSugarVeryHigh) ? ReadingConcern.sameDay : ReadingConcern.none;
   }
 }
 
@@ -260,6 +307,14 @@ class ReadingsStore extends ChangeNotifier with CloudMergedStore {
     final i = _all.indexWhere((e) => e.id == r.id);
     if (i < 0) return;
     _all[i] = r;
+    _changed();
+  }
+
+  /// Puts a removed reading back with its own id (the Undo on a delete), so
+  /// the merge sees the same item come back rather than a new one.
+  void restore(Reading r) {
+    if (_all.any((e) => e.id == r.id)) return;
+    _all.add(r);
     _changed();
   }
 

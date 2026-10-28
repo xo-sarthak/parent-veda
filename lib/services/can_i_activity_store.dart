@@ -71,6 +71,10 @@ class CanIActivityStore extends ChangeNotifier with CloudMergedStore {
   bool get hasRecents => _recents.isNotEmpty;
   CanIDoctorSaid? doctorSaid(String entryId) => _doctor[entryId];
 
+  /// Every answer her doctor gave, by entry id (the doctor-visit summary
+  /// reads it, P1 D4, 2026-10-28).
+  Map<String, CanIDoctorSaid> get doctorCalls => Map.unmodifiable(_doctor);
+
   Future<void> init() async {
     if (_loaded) return;
     _loaded = true;

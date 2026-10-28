@@ -36,6 +36,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../data/checklists/pv_checklist.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/pv_checklist_store.dart';
 import '../../services/pv_checklist_subjects.dart';
 import '../../theme/pv_fonts.dart';
@@ -72,10 +73,71 @@ class PvChecklistScreen extends StatefulWidget {
 class _PvChecklistScreenState extends State<PvChecklistScreen> {
   PvChecklist get list => widget.checklist;
 
+  bool get _ended => PregnancyEndedStore.instance.ended;
+
+  /// What the checklist is about now. None after a loss: "your anomaly scan"
+  /// is a pregnancy still going (P1 D2).
+  String? get _subject => _ended ? null : list.subject?.call(widget.pregnancy);
+
+  /// Where the ticks live (P1 D8): per scan for a list that asks for it, the
+  /// list's own id otherwise.
+  String get _key {
+    final s = _subject;
+    return (list.ticksPerSubject && s != null) ? '${list.id}@$s' : list.id;
+  }
+
   @override
   void initState() {
     super.initState();
-    PvChecklistStore.instance.init(list.id);
+    _init();
+  }
+
+  Future<void> _init() async {
+    final store = PvChecklistStore.instance;
+    await store.init(list.id);
+    if (_key != list.id) {
+      await store.init(_key);
+      // The one-key ticks from before D8 land on the scan she is heading for.
+      await store.adopt(list.id, _key);
+    }
+  }
+
+  Future<void> _clearAll(BuildContext context, V2Palette p) async {
+    final store = PvChecklistStore.instance;
+    // Mobbin: BitePal's "Clear this meal" sheet, one ink button and a way
+    // back. A bulk clear asks; a single untick never does.
+    final yes = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: p.ground,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (c) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text('Clear all ${store.count(_key)} ticks?',
+              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, color: p.ink1)),
+          const SizedBox(height: 6),
+          Text('The questions stay. Only your ticks go.',
+              style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+          const SizedBox(height: 16),
+          FilledButton(
+            key: const ValueKey('checklist_clear_yes'),
+            onPressed: () => Navigator.of(c).pop(true),
+            child: const Text('Clear all ticks'),
+          ),
+          TextButton(
+            key: const ValueKey('checklist_clear_no'),
+            onPressed: () => Navigator.of(c).pop(false),
+            child: Text('Keep them', style: pvManrope(fontSize: 14, color: p.ink2)),
+          ),
+        ]),
+      ),
+    );
+    if (yes != true || !context.mounted) return;
+    final before = store.ticked(_key).toSet();
+    await store.clear(_key);
+    if (!context.mounted) return;
+    pvToast(context, 'Cleared ${before.length} ticks.',
+        kind: PvToastKind.done, action: 'Undo', onAction: () => store.restore(_key, before));
   }
 
   Future<void> _share() async {
@@ -88,7 +150,7 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
     final lines = <String>[];
     for (final g in list.groups) {
       final picked =
-          g.items.where((q) => store.isTicked(list.id, q.id)).toList();
+          g.items.where((q) => store.isTicked(_key, q.id)).toList();
       if (picked.isEmpty) continue;
       lines.add('');
       lines.add(g.heading);
@@ -98,9 +160,9 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
     }
     if (lines.isEmpty) return;
 
-    final subject = list.subject?.call(widget.pregnancy);
+    final subject = _subject;
     final header = subject == null
-        ? list.shareHeader
+        ? (_ended && list.afterLossTitle != null ? 'Questions for my doctor' : list.shareHeader)
         : '${list.shareHeader} — $subject';
 
     await Share.share('$header\n${lines.join('\n')}');
@@ -116,23 +178,28 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
         animation: Listenable.merge([
           PvChecklistStore.instance,
           V2PaletteStore.instance,
+          PregnancyEndedStore.instance,
           ...pvChecklistSubjectStores,
         ]),
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
           final store = PvChecklistStore.instance;
-          final count = store.count(list.id);
-          final subject = list.subject?.call(widget.pregnancy);
+          final key = _key;
+          final count = store.count(key);
+          final subject = _subject;
+          final lossTitle = _ended ? list.afterLossTitle : null;
 
           return PvDoorToolScaffold(
             hue: widget.hue,
             eyebrow: list.eyebrow,
-            title: subject == null
-                ? list.title
-                : (list.subjectTitle?.call(subject) ?? list.title),
-            intro: subject == null
-                ? list.intro
-                : (list.subjectIntro?.call(subject) ?? list.intro),
+            title: lossTitle ??
+                (subject == null
+                    ? list.title
+                    : (list.subjectTitle?.call(subject) ?? list.title)),
+            intro: (lossTitle != null ? list.afterLossIntro : null) ??
+                (subject == null
+                    ? list.intro
+                    : (list.subjectIntro?.call(subject) ?? list.intro)),
             action: count == 0
                 ? null
                 : _ShareBar(p: p, count: count, onTap: _share),
@@ -150,18 +217,18 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
                   pvDoorPad(_ItemRow(
                     item: q,
                     hue: widget.hue,
-                    ticked: store.isTicked(list.id, q.id),
+                    ticked: store.isTicked(key, q.id),
                     p: p,
                     onTap: () async {
-                      final was = store.isTicked(list.id, q.id);
-                      await store.toggle(list.id, q.id);
+                      final was = store.isTicked(key, q.id);
+                      await store.toggle(key, q.id);
                       // The row's tick answers each tap (PvTick); only the
                       // tick that finishes the list earns words (toasts
                       // pass, 2026-10-15). One per list, not one per row.
                       final all = [for (final g in list.groups) ...g.items];
                       if (!was &&
                           context.mounted &&
-                          all.every((x) => store.isTicked(list.id, x.id))) {
+                          all.every((x) => store.isTicked(key, x.id))) {
                         pvToast(context, 'All ${all.length} ticked',
                             kind: PvToastKind.done);
                       }
@@ -181,7 +248,10 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
                         fontSize: 12.5, height: 1.55, color: p.ink3))),
               if (count > 0)
                 pvDoorPad(PvPress(child: GestureDetector(
-                  onTap: () => store.clear(list.id),
+                  // P1 (2026-10-28): asks first, then Undo. Kept for revert:
+                  // onTap: () => store.clear(list.id),
+                  key: const ValueKey('checklist_clear_all'),
+                  onTap: () => _clearAll(context, p),
                   behavior: HitTestBehavior.opaque,
                   child: Text('Clear all',
                       style: pvManrope(

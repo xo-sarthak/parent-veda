@@ -73,6 +73,9 @@ class PvChecklist {
     this.subject,
     this.subjectTitle,
     this.subjectIntro,
+    this.ticksPerSubject = false,
+    this.afterLossTitle,
+    this.afterLossIntro,
   });
 
   /// The storage key. An identity — see [PvChecklistItem.id].
@@ -123,6 +126,19 @@ class PvChecklist {
 
   /// Builds the intro from [subject]'s answer.
   final String Function(String subject)? subjectIntro;
+
+  /// ⚠️ TICKS BELONG TO ONE APPOINTMENT (P1 D8, 2026-10-28). True for the
+  /// scans list: what she ticked for the dating scan is not what she wants to
+  /// ask at the anomaly scan, and one key per list carried every tick into the
+  /// next scan. With this set, ticks are stored per [subject] answer. False for
+  /// the diet list (its subject is her week, which moves every seven days, and
+  /// a list that empties weekly is a page of checkboxes) and conditions.
+  final bool ticksPerSubject;
+
+  /// The heading and intro after a loss (P1 D2), when "your next scan" no
+  /// longer fits. Null keeps [title]: only the lists that name a scan set it.
+  final String? afterLossTitle;
+  final String? afterLossIntro;
 
   /// Every item, flattened.
   List<PvChecklistItem> get items => [for (final g in groups) ...g.items];

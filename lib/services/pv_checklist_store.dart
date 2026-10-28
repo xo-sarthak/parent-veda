@@ -7,7 +7,13 @@
 //  checkboxes. She ticks two questions on Tuesday, remembers a third on
 //  Wednesday, and takes all three in on Thursday.
 //
-//  ⚠️ LOCAL ONLY, AND DELIBERATELY NOT SYNCED. Every other store in this stage
+//  ⚠️ SUPERSEDED (P1 D8, 2026-10-28): the ticks sync since step 13 (see the
+//  note above the class). The reasoning below is kept as history; the
+//  decision that replaced it is that a sign-out or a new phone must not empty
+//  her list. Backup is the house norm; consent (PpUseConsent) governs USING
+//  her data elsewhere, and nothing reads these ticks but this screen.
+//
+//  (was) LOCAL ONLY, AND DELIBERATELY NOT SYNCED. Every other store in this stage
 //  registers with `SyncRegistry` and writes to Supabase. This one does not, and
 //  the reasoning is worth stating because the next person will assume it was an
 //  omission:
@@ -164,6 +170,26 @@ class PvChecklistStore extends ChangeNotifier with CloudMergedStore {
   Future<void> toggle(String list, String id) async {
     final set = _ticked.putIfAbsent(list, () => <String>{});
     if (!set.remove(id)) set.add(id);
+    notifyListeners();
+    await _save(list);
+  }
+
+  /// Moves the ticks of [from] onto [to], once, when [to] has none (P1 D8:
+  /// the one-key scan ticks land on the scan she is heading for now). The old
+  /// list is emptied, so this never runs twice and the move syncs.
+  Future<void> adopt(String from, String to) async {
+    final old = _ticked[from];
+    if (old == null || old.isEmpty || count(to) > 0 || from == to) return;
+    _ticked[to] = {...old};
+    old.clear();
+    notifyListeners();
+    await _save(from);
+    await _save(to);
+  }
+
+  /// Puts back ticks a Clear all removed (its Undo).
+  Future<void> restore(String list, Set<String> ids) async {
+    _ticked.putIfAbsent(list, () => <String>{}).addAll(ids);
     notifyListeners();
     await _save(list);
   }

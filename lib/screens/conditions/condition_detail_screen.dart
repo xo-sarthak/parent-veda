@@ -25,6 +25,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../widgets/pv_placeholders.dart';
+import '../../widgets/pv_toast.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../brackets/hub/problem_hub_screen.dart' show HubPill;
 import '../prepare/consultations_screen.dart';
@@ -113,9 +114,19 @@ class ConditionDetailScreen extends StatelessWidget {
                   // Ask Veda reads, so "I looked up a scary word" must not
                   // become "the app believes I have this" on one tap. The
                   // sheet says what it does; a second tap is the consent.
-                  onTap: () => store.isAddedToJourney(entry.id)
-                      ? store.toggleAddedToJourney(entry.id)
-                      : _confirmAdd(context, entry, store, p, lang),
+                  // P1 (2026-10-28): removing says so, with Undo. Kept for
+                  // revert: ? store.toggleAddedToJourney(entry.id)
+                  onTap: () {
+                    if (!store.isAddedToJourney(entry.id)) {
+                      _confirmAdd(context, entry, store, p, lang);
+                      return;
+                    }
+                    store.toggleAddedToJourney(entry.id);
+                    pvToast(context, 'Removed ${entry.name.of(lang)} from your journey.',
+                        kind: PvToastKind.done,
+                        action: 'Undo',
+                        onAction: () => store.toggleAddedToJourney(entry.id));
+                  },
                 ),
               _ConditionBlock.medicine => _MedicineAsk(
                   entry: entry, pregnancy: pregnancy, p: p, lang: lang, store: store),
@@ -184,6 +195,12 @@ class ConditionDetailScreen extends StatelessWidget {
     if (yes == true) {
       pvCommitFeedback();
       store.toggleAddedToJourney(entry.id);
+      // P1 (2026-10-28): the add says what it changed.
+      if (context.mounted) {
+        pvToast(context,
+            'Added ${entry.name.of(lang)} to your journey. Ask Veda and your question lists now take it into account.',
+            kind: PvToastKind.done);
+      }
     }
   }
 

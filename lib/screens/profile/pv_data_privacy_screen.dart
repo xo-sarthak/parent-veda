@@ -94,15 +94,19 @@ class PvDataPrivacyScreen extends StatelessWidget {
           ),
           // What the app may use from each parenting tool, asked once per kind
           // on the tool and changeable here (tools pass T0, 2026-10-25).
-          if (stage == LifeStage.parenting)
+          // P1 (2026-10-28): Pregnancy's kinds too, each listed under its own
+          // stage. Kept for revert: if (stage == LifeStage.parenting)
+          if (PpUseKind.values.any((k) => k.stage == stage))
             SliverToBoxAdapter(
               child: ListenableBuilder(
                 listenable: PpUseConsent.instance,
                 builder: (context, _) => PvYouSection(
                   title: 'What ParentVeda uses',
-                  lead: 'A yes only changes what we show first. Every tool works the same either way.',
+                  lead: stage == LifeStage.pregnancy
+                      ? 'A yes only adds it to the summary you can show your doctor. Every tool works the same either way.'
+                      : 'A yes only changes what we show first. Every tool works the same either way.',
                   children: [
-                    for (final kind in PpUseKind.values)
+                    for (final kind in PpUseKind.values.where((k) => k.stage == stage))
                       PvYouRow(
                         key: ValueKey('pv_use_${kind.name}'),
                         icon: Icons.tune_rounded,

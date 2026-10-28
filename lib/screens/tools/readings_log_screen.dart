@@ -12,7 +12,9 @@
 //  doctor ("Share with my doctor"). WHAT IT NEVER DOES: judge a number. No red,
 //  no green, no "high", no "normal". The only comparison is her DOCTOR's target,
 //  which she may enter and which we print beside her readings as hers. See
-//  `readings_store.dart` for why that line is held.
+//  `readings_store.dart` for why that line is held, and for its one exception
+//  (P1 D1, 2026-10-28): a reading in the call-today range opens a calm sheet
+//  after the save. The number itself is never coloured or labelled.
 //
 //  WHERE ELSE IT LIVES: the Complications door ("Keep your numbers") and the
 //  Tools list open this same screen. One screen, two ways in.
@@ -24,10 +26,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/pregnancy_controller.dart';
+import '../../services/pp_use_consent.dart';
 import '../../services/readings_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_toast.dart';
+import '../post_pregnancy/pp_use_ask_card.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../brackets/same_day_signs_screen.dart';
 import '../pregnancy/preg_chrome.dart';
@@ -73,7 +79,30 @@ class _ReadingsLogScreenState extends State<ReadingsLogScreen> {
 
   Future<void> _share() => Share.share(store.summary(_kind));
 
-  void _add() => _showEditor(context, store: store, kind: _kind);
+  void _add() => _edit();
+
+  // P1 (2026-10-28): every save says what it changed, a delete can be undone,
+  // and a reading in the call-today range opens the concern sheet (D1). The
+  // sheet pops its result here, because its own context is gone after pop.
+  Future<void> _edit([Reading? existing]) async {
+    final r = await _showEditor(context, store: store, kind: _kind, existing: existing);
+    if (r == null || !mounted) return;
+    final unit = r.reading.kind == ReadingKind.bloodPressure ? 'mmHg' : 'mg/dL';
+    if (r.deleted) {
+      pvToast(context, 'Reading removed: ${r.reading.valueText} $unit, ${_day(r.reading.at)}.',
+          action: 'Undo', onAction: () => store.restore(r.reading));
+      return;
+    }
+    pvToast(
+        context,
+        r.edited
+            ? 'Changes saved: ${r.reading.valueText} $unit.'
+            : 'Saved: ${r.reading.valueText} $unit, ${_sameDay(r.reading.at, DateTime.now()) ? 'today' : _day(r.reading.at)}.');
+    final concern = readingConcern(r.reading, targets: store.targets);
+    if (concern != ReadingConcern.none) {
+      await _showConcern(context, concern, widget.controller);
+    }
+  }
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -91,6 +120,15 @@ class _ReadingsLogScreenState extends State<ReadingsLogScreen> {
             children: [
               pregToolPad(_KindSwitch(kind: _kind, onChanged: (k) => setState(() => _kind = k))),
               const SizedBox(height: 16),
+              // D4 (P1, 2026-10-28): asked once, after her first reading.
+              // The card hides itself once she answers.
+              if (store.of(ReadingKind.bloodPressure).isNotEmpty || store.of(ReadingKind.sugar).isNotEmpty)
+                pregToolPad(const Padding(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: PpUseAskCard(
+                      kind: PpUseKind.pregReadings,
+                      question: 'Add your readings to the summary you can show your doctor?'),
+                )),
               pregToolPad(rows.isEmpty
                   ? _Empty(isBp: _isBp, onAdd: _add)
                   : _Latest(reading: rows.first, targets: store.targets, onAdd: _add)),
@@ -104,7 +142,7 @@ class _ReadingsLogScreenState extends State<ReadingsLogScreen> {
                 const SizedBox(height: 26),
                 pregToolPad(const PregSectionHeading('Your readings')),
                 const SizedBox(height: 10),
-                pregToolPad(_History(rows: rows, onTap: (r) => _showEditor(context, store: store, kind: _kind, existing: r))),
+                pregToolPad(_History(rows: rows, onTap: _edit)),
                 const SizedBox(height: 16),
                 pregToolPad(OutlinedButton.icon(
                   key: const ValueKey('readings_share'),
@@ -339,9 +377,18 @@ class _History extends StatelessWidget {
 
 // ---- the add / edit sheet ----------------------------------------------------
 
-Future<void> _showEditor(BuildContext context,
+/// What the editor did, handed back to the screen so the screen (whose
+/// context outlives the sheet) can say so and open the concern sheet.
+class _EditResult {
+  const _EditResult(this.reading, {this.edited = false, this.deleted = false});
+  final Reading reading;
+  final bool edited;
+  final bool deleted;
+}
+
+Future<_EditResult?> _showEditor(BuildContext context,
     {required ReadingsStore store, required ReadingKind kind, Reading? existing}) {
-  return showModalBottomSheet<void>(
+  return showModalBottomSheet<_EditResult>(
     context: context,
     isScrollControlled: true,
     backgroundColor: pvStorePalette.ground,
@@ -408,17 +455,19 @@ class _EditorSheetState extends State<_EditorSheet> {
           : 'Check the number. It is the figure your meter shows, in mg/dL.');
       return;
     }
+    final Reading saved;
     if (widget.existing != null) {
-      widget.store.update(widget.existing!.copyWith(
+      saved = widget.existing!.copyWith(
         at: _at,
         systolic: probe.systolic,
         diastolic: probe.diastolic,
         mgdl: probe.mgdl,
         context: _isBp ? null : _ctx,
         note: _note.text.trim(),
-      ));
+      );
+      widget.store.update(saved);
     } else {
-      widget.store.add(
+      saved = widget.store.add(
         kind: widget.kind,
         at: _at,
         systolic: probe.systolic,
@@ -428,7 +477,7 @@ class _EditorSheetState extends State<_EditorSheet> {
         note: _note.text,
       );
     }
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(_EditResult(saved, edited: widget.existing != null));
   }
 
   InputDecoration _dec(String label, {String? suffix}) => InputDecoration(
@@ -532,9 +581,10 @@ class _EditorSheetState extends State<_EditorSheet> {
             Center(
               child: TextButton(
                 key: const ValueKey('reading_delete'),
+                // Undo on the toast, not a dialog (Mobbin: X's undo toast).
                 onPressed: () {
                   widget.store.remove(widget.existing!.id);
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(_EditResult(widget.existing!, deleted: true));
                 },
                 child: Text('Delete this reading', style: pvManrope(fontSize: 13.5, color: p.ink2)),
               ),
@@ -564,14 +614,51 @@ class _TargetSheet extends StatefulWidget {
   State<_TargetSheet> createState() => _TargetSheetState();
 }
 
+// What she typed in the target sheet and closed without saving (P1, 2026-10-28:
+// closing the sheet used to lose it). In memory only: it is a draft, not a fact.
+List<String>? _targetDraft;
+
+// Typing bounds, the same kind of hygiene as `Reading.plausible`: wide, and
+// never a judgement of the number her doctor chose.
+const _kTargetBounds = {
+  'sys': (80, 200),
+  'dia': (40, 130),
+  'fasting': (50, 200),
+  'after': (60, 300),
+};
+
 class _TargetSheetState extends State<_TargetSheet> {
-  late final _sys = TextEditingController(text: widget.store.targets.sysUnder?.toString() ?? '');
-  late final _dia = TextEditingController(text: widget.store.targets.diaUnder?.toString() ?? '');
-  late final _fast = TextEditingController(text: widget.store.targets.fastingUnder?.toString() ?? '');
-  late final _after = TextEditingController(text: widget.store.targets.afterFoodUnder?.toString() ?? '');
+  late final List<String> _start = _targetDraft ??
+      [
+        widget.store.targets.sysUnder?.toString() ?? '',
+        widget.store.targets.diaUnder?.toString() ?? '',
+        widget.store.targets.fastingUnder?.toString() ?? '',
+        widget.store.targets.afterFoodUnder?.toString() ?? '',
+      ];
+  late final bool _fromDraft = _targetDraft != null;
+  late final _sys = TextEditingController(text: _start[0]);
+  late final _dia = TextEditingController(text: _start[1]);
+  late final _fast = TextEditingController(text: _start[2]);
+  late final _after = TextEditingController(text: _start[3]);
+  bool _saved = false;
+  String? _error;
 
   @override
   void dispose() {
+    if (!_saved) {
+      final now = [_sys.text, _dia.text, _fast.text, _after.text];
+      final unchanged = [
+        widget.store.targets.sysUnder?.toString() ?? '',
+        widget.store.targets.diaUnder?.toString() ?? '',
+        widget.store.targets.fastingUnder?.toString() ?? '',
+        widget.store.targets.afterFoodUnder?.toString() ?? '',
+      ];
+      var same = true;
+      for (var i = 0; i < 4; i++) {
+        if (now[i].trim() != unchanged[i]) same = false;
+      }
+      _targetDraft = same ? null : now;
+    }
     _sys.dispose();
     _dia.dispose();
     _fast.dispose();
@@ -593,6 +680,45 @@ class _TargetSheetState extends State<_TargetSheet> {
 
   int? _n(TextEditingController c) => int.tryParse(c.text.trim());
 
+  /// The first field that is filled but outside its bounds, or null.
+  String? _check() {
+    final fields = {'sys': _sys, 'dia': _dia, 'fasting': _fast, 'after': _after};
+    for (final e in fields.entries) {
+      final text = e.value.text.trim();
+      if (text.isEmpty) continue;
+      final (lo, hi) = _kTargetBounds[e.key]!;
+      final v = int.tryParse(text);
+      if (v == null || v < lo || v > hi) {
+        return 'Check the numbers: each one is usually between $lo and $hi '
+            '${e.key == 'sys' || e.key == 'dia' ? 'for blood pressure' : 'mg/dL for sugar'}. '
+            'Use the figure your doctor gave you.';
+      }
+    }
+    final s = _n(_sys), d = _n(_dia);
+    if (s != null && d != null && d >= s) {
+      return 'Check the numbers: the top number is larger than the bottom one.';
+    }
+    return null;
+  }
+
+  void _save() {
+    final error = _check();
+    if (error != null) {
+      setState(() => _error = error);
+      return;
+    }
+    final t = ReadingTargets(sysUnder: _n(_sys), diaUnder: _n(_dia), fastingUnder: _n(_fast), afterFoodUnder: _n(_after));
+    widget.store.setTargets(t);
+    _saved = true;
+    _targetDraft = null;
+    pvToast(
+        context,
+        t.isEmpty
+            ? "Your doctor's target is cleared."
+            : "Target saved. It shows beside your readings and in what you share with your doctor.");
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
@@ -610,6 +736,12 @@ class _TargetSheetState extends State<_TargetSheet> {
               'Only if your doctor gave you numbers to aim for. We show them beside your readings as yours, '
               'and never compare your readings to anything of our own.',
               style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+          if (_fromDraft) ...[
+            const SizedBox(height: 8),
+            Text('We kept what you typed last time. Save it, or change it first.',
+                key: const ValueKey('target_draft_line'),
+                style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),
+          ],
           const SizedBox(height: 16),
           Text('BLOOD PRESSURE, UNDER',
               style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
@@ -648,19 +780,126 @@ class _TargetSheetState extends State<_TargetSheet> {
                     keyboardType: TextInputType.number,
                     decoration: _dec('After food', 'mg/dL'))),
           ]),
+          if (_error != null) ...[
+            const SizedBox(height: 10),
+            Text(_error!, key: const ValueKey('target_error'), style: pvManrope(fontSize: 13, color: p.ink2)),
+          ],
           const SizedBox(height: 18),
           FilledButton(
             key: const ValueKey('target_save'),
             style: pregFilledStyle().copyWith(minimumSize: const WidgetStatePropertyAll(Size.fromHeight(48))),
-            onPressed: () {
-              widget.store.setTargets(ReadingTargets(
-                  sysUnder: _n(_sys), diaUnder: _n(_dia), fastingUnder: _n(_fast), afterFoodUnder: _n(_after)));
-              Navigator.of(context).pop();
-            },
+            // Kept for revert (P1, 2026-10-28): saved without a check or a word.
+            // onPressed: () {
+            //   widget.store.setTargets(ReadingTargets(
+            //       sysUnder: _n(_sys), diaUnder: _n(_dia), fastingUnder: _n(_fast), afterFoodUnder: _n(_after)));
+            //   Navigator.of(context).pop();
+            // },
+            onPressed: _save,
             child: Text('Save',
                 style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: Colors.white)),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+// ---- the concern sheet (P1 D1, 2026-10-28) -----------------------------------
+//
+// Opens on its own after a save in the call-today range (`readingConcern`).
+// Mobbin: Bevel's result sheet after a save (one main button, "Not now"),
+// without its coloured category label: we never name a condition or colour
+// the number. The words are on a BEFORE-LAUNCH clinician line.
+
+Future<void> _showConcern(BuildContext context, ReadingConcern concern, PregnancyController c) =>
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: pvStorePalette.ground,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (_) => _ConcernSheet(concern: concern, controller: c),
+    );
+
+class _ConcernSheet extends StatelessWidget {
+  const _ConcernSheet({required this.concern, required this.controller});
+  final ReadingConcern concern;
+  final PregnancyController controller;
+
+  Future<void> _call() async {
+    try {
+      // No number of ours: the dialler opens and she calls her own doctor.
+      await launchUrl(Uri(scheme: 'tel', path: ''));
+    } catch (_) {/* a phone that cannot dial: the words still stand */}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final urgent = concern == ReadingConcern.urgent;
+    final title = urgent ? 'Call your doctor now' : 'Call your doctor today';
+    final body = urgent
+        ? 'Doctors want to hear about a reading like this straight away. '
+            "If you can't reach them, go to your hospital."
+        : 'Doctors like to hear about a reading like this the same day. '
+            'For blood pressure, sit quietly for five minutes and measure again first. '
+            'If it is still this high, call.';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+      child: SingleChildScrollView(
+        child: Column(
+          key: ValueKey('reading_concern_${concern.name}'),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Semantics(
+              header: true,
+              child: Text(title, style: pvFraunces(fontSize: 24, fontWeight: FontWeight.w600, color: p.ink1)),
+            ),
+            const SizedBox(height: 8),
+            Text(body, style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
+            const SizedBox(height: 14),
+            Text('CALL AT ONCE, WHATEVER THE NUMBER, IF YOU HAVE',
+                style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+            const SizedBox(height: 6),
+            for (final s in const [
+              "A bad headache that won't go away",
+              'Blurred vision or flashing lights',
+              'Pain under your ribs, on the right',
+              'Sudden swelling of your face, hands or feet',
+              'Feeling shaky, sweaty or confused',
+            ])
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text('·  $s', style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1)),
+              ),
+            const SizedBox(height: 16),
+            FilledButton(
+              key: const ValueKey('reading_concern_call'),
+              style: pregFilledStyle().copyWith(minimumSize: const WidgetStatePropertyAll(Size.fromHeight(48))),
+              onPressed: _call,
+              child: Text('Call your doctor',
+                  style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: Colors.white)),
+            ),
+            const SizedBox(height: 6),
+            TextButton(
+              key: const ValueKey('reading_concern_signs'),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                settings: const RouteSettings(name: 'bracket/same_day'),
+                builder: (_) => SameDaySignsScreen(pregnancy: controller),
+              )),
+              child: Text('All the signs to get help the same day',
+                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: kPvInk)),
+            ),
+            TextButton(
+              key: const ValueKey('reading_concern_later'),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Not now', style: pvManrope(fontSize: 13.5, color: p.ink2)),
+            ),
+            const SizedBox(height: 4),
+            Text('This is not a diagnosis. Your doctor knows your whole picture.',
+                style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),
+          ],
+        ),
       ),
     );
   }

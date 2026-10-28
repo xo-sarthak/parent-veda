@@ -4361,3 +4361,40 @@ after a push) and, when it does, sends an explicit null. So "absent" means "noth
 The trade-off: the derived number costs a little work on every read (a loop over her pregnancy records), against
 a stored number that would have to be recomputed and re-synced whenever a record, a basis or the date changed.
 Deriving on read cannot go stale; a cached count can.
+
+## 16yy. Derive from the id before adding a column; one consent store across stages (P1, 2026-10-28)
+
+P1 (`docs/preg-ttc-tool-plans/P1-lookups-records.md`) needed two new facts and added no migration for either.
+
+### 1. When the id already holds the answer, read it
+Question: which of her medicines did she add while trying, so the app can say "check these with your doctor"
+when she moves to pregnancy? The obvious answer is a `stage` column on `medications`: a migration, a contract
+line, a backfill for every existing row (which would have to guess), and a field every writer must remember.
+
+But the app makes its own ids (`med_<microseconds>` here, `ttcm_<microseconds>` on the TTC page), so every row
+already records the moment it was made. "Added before this pregnancy began" is `addedAt(id) < enteredAt`, and a
+`ttcm_` prefix says "trying" on its own (`MedicineStore.addedBefore`).
+
+The trade-off, both sides: no migration, no backfill, and old rows answer correctly for free; against that, the
+meaning is now tied to the id's format. So the rule that makes it safe: **an id that does not parse means
+"not known", never a guess**, and "not known" is left off the card. A row that came from somewhere else (an
+import, a hand-made test id) is simply not offered, which is the cautious direction for a medicines prompt.
+The general fact: a client-minted id with a timestamp in it is a created-at column you already have; read it
+before adding one, and write down the format it depends on.
+
+### 2. One consent store, kinds that carry their stage
+`PpUseConsent` (Parenting's "ask once per kind", T0) gained four Pregnancy kinds (`pregReadings`,
+`pregConditions`, `pregReports`, `pregDoctorCalls`) instead of a sibling store. Each kind says its `stage` in an
+exhaustive switch, so a new kind cannot compile without saying where it belongs, and You lists each stage's own.
+
+Why not a second store: the ask card, the You section, the sync (one merged item per kind) and the reset on
+sign-out would all be copied, and two copies drift. Why this is safe for the rows already stored: an item's key
+is the kind's `name`, Parenting's five names did not change, and the new names are new keys, so no stored
+answer moves or is reinterpreted. The cost: the class keeps its Parenting name. Renaming it would touch a
+dozen files for no behaviour change, so it waits for a reason.
+
+### 3. "Unasked" is a third state, and the reader must draw it
+The doctor-visit summary shows a section per kind whatever her answer: her data after a yes, "you chose to
+leave these out" after a no, and, when she has data but was never asked, a line pointing at the tool where she
+is asked. Treating "unasked" as "no" silently would hide a feature; treating it as "yes" would use data she
+never agreed to. Three states, three renders.

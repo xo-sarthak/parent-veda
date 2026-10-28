@@ -26,6 +26,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'life_stage_store.dart' show LifeStage;
 import 'remote/cloud_merged_store.dart';
 
 /// A kind of information a tool collects. One per tool family; later tools
@@ -41,6 +42,13 @@ enum PpUseKind {
   // Tools pass, Food family (2026-10-25): the foods a child has tried, from
   // Can my baby eat this?, for Recipes and Before you see the doctor.
   foods,
+  // P1, Pregnancy look-ups and records (D4/D5, 2026-10-28): what the doctor-
+  // visit summary may include. Pregnancy kinds are their own names, so a stage
+  // never inherits Parenting's answer (00-MASTER T1).
+  pregReadings,
+  pregConditions,
+  pregReports,
+  pregDoctorCalls,
 }
 
 enum PpUseAnswer { unasked, yes, no }
@@ -53,7 +61,38 @@ extension PpUseKindText on PpUseKind {
         PpUseKind.changes => 'What you tell Is my baby OK?',
         PpUseKind.development => 'Milestones and check-in answers',
         PpUseKind.foods => 'Foods tried',
+        PpUseKind.pregReadings => 'Your blood pressure and sugar readings',
+        PpUseKind.pregConditions => 'The conditions you follow',
+        PpUseKind.pregReports => 'Your saved reports',
+        PpUseKind.pregDoctorCalls => 'What your doctor said in Is it safe?',
       };
+
+  /// The stage whose tools collect it. You lists each kind under its stage.
+  /// Kept as a switch (not a name prefix) so a new kind cannot compile
+  /// without saying where it belongs.
+  LifeStage get stage => switch (this) {
+        PpUseKind.feeds ||
+        PpUseKind.nappies ||
+        PpUseKind.changes ||
+        PpUseKind.development ||
+        PpUseKind.foods =>
+          LifeStage.parenting,
+        PpUseKind.pregReadings ||
+        PpUseKind.pregConditions ||
+        PpUseKind.pregReports ||
+        PpUseKind.pregDoctorCalls =>
+          LifeStage.pregnancy,
+      };
+
+  /// The toast after a yes on the ask card: what it now does, in her terms.
+  String get saidYes => stage == LifeStage.pregnancy
+      ? 'Thank you. $label will be in the summary you can show your doctor.'
+      : 'Thank you. $label now helps choose what you see first.';
+
+  /// The toast after a no.
+  String get saidNo => stage == LifeStage.pregnancy
+      ? 'Okay. $label stays in this tool and is left out of the summary.'
+      : 'Okay. $label stays in this tool only.';
 
   /// What a yes changes, in one line. Shown on the ask card and in You.
   String get why => switch (this) {
@@ -69,6 +108,14 @@ extension PpUseKindText on PpUseKind {
             'so the questions are ready when you go.',
         PpUseKind.foods => 'Recipes can show which dishes bring a new food, and '
             'Before you see the doctor lists any reaction you noted.',
+        PpUseKind.pregReadings => 'We add your latest readings to the summary '
+            'you can show your doctor, beside any target they gave you.',
+        PpUseKind.pregConditions => 'We list them in the summary you can show '
+            'your doctor, so nothing is missed at the visit.',
+        PpUseKind.pregReports => 'We list your latest reports, by name and date, '
+            'in the summary you can show your doctor.',
+        PpUseKind.pregDoctorCalls => 'We add what your doctor told you to the '
+            'summary, so the next doctor sees it too.',
       };
 }
 

@@ -41,10 +41,14 @@ import '../../data/reads/read_images.dart';
 import '../../models/can_i_entry.dart';
 import '../../services/can_i_activity_store.dart';
 import '../../services/can_i_store.dart';
+import '../../services/pp_use_consent.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskVedaRoute;
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
+import '../post_pregnancy/pp_use_ask_card.dart';
 import '../doors/pv_door_chrome.dart';
 import '../tools/ask_veda_screen.dart';
 import '../v2/v2_palette.dart';
@@ -60,7 +64,10 @@ class CanIVerdictScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final e = entry;
-    final week = controller.isDueDateSet ? controller.currentWeek : null;
+    // After a loss (P1 D2, 2026-10-28) no "For you" line for her trimester;
+    // the answer and the trimester list stay. Kept for revert:
+    // final week = controller.isDueDateSet ? controller.currentWeek : null;
+    final week = (controller.isDueDateSet && !PregnancyEndedStore.instance.ended) ? controller.currentWeek : null;
     final tri = week == null ? null : canITrimester(week);
     final note = week == null ? null : canINoteForWeek(e, week);
     final swaps = canIInsteadOf(e);
@@ -239,7 +246,7 @@ class CanIVerdictScreen extends StatelessWidget {
                   p,
                   'My doctor said',
                   sub: "Your doctor knows your pregnancy and this page doesn't. Record their call and it shows above ours.",
-                  child: _doctor(p, e),
+                  child: _doctor(context, p, e),
                 ),
 
                 // ---- SEND · ASK VEDA ---------------------------------------------
@@ -394,7 +401,22 @@ class CanIVerdictScreen extends StatelessWidget {
         ),
       );
 
-  Widget _doctor(V2Palette p, CanIEntry e) {
+  // P1 (2026-10-28): the pick says what it saved, and the first one asks
+  // whether it may go in the doctor-visit summary (D4). Kept for revert: the
+  // two chips called setDoctorSaid with no word.
+  void _setSaid(BuildContext context, CanIEntry e, CanIDoctorSaid? now) {
+    CanIActivityStore.instance.setDoctorSaid(e.id, now);
+    pvToast(
+        context,
+        switch (now) {
+          CanIDoctorSaid.ok => 'Saved: your doctor said ${e.name.now} is OK for you.',
+          CanIDoctorSaid.avoid => 'Saved: your doctor said to avoid ${e.name.now} for now.',
+          null => "Cleared what your doctor said about ${e.name.now}.",
+        },
+        kind: PvToastKind.done);
+  }
+
+  Widget _doctor(BuildContext context, V2Palette p, CanIEntry e) {
     final said = CanIActivityStore.instance.doctorSaid(e.id);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       if (said != null) ...[
@@ -419,15 +441,21 @@ class CanIVerdictScreen extends StatelessWidget {
             label: 'OK for me',
             p: p,
             selected: said == CanIDoctorSaid.ok,
-            onTap: () => CanIActivityStore.instance
-                .setDoctorSaid(e.id, said == CanIDoctorSaid.ok ? null : CanIDoctorSaid.ok)),
+            onTap: () => _setSaid(context, e, said == CanIDoctorSaid.ok ? null : CanIDoctorSaid.ok)),
         CanIChip(
             label: 'Avoid for me',
             p: p,
             selected: said == CanIDoctorSaid.avoid,
-            onTap: () => CanIActivityStore.instance
-                .setDoctorSaid(e.id, said == CanIDoctorSaid.avoid ? null : CanIDoctorSaid.avoid)),
+            onTap: () => _setSaid(context, e, said == CanIDoctorSaid.avoid ? null : CanIDoctorSaid.avoid)),
       ]),
+      // The card hides itself once she answers.
+      if (said != null)
+        const Padding(
+          padding: EdgeInsets.only(top: 14),
+          child: PpUseAskCard(
+              kind: PpUseKind.pregDoctorCalls,
+              question: 'Add what your doctor said to the summary you can show your doctor?'),
+        ),
     ]);
   }
 }

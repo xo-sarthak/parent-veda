@@ -129,6 +129,8 @@ void main() {
   test('wiring: the consent store boots, and You lists every kind', () {
     expect(File('lib/main.dart').readAsStringSync(), contains('PpUseConsent.instance.init()'));
     expect(File('lib/screens/profile/pv_data_privacy_screen.dart').readAsStringSync(),
-        contains('for (final kind in PpUseKind.values)'));
+        // P1 (2026-10-28): each stage lists its own kinds. Kept for revert:
+        // contains('for (final kind in PpUseKind.values)'));
+        contains('for (final kind in PpUseKind.values.where((k) => k.stage == stage))'));
   });
 }

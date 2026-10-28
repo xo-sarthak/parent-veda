@@ -43,6 +43,7 @@ import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_chrome.dart' show PvDoorToolScaffold;
 import '../post_pregnancy/pp_attachments.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
 import '../v2/v2_palette.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
@@ -377,7 +378,11 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
       scanId: _scanId,
       clearScanId: _scanId == null,
     ));
-    if (mounted) Navigator.of(context).pop();
+    // P1 (2026-10-28): the save says what it saved.
+    if (mounted) {
+      pvToast(context, 'Saved · $title', kind: PvToastKind.done);
+      Navigator.of(context).pop();
+    }
   }
 }
 

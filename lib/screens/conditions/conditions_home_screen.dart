@@ -38,11 +38,13 @@ import '../../data/reads/read_images.dart';
 
 import '../../data/conditions_data.dart';
 import '../../localization/app_language.dart';
+import '../../services/pp_use_consent.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../brackets/hub/problem_hub_screen.dart' show HubPill;
-import '../doors/pv_door_chrome.dart' show PvDoorRow;
+import '../doors/pv_door_chrome.dart' show PvDoorDisclaimer, PvDoorRow;
+import '../post_pregnancy/pp_use_ask_card.dart';
 import '../v2/v2_palette.dart';
 import 'condition_detail_screen.dart';
 
@@ -109,11 +111,16 @@ class _ConditionsHomeScreenState extends State<ConditionsHomeScreen> {
                 style: pvJakarta(
                     fontSize: 16, fontWeight: FontWeight.w700, color: p.ink1)),
           ),
-          body: !store.answered || _showGate
-              ? _DoorGate(p: p, lang: lang, onAnswered: () {
-                  setState(() => _showGate = false);
-                })
-              : _Browse(
+          // ⚠️ NO GATE HERE EITHER (P1, 2026-10-28). The inline door dropped
+          // "Has your doctor mentioned a condition…?" on 2026-09-19 (derive,
+          // never ask), but this standalone screen, reached from the home and
+          // the condition journeys, still asked it. Kept for revert:
+          // body: !store.answered || _showGate
+          //     ? _DoorGate(p: p, lang: lang, onAnswered: () {
+          //         setState(() => _showGate = false);
+          //       })
+          //     : _Browse(
+          body: _Browse(
                   p: p,
                   lang: lang,
                   store: store,
@@ -136,11 +143,14 @@ class _ConditionsHomeScreenState extends State<ConditionsHomeScreen> {
 //  whether the visit is diagnosed-real or curiosity. Asking for the condition
 //  name at this point would push her toward typing something frightening
 //  before she has even seen that the section is calm.
+// Kept for revert (P1, 2026-10-28): no screen shows the gate now.
+// ignore: unused_element
 class _DoorGate extends StatelessWidget {
   const _DoorGate(
       {required this.p,
       required this.lang,
       required this.onAnswered,
+      // ignore: unused_element_parameter
       this.embedded = false});
   final V2Palette p;
   final AppLanguage lang;
@@ -305,8 +315,10 @@ class _Browse extends StatelessWidget {
             // screen; embedded, the door's bar and the page's pill do their
             // jobs (2026-09-19).
             if (!embedded) ...[
-              _DoorChip(store: store, p: p, lang: lang, onTap: onChangeDoor),
-              const SizedBox(height: 16),
+              // The "Just exploring · change" chip went with the gate (P1,
+              // 2026-10-28). Kept for revert:
+              // _DoorChip(store: store, p: p, lang: lang, onTap: onChangeDoor),
+              // const SizedBox(height: 16),
               _SearchField(controller: search, p: p, lang: lang),
               const SizedBox(height: 22),
             ],
@@ -331,6 +343,14 @@ class _Browse extends StatelessWidget {
               // `test/landing_focus_test.dart` holds that line for the whole
               // app and it holds here too.
               if (store.addedConditions.isNotEmpty) ...[
+                // D4 (P1, 2026-10-28): asked once, after her first add. The
+                // card hides itself once she answers.
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 18),
+                  child: PpUseAskCard(
+                      kind: PpUseKind.pregConditions,
+                      question: 'List these in the summary you can show your doctor?'),
+                ),
                 SolutionGroup(
                   title: const LocalizedText(
                       en: 'What you are managing',
@@ -440,6 +460,10 @@ class _Browse extends StatelessWidget {
                 ]),
               ),
             ],
+            // P1 (2026-10-28): the browse list carried no disclaimer; only
+            // each condition page did.
+            const SizedBox(height: 26),
+            PvDoorDisclaimer(p: p),
           ];
 
         if (embedded) {
@@ -478,6 +502,8 @@ class ConditionsHomeBody extends StatefulWidget {
 class _ConditionsHomeBodyState extends State<ConditionsHomeBody> {
   final _search = TextEditingController();
   bool _seeMore = false;
+  // Kept for revert with _DoorGate (P1, 2026-10-28).
+  // ignore: unused_field
   bool _showGate = false;
 
   @override
@@ -535,6 +561,8 @@ class _ConditionsHomeBodyState extends State<ConditionsHomeBody> {
   }
 }
 
+// Kept for revert (P1, 2026-10-28): the chip went with the gate.
+// ignore: unused_element
 class _DoorChip extends StatelessWidget {
   const _DoorChip({required this.store, required this.p, required this.lang, required this.onTap});
   final ConditionsStore store;

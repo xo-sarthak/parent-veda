@@ -153,7 +153,9 @@ final HubConfig kScansHub = HubConfig(
           hi: 'कोई अनजान लाइन ढूँढिए, और उस पर क्या पूछें।'),
       mark: IntentMark.reportPage,
       hue: 42,
-      surfaceId: 'reports',
+      // P1 D7 (2026-10-28): the decoder by name. Kept for revert:
+      // surfaceId: 'reports',
+      surfaceId: 'report_decoder',
     ),
 
     // ---- STEP 5 · Content + Tool: after-scan guidance, next test -------------

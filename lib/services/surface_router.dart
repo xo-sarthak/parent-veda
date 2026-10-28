@@ -47,6 +47,7 @@ import '../screens/tools/contraction_tracker_screen.dart';
 import '../screens/tools/due_date_calculator_screen.dart';
 import '../screens/tools/kegel_care_screen.dart';
 import '../screens/tools/medicine_tracker_screen.dart';
+import '../screens/tools/readings_log_screen.dart';
 import '../screens/tools/ready_for_birth_screen.dart';
 import '../screens/tools/scans_appointments_screen.dart';
 import '../screens/tools/symptom_companion_screen.dart';
@@ -80,6 +81,11 @@ Widget? _screenFor(String id, PregnancyController c, AppLanguage lang) =>
       'appointments' => ScansAppointmentsScreen(controller: c),
       'due_date' => DueDateCalculatorScreen(controller: c),
       'reports' => ReportScreen(controller: c),
+      // ⚠️ ONE ID, ONE SCREEN (P1 D7, 2026-10-28). Bare 'reports' means the
+      // report decoder here but the Scans door's Reports tab on the home
+      // (`home_v3_screen.dart` `case 'reports'`). Callers that mean the decoder
+      // name it; 'reports' stays for the bracket layers that already use it.
+      'report_decoder' => ReportScreen(controller: c),
       'can_i' => CanIScreen(controller: c),
       // The door (2026-09-23); the companion is kept for revert.
       // 'symptoms' => SymptomCompanionScreen(controller: c),
@@ -90,6 +96,9 @@ Widget? _screenFor(String id, PregnancyController c, AppLanguage lang) =>
       'contractions' => ContractionTrackerScreen(controller: c),
       'hospital_bag' => ReadyForBirthScreen(controller: c),
       'medication' => MedicineTrackerScreen(controller: c),
+      // PG1 (P1, 2026-10-28): the blood pressure and sugar log had no surface
+      // id, so "Log it now" under "Track my readings" opened Weight.
+      'readings' => ReadingsLogScreen(controller: c),
       'product_guide' => const ProductGuideHubScreen(),
 
       // ---- Practice --------------------------------------------------------

@@ -25,8 +25,14 @@ import '../../screens/post_pregnancy/pp_vaccine_data.dart';
 import '../../services/family_profile.dart';
 import '../../models/pv_product.dart' show PvStageCopy;
 import '../../services/life_stage_store.dart';
+import '../../data/can_i_data.dart' show canIById;
+import '../../data/conditions_data.dart' show ConditionsStore;
+import '../../services/can_i_activity_store.dart';
 import '../../services/medicine_store.dart';
+import '../../services/pp_use_consent.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/readings_store.dart';
+import '../../services/scan_reports_store.dart';
 import '../../services/tools_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_doctor_questions_store.dart';
@@ -39,6 +45,9 @@ import '../tools/medicine_tracker_screen.dart';
 import '../tools/weight_tracker_screen.dart';
 import '../ttc/ttc_medication_screen.dart' show TtcMedicationScreen;
 import '../ttc/ttc_records_screen.dart' show TtcRecordsScreen;
+import '../brackets/scan_reports_screen.dart' show ScanReportsScreen;
+import '../tools/readings_log_screen.dart';
+import 'pv_data_privacy_screen.dart';
 import 'pv_details_screen.dart';
 import 'pv_you_chrome.dart';
 import 'pv_you_content.dart';
@@ -74,6 +83,49 @@ class _PvDoctorNotesScreenState extends State<PvDoctorNotesScreen> {
         LifeStage.parenting => 'parenting',
         LifeStage.skilling => 'skilling',
       };
+
+  // The Pregnancy stores the summary reads (P1 D4). Each load is idempotent,
+  // and the page rebuilds once they are in.
+  @override
+  void initState() {
+    super.initState();
+    if (stage.shopStage == LifeStage.pregnancy) {
+      Future.wait([
+        ReadingsStore.instance.load(),
+        ScanReportsStore.instance.load(),
+        ConditionsStore.instance.init(),
+        CanIActivityStore.instance.init(),
+      ]).then((_) {
+        if (mounted) setState(() {});
+      }).catchError((_) {});
+    }
+  }
+
+  /// ⚠️ A SECTION IS ALWAYS DRAWN (P1 D4, 2026-10-28; a feature is never
+  /// hidden). What it holds follows her answer for that kind:
+  ///   · yes: her data, or the plain "none yet" line;
+  ///   · not asked, with data: one line saying it is hers to include, and a
+  ///     way to the tool where she is asked;
+  ///   · no: one line saying she chose to leave it out, and a way to change it.
+  (List<String>, String, _Edit?) _consented(PpUseKind kind, List<String> lines,
+      {required String empty, required _Edit? tool}) {
+    final consent = PpUseConsent.instance;
+    if (consent.allows(kind)) return (lines, empty, tool);
+    if (consent.answerFor(kind) == PpUseAnswer.no) {
+      return (
+        const <String>[],
+        'You chose to leave these out of this summary.',
+        _Edit('Change in Data and privacy', 'you/privacy',
+            () => PvDataPrivacyScreen(stage: stage)),
+      );
+    }
+    if (lines.isEmpty) return (lines, empty, tool);
+    return (
+      const <String>[],
+      'Not included yet. Open it once and choose whether to add it here.',
+      tool,
+    );
+  }
 
   /// The screen the profile's "Change your answers" opens.
   _Edit get _details => _Edit('Edit your details', 'you/details',
@@ -176,6 +228,65 @@ class _PvDoctorNotesScreenState extends State<PvDoctorNotesScreen> {
             : _Edit('Open movement tracker', 'tools/movement',
                 () => BabyMovementScreen(controller: c)),
       ));
+
+      // ---- P1 D4 (2026-10-28): four more, each only after her yes --------
+      final rd = ReadingsStore.instance;
+      final readings = [
+        ...rd.of(ReadingKind.bloodPressure),
+        ...rd.of(ReadingKind.sugar),
+      ]..sort((a, b) => b.at.compareTo(a.at));
+      final (rLines, rEmpty, rEdit) = _consented(
+        PpUseKind.pregReadings,
+        [
+          if (rd.targets.pressureLine case final t?) "Doctor's pressure target: ${t.toLowerCase()}",
+          if (rd.targets.sugarLine case final t?) "Doctor's sugar target: ${t.toLowerCase()}",
+          for (final r in readings.take(8))
+            '${_d(r.at)}: ${r.valueText} ${r.kind == ReadingKind.bloodPressure ? 'mmHg' : 'mg/dL'}'
+                '${r.context != null ? ' · ${r.context!.label.toLowerCase()}' : ''}'
+                '${r.note.isNotEmpty ? ' · ${r.note}' : ''}',
+        ],
+        empty: 'No readings logged. Blood pressure and sugar is under Tools.',
+        tool: c == null
+            ? null
+            : _Edit('Open blood pressure and sugar', 'tools/readings',
+                () => ReadingsLogScreen(controller: c)),
+      );
+      out.add(('Blood pressure and sugar', rLines, rEmpty, rEdit));
+
+      final (cLines, cEmpty, cEdit) = _consented(
+        PpUseKind.pregConditions,
+        [for (final e in ConditionsStore.instance.addedConditions) e.name.en],
+        empty: 'None added. Find a condition is in the Complications door.',
+        tool: null,
+      );
+      out.add(('Conditions you follow', cLines, cEmpty, cEdit));
+
+      final (pLines, pEmpty, pEdit) = _consented(
+        PpUseKind.pregReports,
+        [
+          for (final r in ScanReportsStore.instance.reports.take(6))
+            '${DateTime.tryParse(r.reportDateIso) == null ? '' : '${_d(DateTime.parse(r.reportDateIso))}: '}${r.title}',
+        ],
+        empty: 'No reports saved. My reports is in the Scans door.',
+        tool: c == null
+            ? null
+            : _Edit('Open my reports', 'scans/reports',
+                () => ScanReportsScreen(pregnancy: c)),
+      );
+      out.add(('Reports', pLines, pEmpty, pEdit));
+
+      final calls = CanIActivityStore.instance.doctorCalls;
+      final (dLines, dEmpty, dEdit) = _consented(
+        PpUseKind.pregDoctorCalls,
+        [
+          for (final e in calls.entries)
+            if (canIById(e.key) case final entry?)
+              '${entry.name.en}: ${e.value == CanIDoctorSaid.ok ? 'OK for me' : 'avoid for now'}',
+        ],
+        empty: 'None noted. In Is it safe?, an answer can carry what your doctor said.',
+        tool: null,
+      );
+      out.add(('What your doctor said', dLines, dEmpty, dEdit));
     }
 
     if (s == LifeStage.parenting) {

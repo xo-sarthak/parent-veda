@@ -40,7 +40,9 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../doors/pv_list_row.dart' show PvMarkWell;
+import '../../services/pregnancy_ended_store.dart';
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show PvChip, kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
@@ -123,24 +125,38 @@ class TestsScansReportsScreen extends StatefulWidget {
 
 class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
   int _section = 0; // 0 Tests & Scans · 1 Findings & Conditions
-  TrimesterTag? _filter; // null = All
+
+  // ⚠️ OPENS ON HER TRIMESTER (P1, 2026-10-28). It started on All whatever her
+  // week. Her week is reliable since the relevance pass's foundation commit
+  // (fe1a831). No week, or after a loss: All, as before. "All" is still one
+  // tap away; this changes what is FIRST, never what exists.
+  // Kept for revert: TrimesterTag? _filter; // null = All
+  late TrimesterTag? _filter = _openingFilter();
+
+  TrimesterTag? _openingFilter() {
+    if (!p.isDueDateSet || PregnancyEndedStore.instance.ended) return null;
+    final w = p.currentWeek;
+    return w < 14 ? TrimesterTag.t1 : (w < 28 ? TrimesterTag.t2 : TrimesterTag.t3);
+  }
 
   PregnancyController get p => widget.controller;
 
   @override
   Widget build(BuildContext context) {
     final s = S(p.language);
-    final pal = pvStorePalette;
-    return Scaffold(
-      backgroundColor: pal.ground,
-      // The back arrow only; the title is the page's own, in the serif, below
-      // (the TTC tool's shape). Kept for revert: the title in the app bar,
-      //   title: Text(widget.title ?? s.tsrTitle, style: pvJakarta(
-      //       fontWeight: FontWeight.w700, color: AppTheme.neutral900)),
-      appBar: _pregToolAppBar(),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
-        children: [
+    // ⚠️ THE SHARED TOOL LOOK (P1, 2026-10-28). Was a Scaffold with a bare
+    // back-arrow AppBar and the serif title as the first row of a ListView
+    // (kept for revert in git); the hero now carries the title and the intro.
+    return PregToolScaffold(
+      hue: 206,
+      eyebrow: 'Look up',
+      title: widget.title ?? s.tsrTitle,
+      mark: IntentMark.scanFan,
+      intro: widget.intro ??
+          'The tests, scans and findings you may meet in pregnancy: what '
+              'each one means, and how to read your report.',
+      children: [
+        pregToolPad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           // The natural home for "what has your doctor said". Asks once, ever.
           // ⚠️ OFF, KEPT FOR REVERT — the review said "at all".
           //
@@ -163,18 +179,9 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
           // whether it exists.
           //
           // pregHealthStrip(p.language, 'tests_scans_reports'),
-          Semantics(
-            header: true,
-            child: Text(widget.title ?? s.tsrTitle, style: pregPageTitleStyle()),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            widget.intro ??
-                'The tests, scans and findings you may meet in pregnancy: what '
-                    'each one means, and how to read your report.',
-            style: pvManrope(fontSize: 14, height: 1.45, color: pal.ink2),
-          ),
-          const SizedBox(height: 20),
+          // The title and intro moved into the hero (P1, 2026-10-28). Kept for
+          // revert: Semantics(header) Text(widget.title ?? s.tsrTitle,
+          // pregPageTitleStyle()), then the intro Text, then SizedBox(20).
           // ⚠️ THE TOGGLE GOES WHEN THERE IS NOTHING TO TOGGLE TO. A two-tab
           // control with one live tab is a control that lies about having a
           // choice behind it.
@@ -192,8 +199,8 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
                 ? _testsList()
                 : _findingsList(),
           ),
-        ],
-      ),
+        ])),
+      ],
     );
   }
 
@@ -660,7 +667,10 @@ class FindingDetailScreen extends StatelessWidget {
           _ExpandableSection(
               title: S.now.uiSymptoms,
               bullets: [for (final b in info.symptoms) b.now]),
-          _ExpandableSection(title: S.now.uiDiagnosis, body: info.diagnosis.now),
+          // P1 (2026-10-28): "Diagnosis" read as a verdict on her; the
+          // section says how doctors find it. Kept for revert:
+          // _ExpandableSection(title: S.now.uiDiagnosis, body: info.diagnosis.now),
+          _ExpandableSection(title: 'How doctors find it', body: info.diagnosis.now),
           _ExpandableSection(
               title: S.now.uiPregnancyImplications, body: info.implications.now),
           _ExpandableSection(title: S.now.uiManagement, body: info.management.now),
