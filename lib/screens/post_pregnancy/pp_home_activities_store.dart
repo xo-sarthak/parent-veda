@@ -30,6 +30,16 @@
 //  same age and the same empty history show the same three — which matters
 //  the first time one is screenshot into a family group.
 //
+//  ⚠️ ONE THREE PER CHILD, PER AGE (relevance PP 1, 2026-10-28). The picks
+//  used to be keyed by the DATE alone, so switching from a 3-week-old to a
+//  3-year-old kept the baby's three on the toddler's home until midnight, and
+//  so did saving a real birthday after the stand-in child. Each day now holds
+//  one slot per (child id, age in months): a sibling gets their own three,
+//  switching back the same day finds the first child's three still ticked,
+//  and a month birthday refreshes the picks because the pool itself changed.
+//  The fortnight history stays shared across children: twins sharing it just
+//  get different cards, which is variety, not a fault.
+//
 //  PERSISTENCE. Local only, in shared_preferences, one JSON blob. Not cloud
 //  synced: what a parent was shown on a given day is a device fact, and the
 //  completion itself already syncs through GrowStore. If the pick history ever
@@ -60,18 +70,35 @@ class PpHomeActivitiesStore extends ChangeNotifier {
 
   static const _prefsKey = 'pp_home_activities_v1';
 
-  /// The day the current picks belong to, as yyyy-MM-dd.
+  /// The day the slots belong to, as yyyy-MM-dd.
   String _day = '';
 
-  /// Today's three, in display order.
-  List<String> _picks = const [];
+  /// Today's slots, one per [slotKey]. Was a single `_picks` / `_done` /
+  /// `_swappedIn` for the day, whoever was on screen (PP 1).
+  // Kept for revert:
+  //   List<String> _picks = const [];
+  //   final Set<String> _done = {};
+  //   final Set<String> _swappedIn = {};
+  final Map<String, _Slot> _slots = {};
+
+  /// The slot the last read rolled to: the child on screen. `isDone`,
+  /// `allDone` and `markDone` act on it, so the card rows need no child id.
+  String _current = '';
+
+  _Slot get _slot => _slots[_current] ?? _Slot.empty();
+  List<String> get _picks => _slot.picks;
 
   /// Which of today's picks have been ticked.
-  final Set<String> _done = {};
+  Set<String> get _done => _slot.done;
 
   /// Which of today's picks arrived through "Change" — the card wears a small
   /// "Swapped" chip so she can see the swap happened.
-  final Set<String> _swappedIn = {};
+  Set<String> get _swappedIn => _slot.swapped;
+
+  /// One child's slot for one age. The stand-in child (no saved child) is
+  /// `none`, so a real child saved later never inherits the stand-in's three.
+  static String slotKey(String? childId, int ageMonths) =>
+      '${(childId == null || childId.isEmpty) ? 'none' : childId}|$ageMonths';
 
   /// activityId → the last day it was shown OR sent away. The cooldown reads
   /// this; it is the "history to avoid unnecessary repetition".
@@ -105,7 +132,7 @@ class PpHomeActivitiesStore extends ChangeNotifier {
     // repeat inside a fortnight" true across an app restart.
     if (!cacheIsToday) {
       _day = '';
-      _picks = const [];
+      _slots.clear();
     }
     notifyListeners();
   }
@@ -114,9 +141,7 @@ class PpHomeActivitiesStore extends ChangeNotifier {
   bool _apply(Object data) {
     if (data is! Map) return false;
     final day = data['day'];
-    final picks = data['picks'];
-    final done = data['done'];
-    final swapped = data['swapped'];
+    final slots = data['slots'];
     final seen = data['lastSeen'];
     if (seen is Map) {
       _lastSeen.addAll({
@@ -126,11 +151,23 @@ class PpHomeActivitiesStore extends ChangeNotifier {
     // ⚠️ MERGE, NOT REPLACE, and only if the cache is about TODAY. A tick that
     // happened before the cache landed must survive it; and yesterday's picks
     // must not overwrite today's just because they were read later.
-    if (day is String && day == _todayKey() && picks is List) {
+    //
+    // A cache from before PP 1 has a top-level `picks` and no `slots`. It
+    // belongs to no child, so only its history is kept (above) and its picks
+    // are recomputed, the same thing a load with nothing for today does.
+    if (day is String && day == _todayKey() && slots is Map) {
       _day = day;
-      _picks = [for (final p in picks) p.toString()];
-      if (done is List) _done.addAll(done.map((e) => e.toString()));
-      if (swapped is List) _swappedIn.addAll(swapped.map((e) => e.toString()));
+      for (final e in slots.entries) {
+        final v = e.value;
+        if (v is! Map || v['picks'] is! List) continue;
+        final slot = _slots.putIfAbsent(e.key.toString(), _Slot.empty);
+        slot.picks = [for (final p in v['picks'] as List) p.toString()];
+        final done = v['done'], swapped = v['swapped'];
+        if (done is List) slot.done.addAll(done.map((x) => x.toString()));
+        if (swapped is List) {
+          slot.swapped.addAll(swapped.map((x) => x.toString()));
+        }
+      }
       return true;
     }
     return false;
@@ -138,9 +175,14 @@ class PpHomeActivitiesStore extends ChangeNotifier {
 
   Map<String, Object> _toJson() => {
         'day': _day,
-        'picks': _picks,
-        'done': _done.toList(),
-        'swapped': _swappedIn.toList(),
+        'slots': {
+          for (final e in _slots.entries)
+            e.key: {
+              'picks': e.value.picks,
+              'done': e.value.done.toList(),
+              'swapped': e.value.swapped.toList(),
+            },
+        },
         'lastSeen': _lastSeen,
       };
 
@@ -224,20 +266,24 @@ class PpHomeActivitiesStore extends ChangeNotifier {
     return pool;
   }
 
-  /// Rolls the store over to today if its picks are for another day. Called
-  /// by every public read so the roll happens on the first look after
-  /// midnight rather than needing a timer.
-  void _rollover(int ageMonths) {
+  /// Rolls the store over to today if its slots are for another day, and
+  /// fills this child's slot if it has none yet. Called by every public read
+  /// so the roll happens on the first look after midnight (or after a child
+  /// switch) rather than needing a timer or a listener on the child store.
+  void _rollover(int ageMonths, String? childId) {
     final today = _todayKey();
-    if (_day == today && _picks.length >= kPpHomeActivityCount) return;
+    _current = slotKey(childId, ageMonths);
+    if (_day != today) {
+      _day = today;
+      _slots.clear();
+    }
+    final have = _slots[_current];
+    if (have != null && have.picks.length >= kPpHomeActivityCount) return;
     final fresh = _ranked(ageMonths, today)
         .take(kPpHomeActivityCount)
         .map((a) => a.id)
         .toList();
-    _day = today;
-    _picks = fresh;
-    _done.clear();
-    _swappedIn.clear();
+    _slots[_current] = _Slot.empty()..picks = fresh;
     // History is only stamped once the cache is in; a pre-load pick is a
     // guess that may be replaced the moment the history lands, and a guess
     // must not go on cooldown as if it had been shown.
@@ -253,11 +299,12 @@ class PpHomeActivitiesStore extends ChangeNotifier {
 
   // ---- Public API -----------------------------------------------------------
 
-  /// Today's activities for a child of [ageMonths], in display order. Never
-  /// fewer than three unless the whole library is smaller than three.
-  List<DevActivity> todays(int ageMonths) {
+  /// Today's activities for [childId] at [ageMonths], in display order.
+  /// Never fewer than three unless the whole library is smaller than three.
+  /// [childId] is `ChildProfileStore.activeChildId`; null is the stand-in.
+  List<DevActivity> todays(int ageMonths, {String? childId}) {
     ensureLoaded();
-    _rollover(ageMonths);
+    _rollover(ageMonths, childId);
     return [
       for (final id in _picks)
         if (kGrowActivities.any((a) => a.id == id)) growActivityById(id),
@@ -283,7 +330,8 @@ class PpHomeActivitiesStore extends ChangeNotifier {
   /// Replace one of today's cards with another that suits the age. The one
   /// sent away goes on cooldown so it does not come straight back; the new one
   /// takes its slot so the page does not reflow.
-  void swap(String id, int ageMonths) {
+  void swap(String id, int ageMonths, {String? childId}) {
+    _rollover(ageMonths, childId);
     final i = _picks.indexOf(id);
     if (i < 0 || _done.contains(id)) return;
     final today = _todayKey();
@@ -292,7 +340,7 @@ class PpHomeActivitiesStore extends ChangeNotifier {
         _ranked(ageMonths, '$today#${_swappedIn.length}', exclude: {..._picks});
     if (candidates.isEmpty) return; // the pool has nothing else; keep the card
     final next = candidates.first;
-    _picks = [..._picks]..[i] = next.id;
+    _slot.picks = [..._picks]..[i] = next.id;
     _swappedIn.add(next.id);
     _lastSeen[next.id] = today;
     notifyListeners();
@@ -302,9 +350,16 @@ class PpHomeActivitiesStore extends ChangeNotifier {
   @visibleForTesting
   void resetForTest() {
     _day = '';
-    _picks = const [];
-    _done.clear();
-    _swappedIn.clear();
+    _slots.clear();
+    _current = '';
     _lastSeen.clear();
   }
+}
+
+/// One child's three for one day: what was picked, ticked and swapped in.
+class _Slot {
+  _Slot.empty();
+  List<String> picks = const [];
+  final Set<String> done = {};
+  final Set<String> swapped = {};
 }

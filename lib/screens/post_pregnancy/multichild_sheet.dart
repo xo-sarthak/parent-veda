@@ -32,8 +32,14 @@ Future<void> showMultiChildSheet(BuildContext context) => showModalBottomSheet<v
 
 /// Straight to the add-a-child form, name and birthday (First 40 FD7: "Tell
 /// us his birthday"). The same form the switcher's Add button opens.
-Future<void> showAddChildForm(BuildContext context) =>
-    const MultiChildSheet()._addChild(context, fromSheet: false);
+///
+/// [required] (relevance PP 10, 2026-10-28): the Parenting home opens it
+/// when there is no child yet (`ChildProfileStore.needsChild`). It cannot be
+/// swiped, tapped or backed away, and it says what the answer unlocks. A
+/// developer build passes false so the stand-in child can still be tested.
+Future<void> showAddChildForm(BuildContext context, {bool required = false}) =>
+    const MultiChildSheet()
+        ._addChild(context, fromSheet: false, required: required);
 
 class MultiChildSheet extends StatelessWidget {
   const MultiChildSheet({super.key});
@@ -56,7 +62,8 @@ class MultiChildSheet extends StatelessWidget {
   /// Birth weight is the one that genuinely belongs here: it is a fixed fact
   /// about the child that never changes, a parent knows it on the day, and
   /// asking later means asking someone to remember it.
-  Future<void> _addChild(BuildContext context, {bool fromSheet = true}) async {
+  Future<void> _addChild(BuildContext context,
+      {bool fromSheet = true, bool required = false}) async {
     final nameCtl = TextEditingController();
     // Optional, per the review. Empty stays empty — _num() returns 0 and the
     // store treats 0 as "not recorded" rather than as a measurement of zero.
@@ -72,10 +79,18 @@ class MultiChildSheet extends StatelessWidget {
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
-      builder: (ctx) => StatefulBuilder(
+      isDismissible: !required,
+      enableDrag: !required,
+      builder: (ctx) => PopScope(
+        canPop: !required,
+        child: StatefulBuilder(
         builder: (ctx, setSheet) => Padding(
           padding: EdgeInsets.fromLTRB(
               22, 18, 22, MediaQuery.of(ctx).viewInsets.bottom + 22),
+          // Scrolls (PP 10, 2026-10-28): on a short phone, or with the
+          // keyboard up, the form ran past the sheet's height and the Save
+          // button was clipped. The required form's "why" line made it worse.
+          child: SingleChildScrollView(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Container(
               width: 40, height: 4,
@@ -85,8 +100,21 @@ class MultiChildSheet extends StatelessWidget {
             const SizedBox(height: 18),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('Add a child', style: ppFraunces(24, h: 1.1)),
+              child: Text(required ? 'Tell us about your child' : 'Add a child',
+                  style: ppFraunces(24, h: 1.1)),
             ),
+            // Derive, never ask: and when we must ask, say what it unlocks.
+            if (required) ...[
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                    'Everything here follows their age: the activities, '
+                    'what to expect this month, vaccines and growth. A name '
+                    'and birthday is all we need to start.',
+                    style: ppBody(13, color: ppMuted, h: 1.45)),
+              ),
+            ],
             const SizedBox(height: 16),
             TextField(
               controller: nameCtl,
@@ -162,7 +190,16 @@ class MultiChildSheet extends StatelessWidget {
             const SizedBox(height: 20),
             PvPress(child: GestureDetector(
               onTap: () {
-                if (nameCtl.text.trim().isEmpty || dob == null) return;
+                // No silent tap: say what is missing (was a bare return).
+                if (nameCtl.text.trim().isEmpty || dob == null) {
+                  pvToast(ctx,
+                      nameCtl.text.trim().isEmpty && dob == null
+                          ? 'Add a name and a date of birth to save.'
+                          : nameCtl.text.trim().isEmpty
+                              ? 'Add a name to save.'
+                              : 'Add the date of birth to save.');
+                  return;
+                }
                 Navigator.of(ctx).pop(true);
               },
               behavior: HitTestBehavior.opaque,
@@ -176,6 +213,8 @@ class MultiChildSheet extends StatelessWidget {
               ),
             )),
           ]),
+          ),
+        ),
         ),
       ),
     );

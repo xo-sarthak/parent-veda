@@ -390,6 +390,20 @@ class ChildProfileStore extends ChangeNotifier {
   String? _activeId;
   bool _loaded = false;
 
+  /// True once the phone's children AND the first cloud pull have both been
+  /// tried (relevance PP 10, 2026-10-28). Not `_loaded`, which turns true
+  /// after the local cache alone: a mother on a new phone has no local
+  /// children until the pull lands, and asking her to add a child in that
+  /// gap would make a duplicate of the one already in her account. Same
+  /// reason `pregNeedsDueDate` waits on `PregnancyController.hasLoaded`.
+  bool get hasLoaded => _settled;
+  bool _settled = false;
+
+  /// Test-only: say the load has (or has not) finished, without the
+  /// SharedPreferences round trip that never answers under flutter_test.
+  @visibleForTesting
+  set debugLoaded(bool v) => _settled = v;
+
   /// Removed children: hidden everywhere, their records kept, restorable.
   final List<Child> _removed = [];
 
@@ -451,6 +465,18 @@ class ChildProfileStore extends ChangeNotifier {
 
   /// True once a real child exists - i.e. we're no longer on the seeded default.
   bool get hasRealChild => _children.isNotEmpty;
+
+  /// True when the Parenting home must ask for a child before anything else
+  /// (relevance PP 10, 2026-10-28; the decision of 2026-10-26: the child's
+  /// date of birth is required to be in Parenting, as the due date is in
+  /// Pregnancy). Waits for [hasLoaded], and never asks him: the child is hers
+  /// and reaches his phone when they link, as the due date does.
+  ///
+  /// ⚠️ ONE GATE AT THE DESTINATION. The developer chip, the old sign-in's
+  /// "New parent" and a mother already in Parenting with no child all land
+  /// on the Parenting home, so the home asks; no entrance has to remember.
+  bool needsChild({bool father = false}) =>
+      hasLoaded && !hasRealChild && !father;
 
   /// The child every flat getter below reads from. Falls back to the seed.
   Child get active {
@@ -685,7 +711,14 @@ class ChildProfileStore extends ChangeNotifier {
     notifyListeners();
 
     // 2) Then the cloud (no-op when logged out).
-    await _syncFromCloud();
+    try {
+      await _syncFromCloud();
+    } finally {
+      // Offline or failed, she is still asked: a failed pull must not leave
+      // the Parenting home on the stand-in child for ever.
+      _settled = true;
+      notifyListeners();
+    }
   }
 
   /// A sign-out, or another account signing in (2026-10-17): this store

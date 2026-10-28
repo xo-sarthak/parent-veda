@@ -45,6 +45,7 @@
 //  until told otherwise, because a section is never removed on inference.
 // =============================================================================
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'calendar/pp_child_calendar_screen.dart' show openPpChildCalendar;
 import '../brackets/hub/journey_screen.dart';
@@ -115,6 +116,7 @@ import '../../widgets/pv_toast.dart' show pvToast;
 // import 'pp_saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
 import '../dear_baby_vault_screen.dart' show DearBabyLettersReadyCard;
 import '../profile/pv_you_screen.dart';
+import 'multichild_sheet.dart' show showAddChildForm;
 import '../saved_screen.dart';
 import 'pp_phase_faqs.dart';
 import 'pp_phases_data.dart';
@@ -206,6 +208,20 @@ class _PpHomeV3State extends State<PpHomeV3> {
   // differs — this stage's own tips, and an age instead of a week.
   bool _tipQueued = false;
 
+  /// Opens the required add-child form once, the first build that knows
+  /// there is no child (`ChildProfileStore.needsChild`, relevance PP 10). A
+  /// developer build keeps the form closable, so the stage chip's stand-in
+  /// child still works for testing, as Pregnancy's week-20 stand-in does.
+  bool _childAskQueued = false;
+  void _maybeAskChild() {
+    if (_childAskQueued) return;
+    _childAskQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showAddChildForm(context, required: !(kDebugMode || kPvDevBuild));
+    });
+  }
+
   void _maybeShowTip(int ageMonths, V2Palette p) {
     if (_tipQueued || kDailyTips.isEmpty) return;
     _tipQueued = true;
@@ -257,13 +273,27 @@ class _PpHomeV3State extends State<PpHomeV3> {
         final p = V2PaletteStore.instance.current;
         final child = ChildProfileStore.instance;
         final phase = currentPhase(child);
-        _maybeShowTip(child.ageInMonths, p);
+        // No child: ask for one first, and no tip for an age we don't know
+        // (relevance PP 10, 2026-10-28). Kept for revert:
+        //   _maybeShowTip(child.ageInMonths, p);
+        if (child.needsChild(father: FatherPreview.instance.on)) {
+          _maybeAskChild();
+        } else {
+          _maybeShowTip(child.ageInMonths, p);
+        }
 
         // The single day-rotated pick, replaced by the three-a-day store.
         // Kept for revert:
         //   final activity = _todaysActivity();
-        final activities =
-            PpHomeActivitiesStore.instance.todays(child.ageInMonths);
+        // ⚠️ THIS CHILD'S THREE, BY CORRECTED AGE (relevance PP 1 and PP 2,
+        // 2026-10-28). Keyed by the child on screen, so a switch or a newly
+        // saved birthday brings that child's own three at once, not at
+        // midnight. Activities are development content, so a baby born early
+        // gets them by corrected age, as the hero and the Brain tab already
+        // do. Kept for revert:
+        //   PpHomeActivitiesStore.instance.todays(child.ageInMonths);
+        final activities = PpHomeActivitiesStore.instance
+            .todays(child.devAgeInMonths, childId: child.activeChildId);
         final changes = phaseChangesFor(phase);
         final reads = _readsForAge(child.ageInMonths, 3);
         // Three, as rows: the shape TTC and Pregnancy already use (2026-10-21,
@@ -605,7 +635,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
                     onOpen: (a) => Navigator.of(context).push(MaterialPageRoute<void>(
                         settings: RouteSettings(name: 'pp/activity/${a.id}'),
                         builder: (_) => DevelopmentActivityScreen(activity: a))),
-                    onSwap: (a) => PpHomeActivitiesStore.instance.swap(a.id, child.ageInMonths),
+                    onSwap: (a) => PpHomeActivitiesStore.instance.swap(
+                        a.id, child.devAgeInMonths,
+                        childId: child.activeChildId),
                   )),
                   const SizedBox(height: 10),
                   _pad(Text(
