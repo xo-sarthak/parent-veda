@@ -1044,8 +1044,13 @@ class _PvDoorCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Two lines (PREGNANCY-GAP 21, 2026-10-28): the label has about
+                  // 100pt, roughly 11 letters, and names like "Talk and read to
+                  // baby" were cut to one line. Two lines of 15 plus the line
+                  // under it is about 51pt in a 64pt card. Held by
+                  // test/preg_door_label_fit_test.dart. Kept for revert: maxLines: 1,
                   Text(group.label,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: pvManrope(
                           fontSize: 15,

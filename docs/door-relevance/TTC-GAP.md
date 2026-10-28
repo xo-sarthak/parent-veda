@@ -166,11 +166,11 @@ Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5
 27. **NEW, DONE (Batch 7, 2026-10-28):** a natural cycle had nothing between the window and a late period, while a clinic round already had a mid-wait message. `TtcMessageKind.waitStarts`: the morning after her window closes, 9am, own cycle only, useful for three days, opens `ttc_read_two_week_wait`. ⚠️ It reads this cycle's close from `closesCycleDay` plus her period start, because `ttcFertileWindowNow` rolls on to next cycle's window the day after this one closes, so `closesOn` would lose the very morning the message is for. Test: `relevance_batch7_test.dart`.
 
 **Polish**
-21. `ttcDoorVideosFirst` drops tags. *Fix:* use `s.withTiles`.
-22. `ttcIvfRoundLeads` keeps its own copy of the round. *Fix:* read `ttcHomeRoundPhaseOn`.
+21. ~~`ttcDoorVideosFirst` drops tags.~~ **DONE (polish, 2026-10-28):** it uses `s.withTiles`.
+22. **KEPT ON PURPOSE (2026-10-28):** `ttcIvfRoundLeads` counts a PLANNED round, so a woman preparing for one sees "Going through it" first; `ttcHomeRoundPhaseOn` answers a different question (what step her cycle is on) and rightly ignores a plan. Reading it would hide that tab while she prepares. Was: *Fix:* read `ttcHomeRoundPhaseOn`.
 23. ~~Home products don't change after a loss or in a round.~~ **DONE (Batch 4, 2eb7a77):** kits and tests go last then (`pvTtcNeedsInOrder`), ordered rather than removed.
 24. Possible lavender on the PCOS hero and the hue-268 tab shelves. *Fix:* check on a device.
-25. **PART DONE (Batch 4, 2eb7a77):** the duplicate "Update dates" button is gone. The panel title already names today's step; the round screen's own title (`ttc_treatment_screen.dart:1591`) is still fixed. Was: The round panel's "Update dates" duplicates the main button, and the round screen's title never changes.
+25. **HANDED TO TERMINAL B (2026-10-28):** the round screen is the Treatment tool, inside a tool, so the title is B's (seams table). **PART DONE (Batch 4, 2eb7a77):** the duplicate "Update dates" button is gone. The panel title already names today's step; the round screen's own title (`ttc_treatment_screen.dart:1591`) is still fixed. Was: The round panel's "Update dates" duplicates the main button, and the round screen's title never changes.
 26. **NEW (found in Batch 4, 2026-10-28):** the Batch 3 read "Reading your cycle, phase by phase" had borrowed "How conception works"'s calendar photo, so All articles drew it twice (`ttc_no_repetition_test` failed on main since 0b5823e). **DONE:** it has its own photo now, an open month planner (Commons, CC0, Giulia Bertelli), in `read_images.dart` under its id, picked by eye.
 
 ---

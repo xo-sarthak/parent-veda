@@ -1008,7 +1008,15 @@ class PvDoorPage {
     this.heroImageUrl,
     this.closingLine,
     this.openingGroupFor,
+    this.heroBlurbEnded,
   });
+
+  /// The sentence under the title once she has told us this pregnancy ended
+  /// (`PregnancyEndedStore.ended`; PREGNANCY-GAP 31, 2026-10-28). Null: the
+  /// usual [heroBlurb]. Only for a door whose usual sentence looks ahead
+  /// ("what's coming"): after a loss there is nothing coming, and the door is
+  /// still where her scans and reports live.
+  final String? heroBlurbEnded;
 
   /// The tab the door opens on at her week, when nothing named a tab
   /// (2026-10-27, relevance Batch 2; Parenting's `PpDoor.tabOrder` shape).

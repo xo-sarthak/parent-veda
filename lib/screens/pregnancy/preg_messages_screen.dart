@@ -26,6 +26,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../data/doors/pv_door_data.dart' show PvDoorLibrary;
+import '../../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
+import '../../services/pv_catalog_store.dart';
 import '../../services/last_profile.dart' show LastProfile, kLastHomeRoot;
 import '../../services/life_stage_store.dart';
 import '../../services/preg_messages_store.dart';
@@ -40,7 +42,11 @@ import '../doors/pv_door_router.dart' show openPvDoorRead, pvDoorEntryScreen;
 import '../doors/pv_door_screen.dart' show pvDoorScreenForBracket;
 import '../doors/pv_list_row.dart';
 import '../preg_week_screen.dart';
-import '../products/pv_store_chrome.dart' show kPvInk, pvStorePalette;
+import '../v2/v2_palette.dart' show V2Palette;
+import '../learn/pv_learn_catalog.dart' show PvLearnCatalog;
+import '../learn/pv_offering_screen.dart' show pvOpenOffering;
+import '../products/pv_store_chrome.dart' show kPvInk, pvOpenProduct, pvStorePalette;
+import '../../widgets/pv_toast.dart';
 import '../profile/pv_you_sheets.dart' show showPvAddChildSheet;
 import '../reminders_screen.dart';
 import '../tools/baby_movement_screen.dart';
@@ -64,6 +70,15 @@ void openPregMessage(BuildContext context, PregMessage m, PregnancyController c)
   switch (m.kind) {
     case PregMessageKind.newWeek:
       push('pregnancy/week', () => PregWeekScreen(pregnancy: c, week: m.week ?? c.currentWeek));
+    // Phase 6a (2026-10-28). The tip is that week's, so it opens the week.
+    case PregMessageKind.dayLine:
+      push('pregnancy/week', () => PregWeekScreen(pregnancy: c, week: m.week ?? c.currentWeek));
+    // The check-in is the Symptoms door's Today tab, the home's own "log".
+    case PregMessageKind.checkIn:
+      final door = pvDoorScreenForBracket(kSymptomsBracketId, c);
+      if (door != null) push('bracket/$kSymptomsBracketId', () => door);
+    case PregMessageKind.offer:
+      _openOffer(context, m.ref);
     // Batch 7 (2026-10-28): each opens the page the Scans door opens for it,
     // so the message and the door tell her the same thing.
     case PregMessageKind.firstVisit:
@@ -132,6 +147,24 @@ void pregOpenMessageFromPhone(PregMessage? m, {int attempt = 0}) {
   }
 }
 
+/// What an offer message opens (Phase 6a). The thing may have gone since the
+/// message was sent (a product sold out, a course unpublished): then she is
+/// told so, never sent to a blank page (no silent tap).
+void _openOffer(BuildContext context, String? ref) {
+  final parts = (ref ?? '').split(':');
+  if (parts.length >= 2) {
+    final id = parts.sublist(1).join(':');
+    if (parts.first == 'product') {
+      final product = PvCatalogStore.instance.byId(id);
+      if (product != null) return pvOpenProduct(context, product);
+    } else if (parts.first == 'learn') {
+      final view = PvLearnCatalog.instance.byId(id);
+      if (view != null) return pvOpenOffering(context, view);
+    }
+  }
+  pvToast(context, "That isn't available any more. The Store and Learn have what's there now.");
+}
+
 /// The Scans library entry a scan message opens, or null for the rest. The
 /// ids are the Scans door tiles' (`pv_door_scans.dart`); a test holds that
 /// each resolves.
@@ -144,6 +177,9 @@ String? pregMessageScanId(PregMessageKind k) => switch (k) {
 
 IntentMark _markFor(PregMessageKind k) => switch (k) {
       PregMessageKind.newWeek => IntentMark.calendarDay,
+      PregMessageKind.dayLine => IntentMark.calendarDay,
+      PregMessageKind.checkIn => IntentMark.bodyMark,
+      PregMessageKind.offer => IntentMark.bagMark,
       PregMessageKind.firstVisit => IntentMark.askDoctor,
       PregMessageKind.datingScan => IntentMark.reportPage,
       PregMessageKind.glucoseTest => IntentMark.reportPage,
@@ -158,6 +194,9 @@ IntentMark _markFor(PregMessageKind k) => switch (k) {
 
 double _hueFor(PregMessageKind k) => switch (k) {
       PregMessageKind.newWeek => 268,
+      PregMessageKind.dayLine => 268,
+      PregMessageKind.checkIn => 344,
+      PregMessageKind.offer => 28,
       PregMessageKind.firstVisit => 160,
       PregMessageKind.datingScan => 206,
       PregMessageKind.glucoseTest => 206,
@@ -232,13 +271,22 @@ class _PregMessagesScreenState extends State<PregMessagesScreen> {
                     Text('Messages',
                         style: pvFraunces(fontSize: 28, fontWeight: FontWeight.w500, color: p.ink1)),
                     const SizedBox(height: 6),
+                    // Kept for revert (Phase 6a): 'A note on the morning each new week
+                    // starts, and a word at the moments worth remembering: the scans,
+                    // the vaccine, the bag.'
                     Text(
-                        'A note on the morning each new week starts, and a word at the moments '
-                        'worth remembering: the scans, the vaccine, the bag.',
+                        "A tip each morning, a word at the moments worth remembering, like the "
+                        "scans, the vaccine and the bag, and never more than two on your phone in a day. "
+                        "Everything stays here, even on days your phone stays quiet.",
                         style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
                   ]),
                 ),
                 const SizedBox(height: 18),
+                if (!store.offersAsked && widget.pregnancy.isDueDateSet)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+                    child: _OffersCard(p: p),
+                  ),
                 if (list.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -300,6 +348,71 @@ class _PregMessagesScreenState extends State<PregMessagesScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+/// The one time she is asked about offers (Phase 6a). Apple's rule 4.5.4 and
+/// the user's: nothing promotional until she says yes, inside the app, and a
+/// way back out (the "Offers and new things" switch). Either answer stops the
+/// card, and the toast says what changed (the app explains itself).
+class _OffersCard extends StatelessWidget {
+  const _OffersCard({required this.p});
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = PregMessagesStore.instance;
+    return Container(
+      key: const ValueKey('preg_msg_offers_card'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Classes and things for your week?',
+            style: pvManrope(fontSize: 15.5, fontWeight: FontWeight.w700, color: p.ink1)),
+        const SizedBox(height: 6),
+        Text(
+            'When there is a class, something useful for your week, or an expert you can '
+            'talk to, we can tell you. At most twice a week, and still never more than two '
+            'messages from us in a day.',
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 12),
+        Wrap(spacing: 10, runSpacing: 8, children: [
+          FilledButton(
+            key: const ValueKey('preg_msg_offers_yes'),
+            style: FilledButton.styleFrom(
+                backgroundColor: kPvInk,
+                foregroundColor: Colors.white,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12)),
+            onPressed: () async {
+              await store.answerOffers(true);
+              if (context.mounted) {
+                pvToast(context,
+                    'Offers on. You can turn them off in Choose what we send.',
+                    kind: PvToastKind.done);
+              }
+            },
+            child: Text('Yes, tell me',
+                style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+          ),
+          TextButton(
+            key: const ValueKey('preg_msg_offers_no'),
+            onPressed: () async {
+              await store.answerOffers(false);
+              if (context.mounted) {
+                pvToast(context, 'No offers. You can turn them on in Choose what we send.');
+              }
+            },
+            child: Text('Not now',
+                style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink2)),
+          ),
+        ]),
+      ]),
     );
   }
 }

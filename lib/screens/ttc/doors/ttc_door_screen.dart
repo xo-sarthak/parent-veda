@@ -715,15 +715,16 @@ List<TtcFocusSection> ttcDoorVideosFirst(
     List<TtcFocusSection> sections, String bracketId) {
   if (bracketId != kTtcIvfBracketId) return sections;
   return [
+    // `withTiles` keeps the phase and round-step tags (TTC-GAP 21,
+    // 2026-10-28): a hand-built copy dropped them. Harmless while this runs
+    // after ranking, but the next caller to rank after it would lose them.
+    // Kept for revert:
+    //   TtcFocusSection(heading: s.heading, group: s.group, tiles: [...]),
     for (final s in sections)
-      TtcFocusSection(
-        heading: s.heading,
-        group: s.group,
-        tiles: [
-          ...s.tiles.whereType<TtcVideoTile>(),
-          ...s.tiles.where((t) => t is! TtcVideoTile),
-        ],
-      ),
+      s.withTiles([
+        ...s.tiles.whereType<TtcVideoTile>(),
+        ...s.tiles.where((t) => t is! TtcVideoTile),
+      ]),
   ];
 }
 

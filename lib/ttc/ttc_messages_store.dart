@@ -15,6 +15,22 @@
 //    tryingLong   once, after 6 or 12 months of trying
 //    waitStarts   the morning after her fertile window closes (natural
 //                 cycles only; 2026-10-28, relevance Batch 7)
+//
+//  PHASE 6a (2026-10-28, docs/NOTIFICATIONS-PLAN.md), the market's set:
+//
+//    periodSoon   two days before her period is due, 9 am, steady history only
+//    dayLine      every morning, 8:30, a line for her phase (`ttcPhaseInsights`),
+//                 own cycle only
+//    checkIn      every other evening, 7:30, unless she has logged today
+//    offer        an evening before her window and before her period is due,
+//                 a kit, class or expert that EXISTS (`ttc_message_offers.dart`),
+//                 OFF until she says yes
+//
+//  And the cap: two on her phone a day, one morning, one evening
+//  ([ttcPhonePlan]). Care beats offers; what loses its slot stays in
+//  Messages. Treatment messages are her clinic's dates and are never capped.
+//  After a loss nothing daily is sent until her first period: the cycle has
+//  no start, so there is nothing to count from.
 //    treatment    while a clinic runs a round (2026-09-26, B6, below)
 //
 //  Each lands in the in-app Messages list AND, when she has allowed it, as a
@@ -122,8 +138,15 @@ import '../services/remote/cloud_merged_store.dart';
 // the screen it is about; the store only decides WHICH message was tapped.
 // `ttc_focus_data.dart` does the same. The import cycle is legal Dart.
 import '../screens/ttc/ttc_messages_screen.dart' show ttcOpenMessageFromPhone;
+import '../services/expert_store.dart';
+import '../services/programme_store.dart';
+import '../services/pv_catalog_store.dart';
 import 'cycle_store.dart';
 import 'ttc_chapter.dart';
+import 'ttc_daily_data.dart' show TtcDayPhase, ttcDayPhaseForCycleDay, ttcInsightsForPhase;
+import 'ttc_log_store.dart';
+import 'ttc_message_offers.dart';
+import 'ttc_symptom_data.dart' show kTtcSymptomTracker;
 import 'ttc_fertile_window.dart';
 import 'ttc_fertility_help_rules.dart';
 import 'ttc_fertility_help_store.dart';
@@ -145,14 +168,37 @@ enum TtcMessageKind {
   /// mid-wait message in [treatment].
   waitStarts,
 
+  /// Phase 6a (2026-10-28): two days before her period is due.
+  periodSoon,
+
+  /// Phase 6a: a line for her phase, every morning.
+  dayLine,
+
+  /// Phase 6a: "how are you feeling", every other evening.
+  checkIn,
+
   /// While a clinic runs a round (2026-09-26, B6). One switch for all of
   /// them, "Treatment reminders".
   treatment,
+
+  /// Phase 6a: a kit, class or expert that exists. Off until she says yes.
+  offer,
 }
 
 /// Phone ids the treatment kind may use at once, from its base id (918201)
 /// upwards. More pending than this and the furthest wait for a later refresh.
 const int kTtcTreatmentPhoneSlots = 20;
+
+/// Phase 6a: days ahead the daily kinds are worked out, and their phone ids.
+const int kTtcDailyDays = 14;
+const int kTtcDailyPhoneSlots = 14;
+const int kTtcOfferPhoneSlots = 8;
+
+/// The hour that splits her morning slot from her evening one.
+const int kTtcEveningFromHour = 14;
+
+/// Daily kinds leave Messages after two weeks.
+const Duration kTtcDailyKeep = Duration(days: 14);
 
 extension TtcMessageKindInfo on TtcMessageKind {
   /// One fixed OS notification id per kind. There is never more than one
@@ -165,14 +211,46 @@ extension TtcMessageKindInfo on TtcMessageKind {
         TtcMessageKind.cycleReport => 918104,
         TtcMessageKind.tryingLong => 918105,
         TtcMessageKind.waitStarts => 918106,
+        TtcMessageKind.periodSoon => 918107,
+        // Blocks of their own (Phase 6a), soonest first.
+        TtcMessageKind.dayLine => 918130,
+        TtcMessageKind.checkIn => 918150,
+        TtcMessageKind.offer => 918170,
         // The first of a block: see [kTtcTreatmentPhoneSlots].
         TtcMessageKind.treatment => 918201,
       };
 
   /// Every phone id this kind may hold.
-  List<int> get phoneIds => this == TtcMessageKind.treatment
-      ? [for (var i = 0; i < kTtcTreatmentPhoneSlots; i++) notificationId + i]
-      : [notificationId];
+  // Kept for revert (Phase 6a added the daily blocks):
+  //   List<int> get phoneIds => this == TtcMessageKind.treatment
+  //       ? [for (var i = 0; i < kTtcTreatmentPhoneSlots; i++) notificationId + i]
+  //       : [notificationId];
+  List<int> get phoneIds {
+    final n = switch (this) {
+      TtcMessageKind.treatment => kTtcTreatmentPhoneSlots,
+      TtcMessageKind.dayLine || TtcMessageKind.checkIn => kTtcDailyPhoneSlots,
+      TtcMessageKind.offer => kTtcOfferPhoneSlots,
+      _ => 1,
+    };
+    return [for (var i = 0; i < n; i++) notificationId + i];
+  }
+
+  /// The kinds that come day after day (Phase 6a).
+  bool get isDaily =>
+      this == TtcMessageKind.dayLine ||
+      this == TtcMessageKind.checkIn ||
+      this == TtcMessageKind.offer;
+
+  /// Who wins a phone slot, lowest first (Phase 6a). Treatment is her
+  /// clinic's and outside the cap; [ttcPhonePlan] always arms it.
+  int get slotRank => switch (this) {
+        TtcMessageKind.treatment => 0,
+        TtcMessageKind.cycleReport => 2,
+        TtcMessageKind.dayLine => 3,
+        TtcMessageKind.checkIn => 4,
+        TtcMessageKind.offer => 5,
+        _ => 1,
+      };
 
   /// Where a tap goes, as surface ids for `ttc_surface_router.dart`, best
   /// first. The screen opens the first one that resolves.
@@ -199,6 +277,12 @@ extension TtcMessageKindInfo on TtcMessageKind {
             'ttc_read/ttc_read_two_week_wait',
             'ttc_read/ttc_read_when_to_test',
           ],
+        TtcMessageKind.periodSoon => const ['ttc_read/ttc_read_when_to_test'],
+        // Each tip carries its insight (`to`); this is the fallback.
+        TtcMessageKind.dayLine => const ['ttc_cycle'],
+        TtcMessageKind.checkIn => const ['ttc_symptom_log'],
+        // Each offer carries what it opens (`to`); the Store is the fallback.
+        TtcMessageKind.offer => const ['ttc_shop'],
         // Each treatment message carries its own (`TtcMessage.to`); this is
         // the fallback, the round itself.
         TtcMessageKind.treatment => const ['ttc_treatment'],
@@ -212,6 +296,10 @@ extension TtcMessageKindInfo on TtcMessageKind {
         TtcMessageKind.cycleReport => 'Your cycle report',
         TtcMessageKind.tryingLong => 'A first check',
         TtcMessageKind.waitStarts => 'The two-week wait',
+        TtcMessageKind.periodSoon => 'Before your period is due',
+        TtcMessageKind.dayLine => 'A line for today',
+        TtcMessageKind.checkIn => 'How are you feeling?',
+        TtcMessageKind.offer => 'Offers and new things',
         TtcMessageKind.treatment => 'Treatment reminders',
       };
 
@@ -237,6 +325,17 @@ extension TtcMessageKindInfo on TtcMessageKind {
         TtcMessageKind.waitStarts =>
           'The morning after your fertile window closes. When a test can give '
               'a real answer, and what helps meanwhile. Only on your own cycle.',
+        TtcMessageKind.periodSoon =>
+          'Two days before your period is due, when your cycles are steady. '
+              'When a test can give a real answer.',
+        TtcMessageKind.dayLine =>
+          'Each morning, a line for where you are in your cycle. Only on your '
+              'own cycle.',
+        TtcMessageKind.checkIn =>
+          "Every other evening, only if you haven't logged how today feels.",
+        TtcMessageKind.offer =>
+          'Tests, classes and experts, before your window and before your '
+              'period is due. Off until you turn it on.',
         TtcMessageKind.treatment =>
           'While your clinic runs a round. The evening before each scan, '
               'procedure and blood test, and a few kind words in the wait.',
@@ -416,6 +515,12 @@ class TtcMessageFacts {
     this.closedRound,
     this.lastCycleWasRound = false,
     this.waitStarts,
+    this.cycleStart,
+    this.ovulationDay,
+    this.cycleLength = 0,
+    this.checkedInToday = false,
+    this.offersBeforeWindow = const [],
+    this.offersBeforeDue = const [],
   });
 
   /// Read from the live stores.
@@ -490,6 +595,14 @@ class TtcMessageFacts {
       closedRound: treatment.lastClosed,
       lastCycleWasRound: lastCycleWasRound,
       waitStarts: waitStarts,
+      cycleStart: cycle.lastPeriodStart,
+      ovulationDay: today.estimatedOvulationDay,
+      cycleLength: today.cycleLength,
+      checkedInToday: TtcLogStore.instance
+          .valuesOn(kTtcSymptomTracker, TtcLogStore.dayKey(DateTime.now()))
+          .isNotEmpty,
+      offersBeforeWindow: ttcOffersFor(TtcOfferMoment.beforeWindow),
+      offersBeforeDue: ttcOffersFor(TtcOfferMoment.beforeDue),
     );
   }
 
@@ -522,6 +635,21 @@ class TtcMessageFacts {
   /// The day after this cycle's fertile window closes, or null when there is
   /// no window of ours (a clinic cycle, the engine refused, nothing logged).
   final DateTime? waitStarts;
+
+  /// Phase 6a. Day 1 of the cycle she is in; null after a loss until her
+  /// first period, which is what keeps the daily kinds quiet then.
+  final DateTime? cycleStart;
+
+  /// The engine's ovulation day for this cycle; null on a clinic cycle.
+  final int? ovulationDay;
+  final int cycleLength;
+
+  /// She has logged how today feels (the symptom tracker).
+  final bool checkedInToday;
+
+  /// What exists to offer at each moment, best first. Empty is no offer.
+  final List<TtcOffer> offersBeforeWindow;
+  final List<TtcOffer> offersBeforeDue;
 
   /// Six months when she is 35 or over, or her cycles vary a lot or her PCOS
   /// check found the pattern. Twelve otherwise, including when we do not know
@@ -710,6 +838,25 @@ List<TtcMessage> ttcMessageCandidates(TtcMessageFacts f, DateTime now) {
     }
   }
 
+  // ---- 3b. two days before it is due (Phase 6a, 2026-10-28) ----------------
+  //
+  // The same due date the late message and the home's "Time to test" read
+  // (`ttcReliableLateAdvice`), so three surfaces cannot name three dates.
+  // Only up to the day before: on the day itself it is no longer "soon".
+  final soonAdvice = ttcReliableLateAdvice(f, today);
+  final soonDue = soonAdvice?.due;
+  if (last != null && soonDue != null &&
+      !today.isAfter(_day(soonDue).subtract(const Duration(days: 1)))) {
+    out.add(TtcMessage(
+      id: 'soon:${_key(last)}',
+      kind: TtcMessageKind.periodSoon,
+      at: _at(_day(soonDue).subtract(const Duration(days: 2)), 9),
+      title: 'Your period may start in about 2 days',
+      body: "Going by your dates. If you're hoping, a home test is reliable "
+          'from the day it is due, ${ttcDayDate(soonDue)}.',
+    ));
+  }
+
   // ---- 4. the cycle report -------------------------------------------------
   // Not for a cycle a clinic ran, and not while one runs this cycle
   // (2026-09-26, §3d): a stimulated cycle's length means nothing.
@@ -766,6 +913,125 @@ List<TtcMessage> ttcMessageCandidates(TtcMessageFacts f, DateTime now) {
   // ---- 6. a treatment round (2026-09-26, B6) -------------------------------
   out.addAll(ttcTreatmentMessages(f.round, f.closedRound, now));
 
+  // ---- 7. every day (Phase 6a) ---------------------------------------------
+  out.addAll(ttcDailyCandidates(f, now));
+
+  return out;
+}
+
+/// The daily kinds for the next [kTtcDailyDays] days (Phase 6a). Pure.
+///
+///  * a line for her phase at 8:30, from the same pool the home reads
+///    (`ttcInsightsForPhase`), only on her own cycle: on a clinic cycle the
+///    phase is the clinic's, and the phase says `any`;
+///  * the check-in at 7:30 on odd cycle days, never tonight once she has
+///    logged, never late;
+///  * an offer at 7 pm three days before her window opens and two days
+///    before her period is due, only when something real exists.
+///
+/// Nothing before her first period after a loss: no cycle start, no count.
+/// Nothing more than a week past the cycle's length either: by then a missed
+/// log is likelier than a late period, and a daily line would be guessing.
+List<TtcMessage> ttcDailyCandidates(TtcMessageFacts f, DateTime now) {
+  if (!f.inTtcStage || f.pregnancyConfirmed) return const [];
+  final start = f.cycleStart;
+  if (start == null) return const [];
+  final today = _day(now);
+  final out = <TtcMessage>[];
+  for (var i = 0; i < kTtcDailyDays; i++) {
+    final d = today.add(Duration(days: i));
+    final cd = d.difference(_day(start)).inDays + 1;
+    if (cd < 1) continue;
+    if (f.cycleLength > 0 && cd > f.cycleLength + 7) break;
+
+    final ov = f.ovulationDay;
+    if (f.ownership == TimingOwnership.parentveda && ov != null && f.cycleLength > 0) {
+      final phase = ttcDayPhaseForCycleDay(
+          cycleDay: cd, ovulationDay: ov, usualLength: f.cycleLength);
+      if (phase != TtcDayPhase.any) {
+        final pick = ttcInsightsForPhase(phase, d, count: 1);
+        if (pick.isNotEmpty) {
+          out.add(TtcMessage(
+            id: 'tday:${_key(d)}',
+            kind: TtcMessageKind.dayLine,
+            at: DateTime(d.year, d.month, d.day, 8, 30),
+            title: pick.first.titleEn,
+            body: pick.first.bodyEn,
+            to: ['ttc_insight/${pick.first.id}', 'ttc_cycle'],
+          ));
+        }
+      }
+    }
+
+    final checkAt = DateTime(d.year, d.month, d.day, 19, 30);
+    if (cd.isOdd && !(i == 0 && f.checkedInToday) && checkAt.isAfter(now)) {
+      out.add(TtcMessage(
+        id: 'tcheck:${_key(d)}',
+        kind: TtcMessageKind.checkIn,
+        at: checkAt,
+        title: 'How are you feeling today?',
+        body: 'A quick note of today. Your patterns show up in your cycle report.',
+      ));
+    }
+  }
+
+  void offer(String id, DateTime day, List<TtcOffer> offers) {
+    final at = DateTime(day.year, day.month, day.day, 19);
+    if (offers.isEmpty || !at.isAfter(now)) return;
+    final o = offers.first;
+    out.add(TtcMessage(
+        id: id, kind: TtcMessageKind.offer, at: at, title: o.title, body: o.body,
+        to: [o.to, 'ttc_shop']));
+  }
+
+  final opens = f.windowOpens;
+  if (opens != null) {
+    offer('toffer:w:${_key(opens)}', _day(opens).subtract(const Duration(days: 3)),
+        f.offersBeforeWindow);
+  }
+  final due = ttcReliableLateAdvice(f, today)?.due;
+  if (due != null) {
+    offer('toffer:d:${_key(due)}', _day(due).subtract(const Duration(days: 2)),
+        f.offersBeforeDue);
+  }
+  return out;
+}
+
+/// The phone plan (Phase 6a): which pending messages ring, on which id. Pure.
+///
+/// Treatment messages are always armed: they are her clinic's dates, outside
+/// the cap. A quiet message never rings. Everything else competes per day for
+/// one morning slot (before [kTtcEveningFromHour]) and one evening slot; the
+/// lowest [TtcMessageKindInfo.slotRank] wins, the earlier on a tie.
+List<(int, TtcMessage)> ttcPhonePlan(List<TtcMessage> pending) {
+  final rings = <TtcMessage>[];
+  final best = <String, TtcMessage>{};
+  for (final m in pending) {
+    if (m.quiet) continue;
+    if (m.kind == TtcMessageKind.treatment) {
+      rings.add(m);
+      continue;
+    }
+    final key = '${_key(m.at)}|${m.at.hour < kTtcEveningFromHour ? 'am' : 'pm'}';
+    final cur = best[key];
+    if (cur == null ||
+        m.kind.slotRank < cur.kind.slotRank ||
+        (m.kind.slotRank == cur.kind.slotRank && m.at.isBefore(cur.at))) {
+      best[key] = m;
+    }
+  }
+  rings
+    ..addAll(best.values)
+    ..sort((a, b) => a.at.compareTo(b.at));
+  final used = <TtcMessageKind, int>{};
+  final out = <(int, TtcMessage)>[];
+  for (final m in rings) {
+    final ids = m.kind.phoneIds;
+    final n = used[m.kind] ?? 0;
+    if (n >= ids.length) continue;
+    used[m.kind] = n + 1;
+    out.add((ids[n], m));
+  }
   return out;
 }
 
@@ -1034,6 +1300,8 @@ class TtcMessagesStore extends ChangeNotifier
   static const _kMessages = 'ttc_messages_v1';
   static const _kOff = 'ttc_messages_off';
   static const _kPhone = 'ttc_messages_phone';
+  static const _kOffers = 'ttc_messages_offers';
+  static const _kOffersAsked = 'ttc_messages_offers_asked';
 
   /// Delivered messages kept. Older ones fall off the end.
   static const int _keep = 60;
@@ -1041,6 +1309,8 @@ class TtcMessagesStore extends ChangeNotifier
   final List<TtcMessage> _all = [];
   final Set<TtcMessageKind> _off = {};
   bool _phoneOn = true;
+  bool _offersYes = false;
+  bool _offersAsked = false;
   bool _loaded = false;
   bool _listening = false;
 
@@ -1068,8 +1338,23 @@ class TtcMessagesStore extends ChangeNotifier
 
   int get unreadCount => delivered().where((m) => !m.read).length;
 
-  bool isOn(TtcMessageKind kind) => !_off.contains(kind);
+  // ⚠️ OFFERS START OFF (Phase 6a): they need her yes first; every other
+  // kind is on until she switches it off.
+  bool isOn(TtcMessageKind kind) =>
+      kind == TtcMessageKind.offer ? _offersYes : !_off.contains(kind);
   bool get phoneOn => _phoneOn;
+
+  /// Whether she has answered the offers card, either way.
+  bool get offersAsked => _offersAsked;
+
+  /// Her answer to the offers card. Either answer stops the card.
+  Future<void> answerOffers(bool yes) async {
+    _offersAsked = true;
+    _offersYes = yes;
+    await _persist();
+    notifyListeners();
+    await refresh();
+  }
 
   // ---- lifecycle ------------------------------------------------------------
 
@@ -1085,6 +1370,11 @@ class TtcMessagesStore extends ChangeNotifier
       TtcFertilityHelpStore.instance.addListener(_changed);
       // The round's dates drive the treatment messages (2026-09-26, B6).
       TtcTreatmentStore.instance.addListener(_changed);
+      // Phase 6a: a log today silences tonight's check-in; offers come and go.
+      TtcLogStore.instance.addListener(_changed);
+      PvCatalogStore.instance.addListener(_changed);
+      ProgrammeStore.instance.addListener(_changed);
+      ExpertStore.instance.addListener(_changed);
       // Lazy-loaded store: without this her age answer is not known here.
       TtcFertilityHelpStore.instance.load().catchError((_) {});
       try {
@@ -1204,16 +1494,20 @@ class TtcMessagesStore extends ChangeNotifier
       }
     }
     if (_phoneOn) {
-      var slot = 0;
-      for (final m in pending(now: now)) {
-        if (m.quiet) continue;
-        int id = m.kind.notificationId;
-        if (m.kind == TtcMessageKind.treatment) {
-          if (slot >= kTtcTreatmentPhoneSlots) continue;
-          id += slot++;
-        }
-        await _phone.schedule(
-            id: id, title: m.title, body: m.body, when: m.at);
+      // Kept for revert (Phase 6a: two a day, `ttcPhonePlan`):
+      //   var slot = 0;
+      //   for (final m in pending(now: now)) {
+      //     if (m.quiet) continue;
+      //     int id = m.kind.notificationId;
+      //     if (m.kind == TtcMessageKind.treatment) {
+      //       if (slot >= kTtcTreatmentPhoneSlots) continue;
+      //       id += slot++;
+      //     }
+      //     await _phone.schedule(
+      //         id: id, title: m.title, body: m.body, when: m.at);
+      //   }
+      for (final (id, m) in ttcPhonePlan(pending(now: now))) {
+        await _phone.schedule(id: id, title: m.title, body: m.body, when: m.at);
       }
     }
     if (changed) {
@@ -1264,6 +1558,9 @@ class TtcMessagesStore extends ChangeNotifier
       }
     }
 
+    // Daily kinds leave Messages after two weeks (Phase 6a).
+    next.removeWhere((m) =>
+        m.kind.isDaily && m.deliveredBy(now) && m.at.isBefore(now.subtract(kTtcDailyKeep)));
     next.sort((a, b) => b.at.compareTo(a.at));
     // Trim delivered history only; never a pending message.
     final keepDelivered = next.where((m) => m.deliveredBy(now)).take(_keep);
@@ -1304,7 +1601,12 @@ class TtcMessagesStore extends ChangeNotifier
   /// notification. What she already received stays in her list.
   Future<void> setOn(TtcMessageKind kind, bool on) async {
     if (isOn(kind) == on) return;
-    on ? _off.remove(kind) : _off.add(kind);
+    if (kind == TtcMessageKind.offer) {
+      _offersYes = on;
+      _offersAsked = true;
+    } else {
+      on ? _off.remove(kind) : _off.add(kind);
+    }
     if (!on) {
       final now = DateTime.now();
       _all.removeWhere((m) => m.kind == kind && !m.deliveredBy(now));
@@ -1356,6 +1658,8 @@ class TtcMessagesStore extends ChangeNotifier
         if (m.deliveredBy(now)) 'm|${m.id}': jsonEncode(m.toJson()),
       for (final k in _off) 'off|${k.name}': true,
       'phone': _phoneOn,
+      'offers': _offersYes,
+      'offersAsked': _offersAsked,
     };
   }
 
@@ -1399,6 +1703,8 @@ class TtcMessagesStore extends ChangeNotifier
       ..clear()
       ..addAll(off);
     _phoneOn = items['phone'] is bool ? items['phone'] as bool : true;
+    _offersYes = items['offers'] == true;
+    _offersAsked = items['offersAsked'] == true;
     _loaded = true;
     // A switch or the phone flag may have changed on the other phone: the
     // phone queue follows. Not on a sign-out (no items), which the old reset
@@ -1414,6 +1720,8 @@ class TtcMessagesStore extends ChangeNotifier
     _all.clear();
     _off.clear();
     _phoneOn = true;
+    _offersYes = false;
+    _offersAsked = false;
     _loaded = true;
     notifyListeners();
   }
@@ -1440,6 +1748,8 @@ class TtcMessagesStore extends ChangeNotifier
                 TtcMessageKind.values.where((k) => k.name == n).firstOrNull)
             .whereType<TtcMessageKind>());
       _phoneOn = p.getBool(_kPhone) ?? true;
+      _offersYes = p.getBool(_kOffers) ?? false;
+      _offersAsked = p.getBool(_kOffersAsked) ?? false;
     } catch (_) {/* start empty; a storage failure is never a crash */}
     _loaded = true;
     notifyListeners();
@@ -1453,6 +1763,8 @@ class TtcMessagesStore extends ChangeNotifier
           _kMessages, jsonEncode([for (final m in _all) m.toJson()]));
       await p.setStringList(_kOff, [for (final k in _off) k.name]);
       await p.setBool(_kPhone, _phoneOn);
+      await p.setBool(_kOffers, _offersYes);
+      await p.setBool(_kOffersAsked, _offersAsked);
     } catch (_) {/* best-effort */}
   }
 }

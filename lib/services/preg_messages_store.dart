@@ -33,6 +33,26 @@
 //  The weeks are the Scans door's own (`pv_door_scans.dart` tile metas), so a
 //  message and the page it opens can never name two windows.
 //
+//  ---------------------------------------------------------------------------
+//  ⚠️ PHASE 6a: EVERY DAY, BUT NEVER MORE THAN TWO (2026-10-28)
+//  ---------------------------------------------------------------------------
+//
+//  docs/NOTIFICATIONS-PLAN.md. Three more kinds, and a cap:
+//
+//    dayLine   every morning, 8:30   the week's tip for today
+//                                    (`kPregDailyTips`, 7 per week, 4 to 40)
+//    checkIn   every other evening, 7:30, only if she has not logged today
+//    offer     day 3 and day 6 of her week, 7 pm, a class, a product or an
+//              expert that EXISTS (`preg_message_offers.dart`). OFF until she
+//              says yes: Apple's rule 4.5.4, and the user's.
+//
+//  THE CAP (the user, 2026-10-28): at most two of these on her phone a day, a
+//  morning slot and an evening slot. In each slot the best kind wins
+//  ([PregMessageKindInfo.slotRank]): a dated moment, then the new week, then
+//  the tip, then the check-in, then an offer. The others are still delivered
+//  to Messages; they just do not ring. [pregPhonePlan] is the whole rule and
+//  is pure. Her own reminders (`ReminderStore`) are outside it.
+//
 //  Every clinical line reminds, explains or helps her prepare; none adds a
 //  step her doctor did not (CLAUDE.md, clinical ownership). The scan and
 //  vaccine lines say "usually" and "ask your doctor", never "you need".
@@ -77,12 +97,18 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/preg_daily_tips.dart';
+import 'expert_store.dart';
 import 'father_preview.dart';
 import 'life_stage_store.dart';
 import 'notification_service.dart';
 import 'pregnancy_controller.dart';
+import 'preg_message_offers.dart';
 import 'pregnancy_ended_store.dart';
+import 'programme_store.dart';
+import 'pv_catalog_store.dart';
 import 'remote/cloud_merged_store.dart';
+import 'symptom_store.dart';
 // import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 /// The seven kinds. The NAME is persisted: renaming one strands every message
@@ -92,6 +118,8 @@ import 'remote/cloud_merged_store.dart';
 /// switches in this order. The order is not persisted; only the name is.
 enum PregMessageKind {
   newWeek,
+  dayLine,
+  checkIn,
   firstVisit,
   datingScan,
   ntScan,
@@ -102,12 +130,28 @@ enum PregMessageKind {
   growthScan,
   hospitalBag,
   babyArrived,
+  offer,
 }
 
 /// How many upcoming weeks are armed on the phone at once. If she does not
 /// open the app for a month, the next four still arrive; the fifth is armed
 /// the next time she does.
 const int kPregWeekPhoneSlots = 4;
+
+/// How many days ahead the daily kinds are worked out and armed: two weeks of
+/// mornings still arrive if she does not open the app.
+const int kPregDailyDays = 14;
+
+/// Phone ids each daily kind may hold at once.
+const int kPregDailyPhoneSlots = 14;
+const int kPregOfferPhoneSlots = 8;
+
+/// The hour that splits the morning slot from the evening one.
+const int kPregEveningFromHour = 14;
+
+/// Daily kinds leave Messages after this long: a tip from three weeks ago is
+/// noise beside the dated moments she may want to find again.
+const Duration kPregDailyKeep = Duration(days: 14);
 
 extension PregMessageKindInfo on PregMessageKind {
   /// The first OS notification id of the kind. Only [newWeek] holds more than
@@ -124,15 +168,44 @@ extension PregMessageKindInfo on PregMessageKind {
         PregMessageKind.datingScan => 919118,
         PregMessageKind.glucoseTest => 919119,
         PregMessageKind.growthScan => 919120,
+        // Blocks of their own (Phase 6a), handed out soonest first.
+        PregMessageKind.dayLine => 919130,
+        PregMessageKind.checkIn => 919150,
+        PregMessageKind.offer => 919170,
       };
 
-  List<int> get phoneIds => this == PregMessageKind.newWeek
-      ? [for (var i = 0; i < kPregWeekPhoneSlots; i++) notificationId + i]
-      : [notificationId];
+  List<int> get phoneIds {
+    final n = switch (this) {
+      PregMessageKind.newWeek => kPregWeekPhoneSlots,
+      PregMessageKind.dayLine || PregMessageKind.checkIn => kPregDailyPhoneSlots,
+      PregMessageKind.offer => kPregOfferPhoneSlots,
+      _ => 1,
+    };
+    return [for (var i = 0; i < n; i++) notificationId + i];
+  }
+
+  /// The kinds that come day after day, rather than once at a moment.
+  bool get isDaily =>
+      this == PregMessageKind.dayLine ||
+      this == PregMessageKind.checkIn ||
+      this == PregMessageKind.offer;
+
+  /// Who wins a phone slot, lowest first. A dated moment is about her care
+  /// and comes once; an offer is the first to give way.
+  int get slotRank => switch (this) {
+        PregMessageKind.newWeek => 2,
+        PregMessageKind.dayLine => 3,
+        PregMessageKind.checkIn => 4,
+        PregMessageKind.offer => 5,
+        _ => 1,
+      };
 
   /// The switch's name in Reminders.
   String get label => switch (this) {
         PregMessageKind.newWeek => 'Your new week',
+        PregMessageKind.dayLine => "Today's tip",
+        PregMessageKind.checkIn => 'How are you feeling?',
+        PregMessageKind.offer => 'Offers and new things',
         PregMessageKind.firstVisit => 'Your first visit',
         PregMessageKind.datingScan => 'The dating scan',
         PregMessageKind.glucoseTest => 'The sugar test',
@@ -148,6 +221,12 @@ extension PregMessageKindInfo on PregMessageKind {
   /// One line under the switch: when it comes.
   String get when => switch (this) {
         PregMessageKind.newWeek => 'The morning each new week starts',
+        PregMessageKind.dayLine => 'Each morning, a tip for your week',
+        PregMessageKind.checkIn =>
+          "Every other evening, only if you haven't noted how today feels",
+        PregMessageKind.offer =>
+          'Classes, things for this week and experts. At most twice a week. '
+              'Off until you turn it on',
         PregMessageKind.firstVisit => 'At 6 weeks',
         PregMessageKind.datingScan =>
           'At 7 weeks, unless a scan or your doctor gave your due date',
@@ -171,6 +250,7 @@ class PregMessage {
     required this.body,
     this.week,
     this.read = false,
+    this.ref,
   });
 
   /// `week:<n>` or the moment's name. Stable, persisted, never shown.
@@ -186,6 +266,9 @@ class PregMessage {
   final int? week;
   final bool read;
 
+  /// What an offer opens: `product:<id>` or `learn:<id>`. Null otherwise.
+  final String? ref;
+
   bool deliveredBy(DateTime now) => !at.isAfter(now);
 
   PregMessage copyWith({DateTime? at, bool? read}) => PregMessage(
@@ -195,7 +278,8 @@ class PregMessage {
       title: title,
       body: body,
       week: week,
-      read: read ?? this.read);
+      read: read ?? this.read,
+      ref: ref);
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -205,6 +289,7 @@ class PregMessage {
         'body': body,
         if (week != null) 'week': week,
         'read': read,
+        if (ref != null) 'ref': ref,
       };
 
   static PregMessage? fromJson(Object? raw) {
@@ -221,6 +306,7 @@ class PregMessage {
       body: '${raw['body'] ?? ''}',
       week: raw['week'] is int ? raw['week'] as int : null,
       read: raw['read'] == true,
+      ref: raw['ref'] is String ? raw['ref'] as String : null,
     );
   }
 }
@@ -236,6 +322,8 @@ class PregMessageFacts {
     this.partner = false,
     this.pregnancyStart,
     this.dueDateFromClinic = false,
+    this.checkedInToday = false,
+    this.offersByWeek = const {},
   });
 
   final DateTime dueDate;
@@ -254,6 +342,14 @@ class PregMessageFacts {
   /// and a message suggesting one would second-guess her clinic.
   final bool dueDateFromClinic;
 
+  /// True when she has already noted how today feels (the Symptoms door's
+  /// Today tab, `SymptomStore`): tonight's check-in has nothing to ask.
+  final bool checkedInToday;
+
+  /// What exists to offer, by week (`pregOffersForWeek`), for the weeks the
+  /// daily window covers. Empty means no offer, which is the default.
+  final Map<int, List<PregOffer>> offersByWeek;
+
   static PregMessageFacts? fromStores() {
     final c = PregnancyController.current;
     if (c == null) return null;
@@ -270,7 +366,17 @@ class PregMessageFacts {
           ? LifeStageStore.instance.enteredAt
           : null,
       dueDateFromClinic: c.dueDateFromClinic,
+      checkedInToday: SymptomStore.instance.logsOn(DateTime.now()).isNotEmpty,
+      offersByWeek: _offersAhead(c.dueDate),
     );
+  }
+
+  static Map<int, List<PregOffer>> _offersAhead(DateTime due) {
+    final w0 = pregWeekOn(due, DateTime.now());
+    return {
+      for (var w = w0; w <= w0 + 2; w++)
+        if (w >= 4 && w <= 40) w: pregOffersForWeek(w),
+    };
   }
 
   bool get speaks => dueDateSet && !ended && inPregnancy && !partner;
@@ -357,6 +463,100 @@ List<PregMessage> pregMessageCandidates(PregMessageFacts f, DateTime now) {
   moment(PregMessageKind.babyArrived, 37, 42, 'Has your baby arrived?',
       "Whenever your baby comes, tell us when you're ready and ParentVeda will move with you to the first weeks at home.");
 
+  out.addAll(pregDailyCandidates(f, now));
+  return out;
+}
+
+String _dayKey(DateTime d) =>
+    '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+/// The daily kinds for the next [kPregDailyDays] days (Phase 6a). Pure.
+///
+///  * the tip, 8:30 every morning, weeks 4 to 40, its id the week and day so
+///    a corrected due date moves it, like `week:<n>`;
+///  * the check-in, 7:30 on every other day of her pregnancy, never tonight
+///    once she has logged today, and never once its moment has passed: a
+///    late "how are you feeling" at midnight is not a kindness;
+///  * an offer, 7 pm on day 3 and day 6 of her week, only when something
+///    real exists for that week, and never late either.
+List<PregMessage> pregDailyCandidates(PregMessageFacts f, DateTime now) {
+  if (!f.speaks) return const [];
+  final today = _day(now);
+  final out = <PregMessage>[];
+  for (var i = 0; i < kPregDailyDays; i++) {
+    final d = today.add(Duration(days: i));
+    final w = pregWeekOn(f.dueDate, d);
+    if (w < 4 || w > 40) continue;
+    final dow = d.difference(pregWeekStart(f.dueDate, w)).inDays + 1;
+
+    out.add(PregMessage(
+      id: 'day:$w:$dow',
+      kind: PregMessageKind.dayLine,
+      at: DateTime(d.year, d.month, d.day, 8, 30),
+      week: w,
+      title: "Week $w: today's tip",
+      body: pregDailyTipFor(w, dow),
+    ));
+
+    final pregDay = 280 - _day(f.dueDate).difference(d).inDays;
+    final checkAt = DateTime(d.year, d.month, d.day, 19, 30);
+    if (pregDay.isOdd && !(i == 0 && f.checkedInToday) && checkAt.isAfter(now)) {
+      out.add(PregMessage(
+        id: 'checkin:${_dayKey(d)}',
+        kind: PregMessageKind.checkIn,
+        at: checkAt,
+        week: w,
+        title: 'How are you feeling today?',
+        body: 'Two taps to note it. Your doctor summary keeps the pattern.',
+      ));
+    }
+
+    final offers = f.offersByWeek[w] ?? const <PregOffer>[];
+    final offerAt = DateTime(d.year, d.month, d.day, 19);
+    if ((dow == 3 || dow == 6) && offers.isNotEmpty && offerAt.isAfter(now)) {
+      final o = dow == 3 ? offers.first : offers.last;
+      out.add(PregMessage(
+        id: 'offer:$w:$dow',
+        kind: PregMessageKind.offer,
+        at: offerAt,
+        week: w,
+        title: o.title,
+        body: o.body,
+        ref: o.ref,
+      ));
+    }
+  }
+  return out;
+}
+
+/// The phone plan (Phase 6a): which pending messages ring, and on which id.
+/// Pure, so the cap is held by a test without a phone.
+///
+/// Per calendar day, one morning slot (before [kPregEveningFromHour]) and one
+/// evening slot. In each the lowest [PregMessageKindInfo.slotRank] wins, the
+/// earlier on a tie. Each winner takes the next free id of its kind; a kind
+/// out of ids waits for a later refresh, as the new week always has.
+List<(int, PregMessage)> pregPhonePlan(List<PregMessage> pending) {
+  final best = <String, PregMessage>{};
+  for (final m in pending) {
+    final key = '${_dayKey(m.at)}|${m.at.hour < kPregEveningFromHour ? 'am' : 'pm'}';
+    final cur = best[key];
+    if (cur == null ||
+        m.kind.slotRank < cur.kind.slotRank ||
+        (m.kind.slotRank == cur.kind.slotRank && m.at.isBefore(cur.at))) {
+      best[key] = m;
+    }
+  }
+  final winners = best.values.toList()..sort((a, b) => a.at.compareTo(b.at));
+  final used = <PregMessageKind, int>{};
+  final out = <(int, PregMessage)>[];
+  for (final m in winners) {
+    final ids = m.kind.phoneIds;
+    final n = used[m.kind] ?? 0;
+    if (n >= ids.length) continue;
+    used[m.kind] = n + 1;
+    out.add((ids[n], m));
+  }
   return out;
 }
 
@@ -398,6 +598,8 @@ class PregMessagesStore extends ChangeNotifier
   static const _kMessages = 'preg_messages_v1';
   static const _kOff = 'preg_messages_off';
   static const _kPhone = 'preg_messages_phone';
+  static const _kOffers = 'preg_messages_offers';
+  static const _kOffersAsked = 'preg_messages_offers_asked';
 
   /// Delivered messages kept. A whole pregnancy is about 45.
   static const int _keep = 80;
@@ -405,6 +607,8 @@ class PregMessagesStore extends ChangeNotifier
   final List<PregMessage> _all = [];
   final Set<PregMessageKind> _off = {};
   bool _phoneOn = true;
+  bool _offersYes = false;
+  bool _offersAsked = false;
   bool _loaded = false;
   bool _listening = false;
 
@@ -433,8 +637,23 @@ class PregMessagesStore extends ChangeNotifier
 
   int get unreadCount => delivered().where((m) => !m.read).length;
 
-  bool isOn(PregMessageKind kind) => !_off.contains(kind);
+  // ⚠️ OFFERS ARE THE ONE KIND THAT STARTS OFF (Phase 6a). Every other kind
+  // is on until she switches it off; an offer needs her yes first.
+  bool isOn(PregMessageKind kind) =>
+      kind == PregMessageKind.offer ? _offersYes : !_off.contains(kind);
   bool get phoneOn => _phoneOn;
+
+  /// Whether she has answered the offers question in Messages, either way.
+  bool get offersAsked => _offersAsked;
+
+  /// Her answer to the offers card. Either answer stops the card.
+  Future<void> answerOffers(bool yes) async {
+    _offersAsked = true;
+    _offersYes = yes;
+    await _persist();
+    notifyListeners();
+    await refresh();
+  }
 
   // ---- lifecycle ------------------------------------------------------------
 
@@ -450,6 +669,11 @@ class PregMessagesStore extends ChangeNotifier
       LifeStageStore.instance.addListener(_changed);
       PregnancyEndedStore.instance.addListener(_changed);
       FatherPreview.instance.addListener(_changed);
+      // Phase 6a: a check-in logged today, and offers appearing or going.
+      SymptomStore.instance.addListener(_changed);
+      PvCatalogStore.instance.addListener(_changed);
+      ProgrammeStore.instance.addListener(_changed);
+      ExpertStore.instance.addListener(_changed);
       try {
         WidgetsBinding.instance.addObserver(this);
       } catch (_) {/* no binding in a pure test */}
@@ -541,13 +765,17 @@ class PregMessagesStore extends ChangeNotifier
       }
     }
     if (_phoneOn) {
-      var slot = 0;
-      for (final m in pending(now: now)) {
-        var id = m.kind.notificationId;
-        if (m.kind == PregMessageKind.newWeek) {
-          if (slot >= kPregWeekPhoneSlots) continue;
-          id += slot++;
-        }
+      // Kept for revert (Phase 6a: two a day, `pregPhonePlan`):
+      //   var slot = 0;
+      //   for (final m in pending(now: now)) {
+      //     var id = m.kind.notificationId;
+      //     if (m.kind == PregMessageKind.newWeek) {
+      //       if (slot >= kPregWeekPhoneSlots) continue;
+      //       id += slot++;
+      //     }
+      //     await _phone.schedule(id: id, title: m.title, body: m.body, when: m.at);
+      //   }
+      for (final (id, m) in pregPhonePlan(pending(now: now))) {
         await _phone.schedule(id: id, title: m.title, body: m.body, when: m.at);
       }
     }
@@ -595,13 +823,20 @@ class PregMessagesStore extends ChangeNotifier
         next.add(c);
       }
     }
-    // Late ones: every moment, but only the latest week.
+    // Late ones: every moment, but only the latest week (and, Phase 6a, only
+    // the latest tip: today's).
     final lateWeeks = late.where((m) => m.kind == PregMessageKind.newWeek).toList()
       ..sort((a, b) => (b.week ?? 0).compareTo(a.week ?? 0));
+    final lateTips = late.where((m) => m.kind == PregMessageKind.dayLine).toList()
+      ..sort((a, b) => b.at.compareTo(a.at));
     for (final m in late) {
       if (m.kind == PregMessageKind.newWeek && m != lateWeeks.first) continue;
+      if (m.kind == PregMessageKind.dayLine && m != lateTips.first) continue;
       next.add(m.copyWith(at: now));
     }
+    // Daily kinds leave Messages after two weeks (Phase 6a).
+    next.removeWhere((m) =>
+        m.kind.isDaily && m.deliveredBy(now) && m.at.isBefore(now.subtract(kPregDailyKeep)));
 
     next.sort((a, b) => b.at.compareTo(a.at));
     // One message per id, the newest (B5): an earlier pregnancy's `week:12`
@@ -646,7 +881,12 @@ class PregMessagesStore extends ChangeNotifier
   /// notification. What she already received stays.
   Future<void> setOn(PregMessageKind kind, bool on) async {
     if (isOn(kind) == on) return;
-    on ? _off.remove(kind) : _off.add(kind);
+    if (kind == PregMessageKind.offer) {
+      _offersYes = on;
+      _offersAsked = true;
+    } else {
+      on ? _off.remove(kind) : _off.add(kind);
+    }
     if (!on) {
       final now = DateTime.now();
       _all.removeWhere((m) => m.kind == kind && !m.deliveredBy(now));
@@ -688,6 +928,8 @@ class PregMessagesStore extends ChangeNotifier
     _all.clear();
     _off.clear();
     _phoneOn = true;
+    _offersYes = false;
+    _offersAsked = false;
     _loaded = true;
     notifyListeners();
   }
@@ -705,6 +947,8 @@ class PregMessagesStore extends ChangeNotifier
         if (m.deliveredBy(now)) 'msg|${m.id}': m.toJson(),
       for (final k in _off) 'off|${k.name}': true,
       'phone': _phoneOn,
+      'offers': _offersYes,
+      'offersAsked': _offersAsked,
     };
   }
 
@@ -713,6 +957,8 @@ class PregMessagesStore extends ChangeNotifier
     _all.clear();
     _off.clear();
     _phoneOn = true;
+    _offersYes = false;
+    _offersAsked = false;
     for (final e in items.entries) {
       final k = e.key;
       if (k.startsWith('msg|')) {
@@ -725,6 +971,10 @@ class PregMessagesStore extends ChangeNotifier
         if (kind != null) _off.add(kind);
       } else if (k == 'phone') {
         _phoneOn = e.value != false;
+      } else if (k == 'offers') {
+        _offersYes = e.value == true;
+      } else if (k == 'offersAsked') {
+        _offersAsked = e.value == true;
       }
     }
     _all.sort((a, b) => b.at.compareTo(a.at));
@@ -758,6 +1008,8 @@ class PregMessagesStore extends ChangeNotifier
             .map((n) => PregMessageKind.values.where((k) => k.name == n).firstOrNull)
             .whereType<PregMessageKind>());
       _phoneOn = p.getBool(_kPhone) ?? true;
+      _offersYes = p.getBool(_kOffers) ?? false;
+      _offersAsked = p.getBool(_kOffersAsked) ?? false;
     } catch (_) {/* start empty; a storage failure is never a crash */}
     _loaded = true;
     notifyListeners();
@@ -769,6 +1021,8 @@ class PregMessagesStore extends ChangeNotifier
       await p.setString(_kMessages, jsonEncode([for (final m in _all) m.toJson()]));
       await p.setStringList(_kOff, [for (final k in _off) k.name]);
       await p.setBool(_kPhone, _phoneOn);
+      await p.setBool(_kOffers, _offersYes);
+      await p.setBool(_kOffersAsked, _offersAsked);
     } catch (_) {/* best-effort */}
   }
 }

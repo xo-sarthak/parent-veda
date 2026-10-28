@@ -110,6 +110,10 @@ final PvDoorPage kScansDoor = PvDoorPage(
   // Rewritten 2026-09-29 to docs/PREG-VOICE.md.
   heroBlurb: "What's coming, what you've already had, and what the report "
       'says.',
+  // After a loss (PREGNANCY-GAP 31, 2026-10-28): nothing is coming, and her
+  // scans and reports are still hers to look back on.
+  heroBlurbEnded: "The scans and tests you had, and what the reports said, "
+      'kept here for whenever you want them.',
 
   // ⚠️ THE PHOTOGRAPH IS BACK, AND THE PROCESS THAT PUT IT THERE IS THE POINT.
   //

@@ -4477,3 +4477,36 @@ default with an off switch per appointment, stored as a set of ids in `shared_pr
 a choice that only matters where the notification fires. Notification ids are derived from the appointment
 id with our own FNV-1a hash (not `String.hashCode`, which Dart does not promise to keep stable), so
 re-arming on every launch overwrites rather than duplicates, and cancelling needs no side table.
+
+## 16zzc. A notification that waits for its content, and a cap as a pure plan (Phase 6a, 2026-10-28)
+
+Two ideas, both general.
+
+**1. Gate the message on the thing it points to, not on a flag.** The tempting design for "tell her about our course" is a feature flag someone flips when the course launches. It fails in both directions: flipped too early, the message sends her to nothing; flipped too late, a live course goes unannounced. Instead each offer is *derived* on every refresh from the live store it advertises (`pregOffersForWeek`, `ttcOffersFor`): a published programme, a Store product near her week, a published expert. Empty means no message. The cost is a few store reads per refresh; the gain is that the message and the content cannot disagree, and publishing in the admin panel is the launch.
+
+The same idea decides what "real" means: a bundled course or expert is seed content, so only panel-published rows count. The booking engine already drew that line for selling (`ppExpertIsPlaceholder`); a message is a smaller promise than a sale, but it is still a promise.
+
+**2. Make the cap a pure function over what is pending.** The stores already compute every message from her dates (16m: computed, not queued). The cap is one more pure step between "what is pending" and "what the phone arms": group by day and slot, keep the best by rank, hand out ids (`pregPhonePlan`). Because it runs on every refresh, a corrected due date re-runs the contest, and a test can check "never more than two a day" over a whole week without a phone. What loses is not dropped: it is still delivered to the in-app list at its time. The two lists answer different questions (what rang, what was said), and keeping both is what makes a cap safe.
+
+A trade-off worth naming: the cap is per store. Only one stage speaks at a time, so two stores never compete on one day today. If two ever did (a parent who is also pregnant), the plan would have to move up into one place that sees both. That is a known edge, not a bug, and it is written down here so the next person does not have to rediscover it.
+
+## 16zzd. Anonymity is a column problem: functions as the only door (community, 0121, 2026-10-28)
+
+The community lets a mother post under a community name. The obvious build is a `community_posts` table with an RLS policy "anyone signed in may read live posts". That policy is correct about **rows** and wrong about **columns**: the row it lets B read includes `user_id`, so A's anonymous post is anonymous only in the UI. Any client (or anyone with the anon key and a token) can select the column directly.
+
+RLS cannot hide a column. Three ways out, and why this one:
+
+- **Column privileges** (`grant select (id, title, …)`) hide the column, but every new column then needs a grant, and a `select *` breaks. Easy to get wrong silently.
+- **A view** without `user_id` works for reads, but writes, counters, blocks and moderation still need the table, and a view's security model is easy to misread.
+- **Functions as the only door** (chosen): `revoke all` on every community table from `anon` and `authenticated`, no policies at all, and `security definer` functions for every read and write. A read returns a *resolved* author (community name or first name) and `is_mine`; the user id never leaves the database.
+
+What it costs: no PostgREST filtering for free; every query shape is a function, and a renamed parameter fails as "function not found". The store treats a thrown call as "offline" and keeps the post queued, so a mismatch would look like a stuck post. `test/community_schema_contract_test.dart` reads the store's calls and the SQL signatures and fails the build first.
+
+Four smaller patterns in the same migration:
+
+1. **Writes that return their outcome.** Most of the app's cloud writes are fire-and-forget (local first; the cloud is a copy). A community post is different: it can be *held* by the safety check, and she must be told, or she thinks it vanished. So `community_create_post` returns `{ok, status, crisis}` or `{ok:false, reason}`, and the app turns that into one toast. And `rpcJson` *throws* on a network failure, unlike `callFunction`, so "the server said no" and "we could not reach it" are different branches.
+2. **Idempotent creates on a client-minted id.** The outbox retries; the function returns the existing outcome when the id already exists. Two taps or a dropped connection make one post. (Same as `PvReviewStore`.)
+3. **Counters by trigger, recomputed where state moves.** `like_count` is ±1 (a like has two states). `comment_count` is recounted, because a reply moves between live, held and removed, and ±1 on every transition is where counts drift.
+4. **Private media signed per request.** A public bucket serves an object to anyone with its URL forever, so "approved" would be a promise the app keeps by not drawing it. A private bucket with a select policy that calls a definer check, plus short-lived signed URLs, makes the server enforce it. The path is `<postId>/<random>`, never the uid (0013 and 0090 use the uid, which is right for her own files and wrong for anything shown under a community name).
+
+And one rule kept from CLAUDE.md: the crisis and abuse word lists live in the migration's SQL, mirrored in Dart for the while-typing helpline, with a parity test. Rules are code, not content.

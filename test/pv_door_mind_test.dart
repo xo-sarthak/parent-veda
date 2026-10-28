@@ -34,10 +34,10 @@ void main() {
       // Sex and closeness added 2026-09-29 (pregnancy gap analysis, P2).
       expect(door.groups.map((g) => g.label), [
         'Calm down now', // was 'Feel' (2026-10-22)
-        'Why you feel this way', // was 'Understand' (2026-10-22)
+        'Why moods change', // was 'Why you feel this way' (PREGNANCY-GAP 21, 2026-10-28)
         'Sex and closeness',
         'Mood check-in', // was 'Track' (2026-10-22)
-        "When it's more than a low day", // was 'When it is more than this' (2026-10-22)
+        'More than a low day', // was "When it's more than a low day" (PREGNANCY-GAP 21)
         'Experts', // was 'Talk' (2026-10-22)
       ]);
       expect(door.groups.first.id, kMindTabFeel);

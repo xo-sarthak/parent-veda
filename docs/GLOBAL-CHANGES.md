@@ -253,6 +253,12 @@ quote cost in USD and INR first).
   switch each type on only once the thing it points to exists (no course
   message without a live course). Competitor research done in chat; plan on
   the user's word.
+- **BUILT 2026-10-28 (Phase 6a, Pregnancy + TTC):** the user liked the
+  prototype. A tip every morning (the existing 7-a-week tips), a check-in
+  every other evening, TTC's period-soon, offers off until she says yes and
+  only when the class, product or expert exists, and two a day on her phone.
+  `docs/NOTIFICATIONS-PLAN.md` "As built"; test
+  `test/notifications_6a_test.dart`. 6b (server push) and Parenting not started.
 
 ### 13 · Relevance inside doors
 

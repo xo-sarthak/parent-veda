@@ -230,7 +230,9 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
     // -------------------------------------------------------------------------
     PvDoorGroup(
       id: kGarbhTabRead,
-      label: 'Talk and read to baby', // was 'Talk and read' (2026-10-22)
+      // Two lines on the card (PREGNANCY-GAP 21, 2026-10-28). Kept for revert:
+      //   label: 'Talk and read to baby', // was 'Talk and read' (2026-10-22)
+      label: 'Talking to baby',
       icon: Icons.record_voice_over_outlined,
       mark: IntentMark.askDoctor, // was pageMark: same mark twice on one rail (2026-10-22)
       hue: 14,

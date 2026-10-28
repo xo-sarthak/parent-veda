@@ -1566,7 +1566,7 @@ final List<MmArticle> kMmArticles = [
       "appetite or your interest in everything. That isn't a mood you have "
       'to wait out or push through.\n\n'
       "It's common, it isn't your fault, and it gets better with the right "
-      'help. The same-day signs on the "When it\'s more than a low day" tab tell '
+      'help. The same-day signs on the "More than a low day" tab tell '
       'you when to reach out today.',
     ),
   ),

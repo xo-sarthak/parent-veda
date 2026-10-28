@@ -267,7 +267,9 @@ final PvDoorPage kMindDoor = PvDoorPage(
     // -------------------------------------------------------------------------
     PvDoorGroup(
       id: kMindTabUnderstand,
-      label: 'Why you feel this way', // was 'Understand' (2026-10-22)
+      // Two lines on the card (PREGNANCY-GAP 21, 2026-10-28). Kept for revert:
+      //   label: 'Why you feel this way', // was 'Understand' (2026-10-22)
+      label: 'Why moods change',
       icon: Icons.menu_book_outlined,
       mark: IntentMark.bookMark, // drawn mark, 2026-10-22
       hue: 206,
@@ -318,7 +320,9 @@ final PvDoorPage kMindDoor = PvDoorPage(
     //  the crisis path, which is where the numbers and the next step live.
     PvDoorGroup(
       id: kMindTabMore,
-      label: "When it's more than a low day", // was 'When it is more than this' (2026-10-22)
+      // Two lines on the card (PREGNANCY-GAP 21, 2026-10-28). Kept for revert:
+      //   label: "When it's more than a low day", // was 'When it is more than this' (2026-10-22)
+      label: 'More than a low day',
       icon: Icons.favorite_border_rounded,
       mark: IntentMark.nextStep, // drawn mark, 2026-10-22
       hue: 344,

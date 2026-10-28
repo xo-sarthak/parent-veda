@@ -515,6 +515,12 @@ void main() {
   group('the Messages screen', () {
     testWidgets('empty: says what will arrive, with a switch for each',
         (tester) async {
+      // A tall view (Phase 6a, 2026-10-28): the screen gained the offers card
+      // and four switches, and a ListView builds only what is on screen, so
+      // at the default size the last switches were never built to be found.
+      tester.view.physicalSize = const Size(1080, 6000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
       await tester.pumpWidget(const MaterialApp(home: TtcMessagesScreen()));
       await tester.pumpAndSettle();
       // 2026-09-26 (review M1): a value statement, not an absence, and one

@@ -15,8 +15,11 @@
 //
 //  Ours, in that order:
 //    · the 2D figure on the peach field, big; a back round at the top
-//    · the week chips — every week she has reached, the current one filled;
-//      weeks ahead are dimmed and do not open (the reveal is the product)
+//    · the week chips — every week, the current one filled. Weeks ahead
+//      would dim and stay shut only with `unlockAllWeeks` off; it is on
+//      (`pregnancy_controller.dart`), so every week opens. Corrected
+//      2026-10-28 (PREGNANCY-GAP 23); was "weeks ahead are dimmed and do not
+//      open (the reveal is the product)".
 //    · the sheet: "What happens in week N" · the desk line (ParentVeda
 //      editorial — we do not have a named reviewer, so we do not print
 //      one) · Length · Weight · About the size of … tiles · the milestone
@@ -356,6 +359,15 @@ class _WeekBody extends StatelessWidget {
           'ParentVeda editorial · averages for the week, never a measurement of your ${pregBabies()}',
           style: pvManrope(fontSize: 12, height: 1.45, color: p.ink3),
         ),
+        // No due date (PREGNANCY-GAP 23, 2026-10-28): the week is the
+        // developer stand-in, since the date is required on every way in.
+        // A guard, so a week that is a guess never reads as hers.
+        if (!pregnancy.isDueDateSet) ...[
+          const SizedBox(height: 6),
+          Text('An estimate: add your due date and this follows your own week.',
+              key: const ValueKey('preg_week_estimate'),
+              style: pvManrope(fontSize: 12, height: 1.45, color: p.ink2)),
+        ],
         if (pregExpectingTwins) ...[
           const SizedBox(height: 6),
           Text(kPregTwinWeekNote, style: pvManrope(fontSize: 12, height: 1.45, color: p.ink3)),

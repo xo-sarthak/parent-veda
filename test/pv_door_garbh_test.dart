@@ -54,7 +54,7 @@ void main() {
       expect(door.groups.map((g) => g.label), [
         'Today',
         'Listen',
-        'Talk and read to baby', // was 'Talk and read' (2026-10-22)
+        'Talking to baby', // was 'Talk and read to baby' (PREGNANCY-GAP 21, 2026-10-28)
         'For you',
         'My Journal',
       ]);

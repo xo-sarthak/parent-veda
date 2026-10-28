@@ -30,11 +30,18 @@
 import 'package:flutter/material.dart';
 
 import '../../services/last_profile.dart' show LastProfile, kLastHomeRoot;
+import '../../services/pv_catalog_store.dart';
+import '../../ttc/ttc_daily_data.dart' show ttcAllInsights;
+import '../../ttc/ttc_insight_read.dart' show openTtcInsight;
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_messages_store.dart';
 import '../../ttc/ttc_period_due.dart';
 import '../../widgets/global_ask_fab.dart' show FabState, appNavigatorKey;
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
+import '../learn/pv_learn_catalog.dart' show PvLearnCatalog;
+import '../learn/pv_offering_screen.dart' show pvOpenOffering;
+import '../products/pv_store_chrome.dart' show pvOpenProduct;
 import '../brackets/hub/hub_intent_art.dart';
 import '../v2/v2_palette.dart';
 import 'chats/ttc_chat.dart';
@@ -83,8 +90,42 @@ void ttcOpenMessageFromPhone(TtcMessage? m, {int attempt = 0}) {
   if (LastProfile.instance.onTop != kLastHomeRoot) {
     Navigator.of(ctx).popUntil((r) => r.settings.name == ttcHomeRoute || r.isFirst);
   }
+  if (m != null && ttcOpenMessageTarget(ctx, m)) return;
   final dest = m == null ? null : ttcFirstOpenable(m.destinations);
   openTtcSurface(ctx, dest ?? 'ttc_messages');
+}
+
+/// The Phase 6a targets the surface router does not know (2026-10-28): a
+/// phase line opens its insight, an offer its product or class. True when one
+/// of [m]'s destinations was one of these and opened. A product or class that
+/// has gone since the message was sent says so, never a blank page.
+bool ttcOpenMessageTarget(BuildContext context, TtcMessage m) {
+  for (final d in m.destinations) {
+    if (d.startsWith('ttc_insight/')) {
+      final id = d.substring('ttc_insight/'.length);
+      for (final i in ttcAllInsights) {
+        if (i.id == id) {
+          openTtcInsight(context, i);
+          return true;
+        }
+      }
+    } else if (d.startsWith('product/')) {
+      final product = PvCatalogStore.instance.byId(d.substring('product/'.length));
+      if (product != null) {
+        pvOpenProduct(context, product);
+        return true;
+      }
+      pvToast(context, "That isn't in the Store any more. Here is what's there now.");
+    } else if (d.startsWith('learn/')) {
+      final view = PvLearnCatalog.instance.byId(d.substring('learn/'.length));
+      if (view != null) {
+        pvOpenOffering(context, view);
+        return true;
+      }
+      pvToast(context, "That class isn't running any more. Here is what's on now.");
+    }
+  }
+  return false;
 }
 
 /// The drawn mark for each kind of message (M2).
@@ -95,6 +136,10 @@ IntentMark ttcMessageMark(TtcMessageKind k) => switch (k) {
       TtcMessageKind.cycleReport => IntentMark.reportPage,
       TtcMessageKind.tryingLong => IntentMark.askDoctor,
       TtcMessageKind.waitStarts => IntentMark.cuppedHands,
+      TtcMessageKind.periodSoon => IntentMark.calendarDay,
+      TtcMessageKind.dayLine => IntentMark.cycleRing,
+      TtcMessageKind.checkIn => IntentMark.bodyMark,
+      TtcMessageKind.offer => IntentMark.bagMark,
       TtcMessageKind.treatment => IntentMark.calendarDay,
     };
 
@@ -106,6 +151,10 @@ double _hueFor(TtcMessageKind k) => switch (k) {
       TtcMessageKind.cycleReport => 42,
       TtcMessageKind.tryingLong => 160,
       TtcMessageKind.waitStarts => 300,
+      TtcMessageKind.periodSoon => 206,
+      TtcMessageKind.dayLine => 344,
+      TtcMessageKind.checkIn => 160,
+      TtcMessageKind.offer => 28,
       TtcMessageKind.treatment => 222,
     };
 
@@ -132,6 +181,7 @@ class _TtcMessagesScreenState extends State<TtcMessagesScreen> {
 
   void _open(TtcMessage m) {
     _store.markRead(m.id);
+    if (ttcOpenMessageTarget(context, m)) return;
     // Kept for revert: ttcFirstOpenable(m.kind.destinations).
     final id = ttcFirstOpenable(m.destinations);
     if (id != null) openTtcSurface(context, id);
@@ -174,6 +224,10 @@ class _TtcMessagesScreenState extends State<TtcMessagesScreen> {
                       style: ttcBody(13.5, h: 1.5)),
                 ],
                 const SizedBox(height: 14),
+                if (!_store.offersAsked && !TtcPartnerMode.instance.on) ...[
+                  _TtcOffersCard(store: _store),
+                  const SizedBox(height: 16),
+                ],
                 // Kept for revert: `const _Empty()` and a row + divider pair.
                 if (list.isEmpty)
                   _EmptyInvite(onChoose: () {
@@ -194,6 +248,68 @@ class _TtcMessagesScreenState extends State<TtcMessagesScreen> {
           },
         ),
       ),
+    );
+  }
+}
+
+/// The one time she is asked about offers (Phase 6a, 2026-10-28). Nothing
+/// promotional until she says yes, in the app (Apple 4.5.4, and the user's
+/// rule); the "Offers and new things" switch below is the way back out.
+class _TtcOffersCard extends StatelessWidget {
+  const _TtcOffersCard({required this.store});
+  final TtcMessagesStore store;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const ValueKey('ttc_msg_offers_card'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(ttcCardRadius),
+        border: Border.all(color: ttcLine),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Tests, classes and experts?',
+            style: ttcBody(15.5, color: ttcTitleInk, w: FontWeight.w700, h: 1.3)),
+        const SizedBox(height: 6),
+        Text(
+            'When there are tests that fit where you are in your cycle, a class or an '
+            'expert you can talk to, we can tell you. Twice a cycle at most, and still '
+            'never more than two messages from us in a day.',
+            style: ttcBody(13.5, h: 1.5)),
+        const SizedBox(height: 12),
+        Wrap(spacing: 10, runSpacing: 8, children: [
+          FilledButton(
+            key: const ValueKey('ttc_msg_offers_yes'),
+            style: FilledButton.styleFrom(
+                backgroundColor: ttcTitleInk,
+                foregroundColor: Colors.white,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12)),
+            onPressed: () async {
+              await store.answerOffers(true);
+              if (context.mounted) {
+                pvToast(context, 'Offers on. You can turn them off below.',
+                    kind: PvToastKind.done);
+              }
+            },
+            child: Text('Yes, tell me',
+                style: ttcBody(14, color: Colors.white, w: FontWeight.w700, h: 1.2)),
+          ),
+          TextButton(
+            key: const ValueKey('ttc_msg_offers_no'),
+            onPressed: () async {
+              await store.answerOffers(false);
+              if (context.mounted) {
+                pvToast(context, 'No offers. You can turn them on below.');
+              }
+            },
+            child: Text('Not now',
+                style: ttcBody(14, color: ttcTitleInk, w: FontWeight.w700, h: 1.2)),
+          ),
+        ]),
+      ]),
     );
   }
 }

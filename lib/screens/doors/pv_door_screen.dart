@@ -53,6 +53,7 @@ import '../../data/doors/pv_door_data.dart';
 import '../../models/bracket.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/family_profile.dart' show FamilyProfileStore, Parity;
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/pregnancy_records.dart' show PregnancyRecords;
 import '../post_pregnancy/pp_child_profile.dart' show Child, ChildProfileStore;
 import '../../data/conditions_data.dart' show ConditionsStore;
@@ -1674,7 +1675,12 @@ class _Hero extends StatelessWidget {
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 330),
                         child: Text(
-                          page.heroBlurb,
+                          // After a loss, the door's own line for then
+                          // (PREGNANCY-GAP 31). Kept for revert: page.heroBlurb,
+                          (PregnancyEndedStore.instance.ended
+                                  ? page.heroBlurbEnded
+                                  : null) ??
+                              page.heroBlurb,
                           style: pvManrope(
                             fontSize: 13.5,
                             height: 1.55,
