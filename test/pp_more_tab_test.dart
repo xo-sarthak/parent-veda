@@ -17,7 +17,9 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   testWidgets('tab header, pregnancy sections and rows, the bar lit on More; 360 at 1.5x', (t) async {
-    t.view.physicalSize = const Size(360 * 3, 4200 * 3);
+    // Taller since 2026-10-28: Community is its own section after the journey
+    // rows, below the old 4200 fold. Kept for revert: Size(360 * 3, 4200 * 3)
+    t.view.physicalSize = const Size(360 * 3, 5600 * 3);
     t.view.devicePixelRatio = 3;
     addTearDown(t.view.reset);
     await t.pumpWidget(const MediaQuery(
@@ -31,7 +33,10 @@ void main() {
     expect(find.byType(PregOfferRow), findsWidgets);
     // Community joined 2026-10-28 (the new community). Kept for revert:
     //   expect(find.text('Community'), findsNothing);
-    expect(find.byKey(const ValueKey('pp_more_community')), findsOneWidget);
+    // Its own section since 2026-10-28, with the row inside. Kept for revert:
+    //   expect(find.byKey(const ValueKey('pp_more_community')), findsOneWidget); // the row
+    expect(find.byKey(const ValueKey('pp_more_community')), findsOneWidget); // the section
+    expect(find.byKey(const ValueKey('pp_more_open_community')), findsOneWidget);
     expect(find.byType(PpBottomNav), findsOneWidget);
     expect(t.takeException(), isNull);
   });

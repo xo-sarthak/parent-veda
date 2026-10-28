@@ -165,8 +165,12 @@ void main() {
       ];
       var y = -1.0;
       for (final h in headings) {
-        expect(find.text(h), findsOneWidget, reason: 'no "$h" heading');
-        final dy = tester.getTopLeft(find.text(h)).dy;
+        // The Community heading and its one row both say "Community" since
+        // 2026-10-28 (one place, one row, in every stage); the heading is the
+        // first. Kept for revert: expect(find.text(h), findsOneWidget, ...)
+        expect(find.text(h), h == kTtcMoreCommunityHeading ? findsNWidgets(2) : findsOneWidget,
+            reason: 'no "$h" heading');
+        final dy = tester.getTopLeft(find.text(h).first).dy;
         expect(dy, greaterThan(y), reason: '"$h" is out of order');
         y = dy;
       }

@@ -236,8 +236,10 @@ class _PpMoreScreenState extends State<PpMoreScreen> {
               // Community section on More, after the journey rows, with the
               // same row as Pregnancy and Trying, so the way in never moves
               // when her stage changes.
+              // The row's key is pp_more_open_community, as in Pregnancy: the
+              // section itself is keyed pp_more_community.
               _section('community', 'Community', [
-                _row('pp_more_community', IntentMark.cuppedHands, 20, 'Community',
+                _row('pp_more_open_community', IntentMark.cuppedHands, 20, 'Community',
                     'Rooms for your stage, to read or to talk', () {
                   pvCommitFeedback();
                   openCommunity(context);

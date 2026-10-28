@@ -1130,6 +1130,54 @@ const List<(String, String, String?)> kCommunityReportReasons = [
   ('other', 'Something else', null),
 ];
 
+/// The grievance officer, named by the user 2026-10-28. India's IT Rules 2021
+/// (Rule 3(2)) ask an app that hosts user posts to publish the officer's name
+/// and contact where members can see them, so it sits under the house rules
+/// and on the report thank-you.
+const String kCommunityGrievanceOfficer = 'Deepti Sekhri';
+const String kCommunityGrievanceEmail = 'parentvedateam@gmail.com';
+
+/// "Grievance officer: name, email". A tap opens her mail app; if none
+/// opens, the address is copied and a toast says so (no silent tap).
+class CommunityGrievanceLine extends StatelessWidget {
+  const CommunityGrievanceLine({super.key, this.center = false});
+  final bool center;
+
+  @override
+  Widget build(BuildContext context) => PvPress(
+        child: GestureDetector(
+          key: const ValueKey('community_grievance'),
+          behavior: HitTestBehavior.opaque,
+          onTap: () async {
+            final ok = await launchUrl(Uri(
+              scheme: 'mailto',
+              path: kCommunityGrievanceEmail,
+              query: 'subject=Community%20grievance',
+            ));
+            if (!ok && context.mounted) {
+              Clipboard.setData(const ClipboardData(text: kCommunityGrievanceEmail));
+              pvToast(context, 'Could not open your mail app. $kCommunityGrievanceEmail is copied.',
+                  kind: PvToastKind.info);
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Text.rich(
+              TextSpan(children: [
+                const TextSpan(text: 'Grievance officer: $kCommunityGrievanceOfficer, '),
+                TextSpan(
+                  text: kCommunityGrievanceEmail,
+                  style: const TextStyle(decoration: TextDecoration.underline),
+                ),
+              ]),
+              textAlign: center ? TextAlign.center : TextAlign.start,
+              style: cmText(12, color: cmP.ink3),
+            ),
+          ),
+        ),
+      );
+}
+
 /// Reason → optional details → "confidential" thank-you. True when sent.
 Future<bool> showCommunityReport(
   BuildContext context, {
@@ -1251,6 +1299,8 @@ class _ReportSheetState extends State<_ReportSheet> {
             ],
             const SizedBox(height: 18),
             CommunityInkButton(label: 'Done', onTap: () => Navigator.pop(context, true)),
+            const SizedBox(height: 6),
+            const CommunityGrievanceLine(center: true),
           ]),
         ),
     };
@@ -1442,6 +1492,7 @@ class _WelcomeSheetState extends State<_WelcomeSheet> {
           textAlign: TextAlign.center,
           style: cmText(12, color: cmP.ink3),
         ),
+        const CommunityGrievanceLine(center: true),
       ]),
     );
     final face = PvCommunityAuthor(label: _typing ? _field.text : _name.$1, anon: true, seed: _name.$2);

@@ -273,6 +273,8 @@ class _RulesSheet extends StatelessWidget {
             'Moderators remove posts that break these rules. Repeated breaks pause posting for a while.',
             style: cmText(12.5, color: cmP.ink3),
           ),
+          const SizedBox(height: 4),
+          const CommunityGrievanceLine(),
         ]),
       );
 }

@@ -38,6 +38,18 @@ void main() {
     expect(_live(_read('lib/screens/profile/pv_you_content.dart')).join('\n'), isNot(contains('_ttcCommunity()')));
   });
 
+  // IT Rules 2021, Rule 3(2): the grievance officer's name and contact are
+  // shown where members see them (house rules, the room's rules, the report
+  // thank-you). Named by the user 2026-10-28.
+  test('the grievance officer is shown in the community', () {
+    final chrome = _read('lib/screens/community/community_chrome.dart');
+    expect(chrome, contains("kCommunityGrievanceOfficer = 'Deepti Sekhri'"));
+    expect(chrome, contains("kCommunityGrievanceEmail = 'parentvedateam@gmail.com'"));
+    final uses = RegExp(r'CommunityGrievanceLine\(').allMatches(
+        _live(chrome).join(' ') + _live(_read('lib/screens/community/community_room_screen.dart')).join(' '));
+    expect(uses.length, greaterThanOrEqualTo(4), reason: 'house rules, room rules, report thank-you, plus the class');
+  });
+
   test('the app loads the new store, not the old one', () {
     final main = _live(_read('lib/main.dart')).join('\n');
     expect(main, contains('PvCommunityStore.instance.init()'));

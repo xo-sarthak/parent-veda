@@ -174,9 +174,9 @@ while typing, a thread).
 
 ## What the user must do before it is live
 
-1. **Run migrations** `0121_community.sql` then `0122_community_media.sql`
+1. **DONE 2026-10-28.** **Run migrations** `0121_community.sql` then `0122_community_media.sql`
    in the Supabase SQL editor (in order).
-2. **Make yourself a moderator** (Dashboard → SQL, your user id from
+2. **DONE 2026-10-28.** **Make yourself a moderator** (Dashboard → SQL, your user id from
    Authentication → Users):
    `insert into public.community_moderators (user_id, role) values ('<your uid>', 'admin');`
 3. **Verify the helpline numbers** (Tele-MANAS 14416, iCall 9152987821, 112) —
@@ -184,6 +184,12 @@ while typing, a thread).
 4. **Decide who moderates and the reply time** promised in the report
    thank-you ("within 24 hours"), and **name a grievance officer** (India IT
    Rules 2021 for user content) — `docs/BEFORE-LAUNCH.md`.
+   **Grievance officer named 2026-10-28: Deepti Sekhri, parentvedateam@gmail.com,**
+   shown in the app as Rule 3(2) asks: `CommunityGrievanceLine` under the
+   welcome rules, the room's house rules and the report thank-you; a tap opens
+   mail, or copies the address with a toast. Still owed: the takedown process (acknowledge in 24 hours,
+   resolve in 15 days, intimate images down in 24 hours); and who moderates
+   day to day.
 5. **Walk it on the phone with two accounts** (build on your word): A posts
    under the community name with a photo → B sees the text, not the photo →
    approve the photo in Moderation → B sees it → B reports → type "I can't go
@@ -196,7 +202,7 @@ Cost: Supabase plan as is; photos in Storage at launch volume ≈ $0 (₹0).
 ## RESUME HERE (for a fresh session)
 
 - **Phase 1:** committed `9b9dabb9`; the "one place on More" follow-up (decision 11) is in a second commit.
-- **The user's steps** are in "What the user must do" above. Ask which are done before relying on the live database: the migrations, the moderator row, the helplines, the grievance officer.
+- **The user's steps** are in "What the user must do" above. Done on 2026-10-28: the migrations, the moderator row, and the grievance officer named (Deepti Sekhri). The officer's contact is in the app. Still open: the takedown process, the helplines, and the phone walk.
 - **Next is phase 2** (below). Start it in plan mode: a fresh Mobbin pass for each new screen, a prototype before Flutter, and the decision table.
 - **Order suggested:** (1) course and cohort threads with verified experts, (2) birth clubs and follow, (3) search, editing within 15 minutes, and editorial prompt posts.
 - **Read first:** this file, `docs/BACKEND-PATTERNS.md` §16zzd, `supabase/migrations/0121_community.sql`, `lib/services/pv_community_store.dart` and `lib/screens/community/community_chrome.dart`. Don't re-read the 8 superseded screens.
