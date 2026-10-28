@@ -542,6 +542,11 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                     ? null
                     : pregTimeLeft(_daysToDue(_selected)),
                 pastDueCount: pregPastDueCount(_daysToDue(_selected)),
+                // "Month 6 · Second trimester" (relevance Batch 6,
+                // 2026-10-28): only with a real due date and before it.
+                monthLine: pregnancy.isDueDateSet && pregPastDueCount(_daysToDue(_selected)) == null
+                    ? pregMonthLine(_pageWeek(week))
+                    : null,
                 onHowCounted: () => showPregHowWeeksCounted(context, pregnancy),
                 onPastDue: () => openPvDoorRead(context, kPregPastDueReadId, pregnancy),
                 // No due date yet: the week is a placeholder, so the countdown

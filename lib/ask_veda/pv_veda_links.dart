@@ -45,6 +45,8 @@ import 'package:flutter/material.dart';
 
 import '../data/doors/pv_door_data.dart';
 import '../data/reads/pregnancy_reads.dart' show kPregnancyReads, pregnancyReadById;
+import '../data/reads/symptom_reads.dart' show kNormalReadPrefix;
+import '../data/symptoms/symptom_normal.dart' show normalQuestionById;
 import '../localization/app_language.dart';
 import '../screens/belly_skin/bump_ritual_screen.dart';
 import '../data/preg_faqs.dart' show PregFaq, pregFaqById, pregFaqRead, pregFaqReadById;
@@ -258,6 +260,22 @@ _Target? _resolve(String rawId) {
 
   if (id.startsWith(kPvVedaReadPrefix)) {
     final readId = id.substring(kPvVedaReadPrefix.length);
+    // An "Is this normal?" answer (relevance Batch 6, 2026-10-28,
+    // PREGNANCY-GAP 28): `pvread_normal_<id>`, its read's own id. It is not in
+    // `kPregnancyReads` (the answers are adapted, not written), so it opens
+    // as the Symptoms door's own answer card does, on the exact answer.
+    if (readId.startsWith(kNormalReadPrefix)) {
+      final q = normalQuestionById(readId.substring(kNormalReadPrefix.length));
+      return q == null
+          ? null
+          : _Target(_Kind.doorTile,
+              tile: PvDoorEntryTile(
+                title: q.question,
+                blurb: q.question,
+                library: PvDoorLibrary.symptomNormal,
+                entryId: q.id,
+              ));
+    }
     return pregnancyReadById(readId) == null
         ? null
         : _Target(_Kind.read, readId: readId);

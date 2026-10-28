@@ -279,6 +279,11 @@ quote cost in USD and INR first).
   Itching, Telling work, Maternity leave, Twins Finding out. Learn shelves
   follow the tags. Symptoms stays untagged until its content is by trimester.
   Test: `test/preg_door_first_view_test.dart`.
+- **BUILT 2026-10-28 (relevance Batch 6, content):** Symptoms gets its one
+  time-bound section, "Your baby's movements", banded 16 to 30 weeks, so it
+  leads By symptom while she waits for the first flutters; the body areas stay
+  untagged on purpose. That closes the Symptoms part of the OWED line above
+  (Labour and Partner already open by week). Test: `relevance_batch6_test.dart`.
 
 ### 14 · Nutrition door pitches — LIVE (7df4711)
 

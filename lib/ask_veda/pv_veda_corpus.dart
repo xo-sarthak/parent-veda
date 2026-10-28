@@ -38,7 +38,48 @@ import '../localization/app_language.dart';
 import '../models/pv_read.dart';
 import '../services/bracket_resolver.dart' show bracketById;
 import '../data/preg_faqs.dart' show PregFaq, PregFaqSection, kPregFaqsLive;
+import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
+import '../data/reads/symptom_reads.dart' show pvReadFromNormal, pvReadFromSymptom;
+import '../data/symptoms/symptom_library.dart' show symptomById;
+import '../data/symptoms/symptom_normal.dart' show kNormalQuestions;
 import 'pv_veda_links.dart';
+
+/// The words behind a door card, when the card opens a written page of its
+/// own (relevance Batch 6, 2026-10-28).
+///
+/// ⚠️ A CARD'S BLURB IS NOT ITS PAGE. A symptom card on the Symptoms door was
+/// exported as its one-line blurb ("Very common. Most women have more
+/// discharge"), so Ask Veda never saw the page behind it: which colours mean
+/// calling today, which cramps mean hospital, and every "when to call your
+/// doctor" line. The app said it and Ask Veda could not. The whole page now
+/// rides under the card's existing id, so the card she taps still opens the
+/// same page and the resolver needs no change.
+///
+/// Symptom pages only for now. Scans, conditions, findings and the nutrition
+/// libraries are the same shape, and are recorded as owed in PREGNANCY-GAP.
+String? pvVedaEntryPageBody(PvDoorTile t) {
+  if (t is! PvDoorEntryTile) return null;
+  if (t.library == PvDoorLibrary.symptom) {
+    final s = symptomById(t.entryId);
+    return s == null ? null : pvVedaReadBody(pvReadFromSymptom(s));
+  }
+  return null;
+}
+
+/// What the Symptoms door's own document says about its "Is this normal?"
+/// tab: the questions only (relevance Batch 6, 2026-10-28). Each answer is
+/// its own document (`pvread_normal_<id>`, below), which opens on that exact
+/// answer. Kept for revert, the first build, before the resolver knew those
+/// ids: every answer's whole text written into this one document.
+///
+/// ⚠️ ONE TEXT, ONE DOCUMENT. With the answers in both places, a question
+/// would match two chunks of the same words, and the door would crowd out
+/// the answer it points to.
+String pvVedaNormalAnswersBody() => _join([
+      'Is this normal? The questions mothers ask most, each answered on the '
+          "door's Is this normal? tab:",
+      _join([for (final q in kNormalQuestions) '- ${q.question}'], sep: '\n'),
+    ]);
 
 /// The corpus domain: the same one the older pregnancy documents use, so a
 /// pregnancy question (scoped to this domain by the service) finds both.
@@ -149,6 +190,22 @@ List<Map<String, dynamic>> buildPregnancyVedaCorpus() {
     }
   }
 
+  // ---- the "Is this normal?" answers (relevance Batch 6, 2026-10-28) -----------------
+  // Adapted reads, not in `kPregnancyReads`, so they are added here, each under
+  // its read's own id (`pvread_normal_<id>`), which `pv_veda_links.dart` opens
+  // on the exact answer. The question leads the body, because only the body is
+  // embedded and a question matches a question best.
+  for (final q in kNormalQuestions) {
+    final r = pvReadFromNormal(q);
+    out.add(_doc(
+      docId: pvVedaReadId(r.id),
+      kind: 'pvread',
+      title: q.question,
+      body: _join([q.question, pvVedaReadBody(r)]),
+      keywords: const ['Symptoms', 'Is this normal?'],
+    ));
+  }
+
   // ---- the FAQ Library (2026-10-13) ---------------------------------------------------
   // The user's Ask Veda FAQ Library, as KNOWLEDGE: the AI reads each one as fact
   // and writes the answer fresh for where she is (lib/data/preg_faqs.dart). The
@@ -196,6 +253,7 @@ List<Map<String, dynamic>> buildPregnancyVedaCorpus() {
             ], sep: '\n'),
         ],
         page.closingLine,
+        if (page.bracketId == kSymptomsBracketId) pvVedaNormalAnswersBody(),
       ]),
     ));
 
@@ -214,6 +272,7 @@ List<Map<String, dynamic>> buildPregnancyVedaCorpus() {
             if (t.meta != null) t.meta,
             'Find it in the app: $doorName, ${tabLabel(section.group)}'
                 '${section.heading.isEmpty ? '' : ', ${section.heading}'}.',
+            pvVedaEntryPageBody(t),
           ]),
           keywords: t.keywords,
         ));

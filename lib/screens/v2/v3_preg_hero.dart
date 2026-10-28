@@ -180,7 +180,15 @@ class V3PregHero extends StatefulWidget {
     this.estimateLine,
     this.onAddDueDate,
     this.footer,
+    this.monthLine,
   });
+
+  /// "Month 6 · Second trimester", under the weeks and days (relevance Batch
+  /// 6, 2026-10-28). The stage's most-searched question is which month and
+  /// trimester a week is, and families count in months while the hero counts
+  /// in weeks. Null draws nothing: no due date (the week is a stand-in) or
+  /// past the due date (the line under the week already says how far).
+  final String? monthLine;
 
   final V2Palette p;
   final int week;
@@ -453,6 +461,12 @@ class _V3PregHeroState extends State<V3PregHero> {
                       if ((widget.pastDueCount ?? daysLine) case final s?)
                         Text(s,
                             style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.ink2)),
+                      if (widget.monthLine case final m?) ...[
+                        const SizedBox(height: 2),
+                        Text(m,
+                            key: const ValueKey('preg_hero_month_line'),
+                            style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                      ],
                       if (widget.estimateLine != null) ...[
                         const SizedBox(height: 3),
                         // Its own tap target, like the time left: it must not

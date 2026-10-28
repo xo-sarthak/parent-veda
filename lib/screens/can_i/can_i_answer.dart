@@ -15,6 +15,9 @@ import 'package:share_plus/share_plus.dart';
 import '../../data/can_i_data.dart';
 import '../../data/can_i_groups.dart';
 import '../../data/reads/can_i_read.dart';
+import '../../data/reads/pregnancy_reads.dart' show pregnancyReadById;
+import '../../models/pv_read.dart' show PvRead;
+import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../../models/can_i_entry.dart';
 import '../../services/can_i_activity_store.dart';
 import '../../services/pregnancy_controller.dart';
@@ -67,14 +70,17 @@ class CanIAnswerReader extends StatelessWidget {
         PvCanIDoctorBlock b => _DoctorView(block: b),
         _ => const SizedBox.shrink(),
       },
-      resolveRead: (id) {
-        if (!id.startsWith(kCanIReadPrefix)) return null;
-        final e = canIById(id.substring(kCanIReadPrefix.length));
-        return e == null ? null : pvReadFromCanI(e, week: week);
-      },
+      // Another answer first, then a door's guide (`kCanIGuideReads`,
+      // relevance Batch 6, 2026-10-28). Kept for revert: the two branches
+      // without the pregnancy-read fallbacks.
+      resolveRead: (id) => canIResolveRead(id, week: week),
       openRead: (context, id) {
-        final e = canIById(id.substring(kCanIReadPrefix.length));
-        if (e != null) openCanIAnswer(context, e, controller);
+        if (id.startsWith(kCanIReadPrefix)) {
+          final e = canIById(id.substring(kCanIReadPrefix.length));
+          if (e != null) openCanIAnswer(context, e, controller);
+          return;
+        }
+        openPvDoorRead(context, id, controller);
       },
       openAction: (context, action) => switch (action) {
         'cani_share' => shareCanIAnswer(entry, week: week),
@@ -87,6 +93,16 @@ class CanIAnswerReader extends StatelessWidget {
       },
     );
   }
+}
+
+/// A Read next id on an answer: another answer (`cani_…`), or a door's guide
+/// in the pregnancy library. Null opens nothing, and the reader drops the card.
+PvRead? canIResolveRead(String id, {int? week}) {
+  if (id.startsWith(kCanIReadPrefix)) {
+    final e = canIById(id.substring(kCanIReadPrefix.length));
+    return e == null ? null : pvReadFromCanI(e, week: week);
+  }
+  return pregnancyReadById(id);
 }
 
 /// The answer as a message. The verdict, the short answer, her-week note,

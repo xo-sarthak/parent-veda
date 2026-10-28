@@ -64,6 +64,7 @@ import 'pregnancy_reads_first.dart';
 import 'pregnancy_reads_ready.dart';
 import 'pregnancy_reads_twins.dart';
 import 'pregnancy_reads_work.dart';
+import 'pregnancy_reads_symptoms.dart';
 import 'pregnancy_reads_weekly_b.dart';
 import 'pregnancy_reads_weekly_c.dart';
 import 'pregnancy_reads_weekly_d.dart';
@@ -76,6 +77,7 @@ export 'pregnancy_reads_first.dart';
 export 'pregnancy_reads_ready.dart';
 export 'pregnancy_reads_twins.dart';
 export 'pregnancy_reads_work.dart';
+export 'pregnancy_reads_symptoms.dart';
 export 'pregnancy_reads_nutrition.dart';
 export 'pregnancy_reads_scans.dart';
 export 'pregnancy_reads_weekly_a.dart';
@@ -104,6 +106,8 @@ final List<PvRead> kPregnancyReads = [
   // For partners (2026-09-30): opened from the For partners door (his side).
   ...kPregnancyReadsPartner,
   ...kPregnancyReadsWork,
+  // The Symptoms door's own reads (relevance Batch 6, 2026-10-28).
+  ...kPregnancyReadsSymptoms,
   // The weekly reads, written out 2026-09-18 — see pregnancy_reads_weekly_a.
   ...kPregnancyReadsWeeklyA,
   ...kPregnancyReadsWeeklyB,

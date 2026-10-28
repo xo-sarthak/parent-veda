@@ -162,6 +162,15 @@ const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
           blurb: 'Every test usually ordered, and what each one looks for.',
           readId: 'ttc_read_ivf_workup',
         ),
+        // Relevance Batch 6 (2026-10-28, TTC-GAP 20): AMH is in the first
+        // check, so the result is read where the check is.
+        TtcArticleTile(
+          title: 'A low AMH result',
+          id: 'ttc_tile_a_low_amh_result',
+          blurb: "What the number counts, and what it can't tell anyone.",
+          readId: 'ttc_read_low_amh',
+          keywords: ['AMH', 'low AMH', 'ovarian reserve'],
+        ),
         TtcArticleTile(
           title: 'Words your clinic uses',
           id: 'ttc_tile_words_your_clinic_uses',

@@ -445,6 +445,38 @@ for every question anyone had already asked.
 until the next incremental ingest runs from `C:\Projects\parentveda-askveda`
 it can still quote the old wording. Nothing in the wire body changed.
 
+### Relevance Batch 6: new reads, and symptom pages Ask Veda could not see (2026-10-28)
+
+Six new reads (three Pregnancy, three TTC, `docs/door-relevance/README.md` Batch 6) are in the lists the two
+exports already walk (`kPregnancyReads`, `kTtcReads`), so they need no exporter change. One exporter change did
+matter: **a door card's document was its one-line blurb, not the page behind it.** Every Symptoms door card went
+to Ask Veda as "Very common. Most women have more discharge…" and nothing else, so the page's colours, smells and
+"call today if" lines never reached the service. The app told her which discharge means calling today, and
+Ask Veda could not. `pvVedaEntryPageBody` (`pv_veda_corpus.dart`) now writes the whole symptom page into the
+card's document, under the id it already had, and each of the 11 "Is this normal?" answers is its own
+document (`pvread_normal_<id>`) that opens on that exact answer; the door's document lists the questions only,
+so the same words are never indexed twice. The lesson travels: **an index of titles and blurbs answers "where is it", not "what does it
+say".** A retrieval corpus has to carry the words the answer depends on, the safety lines most of all. The same
+gap remains for the other library cards (PREGNANCY-GAP 27).
+
+**Why the same ids, not new ones:** the ids are a contract with the resolver (`pv_veda_links.dart`), and a
+document whose id does not resolve is an answer card that does nothing. Reusing the card's id means the card
+she taps in Ask Veda opens the same page as before; nothing on the resolver side moves. The "Is this normal?" answers
+were the exception: they are adapted, not in `kPregnancyReads`, so `pv_veda_links.dart` gained one branch for
+`pvread_normal_` (after Terminal B's P2, 01f33b1, freed the file).
+
+**No service change** (no new field, no new kind). **The user runs, in order:**
+1. `flutter test tool/export_pregnancy_corpus.dart`, then in `C:\Projects\parentveda-askveda`:
+   `python -m ingest.import_corpus C:/Projects/parentveda/build/pregnancy_corpus.json --prune-prefix pv`
+   (never a plain `--prune`).
+2. `flutter test tool/export_ttc_corpus.dart`, then
+   `python -m ingest.import_corpus C:/Projects/parentveda/build/ttc_corpus.json` (adds and updates only).
+3. `python -m ingest.ingest` (incremental: only the new and changed chunks are embedded, on the laptop, so
+   $0 / ₹0).
+4. Clear the cached answers for both stages (the pregnancy and `ttc:` buckets in `veda_cache`). A cache is only
+   right while what it was built from is unchanged: an AMH or discharge question answered before the ingest
+   (including a "no answer" or a web answer) would otherwise keep being served.
+
 ## Ask Veda answers for the profile on screen, and after a loss (2026-10-25)
 
 STAGE-TRANSITIONS F8 and R3. Two app fields, landed in both repos at once (the wire body is a two-repo contract;

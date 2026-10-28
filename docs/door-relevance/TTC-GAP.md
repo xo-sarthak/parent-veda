@@ -126,11 +126,11 @@ The fix is guidance in each door's own voice, never a Q&A list.
 | 10, 23, 49 | Cervical mucus as a sign of ovulation | Only "Is my discharge normal?" | Conceiving > When and how |
 | 13, 18, 29, 36 | Basal body temperature | One carousel card (`ttc_focus_conceiving.dart:222`) | Body and cycle |
 | 17, 19, 28, 40 | Ovulation tests: positive if pregnant? how many days? | Only "Do ovulation kits help?" | Conceiving |
-| 15, 45 | Low AMH | A glossary line (`ttc_focus_ivf.dart:377-379`) | IVF > Understand |
-| 35, 41, 48, 51 | IUI / IVF success, failure, timing | Partial | IVF |
-| 39, 46 | Twins, IVF twins | **None** | IVF |
-| 4 | Conceiving after 35 | Hidden in IVF > Age | Conceiving / Getting ready |
-| 33 | Sperm count and age | Partial | His side |
+| 15, 45 | Low AMH | ~~A glossary line~~ **DONE (Batch 6, 2026-10-28):** "A low AMH result: what it measures, and what it does not" (`ttc_read_low_amh`), IVF › Understand (with the clinic's tests) and Not yet › What will a fertility check test? Carries the cut myth card's facts | IVF > Understand |
+| 35, 41, 48, 51 | IUI / IVF success, failure, timing | ~~Partial~~ **DONE (Batch 6):** "When treatment hasn't worked yet: what the next plan can look like" (`ttc_read_when_rounds_dont_work`), in "The wait, and after the result", which lifts from a result and between rounds. Success rates were already covered by "How to read a clinic's success rate" | IVF |
+| 39, 46 | Twins, IVF twins | ~~None~~ **DONE (Batch 6):** "Twins after fertility treatment, and why clinics often transfer one embryo" (`ttc_read_ivf_twins`), IVF › Understand. The legal embryo limit is stated as "usually one or two" until a clinician confirms it (BEFORE-LAUNCH) | IVF |
+| 4 | Conceiving after 35 | ~~Hidden in IVF > Age~~ **DONE (Batch 6):** the existing reads (after 35, after 40) linked in a new Conceiving › When and how section, "Does age change how we try?". No age lift: it would need its own "why you're seeing this" line | Conceiving / Getting ready |
+| 33 | Sperm count and age | **ALREADY COVERED (re-checked in Batch 6):** "Does his age matter" (`ttc_read_his_age`) is a tile on His side and on Not yet | His side |
 
 Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5, 37), implantation bleeding (8, 11), when to see a doctor (26).
 
@@ -162,7 +162,7 @@ Already covered: miscarriage and trying again (2, 7, 9), folic acid (3), PCOS (5
 17. ~~Yoga ignores a round and a loss.~~ **DONE (Batch 4, 2eb7a77):** during a running round or after a recent loss: the waiting days' gentle practice, a line saying why, no Fertility yoga rail.
 18. ~~No search ranks by phase.~~ **DONE (Batch 4, 2eb7a77):** `ttcStageSearch`: on a tie, hits come in the order of their doors on her home (`ttcHomeDoorOrderNow`), and the sort is now stable.
 19. ~~Window messages restart straight after a loss.~~ **ALREADY DONE (found in Batch 1):** `lastPeriodStart` is null after a loss until her first new period (`cycle_store.dart:161-166`, 2026-10-24), so the window and its message stay quiet. The helper misread it. *Fix:* hold them until the first period after the loss.
-20. **PART DONE (Batch 3, 2026-10-27):** the cycle read covers ranks 1, 10/23/49, 13/18/29/36 and 17/19/28/40. Still owed (Batch 6): low AMH, IVF twins, IUI or IVF failure, conceiving after 35, sperm and age. Was: The demand gaps in section 4. *Fix:* one section each in the door that owns it.
+20. **DONE (Batch 6, 2026-10-28):** low AMH, IVF twins and treatment that has not worked are three new reads on the IVF door (AMH also on Not yet); conceiving after 35 is linked on Conceiving; sperm and age was already on His side. Test: `relevance_batch6_test.dart`. Was **PART DONE (Batch 3, 2026-10-27):** the cycle read covers ranks 1, 10/23/49, 13/18/29/36 and 17/19/28/40. Still owed (Batch 6): low AMH, IVF twins, IUI or IVF failure, conceiving after 35, sperm and age. Was: The demand gaps in section 4. *Fix:* one section each in the door that owns it.
 
 **Polish**
 21. `ttcDoorVideosFirst` drops tags. *Fix:* use `s.withTiles`.

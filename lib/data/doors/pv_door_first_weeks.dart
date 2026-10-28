@@ -180,6 +180,14 @@ final PvDoorPage kFirstWeeksDoor = PvDoorPage(
           blurb: 'How it is counted, and why a scan date comes first.',
           readId: 'preg_first_read_due_date',
         ),
+        // Relevance Batch 6 (2026-10-28, PREGNANCY-GAP §4): the stage's
+        // most-searched question, which month and trimester a week is.
+        PvDoorGuideTile(
+          title: 'Weeks, months and trimesters',
+          blurb: 'Which month any week falls in, and where each trimester '
+              'begins.',
+          readId: 'preg_first_read_counting',
+        ),
         PvDoorToolTile(
           title: 'Due date calculator',
           blurb: 'From your last period, a scan, an IVF transfer or your '

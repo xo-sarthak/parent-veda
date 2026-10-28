@@ -86,6 +86,20 @@ LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 String canIIndianHeading(CanICategory c) =>
     c == CanICategory.eat || c == CanICategory.drink ? 'In an Indian kitchen' : 'In India';
 
+/// An answer whose subject has a whole guide on a door, by entry id, to the
+/// guide's read id (relevance Batch 6, 2026-10-28).
+///
+/// ⚠️ AN ANSWER IS TWO LINES; SOME QUESTIONS NEED A PAGE. "Can I fly?" gets
+/// its verdict here, but "how do I plan the trip home for the birth" is the
+/// Getting ready door's travel guide. The answer ends with it, first under
+/// Read next. `can_i_answer.dart` opens it as a pregnancy read, and
+/// `test/relevance_batch6_test.dart` holds that every id here resolves, so a
+/// missing guide fails the build instead of becoming a silent tap.
+const Map<String, String> kCanIGuideReads = {
+  'flight_travel': 'preg_ready_read_travel',
+  'long_travel': 'preg_ready_read_travel',
+};
+
 PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
   final swaps = canIInsteadOf(e);
   final swapIds = {for (final s in swaps) s.id};
@@ -136,6 +150,8 @@ PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
     ),
     faqs: const [],
     readNext: [
+      // The full guide first, where one is written (relevance Batch 6).
+      ?kCanIGuideReads[e.id],
       for (final id in e.related)
         if (!swapIds.contains(id)) '$kCanIReadPrefix$id',
     ],

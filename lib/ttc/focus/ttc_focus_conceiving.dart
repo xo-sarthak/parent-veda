@@ -482,6 +482,31 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
       ],
     ),
 
+    // Relevance Batch 6 (2026-10-28, TTC-GAP 20, search rank 4): "trying
+    // after 35" was written but sat only on the IVF and Not yet doors, so a
+    // woman of 36 trying at home met it only once she was already worried.
+    // The same reads, linked where she tries. No age lift: a lift would need
+    // its own "why you're seeing this" line, and the section is short.
+    TtcFocusSection(
+      heading: 'Does age change how we try?',
+      group: 'trying',
+      tiles: [
+        TtcArticleTile(
+          title: 'Trying after 35',
+          id: 'ttc_tile_trying_after_35',
+          blurb: "What changes, what doesn't, and why the advice is to ask "
+              'after six months.',
+          readId: 'ttc_read_age_after_35',
+        ),
+        TtcArticleTile(
+          title: 'Trying after 40',
+          id: 'ttc_tile_trying_after_40',
+          blurb: 'An honest look, and why seeing a doctor now helps.',
+          readId: 'ttc_read_age_after_40',
+        ),
+      ],
+    ),
+
     // -------------------------------------------------------------------------
     //  Waiting and testing — the gap plan's P1 tab (2026-09-26)
     // -------------------------------------------------------------------------

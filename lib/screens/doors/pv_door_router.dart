@@ -250,7 +250,15 @@ String? pvDoorGarbhPhotoKey(PvDoorTile t) {
 
 String? pvDoorTilePhoto(PvDoorTile t) {
   if (pvDoorTileReadImageId(t) case final id?) {
-    if (readImageFor(id) case final url?) return url;
+    // The read's own photo counts too (relevance Batch 6, 2026-10-28), as it
+    // does on the TTC doors (`photoForTile`) and in the reader's header: the
+    // card she taps shows the picture she lands on. A new read can then
+    // reuse a photo already mirrored and credited, without a second copy
+    // under its own id. No read set `imageUrl` before this, so no existing
+    // card changes. Kept for revert: if (readImageFor(id) case final url?)
+    if (readImageFor(id, own: pregnancyReadById(id)?.imageUrl) case final url?) {
+      return url;
+    }
   }
   // ⚠️ GARBH SANSKAR: ONE PICTURE PER TILE, KEYED BY WHERE IT GOES
   // (2026-09-23). Tracks, affirmations, shelves, games and the relaxations

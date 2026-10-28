@@ -353,6 +353,16 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
               'charged for anyway.',
           readId: 'ttc_read_ivf_icsi',
         ),
+        // Relevance Batch 6 (2026-10-28, TTC-GAP 20): twins after treatment
+        // had nothing on any door (search ranks 39, 46).
+        TtcArticleTile(
+          title: 'Twins after treatment, and one embryo at a time',
+          id: 'ttc_tile_twins_after_treatment',
+          blurb: 'Why twins are more likely, why clinics often transfer one '
+              'embryo, and what to ask first.',
+          readId: 'ttc_read_ivf_twins',
+          keywords: ['twins', 'two embryos', 'single embryo transfer', 'SET'],
+        ),
       ],
     ),
 
@@ -376,6 +386,16 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
           blurb: 'Every test usually ordered in a first round, and what each '
               'one is trying to find out.',
           readId: 'ttc_read_ivf_workup',
+        ),
+        // Relevance Batch 6 (2026-10-28, TTC-GAP 20): the AMH result had a
+        // glossary line only (search ranks 15, 45).
+        TtcArticleTile(
+          title: 'A low AMH result',
+          id: 'ttc_tile_a_low_amh_result',
+          blurb: "What the number counts, what it can't tell anyone, and what "
+              'a clinic does with it.',
+          readId: 'ttc_read_low_amh',
+          keywords: ['AMH', 'low AMH', 'ovarian reserve', 'egg reserve'],
         ),
         TtcArticleTile(
           // Kept for revert (2026-09-28, explicit names): title: 'His side of the tests',
@@ -826,6 +846,17 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
           id: 'ttc_tile_when_the_test_is_negative_after_treatment',
           blurb: 'The next few weeks, for your body and for the two of you.',
           readId: 'ttc_read_tx_negative_after_treatment',
+        ),
+        // Relevance Batch 6 (2026-10-28, TTC-GAP 20): after one round or
+        // several, what can change (search ranks 35, 41, 48, 51). Here, so
+        // it leads with this section from a result onwards.
+        TtcArticleTile(
+          title: "When treatment hasn't worked yet",
+          id: 'ttc_tile_when_treatment_hasn_t_worked_yet',
+          blurb: 'What a clinic looks at, when IUI gives way to IVF, and which '
+              'extras have evidence.',
+          readId: 'ttc_read_when_rounds_dont_work',
+          keywords: ['failed IVF', 'failed IUI', 'IVF failure', 'add-ons'],
         ),
         TtcArticleTile(
           title: 'Your review appointment',

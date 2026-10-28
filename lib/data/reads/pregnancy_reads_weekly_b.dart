@@ -174,7 +174,14 @@ final List<PvRead> kPregnancyReadsWeeklyB = [
     evidence: _en('NICE NG201 Antenatal care (2021); RCOG Green-top '
         'Guideline 57 on reduced fetal movements; Tommy\'s / Sleep on Side '
         'evidence summary (2019); FOGSI antenatal schedule.'),
-    readNext: ['${kPregWeekReadPrefix}anomaly_scan', '${kPregWeekReadPrefix}back_pain'],
+    // The movements guide first (relevance Batch 6, 2026-10-28): weeks 18 to
+    // 22 are when most women first feel their baby, and this read only had a
+    // paragraph on it. Kept for revert: the two ids without it.
+    readNext: [
+      'preg_sym_read_movements',
+      '${kPregWeekReadPrefix}anomaly_scan',
+      '${kPregWeekReadPrefix}back_pain',
+    ],
   ),
 
   // ---------------------------------------------------------------------------

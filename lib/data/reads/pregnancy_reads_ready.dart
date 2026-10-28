@@ -1955,6 +1955,190 @@ final List<PvRead> kPregnancyReadsReady = [
       'preg_ready_read_naming_customs',
     ],
   ),
+
+  // ---------------------------------------------------------------------------
+  //  Travelling while pregnant (relevance Batch 6, 2026-10-28)
+  // ---------------------------------------------------------------------------
+  //  PREGNANCY-GAP §4 (search ranks 22, 30, 38): travel and flying by
+  //  trimester had two Is it safe? entries and no guide. It lives on Home and
+  //  help, under "The last months", beside the move to her mother's home that
+  //  most Indian travel in pregnancy is about (the user's choice). The two
+  //  Is it safe? entries link here, so a search for "flight" at week 14 still
+  //  lands on it, and so does Ask Veda.
+  //
+  //  ⚠️ AIRLINE RULES ARE STATED AS "OFTEN" AND SENT TO THE AIRLINE. They
+  //  change, and differ by airline; a date here would go stale silently.
+  PvRead(
+    id: 'preg_ready_read_travel',
+    hue: _hue,
+    // An existing licensed photo (CC0, credited in read_images.dart under
+    // cani_flight_travel): the view from a plane window. It is on no card of
+    // this door.
+    imageUrl:
+        'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/cani_flight_travel.jpg',
+    kicker: _kHome,
+    title: _en('Travelling while pregnant, from short trips to going home '
+        'for the birth'),
+    teaser: _en("Trains, roads and flights month by month, what to carry, and "
+        "planning the move to your mother's home."),
+    shortAnswer: _en("Travel is usually fine in a healthy pregnancy, and the "
+        "middle months are the easiest time for it. Carry your antenatal "
+        "file, walk and drink water on long trips, and wear a seatbelt below "
+        "your bump. Airlines often ask for a doctor's letter later on and "
+        "stop flying pregnant women at about 36 weeks, earlier with twins. "
+        "Check with your doctor before any long trip."),
+    scaleSetter: _en("Most trips in pregnancy go without a problem. What makes "
+        "the difference is planning: knowing where the nearest hospital is, "
+        "having your papers with you, and not leaving a long trip to the last "
+        "few weeks."),
+    author: _desk,
+    authorRole: _deskRole,
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en("Pregnant women in India travel all the time: to work, to "
+              "weddings, to the village, and very often to their mother's home "
+              "for the birth. You don't have to stay put for nine months."),
+          _en("This page goes through each kind of travel, what to carry, "
+              "and how to plan the bigger move home, so a trip is one less "
+              "thing to think about."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Which months are easiest?'),
+        paragraphs: [
+          _en("In the first three months, sickness and tiredness can make "
+              "travel hard work. Travel itself does not cause a miscarriage, "
+              "but it helps to know where you could get care if you had "
+              "bleeding or pain far from home."),
+          _en("The middle months, roughly weeks 14 to 27, are usually the "
+              "easiest. The sickness has often settled and your bump is still "
+              "comfortable to carry around."),
+          _en("From about 28 weeks, long trips get tiring, feet swell, and "
+              "you'll want to be near the hospital where you plan to give "
+              "birth. After 36 weeks, most doctors suggest staying close to "
+              "it."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Trains and buses'),
+        paragraphs: [
+          _en("Ask for a lower berth when you book a train. Indian Railways "
+              "sets some aside for pregnant women, and the counter may ask to "
+              "see a note from your doctor. A lower berth saves you the climb "
+              "and makes toilet trips easier."),
+          _en("Get up and walk the corridor every hour or two, and move your "
+              "feet and ankles while you sit. Long buses on rough roads are "
+              "harder on the body: sit near the front, where the ride is "
+              "smoother, and ask for stops."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Cars, autos and two-wheelers'),
+        paragraphs: [
+          _en("In a car, wear the seatbelt every time. The lap strap goes low, "
+              "across your hips and under your bump, and the shoulder strap "
+              "goes between your breasts and to the side of your bump. Never "
+              "put the belt across the bump itself. Leave the airbags on."),
+          _en("On a long drive, stop every hour and a half to two hours to "
+              "walk and stretch. Bumpy roads in an auto are uncomfortable but "
+              "not harmful."),
+          _en("Later in pregnancy, avoid riding pillion on rough or busy "
+              "roads. The bumps are not the worry; a fall is."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Flying'),
+        paragraphs: [
+          _en("Flying is safe in a healthy pregnancy. Airport scanners and "
+              "the radiation on a flight are far too small to affect your "
+              "baby."),
+          _en("Long flights make blood clots in the legs more likely, so take "
+              "an aisle seat, walk every hour or so, drink water, and flex "
+              "your ankles in your seat. Ask your doctor about compression "
+              "stockings for a flight of more than four hours."),
+          _en("Airlines set their own rules. Many ask for a fitness-to-fly "
+              "letter from your doctor from about 28 weeks, written a few days "
+              "before you fly, and stop carrying pregnant women from about 36 "
+              "weeks, or 32 weeks with twins. Check the airline's own page "
+              "before you book, and carry the letter."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What to carry'),
+        bullets: [
+          _en('Your antenatal file or MCP card, and your latest scan and blood '
+              'reports.'),
+          _en("Your doctor's phone number, and the name of a hospital near "
+              "where you're going."),
+          _en('Your tablets, in their packets, with a list of what you take.'),
+          _en('Water, a few snacks, a shawl, loose shoes for swollen feet, and '
+              'a couple of pads.'),
+        ],
+        tip: PvReadTip(
+          title: _en('Going somewhere with dengue or malaria?'),
+          body: _en("Ask your doctor before you go, and pack a pregnancy-safe "
+              "mosquito repellent. Fever in pregnancy always needs a doctor."),
+        ),
+      ),
+      PvReadSection(
+        heading: _en("Going to your mother's home for the birth"),
+        paragraphs: [
+          _en("Many women move to their mother's home for the last months and "
+              "the first weeks after the birth. It works best when it is "
+              "planned well before the last few weeks."),
+        ],
+        bullets: [
+          _en('Ask your doctor when to travel. Many families aim for the '
+              'seventh month or early in the eighth, before 32 to 34 weeks.'),
+          _en('Choose the hospital there early, visit it, and register if you '
+              'can. Check how long it takes to reach at night.'),
+          _en('Ask your doctor for a written summary: your blood group, '
+              'tests, scans, tablets and anything to watch.'),
+          _en('Plan how you will get there, and how you would get to hospital '
+              'from there, at any hour.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('On any trip, get to a doctor or hospital straight away if'),
+      body: _en("You have bleeding or fluid leaking from your vagina, strong "
+          "tummy pain or regular tightenings, your baby moving less than "
+          "usual, a severe headache with blurred vision, or a painful, swollen "
+          "leg or sudden breathlessness, which can mean a clot. Call 108 if "
+          "you can't get there safely."),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Can airport scanners harm my baby?'),
+        answer: _en("No. The body scanners and the bag machines are safe to "
+            "walk through or stand near at any stage of pregnancy."),
+      ),
+      PvReadFaq(
+        question: _en('Is it safe to travel in the first three months?'),
+        answer: _en("Yes, for most women. Travel does not cause a miscarriage. "
+            "It's more about comfort, and knowing where you could get care."),
+      ),
+      PvReadFaq(
+        question: _en("How late can I travel to my mother's home?"),
+        answer: _en("Ask your doctor, who knows your pregnancy. Many families "
+            "travel in the seventh month or early in the eighth, so you can "
+            "settle in and register with a hospital there before the last "
+            "weeks."),
+      ),
+    ],
+    evidence: _en('RCOG Scientific Impact Paper 1, Air travel and pregnancy '
+        '(2013) · NHS, Travelling in pregnancy · ACOG Committee Opinion 746, '
+        'Air travel during pregnancy (2018) · Indian Railways lower-berth '
+        'quota for pregnant women · Airline rules change: always check with '
+        'the airline before booking.'),
+    readNext: [
+      'preg_ready_read_last_months',
+      'preg_ready_read_help',
+    ],
+  ),
 ];
 
 /// A read in this file by id, or null.

@@ -378,12 +378,16 @@ void main() {
       //   'When should you test, and how?', 'What if the test says no?',
       //   'The questions that are hard to ask', 'What he should do',
       //   'What you should do'.
+      // ⚠️ 2026-10-28 (relevance Batch 6, TTC-GAP 20): "Does age change how
+      // we try?" links the after-35 and after-40 reads where she tries, last
+      // in the trying tab. Kept for revert: the list without it.
       expect(page.sections.map((s) => s.heading).toList(), [
         'When should we have sex?',
         'How often should we have sex?',
         'Positions, lying down and other myths',
         'Does stress stop pregnancy?',
         'How does conception happen?',
+        'Does age change how we try?',
         'What happens in the two weeks after ovulation?',
         'When and how should you take a pregnancy test?',
         'What if the pregnancy test says no?',

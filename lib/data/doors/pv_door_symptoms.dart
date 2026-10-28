@@ -30,6 +30,7 @@ import 'package:flutter/material.dart' show Icons;
 import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../reads/read_images.dart' show readImageFor;
 import '../symptoms/symptom_library.dart';
+import 'preg_band.dart';
 import 'pv_door_data.dart';
 
 const String kSymptomsBracketId = 'pregnancy_symptoms';
@@ -188,6 +189,26 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
             ),
         ],
       ),
+
+    // Relevance Batch 6 (2026-10-28, PREGNANCY-GAP §4): when movements start
+    // and how to learn their pattern. Not a symptom, so not in an area: its
+    // own section, banded 16 to 30 weeks so it leads this tab while she waits
+    // for the first flutters and learns the pattern, and keeps its place
+    // after the areas the rest of the time.
+    PvDoorSection(
+      group: kSymTabLibrary,
+      heading: "Your baby's movements",
+      weeks: const PregBand(16, 30),
+      tiles: [
+        PvDoorGuideTile(
+          title: 'From first flutters to a pattern',
+          blurb: "When you'll first feel your baby, and how to learn the "
+              'pattern that is normal for them.',
+          readId: 'preg_sym_read_movements',
+          meta: 'From 16 weeks',
+        ),
+      ],
+    ),
 
     // ---- Your week ------------------------------------------------------------------
     PvDoorSection(

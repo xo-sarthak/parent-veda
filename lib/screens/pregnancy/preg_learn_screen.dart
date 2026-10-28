@@ -180,12 +180,19 @@ List<PregLearnTopic> pregLearnTopics({int? week}) {
 
 /// "Pregnancy 101": the reads to begin with, in order, from the first test to
 /// the signs of labour. Ids, not copies, so each one is the door's own read.
+///
+/// Relevance Batch 6 (2026-10-28): how weeks become months and trimesters,
+/// after the due date, and the movements read before "moves less", so the
+/// course teaches the pattern before the warning. Kept for revert: the
+/// seven ids without those two.
 const List<String> kPregLearnStartIds = [
   'preg_first_read_this_week',
   'preg_first_read_due_date',
+  'preg_first_read_counting',
   'preg_scan_read_first_visit',
   'preg_diet_read_add_now',
   'preg_week_read_managing_nausea',
+  'preg_sym_read_movements',
   'preg_cond_read_less_movement',
   'preg_labour_read_signs_near',
 ];

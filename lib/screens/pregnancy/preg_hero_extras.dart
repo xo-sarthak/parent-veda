@@ -33,6 +33,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../data/preg_week_extras.dart' show pregMonthFor, pregTrimesterFor;
 import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/remote/cloud_merged_store.dart';
@@ -40,6 +41,7 @@ import '../../services/remote/cloud_merged_store.dart';
 import '../../services/stage_gateway.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
+import '../doors/pv_door_router.dart' show openPvDoorRead;
 import '../profile/pv_you_sheets.dart' show showPvAddChildSheet;
 import '../v2/pv_celebration.dart' show openBirthCelebration;
 import '../v2/v2_palette.dart';
@@ -47,6 +49,10 @@ import 'preg_chrome.dart' show pregFilledStyle;
 
 /// The read "Past your due date" opens (the Labour door's own).
 const String kPregPastDueReadId = 'preg_labour_read_past_due';
+
+/// The read "How your weeks are counted" opens (Your first weeks door's own,
+/// relevance Batch 6).
+const String kPregCountingReadId = 'preg_first_read_counting';
 
 /// Days past the due date from which the arrival card says more: 42 weeks
 /// and 0 days (R7).
@@ -108,6 +114,12 @@ String? pregPastDueCount(int daysToDue) {
   return '$weeks weeks and ${days == 1 ? '1 day' : '$days days'}';
 }
 
+/// "Month 6 · Second trimester" for [week] (relevance Batch 6, 2026-10-28),
+/// from the same two functions the week page prints, so the hero and the
+/// page can never disagree.
+String pregMonthLine(int week) =>
+    'Month ${pregMonthFor(week)} · ${pregTrimesterFor(week)}';
+
 /// "How your weeks are counted": the (i) after the time left.
 Future<void> showPregHowWeeksCounted(BuildContext context, PregnancyController c) {
   final p = V2PaletteStore.instance.current;
@@ -133,10 +145,34 @@ Future<void> showPregHowWeeksCounted(BuildContext context, PregnancyController c
             owned
                 ? 'Your date came from your doctor, a scan or your transfer, so that is the one we follow.'
                 : 'If your doctor gives you a date from a scan, that is the one we follow. You can change it in You, under Due date.',
+            // Which month and trimester this week is (relevance Batch 6,
+            // 2026-10-28), with no due date left out: the week is a guess.
+            if (c.isDueDateSet)
+              'Week ${c.currentWeek} is in month ${pregMonthFor(c.currentWeek)}, '
+                  'in the ${pregTrimesterFor(c.currentWeek).toLowerCase()}.',
           ]) ...[
             Text(para, style: pvManrope(fontSize: 14.5, height: 1.55, color: p.ink2)),
             const SizedBox(height: 10),
           ],
+          // The whole explanation, one tap on: every week as a month and a
+          // trimester. The sheet closes first, so Back returns to the home.
+          PvPress(child: GestureDetector(
+            key: const ValueKey('preg_how_counted_read'),
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              Navigator.of(ctx).pop();
+              openPvDoorRead(context, kPregCountingReadId, c);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text('Weeks, months and trimesters',
+                    style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),
+                const SizedBox(width: 2),
+                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink1),
+              ]),
+            ),
+          )),
         ]),
       ),
     ),

@@ -135,9 +135,11 @@ void main() {
       }
     });
 
-    test('Pregnancy 101 is seven real reads, each with a short answer to offer', () {
+    // Nine since relevance Batch 6 (2026-10-28): weeks, months and trimesters,
+    // and the baby's movements before "moves less". Was seven.
+    test('Pregnancy 101 is nine real reads, each with a short answer to offer', () {
       expect(pregLearnStartHere().length, kPregLearnStartIds.length);
-      expect(kPregLearnStartIds.length, 7);
+      expect(kPregLearnStartIds.length, 9);
       for (final id in kPregLearnStartIds) {
         expect(pregnancyReadById(id), isNotNull, reason: id);
       }

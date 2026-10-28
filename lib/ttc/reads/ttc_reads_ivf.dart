@@ -2885,4 +2885,653 @@ final List<PvRead> kTtcReadsIvf = [
     ],
   ),
 
+  // ===========================================================================
+  //  RELEVANCE BATCH 6 (2026-10-28): three gaps from the search demand
+  // ===========================================================================
+  //  TTC-GAP fault 20, the part Batch 3 left owed: low AMH (ranks 15, 45),
+  //  twins after treatment (39, 46), and treatment that has not worked (35,
+  //  41, 48, 51). Each is a guide in the door's voice, never a list of
+  //  questions (the user, 2026-10-25). Each also reaches Ask Veda through
+  //  `tool/export_ttc_corpus.dart`, which walks `kTtcReads`.
+  //
+  //  ⚠️ CLINIC OWNERSHIP. All three sit where a clinician decides: how many
+  //  embryos, what a number means for her, whether to change the plan. They
+  //  explain, help her prepare and give her questions to take. None of them
+  //  reads her own result or recommends a step (CLAUDE.md, Clinical
+  //  invariants). Signed by the team until a clinician signs them off.
+
+  // ---------------------------------------------------------------------------
+  //  A low AMH result
+  // ---------------------------------------------------------------------------
+  //  Carries the facts of the myth card cut from the IVF door
+  //  (`ttc_focus_ivf.dart`, "Does a low AMH mean it is over?"), which the
+  //  audit called the best of the four. The glossary line was all the door
+  //  had on the most-searched test result in TTC.
+  PvRead(
+    id: 'ttc_read_low_amh',
+    hue: 206,
+    // An existing licensed photo (CC BY-SA 3.0, Wikimedia Commons, credited
+    // in read_images.dart under ttc_insight_amh_meaning): a plain blood tube.
+    // It is on a daily insight card, never on a door.
+    imageUrl:
+        'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_insight_amh_meaning.jpg',
+    kicker: _en('IVF & IUI'),
+    title: _en('A low AMH result: what it measures, and what it does not'),
+    teaser: _en("What the number on the report counts, what it can't tell "
+        "anyone, and what a clinic usually does with it."),
+    shortAnswer: _en("AMH is a blood test that gives a rough idea of how many "
+        "eggs are left in reserve. It says nothing about whether those eggs "
+        "are healthy, and on its own it doesn't show whether a natural "
+        "pregnancy can happen. Clinics mainly use it to plan IVF medicine "
+        "doses. A low result is a reason to see a fertility doctor sooner, "
+        "not a verdict."),
+    scaleSetter: _en("A low AMH often arrives as one number with a red mark "
+        "beside it, and many women read it as 'my eggs are finished'. That "
+        "isn't what the test says. This piece goes through what it does say, "
+        "so the conversation with your doctor starts from the right place."),
+    author: _en('ParentVeda team'),
+    authorRole: _en('Written from the sources listed at the end'),
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        mythFact: PvMythFact(
+          myth: _en('A low AMH means my eggs are poor and treatment will not '
+              'work for me.'),
+          fact: _en('AMH estimates how many eggs are in reserve, not how '
+              'healthy they are. It helps a clinic choose medicine doses. '
+              'Women with a low AMH do get pregnant, and a normal AMH is no '
+              'guarantee either. It is a count, not a verdict.'),
+        ),
+        paragraphs: [
+          _en("If you have just been handed a low AMH result, it is normal to "
+              "feel frightened. Hold off on any decision until you've read "
+              "what the test can and can't tell you, and talked it through "
+              "with a fertility doctor who can see the rest of your results."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What AMH measures'),
+        paragraphs: [
+          _en("AMH stands for anti-Müllerian hormone. It is made by the small "
+              "follicles in your ovaries, the tiny fluid-filled sacs that "
+              "each hold an egg. The more of these small follicles there are, "
+              "the higher the level in the blood."),
+          _en("So AMH is a stand-in for what doctors call ovarian reserve: "
+              "roughly how many eggs are left. It falls slowly with age, "
+              "faster from the mid-thirties, which is why it is often tested "
+              "as part of a first fertility check."),
+          _en("It is a single blood test that can be taken on any day of the "
+              "cycle. Labs report it in different units, ng/mL or pmol/L "
+              "(1 ng/mL is about 7.1 pmol/L), and each lab uses its own "
+              "ranges. A number from one lab can't be read against another "
+              "lab's chart."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What it cannot tell you'),
+        paragraphs: [
+          _en("AMH does not measure egg quality. Quality is what matters most "
+              "for a healthy pregnancy, and it follows age far more closely "
+              "than it follows AMH. A woman of 30 with a low AMH is in a very "
+              "different place from a woman of 42 with the same number."),
+          _en("It is also not a test of natural fertility. In a large study "
+              "of women aged 30 to 44 trying to conceive without treatment, "
+              "those with a low AMH got pregnant about as often, month by "
+              "month, as those with a normal level. Fewer eggs in reserve "
+              "does not stop the one egg released each month from being "
+              "fertilised."),
+          _en("And it can't say when menopause will come. It gives a rough "
+              "direction, not a date."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Why it can come back low'),
+        paragraphs: [
+          _en("A low AMH can reflect a genuinely smaller reserve, often with "
+              "age. But a few other things can lower the reading, and a "
+              "doctor will think about them before drawing conclusions."),
+        ],
+        bullets: [
+          _en('The pill and other hormonal contraception can lower AMH for a '
+              'while. It usually rises again some months after stopping.'),
+          _en('Surgery on the ovaries, for example to remove a cyst, can '
+              'lower it.'),
+          _en('Endometriosis, smoking, and past chemotherapy or radiotherapy '
+              'can all play a part.'),
+          _en("At the other end, a high AMH is common with PCOS. It's "
+              "expected there, and it isn't a sign of being extra fertile."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What a clinic usually does with it'),
+        paragraphs: [
+          _en("A fertility doctor reads AMH beside your age, a scan that "
+              "counts the small follicles (the antral follicle count), and "
+              "sometimes an FSH blood test taken early in the cycle. Together "
+              "they give a fuller picture than any one of them alone."),
+          _en("For IVF, AMH helps the clinic choose a medicine dose, because "
+              "it predicts roughly how many eggs the ovaries will respond "
+              "with. That's its main job."),
+          _en("A low result can also be a reason not to wait the usual twelve "
+              "months before seeing someone. Depending on the rest of the "
+              "picture, a doctor may talk about starting treatment sooner, "
+              "or about egg freezing. Those are your clinic's suggestions to "
+              "make, with you, from your whole history."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What is worth avoiding'),
+        bullets: [
+          _en("Supplements sold to 'raise AMH'. None has good evidence of "
+              "improving the chance of a baby, and some, such as DHEA, are "
+              "hormones that should only be taken if a doctor advises them."),
+          _en("Repeating the test at several labs to chase a better number. "
+              "Different labs give different readings, which only adds "
+              "confusion."),
+          _en("Deciding on egg freezing or IVF from the number alone, before "
+              "a fertility doctor has looked at everything together."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Questions to take to your doctor'),
+        bullets: [
+          _en('What does my AMH mean alongside my age and my scan?'),
+          _en('Was I on the pill or any hormones when it was tested?'),
+          _en('Does it change how long we should keep trying before tests or '
+              'treatment?'),
+          _en('If we choose IVF, how would it change the plan or the doses?'),
+          _en('Is egg freezing worth talking about for us, and what would it '
+              'involve?'),
+        ],
+        tip: PvReadTip(
+          title: _en('Bring the report itself'),
+          body: _en("The units and the lab's own range are printed on it. A "
+              "doctor needs both to read the number properly."),
+        ),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When to see a fertility doctor'),
+      body: _en("Don't wait the usual year if you've had a low AMH result and "
+          "you are 35 or older, have been trying for six months or more, have "
+          "very irregular or no periods, or know of a condition that affects "
+          "fertility in either of you. See a doctor straight away if you are "
+          "40 or older. Nothing here reads your own result, which only a "
+          "doctor who has your full history can do."),
+    ),
+
+    faqs: [
+      PvReadFaq(
+        question: _en('Can anything raise a low AMH?'),
+        answer: _en("Not in a way that is known to help. Stopping smoking is "
+            "good for fertility in many ways. Supplements that promise a "
+            "higher number have not been shown to lead to more babies. Ask "
+            "your doctor before taking any."),
+      ),
+      PvReadFaq(
+        question: _en('Is egg freezing the answer to a low AMH?'),
+        answer: _en("Sometimes it's worth discussing, especially if you're "
+            "not ready to try yet. But with a low reserve, fewer eggs are "
+            "usually collected in each round. A fertility doctor can say "
+            "whether it makes sense for you."),
+      ),
+      PvReadFaq(
+        question: _en('Should I repeat the AMH test at another lab?'),
+        answer: _en("Usually not. Labs measure it differently, so a second "
+            "number won't settle anything. If your doctor wants a repeat, "
+            "they'll say when and where."),
+      ),
+    ],
+
+    evidence: _en('ASRM Practice Committee, Testing and interpreting measures '
+        'of ovarian reserve: a committee opinion (Fertility and Sterility, '
+        '2020); Steiner AZ et al., Association between biomarkers of ovarian '
+        'reserve and infertility among older women of reproductive age (JAMA, '
+        '2017); ESHRE guideline on ovarian stimulation for IVF/ICSI (2019); '
+        'NICE CG156, Fertility problems. Sources checked October 2026. '
+        'Nothing here reads a personal result.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('What a fertility check involves'),
+        value: _en('The other tests usually done beside AMH, and what each '
+            'one looks for.'),
+        surfaceId: 'ttc_read/ttc_read_ivf_workup',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('Egg freezing in India'),
+        value: _en('What it involves, what it costs, and who it suits.'),
+        surfaceId: 'ttc_read/ttc_read_egg_freezing',
+      ),
+    ],
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  Twins after treatment
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THE LEGAL LIMIT IS STATED LOOSELY ON PURPOSE. Rules made under the
+  //  ART (Regulation) Act 2021 cap how many embryos go back in one cycle;
+  //  secondary reports give one or two, with exceptions. Until a clinician or
+  //  the Gazette text confirms the exact figure (BEFORE-LAUNCH), the read
+  //  says "usually one or two" and sends her to ask her clinic.
+  PvRead(
+    id: 'ttc_read_ivf_twins',
+    hue: 206,
+    // An existing licensed photo (CC0, credited in read_images.dart under
+    // learn_ttc_consult_fertility): a stethoscope on a desk. Not a bump,
+    // which would be the wrong picture for a woman still trying, and not a
+    // scan screen, which can carry printed labels.
+    imageUrl:
+        'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/learn_ttc_consult_fertility.jpg',
+    kicker: _en('IVF & IUI'),
+    title: _en('Twins after fertility treatment, and why clinics often '
+        'transfer one embryo'),
+    teaser: _en('Why treatment makes twins more likely, why a twin pregnancy '
+        'is a bigger pregnancy, and what to ask before a transfer.'),
+    shortAnswer: _en("Fertility treatment makes twins more likely, mostly "
+        "when more than one embryo is put back, or when injections ripen "
+        "several eggs at once. A twin pregnancy brings more early births and "
+        "more complications for mother and babies. That is why most clinics "
+        "now suggest one good embryo at a time, and why rules in India limit "
+        "how many can be transferred."),
+    scaleSetter: _en("Many couples who have waited a long time feel that "
+        "twins would be a gift, two babies from one round. It's an "
+        "understandable hope. This piece explains why doctors are careful "
+        "about it, so the choice at transfer is an informed one."),
+    author: _en('ParentVeda team'),
+    authorRole: _en('Written from the sources listed at the end'),
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en("Without treatment, twins are uncommon. With treatment they are "
+              "much more frequent, and nearly all of that difference comes "
+              "from one thing: more than one egg or embryo having the chance "
+              "to implant at the same time."),
+          _en("Knowing where the extra twins come from makes the clinic's "
+              "advice easier to follow, and the questions to ask easier to "
+              "see."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Why treatment makes twins more likely'),
+        bullets: [
+          _en('Ovulation tablets make twins a little more likely, because now '
+              'and then two eggs ripen. Letrozole does this less often than '
+              'clomiphene.'),
+          _en('Injections before IUI can ripen several eggs. Scans count the '
+              'follicles, and a clinic may cancel a round, or suggest not '
+              'trying that month, if too many are growing.'),
+          _en('In IVF, the number of embryos put back is what matters most. '
+              'Two embryos can mean two babies.'),
+          _en('Even a single embryo can split into identical twins. This is '
+              'uncommon, a little over one in a hundred single transfers in '
+              'large studies, and no one can prevent it.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Why a twin pregnancy is a bigger pregnancy'),
+        paragraphs: [
+          _en("Most twin pregnancies end with two healthy babies. But a twin "
+              "pregnancy asks more of the body, and complications are more "
+              "common than with one baby."),
+        ],
+        bullets: [
+          _en('About half of twins are born early, before 37 weeks, and some '
+              'much earlier. Early babies may need time in a neonatal unit.'),
+          _en('Twins are more often small, and their growth is checked with '
+              'extra scans.'),
+          _en('High blood pressure in pregnancy (pre-eclampsia), pregnancy '
+              'diabetes and anaemia are all more common in the mother.'),
+          _en('A caesarean birth is more likely.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Why clinics put back one embryo at a time'),
+        paragraphs: [
+          _en("Putting back one good embryo, and freezing the others, is "
+              "called single embryo transfer. Large studies show that two "
+              "transfers of one embryo each, one after the other, end in a "
+              "baby nearly as often as one transfer of two embryos, with far "
+              "fewer twins and far fewer early births."),
+          _en("Frozen embryos keep well, and frozen transfers now work about "
+              "as well as fresh ones for many people. So choosing one embryo "
+              "usually means waiting a little longer for a second try, not "
+              "giving one up."),
+          _en("A clinic may still discuss two embryos in some situations, "
+              "for example after several transfers that didn't work. That's "
+              "a decision to make together, with the reasons spelled out."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('If you were hoping for twins'),
+        paragraphs: [
+          _en("It's natural to hope for two after a long wait, especially "
+              "when each round costs so much in money and in feeling. Some "
+              "couples also worry that a second chance may not come."),
+          _en("It can help to say this out loud to your doctor. Frozen "
+              "embryos, and a plan for the next transfer agreed in advance, "
+              "often answer the worry better than a second embryo now. And "
+              "two babies at once means two lots of night feeds, nappies and "
+              "school fees from the very first day, which is worth "
+              "picturing honestly with your family before the transfer."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What the rules in India say'),
+        paragraphs: [
+          _en("The Assisted Reproductive Technology (Regulation) Act 2021 "
+              "and the rules made under it limit how many embryos a clinic "
+              "may transfer in one cycle, usually one or two. A registered "
+              "clinic should explain how many it plans to put back and why, "
+              "before the day of the transfer."),
+          _en("If you are offered more than that, or aren't told, ask. You "
+              "have the right to understand the plan."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('If a scan shows two'),
+        paragraphs: [
+          _en("An early scan after a positive test counts the pregnancies. If "
+              "there are two, your care will usually move to closer "
+              "monitoring, with more scans, and often a specialist team for "
+              "the birth. Most twin pregnancies that are well looked after go "
+              "well."),
+          _en("Once you are pregnant, ParentVeda's pregnancy side has a door "
+              "written for twins, from finding out to the birth."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Questions to ask before a transfer'),
+        bullets: [
+          _en('How many embryos do you plan to put back, and why?'),
+          _en('If we have more than one good embryo, will you freeze the '
+              'rest?'),
+          _en('What would make you suggest two instead of one?'),
+          _en('For IUI with injections, what happens if too many follicles '
+              'grow?'),
+          _en('Who looks after a twin pregnancy if it happens?'),
+        ],
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When to call your clinic'),
+      body: _en("During a round, call your clinic at once for severe tummy "
+          "pain, a lot of bloating, breathlessness or passing much less "
+          "urine. After a positive test, call straight away for bleeding or "
+          "pain on one side, and your clinic will book an early scan to see "
+          "how many pregnancies there are. How many embryos to put back is "
+          "decided by you and your clinic, never by anything here."),
+    ),
+
+    faqs: [
+      PvReadFaq(
+        question: _en('Can we ask the clinic to put back two embryos?'),
+        answer: _en("You can ask, and a good clinic will talk it through. It "
+            "will explain the extra strain of a twin pregnancy, what the "
+            "rules allow, and why it may suggest one. The final plan is "
+            "agreed together."),
+      ),
+      PvReadFaq(
+        question: _en('Can one embryo still become twins?'),
+        answer: _en("Yes, now and then. A single embryo can split into "
+            "identical twins. It is uncommon and not something anyone can "
+            "cause or prevent."),
+      ),
+      PvReadFaq(
+        question: _en('Are twins after IVF looked after differently in '
+            'pregnancy?'),
+        answer: _en("Twins are looked after more closely however they were "
+            "conceived. How the pregnancy began doesn't change the care much; "
+            "having two babies does."),
+      ),
+    ],
+
+    evidence: _en('NICE CG156, Fertility problems (single embryo transfer); '
+        'ASRM Practice Committee, Guidance on the limits to the number of '
+        'embryos to transfer (2021); Cochrane review, Number of embryos for '
+        'transfer following IVF or ICSI (2020); NICE NG137, Twin and triplet '
+        'pregnancy (2019); the Assisted Reproductive Technology (Regulation) '
+        'Act 2021 and rules under it. Sources checked October 2026. The '
+        'number of embryos is your clinic\'s decision with you.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('Fresh or frozen transfer'),
+        value: _en('How clinics decide, and why frozen is now so common.'),
+        surfaceId: 'ttc_read/ttc_read_tx_fresh_or_frozen',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('Ovulation tablets in plain words'),
+        value: _en('Letrozole and clomiphene, and what they mean for twins.'),
+        surfaceId: 'ttc_read/ttc_read_ovulation_tablets',
+      ),
+    ],
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  When treatment has not worked yet
+  // ---------------------------------------------------------------------------
+  //  The step after "When the test is negative after treatment" (the next few
+  //  weeks) and beside "Your review appointment" (what to ask): what a next
+  //  plan can look like after one or several rounds. Add-ons are named
+  //  honestly from the HFEA and ESHRE reviews, without naming any clinic.
+  PvRead(
+    id: 'ttc_read_when_rounds_dont_work',
+    hue: 206,
+    // An existing licensed photo (CC BY-SA 4.0, Wikimedia Commons, credited
+    // in read_images.dart under ttc_insight_ivf_is_not_failure): a quiet
+    // path through trees. On a daily insight card, never on a door.
+    imageUrl:
+        'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_insight_ivf_is_not_failure.jpg',
+    kicker: _en('IVF & IUI'),
+    title: _en("When treatment hasn't worked yet: what the next plan can "
+        "look like"),
+    teaser: _en('What a clinic looks at after a round, when IUI usually gives '
+        'way to IVF, which add-ons have evidence, and the choice to pause.'),
+    shortAnswer: _en("A round that doesn't work is common, and it doesn't "
+        "mean the next one won't. Afterwards, a clinic reviews what happened "
+        "and may keep the plan, change the medicines, move from IUI to IVF, "
+        "or look for a reason with more tests. Some extras offered at this "
+        "point have little evidence behind them. Taking a break, or deciding "
+        "to stop, are real choices too."),
+    scaleSetter: _en("A negative result after everything you put into a "
+        "round can feel crushing, and it's fine to grieve it before thinking "
+        "about what comes next. When you're ready, this piece lays out the "
+        "usual next steps, so the review with your doctor feels less like "
+        "starting again."),
+    author: _en('ParentVeda team'),
+    authorRole: _en('Written from the sources listed at the end'),
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en("Even in the best circumstances, most single rounds of "
+              "treatment don't end in a pregnancy. That's why clinics plan "
+              "in rounds rather than single tries, and why many couples who "
+              "have a baby needed more than one attempt."),
+          _en("What changes after a round depends on what the round showed. "
+              "Some rounds teach the clinic a lot, and some go exactly to "
+              "plan and still don't work, which is frustrating but also "
+              "useful to know."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What a review looks at'),
+        paragraphs: [
+          _en("At a review appointment, the doctor goes back through each "
+              "step. For IVF that usually means how your ovaries responded to "
+              "the medicines, how many eggs were collected and how many were "
+              "mature, how many fertilised, how the embryos grew, how the "
+              "lining looked, and how the transfer went. For IUI it means the "
+              "follicles, the timing and the sperm sample on the day."),
+          _en("From that, the doctor may suggest keeping the same plan, "
+              "changing the dose or the type of medicine, or doing more tests "
+              "before another round."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('When IUI usually gives way to IVF'),
+        paragraphs: [
+          _en("Many clinics suggest moving to IVF after about three or four "
+              "IUI rounds without a pregnancy, because most IUI pregnancies "
+              "happen in the first few rounds. They often move sooner for "
+              "women in their late thirties or older, or when a test points "
+              "to tubes or sperm."),
+          _en("Guidance differs between countries. In the UK, NICE does not "
+              "routinely advise IUI for unexplained infertility at all, while "
+              "many clinics in India offer a few rounds first. It is worth "
+              "asking your clinic how it decides."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('After several IVF transfers'),
+        paragraphs: [
+          _en("When good embryos have been transferred several times without "
+              "a pregnancy, clinics may use the term recurrent implantation "
+              "failure. It describes what has happened, not a diagnosis, and "
+              "often no single cause is found."),
+          _en("The checks with the most support are a look inside the womb "
+              "(a hysteroscopy) if a scan suggests something there, thyroid "
+              "and other blood tests, and a review of the sperm and embryo "
+              "results. Depending on what is found, a clinic may suggest a "
+              "different stimulation plan, testing embryos in some "
+              "situations, or, for some couples, donor eggs or sperm."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Add-ons, honestly'),
+        paragraphs: [
+          _en("After a failed round, clinics often offer extras, each with its "
+              "own price. The UK regulator (HFEA) and the European society "
+              "(ESHRE) have reviewed them. For most, there isn't good "
+              "evidence that they lead to more babies."),
+        ],
+        bullets: [
+          _en('Endometrial scratching, embryo glue and assisted hatching: not '
+              'shown to improve the number of babies born.'),
+          _en('Immune tests and treatments, such as steroids, intralipid or '
+              'IVIG drips: not supported for routine use, and some carry side '
+              'effects.'),
+          _en('Receptivity tests that time the transfer from a biopsy of the '
+              'lining: not shown to help most people.'),
+          _en('Testing embryos for chromosome changes (PGT-A): can help in a '
+              'few situations, but does not raise the overall number of '
+              'babies for most couples.'),
+        ],
+        tip: PvReadTip(
+          title: _en('Three questions for any extra'),
+          body: _en("What does the evidence say it changes? What does it cost? "
+              "Would you suggest it if we were paying nothing extra?"),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('A break, or a different path'),
+        paragraphs: [
+          _en("Many couples take a month or more between rounds, to let the "
+              "body settle and to breathe. A pause is not giving up, and most "
+              "clinics are happy to plan around one."),
+          _en("Some couples decide, after several rounds, to stop treatment, "
+              "or to look at donor eggs or sperm, adoption, or a life without "
+              "children. Each of these is a valid choice, and none has to be "
+              "made in a hurry. A counsellor who knows fertility treatment can "
+              "help you both think it through."),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Questions to take to the review'),
+        bullets: [
+          _en('What did this round show us, step by step?'),
+          _en('What would you change next time, and why?'),
+          _en('Is there a test that could explain what happened?'),
+          _en('How many more rounds would you suggest before we rethink?'),
+          _en('Which extras do you recommend, what is the evidence, and what '
+              'do they cost?'),
+        ],
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When to call, and who to talk to'),
+      body: _en("After a round, call your clinic at once for severe tummy "
+          "pain, a lot of bloating, breathlessness or passing much less "
+          "urine. Call straight away for very heavy bleeding with pain, or a "
+          "fever. If you feel low or hopeless most days, talk to your doctor, "
+          "or call Tele-MANAS free on 14416 at any hour. The next plan is "
+          "your clinic's to make with you."),
+    ),
+
+    faqs: [
+      PvReadFaq(
+        question: _en('How many rounds before a clinic changes the plan?'),
+        answer: _en("There's no single number. Many clinics review after each "
+            "round, and suggest a bigger change after about three IUIs or two "
+            "or three IVF transfers without a pregnancy. Ask yours how it "
+            "decides."),
+      ),
+      PvReadFaq(
+        question: _en('Is an add-on worth paying for after a failed round?'),
+        answer: _en("For most add-ons, the evidence says no. Ask what it is "
+            "meant to change and what the studies show before you agree."),
+      ),
+      PvReadFaq(
+        question: _en('Can we pause treatment and come back to it?'),
+        answer: _en("Yes. Frozen embryos keep well, and a pause of a few months "
+            "doesn't change much for most couples. If age is a concern, ask "
+            "your doctor how long a break makes sense."),
+      ),
+    ],
+
+    evidence: _en('NICE CG156, Fertility problems; ESHRE good practice '
+        'recommendations on recurrent implantation failure (2023); ESHRE good '
+        'practice recommendations on add-ons in reproductive medicine (2023); '
+        'HFEA ratings of treatment add-ons; ASRM Practice Committee opinions '
+        'on unexplained infertility (2020). Sources checked October 2026. '
+        'Nothing here sets your treatment plan, which your clinic decides '
+        'with you.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('Your review appointment'),
+        value: _en('The questions to take, in order.'),
+        surfaceId: 'ttc_read/ttc_read_tx_review_appointment',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en("Reading a clinic's success rate"),
+        value: _en('Which numbers matter when you compare clinics.'),
+        surfaceId: 'ttc_read/ttc_read_ivf_success_rates',
+      ),
+    ],
+  ),
+
 ];

@@ -315,6 +315,15 @@ final PvDoorPage kGettingReadyDoor = PvDoorPage(
           readId: 'preg_ready_read_godh_bharai',
           meta: 'Often in month 7',
         ),
+        // Relevance Batch 6 (2026-10-28, PREGNANCY-GAP §4): travel by
+        // trimester and the move to her mother's home. Here, beside the last
+        // months, by the user's choice; the guide covers every trimester.
+        PvDoorGuideTile(
+          title: 'Travelling while pregnant',
+          blurb: "Trains, roads and flights, what to carry, and going to your "
+              "mother's home for the birth.",
+          readId: 'preg_ready_read_travel',
+        ),
       ],
     ),
     PvDoorSection(

@@ -37,8 +37,38 @@
 
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
+import '../preg_week_extras.dart' show pregMonthFor, pregTrimesterFor;
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
+
+/// "Month 6: weeks 22 to 26", one line a month, worked out from
+/// `pregMonthFor` (relevance Batch 6, 2026-10-28).
+///
+/// ⚠️ DERIVED, NOT TYPED. The week page prints "Week 23 · Month 6" from that
+/// function, and the hero now does too. A table typed by hand into a read is
+/// a second copy, and two copies of the same mapping drift the first time
+/// one of them is corrected.
+List<LocalizedText> _monthRows() {
+  final rows = <LocalizedText>[];
+  for (var m = 1; m <= 9; m++) {
+    final weeks = [for (var w = 1; w <= 40; w++) if (pregMonthFor(w) == m) w];
+    rows.add(_en('Month $m: weeks ${weeks.first} to ${weeks.last}'
+        '${m == 9 ? ', and on until your baby comes' : ''}'));
+  }
+  return rows;
+}
+
+/// The three trimesters, from `pregTrimesterFor`, the week page's own words.
+List<LocalizedText> _trimesterRows() {
+  final rows = <LocalizedText>[];
+  for (final name in ['First trimester', 'Second trimester', 'Third trimester']) {
+    final weeks = [for (var w = 1; w <= 40; w++) if (pregTrimesterFor(w) == name) w];
+    rows.add(_en(name == 'Third trimester'
+        ? '$name: week ${weeks.first} until your baby comes'
+        : '$name: weeks ${weeks.first} to ${weeks.last}'));
+  }
+  return rows;
+}
 
 /// The Your first weeks bracket's own hue (`pregnancy_brackets.dart`), so a
 /// read opened from the door keeps the door's colour.
@@ -331,10 +361,18 @@ final List<PvRead> kPregnancyReadsFirst = [
           _en("Doctors write how far along you are as weeks plus days, such "
               "as 9w3d or 9+3. That means nine weeks and three days. Your "
               "report may call it gestational age, or GA."),
+          // ⚠️ ONE SET OF TRIMESTER WEEKS (relevance Batch 6, 2026-10-28).
+          // This said the first trimester ran to the end of week 13, while
+          // the week page (`pregTrimesterFor`) calls week 13 the second
+          // trimester. Both are used by real guidelines; the app must use
+          // one. The week page's wins, because she sees it every day. Kept
+          // for revert: "The first trimester runs to the end of week 13, the
+          // second from week 14 to 27, and the third from week 28 until your
+          // baby comes."
           _en("Families often count in months (\"she's in her third "
               "month\"), and doctors count in weeks because it's more exact. "
-              "The first trimester runs to the end of week 13, the second "
-              "from week 14 to 27, and the third from week 28 until your baby "
+              "The first trimester runs to the end of week 12, the second "
+              "from week 13 to 27, and the third from week 28 until your baby "
               "comes."),
         ],
       ),
@@ -424,6 +462,186 @@ final List<PvRead> kPregnancyReadsFirst = [
     readNext: [
       'preg_first_read_this_week',
       'preg_first_read_visit_questions',
+      'preg_first_read_counting',
+    ],
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  Weeks, months and trimesters (relevance Batch 6, 2026-10-28)
+  // ---------------------------------------------------------------------------
+  //  PREGNANCY-GAP §4, the most-searched gap in the stage (ranks 2, 5 to 7,
+  //  13 to 15, 23): "what month is week 23", "which trimester is week 13".
+  //  The due-date read covers working the date out; this one covers turning
+  //  a week into a month and a trimester, which is what families and doctors
+  //  each count in. Opened from the hero's "How your weeks are counted"
+  //  sheet, which is where a woman at any week meets the question, and from
+  //  this door's "Your due date" section.
+  PvRead(
+    id: 'preg_first_read_counting',
+    hue: _hue,
+    // An existing licensed photo (CC0, credited in read_images.dart under
+    // scan_dating_scan): a couple holding a scan print with its weeks and
+    // days on it. It is on no card of this door.
+    imageUrl:
+        'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/scan_dating_scan.jpg',
+    kicker: _kFound,
+    title: _en('Weeks, months and trimesters: how your pregnancy is counted'),
+    teaser: _en("Which month any week falls in, where each trimester begins, "
+        "and why doctors count in weeks while families count in months."),
+    shortAnswer: _en("Doctors count pregnancy in weeks, from the first day of "
+        "your last period, and a full pregnancy is about 40 weeks. Families "
+        "usually count in months, and nine months is close to the same "
+        "thing. Week 23, for example, is in month 6 and the second "
+        "trimester. The lists below turn any week into its month and "
+        "trimester."),
+    scaleSetter: _en("Your doctor says week 23 and your mother says the sixth "
+        "month, and both are right. They're counting the same days in "
+        "different units. Once you can move between the two, the advice from "
+        "the clinic and the advice from home start to line up."),
+    author: _desk,
+    authorRole: _deskRole,
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en("Almost everyone is confused by pregnancy counting at first. "
+              "Weeks, months and trimesters all describe the same 40 weeks, "
+              "cut up in different ways, and each is used by different "
+              "people for different reasons."),
+          _en("This page keeps the three side by side. ParentVeda shows all "
+              "of them: the week and day on your home screen, and the month "
+              "and trimester under them and on each week's page."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Where the count starts'),
+        paragraphs: [
+          _en("Every way of counting starts from the same day: the first day "
+              "of your last period. That's about two weeks before you "
+              "conceived, so in the first two weeks of the count you weren't "
+              "pregnant yet. At week 20, your baby has been growing for about "
+              "18 weeks."),
+          _en("If a dating scan, an IVF transfer or your doctor has set your "
+              "due date, the weeks are counted back from that date instead. "
+              "That's the count to go by, here and everywhere."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Reading weeks and days'),
+        paragraphs: [
+          _en("Scan reports write it as weeks plus days: 23w4d, 23+4, or GA "
+              "23 weeks 4 days. All three mean 23 full weeks and 4 days."),
+          _en("23 weeks and 4 days means the 24th week has started, so the "
+              "page you see for that day is week 24. It's the same as a "
+              "birthday: after your 23rd birthday you're in your 24th year. "
+              "Your home screen shows the exact weeks and days, and the week's "
+              "page shows the week you're in."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Which month is each week?'),
+        paragraphs: [
+          _en("A month of pregnancy is about four and a third weeks, counted "
+              "from the same first day. These are the months ParentVeda uses, "
+              "the way Indian doctors and families usually count them."),
+        ],
+        bullets: _monthRows(),
+        tip: PvReadTip(
+          title: _en('A week on the edge'),
+          body: _en("Books and doctors sometimes split the months a little "
+              "differently, so a week at the end of one month may be called "
+              "the start of the next. Neither is wrong."),
+        ),
+      ),
+      PvReadSection(
+        heading: _en('Which trimester is each week?'),
+        paragraphs: [
+          _en("Trimesters are three long stretches, each with its own things "
+              "to look out for. ParentVeda uses the weeks your week pages are "
+              "written to."),
+        ],
+        bullets: _trimesterRows(),
+      ),
+      PvReadSection(
+        heading: _en('What each trimester usually brings'),
+        paragraphs: [
+          _en("The first trimester is the time of early changes: tiredness, "
+              "sickness for many, the first antenatal visit, blood tests and "
+              "the first scans. By its end, the sickness eases for most "
+              "women."),
+          _en("The second trimester often feels easier. The anomaly scan "
+              "comes in the middle of it, your bump starts to show, and most "
+              "women first feel their baby move."),
+          _en("The third trimester is for growing and getting ready: more "
+              "frequent check-ups, your baby's movements to keep an eye on, "
+              "and plans for the birth. Full term starts at 37 weeks."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Nine months, or forty weeks?'),
+        paragraphs: [
+          _en("Forty weeks is 280 days. Nine calendar months is about 274 "
+              "days. So \"nine months\" and \"40 weeks\" are nearly, but not "
+              "quite, the same, and the last week or so spills into what "
+              "families might call the tenth month."),
+          _en("Either way, most healthy babies are born between 37 and 42 "
+              "weeks, and very few on the due date itself."),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Months the way families say them'),
+        paragraphs: [
+          _en("At home you may hear \"she's in her seventh month\" or \"her "
+              "seventh month is running\". Both mean the seventh month has "
+              "begun. \"Seven months complete\" means it has ended, and the "
+              "eighth has started."),
+          _en("Many family customs follow these months, such as the godh "
+              "bharai, often in the seventh month, or going to your mother's "
+              "home for the birth. When you plan around one, turn the month "
+              "into weeks with the lists above, and check the timing with your "
+              "doctor, so travel and celebrations don't land too close to "
+              "your due date."),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Whatever week you are in, go to hospital straight away if'),
+      body: _en("You have bleeding or fluid leaking from your vagina, strong "
+          "pain in your tummy, a severe headache with blurred vision, a fit, "
+          "or, from the middle of pregnancy, your baby is moving less than "
+          "usual. Call 108 if you can't get there safely. For anything else "
+          "that worries you, call your doctor today."),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Is week 13 in the first or the second trimester?'),
+        answer: _en("Guides differ, because week 13 sits on the line. "
+            "ParentVeda counts it as the start of the second trimester, as "
+            "the week pages do. If your doctor counts it the other way, "
+            "nothing about your care changes."),
+      ),
+      PvReadFaq(
+        question: _en('Why does the week page say 24 when my report says 23 '
+            'weeks and 4 days?'),
+        answer: _en("Because 23 weeks and 4 days is inside the 24th week. "
+            "The report gives the completed weeks, and the page shows the "
+            "week you're in."),
+      ),
+      PvReadFaq(
+        question: _en('When does the third trimester start?'),
+        answer: _en("At 28 weeks, which is in month 7. It runs until your baby "
+            "comes."),
+      ),
+    ],
+    evidence: _en('NHS, Your pregnancy and baby guide (week by week and '
+        'trimesters) · ACOG Committee Opinion 700, Methods for estimating the '
+        'due date (2017) · Ministry of Health and Family Welfare, Guidelines '
+        'for antenatal care and skilled attendance at birth · The months and '
+        'trimesters listed are the ones ParentVeda\'s week pages use.'),
+    readNext: [
+      'preg_first_read_due_date',
+      'preg_first_read_this_week',
     ],
   ),
 
