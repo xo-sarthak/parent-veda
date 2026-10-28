@@ -299,16 +299,35 @@ def write_sql(rows: list[dict], out: Path) -> None:
         f"-- {len(rows)} products, {datetime.now():%Y-%m-%d %H:%M}. Run in the Supabase SQL editor.",
         "begin;",
     ]
-    for r in rows:
-        cols = list(r.keys())
+    # One multi-row insert, not one statement per product: the conflict
+    # clause is written once, so 410 products are ~130 KB instead of ~570 KB
+    # (the Supabase SQL editor saves the query as a snippet before running it,
+    # and a large snippet is what made it slow). One statement may not touch
+    # the same key twice, so a repeated key is refused here, not in Postgres.
+    if rows:
+        cols = list(rows[0].keys())
+        assert all(list(r.keys()) == cols for r in rows), "rows differ in columns"
+        dupes = {r["source_key"] for r in rows if sum(x["source_key"] == r["source_key"] for x in rows) > 1}
+        assert not dupes, f"product_key listed twice: {sorted(dupes)}"
         upd = [c for c in cols if c != "source_key"]
         lines.append(
-            f"insert into public.products ({', '.join(cols)})\n"
-            f"  values ({', '.join(sql(r[c]) for c in cols)})\n"
-            f"  on conflict (source_key) do update set "
+            f"insert into public.products ({', '.join(cols)}) values\n"
+            + ",\n".join(f"  ({', '.join(sql(r[c]) for c in cols)})" for r in rows)
+            + "\non conflict (source_key) do update set "
             + ", ".join(f"{c} = excluded.{c}" for c in upd)
             + ", updated_at = now();"
         )
+    # Kept for revert (one statement per product, 2026-10-28):
+    # for r in rows:
+    #     cols = list(r.keys())
+    #     upd = [c for c in cols if c != "source_key"]
+    #     lines.append(
+    #         f"insert into public.products ({', '.join(cols)})\n"
+    #         f"  values ({', '.join(sql(r[c]) for c in cols)})\n"
+    #         f"  on conflict (source_key) do update set "
+    #         + ", ".join(f"{c} = excluded.{c}" for c in upd)
+    #         + ", updated_at = now();"
+    #     )
     keys = ", ".join(sql(r["source_key"]) for r in rows) or "''"
     lines.append(
         "-- A product taken out of the sheet is archived (hidden), never deleted.\n"

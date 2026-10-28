@@ -55,6 +55,37 @@ void main() {
     );
   });
 
+  // The converter (tools/products/convert_finalized_picks.py) matches a
+  // team sheet's picks to products the app already has, by brand + name, so
+  // a link lands on the product (keeping its category and notes) instead of
+  // a duplicate. This is the list it matches against.
+  test('the converter\'s catalogue index is the app\'s catalogue', () {
+    final want = [
+      for (final p in buildPvCatalog())
+        {
+          'id': p.id,
+          'brand': p.brand,
+          'name': p.name,
+          'stage': _stageWord[p.stage] ?? p.stage.name,
+          'category': p.categoryId,
+          'sub': p.subId ?? '',
+          'has_link': (p.buyUrl ?? '').isNotEmpty,
+        },
+    ];
+    final f = File('tools/products/store_catalogue_index.json');
+    if (Platform.environment['WRITE_STORE_CATEGORIES'] == '1') {
+      f.writeAsStringSync(
+        '${const JsonEncoder.withIndent('  ').convert(want)}\n',
+      );
+    }
+    final have = jsonDecode(f.readAsStringSync()) as List;
+    expect(
+      {for (final c in have) (c as Map)['id']},
+      {for (final c in want) c['id']},
+      reason: 'store_catalogue_index.json is stale: re-run with WRITE_STORE_CATEGORIES=1',
+    );
+  });
+
   test('every column the app reads exists in the migrations', () {
     final sql = [
       for (final m in [

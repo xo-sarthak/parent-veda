@@ -34,7 +34,11 @@ const Map<String, Map<String, String>> kPartnerTags = {
   // and attribution switches on everywhere at once. Left ACTIVE (not commented)
   // so the Buy-now flow is testable end to end now; a placeholder tag on a real
   // Amazon link still opens Amazon, it just does not yet earn.
-  'amazon.in': {'tag': 'parentveda-21'},
+  // LIVE TAG (2026-10-28, the user: "at the moment keep it with Ishaan
+  // live"). The product sheet's links already carry it. Swap for the
+  // ParentWise account's tag once it is approved. Kept for revert:
+  //   'amazon.in': {'tag': 'parentveda-21'},
+  'amazon.in': {'tag': 'ishaanlive07-21'},
   // 'firstcry.com': {'aff': 'parentveda'},
 };
 
