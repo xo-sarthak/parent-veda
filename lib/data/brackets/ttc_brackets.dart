@@ -302,9 +302,16 @@ final List<Bracket> kTtcBrackets = [
       //     heading: _t(
       //         en: 'Others who have been here',
       //         hi: 'Aur log jo yahan se guzre hain')),
-      BracketLayer.extras: BracketLayerSpec(
-          state: LayerState.notApplicable,
-          reason: 'Community held back for launch (TTC gap plan §7.1)'),
+      // Re-enabled 2026-10-28 for the new community (lib/screens/community);
+      // 'ttc_community' routes through openTtcSurface to openCommunity.
+      BracketLayer.extras: BracketLayerSpec.live(['ttc_community'],
+          heading: _t(
+              en: 'Others who have been here',
+              hi: 'Aur log jo yahan se guzre hain')),
+      // Kept for revert (held back 2026-09-26):
+      // BracketLayer.extras: BracketLayerSpec(
+      //     state: LayerState.notApplicable,
+      //     reason: 'Community held back for launch (TTC gap plan §7.1)'),
     },
   ),
 

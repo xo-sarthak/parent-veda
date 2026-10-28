@@ -83,9 +83,15 @@ import 'pp_experts_data.dart' show kFindHelpNeeds, categoryIsSeededOnly;
 import 'pp_yoga_data.dart' show kYogaClasses, kYogaAfterCheckIds, yogaClassById;
 import 'yoga_class_screen.dart' show YogaClassScreen;
 import '../../data/mind_mood_data.dart' show kCrisisHelplineName, kCrisisHelplineNumber;
-import 'pp_community_detail_screen.dart';
-import 'community_screen.dart';
-import '../../data/community_data.dart' show kParentingCommunities;
+// The old parenting community, superseded by lib/screens/community/
+// (2026-10-28). Kept for revert with the `pp_community/` branch below:
+// import 'pp_community_detail_screen.dart';
+// import 'community_screen.dart';
+// import '../../data/community_data.dart' show kParentingCommunities;
+import '../community/community_chrome.dart' show openCommunity;
+import '../community/community_home_screen.dart' show CommunityHomeScreen;
+import '../community/community_legacy_rooms.dart' show communityRoomForLegacy;
+import '../community/community_room_screen.dart' show CommunityRoomScreen;
 // import '../../data/kids_books.dart' show KidsBookRank, kKidsBooks; // the toasts' helpers (BHO4), kept for revert
 import 'pp_kids_books_shelf.dart' show ppKidsBooksScreenFor;
 import 'development_all_activities_screen.dart';
@@ -409,8 +415,29 @@ String? ppSurfaceUnavailable(String id) {
   return null;
 }
 
+/// The parenting community surface: bare for the community home,
+/// `pp_community/<roomId>` for one room (2026-10-28, the new community).
+const String kPpCommunitySurface = 'pp_community';
+
+/// The server room a `pp_community/<oldRoomId>` link means, or null for the
+/// community home.
+String? ppCommunityRoomFor(String surfaceId) {
+  const prefix = '$kPpCommunitySurface/';
+  if (!surfaceId.startsWith(prefix)) return null;
+  return communityRoomForLegacy(surfaceId.substring(prefix.length));
+}
+
 /// Opens a parenting surface, or says why it can't (S8). The one opener.
 void ppPushSurface(BuildContext context, String surfaceId) {
+  // ⚠️ THE COMMUNITY PUSHES ITSELF (2026-10-28). The new community names its
+  // own routes ('community', 'community/room/<id>'), and with a room it pushes
+  // two pages so Back from the room lands on the community home. A widget
+  // returned from `ppScreenForSurface` could do neither, so the link is
+  // handed to `openCommunity` before the generic push below.
+  if (surfaceId == kPpCommunitySurface || surfaceId.startsWith('$kPpCommunitySurface/')) {
+    openCommunity(context, roomId: ppCommunityRoomFor(surfaceId));
+    return;
+  }
   final why = ppSurfaceUnavailable(surfaceId);
   if (why != null) {
     const expertPrefix = 'pp_experts/';
@@ -627,13 +654,24 @@ Widget? ppScreenForSurface(String id) {
   // "open your circle" links were `null` surfaces for want of this; the
   // room is data in `community_data.dart`, the screen is the one every
   // room uses.
-  const roomPrefix = 'pp_community/';
-  if (id.startsWith(roomPrefix)) {
-    final roomId = id.substring(roomPrefix.length);
-    for (final c in kParentingCommunities) {
-      if (c.id == roomId) return PpCommunityDetailScreen(community: c);
-    }
-    return const CommunityScreen();
+  //
+  // ⚠️ NOW THE NEW COMMUNITY (2026-10-28). `ppPushSurface` opens these through
+  // `openCommunity` and never reaches here; this branch answers for callers
+  // that take the widget themselves (the tools tab, the Ask Veda corpus's
+  // "is this reachable" check), landing them in the same room. The old room
+  // ids map to the nearest server room (`community_legacy_rooms.dart`).
+  // Kept for revert, the old parenting room screens:
+  //   const roomPrefix = 'pp_community/';
+  //   if (id.startsWith(roomPrefix)) {
+  //     final roomId = id.substring(roomPrefix.length);
+  //     for (final c in kParentingCommunities) {
+  //       if (c.id == roomId) return PpCommunityDetailScreen(community: c);
+  //     }
+  //     return const CommunityScreen();
+  //   }
+  if (id == kPpCommunitySurface || id.startsWith('$kPpCommunitySurface/')) {
+    final room = ppCommunityRoomFor(id);
+    return room == null ? const CommunityHomeScreen() : CommunityRoomScreen(roomId: room);
   }
   // ⚠️ `pp_compare/<shelf>` ARRIVES WITH THE SHELF LOADED. Seven links across
   // Health and First 40 Days said "compare swaddles" and opened the compare

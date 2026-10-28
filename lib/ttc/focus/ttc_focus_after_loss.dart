@@ -495,6 +495,13 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         //       'and nobody gives advice unless you ask for it.',
         //   surfaceId: 'ttc_community',
         // ),
+        // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+        TtcCommunityTile(
+          title: 'Loss & Recovery room',
+          blurb: 'A gentle space. Nobody gives you a timeline or a bright side, '
+              'and nobody gives advice unless you ask for it.',
+          surfaceId: 'ttc_community',
+        ),
         TtcCommunityTile(
           title: 'Your Care Circle',
           id: 'ttc_tile_your_care_circle',

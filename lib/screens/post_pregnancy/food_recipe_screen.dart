@@ -642,6 +642,8 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
         ),
       // Community is out of parenting for now (2026-10-07). Kept for revert:
       // if (r.relatedCommunity != null) (Icons.groups_outlined, 'Community', r.relatedCommunity!, () => openPpTab(context, 3)),
+      // Re-enabled 2026-10-28 for the new community (openPpTab 3 opens lib/screens/community).
+      if (r.relatedCommunity != null) (Icons.groups_outlined, 'Community', r.relatedCommunity!, () => openPpTab(context, 3)),
       (Icons.auto_awesome_outlined, 'Ask Veda', 'Ask about feeding at ${r.ageTag}', () => openPpTab(context, 1)),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

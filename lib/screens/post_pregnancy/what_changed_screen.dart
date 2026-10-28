@@ -11,7 +11,8 @@
 
 import 'package:flutter/material.dart';
 
-import 'community_screen.dart';
+// import 'community_screen.dart'; // superseded by lib/screens/community (2026-10-28), kept for revert
+import '../community/community_chrome.dart' show openCommunity;
 import 'phase_map_screen.dart';
 import 'pp_changes_store.dart';
 import 'pp_child_profile.dart';
@@ -707,13 +708,17 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
         ? Icons.warning_amber_rounded
         : (caution ? Icons.info_outline_rounded : Icons.lightbulb_outline_rounded);
     final body = pvManrope(fontSize: 14, height: 1.55, color: p.ink1);
-    Widget row(String key, IntentMark mark, double hue, String title, String line, Widget screen) => PvListRow(
+    // [open] for a destination that pushes itself (the community, 2026-10-28).
+    // Kept for revert: `Widget screen` and `onTap: () => _push(context, screen)`.
+    Widget row(String key, IntentMark mark, double hue, String title, String line, Widget? screen,
+            {VoidCallback? open}) =>
+        PvListRow(
           key: ValueKey(key),
           p: p,
           leading: PvMarkWell(p: p, hue: hue, size: 40, mark: mark),
           title: title,
           line: line,
-          onTap: () => _push(context, screen),
+          onTap: open ?? () => _push(context, screen!),
         );
     return [
       const SizedBox(height: 26),
@@ -791,8 +796,9 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
       pregToolPad(PvRowGroup(p: p, children: [
         row('wc_flow_phase', IntentMark.timelineRail, 285, _fill('Where {baby} is right now'), 'The phase map',
             const PhaseMapScreen()),
+        // The new community (2026-10-28). Kept for revert: const CommunityScreen() as the screen.
         row('wc_flow_community', IntentMark.cuppedHands, 20, 'Parents going through this too', 'Community',
-            const CommunityScreen()),
+            null, open: () => openCommunity(context)),
         row('wc_flow_expert', IntentMark.askDoctor, 206, 'Talk it through with a paediatrician', 'Ask an expert',
             const ProblemSolverScreen()),
       ])),
@@ -1064,7 +1070,9 @@ class _WcFlowScreenState extends State<WcFlowScreen> {
                 _fill('Where {baby} is right now'), _lav,
                 dark: true, onTap: () => _push(context, const PhaseMapScreen())),
             _railCard(context, Icons.forum_outlined, 'Community', 'Parents going through this too', ppPurple,
-                onTap: () => _push(context, const CommunityScreen())),
+                // The new community (2026-10-28). Kept for revert:
+                //   onTap: () => _push(context, const CommunityScreen())),
+                onTap: () => openCommunity(context)),
             _railCard(context, Icons.medical_services_outlined, 'Ask an expert', 'Talk it through with a paediatrician', ppCoral,
                 onTap: () => _push(context, const ProblemSolverScreen())),
           ],

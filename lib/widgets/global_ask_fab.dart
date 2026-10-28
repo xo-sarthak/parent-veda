@@ -320,6 +320,13 @@ class FabRouteObserver extends NavigatorObserver {
             // the last answer. Ask Veda is the place for open questions and
             // the chat has its own way out.
             name.startsWith('ttc_chat/') ||
+            // The community (2026-10-28): its feeds own the bottom-right
+            // corner with "Write a post", a post has its reply bar at the
+            // foot, and the composer has a keyboard up. Two round buttons in
+            // one corner read as one. Community is never an Ask Veda source
+            // either, so the button has no job there.
+            name == 'community' ||
+            name.startsWith('community/') ||
             name.contains('/story/') ||
             name.contains('/interactive/'));
     FabState.instance._update(

@@ -318,12 +318,12 @@ void main() {
             reason: 'ttc_after_loss → ${l.name} must be notApplicable');
         expect(canRender(b, l), isFalse);
       }
-      // What she IS shown: a person. "And other people" (the community
-      // room) is held back for launch, 2026-09-26, TTC gap plan §7.1; when
-      // community returns, restore the second expectation below.
+      // What she IS shown: a person, and other people. The community room
+      // was held back for launch 2026-09-26 (TTC gap plan §7.1) and is back
+      // 2026-10-28 with the new community. Kept for revert:
+      //   expect(canRender(b, BracketLayer.extras), isFalse);
       expect(canRender(b, BracketLayer.consult), isTrue);
-      // expect(canRender(b, BracketLayer.extras), isTrue);
-      expect(canRender(b, BracketLayer.extras), isFalse);
+      expect(canRender(b, BracketLayer.extras), isTrue);
     });
 
     // =========================================================================

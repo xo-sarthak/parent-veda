@@ -29,7 +29,9 @@ void main() {
       expect(find.byKey(ValueKey('pp_more_$id')), findsOneWidget, reason: id);
     }
     expect(find.byType(PregOfferRow), findsWidgets);
-    expect(find.text('Community'), findsNothing);
+    // Community joined 2026-10-28 (the new community). Kept for revert:
+    //   expect(find.text('Community'), findsNothing);
+    expect(find.byKey(const ValueKey('pp_more_community')), findsOneWidget);
     expect(find.byType(PpBottomNav), findsOneWidget);
     expect(t.takeException(), isNull);
   });

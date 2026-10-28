@@ -11,7 +11,8 @@
 import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 
-import 'community_screen.dart';
+// import 'community_screen.dart'; // superseded by lib/screens/community (2026-10-28), kept for revert
+import '../community/community_chrome.dart' show openCommunity;
 import 'growth_activity_screen.dart';
 import 'pp_common.dart';
 import 'remedy_detail_screen.dart';
@@ -171,7 +172,8 @@ class WonderWeekScreen extends StatelessWidget {
               _pad(_link(context, 'Nuskha', ppBrown, 'Ajwain potli for leap-time sniffles',
                   () => _push(context, const RemedyDetailScreen()), top: true)),
               _pad(_link(context, 'Room', ppPurple, 'Parents in Phase 4 right now',
-                  () => _push(context, const CommunityScreen()), top: true, bottom: true)),
+                  // The new community (2026-10-28). Kept for revert: () => _push(context, const CommunityScreen())
+                  () => openCommunity(context), top: true, bottom: true)),
 
               // timeline
               const SizedBox(height: 28),

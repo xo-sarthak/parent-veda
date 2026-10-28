@@ -42,6 +42,12 @@ import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
 /// real rooms (gap analysis, Behind · Community). Until then every community
 /// screen draws [ppCommunityOpeningSoon]. The seeded screens are untouched
 /// behind this flag.
+///
+/// ⚠️ SUPERSEDED 2026-10-28 by lib/screens/community (the new, shared
+/// community). Every parenting entry point now calls `openCommunity`, so the
+/// old gated screens are never pushed and this flag gates nothing reachable.
+/// The flag and the Opening soon page stay, kept for revert. Do not flip it
+/// to open the community: that would open the OLD seeded screens.
 const bool kPpCommunityOpen = false;
 
 /// Where "Tell me when it opens" is kept: the ids she asked about.

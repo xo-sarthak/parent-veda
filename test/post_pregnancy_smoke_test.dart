@@ -649,7 +649,9 @@ void main() {
     await tester.pumpAndSettle();
 
     // Held behind Opening soon until the community is real (gap analysis P1,
-    // 2026-10-07; pp_opening_soon.dart). The seeded feed below the flag is
+    // 2026-10-07; pp_opening_soon.dart). SUPERSEDED 2026-10-28: the app opens
+    // the new community (lib/screens/community) and never this screen, which
+    // is kept for revert; this test only proves the kept screen still builds. The seeded feed below the flag is
     // still built when kPpCommunityOpen flips; until then the page is honest.
     if (!kPpCommunityOpen) {
       expect(find.byKey(const ValueKey('pp_community_opening_soon')), findsOneWidget);

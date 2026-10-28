@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_community_screen.dart';
+import 'package:parentveda/screens/community/community_home_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_prepare_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
@@ -85,9 +86,14 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(TtcToolsScreen), findsOneWidget);
 
+      // The new, shared community since 2026-10-28 (openTtcTab 4 calls
+      // openCommunity). Kept for revert:
+      //   expect(find.byType(TtcCommunityScreen), findsOneWidget);
       await tester.tap(find.text('Community').last);
-      await tester.pumpAndSettle();
-      expect(find.byType(TtcCommunityScreen), findsOneWidget);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byType(CommunityHomeScreen), findsOneWidget);
+      expect(find.byType(TtcCommunityScreen), findsNothing);
     });
   });
 

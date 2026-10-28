@@ -11,7 +11,9 @@
 //  sheet reached, so every Explore row still has an entrance (the old sheet's
 //  test holds that). The sheet is kept for revert in pp_more_sheet.dart.
 //
-//  Community is not here: out of parenting for now (the user, 2026-10-07).
+//  Community was not here: out of parenting from 2026-10-07. Re-enabled
+//  2026-10-28 for the new, shared community (lib/screens/community): one
+//  row under Your child's journey, opened by `openCommunity`.
 //  A placeholder programme says Opening soon and opens the honest page
 //  (pvOpenOffering), never a sales page.
 // =============================================================================
@@ -39,6 +41,7 @@ import 'pp_expert_honesty.dart' show ppProgramIsPlaceholder;
 import 'pp_messages_screen.dart' show openPpMessages;
 import 'pp_more_sheet.dart' show ppMoreSheetEntries;
 import 'problem_solver_screen.dart';
+import '../community/community_chrome.dart' show openCommunity;
 import 'reading_home_screen.dart';
 // import 'recipes_explore_screen.dart'; // kept for revert
 import 'watch_home_screen.dart';
@@ -50,8 +53,11 @@ import 'pp_recipes_screen.dart';
 // "My Journal V2" opened the old demo journal and "Read" a second reads
 // library; the named Journal and All reads rows above are the real ones
 // (2026-10-07), so both are folded into them rather than listed twice.
+// 'Community' joined 2026-10-28: its named row is below, so the sheet's
+// Community entry is not listed a second time under Everything else.
 const Set<String> _kNamedHere = {
   'Watch', 'Learn', 'Recipes', 'Memories', 'Find help', 'You', 'My Journal V2', 'Read',
+  'Community',
 };
 
 /// ⚠️ MOVED TO THE PARENTING PROFILE (2026-10-07, the user: "Under More >
@@ -219,6 +225,12 @@ class _PpMoreScreenState extends State<PpMoreScreen> {
                 _row('pp_more_find_help', IntentMark.askDoctor, 176, 'Find help',
                     'Lactation, paediatrics and night help near you',
                     () => _push('pp/find_help', () => const ProblemSolverScreen()), art: ttcArtTab(TtcTabMark.doctorChat)),
+                // Re-enabled 2026-10-28 for the new community.
+                _row('pp_more_community', IntentMark.cuppedHands, 20, 'Community',
+                    'Other parents at your stage, to read or to talk', () {
+                  pvCommitFeedback();
+                  openCommunity(context);
+                }, art: ttcArtTab(TtcTabMark.twoFigures)),
               ]),
               if (rest.isNotEmpty)
                 _section('rest', 'Everything else', [

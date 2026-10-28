@@ -19,10 +19,11 @@
 //
 //  ⚠️ EVERY ROW THE OLD BAR REACHED HAS A HOME, AND THAT IS THE TEST. The
 //  TTC More file says it best: a tab that REPLACES another leaves whatever it
-//  displaced with no entrance anywhere. Calendar is here. Community is not,
-//  on purpose: the gap analysis holds it back until it is real ("Hold the
-//  community back", P1), with every entry point commented out, kept for
-//  revert. `test/preg_learn_more_test.dart` holds both.
+//  displaced with no entrance anywhere. Calendar is here. Community was not:
+//  the gap analysis held it back until it was real ("Hold the community
+//  back", P1). It is real now (lib/screens/community, 2026-10-28), so it has
+//  its own section below, opened by `openCommunity`.
+//  `test/preg_learn_more_test.dart` holds both.
 //
 //  ⚠️ A SECTION WITH NOTHING IN IT STILL DRAWS. An empty Groups says nothing
 //  is scheduled yet and points to Prepare; it does not vanish (CLAUDE.md, "a
@@ -75,6 +76,7 @@ import '../referral/invite_friends_screen.dart';
 import '../watch_learn_screen.dart';
 import 'preg_learn_screen.dart' show showPregOpeningSoon;
 import 'preg_messages_screen.dart' show openPregMessages;
+import '../community/community_chrome.dart' show openCommunity;
 import '../../services/preg_messages_store.dart';
 
 /// The pregnancy bar, by position. Positional because the labels are display
@@ -153,6 +155,7 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
     'preg_more_week': ttcArtTab(TtcTabMark.sprout),
     'preg_more_employer': ttcArtTab(TtcTabMark.wallet),
     'preg_more_invite': ttcArtTab(TtcTabMark.bigSmallHearts),
+    'preg_more_open_community': ttcArtTab(TtcTabMark.twoFigures),
   };
 
   static TtcArtBuilder _artOfKind(PvLearnKind k) => switch (k) {
@@ -361,6 +364,15 @@ class _PregMoreScreenState extends State<PregMoreScreen> {
                     () => openPvDoorSurface(context, kPartnerSurfaceDoor, _c)),
               ],
             ]),
+
+            // ---- community (re-enabled 2026-10-28 for the new community) --------
+            _section('community', 'Community', [
+              _row('preg_more_open_community', IntentMark.cuppedHands, 20, 'Talk to other mothers',
+                  'Rooms for your stage, to read or to talk', () {
+                pvCommitFeedback();
+                openCommunity(context);
+              }),
+            ], lead: 'Kind, moderated rooms for every stage'),
 
             // ---- benefits -------------------------------------------------------
             _section('benefits', 'Benefits', [

@@ -235,7 +235,10 @@ void main() {
 
   // ===========================================================================
   group('You holds what More held', () {
-    test('the TTC rows are in the content table, Community is not', () {
+    // Community joined 2026-10-28 (the new, shared community). Kept for
+    // revert, the old title: 'the TTC rows are in the content table,
+    // Community is not'.
+    test('the TTC rows are in the content table, Community too', () {
       final titles = [
         for (final t in pvYouContentFor(LifeStage.tryingToConceive).things)
           t.title
@@ -249,8 +252,10 @@ void main() {
       ]) {
         expect(titles, contains(row), reason: '"$row" lost its entrance');
       }
-      expect(titles.any((t) => t.toLowerCase().contains('community')), isFalse,
-          reason: 'Community is held back');
+      // Kept for revert: expect(titles.any((t) => t.toLowerCase().contains('community')), isFalse,
+      //     reason: 'Community is held back');
+      expect(titles, contains('Community'),
+          reason: 'the new community has a row on You');
       expect(
           [
             for (final t in pvYouContentFor(LifeStage.tryingToConceive).tiles)

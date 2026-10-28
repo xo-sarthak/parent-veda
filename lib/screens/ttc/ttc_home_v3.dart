@@ -167,6 +167,7 @@ import '../learn/pv_offering_content.dart'
 import 'ttc_transition_screen.dart';
 import 'ttc_dose_parts.dart' show TtcDoseInkButton;
 import 'ttc_learn_screen.dart' show openTtcLearn101;
+import '../community/community_home_card.dart';
 
 /// The four chapters' hues, on the same controlled-pastel wheel every other
 /// stage uses.
@@ -1172,6 +1173,13 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                                   // const RouteSettings(name: 'ttc/consults'),
                               // builder: (_) => const TtcPrepareScreen(
                                   // onlyCategory: 'consults'))))),
+                  const SizedBox(height: 26),
+
+                  // ---- PARENTS LIKE YOU (2026-10-28, the community) -------
+                  //
+                  // After the people, before the door out: other people at
+                  // the same point, and the replies waiting for her.
+                  _pad(const CommunityHomeCard()),
                   const SizedBox(height: 26),
 
                   // ---- THE DOOR OUT ----------------------------------------

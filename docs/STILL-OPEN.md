@@ -2239,6 +2239,8 @@ controls" — which is right, and is exactly why this waits.
 - **Demo signals kept deliberately:** community view counts, a pre-set
   "Following", the Nuskhe review-panel claim, "ParentVeda-verified purchase
   reviews". All must become true or go before launch.
+  Community part DONE 2026-10-28: the new community (docs/COMMUNITY.md) ships no view counts, no seed posts
+  and no pre-set follows; every number on it is counted by the server.
 - **Brand Studio's real brand names** in the user-facing Explore drawer.
 - `kPremiereAlwaysShow` and `kDailyPopupAlwaysShow` are still `true`.
 - **Pregnancy tools inside the parenting app** — Memories' "We're Expecting",
@@ -9733,6 +9735,9 @@ Owed:
 - **§79.5 Community** (held back): its PDF items (honest counts, votable poll, two-week-wait and over-35 rooms,
   pinned threads, live thread on the home) wait for the release decision; every entry point is commented, not
   deleted.
+  - **CLOSED 2026-10-28 by the real community** (`docs/COMMUNITY.md`): shared feed, votable polls with real counts,
+    a two-week-wait room, the entry points re-enabled onto the new screens, a "Parents like you" card on the home.
+    Over-35 room and pinned threads are not built (phase 2 list in COMMUNITY.md).
 - **§79.6 Faint-line drawing** (a design asset) for `ttc_read_faint_line`.
 - **§79.7 Six videos** the PDF names (fertile window, when to test, stress, his side, PCOS, when to see someone):
   the placeholder tiles stay until the films are uploaded.
@@ -10224,6 +10229,8 @@ From the parenting gap analysis (theAsianparent and What to Expect vs ParentVeda
   - **§82.10 Community is out of parenting for now** (the user, 2026-10-07: "you don't have to work upon community
     for now"). The More entry, the recipe page's Community link and the "Room" rows are commented out, kept for
     revert; the community screens still say Opening soon if reached.
+    - **CLOSED 2026-10-28:** the shared community replaces it (`docs/COMMUNITY.md`); parenting's entry points open the
+      new screens, the Opening-soon page and flag are kept for revert.
   - **§82.11 The one-ParentVeda pass, done 2026-10-07.** Tools, Brain activities and More are tab screens in the
     TTC/pregnancy format; every tool, recipes, names, the reads and films libraries, Find help and the What changed
     flow are on the shared tool shell, each with a Mobbin reference cited in its file. Later the same day: the

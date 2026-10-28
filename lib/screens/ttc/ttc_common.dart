@@ -25,7 +25,8 @@ import '../../services/app_shell.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../widgets/global_ask_fab.dart';
 import 'ttc_calendar_screen.dart';
-import 'ttc_community_screen.dart';
+// import 'ttc_community_screen.dart'; // superseded by lib/screens/community (2026-10-28), kept for revert
+import '../community/community_chrome.dart' show openCommunity;
 import 'ttc_cycle_palette.dart' show TtcCycleColours;
 // Kept for revert: More left the bar on 2026-09-26 (its rows live in You).
 // import 'ttc_more_screen.dart';
@@ -710,9 +711,12 @@ void openTtcTab(BuildContext context, int index) {
           settings: const RouteSettings(name: 'ttc/calendar')));
       break;
     case 4:
-      nav.push(MaterialPageRoute<void>(
-          builder: (_) => const TtcCommunityScreen(),
-          settings: const RouteSettings(name: 'ttc/community')));
+      // The new community (2026-10-28), shared by every stage; it names its
+      // own route ('community'). Kept for revert:
+      //   nav.push(MaterialPageRoute<void>(
+      //       builder: (_) => const TtcCommunityScreen(),
+      //       settings: const RouteSettings(name: 'ttc/community')));
+      openCommunity(context);
       break;
     // 0 = Today: the popUntil above already returned to it.
   }

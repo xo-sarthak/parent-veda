@@ -159,6 +159,8 @@ void main() {
         kTtcMoreReadWatchHeading,
         // Off More since 2026-09-30 (the user). Kept for revert:
         //   kTtcMoreJourneyHeading,
+        // The new community, 2026-10-28.
+        kTtcMoreCommunityHeading,
         kTtcMoreBenefitsHeading,
       ];
       var y = -1.0;
@@ -244,6 +246,8 @@ void main() {
         'invite': 'invite',
         // 2026-10-16: the one Yoga & fitness hub.
         'yoga_fitness': 'move',
+        // 2026-10-28: the new, shared community (its own route name).
+        'community': 'community',
       };
       final rows = [
         for (final s in ttcMoreSections(partner: false)) ...s.rows,

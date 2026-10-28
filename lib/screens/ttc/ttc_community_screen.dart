@@ -1,3 +1,6 @@
+// SUPERSEDED 2026-10-28 by lib/screens/community/. Unreachable from the app;
+// kept for revert. Do not add entry points.
+
 // =============================================================================
 //  TTC - Community
 // -----------------------------------------------------------------------------

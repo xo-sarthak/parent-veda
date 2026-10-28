@@ -54,7 +54,8 @@ import '../ttc/ttc_daily_data.dart' show TtcInsight, ttcAllInsights;
 import '../ttc/ttc_treatment_content.dart' show kTtcTreatmentInsights;
 import '../ttc/ttc_insight_read.dart' show kTtcInsightReadPrefix, openTtcInsight;
 import 'can_i_screen.dart' show openCanIAnswer;
-import 'community_screen.dart' show PostDetailScreen;
+// import 'community_screen.dart' show PostDetailScreen; // superseded by lib/screens/community (2026-10-28), kept for revert
+import 'community/community_chrome.dart' show openCommunityPost;
 import 'doors/pv_door_router.dart' show openPvDoorRead, pvDoorEntryForReadId, pvDoorEntryTitle, pvDoorEntryScreen;
 import 'garbh_screen.dart' show SamvadScreen;
 import 'post_pregnancy/pp_daily_tips.dart';
@@ -130,16 +131,19 @@ const Set<SavedKind> kTtcSavedKinds = {
 /// What each other stage saves (2026-10-10, the user: Saved "shows stuff of
 /// other stages"). Every kind header renders on a stage's screen, so a kind
 /// that stage never saves was an empty section advertising another stage.
-/// Community is out while it is held back (gap analysis P1).
+/// Community was out while it was held back (gap analysis P1); re-enabled
+/// 2026-10-28 for the new community, which every stage shares, so every
+/// stage's Saved lists saved posts. Kept for revert: the three sets without
+/// `SavedKind.post`, and `'trying': kTtcSavedKinds`.
 const Map<String, Set<SavedKind>> kStageSavedKinds = {
-  'trying': kTtcSavedKinds,
+  'trying': {...kTtcSavedKinds, SavedKind.post},
   'pregnancy': {
     SavedKind.article, SavedKind.video, SavedKind.recipe, SavedKind.product,
-    SavedKind.question, SavedKind.readToBaby, SavedKind.tool,
+    SavedKind.question, SavedKind.readToBaby, SavedKind.tool, SavedKind.post,
   },
   'parenting': {
     SavedKind.article, SavedKind.video, SavedKind.recipe, SavedKind.product,
-    SavedKind.tip, SavedKind.activity, SavedKind.tool,
+    SavedKind.tip, SavedKind.activity, SavedKind.tool, SavedKind.post,
   },
   'skilling': {
     SavedKind.article, SavedKind.video, SavedKind.activity, SavedKind.product,
@@ -660,8 +664,11 @@ class SavedItemOpener {
         return ReadToBabySavedStore.instance.cached(id)?.title;
       case SavedKind.tip:
         return dailyTipById(id)?.title;
+      // The new community saves its post's title with the row (2026-10-28);
+      // an old seeded post still resolves from the old store.
+      // Kept for revert: return _post(id)?.text;
       case SavedKind.post:
-        return _post(id)?.text;
+        return _post(id)?.text ?? (it.title.isEmpty ? null : it.title);
       case SavedKind.recipe:
         return _recipe(id)?.name.en;
       case SavedKind.activity:
@@ -697,8 +704,11 @@ class SavedItemOpener {
         return c != null;
       case SavedKind.tip:
         return dailyTipById(id) != null;
+      // Any saved post opens the new community's post page (2026-10-28),
+      // which says so itself when a post is no longer there.
+      // Kept for revert: return _post(id) != null && c != null;
       case SavedKind.post:
-        return _post(id) != null && c != null;
+        return true;
       // ⚠️ A SAVED RECIPE HAD NO WAY BACK (2026-09-23). The recipe card's
       // heart has saved `SavedKind.recipe` since e9d8ac8, and this said
       // false — every saved recipe was a row that could not be opened.
@@ -787,9 +797,11 @@ class SavedItemOpener {
         final t = dailyTipById(id);
         if (t != null) push(SavedTipScreen(tip: t), name: 'saved/tip/$id');
       case SavedKind.post:
-        if (_post(id) != null && c != null) {
-          push(PostDetailScreen(post: _post(id)!, controller: c), name: 'post/$id');
-        }
+        // The new community (2026-10-28). Kept for revert:
+        //   if (_post(id) != null && c != null) {
+        //     push(PostDetailScreen(post: _post(id)!, controller: c), name: 'post/$id');
+        //   }
+        openCommunityPost(context, id);
       case SavedKind.recipe:
         if (_recipe(id) case final r? when c != null) {
           push(RecipeCookScreen(recipe: r, pregnancy: c), name: 'saved/recipe/$id');

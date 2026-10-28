@@ -36,6 +36,7 @@ import '../../theme/pv_fonts.dart';
 import '../memories/memories_home_screen.dart';
 import '../v2/v2_palette.dart';
 // import 'community_screen.dart'; // kept for revert with the Community entry
+import '../community/community_home_screen.dart' show CommunityHomeScreen;
 import 'courses_explore_screen.dart';
 import 'explore_drawer.dart';
 // import 'family_profile_screen.dart'; // kept for revert — the Settings row became You on 2026-09-19
@@ -61,6 +62,12 @@ List<ExploreEntry> _named() => [
       // ExploreEntry(Icons.people_outline_rounded, 'Community',
       //     'Parents whose babies are the same age as ${ChildProfileStore.instance.nameMid}.',
       //     const CommunityScreen()),
+      // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+      // The live More tab (pp_more_screen.dart) draws its own Community row
+      // through `openCommunity`; this entry is what the kept sheet would show.
+      ExploreEntry(Icons.people_outline_rounded, 'Community',
+          'Parents whose babies are the same age as ${ChildProfileStore.instance.nameMid}.',
+          const CommunityHomeScreen()),
       ExploreEntry(Icons.play_circle_outline, 'Watch',
           'Every video, phase by phase.', const WatchHomeScreen()),
       ExploreEntry(Icons.school_outlined, 'Learn',

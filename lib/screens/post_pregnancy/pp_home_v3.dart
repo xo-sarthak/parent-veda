@@ -157,6 +157,7 @@ import '../v2/pv_insight_rail.dart';
 import '../reader/pv_reader_screen.dart';
 import '../../widgets/pv_home_arrival.dart';
 import 'pp_page_fill.dart' show ppPageTitle;
+import '../community/community_home_card.dart';
 
 // ---- One type scale for the whole home (2026-10-07) ------------------------
 //
@@ -1053,6 +1054,13 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 //       _openCapture(context, 'A moment from today'),
                 //   onOpenAll: () => _openJournal(context),
                 // )),
+                const SizedBox(height: 32),
+
+                // ---- PARENTS LIKE YOU (2026-10-28, the community) ----------
+                //
+                // Before the phase questions: the people asking them. Replies
+                // waiting for her, or a real question from her stage's rooms.
+                _pad(const CommunityHomeCard()),
                 const SizedBox(height: 32),
 
                 // ---- QUESTIONS FOR THIS PHASE -------------------------------

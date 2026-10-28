@@ -206,6 +206,16 @@ PvYouThing _movedThing(String id) {
   );
 }
 
+/// The community from trying to conceive (re-enabled 2026-10-28 for the new,
+/// shared community). Data, not a screen: 'ttc_community' routes through
+/// `openTtcSurface` to `openCommunity`, the one way in from this stage.
+PvYouThing _ttcCommunity() => PvYouThing(
+      icon: Icons.forum_outlined,
+      title: 'Community',
+      subtitle: 'Rooms of people trying too, to read or to talk',
+      open: (c) => openTtcSurface(c, 'ttc_community'),
+    );
+
 /// The one forward action of a stage.
 class PvYouAction {
   const PvYouAction({
@@ -995,8 +1005,9 @@ final PvYouStageContent _trying = PvYouStageContent(
   // Learn · Products · Tools · You, and the More tab went. Everything it held
   // is below, so nothing lost its entrance: Calendar, the cycle companion,
   // the fertility window and the unscoped programmes list (Journal was
-  // already a tile; Profile is this screen). Community is held back on
-  // purpose, the user's call. `test/ttc_tabs_v3_test.dart` pins every row.
+  // already a tile; Profile is this screen). Community was held back on
+  // purpose, the user's call; re-enabled 2026-10-28 for the new community
+  // (lib/screens/community). `test/ttc_tabs_v3_test.dart` pins every row.
   //
   // The doctor's note leads (Flo's "Report for a doctor" sits first under
   // the identity card): it says the app is for her and her clinician.
@@ -1020,6 +1031,8 @@ final PvYouStageContent _trying = PvYouStageContent(
       listen: TtcMessagesStore.instance,
       open: (c) => openTtcSurface(c, 'ttc_messages'),
     ),
+    // Re-enabled 2026-10-28 for the new community.
+    _ttcCommunity(),
     // Y3: the line says whether hiding is on, so she can see it without
     // opening the sheet (the Settings value pattern). Kept for revert:
     //   subtitle: kTtcHideIntimate,
@@ -1129,6 +1142,9 @@ final PvYouStageContent _trying = PvYouStageContent(
         open: (c) => openTtcGetHelp(c),
       ),
     ]),
+    // Community is NOT a group here (2026-10-28): the profile is about her,
+    // and what the app offers lives on the More tab (kTtcFormerYouRows in
+    // ttc_more_tab.dart), where the new community has its own section.
     // Kept for revert: PvYouGroup(title: 'Your app', things: [
     PvYouGroup(
         title: 'Your app',

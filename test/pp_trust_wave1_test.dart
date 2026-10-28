@@ -53,7 +53,12 @@ Future<void> _pump(WidgetTester tester, Widget home) async {
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  group('the community is held behind Opening soon', () {
+  // ⚠️ SUPERSEDED 2026-10-28: the new, shared community (lib/screens/community)
+  // replaced these screens. They stay behind Opening soon, kept for revert,
+  // and no parenting entry point pushes them any more (the last test here).
+  // Kept for revert, the old group title: 'the community is held behind
+  // Opening soon'.
+  group('the old community stays behind Opening soon, and nothing opens it', () {
     testWidgets('the feed draws the honest page, with nothing overflowing', (tester) async {
       await _pump(tester, const CommunityScreen());
       expect(find.byKey(const ValueKey('pp_community_opening_soon')), findsOneWidget);
@@ -65,6 +70,20 @@ void main() {
     testWidgets('a room opened from a recipe or a read lands on the same page', (tester) async {
       await _pump(tester, PpCommunityDetailScreen(community: kParentingCommunities.first));
       expect(find.byKey(const ValueKey('pp_community_opening_soon')), findsOneWidget);
+    });
+
+    test('every parenting entry point opens the new community', () {
+      for (final f in [
+        'lib/screens/post_pregnancy/pp_surface_router.dart',
+        'lib/screens/post_pregnancy/pp_common.dart',
+        'lib/screens/post_pregnancy/pp_more_screen.dart',
+        'lib/screens/post_pregnancy/what_changed_screen.dart',
+      ]) {
+        final src = _live(f);
+        expect(src, contains('openCommunity('), reason: f);
+        expect(src, isNot(contains('const CommunityScreen()')), reason: f);
+        expect(src, isNot(contains('PpCommunityDetailScreen(')), reason: f);
+      }
     });
 
     test('the flag is off, and "Doctor mode" can never reach a release build', () {

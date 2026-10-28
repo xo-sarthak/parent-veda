@@ -87,7 +87,12 @@ void main() {
       expect(_code('lib/screens/home_v3_screen.dart'), contains('CalendarScreen('));
     });
 
-    test('Community is held back at every pregnancy entry point', () {
+    // The community was held back here until 2026-10-28, when the new,
+    // shared community (lib/screens/community) replaced the old screen. Kept
+    // for revert, the old title: 'Community is held back at every pregnancy
+    // entry point'. The old screen is still never pushed; More and search now
+    // open the new one.
+    test('Community opens the new community, never the old screen', () {
       for (final f in [
         'lib/screens/main_scaffold.dart',
         'lib/screens/global_search.dart',
@@ -96,6 +101,12 @@ void main() {
         'lib/screens/tools_hub_screen.dart',
       ]) {
         expect(_code(f), isNot(contains('CommunityScreen(')), reason: f);
+      }
+      for (final f in [
+        'lib/screens/global_search.dart',
+        'lib/screens/pregnancy/preg_more_screen.dart',
+      ]) {
+        expect(_code(f), contains('openCommunity('), reason: f);
       }
       // Ask Veda: the answer's community block and its coming-soon line.
       final veda = _code('lib/screens/tools/ask_veda_screen.dart');
@@ -186,7 +197,9 @@ void main() {
   });
 
   group('More', () {
-    testWidgets('the TTC headings, in order, and no Community', (tester) async {
+    // Community joined 2026-10-28 (the new community), between Your journey
+    // and Benefits. Kept for revert: 'the TTC headings, in order, and no Community'.
+    testWidgets('the TTC headings, in order, with Community', (tester) async {
       await pump(tester, PregMoreScreen(pregnancy: pregnancy), height: 4000);
       expect(tester.takeException(), isNull);
       expect(find.text('More'), findsOneWidget);
@@ -196,6 +209,7 @@ void main() {
         'preg_more_groups',
         'preg_more_read_watch',
         'preg_more_journey',
+        'preg_more_community',
         'preg_more_benefits',
         // 'preg_more_all_programmes', // commented out 2026-10-17, kept for revert
       ];
@@ -208,7 +222,9 @@ void main() {
         last = y;
       }
       expect(find.text('Calendar', skipOffstage: false), findsOneWidget);
-      expect(find.text('Community', skipOffstage: false), findsNothing);
+      // Kept for revert: expect(find.text('Community', skipOffstage: false), findsNothing);
+      expect(find.text('Community', skipOffstage: false), findsOneWidget);
+      expect(find.byKey(const ValueKey('preg_more_open_community'), skipOffstage: false), findsOneWidget);
     });
   });
 

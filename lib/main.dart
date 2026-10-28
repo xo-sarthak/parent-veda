@@ -71,6 +71,7 @@ import 'services/read_store.dart';
 import 'services/recipe_store.dart';
 import 'services/bought_store.dart';
 import 'services/pv_review_store.dart';
+import 'services/pv_community_store.dart';
 import 'services/pv_catalog_store.dart';
 import 'services/pv_list_store.dart';
 import 'services/bump_store.dart';
@@ -78,7 +79,7 @@ import 'services/calendar_store.dart';
 import 'services/can_i_store.dart';
 import 'services/saved_store.dart';
 import 'services/cart_store.dart';
-import 'services/community_store.dart';
+// import 'services/community_store.dart'; // superseded 2026-10-28, kept for revert
 import 'services/expert_follow_store.dart';
 import 'services/daily_store.dart';
 import 'data/garbh_rebuild_data.dart' show GarbhJournalStore;
@@ -275,7 +276,12 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // Same lesson as the line above: a lazy `init()` needs one owner.
     ShravanLibrary.instance.init();
     // Load Community persistence (joins, likes, saves, votes, posts).
-    CommunityStore.instance.init();
+    // Superseded 2026-10-28 by the shared community below; the old
+    // prototype store is unreachable now. Kept for revert:
+    // CommunityStore.instance.init();
+    // The community (0121): cached feeds first, then her standing and
+    // anything she wrote offline goes out (docs/COMMUNITY.md).
+    PvCommunityStore.instance.init();
     // Load followed experts (Twitter-style following, experts only).
     ExpertFollowStore.instance.init();
     // Load Products saved-list persistence.

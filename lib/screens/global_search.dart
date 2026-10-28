@@ -22,6 +22,7 @@ import 'belly_skin/bump_ritual_screen.dart';
 import 'calendar_screen.dart';
 import 'can_i_screen.dart';
 // import 'community_screen.dart'; // held back with the community, kept for revert
+import 'community/community_chrome.dart' show openCommunity;
 import 'garbh_screen.dart';
 import 'journal_screen.dart';
 import 'journey_map_screen.dart';
@@ -56,11 +57,14 @@ void showGlobalSearch(BuildContext context, PregnancyController controller) {
 
 /// A tool / section the search can jump to.
 class _Dest {
-  const _Dest(this.label, this.keys, this.icon, this.build);
+  const _Dest(this.label, this.keys, this.icon, this.build, {this.open});
   final String label;
   final List<String> keys; // lowercase synonyms
   final IconData icon;
-  final Widget Function(PregnancyController) build;
+  // Nullable since 2026-10-28: a destination that pushes itself (the
+  // community names its own route) passes [open] instead.
+  final Widget Function(PregnancyController)? build;
+  final void Function(BuildContext)? open;
 }
 
 class _GlobalSearchDelegate extends SearchDelegate<void> {
@@ -139,6 +143,9 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         // "comment out the tab and every entry point"). Kept for revert:
         // _Dest(s.tabCommunity, const ['community', 'mom', 'group', 'post'],
         //     Icons.groups_rounded, (c) => CommunityScreen(controller: c)),
+        // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+        _Dest(s.tabCommunity, const ['community', 'mom', 'group', 'post'],
+            Icons.groups_rounded, null, open: (ctx) => openCommunity(ctx)),
       ];
 
   Widget _results(BuildContext context) {
@@ -178,7 +185,14 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             ListTile(
               leading: _leadIcon(d.icon),
               title: Text(d.label),
-              onTap: () => _go(context, d.build(controller)),
+              onTap: () {
+                if (d.open case final open?) {
+                  close(context, null);
+                  open(context);
+                } else {
+                  _go(context, d.build!(controller));
+                }
+              },
             ),
         ],
         if (products.isNotEmpty) ...[

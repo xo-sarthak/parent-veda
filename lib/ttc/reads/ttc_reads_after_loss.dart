@@ -325,6 +325,14 @@ final List<PvRead> kTtcReadsAfterLoss = [
       //       'them. Or not at all.'),
       //   surfaceId: 'ttc_community',
       // ),
+      // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+      PvReadNextStep(
+        kind: PvNextKind.activity,
+        title: _en('Others who have been here'),
+        value: _en("People who've been through this too, whenever you want "
+            'them. Or not at all.'),
+        surfaceId: 'ttc_community',
+      ),
     ],
 
     // ⚠️ ONE READ, ONCE, AT THE FOOT (2026-09-28, no repetition):
@@ -607,6 +615,14 @@ final List<PvRead> kTtcReadsAfterLoss = [
       //       'them. Or not at all.'),
       //   surfaceId: 'ttc_community',
       // ),
+      // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+      PvReadNextStep(
+        kind: PvNextKind.activity,
+        title: _en('Others who have been here'),
+        value: _en("People who've been through this too, whenever you want "
+            'them. Or not at all.'),
+        surfaceId: 'ttc_community',
+      ),
       // ⚠️ THE ONE PAID THING THIS BRACKET ALLOWS, AND IT IS NAMED AS A PERSON.
       // The workbook wants counselling and a gynae here — the only layer it
       // actively asks for. It is placed last, described as a conversation, and

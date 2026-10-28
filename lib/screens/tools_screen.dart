@@ -11,7 +11,8 @@ import 'package:flutter/material.dart';
 import '../localization/app_language.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
-import 'community_screen.dart';
+// import 'community_screen.dart'; // superseded by lib/screens/community (2026-10-28), kept for revert
+import 'community/community_chrome.dart' show openCommunity;
 import 'garbh_screen.dart';
 import 'journey_map_screen.dart';
 import 'products_screen.dart';
@@ -62,7 +63,9 @@ class ToolsScreen extends StatelessWidget {
       _ToolInfo(s.gsTitle, Icons.spa_rounded, AppTheme.tertiary500,
           onTap: () => open(() => GarbhScreen(controller: controller))),
       _ToolInfo(s.cmTitle, Icons.forum_rounded, AppTheme.secondary500,
-          onTap: () => open(() => CommunityScreen(controller: controller))),
+          // The new community (2026-10-28). Kept for revert:
+          //   onTap: () => open(() => CommunityScreen(controller: controller))),
+          onTap: () => openCommunity(context)),
       _ToolInfo(s.prTitle, Icons.shopping_bag_rounded, AppTheme.primary500,
           onTap: () => open(() => ProductsScreen(controller: controller))),
     ];

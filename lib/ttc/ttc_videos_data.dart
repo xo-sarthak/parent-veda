@@ -413,6 +413,7 @@ final List<PvVideoSlot> kTtcVideos = [
     readNext: ['ttc_read_loss_recovery'],
     // Community held back for launch (2026-09-26, TTC gap plan §7.1) — kept for revert.
     // surfaceNext: ['ttc_community'],
+    surfaceNext: ['ttc_community'], // re-enabled 2026-10-28 for the new community
   ),
 
   // ---------------------------------------------------------------------------

@@ -383,6 +383,15 @@ final HubConfig kTtcAfterLoss = HubConfig(
     //   hue: 268,
     //   surfaceId: 'ttc_community',
     // ),
+    // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+    HubNeed(
+      label: _en('Get emotional support'),
+      blurb: _en('Others who have been where you are, whenever you '
+          'want to talk.'),
+      mark: IntentMark.cuppedHands,
+      hue: 268,
+      surfaceId: 'ttc_community',
+    ),
   ],
   // ⚠️ NO CLOSING. A consult offer at the foot of this hub is a consult
   // upsell whatever label it carries, and the brief for this hub rules that

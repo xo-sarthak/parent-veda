@@ -256,13 +256,21 @@ void main() {
       }
     });
 
-    test('community is held back for launch', () {
-      for (final page in kTtcFocusPages) {
-        final rooms = page.allTiles.whereType<TtcCommunityTile>().where(
-          (t) => t.surfaceId == 'ttc_community',
-        );
-        expect(rooms, isEmpty, reason: '${page.bracketId} still offers a room');
-      }
+    // Held back for launch until 2026-10-28; the new community brought the
+    // rooms back. Kept for revert, the old test 'community is held back for
+    // launch' (every page: no TtcCommunityTile with surfaceId 'ttc_community').
+    test('the community rooms are back, and open the new community', () {
+      final withRoom = [
+        for (final page in kTtcFocusPages)
+          if (page.allTiles
+              .whereType<TtcCommunityTile>()
+              .any((t) => t.surfaceId == 'ttc_community'))
+            page.bracketId,
+      ];
+      expect(withRoom, containsAll(['ttc_after_loss', 'ttc_pcos']));
+      final router =
+          File('lib/screens/ttc/ttc_surface_router.dart').readAsStringSync();
+      expect(router, contains('openCommunity(context)'));
     });
   });
 

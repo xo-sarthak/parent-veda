@@ -37,7 +37,8 @@ import '../../services/veda_answer.dart';
 import '../../services/veda_index.dart';
 import '../../widgets/mic_dictation_button.dart';
 import '../calendar_screen.dart';
-import '../community_screen.dart';
+// import '../community_screen.dart'; // superseded by lib/screens/community (2026-10-28), kept for revert
+import '../community/community_chrome.dart' show openCommunity;
 import '../products_screen.dart';
 import '../profile_screen.dart';
 import '../read_next_screen.dart';
@@ -260,7 +261,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   void _openProduct(Product prod) =>
       _open(ProductDetailScreen(product: prod, controller: p));
   void _openReads() => _open(ReadNextScreen(controller: p));
-  void _openCommunityPage() => _open(CommunityScreen(controller: p));
+  // The new community (2026-10-28); the old screen is unreachable. Kept for
+  // revert: _open(CommunityScreen(controller: p)).
+  void _openCommunityPage() => openCommunity(context);
 
   void _openWeeklyJourney() {
     p.selectWeek(p.currentWeek);

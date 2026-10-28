@@ -30,7 +30,9 @@ import 'ttc_calendar_screen.dart';
 import 'ttc_can_i_screen.dart';
 import 'ttc_care_circle_screen.dart';
 import 'ttc_chapter_screen.dart';
-import 'ttc_community_screen.dart';
+// import 'ttc_community_screen.dart'; // superseded by lib/screens/community (2026-10-28), kept for revert
+import '../community/community_chrome.dart' show openCommunity;
+import '../community/community_home_screen.dart' show CommunityHomeScreen;
 import 'ttc_cycle_screens.dart';
 // Kept for revert (2026-09-28, journal out of TTC):
 // import 'ttc_journal_screen.dart';
@@ -186,6 +188,10 @@ Widget? ttcScreenForSurface(String id) {
   return _ttcStaticSurface(id);
 }
 
+/// The community, from trying to conceive (2026-10-28: the new, shared
+/// community in lib/screens/community).
+const String kTtcCommunitySurface = 'ttc_community';
+
 /// Opens a surface by id from anywhere in the stage.
 ///
 /// The Tools hub uses this rather than naming screen classes itself. The reason
@@ -203,6 +209,14 @@ void openTtcSurface(BuildContext context, String surfaceId) =>
 /// Lives here rather than in the reader because the reader is stage-neutral and
 /// must not know how any one stage names its routes.
 void _push(BuildContext context, String surfaceId) {
+  // ⚠️ THE COMMUNITY PUSHES ITSELF (2026-10-28): the new community names its
+  // own route ('community'), shared by every stage, so the surface id is not
+  // the route name here. Re-enabled for the new community; the old
+  // TtcCommunityScreen went through the generic push below.
+  if (surfaceId == kTtcCommunitySurface) {
+    openCommunity(context);
+    return;
+  }
   final screen = ttcScreenForSurface(surfaceId);
   if (screen == null) return;
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -401,7 +415,11 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // door's "taught properly rather than described" tile landed on a
       // description. See `ttc_garbh_course_screen.dart`.
       'ttc_garbh_course' => const TtcGarbhCourseScreen(),
-      'ttc_community' => const TtcCommunityScreen(),
+      // The new community (2026-10-28). `_push` hands 'ttc_community' to
+      // `openCommunity` before it gets here, so this answers only callers that
+      // take the widget themselves. Kept for revert:
+      //   'ttc_community' => const TtcCommunityScreen(),
+      kTtcCommunitySurface => const CommunityHomeScreen(),
       'ttc_care_circle' => const TtcCareCircleScreen(),
 
       // ---- Commerce ----------------------------------------------------------

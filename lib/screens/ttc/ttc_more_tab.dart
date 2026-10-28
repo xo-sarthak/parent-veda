@@ -96,6 +96,7 @@ import '../products/pv_store_chrome.dart' show kPvLine, pvStorePalette;
 // Kept for revert (2026-09-29, addresses moved to Settings, Account):
 // import '../profile/pv_you_sheets.dart' show showPvAddressesSheet;
 import '../referral/invite_friends_screen.dart';
+import '../community/community_chrome.dart' show openCommunity;
 import '../v2/v2_palette.dart' show V2Palette, v2BlockTint;
 import 'doors/ttc_tab_art.dart';
 import 'ttc_all_reads_screen.dart';
@@ -131,6 +132,9 @@ const String kTtcMoreJourneyHeading = 'Your journey';
 /// should also be made").
 const String kTtcMoreReadWatchHeading = 'Read and watch';
 const String kTtcMoreBenefitsHeading = 'Benefits';
+
+/// The new, shared community (2026-10-28, lib/screens/community).
+const String kTtcMoreCommunityHeading = 'Community';
 
 /// The one link under the three offering sections: the whole catalogue.
 const String kTtcMoreAllProgrammes = 'All programmes and sessions';
@@ -552,6 +556,23 @@ List<TtcMoreSection> ttcMoreSections({required bool partner}) {
     //     ),
     //   ],
     // ),
+    // ⚠️ COMMUNITY, RE-ENABLED 2026-10-28 for the new, shared community
+    // (lib/screens/community). It was held back for launch (TTC gap plan
+    // §7.1). An offering, not something about her, so More, not the profile.
+    TtcMoreSection(
+      id: 'community',
+      title: kTtcMoreCommunityHeading,
+      hue: 268,
+      rows: [
+        TtcMoreRow(
+          id: 'community',
+          art: ttcArtTab(TtcTabMark.twoFigures),
+          title: 'Talk to others trying',
+          line: 'Kind, moderated rooms for every part of trying',
+          open: (c) => openCommunity(c),
+        ),
+      ],
+    ),
     TtcMoreSection(
       id: 'benefits',
       title: kTtcMoreBenefitsHeading,

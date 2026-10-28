@@ -210,9 +210,10 @@ void main() {
     test('the More sheet reaches every Explore drawer row exactly once', () {
       final sheet = ppMoreSheetEntries();
       final titles = sheet.map((e) => e.title).toList();
-      // Community is out of parenting for now (the user, 2026-10-07).
-      // Kept for revert: expect(titles.first, 'Community', ...).
-      expect(titles, isNot(contains('Community')));
+      // Community was out of parenting from 2026-10-07; re-enabled
+      // 2026-10-28 for the new community (lib/screens/community).
+      // Kept for revert: expect(titles, isNot(contains('Community')));
+      expect(titles.first, 'Community');
       expect(titles.toSet().length, titles.length, reason: 'no duplicates');
       // Every drawer destination is in the sheet — by screen type, since the
       // sheet renames a few (Courses & Masterclasses → Learn).

@@ -153,6 +153,7 @@ import 'symptoms/door/symptoms_today_body.dart' show openSymptomRead;
 import 'journal_compose_screen.dart' show openJournalCompose;
 import 'garbh/garbh_today_practice.dart' show GarbhTodayPractice, openGarbhDoor;
 import '../widgets/pv_home_arrival.dart';
+import 'community/community_home_card.dart';
 
 class HomeV3Screen extends StatefulWidget {
   const HomeV3Screen({super.key, required this.pregnancy, required this.home});
@@ -1407,6 +1408,16 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
               ),
             ),
             const SizedBox(height: 20),
+
+            // ---- PARENTS LIKE YOU (2026-10-28, the community) ----------------
+            //
+            // The community's way in from home: replies waiting for her, or a
+            // real question from her stage's rooms. docs/COMMUNITY.md.
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 18),
+              child: CommunityHomeCard(),
+            ),
+            const SizedBox(height: 24),
 
             // ---- Commerce, after the content --------------------------------
             //

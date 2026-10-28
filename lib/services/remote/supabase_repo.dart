@@ -726,6 +726,61 @@ class SupabaseRepo {
     }
   }
 
+  /// Put bytes in a PRIVATE bucket (0122 community-media). Never upsert: a
+  /// replace needs select + update rights the policy does not grant, and a
+  /// path is written once. True when Storage accepted it.
+  static Future<bool> uploadPrivateFile(
+    String bucket,
+    String path,
+    Uint8List bytes, {
+    String contentType = 'image/jpeg',
+  }) async {
+    if (userId == null) return false;
+    try {
+      await _client.storage.from(bucket).uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: contentType, upsert: false),
+          );
+      return true;
+    } catch (e) {
+      debugPrint('[repo] private upload $bucket/$path refused: $e');
+      return false;
+    }
+  }
+
+  /// Short-lived URLs for objects in a private bucket, by path. Storage only
+  /// signs what its select policy lets this person read, so a path the
+  /// server has not approved simply comes back missing. {} when logged out.
+  static Future<Map<String, String>> signedUrls(
+    String bucket,
+    List<String> paths, {
+    int expiresIn = 3600,
+  }) async {
+    if (userId == null || paths.isEmpty) return {};
+    try {
+      final res =
+          await _client.storage.from(bucket).createSignedUrlsResult(paths, expiresIn);
+      return {
+        for (final r in res)
+          if (r is SignedUrlSuccess && r.signedUrl.isNotEmpty) r.path: r.signedUrl,
+      };
+    } catch (e) {
+      debugPrint('[repo] sign $bucket refused: $e');
+      return {};
+    }
+  }
+
+  /// A function whose answer is one jsonb value (an object or an array).
+  /// Unlike [callFunction] this THROWS when the call fails, so a caller can
+  /// tell "the server said no" (a value) from "we could not reach it" (an
+  /// exception) — the community needs both: one is a toast with a reason,
+  /// the other keeps the post queued on the phone. Null when logged out.
+  static Future<dynamic> rpcJson(String fn, [Map<String, dynamic>? params]) async {
+    if (userId == null) return null;
+    return _client.rpc(fn, params: params);
+  }
+
   /// Update rows matching every column in [filters]. The mirror of
   /// [deleteMatch], for a table whose natural key is not `id` — a sample claim
   /// is identified by (campaign_id, user_id), not by a serial nobody holds.

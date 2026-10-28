@@ -25,7 +25,8 @@ import 'askveda_screen.dart';
 import 'pp_brain_tab.dart';
 import 'pp_more_screen.dart';
 import 'pp_child_profile.dart';
-import 'community_screen.dart';
+// import 'community_screen.dart'; // superseded by lib/screens/community (2026-10-28), kept for revert
+import '../community/community_chrome.dart' show openCommunity;
 import 'parenting_veda.dart';
 import 'pp_faq_data.dart';
 import 'course_detail_screen.dart';
@@ -36,7 +37,7 @@ import 'product_detail_screen.dart';
 import 'products_discovery_screen.dart';
 import 'tools_hub_screen.dart';
 // import 'pp_more_sheet.dart'; // kept for revert with showPpMoreSheet
-import 'pp_opening_soon.dart' show kPpCommunityOpen;
+// import 'pp_opening_soon.dart' show kPpCommunityOpen; // kept for revert with the Room row guard (2026-10-28)
 import '../../widgets/pv_feedback.dart';
 
 // ---- palette ----------------------------------------------------------------
@@ -566,7 +567,10 @@ void openPpTab(BuildContext context, int index) {
     case 3:
       final nav = Navigator.of(context);
       nav.popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
-      nav.push(MaterialPageRoute<void>(builder: (_) => const CommunityScreen()));
+      // The new community (2026-10-28), shared by every stage. Kept for
+      // revert, the old parenting screen:
+      //   nav.push(MaterialPageRoute<void>(builder: (_) => const CommunityScreen()));
+      openCommunity(context);
     case 4:
       openPpTabTo(context, PpTab.products);
   }
@@ -884,11 +888,12 @@ void ppFaqSheet(BuildContext context, String question) {
 // A "go deeper" row (pill · text · →). Routes to the real surface for its pill
 // (FAQ → Ask Veda, Room → Community, Course → Courses) - never a dead end.
 Widget ppDeeperRow(BuildContext context, String pill, String text, {bool top = false, bool bottom = false}) =>
-    // A "Room" row opens the community, which is out of parenting for now
-    // (2026-10-07); the row is not drawn rather than leading nowhere.
-    pill == 'Room' && !kPpCommunityOpen
-        ? const SizedBox.shrink()
-        : PvPress(child: GestureDetector(
+    // A "Room" row opens the community. It was out of parenting from
+    // 2026-10-07 and the row was not drawn rather than leading nowhere; it is
+    // re-enabled 2026-10-28 for the new community (`openPpTab(context, 3)`
+    // now opens lib/screens/community). Kept for revert:
+    //   pill == 'Room' && !kPpCommunityOpen ? const SizedBox.shrink() :
+    PvPress(child: GestureDetector(
       onTap: () {
         switch (pill) {
           case 'Course':

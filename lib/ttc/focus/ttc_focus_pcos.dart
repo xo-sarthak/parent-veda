@@ -782,6 +782,12 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         //   blurb: 'Other people living with PCOS, in their own words.',
         //   surfaceId: 'ttc_community',
         // ),
+        // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+        TtcCommunityTile(
+          title: 'PCOS circle',
+          blurb: 'Other people living with PCOS, in their own words.',
+          surfaceId: 'ttc_community',
+        ),
       ],
     ),
 
