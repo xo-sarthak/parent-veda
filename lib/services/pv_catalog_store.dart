@@ -158,7 +158,10 @@ class PvCatalogStore extends ChangeNotifier {
       case LifeStage.parenting:
         final kids = ChildProfileStore.instance;
         if (!kids.hasRealChild) return null;
-        return p.suitsAge(kids.ageInMonths);
+        // Corrected age for a baby born early, as the Parenting home's rail
+        // (relevance PP 2, 2026-10-28). Kept for revert:
+        //   return p.suitsAge(kids.ageInMonths);
+        return p.suitsAge(kids.devAgeInMonths);
       default:
         return null;
     }

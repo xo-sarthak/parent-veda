@@ -106,7 +106,7 @@ import '../../widgets/storage_image.dart';
 import 'reading_reader_screen.dart';
 import 'development_activity_screen.dart';
 import 'watch_player_screen.dart';
-import 'product_detail_screen.dart';
+// import 'product_detail_screen.dart'; // kept for revert (PP 5: the rail opens PvProductScreen)
 // import 'journal_v2/journal_home_screen.dart'; // the demo journal, kept for revert
 import 'phase_map_screen.dart';
 // import 'family_profile_screen.dart'; // kept for revert — the avatar opens You since 2026-09-19
@@ -132,6 +132,9 @@ import '../../services/father_preview.dart';
 import 'pp_father_card.dart';
 import 'pp_home_reads.dart';
 import 'pp_relevance.dart';
+import 'pp_home_products.dart';
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../../services/pv_catalog_store.dart';
 import 'doors/pp_door_screen.dart' show ppShelfSpecFor, ppTabMarkFor;
 import '../doors/pv_shelf_card.dart';
 import '../doors/pv_list_row.dart';
@@ -269,6 +272,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
         PpChangesStore.instance, // what she told us (2026-10-23, Wave 8)
         PpMessagesStore.instance, // the header's inbox count (2026-10-25)
         MilestoneStore.instance, // the Milestones row (R10, 2026-10-26)
+        PvCatalogStore.instance, // the store sheet's products (PP 5, 2026-10-28)
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -296,14 +300,25 @@ class _PpHomeV3State extends State<PpHomeV3> {
         final activities = PpHomeActivitiesStore.instance
             .todays(child.devAgeInMonths, childId: child.activeChildId);
         final changes = phaseChangesFor(phase);
-        final reads = _readsForAge(child.ageInMonths, 3);
+        // Corrected age, like the activities above (relevance PP 2,
+        // 2026-10-28). Kept for revert:
+        //   final reads = _readsForAge(child.ageInMonths, 3);
+        final reads = _readsForAge(child.devAgeInMonths, 3);
         // Three, as rows: the shape TTC and Pregnancy already use (2026-10-21,
         // Wave 4, approved). Was five on a shelf rail.
         final sit = PpSituation.now();
         final doorReads = ppHomeDoorReads(3, situation: sit);
         // The film is on the phase page now (2026-10-22). Kept for revert:
         // final video = _video(phase);
-        final products = _productsForAge(child.ageInMonths, 6);
+        // ⚠️ THE STORE'S CATALOGUE, ONLY WHAT FITS (relevance PP 3 and PP 5,
+        // 2026-10-28; pp_home_products.dart). Was the 24 built-in products,
+        // padded to six with ones outside the age, so a five-year-old's rail
+        // carried baby items, and the store sheet's products never reached
+        // the home. Fewer cards when fewer fit; none, and the Store is
+        // offered instead. Corrected age (PP 2). Kept for revert:
+        //   final products = _productsForAge(child.ageInMonths, 6);
+        final products =
+            ppCatalogProducts(child.devAgeInMonths, limit: 6, situation: sit);
         // Her situation's questions first (a C-section mother's, a born-early
         // baby's), from the same pool; the brain never drops one.
         final faqs = ppRelevanceOrder(phaseFaqs(phase.number, count: 6),
@@ -908,7 +923,11 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 //       title: 'What parents ask us about',
                 //       note: 'Prices shown',
                 //       p: p)),
-                if (products.isNotEmpty) ...[
+                // The section always shows (a feature is never hidden, PP 3,
+                // 2026-10-28): with nothing in the catalogue for this age yet,
+                // one row offers the whole Store instead of a rail.
+                // Was `if (products.isNotEmpty) ...[` around the rail.
+                ...[
                   // Named for the child (2026-10-22, Wave 6). Was eyebrow
                   // 'Recommended', title 'Recommended products for your baby'.
                   _pad(_Head(
@@ -916,15 +935,30 @@ class _PpHomeV3State extends State<PpHomeV3> {
                       title: 'Useful at this age',
                       p: p)),
                   const SizedBox(height: 14),
-                  _ProductRail(
-                      items: products,
+                  // The PpProduct rail, kept for revert:
+                  //   _ProductRail(
+                  //       items: products,
+                  //       p: p,
+                  //       onOpen: (it) => Navigator.of(context).push(
+                  //           MaterialPageRoute<void>(
+                  //               settings:
+                  //                   RouteSettings(name: 'pp/product/${it.id}'),
+                  //               builder: (_) =>
+                  //                   ProductDetailScreen(product: it)))),
+                  if (products.isNotEmpty)
+                    PpCatalogRail(
+                        key: const ValueKey('pp_home_products'),
+                        items: products,
+                        p: p)
+                  else
+                    _pad(PvListRow(
+                      key: const ValueKey('pp_home_products_empty'),
                       p: p,
-                      onOpen: (it) => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                              settings:
-                                  RouteSettings(name: 'pp/product/${it.id}'),
-                              builder: (_) =>
-                                  ProductDetailScreen(product: it)))),
+                      leading: PvMarkWell(p: p, hue: 28, size: 44, mark: IntentMark.bagMark),
+                      title: 'Browse the Store',
+                      line: 'Nothing picked for ${child.nameMid}\'s age yet. Everything we carry is in the Store.',
+                      onTap: () => _openSurface(context, 'pp_products'),
+                    )),
                   const SizedBox(height: 32),
                 ],
 
@@ -1408,6 +1442,8 @@ class _PpHomeV3State extends State<PpHomeV3> {
   /// every product already declares), the rest to fill the rail. A card for a
   /// product she does not need yet is allowed — the design's own rail says
   /// "You do not need this yet" on one — but it comes after the ones she does.
+  // Superseded by ppCatalogProducts (PP 3 and PP 5, 2026-10-28). Kept for revert.
+  // ignore: unused_element
   List<PpProduct> _productsForAge(int months, int n) {
     if (kPpProducts.isEmpty) return const [];
     List<PpProduct> rotate(List<PpProduct> xs) {
@@ -2638,6 +2674,8 @@ double _productHue(String category) => switch (category) {
 // widget because the models differ (PpProduct here, Product there), the same
 // trade _ReadRow below states. The priced card it replaces is
 // _ProductRailPriced, kept for revert.
+// Superseded by PpCatalogRail (PP 5, 2026-10-28). Kept for revert.
+// ignore: unused_element
 class _ProductRail extends StatelessWidget {
   const _ProductRail(
       {required this.items, required this.p, required this.onOpen});

@@ -41,6 +41,7 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart' show PpBottomNav, PpTab;
 import 'pp_development_data.dart' show DevActivity;
 import 'pp_grow_data.dart';
+import 'pp_home_activities_store.dart';
 
 class PpBrainTabScreen extends StatefulWidget {
   const PpBrainTabScreen({super.key});
@@ -75,12 +76,20 @@ class _PpBrainTabScreenState extends State<PpBrainTabScreen> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([GrowStore.instance, ChildProfileStore.instance, _search]),
+      // PpHomeActivitiesStore: a swap on the home changes this pick (PP 12).
+      listenable: Listenable.merge([GrowStore.instance, ChildProfileStore.instance, PpHomeActivitiesStore.instance, _search]),
       builder: (context, _) {
         final p = pvStorePalette;
         final child = ChildProfileStore.instance;
         final months = child.devAgeInMonths;
-        final today = growToday(ageMonths: months);
+        // ⚠️ THE HOME'S FIRST, NOT A SECOND PICK (relevance PP 12, 2026-10-28).
+        // `growToday` chose on its own, so "One thing, today" here was often
+        // none of the home's three. Now it is the first of this child's three;
+        // the old pick only if the library has nothing for the age. Kept for
+        // revert: final today = growToday(ageMonths: months);
+        final three = PpHomeActivitiesStore.instance
+            .todays(months, childId: child.activeChildId);
+        final today = three.isNotEmpty ? three.first : growToday(ageMonths: months);
         final forAge = growActivitiesForAge(months);
         return Scaffold(
           backgroundColor: p.ground,

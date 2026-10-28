@@ -158,7 +158,9 @@ List<PpHomeInsight> ppHomeInsights({int n = 5, DateTime? on}) {
   final out = <PpHomeInsight>[];
   const hues = <double>[268, 28, 188, 104, 344, 42, 232];
   if (child.hasRealChild) {
-    final pool = ageTipsFor(child.ageInWeeks.floor());
+    // Corrected age: a tip is development content (relevance PP 2,
+    // 2026-10-28). Kept for revert: ageTipsFor(child.ageInWeeks.floor())
+    final pool = ageTipsFor(child.devAgeInWeeks.floor());
     if (pool.isEmpty) return out;
     final start = doy % pool.length;
     for (var i = 0; i < n && i < pool.length; i++) {
@@ -224,6 +226,15 @@ PvRead ppTipAsRead(String id, DailyTip tip) => PvRead(
 /// In the cloud since step 13 (2026-10-22, sync log). It was phone-only, so a
 /// sign-out or a new phone lost her place. One item: `last`, value
 /// `{s: section id, p: page id}`; the newer open wins.
+///
+/// ⚠️ ONE PAGE PER CHILD (relevance PP 17, 2026-10-28). A toddler page read
+/// for the older child was offered on the baby's home. Now each child has an
+/// item `child:<id>` (the stand-in is `none`), and the home shows the page of
+/// the child on screen. `last` stays, as the newest open for any child: an
+/// older app version on another phone still reads it, and a page saved
+/// before this change shows for whoever is on screen until the first open
+/// after it. One item per child, because two phones can each read for a
+/// different child and neither should erase the other's place.
 class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
   PpLastPageStore._();
   // Kept for revert (step 13): the mixin's reset calls applyCloudItems({}).
@@ -233,9 +244,32 @@ class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
   static final PpLastPageStore instance = PpLastPageStore._();
 
   static const _key = 'pp_last_page_v1';
+  // The newest open, any child (the `last` item).
   String? _sectionId;
   String? _pageId;
+  // Child key -> (section id, page id). PP 17.
+  final Map<String, (String, String)> _byChild = {};
   bool _loaded = false;
+
+  /// The item key for [childId]; null or empty is the stand-in child.
+  static String childKey(String? childId) =>
+      (childId == null || childId.isEmpty) ? 'none' : childId;
+
+  String get _activeKey =>
+      childKey(ChildProfileStore.instance.activeChildId);
+
+  static (String, String)? _pair(Object? v) =>
+      v is Map && v['s'] is String && v['p'] is String
+          ? (v['s'] as String, v['p'] as String)
+          : null;
+
+  String _encode() => jsonEncode({
+        's': _sectionId,
+        'p': _pageId,
+        'c': {
+          for (final e in _byChild.entries) e.key: {'s': e.value.$1, 'p': e.value.$2},
+        },
+      });
 
   Future<void> init() async {
     if (_loaded) return;
@@ -246,6 +280,13 @@ class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
         final m = jsonDecode(raw) as Map;
         _sectionId = m['s'] as String?;
         _pageId = m['p'] as String?;
+        // A cache from before PP 17 has no `c`: the page stays as `last`.
+        final c = m['c'];
+        if (c is Map) {
+          for (final e in c.entries) {
+            if (_pair(e.value) case final v?) _byChild['${e.key}'] = v;
+          }
+        }
         notifyListeners();
       }
     } catch (_) {/* nothing to continue */}
@@ -261,6 +302,8 @@ class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
   Map<String, Object?> cloudItems() => {
         if (_sectionId != null && _pageId != null)
           'last': {'s': _sectionId, 'p': _pageId},
+        for (final e in _byChild.entries)
+          'child:${e.key}': {'s': e.value.$1, 'p': e.value.$2},
       };
 
   @override
@@ -268,6 +311,11 @@ class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
     final v = items['last'];
     _sectionId = v is Map && v['s'] is String ? v['s'] as String : null;
     _pageId = v is Map && v['p'] is String ? v['p'] as String : null;
+    _byChild.clear();
+    for (final e in items.entries) {
+      if (!e.key.startsWith('child:')) continue;
+      if (_pair(e.value) case final pv?) _byChild[e.key.substring(6)] = pv;
+    }
     _loaded = true;
   }
 
@@ -278,26 +326,45 @@ class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
       if (_sectionId == null || _pageId == null) {
         await p.remove(_key);
       } else {
-        await p.setString(_key, jsonEncode({'s': _sectionId, 'p': _pageId}));
+        // Kept for revert (PP 17):
+        //   await p.setString(_key, jsonEncode({'s': _sectionId, 'p': _pageId}));
+        await p.setString(_key, _encode());
       }
     } catch (_) {}
   }
 
   /// Called by the one place every door page opens (`_ppPageScreenAndKind`).
+  /// Saved against the child on screen (PP 17).
   void opened(String sectionId, String pageId) {
-    if (_sectionId == sectionId && _pageId == pageId) return;
+    final k = _activeKey;
+    // Kept for revert (PP 17):
+    //   if (_sectionId == sectionId && _pageId == pageId) return;
+    if (_byChild[k] == (sectionId, pageId)) return;
+    _byChild[k] = (sectionId, pageId);
     _sectionId = sectionId;
     _pageId = pageId;
     notifyListeners();
+    // Kept for revert (PP 17):
+    //   .then((p) => p.setString(_key, jsonEncode({'s': sectionId, 'p': pageId})))
+    final blob = _encode();
     SharedPreferences.getInstance()
-        .then((p) => p.setString(_key, jsonEncode({'s': sectionId, 'p': pageId})))
+        .then((p) => p.setString(_key, blob))
         .catchError((_) => false);
   }
 
-  /// The page to continue, when it still exists.
+  /// The page to continue for the child on screen, when it still exists. A
+  /// page saved before PP 17 (no child items yet) shows for whoever is here.
   PpHomeRead? get last {
-    final s = _sectionId == null ? null : ppSectionFor(_sectionId!);
-    final p = s?.pageById(_pageId ?? '');
+    // Kept for revert (PP 17): the newest open, for every child.
+    //   final s = _sectionId == null ? null : ppSectionFor(_sectionId!);
+    //   final p = s?.pageById(_pageId ?? '');
+    final pair = _byChild[_activeKey] ??
+        (_byChild.isEmpty && _sectionId != null && _pageId != null
+            ? (_sectionId!, _pageId!)
+            : null);
+    if (pair == null) return null;
+    final s = ppSectionFor(pair.$1);
+    final p = s?.pageById(pair.$2);
     return (s == null || p == null) ? null : (section: s, page: p);
   }
 
@@ -313,6 +380,7 @@ class PpLastPageStore extends ChangeNotifier with CloudMergedStore {
   void debugReset() {
     _sectionId = null;
     _pageId = null;
+    _byChild.clear();
     _loaded = false;
   }
 }

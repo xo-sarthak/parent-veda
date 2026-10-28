@@ -656,9 +656,12 @@ void main() {
       expect(sheet.contains("'Weight now'"), isTrue);
       expect(sheet.contains("'Height now'"), isTrue);
       expect(sheet.contains("Text('Optional'"), isTrue);
-      // Name + dob stay the only requirements.
-      expect(sheet.contains('if (nameCtl.text.trim().isEmpty || dob == null) return;'),
+      // Name + dob stay the only requirements. Since PP 10 (2026-10-28) a
+      // Save with one missing says which instead of doing nothing. Was:
+      //   'if (nameCtl.text.trim().isEmpty || dob == null) return;'
+      expect(sheet.contains('if (nameCtl.text.trim().isEmpty || dob == null) {'),
           isTrue);
+      expect(sheet.contains('Add a name and a date of birth to save.'), isTrue);
     });
 
     test('the growth hero shows it as a fact, never as an adjusted expectation',

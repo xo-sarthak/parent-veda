@@ -42,7 +42,7 @@ import 'course_detail_screen.dart' show CourseDetailScreen;
 import 'phase_map_screen.dart' show PhasePainting;
 import 'pp_activity_read.dart' show ppActivityReader;
 import 'pp_age_page_parts.dart' show PpAtThisAge;
-import 'pp_common.dart' show PpProductImage;
+// import 'pp_common.dart' show PpProductImage; // kept for revert (PP 5)
 import 'pp_courses_data.dart' show Course, kCourses;
 import 'pp_experts_data.dart' show needLabel;
 import 'pp_activity_paintings.dart' show PpActivityThumb;
@@ -54,13 +54,16 @@ import 'pp_phase_faqs.dart' show phaseFaqs;
 import 'pp_phase_film.dart' show ppPhaseAsRead;
 import 'pp_phases_data.dart';
 import 'pp_child_profile.dart' show ChildProfileStore;
-import 'pp_products_data.dart' show PpProduct, kPpProducts, categoryByName;
+// categoryByName: kept for revert with the 24-product rail (PP 5).
+import 'pp_products_data.dart' show PpProduct, kPpProducts;
+import 'pp_home_products.dart';
+import '../../models/pv_product.dart' show PvProduct;
 import 'pp_search.dart' show ppOpenSurface;
 import 'pp_section_registry.dart' show kPpSections;
 import 'pp_section_screen.dart' show ppOpenPage, PpSection;
 import 'pp_content.dart' show PpPage;
 import 'pp_page_fill.dart' show ppPageTitle;
-import 'product_detail_screen.dart' show ProductDetailScreen;
+// import 'product_detail_screen.dart' show ProductDetailScreen; // kept for revert (PP 5)
 import 'video/pv_video_player.dart' show PvVideoPlayer;
 
 LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
@@ -513,10 +516,22 @@ List<({PpSection section, PpPage page})> ppPhaseReads(AgePhase phase, int n) {
   return soon;
 }
 
-List<PpProduct> ppPhaseProducts(AgePhase phase, int n) {
+// The 24 built-in products, kept for revert (relevance PP 5, 2026-10-28):
+//   List<PpProduct> ppPhaseProducts(AgePhase phase, int n) {
+//     final months = phase.startMonth.floor();
+//     return kPpProducts.where((x) => x.suitsAge(months)).take(n).toList();
+//   }
+// ignore: unused_element
+List<PpProduct> _ppPhaseProductsSeed(AgePhase phase, int n) {
   final months = phase.startMonth.floor();
   return kPpProducts.where((x) => x.suitsAge(months)).take(n).toList();
 }
+
+/// The phase's products from the Store's catalogue, the home's rule at the
+/// phase's first month (relevance PP 5, 2026-10-28; pp_home_products.dart):
+/// only what suits that age, one per category, no padding.
+List<PvProduct> ppPhaseProducts(AgePhase phase, int n) =>
+    ppCatalogProducts(phase.startMonth.floor(), limit: n);
 
 class _Offers extends StatelessWidget {
   const _Offers({required this.block});
@@ -581,45 +596,71 @@ class _Offers extends StatelessWidget {
               ),
           ]),
         ],
-        if (products.isNotEmpty) ...[
-          _sub('Useful at this age', p),
-          SizedBox(
-            height: 150 + ((MediaQuery.textScalerOf(context).scale(10) / 10) - 1).clamp(0.0, 1.0) * 36,
-            child: ListView.separated(
-              key: ValueKey('pp_phase_products_${phase.number}'),
-              scrollDirection: Axis.horizontal,
-              itemCount: products.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 10),
-              itemBuilder: (context, i) {
-                final it = products[i];
-                return SizedBox(
-                  width: 112,
-                  child: InkWell(
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                        settings: RouteSettings(name: 'pp/product/${it.id}'),
-                        builder: (_) => ProductDetailScreen(product: it))),
-                    borderRadius: BorderRadius.circular(14),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      PpProductImage(
-                        url: it.imageUrl,
-                        height: 96,
-                        width: 112,
-                        radius: 14,
-                        border: false,
-                        icon: categoryByName(it.category).icon,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(it.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1)),
-                    ]),
-                  ),
-                );
-              },
+        // ⚠️ ALWAYS SHOWN, FROM THE STORE'S CATALOGUE (relevance PP 3 and
+        // PP 5, 2026-10-28). With nothing for this age yet, one row offers
+        // the Store (a feature is never hidden). The 24-product rail, kept
+        // for revert:
+        //   if (products.isNotEmpty) ...[
+        //     _sub('Useful at this age', p),
+        //     SizedBox(
+        //       height: 150 + ((MediaQuery.textScalerOf(context).scale(10) / 10) - 1).clamp(0.0, 1.0) * 36,
+        //       child: ListView.separated(
+        //         key: ValueKey('pp_phase_products_${phase.number}'),
+        //         scrollDirection: Axis.horizontal,
+        //         itemCount: products.length,
+        //         separatorBuilder: (_, _) => const SizedBox(width: 10),
+        //         itemBuilder: (context, i) {
+        //           final it = products[i];
+        //           return SizedBox(
+        //             width: 112,
+        //             child: InkWell(
+        //               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        //                   settings: RouteSettings(name: 'pp/product/${it.id}'),
+        //                   builder: (_) => ProductDetailScreen(product: it))),
+        //               borderRadius: BorderRadius.circular(14),
+        //               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        //                 PpProductImage(
+        //                   url: it.imageUrl,
+        //                   height: 96,
+        //                   width: 112,
+        //                   radius: 14,
+        //                   border: false,
+        //                   icon: categoryByName(it.category).icon,
+        //                 ),
+        //                 const SizedBox(height: 6),
+        //                 Text(it.name,
+        //                     maxLines: 2,
+        //                     overflow: TextOverflow.ellipsis,
+        //                     style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, height: 1.25, color: p.ink1)),
+        //               ]),
+        //             ),
+        //           );
+        //         },
+        //       ),
+        //     ),
+        //   ],
+        _sub('Useful at this age', p),
+        if (products.isNotEmpty)
+          PpCatalogRail(
+            key: ValueKey('pp_phase_products_${phase.number}'),
+            items: products,
+            p: p,
+            cardWidth: 112,
+            imageHeight: 96,
+            padding: EdgeInsets.zero,
+            itemKey: 'pp_phase_product_',
+          )
+        else
+          PvRowGroup(p: p, children: [
+            PvListRow(
+              key: ValueKey('pp_phase_products_empty_${phase.number}'),
+              p: p,
+              leading: TtcMarkLeading(tool: TtcToolMark.hospitalBag, tint: tint, size: 40),
+              title: 'Browse the Store',
+              line: 'Nothing picked for this age yet. Everything we carry is in the Store.',
+              onTap: () => ppOpenSurface(context, 'pp_products'),
             ),
-          ),
-        ],
+          ]),
         _sub('Talk to an expert', p), // was 'Talk to someone' (2026-10-23)
         PvRowGroup(p: p, children: [
           PvListRow(

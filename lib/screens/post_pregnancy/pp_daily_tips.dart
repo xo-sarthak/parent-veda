@@ -1120,6 +1120,8 @@ AgeTip? _ageTipToday([DateTime? on]) {
   if (!child.hasRealChild) return null;
   final now = on ?? DateTime.now();
   final doy = now.difference(DateTime(now.year)).inDays;
-  final pool = ageTipsFor(child.ageInWeeks.floor());
+  // Corrected age, as the home's tips strip (relevance PP 2, 2026-10-28).
+  // Kept for revert: ageTipsFor(child.ageInWeeks.floor())
+  final pool = ageTipsFor(child.devAgeInWeeks.floor());
   return pool[doy % pool.length];
 }
