@@ -94,6 +94,7 @@ IntentMark ttcMessageMark(TtcMessageKind k) => switch (k) {
       TtcMessageKind.lateByOne => IntentMark.questionMark,
       TtcMessageKind.cycleReport => IntentMark.reportPage,
       TtcMessageKind.tryingLong => IntentMark.askDoctor,
+      TtcMessageKind.waitStarts => IntentMark.cuppedHands,
       TtcMessageKind.treatment => IntentMark.calendarDay,
     };
 
@@ -104,6 +105,7 @@ double _hueFor(TtcMessageKind k) => switch (k) {
       TtcMessageKind.lateByOne => 206,
       TtcMessageKind.cycleReport => 42,
       TtcMessageKind.tryingLong => 160,
+      TtcMessageKind.waitStarts => 300,
       TtcMessageKind.treatment => 222,
     };
 

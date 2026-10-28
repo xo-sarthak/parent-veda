@@ -20,6 +20,19 @@
 //    hospitalBag  week 34   pack the bag
 //    babyArrived  week 37   "Has your baby arrived?", gently
 //
+//  FOUR MORE, 2026-10-28 (relevance Batch 7, PREGNANCY-GAP 11). Weeks 4 to 10
+//  said nothing but "a new week", in the weeks with the most to arrange, and
+//  the sugar test and the growth scan were never mentioned:
+//
+//    firstVisit   week 6    the first antenatal visit (6 to 10 weeks)
+//    datingScan   week 7    the dating scan (6 to 9 weeks), NOT when a scan,
+//                           a doctor or an IVF transfer already gave the date
+//    glucoseTest  week 24   the sugar test (24 to 28 weeks)
+//    growthScan   week 32   a growth scan, if her doctor has advised one
+//
+//  The weeks are the Scans door's own (`pv_door_scans.dart` tile metas), so a
+//  message and the page it opens can never name two windows.
+//
 //  Every clinical line reminds, explains or helps her prepare; none adds a
 //  step her doctor did not (CLAUDE.md, clinical ownership). The scan and
 //  vaccine lines say "usually" and "ask your doctor", never "you need".
@@ -74,12 +87,19 @@ import 'remote/cloud_merged_store.dart';
 
 /// The seven kinds. The NAME is persisted: renaming one strands every message
 /// already delivered under it.
+///
+/// Listed in the order they arrive, because the Messages screen lists its
+/// switches in this order. The order is not persisted; only the name is.
 enum PregMessageKind {
   newWeek,
+  firstVisit,
+  datingScan,
   ntScan,
   anomalyScan,
+  glucoseTest,
   tdap,
   movements,
+  growthScan,
   hospitalBag,
   babyArrived,
 }
@@ -100,6 +120,10 @@ extension PregMessageKindInfo on PregMessageKind {
         PregMessageKind.movements => 919114,
         PregMessageKind.hospitalBag => 919115,
         PregMessageKind.babyArrived => 919116,
+        PregMessageKind.firstVisit => 919117,
+        PregMessageKind.datingScan => 919118,
+        PregMessageKind.glucoseTest => 919119,
+        PregMessageKind.growthScan => 919120,
       };
 
   List<int> get phoneIds => this == PregMessageKind.newWeek
@@ -109,6 +133,10 @@ extension PregMessageKindInfo on PregMessageKind {
   /// The switch's name in Reminders.
   String get label => switch (this) {
         PregMessageKind.newWeek => 'Your new week',
+        PregMessageKind.firstVisit => 'Your first visit',
+        PregMessageKind.datingScan => 'The dating scan',
+        PregMessageKind.glucoseTest => 'The sugar test',
+        PregMessageKind.growthScan => 'A growth scan',
         PregMessageKind.ntScan => 'NT scan window',
         PregMessageKind.anomalyScan => 'Anomaly scan window',
         PregMessageKind.tdap => 'Tdap vaccine',
@@ -120,6 +148,11 @@ extension PregMessageKindInfo on PregMessageKind {
   /// One line under the switch: when it comes.
   String get when => switch (this) {
         PregMessageKind.newWeek => 'The morning each new week starts',
+        PregMessageKind.firstVisit => 'At 6 weeks',
+        PregMessageKind.datingScan =>
+          'At 7 weeks, unless a scan or your doctor gave your due date',
+        PregMessageKind.glucoseTest => 'At 24 weeks',
+        PregMessageKind.growthScan => 'At 32 weeks, if your doctor advises one',
         PregMessageKind.ntScan => 'At 11 weeks',
         PregMessageKind.anomalyScan => 'At 18 weeks',
         PregMessageKind.tdap => 'At 27 weeks',
@@ -202,6 +235,7 @@ class PregMessageFacts {
     this.inPregnancy = true,
     this.partner = false,
     this.pregnancyStart,
+    this.dueDateFromClinic = false,
   });
 
   final DateTime dueDate;
@@ -214,6 +248,11 @@ class PregMessageFacts {
   /// date), or null when unknown. Messages delivered before it belong to an
   /// earlier pregnancy (STAGE-TRANSITIONS B5, 2026-10-24).
   final DateTime? pregnancyStart;
+
+  /// True when a scan, her doctor or an IVF transfer gave the due date
+  /// (`DueDateSource.clinicOwned`). The dating scan's job is already done,
+  /// and a message suggesting one would second-guess her clinic.
+  final bool dueDateFromClinic;
 
   static PregMessageFacts? fromStores() {
     final c = PregnancyController.current;
@@ -230,6 +269,7 @@ class PregMessageFacts {
       pregnancyStart: stage == LifeStage.pregnancy
           ? LifeStageStore.instance.enteredAt
           : null,
+      dueDateFromClinic: c.dueDateFromClinic,
     );
   }
 
@@ -250,8 +290,10 @@ int pregWeekOn(DateTime due, DateTime now) =>
 
 /// Every message her dates call for, from this week on.
 ///
-/// A moment is only offered while it can still help: the NT line up to week
-/// 13, the anomaly line up to 22, Tdap up to 36, the bag up to 38. A moment
+/// A moment is only offered while it can still help: the first visit up to
+/// week 10, the dating scan up to 9, the NT line up to 13, the anomaly line up
+/// to 22, the sugar test up to 28, Tdap up to 36, the growth scan up to 36,
+/// the bag up to 38. A moment
 /// that has passed but is still inside its window is delivered at once, in the
 /// app only (see [PregMessagesStore.apply]).
 List<PregMessage> pregMessageCandidates(PregMessageFacts f, DateTime now) {
@@ -288,14 +330,28 @@ List<PregMessage> pregMessageCandidates(PregMessageFacts f, DateTime now) {
     ));
   }
 
+  moment(PregMessageKind.firstVisit, 6, 10, 'Your first antenatal visit',
+      'Most first visits are between 6 and 10 weeks, with a few blood tests and a check of your dates. Here is what usually happens, and what to ask.');
+  // Not when her clinic already dated the pregnancy (2026-10-28, the user's
+  // call): the scan has done its job, and its date is theirs.
+  if (!f.dueDateFromClinic) {
+    moment(PregMessageKind.datingScan, 7, 9, 'The dating scan',
+        'An early scan, usually between 6 and 9 weeks, confirms how many weeks you are. If it gives you a new due date, you can change yours in the app.');
+  }
   moment(PregMessageKind.ntScan, 11, 13, 'The NT scan window',
       'The NT scan is usually done between 11 and 13 weeks. Ask your doctor if it is right for you.');
   moment(PregMessageKind.anomalyScan, 18, 22, 'The anomaly scan window',
       'The anomaly scan is usually done between 18 and 22 weeks. If it is not booked yet, ask at your next visit.');
+  moment(PregMessageKind.glucoseTest, 24, 28, 'The sugar test',
+      'The sugar test (OGTT) is usually done between 24 and 28 weeks. Some clinics test earlier too. Ask yours when, and whether to come fasting.');
   moment(PregMessageKind.tdap, 27, 36, 'The Tdap vaccine',
       'Your doctor may offer the Tdap vaccine from now. It helps protect your baby from whooping cough. Ask at your next visit.');
   moment(PregMessageKind.movements, 28, 42, "Your baby's movements",
       "From now, get to know your baby's pattern of movements. If they slow down or change, call your doctor the same day.");
+  // "If advised", as the app's own growth scan card says: not every clinic
+  // books one, and the message must not add a step her doctor did not.
+  moment(PregMessageKind.growthScan, 32, 36, 'A growth scan, if advised',
+      'If your doctor has suggested a growth scan, it is often done around now. Here is what it checks, and what the numbers mean.');
   moment(PregMessageKind.hospitalBag, 34, 38, 'Time to pack the bag',
       'A good week to pack the hospital bag, so it is ready and you can stop thinking about it.');
   moment(PregMessageKind.babyArrived, 37, 42, 'Has your baby arrived?',

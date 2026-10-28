@@ -244,6 +244,16 @@ product or service in the payload, frequency cap, quiet hours, never on loss
 paths) → 6b server push for offers (FCM + edge function + campaigns table;
 quote cost in USD and INR first).
 
+- **BUILT 2026-10-28 (relevance Batch 7, the gaps):** Pregnancy gets first
+  visit, dating scan (not on a clinic date), sugar test and growth scan ("if
+  advised"); TTC gets the two-week wait on natural cycles. Mobbin pass done.
+  Quiet hours: nothing to add, every message has a fixed hour from 8am to 7pm.
+  Test: `test/relevance_batch7_test.dart`.
+- **NEXT (user, 2026-10-28):** 6a = copy what the market's apps send, and
+  switch each type on only once the thing it points to exists (no course
+  message without a live course). Competitor research done in chat; plan on
+  the user's word.
+
 ### 13 · Relevance inside doors
 
 - LIVE 19078db: pregnancy doors open on her weeks — `PregBand` +

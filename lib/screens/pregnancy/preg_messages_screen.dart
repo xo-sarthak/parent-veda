@@ -25,6 +25,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../data/doors/pv_door_data.dart' show PvDoorLibrary;
 import '../../services/last_profile.dart' show LastProfile, kLastHomeRoot;
 import '../../services/life_stage_store.dart';
 import '../../services/preg_messages_store.dart';
@@ -35,7 +36,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show appNavigatorKey, FabState;
 import '../../widgets/pv_feedback.dart';
 import '../brackets/hub/hub_intent_art.dart';
-import '../doors/pv_door_router.dart' show openPvDoorRead;
+import '../doors/pv_door_router.dart' show openPvDoorRead, pvDoorEntryScreen;
 import '../doors/pv_door_screen.dart' show pvDoorScreenForBracket;
 import '../doors/pv_list_row.dart';
 import '../preg_week_screen.dart';
@@ -63,6 +64,15 @@ void openPregMessage(BuildContext context, PregMessage m, PregnancyController c)
   switch (m.kind) {
     case PregMessageKind.newWeek:
       push('pregnancy/week', () => PregWeekScreen(pregnancy: c, week: m.week ?? c.currentWeek));
+    // Batch 7 (2026-10-28): each opens the page the Scans door opens for it,
+    // so the message and the door tell her the same thing.
+    case PregMessageKind.firstVisit:
+      openPvDoorRead(context, 'preg_scan_read_first_visit', c);
+    case PregMessageKind.datingScan:
+    case PregMessageKind.glucoseTest:
+    case PregMessageKind.growthScan:
+      final scan = pvDoorEntryScreen(PvDoorLibrary.scan, pregMessageScanId(m.kind)!, c);
+      if (scan != null) push('scans/detail', () => scan);
     case PregMessageKind.ntScan:
     case PregMessageKind.anomalyScan:
       final door = pvDoorScreenForBracket('pregnancy_scans_tests', c);
@@ -122,8 +132,22 @@ void pregOpenMessageFromPhone(PregMessage? m, {int attempt = 0}) {
   }
 }
 
+/// The Scans library entry a scan message opens, or null for the rest. The
+/// ids are the Scans door tiles' (`pv_door_scans.dart`); a test holds that
+/// each resolves.
+String? pregMessageScanId(PregMessageKind k) => switch (k) {
+      PregMessageKind.datingScan => 'dating_scan',
+      PregMessageKind.glucoseTest => 'ogtt',
+      PregMessageKind.growthScan => 'growth_scan',
+      _ => null,
+    };
+
 IntentMark _markFor(PregMessageKind k) => switch (k) {
       PregMessageKind.newWeek => IntentMark.calendarDay,
+      PregMessageKind.firstVisit => IntentMark.askDoctor,
+      PregMessageKind.datingScan => IntentMark.reportPage,
+      PregMessageKind.glucoseTest => IntentMark.reportPage,
+      PregMessageKind.growthScan => IntentMark.reportPage,
       PregMessageKind.ntScan => IntentMark.reportPage,
       PregMessageKind.anomalyScan => IntentMark.reportPage,
       PregMessageKind.tdap => IntentMark.askDoctor,
@@ -134,6 +158,10 @@ IntentMark _markFor(PregMessageKind k) => switch (k) {
 
 double _hueFor(PregMessageKind k) => switch (k) {
       PregMessageKind.newWeek => 268,
+      PregMessageKind.firstVisit => 160,
+      PregMessageKind.datingScan => 206,
+      PregMessageKind.glucoseTest => 206,
+      PregMessageKind.growthScan => 206,
       PregMessageKind.ntScan => 206,
       PregMessageKind.anomalyScan => 206,
       PregMessageKind.tdap => 160,

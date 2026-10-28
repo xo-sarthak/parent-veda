@@ -13,6 +13,8 @@
 //    lateByOne    the day after her period was due, if none is logged
 //    cycleReport  the morning after a new cycle starts
 //    tryingLong   once, after 6 or 12 months of trying
+//    waitStarts   the morning after her fertile window closes (natural
+//                 cycles only; 2026-10-28, relevance Batch 7)
 //    treatment    while a clinic runs a round (2026-09-26, B6, below)
 //
 //  Each lands in the in-app Messages list AND, when she has allowed it, as a
@@ -138,6 +140,11 @@ enum TtcMessageKind {
   cycleReport,
   tryingLong,
 
+  /// The morning after her fertile window closes, on her own cycle only
+  /// (2026-10-28, relevance Batch 7). A clinic round already has its own
+  /// mid-wait message in [treatment].
+  waitStarts,
+
   /// While a clinic runs a round (2026-09-26, B6). One switch for all of
   /// them, "Treatment reminders".
   treatment,
@@ -157,6 +164,7 @@ extension TtcMessageKindInfo on TtcMessageKind {
         TtcMessageKind.lateByOne => 918103,
         TtcMessageKind.cycleReport => 918104,
         TtcMessageKind.tryingLong => 918105,
+        TtcMessageKind.waitStarts => 918106,
         // The first of a block: see [kTtcTreatmentPhoneSlots].
         TtcMessageKind.treatment => 918201,
       };
@@ -187,6 +195,10 @@ extension TtcMessageKindInfo on TtcMessageKind {
             'ttc_cycle_report',
           ],
         TtcMessageKind.tryingLong => const ['ttc_fertility_help'],
+        TtcMessageKind.waitStarts => const [
+            'ttc_read/ttc_read_two_week_wait',
+            'ttc_read/ttc_read_when_to_test',
+          ],
         // Each treatment message carries its own (`TtcMessage.to`); this is
         // the fallback, the round itself.
         TtcMessageKind.treatment => const ['ttc_treatment'],
@@ -199,6 +211,7 @@ extension TtcMessageKindInfo on TtcMessageKind {
         TtcMessageKind.lateByOne => 'If your period is late',
         TtcMessageKind.cycleReport => 'Your cycle report',
         TtcMessageKind.tryingLong => 'A first check',
+        TtcMessageKind.waitStarts => 'The two-week wait',
         TtcMessageKind.treatment => 'Treatment reminders',
       };
 
@@ -221,6 +234,9 @@ extension TtcMessageKindInfo on TtcMessageKind {
         TtcMessageKind.tryingLong =>
           'Once, after six or twelve months of trying. What a first check with '
               'a doctor involves.',
+        TtcMessageKind.waitStarts =>
+          'The morning after your fertile window closes. When a test can give '
+              'a real answer, and what helps meanwhile. Only on your own cycle.',
         TtcMessageKind.treatment =>
           'While your clinic runs a round. The evening before each scan, '
               'procedure and blood test, and a few kind words in the wait.',
@@ -399,6 +415,7 @@ class TtcMessageFacts {
     this.round,
     this.closedRound,
     this.lastCycleWasRound = false,
+    this.waitStarts,
   });
 
   /// Read from the live stores.
@@ -414,6 +431,18 @@ class TtcMessageFacts {
     // of the cycle she is in: a projected one is a guess built on a guess.
     final w = ttcFertileWindowNow();
     final current = w != null && w.cyclesAhead == 0;
+
+    // ⚠️ THIS CYCLE'S WINDOW, EVEN ONCE IT HAS CLOSED (Batch 7, 2026-10-28).
+    // `ttcFertileWindowNow` rolls to NEXT cycle's window the day after this
+    // one closes, so reading `closesOn` from it would lose the very morning
+    // the wait message is for, and a refresh at 7am would drop it. The cycle
+    // day it closes on does not roll: her period start plus that day is the
+    // day after the close. More than one cycle ahead is a missed log, not a
+    // wait, so nothing.
+    final periodStart = cycle.lastPeriodStart;
+    final waitStarts = w != null && w.cyclesAhead <= 1 && periodStart != null
+        ? _day(periodStart).add(Duration(days: w.closesCycleDay))
+        : null;
 
     final help = TtcFertilityHelpStore.instance;
     final ctx = help.context;
@@ -460,6 +489,7 @@ class TtcMessageFacts {
       round: treatment.cycle.isEmpty ? null : treatment.cycle,
       closedRound: treatment.lastClosed,
       lastCycleWasRound: lastCycleWasRound,
+      waitStarts: waitStarts,
     );
   }
 
@@ -488,6 +518,10 @@ class TtcMessageFacts {
   /// True when the cycle that ended at her latest logged period was run by
   /// a clinic: that period is the first after a round.
   final bool lastCycleWasRound;
+
+  /// The day after this cycle's fertile window closes, or null when there is
+  /// no window of ours (a clinic cycle, the engine refused, nothing logged).
+  final DateTime? waitStarts;
 
   /// Six months when she is 35 or over, or her cycles vary a lot or her PCOS
   /// check found the pattern. Twelve otherwise, including when we do not know
@@ -581,6 +615,28 @@ List<TtcMessage> ttcMessageCandidates(TtcMessageFacts f, DateTime now) {
       at: _at(opens, 8),
       title: title,
       body: body,
+    ));
+  }
+
+  // ---- 1b. the wait starts (Batch 7, 2026-10-28) ---------------------------
+  //
+  // The same two gates as the window, because it is the window's other end.
+  // Worth saying for three days; after that she is in the middle of it and
+  // the line would arrive late. A new period moves her cycle on, so a wait
+  // that ended in a period is never announced.
+  final wait = f.waitStarts;
+  if (f.sendsOvulationReminders &&
+      f.ownership == TimingOwnership.parentveda &&
+      wait != null &&
+      !today.isAfter(_day(wait).add(const Duration(days: 2)))) {
+    out.add(TtcMessage(
+      id: 'wait:${_key(wait)}',
+      kind: TtcMessageKind.waitStarts,
+      at: _at(wait, 9),
+      title: 'The two-week wait has started',
+      body: 'Your fertile window has closed. Testing too early can give a '
+          "false no, so here is when a test can give a real answer, and what "
+          'helps in the days between.',
     ));
   }
 
