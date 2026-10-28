@@ -52,10 +52,16 @@ import '../../ask_veda/ask_veda_mark.dart';
 import '../../data/doors/pv_door_data.dart';
 import '../../models/bracket.dart';
 import '../../services/pregnancy_controller.dart';
-import '../../services/family_profile.dart' show FamilyProfileStore, Parity;
+// Round 2 (2026-10-28): her conditions and an older child's birth too. Kept
+// for revert: show FamilyProfileStore, Parity;
+import '../../services/family_profile.dart'
+    show BirthMode, FamilyProfileStore, Parity, PregCondition;
 import '../../services/pregnancy_ended_store.dart';
 import '../../services/pregnancy_records.dart' show PregnancyRecords;
 import '../post_pregnancy/pp_child_profile.dart' show Child, ChildProfileStore;
+import '../pregnancy/preg_twins.dart' show pregExpectingTwins;
+import '../../ttc/ttc_care_pathway.dart' show TtcPath;
+import '../../ttc/ttc_store.dart' show TtcStore;
 import '../../data/conditions_data.dart' show ConditionsStore;
 import '../../services/scan_reports_store.dart';
 import '../../services/pv_door_strip_store.dart';
@@ -336,7 +342,37 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
       childName: kid.hasRealChild && kid.name != Child.placeholder
           ? kid.name
           : null,
+      // Round 2 (2026-10-28): her history beyond a loss. Each is something
+      // she already told us or did; nothing is asked here.
+      afterTreatment: pregAfterTreatment(
+        source: widget.pregnancy.dueDateSource,
+        ttcPath: _ttcPath,
+        ttcConfirmed: _ttcConfirmed,
+      ),
+      twins: pregExpectingTwins,
+      pastCsection: fam.hasPregCondition(PregCondition.previousCsection) ||
+          (kid.hasRealChild && fam.birthMode == BirthMode.cSection),
+      sugar: fam.hasPregCondition(PregCondition.gestationalDiabetes),
+      bp: fam.hasPregCondition(PregCondition.hypertension),
     );
+  }
+
+  // Defensive, as `pp_relevance.dart` is: a TTC store that never loaded is
+  // "no treatment", never a crash on a pregnancy door.
+  TtcPath get _ttcPath {
+    try {
+      return TtcStore.instance.path;
+    } catch (_) {
+      return TtcPath.natural;
+    }
+  }
+
+  bool get _ttcConfirmed {
+    try {
+      return TtcStore.instance.pregnancyConfirmed;
+    } catch (_) {
+      return false;
+    }
   }
 
   // A named tab wins; otherwise her week picks the opening tab when the door
@@ -2461,3 +2497,17 @@ class _StartHereStrip extends StatelessWidget {
     );
   }
 }
+
+/// This pregnancy came after fertility treatment (relevance round 2,
+/// 2026-10-28): the due date came from an IVF transfer, or TTC confirmed this
+/// pregnancy while she was on a treatment path (IUI and ovulation tablets
+/// date from a period, so the transfer alone would miss them). A move back to
+/// trying clears TTC's confirmation, so an old path never leaks into a later
+/// pregnancy. Pure, so the tests read it.
+bool pregAfterTreatment({
+  required DueDateSource source,
+  required TtcPath ttcPath,
+  required bool ttcConfirmed,
+}) =>
+    source == DueDateSource.ivfTransfer ||
+    (ttcConfirmed && ttcPath != TtcPath.natural);

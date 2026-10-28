@@ -68,7 +68,9 @@ final JourneyConfig kTtcImproveChances = JourneyConfig(
         // sourced to the ASRM/SREI committee opinion.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('Timing, and the advice you can let go of'),
+          // Matches its read's new title (round 2, 2026-10-28). Kept for
+          // revert: title: _en('Timing, and the advice you can let go of'),
+          title: _en('How often to have sex, and the advice you can let go of'),
           value: _en('Positions, "saving it up", lying down after. What the '
               'evidence says about each one.'),
           meta: _en('7 MIN'),
@@ -556,7 +558,9 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
       elements: [
         JourneyElement(
           type: SolutionType.read,
-          title: _en('Heat, habits and time'),
+          // Matches its read's new title (round 2, 2026-10-28). Kept for
+          // revert: title: _en('Heat, habits and time'),
+          title: _en('Heat, habits and time: what changes sperm'),
           value: _en('Three things with real evidence behind them, how much '
               'each helps, and how long before it shows.'),
           meta: _en('8 MIN'),
@@ -653,7 +657,9 @@ final JourneyConfig kTtcLossRecoveryLibrary = JourneyConfig(
       elements: [
         JourneyElement(
           type: SolutionType.read,
-          title: _en('On trying again'),
+          // Matches its read's new title (round 2, 2026-10-28). Kept for
+          // revert: title: _en('On trying again'),
+          title: _en('When to try again, and who decides'),
           value: _en('What the evidence says about waiting, and the part '
               'only you can answer.'),
           meta: _en('8 MIN'),

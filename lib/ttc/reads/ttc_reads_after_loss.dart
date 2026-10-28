@@ -364,7 +364,9 @@ final List<PvRead> kTtcReadsAfterLoss = [
     id: 'ttc_read_trying_again',
     hue: 26,
     kicker: _en('After a loss'),
-    title: _en('On trying again'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('On trying again'),
+    title: _en('When to try again, and who decides'),
     teaser: _en('What the evidence says about waiting, what your body needs, '
         'and the part no evidence can answer.'),
     shortAnswer: _en("For an early loss with no complications, there's no "

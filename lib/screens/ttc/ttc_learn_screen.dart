@@ -73,7 +73,8 @@
 
 import 'dart:math' as math;
 import '../../ttc/ttc_home_situation.dart' show ttcHomeDoorOrderNow;
-import '../../ttc/ttc_age_rank.dart' show ttcAgeOrder;
+// By read id since round 2 (2026-10-28). Kept for revert: show ttcAgeOrder;
+import '../../ttc/ttc_age_rank.dart' show ttcAgeOrderReads;
 import '../../ttc/ttc_fertility_help_store.dart' show TtcFertilityHelpStore;
 import 'ttc_intro_flow.dart' show openTtcIntroFilm, ttcIntroVideoSlotId;
 
@@ -1311,10 +1312,11 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
     ];
     // Her age orders the shelf, never filters it (ttc_age_rank.dart). Kept
     // for revert: the list unsorted.
-    final all = ttcAgeOrder(
+    // By read id, not words in the title (round 2, 2026-10-28). Kept for
+    // revert: ttcAgeOrder(reads, band, (r) => '${r.title.en} ${r.teaser.en}')
+    final all = ttcAgeOrderReads(
         [for (final r in s.reads) if (ttcLearnShows(r)) r],
-        TtcFertilityHelpStore.instance.ageBand,
-        (r) => '${r.title.en} ${r.teaser.en}');
+        TtcFertilityHelpStore.instance.ageBand);
     if (all.isEmpty) return const SizedBox.shrink();
     final chosen = _tab[s.key];
     final tab = chosen == null

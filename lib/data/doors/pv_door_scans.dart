@@ -406,6 +406,9 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorSection(
       group: kScansTabScan,
       heading: 'Carrying twins',
+      // Leads its tab when she is expecting twins (round 2, 2026-10-28, the
+      // user's yes); for one baby it stays last.
+      leadsFor: {PregLift.twins},
       tiles: [
         PvDoorToolTile(
           title: 'Twins and more',

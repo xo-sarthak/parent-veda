@@ -342,7 +342,9 @@ final PvDoorPage kMoveDoor = PvDoorPage(
           readId: 'preg_move_read_yoga',
         ),
         PvDoorGuideTile(
-          title: 'Signs to stop and call',
+          // One page, one name (round 2, 2026-10-28). Kept for revert:
+          //   title: 'Signs to stop and call',
+          title: 'When to stop and call your doctor',
           blurb: 'Keep these in mind whenever you exercise.',
           readId: 'preg_move_read_when_to_stop',
         ),

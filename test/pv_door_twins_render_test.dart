@@ -39,12 +39,19 @@ void main() {
     expect(kPvDoorRailDoors.contains(kPregTwinsBracket.id), isTrue);
   });
 
-  test('Scans & tests and Labour prep both open it', () {
+  // Round 2 (2026-10-28): Labour's card opens the twins birth page it
+  // promises, not the whole door; Scans still opens the door. Kept for
+  // revert: `expect(reaches(kLabourDoor), isTrue);`
+  test('Scans & tests opens it; Labour prep opens its birth page', () {
     bool reaches(PvDoorPage d) => d.allTiles
         .whereType<PvDoorToolTile>()
         .any((t) => t.surfaceId == kTwinsSurfaceDoor);
     expect(reaches(kScansDoor), isTrue);
-    expect(reaches(kLabourDoor), isTrue);
+    expect(
+        kLabourDoor.allTiles
+            .whereType<PvDoorGuideTile>()
+            .any((t) => t.readId == 'preg_twins_read_birth'),
+        isTrue);
     expect(pvDoorScreenFor(kTwinsSurfaceDoor, pregnancy), isNotNull);
   });
 }

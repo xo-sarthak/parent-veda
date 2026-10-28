@@ -619,7 +619,9 @@ final List<PvRead> kTtcReadsHisSide = [
     id: 'ttc_read_heat_habits',
     hue: 186,
     kicker: _en('His side'),
-    title: _en('Heat, habits and time'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('Heat, habits and time'),
+    title: _en('Heat, habits and time: what changes sperm'),
     teaser: _en('Three changes with real evidence behind them, roughly how '
         'much each helps, and how long before any of it shows on a test.'),
     shortAnswer: _en('Three changes have the clearest evidence: stopping '
@@ -1357,7 +1359,9 @@ final List<PvRead> kTtcReadsHisSide = [
     id: 'ttc_read_result_normal',
     hue: 186,
     kicker: _en('His side'),
-    title: _en('If the result is normal'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('If the result is normal'),
+    title: _en('If his semen result is normal'),
     teaser: _en('What a normal semen analysis rules out, and the two things '
         "it doesn't."),
     shortAnswer: _en("It's good news. A normal result rules out the most "
@@ -1521,7 +1525,9 @@ final List<PvRead> kTtcReadsHisSide = [
     id: 'ttc_read_result_abnormal',
     hue: 186,
     kicker: _en('His side'),
-    title: _en('If the first test is abnormal'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('If the first test is abnormal'),
+    title: _en('If his first semen test is abnormal'),
     teaser: _en('One low number is a reason to repeat, not a conclusion. Why '
         "that's true is the most useful thing on this page."),
     shortAnswer: _en("Don't treat one low number as the answer. Semen results "
@@ -1757,7 +1763,9 @@ final List<PvRead> kTtcReadsHisSide = [
     id: 'ttc_read_case_for_testing',
     hue: 186,
     kicker: _en('His side'),
-    title: _en('The case for testing early'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('The case for testing early'),
+    title: _en('The case for an early sperm test'),
     teaser: _en("One test, easy to find and cheap, and it answers a question "
         "a year of waiting can't."),
     shortAnswer: _en('Test early, not after a year. A semen analysis costs a '
@@ -1926,7 +1934,9 @@ final List<PvRead> kTtcReadsHisSide = [
     id: 'ttc_read_three_months',
     hue: 186,
     kicker: _en('His side'),
-    title: _en('What three months looks like'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('What three months looks like'),
+    title: _en('What his three months of changes look like'),
     teaser: _en('The twelve-week plan: what to change in which week, and why '
         'the repeat test is booked on day one.'),
     shortAnswer: _en('Book the repeat test for twelve weeks away on day one. '

@@ -58,7 +58,9 @@ final List<PvRead> kTtcReadsMindBody = [
     id: 'ttc_read_stress_fertility',
     hue: 42,
     kicker: _en('Mind & body'),
-    title: _en('Stress, and the thing everyone says about it'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('Stress, and the thing everyone says about it'),
+    title: _en('Can stress stop you getting pregnant?'),
     teaser: _en('What the evidence shows, why "just relax" is wrong and '
         'unkind, and what a daily practice is really for.'),
     shortAnswer: _en("Everyday stress doesn't stop you getting pregnant. Very "

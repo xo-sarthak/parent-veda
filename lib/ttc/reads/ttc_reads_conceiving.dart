@@ -368,7 +368,9 @@ final List<PvRead> kTtcReadsConceiving = [
     id: 'ttc_read_timing_myths',
     hue: 344,
     kicker: _en('Fertile window'),
-    title: _en('Timing, and the advice you can let go of'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('Timing, and the advice you can let go of'),
+    title: _en('How often to have sex, and the advice you can let go of'),
     teaser: _en('When it matters, how often, and which of the things '
         "you've been told make no difference at all."),
     shortAnswer: _en('You can get pregnant on about six days each cycle: the '

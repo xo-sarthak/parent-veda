@@ -93,7 +93,14 @@
 
 import 'package:flutter/foundation.dart' show ValueListenable;
 import '../../../ttc/ttc_age_rank.dart'
-    show ttcAgeOrderSections, ttcIsForAge, ttcTileAgeText;
+    // Round 2 (2026-10-28): by id, plus the child-at-home lift. Kept for
+    // revert: show ttcAgeOrderSections, ttcIsForAge, ttcTileAgeText;
+    show
+        kTtcWithChildAtHome,
+        ttcAgeOrderSections,
+        ttcChildAtHomeOrderSections,
+        ttcIsForAge,
+        ttcIsForChildAtHome;
 // The door opens on where she is (global pass item 13, 2026-10-23).
 import '../../../ttc/ttc_phase_rank.dart';
 import 'package:flutter/material.dart';
@@ -145,6 +152,7 @@ import 'ttc_door_card.dart';
 import 'ttc_door_hero.dart';
 import 'ttc_door_rail.dart';
 import 'ttc_door_search.dart';
+import '../../post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
 import 'ttc_kind_cards.dart';
 
 // -----------------------------------------------------------------------------
@@ -733,6 +741,7 @@ List<TtcFocusGroup> ttcDoorOrderedGroups(
   required String bracketId,
   required FertilityAgeBand? ageBand,
   bool roundRunning = false,
+  bool childAtHome = false,
 }) {
   if (bracketId != kTtcIvfBracketId) return groups;
   if (roundRunning) {
@@ -746,7 +755,12 @@ List<TtcFocusGroup> ttcDoorOrderedGroups(
     if (lead.isEmpty) return groups;
     return [...lead, ...groups.where((g) => !lead.contains(g))];
   }
-  if (!(ageBand?.refersAtPresentation ?? false)) return groups;
+  // "Age and second baby" also moves up for a mother with a child at home
+  // (round 2, 2026-10-28). Kept for revert:
+  //   if (!(ageBand?.refersAtPresentation ?? false)) return groups;
+  if (!(ageBand?.refersAtPresentation ?? false) && !childAtHome) {
+    return groups;
+  }
   final at = groups.indexWhere((g) => g.id == kTtcAgeGroupId);
   if (at <= 1) return groups;
   return [...groups]
@@ -937,6 +951,17 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
 
   /// The second line on a tab's card. Counted, never typed; a tool tab
   /// names itself (`inlineLabel`) rather than counting.
+  /// She has a child at home (round 2, 2026-10-28): a child she added, not
+  /// "trying again", which also follows a loss. Defensive: an unloaded store
+  /// is "no", never a crash.
+  bool get _childAtHome {
+    try {
+      return ChildProfileStore.instance.hasRealChild;
+    } catch (_) {
+      return false;
+    }
+  }
+
   String _countFor(TtcFocusGroup g) {
     if (g.inlineLabel case final label?) return label;
     final n = _sectionsOf(g.id).fold(0, (t, s) => t + s.tiles.length);
@@ -949,9 +974,20 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
 
   /// "For your age" (2026-10-22): a quiet tag on a card her age lifted, so
   /// she can see why it is first. Nothing under 35, where nothing moves.
+  ///
+  /// A card her child at home lifted says so the same way (round 2,
+  /// 2026-10-28): "With a child at home". Kept for revert:
+  ///   if (!ttcIsForAge(
+  ///       ttcTileAgeText(t), TtcFertilityHelpStore.instance.ageBand)) {
+  ///     return card;
+  ///   }
   Widget _forAge(TtcTile t, Widget card) {
-    if (!ttcIsForAge(
-        ttcTileAgeText(t), TtcFertilityHelpStore.instance.ageBand)) {
+    final String tag;
+    if (ttcIsForChildAtHome(t, _childAtHome)) {
+      tag = kTtcWithChildAtHome;
+    } else if (ttcIsForAge(t, TtcFertilityHelpStore.instance.ageBand)) {
+      tag = kTtcForYourAge;
+    } else {
       return card;
     }
     return Stack(children: [
@@ -968,7 +1004,8 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
               borderRadius: BorderRadius.circular(999),
               border: Border.all(color: ttcLine),
             ),
-            child: Text(kTtcForYourAge,
+            // Kept for revert: child: Text(kTtcForYourAge,
+            child: Text(tag,
                 style: pvManrope(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
@@ -1016,6 +1053,7 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
           ageBand: TtcFertilityHelpStore.instance.ageBand,
           roundRunning: page.bracketId == kTtcIvfBracketId &&
               ttcIvfRoundLeads(),
+          childAtHome: _childAtHome,
         );
         final selected = groups.indexWhere((g) => g.id == _groupId);
         final groupIndex = selected < 0 ? 0 : selected;
@@ -1038,11 +1076,16 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
         // ⚠️ HER MOMENT OUTRANKS HER AGE (global pass item 13): the phase
         // order runs after the age order, so a section for today leads and
         // the age order still holds among the rest.
+        // Round 2 (2026-10-28): a child at home outranks her age (it is her
+        // situation; age is a band), and her moment still outranks both.
+        // Kept for revert: the age order alone inside the phase order.
         final sections = ttcDoorVideosFirst(
             ttcPhaseOrderSections(
-                ttcAgeOrderSections(
-                    group == null ? page.sections : _sectionsOf(group.id),
-                    TtcFertilityHelpStore.instance.ageBand),
+                ttcChildAtHomeOrderSections(
+                    ttcAgeOrderSections(
+                        group == null ? page.sections : _sectionsOf(group.id),
+                        TtcFertilityHelpStore.instance.ageBand),
+                    _childAtHome),
                 _moment),
             page.bracketId);
 

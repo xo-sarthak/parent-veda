@@ -87,7 +87,8 @@ import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import 'pv_door_data.dart';
-import 'pv_door_twins.dart' show kTwinsSurfaceDoor;
+// The Having twins card opens the twins birth page now (round 2, 2026-10-28).
+// Kept for revert: import 'pv_door_twins.dart' show kTwinsSurfaceDoor;
 
 /// Surfaces this door opens. Constants because each becomes a route NAME.
 const String kLabourSurfaceTimer = 'contractions';
@@ -439,11 +440,22 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       group: kLabourTabSigns,
       heading: 'If plans change on the day', // was 'If the plan changes' (2026-10-22)
       tiles: [
-        // Twins and more (2026-09-29): how twins are born lives there.
-        PvDoorToolTile(
-          title: 'Having twins',
-          blurb: 'How twins are born, when, and getting ready for two.',
-          surfaceId: kTwinsSurfaceDoor,
+        // ⚠️ THE PAGE, NOT THE DOOR (relevance round 2, 2026-10-28): the card
+        // promised how twins are born and opened the whole Twins door, so she
+        // had to find the page again. It opens that page; the door stays a tap
+        // away from Scans, Learn and the door rail. It leads this section when
+        // she is expecting twins (`kPregLiftPages`). Kept for revert:
+        //   // Twins and more (2026-09-29): how twins are born lives there.
+        //   PvDoorToolTile(
+        //     title: 'Having twins',
+        //     blurb: 'How twins are born, when, and getting ready for two.',
+        //     surfaceId: kTwinsSurfaceDoor,
+        //   ),
+        PvDoorGuideTile(
+          title: 'How twins are born',
+          blurb: 'Normal birth or caesarean, when twins usually come, and the '
+              'day itself.',
+          readId: 'preg_twins_read_birth',
         ),
         PvDoorGuideTile(
           title: 'Induction: why, how and what it feels like',

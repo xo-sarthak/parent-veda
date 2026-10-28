@@ -675,7 +675,14 @@ class PvDoorSection {
     this.weeks,
     this.tilesByWeek = false,
     this.forAfterLoss = false,
+    this.leadsFor = const {},
   }) : inlineSurfaceId = null;
+
+  /// The parts of her history that make this section lead its tab ("Carrying
+  /// twins" when she is expecting twins), the same way [forAfterLoss] does
+  /// after a loss (relevance round 2, 2026-10-28). Empty: her history never
+  /// moves it.
+  final Set<PregLift> leadsFor;
 
   /// Written for a pregnancy after a loss ("After IVF or a loss" on First
   /// weeks). It leads its tab when her last pregnancy was a loss she told us
@@ -731,7 +738,8 @@ class PvDoorSection {
         lead = null,
         weeks = null,
         tilesByWeek = false,
-        forAfterLoss = false;
+        forAfterLoss = false,
+        leadsFor = const {};
 
   final String heading;
   final List<PvDoorTile> tiles;
@@ -799,7 +807,9 @@ class PvDoorSection {
     final byWeek = !tilesByWeek || !weekKnown
         ? led
         : pregRelevanceOrder(led, (t) => PregBand.parse(t.meta), week);
-    return pregOlderChildOrder(byWeek, history);
+    // Round 2 (2026-10-28): then the pages her history lifts. Kept for revert:
+    //   return pregOlderChildOrder(byWeek, history);
+    return pregHistoryOrder(pregOlderChildOrder(byWeek, history), history);
   }
 
   List<PvDoorTile> _leadFor(int week) {
@@ -1093,12 +1103,23 @@ class PvDoorPage {
   }) {
     final byWeek =
         pregRelevanceOrder(sectionsOf(groupId), (s) => s.weeks, week);
-    if (!history.afterLoss) return byWeek;
+    // Round 2 (2026-10-28): a section also leads for the part of her history
+    // it names in `leadsFor`. Kept for revert:
+    //   if (!history.afterLoss) return byWeek;
+    //   return [
+    //     for (final s in byWeek) if (s.forAfterLoss) s,
+    //     for (final s in byWeek) if (!s.forAfterLoss) s,
+    //   ];
+    final lifts = history.lifts;
+    bool leads(PvDoorSection s) =>
+        (s.forAfterLoss && history.afterLoss) ||
+        s.leadsFor.any(lifts.contains);
+    if (!byWeek.any(leads)) return byWeek;
     return [
       for (final s in byWeek)
-        if (s.forAfterLoss) s,
+        if (leads(s)) s,
       for (final s in byWeek)
-        if (!s.forAfterLoss) s,
+        if (!leads(s)) s,
     ];
   }
 }
@@ -1119,10 +1140,45 @@ class PregHistory {
     this.lossToldInOnboarding = false,
     this.hasChild,
     this.childName,
+    this.afterTreatment = false,
+    this.twins = false,
+    this.pastCsection = false,
+    this.sugar = false,
+    this.bp = false,
   });
 
   /// Nothing known: nothing moves.
   static const none = PregHistory();
+
+  // ---- Round 2 (2026-10-28): her history beyond a loss ----------------------
+  //  Each is something she already told us or did; none is asked here.
+
+  /// This pregnancy came after fertility treatment: the due date came from an
+  /// IVF transfer, or TTC confirmed it while she was on a treatment path.
+  final bool afterTreatment;
+
+  /// She told Ready for Birth she is expecting twins or more.
+  final bool twins;
+
+  /// She had a C-section before: the profile chip, or an older child's birth.
+  final bool pastCsection;
+
+  /// Pregnancy sugar (gestational diabetes) is on her profile. One list per
+  /// mother, not per pregnancy, so it may be from last time: the line says
+  /// "you told us about", never "you have".
+  final bool sugar;
+
+  /// High blood pressure in pregnancy is on her profile; the same caveat.
+  final bool bp;
+
+  /// The lifts these facts switch on.
+  Set<PregLift> get lifts => {
+        if (afterTreatment) PregLift.afterTreatment,
+        if (twins) PregLift.twins,
+        if (pastCsection) PregLift.pastCsection,
+        if (sugar) PregLift.sugar,
+        if (bp) PregLift.bp,
+      };
 
   /// The pregnancy before this one was a loss
   /// (`PregnancyRecords.pregnantAfterLoss`). `ended`, with no reason told,
@@ -1161,6 +1217,81 @@ List<PvDoorTile> pregOlderChildOrder(List<PvDoorTile> tiles, PregHistory h) {
   return has ? [...them, ...rest] : [...rest, ...them];
 }
 
+/// A part of her history that moves pages (relevance round 2, 2026-10-28).
+enum PregLift { afterTreatment, twins, pastCsection, sugar, bp }
+
+/// The pages each part of her history lifts, BY ID: a read's id, a library
+/// entry's id, or a tool's surface id ([pregLiftKey]).
+///
+/// ⚠️ IDS, NEVER WORDS IN A TITLE. TTC's age order matched words and lifted a
+/// recipe card for "under 40 minutes" (TTC-GAP 29). A list costs one line per
+/// new page and can never lift the wrong one; `relevance_round2_test.dart`
+/// fails if an id here stops existing on a door.
+const Map<PregLift, Set<String>> kPregLiftPages = {
+  // First weeks › After IVF or a loss (the section also leads, `leadsFor`).
+  PregLift.afterTreatment: {
+    'preg_first_read_ivf_or_loss',
+    'after_ivf_allowed_hard',
+  },
+  // Labour › If plans change on the day.
+  PregLift.twins: {'preg_twins_read_birth'},
+  // Labour › If plans change on the day: birth after a C-section (VBAC).
+  PregLift.pastCsection: {'preg_labour_read_vbac'},
+  // Complications (by month, living with it) and Nutrition (food for it).
+  PregLift.sugar: {
+    'gdm',
+    'preg_cond_read_sugar_india',
+    'gestational_diabetes',
+  },
+  PregLift.bp: {
+    'high_bp',
+    'preg_cond_read_bp_dangerous',
+    'high_bp_preeclampsia',
+  },
+};
+
+/// The id [kPregLiftPages] knows a tile by, or null for a tile it cannot name.
+String? pregLiftKey(PvDoorTile t) => switch (t) {
+      PvDoorGuideTile(:final readId) => readId,
+      PvDoorEntryTile(:final entryId) => entryId,
+      PvDoorMythTile(:final readId) => readId,
+      PvDoorToolTile(:final surfaceId) => surfaceId,
+      _ => null,
+    };
+
+/// The lifts in [h] that name tile [t].
+Set<PregLift> _liftsOn(PvDoorTile t, PregHistory h) {
+  final key = pregLiftKey(t);
+  if (key == null) return const {};
+  return {
+    for (final l in h.lifts)
+      if (kPregLiftPages[l]?.contains(key) ?? false) l,
+  };
+}
+
+/// [tiles] with the pages her history lifts first, the rest in their own
+/// order. ORDER ONLY: a permutation, every tile stays.
+List<PvDoorTile> pregHistoryOrder(List<PvDoorTile> tiles, PregHistory h) {
+  if (h.lifts.isEmpty) return tiles;
+  final up = [for (final t in tiles) if (_liftsOn(t, h).isNotEmpty) t];
+  if (up.isEmpty || up.length == tiles.length) return tiles;
+  return [...up, for (final t in tiles) if (_liftsOn(t, h).isEmpty) t];
+}
+
+/// Her history in her own terms, for the line that explains a lift.
+String _liftReason(Set<PregLift> ls) {
+  if (ls.contains(PregLift.sugar) && ls.contains(PregLift.bp)) {
+    return 'you told us about pregnancy sugar and high blood pressure';
+  }
+  return switch (ls.first) {
+    PregLift.afterTreatment => 'this pregnancy came after fertility treatment',
+    PregLift.twins => "you're expecting twins",
+    PregLift.pastCsection => 'you told us about a C-section before',
+    PregLift.sugar => 'you told us about pregnancy sugar',
+    PregLift.bp => 'you told us about high blood pressure',
+  };
+}
+
 /// The quiet line under a section's heading when her history moved it, or
 /// null.
 ///
@@ -1179,6 +1310,21 @@ String? pvDoorSectionWhy(PvDoorSection s, PregHistory h) {
         ? 'With your little one at home, this comes first'
         : 'With $n at home, this comes first';
   }
+  // Round 2 (2026-10-28): the section itself leads for her history...
+  final led = {for (final l in s.leadsFor) if (h.lifts.contains(l)) l};
+  if (led.isNotEmpty) return 'First here, because ${_liftReason(led)}';
+  // ...or pages inside it moved up. Only when one actually moved: a page the
+  // writers already put first is not "moved up", and the line would be untrue.
+  final order = pregHistoryOrder(s.tiles, h);
+  var changed = false;
+  for (var i = 0; i < order.length; i++) {
+    if (!identical(order[i], s.tiles[i])) changed = true;
+  }
+  final moved = {
+    if (changed)
+      for (final t in s.tiles) ..._liftsOn(t, h),
+  };
+  if (moved.isNotEmpty) return 'Moved up, because ${_liftReason(moved)}';
   return null;
 }
 

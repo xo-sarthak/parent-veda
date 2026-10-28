@@ -511,6 +511,21 @@ the same four steps as the Batch 6 entry above, once for both: export, import wi
 incremental ingest ($0 / ₹0, embedded on the laptop), then clear the pregnancy answer cache. Test:
 `test/relevance_preg27_test.dart`.
 
+### Nine TTC pages renamed to the words of their cards (relevance round 2, TTC-GAP 30, 2026-10-28)
+
+A cross-door check compared every door card's label with the title of the page it opens. Most differences were a
+card shortening its page, which is fine. Nine went the other way: the page title was vaguer than the card ("On
+trying again" behind "When to try again, and who decides"; "If the result is normal" behind "If his semen result
+is normal"). The page title is what search, Read next and Ask Veda's sources show, so a page outside its door
+lost its meaning. The user's pick: the page takes the card's words. One more was left on purpose: "Whose 'side'
+is it, really" speaks to him, and "His half of getting ready" would contradict its own voice.
+
+**The general point:** a title is read in more places than the one it was written for. A title that leans on the
+card above it ("If the result is normal" — which result?) only works on that one screen.
+
+**No service change:** same ids, new titles. **The user runs** nothing extra: the re-ingest already owed for
+Batch 6 and PREGNANCY-GAP 27 picks the titles up. Test: `test/relevance_round2_test.dart`.
+
 ## Ask Veda answers for the profile on screen, and after a loss (2026-10-25)
 
 STAGE-TRANSITIONS F8 and R3. Two app fields, landed in both repos at once (the wire body is a two-repo contract;

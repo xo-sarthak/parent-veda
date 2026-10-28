@@ -275,3 +275,22 @@ illustrations, 14 recipe photos.
 - Group screen chips; the grid's 3-across at the phone's width.
 - Recents fill and cap; Saved rows open the same reader.
 - Foot clearance under the pinned bar on every state, keyboard up and down.
+
+---
+
+## Addendum: the cross-door content check (relevance round 2, 2026-10-28)
+
+Run after Batch 6's new reads, by script rather than by eye, over 155 Pregnancy reads, 140 TTC reads and the
+320 door cards that open them. What it checked and what it found:
+
+- **Every card reaches a page that exists**, and every card that opens at a heading finds that heading. Clean.
+- **Every read has its "when to see a doctor" line** (`whenToSeeSomeone` is never empty). Clean.
+- **No two reads share a title**, and no "Read next" link is broken. Clean.
+- **A card's name and its page's title:** almost every difference is a card shortening its page, which is
+  fine. Nine TTC pages had a title vaguer than their card; they take the card's words now (TTC-GAP 30).
+- **A card opens a page, not a whole door:** Labour's "Having twins" opened the Twins door; it opens "How
+  twins are born" now (PREGNANCY-GAP 33).
+- **One name per page:** Move named one page two ways; one name now.
+- **One figure per fact:** the doctor-check timing and the sugar-test weeks agree everywhere they appear.
+- **Pronouns:** a scan found only correct third-person lines (partner guidance about her, donor and
+  surrogacy law). A full pronoun read was not part of this check.

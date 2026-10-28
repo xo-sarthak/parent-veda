@@ -1120,7 +1120,9 @@ final List<PvRead> kTtcReadsGettingReady = [
     id: 'ttc_read_supplement_timing',
     hue: 104,
     kicker: _en('Getting ready'),
-    title: _en('When to start what, and how early'),
+    // Round 2 (2026-10-28): the card's clearer words, so one name shows
+    // everywhere (TTC-GAP 30). Kept for revert: title: _en('When to start what, and how early'),
+    title: _en('When to start each supplement'),
     teaser: _en('Folic acid has a deadline that has already passed by the time '
         "most people find out they're pregnant. Almost nothing else does."),
     shortAnswer: _en('Start folic acid at least a month before you try. Check '

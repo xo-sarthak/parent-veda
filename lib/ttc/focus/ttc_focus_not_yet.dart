@@ -145,6 +145,14 @@ const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
           blurb: 'Why the usual advice is to ask after six months.',
           readId: 'ttc_read_age_after_35',
         ),
+        // Round 2 (2026-10-28, TTC-GAP 28): "how long" is where a second baby
+        // first comes up; it leads here when she has a child at home.
+        TtcArticleTile(
+          title: 'Why a second baby can take longer',
+          id: 'ttc_tile_why_a_second_baby_can_take_longer',
+          blurb: 'Why it happens, what doctors check, and when to go.',
+          readId: 'ttc_read_second_baby',
+        ),
       ],
     ),
 

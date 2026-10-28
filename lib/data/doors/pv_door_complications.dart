@@ -426,6 +426,9 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorSection(
       group: kCondTabLiving,
       heading: 'Track your readings', // was 'Keep your numbers' (2026-10-22)
+      // Leads its tab when sugar or BP is on her profile (relevance round 2,
+      // 2026-10-28): the log is the thing she does every day with either.
+      leadsFor: {PregLift.sugar, PregLift.bp},
       tiles: [
         PvDoorToolTile(
           title: 'Blood pressure and sugar log',

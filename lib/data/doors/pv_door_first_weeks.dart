@@ -235,6 +235,8 @@ final PvDoorPage kFirstWeeksDoor = PvDoorPage(
       heading: 'After IVF or a loss',
       // Leads the Visit tab when her last pregnancy was a loss (2026-10-26).
       forAfterLoss: true,
+      // ...and after fertility treatment (relevance round 2, 2026-10-28).
+      leadsFor: {PregLift.afterTreatment},
       tiles: [
         PvDoorGuideTile(
           title: 'Your first visit after IVF or a loss',
