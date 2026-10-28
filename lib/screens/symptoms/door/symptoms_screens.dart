@@ -12,6 +12,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../data/reads/symptom_reads.dart';
 import '../../../data/symptoms/symptom_normal.dart';
 import '../../../services/pregnancy_controller.dart';
+import '../../../services/pregnancy_ended_store.dart';
+import '../../../services/tools_store.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../doors/pv_door_chrome.dart';
@@ -242,7 +244,64 @@ class SymptomsNormalScreen extends StatelessWidget {
 /// why it is safe to print (CLAUDE.md: rules are not content, and this is
 /// neither — it is stationery).
 class SymptomsCallingScreen extends StatelessWidget {
-  const SymptomsCallingScreen({super.key});
+  // const SymptomsCallingScreen({super.key}); // kept for revert (before P5 S2)
+  const SymptomsCallingScreen({super.key, this.pregnancy, this.movementToday});
+
+  /// Her pregnancy, for line 1. Null reads `PregnancyController.current`:
+  /// the router (Terminal A's file) still builds this screen as a const, and
+  /// the live controller is the one it would pass anyway.
+  final PregnancyController? pregnancy;
+
+  /// Line 4's own observation, for tests. Null reads `ToolsStore`.
+  final ({int count, DateTime last})? movementToday;
+
+  /// P5 S2, line 1: "You're 24 weeks (due 3 Jan)". A clinic-owned date is
+  /// shown as theirs, never recalculated. Null after a loss or with no date,
+  /// when the generic line stays.
+  static String? weeksLine(PregnancyController? c) {
+    if (c == null || !c.isDueDateSet) return null;
+    if (PregnancyEndedStore.instance.ended) return null;
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    final d = c.dueDate;
+    final due = '${d.day} ${months[d.month - 1]}';
+    final whose = c.dueDateFromClinic ? ', the date your clinic gave' : '';
+    return "You're ${c.currentWeek} weeks (due $due$whose).";
+  }
+
+  /// P5 S2, line 4: from 24 weeks, today's movements as SHE logged them.
+  /// Her own observation, never "normal": the hospital decides what it means.
+  static String? movementLine(
+    PregnancyController? c,
+    ({int count, DateTime last})? today,
+  ) {
+    if (c == null || c.currentWeek < 24) return null;
+    if (PregnancyEndedStore.instance.ended) return null;
+    if (today == null || today.count == 0) return null;
+    final h = today.last.hour % 12 == 0 ? 12 : today.last.hour % 12;
+    final m = today.last.minute.toString().padLeft(2, '0');
+    final ampm = today.last.hour < 12 ? 'am' : 'pm';
+    final moves = today.count == 1 ? 'movement' : 'movements';
+    return 'Today you logged ${today.count} $moves, the last at $h:$m $ampm.';
+  }
+
+  /// Today's logged movements from the kick counter, or null.
+  static ({int count, DateTime last})? _movementFromStore() {
+    final now = DateTime.now();
+    bool isToday(DateTime t) =>
+        t.year == now.year && t.month == now.month && t.day == now.day;
+    final times = [
+      for (final s in ToolsStore.instance.movementSessionHistory)
+        for (final t in s.times)
+          if (isToday(t)) t,
+      for (final t in ToolsStore.instance.currentSessionMovements)
+        if (isToday(t)) t,
+    ]..sort();
+    if (times.isEmpty) return null;
+    return (count: times.length, last: times.last);
+  }
 
   static const _lines = <(String, String)>[
     (
@@ -274,6 +333,11 @@ class SymptomsCallingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
+    final c = pregnancy ?? PregnancyController.current;
+    // P5 S2: her own facts, where the app has them, under the line that asks.
+    final weeks = weeksLine(c);
+    final moved = movementLine(c, movementToday ?? _movementFromStore());
+    final mine = <int, String>{0: ?weeks, 3: ?moved};
     return PvDoorToolScaffold(
       hue: 344,
       eyebrow: 'Symptoms · When you call',
@@ -322,6 +386,27 @@ class SymptomsCallingScreen extends StatelessWidget {
                             color: p.ink2,
                           ),
                         ),
+                        if (mine[i] case final own?) ...[
+                          const SizedBox(height: 6),
+                          Container(
+                            key: ValueKey('calling_mine_$i'),
+                            padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
+                            decoration: BoxDecoration(
+                              color: p.surface,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: p.line),
+                            ),
+                            child: Text(
+                              own,
+                              style: pvManrope(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                height: 1.4,
+                                color: p.ink1,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

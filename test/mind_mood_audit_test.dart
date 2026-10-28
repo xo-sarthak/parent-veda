@@ -215,7 +215,10 @@ void main() {
   // ===========================================================================
 
   group('the worry journal', () {
-    setUp(() {
+    // P5 M1: the store holds an edit until it has read the phone, so the
+    // tests read it first, the way the tab now does.
+    setUp(() async {
+      await MindMoodStore.instance.init();
       for (final e in MindMoodStore.instance.journalEntries.toList()) {
         MindMoodStore.instance.deleteJournalEntry(e.id);
       }

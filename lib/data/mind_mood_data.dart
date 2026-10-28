@@ -31,10 +31,16 @@
 //  wording is now this pass's, the substance is the brief's.
 // =============================================================================
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../services/remote/own_row_ledger.dart';
+import '../services/remote/supabase_repo.dart';
+import '../services/remote/sync_registry.dart';
+import '../services/remote/sync_row_book.dart' show syncParseStamp;
 
 import '../localization/app_language.dart';
 import '../models/breath_pattern.dart';
@@ -2371,9 +2377,76 @@ final List<MmScreenerQuestion> kMmScreenerQuestions = [
   ),
 ];
 
+/// The safety question after a pregnancy loss (P5 G3). "You or your baby"
+/// would ask a bereaved mother about a baby who has died. Same meaning, same
+/// options, same routing. ⚠️ REQUIRED_REVIEW, like the original.
+const String kMmSafetyPromptAfterLoss =
+    'Have you had thoughts of harming yourself, or that others would be '
+    'better off without you?';
+
+/// The screener's questions, with the after-loss wording when [afterLoss].
+List<MmScreenerQuestion> mmScreenerQuestions({bool afterLoss = false}) => [
+      for (final q in kMmScreenerQuestions)
+        if (afterLoss && q.isSafetyQuestion)
+          MmScreenerQuestion(q.id, _en(kMmSafetyPromptAfterLoss), q.options,
+              isSafetyQuestion: true)
+        else
+          q,
+    ];
+
+/// ⚠️ P5 G1 (2026-10-28): ANY answer but "Not at all" to the safety question
+/// opens the crisis path. It used to be only the top answer, so "A fleeting
+/// thought" and "Yes, more than once" added to a total and ended on ordinary
+/// advice. EPDS item 10 practice and NICE CG192: any positive answer to the
+/// self-harm item is followed up, whatever the total. Clinician CHECK line on
+/// BEFORE-LAUNCH.
+bool mmScreenerOpensCrisis(MmScreenerQuestion q, MmScreenerOption o) =>
+    q.isSafetyQuestion && o.severity >= 1;
+
+/// The top answer still opens it at once, mid-screener, as before; the others
+/// open it when she finishes, over her result.
+bool mmScreenerOpensCrisisNow(MmScreenerQuestion q, MmScreenerOption o) =>
+    q.isSafetyQuestion && o.severity >= 3;
+
+/// The top tier's highest total, for the result screen's extra lines.
+const int kMmScreenerMiddleTierMax = 9;
+
+/// The top tier's line about her own clinician (P5, clinician CHECK line).
+const String kMmScreenerTellDoctor =
+    'Tell your doctor or midwife at your next visit, or sooner.';
+
 /// Guidance tiers - supportive prose only, NEVER a number, NEVER a diagnosis.
 /// ⚠️ REQUIRED_REVIEW.
-LocalizedText mmScreenerGuidance(int totalSeverity) {
+LocalizedText mmScreenerGuidance(int totalSeverity, {bool afterLoss = false}) {
+  if (totalSeverity <= 4) {
+    if (afterLoss) {
+      return _en("What you've described sounds like an ordinary hard "
+          'stretch, the kind grief and a changed body bring. "Calm down '
+          "now\" has short things made for this. They're worth trying when "
+          'it flares up.');
+    }
+    return _en("What you've described sounds like an ordinary hard "
+        'stretch of pregnancy, the kind most mothers go through. "Calm down '
+        "now\" has short things made for this. They're worth trying when it "
+        'flares up.');
+  }
+  if (totalSeverity <= kMmScreenerMiddleTierMax) {
+    return _en("What you've described has been with you for a while now. "
+        'It might help to talk it through with someone who knows '
+        '${afterLoss ? 'loss' : 'pregnancy'} and mood well, instead of '
+        'carrying it alone. Perinatal counselling, on the Experts tab, is '
+        "anonymous and it's there for exactly this.");
+  }
+  return _en("Thank you for answering honestly. What you've described is "
+      'worth talking through with someone soon, both a counsellor and your '
+      'doctor. Reaching out now tends to make this easier to get through, '
+      'and sooner.');
+}
+
+// Kept for revert (before P5 G2/G3): named "the Feel tab" (now "Calm down
+// now") and said "an ordinary hard stretch of pregnancy" after a loss too.
+// ignore: unused_element
+LocalizedText _mmScreenerGuidanceOld(int totalSeverity) {
   if (totalSeverity <= 4) {
     return _en("What you've described sounds like an ordinary hard "
         'stretch of pregnancy, the kind most mothers go through. The Feel '
@@ -2458,12 +2531,13 @@ bool mmTextHasSafetySignal(String text) {
 // =============================================================================
 //  MindMoodStore - mood check-ins + worry journal
 // -----------------------------------------------------------------------------
-//  Local-only, shared_preferences, fire-and-forget saves - mirrors
-//  `ReadToBabySavedStore`. Deliberately no cloud sync: nothing in the spec
-//  asked for it, and a mood/journal store is exactly the kind of thing that
-//  should not gain a network dependency casually. If cross-device sync is
-//  wanted later, follow `CloudSyncedStore` the way `ReadToBabySavedStore`
-//  does - the shape here is already close to it.
+//  Kept for revert (before P5): "Local-only, shared_preferences, fire-and-
+//  forget saves - mirrors `ReadToBabySavedStore`. Deliberately no cloud sync:
+//  nothing in the spec asked for it."
+//
+//  P5 (2026-10-28): the user asked for it (D2): a new phone must not lose
+//  what she wrote. It syncs owner-only to `mind_mood_entries` (0125), still
+//  local-first: the phone's copy shows at once and logged out is phone-only.
 // =============================================================================
 
 class MmMoodEntry {
@@ -2534,17 +2608,77 @@ class MindMoodStore extends ChangeNotifier {
   static const _moodKey = 'mm_mood_entries';
   static const _journalKey = 'mm_journal_entries';
 
+  /// The cloud table (0125). Owner-only: see the header of that migration.
+  static const String kTable = 'mind_mood_entries';
+
   final List<MmMoodEntry> _moods = [];
   final List<MmJournalEntry> _journal = [];
   bool _loaded = false;
+
+  // ---- P5 (2026-10-28): it syncs, and it never writes before it has read ----
+  //
+  //  ⚠️ M1, THE BUG. `init()` ran only in the old `MindMoodHomeScreen`, which
+  //  nothing opens any more: the Mind door draws the Track tab directly. So
+  //  her history never loaded, and the first mood she logged wrote the empty
+  //  in-memory list over the saved key. Every earlier check-in and every
+  //  journal entry went with it. It is P4's shopping-list bug (BACKEND-
+  //  PATTERNS 16zze) in a second store, and it gets the same two fixes:
+  //
+  //    · the tab calls `init()` itself;
+  //    · an edit that arrives before the cache is read is HELD and replayed
+  //      on top of what was read (`_change`), never saved over it. Callers
+  //      keep their sync signatures; the cost is that an edit made in the
+  //      first few milliseconds shows when the read lands, not at the tap.
+  //
+  //  D2 (the user): "what if the person wants to change the device ... they
+  //  just lose access to the essential sensitive stuff that they wrote". So
+  //  moods and the journal sync to `mind_mood_entries`, the `SymptomStore`
+  //  shape: newer wins per row, a delete is a soft delete that travels, and
+  //  logged out behaves exactly like phone-only. The first sign-in after this
+  //  build uploads what the phone already holds: rows the cloud has never
+  //  seen are pushed by the merge, so nothing written before is lost.
+  //
+  //  D3 (the user): owner-only. Not the partner, unlike scans (0012). A
+  //  second account on the same phone never sees it either: sign-out and an
+  //  account switch wipe the phone and call `_resetLocal` (LocalOwner).
+  final OwnRowLedger _sync = OwnRowLedger(kTable, 'mind_mood_entries_sync');
+  bool _cacheRead = false;
+  final List<VoidCallback> _waiting = [];
+  Future<void>? _starting;
+
+  /// Changes the cloud has not confirmed (the sign-out sheet reads this).
+  bool get hasPending => _sync.hasPending;
+
+  /// One mood per day is one row on every phone: its id is its day.
+  static String moodRowId(String dateKey) => 'mood_$dateKey';
 
   /// SOS opens, most recent last. Deliberately in-memory only - a 15-minute
   /// window does not need to survive an app restart, and persisting it would
   /// mean writing to disk every time she reaches for calm, for no benefit.
   final List<DateTime> _sosOpens = [];
 
-  Future<void> init() async {
-    if (_loaded) return;
+  // Kept for revert (before P5): read the phone once, no sync, and nothing
+  // stopped a write landing first.
+  // Future<void> init() async {
+  //   if (_loaded) return;
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     ... read _moodKey and _journalKey ...
+  //   } catch (_) {/* start empty */}
+  //   _loaded = true;
+  //   notifyListeners();
+  // }
+
+  /// Reads the phone, then syncs. Safe to call from every screen; every
+  /// caller waits for the same read.
+  Future<void> init() {
+    if (_starting case final f?) return f;
+    if (_loaded) return Future.value();
+    return _starting = _start();
+  }
+
+  Future<void> _start() async {
+    _loaded = true;
     try {
       final prefs = await SharedPreferences.getInstance();
       final rawMoods = prefs.getString(_moodKey);
@@ -2560,8 +2694,159 @@ class MindMoodStore extends ChangeNotifier {
         }
       }
     } catch (_) {/* start empty */}
-    _loaded = true;
+    await _sync.load();
+    SyncRegistry.registerPending(() => hasPending);
+    _cacheRead = true;
+    if (_waiting.isNotEmpty) {
+      final held = List.of(_waiting);
+      _waiting.clear();
+      for (final edit in held) {
+        edit();
+      }
+    }
     notifyListeners();
+    await _syncFromCloud();
+  }
+
+  /// Every change goes through here: applied now, or held until the phone's
+  /// copy is read (see above). [edit] saves and pushes for itself.
+  void _change(VoidCallback edit) {
+    if (_cacheRead) {
+      edit();
+      return;
+    }
+    _waiting.add(edit);
+    unawaited(init());
+  }
+
+  // ---- the cloud ----------------------------------------------------------
+
+  static String _iso(int ms) =>
+      DateTime.fromMillisecondsSinceEpoch(ms).toIso8601String();
+  static int _ms(Object? iso) =>
+      DateTime.tryParse(iso?.toString() ?? '')?.millisecondsSinceEpoch ?? 0;
+
+  /// camelCase model -> the table's columns. Pure, for the contract test.
+  @visibleForTesting
+  static Map<String, dynamic> moodToRow(MmMoodEntry m) => {
+        'id': moodRowId(m.dateKey),
+        'kind': 'mood',
+        'date_key': m.dateKey,
+        'mood_id': m.moodId,
+        'body': null,
+        'prompt_id': null,
+        'created_at_iso': _iso(m.ts),
+      };
+
+  @visibleForTesting
+  static Map<String, dynamic> journalToRow(MmJournalEntry e) => {
+        'id': e.id,
+        'kind': 'journal',
+        'date_key': null,
+        'mood_id': null,
+        'body': e.text,
+        'prompt_id': e.promptId,
+        'created_at_iso': _iso(e.ts),
+      };
+
+  Map<String, Map<String, dynamic>> _live() => {
+        for (final m in _moods) moodRowId(m.dateKey): moodToRow(m),
+        for (final e in _journal) e.id: journalToRow(e),
+      };
+
+  /// Takes one cloud row: a removal drops it here, anything else replaces it.
+  void _takeRow(Map<String, dynamic> r) {
+    final id = (r['id'] ?? '').toString();
+    final isMood = r['kind'] == 'mood';
+    final gone = syncParseStamp(r['removed_at']) != null;
+    if (isMood) {
+      final day = (r['date_key'] ?? '').toString();
+      _moods.removeWhere((m) => m.dateKey == day);
+      if (!gone && day.isNotEmpty) {
+        _moods.add(MmMoodEntry(
+          dateKey: day,
+          moodId: (r['mood_id'] ?? 'steady').toString(),
+          ts: _ms(r['created_at_iso']),
+        ));
+      }
+    } else {
+      _journal.removeWhere((e) => e.id == id);
+      if (!gone) {
+        _journal.add(MmJournalEntry(
+          id: id,
+          ts: _ms(r['created_at_iso']),
+          text: (r['body'] ?? '').toString(),
+          promptId: r['prompt_id']?.toString(),
+        ));
+      }
+    }
+  }
+
+  /// Pure merge, for tests: what a pull of [rows] does to this store.
+  @visibleForTesting
+  void applyCloudRowsForTest(List<Map<String, dynamic>> rows) {
+    for (final r in _sync.apply(liveKeys: _live().keys, rows: rows)) {
+      _takeRow(r);
+    }
+    notifyListeners();
+  }
+
+  /// The rows waiting to upload, as they would go up. For tests.
+  @visibleForTesting
+  Map<String, Map<String, dynamic>?> pendingUploadsForTest() {
+    final live = _live();
+    return {
+      for (final k in _sync.book.dirty)
+        k: _sync.uploadFor(k, live, uid: 'me'),
+    };
+  }
+
+  /// A sign-out, or another account signing in: forget the person in memory;
+  /// the cloud keeps it (LocalOwner wipes the phone's copy).
+  void _resetLocal() {
+    _moods.clear();
+    _journal.clear();
+    _sync
+      ..clear()
+      ..save();
+    notifyListeners();
+  }
+
+  /// Newer wins per row (the `SymptomStore` shape, sync log step 9).
+  Future<void> _syncFromCloud() async {
+    SyncRegistry.register(_syncFromCloud);
+    SyncRegistry.registerReset(_resetLocal);
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      for (final r in await _sync.pull(
+          liveKeys: _live().keys, orderBy: 'created_at_iso')) {
+        _takeRow(r);
+      }
+      await _persistBoth();
+      notifyListeners();
+      await _sync.push(_live);
+    } catch (_) {/* offline - keep local; the ledger keeps what waits */}
+  }
+
+  void _push() {
+    if (!SupabaseRepo.isLoggedIn) return;
+    unawaited(_sync.push(_live));
+  }
+
+  Future<void> _persistBoth() async {
+    await _persistMoods();
+    await _persistJournal();
+  }
+
+  @visibleForTesting
+  void resetForTest() {
+    _moods.clear();
+    _journal.clear();
+    _sync.clear();
+    _waiting.clear();
+    _starting = null;
+    _loaded = false;
+    _cacheRead = false;
   }
 
   // --- mood check-in ---------------------------------------------------------
@@ -2581,13 +2866,26 @@ class MindMoodStore extends ChangeNotifier {
     return null;
   }
 
+  // Kept for revert (before P5): saved at once, loaded or not.
+  // void logMood(String moodId) {
+  //   final key = _todayKey();
+  //   _moods.removeWhere((m) => m.dateKey == key);
+  //   _moods.add(MmMoodEntry(
+  //       dateKey: key, moodId: moodId, ts: DateTime.now().millisecondsSinceEpoch));
+  //   notifyListeners();
+  //   _persistMoods();
+  // }
   void logMood(String moodId) {
     final key = _todayKey();
-    _moods.removeWhere((m) => m.dateKey == key);
-    _moods.add(MmMoodEntry(
-        dateKey: key, moodId: moodId, ts: DateTime.now().millisecondsSinceEpoch));
-    notifyListeners();
-    _persistMoods();
+    final ts = DateTime.now().millisecondsSinceEpoch;
+    _change(() {
+      _moods.removeWhere((m) => m.dateKey == key);
+      _moods.add(MmMoodEntry(dateKey: key, moodId: moodId, ts: ts));
+      _sync.touch(moodRowId(key));
+      notifyListeners();
+      _persistMoods();
+      _push();
+    });
   }
 
   /// Newest first.
@@ -2652,9 +2950,13 @@ class MindMoodStore extends ChangeNotifier {
       text: trimmed,
       promptId: promptId,
     );
-    _journal.add(entry);
-    notifyListeners();
-    _persistJournal();
+    _change(() {
+      _journal.add(entry);
+      _sync.touch(entry.id);
+      notifyListeners();
+      _persistJournal();
+      _push();
+    });
     return mmTextHasSafetySignal(trimmed);
   }
 
@@ -2675,6 +2977,8 @@ class MindMoodStore extends ChangeNotifier {
   bool updateJournalEntry(String id, String text) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return false;
+    // Before the read there is nothing on screen to edit.
+    if (!_cacheRead) return false;
     final i = _journal.indexWhere((e) => e.id == id);
     if (i < 0) return false;
     final old = _journal[i];
@@ -2684,15 +2988,38 @@ class MindMoodStore extends ChangeNotifier {
       text: trimmed,
       promptId: old.promptId,
     );
+    _sync.touch(id);
     notifyListeners();
     _persistJournal();
+    _push();
     return mmTextHasSafetySignal(trimmed);
   }
 
-  void deleteJournalEntry(String id) {
-    _journal.removeWhere((e) => e.id == id);
+  /// Removes an entry and returns it, so the caller can offer Undo
+  /// ([restoreJournalEntry]). A soft delete that travels to her other phones.
+  MmJournalEntry? deleteJournalEntry(String id) {
+    if (!_cacheRead) return null;
+    final i = _journal.indexWhere((e) => e.id == id);
+    if (i < 0) return null;
+    final gone = _journal.removeAt(i);
+    _sync.remove(id, journalToRow(gone));
     notifyListeners();
     _persistJournal();
+    _push();
+    return gone;
+  }
+
+  /// Undo of a delete: the same entry, same id and date, back. A newer
+  /// change, so it wins over the removal everywhere.
+  void restoreJournalEntry(MmJournalEntry e) {
+    _change(() {
+      _journal.removeWhere((x) => x.id == e.id);
+      _journal.add(e);
+      _sync.touch(e.id);
+      notifyListeners();
+      _persistJournal();
+      _push();
+    });
   }
 
   Future<void> _persistJournal() async {

@@ -37,6 +37,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../data/symptoms/symptom_library.dart';
 import '../../../services/pregnancy_controller.dart';
+import '../../../services/pregnancy_ended_store.dart';
 import '../../../services/symptom_store.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
@@ -169,8 +170,14 @@ class SymptomsWeekBody extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
+                  // P5 S6: an empty week says why, instead of a dead button.
+                  // Kept for revert: `rows.isEmpty ? null : ...`.
                   onPressed: rows.isEmpty
-                      ? null
+                      ? () => pvToast(
+                            context,
+                            'Nothing logged this week yet. Log a symptom on '
+                            'Today and it will be here to send.',
+                          )
                       : () {
                           pvCommitFeedback();
                           onSend!();
@@ -214,8 +221,12 @@ String symptomWeekNote(PregnancyController c) {
   final rows = store.weekCounts(today);
   String d(DateTime x) => '${x.day} ${_months[x.month - 1]}';
   final b = StringBuffer();
+  // P5 S5: after a loss there is no week of pregnancy to name. Kept for
+  // revert: the week line, always.
   b.writeln(
-    'Symptoms, ${d(days.first)} to ${d(days.last)} (week ${c.currentWeek} of pregnancy)',
+    PregnancyEndedStore.instance.ended
+        ? 'Symptoms, ${d(days.first)} to ${d(days.last)}'
+        : 'Symptoms, ${d(days.first)} to ${d(days.last)} (week ${c.currentWeek} of pregnancy)',
   );
   b.writeln();
   if (rows.isEmpty) {
@@ -299,7 +310,9 @@ class _WeekGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const nameW = 104.0;
-    final shown = rows.take(8).toList();
+    // P5 S4: every row. It drew 8 and dropped the rest without a word.
+    // final shown = rows.take(8).toList(); // kept for revert
+    final shown = rows;
     return Column(
       children: [
         // ---- the days: letter over date, today as an ink disc ------------------

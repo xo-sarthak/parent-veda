@@ -18,8 +18,21 @@ import '../../data/mind_mood_data.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'mm_crisis_path.dart';
-import 'mm_talk_tab.dart' show showCounsellingBookingSheet;
+import 'mm_talk_tab.dart' show MmScreenerScreen, showCounsellingBookingSheet;
+import '../../services/remote/supabase_repo.dart';
+import '../pregnancy/preg_after_loss_note.dart';
 import '../../widgets/pv_toast.dart';
+
+/// The mood tap's word (P5 M3): it saved, and who can see it.
+const String kMmMoodSavedToast = 'Saved for today. Only you can see this.';
+
+/// The empty journal's promise, signed in (P5 D2/D3). The team's service
+/// role can technically read any row, so the line says "never shared", not
+/// "not us" (the plan's own check).
+const String kMmJournalSyncedNote =
+    'Nothing written yet. Anything you save goes to your account, so it '
+    "follows you to a new phone. Only you can read it: not a partner, and it's "
+    'never shared. You can change or delete it whenever you want.';
 
 class MmTrackTab extends StatefulWidget {
   const MmTrackTab({super.key, this.embedded = false});
@@ -44,6 +57,38 @@ class _MmTrackTabState extends State<MmTrackTab> {
   /// both, because a separate edit screen would mean two places that can save
   /// a journal entry and two places to get the safety-signal check right.
   String? _editingId;
+
+  // ⚠️ P5 M1: THE TAB LOADS ITS OWN STORE. `init()` used to run only in the
+  // old `MindMoodHomeScreen`; the door draws this tab directly, so her
+  // history never loaded and the first tap saved an empty list over it.
+  @override
+  void initState() {
+    super.initState();
+    _store.init();
+  }
+
+  void _openCheckIn() {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'mind/check_in'),
+      builder: (_) => const MmScreenerScreen(),
+    ));
+  }
+
+  /// P5 M3: a delete gives an Undo instead of being gone at once.
+  void _delete(MmJournalEntry e) {
+    if (_editingId == e.id) {
+      setState(() {
+        _editingId = null;
+        _journalCtrl.clear();
+      });
+    }
+    final gone = _store.deleteJournalEntry(e.id);
+    if (gone == null) return;
+    pvToast(context, 'Entry deleted.',
+        kind: PvToastKind.undo,
+        action: 'Undo',
+        onAction: () => _store.restoreJournalEntry(gone));
+  }
 
   @override
   void dispose() {
@@ -94,6 +139,8 @@ class _MmTrackTabState extends State<MmTrackTab> {
         final entries = _store.journalEntries;
 
         final children = <Widget>[
+            // P5 D5: after a loss the log stays, and says what changed.
+            const PregAfterLossNote(kAfterLossMood),
             Text('How are you feeling today?',
                 style: pvFraunces(
                     fontSize: 20,
@@ -113,7 +160,11 @@ class _MmTrackTabState extends State<MmTrackTab> {
                     option: m,
                     selected: m.id == todayMood,
                     p: p,
-                    onTap: () => _store.logMood(m.id),
+                    onTap: () {
+                      _store.logMood(m.id);
+                      pvToast(context, kMmMoodSavedToast,
+                          kind: PvToastKind.done);
+                    },
                   ),
               ],
             ),
@@ -145,6 +196,17 @@ class _MmTrackTabState extends State<MmTrackTab> {
                 onTap: () => openCrisisPath(context),
               ),
             ],
+            // P5 D1: the one-off gentle check-in opens from here. It saves
+            // nothing; this tab is the one mood log.
+            const SizedBox(height: 14),
+            _NudgeCard(
+              key: const ValueKey('mm_track_check_in'),
+              p: p,
+              text: 'Want to look a little deeper? The gentle check-in is six '
+                  'short questions. Nothing is saved.',
+              ctaLabel: 'Take the gentle check-in',
+              onTap: _openCheckIn,
+            ),
             const SizedBox(height: 32),
             Text('Worry journal',
                 style: pvFraunces(
@@ -245,10 +307,14 @@ class _MmTrackTabState extends State<MmTrackTab> {
                   color: p.surfaceAlt,
                   borderRadius: BorderRadius.circular(16),
                 ),
+                // Kept for revert (before P5 D2): always "stays on this phone".
                 child: Text(
-                    'Nothing written yet. Anything you save stays on this '
-                    'phone, and you can come back and change or delete it '
-                    'whenever you want.',
+                    SupabaseRepo.isLoggedIn
+                        ? kMmJournalSyncedNote
+                        : 'Nothing written yet. Anything you save stays on this '
+                            'phone, and you can come back and change or delete '
+                            'it whenever you want. Sign in and it follows you '
+                            'to a new phone.',
                     style: pvManrope(
                         fontSize: 12.5, height: 1.5, color: p.ink2)),
               ),
@@ -310,17 +376,10 @@ class _MmTrackTabState extends State<MmTrackTab> {
                       ),
                       const SizedBox(width: 10),
                       IconButton(
-                        onPressed: () {
-                          // Editing an entry that is then deleted would leave
-                          // her words in the box with nothing to save them to.
-                          if (_editingId == e.id) {
-                            setState(() {
-                              _editingId = null;
-                              _journalCtrl.clear();
-                            });
-                          }
-                          _store.deleteJournalEntry(e.id);
-                        },
+                        // Editing an entry that is then deleted would leave
+                        // her words in the box with nothing to save them to:
+                        // `_delete` clears the edit first.
+                        onPressed: () => _delete(e),
                         icon: Icon(Icons.close_rounded, size: 16, color: p.ink3),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -470,7 +529,11 @@ class _TrendCard extends StatelessWidget {
 
 class _NudgeCard extends StatelessWidget {
   const _NudgeCard(
-      {required this.p, required this.text, required this.ctaLabel, required this.onTap});
+      {super.key,
+      required this.p,
+      required this.text,
+      required this.ctaLabel,
+      required this.onTap});
   final V2Palette p;
   final String text;
   final String ctaLabel;

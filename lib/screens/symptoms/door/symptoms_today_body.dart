@@ -24,21 +24,28 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/doors/pv_door_data.dart' show PvDoorLibrary;
 import '../../../data/reads/read_images.dart' show readImageFor;
 import '../../../data/reads/symptom_reads.dart';
+import '../../../data/symptoms/symptom_call_rules.dart';
 import '../../../data/symptoms/symptom_library.dart';
 import '../../../models/reminder.dart';
 import '../../../models/pv_read.dart' show PvRead;
 import '../../../models/symptom.dart';
 import '../../../services/pregnancy_controller.dart';
+import '../../../services/pregnancy_ended_store.dart';
 import '../../../services/reminder_store.dart';
 import '../../../services/symptom_store.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
+import '../../../widgets/pv_toast.dart';
 import '../../doors/pv_door_chrome.dart';
-import '../../doors/pv_door_router.dart' show pvDoorEntryRoute;
+import '../../../data/doors/pv_door_mind.dart' show kMindSurfaceTrack;
+import '../../doors/pv_door_router.dart'
+    show openPvDoorSurface, pvDoorEntryRoute;
+import '../../pregnancy/preg_after_loss_note.dart';
 import '../../reader/pv_reader_screen.dart';
 // import '../../brackets/hub/hub_intent_art.dart' show HubIntentArt; // kept for revert — the filled marks
 import '../../v2/pv_day_strip.dart';
@@ -220,6 +227,11 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
     final current = store.severityOn(_selected, s.id);
     if (current == null) {
       await store.setOn(_selected, s.id, 'mild');
+      // P5 S6: a log says it saved, and where its help is.
+      if (mounted) {
+        pvToast(context, '${s.name.en} logged. What helps is below.',
+            kind: PvToastKind.done);
+      }
     } else {
       await store.unlogOn(_selected, s.id);
     }
@@ -295,6 +307,8 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // P5 D5: after a loss the check-in stays, and says what changed.
+          pvDoorPad(const PregAfterLossNote(kAfterLossSymptoms)),
           // ---- the day -------------------------------------------------------
           pvDoorPad(
             symptomsHeading(
@@ -336,7 +350,12 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
           // ---- common this week ---------------------------------------------
           pvDoorPad(
             Text(
-              future ? 'THAT DAY HAS NOT COME YET' : 'COMMON IN WEEK $week',
+              future
+                  ? 'THAT DAY HAS NOT COME YET'
+                  // P5 S5: after a loss there is no week to be common in.
+                  : (PregnancyEndedStore.instance.ended
+                        ? 'COMMON ONES'
+                        : 'COMMON IN WEEK $week'),
               style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
@@ -445,6 +464,13 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
             ),
           ),
           const SizedBox(height: 10),
+          // ⚠️ P5 S1: the one fixed rule sits ABOVE the rows, because it is
+          // about the rows together and no single row can say it.
+          if (symptomTogetherRule(
+            [for (final l in loggedToday) l.symptomId],
+            week: week,
+          ))
+            pvDoorPad(SymptomTogetherCard(p: p)),
           for (final l in loggedToday)
             if (symptomById(l.symptomId) case final s?)
               pvDoorPad(
@@ -452,9 +478,33 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
                   p: p,
                   symptom: s,
                   severity: l.severity,
+                  callLine: symptomCallLine(s.id, week: week),
                   onTap: () => openSymptomRead(context, s, c),
                 ),
               ),
+          // P5 D1: "Mood swings" stays on the grid (something she would tell
+          // a doctor), and its row points to the one mood log.
+          if (loggedToday.any((l) => l.symptomId == 'moodSwings'))
+            pvDoorPad(
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  key: const ValueKey('sym_mood_check_in'),
+                  onPressed: () =>
+                      openPvDoorSurface(context, kMindSurfaceTrack, c),
+                  icon: Icon(Icons.arrow_forward_rounded,
+                      size: 16, color: p.ink1),
+                  label: Text(
+                    'Note your mood day to day in Mood check-in',
+                    style: pvManrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           if (loggedToday.isNotEmpty) ...[
             const SizedBox(height: 4),
             pvDoorPad(
@@ -561,19 +611,99 @@ class _Grid extends StatelessWidget {
   );
 }
 
+/// The one fixed rule (P5 S1): from 20 weeks, a headache with blurred vision
+/// or swelling on the same day. A rule from the NHS card, never a risk score,
+/// with the dialler. The dialler opens with no number: hers is the
+/// hospital's, and the app must never guess it (`_CallRound`'s rule).
+class SymptomTogetherCard extends StatelessWidget {
+  const SymptomTogetherCard({super.key, required this.p});
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    key: const ValueKey('symptom_together_card'),
+    margin: const EdgeInsets.only(bottom: 10),
+    padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+    decoration: BoxDecoration(
+      color: p.surface,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: p.ink1.withValues(alpha: 0.35)),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                kSymptomTogetherCallLine,
+                style: pvManrope(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w800,
+                  height: 1.3,
+                  color: p.ink1,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                kSymptomTogetherWhy,
+                style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        FilledButton.icon(
+          onPressed: () async {
+            pvCommitFeedback();
+            var ok = false;
+            try {
+              ok = await launchUrl(Uri(scheme: 'tel'));
+            } catch (_) {}
+            if (!ok && context.mounted) {
+              pvToast(
+                context,
+                "This phone can't open the dialler. Call your maternity unit "
+                'from another phone, or go in.',
+                kind: PvToastKind.gentle,
+              );
+            }
+          },
+          icon: const Icon(Icons.call_rounded, size: 16),
+          label: const Text('Call'),
+          style: FilledButton.styleFrom(
+            backgroundColor: p.ink1,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 /// One logged symptom's help: the mark, the name and strength, the first
-/// tip, the chevron to the page.
+/// tip (or, for a symptom with a call condition, its when-to-call line), the
+/// chevron to the page.
 class _HelpRow extends StatelessWidget {
   const _HelpRow({
     required this.p,
     required this.symptom,
     required this.severity,
     required this.onTap,
+    this.callLine,
   });
   final V2Palette p;
   final Symptom symptom;
   final String severity;
   final VoidCallback onTap;
+
+  /// P5 S1: shown in place of the tip, so a warning sign never reads as a
+  /// comfort tip. Null keeps the tip.
+  final String? callLine;
 
   @override
   Widget build(BuildContext context) => InkWell(
@@ -617,12 +747,30 @@ class _HelpRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 3),
-                Text(
-                  symptom.tips.isEmpty ? symptom.why.en : symptom.tips.first.en,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
-                ),
+                // Kept for revert (before P5 S1): the first tip, always.
+                // Text(
+                //   symptom.tips.isEmpty ? symptom.why.en : symptom.tips.first.en,
+                //   maxLines: 2,
+                //   overflow: TextOverflow.ellipsis,
+                //   style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
+                // ),
+                if (callLine case final line?)
+                  Text(
+                    line,
+                    style: pvManrope(
+                      fontSize: 13,
+                      height: 1.45,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink1,
+                    ),
+                  )
+                else
+                  Text(
+                    symptom.tips.isEmpty ? symptom.why.en : symptom.tips.first.en,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
+                  ),
               ],
             ),
           ),

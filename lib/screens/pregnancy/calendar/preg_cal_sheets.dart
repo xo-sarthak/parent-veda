@@ -20,6 +20,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
+import '../../doors/pv_door_router.dart' show openPvDoorPage;
+
 import '../../../models/calendar_event.dart';
 import '../../../models/scan_appointment.dart';
 import '../../../services/appointment_reminders.dart';
@@ -34,7 +37,7 @@ import '../../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalett
 import '../../tools/baby_movement_screen.dart';
 import '../../brackets/scan_timeline_screen.dart' show ScanTimelineScreen;
 import '../../tools/scans_appointments_screen.dart' show showPregAppointmentSheet;
-import '../../tools/symptom_companion_screen.dart';
+// import '../../tools/symptom_companion_screen.dart'; // kept for revert (P5 S3)
 import '../../tools/weight_tracker_screen.dart';
 import '../../weekly_card_stack_screen.dart';
 import 'preg_cal_data.dart';
@@ -61,8 +64,12 @@ void pregCalOpenWeight(BuildContext context, PregnancyController p) => _push(
 void pregCalOpenKicks(BuildContext context, PregnancyController p) => _push(
     context, 'calendar/kicks', (_) => BabyMovementScreen(controller: p));
 
-void pregCalOpenSymptoms(BuildContext context, PregnancyController p) => _push(
-    context, 'calendar/symptoms', (_) => SymptomCompanionScreen(controller: p));
+// P5 S3 (2026-10-28): the Symptoms door on its first tab, the check-in,
+// not the old companion (kept for revert, it still exists). Kept for revert:
+// void pregCalOpenSymptoms(BuildContext context, PregnancyController p) => _push(
+//     context, 'calendar/symptoms', (_) => SymptomCompanionScreen(controller: p));
+void pregCalOpenSymptoms(BuildContext context, PregnancyController p) =>
+    openPvDoorPage(context, kSymptomsBracketId, p);
 
 void pregCalOpenWeek(BuildContext context, PregnancyController p, int week) {
   p.selectWeek(week);

@@ -26,6 +26,9 @@ import '../../../data/nutrition_data.dart' show kDietCharts;
 import '../../../services/family_profile.dart';
 import '../../../services/nutrition_day_store.dart';
 import '../../../services/pregnancy_controller.dart';
+import '../../../services/pregnancy_ended_store.dart';
+import '../../../widgets/pv_toast.dart';
+import '../../pregnancy/preg_after_loss_note.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../brackets/hub/hub_intent_art.dart';
@@ -114,6 +117,8 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
             // tomorrow?"). The heading is the plate, the date is its sub-line,
             // and looking ahead is what the chart's week is for — the "See
             // the week" line under the plate opens every day of it.
+            // P5 D5: after a loss the plate stays, and says what changed.
+            pvDoorPad(const PregAfterLossNote(kAfterLossPlate)),
             pvDoorPad(nutritionHeading(p, 'Your plate',
                 sub: '${_dateWord(_date)}. Swap anything; "not today" is a real answer.')),
             const SizedBox(height: 10),
@@ -313,7 +318,12 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
   String _needsLine(NutritionDayStore store) {
     final ticked = kPlateNeeds.where((n) => store.ticked(_date, n.id)).length;
     if (ticked == 0) return 'Tap what you had today. Long press one to see what counts.';
-    if (ticked == kPlateNeeds.length) return 'All five today. That\'s a good day for your baby.';
+    // P5 N2: no baby after a loss. Kept for revert: always "for your baby".
+    if (ticked == kPlateNeeds.length) {
+      return PregnancyEndedStore.instance.ended
+          ? "All five today. That's a good day."
+          : "All five today. That's a good day for your baby.";
+    }
     return '$ticked of ${kPlateNeeds.length} today. Every one helps.';
   }
 
@@ -345,6 +355,9 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
                 store.logCraving(kind);
                 final item = cravingById(itemId);
                 if (item == null) return;
+                // P5 N1: the tap logs, and now says so before the page opens.
+                pvToast(context, "Logged. Here's what helps.",
+                    kind: PvToastKind.done);
                 Navigator.of(context).push(MaterialPageRoute<void>(
                   settings: const RouteSettings(name: 'nutrition/craving'),
                   builder: (_) => CravingDetailScreen(item: item, pregnancy: widget.pregnancy),

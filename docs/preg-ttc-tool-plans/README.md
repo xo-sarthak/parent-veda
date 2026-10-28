@@ -11,7 +11,7 @@ The user says go per family. Each plan records every decision with the user's an
 | P2 | Keep | BUILT 2026-10-28 (P2-keep.md); 0118 run 2026-10-28 | 01f33b1 |
 | P3 | Her week | COMMITTED 2026-10-28 (P3-her-week.md) | d94f537e |
 | P4 | Birth prep (+ store seed retired, Coming soon) | COMMITTED 2026-10-28 (P4-birth-prep.md) | 17238591 |
-| P5 | Daily check-ins | waiting | — |
+| P5 | Daily check-ins (+ mood log sync, 0125) | BUILT 2026-10-28 (P5-daily-checkins.md); 0125 to run | (commit) |
 | T1 | TTC: the doctor check (TT1, TT2, TC3, TC5) | COMMITTED (T1-doctor-check.md); 0117 run 10-28 | 00b3cc5 |
 | T2 | TTC: cycle tools | waits on A | — |
 | T3 | TTC: getting ready | waiting | — |

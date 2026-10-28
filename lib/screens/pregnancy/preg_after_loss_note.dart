@@ -64,6 +64,24 @@ const String kAfterLossBirthPlan =
 const String kAfterLossNames =
     'Your shortlist is kept. Nothing here will ask you to choose a name.';
 
+// ---- P5, daily check-ins after a loss (D5, 2026-10-28) -------------------------
+
+/// The Symptoms check-in after a loss.
+const String kAfterLossSymptoms =
+    'Your body is still recovering. Logging how you feel can help at your '
+    'follow-up visit, and the when-to-call lines still apply.';
+
+/// Mood check-in after a loss.
+const String kAfterLossMood =
+    'Grief moves through moods in its own way. Nothing here is graded, and '
+    'only you can see it.';
+
+/// The plate after a loss. The amounts are pregnancy amounts, so it says so
+/// rather than pretend they were worked out for now.
+const String kAfterLossPlate =
+    'Since your loss, this is about getting your strength back. The amounts '
+    'are pregnancy amounts; ask your doctor what you need now.';
+
 class PregAfterLossNote extends StatelessWidget {
   const PregAfterLossNote(this.text, {super.key, this.bottom = 16});
   final String text;

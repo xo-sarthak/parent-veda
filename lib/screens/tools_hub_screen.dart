@@ -65,6 +65,11 @@ import '../theme/pv_fonts.dart';
 import 'learn/pv_learn_screen.dart';
 import '../services/life_stage_store.dart';
 import 'doors/pv_door_screen.dart' show pvDoorScreenForBracket;
+import 'doors/pv_door_router.dart' show pvDoorScreenFor;
+import '../data/doors/pv_door_mind.dart' show kMindSurfaceTrack;
+import '../data/doors/pv_door_nutrition.dart' show kDietSurfaceToday;
+import 'mind_mood/mm_track_tab.dart' show MmTrackTab;
+
 import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
 import '../data/doors/pv_door_labour.dart' show kLabourSurfaceBirthPlan;
 import '../widgets/global_ask_fab.dart' show kAskVedaRoute;
@@ -82,6 +87,9 @@ import '../data/doors/pv_door_getting_ready.dart' show kReadySurfaceNames;
 import '../widgets/pv_toast.dart';
 import 'post_pregnancy/baby_naming_home_screen.dart' show BabyNamingHomeScreen;
 import 'nutrition/door/shopping_list_screen.dart' show ShoppingListScreen;
+
+/// The Tools tab's first group (P5 D1): the three daily check-ins.
+const String kPregCheckInGroup = 'Check in';
 // Kept for revert (PregSectionHeading, 2026-10-02): import 'pregnancy/preg_chrome.dart';
 
 // =============================================================================
@@ -196,6 +204,41 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   int? get _week => controller.isDueDateSet ? controller.currentWeek : null;
 
   List<_ToolGroup> _groups(S s) => [
+        // P5 D1 (2026-10-28): the three daily check-ins, none of which was a
+        // Tools row. Each opens its door's own tool, under the door's route
+        // name, so the Ask button reads it the same. Her side only, like
+        // Track: the mood log is owner-only (D3).
+        if (!FatherPreview.instance.on)
+        _ToolGroup(kPregCheckInGroup, 160, [
+          _Tool('Symptoms today', Icons.healing_outlined, const Color(0xFF4A7BC8),
+              () => _open('bracket/symptoms', () =>
+                  pvDoorScreenForBracket(kSymptomsBracketId, controller) ??
+                  SymptomCompanionScreen(controller: controller)),
+              // After a loss, nothing here is about a baby (D5).
+              line: _ended
+                  ? 'Two taps for how your body feels today, and when to call'
+                  : "Two taps for how you feel, what helps, and when to call",
+              mark: IntentMark.bodyMark,
+              priority: PregPriority.symptoms),
+          _Tool('Mood check-in', Icons.sentiment_satisfied_outlined,
+              const Color(0xFF3E7A6B),
+              () => _open(kMindSurfaceTrack, () =>
+                  pvDoorScreenFor(kMindSurfaceTrack, controller) ??
+                  const MmTrackTab()),
+              line: 'A mood word a day and a private journal. Only you see it',
+              mark: IntentMark.sunMark,
+              priority: PregPriority.anxiety),
+          _Tool('Your plate today', Icons.restaurant_outlined,
+              const Color(0xFF5E8A4A),
+              () => _open(kDietSurfaceToday, () =>
+                  pvDoorScreenFor(kDietSurfaceToday, controller) ??
+                  const SizedBox.shrink()),
+              line: _ended
+                  ? 'Five ticks and your water, for getting your strength back'
+                  : 'Five ticks and your water, for you and your baby',
+              mark: IntentMark.checkMark,
+              priority: PregPriority.nutrition),
+        ]),
         if (!FatherPreview.instance.on)
         _ToolGroup('Track', 206, [
           // if (!_ended) // kept for revert (P3 D5)

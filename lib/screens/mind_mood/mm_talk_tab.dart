@@ -29,7 +29,11 @@ import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
 
 import '../../data/mind_mood_data.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
+import '../../widgets/pv_toast.dart';
 import '../../theme/pv_fonts.dart';
 import '../tools/ask_veda_screen.dart';
 import '../v2/v2_palette.dart';
@@ -269,14 +273,38 @@ class MmScreenerScreenState extends State<MmScreenerScreen> {
   int _total = 0;
   bool _done = false;
 
+  /// P5 G1: a non-zero answer to the safety question, held until she
+  /// finishes, then the crisis path opens over her result.
+  bool _crisisOwed = false;
+
+  /// P5 G3: the after-loss wording, read once when the screen opens.
+  final bool _afterLoss = PregnancyEndedStore.instance.ended;
+  late final List<MmScreenerQuestion> _questions =
+      mmScreenerQuestions(afterLoss: _afterLoss);
+
+  // Kept for revert (before P5 G1): only the top answer reached help.
+  // void _answer(MmScreenerQuestion q, MmScreenerOption opt) {
+  //   if (q.isSafetyQuestion && opt.severity >= 3) {
+  //     openCrisisPath(context);
+  //     return;
+  //   }
+  //   ...
+  // }
   void _answer(MmScreenerQuestion q, MmScreenerOption opt) {
-    if (q.isSafetyQuestion && opt.severity >= 3) {
+    if (mmScreenerOpensCrisisNow(q, opt)) {
       openCrisisPath(context);
       return;
     }
+    if (mmScreenerOpensCrisis(q, opt)) _crisisOwed = true;
     _total += opt.severity;
-    if (_index >= kMmScreenerQuestions.length - 1) {
+    if (_index >= _questions.length - 1) {
       setState(() => _done = true);
+      if (_crisisOwed) {
+        // Calm, no label: the crisis screen never says why it opened.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) openCrisisPath(context);
+        });
+      }
     } else {
       setState(() => _index++);
     }
@@ -298,18 +326,19 @@ class MmScreenerScreenState extends State<MmScreenerScreen> {
               ),
               const Spacer(),
               if (!_done)
-                Text('${_index + 1} / ${kMmScreenerQuestions.length}',
+                Text('${_index + 1} / ${_questions.length}',
                     style: pvManrope(fontSize: 11.5, color: p.ink3)),
             ]),
             Expanded(
               child: Center(
                 child: _done
-                    ? _ScreenerResult(total: _total, p: p)
+                    ? _ScreenerResult(
+                        total: _total, p: p, afterLoss: _afterLoss)
                     : _ScreenerQuestionView(
                         key: ValueKey(_index),
-                        question: kMmScreenerQuestions[_index],
+                        question: _questions[_index],
                         p: p,
-                        onAnswer: (opt) => _answer(kMmScreenerQuestions[_index], opt),
+                        onAnswer: (opt) => _answer(_questions[_index], opt),
                       ),
               ),
             ),
@@ -359,18 +388,33 @@ class _ScreenerQuestionView extends StatelessWidget {
 }
 
 class _ScreenerResult extends StatelessWidget {
-  const _ScreenerResult({required this.total, required this.p});
+  const _ScreenerResult(
+      {required this.total, required this.p, this.afterLoss = false});
   final int total;
   final V2Palette p;
+  final bool afterLoss;
 
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisSize: MainAxisSize.min, children: [
       Icon(Icons.spa_outlined, size: 40, color: p.ink2),
       const SizedBox(height: 18),
-      Text(mmScreenerGuidance(total).now,
+      Text(mmScreenerGuidance(total, afterLoss: afterLoss).now,
           textAlign: TextAlign.center,
           style: pvManrope(fontSize: 14.5, height: 1.6, color: p.ink1)),
+      // P5: the top tier says "a counsellor and your doctor", so it names
+      // the doctor as a step too, and the helpline sits beside the button.
+      if (total > kMmScreenerMiddleTierMax) ...[
+        const SizedBox(height: 10),
+        Text(kMmScreenerTellDoctor,
+            key: const ValueKey('mm_screener_tell_doctor'),
+            textAlign: TextAlign.center,
+            style: pvManrope(
+                fontSize: 13.5,
+                height: 1.5,
+                fontWeight: FontWeight.w700,
+                color: p.ink1)),
+      ],
       const SizedBox(height: 24),
       if (total > 4)
         SizedBox(
@@ -387,6 +431,28 @@ class _ScreenerResult extends StatelessWidget {
             child: const Text('Talk to a counsellor'),
           ),
         ),
+      if (total > kMmScreenerMiddleTierMax) ...[
+        const SizedBox(height: 10),
+        SizedBox(
+          width: 240,
+          child: OutlinedButton.icon(
+            key: const ValueKey('mm_screener_helpline'),
+            style: OutlinedButton.styleFrom(
+                foregroundColor: p.ink1,
+                side: BorderSide(color: p.line),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(999)),
+                padding: const EdgeInsets.symmetric(vertical: 13)),
+            onPressed: () => _callHelpline(context),
+            icon: const Icon(Icons.call_outlined, size: 16),
+            label: Text('$kCrisisHelplineName $kCrisisHelplineNumber'),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(kCrisisHelplineHours,
+            textAlign: TextAlign.center,
+            style: pvManrope(fontSize: 11.5, color: p.ink3)),
+      ],
       const SizedBox(height: 10),
       TextButton(
         onPressed: () => Navigator.of(context).maybePop(),
@@ -394,6 +460,20 @@ class _ScreenerResult extends StatelessWidget {
             style: pvManrope(fontSize: 13, color: p.ink3)),
       ),
     ]);
+  }
+}
+
+/// The helpline from the screener's top tier. A phone that cannot dial says
+/// so, and the number stays on screen to dial by hand.
+Future<void> _callHelpline(BuildContext context) async {
+  var ok = false;
+  try {
+    ok = await launchUrl(Uri(scheme: 'tel', path: kCrisisHelplineNumber));
+  } catch (_) {}
+  if (!ok && context.mounted) {
+    pvToast(context,
+        "This phone can't open the dialler. The number is $kCrisisHelplineNumber.",
+        kind: PvToastKind.gentle);
   }
 }
 
