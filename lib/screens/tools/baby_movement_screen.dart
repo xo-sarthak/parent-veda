@@ -51,6 +51,7 @@ import '../brackets/hub/hub_intent_art.dart';
 // Kept for revert (the start card's own mark, now the hero's): import '../doors/pv_list_row.dart' show PvMarkWell;
 import '../../data/reads/pregnancy_reads_weekly_a.dart' show kPregWeekReadPrefix;
 import '../doors/pv_door_router.dart' show openPvDoorRead;
+import '../pregnancy/preg_after_loss_note.dart';
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../pregnancy/preg_tool_parts.dart';
@@ -164,6 +165,13 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
     }
   }
 
+  /// The undo for a mis-tap (P3 M6): takes back the last movement and says so.
+  Future<void> _undoLast() async {
+    final took = await _store.undoLastMovement();
+    if (!mounted || !took) return;
+    pvToast(context, 'Took back the last movement.', kind: PvToastKind.done);
+  }
+
   Future<void> _logMovement() async {
     await _store.logMovement();
     setState(() => _justLogged = true);
@@ -215,6 +223,9 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // A tool that needs a pregnancy stays after a loss and says
+                  // so once (P3 D5, user 2026-10-28).
+                  const PregAfterLossNote(kAfterLossMovement),
                   if (active) ..._liveViews(context) else ..._idleViews(context),
                   const SizedBox(height: 18),
                   PregNote(s.movementDisclaimer),
@@ -231,7 +242,13 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
                       ),
                     ],
                   ),
-                  if (!active) ...[
+                  // ⚠️ ON SCREEN IN A LIVE SESSION TOO (P3 M2, 2026-10-28). It
+                  // was `if (!active)`, so while she was counting, perhaps
+                  // because she was worried, the only words left were "that
+                  // is perfectly normal". The red flag is the line she must
+                  // not miss, so it shows in both states. Kept for revert:
+                  //   if (!active) ...[
+                  ...[
                     const SizedBox(height: 14),
                     // The teaching the PDF found missing, folded. The line she
                     // must not miss is the title, so it is always on the page.
@@ -326,6 +343,15 @@ class _BabyMovementScreenState extends State<BabyMovementScreen>
         ),
       ),
       const SizedBox(height: 20),
+      if (count > 0)
+        Center(
+          child: TextButton(
+            key: const ValueKey('bm_undo_last'),
+            onPressed: _undoLast,
+            child: Text('Take back the last one',
+                style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink2)),
+          ),
+        ),
       if (count == 0)
         // The empty state keeps its invitation, in one line.
         Text(
@@ -1120,6 +1146,24 @@ class _SessionCard extends StatelessWidget {
               endLabel: s.formatClock(rec.end),
             ),
             const SizedBox(height: 10),
+            // A session can be removed, with Undo (P3 M6, 2026-10-28): it
+            // was the one record here with no way to take it back.
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                key: ValueKey('bm_delete_${rec.id}'),
+                onPressed: () async {
+                  final gone = await ToolsStore.instance.deleteMovementSession(rec.id);
+                  if (gone == null || !context.mounted) return;
+                  pvToast(context, 'Session removed.',
+                      kind: PvToastKind.done,
+                      action: 'Undo',
+                      onAction: () => ToolsStore.instance.restoreMovementSession(gone));
+                },
+                child: Text('Remove this session',
+                    style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink2)),
+              ),
+            ),
             PregFoldRow(
               keyPrefix: 'bm_hist',
               fold: rec.id,

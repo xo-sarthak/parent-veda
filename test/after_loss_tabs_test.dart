@@ -49,7 +49,10 @@ void main() {
       await PregnancyEndedStore.instance.markEnded();
       await pump(tester, ToolsHubScreen(controller: pregnancy));
       expect(tester.takeException(), isNull);
-      expect(text('GET READY'), findsNothing);
+      // P3 D5 (user, 2026-10-28, "everything stays, baby wording dropped"):
+      // Get ready stays for the due date; its birth rows step aside until P4.
+      // Kept for revert: expect(text('GET READY'), findsNothing);
+      expect(text('GET READY'), findsOneWidget);
       expect(text('Birth plan'), findsNothing);
       expect(find.textContaining('get ready for the birth', skipOffstage: false), findsNothing);
       expect(find.textContaining('look after your health', skipOffstage: false), findsOneWidget);

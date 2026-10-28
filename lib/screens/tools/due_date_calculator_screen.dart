@@ -27,6 +27,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../pregnancy/preg_chrome.dart';
+import '../pregnancy/preg_due_date_screen.dart' show PregDueDateScreen;
 import '../pregnancy/preg_tool_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../widgets/pv_feedback.dart' show PvPress;
@@ -86,16 +87,34 @@ DueDateSource ddcSourceFor(DdcMethod m) {
   }
 }
 
-class DueDateCalculatorScreen extends StatefulWidget {
+// ⚠️ ONE DUE-DATE TOOL (P3 D1, user 2026-10-28). Every way into "the
+// calculator" (Tools, the surface router, search, Ask Veda, the door, the
+// Calendar's Change) now lands on `PregDueDateScreen`, the one screen that
+// warns before it replaces a clinic's date, refuses a date no pregnancy could
+// have, and says what the save changed. This page reopened on her saved date
+// with the method still on "Last period", so tapping Start saved a scan's date
+// back as our own count (P3 DD1). The name stays so no caller has to change.
+class DueDateCalculatorScreen extends StatelessWidget {
   const DueDateCalculatorScreen({super.key, required this.controller});
   final PregnancyController controller;
 
   @override
-  State<DueDateCalculatorScreen> createState() =>
+  Widget build(BuildContext context) =>
+      PregDueDateScreen(pregnancy: controller);
+}
+
+/// The old calculator and roadmap. Kept for revert (P3 D1, 2026-10-28):
+/// nothing opens it. To revert, give [DueDateCalculatorScreen] this body back.
+class DueDateCalculatorClassicScreen extends StatefulWidget {
+  const DueDateCalculatorClassicScreen({super.key, required this.controller});
+  final PregnancyController controller;
+
+  @override
+  State<DueDateCalculatorClassicScreen> createState() =>
       _DueDateCalculatorScreenState();
 }
 
-class _DueDateCalculatorScreenState extends State<DueDateCalculatorScreen> {
+class _DueDateCalculatorScreenState extends State<DueDateCalculatorClassicScreen> {
   DdcMethod _method = DdcMethod.lmp;
   DateTime? _lmp, _conception, _transfer, _scan, _known;
   int _cycle = 28;

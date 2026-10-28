@@ -44,9 +44,13 @@ import '../../data/tests_scans_reports_data.dart';
 import '../../localization/app_language.dart';
 import '../../models/scan_appointment.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/appointment_reminders.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_toast.dart';
+import '../pregnancy/preg_after_loss_note.dart';
 import '../pregnancy/preg_chrome.dart';
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine;
 import '../v2/v2_palette.dart';
@@ -154,6 +158,25 @@ class ScanTimelineScreen extends StatelessWidget {
 /// ⚠️ IT IS A COLUMN, NOT A LIST. A scrolling widget inside another scrolling
 /// widget is either unbounded or a nested scroll nobody can drive with a thumb.
 /// The door's own `ListView` does the scrolling; this just lays out.
+/// Mark a scan done, or take the mark back, and say what changed (P3 ST3).
+/// Marking it also writes a Scans entry in her Journal, which the page never
+/// said.
+Future<void> scanToggleDone(BuildContext context,
+    {required String id, required String title, required int week, required bool isDone}) async {
+  if (isDone) {
+    await ScansStore.instance.unmarkCompleted(id);
+    if (context.mounted) {
+      pvToast(context, '$title is no longer marked done.', kind: PvToastKind.done);
+    }
+    return;
+  }
+  await ScansStore.instance.markCompleted(scanId: id, journalTitle: title, week: week);
+  if (context.mounted) {
+    pvToast(context, '$title marked done. It is in your Journal too.',
+        kind: PvToastKind.done);
+  }
+}
+
 class ScanTimelineBody extends StatelessWidget {
   const ScanTimelineBody(
       {super.key, required this.pregnancy, this.showFooter = true});
@@ -201,7 +224,12 @@ class ScanTimelineBody extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (next != null)
+            // ⚠️ AFTER A LOSS (P3 ST2 / D5, 2026-10-28): nothing is "up next",
+            // and "in about n weeks" promised a scan of a baby who is not
+            // coming. The run stays, with every scan she had and its notes.
+            if (PregnancyEndedStore.instance.ended)
+              const PregAfterLossNote(kAfterLossScans, bottom: 0)
+            else if (next != null)
               _UpNext(
                 scan: next,
                 from: nextFrom,
@@ -605,13 +633,11 @@ class _RunRow extends StatelessWidget {
             ink: p.ink1,
             line: p.line,
             surface: p.surface,
+            // Said, both ways (P3 ST3): the tick also writes her Journal.
+            // Kept for revert: the two store calls, silent.
             onTap: canToggle
-                ? () => isDone
-                    ? ScansStore.instance.unmarkCompleted(scan.id)
-                    : ScansStore.instance.markCompleted(
-                        scanId: scan.id,
-                        journalTitle: scan.name.of(lang),
-                        week: week)
+                ? () => scanToggleDone(context,
+                    id: scan.id, title: scan.name.of(lang), week: week, isDone: isDone)
                 : null,
           ),
         ]),
@@ -799,12 +825,10 @@ class _TimelineRow extends StatelessWidget {
                   if (isDone || from <= pregnancy.currentWeek) ...[
                   const SizedBox(height: 7),
                   PvPress(child: GestureDetector(
-                    onTap: () => isDone
-                        ? ScansStore.instance.unmarkCompleted(s.id)
-                        : ScansStore.instance.markCompleted(
-                            scanId: s.id,
-                            journalTitle: s.name.of(lang),
-                            week: from),
+                    // Said, both ways (P3 ST3). Kept for revert: the two
+                    // store calls, silent.
+                    onTap: () => scanToggleDone(context,
+                        id: s.id, title: s.name.of(lang), week: from, isDone: isDone),
                     behavior: HitTestBehavior.opaque,
                     child: Text(
                         (isDone ? _en('Undo done') : _en('Mark as done'))
@@ -1328,6 +1352,11 @@ Future<void> showScanDateSheet(BuildContext context,
                       pvCommitFeedback();
                       await ScansStore.instance.deleteAppointment(existing.id);
                       if (ctx.mounted) Navigator.of(ctx).pop();
+                      // Said (P3 ST3), and its reminder goes with it.
+                      if (context.mounted) {
+                        pvToast(context, 'Date removed from ${scan.name.of(lang)}.',
+                            kind: PvToastKind.done);
+                      }
                     },
                     child: Text(_en('Remove').of(lang)),
                   ),
@@ -1340,6 +1369,8 @@ Future<void> showScanDateSheet(BuildContext context,
                     onPressed: () async {
                       pvCommitFeedback();
                       final store = ScansStore.instance;
+                      // What was saved, for the message (P3 ST3).
+                      Appointment? saved;
                       // kept for revert (before sync step 9): delete then
                       // re-add. With soft deletes that sends a removal and a
                       // revival of one id, and it dropped the doctor, notes
@@ -1357,7 +1388,7 @@ Future<void> showScanDateSheet(BuildContext context,
                       //   type: ApptType.scan,
                       // ));
                       if (existing != null) {
-                        await store.updateAppointment(Appointment(
+                        await store.updateAppointment(saved = Appointment(
                           id: existing.id,
                           title: scan.name.en,
                           dateIso: date.toIso8601String(),
@@ -1369,7 +1400,7 @@ Future<void> showScanDateSheet(BuildContext context,
                           status: existing.status,
                         ));
                       } else {
-                        await store.addAppointment(Appointment(
+                        await store.addAppointment(saved = Appointment(
                           id: 'ap_${DateTime.now().microsecondsSinceEpoch}',
                           title: scan.name.en,
                           dateIso: date.toIso8601String(),
@@ -1379,6 +1410,15 @@ Future<void> showScanDateSheet(BuildContext context,
                         ));
                       }
                       if (ctx.mounted) Navigator.of(ctx).pop();
+                      // Every save says what it changed (P3 ST3), and where
+                      // its reminder lives (D7).
+                      if (context.mounted) {
+                        pvToast(
+                            context,
+                            '${scan.name.of(lang)} is on ${_UpNext._dateLine(saved)}.'
+                            '${AppointmentReminders.instance.bookingLine(saved)}',
+                            kind: PvToastKind.done);
+                      }
                     },
                     child: Text(_en('Save').of(lang)),
                   ),

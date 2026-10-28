@@ -128,6 +128,25 @@ Future<bool> showPvAddChildSheet(
                         color: p.ink2,
                       ),
                     ),
+                    // ⚠️ TWINS, ONE PROFILE EACH (P3 D6, user 2026-10-28:
+                    // "tell the user that you need to make two profiles...
+                    // they need to track both of the babies"). The sheet adds
+                    // one child; she told pregnancy she is carrying more than
+                    // one, so it says how the second gets its own page.
+                    if (arrival && FamilyProfileStore.instance.expectingTwins) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        'Twins? Add one baby here. Then add the other from You, '
+                        'Add a child, so each has their own profile and both are tracked.',
+                        key: const ValueKey('birth_twins_line'),
+                        style: pvManrope(
+                          fontSize: 13.5,
+                          height: 1.45,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink1,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 16),
                     TextField(
                       controller: name,

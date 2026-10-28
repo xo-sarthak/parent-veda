@@ -57,6 +57,7 @@ import '../../localization/app_language.dart';
 import '../../services/family_profile.dart' show BirthMode, FamilyProfileStore;
 import '../../services/life_stage_store.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/tools_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_toast.dart';
@@ -173,8 +174,17 @@ _Routine _ppRecommended() {
 
 /// The recommended routine for whoever is reading: pregnancy by week, exactly
 /// as before; Parenting by weeks since birth.
-_Routine _recommendedNow(PregnancyController? c) =>
-    _kgPostpartum(c) ? _ppRecommended() : _recommendedFor(c!.currentWeek);
+///
+/// ⚠️ AFTER A LOSS (P3 K1, 2026-10-28): the tool stays (D5) and the week no
+/// longer climbs into the third-trimester routine, whose name is "Preparing
+/// for birth". It holds at the middle one ("Building consistency", 5 seconds,
+/// 10 squeezes), the gentlest that still trains. Kept for revert:
+///   _kgPostpartum(c) ? _ppRecommended() : _recommendedFor(c!.currentWeek);
+_Routine _recommendedNow(PregnancyController? c) => _kgPostpartum(c)
+    ? _ppRecommended()
+    : _recommendedFor(PregnancyEndedStore.instance.ended
+        ? math.min(c!.currentWeek, 28)
+        : c!.currentWeek);
 
 /// The effective routine now. In breathe-first a custom squeeze routine does
 /// not apply: there is no squeeze to customise.
@@ -463,7 +473,11 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                       'bladder, bowel and uterus - and then fully relaxes them. '
                       '${_pp ? 'After birth these muscles are stretched and tired, '
                                 'so they come back with breathing first and gentle work '
-                                'after.' : 'During pregnancy these muscles carry extra '
+                                'after.' : PregnancyEndedStore.instance.ended
+                                // After a loss, no "during pregnancy" (P3 K1).
+                                ? 'After a pregnancy these muscles can feel weaker, '
+                                    'so gentle, regular work helps them recover.'
+                                : 'During pregnancy these muscles carry extra '
                                 'weight, so keeping them working well matters.'}',
                       style: _bodyStyle(),
                     ),
@@ -583,7 +597,9 @@ class _KegelCareScreenState extends State<KegelCareScreen> {
                         s.kegelSafetyPain,
                         s.kegelSafetyBleeding,
                         s.kegelSafetyDizziness,
-                        s.kegelSafetyContractions,
+                        // Not after a loss (P3 K1): no contractions to watch.
+                        if (!PregnancyEndedStore.instance.ended)
+                          s.kegelSafetyContractions,
                       ],
                     ),
                 ],
@@ -1497,7 +1513,12 @@ class _SessionScreenState extends State<_SessionScreen>
     if (_settled) return null;
     _settled = true;
     const kMinRepsToSave = 3;
-    if (_completedReps < kMinRepsToSave) return null;
+    // Not silent (P3 K3): one or two rounds are still not kept, and now she
+    // is told why. Nothing done at all needs no word.
+    if (_completedReps == 0) return null;
+    if (_completedReps < kMinRepsToSave) {
+      return 'Not saved: three rounds or more are kept in your history';
+    }
     await ToolsStore.instance.recordKegelSession(
       holdSeconds: widget.hold,
       relaxSeconds: widget.relax,

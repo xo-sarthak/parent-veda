@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/journal_entry.dart';
 import '../models/scan_appointment.dart';
+import 'appointment_reminders.dart';
 import 'journal_store.dart';
 import 'pregnancy_records.dart';
 import 'remote/own_row_ledger.dart';
@@ -122,6 +123,9 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
     SyncRegistry.registerPending(() => hasPending);
     _loaded = true;
     notifyListeners();
+    // Re-arm her appointment reminders (P3 D7): derived ids, so a repeat
+    // overwrites. Not awaited: launch never waits on the plugin.
+    AppointmentReminders.instance.syncAll(_appts).catchError((_) {});
 
     // 2) Then sync with the cloud (no-op if logged out).
     await _syncFromCloud();
@@ -178,10 +182,17 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
           byId[id] = _fromApptRow(r);
         }
       }
+      // A row removed on her other phone takes its reminder with it (P3 D7).
+      for (final a in _appts) {
+        if (!byId.containsKey(a.id)) {
+          AppointmentReminders.instance.cancelFor(a.id).catchError((_) {});
+        }
+      }
       _appts
         ..clear()
         ..addAll(byId.values);
       await _persistAppts();
+      AppointmentReminders.instance.syncAll(_appts).catchError((_) {});
 
       _partnerCompleted.clear();
       _partnerAppts.clear();
@@ -315,16 +326,38 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
   static bool _now(CompletedScan c) => PregnancyRecords.instance
       .inCurrent(DateTime.tryParse(c.dateIso) ?? DateTime.now());
 
+  /// ⚠️ ONE SCAN, ONE ID (P3 CA3, 2026-10-28). The Calendar's usual checks
+  /// are journey milestones (`m_nt`); the Scans timeline is its own run
+  /// (`nt_scan`). Both mark the same scan done in this store, so a scan done
+  /// in one read as open in the other. New marks are written under the
+  /// timeline's id; every read and removal matches either spelling, so a tick
+  /// already stored under the old one is never lost, here or in the cloud.
+  static const Map<String, String> kScanIdTwins = {
+    'm_ultrasound': 'dating_scan',
+    'm_nt': 'nt_scan',
+    'm_anomaly': 'anomaly_scan',
+    'm_glucose': 'ogtt',
+    'm_growth': 'growth_scan',
+    'm_gbs': 'gbs',
+  };
+
+  /// The one id a scan is known by.
+  static String scanKey(String scanId) => kScanIdTwins[scanId] ?? scanId;
+
+  static bool _same(CompletedScan c, String scanId) =>
+      scanKey(c.scanId) == scanKey(scanId);
+
+  // Kept for revert (P3 CA3): `c.scanId == scanId` in both reads below.
   bool isCompleted(String scanId) =>
-      _completed.any((c) => c.scanId == scanId && _now(c)) ||
-      _partnerCompleted.any((c) => c.scanId == scanId && _now(c));
+      _completed.any((c) => _same(c, scanId) && _now(c)) ||
+      _partnerCompleted.any((c) => _same(c, scanId) && _now(c));
 
   CompletedScan? completedOf(String scanId) {
     for (final c in _completed) {
-      if (c.scanId == scanId && _now(c)) return c;
+      if (_same(c, scanId) && _now(c)) return c;
     }
     for (final c in _partnerCompleted) {
-      if (c.scanId == scanId && _now(c)) return c;
+      if (_same(c, scanId) && _now(c)) return c;
     }
     return null;
   }
@@ -401,6 +434,9 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
     required int week,
   }) async {
     if (isCompleted(scanId)) return;
+    // One id per scan (P3 CA3): the timeline's spelling, whichever page
+    // marked it. The journal id below follows it.
+    scanId = scanKey(scanId);
     final now = DateTime.now();
     final scan = CompletedScan(scanId: scanId, dateIso: now.toIso8601String());
     _completed.add(scan);
@@ -427,15 +463,17 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
 
   Future<void> unmarkCompleted(String scanId) async {
     // Which journal entry it wrote (R1): the day it was done picks the id.
-    final was = _completed.where((c) => c.scanId == scanId).firstOrNull;
+    // Either spelling of the scan (P3 CA3); each row goes by its own stored
+    // id, so the cloud removes the row it actually holds.
+    final was = _completed.where((c) => _same(c, scanId)).firstOrNull;
     final journalId = was == null
-        ? 'scan_$scanId'
-        : scanJournalId(scanId, DateTime.tryParse(was.dateIso) ?? DateTime.now());
+        ? 'scan_${scanKey(scanId)}'
+        : scanJournalId(was.scanId, DateTime.tryParse(was.dateIso) ?? DateTime.now());
     // A soft delete that travels (step 9).
-    for (final c in _completed.where((c) => c.scanId == scanId)) {
-      _scanSync.remove(scanId, _toScanRow(c));
+    for (final c in _completed.where((c) => _same(c, scanId)).toList()) {
+      _scanSync.remove(c.scanId, _toScanRow(c));
     }
-    _completed.removeWhere((c) => c.scanId == scanId);
+    _completed.removeWhere((c) => _same(c, scanId));
     notifyListeners();
     await _persistCompleted();
     // kept for revert (before step 9): a one-shot hard delete.
@@ -471,6 +509,7 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
     _appts.add(a);
     _apptSync.touch(a.id);
     notifyListeners();
+    AppointmentReminders.instance.kick(a);
     await _persistAppts();
     // kept for revert (before step 9):
     // if (SupabaseRepo.isLoggedIn) {
@@ -491,6 +530,7 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
     _appts[i] = a;
     _apptSync.touch(a.id);
     notifyListeners();
+    AppointmentReminders.instance.kick(a);
     await _persistAppts();
     // kept for revert (before step 9):
     // if (SupabaseRepo.isLoggedIn) {
@@ -509,6 +549,9 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
     // so it is left alone, as before.
     for (final a in _appts.where((a) => a.id == id)) {
       _apptSync.remove(id, _toApptRow(a));
+    }
+    if (_appts.any((a) => a.id == id)) {
+      AppointmentReminders.instance.cancelFor(id).catchError((_) {});
     }
     _appts.removeWhere((a) => a.id == id);
     notifyListeners();

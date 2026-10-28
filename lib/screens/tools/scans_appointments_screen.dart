@@ -18,6 +18,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../calendar_screen.dart' show CalendarScreen;
+
 import '../../data/journey_milestones.dart';
 import '../../data/scan_guide_data.dart';
 import '../../localization/app_language.dart';
@@ -93,16 +95,32 @@ Widget _loggedCard(List<Widget> rows) => Container(
       ]),
     );
 
-class ScansAppointmentsScreen extends StatefulWidget {
+// ⚠️ RETIRED INTO THE CALENDAR (P3 PG2 / D3, 2026-10-28). The Calendar hub
+// called this screen merged and retired, yet seven links still opened it (the
+// `appointments` surface, scan detail, scan next, the journeys entry, the
+// Calendar's own row). The name now opens the Calendar, where her
+// appointments live, so every old link lands on the one place. The name
+// stays so no caller (some are door files) has to change.
+class ScansAppointmentsScreen extends StatelessWidget {
   const ScansAppointmentsScreen({super.key, required this.controller});
   final PregnancyController controller;
 
   @override
-  State<ScansAppointmentsScreen> createState() =>
+  Widget build(BuildContext context) => CalendarScreen(controller: controller);
+}
+
+/// The old Scans and appointments screen. Kept for revert (P3 D3): nothing
+/// opens it.
+class ScansAppointmentsClassicScreen extends StatefulWidget {
+  const ScansAppointmentsClassicScreen({super.key, required this.controller});
+  final PregnancyController controller;
+
+  @override
+  State<ScansAppointmentsClassicScreen> createState() =>
       _ScansAppointmentsScreenState();
 }
 
-class _ScansAppointmentsScreenState extends State<ScansAppointmentsScreen> {
+class _ScansAppointmentsScreenState extends State<ScansAppointmentsClassicScreen> {
   int _tab = 0; // 0 Upcoming · 1 Completed · 2 Roadmap
   PregnancyController get p => widget.controller;
 

@@ -10,6 +10,9 @@
 //  THE FOUR WAYS ONBOARDING OFFERS, in the same words: Last period, Doctor's
 //  date, Scan date, IVF transfer. After week 12 "Scan date" leads, because by
 //  then most women have had a dating scan and that is the better date.
+//  A FIFTH, Conception date, came with the calculator when the two screens
+//  became one (P3 D1, 2026-10-28): every way into "the calculator" now lands
+//  here, and some women know the day. It is our count, like Last period.
 //
 //  ⚠️ THE ARITHMETIC IS THE CALCULATOR'S, NOT A COPY. `ddcComputeEdd` and
 //  `ddcSourceFor` (tools/due_date_calculator_screen.dart) are the one place the
@@ -34,6 +37,7 @@ import '../../widgets/pv_feedback.dart';
 import '../products/pv_store_chrome.dart' show PvChip, PvCommit, kPvLine, pvStorePalette, pvSnack;
 import '../v2/v2_palette.dart';
 import '../tools/due_date_calculator_screen.dart' show DdcMethod, ddcComputeEdd, ddcSourceFor;
+import 'preg_after_loss_note.dart';
 
 const String kPregDueDateRoute = 'pregnancy/due_date';
 
@@ -66,12 +70,21 @@ const Map<DdcMethod, (String, String)> kPregDueDateWays = {
   DdcMethod.known: ("Doctor's date", 'The due date you were given'),
   DdcMethod.ultrasound: ('Scan date', 'The day of your dating scan'),
   DdcMethod.ivf: ('IVF transfer', 'The day of the embryo transfer'),
+  DdcMethod.conception: ('Conception date', 'The day you conceived'),
 };
 
 /// The order the ways are offered in: "Scan date" first from week 12.
 List<DdcMethod> pregDueDateOrder(int week) => week >= 12
-    ? const [DdcMethod.ultrasound, DdcMethod.known, DdcMethod.lmp, DdcMethod.ivf]
-    : const [DdcMethod.lmp, DdcMethod.known, DdcMethod.ultrasound, DdcMethod.ivf];
+    ? const [DdcMethod.ultrasound, DdcMethod.known, DdcMethod.lmp, DdcMethod.ivf, DdcMethod.conception]
+    : const [DdcMethod.lmp, DdcMethod.known, DdcMethod.ultrasound, DdcMethod.ivf, DdcMethod.conception];
+
+/// When each trimester begins for a due date: the second at week 14, the
+/// third at week 28, both counted from the day 280 before it (the roadmap the
+/// calculator drew, kept short when the two screens became one).
+(DateTime, DateTime) pregTrimesterStarts(DateTime edd) {
+  final start = DateTime(edd.year, edd.month, edd.day).subtract(const Duration(days: 280));
+  return (start.add(const Duration(days: 13 * 7)), start.add(const Duration(days: 27 * 7)));
+}
 
 /// Where her current date came from, in words.
 String pregDueDateFrom(DueDateSource s) => switch (s) {
@@ -116,6 +129,7 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
       : ddcComputeEdd(
           method: _method,
           lmp: _date,
+          conception: _date,
           known: _date,
           scan: _date,
           transfer: _date,
@@ -204,6 +218,7 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
           children: [
+            const PregAfterLossNote(kAfterLossDueDate),
             Text('Your due date',
                 style: pvFraunces(fontSize: 28, fontWeight: FontWeight.w500, height: 1.15, color: p.ink1)),
             const SizedBox(height: 8),
@@ -313,6 +328,12 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
                 ],
               ),
             ],
+            if ((ok ? edd : (_c.isDueDateSet ? _c.dueDate : null)) case final d?) ...[
+              const SizedBox(height: 20),
+              _eyebrow(p, ok ? 'Your trimesters with this date' : 'Your trimesters'),
+              const SizedBox(height: 8),
+              _trimesters(p, d),
+            ],
             const SizedBox(height: 22),
             PvCommit(
               key: const ValueKey('preg_due_save'),
@@ -326,6 +347,32 @@ class _PregDueDateScreenState extends State<PregDueDateScreen> {
         ),
       ),
       ),
+    );
+  }
+
+  Widget _trimesters(V2Palette p, DateTime edd) {
+    final (second, third) = pregTrimesterStarts(edd);
+    Widget row(String label, DateTime d) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(children: [
+            Expanded(child: Text(label, style: pvManrope(fontSize: 13.5, color: p.ink2))),
+            Text(_long(d),
+                style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink1)),
+          ]),
+        );
+    return Container(
+      key: const ValueKey('preg_due_trimesters'),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: kPvLine),
+      ),
+      child: Column(children: [
+        row('Second trimester begins', second),
+        row('Third trimester begins', third),
+        row('Due date', edd),
+      ]),
     );
   }
 

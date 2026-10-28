@@ -31,12 +31,16 @@ import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../services/pregnancy_ended_store.dart';
 import '../../services/tools_store.dart';
+import '../../widgets/pv_toast.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../pregnancy/calendar/preg_cal_data.dart' show pregWeekOf;
 import '../pregnancy/preg_chrome.dart';
 import '../pregnancy/preg_tool_chrome.dart';
+import '../pregnancy/preg_twins.dart' show pregExpectingTwins;
 import '../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 // Kept for revert alongside the commented-out `pregHealthStrip` call below.
 // import '../../widgets/profile_ask_strip.dart';
@@ -106,9 +110,13 @@ Widget _addAction(String label, VoidCallback onTap) => Tooltip(
 // ---------------------------------------------------------------------------
 
 class _SetupFlow extends StatefulWidget {
-  const _SetupFlow({required this.controller, required this.onDone});
+  const _SetupFlow({required this.controller, required this.onDone, this.editing = false});
   final PregnancyController controller;
   final VoidCallback onDone;
+
+  /// Opened from the dashboard to change her start (P3 W2): the fields begin
+  /// with what she saved, and the save says what changed.
+  final bool editing;
 
   @override
   State<_SetupFlow> createState() => _SetupFlowState();
@@ -120,6 +128,18 @@ class _SetupFlowState extends State<_SetupFlow> {
   final _heightCtrl = TextEditingController();
   double? _weight;
   double? _height; // optional
+
+  @override
+  void initState() {
+    super.initState();
+    // Her saved start, when there is one (P3 W2: "Add your height anytime"
+    // was promised and setup was the only way in).
+    final st = ToolsStore.instance;
+    if (st.prePregnancyWeight != null) {
+      _weightCtrl.text = st.prePregnancyWeight!.toStringAsFixed(1);
+    }
+    if (st.heightCm != null) _heightCtrl.text = st.heightCm!.toStringAsFixed(0);
+  }
 
   @override
   void dispose() {
@@ -192,6 +212,14 @@ class _SetupFlowState extends State<_SetupFlow> {
               style: _bigFilled(),
               onPressed: () async {
                 await ToolsStore.instance.setWeightProfile(_weight!, _height);
+                // Every save says what it changed (P3 W2).
+                if (widget.editing && context.mounted) {
+                  pvToast(
+                      context,
+                      'Saved. Your start is ${_weight!.toStringAsFixed(1)} ${s.kgUnit}'
+                      '${_height == null ? '' : ', ${_height!.toStringAsFixed(0)} ${s.cmUnit}'}.',
+                      kind: PvToastKind.done);
+                }
                 widget.onDone();
               },
               child: Text(s.startTrackingCta),
@@ -346,6 +374,11 @@ class _Dashboard extends StatelessWidget {
     final gain = latest != null ? latest.weight - pre : null;
     final entries = store.weightEntries; // newest first
     final p = pvStorePalette;
+    // After a loss the tool stays and the baby wording goes (P3 D5): no week
+    // label, no pregnancy range, no "your growing baby" explainers.
+    final ended = PregnancyEndedStore.instance.ended;
+    final twins = pregExpectingTwins;
+    final range = twins ? store.recommendedGainTwins : store.recommendedGain;
 
     // TOOL SHELL + ORDER (2026-09-30, Tools audit). WH: she opens this to log a
     // weigh-in and see where she is, so her number, her gain, this week's line
@@ -358,9 +391,11 @@ class _Dashboard extends StatelessWidget {
       eyebrow: 'Track',
       title: s.weightToolTitle,
       mark: IntentMark.scaleMark,
-      intro:
-          'A record of your weigh-ins and what they mean for your baby. '
-          'It is a record, not a target: your doctor sets your goals.',
+      intro: ended
+          ? 'A record of your weigh-ins. It is a record, not a target: '
+              'your doctor sets your goals.'
+          : 'A record of your weigh-ins and what they mean for your baby. '
+              'It is a record, not a target: your doctor sets your goals.',
       action: latest != null
           ? _addAction(
               s.addWeightShort,
@@ -407,6 +442,7 @@ class _Dashboard extends StatelessWidget {
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (!ended)
                           Text(
                             '${s.weekWord} $week',
                             style: pregGroupLabelStyle(),
@@ -438,6 +474,7 @@ class _Dashboard extends StatelessWidget {
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (!ended)
                           Text(
                             '${s.weekWord} $week',
                             style: pregGroupLabelStyle(),
@@ -478,13 +515,71 @@ class _Dashboard extends StatelessWidget {
                   ),
                 ),
               if (gain != null) const SizedBox(height: 24),
-              // Weekly insight.
+              // ⚠️ THE RANGE THE TOOLS ROW PROMISES (P3 W1, 2026-10-28). "See a
+              // healthy range for you" showed once, at setup; the chart that
+              // drew it is commented out below. Population ranges by her BMI,
+              // said as a guide her doctor may change, never as a target.
+              if (!ended) ...[
+                _card(
+                  context,
+                  title: twins ? 'A usual range for twins' : 'A usual range for you',
+                  child: Column(
+                    key: const ValueKey('weight_range_card'),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (range != null)
+                        Text(
+                          '${range.min.toStringAsFixed(1)} – ${range.max.toStringAsFixed(1)} ${s.kgUnit} '
+                          'over the whole pregnancy',
+                          style: text.titleMedium,
+                        )
+                      else if (twins && store.bmiCategory == 'underweight')
+                        Text(
+                          'There is no standard range for twins at your BMI. Your doctor will set one with you.',
+                          style: text.bodyLarge,
+                        )
+                      else
+                        Text(s.gainNeedsHeight, style: text.bodyLarge),
+                      const SizedBox(height: 8),
+                      Text(s.weightGuidelineNote, style: text.bodySmall),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+              // Her start can change (P3 W2): setup was the only way in.
+              PregRowCard(children: [
+                PregOfferRow(
+                  key: const ValueKey('weight_edit_start'),
+                  mark: IntentMark.scaleMark,
+                  hue: 206,
+                  title: store.heightCm == null
+                      ? 'Add your height'
+                      : 'Change your starting weight or height',
+                  line: store.heightCm == null
+                      ? 'It lets the app show the usual range for you'
+                      : 'Starting ${pre.toStringAsFixed(1)} ${s.kgUnit}, '
+                          '${store.heightCm!.toStringAsFixed(0)} ${s.cmUnit}',
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: 'tools/weight/start'),
+                    builder: (ctx) => _SetupFlow(
+                      controller: controller,
+                      editing: true,
+                      onDone: () => Navigator.of(ctx).pop(),
+                    ),
+                  )),
+                ),
+              ]),
+              const SizedBox(height: 24),
+              // Weekly insight. Not after a loss (P3 D5).
+              if (!ended) ...[
               _card(
                 context,
                 title: s.thisWeekLabel,
                 child: Text(s.weeklyWeightInsight(week), style: text.bodyLarge),
               ),
               const SizedBox(height: 24),
+              ],
               // History - every entry, with column headings.
               if (entries.isNotEmpty)
                 _card(
@@ -505,6 +600,8 @@ class _Dashboard extends StatelessWidget {
                   ),
                 ),
               if (entries.isNotEmpty) const SizedBox(height: 24),
+              // The three baby explainers step aside after a loss (P3 D5).
+              if (!ended) ...[
               // Supportive insight.
               _card(
                 context,
@@ -545,6 +642,7 @@ class _Dashboard extends StatelessWidget {
                   ),
                 ),
               if (latest != null) const SizedBox(height: 24),
+              ], // !ended
               // Chart REMOVED per request - the plotted weight graph is hidden.
               // Commented out (not deleted) so it can be reverted. The _ChartView /
               // _WeightChartPainter classes below are also commented out to avoid
@@ -868,9 +966,24 @@ class _Dashboard extends StatelessWidget {
         ],
       ),
     );
-    if (ok == true) await ToolsStore.instance.deleteWeightEntry(e.id);
+    if (ok != true) return;
+    await ToolsStore.instance.deleteWeightEntry(e.id);
+    // Said, with Undo (P3 W5): the same id comes back, so the cloud row is
+    // revived rather than duplicated.
+    if (context.mounted) {
+      pvToast(context, 'Weigh-in removed.',
+          kind: PvToastKind.done,
+          action: 'Undo',
+          onAction: () => ToolsStore.instance.addWeightEntry(e));
+    }
   }
 }
+
+/// The pregnancy week [day] fell in (P3 W3), the way the Calendar's own
+/// weight sheet already counts it (`preg_cal_sheets.dart`), so a weigh-in
+/// carries one week whichever page logged it.
+int weightWeekOn(PregnancyController c, DateTime day) =>
+    pregWeekOf(c.dueDate, day).clamp(1, 42);
 
 /// The add-weight bottom sheet, shared by the top app-bar button and the bottom
 /// button. Allows any past date; multiple entries per day are kept.
@@ -943,8 +1056,12 @@ Future<void> showAddWeight(
                   child: FilledButton(
                     style: _bigFilled(),
                     onPressed: () {
-                      final w = double.tryParse(ctrl.text.trim());
-                      if (w == null) return;
+                      final w = double.tryParse(ctrl.text.trim().replaceAll(',', '.'));
+                      if (w == null || w < 25 || w > 250) {
+                        // Never a silent tap (P3 W4).
+                        pvToast(ctx, 'Enter your weight in kg, like 62.5.');
+                        return;
+                      }
                       final now = DateTime.now();
                       final ts = DateTime(
                         date.year,
@@ -960,12 +1077,20 @@ Future<void> showAddWeight(
                           dateIso:
                               '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
                           timeIso: ts.toIso8601String(),
-                          week: controller.currentWeek,
+                          // The week of the day she picked, not of today
+                          // (P3 W3): a backdated weigh-in read as this week's
+                          // in her doctor notes. Kept for revert:
+                          //   week: controller.currentWeek,
+                          week: weightWeekOn(controller, date),
                           weight: w,
                           notes: notesCtrl.text.trim(),
                         ),
                       );
                       Navigator.of(ctx).pop();
+                      // Every save says what it changed (P3 W4).
+                      pvToast(context,
+                          'Saved: ${w.toStringAsFixed(1)} ${s.kgUnit} on ${s.formatShortDate(date)}.',
+                          kind: PvToastKind.done);
                     },
                     child: Text(s.saveCta),
                   ),

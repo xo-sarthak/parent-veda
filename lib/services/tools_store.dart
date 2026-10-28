@@ -448,6 +448,25 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
     return (min: 5.0, max: 9.0);
   }
 
+  /// The range for twins (P3 D6, user 2026-10-28). The US Institute of
+  /// Medicine's 2009 provisional ranges for twins (normal BMI 16.8-24.5 kg,
+  /// overweight 14.1-22.7, obese 11.3-19.1), on the same Asian cut-offs as
+  /// [recommendedGain]. No range is published for twins under BMI 18.5, so
+  /// that returns null and the screen says her doctor sets it.
+  /// ⚠️ A doctor checks these numbers before launch (BEFORE-LAUNCH).
+  ({double min, double max})? get recommendedGainTwins {
+    switch (bmiCategory) {
+      case 'normal':
+        return (min: 16.8, max: 24.5);
+      case 'overweight':
+        return (min: 14.1, max: 22.7);
+      case 'high':
+        return (min: 11.3, max: 19.1);
+      default:
+        return null;
+    }
+  }
+
   String? get bmiCategory {
     final w = _prePregnancyWeight;
     final h = _heightCm;
@@ -999,6 +1018,43 @@ class ToolsStore extends ChangeNotifier implements PregnancyScopedStore {
     //         onConflict: 'id');
     //   } catch (_) {}
     // }
+    await _moveSync.push(_moveRows);
+  }
+
+  /// Take back the last movement logged in the active session: the undo for
+  /// a mis-tap (P3 M6, 2026-10-28). The session is not yet in the cloud
+  /// (only ended sessions go up), so this is a local change only.
+  Future<bool> undoLastMovement() async {
+    final s = activeMovementSession;
+    if (s == null || s.times.isEmpty) return false;
+    s.times.removeLast();
+    notifyListeners();
+    await _persistMovementSessions();
+    return true;
+  }
+
+  /// Delete one ended session, as a soft delete that travels (step 9), the
+  /// way a weight entry goes (P3 M6). Returns the session so the caller can
+  /// offer Undo with [restoreMovementSession].
+  Future<MovementSession?> deleteMovementSession(String id) async {
+    final i = _movementSessions.indexWhere((s) => s.id == id && !s.isActive);
+    if (i < 0) return null;
+    final gone = _movementSessions.removeAt(i);
+    _moveSync.remove(id, _movementToRow(gone));
+    notifyListeners();
+    await _persistMovementSessions();
+    await _moveSync.push(_moveRows);
+    return gone;
+  }
+
+  /// Put a deleted session back (Undo). Same id, so the cloud row is revived,
+  /// not duplicated.
+  Future<void> restoreMovementSession(MovementSession s) async {
+    if (_movementSessions.any((x) => x.id == s.id)) return;
+    _movementSessions.add(s);
+    _moveSync.touch(s.id);
+    notifyListeners();
+    await _persistMovementSessions();
     await _moveSync.push(_moveRows);
   }
 

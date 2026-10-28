@@ -4449,3 +4449,31 @@ network fails, the screen says which and offers Try again; nothing crashes.
 **The general fact:** in a key-value table, row-level security is also key-level security, so the key belongs
 in the policy. The trade-off: each new store a partner should see needs its own policy line (or an allow-list
 of keys), which is more migrations, and in return nothing becomes shared just because it was added to the table.
+
+## 16zzb. Retire a screen by its name, and alias an id at the store (P3, no migration, 2026-10-28)
+
+Two P3 fixes share one idea: **change where a name points, not every place that says it.**
+
+**A retired screen keeps its class name and opens its successor.** Seven links still opened the retired Scans
+and appointments screen, and six opened the old due-date calculator. Some of those links live in door files
+another terminal owns. Rewriting every call site would have meant edits across files we may not touch and a
+miss whenever someone adds an eighth link. Instead `ScansAppointmentsScreen` became a `StatelessWidget` whose
+`build` returns `CalendarScreen`, and `DueDateCalculatorScreen` returns `PregDueDateScreen`. The old bodies
+moved to `...ClassicScreen` classes, kept for revert, and a test fails if anything constructs them. The
+trade-off: the name now lies a little (it says "appointments", it opens the Calendar), and in return every
+link, present and future, lands on the one screen.
+
+**Two ids for one thing are aliased where they are read, not migrated.** The Calendar marked a scan done as a
+journey milestone (`m_nt`), the timeline as its own run (`nt_scan`), in the same `completed_scans` table. The
+tempting fix is a migration that rewrites the old ids. Instead `ScansStore.scanKey` maps each milestone id to
+the timeline's; every read and removal compares `scanKey(a) == scanKey(b)`, and new marks are written under
+the one id. Old rows, here or in the cloud, keep their id and still count. The general fact: **a rename is
+safest as a read-side alias plus a write-side canonical form**, because it needs no backfill, survives a
+phone that has not synced yet, and can be undone by deleting one map.
+
+**A per-device preference stays on the device.** Appointment reminders (`AppointmentReminders`) are on by
+default with an off switch per appointment, stored as a set of ids in `shared_preferences`, not a column on
+`appointments`. A column would follow her to a second phone, but costs a migration and a schema contract for
+a choice that only matters where the notification fires. Notification ids are derived from the appointment
+id with our own FNV-1a hash (not `String.hashCode`, which Dart does not promise to keep stable), so
+re-arming on every launch overwrites rather than duplicates, and cancelling needs no side table.

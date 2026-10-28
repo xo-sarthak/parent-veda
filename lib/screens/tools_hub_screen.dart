@@ -18,6 +18,7 @@ import '../theme/app_theme.dart';
 import '../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../widgets/profile_ask_strip.dart';
 import 'belly_skin/bump_ritual_screen.dart';
+import 'calendar_screen.dart';
 import 'can_i_screen.dart';
 import 'father/father_journal_screen.dart';
 import '../services/father_preview.dart';
@@ -177,6 +178,13 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   // step aside. What looks after her stays: medicines, readings, pelvic
   // floor, reminders, the journal, her bump photos, Ask Veda. The undo brings
   // every one back.
+  //
+  // ⚠️ P3 D5 (user, 2026-10-28): "everything stays, with the baby wording
+  // dropped... we don't need to hide anything." Movement, Weight and the due
+  // date are back after a loss; each one that needs a pregnancy says so at its
+  // top (`PregAfterLossNote`). The rest of Get ready follows in P4, the family
+  // that owns those tools and their wording, so they keep `if (!_ended)` row
+  // by row until then.
   bool get _ended => PregnancyEndedStore.instance.ended;
 
   /// Her real week, or null on the week-20 stand-in (nothing then moves).
@@ -185,22 +193,32 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
   List<_ToolGroup> _groups(S s) => [
         if (!FatherPreview.instance.on)
         _ToolGroup('Track', 206, [
-          if (!_ended)
+          // if (!_ended) // kept for revert (P3 D5)
           _Tool(s.babyMovementTracker, Icons.favorite_border_rounded,
               AppTheme.secondary500,
               () => _open('tools/movement', () => BabyMovementScreen(controller: controller)),
-              line: "Count kicks and get to know your baby's pattern",
+              // Not "Count kicks" (P3 M1): the page says she need not count
+              // unless her doctor asks. Kept for revert:
+              //   line: "Count kicks and get to know your baby's pattern",
+              line: "Note your baby's movements and get to know the pattern",
               mark: IntentMark.stepsMark,
               priority: PregPriority.babyDevelopment,
               // First in Track from 28, after the rest before it (Batch 4).
               fromWeek: kPregToolsThirdTrimesterFrom),
-          if (!_ended)
+          // if (!_ended) // kept for revert (P3 D5)
           _Tool(s.toolWeightTitle, Icons.monitor_weight_outlined,
               AppTheme.tertiary500,
               () => _open('tools/weight', () => WeightTrackerScreen(controller: controller)),
               line: 'Log your weight and see a healthy range for you',
               mark: IntentMark.scaleMark,
               priority: PregPriority.nutrition),
+          // P3 D4 (2026-10-28), rule C1: the Calendar was reached from the
+          // home, More, search and Ask Veda but was never a Tools row. Same
+          // route name as the home's, so the Ask button reads it the same.
+          _Tool(s.tabCalendar, Icons.event_outlined, const Color(0xFF5A6B8C),
+              () => _open('calendar', () => CalendarScreen(controller: controller)),
+              line: 'Your appointments, scans and the checks most women have',
+              mark: IntentMark.calendarDay),
           _Tool(s.medTitle, Icons.medication_outlined, const Color(0xFF4F7A52),
               () => _open('tools/medicines', () => MedicineTrackerScreen(controller: controller)),
               line: 'What your doctor prescribed, with reminders',
@@ -238,10 +256,12 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               line: 'What we remind you about, and when',
               mark: IntentMark.nextStep),
         ]),
-        if (!_ended)
+        // if (!_ended) // kept for revert (P3 D5): the group stays for the due
+        // date; its other rows step aside one by one until P4.
         // Leads the tab from week 28 (Batch 4, PREG 8). The 28 before it is
         // the group's hue, not a week.
         _ToolGroup('Get ready', 28, leadsFromWeek: kPregToolsThirdTrimesterFrom, [
+          if (!_ended)
           _Tool(s.hbName, Icons.luggage_outlined, AppTheme.tertiary400,
               () => _open('tools/hospital_bag', () => ReadyForBirthScreen(controller: controller)),
               line: 'What to pack for you, your baby and your partner',
@@ -249,11 +269,13 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               priority: PregPriority.birthPrep),
           // Added by the gap analysis: the birth plan was built for the Labour
           // door and never listed here.
+          if (!_ended)
           _Tool('Birth plan', Icons.edit_note_rounded, const Color(0xFFB0654A),
               () => _open(kLabourSurfaceBirthPlan, () => BirthPlanScreen(pregnancy: controller)),
               line: 'What you would like on the day, to share with your doctor',
               mark: IntentMark.reportPage,
               priority: PregPriority.birthPrep),
+          if (!_ended)
           _Tool(s.toolContractionTitle, Icons.timer_outlined, AppTheme.neutral500,
               () => _open('tools/contractions', () => ContractionTrackerScreen(controller: controller)),
               line: 'Time your contractions and see when to go in',
@@ -267,6 +289,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               line: 'Work out your due date, or update it after a scan',
               mark: IntentMark.calendarDay,
               staleDueDate: controller.dueDateMayBeStale),
+          if (!_ended)
           _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
               () => _open('tools/product_checklist', () => ProductChecklistScreen(controller: controller)),
               line: 'What you really need before the baby comes',
@@ -275,6 +298,7 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
           // P2 N1 (2026-10-28): Baby names was offered by the Getting ready
           // door only (C1). The screen is the one Parenting opens; a name she
           // chooses now is offered at the birth.
+          if (!_ended)
           _Tool('Baby names', Icons.badge_outlined, const Color(0xFF4F7A8A),
               () => _open(kReadySurfaceNames, () => const BabyNamingHomeScreen()),
               line: 'Find names you both love, and keep a shortlist',

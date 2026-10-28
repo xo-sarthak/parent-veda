@@ -114,7 +114,9 @@ void main() {
         .split('\n')
         .where((l) => !l.trimLeft().startsWith('//'))
         .join('\n');
-    expect(live, contains('store.updateAppointment(Appointment('));
+    // P3 ST3 (2026-10-28): the edit also keeps what it saved for the message,
+    // `saved = Appointment(`; still an update, never delete and re-add.
+    expect(live, contains('store.updateAppointment(saved = Appointment('));
     expect(live, contains('doctor: existing.doctor'));
     expect(live, isNot(contains('await store.deleteAppointment(existing.id)')));
   });

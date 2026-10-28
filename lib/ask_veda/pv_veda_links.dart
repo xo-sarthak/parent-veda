@@ -149,7 +149,8 @@ class PvVedaTool {
 
 final List<PvVedaTool> kPvVedaTools = [
   PvVedaTool('movement', (s) => s.babyMovementTracker,
-      "Count kicks and get to know your baby's pattern", 'tools/movement',
+      // Not "Count kicks" (P3 M1), as the Tools row.
+      "Note your baby's movements and get to know the pattern", 'tools/movement',
       (c) => BabyMovementScreen(controller: c),
       keywords: const ['kick count', 'fetal movement', 'baby movements']),
   PvVedaTool('weight', (s) => s.toolWeightTitle,

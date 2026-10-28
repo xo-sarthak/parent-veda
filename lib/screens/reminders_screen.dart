@@ -23,7 +23,12 @@ import '../localization/app_language.dart';
 import '../models/reminder.dart';
 import '../services/notification_service.dart';
 import '../services/pregnancy_controller.dart';
+import '../models/scan_appointment.dart';
+import '../services/appointment_reminders.dart';
+import '../services/life_stage_store.dart';
 import '../services/pregnancy_ended_store.dart';
+import '../services/scans_store.dart';
+import 'calendar_screen.dart' show CalendarScreen;
 import '../services/reminder_store.dart';
 import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
@@ -288,6 +293,18 @@ class _RemindersScreenState extends State<RemindersScreen> {
               Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final p in _presetsFor(ended: ended)) _presetChip(context, s, store, p),
               ]),
+              // ---- Appointments (P3 D7, 2026-10-28) --------------------------
+              // Her booked appointments remind her the evening before, on by
+              // default; this is where the booking's message sends her, and
+              // where each one is switched off. Pregnancy only: the Calendar
+              // holds them there.
+              if (LifeStageStore.instance.stage == LifeStage.pregnancy) ...[
+                const SizedBox(height: 30),
+                const PregSectionHeading('Appointments',
+                    lead: 'Each one you book reminds you the evening before.'),
+                const SizedBox(height: 12),
+                _ApptReminders(controller: controller),
+              ],
               // ---- From ParentVeda (2026-09-30) -----------------------------
               // The messages the app sends on its own, from her dates. The
               // gap analysis puts their off switches beside the reminders.
@@ -1259,4 +1276,102 @@ class _MedReminderEditorState extends State<_MedReminderEditor> {
           trailing,
         ],
       );
+}
+
+/// Her upcoming appointments, each with its reminder switch (P3 D7). Only her
+/// own: a partner's appointment reminds on his phone, not hers. Empty, it is
+/// the invitation to book one in the Calendar (a feature is never hidden).
+class _ApptReminders extends StatelessWidget {
+  const _ApptReminders({required this.controller});
+  final PregnancyController controller;
+
+  void _openCalendar(BuildContext context) => Navigator.of(context).push(
+      MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'calendar'),
+          builder: (_) => CalendarScreen(controller: controller)));
+
+  @override
+  Widget build(BuildContext context) {
+    final scans = ScansStore.instance;
+    final rem = AppointmentReminders.instance;
+    rem.load();
+    return ListenableBuilder(
+      listenable: Listenable.merge([scans, rem]),
+      builder: (context, _) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final mine = <Appointment>[
+          for (final a in scans.appointments)
+            if (scans.ownsAppointment(a.id) &&
+                a.status == 'upcoming' &&
+                !a.date.isBefore(today))
+              a,
+        ];
+        final pal = pvStorePalette;
+        if (mine.isEmpty) {
+          return PregRowCard(key: const ValueKey('reminders_appts_empty'), children: [
+            PregOfferRow(
+              mark: IntentMark.calendarDay,
+              hue: 220,
+              title: 'Book one in your Calendar',
+              line: 'It will remind you the evening before',
+              onTap: () => _openCalendar(context),
+            ),
+          ]);
+        }
+        return PregRowCard(key: const ValueKey('reminders_appts'), children: [
+          for (final a in mine)
+            Padding(
+              key: ValueKey('reminder_appt_${a.id}'),
+              padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+              child: Row(children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(a.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: pal.ink1)),
+                    const SizedBox(height: 2),
+                    Text(
+                        rem.isOn(a.id)
+                            ? _apptWhen(a, rem)
+                            : 'Off · ${_apptDay(a)}',
+                        style: pvManrope(fontSize: 12.5, height: 1.35, color: pal.ink3)),
+                  ]),
+                ),
+                Switch(
+                  value: rem.isOn(a.id),
+                  trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+                  onChanged: (on) async {
+                    await rem.setOn(a, on);
+                    if (context.mounted) {
+                      pvToast(
+                          context,
+                          on
+                              ? 'Reminder on for ${a.title}.'
+                              : 'Reminder off for ${a.title}. The appointment stays in your Calendar.',
+                          kind: PvToastKind.done);
+                    }
+                  },
+                ),
+              ]),
+            ),
+        ]);
+      },
+    );
+  }
+
+  static String _apptDay(Appointment a) {
+    const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final d = a.date;
+    return '${d.day} ${m[d.month - 1]}${a.time.trim().isEmpty ? '' : ', ${a.time.trim()}'}';
+  }
+
+  static String _apptWhen(Appointment a, AppointmentReminders rem) {
+    final when = AppointmentReminders.whenFor(a, DateTime.now());
+    final day = DateTime.tryParse(a.dateIso);
+    if (when == null || day == null) return '${_apptDay(a)} · too soon to remind';
+    return '${_apptDay(a)} · reminds you ${AppointmentReminders.describe(when, day)}';
+  }
 }

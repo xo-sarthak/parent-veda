@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 
 import '../../../models/calendar_event.dart';
 import '../../../models/scan_appointment.dart';
+import '../../../services/appointment_reminders.dart';
 import '../../../services/calendar_store.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../services/scans_store.dart';
@@ -31,7 +32,8 @@ import '../../../widgets/pv_toast.dart';
 import '../../journal/pv_journal_screen.dart' show JournalScreen;
 import '../../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
 import '../../tools/baby_movement_screen.dart';
-import '../../tools/scans_appointments_screen.dart';
+import '../../brackets/scan_timeline_screen.dart' show ScanTimelineScreen;
+import '../../tools/scans_appointments_screen.dart' show showPregAppointmentSheet;
 import '../../tools/symptom_companion_screen.dart';
 import '../../tools/weight_tracker_screen.dart';
 import '../../weekly_card_stack_screen.dart';
@@ -46,8 +48,12 @@ void _push(BuildContext context, String name, WidgetBuilder b) =>
     Navigator.of(context)
         .push(MaterialPageRoute<void>(settings: RouteSettings(name: name), builder: b));
 
+// P3 D3 (2026-10-28): her scans, not the retired Scans and appointments
+// screen (which now opens this Calendar, so the row would open itself).
+// Kept for revert:
+//   (_) => ScansAppointmentsScreen(controller: p));
 void pregCalOpenScans(BuildContext context, PregnancyController p) => _push(
-    context, 'calendar/scans', (_) => ScansAppointmentsScreen(controller: p));
+    context, 'calendar/scans', (_) => ScanTimelineScreen(pregnancy: p));
 
 void pregCalOpenWeight(BuildContext context, PregnancyController p) => _push(
     context, 'calendar/weight', (_) => WeightTrackerScreen(controller: p));
@@ -148,8 +154,9 @@ Future<void> showPregCalAdd(
     case PregCalKind.appointment:
       final a = await showPregAppointmentSheet(context, initial: day);
       if (a != null && context.mounted) {
+        // Kept for revert: '... Also in Scans & appointments' (retired, P3 D3).
         pvToast(context,
-            'Added to ${pregDayLabel(a.date)}. Also in Scans & appointments',
+            'Added to ${pregDayLabel(a.date)}.${AppointmentReminders.instance.bookingLine(a)}',
             kind: PvToastKind.done);
       }
     case PregCalKind.weight:
@@ -451,7 +458,9 @@ Future<void> showPregCalItem(BuildContext context, PregnancyController p,
     case 'edit_appt':
       final saved = await showPregAppointmentSheet(context, editing: a);
       if (saved != null && context.mounted) {
-        pvToast(context, 'Saved. ${saved.title} is on ${pregDayLabel(saved.date)}',
+        pvToast(context,
+            'Saved. ${saved.title} is on ${pregDayLabel(saved.date)}.'
+            '${AppointmentReminders.instance.bookingLine(saved)}',
             kind: PvToastKind.done);
       }
     case 'delete_appt':
@@ -620,7 +629,8 @@ Future<void> pregCalBookCheck(
   final a = await showPregAppointmentSheet(context,
       initial: initial, title: c.title, type: type);
   if (a != null && context.mounted) {
-    pvToast(context, '${a.title} booked for ${pregDayLabel(a.date)}',
+    pvToast(context,
+        '${a.title} booked for ${pregDayLabel(a.date)}.${AppointmentReminders.instance.bookingLine(a)}',
         kind: PvToastKind.done);
   }
 }

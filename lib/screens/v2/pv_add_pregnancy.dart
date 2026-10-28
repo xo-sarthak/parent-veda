@@ -211,6 +211,8 @@ class _PvAddPregnancyScreenState extends State<PvAddPregnancyScreen> {
     return ddcComputeEdd(
       method: m,
       lmp: _date,
+      // The fifth way, Conception date (P3 D1): the ways list is shared.
+      conception: _date,
       known: _date,
       scan: _date,
       transfer: _date,

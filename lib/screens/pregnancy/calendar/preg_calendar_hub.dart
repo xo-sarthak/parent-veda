@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import '../../../services/calendar_store.dart';
 import '../../../services/journal_store.dart';
 import '../../../services/pregnancy_controller.dart';
+import '../../../services/pregnancy_ended_store.dart';
 import '../../../services/prepare_store.dart';
 import '../../../services/reminder_store.dart';
 import '../../../services/scans_store.dart';
@@ -40,6 +41,7 @@ import '../../../theme/pv_fonts.dart';
 import '../../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../../products/pv_store_chrome.dart' show kPvInk, kPvLine, pvStorePalette;
+import '../preg_after_loss_note.dart';
 import '../../tools/due_date_calculator_screen.dart';
 import 'preg_cal_data.dart';
 import 'preg_cal_journey_screen.dart';
@@ -151,7 +153,15 @@ class _PregCalendarHubState extends State<PregCalendarHub> {
       );
 
   Widget _build(BuildContext context) {
-    final items = pregCalItems();
+    // ⚠️ AFTER A LOSS (P3 CA5 / D5, 2026-10-28): the Calendar stays and keeps
+    // her appointments, notes and logs; the countdown, the weeks and the
+    // usual pregnancy checks go, because each one says a baby is coming.
+    final ended = PregnancyEndedStore.instance.ended;
+    // Kept for revert: final items = pregCalItems();
+    final items = [
+      for (final i in pregCalItems())
+        if (!ended || i.kind != PregCalKind.check) i,
+    ];
     final pal = pvStorePalette;
     return Scaffold(
       backgroundColor: Colors.white,
@@ -192,7 +202,10 @@ class _PregCalendarHubState extends State<PregCalendarHub> {
         children: [
           if (_searching) ...[_search(items), const SizedBox(height: 14)],
           if (_ro) ...[pregCalReadOnlyBanner(), const SizedBox(height: 14)],
-          _hero(),
+          if (ended)
+            const PregAfterLossNote(kAfterLossCalendar, bottom: 0)
+          else
+            _hero(),
           const SizedBox(height: 14),
           _monthCard(items),
           const SizedBox(height: 14),
@@ -200,8 +213,10 @@ class _PregCalendarHubState extends State<PregCalendarHub> {
           const SizedBox(height: 14),
           _comingUp(items),
           const SizedBox(height: 14),
-          _checksCard(),
-          const SizedBox(height: 14),
+          if (!ended) ...[
+            _checksCard(),
+            const SizedBox(height: 14),
+          ],
           _rows(),
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
@@ -732,7 +747,7 @@ class _PregCalendarHubState extends State<PregCalendarHub> {
               (Icons.event_outlined,
                   'Your doctor sets the real date. Tap Add date once it is booked.'),
               (Icons.check_circle_outline_rounded,
-                  'A check you have marked done in Scans & appointments shows as Done.'),
+                  'A check you have marked done in My scans shows as Done.'),
             ]),
           ),
         ]),
@@ -804,7 +819,9 @@ class _PregCalendarHubState extends State<PregCalendarHub> {
     final rows = <(IntentMark, String, String?, VoidCallback)>[
       (IntentMark.timelineRail, 'Whole journey', 'Week by week', _openJourney),
       if (!_ro) ...[
-        (IntentMark.askDoctor, 'Scans & appointments', null, () => pregCalOpenScans(context, p)),
+        // Kept for revert: 'Scans & appointments' (P3 D3: appointments are
+        // this page; the row opens her scans).
+        (IntentMark.askDoctor, 'My scans', 'Mark one done', () => pregCalOpenScans(context, p)),
         (IntentMark.stepsMark, 'Kick counter', 'From about week 28', () => pregCalOpenKicks(context, p)),
         (IntentMark.scaleMark, 'Weight', null, () => pregCalOpenWeight(context, p)),
         (IntentMark.bodyMark, 'Symptoms', null, () => pregCalOpenSymptoms(context, p)),
