@@ -35,6 +35,7 @@ import '../../services/remote/ask_veda_service.dart';
 import '../../ask_veda/pp_veda_corpus.dart' show openPpVedaDoc;
 import 'pp_phase_faqs.dart' show phaseFaqs;
 import 'pp_phases_data.dart' show currentPhase, ppFillChild;
+import 'pp_relevance.dart' show ppAskVedaContext;
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
 
@@ -183,11 +184,21 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
       if (_scroll.hasClients) _scroll.jumpTo(0);
     });
 
+    // The child's context (PP 6, 2026-10-29): the corrected age next to the
+    // birthday age, and what the family told us, as ids. Before this the
+    // answer was pitched at the birthday age while "For this age" above
+    // already used the corrected one, and nothing she told us reached it.
+    final ctx = ppAskVedaContext();
     final res = await AskVedaService.ask(
       t,
       // The open child: the family switch makes the child on screen the
-      // active one (F1), so this is the open profile's age (F8).
-      childAgeMonths: ChildProfileStore.instance.ageInMonths,
+      // active one (F1), so this is the open profile's age (F8). Same value,
+      // now from the same clock as the corrected age. Kept for revert:
+      //   childAgeMonths: ChildProfileStore.instance.ageInMonths,
+      childAgeMonths: ctx.ageMonths,
+      childAgeCorrectedMonths: ctx.correctedMonths,
+      familySignals: ctx.signals,
+      childConditions: ctx.conditions,
       // Scopes the answer and its cards to parenting content (the service's
       // `scope_domain`, 2026-10-10), so every card is one this screen opens.
       stage: 'parenting',
@@ -464,6 +475,9 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     Widget later(Widget w) => PvVedaFadeIn(show: rest, index: i++, child: w);
     return [
       _answerCard(f.answer),
+      // Why this answer is hers (PP 6): only what the service says it used.
+      if (askVedaUsedLine(f.usedContext) != null)
+        _usedLine(askVedaUsedLine(f.usedContext)!),
       if (f.meaning.isNotEmpty)
         PvVedaFadeIn(show: _reveal >= 1, child: _meaning(f.meaning)),
       if (f.actions.isNotEmpty) later(_actions(f.actions)),
@@ -599,11 +613,16 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             const SizedBox(width: 6),
             // Real age, not a hardcoded "4 months" - and flexible, because a
             // child's name is not a fixed length.
+            // The corrected age next to the birthday age (PP 6, 2026-10-29),
+            // as the answer is now written. Two lines rather than "...":
+            // names are never cut off. Kept for revert:
+            //   '${ChildProfileStore.instance.name} · ${ChildProfileStore.instance.ageLabel}',
+            //   maxLines: 1, overflow: TextOverflow.ellipsis
             Flexible(
               child: Text(
-                  '${ChildProfileStore.instance.name} · ${ChildProfileStore.instance.ageLabel}',
+                  '${ChildProfileStore.instance.name} · ${ChildProfileStore.instance.ageLabelWithCorrection}',
                   style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: _vPurple),
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
+                  maxLines: 2),
             ),
           ]),
         ),
@@ -637,6 +656,20 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
               onDone: _answerDone,
               followBottomInset: 150, // clears the bottom bar
               style: pvManrope(fontSize: 14.5, height: 1.6, fontWeight: FontWeight.w500, color: _vBody)),
+        ]),
+      );
+
+  Widget _usedLine(String line) => Padding(
+        padding: const EdgeInsets.fromLTRB(6, 0, 6, 14),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 1),
+            child: Icon(Icons.info_outline_rounded, size: 14, color: _vPurple),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+              child: Text(line,
+                  style: pvManrope(fontSize: 12, height: 1.45, color: _vBody2))),
         ]),
       );
 
@@ -972,3 +1005,33 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   }
 }
 
+/// "Answered with what you told us: ..." from the ids the service used (PP 6,
+/// 2026-10-29), or null when it used none. Pure, for the tests. An id this
+/// build does not know is left out rather than shown raw.
+String? askVedaUsedLine(List<String> used) {
+  const labels = <String, String>{
+    'corrected_age': 'corrected age',
+    'born_early': 'born early',
+    'c_section': 'C-section recovery',
+    'formula': 'formula',
+    'breastfeeding': 'breast milk',
+    'twins': 'twins',
+    'after_treatment': 'after fertility treatment',
+    'two_at_home': 'an older child at home',
+    'after_loss': 'your earlier loss',
+    'eczema': 'eczema',
+    'cmpa': "cow's milk protein allergy",
+    'foodAllergy': 'food allergy',
+    'reflux': 'reflux',
+    'colic': 'colic',
+    'tongueTie': 'tongue-tie',
+    'asthma': 'asthma',
+    'lowBirthWeight': 'low birth weight',
+    'devDelay': 'developmental delay',
+    'hearing': 'hearing',
+    'vision': 'vision',
+  };
+  final words = [for (final u in used) ?labels[u]];
+  if (words.isEmpty) return null;
+  return 'Answered with what you told us: ${words.join(', ')}.';
+}

@@ -61,6 +61,7 @@ class AskVedaResult {
     required this.services,
     required this.source,
     required this.cacheHit,
+    this.usedContext = const [],
   });
 
   final String answer; // S1
@@ -74,6 +75,13 @@ class AskVedaResult {
   /// llm | cache:exact | cache:semantic | red_flag | web | low_confidence | …
   final String source;
   final bool cacheHit;
+
+  /// The child's context the service SAYS it wrote this answer with
+  /// ('corrected_age' and the ids of [AskVedaService.ask]'s familySignals and
+  /// childConditions; PP 6, 2026-10-29). The screen's "Answered with what you
+  /// told us" line reads this, not what was sent, so a service that has not
+  /// been redeployed never makes the app claim something it did not do.
+  final List<String> usedContext;
 
   /// A real, useful answer (grounded / cached / web / safety) — worth showing.
   /// A low-confidence / limit response is not.
@@ -178,6 +186,17 @@ class AskVedaService {
     /// stays in the app (the user, 2026-10-17). Two-repo field, landed in both
     /// (parentveda-askveda `previous_loss`, tests/test_previous_loss.py).
     bool? previousLoss,
+
+    /// PARENTING, the child's context (PP 6, 2026-10-29). The age by the due
+    /// date for a baby born early, sent NEXT TO [childAgeMonths] (the birthday
+    /// age, which vaccines follow); then closed lists of ids, never prose and
+    /// never a name (see `PpAskVedaContext`). Two-repo fields, landed in both
+    /// (parentveda-askveda `child_age_corrected_months`, `family_signals`,
+    /// `child_conditions`, tests/test_child_context.py). Inert until the
+    /// service is redeployed; the old one logs them as ignored.
+    int? childAgeCorrectedMonths,
+    List<String>? familySignals,
+    List<String>? childConditions,
   }) async {
     if (!AskVedaConfig.enabled) return null;
     final q = question.trim();
@@ -217,6 +236,11 @@ class AskVedaService {
               if (pregnancyEnded == true) 'pregnancy_ended': true,
               'family_stage': ?familyStage,
               if (previousLoss == true) 'previous_loss': true,
+              'child_age_corrected_months': ?childAgeCorrectedMonths,
+              if (familySignals != null && familySignals.isNotEmpty)
+                'family_signals': familySignals,
+              if (childConditions != null && childConditions.isNotEmpty)
+                'child_conditions': childConditions,
             }),
           )
           .timeout(const Duration(seconds: 25));
@@ -239,6 +263,10 @@ class AskVedaService {
         services: AskVedaResult._items(map['services']),
         source: (map['source'] as String?) ?? 'unknown',
         cacheHit: (map['cache_hit'] as bool?) ?? false,
+        usedContext: [
+          for (final e in (map['used_context'] as List? ?? const []))
+            e.toString(),
+        ],
       );
     } catch (_) {
       // Network off, server down, timeout, malformed body → screen shows offline state.

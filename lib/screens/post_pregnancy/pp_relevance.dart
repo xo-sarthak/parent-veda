@@ -326,6 +326,99 @@ class PpSituation {
   }
 }
 
+/// What Ask Veda is told about the child (PP 6, 2026-10-29).
+///
+/// IDS, NEVER PROSE, and never the child's name. The service caches answers
+/// and shares them between families: a name in the context could come back in
+/// another family's cached answer, and free text would give every family its
+/// own cache entry. So this is a closed vocabulary, mirrored on the service
+/// (`app/prompt.py` FAMILY_SIGNALS / CHILD_CONDITIONS, test_child_context.py),
+/// which drops any id it does not know. `FamilyProfileStore.aiContext()`
+/// (the prose summary, with the name) stays unused for this reason.
+class PpAskVedaContext {
+  const PpAskVedaContext({
+    required this.ageMonths,
+    this.correctedMonths,
+    this.signals = const [],
+    this.conditions = const [],
+  });
+
+  /// Birthday age: vaccines and growth charts follow it.
+  final int ageMonths;
+
+  /// Age from the due date, for a baby born before 37 weeks and under 24
+  /// months (the 2026-10-26 decision); null otherwise. Development, play,
+  /// sleep and feeding stages follow it.
+  final int? correctedMonths;
+
+  final List<String> signals;
+
+  /// `HealthCondition` names (identity, never a label).
+  final List<String> conditions;
+}
+
+/// Builds [PpAskVedaContext] from the stores, on the clock [now].
+///
+/// Not `PpSituation.signals` copied across, for two reasons:
+///  * after_loss comes ONLY from a loss she recorded (`PregnancyRecords`).
+///    Her onboarding "be gentle" answer raises the home's signal but stays in
+///    the app (the user, 2026-10-17), exactly as `previous_loss` does.
+///  * Conditions are stored per FAMILY, not per child, so with two children
+///    "eczema" may be the older child's while she asks about the baby. They
+///    go only while one child is saved (the user, 2026-10-29; per-child
+///    conditions are an open item). The home's extra-support signal is left
+///    out here for the same reason: it is derived from those conditions.
+/// Her baby on the way is not repeated: `family_stage` already says so.
+PpAskVedaContext ppAskVedaContext({DateTime? now}) {
+  final at = now ?? DateTime.now();
+  final child = ChildProfileStore.instance;
+  final fam = FamilyProfileStore.instance;
+  // Same arithmetic as ChildProfileStore.ageInWeeks / devAgeInMonths, on the
+  // given clock rather than the device's.
+  final days = at.difference(child.active.dob).inDays;
+  final weeks = days > 0 ? days / 7.0 : 0.0;
+  final months = (weeks / 4.345).floor();
+  final bornWeeks = fam.bornWeeks;
+  final correction = (bornWeeks != null && bornWeeks < 37 && months < 24)
+      ? 40 - bornWeeks
+      : null;
+  final corrected = correction == null
+      ? null
+      : (weeks - correction <= 0 ? 0 : ((weeks - correction) / 4.345).floor());
+
+  // The feed log only with her yes, as PpSituation reads it.
+  final feedings = fam.feedings.isNotEmpty ? fam.feedings : {?fam.feeding};
+  final feeds = FeedingStore.instance;
+  final useLog = PpUseConsent.instance.allows(PpUseKind.feeds);
+  final id = child.activeChildId;
+  final signals = <String>[
+    if (fam.premature || fam.nicu || correction != null) 'born_early',
+    if (fam.birthMode == BirthMode.cSection && days < 90) 'c_section',
+    if (feedings.contains(FeedingMethod.formula) ||
+        feedings.contains(FeedingMethod.mixed) ||
+        (useLog && feeds.formulaLast24h))
+      'formula',
+    if (feedings.contains(FeedingMethod.breastfeeding) ||
+        feedings.contains(FeedingMethod.expressed) ||
+        feedings.contains(FeedingMethod.mixed) ||
+        (useLog && feeds.breastMilkLast24h))
+      'breastfeeding',
+    if (fam.multiple) 'twins',
+    if (months < 12 && PpSituation._afterTreatment(id)) 'after_treatment',
+    if (months < 6 && PpSituation._olderChildAtHome(child)) 'two_at_home',
+    if (months < 24 && PregnancyRecords.instance.lossBefore(id)) 'after_loss',
+  ];
+  final conditions = child.children.length <= 1
+      ? ([for (final c in fam.conditions) c.name]..sort())
+      : const <String>[];
+  return PpAskVedaContext(
+    ageMonths: months,
+    correctedMonths: corrected,
+    signals: signals,
+    conditions: conditions,
+  );
+}
+
 /// How far a band is from the child's own: the first term of every score.
 enum PpBandDistance {
   now(0),

@@ -546,6 +546,38 @@ that can make it false; a child's age is evidence of one birth, not of no pregna
 answer's meaning: two people who must hear different things can never share an entry, so every fact that changes
 the answer has to be in the key.
 
+## The child's context reaches Ask Veda: ids, not prose (PARENTING-GAP PP 6, 2026-10-29)
+
+The parenting screen sent only the birthday age, so a baby born early got answers pitched at the wrong age, and
+nothing the family told the app reached the answer. Three fields, landed in both repos (the service's
+`tests/test_wire_contract.py` lists them, `tests/test_child_context.py` pins the vocabulary):
+
+- **`child_age_corrected_months`** next to `child_age_months`: born before 37 weeks and under 24 months only. The
+  note tells the model to use it for development, play, sleep and feeding stages, and the birthday age for vaccines
+  and growth charts (the 2026-10-26 decision).
+- **`family_signals`**: ids from a closed list (`born_early`, `formula`, `twins`, `after_loss`, ...).
+- **`child_conditions`**: `HealthCondition` names, sent only while ONE child is saved, because conditions are stored
+  per family and may belong to another child.
+
+**Why ids and not the ready-made prose summary (`FamilyProfileStore.aiContext()`).** The answer cache is SHARED: the
+same question from the same stage key gets the same stored answer, whoever asks. That rules out free text twice:
+
+1. *Correctness.* Every fact that changes the answer must be in the key (the 2026-10-25 lesson above), or a formula
+   baby's answer is served to a breastfed one. A prose summary is close to unique per family, so in the key it would
+   give each family a cache of its own (a hit rate near zero); out of the key it gives wrong answers. A small closed
+   set can go in the key with a bounded split: `cm8:s1:cc6:g=formula+twins:k=eczema`.
+2. *Privacy.* `aiContext()` starts with the child's name. A model that writes "Aarav may be teething" stores that
+   sentence, and the next family gets Aarav. Nothing that names a person may enter a shared cache.
+
+The service also **cleans on arrival**: an id not on its list is dropped and logged, never passed through. Anything
+a client puts into a prompt is untrusted, and a closed list means no client can add instructions to the model's
+context. A family that told us nothing keeps its old key, and so its old cached answers.
+
+**The answer says what it used, from the server.** The response gains `used_context`, and the app's "Answered with
+what you told us" line reads THAT rather than what it sent. Showing what was sent would claim personalisation that
+a service not yet redeployed silently ignored. The general rule: a client should report a server's behaviour only
+from the server's own acknowledgement.
+
 ## Author once, adapt at display: the door pages' "he" and "When" (2026-10-27)
 
 The final review of the fourteen parenting doors found two content bugs with one shape: the data was right and the place it was drawn decided its meaning wrongly.

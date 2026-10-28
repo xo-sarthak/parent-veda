@@ -23,13 +23,6 @@ Siblings: `PREGNANCY-GAP.md`, `TTC-GAP.md`. Plan and seams: `README.md`.
 
 ## 1. Still open, in build order
 
-### Step 3c
-**6. Ask Veda gets no family context** (Wrong). *Fix:* call `FamilyProfileStore.aiContext()` plus `PpSituation` signals in `AskVedaService.ask`, each gated on `PpUseConsent.allows(kind)`, and send the **corrected age next to the birthday age** (carried over from PP 2). **Two-repo change:** the service must declare the new fields, or they are silently dropped (CLAUDE.md, "The wire body is a contract").
-What the audit found (as of 395ee74, re-check first):
-- Ask Veda sends birthday age and family stage only, no signals (`askveda_screen.dart:185-197`), while its "For this age" questions use corrected age (`askveda_screen.dart:145`).
-- `FamilyProfileStore.aiContext()` (`family_profile.dart:797`) has **0 callers**.
-- Pregnancy sends conditions (`veda_context.dart:100-119`); TTC sends ownership, round step, cycle day and a previous loss. Parenting sends the least.
-
 ### Step 4
 **11. Messages have no situation awareness, no limit, no quiet hours and no offers** (Weak, GLOBAL-CHANGES #12). *Fix:* Phase 6a as built for Pregnancy and TTC in 0a38f4dd (`docs/NOTIFICATIONS-PLAN.md`): two a day at most, quiet hours.
 What the audit found (`pp_messages_store.dart:312-403`, as of 395ee74): per real child, "X weeks old" weekly to 8 weeks at 9am, then monthly to 36 months, then quarterly to 72 months; vaccines 3 days before at 10am; new phase at 6pm (corrected age, active child only, `:252`); Monday activity at 10am.
@@ -39,6 +32,9 @@ What the audit found (`pp_messages_store.dart:312-403`, as of 395ee74): per real
 **14. Stale comments, half left** (Polish). The vaccines header (`pp_messages_store.dart:50-56`) says vaccines go to the active child only, but the code covers every child (`:229-231`). *Fix:* correct it. (The "OFF BY DEFAULT" half was done in be2bb7ee.)
 
 **15. Stale docs** (Polish). STILL-OPEN:1107 ("tips are not personalised by age"), STILL-OPEN §95.6(3) ("Something changed? is not stored"), GLOBAL-CHANGES #2 (Parenting OWED). All three are done in code. *Fix:* mark them done.
+
+### Found in Step 3c
+**21. A child's health conditions are stored per family, not per child** (Weak). Onboarding's conditions (eczema, reflux, a hearing need...) live on `FamilyProfileStore`, so with two children nothing says whose they are. Step 3c sends them to Ask Veda only while one child is saved (`ppAskVedaContext`, held by `test/pp_relevance_step3c_test.dart`, "two children"); the home's extra-support signal has the same blind spot. *Fix (not built):* store conditions on the `Child`, ask whose when a second child is added. Touches `docs/FAMILY-MODEL.md` (the child owns child records), so read that first.
 
 ### Not this terminal's
 **13.** Tools hides two tools after 12 months: Terminal B's (which rows show); the user is deciding.
@@ -64,8 +60,10 @@ What the audit found (`pp_messages_store.dart:312-403`, as of 395ee74): per real
 | 19 | Found: change words matched inside other words | be2bb7ee |
 | 20 | Found: the home's fever card opened the wrong check | be2bb7ee |
 | Fever | Fever check keeps "see a doctor" with her yes, so the home follows up | be2bb7ee |
+| 6 | Ask Veda gets the corrected age next to the birthday age, and the family's context as closed ids (never the name or prose: the cache is shared); conditions only with one child; the answer says what it used, from the service's `used_context`. Two repos. Inert until the service is redeployed. The audit's "Pregnancy sends conditions" was wrong: `VedaContext` feeds only the retired offline engine | (pending) |
 
-Tests: `test/pp_relevance_batch1_test.dart`, `pp_relevance_batch2_test.dart`, `pp_relevance_step3a_test.dart`, `pp_relevance_step3b_test.dart`.
+Tests: `test/pp_relevance_batch1_test.dart`, `pp_relevance_batch2_test.dart`, `pp_relevance_step3a_test.dart`, `pp_relevance_step3b_test.dart`, `pp_relevance_step3c_test.dart`; service: `parentveda-askveda/tests/test_child_context.py`.
 
 ## 3. Decisions still yours
 - Nothing blocking. The hidden-tools question (13) is with the user via Terminal B.
+- When to build PP 21 (conditions per child).
