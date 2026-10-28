@@ -79,7 +79,9 @@ const String _crisis = 'pp_crisis_path';
 
 // ⚠️ FREE HELP SITS ABOVE ANY PAID CARD ON A MIND PAGE (door 3, M5,
 // 2026-10-25). Built from the one helpline constant, so this file still
-// never types a number of its own.
+// never types a number of its own. Since final review item 8 (2026-10-27)
+// it is always its own card, never inside a doctor box (Family's rule), and
+// the reader keeps the paid card below it.
 const String _kFreeNow = 'If you need someone right now, '
     '$kCrisisHelplineName on $kCrisisHelplineNumber is free, any hour, in '
     'Indian languages.';
@@ -2170,11 +2172,14 @@ final PpArea _yourMind = PpArea(
           'Talk to a doctor today, not in two weeks, if any of these are true. '
           'You cannot look after yourself or the baby. You feel you would be '
           'better off gone. You are thinking about harming yourself or your '
-          'baby. You are hearing or believing things others around you do not. '
-          '$_kFreeNow', // the free line (M5), added 2026-10-25
+          'baby. You are hearing or believing things others around you do not.',
           kind: PpCalloutKind.doctor,
           title: 'Do not wait for these',
         ),
+        // Final review item 8: the free line (M5) was the end of the doctor
+        // box above; its own card now, and the reader keeps it above the
+        // paid card (pvReadOwnConsultAfter).
+        PpCallout(_kFreeNow, title: 'Free help, any hour'),
         PpLink('Get help now',
             surfaceId: _crisis,
             blurb: 'If any of that last part is true, start here.'),
@@ -2256,9 +2261,13 @@ final PpArea _yourMind = PpArea(
           'See a doctor if the anxiety is stopping you eating, sleeping or '
           'leaving the house. See a doctor too for panic attacks, or if it has '
           'lasted more than a few weeks. It treats well, often with talking '
-          'therapy alone. $_kFreeNow', // the free line (M5), 2026-10-25
+          'therapy alone.',
           kind: PpCalloutKind.doctor,
         ),
+        // Final review item 8: the free line (M5) was the end of the doctor
+        // box above; its own card now, and the reader keeps it above the
+        // paid card (pvReadOwnConsultAfter).
+        PpCallout(_kFreeNow, title: 'Free help, any hour'),
         PpIndiaNote('If your house is full of people offering opinions on every '
             'feed and every sneeze, anxiety has a lot of fuel. It is reasonable '
             'to say that you will follow your paediatrician and one person, and '
@@ -2292,10 +2301,14 @@ final PpArea _yourMind = PpArea(
           'thing. Thoughts that start to feel reasonable, or urges you are afraid '
           'you might act on, are a different thing and need a doctor today. If '
           'you are not sure which you have, that is exactly what to say to the '
-          'doctor. $_kFreeNow', // the free line (M5), 2026-10-25
+          'doctor.',
           kind: PpCalloutKind.doctor,
           title: 'The one distinction to know',
         ),
+        // Final review item 8: the free line (M5) was the end of the doctor
+        // box above; its own card now, and the reader keeps it above the
+        // paid card (pvReadOwnConsultAfter).
+        PpCallout(_kFreeNow, title: 'Free help, any hour'),
         PpLink('Get help now',
             surfaceId: _crisis,
             blurb: 'If the thoughts feel like urges, start here, right now.'),
@@ -2453,11 +2466,10 @@ final PpArea _yourMind = PpArea(
             'getting heavier, or starting to feel like who you are now? Then '
             'talk to somebody. Many mothers wait until it is unbearable, and '
             'there is no need to.'),
-        // ⚠️ M5: the free line above the paid card. The reader draws the
-        // page's consult right under its first doctor box (Feeding D2), so
-        // the free route is that box.
-        PpCallout(_kFreeNow,
-            kind: PpCalloutKind.doctor, title: 'Free help, any hour'),
+        // ⚠️ M5: the free line above the paid card. Its own card since final
+        // review item 8 (was `kind: PpCalloutKind.doctor`, kept for revert):
+        // the reader pulls the page's consult under it (pvReadOwnConsultAfter).
+        PpCallout(_kFreeNow, title: 'Free help, any hour'),
         PpConsult(
           title: 'Talk to a maternal mental health counsellor',
           whoFor: 'For the mother who cannot say this at home because of what '
@@ -2613,11 +2625,10 @@ final PpArea _yourMind = PpArea(
             surfaceId: _circleSurface,
             blurb: 'Mothers grouped by how far along you are. Moderated, private, '
                 'free.'),
-        // ⚠️ M5: the free line above the paid card. The reader draws the
-        // page's consult right under its first doctor box (Feeding D2), so
-        // the free route is that box.
-        PpCallout(_kFreeNow,
-            kind: PpCalloutKind.doctor, title: 'Free help, any hour'),
+        // ⚠️ M5: the free line above the paid card. Its own card since final
+        // review item 8 (was `kind: PpCalloutKind.doctor`, kept for revert):
+        // the reader pulls the page's consult under it (pvReadOwnConsultAfter).
+        PpCallout(_kFreeNow, title: 'Free help, any hour'),
         PpConsult(
           title: 'A facilitated postpartum support circle',
           whoFor: 'A small paid group session with a counsellor and five or six '
@@ -2705,11 +2716,10 @@ final PpArea _yourMind = PpArea(
         PpLink('If you are not safe at home',
             pageId: 'people_safe_at_home',
             blurb: 'Free help you can reach today, and the law on your side.'),
-        // ⚠️ M5: the free line above the paid card. The reader draws the
-        // page's consult right under its first doctor box (Feeding D2), so
-        // the free route is that box.
-        PpCallout(_kFreeNow,
-            kind: PpCalloutKind.doctor, title: 'Free help, any hour'),
+        // ⚠️ M5: the free line above the paid card. Its own card since final
+        // review item 8 (was `kind: PpCalloutKind.doctor`, kept for revert):
+        // the reader pulls the page's consult under it (pvReadOwnConsultAfter).
+        PpCallout(_kFreeNow, title: 'Free help, any hour'),
         PpConsult(
           title: 'Talk to a counsellor, together or on your own',
           whoFor: 'For couples stuck in the same fight every week. Or for you, '
@@ -2837,11 +2847,10 @@ final PpArea _yourMind = PpArea(
                 'You do not have to be at the worst point to be allowed help. '
                 'Earlier is easier.'),
           ], heading: 'What is not true', hue: 268),
-        // ⚠️ M5: the free line above the paid card. The reader draws the
-        // page's consult right under its first doctor box (Feeding D2), so
-        // the free route is that box.
-        PpCallout(_kFreeNow,
-            kind: PpCalloutKind.doctor, title: 'Free help, any hour'),
+        // ⚠️ M5: the free line above the paid card. Its own card since final
+        // review item 8 (was `kind: PpCalloutKind.doctor`, kept for revert):
+        // the reader pulls the page's consult under it (pvReadOwnConsultAfter).
+        PpCallout(_kFreeNow, title: 'Free help, any hour'),
         // M5: the crisis tile leads the foot, above both paid ones. It was
         // last; kept for revert at the old place below.
         PpLink('Get help now',
@@ -2912,8 +2921,20 @@ final PpArea _yourMind = PpArea(
             'are allowed to not forget it yet. Asking the hospital for your '
             'notes is your right.'),
         // M5: the free line stays first; the paid card goes below it.
+        // Final review item 8 (as Family, FM2 / BH4 rule c): the helpline is
+        // its own card, from the constants, never inside the doctor box. Was
+        // 'If you feel unsafe, or have thoughts of harming yourself, get help
+        // today: call Tele-MANAS on 14416, free and any time.' in the doctor
+        // box, kept for revert. The reader puts the page's paid consult
+        // right under its first doctor box (pvReadOwnConsultAfter), so the
+        // free card goes ABOVE the box: free help still leads (M5).
+        // REQUIRED_REVIEW (Tele-MANAS; the number is REQUIRED_TO_CONFIRM at
+        // the constant).
+        PpCallout('Free, any hour: $kCrisisHelplineName, '
+            '$kCrisisHelplineNumber. Trained counsellors, in your language.',
+            title: 'If there is nobody to talk to'),
         PpCallout('If you feel unsafe, or have thoughts of harming yourself, '
-            'get help today: call Tele-MANAS on 14416, free and any time.',
+            'get help today: see a doctor, or go to a hospital.',
             kind: PpCalloutKind.doctor),
         PpConsult(
           title: 'Talk to a perinatal counsellor about the birth',
@@ -6064,11 +6085,19 @@ const PpArea _thePeopleAroundYou = PpArea(
             'to know he called.'),
         // M5: the free line is the first doctor box, so the paid card the
         // reader draws under it sits below the free help.
-        PpCallout('If either of you has thoughts of not wanting to be here, call '
-            '$kCrisisHelplineName on $kCrisisHelplineNumber today. If his mood '
-            'has been low for more than two weeks, or he is drinking to cope, '
-            'his own doctor is the right first step.',
-            kind: PpCalloutKind.doctor, title: 'Free help first'),
+        // Final review item 8: the helpline was inside this doctor box. It is
+        // its own card now, first, so the free help still leads; the box
+        // keeps the doctor. Was 'If either of you has thoughts of not wanting
+        // to be here, call $kCrisisHelplineName on $kCrisisHelplineNumber
+        // today. ...', title 'Free help first', kept for revert.
+        PpCallout('If either of you has thoughts of not wanting to be here, '
+            'call $kCrisisHelplineName on $kCrisisHelplineNumber today. Free, '
+            'any hour, in your language.',
+            title: 'Free help first'),
+        PpCallout('If his mood has been low for more than two weeks, or he is '
+            'drinking to cope, his own doctor is the right first step. If '
+            'either of you is not safe, go to a hospital today.',
+            kind: PpCalloutKind.doctor),
         PpConsult(
           title: 'A counsellor who sees fathers and couples too',
           whoFor: 'For the two of you, or for him on his own. On video, and he '

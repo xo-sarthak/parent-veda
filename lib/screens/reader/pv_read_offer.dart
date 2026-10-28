@@ -24,8 +24,11 @@
 import 'package:flutter/material.dart';
 
 import '../../data/learn/pv_learn_view.dart';
+import '../../data/mind_mood_data.dart' show kCrisisHelplineNumber;
 import '../../models/pv_read.dart';
 import '../../services/life_stage_store.dart' show LifeStage;
+import '../../ttc/ttc_care_pathway.dart' show TimingOwnership;
+import '../../ttc/ttc_store.dart' show TtcStore;
 import '../../theme/pv_fonts.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_offering_screen.dart' show pvOpenOffering;
@@ -140,8 +143,35 @@ LifeStage? _stageOf(PvRead r) {
   return null;
 }
 
+/// The doctors a TTC read may not offer while a clinic owns her cycle: the
+/// clinic is already her fertility doctor, and our rule is to explain, remind
+/// and help her prepare, never to compete with the clinician who owns the
+/// decision (CLAUDE.md, clinical ownership).
+const Set<String> _kClinicWords = {
+  'fertility', 'gynaecologist', 'gynecologist', 'gynaecology', 'andrologist',
+  'specialist', 'ivf', 'iui',
+};
+
+/// Whether a clinic owns her cycle now, for [pvReadOfferFor]. False when the
+/// store cannot say (local-first: no answer is the ordinary case).
+bool pvReadClinicOwnsCycleNow() {
+  try {
+    return TtcStore.instance.ownership != TimingOwnership.parentveda;
+  } catch (_) {
+    return false;
+  }
+}
+
 /// The one offering that fits [r], or null.
-PvOfferingView? pvReadOfferFor(PvRead r, {List<PvOfferingView>? catalog}) {
+///
+/// ⚠️ NO DOCTOR PITCH MID-ROUND (relevance Batch 4, TTC 15, 2026-10-28). With
+/// [clinicOwnsCycle] a TTC read offers no clinician's consult: no fertility
+/// doctor, no gynaecologist, not as a topic match and not as the stage's
+/// fallback. A psychologist, a nutrition consult or a course (an IVF course
+/// included: it helps her prepare) still can, because they sit beside her
+/// clinic rather than in its place.
+PvOfferingView? pvReadOfferFor(PvRead r,
+    {List<PvOfferingView>? catalog, bool clinicOwnsCycle = false}) {
   final stage = _stageOf(r);
   if (stage == null) return null;
   final read = _words('${r.title.en} ${r.kicker.en} ${r.teaser.en}');
@@ -167,6 +197,14 @@ PvOfferingView? pvReadOfferFor(PvRead r, {List<PvOfferingView>? catalog}) {
     all = catalog ?? PvLearnCatalog.instance.all(stage: stage);
   } catch (_) {
     return null; // local-first: a catalogue that is not ready is no card
+  }
+  if (clinicOwnsCycle && stage == LifeStage.tryingToConceive) {
+    all = [
+      for (final v in all)
+        if (v.kind != PvLearnKind.consult ||
+            _words('${v.title} ${v.subtitle}').intersection(_kClinicWords).isEmpty)
+          v,
+    ];
   }
   PvOfferingView? pick(Set<String> want) {
     PvOfferingView? best;
@@ -229,10 +267,18 @@ String? pvReadConsultNote(PvRead r) =>
 /// The section the page's own consult follows: its first doctor box, or the
 /// matcher's slot when the page has none (after the second section, or the
 /// last on a short read).
+///
+/// ⚠️ FREE HELP STAYS ABOVE IT (You, Maa M5; final review item 8,
+/// 2026-10-27). The free helpline used to ride inside the first doctor box so
+/// that it came before the paid card. It is its own card now, never inside a
+/// doctor box, so a helpline card that comes after the anchor pulls the
+/// consult down under it. Found by the one helpline constant, not by a title.
 int pvReadOwnConsultAfter(PvRead r) {
-  final i = r.sections.indexWhere((s) => s.callout?.tone == PvCalloutTone.urgent);
-  if (i >= 0) return i;
-  return r.sections.length >= 3 ? 1 : r.sections.length - 1;
+  var i = r.sections.indexWhere((s) => s.callout?.tone == PvCalloutTone.urgent);
+  if (i < 0) i = r.sections.length >= 3 ? 1 : r.sections.length - 1;
+  final free = r.sections.lastIndexWhere(
+      (s) => s.callout?.body.en.contains(kCrisisHelplineNumber) ?? false);
+  return free > i ? free : i;
 }
 
 /// The page's own consult, drawn as the offer card is: one line of why, the

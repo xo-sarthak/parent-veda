@@ -87,6 +87,8 @@ import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
 import 'pp_section_screen.dart';
 import 'pp_health_red_flags.dart';
+import '../../data/mind_mood_data.dart'
+    show kAmbulanceNumber, kEmergencyNumber, kMotherBabyAmbulanceNumber, kPoisonsHelplineNumber;
 
 // =============================================================================
 //  THE BANDS
@@ -327,9 +329,9 @@ final PpArea _emergency = PpArea(
         // Logged as D3 in docs/PARENTING-REVIEW.md for confirmation. The
         // REQUIRED_REVIEW flag stays until a clinician signs off the wording,
         // not the digits.
-        PpIndiaNote('These are the Indian numbers. 112 is the national '
-            'emergency line for police, fire or ambulance. 108 reaches an '
-            'ambulance in most states, and 102 is the free ambulance mainly '
+        PpIndiaNote('These are the Indian numbers. $kEmergencyNumber is the national '
+            'emergency line for police, fire or ambulance. $kAmbulanceNumber reaches an '
+            'ambulance in most states, and $kMotherBabyAmbulanceNumber is the free ambulance mainly '
             'for mothers and infants. 1098 is Childline. In heavy city '
             'traffic a car often gets there first, so start moving while '
             'someone else calls. Know the nearest hospital with a children\'s '
@@ -547,7 +549,7 @@ final PpArea _emergency = PpArea(
               'Sleepiness and confusion afterwards are normal. Keep your child '
               'on one side.'),
         ]),
-        PpCallout('Call 112 or go to hospital now if the fit lasts more than 5 '
+        PpCallout('Call $kEmergencyNumber or go to hospital now if the fit lasts more than 5 '
             'minutes, or it\'s the first one ever. Also go now if breathing is '
             'a struggle or the lips turn blue, one fit follows another, or '
             'your child doesn\'t wake properly afterwards. Any first fit needs '
@@ -603,7 +605,7 @@ final PpArea _emergency = PpArea(
               'medicine. He will not swallow his tongue.'),
           PpStep("Don't hold him down", "And don't try to stop the jerking."),
           PpStep('Loosen tight clothes', 'Around the neck.'),
-          PpStep('Call 112, or go to hospital',
+          PpStep('Call $kEmergencyNumber, or go to hospital',
               'If it lasts more than five minutes, if his lips stay blue, or if '
                   'it is his first fit ever.'),
         ]),
@@ -659,7 +661,7 @@ final PpArea _emergency = PpArea(
           PpStep('A coin, with normal breathing and swallowing',
               'Still see a doctor the same day; an X-ray may be needed.'),
         ]),
-        PpCallout('AIIMS poison helpline: 1800-116-117. Emergency: 112.'),
+        PpCallout('AIIMS poison helpline: $kPoisonsHelplineNumber. Emergency: $kEmergencyNumber.'),
         PpSteps(heading: 'A burn or scald', [
           PpStep('Cool it under cool running tap water for 20 minutes',
               'Not ice, and not iced water. This helps more than anything else, '
@@ -755,7 +757,7 @@ final PpArea _emergency = PpArea(
           PpStep('Take off rings, bangles and anklets', 'Near the bite, before '
               'swelling starts.'),
           PpStep('Go to a hospital with anti-snake venom straight away',
-              'Call 108 or 112.'),
+              'Call $kAmbulanceNumber or $kEmergencyNumber.'),
           PpStep("Don't tie a tight band, cut, or suck the wound",
               "And don't go to a faith healer first. These lose the hours that "
                   'matter.'),
@@ -3046,7 +3048,7 @@ final PpArea _skin = PpArea(
             'not at all where a baby sleeps.'),
         // REQUIRED_REVIEW.
         PpCallout('Swelling of the lips, face or tongue, or wheezing after a '
-            'bite or sting, means 112 now: an allergic reaction. See a doctor '
+            'bite or sting, means $kEmergencyNumber now: an allergic reaction. See a doctor '
             'today for a bite that is spreading red, hot and painful, or comes '
             'with a fever.',
             kind: PpCalloutKind.doctor),
@@ -5404,7 +5406,7 @@ final PpArea _preventionAll = PpArea(
           PpCard('Signs', 'Hot, red, dry skin, a very high temperature, '
               'confusion, unusual sleepiness, vomiting, a fit, or not '
               'responding properly.'),
-          PpCard('Do', 'Call 112 or go to hospital now. On the way, cool him '
+          PpCard('Do', 'Call $kEmergencyNumber or go to hospital now. On the way, cool him '
               'with wet cloths and a fan. Give no drinks if he is drowsy.'),
         ]),
         PpWhenLine('On a heat-wave day: indoor play from late morning to late '
@@ -5415,7 +5417,7 @@ final PpArea _preventionAll = PpArea(
             'light on sugar. Packaged "energy" and soft drinks are not for '
             'children.'),
         // REQUIRED_REVIEW.
-        PpCallout("Any sign of heat stroke is an emergency (112). See a doctor "
+        PpCallout("Any sign of heat stroke is an emergency ($kEmergencyNumber). See a doctor "
             "the same day if heat exhaustion doesn't improve within an hour, or "
             'a baby under six months seems unwell in the heat.',
             kind: PpCalloutKind.doctor),
@@ -5868,7 +5870,7 @@ final PpArea _preventionAll = PpArea(
         ]),
         PpCallout('Any reaction with swelling of the lips or face, trouble '
             'breathing, or a floppy, pale child after a food or medicine is '
-            'an emergency. Call 112 or go to hospital.',
+            'an emergency. Call $kEmergencyNumber or go to hospital.',
             kind: PpCalloutKind.doctor),
       ],
     ),

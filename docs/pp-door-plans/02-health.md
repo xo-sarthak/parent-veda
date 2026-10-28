@@ -539,3 +539,5 @@ Held by `test/pp_health_door_test.dart` ("door 2: the plan, held", 26 tests): th
 **Final review, item 6 (2026-10-27): no link opens a whole door.** `rec_abha` opens `pm_health_insurance` (was the whole Papers door); `growth_flags` opens `dev_worth_checking` (was the whole Development door). Held across every door by `test/pp_no_whole_door_links_test.dart`.
 
 **Final review, item 7 (2026-10-27): twin pages link each other.** `health_choking_response` links Safety's `safety_cpr`, and the Get help now tab gains a "CPR: baby or child" row to the same page, after the emergency card. The Tools-tab test lets a page row through, since a page is not a tool. Held by `test/pp_twin_links_test.dart`.
+
+**Final review, item 8 (2026-10-28): single-page fixes.** Health no longer types 112, 108, 102 or the poison line: eleven lines read `kEmergencyNumber`, `kAmbulanceNumber`, `kMotherBabyAmbulanceNumber` and `kPoisonsHelplineNumber`, as Safety does. Childline's 1098 has no constant yet and stays typed on the POCSO card. The test skips temperatures (102 F). Held by `test/pp_single_page_fixes_test.dart`.

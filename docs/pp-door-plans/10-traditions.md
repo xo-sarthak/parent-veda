@@ -214,3 +214,5 @@ Held by `test/pp_traditions_door_test.dart` ("door 10: the plan, held", 11 tests
 **Final review, item 4 (2026-10-27): one figure per fact.** The cord falls off between day 5 and day 15, First 40's window (4o). Held by `test/pp_one_figure_test.dart`; the figures are on the BEFORE-LAUNCH clinical read.
 
 **Final review, item 7 (2026-10-27): twin pages link each other.** `first_festivals` links You, Maa's `cani_fasting`, next to its Ramzan card. Held by `test/pp_twin_links_test.dart`.
+
+**Final review, item 8 (2026-10-28): single-page fixes.** Mundan and ear piercing each had two tiles to `ceremony_day_safety`. Each keeps one, titled as the page ("On the day: blades, piercing and heat"), with the blade rule as its blurb; the second is commented out. Held by `test/pp_single_page_fixes_test.dart`.

@@ -653,8 +653,13 @@ final PpSection kPpFamilySection = PpSection(
             ]),
             PpCards(heading: 'Hold firm on', [
               PpCard('Safe sleep', 'Always on the back, nothing soft around.'),
+              // Final review item 8: honey was in this card, which read as
+              // "fine after six months". Was 'No water, honey, herbal drops
+              // (ghutti) or gripe water.', kept for revert.
               PpCard('Nothing but milk before six months',
-                  'No water, honey, herbal drops (ghutti) or gripe water.'),
+                  'No water, herbal drops (ghutti) or gripe water.'),
+              PpCard('No honey before one year',
+                  'Not even a lick, and not in ghutti.'),
               PpCard('Vaccines on time', 'On the schedule, not delayed for a festival or a cold.'),
               PpCard('Medicines only as the doctor says', 'No leftover or adult medicines.'),
             ]),

@@ -476,8 +476,11 @@ final PpSection kPpPapersSection = PpSection(
                       'An easy home for gift money.'),
               PpCard('Sukanya Samriddhi Yojana, for a girl',
                   'Can be opened for a daughter under ten, at a post office '
-                      'or bank. Government-backed, with tax benefits, and '
-                      'matures when your daughter is 21.'),
+                      'or bank. Government-backed, with tax benefits. It '
+                      'matures 21 years after the account is opened, not '
+                      'when she turns 21.'),
+              // Final review item 8: was "matures when your daughter is
+              // 21". REQUIRED_REVIEW against the current scheme rules.
               PpCard('Public Provident Fund in your child\'s name',
                   'Long-term, government-backed, with tax benefits.'),
               PpCard('Mutual fund SIPs',

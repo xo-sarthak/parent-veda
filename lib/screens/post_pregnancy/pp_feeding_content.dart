@@ -4647,8 +4647,8 @@ final PpArea _safety = PpArea(
             'from it. That pairing does more for an Indian baby\'s iron than '
             'any supplement bought without advice.'),
         PpWhenLine('Iron matters from 6 months. Vitamin D drops usually from '
-            'birth, on your paediatrician\'s advice. Iodised salt from 1 year, '
-            'when salt starts.'),
+            'the first weeks, at the dose your paediatrician gives. Iodised '
+            'salt from 1 year, when salt starts.'),
         PpIndiaNote('Cooking dal and vegetables in an iron pan adds a small '
             'but real amount of iron to the food. A useful plus of the pan '
             'your family probably already owns.'),
@@ -4921,8 +4921,10 @@ final PpArea _safety = PpArea(
               'the heat. So an exclusively breastfed baby can run short, '
               'without anyone doing anything wrong.',
           'That is why most paediatricians in India start breastfed babies on '
-              'vitamin D drops in the first weeks, usually about 400 IU a '
-              'day. Many continue through the first year. Formula is fortified, so a '
+              // Final review item 8: was "usually about 400 IU a day". The
+              // dose is the paediatrician's to give, as the when-line says.
+              'vitamin D drops in the first weeks, at the dose your '
+              'paediatrician gives. Many continue through the first year. Formula is fortified, so a '
               'fully formula-fed baby taking enough usually needs no extra. '
               "Ask, don't guess.",
           'Sun helps, but not the way it is usually done. Ten to fifteen '

@@ -1464,15 +1464,20 @@ final PpArea _milestones = PpArea(
           minutes: '6 MIN',
           slotId: 'traditions/mundan',
         ),
-        PpLink('At the ceremony itself: blades, piercing and heat',
-            pageId: 'ceremony_day_safety'),
+        // Final review item 8: one tile to the ceremony safety page, not
+        // two. Was this link plus "The blade rule, once" below, kept for
+        // revert.
+        PpLink('On the day: blades, piercing and heat',
+            pageId: 'ceremony_day_safety',
+            blurb: 'One fresh sealed blade or needle, opened in front of '
+                'you, and nothing on the skin after.'),
         PpLink('If your family keeps uncut hair (kesh) instead', pageId: 'sikh_naming'),
         // [single-source] The fresh-sealed-blade rule lives once, on "On the
         // day: blades, piercing and heat".
-        PpLink('The blade rule, once',
-            pageId: 'ceremony_day_safety',
-            blurb: 'One fresh sealed blade, opened in front of you, and '
-                'nothing on the shaved head.'),
+        // PpLink('The blade rule, once',
+        //     pageId: 'ceremony_day_safety',
+        //     blurb: 'One fresh sealed blade, opened in front of you, and '
+        //         'nothing on the shaved head.'),
       ],
     ),
 
@@ -1607,14 +1612,19 @@ final PpArea _milestones = PpArea(
           minutes: '5 MIN',
           slotId: 'traditions/karnavedha',
         ),
-        PpLink('At the ceremony itself: blades, piercing and heat',
-            pageId: 'ceremony_day_safety'),
+        // Final review item 8: one tile to the ceremony safety page, not
+        // two. Was this link plus "The blade rule, once" below, kept for
+        // revert.
+        PpLink('On the day: blades, piercing and heat',
+            pageId: 'ceremony_day_safety',
+            blurb: 'One fresh sealed blade or needle, opened in front of '
+                'you, and nothing on the skin after.'),
         // [single-source] The fresh-sealed-blade rule lives once, on "On the
         // day: blades, piercing and heat".
-        PpLink('The blade rule, once',
-            pageId: 'ceremony_day_safety',
-            blurb: 'One fresh sealed blade, opened in front of you, and '
-                'nothing on the shaved head.'),
+        // PpLink('The blade rule, once',
+        //     pageId: 'ceremony_day_safety',
+        //     blurb: 'One fresh sealed blade, opened in front of you, and '
+        //         'nothing on the shaved head.'),
       ],
     ),
 

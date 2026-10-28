@@ -426,3 +426,5 @@ Held by `test/pp_feeding_door_test.dart` ("door 1: the plan, held"): the tab ord
 **Final review, item 6 (2026-10-27): no link opens a whole door.** `solids_constipation` opens Health's `tummy_constipation` and `recipes_sick_days` opens `tummy_dehydration` (both were the whole Health door). Held across every door by `test/pp_no_whole_door_links_test.dart`.
 
 **Final review, item 7 (2026-10-27): twin pages link each other.** `solids_when` links the Confident Weaning course (`pp_learn/co_weaning`), now that the router opens one programme. FD13 is closed. Held by `test/pp_twin_links_test.dart`.
+
+**Final review, item 8 (2026-10-28): single-page fixes.** The vitamin D page gives "at the dose your paediatrician gives" instead of 400 IU, and the iron page's when-line says the same. Held by `test/pp_single_page_fixes_test.dart`.

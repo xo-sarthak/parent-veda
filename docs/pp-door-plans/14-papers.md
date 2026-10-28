@@ -234,3 +234,5 @@ Held by `test/pp_papers_door_test.dart` (28 tests): the tab order for every band
 | Verification: a phone walk | Not run | Only on the user's word. The reminder's date on a phone is on BEFORE-LAUNCH |
 
 **Owed, not in this build:** the intro film (`DOOR-CONTENT-OWED` PMO1) and a closer hero (PMO2). No adviser, product or class is promised: the pages send her to a fee-only adviser, her insurer, the TPA and the government offices, none of which the app sells. On `BEFORE-LAUNCH.md`: a legal and money check of every scheme, document, insurance and tax line against current government notices, a phone check that the Aadhaar reminder rings on the right day, and the user's call on the story deck dropping cross-door links. The door's pages reach Ask Veda through the incremental ingest, which the user runs now that all fourteen doors are built.
+
+**Final review, item 8 (2026-10-28): single-page fixes.** Sukanya Samriddhi matures 21 years after the account is opened, not when the daughter turns 21 (was wrong on the saving page). REQUIRED_REVIEW against the current scheme rules. Held by `test/pp_single_page_fixes_test.dart`.
