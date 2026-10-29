@@ -299,7 +299,9 @@ final HubConfig kTtcPreconceptionHealth = HubConfig(
 final HubConfig kTtcMaleFertility = HubConfig(
   bracketId: 'ttc_male_fertility',
   heroVideoSlot: 'ttc_male_fertility_intro',
-  heroVideoTitle: _en('His side of it, in four minutes'),
+  // The door's name (2026-10-29). Kept for revert:
+  // heroVideoTitle: _en('His side of it, in four minutes'),
+  heroVideoTitle: _en('Male fertility, in four minutes'),
   template: HubTemplate.learnAndPlan,
   coreQuestion: 'What does sperm health depend on, and how do we improve '
       'it?',

@@ -814,7 +814,9 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // A labelled way through to the door written about him
         // (2026-09-27, relevance audit).
         TtcDoorTile(
-          title: 'More in His side',
+          // The door's name (2026-10-29); id unchanged. Kept for revert:
+          // title: 'More in His side',
+          title: 'More in Male fertility',
           id: 'ttc_tile_more_in_his_side',
           blurb: 'The test, his report, and what helps, in his own door.',
           bracketId: 'ttc_male_fertility',

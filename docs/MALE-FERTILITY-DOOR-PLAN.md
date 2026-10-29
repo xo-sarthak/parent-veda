@@ -1,6 +1,6 @@
 # Male fertility door — rename + one gap (planned 2026-10-29)
 
-**Status: PLANNED, decisions taken 2026-10-29, not built.** The TTC door
+**Status: BUILT 2026-10-29** (Steps 1-3, see "As built"; was PLANNED, decisions taken 2026-10-29). The TTC door
 `ttc_male_fertility`, shown today as **"His side"**, becomes **"Male
 fertility"**. It gains one new article for the largest uncovered question
 cluster, and one existing article gets a short section on abstinence and
@@ -157,4 +157,95 @@ restating it. No new tile.
 
 ## As built
 
-*(written during the build)*
+Built 2026-10-29, Steps 1-3 in order, in one change.
+
+### Step 1, the rename
+
+- **Label and kickers moved together.** `ttc_brackets.dart` label is now
+  `_t(en: 'Male fertility', hi: 'Male fertility')`, the old line commented and
+  kept for revert. All 10 kickers in `ttc_reads_his_side.dart` and the 2 in
+  `ttc_reads_extra.dart` (`ttc_read_his_side_pressure`, `ttc_read_his_age`)
+  say `Male fertility`.
+- **Named places changed**, each with a kept-for-revert note: the partner
+  screen's door card, the semen report eyebrow, the Fertile window door's
+  "More in Male fertility" tile (id `ttc_tile_more_in_his_side` unchanged, so
+  its photo and Ask Veda slug hold), the hub film title "Male fertility, in
+  four minutes", the door's hero "Male fertility, in plain words." and the
+  focus file's header line.
+- **Correction to the table above:** the "More in His side" tile is on the
+  **Fertile window** door (`ttc_focus_conceiving.dart`, bracket
+  `ttc_conceiving`), not Getting ready. Same tile, same file, wrong door name
+  in the plan.
+- **Left as prose, per decision 1:** "His side of it" (precheck item and home
+  "meanwhile" line), "His side is also the quickest to check" (journey tile,
+  precheck), "His side." as a list lead in `ttc_reads_age.dart`. They say
+  *his*, they do not name the door. About 60 code comments say "His side"
+  about the partner view; untouched.
+- **Tests:** `test/ttc_his_side_test.dart`'s "no read starts folded" filter
+  now selects by `Male fertility`; otherwise it would have passed vacuously
+  over zero reads, which is the same silent-empty failure in test form.
+- **New test** `test/ttc_male_fertility_door_test.dart`: the label in both
+  languages, every door read's kicker equal to the label, no read still
+  kicked `His side`, the door's Learn shelf present and holding all 13 reads,
+  plus the Step 2 and 3 checks below.
+
+### Step 2, `ttc_read_his_options`
+
+- **Read** "When the problem is on his side: the options" (the working
+  title "If it's his side" failed `ttc_doors_explicit_names_test.dart`: an
+  "it" that names nothing), hue 186, kicker `Male fertility`,
+  "ParentVeda team", `reviewed: false`, in `kTtcReadsHisSide` straight after
+  `ttc_read_azoospermia`. Eight sections as drafted: the opening, finding the
+  cause (points at the azoospermia read for the workup), what can be fixed
+  (varicocele with the 3-6 month wait, medicines pointing at heat and habits,
+  infection), matching treatment to result (natural, IUI with the NICE caveat
+  stated, IVF with ICSI), no sperm in the sample (PESA, TESA, micro-TESE, with
+  a tip on freezing), donor sperm as a choice, costs, who decides.
+- **Prices:** only the IVF door's ranges (`ttc_read_ivf_costs`): semen
+  analysis, medicated IUI, one IVF cycle, ICSI. The test asserts each range
+  appears in both reads, so the two cannot drift. A varicocele repair and a
+  sperm retrieval have no sourced figure in the app, so the read asks for a
+  written quote rather than inventing a range (STILL-OPEN 107.0).
+- **No personalised probability anywhere;** every outcome line is "many",
+  "some", "often". `ttc_clinical_review_test.dart` scans it.
+- **FAQs:** the four from the plan, each its own Ask Veda chunk.
+- **Links, not copies:** next steps to `ttc_read_ivf_icsi` and
+  `ttc_read_ivf_costs`; Read next `ttc_read_azoospermia`,
+  `ttc_read_donor_eggs_sperm`.
+- **Tile** in Test and results, after "If no sperm is found":
+  `ttc_tile_when_the_problem_is_on_his_side_the_options`.
+- **Image:** picked by eye, "Fork in path, Holkham woods" (Derek Harper,
+  CC BY-SA 2.0, Wikimedia Commons): a light woodland path splitting, two
+  people walking on together. Table line and credit in `read_images.dart`.
+  It reaches the phone after the user runs the fetch and R2 upload scripts.
+  Nothing added to DOOR-CONTENT-OWED.
+
+### Step 3, saving it up
+
+- **Section** "Does saving it up help?" in `ttc_read_heat_habits`, after the
+  sleep section: a longer gap raises the count a little but the sperm are
+  older and slower; one to two days gives fresher sperm; a second ejaculation
+  the same day has fewer, which is normal; morning versus evening barely
+  matters; the one set gap is two to seven days before a semen test.
+- **The timing read is the Fertile window door's** `ttc_read_timing_myths`
+  (the plan said Getting ready's; there is no timing read there). The
+  section names that door and a next step opens it; how often is not restated.
+- **FAQ** "Is it normal for sperm count to go up and down?", added last so
+  the existing FAQ chunk ids (`ttcfaq_<read>_<n>`) keep their numbers. The
+  existing "Does frequent sex lower my count?" already covered frequency.
+
+### Wiring gate
+
+- `ttc_read_his_options` resolves through `ttcReadById` (it is in
+  `kTtcReadsHisSide`, spread into `kTtcReads`); the tile is on the door (test);
+  `tool/export_ttc_corpus.dart` walks all of `kTtcReads`, so the read and its
+  FAQs are in the next export with no change there.
+- Learn shelf for `ttc_male_fertility` non-empty and complete (test).
+
+### Afterwards (the user)
+
+- Re-export the TTC corpus and re-ingest Ask Veda.
+- Run `tools/read_images/fetch_read_images.py` and `upload_to_r2.py` for the
+  new photo.
+- Phone walk: her home grid, his home grid, Learn, search, the Fertile window
+  door's "More in Male fertility" tile, and the new card in Test and results.

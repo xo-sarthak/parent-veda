@@ -1370,7 +1370,9 @@ class _HisDoorCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('His side', style: ttcJakarta(16, color: ttcSlateInk)),
+              // The door's name (2026-10-29). Kept for revert: 'His side'.
+              Text('Male fertility',
+                  style: ttcJakarta(16, color: ttcSlateInk)),
               const SizedBox(height: 3),
               Text(
                 'Your tests, your habits and what really changes sperm health.',

@@ -250,7 +250,8 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
 
     return TtcToolScaffold(
       hue: kHisSideHue,
-      eyebrow: 'His side',
+      // The door's name (2026-10-29). Kept for revert: 'His side'.
+      eyebrow: 'Male fertility',
       title: 'Read your\nsemen report.',
       // Shorter, and says what to do first (2026-09-27). Kept for revert:
       // "Type in what the report says and we'll explain it in plain English.

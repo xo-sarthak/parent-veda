@@ -223,7 +223,14 @@ final List<Bracket> kTtcBrackets = [
     stage: LifeStage.tryingToConceive,
     theme: 'partner',
     hue: 186,
-    label: _t(en: 'His side', hi: 'Unki taraf'),
+    // Renamed 2026-10-29 (docs/MALE-FERTILITY-DOOR-PLAN.md): "His side" read
+    // as his half of the app. ⚠️ Reads join this door by `kicker.en ==
+    // label.en`, so every kicker in ttc_reads_his_side.dart and the two in
+    // ttc_reads_extra.dart moved with it; test/ttc_male_fertility_door_test.dart
+    // pins them together. The Hindi side was Latin-script Hinglish, so it now
+    // matches title.hi. Kept for revert:
+    // label: _t(en: 'His side', hi: 'Unki taraf'),
+    label: _t(en: 'Male fertility', hi: 'Male fertility'),
     title: _t(en: 'Male fertility', hi: 'Male fertility'),
     blurb: _t(
         en: 'Sperm health, the lifestyle changes that really make a '

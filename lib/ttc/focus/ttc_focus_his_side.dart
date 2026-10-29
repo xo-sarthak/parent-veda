@@ -1,5 +1,6 @@
 // =============================================================================
-//  His side — the focus page for this door
+//  Male fertility (was "His side" until 2026-10-29; ids keep his_side) — the
+//  focus page for this door
 // -----------------------------------------------------------------------------
 //  Built 2026-09-04 from `his_side_rebuild.pdf`; brought back to the brief on
 //  2026-09-06. Fifth door on the shape PCOS, IVF and Getting ready
@@ -101,7 +102,9 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
   // whole argument is that fertility is a thing the two of them have together.
   // A couple is the picture that says what the copy says.
   // The new door's headline, a sentence (TtcDoorScreen, 2026-09-26).
-  heroTitle: 'His side of trying, in plain words.',
+  // The door's name (2026-10-29). Kept for revert:
+  // heroTitle: 'His side of trying, in plain words.',
+  heroTitle: 'Male fertility, in plain words.',
   heroBlurb: 'Sperm health, the habits that really change it, what the test '
       'involves, and how to read the report when it comes back. Written from '
       'WHO, NICE and other medical guidance.',
@@ -357,6 +360,16 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
           // 'to a specialist rather than to a second sample.',
           blurb: "Finding no sperm is not the end of the road. It's the one result that goes to a specialist rather than to a second sample.",
           readId: 'ttc_read_azoospermia',
+        ),
+        // Added 2026-10-29 (docs/MALE-FERTILITY-DOOR-PLAN.md, Step 2): what
+        // comes after a male-factor result, from varicocele repair to sperm
+        // retrieval and donor sperm, with the prices.
+        TtcArticleTile(
+          title: 'When the problem is on his side: the options',
+          id: 'ttc_tile_when_the_problem_is_on_his_side_the_options',
+          blurb: 'What can be fixed, IUI or ICSI, sperm retrieval, donor sperm, '
+              'and what each costs in India.',
+          readId: 'ttc_read_his_options',
         ),
       ],
     ),

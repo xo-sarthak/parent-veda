@@ -1394,6 +1394,10 @@ const Map<String, String> kReadImageUrls = {
   // If no sperm is found
   'ttc_read_azoospermia':
       'https://cdn.stocksnap.io/img-thumbs/960w/ZJE4KHCDWE.jpg',
+  // When the problem is on his side: the options (2026-10-29). A fork in a woodland path,
+  // two people walking on together: the options, taken as a couple.
+  'ttc_read_his_options':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Fork_in_path%2C_Holkham_woods_-_geograph.org.uk_-_4814592.jpg/1280px-Fork_in_path%2C_Holkham_woods_-_geograph.org.uk_-_4814592.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
   // What three months looks like
   'ttc_read_three_months':
       'https://cdn.stocksnap.io/img-thumbs/960w/BOTAC2JQYV.jpg',
@@ -2689,6 +2693,7 @@ const Map<String, String> kReadImageCredits = {
   'ttc_read_result_normal': 'CC0 · StockSnap · Solo Shutter',
   'ttc_read_result_abnormal': 'CC0 · StockSnap · Altered Reality',
   'ttc_read_azoospermia': 'CC0 · StockSnap · Frank Oschatz',
+  'ttc_read_his_options': 'CC BY-SA 2.0 · Wikimedia Commons · Derek Harper',
   'ttc_read_three_months': 'CC0 · StockSnap · Altered Reality',
   'ttc_read_zinc_coq10': 'CC0 · StockSnap · Mira Bozhko',
   'ttc_tile_zinc': 'CC0 · StockSnap · Patryk Dziejma',

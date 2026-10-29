@@ -11331,3 +11331,21 @@ and 0120 run, 410 sheet products loaded 2026-10-28. Pattern write-up: BACKEND-PA
   browser) with a log of Buy taps; product cards inside guides and tools from the sheet's placements; a calm
   header when she browses another stage's shelf; photo and video reviews; the ParentVeda score per product with
   a method document.
+
+## 107.0 The Male fertility door: what the rename and the options read left open — 2026-10-29
+
+Plan and as-built: `docs/MALE-FERTILITY-DOOR-PLAN.md`. The door `ttc_male_fertility` was "His side".
+
+- *Reads still join doors by a display string.* `read.kicker.en == bracket.label.en` in Learn (shelves, marks,
+  hues), the all-films screen and the home. The rename moved the label and all 12 kickers together and
+  `test/ttc_male_fertility_door_test.dart` pins them, but the next door rename is the same trap. The fix is a
+  `bracketId` on each read and the four call sites joining on it; a refactor, not done here.
+- *Ask Veda corpus is stale until re-exported.* `tool/export_ttc_corpus.dart` sends the kicker as a keyword, and
+  the new read (`ttc_read_his_options`, 4 FAQs) and the new heat-and-habits FAQ are not ingested yet. The user
+  re-exports and re-ingests; no service code changes.
+- *The new read's photo is in the table, not yet on R2.* `ttc_read_his_options` (Commons, Derek Harper, CC BY-SA
+  2.0). Run `tools/read_images/fetch_read_images.py` then `upload_to_r2.py`; until then the card's image request
+  misses.
+- *No sourced price for a varicocele repair or a sperm retrieval.* The read asks for a written quote instead of
+  inventing a range. A sourced India range would let it say more.
+- *Phone walk owed:* her home grid, his home grid, Learn, search, Fertile window's "More in Male fertility" tile.

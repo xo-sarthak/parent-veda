@@ -509,7 +509,8 @@ void main() {
 
     test('no His side read starts folded — Step 7, "remove the accordions"',
         () {
-      for (final read in kTtcReads.where((r) => r.kicker.en == 'His side')) {
+      for (final read
+          in kTtcReads.where((r) => r.kicker.en == 'Male fertility')) {
         for (final s in read.sections) {
           expect(s.collapsible, isFalse,
               reason: '${read.id}: "${s.heading?.en}" is an accordion');

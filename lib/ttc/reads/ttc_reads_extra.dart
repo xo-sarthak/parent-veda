@@ -41,7 +41,7 @@ final List<PvRead> kTtcReadsExtra = [
   PvRead(
     id: 'ttc_read_his_side_pressure',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     title: _en('When sex is hard for him under pressure'),
     teaser: _en("Erection or ejaculation trouble in the fertile days is common, "
         "and it's usually about pressure, not his body. Here's what helps, and "
@@ -289,7 +289,7 @@ final List<PvRead> kTtcReadsExtra = [
   PvRead(
     id: 'ttc_read_his_age',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     title: _en('Does his age affect getting pregnant?'),
     teaser: _en("A man's fertility changes with age too, more slowly than a "
         "woman's. Here's what changes, from when, and what it means for you "

@@ -54,7 +54,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_whose_side',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     title: _en('Whose "side" is it, really'),
     teaser: _en("Your side is part of the picture about half the time. Your "
         "test is the quickest one in all the checks, and it's the one most "
@@ -343,7 +343,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_semen_analysis',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     title: _en('What a semen analysis involves'),
     teaser: _en('How the test is done, what the numbers on the report mean, '
         'and why "below normal" doesn\'t mean what it looks like.'),
@@ -618,7 +618,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_heat_habits',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     // Round 2 (2026-10-28): the card's clearer words, so one name shows
     // everywhere (TTC-GAP 30). Kept for revert: title: _en('Heat, habits and time'),
     title: _en('Heat, habits and time: what changes sperm'),
@@ -803,6 +803,33 @@ final List<PvRead> kTtcReadsHisSide = [
         ],
       ),
 
+      // ⚠️ ADDED 2026-10-29 (docs/MALE-FERTILITY-DOOR-PLAN.md, Step 3): about
+      // twenty-five questions on abstinence, frequency and morning samples.
+      // HOW OFTEN to have sex is the Fertile window door's
+      // (`ttc_read_timing_myths`); this section answers only what saving it
+      // up does to sperm, and points there for the rest.
+      PvReadSection(
+        heading: _en('Does saving it up help?'),
+        paragraphs: [
+          _en("Not in the way people expect. Going a few days without "
+              'ejaculating does raise the count in the next sample a little. '
+              'But the sperm that wait longer move less well and carry more '
+              'DNA damage, so the extra numbers are older, slower sperm.'),
+          _en('Short gaps of one or two days tend to give fresher sperm that '
+              'move better. That is why the usual advice is sex every one to '
+              'two days across the fertile window, rather than saving up for '
+              'one day. The Fertile window door has the full page on timing.'),
+          _en('A second ejaculation on the same day has fewer sperm in it, '
+              "which is normal and doesn't mean anything is wrong. And the "
+              'time of day barely matters. Some studies find slightly higher '
+              "counts in the morning, but the difference is small, so it's not "
+              'worth planning around.'),
+          _en('The one time a set gap does matter is before a semen test. The '
+              'lab will ask for two to seven days without ejaculating, so the '
+              'result can be compared with the reference range.'),
+        ],
+      ),
+
       PvReadSection(
         heading: _en('What three months looks like in real life'),
         paragraphs: [
@@ -885,6 +912,15 @@ final List<PvRead> kTtcReadsHisSide = [
             'it balances count against motility. "Saving it up" is the more '
             'common mistake.'),
       ),
+      // Added 2026-10-29 (Step 3 of the male fertility door plan).
+      PvReadFaq(
+        question: _en('Is it normal for sperm count to go up and down?'),
+        answer: _en('Yes. Counts vary a lot from one sample to the next in '
+            'the same man, with illness, fever, stress, the gap since the last '
+            'ejaculation and how the sample was collected. That is why one low '
+            'result is repeated before anyone draws a conclusion. A high fever '
+            'can lower the count for up to three months.'),
+      ),
     ],
 
     whenToSeeSomeone: PvCallout(
@@ -930,6 +966,15 @@ final List<PvRead> kTtcReadsHisSide = [
         value: _en('A short course built around your side of this.'),
         surfaceId: 'ttc_prepare',
       ),
+      // Added 2026-10-29 (Step 3): "Does saving it up help?" points here
+      // for how often, rather than restating the Fertile window door.
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('How often to have sex, and the advice you can let go of'),
+        value: _en('When it matters, how often, and the rules that make no '
+            'difference.'),
+        surfaceId: 'ttc_read/ttc_read_timing_myths',
+      ),
     ],
 
     readNext: ['ttc_read_whose_side', 'ttc_read_his_side_pressure'],
@@ -966,7 +1011,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_azoospermia',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     title: _en('If no sperm is found'),
     teaser: _en("It's not the end of the road. It's the one result that goes "
         'to a specialist rather than to a second sample.'),
@@ -1144,6 +1189,250 @@ final List<PvRead> kTtcReadsHisSide = [
     readNext: ['ttc_read_semen_analysis', 'ttc_read_donor_eggs_sperm'],
   ),
 
+  // ⚠️ ADDED 2026-10-29 (docs/MALE-FERTILITY-DOOR-PLAN.md, Step 2): what
+  // happens AFTER a male-factor result. About fifteen question clusters in
+  // research/questions/ranked_ttc.csv ("does IUI work for low sperm count",
+  // "does sperm count increase after varicocele surgery", "how much does male
+  // fertility treatment cost"), and sperm retrieval was mentioned nowhere.
+  //
+  // ⚠️ THREE RULES THIS READ IS WRITTEN AGAINST.
+  //  · No number attached to them. Every figure is a population range or a
+  //    price, never "your chance" (test/ttc_clinical_review_test.dart).
+  //  · No second set of prices. IUI, IVF and ICSI come from
+  //    `ttc_read_ivf_costs`; a varicocele repair and a sperm retrieval have no
+  //    sourced figure in the app, so the read says to ask for them in writing
+  //    rather than inventing one.
+  //  · No copies. The workup is `ttc_read_azoospermia`'s, ICSI is the IVF
+  //    door's, donor rules are `ttc_read_donor_eggs_sperm`'s: each gets a
+  //    sentence here and a link, never the section again.
+  PvRead(
+    id: 'ttc_read_his_options',
+    hue: 186,
+    kicker: _en('Male fertility'),
+    // The plan's working title was "If it's his side: the options"; the
+    // explicit-names rule rejects an "it" that names nothing.
+    title: _en('When the problem is on his side: the options'),
+    teaser: _en('Most male-factor results have a next step, and many of '
+        "them don't need IVF. Here's what each one is for, and what it costs."),
+    shortAnswer: _en('Most male-factor results have a next step. Some causes '
+        'can be treated, like a varicocele or a medicine that lowers sperm '
+        'production. Mild problems are sometimes treated with IUI. Low counts '
+        'or poor movement usually mean IVF with ICSI. When no sperm are in the '
+        'sample, a surgeon can often collect them directly. Donor sperm is '
+        'another path some couples choose. The clinic decides which fits.'),
+    scaleSetter: _en('A male-factor result is a reason to look for a cause, '
+        'not a verdict. The options run from fixing something simple, to IUI, '
+        'to IVF with ICSI, to collecting sperm surgically, to donor sperm. '
+        'Which one fits depends on the cause and the numbers, and that is a '
+        "specialist's call. This page explains each so you can follow the "
+        'conversation.'),
+    author: _en('ParentVeda team'),
+    authorRole: _en('Written from the sources listed at the end'),
+    reviewed: false,
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('A low count, poor movement or no sperm in a sample can feel '
+              "like the end of a conversation. It's usually the start of one. "
+              'Male-factor results are common, and most of them have a next '
+              'step.'),
+          _en("Many of those steps don't involve IVF. The order is usually the "
+              'same: find out why first, fix what can be fixed, then match '
+              'any treatment to the numbers.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Why find the cause first?'),
+        paragraphs: [
+          _en('A semen report says what was in the sample. It doesn\'t say '
+              'why. The person who finds out why is an andrologist, or a '
+              'urologist who works in fertility.'),
+          _en('The visit is usually an examination, hormone blood tests and '
+              'a repeat sample. Sometimes a scan or genetic tests are added. '
+              'The page on finding no sperm walks through it step by step, '
+              'and the same visit applies to a low count.'),
+          _en('It matters because some causes can be treated, and a treated '
+              'cause can change which option fits, or whether one is needed '
+              'at all.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What can be fixed?'),
+        paragraphs: [
+          _en('A varicocele is a swelling of the veins above the testis, a '
+              'bit like a varicose vein. It warms the testis from the inside. '
+              'Repairing it, with a small operation or by blocking the vein '
+              'from inside, can improve the numbers in men who have a '
+              'varicocele that can be felt and an abnormal semen result.'),
+          _en("It isn't quick. Sperm take about three months to make, so the "
+              'numbers usually take three to six months to move after a '
+              "repair. Whether it leads to more babies is less clear than "
+              "whether it improves the numbers, and a small varicocele "
+              "that only shows on a scan usually isn't treated."),
+          _en('Medicines are the other common fixable cause. Testosterone and '
+              'anabolic steroids lower sperm production, and so do some '
+              "everyday medicines. The page on heat and habits lists them. "
+              "Don't stop anything yourself; take the list to whoever "
+              'prescribed it.'),
+          _en('An infection in the prostate or the tubes can also lower the '
+              'numbers, and it is treated with antibiotics.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Which treatment matches which result?'),
+        paragraphs: [
+          _en('When the numbers are only a little low, some couples keep '
+              'trying naturally, especially if they have not been trying for '
+              'long. Many couples with a mildly low count conceive on their '
+              'own.'),
+          _en('IUI places prepared sperm inside the womb around ovulation, '
+              'so more of the best-moving sperm start closer to the egg. In '
+              "India it's often offered for mild male-factor problems. UK "
+              'guidance (NICE) is more cautious and prefers more time trying, '
+              "then IVF, so it's fair to ask your clinic why they suggest it."),
+          _en('IVF with ICSI is the usual step when the count or movement is '
+              'low, or when an earlier IVF cycle had little or no '
+              'fertilisation. In ICSI, one sperm is injected into each egg, '
+              'so only a few healthy sperm are needed. The IVF door has the '
+              'full page on when ICSI is needed and when it is just routine.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What if there are no sperm in the sample?'),
+        paragraphs: [
+          _en('Sperm can often be collected directly, in a short procedure, '
+              'and used in IVF with ICSI. There are three main ways.'),
+        ],
+        bullets: [
+          _en('PESA: a fine needle takes sperm from the epididymis, the coiled '
+              'tube behind the testis. Used when sperm are made but a '
+              'blockage stops them getting out.'),
+          _en('TESA: a fine needle takes a little tissue from the testis '
+              'itself. Also used mostly for blockages.'),
+          _en('Micro-TESE: a surgeon looks through an operating microscope '
+              'for the small areas of the testis that are still making sperm. '
+              "Used when production is low, and it's done in specialist "
+              'centres.'),
+        ],
+        tip: PvReadTip(
+          title: _en('Ask about freezing'),
+          body: _en('Sperm collected this way can often be frozen, so one '
+              'procedure may serve more than one IVF cycle. Ask whether the '
+              'clinic does this before the procedure is booked.'),
+        ),
+      ),
+      PvReadSection(
+        heading: _en('Is donor sperm a last resort?'),
+        paragraphs: [
+          _en("It's a choice, not a failure. Some couples come to it after "
+              'every other option, some choose it earlier to avoid surgery or '
+              "more cycles, and some don't choose it at all. None of these is "
+              'the right order.'),
+          _en('In India, donor sperm comes only through registered ART banks '
+              'and clinics, and most offer counselling first. The page on '
+              'donor eggs and sperm covers the rules and the conversations.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What does it cost in India?'),
+        paragraphs: [
+          _en('These are the same 2026 ranges the IVF door uses, so you are '
+              'not comparing two sets of numbers.'),
+        ],
+        bullets: [
+          _en('A semen analysis: about ₹500 to ₹1,500.'),
+          _en('A medicated IUI cycle: usually ₹15,000 to ₹35,000, and it is '
+              'often tried for about three cycles.'),
+          _en('One full IVF cycle: roughly ₹1.5 to ₹2.5 lakh at an '
+              'independent clinic, more at a big-city chain.'),
+          _en('ICSI on top of IVF: roughly ₹15,000 to ₹45,000.'),
+        ],
+        callout: PvCallout(
+          tone: PvCalloutTone.note,
+          title: _en('Ask for these two in writing'),
+          body: _en('A varicocele repair and a surgical sperm retrieval vary '
+              'a lot between hospitals and cities. Ask for a written quote '
+              'for each, including the anaesthetic, any freezing, and the IVF '
+              'cycle the sperm will be used in.'),
+        ),
+      ),
+      PvReadSection(
+        heading: _en('Who decides?'),
+        paragraphs: [
+          _en('The specialist, with both of you. This page explains what each '
+              'option is for, so the appointment is easier to follow. It '
+              "can't say which one fits, because that depends on an "
+              'examination and tests no app can do.'),
+          _en('It helps to go together, and to bring every semen report, '
+              'not a summary. Write down the questions you want answered '
+              'before you go.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Ask for an andrologist, not just a repeat'),
+      body: _en('If a semen result has come back low twice, or once with no '
+          'sperm, ask your doctor to refer him to an andrologist or a '
+          'fertility urologist. Go sooner if he has pain, a swelling or a lump '
+          'in a testis, or takes testosterone or anabolic steroids.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Can we get pregnant with a low sperm count?'),
+        answer: _en('Often, yes. Many couples with a mildly low count conceive '
+            'naturally, given time. Others do with treatment, from fixing a '
+            'cause to IUI or IVF with ICSI. A low count makes it slower, not '
+            'impossible, and a specialist can say which path fits.'),
+      ),
+      PvReadFaq(
+        question: _en('Does IUI work for low sperm count?'),
+        answer: _en('It can help when the problem is mild, because it puts '
+            'the best-moving sperm closer to the egg. It helps much less '
+            'when counts or movement are very low, and then IVF with ICSI is '
+            'usually suggested instead. Guidance differs between countries, '
+            "so ask your clinic why they're suggesting it."),
+      ),
+      PvReadFaq(
+        question: _en('Does varicocele surgery help?'),
+        answer: _en('For men with a varicocele that can be felt and abnormal '
+            'semen results, repair often improves the numbers over three to '
+            'six months. Whether it leads to more pregnancies is less certain. '
+            "A varicocele that only shows on a scan usually isn't treated."),
+      ),
+      PvReadFaq(
+        question: _en('What does male fertility treatment cost?'),
+        answer: _en('It depends on the treatment. A medicated IUI cycle is '
+            'usually ₹15,000 to ₹35,000, one IVF cycle roughly ₹1.5 to ₹2.5 '
+            'lakh, and ICSI adds about ₹15,000 to ₹45,000. Ask for a written '
+            'quote for any surgery, because those prices vary the most.'),
+      ),
+    ],
+    evidence: _en('WHO laboratory manual for the examination and processing '
+        'of human semen, sixth edition, 2021; EAU Guidelines on Sexual and '
+        'Reproductive Health (male infertility), on varicocele repair and '
+        'surgical sperm retrieval; NICE CG156, Fertility problems, on IUI and '
+        'ICSI; ICMR National Guidelines for ART and the Assisted Reproductive '
+        'Technology (Regulation) Act, 2021, for donor sperm in India. Prices '
+        'are the ranges in this app\'s IVF cost page. Sources checked October '
+        '2026.'),
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en("ICSI: when it's needed, and when it's just routine"),
+        value: _en('The full page on the lab step most male-factor IVF uses.'),
+        surfaceId: 'ttc_read/ttc_read_ivf_icsi',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('What IVF really costs in India'),
+        value: _en('Every line of the bill, and the questions that change it.'),
+        surfaceId: 'ttc_read/ttc_read_ivf_costs',
+      ),
+    ],
+    readNext: ['ttc_read_azoospermia', 'ttc_read_donor_eggs_sperm'],
+  ),
+
   // ⚠️ A GLOSSARY, AND A GLOSSARY IS A REAL FORMAT RATHER THAN A LAZY ONE. A
   // semen report is a page of Latin and abbreviations handed over with no
   // explanation, and every one of those words has a plain meaning somebody
@@ -1151,7 +1440,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_report_words',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     title: _en('The words on the report, in plain English'),
     teaser: _en('Every term on the page, said the way a person would say it. '
         'No numbers to pass, no final answers.'),
@@ -1358,7 +1647,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_result_normal',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     // Round 2 (2026-10-28): the card's clearer words, so one name shows
     // everywhere (TTC-GAP 30). Kept for revert: title: _en('If the result is normal'),
     title: _en('If his semen result is normal'),
@@ -1524,7 +1813,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_result_abnormal',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     // Round 2 (2026-10-28): the card's clearer words, so one name shows
     // everywhere (TTC-GAP 30). Kept for revert: title: _en('If the first test is abnormal'),
     title: _en('If his first semen test is abnormal'),
@@ -1762,7 +2051,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_case_for_testing',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     // Round 2 (2026-10-28): the card's clearer words, so one name shows
     // everywhere (TTC-GAP 30). Kept for revert: title: _en('The case for testing early'),
     title: _en('The case for an early sperm test'),
@@ -1933,7 +2222,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_three_months',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     // Round 2 (2026-10-28): the card's clearer words, so one name shows
     // everywhere (TTC-GAP 30). Kept for revert: title: _en('What three months looks like'),
     title: _en('What his three months of changes look like'),
@@ -2179,7 +2468,7 @@ final List<PvRead> kTtcReadsHisSide = [
   PvRead(
     id: 'ttc_read_zinc_coq10',
     hue: 186,
-    kicker: _en('His side'),
+    kicker: _en('Male fertility'),
     title: _en('Zinc and CoQ10, honestly'),
     teaser: _en('The two supplements with any evidence at all: what the '
         "evidence shows, what they cost, and what they can't replace."),
