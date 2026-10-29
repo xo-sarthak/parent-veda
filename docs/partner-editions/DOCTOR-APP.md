@@ -72,6 +72,18 @@ Tests: `doctor_identity_edge_test` (new, 18), `partner_account_test` (+3), `doct
 Tests: `partner_dashboard_test` (new shape, error flag), `doctor_tabs_render_test` (home card
 empty and filled), and a SQL contract test for `my_doctor_referrals` columns.
 
+### D2 as built (2026-10-29)
+| # | What shipped | Where |
+|---|---|---|
+| 0 | **Found:** `attribute_to_partner` never copied the token's `expert_id` onto the attribution (0073 documented the column; nothing wrote it), so every per-doctor count was zero. 0133 copies it, blocks a member doctor scanning her own per-doctor code (self-referral), backfills from the token (nulls only), and turns 0037's three-argument form into a forwarder (defaults kept: `create or replace` cannot drop them) | `0133_my_doctor_referrals.sql` |
+| 1 | `my_doctor_referrals()` → `{scanned, installed, signed_up, active_30d, booked_me}`. "Me" = her `expert_accounts` row only (not `my_expert_ids()`), so an org login gets zeros. Hers = attributions naming her, plus her own practice's org-wide code. Solo parity by identical definitions with `partner_funnel.signed_up` / `partner_impact.active_this_month`; VERIFY block runs it for real. Booked you = her slots, not cancelled | `0133` |
+| 2 | `my_partner_token()`: her per-doctor code (only while `expert_profiles.partner_id` still matches) → her own practice's → an org login's `expert_id is null` code. The store asks for the token and the slice **outside** the partner check, because a member doctor owns no partner row. The kit is ready on the token alone and names the signed-in doctor (`_kitIdentity`); an org login is named as the org. Closes §5.4n | `0133`, `partner_dashboard_store.dart`, `doctor_referral_kit_screen.dart` |
+| 3 | Home "Families you brought" after This week: Joined · Active (last 30 days) · Booked you + "Counts only. Families stay private."; empty → "No families yet" + Share your QR; failed → Try again; loading → a bar. Loads on Home (post-frame, since Home already listens) and on pull-to-refresh | `doctor_home_tab.dart` (`_FamiliesCard`) |
+| 4 | `YourDoctorLine` + `yourDoctorLabel()` in `lib/care_partner/`, parent palette; Home's "How parents see you" shows it above the public card | `your_doctor_line.dart`, `doctor_home_tab.dart` |
+| 5 | `loadFailed` on the store (and `isNotAPartner` is never true after a failure). Impact: "Couldn't load your numbers · Try again"; "Your code is being set up…" when the server says no partner and no code; a member doctor with her own code sees her three counts | `partner_dashboard_store.dart`, `doctor_impact_screen.dart` |
+
+Tests: `doctor_referrals_test` (new, 29: store shape and flags, Home card in four states, Impact in three, kit identity for member / seeded / org, the line, and 0133 contracts). The plan's `doctor_tabs_render_test` and `partner_dashboard_test` additions were put in this one file instead, so D2 reads in one place. Walk owed (STILL-OPEN §5.4r). **Run 0133 before installing.**
+
 ## D3: QR rotation keeps per-doctor codes (STILL-OPEN §5.1b)
 `rotate_partner_token` retires every token and mints one org-wide token, so per-doctor counts
 silently freeze. Fix: rotation re-mints one fresh token per active member doctor

@@ -50,6 +50,7 @@ import '../../booking/booking_models.dart';
 import '../../booking/prescription.dart';
 import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/partner_dashboard_store.dart';
+import '../../care_partner/your_doctor_line.dart';
 import '../../data/reads/doctor_reads.dart';
 import '../../data/reads/read_images.dart' show readImageFor;
 import '../../doctor/doctor_directory.dart';
@@ -86,6 +87,8 @@ class DoctorHomeTab extends StatelessWidget {
         DoctorScheduleStore.instance,
         DoctorLedger.instance,
         PrescriptionStore.instance,
+        // "Families you brought" and the clinic on "Your doctor" (D2).
+        PartnerDashboardStore.instance,
       ]),
       builder: (context, _) {
         final session = DoctorSession.instance;
@@ -156,7 +159,12 @@ class DoctorHomeTab extends StatelessWidget {
             onBell: openUpdates,
           ),
           onRefresh: () async {
-            await Future.wait([roster.refresh(), ledger.refresh(), session.loadProfile()]);
+            await Future.wait([
+              roster.refresh(),
+              ledger.refresh(),
+              session.loadProfile(),
+              PartnerDashboardStore.instance.load(session.sessionKey, force: true),
+            ]);
           },
           children: [
             // ---- 1. the card that rides into the band: NEXT UP, always --------
@@ -232,6 +240,15 @@ class DoctorHomeTab extends StatelessWidget {
             ],
             const SizedBox(height: 22),
 
+            // ---- 3b. families you brought (Partner Editions D2) -------------
+            // Her own slice (my_doctor_referrals, 0133) — inside a clinic,
+            // the families from HER code, never the clinic's. A doctor only:
+            // an organisation login's numbers are the clinic's, on Earnings.
+            if (e != null) ...[
+              _FamiliesCard(onKit: () => _openKit(context)),
+              const SizedBox(height: 22),
+            ],
+
             // ---- 4. needs you — ONE swipe rail: work first, then set-up ---------
             // 2026-09-21: the user asked for the chores as a horizontal
             // swipe, and for the bell to hold updates instead. Work (a
@@ -293,6 +310,17 @@ class DoctorHomeTab extends StatelessWidget {
             // ---- 9. how parents see you ----------------------------------------
             if (e != null) ...[
               const DcSectionHead('How parents see you'),
+              // The line a family's home carries once they join with her
+              // code — the same widget the parent app renders (A1), so this
+              // preview cannot drift from it.
+              YourDoctorLine(
+                name: profile?.name ?? name,
+                clinic: session.orgName ?? partner?.organisation,
+                photoUrl: profile?.photoUrl,
+              ),
+              const SizedBox(height: 6),
+              Text('On the home of every family who joins with your code.', style: dcMeta(12.5)),
+              const SizedBox(height: 12),
               _PublicCard(
                 name: profile?.name ?? name,
                 credential: profile?.credential ?? sub,
@@ -697,6 +725,74 @@ class _NextCard extends StatelessWidget {
         ]),
       ]),
     );
+  }
+}
+
+/// "Families you brought": Joined · Active · Booked you, from her own code.
+///
+/// Stateful only to ask once when Home opens — before D2 the store loaded
+/// from Earnings → Impact alone, so a doctor who never went there never saw a
+/// number. Home's ListenableBuilder already listens to the store, so this
+/// widget only reads it.
+///
+/// Four states, each with its own words: loading (a quiet bar, never a flash
+/// of "No families yet" at a doctor who has forty), couldn't load (Try again),
+/// none yet (the invitation, with the way to change it), and the numbers.
+class _FamiliesCard extends StatefulWidget {
+  const _FamiliesCard({required this.onKit});
+  final VoidCallback onKit;
+
+  @override
+  State<_FamiliesCard> createState() => _FamiliesCardState();
+}
+
+class _FamiliesCardState extends State<_FamiliesCard> {
+  final _store = PartnerDashboardStore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    // After the frame, not now: load() notifies at once (it flips isLoading
+    // before its first await), and Home's builder — mid-build, and already
+    // listening to the store — would be marked dirty during its own build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _store.load(DoctorSession.instance.sessionKey);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = _store.referrals;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const DcSectionHead('Families you brought'),
+      if (r == null && _store.loadFailed)
+        DcEmpty(
+          'Couldn\'t load your numbers',
+          'Your families are safe; we just couldn\'t reach ParentVeda.',
+          mark: DoctorMark.referral,
+          action: 'Try again',
+          onAction: () => _store.load(DoctorSession.instance.sessionKey, force: true),
+        )
+      else if (r == null)
+        const DcCard(child: LinearProgressIndicator(minHeight: 2))
+      else if (r.isEmpty)
+        DcEmpty(
+          'No families yet',
+          'Share your QR. Families who join with your code are counted here.',
+          mark: DoctorMark.qr,
+          action: 'Share your QR',
+          onAction: widget.onKit,
+        )
+      else ...[
+        DcStatRow([
+          DcStat('Joined', '${r.signedUp}'),
+          DcStat('Active', '${r.active30d}', sub: 'last 30 days'),
+          DcStat('Booked you', '${r.bookedMe}'),
+        ]),
+        const SizedBox(height: 8),
+        Text('Counts only. Families stay private.', style: dcMeta(12.5)),
+      ],
+    ]);
   }
 }
 

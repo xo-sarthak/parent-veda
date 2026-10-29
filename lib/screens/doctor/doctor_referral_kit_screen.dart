@@ -38,6 +38,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../care_partner/care_partner_engine.dart';
 import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/partner_dashboard_store.dart';
+import '../../doctor/doctor_directory.dart' show doctorInfoFor;
 import '../../doctor/doctor_session.dart';
 import '../v2/v2_palette.dart' show v2BlockTint;
 import 'care_poster_screen.dart';
@@ -90,14 +91,19 @@ class _DoctorReferralKitScreenState extends State<DoctorReferralKitScreen> {
         // A partner with no server-issued token is NOT set up, whatever the
         // rest of their profile says. Printing a computed one would give
         // them a QR that scans, looks right, and credits nobody.
-        final ready = partner != null && token != null;
+        //
+        // D2: the token alone decides. my_partner_token() (0133) answers
+        // with the caller's OWN code, and a doctor inside a clinic has one
+        // while owning no partner row — requiring a partner hid it from her.
+        final identity = _kitIdentity(partner);
+        final ready = identity != null && token != null;
         return DcScreen(
           title: 'Your referral kit',
           subtitle: ready
               ? 'Patients who scan this land in ParentVeda already knowing you sent them.'
               : 'Not set up yet',
           onRefresh: _recheck,
-          children: ready ? _kit(partner, token) : _notYetAPartner(hasPartner: partner != null),
+          children: ready ? _kit(identity, token) : _notYetAPartner(hasPartner: partner != null),
         );
       },
     );
@@ -127,10 +133,40 @@ class _DoctorReferralKitScreenState extends State<DoctorReferralKitScreen> {
             // analyzer is right that they are different questions, and
             // this closure outlives the build that made it.
             if (!mounted) return;
-            if (_store.partner == null) dcToast(context, 'Still not set up — nothing has changed on our side yet.');
+            if (_store.token == null) dcToast(context, 'Still not set up — nothing has changed on our side yet.');
           },
         ),
       ];
+
+  /// WHOSE code this is, as the card, the poster and the share carry it.
+  ///
+  /// A signed-in DOCTOR is named as herself — "Dr Asha Verma · MS (Obs &
+  /// Gyn) · Bloom Fertility Centre" — because the code is now hers (0133).
+  /// Before D2 the card printed the partner row's name, which on a seeded
+  /// account was the demo identity, not the doctor holding the phone
+  /// (STILL-OPEN §5.4n). An organisation login is named as the organisation.
+  /// Null only when there is nobody to name at all.
+  CarePartner? _kitIdentity(CarePartner? partner) {
+    final session = DoctorSession.instance;
+    final id = session.expertId;
+    final e = (id == null || id.isEmpty) ? null : doctorInfoFor(id, profile: session.profile);
+    if (e == null) return partner;
+    final profile = session.profile;
+    return CarePartner(
+      id: partner?.id ?? session.orgPartnerId ?? e.id,
+      name: profile?.name.isNotEmpty == true ? profile!.name : e.name,
+      type: CarePartnerType.doctor,
+      status: partner?.status ?? PartnerStatus.active,
+      speciality: profile?.credential.isNotEmpty == true ? profile!.credential : e.credential,
+      // Her clinic when she works inside one; a solo practice's own
+      // organisation line otherwise.
+      organisation: session.orgName ?? partner?.organisation ?? '',
+      photoUrl: profile?.photoUrl ?? partner?.photoUrl,
+      city: partner?.city ?? '',
+      trust: partner?.trust ?? const TrustMessage(),
+      expertId: e.id,
+    );
+  }
 
   List<Widget> _kit(CarePartner partner, String token) {
     final p = dcP;

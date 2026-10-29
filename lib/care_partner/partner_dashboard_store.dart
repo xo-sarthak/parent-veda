@@ -1,9 +1,10 @@
 // =============================================================================
 //  PartnerDashboardStore — the numbers behind the Partner Journey Dashboard
 // -----------------------------------------------------------------------------
-//  Feeds the doctor-side impact screen. Everything here is a TOTAL, because the
-//  two server functions it calls (partner_impact and partner_earnings, both in
-//  0037) return only counts and sums. There is deliberately no method on this
+//  Feeds the doctor-side impact screen, the referral kit and Home's "Families
+//  you brought". Everything here is a TOTAL, because every server function it
+//  calls (partner_impact, partner_funnel, partner_earnings, and since 0133
+//  my_doctor_referrals) returns only counts and sums. There is deliberately no method on this
 //  store that could return a family, a name or a row — the privacy boundary is
 //  enforced in SQL, and this file simply has nothing to enforce it against.
 //
@@ -133,6 +134,44 @@ class PartnerFunnel {
       signedUp == 0 ? 0 : ((activated / signedUp) * 100).round();
 }
 
+/// "Families you brought" — the signed-in DOCTOR's own slice (0133,
+/// my_doctor_referrals). Not the partner's totals: a doctor inside a clinic
+/// sees the families from her own code, never the whole clinic's (R4). For a
+/// solo doctor the two are the same families, so the numbers agree with
+/// [PartnerFunnel.signedUp] and [PartnerImpact.activeThisMonth].
+@immutable
+class DoctorReferrals {
+  const DoctorReferrals({
+    this.scanned = 0,
+    this.installed = 0,
+    this.signedUp = 0,
+    this.active30d = 0,
+    this.bookedMe = 0,
+  });
+
+  final int scanned;
+  final int installed;
+
+  /// "Joined" on Home: families who reached an account through her.
+  final int signedUp;
+  final int active30d;
+
+  /// Of those, how many went on to book HER.
+  final int bookedMe;
+
+  bool get isEmpty => signedUp == 0;
+
+  static int _n(Object? v) => (v as num?)?.toInt() ?? 0;
+
+  static DoctorReferrals fromMap(Map d) => DoctorReferrals(
+        scanned: _n(d['scanned']),
+        installed: _n(d['installed']),
+        signedUp: _n(d['signed_up']),
+        active30d: _n(d['active_30d']),
+        bookedMe: _n(d['booked_me']),
+      );
+}
+
 class PartnerDashboardStore extends ChangeNotifier {
   PartnerDashboardStore._();
   static final PartnerDashboardStore instance = PartnerDashboardStore._();
@@ -141,8 +180,10 @@ class PartnerDashboardStore extends ChangeNotifier {
   PartnerImpact? _impact;
   PartnerFunnel? _funnel;
   String? _token;
+  DoctorReferrals? _referrals;
   List<PartnerEarningRow> _earnings = const [];
   bool _loading = false;
+  bool _failed = false;
   String? _loadedFor;
 
   CarePartner? get partner => _partner;
@@ -157,11 +198,22 @@ class PartnerDashboardStore extends ChangeNotifier {
   /// which is invisible on a poster and permanent once printed.
   String? get token => _token;
   List<PartnerEarningRow> get earnings => _earnings;
+
+  /// The doctor's own "families you brought" — null until the first answer.
+  DoctorReferrals? get referrals => _referrals;
   bool get isLoading => _loading;
 
+  /// The LAST load did not reach the server. Kept apart from "no partner":
+  /// "we could not ask" and "you are not set up" need different words, and
+  /// the old store collapsed both into the second (DOCTOR-APP.md D2 item 5).
+  /// Whatever was on screen before stays there — see the catch in [load].
+  bool get loadFailed => _failed;
+
   /// True once we know this doctor is not a Care Partner at all — the screen
-  /// then invites them to become one instead of showing seven zeroes.
-  bool get isNotAPartner => _loadedFor != null && !_loading && _partner == null;
+  /// then invites them to become one instead of showing seven zeroes. Never
+  /// true after a failed load: not knowing is not the same as "no".
+  bool get isNotAPartner =>
+      _loadedFor != null && !_loading && !_failed && _partner == null;
 
   int get totalEarnedMinor =>
       _earnings.fold(0, (a, r) => a + r.partnerMinor);
@@ -193,6 +245,29 @@ class PartnerDashboardStore extends ChangeNotifier {
         final row = mine.whereType<Map>().firstOrNull;
         _partner = row == null ? null : CarePartnerStore.partnerFromRow(row);
 
+        // ONE source of truth for what a poster carries, and the server owns
+        // it. This used to sort partner_referrals client-side and take the
+        // newest active row — which breaks the moment a token is rotated,
+        // because a retired token keeps `active` true through its grace
+        // window (0069) and would have won that sort. A partner would then
+        // be shown, and print, a code that is on its way out.
+        //
+        // Asked OUTSIDE the partner check since 0133: the answer is the
+        // caller's OWN code, and a doctor inside a clinic has one (minted
+        // with her expert_id) while my_care_partner() rightly says she owns
+        // no partner. Gating it on the partner hid her code from her.
+        final tok = await SupabaseRepo.callFunction('my_partner_token');
+        final live =
+            tok.isEmpty || tok.first == null ? null : '${tok.first}'.trim();
+        _token = (live == null || live.isEmpty) ? null : live;
+
+        // Her own slice, outside the check for the same reason. An
+        // organisation login gets a row of zeros, which Home never shows.
+        final slice = await SupabaseRepo.callFunction('my_doctor_referrals');
+        final m = slice.whereType<Map>().firstOrNull;
+        _referrals =
+            m == null ? const DoctorReferrals() : DoctorReferrals.fromMap(m);
+
         final id = _partner?.id;
         if (id != null) {
           final impact = await SupabaseRepo.callFunction(
@@ -201,16 +276,6 @@ class PartnerDashboardStore extends ChangeNotifier {
           _impact = first == null
               ? const PartnerImpact()
               : PartnerImpact.fromMap(first);
-
-          // ONE source of truth for what a poster carries, and the server owns
-          // it. This used to sort partner_referrals client-side and take the
-          // newest active row — which breaks the moment a token is rotated,
-          // because a retired token keeps `active` true through its grace
-          // window (0069) and would have won that sort. A partner would then
-          // be shown, and print, a code that is on its way out.
-          final tok = await SupabaseRepo.callFunction('my_partner_token');
-          final live = tok.isEmpty ? null : '${tok.first}'.trim();
-          _token = (live == null || live.isEmpty) ? null : live;
 
           final funnel = await SupabaseRepo.callFunction(
               'partner_funnel', {'p_partner_id': id});
@@ -226,13 +291,21 @@ class PartnerDashboardStore extends ChangeNotifier {
             // Biggest contribution first — that is the question being asked.
             ..sort((a, b) => b.partnerMinor.compareTo(a.partnerMinor));
         }
+      } else {
+        // Signed out, or a backend that never started — which must behave
+        // exactly like signed out. There is nothing to wait for, so Home's
+        // card gets an answer (none yet) rather than a bar that never ends.
+        _referrals ??= const DoctorReferrals();
       }
       _loadedFor = sessionKey;
+      _failed = false;
     } catch (_) {
       // A failed load leaves the previous numbers on screen rather than
       // replacing real figures with zeroes, which would read as "you lost
-      // everything" instead of "we could not reach the server".
+      // everything" instead of "we could not reach the server". The flag is
+      // what lets a screen say the second thing out loud.
       _loadedFor = sessionKey;
+      _failed = true;
     }
     _loading = false;
     notifyListeners();
@@ -244,17 +317,22 @@ class PartnerDashboardStore extends ChangeNotifier {
     PartnerImpact? impact,
     PartnerFunnel? funnel,
     String? token,
+    DoctorReferrals? referrals,
     List<PartnerEarningRow>? earnings,
+    bool failed = false,
+    String? sessionKey,
   }) {
     _partner = partner;
     _impact = impact;
     _funnel = funnel;
     _token = token;
+    _referrals = referrals;
     _earnings = earnings ?? const [];
+    _failed = failed;
     // An organisation has no expertId, so key the debug seed off the
     // partner id — otherwise seeding an org left _loadedFor null and the
     // next load() would overwrite the seed.
-    _loadedFor = partner?.id ?? 'debug';
+    _loadedFor = sessionKey ?? partner?.id ?? 'debug';
     _loading = false;
     notifyListeners();
   }
@@ -264,9 +342,11 @@ class PartnerDashboardStore extends ChangeNotifier {
     _impact = null;
     _funnel = null;
     _token = null;
+    _referrals = null;
     _earnings = const [];
     _loadedFor = null;
     _loading = false;
+    _failed = false;
     notifyListeners();
   }
 }

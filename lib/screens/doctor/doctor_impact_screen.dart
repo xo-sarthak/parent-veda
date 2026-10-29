@@ -49,13 +49,30 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
       builder: (context, _) {
         final partner = _store.partner;
         final impact = _store.impact;
+        // D2 item 5: three answers that used to look identical — seven
+        // zeroes. "We couldn't ask" (nothing loaded and the load failed),
+        // "you are not a partner yet" (the server said so), and the numbers.
+        final failedEmpty = _store.loadFailed && impact == null && partner == null;
+        final notYet = _store.isNotAPartner;
+        // A doctor inside a clinic owns no partner row but may hold her own
+        // code (0133); her numbers are her slice, not the clinic's totals.
+        final mine = _store.referrals;
+        final ownCodeOnly = notYet && _store.token != null;
 
         return ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
           children: [
             ppEyebrow('YOUR IMPACT', color: ppPurple),
             const SizedBox(height: 8),
-            Text(_headline(impact), style: ppFraunces(26, h: 1.15)),
+            Text(
+                failedEmpty
+                    ? 'Your numbers'
+                    : notYet && !ownCodeOnly
+                        ? 'Your code is\nbeing set up'
+                        : _headline(ownCodeOnly
+                            ? PartnerImpact(familiesReferred: mine?.signedUp ?? 0)
+                            : impact),
+                style: ppFraunces(26, h: 1.15)),
             const SizedBox(height: 8),
             Text(
               partner == null
@@ -67,12 +84,23 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
             if (partner != null && partner.status != PartnerStatus.active)
               _statusNote(partner),
             if (_store.isLoading) const LinearProgressIndicator(minHeight: 2),
+            if (_store.loadFailed) _errorNote(),
             const SizedBox(height: 6),
-            _grid(impact),
-            const SizedBox(height: 4),
-            _kitLink(context, (impact?.familiesReferred ?? 0) == 0),
+            if (failedEmpty) ...[
+              // Nothing to show and nothing known: the note above says why.
+            ] else if (notYet && !ownCodeOnly) ...[
+              _setUpNote(),
+            ] else if (ownCodeOnly) ...[
+              _mySlice(mine ?? const DoctorReferrals()),
+              const SizedBox(height: 4),
+              _kitLink(context, (mine?.signedUp ?? 0) == 0),
+            ] else ...[
+              _grid(impact),
+              const SizedBox(height: 4),
+              _kitLink(context, (impact?.familiesReferred ?? 0) == 0),
+            ],
             const SizedBox(height: 22),
-            _funnelBlock(_store.funnel),
+            if (!notYet) _funnelBlock(_store.funnel),
             const SizedBox(height: 22),
             _privacyNote(),
             const SizedBox(height: 22),
@@ -99,6 +127,60 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
           border: Border.all(color: ppCoral.withValues(alpha: 0.4)),
         ),
         child: Text(p.status.label, style: ppJakarta(12.5)),
+      );
+
+  /// The load did not reach the server. Whatever was on screen stays there;
+  /// this says so, with the way to ask again.
+  Widget _errorNote() => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(color: ppBorder),
+        ),
+        child: Row(children: [
+          const Icon(Icons.cloud_off_rounded, size: 17, color: ppSoft),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text('Couldn\'t load your numbers.', style: ppBody(12.5, h: 1.4)),
+          ),
+          TextButton(
+            onPressed: () => _store.load(DoctorSession.instance.sessionKey, force: true),
+            child: Text('Try again', style: ppJakarta(13, color: ppPurple)),
+          ),
+        ]),
+      );
+
+  /// The server answered: no partner, and no code of her own yet. Said as
+  /// what happens next, not as a refusal.
+  Widget _setUpNote() => Container(
+        padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+        decoration: BoxDecoration(
+            color: ppPanel, borderRadius: BorderRadius.circular(13)),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Icon(Icons.qr_code_2_rounded, size: 17, color: ppPurple),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Your code is being set up. We\'ll tell you when it\'s ready, '
+              'and the families who join with it are counted here.',
+              style: ppBody(12.5, h: 1.5),
+            ),
+          ),
+        ]),
+      );
+
+  /// A member doctor's own slice: the three counts her code can carry.
+  Widget _mySlice(DoctorReferrals r) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(children: [
+          Expanded(child: _tile(('Joined', r.signedUp, Icons.family_restroom_rounded))),
+          const SizedBox(width: 10),
+          Expanded(child: _tile(('Active this month', r.active30d, Icons.bolt_rounded))),
+          const SizedBox(width: 10),
+          Expanded(child: _tile(('Booked you', r.bookedMe, Icons.videocam_rounded))),
+        ]),
       );
 
   Widget _grid(PartnerImpact? i) {

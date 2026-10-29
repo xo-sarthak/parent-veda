@@ -43,7 +43,7 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | Phase | App | Session goal | Migration? | Depends on |
 |---|---|---|---|---|
 | **D1** ✓ 2026-10-29, hash in memory | Doctor | Identity and boot hardening | yes (small): `0132` | — |
-| **D2** | Doctor | "Families you brought" + a doctor's own referral slice + the right code in the kit | yes | D1 |
+| **D2** ✓ 2026-10-29, hash in memory | Doctor | "Families you brought" + a doctor's own referral slice + the right code in the kit | yes | D1 |
 | **D3** | Doctor | QR rotation keeps per-doctor codes (§5.1b) | yes | D2 |
 | **P1** | Partners | New flavour, shell, sign-in, one org resolver, admin-without-seat | yes | — |
 | **P2** | Partners | Employer and school: Overview, People, Report | no (uses existing RPCs) | P1 |

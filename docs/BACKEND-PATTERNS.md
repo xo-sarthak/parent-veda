@@ -4819,3 +4819,40 @@ corollaries:
   `restoreMine()` pulls hers only when the phone has none. "Cloud wins" would be wrong here, because the local row
   may hold an edit that has not been pushed yet and has no timestamp to compare. **A merge rule needs a fact to
   merge on; without a timestamp, "fill what is missing" is the only rule that cannot lose an edit.**
+
+## 16zzr. A column nobody writes, a slice is not the whole, and `create or replace` keeps your defaults (Partner Editions D2, 0133, 2026-10-29)
+
+Giving a doctor "Families you brought" (`my_doctor_referrals()`) and her own code in the kit. Three general facts.
+
+**1. A documented column is not a written column.** 0073 added `partner_attributions.expert_id` with the comment
+"copied from the token at attribution time" and a matching index. Nothing ever copied it: the only writer,
+`attribute_to_partner` (0039), was not touched again, so every row has it null. Nothing failed, because a null in a
+nullable column is legal and every reader just counted zero. A per-doctor dashboard built on it would have shown
+every doctor "No families yet" forever, and looked correct. **When you add a column, grep for every INSERT into
+that table, not only for the readers you are about to write.** The repair is cheap only because the row keeps the
+token it used, so who handed the code over is one join away (`update ... from partner_referrals where r.token =
+a.token and a.expert_id is null`). Keeping the *cause* of a fact, not just the fact, is what makes a backfill
+possible. The backfill fills nulls only: an attribution is history, and history is never rewritten.
+
+**2. Authorise a slice separately; do not widen the rule for the whole.** A doctor inside a clinic needs *her*
+numbers. The quick fix is to make `caller_owns_partner()` true for every member doctor, and that one change would
+also hand each of them the clinic's totals, its funnel and its earnings, because six functions trust that rule.
+Instead the slice has its own function with its own, narrower idea of "me" (her `expert_accounts` row only, not
+`my_expert_ids()`, whose organisation route returns every doctor under a login). **One shared authorisation helper
+is good (one place to fix), until you need a different answer for a different question. Then you write a second
+helper, not a broader first one.** The check that matters: for a solo doctor the slice and the whole are the same
+families, so the two must use *identical* definitions (`signed_up_at is not null`, `t.at > now() - interval '30
+days'`), and a test compares the text of both.
+
+**3. `create or replace function` cannot remove a parameter default.** The old three-argument
+`attribute_to_partner` now forwards to the five-argument one. Writing its signature without `default 'qr'` looks
+harmless and fails the whole migration: *cannot remove parameter defaults from existing function*. Postgres treats
+defaults as part of the contract callers rely on. The forwarder passes all five arguments with typed nulls
+(`null::timestamptz`): with two overloads that both have defaults, a call that leaves arguments out can match both,
+and Postgres refuses it as ambiguous instead of picking one. **When two overloads exist, call the one you mean
+with every argument and an explicit type.**
+
+**A smaller one, on the Dart side: start a load after the frame, not in `initState`, when a parent already
+listens.** `load()` flips `isLoading` and notifies before its first `await`. Home's `ListenableBuilder` listens to
+the store and is mid-build when the card's `initState` runs, so a synchronous notify marks a widget dirty during
+its own build, and Flutter asserts. `addPostFrameCallback` moves the call to after that build.

@@ -371,6 +371,12 @@ BEFORE          cp_apollo/—, cp_apollo/arjun, cp_apollo/priya, cp_apollo/rahul
 AFTER           cp_apollo/—                    ← one code, no person layer
 ```
 
+> **Correction 2026-10-29 (D2, 0133):** the breakdown never grew in the first
+> place. `attribute_to_partner` did not copy the token's `expert_id`, so every
+> family attributed with `expert_id = NULL` whether or not a rotation happened.
+> 0133 copies it and backfills from the token; the rotation problem below is
+> still real and is D3.
+
 **Why it is nasty rather than obvious.** Nothing errors. Rotation succeeds,
 returns a token, posters keep working through the grace window. What silently
 stops is the breakdown: every family arriving afterwards attributes to
@@ -596,11 +602,11 @@ task's verb switches a tab, so Back had nothing to pop and closed the app;
 (`DoctorAppointmentsTab.openOn`), where the owed ones are; the referral kit
 moved onto the doctor chrome (it was the last screen in the parenting
 palette — violet code, violet icons, a tinted foot panel) with WhatsApp's
-own glyph on its row. Owed: the kit's card shows the care-partner demo
+own glyph on its row. ~~Owed: the kit's card shows the care-partner demo
 identity ("Dr Meera Rao · Rainbow Hospital") rather than the signed-in
-doctor — `PartnerDashboardStore` resolves the partner from its own seed,
-not from `expert_profiles`; join them when the partner approval flow lands
-(§13.0).
+doctor.~~ **CLOSED 2026-10-29 (Partner Editions D2, §5.4r):** the card names
+the signed-in doctor from her session, and the code is her own
+(`my_partner_token()`, 0133).
 
 **5.4o The sweep (2026-09-21, later) — DONE.** No Material icon in a well
 and no parenting palette on any reachable doctor screen (audit §9.2);
@@ -638,6 +644,24 @@ PULLED a schedule, so a doctor on a new phone got the starter week and her
 next save overwrote the real one (`DoctorScheduleStore.restoreMine`). Owed:
 the walk — sign out as one doctor and in as another; airplane mode at launch.
 §5.4n's "kit shows the demo identity" is D2's, not closed here.
+
+**5.4r Families you brought + the doctor's own slice (Partner Editions D2,
+2026-10-29) — BUILT, not walked; run `0133` before installing.**
+`docs/partner-editions/DOCTOR-APP.md` §D2. `my_doctor_referrals()` gives a
+doctor the families from HER code (inside a clinic, never the clinic's; an
+organisation login gets zeros, R4); a solo doctor's numbers use the same
+definitions as `partner_impact`/`partner_funnel`. `my_partner_token()` returns
+the caller's own code: a doctor's per-doctor code (while she still belongs to
+that partner), else her own practice's, else an org login's org-wide code.
+Home has "Families you brought" (Joined · Active · Booked you; the empty state
+invites to the kit) and "How parents see you" previews the shared
+`YourDoctorLine` (`lib/care_partner/your_doctor_line.dart`, reused by A1).
+Impact says "Couldn't load" apart from "being set up". **Found and fixed:**
+`attribute_to_partner` never copied the token's `expert_id` onto the
+attribution (0073 documented it, nothing wrote it), so every per-doctor count
+was zero; 0133 copies it and backfills from the token. Owed: the walk — a
+member doctor with her own code sees her QR and her name; an org login's kit
+shows the org code; Home's card fills after a test family joins.
 
 **5.4i Kept for revert, unreachable:** `doctor_home_screen.dart`,
 `doctor_appointments_screen.dart`, `doctor_schedule_screen.dart`,
