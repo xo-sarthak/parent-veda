@@ -89,17 +89,21 @@ void main() {
     'lib/services/notification_service.dart':
         'device: holds no person; every wipe cancels what it scheduled '
             '(LocalOwner.wipeThisPhone -> cancelAllScheduled, step 12)',
-    // The doctor app signs out its own way.
+    // The doctor app signs out its own way: forgetDoctorOnThisPhone()
+    // (lib/doctor/doctor_sign_out.dart, Partner Editions D1), whose store
+    // list partner_account_test pins.
+    'lib/doctor/doctor_reminders.dart':
+        'doctor app: forgetDoctorOnThisPhone cancels and forgets what it armed',
     'lib/doctor/doctor_availability.dart':
         'doctor app: its own sign-out, a separate pass',
     'lib/doctor/doctor_ledger.dart':
-        'doctor app: its own sign-out, a separate pass',
+        'doctor app: cleared by forgetDoctorOnThisPhone',
     'lib/doctor/doctor_onboarding_store.dart':
         'doctor app: its own sign-out, a separate pass',
     'lib/doctor/doctor_schedule_store.dart':
-        'doctor app: its own sign-out, a separate pass',
+        'doctor app: cleared by forgetDoctorOnThisPhone',
     'lib/doctor/doctor_session.dart':
-        'doctor app: its own sign-out, a separate pass',
+        'doctor app: cleared by forgetDoctorOnThisPhone',
     'lib/doctor/doctor_updates.dart':
         'doctor app: its own sign-out, a separate pass',
   };

@@ -89,7 +89,7 @@ class DoctorHomeTab extends StatelessWidget {
       ]),
       builder: (context, _) {
         final session = DoctorSession.instance;
-        final e = session.consults ? doctorInfoById(session.expertId!) : null;
+        final e = session.consults ? doctorInfoFor(session.expertId!, profile: session.profile) : null;
         final partner = PartnerDashboardStore.instance.partner;
         final name = e?.name ?? partner?.name ?? 'Your practice';
         final sub = e?.credential ?? (partner == null ? '' : CarePartnerType.label(partner.type));

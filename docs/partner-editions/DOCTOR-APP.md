@@ -36,6 +36,22 @@ Edge cases and fixes:
 Tests: extend `doctor_app_shell_test` (init failure, offline state), `partner_account_test`
 (sign-out clears every store), and add `doctor_identity_edge_test`.
 
+### D1 as built (2026-10-29)
+| # | What shipped | Where |
+|---|---|---|
+| 1 | `startBackend()` wraps `Supabase.initialize`; a failure opens `DoctorCantReach` with Try again, which retries the init and then resolves | `main_doctor.dart`, `screens/doctor/doctor_cant_reach.dart` |
+| 2 | `enum DoctorResolve { resolved, notADoctor, unreachable }`. A timeout on the first question returns at once (6s, not 12s); a failure on either is unreachable. The boot shows the signed-in can't-reach screen; the sign-in screen no longer signs out a doctor whose check timed out | `doctor_session.dart`, `doctor_auth_screen.dart` |
+| 3 | `forgetDoctorOnThisPhone()`: reminders, session, roster, prescriptions, schedule, ledger, partner dashboard. Reminders now record the booking ids they arm (`doctor_reminders_armed`) so sign-out cancels exactly those, not the parent build's own alarms. Both sign-out paths call it | `doctor/doctor_sign_out.dart`, `doctor_reminders.dart` |
+| 3+ | Found: the doctor app never pulled a schedule. `restoreMine(expertId)` fetches hers when the phone has none; a local schedule still wins (it may hold an unpushed edit, and has no timestamp to compare) | `doctor_schedule_store.dart`, `doctor_scaffold.dart` |
+| 4 | "Test as" behind `kDebugMode \|\| PV_DEV` | `doctor_profile_tab.dart` |
+| 5 | `0132`: own practice first, then `created_at`, then `id` | `supabase/migrations/0132_my_care_partner_order.sql` |
+| 6 | `DoctorPublicProfile` keeps `partner_id` + `domain`; the session reads the partner row (public) and keeps it as `orgPartnerId`/`orgName` only when its `expert_id` is not hers. Profile shows "credential · clinic". (Home's hero has no subtitle slot, so the line is on Profile.) | `doctor_session.dart`, `doctor_profile_tab.dart` |
+| 7 | `doctorInfoFor(id, profile:)` falls back to her own server row; the five call sites use it | `doctor_directory.dart` + 5 screens |
+| 8 | Boot: `notADoctor` while signed in → `claimInvite()` → resolve once more | `main_doctor.dart` |
+
+Tests: `doctor_identity_edge_test` (new, 18), `partner_account_test` (+3), `doctor_app_shell_test` (+3);
+`sync_reset_coverage_test` allowlist names the doctor sign-out. Walk owed (STILL-OPEN §5.4q).
+
 ## D2: Families you brought + the doctor's own slice
 1. Migration: `my_doctor_referrals()` returns `{scanned, installed, signed_up, active_30d,
    booked_me}` for referrals whose `expert_id ∈ my_expert_ids()` **and** that the caller consults as

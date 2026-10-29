@@ -4784,3 +4784,38 @@ a reorder as a change. **Before sorting a list for comparison or storage, check 
 **Also moved, the other way:** learning style was kept per child and flipped on every child switch, but it is how
 the PARENT likes to read. It now lives at her level, syncs as her own set, and the open child's old answer became
 hers once. Not every answer asked on a child's screen is about the child.
+
+## 16zzq. Silence is not a "no", LIMIT without ORDER BY is a coin toss, and a singleton outlives the account (Partner Editions D1, 0132, 2026-10-29)
+
+Hardening how ParentVeda+ decides who is signed in. Three general facts came out of it.
+
+**1. A lookup has three answers, not two.** `resolveFromServer()` returned a bool, and false meant both "the
+server says this account is nobody" and "the server did not answer". The boot treated both as "show sign-in", so a
+doctor offline at launch was shown a sign-in form with her session still live. The fix is a three-value result
+(`resolved | notADoctor | unreachable`), and only an ANSWER may produce `notADoctor`. Two details matter: a
+timeout on the first question returns at once (a network that ignored one call will ignore the next for the same
+deadline), and an error is `unreachable` too, because "could not ask" is not "asked and was told no". **Whenever
+an empty result drives a decision the user cannot undo, the caller must be able to tell "none" from "no answer".**
+(`selectAllOrNull` in 0084 was the same lesson on a read.)
+
+**2. `LIMIT 1` without `ORDER BY` is not "the first row".** SQL tables are sets; without an ORDER BY Postgres keeps
+whichever row its plan reaches first, which can change after a vacuum, a new index or more rows. `my_care_partner()`
+did this, and one account can own several partners, so "which partner am I?" could change between launches and take
+every number on screen with it, silently. 0132 orders by "her own practice", then `created_at`, then `id`. **The
+last key must be unique**, or two rows created in the same instant still tie and the answer is only probably stable.
+
+**3. A singleton outlives the account that filled it.** Every store is `Foo.instance`; sign-out ends the session but
+not the object. ParentVeda+ cleared three of seven stores, so the next doctor on the phone saw the last one's patients
+until a refresh answered, and kept them when it did not. The parent app solved this with `SyncRegistry` resets; the
+doctor app now has one function, `forgetDoctorOnThisPhone()`, and a test that lists every store it must clear. Two
+corollaries:
+
+* **Anything that acts after the app closes needs its handles written down.** Notification ids here are derived
+  from booking ids, which makes re-arming idempotent but means cancelling needs the booking ids, and after sign-out
+  the roster that knew them is gone. So the reminders now persist the ids they arm. The tempting shortcut,
+  `cancelAll()`, would also cancel the parent build's pregnancy and medicine alarms, because both share one plugin.
+* **Clearing a cache is only safe if something refills it.** Clearing the schedule exposed that the doctor app
+  never pulled one: a new phone got the starter week, and the first save overwrote the real week on the server.
+  `restoreMine()` pulls hers only when the phone has none. "Cloud wins" would be wrong here, because the local row
+  may hold an edit that has not been pushed yet and has no timestamp to compare. **A merge rule needs a fact to
+  merge on; without a timestamp, "fill what is missing" is the only rule that cannot lose an edit.**

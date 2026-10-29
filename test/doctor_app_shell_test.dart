@@ -21,9 +21,13 @@
 
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/doctor/doctor_ledger.dart';
+import 'package:parentveda/main_doctor.dart';
+import 'package:parentveda/screens/doctor/doctor_cant_reach.dart';
 import 'package:parentveda/screens/doctor/doctor_chrome.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 String _read(String path) => File(path).readAsStringSync();
 
@@ -36,6 +40,44 @@ void main() {
       final main = _read('lib/main_doctor.dart');
       expect(main, contains('const DoctorScaffold()'));
       expect(main, contains('DoctorAuthScreen('));
+    });
+
+    // Partner Editions D1, items 1 and 2: a backend that will not start, and a
+    // server that does not answer, each get the can't-reach screen. Never a
+    // crash on launch, never the sign-in form for a doctor who is signed in.
+    test('Supabase.initialize is caught, and unreachable maps to offline', () {
+      final main = _read('lib/main_doctor.dart');
+      final start = main.indexOf('Future<bool> startBackend()');
+      final body = main.substring(start, main.indexOf('enum _Boot', start));
+      expect(body.indexOf('try {'), lessThan(body.indexOf('Supabase.initialize(')));
+      expect(body, contains('return false;'));
+      expect(main, contains('runApp(ParentVedaExpertApp(backendUp: await startBackend()));'));
+      expect(main, contains('result == DoctorResolve.unreachable ? _Boot.offline : _Boot.ready'));
+      expect(main, contains('DoctorCantReach(onRetry: _retry, signedIn: true)'));
+    });
+
+    testWidgets('a backend that never started opens on Try again, not a crash',
+        (t) async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      await t.pumpWidget(const ParentVedaExpertApp(backendUp: false));
+      await t.pump();
+      expect(find.text("Can't reach ParentVeda right now"), findsOneWidget);
+      expect(find.text('Try again'), findsOneWidget);
+    });
+
+    testWidgets('the offline screen tells a signed-in doctor her data is safe, '
+        'and Try again runs once per tap', (t) async {
+      var tries = 0;
+      await t.pumpWidget(MaterialApp(
+        home: DoctorCantReach(
+          signedIn: true,
+          onRetry: () async => tries++,
+        ),
+      ));
+      expect(find.textContaining('You are still signed in'), findsOneWidget);
+      await t.tap(find.text('Try again'));
+      await t.pump();
+      expect(tries, 1);
     });
 
     test('five tabs, in the decided order', () {

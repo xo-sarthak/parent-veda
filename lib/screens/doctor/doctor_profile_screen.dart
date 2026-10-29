@@ -12,6 +12,7 @@ import '../../doctor/doctor_directory.dart';
 import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_session.dart';
+import '../../doctor/doctor_sign_out.dart';
 import '../post_pregnancy/pp_common.dart';
 import '../post_pregnancy/pp_experts_data.dart' show needLabel;
 import 'doctor_onboarding_screen.dart';
@@ -92,8 +93,11 @@ Future<void> _signOut(BuildContext context) async {
     // still the right thing — a doctor who taps sign out must not stay signed
     // in because the network was down.
   }
-  DoctorSession.instance.clear();
-  PartnerDashboardStore.instance.reset();
+  // Kept for revert; every doctor store now, the reminders included
+  // (Partner Editions D1):
+  // DoctorSession.instance.clear();
+  // PartnerDashboardStore.instance.reset();
+  await forgetDoctorOnThisPhone();
 }
 
 /// The signed-in account's email, or null if there is no backend to ask.
@@ -129,7 +133,7 @@ class DoctorProfileScreen extends StatelessWidget {
     // unknown id instead of the first doctor in the list, so an unresolved
     // identity falls through to the partner name rather than to a stranger's.
     final session = DoctorSession.instance;
-    final e = session.consults ? doctorInfoById(session.expertId!) : null;
+    final e = session.consults ? doctorInfoFor(session.expertId!, profile: session.profile) : null;
     final partner = PartnerDashboardStore.instance.partner;
     final email = _signedInEmail();
     final name = e?.name ?? partner?.name ?? 'Your practice';

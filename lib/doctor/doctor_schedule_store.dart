@@ -97,6 +97,36 @@ class DoctorScheduleStore extends ChangeNotifier {
     } catch (_) {/* offline - local view still works */}
   }
 
+  /// Bring back THIS doctor's saved week when the phone has none for them —
+  /// the doctor app never pulled schedules, so a doctor signing in on a new
+  /// phone, or again after sign-out cleared this store, got the starter week,
+  /// and their next save overwrote the real one on the server.
+  ///
+  /// Only when the phone has nothing for them. A local schedule wins here
+  /// because it may hold an edit whose push has not landed yet; the local row
+  /// carries no timestamp to compare, so "cloud wins" would quietly undo it.
+  Future<void> restoreMine(String expertId) async {
+    if (expertId.isEmpty || hasSetUp(expertId) || !SupabaseRepo.isLoggedIn) return;
+    final rows = await SupabaseRepo.selectPublicWhere('doctor_schedule', 'expert_id', expertId);
+    final raw = (rows == null || rows.isEmpty) ? null : rows.first['schedule'];
+    if (raw is! Map || hasSetUp(expertId)) return;
+    _byExpert[expertId] = DoctorSchedule.fromMap(raw);
+    _persist();
+    notifyListeners();
+  }
+
+  /// Sign-out (Partner Editions D1): forget every schedule on this phone. The
+  /// signed-in doctor's own week is on the server and [restoreMine] brings
+  /// it back at the next sign-in.
+  Future<void> clearForSignOut() async {
+    _byExpert.clear();
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_key);
+    } catch (_) {/* memory is already clear */}
+  }
+
   /// Slots a parent would actually be offered — the same function the parent
   /// side will call, so the preview cannot drift from reality.
   List<GeneratedSlot> preview(

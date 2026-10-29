@@ -33,7 +33,8 @@ below.
 - [ ] **BLOCKER** · Website `APP_LIVE` → true on listing day, plus the store redirect and `referrer` on `/invite/` · website · STILL-OPEN §1.2, §8.2 · added 2026-10-17
 - [ ] **BLOCKER** · `kPremiereAlwaysShow` → `false` (still `true`, `lib/brand/premiere_screen.dart:47`) · dev · STILL-OPEN §1.4 · added 2026-10-17
 - [ ] **BLOCKER** · `kDailyPopupAlwaysShow` → `false` (still `true`, `lib/screens/post_pregnancy/daily_tip_popup.dart:66`) · dev · STILL-OPEN §5.12, §12.4 · added 2026-10-17
-- [ ] **BLOCKER** · Testing scaffolding out of the release build: the Mom/Dad preview pill, "Reset to Week 20 · testing", the doctor-role picker, `_PreviewBar` (`home_screen.dart:92`), `_FatherPreviewBar` · dev · app-review master §11.4, HANDOFF.md · added 2026-10-17
+- [ ] **BLOCKER** · Testing scaffolding out of the release build: the Mom/Dad preview pill, "Reset to Week 20 · testing", the doctor-role picker, `_PreviewBar` (`home_screen.dart:92`), `_FatherPreviewBar` · dev · app-review master §11.4, HANDOFF.md · added 2026-10-17. ParentVeda+'s "Developer · Test as" switch is gated behind debug/`PV_DEV` since 2026-10-29 (Partner Editions D1): check a store build of the doctor flavour is made without `PV_DEV`
+- [ ] Run `0132_my_care_partner_order.sql` (deterministic `my_care_partner()`; the D1 app build works without it) · user · `docs/partner-editions/DOCTOR-APP.md` §D1 · added 2026-10-29
 - [ ] **BLOCKER** · Google sign-in in release: a second Android OAuth client with the release / Play SHA-1, and the consent screen published out of Testing · user · AUTH-SETUP §1b, §1c · added 2026-10-17
 - [ ] **BLOCKER** · A published privacy notice, and the web account-deletion page Google Play requires (parentveda.in) · user + website · STILL-OPEN §67.3, AUTH-SETUP §3c · added 2026-10-17
 - [ ] **BLOCKER** · A staging database, and migrations through a tracked tool rather than pasted into the live SQL editor (§1 below) · user + dev · added 2026-10-17

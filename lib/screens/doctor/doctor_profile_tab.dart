@@ -19,6 +19,7 @@
 //  down, because a doctor who taps sign out must not stay signed in.
 // =============================================================================
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,6 +28,7 @@ import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_directory.dart';
 import '../../doctor/doctor_ledger.dart';
 import '../../doctor/doctor_session.dart';
+import '../../doctor/doctor_sign_out.dart';
 import '../../doctor/doctor_hero_images.dart';
 import '../post_pregnancy/pp_experts_data.dart' show expertByIdOrNull;
 import 'doctor_art.dart';
@@ -49,11 +51,16 @@ class DoctorProfileTab extends StatelessWidget {
       builder: (context, _) {
         final feed = DoctorFeed.now();
         final session = DoctorSession.instance;
-        final d = session.consults ? doctorInfoById(session.expertId!) : null;
+        final d = session.consults ? doctorInfoFor(session.expertId!, profile: session.profile) : null;
         final e = session.consults ? expertByIdOrNull(session.expertId!) : null;
         final partner = PartnerDashboardStore.instance.partner;
         final name = d?.name ?? e?.name ?? partner?.name ?? 'Your practice';
-        final sub = d?.credential ?? (partner == null ? '' : CarePartnerType.label(partner.type));
+        final cred = d?.credential ?? (partner == null ? '' : CarePartnerType.label(partner.type));
+        // A doctor inside a clinic says so under her name: "MS (Obs & Gyn) ·
+        // Bloom Fertility Centre" (Partner Editions D1, item 6). Null for a
+        // solo doctor, whose practice is herself, and for an org login.
+        final org = d == null ? null : session.orgName;
+        final sub = org == null ? cred : (cred.isEmpty ? org : '$cred · $org');
         final email = _signedInEmail();
         final p = dcP;
         final acct = DoctorLedger.instance.account;
@@ -200,7 +207,9 @@ class DoctorProfileTab extends StatelessWidget {
             // Developer: the stage toggle the old dashboard carried in its
             // header. A testing affordance for flipping between a pregnancy-
             // side and a parenting-side doctor; nothing a clinician needs.
-            if (d != null) ...[
+            // Debug and PV_DEV builds only (Partner Editions D1): in a store
+            // build it was one tap from becoming a different doctor.
+            if (d != null && _kDevTools) ...[
               const DcSectionHead('Developer'),
               DcCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -244,6 +253,12 @@ class DoctorProfileTab extends StatelessWidget {
   }
 }
 
+/// The parent app's switch (`kPvDevBuild`, pv_you_screen.dart), read here
+/// rather than imported so ParentVeda+ does not pull in the parent's You
+/// screen: debug runs, and builds made with --dart-define=PV_DEV=true. A
+/// store build passes neither.
+const bool _kDevTools = kDebugMode || bool.fromEnvironment('PV_DEV');
+
 /// The signed-in account's email, or null if there is no backend to ask.
 /// `Supabase.instance` THROWS when initialize() has not run; an uninitialised
 /// backend must behave exactly like being logged out, so the line hides.
@@ -274,9 +289,12 @@ Future<void> _signOut(BuildContext context) async {
     // Offline, or the token was already gone. Clearing the local identity is
     // still the right thing.
   }
-  DoctorSession.instance.clear();
-  DoctorLedger.instance.clear();
-  PartnerDashboardStore.instance.reset();
+  // Every doctor store, the reminders included (Partner Editions D1). It used
+  // to clear three of them; kept for revert:
+  // DoctorSession.instance.clear();
+  // DoctorLedger.instance.clear();
+  // PartnerDashboardStore.instance.reset();
+  await forgetDoctorOnThisPhone();
 }
 
 /// The circle: 104pt, the photograph or the initial on the neutral

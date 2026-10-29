@@ -164,6 +164,10 @@ class PrescriptionStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The same forgetting, for ParentVeda+'s sign-out, which does not run the
+  /// parent app's [SyncRegistry] wipe (Partner Editions D1).
+  void clear() => _resetForAccount();
+
   /// Pull every prescription this user may see (their own as a parent, or
   /// theirs as the hosting expert). Best-effort; keeps the cache on failure.
   Future<void> refresh() async {

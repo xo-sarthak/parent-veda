@@ -13,6 +13,7 @@
 
 import '../data/prepare_data.dart';
 import '../services/expert_store.dart';
+import 'doctor_session.dart' show DoctorPublicProfile;
 
 enum DoctorStage { pregnancy, parenting }
 
@@ -98,6 +99,35 @@ DoctorInfo? doctorInfoById(String id) {
     if (d.id == id) return d;
   }
   return null;
+}
+
+/// The signed-in doctor, from the catalogue OR from their own server row.
+///
+/// [doctorInfoById] knows only the compiled catalogue plus whatever
+/// ExpertStore has loaded. A doctor onboarded since the build, on a launch
+/// where ExpertStore has not answered yet (offline, or simply slower than the
+/// first frame), came back null, and every screen read null as "this is an
+/// organisation": the org-style Home, no consults, no schedule (Partner
+/// Editions D1, item 7). The session already holds her `expert_profiles` row
+/// (cached on the phone after the first fetch), so that row is the fallback.
+/// Still null when neither knows her, which stays the honest answer.
+DoctorInfo? doctorInfoFor(String id, {DoctorPublicProfile? profile}) {
+  final known = doctorInfoById(id);
+  if (known != null) return known;
+  if (profile == null || profile.expertId != id || profile.name.isEmpty) return null;
+  return DoctorInfo(
+    id: id,
+    name: profile.name,
+    credential: profile.credential,
+    category: profile.category,
+    blurb: profile.blurb,
+    rating: profile.rating > 0 ? profile.rating.toStringAsFixed(1) : '',
+    // Same mapping as allDoctors(), so one doctor cannot land on a different
+    // side depending on which source answered first.
+    stage: profile.domain == 'pregnancy'
+        ? DoctorStage.pregnancy
+        : DoctorStage.parenting,
+  );
 }
 
 /// Which stage an expert works in. Defaults to parenting for an unknown id —

@@ -93,6 +93,9 @@ class _DoctorScaffoldState extends State<DoctorScaffold>
     await Future.wait([
       DoctorRoster.instance.refresh(),
       PrescriptionStore.instance.refresh(),
+      // Her saved week, when this phone has none (new phone, or after a
+      // sign-out cleared it). A no-op once she has a local schedule.
+      DoctorScheduleStore.instance.restoreMine(DoctorSession.instance.expertId ?? ''),
       DoctorLedger.instance.refreshSummary(),
       // The itemised month feeds the bell ("you earned 1,920"), so it loads
       // with the summary rather than waiting for the Earnings tab.

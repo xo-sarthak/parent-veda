@@ -17,7 +17,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/care_partner/care_partner_models.dart';
 import 'package:parentveda/care_partner/partner_dashboard_store.dart';
+import 'package:parentveda/doctor/doctor_schedule.dart';
+import 'package:parentveda/doctor/doctor_schedule_store.dart';
 import 'package:parentveda/doctor/doctor_session.dart';
+import 'package:parentveda/doctor/doctor_sign_out.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // 2026-09-18: the live screens are the *_tab.dart files; the old ones are
 // kept for revert and no longer reachable, so the invariant is held on the
 // screens a partner actually sees.
@@ -163,6 +167,71 @@ void main() {
   // ---------------------------------------------------------------------
   // The half that is not Dart.
   // ---------------------------------------------------------------------
+  // Partner Editions D1, item 3. Every doctor store is a singleton that
+  // outlives the account; sign-out used to clear three of them, so the next
+  // doctor on the same phone inherited the last one's week, patients,
+  // prescriptions and reminders.
+  group('sign-out forgets every doctor store', () {
+    test('one function clears them all, reminders first', () {
+      final src = File('lib/doctor/doctor_sign_out.dart').readAsStringSync();
+      final body = src.substring(src.indexOf('Future<void> forgetDoctorOnThisPhone()'));
+      for (final call in const [
+        'DoctorReminders.instance.cancelAll()',
+        'DoctorSession.instance.clear()',
+        'DoctorRoster.instance.clear()',
+        'PrescriptionStore.instance.clear()',
+        'DoctorScheduleStore.instance.clearForSignOut()',
+        'DoctorLedger.instance.clear()',
+        'PartnerDashboardStore.instance.reset()',
+      ]) {
+        expect(body, contains(call), reason: '$call is missing from sign-out');
+      }
+      expect(body.indexOf('DoctorReminders'), lessThan(body.indexOf('DoctorSession')));
+    });
+
+    test('both sign-out paths go through it', () {
+      for (final f in const [
+        'lib/screens/doctor/doctor_profile_tab.dart',
+        'lib/screens/doctor/doctor_profile_screen.dart',
+      ]) {
+        final live = File(f)
+            .readAsStringSync()
+            .split('\n')
+            .where((l) => !l.trimLeft().startsWith('//'))
+            .join('\n');
+        expect(live, contains('await forgetDoctorOnThisPhone();'), reason: f);
+      }
+    });
+
+    test('doctor A signs out, doctor B signs in: none of A is left', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        // A reminder ladder armed for A's consult.
+        'doctor_reminders_armed': <String>['booking_of_a'],
+      });
+      final schedules = DoctorScheduleStore.instance;
+      await schedules.init();
+
+      DoctorSession.instance.enter('exp_meera');
+      PartnerDashboardStore.instance.debugSeed(partner: _doctor);
+      schedules.save('exp_meera', DoctorSchedule.starter);
+      expect(schedules.hasSetUp('exp_meera'), isTrue);
+
+      await forgetDoctorOnThisPhone();
+
+      expect(DoctorSession.instance.active, isFalse);
+      expect(DoctorSession.instance.expertId, isNull);
+      expect(PartnerDashboardStore.instance.partner, isNull);
+      expect(schedules.hasSetUp('exp_meera'), isFalse);
+      final sp = await SharedPreferences.getInstance();
+      expect(sp.getString('doctor_schedule_v1'), isNull);
+      expect(sp.getStringList('doctor_reminders_armed'), isEmpty);
+
+      DoctorSession.instance.enter('exp_other');
+      expect(schedules.hasSetUp('exp_meera'), isFalse,
+          reason: "B's phone must not hold A's week");
+    });
+  });
+
   group('migration 0068', () {
     final sql =
         File('supabase/migrations/0068_partner_accounts.sql').readAsStringSync();

@@ -69,6 +69,16 @@ class DoctorRoster extends ChangeNotifier {
     } catch (_) {/* keep whatever we have */}
   }
 
+  /// Sign-out: forget the server roster and who each booking was for. The
+  /// singleton outlives the account, so without this the next doctor to sign
+  /// in on the phone saw the last one's patients until the first refresh
+  /// answered, and kept them for good when it did not (Partner Editions D1).
+  void clear() {
+    _server = const [];
+    _patients.clear();
+    notifyListeners();
+  }
+
   List<Booking> _local(String expertId) {
     final cat = BookingCatalog.instance;
     return BookingStore.instance

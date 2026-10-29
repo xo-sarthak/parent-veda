@@ -13,6 +13,7 @@
 //  expert-accounts mapping), and the testing entry is removed.
 // =============================================================================
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -37,6 +38,8 @@ class DoctorPublicProfile {
     required this.feeInr,
     required this.rating,
     required this.takesConsults,
+    this.partnerId,
+    this.domain = 'universal',
   });
   final String expertId;
   final String name;
@@ -48,6 +51,13 @@ class DoctorPublicProfile {
   final int feeInr;
   final double rating;
   final bool takesConsults;
+  /// `expert_profiles.partner_id` (0072): the care_partners row this doctor
+  /// belongs to, or null. For a solo doctor it is their own partner row; for
+  /// a doctor inside a clinic it is the clinic (Partner Editions D1).
+  final String? partnerId;
+  /// pregnancy | parenting | ttc | universal (0072). Which side of the app
+  /// they work on, for a doctor the compiled catalogue does not know.
+  final String domain;
 
   factory DoctorPublicProfile.fromRow(Map r) => DoctorPublicProfile(
         expertId: (r['expert_id'] ?? '').toString(),
@@ -60,6 +70,8 @@ class DoctorPublicProfile {
         feeInr: (r['fee_inr'] as num?)?.toInt() ?? 0,
         rating: (r['rating'] as num?)?.toDouble() ?? 0,
         takesConsults: r['takes_consults'] != false,
+        partnerId: (r['partner_id'] as String?)?.trim().isEmpty ?? true ? null : (r['partner_id'] as String).trim(),
+        domain: (r['domain'] ?? 'universal').toString(),
       );
 
   Map<String, dynamic> toRow() => {
@@ -67,6 +79,7 @@ class DoctorPublicProfile {
         'category': category, 'location': location, 'blurb': blurb,
         'photo_url': photoUrl, 'fee_inr': feeInr, 'rating': rating,
         'takes_consults': takesConsults,
+        'partner_id': partnerId, 'domain': domain,
       };
 
   DoctorPublicProfile withPhoto(String? url) => DoctorPublicProfile.fromRow({...toRow(), 'photo_url': url});
@@ -88,6 +101,23 @@ class DoctorNotice {
         url: (r['url'] as String?)?.trim().isEmpty ?? true ? null : (r['url'] as String).trim(),
         startsAt: DateTime.tryParse((r['starts_at'] ?? '').toString()),
       );
+}
+
+/// What [DoctorSession.resolveFromServer] found out.
+///
+/// It used to be a bool, and "false" meant two different things: the server
+/// said this account is nobody, OR the server never answered. The boot path
+/// treated both as "show the sign-in screen", so a doctor opening the app
+/// offline saw twelve seconds of spinner and then a sign-in form, with her
+/// session still live and no word about why. Those need different screens:
+/// the first is "sign in as someone else", the second is "try again".
+enum DoctorResolve {
+  /// An expert or a partner identity was found; the session is active.
+  resolved,
+  /// The server answered and this account is neither (or nobody is signed in).
+  notADoctor,
+  /// The server did not answer in time, or failed. Identity UNKNOWN, not absent.
+  unreachable,
 }
 
 class DoctorSession extends ChangeNotifier {
@@ -116,6 +146,22 @@ class DoctorSession extends ChangeNotifier {
   DoctorPublicProfile? _profile;
   /// The doctor's own public card, or null until known. See [loadProfile].
   DoctorPublicProfile? get profile => _profile;
+
+  String? _orgPartnerId;
+  String? _orgName;
+
+  /// The organisation this doctor consults inside, when it is not themselves:
+  /// `expert_profiles.partner_id` pointing at a care_partners row whose
+  /// `expert_id` is someone else (a clinic, an IVF centre). Null for a solo
+  /// doctor, whose partner row IS them, and for an organisation login.
+  ///
+  /// D1 only makes the session KNOW this. D2 uses it to show the doctor their
+  /// own slice of the clinic's referrals (Partner Editions MASTER, R4).
+  String? get orgPartnerId => _orgPartnerId;
+
+  /// That organisation's public name, for the header ("Dr X · Bloom
+  /// Fertility Centre"). Null until known.
+  String? get orgName => _orgName;
 
   DoctorNotice? _notice;
   /// The one card from ParentVeda (0088), newest in window, or null.
@@ -218,6 +264,13 @@ class DoctorSession extends ChangeNotifier {
           _profile = DoctorPublicProfile.fromRow(jsonDecode(raw) as Map);
           notifyListeners();
         }
+        final org = sp.getString('doctor_org_$id');
+        if (org != null) {
+          final m = jsonDecode(org) as Map;
+          _orgPartnerId = m['id'] as String?;
+          _orgName = m['name'] as String?;
+          notifyListeners();
+        }
       } catch (_) {}
     }
     if (!SupabaseRepo.isLoggedIn) return;
@@ -232,6 +285,42 @@ class DoctorSession extends ChangeNotifier {
     } catch (_) {}
     notifyListeners();
     loadNotice();
+    _loadOrg(id, _profile!.partnerId);
+  }
+
+  /// Which organisation, if any, this doctor works inside. care_partners is
+  /// public-read (0037: a parent sees "Invited by ..." before signing up), so
+  /// this is a plain select of one public row, not an RPC.
+  ///
+  /// THE TEST FOR "AN ORGANISATION, NOT HERSELF" is the partner row's own
+  /// `expert_id`. A solo doctor's partner row points back at her own expert
+  /// id; a clinic's points at nobody, or at its lead doctor. Comparing names
+  /// would be guesswork; comparing ids is the fact.
+  Future<void> _loadOrg(String expertId, String? partnerId) async {
+    String? orgId;
+    String? orgName;
+    if (partnerId != null) {
+      final rows = await SupabaseRepo.selectPublicWhere('care_partners', 'id', partnerId);
+      if (rows == null) return; // offline: keep what the cache said
+      final cp = rows.isEmpty ? null : rows.first;
+      if (cp != null && cp['expert_id'] != expertId) {
+        orgId = partnerId;
+        final n = (cp['name'] ?? '').toString().trim();
+        orgName = n.isEmpty ? null : n;
+      }
+    }
+    if (_expertId != expertId) return; // signed out or switched meanwhile
+    _orgPartnerId = orgId;
+    _orgName = orgName;
+    try {
+      final sp = await SharedPreferences.getInstance();
+      if (orgId == null) {
+        await sp.remove('doctor_org_$expertId');
+      } else {
+        await sp.setString('doctor_org_$expertId', jsonEncode({'id': orgId, 'name': orgName}));
+      }
+    } catch (_) {}
+    notifyListeners();
   }
 
   /// True while the app should show the doctor experience.
@@ -274,6 +363,8 @@ class DoctorSession extends ChangeNotifier {
     _active = true;
     _expertId = expertId;
     _partnerId = null;
+    _orgPartnerId = null;
+    _orgName = null;
     notifyListeners();
     if (SupabaseRepo.isLoggedIn) {
       SupabaseRepo.callFunction('dev_claim_expert', {'p_expert_id': expertId})
@@ -320,9 +411,13 @@ class DoctorSession extends ChangeNotifier {
   /// from Dart. The timeout is the other half of "a cloud failure degrades to
   /// local-only"; without it the rule holds for errors and breaks for silence.
   ///
-  /// A timeout resolves to "no identity", the same answer as a refusal, so the
-  /// doctor sees the sign-in screen and can act. Six seconds because this blocks
-  /// a person looking at a spinner, not a background sync.
+  /// A timeout resolves to [DoctorResolve.unreachable], NOT to "no identity"
+  /// (Partner Editions D1). It used to be the same answer as a refusal, which
+  /// sent an offline doctor to the sign-in screen with a live session. Six
+  /// seconds because this blocks a person looking at a spinner, not a
+  /// background sync; and a timeout on the FIRST question skips the second,
+  /// because a network that ignored one call will ignore the next for the
+  /// same six seconds (that is where the old twelve came from).
   /// Link this account to the expert an admin invited it as (0084:
   /// expert_invites → claim_expert_invite). Idempotent and silent: called on
   /// every sign-in, it finds nothing for an already-linked account and that
@@ -338,8 +433,12 @@ class DoctorSession extends ChangeNotifier {
     }
   }
 
-  Future<bool> resolveFromServer() async {
-    if (!SupabaseRepo.isLoggedIn) return false;
+  Future<DoctorResolve> resolveFromServer() async {
+    if (!SupabaseRepo.isLoggedIn) return DoctorResolve.notADoctor;
+
+    // Set when a question FAILED rather than answered "nobody". Only when
+    // every question answered do we know this account is not a doctor.
+    var failed = false;
 
     try {
       // expert_accounts is keyed on user_id and has no created_at, so order by
@@ -349,15 +448,23 @@ class DoctorSession extends ChangeNotifier {
           .timeout(_resolveDeadline);
       final expertId = rows.isEmpty ? null : rows.first['expert_id'] as String?;
       if (expertId != null && expertId.isNotEmpty) {
+        if (_expertId != expertId) {
+          _orgPartnerId = null;
+          _orgName = null;
+        }
         _active = true;
         _expertId = expertId;
         _partnerId = null;
         notifyListeners();
         // Not awaited: the card is a nicety, the dashboard is the point.
         loadProfile();
-        return true;
+        return DoctorResolve.resolved;
       }
+    } on TimeoutException catch (e) {
+      debugPrint('[doctor] expert_accounts lookup timed out: $e');
+      return DoctorResolve.unreachable;
     } catch (e) {
+      failed = true;
       // Named, not swallowed. "No expert record" and "could not reach the
       // server" produce the same screen, and telling them apart from the
       // outside is guesswork — which is exactly how this cost an evening.
@@ -373,14 +480,17 @@ class DoctorSession extends ChangeNotifier {
         _active = true;
         _expertId = null;
         _partnerId = id;
+        _orgPartnerId = null;
+        _orgName = null;
         notifyListeners();
-        return true;
+        return DoctorResolve.resolved;
       }
     } catch (e) {
+      failed = true;
       debugPrint('[doctor] my_care_partner lookup failed: $e');
     }
 
-    return false;
+    return failed ? DoctorResolve.unreachable : DoctorResolve.notADoctor;
   }
 
   /// Leave doctor mode entirely. Used when the doctor app signs out, so the
@@ -392,6 +502,8 @@ class DoctorSession extends ChangeNotifier {
     _partnerId = null;
     _profile = null;
     _notice = null;
+    _orgPartnerId = null;
+    _orgName = null;
     notifyListeners();
   }
 
@@ -406,6 +518,8 @@ class DoctorSession extends ChangeNotifier {
     _active = true;
     _expertId = null;
     _partnerId = partnerId;
+    _orgPartnerId = null;
+    _orgName = null;
     notifyListeners();
   }
 
@@ -415,6 +529,8 @@ class DoctorSession extends ChangeNotifier {
     _active = false;
     _expertId = null;
     _partnerId = null;
+    _orgPartnerId = null;
+    _orgName = null;
     notifyListeners();
   }
 }

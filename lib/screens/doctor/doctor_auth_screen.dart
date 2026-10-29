@@ -47,7 +47,9 @@ import 'doctor_chrome.dart';
 class DoctorAuthScreen extends StatefulWidget {
   const DoctorAuthScreen({super.key, required this.onSignedIn});
 
-  /// Called after a successful sign-in AND a successful identity resolve.
+  /// Called after a successful sign-in whose identity resolved, OR could not
+  /// be checked because the server did not answer (the app then shows its
+  /// offline screen rather than this one). Never for "not a doctor".
   final VoidCallback onSignedIn;
 
   @override
@@ -210,9 +212,17 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
   Future<void> _afterSignIn() async {
     if (!mounted) return;
     await DoctorSession.instance.claimInvite();
-    final ok = await DoctorSession.instance.resolveFromServer();
+    final result = await DoctorSession.instance.resolveFromServer();
     if (!mounted) return;
-    if (!ok) {
+    // Signed in, but the server did not say who this is. NOT "not
+    // registered": that would sign a real doctor out and tell her to email us
+    // because her network dropped (Partner Editions D1). The session stays
+    // and the app shows its offline screen, whose Try again resolves again.
+    if (result == DoctorResolve.unreachable) {
+      widget.onSignedIn();
+      return;
+    }
+    if (result == DoctorResolve.notADoctor) {
       await Supabase.instance.client.auth.signOut();
       if (!mounted) return;
       setState(() {

@@ -59,9 +59,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'doctor/doctor_schedule_store.dart';
 import 'doctor/doctor_session.dart';
 import 'screens/doctor/doctor_auth_screen.dart';
+import 'screens/doctor/doctor_cant_reach.dart';
 import 'screens/doctor/doctor_scaffold.dart';
 import 'services/expert_store.dart';
 import 'services/notification_service.dart';
+import 'services/remote/supabase_repo.dart';
 import 'supabase_config.dart';
 import 'theme/app_theme.dart';
 import 'localization/app_language.dart';
@@ -76,32 +78,57 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations(
       const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-  await Supabase.initialize(
-    url: SupabaseConfig.url,
-    publishableKey: SupabaseConfig.publishableKey,
-  );
-
-  runApp(const ParentVedaExpertApp());
+  runApp(ParentVedaExpertApp(backendUp: await startBackend()));
 }
 
+/// Starts Supabase; false when it threw. It used to be a bare await, so a
+/// failure here (corrupt local session storage, a bad config) was a crash on
+/// launch with no screen at all. The house rule is that an uninitialised
+/// backend behaves like being signed out, never like a crash; here it gets
+/// the can't-reach screen and a Try again (Partner Editions D1, item 1).
+Future<bool> startBackend() async {
+  try {
+    await Supabase.initialize(
+      url: SupabaseConfig.url,
+      publishableKey: SupabaseConfig.publishableKey,
+    );
+    return true;
+  } catch (e) {
+    debugPrint('[doctor] Supabase.initialize failed: $e');
+    return false;
+  }
+}
+
+/// Where the first screen stands. Only the BOOT; once [ready], whether a
+/// doctor is signed in is DoctorSession's answer (see build()).
+enum _Boot { booting, backendDown, offline, ready }
+
 class ParentVedaExpertApp extends StatefulWidget {
-  const ParentVedaExpertApp({super.key});
+  const ParentVedaExpertApp({super.key, this.backendUp = true});
+
+  /// False when [startBackend] failed: the app opens on the can't-reach screen
+  /// and asks the server nothing until Try again succeeds.
+  final bool backendUp;
 
   @override
   State<ParentVedaExpertApp> createState() => _ParentVedaExpertAppState();
 }
 
 class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
-  /// null = still deciding. Avoids a flash of the sign-in screen for a doctor
-  /// who is already signed in — which on a phone reads as "it logged me out"
-  /// and is the fastest way to lose trust in an app someone uses daily.
+  /// [_Boot.booting] = still deciding. Avoids a flash of the sign-in screen
+  /// for a doctor who is already signed in — which on a phone reads as "it
+  /// logged me out" and is the fastest way to lose trust in an app someone
+  /// uses daily.
   ///
-  /// ONLY tracks the FIRST resolve. Once that has happened, whether a doctor is
-  /// signed in is DoctorSession's answer, not this field's — see build(). It
-  /// used to be the only answer, which is why signing out was impossible: the
-  /// Profile cleared the session and this field never heard about it, so the
-  /// dashboard stayed on screen.
-  bool? _resolved;
+  /// ONLY tracks the BOOT. Once ready, whether a doctor is signed in is
+  /// DoctorSession's answer, not this field's — see build(). It used to be the
+  /// only answer, which is why signing out was impossible: the Profile cleared
+  /// the session and this field never heard about it, so the dashboard stayed
+  /// on screen.
+  ///
+  /// Kept for revert, the bool it replaced (it could not say "offline"):
+  /// bool? _resolved;
+  late _Boot _boot = widget.backendUp ? _Boot.booting : _Boot.backendDown;
 
   @override
   void initState() {
@@ -120,15 +147,43 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
     // Harmless-looking while every test doctor happened to be in the compiled
     // list. It would have failed on the first real onboarding, which is the
     // worst possible moment to find out.
-    ExpertStore.instance.ensureLoaded();
-    _resolve();
+    if (widget.backendUp) {
+      ExpertStore.instance.ensureLoaded();
+      _resolve();
+    }
   }
 
   Future<void> _resolve() async {
     // A session restored from disk still has to be checked against the server:
     // an expert who was unlinked yesterday must not open a dashboard today.
-    await DoctorSession.instance.resolveFromServer();
-    if (mounted) setState(() => _resolved = true);
+    var result = await DoctorSession.instance.resolveFromServer();
+    // Signed in but nobody: an invite accepted on ANOTHER device has not been
+    // claimed on this one, because only the sign-in screen claimed invites.
+    // Claim and ask once more before showing her the sign-in form (D1, item 8).
+    // Costs nothing for a doctor who resolved; only the unresolved pay for it.
+    if (result == DoctorResolve.notADoctor && SupabaseRepo.isLoggedIn) {
+      await DoctorSession.instance.claimInvite();
+      result = await DoctorSession.instance.resolveFromServer();
+    }
+    if (!mounted) return;
+    // Unreachable is NOT "signed out": her session is live and the server
+    // simply did not answer. The sign-in form would ask her to fix something
+    // that is not broken (D1, item 2).
+    setState(() => _boot = result == DoctorResolve.unreachable ? _Boot.offline : _Boot.ready);
+  }
+
+  /// Try again from either can't-reach state.
+  Future<void> _retry() async {
+    if (_boot == _Boot.backendDown) {
+      if (!await startBackend()) return;
+      ExpertStore.instance.ensureLoaded();
+    }
+    await _resolve();
+  }
+
+  /// The sign-in screen's "done": resolved, or signed in but unreachable.
+  void _afterSignIn() {
+    setState(() => _boot = DoctorSession.instance.active ? _Boot.ready : _Boot.offline);
   }
 
   @override
@@ -163,9 +218,18 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
       home: ListenableBuilder(
         listenable: DoctorSession.instance,
         builder: (context, _) {
-          if (_resolved != true) return const _Booting();
+          switch (_boot) {
+            case _Boot.booting:
+              return const _Booting();
+            case _Boot.backendDown:
+              return DoctorCantReach(onRetry: _retry);
+            case _Boot.offline:
+              return DoctorCantReach(onRetry: _retry, signedIn: true);
+            case _Boot.ready:
+              break;
+          }
           if (DoctorSession.instance.active) return const DoctorScaffold();
-          return DoctorAuthScreen(onSignedIn: () => setState(() {}));
+          return DoctorAuthScreen(onSignedIn: _afterSignIn);
         },
       ),
     );

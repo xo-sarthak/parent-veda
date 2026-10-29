@@ -622,6 +622,23 @@ directory. Owed: nothing crops the picture — the avatar shows a centre
 square of whatever was chosen; a square crop step is the next thing if
 doctors send landscape shots.
 
+**5.4q Identity and boot hardening (Partner Editions D1, 2026-10-29) — BUILT,
+not walked.** `docs/partner-editions/DOCTOR-APP.md` §D1, all eight items. A
+backend that will not start, and a server that does not answer, both land on
+one can't-reach screen with Try again (`doctor_cant_reach.dart`), never a
+crash or the sign-in form; `resolveFromServer` returns `DoctorResolve`
+(`resolved | notADoctor | unreachable`). Sign-out runs one function,
+`forgetDoctorOnThisPhone()` (`lib/doctor/doctor_sign_out.dart`): every doctor
+store plus the reminders it armed. "Test as" is debug/`PV_DEV` only. `0132`
+orders `my_care_partner()`. The session knows a member doctor's clinic
+(`orgPartnerId`, `orgName`; shown under her name on Profile) and builds an
+unknown expert from her own `expert_profiles` row. The boot claims an invite
+accepted on another phone. Found on the way and fixed: the doctor app never
+PULLED a schedule, so a doctor on a new phone got the starter week and her
+next save overwrote the real one (`DoctorScheduleStore.restoreMine`). Owed:
+the walk — sign out as one doctor and in as another; airplane mode at launch.
+§5.4n's "kit shows the demo identity" is D2's, not closed here.
+
 **5.4i Kept for revert, unreachable:** `doctor_home_screen.dart`,
 `doctor_appointments_screen.dart`, `doctor_schedule_screen.dart`,
 `doctor_impact_tab.dart`, `doctor_earnings_screen.dart`,

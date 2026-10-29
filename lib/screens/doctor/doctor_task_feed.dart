@@ -62,7 +62,7 @@ class DoctorFeed {
   /// Reads the stores. Call inside a ListenableBuilder over them.
   factory DoctorFeed.now() {
     final session = DoctorSession.instance;
-    final e = session.consults ? doctorInfoById(session.expertId!) : null;
+    final e = session.consults ? doctorInfoFor(session.expertId!, profile: session.profile) : null;
     final roster = DoctorRoster.instance;
     final ledger = DoctorLedger.instance;
     final upcoming = e == null ? const <Booking>[] : roster.upcomingConsults(e.id);
