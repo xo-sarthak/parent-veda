@@ -49,6 +49,18 @@ import 'ttc_stage_search.dart';
 import 'ttc_tests_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../services/pregnancy_records.dart' show PregnancyRecords;
+import '../../ttc/cycle_store.dart';
+
+/// What placed her fertile days this cycle, for Ask Veda (T2, 2026-10-29):
+/// 'lh', 'temperature', or null for her period dates. The engine's order: a
+/// positive LH test wins over a temperature rise (`estimatedOvulationDay`).
+/// The service drops it on a medicated cycle, so this does not check.
+String? ttcAskVedaWindowSource() {
+  final cycle = CycleStore.instance;
+  if (cycle.lhPositiveDay != null) return 'lh';
+  if (cycle.temperatureShiftDay != null) return 'temperature';
+  return null;
+}
 
 /// What these lists have to clear at the bottom: the pinned composer, and
 /// nothing else.
@@ -167,6 +179,9 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       monthsTrying: days == null ? null : s.tryingTime?.months,
       // PRIVACY: her cycle day never leaves the partner's device. See the header.
       cycleDay: widget.partnerMode ? null : s.today.cycleDay,
+      // T2 (2026-10-29): a test or a temperature rise moved her window, so
+      // the answer must not recount it from her average. Hers, like the day.
+      windowSource: widget.partnerMode ? null : ttcAskVedaWindowSource(),
       // Show her the cards in the language she's reading the app in.
       lang: TtcS.current().hinglish ? 'hi' : 'en',
       // Trying again after a loss she recorded (2026-10-26): gentle framing,

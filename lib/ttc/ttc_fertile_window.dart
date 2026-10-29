@@ -103,7 +103,8 @@ class TtcFertileWindow {
   /// Days from today until it opens. Zero when it is already open.
   final int daysUntilOpen;
 
-  /// How many days it spans, inclusive. Seven on the default model.
+  /// How many days it spans, inclusive. Six on the default model (five
+  /// before ovulation and the day itself; K9, 2026-10-29, was "Seven").
   int get lengthInDays => closesOn.difference(opensOn).inDays + 1;
 
   /// Every date in the window, in order. What the day-by-day bars iterate.

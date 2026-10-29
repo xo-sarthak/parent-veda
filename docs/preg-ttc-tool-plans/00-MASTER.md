@@ -219,6 +219,8 @@ Each family runs the same loop: read-only audit against the 8 points (severity o
 Each Pregnancy family starts with its C1 rows and the one-look move. C1 for the whole stage, with its test, lands as one small build after A's Tools-tab order commit, the way Parenting's C1 did. T1 can run alongside the Pregnancy families because it touches no Tools-tab or door file.
 
 ## Hand-over list for Terminal A (door, home and router files)
+**Status (2026-10-29):** Terminal A did items 1, 2, 3 and 5, plus the owed after-loss hero lines, the bag-on-Partner tile, the "Contraction timer" name and the router's `afterLossNote` and pregnancy pass, in **29077918** (PREGNANCY-GAP 35). **Item 4 (labels that over-promise and tile-name drift) is still open**; T2 adds its own lines to it below.
+
 1. PG3: the Garbh "Choose something else to read" silent tap (`pv_door_router.dart:455, 461`).
 2. PG4: the Labour and Complications consult tiles land on the Scans version.
 3. PG6: does any home tile still reach the silent community return (`home_v3_screen.dart:2027`)?

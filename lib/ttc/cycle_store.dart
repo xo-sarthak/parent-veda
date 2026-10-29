@@ -323,12 +323,18 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   /// clears them on the way out. Correcting a date by one day would quietly
   /// erase everything she recorded about that cycle -- and nothing would look
   /// wrong afterwards, which is the worst shape a data loss can take.
-  void movePeriodStart(DateTime from, DateTime to) {
+  ///
+  /// ⚠️ RETURNS WHETHER IT MOVED (T2 B1, 2026-10-29). A move onto a day that
+  /// already holds a period is refused, and it used to be refused silently:
+  /// the sheet then wrote this period's bleed days onto the OTHER period and
+  /// said "Changed to …". A caller that writes anything after a move must
+  /// check this first. `mergePeriodStart` is the honest way onto a taken day.
+  bool movePeriodStart(DateTime from, DateTime to) {
     final a = _dayOnly(from);
     final b = _dayOnly(to);
-    if (_sameDay(a, b)) return;
-    if (!_periodStarts.any((e) => _sameDay(e, a))) return;
-    if (_periodStarts.any((e) => _sameDay(e, b))) return;
+    if (_sameDay(a, b)) return false;
+    if (!_periodStarts.any((e) => _sameDay(e, a))) return false;
+    if (_periodStarts.any((e) => _sameDay(e, b))) return false;
 
     final bleed = _bleedDays.remove(_key(a));
     final lh = _lhPositive.remove(_key(a));
@@ -357,6 +363,50 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     }
     _persist();
     notifyListeners();
+    return true;
+  }
+
+  /// Folds the period logged on [from] into the one already logged on [into]
+  /// (T2 B1): she corrected a date onto a day that holds a period, and said
+  /// they are the same period.
+  ///
+  /// The period on [into] WINS. What it already carries stays; what only
+  /// [from] carried (a bleed length, an LH day, a temperature shift) moves
+  /// across, so a merge never loses a fact she recorded. Both cycle-day
+  /// signals count from the same day 1 after the merge, so they keep their
+  /// meaning. [from] leaves as a soft delete, exactly as a move does, so
+  /// every phone sees the merge. Returns false, changing nothing, unless both
+  /// days hold a period and they differ.
+  bool mergePeriodStart(DateTime from, DateTime into) {
+    final a = _dayOnly(from);
+    final b = _dayOnly(into);
+    if (_sameDay(a, b)) return false;
+    if (!_periodStarts.any((e) => _sameDay(e, a))) return false;
+    if (!_periodStarts.any((e) => _sameDay(e, b))) return false;
+
+    final bleed = _bleedDays.remove(_key(a));
+    final lh = _lhPositive.remove(_key(a));
+    final temp = _tempShift.remove(_key(a));
+    _periodStarts.removeWhere((e) => _sameDay(e, a));
+    _tomb(_cRow(a));
+    if (lh != null) _tomb(_sRow('lh', a));
+    if (temp != null) _tomb(_sRow('temperature', a));
+
+    if (bleed != null && !_bleedDays.containsKey(_key(b))) {
+      _bleedDays[_key(b)] = bleed;
+    }
+    if (lh != null && !_lhPositive.containsKey(_key(b))) {
+      _lhPositive[_key(b)] = lh;
+      _touch(_sRow('lh', b));
+    }
+    if (temp != null && !_tempShift.containsKey(_key(b))) {
+      _tempShift[_key(b)] = temp;
+      _touch(_sRow('temperature', b));
+    }
+    _touch(_cRow(b));
+    _persist();
+    notifyListeners();
+    return true;
   }
 
   /// Everything hanging off a period start, so a removal can be put back.

@@ -59,6 +59,9 @@ import 'ttc_common.dart';
 import '../../ttc/ttc_cycle_report.dart' show ttcCycleWindowStartsInPeriod;
 import 'ttc_cycle_companion.dart'
     show
+        kTtcAfterLossCycleLine,
+        kTtcLogMyPeriod,
+        ttcCycleAfterLoss,
         showTtcPeriodDateActions,
         showTtcPeriodLogSheet,
         ttcShortDate,
@@ -78,6 +81,11 @@ import 'ttc_timeline_screen.dart';
 import 'ttc_window_screen.dart' show ttcWindowForHim;
 import 'ttc_treatment_screen.dart' show openTtcTreatment;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart' show pvToast;
+
+/// K5 (T2, 2026-10-29): what a greyed day action says when tapped.
+const String kTtcCalendarFutureDayLine =
+    "That day hasn't come yet. You can log it on the day, or any time after.";
 
 class TtcCalendarScreen extends StatefulWidget {
   const TtcCalendarScreen({super.key});
@@ -1521,6 +1529,9 @@ class _DayPanel extends StatelessWidget {
     required bool enabled,
     required VoidCallback onTap,
   }) {
+    // ⚠️ NO SILENT TAP (T2 K5, 2026-10-29). A greyed action did nothing at
+    // all when tapped; now it says why, and what to do instead. Kept for
+    // revert: onTap: enabled ? onTap : null, on the Semantics and the InkWell.
     final body = Container(
       constraints: const BoxConstraints(minHeight: 44),
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -1541,18 +1552,23 @@ class _DayPanel extends StatelessWidget {
         ),
       ]),
     );
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: label,
-      onTap: enabled ? onTap : null,
-      excludeSemantics: true,
-      child: InkWell(
-        onTap: enabled ? onTap : null,
-        borderRadius: BorderRadius.circular(999),
-        child: enabled ? body : Opacity(opacity: 0.42, child: body),
-      ),
-    );
+    // A Builder for the toast's context: this panel is stateless.
+    return Builder(builder: (context) {
+      void tap() =>
+          enabled ? onTap() : pvToast(context, kTtcCalendarFutureDayLine);
+      return Semantics(
+        button: true,
+        enabled: enabled,
+        label: label,
+        onTap: tap,
+        excludeSemantics: true,
+        child: InkWell(
+          onTap: tap,
+          borderRadius: BorderRadius.circular(999),
+          child: enabled ? body : Opacity(opacity: 0.42, child: body),
+        ),
+      );
+    });
   }
 
   /// One fact on the day. With [onTap] it opens what it names, and says so
@@ -1697,9 +1713,15 @@ class _CalendarIntro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final empty = CycleStore.instance.periodStarts.isEmpty;
+    // ⚠️ T2 W13 (2026-10-29): after a loss the log is not empty, so this read
+    // "no estimate" and offered nothing. It says what restarts her cycle and
+    // offers the one action, as the Cycle Companion does.
+    final afterLoss = ttcCycleAfterLoss();
     final clinic = !TtcStore.instance.behaviour.showsFertilityWindow;
     final hasRound = ttcCalendarRound() != null;
-    final text = empty
+    final text = afterLoss
+        ? ttcWindowForHim(kTtcAfterLossCycleLine)
+        : empty
         ? kTtcCalendarIntroEmpty
         : clinic
             ? kTtcCalendarIntroClinic
@@ -1711,6 +1733,12 @@ class _CalendarIntro extends StatelessWidget {
     // His side (2026-10-16): her dates and her clinic's are hers to add.
     final (String, IconData, VoidCallback)? action = TtcPartnerMode.instance.on
         ? null
+        : afterLoss
+        ? (
+            kTtcLogMyPeriod,
+            Icons.add_rounded,
+            () => showTtcPeriodLogSheet(context),
+          )
         : empty
         ? (
             kTtcCalendarAddPeriod,

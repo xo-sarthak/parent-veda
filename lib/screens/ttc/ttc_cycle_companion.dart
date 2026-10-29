@@ -69,6 +69,7 @@ import 'ttc_cycle_headline.dart';
 import 'ttc_partner_home.dart' show TtcPartnerViewOnlyLine;
 import 'ttc_window_screen.dart' show ttcWindowForHim;
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/pv_toast.dart' show pvToast;
 import '../doors/pv_list_row.dart' show PvListRow, PvRowGroup;
 import 'ttc_cycle_hub.dart';
 import 'ttc_ovulation_screen.dart' show kTtcOvPositive, ttcOvResultOn;
@@ -541,7 +542,37 @@ class _CompanionSheet extends StatelessWidget {
   // ⚠️ `TtcCycleCard`, NOT `TtcCard`, ON EVERY CARD HERE (2026-09-27): the
   // V1 card's violet drop shadow was the old look; the base UI is a hairline.
   // Kept for revert: TtcCard( at the four call sites.
-  List<Widget> _empty(BuildContext context) => [
+  List<Widget> _empty(BuildContext context) =>
+      ttcCycleAfterLoss() ? _afterLoss(context) : _firstDate(context);
+
+  /// ⚠️ AFTER A LOSS NOTHING IS HIDDEN (T2 W12, 2026-10-29). The screen fell
+  /// to the first-date ladder ("Your rhythm starts with one date") with no
+  /// dates and no history, as if she had never logged a period. Her history
+  /// stays; one line says what restarts her cycle, and one action logs it.
+  List<Widget> _afterLoss(BuildContext context) => [
+        TtcCycleCard(
+          key: const ValueKey('ttc_companion_after_loss'),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(_his(kTtcAfterLossCycleLine),
+                style: ttcBody(14,
+                    h: 1.55, color: ttcTitleInk, w: FontWeight.w600)),
+            const SizedBox(height: 16),
+            if (TtcPartnerMode.instance.on)
+              TtcPartnerViewOnlyLine(p: p, text: kTtcPartnerDatesEmpty)
+            else
+              _QuietAction(
+                  key: const ValueKey('ttc_companion_after_loss_log'),
+                  label: kTtcLogMyPeriod,
+                  onTap: () => showTtcPeriodLogSheet(context)),
+          ]),
+        ),
+        const SizedBox(height: 28),
+        ..._dates(context),
+        const SizedBox(height: 24),
+        _Estimates(p: p),
+      ];
+
+  List<Widget> _firstDate(BuildContext context) => [
         TtcCycleCard(
           child: Column(children: [
             Text('Your rhythm starts with one date',
@@ -935,7 +966,13 @@ class _TtcPeriodHistoryScreenState extends State<TtcPeriodHistoryScreen> {
             onPicture: (_) {},
             onOpenRow: (d) => setState(() => _openRow = d),
           );
-          final showsRhythm = CycleStore.instance.cycleLengths.isNotEmpty;
+          // W2 (2026-10-29): the hub's refusal withholds her lengths on a
+          // history that looks like a missed log; Period history now does too.
+          // Kept for revert:
+          //   final showsRhythm = CycleStore.instance.cycleLengths.isNotEmpty;
+          final showsRhythm = CycleStore.instance.cycleLengths.isNotEmpty &&
+              !const TtcChapterEngine()
+                  .hasUnreliableHistory(TtcStore.instance.state());
           return Scaffold(
             backgroundColor: p.ground,
             body: SafeArea(
@@ -1306,6 +1343,17 @@ class _DayCell extends StatelessWidget {
 //  Your rhythm
 // =============================================================================
 
+/// ⚠️ ONE GATE FOR "NEXT PERIOD EXPECTED" (T2 W1/W2, 2026-10-29). The hub's
+/// rhythm card and Period history both printed the date on a clinic cycle,
+/// where `countsToPeriod` is false (the clinic owns the timing), and Period
+/// history printed it on a history the engine had called a missed log. Every
+/// place that draws the date asks this, so the two refusals hold everywhere.
+bool _mayPredictNext() {
+  final store = TtcStore.instance;
+  return store.behaviour.countsToPeriod &&
+      !const TtcChapterEngine().hasUnreliableHistory(store.state());
+}
+
 class _RhythmCard extends StatelessWidget {
   const _RhythmCard({required this.p});
   final V2Palette p;
@@ -1363,7 +1411,9 @@ class _RhythmCard extends StatelessWidget {
               '${spread != null && spread <= 4 ? '. That\'s a steady rhythm.' : '.'}'),
               style: ttcBody(13, h: 1.45, color: ttcSoft)),
         ],
-        if (next != null) ...[
+        // W1/W2: on a clinic cycle the lengths stay (they are her history)
+        // and the prediction goes. Kept for revert: if (next != null) ...[
+        if (next != null && _mayPredictNext()) ...[
           const SizedBox(height: 16),
           ttcDivider(),
           const SizedBox(height: 14),
@@ -1455,7 +1505,7 @@ class _DateRowState extends State<_DateRow> {
       if (meta.isNotEmpty) meta.write(' · ');
       meta.write(bleed == kBleedStillOn
           ? 'still on'
-          : '$bleed bleeding ${bleed == 1 ? 'day' : 'days'}');
+          : ttcBleedDaysLabel(bleed));
     }
 
     final offset = widget.open ? -_kRowReveal : _drag;
@@ -1760,7 +1810,7 @@ class _PeriodActionsSheet extends StatelessWidget {
       if (bleed == kBleedStillOn)
         'Still on'
       else if (bleed != null)
-        '$bleed bleeding ${bleed == 1 ? 'day' : 'days'}'
+        ttcBleedDaysLabel(bleed)
       else
         'Bleeding days not added',
       if (cycle != null) 'a ${cycle.days}-day cycle',
@@ -1932,7 +1982,75 @@ class _PeriodActionsSheet extends StatelessWidget {
 /// what the picture needs — the report bands the first stretch by a NUMBER of
 /// days, not by a second date. An end date is a second date-picker and invites
 /// the state where she never comes back to close it.
-const List<int> kTtcBleedChoices = [3, 4, 5, 6, 7];
+///
+/// ⚠️ 2 TO 7, PLUS "MORE THAN 7" (T2 K2, 2026-10-29). The old 3 to "7+" could
+/// not record a 2-day period, and "7+" stored 7, so a 10-day bleed read as an
+/// ordinary week. "More than 7" is stored as [kTtcBleedMoreThanSeven] and
+/// brings the calm doctor line. Kept for revert: [3, 4, 5, 6, 7].
+const List<int> kTtcBleedChoices = [2, 3, 4, 5, 6, 7, kTtcBleedMoreThanSeven];
+
+/// "More than 7", as stored. Any count over 7 reads the same way.
+const int kTtcBleedMoreThanSeven = 8;
+
+/// A bleed count in words: "5 bleeding days", "more than 7 bleeding days".
+String ttcBleedDaysLabel(int n) => n > 7
+    ? 'more than 7 bleeding days'
+    : '$n bleeding ${n == 1 ? 'day' : 'days'}';
+
+// ---- doctor lines (T2 K3, 2026-10-29) ---------------------------------------
+//  Only under-21 cycles had a calm word. Three more, each a fact about her own
+//  record and "worth mentioning to a doctor", never a verdict. Cycles over 35
+//  days (ACOG; the NHS says up to 40, and we take the earlier limit), no
+//  period for 90 days, bleeding for more than 7. A BEFORE-LAUNCH clinician
+//  CHECK line holds each number.
+
+/// Over this, a cycle is a long one worth a calm word.
+const int kTtcLongCycleDays = 35;
+
+/// This long since her last period, with a negative test, is worth a word.
+const int kTtcNoPeriodDays = 90;
+
+/// The calm doctor line for a period that lasted more than 7 days.
+const String kTtcLongBleedLine =
+    "A period that lasts more than 7 days is worth mentioning to a doctor, "
+    'especially if it keeps happening.';
+
+/// Her record's doctor lines, worst first. Empty is the normal answer. A
+/// cycle the engine reads as a missed log is not counted as long.
+List<String> ttcCycleDoctorLines({DateTime? now}) {
+  final cycle = CycleStore.instance;
+  const engine = TtcChapterEngine();
+  final lengths = cycle.cycleLengths;
+  final recent =
+      lengths.length <= 6 ? lengths : lengths.sublist(lengths.length - 6);
+  final long = [
+    for (final l in recent)
+      if (l > kTtcLongCycleDays && !engine.looksLikeMissedLog(l, lengths)) l
+  ];
+  final out = <String>[];
+  final last = cycle.lastPeriodStart;
+  if (last != null) {
+    final n = now ?? DateTime.now();
+    final since = DateTime(n.year, n.month, n.day)
+        .difference(DateTime(last.year, last.month, last.day))
+        .inDays;
+    if (since >= kTtcNoPeriodDays) {
+      out.add("It's been more than $kTtcNoPeriodDays days since your last "
+          "period. If a pregnancy test is negative, it's worth mentioning to "
+          'a doctor.');
+    }
+    final bleed = cycle.bleedDaysFor(last);
+    if (bleed != null && bleed > 7) out.add(kTtcLongBleedLine);
+  }
+  if (long.isNotEmpty) {
+    out.add(long.length == 1
+        ? 'One of your recent cycles ran longer than $kTtcLongCycleDays days. '
+            "If that keeps happening, it's worth mentioning to a doctor."
+        : '${long.length} of your recent cycles ran longer than '
+            "$kTtcLongCycleDays days. It's worth mentioning to a doctor.");
+  }
+  return out;
+}
 
 /// Opens the log sheet. Pass [correcting] to move an existing date instead.
 ///
@@ -2185,6 +2303,39 @@ class _LogSheetState extends State<_LogSheet> {
   bool get _duplicateBleedChanged =>
       _duplicate && CycleStore.instance.bleedDaysFor(_picked!) != _bleed;
 
+  /// ⚠️ A CORRECTION ONTO A DAY THAT HOLDS ANOTHER PERIOD (T2 B1, 2026-10-29).
+  /// `_duplicate` skips edits, so this case used to fall through to `_save`:
+  /// the store refused the move without a word, the sheet then wrote this
+  /// period's bleed days onto the OTHER period, and the toast said "Changed
+  /// to …". Now the sheet asks before anything is written: merge the two, or
+  /// pick another day.
+  bool get _editCollision =>
+      _isEdit &&
+      _picked != null &&
+      !_sameDay(_picked!, widget.correcting!) &&
+      CycleStore.instance.periodStarts.any((s) => _sameDay(s, _picked!));
+
+  /// "Merge into that period": the period on the picked day wins and keeps
+  /// its own details; anything only this one carried moves across
+  /// (`CycleStore.mergePeriodStart`).
+  void _mergeIntoPicked() {
+    final picked = _picked;
+    final from = widget.correcting;
+    if (picked == null || from == null) return;
+    final merged = CycleStore.instance.mergePeriodStart(from, picked);
+    HapticFeedback.selectionClick();
+    final navigator = Navigator.of(context);
+    navigator.maybePop();
+    if (widget.notify) {
+      pvSnack(
+          navigator.context,
+          merged
+              ? 'Merged into the period starting ${ttcShortDate(picked)}.'
+              : 'Nothing changed. Those dates could not be merged.',
+          icon: merged ? Icons.check_rounded : Icons.info_outline_rounded);
+    }
+  }
+
   // ⚠️ EVERY WAY IN ASKS, NOT ONLY THE HOME'S (2026-10-16). The user: "make
   // sure that the user cannot keep logging random dates." The home's sheet
   // already asked when a date sat under 15 days from a logged start; this
@@ -2228,9 +2379,9 @@ class _LogSheetState extends State<_LogSheet> {
     final n = _nearest;
     final picked = _picked;
     if (n == null || picked == null) return;
-    CycleStore.instance
-      ..movePeriodStart(n.$1, picked)
-      ..logBleedDays(picked, _bleed);
+    // B1: bleed days follow only a move that happened.
+    final store = CycleStore.instance;
+    if (store.movePeriodStart(n.$1, picked)) store.logBleedDays(picked, _bleed);
     HapticFeedback.selectionClick();
     final navigator = Navigator.of(context);
     navigator.maybePop();
@@ -2335,10 +2486,15 @@ class _LogSheetState extends State<_LogSheet> {
           note = 'Saved';
         }
       case TtcHomePeriodIntent.move:
-        store.movePeriodStart(anchor!, picked);
-        store.logBleedDays(picked, _bleed);
-        note = 'Moved to ${ttcShortDate(picked)}';
-        undo = () => store.movePeriodStart(picked, anchor);
+        // B1: never write bleed days onto a period the move did not reach.
+        if (store.movePeriodStart(anchor!, picked)) {
+          store.logBleedDays(picked, _bleed);
+          note = 'Moved to ${ttcShortDate(picked)}';
+          undo = () => store.movePeriodStart(picked, anchor);
+        } else {
+          note = 'Nothing changed. ${ttcShortDate(picked)} already has a '
+              'period logged.';
+        }
       case TtcHomePeriodIntent.first:
       case TtcHomePeriodIntent.newCycle:
       case TtcHomePeriodIntent.earlier:
@@ -2433,7 +2589,22 @@ class _LogSheetState extends State<_LogSheet> {
       // the LH strip and the temperature shift — all keyed by the start date —
       // so correcting a date by one day would silently erase everything she
       // recorded about that cycle. See `CycleStore.movePeriodStart`.
-      store.movePeriodStart(widget.correcting!, picked);
+      // B1 (2026-10-29): a refused move writes nothing and says so. Kept for
+      // revert: store.movePeriodStart(widget.correcting!, picked);
+      final moved = _sameDay(widget.correcting!, picked) ||
+          store.movePeriodStart(widget.correcting!, picked);
+      if (!moved) {
+        final navigator = Navigator.of(context);
+        navigator.maybePop();
+        if (widget.notify) {
+          pvSnack(
+              navigator.context,
+              'Nothing changed. ${ttcShortDate(picked)} already has a '
+              'period logged.',
+              icon: Icons.info_outline_rounded);
+        }
+        return;
+      }
     } else {
       store.logPeriodStart(picked);
     }
@@ -2559,7 +2730,11 @@ class _LogSheetState extends State<_LogSheet> {
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     for (final n in kTtcBleedChoices)
                       _Chip(
-                        label: n == kTtcBleedChoices.last ? '$n+' : '$n',
+                        // K2. Kept for revert:
+                        //   label: n == kTtcBleedChoices.last ? '$n+' : '$n',
+                        label: n == kTtcBleedMoreThanSeven
+                            ? 'More than 7'
+                            : '$n',
                         on: _bleed == n,
                         onTap: () =>
                             setState(() => _bleed = _bleed == n ? null : n),
@@ -2576,6 +2751,14 @@ class _LogSheetState extends State<_LogSheet> {
                       'Choose "Still on" if it hasn\'t finished. You can change '
                       'this later.',
                       style: ttcBody(13, h: 1.45)),
+                  // K2/K3: "More than 7" says the calm doctor line at once.
+                  if (_bleed != null && _bleed! > 7) ...[
+                    const SizedBox(height: 8),
+                    Text(kTtcLongBleedLine,
+                        key: const ValueKey('ttc_period_long_bleed_line'),
+                        style: ttcBody(13,
+                            h: 1.45, color: ttcTitleInk, w: FontWeight.w600)),
+                  ],
 
                   const SizedBox(height: 22),
                   if (_homeIntent case final intent?) ...[
@@ -2637,7 +2820,41 @@ class _LogSheetState extends State<_LogSheet> {
                       ),
                       const SizedBox(height: 12),
                     ],
-                    if (_tooClose) ...[
+                    if (_editCollision) ...[
+                      // B1: said before the tap, and nothing written yet.
+                      Container(
+                        key: const ValueKey('ttc_period_collision_line'),
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: const Border.fromBorderSide(
+                              BorderSide(color: ttcLine)),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Text(
+                            'You already logged a period starting '
+                            '${ttcShortDate(_picked!)}. If they are the same '
+                            'period, merge them. Otherwise, pick another day.',
+                            style: ttcBody(13.5,
+                                color: ttcTitleInk,
+                                w: FontWeight.w600,
+                                h: 1.45)),
+                      ),
+                      const SizedBox(height: 12),
+                      _QuietAction(
+                        key: const ValueKey('ttc_period_merge'),
+                        label: 'Merge into that period',
+                        onTap: _mergeIntoPicked,
+                      ),
+                      const SizedBox(height: 10),
+                      _QuietAction(
+                        key: const ValueKey('ttc_period_pick_again'),
+                        label: 'Pick another day',
+                        muted: true,
+                        onTap: () => setState(() => _picked = null),
+                      ),
+                    ] else if (_tooClose) ...[
                       Container(
                         key: const ValueKey('ttc_period_too_close_line'),
                         width: double.infinity,
@@ -2839,7 +3056,12 @@ class _PickCell extends StatelessWidget {
     final isToday = _sameDay(date, today);
 
     return GestureDetector(
-      onTap: future ? null : () => onPick(date),
+      // K5 (2026-10-29): a future day says why it can't be picked. Kept for
+      // revert: onTap: future ? null : () => onPick(date),
+      onTap: future
+          ? () => pvToast(context,
+              "A period can't start on a future day. Pick today or earlier.")
+          : () => onPick(date),
       behavior: HitTestBehavior.opaque,
       child: Container(
         alignment: Alignment.center,
@@ -3105,8 +3327,25 @@ class _Estimates extends StatelessWidget {
   const _Estimates({required this.p});
   final V2Palette p;
 
+  // K3 (2026-10-29): her record's doctor lines sit above the disclaimer,
+  // on the hub, on both refusals and on Period history. Kept for revert:
+  // the Row below, returned alone.
   @override
-  Widget build(BuildContext context) => Row(
+  Widget build(BuildContext context) {
+    final lines = ttcCycleDoctorLines();
+    if (lines.isEmpty) return _disclaimer();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      for (final l in lines) ...[
+        Text(_his(l),
+            key: const ValueKey('ttc_cycle_doctor_line'),
+            style: ttcBody(13.5, h: 1.45, color: ttcTitleInk, w: FontWeight.w600)),
+        const SizedBox(height: 10),
+      ],
+      _disclaimer(),
+    ]);
+  }
+
+  Widget _disclaimer() => Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.info_outline_rounded, size: 16, color: ttcMuted),
@@ -3188,4 +3427,29 @@ String _his(String s) => ttcWindowForHim(s);
 
 const String kTtcPartnerDatesViewOnly =
     'Her dates, as she logs them. Only she can change them.';
-const String kTtcPartnerDatesEmpty = 'Her dates show here once she adds them.';
+// ⚠️ T2 W14 (2026-10-29): he has no read policy on her period dates (0041,
+// own rows only), so "once she adds them" was a promise nothing kept. The
+// user decided (Q2) that her dates stay hers; his copy now says what he
+// really sees. Kept for revert:
+//   'Her dates show here once she adds them.'
+const String kTtcPartnerDatesEmpty =
+    'Only she sees her period dates. You see her fertile window and where '
+    'she is in her cycle.';
+
+/// After a loss, before her first period since (T2 W12/W13, 2026-10-29): the
+/// Cycle Companion and the Calendar say the same line and offer the same
+/// action, and both keep her history on screen. No baby wording.
+const String kTtcAfterLossCycleLine =
+    'Your cycle starts again from your first period after the loss. Log it '
+    'when it comes.';
+const String kTtcLogMyPeriod = 'Log my period';
+
+/// Whether the cycle screens are in the after-loss state: a loss restarts her
+/// cycle (`CycleStore.restartOn`), no period is logged since, and her older
+/// history is still there to show.
+bool ttcCycleAfterLoss() {
+  final cycle = CycleStore.instance;
+  return cycle.restartOn != null &&
+      cycle.lastPeriodStart == null &&
+      cycle.periodStarts.isNotEmpty;
+}

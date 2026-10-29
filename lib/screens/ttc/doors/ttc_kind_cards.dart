@@ -440,7 +440,10 @@ String? ttcCardReadMinutes(TtcTile t) {
 /// 'See your report', and 'Open the tool' as the fallback.
 String ttcToolVerb(String surfaceId, [String? title]) => switch (surfaceId) {
   'ttc_window' => 'See your best days',
-  'ttc_cycle' || 'ttc_calendar' => 'Open the calendar',
+  // T2 W15 (2026-10-29): Cycle Companion is not the calendar. Kept for
+  // revert: 'ttc_cycle' || 'ttc_calendar' => 'Open the calendar',
+  'ttc_cycle' => 'Open Cycle Companion',
+  'ttc_calendar' => 'Open the calendar',
   'ttc_symptom_log' => "Log today's symptoms",
   'ttc_fertility_help' => 'Take the fertility check',
   'ttc_pcos_check' => 'Take the PCOS check',

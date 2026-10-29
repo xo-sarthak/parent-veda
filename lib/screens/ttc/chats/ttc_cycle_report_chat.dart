@@ -24,6 +24,9 @@ import 'package:flutter/material.dart';
 import '../../../ttc/cycle_store.dart';
 import '../../../ttc/ttc_cycle_report.dart';
 import '../../../ttc/ttc_period_due.dart';
+import '../ttc_cycle_companion.dart'
+    show kTtcLongBleedLine, ttcCycleDoctorLines;
+import '../ttc_cycle_report_screen.dart' show TtcCycleReportScreen;
 import 'ttc_chat.dart';
 
 /// What the chat says about one cycle, gathered before it speaks.
@@ -38,6 +41,8 @@ class TtcCycleReportFacts {
     this.lengthNote,
     this.loggedDays = 0,
     this.findings = const [],
+    this.index = 0,
+    this.recordLines = const [],
   });
 
   /// The last COMPLETED cycle when there is one, else the one she is in.
@@ -49,9 +54,13 @@ class TtcCycleReportFacts {
     final report = ttcBuildCycleReport(index: index);
     final start = report.start;
     if (start == null) return const TtcCycleReportFacts();
-    final spans = ttcCyclePhaseSpans(index: index);
-    final fertile =
-        spans.where((s) => s.phase == TtcPhase.fertileWindow).firstOrNull;
+    // ⚠️ W10 (2026-10-29): the report's own whole window, not the
+    // period-wins spans, so the chat and the report name the same days.
+    // Kept for revert:
+    //   final spans = ttcCyclePhaseSpans(index: index);
+    //   final fertile =
+    //       spans.where((s) => s.phase == TtcPhase.fertileWindow).firstOrNull;
+    final fertile = ttcCycleWindowSpan(index: index);
     return TtcCycleReportFacts(
       start: start,
       ranDays: cycle.cycleFrom(start)?.days,
@@ -64,8 +73,18 @@ class TtcCycleReportFacts {
       lengthNote: index == 1 ? ttcCycleLengthNote() : null,
       loggedDays: report.loggedCount,
       findings: report.findings,
+      index: index,
+      recordLines: ttcCycleDoctorLines(),
     );
   }
+
+  /// W9: which cycle the chat describes, so "See the full report" opens the
+  /// report on the same one (0 is the cycle she is in, 1 the last finished).
+  final int index;
+
+  /// K3: the doctor lines from her whole record (`ttcCycleDoctorLines`), as
+  /// the Cycle Companion shows them, so the chat checks more than one cycle.
+  final List<String> recordLines;
 
   final DateTime? start;
 
@@ -161,9 +180,19 @@ class TtcCycleReportChat extends TtcChatScript {
       [
         // Kept for revert (2026-09-28, explicit labels): 'What should I do with this?'
         TtcChatChoice('What should I do with this report?', next: nextStep),
-        const TtcChatChoice('See the full report', open: ['ttc_cycle_report']),
+        // W9: opens on the cycle the chat described. Kept for revert:
+        //   const TtcChatChoice('See the full report', open: ['ttc_cycle_report']),
+        TtcChatChoice('See the full report', action: _openReport),
       ],
     );
+  }
+
+  Future<TtcChatReply?> _openReport(BuildContext context) async {
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'ttc_cycle_report'),
+      builder: (_) => TtcCycleReportScreen(initialIndex: facts.index),
+    ));
+    return null;
   }
 
   /// The things in this cycle worth showing a doctor if they keep happening.
@@ -181,6 +210,15 @@ class TtcCycleReportChat extends TtcChatScript {
     return out;
   }
 
+  /// K3: what her whole record says, beyond this one cycle. A line already
+  /// covered by [worthShowing] for this cycle is not said twice.
+  List<String> get fromRecord => [
+        for (final l in facts.recordLines)
+          if (!(l == kTtcLongBleedLine &&
+              worthShowing.contains('a period that lasts more than 7 days')))
+            l
+      ];
+
   TtcChatStep nextStep() {
     final flags = worthShowing;
     return TtcChatStep(
@@ -190,11 +228,12 @@ class TtcCycleReportChat extends TtcChatScript {
         else
           'Worth showing a doctor if this keeps happening: '
               '${flags.join(', and ')}.',
+        ...fromRecord,
         "This describes what you logged. It isn't a diagnosis.",
       ],
-      const [
-        TtcChatChoice('See the full report', open: ['ttc_cycle_report']),
-        TtcChatChoice('Done', done: true),
+      [
+        TtcChatChoice('See the full report', action: _openReport),
+        const TtcChatChoice('Done', done: true),
       ],
     );
   }

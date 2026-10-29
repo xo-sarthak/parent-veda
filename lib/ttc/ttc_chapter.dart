@@ -548,7 +548,8 @@ class TtcChapterEngine {
   /// Graded fertility for a given cycle day. Returns null when we hold back.
   ///
   /// Sperm survive around five days; the egg around a day. So the window is
-  /// ovulation-5 → ovulation+1, graded rather than flagged.
+  /// ovulation-5 → ovulation, graded rather than flagged (K9, 2026-10-29:
+  /// this said ovulation+1, from before the window closed on ovulation).
   FertilityLevel? fertilityFor(TtcJourneyState s, int? day) {
     // Unless her body owns the timing, there is no calendar answer worth
     // giving. Refusing here means no screen can render one, however it asks.

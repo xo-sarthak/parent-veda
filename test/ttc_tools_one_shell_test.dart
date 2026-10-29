@@ -29,6 +29,7 @@ import 'package:parentveda/screens/ttc/ttc_supplements_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_tests_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_tool_chrome.dart';
 import 'package:parentveda/screens/ttc/ttc_vaccines_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_window_screen.dart';
 import 'package:parentveda/ttc/ttc_supplements_store.dart';
 
 Future<void> _pumpPhone(WidgetTester tester, Widget child,
@@ -66,7 +67,20 @@ void main() {
     ('Weight', const TtcBmiScreen()),
     ('Pre-pregnancy checklist', const TtcPrecheckScreen()),
     ('Pre-pregnancy checklist', const TtcPrecheckSummaryScreen()),
+    // T2 K8 (2026-10-29): the fertile window drew the shell's parts by hand.
+    ('Fertile window', const TtcWindowScreen()),
   ];
+
+  // ⚠️ THE ALLOW-LIST (T2 K8, 2026-10-29): Tools tiles that do NOT wear
+  // `TtcToolScaffold`, each with its reason, so a new exception is a decision
+  // someone wrote down and not a page nobody moved.
+  //  * "Should I test?" and "My cycle report" (chats): the shared chat shell
+  //    (`TtcChatScreen`), one shape for every guided conversation.
+  //  * Cycle Companion: its hero is the week strip (2026-10-17, the user, on
+  //    Clue and Flo: "everything is there under a single screen"). Kept as
+  //    it is (the user, 2026-10-29, T2 Q3).
+  //  * Calendar: a page of today under `TtcPage`, opened from the home's
+  //    header (2026-09-27). Kept as it is (the user, 2026-10-29, T2 Q3).
 
   // Tools that already wore the shell, whose eyebrow named something else.
   final renamed = <(String, Widget)>[

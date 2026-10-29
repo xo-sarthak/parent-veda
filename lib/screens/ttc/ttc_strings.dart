@@ -1053,8 +1053,13 @@ class TtcS {
   //  that is a reading, not a task. Someone who already knows this subject
   //  needed none of it; someone who does not learned nothing.
 
+  // ⚠️ T2 W6 (2026-10-29): a positive marks the LAST two days, the best
+  // ones (the surge comes 24 to 36 hours before ovulation), not "the window
+  // opening". Kept for revert: "…and that's what makes it useful. It tells
+  // you the window is opening, not that it has closed." The Hinglish side is
+  // left as it was (English-only policy, 2026-08-27).
   String get ovulationLhWhat => _p(
-      "A stick you pee on, from any chemist, around ₹30 to ₹60 each. It turns positive a day or two before you ovulate, and that's what makes it useful. It tells you the window is opening, not that it has closed.",
+      "A stick you pee on, from any chemist, around ₹30 to ₹60 each. It turns positive a day or two before you ovulate, which makes today and tomorrow your best two days.",
       'Kisi bhi pharmacy se milne wali stick, lagbhag ₹30–60 ki. Ovulation se ek-do din PEHLE positive aati hai - isiliye kaam ki hai. Ye batati hai ki window khul rahi hai, band nahi hui.');
 
   String get ovulationBbtWhat => _p(

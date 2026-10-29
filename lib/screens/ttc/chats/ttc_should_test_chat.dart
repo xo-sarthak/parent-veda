@@ -35,8 +35,34 @@ import '../../../ttc/ttc_period_due.dart';
 import '../../../ttc/ttc_store.dart';
 import '../../../ttc/ttc_treatment_store.dart';
 import '../../../widgets/pv_date_sheet.dart';
+import '../ttc_strings.dart' show TtcPartnerMode;
 import '../ttc_transition_screen.dart';
+import '../ttc_window_screen.dart' show ttcHerVoice;
 import 'ttc_chat.dart';
+
+/// How long after a loss "Should I test?" reads a test differently, at most
+/// (T2 W7, 2026-10-29). NHS and RCOG: hCG can take weeks to clear after a
+/// miscarriage. The rule ends sooner when her first period after the loss is
+/// logged, because that period restarts her cycle. A BEFORE-LAUNCH clinician
+/// CHECK line holds the number.
+const int kTtcAfterLossTestDays = 42;
+
+/// The after-loss line, said first.
+const String kTtcAfterLossTestLine =
+    'After a loss, a test can stay positive for a few weeks while your body '
+    'settles.';
+
+/// Whether a test result is read the after-loss way today: a loss is
+/// recorded (`CycleStore.restartOn`), no period has been logged since, and
+/// the loss was under [kTtcAfterLossTestDays] ago.
+bool ttcTestAfterLoss({DateTime? now}) {
+  final cycle = CycleStore.instance;
+  final restart = cycle.restartOn;
+  if (restart == null || cycle.lastPeriodStart != null) return false;
+  final n = now ?? DateTime.now();
+  final days = DateTime(n.year, n.month, n.day).difference(restart).inDays;
+  return days >= 0 && days < kTtcAfterLossTestDays;
+}
 
 /// What the chat reads, gathered once when it opens.
 class TtcShouldTestFacts {
@@ -48,6 +74,8 @@ class TtcShouldTestFacts {
     this.irregular = false,
     this.betaDate,
     this.firstCycle = false,
+    this.afterLoss = false,
+    this.forHim = false,
   });
 
   factory TtcShouldTestFacts.fromStores() {
@@ -94,6 +122,8 @@ class TtcShouldTestFacts {
       irregular: engine.isIrregular(state),
       betaDate: TtcTreatmentStore.instance.cycle.betaTest,
       firstCycle: cycle.cycleLengths.isEmpty,
+      afterLoss: ttcTestAfterLoss(),
+      forHim: TtcPartnerMode.instance.on,
     );
   }
 
@@ -107,6 +137,15 @@ class TtcShouldTestFacts {
   /// No completed cycle yet, so any due date is the first-cycle estimate
   /// (stated length, else 28 days) and the chat says it is early.
   final bool firstCycle;
+
+  /// W7: a recent loss with no period since (`ttcTestAfterLoss`). A positive
+  /// may be hCG still clearing, so no branch says "big news" or offers
+  /// "I'm pregnant"; each one routes to a doctor's blood test.
+  final bool afterLoss;
+
+  /// W8: the partner is reading. Lines are about her ("Her period is due"),
+  /// and nothing records or logs from his side.
+  final bool forHim;
 }
 
 /// The line every dated branch adds on a first cycle: the same "early
@@ -145,8 +184,10 @@ class TtcShouldTestChat extends TtcChatScript {
       bool? saveStatedLength})
       : facts = facts ?? TtcShouldTestFacts.fromStores(),
         // A test that hands in its own facts is describing a history the
-        // stores do not hold, so its answers are not saved to them.
-        saveStatedLength = saveStatedLength ?? facts == null;
+        // stores do not hold, so its answers are not saved to them. His
+        // answers are never saved as her length (W8).
+        saveStatedLength = saveStatedLength ??
+            (facts == null && !TtcPartnerMode.instance.on);
 
   /// Whether a length she gives the chat is kept as her stated length.
   final bool saveStatedLength;
@@ -185,8 +226,19 @@ class TtcShouldTestChat extends TtcChatScript {
   @override
   TtcChatStep start() {
     final first = begin();
-    return TtcChatStep([kOpening, ...first.say], first.choices);
+    return TtcChatStep([
+      kOpening,
+      // W7: said first, before any date or branch.
+      if (facts.afterLoss) _v(kTtcAfterLossTestLine),
+      ...first.say,
+    ], first.choices);
   }
+
+  bool get _him => facts.forHim;
+
+  /// W8: his lines are about her. Kept for revert: every line said as is.
+  String _v(String s) => _him ? ttcHerVoice(s) : s;
+  List<String> _vs(List<String> l) => [for (final s in l) _v(s)];
 
   /// The advice for what the chat knows right now.
   TtcTestAdvice get advice => ttcTestAdvice(
@@ -199,6 +251,11 @@ class TtcShouldTestChat extends TtcChatScript {
 
   /// Step 2: read her dates, then branch.
   TtcChatStep begin() {
+    final step = _begin();
+    return TtcChatStep(_vs(step.say), step.choices);
+  }
+
+  TtcChatStep _begin() {
     final a = advice;
     return switch (a.branch) {
       TtcTestBranch.clinic => clinic(),
@@ -249,10 +306,10 @@ class TtcShouldTestChat extends TtcChatScript {
   }
 
   TtcChatStep askLength(DateTime start) => TtcChatStep(
-        [
+        _vs([
           'Your last period started on ${ttcDayDate(start)}.',
           'About how long are your cycles, from one period to the next?',
-        ],
+        ]),
         [
           TtcChatChoice('About 21 to 25 days', next: () => withLength(23)),
           TtcChatChoice('About 26 to 30 days', next: () => withLength(28)),
@@ -267,18 +324,27 @@ class TtcShouldTestChat extends TtcChatScript {
     // Kept as her stated usual length (2026-09-26), so the first cycle she
     // logs is predicted from what she told us rather than from 28 days. The
     // engine reads it only until a cycle completes.
-    if (saveStatedLength) TtcStore.instance.setStatedCycleLength(days);
-    return begin();
+    // K7 (2026-10-29): said, not silent. Kept for revert:
+    //   if (saveStatedLength) TtcStore.instance.setStatedCycleLength(days);
+    //   return begin();
+    if (!saveStatedLength) return begin();
+    TtcStore.instance.setStatedCycleLength(days);
+    final next = begin();
+    return TtcChatStep([
+      'Saved: about $days days as your usual cycle length, until a full '
+          'cycle is logged.',
+      ...next.say,
+    ], next.choices);
   }
 
   /// When nobody knows the due date: the three-week rule.
   TtcChatStep threeWeeks() => TtcChatStep(
-        const [
+        _vs(const [
           "That's okay. When you don't know when your period is due, a test "
               'is reliable about three weeks after the last time you had sex '
               'without contraception.',
           "If that's today or earlier, you can test now.",
-        ],
+        ]),
         [
           // Kept for revert (2026-09-28, explicit labels): 'How do I take it?'
           TtcChatChoice('How do I take a test?', next: () => howTo(null)),
@@ -332,12 +398,12 @@ class TtcShouldTestChat extends TtcChatScript {
   }
 
   TtcChatStep earlyMore(TtcTestAdvice a) => TtcChatStep(
-        [
+        _vs([
           'Some sensitive tests can pick up hCG a few days before a period is '
               'due. Many pregnancies still show negative that early, though.',
           "If you test early and it's negative, test again from "
               '${ttcShortDay(a.due!)}.',
-        ],
+        ]),
         const [
           TtcChatChoice('Read: when to test', open: kTtcReadWhenToTest),
           TtcChatChoice('Done', done: true),
@@ -365,8 +431,9 @@ class TtcShouldTestChat extends TtcChatScript {
       [
         // Kept for revert (2026-09-28, explicit labels): 'How do I take it?', 'I took one already'
         TtcChatChoice('How do I take a test?', next: () => howTo(a)),
-        TtcChatChoice('I took a test already', next: () => result(a)),
-        if (a.looksStale)
+        TtcChatChoice(_him ? 'She took a test already' : 'I took a test already',
+            next: () => result(a)),
+        if (a.looksStale && !_him)
           const TtcChatChoice('Log a period', open: ['ttc_cycle']),
         TtcChatChoice("I'll test later", next: later),
       ],
@@ -374,7 +441,7 @@ class TtcShouldTestChat extends TtcChatScript {
   }
 
   TtcChatStep howTo(TtcTestAdvice? a) => TtcChatStep(
-        const [
+        _vs(const [
           'Use your first wee of the morning if you can. It has the most hCG '
               'in it.',
           'Follow the timing on the packet, and read the result within the '
@@ -382,10 +449,11 @@ class TtcShouldTestChat extends TtcChatScript {
           'Any line in the result window counts, even a faint one, as long as '
               'it shows up in that time. A line that appears later than that '
               "doesn't count.",
-        ],
+        ]),
         [
           // Kept for revert (2026-09-28, explicit labels): "I've taken it"
-          TtcChatChoice("I've taken the test", next: () => result(a)),
+          TtcChatChoice(_him ? 'She has taken the test' : "I've taken the test",
+              next: () => result(a)),
           const TtcChatChoice('Read: how to test', open: kTtcReadHowToTest),
           TtcChatChoice("I'll test later", next: later),
         ],
@@ -395,25 +463,65 @@ class TtcShouldTestChat extends TtcChatScript {
         // Kept for revert (2026-09-28, explicit labels): 'What did it show?'
         const ['What did the test show?'],
         [
-          TtcChatChoice('Positive', next: positive),
+          // W7: after a loss a positive takes the after-loss branch.
+          TtcChatChoice('Positive',
+              next: facts.afterLoss ? afterLossPositive : positive),
           TtcChatChoice('Negative', next: () => negative(a)),
-          TtcChatChoice('A faint line', next: faint),
+          TtcChatChoice('A faint line',
+              next: facts.afterLoss ? afterLossFaint : faint),
           TtcChatChoice("I'll test later", next: later),
         ],
       );
 
   TtcChatStep positive() => TtcChatStep(
-        const [
+        _vs(const [
           "That's big news, and it's okay to feel lots of things at once.",
           'A doctor can confirm it with a blood test or a scan, and start your '
               "care. There's no rush today.",
           'If you have strong pain low in your belly, especially on one side, '
               'or heavy bleeding, see a doctor straight away.',
-        ],
+        ]),
         [
-          TtcChatChoice("I'm pregnant", action: _recordPositive), // was 'Record my positive test' (2026-10-10)
-          // Kept for revert (2026-09-28, explicit labels): 'Log it for today'
-          const TtcChatChoice('Log the test for today', open: kTtcLogResult),
+          // W8: nothing records from his side.
+          if (!_him) ...[
+            TtcChatChoice("I'm pregnant", action: _recordPositive), // was 'Record my positive test' (2026-10-10)
+            // Kept for revert (2026-09-28, explicit labels): 'Log it for today'
+            const TtcChatChoice('Log the test for today', open: kTtcLogResult),
+          ],
+          const TtcChatChoice('Done', done: true),
+        ],
+      );
+
+  /// W7: a positive in the weeks after a loss. No "big news", no "I'm
+  /// pregnant": a doctor's blood test tells hCG still clearing from a new
+  /// pregnancy. The safety line stays.
+  TtcChatStep afterLossPositive() => TtcChatStep(
+        _vs(const [
+          kTtcAfterLossTestLine,
+          'So a positive now may be the hormone from your last pregnancy '
+              "still clearing. It doesn't tell you either way.",
+          'Your doctor can check with a blood test, which can tell the two '
+              'apart.',
+          'If you have strong pain low in your belly, especially on one side, '
+              'or heavy bleeding, see a doctor straight away.',
+        ]),
+        [
+          if (!_him)
+            const TtcChatChoice('Log the test for today', open: kTtcLogResult),
+          const TtcChatChoice('Done', done: true),
+        ],
+      );
+
+  /// W7: a faint line after a loss reads the same way as a positive.
+  TtcChatStep afterLossFaint() => TtcChatStep(
+        _vs(const [
+          'A faint line in the weeks after a loss is often the hormone from '
+              'your last pregnancy, slowly clearing.',
+          'Your doctor can check with a blood test, which can tell that '
+              'apart from a new pregnancy.',
+        ]),
+        [
+          if (!_him) const TtcChatChoice('Log the result', open: kTtcLogResult),
           const TtcChatChoice('Done', done: true),
         ],
       );
@@ -430,8 +538,14 @@ class TtcShouldTestChat extends TtcChatScript {
         a.branch == TtcTestBranch.dueToday ||
         (a.branch == TtcTestBranch.late && a.daysLate < 3);
     return TtcChatStep(
-      [
-        if (early)
+      _vs([
+        // W7: after a loss the first period is the clearer sign.
+        if (facts.afterLoss) ...[
+          'In the weeks after a loss, a test is harder to read. Your first '
+              'period after the loss is the clearest sign your cycle has '
+              'started again.',
+          "If you're worried, your doctor can check with a blood test.",
+        ] else if (early)
           'A test on the day your period is due can still miss an early '
               "pregnancy. If your period hasn't come in three days, test "
               'again.'
@@ -441,17 +555,18 @@ class TtcShouldTestChat extends TtcChatScript {
             'more, book a visit with your doctor. Cycles can shift for lots '
             'of reasons, like stress, illness or travel, and your doctor can '
             'help find out why.',
-      ],
-      const [
-        TtcChatChoice('Log the result', open: kTtcLogResult),
-        TtcChatChoice('Read: late and negative', open: kTtcReadLateNegative),
-        TtcChatChoice('Done', done: true),
+      ]),
+      [
+        if (!_him) const TtcChatChoice('Log the result', open: kTtcLogResult),
+        const TtcChatChoice('Read: late and negative',
+            open: kTtcReadLateNegative),
+        const TtcChatChoice('Done', done: true),
       ],
     );
   }
 
   TtcChatStep faint() => TtcChatStep(
-        const [
+        _vs(const [
           'A faint line that shows up within the reading time usually means '
               "the test picked up hCG. It's often just early, when there's "
               'only a little of it.',
@@ -459,11 +574,11 @@ class TtcShouldTestChat extends TtcChatScript {
               'usually clearer by then.',
           "Either way, it's a good time to see your doctor, who can check "
               'with a blood test.',
-        ],
-        const [
-          TtcChatChoice('Read: faint lines', open: kTtcReadFaintLine),
-          TtcChatChoice('Log the result', open: kTtcLogResult),
-          TtcChatChoice('Done', done: true),
+        ]),
+        [
+          const TtcChatChoice('Read: faint lines', open: kTtcReadFaintLine),
+          if (!_him) const TtcChatChoice('Log the result', open: kTtcLogResult),
+          const TtcChatChoice('Done', done: true),
         ],
       );
 

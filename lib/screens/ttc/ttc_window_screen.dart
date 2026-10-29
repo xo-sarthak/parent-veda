@@ -64,7 +64,9 @@ import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_companion.dart' show TtcCycleCompanionScreen;
+import 'ttc_ovulation_screen.dart' show ttcWindowSourceLine;
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart' show TtcToolLeading, TtcToolScaffold;
 import 'ttc_tool_marks.dart' show ttcToolHeaderMark;
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_treatment_screen.dart' show TtcTreatmentEntryCard;
@@ -87,9 +89,12 @@ const double kWindowHue = TtcCycleColours.fertileHue;
 /// Her window, read from his side (2026-10-10): the same facts about HER.
 /// Swaps only the forms that cannot go wrong ("your", "you're", "you
 /// ovulate"); a bare "you" can be an object ("tells you") and is left alone.
-String ttcWindowForHim(String s) => !TtcPartnerMode.instance.on
-    ? s
-    : s
+String ttcWindowForHim(String s) =>
+    !TtcPartnerMode.instance.on ? s : ttcHerVoice(s);
+
+/// The swaps behind [ttcWindowForHim], without the partner check, for a
+/// script that already knows who is reading (T2 W8, "Should I test?").
+String ttcHerVoice(String s) => s
         .replaceAll("you're", "she's")
         .replaceAll("You're", "She's")
         .replaceAll('the day you ovulate', 'the day she ovulates')
@@ -121,6 +126,52 @@ String ttcWindowIntroLine() {
   return ttcWindowForHim('Your fertile window is the $days days ending on the day you '
       'ovulate. These are your fertile days, the days you\'re most likely to '
       'get pregnant, and they\'re coloured below.');
+}
+
+/// ⚠️ THE WINDOW STATES ITS BASIS WHEN THE BASIS IS THIN (T2 W4, 2026-10-29).
+/// The engine already grades a first or irregular cycle `low`, and the screen
+/// never read it: the six days were drawn with the same confidence as after a
+/// year of steady logs. Withholding them would hide the feature (Flo and Clue
+/// both draw a first estimate), so the days stay and one line says what they
+/// rest on. Null when the basis is ordinary, or when a test or a temperature
+/// rise set the days (the source line says so then).
+String? ttcWindowBasisLine() {
+  if (ttcWindowSourceLine()?.fromTest ?? false) return null;
+  const engine = TtcChapterEngine();
+  final s = TtcStore.instance.state();
+  if (engine.confidence(s) != OvulationConfidence.low) return null;
+  // Only where days are drawn. Not `whyNoEstimate`: it says
+  // `notEnoughHistory` on a first cycle that the engine still places from 28
+  // days, which is exactly the case this line is for.
+  if (ttcFertileWindowNow() == null) return null;
+  final him = TtcPartnerMode.instance.on;
+  if (engine.isIrregular(s)) {
+    return him
+        ? 'Her cycles vary, so these days are a wide guess. An ovulation '
+            'test narrows them.'
+        : 'Your cycles vary, so these days are a wide guess. An ovulation '
+            'test narrows them.';
+  }
+  if (s.cycleLengths.isEmpty) {
+    final stated = s.statedCycleLength;
+    final told = stated != null &&
+        stated >= TtcChapterEngine.statedLengthMin &&
+        stated <= TtcChapterEngine.statedLengthMax;
+    final from = told
+        ? (him ? 'the length she told us' : 'the length you told us')
+        : 'a 28-day cycle';
+    return him
+        ? 'A first estimate from $from. It sharpens after her next period.'
+        : 'A first estimate from $from. It sharpens after your next period.';
+  }
+  if (s.cycleLengths.length == 1) {
+    return him
+        ? 'An estimate from her one full cycle so far. It sharpens as she '
+            'logs more.'
+        : 'An estimate from your one full cycle so far. It sharpens as you '
+            'log more.';
+  }
+  return null;
 }
 
 /// Which picture the "Across this cycle" card is showing.
@@ -228,7 +279,45 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
         final p = V2PaletteStore.instance.current;
         final store = TtcStore.instance;
         final today = store.today;
+        final clinic = !today.behaviour.showsFertilityWindow;
 
+        // ⚠️ ONE SHELL WITH EVERY OTHER TOOL (T2 K8, 2026-10-29). This page
+        // drew its own field, hero and sheet: the same parts as
+        // `TtcToolScaffold`, by hand, a few points off. Now it wears the shell:
+        // the eyebrow is the Tools tile's name, the title says what the page
+        // shows, and the intro is the one-sentence definition. W3: on a clinic
+        // cycle neither the intro nor the cycle-day line is drawn. Back, not
+        // close: a destination inside the stage, as before.
+        final now = DateTime.now();
+        final date = '${now.day} ${_months[now.month - 1]}';
+        return TtcToolScaffold(
+          hue: kWindowHue,
+          variant: 2,
+          toolId: 'window',
+          leading: TtcToolLeading.back,
+          eyebrow: t.fertilityWindow,
+          title: clinic ? t.fertilityWindow : t.windowYourDays,
+          intro: clinic ? null : ttcWindowIntroLine(),
+          children: [
+            if (!clinic) ...[
+              Text(
+                  today.cycleDay == null
+                      ? 'Today is $date'
+                      : ttcWindowForHim(
+                          'Today is day ${today.cycleDay} of your cycle · $date'),
+                  key: const ValueKey('ttc_window_today_line'),
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: p.ink2)),
+              const SizedBox(height: 18),
+            ],
+            ..._sheetChildren(t, p, today),
+          ],
+        );
+
+        // Kept for revert (K8): the page's own field, hero and sheet.
+        // ignore: dead_code
         return Scaffold(
           backgroundColor: p.ground,
           body: Stack(children: [
@@ -257,6 +346,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   // ---------------------------------------------------------------------------
   //  Hero — chroma lives here, and the ink on it is dark
   // ---------------------------------------------------------------------------
+  // Kept for revert (K8, 2026-10-29): the shell draws the hero now.
+  // ignore: unused_element
   Widget _hero(TtcS t, V2Palette p, TtcToday today) {
     // The date, not the month alone (2026-09-27: it read "Cycle day 9 · Sep").
     // Kept for revert: `final month = _months[DateTime.now().month - 1];`
@@ -317,18 +408,26 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           // that those six are her fertile days. Kept for revert:
           //   "The six days each cycle when you're most likely to get "
           //   'pregnant. The coloured days below are yours.',
-          Text(ttcWindowIntroLine(),
-              key: const ValueKey('ttc_window_intro'),
-              style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1)),
-          const SizedBox(height: 8),
-          // Kept for revert: 'Cycle day ${today.cycleDay} · $month'.
-          Text(
-              today.cycleDay == null
-                  ? 'Today is $month'
-                  : ttcWindowForHim(
-                      'Today is day ${today.cycleDay} of your cycle · $month'),
-              style: pvManrope(
-                  fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
+          // ⚠️ NOT ON A CLINIC CYCLE (T2 W3, 2026-10-29). The intro promised
+          // days "coloured below" and the line under it counted her cycle
+          // day, over a sheet that draws neither: the clinic owns the timing.
+          // The treatment card and the disclaimer below stay.
+          if (today.behaviour.showsFertilityWindow) ...[
+            Text(ttcWindowIntroLine(),
+                key: const ValueKey('ttc_window_intro'),
+                style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1)),
+            const SizedBox(height: 8),
+            // Kept for revert: 'Cycle day ${today.cycleDay} · $month'.
+            Text(
+                today.cycleDay == null
+                    ? 'Today is $month'
+                    : ttcWindowForHim(
+                        'Today is day ${today.cycleDay} of your cycle · $month'),
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: p.ink2)),
+          ],
         ]),
       ),
     );
@@ -337,9 +436,9 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   // ---------------------------------------------------------------------------
   //  Sheet
   // ---------------------------------------------------------------------------
+  // Kept for revert (K8, 2026-10-29): the shell draws the sheet now.
+  // ignore: unused_element
   Widget _sheet(TtcS t, V2Palette p, TtcToday today) {
-    final window = ttcWindowAhead(_cyclesAhead);
-
     return Container(
       // Full height, not 0.72 — see the note in ttc_tool_chrome.dart's sheet.
       constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height),
@@ -365,7 +464,16 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
         ],
       ),
       padding: const EdgeInsets.fromLTRB(18, 28, 18, 28 + ttcBottomInset),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _sheetChildren(t, p, today)),
+    );
+  }
+
+  /// What sits in the sheet, in the shell or (kept for revert) in [_sheet].
+  List<Widget> _sheetChildren(TtcS t, V2Palette p, TtcToday today) {
+    final window = ttcWindowAhead(_cyclesAhead);
+    return [
         // ⚠️ A CLINIC-RUN CYCLE REPLACES THE SCREEN, IT DOES NOT CAVEAT IT. The
         // six-day model is not merely unhelpful on a monitored cycle, it is the
         // wrong model — and drawing it with a footnote underneath would be us
@@ -407,8 +515,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           const SizedBox(height: 24),
           TtcDisclaimer(t: t),
         ],
-      ]),
-    );
+    ];
   }
 
   // ---------------------------------------------------------------------------
@@ -591,6 +698,21 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                 : status,
             style: pvManrope(
                 fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink1)),
+        // K6 (2026-10-29): where these days come from, as the hub and the
+        // report already say. W4: and, when it is thin, what that means.
+        if (w.cyclesAhead == 0)
+          if (ttcWindowSourceLine() case final src?) ...[
+            const SizedBox(height: 6),
+            Text(ttcWindowForHim(src.line),
+                key: const ValueKey('ttc_window_source_line'),
+                style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
+          ],
+        if (ttcWindowBasisLine() case final basis?) ...[
+          const SizedBox(height: 6),
+          Text(basis,
+              key: const ValueKey('ttc_window_basis_line'),
+              style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
+        ],
         const SizedBox(height: 14),
         Container(height: 1, color: p.line),
         const SizedBox(height: 14),
@@ -962,7 +1084,9 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
       -1 => 'The day before ovulation. One of your two best days.',
       -2 => 'Two days before ovulation is one of the stronger days.',
       -3 => 'Three days before ovulation, and rising.',
-      1 => 'The last day we show, in case ovulation came a day late.',
+      // K9 (2026-10-29): unreachable since the window closes on ovulation
+      // (`ttcWindowClosesAfterOvulation` is 0). Kept for revert:
+      //   1 => 'The last day we show, in case ovulation came a day late.',
       _ when days < -3 && _sameDay(date, w.opensOn) =>
         'The window opens. Sperm can already be waiting when the egg arrives.',
       _ when days < -3 =>
@@ -1203,7 +1327,12 @@ class _CurveView extends StatelessWidget {
           painter: _CurvePainter(
             window: window,
             cycleLength: len,
-            todayCycleDay: TtcStore.instance.today.cycleDay,
+            // K9 (2026-10-29): TODAY only on the cycle she is in; a cycle
+            // ahead has no today. Kept for revert:
+            //   todayCycleDay: TtcStore.instance.today.cycleDay,
+            todayCycleDay: window.cyclesAhead == 0
+                ? TtcStore.instance.today.cycleDay
+                : null,
             line: p.line,
             ink3: p.ink3,
             tour: tour,

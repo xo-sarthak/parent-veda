@@ -457,11 +457,20 @@ TtcFinding? ttcCycleLengthNote() {
   final lengths = CycleStore.instance.cycleLengths;
   if (lengths.length < 3) return null;
 
-  final recent = lengths.length <= 6
-      ? lengths
-      : lengths.sublist(lengths.length - 6);
-  final usual =
-      (recent.reduce((a, b) => a + b) / recent.length).round();
+  // ⚠️ ONE AVERAGE, THE ENGINE'S (T2 W11, 2026-10-29). This used to work out
+  // its own mean of the last six, which matched the engine only by luck, and
+  // it skipped `hasUnreliableHistory`: a gap that was really a month she did
+  // not log was averaged in and reported as "longer than usual". Kept for
+  // revert:
+  //   final recent = lengths.length <= 6
+  //       ? lengths
+  //       : lengths.sublist(lengths.length - 6);
+  //   final usual =
+  //       (recent.reduce((a, b) => a + b) / recent.length).round();
+  const engine = TtcChapterEngine();
+  final state = TtcStore.instance.state();
+  if (engine.hasUnreliableHistory(state)) return null;
+  final usual = engine.cycleLengthFor(state);
   final last = lengths.last;
   final diff = last - usual;
 

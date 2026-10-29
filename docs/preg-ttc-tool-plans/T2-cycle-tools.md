@@ -18,7 +18,7 @@ Files the build touches (none were open in another terminal on 2026-10-29; **run
 - **Folding Calendar into Cycle Companion:** not done (user, Q1). They stay two tools.
 - **Door data files** (`lib/ttc/focus/ttc_focus_*.dart`, `pv_door_*.dart`, `pv_door_router.dart`) belong to Terminal A. Label fixes there go on the hand-over list at the end.
 - **The report card on clinic cycles** belongs to Terminal A (`00-MASTER.md`). The audit found the report already holds back correctly on clinic cycles (`ttc_cycle_report.dart:300-319`).
-- **Ask Veda learning that an LH test moved her window.** Only `cycle_day` is sent (`ask_veda_service.dart:228`). Adding a field is a two-repo change, so it is recorded here as owed and not built.
+- ~~**Ask Veda learning that an LH test moved her window.**~~ **Built after all (2026-10-29)**, once the user gave access to both repos: see "Ask Veda: `window_source`" in As built.
 - **Hinglish strings in the report** (`ttc_strings.dart:131, 491, 510`): TTC runs on its own language flag, and the policy is English for new work. They are not touched.
 - **"Should I test?" using a logged LH day to count 14 days past ovulation:** recorded as Weak and not built. The period-due date stays on the calendar, shared with the home (`ttc_period_due.dart:98`), so the two screens keep agreeing.
 
@@ -86,6 +86,7 @@ Files the build touches (none were open in another terminal on 2026-10-29; **run
 | — | W12/W13: after a loss | Both screens keep her history. One line: "Your cycle starts again from your first period after the loss. Log it when it comes." Action: "Log my period". No baby wording | chosen and recorded |
 | — | W14: his Companion copy | "Only she sees her period dates. You see her fertile window and where she is in her cycle." | chosen and recorded (Q2) |
 | — | W15: the pill | `'ttc_cycle' => 'Open Cycle Companion'`, `'ttc_calendar' => 'Open the calendar'` | chosen and recorded |
+| Q3 | K8: Cycle Companion and Calendar onto `TtcToolScaffold`? (found during the build: both shapes were earlier user decisions) | Keep both as they are; the Window moves | **Recommended** (2026-10-29) |
 | — | K2: bleed choices | 2 to 7, plus "More than 7". "More than 7" shows the calm doctor line | chosen and recorded |
 | — | K3: doctor lines | Cycles over 35 days (ACOG; NHS says up to 40, we take the earlier limit), no period for 90 days with a negative test, bleeding more than 7 days. Each is "worth mentioning to a doctor" plus the disclaimer. Never a verdict | chosen and recorded |
 
@@ -142,4 +143,41 @@ Nothing new. `CycleStore` is already local-first with date-derived ids, soft del
 - **BEFORE-LAUNCH:** the four CHECK lines above, on the user's word.
 
 ## As built
-(Written during the build, in the new terminal.)
+Built 2026-10-29 in Terminal B's new session, Waves 1 to 3 without a stop. Every superseded line is commented out with "Kept for revert".
+
+**Wave 1: data and clinical**
+- **B1.** `CycleStore.movePeriodStart` returns `bool` (false on the same day, a missing start, or a taken target). New `CycleStore.mergePeriodStart(from, into)`: the period on `into` wins and keeps its own details; a bleed length, LH day or temperature shift that only `from` carried moves across; `from` leaves as a soft delete (`_tomb`), so every phone sees the merge. **Deviation from the plan:** the plan said the merge writes through `movePeriodStart` and `logBleedDays`; neither can carry the LH and temperature signals onto a day that already holds a period, so the merge is its own store method on the same row and tomb rules. Sync is unchanged (no new table, no new column).
+  The sheet: `_editCollision` (a correction onto another logged start) shows a line before anything is written, with "Merge into that period" and "Pick another day". Every other caller of the move (the Edit path in `_save`, the home sheet's Move, "Move that start") now writes bleed days only after a move that happened, and says "Nothing changed…" otherwise.
+- **W1/W2.** `_mayPredictNext()` (`countsToPeriod && !hasUnreliableHistory`) gates "NEXT PERIOD EXPECTED" inside `_RhythmCard`, so the hub, both refusals and Period history all obey it. Period history now also withholds the rhythm card on a history that looks like a missed log, as the hub's refusal already did. On a clinic cycle the lengths stay.
+- **W11.** `ttcCycleLengthNote` calls `TtcChapterEngine().cycleLengthFor` and returns null on `hasUnreliableHistory`.
+- **Data-chain test.** "the most recent entry has no length yet" asks about `ago(kDefectStarts.last)` instead of 25 July, with the mechanism in a comment.
+
+**Wave 2: screens and voices**
+- **W3/W4/K6** (`ttc_window_screen.dart`). On a clinic cycle the intro and the cycle-day line are not drawn. `ttcWindowBasisLine()` reads `confidence`: irregular ("Your cycles vary…"), no completed cycle ("A first estimate from a 28-day cycle" or "from the length you told us"), one completed cycle ("An estimate from your one full cycle so far…"). It is gated on the window being drawn (`ttcFertileWindowNow`), not on `whyNoEstimate`, which says `notEnoughHistory` on a first cycle the engine still places. The source line (`ttcWindowSourceLine`) sits under the status on the current cycle.
+- **W5/W6/K4** (`ttc_ovulation_screen.dart`, `ttc_strings.dart`). On a clinic cycle a positive is still saved, and the toast is `kTtcOvClinicSaved`. The LH explainer says "…which makes today and tomorrow your best two days." (the Hinglish side is left, English-only policy). Toasts for a positive outside this cycle, a later positive, and a Negative strip (with Undo). `ttcOvPositiveSaved` is shared with the daily log, so its chips say these too.
+- **W7/W8/K7** (`ttc_should_test_chat.dart`). `ttcTestAfterLoss()` = `CycleStore.restartOn` set, no `lastPeriodStart` since, and under `kTtcAfterLossTestDays` (42). The first line is `kTtcAfterLossTestLine`; Positive and A faint line route to `afterLossPositive` / `afterLossFaint` (blood test, no "big news", no "I'm pregnant"); Negative says the first period is the clearer sign. His voice: `ttcHerVoice` (split out of `ttcWindowForHim` so a script that already knows the reader can use it) on every step's lines; no "I'm pregnant", "Log…" or "Log a period" chips; his answers are never saved as her length. A length she picks says "Saved: about N days as your usual cycle length…".
+- **W9/W10.** `TtcCycleReportScreen(initialIndex:)`; the chat's facts carry `index` and "See the full report" pushes the report on it (route name `ttc_cycle_report`). Fertile days come from `ttcCycleWindowSpan(index:)`.
+- **W12/W13/W14/W15.** `ttcCycleAfterLoss()` (restart set, no current cycle, history present). Companion's empty state splits: after a loss it shows `kTtcAfterLossCycleLine`, "Log my period" (his side: the view-only line) and her dates list, never the first-date ladder. Calendar's intro says the same line with the same action. `kTtcPartnerDatesEmpty` says "Only she sees her period dates. You see her fertile window and where she is in her cycle." The pill: `'ttc_cycle' => 'Open Cycle Companion'`.
+- **K1** (`ttc_cycle_hub.dart`, not in the plan's file list; no other terminal had it open). "My period started today" (or "…this day" for a picked past day) under the hub's Log button opens the period sheet on that day. Hidden on a day that already starts a period.
+- **K2/K3.** Bleed chips 2 to 7 plus "More than 7" (stored as `kTtcBleedMoreThanSeven` = 8; `ttcBleedDaysLabel` reads it back as "more than 7 bleeding days"), which shows `kTtcLongBleedLine` under the chips. `ttcCycleDoctorLines()`: no period for 90 days ("If a pregnancy test is negative…"), the last period over 7 days, recent cycles over 35 days (a gap the engine reads as a missed log is not counted). They sit above the disclaimer in `_Estimates` (hub, refusals, Period history, the after-loss state) and in the report chat's "What should I do with this report?" beside its one-cycle checks.
+
+**Wave 3: look and polish**
+- **K8, Window only.** `TtcWindowScreen` wears `TtcToolScaffold` (eyebrow "Fertile window", the tile name; title "Your fertile days"; intro `ttcWindowIntroLine()`; Back). Its own `_hero` and `_sheet` are kept for revert; the content is `_sheetChildren`. Pinned in `ttc_tools_one_shell_test.dart`, which now carries an allow-list with reasons.
+  **Not moved, waiting on the user:** Cycle Companion and Calendar. Both were shaped this way by earlier decisions the audit did not weigh: the hub's hero IS the week strip (2026-10-17, the user on Clue and Flo, "everything is there under a single screen"; the shell would put an eyebrow and a 26pt title above it), and the Calendar is a `TtcPage` "page of today" opened from the home's header (2026-09-27). See "Question for the user" below.
+- **K5.** Calendar's greyed day actions and the period picker's future days say why (`pvToast`).
+- **K9.** The dead block in `_setResult` commented out; TODAY drawn on the curve only for the current cycle; the unreachable "+1" day note commented out; the stale "Seven" (`ttc_fertile_window.dart`) and "ovulation+1" (`ttc_chapter.dart`) comments corrected.
+- **K10** recorded only, as planned. **K11:** a live `TtcWindowScreen` clinic test and the first loss tests for Companion, Calendar and "Should I test?" are in the new file; the five retired-screen tests are left as they are.
+
+**Tests.** New `test/ttc_t2_cycle_tools_test.dart` (32 tests, one group per finding). Updated: `ttc_data_chain_test.dart` (the date), `ttc_tools_pass_e_test.dart` (the Window's eyebrow and 26pt title; the intro found by its words), `ttc_tools_one_shell_test.dart` (the Window pinned, the allow-list).
+
+**K8 decided (user, 2026-10-29): keep Cycle Companion and Calendar as they are.** Both stay on the one-shell test's allow-list with their reasons.
+
+**Hand-over check.** `lib/ttc/focus/` has no `ttc_cycle` tile labelled as a calendar (grep, 2026-10-29), so that line closes. The PCOS tile over-promise stays on Terminal A's list.
+
+**Ask Veda: `window_source` (two repos, 2026-10-29).** The user gave access to `C:\Projects\parentveda-askveda`, so the owed field was built on both sides.
+- App: `AskVedaService.ask(windowSource:)` sends `'window_source'` (`lh` | `temperature`, absent for period dates); `ttcAskVedaWindowSource()` in `ttc_askveda_screen.dart` reads `CycleStore` (LH wins, the engine's order); not sent from his phone.
+- Service: `WINDOW_SOURCES` and `clean_window_source` in `app/prompt.py` (unknown dropped, `clinic_controlled` dropped); one sentence in `describe_ttc_stage`; `window_source` on `AskRequest` (an unknown value is logged), through `answer()`; the TTC cache key gains `:w<source>` only when sent. Tests: new `tests/test_window_source.py`, `tests/test_wire_contract.py` lists the field (37 passed with `test_ttc_context.py`).
+- Why, in `docs/CONTENT-BACKEND.md` ("What placed her fertile days reaches Ask Veda").
+- **Inert until the service is redeployed to Railway.** The old service logs it as an ignored field.
+
+**Still owed.** The four BEFORE-LAUNCH CHECK lines above, on the user's word. Terminal A: the PCOS tile line. The askveda commit and a Railway redeploy. Phone walk later.

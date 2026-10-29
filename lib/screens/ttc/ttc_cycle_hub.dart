@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import '../../services/family_timeline.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/cycle_store.dart';
+import 'ttc_cycle_companion.dart' show showTtcPeriodLogSheet;
 import '../../ttc/ttc_chapter.dart' show FertilityLevel, TtcChapterEngine;
 import '../../ttc/ttc_fertile_window.dart'
     show ttcWindowClosesAfterOvulation, ttcWindowOpensBeforeOvulation;
@@ -1751,6 +1752,38 @@ class TtcHubTracked extends StatelessWidget {
                       color: Colors.white)),
             ),
           ),
+          // ⚠️ T2 K1 (2026-10-29): logging a period took four taps or more,
+          // because "Log this day" opens the symptom log and the hub had no
+          // period action. This opens the period sheet already on the picked
+          // day (today, unless she picked another), so it is one tap and
+          // Save. Not on a day that already starts a period.
+          if (!CycleStore.instance.periodStarts.any((s) =>
+              s.year == d.year && s.month == d.month && s.day == d.day)) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                key: const ValueKey('ttc_hub_period_started'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: ttcTitleInk,
+                  side: const BorderSide(color: ttcLine),
+                  minimumSize: const Size.fromHeight(46),
+                  shape: const StadiumBorder(),
+                ),
+                onPressed: () => showTtcPeriodLogSheet(context, initial: d),
+                child: Text(
+                    d.year == today.year &&
+                            d.month == today.month &&
+                            d.day == today.day
+                        ? 'My period started today'
+                        : 'My period started this day',
+                    style: pvManrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: ttcTitleInk)),
+              ),
+            ),
+          ],
         ],
       ]),
     );

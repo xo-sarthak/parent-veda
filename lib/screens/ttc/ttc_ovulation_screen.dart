@@ -164,6 +164,23 @@ const String kTtcOvNegativeLabel = 'Negative';
 const String kTtcOvPositiveLabel = 'Positive';
 const String kTtcOvMoved = 'Your fertile days now follow this test.';
 
+/// ⚠️ ON A CLINIC CYCLE NO FERTILE DAYS ARE DRAWN (T2 W5, 2026-10-29), so
+/// "Your fertile days now follow this test" pointed at nothing. The strip is
+/// still hers and is still saved; the line sends the news to the people
+/// timing the cycle.
+const String kTtcOvClinicSaved =
+    'Saved. Your clinic times this cycle, so tell them about a positive test.';
+
+/// K4 (2026-10-29): the saves that used to say nothing.
+String ttcOvOutsideCycleLine(DateTime day) =>
+    'Saved for ${ttcRoundDate(day)}. Only a test in this cycle moves your '
+    'fertile days.';
+String ttcOvLaterPositiveLine(int first) =>
+    'Saved. Your fertile days still follow your first positive, on day '
+    '$first.';
+String ttcOvNegativeSavedLine(DateTime day) =>
+    'Saved: negative on ${ttcRoundDate(day)}.';
+
 // ⚠️ AN EARLY DAY IS SAID, NOT REFUSED (2026-10-16). The walk found a cycle
 // with no fertile days at all: an LH positive or temperature rise logged on
 // a bleeding day moves ovulation inside the period, and the window with it.
@@ -237,13 +254,38 @@ String ttcOvEarlyKeptLine(int day) =>
 /// Call after a positive strip is saved for [day], from any screen.
 void ttcOvPositiveSaved(BuildContext context, DateTime day,
     {double lift = 24}) {
-  if (!_inCurrentCycle(day)) return;
+  // K4: said, not silent. Kept for revert: if (!_inCurrentCycle(day)) return;
+  if (!_inCurrentCycle(day)) {
+    pvSnack(context, ttcOvOutsideCycleLine(day),
+        icon: Icons.check_rounded, lift: lift);
+    return;
+  }
   final cycle = CycleStore.instance;
   final start = ttcOvCycleStartFor(day)!;
   final cd = _dayOnly(day).difference(start).inDays + 1;
   final prev = cycle.lhPositiveDay;
   // An earlier positive in this cycle already places ovulation.
-  if (prev != null && prev <= cd) return;
+  // K4: said, not silent. Kept for revert: if (prev != null && prev <= cd) return;
+  if (prev != null && prev <= cd) {
+    if (prev < cd) {
+      pvSnack(context, ttcOvLaterPositiveLine(prev),
+          icon: Icons.check_rounded, lift: lift);
+    }
+    return;
+  }
+  // W5: a clinic cycle keeps the strip and says who to tell.
+  if (!TtcStore.instance.today.behaviour.showsFertilityWindow) {
+    cycle.logLhPositive(cd);
+    pvSnack(context, kTtcOvClinicSaved,
+        icon: Icons.check_rounded,
+        lift: lift,
+        action: 'Undo',
+        onAction: () {
+          ttcOvSetResult(day, null);
+          cycle.logLhPositive(prev);
+        });
+    return;
+  }
   if (cd < kTtcEarliestLikelyOvulationDay) {
     pvSnack(context, ttcOvEarlyKeptLine(cd),
         icon: Icons.info_outline_rounded,
@@ -357,7 +399,8 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
 
   void _setResult(DateTime start, DateTime day, String? result) {
     final cycle = CycleStore.instance;
-    final today = _dayOnly(DateTime.now());
+    // Kept for revert (K9, read only by the commented block below):
+    //   final today = _dayOnly(DateTime.now());
     final cd = day.difference(start).inDays + 1;
     final prevChip = ttcOvResultOn(day);
     final prevLh = cycle.lhPositiveDay;
@@ -376,7 +419,18 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
       ttcOvPositiveCleared(context, day);
       return;
     }
-
+    // K4 (2026-10-29): a Negative strip is said too.
+    if (result == kTtcOvNegative) {
+      pvSnack(context, ttcOvNegativeSavedLine(day),
+          icon: Icons.check_rounded,
+          lift: 24,
+          action: 'Undo',
+          onAction: () => ttcOvSetResult(day, prevChip));
+    }
+    // ⚠️ K9 (2026-10-29): everything below was unreachable once both
+    // branches above returned (the shared rule, 2026-10-17). Kept for revert,
+    // commented out:
+    /*
     void undo() {
       ttcOvSetResult(day, prevChip);
       cycle.logLhPositive(prevLh);
@@ -411,6 +465,7 @@ class _TtcOvulationTestsScreenState extends State<TtcOvulationTestsScreen> {
         onAction: undo,
       );
     }
+    */
   }
 
   void _adopt(int cd) {

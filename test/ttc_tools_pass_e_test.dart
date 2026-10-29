@@ -72,14 +72,25 @@ void main() {
       // The title is the tool's one name; the back bar no longer repeats it.
       // (The glossary has a "Fertile window" word pill too; the title is the
       // 27pt one.)
+      // T2 K8 (2026-10-29): the page wears the tools' shell, so the tile's
+      // name is the eyebrow and the title says what the page shows. Kept for
+      // revert:
+      //   expect(find.byWidgetPredicate((w) => w is Text &&
+      //       w.data == 'Fertile window' && w.style?.fontSize == 27),
+      //       findsOneWidget);
+      expect(find.text('FERTILE WINDOW'), findsOneWidget);
       expect(
           find.byWidgetPredicate((w) =>
-              w is Text && w.data == 'Fertile window' && w.style?.fontSize == 27),
+              w is Text &&
+              w.data == 'Your fertile days' &&
+              w.style?.fontSize == 26),
           findsOneWidget);
       // M3 (2026-09-28): the intro defines both names in one place. Kept for
       // revert: expect(find.textContaining('The six days each cycle'), ...);
+      // K8: the shell draws the intro, so it is found by its words. Kept for
+      // revert: find.byKey(const ValueKey('ttc_window_intro')).
       final intro = tester
-          .widget<Text>(find.byKey(const ValueKey('ttc_window_intro')))
+          .widget<Text>(find.text(ttcWindowIntroLine()))
           .data!;
       expect(intro, contains('Your fertile window is the six days ending on '
           'the day you ovulate'));

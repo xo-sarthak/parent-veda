@@ -578,6 +578,20 @@ what you told us" line reads THAT rather than what it sent. Showing what was sen
 a service not yet redeployed silently ignored. The general rule: a client should report a server's behaviour only
 from the server's own acknowledgement.
 
+## What placed her fertile days reaches Ask Veda: `window_source` (T2, 2026-10-29)
+
+The TTC screen sent her cycle day and nothing about how her fertile days were placed. Once she logs a positive LH test (or a temperature rise), the app moves her window to follow it, because her body's signal outranks our calendar arithmetic (the truth hierarchy). Ask Veda could still recount the window from her average, and tell her something the app had already overruled.
+
+One field, landed in both repos (`tests/test_window_source.py` and `tests/test_wire_contract.py` in the service; `test/ttc_t2_cycle_tools_test.dart` here):
+
+- **`window_source`**: `lh` or `temperature`, absent for her period dates. LH wins over temperature, the engine's own order (`ttcAskVedaWindowSource`). Never sent from the partner's phone, the same rule as `cycle_day`.
+- **The service cleans it twice** (`clean_window_source`): an unknown value is dropped and logged, and a fully medicated cycle (`clinic_controlled`) drops it, because her signals are noise there. It is cleaned again inside `describe_ttc_stage`, so a caller that skips the route cannot slip it past a medicated cycle.
+- **It is in the TTC cache key, but only when present** (`...:wlh`). The same rule as the child's context: an answer that says "your days follow your test" must never be served to someone with no test. Appending the segment only when the field is sent means everyone who sent nothing keeps their old key, and their cached answers stay warm.
+
+**Why a closed id and not the day of the positive.** The day would split the cache by cycle day, the trade the key already refuses for `cycle_day` (a hit rate of about 1 in 28). What changes the answer is the *kind* of evidence, not its date; the cycle day already travels in the note, outside the key.
+
+**Deploy order.** The app sends the key before the service knows it; the old service logs it as an ignored field, and nothing breaks. So the service can be redeployed after the app ships, but until it is, the field does nothing.
+
 ## Author once, adapt at display: the door pages' "he" and "When" (2026-10-27)
 
 The final review of the fourteen parenting doors found two content bugs with one shape: the data was right and the place it was drawn decided its meaning wrongly.

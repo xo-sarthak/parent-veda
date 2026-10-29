@@ -267,7 +267,11 @@ void main() {
           findsOneWidget);
       expect(find.text('Still on'), findsOneWidget);
       for (final n in kTtcBleedChoices) {
-        expect(find.text(n == kTtcBleedChoices.last ? '$n+' : '$n'),
+        // T2 K2 (2026-10-29): the last chip says "More than 7". Kept for
+        // revert: find.text(n == kTtcBleedChoices.last ? '$n+' : '$n')
+        expect(
+            find.text(
+                n == kTtcBleedMoreThanSeven ? 'More than 7' : '$n'),
             findsWidgets);
       }
     });

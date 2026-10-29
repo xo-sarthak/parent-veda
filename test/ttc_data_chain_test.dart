@@ -265,7 +265,17 @@ void main() {
       logTheRealDefect();
       // Her current cycle has not ended, so there is no number to print and
       // nothing to judge.
-      expect(CycleStore.instance.cycleFrom(DateTime(2026, 7, 25)), isNull);
+      //
+      // ⚠️ RELATIVE, LIKE THE FIXTURE (T2, 2026-10-29). This asked about the
+      // fixed date 25 July against a fixture of days before today. On most
+      // days it passed for the wrong reason (25 July was not logged at all);
+      // on the days 25 July landed on a non-last start it failed (27 October,
+      // `ago(94)`, and 3 November was next). A test that mixes fixed dates
+      // with relative ones has a calendar of days when it fails. Kept for
+      // revert:
+      //   expect(CycleStore.instance.cycleFrom(DateTime(2026, 7, 25)), isNull);
+      expect(CycleStore.instance.periodStarts.last, ago(kDefectStarts.last));
+      expect(CycleStore.instance.cycleFrom(ago(kDefectStarts.last)), isNull);
     });
 
     test('every counted cycle appears in the average, and no other', () {

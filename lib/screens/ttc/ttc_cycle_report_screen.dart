@@ -57,7 +57,11 @@ import 'ttc_window_screen.dart' show ttcWindowForHim;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 class TtcCycleReportScreen extends StatefulWidget {
-  const TtcCycleReportScreen({super.key, this.series});
+  const TtcCycleReportScreen({super.key, this.series, this.initialIndex = 0});
+
+  /// Which cycle it opens on (T2 W9): 0 is the cycle she is in, 1 the last
+  /// finished one. The report chat passes the cycle it described.
+  final int initialIndex;
 
   /// Which number the chart opens on, when she came from that number's
   /// "View chart" in the logger (launch sanity U2, 2026-09-28): the chart is
@@ -69,7 +73,8 @@ class TtcCycleReportScreen extends StatefulWidget {
 }
 
 class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
-  int _index = 0;
+  // W9. Kept for revert: int _index = 0;
+  late int _index = widget.initialIndex;
   // U2 (2026-09-28): preset from `widget.series`. Kept for revert:
   //   bool _showTemp = false;
   late bool _showTemp = widget.series == TtcMeasureKind.temperature;

@@ -126,6 +126,13 @@ class AskVedaService {
     /// her cycle; sending it from his device would route around that rule on
     /// the client side. From his account pass [chapter] only.
     int? cycleDay,
+
+    /// What placed her fertile days this cycle (T2, 2026-10-29): 'lh' (a
+    /// positive ovulation test) or 'temperature' (a sustained rise); null for
+    /// her period dates. A closed id, read by the service's
+    /// `WINDOW_SOURCES` (app/prompt.py) for the framing and the cache key.
+    /// Same privacy rule as [cycleDay]: never from the partner's account.
+    String? windowSource,
     String? ttcPath, // natural | ovulationInduction | iui | ivf | …
 
     /// WHO owns the timing of this cycle: parentveda | clinic_guided |
@@ -226,6 +233,7 @@ class AskVedaService {
               if (stage != null) 'stage': stage,
               if (chapter != null) 'chapter': chapter,
               if (cycleDay != null) 'cycle_day': cycleDay,
+              'window_source': ?windowSource,
               if (ttcPath != null) 'ttc_path': ttcPath,
               if (timingOwnership != null) 'timing_ownership': timingOwnership,
               if (treatmentStep != null) 'treatment_step': treatmentStep,
