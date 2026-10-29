@@ -63,8 +63,11 @@ const List<TtcSurface> kTtcSurfaces = [
   // 'Vaccinations before trying'.
   TtcSurface('ttc_vaccinations', 'Vaccinations',
       'Koshish se pehle vaccinations'),
-  TtcSurface('ttc_pcos_check', 'PCOS symptom checker',
-      'PCOS symptom checker'),
+  // The tool's one name (T5, 2026-10-29). Kept for revert:
+  // TtcSurface('ttc_pcos_check', 'PCOS symptom checker',
+  //     'PCOS symptom checker'),
+  TtcSurface('ttc_pcos_check', 'PCOS symptom check',
+      'PCOS symptom check'),
   TtcSurface('ttc_precheck', 'Pre-pregnancy checklist',
       'Pregnancy se pehle ki checklist'),
   TtcSurface('ttc_bmi', 'BMI calculator', 'BMI calculator'),
