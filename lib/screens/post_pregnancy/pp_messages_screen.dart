@@ -9,6 +9,9 @@
 //  EACH MESSAGE OPENS THE PAGE IT NAMES:
 //    age, a new stage, something to try  -> the parenting home (the age page)
 //    vaccines                             -> the vaccine tracker
+//    today's tip (PP 11)                  -> the child's home, whose tip it is
+//    an offer (PP 11)                     -> the toy or the class, or a toast
+//                                            when it has gone
 //
 //  ⚠️ FOR THE CHILD IT NAMES, FROM ANY HOME (2026-10-25, STAGE-TRANSITIONS
 //  F3). Every child now has messages, in every stage, so a tap first makes
@@ -21,15 +24,20 @@ import 'package:flutter/material.dart';
 
 import '../../services/last_profile.dart' show LastProfile;
 import '../../services/life_stage_store.dart';
+import '../../services/pv_catalog_store.dart';
 import '../../services/stage_gateway.dart';
 import '../../widgets/global_ask_fab.dart' show appNavigatorKey;
+import '../../widgets/pv_toast.dart';
 import 'pp_child_profile.dart';
 import '../../services/pp_messages_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart';
-import '../products/pv_store_chrome.dart' show kPvInk, pvStorePalette;
+import '../learn/pv_learn_catalog.dart' show PvLearnCatalog;
+import '../learn/pv_offering_screen.dart' show pvOpenOffering;
+import '../products/pv_store_chrome.dart' show kPvInk, pvOpenProduct, pvStorePalette;
+import '../v2/v2_palette.dart' show V2Palette;
 import 'vax_tracker_screen.dart';
 
 const String kPpMessagesRoute = 'pp/messages';
@@ -54,9 +62,14 @@ void openPpMessage(BuildContext context, PpMessage m) {
         settings: const RouteSettings(name: 'pp/vaccines'),
         builder: (_) => const VaxTrackerScreen(),
       ));
+    // PP 11: an offer opens the toy or the class, or says it has gone.
+    case PpMessageKind.offer:
+      _openOffer(context, m.ref);
     case PpMessageKind.age:
     case PpMessageKind.milestones:
     case PpMessageKind.activity:
+    // PP 11: the tip is the one the child's home shows today.
+    case PpMessageKind.tip:
       // The age page is the parenting home: back to it. When parenting is not
       // the root (pregnant again, trying, the learning space), the child's
       // home opens over the root instead. The navigator is held first: this
@@ -84,11 +97,32 @@ void ppOpenMessageFromPhone(PpMessage? m, {int attempt = 0}) {
   m == null ? openPpMessages(ctx) : openPpMessage(ctx, m);
 }
 
+/// What an offer message opens (PP 11), the Pregnancy inbox's rule: the
+/// thing may have gone since it was sent, and then she is told so, never
+/// sent to a blank page. Its own copy, not Pregnancy's: the stages stay
+/// apart.
+void _openOffer(BuildContext context, String? ref) {
+  final parts = (ref ?? '').split(':');
+  if (parts.length >= 2) {
+    final id = parts.sublist(1).join(':');
+    if (parts.first == 'product') {
+      final product = PvCatalogStore.instance.byId(id);
+      if (product != null) return pvOpenProduct(context, product);
+    } else if (parts.first == 'learn') {
+      final view = PvLearnCatalog.instance.byId(id);
+      if (view != null) return pvOpenOffering(context, view);
+    }
+  }
+  pvToast(context, "That isn't available any more. The Store and Learn have what's there now.");
+}
+
 IntentMark _markFor(PpMessageKind k) => switch (k) {
       PpMessageKind.age => IntentMark.calendarDay,
       PpMessageKind.vaccine => IntentMark.pillMark,
       PpMessageKind.milestones => IntentMark.stepsMark,
       PpMessageKind.activity => IntentMark.playMark,
+      PpMessageKind.tip => IntentMark.calendarDay,
+      PpMessageKind.offer => IntentMark.bagMark,
     };
 
 double _hueFor(PpMessageKind k) => switch (k) {
@@ -96,6 +130,8 @@ double _hueFor(PpMessageKind k) => switch (k) {
       PpMessageKind.vaccine => 160,
       PpMessageKind.milestones => 28,
       PpMessageKind.activity => 140,
+      PpMessageKind.tip => 268,
+      PpMessageKind.offer => 28,
     };
 
 String _ago(DateTime at, DateTime now) {
@@ -154,12 +190,21 @@ class _PpMessagesScreenState extends State<PpMessagesScreen> {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('Messages', style: pvFraunces(fontSize: 28, fontWeight: FontWeight.w500, color: p.ink1)),
                     const SizedBox(height: 6),
-                    Text('A note on each new week and month, a reminder before each vaccine, and a word when '
-                        'a new stage starts.',
+                    // Kept for revert (PP 11): 'A note on each new week and month, a reminder
+                    // before each vaccine, and a word when a new stage starts.'
+                    Text(
+                        'A tip each morning, a note on each new week and month, a reminder before each '
+                        'vaccine, and never more than two on your phone in a day. Everything stays here, '
+                        'even on days your phone stays quiet.',
                         style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
                   ]),
                 ),
                 const SizedBox(height: 18),
+                if (!store.offersAsked && ChildProfileStore.instance.hasRealChild)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+                    child: _OffersCard(p: p),
+                  ),
                 if (list.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -212,6 +257,68 @@ class _PpMessagesScreenState extends State<PpMessagesScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+/// The one time she is asked about offers (PP 11), Pregnancy's card: nothing
+/// promotional until she says yes, inside the app, with the "Offers and new
+/// things" switch as the way back. Either answer stops the card, and the
+/// toast says what changed.
+class _OffersCard extends StatelessWidget {
+  const _OffersCard({required this.p});
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = PpMessagesStore.instance;
+    return Container(
+      key: const ValueKey('pp_msg_offers_card'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Classes and toys for their age?',
+            style: pvManrope(fontSize: 15.5, fontWeight: FontWeight.w700, color: p.ink1)),
+        const SizedBox(height: 6),
+        Text(
+            'When there is a class or a toy made for your child\'s age, we can tell you. At most '
+            'twice a week, and still never more than two messages from us in a day.',
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 12),
+        Wrap(spacing: 10, runSpacing: 8, children: [
+          FilledButton(
+            key: const ValueKey('pp_msg_offers_yes'),
+            style: FilledButton.styleFrom(
+                backgroundColor: kPvInk,
+                foregroundColor: Colors.white,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12)),
+            onPressed: () async {
+              await store.answerOffers(true);
+              if (context.mounted) {
+                pvToast(context, 'Offers on. You can turn them off in Choose what we send.',
+                    kind: PvToastKind.done);
+              }
+            },
+            child: Text('Yes, tell me',
+                style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+          ),
+          TextButton(
+            key: const ValueKey('pp_msg_offers_no'),
+            onPressed: () async {
+              await store.answerOffers(false);
+              if (context.mounted) {
+                pvToast(context, 'No offers. You can turn them on in Choose what we send.');
+              }
+            },
+            child: Text('Not now', style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink2)),
+          ),
+        ]),
+      ]),
     );
   }
 }

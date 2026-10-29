@@ -58,6 +58,34 @@
 //  alarm for on the vaccines page (`VaxStore.hasAlarmFor`, per child) gets no
 //  automatic 3-day message, on the phone or in the inbox, so she is not told
 //  twice about one visit.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ PP 11 (2026-10-29): ONE CAP WITH PREGNANCY, A MORNING TIP, OFFERS
+//  ---------------------------------------------------------------------------
+//
+//  docs/NOTIFICATIONS-PLAN.md, "As built: Parenting". Parenting rang every
+//  kind it had, four of each, with no daily limit, while Pregnancy held itself
+//  to two a day; a mother pregnant again with a toddler got both. Now:
+//
+//    tip     8:30 each morning, one child a day in turn, from `kAgeTips` by
+//            corrected age (`dailyTipFor`, the home's own pick). Not on a
+//            morning that child's activity already speaks; pregnant again,
+//            every other day, so it takes turns with Pregnancy's tip.
+//    offer   7 pm on Wednesday and Saturday, children in turn (pregnant
+//            again: on Pregnancy's day 6, its day 3 staying Pregnancy's). A
+//            class or a toy made for this child's age (`ppOffersForAge`),
+//            silent when nothing is. OFF until she says yes, as Pregnancy.
+//
+//  WHICH RING is no longer decided here: `familyPhonePlan`
+//  (`family_phone_plan.dart`) ranks both stores' pending messages together,
+//  two a day, and `FamilyPhone` arms the winners. This store arms only what
+//  it is handed, on its own ids. A message that loses its slot is still
+//  delivered to Messages at its time.
+//
+//  Two fixes on the way: an activity this child already had in the last week
+//  is not sent again (a month note filled four Mondays in a row), and a
+//  phase activity whose intro starts with its own title is not doubled
+//  ("Explore With Both Hands: Explore With Both Hands gives...").
 // =============================================================================
 
 import 'dart:async';
@@ -68,21 +96,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/pp_phase_docs.dart' show ppPhaseDocFor;
 import '../screens/post_pregnancy/pp_child_profile.dart';
+import '../screens/post_pregnancy/pp_daily_tips.dart' show dailyTipFor;
 import '../screens/post_pregnancy/pp_month_notes.dart';
 import '../screens/post_pregnancy/pp_phases_data.dart';
 import '../screens/post_pregnancy/pp_vaccine_data.dart';
+import 'family_phone_plan.dart';
 import 'family_profile.dart';
 import 'father_preview.dart';
 import 'life_stage_store.dart';
 import 'notification_service.dart';
+import 'phone_emoji.dart';
+import 'pp_message_offers.dart';
+import 'preg_messages_store.dart' show pregWeekOn, pregWeekStart;
+import 'pregnancy_controller.dart';
+import 'programme_store.dart';
+import 'pv_catalog_store.dart';
 import 'remote/cloud_merged_store.dart';
 // import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
-/// The kinds. The NAME is persisted.
-enum PpMessageKind { age, vaccine, milestones, activity }
+/// The kinds. The NAME is persisted. [tip] and [offer] since PP 11.
+enum PpMessageKind { age, vaccine, milestones, activity, tip, offer }
 
 /// Upcoming messages armed on the phone at once, per kind.
 const int kPpPhoneSlots = 4;
+
+/// PP 11: days ahead the daily tip and the offers are worked out, and their
+/// phone ids, as Pregnancy's (`kPregDailyDays`).
+const int kPpDailyDays = 14;
+const int kPpTipPhoneSlots = 14;
+const int kPpOfferPhoneSlots = 8;
 
 extension PpMessageKindInfo on PpMessageKind {
   int get notificationId => switch (this) {
@@ -90,26 +132,58 @@ extension PpMessageKindInfo on PpMessageKind {
         PpMessageKind.vaccine => 929111,
         PpMessageKind.milestones => 929121,
         PpMessageKind.activity => 929131,
+        // Blocks of their own (PP 11), still inside 929101 upwards.
+        PpMessageKind.tip => 929140,
+        PpMessageKind.offer => 929160,
       };
 
-  List<int> get phoneIds => [for (var i = 0; i < kPpPhoneSlots; i++) notificationId + i];
+  // Kept for revert (PP 11: the tip and the offer hold more):
+  //   List<int> get phoneIds => [for (var i = 0; i < kPpPhoneSlots; i++) notificationId + i];
+  List<int> get phoneIds {
+    final n = switch (this) {
+      PpMessageKind.tip => kPpTipPhoneSlots,
+      PpMessageKind.offer => kPpOfferPhoneSlots,
+      _ => kPpPhoneSlots,
+    };
+    return [for (var i = 0; i < n; i++) notificationId + i];
+  }
 
-  /// The topic in her family profile that turns this kind on.
-  NotifyTopic get topic => switch (this) {
+  /// The topic in her family profile that turns this kind on. None for the
+  /// tip (on until she turns it off, as Pregnancy's) or the offer (off until
+  /// she says yes).
+  NotifyTopic? get topic => switch (this) {
         PpMessageKind.age => NotifyTopic.weekly,
         PpMessageKind.vaccine => NotifyTopic.vaccinations,
         PpMessageKind.milestones => NotifyTopic.milestones,
         PpMessageKind.activity => NotifyTopic.activities,
+        PpMessageKind.tip || PpMessageKind.offer => null,
       };
 
   /// On when she has chosen no topic at all.
-  bool get onByDefault => this != PpMessageKind.activity;
+  bool get onByDefault => this != PpMessageKind.activity && this != PpMessageKind.offer;
+
+  /// Who wins a phone slot, lowest first, on one scale with Pregnancy's
+  /// (`familyPhonePlan`): a vaccine visit 1, an age or a new stage 2, the
+  /// Monday activity 4, the tip 4.5, an offer 6.
+  double get slotRank => switch (this) {
+        PpMessageKind.vaccine => 1,
+        PpMessageKind.age || PpMessageKind.milestones => 2,
+        PpMessageKind.activity => 4,
+        PpMessageKind.tip => 4.5,
+        PpMessageKind.offer => 6,
+      };
+
+  /// The kinds that come day after day: they leave Messages after
+  /// [kPpDailyKeep], as Pregnancy's do.
+  bool get isDaily => this == PpMessageKind.tip || this == PpMessageKind.offer;
 
   String get label => switch (this) {
         PpMessageKind.age => 'A new week or month',
         PpMessageKind.vaccine => 'Vaccines coming up',
         PpMessageKind.milestones => 'A new stage',
         PpMessageKind.activity => 'One thing to try each week',
+        PpMessageKind.tip => "Today's tip",
+        PpMessageKind.offer => 'Offers and new things',
       };
 
   String get when => switch (this) {
@@ -117,8 +191,21 @@ extension PpMessageKindInfo on PpMessageKind {
         PpMessageKind.vaccine => '3 days before each visit',
         PpMessageKind.milestones => 'When a new stage starts',
         PpMessageKind.activity => 'Monday mornings',
+        PpMessageKind.tip => 'Each morning, a tip for their age',
+        PpMessageKind.offer =>
+          'A class or a toy made for their age. At most twice a week. Off until you turn it on',
       };
 }
+
+/// Daily kinds leave Messages after this long (PP 11, Pregnancy's rule).
+const Duration kPpDailyKeep = Duration(days: 14);
+
+/// A calendar day as a number, the same on every phone: what the turns are
+/// counted on (whose tip, whose offer, which store wins a tie).
+int ppDayNumber(DateTime d) => DateTime.utc(d.year, d.month, d.day).difference(DateTime.utc(1970)).inDays;
+
+/// The week [d] is in, counted from Mondays (1 January 1970 was a Thursday).
+int ppWeekNumber(DateTime d) => (ppDayNumber(d) + 3) ~/ 7;
 
 class PpMessage {
   const PpMessage({
@@ -128,6 +215,7 @@ class PpMessage {
     required this.title,
     required this.body,
     this.read = false,
+    this.ref,
   });
 
   final String id;
@@ -137,10 +225,14 @@ class PpMessage {
   final String body;
   final bool read;
 
+  /// What an offer opens: `product:<id>` or `learn:<id>` (PP 11). Null
+  /// otherwise.
+  final String? ref;
+
   bool deliveredBy(DateTime now) => !at.isAfter(now);
 
   PpMessage copyWith({DateTime? at, bool? read}) =>
-      PpMessage(id: id, kind: kind, at: at ?? this.at, title: title, body: body, read: read ?? this.read);
+      PpMessage(id: id, kind: kind, at: at ?? this.at, title: title, body: body, read: read ?? this.read, ref: ref);
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -149,6 +241,7 @@ class PpMessage {
         'title': title,
         'body': body,
         'read': read,
+        if (ref != null) 'ref': ref,
       };
 
   static PpMessage? fromJson(Object? raw) {
@@ -158,7 +251,13 @@ class PpMessage {
     final id = raw['id'];
     if (kind == null || at == null || id is! String) return null;
     return PpMessage(
-        id: id, kind: kind, at: at, title: '${raw['title'] ?? ''}', body: '${raw['body'] ?? ''}', read: raw['read'] == true);
+        id: id,
+        kind: kind,
+        at: at,
+        title: '${raw['title'] ?? ''}',
+        body: '${raw['body'] ?? ''}',
+        read: raw['read'] == true,
+        ref: raw['ref'] is String ? raw['ref'] as String : null);
   }
 }
 
@@ -180,9 +279,42 @@ class PpMessageFacts {
     this.sexGiven = true,
     this.isBoy = true,
     this.correctionWeeks,
+    this.childIndex = 0,
+    this.childCount = 1,
+    this.pregDueDate,
+    this.offers = const [],
+    this.offered = const {},
+    this.hadActivity = const {},
+    this.activityWanted = true,
   });
 
+  /// Her activity switch is on: only then does a Monday activity take the
+  /// place of that morning's tip.
+  final bool activityWanted;
+
   final DateTime dob;
+
+  /// This child's place in the family, and how many there are (PP 11): the
+  /// tip and the offers go to one child at a time, in turn.
+  final int childIndex;
+  final int childCount;
+
+  /// Her due date while she is pregnant again with a date she set (PP 11),
+  /// else null. Then the tip comes every other day and the offers fall on
+  /// Pregnancy's day 6, so the two stores take turns.
+  final DateTime? pregDueDate;
+
+  /// What exists to offer for this child's age (`ppOffersForAge`), best
+  /// first. Empty when offers are off or nothing is real: no offer.
+  final List<PpOffer> offers;
+
+  /// Refs already offered and delivered, never offered twice.
+  final Set<String> offered;
+
+  /// The activity lines this child was sent in the last 7 days.
+  final Set<String> hadActivity;
+
+  bool get pregnantAgain => pregDueDate != null;
 
   /// Weeks to take off for a baby born early, so "A new stage" arrives when
   /// the phase page says the phase starts (corrected age to 24 months). Null
@@ -237,14 +369,25 @@ class PpMessageFacts {
     //   final active = c.activeChildId;
     //   for (final k in c.children) _forChild(k, withVisits: k.id == active),
     return [
-      for (final k in c.children) _forChild(k, withVisits: true),
+      for (final (i, k) in c.children.indexed) _forChild(k, withVisits: true, index: i),
     ];
   }
 
-  static PpMessageFacts _forChild(Child? k, {required bool withVisits}) {
+  static PpMessageFacts _forChild(Child? k, {required bool withVisits, int index = 0}) {
     final c = ChildProfileStore.instance;
     final vax = VaxStore.instance;
     final dob = k?.dob ?? c.dob;
+    final correction = (k == null || k.id == c.activeChildId) ? c.correctionWeeks : null;
+    final store = PpMessagesStore.instance;
+    final now = DateTime.now();
+    final prefix = ppMessageIdPrefix(k?.id, c.children.isEmpty ? null : c.children.first.id);
+    final ids = [for (final x in c.children) x.id];
+    final mine = [
+      for (final m in store.delivered(now: now))
+        if (k != null && ppMessageChildId(m.id, ids) == k.id) m
+    ];
+    final preg = PregnancyController.current;
+    final weeks = now.difference(dob).inDays / 7 - (correction ?? 0);
     return PpMessageFacts(
       dob: dob,
       name: k?.nameMid ?? c.nameMid,
@@ -254,12 +397,28 @@ class PpMessageFacts {
       //   inParenting: LifeStageStore.instance.stage == LifeStage.parenting,
       inParenting: true,
       partner: FatherPreview.instance.on,
-      idPrefix: ppMessageIdPrefix(
-          k?.id, c.children.isEmpty ? null : c.children.first.id),
+      // Kept for revert: idPrefix: ppMessageIdPrefix(k?.id, c.children.isEmpty ? null : c.children.first.id),
+      idPrefix: prefix,
       named: c.children.length > 1,
       sexGiven: k?.sexGiven ?? c.sexGiven,
       isBoy: k?.isBoy ?? c.isBoy,
-      correctionWeeks: (k == null || k.id == c.activeChildId) ? c.correctionWeeks : null,
+      // Kept for revert: correctionWeeks: (k == null || k.id == c.activeChildId) ? c.correctionWeeks : null,
+      correctionWeeks: correction,
+      // PP 11: turns, pregnant again, offers, what this child already had.
+      childIndex: index,
+      childCount: c.children.isEmpty ? 1 : c.children.length,
+      pregDueDate: LifeStageStore.instance.stage == LifeStage.pregnancy && preg != null && preg.isDueDateSet
+          ? preg.dueDate
+          : null,
+      offers: k == null || !store.isOn(PpMessageKind.offer)
+          ? const []
+          : ppOffersForAge(weeks <= 0 ? 0 : (weeks / 4.345).floor()),
+      offered: {for (final m in mine) if (m.ref != null) m.ref!},
+      hadActivity: {
+        for (final m in mine)
+          if (m.kind == PpMessageKind.activity && m.at.isAfter(now.subtract(const Duration(days: 7)))) m.body
+      },
+      activityWanted: store.isOn(PpMessageKind.activity),
       visits: !withVisits
           ? const []
           : [
@@ -394,8 +553,7 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
 
   // ---- activity: Monday mornings --------------------------------------------
   final monday = today.add(Duration(days: (DateTime.monday - today.weekday) % 7));
-  for (var i = 0; i < kPpPhoneSlots; i++) {
-    final day = monday.add(Duration(days: 7 * i));
+  String? activityOn(DateTime day) {
     final months = (day.difference(f.dob).inDays / 30.44).floor();
     final note = ppMonthNoteFor(months);
     final idx = phaseIndexForMonths(months.toDouble());
@@ -404,8 +562,30 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
     // final play = kPhasesAuthored[idx].sections.where((s) => s.heading.toLowerCase().startsWith('play')).firstOrNull;
     // final line = note?.tryThis ?? play?.paragraphs.first;
     final docTry = ppPhaseDocFor(kPhasesAuthored[idx].number)?.activities.firstOrNull;
-    final line = note?.tryThis ?? (docTry == null ? null : '${docTry.title}: ${docTry.intro}');
-    if (line == null) continue;
+    // The intro alone when it already starts with the title (PP 11): "Explore
+    // With Both Hands: Explore With Both Hands gives..." read twice. Kept for
+    // revert: '${docTry.title}: ${docTry.intro}'
+    final doc = docTry == null
+        ? null
+        : docTry.intro.toLowerCase().startsWith(docTry.title.toLowerCase())
+            ? docTry.intro
+            : '${docTry.title}: ${docTry.intro}';
+    final line = note?.tryThis ?? doc;
+    return line == null ? null : ppFillChildFor(line, sexGiven: f.sexGiven, isBoy: f.isBoy, name: f.name);
+  }
+
+  final activityDays = <DateTime>{};
+  for (var i = 0; i < kPpPhoneSlots; i++) {
+    final day = monday.add(Duration(days: 7 * i));
+    final body = activityOn(day);
+    if (body == null) continue;
+    // Not one this child already had in the last 7 days (PP 11): a month
+    // note fills four Mondays, and she was sent the same idea each week.
+    // Last Monday's is the one before in this run, or one delivered.
+    if (f.hadActivity.contains(body) || (i > 0 && activityOn(day.subtract(const Duration(days: 7))) == body)) {
+      continue;
+    }
+    if (f.activityWanted) activityDays.add(day);
     final week = '${day.year}-${day.month}-${day.day}';
     out.add(PpMessage(
       // The child's prefix too (F3): two children, two Monday ideas. Was
@@ -415,8 +595,75 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
       at: _at(day, 10),
       title: f.named ? 'Something to try with $who this week' : 'Something to try this week',
       // Kept for revert: body: ppFillChild(line), which spoke of the active child.
-      body: ppFillChildFor(line, sexGiven: f.sexGiven, isBoy: f.isBoy, name: f.name),
+      body: body,
     ));
+  }
+
+  out.addAll(ppDailyCandidates(f, now, activityDays: activityDays));
+  return out;
+}
+
+String _dayKey(DateTime d) =>
+    '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+/// The tip and the offers for the next [kPpDailyDays] days (PP 11). Pure.
+///
+///  * the tip, 8:30, to one child a day in turn (pregnant again: every other
+///    day, the days Pregnancy's own tip gives way), never on a morning this
+///    child's activity already speaks ([activityDays]);
+///  * an offer, 7 pm on Wednesday and Saturday, the children in turn
+///    (pregnant again: on Pregnancy's day 6), each one something not offered
+///    before, never late.
+List<PpMessage> ppDailyCandidates(PpMessageFacts f, DateTime now, {Set<DateTime> activityDays = const {}}) {
+  if (!f.speaks) return const [];
+  final out = <PpMessage>[];
+  final who = _cap(f.name);
+  final today = DateTime(now.year, now.month, now.day);
+  final n = f.childCount < 1 ? 1 : f.childCount;
+  final fresh = [for (final o in f.offers) if (!f.offered.contains(o.ref)) o];
+  var nextOffer = 0;
+
+  for (var i = 0; i < kPpDailyDays; i++) {
+    final d = today.add(Duration(days: i));
+    final day = ppDayNumber(d);
+
+    // ---- the tip ------------------------------------------------------------
+    final tipChild = f.pregnantAgain ? (day.isOdd ? (day ~/ 2) % n : -1) : day % n;
+    if (tipChild == f.childIndex && !activityDays.contains(d) && !d.isBefore(f.dob)) {
+      final tip = dailyTipFor(dob: f.dob, correctionWeeks: f.correctionWeeks, on: d).tip;
+      String fill(String s) => ppFillChildFor(s, sexGiven: f.sexGiven, isBoy: f.isBoy, name: f.name);
+      out.add(PpMessage(
+        id: '${f.idPrefix}tip:${_dayKey(d)}',
+        kind: PpMessageKind.tip,
+        at: DateTime(d.year, d.month, d.day, 8, 30),
+        title: f.named ? "Today's tip for $who: ${fill(tip.title)}" : "Today's tip: ${fill(tip.title)}",
+        body: fill(tip.body),
+      ));
+    }
+
+    // ---- the offer ----------------------------------------------------------
+    final offerAt = DateTime(d.year, d.month, d.day, 19);
+    int? offerChild;
+    final due = f.pregDueDate;
+    if (due != null) {
+      final w = pregWeekOn(due, d);
+      if (d.difference(pregWeekStart(due, w)).inDays + 1 == 6) offerChild = ppWeekNumber(d) % n;
+    } else if (d.weekday == DateTime.wednesday || d.weekday == DateTime.saturday) {
+      offerChild = (ppWeekNumber(d) * 2 + (d.weekday == DateTime.saturday ? 1 : 0)) % n;
+    }
+    if (offerChild == f.childIndex && offerAt.isAfter(now) && nextOffer < fresh.length) {
+      final o = fresh[nextOffer++];
+      out.add(PpMessage(
+        id: '${f.idPrefix}offer:${_dayKey(d)}',
+        kind: PpMessageKind.offer,
+        at: offerAt,
+        title: f.named ? 'For $who now: ${o.name}' : 'For this age: ${o.name}',
+        body: o.isClass
+            ? 'Made for ${o.ageLabel}. See what it covers, in Learn.'
+            : 'Made for ${o.ageLabel}. See what parents pick, in the Store.',
+        ref: o.ref,
+      ));
+    }
   }
   return out;
 }
@@ -455,6 +702,8 @@ class PpMessagesStore extends ChangeNotifier
   static const _kOff = 'pp_messages_off';
   static const _kOn = 'pp_messages_on';
   static const _kPhone = 'pp_messages_phone';
+  static const _kOffers = 'pp_messages_offers';
+  static const _kOffersAsked = 'pp_messages_offers_asked';
   static const int _keep = 120;
 
   final List<PpMessage> _all = [];
@@ -464,6 +713,12 @@ class PpMessagesStore extends ChangeNotifier
   final Set<PpMessageKind> _off = {};
   final Set<PpMessageKind> _on = {};
   bool _phoneOn = true;
+
+  /// PP 11: her answer to offers, and whether she has given one. Kept apart
+  /// from [_on]/[_off] as Pregnancy keeps them, so offers can never be on
+  /// by a default or a topic: only by her yes.
+  bool _offersYes = false;
+  bool _offersAsked = false;
   bool _loaded = false;
   bool _listening = false;
   PpMessagePhone _phone = const _OsPhone();
@@ -491,13 +746,34 @@ class PpMessagesStore extends ChangeNotifier
 
   /// On: her own switch first; else the topics she chose; else the default.
   bool isOn(PpMessageKind k) {
+    // ⚠️ OFFERS START OFF (PP 11), whatever her topics say: only her yes.
+    if (k == PpMessageKind.offer) return _offersYes;
     if (_off.contains(k)) return false;
     if (_on.contains(k)) return true;
     final topics = FamilyProfileStore.instance.notify;
-    return topics.isEmpty ? k.onByDefault : topics.contains(k.topic);
+    // The tip has no topic of its own: on until she turns it off.
+    final topic = k.topic;
+    if (topic == null) return k.onByDefault;
+    return topics.isEmpty ? k.onByDefault : topics.contains(topic);
   }
 
   bool get phoneOn => _phoneOn;
+
+  /// Whether she has answered the offers card in Messages, either way.
+  bool get offersAsked => _offersAsked;
+
+  /// Her answer to the offers card. Either answer stops the card.
+  Future<void> answerOffers(bool yes) async {
+    _offersAsked = true;
+    _offersYes = yes;
+    if (!yes) {
+      final now = DateTime.now();
+      _all.removeWhere((m) => m.kind == PpMessageKind.offer && !m.deliveredBy(now));
+    }
+    await _persist();
+    notifyListeners();
+    await refresh();
+  }
 
   Future<void> init() async {
     await _load();
@@ -511,6 +787,10 @@ class PpMessagesStore extends ChangeNotifier
       FatherPreview.instance.addListener(_changed);
       VaxStore.instance.addListener(_changed);
       FamilyProfileStore.instance.addListener(_changed);
+      // PP 11: offers appearing or going, and a due date (pregnant again).
+      PvCatalogStore.instance.addListener(_changed);
+      ProgrammeStore.instance.addListener(_changed);
+      PregnancyController.current?.addListener(_changed);
       try {
         WidgetsBinding.instance.addObserver(this);
       } catch (_) {/* no binding in a pure test */}
@@ -579,20 +859,22 @@ class PpMessagesStore extends ChangeNotifier
     final family = fixedFacts == null ? PpMessageFacts.familyFromStores() : [fixedFacts];
     final now = fixedNow ?? DateTime.now();
     final changed = apply([for (final f in family) ...ppMessageCandidates(f, now)], now);
-    for (final k in PpMessageKind.values) {
-      for (final id in k.phoneIds) {
-        await _phone.cancel(id);
-      }
-    }
-    if (_phoneOn) {
-      final slots = <PpMessageKind, int>{};
-      for (final m in pending(now: now)) {
-        final n = slots[m.kind] ?? 0;
-        if (n >= kPpPhoneSlots) continue;
-        slots[m.kind] = n + 1;
-        await _phone.schedule(id: m.kind.notificationId + n, title: m.title, body: m.body, when: m.at);
-      }
-    }
+    // Kept for revert (PP 11: one cap with Pregnancy, `familyPhonePlan`):
+    //   for (final k in PpMessageKind.values) {
+    //     for (final id in k.phoneIds) {
+    //       await _phone.cancel(id);
+    //     }
+    //   }
+    //   if (_phoneOn) {
+    //     final slots = <PpMessageKind, int>{};
+    //     for (final m in pending(now: now)) {
+    //       final n = slots[m.kind] ?? 0;
+    //       if (n >= kPpPhoneSlots) continue;
+    //       slots[m.kind] = n + 1;
+    //       await _phone.schedule(id: m.kind.notificationId + n, title: m.title, body: m.body, when: m.at);
+    //     }
+    //   }
+    await FamilyPhone.instance.rearm(now: now);
     if (changed) {
       await _persist();
       notifyListeners();
@@ -623,6 +905,8 @@ class PpMessagesStore extends ChangeNotifier
     for (final m in newestLate.values) {
       next.add(m.copyWith(at: now));
     }
+    // Daily kinds leave Messages after two weeks (PP 11, Pregnancy's rule).
+    next.removeWhere((m) => m.kind.isDaily && m.deliveredBy(now) && m.at.isBefore(now.subtract(kPpDailyKeep)));
     next.sort((a, b) => b.at.compareTo(a.at));
     final keepDelivered = next.where((m) => m.deliveredBy(now)).take(_keep);
     final keepPending = next.where((m) => !m.deliveredBy(now));
@@ -631,6 +915,27 @@ class PpMessagesStore extends ChangeNotifier
       ..addAll(keepPending)
       ..addAll(keepDelivered);
     return jsonEncode([for (final m in _all) m.toJson()]) != before;
+  }
+
+  // ---- the phone (PP 11) ----------------------------------------------------
+
+  /// What may ring: everything pending, or nothing when she keeps messages
+  /// in the app only. What [familyPhonePlan] ranks against Pregnancy's.
+  List<PpMessage> phonePending({DateTime? now}) => _phoneOn ? pending(now: now) : const [];
+
+  /// Arms exactly [plan] on this store's own ids, after cancelling all of
+  /// them. Called by [FamilyPhone] only: which messages ring is decided
+  /// there, for both stores at once. The emoji is added here, on the phone
+  /// only (`phone_emoji.dart`); the message keeps its plain title.
+  Future<void> armPhone(List<(int, PpMessage)> plan) async {
+    for (final k in PpMessageKind.values) {
+      for (final id in k.phoneIds) {
+        await _phone.cancel(id);
+      }
+    }
+    for (final (id, m) in plan) {
+      await _phone.schedule(id: id, title: phoneTitle(m.title, m.kind, id: m.id), body: m.body, when: m.at);
+    }
   }
 
   void markRead(String id) {
@@ -657,6 +962,8 @@ class PpMessagesStore extends ChangeNotifier
 
   Future<void> setOn(PpMessageKind kind, bool on) async {
     if (isOn(kind) == on) return;
+    // The offers switch is her yes or no, kept apart (PP 11).
+    if (kind == PpMessageKind.offer) return answerOffers(on);
     if (on) {
       _off.remove(kind);
       _on.add(kind);
@@ -704,6 +1011,8 @@ class PpMessagesStore extends ChangeNotifier
     _off.clear();
     _on.clear();
     _phoneOn = true;
+    _offersYes = false;
+    _offersAsked = false;
     _loaded = true;
     notifyListeners();
   }
@@ -723,6 +1032,9 @@ class PpMessagesStore extends ChangeNotifier
       // Off after on, so a kind somehow in both reads as off, as isOn does.
       for (final k in _off) 'switch|${k.name}': 'off',
       'phone': _phoneOn,
+      // PP 11, the names Pregnancy's row uses.
+      'offers': _offersYes,
+      'offersAsked': _offersAsked,
     };
   }
 
@@ -732,6 +1044,8 @@ class PpMessagesStore extends ChangeNotifier
     _off.clear();
     _on.clear();
     _phoneOn = true;
+    _offersYes = false;
+    _offersAsked = false;
     for (final e in items.entries) {
       final k = e.key;
       if (k.startsWith('msg|')) {
@@ -745,6 +1059,10 @@ class PpMessagesStore extends ChangeNotifier
         e.value == 'off' ? _off.add(kind) : _on.add(kind);
       } else if (k == 'phone') {
         _phoneOn = e.value != false;
+      } else if (k == 'offers') {
+        _offersYes = e.value == true;
+      } else if (k == 'offersAsked') {
+        _offersAsked = e.value == true;
       }
     }
     _all.sort((a, b) => b.at.compareTo(a.at));
@@ -778,6 +1096,8 @@ class PpMessagesStore extends ChangeNotifier
         ..clear()
         ..addAll((p.getStringList(_kOn) ?? const <String>[]).map(kind).whereType<PpMessageKind>());
       _phoneOn = p.getBool(_kPhone) ?? true;
+      _offersYes = p.getBool(_kOffers) ?? false;
+      _offersAsked = p.getBool(_kOffersAsked) ?? false;
     } catch (_) {/* start empty; a storage failure is never a crash */}
     _loaded = true;
     notifyListeners();
@@ -790,6 +1110,8 @@ class PpMessagesStore extends ChangeNotifier
       await p.setStringList(_kOff, [for (final k in _off) k.name]);
       await p.setStringList(_kOn, [for (final k in _on) k.name]);
       await p.setBool(_kPhone, _phoneOn);
+      await p.setBool(_kOffers, _offersYes);
+      await p.setBool(_kOffersAsked, _offersAsked);
     } catch (_) {/* best-effort */}
   }
 }

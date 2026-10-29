@@ -1118,10 +1118,26 @@ List<AgeTip> ageTipsFor(int weeks) {
 AgeTip? _ageTipToday([DateTime? on]) {
   final child = ChildProfileStore.instance;
   if (!child.hasRealChild) return null;
-  final now = on ?? DateTime.now();
-  final doy = now.difference(DateTime(now.year)).inDays;
   // Corrected age, as the home's tips strip (relevance PP 2, 2026-10-28).
   // Kept for revert: ageTipsFor(child.ageInWeeks.floor())
-  final pool = ageTipsFor(child.devAgeInWeeks.floor());
+  // One picker with the morning message (PP 11), so the home and the phone
+  // name the same tip on the same day.
+  return ageTipOn(on ?? DateTime.now(), child.devAgeInWeeks.floor());
+}
+
+/// The tip for a child of [weeks] (corrected) on [day]: the same pick the
+/// home makes, stable within a calendar day.
+AgeTip ageTipOn(DateTime day, int weeks) {
+  final doy = day.difference(DateTime(day.year)).inDays;
+  final pool = ageTipsFor(weeks);
   return pool[doy % pool.length];
+}
+
+/// [dailyTip], given the child (PP 11, 2026-10-29): `dailyTip()` reads the
+/// active child only, and the morning message is for each child in turn.
+/// [correctionWeeks] is taken off the age for a baby born early, as the home.
+AgeTip dailyTipFor({required DateTime dob, int? correctionWeeks, required DateTime on}) {
+  final days = DateTime(on.year, on.month, on.day).difference(DateTime(dob.year, dob.month, dob.day)).inDays;
+  final weeks = days ~/ 7 - (correctionWeeks ?? 0);
+  return ageTipOn(on, weeks < 0 ? 0 : weeks);
 }

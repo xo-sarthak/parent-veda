@@ -23,10 +23,6 @@ Siblings: `PREGNANCY-GAP.md`, `TTC-GAP.md`. Plan and seams: `README.md`.
 
 ## 1. Still open, in build order
 
-### Step 4
-**11. Messages have no situation awareness, no limit, no quiet hours and no offers** (Weak, GLOBAL-CHANGES #12). *Fix:* Phase 6a as built for Pregnancy and TTC in 0a38f4dd (`docs/NOTIFICATIONS-PLAN.md`): two a day at most, quiet hours.
-What the audit found (`pp_messages_store.dart:312-403`, as of 395ee74): per real child, "X weeks old" weekly to 8 weeks at 9am, then monthly to 36 months, then quarterly to 72 months; vaccines 3 days before at 10am; new phase at 6pm (corrected age, active child only, `:252`); Monday activity at 10am.
-
 ### Found in Step 3c
 **21. A child's health conditions are stored per family, not per child** (Weak). Onboarding's conditions (eczema, reflux, a hearing need...) live on `FamilyProfileStore`, so with two children nothing says whose they are. Step 3c sends them to Ask Veda only while one child is saved (`ppAskVedaContext`, held by `test/pp_relevance_step3c_test.dart`, "two children"); the home's extra-support signal has the same blind spot. *Fix (not built):* store conditions on the `Child`, ask whose when a second child is added. Touches `docs/FAMILY-MODEL.md` (the child owns child records), so read that first.
 
@@ -57,6 +53,7 @@ What the audit found (`pp_messages_store.dart:312-403`, as of 395ee74): per real
 | 15 | Stale docs marked: GLOBAL-CHANGES #2 (Parenting live for courses; consults wait on Directus experts), STILL-OPEN tips by age and §95.6 (3) | 9313ed8a + this commit |
 | 14 | Stale comments: the vaccines header and `familyFromStores` now say every child carries their own visits (B11) | 9313ed8a |
 | 16 | A visit with her own vaccine alarm gets no automatic 3-day message, phone or inbox; read per child (`VaxStore.hasAlarmFor`) | 9313ed8a |
+| 11 | One cap of two a day across Pregnancy and Parenting (`familyPhonePlan`), a morning tip per child in turn, offers the Pregnancy way (toys with a real age window, classes with a 0124 window); a repeated activity and a doubled title fixed; phone-only emoji in all three stages | this commit |
 | 6 | Ask Veda gets the corrected age next to the birthday age, and the family's context as closed ids (never the name or prose: the cache is shared); conditions only with one child; the answer says what it used, from the service's `used_context`. Two repos. Inert until the service is redeployed. The audit's "Pregnancy sends conditions" was wrong: `VedaContext` feeds only the retired offline engine | 3e107d77 (askveda ac6ffac; Railway redeploy owed) |
 
 Tests: `test/pp_relevance_batch1_test.dart`, `pp_relevance_batch2_test.dart`, `pp_relevance_step3a_test.dart`, `pp_relevance_step3b_test.dart`, `pp_relevance_step3c_test.dart`, `pp_relevance_step4a_test.dart`; service: `parentveda-askveda/tests/test_child_context.py`.

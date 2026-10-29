@@ -45,8 +45,10 @@ void main() {
     test('tips, reads and products read the corrected age', () {
       expect(_src('lib/screens/post_pregnancy/pp_home_reads.dart'),
           contains('ageTipsFor(child.devAgeInWeeks.floor())'));
+      // One picker with the morning message since PP 11 (`ageTipOn`), still
+      // on the corrected age. Was: 'ageTipsFor(child.devAgeInWeeks.floor())'.
       expect(_src('lib/screens/post_pregnancy/pp_daily_tips.dart'),
-          contains('ageTipsFor(child.devAgeInWeeks.floor())'));
+          contains('ageTipOn(on ?? DateTime.now(), child.devAgeInWeeks.floor())'));
       expect(home, contains('_readsForAge(child.devAgeInMonths, 3)'));
       expect(home, contains('ppCatalogProducts(child.devAgeInMonths'));
       expect(_src('lib/services/pv_catalog_store.dart'),

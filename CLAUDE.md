@@ -145,7 +145,13 @@ it belongs in the answer rather than the screen, it belongs there.
   is opened again. Decided 2026-09-17 (STILL-OPEN §60.6).
 - **Write new copy in English.** Hindi is not a default any more — see
   "New work is English" below before reaching for `_t(...)`.
-- **No decorative emoji** in chrome. Line icons.
+- **No decorative emoji** in chrome. Line icons. **One exception (decided
+  2026-10-29):** a phone notification's title may end in one emoji for its
+  kind, from the single map in `lib/services/phone_emoji.dart`, added only
+  when it is scheduled. Stored titles, ids, cloud rows and the in-app
+  Messages list stay plain, and sensitive kinds (a period, a loss path, the
+  two-week wait, treatment, the baby's movements) get none.
+  `test/phone_emoji_test.dart` holds the map.
 - **Never a diagnosis.** Anything clinical ends with a disclaimer and routes
   calmly to a doctor. The app must never contradict a user's own clinician.
 - **Money and seats are decided server-side**, always.

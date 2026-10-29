@@ -151,4 +151,45 @@ research hand-back of the 2026-10-28 session.
 
 **Ids:** Pregnancy 919130 (14), 919150 (14), 919170 (8); TTC 918107, 918130 (14), 918150 (14), 918170 (8). Held unique by `test/notifications_6a_test.dart` (20 tests) and `stage_transitions_test` M37.
 
-**Owed:** clinician read of the new words (BEFORE-LAUNCH); a phone walk on the user's word (an alarm per slot, the offers card, a tap on each kind); Parenting stays parked.
+**Owed:** clinician read of the new words (BEFORE-LAUNCH); a phone walk on the user's word (an alarm per slot, the offers card, a tap on each kind); Parenting stays parked (built 2026-10-29, below).
+
+## As built: Parenting (2026-10-29, PARENTING-GAP 11)
+
+From the approved prototype (Artifact `8LcSdbkh9LDV32FMVzfqjL`, v3 with the emoji). `lib/services/pp_messages_store.dart`, screen `pp_messages_screen.dart`.
+
+| Kind | When | Opens | Ready when |
+|---|---|---|---|
+| `tip` | 8:30, one child a day in turn | the child's home, whose tip it is | always: `kAgeTips` by corrected age (`dailyTipFor`, the home's own pick); not on a morning that child's activity speaks; pregnant again, odd days only |
+| `offer` | 7 pm Wednesday and Saturday, children in turn; pregnant again, Pregnancy's day 6 | the toy or the class | `ppOffersForAge` (`pp_message_offers.dart`) finds a toy with a REAL age window or a published class with a 0124 window; never one already offered; off until she says yes |
+
+Titles: "Today's tip: <title>", or "Today's tip for Meera: <title>" with two or more children. "For this age: <toy>", or "For Meera now: <toy>"; body "Made for <age label>. See what parents pick, in the Store." (a class: "See what it covers, in Learn.").
+
+**One cap for both stores.** Pregnant again, her messages and her toddler's used to arm separately: Pregnancy held itself to two, Parenting rang everything. Now `familyPhonePlan` (`lib/services/family_phone_plan.dart`) ranks both pending lists on one scale, two a day (before and after 2 pm):
+
+| Rank | Kind |
+|---|---|
+| 1 | a vaccine visit; a pregnancy dated moment (scans, Tdap, the bag...) |
+| 2 | an age; a new stage |
+| 3 | Pregnancy's new week |
+| 4 | the Monday activity |
+| 4.5 | a tip; Pregnancy's day line |
+| 5 | the check-in |
+| 6 | an offer |
+
+Ties: the earlier time; then, between the stores, Parenting on odd days and Pregnancy on even ones (so the toddler's every-other-day tip wins its morning); then, between two children, the one whose week it is. A loser is not armed but still lands in Messages at its time.
+
+**The design, and the trade-off.** Two pieces: the planner is pure (lists in, winners out, held by tests with no phone), and `FamilyPhone` is the one owner of arming, serialised, reading both stores and handing each its share. Each store still cancels and arms only its own id block, through its own phone interface. The cost: a refresh of either store re-arms both (a few dozen cancel and schedule calls). The alternative, each store arming itself after reading the other's list, is cheaper but races: each arms from the other's stale list, and for a moment both ring the same slot. Pregnancy's own ranks keep their order on the shared scale, so with no child the plan is `pregPhonePlan`'s exactly (tested); with a child, Pregnancy gives up its day 6 offer so the two take turns.
+
+**Offers:** the same card, switch ("Offers and new things") and toasts as Pregnancy; stored locally (`pp_messages_offers`, `pp_messages_offers_asked`) and in the cloud row (`offers`, `offersAsked`). Silent when nothing exists. Toys: a toy with no age window defaults to 0-72 months, so the Store's `fitsNow` is true for every child; only the 136 of 281 with a real window are offered.
+
+**Fixed on the way:** an activity this child already had in the last 7 days is not sent again (a month note filled four Mondays in a row); a phase activity whose intro starts with its title is not doubled ("Explore With Both Hands: Explore With Both Hands gives...", at 5 months).
+
+**Daily kinds leave Messages after 14 days**, as Pregnancy's.
+
+**Ids:** Parenting 929101, 929111, 929121, 929131 (4 each), tip 929140 (14), offer 929160 (8). Held unique by `stage_transitions_test` M37 and `test/pp11_family_messages_test.dart`.
+
+### The phone emoji, all three stages (decided 2026-10-29)
+
+One map, `kPhoneEmoji` in `lib/services/phone_emoji.dart`, one emoji per kind at the END of the title, added only when the phone notification is scheduled. The stored title, the ids and the cloud rows are unchanged, and Messages in the app stays plain. Ages: 🎂 on whole years, 🎉 on the rest, 🎂🎒 on the sixth birthday only. None on the sensitive kinds (a period that came, late, the first check, the two-week wait, clinic treatment, the baby's movements). The one exception to "no decorative emoji", recorded in CLAUDE.md and `docs/CHATGPT-BRIEF.md`. Held by `test/phone_emoji_test.dart`, which also fails when a new kind is added without a decision.
+
+**Owed:** clinician read of the new words (BEFORE-LAUNCH); a phone walk on the user's word (two a day with a toddler and a pregnancy, the offers card, a tap on a tip and an offer, the emoji on the lock screen).

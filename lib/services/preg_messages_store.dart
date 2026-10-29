@@ -53,6 +53,13 @@
 //  to Messages; they just do not ring. [pregPhonePlan] is the whole rule and
 //  is pure. Her own reminders (`ReminderStore`) are outside it.
 //
+//  ⚠️ ONE CAP WITH HER CHILDREN'S (PP 11, 2026-10-29). Pregnant again, her
+//  toddler's messages (`PpMessagesStore`) and hers share the same two slots:
+//  `familyPhonePlan` (`family_phone_plan.dart`) ranks both pending lists on
+//  one scale, and `FamilyPhone` arms each store's winners on that store's own
+//  ids ([armPhone]). With no child, the plan is [pregPhonePlan]'s exactly (a
+//  test holds it). Her day 6 offer becomes the child's, so the two take turns.
+//
 //  Every clinical line reminds, explains or helps her prepare; none adds a
 //  step her doctor did not (CLAUDE.md, clinical ownership). The scan and
 //  vaccine lines say "usually" and "ask your doctor", never "you need".
@@ -98,7 +105,10 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/preg_daily_tips.dart';
+import '../screens/post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
 import 'expert_store.dart';
+import 'family_phone_plan.dart';
+import 'phone_emoji.dart';
 import 'father_preview.dart';
 import 'life_stage_store.dart';
 import 'notification_service.dart';
@@ -324,7 +334,14 @@ class PregMessageFacts {
     this.dueDateFromClinic = false,
     this.checkedInToday = false,
     this.offersByWeek = const {},
+    this.withChildren = false,
   });
+
+  /// She is pregnant again with a child already (PP 11, 2026-10-29): the
+  /// stores take turns at offers, so her day 6 is the child's
+  /// (`ppDailyCandidates`) and only day 3 stays hers. False on her own, and
+  /// everything is exactly as before.
+  final bool withChildren;
 
   final DateTime dueDate;
   final bool dueDateSet;
@@ -368,6 +385,7 @@ class PregMessageFacts {
       dueDateFromClinic: c.dueDateFromClinic,
       checkedInToday: SymptomStore.instance.logsOn(DateTime.now()).isNotEmpty,
       offersByWeek: _offersAhead(c.dueDate),
+      withChildren: ChildProfileStore.instance.hasRealChild,
     );
   }
 
@@ -513,7 +531,9 @@ List<PregMessage> pregDailyCandidates(PregMessageFacts f, DateTime now) {
 
     final offers = f.offersByWeek[w] ?? const <PregOffer>[];
     final offerAt = DateTime(d.year, d.month, d.day, 19);
-    if ((dow == 3 || dow == 6) && offers.isNotEmpty && offerAt.isAfter(now)) {
+    // Kept for revert (PP 11: day 6 is the child's when she has one):
+    //   if ((dow == 3 || dow == 6) && offers.isNotEmpty && offerAt.isAfter(now)) {
+    if ((dow == 3 || (dow == 6 && !f.withChildren)) && offers.isNotEmpty && offerAt.isAfter(now)) {
       final o = dow == 3 ? offers.first : offers.last;
       out.add(PregMessage(
         id: 'offer:$w:$dow',
@@ -671,6 +691,8 @@ class PregMessagesStore extends ChangeNotifier
       FatherPreview.instance.addListener(_changed);
       // Phase 6a: a check-in logged today, and offers appearing or going.
       SymptomStore.instance.addListener(_changed);
+      // PP 11: a child added or gone changes who has day 6's offer.
+      ChildProfileStore.instance.addListener(_changed);
       PvCatalogStore.instance.addListener(_changed);
       ProgrammeStore.instance.addListener(_changed);
       ExpertStore.instance.addListener(_changed);
@@ -758,27 +780,30 @@ class PregMessagesStore extends ChangeNotifier
     final changed = apply(pregMessageCandidates(facts, now), now,
         since: facts.pregnancyStart);
 
-    // ---- the phone: cancel our ids only, re-arm what is pending -------------
-    for (final k in PregMessageKind.values) {
-      for (final id in k.phoneIds) {
-        await _phone.cancel(id);
-      }
-    }
-    if (_phoneOn) {
-      // Kept for revert (Phase 6a: two a day, `pregPhonePlan`):
-      //   var slot = 0;
-      //   for (final m in pending(now: now)) {
-      //     var id = m.kind.notificationId;
-      //     if (m.kind == PregMessageKind.newWeek) {
-      //       if (slot >= kPregWeekPhoneSlots) continue;
-      //       id += slot++;
-      //     }
-      //     await _phone.schedule(id: id, title: m.title, body: m.body, when: m.at);
-      //   }
-      for (final (id, m) in pregPhonePlan(pending(now: now))) {
-        await _phone.schedule(id: id, title: m.title, body: m.body, when: m.at);
-      }
-    }
+    // ---- the phone: one plan with her children's (PP 11) --------------------
+    // Kept for revert (PP 11: `familyPhonePlan` decides for both stores, and
+    // `armPhone` below arms this store's share):
+    //   for (final k in PregMessageKind.values) {
+    //     for (final id in k.phoneIds) {
+    //       await _phone.cancel(id);
+    //     }
+    //   }
+    //   if (_phoneOn) {
+    //     // Kept for revert (Phase 6a: two a day, `pregPhonePlan`):
+    //     //   var slot = 0;
+    //     //   for (final m in pending(now: now)) {
+    //     //     var id = m.kind.notificationId;
+    //     //     if (m.kind == PregMessageKind.newWeek) {
+    //     //       if (slot >= kPregWeekPhoneSlots) continue;
+    //     //       id += slot++;
+    //     //     }
+    //     //     await _phone.schedule(id: id, title: m.title, body: m.body, when: m.at);
+    //     //   }
+    //     for (final (id, m) in pregPhonePlan(pending(now: now))) {
+    //       await _phone.schedule(id: id, title: m.title, body: m.body, when: m.at);
+    //     }
+    //   }
+    await FamilyPhone.instance.rearm(now: now);
     if (changed) {
       await _persist();
       notifyListeners();
@@ -851,6 +876,26 @@ class PregMessagesStore extends ChangeNotifier
       ..addAll(keepPending)
       ..addAll(keepDelivered);
     return jsonEncode([for (final m in _all) m.toJson()]) != before;
+  }
+
+  // ---- the phone (PP 11) ----------------------------------------------------
+
+  /// What may ring: everything pending, or nothing when she keeps messages
+  /// in the app only. What `familyPhonePlan` ranks against her children's.
+  List<PregMessage> phonePending({DateTime? now}) => _phoneOn ? pending(now: now) : const [];
+
+  /// Arms exactly [plan] on this store's own ids, after cancelling all of
+  /// them. Called by [FamilyPhone] only. The emoji is added here, on the
+  /// phone only (`phone_emoji.dart`); the message keeps its plain title.
+  Future<void> armPhone(List<(int, PregMessage)> plan) async {
+    for (final k in PregMessageKind.values) {
+      for (final id in k.phoneIds) {
+        await _phone.cancel(id);
+      }
+    }
+    for (final (id, m) in plan) {
+      await _phone.schedule(id: id, title: phoneTitle(m.title, m.kind), body: m.body, when: m.at);
+    }
   }
 
   // ---- her choices ----------------------------------------------------------

@@ -113,7 +113,10 @@ These are the ones most likely to make a proposal land or fail.
   mein takleef" is out of date.
 - **India-first**, not localised afterwards: real Indian kitchens, clinics,
   costs.
-- **No decorative emoji** in interface chrome.
+- **No decorative emoji** in interface chrome. One exception: a phone
+  notification may end its title with one emoji for its kind (from one map,
+  phone only; the in-app Messages list stays plain, and sensitive moments
+  such as a period, a loss or the baby's movements get none).
 - **Money and seats are decided server-side.**
 
 ## Useful shape for a prompt

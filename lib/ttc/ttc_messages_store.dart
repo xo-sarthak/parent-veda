@@ -130,6 +130,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/life_stage_store.dart';
 import '../services/notification_service.dart';
+import '../services/phone_emoji.dart';
 import '../services/remote/cloud_merged_store.dart';
 // import '../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 // ⚠️ A STORE IMPORTING A SCREEN, ON PURPOSE AND FOR ONE FUNCTION (2026-09-27).
@@ -1507,7 +1508,9 @@ class TtcMessagesStore extends ChangeNotifier
       //         id: id, title: m.title, body: m.body, when: m.at);
       //   }
       for (final (id, m) in ttcPhonePlan(pending(now: now))) {
-        await _phone.schedule(id: id, title: m.title, body: m.body, when: m.at);
+        // The kind's emoji on the phone only (2026-10-29, `phone_emoji.dart`);
+        // the message keeps its plain title. Kept for revert: title: m.title,
+        await _phone.schedule(id: id, title: phoneTitle(m.title, m.kind), body: m.body, when: m.at);
       }
     }
     if (changed) {
