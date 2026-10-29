@@ -4656,3 +4656,33 @@ the raw map, so an unknown key is simply never looked at. **This trick costs you
 writes `for (final e in _status.entries)` expecting only vaccine ids, `_2` becomes a ghost vaccine.** The header of
 `ttc_vaccine_store.dart` says so, and the round-trip test pins the key. When the readers are NOT closed over a list,
 add a field instead.
+
+## 16zzm. Who owns a shared resource depends on which way the dependency runs (TTC with a child, no migration, 2026-10-29)
+
+**1. Two writers to one resource: ask first whether each one's decision reads the other's.** Her phone's alarm
+schedule has three writers: the Pregnancy, Parenting and TTC message stores. For PP 11, Pregnancy and Parenting
+share ONE cap of two a day, so which Pregnancy message rings depends on Parenting's list and the other way round.
+That is a two-way dependency, and two independent arming loops would race: each arms from the other's stale list,
+and for a moment both ring the same slot. The fix there was ONE owner (`FamilyPhone`), serialised, reading both.
+For TTC with a child the user's rule is different: TTC arms exactly as on its own, and only the child's alarms
+move out of its way. TTC's decision never reads Parenting's. **A one-way dependency needs no shared owner: let the
+independent side act, then tell the dependent side to recompute from what it did.** TTC arms, then calls
+`FamilyPhone.rearm`, which reads TTC's plan as fixed obstacles. A stale read cannot cause a clash for long,
+because every TTC change ends in another re-arm. The general fact: **a race needs a cycle. Break the cycle and
+ordering alone makes it safe.**
+
+*The alternative, named.* Folding TTC into `FamilyPhone` as a third store would also be correct, and would make
+every arming decision in one place. It costs rewriting TTC's arming path, which TTC on its own (no child, the
+common case) never needed, and puts its tests at the mercy of a planner built for other stores. Keeping TTC's
+arming untouched makes "TTC alone behaves exactly as before" true by construction rather than by care. The price
+is that every TTC refresh re-arms Parenting too: a few dozen cancel and schedule calls.
+
+**2. One definition for "what was done", read by both sides.** `FamilyPhone` must space the child's alarms around
+what TTC ACTUALLY armed, not around a second computation that could drift from it. So TTC's arming loop and
+`FamilyPhone` both call `TtcMessagesStore.phonePlanned()`, and a source test pins that the arming loop uses it.
+Two copies of the same expression are two definitions the day one of them changes.
+
+**3. Move the side effect, not the record.** A child's 9 am age message that clashes with TTC's 9 am cycle report
+rings at 10, but the stored message keeps 9 am, its id and its cloud row. If the stored time depended on TTC's
+plan, correcting a period date would silently rewrite a child's message, and two phones would disagree about a
+row. **Keep derived scheduling out of persisted data; derive it again at the edge where it is used.**

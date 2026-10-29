@@ -164,7 +164,7 @@ From the approved prototype (Artifact `8LcSdbkh9LDV32FMVzfqjL`, v3 with the emoj
 
 Titles: "Today's tip: <title>", or "Today's tip for Meera: <title>" with two or more children. "For this age: <toy>", or "For Meera now: <toy>"; body "Made for <age label>. See what parents pick, in the Store." (a class: "See what it covers, in Learn.").
 
-**One cap for both stores.** Pregnant again, her messages and her toddler's used to arm separately: Pregnancy held itself to two, Parenting rang everything. Now `familyPhonePlan` (`lib/services/family_phone_plan.dart`) ranks both pending lists on one scale, two a day (before and after 2 pm):
+**One cap for both stores** (while pregnant only, since 2026-10-29: with no pregnancy see "As built: trying again with a child" below). Pregnant again, her messages and her toddler's used to arm separately: Pregnancy held itself to two, Parenting rang everything. Now `familyPhonePlan` (`lib/services/family_phone_plan.dart`) ranks both pending lists on one scale, two a day (before and after 2 pm):
 
 | Rank | Kind |
 |---|---|
@@ -193,3 +193,37 @@ Ties: the earlier time; then, between the stores, Parenting on odd days and Preg
 One map, `kPhoneEmoji` in `lib/services/phone_emoji.dart`, one emoji per kind at the END of the title, added only when the phone notification is scheduled. The stored title, the ids and the cloud rows are unchanged, and Messages in the app stays plain. Ages: 🎂 on whole years, 🎉 on the rest, 🎂🎒 on the sixth birthday only. None on the sensitive kinds (a period that came, late, the first check, the two-week wait, clinic treatment, the baby's movements). The one exception to "no decorative emoji", recorded in CLAUDE.md and `docs/CHATGPT-BRIEF.md`. Held by `test/phone_emoji_test.dart`, which also fails when a new kind is added without a decision.
 
 **Owed:** clinician read of the new words (BEFORE-LAUNCH); a phone walk on the user's word (two a day with a toddler and a pregnancy, the offers card, a tap on a tip and an offer, the emoji on the lock screen).
+
+## As built: trying again with a child, and Parenting on its own (2026-10-29)
+
+The user's call, after PP 11: trying again with a child is **not** limited to two a day. "It has to be dynamic. We cannot be fixing something and then just missing out on information." More is fine if each message is worth opening; where TTC and Parenting land together, move them apart, never drop one. Clinic treatment reminders are independent. Asked the same day, the user chose the same rule for Parenting on its own: **moments always ring**.
+
+**What it was.** Two owners armed her phone, blind to each other: TTC through `ttcPhonePlan` (two a day plus treatment), the child through `FamilyPhone` (two a day). So up to four a day already, but at the same minute: the TTC day line and the child's tip both at 8:30 almost every morning; a 9 am TTC message (cycle report, two-week wait, period soon, late) on top of a 9 am age; a 7 pm TTC offer or "period came" on top of the child's 7 pm offer.
+
+**The rule with no pregnancy** (`parentingPhonePlan`, `spacePhoneRings` in `lib/services/family_phone_plan.dart`):
+
+| What | On the phone |
+|---|---|
+| A moment: vaccine visit, age, new stage (rank 2 or better) | always, every child |
+| A daily kind: tip, Monday activity, offer | one per half day (before and after 2 pm), the PP 11 way, and only in a half with no moment |
+| TTC, its own two a day | exactly `ttcPhonePlan`, never moved |
+| Treatment reminders | always, never counted, never moved |
+
+Then every ring of the child's keeps at least **60 minutes** from every other ring, TTC's and treatment included: a clashing one moves to the nearest clear time in 30-minute steps, later first on a tie, between 8:00 and 21:00 of its own day and never into the past. With no clear time it rings at its own: moved, never dropped. Among the child's own rings, the earlier keeps its time.
+
+| Clash | Becomes |
+|---|---|
+| tip 8:30 / TTC day line 8:30 | tip 9:30 |
+| age 9:00 / cycle report 9:00 | age 10:00 |
+| offer 7 pm / TTC check-in 7:30 pm | offer 6:30 pm (8:30 pm if a new stage holds 6 pm) |
+| offer 7 pm / TTC offer 7 pm | offer 8 pm |
+
+**Only the phone time moves.** The message keeps its own time in Messages, its id and its cloud row, so a corrected cycle date never rewrites a child's message. The cost: the in-app time and the buzz can differ by up to an hour or so.
+
+**The design: a one-way dependency, not a third shared owner.** PP 11 put Pregnancy and Parenting under one owner because they compete for the same two slots: each one's winner depends on the other's list, and two arming loops would race. TTC does not depend on the child's list at all. So TTC arms itself as before, from one definition (`TtcMessagesStore.phonePlanned`), and then calls `FamilyPhone.rearm`, which reads that plan as fixed obstacles and spaces the child's rings around them. A stale read is corrected by the next re-arm; there is no moment where two ring together. The cost: every TTC refresh re-arms Parenting too. The gain: TTC on its own arms exactly as before, by construction.
+
+**Pregnant, unchanged:** one cap of two across Pregnancy and Parenting (`familyPhonePlan`). Chosen by `FamilyPhone` when the stage is pregnancy or a Pregnancy message is still pending.
+
+Held by `test/ttc_with_child_messages_test.dart` (the worked examples, never dropped, moments ring, TTC's plan untouched, the call sites), with `pp11_family_messages_test`, `notifications_6a_test` and `stage_transitions_test` M37.
+
+**Owed:** a phone walk on the user's word (trying again with a toddler: two buzzes never together, a moved tip at 9:30).

@@ -140,6 +140,7 @@ import '../services/remote/cloud_merged_store.dart';
 // `ttc_focus_data.dart` does the same. The import cycle is legal Dart.
 import '../screens/ttc/ttc_messages_screen.dart' show ttcOpenMessageFromPhone;
 import '../services/expert_store.dart';
+import '../services/family_phone_plan.dart' show FamilyPhone;
 import '../services/programme_store.dart';
 import '../services/pv_catalog_store.dart';
 import 'cycle_store.dart';
@@ -1507,17 +1508,31 @@ class TtcMessagesStore extends ChangeNotifier
       //     await _phone.schedule(
       //         id: id, title: m.title, body: m.body, when: m.at);
       //   }
-      for (final (id, m) in ttcPhonePlan(pending(now: now))) {
+      // Kept for revert (2026-10-29, one definition with `phonePlanned`):
+      //   for (final (id, m) in ttcPhonePlan(pending(now: now))) {
+      for (final (id, m) in phonePlanned(now: now)) {
         // The kind's emoji on the phone only (2026-10-29, `phone_emoji.dart`);
         // the message keeps its plain title. Kept for revert: title: m.title,
         await _phone.schedule(id: id, title: phoneTitle(m.title, m.kind), body: m.body, when: m.at);
       }
     }
+    // A child's messages step out of the way of what was just armed
+    // (2026-10-29, `family_phone_plan.dart`): trying again with a child, more
+    // than two a day may ring, never two together. TTC's own arming above
+    // does not read Parenting's, so this runs one way only.
+    await FamilyPhone.instance.rearm(now: now);
     if (changed) {
       await _persist();
       notifyListeners();
     }
   }
+
+  /// What rings on her phone: [ttcPhonePlan] of what is pending, or nothing
+  /// when she keeps messages in the app only. The one definition, read by the
+  /// arming above and by `FamilyPhone`, which spaces a child's messages
+  /// clear of these (2026-10-29).
+  List<(int, TtcMessage)> phonePlanned({DateTime? now}) =>
+      _phoneOn ? ttcPhonePlan(pending(now: now)) : const [];
 
   /// Folds [candidates] into the list. Returns true when anything changed.
   ///

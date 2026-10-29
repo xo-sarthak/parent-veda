@@ -43,11 +43,41 @@
 //
 //  A store that has not loaded yet is left alone: it has armed nothing this
 //  session, and its own init triggers the next re-arm.
+//
+//  NOT PREGNANT: MOMENTS ALWAYS RING, AND NOTHING RINGS TOGETHER
+//  (2026-10-29, the user's call after PP 11)
+//
+//  Two a day was right for a pregnancy and a toddler at once. For Parenting
+//  on its own, and for a child while she is trying again, the user decided
+//  otherwise: "it has to be dynamic. We cannot be fixing something and then
+//  just missing out on information." So with no pregnancy, [parentingPhonePlan]:
+//
+//    * a MOMENT (a vaccine visit, an age, a new stage: rank 2 or better)
+//      always rings, for every child;
+//    * a DAILY kind (the tip, the Monday activity, an offer) keeps one slot
+//      per half day, and only in a half with no moment in it;
+//    * and [spacePhoneRings] keeps every ring at least [kFamilyRingGap] from
+//      every other one, hers from TTC included.
+//
+//  TRYING AGAIN WITH A CHILD. TTC arms itself, exactly as on its own
+//  (`ttcPhonePlan`, its own two a day, treatment never capped), and never
+//  moves. Parenting's rings step out of its way. That makes the dependency
+//  ONE-WAY: TTC's plan never reads Parenting's, so there is no race of the
+//  kind the header warns about, and TTC needs no shared owner. TTC asks for a
+//  re-arm after it arms, and a re-arm reads TTC's latest plan; a stale read
+//  is corrected by the next one. The cost: a TTC refresh re-arms Parenting
+//  too. The gain: TTC's arming is untouched by construction, not by care.
+//
+//  ⚠️ ONLY THE PHONE TIME MOVES. The message keeps its own time in Messages,
+//  its id and its cloud row: a corrected cycle date must never rewrite a
+//  child's message, which it would if the store's `at` depended on TTC's.
 // =============================================================================
 
 import 'dart:async';
 
 import '../screens/post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
+import '../ttc/ttc_messages_store.dart';
+import 'life_stage_store.dart';
 import 'pp_messages_store.dart';
 import 'preg_messages_store.dart';
 
@@ -150,6 +180,101 @@ String _slot(DateTime at) =>
   return (preg: outPreg, pp: outPp);
 }
 
+/// The least time between two rings on her phone, when she is not pregnant.
+const Duration kFamilyRingGap = Duration(minutes: 60);
+
+/// A moved ring steps by this, and stays between these hours of its own day.
+const Duration kFamilyRingStep = Duration(minutes: 30);
+const int kFamilyRingFromHour = 8;
+const int kFamilyRingUntilHour = 21;
+
+/// Parenting's phone plan with no pregnancy (see the header). Pure.
+///
+/// Moments (rank 2 or better) all ring; a daily kind wins its half day the
+/// [familyPhonePlan] way, only where no moment is. Then [spacePhoneRings]
+/// keeps them [kFamilyRingGap] apart and clear of [keepClearOf] (what TTC
+/// armed). Each ring takes the next free id of its kind, soonest first.
+List<(int, PpMessage)> parentingPhonePlan({
+  List<PpMessage> pp = const [],
+  List<String> childIds = const [],
+  List<DateTime> keepClearOf = const [],
+  DateTime? now,
+}) {
+  bool moment(PpMessage m) => m.kind.slotRank <= 2;
+  final busy = {
+    for (final m in pp)
+      if (moment(m)) _slot(m.at),
+  };
+  final daily = familyPhonePlan(
+    pp: [
+      for (final m in pp)
+        if (!moment(m) && !busy.contains(_slot(m.at))) m,
+    ],
+    childIds: childIds,
+  ).pp;
+  final rings = [
+    for (final m in pp)
+      if (moment(m)) m,
+    for (final (_, m) in daily) m,
+  ]..sort((a, b) => a.at.compareTo(b.at));
+  final used = <PpMessageKind, int>{};
+  final out = <(int, PpMessage)>[];
+  for (final m in rings) {
+    final ids = m.kind.phoneIds;
+    final i = used[m.kind] ?? 0;
+    if (i >= ids.length) continue;
+    used[m.kind] = i + 1;
+    out.add((ids[i], m));
+  }
+  return spacePhoneRings(out, keepClearOf: keepClearOf, now: now);
+}
+
+/// Moves each ring that would land within [kFamilyRingGap] of another to the
+/// nearest clear time, in [kFamilyRingStep]s, later first on a tie, inside
+/// [kFamilyRingFromHour]..[kFamilyRingUntilHour] of its own day and after
+/// [now]. [keepClearOf] never moves; among [rings], the earlier keeps its
+/// time. With no clear time that day it rings at its own: moved, never
+/// dropped. Pure; only the phone time changes (`copyWith(at:)`).
+List<(int, PpMessage)> spacePhoneRings(
+  List<(int, PpMessage)> rings, {
+  List<DateTime> keepClearOf = const [],
+  DateTime? now,
+}) {
+  final placed = [...keepClearOf];
+  bool clear(DateTime t) =>
+      placed.every((o) => t.difference(o).abs() >= kFamilyRingGap);
+  bool fits(DateTime t, DateTime own) {
+    final from = DateTime(own.year, own.month, own.day, kFamilyRingFromHour);
+    final until = DateTime(own.year, own.month, own.day, kFamilyRingUntilHour);
+    return !t.isBefore(from) &&
+        !t.isAfter(until) &&
+        (now == null || t.isAfter(now));
+  }
+
+  final sorted = [...rings]..sort((a, b) => a.$2.at.compareTo(b.$2.at));
+  final out = <(int, PpMessage)>[];
+  for (final (id, m) in sorted) {
+    var at = m.at;
+    if (!clear(at)) {
+      for (var k = 1; k < 48; k++) {
+        final later = m.at.add(kFamilyRingStep * k);
+        final earlier = m.at.subtract(kFamilyRingStep * k);
+        if (fits(later, m.at) && clear(later)) {
+          at = later;
+          break;
+        }
+        if (fits(earlier, m.at) && clear(earlier)) {
+          at = earlier;
+          break;
+        }
+      }
+    }
+    placed.add(at);
+    out.add((id, at == m.at ? m : m.copyWith(at: at)));
+  }
+  return out;
+}
+
 /// The one owner of arming for Pregnancy and Parenting (see the header).
 class FamilyPhone {
   FamilyPhone._();
@@ -191,12 +316,41 @@ class FamilyPhone {
     } catch (_) {
       ids = const [];
     }
-    final plan = familyPhonePlan(
-      preg: preg.isLoaded ? preg.phonePending(now: now) : const [],
-      pp: pp.isLoaded ? pp.phonePending(now: now) : const [],
-      childIds: ids,
-    );
-    if (preg.isLoaded) await preg.armPhone(plan.preg);
-    if (pp.isLoaded) await pp.armPhone(plan.pp);
+    final pregList = preg.isLoaded
+        ? preg.phonePending(now: now)
+        : const <PregMessage>[];
+    final ppList = pp.isLoaded
+        ? pp.phonePending(now: now)
+        : const <PpMessage>[];
+    // Pregnant (or a pregnancy still speaking): one cap of two for both, as
+    // PP 11 built it. Otherwise moments always ring, spaced clear of TTC.
+    if (LifeStageStore.instance.stage == LifeStage.pregnancy ||
+        pregList.isNotEmpty) {
+      // Kept for revert (2026-10-29, this branch was the whole plan):
+      //   final plan = familyPhonePlan(
+      //     preg: preg.isLoaded ? preg.phonePending(now: now) : const [],
+      //     pp: pp.isLoaded ? pp.phonePending(now: now) : const [],
+      //     childIds: ids,
+      //   );
+      final plan = familyPhonePlan(preg: pregList, pp: ppList, childIds: ids);
+      if (preg.isLoaded) await preg.armPhone(plan.preg);
+      if (pp.isLoaded) await pp.armPhone(plan.pp);
+      return;
+    }
+    final ttc = TtcMessagesStore.instance;
+    final ttcRings = ttc.isLoaded
+        ? [for (final (_, m) in ttc.phonePlanned(now: now)) m.at]
+        : const <DateTime>[];
+    if (preg.isLoaded) await preg.armPhone(const []);
+    if (pp.isLoaded) {
+      await pp.armPhone(
+        parentingPhonePlan(
+          pp: ppList,
+          childIds: ids,
+          keepClearOf: ttcRings,
+          now: now,
+        ),
+      );
+    }
   }
 }
