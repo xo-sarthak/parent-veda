@@ -261,13 +261,13 @@ written down so it isn't lost.
   With a self-claimed id, an account can get a host token with publish rights, join that expert's consults, mute,
   remove or end their rooms, and read their roster. *The general fact: row-level security that checks "it's your
   row" is not enough when the value in the row is the privilege. A table grant overrides every careful function
-  built on top of it.* · L.10 · pass **L2a** · open
+  built on top of it.* · L.10 · pass **L2a** · built 2026-10-29 in `0123` (grant revoked, `dev_claim_expert` behind `dev_testers`), waiting on the run and commit
 - [ ] **LA-2 · A credit can be spent twice (0084 regression).** `book_slot`'s rewrite dropped 0066's credit claim.
   Sponsor credits (0067) are never attached to a booking; `cancel_booking`'s return finds nothing. *The general fact:
   `create or replace` swaps the whole body, so whatever an earlier migration added is silently gone unless it is
-  copied forward. The guard is a test that reads the last definition.* · L.11 · pass **L2a** · open
+  copied forward. The guard is a test that reads the last definition.* · L.11 · pass **L2a** · built 2026-10-29 in `0123`, guarded by `test/learning_security_contract_test.dart`; waiting on the run and commit
 - [ ] **LA-3 · A host can open a room for any slot, at any time, with phone-supplied values.** `open_session_room`
-  creates the slot from what the phone sends (0079:252-258). · L.19 · pass **L2a** · open
+  creates the slot from what the phone sends (0079:252-258). · L.19 · pass **L2a** · built 2026-10-29 in `0123` (stored slot only; the five unused arguments stay until L3); waiting on the run and commit
 - [ ] **LA-4 · The client sets the price.** Pay ₹1 for a ₹2,499 course with a valid signature
   (`razorpay-create-order:82-98`). · L.1 · pass **L2b** · open
 - [ ] **LA-5 · The server keeps no record of a purchase.** Verify returns `{valid}`; the phone mints access. Edit the

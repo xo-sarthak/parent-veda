@@ -263,14 +263,31 @@ class DoctorSession extends ChangeNotifier {
   /// Enter doctor mode as [expertId]. The app root swaps to the DoctorScaffold.
   /// Also registers the user<->expert mapping on the server (best-effort) so the
   /// roster and the expert-join token know who this account is.
+  ///
+  /// TESTING ONLY, and since 0123 the server agrees. The app can no longer
+  /// write `expert_accounts` itself (LA-1: that table grant let any account
+  /// name itself any expert). It asks `dev_claim_expert()`, which links the
+  /// account only when it is in the server's `dev_testers` allowlist. The
+  /// local switch happens either way; without the allowlist row the roster
+  /// and the join token simply do not know this account, and the log says so.
   void enter(String expertId) {
     _active = true;
     _expertId = expertId;
     _partnerId = null;
     notifyListeners();
     if (SupabaseRepo.isLoggedIn) {
-      SupabaseRepo.upsert('expert_accounts', {'expert_id': expertId})
-          .catchError((_) => null);
+      SupabaseRepo.callFunction('dev_claim_expert', {'p_expert_id': expertId})
+          .then((res) {
+        if (res.isEmpty || res.first == null) {
+          debugPrint('[doctor] dev_claim_expert refused $expertId: this '
+              'account is not in dev_testers (0123)');
+        }
+      }).catchError((Object e) {
+        debugPrint('[doctor] dev_claim_expert failed: $e');
+      });
+      // Kept for revert — the pre-0123 direct write, refused by the server now:
+      // SupabaseRepo.upsert('expert_accounts', {'expert_id': expertId})
+      //     .catchError((_) => null);
     }
   }
 

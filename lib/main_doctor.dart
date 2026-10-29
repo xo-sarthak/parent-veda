@@ -40,8 +40,10 @@
 //  record is signed back out and told so.
 //
 //  ⚠️ CONSEQUENCE, worth knowing before the first demo: an expert must already
-//  be LINKED for this app to let them in. Today that link is created by the
-//  parent build's testing picker, or by SQL:
+//  be LINKED for this app to let them in. The real link is an expert_invites
+//  row, claimed at sign-in by claim_expert_invite() (0084). Since 0123 the
+//  parent build's testing picker links only accounts in dev_testers, and the
+//  app can no longer write expert_accounts directly. The SQL editor still can:
 //
 //      insert into public.expert_accounts (user_id, expert_id)
 //      values ((select id from auth.users where email = '...'), 'exp_neha')
