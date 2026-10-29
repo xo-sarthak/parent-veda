@@ -134,4 +134,120 @@ void main() {
       }
     }
   });
+
+  // D3 (0134): a rotation re-mints each doctor's code instead of dropping
+  // the person layer (STILL-OPEN 5.1b). Before this, a clinic came back from
+  // a rotation with one org-wide code and every doctor's count froze.
+  group('rotation keeps the per-doctor codes (0134)', () {
+    final s0134 =
+        File('supabase/migrations/0134_rotation_keeps_doctor_codes.sql')
+            .readAsStringSync();
+    final s0133 = File('supabase/migrations/0133_my_doctor_referrals.sql')
+        .readAsStringSync();
+
+    String body(String src, String fn) {
+      final start = src.indexOf('function public.$fn(');
+      expect(start, greaterThan(-1), reason: '$fn missing');
+      return src.substring(start, src.indexOf(r'$$;', start));
+    }
+
+    // The newest migration that defines [fn] is the live one. Checking it,
+    // rather than 0134 by name, keeps these honest if a later file copies a
+    // rotation from an older migration and drops the re-mint again.
+    String latest(String fn) {
+      final files = Directory('supabase/migrations')
+          .listSync()
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.sql'))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
+      String? src;
+      for (final f in files) {
+        final s = f.readAsStringSync();
+        if (s.contains('create or replace function public.$fn(')) src = s;
+      }
+      return body(src!, fn);
+    }
+
+    test('both rotations re-mint through the one helper', () {
+      for (final fn in ['rotate_partner_token', 'rotate_partner_tokens']) {
+        expect(latest(fn).contains('public._remint_doctor_codes('), isTrue,
+            reason: '$fn mints one org-wide code and drops every doctor\'s');
+      }
+    });
+
+    test('"still belongs" is the same rule my_partner_token uses', () {
+      // If the two disagreed, rotation could mint a code the kit then
+      // refuses to show, or skip one it would have shown.
+      expect(body(s0133, 'my_partner_token'),
+          contains('ep.expert_id = c.expert_id and ep.partner_id = c.partner_id'));
+      expect(body(s0134, '_remint_doctor_codes'),
+          contains('ep.expert_id = d and ep.partner_id = p_partner_id'));
+    });
+
+    test('the re-mint names the doctor, so the code stays hers', () {
+      expect(body(s0134, '_remint_doctor_codes'),
+          contains("mint_partner_token(p_partner_id, 'qr', null, null, v_expert)"));
+    });
+
+    test('only doctors holding a CURRENT code are re-minted, read before the '
+        'retire', () {
+      for (final fn in ['rotate_partner_token', 'rotate_partner_tokens']) {
+        final b = latest(fn);
+        final read = b.indexOf('array_agg(distinct expert_id)');
+        final retire = b.indexOf('update public.partner_referrals');
+        expect(read, greaterThan(-1), reason: fn);
+        expect(read, lessThan(retire),
+            reason: '$fn must read the doctors before retiring: afterwards '
+                'every row looks retired, or carries the new expiry');
+        expect(b.substring(read, retire),
+            contains('expires_at is null or expires_at > now()'),
+            reason: 'a code that expired on its own was on nobody\'s wall');
+      }
+    });
+
+    test('0069\'s promises survive: grace, reason, no timeline row', () {
+      final b = latest('rotate_partner_token');
+      expect(b, contains('make_interval(days => greatest(p_grace_days, 0))'));
+      expect(b, contains("coalesce(trim(p_reason), '') = ''"));
+      expect(b, contains('retired_reason = p_reason'));
+      expect(b.contains('insert into public.parent_timeline'), isFalse);
+      expect(b.toLowerCase().contains('delete from public.partner_referrals'),
+          isFalse);
+      expect(latest('rotate_partner_tokens'),
+          contains('p_confirm is distinct from p_partner_id'));
+    });
+
+    test('no client can rotate or call the helper', () {
+      final flat = s0134.replaceAll(RegExp(r'\s+'), ' ');
+      for (final sig in [
+        '_remint_doctor_codes(text, text[])',
+        'rotate_partner_token(text, text, int)',
+        'rotate_partner_tokens(text, text, text, text)',
+      ]) {
+        expect(
+            flat.contains('revoke execute on function public.$sig '
+                'from public, anon, authenticated;'),
+            isTrue,
+            reason: '$sig must be closed to every client role (LA-28)');
+      }
+      expect(RegExp(r'grant execute[^;]*_remint_doctor_codes').hasMatch(s0134),
+          isFalse);
+    });
+
+    test('the verification pass covers every case the decision named', () {
+      final v = File('supabase/seed/verify_rotation.sql').readAsStringSync();
+      for (final who in [
+        'zzr_left', // left the clinic: not re-minted
+        'zzr_never', // never had a code: not given one
+        'zzr_lapsed', // expired on its own: not re-minted
+        'zzr_solo', // own practice: only its own codes
+        'zzr_other', // another clinic: untouched
+      ]) {
+        expect(v, contains(who), reason: '$who is not exercised');
+      }
+      expect(v, contains("raise exception E'\\n\\n=== ROTATION VERIFICATION"),
+          reason: 'the report raise is what rolls the fixtures back');
+    });
+  });
 }

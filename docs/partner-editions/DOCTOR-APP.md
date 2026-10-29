@@ -91,3 +91,13 @@ silently freeze. Fix: rotation re-mints one fresh token per active member doctor
 records the reason. Edge cases: a doctor who left the clinic (`partner_id` changed) is not re-minted;
 an own-partner doctor rotates only their own token. Extend `care_rotation_test`. Close §5.1b.
 
+### D3 as built (2026-10-29)
+| # | What shipped | Where |
+|---|---|---|
+| 1 | `_remint_doctor_codes(partner, doctors[])`: mints a `qr` code naming each doctor who still belongs (`expert_profiles.partner_id` = partner, the 0133 `my_partner_token` rule verbatim). Internal: revoked from `public, anon, authenticated` | `0134_rotation_keeps_doctor_codes.sql` |
+| 2 | `rotate_partner_token` reads the doctors holding a CURRENT code **before** retiring (a `returning` would see the new expiry and re-mint an already-expired code), retires as 0069 did, mints the org-wide code, then the doctors'. Same signature and return (the org-wide token), so 0070's CMS grant and 0126's revokes survive | `0134` |
+| 2+ | **Found:** the panel's own rotation, `rotate_partner_tokens` (0055), had the same bug. Same fix through the same helper; its result gains `reminted`. It still retires instantly, as 0055 made it (a grace window there is a separate decision) | `0134` |
+| 3 | Edge cases: a doctor who left is not re-minted (old code in grace for the clinic that printed it); never-had and already-expired get nothing; an own practice rotates only its own codes (scoped by `partner_id`) | `0134` |
+| 4 | Verification pass in the `verify_admin_gates` mould: 14 checks, one fixture per case, rolls back by raising the report | `supabase/seed/verify_rotation.sql` |
+
+Tests: `care_rotation_test` +7 (both rotations call the helper, same membership rule as `my_partner_token`, read-before-retire, 0069's promises on the **latest** definition, LA-28 revokes, the verify pass covers each case). No app change, so no walk. **Run 0134, then `verify_rotation.sql`.**

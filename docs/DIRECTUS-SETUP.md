@@ -662,7 +662,7 @@ is not.
 | Approve partner | `approve_care_partner` | Missing verification record; blank council / registration / KYC; expired registration |
 | Deactivate partner | `deactivate_care_partner` | Soft only — attribution and ledger history survive |
 | New campaign | `create_partner_campaign` | A partner who is not `active` |
-| Rotate QR codes | `rotate_partner_tokens` | Unless the partner id is **retyped** as confirmation — this invalidates every printed poster |
+| Rotate QR codes | `rotate_partner_tokens` | Unless the partner id is **retyped** as confirmation — this invalidates every printed poster. Re-mints each current doctor's code too (0134); the result's `reminted` says how many |
 | Remove demo partners | `remove_demo_partners` | If any demo partner has acquired a real attribution or ledger row |
 
 **Approval order matters.** Fill in `care_partner_verification` first, then run

@@ -344,7 +344,24 @@ A council registration number and a KYC reference are not public identity.
 possible from the SQL editor but not from the panel — so keep raising this.
 `test/admin_actions_test.dart` holds the invariants meanwhile.
 
-## 5.1b Rotating a QR drops the per-doctor layer — KNOWN, NOT URGENT
+## 5.1b Rotating a QR drops the per-doctor layer — FIXED 2026-10-29 (0134, Partner Editions D3)
+
+> **Closed 2026-10-29 by `0134_rotation_keeps_doctor_codes.sql`.** Both rotations
+> (`rotate_partner_token`, 0069, and the panel's `rotate_partner_tokens`, 0055) now
+> re-mint one fresh code per doctor whose CURRENT code they retired, in the same
+> transaction, through one helper, `_remint_doctor_codes()`. The open question
+> below is decided: **a doctor who has left the clinic is not re-minted.** "Still
+> belongs" is the rule `my_partner_token()` (0133) already uses,
+> `expert_profiles.partner_id` = the partner. A doctor who never had a per-doctor
+> code is not given one, and an already-expired code is not replaced. Grace window,
+> required reason, service_role only and no `parent_timeline` row are unchanged.
+> The panel's rotation still retires instantly (no grace), as 0055 made it; giving
+> it a grace window is a separate decision, not taken. Verification pass:
+> `supabase/seed/verify_rotation.sql` (run after 0134). Tests:
+> `test/care_rotation_test.dart`, group "rotation keeps the per-doctor codes".
+> Pattern write-up: BACKEND-PATTERNS §16zzs. The history below is kept as written.
+
+*(Superseded heading, kept for the record: "KNOWN, NOT URGENT".)*
 
 *Raised 2026-07-30, while building `0073`. Left broken on purpose, with a
 workaround, rather than half-fixed.*

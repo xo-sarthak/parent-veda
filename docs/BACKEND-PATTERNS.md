@@ -4856,3 +4856,41 @@ with every argument and an explicit type.**
 listens.** `load()` flips `isLoading` and notifies before its first `await`. Home's `ListenableBuilder` listens to
 the store and is mid-build when the card's `initState` runs, so a synchronous notify marks a widget dirty during
 its own build, and Flutter asserts. `addPostFrameCallback` moves the call to after that build.
+
+## 16zzs. Replacing what was printed: read before you retire, and one rule in one helper (Partner Editions D3, 0134, 2026-10-29)
+
+A rotation retires every current QR code for a partner and mints replacements. It minted one org-wide code, so a
+clinic with a code per doctor lost its person layer and every doctor's count froze (STILL-OPEN 5.1b). 0134 re-mints
+one code per doctor, in the same call. Four general facts.
+
+**1. A function body is one transaction, and that is the feature here.** Retiring the old codes and minting the new
+ones happen inside one `plpgsql` call, so either every replacement exists or nothing changed: if a mint raises, the
+retirements roll back with it. A rotation done as two client calls ("retire", then "mint each") could stop halfway
+and leave a clinic with no current code, which reads to a patient at the poster as "this doctor's code is wrong".
+The trade-off is the one 0055 found the other way round: a raise discards *everything* the transaction wrote. For the
+panel gates that was a cost (the audit row vanished, so they return refusals instead); for a rotation it is exactly
+the property you want, because there is nothing partial worth keeping.
+
+**2. Read the "before" before you change it.** The obvious way to learn which doctors held a code is to let the
+`update` tell you: `with retired as (update ... returning expert_id)`. But `returning` hands back the rows *as
+updated*: each now carries the new 30-day expiry, so a code that had already expired on its own looks current again
+and its doctor would get a fresh code for a poster that was never on a wall. Reading the set first, with the same
+"current" test the readers use (`retired_at is null and (expires_at is null or expires_at > now())`), asks the
+question of the state you meant. **`RETURNING` reports the new row. If your decision depends on the old one, select
+it first.** (Inside one transaction `now()` is fixed, so the read and the update agree on what "now" is.)
+
+**3. Two writers, one membership rule, one helper.** There were two rotations: the service-role one with a grace
+window (0069) and the panel's confirm-by-retyping gate (0055). Both had the bug. Fixing each inline would put "who
+still belongs to this clinic" in two places, and it already lived in a third: `my_partner_token()` (0133) only hands
+a doctor her per-doctor code while `expert_profiles.partner_id` still matches. So the rule is written once, in
+`_remint_doctor_codes()`, as the same join `my_partner_token()` uses, and a test compares the two texts. If rotation
+and the kit disagreed, rotation could mint a code the kit then refuses to show. **When two functions must agree on a
+fact, make one of them call the other's rule, or make a test hold them to the same words.** The helper is
+internal, so it is revoked from `public, anon, authenticated` (LA-28: on Supabase each role holds its own grant).
+
+**4. A replacement replaces; it does not create.** Only doctors whose *current* code was just retired get one. A
+doctor who never had a per-doctor code is not handed one by a rotation, a doctor who has left the clinic is not
+re-minted (her old code keeps working through the grace window, for the clinic that printed it, then stops), and a
+campaign code is not re-minted as a campaign. Each of those would be a new decision made silently by a maintenance
+act. The verification pass (`supabase/seed/verify_rotation.sql`) has one fixture per case and rolls itself back by
+ending in a raise.

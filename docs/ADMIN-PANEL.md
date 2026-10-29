@@ -177,6 +177,11 @@ Three things the panel must respect:
   being wrong.
 * **Never let a partner rotate their own code.** They could invalidate posters
   ParentVeda paid to print. `rotate_partner_token` is revoked from clients.
+* **A rotation keeps the per-doctor codes (0134).** Each doctor whose current
+  code was retired, and who still belongs to the partner, gets a fresh one in
+  the same call. A doctor who has left is not re-minted. The function still
+  returns the org-wide code; the doctors' new codes show in
+  `partner_token_history`. Needs new posters for each doctor, not only the org.
 
 A partner's identity is now `care_partners` + `partner_accounts`, and
 `expert_id` means only "this partner also consults". An organisation needs no
