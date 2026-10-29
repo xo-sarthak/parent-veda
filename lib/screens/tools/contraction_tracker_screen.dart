@@ -96,8 +96,10 @@ const String kCtWhenToGoReadId = 'preg_labour_read_when_to_go';
 // ---- shared pieces (private: the stages stay code-isolated) -----------------
 
 /// The page title on a pushed page, announced as a heading.
-Widget _pageTitle(String text) =>
-    Semantics(header: true, child: Text(text, style: pregPageTitleStyle()));
+// Kept for revert (C1, 2026-10-30): the three pushed pages are on
+// `PregToolScaffold` now, whose hero carries the title.
+// Widget _pageTitle(String text) =>
+//     Semantics(header: true, child: Text(text, style: pregPageTitleStyle()));
 
 /// A card's own title: the serif, smaller than a section heading.
 TextStyle _cardTitleStyle() => pvFraunces(
@@ -2603,14 +2605,22 @@ class _SummaryScreen extends StatelessWidget {
       afterLoss: afterLoss,
     );
 
-    return Scaffold(
-      // Kept for revert: appBar: AppBar(title: Text(s.sessionSummaryTitle)).
-      appBar: AppBar(),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+    // ⚠️ ON THE TOOL SHELL (C1, P4's hand-over, 2026-10-30): the timer wears
+    // `PregToolScaffold`, and its pages kept a bare Scaffold and an empty app
+    // bar. Kept for revert:
+    //   return Scaffold(appBar: AppBar(), body: ListView(
+    //     padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+    //     children: [_pageTitle(s.sessionSummaryTitle),
+    //       const SizedBox(height: 22), ...the same children]));
+    return PregToolScaffold(
+      hue: _kContractionHue,
+      eyebrow: s.contractionToolTitle,
+      title: s.sessionSummaryTitle,
+      variant: 3,
+      children: [
+        pregToolPad(Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _pageTitle(s.sessionSummaryTitle),
-          const SizedBox(height: 22),
           // Kept for revert: Text(s.currentPatternLabel, headlineSmall).
           PregSectionHeading(s.currentPatternLabel),
           const SizedBox(height: 12),
@@ -2675,7 +2685,8 @@ class _SummaryScreen extends StatelessWidget {
                 style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800)),
           ),
         ],
-      ),
+      )),
+      ],
     );
   }
 
@@ -2713,18 +2724,22 @@ class _ContractionHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    return Scaffold(
-      // Kept for revert: appBar: AppBar(title: Text(s.historyLabel)).
-      appBar: AppBar(),
-      body: AnimatedBuilder(
-        animation: ToolsStore.instance,
-        builder: (context, _) {
-          final sessions = ToolsStore.instance.contractionSessions;
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
-            children: [
-              _pageTitle(s.historyLabel),
-              const SizedBox(height: 16),
+    // On the tool shell (C1, P4's hand-over). Kept for revert:
+    //   Scaffold(appBar: AppBar(), body: AnimatedBuilder(... ListView(
+    //     padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+    //     children: [_pageTitle(s.historyLabel), const SizedBox(height: 16),
+    //       PregRowCard(...)])))
+    return AnimatedBuilder(
+      animation: ToolsStore.instance,
+      builder: (context, _) {
+        final sessions = ToolsStore.instance.contractionSessions;
+        return PregToolScaffold(
+          hue: _kContractionHue,
+          eyebrow: s.contractionToolTitle,
+          title: s.historyLabel,
+          variant: 1,
+          children: [
+            pregToolPad(
               // Kept for revert: one outlined card per session. They open a
               // session, so they are rows with a drawn mark in one white card.
               PregRowCard(
@@ -2734,10 +2749,10 @@ class _ContractionHistoryScreen extends StatelessWidget {
                     _sessionRow(context, session, s),
                 ],
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -2817,14 +2832,23 @@ class _SessionDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S(controller.language);
-    return Scaffold(
-      // Kept for revert: appBar: AppBar(title: Text(s.sessionSummaryTitle)).
-      appBar: AppBar(),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+    final date = DateTime.tryParse(session.dateIso);
+    // On the tool shell (C1, P4's hand-over). Kept for revert:
+    //   Scaffold(appBar: AppBar(), body: ListView(
+    //     padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+    //     children: [_pageTitle(s.sessionSummaryTitle),
+    //       const SizedBox(height: 16), ...the same children]))
+    return PregToolScaffold(
+      hue: _kContractionHue,
+      eyebrow: s.contractionToolTitle,
+      title: s.sessionSummaryTitle,
+      // Which session this is, now that the page has a sentence for it.
+      intro: date != null ? s.formatLongDate(date) : null,
+      variant: 3,
+      children: [
+        pregToolPad(Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _pageTitle(s.sessionSummaryTitle),
-          const SizedBox(height: 16),
           if (session.laborResponse != null) ...[
             // Kept for revert: a tinted block (orange or blue at 12%) with a
             // heart glyph. A tag now.
@@ -2879,7 +2903,8 @@ class _SessionDetailScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
+      )),
+      ],
     );
   }
 }

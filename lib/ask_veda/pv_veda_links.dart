@@ -241,8 +241,29 @@ String? pvVedaToolStepsAside(String id) {
   if (id == 'bump' && FatherPreview.instance.on) {
     return 'Her bump photos are hers. Your own journal is on your Tools tab.';
   }
+  // C1 X5 (2026-10-30): his Tools tab keeps her trackers, her due date and
+  // her journal off his list, and Ask Veda's links opened every one of them.
+  // The same set, said in the link rather than hidden from it.
+  if (FatherPreview.instance.on && kPvVedaHerOnlyToolIds.contains(id)) {
+    return "This is her tracker, so it stays hers. Your own journal is on your Tools tab.";
+  }
   return null;
 }
+
+/// The Ask Veda tools that are hers alone on his side: what his Tools tab
+/// leaves off (Track, the due date, her journal; Bump has its own words
+/// above). `test/preg_c1_tools_test.dart` holds it against the hub.
+const Set<String> kPvVedaHerOnlyToolIds = {
+  'movement',
+  'weight',
+  'medicines',
+  'readings',
+  'shopping_list',
+  'kegel',
+  'reminders',
+  'due_date',
+  'journal',
+};
 
 PvVedaTool? pvVedaToolById(String id) {
   for (final t in kPvVedaTools) {

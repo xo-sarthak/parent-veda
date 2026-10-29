@@ -220,7 +220,8 @@ class MultiChildSheet extends StatelessWidget {
     );
 
     if (saved != true || dob == null) return;
-    await _store.addChild(
+    // Kept for revert (C1): `await _store.addChild(` with no result read.
+    final added = await _store.addChild(
       name: nameCtl.text.trim(),
       isBoy: isBoy,
       dob: dob!,
@@ -232,7 +233,14 @@ class MultiChildSheet extends StatelessWidget {
     // Closes the switcher it was opened from; from a door there is no sheet
     // to close, and popping would close the door.
     if (fromSheet) Navigator.of(context).maybePop();
-    pvToast(context, '${nameCtl.text.trim()} added', kind: PvToastKind.done);
+    // C1: the second twin is marked for her, and the toast says so.
+    final twin = _store.twinOf(added);
+    pvToast(
+        context,
+        twin == null
+            ? '${nameCtl.text.trim()} added'
+            : '${nameCtl.text.trim()} added, as a twin of ${twin.name}, born the same day',
+        kind: PvToastKind.done);
   }
 
   /// A blank optional field is 0, not an error and not a zero measurement.

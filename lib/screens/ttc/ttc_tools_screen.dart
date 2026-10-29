@@ -225,6 +225,19 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Aapke periods, aur unka matlab',
         open: (c) => openTtcSurface(c, 'ttc_cycle'),
       ),
+      // C1 (2026-10-30): the month at a glance, clinic dates included, reached
+      // from the home and You only. Its own job beside Cycle Companion (T2 Q1:
+      // Companion logs, the Calendar shows the month), and off the tool
+      // shell by T2 Q3, so its page draws the header mark itself.
+      TtcTool(
+        id: 'calendar',
+        icon: Icons.calendar_month_outlined,
+        nameEn: 'Calendar',
+        nameHi: 'Calendar',
+        descEn: 'Your month at a glance, clinic dates included',
+        descHi: 'Your month at a glance, clinic dates included',
+        open: (c) => openTtcSurface(c, 'ttc_calendar'),
+      ),
       TtcTool(
         id: 'ovulation',
         icon: Icons.egg_outlined,
@@ -255,6 +268,17 @@ final List<TtcToolGroup> ttcToolGroups = [
         descEn: "The six days you're most likely to get pregnant",
         descHi: 'Sabse ahem din',
         open: (c) => openTtcSurface(c, 'ttc_window'),
+      ),
+      // C1 (2026-10-30): offered by the Conceiving door only. A check she
+      // answers from her own dates, so a tool under M6.
+      TtcTool(
+        id: 'should_test',
+        icon: Icons.schedule_rounded,
+        nameEn: 'Should I test?',
+        nameHi: 'Should I test?',
+        descEn: "When a pregnancy test can give you a clear answer",
+        descHi: "When a pregnancy test can give you a clear answer",
+        open: (c) => openTtcSurface(c, 'ttc_chat/should_test'),
       ),
       TtcTool(
         id: 'symptoms',
@@ -340,6 +364,17 @@ final List<TtcToolGroup> ttcToolGroups = [
         descEn: 'Questions worth taking to a doctor',
         descHi: 'Doctor ko dikhane layak sawaal',
         open: (c) => openTtcSurface(c, 'ttc_pcos_check'),
+      ),
+      // C1 (2026-10-30): offered by the PCOS door only. It reads her logged
+      // cycles back to her, so a tool under M6.
+      TtcTool(
+        id: 'cycle_report',
+        icon: Icons.insights_outlined,
+        nameEn: 'Cycle report',
+        nameHi: 'Cycle report',
+        descEn: 'What your logged cycles show, to take to a doctor',
+        descHi: 'What your logged cycles show, to take to a doctor',
+        open: (c) => openTtcSurface(c, 'ttc_cycle_report'),
       ),
       // ⚠️ FOLDED INTO WEIGHT (launch sanity T1/T2, 2026-09-28): the BMI
       // page opens from the Weight page, so a second row for the same
@@ -528,6 +563,18 @@ final List<TtcToolGroup> ttcToolGroups = [
             builder: (_) => const TtcTestsScreen(),
             settings: const RouteSettings(name: 'ttc/tests'))),
       ),
+      // C1 (2026-10-30): offered by his door only (T4 K12's one name). On
+      // both their Tools tabs: it files his report into the records they
+      // share, so it is hers to read and his to keep.
+      TtcTool(
+        id: 'semen_report',
+        icon: Icons.biotech_outlined,
+        nameEn: 'Read your semen report',
+        nameHi: 'Read your semen report',
+        descEn: 'His four numbers, read against the WHO lines',
+        descHi: 'His four numbers, read against the WHO lines',
+        open: (c) => openTtcSurface(c, 'ttc_semen_report'),
+      ),
       TtcTool(
         id: 'vaccinations',
         icon: Icons.vaccines_outlined,
@@ -663,6 +710,18 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Pehle ke teen mahine',
         open: (c) => openTtcSurface(c, 'ttc_precheck'),
       ),
+      // C1 (2026-10-30): offered by the Preconception door only. Her plan,
+      // week by week, built from the checklist; a tool under M6. Kept beside
+      // the checklist, not folded into it (T3).
+      TtcTool(
+        id: 'ready_plan',
+        icon: Icons.flag_outlined,
+        nameEn: 'Ready-to-Try plan',
+        nameHi: 'Ready-to-Try plan',
+        descEn: 'Your weeks before trying, a few small things at a time',
+        descHi: 'Your weeks before trying, a few small things at a time',
+        open: (c) => openTtcSurface(c, 'ttc_ready_plan'),
+      ),
       // ⚠️ OFF THE HUB (launch sanity T1, 2026-09-28): it opened the same
       // store as the bar's Products tab (V3) and the Prepare tab (V1), so
       // it was a link to a tab she can already see, not a tool. Kept for
@@ -787,6 +846,12 @@ const Map<String, bool> kTtcToolKinds = {
   'nutrition': true, // plans the week's food, keeps her swaps
   'canI': true, // checks an everyday worry
   'precheck': true, // plans the three months before, ticked off
+  // In from the doors (C1, 2026-10-30).
+  'calendar': true, // shows her month, her cycle and clinic dates on it
+  'should_test': true, // checks, from her dates, when a test can answer
+  'cycle_report': true, // reads her logged cycles back to her
+  'semen_report': true, // reads his numbers and keeps his report
+  'ready_plan': true, // plans her weeks before trying, ticked off
   // NOT tools: moved to More on 2026-09-28.
   'expert': false, // booking a consult
   'courses': false, // a course
@@ -968,6 +1033,9 @@ const Set<String> kTtcHisToolIds = {
   // already is (T4 Q3, confirmed by the user at the build's start,
   // 2026-10-29). He never sees or edits hers.
   'medication',
+  // His own report, filed into the records they share (C1, T4's hand-over,
+  // 2026-10-30). His door offers it; his Tools tab did not.
+  'semen_report',
 };
 
 /// Where he starts when he has opened nothing yet.
@@ -987,8 +1055,11 @@ const Map<String, (String, String)> kTtcHisToolWords = {
   // Change 5 (2026-09-28): "half of this" named nothing. Kept for revert:
   //   ('Your health', 'Your tests, habits and half of this'),
   // T5 PH2. Kept for revert: ('Your health', 'Your health, tests and habits'),
+  // C1 (T5 PH3's hand-over): his own weight and BMI live on this page, so the
+  // line names them and his Tools search finds "weight". Kept for revert:
+  //   ('Your health', 'Your sleep, drinks, smoking, heat and movement'),
   'partner_health':
-      ('Your health', 'Your sleep, drinks, smoking, heat and movement'),
+      ('Your health', 'Your weight, sleep, drinks, smoking, heat and movement'),
   // Kept for revert: 'The days that count most this cycle'.
   'window': ('Her fertile window', "The six days she's most likely to get pregnant"),
 };

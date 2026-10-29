@@ -42,7 +42,11 @@ void main() {
     expect(hub, contains('mark: IntentMark.'));
     // 's.garbhToolTitle' left this list on 2026-10-28: M7 (the user,
     // 2026-10-27) puts a Garbh Sanskar row back as a named exception.
-    for (final gone in ['s.symToolTitle', 's.tsrTitle', "'Is it safe?'"]) {
+    // 's.tsrTitle' and "'Is it safe?'" left it in C1 (2026-10-30): M7 put
+    // Tests and reports and Is it safe? back too. Symptoms came back as the
+    // Check in group's "Symptoms today", so its old row stays gone.
+    // Kept for revert: ['s.symToolTitle', 's.tsrTitle', "'Is it safe?'"]
+    for (final gone in ['s.symToolTitle']) {
       expect(hub, isNot(contains('_Tool($gone')), reason: '$gone is a door already');
     }
   });

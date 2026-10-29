@@ -190,13 +190,21 @@ void main() {
       'ttc_nutrition': 'nutrition',
       'ttc_can_i': 'canI',
       'ttc_precheck': 'precheck',
+      // C1 (2026-10-30): five door tools became rows.
+      'ttc_calendar': 'calendar',
+      'ttc_chat/should_test': 'should_test',
+      'ttc_cycle_report': 'cycle_report',
+      'ttc_ready_plan': 'ready_plan',
+      'ttc_semen_report': 'semen_report',
     };
     bySurface.forEach((surface, id) {
       expect(ttcToolMarkForSurface(surface), ttcToolMarkFor(id),
           reason: surface);
     });
     // Not tools: the door keeps its own drawing.
-    for (final s in ['ttc_chat/should_test', 'ttc_read/x', 'ttc_shop']) {
+    // Kept for revert (C1: Should I test? is a Tools row now):
+    //   ['ttc_chat/should_test', 'ttc_read/x', 'ttc_shop']
+    for (final s in ['ttc_chat/period_came', 'ttc_read/x', 'ttc_shop']) {
       expect(ttcToolMarkForSurface(s), isNull, reason: s);
     }
   });

@@ -236,12 +236,18 @@ PregCheckStatus pregCheckStatus(PregCheck c) {
   // The appointment model has no link to a check, so "booked" is matched by
   // name: "Add as appointment" fills the title with the check's name, and
   // she may rename it (then it simply reads as open again, never wrong).
-  final key = c.title.toLowerCase();
-  for (final a in ScansStore.instance.appointments) {
-    if (a.status == 'completed') continue;
-    if (a.title.trim().toLowerCase() == key) {
-      return PregCheckStatus(PregCheckState.booked, pregDayOnly(a.date));
-    }
+  // C1 (2026-10-30): the one rule the Scans timeline also uses
+  // (`ScansStore.bookedFor`). Kept for revert:
+  //   final key = c.title.toLowerCase();
+  //   for (final a in ScansStore.instance.appointments) {
+  //     if (a.status == 'completed') continue;
+  //     if (a.title.trim().toLowerCase() == key) {
+  //       return PregCheckStatus(PregCheckState.booked, pregDayOnly(a.date));
+  //     }
+  //   }
+  final a = ScansStore.instance.bookedFor([c.title]);
+  if (a != null) {
+    return PregCheckStatus(PregCheckState.booked, pregDayOnly(a.date));
   }
   return const PregCheckStatus(PregCheckState.open);
 }

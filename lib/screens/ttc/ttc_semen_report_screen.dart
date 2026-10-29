@@ -293,6 +293,8 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
 
     return TtcToolScaffold(
       hue: kHisSideHue,
+      // C1 (2026-10-30): a Tools row now, so the row's mark greets him.
+      toolId: 'semen_report',
       // The door's name (2026-10-29). Kept for revert: 'His side'.
       eyebrow: 'Male fertility',
       title: 'Read your\nsemen report.',

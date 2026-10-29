@@ -76,7 +76,9 @@ import 'ttc_appointments_screen.dart'
         kTtcRoundVisitSteps;
 import 'ttc_symptom_log_screen.dart' show TtcSymptomLogScreen;
 import 'ttc_partner_home.dart' show TtcPartnerViewOnlyLine;
-import '../v2/v2_palette.dart' show V2PaletteStore;
+import '../v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
+import 'ttc_tool_hues.dart' show kTtcToolHueBody;
+import 'ttc_tool_marks.dart' show ttcToolHeaderMark;
 // `logTtcPeriod` was the day card's period button until 2026-09-27; kept for
 // revert: import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_round_strings.dart';
@@ -1798,12 +1800,22 @@ class _CalendarIntro extends StatelessWidget {
                   color: ttcTitleInk,
                   borderRadius: BorderRadius.circular(999),
                 ),
+                // ⚠️ FLEXIBLE (C1, 2026-10-30): the label sat in a Row with
+                // no Flexible and ran 106px off a 360dp phone at 1.5x text,
+                // found when the Calendar became a Tools row and the marks
+                // test opened it. It wraps now. Kept for revert: the bare
+                // Text(action.$1, ...) child.
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(action.$2, size: 17, color: Colors.white),
                   const SizedBox(width: 8),
-                  Text(action.$1,
-                      style: ttcBody(13.5,
-                          color: Colors.white, w: FontWeight.w700)),
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(action.$1,
+                          style: ttcBody(13.5,
+                              color: Colors.white, w: FontWeight.w700)),
+                    ),
+                  ),
                 ]),
               ),
             ),
@@ -2062,7 +2074,68 @@ class _CalendarTop extends StatelessWidget {
   final VoidCallback onToday;
 
   @override
-  Widget build(BuildContext context) => Row(children: [
+  // C1 (2026-10-30): the Tools row's mark over the title, as Cycle Companion
+  // and every tool page carry it. Beside the title it pushed the Today chip
+  // off a 360dp phone at 1.5x text (106px over), so the back arrow and the
+  // chip keep the first line and the mark and the title take the next two.
+  // Kept for revert: the single Row below, back · title · Today.
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            _back(context),
+            const Spacer(),
+            _today(),
+          ]),
+          const SizedBox(height: 6),
+          ttcToolHeaderMark(
+              'calendar', v2BlockTint(kTtcToolHueBody, V2PaletteStore.instance.current))!,
+          const SizedBox(height: 10),
+          Text('Calendar',
+              style: pvFraunces(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.5,
+                  color: ttcTitleInk)),
+        ],
+      );
+
+  Widget _back(BuildContext context) => Semantics(
+        button: true,
+        label: 'Back',
+        child: InkWell(
+          onTap: () => Navigator.of(context).maybePop(),
+          customBorder: const CircleBorder(),
+          child: const SizedBox(
+            width: 44,
+            height: 44,
+            child: Icon(Icons.arrow_back_rounded, size: 22, color: ttcInk),
+          ),
+        ),
+      );
+
+  Widget _today() => Semantics(
+        button: true,
+        label: 'Go to today',
+        child: InkWell(
+          onTap: onToday,
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 36),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: ttcBorder, width: 1.2),
+            ),
+            child: Text('Today', style: ttcBody(13, color: ttcInk, w: FontWeight.w700)),
+          ),
+        ),
+      );
+
+  // Kept for revert (C1): the one-row header.
+  // ignore: unused_element
+  Widget _buildRow(BuildContext context) => Row(children: [
         Semantics(
           button: true,
           label: 'Back',

@@ -60,6 +60,9 @@ import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../ttc_common.dart';
 import '../ttc_surface_router.dart';
+import '../ttc_tool_hues.dart' show kTtcToolHueBody;
+import '../ttc_tool_marks.dart' show ttcToolHeaderMark;
+import '../../v2/v2_palette.dart' show V2PaletteStore, v2BlockTint;
 
 /// What an action chip returns when the chat should continue: the words for
 /// her bubble, and the step that answers them.
@@ -143,9 +146,16 @@ class TtcChatScreen extends StatefulWidget {
     super.key,
     required this.script,
     this.pause = const Duration(milliseconds: 650),
+    this.toolId,
   });
 
   final TtcChatScript script;
+
+  /// The Tools row this chat is, when it is one (C1, 2026-10-30: "Should I
+  /// test?"). Its mark then sits in the header, the object she tapped on the
+  /// row, as every tool page shows it. Null for the chats that are not tools,
+  /// and the header is exactly as before.
+  final String? toolId;
 
   /// The typing pause before each line. A beat, so the words arrive at the
   /// speed of someone saying them rather than as a wall. Zero in tests.
@@ -278,7 +288,12 @@ class _TtcChatScreenState extends State<TtcChatScreen> {
         child: Column(children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(ttcGutter, 8, ttcGutter, 6),
-            child: TtcBackBar(title: _script.title),
+            // Kept for revert (C1): child: TtcBackBar(title: _script.title),
+            child: Row(children: [
+              Expanded(child: TtcBackBar(title: _script.title)),
+              ?ttcToolHeaderMark(widget.toolId,
+                  v2BlockTint(kTtcToolHueBody, V2PaletteStore.instance.current)),
+            ]),
           ),
           Expanded(
             child: ListView(

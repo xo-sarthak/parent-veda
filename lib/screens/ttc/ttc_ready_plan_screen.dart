@@ -245,7 +245,9 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
     return TtcToolScaffold(
       key: const ValueKey('ttc_ready_plan_intake'),
       hue: _hue,
-      toolId: 'precheck',
+      // C1 (2026-10-30): a Tools row of its own, so its own mark. Kept for
+      // revert: toolId: 'precheck',
+      toolId: 'ready_plan',
       leading: hasPlan ? TtcToolLeading.back : TtcToolLeading.close,
       eyebrow: kReadyPlanName,
       title: 'A few questions,\nthen your plan.',
@@ -630,7 +632,9 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
       key: const ValueKey('ttc_ready_plan_plan'),
       hue: _hue,
       variant: 3,
-      toolId: 'precheck',
+      // C1 (2026-10-30): a Tools row of its own, so its own mark. Kept for
+      // revert: toolId: 'precheck',
+      toolId: 'ready_plan',
       eyebrow: kReadyPlanName,
       // ⚠️ THE MONTH FIRST, THE COUNT SECOND AND SMALLER (STILL-OPEN, the
       // next-milestone card): leading with a countdown makes the months

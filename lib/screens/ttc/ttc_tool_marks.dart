@@ -97,6 +97,18 @@ enum TtcToolMark {
   hospitalBag,
   stopwatch,
   bell,
+  // ---- C1 (2026-10-30): the door tools that became Tools rows. No two rows
+  // share a mark (`ttc_tool_marks_test`), so each takes its own object.
+  /// A month page with a stretch of days filled: the month at a glance, her
+  /// cycle and the clinic's dates on it. Appointments' page has one day
+  /// ringed, the visit; this one is the whole month. Drawn, not borrowed.
+  calendar,
+  /// The clock: "is it time to test?".
+  shouldTest,
+  /// The path to a flag: the plan for the months before trying.
+  readyPlan,
+  /// The magnifier over a page: reading his report line by line.
+  semenReport,
 }
 
 /// Every hub row's id (hers and his) and every moved row's id, to its mark.
@@ -124,6 +136,12 @@ const Map<String, TtcToolMark> kTtcToolMarks = {
   'expert': TtcToolMark.expert,
   'courses': TtcToolMark.courses,
   'map': TtcToolMark.map,
+  // C1 (2026-10-30): the five door tools that became rows.
+  'calendar': TtcToolMark.calendar,
+  'should_test': TtcToolMark.shouldTest,
+  'cycle_report': TtcToolMark.cycleReport,
+  'ready_plan': TtcToolMark.readyPlan,
+  'semen_report': TtcToolMark.semenReport,
 };
 
 /// A tool's mark by its Tools id, or null for an id that is not a tool.
@@ -133,11 +151,22 @@ TtcToolMark? ttcToolMarkFor(String toolId) => kTtcToolMarks[toolId];
 /// it opens, for the door tool cards. Null for a surface that is not a tool
 /// (a chat, a read, a door, the store), so the caller keeps its own drawing.
 TtcToolMark? ttcToolMarkForSurface(String surfaceId) {
+  // A chat that is a Tools row (C1): matched whole, before the root, because
+  // every chat shares the root `ttc_chat` and the others are not tools.
+  if (surfaceId == 'ttc_chat/should_test') return TtcToolMark.shouldTest;
   // Sub-routes ('ttc_treatment/start', 'ttc_precheck/…', 'ttc_practice/…')
   // open the same tool as their root.
   final root = surfaceId.split('/').first;
   return switch (root) {
-    'ttc_cycle' || 'ttc_calendar' => TtcToolMark.cycle,
+    // C1: the Calendar, the Ready-to-Try plan and the semen report are rows
+    // now, each with its own mark. Kept for revert:
+    //   'ttc_cycle' || 'ttc_calendar' => TtcToolMark.cycle,
+    //   'ttc_tests' || 'ttc_semen_report' => TtcToolMark.tests,
+    //   'ttc_precheck' || 'ttc_ready_plan' => TtcToolMark.precheck,
+    'ttc_calendar' => TtcToolMark.calendar,
+    'ttc_semen_report' => TtcToolMark.semenReport,
+    'ttc_ready_plan' => TtcToolMark.readyPlan,
+    'ttc_cycle' => TtcToolMark.cycle,
     'ttc_ovulation' => TtcToolMark.ovulation,
     'ttc_window' => TtcToolMark.window,
     'ttc_symptom_log' => TtcToolMark.symptoms,
@@ -148,15 +177,16 @@ TtcToolMark? ttcToolMarkForSurface(String surfaceId) {
     'ttc_fertility_help' => TtcToolMark.fertilityHelp,
     'ttc_supplements' => TtcToolMark.supplements,
     'ttc_medication' => TtcToolMark.medication,
-    'ttc_tests' || 'ttc_semen_report' => TtcToolMark.tests,
+    'ttc_tests' => TtcToolMark.tests,
     'ttc_vaccinations' => TtcToolMark.vaccinations,
     'ttc_records' => TtcToolMark.records,
     'ttc_appointments' => TtcToolMark.appointments,
     'ttc_treatment' => TtcToolMark.treatment,
     'ttc_nutrition' => TtcToolMark.nutrition,
     'ttc_can_i' => TtcToolMark.canI,
-    // The plan is the checklist made personal, so it draws the clipboard.
-    'ttc_precheck' || 'ttc_ready_plan' => TtcToolMark.precheck,
+    // The plan was "the checklist made personal" and drew the clipboard; a
+    // row of its own now (C1), so it takes the path to a flag (above).
+    'ttc_precheck' => TtcToolMark.precheck,
     'ttc_garbh_course' => TtcToolMark.courses,
     'ttc_cycle_report' => TtcToolMark.cycleReport,
     'ttc_ritual' || 'ttc_practice' || 'ttc_mind_today' => TtcToolMark.practice,
@@ -186,8 +216,18 @@ TtcTabMark? _borrowed(TtcToolMark m) => switch (m) {
   TtcToolMark.cycleReport => TtcTabMark.chartLine,
   TtcToolMark.practice => TtcTabMark.lotus,
   TtcToolMark.careCircle => TtcTabMark.twoFigures,
+  TtcToolMark.shouldTest => TtcTabMark.clock,
+  TtcToolMark.readyPlan => TtcTabMark.flagPath,
+  TtcToolMark.semenReport => TtcTabMark.magnifier,
   _ => null,
 };
+
+/// What a mark actually draws (C1): the rail mark a tool borrows, or the tool
+/// mark itself. Two rows that name different marks can still draw the same
+/// object (a tool that borrows a rail mark, and a row that names that rail
+/// mark), so "no two rows share a glyph" compares these, not the names.
+Object ttcMarkArtOf({TtcTabMark? tab, TtcToolMark? tool}) =>
+    tab ?? (tool == null ? 'none' : (_borrowed(tool) ?? tool));
 
 /// A tool's drawn mark. Size comes from the parent box, like `TtcTabArt`.
 class TtcToolArt extends StatelessWidget {
@@ -439,6 +479,30 @@ class TtcToolPainter extends CustomPainter {
             math.pi * 1.12, math.pi * 0.2, false, stroke(inkC.withValues(alpha: 0.32), kLine));
         canvas.drawArc(Rect.fromCircle(center: const Offset(50, 46), radius: 40),
             math.pi * 1.68, math.pi * 0.2, false, stroke(inkC.withValues(alpha: 0.32), kLine));
+
+      // ---- CALENDAR (C1) -----------------------------------------------------
+      case TtcToolMark.calendar:
+        // A month page: a soft sheet under an ink band with its two rings,
+        // three weeks of days, and a stretch of five days filled in. Not
+        // Appointments' page (an ink page, one day ringed): this is the
+        // month, her cycle and the clinic's dates on it.
+        canvas.drawRRect(rr(16, 22, 84, 84, 11), soft);
+        canvas.drawRRect(rr(16, 22, 84, 38, 11), ink);
+        canvas.drawRect(const Rect.fromLTRB(16, 32, 84, 38), ink);
+        for (final x in [32.0, 68.0]) {
+          canvas.drawRRect(rr(x - 4, 14, x + 4, 30, 4), ink);
+        }
+        const xs = [27.0, 42.0, 57.0, 72.0];
+        for (final y in [50.0, 63.0, 76.0]) {
+          for (final x in xs) {
+            if (y == 63) continue; // the filled week, drawn below
+            canvas.drawCircle(Offset(x, y), 3.2, ink);
+          }
+        }
+        canvas.drawRRect(rr(21, 57, 78, 69, 6), ink);
+        for (final x in xs) {
+          canvas.drawCircle(Offset(x, 63), 2.6, ground);
+        }
 
       // Borrowed marks never reach here (see the top of `paint`).
       default:

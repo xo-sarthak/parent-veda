@@ -205,6 +205,8 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
         TtcReportState.clinicHeld => 5,
         _ => 3,
       },
+      // C1 (2026-10-30): a Tools row now, so the row's mark greets her.
+      toolId: 'cycle_report',
       eyebrow: t.reportTitle,
       title: title,
       // ⚠️ THE i SAYS WHAT THIS SCREEN IS (2026-09-30): the shared "What is
@@ -556,6 +558,8 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       chroma: v3FieldChroma(heroHue) *
           TtcCycleColours.heroChromaScale(here.phase),
       variant: 2,
+      // C1 (2026-10-30): a Tools row now, so the row's mark greets her.
+      toolId: 'cycle_report',
       eyebrow: t.reportTitle,
       // Kept for revert: title: _heroLine(here.phase),
       // His side (2026-10-16): "She's in the waiting days".

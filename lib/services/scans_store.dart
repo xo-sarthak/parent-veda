@@ -488,6 +488,40 @@ class ScansStore extends ChangeNotifier implements PregnancyScopedStore {
   }
 
   // ---- appointments ---------------------------------------------------------
+
+  /// Her booked appointment for a scan or check known by any of [names], or
+  /// null (C1, P3's hand-over, 2026-10-30). ONE RULE for the Calendar and the
+  /// Scans timeline, which matched two ways: the Calendar by exact title,
+  /// skipping completed visits; the timeline by substring, not skipping them,
+  /// so a finished visit still read as booked. The appointment model has no
+  /// link to a check, so a name is all there is: a name matches when its
+  /// words appear in the title as whole words, in order ("NT scan" matches
+  /// "My NT scan at Apollo", and "NT" never matches inside "appointment"). A
+  /// renamed visit simply reads as open again, never wrong.
+  Appointment? bookedFor(Iterable<String> names) {
+    List<String> words(String t) =>
+        t.toLowerCase().split(RegExp(r'[^a-z0-9]+')).where((w) => w.isNotEmpty).toList();
+    bool contains(List<String> hay, List<String> needle) {
+      if (needle.isEmpty || needle.length > hay.length) return false;
+      for (var i = 0; i + needle.length <= hay.length; i++) {
+        var ok = true;
+        for (var j = 0; j < needle.length && ok; j++) {
+          ok = hay[i + j] == needle[j];
+        }
+        if (ok) return true;
+      }
+      return false;
+    }
+
+    final keys = [for (final n in names) words(n)];
+    for (final a in appointments) {
+      if (a.status == 'completed') continue;
+      final t = words(a.title);
+      if (keys.any((k) => contains(t, k))) return a;
+    }
+    return null;
+  }
+
   List<Appointment> get appointments {
     // Union of own + the partner's appointments (keyed by id), soonest first.
     // This pregnancy's only (R1, 2026-10-25). Kept for revert:

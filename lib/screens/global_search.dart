@@ -25,7 +25,7 @@ import 'calendar_screen.dart';
 import 'can_i_screen.dart';
 // import 'community_screen.dart'; // held back with the community, kept for revert
 import 'community/community_chrome.dart' show openCommunity;
-import 'garbh_screen.dart';
+// Kept for revert (C1: the Garbh row opens the door now): import 'garbh_screen.dart';
 import 'journal_screen.dart';
 import 'journey_map_screen.dart';
 import 'nutrition/door/shopping_list_screen.dart';
@@ -48,6 +48,26 @@ import 'tools/product_checklist_screen.dart';
 import 'tools/spiritual_reading_screen.dart';
 import 'tools/tests_scans_reports_screen.dart';
 import 'tools/symptom_companion_screen.dart';
+// C1 X4/X5 (2026-10-30): every Tools row, and his side.
+import '../services/father_preview.dart';
+import '../services/surface_router.dart' show screenForSurface;
+import '../widgets/pv_toast.dart';
+import 'tools/weight_tracker_screen.dart';
+import 'tools/kegel_care_screen.dart';
+import 'tools/readings_log_screen.dart';
+import 'tools/contraction_tracker_screen.dart';
+import 'reminders_screen.dart';
+import 'pregnancy/birth_plan_screen.dart';
+import 'pregnancy/preg_question_lists_sheet.dart' show showPregQuestionLists;
+import 'post_pregnancy/baby_naming_home_screen.dart' show BabyNamingHomeScreen;
+import 'mind_mood/mm_track_tab.dart' show MmTrackTab;
+import 'doors/pv_door_router.dart' show pvDoorScreenFor;
+import '../data/doors/pv_door_mind.dart' show kMindSurfaceTrack;
+import '../data/doors/pv_door_nutrition.dart' show kDietSurfaceToday;
+import '../data/doors/pv_door_belly_skin.dart' show kBsSurfaceChecker;
+import '../data/doors/pv_door_complications.dart' show kCondSurfaceFind;
+import '../data/doors/pv_door_scans.dart'
+    show kScansSurfaceTimeline, kScansSurfaceReports, kScansSurfaceDecoder;
 import '../theme/pv_fonts.dart';
 import 'doors/pv_door_screen.dart' show pvDoorScreenForBracket;
 import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
@@ -60,7 +80,7 @@ void showGlobalSearch(BuildContext context, PregnancyController controller) {
 
 /// A tool / section the search can jump to.
 class _Dest {
-  const _Dest(this.label, this.keys, this.icon, this.build, {this.open});
+  const _Dest(this.label, this.keys, this.icon, this.build, {this.open, this.hers = false});
   final String label;
   final List<String> keys; // lowercase synonyms
   final IconData icon;
@@ -68,6 +88,12 @@ class _Dest {
   // community names its own route) passes [open] instead.
   final Widget Function(PregnancyController)? build;
   final void Function(BuildContext)? open;
+
+  /// Hers alone on his side (C1 X5, 2026-10-30): the rows his Tools tab
+  /// leaves off (Check in, Track, Records, the due date, her journal and
+  /// bump, Find a condition). In the father preview search leaves them off
+  /// too, as his Tools tab does.
+  final bool hers;
 }
 
 class _GlobalSearchDelegate extends SearchDelegate<void> {
@@ -114,22 +140,42 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         _Dest('Shopping list', const ['shopping', 'shopping list', 'grocery', 'groceries', 'ingredients'],
             Icons.shopping_basket_rounded, (_) => const ShoppingListScreen()),
         _Dest(s.bumpTitle, const ['bump', 'belly', 'photo', 'journey'],
-            Icons.pregnant_woman_rounded, (c) => BumpRitualScreen(controller: c)),
+            Icons.pregnant_woman_rounded, (c) => BumpRitualScreen(controller: c),
+            hers: true),
         _Dest(s.jrTitle, const ['journal', 'memory', 'diary', 'note'],
-            Icons.menu_book_rounded, (c) => JournalScreen(controller: c)),
+            Icons.menu_book_rounded, (c) => JournalScreen(controller: c),
+            hers: true),
+        // C1 (found listing the rows): this opened the retired pillar menu,
+        // which M7 says the Garbh Sanskar row must never open. It opens the
+        // door now, as the Tools row does, or says why not. Kept for revert:
+        //   _Dest(s.garbhToolTitle, ..., (c) => GarbhScreen(controller: c)),
         _Dest(s.garbhToolTitle, const ['garbh', 'sanskar', 'ritual', 'spiritual'],
-            Icons.spa_rounded, (c) => GarbhScreen(controller: c)),
+            Icons.spa_rounded, null, open: (ctx) {
+          final w = screenForSurface('garbh_daily', controller, controller.language);
+          if (w == null) {
+            pvToast(ctx, 'Garbh Sanskar could not open just now. Its card on your home opens it too.');
+            return;
+          }
+          Navigator.of(ctx).push(MaterialPageRoute<void>(
+              settings: const RouteSettings(name: 'garbh_daily'), builder: (_) => w));
+        }),
         _Dest(s.sprToolTitle, const ['spiritual', 'reading', 'faith', 'religion'],
             Icons.auto_stories_rounded, (c) => SpiritualReadingScreen(controller: c)),
-        _Dest(s.toolCanI, const ['can i', 'safe', 'eat', 'food', 'drink'],
+        // One name per tool (C1): the Tools row's "Is it safe?", with the
+        // older "Can I" kept as a word to find it by. Kept for revert:
+        // _Dest(s.toolCanI, const ['can i', 'safe', 'eat', 'food', 'drink'], ...
+        _Dest('Is it safe?', const ['can i', 'safe', 'eat', 'food', 'drink'],
             Icons.help_outline_rounded, (c) => CanIScreen(controller: c)),
-        _Dest(s.symToolTitle, const ['symptom', 'nausea', 'pain', 'relief'],
+        // One name per tool (C1): the Tools row's. Kept for revert: s.symToolTitle.
+        _Dest('Symptoms today', const ['symptom', 'nausea', 'pain', 'relief'],
             // The Symptoms door (2026-09-23); the companion kept for revert.
-            Icons.healing_rounded, (c) => pvDoorScreenForBracket(kSymptomsBracketId, c) ?? SymptomCompanionScreen(controller: c)),
+            Icons.healing_rounded, (c) => pvDoorScreenForBracket(kSymptomsBracketId, c) ?? SymptomCompanionScreen(controller: c),
+            hers: true),
         _Dest(s.vedaToolTitle, const ['veda', 'ask', 'assistant', 'help'],
             Icons.auto_awesome_rounded, (c) => AskVedaScreen(controller: c)),
         _Dest(s.babyMovementTracker, const ['kick', 'movement', 'counter'],
-            Icons.favorite_rounded, (c) => BabyMovementScreen(controller: c)),
+            Icons.favorite_rounded, (c) => BabyMovementScreen(controller: c),
+            hers: true),
         // One name per tool (P4): "Hospital bag". Kept for revert: s.hbName.
         _Dest('Hospital bag', const ['hospital', 'bag', 'pack', 'labour'],
             Icons.luggage_rounded, (c) => ReadyForBirthScreen(controller: c)),
@@ -140,14 +186,70 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         // Icons.description_rounded, ...) below the medicines row.
         _Dest(s.tsrTitle, const ['scan', 'ultrasound', 'nt', 'anomaly', 'growth', 'doppler',
             'report', 'test', 'result', 'blood', 'finding', 'condition'],
-            Icons.fact_check_rounded, (c) => TestsScansReportsScreen(controller: c)),
+            Icons.fact_check_rounded, (c) => TestsScansReportsScreen(controller: c),
+            hers: true),
         _Dest(s.ddcToolTitle, const ['due date', 'calculator', 'edd'],
             Icons.calendar_month_rounded,
-            (c) => DueDateCalculatorScreen(controller: c)),
+            (c) => DueDateCalculatorScreen(controller: c),
+            hers: true),
         _Dest(s.medTitle, const ['medicine', 'medication', 'supplement', 'pill'],
-            Icons.medication_rounded, (c) => MedicineTrackerScreen(controller: c)),
+            Icons.medication_rounded, (c) => MedicineTrackerScreen(controller: c),
+            hers: true),
         _Dest(s.tabCalendar, const ['calendar', 'date', 'event', 'reminder'],
-            Icons.calendar_today_rounded, (c) => CalendarScreen(controller: c)),
+            Icons.calendar_today_rounded, (c) => CalendarScreen(controller: c),
+            hers: true),
+        // X4 (C1, 2026-10-30): every Tools row is found here. Movement was
+        // listed and Weight and Kegel were not, nor these others.
+        // test/preg_c1_tools_test.dart searches every row by its title.
+        _Dest(s.toolWeightTitle, const ['weight', 'weigh', 'kg', 'bmi'],
+            Icons.monitor_weight_rounded, (c) => WeightTrackerScreen(controller: c),
+            hers: true),
+        _Dest(s.toolKegelTitle, const ['kegel', 'pelvic floor', 'pelvic'],
+            Icons.self_improvement_rounded, (c) => KegelCareScreen(controller: c),
+            hers: true),
+        _Dest('Blood pressure & sugar', const ['blood pressure', 'bp', 'sugar', 'glucose', 'readings'],
+            Icons.monitor_heart_rounded, (c) => ReadingsLogScreen(controller: c),
+            hers: true),
+        _Dest(s.rmdTitle, const ['reminder', 'remind', 'alarm'],
+            Icons.notifications_none_rounded, (c) => RemindersScreen(controller: c),
+            hers: true),
+        _Dest('Mood check-in', const ['mood', 'feel', 'feeling', 'worry'],
+            Icons.sentiment_satisfied_rounded,
+            (c) => pvDoorScreenFor(kMindSurfaceTrack, c) ?? const MmTrackTab(),
+            hers: true),
+        _Dest('Your plate today', const ['plate', 'water', 'diet today', 'eat today'],
+            Icons.restaurant_rounded,
+            (c) => pvDoorScreenFor(kDietSurfaceToday, c) ?? const SizedBox.shrink(),
+            hers: true),
+        _Dest('Birth plan', const ['birth plan', 'birth preferences', 'labour plan'],
+            Icons.edit_note_rounded, (c) => BirthPlanScreen(pregnancy: c)),
+        _Dest('Contraction timer', const ['contraction', 'labour', 'timer'],
+            Icons.timer_rounded, (c) => ContractionTrackerScreen(controller: c)),
+        _Dest('Baby names', const ['name', 'names', 'baby name'],
+            Icons.badge_rounded, (_) => const BabyNamingHomeScreen(afterLossNote: true)),
+        _Dest('Find a condition', const ['condition', 'diabetes', 'thyroid', 'bp'],
+            Icons.manage_search_rounded,
+            (c) => pvDoorScreenFor(kCondSurfaceFind, c) ?? const SizedBox.shrink(),
+            hers: true),
+        _Dest('Ingredient checker', const ['ingredient', 'cream', 'skincare', 'retinol', 'face wash'],
+            Icons.spa_rounded,
+            (c) => pvDoorScreenFor(kBsSurfaceChecker, c) ?? const SizedBox.shrink()),
+        _Dest('My scans', const ['scan', 'scans', 'ultrasound', 'timeline'],
+            Icons.timeline_rounded,
+            (c) => pvDoorScreenFor(kScansSurfaceTimeline, c) ?? const SizedBox.shrink(),
+            hers: true),
+        _Dest('My reports', const ['report', 'reports', 'locker', 'documents'],
+            Icons.folder_rounded,
+            (c) => pvDoorScreenFor(kScansSurfaceReports, c) ?? const SizedBox.shrink(),
+            hers: true),
+        _Dest('Report decoder', const ['decoder', 'report', 'what does my report mean'],
+            Icons.search_rounded,
+            (c) => pvDoorScreenFor(kScansSurfaceDecoder, c) ?? const SizedBox.shrink(),
+            hers: true),
+        _Dest('Questions for your doctor', const ['question', 'questions', 'what to ask', 'checklist'],
+            Icons.help_center_rounded, null,
+            open: (ctx) => showPregQuestionLists(ctx, controller),
+            hers: true),
         // Held back with the community (2026-09-29, pregnancy gap analysis:
         // "comment out the tab and every entry point"). Kept for revert:
         // _Dest(s.tabCommunity, const ['community', 'mom', 'group', 'post'],
@@ -166,11 +268,15 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
     }
     final lc = q.toLowerCase();
 
+    final him = FatherPreview.instance.on;
     final dests = _destinations(s)
+        .where((d) => !(him && d.hers))
         .where((d) =>
             d.label.toLowerCase().contains(lc) ||
             d.keys.any((k) => k.contains(lc)))
-        .take(8)
+        // Kept for revert (C1): .take(8). Every Tools row is a destination
+        // now, so a word like "report" names more than eight; none is cut.
+        .take(12)
         .toList();
     // The live store, not the seed (2026-10-28, the user: "no fake
     // situations"). Real products first; a Coming soon card only when

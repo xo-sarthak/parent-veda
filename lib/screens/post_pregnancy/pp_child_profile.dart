@@ -640,6 +640,16 @@ class ChildProfileStore extends ChangeNotifier {
   static int _childSeq = 0;
   static String _newChildId() => 'child_${DateTime.now().microsecondsSinceEpoch}_${_childSeq++}';
 
+  /// The sibling [c] is a twin of: another child already marked a multiple
+  /// birth, born within a day of [c]. Null when there is none.
+  Child? twinOf(Child c) {
+    for (final o in _children) {
+      if (o.id == c.id || o.multiple != true) continue;
+      if (o.dob.difference(c.dob).inHours.abs() <= 36) return o;
+    }
+    return null;
+  }
+
   /// Add a second/third child and make them active.
   Future<Child> addChild({
     required String name,
@@ -666,6 +676,14 @@ class ChildProfileStore extends ChangeNotifier {
       birthMode: birthMode,
       bornWeeks: bornWeeks,
     );
+    // ⚠️ THE SECOND TWIN (C1, P3 D6's hand-over, 2026-10-30): the birth sheet
+    // marks the first baby a multiple birth and tells her to add the other
+    // from Add a child, which never marked it. Derived, never asked: a living
+    // sibling already marked as one, born within a day of this child (twins
+    // can straddle midnight), makes this child one too. Callers read
+    // [twinOf] to say so.
+    final twin = twinOf(c);
+    if (twin != null) c.multiple = true;
     _children.add(c);
     _activeId = c.id;
     _book.touch(c.id);

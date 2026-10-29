@@ -154,7 +154,10 @@ void main() {
       // ⚠️ 21 -> 19 ON 2026-09-28 (the user: Tools holds only tools). Talk to
       // an expert, Courses and the Journey map left for More; the treatment
       // cycle came in from More. Kept for revert: 21.
-      expect(TtcToolsScreen.toolCount, 19);
+      // ⚠️ 19 -> 24 ON 2026-10-30 (C1): Calendar, Should I test?, Cycle
+      // report, Read your semen report and the Ready-to-Try plan came in
+      // from the doors. Kept for revert: 19.
+      expect(TtcToolsScreen.toolCount, 24);
     });
 
     test('supplements and medication are not the same destination', () {

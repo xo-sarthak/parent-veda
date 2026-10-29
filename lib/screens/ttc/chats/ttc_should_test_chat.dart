@@ -600,5 +600,7 @@ class TtcShouldTestChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      TtcChatScreen(script: TtcShouldTestChat());
+      // C1: a Tools row now, so the header carries its mark. Kept for revert:
+      // TtcChatScreen(script: TtcShouldTestChat());
+      TtcChatScreen(script: TtcShouldTestChat(), toolId: 'should_test');
 }

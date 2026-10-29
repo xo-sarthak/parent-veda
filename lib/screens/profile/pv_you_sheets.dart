@@ -372,6 +372,15 @@ Future<bool> showPvAddChildSheet(
                                   childId: child.id,
                                 );
                               }
+                              // C1 (P3 D6's hand-over): the second twin, added
+                              // here, is marked a multiple birth by the store;
+                              // say so, so nothing is decided silently.
+                              final twin = ChildProfileStore.instance.twinOf(child);
+                              if (!arrival && twin != null && ctx.mounted) {
+                                pvToast(ctx,
+                                    '${child.name} added, as a twin of ${twin.name}, born the same day',
+                                    kind: PvToastKind.done);
+                              }
                               if (ctx.mounted) Navigator.of(ctx).pop(true);
                             }
                           : null,

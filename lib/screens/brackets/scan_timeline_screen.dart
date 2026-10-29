@@ -348,14 +348,17 @@ class ScanTimelineBody extends StatelessWidget {
   Appointment? _bookedFor(String id, ScansStore store) {
     final scan = _byId(id);
     if (scan == null) return null;
-    for (final a in store.appointments) {
-      final t = a.title.toLowerCase();
-      if (t.contains(scan.name.en.toLowerCase())) return a;
-      for (final alias in scan.aliases) {
-        if (t.contains(alias.en.toLowerCase())) return a;
-      }
-    }
-    return null;
+    // C1 (2026-10-30): the Calendar's rule too (`ScansStore.bookedFor`):
+    // whole words, and a completed visit is not "booked". Kept for revert:
+    //   for (final a in store.appointments) {
+    //     final t = a.title.toLowerCase();
+    //     if (t.contains(scan.name.en.toLowerCase())) return a;
+    //     for (final alias in scan.aliases) {
+    //       if (t.contains(alias.en.toLowerCase())) return a;
+    //     }
+    //   }
+    //   return null;
+    return store.bookedFor([scan.name.en, for (final alias in scan.aliases) alias.en]);
   }
 }
 

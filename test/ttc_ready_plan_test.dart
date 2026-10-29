@@ -391,7 +391,9 @@ void main() {
       ].whereType<TtcToolTile>().where((t) => t.surfaceId == 'ttc_ready_plan');
       expect(tiles, hasLength(1));
       expect(ttcScreenForSurface('ttc_ready_plan'), isA<TtcReadyPlanScreen>());
-      expect(ttcToolMarkForSurface('ttc_ready_plan'), TtcToolMark.precheck);
+      // C1 (2026-10-30): a Tools row of its own now, with its own mark.
+      // Kept for revert: TtcToolMark.precheck.
+      expect(ttcToolMarkForSurface('ttc_ready_plan'), TtcToolMark.readyPlan);
     });
 
     test('the door names it with the screen\'s own name', () {

@@ -76,7 +76,16 @@ import '../widgets/global_ask_fab.dart' show kAskVedaRoute;
 import '../widgets/pv_feedback.dart';
 import 'brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'ttc/ttc_tab_root_header.dart' show TtcTabRootHeader, ttcTabRootIntroStyle;
-import 'ttc/ttc_tool_marks.dart' show ttcFamilyMarkForIntent;
+// Kept for revert (C1 Q2): import 'ttc/ttc_tool_marks.dart' show ttcFamilyMarkForIntent;
+import 'ttc/ttc_tool_marks.dart' show ttcFamilyMarkForIntent, TtcMarkLeading, TtcToolMark;
+import 'ttc/doors/ttc_tab_art.dart' show TtcTabMark;
+// C1 (2026-10-30): the door tools that had no row. Each opens through the
+// door router under the door's own id, so the Ask button reads it the same.
+import '../data/doors/pv_door_belly_skin.dart' show kBsSurfaceChecker;
+import '../data/doors/pv_door_complications.dart' show kCondSurfaceFind;
+import '../data/doors/pv_door_scans.dart'
+    show kScansSurfaceTimeline, kScansSurfaceReports, kScansSurfaceDecoder;
+import 'pregnancy/preg_question_lists_sheet.dart' show showPregQuestionLists;
 import 'doors/pv_list_row.dart';
 import 'doors/pv_live_search.dart';
 import 'pregnancy/birth_plan_screen.dart';
@@ -177,6 +186,25 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
     _open('garbh_daily', () => w);
   }
 
+  /// A door's tool, opened as its door opens it (C1): the door router builds
+  /// it, and the route name is the door's id, so the Ask button and the C1
+  /// test read the same thing. A tool the router cannot build says so.
+  void _openDoorTool(String id) {
+    final w = pvDoorScreenFor(id, controller);
+    if (w == null) {
+      pvToast(context, 'That tool could not open just now. Its door opens it too.');
+      return;
+    }
+    _open(id, () => w);
+  }
+
+  /// "Questions for your doctor" (C1): the three lists the doors hold, one
+  /// tool with three subjects. The sheet is shared with global search.
+  void _openQuestionLists() {
+    pvCommitFeedback();
+    showPregQuestionLists(context, controller);
+  }
+
   // HIS SIDE (2026-10-13): her trackers, her due date and her journal and
   // bump photos are hers; he gets getting ready, read to baby, Ask Veda and
   // his own journal. Same hub, less on it.
@@ -219,6 +247,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   ? 'Two taps for how your body feels today, and when to call'
                   : "Two taps for how you feel, what helps, and when to call",
               mark: IntentMark.bodyMark,
+              // C1 Q2: the two hearts are Bump's; the symptoms face.
+              tool: TtcToolMark.symptoms,
+              route: 'bracket/symptoms',
               priority: PregPriority.symptoms),
           _Tool('Mood check-in', Icons.sentiment_satisfied_outlined,
               const Color(0xFF3E7A6B),
@@ -227,6 +258,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   const MmTrackTab()),
               line: 'A mood word a day and a private journal. Only you see it',
               mark: IntentMark.sunMark,
+              tab: TtcTabMark.sun,
+              route: kMindSurfaceTrack,
               priority: PregPriority.anxiety),
           _Tool('Your plate today', Icons.restaurant_outlined,
               const Color(0xFF5E8A4A),
@@ -237,6 +270,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   ? 'Five ticks and your water, for getting your strength back'
                   : 'Five ticks and your water, for you and your baby',
               mark: IntentMark.checkMark,
+              tab: TtcTabMark.checklist,
+              route: kDietSurfaceToday,
               priority: PregPriority.nutrition),
         ]),
         if (!FatherPreview.instance.on)
@@ -250,6 +285,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               //   line: "Count kicks and get to know your baby's pattern",
               line: "Note your baby's movements and get to know the pattern",
               mark: IntentMark.stepsMark,
+              tab: TtcTabMark.heartHand,
+              route: 'tools/movement',
               priority: PregPriority.babyDevelopment,
               // First in Track from 28, after the rest before it (Batch 4).
               fromWeek: kPregToolsThirdTrimesterFrom),
@@ -259,6 +296,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open('tools/weight', () => WeightTrackerScreen(controller: controller)),
               line: 'Log your weight and see a healthy range for you',
               mark: IntentMark.scaleMark,
+              tool: TtcToolMark.weight,
+              route: 'tools/weight',
               priority: PregPriority.nutrition),
           // P3 D4 (2026-10-28), rule C1: the Calendar was reached from the
           // home, More, search and Ask Veda but was never a Tools row. Same
@@ -266,11 +305,16 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
           _Tool(s.tabCalendar, Icons.event_outlined, const Color(0xFF5A6B8C),
               () => _open('calendar', () => CalendarScreen(controller: controller)),
               line: 'Your appointments, scans and the checks most women have',
-              mark: IntentMark.calendarDay),
+              mark: IntentMark.calendarDay,
+              // C1 Q2: the window ring is the due date's; the month page.
+              tool: TtcToolMark.calendar,
+              route: 'calendar'),
           _Tool(s.medTitle, Icons.medication_outlined, const Color(0xFF4F7A52),
               () => _open('tools/medicines', () => MedicineTrackerScreen(controller: controller)),
               line: 'What your doctor prescribed, with reminders',
               mark: IntentMark.pillMark,
+              tool: TtcToolMark.medication,
+              route: 'tools/medicines',
               priority: PregPriority.symptoms),
           // REDUNDANT (2026-09-30, Tools audit): the Symptoms tile on the home already opens this door. Kept for revert:
           // _Tool(s.symToolTitle, Icons.healing_outlined, const Color(0xFF4A7BC8),
@@ -286,6 +330,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open('tools/readings', () => ReadingsLogScreen(controller: controller)),
               line: 'Log the numbers your doctor asked for, and share them',
               mark: IntentMark.chartLog,
+              tab: TtcTabMark.chartLine,
+              route: 'tools/readings',
               priority: PregPriority.symptoms),
           // P4 S3 / D3 (2026-10-28): the food shopping list was reached from
           // the Nutrition door only. Track, beside Weight and the readings;
@@ -295,12 +341,16 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open('nutrition/list', () => const ShoppingListScreen()),
               line: 'What the recipes and diet chart days you picked need',
               mark: IntentMark.forkMark,
+              tab: TtcTabMark.bowl,
+              route: 'nutrition/list',
               priority: PregPriority.nutrition),
           _Tool(s.toolKegelTitle, Icons.self_improvement_rounded,
               AppTheme.secondary400,
               () => _open('tools/kegel', () => KegelCareScreen(controller: controller)),
               line: 'A few minutes a day for your pelvic floor',
               mark: IntentMark.lotusMark,
+              tab: TtcTabMark.lotus,
+              route: 'tools/kegel',
               priority: PregPriority.fitness),
           // REDUNDANT (2026-09-30, Tools audit): Tests & reports lives inside the Scans & tests door. Kept for revert:
           // _Tool(s.tsrTitle, Icons.fact_check_outlined, AppTheme.neutral900,
@@ -311,7 +361,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               const Color(0xFFE0921C),
               () => _open('tools/reminders', () => RemindersScreen(controller: controller)),
               line: 'What we remind you about, and when',
-              mark: IntentMark.nextStep),
+              mark: IntentMark.nextStep,
+              tool: TtcToolMark.bell,
+              route: 'tools/reminders'),
         ]),
         // if (!_ended) // kept for revert (P3 D5): the group stays for the due
         // date; its other rows step aside one by one until P4.
@@ -328,6 +380,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   ? 'What to take for you, if you go into hospital'
                   : 'What to pack for you, your baby and your partner',
               mark: IntentMark.bagMark,
+              tool: TtcToolMark.hospitalBag,
+              route: 'tools/hospital_bag',
               priority: PregPriority.birthPrep),
           // Added by the gap analysis: the birth plan was built for the Labour
           // door and never listed here.
@@ -338,6 +392,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   ? 'Your plan, kept as you left it'
                   : 'What you would like on the day, to share with your doctor',
               mark: IntentMark.reportPage,
+              tool: TtcToolMark.records,
+              route: kLabourSurfaceBirthPlan,
               priority: PregPriority.birthPrep),
           // if (!_ended) // kept for revert (P4 D4)
           // One name per tool (P4): "Contraction timer". Kept for revert:
@@ -348,6 +404,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   ? 'Time contractions, if your doctor has asked you to'
                   : 'Time your contractions and see when to go in',
               mark: IntentMark.timelineRail,
+              tool: TtcToolMark.stopwatch,
+              route: 'tools/contractions',
               priority: PregPriority.birthPrep,
               // First in Get ready from 37, as the Labour door (Batch 4).
               fromWeek: kPregToolsTimerFrom),
@@ -356,6 +414,8 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               () => _open('tools/due_date', () => DueDateCalculatorScreen(controller: controller)),
               line: 'Work out your due date, or update it after a scan',
               mark: IntentMark.calendarDay,
+              tab: TtcTabMark.windowRing,
+              route: 'tools/due_date',
               staleDueDate: controller.dueDateMayBeStale),
           // if (!_ended) // kept for revert (P4 D4)
           _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
@@ -364,6 +424,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   ? "Your lists, and what you've bought"
                   : 'What you really need before the baby comes',
               mark: IntentMark.listMark,
+              // C1 Q2: the clipboard is Your plate's; what to buy, the wallet.
+              tab: TtcTabMark.wallet,
+              route: 'tools/product_checklist',
               priority: PregPriority.birthPrep),
           // P2 N1 (2026-10-28): Baby names was offered by the Getting ready
           // door only (C1). The screen is the one Parenting opens; a name she
@@ -378,6 +441,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
                   ? 'Your shortlist, kept'
                   : 'Find names you both love, and keep a shortlist',
               mark: IntentMark.pageMark,
+              // C1 Q2: the open book is the Journal's; names you both love.
+              tab: TtcTabMark.twoCircles,
+              route: kReadySurfaceNames,
               priority: PregPriority.birthPrep),
         ]),
         _ToolGroup('Keep', 330, [
@@ -385,17 +451,23 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
             _Tool('Your journal', Icons.menu_book_outlined, const Color(0xFF2F2C30),
                 () => _open('father/journal', () => FatherJournalScreen(controller: controller)),
                 line: "Yours. She won't see it unless you share it",
-                mark: IntentMark.bookMark),
+                mark: IntentMark.bookMark,
+                tab: TtcTabMark.openBook,
+                route: 'father/journal'),
           if (!FatherPreview.instance.on)
           _Tool(s.jrTitle, Icons.menu_book_outlined, const Color(0xFF2F2C30),
               () => _open('journal', () => JournalScreen(controller: controller)),
               line: 'Write to yourself, or to your baby',
-              mark: IntentMark.bookMark),
+              mark: IntentMark.bookMark,
+              tab: TtcTabMark.openBook,
+              route: 'journal'),
           if (!FatherPreview.instance.on)
           _Tool(s.bumpTitle, Icons.pregnant_woman_rounded, const Color(0xFFCB6F94),
               () => _open('tools/bump', () => BumpRitualScreen(controller: controller)),
               line: 'A photo of your bump, week by week',
-              mark: IntentMark.bodyMark),
+              mark: IntentMark.bodyMark,
+              tab: TtcTabMark.bigSmallHearts,
+              route: 'tools/bump'),
           // ⚠️ BACK ON TOOLS (M7, the user 2026-10-27), a named exception to M6:
           // a practice, not her data, but where she looks for it. It opens the
           // door (today's practice is there); if the door cannot be built it
@@ -408,6 +480,9 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               _openGarbh,
               line: 'The Garbh Sanskar door: a story, a sound, a quiet minute',
               mark: IntentMark.cuppedHands,
+              // C1 Q2: the heart in a hand is Baby movement's.
+              tab: TtcTabMark.tulip,
+              route: 'garbh_daily',
               priority: PregPriority.anxiety),
           // REDUNDANT (2026-09-30, Tools audit): the Garbh Sanskar tile on the home opens the door that holds today's practice. Kept for revert:
           // _Tool(s.garbhToolTitle, Icons.spa_outlined, const Color(0xFFBE9C4E),
@@ -422,7 +497,48 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               // line: 'Short readings to hear, or to read aloud',
               line: 'Short readings from six faiths, for a quiet moment',
               mark: IntentMark.lampMark,
+              tab: TtcTabMark.sunrise,
+              route: 'tools/spiritual_reading',
               priority: PregPriority.anxiety),
+        ]),
+        // C1 Q1 (the user, 2026-10-30, "three rows"): her scans, her reports and
+        // the questions she takes in, reached until now from the Scans,
+        // Complications and Nutrition doors only. A door may show a tool; it
+        // may never be the only way to find it. Hers, like Track: on his side
+        // her scans and reports stay hers.
+        if (!FatherPreview.instance.on)
+        _ToolGroup('Records', 206, [
+          _Tool('My scans', Icons.timeline_rounded, const Color(0xFF4A7BC8),
+              () => _openDoorTool(kScansSurfaceTimeline),
+              line: _ended
+                  ? 'The scans you have had, and their dates'
+                  : 'Every scan in order, with the ones you have had marked',
+              tab: TtcTabMark.timelineDots,
+              route: kScansSurfaceTimeline),
+          _Tool('My reports', Icons.folder_outlined, const Color(0xFF4A7BC8),
+              () => _openDoorTool(kScansSurfaceReports),
+              line: 'Your reports and photos of them, kept in one place',
+              tool: TtcToolMark.pcosCheck,
+              route: kScansSurfaceReports),
+          _Tool('Report decoder', Icons.search_rounded, const Color(0xFF4A7BC8),
+              () => _openDoorTool(kScansSurfaceDecoder),
+              line: 'What a line on your report means, in plain words',
+              tab: TtcTabMark.magnifier,
+              route: kScansSurfaceDecoder),
+          // M7 (the user, 2026-10-27): "Tests and reports" goes back. The
+          // library of what each test checks; the same screen `tests_scans`
+          // has always opened from the router.
+          _Tool(s.tsrTitle, Icons.fact_check_outlined, const Color(0xFF4A7BC8),
+              () => _open('tests_scans', () => TestsScansReportsScreen(controller: controller)),
+              line: 'What each scan and test checks, and when',
+              tool: TtcToolMark.tests,
+              route: 'tests_scans'),
+          // One row for the three lists (C1): one tool, three subjects.
+          _Tool('Questions for your doctor', Icons.help_center_outlined, const Color(0xFF4A7BC8),
+              _openQuestionLists,
+              line: 'Lists to tick and take in: a scan, your condition, your diet',
+              tab: TtcTabMark.doctorChat,
+              route: 'questions'),
         ]),
         // Was 'Check and ask' while Is it safe? sat beside Ask Veda (2026-09-30).
         _ToolGroup('Ask', 268, [
@@ -432,12 +548,34 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
           // _Tool('Is it safe?', Icons.help_outline_rounded, AppTheme.secondary600,
           // () => _open('can_i', () => CanIScreen(controller: controller)),
           // line: 'Food, medicines and everyday things, answered'),
+          // ⚠️ BACK ON TOOLS (M7, the user 2026-10-27; built in C1). The home
+          // tile is not the only way in any more than a door is.
+          _Tool('Is it safe?', Icons.help_outline_rounded, AppTheme.secondary600,
+              () => _open('can_i', () => CanIScreen(controller: controller)),
+              line: 'Food, medicines and everyday things, answered',
+              tool: TtcToolMark.canI,
+              route: 'can_i'),
+          // C1: from the Complications door only until now. Hers (it adds to
+          // her journey), so not on his side.
+          if (!FatherPreview.instance.on)
+          _Tool('Find a condition', Icons.manage_search_rounded, AppTheme.secondary600,
+              () => _openDoorTool(kCondSurfaceFind),
+              line: 'Look up a condition your doctor has mentioned',
+              tab: TtcTabMark.signpost,
+              route: kCondSurfaceFind),
+          // C1: from the Belly and skin door only until now.
+          _Tool('Ingredient checker', Icons.spa_outlined, AppTheme.secondary600,
+              () => _openDoorTool(kBsSurfaceChecker),
+              line: 'Check a cream or face wash, ingredient by ingredient',
+              tab: TtcTabMark.jarLeaf,
+              route: kBsSurfaceChecker),
           _Tool(s.vedaToolTitle, Icons.auto_awesome_outlined, AppTheme.neutral900,
               () => _open(kAskVedaRoute, () => AskVedaScreen(controller: controller)),
               line: 'Ask anything, in your own words',
               mark: IntentMark.askDoctor,
               // The Ask Veda mark, not the two bubbles (2026-10-24).
-              leading: const AskVedaMark(size: 44)),
+              leading: const AskVedaMark(size: 44),
+              route: kAskVedaRoute),
         ]),
         // The two workbenches the grid carried, debug builds only, as before.
         if (kDebugMode)
@@ -566,13 +704,18 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
       ];
 
   Widget _row(V2Palette p, _Tool t, double hue) => PvListRow(
+        key: t.route == null ? null : ValueKey('preg_tool_${t.route}'),
         p: p,
         // Kept for revert: leading: PvMarkWell(p: p, hue: hue, size: 40, icon: t.icon),
         // ⚠️ TTC'S MARKS (2026-10-02): the drawn object on a disc, 44, as the
         // TTC Tools rows draw theirs (`TtcToolMarkLeading`). A tool with no
         // such mark (the debug rows) keeps its well. Kept for revert:
         // `PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark)`.
+        // C1 Q2: the row's own drawing first, so no two rows share one.
         leading: t.leading ??
+            (t.tab != null || t.tool != null
+                ? TtcMarkLeading(tab: t.tab, tool: t.tool, tint: v2BlockTint(hue % 360, p))
+                : null) ??
             ttcFamilyMarkForIntent(t.mark, v2BlockTint(hue % 360, p)) ??
             (t.mark != null
                 ? PvMarkWell(p: p, hue: hue, size: 40, mark: t.mark)
@@ -1162,8 +1305,24 @@ class _Tool {
     this.mark,
     this.leading,
     this.fromWeek,
+    this.route,
+    this.tab,
+    this.tool,
   });
   final String title;
+
+  /// The route name the row pushes, the same string its `_open` passes (C1,
+  /// 2026-10-30). The row is keyed `preg_tool_<route>`, so the C1 test can
+  /// hold every door's tools against the rows she actually sees.
+  final String? route;
+
+  /// The row's own drawing (C1 Q2, the user 2026-10-30: one mark per row, as
+  /// Parenting's Tools tab). Two intents resolved to one drawing in
+  /// `ttcFamilyMarkForIntent`, so five pairs of rows wore the same glyph. A
+  /// row names its door-art object directly; [mark] stays for revert and for
+  /// any row that names neither.
+  final TtcTabMark? tab;
+  final TtcToolMark? tool;
 
   /// The week from which this row is in its time: it leads its group from
   /// then and waits behind the rows with no week before then (relevance
