@@ -453,7 +453,9 @@ String ttcToolVerb(String surfaceId, [String? title]) => switch (surfaceId) {
   'ttc_records' => 'Open your records',
   'ttc_tests' => 'See the test library',
   'ttc_appointments' => 'Open your appointments',
-  'ttc_semen_report' => 'Read his semen report',
+  // The tool's one name (T4 hand-over item 3, 2026-10-29): "his" read as
+  // hers on his phone. Kept for revert: 'Read his semen report',
+  'ttc_semen_report' => 'Read your semen report',
   'ttc_cycle_report' => 'See your cycle report',
   _ => title == null || title.isEmpty ? 'Open the tool' : 'Open $title',
 };

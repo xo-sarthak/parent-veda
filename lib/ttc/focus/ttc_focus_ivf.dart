@@ -953,8 +953,11 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         TtcToolTile(
           title: 'Your medicines and timings',
           id: 'ttc_tile_your_medicines_and_timings',
-          blurb: 'What to take and when, including the trigger time that '
-              'really matters.',
+          // T4 hand-over item 1, 2026-10-29: the trigger lives in Treatment
+          // cycle (the tile above), not in Medication. Kept for revert:
+          // blurb: 'What to take and when, including the trigger time that '
+          //     'really matters.',
+          blurb: 'What to take and when, with a reminder for each.',
           surfaceId: 'ttc_medication',
         ),
         // ⚠️ THE SAFETY TILE BELONGS IN *THIS* SECTION, NOT ONLY IN "GOING
