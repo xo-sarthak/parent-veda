@@ -246,9 +246,9 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **CHECK** · Razorpay live keys and merchant KYC: no doc records moving off test mode · user · STILL-OPEN §65.2 · added 2026-10-17
 
 **Learning: courses, masterclasses, cohorts, live, recordings** (audit 2026-10-28, decisions 2026-10-29; the ledger is LEARNING-ARCHITECTURE §5, ticked there first):
-- [ ] **BLOCKER** · Any signed-in account can claim any `expert_id` (`expert_accounts` grant, `0030:29`), which gives that expert's host tokens, moderation and roster · dev, then user runs 0123 · LEARNING-ARCHITECTURE LA-1 · added 2026-10-29
-- [ ] **BLOCKER** · `book_slot` (0084) dropped 0066's credit claim, so a server credit can be spent twice · dev, then user runs 0123 · LEARNING-ARCHITECTURE LA-2 · added 2026-10-29
-- [ ] **BLOCKER** · `open_session_room` creates a slot from phone-supplied values · dev, then user runs 0123 · LEARNING-ARCHITECTURE LA-3 · added 2026-10-29
+- [x] **BLOCKER** · Any signed-in account can claim any `expert_id` (`expert_accounts` grant, `0030:29`), which gives that expert's host tokens, moderation and roster · dev, then user runs 0123 · LEARNING-ARCHITECTURE LA-1 · added 2026-10-29 · done 2026-10-29, ad5be7de
+- [x] **BLOCKER** · `book_slot` (0084) dropped 0066's credit claim, so a server credit can be spent twice · dev, then user runs 0123 · LEARNING-ARCHITECTURE LA-2 · added 2026-10-29 · done 2026-10-29, ad5be7de
+- [x] **BLOCKER** · `open_session_room` creates a slot from phone-supplied values · dev, then user runs 0123 · LEARNING-ARCHITECTURE LA-3 · added 2026-10-29 · done 2026-10-29, ad5be7de
 - [ ] **LAUNCH** · `dev_testers` (0123) is empty, or holds staff accounts only: an account in it can link itself to any expert through the testing picker · user · LEARNING-ARCHITECTURE LA-1, BACKEND-PATTERNS 16zzi · added 2026-10-29
 - [ ] **BLOCKER** · The server writes no course receipt and courses are charged the app's price; `book_slot` takes expert, capacity, start and price from the client and never checks payment · dev, then user (migration, three functions, webhook secret) · LEARNING-ARCHITECTURE LA-4 to LA-6, LA-8 · added 2026-10-29
 - [ ] **BLOCKER** · The no-charge preview (`notConfigured` counts as bought) can reach a release build; flip `payment_mode` to `live` before the first real sale · dev, then user · LEARNING-ARCHITECTURE LA-7 · added 2026-10-29
