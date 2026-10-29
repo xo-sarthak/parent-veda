@@ -39,9 +39,11 @@ import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../screens/learn/pv_my_learning_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/global_ask_fab.dart' show kCallRoute;
 import 'booking_models.dart';
+import 'call_chrome.dart';
 import 'call_screen.dart';
 import 'call_session.dart';
 import 'group_call_screen.dart';
@@ -50,7 +52,9 @@ import '../widgets/pv_feedback.dart' show PvPress;
 const _bg = Color(0xFF0E0D12);
 const _panel = Color(0xFF17151E);
 const _accent = AppTheme.primary;
-const _danger = Color(0xFFE5484D);
+// Kept for revert — the red "off" fill, retired 2026-10-29 for the call's
+// white one:
+// const _danger = Color(0xFFE5484D);
 
 class CallPrejoinScreen extends StatefulWidget {
   const CallPrejoinScreen({
@@ -61,6 +65,7 @@ class CallPrejoinScreen extends StatefulWidget {
     this.waitingFor,
     this.startsUtc,
     this.hostSlot,
+    this.asExpert = false,
   });
 
   final String bookingId;
@@ -86,6 +91,14 @@ class CallPrejoinScreen extends StatefulWidget {
   /// rather than making her work it out.
   final DateTime? startsUtc;
 
+  /// Set by the doctor-side call sites (polish pass, 2026-10-29).
+  ///
+  /// A refusal carries no role: the server refuses before it says who you
+  /// are. So the doctor arriving after +20 was shown the parent's sentence,
+  /// "you can ask for a refund from Your bookings", about her own no-show.
+  /// The call site knows which side it is; it says so here.
+  final bool asExpert;
+
   @override
   State<CallPrejoinScreen> createState() => _CallPrejoinScreenState();
 }
@@ -107,6 +120,28 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
   CallJoin? _join;
   CallJoinFailure? _failure;
   bool _joining = false;
+
+  /// A host opening a class (the only class route through this screen;
+  /// attendees go straight to the room).
+  bool get _isClass => widget.hostSlot != null;
+
+  /// The doctor's side: hosting a class, or the expert in a consult.
+  bool get _isExpert => widget.asExpert || _isClass;
+
+  String get _what => _isClass ? 'class' : 'consultation';
+
+  /// The +20 close time, when the start is known.
+  String? get _closedAt {
+    final s = widget.startsUtc;
+    return s == null ? null : callClockAt(s.add(const Duration(minutes: 20)));
+  }
+
+  void _openBookings() {
+    Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'bookings'),
+      builder: (_) => const PvMyLearningScreen(),
+    ));
+  }
 
   @override
   void initState() {
@@ -308,8 +343,11 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
               _permanentlyDenied
                   ? 'They are turned off for ParentVeda. Open Settings to allow '
                       'them, then come back to this screen.'
-                  : 'They are only used during a live consultation, and only '
-                      'while you are on the call.',
+                  : _isClass
+                      ? 'They are only used while you are hosting this class, '
+                          'and only while you are in it.'
+                      : 'They are only used during a live consultation, and '
+                          'only while you are on the call.',
               textAlign: TextAlign.center,
               style: const TextStyle(
                   color: Colors.white54, fontSize: 13.5, height: 1.55),
@@ -335,38 +373,88 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
   /// its own button — the whole point of keeping the refusal body.
   Widget _refusalView() {
     final f = _failure!;
+
+    // The parent whose doctor never came gets the same closed screen she
+    // would have seen from inside the call: what happened, what has been
+    // done, one next step. The consult was described with class words
+    // ("host", "seat", "everyone booked").
+    if (f.kind == CallRefusal.hostMissed && !_isExpert) {
+      final who = (widget.waitingFor?.trim().isNotEmpty ?? false)
+          ? widget.waitingFor!.trim()
+          : 'Your doctor';
+      final at = _closedAt;
+      return CallOutcomeView(
+        icon: Icons.event_busy_rounded,
+        title: "$who couldn't make it",
+        line: at != null
+            ? 'We closed this consultation at $at, 20 minutes after it was '
+                'due to start.'
+            : 'We closed this consultation because the doctor had not joined '
+                '20 minutes in.',
+        checks: const [
+          'Your credit is back, so you can book another time',
+          'Our team has been told',
+          'Refunds for consultations go through support',
+        ],
+        actions: [
+          callButton('Go to Your bookings', _openBookings),
+          callButton('Back', () => Navigator.of(context).maybePop(),
+              primary: false),
+        ],
+      );
+    }
+
+    final at = _closedAt;
+    final patient = (widget.waitingFor?.trim().isNotEmpty ?? false)
+        ? "${widget.waitingFor!.trim()}'s"
+        : "the parent's";
     final (title, body) = switch (f.kind) {
       CallRefusal.tooEarly => (
-          'This consultation has not opened yet',
+          'This $_what has not opened yet',
           f.opensUtc != null
               ? 'You can join from ${_clock(f.opensUtc!)}, ten minutes before '
                   'it starts. We will remind you.'
               : 'You can join ten minutes before it starts. We will remind you.',
         ),
+      // The doctor's own late arrival, said to the doctor.
       CallRefusal.hostMissed => (
-          'This session was closed',
-          'The host had not joined 20 minutes in, so the session was closed '
-              'and everyone booked has their seat or credit back. You can ask '
-              'for a refund from Your bookings.',
+          'This $_what was closed',
+          _isClass
+              ? 'You joined after 20 minutes, so we closed the class'
+                  '${at != null ? ' at $at' : ''} and everyone\'s seat was '
+                  'returned. Our team has been told.'
+              : 'You joined after 20 minutes, so we closed the consultation'
+                  '${at != null ? ' at $at' : ''} and $patient credit was '
+                  'returned. Our team has been told.',
         ),
       CallRefusal.ended => (
-          'This consultation has ended',
-          'The room is closed. If you still need to speak to someone, you can '
-              'book a follow-up from My Bookings.',
+          'This $_what has ended',
+          _isExpert
+              ? 'The room is closed.'
+              : 'The room is closed. If you still need to speak to someone, '
+                  'you can book a follow-up from Your bookings.',
         ),
       CallRefusal.notYours => (
           'This session is not available',
-          'It may have been cancelled, or it belongs to a different account. '
-              'Check My Bookings, or sign in as the account that booked it.',
+          _isExpert
+              ? 'It may have been cancelled, or it belongs to a different '
+                  'account.'
+              : 'It may have been cancelled, or it belongs to a different '
+                  'account. Check Your bookings, or sign in as the account '
+                  'that booked it.',
         ),
       CallRefusal.notSignedIn => (
           'Please sign in',
-          'You need to be signed in as the account that booked this session.',
+          _isExpert
+              ? 'You need to be signed in as the account this session belongs '
+                  'to.'
+              : 'You need to be signed in as the account that booked this '
+                  'session.',
         ),
       CallRefusal.offline => (
           'You appear to be offline',
-          'A video consultation needs a working connection. Check your network '
-              'and try again.',
+          'A live $_what needs a working connection. Check your network and '
+              'try again.',
         ),
       CallRefusal.serverError => (
           'We could not open this session',
@@ -374,6 +462,47 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
               'moment.',
         ),
     };
+    // Kept for revert — the one-voice refusal copy, before it knew which
+    // side and which kind of session it was speaking to (2026-10-29):
+    // final (oldTitle, oldBody) = switch (f.kind) {
+    //   CallRefusal.tooEarly => (
+    //       'This consultation has not opened yet',
+    //       f.opensUtc != null
+    //           ? 'You can join from ${_clock(f.opensUtc!)}, ten minutes before '
+    //               'it starts. We will remind you.'
+    //           : 'You can join ten minutes before it starts. We will remind you.',
+    //     ),
+    //   CallRefusal.hostMissed => (
+    //       'This session was closed',
+    //       'The host had not joined 20 minutes in, so the session was closed '
+    //           'and everyone booked has their seat or credit back. You can ask '
+    //           'for a refund from Your bookings.',
+    //     ),
+    //   CallRefusal.ended => (
+    //       'This consultation has ended',
+    //       'The room is closed. If you still need to speak to someone, you can '
+    //           'book a follow-up from My Bookings.',
+    //     ),
+    //   CallRefusal.notYours => (
+    //       'This session is not available',
+    //       'It may have been cancelled, or it belongs to a different account. '
+    //           'Check My Bookings, or sign in as the account that booked it.',
+    //     ),
+    //   CallRefusal.notSignedIn => (
+    //       'Please sign in',
+    //       'You need to be signed in as the account that booked this session.',
+    //     ),
+    //   CallRefusal.offline => (
+    //       'You appear to be offline',
+    //       'A video consultation needs a working connection. Check your network '
+    //           'and try again.',
+    //     ),
+    //   CallRefusal.serverError => (
+    //       'We could not open this session',
+    //       'Something went wrong on our side, not yours. Please try again in a '
+    //           'moment.',
+    //     ),
+    // };
 
     return Center(
       child: Padding(
@@ -401,6 +530,9 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
           const SizedBox(height: 26),
           if (f.retryable) ...[
             _wideButton('Try again', _prepare),
+            const SizedBox(height: 12),
+          ] else if (f.kind == CallRefusal.ended && !_isExpert) ...[
+            _wideButton('Go to Your bookings', _openBookings),
             const SizedBox(height: 12),
           ],
           _quietButton('Back', () => Navigator.of(context).maybePop()),
@@ -536,9 +668,12 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: on ? Colors.white.withValues(alpha: 0.16) : _danger,
+                // Off is a white circle, as in the call itself (it was red
+                // here and white there; one meaning, one look).
+                // Kept for revert: color: on ? ... : _danger,
+                color: on ? Colors.white.withValues(alpha: 0.16) : Colors.white,
               ),
-              child: Icon(icon, size: 24, color: Colors.white),
+              child: Icon(icon, size: 24, color: on ? Colors.white : kCallInk),
             ),
             const SizedBox(height: 8),
             Text(label,
@@ -559,11 +694,15 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
               height: 52,
               width: double.infinity,
               alignment: Alignment.center,
+              // The house button on a dark ground: white fill, ink text
+              // (it was the brand purple). Kept for revert:
+              // decoration: BoxDecoration(
+              //     color: _accent, borderRadius: BorderRadius.circular(15)),
               decoration: BoxDecoration(
-                  color: _accent, borderRadius: BorderRadius.circular(15)),
+                  color: Colors.white, borderRadius: BorderRadius.circular(15)),
               child: Text(label,
                   style: const TextStyle(
-                      color: Colors.white,
+                      color: kCallInk,
                       fontSize: 15,
                       fontWeight: FontWeight.w700)),
             ),

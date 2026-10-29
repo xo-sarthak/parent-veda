@@ -89,10 +89,12 @@ import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../screens/learn/pv_my_learning_screen.dart';
 import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import '../localization/app_language.dart';
 import 'booking_store.dart';
+import 'call_chrome.dart';
 import 'call_session.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
 import '../widgets/pv_toast.dart';
@@ -160,7 +162,10 @@ class CallScreen extends StatefulWidget {
 /// that dropped mid-call had no state to move to: it stayed in the "connected"
 /// branch, rendering a frozen last frame with a running clock and a green
 /// "live" dot. Every one of those said the call was fine.
-enum _Phase { connecting, live, reconnecting, ended, failed }
+///
+/// `closed` (polish pass, 2026-10-29): the server closed the consultation
+/// because the doctor never came. Its own screen, out of the room.
+enum _Phase { connecting, live, reconnecting, ended, failed, closed }
 
 class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
   Room? _room;
@@ -168,6 +173,19 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
 
   _Phase _phase = _Phase.connecting;
   String? _error;
+
+  /// The refusal behind [_Phase.failed], so Try again is offered only where
+  /// trying again can work.
+  CallJoinFailure? _failure;
+
+  /// The other person has left the room mid-consult. Not the end of the
+  /// call: a dropped network looks identical from here, and the room stays
+  /// open. Cleared when they come back.
+  bool _remoteLeft = false;
+
+  /// The connection was lost (rather than the consult running out), so the
+  /// ended screen leads with Rejoin.
+  bool _lostConnection = false;
 
   /// Set when the room closed for a reason worth naming — the other person
   /// hung up, or the connection was lost for good.
@@ -271,6 +289,8 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
     setState(() {
       _phase = _Phase.connecting;
       _error = null;
+      _lostConnection = false;
+      _remoteLeft = false;
     });
     try {
       // The id is logged because a refusal is ambiguous without it: a booking
@@ -289,11 +309,17 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
         if (!mounted) return;
         if (failure != null) {
           setState(() {
-            _phase = _Phase.failed;
+            _failure = failure;
+            // The doctor never came: the same closed screen she would have
+            // seen from inside the room, not a refusal with Try again.
+            _phase = failure.kind == CallRefusal.hostMissed
+                ? _Phase.closed
+                : _Phase.failed;
             _error = _failureCopy(failure);
           });
           return;
         }
+        _failure = null;
         join = fetched;
       }
       if (join == null) {
@@ -364,22 +390,30 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
       ..on<ParticipantConnectedEvent>((_) {
         if (!mounted) return;
         _noteIfBothPresent();
-        setState(() {});
+        setState(() => _remoteLeft = false);
       })
       ..on<ParticipantDisconnectedEvent>((_) {
         if (!mounted) return;
-        // In a consult there is exactly one other person, so their leaving IS
-        // the end of the call and should say so. In a class it is one of fifty
-        // and means nothing — hence the guard.
-        if (_isConsult && _remote == null) {
-          setState(() {
-            _phase = _Phase.ended;
-            _endedBecause = '$_remoteName left the call.';
-          });
-          _tick?.cancel();
-        } else {
-          setState(() {});
-        }
+        // THEIR LEAVING IS NOT THE END OF THE CALL (polish pass, 2026-10-29).
+        // This used to end the call the moment the other side's network
+        // blipped, while the room was still open and they were on their way
+        // back. Now she stays, told they left and may be reconnecting: the
+        // class screen's rule for a host who drops. The consult ends at its
+        // own end time (_onTick), or when she leaves.
+        //
+        // Kept for revert:
+        // if (_isConsult && _remote == null) {
+        //   setState(() {
+        //     _phase = _Phase.ended;
+        //     _endedBecause = '$_remoteName left the call.';
+        //   });
+        //   _tick?.cancel();
+        // } else {
+        //   setState(() {});
+        // }
+        setState(() {
+          if (_isConsult && _remote == null) _remoteLeft = true;
+        });
       })
       ..on<RoomReconnectingEvent>((_) {
         if (!mounted) return;
@@ -395,6 +429,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
         _tick?.cancel();
         setState(() {
           _phase = _Phase.ended;
+          _lostConnection = e.reason != DisconnectReason.clientInitiated;
           _endedBecause = e.reason == DisconnectReason.clientInitiated
               ? null
               : 'The connection to the call was lost.';
@@ -480,7 +515,47 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
     if (s['outcome'] == 'host_missed' || s['cancel_reason'] == 'host_missed') {
       setState(() => _hostMissed = true);
       BookingStore.instance.refreshFromServer();
+      // Out of the room: her camera and mic were still publishing into a
+      // consultation the server had already closed.
+      await _closeRoom();
+      if (mounted) setState(() => _phase = _Phase.closed);
     }
+  }
+
+  /// When the server closes a consultation nobody came to: the start plus
+  /// twenty minutes.
+  DateTime? get _closesAt =>
+      _join?.startsUtc?.add(const Duration(minutes: 20));
+
+  /// Before the consultation's end time, so Rejoin can still work.
+  bool get _windowOpen {
+    final e = _join?.endsUtc;
+    return e == null || DateTime.now().toUtc().isBefore(e);
+  }
+
+  /// The doctor, still waiting for the parent.
+  bool get _waitingOnParent =>
+      _isConsult && _myRole.isExpert && _remote == null && _bothPresentAt == null;
+
+  /// Leaves the room but not the screen.
+  Future<void> _closeRoom() async {
+    _recordLeave();
+    final r = _room;
+    _room = null;
+    _tick?.cancel();
+    _chromeTimer?.cancel();
+    await _events?.dispose();
+    _events = null;
+    r?.removeListener(_refresh);
+    await r?.disconnect();
+    await r?.dispose();
+  }
+
+  void _openBookings() {
+    Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'bookings'),
+      builder: (_) => const PvMyLearningScreen(),
+    ));
   }
 
   void _onTick() {
@@ -496,6 +571,15 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
         _elapsed += const Duration(seconds: 1);
       }
     });
+
+    // The other side left and the consultation's time has run out: nothing
+    // more is coming, so the call ends here rather than waiting forever.
+    if (_isConsult && _remoteLeft && _remote == null && !_windowOpen) {
+      _closeRoom().then((_) {
+        if (mounted) setState(() => _phase = _Phase.ended);
+      });
+      return;
+    }
 
     // Five minutes out from the end of what was bought. Said once, quietly,
     // and only for a consult: a class overrunning is the host's business.
@@ -525,8 +609,8 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
               'closed and your credit is back. Book another time from Your '
               'bookings.',
         CallRefusal.ended =>
-          'This consultation has ended. You can book a follow-up from My '
-              'Bookings.',
+          'This consultation has ended. You can book a follow-up from Your '
+              'bookings.',
         CallRefusal.notYours =>
           'This session is not available. It may have been cancelled, or it '
               'belongs to a different account.',
@@ -575,6 +659,13 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
       await _leave();
       return;
     }
+    // Where she comes back from, by side: a doctor has no Your bookings, they
+    // rejoin from Today. And until when, if the server said.
+    final ends = _join?.endsUtc;
+    final from = _myRole.isExpert ? 'Today' : 'Your bookings';
+    final until = ends != null
+        ? 'until ${callClockAt(ends)}'
+        : 'while the session is running';
     final go = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -583,13 +674,15 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
             style: TextStyle(color: Colors.white, fontSize: 17)),
         content: Text(
           _remote == null
-              ? 'You can rejoin from My Bookings while the session is running.'
+              ? 'You can rejoin from $from $until.'
               : 'You are still connected to $_remoteName. You can rejoin from '
-                  'My Bookings while the session is running.',
+                  '$from $until.',
           style: const TextStyle(color: Colors.white70, height: 1.5),
         ),
         actions: [
           TextButton(
+            // White, not the theme purple: about 2.5:1 on this panel.
+            style: TextButton.styleFrom(foregroundColor: Colors.white),
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Stay'),
           ),
@@ -741,7 +834,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
           Text(
             label,
             style: TextStyle(
-                color: role.isExpert ? _accent : Colors.white70,
+                color: role.isExpert ? kCallTint : Colors.white70,
                 fontSize: compact ? 10 : 11.5,
                 fontWeight: FontWeight.w700),
           ),
@@ -811,7 +904,15 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
     // then the line says "Waiting", because a timer running against an empty
     // room is telling the user a number about nothing.
     final counting = !_isConsult || _bothPresentAt != null;
-    final state = (_remote == null || !counting) ? 'Waiting' : _clock;
+    final late = _remote == null &&
+        _bothPresentAt == null &&
+        (_waitingOnDoctor || _waitingOnParent) &&
+        _minutesLate >= 10;
+    final state = late
+        ? 'Starting late'
+        : (_remote == null || !counting)
+            ? 'Waiting'
+            : _clock;
     final name = _remoteName.trim();
     var what = widget.title.trim();
     if (name.isNotEmpty && name != 'the other person') {
@@ -850,8 +951,10 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
             _status('Joining ${widget.title}…', spinner: true),
           _Phase.failed => _status(
               _error ?? 'Something went wrong joining the call.',
-              retry: true,
+              retry: _failure?.retryable ?? true,
+              bookings: _failure?.kind == CallRefusal.ended,
             ),
+          _Phase.closed => _closedView(),
           _Phase.ended => _endedView(),
           _Phase.live || _Phase.reconnecting => _callView(),
         },
@@ -859,7 +962,8 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
     );
   }
 
-  Widget _status(String msg, {bool spinner = false, bool retry = false}) =>
+  Widget _status(String msg,
+          {bool spinner = false, bool retry = false, bool bookings = false}) =>
       SafeArea(
         child: Center(
           child: Padding(
@@ -878,26 +982,108 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: Colors.white70, fontSize: 15, height: 1.55)),
-              if (!spinner) ...[
-                const SizedBox(height: 24),
+              const SizedBox(height: 24),
+              // A slow network used to leave "Joining…" with no way out but
+              // the back gesture.
+              if (spinner)
+                callButton('Cancel', () => Navigator.of(context).maybePop(),
+                    primary: false)
+              else ...[
                 // A dead end with one Close button was the whole vocabulary
                 // here, for six different causes. Where trying again could
-                // plausibly work, offer it.
+                // plausibly work, offer it, and only there.
                 if (retry) ...[
-                  _pillButton('Try again', _connect, filled: true),
+                  callButton('Try again', _connect),
+                  const SizedBox(height: 10),
+                ] else if (bookings) ...[
+                  callButton('Go to Your bookings', _openBookings),
                   const SizedBox(height: 10),
                 ],
-                _pillButton(S.now.uiClose, () => Navigator.of(context).maybePop()),
+                callButton(S.now.uiClose, () => Navigator.of(context).maybePop(),
+                    primary: !retry && !bookings),
               ],
             ]),
           ),
         ),
       );
 
+  /// The doctor never came and the server closed the consultation (+20).
+  Widget _closedView() {
+    final name =
+        _remoteName == 'the other person' ? 'Your doctor' : _remoteName;
+    final at = _closesAt;
+    return CallOutcomeView(
+      icon: Icons.event_busy_rounded,
+      title: "$name couldn't make it",
+      line: at != null
+          ? 'We closed this consultation at ${callClockAt(at)}, 20 minutes '
+              'after it was due to start.'
+          : 'We closed this consultation because the doctor had not joined '
+              '20 minutes in.',
+      checks: const [
+        'Your credit is back, so you can book another time',
+        'Our team has been told',
+        'Refunds for consultations go through support',
+      ],
+      actions: [
+        callButton('Go to Your bookings', _openBookings),
+        callButton('Done', () => Navigator.of(context).maybePop(),
+            primary: false),
+      ],
+    );
+  }
+
+  /// The call is over, said by why (polish pass, 2026-10-29). A lost
+  /// connection while the consultation is still running leads with Rejoin;
+  /// otherwise it is over, and the parent's next step is Your bookings,
+  /// where a prescription or follow-up lands.
+  Widget _endedView() {
+    final done = callButton('Done', () => Navigator.of(context).maybePop(),
+        primary: false);
+    if (_lostConnection && _windowOpen) {
+      return CallOutcomeView(
+        icon: Icons.wifi_off_rounded,
+        title: "You've been disconnected",
+        line: _isConsult
+            ? 'The consultation is still open. Rejoin to carry on.'
+            : 'Rejoin to carry on.',
+        actions: [callButton('Rejoin', _connect), done],
+      );
+    }
+    final spoke = _bothPresentAt != null;
+    final parent = !_myRole.isExpert;
+    final canRejoin = _windowOpen && !spoke;
+    return CallOutcomeView(
+      icon: Icons.check_rounded,
+      title: _isConsult ? 'Consultation ended' : 'Call ended',
+      line: spoke
+          ? 'You spoke with $_remoteName for $_clockLabel.'
+          : _endedBecause,
+      checks: [
+        if (parent && _isConsult && spoke)
+          'Any prescription or follow-up will appear in Your bookings',
+      ],
+      actions: [
+        if (canRejoin) callButton('Rejoin', _connect),
+        if (parent)
+          callButton('Go to Your bookings', _openBookings,
+              primary: !canRejoin),
+        if (parent || canRejoin)
+          done
+        else
+          callButton('Done', () => Navigator.of(context).maybePop()),
+      ],
+    );
+  }
+
+  /// Kept for revert — the single "Call ended" view (polish pass,
+  /// 2026-10-29, replaced by [_endedView] above).
+  ///
   /// The call is over. Previously this state did not exist: the screen either
   /// stayed frozen on a dead room or popped with no explanation, so "the doctor
   /// hung up" and "your Wi-Fi died" looked the same and neither was said.
-  Widget _endedView() => SafeArea(
+  // ignore: unused_element
+  Widget _endedViewOld() => SafeArea(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -952,6 +1138,12 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
           ),
         )),
       );
+
+  /// " until 8:00 PM", or nothing when the server gave no end.
+  String get _endsLabel {
+    final e = _join?.endsUtc;
+    return e == null ? '' : ' until ${callClockAt(e)}';
+  }
 
   String get _clockLabel {
     final m = _elapsed.inMinutes;
@@ -1014,7 +1206,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
         Positioned(
           left: 18,
           right: 140, // clear of the self card's landing corner
-          bottom: MediaQuery.of(context).padding.bottom + 108,
+          bottom: MediaQuery.of(context).padding.bottom + 126,
           child: Align(
             alignment: Alignment.centerLeft,
             child: _nameChip(
@@ -1031,6 +1223,12 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
           _banner(
             icon: Icons.wifi_tethering_rounded,
             text: 'Reconnecting…',
+            color: _waiting,
+          )
+        else if (_remoteLeft && _remote == null)
+          _banner(
+            icon: Icons.signal_cellular_alt_rounded,
+            text: '$_remoteName left the call',
             color: _waiting,
           )
         else if (_remote != null &&
@@ -1141,7 +1339,11 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                 ? 'Your camera is off'
                 : alone && _hostMissed
                     ? "$name couldn't make it"
-                    : alone && _waitingOnDoctor && _minutesLate >= 10
+                    : alone && _remoteLeft
+                        ? '$name left the call'
+                    : alone &&
+                            (_waitingOnDoctor || _waitingOnParent) &&
+                            _minutesLate >= 10
                         ? "$name hasn't joined yet"
                         : alone
                             ? 'Waiting for $name to join'
@@ -1160,9 +1362,21 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                     ? 'We have closed this consultation and your credit is '
                         'back. Book another time from Your bookings, or ask '
                         'us for a refund.'
+                    : alone && _remoteLeft
+                        ? 'They may be reconnecting. The consultation stays '
+                            'open$_endsLabel, so you can wait here.'
                     : alone && _waitingOnDoctor && _minutesLate >= 10
-                        ? "We've told the team. If they can't make it, your "
-                            'credit comes back.'
+                        ? _closesAt != null
+                            ? "We've told the team. If they haven't joined by "
+                                '${callClockAt(_closesAt!)}, we close the '
+                                'consultation and your credit comes back.'
+                            : "We've told the team. If they can't make it, "
+                                'your credit comes back.'
+                    // The doctor's side had no late state at all. No promise
+                    // about pay here: there is no parent no-show rule yet.
+                    : alone && _waitingOnParent && _minutesLate >= 10
+                        ? 'The consultation stays open$_endsLabel. You can '
+                            'wait here, or leave and rejoin from Today.'
                         : alone
                             ? 'They will appear here as soon as they do.'
                             : 'You can still hear each other.',
@@ -1302,7 +1516,12 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                         height: 7,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: _remote == null ? _waiting : _live),
+                            // Amber while reconnecting too: the banner said
+                            // Reconnecting under a green dot.
+                            color: _remote == null ||
+                                    _phase == _Phase.reconnecting
+                                ? _waiting
+                                : _live),
                       ),
                       const SizedBox(width: 7),
                       Flexible(
@@ -1370,7 +1589,39 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                     border: Border.all(
                         color: Colors.white.withValues(alpha: 0.10)),
                   ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    // Labels under every control (polish pass 2026-10-29),
+                    // the same words the pre-join screen uses.
+                    CallControl(
+                        icon: Icons.flip_camera_ios_rounded,
+                        label: 'Flip',
+                        onTap: _flipCamera),
+                    CallControl(
+                        icon: _speakerOn
+                            ? Icons.volume_up_rounded
+                            : Icons.phone_in_talk_rounded,
+                        label: _speakerOn ? 'Speaker' : 'Earpiece',
+                        onTap: _toggleSpeaker,
+                        on: _speakerOn),
+                    CallControl(
+                        icon: _camOn
+                            ? Icons.videocam_rounded
+                            : Icons.videocam_off_rounded,
+                        label: _camOn ? 'Camera on' : 'Camera off',
+                        onTap: _toggleCam,
+                        on: _camOn),
+                    CallControl(
+                        icon: _micOn ? Icons.mic_rounded : Icons.mic_off_rounded,
+                        label: _micOn ? 'Mic on' : 'Mic off',
+                        onTap: _toggleMic,
+                        on: _micOn),
+                    const SizedBox(width: 4),
+                    CallLeaveControl(onTap: _confirmLeave),
+                    // Kept for revert — the unlabelled bar:
+                    /*
                     _round(Icons.flip_camera_ios_rounded, _flipCamera,
                         tip: 'Flip camera'),
                     _round(
@@ -1409,6 +1660,7 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                         ),
                       )),
                     ),
+                    */
                   ]),
                 ),
               ),
@@ -1421,6 +1673,8 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
   /// An "off" control inverts to a white fill — the same signal WhatsApp uses,
   /// and the reason there are no text labels: inverted-means-off is understood
   /// without reading, and a row of five labels would crowd the bar.
+  // Kept for revert — the unlabelled control (now CallControl).
+  // ignore: unused_element
   Widget _round(IconData icon, VoidCallback onTap,
           {bool on = true, required String tip}) =>
       Semantics(

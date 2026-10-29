@@ -86,6 +86,8 @@ void openHostSession(BuildContext context, HostSession h) {
       bookingId: '',
       title: h.offering.title,
       displayName: doctorDisplayName(),
+      // The doctor's side: refusals speak to them, not to the parent.
+      asExpert: true,
       waitingFor: h.offering.title,
       startsUtc: h.scheduled ? next.startsUtc : now,
       hostSlot: h.scheduled
@@ -111,6 +113,8 @@ void openConsult(BuildContext context, Booking b, {required String waitingFor}) 
       bookingId: b.id,
       title: b.title,
       displayName: doctorDisplayName(),
+      // The doctor's side: refusals speak to them, not to the parent.
+      asExpert: true,
       waitingFor: waitingFor,
       startsUtc: b.startsUtc,
     ),

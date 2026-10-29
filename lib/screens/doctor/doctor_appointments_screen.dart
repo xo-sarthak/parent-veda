@@ -307,6 +307,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                         // parent by name — the roster already resolved it, so
                         // neither side has to see "Guest".
                         displayName: _myName(),
+                        // The doctor's side: refusals speak to them, not to the parent.
+                        asExpert: true,
                         waitingFor: patient.name.isEmpty ? null : patient.name,
                         startsUtc: b.startsUtc,
                       ),

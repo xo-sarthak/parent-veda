@@ -49,9 +49,11 @@ import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../screens/learn/pv_my_learning_screen.dart';
 import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import 'booking_store.dart';
+import 'call_chrome.dart';
 import 'call_session.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
 import '../widgets/pv_toast.dart';
@@ -105,7 +107,14 @@ class GroupCallScreen extends StatefulWidget {
   State<GroupCallScreen> createState() => _GroupCallScreenState();
 }
 
-enum _Phase { connecting, live, reconnecting, ended, failed }
+/// `closed` (2026-10-29 polish): the server closed the class because the host
+/// never came. Not `ended` — nothing happened to end — and not `failed` —
+/// nothing went wrong on her side. It gets its own screen and its own next
+/// step, and the phone is no longer in the room.
+enum _Phase { connecting, live, reconnecting, ended, failed, closed }
+
+/// Why the room went away, so the ended screen can say the right sentence.
+enum _EndKind { lost, hostEnded, removed }
 
 class _Question {
   _Question(this.who, this.text, this.at);
@@ -122,6 +131,13 @@ class _GroupCallScreenState extends State<GroupCallScreen>
   _Phase _phase = _Phase.connecting;
   String? _error;
   String? _endedBecause;
+
+  /// The refusal behind [_Phase.failed], kept so the screen can tell a
+  /// refusal worth retrying (offline) from one that is not (ended).
+  CallJoinFailure? _failure;
+
+  _EndKind _endKind = _EndKind.lost;
+
 
   bool _micOn = false;
   bool _camOn = false;
@@ -214,7 +230,39 @@ class _GroupCallScreenState extends State<GroupCallScreen>
       setState(() => _hostMissed = true);
       // Her Past row and credits follow from the server's record.
       BookingStore.instance.refreshFromServer();
+      // The class is over before it began. Staying connected left her in a
+      // room that still said "Live · Recorded" with a raise-hand button
+      // waiting for nobody (polish pass, 2026-10-29).
+      await _closeRoom();
+      if (mounted) setState(() => _phase = _Phase.closed);
     }
+  }
+
+  /// When the server closes a session at +20: the scheduled start plus the
+  /// twenty minutes. Null when the server gave no start.
+  DateTime? get _closesAt =>
+      _join?.startsUtc?.add(const Duration(minutes: 20));
+
+  /// Leaves the room without leaving the screen: attendance is closed, the
+  /// clock stops, and nothing more is sent or received.
+  Future<void> _closeRoom() async {
+    _recordLeave();
+    final r = _room;
+    _room = null;
+    _tick?.cancel();
+    _statePoll?.cancel();
+    await _events?.dispose();
+    _events = null;
+    r?.removeListener(_refresh);
+    await r?.disconnect();
+    await r?.dispose();
+  }
+
+  void _openBookings() {
+    Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'bookings'),
+      builder: (_) => const PvMyLearningScreen(),
+    ));
   }
 
   /// True when [who] has sent more than [_perMinute] hands or questions in
@@ -267,11 +315,17 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         if (!mounted) return;
         if (failure != null) {
           setState(() {
-            _phase = _Phase.failed;
+            _failure = failure;
+            // Closed because the host never came: the same screen she would
+            // have seen from inside the room, not a refusal with Try again.
+            _phase = failure.kind == CallRefusal.hostMissed && !_isHost
+                ? _Phase.closed
+                : _Phase.failed;
             _error = _failureCopy(failure);
           });
           return;
         }
+        _failure = null;
         join = fetched;
       }
       if (join == null) {
@@ -372,6 +426,11 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         _tick?.cancel();
         setState(() {
           _phase = _Phase.ended;
+          _endKind = switch (e.reason) {
+            DisconnectReason.roomDeleted => _EndKind.hostEnded,
+            DisconnectReason.participantRemoved => _EndKind.removed,
+            _ => _EndKind.lost,
+          };
           _endedBecause = switch (e.reason) {
             DisconnectReason.clientInitiated => null,
             // The host ended it for everyone. Not an error — the class is over.
@@ -412,8 +471,10 @@ class _GroupCallScreenState extends State<GroupCallScreen>
           _room?.localParticipant?.setMicrophoneEnabled(false);
           _room?.localParticipant?.setCameraEnabled(false);
         }
+        // Her mic is still OFF at this point: promotion allows it, it does
+        // not switch it on. "Your mic is ready" read as "you are live".
         _toast(may
-            ? 'The host has invited you to speak. Your mic is ready.'
+            ? 'You can speak now. Tap Mic to turn it on.'
             : 'You are back on mute.');
       })
       ..on<DataReceivedEvent>(_onData);
@@ -433,6 +494,12 @@ class _GroupCallScreenState extends State<GroupCallScreen>
           if (id == null) return;
           // A lowered hand always counts; only raising is limited.
           if (msg['up'] == true && _isHost && _overLimit(id)) return;
+          // The host used to learn of a hand only by opening People. The
+          // first hand of a quiet room is said out loud; after that the
+          // count in the top bar carries it.
+          if (msg['up'] == true && _isHost && _handsUp.isEmpty) {
+            _toast('$who raised a hand.');
+          }
           setState(() {
             if (msg['up'] == true) {
               _handsUp.add(id);
@@ -482,8 +549,8 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                 'closed. Your seat or credit is back, and you can ask for a '
                 'refund from Your bookings.',
         CallRefusal.ended =>
-          'This session has ended. If a recording was included, it will appear '
-              'in My Bookings.',
+          'This session has ended. If it was recorded, the recording will '
+              'appear in Your bookings.',
         CallRefusal.notYours =>
           'This session is not available. It may have been cancelled, or it '
               'belongs to a different account.',
@@ -558,27 +625,33 @@ class _GroupCallScreenState extends State<GroupCallScreen>
     // The host leaving is not the same act as an attendee leaving, so it does
     // not get the same question. A teacher walking out of their own class
     // should be asked whether they mean to end it for everyone.
-    if (!_isHost) {
+    if (!_isHost || _phase != _Phase.live && _phase != _Phase.reconnecting) {
       await _leave();
       return;
     }
+    // White, not the theme's purple: purple text on this panel is ~2.5:1.
+    final white = TextButton.styleFrom(foregroundColor: Colors.white);
     final choice = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: _panel,
-        title: const Text('Leave this session?',
+        title: const Text('Leave this class?',
             style: TextStyle(color: Colors.white, fontSize: 17)),
+        // "Step out" is the phrase attendees are shown while the host is
+        // away, so both sides use one word for one thing.
         content: const Text(
-          'You can step out and come back, or end it for everyone.',
+          'Step out and the class waits for you. End it and everyone leaves.',
           style: TextStyle(color: Colors.white70, height: 1.5),
         ),
         actions: [
           TextButton(
+              style: white,
               onPressed: () => Navigator.of(ctx).pop('stay'),
               child: const Text('Stay')),
           TextButton(
+              style: white,
               onPressed: () => Navigator.of(ctx).pop('leave'),
-              child: const Text('Just leave')),
+              child: const Text('Step out')),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop('end'),
             child: const Text('End for everyone',
@@ -795,7 +868,13 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         backgroundColor: _bg,
         body: switch (_phase) {
           _Phase.connecting => _status('Joining ${widget.title}…', spinner: true),
-          _Phase.failed => _status(_error ?? 'Something went wrong.', retry: true),
+          // Try again only where trying again can work (offline, our side).
+          // "This session has ended" with a Try again button was a promise
+          // the next tap could not keep.
+          _Phase.failed => _status(_error ?? 'Something went wrong.',
+              retry: _failure?.retryable ?? true,
+              bookings: _failure?.kind == CallRefusal.ended && !_isHost),
+          _Phase.closed => _closedView(),
           _Phase.ended => _endedView(),
           _Phase.live || _Phase.reconnecting => _room == null
               ? _status('Joining…', spinner: true)
@@ -805,7 +884,8 @@ class _GroupCallScreenState extends State<GroupCallScreen>
     );
   }
 
-  Widget _status(String msg, {bool spinner = false, bool retry = false}) =>
+  Widget _status(String msg,
+          {bool spinner = false, bool retry = false, bool bookings = false}) =>
       SafeArea(
         child: Center(
           child: Padding(
@@ -823,20 +903,117 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: Colors.white70, fontSize: 15, height: 1.55)),
-              if (!spinner) ...[
-                const SizedBox(height: 24),
+              const SizedBox(height: 24),
+              // A slow network used to leave "Joining…" with no way out but
+              // the back gesture.
+              if (spinner)
+                callButton('Cancel', () => Navigator.of(context).maybePop(),
+                    primary: false)
+              else ...[
                 if (retry) ...[
-                  _pill('Try again', _connect, filled: true),
+                  callButton('Try again', _connect),
+                  const SizedBox(height: 10),
+                ] else if (bookings) ...[
+                  callButton('Go to Your bookings', _openBookings),
                   const SizedBox(height: 10),
                 ],
-                _pill('Close', () => Navigator.of(context).maybePop()),
+                callButton('Close', () => Navigator.of(context).maybePop(),
+                    primary: !retry && !bookings),
               ],
             ]),
           ),
         ),
       );
 
-  Widget _endedView() => SafeArea(
+  /// The host never came and the server closed the class (+20). Said once,
+  /// with what has already been done for her and the one place to go next.
+  Widget _closedView() {
+    final host = _hostName();
+    final who = host == 'the host' ? 'The host' : host;
+    final at = _closesAt;
+    return CallOutcomeView(
+      icon: Icons.event_busy_rounded,
+      title: "$who couldn't make it",
+      line: at != null
+          ? 'We closed this class at ${callClockAt(at)}, 20 minutes after it '
+              'was due to start.'
+          : 'We closed this class because the host had not joined 20 minutes '
+              'in.',
+      checks: const [
+        'Your seat or credit is back',
+        'Our team has been told',
+        'You can ask for a refund from Your bookings',
+      ],
+      actions: [
+        callButton('Go to Your bookings', _openBookings),
+        callButton('Done', () => Navigator.of(context).maybePop(),
+            primary: false),
+      ],
+    );
+  }
+
+  /// Minutes, said as a person would.
+  String get _stayed {
+    final m = _elapsed.inMinutes;
+    return m < 1 ? 'less than a minute' : m == 1 ? '1 minute' : '$m minutes';
+  }
+
+  /// Why the room went away, each with its own sentence and next step.
+  ///
+  /// It used to be one "Session ended" view for all of them, so a dropped
+  /// connection told her a running class was over, and someone the host had
+  /// just removed was offered Rejoin.
+  Widget _endedView() {
+    final done = callButton('Done', () => Navigator.of(context).maybePop(),
+        primary: false);
+    switch (_endKind) {
+      case _EndKind.hostEnded:
+        if (_isHost) {
+          return CallOutcomeView(
+            icon: Icons.check_rounded,
+            title: 'Class ended',
+            line: 'You ended the class for everyone.',
+            meta: 'You hosted for $_stayed',
+            actions: [
+              callButton('Done', () => Navigator.of(context).maybePop()),
+            ],
+          );
+        }
+        final host = _hostName();
+        return CallOutcomeView(
+          icon: Icons.check_rounded,
+          title: 'Class ended',
+          line: '${host == 'the host' ? 'The host' : host} ended the class.',
+          meta: 'You were here for $_stayed',
+          checks: const [
+            'If it was recorded, the recording will appear in Your bookings',
+          ],
+          actions: [callButton('Go to Your bookings', _openBookings), done],
+        );
+      case _EndKind.removed:
+        return CallOutcomeView(
+          icon: Icons.block_rounded,
+          title: 'You were removed',
+          line: 'The host removed you from this class. If you think this was '
+              'a mistake, contact us from Your bookings.',
+          actions: [
+            callButton('Done', () => Navigator.of(context).maybePop()),
+          ],
+        );
+      case _EndKind.lost:
+        return CallOutcomeView(
+          icon: Icons.wifi_off_rounded,
+          title: "You've been disconnected",
+          line: 'The class is still going. Rejoin to carry on.',
+          actions: [callButton('Rejoin', _connect), done],
+        );
+    }
+  }
+
+  // Kept for revert — the single "Session ended" view (polish pass,
+  // 2026-10-29, replaced by the per-reason [_endedView] above).
+  // ignore: unused_element
+  Widget _endedViewOld() => SafeArea(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -906,7 +1083,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         Positioned(
           left: 18,
           right: 18,
-          bottom: strip.isEmpty ? 132 : 244,
+          bottom: strip.isEmpty ? 150 : 262,
           child: Align(
             alignment: Alignment.centerLeft,
             child: _chip(_nameOf(stage),
@@ -915,7 +1092,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         ),
 
       if (strip.isNotEmpty)
-        Positioned(left: 0, right: 0, bottom: 128, child: _filmstrip(strip)),
+        Positioned(left: 0, right: 0, bottom: 146, child: _filmstrip(strip)),
 
       Positioned(top: 0, left: 0, right: 0, child: _topBar()),
 
@@ -1000,12 +1177,19 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                           ? 'They may be reconnecting. Stay here and the class '
                               'carries on when they are back.'
                       : !_hostPresent && _minutesLate >= 10
-                          ? "We've told the team. If they can't make it, your "
-                              'seat or credit comes back and you can ask for a '
-                              'refund.'
-                          : 'The session will start here. Your microphone is '
-                              'off until the host invites you to speak. This '
-                              'class is recorded for the people who booked it.',
+                          ? _closesAt != null
+                              ? "We've told the team. If they haven't joined "
+                                  'by ${callClockAt(_closesAt!)}, we close the '
+                                  'class, your seat or credit comes back and '
+                                  'you can ask for a refund.'
+                              : "We've told the team. If they can't make it, "
+                                  'your seat or credit comes back and you can '
+                                  'ask for a refund.'
+                          // Recording starts when the host joins (D1), so
+                          // "this class is recorded" before then was early.
+                          : 'The class starts here. Your mic stays off until '
+                              'the host invites you to speak. Recording starts '
+                              'when the host joins.',
               textAlign: TextAlign.center,
               style: const TextStyle(
                   color: Colors.white54, fontSize: 13.5, height: 1.5),
@@ -1079,10 +1263,65 @@ class _GroupCallScreenState extends State<GroupCallScreen>
           const SizedBox(width: 6),
           Text(label,
               style: const TextStyle(
-                  color: _accent, fontSize: 11.5, fontWeight: FontWeight.w700)),
+                  color: kCallTint,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700)),
         ],
       ]),
     );
+  }
+
+  /// The top bar's second line. "Live" only once the class is: before the
+  /// host arrives, and while they are away, it says what she is waiting for.
+  /// It used to read "Live · 03:12 · Recorded" over an empty stage.
+  Widget _statusLine() {
+    final waiting = !_isHost && !_hostPresent;
+    final String text;
+    if (waiting) {
+      text = _hostLeft
+          ? '${_hostName()} stepped out'
+          : _minutesLate >= 10
+              ? 'Starting late'
+              : 'Waiting for ${_hostName()}';
+    } else {
+      text = '${_isHost ? 'Hosting' : 'Live'} · $_clock';
+    }
+    final rec = !waiting && !_recordingStopped;
+    final ok = _phase == _Phase.live && !waiting;
+    return Row(children: [
+      Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle, color: ok ? _live : _waiting)),
+      const SizedBox(width: 7),
+      Flexible(
+        child: Text(text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500)),
+      ),
+      // A red dot and REC, the convention every recorder uses, instead of the
+      // word "Recorded" trailing the clock.
+      if (rec) ...[
+        const SizedBox(width: 8),
+        Container(
+            width: 6,
+            height: 6,
+            decoration:
+                const BoxDecoration(shape: BoxShape.circle, color: _danger)),
+        const SizedBox(width: 4),
+        const Text('REC',
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.4)),
+      ],
+    ]);
   }
 
   Widget _topBar() => SafeArea(
@@ -1103,25 +1342,31 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.2)),
                     const SizedBox(height: 4),
-                    Row(children: [
-                      Container(
-                          width: 7,
-                          height: 7,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _phase == _Phase.live ? _live : _waiting)),
-                      const SizedBox(width: 7),
-                      Text(
-                        '${_isHost ? 'Hosting' : 'Live'} · $_clock'
-                        '${_recordingStopped ? '' : ' · Recorded'}',
-                        style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ]),
+                    _statusLine(),
+                    // Kept for revert — "Live · clock · Recorded" whatever the
+                    // state (polish pass 2026-10-29, see _statusLine):
+                    // Row(children: [
+                    //   Container(width: 7, height: 7, decoration: BoxDecoration(
+                    //       shape: BoxShape.circle,
+                    //       color: _phase == _Phase.live ? _live : _waiting)),
+                    //   const SizedBox(width: 7),
+                    //   Text('${_isHost ? 'Hosting' : 'Live'} · $_clock'
+                    //       '${_recordingStopped ? '' : ' · Recorded'}', ...),
+                    // ]),
                   ]),
             ),
+            // Raised hands, for the host, where she can see them without
+            // opening anything. Tap goes to People, where the hands are.
+            if (_isHost && _handsUp.isNotEmpty) ...[
+              _roundSmall(
+                Icons.back_hand_rounded,
+                _openParticipants,
+                badge: '${_handsUp.length}',
+                badgeHot: true,
+                tint: _waiting,
+              ),
+              const SizedBox(width: 6),
+            ],
             // The count is the number a class needs and a grid of forty tiles
             // would only obscure. Tap for who.
             _roundSmall(
@@ -1158,10 +1403,58 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                     border:
                         Border.all(color: Colors.white.withValues(alpha: 0.10)),
                   ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                     // ATTENDEE CONTROLS ARE DIFFERENT CONTROLS, not greyed-out
                     // versions of the host's. Showing a mic button that cannot
                     // work would be an invitation to tap it and wonder.
+                    //
+                    // Every control now carries its label (call_chrome.dart).
+                    // MUTE ALL LEFT THE BAR: it was a second crossed-out mic
+                    // beside the host's own, same icon, no label. It lives in
+                    // People as "Mute everyone", where Meet and Zoom keep it.
+                    if (_canPublish) ...[
+                      CallControl(
+                          icon: Icons.flip_camera_ios_rounded,
+                          label: 'Flip',
+                          onTap: _flipCamera),
+                      CallControl(
+                          icon: _camOn
+                              ? Icons.videocam_rounded
+                              : Icons.videocam_off_rounded,
+                          label: _camOn ? 'Camera on' : 'Camera off',
+                          onTap: _toggleCam,
+                          on: _camOn),
+                      CallControl(
+                          icon: _micOn
+                              ? Icons.mic_rounded
+                              : Icons.mic_off_rounded,
+                          label: _micOn ? 'Mic on' : 'Mic off',
+                          onTap: _toggleMic,
+                          on: _micOn),
+                    ] else
+                      CallControl(
+                        icon: _handUp
+                            ? Icons.back_hand_rounded
+                            : Icons.back_hand_outlined,
+                        label: _handUp ? 'Hand raised' : 'Raise hand',
+                        onTap: _toggleHand,
+                        on: !_handUp,
+                      ),
+                    CallControl(
+                        icon: _speakerOn
+                            ? Icons.volume_up_rounded
+                            : Icons.phone_in_talk_rounded,
+                        label: _speakerOn ? 'Speaker' : 'Earpiece',
+                        onTap: _toggleSpeaker,
+                        on: _speakerOn),
+                    const SizedBox(width: 4),
+                    CallLeaveControl(onTap: _confirmLeave),
+                    // Kept for revert — the unlabelled bar, mute-all included
+                    // (polish pass 2026-10-29):
+                    /*
                     if (_canPublish) ...[
                       _round(Icons.flip_camera_ios_rounded, _flipCamera),
                       _round(
@@ -1208,6 +1501,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                         ),
                       )),
                     ),
+                    */
                   ]),
                 ),
               ),
@@ -1216,6 +1510,9 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         ),
       );
 
+  // Kept for revert — the unlabelled round control (polish pass 2026-10-29;
+  // the bar now uses CallControl from call_chrome.dart).
+  // ignore: unused_element
   Widget _round(IconData icon, VoidCallback? onTap, {bool on = true}) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: PvPress(enabled: onTap != null, child: GestureDetector(
@@ -1240,7 +1537,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
       );
 
   Widget _roundSmall(IconData icon, VoidCallback onTap,
-          {String? badge, bool badgeHot = false}) =>
+          {String? badge, bool badgeHot = false, Color? tint}) =>
       PvPress(child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -1251,12 +1548,12 @@ class _GroupCallScreenState extends State<GroupCallScreen>
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, size: 15, color: Colors.white),
+            Icon(icon, size: 15, color: tint ?? Colors.white),
             if (badge != null) ...[
               const SizedBox(width: 5),
               Text(badge,
                   style: TextStyle(
-                      color: badgeHot ? _accent : Colors.white,
+                      color: badgeHot ? (tint ?? kCallTint) : Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w700)),
             ],
@@ -1321,16 +1618,20 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                               : 'Could not stop the recording. Please try again.');
                         },
                         child: const Text('Stop recording',
-                            style: TextStyle(color: _accent)),
+                            style: TextStyle(color: kCallTint)),
                       ),
                     if (_isHost && people.length > 1)
                       TextButton(
-                        onPressed: () async {
+                        onPressed: _busy
+                            ? null
+                            : () async {
                           await _muteAll();
                           setSheet(() {});
                         },
-                        child: const Text('Mute all',
-                            style: TextStyle(color: _accent)),
+                        // Says who it acts on. It used to be "Mute all" here and
+                        // an unlabelled crossed mic on the bar.
+                        child: const Text('Mute everyone',
+                            style: TextStyle(color: kCallTint)),
                       ),
                   ]),
                 ),
@@ -1375,7 +1676,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
           const SizedBox(width: 8),
           Text(role.label,
               style: const TextStyle(
-                  color: _accent, fontSize: 11, fontWeight: FontWeight.w700)),
+                  color: kCallTint, fontSize: 11, fontWeight: FontWeight.w700)),
         ],
         if (hand) ...[
           const SizedBox(width: 8),
@@ -1383,7 +1684,11 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         ],
       ]),
       subtitle: Text(
-        mayPublish ? (_muted(p) ? 'Muted' : 'Speaking') : 'Listening',
+        hand
+            ? 'Hand raised'
+            : mayPublish
+                ? (_muted(p) ? 'Muted' : 'Speaking')
+                : 'Listening',
         style: const TextStyle(color: Colors.white38, fontSize: 11.5),
       ),
       // Host actions live behind an explicit menu rather than on the row, so
@@ -1485,7 +1790,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                               dense: true,
                               title: Text(q.who,
                                   style: const TextStyle(
-                                      color: _accent,
+                                      color: kCallTint,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700)),
                               subtitle: Text(q.text,
@@ -1520,7 +1825,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                      icon: const Icon(Icons.send_rounded, color: _accent),
+                      icon: const Icon(Icons.send_rounded, color: kCallTint),
                       onPressed: () async {
                         final text = controller.text.trim();
                         if (text.isEmpty) return;
