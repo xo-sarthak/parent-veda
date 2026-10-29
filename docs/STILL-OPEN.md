@@ -504,6 +504,10 @@ in the same transaction — a function the payment side can call;
 `write_expert_earning` is the seam. The other terminal owns
 `payment_service.dart` / `razorpay-*`; hand this over rather than editing
 theirs.
+**2026-10-29: the owner note above is stale.** The learning-architecture work
+(`docs/LEARNING-ARCHITECTURE.md`, passes L2b/L2c) now owns `payment_service.dart`
+and `razorpay-*`, and replaces the phone-minted entitlement with a server
+receipt (LA-4 to LA-8). The `accrued → payable` flip on capture belongs there.
 
 **5.4e Payouts are manual.** `record_expert_payout()` after the NEFT, with
 the UTR. Razorpay Route later = a webhook writer, not a migration. The 7th
@@ -703,6 +707,10 @@ consultation audit; five are closed and the sixth is deliberately parked.
   **The copy stays**, deliberately: it describes what we intend to give.
 - **The discussion thread.** Same shape. `ownsDiscussion()` has zero call
   sites and the buy sheet advertises *"private discussion group"*. Not built.
+- **2026-10-29: both are now decided and scheduled.** Recordings go to Mux
+  with signed playback after `has_course_access(…,'recording')` (pass L3),
+  and the discussion is one per offering run (pass L4). See
+  `docs/LEARNING-ARCHITECTURE.md` §4 (L.2, L.7) and the ledger LA-19, LA-20.
 
 `0054_programmes.sql` and `§5.1c` (registering programmes in Directus, making
 the masterclass host a dropdown rather than a typed id) are unchanged and still
@@ -11300,3 +11308,22 @@ Plan `wise-singing-shamir.md` (the user's Claude plans folder); PERSONALIZATION 
 - *N4, her chosen name at the birth sheet: built 2026-10-28* after `pv_you_sheets.dart` was free. The sheet
   offers the name she chose (or up to three from her shortlist) and never fills it in for her; with none kept,
   it offers "Still deciding? Find a name".
+
+## 106.0 The affiliate store (Store Track A): what is live and what is left — 2026-10-28
+
+Plan: `~/.claude/plans/if-you-actually-look-tingly-horizon.md`. Commits `6c80dd86` and `62250cba`; migrations 0119
+and 0120 run, 410 sheet products loaded 2026-10-28. Pattern write-up: BACKEND-PATTERNS §16zzh.
+
+- *Links are Amazon search pages, not exact listings.* They carry the tag and earn, but cannot sync a price or a
+  photo. Exact ASINs in the sheet, then the converter and importer re-run, update the same rows.
+- *Amazon prices, stars and photos wait for the Creators API keys.* Until then Amazon items say "See price on
+  Amazon"; a typed price is cleared on purpose (`pvGuardRetailerPrice`).
+- *9 placeholder picks ignored for now* (the user, 2026-10-28): the seven "ParentVeda Curated ..." and two
+  "Generic ..." toys in the team sheet's Finalized picks. The converter skips them (`IGNORED_PREFIXES`); a real
+  product name brings one in.
+- *Held picks stay out:* portable fetal dopplers and herbal anti-nausea teas, until clinically signed off.
+- *Reviews are approved by hand* in the Supabase dashboard until Directus has a moderation queue.
+- *Still to build:* each shop opened the right way (Amazon and Flipkart in their app, brand networks in the
+  browser) with a log of Buy taps; product cards inside guides and tools from the sheet's placements; a calm
+  header when she browses another stage's shelf; photo and video reviews; the ParentVeda score per product with
+  a method document.
