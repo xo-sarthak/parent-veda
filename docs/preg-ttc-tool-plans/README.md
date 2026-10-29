@@ -13,7 +13,7 @@ The user says go per family. Each plan records every decision with the user's an
 | P4 | Birth prep (+ store seed retired, Coming soon) | COMMITTED 2026-10-28 (P4-birth-prep.md) | 17238591 |
 | P5 | Daily check-ins (+ mood log sync, 0125) | COMMITTED 2026-10-28 (P5-daily-checkins.md); 0125 run 10-29; BACKEND-PATTERNS 16zzg f7131e97 | d2d5376e |
 | T1 | TTC: the doctor check (TT1, TT2, TC3, TC5) | COMMITTED (T1-doctor-check.md); 0117 run 10-28 | 00b3cc5 |
-| T2 | TTC: cycle tools | BUILT 2026-10-29 (T2-cycle-tools.md, As built); Ask Veda `window_source` in both repos (Railway redeploy owed) | — |
+| T2 | TTC: cycle tools | BUILT 2026-10-29 (T2-cycle-tools.md, As built); Ask Veda `window_source` in both repos (Railway redeploy owed) | 635838fe |
 | T3 | TTC: getting ready | waiting | — |
 | T4 | TTC: treatment and records | waiting | — |
 | T5 | TTC: body checks | waiting | — |
