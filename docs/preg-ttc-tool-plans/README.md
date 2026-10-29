@@ -14,7 +14,7 @@ The user says go per family. Each plan records every decision with the user's an
 | P5 | Daily check-ins (+ mood log sync, 0125) | COMMITTED 2026-10-28 (P5-daily-checkins.md); 0125 run 10-29; BACKEND-PATTERNS 16zzg f7131e97 | d2d5376e |
 | T1 | TTC: the doctor check (TT1, TT2, TC3, TC5) | COMMITTED (T1-doctor-check.md); 0117 run 10-28 | 00b3cc5 |
 | T2 | TTC: cycle tools | BUILT 2026-10-29 (T2-cycle-tools.md, As built); Ask Veda `window_source` in both repos (Railway redeploy owed) | 635838fe |
-| T3 | TTC: getting ready | waiting | — |
+| T3 | TTC: getting ready | PLANNED 2026-10-29 (T3-getting-ready.md; Q1, Q2 answered); build next | — |
 | T4 | TTC: treatment and records | waiting | — |
 | T5 | TTC: body checks | waiting | — |
 | C1 | Pregnancy and TTC Tools rows + tests; plus from P3: the father preview (X5) and Weight and Kegel missing from search (X4), one shared "booked" match for the Calendar and the Scans timeline (today matched by title two ways), the second twin from Add a child marked as a multiple birth (check git status on the family-profile files first) | after A's Tools-tab order commit | — |
