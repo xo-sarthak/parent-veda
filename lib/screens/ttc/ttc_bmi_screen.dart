@@ -62,6 +62,9 @@ import '../../ttc/ttc_bmi_store.dart';
 import '../../ttc/ttc_chapter.dart' show kTtcIrregularSpreadDays;
 import '../../ttc/ttc_pcos_check_rules.dart';
 import '../../ttc/ttc_pcos_check_store.dart';
+import '../../services/family_profile.dart';
+import '../../ttc/ttc_care_pathway.dart' show TtcPath;
+import '../../ttc/ttc_store.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_strings.dart';
@@ -81,7 +84,12 @@ import '../../widgets/pv_toast.dart';
 const double kBmiHue = kTtcToolHueBody;
 
 class TtcBmiScreen extends StatefulWidget {
-  const TtcBmiScreen({super.key});
+  const TtcBmiScreen({super.key, this.forHim = false});
+
+  /// T5 Q2/PH3 (2026-10-29): his own reading, from his Partner health page.
+  /// His wording, his own account (every store here is the phone's own), no
+  /// pregnancy guard.
+  final bool forHim;
 
   @override
   State<TtcBmiScreen> createState() => _TtcBmiScreenState();
@@ -134,9 +142,11 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
       final last = _store.latest;
       if (last != null) {
         _height.text = (last.metres * 100).toStringAsFixed(0);
-        final totalIn = last.metres / 0.0254;
-        _feet.text = (totalIn ~/ 12).toString();
-        _inches.text = (totalIn % 12).toStringAsFixed(0);
+        // T5 BW2. Kept for revert:
+        //   final totalIn = last.metres / 0.0254;
+        //   _feet.text = (totalIn ~/ 12).toString();
+        //   _inches.text = (totalIn % 12).toStringAsFixed(0);
+        _setFeetInches(last.metres);
         _weight.text = _store.weightUnit == BmiWeightUnit.kg
             ? last.kilograms.toStringAsFixed(1)
             : (last.kilograms / 0.45359237).toStringAsFixed(1);
@@ -172,9 +182,8 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
     final m = _store.heightMetres;
     if (m != null) {
       _height.text = (m * 100).toStringAsFixed(0);
-      final totalIn = m / 0.0254;
-      _feet.text = (totalIn ~/ 12).toString();
-      _inches.text = (totalIn % 12).toStringAsFixed(0);
+      // T5 BW2. Kept for revert: the same three lines as in initState.
+      _setFeetInches(m);
       _heightFrom = 'Saved from last time. Change it if it is wrong.';
       _heightFilled = _heightKey;
     }
@@ -198,6 +207,53 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
   }
 
   static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  /// ⚠️ T5 BW2 (2026-10-29): TOTAL INCHES ARE ROUNDED FIRST, the way
+  /// [_heightText] does. Rounding the remainder alone turned 182 cm (71.65
+  /// in) into 5 ft "12", which this screen's own check then refused.
+  void _setFeetInches(double metres) {
+    final ft = bmiFeetInches(metres);
+    _feet.text = '${ft.$1}';
+    _inches.text = '${ft.$2}';
+  }
+
+  /// ⚠️ T5 BW1 (2026-10-29): THE kg/lb TOGGLE CONVERTS THE NUMBER IN THE BOX.
+  /// It changed the label only, so a prefilled "62.0" was read as 62 lb
+  /// (28.1 kg), passed the plausibility floor, and showed a BMI of about 10.
+  void _switchWeight(bool toKg) {
+    final now = _store.weightUnit == BmiWeightUnit.kg;
+    if (now != toKg) {
+      final v = double.tryParse(_weight.text);
+      if (v != null) {
+        final same = _weightFrom != null && _weight.text == _weightFilled;
+        _weight.text = bmiConvertWeight(v, toKg: toKg).toStringAsFixed(1);
+        // The number is the same weight, so where it came from still holds.
+        if (same) _weightFilled = _weight.text;
+      }
+    }
+    _store.setUnits(weight: toKg ? BmiWeightUnit.kg : BmiWeightUnit.lb);
+  }
+
+  /// T5 BW10: the height toggle converts too, instead of dropping a typed cm.
+  void _switchHeight(bool toCm) {
+    final now = _store.heightUnit == BmiHeightUnit.cm;
+    if (now != toCm) {
+      final same = _heightFrom != null && _heightKey == _heightFilled;
+      if (toCm) {
+        final ft = int.tryParse(_feet.text);
+        final inch = double.tryParse(_inches.text) ?? 0;
+        if (ft != null) {
+          _height.text =
+              ((ft * 12 + inch) * 2.54).toStringAsFixed(0);
+        }
+      } else {
+        final cm = double.tryParse(_height.text);
+        if (cm != null) _setFeetInches(cm / 100);
+      }
+      if (same) _heightFilled = _heightKey;
+    }
+    _store.setUnits(height: toCm ? BmiHeightUnit.cm : BmiHeightUnit.ftIn);
+  }
 
   String get _heightKey => '${_height.text}|${_feet.text}|${_inches.text}';
 
@@ -233,7 +289,21 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
         ? 0
         : cycles.reduce((a, b) => a > b ? a : b) -
             cycles.reduce((a, b) => a < b ? a : b);
+    // ⚠️ T5 BW3 (2026-10-29): THE TWO GUARDS COULD NEVER FIRE. The rules
+    // refuse a category when she is pregnant or under 18, but nothing passed
+    // either in, so the rules test pinned a path the screen could not reach.
+    // His reading takes neither her pregnancy nor her PCOS check.
+    if (widget.forHim) {
+      return BmiContext(
+        forHim: true,
+        isMinor: (FamilyProfileStore.instance.age ?? 99) < 18,
+        previousKg: _previousKg,
+      );
+    }
     return BmiContext(
+      isPregnant: TtcStore.instance.pregnancyConfirmed,
+      isMinor: (FamilyProfileStore.instance.age ?? 99) < 18,
+      onClinicPath: TtcStore.instance.path != TtcPath.natural,
       hasPcosPattern: r != null &&
           !r.stopped &&
           (r.level == PcosLevel.discuss || r.level == PcosLevel.soon),
@@ -561,8 +631,9 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
             left: 'cm',
             right: 'ft/in',
             leftOn: metric,
-            onTap: (l) => _store.setUnits(
-                height: l ? BmiHeightUnit.cm : BmiHeightUnit.ftIn),
+            // T5 BW10. Kept for revert: onTap: (l) => _store.setUnits(
+            //     height: l ? BmiHeightUnit.cm : BmiHeightUnit.ftIn),
+            onTap: _switchHeight,
           ),
         ]),
         const SizedBox(height: 22),
@@ -589,8 +660,9 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
             left: 'kg',
             right: 'lb',
             leftOn: _store.weightUnit == BmiWeightUnit.kg,
-            onTap: (l) => _store.setUnits(
-                weight: l ? BmiWeightUnit.kg : BmiWeightUnit.lb),
+            // T5 BW1. Kept for revert: onTap: (l) => _store.setUnits(
+            //     weight: l ? BmiWeightUnit.kg : BmiWeightUnit.lb),
+            onTap: _switchWeight,
           ),
         ]),
 
@@ -715,13 +787,17 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
                 letterSpacing: -2,
                 color: p.ink1)),
         const SizedBox(height: 10),
-        Text(primary.label.of(lang),
+        // T5 BW3: a refused scope (pregnant, under 18) shows the refusal's
+        // own headline and no category. Kept for revert: primary.label only.
+        Text(r.interpreted ? primary.label.of(lang) : r.headline.of(lang),
+            key: const ValueKey('ttc_bmi_headline'),
             style: pvFraunces(
                 fontSize: 20,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: p.ink1)),
         const SizedBox(height: 4),
+        if (r.interpreted)
         Text(
             lang == AppLanguage.hinglish
                 ? 'South Asian thresholds ke hisaab se'
@@ -739,8 +815,10 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
             style: pvManrope(fontSize: 13, color: p.ink3)),
 
         const SizedBox(height: 22),
-        _Scale(p: p, bmi: calc.bmi),
-        const SizedBox(height: 20),
+        if (r.interpreted) ...[
+          _Scale(p: p, bmi: calc.bmi),
+          const SizedBox(height: 20),
+        ],
 
         // ⚠️ SAVE SITS UNDER THE NUMBER (tools pass, 2026-09-27). It was the
         // last button on a ten-block page, so she could leave without saving,
@@ -757,12 +835,20 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
               if (identical(_savedCalc, calc)) return;
               setState(() => _savedCalc = calc);
               await _store.save(calc);
+              // ⚠️ T5 BW8 (2026-10-29): ONE WEIGHT TRUTH. A BMI save never
+              // reached the Weight log, so the two showed different weights.
+              // The weight goes into the log for today too.
+              TtcLogStore.instance.log(
+                  kTtcWeightTracker, kTtcWeightField, calc.kilograms);
               // The entry just made is the one on screen now, so the change
               // note keeps comparing with the one before it (2026-09-27).
               if (mounted) setState(() => _shownEntry = _store.latest);
               await _store.setOnChecklist(true);
               if (!mounted) return;
-              pvToast(context, t('Measurement saved.', 'Save ho gaya'),
+              // T5 BW9: says what it changed. Kept for revert:
+              //   pvToast(context, t('Measurement saved.', 'Save ho gaya'),
+              //       kind: PvToastKind.done);
+              pvToast(context, ttcBmiSavedLine(_weightText(calc.kilograms)),
                   kind: PvToastKind.done);
             }),
         const SizedBox(height: 6),
@@ -779,6 +865,23 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
         Text(r.body.of(lang),
             style: pvManrope(fontSize: 15, height: 1.7, color: p.ink2)),
 
+        // T5 PH3: his line, in his voice, under his result.
+        if (r.himNote != null) ...[
+          const SizedBox(height: 14),
+          Text(r.himNote!.of(lang),
+              key: const ValueKey('ttc_bmi_his_line'),
+              style: pvManrope(fontSize: 14, height: 1.65, color: p.ink2)),
+        ],
+        // T5: on a clinic path, under the result, never as a target.
+        if (r.clinicNote != null) ...[
+          const SizedBox(height: 14),
+          Text(r.clinicNote!.of(lang),
+              key: const ValueKey('ttc_bmi_clinic_line'),
+              style: pvManrope(fontSize: 14, height: 1.65, color: p.ink2)),
+        ],
+
+        // T5 PH3: the "before pregnancy" box is hers.
+        if (!widget.forHim) ...[
         const SizedBox(height: 22),
         Container(
           padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
@@ -801,6 +904,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
                 style: pvManrope(fontSize: 14, height: 1.68, color: p.ink2)),
           ]),
         ),
+        ],
 
         if (r.contextNote != null) ...[
           const SizedBox(height: 14),

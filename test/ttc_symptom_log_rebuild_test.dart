@@ -358,8 +358,10 @@ void main() {
 
   // ===========================================================================
   group('done', () {
+    // T5 S6 (2026-10-29): Done says what THIS VISIT changed, so the chip is
+    // tapped during the visit. Kept for revert: the 'calm' log before opening
+    // and the ttcLogDoneLine(1, 'Today') expectation.
     testWidgets('closes and says what was kept', (tester) async {
-      TtcLogStore.instance.log(kTtcSymptomTracker, 'calm', 1, on: today);
       await pump(
           tester,
           Builder(
@@ -375,10 +377,14 @@ void main() {
                   )));
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Bloating'));
+      await tester.tap(find.text('Bloating'));
+      await tester.pump();
+      await tester.ensureVisible(find.byKey(const ValueKey('ttc_log_done')));
       await tester.tap(find.byKey(const ValueKey('ttc_log_done')));
       await tester.pumpAndSettle();
       expect(find.byType(TtcSymptomLogScreen), findsNothing);
-      expect(find.text(ttcLogDoneLine(1, 'Today')), findsOneWidget);
+      expect(find.text('1 added for today'), findsOneWidget);
       expect(ttcLogDoneLine(1, 'Today'), '1 thing saved for today');
       await drain(tester);
     });

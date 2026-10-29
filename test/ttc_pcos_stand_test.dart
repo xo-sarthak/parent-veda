@@ -286,6 +286,13 @@ void main() {
       expect(store.answerFor('q_trying'), 'under6');
       expect(store.answerFor('q_acne'), isNull);
       expect(store.answerFor('q_gap'), isNull);
+      // T5 PC3 (2026-10-29): a blank is still never WRITTEN, and on a retake
+      // it now REMOVES what was there, so an un-ticked answer does not stay
+      // behind in the shared store.
+      await (PcosStandAnswers()..acne = PcosDegree.mild).writeThrough();
+      expect(store.answerFor('q_acne'), 'sometimes');
+      await PcosStandAnswers().writeThrough();
+      expect(store.answerFor('q_acne'), isNull);
     });
   });
 

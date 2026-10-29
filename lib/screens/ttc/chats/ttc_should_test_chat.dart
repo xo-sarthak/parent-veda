@@ -175,7 +175,9 @@ const List<String> kTtcReadFaintLine = ['ttc_read/ttc_read_faint_line'];
 const List<String> kTtcReadLateNegative = ['ttc_read/ttc_read_late_negative'];
 
 /// The symptom logger, where the pregnancy test row lives.
-const List<String> kTtcLogResult = ['ttc_symptom_log'];
+// T5 S5 (2026-10-29): opened on that card. Kept for revert:
+//   const List<String> kTtcLogResult = ['ttc_symptom_log'];
+const List<String> kTtcLogResult = ['ttc_symptom_log/pregnancy_test'];
 
 class TtcShouldTestChat extends TtcChatScript {
   TtcShouldTestChat(

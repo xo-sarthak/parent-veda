@@ -91,6 +91,9 @@ const Map<String, List<String>> written = {
     'id', 'user_id', 'body', 'written_at', 'updated_at', 'removed_at',
     'appointment_id', 'asked_at',
   ],
+  // T5 Q1 (0131, 2026-10-29): may my partner see this log
+  // (TtcLogShareStore.rowFor).
+  'ttc_log_shares': ['user_id', 'tracker', 'shared', 'updated_at'],
 };
 
 /// The column each read orders by. A missing one is a runtime error from
@@ -108,6 +111,7 @@ const Map<String, String> orderedBy = {
   'ttc_records': 'taken_on',
   'ttc_appointments': 'starts_utc',
   TtcTables.doctorQuestions: 'written_at',
+  'ttc_log_shares': 'updated_at', // T5, 0131
 };
 
 /// The upsert conflict target for each table. Every one of these must be a
@@ -126,6 +130,7 @@ const Map<String, String> conflictTarget = {
   'ttc_records': 'id',
   'ttc_appointments': 'id',
   TtcTables.doctorQuestions: 'id',
+  'ttc_log_shares': 'user_id,tracker', // T5, 0131
 };
 
 void main() {
@@ -134,6 +139,8 @@ void main() {
     File('supabase/migrations/0042_ttc_records.sql').readAsStringSync(),
     File('supabase/migrations/0092_ttc_doctor_questions.sql')
         .readAsStringSync(),
+    // T5 (2026-10-29): the share switch.
+    File('supabase/migrations/0131_ttc_log_shares.sql').readAsStringSync(),
   ].join('\n');
 
   /// Columns a later migration adds with `alter table ... add column`
@@ -179,7 +186,8 @@ void main() {
 
   group('every table the client uses exists', () {
     // Kept for revert (2026-09-28): 'all eleven'. Twelve with 0092.
-    test('all twelve', () {
+    // Thirteen with 0131 (T5). Kept for revert: 'all twelve'.
+    test('all thirteen', () {
       for (final table in written.keys) {
         expect(sql.contains('create table if not exists public.$table'), isTrue,
             reason: 'the client writes to $table, which no migration creates');

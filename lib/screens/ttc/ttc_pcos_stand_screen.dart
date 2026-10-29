@@ -57,6 +57,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/cycle_store.dart';
+import '../../ttc/ttc_pcos_check_store.dart' show TtcPcosCheckStore;
 import '../../ttc/ttc_pcos_stand.dart';
 import '../../ttc/ttc_selfcheck_store.dart';
 import '../../ttc/ttc_store.dart';
@@ -113,8 +114,11 @@ const String kPcosStandTitle = 'A look at your own pattern.';
 // the user's simplicity rule). Kept for revert:
 //   "This won't give you a score or a verdict. It puts your pattern into plain "
 //   "words, and shows what's worth taking to a doctor."
+// T5 PC4 (2026-10-29): nine since the contraception question. Kept for
+// revert: 'Eight short questions about your periods, skin and hair. These
+// are the '
 const String kPcosStandIntro =
-    'Eight short questions about your periods, skin and hair. These are the '
+    'Nine short questions about your periods, skin and hair. These are the '
     'signs doctors look at for PCOS, a common hormone condition that can make '
     "periods irregular. You'll get your answers back in plain words, with "
     'notes for a doctor. No score and no verdict.';
@@ -228,8 +232,15 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
   }
 
   /// "Clear my answers": the form goes back to its prefills, with Undo.
+  ///
+  /// ⚠️ T5 PC2 (2026-10-29): IT CLEARS THE SHARED STORE TOO. It cleared the
+  /// saved form only, so the answers written through to `TtcPcosCheckStore`,
+  /// and its finished date, stayed: BMI, the precheck and the doctor check
+  /// kept reading a check she believed she had cleared. Undo puts both back.
   Future<void> _clear() async {
     final was = await _saved.clearPcos();
+    final shared =
+        await TtcPcosCheckStore.instance.takeAnswers(kPcosStandQids);
     if (!mounted) return;
     setState(() {
       _a = PcosStandAnswers();
@@ -240,6 +251,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
         lift: 24,
         onAction: () async {
           await _saved.restorePcos(was);
+          await TtcPcosCheckStore.instance.putBack(shared.$1, shared.$2);
           if (mounted) setState(_restore);
         });
   }
@@ -337,6 +349,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
         _a.skinDarkening,
         _a.trying,
         _a.family,
+        _a.contraception,
       ].where((v) => v != null).length;
 
   @override
@@ -375,10 +388,12 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
                 )),
                 const SizedBox(height: 18),
               ],
+              // T5 PC4: nine. Kept for revert: total: 8, 'EIGHT SHORT
+              // QUESTIONS'.
               ttcToolPad(TtcToolProgress(
                   done: _answered,
-                  total: 8,
-                  startLabel: 'EIGHT SHORT QUESTIONS')),
+                  total: 9,
+                  startLabel: 'NINE SHORT QUESTIONS')),
               const SizedBox(height: 12),
 
               ttcToolPad(TtcToolQuestion(
@@ -420,9 +435,33 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
                     p: p),
               )),
 
+              // ⚠️ T5 PC4 (2026-10-29): THE ONE QUESTION THE ENGINE'S PILL
+              // SAFEGUARD NEEDS. On the pill a bleed comes on a schedule the
+              // pill sets, so regular "periods" read as false reassurance.
+              // The engine caps on `q_contraception`, and this check never
+              // asked it. A ninth question is the price of that safeguard
+              // working; the questions after it moved down one.
               ttcToolPad(TtcToolQuestion(
+                key: const ValueKey('ttc_pcos_stand_contraception'),
                 hue: widget.hue,
                 n: 3,
+                title: 'In the last 3 months, have you used the pill, patch, '
+                    'ring, injection, implant or hormonal coil?',
+                child: _Chips<PcosContraception>(
+                  value: _a.contraception,
+                  options: const {
+                    PcosContraception.yes: 'Yes',
+                    PcosContraception.stopped: 'Stopped in the last 3 months',
+                    PcosContraception.no: 'No',
+                  },
+                  onTap: (v) => _set(() => _a.contraception = v),
+                  p: p,
+                ),
+              )),
+
+              ttcToolPad(TtcToolQuestion(
+                hue: widget.hue,
+                n: 4,
                 title: 'Have you noticed extra hair growth anywhere?',
                 note: 'Tap every area that applies.',
                 child: _AreaPicker(
@@ -455,7 +494,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
 
               ttcToolPad(TtcToolQuestion(
                 hue: widget.hue,
-                n: 4,
+                n: 5,
                 title: 'Any hair thinning or loss?',
                 note: kPcosDegreeHint,
                 child: _Degree(
@@ -466,12 +505,12 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
 
               ttcToolPad(TtcToolQuestion(
                 hue: widget.hue,
-                n: 5,
+                n: 6,
                 title: "Acne for 6 months or more that skincare didn't fix?",
-                // Said once, on question 4 (no repetition, 2026-09-28).
-                // Kept for revert: note: kPcosDegreeHint,
+                // Said once, on question 5 (no repetition, 2026-09-28; one
+                // down since T5 PC4). Kept for revert: note: kPcosDegreeHint,
                 note: 'Mild, moderate and severe mean the same as in '
-                    'question 4.',
+                    'question 5.',
                 child: _Degree(
                     value: _a.acne,
                     onTap: (v) => _set(() => _a.acne = v),
@@ -480,7 +519,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
 
               ttcToolPad(TtcToolQuestion(
                 hue: widget.hue,
-                n: 6,
+                n: 7,
                 title: 'Darker, thicker skin on your neck, armpits or belly?',
                 child: _YesNo(
                     value: _a.skinDarkening,
@@ -490,7 +529,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
 
               ttcToolPad(TtcToolQuestion(
                 hue: widget.hue,
-                n: 7,
+                n: 8,
                 title: 'How long have you been trying?',
                 // Q7 is prefilled and now says so, like Q1 (D9, 2026-09-28).
                 note: _q7Source,
@@ -509,7 +548,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
 
               ttcToolPad(TtcToolQuestion(
                 hue: widget.hue,
-                n: 8,
+                n: 9,
                 title: 'Has your mother or sister been told they have PCOS?',
                 note: 'Optional.',
                 child: _Chips<PcosFamily>(
@@ -568,7 +607,12 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
   }
 }
 
-/// What "mild", "moderate" and "severe" mean on questions 4 and 5, so the
+/// Under the result's title (T5 PC11).
+const String kPcosStandSavedLine =
+    'Your answers are saved for next time. You can change them whenever '
+    'you like.';
+
+/// What "mild", "moderate" and "severe" mean on questions 5 and 6, so the
 /// three chips are not a guess (tools pass, 2026-09-27).
 const String kPcosDegreeHint =
     "Mild: you notice it, others don't. Moderate: others may notice it. "
@@ -660,6 +704,8 @@ class TtcPcosStandResultScreen extends StatelessWidget {
       // One tool, one name (2026-09-27). Kept for revert: 'Your pattern'.
       eyebrow: kPcosStandEyebrow,
       title: "Here's what you told us,\nin plain words.",
+      // T5 PC11: "See my pattern" saved her answers without saying so.
+      intro: kPcosStandSavedLine,
       children: [
               const SizedBox(height: 24),
 
@@ -669,6 +715,14 @@ class TtcPcosStandResultScreen extends StatelessWidget {
                   mark: _standPainter(_StandMark.cycle, 206))),
               const SizedBox(height: 10),
               _pad(TtcToolBlock(text: result.cycleLine, hue: 206)),
+              // T5 PC4: on the pill, the cycle line above describes the pill.
+              if (result.capped != null) ...[
+                const SizedBox(height: 8),
+                _pad(TtcToolBlock(
+                    key: const ValueKey('ttc_pcos_stand_capped'),
+                    text: result.capped!,
+                    hue: 206)),
+              ],
 
               if (result.noticed.isNotEmpty) ...[
                 const SizedBox(height: 26),
@@ -702,6 +756,12 @@ class TtcPcosStandResultScreen extends StatelessWidget {
                 _pad(TtcToolBlock(
                     text: result.nudge!, hue: 42, outlined: true)),
               ],
+              // T5 PC6: one fixed line on every result.
+              const SizedBox(height: 8),
+              _pad(TtcToolBlock(
+                  key: const ValueKey('ttc_pcos_stand_fast_change'),
+                  text: result.fastChange,
+                  hue: 160)),
 
               // ⚠️ THE FREE STEPS LEAD, THE PAID ONE IS LAST (tools pass,
               // 2026-09-27). The result used to offer only the consult as its
@@ -796,8 +856,10 @@ class TtcPcosChecklistScreen extends StatelessWidget {
       title: 'What to take\nwith you.',
       // Copy is offered now (2026-09-27). Kept for revert:
       // intro: "Take a screenshot, or read it out. It's only four lines.",
+      // T5 PC11: five lines since family history joined. Kept for revert:
+      // "out. It's only four lines."
       intro: 'Copy them into a message, take a screenshot, or read them '
-          "out. It's only four lines.",
+          "out. It's only five lines.",
       children: [
               const SizedBox(height: 24),
               // ⚠️ THE SHARED CARD, NOT A LOCAL COPY OF IT — FOLDED IN

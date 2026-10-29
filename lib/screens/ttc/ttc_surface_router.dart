@@ -59,6 +59,9 @@ import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_symptom_log_screen.dart';
+import 'ttc_partner_log_view.dart'
+    show TtcHerPrivateNote, TtcHerPrivateNoteBody, ttcIsHerPrivateSurface;
+import '../../ttc/ttc_symptom_data.dart' show kTtcSymptomGroups;
 import 'ttc_mind_today_screen.dart';
 import 'ttc_garbh_course_screen.dart';
 import 'ttc_practice_screen.dart';
@@ -94,6 +97,32 @@ import 'ttc_read_blocks_view.dart' show ttcReadCustomBlock;
 const String kTtcReadPrefix = 'ttc_read/';
 
 Widget? ttcScreenForSurface(String id) {
+  // ---- her private tools, on his phone (T5 S4 / D5, 2026-10-29) ------------
+  //
+  // ⚠️ THE DOOR TILES MAY STAY; THE ROUTER CATCHES HIS PHONE. Her logger and
+  // her PCOS check opened with no partner check, so he landed in her logger
+  // and wrote to his own rows. Every way in passes here, so one gate covers
+  // the doors, the reads and the home. Not hidden, not a silent tap: a calm
+  // note saying whose it is, and the way to his own log.
+  if (TtcPartnerMode.instance.on && ttcIsHerPrivateSurface(id)) {
+    return const TtcHerPrivateNote();
+  }
+
+  // ---- the logger, opened on one card (T5 S5, 2026-10-29) -----------------
+  //
+  // "Log your weight" and "Log the test for today" opened the logger at the
+  // top, and she had to hunt for what the label named. Same prefix pattern as
+  // `ttc_read/`, resolved against the logger's own cards, so an unknown card
+  // opens nothing.
+  const logPrefix = 'ttc_symptom_log/';
+  if (id.startsWith(logPrefix)) {
+    final group = id.substring(logPrefix.length);
+    final known = group == kTtcLogMeasurementsGroup ||
+        kTtcSymptomGroups.any((g) => g.id == group);
+    if (!known) return null;
+    return TtcSymptomLogScreen(focusGroup: group);
+  }
+
   // ---- long-form reads ------------------------------------------------------
   if (id.startsWith(kTtcReadPrefix)) {
     final read = ttcReadById(id.substring(kTtcReadPrefix.length));
@@ -460,7 +489,11 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
 /// fails the way this repo's worst bugs fail: the tile renders, and nothing
 /// happens.
 Widget? ttcInlineToolFor(String surfaceId) => switch (surfaceId) {
-      'ttc_pcos_check' => const TtcPcosStandBody(),
+      // T5 S4 / D5: inline in the PCOS door on his phone, the same note.
+      // Kept for revert: 'ttc_pcos_check' => const TtcPcosStandBody(),
+      'ttc_pcos_check' => TtcPartnerMode.instance.on
+          ? const TtcHerPrivateNoteBody()
+          : const TtcPcosStandBody(),
       // Mind & body's Today. Rendered INSIDE the tab rather than pushed, which
       // is the whole point of a do-it screen: opening the door is opening the
       // practice, with nothing in between.

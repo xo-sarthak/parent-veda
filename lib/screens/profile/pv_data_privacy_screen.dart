@@ -19,9 +19,42 @@ import '../../services/life_stage_store.dart';
 import '../../services/pp_use_consent.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../theme/pv_fonts.dart';
+import '../../ttc/ttc_log_share_store.dart';
 import 'pv_account_actions.dart';
 import 'pv_you_chrome.dart';
 import 'pv_you_content.dart';
+
+// ---- T5 Q1: shared with your partner ----------------------------------------
+
+const String kTtcSharedWithPartnerTitle = 'Shared with your partner';
+const String kTtcSharedWithPartnerLead =
+    'Only your habits can be shared, and only if you switch it on. Your '
+    'symptoms, mood, weight and PCOS check stay private to you.';
+
+/// Each shareable log: its tracker id, its name, and what it holds.
+const List<(String, String, String)> kTtcShareRows = [
+  ('habits', 'Your habits', 'sleep, movement, stress and lifestyle'),
+  (
+    'partner_health',
+    'Your Partner health log',
+    'sleep, drinks, smoking, heat and movement'
+  ),
+];
+
+/// What the switch means right now, so the row says what changes.
+String ttcShareRowLine(String what, bool on) => on
+    ? 'Your partner can see your $what, read-only. Switch off to stop.'
+    : 'Only you can see your $what. Switch on and your partner can see it, '
+        'read-only.';
+
+void _setShare(BuildContext context, String tracker, bool on) {
+  TtcLogShareStore.instance.set(tracker, on);
+  pvSnack(
+      context,
+      on
+          ? 'Shared with your partner. They can see it now.'
+          : 'No longer shared. Only you can see it now.');
+}
 
 class PvDataPrivacyScreen extends StatelessWidget {
   const PvDataPrivacyScreen({super.key, required this.stage});
@@ -117,6 +150,43 @@ class PvDataPrivacyScreen extends StatelessWidget {
                           onChanged: (v) => PpUseConsent.instance.set(kind, v),
                         ),
                         onTap: () => PpUseConsent.instance.set(kind, !PpUseConsent.instance.allows(kind)),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          // ⚠️ T5 Q1 (2026-10-29): WHAT A PARTNER MAY SEE, BESIDE WHAT THE APP
+          // MAY USE. Two different questions asked by two different people,
+          // so two groups. Only the two habit logs can be shared (0131 holds
+          // the same two); body data stays private and is said to.
+          if (stage == LifeStage.tryingToConceive)
+            SliverToBoxAdapter(
+              child: ListenableBuilder(
+                listenable: TtcLogShareStore.instance,
+                builder: (context, _) => PvYouSection(
+                  key: const ValueKey('pv_ttc_shared_with_partner'),
+                  title: kTtcSharedWithPartnerTitle,
+                  lead: kTtcSharedWithPartnerLead,
+                  children: [
+                    for (final (tracker, title, what) in kTtcShareRows)
+                      PvYouRow(
+                        key: ValueKey('pv_share_$tracker'),
+                        icon: Icons.people_outline_rounded,
+                        title: title,
+                        subtitle: ttcShareRowLine(
+                            what,
+                            TtcLogShareStore.instance.sharedFor(tracker) ??
+                                false),
+                        trailing: Switch(
+                          value: TtcLogShareStore.instance.sharedFor(tracker) ??
+                              false,
+                          onChanged: (v) => _setShare(context, tracker, v),
+                        ),
+                        onTap: () => _setShare(
+                            context,
+                            tracker,
+                            !(TtcLogShareStore.instance.sharedFor(tracker) ??
+                                false)),
                       ),
                   ],
                 ),

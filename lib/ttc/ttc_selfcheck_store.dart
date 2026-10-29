@@ -177,7 +177,9 @@ class TtcSelfCheckStore extends ChangeNotifier with CloudMergedStore {
       ..acne = _enum(PcosDegree.values, m['acne'])
       ..skinDarkening = _enum(PcosYesNo.values, m['skin'])
       ..trying = _enum(PcosTrying.values, m['trying'])
-      ..family = _enum(PcosFamily.values, m['family']);
+      ..family = _enum(PcosFamily.values, m['family'])
+      // T5 PC4.
+      ..contraception = _enum(PcosContraception.values, m['contra']);
   }
 
   Future<void> savePcos(PcosStandAnswers a, {DateTime? at}) async {
@@ -195,6 +197,7 @@ class TtcSelfCheckStore extends ChangeNotifier with CloudMergedStore {
         'skin': a.skinDarkening?.name,
         'trying': a.trying?.name,
         'family': a.family?.name,
+        'contra': a.contraception?.name,
       }.entries)
         if (e.value != null) e.key: e.value!,
     };

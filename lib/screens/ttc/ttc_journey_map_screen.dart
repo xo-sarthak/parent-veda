@@ -82,8 +82,13 @@ const Map<String, ({String? surface, String? action, String? byItself})>
   ),
   'partner_joined':
       (surface: 'ttc_care_circle', action: 'Invite your partner', byItself: null),
-  'tests_done':
-      (surface: 'ttc_symptom_log', action: 'Log your weight', byItself: null),
+  // T5 S5 (2026-10-29): opens on the weight card. Kept for revert:
+  //   (surface: 'ttc_symptom_log', action: 'Log your weight', byItself: null),
+  'tests_done': (
+    surface: 'ttc_symptom_log/measurements',
+    action: 'Log your weight',
+    byItself: null
+  ),
   // Kept for revert (2026-09-28, journal out of TTC): the milestone left the
   // list in ttc_milestones.dart with the journal.
   //   'wrote_something':

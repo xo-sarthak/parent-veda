@@ -22,6 +22,8 @@ import 'package:parentveda/screens/ttc/ttc_ovulation_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_round_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_tracker_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_partner_log_view.dart'
+    show kTtcPartnerInviteHer;
 import 'package:parentveda/screens/ttc/ttc_treatment_screen.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_care_pathway.dart';
@@ -173,7 +175,8 @@ void main() {
         TtcTrackerScreen(tracker: ttcTrackerById('partner_health')!),
       );
       expect(find.text('PARTNER HEALTH'), findsOneWidget);
-      expect(find.text(kTtcTrackerPartnerWho), findsOneWidget);
+      // T5 PH1: the honest line replaced kTtcTrackerPartnerWho.
+      expect(find.text(kTtcPartnerInviteHer), findsOneWidget);
       TtcPartnerMode.instance.on = true;
       await tester.pump();
       expect(find.text('YOUR HEALTH'), findsOneWidget);

@@ -50,6 +50,7 @@
 import '../services/family_profile.dart';
 import 'cycle_store.dart';
 import 'ttc_chapter.dart' show kTtcIrregularSpreadDays;
+import 'ttc_pcos_check_rules.dart' show kPcosCappedBody;
 import 'ttc_pcos_check_store.dart';
 
 // -----------------------------------------------------------------------------
@@ -71,6 +72,24 @@ enum PcosCycleLength { typical, shorter, longer, notSure }
 enum PcosTrying { underSix, sixToTwelve, overAYear, notTrying }
 
 enum PcosFamily { yes, no, dontKnow }
+
+/// T5 PC4: hormonal contraception in the last 3 months. Written through as
+/// `q_contraception` (`yes` / `stopped` / `no`), the ids the shipped engine
+/// caps on. Persisted by name in `TtcSelfCheckStore`.
+enum PcosContraception { yes, stopped, no }
+
+/// The ids the short check writes through. "Clear my answers" takes exactly
+/// these out of the shared store (PC2), and nothing the older check wrote.
+const List<String> kPcosStandQids = [
+  'q_length',
+  'q_gap',
+  'q_hair_growth',
+  'q_thinning',
+  'q_acne',
+  'q_skin_patches',
+  'q_trying',
+  'q_contraception',
+];
 
 /// Where extra hair growth was noticed. Ids are persisted, labels are not.
 enum PcosHairArea { upperLip, chin, chest, belly, thighs }
@@ -101,6 +120,15 @@ class PcosStandAnswers {
   PcosTrying? trying;
   PcosFamily? family;
 
+  /// T5 PC4, the ninth question.
+  PcosContraception? contraception;
+
+  /// Pill, patch or the rest, now or in the last 3 months: the cycle answers
+  /// cannot be read as a sign about ovulation.
+  bool get capped =>
+      contraception == PcosContraception.yes ||
+      contraception == PcosContraception.stopped;
+
   /// Write these answers into the shipped PCOS store.
   ///
   /// ⚠️ THIS IS THE WHOLE REASON THE TOOL IS NOT A SECOND STORE. A 20-question
@@ -126,8 +154,17 @@ class PcosStandAnswers {
   Future<void> writeThrough() async {
     final store = TtcPcosCheckStore.instance;
 
+    // T5 PC3 (2026-10-29): a blank now REMOVES the old answer. A retake that
+    // un-ticked a question used to leave last time's value in the shared
+    // store, where the BMI screen and the doctor check still read it. A blank
+    // is still never WRITTEN as a value. Kept for revert:
+    //   if (option != null) await store.answer(qid, option);
     Future<void> put(String qid, String? option) async {
-      if (option != null) await store.answer(qid, option);
+      if (option != null) {
+        await store.answer(qid, option);
+      } else {
+        await store.remove(qid);
+      }
     }
 
     await put(
@@ -149,16 +186,18 @@ class PcosStandAnswers {
           null => null,
         });
 
-    if (hairChecked) {
-      await put(
-          'q_hair_growth',
-          switch (hairAreas.length) {
-            0 => 'no',
-            1 => 'mild',
-            2 => 'noticeable',
-            _ => 'significant',
-          });
-    }
+    // Kept for revert (T5 PC3): the `if (hairChecked)` guard, which skipped
+    // the write rather than removing an answer she took back.
+    await put(
+        'q_hair_growth',
+        !hairChecked
+            ? null
+            : switch (hairAreas.length) {
+                0 => 'no',
+                1 => 'mild',
+                2 => 'noticeable',
+                _ => 'significant',
+              });
 
     await put(
         'q_thinning',
@@ -199,6 +238,16 @@ class PcosStandAnswers {
           null => null,
         });
 
+    // T5 PC4: the shipped engine's pill safeguard reads this id.
+    await put(
+        'q_contraception',
+        switch (contraception) {
+          PcosContraception.yes => 'yes',
+          PcosContraception.stopped => 'stopped',
+          PcosContraception.no => 'no',
+          null => null,
+        });
+
     await store.complete();
   }
 }
@@ -215,6 +264,7 @@ class PcosCycleFacts {
     required this.regularity,
     required this.completedCycles,
     required this.longestGapDays,
+    this.recentGapDays,
   });
 
   final PcosRegularity regularity;
@@ -227,8 +277,20 @@ class PcosCycleFacts {
   /// header. This number is allowed to be 140 days; the average is not.
   final int? longestGapDays;
 
-  /// Three months or more without a period.
-  bool get hasLongGap => (longestGapDays ?? 0) >= 90;
+  /// T5 PC7: the longest gap that ENDED in the last 365 days, the window Q2
+  /// asks about. 0 when there are gaps but none recent; null when it was not
+  /// worked out (a facts object built by hand), and [longestGapDays] stands.
+  final int? recentGapDays;
+
+  /// Three months or more without a period, in the last year.
+  ///
+  /// ⚠️ T5 PC7 (2026-10-29): it read the longest gap EVER logged, so a gap
+  /// from three years ago kept the "book sooner" nudge on for good. Kept for
+  /// revert: (longestGapDays ?? 0) >= 90.
+  bool get hasLongGap => (recentGapDays ?? longestGapDays ?? 0) >= 90;
+
+  /// The gap [hasLongGap] is about, for the sentence that names it.
+  int? get longGapDays => recentGapDays ?? longestGapDays;
 
   /// What Q1 should be prefilled with, or null to ask cold.
   PcosCycleLength? get suggestedLength {
@@ -248,10 +310,18 @@ PcosCycleFacts pcosCycleFacts() {
   final lens = CycleStore.instance.cycleLengths;
 
   int? longest;
+  // T5 PC7: gaps that ended in the last 365 days.
+  final now = DateTime.now();
+  final yearAgo = DateTime(now.year - 1, now.month, now.day);
+  int? recent;
   for (var i = 1; i < starts.length; i++) {
     final gap = starts[i].difference(starts[i - 1]).inDays;
     if (longest == null || gap > longest) longest = gap;
+    if (!starts[i].isBefore(yearAgo)) {
+      if (recent == null || gap > recent) recent = gap;
+    }
   }
+  if (longest != null) recent ??= 0;
 
   // ⚠️ THREE CYCLES BEFORE WE WILL CALL ANYTHING IRREGULAR. Two cycles give one
   // comparison, and one comparison is an anecdote — a 26 followed by a 33 is
@@ -282,6 +352,7 @@ PcosCycleFacts pcosCycleFacts() {
     regularity: regularity,
     completedCycles: lens.length,
     longestGapDays: longest,
+    recentGapDays: recent,
   );
 }
 
@@ -298,7 +369,16 @@ class PcosStandResult {
     required this.always,
     required this.nudge,
     required this.checklist,
+    this.capped,
+    this.fastChange = kPcosFastChangeLine,
   });
+
+  /// T5 PC4: the engine's capped sentence, when she is on (or has just
+  /// stopped) hormonal contraception. Null otherwise.
+  final String? capped;
+
+  /// T5 PC6: on every result.
+  final String fastChange;
 
   /// Block 1 — one sentence about her cycle, in her own data's terms.
   final String cycleLine;
@@ -326,8 +406,17 @@ class PcosStandResult {
 /// doctor looking at, which is true of every branch.
 String _cycleLine(PcosCycleFacts facts, PcosStandAnswers a) {
   if (facts.hasLongGap) {
-    return 'Your logs show a gap of about ${facts.longestGapDays! ~/ 30} '
+    // Kept for revert (T5 PC7): facts.longestGapDays! ~/ 30.
+    return 'Your logs show a gap of about ${facts.longGapDays! ~/ 30} '
         'months without a period. That can make ovulation hard to predict. '
+        "It's one of the things a doctor can look into.";
+  }
+  // ⚠️ T5 PC1 (2026-10-29): HER "YES" COUNTS. With no logs, her own answer
+  // to Q2 never reached her result, though it was written to `q_gap` and the
+  // doctor check read it. Her word stands where the logs are silent.
+  if (a.longGaps == PcosYesNo.yes) {
+    return "You said you've gone 3 months or more without a period in the "
+        'last year. That can make ovulation hard to predict. '
         "It's one of the things a doctor can look into.";
   }
   if (facts.regularity == PcosRegularity.irregular) {
@@ -408,7 +497,8 @@ List<String> _noticed(PcosStandAnswers a) {
 /// ⚠️ NULL AGE STILL WORKS. It simply does not fire — the same behaviour this
 /// had before the field existed, which is why nothing else needed changing.
 String? _nudge(PcosCycleFacts facts, PcosStandAnswers a) {
-  if (facts.hasLongGap) {
+  // T5 PC1: her own "yes" too. Kept for revert: if (facts.hasLongGap) {
+  if (facts.hasLongGap || a.longGaps == PcosYesNo.yes) {
     return "Because you've had a long gap without a period, it's worth "
         'booking a check sooner rather than later.';
   }
@@ -439,6 +529,12 @@ const String kPcosAlwaysLine =
     "Only a doctor can say what's behind this. PCOS is diagnosed by a doctor, "
     'with a check-up and sometimes a scan or a blood test, not by an app.';
 
+/// T5 PC6 (2026-10-29), one fixed line on every result. 2023 International
+/// PCOS Guideline: signs that come on fast need other causes ruled out.
+const String kPcosFastChangeLine =
+    'If hair growth, a deeper voice or acne came on quickly, over a few '
+    'months, see a doctor soon rather than waiting for your next visit.';
+
 /// The closing line on the checklist. Also a constant, same reason.
 const String kPcosChecklistDisclaimer =
     'These are my notes for my appointment. They are not a diagnosis.';
@@ -462,6 +558,7 @@ PcosStandResult pcosBuildStand(PcosStandAnswers a, {PcosCycleFacts? facts}) {
     noticed: _noticed(a),
     always: kPcosAlwaysLine,
     nudge: _nudge(f, a),
+    capped: a.capped ? kPcosCappedBody : null,
     checklist: [
       (
         label: 'My cycle pattern, from my logs',
@@ -473,11 +570,17 @@ PcosStandResult pcosBuildStand(PcosStandAnswers a, {PcosCycleFacts? facts}) {
           PcosRegularity.notEnoughData => 'Not enough logged yet',
         },
       ),
+      // T5 PC1: her own answer when the logs have no gap to show. Kept for
+      // revert: the value without the `a.longGaps` branch.
       (
         label: 'Longest gap without a period',
-        value: f.longestGapDays == null
-            ? 'Not known yet'
-            : '${f.longestGapDays} days',
+        value: f.longestGapDays != null && f.hasLongGap
+            ? '${f.longestGapDays} days'
+            : a.longGaps == PcosYesNo.yes
+                ? 'You said: 3 months or more without a period'
+                : f.longestGapDays == null
+                    ? 'Not known yet'
+                    : '${f.longestGapDays} days',
       ),
       (
         label: "What I've noticed",
@@ -493,6 +596,16 @@ PcosStandResult pcosBuildStand(PcosStandAnswers a, {PcosCycleFacts? facts}) {
           PcosTrying.sixToTwelve => '6 to 12 months',
           PcosTrying.overAYear => 'More than a year',
           PcosTrying.notTrying => 'Not trying right now',
+          null => 'Not answered',
+        },
+      ),
+      // T5 PC11: family history was in the result and not in her notes.
+      (
+        label: 'PCOS in my family',
+        value: switch (a.family) {
+          PcosFamily.yes => 'My mother or sister has been told they have it',
+          PcosFamily.no => 'No',
+          PcosFamily.dontKnow => "I don't know",
           null => 'Not answered',
         },
       ),

@@ -78,6 +78,14 @@ import 'ttc_tool_hues.dart';
 import 'ttc_surface_router.dart' show openTtcSurface;
 import '../../ttc/ttc_bmi_rules.dart';
 import '../../ttc/ttc_bmi_store.dart';
+import 'ttc_bmi_screen.dart' show TtcBmiScreen;
+import 'ttc_partner_log_view.dart'
+    show
+        TtcPartnerLogCard,
+        TtcShareAskCard,
+        kTtcPartnerInviteHer,
+        kTtcYourNotes,
+        kTtcYourNotesLine;
 import '../../widgets/pv_feedback.dart' show PvPress;
 
 /// The hue a field's linked read opens in. 42 is the stage's warm read tone —
@@ -383,7 +391,8 @@ class _TodayBody extends StatelessWidget {
                 // Who fills in his tracker, said on it (2026-09-27).
                 if (tracker.forPartner) ...[
                   const SizedBox(height: 10),
-                  Text(kTtcTrackerPartnerWho,
+                  // T5 PH1: the line it said is commented out below.
+                  Text(kTtcPartnerInviteHer,
                       key: const ValueKey('ttc_tracker_partner_who'),
                       style: ttcBody(13, color: ttcSoft, h: 1.55)),
                 ],
@@ -1365,10 +1374,15 @@ const String kTtcTrackerLookBack = 'Past 4 weeks';
 /// Beside a field that holds a value.
 const String kTtcTrackerSaved = 'Saved';
 
-/// On his tracker: who fills it in.
-const String kTtcTrackerPartnerWho =
-    'You can fill this in together, or your partner can fill it in from his '
-    'side of the app.';
+// ⚠️ T5 PH1 (2026-10-29): A PROMISE THE DATABASE NEVER KEPT. `ttc_logs` is
+// own-row, so her entries sat under her account and his under his: two
+// half-filled logs that never met. Since 0131 he can SHARE his, and her page
+// says so honestly (`TtcPartnerLogCard`, `kTtcPartnerInviteHer`). Kept for
+// revert:
+// /// On his tracker: who fills it in.
+// const String kTtcTrackerPartnerWho =
+//     'You can fill this in together, or your partner can fill it in from his '
+//     'side of the app.';
 
 /// 6 · 7 · 8 hrs. A tap writes the value; tapping the chosen one clears it,
 /// like every other choice on this screen.
@@ -1484,9 +1498,12 @@ String ttcTrackerTitle(TtcTracker t) {
     // T3 K15 (2026-10-29): the row's own four words. Kept for revert:
     //   'habits' => 'Sleep, movement and what you cut down.',
     'habits' => 'Sleep, movement, stress and lifestyle.',
+    // T5 PH7 (2026-10-29): movement was missing. Kept for revert:
+    //   him ? 'Your sleep, drinks, smoke and heat.'
+    //       : 'His sleep, drinks, smoke and heat.',
     'partner_health' => him
-        ? 'Your sleep, drinks, smoke and heat.'
-        : 'His sleep, drinks, smoke and heat.',
+        ? 'Your sleep, drinks, smoking, heat and movement.'
+        : 'His sleep, drinks, smoking, heat and movement.',
     'mood' => 'How today felt.',
     'symptoms' => 'What your body did today.',
     _ => t.subtitle(false),
@@ -1540,6 +1557,9 @@ class TtcTrackerScreen extends StatefulWidget {
 class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
   late DateTime _day = _dayOnly(widget.day ?? DateTime.now());
   bool _past = false;
+
+  /// T5 PH1: her own notes on his tracker, folded under "Your notes".
+  bool _notesOpen = false;
   late String _pastField = widget.tracker.fields.first.id;
 
   void _openDay(DateTime d) => setState(() {
@@ -1617,7 +1637,7 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
       }
     }
 
-    return [
+    final form = <Widget>[
       ttcToolPad(_DayStrip(
         tracker: tracker,
         selected: _day,
@@ -1671,18 +1691,24 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
       if (ttcTrackerWhyLead(tracker, hi) != tracker.why(hi).trim())
         ttcToolPad(_WhyRow(
             onTap: () => showTtcTrackerWhy(context, tracker, hi))),
-      if (tracker.forPartner) ...[
+      // T5 PH1 (2026-10-29): his phone keeps "This tracker is yours to fill
+      // in"; her phone's line moved above the fold (`TtcPartnerLogCard`).
+      // Kept for revert: the same Text choosing kTtcTrackerPartnerWho on her
+      // phone.
+      if (tracker.forPartner && TtcPartnerMode.instance.on) ...[
         const SizedBox(height: 10),
-        ttcToolPad(Text(
-            TtcPartnerMode.instance.on
-                ? kTtcTrackerPartnerWhoHim
-                : kTtcTrackerPartnerWho,
+        ttcToolPad(Text(kTtcTrackerPartnerWhoHim,
             key: const ValueKey('ttc_tracker_partner_who'),
             style: pvManrope(
                 fontSize: 12.5,
                 height: 1.5,
                 fontWeight: FontWeight.w700,
                 color: p.ink2))),
+      ],
+      // T5 Q1: once, after the first save to the phone's own shareable log.
+      if (tracker.id == 'partner_health' || tracker.id == 'habits') ...[
+        const SizedBox(height: 14),
+        ttcToolPad(TtcShareAskCard(tracker: tracker.id)),
       ],
       const SizedBox(height: 24),
       // ⚠️ A GROUP IS A CARD WITH ITS OWN DRAWN MARK (2026-10-02, the user:
@@ -1748,12 +1774,74 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
         const SizedBox(height: 24),
         ttcToolPad(const TtcWeightBmiRow()),
       ],
+      // T5 Q2/PH3: his own weight and BMI, on his own account.
+      if (tracker.id == 'partner_health' && TtcPartnerMode.instance.on) ...[
+        const SizedBox(height: 24),
+        ttcToolPad(const TtcWeightBmiRow(forHim: true)),
+      ],
       if (tracker.disclaimer(hi) != null) ...[
         const SizedBox(height: 24),
         ttcToolPad(Text(tracker.disclaimer(hi)!,
             style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3))),
       ],
     ];
+
+    // T5 Q1: on his phone, Habits says "See hers" when she shares.
+    if (tracker.id == 'habits' && TtcPartnerMode.instance.on) {
+      return [
+        ttcToolPad(const TtcPartnerLogCard(tracker: 'habits')),
+        const SizedBox(height: 14),
+        ...form,
+      ];
+    }
+
+    // ⚠️ T5 PH1: ON HER PHONE, PARTNER HEALTH IS HIS LOG FIRST. His shared
+    // view (or the honest line that it is on his phone), then her own old
+    // notes under a fold: kept, never deleted, one tap away.
+    if (tracker.id == 'partner_health' && !TtcPartnerMode.instance.on) {
+      return [
+        ttcToolPad(const TtcPartnerLogCard(tracker: 'partner_health')),
+        const SizedBox(height: 18),
+        ttcToolPad(InkWell(
+          key: const ValueKey('ttc_tracker_your_notes'),
+          onTap: () => setState(() => _notesOpen = !_notesOpen),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 48),
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: p.line))),
+            child: Row(children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(kTtcYourNotes,
+                        style: pvManrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: p.ink1)),
+                    const SizedBox(height: 2),
+                    Text(kTtcYourNotesLine,
+                        style: pvManrope(
+                            fontSize: 12.5, height: 1.45, color: p.ink2)),
+                  ],
+                ),
+              ),
+              Icon(
+                  _notesOpen
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
+                  color: p.ink2),
+            ]),
+          ),
+        )),
+        if (_notesOpen) ...[
+          const SizedBox(height: 16),
+          ...form,
+        ],
+      ];
+    }
+    return form;
   }
 
   List<Widget> _pastView(TtcTracker tracker, TtcS t) {
@@ -2052,6 +2140,13 @@ class _FieldBlock extends StatelessWidget {
         TtcFieldKind.choice => _ChoiceWrap(
             tracker: tracker, field: field, day: day, hi: hi, current: current),
       },
+      // T5 PH4: a guide under the field, where it has one.
+      if (field.noteEn case final note?) ...[
+        const SizedBox(height: 8),
+        Text(note,
+            key: ValueKey('ttc_tracker_note_${field.id}'),
+            style: pvManrope(fontSize: 12, height: 1.45, color: p.ink2)),
+      ],
       if (read != null) ...[
         const SizedBox(height: 12),
         Semantics(
@@ -2210,11 +2305,31 @@ class _NumberRow extends StatelessWidget {
   final DateTime day;
   final TtcLogValue? current;
 
-  void _bump(double delta) {
+  // Kept for revert (T5 BW6, 2026-10-29): the first tap on Weight's − or +
+  // logged 30 kg (no `start`), which then prefilled BMI and ticked a
+  // milestone.
+  //   void _bump(double delta) {
+  //     final next = current != null
+  //         ? (current!.value + delta).clamp(field.min, field.max)
+  //         : (field.start ?? field.min);
+  //     TtcLogStore.instance
+  //         .log(tracker.id, field.id, (next * 10).roundToDouble() / 10, on: day);
+  //   }
+  void _bump(BuildContext context, double delta) {
     // The first tap lands on `start`, whichever button it was (see _Stepper).
-    final next = current != null
-        ? (current!.value + delta).clamp(field.min, field.max)
-        : (field.start ?? field.min);
+    double? next = current != null
+        ? (current!.value + delta).clamp(field.min, field.max).toDouble()
+        : field.start;
+    // ⚠️ A WEIGHT NEVER STARTS AT THE FLOOR: her latest logged weight, else
+    // her last BMI weight, else the sheet to type it.
+    if (next == null && ttcIsWeightField(tracker, field)) {
+      next = ttcWeightStart(tracker, field);
+      if (next == null) {
+        _showTypeSheet(context, tracker, field, day, current);
+        return;
+      }
+    }
+    next ??= field.min;
     TtcLogStore.instance
         .log(tracker.id, field.id, (next * 10).roundToDouble() / 10, on: day);
   }
@@ -2250,7 +2365,7 @@ class _NumberRow extends StatelessWidget {
       Row(children: [
         // Kept for revert (2026-09-28): the spoken labels were 'Less' and
         // 'More'.
-        stepButton('−', 'Lower the number', () => _bump(-field.step)),
+        stepButton('−', 'Lower the number', () => _bump(context, -field.step)),
         const SizedBox(width: 10),
         Expanded(
           child: Semantics(
@@ -2307,7 +2422,7 @@ class _NumberRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        stepButton('+', 'Raise the number', () => _bump(field.step)),
+        stepButton('+', 'Raise the number', () => _bump(context, field.step)),
       ]),
       if (field.presets.isNotEmpty) ...[
         const SizedBox(height: 10),
@@ -2496,7 +2611,12 @@ Future<void> _showTypeSheet(BuildContext context, TtcTracker tracker,
       backgroundColor: Colors.transparent,
       routeSettings: const RouteSettings(name: 'ttc/tracker/type'),
       builder: (_) => _TypeSheet(
-          tracker: tracker, field: field, day: day, current: current?.value),
+          tracker: tracker,
+          field: field,
+          day: day,
+          current: current?.value,
+          // T5 BW9: the page the toast lands on once the sheet has closed.
+          page: context),
     );
 
 class _TypeSheet extends StatefulWidget {
@@ -2505,7 +2625,10 @@ class _TypeSheet extends StatefulWidget {
     required this.field,
     required this.day,
     required this.current,
+    required this.page,
   });
+
+  final BuildContext page;
 
   final TtcTracker tracker;
   final TtcField field;
@@ -2526,18 +2649,58 @@ class _TypeSheetState extends State<_TypeSheet> {
     super.dispose();
   }
 
+  /// T5 BW4/BW5: why Save did nothing, said under the box. Null when fine.
+  String? _error;
+
+  // Kept for revert (T5 BW4/BW5, 2026-10-29): text that did not parse
+  // ("62..5") cleared the day's value with no word, and a number out of range
+  // was saved as the nearest end (250 became 200, 25 became 30).
+  //   void _save() {
+  //     final v = double.tryParse(_c.text.trim());
+  //     final log = TtcLogStore.instance;
+  //     if (v == null) {
+  //       log.clear(widget.tracker.id, widget.field.id, on: widget.day);
+  //     } else {
+  //       log.log(widget.tracker.id, widget.field.id,
+  //           v.clamp(widget.field.min, widget.field.max).toDouble(),
+  //           on: widget.day);
+  //     }
+  //     Navigator.of(context).maybePop();
+  //   }
   void _save() {
-    final v = double.tryParse(_c.text.trim());
+    final text = _c.text.trim();
     final log = TtcLogStore.instance;
-    if (v == null) {
+    final f = widget.field;
+    final tracker = widget.tracker;
+    final day = widget.day;
+    final page = widget.page;
+    final weight = ttcIsWeightField(tracker, f);
+    if (text.isEmpty) {
       // A blank clears rather than writing a zero she did not enter.
-      log.clear(widget.tracker.id, widget.field.id, on: widget.day);
-    } else {
-      log.log(widget.tracker.id, widget.field.id,
-          v.clamp(widget.field.min, widget.field.max).toDouble(),
-          on: widget.day);
+      log.clear(tracker.id, f.id, on: day);
+      Navigator.of(context).maybePop();
+      final was = widget.current;
+      if (weight && was != null && page.mounted) {
+        pvSnack(page, ttcWeightRemovedLine(day),
+            icon: Icons.check_rounded,
+            lift: 24,
+            action: 'Undo',
+            onAction: () => log.log(tracker.id, f.id, was, on: day));
+      }
+      return;
     }
+    final error = ttcNumberError(f, text, weight: weight);
+    if (error != null) {
+      setState(() => _error = error);
+      return;
+    }
+    final v = double.parse(text);
+    log.log(tracker.id, f.id, v, on: day);
     Navigator.of(context).maybePop();
+    if (weight && page.mounted) {
+      pvSnack(page, ttcWeightSavedLine(v, widget.current, day),
+          icon: Icons.check_rounded, lift: 24);
+    }
   }
 
   @override
@@ -2583,6 +2746,9 @@ class _TypeSheetState extends State<_TypeSheet> {
                       child: TextField(
                         key: const ValueKey('ttc_tracker_type_field'),
                         controller: _c,
+                        onChanged: (_) {
+                          if (_error != null) setState(() => _error = null);
+                        },
                         autofocus: true,
                         keyboardType: const TextInputType.numberWithOptions(
                             decimal: true),
@@ -2599,6 +2765,9 @@ class _TypeSheetState extends State<_TypeSheet> {
                           filled: true,
                           fillColor: Colors.white,
                           hintText: '—',
+                          // T5 BW4/BW5.
+                          errorText: _error,
+                          errorMaxLines: 3,
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 14),
                           enabledBorder: OutlineInputBorder(
@@ -2764,7 +2933,10 @@ Future<void> showTtcTrackerWhy(
 /// Her BMI when she has worked one out, else an invitation to. Opens the BMI
 /// screen, which fills her height and her latest weight in for her.
 class TtcWeightBmiRow extends StatefulWidget {
-  const TtcWeightBmiRow({super.key});
+  const TtcWeightBmiRow({super.key, this.forHim = false});
+
+  /// T5 Q2/PH3: on his Partner health page, opening his own reading.
+  final bool forHim;
 
   @override
   State<TtcWeightBmiRow> createState() => _TtcWeightBmiRowState();
@@ -2783,10 +2955,19 @@ class _TtcWeightBmiRowState extends State<TtcWeightBmiRow> {
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
           final last = TtcBmiStore.instance.latest;
-          final title = last == null
-              ? 'Work out your BMI'
-              : 'Your BMI: ${last.bmi.toStringAsFixed(1)}';
-          final line = last == null
+          // ⚠️ T5 BW8 (2026-10-29): ONE WEIGHT TRUTH. The row showed the last
+          // SAVED BMI after a newer weight was logged. When the Weight log is
+          // newer, the number is worked out from it and her saved height.
+          final fresh = ttcBmiFromLatestWeight();
+          final title = fresh != null
+              ? 'Your BMI: ${fresh.toStringAsFixed(1)}'
+              : last == null
+                  ? (widget.forHim ? kTtcHisBmiRowTitle : 'Work out your BMI')
+                  : 'Your BMI: ${last.bmi.toStringAsFixed(1)}';
+          final line = fresh != null
+              ? '${categoriseBmi(fresh, kBmiPrimaryStandard).label.en}, '
+                  '$kTtcBmiFromLatestWeight Tap to see what it means.'
+              : last == null
               ? "What BMI does and doesn't tell you, from your height and "
                   'weight. We fill in what you have logged.'
               : '${categoriseBmi(last.bmi, kBmiPrimaryStandard).label.en}, '
@@ -2802,8 +2983,17 @@ class _TtcWeightBmiRowState extends State<TtcWeightBmiRow> {
                   side: BorderSide(color: p.line)),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
-                key: const ValueKey('ttc_weight_bmi_row'),
-                onTap: () => openTtcSurface(context, 'ttc_bmi'),
+                key: ValueKey(widget.forHim
+                    ? 'ttc_his_bmi_row'
+                    : 'ttc_weight_bmi_row'),
+                // T5 PH3: his row opens his own reading. Kept for revert:
+                //   onTap: () => openTtcSurface(context, 'ttc_bmi'),
+                onTap: () => widget.forHim
+                    ? Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: 'ttc/bmi/his'),
+                        builder: (_) => const TtcBmiScreen(forHim: true),
+                      ))
+                    : openTtcSurface(context, 'ttc_bmi'),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
                   child: Row(children: [
@@ -2836,3 +3026,67 @@ class _TtcWeightBmiRowState extends State<TtcWeightBmiRow> {
         },
       );
 }
+
+// =============================================================================
+//  T5 (2026-10-29): the Weight numbers she typed, and saves that say so
+// =============================================================================
+
+/// The Weight tracker's number, wherever it shows.
+bool ttcIsWeightField(TtcTracker t, TtcField f) =>
+    t.id == 'weight' && f.id == 'kg';
+
+/// BW6: where the first − or + starts a weight: her latest logged weight,
+/// else her last BMI weight, else null (the screen opens the sheet).
+double? ttcWeightStart(TtcTracker t, TtcField f) =>
+    TtcLogStore.instance.latest(t.id, f.id)?.value ??
+    TtcBmiStore.instance.latest?.kilograms;
+
+/// BW4/BW5: why a typed number is refused, or null. Nothing is saved until
+/// it is fixed, and nothing is clamped to a value she did not type.
+String? ttcNumberError(TtcField f, String text, {required bool weight}) {
+  final v = double.tryParse(text);
+  if (v == null) return "That doesn't look like a number. Try again.";
+  if (v < f.min || v > f.max) {
+    return weight
+        ? 'That looks like a mis-tap: weights here are '
+            '${_fmtNum(f.min)} to ${_fmtNum(f.max)} kg'
+        : 'That looks like a mis-tap: this takes ${_fmtNum(f.min)} to '
+            '${_fmtNum(f.max)}${f.unit == null ? '' : ' ${f.unit}'}';
+  }
+  return null;
+}
+
+String _dayWord(DateTime day) {
+  final gap = _dayOnly(DateTime.now()).difference(_dayOnly(day)).inDays;
+  if (gap == 0) return 'today';
+  if (gap == 1) return 'yesterday';
+  return ttcRoundDate(day);
+}
+
+/// BW9: "62.5 kg saved for today", or "62.5 kg saved for today (changed
+/// from 62.0)".
+String ttcWeightSavedLine(double kg, double? was, DateTime day) {
+  final base = '${kg.toStringAsFixed(1)} kg saved for ${_dayWord(day)}';
+  if (was == null || (was - kg).abs() < 1e-6) return base;
+  return '$base (changed from ${was.toStringAsFixed(1)})';
+}
+
+/// BW4: a blank clears, and says so.
+String ttcWeightRemovedLine(DateTime day) => 'Weight removed for ${_dayWord(day)}';
+
+/// BW8: the BMI from her latest Weight log and saved height, when that weight
+/// is newer than her last saved BMI. Null otherwise (the saved BMI stands).
+double? ttcBmiFromLatestWeight() {
+  final w = TtcLogStore.instance.latest('weight', 'kg');
+  final m = TtcBmiStore.instance.heightMetres;
+  if (w == null || m == null || m <= 0) return null;
+  final last = TtcBmiStore.instance.latest;
+  if (last != null && !w.day.isAfter(_dayOnly(last.at))) return null;
+  return w.value / (m * m);
+}
+
+/// BW8, on the row when the number is worked out from the latest weight.
+const String kTtcBmiFromLatestWeight = 'from your latest weight.';
+
+/// PH3: his row before he has a reading.
+const String kTtcHisBmiRowTitle = 'Weight and BMI';

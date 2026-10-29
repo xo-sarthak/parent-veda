@@ -17,10 +17,13 @@
 //  The brief specifies the WHO international cut-offs — 18.5 / 25 / 30. Those
 //  are correct and they are also not the ones used in India.
 //
-//  ICMR, the WHO Asia-Pacific classification and NICE's 2023 South Asian
-//  guidance all place overweight at 23 and obesity at 25, because South Asians
-//  accumulate visceral fat at lower body weights and metabolic risk appears
-//  earlier. `ttc_read_three_months_before` — already shipped — says exactly
+//  ICMR and the Indian consensus (2009), with the WHO Asia-Pacific
+//  classification (2000), place overweight at 23 and obesity at 25, because
+//  South Asians accumulate visceral fat at lower body weights and metabolic
+//  risk appears earlier. NICE (PH46) and the NHS use 23 and 27.5 for South
+//  Asian adults. (T5 BW7, 2026-10-29: this said NICE used 25 too. Kept for
+//  revert: "ICMR, the WHO Asia-Pacific classification and NICE's 2023 South
+//  Asian guidance all place overweight at 23 and obesity at 25".) `ttc_read_three_months_before` — already shipped — says exactly
 //  this: "BMI reads Indian bodies badly. The thresholds were derived from
 //  European populations."
 //
@@ -274,7 +277,17 @@ class BmiContext {
     this.hasPcosPattern = false,
     this.irregularCycles = false,
     this.previousKg,
+    this.onClinicPath = false,
+    this.forHim = false,
   });
+
+  /// T5: she is on a clinic path (`TtcStore.path` is not natural). Adds the
+  /// one line about the BMI clinics ask for before treatment.
+  final bool onClinicPath;
+
+  /// T5 Q2/PH3: his own reading, on his phone. His wording: no pregnancy
+  /// guard, no line about periods or PCOS, and the sperm-quality line.
+  final bool forHim;
 
   final bool isPregnant;
   final bool isMinor;
@@ -297,7 +310,15 @@ class BmiInterpretation {
     required this.preconception,
     this.contextNote,
     this.changeNote,
+    this.clinicNote,
+    this.himNote,
   });
+
+  /// T5: the clinic-path line, or null.
+  final LocalizedText? clinicNote;
+
+  /// T5 PH3: his line, or null.
+  final LocalizedText? himNote;
 
   final BmiScope scope;
   final LocalizedText headline;
@@ -315,6 +336,27 @@ class BmiInterpretation {
   bool get interpreted => scope == BmiScope.adultPreconception;
 }
 
+// ---- T5 BW1, BW2, BW8 (2026-10-29): units and the save line ------------------
+
+/// Pounds per kilogram's inverse: one pound in kilograms.
+const double kBmiKgPerLb = 0.45359237;
+
+/// [v] in the other unit: kg to lb when [toKg] is false, lb to kg when true.
+double bmiConvertWeight(double v, {required bool toKg}) =>
+    toKg ? v * kBmiKgPerLb : v / kBmiKgPerLb;
+
+/// [metres] as whole feet and inches, total inches rounded FIRST, so the
+/// inches are always 0 to 11 (BW2).
+(int, int) bmiFeetInches(double metres) {
+  final totalIn = (metres / 0.0254).round();
+  return (totalIn ~/ 12, totalIn % 12);
+}
+
+/// The BMI save's toast (BW8, BW9): "Saved. 62.0 kg added to your Weight
+/// log for today."
+String ttcBmiSavedLine(String weight) =>
+    'Saved. $weight added to your Weight log for today.';
+
 /// ⚠️ WEIGHT CHANGE THAT EARNS A MENTION. Deliberately large — a couple of
 /// kilos between entries is noise, and flagging it would turn a calculator
 /// into a scale that comments.
@@ -323,7 +365,8 @@ const double kBmiNotableChangeKg = 5.0;
 BmiInterpretation interpretBmi(BmiCalculation? calc, BmiContext context,
     {BmiStandard standard = kBmiPrimaryStandard}) {
   // ---- SCOPE FIRST. Both of these refuse to interpret. ----------------------
-  if (context.isPregnant) {
+  // T5 PH3: his reading never takes the pregnancy guard.
+  if (context.isPregnant && !context.forHim) {
     return BmiInterpretation(
       scope: BmiScope.pregnant,
       headline: _en("This isn't the right tool right now"),
@@ -375,8 +418,16 @@ BmiInterpretation interpretBmi(BmiCalculation? calc, BmiContext context,
   // she has ALREADY told us something, and it only ever says a conversation
   // may be useful.
   LocalizedText? contextNote;
-  if (context.hasPcosPattern) {
-    contextNote = _en("You've already told us about a PCOS pattern. That "
+  // ⚠️ T5 PC5 (2026-10-29): THE PCOS CHECK PROMISES "NO SCORE AND NO
+  // VERDICT", so this line may not say she "told us about a PCOS pattern".
+  // Kept for revert:
+  //   "You've already told us about a PCOS pattern. That makes a check-up "
+  //   'before pregnancy more useful than usual. Not because of this number, '
+  //   'but because it helps to look at these things together.'
+  if (context.forHim) {
+    // Her cycles and her PCOS check are not his.
+  } else if (context.hasPcosPattern) {
+    contextNote = _en('Your PCOS check noted some signs worth raising. That '
         'makes a check-up before pregnancy more useful than usual. Not '
         'because of this number, but because it helps to look at these '
         'things together.');
@@ -388,12 +439,41 @@ BmiInterpretation interpretBmi(BmiCalculation? calc, BmiContext context,
   return BmiInterpretation(
     scope: BmiScope.adultPreconception,
     headline: cat.label,
-    body: _bandBody(cat),
+    body: context.forHim ? _bandBodyHim(cat) : _bandBody(cat),
     preconception: _bandPreconception(cat.band),
     contextNote: contextNote,
     changeNote: change,
+    // T5: never a target, and only on a clinic path. NICE CG156 1.2.2; HFEA.
+    clinicNote: context.onClinicPath && !context.forHim
+        ? _en(kBmiClinicPathLine)
+        : null,
+    // T5 PH3: NHS male infertility page; NICE CG156 1.2.3.
+    himNote: context.forHim ? _en(kBmiHisLine) : null,
   );
 }
+
+/// T5, under her result on a clinic path.
+const String kBmiClinicPathLine =
+    'Many clinics ask for a BMI between 19 and 30 before IVF, because '
+    'treatment is safer in that range. Your clinic will tell you what it uses.';
+
+/// T5 PH3, under his result, in his voice.
+const String kBmiHisLine =
+    'A BMI over 30 is linked with lower sperm quality. Small changes count, '
+    'and sperm take about three months to show them.';
+
+/// T5 PH3: his body text. The same words as hers, cut where hers speak of
+/// periods or pregnancy risks; nothing new is said.
+LocalizedText _bandBodyHim(BmiCategory cat) => switch (cat.band) {
+      BmiBand.under => _en('Your BMI is below the standard adult range. That '
+          'on its own does not tell us why. If you have weight loss you '
+          "didn't plan, a low appetite or any worry about nutrition, those "
+          'are worth raising with a doctor.'),
+      BmiBand.obese => _en('Your BMI falls in the obesity category used in '
+          'standard adult ranges. This is a screening category, not a '
+          'diagnosis.'),
+      _ => _bandBody(cat),
+    };
 
 LocalizedText _bandBody(BmiCategory cat) {
   final southAsian = cat.standard == BmiStandard.southAsian;
@@ -470,10 +550,19 @@ final LocalizedText kBmiDisclaimer = _en(
     'alongside your overall health and history.');
 
 /// Why the two sets of numbers differ. Shown beside the second reading.
+// ⚠️ T5 BW7 / D3 (2026-10-29): THE ATTRIBUTION WAS WRONG ON SCREEN. NICE
+// (PH46) and the NHS use 27.5 for obesity in South Asian adults; 25 is the
+// Indian guidance and WHO Asia-Pacific. 25 stays the India-first default
+// (a BEFORE-LAUNCH clinician CHECK). Kept for revert, the first two
+// sentences:
+//   'We use the South Asian cut-offs, because they compare you with people '
+//   'built like you. ICMR, the WHO Asia-Pacific classification and NICE all '
+//   'set overweight at 23 and obesity at 25 for South Asian people. Risks like '
 final LocalizedText kBmiStandardsExplainer = _en(
-    'We use the South Asian cut-offs, because they compare you with people '
-    'built like you. ICMR, the WHO Asia-Pacific classification and NICE all '
-    'set overweight at 23 and obesity at 25 for South Asian people. Risks like '
+    'We use the South Asian cut-offs: overweight from 23, and obesity from '
+    '25, as Indian guidance and the WHO Asia-Pacific classification set '
+    'them. The NHS uses 27.5 for obesity in South Asian adults, so you may '
+    'see that number too. Risks like '
     'high blood sugar tend to show up at a lower BMI than the international '
     'numbers assume, and those numbers came mostly from European '
     "populations. The international figure is shown below because you'll "
@@ -498,9 +587,14 @@ const List<({String area, String claim})> kBmiReviewRegister = [
   ),
   (
     area: 'Category thresholds — South Asian',
-    claim: '⚠️ NOT SETTLED. Overweight ≥23 and obesity ≥25 are used here per '
-        'WHO Asia-Pacific, ICMR and NICE 2023 South Asian guidance. More '
-        'recent ICMR material gives obesity ≥27.5. Which to ship needs a call.'
+    // T5 D3 (2026-10-29): the choice, recorded. Kept for revert: "⚠️ NOT
+    // SETTLED. ... per WHO Asia-Pacific, ICMR and NICE 2023 South Asian
+    // guidance. More recent ICMR material gives obesity ≥27.5. Which to ship
+    // needs a call."
+    claim: 'CHOSEN 2026-10-29, for clinician sign-off: overweight ≥23 and '
+        'obesity ≥25, per ICMR and the Indian consensus (2009) and WHO '
+        'Asia-Pacific (2000), as the India-first default. NICE PH46 and the '
+        'NHS use obesity ≥27.5 for South Asian adults; the explainer says so.'
   ),
   (
     area: 'Showing both standards',
@@ -533,5 +627,15 @@ const List<({String area, String claim})> kBmiReviewRegister = [
   (
     area: 'Weight-change flag',
     claim: 'The 5 kg threshold for suggesting a doctor conversation.'
+  ),
+  (
+    area: 'Clinic-path line (T5)',
+    claim: 'Many clinics ask for BMI 19 to 30 before IVF (NICE CG156 1.2.2, '
+        'HFEA), shown only on a clinic path and never as a target.'
+  ),
+  (
+    area: "His reading (T5 PH3)",
+    claim: 'A male BMI over 30 is linked with lower sperm quality; sperm take '
+        'about three months to show a change (NHS, NICE CG156 1.2.3).'
   ),
 ];

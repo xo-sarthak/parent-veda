@@ -330,6 +330,18 @@ PcosInterpretation interpretPcos(Map<String, String> answers) {
   );
 }
 
+/// The capped reading's body: on hormonal contraception (or just after a
+/// birth) a cycle cannot be read as a sign about ovulation. One copy, read by
+/// this engine and by the short check's result (T5 PC4).
+const String kPcosCappedBody =
+    'Hormonal contraception controls when you bleed, instead of '
+    'letting a cycle run on its own. A recent birth or breastfeeding also '
+    'changes cycles, for completely normal reasons. Either way, what '
+    "you've described cannot be read as a sign about ovulation, in either "
+    "direction. That isn't the same as nothing being there. If you have "
+    'other symptoms, or your cycles were irregular before, those are still '
+    'worth raising.';
+
 LocalizedText _headline(PcosLevel level, bool capped) {
   if (capped) return _en('Your cycle is hard to read right now');
   return switch (level) {
@@ -342,15 +354,10 @@ LocalizedText _headline(PcosLevel level, bool capped) {
 
 LocalizedText _body(
     PcosLevel level, bool capped, PcosStrength Function(PcosDomain) strength) {
-  if (capped) {
-    return _en('Hormonal contraception controls when you bleed, instead of '
-        'letting a cycle run on its own. A recent birth or breastfeeding also '
-        'changes cycles, for completely normal reasons. Either way, what '
-        "you've described cannot be read as a sign about ovulation, in either "
-        "direction. That isn't the same as nothing being there. If you have "
-        'other symptoms, or your cycles were irregular before, those are still '
-        'worth raising.');
-  }
+  // T5 PC4 (2026-10-29): the words moved, unchanged, to [kPcosCappedBody] so
+  // the short check prints the same sentence. Kept for revert: the literal
+  // inside `_en(...)` here.
+  if (capped) return _en(kPcosCappedBody);
 
   return switch (level) {
     PcosLevel.none => _en("From what you've entered, your answers don't show "

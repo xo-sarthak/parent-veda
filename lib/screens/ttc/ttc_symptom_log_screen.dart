@@ -75,6 +75,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // import '../../services/bracket_resolver.dart' show bracketById; // kept for revert: only the retired door push read it (2026-10-28)
 import '../../theme/pv_fonts.dart';
@@ -87,6 +88,8 @@ import '../../ttc/ttc_logging_extras.dart';
 import '../../ttc/ttc_reads_data.dart' show ttcReadById;
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
+import '../../ttc/ttc_symptom_flags.dart';
+import '../../ttc/ttc_treatment_store.dart';
 import '../../widgets/pv_feedback.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import 'ttc_ovulation_screen.dart'
@@ -97,7 +100,8 @@ import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_edit_categories_screen.dart';
 // import 'ttc_focus_screen.dart' show TtcFocusScreen; // kept for revert: the retired door (2026-10-28)
-import 'doors/ttc_door_screen.dart' show openTtcDoor;
+import 'doors/ttc_door_screen.dart' show openTtcDoor, ttcFlagLines;
+import '../doors/pv_door_chrome.dart' show kPvUrgentInk;
 import 'ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
 import 'ttc_symptom_mark.dart';
 import 'ttc_strings.dart';
@@ -145,9 +149,60 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
   GlobalKey _keyFor(String groupId) =>
       _groupKeys.putIfAbsent(groupId, () => GlobalKey());
 
+  /// T5 S6: each thing touched this visit, with the value it held when she
+  /// first touched it (null = nothing saved). Done compares it with now, so
+  /// it can say "2 added, 1 removed" rather than the day's total.
+  final Map<String, double?> _visitBefore = {};
+
+  void _noteBefore(String tracker, String field, DateTime day) {
+    final k = '$tracker/$field/${TtcLogStore.dayKey(day)}';
+    _visitBefore.putIfAbsent(k,
+        () => TtcLogStore.instance.valueFor(tracker, field, on: day)?.value);
+  }
+
+  /// T5 S2: the day the low-mood line last showed, kept on this phone.
+  static const String _lowMoodKey = 'ttc_low_mood_line_shown';
+  DateTime? _lowMoodShown;
+  bool _lowMoodLoaded = false;
+
+  Future<void> _loadLowMood() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final iso = prefs.getString(_lowMoodKey);
+      _lowMoodShown = iso == null ? null : DateTime.tryParse(iso);
+    } catch (_) {}
+    if (mounted) setState(() => _lowMoodLoaded = true);
+  }
+
+  /// Records that the line showed today, once.
+  void _markLowMoodShown() {
+    final today = _dayOnly(DateTime.now());
+    if (_lowMoodShown != null && _dayOnly(_lowMoodShown!) == today) return;
+    _lowMoodShown = today;
+    SharedPreferences.getInstance()
+        .then((p) => p.setString(_lowMoodKey, today.toIso8601String()))
+        .catchError((_) => false);
+  }
+
+  /// T5 S1/S3: the red-flag card for the day on screen, or null.
+  TtcSymptomFlag? get _flag => ttcSymptomFlag(
+        _day,
+        logs: TtcLogStore.instance,
+        periodStarts: CycleStore.instance.currentPeriodStarts,
+        usualCycleLength: TtcStore.instance.today.cycleLength,
+        round: TtcTreatmentStore.instance.cycle,
+      );
+
+  /// T5 S2: the low-mood line shows on today only, at most once a week.
+  bool get _lowMoodDue =>
+      _lowMoodLoaded &&
+      !_canGoForward &&
+      ttcLowMoodDue(TtcLogStore.instance, DateTime.now(), _lowMoodShown);
+
   @override
   void initState() {
     super.initState();
+    _loadLowMood();
     // ⚠️ A BUG, FOUND IN THE REBUILD (2026-09-27): only the Show or hide
     // page loaded her choices, so after a restart every card she had hidden
     // came back until she happened to open that page. The logger reads them,
@@ -330,6 +385,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                         item: i,
                         removed: removed.containsKey(i.field),
                         onRemove: () {
+                          _noteBefore(i.tracker, i.field, day);
                           final old = _takeOff(i, day);
                           if (old == null) return;
                           setSheet(() => removed[i.field] = old);
@@ -388,6 +444,9 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
 
   /// The way out that says what was kept. Taps have already saved; this only
   /// closes, and the confirmation lands on the screen she returns to.
+  // T5 S6 (2026-10-29): Done said the day's total ("5 things saved for
+  // today"), and nothing when she had only removed things. It now says what
+  // this visit changed (`_doneLine`). [saved] is kept for revert.
   void _done(int saved) {
     // ⚠️ SHOWN AFTER THE SCREEN HAS CHANGED (2026-09-30, the user: the
     // pop-up "comes abruptly in the very lower middle of the screen… should
@@ -401,15 +460,47 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
     // revert: pvSnack(context, …, lift: 96) before maybePop().
     final nav = Navigator.of(context);
     final host = nav.context;
-    final line = ttcLogDoneLine(saved, _dayName);
+    // Kept for revert (T5 S6): final line = ttcLogDoneLine(saved, _dayName);
+    final line = _doneLine();
     nav.maybePop();
-    if (saved > 0) {
+    // Kept for revert (T5 S6): if (saved > 0) {
+    if (line != null) {
       Future<void>.delayed(const Duration(milliseconds: 360), () {
         if (!host.mounted) return;
         // Lifted clear of the home's bar, where it lands.
         pvSnack(host, line, icon: Icons.check_rounded, lift: 96);
       });
     }
+  }
+
+  /// T5 S6: what this visit changed, or null when nothing did.
+  String? _doneLine() {
+    final log = TtcLogStore.instance;
+    var added = 0, removed = 0, changed = 0;
+    final days = <String>{};
+    _visitBefore.forEach((k, before) {
+      final parts = k.split('/');
+      final now = log
+          .valueFor(parts[0], parts[1], on: DateTime.parse(parts[2]))
+          ?.value;
+      if (before == null && now != null) {
+        added++;
+      } else if (before != null && now == null) {
+        removed++;
+      } else if (before != null && now != null && before != now) {
+        changed++;
+      } else {
+        return;
+      }
+      days.add(parts[2]);
+    });
+    final oneDay =
+        days.length == 1 && days.first == TtcLogStore.dayKey(_day);
+    return ttcLogVisitLine(
+        added: added,
+        removed: removed,
+        changed: changed,
+        dayName: oneDay ? _dayName : null);
   }
 
   /// Everything saved for the day on screen, in the order the screen shows it.
@@ -439,6 +530,12 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
     // A positive strip moves her fertile days from here too (2026-10-17), by
     // the same rule as the Ovulation tests screen (`ttcOvPositiveSaved`).
     final wasPositive = _selected.contains(kTtcOvPositive);
+    _noteBefore(kTtcSymptomTracker, symptom.id, _day);
+    if (group.single) {
+      for (final other in group.symptoms) {
+        _noteBefore(kTtcSymptomTracker, other.id, _day);
+      }
+    }
     if (_selected.contains(symptom.id)) {
       store.clear(kTtcSymptomTracker, symptom.id, on: _day);
     } else {
@@ -462,6 +559,7 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
   }
 
   void _setNumber(String tracker, String field, double? v) {
+    _noteBefore(tracker, field, _day);
     if (v == null) {
       TtcLogStore.instance.clear(tracker, field, on: _day);
     } else {
@@ -524,6 +622,8 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
         // The temperature chart lays readings on her cycle, so a period
         // logged or moved has to redraw it.
         CycleStore.instance,
+        // T5 S1: the OHSS and fever cards read the open round.
+        TtcTreatmentStore.instance,
       ]),
       builder: (context, _) {
         final t = TtcS.current();
@@ -535,6 +635,9 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
         final saved = _savedItems(selected);
         final savedCount = _savedCount(selected);
         final hidden = TtcCategoryPrefs.instance.hidden.length;
+        final flag = _flag;
+        final lowMood = _lowMoodDue;
+        if (lowMood) _markLowMoodShown();
 
         // Kept for revert (2026-09-27, tool rebuild): the plain page this
         // was, before it moved into the tool shell. Everything from the
@@ -662,6 +765,19 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                   ),
                   const SizedBox(height: 14),
                 ],
+                // ⚠️ T5 S1/S3: ONE CALM CARD AT THE TOP OF THE DAY, NEVER A
+                // MODAL. It stands while the pattern stands and goes when a
+                // chip is cleared, because it is worked out on every build.
+                if (flag != null) ...[
+                  TtcSymptomFlagCard(
+                    flag: flag,
+                    onRead: flag == TtcSymptomFlag.ohss
+                        ? () => openTtcSurface(
+                            context, '${kTtcReadPrefix}ttc_read_ivf_ohss')
+                        : null,
+                  ),
+                  const SizedBox(height: 18),
+                ],
                 // Kept for revert (2026-09-28): the saved card above the
                 // search, which said "Nothing saved for this day yet" on
                 // every first open and pushed the form down a card's height.
@@ -768,6 +884,15 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                     const SizedBox(height: 12),
                     _GentleLine(
                         text: kTtcHardThoughtsLine, onTap: _openHardThoughts),
+                  ],
+                  // T5 S2: two heavy weeks, once a week, today only. Never a
+                  // score; it opens the same Hard days place.
+                  if (lowMood) ...[
+                    const SizedBox(height: 12),
+                    _GentleLine(
+                        key: const ValueKey('ttc_log_low_mood'),
+                        text: kTtcLowMoodLine,
+                        onTap: _openHardThoughts),
                   ],
                   const SizedBox(height: 22),
                   Row(children: [
@@ -1375,8 +1500,87 @@ class _LinkRow extends StatelessWidget {
 ///
 /// ⚠️ WHITE, NOT A WARNING. It is not an alert and must not look like one:
 /// no amber, no icon of a triangle. It is the app noticing, kindly.
+/// T5 S1/S3: the red-flag card at the top of the day.
+///
+/// ⚠️ THE DOOR'S RED-FLAG LOOK (`TtcDoorRedFlag`), REBUILT FROM ITS PARTS,
+/// NOT THE WIDGET: that one takes a `PvCallout` with bilingual text, and this
+/// copy is English (CLAUDE.md, new work is English). An ink rule, the heading
+/// in the display face, one urgent dot per sentence. Never a modal: she is
+/// logging, and the card waits on the page until the pattern is gone.
+class TtcSymptomFlagCard extends StatelessWidget {
+  const TtcSymptomFlagCard({super.key, required this.flag, this.onRead});
+
+  final TtcSymptomFlag flag;
+
+  /// The OHSS read, for the OHSS card only.
+  final VoidCallback? onRead;
+
+  @override
+  Widget build(BuildContext context) {
+    final lines = ttcFlagLines(ttcSymptomFlagText(flag));
+    return Container(
+      key: ValueKey('ttc_symptom_flag_${flag.name}'),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(ttcCardRadius),
+        border: Border.all(color: ttcInk, width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(kTtcFlagHeading,
+              style: pvFraunces(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  color: ttcInk)),
+          const SizedBox(height: 8),
+          for (final line in lines)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, right: 11),
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                          color: kPvUrgentInk, shape: BoxShape.circle),
+                    ),
+                  ),
+                  Expanded(
+                      child: Text(line,
+                          style: ttcBody(14, color: ttcInk, h: 1.5))),
+                ],
+              ),
+            ),
+          if (onRead != null)
+            PvPress(child: GestureDetector(
+              key: const ValueKey('ttc_symptom_flag_read'),
+              behavior: HitTestBehavior.opaque,
+              onTap: onRead,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Row(children: [
+                  Text(kTtcFlagOhssReadLink,
+                      style: ttcBody(13,
+                          color: ttcTitleInk, w: FontWeight.w800)),
+                  const Icon(Icons.chevron_right_rounded,
+                      size: 18, color: ttcTitleInk),
+                ]),
+              ),
+            )),
+        ],
+      ),
+    );
+  }
+}
+
 class _GentleLine extends StatelessWidget {
-  const _GentleLine({required this.text, required this.onTap});
+  const _GentleLine({super.key, required this.text, required this.onTap});
 
   final String text;
   final VoidCallback onTap;
@@ -3338,6 +3542,26 @@ const String kTtcLogDone = 'Done';
 String ttcLogDoneLine(int n, String dayName) {
   final d = ttcLogDayInLine(dayName);
   return n == 1 ? '1 thing saved for $d' : '$n things saved for $d';
+}
+
+/// T5 S6: what one visit changed, "2 added, 1 removed for today". Null when
+/// nothing changed. [dayName] is null when the visit touched more than one
+/// day, and the line then names none.
+String? ttcLogVisitLine({
+  required int added,
+  required int removed,
+  int changed = 0,
+  String? dayName,
+}) {
+  final parts = [
+    if (added > 0) '$added added',
+    if (changed > 0) '$changed changed',
+    if (removed > 0) '$removed removed',
+  ];
+  if (parts.isEmpty) return null;
+  final body = parts.join(', ');
+  final line = '${body[0].toUpperCase()}${body.substring(1)}';
+  return dayName == null ? line : '$line for ${ttcLogDayInLine(dayName)}';
 }
 
 /// The snack after an × in the saved list, or "Remove this reading".

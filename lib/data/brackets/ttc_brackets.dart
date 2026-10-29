@@ -199,8 +199,9 @@ final List<Bracket> kTtcBrackets = [
       BracketLayer.activities:
           BracketLayerSpec.live(['ttc_precheck/lifestyle', 'ttc_tools']),
       // Was notReady: "Pre-pregnancy checklist, BMI". The checklist ships and
-      // carries the weight item — with no BMI figure, no target and no
-      // calculator, for the reason written at the journey's BMI slot.
+      // carries the weight item with no BMI figure and no target. The BMI
+      // calculator (`ttc_bmi`) is listed beside it since the T1/T2 fold, so
+      // the old "no calculator" here was out of date (T5 BW10, 2026-10-29).
       BracketLayer.tools: BracketLayerSpec.live(
           ['ttc_precheck', 'ttc_bmi', 'ttc_vaccinations', 'ttc_tests']),
       BracketLayer.products:

@@ -13,6 +13,8 @@
 //  So the history is a list of measurements with dates, and the only thing the
 //  store ever says about a change is that it happened.
 //
+//  T5 BW10 (2026-10-29): this said "NO CLOUD SYNC" against the step-13 note
+//  below. The store has been in the cloud since step 13. Kept for revert:
 //  ⚠️ NO CLOUD SYNC. TTC takes no new tables while its UI is settling —
 //  `docs/STILL-OPEN.md` §9.7, the same call attachments, vaccinations, the
 //  PCOS checker and the checklist all made.

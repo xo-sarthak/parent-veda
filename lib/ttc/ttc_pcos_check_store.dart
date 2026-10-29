@@ -166,6 +166,54 @@ class TtcPcosCheckStore extends ChangeNotifier with CloudMergedStore {
     await _persist();
   }
 
+  /// T5 PC3: an answer she took back. A retake that un-ticks a question used
+  /// to leave the old value here, because the write-through skipped nulls.
+  Future<void> remove(String qid) async {
+    if (_answers.remove(qid) == null) return;
+    _sources.remove(qid);
+    notifyListeners();
+    await _persist();
+  }
+
+  /// T5 PC2: "Clear my answers" on the short check takes its own ids and the
+  /// finished date with it, and hands both back so Undo can restore them.
+  /// Answers to the other questions (the older check's) are left alone.
+  Future<(Map<String, String>, DateTime?)> takeAnswers(
+      Iterable<String> qids) async {
+    final taken = <String, String>{
+      for (final q in qids)
+        if (_answers.containsKey(q)) q: _answers[q]!,
+    };
+    final done = _completedAt;
+    for (final q in taken.keys) {
+      _answers.remove(q);
+      _sources.remove(q);
+    }
+    _completedAt = null;
+    notifyListeners();
+    await _persist();
+    final p = await SharedPreferences.getInstance();
+    await p.remove(_kDone);
+    return (taken, done);
+  }
+
+  /// Undo for [takeAnswers].
+  Future<void> putBack(Map<String, String> answers, DateTime? done) async {
+    for (final e in answers.entries) {
+      _answers[e.key] = e.value;
+      _sources[e.key] = PcosAnswerSource.hers;
+    }
+    _completedAt = done;
+    notifyListeners();
+    await _persist();
+    final p = await SharedPreferences.getInstance();
+    if (done == null) {
+      await p.remove(_kDone);
+    } else {
+      await p.setString(_kDone, done.toIso8601String());
+    }
+  }
+
   Future<void> complete() async {
     _completedAt = DateTime.now();
     notifyListeners();

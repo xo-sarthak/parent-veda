@@ -19,6 +19,8 @@ import 'package:parentveda/screens/ttc/ttc_cycle_report_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_mood_face.dart';
 import 'package:parentveda/screens/ttc/ttc_symptom_log_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_tracker_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_partner_log_view.dart'
+    show kTtcPartnerInviteHer;
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_cycle_report.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
@@ -306,7 +308,8 @@ void main() {
         tester,
         TtcTrackerScreen(tracker: ttcTrackerById('partner_health')!),
       );
-      expect(find.text(kTtcTrackerPartnerWho), findsOneWidget);
+      // T5 PH1: the honest line replaced kTtcTrackerPartnerWho.
+      expect(find.text(kTtcPartnerInviteHer), findsOneWidget);
     });
   });
 

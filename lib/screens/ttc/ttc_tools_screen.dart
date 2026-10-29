@@ -387,7 +387,9 @@ final List<TtcToolGroup> ttcToolGroups = [
         nameEn: 'Partner health',
         nameHi: 'Partner ki sehat',
         // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'His half of this'.
-        descEn: 'His health, tests and habits',
+        // T5 PH2 (2026-10-29): there are no tests on this tracker. Kept for
+        // revert: 'His health, tests and habits'.
+        descEn: 'His sleep, drinks, smoking, heat and movement',
         descHi: 'Unka aadha hissa',
         open: (c) => openTtcTracker(c, 'partner_health'),
       ),
@@ -984,7 +986,9 @@ const List<String> kTtcHisToolsStartIds = [
 const Map<String, (String, String)> kTtcHisToolWords = {
   // Change 5 (2026-09-28): "half of this" named nothing. Kept for revert:
   //   ('Your health', 'Your tests, habits and half of this'),
-  'partner_health': ('Your health', 'Your health, tests and habits'),
+  // T5 PH2. Kept for revert: ('Your health', 'Your health, tests and habits'),
+  'partner_health':
+      ('Your health', 'Your sleep, drinks, smoking, heat and movement'),
   // Kept for revert: 'The days that count most this cycle'.
   'window': ('Her fertile window', "The six days she's most likely to get pregnant"),
 };

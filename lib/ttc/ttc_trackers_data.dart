@@ -33,6 +33,16 @@ enum TtcFieldKind {
   choice,
 }
 
+/// T5 PH4 (2026-10-29), under his alcohol row. NHS low-risk guide.
+const String kTtcAlcoholGuideLine =
+    'The NHS guide is no more than 14 units a week, spread over 3 or more '
+    'days. A pint of beer is about 2 to 3 units.';
+
+/// T5 Q1: the two trackers a partner may share (migration 0131's check
+/// constraint holds the same two). His `partner_health`, her `habits`.
+/// Symptoms, mood, weight and the PCOS check stay private, always.
+const Set<String> kTtcShareableTrackers = {'partner_health', 'habits'};
+
 class TtcField {
   const TtcField({
     required this.id,
@@ -53,7 +63,12 @@ class TtcField {
     this.group,
     this.start,
     this.presets = const [],
+    this.noteEn,
   });
+
+  /// T5 PH4 (2026-10-29): one plain line under the field, where a guide
+  /// helps the number mean something. English only (new work is English).
+  final String? noteEn;
 
   final String id;
   final String labelEn;
@@ -389,6 +404,8 @@ const List<TtcTracker> ttcTrackers = [
         kind: TtcFieldKind.choice,
         choicesEn: ['None', '1 drink', '2 drinks', 'More than 2'],
         choicesHi: ['Bilkul nahi', '1 drink', '2 drink', '2 se zyada'],
+        // T5 PH4: drinks a day had no guide.
+        noteEn: kTtcAlcoholGuideLine,
       ),
       TtcField(
         id: 'smoking',
