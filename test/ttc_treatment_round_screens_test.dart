@@ -356,7 +356,11 @@ void main() {
       // The header counts the day since the tool rebuild (2026-09-27), as
       // the IVF door's panel does. Was:
       //   expect(find.text('Stimulation'), findsOneWidget, ...);
-      expect(find.text('Stimulation · day 4'), findsOneWidget,
+      // TTC-GAP 25 (T4, 2026-10-29): the title names today's step itself
+      // (`ttcTreatmentTitle`), and the Today card leads with its "Today: …"
+      // line, so the step is not said twice. Was:
+      //   expect(find.text('Stimulation · day 4'), findsOneWidget, ...);
+      expect(find.text('Stimulation, day 4.'), findsOneWidget,
           reason: 'the step, derived from her dates');
       // The old chooser and questions are gone (decision 2).
       expect(find.byType(TtcPathChooser), findsNothing);

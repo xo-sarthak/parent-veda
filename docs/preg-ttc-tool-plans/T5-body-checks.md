@@ -114,7 +114,7 @@ Files the build touches. **Run `git status` before each edit.** On 2026-10-29 ot
 7. PC1: her "yes" counts. `_cycleLine`, `_nudge` and the checklist read `facts.hasLongGap || a.longGaps == PcosYesNo.yes`; the checklist line reads "You said: 3 months or more without a period".
 8. PC2: "Clear my answers" also clears the T5-written ids in `TtcPcosCheckStore` and its `completedAt`; Undo restores both.
 9. PC3: un-ticking removes the old value (a `remove(qid)` on the store); update the test at `ttc_pcos_stand_test.dart:279`.
-10. PC5: BMI's note reads "Your PCOS check noted some signs worth raising. That makes a check-up before pregnancy more useful than usual…". PC7: `hasLongGap` counts gaps that ended in the last 365 days. PC8 names in the two reads and `ttc_surfaces.dart:66`. PC11 both.
+10. PC5: BMI's note reads "Your PCOS check noted some signs worth raising. That makes a check-up before pregnancy more useful than usual…". PC7: `hasLongGap` counts gaps that ended in the last 365 days. PC8 is **done by Terminal A** (91b09097, 54e9b0e0: the two reads, `ttc_surfaces.dart` and the door card), so only check nothing else still says "PCOS symptom checker". PC11 both.
 11. S5: the router passes `focusGroup` for the two labelled entries (a `ttc_symptom_log#measurements` style id, or a named surface; pick the smaller change). S6: "Done" reports what changed this visit ("2 added, 1 removed"), and says it when only removals happened.
 12. PH2: both descriptions become "His sleep, drinks, smoking, heat and movement" / "Your sleep, drinks, smoking, heat and movement". PH7: her title adds movement. BW10 comments.
 
@@ -144,7 +144,7 @@ Files the build touches. **Run `git status` before each edit.** On 2026-10-29 ot
 - **Sync log:** one step for 0131 and the share store, on the user's word.
 
 ## Owed and hand-over
-- **Terminal A (door files):**
+- **Terminal A (door files): DONE 2026-10-29 in 91b09097 + 54e9b0e0** (items 1 and 2 built, item 3 noted).
   1. `ttc_focus_his_side.dart:528-529` "What he can track": "his own log, on his own account" becomes "his own log; he can choose to share it with you".
   2. PC8: any door tile naming the PCOS tool uses "PCOS symptom check".
   3. S4: the door tiles to her logger and PCOS check may stay; the router now catches his phone (D5). Heads-up only.
