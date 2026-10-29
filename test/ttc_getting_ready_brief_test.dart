@@ -66,7 +66,8 @@ const _brief = <(String, String, TtcTileFormat)>[
   ('diet', 'Ten everyday recipes', TtcTileFormat.article), // was 'meals'
   // ⚠️ CHANGED ON PURPOSE 2026-09-28 (explicit names: every title names
   // what it opens, the user's instruction). Kept for revert: 'Plan your own week'.
-  ('diet', 'Plan your own week of meals', TtcTileFormat.tool), // was 'meals'
+  // Kept for revert (door names, hand-over item 4, 2026-10-29): 'Plan your own week of meals'.
+  ('diet', "This week's food ideas", TtcTileFormat.tool), // was 'meals'
   ('diet', 'Iron before pregnancy', TtcTileFormat.article), // was 'meals'
   ('diet', 'Omega-3 without fish', TtcTileFormat.article), // was 'meals'
   ('diet', 'Ask a dietitian: ten questions', TtcTileFormat.article), // was 'meals'
@@ -84,7 +85,8 @@ const _brief = <(String, String, TtcTileFormat)>[
   // ⚠️ CHANGED ON PURPOSE 2026-09-28 (explicit names: every title names
   // what it opens, the user's instruction). Kept for revert: "Track what
   // you're working on".
-  ('habits', 'Your habit trackers', TtcTileFormat.tool),
+  // Kept for revert (door names, hand-over item 4, 2026-10-29): 'Your habit trackers'.
+  ('habits', "What you're working on", TtcTileFormat.tool),
   // Moved here from diet, 2026-09-27 (relevance audit).
   ('habits', 'What to cut before trying', TtcTileFormat.article),
 
@@ -232,7 +234,8 @@ void main() {
       final tracker = tiles()
           .map((e) => e.$2)
           // Kept for revert (2026-09-28): "Track what you're working on".
-          .firstWhere((t) => t.title == 'Your habit trackers');
+          // Kept for revert (door names, hand-over item 4, 2026-10-29): 'Your habit trackers'.
+          .firstWhere((t) => t.title == "What you're working on");
       expect(practice.format, TtcTileFormat.practice);
       expect(tracker.format, TtcTileFormat.tool);
     });

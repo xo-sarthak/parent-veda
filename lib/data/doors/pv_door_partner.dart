@@ -321,12 +321,16 @@ final PvDoorPage kPartnerDoor = PvDoorPage(
           readId: kPartnerReadFirstTimeDad,
         ),
         PvDoorToolTile(
-          title: 'The hospital bag',
+          // The tool's one name (P4), door names, hand-over item 4, 2026-10-29.
+          // Kept for revert: title: 'The hospital bag',
+          title: 'Hospital bag',
           blurb: 'What to pack for her, the baby and you.',
           surfaceId: kLabourSurfaceBag,
         ),
         PvDoorToolTile(
-          title: 'What you really need for the baby',
+          // The tool's one name, door names, hand-over item 4, 2026-10-29.
+          // Kept for revert: title: 'What you really need for the baby',
+          title: 'Product checklist',
           blurb: 'A checklist, so you buy what is needed and nothing more.',
           surfaceId: kReadySurfaceStore,
         ),

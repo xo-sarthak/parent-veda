@@ -451,7 +451,9 @@ final List<PvRead> kPregnancyReadsReady = [
             "nappies, a safe place to sleep, and you. Everything below "
             "supports one of those. The numbers are a rough guide for a "
             "family doing laundry every day or two."),
-        _en("If you'd like, the Shop the list card on this tab opens a "
+        // The card was renamed (door names, hand-over item 4, 2026-10-29). Kept for revert:
+        // _en("If you'd like, the Shop the list card on this tab opens a "
+        _en("If you'd like, the Product checklist card on this tab opens a "
             "shopping checklist you can build and tick off, with a starter "
             "list for newborns. You don't have to buy anything from us to "
             "use this list."),
@@ -585,7 +587,9 @@ final List<PvRead> kPregnancyReadsReady = [
               "at their home until then. Only the car seat, if you need one, "
               "has to be ready before you leave hospital."),
           _en("Your hospital bag has its own list in ParentVeda. Look for "
-              "Ready for Birth on this tab, so you only pack once."),
+              // Kept for revert (door names, hand-over item 4, 2026-10-29):
+              // "Ready for Birth on this tab, so you only pack once."),
+              "Hospital bag on this tab, so you only pack once."),
         ],
       ),
     ],
@@ -1212,7 +1216,9 @@ final List<PvRead> kPregnancyReadsReady = [
           _en("Make lists: what to buy, what to pack, who to call."),
           _en("Set up the sleep corner once someone has moved the cot into "
               "place."),
-          _en("Pack your hospital bag, with the Ready for Birth list in "
+          // Kept for revert (door names, hand-over item 4, 2026-10-29):
+          // _en("Pack your hospital bag, with the Ready for Birth list in "
+          _en("Pack your hospital bag, with the Hospital bag list in "
               "ParentVeda."),
           _en("Cook and freeze a few simple meals for the first weeks, if "
               "your family would like that."),
@@ -1377,7 +1383,9 @@ final List<PvRead> kPregnancyReadsReady = [
       PvReadSection(
         heading: _en('From about 36 weeks'),
         bullets: [
-          _en("Have your hospital bag packed. The Ready for Birth list in "
+          // Kept for revert (door names, hand-over item 4, 2026-10-29):
+          // _en("Have your hospital bag packed. The Ready for Birth list in "
+          _en("Have your hospital bag packed. The Hospital bag list in "
               "ParentVeda covers you, the baby, your papers and whoever comes "
               "with you."),
           _en("Plan the ride to hospital, day and night, and a back-up. Save "
@@ -1437,7 +1445,9 @@ final List<PvRead> kPregnancyReadsReady = [
       PvReadFaq(
         question: _en('When should I pack my hospital bag?'),
         answer: _en("By about 36 weeks, or earlier if your doctor expects an "
-            "early birth. Ready for Birth has the full list."),
+            // Kept for revert (door names, hand-over item 4, 2026-10-29):
+            // "early birth. Ready for Birth has the full list."),
+            "early birth. The Hospital bag list has it all."),
       ),
       PvReadFaq(
         question: _en('Do we need to choose the paediatrician before the '

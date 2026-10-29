@@ -932,7 +932,9 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       steps: {TtcRoundPhase.gettingReady, TtcRoundPhase.stimulation, TtcRoundPhase.trigger, TtcRoundPhase.procedure, TtcRoundPhase.embryoDays, TtcRoundPhase.transfer, TtcRoundPhase.waiting, TtcRoundPhase.testDay}, // global pass item 13, 2026-10-23
       tiles: [
         TtcToolTile(
-          title: 'Track this treatment cycle',
+          // The tool's one name, door names, hand-over item 4, 2026-10-29.
+          // Kept for revert: title: 'Track this treatment cycle',
+          title: 'Treatment cycle',
           id: 'ttc_tile_track_this_treatment_cycle',
           blurb: 'Trigger, egg collection, transfer and the wait. The dates '
               'your clinic gave you, all in one place.',

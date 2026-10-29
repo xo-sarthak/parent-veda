@@ -333,7 +333,9 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         ),
         TtcToolTile(
           // Kept for revert (2026-09-28, explicit names): title: 'Plan your own week',
-          title: 'Plan your own week of meals',
+          // The tool's one name, door names, hand-over item 4, 2026-10-29: the page plans nothing, it
+          // offers ideas. Kept for revert: title: 'Plan your own week of meals',
+          title: "This week's food ideas",
           id: 'ttc_tile_plan_your_own_week',
           blurb: 'Pick meals from an Indian kitchen and see what each one does.',
           surfaceId: 'ttc_nutrition',
@@ -492,10 +494,15 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // it with. Two rows, two formats, and the brief had them right.
         TtcToolTile(
           // Kept for revert (2026-09-28, explicit names): title: "Track what you're working on",
-          title: 'Your habit trackers',
+          // The tool's one name, door names, hand-over item 4, 2026-10-29: the four trackers are one
+          // since 2026-09-04. Kept for revert:
+          //   title: 'Your habit trackers',
+          //   blurb: "The four habit trackers in one place. It's a record, not a "
+          //       'report card: no streaks and no score.',
+          title: "What you're working on",
           id: 'ttc_tile_track_what_you_re_working_on',
-          blurb: "The four habit trackers in one place. It's a record, not a "
-              'report card: no streaks and no score.',
+          blurb: 'Sleep, movement, stress and lifestyle in one place. A '
+              'record, not a report card: no streaks and no score.',
           surfaceId: 'ttc_habits',
         ),
         // Moved here from "Eating before you try" (2026-09-27, relevance

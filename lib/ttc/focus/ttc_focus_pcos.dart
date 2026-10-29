@@ -726,7 +726,10 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         TtcToolTile(
           title: 'What your cycle shows',
           id: 'ttc_tile_what_your_cycle_shows',
-          blurb: 'The months you logged, turned into a pattern in plain words.',
+          // The report is one cycle, not a pattern over months (door names, hand-over item 4, 2026-10-29,
+          // from T2). Kept for revert:
+          // blurb: 'The months you logged, turned into a pattern in plain words.',
+          blurb: 'Each cycle you logged, given back in plain words.',
           surfaceId: 'ttc_cycle_report',
         ),
         // WARNING: QUIET, AND THE BRIEF SAYS SO TWICE. "Calm card, quiet, not

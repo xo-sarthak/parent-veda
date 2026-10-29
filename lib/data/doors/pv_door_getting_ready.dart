@@ -70,7 +70,9 @@ const String kReadyTabBuy = 'buy';
 const String kReadyTabHome = 'home';
 
 /// The hospital bag card's words, shared by the two tabs it sits on.
-const String _bagTitle = 'Ready for Birth: your hospital bag';
+// The tool's one name (P4), door names, hand-over item 4, 2026-10-29. Kept for revert:
+// const String _bagTitle = 'Ready for Birth: your hospital bag';
+const String _bagTitle = 'Hospital bag';
 const String _bagBlurb = 'What to pack for you, the baby and whoever comes '
     'with you.';
 
@@ -228,7 +230,9 @@ final PvDoorPage kGettingReadyDoor = PvDoorPage(
           readId: 'preg_ready_read_skip',
         ),
         PvDoorToolTile(
-          title: 'Shop the list',
+          // The tool's one name, door names, hand-over item 4, 2026-10-29: the card opened a checklist,
+          // not the store. Kept for revert: title: 'Shop the list',
+          title: 'Product checklist',
           blurb: 'A shopping checklist to build and tick off, with a '
               'newborn starter list.',
           surfaceId: kReadySurfaceStore,

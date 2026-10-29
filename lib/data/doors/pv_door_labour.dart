@@ -505,7 +505,9 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       heading: 'Your hospital bag list', // was 'Pack it once, properly' (2026-10-22)
       tiles: [
         PvDoorToolTile(
-          title: 'Ready for Birth',
+          // The tool's one name (P4), door names, hand-over item 4, 2026-10-29.
+          // Kept for revert: title: 'Ready for Birth',
+          title: 'Hospital bag',
           blurb: 'Documents, you, the baby and whoever comes with you, and '
               "how ready you are.",
           surfaceId: kLabourSurfaceBag,
