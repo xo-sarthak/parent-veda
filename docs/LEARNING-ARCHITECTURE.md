@@ -225,6 +225,8 @@ differ.
 | L.14 | Host never arrives | **+10 min:** the waiting room says "Dr X hasn't joined yet. We've told the team" (Preply). **+20 min** with no host (from the webhook): the session is `host_missed`; her seat or credit comes back, she is offered a refund, and the expert is not paid | Closes STILL-OPEN §5.4f's "a doctor who no-shows is paid". Needs L.15 first |
 | L.18 | Shop orders: the client can set `paid` | **Folded into L2.** The same `payment_orders` + verify path writes the shop order's paid status | One receipt pattern, not two |
 | L.22 | Where she sees what she has booked and bought (asked by the user 2026-10-29) | **Your bookings is the one history, for the whole app.** The screen exists (`PvMyLearningScreen`, Profile › Your bookings, the same profile in all four stages; rows carry a stage word, nothing switches on stage). Keep Upcoming, Continue, Credits and Past as built; add **Payments** (every payment and refund with amount, date, status and its receipt); a cohort shows its batch and its next session from the server timetable; past sessions show attendance (L3) and the recording. All of it read from the server (`booking_bookings` as today, plus `my_purchases`), cached on the phone. Shop orders stay in Your orders | One place, so a reinstall or a new phone shows the same history, and a parent who moves from pregnancy to parenting keeps hers. Costs: `my_purchases` returns amount, status and refund date (L2b), and the Payments section plus reading receipts instead of local minting (L2c) |
+| L.23 | The expert's cut (asked 2026-10-29, in L2b) | **Variable per offering, by agreement.** `programme_experts` carries `share_bps` or `share_flat_paise` for that expert on that programme; empty falls back to the expert's rule, then the format's default (0084). A credit-covered seat (sponsor, referral, pack) earns the same cut of the same server price as a paid one | The user: "it's not decided, it might be variable according to the course or the format... an agreement with the expert". A flat amount covers the cheap-masterclass case a percentage cannot |
+| L.24 | Refunds for consults and class packs (asked 2026-10-29) | **Support only for now.** No self-serve button; support refunds unspent credits from the dashboard and the webhook voids them | L.12 covers masterclass, cohort and course only. Cancelling a consult in time already returns the credit (0066) |
 
 **Obvious: chosen and recorded, not asked.**
 
@@ -269,16 +271,17 @@ written down so it isn't lost.
 - [x] **LA-3 · A host can open a room for any slot, at any time, with phone-supplied values.** `open_session_room`
   creates the slot from what the phone sends (0079:252-258). · L.19 · pass **L2a** · built 2026-10-29 in `0123` (stored slot only; the five unused arguments stay until L3); **closed 2026-10-29**, `ad5be7de`, 0123 run and checked on the live DB
 - [ ] **LA-4 · The client sets the price.** Pay ₹1 for a ₹2,499 course with a valid signature
-  (`razorpay-create-order:82-98`). · L.1 · pass **L2b** · open
+  (`razorpay-create-order:82-98`). · L.1 · pass **L2b** · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (`price_offering`; the client amount is read only in stub mode, for an offering the server cannot price)
 - [ ] **LA-5 · The server keeps no record of a purchase.** Verify returns `{valid}`; the phone mints access. Edit the
-  prefs and you own any course. · L.1, L.17 · pass **L2b** (server) + **L2c** (app) · open
+  prefs and you own any course. · L.1, L.17 · pass **L2b** (server) + **L2c** (app) · server half · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (`course_purchases`, written by verify and the webhook); app half open (L2c)
 - [ ] **LA-6 · `book_slot` trusts the client and never checks payment.** Expert, capacity, start and price come from
   the caller; the slot is created on demand; unpaid is not refused (STILL-OPEN §11.7). The client price flows into
-  the expert's earnings. · L.9 · pass **L2b** · open
+  the expert's earnings. · L.9 · pass **L2b** · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (server values only; unpaid raises `payment required` in live mode; the stub branch keeps today's app working)
 - [ ] **LA-7 · The no-charge preview can reach a release build.** `notConfigured` counts as success. · L.17 · pass
-  **L2b** + **L2c** · open
+  **L2b** + **L2c** · server half · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (`payment_mode`, `record_stub_purchase`); app half open (L2c)
 - [ ] **LA-8 · The payment functions don't know who is calling.** `--no-verify-jwt` and no JWT read. · L.21 · pass
-  **L2b** · open
+  **L2b** · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (both read the JWT; verify refuses another user's order)
+- [ ] **LA-28 · Thirty-one internal functions were callable by any signed-in account** (found 2026-10-29 while building L2b). They were revoked `from public` only; Supabase grants every new function to `anon` and `authenticated` by name, so the revoke closed a path nobody used. `grant_consult_credits` (fifty free consults), `grant_plan`, `write_expert_earning`, `void_consult_credits`, `publish_programme`, `approve_care_partner`, `mint_partner_token`, the `phone_otp_*` set and more. *The general fact: a privilege can arrive by several paths, and a revoke closes one. Check with `has_function_privilege`, not by reading the migration.* · — · pass **L2b** · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (all overloads revoked from anon and authenticated; `test/learning_money_contract_test.dart` fails on a bare `from public`)
 - [ ] **LA-9 · A paid video would be public.** None exist yet. The rule: private storage, playback only after
   `has_course_access(…,'recording')`, signed and short-lived. · L.7 · pass **L3** · open (must close before the
   first upload)
@@ -286,14 +289,14 @@ written down so it isn't lost.
 ### LAUNCH
 
 - [ ] **LA-10 · Session times are invented on the phone.** The real `ps_<id>` slots exist and go unused. · L.9 ·
-  **L2b** + **L2c** · open
+  **L2b** + **L2c** · server half · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (sessions mirror to slots on every write, under the offering id); app half open (L2c)
 - [ ] **LA-11 · No webhook backstop.** A phone that dies mid-payment leaves a paid order with no receipt. · L.1 ·
-  **L2b** · open
+  **L2b** · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (`razorpay-webhook`; the user adds the webhook in the Razorpay dashboard)
 - [ ] **LA-12 · No refunds, and the copy promises three different rules.** · L.12 · **L2b** (server) + **L2c**
-  (copy) · open
-- [ ] **LA-13 · Shop orders: the client can set `paid`.** No unique `payment_id`. · L.18 · **L2b** · open
+  (copy) · server half · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (`request_refund`, `record_refund`, the rule per programme; the money is returned by support from the dashboard until a refund function exists, LA-31); copy open (L2c)
+- [ ] **LA-13 · Shop orders: the client can set `paid`.** No unique `payment_id`. · L.18 · **L2b** · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (an unproven `paid` is demoted to `placed`; unique index)
 - [ ] **LA-14 · A recorded course cannot be sold** (the builder returns `null`). · L.1 · **L2c** · open
-- [ ] **LA-15 · Only the first host is visible** (0056 view). · L.5 · **L2b** · open
+- [ ] **LA-15 · Only the first host is visible** (0056 view). · L.5 · **L2b** · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (`hosts`, lead host prefers role `host`)
 - [ ] **LA-16 · Attendance is self-reported.** · L.15 · **L3** · open
 - [ ] **LA-17 · Host never arrives: nothing happens, and the expert is still paid** (STILL-OPEN §5.4f). · L.14 ·
   **L3** · open
@@ -306,7 +309,11 @@ written down so it isn't lost.
   notice first; push in phase 3). · L.6 · **L4** · open
 - [ ] **LA-27 · Your bookings shows no payments or refunds, and a bought course lives only on the phone.** A
   reinstall or a second phone loses course access and the history. · L.22 · **L2b** (`my_purchases` fields) + **L2c**
-  (Payments section, receipts read from the server) · open
+  (Payments section, receipts read from the server) · server half · built 2026-10-29 in `0126` + the three Razorpay functions, **waiting on run and deploy** (`my_purchases` returns amount, status, provider, mode, payment id, stage, paid / refund dates and the refund rule's verdict); app half open (L2c)
+
+- [ ] **LA-29 · A consult's start time is the parent's pick, not checked against the doctor's schedule.** `book_slot` makes a real-expert consult slot with the server's expert, duration, one seat and price, and refuses a past start, but does not yet read `doctor_schedule` (0033). · L.9 · **L2c** or **L3** · open
+- [ ] **LA-30 · The 20 bundled consults have no server price.** They belong to bundled (fictional) experts: yoga 1:1s, the pregnancy specialists, Mind and Mood, the TTC doctors. A consult is priced from its expert's `expert_profiles` fee (L.1), so these sell only in stub mode. Before live, each becomes a real expert (booked as `off_exp_<id>`) or is withdrawn, the same rule as `ppExpertIsPlaceholder`. · L.1 · **L2c** + content · open
+- [ ] **LA-31 · Refund money is returned by hand.** `request_refund` decides and revokes access at once; support then refunds in the Razorpay dashboard, and the webhook marks it refunded. Automating it is one function calling Razorpay's refund API. · L.12 · before the first real refund · open
 
 ### LATER
 
@@ -359,7 +366,7 @@ Each step depends only on the steps before it.
 |---|---|---|---|
 | **L1** | This doc, BEFORE-LAUNCH rows, MOBBIN-DISCOVERY §39, the prototype (https://claude.ai/artifact/NjtHCJ3J6fLfquN7Tbhdf1: course page, discussion, lesson player, timetable, waiting room, doctor offerings, refund, Your bookings). **Signed off 2026-10-29**, with Your bookings as the one history added (L.22) | — | Signed off |
 | **L2a** | LA-1, LA-2, LA-3: the security hotfix. Contract test on the last `book_slot` | `0123` | Runs it; as an ordinary user, tries to insert into `expert_accounts`, which must be refused |
-| **L2b** | Server receipts and schedule: seeded `programmes`, `programme_runs`, refund rules, `payment_orders`, `course_purchases`, `payment_mode`, `has_course_access`, `record_course_purchase`, `my_purchases` (returning amount, status, paid and refunded dates, payment id and stage, for Your bookings, L.22), `claim_free_offering`, `record_stub_purchase`, the refund function, `book_slot` reading only server values, shop paid status; create-order, verify and a new `razorpay-webhook` | next free (≥ `0126`) | Runs it; deploys three functions; sets `RAZORPAY_WEBHOOK_SECRET`; adds the test webhook; checks that `book_slot` with no purchase is refused in live mode |
+| **L2b** · **built 2026-10-29, `0126`, waiting on run** | Server receipts and schedule: seeded `programmes`, `programme_runs`, refund rules, `payment_orders`, `course_purchases`, `payment_mode`, `has_course_access`, `record_course_purchase`, `my_purchases` (returning amount, status, paid and refunded dates, payment id and stage, for Your bookings, L.22), `claim_free_offering`, `record_stub_purchase`, the refund function, `book_slot` reading only server values, shop paid status; create-order, verify and a new `razorpay-webhook` | next free (≥ `0126`) | Runs it; deploys three functions; sets `RAZORPAY_WEBHOOK_SECRET`; adds the test webhook; checks that `book_slot` with no purchase is refused in live mode |
 | **L2c** | The app on the server: `PaymentService` sends only the id; `my_purchases()` replaces local minting (kept for revert); the app books `ps_<id>`; the preview through the stub; a recorded course sellable; refund copy; Your bookings gains Payments and reads receipts from the server (L.22) | — | Installs the build; walks buy → book → join in test mode |
 | **L3** | `livekit-webhook` (attendance, +10 / +20 states), room capacity, the 0075 fallback removed, egress → bucket → Mux → lesson, playback through `has_course_access`; Your bookings' Past shows attendance and the recording | next free | Creates a Mux account; LiveKit Ship before the first paid class |
 | **L4** | Community phase 2 on this model (Part B of `course-receipts-then-community-p2.md`), including the doctor's "Your offerings" | next free | As in Part B |
@@ -368,7 +375,7 @@ Each step depends only on the steps before it.
 still in `stub` mode. When you change a contract, the server learns the new shape first and the client moves
 after, so the people already using it never see a break.
 
-**Migration numbers** (2026-10-29): `0123` is free and is L2a's. `0124` (programme age window) and `0125` (Mind and
+**Migration numbers** (2026-10-29): L2b took `0126`. `0123` is free and is L2a's. `0124` (programme age window) and `0125` (Mind and
 Mood entries) are other terminals'. Every later pass re-checks `ls supabase/migrations` first and takes the next
 free number. Never rename another terminal's file.
 

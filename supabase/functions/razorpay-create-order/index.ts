@@ -5,23 +5,32 @@
 //  the Key SECRET, which must never ship in a client. This function holds the
 //  secret (as a Supabase env var) and returns only the order id + amount.
 //
-//  TWO CALLERS SINCE 2026-09-17. A booking sends `amountMinor` + `offeringId`
-//  as before. The product store ALSO sends `lines: [{productId, variantId?,
-//  qty}]`, and then THE SERVER PRICES THE ORDER from `public.products` —
-//  "money is decided server-side, always". A phone can be edited; a price
-//  the server looked up cannot. If a line's product is not in the table yet
-//  (the unified catalogue is still seed-only until 0083 is loaded), the
-//  function falls back to the client's amount and writes
-//  `notes.priced_by = "client"` on the Razorpay order, so the fallback is
-//  visible in the dashboard rather than silent. Never refuse: a shop that
-//  cannot take money because the catalogue table is behind is a worse
-//  failure than an auditable one.
+//  SINCE 0126 (L2b) THE SERVER DECIDES THE AMOUNT, for everything.
 //
-//  DEPLOY:
-//    supabase functions deploy razorpay-create-order --no-verify-jwt
+//    * It knows WHO is paying. The caller's JWT is read (getUser) and the
+//      order is recorded against that user in `payment_orders` BEFORE
+//      Razorpay hears of it (LA-8). An order with no owner cannot be turned
+//      into a receipt by verify, so an anonymous caller gets nothing.
+//    * An OFFERING is priced by `open_payment_order` -> `price_offering()`,
+//      the same function book_slot reads, from an offering id alone. The
+//      `amountMinor` the app sends is IGNORED for anything the server knows
+//      (LA-4: "pay ₹1 for a ₹2,499 course" is gone).
+//    * SHOP `lines` are priced from `public.products`, as since 2026-09-17.
+//
+//  THE ONE ALLOWANCE, and it is stub-only. Today's app still sends offerings
+//  the server cannot price (the 20 bundled consults, LA-30). In payment_mode
+//  'stub' those are charged at the phone's figure and the order row says
+//  priced_by = 'client', visible rather than silent. In 'live' they are
+//  refused with 400. That is how the old app keeps working while the contract
+//  moves server-first.
+//
+//  DEPLOY (no --no-verify-jwt since 0126: the gateway checks the JWT, and the
+//  code below reads it):
+//    supabase functions deploy razorpay-create-order
 //  SECRETS (set once):
-//    supabase secrets set RAZORPAY_KEY_ID=rzp_test_TGxRqeBTGuJAzQ
+//    supabase secrets set RAZORPAY_KEY_ID=rzp_test_...
 //    supabase secrets set RAZORPAY_KEY_SECRET=<your test key secret>
+//  (SUPABASE_URL / SUPABASE_ANON_KEY / SUPABASE_SERVICE_ROLE_KEY are injected.)
 // =============================================================================
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -30,13 +39,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const KEY_ID = Deno.env.get("RAZORPAY_KEY_ID") ?? "";
 const KEY_SECRET = Deno.env.get("RAZORPAY_KEY_SECRET") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
 type Line = { productId: string; variantId?: string; qty: number };
 
 /// Sum the lines from the products table, in paise. Null = could not price
-/// every line (a product missing, or no service key), so the caller falls
-/// back to the client amount and says so.
+/// every line (a product missing, or no service key). What happens next is
+/// open_payment_order's decision: the client figure in stub mode, a refusal
+/// in live mode.
 async function priceLines(lines: Line[]): Promise<number | null> {
   if (!SUPABASE_URL || !SERVICE_KEY || lines.length === 0) return null;
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
@@ -77,41 +88,68 @@ const json = (body: unknown, status = 200) =>
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (!KEY_ID || !KEY_SECRET) return json({ error: "keys not set" }, 500);
+  if (!SUPABASE_URL || !SERVICE_KEY) return json({ error: "server not set" }, 500);
 
   try {
+    // 1) Who is paying. The caller's own token, validated by Auth.
+    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
+      global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } },
+    });
+    const { data: { user } } = await authClient.auth.getUser();
+    if (!user) return json({ error: "not signed in" }, 401);
+
     const { amountMinor, offeringId, lines } = await req.json();
-    if (typeof amountMinor !== "number" || amountMinor <= 0) {
-      return json({ error: "bad amount" }, 400);
-    }
+    const isShop = Array.isArray(lines) && lines.length > 0;
+    const clientAmount =
+      typeof amountMinor === "number" && amountMinor > 0 ? Math.floor(amountMinor) : null;
 
-    // Server pricing for product orders; the client's figure only as the
-    // audited fallback.
-    let chargeMinor = amountMinor;
-    let pricedBy = "client";
-    if (Array.isArray(lines) && lines.length > 0) {
-      const priced = await priceLines(lines as Line[]);
-      if (priced !== null && priced > 0) {
-        chargeMinor = priced;
-        pricedBy = "server";
-      }
-    } else {
-      pricedBy = "offering";
-    }
+    // 2) What it costs: the server's figure, recorded before Razorpay is asked.
+    const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+    const { data: po, error: poErr } = await admin.rpc("open_payment_order", {
+      p_user_id: user.id,
+      p_purpose: isShop ? "shop" : "offering",
+      p_offering_id: isShop ? null : String(offeringId ?? ""),
+      p_server_amount: isShop ? await priceLines(lines as Line[]) : null,
+      p_client_amount: clientAmount,
+    });
+    if (poErr) return json({ error: poErr.message }, 500);
+    if (!po?.ok) return json({ error: po?.reason ?? "refused" }, 400);
 
+    // 3) The Razorpay order, tied back to our row by `receipt` and notes, so
+    //    the webhook can find it even if the phone never calls verify.
     const auth = "Basic " + btoa(`${KEY_ID}:${KEY_SECRET}`);
     const res = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",
       headers: { Authorization: auth, "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: chargeMinor, // paise
+        amount: po.amount_paise, // paise
         currency: "INR",
-        notes: { offeringId: String(offeringId ?? ""), priced_by: pricedBy },
+        receipt: po.payment_order_id,
+        notes: {
+          payment_order_id: po.payment_order_id,
+          offeringId: String(offeringId ?? ""),
+          priced_by: po.priced_by,
+          mode: po.mode,
+        },
       }),
     });
 
     const order = await res.json();
     if (!res.ok) return json({ error: order }, 400);
-    return json({ orderId: order.id, amount: order.amount });
+
+    const { error: linkErr } = await admin
+      .from("payment_orders")
+      .update({ razorpay_order_id: order.id })
+      .eq("id", po.payment_order_id);
+    // Without the link, verify cannot find whose order this is and would
+    // refuse a real payment. Better to fail now, before any money moves.
+    if (linkErr) return json({ error: linkErr.message }, 500);
+
+    return json({
+      orderId: order.id,
+      amount: order.amount,
+      paymentOrderId: po.payment_order_id,
+    });
   } catch (e) {
     return json({ error: String(e) }, 500);
   }

@@ -105,7 +105,10 @@ void main() {
       expect(d.body, contains('for update skip locked'), reason: d.file);
       expect(d.body, contains('set booking_id = v_booking.id, spent_at = now()'), reason: d.file);
       expect(d.body, contains("set paid_by = 'credit'"), reason: d.file);
-      expect(d.body, contains("'upcoming', 'unpaid', p_price_paise"), reason: d.file);
+      // Since 0126 (L2b) the booking records the SERVER's seat value, not
+      // the phone's p_price_paise (LA-6). Kept for revert:
+      // expect(d.body, contains("'upcoming', 'unpaid', p_price_paise"), reason: d.file);
+      expect(d.body, contains("'upcoming', 'unpaid', v_seat_paise"), reason: d.file);
     });
 
     test('a consult credit is only spent on a one-seat slot', () {
