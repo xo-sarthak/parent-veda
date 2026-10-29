@@ -462,7 +462,9 @@ final List<PvRead> kTtcReadsBodyCycle = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Check the signs of PCOS'),
+        // The tool's one name (T5 hand-over item 2, 2026-10-29). Kept for
+        // revert: title: _en('Check the signs of PCOS'),
+        title: _en('Take the PCOS symptom check'),
         value: _en('A short check that helps you decide what to ask your '
             'doctor about.'),
         surfaceId: 'ttc_pcos_check',

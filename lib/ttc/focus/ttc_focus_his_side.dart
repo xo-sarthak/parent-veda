@@ -526,8 +526,12 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         TtcToolTile(
           title: 'What he can track',
           id: 'ttc_tile_what_he_can_track',
-          blurb: 'Sleep, alcohol, tobacco, heat and movement: his own log, on '
-              'his own account.',
+          // T5 hand-over item 1, 2026-10-29: each partner may now share
+          // their habit log (0131). Kept for revert:
+          // blurb: 'Sleep, alcohol, tobacco, heat and movement: his own log, on '
+          //     'his own account.',
+          blurb: 'Sleep, alcohol, tobacco, heat and movement: his own log, '
+              'and he can choose to share it with you.',
           surfaceId: 'ttc_partner_health',
         ),
         // ⚠️ ONE TOOL SHOWN TWICE, NOT TWO TOOLS — Step 5b. IVF's "Keep your

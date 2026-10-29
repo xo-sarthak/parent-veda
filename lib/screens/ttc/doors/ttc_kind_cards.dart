@@ -446,7 +446,9 @@ String ttcToolVerb(String surfaceId, [String? title]) => switch (surfaceId) {
   'ttc_calendar' => 'Open the calendar',
   'ttc_symptom_log' => "Log today's symptoms",
   'ttc_fertility_help' => 'Take the fertility check',
-  'ttc_pcos_check' => 'Take the PCOS check',
+  // The tool's one name (T5 hand-over item 2, 2026-10-29). Kept for revert:
+  // 'Take the PCOS check',
+  'ttc_pcos_check' => 'Take the PCOS symptom check',
   'ttc_precheck' => 'Open your checklist',
   'ttc_medication' => 'Open your medicines',
   'ttc_supplements' => 'Open your supplements',
