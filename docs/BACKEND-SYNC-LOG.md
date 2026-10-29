@@ -1694,3 +1694,40 @@ The birth plan lived only on her phone, and the partner's phone showed his own e
 - A session started at 23:50 keeps its time after sign-out and sign-in.
 - Logged out, open a recipe from search, add to list, then open the Nutrition door: water and earlier ticks are
   still there.
+
+---
+
+## Step 28: whose supplement it is, from the row's owner; a second vaccine dose as one more item (T3)
+
+**Date:** 2026-10-29 (Pregnancy and TTC tools pass, T3, the user's word). **Migration:** none; no table, column or
+item format changed. **Commit:** `ecb47348`.
+
+### Why
+- `ttc_supplements` is couple-scoped: both phones read every row. Each row has `user_id` (who first wrote it) and
+  `for_partner`. The app read `for_partner` as if it were written from THIS phone's side, so on his phone her folic
+  acid read "Yours" and his CoQ10 "Your partner's". An item he added for himself went up as `for_partner: false`
+  and landed on her side on her phone.
+- Varicella is two doses, four weeks apart, and the month's wait before trying counts from the second.
+  `TtcVaccineStore` kept one date per vaccine, so logging dose one showed "clear to try" 28 days later with dose
+  two still to come.
+
+### What changed
+- [x] **Supplements, read:** `TtcSupplementsStore.authorOf(row, me)`. If the row's owner is this phone's user, the
+  flag reads as written; if the owner is the partner, it flips. With no signed-in id (a test, or signed out) the flag
+  reads as before. Doctor questions take the author from `user_id` alone, which is right for them (a question is
+  always its writer's); a supplement can be added FOR the other person, so it needs both fields.
+- [x] **Supplements, write:** `_cloudColumns` writes `for_partner` from the owner's side (`_book.owners[id]`), so
+  his phone editing a row she owns does not flip its meaning. `for_partner` is still written, for older builds.
+- [x] **Vaccines:** dose two is the id `<vaccine>_2` (`v|varicella_2` -> `[done, date]`) in the same maps and the
+  same `ttc_vaccines` merged item set. Every reader walks `kTtcVaccines`, so the extra key is invisible to them.
+  Clearing dose one clears dose two; the wait counts from the last dose; with dose two owed there is no
+  clear-to-try date.
+- [x] Pattern written up: BACKEND-PATTERNS §16zzl.
+- [x] Tests: `test/ttc_t3_getting_ready_test.dart` (W11 on his phone and hers; the `<id>_2` cloud round-trip).
+
+### Verify
+- Two phones, one couple. She adds folic acid for herself and CoQ10 for him; he adds zinc for himself. On her phone:
+  folic acid under "Yours", CoQ10 and zinc under "Your partner's". On his phone: the reverse.
+- He edits the dose of her folic acid: it stays on her side on both phones.
+- Log varicella dose one, sync, open on a second phone: "Dose 2 is due from". Log dose two: both phones show the
+  wait from dose two. Sign out and in: both dates return.

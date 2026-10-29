@@ -180,4 +180,4 @@ Built 2026-10-29 in Terminal B's new session, Waves 1 to 3 without a stop. Every
 - Why, in `docs/CONTENT-BACKEND.md` ("What placed her fertile days reaches Ask Veda").
 - **Inert until the service is redeployed to Railway.** The old service logs it as an ignored field.
 
-**Still owed.** The four BEFORE-LAUNCH CHECK lines above, on the user's word. Terminal A: the PCOS tile line. A Railway redeploy (the askveda commit is 5e87909). Phone walk later.
+**Still owed.** ~~The four BEFORE-LAUNCH CHECK lines above~~: written 2026-10-29. Terminal A: the PCOS tile line. A Railway redeploy (the askveda commit is 5e87909). Phone walk later.

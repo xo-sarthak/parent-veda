@@ -4626,3 +4626,33 @@ Before 0126 the phone decided the price, whether she had paid and what she owned
 **7. What can't be priced can't be sold, so derive "sellable" from the same fact the server uses.** The server prices a consult only from a real expert's fee, booked as `off_exp_<id>`. So the app's rule for "opening soon" is not a list of the 20 bundled consults; it's the id shape: a consult not under `off_exp_` has no server price (`offeringHasServerPrice`). A list would miss the next bundled consult someone adds; a rule derived from how the server prices cannot. (LA-30, the user's decision 2026-10-29: "anything that has no price becomes opening soon".)
 
 **8. A test seam for "signed in" without a backend.** Ownership now depends on who is signed in, and a unit test has no Supabase session. `BookingStore.debugUid` (`@visibleForTesting`) stands in for `SupabaseRepo.userId` when set, and `seedReceipts()` stands in for `my_purchases()`. The seam is one field, and production never sets it. The alternative, a mocking framework, is a dependency this repo deliberately doesn't have (CLAUDE.md: no mocking framework).
+
+## 16zzl. A relative flag in a shared row needs a fixed point of view (T3, no migration, 2026-10-29)
+
+**1. "Mine" is not a fact about a row; it is a fact about a row AND a reader.** `ttc_supplements` rows are read by
+both phones of a couple. The row says `for_partner: true`. For partner of whom? The phone that wrote it meant "for
+my partner". The phone that reads it took it to mean "for MY partner", which on the other phone is the opposite
+person. Neither phone crashed or logged anything: both were sure they were right, and the list was quietly
+mirrored on his side. The general rule: **a field whose meaning depends on who reads it must be stored against a
+fixed reference, and every reader must translate from that reference to itself.** Here the reference is the row's
+owner (`user_id`): `for_partner` means "for the owner's partner". A reader that is not the owner flips it
+(`TtcSupplementsStore.authorOf`). The write side has to agree: a phone editing a row it does not own writes the flag
+from the owner's side, or one edit flips the row for everyone.
+
+*Why not just `user_id`?* That is what doctor questions do, and it is right for them: a question always belongs to
+whoever wrote it. A supplement can be added FOR the other person ("CoQ10 for him", typed on her phone), so whose it
+is and who wrote it are two facts, and the row needs both. **Before copying a pattern from a neighbouring table,
+check that its data has the same shape. Two tables that look the same can differ in exactly the fact that matters.**
+
+*The alternative, named.* An absolute column (`taker_id`, the person who takes it) would need no translation at all,
+and it is the better design for a new table. It costs a migration, a backfill that has to guess for every existing
+row, and a contract change for every installed build. Translating the existing flag fixes the meaning with none of
+those, which is why it was chosen here. Record it as debt to pay if the table is ever reshaped.
+
+**2. A new kind of item can ride an existing key space, if every reader is closed over a known list.**
+Varicella's second dose is stored as the id `varicella_2` in the same maps and the same merged cloud items as
+dose one. That works because every reader walks `kTtcVaccines`, the fixed list of vaccines, and never iterates
+the raw map, so an unknown key is simply never looked at. **This trick costs you a convention: the day someone
+writes `for (final e in _status.entries)` expecting only vaccine ids, `_2` becomes a ghost vaccine.** The header of
+`ttc_vaccine_store.dart` says so, and the round-trip test pins the key. When the readers are NOT closed over a list,
+add a field instead.
