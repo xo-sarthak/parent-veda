@@ -282,6 +282,12 @@ quote cost in USD and INR first).
   kind on the phone in all three stages. `docs/NOTIFICATIONS-PLAN.md` "As built:
   Parenting"; tests `test/pp11_family_messages_test.dart`,
   `test/phone_emoji_test.dart`. Left: 6b (server push).
+- **PLANNED 2026-10-29 (Phase 6b, server push):** `docs/NOTIFICATIONS-6B-PLAN.md`.
+  The server sends visible notifications through Firebase Cloud Messaging, as other
+  apps do. The phone uploads its busy evenings and a quiet-after-loss flag, so
+  the two-a-day cap and the loss rule hold. Offers consent is per stage, in its
+  own table. Campaigns are made with SQL for now. Android first, iPhone later.
+  Not built; B0 (tap routing) is first, on the user's word.
 
 ### 13 · Relevance inside doors
 

@@ -10,7 +10,8 @@ prototype and said build it, with one note: too few pregnancy messages.
   (PP 11, PP 16 in `door-relevance/PARENTING-GAP.md`).
 - **Server push (Phase 6b):** FCM, an edge function, a campaigns table. Every
   message here is local (`flutter_local_notifications`), computed on the phone.
-  6b gets its own plan with costs in USD and INR.
+  6b gets its own plan with costs in USD and INR: `docs/NOTIFICATIONS-6B-PLAN.md`
+  (written 2026-10-29).
 - **Her own reminders** (medicines, appointments, `ReminderStore`): Terminal B's.
   They are never counted against the cap and never moved by it.
 - **Clinic treatment alerts** (the trigger shot, 918001/918002): never capped.
