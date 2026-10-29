@@ -47,7 +47,7 @@ class DoctorHomeScreen extends StatelessWidget {
         // below still matters: a partner with no consulting identity has no
         // expert to look up at all, and falls through to their partner name.
         final session = DoctorSession.instance;
-        final e = session.consults ? doctorInfoById(session.expertId!) : null;
+        final e = session.consults ? doctorInfoFor(session.expertId!, profile: session.profile) : null;
         final partner = PartnerDashboardStore.instance.partner;
 
         final name = e?.name ?? partner?.name ?? 'Your practice';
@@ -321,6 +321,8 @@ class DoctorHomeScreen extends StatelessWidget {
                           bookingId: b.id,
                           title: b.title,
                           displayName: _myName(),
+                          // The doctor's side: refusals speak to them, not to the parent.
+                          asExpert: true,
                           waitingFor: DoctorRoster.instance
                               .patientFor(b.id, stage: b.stage)
                               .name,
@@ -475,6 +477,8 @@ class DoctorHomeScreen extends StatelessWidget {
                         bookingId: '',
                         title: o.title,
                         displayName: _myName(),
+                        // The doctor's side: refusals speak to them, not to the parent.
+                        asExpert: true,
                         waitingFor: o.title,
                         startsUtc: scheduled ? next.startsUtc : now,
                         // An unbooked class is seeded AT THE MOMENT the host
