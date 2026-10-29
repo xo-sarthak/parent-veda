@@ -1112,9 +1112,12 @@ bool kDailyPopupAlwaysShow = false;
 ### Still not built
 
 * **No video on the pregnancy side.** Held by decision, not by difficulty.
-* **Tips are not personalised by age.** The rotation is by day-of-year, so a
+* ~~**Tips are not personalised by age.** The rotation is by day-of-year, so a
   four-month-old and a four-year-old get the same tip. Fine for fourteen
-  general tips; wrong the moment the set grows.
+  general tips; wrong the moment the set grows.~~ **DONE** (found done
+  2026-10-29, PARENTING-GAP 15): the daily tip picks one for the child's age
+  first (`kAgeTips`, `pp_daily_tips.dart:137,160`), on corrected age under
+  24 months since b3caf0dd, and falls back to the general rotation.
 
 ## 5.13 The four Explore redesigns, and the nav restyle
 
@@ -10763,8 +10766,9 @@ waves 0 to 7. Every redesigned screen is shown as an Artifact first.
   **Owed:** (1) ~~TTC's home products still use the priced store card
   (`PvCardRail`) and should move to card B~~ DONE 2026-10-23: `_ProductRailB`
   in `ttc_home_v3.dart`, the PvCardRail line kept for revert; (2) FAQ sections for TTC and Pregnancy,
-  the questions to be written first; (3) "Something changed?" answers are
-  not stored, so they are not a signal; (4) Pregnancy doors: `lead(week)` is
+  the questions to be written first; (3) ~~"Something changed?" answers are
+  not stored, so they are not a signal~~ DONE 2026-10-23: `PpChangesStore`
+  keeps them per child, see §95.12 (marked 2026-10-29, PARENTING-GAP 15); (4) Pregnancy doors: `lead(week)` is
   still only set by Nutrition. Not walked on a phone.
 - **§95.7 Wave 5a, the phase screen — DONE 2026-10-21.** Artifact
   claude.ai/artifact/NYQX3ovZZR4Uxwympe7gCX, approved. `phase_detail_screen.dart`
