@@ -314,7 +314,9 @@ void main() {
     test('the partner packing list opens the bag, not a second list', () {
       final tile = door.allTiles.firstWhere(
           (t) => t.title == 'What to pack for whoever comes with you');
-      expect((tile as PvDoorToolTile).surfaceId, kLabourSurfaceBag);
+      // The same bag, opened on its Partner & extras part (2026-10-29).
+      // Kept for revert: expect(..., kLabourSurfaceBag);
+      expect((tile as PvDoorToolTile).surfaceId, kLabourSurfaceBagPartner);
     });
 
     test('all six classes exist behind the course card', () {

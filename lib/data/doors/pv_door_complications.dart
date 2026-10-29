@@ -73,7 +73,9 @@ const String kCondSurfaceSameDay = 'conditions/same_day';
 const String kCondSurfaceJourney = 'conditions/journey';
 const String kCondSurfaceQuestions = 'conditions/questions';
 const String kCondSurfaceUrgent = 'scans/urgent';
-const String kCondSurfaceConsult = 'consults';
+// Its own id since 2026-10-29 (PG4), as Labour's. Kept for revert:
+// const String kCondSurfaceConsult = 'consults';
+const String kCondSurfaceConsult = 'conditions/consult';
 
 /// ⚠️ IT POINTS AT THE SCANS DOOR'S LOCKER, ON PURPOSE. The brief's own words
 /// for the card: *"'Keep your reports for this' links to My reports in Scans

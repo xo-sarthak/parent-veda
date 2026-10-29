@@ -94,7 +94,13 @@ import 'pv_door_data.dart';
 const String kLabourSurfaceTimer = 'contractions';
 const String kLabourSurfaceBag = 'hospital_bag';
 const String kLabourSurfaceCourse = 'birthing_classes';
-const String kLabourSurfaceConsult = 'consults';
+// Its own id since 2026-10-29 (PG4): 'consults' was the Scans door's too, so
+// this card opened "Talk it through", about reading a report. Kept for
+// revert: const String kLabourSurfaceConsult = 'consults';
+const String kLabourSurfaceConsult = 'labour/consult';
+
+/// The hospital bag opened on its Partner & extras part (2026-10-29).
+const String kLabourSurfaceBagPartner = 'hospital_bag/partner';
 
 /// ⚠️ A ROUTE NAME. `openPvDoorSurface` pushes with `RouteSettings(name: id)`,
 /// so this string is what the navigator stack shows — the same `area/thing`
@@ -145,6 +151,10 @@ final PvDoorPage kLabourDoor = PvDoorPage(
   // Rewritten 2026-09-29 to docs/PREG-VOICE.md.
   heroBlurb: 'What happens on the day, what to decide now, and what to take '
       'with you.',
+  // After a loss (2026-10-29, after PREGNANCY-GAP 31): nothing here is asked
+  // of her now. Some late losses still mean labour, so the pages stay useful.
+  heroBlurbEnded: 'What happens in labour and birth, kept here for whenever '
+      'you want to read it.',
 
   // ⚠️ A LATE BUMP AND A DOORWAY, NOT A PACKED SUITCASE. The literal reading
   // of "what to carry" is a bag, and every stock bag is a holiday suitcase on
@@ -303,7 +313,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
         // from the timer, and the tap lands on the tool's own full screen
         // where the button is the size it needs to be.
         PvDoorToolTile(
-          title: 'Contraction Tracker',
+          title: 'Contraction timer', // the tool's one name (P4); was 'Contraction Tracker'
           blurb: 'Tap when one starts, tap when it stops. It keeps track of '
               'the pattern for you.',
           surfaceId: kLabourSurfaceTimer,
@@ -392,7 +402,7 @@ final PvDoorPage kLabourDoor = PvDoorPage(
       heading: 'Time your contractions', // was 'Time them' (2026-10-22)
       tiles: [
         PvDoorToolTile(
-          title: 'Contraction Tracker',
+          title: 'Contraction timer', // the tool's one name (P4); was 'Contraction Tracker'
           blurb: 'Tap when one starts and when it stops. It shows the pattern '
               'to tell your doctor.',
           surfaceId: kLabourSurfaceTimer,
@@ -608,7 +618,9 @@ final PvDoorPage kLabourDoor = PvDoorPage(
         PvDoorToolTile(
           title: 'What to pack for whoever comes with you',
           blurb: 'The Partner & extras part of your hospital bag.',
-          surfaceId: kLabourSurfaceBag,
+          // Opens on that part now (2026-10-29). Kept for revert:
+          // surfaceId: kLabourSurfaceBag,
+          surfaceId: kLabourSurfaceBagPartner,
         ),
       ],
     ),

@@ -9,7 +9,7 @@
 //                     tap logs, the next tap sets how strong, the week strip
 //                     over it (PvDayStrip, the home's). Under the grid: what
 //                     helps for what she logged today, the evening reminder.
-//    Is this normal?  the ten questions, in her words, each wearing its
+//    Is this normal?  the eleven questions, in her words, each wearing its
 //                     verdict — a "now" row ends in the phone.
 //    By symptom       the library, by where she feels it (six areas).
 //    Your week        the log — a grid of the last seven days, the pattern
@@ -95,7 +95,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
       inlineSurfaceId: kSymSurfaceToday,
       inlineLabel: 'Your check-in',
     ),
-    // ⚠️ A TOOL, NOT A LIST OF READS. The ten rows wear their verdict and a
+    // ⚠️ A TOOL, NOT A LIST OF READS. The eleven rows wear their verdict and a
     // "now" row carries the phone; a read row cannot dial. The questions
     // reach the door's search through `_symptomLibraries`.
     PvDoorGroup(
@@ -148,8 +148,8 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
     // per tab, and each surface has exactly one home.
 
     // ---- Is this normal? -------------------------------------------------------
-    // ⚠️ THE TOOL DRAWS THE TEN. Under it stood "The five to call about", which
-    // opened `SymptomsNormalScreen` — the SAME TEN ROWS the tab was already
+    // ⚠️ THE TOOL DRAWS THE ELEVEN. Under it stood "The five to call about", which
+    // opened `SymptomsNormalScreen` — the SAME ROWS the tab was already
     // showing. The user, walking it (2026-09-22): *"you have listed a lot of
     // things under 'is this normal?', then under 'if it is one of these, call —
     // do not read' you have listed the same ones"*. He is right, and on this
@@ -157,7 +157,7 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
     // teaches her to skim it.
     //
     // So the tab now says each thing once: the five live on Talk as the pinned
-    // flag (one home), the ten are the answers, and the section under them is
+    // flag (one home), the eleven are the answers, and the section under them is
     // the thing neither covers — what to actually SAY when she rings.
     PvDoorSection(
       group: kSymTabNormal,

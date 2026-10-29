@@ -339,6 +339,25 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
         'A gynaecologist can read the report with you, say what the '
         'numbers mean and whether anything needs doing.',
   ),
+  // PG4 (2026-10-29): Labour's and Complications' cards shared the id
+  // 'consults' with Scans, so both opened "Talk it through". Each now carries
+  // its own card's words in.
+  kLabourSurfaceConsult => ConsultationsScreen(
+    lang: c.language,
+    onlyRole: kScanConsultRole,
+    title: 'A 1:1 about the birth',
+    lead:
+        'Half an hour with an obstetrician, to ask everything you want to '
+        'ask about labour and the birth.',
+  ),
+  kCondSurfaceConsult => ConsultationsScreen(
+    lang: c.language,
+    onlyRole: kScanConsultRole,
+    title: 'Your condition, explained',
+    lead:
+        'A gynaecologist can go through your condition with you, what it '
+        'means for this pregnancy and what to watch for.',
+  ),
 
   // ⚠️ THE RESLOT, AND IT IS THE SAME TOOL — NOT A COPY OF IT.
   //
@@ -391,6 +410,8 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   // upstream would otherwise fail on a phone rather than in CI.
   kLabourSurfaceTimer => ContractionTrackerScreen(controller: c),
   kLabourSurfaceBag => ReadyForBirthScreen(controller: c),
+  kLabourSurfaceBagPartner =>
+      ReadyForBirthScreen(controller: c, initialCategory: 'partner'),
   kLabourSurfaceCourse => BirthingClassesScreen(lang: c.language),
   kLabourSurfaceBirthPlan => BirthPlanScreen(pregnancy: c),
 
@@ -421,7 +442,8 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   kSymSurfaceWeek => SymptomsWeekScreen(pregnancy: c),
   kSymSurfaceSend => SymptomsSendScreen(pregnancy: c),
   kSymSurfaceUrgent => SymptomsNormalScreen(pregnancy: c),
-  kSymSurfaceCalling => const SymptomsCallingScreen(),
+  // Kept for revert: kSymSurfaceCalling => const SymptomsCallingScreen(),
+  kSymSurfaceCalling => SymptomsCallingScreen(pregnancy: c),
   kDietSurfaceFasting => const FastingScreen(),
   kDietSurfaceBigger => const NutrientsScreen(),
   kDietSurfaceExperts => const _DieticiansScreen(),
@@ -461,13 +483,15 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   kGarbhSurfaceListenToday => ShravanScreen(controller: c, daily: true),
   kGarbhSurfaceReadToday => GarbhSamvadDailyScreen(
     controller: c,
-    onOpenLibrary: () {}, // the door's own rail is the library
+    // The door's own rail is the library, one Back away, so no row here
+    // (PG3, 2026-10-29: the row drew and did nothing). Kept for revert:
+    // onOpenLibrary: () {}, // the door's own rail is the library
   ),
   // Today's story (the user's sheet, 2026-10-13), on the same record-first screen.
   kGarbhSurfaceStoryToday => GarbhSamvadDailyScreen(
     controller: c,
     piece: garbhStoryForDay(c.currentDay),
-    onOpenLibrary: () {},
+    // Kept for revert (PG3): onOpenLibrary: () {},
   ),
   // ⚠️ THE SESSION ITSELF, since the pillars build — script, narration,
   // figure. Not the practice detail in front of it.
@@ -501,7 +525,9 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
   // Getting ready for baby (2026-09-29): the name finder the parenting stage
   // ships (reused, not copied), the shopping checklist with its newborn
   // starter list, and the hospital bag.
-  kReadySurfaceNames => const BabyNamingHomeScreen(),
+  // The after-loss note shows only after a loss (the Tools tab asks for it
+  // too). Kept for revert: kReadySurfaceNames => const BabyNamingHomeScreen(),
+  kReadySurfaceNames => const BabyNamingHomeScreen(afterLossNote: true),
   kReadySurfaceStore => ProductChecklistScreen(controller: c),
   kReadySurfaceBag => ReadyForBirthScreen(controller: c),
   // Twins and more: not a home tile, opened from Scans & tests and Labour.
@@ -928,6 +954,8 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kScansSurfaceUrgent ||
   kScansSurfaceQuestions ||
   kScansSurfaceConsult ||
+  kLabourSurfaceConsult ||
+  kCondSurfaceConsult ||
   kScansSurfaceParameters ||
   kCondSurfaceFind ||
   kCondSurfaceSameDay ||
@@ -956,6 +984,7 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
   kBsSurfaceRitual ||
   kLabourSurfaceTimer ||
   kLabourSurfaceBag ||
+  kLabourSurfaceBagPartner ||
   kLabourSurfaceCourse ||
   kLabourSurfaceBirthPlan ||
   kMindSurfaceReset ||

@@ -80,6 +80,9 @@ final PvDoorPage kGettingReadyDoor = PvDoorPage(
   heroTitle: 'Getting ready for your baby.',
   heroBlurb: 'Choosing a name, what to buy and what to skip, and getting '
       'your home and your help ready.',
+  // After a loss (2026-10-29): nothing was cleared, and nothing will ask.
+  heroBlurbEnded: 'Your lists and your shortlist of names, kept as you left '
+      'them.',
 
   // ⚠️ NOT LOOKED AT BY THE AUTHOR OF THIS FILE, AND SAID SO. The rule in
   // `pv_door_scans.dart` is "look at it first", and the image hosts were
