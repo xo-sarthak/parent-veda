@@ -117,6 +117,7 @@ class Child {
     this.sexGiven = true,
     this.birthMode,
     this.bornWeeks,
+    this.conditions,
   });
 
   /// How the baby was born, as a `BirthMode` name (normal, cSection, assisted,
@@ -130,6 +131,17 @@ class Child {
 
   /// Weeks of pregnancy at birth when born early, else null (0102).
   int? bornWeeks;
+
+  /// This child's health conditions, as `HealthCondition` names (PP 21,
+  /// 2026-10-29, `children.conditions`, 0129). Strings for the same reason
+  /// as [birthMode]: the enum lives in the family profile.
+  ///
+  /// ⚠️ NULL IS NOT EMPTY. Null: no phone has said, so the family profile
+  /// falls back to this phone's own answers. Empty: she said none, which
+  /// must beat a stale answer on the other parent's phone. Unlike
+  /// [birthMode] (said once), this is edited, so the CHILD's copy is the
+  /// truth when it exists, not this phone's.
+  List<String>? conditions;
 
   final String id;
   String name;
@@ -186,6 +198,7 @@ class Child {
         sexGiven: sexGiven,
         birthMode: birthMode,
         bornWeeks: bornWeeks,
+        conditions: conditions == null ? null : [...conditions!],
       );
 
   /// 'YYYY-MM-DD' for the `dob date` column (and the local cache).
@@ -205,6 +218,7 @@ class Child {
         'sexGiven': sexGiven,
         'birthMode': birthMode,
         'bornWeeks': bornWeeks,
+        'conditions': conditions,
       };
 
   factory Child.fromJson(Map<String, dynamic> j) => Child(
@@ -219,6 +233,7 @@ class Child {
         sexGiven: j['sexGiven'] != false,
         birthMode: j['birthMode'] as String?,
         bornWeeks: (j['bornWeeks'] as num?)?.toInt(),
+        conditions: _names(j['conditions']),
       );
 
   // camelCase model <-> snake_case columns. `user_id` is NOT here: on insert
@@ -237,6 +252,7 @@ class Child {
         if (kChildSexGivenColumn) 'sex_given': sexGiven,
         if (kChildBirthColumns) 'birth_mode': birthMode,
         if (kChildBirthColumns) 'born_weeks': bornWeeks,
+        if (kChildConditionsColumn) 'conditions': conditions,
       };
 
   factory Child.fromRow(Map<String, dynamic> r) => Child(
@@ -257,7 +273,12 @@ class Child {
         sexGiven: r['sex_given'] != false,
         birthMode: r['birth_mode'] as String?,
         bornWeeks: (r['born_weeks'] as num?)?.toInt(),
+        // A missing column (0129 not run) and a null both read as "not said".
+        conditions: _names(r['conditions']),
       );
+
+  static List<String>? _names(Object? raw) =>
+      raw is List ? [for (final e in raw) '$e'] : null;
 }
 
 /// Flip to true once `supabase/migrations/0102_onboarding_v3.sql` has been
@@ -265,6 +286,12 @@ class Child {
 /// on this phone (the child's local copy and the family profile).
 /// Run on the live database 2026-10-17 (the user).
 const bool kChildBirthColumns = true;
+
+/// Flip to true once `supabase/migrations/0129_children_conditions.sql` has
+/// been run on the live database (PP 21). Until then a child's conditions
+/// stay on this phone (the child's local copy and the family profile).
+/// Run on the live database by the user 2026-10-29.
+const bool kChildConditionsColumn = true;
 
 /// Flip to true once `supabase/migrations/0093_children_sex_given.sql` has
 /// been run. Until then `sex_given` is kept on this phone only.
@@ -324,6 +351,9 @@ const bool kChildSexGivenColumn = true;
       if (!r.containsKey('sex_given')) c.sexGiven = mine.sexGiven;
       c.birthMode ??= mine.birthMode;
       c.bornWeeks ??= mine.bornWeeks;
+      // PP 21: a row with no conditions yet (an older app, or 0129 not run)
+      // keeps this phone's. An empty list is an answer and is taken.
+      c.conditions ??= mine.conditions;
       // The growth figures are this phone's own, worked out from the growth
       // log: never taken from another phone's row.
       c
@@ -647,6 +677,22 @@ class ChildProfileStore extends ChangeNotifier {
       ..heightCm = heightCm
       ..headCm = headCm;
     if (_book.stamps.containsKey(c.id)) _book.dirty.add(c.id);
+    notifyListeners();
+    await _persist();
+    await _pushWaiting();
+  }
+
+  /// PP 21: [childId]'s health conditions, as `HealthCondition` names. An
+  /// edit, so it moves the sync clock and the newer write wins on both
+  /// parents' phones. Called by `FamilyProfileStore`, which owns the words.
+  Future<void> setConditions(String childId, List<String> names) async {
+    final c = _children.where((x) => x.id == childId).firstOrNull;
+    if (c == null) return;
+    final next = [...names]..sort();
+    final had = c.conditions == null ? null : ([...c.conditions!]..sort());
+    if (had != null && had.join(',') == next.join(',')) return;
+    c.conditions = next;
+    _book.touch(c.id);
     notifyListeners();
     await _persist();
     await _pushWaiting();

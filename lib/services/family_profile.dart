@@ -500,7 +500,16 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   bool _loaded = false;
 
   // ---- reads --------------------------------------------------------------
-  Set<HealthCondition> get conditions => Set.unmodifiable(_conditions);
+  // Kept for revert (PP 21): Set<HealthCondition> get conditions => Set.unmodifiable(_conditions);
+  /// The ACTIVE child's conditions (PP 21, 2026-10-29). The child's own copy
+  /// when any phone has said (`Child.conditions`, `children.conditions`,
+  /// 0129), which is how the other parent's phone learns them; else this
+  /// phone's bucket. Every read in this store goes through here, so the two
+  /// parents' phones cannot answer differently.
+  Set<HealthCondition> get conditions {
+    final theirs = _activeChild()?.conditions;
+    return Set.unmodifiable(theirs == null ? _conditions : _decode(theirs, HealthCondition.values).toSet());
+  }
   FeedingMethod? get feeding => _feedings.isNotEmpty ? _feedings.first : _feeding;
   Set<FeedingMethod> get feedings => Set.unmodifiable(_feedings);
   SleepPattern? get sleep => _sleeps.isNotEmpty ? _sleeps.first : _sleep;
@@ -581,7 +590,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     return years < 0 || years > 120 ? null : years;
   }
 
-  bool hasCondition(HealthCondition c) => _conditions.contains(c);
+  // Kept for revert (PP 21): bool hasCondition(HealthCondition c) => _conditions.contains(c);
+  bool hasCondition(HealthCondition c) => conditions.contains(c);
   bool wants(Priority p) => _priorities.contains(p);
 
   // ---- pregnancy reads ----
@@ -640,7 +650,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   double get completeness {
     var filled = 0;
     const total = 5;
-    if (_conditions.isNotEmpty || _asked.contains(ProfileField.health)) filled++;
+    if (conditions.isNotEmpty || _asked.contains(ProfileField.health)) filled++; // was _conditions (PP 21)
     if (_feeding != null) filled++;
     if (_sleep != null) filled++;
     if (_priorities.isNotEmpty) filled++;
@@ -657,7 +667,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   bool shouldAsk(ProfileField f) {
     if (_asked.contains(f)) return false;
     return switch (f) {
-      ProfileField.health => _conditions.isEmpty,
+      ProfileField.health => conditions.isEmpty, // was _conditions (PP 21)
       ProfileField.feeding => _feeding == null,
       ProfileField.sleep => _sleep == null,
       ProfileField.priorities => _priorities.isEmpty,
@@ -713,7 +723,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     for (final p in _priorities) {
       add(p.name, 1.0);
     }
-    for (final c in _conditions) {
+    for (final c in conditions) { // was _conditions (PP 21)
       add(c.name, 1.4); // health signals rank strongest
     }
     if (_feeding != null) add(_feeding!.name, 0.8);
@@ -744,7 +754,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   /// a filter that quietly matches nothing the moment she switches to Hindi.
   bool matchesSignal(String text) {
     final t = text.toLowerCase();
-    for (final c in _conditions) {
+    for (final c in conditions) { // was _conditions (PP 21)
       if (t.contains(c.name.toLowerCase()) || t.contains(c.label.toLowerCase())) return true;
     }
     for (final p in _priorities) {
@@ -798,7 +808,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     final c = ChildProfileStore.instance;
     final parts = <String>['${c.name} is ${c.ageLabel} old'];
     if (_feeding != null) parts.add('feeding: ${_feeding!.label.toLowerCase()}');
-    if (_conditions.isNotEmpty) parts.add('noted: ${_conditions.map((e) => e.label.toLowerCase()).join(', ')}');
+    // Kept for revert (PP 21): read _conditions.
+    if (conditions.isNotEmpty) parts.add('noted: ${conditions.map((e) => e.label.toLowerCase()).join(', ')}');
     if (_sleep != null) parts.add('sleep: ${_sleep!.label.toLowerCase()}');
     if (_priorities.isNotEmpty) parts.add('wants help with: ${_priorities.map((e) => e.label.toLowerCase()).join(', ')}');
     return parts.join(' · ');
@@ -831,14 +842,62 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   }
 
   // ---- writes -------------------------------------------------------------
+  // Kept for revert (PP 21):
+  //   void toggleCondition(HealthCondition c) {
+  //     if (!_conditions.add(c)) _conditions.remove(c);
+  //     _save(field: 'conditions', value: c.name);
+  //   }
+  //   void clearConditions() {
+  //     _conditions.clear();
+  //     _save();
+  //   }
+  /// Toggles from what is SHOWN ([conditions]: the child's copy when there
+  /// is one), then writes this phone's bucket and the child's row together.
   void toggleCondition(HealthCondition c) {
-    if (!_conditions.add(c)) _conditions.remove(c);
+    final next = {...conditions};
+    if (!next.add(c)) next.remove(c);
+    _conditions
+      ..clear()
+      ..addAll(next);
     _save(field: 'conditions', value: c.name);
+    _conditionsToChild();
   }
 
   void clearConditions() {
     _conditions.clear();
     _save();
+    _conditionsToChild();
+  }
+
+  /// PP 21: the active child's conditions onto the child's own row, so the
+  /// other parent's phone learns them. Before a real child exists
+  /// (onboarding) the bucket alone holds them, and [_backfillChildConditions]
+  /// carries them across once the child is saved.
+  void _conditionsToChild() {
+    try {
+      final id = ChildProfileStore.instance.activeChildId;
+      if (id == null) return;
+      ChildProfileStore.instance.setConditions(id, [for (final c in _conditions) c.name]);
+    } catch (_) {/* no child store: the bucket still has them */}
+  }
+
+  /// PP 21, once per child and idempotent: a child whose row has never had
+  /// conditions takes this phone's answers (the active child's from memory,
+  /// the others' from their buckets). Without it, conditions given before
+  /// 0129 would stay on this phone, and the other parent would never learn
+  /// them. Only a non-empty answer is copied: an empty bucket is as likely
+  /// "never asked" as "none", and null already reads as this phone's.
+  void _backfillChildConditions() {
+    try {
+      final store = ChildProfileStore.instance;
+      for (final child in store.children) {
+        if (child.conditions != null) continue;
+        final raw = child.id == _loadedBucket
+            ? [for (final c in _conditions) c.name]
+            : [for (final c in _decode(_perChild[child.id]?['conditions'], HealthCondition.values)) c.name];
+        if (raw.isNotEmpty) store.setConditions(child.id, raw);
+      }
+    } catch (_) {/* no child store yet: the next change runs it again */}
   }
 
   /// Single-choice write (onboarding). ⚠️ It fills the SET too: the per-child
@@ -993,6 +1052,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
       // await syncStateFromCloud(); // kept for revert (step 13)
       await syncMergedFromCloud();
     } catch (_) {/* stay local */}
+    // PP 21: children already loaded send no change, so carry once here too.
+    _backfillChildConditions();
   }
 
   // ---- per-child partitioning ---------------------------------------------
@@ -1047,6 +1108,9 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   /// child it belongs to, then load the newly-active child's answers.
   void _onChildSwitched() {
     final now = _bucketId;
+    // PP 21: every change of the child list, not only a switch, may bring a
+    // child whose row has no conditions yet. Idempotent, so safe to run here.
+    _backfillChildConditions();
     if (now == _loadedBucket) return;
     final carried = _childBucket();
     _perChild[_loadedBucket] = carried;
@@ -1060,6 +1124,10 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     }
     _applyChildBucket(_perChild[now] ?? const {});
     _loadedBucket = now;
+    // PP 21: again AFTER the swap. Onboarding's answers (the '_none' bucket)
+    // only become the first child's above, so the carry before the swap
+    // could not see them.
+    _backfillChildConditions();
     notifyListeners();
   }
 

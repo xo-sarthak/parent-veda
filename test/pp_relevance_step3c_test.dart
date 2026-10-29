@@ -133,27 +133,47 @@ void main() {
     });
   });
 
-  group('PP 6: two children (conditions are stored per family)', () {
+  group('PP 6: two children (conditions per child since PP 21)', () {
     test('one child: her noted conditions go', () async {
       await kids.addChild(name: 'Dev', isBoy: true, dob: _eightMonthsAgo);
       fam.toggleCondition(HealthCondition.eczema);
       expect(ppAskVedaContext(now: _now).conditions, ['eczema']);
     });
 
-    test('two children: none go, whichever child is open', () async {
+    // Kept for revert (step 3c, superseded by PP 21 on 2026-10-29: the
+    // conditions are the active child's, so two children no longer silence
+    // them):
+    // test('two children: none go, whichever child is open', () async {
+    //   final older = await kids.addChild(
+    //       name: 'Riya', isBoy: false, dob: _now.subtract(const Duration(days: 1100)));
+    //   final baby = await kids.addChild(name: 'Dev', isBoy: true, dob: _eightMonthsAgo);
+    //   fam.toggleCondition(HealthCondition.eczema);
+    //   fam.toggleCondition(HealthCondition.hearing);
+    //   await kids.switchTo(baby.id);
+    //   final ctx = ppAskVedaContext(now: _now);
+    //   expect(ctx.conditions, isEmpty,
+    //       reason: 'the eczema may be the older child\'s, not the baby\'s');
+    //   expect(ctx.signals, everyElement(isIn(_kSignals)),
+    //       reason: 'no extra-support signal derived from those conditions');
+    //   await kids.switchTo(older.id);
+    //   expect(ppAskVedaContext(now: _now).conditions, isEmpty);
+    // });
+
+    test("two children (PP 21): each child's own conditions go, never the other's", () async {
+      // The app's init registers the child-switch listener that swaps buckets.
+      await fam.init();
       final older = await kids.addChild(
           name: 'Riya', isBoy: false, dob: _now.subtract(const Duration(days: 1100)));
       final baby = await kids.addChild(name: 'Dev', isBoy: true, dob: _eightMonthsAgo);
+      await kids.switchTo(baby.id);
       fam.toggleCondition(HealthCondition.eczema);
+      await kids.switchTo(older.id);
       fam.toggleCondition(HealthCondition.hearing);
+      expect(ppAskVedaContext(now: _now).conditions, ['hearing']);
       await kids.switchTo(baby.id);
       final ctx = ppAskVedaContext(now: _now);
-      expect(ctx.conditions, isEmpty,
-          reason: 'the eczema may be the older child\'s, not the baby\'s');
-      expect(ctx.signals, everyElement(isIn(_kSignals)),
-          reason: 'no extra-support signal derived from those conditions');
-      await kids.switchTo(older.id);
-      expect(ppAskVedaContext(now: _now).conditions, isEmpty);
+      expect(ctx.conditions, ['eczema'], reason: "the baby's, not the older child's");
+      expect(ctx.signals, everyElement(isIn(_kSignals)));
     });
   });
 

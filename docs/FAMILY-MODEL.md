@@ -17,6 +17,7 @@ about the child. Stage is a tag, never an owner.**
 | Account, sign-in, phone, WhatsApp consent | the person (`profiles`) | she exists before any baby does |
 | Cycle, symptoms, journal, scans, due date | the person | it is her body; the partner may read, never write (0012) |
 | Feeds, sleep, vaccines, growth, milestones, documents | **the child** (`children`, via `my_child_ids()`) | both parents log the same baby; a per-parent copy would fork every record (0021) |
+| Facts about the child: birth mode, born-early weeks (0102), health conditions (0129, PP 21) | **the child's own row** (`children` columns) | they were answers on her phone, so his never learned them. An edited set takes the child's copy as the truth when it exists; null means not said, empty means none. The other per-child answers (feeding style, sleep, NICU...) still ride her profile: PARENTING-GAP 22 |
 | The timeline | the person, readable by the couple (`journey_timeline`) | one continuous story from trying to parenting |
 | **Saved items — bookmarks** | **the person** | a bookmark is an act she did; it is hers in every stage after |
 | Partner link | between two persons (`profiles.partner_id`) | he links to *her*, and reaches her children through her |

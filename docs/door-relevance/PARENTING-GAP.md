@@ -23,9 +23,8 @@ Siblings: `PREGNANCY-GAP.md`, `TTC-GAP.md`. Plan and seams: `README.md`.
 
 ## 1. Still open, in build order
 
-### Found in Step 3c
-**21. A child's health conditions are stored per family, not per child** (Weak). Onboarding's conditions (eczema, reflux, a hearing need...) live on `FamilyProfileStore`, so with two children nothing says whose they are. Step 3c sends them to Ask Veda only while one child is saved (`ppAskVedaContext`, held by `test/pp_relevance_step3c_test.dart`, "two children"); the home's extra-support signal has the same blind spot. *Fix (not built):* store conditions on the `Child`, ask whose when a second child is added. Touches `docs/FAMILY-MODEL.md` (the child owns child records), so read that first.
-
+### Found in PP 21
+**22. A child's other answers reach only her phone** (Weak). Feeding, sleep, learning style, NICU, a twin, the vaccine schedule: per child on her phone since B1 (`FamilyProfileStore._perChild`), but inside HER `family_profile` cloud items, so the other parent's phone never learns them (his home, recommendations and Ask Veda go without). Birth mode and born-early weeks already moved to the child's row (0102), conditions in PP 21 (0129). *Fix (not built):* the same move per field, on the child's row, with PP 21's rule (the child's copy is the truth when it exists; null is not said). Found 2026-10-29; the user kept PP 21 to conditions only.
 
 ---
 
@@ -51,6 +50,7 @@ Siblings: `PREGNANCY-GAP.md`, `TTC-GAP.md`. Plan and seams: `README.md`.
 | 15 | Stale docs marked: GLOBAL-CHANGES #2 (Parenting live for courses; consults wait on Directus experts), STILL-OPEN tips by age and §95.6 (3) | 9313ed8a + this commit |
 | 14 | Stale comments: the vaccines header and `familyFromStores` now say every child carries their own visits (B11) | 9313ed8a |
 | 16 | A visit with her own vaccine alarm gets no automatic 3-day message, phone or inbox; read per child (`VaxStore.hasAlarmFor`) | 9313ed8a |
+| 21 | A child's health conditions on the child's own row (`children.conditions`, 0129), so the other parent's phone learns them; the child's copy is the truth when it exists (null = not said, empty = none); her phone's answers carried across once; Ask Veda sends the open child's conditions with two children too. The premise was half stale: conditions were already per child on her phone since B1. 0129 run by the user and `kChildConditionsColumn` on, 2026-10-29 | (pending) |
 | 11 | One cap of two a day across Pregnancy and Parenting (`familyPhonePlan`), a morning tip per child in turn, offers the Pregnancy way (toys with a real age window, classes with a 0124 window); a repeated activity and a doubled title fixed; phone-only emoji in all three stages | ce30abf8 |
 | 13 | Re-checked 2026-10-29: already done 2026-10-27 by the tools pass (CL2, user: "dont hide tools"). The breastfeed timer and tummy time show at every age; guards commented out in `pp_tools_tab.dart:119-135`; held by `pp_tools_tab_test.dart` "no tool is hidden by the child's age". The gap doc was stale | tools pass, 2026-10-27 |
 | 6 | Ask Veda gets the corrected age next to the birthday age, and the family's context as closed ids (never the name or prose: the cache is shared); conditions only with one child; the answer says what it used, from the service's `used_context`. Two repos. Inert until the service is redeployed. The audit's "Pregnancy sends conditions" was wrong: `VedaContext` feeds only the retired offline engine | 3e107d77 (askveda ac6ffac; Railway redeploy owed) |
@@ -59,4 +59,4 @@ Tests: `test/pp_relevance_batch1_test.dart`, `pp_relevance_batch2_test.dart`, `p
 
 ## 3. Decisions still yours
 - Nothing blocking. The hidden-tools question (13) is with the user via Terminal B.
-- When to build PP 21 (conditions per child).
+- When to build PP 22 (the other per-child answers on the child's row).

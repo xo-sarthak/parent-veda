@@ -408,9 +408,14 @@ PpAskVedaContext ppAskVedaContext({DateTime? now}) {
     if (months < 6 && PpSituation._olderChildAtHome(child)) 'two_at_home',
     if (months < 24 && PregnancyRecords.instance.lossBefore(id)) 'after_loss',
   ];
-  final conditions = child.children.length <= 1
-      ? ([for (final c in fam.conditions) c.name]..sort())
-      : const <String>[];
+  // PP 21 (2026-10-29): the conditions are the ACTIVE child's (per-child
+  // buckets since B1, the child's own row since 0129), the same child whose
+  // age goes beside them, so two children no longer silence them. Kept for
+  // revert (step 3c, when they were taken to be the family's):
+  //   final conditions = child.children.length <= 1
+  //       ? ([for (final c in fam.conditions) c.name]..sort())
+  //       : const <String>[];
+  final conditions = [for (final c in fam.conditions) c.name]..sort();
   return PpAskVedaContext(
     ageMonths: months,
     correctedMonths: corrected,
