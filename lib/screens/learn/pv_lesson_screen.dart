@@ -20,6 +20,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../booking/booking_store.dart';
 import '../../data/learn/pv_learn_view.dart';
 import '../../services/pv_learn_progress_store.dart';
 import '../../theme/pv_fonts.dart';
@@ -29,11 +30,23 @@ import 'pv_offering_content.dart';
 
 const String kPvLessonRoutePrefix = 'learn/lesson/';
 
+/// A lesson was opened: the phone's progress, and (L2c) the server's count.
+///
+/// The server's copy is what the course refund rule reads - "7 days, if you
+/// have opened no more than lesson 1" (L.12, 0126 `_refund_check`). The
+/// programme id is the view's id: 0126 seeded every bundled programme under
+/// the app's catalogue id. The server ignores an open by someone without the
+/// recording (a lesson-1 preview), so it is safe to send every time.
+void _opened(PvOfferingView v, PvLearnLesson l) {
+  PvLearnProgressStore.instance.opened(v.id, l.id);
+  if (v.offering != null) BookingStore.instance.recordLessonOpen(v.id, l.id);
+}
+
 /// Opens lesson [index] of [v] — the lesson's own opener when it has one.
 void pvOpenLesson(BuildContext context, PvOfferingView v, int index) {
   if (index < 0 || index >= v.lessons.length) return;
   final l = v.lessons[index];
-  PvLearnProgressStore.instance.opened(v.id, l.id);
+  _opened(v, l); // was: PvLearnProgressStore.instance.opened(v.id, l.id);
   if (l.open != null) {
     l.open!(context);
     return;
@@ -75,12 +88,12 @@ class _PvLessonScreenState extends State<PvLessonScreen> {
     }
     final l = v.lessons[i];
     if (l.open != null) {
-      PvLearnProgressStore.instance.opened(v.id, l.id);
+      _opened(v, l); // was: PvLearnProgressStore.instance.opened(v.id, l.id);
       l.open!(context);
       return;
     }
     setState(() => _i = i);
-    PvLearnProgressStore.instance.opened(v.id, l.id);
+    _opened(v, l); // was: PvLearnProgressStore.instance.opened(v.id, l.id);
   }
 
   @override

@@ -25,6 +25,12 @@
 //  preview so the flow is never a dead end, exactly as `showBookingSheet`
 //  did. Nothing about money changed hands-wise; only where it is asked.
 //
+//  L2c (2026-10-29): the review sheet ends in `BookingStore.acquire`, which
+//  gets the SERVER's receipt (paid, free claim, or the stub preview the server
+//  allows only in stub mode) and reads it back. The sheet says yes only when
+//  that receipt is on the phone, so the commit paths below no longer mint
+//  anything; their old `purchase(o)` lines are kept, commented, for revert.
+//
 //  ⚠️ PAY AFTER PICKING, FOR A 1:1. The old sheet sold the credit first and
 //  showed times second, so a parent could pay and then find no time that
 //  suited. Alan's order — time, then money — is the one a person expects.
@@ -72,7 +78,7 @@ Future<void> pvLearnCommit(BuildContext context, PvOfferingView v) async {
       }
       final ok = await showPvReviewSheet(context, v);
       if (!ok || !context.mounted) return;
-      BookingStore.instance.purchase(o);
+      // BookingStore.instance.purchase(o); // kept for revert (L2c: acquire)
       _play(context, v);
       return;
     case PvCommitAction.buyPack:
@@ -80,7 +86,7 @@ Future<void> pvLearnCommit(BuildContext context, PvOfferingView v) async {
       if (state != PvLearnState.owned) {
         final ok = await showPvReviewSheet(context, v);
         if (!ok || !context.mounted) return;
-        BookingStore.instance.purchase(o);
+        // BookingStore.instance.purchase(o); // kept for revert (L2c: acquire)
       }
       if (!context.mounted) return;
       final slot = await showPvSlotSheet(context, v);
@@ -94,7 +100,7 @@ Future<void> pvLearnCommit(BuildContext context, PvOfferingView v) async {
       if (state != PvLearnState.owned) {
         final ok = await showPvReviewSheet(context, v, slot: slot);
         if (!ok || !context.mounted) return;
-        BookingStore.instance.purchase(o);
+        // BookingStore.instance.purchase(o); // kept for revert (L2c: acquire)
       }
       if (!context.mounted) return;
       await _reserve(context, slot);
@@ -440,8 +446,9 @@ class _SlotSheetState extends State<_SlotSheet> {
 //  The review sheet
 // =============================================================================
 
-/// True when she may proceed — paid, free, or the payment backend is not
-/// configured (the no-charge preview, as before).
+/// True when she may proceed: the server holds her receipt and the phone has
+/// read it (L2c). Paid, free and the stub preview all end there; the preview
+/// is the server's to allow, not this sheet's.
 Future<bool> showPvReviewSheet(
   BuildContext context,
   PvOfferingView v, {
@@ -479,12 +486,15 @@ class _ReviewSheetState extends State<_ReviewSheet> {
       o,
       email: SupabaseRepo.userEmail,
     );
+    final got = await BookingStore.instance.acquire(o, result);
     if (!mounted) return;
     setState(() => _busy = false);
-    if (result.granted || result.outcome == PaymentOutcome.notConfigured) {
+    // Kept for revert (L2c): the phone decided, and "not configured" granted.
+    // if (result.granted || result.outcome == PaymentOutcome.notConfigured) {
+    if (got.owned) {
       Navigator.of(context).pop(true);
-    } else if (result.outcome != PaymentOutcome.cancelled) {
-      pvSnack(context, result.message ?? 'Payment did not go through.');
+    } else if (got.status != AcquireStatus.cancelled) {
+      pvSnack(context, got.message ?? 'Payment did not go through.');
     }
   }
 

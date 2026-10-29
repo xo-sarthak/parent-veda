@@ -18,6 +18,8 @@ import 'package:flutter/material.dart';
 import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
+import '../../booking/payment_service.dart';
+import '../../services/remote/supabase_repo.dart';
 import '../../ttc/ttc_prepare_data.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
@@ -376,11 +378,24 @@ class TtcOfferingScreenClassic extends StatelessWidget {
     );
   }
 
-  void _buy(BuildContext context) {
+  /// L2c (2026-10-29): this button minted the entitlement with NO payment at
+  /// all - a paid TTC programme was free from here. It now goes through
+  /// checkout and the server's receipt, like every other buy (LA-5).
+  Future<void> _buy(BuildContext context) async {
     final o = BookingCatalog.instance.offeringById(offering.id);
     if (o == null) return;
-    BookingStore.instance.purchase(o);
-    pvToast(context, TtcS.current().prepareBought, kind: PvToastKind.done);
+    // Kept for revert:
+    // BookingStore.instance.purchase(o);
+    // pvToast(context, TtcS.current().prepareBought, kind: PvToastKind.done);
+    final nav = Navigator.of(context);
+    final paid = await PaymentService.instance
+        .checkout(o, email: SupabaseRepo.userEmail);
+    final got = await BookingStore.instance.acquire(o, paid);
+    if (got.status == AcquireStatus.cancelled) return;
+    // pvToast checks mounted itself and falls back to the app navigator.
+    // ignore: use_build_context_synchronously
+    pvToast(nav.context, got.owned ? TtcS.current().prepareBought : got.message!,
+        kind: got.owned ? PvToastKind.done : PvToastKind.gentle);
   }
 }
 

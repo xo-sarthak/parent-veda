@@ -571,6 +571,13 @@ class SupabaseRepo {
     // What the parent paid, recorded ON the booking (0084). The doctor's
     // ledger reads this and never the catalogue, so a later price change
     // cannot rewrite what a session was worth when it was booked.
+    //
+    // L2c: no longer sent by the app. 0126 records the SERVER's seat value
+    // and reads this only in stub mode, for an offering it cannot price.
+    // The five slot values above are still sent because book_slot declares
+    // them without defaults, so PostgREST cannot resolve the call without
+    // them; the server reads them only for a consult's start (her pick) and
+    // the stub branch. Dropping them needs defaults first (expand/contract).
     int? priceMinor,
   }) async {
     if (userId == null) return false;
@@ -586,7 +593,7 @@ class SupabaseRepo {
         'p_stage': stage,
         'p_title': title,
         'p_join_url': joinUrl,
-        'p_price_paise': priceMinor,
+        'p_price_paise': ?priceMinor,
       });
       return true;
     } catch (_) {

@@ -2,6 +2,8 @@
 // (catches layout/overflow errors before running on a device).
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/booking/booking_catalog.dart';
+import 'package:parentveda/booking/booking_store.dart';
 
 import 'package:parentveda/screens/post_pregnancy/doors/pp_door_screen.dart' show PpDoorScreen;
 import 'package:parentveda/screens/post_pregnancy/article_archive_screen.dart';
@@ -922,6 +924,13 @@ void main() {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
+    // L2c (LA-14): a paid course is SOLD now, so Module 2 waits behind the
+    // purchase (lesson 1 is the free preview). Own the course first - through
+    // the signed-out seam, as the engine tests do - so this still tests what
+    // it is about: where the lesson opens.
+    BookingStore.instance.purchase(
+        BookingCatalog.instance.offeringForCatalog('rc_sleep')!);
+    addTearDown(BookingStore.instance.resetAll);
 
     await tester.pumpWidget(MaterialApp(home: CourseDetailScreen(course: courseById('sleep'))));
     await tester.pumpAndSettle();

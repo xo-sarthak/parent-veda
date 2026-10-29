@@ -124,28 +124,49 @@ void main() {
     });
   });
 
+  // L2c (2026-10-29): a class's slots are the SERVER timetable, the `ps_`
+  // rows 0126 writes from programme_sessions. These groups used to start from
+  // the generated slot and lay the ledger over it; there is no generated slot
+  // any more, so each test seeds the timetable row it needs. What they pin is
+  // unchanged: the ledger's count and date win, and a host keeps a full or a
+  // running class. The one rule that flipped is the placeholder test, below.
+  ServerSlot ps(String offeringId,
+          {String id = 'ps_s1',
+          int booked = 0,
+          DateTime? at,
+          int capacity = 40}) =>
+      ServerSlot(
+        id: id,
+        offeringId: offeringId,
+        booked: booked,
+        startsUtc: at ?? DateTime.now().toUtc().add(const Duration(days: 6)),
+        expertId: 'exp_host',
+        durationMin: 75,
+        capacity: capacity,
+      );
+
   group('seat counts come from the ledger, not from a hash', () {
     final cat = BookingCatalog.instance;
 
     setUp(ServerSlotStore.instance.resetAll);
     tearDown(ServerSlotStore.instance.resetAll);
 
-    test('a masterclass with no server row shows nobody booked', () {
-      // It used to show `40 + seed % 45` — a stable function of the offering
+    test('a timetabled masterclass nobody has booked shows nobody booked', () {
+      // It used to show `40 + seed % 45` - a stable function of the offering
       // id, convincing precisely because it never changed, and unrelated to
       // whether one person had booked or none had.
       final o = cat.offeringForCatalog('mc_sleepreg');
       expect(o, isNotNull, reason: 'the wired masterclass must resolve');
-      final slots = cat.slotsFor(o!.id);
+      ServerSlotStore.instance.seed({'ps_s1': ps(o!.id)});
+      final slots = cat.slotsFor(o.id);
       expect(slots, isNotEmpty);
       expect(slots.first.booked, 0,
-          reason: 'no server row means no bookings, which is zero, not 43');
+          reason: 'no bookings is zero, not 43');
     });
 
     test('a real count from the server wins', () {
       final o = cat.offeringForCatalog('mc_sleepreg')!;
-      final id = cat.slotsFor(o.id).first.id;
-      ServerSlotStore.instance.seed({id: const ServerSlot(booked: 7, startsUtc: null)});
+      ServerSlotStore.instance.seed({'ps_s1': ps(o.id, booked: 7)});
 
       final after = cat.slotsFor(o.id).first;
       expect(after.booked, 7);
@@ -154,9 +175,7 @@ void main() {
 
     test('a full slot disappears from what is offered', () {
       final o = cat.offeringForCatalog('mc_sleepreg')!;
-      final slot = cat.slotsFor(o.id).first;
-      ServerSlotStore.instance
-          .seed({slot.id: ServerSlot(booked: slot.capacity, startsUtc: null)});
+      ServerSlotStore.instance.seed({'ps_s1': ps(o.id, booked: 40)});
 
       expect(cat.slotsFor(o.id), isEmpty,
           reason: 'a sold-out class must not be offered');
@@ -164,10 +183,14 @@ void main() {
 
     test('a count is never allowed to exceed the cap', () {
       final o = cat.offeringForCatalog('mc_sleepreg')!;
-      final slot = cat.slotsFor(o.id).first;
-      ServerSlotStore.instance.seed(
-          {slot.id: ServerSlot(booked: slot.capacity + 50, startsUtc: null)});
+      ServerSlotStore.instance.seed({'ps_s1': ps(o.id, booked: 90)});
       // Still simply full, not negative-seats-left.
+      expect(cat.slotsFor(o.id), isEmpty);
+    });
+
+    test("another offering's timetable is not this one's", () {
+      final o = cat.offeringForCatalog('mc_sleepreg')!;
+      ServerSlotStore.instance.seed({'ps_s1': ps('off_mc_solids')});
       expect(cat.slotsFor(o.id), isEmpty);
     });
   });
@@ -177,16 +200,13 @@ void main() {
     setUp(ServerSlotStore.instance.resetAll);
     tearDown(ServerSlotStore.instance.resetAll);
 
-    test('the ledger date wins over the generated one', () {
-      // THE BUG THIS PINS. A one-off class is generated as `now + 5..8 days`,
-      // recomputed on every read — so asked on the 23rd it fell on the 28th,
-      // and asked on the 24th the SAME SLOT fell on the 29th. The class never
-      // arrived, and a host's start-time was permanently in the future, which
-      // is why "Start session" could never light up.
+    test('the ledger date is the date, whenever she asks', () {
+      // THE BUG THIS PINS. A one-off class was generated as `now + 5..8
+      // days`, recomputed on every read - so asked on the 23rd it fell on the
+      // 28th, and asked on the 24th the SAME SLOT fell on the 29th.
       final o = cat.offeringForCatalog('mc_sleepreg')!;
-      final id = cat.sessionSlotsFor(o.id).first.id;
       final real = DateTime.utc(2026, 9, 1, 14, 30);
-      ServerSlotStore.instance.seed({id: ServerSlot(booked: 3, startsUtc: real)});
+      ServerSlotStore.instance.seed({'ps_s1': ps(o.id, booked: 3, at: real)});
 
       final onThe23rd =
           cat.sessionSlotsFor(o.id, now: DateTime.utc(2026, 8, 23)).first;
@@ -198,12 +218,24 @@ void main() {
           reason: 'a booked class must not move overnight');
     });
 
-    test('without a ledger row the date is still a placeholder', () {
-      // Honest about where the product is: nobody has booked, so there is
-      // nothing to contradict, and the host may go live whenever.
+    // Kept for revert (L2c): with no ledger row the generated date stood as a
+    // placeholder.
+    //   test('without a ledger row the date is still a placeholder', () {
+    //     final o = cat.offeringForCatalog('mc_sleepreg')!;
+    //     final id = cat.sessionSlotsFor(o.id).first.id;
+    //     expect(ServerSlotStore.instance.isReal(id), isFalse);
+    //   });
+    test('with no session on the server there is no date at all', () {
+      // L2c, the user's decision 2026-10-29 ("server dates only"): an
+      // offering with no `programme_sessions` row has nothing to book, for a
+      // parent or a host. Never an invented day.
       final o = cat.offeringForCatalog('mc_sleepreg')!;
-      final id = cat.sessionSlotsFor(o.id).first.id;
-      expect(ServerSlotStore.instance.isReal(id), isFalse);
+      expect(cat.slotsFor(o.id), isEmpty);
+      expect(cat.sessionSlotsFor(o.id), isEmpty);
+      for (final id in ['co_sleep', 'y_flow_am']) {
+        final x = cat.offeringForCatalog(id)!;
+        expect(cat.slotsFor(x.id), isEmpty, reason: '$id has no timetable');
+      }
     });
   });
 
@@ -216,9 +248,7 @@ void main() {
       // slotsFor drops full slots, which is right for a buyer and would take a
       // host's session away from them entirely.
       final o = cat.offeringForCatalog('mc_sleepreg')!;
-      final slot = cat.sessionSlotsFor(o.id).first;
-      ServerSlotStore.instance
-          .seed({slot.id: ServerSlot(booked: slot.capacity, startsUtc: null)});
+      ServerSlotStore.instance.seed({'ps_s1': ps(o.id, booked: 40)});
 
       expect(cat.slotsFor(o.id), isEmpty, reason: 'not offered to a buyer');
       expect(cat.sessionSlotsFor(o.id), isNotEmpty,
@@ -227,10 +257,9 @@ void main() {
 
     test('a class already running is still visible to the host', () {
       final o = cat.offeringForCatalog('mc_sleepreg')!;
-      final slot = cat.sessionSlotsFor(o.id).first;
       final started = DateTime.utc(2026, 9, 1, 14, 30);
       ServerSlotStore.instance
-          .seed({slot.id: ServerSlot(booked: 5, startsUtc: started)});
+          .seed({'ps_s1': ps(o.id, booked: 5, at: started)});
 
       // Ten minutes into the class.
       final during = started.add(const Duration(minutes: 10));
@@ -242,10 +271,14 @@ void main() {
   });
 
   group('the offerings a host can actually run', () {
+    setUp(ServerSlotStore.instance.resetAll);
+    tearDown(ServerSlotStore.instance.resetAll);
+
     test('a masterclass and a cohort are group formats', () {
       final mc = BookingCatalog.instance.offeringForCatalog('mc_sleepreg');
       expect(mc, isNotNull);
       expect(mc!.kind, OfferingKind.masterclass);
+      ServerSlotStore.instance.seed({'ps_s1': ps(mc.id)});
       // capacity > 1 is what every guard keys on, server and client alike.
       final slot = BookingCatalog.instance.slotsFor(mc.id).first;
       expect(slot.capacity, greaterThan(1));

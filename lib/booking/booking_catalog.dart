@@ -274,7 +274,15 @@ class BookingCatalog {
   static Offering? _fromLearning(LearningProgram p) {
     switch (p.kind) {
       case LearningKind.recordedCourse:
-        return null; // plays, not booked
+        // LA-14 (L2c, 2026-10-29): A RECORDED COURSE IS SOLD. It had no
+        // offering, and the commit bar plays whatever has none - so every
+        // paid course played free. Now it is bought once under `off_<id>`,
+        // the id 0126 seeded with its price and the course refund rule, the
+        // same shape as a priced recorded yoga class. A free one still plays.
+        // Kept for revert: return null; // plays, not booked
+        if (_minor(p.price) == 0) return null;
+        return _recordedCourse('off_${p.id}', ServiceStage.parenting, p.id,
+            p.title, p.instructorId, _minor(p.price));
       case LearningKind.masterclass:
         return Offering(
           id: 'off_${p.id}',
@@ -303,6 +311,24 @@ class BookingCatalog {
         );
     }
   }
+
+  /// A recorded course: bought once, nothing to book, the recording for life
+  /// (L.13). The engine's "bought once" kind is masterclass; the format says
+  /// recorded, so it has no slots and the server's kind (`course`) decides
+  /// the refund rule.
+  static Offering _recordedCourse(String id, ServiceStage stage,
+          String catalogId, String title, String expertId, int priceMinor) =>
+      Offering(
+        id: id,
+        stage: stage,
+        kind: OfferingKind.masterclass,
+        format: SessionFormat.recorded,
+        catalogId: catalogId,
+        title: title,
+        expertId: expertId,
+        priceMinor: priceMinor,
+        grant: const EntitlementGrant(recordingAccess: true),
+      );
 
   /// A doctor/specialist with real availability becomes an in-app 1:1 consult —
   /// the calendar case, on a doctor. An expert with no timings set is not
@@ -335,7 +361,11 @@ class BookingCatalog {
   static Offering? _fromPrep(PrepProgram p) {
     switch (p.kind) {
       case PrepKind.course:
-        return null;
+        // LA-14 (L2c): sold as `off_pg_<id>`, as 0126 seeded it.
+        // Kept for revert: return null;
+        if (_minor(p.price) == 0) return null;
+        return _recordedCourse('off_pg_${p.id}', ServiceStage.pregnancy, p.id,
+            p.title.now, _slug(p.instructorName.now), _minor(p.price));
       case PrepKind.masterclass:
         return Offering(
           id: 'off_pg_${p.id}',
@@ -469,13 +499,22 @@ class BookingCatalog {
     if (o.format == SessionFormat.recorded) return const [];
     final seed = o.catalogId.hashCode & 0x7fffffff;
     switch (o.kind) {
+      // L2c (2026-10-29): a class's times are the SERVER timetable, the `ps_`
+      // slots 0126 writes from `programme_sessions` (LA-10). The generated
+      // times below are kept for revert and no longer reached: an offering
+      // with no sessions shows "dates are being set", never a made-up day.
       case OfferingKind.classPack:
-        return _recurring(at, o, seed,
-            weekdays: _weekdays(seed),
-            hour: 6 + seed % 4, // 6–9am
-            durationMin: 45,
-            capacity: 18 + seed % 8,
-            count: 9);
+      case OfferingKind.masterclass:
+      case OfferingKind.cohort:
+        return _serverTimetable(o);
+      // Kept for revert (L2c): the generated recurring pack times.
+      // case OfferingKind.classPack:
+      //   return _recurring(at, o, seed,
+      //       weekdays: _weekdays(seed),
+      //       hour: 6 + seed % 4, // 6-9am
+      //       durationMin: 45,
+      //       capacity: 18 + seed % 8,
+      //       count: 9);
       case OfferingKind.consult:
         // PHASE 3: the doctor's schedule IS the slot list. What they set in
         // Availability is what a parent sees - same engine, same rules, no
@@ -490,27 +529,46 @@ class BookingCatalog {
           return _fromSchedule(at, o);
         }
         return _calendar(at, o, seed);
-      case OfferingKind.masterclass:
-        return _oneOff(at, o,
-            daysAhead: 5 + seed % 4,
-            hour: 20,
-            durationMin: 75,
-            capacity: 100,
-            seatsTaken: 40 + seed % 45);
-      case OfferingKind.cohort:
-        return _oneOff(at, o,
-            daysAhead: 8 + seed % 6,
-            hour: 19,
-            durationMin: 60,
-            capacity: 50,
-            seatsTaken: 18 + seed % 25);
+      // Kept for revert (L2c): the generated one-off dates.
+      // case OfferingKind.masterclass:
+      //   return _oneOff(at, o,
+      //       daysAhead: 5 + seed % 4,
+      //       hour: 20,
+      //       durationMin: 75,
+      //       capacity: 100,
+      //       seatsTaken: 40 + seed % 45);
+      // case OfferingKind.cohort:
+      //   return _oneOff(at, o,
+      //       daysAhead: 8 + seed % 6,
+      //       hour: 19,
+      //       durationMin: 60,
+      //       capacity: 50,
+      //       seatsTaken: 18 + seed % 25);
       case OfferingKind.subscription:
         return const [];
     }
   }
 
+  /// The server's `ps_` slots for [o] as engine [Slot]s. The host, length and
+  /// seats are the row's; the offering's own values fill a gap only, and a
+  /// gap cannot reach book_slot, which reads the stored row (0126).
+  static List<Slot> _serverTimetable(Offering o) => [
+        for (final s in ServerSlotStore.instance.timetableFor(o.id))
+          Slot(
+            id: s.id,
+            offeringId: o.id,
+            expertId: s.expertId ?? o.expertId,
+            startsUtc: s.startsUtc!,
+            durationMin: s.durationMin ?? 60,
+            capacity: s.capacity ?? 1,
+            booked: s.booked,
+          ),
+      ];
+
   /// The next [count] occurrences of [weekdays] at [hour]:00 local — a recurring
   /// group class.
+  // Unreached since L2c (server timetable); kept for revert.
+  // ignore: unused_element
   static List<Slot> _recurring(
     DateTime from,
     Offering o,
@@ -669,6 +727,8 @@ class BookingCatalog {
   }
 
   /// A single dated session — a masterclass airing or a cohort kickoff.
+  // Unreached since L2c (server timetable); kept for revert.
+  // ignore: unused_element
   static List<Slot> _oneOff(
     DateTime from,
     Offering o, {
@@ -699,6 +759,8 @@ class BookingCatalog {
 
   /// Three weekdays, chosen deterministically so a class always recurs on the
   /// same days between reads.
+  // Unreached since L2c (server timetable); kept for revert.
+  // ignore: unused_element
   static Set<int> _weekdays(int seed) {
     switch (seed % 3) {
       case 0:

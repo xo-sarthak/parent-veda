@@ -182,6 +182,19 @@ PvLearnVerb pvCommitFor(
           note: "We're adding a specialist",
         );
       }
+      // LA-30 (2026-10-29): a bundled consult with no real expert behind it
+      // has no server price, so it cannot be bought. Shown, never hidden.
+      final o = v.offering;
+      if (booking == null &&
+          state == PvLearnState.none &&
+          o != null &&
+          !offeringHasServerPrice(o)) {
+        return const PvLearnVerb(
+          'Opening soon',
+          PvCommitAction.comingSoon,
+          note: 'Opens when a specialist joins',
+        );
+      }
       if (state == PvLearnState.booked && booking != null) {
         return PvLearnVerb(
           'Your session',
@@ -288,6 +301,18 @@ PvLearnTrust pvTtcLeadTrustRow(PvOfferingView v) {
   );
 }
 
+// LA-12 (L2c, 2026-10-29): EVERY REFUND LINE ON THIS PAGE QUOTES THE SERVER.
+// The copy promised three different rules and nothing enforced any of them.
+// The rules now live in 0126 (`_refund_check`, one rule per programme, L.12)
+// and these lines say exactly what it does:
+//   course       7 days, while no more than lesson 1 has been opened
+//   masterclass  until 24 hours before it starts
+//   cohort       before the first session
+//   consult, class pack   support only (L.24); a booked time can be moved
+//                up to 4 hours before (0066 credit_return_hours)
+// And a refund ends everything the purchase gave: seat, recording, thread.
+// Change a rule in SQL and these must move with it. The old lines are kept,
+// commented, beside each.
 List<PvLearnTrust> _pvTrustRowsFor(PvOfferingView v) {
   final reviewer = v.expert.expert != null
       ? 'by ${v.expert.name}'
@@ -302,10 +327,12 @@ List<PvLearnTrust> _pvTrustRowsFor(PvOfferingView v) {
         ),
         PvLearnTrust(
           PvLearnMark.refund,
+          // Kept for revert: 'Full refund within 7 days' /
+          // 'If it is not for you, say so and the money comes back.'
           v.isFree ? 'Free, always' : 'Full refund within 7 days',
           v.isFree
               ? 'Nothing here is locked or upsold.'
-              : 'If it is not for you, say so and the money comes back.',
+              : 'While you have opened no more than lesson 1. Ask from Your bookings.',
         ),
         const PvLearnTrust(
           PvLearnMark.keep,
@@ -323,7 +350,8 @@ List<PvLearnTrust> _pvTrustRowsFor(PvOfferingView v) {
         const PvLearnTrust(
           PvLearnMark.refund,
           'Full refund up to 24 hours before',
-          'Cancel from the app; the seat goes back to someone else.',
+          // Kept for revert: 'Cancel from the app; the seat goes back to someone else.'
+          'Ask from Your bookings; the seat goes back to someone else.',
         ),
         PvLearnTrust(
           PvLearnMark.recording,
@@ -372,10 +400,12 @@ List<PvLearnTrust> _pvTrustRowsFor(PvOfferingView v) {
             'Verified clinician',
             'Registration checked before they are listed.',
           ),
+        // Kept for revert: 'Free cancellation up to 24 hours before' /
+        // 'Later than that and the session is spent — the doctor held the time.'
         const PvLearnTrust(
           PvLearnMark.refund,
-          'Free cancellation up to 24 hours before',
-          'Later than that and the session is spent — the doctor held the time.',
+          'Free to cancel up to 4 hours before',
+          'The session comes back to book again. Refunds go through our support team.',
         ),
         const PvLearnTrust(
           PvLearnMark.notOurs,
@@ -390,10 +420,12 @@ List<PvLearnTrust> _pvTrustRowsFor(PvOfferingView v) {
           'Taught $reviewer',
           'Pregnancy-safe and postnatal-safe by design.',
         ),
+        // Kept for revert: 'Unused classes refunded' /
+        // 'Change your mind before the first class and the pack comes back in full.'
         const PvLearnTrust(
           PvLearnMark.refund,
-          'Unused classes refunded',
-          'Change your mind before the first class and the pack comes back in full.',
+          'Unused classes refunded by support',
+          'Write to us from Help. A booked class can be moved up to 4 hours before.',
         ),
         const PvLearnTrust(
           PvLearnMark.calendar,
@@ -457,8 +489,9 @@ List<PvLearnSession> pvHowItWorks(PvOfferingView v) => switch (v.kind) {
 /// enrol or pay has to answer what stops them: is it for me, what happens,
 /// what if I cannot go, what if it is not for me, is it medical advice.
 /// Every answer here repeats only what the page's own trust rows already
-/// promise (7-day refund on a course, 24 hours on a masterclass or consult,
-/// before the first call on a cohort, no diagnosis from ParentVeda); no new
+/// promise (L2c: 7 days on a course while no more than lesson 1 is opened,
+/// 24 hours on a masterclass, before the first call on a cohort, support for
+/// consults and packs, no diagnosis from ParentVeda); no new
 /// policy is invented in a question. The two questions each kind had before
 /// come first and are unchanged.
 const int kPvFaqMax = 8;
@@ -501,7 +534,8 @@ List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
       'What if it is not for me?',
       v.isFree
           ? 'It is free, so there is nothing to lose. Stop whenever you like.'
-          : 'Say so within 7 days and the money comes back in full.',
+          // Kept for revert: 'Say so within 7 days and the money comes back in full.'
+          : 'Ask within 7 days, from Your bookings, while you have opened no more than lesson 1, and the money comes back in full.',
     ),
     const PvLearnFaq(
       'Is this medical advice?',
@@ -527,7 +561,8 @@ List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
     ),
     PvLearnFaq(
       'Can I get a refund?',
-      'Yes. A full refund up to 24 hours before it starts. Cancel from the app and the seat goes back to someone else.',
+      // Kept for revert: '... Cancel from the app and the seat goes back to someone else.'
+      'Yes. A full refund up to 24 hours before it starts: ask from Your bookings. The seat goes back to someone else, and the recording and thread go with it.',
     ),
     PvLearnFaq(
       'What do I need to join?',
@@ -565,7 +600,8 @@ List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
     ),
     PvLearnFaq(
       'Can I get a refund?',
-      'Yes, in full before the first call. After it starts, the seat is yours and so is the thread.',
+      // Kept for revert: 'Yes, in full before the first call. After it starts, the seat is yours and so is the thread.'
+      'Yes, in full before the first call: ask from Your bookings. After it starts, the seat is yours and so is the thread.',
     ),
     PvLearnFaq(
       'Who else is in the group?',
@@ -603,7 +639,8 @@ List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
     ),
     PvLearnFaq(
       'What if I need to cancel?',
-      'Free up to 24 hours before. Later than that the session is spent, because the doctor held the time.',
+      // Kept for revert: 'Free up to 24 hours before. Later than that the session is spent, because the doctor held the time.'
+      'Cancel up to 4 hours before and the session comes back to book again. Later than that it is spent, because the doctor held the time. For a refund, write to our support team from Help.',
     ),
     PvLearnFaq(
       'How does the call work?',
@@ -629,7 +666,8 @@ List<PvLearnFaq> pvDefaultFaqs(PvOfferingView v) => switch (v.kind) {
     ),
     PvLearnFaq(
       'Can I get a refund?',
-      'Unused classes are refunded. Change your mind before the first class and the pack comes back in full.',
+      // Kept for revert: 'Unused classes are refunded. Change your mind before the first class and the pack comes back in full.'
+      'Unused classes are refunded by our support team: write to us from Help. A booked class can be moved up to 4 hours before.',
     ),
     PvLearnFaq(
       'Do I need any experience?',

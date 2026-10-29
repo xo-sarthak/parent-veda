@@ -11,6 +11,8 @@ import 'package:parentveda/booking/booking_catalog.dart';
 import 'package:parentveda/booking/booking_models.dart';
 import 'package:parentveda/booking/booking_store.dart';
 
+import 'support/timetable.dart';
+
 void main() {
   final cat = BookingCatalog.instance;
   final store = BookingStore.instance;
@@ -44,6 +46,8 @@ void main() {
 
   test('slots come back soonest-first', () {
     final o = cat.offeringForCatalog('y_flow_am')!; // liveGroup class-pack
+    // L2c: a class has the server's dates only; say when it is first.
+    seedTimetable([o.id]);
     final s = cat.slotsFor(o.id);
     expect(s.length, greaterThan(1));
     for (var i = 1; i < s.length; i++) {
@@ -70,6 +74,8 @@ void main() {
   test('an offering flows through purchase -> book end to end', () {
     final o = cat.offeringForCatalog('y_flow_am')!;
     store.purchase(o);
+    // L2c: a class has the server's dates only; say when it is first.
+    seedTimetable([o.id]);
     final slot = cat.slotsFor(o.id).first;
     final b = store.book(slot);
     expect(b, isNotNull);

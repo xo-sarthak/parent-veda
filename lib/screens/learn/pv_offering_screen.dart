@@ -198,6 +198,9 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
   void initState() {
     super.initState();
     BookingStore.instance.init();
+    // L2c: the commit bar's verb depends on what she owns, which is the
+    // server's answer - re-read it whenever a page opens.
+    BookingStore.instance.syncPurchases();
     PvLearnProgressStore.instance.init();
     if (v.isLive) ServerSlotStore.instance.refresh();
   }

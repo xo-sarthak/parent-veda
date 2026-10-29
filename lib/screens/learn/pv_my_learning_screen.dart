@@ -56,12 +56,22 @@
 //      https://mobbin.com/screens/03cb7619-68e6-4030-91ec-70b6a18cae7c
 //  What was not taken: photographs on the cards (Peerspace, Booking.com); a
 //  consult has no picture of its own, and a stock one would be a face.
+//
+//  L2c (2026-10-29, L.22): PAYMENTS. Every payment and refund she has made,
+//  in every stage, read from the server (`my_purchases()`, 0126) and cached
+//  on the phone, so a reinstall or a new phone shows the same history. Each
+//  row opens its receipt: amount, date, payment id, status, and what the
+//  refund rule says today. The rule is the SERVER's verdict (`_refund_check`)
+//  shown, never re-derived; "Request a refund" asks `request_refund` and shows
+//  its answer. Shop orders stay in Your orders. Prototype screen 8, signed off
+//  2026-10-29.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
+import '../../services/remote/supabase_repo.dart';
 import '../../data/learn/pv_learn_view.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pv_learn_progress_store.dart';
@@ -96,6 +106,8 @@ class _PvMyLearningScreenState extends State<PvMyLearningScreen> {
     PvLearnProgressStore.instance.init();
     // Settle anything that has finished, from whether she actually joined.
     BookingStore.instance.settleAttendance();
+    // Payments are the server's record; re-read them each time she looks.
+    BookingStore.instance.syncPurchases();
   }
 
   static String _stageWord(ServiceStage s) => switch (s) {
@@ -278,6 +290,20 @@ class _PvMyLearningScreenState extends State<PvMyLearningScreen> {
                   ),
                 ),
               ],
+              // ---- payments (L2c, L.22) ---------------------------------------------------------
+              // Always drawn: the empty line is the section's advertisement.
+              const SliverToBoxAdapter(
+                child: PvLearnHead(
+                  'Payments',
+                  lead: 'Every payment and refund, with its receipt.',
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: _Payments(
+                  purchases: store.purchases,
+                  stageWord: _stageWord,
+                ),
+              ),
               // ---- past, folded -------------------------------------------------------------------
               if (past.isNotEmpty) ...[
                 SliverToBoxAdapter(
@@ -711,3 +737,229 @@ class _PastFold extends StatelessWidget {
 //
 // and Past, always open, under `const PvLearnHead('Past')`, the same rows as
 // the fold draws now.
+
+
+// =============================================================================
+//  Payments (L2c, L.22)
+// =============================================================================
+
+/// Rupees from paise, Indian grouping: 149900 -> "₹1,499".
+String pvRupees(int minor) {
+  final s = (minor ~/ 100).toString();
+  if (s.length <= 3) return '₹$s';
+  final last3 = s.substring(s.length - 3);
+  var rest = s.substring(0, s.length - 3);
+  final parts = <String>[];
+  while (rest.length > 2) {
+    parts.insert(0, rest.substring(rest.length - 2));
+    rest = rest.substring(0, rest.length - 2);
+  }
+  if (rest.isNotEmpty) parts.insert(0, rest);
+  return '₹${parts.join(',')},$last3';
+}
+
+/// The one line under a payment: what happened to it, then what the refund
+/// rule says. Both are the server's words, put into hers.
+String pvPurchaseLine(Purchase p) {
+  final what = switch (p.status) {
+    'refund_requested' => 'Refund requested · access ended',
+    'refunded' => 'Refunded',
+    'revoked' => 'Ended',
+    _ => p.provider == 'free'
+        ? 'Free'
+        : p.isTest
+        ? 'Paid · test purchase'
+        : 'Paid',
+  };
+  if (!p.isActive || !p.refundEligible) return what;
+  final until = p.refundUntilUtc;
+  return until == null
+      ? '$what · refundable'
+      : '$what · refundable until ${pvLearnDay(until)}';
+}
+
+class _Payments extends StatelessWidget {
+  const _Payments({required this.purchases, required this.stageWord});
+  final List<Purchase> purchases;
+  final String Function(ServiceStage) stageWord;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    if (purchases.isEmpty) {
+      return Padding(
+        key: const ValueKey('pv_payments_empty'),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+        child: Text(
+          SupabaseRepo.isLoggedIn
+              ? 'Nothing paid yet. Every course, class or consult you buy '
+                    'shows here, with its receipt and its refund rule.'
+              : 'Sign in to see your payments. They are kept on your '
+                    'account, so they follow you to a new phone.',
+          style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2),
+        ),
+      );
+    }
+    return Column(
+      key: const ValueKey('pv_payments_list'),
+      children: [
+        for (final x in purchases.take(50))
+          PvLearnRow(
+            leadTop: pvLearnDay(x.paidUtc).toUpperCase(),
+            leadBottom: x.provider == 'free' ? 'Free' : pvRupees(x.amountMinor),
+            tag: x.stage == null ? null : stageWord(x.stage!),
+            title: x.title.isEmpty ? 'Purchase' : x.title,
+            sub: pvPurchaseLine(x),
+            onTap: () => showPvReceiptSheet(context, x),
+          ),
+      ],
+    );
+  }
+}
+
+/// The receipt: what was paid, when, the payment id, the status, the refund
+/// rule's verdict, and - only where that verdict says yes - the refund button.
+Future<void> showPvReceiptSheet(BuildContext context, Purchase x) {
+  final p = pvStorePalette;
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: p.ground,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => _ReceiptSheet(purchase: x),
+  );
+}
+
+class _ReceiptSheet extends StatefulWidget {
+  const _ReceiptSheet({required this.purchase});
+  final Purchase purchase;
+
+  @override
+  State<_ReceiptSheet> createState() => _ReceiptSheetState();
+}
+
+class _ReceiptSheetState extends State<_ReceiptSheet> {
+  /// Asking is two taps: the first shows what a refund ends (L.12: the
+  /// seat, the recording and the discussion), the second asks the server.
+  bool _confirming = false;
+  bool _busy = false;
+
+  Future<void> _refund() async {
+    setState(() => _busy = true);
+    final answer = await BookingStore.instance.requestRefund(widget.purchase);
+    if (!mounted) return;
+    final messenger = context;
+    Navigator.of(context).pop();
+    if (messenger.mounted) pvSnack(messenger, answer);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    final x = widget.purchase;
+    Widget line(String k, String v) => Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 104,
+            child: Text(k, style: pvManrope(fontSize: 13, color: p.ink3)),
+          ),
+          Expanded(
+            child: Text(
+              v,
+              style: pvManrope(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w700,
+                color: p.ink1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    final rule = x.isActive && !x.refundEligible && x.refundReason.isNotEmpty
+        ? pvRefundRefusal(x.refundReason)
+        : null;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              x.title.isEmpty ? 'Receipt' : x.title,
+              style: pvFraunces(
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+                color: p.ink1,
+              ),
+            ),
+            const SizedBox(height: 14),
+            line('Amount', x.provider == 'free' ? 'Free' : pvRupees(x.amountMinor)),
+            line('Date', '${pvLearnDay(x.paidUtc)}, ${pvLearnTime(x.paidUtc)}'),
+            line('Status', pvPurchaseLine(x)),
+            if (x.refundedUtc != null)
+              line(
+                'Refunded',
+                '${pvLearnDay(x.refundedUtc!)}${x.refundMinor == null ? '' : ' · ${pvRupees(x.refundMinor!)}'}',
+              ),
+            if (x.paymentId != null && x.paymentId!.isNotEmpty)
+              line('Payment id', x.paymentId!),
+            if (x.isTest)
+              line('Note', 'A test purchase. No money moved.'),
+            if (rule != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                rule,
+                style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
+              ),
+            ],
+            if (x.isActive && x.refundEligible) ...[
+              const SizedBox(height: 12),
+              if (_confirming)
+                Text(
+                  'A refund ends the seat, the recording and the discussion '
+                  'that came with this.',
+                  style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
+                ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: PvSecondary(
+                      label: _confirming ? 'Keep it' : 'Close',
+                      onTap: () => _confirming
+                          ? setState(() => _confirming = false)
+                          : Navigator.of(context).pop(),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: PvCommit(
+                      key: const ValueKey('pv_receipt_refund'),
+                      label: _busy
+                          ? 'Asking...'
+                          : _confirming
+                          ? 'Yes, refund'
+                          : 'Request a refund',
+                      onTap: _busy
+                          ? null
+                          : () => _confirming
+                                ? _refund()
+                                : setState(() => _confirming = true),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

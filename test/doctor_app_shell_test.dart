@@ -153,11 +153,18 @@ void main() {
       expect(sql, contains("with check (expert_id in (select public.my_expert_ids()) and status = 'pending')"));
     });
 
-    test('book_slot gained price_paise and the client sends it', () {
+    // Kept for revert: 'book_slot gained price_paise and the client sends it'
+    //   expect(_read('lib/services/remote/supabase_repo.dart'), contains("'p_price_paise': priceMinor"));
+    //   expect(_read('lib/booking/booking_store.dart'), contains('priceMinor:'));
+    // L2c (2026-10-29): the client STOPPED sending it. 0126 records the
+    // server's seat value (price_offering) and reads p_price_paise only in
+    // stub mode for an offering it cannot price; the parameter stays declared
+    // (with its default) so an old build still resolves the call.
+    test('book_slot gained price_paise; since L2c the client sends none', () {
       expect(sql, contains('p_price_paise  int  default null'));
       expect(sql, contains('drop function if exists public.book_slot('));
-      expect(_read('lib/services/remote/supabase_repo.dart'), contains("'p_price_paise': priceMinor"));
-      expect(_read('lib/booking/booking_store.dart'), contains('priceMinor:'));
+      expect(_read('lib/services/remote/supabase_repo.dart'), contains("'p_price_paise': ?priceMinor"));
+      expect(_read('lib/booking/booking_store.dart'), contains('// priceMinor: BookingCatalog'));
     });
 
     test('share_bps is not capped at 50% — a delivery share is not a commission', () {

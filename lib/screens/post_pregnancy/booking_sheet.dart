@@ -102,18 +102,26 @@ class _BookingSheetState extends State<_BookingSheet> {
     ServerSlotStore.instance.refresh();
   }
 
-  /// Buy → Razorpay checkout (order + pay + verify) → mint the entitlement.
-  /// A free offering skips payment; if the payment backend is not reachable it
-  /// falls back to the no-charge preview so the flow is never a dead end.
+  /// Buy → Razorpay checkout (order + pay + verify) → the server's receipt,
+  /// read back (L2c). A free offering is claimed on the server; if the payment
+  /// backend is not reachable the server's stub preview stands in, in stub
+  /// mode only.
   Future<void> _buy() async {
     setState(() => _busy = true);
     final result = await PaymentService.instance.checkout(o);
+    // L2c: the server writes the receipt and the phone reads it back.
+    final got = await BookingStore.instance.acquire(o, result);
     if (!mounted) return;
     setState(() => _busy = false);
-    if (result.granted || result.outcome == PaymentOutcome.notConfigured) {
-      BookingStore.instance.purchase(o);
-    } else if (result.outcome != PaymentOutcome.cancelled) {
-      pvToast(context, result.message ?? 'Payment failed.', kind: PvToastKind.gentle);
+    // Kept for revert (L2c): the phone minted, and "not configured" granted.
+    // if (result.granted || result.outcome == PaymentOutcome.notConfigured) {
+    //   BookingStore.instance.purchase(o);
+    // } else if (result.outcome != PaymentOutcome.cancelled) {
+    //   pvToast(context, result.message ?? 'Payment failed.', kind: PvToastKind.gentle);
+    // }
+    if (!got.owned && got.status != AcquireStatus.cancelled) {
+      pvToast(context, got.message ?? 'Payment failed.',
+          kind: PvToastKind.gentle);
     }
   }
 

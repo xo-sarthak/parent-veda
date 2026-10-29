@@ -58,8 +58,11 @@ void main() {
     });
 
     test('no answer promises a refund window the trust rows do not', () {
-      // The refund answers repeat the page's own rows: 7 days (course),
-      // 24 hours (masterclass, consult), before the first call (cohort).
+      // The refund answers repeat the page's own rows, which quote the
+      // server's rules (L2c, LA-12; 0126 _refund_check): 7 days while no
+      // more than lesson 1 is opened (course), 24 hours (masterclass), before
+      // the first call (cohort), support only with a 4-hour move window
+      // (consult, class pack: L.24, 0066 credit_return_hours).
       String refund(PvLearnKind k) => pvFaqsFor(
               PvLearnCatalog.instance.all(kind: k).first)
           .where((f) => f.q.toLowerCase().contains('refund') ||
@@ -68,7 +71,11 @@ void main() {
           .map((f) => f.a)
           .join(' ');
       expect(refund(PvLearnKind.masterclass), contains('24 hours'));
-      expect(refund(PvLearnKind.consult), contains('24 hours'));
+      // Kept for revert: expect(refund(PvLearnKind.consult), contains('24 hours'));
+      expect(refund(PvLearnKind.consult), contains('4 hours'));
+      expect(refund(PvLearnKind.consult), contains('support'));
+      expect(refund(PvLearnKind.classPack), contains('support'));
+      expect(refund(PvLearnKind.course), contains('lesson 1'));
       expect(refund(PvLearnKind.cohort), contains('before the first call'));
     });
   });

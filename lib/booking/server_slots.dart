@@ -61,6 +61,21 @@
 //  `booking_slots` is readable by any signed-in user on purpose — 0029's policy
 //  is `using (true)`, with the note that "a seat count is not private" — so
 //  this needs no special grant and no definer function.
+//
+// -----------------------------------------------------------------------------
+//  L2c (2026-10-29): THE TIMETABLE IS THE SERVER'S, FULL STOP
+// -----------------------------------------------------------------------------
+//  The rule above ("no row -> the generated date is a placeholder") is
+//  retired for classes. Since 0126 a `programme_sessions` row becomes a
+//  `ps_<session id>` slot the moment it is written, under the OFFERING id the
+//  app books with. So the timetable for a masterclass, cohort or class pack is
+//  exactly the `ps_` rows for that offering — [timetableFor] — and an offering
+//  with none has no dates yet (the sheet says so). Consults are unchanged:
+//  their times are the doctor's schedule, and book_slot makes the slot.
+//
+//  This store now keeps the whole slot (offering, host, length, seats), not
+//  just the seat count and date, because the catalogue builds its [Slot]s
+//  from it rather than from a hash of the offering id.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
@@ -69,9 +84,28 @@ import '../services/remote/supabase_repo.dart';
 
 @immutable
 class ServerSlot {
-  const ServerSlot({required this.booked, required this.startsUtc});
+  const ServerSlot({
+    required this.booked,
+    required this.startsUtc,
+    this.id = '',
+    this.offeringId = '',
+    this.expertId,
+    this.durationMin,
+    this.capacity,
+  });
   final int booked;
   final DateTime? startsUtc;
+
+  // L2c: the rest of the row, so a class's slots can be built from it.
+  final String id;
+  final String offeringId;
+  final String? expertId;
+  final int? durationMin;
+  final int? capacity;
+
+  /// A slot the timetable wrote (0126 `_mirror_session`), as opposed to one a
+  /// consult booking created.
+  bool get isTimetabled => id.startsWith('ps_');
 }
 
 class ServerSlotStore extends ChangeNotifier {
@@ -103,6 +137,15 @@ class ServerSlotStore extends ChangeNotifier {
   /// The date this slot actually has, or null while it is still a placeholder.
   DateTime? startsUtc(String slotId) => _slots[slotId]?.startsUtc;
 
+  /// The server timetable for [offeringId]: its `ps_` slots, soonest first.
+  /// Empty means no session has been scheduled yet - not "unknown", and never
+  /// a cue to invent one.
+  List<ServerSlot> timetableFor(String offeringId) => _slots.values
+      .where((s) =>
+          s.isTimetabled && s.offeringId == offeringId && s.startsUtc != null)
+      .toList()
+    ..sort((a, b) => a.startsUtc!.compareTo(b.startsUtc!));
+
   /// Pull every slot the ledger holds. Cheap: one row per slot that has ever
   /// been booked, and the table holds nothing personal.
   ///
@@ -126,6 +169,11 @@ class ServerSlotStore extends ChangeNotifier {
           booked: (r['booked'] as num?)?.toInt() ?? 0,
           startsUtc: DateTime.tryParse((r['starts_utc'] ?? '').toString())
               ?.toUtc(),
+          id: id,
+          offeringId: (r['offering_id'] ?? '').toString(),
+          expertId: r['expert_id']?.toString(),
+          durationMin: (r['duration_min'] as num?)?.toInt(),
+          capacity: (r['capacity'] as num?)?.toInt(),
         );
       }
       _loaded = true;

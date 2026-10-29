@@ -13,6 +13,8 @@ import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/screens/post_pregnancy/my_bookings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/timetable.dart';
+
 void main() {
   // Mock prefs so the store's async _save() resolves cleanly instead of throwing
   // a MissingPluginException that can bleed into a later test under the runner.
@@ -53,6 +55,8 @@ void main() {
   testWidgets('a booked session and its credits render', (tester) async {
     final o = BookingCatalog.instance.offeringForCatalog('y_flow_am')!;
     store.purchase(o);
+    // L2c: a class has the server's dates only; say when it is first.
+    seedTimetable([o.id]);
     store.book(BookingCatalog.instance.slotsFor(o.id).first);
 
     await pump(tester);

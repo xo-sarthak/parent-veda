@@ -260,6 +260,21 @@ class Slot {
 /// rewards use it: "a free consultation" is not a promise about who with.
 const String kAnyConsultOffering = '*any_consult';
 
+/// Can the SERVER price [o]? (LA-30, decided by the user 2026-10-29:
+/// "anything that has no price becomes opening soon".)
+///
+/// Since L2c the phone sends no amount, so an offering the server cannot price
+/// cannot be bought. Every class, course and pack the app sells is seeded in
+/// `programmes` (0126, held equal by test/learning_money_contract_test). A
+/// consult is priced from its REAL expert's fee, and a real expert is booked as
+/// `off_exp_<id>` (`_fromExpert`). So the only unpriced offerings are the
+/// bundled consults under other prefixes - yoga 1:1s, the pregnancy
+/// specialists, Mind and Mood, the TTC doctors - and they stay on the shelf as
+/// "opening soon" until a real expert takes them. Derived from the id, not
+/// listed, so a new bundled consult cannot slip past it.
+bool offeringHasServerPrice(Offering o) =>
+    o.kind != OfferingKind.consult || o.id.startsWith('off_exp_');
+
 @immutable
 class Entitlement {
   const Entitlement({
@@ -471,3 +486,107 @@ ServiceStage _stageFrom(Object? v) => ServiceStage.values.firstWhere(
       (s) => s.name == v,
       orElse: () => ServiceStage.parenting,
     );
+
+// ---------------------------------------------------------------------------
+//  Purchase — the SERVER's receipt (L2c, 0126 `my_purchases()`)
+// ---------------------------------------------------------------------------
+
+/// One row of `my_purchases()`: what the server says she bought, and what its
+/// refund rule says about it today.
+///
+/// ⚠️ THIS IS A COPY, NEVER THE RECORD. Before L2c the phone minted an
+/// [Entitlement] the moment checkout said yes, and that entitlement WAS the
+/// purchase - edit the prefs and you owned any course (LA-5). Now the server
+/// writes the receipt (verify, the webhook, a free claim or the stub) and the
+/// phone keeps the last answer so the page can render offline. Ownership is
+/// derived from these rows; nothing on the phone can add one.
+@immutable
+class Purchase {
+  const Purchase({
+    required this.id,
+    required this.offeringId,
+    required this.title,
+    required this.kind,
+    required this.amountMinor,
+    required this.status,
+    required this.provider,
+    required this.mode,
+    required this.paidUtc,
+    this.programmeId,
+    this.runId,
+    this.stage,
+    this.paymentId,
+    this.refundRequestedUtc,
+    this.refundedUtc,
+    this.refundMinor,
+    this.refundEligible = false,
+    this.refundUntilUtc,
+    this.refundReason = '',
+  });
+
+  final String id;
+  final String offeringId;
+  final String? programmeId;
+  final String? runId;
+
+  /// The SERVER's kind: masterclass | cohort | course | class_pack | consult.
+  /// Not [OfferingKind] - a recorded course is `course` here and a recorded
+  /// `masterclass` in the app's engine, and the refund copy needs the former.
+  final String kind;
+  final String title;
+  final ServiceStage? stage;
+  final int amountMinor;
+
+  /// active | refund_requested | refunded | revoked
+  final String status;
+
+  /// razorpay | free | stub
+  final String provider;
+
+  /// stub | live. A stub receipt stops counting the day the switch goes live,
+  /// on the server; the phone shows it as a test purchase.
+  final String mode;
+  final String? paymentId;
+  final DateTime paidUtc;
+  final DateTime? refundRequestedUtc;
+  final DateTime? refundedUtc;
+  final int? refundMinor;
+
+  /// The refund rule's verdict, computed by the server (`_refund_check`). The
+  /// phone shows it and never re-derives it - one rule, one place.
+  final bool refundEligible;
+  final DateTime? refundUntilUtc;
+  final String refundReason;
+
+  bool get isActive => status == 'active';
+  bool get isTest => mode == 'stub' || provider == 'stub';
+
+  static DateTime? _at(Object? v) =>
+      v == null ? null : DateTime.tryParse(v.toString())?.toUtc();
+
+  /// From a `my_purchases()` element (snake_case, as the server writes it).
+  static Purchase fromRow(Map r) {
+    final refund = r['refund'] is Map ? r['refund'] as Map : const {};
+    return Purchase(
+      id: (r['id'] ?? '').toString(),
+      offeringId: (r['offering_id'] ?? '').toString(),
+      programmeId: r['programme_id']?.toString(),
+      runId: r['run_id']?.toString(),
+      kind: (r['kind'] ?? '').toString(),
+      title: (r['title'] ?? '').toString(),
+      stage: r['stage'] == null ? null : _stageFrom(r['stage']),
+      amountMinor: (r['amount_paise'] as num?)?.toInt() ?? 0,
+      status: (r['status'] ?? 'active').toString(),
+      provider: (r['provider'] ?? '').toString(),
+      mode: (r['mode'] ?? '').toString(),
+      paymentId: r['payment_id']?.toString(),
+      paidUtc: _at(r['paid_at']) ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+      refundRequestedUtc: _at(r['refund_requested_at']),
+      refundedUtc: _at(r['refunded_at']),
+      refundMinor: (r['refund_paise'] as num?)?.toInt(),
+      refundEligible: refund['eligible'] == true,
+      refundUntilUtc: _at(refund['until']),
+      refundReason: (refund['reason'] ?? '').toString(),
+    );
+  }
+}

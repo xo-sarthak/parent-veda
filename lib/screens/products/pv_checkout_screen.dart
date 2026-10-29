@@ -100,7 +100,13 @@ class _PvCheckoutScreenState extends State<PvCheckoutScreen> {
         );
         cart.clear(kProductsCartId);
         _done(o);
+      // The three L2c outcomes are offering words; the shop treats them as it
+      // treated every refusal before (a preview order, nothing charged).
+      // Shop orders are outside L2c - LA-13 made `paid` the server's to write.
       case PaymentOutcome.notConfigured:
+      case PaymentOutcome.alreadyOwned:
+      case PaymentOutcome.unpriced:
+      case PaymentOutcome.signedOut:
         final o = PvOrderStore.instance.place(
           lines: lines,
           address: address,

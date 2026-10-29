@@ -29,6 +29,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/booking/booking_catalog.dart';
+import 'package:parentveda/booking/booking_models.dart';
 import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/data/learn/pv_learn_view.dart';
 import 'package:parentveda/data/learn/pv_learn_images.dart';
@@ -159,8 +160,39 @@ void main() {
   // ===========================================================================
   group('the verb is the kind\'s', () {
     test('five kinds, five verbs, nothing bought', () {
+      // Kept for revert (L2c): every consult said 'See availability'.
+      // LA-30 (the user, 2026-10-29): a bundled consult has no server price,
+      // so it is 'Opening soon'; a REAL expert's consult (`off_exp_<id>`,
+      // priced from expert_profiles) still sells.
       expect(
         pvCommitFor(oneOf(PvLearnKind.consult), PvLearnState.none).verb,
+        'Opening soon',
+      );
+      final bundled = oneOf(PvLearnKind.consult);
+      final real = PvOfferingView(
+        id: 'exp_test',
+        stage: bundled.stage,
+        kind: PvLearnKind.consult,
+        title: 'Consult',
+        subtitle: '',
+        about: '',
+        expert: const PvLearnExpert(id: 'exp_test', name: 'Dr Test', role: 'GP'),
+        hue: 0,
+        priceMinor: 80000,
+        offering: const Offering(
+          id: 'off_exp_test',
+          stage: ServiceStage.parenting,
+          kind: OfferingKind.consult,
+          format: SessionFormat.liveOneToOne,
+          catalogId: 'exp_test',
+          title: 'Consult · Dr Test',
+          expertId: 'exp_test',
+          priceMinor: 80000,
+          grant: EntitlementGrant(credits: 1),
+        ),
+      );
+      expect(
+        pvCommitFor(real, PvLearnState.none).verb,
         'See availability',
       );
       expect(

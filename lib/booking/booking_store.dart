@@ -13,6 +13,16 @@
 //  passed in and spends a credit locally — enough to build and demo the whole
 //  flow. When the RPC arrives, [book] gains a server round-trip in front of the
 //  same local write; nothing else in the app changes.
+//
+//  L2c (2026-10-29): WHAT SHE OWNS IS THE SERVER'S ANSWER. Signed in, an
+//  entitlement is DERIVED from a server receipt (`my_purchases()`, 0126) plus
+//  the gift credits a reward grants - never from a row the phone minted.
+//  [acquire] is the one way to buy: it asks the server to write the receipt
+//  (verify, a free claim, or the stub preview) and then reads it back.
+//  [purchase] stays for the signed-out / test seam only; it has no production
+//  caller. The general shape: the phone holds a CACHE of a server decision,
+//  and a cache that can grant something is not a cache (LEARNING-ARCHITECTURE
+//  section 1, LA-5).
 // =============================================================================
 
 import 'dart:convert';
@@ -25,6 +35,46 @@ import '../services/remote/supabase_repo.dart';
 import '../care_partner/care_journey.dart';
 import 'booking_catalog.dart';
 import 'booking_models.dart';
+import 'payment_service.dart';
+
+/// What [BookingStore.acquire] came back with.
+enum AcquireStatus {
+  /// The server holds an active receipt and the phone has read it.
+  owned,
+
+  /// Money was taken and verified, but the receipt has not reached the phone
+  /// yet (verify's write failed and the webhook will retry). Never "failed":
+  /// telling her a payment failed when it did not is the worse error.
+  pending,
+
+  /// Nothing was granted. [AcquireResult.message] says why, in her words.
+  refused,
+
+  /// She closed the payment sheet. Say nothing.
+  cancelled,
+}
+
+class AcquireResult {
+  const AcquireResult(this.status, [this.message]);
+  final AcquireStatus status;
+  final String? message;
+  bool get owned => status == AcquireStatus.owned;
+}
+
+/// Her sentence for a refund the rule refused. The reasons are 0126's
+/// `_refund_check` words; the rule itself is never re-derived on the phone.
+String pvRefundRefusal(String reason) => switch (reason) {
+      'window_closed' => 'The refund window for this has closed.',
+      'lessons_opened' =>
+        'A course can be refunded while you have opened no more than lesson 1.',
+      'support_only' =>
+        'Consults and class packs are refunded by our support team. Write to '
+            'us from Help and we will sort it.',
+      'nothing_paid' => 'This was free, so there is nothing to refund.',
+      'refund_requested' => 'A refund is already on its way.',
+      'refunded' => 'This has already been refunded.',
+      _ => "We couldn't refund this from the app. Write to us from Help.",
+    };
 
 class BookingStore extends ChangeNotifier with CloudSyncedStore {
   BookingStore._();
@@ -49,6 +99,27 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
   /// bookingId -> booking. Both stages; filter on read.
   final Map<String, Booking> _bookings = {};
 
+  /// The server's receipts (`my_purchases()`), newest first. A cache: written
+  /// only from the server's answer, kept in prefs so the page renders offline,
+  /// and NOT in the synced blob - the server already holds the record, and a
+  /// second copy in user_state is a second place for it to disagree.
+  final List<Purchase> _receipts = [];
+  static const _receiptsKey = 'booking_receipts_v1';
+
+  /// Whose receipts these are. The cache is per ACCOUNT, not per phone: a
+  /// sign-out and a different sign-in must never show the last person's
+  /// purchases for the second it takes to re-read them. Receipts count only
+  /// while this matches the signed-in user.
+  String? _receiptsUid;
+
+  /// Tests only: who is "signed in", without a Supabase session. Unset in the
+  /// app, where the signed-in user is [SupabaseRepo.userId].
+  @visibleForTesting
+  String? debugUid;
+
+  String? get _who => debugUid ?? SupabaseRepo.userId;
+  bool get _signedIn => _who != null;
+
   bool _loaded = false;
 
   Future<void> init() async {
@@ -57,6 +128,11 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
       if (raw != null) _apply(jsonDecode(raw) as Map);
+      final rc = prefs.getString(_receiptsKey);
+      if (rc != null) {
+        final m = jsonDecode(rc) as Map;
+        _applyReceipts(m['rows'] as List? ?? const [], m['uid']?.toString());
+      }
     } catch (_) {/* start fresh */}
     _loaded = true;
     _reconcileStatuses();
@@ -72,6 +148,229 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     } catch (e) {
       debugPrint('[booking] server hydrate failed: $e');
     }
+    await syncPurchases();
+  }
+
+  // ---- receipts (L2c) --------------------------------------------------------
+
+  /// Re-read `my_purchases()`. Returns false when the server could not be
+  /// asked (signed out, offline) - the cached receipts then stand, because
+  /// "we could not check" is not "she owns nothing".
+  Future<bool> syncPurchases() async {
+    if (!SupabaseRepo.isLoggedIn) return false;
+    try {
+      final uid = SupabaseRepo.userId;
+      final res = await SupabaseRepo.rpcJson('my_purchases');
+      if (res is! List) return false;
+      _applyReceipts(res, uid);
+      notifyListeners();
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+            _receiptsKey, jsonEncode({'uid': uid, 'rows': res}));
+      } catch (_) {/* best-effort cache */}
+      return true;
+    } catch (e) {
+      debugPrint('[booking] my_purchases failed: $e');
+      return false;
+    }
+  }
+
+  void _applyReceipts(List rows, String? uid) {
+    _receiptsUid = uid;
+    _receipts
+      ..clear()
+      ..addAll(rows.whereType<Map>().map(Purchase.fromRow))
+      ..sort((a, b) => b.paidUtc.compareTo(a.paidUtc));
+  }
+
+  /// Every receipt, newest first: Your bookings' Payments section (L.22).
+  /// Empty when signed out, or until this account's receipts have been read.
+  List<Purchase> get purchases => _mine.toList(growable: false);
+
+  Iterable<Purchase> get _mine => _signedIn && _receiptsUid == _who
+      ? _receipts
+      : const <Purchase>[];
+
+  /// Buy [offering] after checkout answered [paid]. The ONE way the app comes
+  /// to own something.
+  ///
+  /// Every branch ends with the server's receipt or with nothing:
+  ///
+  ///   paid / alreadyOwned  verify (or the webhook) wrote it; read it back
+  ///   free                 `claim_free_offering` writes a real receipt
+  ///   notConfigured        `record_stub_purchase` - the no-charge preview,
+  ///                        which the SERVER refuses once payment_mode is live
+  ///
+  /// The last one is LA-7's fix. Before L2c the phone decided that "payments
+  /// are not configured" meant "free"; a release build could do it. Now the
+  /// phone only asks, and one row on the server answers for every build.
+  Future<AcquireResult> acquire(Offering offering, PaymentResult paid) async {
+    switch (paid.outcome) {
+      case PaymentOutcome.cancelled:
+        return const AcquireResult(AcquireStatus.cancelled);
+      case PaymentOutcome.failed:
+        return AcquireResult(AcquireStatus.refused,
+            paid.message ?? 'Payment did not go through.');
+      case PaymentOutcome.signedOut:
+        return const AcquireResult(AcquireStatus.refused,
+            'Sign in to buy. What you buy is kept on your account, so it '
+            'follows you to a new phone.');
+      case PaymentOutcome.unpriced:
+        return const AcquireResult(AcquireStatus.refused,
+            "This opens when a specialist joins. We'll add them here.");
+      case PaymentOutcome.paid:
+      case PaymentOutcome.alreadyOwned:
+        break;
+      case PaymentOutcome.free:
+        final r = await _ask('claim_free_offering', offering.id);
+        if (r != null) return r;
+      case PaymentOutcome.notConfigured:
+        final r = await _ask('record_stub_purchase', offering.id);
+        if (r != null) return r;
+    }
+
+    await syncPurchases();
+    if (_activeReceiptFor(offering.id) != null) {
+      if (paid.outcome != PaymentOutcome.alreadyOwned) CareJourney.purchased();
+      return const AcquireResult(AcquireStatus.owned);
+    }
+    if (paid.outcome == PaymentOutcome.paid) {
+      return const AcquireResult(AcquireStatus.pending,
+          'Your payment went through. It can take a minute to show here; '
+          'it will appear in Your bookings.');
+    }
+    return const AcquireResult(AcquireStatus.refused,
+        "We couldn't confirm that just now. Nothing was charged. Try again.");
+  }
+
+  /// Call a 0126 grant function. Null when it granted; a refusal otherwise.
+  Future<AcquireResult?> _ask(String fn, String offeringId) async {
+    try {
+      final res =
+          await SupabaseRepo.rpcJson(fn, {'p_offering_id': offeringId});
+      if (res is Map && res['ok'] == true) return null;
+      final reason = res is Map ? (res['reason'] ?? '').toString() : '';
+      return AcquireResult(AcquireStatus.refused, switch (reason) {
+        'live_mode' => 'Payments are switching on. Try again in a moment.',
+        'unknown_offering' =>
+          "This opens when a specialist joins. We'll add them here.",
+        'not_free' => 'This one has a price now. Open it again to see it.',
+        'not_signed_in' || '' => 'Sign in to buy.',
+        _ => "We couldn't confirm that just now. Nothing was charged.",
+      });
+    } catch (e) {
+      debugPrint('[booking] $fn failed: $e');
+      return const AcquireResult(AcquireStatus.refused,
+          "We couldn't reach ParentVeda. Nothing was charged. Try again.");
+    }
+  }
+
+  /// Ask for a refund (L.12). The server applies the rule and answers; the
+  /// phone shows the answer. Returns her sentence.
+  Future<String> requestRefund(Purchase p) async {
+    try {
+      final res = await SupabaseRepo.rpcJson(
+          'request_refund', {'p_purchase_id': p.id});
+      // Both halves: the receipt's new status, and the upcoming seats a
+      // refund cancels (refreshFromServer re-reads receipts as well).
+      await refreshFromServer();
+      if (res is Map && res['ok'] == true) {
+        return res['status'] == 'refunded'
+            ? 'Refunded. This was a test purchase, so no money moved.'
+            : 'Refund requested. Your access has ended, and the money reaches '
+                'your account in 5 to 7 working days.';
+      }
+      final reason = res is Map ? (res['reason'] ?? '').toString() : '';
+      return pvRefundRefusal(reason);
+    } catch (e) {
+      debugPrint('[booking] request_refund failed: $e');
+      return "We couldn't reach ParentVeda. Nothing has changed. Try again.";
+    }
+  }
+
+  /// Tell the server a lesson was opened. The course refund rule counts these
+  /// (0126 `_refund_check`: refundable while no more than lesson 1 is opened),
+  /// so this is what makes "7 days, if you have opened no more than lesson
+  /// 1" true. Fire-and-forget: a lesson must never wait on the network.
+  void recordLessonOpen(String programmeId, String lessonId) {
+    if (!SupabaseRepo.isLoggedIn) return;
+    SupabaseRepo.rpcJson('record_lesson_open', {
+      'p_programme_id': programmeId,
+      'p_lesson_id': lessonId,
+    }).catchError((_) => null);
+  }
+
+  Purchase? _activeReceiptFor(String offeringId) {
+    for (final p in _mine) {
+      if (p.offeringId == offeringId && p.isActive) return p;
+    }
+    return null;
+  }
+
+  /// The entitlements the receipts imply. DERIVED, never stored: credits used
+  /// is counted from her bookings each time, so a cancelled booking hands its
+  /// credit back without anyone remembering to.
+  List<Entitlement> _fromReceipts() {
+    final out = <Entitlement>[];
+    final byOffering = <String, List<Purchase>>{};
+    for (final p in _mine.where((p) => p.isActive)) {
+      byOffering.putIfAbsent(p.offeringId, () => []).add(p);
+    }
+    byOffering.forEach((offeringId, list) {
+      list.sort((a, b) => a.paidUtc.compareTo(b.paidUtc)); // spend oldest first
+      var used = _bookings.values
+          .where((b) =>
+              b.offeringId == offeringId && b.status != BookingStatus.cancelled)
+          .length;
+      final o = BookingCatalog.instance.offeringById(offeringId);
+      for (final p in list) {
+        final grant = o?.grant ?? _grantForKind(p.kind);
+        final total = grant.credits;
+        final take = used.clamp(0, total);
+        used -= take;
+        out.add(Entitlement(
+          id: 'ent_rcp_${p.id}',
+          offeringId: offeringId,
+          stage: o?.stage ?? p.stage ?? ServiceStage.parenting,
+          title: o?.title ?? p.title,
+          creditsTotal: total,
+          creditsUsed: take,
+          purchasedUtc: p.paidUtc,
+          expiresUtc:
+              grant.validFor == null ? null : p.paidUtc.add(grant.validFor!),
+          recordingAccess: grant.recordingAccess,
+          discussionThread: grant.discussionThread,
+        ));
+      }
+    });
+    return out;
+  }
+
+  /// A receipt for something this build's catalogue no longer lists (a panel
+  /// programme, or one retired): the grant its server kind implies (L.13).
+  static EntitlementGrant _grantForKind(String kind) => switch (kind) {
+        'course' => const EntitlementGrant(recordingAccess: true),
+        'masterclass' => const EntitlementGrant(
+            credits: 1, recordingAccess: true, discussionThread: true),
+        'cohort' => const EntitlementGrant(credits: 1, discussionThread: true),
+        _ => const EntitlementGrant(credits: 1),
+      };
+
+  /// What counts as hers. Signed in: receipts plus gift credits. Signed out
+  /// (and in tests): the local entitlements, as before L2c - a signed-out
+  /// phone cannot buy any more, so the only rows it can hold are a reward or
+  /// a test's.
+  ///
+  /// The phone-minted entitlements of the pre-L2c preview stay in the blob
+  /// untouched (kept, not deleted) but stop counting once she is signed in.
+  Iterable<Entitlement> get _owned sync* {
+    if (!_signedIn) {
+      yield* _entitlements.values;
+      return;
+    }
+    yield* _entitlements.values.where((e) => e.id.startsWith('ent_gift_'));
+    yield* _fromReceipts();
   }
 
   /// Re-read the server's bookings on demand — pull-to-refresh, or returning
@@ -83,6 +382,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     } catch (e) {
       debugPrint('[booking] refresh failed: $e');
     }
+    await syncPurchases(); // L2c: what she owns is the server's too
   }
 
   /// Adopt the authoritative `booking_bookings` rows for this user.
@@ -150,7 +450,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
 
   /// Every entitlement, newest purchase first.
   List<Entitlement> entitlements({ServiceStage? stage}) {
-    final all = _entitlements.values
+    final all = _owned
         .where((e) => stage == null || e.stage == stage)
         .toList()
       ..sort((a, b) => b.purchasedUtc.compareTo(a.purchasedUtc));
@@ -159,7 +459,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
 
   /// An entitlement bought FOR this specific offering, if any.
   Entitlement? _exactEntitlementFor(String offeringId) {
-    final matches = _entitlements.values
+    final matches = _owned
         .where((e) => e.offeringId == offeringId && e.canBook)
         .toList()
       ..sort((a, b) => a.purchasedUtc.compareTo(b.purchasedUtc)); // spend oldest first
@@ -180,10 +480,10 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     return _exactEntitlementFor(kAnyConsultOffering);
   }
 
-  bool ownsRecording(String offeringId) => _entitlements.values.any(
+  bool ownsRecording(String offeringId) => _owned.any(
       (e) => e.offeringId == offeringId && e.recordingAccess && !e.isExpired);
 
-  bool hasThread(String offeringId) => _entitlements.values.any(
+  bool hasThread(String offeringId) => _owned.any(
       (e) => e.offeringId == offeringId && e.discussionThread && !e.isExpired);
 
   /// The one history — every booking, newest session first, optionally by stage.
@@ -314,9 +614,13 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     notifyListeners();
   }
 
-  /// Record a purchase. Mints an entitlement from the offering's grant. (The
-  /// real charge happens before this once payments are live; for now it is the
-  /// purchase.) Returns the new entitlement.
+  /// Record a purchase LOCALLY. Mints an entitlement from the offering's grant.
+  ///
+  /// NO PRODUCTION CALLER SINCE L2c (2026-10-29). The flows call [acquire],
+  /// which reads the server's receipt. This stays for the signed-out seam the
+  /// engine tests drive, and for revert; signed in, what it mints does not
+  /// count (see [_owned]).
+  @visibleForTesting
   Entitlement purchase(Offering offering, {DateTime? at}) {
     final now = (at ?? DateTime.now()).toUtc();
     final e = Entitlement(
@@ -364,7 +668,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
       joinUrl: slot.joinUrl,
     );
     _bookings[b.id] = b;
-    _entitlements[ent.id] = ent.copyWith(creditsUsed: ent.creditsUsed + 1);
+    _spend(ent);
     _save();
     CareJourney.consultationBookedNow();
     return b;
@@ -398,7 +702,9 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
       stage: ent.stage.name,
       title: ent.title,
       joinUrl: slot.joinUrl,
-      priceMinor: BookingCatalog.instance.offeringById(slot.offeringId)?.priceMinor,
+      // L2c: the seat's value is the server's (0126 price_offering), so the
+      // phone no longer sends one. Kept for revert:
+      // priceMinor: BookingCatalog.instance.offeringById(slot.offeringId)?.priceMinor,
     );
     if (!granted) return null; // server refused the seat
 
@@ -415,9 +721,17 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
       joinUrl: slot.joinUrl,
     );
     _bookings[b.id] = b;
-    _entitlements[ent.id] = ent.copyWith(creditsUsed: ent.creditsUsed + 1);
+    _spend(ent);
     _save();
     return b;
+  }
+
+  /// Count a credit as used. Only a STORED entitlement keeps a count; one
+  /// derived from a receipt counts her bookings instead, so writing it into
+  /// the map would turn a derivation into a second record.
+  void _spend(Entitlement ent) {
+    if (!_entitlements.containsKey(ent.id)) return;
+    _entitlements[ent.id] = ent.copyWith(creditsUsed: ent.creditsUsed + 1);
   }
 
   /// Cancel through the server (frees the seat via cancel_booking) then locally.
@@ -547,7 +861,17 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
   void resetAll() {
     _entitlements.clear();
     _bookings.clear();
+    _receipts.clear();
+    _receiptsUid = null;
+    debugUid = null;
     _save();
+  }
+
+  /// Load receipts as if `my_purchases()` had answered, for tests.
+  @visibleForTesting
+  void seedReceipts(List<Map<String, Object?>> rows, {String? uid}) {
+    _applyReceipts(rows, uid);
+    notifyListeners();
   }
 
   // ---- persistence ----------------------------------------------------------

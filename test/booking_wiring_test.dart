@@ -15,6 +15,8 @@ import 'package:parentveda/data/mind_mood_data.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_expert_honesty.dart';
 import 'package:parentveda/services/expert_store.dart';
 
+import 'support/timetable.dart';
+
 void main() {
   _mindMood();
   final cat = BookingCatalog.instance;
@@ -26,6 +28,8 @@ void main() {
     final o = cat.offeringForCatalog('y_flow_am');
     expect(o, isNotNull);
     expect(o!.kind, OfferingKind.classPack);
+    // L2c: a class has the server's dates only; say when it is first.
+    seedTimetable([o.id]);
     expect(cat.slotsFor(o.id), isNotEmpty);
   });
 
@@ -73,6 +77,8 @@ void main() {
   test('buy then book works end to end for the masterclass', () async {
     final o = cat.offeringForCatalog('mc_sleepreg')!;
     store.purchase(o);
+    // L2c: a class has the server's dates only; say when it is first.
+    seedTimetable([o.id]);
     final slot = cat.slotsFor(o.id).first;
     final b = await store.reserve(slot);
     expect(b, isNotNull);
@@ -110,6 +116,9 @@ void _mindMood() {
           reason: 'mm offering ${o.id} has no catalogue entry, so the Talk tab '
               'falls back to the placeholder sheet that books nothing');
       expect(real!.stage, ServiceStage.pregnancy);
+      // L2c: the check-in PACK books the server's timetable (consults keep
+      // the counsellor's calendar), so it needs its dates seeded first.
+      if (real.kind == OfferingKind.classPack) seedTimetable([real.id]);
       expect(cat.slotsFor(real.id), isNotEmpty,
           reason: 'a sheet with no slots is a dead end for a woman who has '
               'just decided she needs to talk to someone');
