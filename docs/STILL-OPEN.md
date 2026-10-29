@@ -523,8 +523,8 @@ LiveKit webhook is that doctor-side record. At +20 minutes with attendees
 seen and no host, every seat is cancelled with `cancel_reason =
 'host_missed'`, credits return, and the 0084 trigger reverses the accrual,
 for consults and classes alike. A parent who did not come still pays the
-doctor (`missed` stays payable), as before. Waiting on the 0128 run and the
-LiveKit webhook.
+doctor (`missed` stays payable), as before. **Live 2026-10-29**, `54875c57`:
+0128 run, functions deployed, the LiveKit webhook added.
 
 **5.4g Programme money is capacity-based.** The trigger calls a slot with
 capacity 1 a consultation and everything else a programme, then looks the

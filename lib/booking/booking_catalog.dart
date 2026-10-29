@@ -497,6 +497,8 @@ class BookingCatalog {
     // A recorded offering has no times to pick (2026-10-25): it is bought and
     // watched, never reserved.
     if (o.format == SessionFormat.recorded) return const [];
+    // Read only by the generated times kept for revert below.
+    // ignore: unused_local_variable
     final seed = o.catalogId.hashCode & 0x7fffffff;
     switch (o.kind) {
       // L2c (2026-10-29): a class's times are the SERVER timetable, the `ps_`
@@ -525,10 +527,21 @@ class BookingCatalog {
         // "this doctor has not opened their diary". Once a doctor has saved a
         // schedule, their schedule is the ONLY thing consulted - including when
         // it says they are unavailable.
-        if (DoctorScheduleStore.instance.hasSetUp(o.expertId)) {
-          return _fromSchedule(at, o);
-        }
-        return _calendar(at, o, seed);
+        //
+        // (L3, 2026-10-29) For a doctor who has set nothing, the fallback is
+        // now the STARTER clinic (Mon-Sat 10-1 and 5-8, what scheduleFor()
+        // returns), because that is what the server assumes for a doctor
+        // with no `doctor_schedule` row (0128 `slot_fits_schedule`). The old
+        // fallback offered 18:30, which is off the starter's grid, so the
+        // server would refuse it ("outside schedule"); it also showed about
+        // one slot in four as taken when nobody had booked it, and numbered
+        // its slot ids by position, so one id could mean two different
+        // times. Kept for revert:
+        // if (DoctorScheduleStore.instance.hasSetUp(o.expertId)) {
+        //   return _fromSchedule(at, o);
+        // }
+        // return _calendar(at, o, seed);
+        return _fromSchedule(at, o);
       // Kept for revert (L2c): the generated one-off dates.
       // case OfferingKind.masterclass:
       //   return _oneOff(at, o,
@@ -606,6 +619,8 @@ class BookingCatalog {
   /// THE CALENDAR CASE. Several days ahead, a few times on each — the shape a
   /// 1:1 needs: pick a day, then a time. Capacity 1, and some slots pre-taken so
   /// the availability reads like a real calendar rather than a blank grid.
+  // RETIRED (L3, 2026-10-29): see the consult case in _generate. Kept for revert.
+  // ignore: unused_element
   static List<Slot> _calendar(DateTime from, Offering o, int seed) {
     final local = from.toLocal();
     final times = <List<int>>[

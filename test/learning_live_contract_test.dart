@@ -257,6 +257,37 @@ void main() {
     });
   });
 
+  group('LA-32 · contract: the app sends what the server needs, no more', () {
+    test('every slot value is optional, and a null leaves the key out', () {
+      final repo = _src('lib/services/remote/supabase_repo.dart');
+      for (final p in [
+        "'p_expert_id': ?expertId",
+        "'p_starts_utc': ?startsUtc",
+        "'p_duration_min': ?durationMin",
+        "'p_capacity': ?capacity",
+        "'p_title': ?title",
+        "'p_join_url': ?joinUrl",
+      ]) {
+        expect(repo, contains(p));
+      }
+    });
+
+    test('an offering the server prices is booked by its ids', () {
+      final store = _src('lib/booking/booking_store.dart');
+      expect(store, contains('offeringHasServerPrice(offering)'));
+      expect(store, contains('expertId: serverKnows ? null : slot.expertId'));
+      expect(store,
+          contains('startsUtc: (!serverKnows || consult) ? slot.startsUtc : null'));
+    });
+
+    test('a doctor with no saved schedule is offered the starter clinic the server assumes', () {
+      final cat = _src('lib/booking/booking_catalog.dart');
+      expect(cat, contains('        return _fromSchedule(at, o);'));
+      expect(cat, contains('        // return _calendar(at, o, seed);'));
+      expect(_last('slot_fits_schedule').body, contains('public._starter_schedule()'));
+    });
+  });
+
   group('the wiring gate · every new server function has a caller', () {
     String lib(String path) => _src(path);
 

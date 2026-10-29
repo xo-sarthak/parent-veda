@@ -561,12 +561,20 @@ class SupabaseRepo {
     required String bookingId,
     required String slotId,
     required String offeringId,
-    required String expertId,
-    required DateTime startsUtc,
-    required int durationMin,
-    required int capacity,
     required String stage,
-    required String title,
+    // LA-32, CONTRACT (after 0128 gave these defaults, 2026-10-29). Each is
+    // sent only when the server needs it, and a null leaves the key out
+    // entirely (`'key': ?value`), so PostgREST matches the defaults:
+    //   startsUtc     a consult's start (her pick), or the stub branch;
+    //   the others    only the stub branch, for an offering the server
+    //                 cannot price (live mode refuses those anyway).
+    // Kept for revert: all five were `required` while 0126 declared them
+    // without defaults and PostgREST could not resolve the call without them.
+    String? expertId,
+    DateTime? startsUtc,
+    int? durationMin,
+    int? capacity,
+    String? title,
     String? joinUrl,
     // What the parent paid, recorded ON the booking (0084). The doctor's
     // ledger reads this and never the catalogue, so a later price change
@@ -586,13 +594,13 @@ class SupabaseRepo {
         'p_booking_id': bookingId,
         'p_slot_id': slotId,
         'p_offering_id': offeringId,
-        'p_expert_id': expertId,
-        'p_starts_utc': startsUtc.toUtc().toIso8601String(),
-        'p_duration_min': durationMin,
-        'p_capacity': capacity,
+        'p_expert_id': ?expertId,
+        'p_starts_utc': ?startsUtc?.toUtc().toIso8601String(),
+        'p_duration_min': ?durationMin,
+        'p_capacity': ?capacity,
         'p_stage': stage,
-        'p_title': title,
-        'p_join_url': joinUrl,
+        'p_title': ?title,
+        'p_join_url': ?joinUrl,
         'p_price_paise': ?priceMinor,
       });
       return true;

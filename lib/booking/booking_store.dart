@@ -735,17 +735,30 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
 
     final now = (at ?? DateTime.now()).toUtc();
     final bookingId = _uid('bkg', now);
+    // LA-32, CONTRACT (2026-10-29, after 0128). An offering the server can
+    // price is booked by its ids alone: the slot is the server's row (a class)
+    // or the server makes it from the doctor's schedule (a consult, which
+    // still sends her chosen start). Only an offering the server cannot
+    // price sends the slot's own values, for the stub-mode branch that still
+    // books the phone's slots; in live mode the server refuses those.
+    final offering = BookingCatalog.instance.offeringById(slot.offeringId);
+    final serverKnows = offering != null && offeringHasServerPrice(offering);
+    final consult = offering?.kind == OfferingKind.consult;
     final granted = await SupabaseRepo.bookSlot(
       bookingId: bookingId,
       slotId: slot.id,
       offeringId: slot.offeringId,
-      expertId: slot.expertId,
-      startsUtc: slot.startsUtc,
-      durationMin: slot.durationMin,
-      capacity: slot.capacity,
       stage: ent.stage.name,
-      title: ent.title,
-      joinUrl: slot.joinUrl,
+      startsUtc: (!serverKnows || consult) ? slot.startsUtc : null,
+      expertId: serverKnows ? null : slot.expertId,
+      durationMin: serverKnows ? null : slot.durationMin,
+      capacity: serverKnows ? null : slot.capacity,
+      title: serverKnows ? null : ent.title,
+      joinUrl: serverKnows ? null : slot.joinUrl,
+      // Kept for revert (sent all five, 0126-era):
+      // expertId: slot.expertId, startsUtc: slot.startsUtc,
+      // durationMin: slot.durationMin, capacity: slot.capacity,
+      // title: ent.title, joinUrl: slot.joinUrl,
       // L2c: the seat's value is the server's (0126 price_offering), so the
       // phone no longer sends one. Kept for revert:
       // priceMinor: BookingCatalog.instance.offeringById(slot.offeringId)?.priceMinor,
