@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/notification_service.dart';
+import '../services/remote/storage_service.dart';
 import '../services/remote/supabase_repo.dart';
 // The evening-before reminder says how many questions a visit has
 // (2026-09-28). The two stores import each other, which Dart allows; the
@@ -75,13 +76,12 @@ class TtcRecord {
   /// column name out, which is the shape that makes this safe rather than
   /// lucky.
   ///
-  /// Adding a column to `ttc_records` is a migration, and the decision for now
-  /// is that TTC gains no new schema. So attachments do not travel to a second
-  /// device — stated here rather than discovered later, because a silent
-  /// half-sync is exactly the failure this codebase keeps having.
-  ///
-  /// Making them travel later is one nullable column and one line in
-  /// `pushToCloud`.
+  /// ⚠️ SENT SINCE 2026-10-29 (T4 B3, migration 0127 `files`). It was
+  /// local-only, and that made a sign-out a deletion: `LocalWipe` clears the
+  /// prefs cache, the pull rebuilt each row with no files, and the photos sat
+  /// in storage with nothing pointing at them. A cache is not a record. The
+  /// column costs one migration and makes the cloud the record's memory. An
+  /// older row with no `files` (null) keeps whatever this phone holds.
   final List<String> attachments;
 
   String get display => unit.isEmpty ? value : '$value $unit';
@@ -95,8 +95,8 @@ class TtcRecord {
         'on': TtcSyncUtil.date(takenOn),
         if (note != null) 'note': note,
         'partner': forPartner,
-        // Cached on disk with the rest of the row. Never sent up - `pushToCloud`
-        // names its columns explicitly and does not name this one.
+        // Cached on disk with the rest of the row, and sent up as the `files`
+        // column since T4 B3 (`_cloudColumns`).
         if (attachments.isNotEmpty) 'files': attachments,
       };
 
@@ -188,6 +188,17 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
   static const _bookKey = 'ttc_records_sync';
   final TtcRowBook _book = TtcRowBook();
 
+  /// Scans of removed results, waiting to be deleted from storage (T4 W12,
+  /// 2026-10-29). Remove said the record goes "with its photos", and nothing
+  /// ever deleted the uploaded scan. A removal can be undone (the toast, or
+  /// the other phone), so the files are not deleted at the tap: they wait
+  /// here, id -> (when removed, the refs), and go once the removal is as old
+  /// as the phone's own memory of it ([SyncRowBook.keepRemovals]). Only the
+  /// phone that removed it sweeps, which is also the phone whose user owns
+  /// the storage path.
+  static const _sweepKey = 'ttc_records_file_sweep';
+  final Map<String, ({int at, List<String> files})> _sweep = {};
+
   final List<TtcRecord> _items = [];
   bool _loaded = false;
 
@@ -208,6 +219,15 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
   }
 
   int get count => _items.length;
+
+  /// Whether this phone's account may change [id] (T4 Q2, 0127): a row made
+  /// here (no owner noted) or one the cloud says is ours. Each partner
+  /// changes only their own results; the other's are read-only, in the UI
+  /// and in RLS.
+  bool isMine(String id) {
+    final owner = _book.owners[id];
+    return owner == null || owner == SupabaseRepo.userId;
+  }
 
   List<TtcRecord> forPerson({required bool partner}) =>
       records.where((r) => r.forPartner == partner).toList();
@@ -268,6 +288,12 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     if (i < 0) return;
     final gone = _items.removeAt(i);
     _book.remove(id, _cloudColumns(gone));
+    if (gone.attachments.isNotEmpty) {
+      _sweep[id] = (
+        at: DateTime.now().toUtc().millisecondsSinceEpoch,
+        files: gone.attachments,
+      );
+    }
     _persist();
     // Kept for revert (2026-10-17):
     //   if (SupabaseRepo.isLoggedIn) {
@@ -300,6 +326,7 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
       if (_items.any((e) => e.id == r.id)) continue;
       _items.add(r);
       _book.touch(r.id);
+      _sweep.remove(r.id);
       changed = true;
     }
     if (!changed) return;
@@ -319,8 +346,8 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
   /// Persists locally. It names no cloud call of its own, and it does not
   /// need one: `notifyListeners` is the `TtcSyncedStore` mixin's, which
   /// schedules the debounced upsert of every row by id. So a changed label,
-  /// date or number travels; the attachment list does not, because
-  /// `pushToCloud` names no column for it (see `attachments`).
+  /// date or number travels, and since T4 B3 the attachment list does too
+  /// (the `files` column, see `attachments`).
   ///
   /// (Corrected 2026-09-27. This comment used to say "does NOT push", which
   /// was never true of the mixin, and mattered once edits of synced fields
@@ -342,6 +369,7 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
   void resetForTest() {
     _items.clear();
     _book.clear();
+    _sweep.clear();
     _loaded = true;
     notifyListeners();
   }
@@ -358,6 +386,10 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
         'taken_on': TtcSyncUtil.date(r.takenOn),
         'note': r.note,
         'for_partner': r.forPartner,
+        // T4 B3 (0127): the storage refs, so a sign-out or a second phone
+        // keeps the scan. Always sent, an empty list included, so removing the
+        // last photo on one phone removes it everywhere.
+        'files': r.attachments,
       };
 
   // ⚠️ NEWER WINS, BOTH WAYS (2026-10-17, 0098). The union pull kept
@@ -369,7 +401,26 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     final rows = await SupabaseRepo.fetchShared('ttc_records',
         orderBy: 'taken_on', ascending: true);
     applyCloudRows(rows);
+    await _sweepFiles();
   }
+
+  /// Deletes the scans of removals that are now final (W12). Best-effort,
+  /// like every storage call: a miss is retried on the next pull.
+  Future<void> _sweepFiles() async {
+    if (_sweep.isEmpty) return;
+    final due = ttcFilesDueForSweep(_sweep,
+        liveIds: {for (final r in _items) r.id},
+        nowMs: DateTime.now().toUtc().millisecondsSinceEpoch);
+    if (due.drop.isEmpty) return;
+    for (final ref in due.delete) {
+      await StorageService.remove(ref);
+    }
+    due.drop.forEach(_sweep.remove);
+    await _persist();
+  }
+
+  @visibleForTesting
+  Map<String, ({int at, List<String> files})> get sweepForTest => _sweep;
 
   /// The merge, network-free so a test can hand it rows.
   @visibleForTesting
@@ -392,9 +443,11 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
         takenOn: on,
         note: row['note'] as String?,
         forPartner: row['for_partner'] == true,
-        // Local-only (see `attachments`): the cloud copy never carries them,
-        // so taking it must not drop the files on this phone.
-        attachments: i >= 0 ? _items[i].attachments : const [],
+        // The cloud carries them since T4 B3. A row from before 0127 has
+        // null there: keep this phone's list, as before. Kept for revert:
+        //   attachments: i >= 0 ? _items[i].attachments : const [],
+        attachments: ttcFilesFromCloud(row['files']) ??
+            (i >= 0 ? _items[i].attachments : const []),
       );
       if (i >= 0) {
         _items[i] = r;
@@ -440,6 +493,14 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
       final live = _items.where((e) => e.id == id).firstOrNull;
       final cols = live != null ? _cloudColumns(live) : _book.removedRows[id];
       if (cols == null) {
+        _book.dirty.remove(id);
+        continue;
+      }
+      // ⚠️ THE PARTNER'S ROW IS NOT OURS TO SEND (T4 Q2, 0127). Each partner
+      // changes only their own results, and RLS refuses the rest, so a row
+      // owned by the other account would wait here and retry for ever.
+      final owner = _book.owners[id];
+      if (owner != null && owner != uid) {
         _book.dirty.remove(id);
         continue;
       }
@@ -507,6 +568,21 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
             .whereType<TtcRecord>());
       final book = p.getString(_bookKey);
       if (book != null) _book.loadJson(jsonDecode(book));
+      final sweep = p.getString(_sweepKey);
+      if (sweep != null) {
+        final m = jsonDecode(sweep);
+        if (m is Map) {
+          for (final e in m.entries) {
+            final v = e.value;
+            if (v is Map && v['at'] is int && v['files'] is List) {
+              _sweep[e.key.toString()] = (
+                at: v['at'] as int,
+                files: [for (final f in v['files'] as List) f.toString()],
+              );
+            }
+          }
+        }
+      }
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
@@ -519,8 +595,37 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
       await p.setStringList(
           _key, _items.map((e) => jsonEncode(e.toJson())).toList());
       await p.setString(_bookKey, jsonEncode(_book.toJson()));
+      await p.setString(
+          _sweepKey,
+          jsonEncode({
+            for (final e in _sweep.entries)
+              e.key: {'at': e.value.at, 'files': e.value.files},
+          }));
     } catch (_) {/* best-effort */}
   }
+}
+
+/// Which waiting scans to delete now (T4 W12), network-free so a test can
+/// drive it. A removal older than [SyncRowBook.keepRemovals] is final: its
+/// files go in `delete` and its id in `drop`. A removal that came back (the id
+/// is live again, an Undo on either phone) is dropped with nothing deleted.
+({Set<String> drop, List<String> delete}) ttcFilesDueForSweep(
+  Map<String, ({int at, List<String> files})> sweep, {
+  required Set<String> liveIds,
+  required int nowMs,
+}) {
+  final cutoff = nowMs - SyncRowBook.keepRemovals.inMilliseconds;
+  final drop = <String>{};
+  final delete = <String>[];
+  for (final e in sweep.entries) {
+    if (liveIds.contains(e.key)) {
+      drop.add(e.key);
+    } else if (e.value.at < cutoff) {
+      drop.add(e.key);
+      delete.addAll(e.value.files);
+    }
+  }
+  return (drop: drop, delete: delete);
 }
 
 // =============================================================================
@@ -1153,4 +1258,12 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
       await p.setString(_bookKey, jsonEncode(_book.toJson()));
     } catch (_) {/* best-effort */}
   }
+}
+
+/// The `files` column of a `ttc_records` row (T4 B3). Null when the column is
+/// null or missing (a row written before 0127), so the caller keeps its own
+/// list; a list, empty included, when the cloud has spoken.
+List<String>? ttcFilesFromCloud(Object? raw) {
+  if (raw is! List) return null;
+  return [for (final f in raw) if (f != null) f.toString()];
 }

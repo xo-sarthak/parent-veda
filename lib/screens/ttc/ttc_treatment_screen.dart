@@ -28,6 +28,7 @@ import '../../theme/pv_fonts.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
+import 'ttc_focus_screen.dart' show openTtcArticle;
 import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
 import 'ttc_tool_chrome.dart';
 import 'ttc_strings.dart';
@@ -1583,12 +1584,31 @@ class TtcTreatmentScreen extends StatelessWidget {
                 blood != null && !blood.isAfter(now));
         final next = round.next;
 
+        // ⚠️ HIS PHONE: HER ROUND, READ-ONLY (T4 Q1 and W1, 2026-10-29). The
+        // user: "He should not be editing something personal of hers… his app
+        // should be a check more than starting to edit." He got her wording
+        // and every edit, and his edits went to his own row (B1). Now he sees
+        // her dates and his line, no edit is drawn, and the one control left
+        // says why with a toast.
+        if (TtcPartnerMode.instance.on) {
+          return _HisRoundView(round: round, now: now);
+        }
+
+        // After a close: the door's own state for 90 days (T4 K1). It led
+        // with "Starting treatment?" the day after a test.
+        final panel = none ? ttcIvfPanelNow(now: now) : TtcIvfPanel.round;
+        final recentClose =
+            panel == TtcIvfPanel.between || panel == TtcIvfPanel.positive;
+        final reminderLine = ttcTriggerReminderLine(round, now);
+
         return TtcToolScaffold(
           hue: kIvfHue,
           // The tool's mark over the eyebrow (2026-09-29, ttc_tool_marks.dart).
           toolId: 'treatment',
           eyebrow: t.treatmentTitle,
-          title: 'The dates your\nclinic gave you.',
+          // TTC-GAP 25 (T4): the title names today's step. Kept for revert:
+          //   title: 'The dates your\nclinic gave you.',
+          title: ttcTreatmentTitle(round, store, now, partner: false),
           intro: hi
               ? t.treatmentIntro
               : "Add the dates your clinic gave you, and we'll remind you "
@@ -1598,8 +1618,35 @@ class TtcTreatmentScreen extends StatelessWidget {
             const SizedBox(height: 22),
 
             // ---- no round: the way in ---------------------------------------
-            if (none) ...[
-              ttcToolPad(const TtcStartTreatmentCard()),
+            // K1: within 90 days of a close, the door's panel leads, and it
+            // carries its own way into the next round. Kept for revert:
+            //   if (none) ...[ttcToolPad(const TtcStartTreatmentCard()), ...]
+            if (none && recentClose) ...[
+              ttcToolPad(TtcIvfRoundPanel(
+                onStart: () =>
+                    openTtcTreatmentStart(context, backToRound: true),
+                onRead: (id) => openTtcArticle(context, id, hue: kIvfHue),
+              )),
+              if (panel == TtcIvfPanel.positive) ...[
+                const SizedBox(height: 10),
+                ttcToolPad(
+                  TtcRoundButton(
+                    key: const ValueKey('ttc_round_start_new'),
+                    label: 'Start a new round',
+                    primary: false,
+                    onTap: () =>
+                      openTtcTreatmentStart(context, backToRound: true),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
+            ] else if (none) ...[
+              // K5 (T4): back to this screen when the round is set up.
+              // Kept for revert: ttcToolPad(const TtcStartTreatmentCard()),
+              ttcToolPad(TtcStartTreatmentCard(
+                onTap: () =>
+                    openTtcTreatmentStart(context, backToRound: true),
+              )),
               const SizedBox(height: 20),
             ],
 
@@ -1627,7 +1674,8 @@ class TtcTreatmentScreen extends StatelessWidget {
                   title: kTtcRoundLegacyTitle,
                   line: kTtcRoundLegacyBody,
                   icon: Icons.help_outline_rounded,
-                  onTap: () => openTtcTreatmentStart(context),
+                  onTap: () =>
+                      openTtcTreatmentStart(context, backToRound: true),
                 ),
               ),
               const SizedBox(height: 20),
@@ -1637,6 +1685,19 @@ class TtcTreatmentScreen extends StatelessWidget {
             if (hasKind) ...[
               ttcToolPad(_TodayCard(round: round, phase: phase)),
               const SizedBox(height: 18),
+              // K3: one fixed red-flag line, collection to the test.
+              if (ttcShowOhssLine(round, now)) ...[
+                ttcToolPad(
+                  TtcRoundInfoRow(
+                    key: const ValueKey('ttc_round_ohss_line'),
+                    icon: Icons.error_outline_rounded,
+                    text: kTtcOhssLine,
+                    onTap: () =>
+                        openTtcArticle(context, kTtcOhssReadId, hue: kIvfHue),
+                  ),
+                ),
+                const SizedBox(height: 18),
+              ],
               if (canResult) ...[
                 ttcToolPad(
                   TtcRoundButton(
@@ -1718,12 +1779,18 @@ class TtcTreatmentScreen extends StatelessWidget {
               ],
             ],
 
-            if (round[TtcTreatmentStep.trigger] != null) ...[
+            // W5: only while a reminder is still to come, or "Taken". Kept
+            // for revert: shown whenever a trigger date existed, with
+            // `t.treatmentTriggerReminder`.
+            if (reminderLine != null) ...[
               const SizedBox(height: 4),
               ttcToolPad(
                 TtcRoundInfoRow(
+                  key: const ValueKey('ttc_round_trigger_reminder'),
                   icon: Icons.notifications_active_outlined,
-                  text: t.treatmentTriggerReminder,
+                  text: hi && !round.triggerTaken
+                      ? t.treatmentTriggerReminder
+                      : reminderLine,
                 ),
               ),
             ],
@@ -1749,6 +1816,13 @@ class TtcTreatmentScreen extends StatelessWidget {
                       route: 'ttc/treatment/confirm_remove',
                     )) {
                       store.clearCycle();
+                      // K2: kept, not deleted, so it can come back.
+                      if (context.mounted) {
+                        pvSnack(context, kTtcRoundClearedToast,
+                            action: 'Undo',
+                            onAction: store.undoClear,
+                            lift: 24);
+                      }
                     }
                   },
                   child: Text(
@@ -1813,12 +1887,14 @@ class _TodayCard extends StatelessWidget {
     final kind = round.kind;
     DateTime day(DateTime d) => DateTime(d.year, d.month, d.day);
 
-    final count = ttcRoundDayCount(round, phase, today);
-    final title = round.isEmpty
-        ? kTtcPanelNoDatesTitle
-        : count == null || count.$1 <= 0
-        ? ttcRoundPhaseName(phase, kind)
-        : '${ttcRoundPhaseName(phase, kind)} · day ${count.$1}';
+    // Kept for revert (GAP 25, T4): the card's own "{step} · day N" title,
+    // now said once, by the screen's title.
+    //   final count = ttcRoundDayCount(round, phase, today);
+    //   final title = round.isEmpty
+    //       ? kTtcPanelNoDatesTitle
+    //       : count == null || count.$1 <= 0
+    //       ? ttcRoundPhaseName(phase, kind)
+    //       : '${ttcRoundPhaseName(phase, kind)} · day ${count.$1}';
 
     // What is on today, named.
     final todays = <String>[
@@ -1851,6 +1927,12 @@ class _TodayCard extends StatelessWidget {
       nextLine = kTtcPanelNoNext;
     }
 
+    // TTC-GAP 25 (T4): the screen's title now names the step and its day,
+    // so the card leads with what is on today (or what is next) instead of
+    // saying the step twice. Kept for revert: the Fraunces line was [title].
+    final headline =
+        todays.isNotEmpty ? 'Today: ${todays.join(', ')}.' : nextLine;
+
     return Container(
       key: const ValueKey('ttc_round_header'),
       width: double.infinity,
@@ -1874,33 +1956,29 @@ class _TodayCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            title,
+            headline,
+            key: ValueKey(todays.isNotEmpty
+                ? 'ttc_round_today_line'
+                : 'ttc_round_next_line'),
             style: pvFraunces(
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.w600,
-              height: 1.2,
+              height: 1.25,
               color: p.ink1,
             ),
           ),
           if (todays.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
-              'Today: ${todays.join(', ')}.',
-              key: const ValueKey('ttc_round_today_line'),
-              style: pvManrope(
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                height: 1.4,
-                color: p.ink1,
-              ),
+              nextLine,
+              key: const ValueKey('ttc_round_next_line'),
+              style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2),
             ),
           ],
+          // Kept for revert (GAP 25): the phase title in Fraunces, then
+          //   if (todays.isNotEmpty) Text('Today: ...') in Manrope 14 w800,
+          //   then Text(nextLine).
           const SizedBox(height: 6),
-          Text(
-            nextLine,
-            key: const ValueKey('ttc_round_next_line'),
-            style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2),
-          ),
           const SizedBox(height: 10),
           Divider(color: p.line, height: 1),
           Row(
@@ -1981,7 +2059,14 @@ class _UndoCloseRow extends StatelessWidget {
           ),
           TextButton(
             key: const ValueKey('ttc_round_undo'),
-            onPressed: store.undoClose,
+            // K2 (T4): the Undo says what it did. Kept for revert:
+            //   onPressed: store.undoClose,
+            onPressed: () {
+              if (store.undoClose()) {
+                pvSnack(context, kTtcRoundReopenedToast,
+                    icon: Icons.check_rounded, lift: 24);
+              }
+            },
             child: Text(
               kTtcRoundUndoCta,
               style: pvManrope(
@@ -2240,6 +2325,67 @@ class _LegacyRow extends StatelessWidget {
           }
         });
       },
+    );
+  }
+}
+
+/// Her round on his phone (T4 Q1, W1). Read-only: her dates on a timeline
+/// that offers no edit, the clinic as text, and his line as the intro. No
+/// result, no history, no cycle: a closed round shows him nothing of how it
+/// went, because that is hers to tell (the rule of [ttcPartnerRoundLine]).
+class _HisRoundView extends StatelessWidget {
+  const _HisRoundView({required this.round, required this.now});
+
+  final TtcTreatmentCycle round;
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final open = !round.isEmpty && !round.isClosed && round.kind != null;
+    return TtcToolScaffold(
+      key: const ValueKey('ttc_round_his_view'),
+      hue: kIvfHue,
+      toolId: 'treatment',
+      eyebrow: 'Treatment cycle',
+      title: ttcTreatmentTitle(round, TtcTreatmentStore.instance, now,
+          partner: true),
+      intro: ttcPartnerTreatmentIntro(round, now),
+      children: [
+        const SizedBox(height: 22),
+        if (open) ...[
+          ttcToolPad(_heading(kTtcRoundPlanTitle)),
+          const SizedBox(height: 12),
+          ttcToolPad(TtcRoundTimeline(round: round, readOnly: true)),
+          if (round.clinic.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            ttcToolPad(Row(children: [
+              Icon(Icons.local_hospital_outlined, size: 16, color: p.ink3),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(round.clinic,
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink1)),
+              ),
+            ])),
+          ],
+          const SizedBox(height: 18),
+        ],
+        // The one control left: it says why rather than editing. Tapping a
+        // date he wants to correct lands here too.
+        ttcToolPad(
+          TtcRoundInfoRow(
+            key: const ValueKey('ttc_round_his_note'),
+            icon: Icons.lock_outline_rounded,
+            text: 'Only she can change these dates. If something looks '
+                'wrong, tell her.',
+            onTap: () => pvSnack(context, kTtcHersToChange, lift: 24),
+          ),
+        ),
+        const SizedBox(height: 26),
+      ],
     );
   }
 }

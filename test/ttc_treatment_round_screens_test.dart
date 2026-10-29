@@ -633,7 +633,8 @@ void main() {
       final body = src(you);
       final trying = body.substring(body.indexOf('final PvYouStageContent _trying'),
           body.indexOf('final PvYouStageContent _pregnancy'));
-      expect(trying, contains("title: 'Treatment',"));
+      // T4 K5: the round's one name. Was "title: 'Treatment',".
+      expect(trying, contains("title: 'Treatment cycle',"));
       expect(trying, contains("openTtcSurface(c, 'ttc_treatment')"));
     });
 

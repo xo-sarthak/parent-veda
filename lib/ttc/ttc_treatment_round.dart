@@ -358,6 +358,13 @@ TtcRoundPhase ttcTreatmentPhase(TtcTreatmentCycle r, DateTime date) {
       case TtcRoundKind.fetNatural:
         // The trigger times her own ovulation; the transfer follows days later.
         return on(trig) ? TtcRoundPhase.trigger : TtcRoundPhase.gettingReady;
+      case TtcRoundKind.iui:
+        // T4 K4: an IUI with a trigger and no IUI date stayed in "Trigger"
+        // until the test. The IUI follows the trigger by about a day and a
+        // half, so after two days this is the wait.
+        return d.difference(trig).inDays <= 1
+            ? TtcRoundPhase.trigger
+            : TtcRoundPhase.waiting;
       default:
         return TtcRoundPhase.trigger; // to the collection or the IUI
     }

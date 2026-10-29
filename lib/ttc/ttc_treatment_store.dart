@@ -62,6 +62,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../screens/ttc/ttc_strings.dart' show TtcPartnerMode;
 import '../services/notification_service.dart';
 import '../services/remote/supabase_repo.dart';
 import 'ttc_sync.dart';
@@ -148,7 +149,10 @@ extension TtcTreatmentStepCopy on TtcTreatmentStep {
       case TtcTreatmentStep.retrieval:
         return hi
             ? 'Aam taur par sedation hoti hai. Aadhi raat se kuch na khaayein, aur koi saath aaye.'
-            : "It's usually done under sedation. Don't eat anything after midnight, and bring someone with you.";
+            // T4 K4: the clinic sets the fasting time, as the day's card
+            // says. Kept for revert: "... Don't eat anything after midnight,
+            // and bring someone with you."
+            : "It's usually done under sedation. Your clinic will tell you when to stop eating, and bring someone with you.";
       case TtcTreatmentStep.transfer:
         return hi
             ? 'Kai clinics bharay hue bladder ke saath kehti hain. Unka nirdesh hi maanein.'
@@ -282,10 +286,18 @@ class TtcTreatmentCycle {
   /// The next milestone still ahead, or null when the cycle is behind them.
   (TtcTreatmentStep, DateTime)? get next {
     final now = DateTime.now();
+    // T4 K4: a date-only step is stored at midnight, so `isBefore(now)`
+    // dropped a step dated today from the moment the day began. A dated day
+    // counts through the whole of it; the trigger keeps its exact time.
+    // Kept for revert: if (at == null || at.isBefore(now)) continue;
+    final today = DateTime(now.year, now.month, now.day);
     (TtcTreatmentStep, DateTime)? best;
     for (final step in TtcTreatmentStep.values) {
       final at = dates[step];
-      if (at == null || at.isBefore(now)) continue;
+      if (at == null) continue;
+      if (step.needsTime ? at.isBefore(now) : _dayOf(at).isBefore(today)) {
+        continue;
+      }
       if (best == null || at.isBefore(best.$2)) best = (step, at);
     }
     return best;
@@ -495,6 +507,10 @@ String ttcTriggerPrepBody(TtcRoundKind? kind, DateTime at) {
     TtcRoundKind.fetNatural =>
       'Your clinic set this for $time. A good time to get the injection '
           'ready. If anything is unclear, call them now.',
+    // T4 W3: an older round with no kind may be an IUI (they were stored as
+    // "Egg retrieval / IUI"), so it names no procedure and no hours.
+    null => 'Your clinic set this for $time, and the next step is timed '
+        'from it. If anything is unclear, call them now.',
     _ => 'Your clinic set this for $time. Egg collection is timed from it, '
         'about 34 to 36 hours later. If anything is unclear, call them now.',
   };
@@ -532,6 +548,14 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
 
   TtcTreatmentCycle _cycle = const TtcTreatmentCycle(dates: {});
   List<TtcTreatmentCycle> _history = const [];
+
+  /// Rounds whose dates she removed, newest last (T4 K2, 2026-10-29). "Remove
+  /// this round's dates" was a hard remove with no Undo, against this file's
+  /// "nothing is deleted". A removal is for a round entered by mistake, so it
+  /// is NOT a past round: it is kept apart from [history], which the home,
+  /// the calendar, the messages and the door all read as rounds she had.
+  /// Kept in the same blob (`cleared`); an older app ignores the key.
+  List<TtcTreatmentCycle> _cleared = const [];
   bool _loaded = false;
 
   // ---- her own flags (local) -----------------------------------------------
@@ -760,7 +784,16 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
 
   /// Clearing the current round - "Remove these dates", for a round entered
   /// by mistake. Past rounds in [history] are untouched.
+  ///
+  /// ⚠️ KEPT, NOT DELETED, SINCE T4 K2: the round moves to [_cleared] and
+  /// [undoClear] brings it back exactly. Kept for revert, the hard remove:
+  ///   _cycle = const TtcTreatmentCycle(dates: {});
   void clearCycle() {
+    if (!_cycle.isEmpty || _cycle.kind != null) {
+      var round = _cycle;
+      if (round.id.isEmpty) round = round.withId(ttcNewRoundId(DateTime.now()));
+      _cleared = [..._cleared, round];
+    }
     _cycle = const TtcTreatmentCycle(dates: {});
     _persist();
     NotificationService.instance
@@ -768,6 +801,22 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
       ..cancel(triggerNotificationId);
     notifyListeners();
   }
+
+  /// The Undo on "Dates removed." Puts the last cleared round back, its
+  /// trigger reminders with it. False when there is nothing to put back, or a
+  /// new round has been started since.
+  bool undoClear() {
+    if (_cleared.isEmpty || !_cycle.isEmpty || _cycle.kind != null) {
+      return false;
+    }
+    _cycle = _cleared.last;
+    _cleared = _cleared.sublist(0, _cleared.length - 1);
+    _changed(trigger: true);
+    return true;
+  }
+
+  @visibleForTesting
+  List<TtcTreatmentCycle> get clearedForTest => _cleared;
 
   void _changed({bool trigger = false, bool ui = false}) {
     _persist();
@@ -797,6 +846,13 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
     final service = NotificationService.instance;
     await service.cancel(triggerPrepNotificationId);
     await service.cancel(triggerNotificationId);
+
+    // ⚠️ NO TRIGGER ALARM ON HIS PHONE (T4 B2, 2026-10-29). His copy is her
+    // round read for him; an alarm armed from it said "your injection" to the
+    // person not taking it, and rang on after she had ticked it taken. His
+    // home's partner line already tells him the day. The cancels above stay,
+    // so a phone that switches to his side drops any alarm it held.
+    if (TtcPartnerMode.instance.on) return;
 
     final at = _cycle[TtcTreatmentStep.trigger];
     if (at == null || _cycle.triggerTaken) return;
@@ -834,6 +890,7 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
   void resetForTest() {
     _cycle = const TtcTreatmentCycle(dates: {});
     _history = const [];
+    _cleared = const [];
     _lastSeen = null;
     _askOnReturn = false;
     _snoozedUntil = null;
@@ -850,6 +907,7 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
     _loaded = false;
     _cycle = const TtcTreatmentCycle(dates: {});
     _history = const [];
+    _cleared = const [];
     await _load(sync: false);
   }
 
@@ -857,15 +915,39 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
   //  Couple-scoped: a treatment cycle is emphatically not one person's. He needs
   //  the retrieval date as much as she does.
 
+  //
+  //  ⚠️ ONE WRITER: HER (T4 B1, 2026-10-29). This used to take `rows.first`,
+  //  "the newest row wins", over both partners' rows. Every launch pushed this
+  //  phone's copy stamped `updated_at: now`, so his row was usually the newest:
+  //  a reinstall on her phone pulled his stale copy and her next push wrote it
+  //  over her own row, history included. Last-write-wins is right for one
+  //  writer and wrong for two. Making her the only writer is simpler than a
+  //  merge and matches the product rule (Q1: he sees her round, he does not
+  //  edit it). So the pull prefers HER row on both phones, and his phone never
+  //  pushes. A row he wrote before this stays in the cloud and is ignored.
+
   @override
   Future<void> pullFromCloud() async {
     final rows = await SupabaseRepo.fetchShared('ttc_treatment',
         orderBy: 'updated_at', ascending: false);
-    if (rows.isEmpty) return;
-    // One active cycle per couple; the newest row wins. This is settings-shaped
-    // rather than log-shaped, so last-write-wins is right here.
+    final partner = TtcPartnerMode.instance.on;
+    final row = ttcPickTreatmentRow(rows,
+        myId: SupabaseRepo.userId, partnerMode: partner);
+    if (partner) {
+      // Fresh on every pull, not only when empty: his copy is a read of hers,
+      // so her edits must reach it. No alarm (B2), no push.
+      _decodeBlob(row?['cycle']);
+      notifyListeners();
+      return;
+    }
+    if (row == null) return;
+    // Kept for revert, the newest row of either partner:
+    //   if (_cycle.isEmpty && _history.isEmpty) {
+    //     _decodeBlob(rows.first['cycle']);
+    //     _rescheduleTrigger();
+    //   }
     if (_cycle.isEmpty && _history.isEmpty) {
-      _decodeBlob(rows.first['cycle']);
+      _decodeBlob(row['cycle']);
       _rescheduleTrigger();
     }
   }
@@ -874,6 +956,8 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pushToCloud() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
+    // His phone never writes the round (B1): it holds a read of hers.
+    if (TtcPartnerMode.instance.on) return;
     // Confirmed and remembered (sync log step 11); it was
     // `SupabaseRepo.upsertRow`, which swallowed a refusal. Kept for revert.
     await sendTracked(() => SupabaseRepo.upsertRowConfirmed(
@@ -916,6 +1000,8 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
         ..._cycle.toJson(),
         if (_history.isNotEmpty)
           'history': [for (final r in _history) r.toJson()],
+        if (_cleared.isNotEmpty)
+          'cleared': [for (final r in _cleared) r.toJson()],
       };
 
   void _decodeBlob(Object? raw) {
@@ -925,6 +1011,15 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
         ? [
             for (final r in h)
               if (TtcTreatmentCycle.fromJson(r) case final c when !c.isEmpty) c,
+          ]
+        : const [];
+    final x = raw is Map ? raw['cleared'] : null;
+    _cleared = x is List
+        ? [
+            for (final r in x)
+              if (TtcTreatmentCycle.fromJson(r)
+                  case final c when !c.isEmpty || c.kind != null)
+                c,
           ]
         : const [];
   }
@@ -974,4 +1069,19 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
           }));
     } catch (_) {/* best-effort */}
   }
+}
+
+/// Which `ttc_treatment` row this phone reads (T4 B1). Her phone reads its own
+/// row; his phone ([partnerMode]) reads the row that is not his. Null when the
+/// row it wants is not there: her phone then keeps what it holds, and his
+/// shows no round. Never "the newest", which is how his stale copy won.
+@visibleForTesting
+Map<String, dynamic>? ttcPickTreatmentRow(List<Map<String, dynamic>> rows,
+    {required String? myId, required bool partnerMode}) {
+  if (myId == null) return null;
+  for (final r in rows) {
+    final own = r['user_id'] == myId;
+    if (own != partnerMode) return r;
+  }
+  return null;
 }

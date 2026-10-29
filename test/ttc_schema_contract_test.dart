@@ -73,9 +73,11 @@ const Map<String, List<String>> written = {
     'id', 'user_id', 'stage', 'kind', 'happened_on', 'title_en', 'title_hi',
     'detail_en', 'detail_hi', 'updated_at', 'removed_at',
   ],
+  // T4 B3 (0127, 2026-10-29): the scans' storage refs travel as `files`.
+  // Kept for revert: the list without 'files'.
   'ttc_records': [
     'id', 'user_id', 'test_id', 'label', 'value', 'unit', 'taken_on', 'note',
-    'for_partner', 'updated_at', 'removed_at',
+    'for_partner', 'updated_at', 'removed_at', 'files',
   ],
   'ttc_appointments': [
     'id', 'user_id', 'title', 'with_whom', 'starts_utc', 'note', 'updated_at',
@@ -142,6 +144,7 @@ void main() {
     File('supabase/migrations/0099_ttc_supplements_timeline_sync_clock.sql'),
     File('supabase/migrations/0044_ttc_care_pathway.sql'),
     File('supabase/migrations/0117_ttc_trying_count.sql'),
+    File('supabase/migrations/0127_ttc_records_files_and_own_writes.sql'),
   ].map((f) => f.readAsStringSync()).join('\n').replaceAll('\r\n', '\n');
   // ⚠️ PER STATEMENT, NOT PER LINE (2026-10-27). The regex matched only the
   // first column after each `alter table`, so 0044's three-column alter could

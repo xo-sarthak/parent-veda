@@ -2026,7 +2026,9 @@ final List<PvRead> kTtcReadsAge = [
       PvReadNextStep(
         kind: PvNextKind.tool,
         title: _en("Track a cycle you're in"),
-        value: _en('Scans, sizes and the trigger, in one place.'),
+        // T4 W4: there is no follicle-size field. Kept for revert:
+        // _en('Scans, sizes and the trigger, in one place.'),
+        value: _en('Scans and the trigger, in one place.'),
         surfaceId: 'ttc_treatment',
       ),
     ],

@@ -961,9 +961,13 @@ final List<PvRead> kTtcReadsBodyConditions = [
       ),
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Look at the treatment routes'),
-        value: _en('Tablets, IUI and IVF side by side, so the options feel '
-            'less new when your doctor names them.'),
+        // T4 K5: it opens the round's dates, not a comparison, so it says
+        // so. Kept for revert: 'Look at the treatment routes' / 'Tablets,
+        // IUI and IVF side by side, so the options feel less new when your
+        // doctor names them.'
+        title: _en('Keep a treatment round in one place'),
+        value: _en('If your doctor starts tablets, IUI or IVF, the dates '
+            'your clinic gives you and the trigger reminder live here.'),
         surfaceId: 'ttc_treatment',
       ),
     ],

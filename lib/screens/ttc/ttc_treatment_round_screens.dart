@@ -99,10 +99,14 @@ import '../../widgets/pv_feedback.dart' show PvPress;
 //  Openers
 // =============================================================================
 
-void openTtcTreatmentStart(BuildContext context) {
+///
+/// [backToRound] (T4 K5): opened from the round screen itself, so finishing
+/// goes back to it. It used to replace the start flow with a second round
+/// screen, stacking two.
+void openTtcTreatmentStart(BuildContext context, {bool backToRound = false}) {
   Navigator.of(context).push(
     MaterialPageRoute<void>(
-      builder: (_) => const TtcTreatmentStartScreen(),
+      builder: (_) => TtcTreatmentStartScreen(backToRound: backToRound),
       settings: const RouteSettings(name: 'ttc/treatment/start'),
     ),
   );
@@ -600,7 +604,10 @@ Future<bool> ttcConfirmCloseRound(
 // =============================================================================
 
 class TtcTreatmentStartScreen extends StatefulWidget {
-  const TtcTreatmentStartScreen({super.key});
+  const TtcTreatmentStartScreen({super.key, this.backToRound = false});
+
+  /// See [openTtcTreatmentStart].
+  final bool backToRound;
 
   @override
   State<TtcTreatmentStartScreen> createState() =>
@@ -728,6 +735,12 @@ class _TtcTreatmentStartScreenState extends State<TtcTreatmentStartScreen> {
       clinic: _clinic.text,
     );
     // Straight on to the plan: "Here's how your round usually goes".
+    // K5 (T4): from the round screen, back to it (it rebuilds from the
+    // store); from anywhere else, on to it.
+    if (widget.backToRound) {
+      Navigator.of(context).pop();
+      return;
+    }
     Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
         builder: (_) => const TtcTreatmentScreen(),
@@ -1557,6 +1570,17 @@ class _TimelineRow extends StatelessWidget {
     } else {
       store.setDate(row.step!, picked);
     }
+    // K2 (T4): every date save says what it set; the trigger names its
+    // reminder times. Saves used to say nothing.
+    if (!context.mounted) return;
+    final step = row.step;
+    final what = step == null
+        ? '${ttcScanLabel(round.kind)} added for ${ttcRoundDate(picked)}.'
+        : step == TtcTreatmentStep.trigger
+            ? ttcTriggerSavedLine(picked, DateTime.now())
+            : '${ttcStepLabel(step, round.kind)} set for '
+                '${ttcRoundDate(picked)}.';
+    pvSnack(context, what, icon: Icons.check_rounded, lift: 24);
   }
 }
 

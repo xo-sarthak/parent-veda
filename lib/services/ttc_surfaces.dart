@@ -80,13 +80,19 @@ const List<TtcSurface> kTtcSurfaces = [
   TtcSurface('ttc_tracker', 'Daily log', 'Roz ka log'),
 
   // ---- Treatment ------------------------------------------------------------
-  TtcSurface('ttc_treatment', 'IUI & IVF explained', 'IUI aur IVF samjhein'),
+  // T4 K5: it opens the round, so it takes the round's one name. Kept for
+  // revert: TtcSurface('ttc_treatment', 'IUI & IVF explained',
+  //     'IUI aur IVF samjhein'),
+  TtcSurface('ttc_treatment', 'Treatment cycle', 'Treatment cycle'),
   // The round (2026-09-26). New work is English, so both columns match.
   TtcSurface('ttc_treatment/start', 'Start a treatment round',
       'Start a treatment round'),
   TtcSurface('ttc_treatment/result', 'Tell us how the test went',
       'Tell us how the test went'),
   TtcSurface('ttc_records', 'Your records', 'Aapke records'),
+  // T4 K12: the tool had no surface entry. One name, English only.
+  TtcSurface('ttc_semen_report', 'Read your semen report',
+      'Read your semen report'),
   TtcSurface('ttc_medication', 'Medication schedule', 'Dawai ka schedule'),
   TtcSurface('ttc_appointments', 'Appointments', 'Appointments'),
 

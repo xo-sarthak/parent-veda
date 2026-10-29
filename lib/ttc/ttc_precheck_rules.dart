@@ -166,7 +166,9 @@ class PrecheckContext {
           !pcosResult.stopped &&
           (pcosResult.level == PcosLevel.discuss ||
               pcosResult.level == PcosLevel.soon),
-      medicineCount: MedicineStore.instance.all.length,
+      // T4 K7: the medicines she still takes, as Tools counts them. Finished
+      // and stopped courses were counted. Kept for revert: `.all.length`.
+      medicineCount: MedicineStore.instance.activeMeds.length,
       supplementCount: supplements.length,
       // ⚠️ A LOOSE NAME MATCH, AND IT ONLY EVER SHOWS EVIDENCE. It is used to
       // say "folic acid is on your list", never to tick the item — the
@@ -178,7 +180,8 @@ class PrecheckContext {
       // revert: `takesFolate: supplements.any(...)` over supplements only.
       takesFolate: [
         for (final s in supplements) s.name,
-        for (final m in MedicineStore.instance.all) m.name,
+        // T4 K7: `activeMeds`, not `.all`. Kept for revert: `.all`.
+        for (final m in MedicineStore.instance.activeMeds) m.name,
       ].any((name) {
         final n = name.toLowerCase();
         return n.contains('folic') || n.contains('folate');

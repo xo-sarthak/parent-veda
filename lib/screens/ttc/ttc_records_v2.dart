@@ -130,7 +130,25 @@ String ttcRecordDate(DateTime d) =>
 /// person. A circle containing "Y" is worse than no circle, so ownership is a
 /// small word instead. If names are ever collected, this is the one place to
 /// change.
-String ttcWhose(bool forPartner) => forPartner ? 'Partner' : 'You';
+///
+/// ⚠️ `for_partner` IS ABSOLUTE: true means HIS (T4 W10, 2026-10-29). The
+/// words were written from her side, so on his phone his semen analysis read
+/// "Partner" and "Yours" filed a result as hers. Kept for revert:
+///   String ttcWhose(bool forPartner) => forPartner ? 'Partner' : 'You';
+String ttcWhose(bool forPartner) =>
+    ttcWhoseFor(forPartner, TtcPartnerMode.instance.on);
+
+/// "You" or "Partner" for a row whose `for_partner` is [forHim], read from
+/// the side this phone is on. The one place the two words are decided.
+String ttcWhoseFor(bool forHim, bool partnerMode, {bool long = false}) {
+  final mine = forHim == partnerMode;
+  if (long) return mine ? 'Yours' : "Your partner's";
+  return mine ? 'You' : 'Partner';
+}
+
+/// The `for_partner` value that means "mine" on this phone: false on hers,
+/// true on his. The add page's "Yours" writes this.
+bool ttcMineFlag() => TtcPartnerMode.instance.on;
 
 // =============================================================================
 //  1a — the main screen
@@ -138,8 +156,29 @@ String ttcWhose(bool forPartner) => forPartner ? 'Partner' : 'You';
 
 /// "Yours" or "Your partner's": the long form, for a sentence rather than a
 /// tag. The same two words as the switch on the add page.
+// Kept for revert (T4 W10):
+//   String ttcWhoseLong(bool forPartner) =>
+//       forPartner ? "Your partner's" : 'Yours';
 String ttcWhoseLong(bool forPartner) =>
-    forPartner ? "Your partner's" : 'Yours';
+    ttcWhoseFor(forPartner, TtcPartnerMode.instance.on, long: true);
+
+/// The words for a result this phone may show but not change (T4 Q2).
+String ttcNotYoursToChange() =>
+    TtcPartnerMode.instance.on ? kTtcHersToChange : kTtcHisToChange;
+
+/// The muted line drawn where Change and Remove would be, on a result that
+/// is the other partner's (T4 Q2). The controls are not drawn at all.
+class TtcRecordReadOnlyNote extends StatelessWidget {
+  const TtcRecordReadOnlyNote({super.key});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        key: const ValueKey('ttc_rec_read_only'),
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Text(ttcNotYoursToChange(),
+            style: ttcBody(13, color: ttcMuted, h: 1.5)),
+      );
+}
 
 /// One white block with a hairline: the tool shell's surface, in place of the
 /// V1 `TtcCard` and its shadow (2026-09-27). Hairlines, not shadows, inside a
@@ -1367,6 +1406,10 @@ class TtcRecordTrendScreen extends StatelessWidget {
           final latest = group.latest;
           final span = ttcReadingChange(latest, oldest);
           void addOne() => openTtcRecordEdit(context, like: latest);
+          // T4 Q2: the other partner's test is read here, never changed. A
+          // new reading "like" it would file under them, so it goes too.
+          final mine = group.readings
+              .every((r) => TtcRecordsStore.instance.isMine(r.id));
 
           return TtcToolScaffold(
             hue: kTtcRecordsHue,
@@ -1384,12 +1427,14 @@ class TtcRecordTrendScreen extends StatelessWidget {
                 '${latest.takenOn.year}'
                 '${latest.unit.trim().isEmpty ? '' : ' · all values in '
                     '${latest.unit.trim()}'}',
-            action: TtcRecordsHeroPill(
-                key: const ValueKey('ttc_rec_trend_add'),
-                icon: Icons.add_rounded,
-                // Kept for revert (2026-09-28): 'Add'
-                label: 'Add a result',
-                onTap: addOne),
+            action: !mine
+                ? null
+                : TtcRecordsHeroPill(
+                    key: const ValueKey('ttc_rec_trend_add'),
+                    icon: Icons.add_rounded,
+                    // Kept for revert (2026-09-28): 'Add'
+                    label: 'Add a result',
+                    onTap: addOne),
             children: [
               ttcToolPad(Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1443,19 +1488,27 @@ class TtcRecordTrendScreen extends StatelessWidget {
                   ],
                   const SizedBox(height: 16),
                   Text(
-                      'These are your own readings, in the order you saved '
-                      'them. Tap one to see it, change it or remove it. Your '
-                      'clinic can tell you what they mean.',
+                      mine
+                          ? 'These are your own readings, in the order you '
+                              'saved them. Tap one to see it, change it or '
+                              'remove it. Your clinic can tell you what they '
+                              'mean.'
+                          : "These readings were saved on your partner's "
+                              'phone. Tap one to see it. Your clinic can tell '
+                              'you what they mean.',
                       style: ttcBody(12.5, color: ttcMuted, h: 1.5)),
                   const SizedBox(height: 18),
-                  TtcToolSecondary(
-                      label: 'Add a new reading', onTap: addOne),
-                  const SizedBox(height: 10),
-                  TtcRecordsRemoveButton(
-                    key: const ValueKey('ttc_rec_trend_remove'),
-                    label: 'Remove all ${group.count} readings',
-                    onTap: () => _removeAll(context, group),
-                  ),
+                  if (mine) ...[
+                    TtcToolSecondary(
+                        label: 'Add a new reading', onTap: addOne),
+                    const SizedBox(height: 10),
+                    TtcRecordsRemoveButton(
+                      key: const ValueKey('ttc_rec_trend_remove'),
+                      label: 'Remove all ${group.count} readings',
+                      onTap: () => _removeAll(context, group),
+                    ),
+                  ] else
+                    const TtcRecordReadOnlyNote(),
                   const SizedBox(height: 16),
                 ],
               )),
@@ -1853,6 +1906,8 @@ class TtcRecordDetailScreen extends StatelessWidget {
           // "Concentration 12 million per ml · Progressive motility 28.5 per
           // cent · Volume 2 ml") reads as a list, not as one huge headline.
           final parts = value.split(' · ');
+          // T4 Q2: the other partner's result is read here, never changed.
+          final mine = TtcRecordsStore.instance.isMine(r.id);
 
           return TtcToolScaffold(
             hue: kTtcRecordsHue,
@@ -1863,12 +1918,14 @@ class TtcRecordDetailScreen extends StatelessWidget {
             eyebrow: 'Records and reports',
             title: r.label,
             intro: '${ttcWhoseLong(r.forPartner)} · ${ttcRecordDate(r.takenOn)}',
-            action: TtcRecordsHeroPill(
-                key: const ValueKey('ttc_rec_edit'),
-                icon: Icons.edit_outlined,
-                // Kept for revert (2026-09-28): 'Edit'
-                label: 'Edit result',
-                onTap: () => _edit(context, r)),
+            action: !mine
+                ? null
+                : TtcRecordsHeroPill(
+                    key: const ValueKey('ttc_rec_edit'),
+                    icon: Icons.edit_outlined,
+                    // Kept for revert (2026-09-28): 'Edit'
+                    label: 'Edit result',
+                    onTap: () => _edit(context, r)),
             children: [
               ttcToolPad(Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1887,10 +1944,12 @@ class TtcRecordDetailScreen extends StatelessWidget {
                             Text('Number not entered',
                                 style: ttcBody(15,
                                     color: ttcSoft, w: FontWeight.w700)),
-                            const SizedBox(height: 12),
-                            TtcRecordsAction(
-                                label: 'Type the number',
-                                onTap: () => showTtcTypeValue(context, r)),
+                            if (mine) ...[
+                              const SizedBox(height: 12),
+                              TtcRecordsAction(
+                                  label: 'Type the number',
+                                  onTap: () => showTtcTypeValue(context, r)),
+                            ],
                           ] else if (parts.length > 1)
                             for (var i = 0; i < parts.length; i++) ...[
                               if (i > 0) const SizedBox(height: 8),
@@ -1958,13 +2017,15 @@ class TtcRecordDetailScreen extends StatelessWidget {
                             // saved for this one.'
                             Text('No photo saved for this result.',
                                 style: ttcBody(13.5, h: 1.5)),
-                            const SizedBox(height: 14),
                             // Kept for revert (2026-09-27): this opened the
                             // old attachment chooser, a V1 sheet over this
                             // page: onTap: () => _attach(context, r).
-                            TtcRecordsAction(
-                                label: 'Add a photo of the report',
-                                onTap: () => _edit(context, r)),
+                            if (mine) ...[
+                              const SizedBox(height: 14),
+                              TtcRecordsAction(
+                                  label: 'Add a photo of the report',
+                                  onTap: () => _edit(context, r)),
+                            ],
                           ]),
                     )
                   else
@@ -1979,15 +2040,18 @@ class TtcRecordDetailScreen extends StatelessWidget {
                         ),
                     ]),
                   const SizedBox(height: 26),
-                  TtcToolSecondary(
-                      label: 'Change this result',
-                      onTap: () => _edit(context, r)),
-                  const SizedBox(height: 10),
-                  TtcRecordsRemoveButton(
-                    key: const ValueKey('ttc_rec_detail_remove'),
-                    label: 'Remove this result',
-                    onTap: () => _remove(context, r),
-                  ),
+                  if (mine) ...[
+                    TtcToolSecondary(
+                        label: 'Change this result',
+                        onTap: () => _edit(context, r)),
+                    const SizedBox(height: 10),
+                    TtcRecordsRemoveButton(
+                      key: const ValueKey('ttc_rec_detail_remove'),
+                      label: 'Remove this result',
+                      onTap: () => _remove(context, r),
+                    ),
+                  ] else
+                    const TtcRecordReadOnlyNote(),
                   const SizedBox(height: 16),
                 ],
               )),

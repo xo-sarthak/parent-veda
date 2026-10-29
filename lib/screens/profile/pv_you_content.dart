@@ -1052,7 +1052,8 @@ final PvYouStageContent _trying = PvYouStageContent(
     // treatment screen, whose top is the start card when no round exists.
     PvYouThing(
       icon: Icons.event_note_outlined,
-      title: 'Treatment',
+      // T4 K5: the round's one name. Kept for revert: 'Treatment'.
+      title: 'Treatment cycle',
       subtitle: "Your clinic's dates, step by step",
       open: (c) => openTtcSurface(c, 'ttc_treatment'),
     ),

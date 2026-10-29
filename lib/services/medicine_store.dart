@@ -524,6 +524,22 @@ class MedicineStore extends ChangeNotifier {
             m,
       ];
 
+  /// The medicines she added during a pregnancy that has ended and still has
+  /// on (T4 K7, the TTC mirror of D3). Read from the id, as [addedBefore]
+  /// is: a TTC id (`ttcm_`) was added while trying, so it never counts, and
+  /// an id that does not parse is left out.
+  List<Medication> addedDuring(DateTime start, DateTime end) {
+    final from = DateTime(start.year, start.month, start.day);
+    final to = DateTime(end.year, end.month, end.day)
+        .add(const Duration(days: 1));
+    return [
+      for (final m in activeMeds)
+        if (!m.id.startsWith('ttcm_'))
+          if (addedAt(m) case final at?)
+            if (!at.isBefore(from) && at.isBefore(to)) m,
+    ];
+  }
+
   Future<void> _persistMeds() async {
     try {
       final prefs = await SharedPreferences.getInstance();

@@ -69,7 +69,11 @@ import 'ttc_cycle_companion.dart'
 import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_hub.dart' show TtcHubMonth, ttcCycleViewChanges;
 import 'ttc_appointments_screen.dart'
-    show TtcApptEntry, openTtcAppointment;
+    show
+        TtcApptEntry,
+        openTtcAppointment,
+        ttcApptMatchesStep,
+        kTtcRoundVisitSteps;
 import 'ttc_symptom_log_screen.dart' show TtcSymptomLogScreen;
 import 'ttc_partner_home.dart' show TtcPartnerViewOnlyLine;
 import '../v2/v2_palette.dart' show V2PaletteStore;
@@ -467,17 +471,32 @@ List<String> ttcCalendarClinicLines(DateTime d) {
   // clinic date where the hour matters, and the calendar showed only its
   // name. Same "Trigger injection · 10:15pm" shape the round screens use.
   // Kept for revert: if (_sameDay(r[step], d)) '$prefix${name(step, r.kind)}',
-  List<String> of(TtcTreatmentCycle r, {String prefix = ''}) => [
+  // ⚠️ ONE LINE PER VISIT (T4 K9, 2026-10-29). A clinic date she also typed
+  // into Appointments drew twice, with two reminders. On the open round, a
+  // step whose day holds an appointment of the matching type drops its line:
+  // the appointment wins, because it carries the time and the reminder. Past
+  // rounds are untouched.
+  final own = TtcAppointmentsStore.instance.on(d);
+  bool carried(TtcTreatmentStep? step) =>
+      own.any((a) => ttcApptMatchesStep(a.title, step));
+  List<String> of(TtcTreatmentCycle r,
+          {String prefix = '', bool dedupe = false}) =>
+      [
         for (final step in TtcTreatmentStep.values)
-          if (_sameDay(r[step], d))
+          if (_sameDay(r[step], d) &&
+              !(dedupe &&
+                  kTtcRoundVisitSteps.contains(step) &&
+                  carried(step)))
             step.needsTime
                 ? '$prefix${name(step, r.kind)} · ${ttcRoundTime(r[step]!)}'
                 : '$prefix${name(step, r.kind)}',
         for (final s in r.scans)
-          if (_sameDay(s, d)) '$prefix${name(null, r.kind)}',
+          if (_sameDay(s, d) && !(dedupe && carried(null)))
+            '$prefix${name(null, r.kind)}',
       ];
   return [
-    ...of(t.cycle),
+    // Kept for revert: ...of(t.cycle),
+    ...of(t.cycle, dedupe: true),
     for (final h in t.history.reversed)
       ...of(h, prefix: '$kTtcCalendarPastRound · '),
   ];
@@ -1467,7 +1486,9 @@ class _DayPanel extends StatelessWidget {
           //   _line(_timelineIcon(e.kind), ttcSoft, e.title(hi)),
         ],
         const SizedBox(height: 6),
-        // His side (2026-10-10): he sees her calendar, he never edits it.
+        // His side (2026-10-10): he sees her calendar and never edits her
+        // days. (T4 K10: "he never edits it" was stale; he adds and changes
+        // appointments, through Appointments.)
         if (TtcPartnerMode.instance.on)
           TtcPartnerViewOnlyLine(p: V2PaletteStore.instance.current)
         else

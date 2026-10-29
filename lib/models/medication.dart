@@ -38,6 +38,9 @@ class MedAlarm {
   final String id;
 
   /// Custom alarm title. Empty means "use the medication name" at display time.
+  ///
+  /// [kPrivateMedAlarmTitle] is the TTC sheet's (T4 Q4, 2026-10-29): the
+  /// alarm then names no medicine on the lock screen, title or body.
   final String title;
 
   /// Times of day, minutes-since-midnight. Multiple entries = multiple alarms
@@ -256,3 +259,13 @@ class MedicationLog {
         takenAtIso: (j['takenAtIso'] ?? '').toString(),
       );
 }
+
+/// The lock-screen title for a medicine saved from the TTC sheet (T4 Q4, the
+/// user, 2026-10-29: "if someone else reads it… less private"). A fertility
+/// drug's name on a lock screen tells anyone who glances at the phone. When an
+/// alarm carries this title the body names nothing either, because the body
+/// shows on the lock screen too; the name is inside the app.
+const String kPrivateMedAlarmTitle = 'Time for your medicine';
+
+/// The body that goes with [kPrivateMedAlarmTitle].
+const String kPrivateMedAlarmBody = 'Open ParentVeda to see which.';

@@ -173,28 +173,38 @@ class TtcSemenReading {
     this.abstinenceNote,
     this.extra,
     this.volumeMl,
+    this.readId,
     this.coupleReadiness = false,
   });
 
   final TtcSemenRoute route;
   final List<TtcSemenLine> lines;
 
+  /// A read that answers this route, opened from under [extra] (T4 K12: the
+  /// azoospermia route said "There's a piece in this section" with no link).
+  final String? readId;
+
   /// Reported, never compared. See the note on `kTtcSemenLimits`.
   final double? volumeMl;
 
   /// What the screen says about volume, when he entered it.
   ///
-  /// ⚠️ NO THRESHOLD, ON PURPOSE. WHO publishes a fifth-percentile volume too,
-  /// and it is deliberately not in `kTtcSemenLimits` — a low volume on its own
-  /// is a reason to mention it, not a fifth line to fall below. So this
-  /// sentence reports the number and says exactly that.
+  /// ⚠️ NOT A FIFTH LINE, BUT NOT DENIED EITHER (T4 W13, 2026-10-29). WHO
+  /// 2021 publishes a lower reference for volume, 1.4 ml, and the sentence
+  /// used to say volume "is not one of the four numbers with a reference
+  /// line", which was false. The four lines stay four (a low volume on its
+  /// own is a reason to mention it, not a line to fall below), and this
+  /// sentence now names WHO's number. Kept for revert:
+  ///   'Your volume is $n ml. The lab reports volume, but it is not one of
+  ///   the four numbers with a reference line, so nothing here rates it. A
+  ///   very low volume on its own is worth mentioning to a doctor.'
   String? get volumeSentence {
     final v = volumeMl;
     if (v == null) return null;
     final n = v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
-    return 'Your volume is $n ml. The lab reports volume, but it is not one '
-        'of the four numbers with a reference line, so nothing here rates it. '
-        'A very low volume on its own is worth mentioning to a doctor.';
+    return 'Your volume is $n ml. WHO also publishes a lower reference for '
+        'volume, 1.4 ml. A low volume on its own is worth mentioning to your '
+        'doctor, who reads it with the rest.';
   }
 
   /// True only on the usual-range path: the brief says that when everything
@@ -285,8 +295,10 @@ TtcSemenReading ttcReadSemenReport(TtcSemenEntry e) {
           'one result that goes straight to an andrologist rather than to a '
           'second sample. Sperm can often be retrieved directly, and sometimes '
           'the cause is a blockage that can be treated.',
-      extra: "There's a piece in this section about exactly this. Read it "
-          'before anything else you find tonight.',
+      // K12 (T4): the piece is linked now, under this line.
+      extra: "There's a piece about exactly this. Read it before anything "
+          'else you find tonight.',
+      readId: 'ttc_read_azoospermia',
     );
   }
 
@@ -341,14 +353,22 @@ TtcSemenReading ttcReadSemenReport(TtcSemenEntry e) {
     volumeMl: e.volumeMl,
     abstinenceNote: abstinence,
     coupleReadiness: true,
-    headline: 'These are in the usual range.',
+    // K12 (T4): with the abstinence window off, the headline cannot sit
+    // plainly over "may not be reliable". Kept for revert:
+    //   headline: 'These are in the usual range.',
+    headline: abstinence == null
+        ? 'These are in the usual range.'
+        : 'These look in the usual range, but read the note first.',
     // ⚠️ "DOES NOT GUARANTEE ANYTHING" IS NOT HEDGING. A normal semen analysis
     // rules out the commonest male causes and rules out nothing else, and a man
     // who reads it as "my side is fine" stops looking — which is how a couple
     // spends another year on her.
-    body: 'A normal result rules out the most common male causes, and that '
-        "is worth having. It does not guarantee anything, and it doesn't mean "
-        "the question is closed if you've been trying for a while.",
+    // K12 (T4): "rules out" overclaimed. Kept for revert: 'A normal result
+    // rules out the most common male causes, and that is worth having. ...'
+    body: 'A result in the usual range makes the most common male causes '
+        "less likely, and that is worth having. It does not guarantee "
+        "anything, and it doesn't mean the question is closed if you've been "
+        'trying for a while.',
   );
 }
 

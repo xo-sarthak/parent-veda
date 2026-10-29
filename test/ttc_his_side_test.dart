@@ -527,7 +527,9 @@ void main() {
         volumeMl: 1.2,
       ));
       expect(r.volumeSentence, contains('1.2 ml'));
-      expect(r.volumeSentence!.toLowerCase(), contains('not one of the four'));
+      // T4 W13: WHO 2021 does publish 1.4 ml, and the sentence names it.
+      // Was: contains('not one of the four').
+      expect(r.volumeSentence, contains('1.4 ml'));
       expect(r.volumeSentence!.toLowerCase(), isNot(contains('below')));
     });
 

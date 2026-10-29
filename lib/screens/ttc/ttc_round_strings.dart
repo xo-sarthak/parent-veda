@@ -23,6 +23,9 @@
 import '../../ttc/ttc_home_hero.dart';
 import '../../ttc/ttc_treatment_round.dart';
 import '../../ttc/ttc_treatment_store.dart';
+// Dart allows the two files to import each other; the panel state is decided
+// once, there, and the title reads it (T4 GAP 25).
+import 'ttc_treatment_round_screens.dart' show TtcIvfPanel, ttcIvfPanelNow;
 
 // ---- dates --------------------------------------------------------------------
 
@@ -283,9 +286,12 @@ String ttcRoundUpcomingLine(TtcHeroLine line) {
       );
     case TtcHeroState.treatmentStimulation:
       final scansOnly = line.countStep == null;
+      // T4 W2: an IUI round's first step reads "First tablet or injection",
+      // so the stage cannot say tablets only. Kept for revert:
+      // 'Tablets and scans'.
       final stage = kind == TtcRoundKind.ovulationInduction ||
               kind == TtcRoundKind.iui
-          ? 'Tablets and scans'
+          ? 'Medicines and scans'
           : kind == TtcRoundKind.fetNatural
               ? 'Scans'
               : 'Stimulation';
@@ -666,9 +672,10 @@ String ttcRoundPhaseName(TtcRoundPhase phase, TtcRoundKind? kind) =>
       TtcRoundPhase.ownCycle => 'No dates yet',
       TtcRoundPhase.planned => 'Not started yet',
       TtcRoundPhase.gettingReady => 'Getting ready',
+      // T4 W2. Kept for revert: 'Tablets and scans'.
       TtcRoundPhase.stimulation => kind == TtcRoundKind.ovulationInduction ||
               kind == TtcRoundKind.iui
-          ? 'Tablets and scans'
+          ? 'Medicines and scans'
           : kind == TtcRoundKind.fetNatural
               ? 'Scans'
               : 'Stimulation',
@@ -684,6 +691,147 @@ String ttcRoundPhaseName(TtcRoundPhase phase, TtcRoundKind? kind) =>
     };
 
 const String kTtcUndoCardLine = 'You closed a round in the last 7 days.';
+
+// ---- the trigger reminder line (T4 W5) ------------------------------------------
+
+/// The line under a trigger date, or null when no reminder is still to come
+/// (T4 W5). "We'll remind you 4 hours before… and 15 minutes before" showed
+/// whenever a trigger date existed: after it was ticked taken (both are
+/// cancelled then), after the time had passed, and when the 4-hour mark had
+/// already gone by when the time was set.
+String? ttcTriggerReminderLine(TtcTreatmentCycle r, DateTime now) {
+  final at = r[TtcTreatmentStep.trigger];
+  if (at == null) return null;
+  if (r.triggerTaken) return 'Taken. Reminders are off.';
+  if (!at.subtract(const Duration(minutes: 15)).isAfter(now)) return null;
+  return at.subtract(const Duration(hours: 4)).isAfter(now)
+      ? "We'll remind you 4 hours before the trigger injection, and again "
+          '15 minutes before.'
+      : "We'll remind you 15 minutes before the trigger injection.";
+}
+
+/// "Reminders set for 5:15pm and 9:00pm." The trigger save names both
+/// reminder times (T4 K2), or the one still to come.
+String ttcTriggerSavedLine(DateTime at, DateTime now) {
+  final prep = at.subtract(const Duration(hours: 4));
+  final last = at.subtract(const Duration(minutes: 15));
+  if (!last.isAfter(now)) return 'Trigger time saved.';
+  return prep.isAfter(now)
+      ? 'Reminders set for ${ttcRoundTime(prep)} and ${ttcRoundTime(last)}.'
+      : 'Reminder set for ${ttcRoundTime(last)}.';
+}
+
+// ---- OHSS, one fixed line (T4 K3) -------------------------------------------------
+
+/// The red-flag line, shown from egg collection until the test (T4 K3). The
+/// signs were one rotating card, on about half the embryo days, never in the
+/// wait (late OHSS) and never for freeze-all after collection. Routes: the
+/// clinic the same day, hospital for breathlessness (NHS, HFEA). "Go to
+/// hospital" is the app's own wording for emergency routing everywhere else.
+const String kTtcOhssLine =
+    'Bad tummy pain or swelling, vomiting, or passing much less urine: call '
+    "your clinic today. If you're short of breath, go to hospital now.";
+const String kTtcOhssReadId = 'ttc_read_ivf_ohss';
+
+/// Whether [kTtcOhssLine] shows: a round with an egg collection, from that
+/// day until the blood test (or open-ended when no test is dated).
+bool ttcShowOhssLine(TtcTreatmentCycle r, DateTime now) {
+  if (r.isClosed || r.kind == TtcRoundKind.iui) return false;
+  final opu = r[TtcTreatmentStep.retrieval];
+  if (opu == null) return false;
+  final today = _d(now);
+  if (today.isBefore(_d(opu))) return false;
+  final test = r[TtcTreatmentStep.betaTest];
+  return test == null || !today.isAfter(_d(test));
+}
+
+const String kTtcRoundClearedToast = 'Dates removed.';
+const String kTtcRoundReopenedToast = 'Round reopened.';
+
+// ---- the tool's title (T4, TTC-GAP 25) -------------------------------------------
+
+/// The treatment tool's title, naming today's step (TTC-GAP 25, 2026-10-29).
+/// It was "The dates your\nclinic gave you." whatever the day; everything it
+/// needed was already worked out on the screen. One line, no hard break.
+///
+/// ⚠️ HIS PHONE GETS "Her round", never a step, a day or a result. His line
+/// ([ttcPartnerRoundLine]) is the intro, and it is null while she waits to
+/// hear, so the title cannot tell him how the test went before she does.
+String ttcTreatmentTitle(
+  TtcTreatmentCycle round,
+  TtcTreatmentStore store,
+  DateTime now, {
+  required bool partner,
+}) {
+  if (partner) return kTtcPartnerRoundEyebrow;
+  final today = _d(now);
+  final none = round.kind == null && round.isEmpty;
+  if (none) {
+    switch (ttcIvfPanelNow(now: now)) {
+      case TtcIvfPanel.between:
+        return store.lastClosed?.outcome == TtcRoundOutcome.paused
+            ? 'Taking a break.'
+            : 'Between rounds.';
+      case TtcIvfPanel.positive:
+        return 'A positive test.';
+      case TtcIvfPanel.start:
+      case TtcIvfPanel.round:
+        return "Your clinic's dates, in one place.";
+    }
+  }
+  // An older round with no kind: the phase maths assumes IVF and would call
+  // an IUI "Egg collection day", so it keeps the old title.
+  if (round.kind == null) return 'The dates your clinic gave you.';
+  if (round.isEmpty) return 'No dates yet.';
+  final kind = round.kind;
+  final phase = ttcTreatmentPhase(round, today);
+  final count = ttcRoundDayCount(round, phase, today);
+  final n = count == null || count.$1 <= 0 ? null : count.$1;
+  String withDay(String name) => n == null ? '$name.' : '$name, day $n.';
+  switch (phase) {
+    case TtcRoundPhase.planned:
+      final first = ttcFirstTreatmentDate(round);
+      return first == null
+          ? 'No dates yet.'
+          : 'Starts ${ttcRoundDate(first)}.';
+    case TtcRoundPhase.embryoDays:
+      return n == null ? 'Embryo days.' : 'Embryo day $n.';
+    case TtcRoundPhase.waiting:
+      return withDay('The wait');
+    case TtcRoundPhase.testDay:
+      DateTime? at(TtcTreatmentStep s) =>
+          round[s] == null ? null : _d(round[s]!);
+      final onTest = at(TtcTreatmentStep.betaTest) == today ||
+          at(TtcTreatmentStep.repeatBeta) == today;
+      return onTest ? 'Test day.' : 'Waiting to hear.';
+    case TtcRoundPhase.result:
+      return 'A positive test.';
+    case TtcRoundPhase.betweenRounds:
+      return 'Between rounds.';
+    case TtcRoundPhase.ownCycle:
+      return 'The dates your clinic gave you.';
+    case TtcRoundPhase.gettingReady:
+    case TtcRoundPhase.stimulation:
+    case TtcRoundPhase.trigger:
+      return withDay(ttcRoundPhaseName(phase, kind));
+    case TtcRoundPhase.procedure:
+    case TtcRoundPhase.transfer:
+      return '${ttcRoundPhaseName(phase, kind)}.';
+  }
+}
+
+/// His intro under "Her round": his line and its note, or a calm line when
+/// there is nothing of hers to show him (no round, closed, or waiting).
+String ttcPartnerTreatmentIntro(TtcTreatmentCycle round, DateTime now) {
+  final line = ttcPartnerRoundLine(round, now);
+  if (line == null) {
+    return round.isEmpty || round.isClosed
+        ? "When she adds her clinic's dates, you'll see them here."
+        : 'Her dates are below. How the test went is hers to share.';
+  }
+  final (_, text, note) = line;
+  return note == null ? '$text.' : '$text. $note';
+}
 
 // ---- the calendar (B5, §3c) ---------------------------------------------------
 

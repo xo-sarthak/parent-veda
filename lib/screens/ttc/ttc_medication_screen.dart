@@ -77,8 +77,11 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../models/medication.dart';
 import '../../services/medicine_store.dart';
+import '../../services/pregnancy_records.dart';
 import '../../theme/pv_fonts.dart';
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
@@ -129,6 +132,58 @@ List<int> ttcMedTimes(Medication m) => m.alarms
     .toSet()
     .toList()
   ..sort();
+
+/// How often a medicine's reminders ring, from the alarms' own repeat (T4
+/// W9): "every day", "on Mondays and Thursdays", or "on the days you set".
+/// The page said "every day" even for weekday alarms made in Pregnancy.
+String ttcMedRepeatLine(Medication m) {
+  final on = [for (final a in m.alarms) if (a.enabled && a.times.isNotEmpty) a];
+  if (on.isEmpty || on.every((a) => a.repeat == MedAlarmRepeat.daily)) {
+    return 'every day';
+  }
+  final days = on.first.weekdays.toSet();
+  final same = on.every((a) =>
+      a.repeat != MedAlarmRepeat.daily &&
+      a.weekdays.toSet().length == days.length &&
+      a.weekdays.toSet().containsAll(days));
+  if (!same || days.isEmpty) return 'on the days you set';
+  const names = [
+    'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays',
+    'Saturdays', 'Sundays',
+  ];
+  final s = [for (final d in days.toList()..sort()) names[d - 1]];
+  if (s.length == 1) return 'on ${s.first}';
+  return 'on ${s.sublist(0, s.length - 1).join(', ')} and ${s.last}';
+}
+
+/// The first day a medicine's reminders ring, when it is set (T4 W7).
+DateTime? ttcMedFirstDay(Medication m) {
+  for (final a in m.alarms) {
+    final d = DateTime.tryParse(a.startDateIso ?? '');
+    if (d != null) return ttcDoseDay(d);
+  }
+  return null;
+}
+
+/// "Dose and reminders changed." What an edit did (T4 K7; a plain edit saved
+/// without a word).
+String ttcMedChangeToast(Medication before, Medication after) {
+  final what = <String>[
+    if (before.name != after.name) 'name',
+    if (before.dose != after.dose) 'dose',
+    if (before.frequency != after.frequency) 'when',
+    if (before.notes != after.notes) 'notes',
+    if (ttcMedTimes(before).join(',') != ttcMedTimes(after).join(',') ||
+        ttcMedFirstDay(before) != ttcMedFirstDay(after))
+      'reminders',
+    if (ttcMedLastDay(before) != ttcMedLastDay(after)) 'last day',
+  ];
+  if (what.isEmpty) return 'Nothing changed.';
+  final j = what.length == 1
+      ? what.first
+      : '${what.sublist(0, what.length - 1).join(', ')} and ${what.last}';
+  return '${j[0].toUpperCase()}${j.substring(1)} changed.';
+}
 
 /// "8:00 am and 9:00 pm".
 String _joinTimes(List<int> times) {
@@ -241,6 +296,10 @@ class _TtcMedicationScreenState extends State<TtcMedicationScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 22),
+
+                // K7 (T4): after a loss, the medicines added while she was
+                // pregnant, to check with her doctor. Nothing stops by itself.
+                const TtcMedAfterLossCard(),
 
                 // A feature is never hidden: the empty state is an invitation,
                 // and it says what this is FOR rather than that it is empty.
@@ -456,8 +515,16 @@ class _TtcMedicineDetailScreenState extends State<TtcMedicineDetailScreen> {
         } else if (finished) {
           reminders = 'Reminders stopped after ${ttcDoseShortDate(last!)}.';
         } else {
-          reminders = 'Your phone reminds you at ${_joinTimes(times)}, every '
-              'day${last == null ? '' : ' until ${ttcDoseShortDate(last)}'}.';
+          // T4 W9: the alarm's own repeat, and W7's first day. Kept for
+          // revert: '... at ${_joinTimes(times)}, every day...'
+          final first = ttcMedFirstDay(m);
+          final starts = first != null &&
+                  first.isAfter(ttcDoseDay(DateTime.now()))
+              ? ', from ${ttcDoseShortDate(first)}'
+              : '';
+          reminders = 'Your phone reminds you at ${_joinTimes(times)}, '
+              '${ttcMedRepeatLine(m)}$starts'
+              '${last == null ? '' : ' until ${ttcDoseShortDate(last)}'}.';
         }
 
         return TtcToolScaffold(
@@ -565,10 +632,15 @@ class _TtcMedicineDetailScreenState extends State<TtcMedicineDetailScreen> {
         title: 'Remove ${m.name}?',
         body: 'Its reminders stop, and the days you ticked it go too.');
     if (!ok || !context.mounted) return;
-    pvSnack(context, '${m.name} removed', lift: 24);
+    final store = MedicineStore.instance;
+    // K7 (T4): Undo, with the ticked days (P1's `restoreMed`). Kept for
+    // revert: pvSnack(context, '${m.name} removed', lift: 24);
+    final logs = store.logsFor(m.id);
+    pvSnack(context, '${m.name} removed',
+        action: 'Undo', onAction: () => store.restoreMed(m, logs), lift: 24);
     // Not awaited: the list changes at once, and the alarm cancel behind it
     // is a platform call the page need not wait for.
-    MedicineStore.instance.deleteMed(m.id);
+    store.deleteMed(m.id);
     nav.maybePop();
   }
 }
@@ -584,6 +656,8 @@ Future<void> editTtcMedication(BuildContext context, Medication? existing,
     showTtcDoseSheet<void>(
       context,
       routeName: 'ttc/medication_edit',
+      // K7 (T4): the form asks before a half-typed entry is dropped.
+      enableDrag: false,
       builder: (_) =>
           _MedSheet(t: TtcS.current(), existing: existing, again: again),
     );
@@ -621,6 +695,36 @@ class _MedSheetState extends State<_MedSheet> {
   DateTime? _lastDay;
   DateTime? _startLastDay;
 
+  /// The first day the reminders ring (T4 W7). Null means from today. The
+  /// hint invites "Days 3 to 7, once a day", and the reminders rang from
+  /// the day it was saved; the scheduler already honoured a start date.
+  DateTime? _firstDay;
+  DateTime? _startFirstDay;
+
+  /// Set once Save or a confirmed discard closes the sheet (K7).
+  bool _closing = false;
+
+  bool get _dirty {
+    if (_closing) return false;
+    final e = widget.existing;
+    if (e == null) {
+      return _name.text.trim().isNotEmpty ||
+          _dose.text.trim().isNotEmpty ||
+          _freq.text.trim().isNotEmpty ||
+          _notes.text.trim().isNotEmpty ||
+          _times.isNotEmpty ||
+          _lastDay != null ||
+          _firstDay != null;
+    }
+    return _name.text.trim() != e.name ||
+        _dose.text.trim() != e.dose ||
+        _freq.text.trim() != e.frequency ||
+        _notes.text.trim() != e.notes ||
+        !_sameTimes(_times, _startTimes) ||
+        _lastDay != _startLastDay ||
+        _firstDay != _startFirstDay;
+  }
+
   /// Set when she taps Save with no name, so the reason shows under the
   /// button instead of the tap doing nothing.
   bool _needsName = false;
@@ -644,6 +748,8 @@ class _MedSheetState extends State<_MedSheet> {
     _times = e == null ? <int>[] : ttcMedTimes(e);
     _startTimes = [..._times];
     _startLastDay = e == null ? null : ttcMedLastDay(e);
+    _startFirstDay = e == null ? null : ttcMedFirstDay(e);
+    _firstDay = _startFirstDay;
     // "Take it again" opens with the old last day gone, and says so.
     _lastDay = widget.again ? null : _startLastDay;
   }
@@ -662,7 +768,23 @@ class _MedSheetState extends State<_MedSheet> {
     final t = widget.t;
     final p = V2PaletteStore.instance.current;
     final editing = widget.existing != null;
-    return TtcDoseSheet(
+    return PopScope(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final nav = Navigator.of(context);
+        final leave = await ttcConfirmRemove(context,
+            title: editing ? 'Leave without saving?' : 'Discard this medicine?',
+            body: editing
+                ? 'Your changes will not be kept.'
+                : 'What you typed will not be added.',
+            yes: 'Discard',
+            no: 'Keep editing');
+        if (!leave || !mounted) return;
+        setState(() => _closing = true);
+        nav.pop();
+      },
+      child: TtcDoseSheet(
       eyebrow: t.hinglish ? 'Dawaiyan' : 'Medication',
       // Kept for revert (2026-09-28): 'Take it again'
       title: widget.again
@@ -758,6 +880,68 @@ class _MedSheetState extends State<_MedSheet> {
           ),
         ]),
 
+        // ---- the first day (T4 W7) ------------------------------------
+        const SizedBox(height: 18),
+        ttcDoseLabel('First day (optional)'),
+        Text(
+            'For a course that starts later, like days 3 to 7. Reminders '
+            'wait until this day.',
+            style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(
+            child: InkWell(
+              key: const ValueKey('ttc_med_first_day'),
+              onTap: _pickFirstDay,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: p.line),
+                ),
+                child: Row(children: [
+                  Icon(Icons.event_outlined, size: 16, color: p.ink2),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                        _firstDay == null
+                            ? 'From today'
+                            : 'From ${ttcDoseShortDate(_firstDay!)} '
+                                '${_firstDay!.year}',
+                        style: pvManrope(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink1)),
+                  ),
+                  Text(_firstDay == null ? 'Set first day' : 'Change first day',
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: p.ink1)),
+                ]),
+              ),
+            ),
+          ),
+          if (_firstDay != null) ...[
+            const SizedBox(width: 6),
+            TextButton(
+              onPressed: () => setState(() => _firstDay = null),
+              child: Text('From today',
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink2)),
+            ),
+          ],
+        ]),
+        if (_firstDay != null && _times.isNotEmpty)
+          TtcFormHint(
+              key: const ValueKey('ttc_med_first_day_line'),
+              text: 'Reminders start on ${ttcDoseShortDate(_firstDay!)}.'),
+
         // ---- the last day ----------------------------------------------
         const SizedBox(height: 18),
         ttcDoseLabel('Last day (optional)'),
@@ -831,7 +1015,22 @@ class _MedSheetState extends State<_MedSheet> {
                   'again to keep both, or close this and open the one you '
                   'have.'),
       ],
+    ));
+  }
+
+  Future<void> _pickFirstDay() async {
+    final today = ttcDoseDay(DateTime.now());
+    final picked = await showDatePicker(
+      context: context,
+      helpText: 'First day of this medicine',
+      initialDate:
+          _firstDay != null && !_firstDay!.isBefore(today) ? _firstDay! : today,
+      firstDate: today,
+      lastDate: today.add(const Duration(days: 365)),
     );
+    // A closed picker changes nothing: no silent default.
+    if (picked == null || !mounted) return;
+    setState(() => _firstDay = picked);
   }
 
   Future<void> _addTime() async {
@@ -897,6 +1096,7 @@ class _MedSheetState extends State<_MedSheet> {
     }
 
     final lastIso = _lastDay?.toIso8601String();
+    final firstIso = _firstDay?.toIso8601String();
 
     // ⚠️ AN UNTOUCHED SCHEDULE IS KEPT AS IT WAS. `MedicineStore` is shared
     // with pregnancy, whose tracker can hold weekday alarms and several
@@ -904,9 +1104,19 @@ class _MedSheetState extends State<_MedSheet> {
     // alarms when she changed the times or the last day here.
     final unchanged = existing != null &&
         _sameTimes(_times, _startTimes) &&
-        _lastDay == _startLastDay;
+        _lastDay == _startLastDay &&
+        _firstDay == _startFirstDay;
+    // ⚠️ Q4 (T4, the user, 2026-10-29): a medicine saved from this sheet
+    // names nothing on the lock screen ([kPrivateMedAlarmTitle]). An
+    // untouched schedule keeps its configs; one with no title of its own
+    // takes the private one. Kept for revert: `? existing.alarms`.
     final alarms = unchanged
-        ? existing.alarms
+        ? [
+            for (final a in existing.alarms)
+              a.title.trim().isEmpty
+                  ? a.copyWith(title: kPrivateMedAlarmTitle)
+                  : a,
+          ]
         : _times.isEmpty
             ? const <MedAlarm>[]
             : [
@@ -916,8 +1126,10 @@ class _MedSheetState extends State<_MedSheet> {
                   id: existing?.alarms.isNotEmpty == true
                       ? existing!.alarms.first.id
                       : 'ttcma_${DateTime.now().microsecondsSinceEpoch}',
+                  title: kPrivateMedAlarmTitle,
                   times: _times,
                   repeat: MedAlarmRepeat.daily,
+                  startDateIso: firstIso,
                   // `NotificationService` compares by day, so the medicine
                   // still rings on its last day and not after.
                   endDateIso: lastIso,
@@ -942,10 +1154,11 @@ class _MedSheetState extends State<_MedSheet> {
         alarms: alarms,
       ));
       pvSnack(context, '$name added', icon: Icons.check_rounded, lift: 24);
+      _closing = true;
     } else {
       // Built in full rather than with `copyWith`, which cannot clear an end
       // date: "No end" has to be able to take one away.
-      store.updateMed(Medication(
+      final updated = Medication(
         id: existing.id,
         name: name,
         type: existing.type,
@@ -958,9 +1171,15 @@ class _MedSheetState extends State<_MedSheet> {
         endDateIso: lastIso,
         isActive: existing.isActive,
         alarms: alarms,
-      ));
+      );
+      store.updateMed(updated);
+      _closing = true;
       if (widget.again) {
         pvSnack(context, "$name is back on today's list",
+            icon: Icons.check_rounded, lift: 24);
+      } else {
+        // K7 (T4): the edit says what changed.
+        pvSnack(context, ttcMedChangeToast(existing, updated),
             icon: Icons.check_rounded, lift: 24);
       }
     }
@@ -1754,3 +1973,146 @@ class _Pill extends StatelessWidget {
 //         ]),
 //       );
 // }
+
+/// After a loss: the medicines added while she was pregnant, to check with
+/// her doctor (T4 K7, the TTC mirror of P1's D3). The same wording rule as
+/// every after-loss surface: no baby words, nothing stops by itself, every
+/// row asks Keep or Stop, and Stop has an Undo. Answers are kept per loss,
+/// on this phone. Draws nothing when there is nothing to ask.
+class TtcMedAfterLossCard extends StatefulWidget {
+  const TtcMedAfterLossCard({super.key});
+
+  @override
+  State<TtcMedAfterLossCard> createState() => _TtcMedAfterLossCardState();
+}
+
+class _TtcMedAfterLossCardState extends State<TtcMedAfterLossCard> {
+  Set<String> _answered = {};
+
+  static String _key(DateTime ended) =>
+      'ttc_med_after_loss_${MedicineStore.dateKey(ended)}';
+
+  ({DateTime start, DateTime end})? get _loss {
+    final r = PregnancyRecords.instance;
+    if (r.current != null) return null;
+    final last = r.lastEnded;
+    if (last == null || last.outcome != PregnancyOutcome.loss) return null;
+    final end = last.endedOn;
+    if (end == null) return null;
+    return (start: last.startedOn, end: end);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final loss = _loss;
+    if (loss == null) return;
+    try {
+      final ids = (await SharedPreferences.getInstance())
+              .getStringList(_key(loss.end)) ??
+          const <String>[];
+      if (mounted) setState(() => _answered = ids.toSet());
+    } catch (_) {/* nothing answered yet */}
+  }
+
+  Future<void> _answer(String id) async {
+    final loss = _loss;
+    if (loss == null) return;
+    setState(() => _answered = {..._answered, id});
+    try {
+      await (await SharedPreferences.getInstance())
+          .setStringList(_key(loss.end), _answered.toList());
+    } catch (_) {/* best-effort */}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loss = _loss;
+    if (loss == null) return const SizedBox.shrink();
+    final store = MedicineStore.instance;
+    final rows = [
+      for (final m in store.addedDuring(loss.start, loss.end))
+        if (!_answered.contains(m.id)) m,
+    ];
+    if (rows.isEmpty) return const SizedBox.shrink();
+    final p = V2PaletteStore.instance.current;
+    Widget pill(String label, Key key, VoidCallback onTap,
+            {bool filled = false}) =>
+        PvPress(
+          child: GestureDetector(
+            key: key,
+            onTap: onTap,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: filled ? p.ink1 : Colors.white,
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(color: p.ink1, width: 1.2),
+              ),
+              child: Text(label,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: filled ? Colors.white : p.ink1)),
+            ),
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Container(
+        key: const ValueKey('ttc_med_after_loss_card'),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line, width: 1.2),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Added while you were pregnant',
+              style: pvFraunces(
+                  fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1)),
+          const SizedBox(height: 6),
+          Text(
+              'Check these with your doctor. Keep each one or stop it. '
+              'Nothing changes until you choose.',
+              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+          const SizedBox(height: 4),
+          for (final m in rows)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Row(children: [
+                Expanded(
+                  child: Text(m.name,
+                      style: pvManrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink1)),
+                ),
+                pill('Keep', ValueKey('ttc_med_loss_keep_${m.id}'), () {
+                  _answer(m.id);
+                  pvSnack(context, 'Kept: ${m.name}. It stays on your list.',
+                      icon: Icons.check_rounded, lift: 24);
+                }),
+                const SizedBox(width: 8),
+                pill('Stop', ValueKey('ttc_med_loss_stop_${m.id}'), () {
+                  store.updateMed(m.copyWith(isActive: false));
+                  _answer(m.id);
+                  pvSnack(context,
+                      'Stopped: ${m.name}. Its reminders are off too.',
+                      action: 'Undo',
+                      onAction: () =>
+                          store.updateMed(m.copyWith(isActive: true)),
+                      lift: 24);
+                }, filled: true),
+              ]),
+            ),
+        ]),
+      ),
+    );
+  }
+}

@@ -78,6 +78,9 @@ import '../../theme/pv_fonts.dart';
 // import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_doctor_questions_store.dart';
 import '../../ttc/ttc_records_store.dart';
+import '../../ttc/ttc_treatment_store.dart';
+import 'ttc_round_strings.dart' show ttcStepLabel, ttcScanLabel;
+import 'ttc_treatment_screen.dart' show openTtcTreatment;
 import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
@@ -110,12 +113,20 @@ class TtcApptEntry {
     required this.fromParentVeda,
     this.own,
     this.bookingId,
+    this.roundStep,
+    this.fromRound = false,
   });
 
   final String title;
   final DateTime startsUtc;
   final String detail;
   final bool fromParentVeda;
+
+  /// A clinic date from her treatment round (T4 K9), shown here read-only
+  /// and opening the round. The round's dates are days, not times, so the
+  /// row shows no time. [roundStep] is null for a monitoring scan.
+  final bool fromRound;
+  final TtcTreatmentStep? roundStep;
 
   /// The couple's own appointment. Null for a ParentVeda booking, which is
   /// read-only here because the booking engine owns the seat.
@@ -130,14 +141,99 @@ class TtcApptEntry {
       own?.id ?? ttcBookingVisitId(bookingId ?? '$title@$startsUtc');
 
   DateTime get startsLocal => startsUtc.toLocal();
-  bool get isUpcoming => startsUtc.isAfter(DateTime.now().toUtc());
+
+  /// A round date is upcoming through the whole of its day; a visit with a
+  /// time, until that time.
+  bool get isUpcoming {
+    if (!fromRound) return startsUtc.isAfter(DateTime.now().toUtc());
+    final n = DateTime.now();
+    final l = startsLocal;
+    return !DateTime(l.year, l.month, l.day)
+        .isBefore(DateTime(n.year, n.month, n.day));
+  }
+
+  /// "Thu 2 Oct at 10:30am", or the day alone for a round date.
+  String get whenLabel => fromRound
+      ? ttcApptDay(startsLocal)
+      : '${ttcApptDay(startsLocal)} at ${ttcApptTime(startsLocal)}';
+}
+
+/// The tag a round date wears (T4 K9).
+const String kTtcApptFromRound = 'From your treatment cycle';
+
+/// The round steps that are a visit to the clinic. A first injection or a
+/// progesterone start is done at home, so it is not an appointment.
+const List<TtcTreatmentStep> kTtcRoundVisitSteps = [
+  TtcTreatmentStep.baselineScan,
+  TtcTreatmentStep.retrieval,
+  TtcTreatmentStep.iui,
+  TtcTreatmentStep.transfer,
+  TtcTreatmentStep.betaTest,
+  TtcTreatmentStep.repeatBeta,
+  TtcTreatmentStep.reviewAppointment,
+];
+
+/// Whether an appointment she typed is the same visit as a round step
+/// (T4 K9): same day is checked by the caller; this matches the type by the
+/// words in its name. [step] null is a monitoring scan. A name that says
+/// nothing recognisable matches nothing, so both lines stay.
+bool ttcApptMatchesStep(String title, TtcTreatmentStep? step) {
+  final t = title.toLowerCase();
+  bool any(List<String> w) => w.any(t.contains);
+  return switch (step) {
+    null || TtcTreatmentStep.baselineScan =>
+      any(['scan', 'ultrasound', 'follicle', 'usg']),
+    TtcTreatmentStep.retrieval =>
+      any(['egg collection', 'retrieval', 'opu', 'pick up', 'pickup']),
+    TtcTreatmentStep.iui => any(['iui', 'insemination']),
+    TtcTreatmentStep.transfer => any(['transfer', 'fet']),
+    TtcTreatmentStep.betaTest || TtcTreatmentStep.repeatBeta =>
+      any(['blood test', 'beta', 'hcg', 'pregnancy test']),
+    TtcTreatmentStep.reviewAppointment =>
+      any(['review', 'follow-up', 'follow up', 'consultation']),
+    _ => false,
+  };
+}
+
+/// The open round's clinic visits as entries (T4 K9): every visit step and
+/// monitoring scan with a date, minus any her own appointment already
+/// carries (same day, matching name), so one visit is one line.
+List<TtcApptEntry> ttcRoundApptEntries() {
+  final r = TtcTreatmentStore.instance.cycle;
+  if (r.isEmpty || r.isClosed || r.kind == null) return const [];
+  final own = TtcAppointmentsStore.instance.all;
+  bool carried(DateTime d, TtcTreatmentStep? step) => own.any((a) {
+        final l = a.startsLocal;
+        return l.year == d.year &&
+            l.month == d.month &&
+            l.day == d.day &&
+            ttcApptMatchesStep(a.title, step);
+      });
+  TtcApptEntry entry(DateTime d, TtcTreatmentStep? step) => TtcApptEntry(
+        title: step == null ? ttcScanLabel(r.kind) : ttcStepLabel(step, r.kind),
+        startsUtc: DateTime(d.year, d.month, d.day).toUtc(),
+        detail: kTtcApptFromRound,
+        fromParentVeda: false,
+        fromRound: true,
+        roundStep: step,
+      );
+  return [
+    for (final s in kTtcRoundVisitSteps)
+      if (r[s] case final d? when !carried(d, s)) entry(d, s),
+    for (final d in r.scans)
+      if (!carried(d, null)) entry(d, null),
+  ];
 }
 
 /// "Follicle scan, Thu 2 Oct": a visit named the way a caption names it.
 String ttcVisitName(TtcVisitRef v) => '${v.title}, ${ttcApptDay(v.startsLocal)}';
 
 /// Both sources, soonest first.
-List<TtcApptEntry> ttcApptEntries() {
+///
+/// [withRound] (T4 K9) adds the open round's clinic dates. The Appointments
+/// page passes it; the home's visit card does not, because the round has its
+/// own card there.
+List<TtcApptEntry> ttcApptEntries({bool withRound = false}) {
   final t = TtcS.current();
   return <TtcApptEntry>[
     for (final a in TtcAppointmentsStore.instance.all)
@@ -149,9 +245,13 @@ List<TtcApptEntry> ttcApptEntries() {
         fromParentVeda: false,
       ),
     // Booked through ParentVeda. Read-only here: the engine owns the seat.
+    //
+    // T4 K9: an attended or missed booking now reaches Past; only upcoming
+    // ones ever showed. A cancelled one stays out. Kept for revert:
+    //   .where((b) => b.status == BookingStatus.upcoming))
     for (final b in BookingStore.instance
         .bookings(stage: ServiceStage.tryingToConceive)
-        .where((b) => b.status == BookingStatus.upcoming))
+        .where((b) => b.status != BookingStatus.cancelled))
       TtcApptEntry(
         title: b.title,
         startsUtc: b.startsUtc,
@@ -159,6 +259,7 @@ List<TtcApptEntry> ttcApptEntries() {
         fromParentVeda: true,
         bookingId: b.id,
       ),
+    if (withRound) ...ttcRoundApptEntries(),
   ]..sort((a, b) => a.startsUtc.compareTo(b.startsUtc));
 }
 
@@ -231,7 +332,7 @@ class _TtcAppointmentsScreenState extends State<TtcAppointmentsScreen> {
       builder: (context, _) {
         final t = TtcS.current();
         final p = V2PaletteStore.instance.current;
-        final entries = ttcApptEntries();
+        final entries = ttcApptEntries(withRound: true);
         final upcoming = entries.where((e) => e.isUpcoming).toList();
         final past = entries.where((e) => !e.isUpcoming).toList().reversed
             .toList();
@@ -548,12 +649,14 @@ class _NextUp extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                             color: p.ink1)),
                     const SizedBox(height: 4),
+                    // K9 (T4): a round date is a day, not a time. Kept for
+                    // revert: '${ttcApptDay(local)} at ${ttcApptTime(local)}'
                     Text(
-                        '${ttcApptDay(local)} at ${ttcApptTime(local)}'
-                        '${entry.detail.isEmpty || entry.fromParentVeda ? '' : ' · ${entry.detail}'}',
+                        '${entry.whenLabel}'
+                        '${entry.detail.isEmpty || entry.fromParentVeda || entry.fromRound ? '' : ' · ${entry.detail}'}',
                         style: pvManrope(
                             fontSize: 13.5, height: 1.45, color: p.ink2)),
-                    if (entry.fromParentVeda) ...[
+                    if (entry.fromParentVeda || entry.fromRound) ...[
                       const SizedBox(height: 8),
                       _Tag(p: p, text: entry.detail),
                     ],
@@ -632,9 +735,12 @@ class TtcApptRow extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // K9 (T4): no time on a round date.
                   Text(
-                      '${ttcApptRelative(local).toUpperCase()} · '
-                      '${ttcApptTime(local).toUpperCase()}',
+                      entry.fromRound
+                          ? ttcApptRelative(local).toUpperCase()
+                          : '${ttcApptRelative(local).toUpperCase()} · '
+                              '${ttcApptTime(local).toUpperCase()}',
                       style: pvManrope(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w700,
@@ -646,7 +752,9 @@ class TtcApptRow extends StatelessWidget {
                           fontSize: 15.5,
                           fontWeight: FontWeight.w700,
                           color: upcoming ? p.ink1 : p.ink2)),
-                  if (entry.detail.isNotEmpty && !entry.fromParentVeda) ...[
+                  if (entry.detail.isNotEmpty &&
+                      !entry.fromParentVeda &&
+                      !entry.fromRound) ...[
                     const SizedBox(height: 3),
                     Text(entry.detail,
                         style: pvManrope(
@@ -674,7 +782,7 @@ class TtcApptRow extends StatelessWidget {
                             .openCountFor(entry.visitId))),
                   ],
                   // The source is a tag, never a section heading.
-                  if (entry.fromParentVeda) ...[
+                  if (entry.fromParentVeda || entry.fromRound) ...[
                     const SizedBox(height: 7),
                     _Tag(p: p, text: entry.detail),
                   ],
@@ -1386,11 +1494,19 @@ class TtcApptFollowUpLine extends StatelessWidget {
 // =============================================================================
 
 /// Opens one appointment on its own page.
-Future<void> openTtcAppointment(BuildContext context, TtcApptEntry entry) =>
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      builder: (_) => TtcAppointmentScreen(entry: entry),
-      settings: const RouteSettings(name: 'ttc/appointment'),
-    ));
+///
+/// A round date (T4 K9) opens the round itself: its date is the clinic's,
+/// changed there, never here.
+Future<void> openTtcAppointment(BuildContext context, TtcApptEntry entry) {
+  if (entry.fromRound) {
+    openTtcTreatment(context);
+    return Future.value();
+  }
+  return Navigator.of(context).push(MaterialPageRoute<void>(
+    builder: (_) => TtcAppointmentScreen(entry: entry),
+    settings: const RouteSettings(name: 'ttc/appointment'),
+  ));
+}
 
 class TtcAppointmentScreen extends StatelessWidget {
   const TtcAppointmentScreen({super.key, required this.entry});
@@ -1517,6 +1633,10 @@ class TtcAppointmentScreen extends StatelessWidget {
                               lift: 24);
                         } else if (v) {
                           _askPhonePermission();
+                        } else {
+                          // K10 (T4): switching it off said nothing.
+                          pvSnack(context, 'Reminder off for this visit.',
+                              lift: 24);
                         }
                       },
                     ),
@@ -1838,12 +1958,21 @@ class _TtcAppointmentEditScreenState extends State<TtcAppointmentEditScreen> {
 
   /// The quick names. The visits a trying couple actually books, so the
   /// common case is one tap instead of typing on a phone in a corridor.
+  // T4 K9: the three a treatment round books, too. Kept for revert: the
+  // first four alone.
   static const _quick = [
     'Follicle scan',
     'Blood test',
     'Consultation',
     'Follow-up',
+    'IUI',
+    'Egg collection',
+    'Embryo transfer',
   ];
+
+  /// The time a new visit opens on, so a picked date counts as a change
+  /// (T4 K10: the leave guard ignored it).
+  late final DateTime _startWhen = _when;
 
   bool get _dirty {
     final e = widget.existing;
@@ -1851,7 +1980,8 @@ class _TtcAppointmentEditScreenState extends State<TtcAppointmentEditScreen> {
     if (e == null) {
       return _title.text.trim().isNotEmpty ||
           _who.text.trim().isNotEmpty ||
-          _note.text.trim().isNotEmpty;
+          _note.text.trim().isNotEmpty ||
+          _when != _startWhen;
     }
     return _title.text.trim() != e.title ||
         _who.text.trim() != e.withWhom ||
@@ -1901,6 +2031,15 @@ class _TtcAppointmentEditScreenState extends State<TtcAppointmentEditScreen> {
     final store = TtcAppointmentsStore.instance;
     final e = widget.existing;
     final note = _note.text.trim();
+    // K9 (T4): the visit went while this form was open (the other phone
+    // removed it). It toasted "Changes saved." and saved nothing.
+    if (e != null && !store.all.any((a) => a.id == e.id)) {
+      _saved = true;
+      pvSnack(context, 'This visit was removed on the other phone.',
+          lift: 24);
+      Navigator.of(context).pop();
+      return;
+    }
     if (e == null) {
       store.add(
         title: _title.text,

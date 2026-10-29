@@ -962,6 +962,10 @@ const Set<String> kTtcHisToolIds = {
   // In from More (2026-09-28): the round is the couple's (B10), and More's
   // "Treatment" row, which he could open, is now this Tools row.
   'treatment',
+  // His own medicines (male-factor clomiphene, hCG), own-only as the store
+  // already is (T4 Q3, confirmed by the user at the build's start,
+  // 2026-10-29). He never sees or edits hers.
+  'medication',
 };
 
 /// Where he starts when he has opened nothing yet.

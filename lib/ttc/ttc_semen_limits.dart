@@ -65,9 +65,11 @@ class TtcSemenLimit {
 }
 
 /// ⚠️ FOUR, AND VOLUME IS NOT ONE OF THEM. Volume is reported and is worth
-/// recording, but a low volume on its own is not one of the four numbers the
-/// reference limits are built from — and treating it as a fifth line to pass or
-/// fail would invent a threshold WHO did not publish.
+/// recording. WHO 2021 does publish a lower reference for it (1.4 ml), and
+/// the volume sentence names that number; it is still not a fifth line here,
+/// because a low volume on its own is a reason to mention it to a doctor,
+/// not a line to pass or fail. (T4 W13, 2026-10-29: this comment used to say
+/// a line "would invent a threshold WHO did not publish", which was wrong.)
 const List<TtcSemenLimit> kTtcSemenLimits = [
   TtcSemenLimit(
     id: 'concentration',
@@ -102,8 +104,11 @@ const List<TtcSemenLimit> kTtcSemenLimits = [
     // man reading "5%" next to a line at "4%" concludes he has scraped past
     // something. He has not — 5 is normal, comfortably. The brief names this
     // explicitly: "do not let a low-looking morphology number read as bad".
-    note: "It's measured strictly. 4 per cent or above is normal, so "
-        '5 per cent is a normal result, not a borderline one.',
+    // T4 K12: "normal" sat beside "not a pass mark". Kept for revert:
+    //   "It's measured strictly. 4 per cent or above is normal, so "
+    //   '5 per cent is a normal result, not a borderline one.'
+    note: "It's measured strictly. 4 per cent or above is in the usual "
+        'range, so 5 per cent is a usual result, not a borderline one.',
   ),
 ];
 

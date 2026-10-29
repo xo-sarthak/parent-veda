@@ -302,9 +302,11 @@ final Map<TtcRoundPhase, List<TtcInsight>> kTtcTreatmentInsights = {
         'ttc_tx_ins_after_collection',
         'medical',
         'After egg collection',
+        // T4 K3: breathlessness is hospital, not a call (NHS). Kept for
+        // revert: '... or find it hard to breathe, call your clinic.'
         'Some cramping and bloating is common for a few days. If you feel very '
-            'bloated, pass much less urine, or find it hard to breathe, call '
-            'your clinic.',
+            'bloated or have bad tummy pain, or pass much less urine, call '
+            "your clinic today. If you're short of breath, go to hospital now.",
         'Know the signs that mean you should call.'),
   ],
   TtcRoundPhase.transfer: [

@@ -279,7 +279,9 @@ class _TtcTestsScreenState extends State<TtcTestsScreen> {
               TtcLookupActionRow(
                 key: const ValueKey('ttc_tests_semen_reader'),
                 icon: Icons.description_outlined,
-                label: 'Read a semen analysis report',
+                // T4 K12: one name. Kept for revert:
+                // 'Read a semen analysis report'
+                label: 'Read your semen report',
                 line: 'We go through it with you, line by line.',
                 hue: kIvfHue,
                 onTap: () => openTtcSemenReport(context),

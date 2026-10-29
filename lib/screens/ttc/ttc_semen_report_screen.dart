@@ -82,7 +82,9 @@ import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_semen_limits.dart';
 import '../../ttc/ttc_semen_reading.dart';
 import 'ttc_common.dart';
+import 'ttc_focus_screen.dart' show openTtcArticle;
 import 'ttc_record_edit_screen.dart' show TtcRecordDateField;
+import 'ttc_tool_confirm.dart' show ttcConfirmRemove;
 import 'ttc_records_v2.dart' show TtcRecordPanel;
 // import 'ttc_focus_screen.dart' show TtcFocusScreen; // kept for revert: the old IVF gateway push (2026-09-26)
 import 'doors/ttc_door_screen.dart' show openTtcDoor;
@@ -178,6 +180,24 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
     // cleared by the read.
     await store.ensureLoaded();
     if (!mounted) return;
+    // K12 (T4): the same report kept in an earlier session is the same
+    // record. `_keptId` lives only as long as this screen, so keeping the
+    // same date and numbers again wrote a duplicate.
+    if (!_isKept) {
+      final value = ttcSemenRecordValue(_e);
+      final same = store.records.where((r) =>
+          r.testId == 'semen' &&
+          r.value == value &&
+          r.takenOn.year == _takenOn.year &&
+          r.takenOn.month == _takenOn.month &&
+          r.takenOn.day == _takenOn.day);
+      if (same.isNotEmpty) {
+        setState(() => _keptId = same.first.id);
+        pvSnack(context, 'Already in your reports.', lift: 24);
+        openTtcSurface(context, 'ttc_records');
+        return;
+      }
+    }
     if (!_isKept) {
       final r = store.add(
         label: 'Semen analysis',
@@ -210,11 +230,34 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
   // back arrow and a pop while it shows is turned into "back to the
   // numbers", with every answer still filled in. One PopScope for the
   // button and the gesture, so they cannot disagree.
+  /// Numbers typed and not yet kept or read (K12, T4): leaving asks first.
+  bool _leaving = false;
+  bool get _hasEntry =>
+      _e.values.isNotEmpty ||
+      _e.volumeMl != null ||
+      _e.abstinenceDays != null ||
+      _e.redFlags.isNotEmpty ||
+      _noSperm != null;
+
   @override
   Widget build(BuildContext context) => PopScope(
-        canPop: !_read,
-        onPopInvokedWithResult: (didPop, _) {
-          if (!didPop && _read) setState(() => _read = false);
+        // Kept for revert (K12): canPop: !_read,
+        canPop: !_read && (_leaving || _isKept || !_hasEntry),
+        onPopInvokedWithResult: (didPop, _) async {
+          if (didPop) return;
+          if (_read) {
+            setState(() => _read = false);
+            return;
+          }
+          final nav = Navigator.of(context);
+          final leave = await ttcConfirmRemove(context,
+              title: 'Leave without reading it?',
+              body: 'The numbers you typed will not be kept.',
+              yes: 'Leave',
+              no: 'Keep going');
+          if (!leave || !mounted) return;
+          setState(() => _leaving = true);
+          nav.pop();
         },
         child: _page(context),
       );
@@ -438,8 +481,11 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
               label: 'Read my report back to me',
               onTap: () => setState(() => _read = true),
             ),
-            const SizedBox(height: 14),
-            const TtcToolPrivacyLine(),
+            // T4 W14: "This stays on your phone. It isn't a medical record."
+            // was untrue once "Keep the report" wrote a synced record the
+            // partner reads. Kept for revert:
+            //   const SizedBox(height: 14),
+            //   const TtcToolPrivacyLine(),
             const SizedBox(height: 26),
           ],
         )),
@@ -705,8 +751,28 @@ class _Result extends StatelessWidget {
             if (reading.extra != null) ...[
               // Kept for revert (2026-09-27): a shadowed V1 TtcCard in grey.
               TtcRecordPanel(
-                child: Text(reading.extra!,
-                    style: ttcBody(13.5, color: ttcTitleInk, h: 1.6)),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(reading.extra!,
+                          style: ttcBody(13.5, color: ttcTitleInk, h: 1.6)),
+                      // K12 (T4): the piece the line names, one tap away.
+                      if (reading.readId case final id?) ...[
+                        const SizedBox(height: 10),
+                        InkWell(
+                          key: const ValueKey('ttc_semen_extra_read'),
+                          onTap: () =>
+                              openTtcArticle(context, id, hue: kHisSideHue),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Text('Read it now',
+                                style: ttcBody(13.5,
+                                    color: ttcTitleInk,
+                                    w: FontWeight.w800)),
+                          ),
+                        ),
+                      ],
+                    ]),
               ),
               const SizedBox(height: 18),
             ],
@@ -768,6 +834,11 @@ class _Result extends StatelessWidget {
                 onTap: () => _openAndrologist(context),
               ),
             ],
+            // T4 W14: where a kept report goes, said plainly.
+            const SizedBox(height: 8),
+            Text('Kept in your records, which you both can see.',
+                key: const ValueKey('ttc_semen_kept_where'),
+                style: ttcBody(12.5, color: ttcSoft, h: 1.5)),
             const SizedBox(height: 10),
             TtcToolSecondary(label: 'Change an answer', onTap: onEdit),
             const SizedBox(height: 24),

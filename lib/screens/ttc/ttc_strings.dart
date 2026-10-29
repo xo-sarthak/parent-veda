@@ -78,6 +78,16 @@ class TtcPartnerMode extends ChangeNotifier {
   }
 }
 
+/// The one toast, and the one line, when his phone meets something of hers it
+/// may show but not change (T4 Q1 and Q2, the user, 2026-10-29: "his app
+/// should be a check more than starting to edit"). The same words in every
+/// tool, so he learns the rule once.
+const String kTtcHersToChange = 'This is hers to change. You can see it here.';
+
+/// The same rule from her side, for a result he filed (records are own-write
+/// for both, 0127).
+const String kTtcHisToChange = 'This is his to change. You can see it here.';
+
 class TtcLang extends ChangeNotifier {
   TtcLang._() {
     _load();

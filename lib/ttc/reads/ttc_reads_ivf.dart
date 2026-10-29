@@ -713,8 +713,10 @@ final List<PvRead> kTtcReadsIvf = [
       PvReadNextStep(
         kind: PvNextKind.tool,
         title: _en("Track a cycle you're already in"),
+        // T4 W4: he sees it, he does not edit it (Q1, B1). Kept for revert:
+        // '... all in one place and shared with him.'
         value: _en('Injections, trigger, retrieval, transfer and the test date, '
-              'all in one place and shared with him.'),
+              'all in one place and shared with him to see.'),
         surfaceId: 'ttc_treatment',
       ),
       PvReadNextStep(

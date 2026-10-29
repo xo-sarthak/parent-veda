@@ -753,12 +753,19 @@ class TtcDoseHistory extends StatelessWidget {
 
 /// Opens a tool sheet. One route name per sheet so tests and the Ask Veda
 /// button can tell where she is.
+///
+/// [enableDrag] false (T4 K7) for a form that guards its own leaving: a
+/// drag-to-close calls `Navigator.pop` directly and so never asks a
+/// `PopScope`, while the back button and a tap outside do.
 Future<T?> showTtcDoseSheet<T>(BuildContext context,
-        {required String routeName, required WidgetBuilder builder}) =>
+        {required String routeName,
+        required WidgetBuilder builder,
+        bool enableDrag = true}) =>
     showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      enableDrag: enableDrag,
       routeSettings: RouteSettings(name: routeName),
       builder: builder,
     );

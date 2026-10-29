@@ -291,31 +291,77 @@ class NotificationService {
   int _medOccId(String medId, int index) =>
       ('medalarm_$medId#$index').hashCode & 0x7fffffff;
 
-  DateTime? _dayOf(String? iso) {
-    if (iso == null || iso.isEmpty) return null;
-    final d = DateTime.tryParse(iso);
-    return d == null ? null : DateTime(d.year, d.month, d.day);
-  }
+  // Kept for revert (T4, 2026-10-29): now the static `_dayOfIso`, which the
+  // pure `medicationOccurrences` needs.
+  // DateTime? _dayOf(String? iso) {
+  //   if (iso == null || iso.isEmpty) return null;
+  //   final d = DateTime.tryParse(iso);
+  //   return d == null ? null : DateTime(d.year, d.month, d.day);
+  // }
 
   /// Cancel + (re)schedule every alarm on [m]. Disabled alarms are skipped.
+  ///
+  /// ⚠️ A STOPPED MEDICINE RINGS NOTHING (T4 W6, 2026-10-29). Stop sets
+  /// `isActive: false` and says "Its reminders are off too", but this never
+  /// read `isActive`, so the next edit and every launch re-armed it. The
+  /// occurrences now come from [medicationOccurrences], which returns none
+  /// for a stopped medicine; the cancel above it still runs, so stopping one
+  /// also clears what it had pending.
   Future<void> scheduleMedicationAlarms(Medication m) async {
     if (!_ready) await init();
     if (!_ready) return;
     if (await _muted()) return; // signed out (2026-10-10)
     await cancelMedicationAlarms(m.id);
 
-    final now = tz.TZDateTime.now(tz.local);
-    final today = DateTime(now.year, now.month, now.day);
+    final occ = medicationOccurrences(m, DateTime.now(),
+        dueBody: S.now.medicationDue);
     var index = 0;
+    for (final o in occ) {
+      final when = tz.TZDateTime(tz.local, o.when.year, o.when.month,
+          o.when.day, o.when.hour, o.when.minute);
+      try {
+        await _plugin.zonedSchedule(
+          _medOccId(m.id, index),
+          o.title,
+          o.body,
+          when,
+          _medDetails,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+        );
+      } catch (_) {/* best-effort */}
+      index++;
+    }
+    debugPrint('[medalarms] scheduled $index occurrence(s) for "${m.name}"');
+  }
 
+  /// Every alarm [m] should ring, from [now] over the rolling horizon, capped
+  /// at the per-medicine budget. Pure, so a test can read what would ring
+  /// without a plugin (T4 W6, W7, Q4). The loop is the one that lived inside
+  /// [scheduleMedicationAlarms]; kept as it was, plus the `isActive` gate and
+  /// the private title's body.
+  @visibleForTesting
+  static List<({DateTime when, String title, String body})>
+      medicationOccurrences(
+    Medication m,
+    DateTime now, {
+    required String Function(String name, String dose) dueBody,
+  }) {
+    final out = <({DateTime when, String title, String body})>[];
+    if (!m.isActive) return out;
+    final today = DateTime(now.year, now.month, now.day);
     for (final a in m.alarms) {
       if (!a.enabled || a.times.isEmpty) continue;
-      final start = _dayOf(a.startDateIso);
-      final end = _dayOf(a.endDateIso);
+      final start = _dayOfIso(a.startDateIso);
+      final end = _dayOfIso(a.endDateIso);
+      final private = a.title.trim() == kPrivateMedAlarmTitle;
       final title = a.title.trim().isNotEmpty ? a.title.trim() : m.name;
-      final body = S.now.medicationDue(m.name, m.dose.trim());
+      final body = private
+          ? kPrivateMedAlarmBody
+          : dueBody(m.name, m.dose.trim());
 
-      for (int d = 0; d <= _medHorizonDays && index < _medMaxOcc; d++) {
+      for (int d = 0; d <= _medHorizonDays && out.length < _medMaxOcc; d++) {
         final day = today.add(Duration(days: d));
         if (start != null && day.isBefore(start)) continue;
         if (end != null && day.isAfter(end)) break;
@@ -326,27 +372,21 @@ class NotificationService {
         }
         final sortedTimes = a.times.toList()..sort();
         for (final mins in sortedTimes) {
-          if (index >= _medMaxOcc) break;
-          final when = tz.TZDateTime(
-              tz.local, day.year, day.month, day.day, mins ~/ 60, mins % 60);
+          if (out.length >= _medMaxOcc) break;
+          final when = DateTime(
+              day.year, day.month, day.day, mins ~/ 60, mins % 60);
           if (!when.isAfter(now)) continue;
-          try {
-            await _plugin.zonedSchedule(
-              _medOccId(m.id, index),
-              title,
-              body,
-              when,
-              _medDetails,
-              androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-              uiLocalNotificationDateInterpretation:
-                  UILocalNotificationDateInterpretation.absoluteTime,
-            );
-          } catch (_) {/* best-effort */}
-          index++;
+          out.add((when: when, title: title, body: body));
         }
       }
     }
-    debugPrint('[medalarms] scheduled $index occurrence(s) for "${m.name}"');
+    return out;
+  }
+
+  static DateTime? _dayOfIso(String? iso) {
+    if (iso == null || iso.isEmpty) return null;
+    final d = DateTime.tryParse(iso);
+    return d == null ? null : DateTime(d.year, d.month, d.day);
   }
 
   /// Cancel all pending alarm occurrences for a medication id.

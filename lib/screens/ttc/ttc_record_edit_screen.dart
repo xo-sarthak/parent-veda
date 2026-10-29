@@ -54,7 +54,12 @@ import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_records_v2.dart'
-    show kTtcRecordsHue, ttcRecordDate, TtcRecordsAction, ttcRecordFileName;
+    show
+        kTtcRecordsHue,
+        ttcRecordDate,
+        TtcRecordsAction,
+        ttcRecordFileName,
+        ttcMineFlag;
 import 'ttc_tool_chrome.dart';
 import 'ttc_tool_confirm.dart';
 
@@ -210,8 +215,107 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
     final label = _label.text.trim().toLowerCase();
     final test = ttcTests.where((t) => t.name.toLowerCase().startsWith(label));
     if (label.isNotEmpty && test.isNotEmpty) return test.first.forHim;
+    // T4 W10: on his phone nothing he files is guessed as hers. Kept for
+    // revert: return last.isEmpty ? false : last.first.forPartner;
+    if (ttcMineFlag()) return true;
     final last = TtcRecordsStore.instance.records;
     return last.isEmpty ? false : last.first.forPartner;
+  }
+
+  /// K11 (T4, 2026-10-29): anything typed or brought in that a back would
+  /// lose. The page had no guard, and backing out left an uploaded photo in
+  /// storage with nothing pointing at it.
+  bool _saved = false;
+  bool get _dirty {
+    if (_saved) return false;
+    final r = _r;
+    if (r == null) {
+      return _shots.isNotEmpty ||
+          _label.text.trim().isNotEmpty &&
+              _label.text.trim() != (widget.like?.label ?? '') ||
+          _value.text.trim().isNotEmpty ||
+          _note.text.trim().isNotEmpty;
+    }
+    return _label.text.trim() != r.label ||
+        _value.text.trim() != r.value ||
+        _unit.text.trim() != r.unit ||
+        _note.text.trim() != (r.note ?? '') ||
+        !_sameDay(_taken, r.takenOn) ||
+        _whose != r.forPartner ||
+        _shots.length != r.attachments.length ||
+        _shots.any((s) => !r.attachments.contains(s));
+  }
+
+  static bool _sameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  /// Photos uploaded on this visit to the page that the saved record does
+  /// not hold: deleted on a discard, so storage keeps nothing orphaned.
+  void _dropUnsavedUploads() {
+    final kept = _r?.attachments ?? const <String>[];
+    for (final s in _shots) {
+      if (!kept.contains(s)) StorageService.remove(s);
+    }
+  }
+
+  Future<bool> _confirmLeave() async {
+    final p = V2PaletteStore.instance.current;
+    final leave = await showDialog<bool>(
+      context: context,
+      routeSettings: const RouteSettings(name: 'ttc/confirm_leave'),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        title: Text(_editing ? 'Leave without saving?' : 'Discard this result?',
+            style: pvFraunces(fontSize: 20, color: p.ink1)),
+        content: Text(
+            _editing
+                ? 'Your changes will not be kept.'
+                : 'This result will not be added, and any photo you added '
+                    'here goes with it.',
+            style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+        actions: [
+          TextButton(
+              key: const ValueKey('ttc_rec_keep_editing'),
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('Keep editing',
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink1))),
+          TextButton(
+              key: const ValueKey('ttc_rec_discard'),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('Discard',
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFFB3261E)))),
+        ],
+      ),
+    );
+    return leave == true;
+  }
+
+  /// "Date changed." / "Number and note changed.": what the save did, in her
+  /// words (K11; it was a generic "Changes saved.").
+  static String ttcRecordChangeToast(TtcRecord before, TtcRecord after) {
+    final what = <String>[
+      if (before.label != after.label) 'name',
+      if (!_sameDay(before.takenOn, after.takenOn)) 'date',
+      if (before.value != after.value || before.unit != after.unit) 'number',
+      if ((before.note ?? '') != (after.note ?? '')) 'note',
+      if (before.forPartner != after.forPartner) 'whose it is',
+      if (before.attachments.length != after.attachments.length ||
+          before.attachments.any((a) => !after.attachments.contains(a)))
+        'photos',
+    ];
+    if (what.isEmpty) return 'Nothing changed.';
+    final joined = what.length == 1
+        ? what.first
+        : '${what.sublist(0, what.length - 1).join(', ')} and ${what.last}';
+    return '${joined[0].toUpperCase()}${joined.substring(1)} changed.';
   }
 
   bool get _canSave => _shots.isNotEmpty || _label.text.trim().isNotEmpty;
@@ -288,7 +392,7 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
       pvSnack(context, 'Saved to your reports.',
           icon: Icons.check_rounded, lift: 24);
     } else {
-      store.replace(r.copyWith(
+      final after = r.copyWith(
         label: label.isEmpty ? r.label : label,
         takenOn: _taken,
         testId: testId,
@@ -299,9 +403,13 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
         note: note,
         forPartner: _whose,
         attachments: _shots,
-      ));
-      pvSnack(context, 'Changes saved.', icon: Icons.check_rounded, lift: 24);
+      );
+      store.replace(after);
+      // Kept for revert (K11): 'Changes saved.'
+      pvSnack(context, ttcRecordChangeToast(r, after),
+          icon: Icons.check_rounded, lift: 24);
     }
+    _saved = true;
     HapticFeedback.selectionClick();
     Navigator.of(context).maybePop(false);
   }
@@ -309,14 +417,28 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
   Future<void> _remove() async {
     final nav = Navigator.of(context);
     final gone = await ttcRemoveRecord(context, _r!);
-    if (gone) nav.pop(true);
+    if (gone) {
+      _saved = true;
+      nav.pop(true);
+    }
   }
 
   // ---- the page ----------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
-    return TtcToolScaffold(
+    return PopScope(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        if (await _confirmLeave() && context.mounted) {
+          _dropUnsavedUploads();
+          _saved = true; // lets this pop through
+          setState(() {});
+          Navigator.of(context).pop();
+        }
+      },
+      child: TtcToolScaffold(
       hue: kTtcRecordsHue,
       variant: 1,
       eyebrow: 'Records and reports',
@@ -338,14 +460,19 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
                 hue: kTtcRecordsHue,
                 p: V2PaletteStore.instance.current,
                 items: [
+                  // T4 W10: "Yours" is this phone's own flag (his on his).
+                  // Kept for revert: on: !_whose / _partner = false, and
+                  // on: _whose / _partner = true.
                   TtcToolOption(
                       label: 'Yours',
-                      on: !_whose,
-                      onTap: () => setState(() => _partner = false)),
+                      on: _whose == ttcMineFlag(),
+                      onTap: () =>
+                          setState(() => _partner = ttcMineFlag())),
                   TtcToolOption(
                       label: "Your partner's",
-                      on: _whose,
-                      onTap: () => setState(() => _partner = true)),
+                      on: _whose != ttcMineFlag(),
+                      onTap: () =>
+                          setState(() => _partner = !ttcMineFlag())),
                 ],
               ),
             ),
@@ -511,7 +638,7 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
           ],
         )),
       ],
-    );
+    ));
   }
 }
 
