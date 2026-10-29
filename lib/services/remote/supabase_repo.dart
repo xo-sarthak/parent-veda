@@ -886,6 +886,39 @@ class SupabaseRepo {
     } catch (_) {/* best-effort; see above */}
   }
 
+  // ---- live sessions and recordings (0128, L3) -------------------------------
+
+  /// The waiting room's question (0128 `session_state`): has the host come,
+  /// and has the session been closed as host-missed? Null when offline,
+  /// signed out, or not her booking. Keys: status, cancel_reason, outcome,
+  /// host_seen, starts_utc, paid_by, server_now.
+  static Future<Map<String, dynamic>?> sessionState(String bookingId) async {
+    if (userId == null) return null;
+    try {
+      final res = await _client
+          .rpc('session_state', params: {'p_booking_id': bookingId});
+      return res is Map ? Map<String, dynamic>.from(res) : null;
+    } catch (e) {
+      debugPrint('[live] session_state failed: $e');
+      return null;
+    }
+  }
+
+  /// Every session recording she may watch, with its state (0128
+  /// `my_recordings`): id, slot_id, programme_id, title, status, duration_s.
+  /// Never a playback id; that is only handed out signed.
+  static Future<List<Map<String, dynamic>>> myRecordings() async {
+    if (userId == null) return const [];
+    try {
+      final res = await _client.rpc('my_recordings');
+      if (res is! List) return const [];
+      return [for (final r in res) if (r is Map) Map<String, dynamic>.from(r)];
+    } catch (e) {
+      debugPrint('[live] my_recordings failed: $e');
+      return const [];
+    }
+  }
+
   /// Ask the server to settle past bookings from attendance evidence.
   /// Returns how many it settled.
   static Future<int> settleMyBookings() async {

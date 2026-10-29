@@ -647,12 +647,15 @@ class BookingCatalog {
   /// doctor's preview and the parent's list are literally the same computation.
   static List<Slot> _fromSchedule(DateTime from, Offering o) {
     final schedule = DoctorScheduleStore.instance.scheduleFor(o.expertId);
-    final now = from.toLocal();
+    // (LA-34, 2026-10-29) The clinic's clock, not the phone's. Was
+    // `from.toLocal()`, which offered a parent abroad her own 10:00.
+    // final now = from.toLocal();   // kept for revert
+    final now = istWallClock(from);
 
     // Times already taken, so nothing is offered twice. Matched on offeringId:
     // a consult offering is one-per-doctor (off_exp_<id>), so this is exactly
-    // "this doctor's booked times". Local, because the schedule works in local
-    // wall-clock (IST).
+    // "this doctor's booked times". In IST wall clock, because the schedule
+    // is (see istWallClock).
     //
     // NOTE this is the LOCAL view. The authoritative guard against two parents
     // taking the same minute stays the server: book_slot in 0029 locks the row.
@@ -661,7 +664,7 @@ class BookingCatalog {
         .bookings()
         .where((b) =>
             b.offeringId == o.id && b.status != BookingStatus.cancelled)
-        .map((b) => b.startsUtc.toLocal())
+        .map((b) => istWallClock(b.startsUtc))
         .toSet();
 
     final generated = generateSlots(
@@ -678,10 +681,12 @@ class BookingCatalog {
           // Stable across rebuilds: the same minute always yields the same id,
           // so a slot a parent is looking at does not change identity under
           // them mid-booking.
-          id: '${o.id}_s${generated[i].start.millisecondsSinceEpoch}',
+          // The real instant's millis, so on an Indian phone the id is the
+          // same one the local-time version minted.
+          id: '${o.id}_s${instantFromIstWallClock(generated[i].start).millisecondsSinceEpoch}',
           offeringId: o.id,
           expertId: o.expertId,
-          startsUtc: generated[i].start.toUtc(),
+          startsUtc: instantFromIstWallClock(generated[i].start),
           durationMin: generated[i].durationMin,
           capacity: 1, // a 1:1 consultation is one seat, by definition
           booked: 0,

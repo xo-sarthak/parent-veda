@@ -128,6 +128,34 @@ async function roomService(
   return { ok: res.ok, status: res.status, body: await res.text() };
 }
 
+/// The Egress API wants a `roomRecord` grant, which roomAdmin does not carry.
+/// Same shape as roomService: one room, sixty seconds.
+async function egressService(
+  method: string,
+  room: string,
+  payload: Record<string, unknown>,
+): Promise<{ ok: boolean; status: number; body: string }> {
+  const base = LK_URL.replace(/^wss:/, "https:").replace(/^ws:/, "http:")
+    .replace(/\/+$/, "");
+  const now = Math.floor(Date.now() / 1000);
+  const token = await signJwt({
+    exp: now + 60,
+    iss: LK_KEY,
+    nbf: now,
+    sub: "moderator",
+    video: { room, roomRecord: true },
+  }, LK_SECRET);
+  const res = await fetch(`${base}/twirp/livekit.Egress/${method}`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  return { ok: res.ok, status: res.status, body: await res.text() };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (!LK_URL || !LK_KEY || !LK_SECRET) {
@@ -227,6 +255,50 @@ serve(async (req) => {
             detail: r.body }, 502);
         }
         return json({ ok: true, identity, canPublish: allow });
+      }
+
+      // LA-25 (0128): stop one person's raised-hand flood AT THE SERVER.
+      //
+      // A raised hand is a LiveKit data message, so it never passes through
+      // our server and cannot be throttled here. The apps throttle it (a
+      // cooldown on the sender, a per-person limit on the host's side), but a
+      // modified app ignores its own cooldown. This is the part a modified
+      // app cannot ignore: the media server stops accepting its data
+      // messages, and its microphone, until the host allows it to speak
+      // again (allowSpeak restores data too).
+      case "silenceHand": {
+        if (!identity) return json({ error: "identity required" }, 400);
+        const r = await roomService("UpdateParticipant", room, {
+          room,
+          identity,
+          permission: {
+            can_subscribe: true,
+            can_publish: false,
+            can_publish_data: false,
+          },
+        });
+        if (!r.ok) {
+          return json({ error: "could not update permissions",
+            detail: r.body }, 502);
+        }
+        return json({ ok: true, identity, canPublishData: false });
+      }
+
+      // D1 (0128): the host may stop the class recording. What was recorded
+      // so far is still uploaded and processed (egress_ended still fires);
+      // "stop" means "from here on, not on the record".
+      case "stopRecording": {
+        const { data: egressId } = await authClient
+          .rpc("recording_egress_for_slot", { p_slot_id: String(slotId) });
+        if (!egressId) return json({ ok: true, recording: false });
+        const r = await egressService("StopEgress", room, {
+          egress_id: egressId,
+        });
+        if (!r.ok) {
+          return json({ error: "could not stop the recording", detail: r.body },
+            502);
+        }
+        return json({ ok: true, recording: false });
       }
 
       // Remove someone from the room entirely.

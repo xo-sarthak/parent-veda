@@ -109,6 +109,11 @@ enum CallRefusal {
   /// A consult, after its window closed.
   ended,
 
+  /// (0128) The session was closed at +20 minutes because the host had not
+  /// joined; everyone's seat or credit is back. Seen by a host who arrives
+  /// late, and by an attendee whose booking was closed while she waited.
+  hostMissed,
+
   /// LiveKit keys missing, the function down, a migration unapplied.
   serverError,
 }
@@ -227,12 +232,13 @@ class CallSession {
   /// taught**; the only way in would have been handing the teacher one of
   /// their attendees' booking ids.
   ///
-  /// The slot descriptor travels with the request because the slot row may not
-  /// exist yet: `booking_slots` self-seeds on first booking (0029), so a class
-  /// nobody has booked has no row to point a room at. `open_session_room`
-  /// (0079) creates it — after checking, against `my_expert_ids()`, that the
-  /// caller may host it. A caller can only ever open a room for an expert they
-  /// already are.
+  /// (Superseded: since 0123 `open_session_room` reads only the stored slot,
+  /// and since 0128 livekit-token sends it the slot id alone. The descriptor
+  /// below is still sent, on purpose, until every deployed livekit-token is
+  /// the 0128 one: the 0123-era function casts `startsUtc` to a timestamp,
+  /// and an empty string there would fail the host's join. It is dropped
+  /// together with the 6-argument open_session_room, in the next learning
+  /// migration's contract step.)
   static Future<(CallJoin?, CallJoinFailure?)> fetchHostJoin({
     required Slot slot,
     String? displayName,
@@ -268,6 +274,7 @@ class CallSession {
       final kind = switch ((res.status, reason)) {
         (_, 'too_early') => CallRefusal.tooEarly,
         (_, 'ended') => CallRefusal.ended,
+        (_, 'host_missed') => CallRefusal.hostMissed,
         (401, _) => CallRefusal.notSignedIn,
         (403, _) => CallRefusal.notYours,
         _ => CallRefusal.serverError,
@@ -374,6 +381,16 @@ class CallModeration {
 
   static Future<bool> remove(String slotId, String identity) async =>
       await _call(slotId, 'remove', identity: identity) != null;
+
+  /// (LA-25) Stop one person's raised hands and questions at the media
+  /// server. Their data messages are refused until the host lets them speak.
+  static Future<bool> silenceHand(String slotId, String identity) async =>
+      await _call(slotId, 'silenceHand', identity: identity) != null;
+
+  /// (D1) Stop the class recording from here on. What was recorded so far is
+  /// still kept and processed.
+  static Future<bool> stopRecording(String slotId) async =>
+      await _call(slotId, 'stopRecording') != null;
 
   /// End the class for everyone, rather than leaving an audience in a room
   /// with nobody teaching.

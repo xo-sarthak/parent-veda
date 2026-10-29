@@ -176,6 +176,31 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     }
   }
 
+  // ---- recordings (0128, L.22) ---------------------------------------------
+  //
+  // Which past sessions have a recording she may watch, keyed by slot. Held
+  // in memory only, on purpose: a recording plays over the network anyway,
+  // so an offline Past row that says nothing about it loses nothing, and a
+  // cached "ready" could outlive a refund. Never a playback id: that is
+  // handed out signed and short-lived by recording-playback.
+  final Map<String, Map<String, dynamic>> _recordingsBySlot = {};
+
+  /// The recording of [slotId] she may watch, or null. Keys: id, status
+  /// (recording | uploaded | importing | ready), title, duration_s.
+  Map<String, dynamic>? recordingForSlot(String slotId) =>
+      _recordingsBySlot[slotId];
+
+  Future<void> syncRecordings() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    final rows = await SupabaseRepo.myRecordings();
+    _recordingsBySlot
+      ..clear()
+      ..addEntries(rows
+          .where((r) => (r['slot_id'] ?? '').toString().isNotEmpty)
+          .map((r) => MapEntry(r['slot_id'].toString(), r)));
+    notifyListeners();
+  }
+
   void _applyReceipts(List rows, String? uid) {
     _receiptsUid = uid;
     _receipts
@@ -383,6 +408,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
       debugPrint('[booking] refresh failed: $e');
     }
     await syncPurchases(); // L2c: what she owns is the server's too
+    await syncRecordings(); // L3: what she may watch again
   }
 
   /// Adopt the authoritative `booking_bookings` rows for this user.
@@ -410,9 +436,9 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
   /// `upcoming` once this device has marked it attended: _reconcileStatuses()
   /// calls CareJourney.consultationDone() exactly once on that transition, and
   /// re-opening a finished booking would let the count climb by one on every
-  /// launch. The server does not track attendance yet (see 0029), so on that
-  /// one field the device knows more than the database — and the merge has to
-  /// say so rather than defer by reflex.
+  /// launch. (Superseded 2026-10-29: "the server does not track attendance
+  /// yet" stopped being true with 0078 and 0128; it may now settle attended
+  /// and missed, see the branch below. Still never back to upcoming.)
   ///
   /// Local-only bookings — made offline, never granted a seat — are left
   /// alone. Absence from the server is not evidence of deletion when the
@@ -432,8 +458,26 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
         _bookings[remote.id] = remote; // the case that was being lost
         changed = true;
       } else if (remote.status == BookingStatus.cancelled &&
-          local.status != BookingStatus.cancelled) {
+          (local.status != BookingStatus.cancelled ||
+              local.cancelReason != remote.cancelReason)) {
         // Cancelled elsewhere — a seat this device must stop offering to join.
+        // (0128) With the server's reason, so Past can say "the host could
+        // not make it" instead of a bare "Cancelled".
+        _bookings[remote.id] = local.copyWith(
+            status: remote.status, cancelReason: remote.cancelReason);
+        changed = true;
+      } else if ((remote.status == BookingStatus.missed &&
+              local.status != BookingStatus.missed &&
+              local.status != BookingStatus.cancelled) ||
+          (remote.status == BookingStatus.attended &&
+              local.status == BookingStatus.missed)) {
+        // (0128, LA-16) The server now settles attendance from what LiveKit
+        // saw, so on THIS field it knows more than the device, which can only
+        // guess "ended == attended". Adopt its attended / missed verdict,
+        // with one exception kept from the rule above: upcoming -> attended
+        // is left to _reconcileStatuses below, because that transition is
+        // what fires CareJourney.consultationDone() exactly once. Never back
+        // to upcoming.
         _bookings[remote.id] = local.copyWith(status: remote.status);
         changed = true;
       }
@@ -863,6 +907,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     _bookings.clear();
     _receipts.clear();
     _receiptsUid = null;
+    _recordingsBySlot.clear();
     debugUid = null;
     _save();
   }

@@ -343,6 +343,12 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
                   'it starts. We will remind you.'
               : 'You can join ten minutes before it starts. We will remind you.',
         ),
+      CallRefusal.hostMissed => (
+          'This session was closed',
+          'The host had not joined 20 minutes in, so the session was closed '
+              'and everyone booked has their seat or credit back. You can ask '
+              'for a refund from Your bookings.',
+        ),
       CallRefusal.ended => (
           'This consultation has ended',
           'The room is closed. If you still need to speak to someone, you can '

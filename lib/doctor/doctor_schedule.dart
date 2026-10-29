@@ -402,7 +402,49 @@ class GeneratedSlot {
   String toString() => '${start.toIso8601String()} (${durationMin}m)';
 }
 
+// ---------------------------------------------------------------------------
+//  WHOSE CLOCK (LA-34, 2026-10-29)
+// ---------------------------------------------------------------------------
+//  A doctor's "10:00 to 13:00" is Indian wall-clock time. generateSlots used
+//  to read it in the PHONE's zone, so a parent in Dubai was offered 10:00
+//  Dubai time, which is 11:30 in the doctor's clinic. Since 0128 the server
+//  checks every consult start against the same rule in IST
+//  (`slot_fits_schedule`), so those bookings would now be refused.
+//
+//  The fix carries IST wall-clock time in a UTC-flagged DateTime: its fields
+//  read as the clinic's clock, and no time-zone database is involved. India
+//  keeps one offset all year (no daylight saving), which is what makes a
+//  fixed +05:30 correct rather than an approximation. generateSlots keeps the
+//  zone of what it is given (see [_dayOf]), so the doctor's own preview, which
+//  passes local time on an Indian phone, is unchanged.
+// ---------------------------------------------------------------------------
+
+/// India's offset from UTC, all year.
+const Duration kIstOffset = Duration(hours: 5, minutes: 30);
+
+/// The clinic's wall clock for an [instant], as a UTC-flagged DateTime whose
+/// fields read in IST. Feed these to [generateSlots].
+DateTime istWallClock(DateTime instant) => instant.toUtc().add(kIstOffset);
+
+/// The real instant behind an IST wall-clock value from [istWallClock].
+DateTime instantFromIstWallClock(DateTime wall) => DateTime.utc(wall.year,
+        wall.month, wall.day, wall.hour, wall.minute, wall.second,
+        wall.millisecond)
+    .subtract(kIstOffset);
+
+/// Midnight of [d]'s date, in [d]'s own representation (UTC-flagged or local),
+/// so a UTC-flagged wall clock is never mixed with a local one mid-calculation.
+DateTime _dayOf(DateTime d) =>
+    d.isUtc ? DateTime.utc(d.year, d.month, d.day) : DateTime(d.year, d.month, d.day);
+
 /// Turn a schedule into the actual slots a parent may book.
+///
+/// [from], [now] and [booked] must share one representation: all local, or
+/// all IST wall clock from [istWallClock]. The parent's path uses IST.
+///
+/// The SAME rule runs in SQL (`_slot_fits_schedule`, migration 0128), and
+/// `test/schedule_parity_test.dart` holds both to one case table,
+/// `test/fixtures/schedule_parity_cases.json`. Change one, change both.
 ///
 /// [from]    first day to consider (date part only).
 /// [days]    how many days forward to walk.
@@ -425,14 +467,13 @@ List<GeneratedSlot> generateSlots(
   if (rules.slotMinutes <= 0) return const [];
 
   final earliest = clock.add(Duration(minutes: rules.minNoticeMinutes));
-  final latest = DateTime(clock.year, clock.month, clock.day)
-      .add(Duration(days: rules.advanceWindowDays));
+  final latest = _dayOf(clock).add(Duration(days: rules.advanceWindowDays));
 
   final bookedSet = booked.map((d) => d.millisecondsSinceEpoch).toSet();
   final out = <GeneratedSlot>[];
 
   for (var i = 0; i < days; i++) {
-    final day = DateTime(from.year, from.month, from.day).add(Duration(days: i));
+    final day = _dayOf(from).add(Duration(days: i));
     if (day.isAfter(latest)) break;
 
     // A holiday or vacation removes the day outright.
@@ -470,8 +511,7 @@ List<GeneratedSlot> generateSlots(
       // before the session opens plus its own lead-in.
       var cursor = s.start + rules.bufferBeforeMin;
       while (cursor + rules.slotMinutes <= s.end) {
-        final start = DateTime(day.year, day.month, day.day)
-            .add(Duration(minutes: cursor));
+        final start = _dayOf(day).add(Duration(minutes: cursor));
         cursor += rules.slotMinutes + rules.bufferAfterMin + rules.bufferBeforeMin;
 
         if (bookedSet.contains(start.millisecondsSinceEpoch)) continue;

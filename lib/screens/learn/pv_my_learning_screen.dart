@@ -82,6 +82,7 @@ import 'pv_learn_chrome.dart';
 import 'pv_learn_screen.dart' show openPvLearn;
 import 'pv_lesson_screen.dart';
 import 'pv_offering_screen.dart';
+import 'pv_recording_screen.dart';
 import 'pv_session_screen.dart';
 
 /// The route this screen is opened under from the Learn home's bookmark.
@@ -108,6 +109,22 @@ class _PvMyLearningScreenState extends State<PvMyLearningScreen> {
     BookingStore.instance.settleAttendance();
     // Payments are the server's record; re-read them each time she looks.
     BookingStore.instance.syncPurchases();
+    // (L3) And which past sessions she can watch again.
+    BookingStore.instance.syncRecordings();
+  }
+
+  /// "Watch" on a past row whose recording is ready. Nothing otherwise: the
+  /// row's quieter line already says whether one is on its way.
+  Widget? _watchButton(
+      BuildContext context, Booking b, Map<String, dynamic>? rec) {
+    if (rec == null || rec['status'] != 'ready') return null;
+    return TextButton(
+      key: ValueKey('pv_bookings_watch_${b.id}'),
+      onPressed: () => pvOpenRecording(context,
+          title: (rec['title'] ?? b.title).toString(),
+          recordingId: rec['id'].toString()),
+      child: const Text('Watch'),
+    );
   }
 
   static String _stageWord(ServiceStage s) => switch (s) {
@@ -327,12 +344,13 @@ class _PvMyLearningScreenState extends State<PvMyLearningScreen> {
                             leadBottom: pvLearnTime(b.startsUtc),
                             tag: _stageWord(b.stage),
                             title: b.title,
-                            sub: switch (b.status) {
-                              BookingStatus.cancelled => 'Cancelled',
-                              BookingStatus.missed => 'Missed',
-                              BookingStatus.attended => 'Attended',
-                              BookingStatus.upcoming => 'Done',
-                            },
+                            // (L3, L.22) Attendance is the server's since
+                            // 0128: what LiveKit saw, the phone as fallback.
+                            sub: pvPastStatusLine(b),
+                            foot: pvPastRecordingLine(
+                                store.recordingForSlot(b.slotId)),
+                            trailing: _watchButton(context, b,
+                                store.recordingForSlot(b.slotId)),
                             onTap: () => pvOpenSession(context, b),
                           ),
                       ],
@@ -346,6 +364,32 @@ class _PvMyLearningScreenState extends State<PvMyLearningScreen> {
       },
     );
   }
+}
+
+/// A past booking's status, in her words (L3). A session the host never
+/// joined says so, and says what happened next, instead of a bare
+/// "Cancelled" that reads as if she cancelled it.
+String pvPastStatusLine(Booking b) {
+  if (b.hostMissed) {
+    return "The host couldn't make it. Your seat or credit is back";
+  }
+  return switch (b.status) {
+    BookingStatus.cancelled => 'Cancelled',
+    BookingStatus.missed => 'Missed',
+    BookingStatus.attended => 'Attended',
+    BookingStatus.upcoming => 'Done',
+  };
+}
+
+/// The recording's state under a past row, or null when there is none.
+String? pvPastRecordingLine(Map<String, dynamic>? rec) {
+  if (rec == null) return null;
+  return switch (rec['status']) {
+    'ready' => 'Recording ready to watch',
+    'recording' || 'uploaded' || 'importing' =>
+      'Recording on its way, usually within the hour',
+    _ => null,
+  };
 }
 
 /// The local time zone, short: "IST", else "GMT+5:30" (a device can report

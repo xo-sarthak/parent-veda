@@ -27,6 +27,7 @@ import '../../theme/pv_fonts.dart';
 import 'pv_learn_chrome.dart';
 import 'pv_learn_flow.dart';
 import 'pv_offering_content.dart';
+import 'pv_recording_screen.dart';
 
 const String kPvLessonRoutePrefix = 'learn/lesson/';
 
@@ -94,6 +95,34 @@ class _PvLessonScreenState extends State<PvLessonScreen> {
     }
     setState(() => _i = i);
     _opened(v, l); // was: PvLearnProgressStore.instance.opened(v.id, l.id);
+    _askForVideo();
+  }
+
+  // ---- the lesson's video (L3, 0128) ----------------------------------------
+  //
+  // A lesson's video lives on Mux, registered on the server
+  // (programme_recordings with this lesson id), not in the bundled outline.
+  // Ask once per lesson: a signed address comes back when there is a ready
+  // video she may watch (lesson 1 is the open preview), otherwise nothing,
+  // and the page stays as it was: "Video · arriving" and the notes.
+  String? _videoUrl;
+  int _askedFor = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    _askForVideo();
+  }
+
+  Future<void> _askForVideo() async {
+    final at = _i;
+    if (_askedFor == at) return;
+    _askedFor = at;
+    _videoUrl = null;
+    final res = await pvFetchPlayback(programmeId: v.id, lessonId: lesson.id);
+    if (!mounted || _i != at) return;
+    final String? url = res.ok ? (res.data?['url'])?.toString() : null;
+    if (url != null) setState(() => _videoUrl = url);
   }
 
   @override
@@ -129,9 +158,29 @@ class _PvLessonScreenState extends State<PvLessonScreen> {
                         left: 12,
                         top: 12,
                         child: PvKindTag(
-                          lesson.videoUrl == null ? 'Video · arriving' : 'Video', // kept for revert: 'Film · arriving' / 'Film'
+                          lesson.videoUrl == null && _videoUrl == null
+                              ? 'Video · arriving'
+                              : 'Video', // kept for revert: 'Film · arriving' / 'Film'
                         ),
                       ),
+                      if (_videoUrl != null)
+                        Positioned.fill(
+                          child: Material(
+                            color: Colors.black26,
+                            child: InkWell(
+                              key: const ValueKey('pv_lesson_play'),
+                              onTap: () => pvOpenRecording(context,
+                                  title: lesson.title,
+                                  programmeId: v.id,
+                                  lessonId: lesson.id,
+                                  prefetchedUrl: _videoUrl),
+                              child: const Center(
+                                child: Icon(Icons.play_circle_outline,
+                                    size: 64, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
                       if (lesson.minutes > 0)
                         Positioned(
                           right: 12,

@@ -92,6 +92,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import '../localization/app_language.dart';
+import 'booking_store.dart';
 import 'call_session.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
 import '../widgets/pv_toast.dart';
@@ -447,8 +448,46 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
     _elapsed = Duration.zero;
   }
 
+  // ---- the doctor who has not come (L3, LA-17, D3) --------------------------
+  //
+  // The consult twin of the class rule: +10 minutes alone in the room, the
+  // parent is told the doctor has not joined and the team knows; from +20
+  // the screen asks the server once a minute whether the session has been
+  // closed (her credit back, the doctor not paid). The server decides, from
+  // what LiveKit saw; this only says so.
+  bool _hostMissed = false;
+  DateTime? _lastStateAsk;
+
+  int get _minutesLate {
+    final s = _join?.startsUtc;
+    if (s == null) return 0;
+    final m = DateTime.now().toUtc().difference(s).inMinutes;
+    return m < 0 ? 0 : m;
+  }
+
+  bool get _waitingOnDoctor =>
+      _isConsult && _myRole.isParent && _remote == null;
+
+  Future<void> _askSessionState() async {
+    final now = DateTime.now();
+    final last = _lastStateAsk;
+    if (last != null && now.difference(last) < const Duration(minutes: 1)) {
+      return;
+    }
+    _lastStateAsk = now;
+    final s = await SupabaseRepo.sessionState(widget.bookingId);
+    if (!mounted || s == null) return;
+    if (s['outcome'] == 'host_missed' || s['cancel_reason'] == 'host_missed') {
+      setState(() => _hostMissed = true);
+      BookingStore.instance.refreshFromServer();
+    }
+  }
+
   void _onTick() {
     if (!mounted) return;
+    if (_waitingOnDoctor && !_hostMissed && _minutesLate >= 20) {
+      _askSessionState();
+    }
     setState(() {
       // Before the other person arrives there is nothing to count. A group
       // session keeps the old behaviour — count from connect — because a class
@@ -481,6 +520,10 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
                 'before it starts.'
             : 'This consultation has not opened yet. You can join ten minutes '
                 'before it starts.',
+        CallRefusal.hostMissed =>
+          'The doctor had not joined 20 minutes in, so this consultation was '
+              'closed and your credit is back. Book another time from Your '
+              'bookings.',
         CallRefusal.ended =>
           'This consultation has ended. You can book a follow-up from My '
               'Bookings.',
@@ -1096,9 +1139,13 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
           Text(
             _selfIsMain
                 ? 'Your camera is off'
-                : alone
-                    ? 'Waiting for $name to join'
-                    : '$name has their camera off',
+                : alone && _hostMissed
+                    ? "$name couldn't make it"
+                    : alone && _waitingOnDoctor && _minutesLate >= 10
+                        ? "$name hasn't joined yet"
+                        : alone
+                            ? 'Waiting for $name to join'
+                            : '$name has their camera off',
             textAlign: TextAlign.center,
             style: const TextStyle(
                 color: Colors.white,
@@ -1109,9 +1156,16 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
           Text(
             _selfIsMain
                 ? 'Tap the video button to turn it back on.'
-                : alone
-                    ? 'They will appear here as soon as they do.'
-                    : 'You can still hear each other.',
+                : alone && _hostMissed
+                    ? 'We have closed this consultation and your credit is '
+                        'back. Book another time from Your bookings, or ask '
+                        'us for a refund.'
+                    : alone && _waitingOnDoctor && _minutesLate >= 10
+                        ? "We've told the team. If they can't make it, your "
+                            'credit comes back.'
+                        : alone
+                            ? 'They will appear here as soon as they do.'
+                            : 'You can still hear each other.',
             textAlign: TextAlign.center,
             style: const TextStyle(
                 color: Colors.white54, fontSize: 13.5, height: 1.5),

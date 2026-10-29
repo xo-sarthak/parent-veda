@@ -21,8 +21,7 @@
 //  a modified client cannot grant itself a camera in someone's class.
 //
 //  That gate lives in POSTGRES, not here — join_context_for_booking() in 0076
-//  (which succeeded join_room_for_booking() in 0075; that one is kept as the
-//  fallback for a half-finished deploy). This file signs a JWT and nothing
+//  (which succeeded join_room_for_booking() in 0075). This file signs a JWT and nothing
 //  else, which is the only thing that has to happen outside the database. It
 //  holds no service-role credential; read 0075 for why it used to, and what
 //  that cost.
@@ -31,7 +30,17 @@
 //  `metadata` and echoed in the response. Before that, doctor and parent got
 //  byte-identical tokens and neither app could tell you who was on the call.
 //
-//  DEPLOY:
+//  0128 (L3, 2026-10-29):
+//    * LA-24: the 0075 fallback is gone. It answered with no role, so the
+//      token defaulted publish to TRUE: every attendee could broadcast.
+//      0076 has been live for months; the fallback only kept a hole open.
+//    * LA-18: the room is CREATED here, before the token is minted, with
+//      LiveKit's own maxParticipants (seats + hosts + 1, see 0128). The
+//      media server then refuses a connection past capacity, whoever holds
+//      a token.
+//    * The host route calls the 1-argument open_session_room (expand; 0128).
+//
+//  DEPLOY (after 0128 is run):
 //    supabase functions deploy livekit-token
 //  SECRETS (already set by you):
 //    LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET
@@ -114,6 +123,59 @@ async function signJwt(payload: object, secret: string): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
+//  ensureRoom — LA-18. Create the room with a hard size before anyone joins.
+//
+//  LiveKit would create the room on the first join, with no limit. Creating
+//  it here first means the limit exists before the first token is used.
+//  CreateRoom on a room that already exists returns it unchanged, so calling
+//  this on every join is safe and cheap.
+//
+//  FAILS OPEN, deliberately. If LiveKit's API is briefly unreachable, the
+//  join still goes ahead: the database has already refused anyone without a
+//  seat, so the room limit is the second lock, not the only one. Failing
+//  closed would turn a LiveKit hiccup into a class nobody can enter.
+// ---------------------------------------------------------------------------
+async function ensureRoom(
+  room: string,
+  slotId: string,
+  // deno-lint-ignore no-explicit-any
+  authClient: any,
+): Promise<void> {
+  try {
+    const { data: max } = await authClient
+      .rpc("room_max_participants", { p_slot_id: slotId });
+    const now = Math.floor(Date.now() / 1000);
+    const admin = await signJwt({
+      exp: now + 60,
+      iss: LK_KEY,
+      nbf: now,
+      sub: "room-creator",
+      video: { roomCreate: true },
+    }, LK_SECRET);
+    const base = LK_URL.replace(/^wss:/, "https:").replace(/^ws:/, "http:")
+      .replace(/\/+$/, "");
+    const res = await fetch(`${base}/twirp/livekit.RoomService/CreateRoom`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${admin}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: room,
+        max_participants: Number(max ?? 0) || 0, // 0 = no limit (slot unknown)
+        empty_timeout: 10 * 60,
+        departure_timeout: 2 * 60,
+      }),
+    });
+    if (!res.ok) {
+      console.warn("livekit-token: CreateRoom", res.status, await res.text());
+    }
+  } catch (e) {
+    console.warn("livekit-token: CreateRoom threw", String(e));
+  }
+}
+
+// ---------------------------------------------------------------------------
 //  mintAndReturn — sign the token, and answer.
 //
 //  Extracted because there are now TWO ways to arrive at a join context: an
@@ -168,6 +230,7 @@ async function mintAndReturn(
 
     // Same slot -> same room, so both parties meet.
     const room = `bkroom_${slotId}`;
+    await ensureRoom(room, slotId, authClient);
     const now = Math.floor(Date.now() / 1000);
 
     // HOW LONG THE TOKEN IS GOOD FOR.
@@ -286,8 +349,8 @@ serve(async (req) => {
     //
     //   bookingId -> someone who holds a seat. A patient, or an attendee.
     //   slotId    -> the HOST, who holds no seat at their own class and so
-    //                has no booking id to offer. See open_session_room (0079)
-    //                for why that route needs the slot descriptor too.
+    //                has no booking id to offer. open_session_room decides
+    //                from the stored slot (0123; one argument since 0128).
     //
     // A caller may not supply both; that would be asking two questions and
     // taking whichever answer it preferred.
@@ -324,39 +387,26 @@ serve(async (req) => {
     // It is also less authority: this function can no longer read any row in
     // any table, only ask one question about one booking.
     //
-    // WHY THE FALLBACK BELOW EXISTS. A migration and an edge function deploy
-    // are two commands, run by a human, in some order. If this function ships
-    // first, `join_context_for_booking` does not exist yet and every join
-    // would 500 — a self-inflicted outage on the one path that was working.
-    // Falling back to 0075's narrower answer means the worst case of a
-    // half-finished deploy is "no role metadata", which the app already
-    // tolerates, rather than "nobody can join".
+    // THE 0075 FALLBACK WAS HERE (removed in L3, LA-24). It covered a deploy
+    // order that has not been possible since 0076 went live, and its answer
+    // carried no role, which made publishing default to TRUE for everyone.
+    // A fallback that is less safe than the path it backs up is a hole with
+    // a good reason attached.
     let ctx: JoinContext | null = null;
 
     // ---- THE HOST ROUTE -------------------------------------------------
-    // No booking to resolve, so the slot descriptor comes from the host's own
-    // catalogue and open_session_room decides whether they may host it. It
-    // self-seeds the slot for a class nobody has booked yet — otherwise the
-    // teacher of an empty class would have nothing to point a room at.
-    //
-    // There is deliberately NO fallback for this path: it is new in 0079, and
-    // if 0079 is not applied the honest answer is "hosting is not deployed
-    // yet", not a silently different kind of join.
+    // No booking to resolve. open_session_room decides from the STORED slot
+    // (0123): its expert, its time, its size. Since 0128 it is sent the slot
+    // id and nothing else; any descriptor an older app still sends is
+    // ignored here.
     if (slotId) {
       const { data: hostRaw, error: hostErr } = await authClient
-        .rpc("open_session_room", {
-          p_slot_id: String(slotId),
-          p_offering_id: String(body.offeringId ?? ""),
-          p_expert_id: String(body.expertId ?? ""),
-          p_starts_utc: String(body.startsUtc ?? ""),
-          p_duration_min: Number(body.durationMin ?? 60),
-          p_capacity: Number(body.capacity ?? 1),
-        });
+        .rpc("open_session_room", { p_slot_id: String(slotId) });
       if (hostErr) {
         return json({
           error: "could not open the session room",
           detail: hostErr.message,
-          hint: "is migration 0079 applied?",
+          hint: "is migration 0128 applied?",
         }, 500);
       }
       if (!hostRaw) return json({ error: "not your session", slotId }, 403);
@@ -377,36 +427,10 @@ serve(async (req) => {
       .rpc("join_context_for_booking", { p_booking_id: bookingId });
 
     if (ctxErr) {
-      // Distinguish "not deployed yet" from "genuinely broken". Postgres
-      // reports an unknown function as 42883; anything else is a real fault
-      // and must not be silently papered over by the fallback.
-      const undeployed = ctxErr.code === "42883" ||
-        /join_context_for_booking/.test(ctxErr.message ?? "");
-      if (!undeployed) {
-        return json({
-          error: "authorisation lookup failed",
-          detail: ctxErr.message,
-          hint: "is migration 0076 applied?",
-        }, 500);
-      }
-
-      console.warn("livekit-token: 0076 not applied, falling back to 0075");
-      const { data: slotId, error: legacyErr } = await authClient
-        .rpc("join_room_for_booking", { p_booking_id: bookingId });
-
-      // Keep the error. A failed CALL and a refused ANSWER are different facts
-      // and must not share a message — conflating them is the exact bug above.
-      if (legacyErr) {
-        return json({
-          error: "authorisation lookup failed",
-          detail: legacyErr.message,
-          hint: "is migration 0075 applied?",
-        }, 500);
-      }
-      if (!slotId) return json({ error: "not your session", bookingId }, 403);
-
-      // No role, no capacity, no window — exactly the pre-0076 behaviour.
-      ctx = { ok: true, slot_id: String(slotId) };
+      return json({
+        error: "authorisation lookup failed",
+        detail: ctxErr.message,
+      }, 500);
     } else if (!ctxRaw) {
       // Deliberately one message for "no such booking" and "not yours": the
       // database returns null for both so ids cannot be probed from here.

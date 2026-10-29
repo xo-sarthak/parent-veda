@@ -378,6 +378,7 @@ class Booking {
     required this.status,
     required this.bookedUtc,
     this.joinUrl,
+    this.cancelReason,
   });
 
   final String id;
@@ -397,6 +398,16 @@ class Booking {
   /// wired; a UI shows "link coming" rather than a dead button.
   final String? joinUrl;
 
+  /// Why the SERVER cancelled it, when she did not (0128). Null for her own
+  /// cancellation. 'host_missed': the host had not arrived 20 minutes in, so
+  /// the session was closed, her seat or credit returned and a refund offered.
+  /// A reason rather than a new [BookingStatus] value on purpose: an installed
+  /// app reads an unknown status as `upcoming` (the `orElse` below), so a new
+  /// status would show a closed session as still to come.
+  final String? cancelReason;
+
+  bool get hostMissed => cancelReason == 'host_missed';
+
   DateTime get endsUtc => startsUtc.add(Duration(minutes: durationMin));
   bool get isUpcoming => status == BookingStatus.upcoming;
 
@@ -409,7 +420,9 @@ class Booking {
         u.isBefore(endsUtc);
   }
 
-  Booking copyWith({BookingStatus? status, String? joinUrl}) => Booking(
+  Booking copyWith(
+          {BookingStatus? status, String? joinUrl, String? cancelReason}) =>
+      Booking(
         id: id,
         offeringId: offeringId,
         slotId: slotId,
@@ -420,6 +433,7 @@ class Booking {
         status: status ?? this.status,
         bookedUtc: bookedUtc,
         joinUrl: joinUrl ?? this.joinUrl,
+        cancelReason: cancelReason ?? this.cancelReason,
       );
 
   Map<String, Object?> toMap() => {
@@ -433,6 +447,7 @@ class Booking {
         'status': status.name,
         'bookedUtc': bookedUtc.toUtc().toIso8601String(),
         'joinUrl': joinUrl,
+        if (cancelReason != null) 'cancelReason': cancelReason,
       };
 
   static Booking fromMap(Map data) => Booking(
@@ -449,6 +464,7 @@ class Booking {
         ),
         bookedUtc: DateTime.parse(data['bookedUtc'].toString()).toUtc(),
         joinUrl: data['joinUrl']?.toString(),
+        cancelReason: data['cancelReason']?.toString(),
       );
 
   /// Build from a `booking_bookings` ROW (snake_case), as returned by
@@ -479,6 +495,7 @@ class Booking {
         bookedUtc:
             DateTime.parse((r['created_at'] ?? r['starts_utc']).toString())
                 .toUtc(),
+        cancelReason: r['cancel_reason']?.toString(),
       );
 }
 

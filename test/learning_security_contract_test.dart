@@ -100,7 +100,10 @@ void main() {
     final d = _lastDefinition('book_slot');
 
     test('it keeps 0084\'s price and 0066\'s credit claim', () {
-      expect(d.body, contains('p_price_paise  int  default null'), reason: d.file);
+      // (0128 realigned the argument list when the others gained defaults.)
+      // Kept for revert: contains('p_price_paise  int  default null')
+      expect(d.body, matches(RegExp(r'p_price_paise\s+int\s+default null')),
+          reason: d.file);
       expect(d.body, contains('from public.consult_credits c'), reason: d.file);
       expect(d.body, contains('for update skip locked'), reason: d.file);
       expect(d.body, contains('set booking_id = v_booking.id, spent_at = now()'), reason: d.file);
@@ -132,12 +135,25 @@ void main() {
       }
     });
 
-    test('the edge function still calls it with the arguments it declares', () {
+    // Kept for revert (0123, six arguments):
+    // test('the edge function still calls it with the arguments it declares', () {
+    //   final edge = File('supabase/functions/livekit-token/index.ts').readAsStringSync();
+    //   for (final p in ['p_slot_id', 'p_offering_id', 'p_expert_id', 'p_starts_utc', 'p_duration_min', 'p_capacity']) {
+    //     expect(edge, contains('$p:'));
+    //     expect(d.body, contains(p));
+    //   }
+    // });
+
+    // (0128, expand) The last definition takes the slot alone, and the edge
+    // function sends exactly that. PostgREST matches by argument names, so a
+    // name sent that the function does not declare would match nothing.
+    test('the edge function calls the 1-argument version with the slot alone', () {
       final edge = File('supabase/functions/livekit-token/index.ts').readAsStringSync();
-      for (final p in ['p_slot_id', 'p_offering_id', 'p_expert_id', 'p_starts_utc', 'p_duration_min', 'p_capacity']) {
-        expect(edge, contains('$p:'));
-        expect(d.body, contains(p));
+      expect(edge, contains('.rpc("open_session_room", { p_slot_id: String(slotId) })'));
+      for (final p in ['p_offering_id', 'p_expert_id', 'p_starts_utc', 'p_duration_min', 'p_capacity']) {
+        expect(edge, isNot(contains('$p:')), reason: '$p is no longer declared');
       }
+      expect(d.body, startsWith('create or replace function public.open_session_room(p_slot_id text)'));
     });
   });
 }

@@ -51,6 +51,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
+import 'booking_store.dart';
 import 'call_session.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
 import '../widgets/pv_toast.dart';
@@ -154,6 +155,78 @@ class _GroupCallScreenState extends State<GroupCallScreen>
   /// [ParticipantPermissionsUpdatedEvent] tells us.
   bool _canPublish = false;
 
+  // ---- the host who has not come (L3, LA-17) --------------------------------
+  //
+  // +10 minutes with no host in the room: the waiting room says so, and that
+  // the team has been told (the server's minute sweep writes the notice at
+  // the same moment, 0128). From +20 it asks the server once a minute
+  // (`session_state`) whether the session has been closed as host-missed,
+  // because that decision is the server's, from what LiveKit saw. The phone
+  // only reports it.
+  bool _hostMissed = false;
+  Timer? _statePoll;
+
+  /// The host was here and dropped out (L3 review, 2026-10-29). The stage
+  /// used to say "Waiting for X to begin" in the middle of a class.
+  bool _hostLeft = false;
+
+  /// The host ended the class for everyone. "Rejoin" would open an empty
+  /// room, so the ended view does not offer it.
+  bool _hostEnded = false;
+
+  /// The recording, as far as this screen knows (D1: a class records itself
+  /// once the host joins; the host can stop it).
+  bool _recordingStopped = false;
+
+  // ---- raised hands and questions, throttled (LA-25) -------------------------
+  //
+  // A hand is a data message: it goes phone to phone through the media
+  // server, never past ours, so the rate limit has two halves here and one
+  // on the server. The sender waits [_handCooldown] between toggles. The
+  // host's screen counts what each person sends and ignores more than
+  // [_perMinute] a minute. A modified app can skip both; the host can then
+  // silence that person at the media server (`silenceHand`).
+  static const _handCooldown = Duration(seconds: 5);
+  static const _perMinute = 3;
+  DateTime? _lastHandAt;
+  final Map<String, List<DateTime>> _recentFrom = {};
+
+  bool get _hostPresent => _everyone.any((p) =>
+      p is! LocalParticipant &&
+      CallSession.roleFromMetadata(p.metadata).isHost);
+
+  /// Whole minutes since the scheduled start; 0 before it, or when the server
+  /// gave no start.
+  int get _minutesLate {
+    final s = _join?.startsUtc;
+    if (s == null) return 0;
+    final m = DateTime.now().toUtc().difference(s).inMinutes;
+    return m < 0 ? 0 : m;
+  }
+
+  Future<void> _checkSessionState() async {
+    final id = widget.bookingId;
+    if (_isHost || id == null || _hostMissed || _hostPresent) return;
+    if (_minutesLate < 20) return;
+    final s = await SupabaseRepo.sessionState(id);
+    if (!mounted || s == null) return;
+    if (s['outcome'] == 'host_missed' || s['cancel_reason'] == 'host_missed') {
+      setState(() => _hostMissed = true);
+      // Her Past row and credits follow from the server's record.
+      BookingStore.instance.refreshFromServer();
+    }
+  }
+
+  /// True when [who] has sent more than [_perMinute] hands or questions in
+  /// the last minute: the host's screen drops the rest.
+  bool _overLimit(String who) {
+    final now = DateTime.now();
+    final list = _recentFrom.putIfAbsent(who, () => [])
+      ..removeWhere((t) => now.difference(t) > const Duration(minutes: 1))
+      ..add(now);
+    return list.length > _perMinute;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -164,6 +237,8 @@ class _GroupCallScreenState extends State<GroupCallScreen>
       debugPrint('[group] wakelock unavailable: $e');
     });
     _connect();
+    _statePoll = Timer.periodic(
+        const Duration(minutes: 1), (_) => _checkSessionState());
   }
 
   @override
@@ -266,14 +341,22 @@ class _GroupCallScreenState extends State<GroupCallScreen>
 
   void _wireEvents(EventsListener<RoomEvent> events) {
     events
-      ..on<ParticipantConnectedEvent>((_) => _refresh())
+      ..on<ParticipantConnectedEvent>((e) {
+        if (CallSession.roleFromMetadata(e.participant.metadata).isHost) {
+          _hostLeft = false;
+        }
+        _refresh();
+      })
       ..on<ParticipantDisconnectedEvent>((e) {
         // In a class one person leaving means nothing — unless it is the
         // teacher, and then it means everything.
         final left = CallSession.roleFromMetadata(e.participant.metadata);
         if (left.isHost && !_isHost) {
-          setState(() => _endedBecause =
-              '${_hostName()} has left. They may be reconnecting.');
+          setState(() {
+            _hostLeft = true;
+            _endedBecause =
+                '${_hostName()} has left. They may be reconnecting.';
+          });
         }
         _handsUp.remove(e.participant.identity);
         _refresh();
@@ -292,7 +375,10 @@ class _GroupCallScreenState extends State<GroupCallScreen>
           _endedBecause = switch (e.reason) {
             DisconnectReason.clientInitiated => null,
             // The host ended it for everyone. Not an error — the class is over.
-            DisconnectReason.roomDeleted => 'The host ended this session.',
+            DisconnectReason.roomDeleted => () {
+                _hostEnded = true;
+                return 'The host ended this session.';
+              }(),
             DisconnectReason.participantRemoved =>
               'You were removed from this session.',
             _ => 'The connection to this session was lost.',
@@ -345,6 +431,8 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         case _Wire.hand:
           final id = e.participant?.identity;
           if (id == null) return;
+          // A lowered hand always counts; only raising is limited.
+          if (msg['up'] == true && _isHost && _overLimit(id)) return;
           setState(() {
             if (msg['up'] == true) {
               _handsUp.add(id);
@@ -355,6 +443,8 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         case _Wire.question:
           final text = (msg['text'] ?? '').toString().trim();
           if (text.isEmpty) return;
+          final from = e.participant?.identity;
+          if (_isHost && from != null && _overLimit(from)) return;
           setState(() {
             _questions.add(_Question(who, text, DateTime.now()));
             _unreadQuestions++;
@@ -384,6 +474,13 @@ class _GroupCallScreenState extends State<GroupCallScreen>
         CallRefusal.tooEarly => f.opensUtc != null
             ? 'This session opens at ${_clockAt(f.opensUtc!)}.'
             : 'This session has not opened yet.',
+        CallRefusal.hostMissed => _isHost || widget.bookingId == null
+            ? 'This session was closed at 20 minutes because the host had not '
+                'joined, and everyone booked has their seat back. The team has '
+                'been told.'
+            : 'The host had not joined 20 minutes in, so this session was '
+                'closed. Your seat or credit is back, and you can ask for a '
+                'refund from Your bookings.',
         CallRefusal.ended =>
           'This session has ended. If a recording was included, it will appear '
               'in My Bookings.',
@@ -517,6 +614,7 @@ class _GroupCallScreenState extends State<GroupCallScreen>
     WakelockPlus.disable().catchError((Object e) {});
     _recordLeave();
     _tick?.cancel();
+    _statePoll?.cancel();
     _events?.dispose();
     final r = _room;
     r?.removeListener(_refresh);
@@ -634,6 +732,13 @@ class _GroupCallScreenState extends State<GroupCallScreen>
   }
 
   Future<void> _toggleHand() async {
+    final now = DateTime.now();
+    final last = _lastHandAt;
+    if (!_handUp && last != null && now.difference(last) < _handCooldown) {
+      _toast('One moment. You can raise your hand again in a few seconds.');
+      return;
+    }
+    _lastHandAt = now;
     setState(() => _handUp = !_handUp);
     await _send({'t': _Wire.hand, 'up': _handUp});
     _toast(_handUp
@@ -754,8 +859,10 @@ class _GroupCallScreenState extends State<GroupCallScreen>
               Text('You were here for $_clock',
                   style: const TextStyle(color: Colors.white70, fontSize: 13)),
               const SizedBox(height: 24),
-              _pill('Rejoin', _connect, filled: true),
-              const SizedBox(height: 10),
+              if (!_hostEnded) ...[
+                _pill('Rejoin', _connect, filled: true),
+                const SizedBox(height: 10),
+              ],
               _pill('Done', () => Navigator.of(context).maybePop()),
             ]),
           ),
@@ -865,9 +972,15 @@ class _GroupCallScreenState extends State<GroupCallScreen>
             ),
             const SizedBox(height: 20),
             Text(
-              waitingForHost
-                  ? 'Waiting for ${_hostName()} to begin'
-                  : 'You are live. Turn on your camera to begin.',
+              !waitingForHost
+                  ? 'You are live. Turn on your camera to begin.'
+                  : _hostMissed
+                      ? "${_hostName()} couldn't make it"
+                      : _hostLeft && !_hostPresent
+                          ? '${_hostName()} has stepped out'
+                      : !_hostPresent && _minutesLate >= 10
+                          ? "${_hostName()} hasn't joined yet"
+                          : 'Waiting for ${_hostName()} to begin',
               textAlign: TextAlign.center,
               style: const TextStyle(
                   color: Colors.white,
@@ -876,10 +989,23 @@ class _GroupCallScreenState extends State<GroupCallScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              waitingForHost
-                  ? 'The session will start here. Your microphone is off until '
-                      'the host invites you to speak.'
-                  : '${_everyone.length - 1} ${_everyone.length == 2 ? "person is" : "people are"} here.',
+              !waitingForHost
+                  ? '${_everyone.length - 1} ${_everyone.length == 2 ? "person is" : "people are"} here.\n'
+                      'This class is recorded for the people who booked it.'
+                  : _hostMissed
+                      ? 'We have closed this session. Your seat or credit is '
+                          'back, and you can ask for a refund from Your '
+                          'bookings.'
+                      : _hostLeft && !_hostPresent
+                          ? 'They may be reconnecting. Stay here and the class '
+                              'carries on when they are back.'
+                      : !_hostPresent && _minutesLate >= 10
+                          ? "We've told the team. If they can't make it, your "
+                              'seat or credit comes back and you can ask for a '
+                              'refund.'
+                          : 'The session will start here. Your microphone is '
+                              'off until the host invites you to speak. This '
+                              'class is recorded for the people who booked it.',
               textAlign: TextAlign.center,
               style: const TextStyle(
                   color: Colors.white54, fontSize: 13.5, height: 1.5),
@@ -986,7 +1112,8 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                               color: _phase == _Phase.live ? _live : _waiting)),
                       const SizedBox(width: 7),
                       Text(
-                        _isHost ? 'Hosting · $_clock' : 'Live · $_clock',
+                        '${_isHost ? 'Hosting' : 'Live'} · $_clock'
+                        '${_recordingStopped ? '' : ' · Recorded'}',
                         style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 12.5,
@@ -1181,6 +1308,21 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                             fontSize: 16,
                             fontWeight: FontWeight.w700)),
                     const Spacer(),
+                    if (_isHost && !_recordingStopped)
+                      TextButton(
+                        key: const ValueKey('group_stop_recording'),
+                        onPressed: () async {
+                          final ok = await CallModeration.stopRecording(_slotId);
+                          if (!mounted) return;
+                          if (ok) setState(() => _recordingStopped = true);
+                          setSheet(() {});
+                          _toast(ok
+                              ? 'Recording stopped. What was recorded so far is kept for the people who booked.'
+                              : 'Could not stop the recording. Please try again.');
+                        },
+                        child: const Text('Stop recording',
+                            style: TextStyle(color: _accent)),
+                      ),
                     if (_isHost && people.length > 1)
                       TextButton(
                         onPressed: () async {
@@ -1260,6 +1402,13 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                         allow: v == 'allow');
                   case 'remove':
                     await CallModeration.remove(_slotId, p.identity);
+                  case 'silence':
+                    final ok =
+                        await CallModeration.silenceHand(_slotId, p.identity);
+                    if (ok) _handsUp.remove(p.identity);
+                    _toast(ok
+                        ? "${_nameOf(p)}'s hands and questions are paused until you invite them to speak."
+                        : 'Could not pause their hand. Please try again.');
                 }
                 rebuild();
               },
@@ -1269,6 +1418,11 @@ class _GroupCallScreenState extends State<GroupCallScreen>
                   child: Text(
                       mayPublish ? 'Mute and stop video' : 'Invite to speak',
                       style: const TextStyle(color: Colors.white)),
+                ),
+                const PopupMenuItem(
+                  value: 'silence',
+                  child: Text('Pause hands and questions',
+                      style: TextStyle(color: Colors.white)),
                 ),
                 const PopupMenuItem(
                   value: 'remove',

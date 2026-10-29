@@ -518,6 +518,13 @@ build, not yet confirmed by the user.
 (consult_policy: the doctor is paid). A doctor who *themselves* no-shows is
 not detected anywhere (§5.3) and would be paid too. Needs the doctor-side
 session record before it can be reversed automatically.
+**Built 2026-10-29 in `0128` (L3, LEARNING-ARCHITECTURE LA-17, L.27):** the
+LiveKit webhook is that doctor-side record. At +20 minutes with attendees
+seen and no host, every seat is cancelled with `cancel_reason =
+'host_missed'`, credits return, and the 0084 trigger reverses the accrual,
+for consults and classes alike. A parent who did not come still pays the
+doctor (`missed` stays payable), as before. Waiting on the 0128 run and the
+LiveKit webhook.
 
 **5.4g Programme money is capacity-based.** The trigger calls a slot with
 capacity 1 a consultation and everything else a programme, then looks the

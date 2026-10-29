@@ -1,0 +1,2484 @@
+[
+ {
+  "name": "first morning slot, exactly at the notice edge",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T04:30:00Z",
+  "expect": true
+ },
+ {
+  "name": "inside the notice period",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T03:00:00Z",
+  "booked": [],
+  "start": "2026-11-02T04:30:00Z",
+  "expect": false
+ },
+ {
+  "name": "off the grid",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T04:45:00Z",
+  "expect": false
+ },
+ {
+  "name": "last slot that fits the morning session",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T06:50:00Z",
+  "expect": true
+ },
+ {
+  "name": "would run past the session end",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T07:25:00Z",
+  "expect": false
+ },
+ {
+  "name": "first evening slot",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T11:30:00Z",
+  "expect": true
+ },
+ {
+  "name": "ninth slot of the day is past maxPerDay",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T13:15:00Z",
+  "expect": false
+ },
+ {
+  "name": "Sunday is closed",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-08T04:30:00Z",
+  "expect": false
+ },
+ {
+  "name": "a later weekday on the stride",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-03T05:05:00Z",
+  "expect": true
+ },
+ {
+  "name": "time off removes the day",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [
+    {
+     "from": "2026-11-04T00:00:00.000",
+     "to": "2026-11-04T00:00:00.000",
+     "reason": "Conference"
+    }
+   ],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-04T04:30:00Z",
+  "expect": false
+ },
+ {
+  "name": "a closed date override",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {
+    "2026-11-05": {
+     "date": "2026-11-05T00:00:00.000",
+     "closed": true
+    }
+   },
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-05T04:30:00Z",
+  "expect": false
+ },
+ {
+  "name": "override hours replace the weekday",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {
+    "2026-11-06": {
+     "date": "2026-11-06T00:00:00.000",
+     "closed": false,
+     "sessions": [
+      {
+       "start": 840,
+       "end": 900
+      }
+     ]
+    }
+   },
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-06T08:30:00Z",
+  "expect": true
+ },
+ {
+  "name": "override hours drop the weekday's",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {
+    "2026-11-06": {
+     "date": "2026-11-06T00:00:00.000",
+     "closed": false,
+     "sessions": [
+      {
+       "start": 840,
+       "end": 900
+      }
+     ]
+    }
+   },
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-06T04:30:00Z",
+  "expect": false
+ },
+ {
+  "name": "paused takes nothing",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": true
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-03T04:30:00Z",
+  "expect": false
+ },
+ {
+  "name": "last day inside the advance window",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-12-01T04:30:00Z",
+  "expect": true
+ },
+ {
+  "name": "first day past the advance window",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-12-02T04:30:00Z",
+  "expect": false
+ },
+ {
+  "name": "an already booked time",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [
+   "2026-11-03T05:05:00Z"
+  ],
+  "start": "2026-11-03T05:05:00Z",
+  "expect": false
+ },
+ {
+  "name": "four back to back force a break",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [
+   "2026-11-03T04:30:00Z",
+   "2026-11-03T05:05:00Z",
+   "2026-11-03T05:40:00Z",
+   "2026-11-03T06:15:00Z"
+  ],
+  "start": "2026-11-03T06:50:00Z",
+  "expect": false
+ },
+ {
+  "name": "three back to back still allow a fourth",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [
+   "2026-11-03T04:30:00Z",
+   "2026-11-03T05:05:00Z",
+   "2026-11-03T05:40:00Z"
+  ],
+  "start": "2026-11-03T06:15:00Z",
+  "expect": true
+ },
+ {
+  "name": "the day's cap keeps the earliest free slots",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [
+   "2026-11-03T04:30:00Z",
+   "2026-11-03T05:05:00Z",
+   "2026-11-03T05:40:00Z",
+   "2026-11-03T11:30:00Z",
+   "2026-11-03T12:05:00Z",
+   "2026-11-03T12:40:00Z"
+  ],
+  "start": "2026-11-03T06:50:00Z",
+  "expect": true
+ },
+ {
+  "name": "the day's cap drops the later ones",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [
+   "2026-11-03T04:30:00Z",
+   "2026-11-03T05:05:00Z",
+   "2026-11-03T05:40:00Z",
+   "2026-11-03T11:30:00Z",
+   "2026-11-03T12:05:00Z",
+   "2026-11-03T12:40:00Z"
+  ],
+  "start": "2026-11-03T13:15:00Z",
+  "expect": false
+ },
+ {
+  "name": "a night session's slot after midnight belongs to the evening",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 1320,
+       "end": 1560
+      }
+     ]
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T20:00:00Z",
+  "expect": true
+ },
+ {
+  "name": "a night session's slot past its end",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 1320,
+       "end": 1560
+      }
+     ]
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T20:35:00Z",
+  "expect": false
+ },
+ {
+  "name": "the night's cap counts across midnight",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 1320,
+       "end": 1560
+      }
+     ]
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 2,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [
+   "2026-11-02T16:30:00Z",
+   "2026-11-02T17:05:00Z"
+  ],
+  "start": "2026-11-02T18:50:00Z",
+  "expect": false
+ },
+ {
+  "name": "yesterday's night is not offered after midnight",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 1320,
+       "end": 1560
+      }
+     ]
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 0,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 0,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T18:40:00Z",
+  "booked": [],
+  "start": "2026-11-02T20:00:00Z",
+  "expect": false
+ },
+ {
+  "name": "buffers move the grid",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 10,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T04:40:00Z",
+  "expect": true
+ },
+ {
+  "name": "buffers move the grid off the old time",
+  "schedule": {
+   "byWeekday": {
+    "1": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "2": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "3": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "4": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "5": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "6": {
+     "sessions": [
+      {
+       "start": 600,
+       "end": 780
+      },
+      {
+       "start": 1020,
+       "end": 1200
+      }
+     ]
+    },
+    "7": {
+     "sessions": []
+    }
+   },
+   "rules": {
+    "slotMinutes": 30,
+    "bufferBeforeMin": 10,
+    "bufferAfterMin": 5,
+    "maxPerDay": 8,
+    "maxConsecutive": 4,
+    "minNoticeMinutes": 120,
+    "advanceWindowDays": 30,
+    "autoConfirm": true
+   },
+   "timeOff": [],
+   "overrides": {},
+   "paused": false
+  },
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-02T04:30:00Z",
+  "expect": false
+ },
+ {
+  "name": "no schedule row means the starter clinic",
+  "schedule": null,
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-03T12:05:00Z",
+  "expect": true
+ },
+ {
+  "name": "an empty schedule offers nothing",
+  "schedule": {},
+  "now": "2026-11-02T02:30:00Z",
+  "booked": [],
+  "start": "2026-11-03T04:30:00Z",
+  "expect": false
+ }
+]
