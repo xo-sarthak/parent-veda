@@ -954,6 +954,9 @@ const Set<String> kTtcHisToolIds = {
   // Kept for revert (2026-09-28, Tools holds only tools): 'expert',
   // 'courses' and 'map' left for More, which he opens from the same bar.
   'tests',
+  // His own supplements (CoQ10, zinc) to tick (T3 K8, user Q1 2026-10-29);
+  // W11 made "Yours" his on his phone.
+  'supplements',
   'records',
   'appointments',
   // In from More (2026-09-28): the round is the couple's (B10), and More's

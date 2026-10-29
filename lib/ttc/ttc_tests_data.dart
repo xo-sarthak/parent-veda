@@ -81,7 +81,9 @@ const List<TtcTest> ttcTests = [
     costEn: '₹150 to ₹400',
     costHi: '₹150 – ₹400',
     readingEn:
-        'Many fertility specialists like TSH to be below 2.5 while you\'re trying. That\'s stricter than the usual lab range, so a result marked "normal" may still be worth talking about. Treatment is usually one tablet a day.',
+        // T3 K10 (2026-10-29): guidelines differ on 2.5. Kept for revert:
+        //   'Many fertility specialists like TSH to be below 2.5 while you\'re trying. That\'s stricter than the usual lab range, so a result marked "normal" may still be worth talking about. Treatment is usually one tablet a day.',
+        'Many fertility specialists like TSH to be below 2.5 while you\'re trying, though guidelines differ. That\'s stricter than the usual lab range, so a result marked "normal" may still be worth talking about. Treatment is usually one tablet a day.',
     readingHi:
         'Bahut se fertility specialists koshish ke dauraan TSH 2.5 se neeche pasand karte hain, jo aam lab range se sakht hai - toh "normal" likha result bhi baat karne layak ho sakta hai. Ilaaj aam taur par roz ki ek goli hoti hai.',
   ),
@@ -144,7 +146,10 @@ const List<TtcTest> ttcTests = [
     whyHi:
         'Jo couples mushkil jhelte hain unmein lagbhag chalis se pachas pratishat mein mard ka factor hota hai - phir bhi aam taur par pehle aurat ke test hote hain, jo dheere, mehnge aur zyada takleefdeh hote hain. Ye sasta, usi din ka aur bina takleef ka hai.',
     whenEn:
-        'After two to five days without ejaculating. Fewer or more days than that changes the result.',
+        // T3 K10 (2026-10-29): WHO is 2 to 7 days; "changes the result" was
+        // too absolute. Kept for revert:
+        //   'After two to five days without ejaculating. Fewer or more days than that changes the result.',
+        'After two to seven days without ejaculating, as the lab advises. Much fewer or more days can change the result.',
     whenHi:
         'Do se paanch din bina ejaculation ke baad. Isse kam ya zyada hone par result badal jaata hai.',
     costEn: '₹300 to ₹1,000',
@@ -161,7 +166,10 @@ const List<TtcTest> ttcTests = [
     whatEn: 'How much vitamin D is in your blood.',
     whatHi: 'Aapke khoon mein kitna vitamin D chal raha hai.',
     whyEn:
-        "Most Indian adults are low, even people who spend time outdoors. Low levels are linked to irregular cycles and to sperm quality, so it's worth testing both of you.",
+        // T3 K10 (2026-10-29): the test sits on her list only (`forHim:
+        // false`), so it no longer says "testing both of you". Kept for revert:
+        //   "Most Indian adults are low, even people who spend time outdoors. Low levels are linked to irregular cycles and to sperm quality, so it's worth testing both of you.",
+        'Most Indian adults are low, even people who spend time outdoors. Low levels are linked to irregular cycles, and in men to sperm quality, so your partner may want it checked too.',
     whyHi:
         'Zyadatar Indian adults mein kami hai, un logon mein bhi jo dhoop mein rehte hain. Kam level cycle ki irregularity aur sperm quality dono se juda hai, toh dono ka test karwana theek hai.',
     whenEn: 'Any day. No fasting needed.',
@@ -169,7 +177,10 @@ const List<TtcTest> ttcTests = [
     costEn: '₹500 to ₹1,500',
     costHi: '₹500 – ₹1,500',
     readingEn:
-        'Test before you start a supplement, not after. The dose depends on how low you are, and high-dose weekly sachets are often sold without anyone checking whether you need them.',
+        // T3 K7 (2026-10-29): 10 mcg a day needs no test (NHS). Kept for
+        // revert:
+        //   'Test before you start a supplement, not after. The dose depends on how low you are, and high-dose weekly sachets are often sold without anyone checking whether you need them.',
+        '10 mcg a day is a safe everyday dose without a test. A test decides whether you need more, and high-dose weekly sachets are often sold without anyone checking whether you need them.',
     readingHi:
         'Supplement lene se pehle test karwayein, baad mein nahi - dose is par nirbhar hai ki kami kitni hai, aur high-dose weekly sachets aam taur par bina ye dekhe bech diye jaate hain ki aapko zaroorat thi ya nahi.',
   ),

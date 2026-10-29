@@ -57,6 +57,8 @@ import '../theme/pv_fonts.dart';
 import '../screens/v2/v2_palette.dart';
 import 'ttc_can_i_data.dart';
 import 'ttc_can_i_recent_store.dart';
+import 'ttc_care_pathway.dart' show TimingOwnership;
+import 'ttc_store.dart' show TtcStore;
 import 'ttc_tests_data.dart';
 
 const String kTtcTestReadPrefix = 'ttc_test_';
@@ -157,7 +159,25 @@ PvRead? ttcTestReadById(String id) {
 
 // ---- a "Can I...?" answer -------------------------------------------------
 
-PvRead ttcCanIAsRead(TtcCanI item) {
+/// The answers a clinic cycle changes: exercise and heat during stimulation,
+/// and every medicine (T3 K14, 2026-10-29). On these, her clinic's advice
+/// comes before ours. Ids only; no answer's own words change.
+const Set<String> kTtcCanIClinicFirstIds = {
+  'exercise', 'yoga', 'swimming', 'hot_bath', 'sauna',
+  'painkillers', 'cold_medicine', 'antibiotics', 'vaccines', 'regular_meds',
+  'thyroid_tablets', 'after_pill', 'isotretinoin', 'xray', 'ayurvedic',
+};
+
+/// The one line those answers open with on a clinic cycle.
+const String kTtcCanIClinicFirstLine =
+    "On a clinic cycle, your clinic's advice comes first.";
+
+/// ⚠️ CLINICAL OWNERSHIP, NOT A NEW ANSWER (T3 K14). When the clinic owns her
+/// timing (`TimingOwnership` is not ours), a general "Yes, with a limit" on
+/// exercise during stimulation could contradict her clinician. We may
+/// explain and remind; we do not compete. So the answer stays, and one line
+/// first says whose advice wins.
+PvRead ttcCanIAsRead(TtcCanI item, {bool clinicCycle = false}) {
   final group = ttcCanIGroupOf(item.id);
   final peers = [
     for (final e in ttcCanI)
@@ -186,6 +206,13 @@ PvRead ttcCanIAsRead(TtcCanI item) {
     reviewed: false,
     hue: 104,
     sections: [
+      if (clinicCycle && kTtcCanIClinicFirstIds.contains(item.id))
+        PvReadSection(
+          tip: PvReadTip(
+            title: _en('Your clinic first'),
+            body: _en(kTtcCanIClinicFirstLine),
+          ),
+        ),
       PvReadSection(
         heading: _en('Why is that the answer?'),
         paragraphs: [LocalizedText(en: item.why(false), hi: item.why(true))],
@@ -278,7 +305,13 @@ void openTtcTestRead(BuildContext context, TtcTest test) =>
 /// she opened (2026-09-29). Kept for revert: the arrow body alone.
 void openTtcCanIRead(BuildContext context, TtcCanI item) {
   TtcCanIRecentStore.instance.touch(item.id);
-  _openLookupRead(context, ttcCanIAsRead(item), 'ttc/can_i/${item.id}');
+  // Kept for revert (T3 K14): ttcCanIAsRead(item) with no clinic line.
+  _openLookupRead(
+      context,
+      ttcCanIAsRead(item,
+          clinicCycle:
+              TtcStore.instance.ownership != TimingOwnership.parentveda),
+      'ttc/can_i/${item.id}');
 }
 
 /// Draws this file's blocks, and hands every other block to the stage's

@@ -347,17 +347,36 @@ String? ttcJainSwapFor(String dish) {
   if (d.contains('aloo') || d.contains('potato')) return kTtcJainSwaps[1];
   if (d.contains('carrot') || d.contains('beetroot')) return kTtcJainSwaps[1];
   if (d.contains('sprout')) return kTtcJainSwaps[2];
-  // Not onion: the read's onion rule is about the tadka, and the one dish
-  // that names onion names it raw in a salad, where the rule does not fit.
+  // ⚠️ ONION TOO, RAW OR COOKED (T3 W5, 2026-10-29). A Jain kitchen eats no
+  // onion at all, so a salad that names it needs the swap as much as a tadka
+  // does. Kept for revert, the reasoning that skipped it:
+  //   // Not onion: the read's onion rule is about the tadka, and the one dish
+  //   // that names onion names it raw in a salad, where the rule does not fit.
+  if (d.contains('onion')) return kTtcJainOnionSwap;
   return null;
 }
+
+/// A Jain plate's swap for a dish that names onion (T3 W5).
+const String kTtcJainOnionSwap =
+    'Make the salad with cucumber and tomato, with lemon, in place of onion.';
+
+/// The one fish list, said the same way by Can I and the food tool (T3 W2):
+/// the low-mercury fish to choose and the large ones to avoid (FDA; NHS for
+/// women trying).
+const String kTtcFishLine = 'Rohu, pomfret, sardines (mathi), Indian '
+    'mackerel (bangda) and prawns are good choices. Avoid shark, swordfish '
+    'and large king mackerel (surmai).';
 
 /// A non-veg kitchen's note: the read's answer to "We eat chicken and fish at
 /// home. Can I still use this?", word for word.
 const String kTtcNonVegNote = 'Swap a dal or paneer dish for chicken, fish or '
-    'eggs whenever you like, and cook them all the way through. Fish like '
-    'sardines, mackerel, rohu or pomfret are good choices. Skip large fish '
-    'like shark and swordfish.';
+    'eggs whenever you like, and cook them all the way through. '
+    '$kTtcFishLine';
+// Kept for revert (T3 W2, 2026-10-29): the note's own fish list, which left
+// king mackerel out of the ones to avoid:
+//   'eggs whenever you like, and cook them all the way through. Fish like '
+//   'sardines, mackerel, rohu or pomfret are good choices. Skip large fish '
+//   'like shark and swordfish.';
 
 /// The read the week comes from, to open for the full plan and the shopping
 /// list.

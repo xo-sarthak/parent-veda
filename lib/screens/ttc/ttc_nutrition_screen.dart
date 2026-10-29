@@ -35,8 +35,15 @@
 //      next visit is a button that lies.
 //    · "Nutrients this week" as chips that jump to the day each is on, so the
 //      summary and the week are one thing, not two panels.
-//  Today's card on the home still reads the rotation, not her swap; see the
-//  note in the report for the lead (it is not this file's to change).
+//  Today's card on the home reads her swap too, through
+//  `TtcFoodIdeaToday` below (T3 K12, 2026-10-29). Kept for revert: "Today's
+//  card on the home still reads the rotation, not her swap".
+//
+//  ⚠️ HER KITCHEN COMES FROM HER PROFILE (T3 K12): derive, never ask. The
+//  diet she gave anywhere (onboarding, the Ready plan, You) is
+//  `FamilyProfileStore.diet`, and that row already syncs; a pick here writes
+//  back to it. The prefs key stays as a local cache for a profile with no
+//  diet. Meal and idea swaps stay prefs-only (recorded, T3 plan).
 //
 //  ---------------------------------------------------------------------------
 //  ⚠️ REBUILT AS A TOOL (2026-09-29): a day's food idea as a photo card, the
@@ -53,6 +60,8 @@ import '../../data/nutrition/nutrition_photos.dart'
     show nutritionPhotoFor, nutritionRecipePhoto;
 import '../../data/nutrition_data.dart' show kRecipes, Recipe;
 import '../../data/reads/read_images.dart' show readImageFor;
+import '../../services/family_profile.dart'
+    show DietPreference, FamilyProfileStore;
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_meal_week_data.dart';
@@ -124,6 +133,68 @@ const String kTtcFoodMealSwapsKey = 'ttc_food_meal_swaps_v1';
 
 /// Her kitchen (`TtcKitchen.name`), kept across visits.
 const String kTtcFoodKitchenKey = 'ttc_food_kitchen_v1';
+
+/// The kitchen her profile's diet means (T3 K12). Vegan has no kitchen of
+/// its own here, so it reads as the no-eggs one, the nearest.
+TtcKitchen ttcKitchenForDiet(DietPreference d) => switch (d) {
+      DietPreference.vegetarian || DietPreference.vegan => TtcKitchen.noEggs,
+      DietPreference.eggetarian => TtcKitchen.vegEggs,
+      DietPreference.nonVegetarian => TtcKitchen.nonVeg,
+      DietPreference.jain => TtcKitchen.jain,
+    };
+
+/// The profile diet a kitchen pick writes back. A vegan profile is not
+/// narrowed to "vegetarian" by picking the no-eggs kitchen.
+DietPreference ttcDietForKitchen(TtcKitchen k, DietPreference? current) =>
+    switch (k) {
+      TtcKitchen.noEggs => current == DietPreference.vegan
+          ? DietPreference.vegan
+          : DietPreference.vegetarian,
+      TtcKitchen.vegEggs => DietPreference.eggetarian,
+      TtcKitchen.nonVeg => DietPreference.nonVegetarian,
+      TtcKitchen.jain => DietPreference.jain,
+    };
+
+/// Today's food idea as she left it: her kept swap for today, else the
+/// rotation. What the home's Today card shows (T3 K12).
+Future<TtcNutrition> ttcFoodIdeaToday({DateTime? now}) async {
+  final day = now ?? DateTime.now();
+  final rotation = ttcPickForToday(ttcNutrition, now: day, offset: 1);
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(kTtcFoodSwapsKey);
+    if (raw == null) return rotation;
+    final map = jsonDecode(raw);
+    final id = map is Map ? map[ttcFoodDayKey(day)] : null;
+    for (final n in ttcNutrition) {
+      if (n.id == id) return n;
+    }
+  } catch (_) {/* local-first: the rotation */}
+  return rotation;
+}
+
+/// Builds with today's idea: the rotation at once, her swap once read.
+class TtcFoodIdeaToday extends StatefulWidget {
+  const TtcFoodIdeaToday(
+      {super.key, required this.fallback, required this.builder});
+  final TtcNutrition fallback;
+  final Widget Function(BuildContext, TtcNutrition) builder;
+
+  @override
+  State<TtcFoodIdeaToday> createState() => _TtcFoodIdeaTodayState();
+}
+
+class _TtcFoodIdeaTodayState extends State<TtcFoodIdeaToday> {
+  late final Future<TtcNutrition> _idea = ttcFoodIdeaToday();
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<TtcNutrition>(
+        future: _idea,
+        initialData: widget.fallback,
+        builder: (context, snap) =>
+            widget.builder(context, snap.data ?? widget.fallback),
+      );
+}
 
 String _mealKey(DateTime day, TtcMealSlot slot) =>
     '${ttcFoodDayKey(day)}|${slot.name}';
@@ -250,6 +321,10 @@ class _TtcNutritionScreenState extends State<TtcNutritionScreen> {
       for (final v in TtcKitchen.values) {
         if (v.name == k) kitchen = v;
       }
+      // Her profile's diet wins over the cache: it is the one answer every
+      // stage reads, and a pick here writes it back (T3 K12).
+      final diet = FamilyProfileStore.instance.diet;
+      if (diet != null) kitchen = ttcKitchenForDiet(diet);
       if (!mounted) return;
       setState(() {
         _swaps.addAll(ideas);
@@ -266,6 +341,15 @@ class _TtcNutritionScreenState extends State<TtcNutritionScreen> {
       await prefs.setString(kTtcFoodMealSwapsKey, jsonEncode(_mealSwaps));
       await prefs.setString(kTtcFoodKitchenKey, _kitchen.name);
     } catch (_) {}
+  }
+
+  /// A kitchen pick, written back to her profile so it syncs (T3 K12).
+  void _saveKitchenToProfile() {
+    try {
+      final store = FamilyProfileStore.instance;
+      final want = ttcDietForKitchen(_kitchen, store.diet);
+      if (store.diet != want) store.setDiet(want);
+    } catch (_) {/* local-first: the prefs cache still has it */}
   }
 
   TtcNutrition? _byId(String id) {
@@ -404,19 +488,45 @@ class _TtcNutritionScreenState extends State<TtcNutritionScreen> {
                   tipOpen: _tipOpen,
                   onTip: () => setState(() => _tipOpen = !_tipOpen),
                   swapped: swapped,
+                  // ⚠️ EVERY SAVE SAYS WHAT IT CHANGED (T3 K12, 2026-10-29):
+                  // both saved silently. Each now says so, with Undo back to
+                  // what was there. Kept for revert: no pvSnack in either.
                   onSwap: () {
+                    final key = ttcFoodDayKey(day);
+                    final was = _swaps[key];
                     final next = ttcNextNutritionIdea(
                         idea, {for (final e in week) e.$2.id});
                     setState(() {
-                      _swaps[ttcFoodDayKey(day)] = next.id;
+                      _swaps[key] = next.id;
                       _tipOpen = false;
                     });
                     _save();
                     pvCommitFeedback();
+                    pvSnack(context,
+                        'Swapped to a ${next.nutrient(hi).toLowerCase()} idea for $dayName. It stays swapped.',
+                        action: 'Undo', onAction: () {
+                      if (!mounted) return;
+                      setState(() {
+                        if (was == null) {
+                          _swaps.remove(key);
+                        } else {
+                          _swaps[key] = was;
+                        }
+                      });
+                      _save();
+                    });
                   },
                   onUnswap: () {
-                    setState(() => _swaps.remove(ttcFoodDayKey(day)));
+                    final key = ttcFoodDayKey(day);
+                    final was = _swaps[key];
+                    setState(() => _swaps.remove(key));
                     _save();
+                    pvSnack(context, 'Back to the first idea for $dayName.',
+                        action: 'Undo', onAction: () {
+                      if (!mounted || was == null) return;
+                      setState(() => _swaps[key] = was);
+                      _save();
+                    });
                   },
                 ),
 
@@ -488,6 +598,7 @@ class _TtcNutritionScreenState extends State<TtcNutritionScreen> {
                               _noteOpen = false;
                             });
                             _save();
+                            _saveKitchenToProfile();
                             pvCommitFeedback();
                           },
                         ),

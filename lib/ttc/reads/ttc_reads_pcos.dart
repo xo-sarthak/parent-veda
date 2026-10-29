@@ -1056,8 +1056,11 @@ final List<PvRead> kTtcReadsPcos = [
       PvReadNextStep(
         kind: PvNextKind.tool,
         title: _en('Eating, day to day'),
-        value: _en('The meal planner, built around what an Indian kitchen '
-            'already cooks.'),
+        // T3 W6 (2026-10-29). Kept for revert:
+        //   value: _en('The meal planner, built around what an Indian kitchen '
+        //       'already cooks.'),
+        value: _en('Food ideas built around what an Indian kitchen already '
+            'cooks.'),
         surfaceId: 'ttc_nutrition',
       ),
       PvReadNextStep(

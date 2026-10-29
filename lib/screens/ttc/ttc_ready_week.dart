@@ -216,6 +216,22 @@ class _HabitRow extends StatelessWidget {
                   style: ttcBody(12.5,
                       color: ttcTitleInk, w: FontWeight.w700)),
             ),
+            // ⚠️ LINKED, NOT MERGED (T3 K6, user Q2 2026-10-29). Movement
+            // lives here as a plan habit and in "What you're working on" as
+            // a logged field; neither saw the other. One tap carries her to
+            // where movement is logged. Each keeps its own data.
+            if (habit.id == 'move')
+              TextButton(
+                key: const ValueKey('ttc_ready_habit_log_move'),
+                onPressed: () {
+                  pvCommitFeedback();
+                  openTtcSurface(context, 'ttc_habits');
+                },
+                // Names what she logs (explicit labels rule).
+                child: Text('Log movement',
+                    style: ttcBody(12.5,
+                        color: ttcTitleInk, w: FontWeight.w700)),
+              ),
             Row(mainAxisSize: MainAxisSize.min, children: [
             Text('Remind me', style: ttcBody(12)),
             Switch.adaptive(

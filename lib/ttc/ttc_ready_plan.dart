@@ -621,6 +621,19 @@ const ReadyStep _window = ReadyStep(
   readId: 'ttc_read_timing_myths',
 );
 
+/// In place of [_window] when her clinic owns the timing (T3 K5,
+/// 2026-10-29). "Learn your fertile days" asks a clinic couple to time
+/// something their clinic times for them; clinical ownership says we explain
+/// and help her prepare, never compete. Same checklist item underneath.
+const ReadyStep _clinicWindow = ReadyStep(
+  precheckId: 'fertile_window',
+  title: 'Your clinic times this',
+  why:
+      'On a clinic cycle, the clinic decides the timing. Note what they tell '
+      'you, and bring your questions to the next visit.',
+  surfaceId: 'ttc_appointments',
+);
+
 const ReadyStep _whenHelp = ReadyStep(
   precheckId: 'when_to_seek_help',
   title: "Agree when you'd ask for help",
@@ -697,9 +710,14 @@ List<ReadyTest> _testsFor(ReadyPlanAnswers a) {
     ),
     const ReadyTest(
       name: 'Vitamin D',
+      // T3 K7 (2026-10-29): 10 mcg a day needs no test (NHS). Kept for
+      // revert: 'Most Indian adults are low. Test before starting a
+      // supplement, not after.'
+      // No figure here: the plan names no dose anywhere (its test); the
+      // number is in Supplements and the tests library.
       why:
-          'Most Indian adults are low. Test before starting a supplement, '
-          'not after.',
+          'Most Indian adults are low. A small everyday dose is safe without '
+          'a test. A test decides whether you need more.',
       testId: 'vitd',
     ),
     const ReadyTest(
@@ -739,7 +757,8 @@ List<ReadyTest> _testsFor(ReadyPlanAnswers a) {
 ///
 /// ⚠️ A CLOSE MONTH COMPRESSES; IT NEVER MOVES. With one month to go the same
 /// steps sit in fewer months. Nothing here tells her to wait.
-List<List<ReadyStep>> _allocate(int prepMonths, ReadyPlanAnswers a) {
+List<List<ReadyStep>> _allocate(int prepMonths, ReadyPlanAnswers a,
+    {bool clinicTiming = false}) {
   final early = [_folate, _visit, _cycles];
   final checks = [
     _vaccines,
@@ -749,7 +768,8 @@ List<List<ReadyStep>> _allocate(int prepMonths, ReadyPlanAnswers a) {
     if (a.conditions.isNotEmpty) _conditionsStep(a.conditions),
   ];
   final everyday = [_food, _dental, _his];
-  final last = [_window, _whenHelp];
+  // Kept for revert (T3 K5): final last = [_window, _whenHelp];
+  final last = [clinicTiming ? _clinicWindow : _window, _whenHelp];
 
   switch (prepMonths) {
     case <= 0:
@@ -785,14 +805,17 @@ List<List<ReadyStep>> _allocate(int prepMonths, ReadyPlanAnswers a) {
 ///
 /// Null when there is no plan to make: no month picked, or she is already
 /// trying (her checklist is the better fit then).
-ReadyPlan? buildReadyPlan(ReadyPlanAnswers a, {required DateTime now}) {
+/// [clinicTiming]: her clinic owns the timing (`TimingOwnership` is not
+/// ParentVeda's), so the fertile-days step becomes the clinic's (T3 K5).
+ReadyPlan? buildReadyPlan(ReadyPlanAnswers a,
+    {required DateTime now, bool clinicTiming = false}) {
   final target = a.target;
   if (target == null || a.alreadyTrying) return null;
   final t = readyMonthOf(target);
   final start = readyMonthOf(now);
   final away = readyMonthsBetween(start, t);
 
-  final buckets = _allocate(away, a);
+  final buckets = _allocate(away, a, clinicTiming: clinicTiming);
   final months = <ReadyMonth>[
     for (var i = 0; i < buckets.length; i++)
       ReadyMonth(
@@ -809,7 +832,8 @@ ReadyPlan? buildReadyPlan(ReadyPlanAnswers a, {required DateTime now}) {
       ? [
           _folate,
           _visit,
-          _window,
+          // Kept for revert (T3 K5): _window,
+          clinicTiming ? _clinicWindow : _window,
           if (a.conditions.isNotEmpty) _conditionsStep(a.conditions),
           _whenHelp,
         ]
@@ -844,7 +868,9 @@ List<ReadyHabit> readyHabitsFor(ReadyPlanAnswers a) {
       title: 'Folic acid',
       minimum: 'Every day. Just the tablet.',
       minutes: 9 * 60,
-      surfaceId: 'ttc_medication',
+      // T3 W7 (2026-10-29): Medication itself says folic acid goes in
+      // Supplements. Kept for revert: surfaceId: 'ttc_medication',
+      surfaceId: 'ttc_supplements',
     ),
     switch (a.move) {
       ReadyMove.thirty || ReadyMove.fifteen => ReadyHabit(
@@ -982,9 +1008,19 @@ List<String> _hisLines(ReadyPlanAnswers a) {
 List<String> _notes(ReadyPlanAnswers a) => [
   // The onboarding's own shipped line for this age, word for word, so
   // the app gives one answer to one question.
-  if (a.age != null && a.age != FertilityAgeBand.under35)
-    "If you're over 35, six months of trying is a good time to see a "
+  // ⚠️ ONE AGE RULE (T3 W9, 2026-10-29): the doctor check's. 35 and over is
+  // six months; over 40 is before trying. Kept for revert:
+  //   if (a.age != null && a.age != FertilityAgeBand.under35)
+  //     "If you're over 35, six months of trying is a good time to see a "
+  //         "doctor. It's a calm check, not an emergency.",
+  if (a.age != null &&
+      a.age != FertilityAgeBand.under35 &&
+      a.age != FertilityAgeBand.over40)
+    "If you're 35 or over, six months of trying is a good time to see a "
         "doctor. It's a calm check, not an emergency.",
+  if (a.age == FertilityAgeBand.over40)
+    "Over 40, it's worth seeing a doctor before you start trying. It's a "
+        'calm check that gives you the most time, not an emergency.',
   if (a.conditionsUnsure)
     "You weren't sure about any conditions. That's worth one question at "
         'your check-up.',

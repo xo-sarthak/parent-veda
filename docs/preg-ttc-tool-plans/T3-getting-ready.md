@@ -166,4 +166,43 @@ None. No save loses her data.
 - **Recorded for later:** new tests in the library (CBC, thalassaemia, blood group and Rh, mid-luteal progesterone), Supplements and Vaccinations reminders, Zika, an after-loss Can I question, ashwagandha by name, COVID and HPV, pregnancy reading the supplements list, PCOS-aware food ideas.
 
 ## As built
-(Written during the build.)
+Built 2026-10-29, all three waves, in one terminal. Every superseded line is commented out with "kept for revert".
+
+**Wave 1: clinical and data**
+- **W1** `ttc_can_i_data.dart`: alcohol is `avoid`, no limit chip; short, why and India line as decided. The Hindi side said the same wrong thing, so it is commented out and the English shows. `ttc_can_i_polarity_test.dart` now pins `alcohol: avoid`, with a note saying why the one verdict moved.
+- **W2** One fish list, `kTtcFishLine` in `ttc_meal_week_data.dart`. Can I's fish answer IS that constant, and the non-veg kitchen note interpolates it, so the two cannot drift.
+- **W3** Vaping answer: the National Tobacco Quitline 1800-11-2356.
+- **W10, K2** Checklist caffeine under 200 mg with the mug equivalents; thalassaemia "for everyone, beyond it not everyone needs genetic testing".
+- **W9, K1** One age rule. `PrecheckContext` gains `ageBand` (from `TtcFertilityHelpStore`, which the Ready plan already writes) and `pastTimeToAsk`: over 40 at once, 35+ at 182 days, under 35 at 365, the same thresholds as `kFertilityHelpRules`. Evidence and priorities read it; the checklist text and its `medicalReview` say the same three numbers; the plan's note says "35 or over" and adds an over-40 line. The checklist screen now loads that store and listens to it.
+- **W12** `takesFolate` matches Supplements AND Medication names. `'folate'` left `kPrecheckFromRecords` (the D12 decision is reversed, on the plan's call: a name match is evidence, not a tick). The evidence line is "Folic acid is on your list. Check the dose…, then tick this yourself." `ttc_precheck_rebuild_test.dart` updated to match; the 360dp test ticks folate itself so Done still has a row to fold.
+- **W14** `TtcVaccine.doses` (varicella 2) and `secondDoseOptional` (MMR). Dose two is the id `<id>_2` in the same status and date maps, so the merged cloud item set carries it with no format change. `secondDoseDueFrom`, `secondDoseOwed`, `lastDoseOn`, `setSecondDose`; `clearToTryFrom` skips a course with dose two owed and counts from the last dose; clearing dose one clears dose two. The checklist counts dose two owed as a live vaccine outstanding, so the vaccines item cannot tick early.
+- **W11** Supplements' `for_partner` is relative to the row's OWNER, not to the phone. Reading: `authorOf(row, me)`: owner is me → the flag as written; owner is the partner → the flag flipped. Writing: `_cloudColumns` writes the flag from the owner's side (`_book.owners`). **This differs from the plan's one-liner** ("author from `user_id == me`, as doctor questions do"): a doctor question is always its writer's, but a supplement can be added FOR the other person, so the owner alone would put "CoQ10 for him", written on her phone, on her side on his. With no signed-in id (tests, signed out) the flag reads as before. `for_partner` is still written, as the plan required.
+- **K7, K10, K11 copy**: vitamin D 10 mcg a day needs no test (supplements, plan, tests library); folic acid 5 mg line; TSH "guidelines differ"; semen 2 to 7 days; vitamin D "your partner may want it checked too" (it is on her list only); MMR "usually one dose, some doctors advise two"; chickenpox memory is a weaker guide in India; W15 anti-HBs and its ask line; W17 rubella line.
+
+**Wave 2: screens**
+- **W4** `ttcCanIShown(e, hideIntimate:)` in `ttc_can_i_screen.dart`, read by the tool's list and by `ttcStageSearch`.
+- **W5** `ttcJainSwapFor` swaps a dish naming onion (`kTtcJainOnionSwap`); the old reasoning kept as a comment.
+- **W6** Meal-plan read steps, PCOS read and the TTC journey use "This week's food ideas" / "Food ideas built around…".
+- **W7, W8** The folic habit opens `ttc_supplements`; the weekly reminder names no number.
+- **W13, K11 verdict** The wait line names an outstanding live vaccine; dose two owed is its own verdict ("Dose 2 of Varicella is due from…"); "Nothing you've recorded is holding you back" plus the unrecorded live vaccine's name when one is unanswered. **W16** header without the week range. The answered card: "Had dose 1 on…", "I've had dose 2" / "Change dose 2 date" (its picker cannot go before dose one), and Undo on Clear brings dose two back.
+- **K4** The plan's save toast names only what her answers wrote (age band, kitchen, folic acid); the already-trying path now has a toast too.
+- **K5** `buildReadyPlan(clinicTiming:)`: "Your clinic times this" (opens Appointments) replaces "Learn your fertile days"; `TtcReadyPlanStore.planFor` passes `TtcStore.ownership != parentveda`.
+- **K6 (Q2)** "Log it" on the plan's movement habit opens `ttc_habits` ("What you're working on"). Linked, not merged.
+- **K8 (Q1)** `'supplements'` in `kTtcHisToolIds`. On his phone a suggestion's side flips with partner mode (`ttcSuggestionAuthor`), so his CoQ10 and zinc land under "Yours". Remove now has Undo (`removeWithUndo`, the ticks come back too).
+- **K12** The kitchen comes from `FamilyProfileStore.diet` (`ttcKitchenForDiet`), and a pick writes back (`ttcDietForKitchen`; a vegan profile is not narrowed). The prefs key stays as a local cache. Today's food row reads her kept swap (`TtcFoodIdeaToday` / `ttcFoodIdeaToday`). The idea swap and unswap toast with Undo. The folate idea says food does not replace the tablet; B12 wording no longer says "pure vegetarian" beside dahi and paneer (same in Supplements).
+- **K14** On a clinic cycle the exercise, heat and medicine answers open with "On a clinic cycle, your clinic's advice comes first." (`kTtcCanIClinicFirstIds`, `ttcCanIAsRead(clinicCycle:)`). No answer's words changed. Coconut oil commented out. Short answers wrap instead of an ellipsis (longest is about 100 characters; the test holds them at 130 or fewer). One route name `ttc/can_i` (search and the Ask Veda pointer).
+- **K15** Tracker line "Sleep, movement, stress and lifestyle."
+- **K2** The checklist's silent tap now toasts.
+
+**Wave 3: polish**
+- The vaccines verdict's unreachable first-open branch is commented out; the vaccine store's header no longer says "NO CLOUD SYNC".
+
+**Tests.** New `test/ttc_t3_getting_ready_test.dart`, 42 tests, all pass. Updated, each with a kept-for-revert note: `ttc_can_i_polarity_test.dart` and `ttc_care_test.dart` (alcohol is `avoid`; the care test now names the avoid set, smoking, vaping and alcohol, instead of capping it at two), `ttc_precheck_rebuild_test.dart` and `ttc_precheck_test.dart` (folic acid never self-ticks; caffeine's 200 mg is a limit, not a supplement dose), `ttc_appointments_vaccines_rebuild_test.dart` (varicella after dose one shows "Dose 2 is due from"). Two fixes came from the suite: the plan's vitamin D line names no figure (the plan's "no dose, anywhere" rule), and the link reads "Log movement" (explicit labels). The meal-plan read's non-veg FAQ uses `kTtcFishLine`, so it stays word for word with the tool's note.
+
+**Suite (2026-10-29).** The full TTC run ended at 3231 passed, 14 failed. A second full run was stopped by Claude Code for low memory, so the failures were run file by file instead: every T3-related file (21 files) now passes, plus the care test. `ttc_can_i_rebuild_test` and `ttc_all_reads_videos_test` failed in the full run and pass on their own (run-order flakiness, not T3). The four known fails listed under Out of scope are not T3's. That accounts for 13 of the 14; **one failure was not identified** before the re-run was stopped. **Owed:** one full TTC run when memory allows.
+
+**Wiring grep (2026-10-29).** Every new reader has its call site: `ttcCanIShown` (screen + search), `ageBand` (gather + the screen's load), `setSecondDose` / `_askWhenSecond` (the card), `ttcKitchenForDiet` / `_saveKitchenToProfile` (load + pick), `ttc_ready_habit_log_move`, `'supplements'` in his set, `TtcFoodIdeaToday` (Today), `clinicTiming` (store), `clinicCycle` (`openTtcCanIRead`), `removeWithUndo` (Remove), `ttcSuggestionAuthor` (list, add, toast), `authorOf` (cloud merge).
+
+**Backend.** No table, column or migration. Two sync behaviours changed, both on existing rows: supplements' `for_partner` is now written and read relative to the row's owner (W11), and `ttc_vaccines` items may now include `v|<id>_2` (W14). A BACKEND-SYNC-LOG step is owed, on the user's word.
+
+**Still owed.** The 12 BEFORE-LAUNCH CHECK lines and the LAUNCH line (Ask Veda re-ingest), on the user's word. C1: the Ready-to-Try plan's Tools row. Terminal A: the food tool's one name is "This week's food ideas" (hand-over item 4). Phone walk later.

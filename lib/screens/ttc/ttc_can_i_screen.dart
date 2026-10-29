@@ -200,6 +200,13 @@ class TtcCanIScreen extends StatefulWidget {
 /// An Ask Veda pointer to one still opens it: she asked for it by name.
 const Set<String> kTtcCanIIntimateIds = {'sex_frequency'};
 
+/// Whether an answer is shown, given the shared-phone switch. The one rule,
+/// read by this screen's list AND by stage search (T3 W4, 2026-10-29): search
+/// listed every answer, so "sex" on a shared phone found the one the tool
+/// had hidden.
+bool ttcCanIShown(TtcCanI e, {required bool hideIntimate}) =>
+    !(hideIntimate && kTtcCanIIntimateIds.contains(e.id));
+
 /// How many recently checked answers sit on top of the list.
 const int kTtcCanIRecentShown = 3;
 
@@ -246,8 +253,9 @@ class _TtcCanIScreenState extends State<TtcCanIScreen> {
 
         // Everything she can see, before the search and the chip.
         final pool = [
+          // Kept for revert (T3 W4): if (!(hide && kTtcCanIIntimateIds.contains(e.id))) e,
           for (final e in ttcCanI)
-            if (!(hide && kTtcCanIIntimateIds.contains(e.id))) e,
+            if (ttcCanIShown(e, hideIntimate: hide)) e,
         ];
         final topics = [
           for (final (name, _) in kTtcCanIGroups)

@@ -206,9 +206,13 @@ class TtcCanIRow extends StatelessWidget {
                   // opens first in the reader. Kept for revert: if (!compact)
                   if (!compact && limit == null) ...[
                     const SizedBox(height: 8),
+                    // ⚠️ NEVER CUT (T3 K14, 2026-10-29): two lines and an
+                    // ellipsis cut answers mid-sentence. The longest short
+                    // answer is about 100 characters, three lines at most,
+                    // and `test/ttc_t3_getting_ready_test.dart` holds them
+                    // short. Kept for revert: maxLines: 2, overflow:
+                    // TextOverflow.ellipsis,
                     Text(item.short(hi),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                         style: pvManrope(
                             fontSize: 13,
                             height: 1.45,

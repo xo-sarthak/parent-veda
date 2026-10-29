@@ -87,7 +87,10 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'Folic acid',
     dose: '400 mcg daily',
     noteEn:
-        'The one with the strongest evidence. You need it before conception, not after. The neural tube, which becomes the baby\'s brain and spine, closes in the first four weeks.',
+        // T3 K7 (2026-10-29): the 5 mg line added. Kept for revert: the note
+        // ended at "closes in the first four weeks."
+        'The one with the strongest evidence. You need it before conception, not after. The neural tube, which becomes the baby\'s brain and spine, closes in the first four weeks. '
+        'Some women need 5 mg on a doctor\'s advice, for example with diabetes, a BMI of 30 or more, or a past pregnancy affected by a neural tube defect.',
     noteHi:
         'Iske peeche sabse mazboot saboot hai. Conception se pehle chahiye, baad mein nahi - neural tube pehle chaar hafton mein band ho jaata hai.',
   ),
@@ -95,7 +98,11 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'Vitamin D',
     dose: 'As advised',
     noteEn:
-        'Most Indian adults are low. Test before you start taking it. The dose depends on how low you are, and only a test can tell you that.',
+        // T3 K7 (2026-10-29): NHS, 10 mcg a day needs no test. Kept for
+        // revert: 'Most Indian adults are low. Test before you start taking
+        // it. The dose depends on how low you are, and only a test can tell
+        // you that.'
+        'Most Indian adults are low. 10 mcg a day is a safe everyday dose without a test. A test decides whether you need more.',
     noteHi:
         'Zyadatar Indian adults mein kami hai. Lene se pehle test karwayein - dose is par nirbhar hai ki kami kitni hai, jo sirf test bata sakta hai.',
   ),
@@ -103,7 +110,10 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'Vitamin B12',
     dose: 'As advised',
     noteEn:
-        "A pure vegetarian diet almost always needs this. It's one of the few cases where food alone isn't enough.",
+        // T3 K12 (2026-10-29): the same B12 wording as the food idea. Kept
+        // for revert: "A pure vegetarian diet almost always needs this. It's
+        // one of the few cases where food alone isn't enough."
+        "Many vegetarians run low even with dairy, and without dairy or eggs this is almost always needed. A B12 test tells you where you stand.",
     noteHi:
         'Shuddh shakahari khaane mein ye lagbhag hamesha chahiye. Un gine-chune jagahon mein se ek jahan khana sach mein kaafi nahi hai.',
   ),
@@ -410,6 +420,29 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
     notifyListeners();
   }
 
+  /// [remove], returning the way back (T3 K7, 2026-10-29: Remove had no
+  /// Undo, and it takes every tick with it). The Undo is a newer change to
+  /// the same id and the same tick keys, so it wins over the removal on both
+  /// phones (`SyncRowBook.touch`).
+  VoidCallback? removeWithUndo(String id) {
+    final i = _items.indexWhere((e) => e.id == id);
+    if (i < 0) return null;
+    final item = _items[i];
+    final ticks = _taken.where((k) => k.startsWith('$id|')).toList();
+    remove(id);
+    return () {
+      if (_items.any((e) => e.id == id)) return;
+      _items.insert(i.clamp(0, _items.length), item);
+      _book.touch(id);
+      for (final k in ticks) {
+        _taken.add(k);
+        _takenBook.touch(k);
+      }
+      _persist();
+      notifyListeners();
+    };
+  }
+
   /// One tick is one row per (supplement, day), whoever of the two ticked it,
   /// so the newer tick or un-tick wins (2026-10-17, 0099).
   void toggleTaken(String id, {DateTime? on}) {
@@ -480,11 +513,41 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
   //  his in the same way folic acid is hers.
 
   /// The supplement's own columns, without the owner or the two times.
-  static Map<String, dynamic> _cloudColumns(TtcSupplement s) => {
-        'for_partner': s.author == TtcAuthor.partner,
-        'name': s.name,
-        'dose': s.dose,
-      };
+  ///
+  /// ⚠️ `for_partner` IS RELATIVE TO THE ROW'S OWNER (T3 W11, 2026-10-29).
+  /// `author` on this phone means "whose supplement, from where I stand":
+  /// `me` is mine, `partner` is theirs. A row's `user_id` is whoever first
+  /// wrote it. So on HIS phone, editing a row SHE owns, "mine" is her
+  /// partner's from the owner's side, and the flag flips. Writing the flag
+  /// from this phone's point of view is what put his items on her side.
+  /// Kept for revert: `'for_partner': s.author == TtcAuthor.partner,` always.
+  Map<String, dynamic> _cloudColumns(TtcSupplement s) {
+    final owner = _book.owners[s.id];
+    final me = SupabaseRepo.userId;
+    final ownedByMe = owner == null || me == null || owner == me;
+    return {
+      'for_partner': ownedByMe
+          ? s.author == TtcAuthor.partner
+          : s.author == TtcAuthor.me,
+      'name': s.name,
+      'dose': s.dose,
+    };
+  }
+
+  /// Whose supplement a cloud row is, seen from this phone (T3 W11).
+  ///
+  /// The owner (`user_id`) says whose point of view `for_partner` was written
+  /// from; the flag says whether it is the owner's own or the owner's
+  /// partner's. Doctor questions read the owner alone, because a question
+  /// is always its writer's; a supplement can be added for the other person,
+  /// so it needs both. With no signed-in id to compare (a test, or signed
+  /// out), the flag is read as this phone's, as it always was.
+  static TtcAuthor authorOf(Map<String, dynamic> row, String? me) {
+    final owner = row['user_id']?.toString();
+    final ownedByMe = owner == null || me == null || owner == me;
+    final forPartner = row['for_partner'] == true;
+    return forPartner == ownedByMe ? TtcAuthor.partner : TtcAuthor.me;
+  }
 
   // ⚠️ NEWER WINS, BOTH WAYS (2026-10-17, 0099), for the list and the ticks.
   // The union pull is kept below as `_pullUnionKept`, for revert.
@@ -501,8 +564,10 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
   @visibleForTesting
   void applyCloudRows(
     List<Map<String, dynamic>> rows,
-    List<Map<String, dynamic>> taken,
-  ) {
+    List<Map<String, dynamic>> taken, {
+    String? me,
+  }) {
+    final self = me ?? SupabaseRepo.userId;
     for (final row in _book.merge(_items.map((e) => e.id), rows)) {
       final id = row['id'] as String;
       final i = _items.indexWhere((e) => e.id == id);
@@ -517,7 +582,9 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
         id: id,
         name: (row['name'] as String?) ?? '',
         dose: (row['dose'] as String?) ?? '',
-        author: row['for_partner'] == true ? TtcAuthor.partner : TtcAuthor.me,
+        // T3 W11 (2026-10-29). Kept for revert:
+        //   author: row['for_partner'] == true ? TtcAuthor.partner : TtcAuthor.me,
+        author: authorOf(row, self),
       );
       if (i >= 0) {
         _items[i] = s;

@@ -79,6 +79,7 @@ import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
+import '../../ttc/ttc_fertility_help_store.dart';
 import '../../ttc/ttc_precheck_data.dart';
 import '../../ttc/ttc_precheck_rules.dart';
 import '../../ttc/ttc_precheck_store.dart';
@@ -184,6 +185,9 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
   @override
   void initState() {
     super.initState();
+    // The age band the one age rule reads (T3 W9/K1). It notifies, so the
+    // "when to ask for help" line catches up once it has loaded.
+    TtcFertilityHelpStore.instance.load().catchError((_) {});
     _store.load().then((_) async {
       if (!mounted) return;
       _store.markOpened();
@@ -235,6 +239,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
         _store,
         V2PaletteStore.instance,
         TtcLang.instance,
+        TtcFertilityHelpStore.instance,
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -1991,7 +1996,15 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
 
   void _open(String surfaceId) {
     final screen = ttcScreenForSurface(surfaceId);
-    if (screen == null) return;
+    // ⚠️ NO SILENT TAP (T3 K2, 2026-10-29). Latent today (all 13 ids
+    // resolve), but a tap that does nothing reads as a broken app. Kept for
+    // revert: if (screen == null) return;
+    if (screen == null) {
+      pvSnack(context,
+          "That tool isn't available here yet. Ask Veda can help in the meantime.",
+          lift: 24);
+      return;
+    }
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         settings: RouteSettings(name: surfaceId),

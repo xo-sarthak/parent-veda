@@ -1345,7 +1345,9 @@ const List<TtcNutrition> ttcNutrition = [
     nutrientEn: 'Folate',
     nutrientHi: 'Folate',
     whyEn:
-        'Folate is the form of folic acid found in food, and you need it before you conceive, not after.',
+        // T3 K12 (2026-10-29): food is not a substitute for the tablet.
+        // Kept for revert: the line ended at "not after."
+        'Folate is the form of folic acid found in food, and you need it before you conceive, not after. Food helps, but it does not replace the daily folic acid tablet.',
     whyHi:
         'Folate folic acid ka khaane wala roop hai, aur ye conceive karne ke baad nahi, pehle chahiye hota hai.',
     mealEn: 'Palak dal with a squeeze of lemon, and roti.',
@@ -1501,7 +1503,10 @@ const List<TtcNutrition> ttcNutrition = [
     mealEn: "Dahi, paneer, milk and eggs, or a supplement if you don't eat dairy.",
     mealHi: 'Dahi, paneer, doodh, ande - ya supplement agar dairy bilkul nahi khate.',
     indianEn:
-        "A pure vegetarian diet almost always needs a B12 supplement. This is one of the few times when food alone isn't enough.",
+        // T3 K12 (2026-10-29): "pure vegetarian" sat beside dahi, paneer
+        // and milk. Kept for revert:
+        //   "A pure vegetarian diet almost always needs a B12 supplement. This is one of the few times when food alone isn't enough.",
+        "Even with dahi and milk every day, many vegetarians run low, and without dairy or eggs a B12 supplement is almost always needed. A B12 test tells you where you stand.",
     indianHi:
         'Shuddh shakahari khaane mein lagbhag hamesha B12 supplement chahiye hota hai. Ye un gine-chune jagahon mein hai jahan khana sach mein kaafi nahi hai.',
   ),

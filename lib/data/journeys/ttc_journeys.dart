@@ -393,8 +393,11 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
         JourneyElement(
           type: SolutionType.tool,
           title: _en('Eating, day to day'),
-          value: _en('A meal planner built around the Indian food you '
-              'already cook.'),
+          // T3 W6 (2026-10-29). Kept for revert:
+          //   value: _en('A meal planner built around the Indian food you '
+          //       'already cook.'),
+          value: _en('Food ideas built around the Indian food you already '
+              'cook.'),
           surfaceId: 'ttc_nutrition',
         ),
       ],

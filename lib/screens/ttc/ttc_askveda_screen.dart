@@ -1103,7 +1103,8 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       return true;
     }
     if (id.startsWith('ttccani_')) {
-      push(TtcCanIScreen(focusId: id.substring('ttccani_'.length)), 'ttc/canI');
+      // One route name with the tool's own (T3 K14). Kept for revert: 'ttc/canI'
+      push(TtcCanIScreen(focusId: id.substring('ttccani_'.length)), 'ttc/can_i');
       return true;
     }
     if (id.startsWith('ttcprod_')) {

@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/bracket_resolver.dart';
 import '../../ttc/ttc_can_i_data.dart';
+import '../../ttc/ttc_content_prefs.dart';
 import '../../ttc/ttc_focus_data.dart';
 import '../../ttc/ttc_home_situation.dart' show ttcHomeDoorOrderNow;
 import '../../ttc/ttc_products_data.dart';
@@ -179,16 +180,20 @@ List<TtcStageHit> ttcStageSearch(
         ),
   ]);
 
-  // Can I…? answers.
+  // Can I…? answers, minus the ones the shared-phone switch hides (T3 W4).
+  final hideIntimate = TtcContentPrefs.instance.hideIntimate;
   addAll([
     for (final c in ttcCanI)
+      if (ttcCanIShown(c, hideIntimate: hideIntimate))
       if (_score(q, c.questionEn, c.shortEn) case final s when s > 0)
         TtcStageHit(
           kind: TtcStageHitKind.canI,
           title: c.questionEn,
           line: c.shortEn,
           open: (ctx) => Navigator.of(ctx).push(MaterialPageRoute<void>(
-            settings: const RouteSettings(name: 'ttc/canI'),
+            // One route name with the tool's own (T3 K14). Kept for revert:
+            //   settings: const RouteSettings(name: 'ttc/canI'),
+            settings: const RouteSettings(name: 'ttc/can_i'),
             builder: (_) => TtcCanIScreen(focusId: c.id),
           )),
           score: s,

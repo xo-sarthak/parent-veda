@@ -1481,7 +1481,9 @@ String ttcTrackerTitle(TtcTracker t) {
   final him = TtcPartnerMode.instance.on;
   return switch (t.id) {
     'weight' => 'Note your weight.',
-    'habits' => 'Sleep, movement and what you cut down.',
+    // T3 K15 (2026-10-29): the row's own four words. Kept for revert:
+    //   'habits' => 'Sleep, movement and what you cut down.',
+    'habits' => 'Sleep, movement, stress and lifestyle.',
     'partner_health' => him
         ? 'Your sleep, drinks, smoke and heat.'
         : 'His sleep, drinks, smoke and heat.',

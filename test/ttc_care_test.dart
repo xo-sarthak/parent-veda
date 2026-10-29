@@ -359,9 +359,13 @@ void main() {
 
     test('"avoid" is reserved, not sprayed around', () {
       final avoid = ttcCanI.where((q) => q.verdict == TtcVerdict.avoid).toList();
-      expect(avoid.length, lessThanOrEqualTo(2),
+      // T3 W1 (2026-10-29): alcohol joined, a deliberate clinical call (NHS:
+      // none while trying). The set is named, so a fourth "avoid" has to be
+      // added here on purpose. Kept for revert:
+      //   expect(avoid.length, lessThanOrEqualTo(2),
+      //       reason: 'only the things with genuinely clear evidence');
+      expect(avoid.map((q) => q.id).toSet(), {'smoking', 'vaping', 'alcohol'},
           reason: 'only the things with genuinely clear evidence');
-      expect(avoid.map((q) => q.id), contains('smoking'));
     });
 
     test('every entry is bilingual and carries its Indian line', () {

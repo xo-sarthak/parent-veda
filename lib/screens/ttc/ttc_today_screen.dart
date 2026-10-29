@@ -33,6 +33,7 @@ import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_chapter_screen.dart';
+import 'ttc_nutrition_screen.dart' show TtcFoodIdeaToday;
 import 'ttc_today_parts.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_screens.dart';
@@ -1264,7 +1265,11 @@ class _TodayList extends StatelessWidget {
             ],
           ),
         ),
-        TtcTodayRow(
+        // Her kept swap for today, not only the rotation (T3 K12,
+        // 2026-10-29). Kept for revert: the row on its own, reading `n`.
+        TtcFoodIdeaToday(
+          fallback: n,
+          builder: (context, n) => TtcTodayRow(
           icon: Icons.restaurant_rounded,
           eyebrow: t.todaysNutrition,
           title: n.meal(hi),
@@ -1288,7 +1293,7 @@ class _TodayList extends StatelessWidget {
               ),
             ],
           ),
-        ),
+        )),
         TtcTodayRow(
           icon: Icons.directions_walk_rounded,
           eyebrow: t.todaysMovement,

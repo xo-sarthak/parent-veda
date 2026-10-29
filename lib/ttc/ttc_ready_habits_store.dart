@@ -361,7 +361,10 @@ class TtcReadyHabitsStore extends ChangeNotifier with CloudMergedStore {
   static const Reminder weeklyReminder = Reminder(
     id: 'ttc_plan_week',
     title: 'Your week ahead',
-    body: 'Five small things this week. Open your Ready-to-Try plan.',
+    // T3 W8 (2026-10-29): the week holds three to five habits (calm and
+    // garbh are conditional), so the reminder names no number. Kept for
+    // revert: body: 'Five small things this week. Open your Ready-to-Try plan.',
+    body: 'Your small things for this week. Open your Ready-to-Try plan.',
     hour: 19,
     minute: 0,
     repeat: ReminderRepeat.weekly,

@@ -35,11 +35,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/family_profile.dart';
 import '../services/notification_service.dart';
 import '../services/remote/supabase_repo.dart';
+import 'ttc_care_pathway.dart' show TimingOwnership;
 import 'ttc_fertility_help_store.dart';
 import 'ttc_precheck_data.dart';
 import 'ttc_precheck_rules.dart';
 import 'ttc_precheck_store.dart';
 import 'ttc_ready_plan.dart';
+import 'ttc_store.dart' show TtcStore;
 import 'ttc_sync.dart';
 
 /// The food tool's saved kitchen. The same string as `kTtcFoodKitchenKey` in
@@ -95,7 +97,11 @@ class TtcReadyPlanStore extends ChangeNotifier with TtcSyncedStore {
   ReadyPlan? planFor(DateTime now) {
     final a = _answers;
     if (a == null || _madeAt == null) return null;
-    return buildReadyPlan(a, now: now);
+    // Kept for revert (T3 K5): return buildReadyPlan(a, now: now);
+    return buildReadyPlan(a,
+        now: now,
+        clinicTiming:
+            TtcStore.instance.ownership != TimingOwnership.parentveda);
   }
 
   /// She has said she is planning but has not made a plan yet: the home's

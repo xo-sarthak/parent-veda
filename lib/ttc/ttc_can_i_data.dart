@@ -19,6 +19,8 @@
 //  every page ends with a disclaimer and anything clinical routes to a doctor.
 // =============================================================================
 
+import 'ttc_meal_week_data.dart' show kTtcFishLine;
+
 /// The verdict, in the product's small calm colour language. Never a traffic
 /// light - see ttcVerdictTint in the screen.
 enum TtcVerdict { safe, moderate, avoid, askDoctor }
@@ -128,23 +130,31 @@ const List<TtcCanI> ttcCanI = [
   ),
   TtcCanI(
     id: 'alcohol',
-    limitEn: 'now and then, never heavy',
-    limitHi: 'now and then, never heavy',
+    // ⚠️ NONE WHILE TRYING (T3 W1, 2026-10-29). This was `moderate`, "Now and
+    // then, yes", with an India line about drinking as normal in the first
+    // half of the cycle. NHS advice is no alcohol while trying: a pregnancy
+    // starts two weeks before any test can show it, so "only before the
+    // fertile window" is drinking in the weeks she may already be pregnant.
+    // The Hindi side said the same thing, so it is set aside and the English
+    // shows (CLAUDE.md, "New work is English"). Kept for revert:
+    //   limitEn: 'now and then, never heavy',
+    //   limitHi: 'now and then, never heavy',
+    //   verdict: TtcVerdict.moderate,
+    //   shortEn: 'Now and then, yes. Heavy drinking is a different question, and there the answer is no.',
+    //   shortHi: 'Kabhi-kabhaar, haan. Zyada peena alag baat hai, aur uska jawab nahi hai.',
+    //   whyEn: "Heavy drinking is linked again and again to upset ovulation and to poorer sperm quality. The evidence on an occasional social drink while trying is mixed. Once pregnancy is confirmed, the advice is no alcohol at all. That's worth knowing, because you may be pregnant for two weeks before a test can tell you.",
+    //   whyHi: 'Zyada sharab, ovulation bigadne aur kam sperm quality se lagatar judi hai. Koshish ke dauraan kabhi-kabhaar peene par saboot sach mein mile-jule hain. Pregnancy confirm hone ke baad salaah bilkul na peene ki ho jaati hai - aur ye jaanna zaroori hai, kyunki test batane se do hafte pehle hi aap pregnant ho sakti hain.',
+    //   indianEn: 'What most couples end up doing: drinking as normal in the first half of the cycle, and not at all once the fertile window has passed.',
+    //   indianHi: 'Zyadatar couples jo practical tareeka apnate hain: cycle ke pehle aadhe hisse mein normal, aur fertile window guzarne ke baad kuch nahi.',
     questionEn: 'Can I drink alcohol?',
     questionHi: 'Kya main sharab pi sakti hoon?',
-    verdict: TtcVerdict.moderate,
+    verdict: TtcVerdict.avoid,
     shortEn:
-        'Now and then, yes. Heavy drinking is a different question, and there the answer is no.',
-    shortHi:
-        'Kabhi-kabhaar, haan. Zyada peena alag baat hai, aur uska jawab nahi hai.',
+        "Best to stop while you're trying. No amount is known to be safe once you might be pregnant.",
     whyEn:
-        "Heavy drinking is linked again and again to upset ovulation and to poorer sperm quality. The evidence on an occasional social drink while trying is mixed. Once pregnancy is confirmed, the advice is no alcohol at all. That's worth knowing, because you may be pregnant for two weeks before a test can tell you.",
-    whyHi:
-        'Zyada sharab, ovulation bigadne aur kam sperm quality se lagatar judi hai. Koshish ke dauraan kabhi-kabhaar peene par saboot sach mein mile-jule hain. Pregnancy confirm hone ke baad salaah bilkul na peene ki ho jaati hai - aur ye jaanna zaroori hai, kyunki test batane se do hafte pehle hi aap pregnant ho sakti hain.',
+        'Heavy drinking is linked again and again to upset ovulation and to poorer sperm quality. Once you might be pregnant, no amount of alcohol is known to be safe. You may be pregnant for two weeks before a test can tell you, which is why the advice is to stop from the start of trying.',
     indianEn:
-        'What most couples end up doing: drinking as normal in the first half of the cycle, and not at all once the fertile window has passed.',
-    indianHi:
-        'Zyadatar couples jo practical tareeka apnate hain: cycle ke pehle aadhe hisse mein normal, aur fertile window guzarne ke baad kuch nahi.',
+        'Many couples stop from the start of trying, because a pregnancy shows up two weeks after it begins.',
   ),
   TtcCanI(
     id: 'smoking',
@@ -381,7 +391,10 @@ const List<TtcCanI> ttcCanI = [
     whyEn:
         "Fish gives you protein, iodine and omega-3 fats, which are good for you and for an early pregnancy. The one thing to watch is mercury, which builds up in large fish that eat other fish. Choosing smaller fish keeps the benefit without the mercury.",
     indianEn:
-        'Rohu, pomfret, sardines (mathi), mackerel (bangda) and prawns are all good choices. Keep large surmai (king mackerel) and shark to now and then.',
+        // T3 W2 (2026-10-29): one fish list with the food tool, and king
+        // mackerel is to avoid, not "now and then" (FDA). Kept for revert:
+        //   'Rohu, pomfret, sardines (mathi), mackerel (bangda) and prawns are all good choices. Keep large surmai (king mackerel) and shark to now and then.',
+        kTtcFishLine,
   ),
   TtcCanI(
     id: 'green_tea',
@@ -470,7 +483,10 @@ const List<TtcCanI> ttcCanI = [
     whyEn:
         "Most everyday lubricants, and saliva, can make it harder for sperm to swim. Sperm-friendly lubricants are made to match the body's own fluid. If you need one, it's much better than sex that hurts.",
     indianEn:
-        'Look for "sperm-friendly" or "fertility-friendly" on the pack at a chemist or online. A little plain coconut oil is another option many couples use.',
+        // T3 K14 (2026-10-29): coconut oil is not tested as sperm-friendly, so
+        // the line stops at the pack. Kept for revert:
+        //   'Look for "sperm-friendly" or "fertility-friendly" on the pack at a chemist or online. A little plain coconut oil is another option many couples use.',
+        'Look for "sperm-friendly" or "fertility-friendly" on the pack at a chemist or online.',
   ),
   TtcCanI(
     id: 'get_up_after',
@@ -563,7 +579,12 @@ const List<TtcCanI> ttcCanI = [
     whyEn:
         "Vapes still deliver nicotine, which affects eggs, sperm and an early pregnancy. They aren't a safe swap for cigarettes while trying. Stopping helps both of you, and a doctor can help you do it.",
     indianEn:
-        "The same goes for gutka, khaini and paan with tobacco. Tele-MANAS (14416) and your doctor can help if stopping is hard.",
+        // T3 W3 (2026-10-29): Tele-MANAS is the mental-health line; the
+        // tobacco quitline is its own number. Kept for revert:
+        //   "The same goes for gutka, khaini and paan with tobacco. Tele-MANAS (14416) and your doctor can help if stopping is hard.",
+        'The same goes for gutka, khaini and paan with tobacco. The National '
+        'Tobacco Quitline (1800-11-2356) and your doctor can help if stopping '
+        'is hard.',
   ),
 
   // ---- For him --------------------------------------------------------------------

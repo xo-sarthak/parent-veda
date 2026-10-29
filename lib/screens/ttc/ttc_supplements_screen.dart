@@ -65,6 +65,15 @@ import 'ttc_tool_confirm.dart';
 /// The read that sits under the list: which supplement to start when.
 const String kTtcSupplementsRead = 'ttc_read_supplement_timing';
 
+/// Whose list a suggestion goes on, from THIS phone (T3 K8, 2026-10-29).
+/// `forPartner` on a suggestion means "his" (CoQ10 for sperm, zinc). On his
+/// phone, his is "Yours", so the side flips with partner mode; reading the
+/// flag as "the partner's" put his own CoQ10 under "Your partner's".
+TtcAuthor ttcSuggestionAuthor(TtcSuggestedSupplement s) =>
+    s.forPartner == TtcPartnerMode.instance.on
+        ? TtcAuthor.me
+        : TtcAuthor.partner;
+
 class TtcSupplementsScreen extends StatefulWidget {
   const TtcSupplementsScreen({super.key});
 
@@ -96,11 +105,8 @@ class _TtcSupplementsScreenState extends State<TtcSupplementsScreen> {
         // added is on the list above, not a second time down here.
         final ideas = [
           for (final s in ttcSuggestedSupplements)
-            if (!store.has(
-              s.name,
-              s.forPartner ? TtcAuthor.partner : TtcAuthor.me,
-            ))
-              s,
+            // Kept for revert (T3 K8): s.forPartner ? TtcAuthor.partner : TtcAuthor.me,
+            if (!store.has(s.name, ttcSuggestionAuthor(s))) s,
         ];
         // ⚠️ ONE ROW PER NAME (launch sanity T5, 2026-09-28). CoQ10 is two
         // honest entries (her egg quality, his sperm), and the walk read the
@@ -430,13 +436,17 @@ class _SuggestionGroupRow extends StatelessWidget {
     TtcSupplementsStore.instance.add(
       s.name,
       dose: s.dose,
-      author: s.forPartner ? TtcAuthor.partner : TtcAuthor.me,
+      // Kept for revert (T3 K8): s.forPartner ? TtcAuthor.partner : TtcAuthor.me,
+      author: ttcSuggestionAuthor(s),
     );
     // Tell her where it went: a partner's item lands in a list further up
     // the screen, out of sight of the thumb that added it.
     pvSnack(
       context,
-      s.forPartner ? "Added to your partner's list" : 'Added to your list',
+      // Kept for revert (T3 K8): s.forPartner ? ... : ...,
+      ttcSuggestionAuthor(s) == TtcAuthor.partner
+          ? "Added to your partner's list"
+          : 'Added to your list',
       icon: Icons.check_rounded,
       lift: 24,
     );
@@ -922,8 +932,12 @@ class _TtcSupplementDetailScreenState extends State<TtcSupplementDetailScreen> {
       body: 'The days you ticked it go too.',
     );
     if (!ok || !context.mounted) return;
-    pvSnack(context, '${s.name} removed', lift: 24);
-    TtcSupplementsStore.instance.remove(s.id);
+    // With Undo (T3 K7): the ticked days go too. Kept for revert:
+    //   pvSnack(context, '${s.name} removed', lift: 24);
+    //   TtcSupplementsStore.instance.remove(s.id);
+    final undo = TtcSupplementsStore.instance.removeWithUndo(s.id);
+    pvSnack(context, '${s.name} removed, with the days you ticked it.',
+        lift: 24, action: 'Undo', onAction: undo);
     nav.maybePop();
   }
 }

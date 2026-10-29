@@ -348,21 +348,47 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
       V2Palette p, TtcVaccineStore store, String Function(String, String) t) {
     final until = store.clearToTryFrom();
     final outstanding = store.liveOutstanding;
+    final dose2 = store.secondDoseOwed;
     final tint = v2BlockTint(_kHue, p);
+    final outstandingNames =
+        outstanding.map((v) => v.name.en).join(t(' and ', ' aur '));
 
     late final String head;
     late final String body;
     late final IconData icon;
 
-    if (until != null) {
+    // ⚠️ DOSE TWO BEFORE ANY "CLEAR TO TRY" (T3 W14, 2026-10-29). With one
+    // date per vaccine, logging varicella's first dose showed her clear 28
+    // days later, while the second dose and its month were still to come.
+    if (dose2.isNotEmpty) {
+      final v = dose2.first;
+      final due = store.secondDoseDueFrom(v)!;
+      head = t('Dose 2 of ${v.name.en} is due from ${_date(due)}',
+          'Dose 2 of ${v.name.en} is due from ${_date(due)}');
+      body = t(
+          'The month\'s wait before trying counts from the second dose, so '
+              'there is no clear-to-try date yet.',
+          'The month\'s wait before trying counts from the second dose, so '
+              'there is no clear-to-try date yet.');
+      icon = Icons.event_available_rounded;
+    } else if (until != null) {
       final days = until.difference(DateTime.now()).inDays + 1;
       head = t('Best to wait until ${_date(until)}',
           '${_date(until)} tak rukna behtar');
-      body = t(
-          'That\'s about $days more ${days == 1 ? 'day' : 'days'}, counted '
-              'from your live vaccine. Nothing else on this page needs a wait.',
-          'Lagbhag $days aur din, live vaccine se gina hua. Is page par aur '
-              'kisi cheez ke liye rukna nahi hai.');
+      // ⚠️ NAMES WHAT IS STILL NEEDED (T3 W13, 2026-10-29). "Nothing else
+      // needs a wait" was said even with varicella still to get, which is
+      // a second wait. Kept for revert: the one body below, always.
+      body = outstanding.isEmpty
+          ? t(
+              'That\'s about $days more ${days == 1 ? 'day' : 'days'}, counted '
+                  'from your live vaccine. Nothing else on this page needs a wait.',
+              'Lagbhag $days aur din, live vaccine se gina hua. Is page par aur '
+                  'kisi cheez ke liye rukna nahi hai.')
+          : t(
+              'That\'s about $days more ${days == 1 ? 'day' : 'days'}, counted '
+                  'from your live vaccine. $outstandingNames still needs doing.',
+              'That\'s about $days more ${days == 1 ? 'day' : 'days'}, counted '
+                  'from your live vaccine. $outstandingNames still needs doing.');
       icon = Icons.hourglass_bottom_rounded;
     } else if (outstanding.isNotEmpty) {
       final names = outstanding.map((v) => v.name.en).join(t(' and ', ' aur '));
@@ -380,33 +406,57 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
               'sabse chhota rasta hai. List par aur kisi cheez ke liye rukna '
               'nahi hai.');
       icon = Icons.event_available_rounded;
-    } else if (store.unrecorded == kTtcVaccines.length) {
-      // ⚠️ THIS SAID "NOTHING RECORDED YET" AND THAT WAS THE WRONG SENTENCE.
-      //
-      // It is accurate and it frames her as already behind, on a screen she
-      // has just opened, in a stage where the prevailing feeling is that she
-      // is failing at something. An empty state is not a deficit — she has
-      // simply arrived. Say what happens next instead of what has not
-      // happened yet.
-      // Kept for revert (2026-09-28): 'One blood test settles most of this'
-      head = t('One blood test settles most of your jabs',
-          'Ek blood test se zyadatar baat saaf ho jaati hai');
-      body = t(
-          'Rubella is the one worth doing first. If it shows you\'re immune, '
-              'as it usually does, there\'s nothing more to do here.',
-          'Rubella sabse pehle karwane layak hai. Agar immune aaya — jo aksar '
-              'aata hai — toh yahan aur kuch karna nahi hai.');
-      icon = Icons.science_outlined;
+    // ⚠️ UNREACHABLE, SO SET ASIDE (T3 K11 polish, 2026-10-29): `_verdict` is
+    // drawn only when `!_firstOpen`, which is exactly "not everything
+    // unrecorded". The first-open words live in the tests box. Kept for
+    // revert: the branch below, from `} else if (store.unrecorded ==` to
+    // its `icon` line, was live.
+    // } else if (store.unrecorded == kTtcVaccines.length) {
+    //   // ⚠️ THIS SAID "NOTHING RECORDED YET" AND THAT WAS THE WRONG SENTENCE.
+    //   //
+    //   // It is accurate and it frames her as already behind, on a screen she
+    //   // has just opened, in a stage where the prevailing feeling is that she
+    //   // is failing at something. An empty state is not a deficit — she has
+    //   // simply arrived. Say what happens next instead of what has not
+    //   // happened yet.
+    //   // Kept for revert (2026-09-28): 'One blood test settles most of this'
+    //   head = t('One blood test settles most of your jabs',
+    //       'Ek blood test se zyadatar baat saaf ho jaati hai');
+    //   body = t(
+    //       'Rubella is the one worth doing first. If it shows you\'re immune, '
+    //           'as it usually does, there\'s nothing more to do here.',
+    //       'Rubella sabse pehle karwane layak hai. Agar immune aaya — jo aksar '
+    //           'aata hai — toh yahan aur kuch karna nahi hai.');
+    //   icon = Icons.science_outlined;
     } else {
       // Change 5 (2026-09-28): the heading names what is not holding her
       // back. Kept for revert (2026-09-28): 'Nothing here is holding you back'
-      head = t('No vaccine is holding you back',
-          'Yahan kuch bhi aapko rok nahi raha');
-      body = t(
-          'This is based on what you\'ve recorded. If a result changes, '
-              'update it here so the date stays right.',
-          'Jo aapne darj kiya uske hisaab se. Koi result badle toh yahan bhi '
-              'badal dein, taaki tareekh sahi rahe.');
+      // ⚠️ NOT WHILE A LIVE VACCINE IS UNRECORDED (T3 K11, 2026-10-29). "No
+      // vaccine is holding you back" read as settled with varicella never
+      // answered. The heading now says what it is based on and names the
+      // gap. Unchanged when every live vaccine is recorded.
+      final unanswered = [
+        for (final v in ttcLiveVaccines)
+          if (store.statusOf(v.id) == TtcVaccineStatus.unknown) v.name.en,
+      ];
+      if (unanswered.isNotEmpty) {
+        final names = unanswered.join(' and ');
+        head = t("Nothing you've recorded is holding you back",
+            "Nothing you've recorded is holding you back");
+        body = t(
+            "$names isn't recorded yet. If a result changes, update it here "
+                'so the date stays right.',
+            "$names isn't recorded yet. If a result changes, update it here "
+                'so the date stays right.');
+      } else {
+        head = t('No vaccine is holding you back',
+            'Yahan kuch bhi aapko rok nahi raha');
+        body = t(
+            'This is based on what you\'ve recorded. If a result changes, '
+                'update it here so the date stays right.',
+            'Jo aapne darj kiya uske hisaab se. Koi result badle toh yahan bhi '
+                'badal dein, taaki tareekh sahi rahe.');
+      }
       icon = Icons.check_rounded;
     }
 
@@ -648,8 +698,14 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         _groupHead(
             p,
             t('LATER, IN PREGNANCY', 'BAAD MEIN, PREGNANCY MEIN'),
-            t('Given at 27 to 36 weeks. Good to know now, so you can ask then.',
-                '27 se 36 hafte ke beech. Pata ho toh tab maang sakti hain.')),
+            // T3 W16 (2026-10-29): flu is any trimester, so the group
+            // header loses the week range; each card's schedule line states
+            // its own timing. The Hindi side said the same range. Kept for
+            // revert:
+            //   t('Given at 27 to 36 weeks. Good to know now, so you can ask then.',
+            //       '27 se 36 hafte ke beech. Pata ho toh tab maang sakti hain.')),
+            t('Given in pregnancy. Good to know now, so you can ask then.',
+                'Given in pregnancy. Good to know now, so you can ask then.')),
         const SizedBox(height: 14),
         for (final v in later) ...[
           _card(p, lang, store, v, t, interactive: false),
@@ -950,12 +1006,31 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
             t("I've had the jab now", "I've had it now"),
             () => _askWhen(store, v, t));
       case TtcVaccineStatus.done:
+        final second = store.secondDoseOn(v.id);
+        final dueFrom = store.secondDoseDueFrom(v);
         head = had == null
             // Kept for revert (2026-09-28): 'Had it', 'Had it on …'
             ? t('Had the jab', 'Lagwa liya')
-            : t('Had the jab on ${_date(had)}', 'Had it on ${_date(had)}');
-        if (v.isLive && had != null) {
-          final until = had.add(Duration(days: v.waitDays));
+            : second != null
+                // Two doses logged (T3 W14).
+                ? t('Had both doses, the second on ${_date(second)}',
+                    'Had both doses, the second on ${_date(second)}')
+                : v.takesSecondDose
+                    ? t('Had dose 1 on ${_date(had)}',
+                        'Had dose 1 on ${_date(had)}')
+                    : t('Had the jab on ${_date(had)}',
+                        'Had it on ${_date(had)}');
+        if (dueFrom != null) {
+          // ⚠️ NOT CLEAR TO TRY WITH DOSE TWO OWED (T3 W14).
+          sub = t(
+              'Dose 2 is due from ${_date(dueFrom)}. The ${v.waitDays}-day '
+                  'wait counts from dose 2.',
+              'Dose 2 is due from ${_date(dueFrom)}. The ${v.waitDays}-day '
+                  'wait counts from dose 2.');
+        } else if (v.isLive && had != null) {
+          // From the last dose (T3 W14). Kept for revert: from `had`.
+          final until =
+              (second ?? had).add(Duration(days: v.waitDays));
           sub = until.isAfter(DateTime.now())
               ? t('Clear to try from ${_date(until)}.',
                   'Clear to try from ${_date(until)}.')
@@ -965,8 +1040,26 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
           sub = t('Nothing more to do.', 'Nothing more to do.');
         }
         icon = Icons.check_rounded;
-        next = _smallAction(p, ValueKey('ttc_vax_${v.id}_date'),
-            t('Change the date', 'Change the date'), () => _askWhen(store, v, t));
+        // Kept for revert (T3 W14): next = the "Change the date" pill alone.
+        next = Wrap(spacing: 8, runSpacing: 8, children: [
+          _smallAction(
+              p,
+              ValueKey('ttc_vax_${v.id}_date'),
+              v.takesSecondDose
+                  ? t('Change dose 1 date', 'Change dose 1 date')
+                  : t('Change the date', 'Change the date'),
+              () => _askWhen(store, v, t)),
+          if (v.takesSecondDose && had != null)
+            _smallAction(
+                p,
+                ValueKey('ttc_vax_${v.id}_dose2'),
+                second == null
+                    ? (v.doses >= 2
+                        ? t("I've had dose 2", "I've had dose 2")
+                        : t('Had a second dose', 'Had a second dose'))
+                    : t('Change dose 2 date', 'Change dose 2 date'),
+                () => _askWhenSecond(store, v, had, t)),
+        ]);
       case TtcVaccineStatus.notApplicable:
         head = t('Not for me', 'Mere liye nahi');
         // Kept for revert (2026-09-28): 'You marked this as not for you.'
@@ -1051,13 +1144,16 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
       String Function(String, String) t) async {
     final was = store.statusOf(v.id);
     final on = store.doneOn(v.id);
+    // Dose two comes back with the Undo too (T3 W14).
+    final second = store.secondDoseOn(v.id);
     setState(() => _changing.remove(v.id));
     await store.set(v.id, TtcVaccineStatus.unknown);
     if (!mounted) return;
     pvSnack(context, t('Answer cleared.', 'Answer cleared.'),
-        action: t('Undo', 'Undo'),
-        onAction: () => store.set(v.id, was, on: on),
-        lift: 24);
+        action: t('Undo', 'Undo'), onAction: () async {
+      await store.set(v.id, was, on: on);
+      if (second != null) await store.setSecondDose(v.id, second);
+    }, lift: 24);
   }
 
   // Kept for revert (2026-09-27, tool rebuild): the card that showed the
@@ -1358,6 +1454,29 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
     if (picked == null || !mounted) return;
     setState(() => _changing.remove(v.id));
     await store.set(v.id, TtcVaccineStatus.done, on: picked);
+  }
+
+  /// Dose two's date (T3 W14): not before dose one, not in the future. A
+  /// closed picker records nothing, as for dose one.
+  Future<void> _askWhenSecond(TtcVaccineStore store, TtcVaccine v,
+      DateTime first, String Function(String, String) t) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final firstDay = DateTime(first.year, first.month, first.day);
+    if (firstDay.isAfter(today)) return;
+    final had = store.secondDoseOn(v.id);
+    final picked = await showDatePicker(
+      context: context,
+      helpText: t('When did you have dose 2 of ${v.name.en}?',
+          'When did you have dose 2 of ${v.name.en}?'),
+      initialDate: had != null && !had.isAfter(today) && !had.isBefore(firstDay)
+          ? had
+          : today,
+      firstDate: firstDay,
+      lastDate: today,
+    );
+    if (picked == null || !mounted) return;
+    await store.setSecondDose(v.id, picked);
   }
 
   // ⚠️ FOUR ANSWERS SHE CAN TELL APART (launch sanity T8, 2026-09-28).

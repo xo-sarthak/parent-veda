@@ -110,6 +110,8 @@ class TtcVaccine {
     this.inUip = false,
     this.conditional,
     this.note,
+    this.doses = 1,
+    this.secondDoseOptional = false,
   });
 
   final String id;
@@ -148,6 +150,22 @@ class TtcVaccine {
 
   /// The India-specific thing worth knowing, where there is one.
   final LocalizedText? note;
+
+  /// How many doses the course needs (T3 W14, 2026-10-29). Varicella is two,
+  /// four weeks apart, and a live vaccine's wait counts from the LAST dose:
+  /// one stored date per vaccine showed her clear to try 28 days after dose
+  /// one, while dose two was still to come.
+  final int doses;
+
+  /// A second dose she may log when a doctor gives one (MMR), without the
+  /// course needing it. The wait still counts from the last dose logged.
+  final bool secondDoseOptional;
+
+  /// Whether the card offers a second dose date at all.
+  bool get takesSecondDose => doses >= 2 || secondDoseOptional;
+
+  /// Days between doses, where there are two.
+  static const int doseGapDays = 28;
 }
 
 /// The list, ordered by how much a delay would cost her — live vaccines first,
@@ -163,14 +181,27 @@ final List<TtcVaccine> kTtcVaccines = [
         'item on this list, and the one most often found out too late.'),
     howChecked: _en('A rubella IgG blood test. Ask for it by name. It doesn\'t '
         'cost much, and most labs do it.'),
-    schedule: _en('One dose if you\'re not immune. MMR is better than a '
-        'rubella-only or MR vaccine, because it covers measles and mumps too.'),
+    // T3 K11 (2026-10-29): the Green Book gives two doses. Kept for revert:
+    //   schedule: _en('One dose if you\'re not immune. MMR is better than a '
+    //       'rubella-only or MR vaccine, because it covers measles and mumps too.'),
+    schedule: _en('Usually one dose if you\'re not immune. Some doctors '
+        'advise two, a month apart. MMR is better than a rubella-only or MR '
+        'vaccine, because it covers measles and mumps too.'),
     isLive: true,
     waitDays: 28,
-    note: _en('Most Indian women were vaccinated as children, but very few '
-        'still have the record. What counts is being immune, not the card. And '
-        'a small number of people vaccinated as children aren\'t immune as '
-        'adults. The test settles it either way.'),
+    // A second dose is hers to log when a doctor gives one (T3 W14).
+    secondDoseOptional: true,
+    // T3 W17 (2026-10-29): rubella entered the national programme with the
+    // 2017 MR campaign, to age 15, so most women trying now were not
+    // vaccinated as children. Kept for revert:
+    //   note: _en('Most Indian women were vaccinated as children, but very few '
+    //       'still have the record. What counts is being immune, not the card. And '
+    //       'a small number of people vaccinated as children aren\'t immune as '
+    //       'adults. The test settles it either way.'),
+    note: _en('Many women in India were never vaccinated against rubella, '
+        'and few have the record. What counts is being immune, not the card. '
+        'And a small number of people vaccinated as children aren\'t immune '
+        'as adults. The test settles it either way.'),
   ),
 
   TtcVaccine(
@@ -180,12 +211,19 @@ final List<TtcVaccine> kTtcVaccines = [
     protectsAgainst: _en('Chickenpox'),
     why: _en('Chickenpox in pregnancy can be serious for both mother and '
         'baby. More women aren\'t immune than you might expect.'),
-    howChecked: _en('A varicella IgG blood test. A clear memory of having had '
-        'chickenpox as a child is also a fair guide.'),
+    // T3 K11 (2026-10-29): a remembered chickenpox is a weaker guide for
+    // people who grew up in a tropical country. Kept for revert:
+    //   howChecked: _en('A varicella IgG blood test. A clear memory of having had '
+    //       'chickenpox as a child is also a fair guide.'),
+    howChecked: _en('A varicella IgG blood test. Remembering chickenpox as a '
+        'child is a less reliable guide for people who grew up in India, so '
+        'the test is worth it.'),
     schedule: _en('Two doses, four weeks apart, if you\'ve never had '
         'chickenpox and never been vaccinated.'),
     isLive: true,
     waitDays: 28,
+    // Two doses, and the wait counts from the second (T3 W14).
+    doses: 2,
     note: _en('Two doses four weeks apart, plus a month afterwards, is about '
         'two months from starting to being clear to try. That\'s the longest '
         'wait on this page, and the reason to check early, not late.'),
@@ -231,8 +269,13 @@ final List<TtcVaccine> kTtcVaccines = [
     protectsAgainst: _en('Hepatitis B'),
     why: _en('It can pass to the baby at birth, and getting vaccinated '
         'beforehand prevents that.'),
-    howChecked: _en('A hepatitis B surface antigen test. It\'s usually part of '
-        'the pregnancy blood tests anyway, and it\'s better done before.'),
+    // T3 W15 (2026-10-29): HBsAg shows infection; immunity is anti-HBs. Kept
+    // for revert:
+    //   howChecked: _en('A hepatitis B surface antigen test. It\'s usually part of '
+    //       'the pregnancy blood tests anyway, and it\'s better done before.'),
+    howChecked: _en('A hepatitis B surface antibody test (anti-HBs) shows '
+        'whether you\'re protected. The surface antigen test (HBsAg) in the '
+        'pregnancy bloods checks for infection.'),
     schedule: _en('Three doses over six months, where it\'s advised.'),
     conditional: _en('Advised where there\'s a risk, not for everyone: working '
         'in healthcare, living with someone who has it, dialysis, or a '
@@ -278,5 +321,7 @@ List<TtcVaccine> ttcVaccinesOn(TtcVaccineTrack track) =>
 const List<String> kTtcVaccineAsks = [
   'Rubella IgG',
   'Varicella IgG (only if you never had chickenpox)',
-  'Hepatitis B surface antigen (usually in the routine tests anyway)',
+  // T3 W15 (2026-10-29). Kept for revert:
+  //   'Hepatitis B surface antigen (usually in the routine tests anyway)',
+  'Hepatitis B surface antibody (anti-HBs), if your doctor advises the vaccine',
 ];

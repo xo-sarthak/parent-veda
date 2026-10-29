@@ -132,6 +132,15 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
       await _store.save(_a);
       if (!mounted) return;
       final screen = ttcScreenForSurface('ttc_precheck');
+      // ⚠️ THIS PATH SAVED IN SILENCE (T3 K4, 2026-10-29), and it also drops
+      // the planned month. Say both, before the checklist opens. Kept for
+      // revert: no pvSnack here.
+      pvSnack(
+        context,
+        _whatWasWritten('Saved. You are already trying, so there is no '
+            'month to plan for; the checklist fits better.'),
+        lift: 24,
+      );
       if (screen == null) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(
@@ -150,11 +159,27 @@ class _TtcReadyPlanScreenState extends State<TtcReadyPlanScreen> {
     setState(() => _editing = false);
     // ⚠️ THE SAVE SAYS WHAT IT CHANGED (the app explains itself): her age,
     // diet and folic acid answer were written to the tools that own them.
-    pvSnack(
-      context,
-      'Plan saved. Your answers also updated your checklist and food ideas.',
-      lift: 24,
-    );
+    // T3 K4 (2026-10-29): it named the checklist and food ideas whether or
+    // not anything was written, and never the age. It now names only what
+    // her answers actually wrote. Kept for revert:
+    //   'Plan saved. Your answers also updated your checklist and food ideas.',
+    pvSnack(context, _whatWasWritten('Plan saved.'), lift: 24);
+  }
+
+  /// The save's toast: [lead], then each tool her answers wrote to (the
+  /// write-through in `TtcReadyPlanStore`): age to the doctor check, diet to
+  /// her profile and food ideas, folic acid to the checklist.
+  String _whatWasWritten(String lead) {
+    final wrote = [
+      if (_a.age != null) 'your age band for the doctor check',
+      if (_a.diet != null) 'your kitchen in food ideas',
+      if (_a.folic != null) 'folic acid on your checklist',
+    ];
+    if (wrote.isEmpty) return lead;
+    final list = wrote.length == 1
+        ? wrote.single
+        : '${wrote.sublist(0, wrote.length - 1).join(', ')} and ${wrote.last}';
+    return '$lead It also updated $list.';
   }
 
   @override

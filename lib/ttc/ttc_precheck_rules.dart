@@ -52,6 +52,8 @@ import '../localization/app_language.dart';
 import '../services/medicine_store.dart';
 import 'cycle_store.dart';
 import 'ttc_chapter.dart' show kTtcIrregularSpreadDays;
+import 'ttc_fertility_help_rules.dart' show FertilityAgeBand, FertilityAgeBandCopy;
+import 'ttc_fertility_help_store.dart';
 import 'ttc_pcos_check_rules.dart';
 import 'ttc_pcos_check_store.dart';
 import 'ttc_precheck_data.dart';
@@ -85,6 +87,7 @@ class PrecheckContext {
     required this.liveVaccineOutstanding,
     required this.daysTrying,
     this.liveImmunitySettled = false,
+    this.ageBand,
   });
 
   final int loggedCycles;
@@ -114,8 +117,25 @@ class PrecheckContext {
   /// exactly what it was.
   final bool liveImmunitySettled;
 
+  /// Her age band, from the one answer the doctor check, the Ready plan and
+  /// the "Trying after 35" read all write (`TtcFertilityHelpStore`). Null when
+  /// she has not said. Optional so a context built by hand stays as it was.
+  final FertilityAgeBand? ageBand;
+
   bool get tryingOverAYear => (daysTrying ?? 0) >= 365;
   bool get tryingOverSixMonths => (daysTrying ?? 0) >= 182;
+
+  /// ⚠️ ONE AGE RULE, THE DOCTOR CHECK'S (T3 W9 and K1, 2026-10-29). Under
+  /// 35 a year; 35 and over six months; over 40 before trying. The checklist
+  /// had its own rule ("under 36 a year, from 36 no wait") and no age at all,
+  /// so `tryingOverSixMonths` was written and never read. Same thresholds as
+  /// `kFertilityHelpRules` (`age_at_presentation`, `age_forty`,
+  /// `twelve_months`), so the two screens cannot disagree about one woman.
+  bool get pastTimeToAsk {
+    if (ageBand == FertilityAgeBand.over40) return true;
+    if (ageBand?.refersAtPresentation ?? false) return tryingOverSixMonths;
+    return tryingOverAYear;
+  }
 
   /// Gathers the snapshot. The one place that reaches across stores.
   static PrecheckContext gather() {
@@ -149,16 +169,27 @@ class PrecheckContext {
       medicineCount: MedicineStore.instance.all.length,
       supplementCount: supplements.length,
       // ⚠️ A LOOSE NAME MATCH, AND IT ONLY EVER SHOWS EVIDENCE. It is used to
-      // say "you have folic acid on your list", never to tick the item — the
+      // say "folic acid is on your list", never to tick the item — the
       // folate item is core and medical, so it is not auto-completable and a
       // matching string is not a conversation with a pharmacist.
-      takesFolate: supplements.any((s) {
-        final n = s.name.toLowerCase();
+      //
+      // ⚠️ BOTH LISTS (T3 W12, 2026-10-29). A doctor's 5 mg goes in
+      // Medication, so reading Supplements alone never saw it. Kept for
+      // revert: `takesFolate: supplements.any(...)` over supplements only.
+      takesFolate: [
+        for (final s in supplements) s.name,
+        for (final m in MedicineStore.instance.all) m.name,
+      ].any((name) {
+        final n = name.toLowerCase();
         return n.contains('folic') || n.contains('folate');
       }),
       vaccinesRecorded: recorded,
-      liveVaccineOutstanding: vax.liveOutstanding.isNotEmpty,
+      // Dose two still owed is a live vaccine still to get (T3 W14). Kept for
+      // revert: liveVaccineOutstanding: vax.liveOutstanding.isNotEmpty,
+      liveVaccineOutstanding:
+          vax.liveOutstanding.isNotEmpty || vax.secondDoseOwed.isNotEmpty,
       daysTrying: TtcStore.instance.daysTrying,
+      ageBand: TtcFertilityHelpStore.instance.ageBand,
       liveImmunitySettled: ttcLiveVaccines.isNotEmpty &&
           ttcLiveVaccines.every((v) => const {
                 TtcVaccineStatus.immune,
@@ -207,8 +238,11 @@ LocalizedText? precheckEvidenceFor(PrecheckItem item, PrecheckContext c) {
 
     case 'folate':
       if (!c.takesFolate) return null;
-      return _en('You have folic acid on your supplement list. Still check '
-          'the dose with the doctor who prescribes for you.');
+      // T3 W12 (2026-10-29): it reads both lists now, and she ticks the item
+      // herself. Kept for revert: 'You have folic acid on your supplement
+      // list. Still check the dose with the doctor who prescribes for you.'
+      return _en('Folic acid is on your list. Check the dose with the doctor '
+          'who prescribes for you, then tick this yourself.');
 
     case 'vaccines':
       if (c.liveVaccineOutstanding) {
@@ -225,6 +259,16 @@ LocalizedText? precheckEvidenceFor(PrecheckItem item, PrecheckContext c) {
           'this conversation is more useful than usual.');
 
     case 'when_to_seek_help':
+      // One age rule (T3 W9/K1). Kept for revert: `if (c.tryingOverAYear)`
+      // with the over-a-year line only.
+      if (c.ageBand == FertilityAgeBand.over40) {
+        return _en("Over 40, the usual advice is to see a doctor as soon as "
+            'you start trying. It gives you the most time.');
+      }
+      if (c.pastTimeToAsk && c.ageBand != null && c.ageBand!.refersAtPresentation) {
+        return _en("You're 35 or over and have been trying for six months. "
+            'The usual advice is to see a doctor at this point.');
+      }
       if (c.tryingOverAYear) {
         return _en("You've been trying for over a year. The usual advice is "
             'to see a doctor at this point.');
@@ -282,7 +326,13 @@ bool precheckAutoDone(PrecheckItem item, PrecheckContext c) {
 // tick is one tap from being taken off, with Undo.
 
 /// The items that may be ticked from her own records. Nothing else, ever.
-const Set<String> kPrecheckFromRecords = {'folate', 'vaccines'};
+///
+/// ⚠️ NOT FOLIC ACID ANY MORE (T3 W12, 2026-10-29). A loose name match on a
+/// list is not her saying she takes the right dose, and the header of
+/// `PrecheckContext.gather` already said the match "never" ticks the item:
+/// the rule in that comment wins over D12. The row shows the evidence and she
+/// ticks it. Kept for revert: `{'folate', 'vaccines'}`.
+const Set<String> kPrecheckFromRecords = {'vaccines'};
 
 /// True when her own records on another tool already settle this item.
 bool precheckDerivedDone(PrecheckItem item, PrecheckContext c) {
@@ -371,14 +421,22 @@ List<PrecheckPriority> precheckPriorities(
             "list is ready. The review hasn't happened yet."));
   }
 
-  if (c.cyclesLookIrregular || c.tryingOverAYear) {
+  // One age rule (T3 W9/K1). Kept for revert: `c.tryingOverAYear` in both
+  // places below, and the over-a-year reason only.
+  if (c.cyclesLookIrregular || c.pastTimeToAsk) {
     consider(
         'when_to_seek_help',
-        c.tryingOverAYear
-            ? _en("You've been trying for over a year. That's usually when "
-                'to see a doctor.')
-            : _en('Your cycles vary enough that the "wait a year" advice '
-                "wasn't meant for you."));
+        c.ageBand == FertilityAgeBand.over40
+            ? _en("Over 40, it's usually worth seeing a doctor as soon as "
+                'you start trying.')
+            : c.pastTimeToAsk && !c.tryingOverAYear
+                ? _en("At 35 or over, six months of trying is usually when "
+                    'to see a doctor.')
+                : c.pastTimeToAsk
+                    ? _en("You've been trying for over a year. That's "
+                        'usually when to see a doctor.')
+                    : _en('Your cycles vary enough that the "wait a year" '
+                        "advice wasn't meant for you."));
   }
 
   if (!c.takesFolate) {

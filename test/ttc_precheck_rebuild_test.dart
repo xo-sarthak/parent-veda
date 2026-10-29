@@ -118,8 +118,11 @@ void main() {
 
   // ===========================================================================
   group('done from her own records (D12), and nothing else', () {
-    test('only folic acid and vaccines may tick from her records', () {
-      expect(kPrecheckFromRecords, {'folate', 'vaccines'});
+    // T3 W12 (2026-10-29): folic acid left this set. A name on a list is
+    // evidence she sees, not a tick the app makes. Kept for revert:
+    //   expect(kPrecheckFromRecords, {'folate', 'vaccines'});
+    test('only vaccines may tick from her records', () {
+      expect(kPrecheckFromRecords, {'vaccines'});
       for (final id in ['medication_review', 'supplement_review']) {
         final item = precheckItemById(id)!;
         expect(
@@ -138,14 +141,14 @@ void main() {
       }
     });
 
-    test('folic acid on her list ticks the item, and says where from', () {
+    // T3 W12 (2026-10-29): it shows the evidence and never ticks itself.
+    test('folic acid on her list shows the evidence and does not tick', () {
       final item = precheckItemById('folate')!;
       final c = _ctx(takesFolate: true, supplementCount: 1);
-      expect(precheckDerivedDone(item, c), isTrue);
-      expect(precheckDoneSource(item, c)!.en, 'From your supplements');
-      // Still not auto-completion: that rule and its test stand.
+      expect(precheckDerivedDone(item, c), isFalse);
+      expect(precheckDoneSource(item, c), isNull);
       expect(precheckAutoDone(item, c), isFalse);
-      // And the dose line still shows on the row.
+      expect(precheckEvidenceFor(item, c)!.en, contains('Folic acid is on your list'));
       expect(precheckEvidenceFor(item, c)!.en, contains('dose'));
     });
 
@@ -166,43 +169,34 @@ void main() {
       );
     });
 
+    // T3 W12: the derived tick is the vaccines item's now.
     test(
       'her answer wins over the derived tick, and undo restores it',
       () async {
         final s = TtcPrecheckStore.instance;
-        final c = _ctx(takesFolate: true);
-        expect(s.statusOf('folate', c), PrecheckStatus.done);
-        await s.setStatus('folate', PrecheckStatus.untouched);
-        expect(s.statusOf('folate', c), PrecheckStatus.untouched);
-        await s.restore('folate', null);
-        expect(s.entryFor('folate'), isNull);
-        expect(s.statusOf('folate', c), PrecheckStatus.done);
+        final c = _ctx(liveImmunitySettled: true);
+        expect(s.statusOf('vaccines', c), PrecheckStatus.done);
+        await s.setStatus('vaccines', PrecheckStatus.untouched);
+        expect(s.statusOf('vaccines', c), PrecheckStatus.untouched);
+        await s.restore('vaccines', null);
+        expect(s.entryFor('vaccines'), isNull);
+        expect(s.statusOf('vaccines', c), PrecheckStatus.done);
       },
     );
 
-    testWidgets('on screen: folded into Done, tagged, and one tap takes it '
-        'off with Undo back to the app\'s tick', (tester) async {
+    // T3 W12 (2026-10-29): the row stays hers to tick. Kept for revert: the
+    // test that it was folded into Done and tagged "From your supplements".
+    testWidgets('on screen: folic acid on her list leaves the row open for '
+        'her to tick', (tester) async {
       await _addFolicAcid(tester);
       await _pump(tester, const TtcPrecheckScreen());
-      expect(
-        _key('ttc_precheck_folate_mark'),
-        findsNothing,
-        reason: 'settled before she opened the list, so it is folded',
-      );
-      await _tap(tester, _key('ttc_precheck_fold_done'));
-      expect(find.text('From your supplements'), findsOneWidget);
-      await _tap(tester, _key('ttc_precheck_folate_mark'));
+      expect(_key('ttc_precheck_folate_mark'), findsOneWidget);
+      expect(find.text('From your supplements'), findsNothing);
       final c = PrecheckContext.gather();
+      expect(c.takesFolate, isTrue);
       expect(
         TtcPrecheckStore.instance.statusOf('folate', c),
-        PrecheckStatus.untouched,
-      );
-      await tester.tap(find.text('Undo'));
-      await tester.pumpAndSettle();
-      expect(TtcPrecheckStore.instance.entryFor('folate'), isNull);
-      expect(
-        TtcPrecheckStore.instance.statusOf('folate', c),
-        PrecheckStatus.done,
+        isNot(PrecheckStatus.done),
       );
     });
   });
@@ -388,6 +382,11 @@ void main() {
         ) async {
           TtcLang.instance.hinglish = hindi;
           await _addFolicAcid(tester);
+          // She ticks it herself now (T3 W12), so Done has a row to fold.
+          await TtcPrecheckStore.instance.setStatus(
+            'folate',
+            PrecheckStatus.done,
+          );
           await TtcPrecheckStore.instance.setStatus(
             'tobacco',
             PrecheckStatus.notSure,

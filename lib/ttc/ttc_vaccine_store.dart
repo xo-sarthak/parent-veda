@@ -10,10 +10,20 @@
 //  because "am I rubella immune?" is a question with a real answer that a woman
 //  gets once, from a blood test, and then has to remember for months.
 //
-//  ⚠️ NO CLOUD SYNC, DELIBERATELY. TTC takes no new tables while its UI is
-//  being finalised — docs/STILL-OPEN.md §9.7, the same call TTC attachments
-//  made. Local-first already behaves correctly: it shows instantly and there is
-//  no cloud call to fail.
+//  ⚠️ SYNCED SINCE STEP 13 (2026-10-22): see the note above the class. The
+//  header said "NO CLOUD SYNC, DELIBERATELY" until T3 K11 (2026-10-29), which
+//  had been untrue for a week. Kept for revert:
+//    ⚠️ NO CLOUD SYNC, DELIBERATELY. TTC takes no new tables while its UI is
+//    being finalised — docs/STILL-OPEN.md §9.7, the same call TTC attachments
+//    made. Local-first already behaves correctly: it shows instantly and there
+//    is no cloud call to fail.
+//
+//  ⚠️ A SECOND DOSE IS ONE MORE ID, NOT A NEW SHAPE (T3 W14, 2026-10-29).
+//  Varicella is two doses, and the month's wait counts from the second. Dose
+//  two is stored as `<id>_2` with status `done` and its date, in the same maps
+//  and the same merged cloud item set, so no table, column or item format
+//  changed. Nothing iterates `_status` expecting only vaccine ids: every
+//  reader walks `kTtcVaccines`, so `varicella_2` is invisible to them.
 //
 //  ⚠️ STATUS IS PERSISTED BY NAME, NOT INDEX. Reordering `TtcVaccineStatus`
 //  later would silently reinterpret every stored value — the same class of bug
@@ -55,6 +65,43 @@ class TtcVaccineStore extends ChangeNotifier with CloudMergedStore {
       _status[id] ?? TtcVaccineStatus.unknown;
 
   DateTime? doneOn(String id) => _doneOn[id];
+
+  static String _second(String id) => '${id}_2';
+
+  /// When dose two was given, for a vaccine given in two (T3 W14).
+  DateTime? secondDoseOn(String id) => _doneOn[_second(id)];
+
+  /// The dose the live wait counts from: the second when there is one.
+  DateTime? lastDoseOn(String id) => secondDoseOn(id) ?? _doneOn[id];
+
+  /// The day dose two can be given: four weeks after dose one. Null unless
+  /// the course needs it and only dose one is logged.
+  DateTime? secondDoseDueFrom(TtcVaccine v) {
+    if (v.doses < 2 || statusOf(v.id) != TtcVaccineStatus.done) return null;
+    final first = _doneOn[v.id];
+    if (first == null || secondDoseOn(v.id) != null) return null;
+    return first.add(const Duration(days: TtcVaccine.doseGapDays));
+  }
+
+  /// Live vaccines with dose one logged and dose two still owed.
+  List<TtcVaccine> get secondDoseOwed => [
+        for (final v in ttcLiveVaccines)
+          if (secondDoseDueFrom(v) != null) v,
+      ];
+
+  /// Logs dose two (or clears it with null). Dose one must be logged first.
+  Future<void> setSecondDose(String id, DateTime? on) async {
+    final k = _second(id);
+    if (on == null) {
+      _status.remove(k);
+      _doneOn.remove(k);
+    } else {
+      _status[k] = TtcVaccineStatus.done;
+      _doneOn[k] = on;
+    }
+    notifyListeners();
+    await _persistNow();
+  }
 
   Future<void> load() async {
     if (_loaded) return;
@@ -136,10 +183,16 @@ class TtcVaccineStore extends ChangeNotifier with CloudMergedStore {
       _doneOn[id] = on ?? DateTime.now();
     } else {
       _doneOn.remove(id);
+      // Dose two cannot outlive dose one (T3 W14).
+      _status.remove(_second(id));
+      _doneOn.remove(_second(id));
     }
 
     notifyListeners();
+    await _persistNow();
+  }
 
+  Future<void> _persistNow() async {
     final p = await SharedPreferences.getInstance();
     await p.setStringList(
         _kStatus, [for (final e in _status.entries) '${e.key}:${e.value.name}']);
@@ -183,7 +236,12 @@ class TtcVaccineStore extends ChangeNotifier with CloudMergedStore {
     DateTime? latest;
     for (final v in ttcLiveVaccines) {
       if (statusOf(v.id) != TtcVaccineStatus.done) continue;
-      final at = _doneOn[v.id];
+      // ⚠️ FROM THE LAST DOSE, AND NOT WHILE ONE IS OWED (T3 W14). With dose
+      // one only, the course is not finished, so there is no wait to count
+      // yet: `secondDoseOwed` carries it instead. Kept for revert:
+      //   final at = _doneOn[v.id];
+      if (secondDoseDueFrom(v) != null) continue;
+      final at = lastDoseOn(v.id);
       if (at == null) continue;
       final until = at.add(Duration(days: v.waitDays));
       if (latest == null || until.isAfter(latest)) latest = until;

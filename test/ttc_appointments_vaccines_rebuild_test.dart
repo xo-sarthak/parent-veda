@@ -425,8 +425,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(TtcVaccineStore.instance.statusOf('varicella'),
           TtcVaccineStatus.done);
-      expect(find.textContaining('Clear to try from'), findsOneWidget,
-          reason: 'the date the wait ends sits on the card');
+      // T3 W14 (2026-10-29): varicella is two doses, so after dose one the
+      // card says when dose two is due, not a clear-to-try date. Kept for
+      // revert:
+      //   expect(find.textContaining('Clear to try from'), findsOneWidget,
+      //       reason: 'the date the wait ends sits on the card');
+      expect(find.textContaining('Dose 2 is due from'), findsOneWidget,
+          reason: 'the wait counts from dose two');
+      expect(find.byKey(const ValueKey('ttc_vax_varicella_dose2')),
+          findsOneWidget);
       expect(find.byKey(const ValueKey('ttc_vax_varicella_date')),
           findsOneWidget);
     });

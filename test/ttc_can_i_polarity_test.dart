@@ -126,9 +126,12 @@ void main() {
 
     test('no medical meaning moved: verdicts are the ones that shipped', () {
       // The fix rephrased questions; it did not change a single verdict.
+      // One verdict has moved since, on purpose: alcohol is `avoid` (T3 W1,
+      // 2026-10-29, NHS: none while trying). Kept for revert:
+      //   'alcohol': TtcVerdict.moderate,
       const shipped = {
         'chai': TtcVerdict.moderate,
-        'alcohol': TtcVerdict.moderate,
+        'alcohol': TtcVerdict.avoid,
         'smoking': TtcVerdict.avoid,
         'painkillers': TtcVerdict.askDoctor,
         'hot_bath': TtcVerdict.moderate,

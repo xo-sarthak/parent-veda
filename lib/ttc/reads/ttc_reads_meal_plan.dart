@@ -23,6 +23,7 @@
 
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
+import '../ttc_meal_week_data.dart' show kTtcFishLine;
 
 // Private and duplicated per file, on purpose. See the note in
 // `ttc_reads_getting_ready.dart`.
@@ -256,10 +257,15 @@ final List<PvRead> kTtcReadsMealPlan = [
       ),
       PvReadFaq(
         question: _en('We eat chicken and fish at home. Can I still use this?'),
+        // T3 W2 (2026-10-29): the one fish list, so the read and the food
+        // tool's note stay word for word. Kept for revert:
+        //   answer: _en('Yes. Swap a dal or paneer dish for chicken, fish or eggs '
+        //       'whenever you like, and cook them all the way through. Fish like '
+        //       'sardines, mackerel, rohu or pomfret are good choices. Skip large '
+        //       'fish like shark and swordfish.'),
         answer: _en('Yes. Swap a dal or paneer dish for chicken, fish or eggs '
-            'whenever you like, and cook them all the way through. Fish like '
-            'sardines, mackerel, rohu or pomfret are good choices. Skip large '
-            'fish like shark and swordfish.'),
+            'whenever you like, and cook them all the way through. '
+            '$kTtcFishLine'),
       ),
       PvReadFaq(
         question: _en("Some days I'm too tired to cook. Is that a problem?"),
@@ -287,9 +293,13 @@ final List<PvRead> kTtcReadsMealPlan = [
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.tool,
-        title: _en('Plan your own week'),
-        value: _en('Turn these ideas into a day-by-day plan that fits your '
-            'kitchen.'),
+        // T3 W6 (2026-10-29): the tool says it is "A week of ideas, not a
+        // plan", so the step uses its one name. Kept for revert:
+        //   title: _en('Plan your own week'),
+        //   value: _en('Turn these ideas into a day-by-day plan that fits your '
+        //       'kitchen.'),
+        title: _en("This week's food ideas"),
+        value: _en('See a week of food ideas that fits your kitchen.'),
         surfaceId: 'ttc_nutrition',
       ),
       PvReadNextStep(
@@ -578,9 +588,12 @@ final List<PvRead> kTtcReadsMealPlan = [
       PvReadNextStep(
         kind: PvNextKind.tool,
         // Kept for revert (2026-09-28, explicit names): title: _en('Put them into your week'),
-        title: _en('Add the recipes to your meal plan'),
-        value: _en('Add these dishes to a meal plan you can follow day by '
-            'day.'),
+        // T3 W6 (2026-10-29). Kept for revert:
+        //   title: _en('Add the recipes to your meal plan'),
+        //   value: _en('Add these dishes to a meal plan you can follow day by '
+        //       'day.'),
+        title: _en("This week's food ideas"),
+        value: _en("See these in this week's food ideas."),
         surfaceId: 'ttc_nutrition',
       ),
       PvReadNextStep(

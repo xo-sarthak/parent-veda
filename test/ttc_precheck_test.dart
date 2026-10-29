@@ -89,12 +89,10 @@ void main() {
       expect(precheckAutoDone(item, c), isFalse,
           reason: 'a matching string is not a conversation with a pharmacist');
       expect(precheckEvidenceFor(item, c), isNotNull);
-      // ⚠️ 2026-09-29 (launch sanity D12): the item IS shown done now, by a
-      // separate and narrower path, `precheckDerivedDone`: folic acid on her
-      // own list is her saying she takes it. The dose conversation stays
-      // open (the evidence line, and the "talked to my doctor" flag). Held
-      // in test/ttc_precheck_rebuild_test.dart.
-      expect(precheckDerivedDone(item, c), isTrue);
+      // T3 W12 (2026-10-29): not by the D12 path either, any more. The row
+      // shows the evidence and she ticks it. Kept for revert:
+      //   expect(precheckDerivedDone(item, c), isTrue);
+      expect(precheckDerivedDone(item, c), isFalse);
     });
 
     test('logged cycles do complete cycle tracking', () {
@@ -209,6 +207,9 @@ void main() {
           r'|letrozole|clomiphene|clomid|metformin',
           caseSensitive: false);
       for (final s in allCopy()) {
+        // Caffeine is not a supplement: its 200 mg is a limit to stay under,
+        // the figure the item's own question already uses (T3 W10).
+        if (s.toLowerCase().contains('caffeine')) continue;
         expect(banned.hasMatch(s), isFalse, reason: s);
       }
     });

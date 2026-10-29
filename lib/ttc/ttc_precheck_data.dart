@@ -427,8 +427,13 @@ final List<PrecheckItem> kPrecheckItems = [
     title: _en('Caffeine'),
     why: _en('The one people worry about too much. A moderate amount '
         "hasn't been shown to lower fertility."),
-    whatToDo: _en("You don't need to give up chai. Around two to three cups "
-        'of coffee a day is the figure usually quoted.'),
+    // T3 W10 (2026-10-29): two to three coffees is over 200 mg, the figure
+    // this item's own question uses. Kept for revert:
+    //   whatToDo: _en("You don't need to give up chai. Around two to three cups "
+    //       'of coffee a day is the figure usually quoted.'),
+    whatToDo: _en("You don't need to give up chai. Keep caffeine under 200 mg "
+        'a day: about two mugs of instant coffee, or one of filter coffee '
+        'and a cup of chai.'),
     medicalReview: _en('Caffeine threshold.'),
   ),
 
@@ -504,9 +509,16 @@ final List<PrecheckItem> kPrecheckItems = [
     why: _en('Thalassaemia carrier screening is advised for all couples in '
         'India, whatever your family history. Carriers have no symptoms, and '
         'the result only means something when you look at both of you.'),
-    whatToDo: _en('Tell your doctor about any condition that runs in either '
-        'family. Not everyone needs genetic testing. Your doctor decides '
-        'whether carrier screening or counselling applies to you.'),
+    // T3 K2 (2026-10-29): "Not everyone needs genetic testing" sat under "advised
+    // for all couples". Thalassaemia is the one for everyone; the rest is the
+    // doctor's call. Kept for revert:
+    //   whatToDo: _en('Tell your doctor about any condition that runs in either '
+    //       'family. Not everyone needs genetic testing. Your doctor decides '
+    //       'whether carrier screening or counselling applies to you.'),
+    whatToDo: _en('Ask for the thalassaemia test, and tell your doctor about '
+        'any condition that runs in either family. Beyond thalassaemia, not '
+        'everyone needs genetic testing. Your doctor decides whether other '
+        'carrier screening or counselling applies to you.'),
     askDoctor: _en('With our family histories, is carrier screening worth '
         'doing?'),
     readId: 'ttc_read_preconception_tests',
@@ -595,14 +607,24 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.practical,
     tier: PrecheckTier.worthDoing,
     title: _en('Knowing when to ask for help'),
-    why: _en("The usual advice is a year of trying if you're under 36, and "
-        "no need to wait from 36. But that assumes regular cycles, and in "
+    // ⚠️ ONE AGE RULE (T3 W9, 2026-10-29): the doctor check's, app-wide.
+    // Under 35 a year, 35 and over six months, over 40 before trying
+    // (`ttc_fertility_help_rules.dart`). Kept for revert:
+    //   why: _en("The usual advice is a year of trying if you're under 36, and "
+    //       "no need to wait from 36. But that assumes regular cycles, and in "
+    //       "several situations the waiting time doesn't apply at all."),
+    why: _en("The usual advice is a year of trying if you're under 35, six "
+        "months if you're 35 or over, and a talk with a doctor before you "
+        "start if you're over 40. But that assumes regular cycles, and in "
         "several situations the waiting time doesn't apply at all."),
     whatToDo: _en('It helps if the two of you agree on a point in advance, '
         'instead of deciding one hard month at a time.'),
     readId: 'ttc_read_when_to_seek_help',
-    medicalReview: _en('Referral thresholds per NICE — 12 months under 36, at '
-        'presentation from 36, earlier where a cause is known.'),
+    // Kept for revert (T3 W9): 'Referral thresholds per NICE — 12 months
+    // under 36, at presentation from 36, earlier where a cause is known.'
+    medicalReview: _en('Referral thresholds (ACOG/ASRM, as the doctor check): '
+        '12 months under 35, 6 months from 35, before trying over 40, '
+        'earlier where a cause is known.'),
   ),
 
   PrecheckItem(
