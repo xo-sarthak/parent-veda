@@ -42,7 +42,7 @@ Agreed 2026-10-27. The **relevance terminal** owns *where she is and what shows 
 | Door tabs that open on a tool (Labour timer, TTC Getting ready checklist, Not yet doctor check) | Owns which tab or card opens first | Owns the tool. If it renames a tool or changes a surface id, it hands over the door row instead of editing door files |
 | TTC doctor-check rules (`ttc_fertility_help_rules.dart`) | Only reads `firedRules` (e.g. the home "Time for a check" card) | Owns the engine and its gaps: losses asked rather than worked out from her record, the "under 36" label, the trying-again start date |
 | Parenting activities per child | Takes the fix (Batch 1), recorded against Parenting tool 20 | — |
-| Parenting tools hidden after 12 months (`pp_tools_tab.dart:117`) | — | Owns it (which rows show); the user is deciding |
+| Parenting tools hidden after 12 months (`pp_tools_tab.dart:117`) | — | DONE 2026-10-27 (CL2: never hidden by age) |
 | Report card on clinic cycles; "Your best days" copy; Move today at week 20 | **Relevance terminal's** (moved from "left to the tools terminal" on 2026-10-27) | — |
 
 **A two-repo change:** anything new sent to Ask Veda (Parenting family context, any new field) needs the service repo `C:\Projects\parentveda-askveda`. Ask the user for access first. Never ship one side alone without writing down what the other side still needs.
