@@ -1,0 +1,65 @@
+# Partner Editions — DOCTOR APP PLAN (ParentVeda+)
+
+> Phases D1–D3. Decisions and defaults (D1–D4, R1–R9) and the session rules live in [MASTER.md](MASTER.md); read its phase table first.
+
+**Today (verified):** `lib/main_doctor.dart` boots 5 stores and resolves identity through
+`DoctorSession.resolveFromServer` (`lib/doctor/doctor_session.dart:341–384`): an
+`expert_accounts` row first, else `my_care_partner()`. There are five tabs
+(`doctor_scaffold.dart:113–119`). Referral data comes from
+`lib/care_partner/partner_dashboard_store.dart:175–239` (`partner_impact`, `partner_funnel`,
+`partner_earnings`, `my_partner_token`); nothing calls `partner_referral_breakdown`.
+
+## D1: Identity and boot hardening
+Edge cases and fixes:
+1. **`Supabase.initialize` throws** (`main_doctor.dart:79`, no try/catch): wrap it and boot into a
+   calm "Can't reach ParentVeda right now · Try again" screen. Same rule as the parent app: an
+   uninitialised backend behaves like signed-out, never crashes.
+2. **Offline at launch:** today it's about 12s of spinner, then the sign-in screen, with a live session
+   and no explanation. Fix: if a session exists and the resolve *timed out* (distinct from "no
+   identity"), show an offline state with Retry instead of the sign-in screen. `resolveFromServer`
+   returns an enum (`resolved | notADoctor | unreachable`) instead of a bool.
+3. **Sign-out leaves data behind** (`doctor_profile_tab.dart:258–280`): also clear
+   `DoctorRoster`, `PrescriptionStore`, `DoctorScheduleStore`, and cancel `DoctorReminders`
+   notifications. Test: sign out, then sign in as a different doctor and see none of the first one's bookings.
+4. **"Developer · Test as" switch visible in release** (`doctor_profile_tab.dart:203–223`):
+   gate it behind `PV_DEV` (as the parent app does). Add it to the BEFORE-LAUNCH line 36 list.
+5. **`my_care_partner()` has `limit 1` with no ORDER BY** (0068:209–238): add a deterministic
+   order (own-partner first, then `created_at`). Migration.
+6. **Member doctor of a clinic** resolves as an expert, but `my_care_partner()` returns nothing,
+   so the kit says "code on its way" forever. D1 makes the session *know* its org
+   (`expert_profiles.partner_id`, read as `orgPartnerId`) so D2 can show the right thing. The
+   header shows "Dr X · Bloom Fertility Centre".
+7. **Unknown expert id** (`doctor_directory.dart:96` null): today it falls into the org-style Home.
+   Fix: build the profile from the server row (`expert_profiles`), not only the compiled catalogue.
+8. **Boot doesn't call `claimInvite()`** (only sign-in does): call it on boot when signed in but
+   unresolved, so an invite accepted on another device still lands.
+Tests: extend `doctor_app_shell_test` (init failure, offline state), `partner_account_test`
+(sign-out clears every store), and add `doctor_identity_edge_test`.
+
+## D2: Families you brought + the doctor's own slice
+1. Migration: `my_doctor_referrals()` returns `{scanned, installed, signed_up, active_30d,
+   booked_me}` for referrals whose `expert_id ∈ my_expert_ids()` **and** that the caller consults as
+   (an org login gets none here, R4). An own-partner doctor gets the same numbers as `partner_impact`.
+   Test asserting parity for the solo doctor.
+2. `my_partner_token()` returns, per R4, the caller's **own** code: a doctor gets the token with
+   `expert_id` = them, else the own-partner org token. An org login gets only `expert_id is null`.
+   (Today an org can be shown one doctor's code as "your code".) Fixes STILL-OPEN §5.4n too: the kit
+   shows the signed-in doctor, not the seeded demo identity.
+3. Home card "Families you brought" (`doctor_home_tab.dart`, after This week): Joined · Active · Booked
+   you, "Counts only. Families stay private." Empty state: "No families yet. Share your QR" with a
+   button to the kit (a feature is never hidden). The store loads on Home, not only from Earnings.
+4. "How parents see you": a preview of the parent-app "Your doctor · Dr X, <clinic>" line (the parent
+   side is built in A1; this is the same widget, so build it shared in `lib/care_partner/`).
+5. **Impact screen error state** (`doctor_impact_screen.dart` has none; `isNotAPartner` unused):
+   add an error flag to the store; show "Couldn't load your numbers · Try again"; distinguish a doctor who
+   isn't a partner yet ("Your code is being set up. We'll tell you when it's ready").
+Tests: `partner_dashboard_test` (new shape, error flag), `doctor_tabs_render_test` (home card
+empty and filled), and a SQL contract test for `my_doctor_referrals` columns.
+
+## D3: QR rotation keeps per-doctor codes (STILL-OPEN §5.1b)
+`rotate_partner_token` retires every token and mints one org-wide token, so per-doctor counts
+silently freeze. Fix: rotation re-mints one fresh token per active member doctor
+(`mint_partner_token(..., p_expert_id)`) inside the same transaction, keeps the grace window, and
+records the reason. Edge cases: a doctor who left the clinic (`partner_id` changed) is not re-minted;
+an own-partner doctor rotates only their own token. Extend `care_rotation_test`. Close §5.1b.
+
