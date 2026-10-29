@@ -11343,9 +11343,8 @@ Plan and as-built: `docs/MALE-FERTILITY-DOOR-PLAN.md`. The door `ttc_male_fertil
 - *Ask Veda corpus is stale until re-exported.* `tool/export_ttc_corpus.dart` sends the kicker as a keyword, and
   the new read (`ttc_read_his_options`, 4 FAQs) and the new heat-and-habits FAQ are not ingested yet. The user
   re-exports and re-ingests; no service code changes.
-- *The new read's photo is in the table, not yet on R2.* `ttc_read_his_options` (Commons, Derek Harper, CC BY-SA
-  2.0). Run `tools/read_images/fetch_read_images.py` then `upload_to_r2.py`; until then the card's image request
-  misses.
+- ~~*The new read's photo is in the table, not yet on R2.*~~ DONE 2026-10-29: fetched and uploaded by the user,
+  `ttc_read_his_options.jpg` answers 200 from R2 (Commons, Derek Harper, CC BY-SA 2.0).
 - *No sourced price for a varicocele repair or a sperm retrieval.* The read asks for a written quote instead of
   inventing a range. A sourced India range would let it say more.
 - *Phone walk owed:* her home grid, his home grid, Learn, search, Fertile window's "More in Male fertility" tile.
