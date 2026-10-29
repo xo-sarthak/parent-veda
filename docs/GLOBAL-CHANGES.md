@@ -23,7 +23,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | # | Change | Status | Where |
 |---|---|---|---|
 | 1 | Life-moment welcome video (pop-up, blurred) | OWED — design approved | Phase 3 |
-| 2 | Every article links to a service | LIVE for Pregnancy + TTC (aa1fe9e); Parenting OWED | Phase 2 |
+| 2 | Every article links to a service | LIVE for Pregnancy + TTC (aa1fe9e); Parenting LIVE for courses (2026-10-29, PARENTING-GAP 15); its consults wait on Directus experts | Phase 2 |
 | 3 | Universal search + Ask Veda mark | ON HOLD (user, 2026-10-24): mark built as Aurora (COMMITTED c237e83, final design H vs K still open); search placement study done, choice on hold | Phase 4 |
 | 4 | "Films" → "Videos" | LIVE (faf0f04) | Phase 0 |
 | 5 | Door intro video (Option A chip) | Chip LIVE in all four stages, "Coming soon" (2026-10-25); films OWED | Phase 3 |
@@ -82,16 +82,27 @@ stage's Videos screen.
 
 **Waiting on:** the videos themselves (list them in `DOOR-CONTENT-OWED.md`).
 
-### 2 · Every article links to a service — LIVE for Pregnancy + TTC
+### 2 · Every article links to a service — LIVE for Pregnancy + TTC; Parenting LIVE for courses
 
 - LIVE aa1fe9e: `pv_read_offer.dart` maps a read's topic to the expert who
   helps (scan → obstetrician, iron → nutritionist, OHSS → fertility doctor),
   with the stage's own doctor as the last resort. Pregnancy 69 → 132 of 152
   reads, TTC 74 → 125 of 135. Loss and urgent reads never pitch.
   Held by `test/read_offer_coverage_test.dart`.
-- **OWED:** Parenting reads (they live in `pp_*_content.dart`, mostly not
+- **LIVE for Parenting, courses (checked 2026-10-29, PARENTING-GAP 15):**
+  every Parenting read opens as a `PvRead`, and `pv_read_offer.dart` maps its
+  words to the course or class that fits (step 0 · S6), one pitch per page
+  (none when the page carries its own consult or course), and no programme
+  made for another age (PP 8, be2bb7ee). The stage fallback is coded
+  (`_kStageFallback` parenting → paediatrician), but **Parenting has no
+  consult in the catalogue yet** (its experts are gated until Directus serves
+  them), so that fallback finds nothing today. **Still owed:** when
+  paediatric consults arrive, add `paediatrician`, `lactation`, `speech` and
+  `child psychologist` to the word map (the note at `pv_read_offer.dart` says
+  where). The owed line below is kept, struck through, for the record:
+- ~~**OWED:** Parenting reads (they live in `pp_*_content.dart`, mostly not
   `PvRead`), and a check that the per-stage clinical fallback exists in the
-  Parenting catalogue (a paediatrician consult).
+  Parenting catalogue (a paediatrician consult).~~
 - **Known small mismatches:** "vaccines in pregnancy" lands on a newborn
   masterclass; the two-week wait lands on the fertility doctor rather than the
   psychologist. Tune the word map when walking.

@@ -663,6 +663,12 @@ class VaxStore extends ChangeNotifier {
   bool isDoneFor(String childId, String visitId) =>
       _of(childId).done.contains(visitId);
 
+  /// Whether [childId] has her own opt-in alarm for [visitId]: reminded, not
+  /// yet given, with a time, exactly what [_alarms] arms. The messages skip
+  /// their automatic 3-day reminder for it (PARENTING-GAP 16).
+  bool hasAlarmFor(String childId, String visitId) =>
+      _alarms(_of(childId)).containsKey(visitId);
+
   // _givenOn: the day each dose was given, when the parent said (2026-10-07,
   // gap analysis P1: "a dose can be ticked but not dated"). Syncs to the
   // `done_at` column 0023 already has. Missing = ticked without a date.

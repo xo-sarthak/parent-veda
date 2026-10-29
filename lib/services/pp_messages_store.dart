@@ -47,12 +47,17 @@
 //  candidates (`familyFromStores`), their ids kept apart by B6's prefix, and
 //  with two or more each title says whose it is.
 //
-//  ⚠️ VACCINE REMINDERS STAY WITH THE ACTIVE CHILD, ON PURPOSE. They read
-//  which visits are done, and `VaxStore` keeps ONE record for whichever child
-//  is open, not one per child (STAGE-TRANSITIONS B11). Reminding a second
-//  child from that record would remind her of doses already given, or skip
-//  ones still owed. Age, stage and activity messages need only the date of
-//  birth, so they are right for every child today.
+//  ⚠️ VACCINE REMINDERS ARE EVERY CHILD'S TOO, since B11 (2026-10-25). They
+//  read which visits are done, and `VaxStore` now keeps one record per child
+//  (`isDoneFor`), so each child is reminded of their own visits only, never a
+//  dose a sibling was given. (Until B11 the record was one for the family, so
+//  vaccines went to the active child alone; this note said so until
+//  2026-10-29, PARENTING-GAP 14.)
+//
+//  ⚠️ HER OWN ALARM WINS (PARENTING-GAP 16, 2026-10-29). A visit she set an
+//  alarm for on the vaccines page (`VaxStore.hasAlarmFor`, per child) gets no
+//  automatic 3-day message, on the phone or in the inbox, so she is not told
+//  twice about one visit.
 // =============================================================================
 
 import 'dart:async';
@@ -169,6 +174,7 @@ class PpMessageFacts {
     this.inParenting = true,
     this.partner = false,
     this.visits = const [],
+    this.alarmed = const {},
     this.idPrefix = '',
     this.named = false,
     this.sexGiven = true,
@@ -208,6 +214,10 @@ class PpMessageFacts {
   final bool partner;
   final List<PpVaxFact> visits;
 
+  /// The visit ids this child has her own opt-in alarm for (PP 16): those get
+  /// no automatic vaccine message, so one visit is never reminded twice.
+  final Set<String> alarmed;
+
   bool get speaks => realChild && inParenting && !partner;
 
   /// The active child's facts, as before F3. Kept for the callers that ask
@@ -218,7 +228,7 @@ class PpMessageFacts {
   }
 
   /// One set of facts per real child (F3). The first child keeps the bare
-  /// ids; the active child alone carries the vaccine visits (see the header).
+  /// ids; every child carries their own vaccine visits (see the header).
   static List<PpMessageFacts> familyFromStores() {
     final c = ChildProfileStore.instance;
     if (!c.hasRealChild) return [_forChild(null, withVisits: false)];
@@ -264,6 +274,9 @@ class PpMessageFacts {
                     shortNames: [for (final id in v.vaccineIds) vaccineById(id).shortName],
                   ),
             ],
+      alarmed: (k == null || !withVisits)
+          ? const {}
+          : {for (final v in kVaxVisits) if (vax.hasAlarmFor(k.id, v.id)) v.id},
     );
   }
 }
@@ -339,7 +352,11 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
   }
 
   // ---- vaccines: 3 days before each visit still to come --------------------
-  final upcoming = f.visits.where((v) => !v.date.isBefore(today)).toList()..sort((a, b) => a.date.compareTo(b.date));
+  // A visit with her own alarm is hers to be reminded of (PP 16), and does
+  // not take one of the slots. Kept for revert:
+  //   final upcoming = f.visits.where((v) => !v.date.isBefore(today)).toList()..sort(...);
+  final upcoming = f.visits.where((v) => !v.date.isBefore(today) && !f.alarmed.contains(v.id)).toList()
+    ..sort((a, b) => a.date.compareTo(b.date));
   for (final v in upcoming.take(kPpPhoneSlots)) {
     final day = v.date.subtract(const Duration(days: 3));
     out.add(PpMessage(
