@@ -4717,3 +4717,38 @@ The order follows from who breaks: **the side that accepts both shapes ships fir
 *Whose clock (LA-34).* Writing the SQL forced a question the Dart had answered by accident: a doctor's "10:00" is 10:00 *in her clinic*, but `generateSlots` read it in the phone's zone, so a parent abroad was offered her own 10:00. The SQL works in IST (`at time zone 'Asia/Kolkata'`). The Dart now carries IST wall-clock time in a UTC-flagged `DateTime` (`istWallClock`), whose fields read as the clinic's clock with no time-zone database. That's exact because India keeps one offset all year. **A wall-clock time without a zone is a bug waiting for a traveller; porting a rule is a good moment to find which zone it silently assumed.**
 
 **7. A database can't post to a chat, until it can.** The +10 "the team has been told" needs a message to leave the database from a cron job, where no edge function is running. `pg_net` makes an asynchronous HTTP call from SQL: the request is queued and the insert doesn't wait for Discord. The URL is a secret, so it lives in **Supabase Vault** (`team_alert_webhook_url`), not in the migration. And the trigger that posts never raises. A failure to post is written on the row (`send_error`), because a raise inside the trigger would roll back the sweep that found the late host. **A side effect inside a transaction must never be able to undo the transaction's real work. Catch it, record it, move on.** (L.26.)
+
+## 16zzo. A fact about the child moves onto the child: null is not empty, and an edited value needs one truth (PP 21, 0129, 2026-10-29)
+
+**1. Whose row a fact lives in decides who can see it.** A child's conditions (eczema, reflux, a hearing need) were
+kept per child since B1, but inside the MOTHER's `family_profile` cloud items. Per child is not the same as on the
+child: her account owned the row, so the other parent's phone never learned them, and his home, recommendations
+and Ask Veda went without. `docs/FAMILY-MODEL.md` already says the child owns what is recorded about the child.
+The column `children.conditions` puts it there, and the existing RLS ("children own or partner select/update",
+0021) does the rest. **Before adding a field, ask who must read it. That answer, not "where is the screen that
+asks", picks the table.**
+
+**2. Null is not empty.** `null` means no phone has said: each phone falls back to its own answers. `'{}'` means she
+said none, and that must beat a stale "eczema" on the other phone. Collapse the two and either "none" can never
+win, or an untouched row wipes every answer on the first pull. The merge follows: a row that has not said keeps
+this phone's copy (`c.conditions ??= mine.conditions`); an empty list is an answer and is taken. **A nullable
+collection column has three states. Write down what each one means before writing the merge.**
+
+**3. Said once, phone first; edited, the shared copy is the truth.** 0102 moved birth mode with the rule "this
+phone's answer first, else the child's". That works for a fact said once. For a set either parent edits it fails:
+he clears eczema, her stale local answer keeps winning on her phone, and the two phones disagree for ever. So for
+conditions the CHILD's copy is the truth when it exists, every read goes through one getter
+(`FamilyProfileStore.conditions`), and a toggle starts from what is shown and writes both. *The cost:* her phone's
+own copy is now only a fallback, kept so an install from before the column still works offline.
+
+**4. A backfill the database cannot do.** Answers given before 0129 exist only on her phone, which SQL cannot read.
+So the carry runs in the client, once per child and idempotent: a child whose row is null takes this phone's
+non-empty answer. An empty answer is not carried, because on her phone "never asked" and "none" look the same, and
+null already reads as hers. *The edge, named:* the carry runs at init and on every change to the child list,
+including after onboarding's answers move onto the first child. A carry that ran only before that move found
+nothing, the bug the test caught.
+
+**5. A column the code names, behind a flag until the migration runs.** PostgREST rejects a row naming a column it
+does not have, and the write is fire-and-forget, so shipping the client first would have silently stopped every
+child row from syncing. `kChildConditionsColumn` kept the key out of the row until the user ran 0129, the same
+pattern as `kChildSexGivenColumn` and `kChildBirthColumns`.
