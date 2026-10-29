@@ -194,7 +194,7 @@ void main() {
         kind: 'ttccani',
         sourceLabel: 'Can I…?',
         titleEn: c.questionEn,
-        titleHi: c.questionHi,
+        titleHi: c.questionHi ?? c.questionEn,
         bodyEn: join([
           'Verdict: ${c.verdict.name}. ${c.shortEn}',
           c.whyEn,
@@ -202,8 +202,8 @@ void main() {
         ]),
         bodyHi: join([
           'Verdict: ${c.verdict.name}. ${c.shortHi}',
-          c.whyHi,
-          c.indianHi,
+          c.whyHi ?? c.whyEn,
+          c.indianHi ?? c.indianEn,
         ]),
       );
     }
