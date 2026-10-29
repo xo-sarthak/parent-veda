@@ -118,6 +118,12 @@ class Child {
     this.birthMode,
     this.bornWeeks,
     this.conditions,
+    this.feedings,
+    this.sleeps,
+    this.vaxSchedule,
+    this.nicu,
+    this.multiple,
+    this.premature,
   });
 
   /// How the baby was born, as a `BirthMode` name (normal, cSection, assisted,
@@ -142,6 +148,19 @@ class Child {
   /// [birthMode] (said once), this is edited, so the CHILD's copy is the
   /// truth when it exists, not this phone's.
   List<String>? conditions;
+
+  /// The child's other answers (PP 22, 2026-10-29, 0130), the same move PP 21
+  /// made for [conditions]: how they feed (`FeedingMethod` names), how they
+  /// sleep (`SleepPattern` names), the vaccine schedule (a `VaxSchedule`
+  /// name), and three facts of the birth. ⚠️ NULL IS "NOT SAID" FOR EVERY ONE,
+  /// THE BOOLEANS INCLUDED: false is "no", and must beat a stale "yes" on the
+  /// other parent's phone. The child's copy is the truth when it exists.
+  List<String>? feedings;
+  List<String>? sleeps;
+  String? vaxSchedule;
+  bool? nicu;
+  bool? multiple;
+  bool? premature;
 
   final String id;
   String name;
@@ -199,6 +218,12 @@ class Child {
         birthMode: birthMode,
         bornWeeks: bornWeeks,
         conditions: conditions == null ? null : [...conditions!],
+        feedings: feedings == null ? null : [...feedings!],
+        sleeps: sleeps == null ? null : [...sleeps!],
+        vaxSchedule: vaxSchedule,
+        nicu: nicu,
+        multiple: multiple,
+        premature: premature,
       );
 
   /// 'YYYY-MM-DD' for the `dob date` column (and the local cache).
@@ -219,6 +244,12 @@ class Child {
         'birthMode': birthMode,
         'bornWeeks': bornWeeks,
         'conditions': conditions,
+        'feedings': feedings,
+        'sleeps': sleeps,
+        'vaxSchedule': vaxSchedule,
+        'nicu': nicu,
+        'multiple': multiple,
+        'premature': premature,
       };
 
   factory Child.fromJson(Map<String, dynamic> j) => Child(
@@ -234,6 +265,12 @@ class Child {
         birthMode: j['birthMode'] as String?,
         bornWeeks: (j['bornWeeks'] as num?)?.toInt(),
         conditions: _names(j['conditions']),
+        feedings: _names(j['feedings']),
+        sleeps: _names(j['sleeps']),
+        vaxSchedule: j['vaxSchedule'] as String?,
+        nicu: j['nicu'] as bool?,
+        multiple: j['multiple'] as bool?,
+        premature: j['premature'] as bool?,
       );
 
   // camelCase model <-> snake_case columns. `user_id` is NOT here: on insert
@@ -253,6 +290,12 @@ class Child {
         if (kChildBirthColumns) 'birth_mode': birthMode,
         if (kChildBirthColumns) 'born_weeks': bornWeeks,
         if (kChildConditionsColumn) 'conditions': conditions,
+        if (kChildAnswersColumns) 'feedings': feedings,
+        if (kChildAnswersColumns) 'sleeps': sleeps,
+        if (kChildAnswersColumns) 'vax_schedule': vaxSchedule,
+        if (kChildAnswersColumns) 'nicu': nicu,
+        if (kChildAnswersColumns) 'multiple': multiple,
+        if (kChildAnswersColumns) 'premature': premature,
       };
 
   factory Child.fromRow(Map<String, dynamic> r) => Child(
@@ -275,6 +318,13 @@ class Child {
         bornWeeks: (r['born_weeks'] as num?)?.toInt(),
         // A missing column (0129 not run) and a null both read as "not said".
         conditions: _names(r['conditions']),
+        // PP 22: the same, for each of the child's other answers (0130).
+        feedings: _names(r['feedings']),
+        sleeps: _names(r['sleeps']),
+        vaxSchedule: r['vax_schedule'] as String?,
+        nicu: r['nicu'] as bool?,
+        multiple: r['multiple'] as bool?,
+        premature: r['premature'] as bool?,
       );
 
   static List<String>? _names(Object? raw) =>
@@ -292,6 +342,13 @@ const bool kChildBirthColumns = true;
 /// stay on this phone (the child's local copy and the family profile).
 /// Run on the live database by the user 2026-10-29.
 const bool kChildConditionsColumn = true;
+
+/// Flip to true once `supabase/migrations/0130_children_answers.sql` has been
+/// run on the live database (PP 22). Until then a child's feeding, sleep,
+/// vaccine schedule, NICU, twin and born-early answers stay on this phone
+/// (the child's local copy and the family profile).
+/// Run on the live database by the user 2026-10-29.
+const bool kChildAnswersColumns = true;
 
 /// Flip to true once `supabase/migrations/0093_children_sex_given.sql` has
 /// been run. Until then `sex_given` is kept on this phone only.
@@ -354,6 +411,13 @@ const bool kChildSexGivenColumn = true;
       // PP 21: a row with no conditions yet (an older app, or 0129 not run)
       // keeps this phone's. An empty list is an answer and is taken.
       c.conditions ??= mine.conditions;
+      // PP 22: the same for the child's other answers (0130).
+      c.feedings ??= mine.feedings;
+      c.sleeps ??= mine.sleeps;
+      c.vaxSchedule ??= mine.vaxSchedule;
+      c.nicu ??= mine.nicu;
+      c.multiple ??= mine.multiple;
+      c.premature ??= mine.premature;
       // The growth figures are this phone's own, worked out from the growth
       // log: never taken from another phone's row.
       c
@@ -692,6 +756,56 @@ class ChildProfileStore extends ChangeNotifier {
     final had = c.conditions == null ? null : ([...c.conditions!]..sort());
     if (had != null && had.join(',') == next.join(',')) return;
     c.conditions = next;
+    _book.touch(c.id);
+    notifyListeners();
+    await _persist();
+    await _pushWaiting();
+  }
+
+  /// PP 22: [childId]'s other answers. Each named value is written, an
+  /// omitted one left as it was (so a value cannot be cleared back to "not
+  /// said" through here, and nothing needs to). An edit, so it moves the sync
+  /// clock like [setConditions]; no change, no push.
+  Future<void> setAnswers(
+    String childId, {
+    List<String>? feedings,
+    List<String>? sleeps,
+    String? vaxSchedule,
+    bool? nicu,
+    bool? multiple,
+    bool? premature,
+  }) async {
+    final c = _children.where((x) => x.id == childId).firstOrNull;
+    if (c == null) return;
+    // In pick order, unlike [setConditions]: the first pick is the single
+    // `feeding` / `sleep` the engine reads, so both phones must agree on it.
+    String? key(List<String>? l) => l?.join(',');
+    var changed = false;
+    if (feedings != null && key(feedings) != key(c.feedings)) {
+      c.feedings = [...feedings];
+      changed = true;
+    }
+    if (sleeps != null && key(sleeps) != key(c.sleeps)) {
+      c.sleeps = [...sleeps];
+      changed = true;
+    }
+    if (vaxSchedule != null && vaxSchedule != c.vaxSchedule) {
+      c.vaxSchedule = vaxSchedule;
+      changed = true;
+    }
+    if (nicu != null && nicu != c.nicu) {
+      c.nicu = nicu;
+      changed = true;
+    }
+    if (multiple != null && multiple != c.multiple) {
+      c.multiple = multiple;
+      changed = true;
+    }
+    if (premature != null && premature != c.premature) {
+      c.premature = premature;
+      changed = true;
+    }
+    if (!changed) return;
     _book.touch(c.id);
     notifyListeners();
     await _persist();

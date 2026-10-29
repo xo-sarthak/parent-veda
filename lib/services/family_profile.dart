@@ -510,10 +510,36 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     final theirs = _activeChild()?.conditions;
     return Set.unmodifiable(theirs == null ? _conditions : _decode(theirs, HealthCondition.values).toSet());
   }
-  FeedingMethod? get feeding => _feedings.isNotEmpty ? _feedings.first : _feeding;
-  Set<FeedingMethod> get feedings => Set.unmodifiable(_feedings);
-  SleepPattern? get sleep => _sleeps.isNotEmpty ? _sleeps.first : _sleep;
-  Set<SleepPattern> get sleeps => Set.unmodifiable(_sleeps);
+  // Kept for revert (PP 22): this phone's own answers only.
+  //   FeedingMethod? get feeding => _feedings.isNotEmpty ? _feedings.first : _feeding;
+  //   Set<FeedingMethod> get feedings => Set.unmodifiable(_feedings);
+  //   SleepPattern? get sleep => _sleeps.isNotEmpty ? _sleeps.first : _sleep;
+  //   Set<SleepPattern> get sleeps => Set.unmodifiable(_sleeps);
+  /// PP 22 (2026-10-29): the ACTIVE child's feeding and sleep by PP 21's rule
+  /// (see [conditions]): the child's own copy when any phone has said
+  /// (`children.feedings` / `sleeps`, 0130), else this phone's bucket. In
+  /// pick order, so the single value is the first pick on both phones.
+  FeedingMethod? get feeding {
+    final theirs = _activeChild()?.feedings;
+    if (theirs != null) return _decode(theirs, FeedingMethod.values).firstOrNull;
+    return _feedings.isNotEmpty ? _feedings.first : _feeding;
+  }
+
+  Set<FeedingMethod> get feedings {
+    final theirs = _activeChild()?.feedings;
+    return Set.unmodifiable(theirs == null ? _feedings : _decode(theirs, FeedingMethod.values).toSet());
+  }
+
+  SleepPattern? get sleep {
+    final theirs = _activeChild()?.sleeps;
+    if (theirs != null) return _decode(theirs, SleepPattern.values).firstOrNull;
+    return _sleeps.isNotEmpty ? _sleeps.first : _sleep;
+  }
+
+  Set<SleepPattern> get sleeps {
+    final theirs = _activeChild()?.sleeps;
+    return Set.unmodifiable(theirs == null ? _sleeps : _decode(theirs, SleepPattern.values).toSet());
+  }
   Set<Priority> get priorities => Set.unmodifiable(_priorities);
   LearningStyle? get learning => _learnings.isNotEmpty ? _learnings.first : _learning;
   Set<LearningStyle> get learnings => Set.unmodifiable(_learnings);
@@ -521,9 +547,16 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   /// The free-text answer for a field, if she gave one.
   String? otherFor(String field) => _other[field];
   Set<NotifyTopic> get notify => Set.unmodifiable(_notify);
-  /// Also true when only the child's cloud copy says "born early" (0102).
-  bool get premature => _premature || (_bornWeeks == null && _activeChild()?.bornWeeks != null);
-  bool get nicu => _nicu;
+  // Kept for revert (PP 22):
+  //   bool get premature => _premature || (_bornWeeks == null && _activeChild()?.bornWeeks != null);
+  //   bool get nicu => _nicu;
+  /// The child's own "born early" when said (PP 22, 0130), else this phone's.
+  /// Also true when only the child's cloud copy has born-early weeks (0102).
+  bool get premature =>
+      (_activeChild()?.premature ?? _premature) || (_bornWeeks == null && _activeChild()?.bornWeeks != null);
+
+  /// PP 22: the child's own copy when said, else this phone's.
+  bool get nicu => _activeChild()?.nicu ?? _nicu;
   /// This phone's answer first; else the child's own copy, which is how the
   /// OTHER parent's phone learns it (`children.birth_mode`, 0102).
   BirthMode? get birthMode => _birthMode ?? _one(_activeChild()?.birthMode, BirthMode.values);
@@ -538,13 +571,20 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     }
   }
   CareRole? get role => _role;
-  VaxSchedule? get vaxSchedule => _vaxSchedule;
+  // Kept for revert (PP 22): VaxSchedule? get vaxSchedule => _vaxSchedule;
+  /// PP 22: the child's own schedule when said (`children.vax_schedule`,
+  /// 0130), else this phone's. The worst of the gaps it closes: the tracker
+  /// could show the other parent a different schedule for the same baby.
+  VaxSchedule? get vaxSchedule => _one(_activeChild()?.vaxSchedule, VaxSchedule.values) ?? _vaxSchedule;
 
   void setVaxSchedule(VaxSchedule s) {
     _vaxSchedule = s;
     _save(field: 'vaxSchedule', value: s.name);
+    _answerToChild((store, id) => store.setAnswers(id, vaxSchedule: s.name));
   }
-  bool get multiple => _multiple;
+  // Kept for revert (PP 22): bool get multiple => _multiple;
+  /// PP 22: the child's own copy when said, else this phone's.
+  bool get multiple => _activeChild()?.multiple ?? _multiple;
   bool get onboarded => _onboarded;
 
   String? get gentle => _gentle;
@@ -651,10 +691,11 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     var filled = 0;
     const total = 5;
     if (conditions.isNotEmpty || _asked.contains(ProfileField.health)) filled++; // was _conditions (PP 21)
-    if (_feeding != null) filled++;
-    if (_sleep != null) filled++;
+    // Kept for revert (PP 22): _feeding, _sleep and _learning read directly.
+    if (feeding != null) filled++;
+    if (sleep != null) filled++;
     if (_priorities.isNotEmpty) filled++;
-    if (_learning != null) filled++;
+    if (learning != null) filled++;
     return filled / total;
   }
 
@@ -668,10 +709,10 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     if (_asked.contains(f)) return false;
     return switch (f) {
       ProfileField.health => conditions.isEmpty, // was _conditions (PP 21)
-      ProfileField.feeding => _feeding == null,
-      ProfileField.sleep => _sleep == null,
+      ProfileField.feeding => feeding == null, // was _feeding (PP 22)
+      ProfileField.sleep => sleep == null, // was _sleep (PP 22)
       ProfileField.priorities => _priorities.isEmpty,
-      ProfileField.learning => _learning == null,
+      ProfileField.learning => learning == null, // was _learning (PP 22)
       ProfileField.pregHealth => _pregConditions.isEmpty,
       ProfileField.pregPriorities => _pregPriorities.isEmpty,
       ProfileField.diet => _diet == null,
@@ -705,8 +746,9 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     if (hasCondition(HealthCondition.cmpa) || hasCondition(HealthCondition.foodAllergy)) {
       return 'Allergy-aware feeding for $name';
     }
-    if (_sleep == SleepPattern.nightWaking || wants(Priority.sleep)) return 'Better sleep for $name this week';
-    if (_feeding == FeedingMethod.solids || _feeding == FeedingMethod.weaning || wants(Priority.feeding)) {
+    // Kept for revert (PP 22): read _sleep and _feeding.
+    if (sleep == SleepPattern.nightWaking || wants(Priority.sleep)) return 'Better sleep for $name this week';
+    if (feeding == FeedingMethod.solids || feeding == FeedingMethod.weaning || wants(Priority.feeding)) {
       return 'Making solids easier for $name';
     }
     if (wants(Priority.development) || wants(Priority.brain)) return "$name's development this week";
@@ -726,9 +768,11 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     for (final c in conditions) { // was _conditions (PP 21)
       add(c.name, 1.4); // health signals rank strongest
     }
-    if (_feeding != null) add(_feeding!.name, 0.8);
-    if (_sleep != null && _sleep != SleepPattern.well && _sleep != SleepPattern.unsure) add('sleep', 0.8);
-    if (_learning == LearningStyle.videos) add('video', 0.6);
+    // Kept for revert (PP 22): read _feeding, _sleep and _learning.
+    final f = feeding, sl = sleep;
+    if (f != null) add(f.name, 0.8);
+    if (sl != null && sl != SleepPattern.well && sl != SleepPattern.unsure) add('sleep', 0.8);
+    if (learning == LearningStyle.videos) add('video', 0.6);
     // Pregnancy signals feed the same weight map — a consumer never needs to
     // know which journey the weights came from, only how to match them.
     for (final p in _pregPriorities) {
@@ -807,10 +851,12 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
   String aiContext() {
     final c = ChildProfileStore.instance;
     final parts = <String>['${c.name} is ${c.ageLabel} old'];
-    if (_feeding != null) parts.add('feeding: ${_feeding!.label.toLowerCase()}');
+    // Kept for revert (PP 22): read _feeding and _sleep.
+    final f = feeding, sl = sleep;
+    if (f != null) parts.add('feeding: ${f.label.toLowerCase()}');
     // Kept for revert (PP 21): read _conditions.
     if (conditions.isNotEmpty) parts.add('noted: ${conditions.map((e) => e.label.toLowerCase()).join(', ')}');
-    if (_sleep != null) parts.add('sleep: ${_sleep!.label.toLowerCase()}');
+    if (sl != null) parts.add('sleep: ${sl.label.toLowerCase()}');
     if (_priorities.isNotEmpty) parts.add('wants help with: ${_priorities.map((e) => e.label.toLowerCase()).join(', ')}');
     return parts.join(' · ');
   }
@@ -900,6 +946,50 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     } catch (_) {/* no child store yet: the next change runs it again */}
   }
 
+  static List<String> _names(Iterable<Enum> values) => [for (final v in values) v.name];
+
+  /// PP 22: one answer onto the active child's own row (0130), so the other
+  /// parent's phone learns it. Before a real child exists (onboarding) the
+  /// bucket alone holds it, and [_backfillChildAnswers] carries it across.
+  void _answerToChild(void Function(ChildProfileStore store, String id) write) {
+    try {
+      final store = ChildProfileStore.instance;
+      final id = store.activeChildId;
+      if (id == null) return;
+      write(store, id);
+    } catch (_) {/* no child store: the bucket still has it */}
+  }
+
+  /// PP 22, per field and idempotent, the twin of [_backfillChildConditions]:
+  /// a field the child's row has never had takes this phone's answer. Only a
+  /// real answer is copied (a non-empty list, a schedule, a true): an empty
+  /// list or a false in the bucket is as likely "never asked" as "no", and
+  /// null on the row already reads as this phone's.
+  void _backfillChildAnswers() {
+    try {
+      final store = ChildProfileStore.instance;
+      for (final child in store.children) {
+        final mine = child.id == _loadedBucket ? _childBucket() : _perChild[child.id];
+        if (mine == null) continue;
+        List<String>? said(Object? raw) {
+          final l = [for (final e in (raw is List ? raw : const [])) '$e'];
+          return l.isEmpty ? null : l;
+        }
+
+        bool? yes(Object? raw) => raw == true ? true : null;
+        store.setAnswers(
+          child.id,
+          feedings: child.feedings == null ? said(mine['feedings']) : null,
+          sleeps: child.sleeps == null ? said(mine['sleeps']) : null,
+          vaxSchedule: child.vaxSchedule == null ? mine['vaxSchedule'] as String? : null,
+          nicu: child.nicu == null ? yes(mine['nicu']) : null,
+          multiple: child.multiple == null ? yes(mine['multiple']) : null,
+          premature: child.premature == null ? yes(mine['premature']) : null,
+        );
+      }
+    } catch (_) {/* no child store yet: the next change runs it again */}
+  }
+
   /// Single-choice write (onboarding). ⚠️ It fills the SET too: the per-child
   /// bucket stores only the sets, so a value written here alone was dropped the
   /// first time the child bucket was saved (bug B1, 2026-10-17).
@@ -909,6 +999,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
       ..clear()
       ..addAll([?f]);
     _save(field: 'feeding', value: f?.name);
+    _answerToChild((store, id) => store.setAnswers(id, feedings: _names(_feedings)));
   }
 
   /// See [setFeeding]: the set is the stored copy.
@@ -918,6 +1009,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
       ..clear()
       ..addAll([?s]);
     _save(field: 'sleep', value: s?.name);
+    _answerToChild((store, id) => store.setAnswers(id, sleeps: _names(_sleeps)));
   }
 
   void togglePriority(Priority p) {
@@ -925,14 +1017,35 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     _save(field: 'priorities', value: p.name);
   }
 
+  // Kept for revert (PP 22):
+  //   void toggleFeeding(FeedingMethod f) {
+  //     if (!_feedings.add(f)) _feedings.remove(f);
+  //     _save(field: 'feeding', value: f.name);
+  //   }
+  //   void toggleSleep(SleepPattern sp) {
+  //     if (!_sleeps.add(sp)) _sleeps.remove(sp);
+  //     _save(field: 'sleep', value: sp.name);
+  //   }
+  /// PP 22: toggles from what is SHOWN (the child's copy when there is one),
+  /// then writes this phone's bucket and the child's row together.
   void toggleFeeding(FeedingMethod f) {
-    if (!_feedings.add(f)) _feedings.remove(f);
+    final next = {...feedings};
+    if (!next.add(f)) next.remove(f);
+    _feedings
+      ..clear()
+      ..addAll(next);
     _save(field: 'feeding', value: f.name);
+    _answerToChild((store, id) => store.setAnswers(id, feedings: _names(_feedings)));
   }
 
   void toggleSleep(SleepPattern sp) {
-    if (!_sleeps.add(sp)) _sleeps.remove(sp);
+    final next = {...sleeps};
+    if (!next.add(sp)) next.remove(sp);
+    _sleeps
+      ..clear()
+      ..addAll(next);
     _save(field: 'sleep', value: sp.name);
+    _answerToChild((store, id) => store.setAnswers(id, sleeps: _names(_sleeps)));
   }
 
   void toggleLearning(LearningStyle l) {
@@ -965,6 +1078,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     if (nicu != null) _nicu = nicu;
     if (multiple != null) _multiple = multiple;
     _save();
+    // PP 22: only what was answered; an omitted one stays "not said".
+    _answerToChild((store, id) => store.setAnswers(id, premature: premature, nicu: nicu, multiple: multiple));
   }
 
   /// The onboarding birth answers (2026-10-07). [bornWeeks] only when early;
@@ -978,6 +1093,9 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     if (bornWeeks != null) _bornWeeks = bornWeeks;
     if (role != null) _role = role;
     _save();
+    // PP 22: "born early" rides the child's row. Mode and weeks keep 0102's
+    // own path (said once, this phone's answer first).
+    if (early != null) _answerToChild((store, id) => store.setAnswers(id, premature: early));
   }
 
   void markOnboarded() {
@@ -1054,6 +1172,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     } catch (_) {/* stay local */}
     // PP 21: children already loaded send no change, so carry once here too.
     _backfillChildConditions();
+    _backfillChildAnswers(); // PP 22
   }
 
   // ---- per-child partitioning ---------------------------------------------
@@ -1078,7 +1197,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
         'conditions': _conditions.map((e) => e.name).toList(),
         'feedings': _feedings.map((e) => e.name).toList(),
         'sleeps': _sleeps.map((e) => e.name).toList(),
-        'learnings': _learnings.map((e) => e.name).toList(),
+        // Kept for revert (PP 22): learning style is the parent's now.
+        //   'learnings': _learnings.map((e) => e.name).toList(),
         'premature': _premature,
         'nicu': _nicu,
         'multiple': _multiple,
@@ -1091,7 +1211,8 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     _conditions..clear()..addAll(_decode(m['conditions'], HealthCondition.values));
     _feedings..clear()..addAll(_decode(m['feedings'], FeedingMethod.values));
     _sleeps..clear()..addAll(_decode(m['sleeps'], SleepPattern.values));
-    _learnings..clear()..addAll(_decode(m['learnings'], LearningStyle.values));
+    // Kept for revert (PP 22), learning style is no longer swapped per child:
+    //   _learnings..clear()..addAll(_decode(m['learnings'], LearningStyle.values));
     _premature = m['premature'] == true;
     _nicu = m['nicu'] == true;
     _multiple = m['multiple'] == true;
@@ -1101,7 +1222,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     // Keep the legacy single-value fields in step with the sets they replaced.
     _feeding = _feedings.isEmpty ? null : _feedings.first;
     _sleep = _sleeps.isEmpty ? null : _sleeps.first;
-    _learning = _learnings.isEmpty ? null : _learnings.first;
+    // Kept for revert (PP 22): _learning = _learnings.isEmpty ? null : _learnings.first;
   }
 
   /// Called when the active child changes: stash what is on screen under the
@@ -1111,6 +1232,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     // PP 21: every change of the child list, not only a switch, may bring a
     // child whose row has no conditions yet. Idempotent, so safe to run here.
     _backfillChildConditions();
+    _backfillChildAnswers(); // PP 22: the same, for the other answers
     if (now == _loadedBucket) return;
     final carried = _childBucket();
     _perChild[_loadedBucket] = carried;
@@ -1128,6 +1250,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     // only become the first child's above, so the carry before the swap
     // could not see them.
     _backfillChildConditions();
+    _backfillChildAnswers(); // PP 22
     notifyListeners();
   }
 
@@ -1197,6 +1320,17 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
       });
     }
     _loadedBucket = _bucketId;
+    // PP 22: learning style is HER reading preference, not the child's (it
+    // flipped on every child switch). The cloud kept it only inside the child
+    // buckets, so the open child's answer becomes hers, once, and the bucket
+    // copies are dropped so they stop travelling.
+    final oldLearnings = _perChild[_loadedBucket]?['learnings'];
+    if (_learnings.isEmpty && oldLearnings is List) {
+      _learnings.addAll(_decode(oldLearnings, LearningStyle.values));
+    }
+    for (final b in _perChild.values) {
+      b.remove('learnings');
+    }
     if (_perChild.containsKey(_loadedBucket)) {
       _applyChildBucket(_perChild[_loadedBucket]!);
     } else {
@@ -1314,6 +1448,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     'asked',
     'pregConditions',
     'pregPriorities',
+    'learnings', // PP 22: the parent's now, one item per pick
   };
 
   /// The active child's answers, also written flat by [_toMap]. They travel
@@ -1322,7 +1457,7 @@ class FamilyProfileStore extends ChangeNotifier with CloudMergedStore {
     'conditions',
     'feedings',
     'sleeps',
-    'learnings',
+    // 'learnings', // kept for revert (PP 22): a parent-level set now
     'premature',
     'nicu',
     'multiple',

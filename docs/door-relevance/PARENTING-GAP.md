@@ -23,8 +23,7 @@ Siblings: `PREGNANCY-GAP.md`, `TTC-GAP.md`. Plan and seams: `README.md`.
 
 ## 1. Still open, in build order
 
-### Found in PP 21
-**22. A child's other answers reach only her phone** (Weak). Feeding, sleep, learning style, NICU, a twin, the vaccine schedule: per child on her phone since B1 (`FamilyProfileStore._perChild`), but inside HER `family_profile` cloud items, so the other parent's phone never learns them (his home, recommendations and Ask Veda go without). Birth mode and born-early weeks already moved to the child's row (0102), conditions in PP 21 (0129). *Fix (not built):* the same move per field, on the child's row, with PP 21's rule (the child's copy is the truth when it exists; null is not said). Found 2026-10-29; the user kept PP 21 to conditions only.
+Nothing open. PP 22 closed the last item; what is left is the walk, the Railway redeploy and the clinician read (section 3).
 
 ---
 
@@ -53,10 +52,11 @@ Siblings: `PREGNANCY-GAP.md`, `TTC-GAP.md`. Plan and seams: `README.md`.
 | 21 | A child's health conditions on the child's own row (`children.conditions`, 0129), so the other parent's phone learns them; the child's copy is the truth when it exists (null = not said, empty = none); her phone's answers carried across once; Ask Veda sends the open child's conditions with two children too. The premise was half stale: conditions were already per child on her phone since B1. 0129 run by the user and `kChildConditionsColumn` on, 2026-10-29 | c78e724a |
 | 11 | One cap of two a day across Pregnancy and Parenting (`familyPhonePlan`), a morning tip per child in turn, offers the Pregnancy way (toys with a real age window, classes with a 0124 window); a repeated activity and a doubled title fixed; phone-only emoji in all three stages | ce30abf8 |
 | 13 | Re-checked 2026-10-29: already done 2026-10-27 by the tools pass (CL2, user: "dont hide tools"). The breastfeed timer and tummy time show at every age; guards commented out in `pp_tools_tab.dart:119-135`; held by `pp_tools_tab_test.dart` "no tool is hidden by the child's age". The gap doc was stale | tools pass, 2026-10-27 |
+| 22 | A child's other answers on the child's own row (0130): feeding and sleep (in pick order), the vaccine schedule, NICU, a twin, born early; null = not said for every field, the yes/no ones included (no defaults); the child's copy is the truth when it exists, every read through the getters, every write to both, her phone's real answers carried once. Learning style became the parent's own preference, not per child, and stays off the child's row. 0130 run by the user and `kChildAnswersColumns` on, 2026-10-29. Test `pp22_child_answers_test.dart` | this commit |
 | 6 | Ask Veda gets the corrected age next to the birthday age, and the family's context as closed ids (never the name or prose: the cache is shared); conditions only with one child; the answer says what it used, from the service's `used_context`. Two repos. Inert until the service is redeployed. The audit's "Pregnancy sends conditions" was wrong: `VedaContext` feeds only the retired offline engine | 3e107d77 (askveda ac6ffac; Railway redeploy owed) |
 
 Tests: `test/pp_relevance_batch1_test.dart`, `pp_relevance_batch2_test.dart`, `pp_relevance_step3a_test.dart`, `pp_relevance_step3b_test.dart`, `pp_relevance_step3c_test.dart`, `pp_relevance_step4a_test.dart`; service: `parentveda-askveda/tests/test_child_context.py`.
 
 ## 3. Decisions still yours
-- Nothing blocking. The hidden-tools question (13) is with the user via Terminal B.
-- When to build PP 22 (the other per-child answers on the child's row).
+- Nothing blocking.
+- Left to do together: the Railway redeploy of Ask Veda (PP 6 is inert until then); one phone walk (Steps 1-3a, PP 11, trying again with a toddler, PP 21/22 on the partner's phone); the clinician read.

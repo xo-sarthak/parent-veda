@@ -4756,3 +4756,31 @@ pattern as `kChildSexGivenColumn` and `kChildBirthColumns`.
 **8. The contract half, and a default is part of the rule (after the 0128 run, 2026-10-29).** Once 0128 gave `book_slot`'s slot arguments defaults, the app stopped sending what the server no longer reads. Each value is now sent only for the case that needs it: the start for a consult (her pick), and the full slot only for an offering the server cannot price, which goes through the stub-mode branch (live mode refuses it anyway). Dart's null-aware map entry, `'p_expert_id': ?expertId`, leaves the key out entirely, and that is what lets PostgREST match the default. Sending `null` explicitly would not do it: a named argument that is sent, even as null, overrides the default.
 
 Moving the schedule check to the server also exposed a mismatch in a **fallback**. For a doctor who had saved no schedule, the phone offered a made-up calendar (10:00, 17:00, 18:30, with about one slot in four shown as taken when nobody had booked it), while the server assumes the starter clinic, the same thing `DoctorScheduleStore.scheduleFor` returns. 18:30 is off the starter's 35-minute grid, so the server would have refused a time the phone had just offered. The parity table held the two copies of the *rule* together, but the two copies of the *default input* had drifted. Now the phone offers the starter clinic too. **When two places share a rule, they also have to share its defaults: what each one assumes when the data is missing is part of the rule.**
+
+## 16zzp. A boolean with three states has no default, and a list keeps its order when the first item means something (PP 22, 0130, 2026-10-29)
+
+The rest of 16zzo's move: feeding, sleep, the vaccine schedule, a NICU stay, a twin and "born early" onto the
+child's row, by the same rule (the child's copy is the truth when it exists, every read through a getter, every
+write to both, a one-time carry). Three things were new.
+
+**1. No default on a yes/no column.** `nicu boolean default false` looks tidy and is wrong here. Null means no
+phone has said; false means she said no, and a "no" must beat a stale "yes" on the other phone. A default turns
+every row that was never asked into a "no", and on the first pull that "no" would overwrite the real "yes" on her
+phone. So all six columns are nullable with no default, and every getter falls back with `??`
+(`_activeChild()?.nicu ?? _nicu`). **When false is an answer, the column needs a third state for "not said", and a
+default deletes it.**
+
+**2. The same ambiguity on the phone decides what the carry may copy.** Her phone stores these as plain booleans
+that start false, so there "no" and "never asked" look the same. The carry therefore copies only a true, a
+non-empty list or a schedule. For the same reason `setBirth(nicu: true)` writes only `nicu`: the omitted
+`multiple` stays null on the row, not false.
+
+**3. Order is data when the first item is read on its own.** PP 21 stores conditions sorted, because a set of
+conditions has no main one. Feeding does: the single `feeding` the app reads (focus line, boosts, Ask Veda's
+context) is her FIRST pick. Sorted, "solids, then breastfeeding" would become breastfeeding first, and the two
+phones could each treat a different method as her main one. So `setAnswers` stores lists in pick order and treats
+a reorder as a change. **Before sorting a list for comparison or storage, check nothing reads its first element.**
+
+**Also moved, the other way:** learning style was kept per child and flipped on every child switch, but it is how
+the PARENT likes to read. It now lives at her level, syncs as her own set, and the open child's old answer became
+hers once. Not every answer asked on a child's screen is about the child.
