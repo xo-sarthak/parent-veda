@@ -54,7 +54,9 @@ const List<(String, String, String)> _kTools = [
   ),
   (
     'contraction',
-    'Contraction Timer',
+    // The tool's one name (P4, PREGNANCY-GAP 36 leftover, 2026-10-29). Kept
+    // for revert: 'Contraction Timer',
+    'Contraction timer',
     'Time your contractions - how long they last and how far apart - in the Tools tab.'
   ),
   (

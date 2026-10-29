@@ -906,7 +906,10 @@ const List<JourneyMilestone> kJourneyMilestones = [
     type: JourneyNodeType.feature,
     anchorWeek: 36,
     emoji: '🔓',
-    title: LocalizedText(en: 'Contraction tracker', hi: 'संकुचन ट्रैकर'),
+    // The tool's one name (P4, PREGNANCY-GAP 36 leftover, 2026-10-29); the
+    // Hindi follows the tool's own string in app_language.dart. Kept for
+    // revert: title: LocalizedText(en: 'Contraction tracker', hi: 'संकुचन ट्रैकर'),
+    title: LocalizedText(en: 'Contraction timer', hi: 'संकुचन टाइमर'),
     launchComingSoon: true,
     sections: [
       CardSection(
