@@ -15,6 +15,14 @@
 //  are being supported. They never learn WHICH families, and that is not an
 //  omission we might fill in later — it is the boundary the whole module rests
 //  on.
+//
+//  SMALL NUMBERS (R3, 0141, decided 2026-10-30). What families DID
+//  (pregnancies, babies, consultations, vaccinations, guides, "told us about
+//  their family") arrives as null until the partner has the server's
+//  min_cohort families. With two families, "Pregnancies supported: 1" says
+//  which patient conceived. A held-back tile shows a dash and one line says
+//  why; it is never drawn as 0. Families referred and active stay visible:
+//  she handed the code over, so that they arrived is hers to know.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -96,6 +104,7 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
               _kitLink(context, (mine?.signedUp ?? 0) == 0),
             ] else ...[
               _grid(impact),
+              if (impact?.suppressed ?? false) _heldBackNote(impact!.minCohort),
               const SizedBox(height: 4),
               _kitLink(context, (impact?.familiesReferred ?? 0) == 0),
             ],
@@ -184,14 +193,15 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
       );
 
   Widget _grid(PartnerImpact? i) {
-    final tiles = <(String, int, IconData)>[
+    final tiles = <(String, int?, IconData)>[
       ('Families referred', i?.familiesReferred ?? 0, Icons.family_restroom_rounded),
       ('Active this month', i?.activeThisMonth ?? 0, Icons.bolt_rounded),
-      ('Pregnancies supported', i?.pregnanciesSupported ?? 0, Icons.pregnant_woman_rounded),
-      ('Babies welcomed', i?.childrenAdded ?? 0, Icons.child_care_rounded),
-      ('Consultations completed', i?.consultationsDone ?? 0, Icons.videocam_rounded),
-      ('Vaccinations completed', i?.vaccinationsCompleted ?? 0, Icons.vaccines_rounded),
-      ('Guides read', i?.contentConsumed ?? 0, Icons.menu_book_rounded),
+      // Null = held back by the server (0141): a dash, not a 0.
+      ('Pregnancies supported', i == null ? 0 : i.pregnanciesSupported, Icons.pregnant_woman_rounded),
+      ('Babies welcomed', i == null ? 0 : i.childrenAdded, Icons.child_care_rounded),
+      ('Consultations completed', i == null ? 0 : i.consultationsDone, Icons.videocam_rounded),
+      ('Vaccinations completed', i == null ? 0 : i.vaccinationsCompleted, Icons.vaccines_rounded),
+      ('Guides read', i == null ? 0 : i.contentConsumed, Icons.menu_book_rounded),
     ];
     // An ODD COUNT gets a full-width last tile, not a half one next to a hole.
     //
@@ -214,7 +224,17 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
     ]);
   }
 
-  Widget _tile((String, int, IconData) t) => Container(
+  /// Why some tiles show a dash. [min] is the server's threshold.
+  Widget _heldBackNote(int min) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Text(
+          'What families did is shown once $min have joined through you. '
+          'In a small group a single pregnancy is close to a name.',
+          style: ppBody(11.5, h: 1.45),
+        ),
+      );
+
+  Widget _tile((String, int?, IconData) t) => Container(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -224,7 +244,7 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Icon(t.$3, size: 18, color: ppPurple),
           const SizedBox(height: 10),
-          Text('${t.$2}', style: ppFraunces(24, h: 1)),
+          Text(t.$2?.toString() ?? '—', style: ppFraunces(24, h: 1)),
           const SizedBox(height: 3),
           Text(t.$1, style: ppBody(11, h: 1.35)),
         ]),
@@ -266,7 +286,7 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
   /// the number they actually care about is how many families arrived.
   Widget _funnelBlock(PartnerFunnel? f) {
     if (f == null || f.signedUp == 0) return const SizedBox.shrink();
-    final steps = <(String, int)>[
+    final steps = <(String, int?)>[
       ('Scanned your code', f.scanned),
       ('Installed the app', f.installed),
       ('Signed up', f.signedUp),
@@ -301,7 +321,7 @@ class _DoctorImpactScreenState extends State<DoctorImpactScreen> {
                 ),
                 const SizedBox(width: 11),
                 Expanded(child: Text(s.$1, style: ppBody(12.5))),
-                Text('${s.$2}', style: ppJakarta(13.5)),
+                Text(s.$2?.toString() ?? '—', style: ppJakarta(13.5)),
               ]),
             ),
         ]),

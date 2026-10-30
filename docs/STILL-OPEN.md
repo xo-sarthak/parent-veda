@@ -457,7 +457,10 @@ named. Detail and the reasons: `docs/partner-editions/PARTNERS-APP.md` §P3 as b
   own practice gets both merged. Either give it a `p_partner_id` (drop the zero-arg signature first, or the call is
   ambiguous, the trap `partner_parity_test` describes for `mint_partner_token`) or drop it. `care_org_dashboard()`
   covers its only planned use.
-- [ ] **Solo doctors in ParentVeda+ still see behaviour unwithheld.** R3 says small numbers are hidden "for clinics
+- [x] **DECIDED and BUILT 2026-10-30 (option A, 0141):** solo doctors now get the same rule. `partner_impact` and
+  `partner_funnel` hold back what families did below `min_cohort`; the Impact screen shows a dash and one line saying
+  why; families referred and active stay. Detail: PARTNERS-APP.md §P3, "Follow-up: 0141". *(Original item kept below.)*
+- [x] ~~**Solo doctors in ParentVeda+ still see behaviour unwithheld.**~~ R3 says small numbers are hidden "for clinics
   and doctors", but `partner_impact` (read by the doctor app's impact screen) has no threshold. P3 left it alone so
   as not to change the doctor app. For a solo doctor with three families, "pregnancies: 1" is close to a name. **The
   user's call** whether ParentVeda+ gets the same rule.

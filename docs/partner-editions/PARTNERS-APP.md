@@ -156,6 +156,17 @@ second login: create it in Authentication → Users with a password (R6), then
 (Nova IVF Fertility, from `care_partner_demo_orgs.sql`). It has no doctors or families yet, so it opens on the empty
 states; the per-doctor table needs `expert_profiles.partner_id = 'demo_org_ivf'` rows and attributions.
 
+**Follow-up: 0141 (2026-10-30, the user chose option A on STILL-OPEN §5.1e).** R3 now holds for solo doctors in
+ParentVeda+ too. `0141_doctor_impact_small_numbers.sql` replaces `partner_impact` (dropped and recreated: it gains
+`suppressed` and `min_cohort`, and a return type cannot change under `create or replace`) and `partner_funnel` (same
+type, so replaced in place). Behaviour (pregnancies, babies, consultations, vaccinations, guides, "told us about their
+family") is null below the shared `min_cohort`; families referred and active, scanned, installed and signed up are
+not. `PartnerImpact` / `PartnerFunnel` read null as "held back" (a missing column still reads 0), and
+`doctor_impact_screen.dart` shows a dash in each held-back tile plus "What families did is shown once N have joined
+through you." Counting definitions unchanged word for word. Test `doctor_impact_small_numbers_test` (10); verify
+`supabase/seed/verify_doctor_impact.sql` (expect PASSED 4 FAILED 0). An old ParentVeda+ build keeps working: it
+ignores the new keys and shows 0 where the server sent null, until it updates.
+
 ## P4: Exclusive content and contract end
 1. Migration: `programmes.audience_sponsor_id`, `audience_partner_id` (nullable, FK);
    `programmes_published` filters them (null = everyone; set = only members of that sponsor, or

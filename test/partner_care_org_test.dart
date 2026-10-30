@@ -371,9 +371,10 @@ void main() {
       }
     });
 
-    test('the shared care RPCs are untouched, so ParentVeda+ is too', () {
-      expect(_last('partner_impact').file, '0068_partner_accounts.sql');
-      expect(_last('partner_funnel').file, '0068_partner_accounts.sql');
+    // partner_impact and partner_funnel moved on in 0141 (a solo doctor's
+    // small numbers held back too, decided 2026-10-30), and are pinned there
+    // by doctor_impact_small_numbers_test. The other two are untouched.
+    test('the shared care RPCs P3 did not need are untouched', () {
       expect(_last('partner_earnings').file, '0068_partner_accounts.sql');
       expect(
         _last('partner_referral_breakdown').file,

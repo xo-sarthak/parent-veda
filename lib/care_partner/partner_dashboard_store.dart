@@ -22,6 +22,12 @@ import 'care_partner_store.dart';
 
 /// The impact totals. Every field is a count of families or of events across
 /// them — never anything identifying.
+///
+/// TWO KINDS (R3, 0141). [familiesReferred] and [activeThisMonth] are referral
+/// facts and always arrive. The five behaviour figures are NULL while the
+/// partner has fewer than [minCohort] families: with two families,
+/// "pregnancies supported: 1" says which patient conceived. Null is "held
+/// back", never zero; the screen shows a dash and says why.
 @immutable
 class PartnerImpact {
   const PartnerImpact({
@@ -32,29 +38,46 @@ class PartnerImpact {
     this.consultationsDone = 0,
     this.vaccinationsCompleted = 0,
     this.contentConsumed = 0,
+    this.suppressed = false,
+    this.minCohort = 5,
   });
 
   final int familiesReferred;
   final int activeThisMonth;
-  final int pregnanciesSupported;
-  final int childrenAdded;
-  final int consultationsDone;
-  final int vaccinationsCompleted;
-  final int contentConsumed;
+  final int? pregnanciesSupported;
+  final int? childrenAdded;
+  final int? consultationsDone;
+  final int? vaccinationsCompleted;
+  final int? contentConsumed;
 
-  bool get isEmpty => familiesReferred == 0 && childrenAdded == 0;
+  /// The server held the behaviour figures back (0141).
+  final bool suppressed;
+
+  /// The server's threshold, for "shown once N families join".
+  final int minCohort;
+
+  bool get isEmpty => familiesReferred == 0 && (childrenAdded ?? 0) == 0;
 
   static int _n(Object? v) => (v as num?)?.toInt() ?? 0;
 
-  static PartnerImpact fromMap(Map d) => PartnerImpact(
-        familiesReferred: _n(d['families_referred']),
-        activeThisMonth: _n(d['active_this_month']),
-        pregnanciesSupported: _n(d['pregnancies_supported']),
-        childrenAdded: _n(d['children_added']),
-        consultationsDone: _n(d['consultations_done']),
-        vaccinationsCompleted: _n(d['vaccinations_completed']),
-        contentConsumed: _n(d['content_consumed']),
-      );
+  static PartnerImpact fromMap(Map d) {
+    final held = d['suppressed'] == true;
+    // Null ONLY when the server says it held the figures back, and then even
+    // if a figure came with it. A missing column (a server before 0141)
+    // still reads as 0, as it always did.
+    int? b(Object? v) => held ? null : _n(v);
+    return PartnerImpact(
+      familiesReferred: _n(d['families_referred']),
+      activeThisMonth: _n(d['active_this_month']),
+      pregnanciesSupported: b(d['pregnancies_supported']),
+      childrenAdded: b(d['children_added']),
+      consultationsDone: b(d['consultations_done']),
+      vaccinationsCompleted: b(d['vaccinations_completed']),
+      contentConsumed: b(d['content_consumed']),
+      suppressed: held,
+      minCohort: (d['min_cohort'] as num?)?.toInt() ?? 5,
+    );
+  }
 }
 
 /// One row of "where the money came from" — a source and a status, with a count
@@ -119,19 +142,26 @@ class PartnerFunnel {
   final int scanned;
   final int installed;
   final int signedUp;
-  final int activated;
+
+  /// Behaviour: null while the partner has fewer families than the server's
+  /// threshold (0141), shown as a dash, never a 0.
+  final int? activated;
 
   static PartnerFunnel fromMap(Map d) => PartnerFunnel(
         scanned: (d['scanned'] as num?)?.toInt() ?? 0,
         installed: (d['installed'] as num?)?.toInt() ?? 0,
         signedUp: (d['signed_up'] as num?)?.toInt() ?? 0,
-        activated: (d['activated'] as num?)?.toInt() ?? 0,
+        activated: (d['activated'] as num?)?.toInt(),
       );
 
   /// Of the families who signed up, how many told us something real about
-  /// themselves. The only ratio here worth showing a doctor.
-  int get activationPct =>
-      signedUp == 0 ? 0 : ((activated / signedUp) * 100).round();
+  /// themselves. The only ratio here worth showing a doctor. Null while
+  /// [activated] is held back.
+  int? get activationPct {
+    final a = activated;
+    if (a == null) return null;
+    return signedUp == 0 ? 0 : ((a / signedUp) * 100).round();
+  }
 }
 
 /// "Families you brought" — the signed-in DOCTOR's own slice (0133,
