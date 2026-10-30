@@ -33,7 +33,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + B1–B7, B10 LIVE (04847a5), see `docs/STAGE-TRANSITIONS.md`; family switch F1/F3, celebration pages F4 and turning six LIVE (adae4d5); B9 and B11 LIVE; per-pregnancy records and Kept for you LIVE (R1, 656bbb3, 0114 run); F2 Add a pregnancy from the family LIVE (2290cce); F5 one learning space per child LIVE (5fa51e2); F6 open on the last profile used, and taps open their own profile, LIVE (0d72a21); R8, R5, R6, R3, trying again, R2, F8 and F7 (child calendar) LIVE 57c844b (F8 and R3 also in the Ask Veda service) | Phase 5 |
 | 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
-| 12 | Position-aware notifications | 6a LIVE for TTC, Pregnancy and Parenting (Parenting 2026-10-29, PARENTING-GAP 11, one cap with Pregnancy); 6b B0 (one tap opener) BUILT 2026-10-30; B1 (Firebase) and B2 (devices, consent, audience; 0140 run) BUILT 2026-10-30; B3 (campaigns, bookings, the rules; 0143 to run) BUILT 2026-10-30; B4 onward OWED | Phase 6 |
+| 12 | Position-aware notifications | 6a LIVE for TTC, Pregnancy and Parenting (Parenting 2026-10-29, PARENTING-GAP 11, one cap with Pregnancy); 6b B0 (one tap opener) BUILT 2026-10-30; B1 (Firebase) and B2 (devices, consent, audience; 0140 run) BUILT 2026-10-30; B3 (campaigns, bookings, the rules; 0143 run, verify 50/0) BUILT 2026-10-30; B4 onward OWED | Phase 6 |
 | 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags LIVE (2d3a07f) | Phase 1 |
 | 14 | Nutrition door pitches | LIVE (7df4711); supplements WAITING on sheet | Phase 2 |
 | 15 | Action doors lead with an action | LIVE (aa1fe9e) | Phase 2 |
@@ -323,8 +323,8 @@ quote cost in USD and INR first).
   phone, in the two-week wait and an active treatment round, priority then
   sooner end, a 21:00 cutoff, title 50 / body 150, ONE a week. Nothing sends
   yet. Plan "As built: B3"; test `test/push_b3_contract_test.dart`; verify
-  `supabase/seed/verify_push_campaigns.sql`. Owed: run 0143 + the verify (the
-  user). Next: B4 (the sender), on the user's word.
+  `supabase/seed/verify_push_campaigns.sql`. 0143 run 2026-10-30, verify
+  PASSED 50 FAILED 0. Commit 04132625. Next: B4 (the sender), on the user's word.
 
 ### 13 · Relevance inside doors
 

@@ -530,7 +530,7 @@ in `NotificationOpener.kinds`, the grants and both policies, cancel, and the
 quiet flag's truth table and wiring.
 
 **Owed from B3:**
-- Run 0143, then the verify file (the user).
+- ~~Run 0143, then the verify file (the user).~~ Run 2026-10-30: cron job 5, verify PASSED 50 FAILED 0, none skipped.
 - **A stale quiet flag.** The flag is as fresh as her last app open. If she
   opens the app in her fertile window and not again for five days, the server
   still reads "not quiet" in her two-week wait. The fix, if the walk shows it
@@ -587,7 +587,7 @@ account you need for the App Store anyway.
 | B0 | One tap opener for every notification, local and pushed | A tap on each 6a kind opens its page. The `syncAll` fix stays out of scope. **BUILT 2026-10-30**, see "As built: B0" |
 | B1 | Firebase in the app (`firebase_core`, `firebase_messaging`). It must not crash with no config: an unconfigured Firebase behaves like being logged out | The app starts on a build with no `google-services.json`. **BUILT 2026-10-30**, see "As built: B1"; the build check is owed |
 | B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`). **BUILT 2026-10-30**, see "As built: B2"; 0140 run 2026-10-30 |
-| B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron. Plus decisions 15 to 22 (holdout, `tapped_at`, 7-day grace, wider quiet incl. the phone flag, priority, cutoff, length limits, 1 a week) | `supabase/seed/verify_push_campaigns.sql` passes by hand. **BUILT 2026-10-30**, see "As built: B3"; 0143 to run |
+| B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron. Plus decisions 15 to 22 (holdout, `tapped_at`, 7-day grace, wider quiet incl. the phone flag, priority, cutoff, length limits, 1 a week) | `supabase/seed/verify_push_campaigns.sql` passes by hand. **BUILT 2026-10-30** (04132625), see "As built: B3"; 0143 run, verify 50/0 |
 | B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens, the 19:00 IST cron through `pg_net` | `pv_campaign_test` reaches your phone |
 | B5 | Phone: read bookings, give the evening to the campaign, show it in Messages | Planner tests: a booked evening never rings two |
 | B6 | Phone walk, on the user's word | See "Owed" |

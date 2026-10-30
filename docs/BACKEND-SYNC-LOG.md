@@ -1837,7 +1837,7 @@ item format changed. **Commit:** `ecb47348`.
 ## Step 32: push campaigns, bookings and the rules (Notifications 6b B3, 0143)
 
 **Date:** 2026-10-30 (the user's word: "You have my go for B3"). **Migration:**
-`0143_push_campaigns_and_sends.sql`, to be run by the user. **Commit:** pending.
+`0143_push_campaigns_and_sends.sql`, run by the user 2026-10-30 (cron job 5). **Commit:** `04132625`.
 
 ### Why
 - B2 gave the server its inputs. B3 is the half that decides: who gets which campaign tonight, under consent, the
@@ -1858,5 +1858,5 @@ item format changed. **Commit:** `ecb47348`.
 
 ### Verify
 - Run 0143, then paste `supabase/seed/verify_push_campaigns.sql` into the SQL editor. It ends in a red error that is
-  the report (50 checks, PASSED / FAILED) and rolls every fixture back.
+  the report (50 checks, PASSED / FAILED) and rolls every fixture back. **Run 2026-10-30: PASSED 50 FAILED 0.**
 - `select jobname, schedule, active from cron.job where jobname = 'push-enqueue-daily';` shows one active row.
