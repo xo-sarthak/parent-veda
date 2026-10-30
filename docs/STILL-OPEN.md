@@ -2142,6 +2142,19 @@ product has is a bug surface.
   very different intentions produce the same bytes, do not infer the
   intention.**
 
+**Update 2026-10-30 (`0142`, Partner Editions P4, MASTER R2): a contract that ENDS now ends the benefit.** Until
+0142 nothing revoked anything when `sponsors.status` changed, so an ended contract kept everyone's sponsored Premium
+running for free. A trigger (`sponsors_contract_end`) now runs on `status -> 'ended'`, whoever makes the change, and
+withdraws every plan and every unspent consultation credit granted with `source = 'sponsor'` for that sponsor. Booked
+consultations stand. `suspended` does nothing: members keep their benefits, the admin's view is hidden and new
+activations are blocked (both already true). `sponsor_members` rows are left as they are (they record who activated).
+
+**Not automatic in reverse.** Setting an ended sponsor back to `active` re-grants nothing: a renewal is a new decision
+(seats, plan). Until there is a screen, ops re-grants per member in SQL:
+`select public.grant_plan(m.user_id, s.plan_id, 'sponsor', s.id, null, 'ops: renewal') from public.sponsor_members m
+join public.sponsors s on s.id = m.sponsor_id where s.id = '<id>' and m.status = 'active';` (consultation credits are
+granted at activation, so a renewal that includes them needs `grant_consult_credits` as well).
+
 ## 11.5 Company-uploaded resources are third-party content in a health product
 
 Sponsors upload documents that render inside the app. Needs a review path and a
@@ -2269,7 +2282,25 @@ used" (which sections they use) on Overview, and a KPI of "consults used of incl
 
 Detail: `docs/partner-editions/PARTNERS-APP.md` §P2 as built.
 
-## 11.9 Company events and resources have no audience scope
+## 11.9 Company events and resources have no audience scope — FIXED 2026-10-30 (`0142`, Partner Editions P4)
+
+**Update 2026-10-30.** Built as planned below, for sponsors *and* care partners: `programmes.audience_sponsor_id` /
+`audience_partner_id` (and the same on `programme_coupons`), one rule (`_audience_ok`) applied by the view, the
+table's read policy, the three receipt doors and the coupon validator, and a read-only Content tab in ParentVeda
+Partners. The parent app does not show an "Exclusively for you" rail yet; that is Partner Editions A2.
+
+**Still open, said plainly:**
+- **"Viewed" counts.** The P4 plan asked for them. Nothing records who opened which programme (0065 records rooms,
+  never what was in them), so the Content tab shows booked and used only. Adding a per-programme view event is a
+  privacy decision: an employer learning that someone *looked at* a fertility session is the same leak as booking.
+  **The user's call** whether to build it, and if so, withheld below `min_cohort` like every behaviour figure.
+- **Stub-mode `book_slot`** books against a seat without a receipt and is not audience-checked. Live mode books only
+  against a receipt, and every receipt door is checked, so this is a demo-mode gap only.
+- **No screen to make a session exclusive.** SQL now (R9), Directus later (`docs/ADMIN-PANEL.md`).
+- **The Employer Benefits screen's events and resources sections** are not wired to exclusive programmes yet; that
+  is A2.
+
+*Original text:*
 
 `sponsor_events` and `sponsor_resources` capabilities are registered and the
 Employer Benefits screen renders their sections, but `programmes` (0054) has no
@@ -2452,7 +2483,8 @@ Rejected: **refuse** (then why is the field editable?) and **move** (contradicts
 
 ### What this needs, when it gets built
 
-1. `expert_id` on `programme_coupons`, so a redemption knows whose code it was.
+1. ~~`expert_id` on `programme_coupons`, so a redemption knows whose code it was.~~ **Column added 2026-10-30
+   (`0142`).** Recorded only: nothing in the app redeems a coupon yet, and item 2 is still the work.
 2. A per-sale attribution row — the ledger currently models a partner earning on
    an attributed parent, not on a single transaction.
 3. Commission sources for the workbook's other rows: `care_commission_rules`

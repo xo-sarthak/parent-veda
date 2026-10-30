@@ -74,3 +74,21 @@ String partnerCarePrivacyText(int min) =>
     'any one family did. What families did is held back until $min have '
     'joined, because in a small group a single pregnancy is close to a name. '
     'The families you brought were promised this when they joined.';
+
+// ---- P4: the Content tab ------------------------------------------------------
+
+/// Who an organisation's exclusive content is for. A centre's audience is the
+/// families its doctors brought, not the doctors themselves.
+String partnerContentAudienceWord(PartnerOrg org) =>
+    org.kind == PartnerOrgKind.careOrg ? 'families' : org.peopleWord;
+
+/// Why a booked or used count shows "—". [min] is the server's min_cohort.
+String partnerContentHeldBackText(int min) =>
+    'Booked and used counts show once $min have taken part. Below that a '
+    'count could point to one person, so it shows "—", even at none. Nobody '
+    'is ever named, and nothing records who opened a session.';
+
+/// Read-only (R9): who adds a session or an offer.
+String partnerContentReadOnlyText(String who) =>
+    'To add a session or an offer for your $who, contact your ParentVeda '
+    'manager. ParentVeda prepares every session your $who see.';

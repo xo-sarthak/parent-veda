@@ -48,7 +48,7 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | **P1** ✓ 2026-10-30, hash in memory | Partners | New flavour, shell, sign-in, one org resolver, admin-without-seat | yes: `0136` | — |
 | **P2** ✓ 2026-10-30, hash in memory | Partners | Employer and school: Overview, People, Report | small: `0138` (self-removal refused) | P1 |
 | **P3** ✓ 2026-10-30, hash in memory | Partners | IVF centre: Overview, per-doctor table; ParentVeda+ refuses org logins (R5) | yes: `0139` (`care_org_dashboard`) | P1, D2 |
-| **P4** | Partners + DB | Exclusive content: audience columns, Content tab, contract end (R2) | yes | P2 |
+| **P4** ✓ 2026-10-30 (0142 RUN, verify 20/0), hash in memory | Partners + DB | Exclusive content: audience columns, Content tab, contract end (R2) | yes | P2 |
 | **A1** | Parent (LAST) | `PartnerBrand` resolver, lockup strip, "Your doctor" line, welcome sheet in new onboarding | no | P4 |
 | **A2** | Parent (LAST) | "Exclusively for you" rail, You chip with logo + benefit meter | no | A1, P4 |
 
@@ -74,5 +74,7 @@ Kept short; this was detailed in the storyboard.
   strip (logo, `BrandMark` fallback; **not** `PresentedBy`, per `care_visibility.dart:14–17`), and
   one-line inserts in `home_v3_screen.dart`, `ttc/ttc_home_v3.dart`, `post_pregnancy/pp_home_v3.dart`.
   `care_welcome_sheet.dart` wired into `onboarding_flow.dart`; the `invited` box gets the partner variant.
-- **A2:** the "Exclusively for {name}" rail reading P4's filtered programmes; You chip with logo
+- **A2:** the "Exclusively for {name}" rail reading P4's filtered programmes (the view's `audience_sponsor_id` /
+  `audience_partner_id`); **first make `ProgrammeStore` refresh on a change of signed-in user and clear its cache on
+  sign-out** (found in P4: the view now answers per account, the cache is one key); You chip with logo
   (`pv_you_screen.dart:598`) + a benefit meter; update the `employer_benefits_screen.dart:14–17` comment (D1).

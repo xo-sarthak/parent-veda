@@ -5275,3 +5275,73 @@ a `>=`. A string like "1.0.0+2" answers a different question and compares badly 
 
 Pinned by `test/push_b2_contract_test.dart`: every builder's keys against the real function signature in 0140, the
 check words, no direct grants, newest-wins, the outbox, and the wiring.
+
+## 16zzz-b. One visibility rule, every door; a policy's subquery is filtered too; a delete must not widen access; refuse before money; a trigger is the rule nobody has to remember (Partner Editions P4, 0142, 2026-10-30)
+
+P4 lets ParentVeda write a session or an offer only one employer's people (or one IVF centre's families) can see,
+gives the organisation a read-only Content tab with booked counts, and makes "contract ended" actually end the
+benefit. Each piece taught something that travels.
+
+**1. A visibility rule has more doors than the screen you are thinking of.** The obvious place to filter "only
+Acme's people" is the view the app reads, `programmes_published`. But `programmes` itself has a public read policy
+(the website and anyone with the public key can select from it), the three functions that write a receipt look the
+programme up as definer and never see the view, and the coupon validator does the same. Filtering only the view
+would have hidden the session from the honest app and from nobody else. So **list every door that reaches the
+row** (view, table policy, definer functions that read it) **and put the rule in each**.
+
+**2. Four doors, one rule.** Four copies of "who is in the audience" is four chances to fix one. There is one
+function, `_audience_ok(uid, sponsor, partner)`, and every door calls it. The catch is 0126's lesson: **a view and an
+RLS policy run functions with the *viewer's* execute rights.** `_audience_ok` takes a user id, so granting it would
+let anyone ask "is user X a member of sponsor Y?", which is the membership table by another name. So the view and
+the policy call a thin public wrapper, `in_programme_audience(sponsor, partner)`, that only ever passes
+`auth.uid()`. It tells you whether *you* are in an audience, which you already know. **When a helper must be public,
+make it unable to ask about anyone but the caller.**
+
+**3. A policy's subquery is itself filtered by RLS.** `programme_sessions` and `programme_runs` are readable when
+`exists (select 1 from programmes where status = 'published')`. That inner select runs as the same caller, through
+`programmes`' policy, so once the parent's policy filters the audience, the children's rows disappear for a
+non-member with no change to their policies. Useful, and also a trap the other way round: a child policy can go
+silently empty because of a parent policy you didn't touch. The verify script proves it (`set local role
+authenticated`, then count sessions) instead of trusting it. **The SQL editor's own role bypasses RLS, so a check
+run without switching role proves nothing.**
+
+**4. A delete must not widen access.** The audience columns are foreign keys to `sponsors` and `care_partners`.
+`on delete set null` looks tidy, and it would quietly turn a company's private session into a public one the moment
+the company row is deleted. They are `on delete restrict`: the delete is refused until someone clears the column on
+purpose. **Before you pick an `on delete` action, ask what the row *means* when the reference becomes null.** Here
+null means "everyone", so null must never happen by accident.
+
+**5. Refuse before money moves, never after.** A non-member who knows an exclusive programme's id could still try
+to buy it. The check goes in `open_payment_order` (before Razorpay is asked for anything), `claim_free_offering` and
+`record_stub_purchase`. It does **not** go in `_write_purchase`, the shared receipt writer: by the time a paid receipt
+is written the money has been taken, and refusing then means keeping someone's money and giving them nothing. Every
+refusal reads `unknown_offering`, the same as an id that doesn't exist, because "not for you" confirms the session
+exists (0054's discovery-oracle rule, applied to programmes).
+
+**6. Small-cell suppression includes zero.** Booked and redeemed counts are null below `min_cohort`. If 0 were shown
+and 1–4 were not, a blank would mean "someone did", and in a team of twelve, "someone booked the fertility session"
+is close to a name. **Suppress the whole small range, zero included, or the gap leaks the thing you hid.** The plan's
+"viewed" count was dropped: `usage_events` records which room, never what was in it, so no table knows who opened
+which programme, and adding one is a privacy decision, not a column (STILL-OPEN §11.9).
+
+**7. A trigger is the rule nobody has to remember.** R2 says an ended contract withdraws members' sponsored plans.
+That could be a function ops calls after changing the status. But the status is changed in the SQL editor today and
+in Directus later, and a rule that holds only if every editor remembers to call something is not a rule. An `after
+update of status` trigger with `when (new.status = 'ended' and old.status is distinct from 'ended')` runs whoever
+makes the change, exactly once per transition. Three details:
+- it is `security definer`, because the person updating (Directus's role, say) may not be allowed to call
+  `revoke_plan_by_source` directly; the trigger is, and only for this one purpose;
+- it finds people by **what was granted** (`user_entitlements` and unspent `consult_credits` with `source =
+  'sponsor'`), not by `sponsor_members`: the grant is the thing to withdraw, so read the grants themselves and you
+  cannot miss one;
+- `suspended` deliberately does nothing. A suspension is usually a late invoice; it hides the admin's view and blocks
+  new activations, but employees keep what they have. **The `when` clause is where the business rule is written, so
+  test what it does *not* match as carefully as what it does.**
+
+It does not run in reverse: setting an ended sponsor back to active re-grants nothing, because a renewal is a new
+decision (seats, plan). STILL-OPEN §11.4 says how ops re-grants.
+
+Pinned by `test/partner_content_test.dart` (the one rule and its doors on the latest definitions, the view and policy
+through the public wrapper, `restrict`, the trigger's `when`, the Content tab's held-back dash) and
+`supabase/seed/verify_exclusive_content.sql` (RLS as anon, a non-member, a member and a family; both purchase doors;
+the coupon; the Content RPC; suspended vs ended).

@@ -5,7 +5,8 @@
 //  tab; P2 gave an employer or a school its Overview and People
 //  (partner_sponsor_overview.dart, partner_sponsor_people.dart); P3 gave an
 //  IVF centre its Overview and Doctors (partner_care_overview.dart,
-//  partner_care_doctors.dart). What is left
+//  partner_care_doctors.dart); P4 gave every organisation its Content
+//  (partner_exclusive_content.dart). What is left
 //  opens on its empty state, which is the
 //  house rule rather than a placeholder: a feature is never hidden, and the
 //  empty state is the feature's advertisement. Each one is replaced in place
@@ -29,6 +30,7 @@ import '../../services/remote/supabase_repo.dart';
 import '../doctor/doctor_chrome.dart';
 import 'partner_care_doctors.dart';
 import 'partner_care_overview.dart';
+import 'partner_exclusive_content.dart';
 import 'partner_sponsor_overview.dart';
 import 'partner_sponsor_people.dart';
 import 'partner_words.dart';
@@ -168,23 +170,28 @@ class PartnerContentTab extends StatelessWidget {
   const PartnerContentTab({super.key, required this.org});
   final PartnerOrg org;
 
+  // P4: the organisation's exclusive sessions and offers
+  // (partner_exclusive_content, 0142). Its empty state is the one that
+  // stood here, and it shows until something is written for them.
   @override
-  Widget build(BuildContext context) => DcTab(
-    title: 'Content',
-    // A care_org's members are the families its doctors brought, not
-    // the doctors themselves.
-    subtitle:
-        'Sessions and offers only your '
-        '${org.kind == PartnerOrgKind.careOrg ? 'families' : org.peopleWord} see',
-    children: const [
-      DcEmpty(
-        'No exclusive sessions yet',
-        'Your ParentVeda manager can set one up.',
-        icon: Icons.event_available_outlined,
-      ),
-      _barRoom,
-    ],
-  );
+  Widget build(BuildContext context) => PartnerExclusiveContent(org: org);
+  // Kept for revert (P1, before P4):
+  // Widget build(BuildContext context) => DcTab(
+  //   title: 'Content',
+  //   // A care_org's members are the families its doctors brought, not
+  //   // the doctors themselves.
+  //   subtitle:
+  //       'Sessions and offers only your '
+  //       '${org.kind == PartnerOrgKind.careOrg ? 'families' : org.peopleWord} see',
+  //   children: const [
+  //     DcEmpty(
+  //       'No exclusive sessions yet',
+  //       'Your ParentVeda manager can set one up.',
+  //       icon: Icons.event_available_outlined,
+  //     ),
+  //     _barRoom,
+  //   ],
+  // );
 }
 
 class PartnerAccountTab extends StatefulWidget {

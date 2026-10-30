@@ -22,6 +22,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../care_partner/partner_dashboard_store.dart';
 import '../services/sponsor_admin_store.dart';
 import 'care_org_store.dart';
+import 'partner_content_store.dart';
 import 'partner_org_session.dart';
 
 Future<void> forgetPartnerOrgOnThisPhone() async {
@@ -36,6 +37,8 @@ Future<void> forgetPartnerOrgOnThisPhone() async {
   SponsorAdminStore.instance.clear();
   // IVF centre: its dashboard and per-doctor table (P3, 0139).
   CareOrgStore.instance.clear();
+  // Every organisation: its exclusive sessions and offers (P4, 0142).
+  PartnerContentStore.instance.clear();
   // ParentVeda+'s store. P1 cleared it here expecting P3 to use it; P3 does
   // not (it resolves through my_care_partner, which can pick a different
   // partner, see care_org_store.dart). Cleared anyway: the parent build's

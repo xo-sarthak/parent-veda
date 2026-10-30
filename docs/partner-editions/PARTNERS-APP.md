@@ -178,6 +178,48 @@ ignores the new keys and shows 0 where the server sent null, until it updates.
 3. R2 trigger: sponsor `status → ended` calls `revoke_plan_by_source('sponsor', id)`; `suspended`
    doesn't. Test both. Update STILL-OPEN §11.4.
 
+### P4 as built (2026-10-30)
+
+**Changed from the plan, said plainly.**
+- **"Viewed" counts dropped.** `usage_events` (0065) records which room, never what was in it, so no table knows who
+  opened which programme. Adding that is a privacy decision, not a column; parked in STILL-OPEN §11.9. The tab shows
+  **booked** (sessions) and **used** (offers) only.
+- **The coupon half** is the audience columns plus `expert_id` (§13.0 item 1) and the validator's check. The per-sale
+  coupon share (§13.0 item 2) is not built, and nothing in the app redeems a coupon yet, so "used" stays 0 (shown as
+  "—") until it is.
+- **Contract end also voids unspent sponsored consultation credits**, not only the plan, as `remove_sponsor_member`
+  already does for one leaver. Otherwise an ended contract kept paying for consultations. Booked ones stand.
+- **Three purchase doors guarded** (the plan named only the view and the policy): without them a non-member who
+  knows the id could still buy the session.
+
+| # | What shipped | Where |
+|---|---|---|
+| 1 | `programmes.audience_sponsor_id` / `audience_partner_id` and the same on `programme_coupons` (+ `expert_id`). Null = everyone. Never both (check). FKs `on delete restrict`: deleting a sponsor must not turn its session public | `supabase/migrations/0142_exclusive_content_and_contract_end.sql` |
+| 2 | ONE rule, `_audience_ok(uid, sponsor, partner)`: sponsor = an active membership of an active **or suspended** sponsor (R2: a suspension keeps benefits); centre = an attribution to an active or paused partner, not rejected or deleted. Closed to the API. The view and the policy call `in_programme_audience(...)`, which passes only `auth.uid()` | `0142` |
+| 3 | The doors: `programmes_published` (0126 verbatim + the two columns last + the filter), the `programmes public read` policy (sessions and runs follow through their subqueries), `open_payment_order` / `claim_free_offering` / `record_stub_purchase` (refused as `unknown_offering`, before money moves), `preview_programme_coupon` (the same vague "not applicable") | `0142` |
+| 4 | `partner_exclusive_content()`: zero arguments, resolves through `my_partner_org()`, live only (`not_live` otherwise), the org's scheduled / published / completed sessions with first/last dates and **booked** (distinct active receipts, live receipts only in live mode), and its offers with the code, discount, end and **redeemed**. Both counts null below the shared `min_cohort`, zero included. No member id leaves it | `0142` |
+| 5 | R2 trigger `sponsors_contract_end`: `after update of status`, `when new.status = 'ended'` (from anything else). Withdraws every plan and unspent credit granted with `source = 'sponsor'` for that sponsor, via `revoke_plan_by_source` and `void_consult_credits`. `suspended` does nothing. Not reversed by a renewal (STILL-OPEN §11.4) | `0142` |
+| 6 | `PartnerContentStore`: singleton, not cached to disk, `ask` seam. A failed load keeps what was shown and says so | `lib/partner_app/partner_content_store.dart` |
+| 7 | Content tab for every organisation: Sessions (title, kind, Coming soon / Starts / Running now / Finished, booked) and Offers ("50% off · CODE", which session or "Any session", until when or "Not live", used). "—" plus "Booked and used counts show once N have taken part…" with the server's N. Read-only: "To add a session or an offer for your {people}, contact your ParentVeda manager." P1's empty state stays when nothing is written | `lib/screens/partner_app/partner_exclusive_content.dart`, `partner_tabs.dart` (P1 body commented out, kept for revert), `partner_words.dart` |
+| 8 | Sign-out clears `PartnerContentStore` | `lib/partner_app/partner_sign_out.dart` |
+| 9 | Verify pass: borrows 4 users (HR admin, member, centre family, nobody); walks two audiences refused, restrict, RLS as anon / non-member / member / family (view, table, sessions), both purchase doors, the coupon, the Content RPC (held back at 5, shown at 1, no member id), suspended keeps / ended withdraws and hides | `supabase/seed/verify_exclusive_content.sql` |
+
+Tests: `partner_content_test` (21: the model, the store, the tab with counts / held back with a threshold of 7 /
+empty / error, read-only, the 0142 contract on the **latest** definitions, wiring, the verify script's steps).
+`learning_money_contract_test`, `learning_app_contract_test`, `pp_relevance_step3b_test` and the P1-P3 partner tests
+stay green against the new view and doors. **Run 0142, then `verify_exclusive_content.sql` (**RUN 2026-10-30: PASSED 20 FAILED 0**),
+before the walk.**
+
+**To see it on a phone.** Nothing is exclusive yet, so the tab opens on its empty state. To fill it for the demo
+admin (Northwind): `update public.programmes set audience_sponsor_id = 'demo_northwind' where id = '<a published
+programme>';` and, for an offer, `insert into public.programme_coupons (code, kind, value, audience_sponsor_id)
+values ('NORTHWIND20', 'percent', 20, 'demo_northwind');`. Counts show "—" until 5 have booked.
+
+**Owed by A2 (parent app), found here.** `ProgrammeStore` caches the view's rows to disk under one key, and the view
+now answers differently per account. On a shared phone, the next account would see the last one's exclusive session
+from cache until the store next refreshes. A2 must refresh `ProgrammeStore` on a change of signed-in user (and clear
+its cache on sign-out) before it shows an "Exclusively for you" rail.
+
 ## Verification (every P-phase)
 Demo sponsor seed (`supabase/seed/sponsor_demo.sql`, `@parentveda-demo.com`, `DEMO-ACTIVATE-2026`)
 plus a `sponsor_admins` row → sign in on the partner flavour → numbers match the portal for the same
