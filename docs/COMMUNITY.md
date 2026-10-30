@@ -201,6 +201,9 @@ Cost: Supabase plan as is; photos in Storage at launch volume ≈ $0 (₹0).
 
 ## RESUME HERE (for a fresh session)
 
+- **Phase 3 is PLANNED (2026-10-30), nothing built.** Read "Phase 3: plan and decisions" at the end of this file.
+  Next: **P0, the prototype** (one Artifact, signed off by the user before any Flutter), then C3-1 (live thread, needs
+  nothing else). C3-2 (alerts) waits for 6B's B4 sender, which the notifications terminal builds.
 - **Phase 2 is BUILT (2026-10-30).** L4a committed `5e1ab087`, 0137 run; **L4b built in the next chat** (birth clubs,
   Following, search, #tags, edit, prompts from Moderation, Over-35): see "App (L4b)" below. **Left: the phone walk**
   (two accounts + an expert login on the doctor flavour), and Ask Veda is untouched (no ingest needed). Phase 3 (push,
@@ -372,3 +375,88 @@ moderator analytics.
 
 **Phase 4 — live sessions:** room `kind='session'` attached to
 `GroupCallScreen`, so in-call questions continue as a thread afterwards.
+
+---
+
+## Phase 3: plan and decisions (2026-10-30)
+
+Planned in one chat, plan only. The user accepted every recommendation ("you can go with all of your
+recommendations"). Mobbin pass: MOBBIN-DISCOVERY §40. **Nothing is built.**
+
+### Out of scope for phase 3, said plainly
+
+- **A Directus view over community rows (old item 5): moved out.** The admin panel is not ready, and Directus reads
+  tables as a privileged role, so it would see `user_id` (anonymity) and act outside the definer functions that write
+  audit rows. A later pass needs a view with no user id, read only.
+- **Crisis routing to experts (W20, second half):** still held. Crisis alerts go to moderators only.
+- **Push in the doctor app**, the expert queue included (6B decision 6).
+- **6B's campaigns, the audience upload, B5, iPhone (B7):** the notifications track's.
+- **Pushes for likes, follows, or new posts in a room; email digests.**
+- **Typing indicators, presence, video replies, clips over 60 seconds, live streaming** (phase 4).
+- **Screening that approves or rejects on its own.**
+- WhatsApp, Hindi.
+
+### What the code decided before anyone asked
+
+- **6B's B2 and B3 are built** (0140, 0143). `push_consent` is per stage and `push_sends` is campaign-only; both stay
+  as they are. Community adds its OWN consent table and queue beside them.
+- **The sender is shared.** 6B's B4 reads only `pv_push_due()` and writes only `pv_push_mark()`, every minute
+  (written into NOTIFICATIONS-6B-PLAN.md, "For B4, agreed with Community phase 3"). Community adds a branch to those
+  two functions and never edits the sender.
+- **Supabase's ready-made "send me database changes" Realtime cannot be used.** The app has no rights on community
+  tables, and that path sends the whole row, `user_id` included (§16zzd). Live threads use a private **broadcast**
+  carrying only `{post_id}`; the phone then re-reads through `community_comments_list`.
+- **"Replied to you" is not stored anywhere.** `community_activity` (0121:609) derives it at read time. The push queue
+  must use the same rule, so both read one helper, and a test checks they agree.
+- **Mux is already set up** (L3: `recording-playback`, `mux-webhook`). Video posts reuse it, so the Mux key stays in
+  one function.
+- **The device's `link_version` (0140)** already answers "can this build open a community link?". The new link kinds
+  raise `PushService.linkVersion` to 2.
+
+### Decisions
+
+| # | Question | Recommended | User (2026-10-30) |
+|---|---|---|---|
+| C1 | Wait for 6B, or build alongside? | Alongside: own consent + queue, the shared B4 sender | Recommended |
+| C2 | Lock-screen wording | No content: "New reply in ParentVeda Community · Someone replied to your post." No room, title, text or name (phones are shared; room names say "loss", "IVF") | Recommended |
+| C3 | Moved-session alert | On once she books, a switch to turn it off | Recommended |
+| C4 | Reply limits | 3 a day; replies to one post combine (`collapse_key` = post); quiet 21:00 to 08:00 IST, then one at 08:00; beyond the 3, Activity only | Recommended |
+| C5 | The care cap | Community alerts sit outside 6a's cap: she started these conversations. Their own limits instead (C4) | Recommended |
+| C6 | Loss | Replies continue (she posted and wants to hear back; C2 makes them neutral). No room-wide pushes ever. A pregnancy-stage class after a loss (0112 condition) gets no moved-session push; the pinned notice still shows | Recommended |
+| C7 | Moderators | A crisis post alerts moderators (topic `moderation`), within W20's "moderators only" | Recommended |
+| C8 | Consent ask | In context, after her first post goes live (LinkedIn's pattern), never at launch | Recommended |
+| C9 | Realtime shape | Private broadcast, topic `post:<id>`, authorised through `community_can_see`, payload `{post_id}` only | Recommended |
+| C10 | Screening | Google Vision SafeSearch **sorts the queue, never decides**: breastfeeding and birth photos read as risky | Recommended |
+| C11 | Video | 60 s, one per post, basic quality, pending until a moderator watches it; straight from the phone to Mux (an upload link only for her own post), never through our bucket | Recommended |
+| C12 | Video on anonymous posts | Allowed, with a one-time "Faces and voices can show who you are" | Recommended |
+| C13 | Where push triggers hang | Triggers on `community_comments` / `community_posts`, never a rewrite of `community_comment` or `_community_timetable_notice` (§16zzi: a rewrite can drop 0137's lines) | Recommended |
+| C14 | Migration numbers | None fixed here. Each pass runs `ls supabase/migrations` and takes the next free number | Recommended |
+
+### Passes (each one migration plus the app; each needs only the ones before)
+
+| Pass | Server | App | Done when | Prototype |
+|---|---|---|---|---|
+| **P0** | — | One Artifact: opt-in sheet, notification settings, the new-replies pill, video compose / processing / player, the analytics tab | User signs it off | — |
+| **C3-1 Live thread** | Policy on `realtime.messages`; a trigger broadcasting `{post_id}` when a reply arrives or changes status | Subscribe on open, leave on close; "N new replies" pill (the list never moves under her finger); pull still works if Realtime fails | A second phone's reply shows the pill; no user id in the broadcast (contract test) | Yes |
+| **C3-2 Alerts** (after 6B's B4) | Community consent table (`replies`, `bookings`, `moderation`); queue; triggers for replies (shared recipient helper, C4 limits, per-post mute), moved sessions (team posts with `moved_from`, to seat holders, C6) and crisis to moderators; a branch in `pv_push_due` / `pv_push_mark` | Opt-in sheet, settings, "Turn off replies for this post", link kinds `community_post` and `booking` (linkVersion 2), Android channels "Replies" and "Your bookings", rows in `notifications_b0_tap_test` | One reply rings once, three combine, a muted post is silent, a moved session rings everyone booked | Yes |
+| **C3-3 Image screening** | Likelihood columns on media; `add_media` calls `community-screen` (Vision) through `pg_net` | A risk chip in Moderation's photo queue, riskiest first | A test image is scored and sorted; nothing approved by itself | No |
+| **C3-4 Video posts** | Media `kind='video'`, Mux ids, `processing`; `community-video-upload` (new); community branches in `mux-webhook` and `recording-playback`; three thumbnails screened by C3-3 | Picker (60 s), upload progress, processing state, player, video review in Moderation | She posts a clip, B sees nothing, a moderator approves, B plays it through a signed link | Yes |
+| **C3-5 Moderator analytics** | `community_mod_stats(p_days)`, moderators only, counts only, from `community_mod_actions` | "This week" tab in Moderation: open per queue, oldest crisis waiting, median time to first action, share inside the 24-hour takedown | Numbers match a hand count | Yes |
+
+Tests scoped to `community_*`, `push_*`, `notifications_b0_tap_test`.
+
+### Costs (Mux and Supabase checked 2026-10-30; Vision from phase 1's figure; ₹84 = $1)
+
+| Item | USD | INR | At launch |
+|---|---|---|---|
+| FCM | $0 | ₹0 | $0 |
+| Sender every minute | inside the Supabase plan | ₹0 | $0 |
+| Realtime | Pro: 500 connected at once + 5M messages a month included; then $10 per 1,000 connections, $2.50 per 1M messages | ₹840 / ₹210 | $0 |
+| Mux upload (basic) | free | ₹0 | $0 |
+| Mux storage | $0.0024 per minute per month | ₹0.20 | 500 one-minute clips a month, kept a year: ≈ $14 a month after 12 months (₹1,210) |
+| Mux viewing | 100,000 minutes a month free, then $0.0008 a minute | ₹0.07 | $0 |
+| Vision SafeSearch | 1,000 a month free, then $1.50 per 1,000 | ₹126 | ≈ $5 a month (₹440) |
+
+**Owed by the user before C3-4:** Mux's free plan stores only 10 videos; video needs pay-as-you-go ($20 of usage
+included a month, ≈ ₹1,680). Check which plan the L3 account is on. Before C3-3: a Google Cloud key with the Vision
+API on, and a privacy-policy line that photos are screened by Google (DPDP).

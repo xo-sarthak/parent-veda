@@ -1495,3 +1495,29 @@ bookings in all four stages, rows stage-tagged), so this pass only looked for th
   the receipt the refund screen already draws.
 - Declined: filter chips (Walmart, GoPay), since one family's history is a few rows a year; promotional banners
   inside the history (GoPay); card brand logos, since Razorpay methods vary and the payment id is enough.
+
+## 40. Community phase 3: push opt-in, notification settings, live thread, video post, moderator analytics (2026-10-30)
+
+Plan: docs/COMMUNITY.md "Phase 3: plan and decisions".
+
+- **Push opt-in.** LinkedIn asks in context ("Would you like to know when yash responds?",
+  https://mobbin.com/screens/793445c7-16ab-4b84-8deb-09c6a9a8eb88); Claude, Bumble, Lloyds ask full screen.
+  Adopted: LinkedIn's moment (after her first post goes live), one line on what it unlocks, "Not now" as weighty as
+  yes. Declined: asking at launch.
+- **Notification settings.** Suno (https://mobbin.com/screens/4551d3c7-8330-4fe5-90b5-05a9a4a2bdc5) and Insight
+  Timer ("Only for events you are attending", https://mobbin.com/screens/884442d3-618e-448c-9fda-19c4c925e952):
+  short switch lists with a line each; LinkedIn's switch for one post type
+  (https://mobbin.com/screens/96285f4d-abae-4ff0-bdda-8e162598d2a2). Adopted: a short list plus "Turn off replies
+  for this post". Declined: Reddit's per-community menus (we send no room pushes).
+- **Live thread.** YouTube comments, Meetup, NYT, LinkedIn: none shows a new-replies pill. **Library gap.** Taken from
+  chat apps: a "N new replies" pill; the list never moves under her finger.
+- **Video post.** Facebook composer (clip tile, length, remove,
+  https://mobbin.com/screens/365ad1eb-b77b-4330-ad23-946090f0260b), Facebook "Sit tight while we process your video"
+  (https://mobbin.com/screens/69232f22-d198-423a-b753-aeb141b82744), Instagram posting bar
+  (https://mobbin.com/screens/d6c0bdb7-e6bd-48d5-ad84-85691e43a2e5). Adopted: tile, progress strip, then our
+  existing "waiting for a quick review".
+- **Moderator analytics.** Klaviyo helpdesk (resolved, average response, average resolution,
+  https://mobbin.com/screens/44b25083-c1d3-4b7c-8475-9458ac688882), Gumloop insights. Adopted: count tiles first, one
+  bar chart, 7 or 30 days. **Library gap:** only web dashboards, no mobile moderation stats.
+- Queries that worked: "community app asking permission to send notifications for replies", "post with video still
+  processing or uploading state in feed". Thin: "new comments pill", moderation dashboards on iOS.
