@@ -4894,3 +4894,62 @@ re-minted (her old code keeps working through the grace window, for the clinic t
 campaign code is not re-minted as a campaign. Each of those would be a new decision made silently by a maintenance
 act. The verification pass (`supabase/seed/verify_rotation.sql`) has one fixture per case and rolls itself back by
 ending in a raise.
+
+## 16zzt. A cache is not a record, one writer for a couple's blob, and an upsert meets two policies (TTC T4, 0127, 2026-10-29)
+
+Three bugs in the TTC treatment tools, each the local case of a general fact. Sync log step 29 has the detail.
+
+**1. A cache is not a record.** A result's photos were kept in the phone's JSON (shared_preferences) and never in the
+cloud row. The files themselves were safe in Storage, but the *list of which files belong to which result* lived only
+on the phone, and sign-out clears the phone. So the scans were still there, and nothing pointed at them. **The test
+for "is this data safe" is not "is the expensive part stored" but "can the thing be rebuilt from the server alone".**
+The trade-off: one nullable `files jsonb` column costs a migration and a little on every row; leaving the list on the
+phone cost a sign-out that acts as a delete. Null is kept meaning "a row from before the column", so an old row keeps
+the phone's list instead of being emptied: **a new column needs a value that means "never written", distinct from
+"written as empty"**, or the first pull after the migration wipes what it was meant to save.
+
+**2. A blob two people can write needs one writer.** Her treatment round is one row per person, and the store took
+`rows.first` from a fetch that returns both partners' rows in no promised order (no `order by` that prefers either,
+so the database is free to return either, the same coin toss as 16zzq). Worse, every phone pushed its copy stamped
+`updated_at: now` on launch, so "newest wins" chose whoever opened the app last, not whoever changed something. Her
+reinstall could pull his stale copy and then push it over her own row. The fix is a rule about *who writes*, not a
+cleverer merge: her phone writes her row; his phone reads her row and never pushes (`ttcPickTreatmentRow`).
+**Last-writer-wins is only safe when a write means someone changed something.** A push on launch is not a change; it
+is a clock, and it makes the newest row the least informed one.
+
+**3. "He reads, she writes" is a policy per command, and an upsert asks two of them.** 0042's single `for all` policy
+("mine or my partner's") let his phone change or soft-remove her results; a soft remove is an UPDATE of `removed_at`,
+so "read-only" needed the UPDATE policy narrowed, not just DELETE. 0127 splits it: select couple-wide, insert, update
+and delete own-row. An upsert is `INSERT ... ON CONFLICT DO UPDATE`: Postgres checks the insert's `with check` on the
+proposed row, and on a conflict the update's `using` on the existing row, so both paths must say own-row or one of
+them is a way round the other. And because RLS refuses quietly (an update that matches no permitted row affects 0
+rows, with no error), the client drops a dirty row owned by the other account from its queue instead of retrying it
+for ever. **When the server is the rule, the client should still know the rule, or it retries a refusal as if it were
+a network blip.**
+
+## 16zzu. Consent the database enforces: a switch in a table, permissive policies OR, and the query still pins the user (TTC T5, 0131, 2026-10-29)
+
+The decision (the user, Q1): partners can see each other's habit logs, each by their own choice, and body data
+(symptoms, mood, weight, the PCOS check) stays private. Sync log step 30 has the detail.
+
+**1. The switch lives in the database, not only in the app.** A preference held only on the phone is a rule any
+other client can skip: an old build, a bug, or someone calling the API directly. So `ttc_log_shares` holds one row per
+person and tracker, and the read policy on `ttc_logs` asks it through `ttc_log_is_shared(owner, tracker)`. A check
+constraint allows only the two habit trackers, so a client bug cannot share symptoms by writing `tracker =
+'symptoms'`. **Consent is data. If it gates access, it belongs where the access is decided.** No row means private: the
+default is the safe answer, and saying yes is the act.
+
+**2. Permissive policies OR together, so a new read widens without touching the old write.** The 0041 own-row `for
+all` policy stays exactly as it was. 0131 adds a second SELECT policy: my partner's rows, for a shared tracker, while
+their switch is on. Postgres grants a row if any permissive policy for that command allows it, so this can only add
+reads; it grants no insert, update or delete, so the partner view is read-only by rule. Unpairing needs no code:
+`my_partner_id()` becomes null and `user_id = null` is never true. The function is `security definer` so the policy
+can read the owner's switch row without the reader holding a grant on it, which is the usual reason a policy calls a
+function rather than a subquery.
+
+**3. Widening RLS is safe only while the query still asks for its own rows.** RLS says what you *may* read, not what
+you *do* read. `TtcLogStore` pulls with `SupabaseRepo.fetch`, which pins `.eq('user_id', uid)`, so her store still gets
+only her rows; the partner view reads separately with `fetchByUser(his id)`. Had the store used the couple-wide
+`fetchShared`, his shared rows would have merged into hers and been pushed back under her id. **After widening a
+policy, check every query on that table: the policy changed the ceiling, and a query without its own filter rises to
+meet it.** The test pins the query call, not just the policy text, because that is where the leak would be.

@@ -1731,3 +1731,75 @@ item format changed. **Commit:** `ecb47348`.
 - He edits the dose of her folic acid: it stays on her side on both phones.
 - Log varicella dose one, sync, open on a second phone: "Dose 2 is due from". Log dose two: both phones show the
   wait from dose two. Sign out and in: both dates return.
+
+## Step 29: a result's scans travel, each partner writes only their own, and the round has one writer (T4, 0127)
+
+**Date:** 2026-10-29, written up 2026-10-30 (Pregnancy and TTC tools pass, T4, the user's word). **Migration:**
+`0127_ttc_records_files_and_own_writes.sql`, run by the user 2026-10-29. **Commit:** `dff5e77a`.
+
+### Why
+- **A cache is not a record.** A result's photos and PDFs lived in `toJson` (shared_preferences) only. A sign-out
+  runs `LocalWipe` (`prefs.clear()`), the next pull rebuilt each row with `attachments: const []`, and the scans
+  sat in the `media` bucket with nothing pointing at them. STILL-OPEN §9.7 had only "not on the next phone".
+- **Her round, two writers.** `TtcTreatmentStore.pullFromCloud` decoded only when the phone was empty and took
+  `rows.first` from a couple-wide fetch, which returns both partners' rows in no preferred order. Every launch
+  pushed this phone's copy stamped `updated_at: now`, so his copy was usually the newest. If she reinstalled she
+  pulled his stale copy, and her next push wrote it over her own row, history included.
+- **He could change her results.** 0042 gave `ttc_records` one `for all` policy, "mine or my partner's". The user
+  (Q2): "he changes his own results and only reads her results".
+
+### What changed
+- [x] **0127:** `ttc_records.files jsonb`, nullable (null = a row from before the column; the app keeps its local
+  list). One policy per command: select couple-wide, insert, update and delete own-row only.
+- [x] **Records:** `_cloudColumns` always sends `files` (an empty list too, so removing the last photo travels);
+  `applyCloudRows` reads it through `ttcFilesFromCloud`. A dirty row owned by the other account is dropped from the
+  push queue instead of retried for ever, because 0127 refuses it. The UI follows the same owner rule
+  (`TtcRecordsStore.isMine`).
+- [x] **Treatment round:** `ttcPickTreatmentRow` picks the row: her phone takes her own; his phone (partner mode)
+  takes the row that is not his, decoded fresh on every pull. His phone never pushes. A row he wrote before this
+  stays in the cloud and is ignored.
+- [x] **Alarms:** a stopped medicine schedules nothing (`NotificationService.medicationOccurrences` returns empty
+  when `!isActive`), in both stages; his phone cancels any trigger alarm it held.
+- [x] **Found in the suite run (2026-10-30):** saving a result raised "Discard this result?" over the saved record
+  (Save used `maybePop` while the page's `PopScope` still held the unsaved state), and Discard deleted the photos
+  the record had just kept from storage. Save now pops; `test/ttc_records_rebuild_test.dart` holds it.
+- [x] Pattern written up: BACKEND-PATTERNS §16zzt.
+- [x] Tests: `test/ttc_t4_treatment_records_test.dart` (B1, B3, Q2's SQL and push); `test/ttc_schema_contract_test.dart`
+  pins `files` and reads 0127.
+
+### Verify
+- Attach a photo to a result, sign out and in: the photo is still on the result.
+- Two phones: his shows her round as "Her round", read-only; she changes a date and his phone shows it on the next
+  pull. She reinstalls: she gets her own round back.
+- On his phone her results have no Edit or Remove; his own result he can change. In SQL as him, an update of her
+  row affects 0 rows.
+
+## Step 30: habits shared by each person's own choice, body data private (T5, 0131)
+
+**Date:** 2026-10-29, written up 2026-10-30 (Pregnancy and TTC tools pass, T5, the user's word). **Migration:**
+`0131_ttc_log_shares.sql`, run by the user 2026-10-29. **Commit:** `c8c117e5`.
+
+### Why
+- The user (Q1): a couple trying together can see each other's habits, "just to be having an accountability
+  check", while symptoms, mood, weight, BMI and the PCOS check stay private. Each person decides for their own log.
+  Before this, `ttc_logs` was own-row only, and the partner copy promised a view that did not exist.
+
+### What changed
+- [x] **0131:** `ttc_log_shares (user_id, tracker, shared, updated_at)`, one row per person and tracker, a check
+  constraint allowing only `habits` and `partner_health`. Own row read and write, the partner's row read only.
+  `ttc_log_is_shared(owner, tracker)` (security definer) maps the four ids folded into `habits` on 2026-09-28. A
+  second SELECT policy on `ttc_logs` adds a read of the partner's rows for a shared tracker while the switch is on.
+  No row means private.
+- [x] **App:** `TtcLogShareStore` (local-first, upsert on `user_id,tracker`, newer `updated_at` wins, the partner's
+  rows read with `fetchByUser` and never pushed). The ask card after the first save offers Share first; You
+  changes it. The partner view is read-only by rule as well as by UI.
+- [x] **Kept pinned:** `TtcLogStore` still pulls with `SupabaseRepo.fetch` (`.eq('user_id', uid)`), so the widened
+  read never merges his rows into hers. The test pins the call, not only the policy.
+- [x] Pattern written up: BACKEND-PATTERNS §16zzu.
+- [x] Tests: `test/ttc_t5_body_checks_test.dart` (the share store, the pinned query, the partner filter, the ask card
+  and the partner view); `test/ttc_schema_contract_test.dart` reads 0131.
+
+### Verify
+- Two phones, one couple: she shares her habits, his phone shows them read-only; she switches it off, his view says
+  she keeps them to herself. He shares Partner health; her phone shows it. Unpair: neither sees the other's.
+- At no point do her symptoms, mood, weight or PCOS answers appear on his phone.

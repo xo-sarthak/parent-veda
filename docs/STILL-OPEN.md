@@ -1779,6 +1779,8 @@ declared for.
 
 ## 9.7 TTC attachments do not sync
 
+**DONE 2026-10-29 (T4, `dff5e77a`, migration 0127 run the same day):** `ttc_records.files jsonb` carries the list, `_cloudColumns` sends it and `applyCloudRows` reads it (null = a row from before 0127, the phone's list kept). The gap was wider than written below: a sign-out on the SAME phone lost the list too. Sync log step 29, BACKEND-PATTERNS §16zzt. Kept below as written.
+
 `TtcRecord.attachments` is cached locally and is deliberately absent from the
 cloud row: `pushToCloud` names its columns explicitly and does not name this
 one. So a report attached on one phone is not on the next one.
@@ -11413,3 +11415,38 @@ Plan and as-built: `docs/MALE-FERTILITY-DOOR-PLAN.md`. The door `ttc_male_fertil
 - *No sourced price for a varicocele repair or a sperm retrieval.* The read asks for a written quote instead of
   inventing a range. A sourced India range would let it say more.
 - *Phone walk owed:* her home grid, his home grid, Learn, search, Fertile window's "More in Male fertility" tile.
+
+## 108.0 TTC tools T2 to T5 and C1: what the builds left open — 2026-10-30
+
+Plans and as-built: `docs/preg-ttc-tool-plans/` (T2 `635838fe`, T3 `ecb47348`, T4 `dff5e77a`, T5 `c8c117e5`, C1
+`046f0df7`). The one full suite ran 2026-10-30 (README row S1). Clinical sign-off for every number is on
+BEFORE-LAUNCH §4; the two-phone walks are on §1.
+
+- *Ask Veda learns nothing about her medicines or her body.* No medications field on the wire (T4), and no
+  `ttc_body` object (T5). If wanted, the T5 hand-over is `bmi_band` (`under|within|over|obese`, South Asian),
+  `pcos_check_done`, `pcos_signs` (domain ids, never a level) and `recent_symptoms` (ids from the last 7 days),
+  for framing only and each behind a consent kind (T1). A two-repo change; needs `parentveda-askveda`.
+- *Our own readings never move a clinical route, by rule.* A kept semen result (T4) and his BMI (T5) do not feed the
+  doctor check's `partnerConcern`; the check keeps asking her. `kPrecheckFromRecords` does not read Records (a filed
+  AMH is evidence, not a tick, like T3 W12). Recorded so nobody "fixes" it.
+- *Not built, recorded:* a follicle-size field on the round (T4; the read's promise was corrected instead); the
+  extra semen numbers, volume 1.4 ml, total 39 M, vitality 54%, pH 7.2 (T4; the tool keeps four lines); the natural
+  FET trigger-to-transfer order; a midnight rebuild of the round screen; new Medical tests (CBC, thalassaemia
+  carrier, blood group and Rh, mid-luteal progesterone) and reminders on Supplements and Vaccinations (T3); Zika
+  travel advice, an after-loss Can I question, ashwagandha by name (T3); a cycle-report share or PDF, which the
+  copy promises as "something you can show your doctor" (T5 S-K6, T2's tool); a ticked count on the question-lists
+  sheet (C1).
+- *Decided, nothing owed:* Calendar and Cycle Companion stay two tools and stay off the tool shell (T2 Q1, Q3); the
+  partner does not read her period dates (T2 Q2); the Ready plan's habits link to the habits tracker, not merged
+  (T3 Q2); body data stays private, only the two habit trackers can be shared (T5 Q1).
+- *"Should I test?" does not count 14 days from a logged LH day* (T2, Weak): the period-due date stays shared with
+  the home so the two screens agree.
+- *Hindi in Latin script left as it is:* the report strings (`ttc_strings.dart:131, 491, 510`) and the disclaimer
+  that drops the two-week-wait sentence (T5 S7, `ttc_strings.dart:491-493`). Only on the user's word.
+- *Two treatment route names* (`ttc/treatment`, `ttc_treatment`) are left; nothing reads either for a decision.
+- *Owed later, on the user's word:* the Railway redeploy of Ask Veda (`window_source`, askveda `5e87909`), the Ask
+  Veda re-ingest lines for T3 and T4, and one phone walk across the pass.
+- *Not this pass's, still failing in the suite (2026-10-30):* door photos and ids for the PCOS circle and the Loss
+  room (4 tests), "Others who have been here" in two loss reads (1), "What you're working on" twice on the Tools tab
+  (1). Listed for the door and Community terminals. DONE 2026-10-30 by the other terminals in `b957d0e9` and
+  `a63abb59`; the four files re-run green (111 pass), so the suite is fully green.
