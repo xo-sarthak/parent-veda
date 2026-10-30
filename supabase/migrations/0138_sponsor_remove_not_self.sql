@@ -74,7 +74,9 @@ grant execute on function public.sponsor_remove_member(text) to authenticated;
 
 
 -- =====================================================================
--- VERIFY (as the demo admin, in the app or with a JWT in the editor)
+-- VERIFY: run supabase/seed/verify_remove_self.sql. The lines below need
+-- a signed-in admin; pasted into the SQL editor (no user) they all answer
+-- not_a_sponsor_admin, which is correct and proves nothing.
 --
 --   -- Removing your own work email is refused and audited:
 --   select public.sponsor_remove_member('<your-work-email>');
