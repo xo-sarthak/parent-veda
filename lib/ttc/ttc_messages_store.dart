@@ -156,6 +156,8 @@ import 'ttc_period_due.dart';
 import 'ttc_store.dart';
 import 'ttc_treatment_store.dart';
 import '../services/notification_link.dart';
+import '../services/push_consent.dart';
+import '../services/push_wire.dart';
 
 /// The five messages. The NAME is persisted, so renaming one strands every
 /// message already delivered under it.
@@ -1363,6 +1365,9 @@ class TtcMessagesStore extends ChangeNotifier
   Future<void> answerOffers(bool yes) async {
     _offersAsked = true;
     _offersYes = yes;
+    // 6b B2: the server's copy too. A "no" is queued until it lands.
+    await PushConsent.instance.record(
+        stage: PushWire.stageTrying, granted: yes, source: PushWire.sourceCard);
     await _persist();
     notifyListeners();
     await refresh();
@@ -1647,6 +1652,9 @@ class TtcMessagesStore extends ChangeNotifier
     if (kind == TtcMessageKind.offer) {
       _offersYes = on;
       _offersAsked = true;
+      // 6b B2: the server's copy too. A "no" is queued until it lands.
+      await PushConsent.instance.record(
+          stage: PushWire.stageTrying, granted: on, source: PushWire.sourceSwitch);
     } else {
       on ? _off.remove(kind) : _off.add(kind);
     }

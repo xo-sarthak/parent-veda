@@ -154,6 +154,11 @@ void main() {
         'baby_voice_muted_journey', // sound
         'baby_voice_muted', // sound
         'preg_size_set', // display
+        // 6b B2 (2026-10-30): the install's push id, and the opt-out queue,
+        // whose every entry names its account and is sent only while that
+        // account is signed in. A wiped queue would lose a 'no'.
+        'push_device_id', // the install, not a person
+        'push_consent_outbox_v1', // her pending 'no', kept for her alone
       };
       expect(LocalWipe.keep, justified,
           reason: 'an allowlist that grows quietly is how data survives a '

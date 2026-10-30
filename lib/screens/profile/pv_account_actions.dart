@@ -38,6 +38,7 @@ import '../../services/app_shell.dart';
 import '../../services/auth/social_auth.dart';
 import '../../services/father_preview.dart';
 import '../../services/last_profile.dart' show LastProfile;
+import '../../services/push_service.dart' show PushService;
 import '../../services/notification_service.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/remote/sync_registry.dart';
@@ -212,6 +213,14 @@ Future<void> pvSignOut(BuildContext context) async {
     await SocialAuth.signOutGoogle();
   } catch (_) {
     /* best-effort: it already swallows its own plugin errors */
+  }
+  // 6b B2: this phone stops receiving offers, and a queued "no" goes out.
+  // ⚠️ BEFORE `auth.signOut()`: afterwards there is no session to prove
+  // whose device row it is. Time-limited inside, so it never holds this.
+  if (wasSignedIn) {
+    try {
+      await PushService.instance.signOut();
+    } catch (_) {/* best-effort */}
   }
   try {
     await Supabase.instance.client.auth.signOut();

@@ -80,6 +80,7 @@ import '../ttc/ttc_messages_store.dart';
 import 'life_stage_store.dart';
 import 'pp_messages_store.dart';
 import 'preg_messages_store.dart';
+import 'push_audience.dart';
 
 /// Pregnancy's kinds on the family scale. The order is [PregMessageKindInfo.slotRank]'s.
 double pregFamilyRank(PregMessageKind k) => switch (k) {
@@ -335,6 +336,10 @@ class FamilyPhone {
       final plan = familyPhonePlan(preg: pregList, pp: ppList, childIds: ids);
       if (preg.isLoaded) await preg.armPhone(plan.preg);
       if (pp.isLoaded) await pp.armPhone(plan.pp);
+      _tellServer(now, [
+        for (final (_, m) in plan.preg) m.at,
+        for (final (_, m) in plan.pp) m.at,
+      ]);
       return;
     }
     final ttc = TtcMessagesStore.instance;
@@ -342,15 +347,48 @@ class FamilyPhone {
         ? [for (final (_, m) in ttc.phonePlanned(now: now)) m.at]
         : const <DateTime>[];
     if (preg.isLoaded) await preg.armPhone(const []);
-    if (pp.isLoaded) {
-      await pp.armPhone(
-        parentingPhonePlan(
-          pp: ppList,
-          childIds: ids,
-          keepClearOf: ttcRings,
-          now: now,
-        ),
-      );
+    final ppPlan = parentingPhonePlan(
+      pp: ppList,
+      childIds: ids,
+      keepClearOf: ttcRings,
+      now: now,
+    );
+    // Kept for revert (6b B2, the plan is now named so the server hears it):
+    //   if (pp.isLoaded) {
+    //     await pp.armPhone(
+    //       parentingPhonePlan(
+    //         pp: ppList,
+    //         childIds: ids,
+    //         keepClearOf: ttcRings,
+    //         now: now,
+    //       ),
+    //     );
+    //   }
+    if (pp.isLoaded) await pp.armPhone(ppPlan);
+    _tellServer(now, [for (final (_, m) in ppPlan) m.at]);
+  }
+
+  /// 6b B2: tells the server which evenings now ring and whether TTC is
+  /// quiet after a loss (`push_audience.dart`). Every stage's rings, TTC's
+  /// included, since its own plan arms apart from this one.
+  ///
+  /// ⚠️ ONLY WHEN ALL THREE STORES HAVE LOADED. One still loading may have
+  /// alarms set on the phone from the last run that this run cannot see, and
+  /// an upload then would say an evening is free when it rings. Skipping is
+  /// safe: the store's own load triggers the next re-arm.
+  void _tellServer(DateTime now, List<DateTime> rings) {
+    final ttc = TtcMessagesStore.instance;
+    if (!PregMessagesStore.instance.isLoaded ||
+        !PpMessagesStore.instance.isLoaded ||
+        !ttc.isLoaded) {
+      return;
     }
+    try {
+      PushAudience.instance.upload(
+        rings: [...rings, for (final (_, m) in ttc.phonePlanned(now: now)) m.at],
+        quiet: pushTtcQuiet(),
+        now: now,
+      );
+    } catch (_) {/* never let the server copy break the phone's arming */}
   }
 }

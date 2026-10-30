@@ -107,6 +107,8 @@ import 'life_stage_store.dart';
 import 'notification_service.dart';
 import 'phone_emoji.dart';
 import 'pp_message_offers.dart';
+import 'push_consent.dart';
+import 'push_wire.dart';
 import 'preg_messages_store.dart' show pregWeekOn, pregWeekStart;
 import 'pregnancy_controller.dart';
 import 'programme_store.dart';
@@ -787,9 +789,14 @@ class PpMessagesStore extends ChangeNotifier
   bool get offersAsked => _offersAsked;
 
   /// Her answer to the offers card. Either answer stops the card.
-  Future<void> answerOffers(bool yes) async {
+  /// [source] says which control she used: the card, or the switch (6b B2).
+  Future<void> answerOffers(bool yes,
+      {String source = PushWire.sourceCard}) async {
     _offersAsked = true;
     _offersYes = yes;
+    // 6b B2: the server's copy too. A "no" is queued until it lands.
+    await PushConsent.instance.record(
+        stage: PushWire.stageParenting, granted: yes, source: source);
     if (!yes) {
       final now = DateTime.now();
       _all.removeWhere((m) => m.kind == PpMessageKind.offer && !m.deliveredBy(now));
@@ -996,7 +1003,10 @@ class PpMessagesStore extends ChangeNotifier
   Future<void> setOn(PpMessageKind kind, bool on) async {
     if (isOn(kind) == on) return;
     // The offers switch is her yes or no, kept apart (PP 11).
-    if (kind == PpMessageKind.offer) return answerOffers(on);
+    // Kept for revert (6b B2): return answerOffers(on);
+    if (kind == PpMessageKind.offer) {
+      return answerOffers(on, source: PushWire.sourceSwitch);
+    }
     if (on) {
       _off.remove(kind);
       _on.add(kind);

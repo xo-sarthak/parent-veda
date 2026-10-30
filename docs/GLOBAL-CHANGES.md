@@ -33,7 +33,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + B1–B7, B10 LIVE (04847a5), see `docs/STAGE-TRANSITIONS.md`; family switch F1/F3, celebration pages F4 and turning six LIVE (adae4d5); B9 and B11 LIVE; per-pregnancy records and Kept for you LIVE (R1, 656bbb3, 0114 run); F2 Add a pregnancy from the family LIVE (2290cce); F5 one learning space per child LIVE (5fa51e2); F6 open on the last profile used, and taps open their own profile, LIVE (0d72a21); R8, R5, R6, R3, trying again, R2, F8 and F7 (child calendar) LIVE 57c844b (F8 and R3 also in the Ask Veda service) | Phase 5 |
 | 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
-| 12 | Position-aware notifications | 6a LIVE for TTC, Pregnancy and Parenting (Parenting 2026-10-29, PARENTING-GAP 11, one cap with Pregnancy); 6b B0 (one tap opener) BUILT 2026-10-30; rest of 6b OWED | Phase 6 |
+| 12 | Position-aware notifications | 6a LIVE for TTC, Pregnancy and Parenting (Parenting 2026-10-29, PARENTING-GAP 11, one cap with Pregnancy); 6b B0 (one tap opener) BUILT 2026-10-30; B1 (Firebase) and B2 (devices, consent, audience; 0140 to run) BUILT 2026-10-30; B3 onward OWED | Phase 6 |
 | 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags LIVE (2d3a07f) | Phase 1 |
 | 14 | Nutrition door pitches | LIVE (7df4711); supplements WAITING on sheet | Phase 2 |
 | 15 | Action doors lead with an action | LIVE (aa1fe9e) | Phase 2 |
@@ -246,7 +246,7 @@ needed for those, they match by name / category.
 26 buttons and headings. Crisis lines and "someone you trust" prose
 unchanged, by decision.
 
-### 12 · Position-aware notifications — 6a LIVE in all three stages; 6b OWED (Phase 6)
+### 12 · Position-aware notifications — 6a LIVE in all three stages; 6b B0-B2 BUILT, B3 on OWED (Phase 6)
 
 **Asked:** notifications relevant to where she stands (phase / week / child
 age), milestone days (baby turns 2 months), offers and product pitches.
@@ -307,6 +307,14 @@ quote cost in USD and INR first).
   three Android apps registered (parent, doctor, partner). Plan "As built: B1";
   test `test/push_b1_test.dart`. Owed: the build check (with and without the
   file, all three flavours), on the user's word. Next: B2.
+- **BUILT 2026-10-30 (6b B2, what the server needs):** migration 0140
+  (`push_devices`, `push_consent`, `push_audience`, written only through four
+  functions). The phone registers its token on open and sign-in and removes it
+  at sign-out. Her offers yes or no goes to the server from all three stages,
+  and a "no" is retried until it lands. After each re-arm the phone uploads its
+  busy evenings and TTC's quiet-after-loss flag. Plan "As built: B2"; test
+  `test/push_b2_contract_test.dart`. Owed: run 0140, the phone walk, B1's
+  build check. Next: B3 (campaigns and the enqueue), on the user's word.
 
 ### 13 · Relevance inside doors
 

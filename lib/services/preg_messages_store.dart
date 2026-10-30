@@ -114,6 +114,8 @@ import 'life_stage_store.dart';
 import 'notification_service.dart';
 import 'pregnancy_controller.dart';
 import 'preg_message_offers.dart';
+import 'push_consent.dart';
+import 'push_wire.dart';
 import 'pregnancy_ended_store.dart';
 import 'programme_store.dart';
 import 'pv_catalog_store.dart';
@@ -675,6 +677,9 @@ class PregMessagesStore extends ChangeNotifier
   Future<void> answerOffers(bool yes) async {
     _offersAsked = true;
     _offersYes = yes;
+    // 6b B2: the server's copy too. A "no" is queued until it lands.
+    await PushConsent.instance.record(
+        stage: PushWire.stagePregnancy, granted: yes, source: PushWire.sourceCard);
     await _persist();
     notifyListeners();
     await refresh();
@@ -944,6 +949,9 @@ class PregMessagesStore extends ChangeNotifier
     if (kind == PregMessageKind.offer) {
       _offersYes = on;
       _offersAsked = true;
+      // 6b B2: the server's copy too. A "no" is queued until it lands.
+      await PushConsent.instance.record(
+          stage: PushWire.stagePregnancy, granted: on, source: PushWire.sourceSwitch);
     } else {
       on ? _off.remove(kind) : _off.add(kind);
     }

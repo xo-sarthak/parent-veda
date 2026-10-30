@@ -1803,3 +1803,33 @@ item format changed. **Commit:** `ecb47348`.
 - Two phones, one couple: she shares her habits, his phone shows them read-only; she switches it off, his view says
   she keeps them to herself. He shares Partner health; her phone shows it. Unpair: neither sees the other's.
 - At no point do her symptoms, mood, weight or PCOS answers appear on his phone.
+
+## Step 31: push devices, consent and audience (Notifications 6b B2, 0140)
+
+**Date:** 2026-10-30 (the user's word: "You have my go for B2"). **Migration:**
+`0140_push_devices_consent_audience.sql`, to be run by the user before installing. **Commit:** pending.
+
+### Why
+- 6b's server sends offers as visible pushes (`docs/NOTIFICATIONS-6B-PLAN.md`, decision 1). To keep 6a's promises it
+  needs a token to reach the phone, her yes or no per stage as a row it can filter, and the phone's busy evenings and
+  TTC quiet flag. B2 stores them. Nothing reads them until B3.
+
+### What changed
+- [x] **0140:** `push_devices (user_id, device_id, token unique, platform, link_version, created_at, last_seen_at)`,
+  `push_consent (user_id, stage, granted, decided_at, source, updated_at)`, and
+  `push_audience (user_id, busy_evenings date[], quiet, planned_at)`. RLS on all three, no direct grants; own select
+  on `push_consent` only. Writes through `pv_push_register`, `pv_push_unregister`, `pv_push_consent` (newest
+  `decided_at` wins) and `pv_push_audience` (keeps today to 14 days, IST), all `security definer`.
+- [x] **App:** `PushWire` (the one transport), `PushService` registers the token on app open, sign-in and rotation
+  (only when Firebase is up) and unregisters in `pvSignOut` before the session goes. `PushConsent` is called from all
+  three messages stores, with "no" queued until confirmed. `PushAudience` is called from `FamilyPhone` after each
+  re-arm. `LocalWipe.keep` holds the device id and the queue.
+- [x] Pattern written up: BACKEND-PATTERNS §16zzz-a.
+- [x] Tests: `test/push_b2_contract_test.dart`. `auth_delete_account_test` and `sync_reset_coverage_test` list the
+  new keys and files, with why.
+
+### Verify
+- After running 0140, in the SQL editor: `select * from push_devices;` shows a row after a B2 build signs in (needs
+  `google-services.json`). Switching offers off then on in Messages leaves `push_consent.granted = true` with the
+  later `decided_at`. Opening Messages fills `push_audience`. Signing out removes the `push_devices` row.
+- Offline: switch offers off, kill the app, come back online, open it: the "no" lands.

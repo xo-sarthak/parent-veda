@@ -77,6 +77,12 @@ void main() {
     'lib/services/usage_events.dart':
         'device: a queue of screen-level usage events, no content',
     'lib/ttc/ttc_cue_sounds.dart': 'device: practice cue sounds on or off',
+    // 6b B2 (2026-10-30).
+    'lib/services/push_service.dart':
+        'device: the install id and Firebase state; no person in memory',
+    'lib/services/push_consent.dart':
+        'device: an opt-out queue on disk, each entry keyed by account and '
+            'sent only while that account is in; memory holds only a timer',
     'lib/screens/v2/v2_block_art.dart':
         'device: door marks drawn as vectors or images',
     // Another terminal, or the main session, is editing these.

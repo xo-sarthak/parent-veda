@@ -5216,3 +5216,62 @@ react only when it changes.
 
 Pinned by `test/partner_care_org_test.dart` (the 0139 contract on the latest definition, the shared RPCs still at
 0068/0073, wiring), `test/doctor_app_shell_test.dart` group R5, and `supabase/seed/verify_care_org_dashboard.sql`.
+
+**Follow-up, 0141: changing what a function returns.** Applying the same rule to solo doctors meant `partner_impact`
+had to return two more columns (`suppressed`, `min_cohort`) so the screen could say "shown once 5 families join"
+with the server's number. Postgres identifies a function by its name and **argument** types, and `create or replace`
+may change the body but not the result type, so it refuses. The fix is `drop function if exists ... (text)` then
+`create function`. Two things to remember when you do that: a dropped function **takes its grants with it** (restate
+them), and a new function is executable by `PUBLIC` by default (so revoke from `public, anon` explicitly). Keeping
+the **argument list** identical is what keeps every caller working: `rpc('partner_impact', {p_partner_id})` resolves
+to the new function, and an older app build simply ignores the keys it doesn't know. Contrast `partner_funnel`, whose
+`activated` was always a nullable `bigint` on the wire: returning null there changes values, not types, so a plain
+`create or replace` was enough. **Adding output columns is a drop-and-recreate; changing values is not.**
+
+## 16zzz-a. Moving a decision moves its inputs; the cost of losing a write decides how hard you deliver it; pick the shape where missing means true (Notifications 6b B2, 0140, 2026-10-30)
+
+6b lets the server send offers as visible pushes, because a silent "wake up and decide" push is throttled on
+iPhone (`docs/NOTIFICATIONS-6B-PLAN.md`, decision 1). B2 built the three tables that decision needs. Four general
+facts came out of it.
+
+**1. Moving a decision to a server moves its inputs there too, and a copied input is a cache.** The phone already
+knew which evenings ring and whether she is quiet after a loss. Once the server decides, it needs a copy, and a copy
+can be stale. A cache needs either a rule for when it is too old, or a shape where "missing" means the safe answer.
+We chose the second (point 3). The phone only *reports* what it just armed (`FamilyPhone` → `pv_push_audience`).
+The server never recomputes a cycle or a week, so there is one source of truth and one copy, never two
+calculations.
+
+**2. The cost of losing a write decides how hard you try to deliver it.** House rule: cloud writes are
+fire-and-forget. A lost "yes" to offers means she gets nothing yet, which is safe, so it is sent once. A lost "no"
+means offers keep coming after she said no, which is unsafe and a DPDP problem. So a "no" is written to the phone's
+disk first and retried until the server answers (`PushConsent`, an outbox). The register is sent once too, because
+the next app open redoes it. Same app, same network, three different delivery guarantees, each matched to what a
+loss would cost. Two details make the outbox safe:
+- **A retried write carries its own time.** A "no" can land hours late. Without `decided_at` the server would apply
+  the last write to *arrive*, and a late "no" from phone A would overwrite a later "yes" from phone B. With it,
+  `on conflict ... do update ... where existing.decided_at <= excluded.decided_at` applies the last decision
+  *made*. This is the same newest-wins merge as the sync stores (16q), applied to an RPC.
+- **An outbox entry names whose it is.** The RPC writes as whoever is signed in *now*. So each entry stores its
+  account, is sent only while that account is in, and is checked again right before each send (a flush that began
+  as one account could otherwise finish as another). The queue survives the sign-out wipe (`LocalWipe.keep`),
+  because a wiped queue loses exactly the write we promised to deliver.
+
+**3. Pick the shape where missing data means the true answer.** "Busy evenings" and "free evenings" hold the same
+information. The phone arms only 14 days ahead, so an evening *not* listed really is free. With a "free" list, a
+phone silent for three weeks would have no free evenings left and never get a re-engagement offer. Missing = free is
+true; missing = busy is false. Same for `quiet`: a missing row is not quiet. A phone that never uploaded has
+recorded no loss either, and pregnancy loss is read from `profiles` (0112) anyway.
+
+**4. Make a security rule a property of the table, not only of a function.** `pv_push_register` deletes the same
+token under any other account (one phone signed in as two people one after the other must not keep the first
+person's offers). A `unique` index on `token` makes that true however the row got there. RLS cannot do this job: it
+must never let her delete another person's row. A `security definer` function can, *after* checking `auth.uid()`.
+That is the write-only shape (§8): no select policy on `push_devices` or `push_audience` at all, because nothing in
+the app reads them.
+
+Also: **send what the server actually needs to know.** The plan said `app_version`, but the sender's question is "can
+this build open this link kind?". `link_version int`, raised by hand when the opener learns a kind, answers that with
+a `>=`. A string like "1.0.0+2" answers a different question and compares badly in SQL.
+
+Pinned by `test/push_b2_contract_test.dart`: every builder's keys against the real function signature in 0140, the
+check words, no direct grants, newest-wins, the outbox, and the wiring.

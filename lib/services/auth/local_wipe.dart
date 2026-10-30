@@ -82,6 +82,13 @@ class LocalWipe {
     'baby_voice_muted_journey',
     'baby_voice_muted',
     'preg_size_set', // PregSizeSetStore
+    // ── Added 2026-10-30 (6b B2) ────────────────────────────────────────────
+    // The install's push id names the phone, not a person. The consent queue
+    // must outlive a sign-out: a "no" still waiting would otherwise be lost
+    // with the wipe, and offers would keep coming after she said no. Each
+    // entry names its account and is sent only while that account is in.
+    'push_device_id', // PushService.deviceIdKey
+    'push_consent_outbox_v1', // PushConsent.prefsKey
   };
 
   /// Erase all locally cached account data. Best-effort and never throws — by

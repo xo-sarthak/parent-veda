@@ -391,6 +391,70 @@ it, and start each on a phone. On the user's word. The setup (steps 1 to 3)
 is done; the service-account key (step 4) is created and kept outside the
 repo until B4.
 
+### As built: B2 (2026-10-30)
+
+**The server now has what it needs to decide, and nothing reads it yet.**
+Migration `0140_push_devices_consent_audience.sql` (run it before installing a
+B2 build). The phone writes only through four functions; no table grants
+insert or update.
+
+| Piece | File | What it does |
+|---|---|---|
+| Tables + functions | `supabase/migrations/0140_push_devices_consent_audience.sql` | `push_devices`, `push_consent`, `push_audience`, and `pv_push_register` / `pv_push_unregister` / `pv_push_consent` / `pv_push_audience`, all `security definer`, each checking `auth.uid()` |
+| The wire | `lib/services/push_wire.dart` | The four function names, one builder per parameter list, the stage and source words. The only way the push classes reach Supabase |
+| The token | `lib/services/push_service.dart` | On app open and sign-in (the auth stream), only when `ready`: `pv_push_register` with a per-install `device_id` and `linkVersion`. Again when FCM rotates the token. `signOut()`: queued consent, then `pv_push_unregister`, then FCM `deleteToken`, each limited to 5 s. An expired session deletes the token on the phone only |
+| Sign-out | `lib/screens/profile/pv_account_actions.dart` | `PushService.signOut()` runs **before** `auth.signOut()`; afterwards there is no session to prove whose row it is |
+| Consent | `lib/services/push_consent.dart` | Called from the offers card and switch in all three stores. A "no" goes to disk first and is retried (app open, sign-in, sign-out, then 30 s, 2 min, every 10 min). A "yes" is sent once |
+| Audience | `lib/services/push_audience.dart`, `lib/services/family_phone_plan.dart` | After each re-arm, every evening that rings in the next 14 days (Pregnancy, Parenting and TTC), plus TTC `quiet`. Only once all three stores have loaded, only when it changed |
+| Wipe | `lib/services/auth/local_wipe.dart` | Keeps `push_device_id` and the consent queue |
+
+**Changed from the plan above, each for a reason:**
+
+- **The stage is `trying`, not `ttc`**: `profiles.life_stage`'s own word, so B3
+  joins consent to the profile with a plain `=`.
+- **`link_version int` in place of `app_version`.** The server's question is
+  "can this build open this link kind?". A number raised by hand when the
+  opener learns a kind (`PushService.linkVersion`, now 1) answers it. A
+  version string answers a different question and is awkward to compare.
+- **`pv_push_consent` takes when she decided.** A queued "no" can land hours
+  late. The server keeps the newest decision by that time (clamped to now), so
+  a late "no" from one phone never overwrites a later "yes" from another.
+- **The token is unique across the whole table**, not only cleared by the
+  function: one phone, one account, as a rule of the schema.
+
+**TTC quiet** is `CycleStore.restartOn != null && lastPeriodStart == null`: a
+loss recorded while trying, and no period logged since. It is the same condition
+that silences 6a's daily TTC kinds, derived, not stored.
+
+**Found while testing:** a consent flush that began as one account could send
+its entry after the account switched, and the RPC writes as whoever is signed in
+now. Each send re-checks the account right before it goes.
+
+**Kept on the deprecated token API on purpose.** firebase_messaging 17 deprecates
+`getToken` / `deleteToken` / `onTokenRefresh` for `register()` / `onRegistered`,
+which return a Firebase Installation ID for a newer direct-send path. B4's
+sender uses the HTTP v1 API, whose documented target is the token. Moving to
+the ID is a B4 decision, taken with the sender.
+
+**Test:** `test/push_b2_contract_test.dart`: each builder's keys equal the
+function's parameters in 0140; the three tables' columns; the stage, source and
+platform words equal the checks (and stage equals `profiles.life_stage`); no
+direct grants, one select policy; the token rule and newest-wins; the queue (a
+"no" kept on failure, a "yes" never queued, latest wins per stage, an entry waits
+for its own account, logged out records nothing); busy evenings; the upload
+coalescing; the wiring (sign-out order, the wipe, FamilyPhone, all three stores);
+PushService with and without Firebase. `auth_delete_account_test` and
+`sync_reset_coverage_test` list the two new keys and two files, with why.
+
+**Owed from B2:**
+- Run 0140 (the user), before installing.
+- People who said yes before B2 have no consent row. No real users yet; a tester
+  switches offers off and on once.
+- The phone walk (B6): sign in and see a `push_devices` row; switch offers off
+  and on and see `push_consent`; open Messages and see `push_audience`; sign out
+  and see the device row gone.
+- B1's build check still stands.
+
 ## Costs
 
 List prices as of 2026-10. Re-check them at build time. ₹84 = $1.
@@ -439,7 +503,7 @@ account you need for the App Store anyway.
 |---|---|---|
 | B0 | One tap opener for every notification, local and pushed | A tap on each 6a kind opens its page. The `syncAll` fix stays out of scope. **BUILT 2026-10-30**, see "As built: B0" |
 | B1 | Firebase in the app (`firebase_core`, `firebase_messaging`). It must not crash with no config: an unconfigured Firebase behaves like being logged out | The app starts on a build with no `google-services.json`. **BUILT 2026-10-30**, see "As built: B1"; the build check is owed |
-| B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`) |
+| B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`). **BUILT 2026-10-30**, see "As built: B2"; 0140 to run |
 | B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron | The SQL in "How to test" passes by hand |
 | B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens, the 19:00 IST cron through `pg_net` | `pv_campaign_test` reaches your phone |
 | B5 | Phone: read bookings, give the evening to the campaign, show it in Messages | Planner tests: a booked evening never rings two |
@@ -489,7 +553,9 @@ before B2.
 - **Before B2:** ~~the user's Firebase setup (steps 1 to 4)~~ done 2026-10-30
   (project `parentveda-15ec4`, three Android apps, key kept outside the repo),
   and `pg_net` (step 9), turned on by the user 2026-10-30.
-- **During the build:** a BACKEND-PATTERNS section for 6b. It should cover
+- **During the build:** ~~a BACKEND-PATTERNS section for 6b~~ written with B2
+  (§16zzz-a), and B2's sync-log step (step 31). Still owed: the BEFORE-LAUNCH lines below.
+  Original note: a BACKEND-PATTERNS section for 6b. It should cover
   "moving a decision moves its inputs", "the cost of losing a write decides how
   hard you deliver it" and "pick the shape where missing means the true answer".
   Also a `docs/BACKEND-SYNC-LOG.md` step for the new tables, and BEFORE-LAUNCH
