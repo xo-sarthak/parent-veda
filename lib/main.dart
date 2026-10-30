@@ -96,6 +96,7 @@ import 'services/journal_store.dart';
 import 'services/medicine_store.dart';
 import 'services/notification_service.dart' show NotificationService;
 import 'services/push_service.dart' show PushService;
+import 'services/community_alerts.dart' show CommunityAlerts;
 import 'services/memory_store.dart';
 import 'services/pregnancy_controller.dart';
 import 'services/product_checklist_store.dart';
@@ -338,6 +339,9 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // Server push (6b B1, 2026-10-30): a push tap goes to the same opener.
     // With no google-services.json on this build it stays off, quietly.
     PushService.instance.init();
+    // Community alerts (C3-2, 0147): the "Replies", "Your bookings" and
+    // "Moderation" channels, before any push names one. Parent app only.
+    CommunityAlerts.instance.init();
     ReminderStore.instance
         .init()
         .then((_) => TtcMessagesStore.instance.init())

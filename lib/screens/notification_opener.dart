@@ -25,18 +25,22 @@
 //  Registered once, in main.dart: `NotificationService.setLinkOpener`.
 // =============================================================================
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import '../services/last_profile.dart' show LastProfile;
 import '../services/notification_link.dart';
 import '../services/pp_messages_store.dart';
 import '../services/preg_messages_store.dart';
 import '../services/pv_catalog_store.dart';
+import '../services/pv_community_store.dart';
 import '../services/saved_store.dart' show SavedItem, SavedKind;
 import '../ttc/ttc_messages_store.dart';
 import '../widgets/global_ask_fab.dart' show appNavigatorKey;
 import '../widgets/pv_toast.dart';
+import 'community/community_chrome.dart'
+    show openCommunityActivity, openCommunityModeration, openCommunityPost;
 import 'learn/pv_learn_catalog.dart' show PvLearnCatalog;
+import 'learn/pv_my_learning_screen.dart' show PvMyLearningScreen;
 import 'learn/pv_offering_screen.dart' show pvOpenOffering;
 import 'post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import 'post_pregnancy/pp_experts_data.dart' show expertByIdOrNull;
@@ -50,6 +54,10 @@ const String kNotifGoneCourse = "That class isn't running any more. Here is what
 const String kNotifGoneExpert = "That expert isn't taking sessions here any more.";
 const String kNotifGoneRead = "That page isn't here any more.";
 const String kNotifUnknownKind = 'This needs a newer ParentVeda. Update the app to open it.';
+const String kNotifNotModerator = 'Moderation is for moderators. This account is not one any more.';
+
+/// The route her bookings open under from a moved-session alert.
+const String kPvBookingsFromAlertRoute = 'bookings/from_alert';
 
 class NotificationOpener {
   NotificationOpener._();
@@ -65,6 +73,10 @@ class NotificationOpener {
     NotificationLink.course,
     NotificationLink.expert,
     NotificationLink.read,
+    // (C3-2, 0147) Community alerts: PushService.linkVersion 2.
+    NotificationLink.communityPost,
+    NotificationLink.booking,
+    NotificationLink.communityModeration,
   };
 
   /// How long a tap waits for the app to be ready: 20 tries, half a second
@@ -132,6 +144,29 @@ class NotificationOpener {
         final item = SavedItem(kind: SavedKind.article, itemId: link.id, savedAt: now, updatedAt: now);
         if (SavedItemOpener.resolveTitle(item) != null) return SavedItemOpener.open(context, item);
         pvToast(context, kNotifGoneRead);
+
+      // ---- Community alerts (C3-2, 0147) -----------------------------------
+      // The post screen says itself when a post has gone, so it opens as is.
+      case NotificationLink.communityPost:
+        if (link.id.isEmpty) return openCommunityActivity(context);
+        openCommunityPost(context, link.id);
+      // Her bookings: the moved card says "Moved from ..." (0137, LA-22).
+      case NotificationLink.booking:
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (_) => const PvMyLearningScreen(),
+          settings: const RouteSettings(name: kPvBookingsFromAlertRoute),
+        ));
+      // Moderation opens on At risk. A member who is not a moderator (a
+      // role removed after the alert went) is told, not shown the queue.
+      case NotificationLink.communityModeration:
+        final store = PvCommunityStore.instance;
+        store.init().then((_) async {
+          if (!store.me.isMod) await store.refreshMe();
+          final ctx = appNavigatorKey.currentContext;
+          if (ctx == null || !ctx.mounted) return;
+          if (store.me.isMod) return openCommunityModeration(ctx);
+          pvToast(ctx, kNotifNotModerator);
+        });
       default:
         pvToast(context, kNotifUnknownKind);
     }

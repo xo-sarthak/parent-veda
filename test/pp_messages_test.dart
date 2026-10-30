@@ -73,6 +73,6 @@ void main() {
     final preg = main.indexOf('PregMessagesStore.instance.init()');
     final pp = main.indexOf('PpMessagesStore.instance.init()');
     expect(pp, greaterThan(preg));
-    expect(File('lib/screens/profile/pv_you_content.dart').readAsStringSync(), contains('notificationThings: [_ppMessages()]'));
+    expect(File('lib/screens/profile/pv_you_content.dart').readAsStringSync(), contains('notificationThings: [_ppMessages(), _communityAlerts()]'));
   });
 }

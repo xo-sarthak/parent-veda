@@ -490,7 +490,7 @@ name. A changed app therefore gains nothing: hiding the shield is presentation, 
 C3-2, a moderator's phone also gets the "Moderation" alerts (P0-3), on the phone where they are signed in. The
 doctor app does not get them (6B decision 6).
 
-## As built (phase 3) — C3-1, the live thread (2026-10-30)
+## As built (phase 3) — C3-1, the live thread (2026-10-30, COMMITTED a55547ab)
 
 ### Server: `supabase/migrations/0145_community_live_thread.sql`
 
@@ -541,4 +541,87 @@ raising nothing, and the screen's wiring. All community tests: 112 pass.
 3. Nothing to switch on in the dashboard. The project is on the FREE plan (seen 2026-10-30): Realtime there allows 200 concurrent connections and 2M messages a month, ample before launch; Pro raises it to 500 concurrent
    connections and 5M messages a month).
 
-**NEXT:** C3-2 alerts, once 6B's B4 sender is committed (it is in the tree as 0144, not yet committed).
+**NEXT:** C3-2 alerts: BUILT 2026-10-30, see "As built (phase 3) — C3-2" below. (Kept for revert: "C3-2 alerts, once 6B's B4 sender is committed".)
+
+## As built (phase 3) — C3-2, reply alerts (2026-10-30)
+
+### Server: `supabase/migrations/0147_community_alerts.sql` (needs 0146, B5's, first)
+
+0146 was taken by 6B's B5 while this pass was being built, so C3-2 is 0147, and it extends B5's `pv_push_due`, not
+0144's.
+
+| Piece | What it does |
+|---|---|
+| `community_replied_to` + `community_reply_recipient` | **The "replied to you" rule, once.** `community_activity`, `community_me`'s unread count and the reply trigger all call it. This also fixed a drift: the unread dot counted a reply under someone else's comment on her post, but the list did not show it |
+| `community_push_consent` | Her switches: `replies` (missing = off), `bookings` (missing = on, C3), `moderation` (missing = on, moderators only, P0-3). 6B's `push_consent` is unchanged |
+| `community_post_mutes` | "Turn off replies for this post" |
+| `community_push_queue` | Community's own queue. **One row = one buzz.** Replies to one post merge into the waiting row (`n`), enforced by a partial unique index |
+| `community_push_enqueue` | C4 in one place: her switch and mutes, a 3-minute burst window for replies, 3 reply alerts per IST day (the 4th is Replies to you only), `ring_day`, and a cutoff of 21:00 on the day it rings |
+| Triggers (C13: triggers only) | `community_comments_reply_alert` (live on insert, or held to live); `community_posts_moved_alert` (a team notice with `moved_from`: everyone holding a seat on `ps_<session>`, minus a pregnancy class after a loss, C6); `community_posts_crisis_alert` + `community_comments_crisis_alert` (crisis on insert, or flagged later: every moderator except the author, C7) |
+| `community_push_due` | Community's branch of the sender. Ends rows that are late, switched off or have no linkVersion 2 device, then claims the due ones. Quiet hours 21:00 to 08:00 IST are checked here, so an overnight reply waits until 08:00. Moderation rings at any hour |
+| `pv_push_due` / `pv_push_mark` / `pv_push_any_due` / `pv_push_link_needs` | Each is its latest earlier definition plus Community's branch. `push-send` is not edited |
+| `community_alerts_get` / `_set`, `community_post_mute` | The only three the app calls |
+
+**What reaches the lock screen (C2, P0-2, C3):** "New reply in ParentVeda Community" / "Someone replied to your
+post." (or "N new replies to your post.", "N new replies to your post overnight."); "A session you booked has moved"
+/ "Tap to see the new time."; "A post may need a moderator now" / "Open Moderation to see it." These are fixed in
+`community_push_text`, which never reads the post. The collapse key is `community-post-<id>`, so replies to one post
+replace each other on the phone.
+
+**Channels and links.** The Android channels are `community_replies` "Replies", `community_bookings` "Your
+bookings" and `community_moderation` "Moderation" (high importance). The link kinds are `community_post` (opens the
+post), `booking` (opens Your bookings, where the moved card says "Moved from ...") and `community_moderation` (opens
+Moderation on At risk). All three need linkVersion 2.
+
+**One addition to the plan:** a third link kind, `community_moderation`. The plan listed two kinds, but the signed-off
+prototype has the moderator alert open Moderation, and a post link could land a moderator on a post the queue is
+already handling. A member who is no longer a moderator gets a toast instead of the queue.
+
+**Bookings ring in quiet hours?** No. Quiet hours apply to moved sessions as well as replies (the prototype: "Between
+9 pm and 8 am nothing rings"). Only moderation rings at any hour.
+
+### App
+
+- `lib/services/community_alerts.dart`: `CommunityAlerts`, a singleton store. It holds her switches (optimistic,
+  rolled back with a toast if the server says no), muted posts, whether she was asked, and whether the phone allows
+  notifications. `init()` creates the three channels. It is called from `main.dart` only, so the doctor and partner
+  apps get none.
+- `lib/screens/community/community_alerts_screen.dart`: **Community alerts** (the switches, the moderator switch for
+  moderators only, the lock-screen preview, the fixed quiet-hours line, muted posts with Unmute, and "Notifications
+  are off for ParentVeda on this phone" with "Open phone settings"). Also `maybeAskCommunityAlerts`, **the ask after
+  her first live post**: shown once, and "Not now" is stored on the server (replies = off, which counts as asked)
+  and on the phone, so it is never asked again (P0-1). After a yes, Android's own permission question appears only
+  if the phone has not allowed ParentVeda yet.
+- Doors: Settings, Notifications, **Community** in all three stages (`pv_you_content.dart`); the gear on Replies to
+  you; "Turn off replies for this post" in the post menu, on her own posts and on posts she has replied to.
+- `PushService.linkVersion` is now 2. `NotificationOpener` has the three new kinds.
+
+### Tests
+
+`test/community_alerts_test.dart` (40) covers: one rule and its three readers; every line of the shared sender
+functions kept; push-send untouched; triggers only; the C2 words and that they read no post; the C4 and P0-3
+limits; kinds, version, channels and grants; the store (asked once, offline "Not now", rollback, mute); the screen;
+and the wiring, including that the doctor and partner apps never call it. Rows were added to
+`notifications_b0_tap_test`. `pp_messages_test` and `pp_messages_family_test` were updated for the new Settings row.
+Scoped run: community_*, push_*, notifications_b0_tap_test: 280 pass.
+
+**Found, not this pass's:** `pv_you_pregnancy_test` "the rows that belong to a mother who is expecting" fails on
+"About ParentVeda". It fails the same way with the Community row taken out, so it was already failing before C3-2.
+
+**Fixed after the first live run (2026-10-30):** the verify stopped at check 17, `argument of LIMIT must not contain
+variables`. `community_push_due`'s limit variable was named `n`, the same as a queue column, and `use_column` made it
+mean the column. It is now `v_limit`, and a test checks that no variable shares a column's name. While it was live,
+every `pv_push_due` call failed, campaigns included. BACKEND-PATTERNS §16zzz-g point 8.
+
+### Owed by the user
+
+1. ~~Run 0146 then 0147, then the verify.~~ **RUN 2026-10-30: 0146 and 0147 run (0147 re-run after the v_limit fix), verify PASSED 21 FAILED 0.** Kept for revert: Run `0146_push_channel_and_tap.sql` (B5's) first, then `supabase/migrations/0147_community_alerts.sql`. Then run
+   `supabase/seed/verify_community_alerts.sql` and expect "21 passed, 0 failed". It creates its own five accounts,
+   posts, slot and bookings, and rolls them all back.
+2. Make at least one moderator before launch (a `community_moderators` row, SQL at the foot of 0147), signed in to
+   the parent app on a linkVersion 2 build. Otherwise a crisis alert reaches nobody.
+3. Phone walk: post as A and see the ask once. Turn alerts on, reply as B and get one alert about 3 minutes later.
+   Three quick replies give one alert saying "3 new replies". A muted post stays silent. Move a booked session and
+   every booked phone rings. Post a crisis word as B and the moderator's phone rings.
+
+**NEXT:** C3-3, image screening (needs the Google Cloud Vision key and the privacy line first).

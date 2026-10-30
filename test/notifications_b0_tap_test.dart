@@ -328,6 +328,25 @@ void main() {
       expect(NotificationOpener.kinds,
           containsAll([NotificationLink.ttcMessage, NotificationLink.pregMessage, NotificationLink.ppMessage]));
     });
+
+    // Community C3-2 (0147): the three alert kinds, each pinned to its page.
+    test('Community alerts: a reply opens the post, a moved session her bookings, at risk Moderation', () {
+      final src = _code('lib/screens/notification_opener.dart');
+      const head = 'static void _openThing';
+      expect(NotificationOpener.kinds,
+          containsAll(['community_post', 'booking', 'community_moderation']));
+      expect(_caseBody(src, head, 'NotificationLink', 'communityPost'),
+          contains('openCommunityPost(context, link.id)'));
+      // An empty id still lands somewhere real: Replies to you.
+      expect(_caseBody(src, head, 'NotificationLink', 'communityPost'),
+          contains('openCommunityActivity(context)'));
+      expect(_caseBody(src, head, 'NotificationLink', 'booking'), contains('PvMyLearningScreen()'));
+      final mod = _caseBody(src, head, 'NotificationLink', 'communityModeration');
+      expect(mod, contains('openCommunityModeration(ctx)'));
+      // Not a moderator any more: said, not a silent tap or a queue she may not see.
+      expect(mod, contains('pvToast(ctx, kNotifNotModerator)'));
+      expect(mod, contains('store.me.isMod'));
+    });
   });
 
   // ===========================================================================

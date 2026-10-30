@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/pv_community_store.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
+import 'community_alerts_screen.dart' show openCommunityAlerts;
 import 'community_chrome.dart';
 import 'community_marks.dart';
 
@@ -54,6 +55,14 @@ class _CommunityActivityScreenState extends State<CommunityActivityScreen> {
               ),
               title: Text('Replies to you', style: cmText(17, weight: FontWeight.w800)),
               centerTitle: true,
+              // (0147, C3-2) The alert switches, the same screen Settings opens.
+              actions: [
+                IconButton(
+                  tooltip: 'Community alerts',
+                  icon: const Icon(Icons.settings_outlined, color: kPvInk),
+                  onPressed: () => openCommunityAlerts(context),
+                ),
+              ],
             ),
             body: RefreshIndicator(
               color: kPvInk,

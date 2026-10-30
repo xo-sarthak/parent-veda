@@ -64,6 +64,7 @@ import '../pregnancy/preg_messages_screen.dart' show openPregMessages;
 import '../../services/preg_messages_store.dart' show PregMessagesStore;
 import '../../services/pp_messages_store.dart' show PpMessagesStore;
 import '../post_pregnancy/pp_messages_screen.dart' show openPpMessages;
+import '../community/community_alerts_screen.dart' show openCommunityAlerts;
 import '../v2/pv_celebration.dart' show openBirthCelebration;
 import '../v2/pv_try_again.dart'
     show TryAgainUndo, kTryAgainTitle, openTryAgain, tryingAgainOffered, undoTryAgainFromYou;
@@ -778,6 +779,17 @@ PvYouThing _ppChildMessages() => PvYouThing(
   open: openPpMessages,
 );
 
+/// (0147, Community C3-2) Settings, Notifications, Community, in every stage:
+/// the alert switches. Community itself stays on More (2026-10-28); this is
+/// only its switches. Shown signed out too: the screen says what signing in
+/// unlocks (a feature is never hidden).
+PvYouThing _communityAlerts() => PvYouThing(
+  icon: Icons.people_outline_rounded,
+  title: 'Community',
+  subtitle: 'Replies to your posts, and your bookings',
+  open: openCommunityAlerts,
+);
+
 PvYouThing _findHelp() => PvYouThing(
   icon: Icons.location_on_outlined,
   title: 'Find help near you',
@@ -1250,7 +1262,7 @@ final PvYouStageContent _trying = PvYouStageContent(
   preferenceThings: [_ttcWhatYouSee()],
   // Her children's messages too, when she has one (F3). Kept for revert:
   //   notificationThings: [_ttcMessages()],
-  notificationThings: [_ttcMessages(), _ppChildMessages()],
+  notificationThings: [_ttcMessages(), _ppChildMessages(), _communityAlerts()],
   supportThings: [_ttcGetHelp()],
   childrenInvitation: 'Your first child\'s page appears here after the birth.',
   whatWeStore: [
@@ -1403,7 +1415,7 @@ final PvYouStageContent _pregnancy = PvYouStageContent(
   ],
   // Her children's messages too, when she has one (F3). Kept for revert:
   //   notificationThings: [_pregMessages()],
-  notificationThings: [_pregMessages(), _ppChildMessages()],
+  notificationThings: [_pregMessages(), _ppChildMessages(), _communityAlerts()],
   supportThings: [_findHelp()],
   childrenInvitation:
       'Your baby\'s page appears here after the birth. An older child can be added now.',
@@ -1420,7 +1432,7 @@ final PvYouStageContent _parenting = PvYouStageContent(
   stage: LifeStage.parenting,
   // The parenting inbox (2026-10-07, gap analysis P1 "an app that speaks
   // first"), in Settings, Notifications, as TTC's and pregnancy's are.
-  notificationThings: [_ppMessages()],
+  notificationThings: [_ppMessages(), _communityAlerts()],
   clock: () {
     final s = ChildProfileStore.instance;
     if (!s.hasRealChild) return 'Parenting';

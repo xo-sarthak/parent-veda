@@ -48,6 +48,13 @@ class NotificationLink {
   static const String expert = 'expert';
   static const String read = 'read';
 
+  // Community alerts (C3-2, 0147; PushService.linkVersion 2). A reply opens
+  // the post (id = post id); a moved session opens her bookings (id = the
+  // booking id); an at-risk post opens Moderation on its At risk queue.
+  static const String communityPost = 'community_post';
+  static const String booking = 'booking';
+  static const String communityModeration = 'community_moderation';
+
   /// The payload string a local notification carries.
   String get payload => jsonEncode({'link_kind': kind, 'link_id': id});
 

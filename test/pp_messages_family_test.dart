@@ -156,8 +156,9 @@ void main() {
   group('messages: the way in from any stage', () {
     test('Settings on Pregnancy and TTC has her children\'s messages, only with a child', () {
       final code = _code('lib/screens/profile/pv_you_content.dart');
-      expect(code, contains('notificationThings: [_pregMessages(), _ppChildMessages()]'));
-      expect(code, contains('notificationThings: [_ttcMessages(), _ppChildMessages()]'));
+      // (0147, C3-2) Community's alert switches follow in every stage.
+      expect(code, contains('notificationThings: [_pregMessages(), _ppChildMessages(), _communityAlerts()]'));
+      expect(code, contains('notificationThings: [_ttcMessages(), _ppChildMessages(), _communityAlerts()]'));
       final row = code.substring(code.indexOf('PvYouThing _ppChildMessages()'));
       expect(row.substring(0, row.indexOf(');')), contains('shown: () => ChildProfileStore.instance.hasRealChild'));
       expect(_code('lib/screens/profile/pv_you_screen.dart'),

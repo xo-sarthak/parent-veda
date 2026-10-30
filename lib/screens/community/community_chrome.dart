@@ -17,6 +17,7 @@
 //  · Every write ends in a toast that says what happened (pvToast, the one
 //    notice). A post that is waiting for review says so; a post kept on the
 //    phone for later says so. Nothing is silent.
+import 'dart:async' show unawaited;
 import 'dart:io';
 
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
@@ -25,6 +26,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/pv_community.dart';
+import '../../services/community_alerts.dart';
 import '../../services/community_safety.dart';
 import '../../services/pv_community_store.dart';
 import '../../theme/pv_fonts.dart';
@@ -35,6 +37,7 @@ import '../auth/auth_flow_screen.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
 import '../v2/v2_palette.dart';
 import 'community_activity_screen.dart';
+import 'community_alerts_screen.dart';
 import 'community_compose_screen.dart';
 import 'community_home_screen.dart';
 import 'community_marks.dart';
@@ -1178,6 +1181,15 @@ Future<void> showCommunityPostMenu(BuildContext context, PvCommunityPost post) a
   final saved = store.isSaved(post.id);
   final canPin = communityCanPin(post) && !post.sending;
   final canEdit = store.canEdit(post);
+  // (0147, C3-2) Her own posts and posts she replied to: both can send her
+  // "replied to you". Loading the switches here keeps the row's words true.
+  final alerts = CommunityAlerts.instance;
+  final canMute = !post.sending &&
+      ((post.author.isMine && !post.author.team) || (store.comments(post.id) ?? const []).any((c) => c.author.isMine));
+  // Not awaited: an offline phone must not hold the menu. Unloaded reads as
+  // "not muted", and muting twice is harmless on the server.
+  if (canMute && !alerts.isLoaded) unawaited(alerts.load());
+  final muted = alerts.isMuted(post.id);
   final action = await showCommunitySheet<String>(
     context,
     (c) => ListView(shrinkWrap: true, children: [
@@ -1194,6 +1206,13 @@ Future<void> showCommunityPostMenu(BuildContext context, PvCommunityPost post) a
         label: saved ? 'Remove from saved' : 'Save',
         onTap: () => Navigator.pop(c, 'save'),
       ),
+      if (canMute)
+        CommunitySheetRow(
+          icon: muted ? Icons.notifications_none_rounded : Icons.notifications_off_outlined,
+          label: muted ? kAlertsMuteOn : kAlertsMuteOff,
+          note: muted ? kAlertsMuteOnNote : kAlertsMuteOffNote,
+          onTap: () => Navigator.pop(c, 'mute'),
+        ),
       if (canPin)
         CommunitySheetRow(
           icon: Icons.push_pin_outlined,
@@ -1256,6 +1275,16 @@ Future<void> showCommunityPostMenu(BuildContext context, PvCommunityPost post) a
           context,
           err ?? (post.pinned ? 'Unpinned' : 'Pinned to the top of this room for 7 days'),
           kind: err == null ? PvToastKind.done : PvToastKind.gentle,
+        );
+      }
+    case 'mute':
+      final ok = await alerts.mute(post.id,
+          on: !muted, title: post.title, room: post.roomTitle.isEmpty ? null : post.roomTitle, mine: post.author.isMine);
+      if (context.mounted) {
+        pvToast(
+          context,
+          ok ? (muted ? kAlertsUnmutedToast : kAlertsMutedToast) : 'No connection. Nothing changed; try again when you are online.',
+          kind: ok ? PvToastKind.done : PvToastKind.gentle,
         );
       }
     case 'save':

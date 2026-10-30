@@ -15,6 +15,7 @@ import '../../theme/pv_motion.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
+import 'community_alerts_screen.dart' show maybeAskCommunityAlerts;
 import 'community_chrome.dart';
 import 'community_marks.dart';
 import 'community_offering_thread.dart' show communityAboutLabel;
@@ -60,6 +61,12 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       final hasName = (_store.me.firstName ?? '').isNotEmpty || _store.me.isExpert;
       if (hasName && (_store.me.isExpert || p?.roomKind == 'offering')) _replyAnon = false;
       if (mounted) setState(() => _loaded = true);
+      // (0147, C3-2) Her own post is live: ask once whether she wants an
+      // alert when someone replies (C8). Never again after any answer.
+      if (mounted && p != null) {
+        await maybeAskCommunityAlerts(context,
+            postIsMineAndLive: p.author.isMine && !p.author.team && !p.sending && p.status == 'live');
+      }
     });
     _reply.addListener(() => setState(() {}));
   }
