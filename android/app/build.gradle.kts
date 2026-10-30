@@ -61,6 +61,17 @@ android {
             applicationIdSuffix = ".doctor"
             manifestPlaceholders["appLabel"] = "ParentVeda+"
         }
+        // `partner` (ParentVeda Partners, Partner Editions P1): the app an
+        // employer, school or IVF centre opens to see its programme. Its own
+        // suffix so it installs alongside the other two, its own icons in
+        // src/partner/res, and no src/partner/AndroidManifest.xml: it signs in
+        // with email + password (R6), so it claims no OAuth callback scheme.
+        //     flutter build apk --release --flavor partner --target lib/main_partner.dart
+        create("partner") {
+            dimension = "audience"
+            applicationIdSuffix = ".partners"
+            manifestPlaceholders["appLabel"] = "ParentVeda Partners"
+        }
     }
 
     buildTypes {

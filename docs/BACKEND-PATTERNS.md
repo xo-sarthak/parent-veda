@@ -5009,3 +5009,41 @@ on a unique index, so running every minute writes each notice once.
 written when the doctor taps Join, before any connection. LiveKit's webhook writes a row only when someone actually
 joined the room. Now, if LiveKit has any rows for the slot, only LiveKit's count. **When two sources disagree, prefer
 the one the user cannot produce by tapping a button.** This is the truth hierarchy (CLAUDE.md) applied to attendance.
+
+## 16zzw. A role is not a membership, who-you-are is not what-you-may-see, and one resolver beats two (Partner Editions P1, 0136, 2026-10-30)
+
+ParentVeda Partners is the third app from this repo: employers, schools and IVF centres see their programme. Before
+it can show a number it has to know which organisation a login runs. Three general facts came out of building that.
+
+**1. Model a role as its own row, not as a flag on something else.** 0060 made an HR admin "an active *member* of the
+sponsor who also holds the `sponsor_admin` capability". That conflates two things: being covered by the benefit, and
+running it. The cost was concrete: the admin had to activate with a work email and so spent one of the seats the
+company paid for, and a school admin who is not a parent there could not exist at all. `sponsor_admins(user_id,
+sponsor_id)` says only "this login runs this programme". The trade-off of keeping the old route as a fallback: for a
+while there are two ways to be an admin, which is more to reason about. What it buys: the existing demo admin keeps
+working on the day of a sales call. **When you split a concept, keep the old path as a read-only fallback and
+delete it later, rather than migrating everyone at once.**
+
+**2. Resolve the context in one function, and every caller inherits a change.** Every sponsor RPC (dashboard,
+roster, trend, engagement, remove) starts with `v_id := my_sponsor_admin_id()`. Adding the new way in was *one* edit
+to that function; none of the five needed touching. That is the payoff of 0060's decision to resolve the company from
+`auth.uid()` in one place instead of each RPC doing its own lookup. **If five functions answer "which tenant is
+this?", make them all ask the same function.** The same instinct gave `my_partner_org()`: the phone could ask "am I a
+sponsor admin?" and "am I a care org?" separately and decide "sponsor wins" in Dart, but then that rule would live
+where the web portal can't see it. The server answers once, flat, with the rule inside.
+
+**3. Who you are and what you may see are separate answers.** `my_sponsor_admin_id()` still answers only for
+*active* sponsors, so a paused contract's dashboard goes dark (R2). If the Partners app used that same function to
+decide identity, a paused HR admin would be told "you're not an admin" (false) and would chase the wrong person. So
+`my_partner_org()` reports the organisation **whatever its status** and returns the status alongside. The app says
+"Acme Corp is paused", and the data functions still refuse. **Authorisation gates should fail closed; identity
+lookups should tell the truth.** Mixing them produces error messages that are secure and wrong.
+
+**And one from the client: a refusal says what the account *is*, not only what it isn't.** `{ok:false, code:'doctor'}`
+lets the sign-in screen say "use ParentVeda+" instead of a dead-end "not registered". It leaks nothing new: the person
+has already proved they own the email by signing in with its password. Contrast password reset, where the screen
+says "if there is an account" because no proof has been given yet. **What you may reveal depends on what the caller
+has already proved.**
+
+Pinned by `test/partner_app_shell_test.dart` (on the latest definitions) and `supabase/seed/verify_partner_org.sql`
+(against real tables).

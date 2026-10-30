@@ -2197,7 +2197,13 @@ The fix is a check inside `book_slot()`, not a better client: mark consult
 offerings as capability-gated and refuse there. Deferred because payments are
 still stubbed, so nothing about the money path is settled yet.
 
-## 11.8 A sponsor admin consumes a seat
+## 11.8 A sponsor admin consumes a seat — FIXED 2026-10-30 (`0136`, Partner Editions P1)
+
+`sponsor_admins(user_id, sponsor_id)` is the role on its own, written by service_role only, and
+`my_sponsor_admin_id()` reads it before the 0060 rule below, so an HR or school admin needs no seat and every
+sponsor RPC accepts them unchanged. The 0060 route stays as a fallback so the existing demo admin keeps working;
+drop it once every admin has a row. `my_partner_org()` (same migration) is what the Partners app resolves with.
+Detail: `docs/partner-editions/PARTNERS-APP.md` §P1 as built. What follows is the original note.
 
 `my_sponsor_admin_id()` (0060) resolves the company from the caller's
 `sponsor_members` row, so an HR person must activate like any employee. Simple,

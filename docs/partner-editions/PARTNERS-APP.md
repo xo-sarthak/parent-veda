@@ -31,6 +31,34 @@ report). Flavour wiring is copied from the doctor app: `android/app/build.gradle
    support contact, sign out (clears every store).
 Tests: `partner_app_shell_test` (boot, tabs, routes, refusals), and a SQL contract test for `my_partner_org`.
 
+### P1 as built (2026-10-30)
+| # | What shipped | Where |
+|---|---|---|
+| 1 | Flavour `partner`: suffix `.partners`, label "ParentVeda Partners", no `src/partner/AndroidManifest.xml` (so no OAuth callback). Icons: the family mark plus a purple disc with three rising bars, made by the same generator, which now takes a flavour argument so adding one leaves the other two icon sets unchanged | `android/app/build.gradle.kts`, `android/app/src/partner/res/`, `tools/gen_launcher_icons.py` (`python tools/gen_launcher_icons.py partner`) |
+| 2 | `sponsor_admins(user_id PK, sponsor_id, added_at, added_by)`: own-row read, no write policy. `my_sponsor_admin_id()` reads it first (active sponsors only), then the 0060 rule, so every sponsor RPC accepts a seatless admin with no change of its own | `0136_partner_org_admins.sql` |
+| 2+ | `my_partner_org()` → `{ok, kind, id, name, sponsor_kind, partner_type, logo_url, status, support_contact}`. Sponsor wins. A care_org is **Route A only** (`partner_accounts`): Route B is a doctor. It **reports** status rather than filtering, so a paused admin is told why. A non-admin gets `{ok:false, code}`: `doctor` / `parent` (onboarded profile) / `not_an_admin` / `not_signed_in`. `sponsors.kind` is free text, so `school` needed no check change | `0136` |
+| 3 | `PartnerOrgSession`: singleton, not cached to disk (as `SponsorAdminStore`), resolve enum `resolved / notAnAdmin / suspended / unreachable`. Two seams (`ask`, `signedIn`) let the test drive the real path with no mocking framework | `lib/partner_app/partner_org_session.dart` |
+| 4 | Sign-in: password with show/hide; "Forgot password?" is the parent app's **code** flow (email, then a 6-digit code, then a new password), not a link. Refusals carry the next step (doctor → ParentVeda+, parent → ParentVeda, otherwise → your ParentVeda contact). Paused, not started and ended each get their own line. Offline and backend-down share one calm hold screen; Sign out appears whenever someone is signed in | `lib/screens/partner_app/partner_auth_screen.dart`, `partner_hold_screen.dart`, `partner_words.dart`, `lib/main_partner.dart` |
+| 5 | Shell: `PvNavBar`, Overview · People (Doctors for an IVF centre) · Content · Account; Back on any tab returns to Overview. Overview, People and Content open on their empty states (the house rule, not placeholders); P2–P4 replace them in `partner_tabs.dart`. Account: logo (initial fallback), org name, signed-in email, ParentVeda support, the members' support line, sign out | `partner_scaffold.dart`, `partner_tabs.dart` |
+| 5+ | One sign-out, `forgetPartnerOrgOnThisPhone()`: signs out, then clears `PartnerOrgSession`, `SponsorAdminStore` (new `clear()`; it had no way to forget a roster) and `PartnerDashboardStore`. Every path calls it; the test fails if one signs out around it | `lib/partner_app/partner_sign_out.dart`, `lib/services/sponsor_admin_store.dart` |
+| 6 | Verify pass: borrows the oldest user, walks nothing → parent → doctor → care_org → sponsor wins → paused → ended, checks the seatless admin's dashboard answers and a paused one's does not; rolls back by raising the report | `supabase/seed/verify_partner_org.sql` |
+
+**Not done, said plainly.** "Named routes": P1 pushes no route (tabs are a state switch, as in the doctor app), so
+there is nothing to name yet; the test that every `MaterialPageRoute` under `lib/screens/partner_app/` carries
+`RouteSettings(name:)` is in place for P2. **Found, not fixed (outside P1):** the `/invite` and `/care` App Links
+live in `src/main`, so the doctor and partner flavours claim them too, and a phone with all three apps sees a
+chooser on a referral link (BEFORE-LAUNCH).
+
+**Found while testing:** a `TextEditingController` notifies on *selection* as well as text, and an autofocused field
+sets its selection on first layout. The sign-in screen cleared its error on any notification, so a refusal carried in
+from the boot (a restored doctor login) was wiped before it was seen: a blank form, no reason. It now clears only on a
+change of text. `DoctorAuthScreen` has the same listener but never sets an error before first layout, so it is not
+affected today (left alone: P1 does not touch the doctor app).
+
+Tests: `partner_app_shell_test` (25: resolver outcomes, boot, refusals, paused, shell tabs and Back, sign-out
+coverage, flavour and icons, the 0136 contract on the **latest** definitions). **Run 0136, then
+`verify_partner_org.sql`, then give an admin a `sponsor_admins` row (SQL at the foot of 0136).**
+
 ## P2: Employer and school views
 1. **Overview** from `sponsor_dashboard` + `sponsor_trend(12)` + `sponsor_engagement(6)`. KPIs: seats
    (or "Unlimited" when null), activated with rate, active this month, consults used of included.

@@ -45,7 +45,7 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | **D1** ✓ 2026-10-29, hash in memory | Doctor | Identity and boot hardening | yes (small): `0132` | — |
 | **D2** ✓ 2026-10-29, hash in memory | Doctor | "Families you brought" + a doctor's own referral slice + the right code in the kit | yes | D1 |
 | **D3** ✓ 2026-10-29, hash in memory | Doctor | QR rotation keeps per-doctor codes (§5.1b) | yes: `0134` | D2 |
-| **P1** | Partners | New flavour, shell, sign-in, one org resolver, admin-without-seat | yes | — |
+| **P1** ✓ 2026-10-30, hash in memory | Partners | New flavour, shell, sign-in, one org resolver, admin-without-seat | yes: `0136` | — |
 | **P2** | Partners | Employer and school: Overview, People, Report | no (uses existing RPCs) | P1 |
 | **P3** | Partners | IVF centre: Overview, per-doctor table; ParentVeda+ refuses org logins (R5) | maybe | P1, D2 |
 | **P4** | Partners + DB | Exclusive content: audience columns, Content tab, contract end (R2) | yes | P2 |

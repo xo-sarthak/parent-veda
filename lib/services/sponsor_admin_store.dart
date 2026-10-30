@@ -288,6 +288,20 @@ class SponsorAdminStore extends ChangeNotifier {
     }
   }
 
+  /// Forget the programme: the dashboard, the roster of names, the trend.
+  /// The Partners app's sign-out (forgetPartnerOrgOnThisPhone) calls it, so
+  /// the next organisation to sign in on a shared desk phone never sees the
+  /// last one's staff list. Nothing is on disk to clear; it never was.
+  void clear() {
+    _dashboard = null;
+    _roster = const [];
+    _trend = const [];
+    _error = null;
+    _loading = false;
+    _everLoaded = false;
+    notifyListeners();
+  }
+
   @visibleForTesting
   void setForTest({
     SponsorDashboard? dashboard,
