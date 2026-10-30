@@ -822,14 +822,76 @@ class SupabaseRepo {
     } catch (_) {/* best-effort */}
   }
 
-  /// Free a seat via cancel_booking(). Best-effort: a failure here is not worth
-  /// blocking the UI over — the local cancel still stands, and the ledger is
-  /// reconciled on the next server round-trip.
-  static Future<void> cancelBooking(String bookingId) async {
-    if (userId == null) return;
+  // Kept for revert (superseded 2026-10-30, 0135): best-effort, and the phone
+  // cancelled locally whatever happened. A swallowed failure left her seeing
+  // "cancelled" while the server still held the booking, and the merge never
+  // put it back -- the one place a fire-and-forget write cost the truth.
+  //
+  // static Future<void> cancelBooking(String bookingId) async {
+  //   if (userId == null) return;
+  //   try {
+  //     await _client.rpc('cancel_booking', params: {'p_booking_id': bookingId});
+  //   } catch (_) {/* best-effort */}
+  // }
+
+  /// Cancel a booking through the server (0135 `cancel_booking`). NOT
+  /// fire-and-forget, like [expertCancelBooking] below: the caller cancels
+  /// locally only on `ok`, and says whether the credit came back from what
+  /// the server answered, never from a guess.
+  ///
+  /// Returns the server's map: `ok`, `credit_returned`, `late`, `reason`,
+  /// `window_hours`. Signed out: `{ok: true, local: true}` (nothing to ask).
+  /// A server still on 0066 returns nothing; that is read as ok, its old
+  /// behaviour. A network failure is `{ok: false, reason: 'network'}`.
+  static Future<Map<String, dynamic>> cancelBooking(String bookingId) async {
+    if (userId == null) return const {'ok': true, 'local': true};
     try {
-      await _client.rpc('cancel_booking', params: {'p_booking_id': bookingId});
-    } catch (_) {/* best-effort */}
+      final res = await _client
+          .rpc('cancel_booking', params: {'p_booking_id': bookingId});
+      if (res is Map) return res.cast<String, dynamic>();
+      return const {'ok': true};
+    } catch (e) {
+      debugPrint('[repo] cancel_booking failed: $e');
+      return const {'ok': false, 'reason': 'network'};
+    }
+  }
+
+  /// Move a booking in ONE server transaction (0135 `reschedule_booking`):
+  /// the old seat is released and the new one claimed together, or neither.
+  /// Same answer shape as [cancelBooking]; on `ok`, `booking` is the new row.
+  static Future<Map<String, dynamic>> rescheduleBooking({
+    required String bookingId,
+    required String newBookingId,
+    required String newSlotId,
+    DateTime? startsUtc,
+  }) async {
+    if (userId == null) return const {'ok': false, 'reason': 'not_signed_in'};
+    try {
+      final res = await _client.rpc('reschedule_booking', params: {
+        'p_booking_id': bookingId,
+        'p_new_booking_id': newBookingId,
+        'p_new_slot_id': newSlotId,
+        if (startsUtc != null) 'p_starts_utc': startsUtc.toUtc().toIso8601String(),
+      });
+      if (res is Map) return res.cast<String, dynamic>();
+      return const {'ok': false, 'reason': 'unknown'};
+    } catch (e) {
+      debugPrint('[repo] reschedule_booking failed: $e');
+      return const {'ok': false, 'reason': 'network'};
+    }
+  }
+
+  /// The cancel window in hours, from the one place it is set (0135
+  /// `booking_terms`, reading `booking_policy`). Null when it cannot be read.
+  static Future<int?> bookingTermsHours() async {
+    if (userId == null) return null;
+    try {
+      final res = await _client.rpc('booking_terms');
+      if (res is Map && res['credit_return_hours'] is num) {
+        return (res['credit_return_hours'] as num).toInt();
+      }
+    } catch (_) {/* not run yet, or offline: the cached value stands */}
+    return null;
   }
 
   /// The DOCTOR's cancel / no-show (0077). Returns the server's status code.

@@ -4953,3 +4953,59 @@ only her rows; the partner view reads separately with `fetchByUser(his id)`. Had
 `fetchShared`, his shared rows would have merged into hers and been pushed back under her id. **After widening a
 policy, check every query on that table: the policy changed the ceiling, and a query without its own filter rises to
 meet it.** The test pins the query call, not just the policy text, because that is where the leak would be.
+
+## 16zzv. Spent once, returned once: the status is the guard, a savepoint is all-or-nothing, and an answer beats a void (credits fix, 0135, 2026-10-30)
+
+The credits audit found the money rules right in the middle and wrong at the edges. Each fix is a pattern worth
+carrying. LEARNING-ARCHITECTURE LA-35 to LA-46 has the list; `test/credits_truth_contract_test.dart` pins it.
+
+**1. Why spending was already safe: one row per credit, `skip locked`, and a unique index.** A credit is a row, not a
+counter, so nothing does `balance = balance - 1` and there is no lost update to race. `book_slot` claims one with
+`select ... for update skip locked`: two bookings at the same instant do not queue behind the same row, the second
+simply takes the next free one. The unique index on `booking_id` is the backstop: even if two transactions somehow
+picked the same credit, the second attach fails. **Locking decides who goes first; a constraint decides what can never
+be true. Use both. The lock is for speed, the constraint is for correctness.**
+
+**2. Guard on the row's status, not on who is calling.** `cancel_booking` refused only `'cancelled'`, so an
+`attended` session could be cancelled. That reversed the expert's payable earning and lowered the seat count for
+something that had already happened. The caller was allowed to cancel *their own* booking; what was wrong was
+cancelling *that state*. `if status <> 'upcoming' then return` is one line, and it also makes the function
+**idempotent**: a second tap finds `cancelled` and changes nothing. **A state machine is enforced where the state lives.
+List the states a transition may start from, never the ones it may not, because a new state then defaults to "no".**
+
+**3. Return what happened. A `void` makes the caller guess.** `cancel_booking` returned nothing, so the phone assumed
+the credit came back. It did not, inside 4 hours. Now it returns `{ok, credit_returned, late, reason}` and the phone
+says exactly that. Changing a function's return type is not something `create or replace` can do, so it is `drop`
+then `create`, and an installed app that ignores the result keeps working. The phone half matters as much: the repo
+used to swallow errors (`catch (_) {}`), and the store cancelled locally anyway. Fire-and-forget is right for a sync
+the next refresh repairs. **It is wrong for a write whose result you are about to show a person, because there is no
+later refresh that un-tells them.**
+
+**4. A savepoint makes two steps one.** Rescheduling was release, then reserve: two calls, two transactions. When
+the second failed, the first had already happened, and inside the window the first had spent the credit. In
+PL/pgSQL, a `begin ... exception when others then ... end` block runs as a **savepoint**. If anything inside raises
+(`book_slot`'s `'slot full'`), every write since the block began is rolled back: the old booking's cancel, the freed
+credit, the seat count. The function then returns the reason instead of an error. **The general fact: in Postgres a
+raise undoes everything its transaction (or the innermost savepoint) wrote.** That is a feature: put the steps that
+must happen together inside one block, and let the failure do the undoing.
+
+**5. A compensation rule must name exactly what it compensates.** The host-missed refund rule said: if *any* of her
+bookings on this offering was host-missed, *this* purchase is refundable, whatever the date. So a consult whose credit
+had already come back could also be refunded in money (paid back twice), and a masterclass she rebooked and attended
+stayed refundable. Now the rule names the seat this purchase paid for, in its run, and requires that she was not given
+another. The same shape fixed `_revoke_purchase`, which cancelled *every* upcoming booking on the offering, including
+ones a sponsor's credit paid for. **"Anything related" is never the right scope for money. Join on the thing that was
+paid.**
+
+**6. When the evidence is missing, hold; don't guess.** The sweep raised `host_unknown` when LiveKit saw no one, and
+then settled the slot anyway at end + 30, which made the expert's earning payable with nothing to undo it. Guessing
+"attended" pays for a class that may not have happened; guessing "missed" refunds one that may have. Now an
+unresolved alert stops `_settle_slot`, which every settling path goes through (the minute sweep, the webhook, the
+phone), so one check covers all three. A person ends the hold with `resolve_host_alert`. **Put a hold at the one
+function every path calls, not in each caller.** And the sweep stays idempotent: alerts are `on conflict do nothing`
+on a unique index, so running every minute writes each notice once.
+
+**7. Trust the record that is hard to fake over the one that is easy.** `_host_seen` counted the doctor app's own row,
+written when the doctor taps Join, before any connection. LiveKit's webhook writes a row only when someone actually
+joined the room. Now, if LiveKit has any rows for the slot, only LiveKit's count. **When two sources disagree, prefer
+the one the user cannot produce by tapping a button.** This is the truth hierarchy (CLAUDE.md) applied to attendance.

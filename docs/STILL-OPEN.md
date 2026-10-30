@@ -548,6 +548,26 @@ seen and no host, every seat is cancelled with `cancel_reason =
 for consults and classes alike. A parent who did not come still pays the
 doctor (`missed` stays payable), as before. **Live 2026-10-29**, `54875c57`:
 0128 run, functions deployed, the LiveKit webhook added.
+**Extended 2026-10-30 in `0135` (credits fix, LEARNING-ARCHITECTURE LA-35 to
+LA-46):** a slot where the host was never seen by LiveKit, or joined and left
+with 15+ minutes to go and did not come back, is now HELD from auto-settling
+until a person calls `resolve_host_alert(slot, came)` (service role). Before,
+`host_unknown` only raised a notice and the slot settled at end + 30 with the
+expert paid. A late parent cancel that keeps her credit now pays the doctor,
+like a no-show (L.31).
+
+**5.4f2 Parked from the credits fix (2026-10-30, 0135).**
+- **A cohort session the host missed, for someone who attended the others.**
+  The self-serve host-missed refund is for a purchase that delivered nothing
+  in its run (a masterclass, or a cohort with no seat upcoming or attended).
+  A partial refund for one missed cohort session is support's call from the
+  Razorpay dashboard. Revisit if cohorts sell.
+- **What attendees see when the host leaves and does not return.** The server
+  raises `host_left` and holds the slot; the waiting-room copy still says the
+  host "stepped out". A line after 15 minutes ("We've told the team; your
+  seat is safe") is owed with L4 or the next call pass.
+- **Who resolves held slots.** `resolve_host_alert` has no screen; until the
+  admin panel exists it is a SQL-editor call. BEFORE-LAUNCH holds the owner.
 
 **5.4g Programme money is capacity-based.** The trigger calls a slot with
 capacity 1 a consultation and everything else a programme, then looks the

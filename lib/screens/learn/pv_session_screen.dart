@@ -158,33 +158,54 @@ Future<bool> pvConfirmCancelBooking(
     ),
   );
   if (yes != true) return false;
-  await BookingStore.instance.release(b.id);
-  return true;
+  // Kept for revert: `await BookingStore.instance.release(b.id); return true;`
+  // -- it reported success whatever the server said (0135).
+  final res = await BookingStore.instance.release(b.id);
+  if (context.mounted) pvSnack(context, res.message);
+  return res.ok;
 }
 
 /// Reschedule, lifted out of the session page with [pvConfirmCancelBooking]
-/// (2026-09-29): pick a new slot, release the old one, claim the new one.
-/// Returns the new booking, or null (no slot picked, or the time just went,
-/// in which case she is told and her credit is back).
+/// (2026-09-29): pick a new slot, then one server move (0135). Returns the
+/// new booking, or null (inside the window, no slot picked, or the time just
+/// went -- she is told why, and the old booking is unchanged).
 Future<Booking?> pvRescheduleBooking(
   BuildContext context,
   Booking b,
   PvOfferingView v,
 ) async {
-  final slot = await showPvSlotSheet(context, v);
-  if (slot == null || !context.mounted) return null;
-  // Release first, then claim: the credit returns and is spent again.
-  await BookingStore.instance.release(b.id);
-  if (!context.mounted) return null;
-  final nb = await BookingStore.instance.reserve(slot);
-  if (!context.mounted) return null;
-  if (nb == null) {
+  // (0135) Inside the window a booking cannot be moved (user, 2026-10-30).
+  // Said before the slot sheet opens, so she never picks a time first and
+  // is refused after.
+  if (BookingStore.instance.insideCancelWindow(b)) {
+    final h = BookingStore.instance.freeCancelWindow.inHours;
     pvSnack(
       context,
-      'That time just went. Your credit is back — pick another.',
+      'Within $h hours of the start, a booking can no longer be moved. '
+      'You can still cancel; the credit stays with this session.',
     );
+    return null;
   }
-  return nb;
+  final slot = await showPvSlotSheet(context, v);
+  if (slot == null || !context.mounted) return null;
+  // Kept for revert (superseded 2026-10-30, 0135): release, then reserve.
+  // Two transactions: inside the window the release spent the credit, then
+  // a lost time lost the booking too, and the toast said the credit was back.
+  //
+  //   await BookingStore.instance.release(b.id);
+  //   if (!context.mounted) return null;
+  //   final nb = await BookingStore.instance.reserve(slot);
+  //   if (!context.mounted) return null;
+  //   if (nb == null) {
+  //     pvSnack(context, 'That time just went. Your credit is back — pick another.');
+  //   }
+  //   return nb;
+  //
+  // One server move: both seats change together or neither does.
+  final res = await BookingStore.instance.reschedule(b, slot);
+  if (!context.mounted) return null;
+  if (res.message != null) pvSnack(context, res.message!);
+  return res.booking;
 }
 
 class PvSessionScreen extends StatefulWidget {

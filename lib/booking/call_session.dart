@@ -234,11 +234,8 @@ class CallSession {
   ///
   /// (Superseded: since 0123 `open_session_room` reads only the stored slot,
   /// and since 0128 livekit-token sends it the slot id alone. The descriptor
-  /// below is still sent, on purpose, until every deployed livekit-token is
-  /// the 0128 one: the 0123-era function casts `startsUtc` to a timestamp,
-  /// and an empty string there would fail the host's join. It is dropped
-  /// together with the 6-argument open_session_room, in the next learning
-  /// migration's contract step.)
+  /// was still sent until the 6-argument open_session_room was dropped in
+  /// 0135's contract step; now only the slot id goes.)
   static Future<(CallJoin?, CallJoinFailure?)> fetchHostJoin({
     required Slot slot,
     String? displayName,
@@ -247,13 +244,14 @@ class CallSession {
       return (null, const CallJoinFailure(CallRefusal.notSignedIn));
     }
 
+    // (0135, the contract step) The slot id alone: livekit-token reads the
+    // stored slot, and the 6-argument open_session_room is dropped. Kept for
+    // revert, the descriptor it used to send:
+    //   'offeringId': slot.offeringId, 'expertId': slot.expertId,
+    //   'startsUtc': slot.startsUtc.toUtc().toIso8601String(),
+    //   'durationMin': slot.durationMin, 'capacity': slot.capacity,
     final res = await SupabaseRepo.invokeEdgeResult('livekit-token', {
       'slotId': slot.id,
-      'offeringId': slot.offeringId,
-      'expertId': slot.expertId,
-      'startsUtc': slot.startsUtc.toUtc().toIso8601String(),
-      'durationMin': slot.durationMin,
-      'capacity': slot.capacity,
       if (displayName != null && displayName.trim().isNotEmpty)
         'name': displayName,
     });

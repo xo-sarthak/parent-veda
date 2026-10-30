@@ -68,6 +68,9 @@ const Map<String, int> kTapFeedbackAllowed = {
   'lib/screens/home_screen_b.dart': 1,
   'lib/screens/journal_screen.dart': 1,
   'lib/screens/journal_writer_screen.dart': 1,
+  // The video surface's tap-to-play (L3): the whole frame settling under the
+  // finger would shrink the picture she is watching. (2026-10-30)
+  'lib/screens/learn/pv_recording_screen.dart': 1,
   'lib/screens/memories/memory_personalize_screen.dart': 2,
   'lib/screens/memories/memory_preview_screen.dart': 2,
   'lib/screens/nutrition/door/nutrition_widgets.dart': 1,

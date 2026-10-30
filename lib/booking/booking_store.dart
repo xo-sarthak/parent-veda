@@ -30,6 +30,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/credits_store.dart';
 import '../services/remote/cloud_synced_store.dart';
 import '../services/remote/supabase_repo.dart';
 import '../care_partner/care_journey.dart';
@@ -52,6 +53,23 @@ enum AcquireStatus {
 
   /// She closed the payment sheet. Say nothing.
   cancelled,
+}
+
+/// What a cancel did (0135). [ok] false: nothing changed, and [message] says
+/// why and what to do. [creditReturned]: the server's answer, not a guess.
+class ReleaseResult {
+  const ReleaseResult(this.ok, this.creditReturned, this.message);
+  final bool ok;
+  final bool creditReturned;
+  final String message;
+}
+
+/// What a move did (0135). [booking] null: the old booking is unchanged and
+/// [message] says why.
+class RescheduleResult {
+  const RescheduleResult(this.booking, this.message);
+  final Booking? booking;
+  final String? message;
 }
 
 class AcquireResult {
@@ -120,12 +138,30 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
   String? get _who => debugUid ?? SupabaseRepo.userId;
   bool get _signedIn => _who != null;
 
+  /// How long before the start a cancel still returns the credit, and a
+  /// booking can still be moved. THE SERVER'S NUMBER (0135 `booking_terms`,
+  /// `booking_policy.credit_return_hours`), cached for offline. 4 is the
+  /// server's default, so a phone that has never asked is still right.
+  /// The phone used to carry its own 2 hours (consult_policy.dart), which
+  /// promised a free cancel the server then refused.
+  int _cancelWindowHours = 4;
+  static const _windowKey = 'booking_cancel_window_h';
+
+  Duration get freeCancelWindow => Duration(hours: _cancelWindowHours);
+
+  /// True once the booking is inside the window: a cancel keeps the credit,
+  /// and a move is refused (user, 2026-10-30: no free late reschedule).
+  /// The same comparison as the server's: `starts_utc <= now() + window`.
+  bool insideCancelWindow(Booking b, {DateTime? now}) => !b.startsUtc
+      .isAfter((now ?? DateTime.now()).toUtc().add(freeCancelWindow));
+
   bool _loaded = false;
 
   Future<void> init() async {
     if (_loaded) return;
     try {
       final prefs = await SharedPreferences.getInstance();
+      _cancelWindowHours = prefs.getInt(_windowKey) ?? _cancelWindowHours;
       final raw = prefs.getString(_key);
       if (raw != null) _apply(jsonDecode(raw) as Map);
       final rc = prefs.getString(_receiptsKey);
@@ -344,9 +380,16 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     }
     byOffering.forEach((offeringId, list) {
       list.sort((a, b) => a.paidUtc.compareTo(b.paidUtc)); // spend oldest first
+      // (0135) A late cancel KEPT its credit on the server (cancel_reason
+      // 'late_cancel'), so it still counts as used. Counting every cancel as
+      // returned showed her a credit the server would then refuse to spend.
+      // Kept for revert:
+      //   .where((b) =>
+      //       b.offeringId == offeringId && b.status != BookingStatus.cancelled)
       var used = _bookings.values
           .where((b) =>
-              b.offeringId == offeringId && b.status != BookingStatus.cancelled)
+              b.offeringId == offeringId &&
+              (b.status != BookingStatus.cancelled || b.keptCredit))
           .length;
       final o = BookingCatalog.instance.offeringById(offeringId);
       for (final p in list) {
@@ -409,6 +452,22 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     }
     await syncPurchases(); // L2c: what she owns is the server's too
     await syncRecordings(); // L3: what she may watch again
+    // (0135) The credit count and the cancel window are the server's too.
+    // CreditsStore was read only at launch, so a credit spent or returned
+    // here showed its old count until the next one.
+    await CreditsStore.instance.refresh();
+    await _refreshTerms();
+  }
+
+  Future<void> _refreshTerms() async {
+    final h = await SupabaseRepo.bookingTermsHours();
+    if (h == null || h == _cancelWindowHours) return;
+    _cancelWindowHours = h;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_windowKey, h);
+    } catch (_) {/* the default stands */}
   }
 
   /// Adopt the authoritative `booking_bookings` rows for this user.
@@ -791,11 +850,133 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     _entitlements[ent.id] = ent.copyWith(creditsUsed: ent.creditsUsed + 1);
   }
 
-  /// Cancel through the server (frees the seat via cancel_booking) then locally.
-  Future<bool> release(String bookingId) async {
-    await SupabaseRepo.cancelBooking(bookingId);
-    return cancel(bookingId);
+  // Kept for revert (superseded 2026-10-30, 0135): cancelled locally whatever
+  // the server said, and could not tell a returned credit from a kept one.
+  //
+  // Future<bool> release(String bookingId) async {
+  //   await SupabaseRepo.cancelBooking(bookingId);
+  //   return cancel(bookingId);
+  // }
+
+  /// Cancel through the server, then locally ONLY if the server agreed.
+  ///
+  /// Local-first still holds for reading: a cloud failure never crashes and
+  /// the list still renders. What changes is that a failed cancel no longer
+  /// pretends: the booking stays upcoming on her phone because it is still
+  /// upcoming on the server, and [ReleaseResult.message] says so.
+  Future<ReleaseResult> release(String bookingId) async {
+    final b = _bookings[bookingId];
+    final res = await SupabaseRepo.cancelBooking(bookingId);
+    if (res['ok'] != true) {
+      final reason = (res['reason'] ?? '').toString();
+      // The server already holds it cancelled (another phone, the doctor):
+      // adopt that rather than reporting a failure.
+      if (reason == 'already_cancelled') {
+        cancel(bookingId, refundCredit: false);
+        notifyListeners();
+        return const ReleaseResult(true, false, 'This booking was already cancelled.');
+      }
+      return ReleaseResult(false, false, switch (reason) {
+        'ended' => 'This session has already ended, so it cannot be cancelled.',
+        'already_attended' || 'already_missed' =>
+          'This session has already happened, so it cannot be cancelled.',
+        _ => "We couldn't reach ParentVeda, so nothing was cancelled. "
+            'Your booking still stands. Try again in a moment.',
+      });
+    }
+
+    // Signed out, or a 0066 server that answers nothing: the window decides
+    // locally, exactly as the server would.
+    final late = res['late'] is bool
+        ? res['late'] as bool
+        : (b != null && insideCancelWindow(b));
+    final kept =
+        res['reason'] == 'late_cancel' || (res['reason'] == null && late);
+    cancel(bookingId,
+        refundCredit: !late, cancelReason: kept ? 'late_cancel' : null);
+    if (SupabaseRepo.isLoggedIn) {
+      await CreditsStore.instance.refresh();
+    }
+    notifyListeners();
+    final h = (res['window_hours'] as num?)?.toInt() ?? _cancelWindowHours;
+    return ReleaseResult(
+      true,
+      !late,
+      kept
+          ? 'Cancelled. This was within $h hours of the start, so the credit '
+              'stays with this session.'
+          : late
+              ? 'Cancelled. Your seat has gone back to someone else.'
+              : 'Cancelled. Your credit is back, so you can book another time.',
+    );
   }
+
+  /// Move a booking to [slot] as ONE server transaction (0135
+  /// `reschedule_booking`): the old seat and the new one change together,
+  /// or not at all. Refused inside the cancel window (user, 2026-10-30: no
+  /// free late reschedule). Replaces release-then-reserve, which inside the
+  /// window lost the credit on the release and then the seat on the reserve.
+  Future<RescheduleResult> reschedule(Booking old, Slot slot,
+      {DateTime? at}) async {
+    if (insideCancelWindow(old, now: at)) {
+      return RescheduleResult(null, _insideWindowLine);
+    }
+    final now = (at ?? DateTime.now()).toUtc();
+
+    if (!SupabaseRepo.isLoggedIn) {
+      // Offline / signed out: the old local path, which is safe outside the
+      // window (the credit returns on the cancel and is spent on the book).
+      cancel(old.id, cancelReason: 'rescheduled');
+      final nb = await reserve(slot, at: at);
+      return RescheduleResult(
+          nb, nb == null ? 'That time just went. Your credit is back, pick another.' : null);
+    }
+
+    final newId = _uid('bkg', now);
+    final offering = BookingCatalog.instance.offeringById(slot.offeringId);
+    final consult = offering?.kind == OfferingKind.consult;
+    final res = await SupabaseRepo.rescheduleBooking(
+      bookingId: old.id,
+      newBookingId: newId,
+      newSlotId: slot.id,
+      startsUtc: consult ? slot.startsUtc : null,
+    );
+    if (res['ok'] != true) {
+      final reason = (res['reason'] ?? '').toString();
+      return RescheduleResult(null, switch (reason) {
+        'inside_window' => _insideWindowLine,
+        'slot full' || 'slot closed' =>
+          'That time just went. Your booking has not changed, pick another.',
+        'network' => "We couldn't reach ParentVeda. Your booking has not "
+            'changed. Try again in a moment.',
+        _ => "We couldn't move it. Your booking has not changed.",
+      });
+    }
+
+    _bookings[old.id] = old.copyWith(
+        status: BookingStatus.cancelled, cancelReason: 'rescheduled');
+    final nb = Booking(
+      id: newId,
+      offeringId: slot.offeringId,
+      slotId: slot.id,
+      stage: old.stage,
+      title: old.title,
+      startsUtc: slot.startsUtc,
+      durationMin: slot.durationMin,
+      status: BookingStatus.upcoming,
+      bookedUtc: now,
+      joinUrl: slot.joinUrl,
+    );
+    _bookings[nb.id] = nb;
+    _save();
+    await CreditsStore.instance.refresh();
+    notifyListeners();
+    return RescheduleResult(nb, null);
+  }
+
+  String get _insideWindowLine =>
+      'Within $_cancelWindowHours hours of the start, a booking can no longer '
+      'be moved. You can still cancel; the credit stays with this session.';
 
   /// The DOCTOR's version: cancel, or mark a no-show, for a booking they host.
   ///
@@ -835,10 +1016,12 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
 
   /// Cancel an upcoming booking and refund its credit. Returns true if a
   /// booking was cancelled.
-  bool cancel(String bookingId, {bool refundCredit = true}) {
+  bool cancel(String bookingId,
+      {bool refundCredit = true, String? cancelReason}) {
     final b = _bookings[bookingId];
     if (b == null || b.status != BookingStatus.upcoming) return false;
-    _bookings[bookingId] = b.copyWith(status: BookingStatus.cancelled);
+    _bookings[bookingId] = b.copyWith(
+        status: BookingStatus.cancelled, cancelReason: cancelReason);
     if (refundCredit) {
       final ent = activeEntitlementForCancel(b.offeringId);
       if (ent != null && ent.creditsUsed > 0) {

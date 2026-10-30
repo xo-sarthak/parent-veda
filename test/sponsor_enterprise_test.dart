@@ -473,7 +473,10 @@ void main() {
         .firstWhere((e) => true, orElse: () => null);
 
     test('no sponsor, no credit', () {
-      CreditsStore.instance.setForTest(available: 2);
+      // (0135) The mirror reads the SPONSOR'S count (by_source), not the
+      // total. Was: setForTest(available: 2).
+      CreditsStore.instance
+          .setForTest(available: 2, bySource: const {'sponsor': 2});
       SponsorBenefits.sync();
       expect(sponsored(), isNull);
     });
@@ -485,7 +488,10 @@ void main() {
         capabilities: const {Caps.sponsorEvents},
         sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
       );
-      CreditsStore.instance.setForTest(available: 2);
+      // (0135) The mirror reads the SPONSOR'S count (by_source), not the
+      // total. Was: setForTest(available: 2).
+      CreditsStore.instance
+          .setForTest(available: 2, bySource: const {'sponsor': 2});
       SponsorBenefits.sync();
       expect(sponsored(), isNull);
     });
@@ -499,7 +505,10 @@ void main() {
         capabilities: const {Caps.consultationCredit},
         sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
       );
-      CreditsStore.instance.setForTest(available: 2);
+      // (0135) The mirror reads the SPONSOR'S count (by_source), not the
+      // total. Was: setForTest(available: 2).
+      CreditsStore.instance
+          .setForTest(available: 2, bySource: const {'sponsor': 2});
       SponsorBenefits.sync();
 
       final e = sponsored();
@@ -507,6 +516,19 @@ void main() {
       expect(e!.creditsLeft, 2);
       // Floating: "a free consultation" is not a promise about who with.
       expect(e.offeringId, kAnyConsultOffering);
+    });
+
+    test('a bought pack or a referral is not shown as the employer credit (0135)',
+        () {
+      EntitlementStore.instance.setForTest(
+        capabilities: const {Caps.consultationCredit},
+        sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
+      );
+      CreditsStore.instance.setForTest(
+          available: 5, bySource: const {'sponsor': 1, 'purchase': 4});
+      SponsorBenefits.sync();
+      expect(sponsored()!.creditsLeft, 1,
+          reason: 'pack credits have their own card, and their own scope');
     });
 
     test('a server count of zero advertises nothing', () {
@@ -528,7 +550,10 @@ void main() {
         capabilities: const {Caps.consultationCredit},
         sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
       );
-      CreditsStore.instance.setForTest(available: 2);
+      // (0135) The mirror reads the SPONSOR'S count (by_source), not the
+      // total. Was: setForTest(available: 2).
+      CreditsStore.instance
+          .setForTest(available: 2, bySource: const {'sponsor': 2});
       for (var i = 0; i < 25; i++) {
         SponsorBenefits.sync();
       }
@@ -547,7 +572,10 @@ void main() {
         capabilities: const {Caps.consultationCredit},
         sponsor: const SponsorInfo(id: 'acme', name: 'Acme'),
       );
-      CreditsStore.instance.setForTest(available: 2);
+      // (0135) The mirror reads the SPONSOR'S count (by_source), not the
+      // total. Was: setForTest(available: 2).
+      CreditsStore.instance
+          .setForTest(available: 2, bySource: const {'sponsor': 2});
       SponsorBenefits.sync();
       final e = sponsored()!;
       expect(e.expiresUtc!.difference(e.purchasedUtc).inDays, greaterThan(300));

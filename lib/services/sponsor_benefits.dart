@@ -54,7 +54,13 @@ class SponsorBenefits {
     // expired, the phone must stop advertising it — the old version granted a
     // fixed 1 forever and would have shown a credit that no longer existed,
     // which is the worst of both: a button that fails at the last step.
-    final available = CreditsStore.instance.available;
+    //
+    // (0135) The SPONSOR'S credits only. `available` counts every source, so a
+    // bought pack or a referral showed here as the employer's, and was counted
+    // twice (once on its own card). It also offered credits book_slot then
+    // refused, because a pack credit is scoped to its own offering.
+    // Kept for revert: final available = CreditsStore.instance.available;
+    final available = CreditsStore.instance.fromSource('sponsor');
 
     // MIRROR, not grant. grantFloatingCredit() is grant-once by design — it
     // returns the existing row untouched, so it can only ever count upward and

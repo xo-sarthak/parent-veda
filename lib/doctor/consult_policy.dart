@@ -15,11 +15,18 @@
 //     cannot re-sell that half hour. The grace period matters: joining five
 //     minutes late is ordinary life, not a no-show.
 //
-//  3. THE PARENT CANCELS LATE -> free up to 2 HOURS before; inside that, the
-//     credit is not returned, but they get ONE free reschedule. Two hours is
-//     roughly the point past which a doctor cannot fill the slot. Taking the
-//     money AND the appointment would be punitive, so the reschedule is the
-//     release valve.
+//  3. THE PARENT CANCELS LATE -> free up to the SERVER'S window before
+//     (booking_policy.credit_return_hours, 4 hours, read through 0135
+//     `booking_terms`); inside it the credit stays with the session and the
+//     doctor is paid, and a booking can no longer be moved. Moving is free
+//     any time before the window. (User, 2026-10-30, the industry norm:
+//     Practo and Zocdoc allow moves up to a cutoff, not after.)
+//
+//     Superseded, kept for revert: "free up to 2 HOURS before; inside that,
+//     the credit is not returned, but they get ONE free reschedule." The
+//     server never had either: it kept the credit at 4 hours, and the "free
+//     reschedule" was a cancel that lost the credit followed by a booking
+//     that then failed.
 //
 //  HOW A "REFUND" WORKS HERE. The booking engine is credit-based: a parent buys
 //  an entitlement and spends credits on slots. So a refund RETURNS THE CREDIT
@@ -32,9 +39,14 @@
 import 'package:flutter/foundation.dart';
 
 import '../booking/booking_models.dart';
+import '../booking/booking_store.dart';
 
-/// Free-cancellation window for the PARENT, before the consultation starts.
-const Duration kFreeCancelWindow = Duration(hours: 2);
+/// Free-cancellation window for the PARENT, before the consultation starts:
+/// the server's default, used only until the phone has read the real one
+/// ([BookingStore.freeCancelWindow]). Was 2 hours, which the server never
+/// honoured (0135). Kept for revert:
+/// const Duration kFreeCancelWindow = Duration(hours: 2);
+const Duration kFreeCancelWindow = Duration(hours: 4);
 
 /// How late a parent may join before the doctor may mark them a no-show.
 const Duration kNoShowGrace = Duration(minutes: 10);
@@ -83,9 +95,12 @@ class ConsultPolicy {
   ConsultPolicy._();
 
   /// True while a parent may still cancel without losing the credit.
-  static bool parentMayCancelFree(Booking b, {DateTime? now}) =>
+  /// The window is the server's ([BookingStore.freeCancelWindow]); [window]
+  /// overrides it for tests.
+  static bool parentMayCancelFree(Booking b,
+          {DateTime? now, Duration? window}) =>
       b.startsUtc.difference((now ?? DateTime.now()).toUtc()) >
-          kFreeCancelWindow;
+      (window ?? BookingStore.instance.freeCancelWindow);
 
   /// True once the doctor may fairly record a no-show.
   static bool mayMarkNoShow(Booking b, {DateTime? now}) =>
@@ -119,8 +134,10 @@ class ConsultPolicy {
       );
 
   /// The parent cancelling — which side of the window they are on decides it.
-  static ConsultResolution parentCancels(Booking b, {DateTime? now}) {
-    if (parentMayCancelFree(b, now: now)) {
+  static ConsultResolution parentCancels(Booking b,
+      {DateTime? now, Duration? window}) {
+    final w = window ?? BookingStore.instance.freeCancelWindow;
+    if (parentMayCancelFree(b, now: now, window: w)) {
       return const ConsultResolution(
         outcome: ConsultOutcome.parentCancelledEarly,
         creditReturned: true,
@@ -131,14 +148,18 @@ class ConsultPolicy {
             'whenever you are ready.',
       );
     }
-    return const ConsultResolution(
+    // Kept for revert (2026-10-30, no free late reschedule):
+    //   freeReschedule: true,
+    //   parentMessage: 'Cancelled. This was inside the 2-hour window, so the
+    //     credit stays with this consultation - but you can reschedule it
+    //     once, free.',
+    return ConsultResolution(
       outcome: ConsultOutcome.parentCancelledLate,
       creditReturned: false,
       doctorPaid: true,
-      freeReschedule: true,
-      parentMessage:
-          'Cancelled. This was inside the 2-hour window, so the credit stays '
-          'with this consultation - but you can reschedule it once, free.',
+      freeReschedule: false,
+      parentMessage: 'Cancelled. This was within ${w.inHours} hours of the '
+          'start, so the credit stays with this consultation.',
     );
   }
 

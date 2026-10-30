@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/booking/booking_models.dart';
+import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/doctor/consult_patient.dart';
 import 'package:parentveda/doctor/consult_policy.dart';
 import 'package:parentveda/doctor/doctor_onboarding_store.dart';
@@ -100,14 +101,17 @@ void main() {
       expect(r.creditReturned, isTrue);
     });
 
-    test('a parent cancelling inside 2 hours keeps the slot but may rebook once',
+    // (0135, user 2026-10-30) No free late reschedule: inside the server's
+    // window the credit stays and the booking can no longer be moved. Was:
+    // 'a parent cancelling inside 2 hours keeps the slot but may rebook once'.
+    test('a parent cancelling inside the window keeps no credit and no move',
         () {
       final r = ConsultPolicy.parentCancels(soon);
       expect(r.outcome, ConsultOutcome.parentCancelledLate);
       expect(r.creditReturned, isFalse);
-      expect(r.freeReschedule, isTrue,
-          reason: 'taking the money AND the appointment would be punitive');
+      expect(r.freeReschedule, isFalse);
       expect(r.doctorPaid, isTrue);
+      expect(r.parentMessage, isNot(contains('reschedule')));
     });
 
     test('a no-show pays the doctor, who held the time and turned up', () {
@@ -126,15 +130,18 @@ void main() {
       expect(ConsultPolicy.mayMarkNoShow(wellPast), isTrue);
     });
 
-    test('the free-cancellation window is exactly 2 hours', () {
-      expect(kFreeCancelWindow, const Duration(hours: 2));
+    // (0135) The window is the server's (booking_terms); 4 hours is its
+    // default, and the phone's fallback until it has asked. Was 2 hours.
+    test('the free-cancellation window is the server default, 4 hours', () {
+      expect(kFreeCancelWindow, const Duration(hours: 4));
+      expect(BookingStore.instance.freeCancelWindow, kFreeCancelWindow);
       expect(
           ConsultPolicy.parentMayCancelFree(
-              booking(DateTime.now().add(const Duration(hours: 3)))),
+              booking(DateTime.now().add(const Duration(hours: 5)))),
           isTrue);
       expect(
           ConsultPolicy.parentMayCancelFree(
-              booking(DateTime.now().add(const Duration(hours: 1)))),
+              booking(DateTime.now().add(const Duration(hours: 3)))),
           isFalse);
     });
   });

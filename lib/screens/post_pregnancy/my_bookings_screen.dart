@@ -31,6 +31,7 @@ import '../../booking/prescription.dart';
 import '../../booking/prescription_watch.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
+import '../../widgets/pv_toast.dart';
 import 'problem_solver_screen.dart';
 import 'yoga_home_screen.dart';
 import '../../services/remote/supabase_repo.dart';
@@ -720,7 +721,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
       ),
     );
     if (yes == true) {
-      await BookingStore.instance.release(b.id);
+      // (0135) Says what happened: the credit back, kept, or nothing changed.
+      final res = await BookingStore.instance.release(b.id);
+      if (mounted) pvToast(context, res.message);
     }
   }
 

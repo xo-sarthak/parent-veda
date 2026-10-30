@@ -230,6 +230,10 @@ differ.
 | L.25 | How a class recording starts (asked 2026-10-29, L3 D1) | **By itself, when the host joins a class.** Consults are never recorded. "Recorded" shows in the call; the host can stop it (what was recorded so far is kept) | A recording is sold, so it cannot depend on a host remembering a button. Consults are clinical |
 | L.26 | How the team is told at +10 / +20 (L3 D2) | **An `ops_alerts` row, posted to a Discord or Slack incoming webhook** (pg_net; the URL in Vault as `team_alert_webhook_url`). No URL: the row only | Free and instant; WhatsApp would need an approved template and the test number reaches registered phones only |
 | L.27 | Does the host rule cover 1:1 consults (L3 D3) | **Yes.** A doctor who never joins: her credit back, the doctor not paid, the parent told at +10 and +20 | STILL-OPEN §5.4f is about consults; 20 minutes is most of a 30-minute consult |
+| L.29 | The cancel window and a late move (credits fix, 2026-10-30) | **One window, the server's: 4 hours (`booking_policy.credit_return_hours`).** Cancel before it and the credit comes back; inside it the credit stays with the session. A booking can be moved any time before the window, never inside it; the phone's "one free reschedule" is withdrawn | The user, 2026-10-30: "drop it". Practo and Zocdoc allow moves up to a cutoff, not after. The phone said 2 hours and a free move; the server had neither, so she lost the credit and then the booking |
+| L.30 | A credit returned through no fault of hers (credits fix) | **It lives at least 30 more days** (`expires_at = greatest(expires_at, now() + 30 days)`) when the host missed or the expert cancelled | A 30-day pack credit returned on day 29 would be useless. ClassPass extends returned credits the same way |
+| L.31 | Who is paid when she cancels late or does not come (credits fix) | **The doctor, in both cases.** A late cancel that keeps her credit makes the earning payable, as `missed` already did | The hour was held and cannot be resold. Industry standard (Practo, Zocdoc); the phone's ConsultPolicy already said so |
+| L.32 | A session nobody can vouch for (credits fix) | **Held for a person.** No host seen, or the host left and did not come back: no seat settles and no one is paid until `resolve_host_alert` says whether the host came | A guess either way costs someone money; a short hold costs nothing |
 | L.28 | The original file after Mux imports it (L3 D4) | **Kept** in the private `recordings` bucket | The master copy, and the way out if Mux is replaced. About 1 GB a class hour, ~$0.02 (₹1.8) a month |
 
 **Obvious: chosen and recorded, not asked.**
@@ -323,7 +327,46 @@ written down so it isn't lost.
 
 - [x] **LA-34 · Consult times were worked out in the phone's time zone** (found 2026-10-29 in L3). `generateSlots` built times with `DateTime(day…)`, local time, so a parent abroad was offered the doctor's 10:00 in her own zone. Once the server checks the schedule in IST (LA-29) those bookings would be refused. Fixed in the same pass: the parent's path runs the rule on IST wall clock (`istWallClock`, a fixed +05:30; India keeps one offset all year), and on an Indian phone the slot ids and times are unchanged · LA-29 · **L3** · **closed 2026-10-29**, `54875c57`. Also (after the run): a doctor who has saved no schedule is now offered the starter clinic, the one the server assumes, not the old made-up calendar (whose 18:30 the server would refuse). The doctor's own preview still runs in local time (she is in India)
 
-### LATER
+**Credits fix (audit 2026-10-29, built 2026-10-30 in `0135_credits_truth.sql`, waiting on the run).** Each line
+was checked against the function's last definition; `test/credits_truth_contract_test.dart` pins them, and a pgserver
+run on a stub schema checked 41 behaviours.
+
+- [ ] **LA-35 · A late cancel showed "credit back".** `cancel_booking` returned nothing, so the phone counted every
+  cancel as a return; inside 4 hours the server had kept it. Now it returns `{ok, credit_returned, late, reason}`, a
+  kept credit is `cancel_reason = 'late_cancel'` (still counted as used), and the window is read from the server
+  (`booking_terms`). · L.29 · built 2026-10-30
+- [ ] **LA-36 · Past bookings could be cancelled.** Both cancel functions refused only `cancelled`, so an attended
+  session could be cancelled, reversing a payable earning (and, on the expert side, returning the credit). Now:
+  upcoming only, idempotent; a doctor's no-show only after the 10-minute grace. · built 2026-10-30
+- [ ] **LA-37 · A reschedule inside the window lost the credit, then the booking.** It was release-then-reserve
+  from the phone. Now `reschedule_booking` is one transaction (a savepoint around release and claim) and is refused
+  inside the window. · L.29 · built 2026-10-30
+- [ ] **LA-38 · A host-missed purchase was refundable twice.** Any host-missed booking on the offering, ever, made
+  every purchase refundable, consults and packs included (their credit had already come back). Now: masterclass and
+  cohort only, the seat this purchase paid for in its run, and not if she holds or used another seat there. Expert
+  cancellations count the same. · L.14, L.24 · built 2026-10-30
+- [ ] **LA-39 · A refund cancelled seats it had not paid for.** `_revoke_purchase` cancelled every upcoming booking
+  on the offering, leaving a sponsor's or another pack's credit spent on a dead seat. Now only this purchase's seats.
+  · built 2026-10-30
+- [ ] **LA-40 · A returned credit could come back expired.** · L.30 · built 2026-10-30
+- [ ] **LA-41 · A started or closed slot could be booked.** · built 2026-10-30
+- [ ] **LA-42 · The doctor's tap counted as the host being there.** `_host_seen` accepted the app's own row, written
+  before the connection; LiveKit's record now wins when it has any rows. · built 2026-10-30
+- [ ] **LA-43 · `host_unknown` settled anyway, and paid.** Now held until `resolve_host_alert`; the sweep also raises
+  `host_left` for a host who left with 15+ minutes to go (gap A). · L.32 · built 2026-10-30
+- [ ] **LA-44 · A late cancel paid nobody.** The credit was kept and the earning reversed. Now payable. · L.31 ·
+  built 2026-10-30
+- [ ] **LA-45 · The sponsor card counted every credit.** It mirrored the total, so bought and pack credits showed as
+  the employer's (and twice); credits were re-read only at launch. Now `fromSource('sponsor')`, refreshed with
+  bookings. · built 2026-10-30
+- [ ] **LA-46 · A failed cancel looked like a cancel.** The repo swallowed the error and the phone cancelled anyway,
+  and the merge never put the booking back. Now the phone cancels only on the server's `ok`, and says why when it
+  cannot. · built 2026-10-30
+
+A parent who does not come to a consult forfeits the credit and the doctor is paid. That was already the rule
+(`_settle_slot` marks `missed`); it is recorded as L.31, not rebuilt.
+
+### LATER### LATER
 
 - [ ] **LA-23 · Referral credits are granted on the phone only** (`referral_store.dart:243`). Same fix shape as 0067:
   grant through `grant_consult_credits`. · — · unassigned · open
@@ -377,6 +420,7 @@ Each step depends only on the steps before it.
 | **L2b** · **closed 2026-10-29, `7575940a`, 0126 run, functions deployed** | Server receipts and schedule: seeded `programmes`, `programme_runs`, refund rules, `payment_orders`, `course_purchases`, `payment_mode`, `has_course_access`, `record_course_purchase`, `my_purchases` (returning amount, status, paid and refunded dates, payment id and stage, for Your bookings, L.22), `claim_free_offering`, `record_stub_purchase`, the refund function, `book_slot` reading only server values, shop paid status; create-order, verify and a new `razorpay-webhook` | next free (≥ `0126`) | Runs it; deploys three functions; sets `RAZORPAY_WEBHOOK_SECRET`; adds the test webhook; checks that `book_slot` with no purchase is refused in live mode |
 | **L2c** · **built 2026-10-29, not committed** | The app on the server: `PaymentService` sends only the id; `my_purchases()` replaces local minting (kept for revert); the app books `ps_<id>`; the preview through the stub; a recorded course sellable; refund copy; Your bookings gains Payments and reads receipts from the server (L.22) | — | Installs the build; walks buy → book → join in test mode |
 | **L3** · **closed 2026-10-29, `54875c57`, 0128 run, functions deployed, LiveKit webhook added** (recordings open until Mux) | `livekit-webhook` (attendance, +10 / +20 states), room capacity, the 0075 fallback removed, egress → bucket → Mux → lesson, playback through `has_course_access`; Your bookings' Past shows attendance and the recording; LA-29 schedule check with a parity table; LA-32 expand; LA-34 | `0128` (`0127` went to TTC records) | Runs 0128 and its VERIFY; deploys five functions; adds the LiveKit webhook; S3 keys; then a Mux account for the recording walk; LiveKit Ship before the first paid class |
+| **Credits fix** · **built 2026-10-30, waiting on the run** | LA-35 to LA-46: a cancel tells the truth, a one-transaction reschedule, refunds once, held sessions, the 6-argument `open_session_room` dropped | `0135` | Runs it and its VERIFY block |
 | **L4** | Community phase 2 on this model (Part B of `course-receipts-then-community-p2.md`), including the doctor's "Your offerings" | next free | As in Part B |
 
 **Why L2b and L2c are separate.** While L2b is live and L2c isn't, the old app keeps working because the server is

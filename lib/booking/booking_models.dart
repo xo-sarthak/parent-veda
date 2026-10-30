@@ -408,6 +408,11 @@ class Booking {
 
   bool get hostMissed => cancelReason == 'host_missed';
 
+  /// (0135) She cancelled inside the window, so the server kept the credit
+  /// on this booking: it still counts as used. Other reasons the server
+  /// writes: 'rescheduled', 'expert_cancelled', 'refunded'.
+  bool get keptCredit => cancelReason == 'late_cancel';
+
   DateTime get endsUtc => startsUtc.add(Duration(minutes: durationMin));
   bool get isUpcoming => status == BookingStatus.upcoming;
 
