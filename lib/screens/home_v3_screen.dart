@@ -153,6 +153,7 @@ import 'symptoms/door/symptoms_today_body.dart' show openSymptomRead;
 import 'journal_compose_screen.dart' show openJournalCompose;
 import 'garbh/garbh_today_practice.dart' show GarbhTodayPractice, openGarbhDoor;
 import '../widgets/pv_home_arrival.dart';
+import '../widgets/partner_lockup.dart' show PartnerStrip; // Partner Editions A1
 import 'community/community_home_card.dart';
 
 class HomeV3Screen extends StatefulWidget {
@@ -491,6 +492,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
               PvArrive(
                 delay: PvArriveAt.header,
                 child: V3PregHero(
+                partner: PartnerStrip(p: p),
                 p: p,
                 // "Week 41" once she is past her due date (2026-09-30); the
                 // figure's art clamps to week 40 inside the hero. Kept for revert:

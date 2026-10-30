@@ -66,6 +66,7 @@ import '../../services/life_stage_store.dart';
 import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/partner_lockup.dart' show PartnerStrip; // Partner Editions A1
 // PvCardRail left the show list with card B (2026-10-23); add it back to revert.
 import '../products/pv_store_chrome.dart'
     show pvSnack, PvProductImage, pvOpenProduct;
@@ -477,6 +478,7 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                 PvArrive(
                   delay: PvArriveAt.header,
                   child: _CycleHeader(
+                  partner: PartnerStrip(p: p),
                   today: today,
                   p: p,
                   hinglish: hinglish,
@@ -1538,7 +1540,12 @@ class _CycleHeader extends StatelessWidget {
     required this.onMessages,
     required this.onTalk,
     required this.unread,
+    this.partner,
   });
+
+  /// Under the top row: the partner strip (Partner Editions A1). It owns its
+  /// gap and takes no room without a partner.
+  final Widget? partner;
 
   final TtcToday today;
   final V2Palette p;
@@ -1701,6 +1708,7 @@ class _CycleHeader extends StatelessWidget {
                   ]),
             ),
           ]),
+          ?partner,
           const SizedBox(height: 16),
 
           // ---- the week ----------------------------------------------------

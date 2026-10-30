@@ -114,10 +114,30 @@ class _CarePartnerSlotState extends State<CarePartnerSlot> {
         }
 
         final rule = CareConfig.instance.ruleFor(partner);
+        // A small, unlabelled dismiss. She is closing a card, not reporting a
+        // doctor - anything heavier would make the presence feel like
+        // something to defend against.
+        final dismiss = PvPress(child: GestureDetector(
+          onTap: () {
+            _presence.dismiss(partner.id, widget.surface, widget.topic);
+            _store.recordEvent('partner_dismissed',
+                detail: widget.surface.name);
+            setState(() => _visible = false);
+          },
+          behavior: HitTestBehavior.opaque,
+          child: const Padding(
+            padding: EdgeInsets.fromLTRB(10, 8, 2, 8),
+            child: Icon(Icons.close_rounded, size: 15, color: ppSoft),
+          ),
+        ));
+        // The home line draws its own box, so the cross goes INSIDE it
+        // (Partner Editions A1); beside a bordered box it would float.
+        final inside = widget.shape == CarePartnerCardShape.home;
         final card = CarePartnerCard(
           partner: partner,
           shape: widget.shape,
           padding: EdgeInsets.zero,
+          trailing: inside && rule.dismissible ? dismiss : null,
           onTap: () {
             _store.recordEvent('partner_tapped', detail: widget.surface.name);
             Navigator.of(context).push(MaterialPageRoute(
@@ -125,29 +145,35 @@ class _CarePartnerSlotState extends State<CarePartnerSlot> {
           },
         );
 
+        // Kept for revert (the dismiss built inline, before A1):
+        // return Padding(
+        //   padding: widget.padding,
+        //   child: rule.dismissible
+        //       ? Row(children: [
+        //           Expanded(child: card),
+        //           // A small, unlabelled dismiss. She is closing a card, not
+        //           // reporting a doctor - anything heavier would make the
+        //           // presence feel like something to defend against.
+        //           PvPress(child: GestureDetector(
+        //             onTap: () {
+        //               _presence.dismiss(
+        //                   partner.id, widget.surface, widget.topic);
+        //               _store.recordEvent('partner_dismissed',
+        //                   detail: widget.surface.name);
+        //               setState(() => _visible = false);
+        //             },
+        //             behavior: HitTestBehavior.opaque,
+        //             child: const Padding(
+        //               padding: EdgeInsets.fromLTRB(10, 8, 2, 8),
+        //               child: Icon(Icons.close_rounded, size: 15, color: ppSoft),
+        //             ),
+        //           )),
+        //         ])
+        //       : card,
         return Padding(
           padding: widget.padding,
-          child: rule.dismissible
-              ? Row(children: [
-                  Expanded(child: card),
-                  // A small, unlabelled dismiss. She is closing a card, not
-                  // reporting a doctor - anything heavier would make the
-                  // presence feel like something to defend against.
-                  PvPress(child: GestureDetector(
-                    onTap: () {
-                      _presence.dismiss(
-                          partner.id, widget.surface, widget.topic);
-                      _store.recordEvent('partner_dismissed',
-                          detail: widget.surface.name);
-                      setState(() => _visible = false);
-                    },
-                    behavior: HitTestBehavior.opaque,
-                    child: const Padding(
-                      padding: EdgeInsets.fromLTRB(10, 8, 2, 8),
-                      child: Icon(Icons.close_rounded, size: 15, color: ppSoft),
-                    ),
-                  )),
-                ])
+          child: rule.dismissible && !inside
+              ? Row(children: [Expanded(child: card), dismiss])
               : card,
         );
       },

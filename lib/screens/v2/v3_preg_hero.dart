@@ -181,6 +181,7 @@ class V3PregHero extends StatefulWidget {
     this.onAddDueDate,
     this.footer,
     this.monthLine,
+    this.partner,
   });
 
   /// "Month 6 · Second trimester", under the weeks and days (relevance Batch
@@ -252,6 +253,11 @@ class V3PregHero extends StatefulWidget {
 
   /// A card at the foot of the hero ("Has your baby arrived?", from week 37).
   final Widget? footer;
+
+  /// Under the top row: the partner strip (Partner Editions A1,
+  /// `widgets/partner_lockup.dart`). It owns its own gap and takes no room
+  /// without a partner, so nothing here pads around it.
+  final Widget? partner;
 
   static const _months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -406,6 +412,7 @@ class _V3PregHeroState extends State<V3PregHero> {
               ),
             ]);
           }),
+          ?widget.partner,
           const SizedBox(height: 16),
 
           // ---- the week ---------------------------------------------------------

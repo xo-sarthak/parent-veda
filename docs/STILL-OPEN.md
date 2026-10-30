@@ -471,6 +471,34 @@ named. Detail and the reasons: `docs/partner-editions/PARTNERS-APP.md` §P3 as b
   written, because attributions need real auth users.
 - [ ] **A centre has no monthly report** (employers and schools do, P2). Not in the P3 plan; add if a centre asks.
 
+## 5.1f Partner Editions A1 in the parent app: what is built and what it left (2026-10-30)
+
+Built: `PartnerBrand` (`lib/services/partner_brand.dart`) decides who a family's homes name. A sponsor gets the
+"ParentVeda × Northwind" lockup, and a care partner gets a "Your doctor · Dr Rao" line (D1, D3). One `PartnerStrip`
+(`lib/widgets/partner_lockup.dart`) sits under the top row of all three homes, through a nullable slot in each hero.
+The new onboarding now binds a clinic QR in `_finish` and shows the care welcome; before A1 it bound only on the next
+launch, and the welcome never showed. The welcome screen's invited box has a doctor variant. Two decisions from the
+user on 2026-10-30: the strip sits under the top row as in the storyboard, and **a care partner's home line is on by
+default**. `CareVisibilityRule.defaultsFor` now includes `home`, and the home is exempt from the once-a-day frequency,
+though her dismissal, expiry and status still apply. Detail is in `docs/partner-editions/MASTER.md` A1 as built.
+
+- [ ] **The invited box usually says "your doctor", not the name.** `CarePartnerStore.lookup()` reads
+  `partner_referrals` and `care_partners` before sign-up, and RLS most likely refuses an anonymous read. Naming the
+  doctor before sign-up needs a small public RPC, for example `partner_for_token(token)` returning name, type,
+  organisation and city only. That RPC is a migration, so it was not built in A1.
+- [ ] **No sponsor variant before sign-up.** A sponsor only exists after work-email activation, so the welcome screen
+  cannot name an employer. The storyboard's "Northwind has given you ParentVeda" would need a sponsor invite link
+  that carries the sponsor id. Not built; nobody has asked for one yet.
+- [ ] **The sponsor's welcome sheet** (the storyboard's perks sheet) is not A1's. The activation flow already ends
+  on its own success screen (`activation_flow_screen.dart`). If the perks sheet is wanted, it belongs with A2.
+- [ ] **An IVF centre's line names the centre, not the doctor.** The storyboard shows "Your doctor · Dr Meera Rao,
+  Bloom Fertility Centre" for a centre family. The parent's attribution holds only the partner (the centre). The
+  per-doctor code from D2 is on the server side, so naming the doctor needs the parent to be able to read which
+  doctor's code she used.
+- [ ] **`CareJourney.childBorn()` is not fired by the new onboarding** for a parent who adds her child there, so a
+  doctor's funnel misses "child added" for families onboarded straight into Parenting. The old flow fired only
+  `pregnancyStarted`, and A1 keeps that parity. Adding it is one line in `_finish` step 7.
+
 ## 5.1d `programmes.price_paise` still stores minor units — minor, deferred
 
 `0074` moved the consult fee to whole rupees (`expert_profiles.fee_inr`) because

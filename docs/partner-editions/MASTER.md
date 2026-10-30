@@ -53,7 +53,7 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | **P2** ✓ 2026-10-30, hash in memory | Partners | Employer and school: Overview, People, Report | small: `0138` (self-removal refused) | P1 |
 | **P3** ✓ 2026-10-30, hash in memory | Partners | IVF centre: Overview, per-doctor table; ParentVeda+ refuses org logins (R5) | yes: `0139` (`care_org_dashboard`) | P1, D2 |
 | **P4** ✓ 2026-10-30 (0142 RUN, verify 20/0), hash in memory | Partners + DB | Exclusive content: audience columns, Content tab, contract end (R2) | yes | P2 |
-| **A1** | Parent (LAST) | `PartnerBrand` resolver, lockup strip, "Your doctor" line, welcome sheet in new onboarding | no | P4 |
+| **A1** ✓ 2026-10-30, hash in memory | Parent (LAST) | `PartnerBrand` resolver, lockup strip, "Your doctor" line, welcome sheet in new onboarding | no | P4 |
 | **A2** | Parent (LAST) | "Exclusively for you" rail, You chip with logo + benefit meter | no | A1, P4 |
 
 D-phases and P-phases can run in either order; P3 needs D2 for `my_doctor_referrals` shape parity.
@@ -82,3 +82,34 @@ Kept short; this was detailed in the storyboard.
   `audience_partner_id`); **first make `ProgrammeStore` refresh on a change of signed-in user and clear its cache on
   sign-out** (found in P4: the view now answers per account, the cache is one key); You chip with logo
   (`pv_you_screen.dart:598`) + a benefit meter; update the `employer_benefits_screen.dart:14–17` comment (D1).
+
+### A1 as built (2026-10-30)
+Two decisions from the user, made before the build:
+- **The strip sits under the top row, as in the storyboard.** It is not the first item on the white sheet. Each hero
+  got one nullable slot: `V3PregHero.partner`, TTC `_CycleHeader.partner` and Parenting `_PaintedHero.partner`. Each
+  home passes `partner: PartnerStrip(p: p)`.
+- **A care partner's home line is on by default.** `CareVisibilityRule.defaultsFor` gained `CareSurface.home` (the
+  old set is kept for revert). The home is exempt from frequency, because a line that disappeared after a tab switch
+  would read as a fault. Her dismissal, expiry and the partner's status still apply. An admin can still remove home
+  from one partner.
+
+What was built:
+- `lib/services/partner_brand.dart` decides **who**. A sponsor gives the lockup. A care partner gives the line, unless
+  there is a sponsor, in which case the lockup takes the strip. `careLineLabel` returns "Your doctor" for a person and
+  "Your clinic" for an organisation; `careLineDetail` returns the organisation or the city.
+- `lib/widgets/partner_lockup.dart` decides **how**. The lockup is a white pill with a hairline: the ParentVeda mark,
+  "ParentVeda × {name}", then their logo, or a monogram in ink when there is no logo. It is not `PresentedBy`, uses no
+  partner colours, and taps through to `EmployerBenefitsScreen` (route `employer`). The doctor line goes through
+  `CarePartnerSlot`, using the new `CarePartnerCardShape.home`: a hairline box, the avatar, "Your doctor · name", the
+  place underneath, a chevron, and the dismiss inside the box. The line taps through to the Care Circle.
+- **Spacing:** the strip owns a 14pt gap above it and takes zero room without a partner, so a plain family's homes
+  are unchanged. On Pregnancy and TTC it sits between the top row and the existing 16pt gap above the day strip. On
+  Parenting it is positioned on the painting at `top + 10 + 38`, and the painting keeps its height so the caption
+  does not move. The gutter is 18 on all three.
+- **Onboarding:** step 7 of `_finish` calls `applyPending()`, then `CareJourney.pregnancyStarted()` when there is a due
+  date, then `showCareWelcome`, all inside a try so it can never block her. The welcome screen's invited box has a
+  doctor variant ("Recommended by …", or "by your doctor" when the lookup cannot read the tables before sign-up).
+- Tests: `test/partner_brand_test.dart` (resolver, strip, 360pt overflow, wiring gate on source) and
+  `test/care_visibility_test.dart`, where the home group replaces the "home is off" test, kept for revert.
+- What A1 left is in STILL-OPEN §5.1f; the logo hosting and the phone walk are in BEFORE-LAUNCH.
+

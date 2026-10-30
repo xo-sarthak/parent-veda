@@ -111,12 +111,20 @@ class CareVisibilityRule {
   static CareVisibilityRule defaultsFor(String partnerType) =>
       CareVisibilityRule(
         topics: CareTopic.defaultsFor(partnerType),
-        // Home is deliberately absent. The daily home is the most valuable
-        // space in the app and a partner credit there has to be a decision
-        // someone makes in the admin panel, not something a new partner gets
-        // by default.
+        // HOME IS ON BY DEFAULT since Partner Editions A1 (2026-10-30, the
+        // user, deciding D3): a family a doctor brought sees "Your doctor ·
+        // Dr Rao" under the top row of every home. The reason it used to be
+        // absent still holds for a CREDIT ("recommended by"), which is why
+        // the home draws a plain line naming her doctor and nothing else. An
+        // admin can still take home out of one partner's surfaces.
+        // Kept for revert: the four surfaces below without `home`, under the
+        // note "Home is deliberately absent. The daily home is the most
+        // valuable space in the app and a partner credit there has to be a
+        // decision someone makes in the admin panel, not something a new
+        // partner gets by default."
         surfaces: const {
           CareSurface.welcome,
+          CareSurface.home,
           CareSurface.careCircle,
           CareSurface.topic,
           CareSurface.profile,
@@ -208,10 +216,14 @@ class CareVisibility {
     if (dismissed && rule.dismissible) return false;
 
     // FREQUENCY. `once` means once ever, `daily` means once per calendar day.
+    // Not on the home (A1): the home line names who looks after her, like the
+    // Care Circle, so it stands rather than taking a turn. A line that showed
+    // on the first open of the day and was gone after a tab switch would read
+    // as a fault. Dismissal and expiry above still apply.
     // Without this the rule round-trips through the admin panel and changes
     // nothing, which is worse than not offering the setting: someone sets a
     // partner to `once` and watches them appear every single day.
-    if (lastShown != null) {
+    if (lastShown != null && context.surface != CareSurface.home) {
       final at = now ?? DateTime.now();
       switch (rule.frequency) {
         case CareFrequency.once:

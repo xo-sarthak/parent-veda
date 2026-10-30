@@ -5604,3 +5604,33 @@ captures one.** A test now checks that no variable in that function shares a que
 
 Pinned by `test/community_alerts_test.dart` and proved on the database by `supabase/seed/verify_community_alerts.sql`
 (21 checks).
+
+## 16zzz-h. A rewritten flow must carry every side effect of the old one; a derived resolver over two stores; a slot that owns its own gap (Partner Editions A1, 2026-10-30)
+
+A1 put the partner's name on the parent app's homes. There was no migration. Three things in it apply beyond this
+feature.
+
+**1. A rewritten flow must carry every side effect of the old one.** The old sign-up (`auth_flow_screen.dart`) bound
+a clinic's QR token and showed the doctor's welcome. The new onboarding (`onboarding_flow.dart`, V3) replaced it as
+the way in and carried over the questions, but not those two calls. Nothing failed. The token still bound on the
+*next* launch (`main.dart` retries it), so attribution looked correct in the database, and the welcome simply never
+appeared. The general fact: when a flow is replaced, list everything the old one **wrote or triggered**, not just
+what it **showed**. Side effects have no pixels, so a visual review cannot catch them. A1 now pins the calls in
+`_finish` with a source test.
+
+**2. A derived resolver over two stores.** A sponsor (`EntitlementStore`) and a care partner (`CarePartnerStore`)
+were never related, but the homes need one answer: who, if anyone, do we name? `PartnerBrand` listens to both and
+**stores nothing**. Each getter re-derives from its sources.
+- What it buys: the rule ("a sponsor's lockup wins") is in one place and can be tested without pumping a screen.
+- What it costs: one more class to know about.
+- Why derive instead of copying into a third cache: a copy can disagree with its source after sign-out, and this
+  repo has already been hurt by singletons that outlived the account (sync log step 12).
+
+**3. A slot that owns its own gap.** The heroes take `Widget? partner` and put nothing around it. The strip carries
+its 14pt top padding and returns a zero-size box when there is no partner. If the hero added the `SizedBox`, every
+family without a partner would get 14pt of empty space: the "no partner, same pixels" promise would be broken by
+the spacing, not by the content. The general rule: **whoever decides whether something is drawn also owns the space
+around it.**
+
+Pinned by `test/partner_brand_test.dart` and `test/care_visibility_test.dart` (the home group).
+

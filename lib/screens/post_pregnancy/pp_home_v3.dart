@@ -113,6 +113,7 @@ import 'phase_map_screen.dart';
 // import 'family_profile_screen.dart'; // kept for revert — the avatar opens You since 2026-09-19
 // import 'pp_hero_field.dart'; // the field gave way to the painted hero (2026-10-22)
 import '../../widgets/pv_feedback.dart' show PvPress;
+import '../../widgets/partner_lockup.dart' show PartnerStrip; // Partner Editions A1
 import '../../widgets/pv_toast.dart' show pvToast;
 // import 'pp_saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
 import '../dear_baby_vault_screen.dart' show DearBabyLettersReadyCard;
@@ -401,6 +402,7 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   //       settings: const RouteSettings(name: 'pp/phase_map'),
                   //       builder: (_) => const PhaseMapScreen())),
                   child: _PaintedHero(
+                  partner: PartnerStrip(p: p),
                   phase: phase,
                   next: next,
                   child: child,
@@ -4613,7 +4615,12 @@ class _PaintedHero extends StatelessWidget {
     required this.onMessages,
     required this.onCalendar,
     this.unreadMessages = 0,
+    this.partner,
   });
+
+  /// Under the top row, on the painting: the partner strip (Partner Editions
+  /// A1). It owns its gap and takes no room without a partner.
+  final Widget? partner;
 
   final AgePhase phase;
   final AgePhase? next;
@@ -4768,6 +4775,11 @@ class _PaintedHero extends StatelessWidget {
                 ),
               ]),
             ),
+            // The strip sits under the 38pt top row, on the painting, as on
+            // the other two homes; the painting keeps its height, so the
+            // caption below does not move for anyone.
+            if (partner != null)
+              Positioned(left: 18, right: 18, top: top + 10 + 38, child: partner!),
           ]),
         ),
         Padding(

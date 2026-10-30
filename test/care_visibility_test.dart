@@ -54,16 +54,69 @@ void main() {
     });
   });
 
-  test('home is off by default — it has to be switched on deliberately', () {
+  // Kept for revert: home was OFF by default until Partner Editions A1
+  // (2026-10-30, the user deciding D3: a doctor is a "Your doctor" line on
+  // every home).
+  // test('home is off by default — it has to be switched on deliberately', () {
+  //   final partner = _p(type: CarePartnerType.doctor);
+  //   expect(
+  //     CareVisibility.shouldShow(
+  //       partner: partner,
+  //       rule: CareVisibilityRule.defaultsFor(partner.type),
+  //       context: const CareContext(surface: CareSurface.home),
+  //     ),
+  //     isFalse,
+  //   );
+  // });
+  group('home (Partner Editions A1)', () {
     final partner = _p(type: CarePartnerType.doctor);
-    expect(
-      CareVisibility.shouldShow(
-        partner: partner,
-        rule: CareVisibilityRule.defaultsFor(partner.type),
-        context: const CareContext(surface: CareSurface.home),
-      ),
-      isFalse,
-    );
+    final rule = CareVisibilityRule.defaultsFor(partner.type);
+    const home = CareContext(surface: CareSurface.home);
+
+    test('on by default for a partner who brought her', () {
+      expect(CareVisibility.shouldShow(partner: partner, rule: rule, context: home), isTrue);
+    });
+
+    test('stands all day: shown once already today does not hide it', () {
+      final now = DateTime(2026, 10, 30, 18);
+      expect(
+        CareVisibility.shouldShow(
+            partner: partner, rule: rule, context: home,
+            lastShown: DateTime(2026, 10, 30, 9), now: now),
+        isTrue,
+      );
+    });
+
+    test('her dismissal still holds', () {
+      expect(
+        CareVisibility.shouldShow(partner: partner, rule: rule, context: home, dismissed: true),
+        isFalse,
+      );
+    });
+
+    test('an admin can still take home out of one partner', () {
+      const noHome = CareVisibilityRule(surfaces: {CareSurface.careCircle, CareSurface.topic});
+      expect(CareVisibility.shouldShow(partner: partner, rule: noHome, context: home), isFalse);
+    });
+
+    test('a pending partner never reaches the home', () {
+      expect(
+        CareVisibility.shouldShow(
+            partner: _p(type: CarePartnerType.doctor, status: PartnerStatus.pending),
+            rule: rule, context: home),
+        isFalse,
+      );
+    });
+
+    test('daily frequency still applies off the home', () {
+      final now = DateTime(2026, 10, 30, 18);
+      expect(
+        CareVisibility.shouldShow(
+            partner: partner, rule: rule, context: const CareContext(surface: CareSurface.profile),
+            lastShown: DateTime(2026, 10, 30, 9), now: now),
+        isFalse,
+      );
+    });
   });
 
   group('status', () {

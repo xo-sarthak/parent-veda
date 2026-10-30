@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 
 import '../../care_partner/care_partner_models.dart';
+import '../../services/partner_brand.dart' show careLineDetail, careLineLabel;
 import '../post_pregnancy/pp_common.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
@@ -26,6 +27,11 @@ enum CarePartnerCardShape {
 
   /// A card with the photo and welcome — for the welcome moment and Care Circle.
   full,
+
+  /// "Your doctor · Dr Meera Rao", the place underneath, under the top row of
+  /// the three homes (Partner Editions A1, D3). A hairline box on white, never
+  /// a tinted slab: the base UI's rule for a note on the page.
+  home,
 }
 
 class CarePartnerCard extends StatelessWidget {
@@ -35,6 +41,7 @@ class CarePartnerCard extends StatelessWidget {
     this.shape = CarePartnerCardShape.line,
     this.onTap,
     this.padding = EdgeInsets.zero,
+    this.trailing,
   });
 
   final CarePartner partner;
@@ -42,9 +49,19 @@ class CarePartnerCard extends StatelessWidget {
   final VoidCallback? onTap;
   final EdgeInsets padding;
 
+  /// The home shape only: drawn inside its box after the chevron, where the
+  /// slot puts its dismiss so the cross sits in the line, not beside it.
+  final Widget? trailing;
+
   @override
   Widget build(BuildContext context) {
-    final body = shape == CarePartnerCardShape.line ? _line() : _full();
+    // Kept for revert (two shapes, before A1's home line):
+    // final body = shape == CarePartnerCardShape.line ? _line() : _full();
+    final body = switch (shape) {
+      CarePartnerCardShape.line => _line(),
+      CarePartnerCardShape.home => _home(),
+      CarePartnerCardShape.full => _full(),
+    };
     return Padding(
       padding: padding,
       child: onTap == null
@@ -95,6 +112,45 @@ class CarePartnerCard extends StatelessWidget {
           style: ppJakarta(size * 0.34, color: ppPurple)),
     );
   }
+
+  /// The home line. 46pt tall at the default text size: a 30pt avatar inside
+  /// 8pt of padding, the same rhythm as the lockup pill beside it in the
+  /// storyboard. Both lines are single and ellipsised, so a long clinic name
+  /// can never push the hero down.
+  Widget _home() => Container(
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+        decoration: BoxDecoration(
+          color: ppBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: ppLine),
+        ),
+        child: Row(children: [
+          _avatar(30),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('${careLineLabel(partner)} · ${partner.name}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: ppJakarta(12.5, color: ppInk)),
+                if (careLineDetail(partner).isNotEmpty) ...[
+                  const SizedBox(height: 1),
+                  Text(careLineDetail(partner),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ppBody(11.5, color: ppSoft, h: 1.3)),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 6),
+          const Icon(Icons.chevron_right_rounded, size: 18, color: ppSoft),
+          ?trailing,
+        ]),
+      );
 
   Widget _line() => Row(children: [
         _avatar(28),

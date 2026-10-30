@@ -112,6 +112,13 @@ import '../auth_flow_screen.dart'
 import 'onboarding_art.dart';
 import 'onboarding_chrome.dart';
 import 'onboarding_questions.dart';
+// Partner Editions A1: a clinic's QR binds at the end, and the first screen
+// names who sent her.
+import '../../../care_partner/care_journey.dart';
+import '../../../care_partner/care_partner_models.dart' show CarePartner;
+import '../../../care_partner/care_partner_store.dart';
+import '../../care_partner/care_welcome_sheet.dart' show showCareWelcome;
+import '../../../services/partner_brand.dart' show careLineDetail;
 import '../../../widgets/pv_feedback.dart' show PvPress;
 
 /// ⚠️ `hello` IS KEPT AND IS NO LONGER REACHED. It is the V1 name-confirmation
@@ -334,6 +341,24 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   // `_runQuestions` replace it, because the run now depends on the answers.
   //   List<ObQuestion> get _questions =>
   //       onboardingQuestionsFor(_stage ?? '', childName: _childName.text);
+
+  /// The doctor or clinic behind a QR she scanned before installing, looked
+  /// up so the first screen can name them (Partner Editions A1). Null until
+  /// the lookup lands, and for good when it cannot (offline, or the tables
+  /// are not readable before sign-up): the box then says "your doctor".
+  CarePartner? _careInviter;
+
+  @override
+  void initState() {
+    super.initState();
+    final care = CarePartnerStore.instance;
+    final token = care.pendingToken;
+    if (care.hasPending && token != null) {
+      care.lookup(token).then((partner) {
+        if (mounted && partner != null) setState(() => _careInviter = partner);
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -736,6 +761,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                       ],
                     ),
                   ),
+                ],
+                // THE PARTNER VARIANT (Partner Editions A1): a QR from a
+                // clinic is held until she has an account, then binds in
+                // `_finish`. Told, not asked, exactly like a friend's code. A
+                // sponsor has no variant here: an employer's benefit only
+                // exists once she activates with her work email, after sign-up.
+                if (CarePartnerStore.instance.hasPending) ...[
+                  SizedBox(height: invited ? 10 : 20),
+                  _careInvitedBox(p),
                 ],
               ],
             ),
@@ -3928,10 +3962,74 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       /* best-effort */
     }
 
+    // 7. A clinic's QR (Partner Editions A1). She has an account by now (the
+    //    account step comes before reach), so the token held since the scan
+    //    can bind, and the welcome the old sign-up flow showed is shown here
+    //    too: before A1 this flow bound it only on her next launch
+    //    (main.dart) and the welcome never appeared. Same order as
+    //    `_finishMother` in auth_flow_screen.dart. Never blocks her.
+    try {
+      await CarePartnerStore.instance.applyPending();
+      // Bound by now, so the milestone lands against the right partner.
+      if (due != null) CareJourney.pregnancyStarted();
+      if (mounted) await showCareWelcome(context);
+    } catch (_) {/* a doctor's introduction must never block her way in */}
+
     if (!mounted) return;
     // The home she lands on welcomes her, once (pv_home_arrival.dart).
     PvFirstHome.owe();
     widget.onDone(stage, isFather);
+  }
+
+  /// "Recommended by Dr Meera Rao" — the doctor variant of the welcome
+  /// screen's invited box. Same box, same type, so the two read as one family.
+  Widget _careInvitedBox(V2Palette p) {
+    final partner = _careInviter;
+    final detail = partner == null ? '' : careLineDetail(partner);
+    return Container(
+      key: const ValueKey('ob_care_invited'),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      decoration: BoxDecoration(
+        color: p.surfaceAlt,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle_rounded, size: 18, color: p.ink1),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  partner == null
+                      ? 'Recommended by your doctor'
+                      : 'Recommended by ${partner.name}',
+                  style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink1,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  detail.isEmpty
+                      ? "They'll appear in your app once you're set up"
+                      : "$detail · they'll appear in your app once you're set up",
+                  style: pvManrope(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    height: 1.35,
+                    color: p.ink3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
