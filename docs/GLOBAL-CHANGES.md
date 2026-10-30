@@ -33,7 +33,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + B1–B7, B10 LIVE (04847a5), see `docs/STAGE-TRANSITIONS.md`; family switch F1/F3, celebration pages F4 and turning six LIVE (adae4d5); B9 and B11 LIVE; per-pregnancy records and Kept for you LIVE (R1, 656bbb3, 0114 run); F2 Add a pregnancy from the family LIVE (2290cce); F5 one learning space per child LIVE (5fa51e2); F6 open on the last profile used, and taps open their own profile, LIVE (0d72a21); R8, R5, R6, R3, trying again, R2, F8 and F7 (child calendar) LIVE 57c844b (F8 and R3 also in the Ask Veda service) | Phase 5 |
 | 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
-| 12 | Position-aware notifications | 6a LIVE for TTC, Pregnancy and Parenting (Parenting 2026-10-29, PARENTING-GAP 11, one cap with Pregnancy); 6b B0 (one tap opener) BUILT 2026-10-30; B1 (Firebase) and B2 (devices, consent, audience; 0140 run) BUILT 2026-10-30; B3 (campaigns, bookings, the rules; 0143 run, verify 50/0) BUILT 2026-10-30; B4 onward OWED | Phase 6 |
+| 12 | Position-aware notifications | 6a LIVE for TTC, Pregnancy and Parenting (Parenting 2026-10-29, PARENTING-GAP 11, one cap with Pregnancy); 6b B0 (one tap opener) BUILT 2026-10-30; B1 (Firebase) and B2 (devices, consent, audience; 0140 run) BUILT 2026-10-30; B3 (campaigns, bookings, the rules; 0143 run, verify 50/0) BUILT 2026-10-30; B4 (the sender, 0144) BUILT 2026-10-30; B5 onward OWED | Phase 6 |
 | 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags LIVE (2d3a07f) | Phase 1 |
 | 14 | Nutrition door pitches | LIVE (7df4711); supplements WAITING on sheet | Phase 2 |
 | 15 | Action doors lead with an action | LIVE (aa1fe9e) | Phase 2 |
@@ -246,7 +246,7 @@ needed for those, they match by name / category.
 26 buttons and headings. Crisis lines and "someone you trust" prose
 unchanged, by decision.
 
-### 12 · Position-aware notifications — 6a LIVE in all three stages; 6b B0-B3 BUILT, B4 on OWED (Phase 6)
+### 12 · Position-aware notifications — 6a LIVE in all three stages; 6b B0-B4 BUILT, B5 on OWED (Phase 6)
 
 **Asked:** notifications relevant to where she stands (phase / week / child
 age), milestone days (baby turns 2 months), offers and product pitches.
@@ -325,6 +325,15 @@ quote cost in USD and INR first).
   yet. Plan "As built: B3"; test `test/push_b3_contract_test.dart`; verify
   `supabase/seed/verify_push_campaigns.sql`. 0143 run 2026-10-30, verify
   PASSED 50 FAILED 0. Commit 04132625. Next: B4 (the sender), on the user's word.
+- **BUILT 2026-10-30 (6b B4, the sender):** migration 0144 (`pv_push_due`
+  hands out due rows from every queue in one shape, `pv_push_mark` takes the
+  result and drops dead tokens, `pv_push_tick` on an every-minute cron calls
+  the sender only when something is due, `pv_campaign_test(id, email)` through
+  its own `push_tests` queue) and the edge function `push-send` (FCM HTTP v1).
+  Campaigns go at 19:00 IST or later and never past 21:00. Plan "As built:
+  B4"; test `test/push_b4_contract_test.dart`; verify
+  `supabase/seed/verify_push_send.sql`. Owed: run 0144, the secrets, deploy,
+  a test reaching the phone. Next: B5 (the phone reads its booking).
 
 ### 13 · Relevance inside doors
 

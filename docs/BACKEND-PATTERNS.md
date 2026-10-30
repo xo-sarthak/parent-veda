@@ -5389,3 +5389,42 @@ We kept the flag and wrote the risk down; the fix, if it bites, is a date list i
 phone already knows the next 14 days).
 
 Pinned by `test/push_b3_contract_test.dart` and proved on the database by `supabase/seed/verify_push_campaigns.sql`.
+
+## 16zzz-d. A worker that knows no table; a lease, not a lock; at least once beats at most once; a deadline ends the retries; idle should cost nothing (Notifications 6b B4, 0144, 2026-10-30)
+
+B4 sends what B3 booked. The edge function `push-send` talks to Firebase; the database decides everything else.
+
+**1. A queue read through a function can grow a second source without the worker changing.** The sender calls
+`pv_push_due()` for rows and `pv_push_mark()` with results, and nothing else. Each queue (campaigns, tests, and
+later Community's replies) is a branch inside those two functions that returns one shared shape. Adding a queue is
+a SQL change; the code that holds the Firebase key never moves. **Put the knowledge of "what is due" next to the
+data, and keep the worker that talks to the outside world dumb.**
+
+**2. A lease, not a lock.** Two runs can overlap: the cron fires every minute, and a run might take longer.
+`pv_push_due` claims rows with `for update skip locked` (a second run skips rows the first has locked instead of
+waiting for them) and stamps `claimed_at`. A claim older than 5 minutes is free again. A database lock would end
+with the transaction, long before the HTTP calls finish; a lease is a lock written as data, so it survives the
+transaction and expires on its own if the worker dies.
+
+**3. At least once beats at most once, when a duplicate is cheap.** If the worker crashes after Firebase said yes
+but before the mark, the lease lapses and the row goes again: a duplicate. The other choice, marking before sending,
+loses the message on the same crash. We picked the duplicate, and made it cheap: the Android `tag` makes the second
+notification replace the first. **No system delivers exactly once over a network; choose which failure you can
+afford, then make it harmless.**
+
+**4. A deadline stored with the work ends the retries.** A short failure (429, 5xx, network) sends the row back to
+`queued`, and the next minute tries again. There is no retry counter: the row's `send_before` (21:00 IST) ends it
+as `past_cutoff`. The deadline B3 stored for "never a night buzz" doubles as the retry limit.
+
+**5. Idle should cost nothing.** The cron runs every minute but calls the function over HTTP only when
+`pv_push_any_due()` says a row is due. Most minutes are one indexed query. The general shape: **poll cheaply
+where the data lives, and wake the expensive thing only when there is work.**
+
+**6. Give each caller the narrowest key.** The cron authenticates with its own `PUSH_SEND_SECRET`, kept in Vault
+and in the function's secrets, not the service-role key. If it leaked, all it could do is make due rows go a minute
+early. The function itself uses the service-role key, which never leaves Supabase.
+
+**7. Clean up on the answer that proves it.** A token is deleted only when Firebase answers `UNREGISTERED` (the app
+is gone from that phone), not on any error: a bad payload or a Firebase outage must not wipe her devices.
+
+Pinned by `test/push_b4_contract_test.dart` and proved on the database by `supabase/seed/verify_push_send.sql`.

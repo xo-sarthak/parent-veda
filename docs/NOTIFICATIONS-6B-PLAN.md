@@ -522,6 +522,29 @@ booking tonight, a campaign in the 7 days ending tonight (cap **1**).
 Fill `sent_at`, `devices_sent`, `status`, `error`. The phone's tap needs the
 booking's `id` in the push data to fill `tapped_at` (B5).
 
+**For B4, agreed with Community phase 3 (user, 2026-10-30): one sender, many
+queues.** Community will push replies, moved-session alerts and crisis alerts
+to moderators, from its OWN consent table and its OWN queue (0140 and 0143
+stay as they are). So the sender must not know any queue's table:
+
+- `push-send` gets its rows from **one SQL function, `pv_push_due()`**
+  (service_role only), returning each due row as `{queue, row_id, user_id,
+  title, body, data, collapse_key}`, and reports back through one
+  `pv_push_mark(queue, row_id, status, devices_sent, error)`. B4 writes both
+  with the `push_sends` branch only (the 19:00 rule, `send_before`,
+  `past_cutoff` stay inside it). Community adds its branch to these two
+  functions later and never edits the sender.
+- **It runs every minute** (`pg_cron`, through `pg_net`), and the cron's SQL
+  calls the function only when something is due, so an idle minute costs
+  nothing. Campaign rows are simply not due until 19:00.
+- `collapse_key` becomes FCM's `collapse_key` and the Android notification
+  `tag`, so several replies to one post replace each other on the phone.
+
+Why: the outbox-and-worker shape most apps use. A queue that is read through a
+function can grow a second source without the sender changing, and a sweep
+every minute is the guarantee: a missed run costs a minute, never a message.
+Detail: docs/COMMUNITY.md, "Phase 3: plan and decisions".
+
 **Test:** `test/push_b3_contract_test.dart` pins both tables' columns, the
 constants (1 a week, 10%, 7 days, 14 days, 21:00, the 10:00 cron), the rule
 order and its doc comment, the 0112 condition word for word, no TTC table read,
@@ -537,6 +560,86 @@ quiet flag's truth table and wiring.
   matters: `quiet_evenings date[]`, the busy-evenings shape.
 - Campaign text can still be edited after approval by a direct table write
   (the Directus phase should lock it).
+
+### As built: B4 (2026-10-30)
+
+**The sender exists. Tonight's booking now goes out at 19:00 IST through
+Firebase.** Migration `0144_push_send.sql`, edge function
+`supabase/functions/push-send/index.ts`, verify
+`supabase/seed/verify_push_send.sql` (38 checks, ends in the red "error"
+that is the report and rolls back), test `test/push_b4_contract_test.dart`.
+
+| Piece | Where | What it does |
+|---|---|---|
+| `pv_push_due(limit)` | 0144 | Every due row from every queue, one shape: `queue, row_id, user_id, tokens, title, body, data, collapse_key, priority, channel`. Claims what it hands out. Ends what can no longer go (`past_cutoff`, `no_device`) |
+| `pv_push_mark(queue, row_id, status, devices_sent, error, dead_tokens)` | 0144 | The result. Changes only a row still `queued`; deletes the dead tokens |
+| `pv_push_tick()` | 0144, cron `push-send-every-minute` | Ends late rows, then calls `push-send` through `pg_net` **only if** `pv_push_any_due()` |
+| `push_tests` + `pv_campaign_test(id, email)` | 0144 | Your own devices, within a minute, any hour, draft or approved. Stale after 10 minutes |
+| `push_sends.claimed_at` | 0144 | The lease: a row being sent is not handed out twice; it lapses after 5 minutes |
+| `push-send` | edge function | FCM HTTP v1, one request per token, 20 in flight, 500 rows a run. UNREGISTERED: token dropped. 429 / 5xx / network: back to `queued`, next minute retries. `sent` once any device took it |
+
+**The push data:** `link_kind`, `link_id` (the phone opens it, B0), `queue`
+and `row_id` (the booking's id; B5's tap fills `tapped_at` from these two).
+`collapse_key` = `campaign-<id>`, sent as FCM's `collapse_key` and the
+Android `tag`.
+
+**Why it is shaped this way:**
+
+- **The sender knows no table.** It calls two functions. Every rule about
+  *when* (19:00, the cutoff) and *to which device* (link version) is in the
+  queue's SQL branch, so Community's queue is a new branch, not a new sender.
+  The test fails if the sender calls any other function or reads a table.
+- **The tokens come with the row.** The agreed shape had no tokens, and the
+  sender reading `push_devices` would have broken "knows no table". So the
+  branch returns them, already filtered to builds that can open the link.
+  `tokens`, `priority` and `channel` are additions Community can fill;
+  campaigns send `normal` and no channel (FCM's default) until B5 makes one.
+- **At least once, never lost.** A claim for 5 minutes, `for update skip
+  locked`. Two runs at once take different rows. A sender that dies leaves
+  its rows to the next minute. The cost: a crash between FCM's "yes" and the
+  mark sends twice; the Android tag makes the second replace the first.
+- **The cutoff ends the retries.** A short failure releases the row; past
+  21:00 the next tick ends it as `past_cutoff`. No retry counter needed.
+- **Idle costs one query.** The cron runs every minute but makes the HTTP
+  call only when a row is due: a few edge invocations an evening, not 1,440
+  a day.
+- **A dedicated `PUSH_SEND_SECRET`, not the service-role key, on the cron's
+  call.** Leaked, it lets someone make due rows go a minute early, nothing
+  more. Least privilege for the one door that is open to the internet.
+
+**Changed from the plan, each for a reason:**
+
+- `pv_campaign_test` takes **your email**: the SQL editor has no
+  `auth.uid()`, so it cannot know who "you" are.
+- **Tests are their own queue** (`push_tests`), not `push_sends` rows: a test
+  booking would have used up your real booking of that campaign (one
+  campaign reaches a person once) and counted toward the weekly cap. The
+  user's call, 2026-10-30.
+- `pv_push_mark` gained `dead_tokens` (default empty), so the sender still
+  writes through one function.
+
+**Setup, once (the user), in this order:**
+
+1. Run `supabase/migrations/0144_push_send.sql`.
+2. Dashboard → Edge Functions → Secrets: `FCM_SERVICE_ACCOUNT` = the whole
+   service-account JSON (`C:\Users\sarth\secrets\`), and `PUSH_SEND_SECRET` =
+   a long random string.
+3. SQL editor: `select vault.create_secret('https://<ref>.supabase.co/functions/v1/push-send', 'push_send_url');`
+   and `select vault.create_secret('<the same random string>', 'push_send_secret');`
+4. `supabase functions deploy push-send --no-verify-jwt`
+5. Run `supabase/seed/verify_push_send.sql` (check 38 needs step 3).
+6. Create a draft campaign and `select public.pv_campaign_test('<id>', '<your email>');`.
+   Within a minute it should reach your phone. Then
+   `select status, devices_sent, error from public.push_tests order by created_at desc limit 1;`
+
+**Owed from B4:**
+- ~~The setup above~~ done 2026-10-30: 0144 run (cron job 6), secrets and Vault set, push-send deployed, verify PASSED 38 FAILED 0. Still owed: a test reaching the phone (the B4 row's proof), moved to the phone walk by the user 2026-10-30: the phone has no build with B1/B2 yet, so it has no token on the server. Run step 6 then.
+- A push that arrives while the app is OPEN is not shown (FCM gives it to
+  the app, and the app does not draw it yet): B5, as B1 recorded.
+- An Android channel for campaigns ("Offers and news"): until then FCM's
+  default channel. B5 creates it and the branch returns its id.
+- The Deno code was not type-checked here (no Deno on this machine); the
+  deploy compiles it.
 
 ## Costs
 
@@ -588,7 +691,7 @@ account you need for the App Store anyway.
 | B1 | Firebase in the app (`firebase_core`, `firebase_messaging`). It must not crash with no config: an unconfigured Firebase behaves like being logged out | The app starts on a build with no `google-services.json`. **BUILT 2026-10-30**, see "As built: B1"; the build check is owed |
 | B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`). **BUILT 2026-10-30**, see "As built: B2"; 0140 run 2026-10-30 |
 | B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron. Plus decisions 15 to 22 (holdout, `tapped_at`, 7-day grace, wider quiet incl. the phone flag, priority, cutoff, length limits, 1 a week) | `supabase/seed/verify_push_campaigns.sql` passes by hand. **BUILT 2026-10-30** (04132625), see "As built: B3"; 0143 run, verify 50/0 |
-| B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens, the 19:00 IST cron through `pg_net` | `pv_campaign_test` reaches your phone |
+| B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens. **Reads only `pv_push_due()` / writes only `pv_push_mark()`, every minute through `pg_net`** (see "For B4, agreed with Community phase 3") | `pv_campaign_test` reaches your phone. **BUILT 2026-10-30**, see "As built: B4"; 0144 run, deployed, verify 38/0; the phone test owed |
 | B5 | Phone: read bookings, give the evening to the campaign, show it in Messages | Planner tests: a booked evening never rings two |
 | B6 | Phone walk, on the user's word | See "Owed" |
 | B7 | iPhone, once the Apple account exists | One test campaign on an iPhone |
@@ -645,7 +748,9 @@ before B2.
   (project `parentveda-15ec4`, three Android apps, key kept outside the repo),
   and `pg_net` (step 9), turned on by the user 2026-10-30.
 - **During the build:** ~~a BACKEND-PATTERNS section for 6b~~ written with B2
-  (§16zzz-a), and B2's sync-log step (step 31). Still owed: the BEFORE-LAUNCH lines below.
+  (§16zzz-a), and B2's sync-log step (step 31). B3: §16zzz-c, step 32, and the
+  BEFORE-LAUNCH lines (Firebase project, privacy line, DPDP for server offers, Play
+  disclosure), written 2026-10-30. B4: §16zzz-d.
   Original note: a BACKEND-PATTERNS section for 6b. It should cover
   "moving a decision moves its inputs", "the cost of losing a write decides how
   hard you deliver it" and "pick the shape where missing means the true answer".
