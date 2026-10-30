@@ -83,6 +83,7 @@ import 'pv_account_actions.dart';
 import 'pv_child_screen.dart';
 import 'pv_data_privacy_screen.dart';
 import 'pv_details_screen.dart';
+import 'pv_experts_screen.dart';
 import 'pv_more_bento.dart';
 import 'pv_partner_screen.dart';
 import 'pv_settings_screen.dart';
@@ -1556,6 +1557,12 @@ class _PvYouScreenState extends State<PvYouScreen> {
           EmployerBenefitsScreen(lang: ctl?.language ?? AppLanguage.english),
           'employer',
         ),
+      ),
+      PvYouRow(
+        icon: Icons.workspace_premium_outlined,
+        title: 'Our experts',
+        subtitle: 'The specialists who work with ParentVeda',
+        onTap: () => _push(const PvExpertsScreen(), kPvExpertsRoute),
       ),
       PvYouRow(
         icon: Icons.info_outline_rounded,

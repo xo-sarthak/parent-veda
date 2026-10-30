@@ -15,6 +15,7 @@ import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../profile/pv_experts_screen.dart' show openPvExperts;
 import '../doors/pv_list_row.dart' show PvRowGroup, PvListRow;
 import '../pregnancy/preg_tool_chrome.dart' show PregToolScaffold, pregToolPad;
 import '../ttc/ttc_tool_marks.dart' show TtcMarkLeading, TtcToolMark;
@@ -137,6 +138,21 @@ class _ProviderResultsScreenState extends State<ProviderResultsScreen> {
         pregToolPad(Text(
             'Ranked by ParentVeda from our research and real parent reviews. Booking is mock for now.',
             style: ppBody(12, color: p.ink3, h: 1.55))),
+        // A quiet way to the directory of the specialists who work with
+        // ParentVeda (2026-10-30). Below the list, so it never competes with
+        // the experts she can book.
+        const SizedBox(height: 14),
+        pregToolPad(PvPress(
+          child: InkWell(
+            onTap: () => openPvExperts(context),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text('Meet our experts',
+                  style: ppBody(13.5, color: p.ink1, w: FontWeight.w700)
+                      .copyWith(decoration: TextDecoration.underline)),
+            ),
+          ),
+        )),
         const SizedBox(height: 32),
       ],
     );

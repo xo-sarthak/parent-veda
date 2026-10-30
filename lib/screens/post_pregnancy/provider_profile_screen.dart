@@ -13,6 +13,7 @@
 import 'package:flutter/material.dart';
 
 import '../../booking/booking_catalog.dart';
+import '../../experts/panel_experts.dart' show kPanelNameNote;
 import '../../data/prepare_data.dart';
 import '../../localization/app_language.dart';
 import '../prepare/program_detail_screen.dart';
@@ -37,10 +38,22 @@ import '../learn/pv_learn_flow.dart';
 import '../learn/pv_offering_screen.dart';
 
 class ProviderProfileScreen extends StatelessWidget {
-  const ProviderProfileScreen({super.key, this.expert});
+  const ProviderProfileScreen({super.key, this.expert, this.onlyProfile = false});
 
   /// The person to render. Defaults to Dr. Neha Sharma when null.
   final Expert? expert;
+
+  /// ⚠️ PROFILE ONLY - ADDED 2026-10-30 FOR THE "OUR EXPERTS" DIRECTORY
+  /// (`kPanelExperts`). True switches off everything that belongs to a
+  /// bookable expert and could not be true of these five: the rating and
+  /// reviews stat row, "Sessions with ...", reviews, and the Book pill. It also
+  /// reads `why` as the "More about her" list (one item per line, first four,
+  /// then a "Show all N" toggle) instead of a paragraph.
+  ///
+  /// Default false, so every existing caller renders exactly as before. A flag
+  /// rather than a second profile page, because the credentials block is the
+  /// one thing the two must never disagree about.
+  final bool onlyProfile;
 
   static const Color _green = Color(0xFF1F8A5B);
 
@@ -675,6 +688,7 @@ class _ProfileBody extends StatefulWidget {
 
 class _ProfileBodyState extends State<_ProfileBody> {
   bool _qualsOpen = false;
+  bool _moreOpen = false;
 
   Expert get e => widget.e;
 
@@ -698,11 +712,18 @@ class _ProfileBodyState extends State<_ProfileBody> {
     // instead. The profile reads both, so a person is bookable and reviewed
     // whichever side wrote them. Merging the two models is owed
     // (STILL-OPEN §63.16); until then this seam is the one place they meet.
-    final sp = kSpecialists.where((x) => x.name.en == e.name).firstOrNull;
-    final bookable = e.timings.trim().isNotEmpty || sp != null;
-    final reviews = e.reviews.isNotEmpty
-        ? e.reviews
-        : [for (final r in sp?.reviews ?? const <Review>[]) (r.who.now, r.when.now, r.quote.now)];
+    final only = widget.screen.onlyProfile;
+    final sp = only ? null : kSpecialists.where((x) => x.name.en == e.name).firstOrNull;
+    final bookable = !only && (e.timings.trim().isNotEmpty || sp != null);
+    final reviews = only
+        ? const <(String, String, String)>[]
+        : e.reviews.isNotEmpty
+            ? e.reviews
+            : [for (final r in sp?.reviews ?? const <Review>[]) (r.who.now, r.when.now, r.quote.now)];
+    final moreItems = only
+        ? [for (final l in e.whyNow.split('\n')) if (l.trim().isNotEmpty) l.trim()]
+        : const <String>[];
+    final nameNote = only ? (kPanelNameNote[e.id] ?? '') : '';
     final first = _first(e);
     final initials = e.name
         .replaceAll('Dr. ', '')
@@ -765,7 +786,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
     // }
     final offers = <Widget>[];
     final offered = <PvOfferingView>[
-      ...PvLearnCatalog.instance.forExpert(e.id),
+      if (!only) ...PvLearnCatalog.instance.forExpert(e.id),
       if (sp != null) ?PvLearnCatalog.instance.byId(sp.id),
     ];
     final seen = <String>{};
@@ -821,7 +842,19 @@ class _ProfileBodyState extends State<_ProfileBody> {
                           fontSize: 30, fontWeight: FontWeight.w800, color: p.ink1)),
                 ),
                 const SizedBox(height: 16),
-                Text(e.name,
+                Text.rich(
+                    TextSpan(children: [
+                      TextSpan(text: e.name),
+                      // "Dr." beside the qualification, so it is never read as
+                      // a medical doctor (onlyProfile only).
+                      if (nameNote.isNotEmpty)
+                        TextSpan(
+                            text: ', $nameNote',
+                            style: pvManrope(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: p.ink2)),
+                    ]),
                     style: pvFraunces(
                         fontSize: 28,
                         fontWeight: FontWeight.w600,
@@ -862,16 +895,19 @@ class _ProfileBodyState extends State<_ProfileBody> {
                 ],
                 const SizedBox(height: 20),
                 // ---- the stat row (Airbnb's host page) --------------------
-                Row(children: [
-                  _stat(p, '★ ${e.rating}', e.reviewsCount.isNotEmpty ? e.reviewsCount : 'rating'),
-                  _rule(p),
-                  _stat(p, e.mid.$1, e.mid.$2),
-                  if (e.experience.trim().isNotEmpty) ...[
+                // Not for a profile-only expert: no rating, no reach, no years
+                // taken from the first word of a sentence.
+                if (!only)
+                  Row(children: [
+                    _stat(p, '★ ${e.rating}', e.reviewsCount.isNotEmpty ? e.reviewsCount : 'rating'),
                     _rule(p),
-                    _stat(p, e.experience.split(' ').first, 'years'),
-                  ],
-                ]),
-                const SizedBox(height: 8),
+                    _stat(p, e.mid.$1, e.mid.$2),
+                    if (e.experience.trim().isNotEmpty) ...[
+                      _rule(p),
+                      _stat(p, e.experience.split(' ').first, 'years'),
+                    ],
+                  ]),
+                if (!only) const SizedBox(height: 8),
                 Divider(height: 1, color: p.line),
               ]),
             ),
@@ -880,12 +916,38 @@ class _ProfileBodyState extends State<_ProfileBody> {
             if (e.blurbNow.trim().isNotEmpty)
               _section(p, 'About $first', Text(e.blurbNow,
                   style: pvManrope(fontSize: 15, height: 1.6, color: p.ink1))),
-            if (e.whyNow.trim().isNotEmpty)
+            if (e.whyNow.trim().isNotEmpty && !only)
               _section(
                   p,
                   e.whyHeadingNow.trim().isEmpty ? 'Why ParentVeda picks $first' : e.whyHeadingNow,
                   Text(e.whyNow,
                       style: pvManrope(fontSize: 15, height: 1.6, color: p.ink1))),
+            // "More about her" - the first four, then "Show all N" (onlyProfile).
+            if (moreItems.isNotEmpty)
+              _section(
+                  p,
+                  e.whyHeadingNow.trim().isEmpty ? 'More about $first' : e.whyHeadingNow,
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    for (final m in (_moreOpen ? moreItems : moreItems.take(4))) _line(p, m),
+                    if (moreItems.length > 4)
+                      PvPress(
+                        child: InkWell(
+                          onTap: () {
+                            pvCommitFeedback();
+                            setState(() => _moreOpen = !_moreOpen);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Text(
+                                _moreOpen ? 'Show less' : 'Show all ${moreItems.length}',
+                                style: pvManrope(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: p.ink1)),
+                          ),
+                        ),
+                      ),
+                  ])),
             if (focus.isNotEmpty || langs.isNotEmpty)
               _section(
                   p,
