@@ -58,3 +58,19 @@ String partnerPrivacyText(PartnerOrg org) =>
     'who is worried about what. Every total is held back below a minimum '
     'group size. Your ${org.peopleWord} were promised this when they '
     'activated.';
+
+// ---- P3: an IVF centre's tabs -------------------------------------------------
+
+/// A centre's behavioural figure held back. [min] is the server's min_cohort.
+String partnerCareWithheldText(int min) => 'Shown once $min families join';
+
+/// How a centre adds a doctor: we do it (STILL-OPEN §5.1c).
+const kPartnerAddDoctorText =
+    'To add a doctor, contact your ParentVeda manager.';
+
+/// What a centre will never see, said where it looks at its numbers.
+String partnerCarePrivacyText(int min) =>
+    'You see totals, never a family: no names, no contact details, nothing '
+    'any one family did. What families did is held back until $min have '
+    'joined, because in a small group a single pregnancy is close to a name. '
+    'The families you brought were promised this when they joined.';

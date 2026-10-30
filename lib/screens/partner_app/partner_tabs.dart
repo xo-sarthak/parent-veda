@@ -3,7 +3,9 @@
 // -----------------------------------------------------------------------------
 //  Overview · People · Content · Account. P1 built the frame and the Account
 //  tab; P2 gave an employer or a school its Overview and People
-//  (partner_sponsor_overview.dart, partner_sponsor_people.dart). What is left
+//  (partner_sponsor_overview.dart, partner_sponsor_people.dart); P3 gave an
+//  IVF centre its Overview and Doctors (partner_care_overview.dart,
+//  partner_care_doctors.dart). What is left
 //  opens on its empty state, which is the
 //  house rule rather than a placeholder: a feature is never hidden, and the
 //  empty state is the feature's advertisement. Each one is replaced in place
@@ -25,6 +27,8 @@ import '../../partner_app/partner_org_session.dart';
 import '../../partner_app/partner_sign_out.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../doctor/doctor_chrome.dart';
+import 'partner_care_doctors.dart';
+import 'partner_care_overview.dart';
 import 'partner_sponsor_overview.dart';
 import 'partner_sponsor_people.dart';
 import 'partner_words.dart';
@@ -107,26 +111,29 @@ class PartnerOverviewTab extends StatelessWidget {
   const PartnerOverviewTab({super.key, required this.org});
   final PartnerOrg org;
 
-  // P2: an employer or a school gets its numbers; an IVF centre keeps the
-  // empty state until P3.
+  // P2: an employer or a school gets its numbers; P3: an IVF centre gets its
+  // own (care_org_dashboard, 0139). Its empty state moved into
+  // PartnerCareOverview, which shows it until the numbers arrive.
   @override
   Widget build(BuildContext context) => org.kind == PartnerOrgKind.sponsor
       ? PartnerSponsorOverview(org: org)
-      : DcTab(
-          title: 'Overview',
-          subtitle: org.name,
-          children: [
-            PartnerOrgHeader(org),
-            const SizedBox(height: 20),
-            const DcEmpty(
-              'Your numbers live here',
-              'Families each of your doctors brought, and how many are active, '
-                  'appear on this tab.',
-              icon: Icons.insights_outlined,
-            ),
-            _barRoom,
-          ],
-        );
+      : PartnerCareOverview(org: org);
+  // Kept for revert (P1's care_org Overview, before P3):
+  //   : DcTab(
+  //       title: 'Overview',
+  //       subtitle: org.name,
+  //       children: [
+  //         PartnerOrgHeader(org),
+  //         const SizedBox(height: 20),
+  //         const DcEmpty(
+  //           'Your numbers live here',
+  //           'Families each of your doctors brought, and how many are active, '
+  //               'appear on this tab.',
+  //           icon: Icons.insights_outlined,
+  //         ),
+  //         _barRoom,
+  //       ],
+  //     );
 }
 
 class PartnerPeopleTab extends StatelessWidget {
@@ -136,18 +143,21 @@ class PartnerPeopleTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (org.kind == PartnerOrgKind.careOrg) {
-      return const DcTab(
-        title: 'Your doctors',
-        children: [
-          DcEmpty(
-            'Your doctors appear here',
-            'Each doctor at your centre, with the families they brought. '
-                'No family is ever named. To add a doctor, contact your ParentVeda manager.',
-            icon: Icons.medical_services_outlined,
-          ),
-          _barRoom,
-        ],
-      );
+      // P3: the per-doctor table. Its empty state is the one that stood here.
+      return PartnerCareDoctors(org: org);
+      // Kept for revert (P1, before P3):
+      // return const DcTab(
+      //   title: 'Your doctors',
+      //   children: [
+      //     DcEmpty(
+      //       'Your doctors appear here',
+      //       'Each doctor at your centre, with the families they brought. '
+      //           'No family is ever named. To add a doctor, contact your ParentVeda manager.',
+      //       icon: Icons.medical_services_outlined,
+      //     ),
+      //     _barRoom,
+      //   ],
+      // );
     }
     // P2: the roster. Its empty state is the one that stood here.
     return PartnerSponsorPeople(org: org);

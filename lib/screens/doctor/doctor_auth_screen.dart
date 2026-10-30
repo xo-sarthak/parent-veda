@@ -44,8 +44,17 @@ import '../../doctor/doctor_session.dart';
 import 'doctor_art.dart';
 import 'doctor_chrome.dart';
 
+/// (P3, R5) What an organisation login is told in ParentVeda+, and where to go.
+const kDoctorOrgLoginText =
+    'This account is for ParentVeda Partners, the app for clinics and '
+    "centres. Sign in there to see your centre's numbers.";
+
 class DoctorAuthScreen extends StatefulWidget {
-  const DoctorAuthScreen({super.key, required this.onSignedIn});
+  const DoctorAuthScreen({super.key, required this.onSignedIn, this.notice});
+
+  /// A refusal carried in from the boot (a restored org login, R5), shown on
+  /// the form until she starts typing.
+  final String? notice;
 
   /// Called after a successful sign-in whose identity resolved, OR could not
   /// be checked because the server did not answer (the app then shows its
@@ -64,7 +73,10 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
   final _password = TextEditingController();
   _Step _step = _Step.email;
   bool _busy = false;
-  String? _error;
+  late String? _error = widget.notice;
+
+  /// The text each field had when its listener last ran. See [_clearError].
+  final _lastText = <TextEditingController, String>{};
 
   /// Must agree with Authentication → Email → "Email OTP Length" in the
   /// dashboard (6; the project defaulted to 8 once — AUTH-SETUP §3b).
@@ -77,18 +89,28 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
     // field it is gone — a red line that stays while she is already typing
     // the fix is the app arguing with her (walked 2026-09-21).
     for (final c in [_email, _code, _password]) {
-      c.addListener(_clearError);
+      _lastText[c] = c.text;
+      c.addListener(() => _clearError(c));
     }
   }
 
-  void _clearError() {
+  /// Clears on a change of TEXT only. A controller also notifies on a change
+  /// of selection, and an autofocused field sets its selection on first
+  /// layout, so clearing on any notification wiped a refusal carried in from
+  /// the boot before anyone saw it. The Partners sign-in hit exactly this in
+  /// P1; this screen only became exposed when [DoctorAuthScreen.notice] was
+  /// added (P3).
+  void _clearError(TextEditingController c) {
+    if (c.text == _lastText[c]) return;
+    _lastText[c] = c.text;
     if (_error != null && mounted) setState(() => _error = null);
   }
 
   @override
   void dispose() {
+    // The listeners are closures, so there is nothing to remove by name;
+    // disposing the controller drops them.
     for (final c in [_email, _code, _password]) {
-      c.removeListener(_clearError);
       c.dispose();
     }
     super.dispose();
@@ -220,6 +242,20 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
     // and the app shows its offline screen, whose Try again resolves again.
     if (result == DoctorResolve.unreachable) {
       widget.onSignedIn();
+      return;
+    }
+    // R5 (P3): an organisation login belongs in ParentVeda Partners. Signed
+    // out here, as a not-a-doctor is, so the next person on the phone starts
+    // clean; the line says where to go instead.
+    if (result == DoctorResolve.orgLogin) {
+      await Supabase.instance.client.auth.signOut();
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _step = _Step.email;
+        _code.clear();
+        _error = kDoctorOrgLoginText;
+      });
       return;
     }
     if (result == DoctorResolve.notADoctor) {

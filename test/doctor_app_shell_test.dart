@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/doctor/doctor_ledger.dart';
 import 'package:parentveda/main_doctor.dart';
+import 'package:parentveda/screens/doctor/doctor_auth_screen.dart';
 import 'package:parentveda/screens/doctor/doctor_cant_reach.dart';
 import 'package:parentveda/screens/doctor/doctor_chrome.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -316,6 +317,51 @@ void main() {
       });
       expect(video.headline, 'Video: Sleep basics');
       expect(video.isReversal, isFalse);
+    });
+  });
+
+  // Partner Editions P3, R5: once the Partners app exists, ParentVeda+ refuses
+  // an organisation-only login and says where it belongs. A login that is
+  // ALSO a clinician (expert_accounts) still opens as a doctor.
+  group('R5 · an organisation login is sent to ParentVeda Partners', () {
+    final src = _read('lib/doctor/doctor_session.dart').replaceAll('\r\n', '\n');
+    final resolve = src.substring(src.indexOf('Future<DoctorResolve> resolveFromServer()'));
+
+    test('expert first; the org branch refuses in the standalone app only', () {
+      final expert = resolve.indexOf("'expert_accounts'");
+      final org = resolve.indexOf("'my_care_partner'");
+      final refuse = resolve.indexOf('if (standalone) return DoctorResolve.orgLogin;');
+      expect(expert, greaterThanOrEqualTo(0));
+      expect(expert, lessThan(org), reason: 'a clinician who manages a clinic stays a doctor');
+      expect(refuse, greaterThan(org));
+      // Refused BEFORE the session is activated in that branch.
+      expect(refuse, lessThan(resolve.indexOf('_active = true;', org)));
+    });
+
+    test('the sign-in form and the boot both handle it, and both sign out', () {
+      final auth = _read('lib/screens/doctor/doctor_auth_screen.dart');
+      final branch = auth.substring(auth.indexOf('if (result == DoctorResolve.orgLogin)'));
+      expect(branch.indexOf('auth.signOut()'), lessThan(branch.indexOf('_error = kDoctorOrgLoginText;')));
+      final main = _read('lib/main_doctor.dart');
+      expect(main, contains('if (result == DoctorResolve.orgLogin)'));
+      expect(main, contains('_refusal = kDoctorOrgLoginText;'));
+      expect(main, contains('DoctorAuthScreen(onSignedIn: _afterSignIn, notice: _refusal)'));
+    });
+
+    testWidgets('a refusal carried in from the boot survives first layout', (t) async {
+      // The autofocused field sets its selection on first layout; a listener
+      // that cleared the error on ANY notification wiped this before it was
+      // seen (P1 found it on the Partners sign-in).
+      await t.pumpWidget(MaterialApp(
+        home: DoctorAuthScreen(onSignedIn: () {}, notice: kDoctorOrgLoginText),
+      ));
+      await t.pumpAndSettle();
+      expect(find.text(kDoctorOrgLoginText), findsOneWidget);
+      expect(find.textContaining('ParentVeda Partners'), findsOneWidget);
+      // Typing is still what clears it.
+      await t.enterText(find.byType(TextField).first, 'a');
+      await t.pump();
+      expect(find.text(kDoctorOrgLoginText), findsNothing);
     });
   });
 }

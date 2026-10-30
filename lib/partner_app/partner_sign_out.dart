@@ -21,6 +21,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../care_partner/partner_dashboard_store.dart';
 import '../services/sponsor_admin_store.dart';
+import 'care_org_store.dart';
 import 'partner_org_session.dart';
 
 Future<void> forgetPartnerOrgOnThisPhone() async {
@@ -33,6 +34,11 @@ Future<void> forgetPartnerOrgOnThisPhone() async {
   PartnerOrgSession.instance.clear();
   // Employer and school: the dashboard and the roster of names (P2).
   SponsorAdminStore.instance.clear();
-  // IVF centre: the care-partner numbers (P3).
+  // IVF centre: its dashboard and per-doctor table (P3, 0139).
+  CareOrgStore.instance.clear();
+  // ParentVeda+'s store. P1 cleared it here expecting P3 to use it; P3 does
+  // not (it resolves through my_care_partner, which can pick a different
+  // partner, see care_org_store.dart). Cleared anyway: the parent build's
+  // doctor mode can fill it, and clearing an empty store costs nothing.
   PartnerDashboardStore.instance.reset();
 }

@@ -116,6 +116,46 @@ the app's email check still stops the common case).
    Edge cases: an org login that is *also* a clinician (has `expert_accounts`) stays in ParentVeda+ as a doctor.
 Tests: `partner_care_org_test` and `doctor_app_shell_test` (org refusal).
 
+### P3 as built (2026-10-30)
+
+**Changed from the plan, said plainly.** The plan read the Overview from `partner_impact` + `partner_funnel` +
+`partner_earnings` and the per-doctor table from `partner_referral_breakdown()`. Checked against `my_partner_org()`
+first:
+- the three that take `p_partner_id` **agree** (the app passes the Route A id `my_partner_org()` returned, and
+  `caller_owns_partner` always lets that through);
+- `partner_referral_breakdown()` **does not**: it takes no id, sums every partner the login owns by either route and
+  groups by doctor only, so a centre manager who is also a doctor with her own practice gets both in one table;
+- `partner_impact` / `partner_funnel` send behaviour (pregnancies, children, consults, vaccinations, reads, activated)
+  with no small-number rule, so hiding it in the app would not hide it (R3);
+- and `PartnerDashboardStore.load()` resolves through `my_care_partner()`, which prefers her own practice (0132).
+
+The user chose (2026-10-30) **one new zero-argument RPC, `care_org_dashboard()` (0139)**, shaped like
+`sponsor_dashboard`. The four shared RPCs and ParentVeda+ are unchanged. `partner_referral_breakdown()` still has no
+caller (STILL-OPEN §5.1e).
+
+| # | What shipped | Where |
+|---|---|---|
+| 1 | `care_org_dashboard()` → `{ok, partner_id, min_cohort, suppressed, families, scanned, installed, signed_up, active_30d, activated, pregnancies, children, consultations, vaccinations, content_read, earnings[], doctors[]}`. It finds the centre by **calling `my_partner_org()`** (not a copy of its join), and answers only a live care_org: otherwise `{ok:false, code: not_a_care_org | not_live}`. Referral facts and money as they are; behaviour null below `min_cohort` (the sponsors' config row, so one privacy dial), base = the centre's families. Same counting definitions as `partner_funnel` / `partner_impact` | `supabase/migrations/0139_care_org_dashboard.sql` |
+| 1+ | Per-doctor rows, three kinds so every family is filed: `doctor` (each published doctor of the centre, **even at 0**: the empty row is the nudge), `former` (a code naming a doctor no longer listed; attribution is history), `centre` (the centre's own code). Name, count, and the **day** of the latest family (`::date`, not a timestamp: a time can be laid against an appointment book) | `0139` |
+| 2 | `CareOrgStore`: singleton, not cached to disk, one `ask` seam for tests. Behaviour that arrives with `suppressed: true` is dropped on the phone too (belt and braces). A failed load keeps what was shown and says so | `lib/partner_app/care_org_store.dart` |
+| 3 | Overview: Families joined, Active (30 days), From code to family (scanned / installed / signed up, with the "a scan is counted only for a family who joined" line), What families did (six figures, "—" and "Shown once N families join" with the server's N), the top three doctors and "All N on the Doctors tab", earnings by kind and status, and the privacy note. Pull to refresh; Try again; P1's empty state until loaded | `lib/screens/partner_app/partner_care_overview.dart` |
+| 4 | Your doctors: "N doctors listed · N families in all", a row per doctor / former doctor / the centre's code, "No families yet. Hand out their code." for an empty one, and "No family is ever named: each row is a count. To add a doctor, contact your ParentVeda manager." P1's empty state when the centre has no doctors and no families | `lib/screens/partner_app/partner_care_doctors.dart` |
+| 5 | Wiring: `partner_tabs.dart` opens both for a care_org (P1's empty states commented out, kept for revert). `PartnerLoadProblem` takes an optional `onRetry`. Sign-out clears `CareOrgStore` (P1's `PartnerDashboardStore.reset()` stays: P3 does not fill it, but the parent build's doctor mode can) | `partner_tabs.dart`, `partner_sponsor_overview.dart`, `lib/partner_app/partner_sign_out.dart`, `partner_words.dart` |
+| 6 | **R5.** `DoctorResolve.orgLogin`: in the standalone ParentVeda+ only, a login whose only identity is a `partner_accounts` row is refused (session not activated), signed out, and told "This account is for ParentVeda Partners, the app for clinics and centres. Sign in there to see your centre's numbers." Both doors: after sign-in, and on boot for a restored session. A login that **also** has `expert_accounts` resolves as a doctor first, unchanged. The parent build's doctor mode is unchanged | `lib/doctor/doctor_session.dart`, `lib/screens/doctor/doctor_auth_screen.dart`, `lib/main_doctor.dart` |
+| 6+ | **Found and fixed on the way:** `DoctorAuthScreen` cleared its error on *any* controller notification, including the selection an autofocused field sets on first layout. P1 found this on the Partners sign-in and left ParentVeda+ alone because nothing set an error before first layout; the new boot refusal does, so it now clears only on a change of text | `doctor_auth_screen.dart` |
+| 7 | Verify pass: borrows the oldest user as the centre's login and four more as families; walks nobody → nothing → centre below 5 (held back, per-doctor sums) → threshold 2 (shown) → dual login (own practice not mixed in) → no family id or token in the answer → paused → sponsor wins. Rolls back by raising the report | `supabase/seed/verify_care_org_dashboard.sql` |
+
+Tests: `partner_care_org_test` (19: the model, the store, Overview unsuppressed / suppressed with a threshold of 7 /
+empty / error, Doctors rows and empty, the 0139 contract on the **latest** definitions, the four shared RPCs still at
+0068/0073, wiring). `doctor_app_shell_test` gains the R5 group (3). `doctor_identity_edge_test` updated for the fourth
+outcome and the second sign-out. **Run 0139, then `verify_care_org_dashboard.sql`, before the care_org walk.**
+
+**To see it on a phone (Route A).** The demo admin is a sponsor admin, and a sponsor wins, so a care_org walk needs a
+second login: create it in Authentication → Users with a password (R6), then
+`select public.link_partner_account((select id from auth.users where email = '<that email>'), 'demo_org_ivf', 'demo');`
+(Nova IVF Fertility, from `care_partner_demo_orgs.sql`). It has no doctors or families yet, so it opens on the empty
+states; the per-doctor table needs `expert_profiles.partner_id = 'demo_org_ivf'` rows and attributions.
+
 ## P4: Exclusive content and contract end
 1. Migration: `programmes.audience_sponsor_id`, `audience_partner_id` (nullable, FK);
    `programmes_published` filters them (null = everyone; set = only members of that sponsor, or

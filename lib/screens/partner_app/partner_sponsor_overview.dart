@@ -259,10 +259,12 @@ class PartnerBars extends StatelessWidget {
   }
 }
 
-/// A load problem with the way out: pull down, or tap.
+/// A load problem with the way out: pull down, or tap. [onRetry] defaults to
+/// the sponsor store; an IVF centre's tabs (P3) pass their own.
 class PartnerLoadProblem extends StatelessWidget {
-  const PartnerLoadProblem(this.text, {super.key});
+  const PartnerLoadProblem(this.text, {super.key, this.onRetry});
   final String text;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -271,7 +273,7 @@ class PartnerLoadProblem extends StatelessWidget {
       DcNotice(text, problem: true),
       const SizedBox(height: 6),
       TextButton(
-        onPressed: SponsorAdminStore.instance.refresh,
+        onPressed: onRetry ?? SponsorAdminStore.instance.refresh,
         child: Text('Try again', style: dcStrong(14, color: dcP.action)),
       ),
     ],

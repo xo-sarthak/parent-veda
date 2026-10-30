@@ -131,6 +131,9 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
   /// bool? _resolved;
   late _Boot _boot = widget.backendUp ? _Boot.booting : _Boot.backendDown;
 
+  /// (P3, R5) Why a restored session was turned away, for the sign-in form.
+  String? _refusal;
+
   @override
   void initState() {
     super.initState();
@@ -171,6 +174,16 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
       await DoctorSession.instance.claimInvite();
       result = await DoctorSession.instance.resolveFromServer();
     }
+    // R5 (P3): a restored organisation login. Sign it out and say where it
+    // belongs, rather than open three tabs that cannot explain themselves.
+    if (result == DoctorResolve.orgLogin) {
+      try {
+        await Supabase.instance.client.auth.signOut();
+      } catch (e) {
+        debugPrint('[doctor] signOut after org refusal: $e');
+      }
+      _refusal = kDoctorOrgLoginText;
+    }
     if (!mounted) return;
     // Unreachable is NOT "signed out": her session is live and the server
     // simply did not answer. The sign-in form would ask her to fix something
@@ -189,6 +202,8 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
 
   /// The sign-in screen's "done": resolved, or signed in but unreachable.
   void _afterSignIn() {
+    // A boot refusal belongs to the account it was about, not the next one.
+    _refusal = null;
     setState(() => _boot = DoctorSession.instance.active ? _Boot.ready : _Boot.offline);
   }
 
@@ -235,7 +250,7 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
               break;
           }
           if (DoctorSession.instance.active) return const DoctorScaffold();
-          return DoctorAuthScreen(onSignedIn: _afterSignIn);
+          return DoctorAuthScreen(onSignedIn: _afterSignIn, notice: _refusal);
         },
       ),
     );

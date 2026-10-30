@@ -118,6 +118,11 @@ enum DoctorResolve {
   notADoctor,
   /// The server did not answer in time, or failed. Identity UNKNOWN, not absent.
   unreachable,
+  /// (Partner Editions P3, R5) An organisation login with no clinician
+  /// account: a clinic manager. In the standalone ParentVeda+ app this is
+  /// refused and pointed to ParentVeda Partners, where the centre's numbers
+  /// live. The session is NOT activated. Never returned in the parent build.
+  orgLogin,
 }
 
 class DoctorSession extends ChangeNotifier {
@@ -477,6 +482,12 @@ class DoctorSession extends ChangeNotifier {
       final first = res.isEmpty ? null : res.first;
       final id = (first is Map) ? first['id'] as String? : null;
       if (id != null && id.isNotEmpty) {
+        // R5 (P3). Reaching here means expert_accounts had nothing, so this
+        // is a Route A login: an organisation, not a person who consults. A
+        // manager who IS also a clinician returned above, as a doctor. In
+        // ParentVeda+ an org login used to get three tabs that said "No
+        // consulting identity"; the Partners app is its home now.
+        if (standalone) return DoctorResolve.orgLogin;
         _active = true;
         _expertId = null;
         _partnerId = id;

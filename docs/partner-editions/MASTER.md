@@ -47,7 +47,7 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | **D3** ✓ 2026-10-29, hash in memory | Doctor | QR rotation keeps per-doctor codes (§5.1b) | yes: `0134` | D2 |
 | **P1** ✓ 2026-10-30, hash in memory | Partners | New flavour, shell, sign-in, one org resolver, admin-without-seat | yes: `0136` | — |
 | **P2** ✓ 2026-10-30, hash in memory | Partners | Employer and school: Overview, People, Report | small: `0138` (self-removal refused) | P1 |
-| **P3** | Partners | IVF centre: Overview, per-doctor table; ParentVeda+ refuses org logins (R5) | maybe | P1, D2 |
+| **P3** ✓ 2026-10-30, hash in memory | Partners | IVF centre: Overview, per-doctor table; ParentVeda+ refuses org logins (R5) | yes: `0139` (`care_org_dashboard`) | P1, D2 |
 | **P4** | Partners + DB | Exclusive content: audience columns, Content tab, contract end (R2) | yes | P2 |
 | **A1** | Parent (LAST) | `PartnerBrand` resolver, lockup strip, "Your doctor" line, welcome sheet in new onboarding | no | P4 |
 | **A2** | Parent (LAST) | "Exclusively for you" rail, You chip with logo + benefit meter | no | A1, P4 |

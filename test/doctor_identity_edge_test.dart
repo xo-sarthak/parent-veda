@@ -70,11 +70,14 @@ void main() {
   });
 
   group('resolve says WHY it found nobody (item 2)', () {
-    test('three answers, not a bool', () {
+    // Four since P3 (R5): orgLogin, an organisation login refused in
+    // ParentVeda+ and pointed to ParentVeda Partners.
+    test('three answers, not a bool (four since P3)', () {
       expect(DoctorResolve.values, [
         DoctorResolve.resolved,
         DoctorResolve.notADoctor,
         DoctorResolve.unreachable,
+        DoctorResolve.orgLogin,
       ]);
     });
 
@@ -116,8 +119,15 @@ void main() {
         final notRegistered = src.indexOf('result == DoctorResolve.notADoctor');
         expect(unreachable, greaterThan(-1));
         expect(notRegistered, greaterThan(unreachable));
-        // The sign-out lives only under "not a doctor".
-        expect(src.indexOf('auth.signOut()'), greaterThan(notRegistered));
+        // The sign-out never runs on the unreachable path: every one comes
+        // after that branch, which itself has none. Since P3 there are two,
+        // under "not a doctor" and under an organisation login (R5).
+        final orgLogin = src.indexOf('result == DoctorResolve.orgLogin');
+        expect(orgLogin, greaterThan(unreachable));
+        final unreachableBranch = src.substring(
+            unreachable, orgLogin < notRegistered ? orgLogin : notRegistered);
+        expect(unreachableBranch, isNot(contains('auth.signOut()')));
+        expect(src.indexOf('auth.signOut()'), greaterThan(unreachable));
       },
     );
   });
