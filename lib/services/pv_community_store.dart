@@ -27,7 +27,10 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/pv_community.dart';
+import '../screens/post_pregnancy/pp_child_profile.dart' show ChildProfileStore;
 import 'life_stage_store.dart';
+import 'pregnancy_controller.dart';
+import 'pregnancy_ended_store.dart';
 import 'remote/supabase_repo.dart';
 import 'saved_store.dart';
 
@@ -72,12 +75,14 @@ class PvCommunityStore extends ChangeNotifier {
 
   List<PvCommunityRoom> _rooms = const [];
 
-  /// Rooms, her stage's first, then joined, then the house order.
+  /// Rooms, her stage's first, then joined, then the house order. (0137) Her
+  /// birth club leads the rail: it is the one room made only for her month.
   List<PvCommunityRoom> get rooms {
     final stage = currentStageTag;
     final list = [..._rooms];
-    int score(PvCommunityRoom r) =>
-        (r.stage == stage ? 0 : (r.stage == 'all' ? 1 : 2)) * 1000 + r.sort;
+    int score(PvCommunityRoom r) => r.isClub
+        ? -1
+        : (r.stage == stage ? 0 : (r.stage == 'all' ? 1 : 2)) * 1000 + r.sort;
     list.sort((a, b) => score(a).compareTo(score(b)));
     return list;
   }
@@ -115,6 +120,8 @@ class PvCommunityStore extends ChangeNotifier {
 
   /// [about] narrows a course room's feed to one lesson or session (0137);
   /// the part is only added when set, so phase 1's cached keys still parse.
+  /// A #tag feed (scope 'tag') carries its tag in the [room] slot, so the key
+  /// keeps its shape and `_reloadKey` needs no new case.
   static String feedKey({String scope = 'for_you', String sort = 'top', String? room, PvPostAbout? about}) =>
       '$scope|$sort|${room ?? ''}${about == null ? '' : '|${about.kind}:${about.id}'}';
 
@@ -207,6 +214,7 @@ class PvCommunityStore extends ChangeNotifier {
       notifyListeners();
       unawaited(_persist());
       unawaited(flushOutbox());
+      unawaited(syncBirthClub());
     } catch (e) {
       debugPrint('[community] me: $e');
     }
@@ -231,7 +239,8 @@ class PvCommunityStore extends ChangeNotifier {
       final res = await _call('community_feed', {
         'p_scope': scope,
         'p_sort': sort,
-        'p_room': room,
+        'p_room': scope == 'tag' ? null : room,
+        'p_tag': scope == 'tag' ? room : null,
         'p_stage': currentStageTag,
         'p_ids': scope == 'ids' ? savedPostIds : null,
         'p_offset': have,
@@ -819,6 +828,10 @@ class PvCommunityStore extends ChangeNotifier {
     } catch (_) {}
   }
 
+  /// Whether she follows the face [face] last opened (0137). Kept beside the
+  /// record rather than in it, so the one caller's shape did not change.
+  bool lastFaceFollowing = false;
+
   /// One face of a member: from a post or comment id she tapped, or her own.
   Future<(PvCommunityAuthor, List<PvCommunityPost>)?> face({String? fromId, bool anon = true}) async {
     if (!signedIn) return null;
@@ -833,6 +846,7 @@ class PvCommunityStore extends ChangeNotifier {
         _posts[p.id] = _withLocalMedia(p);
       }
       unawaited(_signFor(posts));
+      lastFaceFollowing = res['following'] == true;
       return (PvCommunityAuthor.fromJson(res['author']), posts);
     } catch (_) {
       return null;
@@ -1169,6 +1183,270 @@ class PvCommunityStore extends ChangeNotifier {
     }
   }
 
+  // ---- birth clubs (0137, plan decisions 11-13) -------------------------------
+  //
+  // The phone, not the server, knows her month: the server's copy of a due
+  // date can lag behind the phone and outlives a loss (the same reason the
+  // phone already sends her stage). So the app DERIVES the month and sends
+  // it; the server creates `club_YYYY_MM` on first need and moves only the
+  // memberships it made itself ('auto'). One she chose ('self') stays hers.
+
+  static const _kClubLossAnswered = 'pv_community_club_loss_answered';
+
+  /// Test seam: the facts the month is derived from, in place of the stores.
+  @visibleForTesting
+  ({String? month, bool loss})? debugClubFacts;
+
+  String? _clubAfterLoss;
+
+  /// Her birth club's room id when her pregnancy ended in a loss and she has
+  /// not yet said whether to stay. The home shows the Stay / Leave sheet once;
+  /// nothing changes until she answers (decision 12).
+  String? get clubAfterLoss => _clubAfterLoss;
+
+  PvCommunityRoom? get myClub => _rooms.where((r) => r.isClub && r.joined).firstOrNull;
+
+  static String _month(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}';
+
+  ({String? month, bool loss}) _clubFacts() {
+    final d = debugClubFacts;
+    if (d != null) return d;
+    final stage = LifeStageStore.instance.stage;
+    if (stage == LifeStage.tryingToConceive) {
+      // Trying sends nothing; a loss recorded before she went back to trying
+      // still asks about the club she was in.
+      return (month: null, loss: PregnancyEndedStore.instance.ended);
+    }
+    final c = PregnancyController.current;
+    final due = c != null && c.isDueDateSet ? c.dueDate : null;
+    if (stage != LifeStage.parenting) {
+      final loss = PregnancyEndedStore.instance.ended;
+      return (month: loss || due == null ? null : _month(due), loss: loss);
+    }
+    // Parenting. `children` never holds the seed child (dob = today), so an
+    // empty list means no real child yet.
+    final kids = ChildProfileStore.instance.children;
+    if (kids.isEmpty) return (month: due == null ? null : _month(due), loss: false);
+    final youngest = kids.map((k) => k.dob).reduce((a, b) => a.isAfter(b) ? a : b);
+    // After birth she stays in her due month's club (it becomes her baby's
+    // month group), so the due month wins when this pregnancy made this child.
+    final same = due != null && due.difference(youngest).inDays.abs() <= 62;
+    return (month: _month(same ? due : youngest), loss: false);
+  }
+
+  /// Puts her in her month's club, or raises the after-a-loss question.
+  /// Called from [refreshMe]; a no-op when she is already in the right club.
+  Future<void> syncBirthClub() async {
+    if (!signedIn) return;
+    final f = _clubFacts();
+    if (f.loss) {
+      final club = _rooms.where((r) => r.isClub && r.joined && r.via != 'self').firstOrNull;
+      String? answered;
+      try {
+        answered = (await SharedPreferences.getInstance()).getString(_kClubLossAnswered);
+      } catch (_) {}
+      final next = club != null && answered != club.id ? club.id : null;
+      if (next != _clubAfterLoss) {
+        _clubAfterLoss = next;
+        notifyListeners();
+      }
+      return;
+    }
+    _clubAfterLoss = null;
+    final month = f.month;
+    if (month == null) return;
+    final want = 'club_${month.replaceAll('-', '_')}';
+    if (_rooms.any((r) => r.id == want && r.joined)) return;
+    try {
+      final res = await _call('community_birth_club', {'p_month': month});
+      if (res is! Map || res['ok'] != true) return;
+      final rooms = await _call('community_rooms_list');
+      if (rooms is List) {
+        _rooms = [
+          for (final r in rooms)
+            ?PvCommunityRoom.fromJson(r),
+        ];
+        notifyListeners();
+        unawaited(_persist());
+      }
+    } catch (e) {
+      debugPrint('[community] club: $e');
+    }
+  }
+
+  /// Her answer on the after-a-loss sheet. Stay re-joins as her own choice
+  /// ('self'), so no later sync moves her; Leave takes her out. Either way the
+  /// sheet never shows again for this club. Returns false if it did not go
+  /// through (the sheet stays due).
+  Future<bool> answerClubAfterLoss({required bool stay}) async {
+    final id = _clubAfterLoss;
+    if (id == null) return true;
+    final ok = await setRoom(id, join: stay);
+    if (!ok) return false;
+    _clubAfterLoss = null;
+    if (stay) {
+      final i = _rooms.indexWhere((r) => r.id == id);
+      if (i >= 0) _rooms = [..._rooms]..[i] = _rooms[i].copyWith(via: 'self');
+    }
+    notifyListeners();
+    unawaited(_persist());
+    try {
+      await (await SharedPreferences.getInstance()).setString(_kClubLossAnswered, id);
+    } catch (_) {}
+    return true;
+  }
+
+  // ---- following (0137, decisions 14-15) --------------------------------------
+
+  PvCommunityFollowing _following = const PvCommunityFollowing();
+
+  /// Rooms she is in, #tags and faces she follows. No ids of people.
+  PvCommunityFollowing get following => _following;
+
+  static String _tagOf(String t) => t.trim().toLowerCase().replaceFirst(RegExp('^#'), '');
+
+  bool followsTag(String tag) => _following.tags.contains(_tagOf(tag));
+
+  Future<bool> loadFollowing() async {
+    if (!signedIn) return false;
+    try {
+      _following = PvCommunityFollowing.fromJson(await _call('community_following_list'));
+      notifyListeners();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Follow or unfollow. [kind] 'tag' (target = the tag), 'member' (target =
+  /// a post or comment id of that face) or 'follow' (target = a row id from
+  /// [following]; unfollow only). A tag or a row changes on screen at once and
+  /// rolls back if the server says no. Returns false when it did not go through.
+  Future<bool> follow({required String kind, required String target, required bool on}) async {
+    final before = _following;
+    if (kind == 'tag') {
+      final t = _tagOf(target);
+      _following = PvCommunityFollowing(
+        rooms: before.rooms,
+        tags: [if (on) t, ...before.tags.where((x) => x != t)],
+        people: before.people,
+      );
+    } else if (kind == 'follow' && !on) {
+      _following = PvCommunityFollowing(
+        rooms: before.rooms,
+        tags: before.tags,
+        people: [...before.people.where((p) => p.id != target)],
+      );
+    }
+    notifyListeners();
+    try {
+      final res = await _call('community_follow', {'p_kind': kind, 'p_target': target, 'p_on': on});
+      if (res is Map && res['ok'] == true) {
+        if (kind == 'member') {
+          lastFaceFollowing = on;
+          unawaited(loadFollowing());
+        }
+        return true;
+      }
+    } catch (_) {}
+    _following = before;
+    notifyListeners();
+    return false;
+  }
+
+  // ---- search (0137, decision 16) ---------------------------------------------
+
+  static const _kRecentSearches = 'pv_community_recent_searches';
+
+  /// Posts, rooms and #tags for [q]. Null when the server could not be
+  /// reached, so the screen can say so rather than show "no results".
+  Future<PvCommunitySearch?> search(String q, {int offset = 0}) async {
+    if (!signedIn) return null;
+    try {
+      final r = PvCommunitySearch.fromJson(await _call('community_search', {'p_q': q.trim(), 'p_offset': offset}));
+      for (final p in r.posts) {
+        _posts[p.id] = _withLocalMedia(p);
+      }
+      unawaited(_signFor(r.posts));
+      return r;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Her last searches, newest first. Kept on the phone only.
+  Future<List<String>> recentSearches() async {
+    try {
+      return (await SharedPreferences.getInstance()).getStringList(_kRecentSearches) ?? const [];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<void> rememberSearch(String q) async {
+    final t = q.trim();
+    if (t.length < 2) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = prefs.getStringList(_kRecentSearches) ?? const [];
+      await prefs.setStringList(
+          _kRecentSearches, [t, ...list.where((x) => x.toLowerCase() != t.toLowerCase())].take(6).toList());
+    } catch (_) {}
+  }
+
+  Future<void> clearRecentSearches() async {
+    try {
+      await (await SharedPreferences.getInstance()).remove(_kRecentSearches);
+    } catch (_) {}
+  }
+
+  // ---- edit within 15 minutes (0137, decisions 17-18) ------------------------
+
+  static const editWindow = Duration(minutes: 15);
+
+  /// Whether the Edit row shows: her own post, inside the window. A team
+  /// post is edited by nobody (it is the house speaking).
+  bool canEdit(PvCommunityPost p) =>
+      p.author.isMine && !p.author.team && DateTime.now().difference(p.createdAt) < editWindow;
+
+  /// Title and body only. Online only: an edit queued past the window would
+  /// be refused later, which surprises her more than "no connection" now. A
+  /// post still in the outbox is edited in place (it has not been sent).
+  /// Returns 'ok' | 'held' | 'too_late' | 'too_short' | 'offline' | 'error'.
+  Future<String> editPost(String id, {required String title, required String body}) async {
+    final t = title.trim();
+    final b = body.trim();
+    final p = _posts[id];
+    final i = _outbox.indexWhere((e) => e['id'] == id);
+    if (i >= 0) {
+      final e = Map<String, dynamic>.from(_outbox[i]);
+      e['params'] = {...(e['params'] as Map), 'p_title': t, 'p_body': b};
+      _outbox[i] = e;
+      if (p != null) _posts[id] = p.copyWith(title: t, body: b);
+      notifyListeners();
+      unawaited(_persist());
+      return 'ok';
+    }
+    if (p != null && !canEdit(p)) return 'too_late';
+    try {
+      final res = await _call('community_edit_post', {'p_id': id, 'p_title': t, 'p_body': b});
+      if (res is Map && res['ok'] == true) {
+        final st = '${res['status'] ?? 'live'}';
+        if (p != null) _posts[id] = p.copyWith(title: t, body: b, editedAt: DateTime.now(), status: st);
+        notifyListeners();
+        unawaited(_persist());
+        return st == 'held' ? 'held' : 'ok';
+      }
+      return switch (res is Map ? res['reason'] : null) {
+        'too_late' => 'too_late',
+        'too_short' => 'too_short',
+        _ => 'error',
+      };
+    } catch (_) {
+      return 'offline';
+    }
+  }
+
   // ---- tests -----------------------------------------------------------------
 
   @visibleForTesting
@@ -1188,6 +1466,10 @@ class PvCommunityStore extends ChangeNotifier {
     _offering.clear();
     _queue = const [];
     _offerings = const [];
+    _following = const PvCommunityFollowing();
+    _clubAfterLoss = null;
+    debugClubFacts = null;
+    lastFaceFollowing = false;
     debugBackend = null;
     debugSignedIn = null;
   }

@@ -20,7 +20,14 @@ import 'community_marks.dart';
 import 'community_offering_thread.dart' show communityAboutLabel;
 
 class CommunityComposeScreen extends StatefulWidget {
-  const CommunityComposeScreen({super.key, this.roomId, this.about, this.aboutLabel, this.asTeam = false});
+  const CommunityComposeScreen({
+    super.key,
+    this.roomId,
+    this.about,
+    this.aboutLabel,
+    this.asTeam = false,
+    this.edit,
+  });
   final String? roomId;
 
   /// (0137) A course post about a lesson or session; [aboutLabel] reads
@@ -32,6 +39,11 @@ class CommunityComposeScreen extends StatefulWidget {
   /// photos or poll, and a pin of 0..14 days.
   final bool asTeam;
 
+  /// (0137, L4b) Her own post, edited within 15 minutes: title and body only
+  /// (decision 18). No room, face, photos or poll; the safety check runs
+  /// again on the server.
+  final PvCommunityPost? edit;
+
   @override
   State<CommunityComposeScreen> createState() => _CommunityComposeScreenState();
 }
@@ -41,7 +53,12 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
   final _title = TextEditingController();
   final _body = TextEditingController();
   final _titleFocus = FocusNode();
-  late String? _room = widget.roomId;
+  late String? _room = widget.roomId ?? widget.edit?.roomId;
+
+  bool get _editing => widget.edit != null;
+
+  /// A team prompt opened from Moderation has no room yet: she picks one.
+  bool get _teamPicksRoom => widget.asTeam && widget.roomId == null;
   late PvPostAbout? _about = widget.about;
 
   /// Her community name by default (user's call, 2026-10-28): most first
@@ -65,8 +82,18 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
   @override
   void initState() {
     super.initState();
+    final e = widget.edit;
+    if (e != null) {
+      _title.text = e.title;
+      _body.text = e.body;
+      _anon = e.author.anon;
+    }
     for (final c in [_title, _body]) {
       c.addListener(() => setState(() {}));
+    }
+    if (e != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _titleFocus.requestFocus());
+      return;
     }
     final hasName = (_store.me.firstName ?? '').isNotEmpty || _store.me.isExpert;
     if (_store.me.isExpert || (_inCourse && hasName)) _anon = false;
@@ -96,7 +123,9 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
     super.dispose();
   }
 
-  bool get _dirty => _title.text.trim().isNotEmpty || _body.text.trim().isNotEmpty || _photos.isNotEmpty;
+  bool get _dirty => _editing
+      ? _title.text.trim() != widget.edit!.title || _body.text.trim() != widget.edit!.body
+      : _title.text.trim().isNotEmpty || _body.text.trim().isNotEmpty || _photos.isNotEmpty;
 
   List<String> get _pollOptions => [for (final c in _opts) if (c.text.trim().isNotEmpty) c.text.trim()];
 
@@ -173,8 +202,43 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
     }
   }
 
+  Future<void> _saveEdit() async {
+    setState(() => _posting = true);
+    final r = await _store.editPost(widget.edit!.id, title: _title.text, body: _body.text);
+    if (!mounted) return;
+    setState(() => _posting = false);
+    final text = '${_title.text} ${_body.text}';
+    switch (r) {
+      case 'ok':
+        pvToast(context, 'Saved. Your post now shows Edited.', kind: PvToastKind.done);
+        if (communityLooksLikeCrisis(text)) {
+          pvToast(context, 'If you are not safe right now, the helplines are on your post.', kind: PvToastKind.gentle);
+        }
+        Navigator.of(context).pop();
+      case 'held':
+        pvToast(
+          context,
+          'Saved. The new words wait for a quick review, so only you see the post until a moderator has looked.',
+          kind: PvToastKind.info,
+          hold: const Duration(seconds: 5),
+        );
+        Navigator.of(context).pop();
+      case 'too_late':
+        pvToast(context, 'Posts can be edited for 15 minutes. You can still delete it and post again.',
+            kind: PvToastKind.info);
+      case 'too_short':
+        pvToast(context, 'Add a title of at least four letters.', kind: PvToastKind.info);
+      case 'offline':
+        pvToast(context, 'No connection. Your edit was not saved; try again when you are online.',
+            kind: PvToastKind.gentle);
+      default:
+        pvToast(context, 'That did not go through. Try again.', kind: PvToastKind.gentle);
+    }
+  }
+
   Future<void> _post() async {
     if (_blocker != null || _posting) return;
+    if (_editing) return _saveEdit();
     if (widget.asTeam) return _postAsTeam();
     if (!_anon && (_store.me.firstName ?? '').isEmpty && !_store.me.isExpert) {
       communityOutcomeToast(context, PvCommunityOutcome.noName);
@@ -244,7 +308,7 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                 child: Tooltip(
                   message: _blocker ?? 'Post',
                   child: CommunityInkButton(
-                    label: widget.asTeam ? 'Post as team' : 'Post',
+                    label: _editing ? 'Save' : (widget.asTeam ? 'Post as team' : 'Post'),
                     compact: true,
                     busy: _posting,
                     onTap: _blocker == null ? _post : null,
@@ -259,13 +323,23 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
               children: [
+                if (_editing)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: CommunityStatusLine(
+                      key: ValueKey('community_compose_editing'),
+                      icon: Icons.edit_outlined,
+                      text: 'Editing your post. Title and words only, for 15 minutes after posting. It will show Edited.',
+                    ),
+                  ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(999),
                     // A course post stays in its course (and a team post in
-                    // the room it was opened from): no room switching.
-                    onTap: inCourse || widget.asTeam
+                    // the room it was opened from): no room switching. An
+                    // edit keeps its room. A prompt from Moderation picks one.
+                    onTap: _editing || inCourse || (widget.asTeam && !_teamPicksRoom)
                         ? null
                         : () async {
                             final r = await pickCommunityRoom(context, current: _room);
@@ -290,7 +364,7 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                           child: Text(room?.title ?? 'Choose a room',
                               maxLines: 1, overflow: TextOverflow.ellipsis, style: cmText(13.5, weight: FontWeight.w700)),
                         ),
-                        if (!inCourse && !widget.asTeam) ...[
+                        if (!_editing && !inCourse && (!widget.asTeam || _teamPicksRoom)) ...[
                           const SizedBox(width: 4),
                           const Icon(Icons.expand_more_rounded, size: 18, color: kPvInk),
                         ],
@@ -298,7 +372,7 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                     ),
                   ),
                 ),
-                if (inCourse && _about != null && !widget.asTeam) ...[
+                if (inCourse && _about != null && !widget.asTeam && !_editing) ...[
                   const SizedBox(height: 10),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -367,7 +441,7 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                     icon: Icons.lock_outline_rounded,
                     text: 'Members see ParentVeda team, never your name. The audit trail records that you wrote it.',
                   ),
-                ] else
+                ] else if (!_editing)
                 Row(children: [
                   Expanded(
                     child: _FaceChoice(
@@ -389,7 +463,7 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                     ),
                   ),
                 ]),
-                if (!widget.asTeam) ...[
+                if (!widget.asTeam && !_editing) ...[
                   const SizedBox(height: 8),
                   AnimatedSwitcher(
                     duration: PvMotion.swap,
@@ -500,7 +574,7 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                 decoration: BoxDecoration(border: Border(top: BorderSide(color: cmP.line))),
                 padding: const EdgeInsets.fromLTRB(6, 4, 14, 4),
                 child: Row(children: [
-                  if (!widget.asTeam) ...[
+                  if (!widget.asTeam && !_editing) ...[
                     TextButton.icon(
                       onPressed: _photos.length >= 4 ? null : _pickPhotos,
                       icon: const Icon(Icons.image_outlined, size: 20),

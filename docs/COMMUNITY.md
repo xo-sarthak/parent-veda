@@ -201,7 +201,11 @@ Cost: Supabase plan as is; photos in Storage at launch volume ≈ $0 (₹0).
 
 ## RESUME HERE (for a fresh session)
 
-- **Phase 2 L4a is BUILT (2026-10-30), not yet committed or run.** Migration `0137_community_phase2.sql` (0136 was
+- **Phase 2 is BUILT (2026-10-30).** L4a committed `5e1ab087`, 0137 run; **L4b built in the next chat** (birth clubs,
+  Following, search, #tags, edit, prompts from Moderation, Over-35): see "App (L4b)" below. **Left: the phone walk**
+  (two accounts + an expert login on the doctor flavour), and Ask Veda is untouched (no ingest needed). Phase 3 (push,
+  realtime) is next when the user calls it.
+- *History:* **Phase 2 L4a is BUILT (2026-10-30), not yet committed or run.** Migration `0137_community_phase2.sql` (0136 was
   taken by Partner Editions P1) holds the WHOLE phase 2 server (D4: one file). The app half built so far: course
   discussions, the team voice and pin, experts, the moved-session notice, and the doctor's Your offerings. See
   "As built (phase 2)" below. **Next: the user runs 0137 + its VERIFY block; then L4b in a fresh chat** (birth clubs,
@@ -315,6 +319,28 @@ and a leak scan (no user id in any answer). Harness: the session scratchpad's `l
 | `community_chrome.dart` / `community_marks.dart` / `community_post_screen.dart` | The seal and "Dr Name · category"; role and Moderator chips; the team's ink square; Pinned and About on cards; Pin in the post menu; team posts cannot be blocked or opened as a face; the expert footer, "Found helpful by", Endorse, the Experts pill and "Ask an expert to look" |
 | `pv_my_learning_screen.dart` | A booked class that moved reads "Moved from …" from the pinned notice |
 | Doctor flavour | `main_doctor.dart` inits the store; `doctor_offerings_screen.dart` (Your offerings → the room as host) and `doctor_community_queue_screen.dart` (new); home section 8 is "Your offerings" + "Parents asking an expert to look", the go-live ClassCard unchanged under it |
+
+### App (L4b), 2026-10-30 (the server half was already in 0137)
+
+| Where | What |
+|---|---|
+| `pv_community_store.dart` | `syncBirthClub` (called from `refreshMe`; the month is derived on the phone: due date in Pregnancy, in Parenting the due month if the youngest real child was born within two months of it, else that child's birth month; Trying sends nothing; a no-op when she is already in the right club), `clubAfterLoss` + `answerClubAfterLoss`, `following` / `loadFollowing` / `follow`, `search` + recent searches (phone only), `canEdit` / `editPost` (online only; an outbox post is edited in place), tag feeds through `loadFeed(scope: 'tag')`, her club first in `rooms` |
+| `community_home_screen.dart` | Search icon; "My rooms" → **Following** (rooms + #tags + people) with Manage; the after-a-loss Stay / Leave sheet, once, nothing changes until she taps (closing it asks again next visit); the rail card of her club reads "Due May 2027" ("May 2027 babies" in Parenting) |
+| `community_search_screen.dart` (new, `community/search`) | Debounced search; #tags, rooms, then posts; recent searches with Clear; offline and no-result states |
+| `community_tag_screen.dart` (new, `community/tag/<tag>`) | A tag's feed, newest first, with Follow / Following |
+| `community_chrome.dart` | Routes and openers; `CommunityBodyText` (tappable #tags in a post's words); Edit in the post menu inside 15 minutes; `communityClubLine` |
+| `community_compose_screen.dart` | Edit mode (title and words only, "Save", the safety check runs again on the server); a team prompt opened from Moderation picks its room |
+| `community_profile_screen.dart` | Follow / Following on someone else's face (they are not told); "Following" in her own menu beside Blocked (`showCommunityFollowing`) |
+| `community_room_screen.dart` | A birth club shows its "Due …" line |
+| `community_moderation_screen.dart` | "Write a prompt" (posts as ParentVeda team, pin 0–14 days) |
+
+The Over-35 room needed no app code: it is a seeded room, so `community_rooms_list` brings it onto the rail.
+
+Tests: `community_phase2_test` gains birth clubs (month sent, no-op when already in, Trying sends nothing, Stay survives
+the next sync, Leave does not come back, the home sheet), Following (the pill, tag follow, unfollow by row id), search,
+and edit (refused on the phone after 15 minutes, saved inside, a late server answer, Edit in the menu);
+`community_reachability_test` checks the new routes are reached only from inside Community and every new store call
+has a screen caller.
 
 Tests: `community_schema_contract_test` and `community_anonymity_test` now read every community migration through
 `test/support/community_sql.dart` (last definition wins; a parenthesis-counting parser); new

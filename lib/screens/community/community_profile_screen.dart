@@ -2,7 +2,9 @@
 // never both: the community-name face lists only posts made under it, the
 // first-name face only posts made under that. On her own profile she can
 // switch between her two faces, rename her community name, and manage the
-// members she has blocked.
+// members she has blocked. (0137) On someone else's face she can Follow it;
+// they are not told and no count is shown. Her own menu lists what she
+// follows, beside Blocked.
 import 'package:flutter/material.dart';
 
 import '../../models/pv_community.dart';
@@ -30,6 +32,7 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
   PvCommunityAuthor? _author;
   List<PvCommunityPost> _posts = const [];
   bool _loading = true;
+  bool _following = false;
 
   bool get _own => widget.fromId == null;
 
@@ -48,7 +51,26 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
       _loading = false;
       _author = res?.$1;
       _posts = res?.$2 ?? const [];
+      _following = _store.lastFaceFollowing;
     });
+  }
+
+  Future<void> _toggleFollow() async {
+    final from = widget.fromId;
+    if (from == null || !await communityEnsureMember(context)) return;
+    final on = !_following;
+    setState(() => _following = on);
+    final ok = await _store.follow(kind: 'member', target: from, on: on);
+    if (!mounted) return;
+    if (!ok) setState(() => _following = !on);
+    final name = _author?.label ?? 'them';
+    pvToast(
+      context,
+      !ok
+          ? 'That did not go through. Try again.'
+          : (on ? 'Following $name. Their posts now show in Following. They are not told.' : 'You stopped following $name'),
+      kind: ok ? (on ? PvToastKind.done : PvToastKind.info) : PvToastKind.gentle,
+    );
   }
 
   Future<void> _blocked() async {
@@ -126,10 +148,13 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                       if (ok == true) _load();
                     } else if (v == 'blocked') {
                       _blocked();
+                    } else if (v == 'following') {
+                      showCommunityFollowing(context);
                     }
                   },
                   itemBuilder: (_) => const [
                     PopupMenuItem(value: 'rename', child: Text('Change community name')),
+                    PopupMenuItem(value: 'following', child: Text('Following')),
                     PopupMenuItem(value: 'blocked', child: Text('Blocked members')),
                   ],
                 ),
@@ -176,6 +201,30 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
                           textAlign: TextAlign.center,
                           style: cmText(14, color: cmP.ink2),
                         ),
+                        // A team post has no face, so only a member's face
+                        // can be followed (the server refuses 'team' too).
+                        if (!_own && !author.team) ...[
+                          const SizedBox(height: 14),
+                          _following
+                              ? OutlinedButton.icon(
+                                  key: const ValueKey('community_profile_following'),
+                                  onPressed: _toggleFollow,
+                                  icon: const Icon(Icons.check_rounded, size: 18),
+                                  label: const Text('Following'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: kPvInk,
+                                    side: const BorderSide(color: kPvInk, width: 1.4),
+                                    shape: const StadiumBorder(),
+                                    textStyle: cmText(14, weight: FontWeight.w700),
+                                  ),
+                                )
+                              : CommunityInkButton(
+                                  key: const ValueKey('community_profile_follow'),
+                                  label: 'Follow',
+                                  compact: true,
+                                  onTap: _toggleFollow,
+                                ),
+                        ],
                         if (_own) ...[
                           const SizedBox(height: 14),
                           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -233,4 +282,99 @@ class _CommunityProfileScreenState extends State<CommunityProfileScreen> {
       },
     );
   }
+}
+
+/// What she follows: rooms, #tags and people, each with a way out (0137).
+/// Opened from her profile menu and from "Manage" on the Following pill.
+Future<void> showCommunityFollowing(BuildContext context) async {
+  final store = PvCommunityStore.instance;
+  final loaded = await store.loadFollowing();
+  if (!context.mounted) return;
+  await showCommunitySheet<void>(
+    context,
+    (c) => AnimatedBuilder(
+      animation: store,
+      builder: (c, _) {
+        final f = store.following;
+        Widget head(String t) => Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 4),
+              child: Text(t.toUpperCase(),
+                  style: cmText(11, weight: FontWeight.w800, color: cmP.action).copyWith(letterSpacing: 1)),
+            );
+        Future<void> undo(String kind, String target, String label) async {
+          final ok = await store.follow(kind: kind, target: target, on: false);
+          if (c.mounted) {
+            pvToast(c, ok ? 'You stopped following $label' : 'That did not go through. Try again.',
+                kind: ok ? PvToastKind.info : PvToastKind.gentle);
+          }
+        }
+
+        return ListView(shrinkWrap: true, children: [
+          Padding(padding: const EdgeInsets.fromLTRB(20, 4, 20, 0), child: Text('Following', style: cmTitle(24))),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+            child: Text('Only you see this list. Nobody is told when you follow them.',
+                style: cmText(13, color: cmP.ink3)),
+          ),
+          if (!loaded)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: CommunityStatusLine(
+                icon: Icons.cloud_off_outlined,
+                text: 'Could not load what you follow. Check your connection.',
+              ),
+            )
+          else if (f.isEmpty)
+            const CommunityEmpty(
+              icon: Icons.favorite_border_rounded,
+              title: 'You do not follow anything yet',
+              body: 'Join a room, tap a #tag in any post, or open a member and tap Follow.',
+            ),
+          if (f.rooms.isNotEmpty) head('Rooms'),
+          for (final r in f.rooms)
+            CommunitySheetRow(
+              icon: Icons.forum_outlined,
+              label: r.title,
+              note: r.isOffering ? 'Your course. It stays while you hold a seat' : null,
+              onTap: () {
+                Navigator.pop(c);
+                openCommunityRoom(context, r.id);
+              },
+            ),
+          if (f.tags.isNotEmpty) head('#Tags'),
+          for (final t in f.tags)
+            CommunitySheetRow(
+              icon: Icons.tag_rounded,
+              label: '#$t',
+              onTap: () {
+                Navigator.pop(c);
+                openCommunityTag(context, t);
+              },
+              trailing: TextButton(
+                onPressed: () => undo('tag', t, '#$t'),
+                style: TextButton.styleFrom(foregroundColor: kPvInk),
+                child: const Text('Unfollow'),
+              ),
+            ),
+          if (f.people.isNotEmpty) head('People'),
+          for (final p in f.people)
+            CommunitySheetRow(
+              icon: p.anon ? Icons.lock_outline_rounded : Icons.person_outline_rounded,
+              label: p.label,
+              note: p.anon ? 'Community name' : null,
+              // No silent tap: the list holds no post to open their face from.
+              onTap: () => pvToast(c,
+                  'Their posts show in your Following feed. Tap their name on any post to open their profile.',
+                  kind: PvToastKind.info),
+              trailing: TextButton(
+                onPressed: () => undo('follow', p.id, p.label),
+                style: TextButton.styleFrom(foregroundColor: kPvInk),
+                child: const Text('Unfollow'),
+              ),
+            ),
+          const SizedBox(height: 12),
+        ]);
+      },
+    ),
+  );
 }

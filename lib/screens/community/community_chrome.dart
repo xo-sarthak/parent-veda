@@ -19,6 +19,7 @@
 //    phone for later says so. Nothing is silent.
 import 'dart:io';
 
+import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,6 +43,8 @@ import 'community_offering_thread.dart';
 import 'community_post_screen.dart';
 import 'community_profile_screen.dart';
 import 'community_room_screen.dart';
+import 'community_search_screen.dart';
+import 'community_tag_screen.dart';
 
 // ---- routes -------------------------------------------------------------------
 //
@@ -55,6 +58,8 @@ const String kCommunityComposeRoute = 'community/compose';
 const String kCommunityProfileRoute = 'community/profile';
 const String kCommunityActivityRoute = 'community/activity';
 const String kCommunityModerationRoute = 'community/moderation';
+const String kCommunitySearchRoute = 'community/search';
+const String kCommunityTagPrefix = 'community/tag/';
 
 /// The community home; with [roomId], straight into that room.
 void openCommunity(BuildContext context, {String? roomId}) {
@@ -86,21 +91,103 @@ void openCommunityPost(BuildContext context, String postId) {
 /// (0137) [about] tags a course post to a lesson or session ([aboutLabel] is
 /// how the chip reads, "Lesson 2"). [asTeam] opens the moderators' "Post as
 /// ParentVeda team" mode, with pin days.
+///
+/// (0137, L4b) [edit] opens her own post in edit mode: title and body only,
+/// inside the 15-minute window. It returns to the post, not to a new one.
 Future<void> openCommunityCompose(
   BuildContext context, {
   String? roomId,
   PvPostAbout? about,
   String? aboutLabel,
   bool asTeam = false,
+  PvCommunityPost? edit,
 }) async {
-  if (!await communityEnsureMember(context)) return;
+  if (edit == null && !await communityEnsureMember(context)) return;
   if (!context.mounted) return;
   final id = await Navigator.of(context).push<String>(MaterialPageRoute<String>(
     fullscreenDialog: true,
-    builder: (_) => CommunityComposeScreen(roomId: roomId, about: about, aboutLabel: aboutLabel, asTeam: asTeam),
+    builder: (_) =>
+        CommunityComposeScreen(roomId: roomId, about: about, aboutLabel: aboutLabel, asTeam: asTeam, edit: edit),
     settings: const RouteSettings(name: kCommunityComposeRoute),
   ));
-  if (id != null && context.mounted) openCommunityPost(context, id);
+  if (id != null && edit == null && context.mounted) openCommunityPost(context, id);
+}
+
+/// Search the community (0137): posts, rooms and #tags.
+void openCommunitySearch(BuildContext context) {
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    builder: (_) => const CommunitySearchScreen(),
+    settings: const RouteSettings(name: kCommunitySearchRoute),
+  ));
+}
+
+/// One #tag's feed, with Follow (0137).
+void openCommunityTag(BuildContext context, String tag) {
+  final t = tag.replaceFirst(RegExp('^#'), '').toLowerCase();
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    builder: (_) => CommunityTagScreen(tag: t),
+    settings: RouteSettings(name: '$kCommunityTagPrefix$t'),
+  ));
+}
+
+/// "Due May 2027" for a birth club room id (`club_2027_05`); "May 2027
+/// babies" once she is parenting. Null for any other room.
+String? communityClubLine(String roomId) {
+  final m = RegExp(r'^club_(\d{4})_(\d{2})$').firstMatch(roomId);
+  if (m == null) return null;
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+      'October', 'November', 'December'];
+  final month = int.parse(m.group(2)!);
+  if (month < 1 || month > 12) return null;
+  final when = '${months[month - 1]} ${m.group(1)}';
+  return PvCommunityStore.instance.currentStageTag == 'parenting' ? '$when babies' : 'Due $when';
+}
+
+/// A post's body with its #tags tappable (0137): a tag opens its feed.
+/// Selectable, like the plain body it replaces.
+class CommunityBodyText extends StatefulWidget {
+  const CommunityBodyText(this.text, {super.key, required this.style});
+  final String text;
+  final TextStyle style;
+
+  @override
+  State<CommunityBodyText> createState() => _CommunityBodyTextState();
+}
+
+class _CommunityBodyTextState extends State<CommunityBodyText> {
+  static final _tag = RegExp(r'#([A-Za-z][A-Za-z0-9_]{1,30})');
+  final List<TapGestureRecognizer> _taps = [];
+
+  @override
+  void dispose() {
+    for (final t in _taps) {
+      t.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    for (final t in _taps) {
+      t.dispose();
+    }
+    _taps.clear();
+    final spans = <InlineSpan>[];
+    var at = 0;
+    for (final m in _tag.allMatches(widget.text)) {
+      if (m.start > at) spans.add(TextSpan(text: widget.text.substring(at, m.start)));
+      final tap = TapGestureRecognizer()..onTap = () => openCommunityTag(context, m.group(1)!);
+      _taps.add(tap);
+      spans.add(TextSpan(
+        text: m.group(0),
+        recognizer: tap,
+        style: TextStyle(color: cmP.action, fontWeight: FontWeight.w700),
+      ));
+      at = m.end;
+    }
+    if (at < widget.text.length) spans.add(TextSpan(text: widget.text.substring(at)));
+    return SelectableText.rich(TextSpan(style: widget.style, children: spans));
+  }
 }
 
 void openCommunityProfile(BuildContext context, {String? fromId, bool anon = true}) {
@@ -1090,9 +1177,18 @@ Future<void> showCommunityPostMenu(BuildContext context, PvCommunityPost post) a
   final store = PvCommunityStore.instance;
   final saved = store.isSaved(post.id);
   final canPin = communityCanPin(post) && !post.sending;
+  final canEdit = store.canEdit(post);
   final action = await showCommunitySheet<String>(
     context,
     (c) => ListView(shrinkWrap: true, children: [
+      // (0137) Her own post, for 15 minutes: title and body only.
+      if (canEdit)
+        CommunitySheetRow(
+          icon: Icons.edit_outlined,
+          label: 'Edit',
+          note: 'Title and words, for 15 minutes after posting',
+          onTap: () => Navigator.pop(c, 'edit'),
+        ),
       CommunitySheetRow(
         icon: saved ? Icons.bookmark_remove_outlined : Icons.bookmark_border_rounded,
         label: saved ? 'Remove from saved' : 'Save',
@@ -1145,6 +1241,14 @@ Future<void> showCommunityPostMenu(BuildContext context, PvCommunityPost post) a
   );
   if (action == null || !context.mounted) return;
   switch (action) {
+    case 'edit':
+      // Checked again: the sheet may have stayed open past the window.
+      if (!store.canEdit(post)) {
+        pvToast(context, 'Posts can be edited for 15 minutes. You can still delete it and post again.',
+            kind: PvToastKind.info);
+        return;
+      }
+      await openCommunityCompose(context, edit: store.post(post.id) ?? post);
     case 'pin':
       final err = await store.pin(post.id, post.pinned ? 0 : 7);
       if (context.mounted) {

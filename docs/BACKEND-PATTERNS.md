@@ -5119,6 +5119,19 @@ Also in 0137, worth knowing:
 Pinned by `test/community_phase2_contract_test.dart` (grants, helpers revoked, signature drops, no user id, the
 team-only null author, the notice written after the slot moves) and a local Postgres scenario run before hand-over.
 
+**The phone half (L4b, 2026-10-30): two choices about WHERE a fact is decided.**
+
+- **Her birth month is derived on the phone and sent, never read from the server's copy.** The phone holds the live
+  due date (and knows about a loss the moment she records it); the server's copy is synced later and outlives a loss.
+  So `syncBirthClub` sends `YYYY-MM` the same way the feed already sends her stage, and the server only validates the
+  range and moves its own 'auto' rows. Trade-off: the month is as fresh as the phone (good) but a second phone with a
+  stale date could move her (bounded: it only touches 'auto' rows, never her own choice).
+- **Edit is online-only; a post is outbox-first.** Both are writes, so why differ? A post has no deadline: sent an hour
+  late it is still right. An edit has a 15-minute window; queued offline and sent at minute 20 it would be refused
+  long after she believed it saved. A queue is the right tool when a write stays valid while it waits; when validity
+  expires, an honest "no connection, not saved" now beats a silent refusal later. (A post still IN the outbox is edited
+  in place: it has not been sent, so nothing has expired.)
+
 ## 16zzy. A client check is a hint, a server check is policy; a status with three values is not a bool; null is not zero (Partner Editions P2, 0138, 2026-10-30)
 
 P2 gave an employer's or a school's admin their Overview, People and a shareable report in ParentVeda Partners,
@@ -5154,3 +5167,52 @@ both the screen and the PDF only lay it out. Two layouts can then disagree about
 
 Pinned by `test/sponsor_roster_status_test.dart` (the three statuses, the HR screen, 0138's guard before the remove),
 `partner_overview_test`, `partner_people_test`.
+
+## 16zzz. Check the resolver before reusing a query; hidden in the app is not hidden; reuse the function, not its join (Partner Editions P3, 0139, 2026-10-30)
+
+P3 gave an IVF centre its Overview and a per-doctor table in ParentVeda Partners, and made ParentVeda+ turn away an
+organisation-only login. The plan named four existing RPCs. Checking them before building changed the plan, and the
+reasons are general.
+
+**1. Two queries can be "about the same org" and still disagree about which one.** `my_partner_org()` (0136) picks
+the centre by Route A only (`partner_accounts`). Three of the four RPCs take an id and authorise it with
+`caller_owns_partner()`, Route A *or* B: passing them the id the resolver returned keeps them in step. The fourth,
+`partner_referral_breakdown()`, takes **no** id and sums every partner the caller owns by either route. For most
+logins that is the same set. For a manager who is also a doctor with her own practice it is two partners merged into
+one table, and nothing on screen would say so. The store the doctor app uses has the same trap one level up:
+`my_care_partner()` breaks the tie towards her own practice (0132), so the header would name the centre while the
+numbers came from her clinic. **Before reusing a read, ask "how does it decide whose rows these are?" and compare
+that to how the screen decided who is signed in.** Same answer for the common case is not the same rule.
+
+**2. A rule the client applies is a rule the client can skip.** R3 says behaviour (pregnancies, consults…) is held
+back below 5. `partner_impact` sends it regardless. Hiding it in Flutter would have looked done and passed a widget
+test, but the admin signs in with a password and the app ships the public key: anyone can call the RPC from a laptop
+and read the figure the screen hides. For an IVF centre, "pregnancies: 1" after two referrals names a patient's
+outcome. **Suppression lives where the data is.** (Same lesson as P2's self-removal, from the privacy side: P2 was
+"a client check is a hint", this is "a client hide is decoration".)
+
+**3. Reuse the function, not a copy of its join.** `care_org_dashboard()` does not repeat the `partner_accounts`
+join; it calls `my_partner_org()` and reads `kind`, `status` and `id` from the answer. So "sponsor wins", "rejected
+and deleted partners are not organisations" and every later change to who counts as a centre apply here for free.
+The trade-off: the dashboard pays for the resolver's extra lookups (sponsor rows it then ignores), a few index hits
+on a desk screen. What it buys: there is one definition of "which centre", so the two can't drift apart. A test pins
+it (the body must contain `my_partner_org()` and must *not* contain `partner_accounts`).
+
+**4. A new function instead of widening a shared one.** Suppressing inside `partner_impact` would also change the
+doctor app's impact screen, a decision outside this phase. A new zero-argument function, shaped like
+`sponsor_dashboard`, gives the Partners app exactly its question and leaves the old callers alone. The cost is two
+places counting "families" for a partner. They are kept honest by using **the same definitions word for word**,
+because two copies of the definition are the cheaper risk next to changing a shared function.
+
+**5. Precision is a privacy setting.** The per-doctor "latest" is a `date`, not a `timestamptz`. A clinic holds its
+own appointment book; "joined at 11:42 on the 12th" next to "Dr Rao saw Mrs X at 11:30 on the 12th" names a family. A
+day answers "is this doctor still bringing people?" and nothing more. **Send the coarsest value that answers the
+question.**
+
+On the R5 side, a small general one: **a refusal shown on first frame needs a listener that ignores selection.** A
+`TextEditingController` notifies on selection as well as text, and an autofocused field sets a selection on first
+layout; an "on change, clear the error" listener wiped the boot refusal before it was painted. Track the last text and
+react only when it changes.
+
+Pinned by `test/partner_care_org_test.dart` (the 0139 contract on the latest definition, the shared RPCs still at
+0068/0073, wiring), `test/doctor_app_shell_test.dart` group R5, and `supabase/seed/verify_care_org_dashboard.sql`.

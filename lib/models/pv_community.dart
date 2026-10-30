@@ -155,7 +155,7 @@ class PvCommunityRoom {
   bool get isOffering => kind == 'offering';
   bool get isClub => kind == 'birth_club';
 
-  PvCommunityRoom copyWith({bool? joined, bool? muted, int? members, int? unread}) => PvCommunityRoom(
+  PvCommunityRoom copyWith({bool? joined, bool? muted, int? members, int? unread, String? via}) => PvCommunityRoom(
         id: id,
         title: title,
         blurb: blurb,
@@ -171,7 +171,7 @@ class PvCommunityRoom {
         runId: runId,
         access: access,
         unread: unread ?? this.unread,
-        via: via,
+        via: via ?? this.via,
       );
 
   static PvCommunityRoom? fromJson(Object? raw) {
@@ -365,6 +365,9 @@ class PvCommunityPost {
     List<PvCommunityMedia>? media,
     bool? pinned,
     bool? expertAsked,
+    String? title,
+    String? body,
+    DateTime? editedAt,
   }) =>
       PvCommunityPost(
         id: id,
@@ -373,8 +376,8 @@ class PvCommunityPost {
         roomMark: roomMark,
         roomHue: roomHue,
         author: author,
-        title: title,
-        body: body,
+        title: title ?? this.title,
+        body: body ?? this.body,
         poll: poll ?? this.poll,
         media: media ?? this.media,
         likeCount: likeCount ?? this.likeCount,
@@ -386,7 +389,7 @@ class PvCommunityPost {
         roomKind: roomKind,
         hostRole: hostRole,
         hashtags: hashtags,
-        editedAt: editedAt,
+        editedAt: editedAt ?? this.editedAt,
         pinned: pinned ?? this.pinned,
         about: about,
         movedFrom: movedFrom,
@@ -701,6 +704,61 @@ class PvOfferingRoom {
       isHost: raw['is_host'] == true,
       isMod: raw['is_mod'] == true,
       posts: (raw['posts'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// What a search found (0137 `community_search`): posts ranked by text match
+/// and recency, plus rooms and #tags whose names match.
+class PvCommunitySearch {
+  const PvCommunitySearch({this.posts = const [], this.rooms = const [], this.tags = const []});
+
+  final List<PvCommunityPost> posts;
+  final List<PvCommunityRoom> rooms;
+  final List<String> tags;
+
+  bool get isEmpty => posts.isEmpty && rooms.isEmpty && tags.isEmpty;
+
+  static PvCommunitySearch fromJson(Object? raw) {
+    final m = raw is Map ? raw : const {};
+    return PvCommunitySearch(
+      posts: [for (final p in (m['posts'] as List?) ?? const []) ?PvCommunityPost.fromJson(p)],
+      rooms: [for (final r in (m['rooms'] as List?) ?? const []) ?PvCommunityRoom.fromJson(r)],
+      tags: [for (final t in (m['tags'] as List?) ?? const []) '$t'],
+    );
+  }
+}
+
+/// A person she follows. [id] is the follow row's id, never the person's:
+/// unfollowing from the list needs no user id on the phone.
+class PvFollowedFace {
+  const PvFollowedFace({required this.id, required this.label, this.anon = true});
+  final String id;
+  final String label;
+  final bool anon;
+}
+
+/// Everything "Following" covers (0137 `community_following_list`): the
+/// rooms she is in, the #tags and the faces she follows.
+class PvCommunityFollowing {
+  const PvCommunityFollowing({this.rooms = const [], this.tags = const [], this.people = const []});
+
+  final List<PvCommunityRoom> rooms;
+  final List<String> tags;
+  final List<PvFollowedFace> people;
+
+  bool get isEmpty => rooms.isEmpty && tags.isEmpty && people.isEmpty;
+
+  static PvCommunityFollowing fromJson(Object? raw) {
+    final m = raw is Map ? raw : const {};
+    return PvCommunityFollowing(
+      rooms: [for (final r in (m['rooms'] as List?) ?? const []) ?PvCommunityRoom.fromJson(r)],
+      tags: [for (final t in (m['tags'] as List?) ?? const []) '$t'],
+      people: [
+        for (final p in (m['people'] as List?) ?? const [])
+          if (p is Map && p['id'] != null)
+            PvFollowedFace(id: '${p['id']}', label: '${p['label'] ?? ''}', anon: p['anon'] != false),
+      ],
     );
   }
 }

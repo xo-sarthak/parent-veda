@@ -151,6 +151,21 @@ class _CommunityModerationScreenState extends State<CommunityModerationScreen> {
           title: Text('Moderation', style: cmText(17, weight: FontWeight.w800)),
           centerTitle: true,
         ),
+        // (0137, decision 19) An editorial prompt: posted as ParentVeda team
+        // into a room she picks, optionally pinned. Pinning any other post is
+        // in that post's menu.
+        floatingActionButton: _denied
+            ? null
+            : FloatingActionButton.extended(
+                key: const ValueKey('community_mod_write_prompt'),
+                heroTag: 'community-mod-prompt',
+                backgroundColor: kPvInk,
+                foregroundColor: Colors.white,
+                shape: const StadiumBorder(),
+                onPressed: () => openCommunityCompose(context, asTeam: true),
+                icon: const Icon(Icons.campaign_outlined, size: 20),
+                label: Text('Write a prompt', style: cmText(15, weight: FontWeight.w700, color: Colors.white)),
+              ),
         body: _denied
             ? const CommunityEmpty(
                 icon: Icons.shield_outlined,
@@ -210,7 +225,15 @@ class _CommunityModerationScreenState extends State<CommunityModerationScreen> {
                       )
                     else
                       for (final it in items) _item(it),
-                    const SizedBox(height: 40),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: Text(
+                        'Write a prompt posts as ParentVeda team and can pin it for up to 14 days. '
+                        'To pin any post, use Pin in its ⋯ menu.',
+                        style: cmText(12.5, color: cmP.ink3),
+                      ),
+                    ),
+                    const SizedBox(height: 110),
                   ],
                 ),
               ),

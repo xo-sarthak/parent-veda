@@ -318,7 +318,9 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                         Text(post.title, style: cmTitle(27)),
                         if (post.body.isNotEmpty) ...[
                           const SizedBox(height: 10),
-                          SelectableText(post.body, style: cmText(15.5, height: 1.55)),
+                          // (0137) #tags open their feed. Kept for revert:
+                          // SelectableText(post.body, style: cmText(15.5, height: 1.55)),
+                          CommunityBodyText(post.body, style: cmText(15.5, height: 1.55)),
                         ],
                         if (post.poll != null) ...[
                           const SizedBox(height: 14),

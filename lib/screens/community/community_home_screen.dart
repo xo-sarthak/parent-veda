@@ -13,6 +13,7 @@ import '../../widgets/pv_toast.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
 import 'community_chrome.dart';
 import 'community_marks.dart';
+import 'community_profile_screen.dart' show showCommunityFollowing;
 
 class CommunityHomeScreen extends StatefulWidget {
   const CommunityHomeScreen({super.key});
@@ -21,6 +22,8 @@ class CommunityHomeScreen extends StatefulWidget {
   State<CommunityHomeScreen> createState() => _CommunityHomeScreenState();
 }
 
+// (0137) `rooms` is now the Following pill: joined rooms, followed #tags and
+// followed people (plan decision 14). Still four pills.
 enum _Tab { forYou, rooms, saved, mine }
 
 class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
@@ -32,7 +35,8 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
 
   String get _scope => switch (_tab) {
         _Tab.forYou => 'for_you',
-        _Tab.rooms => 'rooms',
+        // Kept for revert: _Tab.rooms => 'rooms',
+        _Tab.rooms => 'following',
         _Tab.saved => 'ids',
         _Tab.mine => 'mine',
       };
@@ -42,15 +46,94 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _store.init().then((_) {
-      _store.refreshMe();
+    _store.init().then((_) async {
       _load();
+      // refreshMe syncs her birth club; a loss raises the sheet via _onStore.
+      await _store.refreshMe();
+      if (mounted) _askAboutClub();
     });
+    _store.addListener(_onStore);
     _scroll.addListener(_onScroll);
+  }
+
+  bool _clubAsked = false;
+
+  void _onStore() {
+    if (_store.clubAfterLoss != null && !_clubAsked && mounted) _askAboutClub();
+  }
+
+  /// Decision 12: after a loss, ask her once whether to stay in her birth
+  /// club. Nothing changes until she taps. Closing the sheet without an
+  /// answer leaves her in, and it asks again on her next visit.
+  Future<void> _askAboutClub() async {
+    final id = _store.clubAfterLoss;
+    if (id == null || _clubAsked) return;
+    _clubAsked = true;
+    final club = _store.room(id);
+    final stay = await showCommunitySheet<bool>(
+      context,
+      (c) => Padding(
+        key: const ValueKey('community_club_after_loss'),
+        padding: const EdgeInsets.fromLTRB(20, 6, 20, 16),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text('Your birth club', style: cmTitle(26)),
+          const SizedBox(height: 8),
+          Text(
+            'We are so sorry. You are still in ${club?.title ?? 'your birth club'}, and nothing changes unless you choose. '
+            'Some parents find it a comfort to stay; others need a break from it. Either is right.',
+            style: cmText(14.5, color: cmP.ink2),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'There is also a quiet room, After a loss, held gently by people who understand.',
+            style: cmText(14.5, color: cmP.ink2),
+          ),
+          const SizedBox(height: 18),
+          CommunityInkButton(label: 'Stay in my birth club', onTap: () => Navigator.pop(c, true)),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: () => Navigator.pop(c, false),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: kPvInk,
+              side: BorderSide(color: cmP.line),
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              textStyle: cmText(15, weight: FontWeight.w700),
+            ),
+            child: const Text('Leave it for now'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(c);
+              openCommunityRoom(context, 'ttc_loss');
+            },
+            style: TextButton.styleFrom(foregroundColor: kPvInk),
+            child: const Text('Look at After a loss'),
+          ),
+        ]),
+      ),
+    );
+    if (stay == null || !mounted) {
+      _clubAsked = false;
+      return;
+    }
+    final ok = await _store.answerClubAfterLoss(stay: stay);
+    if (!mounted) return;
+    pvToast(
+      context,
+      !ok
+          ? 'That did not go through. Nothing changed; we will ask again next time.'
+          : (stay
+              ? 'You are staying in ${club?.title ?? 'your birth club'}. Leave it any time from the room.'
+              : 'You have left ${club?.title ?? 'your birth club'}. Take all the time you need.'),
+      kind: ok ? PvToastKind.done : PvToastKind.gentle,
+    );
+    if (!ok) _clubAsked = false;
   }
 
   @override
   void dispose() {
+    _store.removeListener(_onStore);
     _scroll.dispose();
     super.dispose();
   }
@@ -115,6 +198,11 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                     onPressed: () => Navigator.of(context).maybePop(),
                   ),
                   actions: [
+                    IconButton(
+                      tooltip: 'Search the community',
+                      icon: const Icon(Icons.search_rounded, color: kPvInk),
+                      onPressed: () => openCommunitySearch(context),
+                    ),
                     if (me.isMod)
                       IconButton(
                         tooltip: 'Moderation',
@@ -165,7 +253,8 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                       child: Row(children: [
                         for (final (t, l) in const [
                           (_Tab.forYou, 'For you'),
-                          (_Tab.rooms, 'My rooms'),
+                          // Kept for revert: (_Tab.rooms, 'My rooms'),
+                          (_Tab.rooms, 'Following'),
                           (_Tab.saved, 'Saved'),
                           (_Tab.mine, 'My posts'),
                         ]) ...[
@@ -208,6 +297,24 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                   ),
                   SliverToBoxAdapter(child: _RoomRail(rooms: _store.rooms)),
                 ],
+                if (_tab == _Tab.rooms && _store.signedIn)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 8, 4),
+                      child: Row(children: [
+                        Expanded(
+                          child: Text('Rooms you joined, #tags and people you follow',
+                              style: cmText(13, color: cmP.ink3)),
+                        ),
+                        TextButton(
+                          key: const ValueKey('community_following_manage'),
+                          onPressed: () => showCommunityFollowing(context),
+                          style: TextButton.styleFrom(foregroundColor: kPvInk),
+                          child: const Text('Manage'),
+                        ),
+                      ]),
+                    ),
+                  ),
                 ..._feed(posts),
                 const SliverToBoxAdapter(child: SizedBox(height: 110)),
               ],
@@ -238,8 +345,8 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
             'Write a post',
           ),
         _Tab.rooms => (
-            'Join a room to fill this',
-            'Rooms for your stage are above. Their posts gather here.',
+            'Follow something to fill this',
+            'Join a room, follow a #tag from any post, or follow a member from their profile. Their posts gather here.',
             null,
           ),
         _Tab.saved => (
@@ -329,7 +436,10 @@ class _RoomRail extends StatelessWidget {
                     const Spacer(),
                     Text(r.title, maxLines: 2, style: cmText(13.5, weight: FontWeight.w800, height: 1.25)),
                     const SizedBox(height: 2),
-                    Text(r.joined ? 'Joined' : (communityMembersLine(r.members) ?? 'Tap to look in'),
+                    // (0137) Her birth club says whose month it is.
+                    Text(
+                        communityClubLine(r.id) ??
+                            (r.joined ? 'Joined' : (communityMembersLine(r.members) ?? 'Tap to look in')),
                         style: cmText(12, color: cmP.ink3)),
                   ]),
                 ),

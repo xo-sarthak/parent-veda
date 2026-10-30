@@ -168,6 +168,14 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(r.title, style: cmTitle(30)),
+                            if (communityClubLine(r.id) != null) ...[
+                              const SizedBox(height: 6),
+                              CommunityStatusLine(
+                                key: const ValueKey('community_room_club_line'),
+                                icon: Icons.calendar_month_outlined,
+                                text: '${communityClubLine(r.id)} · your birth club, made for your month',
+                              ),
+                            ],
                             const SizedBox(height: 6),
                             if (r.isOffering)
                               // No Join: her seat is her membership (B1).

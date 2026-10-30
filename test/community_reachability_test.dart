@@ -94,8 +94,44 @@ void main() {
       '.endorse(',
       '.myOfferings(',
       '.movedFrom(',
+      // L4b
+      '.answerClubAfterLoss(',
+      '.follow(',
+      '.loadFollowing(',
+      '.search(',
+      '.recentSearches(',
+      '.editPost(',
     ]) {
       expect(screens, contains(call), reason: '$call has no caller in lib/screens');
+    }
+  });
+
+  test('L4b screens are reached from inside Community only', () {
+    final home = _live(_read('lib/screens/community/community_home_screen.dart')).join('\n');
+    expect(home, contains('openCommunitySearch(context)'));
+    expect(home, contains("(_Tab.rooms, 'Following')"));
+    expect(home, contains('showCommunityFollowing(context)'));
+    final chrome = _live(_read('lib/screens/community/community_chrome.dart')).join('\n');
+    expect(chrome, contains("kCommunitySearchRoute = 'community/search'"));
+    expect(chrome, contains("kCommunityTagPrefix = 'community/tag/'"));
+    expect(chrome, contains('openCommunityTag(context, m.group(1)!)'));
+    expect(chrome, contains('openCommunityCompose(context, edit:'));
+    final post = _live(_read('lib/screens/community/community_post_screen.dart')).join('\n');
+    expect(post, contains('CommunityBodyText(post.body'));
+    expect(_live(_read('lib/screens/community/community_search_screen.dart')).join('\n'),
+        contains('openCommunityTag(context, t)'));
+    final profile = _live(_read('lib/screens/community/community_profile_screen.dart')).join('\n');
+    expect(profile, contains("PvCommunityStore.instance"));
+    expect(profile, contains('_toggleFollow'));
+    expect(_live(_read('lib/screens/community/community_moderation_screen.dart')).join('\n'),
+        contains('openCommunityCompose(context, asTeam: true)'));
+    expect(_live(_read('lib/services/pv_community_store.dart')).join('\n'), contains('unawaited(syncBirthClub())'));
+    // No new member-app entry point outside Community.
+    for (final f in Directory('lib').listSync(recursive: true)) {
+      final path = f.path.replaceAll('\\', '/');
+      if (f is! File || !path.endsWith('.dart') || path.contains('lib/screens/community/')) continue;
+      final src = _live(f.readAsStringSync()).join('\n');
+      expect(src.contains('openCommunitySearch(') || src.contains('openCommunityTag('), isFalse, reason: path);
     }
   });
 

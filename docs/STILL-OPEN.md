@@ -447,6 +447,27 @@ Deferred by decision: testing 1:1 and 1:many end to end comes first. Do it in
 the same sitting as §1b (the presentation pass), since both are Data Model work
 on the same screens.
 
+## 5.1e IVF centres in ParentVeda Partners: what P3 left open (2026-10-30)
+
+P3 built the centre's Overview and Doctors on a new RPC, `care_org_dashboard()` (0139), instead of the four the plan
+named. Detail and the reasons: `docs/partner-editions/PARTNERS-APP.md` §P3 as built. Left open:
+
+- [ ] **`partner_referral_breakdown()` (0073) still has no caller, and must not gain one as it stands.** It takes no
+  partner id and sums every partner the login owns by either route, so a centre manager who is also a doctor with her
+  own practice gets both merged. Either give it a `p_partner_id` (drop the zero-arg signature first, or the call is
+  ambiguous, the trap `partner_parity_test` describes for `mint_partner_token`) or drop it. `care_org_dashboard()`
+  covers its only planned use.
+- [ ] **Solo doctors in ParentVeda+ still see behaviour unwithheld.** R3 says small numbers are hidden "for clinics
+  and doctors", but `partner_impact` (read by the doctor app's impact screen) has no threshold. P3 left it alone so
+  as not to change the doctor app. For a solo doctor with three families, "pregnancies: 1" is close to a name. **The
+  user's call** whether ParentVeda+ gets the same rule.
+- [ ] **Adding a doctor to a centre is still SQL** (§5.1c): `expert_profiles.partner_id`. The Doctors tab says
+  "contact your ParentVeda manager".
+- [ ] **The demo centre has no doctors or families**, so a phone walk shows the empty states only. A seed that adds
+  two `expert_profiles` under `demo_org_ivf` and a few attributions would let the per-doctor table be walked; not
+  written, because attributions need real auth users.
+- [ ] **A centre has no monthly report** (employers and schools do, P2). Not in the P3 plan; add if a centre asks.
+
 ## 5.1d `programmes.price_paise` still stores minor units — minor, deferred
 
 `0074` moved the consult fee to whole rupees (`expert_profiles.fee_inr`) because
@@ -799,6 +820,9 @@ consultation audit; five are closed and the sixth is deliberately parked.
 - **2026-10-30 (L4a): the discussion is built, migration `0137_community_phase2.sql` not yet run.** The course page,
   the lesson's Discussion tab and the doctor's Your offerings are wired (docs/COMMUNITY.md "As built (phase 2)").
   This entry closes in L4b, after the user runs 0137 and the walk.
+- **CLOSED 2026-10-30 (L4b), phone walk owed.** 0137 is run; L4a (course discussions) and L4b (birth clubs,
+  Following, search, #tags, edit, team prompts, Over-35) are built. The only thing left here is the walk with two
+  accounts and an expert login. The buy sheet's "private discussion group" now describes something real.
 - **W20 (DESIGN-DECISIONS) stays OPEN, half built.** The expert layer is built in L4a: the verified seal on named
   posts, the footer, endorsement, "Ask an expert to look" and the doctor's claimable queue. **Crisis routing to experts
   is held back by the user (2026-10-28): crisis posts stay with the moderators for now**, and "Ask an expert to look"
@@ -9868,6 +9892,8 @@ Owed:
   - **CLOSED 2026-10-28 by the real community** (`docs/COMMUNITY.md`): shared feed, votable polls with real counts,
     a two-week-wait room, the entry points re-enabled onto the new screens, a "Parents like you" card on the home.
     Over-35 room and pinned threads are not built (phase 2 list in COMMUNITY.md).
+  - **CLOSED 2026-10-30 (phase 2, 0137 + L4b):** the "Pregnant after 35" room is seeded and on the rail, and
+    moderators and a course's hosts can pin a post for 1 to 14 days (a team prompt can be pinned as it is written).
 - **§79.6 Faint-line drawing** (a design asset) for `ttc_read_faint_line`.
 - **§79.7 Six videos** the PDF names (fertile window, when to test, stress, his side, PCOS, when to see someone):
   the placeholder tiles stay until the films are uploaded.
