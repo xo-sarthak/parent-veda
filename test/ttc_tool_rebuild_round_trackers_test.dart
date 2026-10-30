@@ -206,7 +206,9 @@ void main() {
         reason: '"I\'ll add it later" came back as "Starting treatment?"',
       );
       expect(find.byKey(const ValueKey('ttc_round_header')), findsOneWidget);
-      expect(find.text(kTtcPanelNoDatesTitle), findsOneWidget);
+      // T4 GAP 25 (2026-10-29): the screen's title says it, as a sentence.
+      // Kept for revert: find.text(kTtcPanelNoDatesTitle)
+      expect(find.text('No dates yet.'), findsOneWidget);
       expect(find.byKey(const ValueKey('ttc_round_timeline')), findsOneWidget);
       expect(find.text('Add date'), findsWidgets);
       // Nothing to pause on an empty round; the kind can still be fixed.

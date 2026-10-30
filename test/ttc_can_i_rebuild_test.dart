@@ -123,8 +123,10 @@ void main() {
       // The row merges it into one announcement with its question.
       // 2026-09-30: vaping joined smoking on this verdict, so two rows say
       // it. Kept for revert: findsOneWidget.
+      // 2026-10-29 (T3 W1): alcohol joined them, so three rows say it.
+      // Kept for revert: findsNWidgets(2).
       expect(find.bySemanticsLabel(RegExp('Answer: No, best to stop')),
-          findsNWidgets(2));
+          findsNWidgets(3));
       handle.dispose();
     });
   });

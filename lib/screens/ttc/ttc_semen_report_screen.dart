@@ -251,7 +251,8 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
           }
           final nav = Navigator.of(context);
           final leave = await ttcConfirmRemove(context,
-              title: 'Leave without reading it?',
+              // Kept for revert (2026-10-30): 'Leave without reading it?'
+              title: 'Leave without reading your report?',
               body: 'The numbers you typed will not be kept.',
               yes: 'Leave',
               no: 'Keep going');
@@ -767,7 +768,8 @@ class _Result extends StatelessWidget {
                               openTtcArticle(context, id, hue: kHisSideHue),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Text('Read it now',
+                            // Kept for revert (2026-10-30): 'Read it now'
+                            child: Text('Read about azoospermia',
                                 style: ttcBody(13.5,
                                     color: ttcTitleInk,
                                     w: FontWeight.w800)),

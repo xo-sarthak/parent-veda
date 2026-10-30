@@ -148,7 +148,9 @@ void main() {
     testWidgets('his tab points on to the semen report reader',
         (tester) async {
       await pumpTall(tester, const TtcTestsScreen(focusId: 'semen'));
-      expect(find.textContaining('semen analysis report'), findsOneWidget);
+      // T4 K12 (2026-10-29) named the row after the tool. Kept for revert:
+      //   find.textContaining('semen analysis report')
+      expect(find.text('Read your semen report'), findsOneWidget);
     });
   });
 

@@ -382,6 +382,10 @@ void main() {
           reason: 'the number he typed is still there');
       await _expectClose(tester);
       await _tap(tester, _close);
+      // T4 K12 (2026-10-29): leaving with numbers typed asks first. Kept for
+      // revert: straight to _base.
+      expect(find.text('Leave without reading your report?'), findsOneWidget);
+      await _tap(tester, find.text('Leave'));
       expect(find.text(_base), findsOneWidget);
     });
 

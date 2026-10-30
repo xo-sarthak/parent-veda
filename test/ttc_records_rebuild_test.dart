@@ -162,6 +162,11 @@ void main() {
       expect(r.forPartner, isTrue);
       // Back on the folder, with the row and a word that it saved.
       expect(find.byType(TtcRecordEditScreen), findsNothing);
+      // 2026-10-30: Save closed through maybePop while the PopScope still
+      // held the unsaved form, so "Discard this result?" rose over a saved
+      // record, and Discard deleted the photos it had just kept.
+      expect(find.text('Discard this result?'), findsNothing);
+      expect(find.text('Leave without saving?'), findsNothing);
       expect(find.text('Thyroid panel'), findsOneWidget);
       expect(find.text('Saved to your reports.'), findsOneWidget);
       await _drain(tester);

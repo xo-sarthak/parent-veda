@@ -306,7 +306,8 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
       if (!_sameDay(before.takenOn, after.takenOn)) 'date',
       if (before.value != after.value || before.unit != after.unit) 'number',
       if ((before.note ?? '') != (after.note ?? '')) 'note',
-      if (before.forPartner != after.forPartner) 'whose it is',
+      // Kept for revert (labels name their thing, 2026-10-30): 'whose it is'
+      if (before.forPartner != after.forPartner) 'owner',
       if (before.attachments.length != after.attachments.length ||
           before.attachments.any((a) => !after.attachments.contains(a)))
         'photos',
@@ -411,7 +412,11 @@ class _TtcRecordEditScreenState extends State<TtcRecordEditScreen> {
     }
     _saved = true;
     HapticFeedback.selectionClick();
-    Navigator.of(context).maybePop(false);
+    // pop, not maybePop: the PopScope's canPop was read at the last build,
+    // so maybePop still saw an unsaved form and asked "Discard this result?"
+    // over a saved one (and Discard deleted its photos). Kept for revert:
+    //   Navigator.of(context).maybePop(false);
+    Navigator.of(context).pop(false);
   }
 
   Future<void> _remove() async {

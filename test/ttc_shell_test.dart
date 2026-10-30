@@ -135,7 +135,10 @@ void main() {
       // call). Kept for revert: 22.
       // ⚠️ 21 -> 19 ON 2026-09-28 (Tools holds only tools): three rows left
       // for More, the treatment cycle came in. Kept for revert: 21.
-      expect(TtcToolsScreen.toolCount, 19);
+      // ⚠️ 19 -> 24 ON 2026-10-30 (C1): Calendar, Should I test?, Cycle
+      // report, Read your semen report and Ready-to-Try plan became rows.
+      // Kept for revert: 19.
+      expect(TtcToolsScreen.toolCount, 24);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

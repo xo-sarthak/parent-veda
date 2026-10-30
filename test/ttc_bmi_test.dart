@@ -316,7 +316,10 @@ void main() {
           .firstWhere((r) => r.area.contains('South Asian'))
           .claim;
       expect(claim.contains('27.5'), isTrue);
-      expect(claim.toUpperCase().contains('NOT SETTLED'), isTrue);
+      // T5 D3 (2026-10-29): the choice is made and recorded, for clinician
+      // sign-off. Kept for revert:
+      //   expect(claim.toUpperCase().contains('NOT SETTLED'), isTrue);
+      expect(claim, startsWith('CHOSEN 2026-10-29, for clinician sign-off'));
     });
   });
 }

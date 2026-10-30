@@ -877,6 +877,9 @@ void main() {
           t.follow = false;
         }
         await tester.pumpWidget(const SizedBox());
+        // A chat (Should I test?, a Tools row since C1) leaves its typing
+        // pause pending; let it run out on the unmounted screen.
+        await tester.pump(const Duration(seconds: 2));
         tester.takeException();
         _check(e.key, s);
       });

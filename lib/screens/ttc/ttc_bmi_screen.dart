@@ -885,9 +885,12 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
         const SizedBox(height: 22),
         Container(
           padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
+          // A card is white with a hairline (DESIGN-SYSTEM 4.0). Kept for
+          // revert (2026-10-30): color: p.surfaceAlt, with no border.
           decoration: BoxDecoration(
-            color: p.surfaceAlt,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.line),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(

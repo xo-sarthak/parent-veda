@@ -307,7 +307,9 @@ void main() {
 
     test('the context reads Medication as well as Supplements', () {
       final src = File('lib/ttc/ttc_precheck_rules.dart').readAsStringSync();
-      expect(src, contains('MedicineStore.instance.all) m.name'));
+      // T4 (2026-10-29) reads only the medicines she still takes. Kept for
+      // revert: contains('MedicineStore.instance.all) m.name')
+      expect(src, contains('MedicineStore.instance.activeMeds) m.name'));
     });
   });
 

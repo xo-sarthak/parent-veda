@@ -2050,9 +2050,11 @@ class _TtcMedAfterLossCardState extends State<TtcMedAfterLossCard> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: filled ? p.ink1 : Colors.white,
+                // The one black (palette test). Kept for revert: p.ink1 for
+                // the fill and the border.
+                color: filled ? ttcTitleInk : Colors.white,
                 borderRadius: BorderRadius.circular(99),
-                border: Border.all(color: p.ink1, width: 1.2),
+                border: Border.all(color: ttcTitleInk, width: 1.2),
               ),
               child: Text(label,
                   style: pvManrope(
