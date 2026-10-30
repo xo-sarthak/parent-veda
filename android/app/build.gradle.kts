@@ -2,6 +2,22 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services") apply false
+}
+
+// ---- Server push: Firebase config, only when it is there (6b B1) ----------
+//
+// ⚠️ THE PLUGIN FAILS THE BUILD WITHOUT ITS FILE. Applied always, a checkout
+// with no google-services.json (it is git-ignored) could not build at all.
+// Applied only when the file exists, that build simply has no Firebase
+// settings, and the app starts with push off (lib/services/push_service.dart).
+//
+// ⚠️ EVERY FLAVOUR'S APP ID MUST BE IN THE FILE. Once applied, the plugin
+// checks all variants and fails any id it cannot find. parentveda-15ec4 has
+// all three registered: com.parentveda.app, .doctor and .partners. A fourth
+// flavour must be registered in Firebase and the file downloaded again.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 android {

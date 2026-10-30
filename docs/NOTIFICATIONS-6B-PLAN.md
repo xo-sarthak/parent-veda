@@ -350,6 +350,47 @@ parameter.
   age apart. Same day, same child, so it is accepted.
 - The phone walk (B6).
 
+### As built: B1 (2026-10-30)
+
+**Firebase is in the app, and a build without its config still starts.**
+`firebase_core` ^5.1.0 and `firebase_messaging` ^17.0.1, FCM only (no
+Analytics). The Firebase project is `parentveda-15ec4`, with three Android
+apps registered: `com.parentveda.app`, `.doctor` and `.partners` (the partner
+flavour arrived with Partner Editions P1 and needs registering too).
+
+| Piece | File | What it does |
+|---|---|---|
+| `PushService` | `lib/services/push_service.dart` | `init()` starts Firebase. If that throws (no config), push stays off: `ready == false`, the logged-out shape, nothing wired. If it starts, a tap from the background (`onMessageOpenedApp`) and a tap that launched the app (`getInitialMessage`) both go to `openLink(NotificationLink.fromData(data))` |
+| The call | `lib/main.dart` | `PushService.instance.init()`, not awaited, right after `setLinkOpener`. A launch tap is held by B0's opener until it is registered, so the order is safe either way |
+| The plugin, guarded | `android/settings.gradle.kts`, `android/app/build.gradle.kts` | Google services plugin 4.5.0, declared `apply false`, applied only `if (file("google-services.json").exists())`. Applied always, a missing file fails the BUILD, not the app |
+| Secrets | `.gitignore` | `*firebase-adminsdk*.json` (the old patterns missed Firebase's key file name) and `android/app/google-services.json`, plus the iPhone plist for B7 |
+
+**Why the guard is in Gradle and in Dart:** "no config must not crash" has two
+places to fail. Gradle would refuse to build; Dart would throw at start. Each
+side holds the rule on its own.
+
+**Every flavour's app id must be in `google-services.json`.** Once applied,
+the plugin checks every variant. A new flavour means registering its id in
+Firebase and downloading the file again; the test fails on a fourth flavour
+to say so.
+
+**Not in B1:** the token and its upload (B2); permission (the app already asks
+through `flutter_local_notifications`); a push that arrives while the app is
+open, and the Android notification channel pushes use (B4/B5). The doctor and
+partner apps never call `PushService` (decision 6), though the plugin is
+compiled into them.
+
+**Test:** `test/push_b1_test.dart`: Firebase throwing is caught (async, sync
+and the real plugin with no platform); taps are wired once; a tap opens its
+link or is held; the guarded plugin; the three flavours; main.dart wiring and
+the doctor/partner apps left out; both ignore lines.
+
+**Owed:** the real proof is a build. Build `--flavor parent` once with the file
+and once with it moved away, plus `--flavor doctor` and `--flavor partner` with
+it, and start each on a phone. On the user's word. The setup (steps 1 to 3)
+is done; the service-account key (step 4) is created and kept outside the
+repo until B4.
+
 ## Costs
 
 List prices as of 2026-10. Re-check them at build time. ₹84 = $1.
@@ -397,7 +438,7 @@ account you need for the App Store anyway.
 | Step | What | Done when |
 |---|---|---|
 | B0 | One tap opener for every notification, local and pushed | A tap on each 6a kind opens its page. The `syncAll` fix stays out of scope. **BUILT 2026-10-30**, see "As built: B0" |
-| B1 | Firebase in the app (`firebase_core`, `firebase_messaging`). It must not crash with no config: an unconfigured Firebase behaves like being logged out | The app starts on a build with no `google-services.json` |
+| B1 | Firebase in the app (`firebase_core`, `firebase_messaging`). It must not crash with no config: an unconfigured Firebase behaves like being logged out | The app starts on a build with no `google-services.json`. **BUILT 2026-10-30**, see "As built: B1"; the build check is owed |
 | B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`) |
 | B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron | The SQL in "How to test" passes by hand |
 | B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens, the 19:00 IST cron through `pg_net` | `pv_campaign_test` reaches your phone |
@@ -445,7 +486,9 @@ before B2.
 
 ## Owed
 
-- **Before B2:** the user's Firebase setup (steps 1 to 4) and `pg_net` (step 9).
+- **Before B2:** ~~the user's Firebase setup (steps 1 to 4)~~ done 2026-10-30
+  (project `parentveda-15ec4`, three Android apps, key kept outside the repo),
+  and `pg_net` (step 9), still owed.
 - **During the build:** a BACKEND-PATTERNS section for 6b. It should cover
   "moving a decision moves its inputs", "the cost of losing a write decides how
   hard you deliver it" and "pick the shape where missing means the true answer".

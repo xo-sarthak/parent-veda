@@ -56,6 +56,16 @@ xcuserdata/
 *-key.json
 *service-account*.json
 *credentials*.json
+# The FCM service-account key (6b). Firebase names it
+# <project>-firebase-adminsdk-<id>-<hash>.json, which none of the three lines
+# above catch. It can send a push to every user; it lives outside the repo and
+# in Supabase as FCM_SERVICE_ACCOUNT, never here.
+*firebase-adminsdk*.json
+# The Firebase app config. Not a secret like the key above, but kept out so
+# history holds no project keys and a fresh checkout builds the no-config way
+# (push off, app fine). Each machine that ships push needs its own copy.
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
 .env
 .env.*
 

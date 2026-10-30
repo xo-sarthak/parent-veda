@@ -298,6 +298,15 @@ quote cost in USD and INR first).
   built: B0"; test `test/notifications_b0_tap_test.dart`. Next: B1, on the
   user's word. Owed: payloads for the 14 older schedulers (reminders,
   medicines, vaccines and the rest), listed in the plan.
+- **BUILT 2026-10-30 (6b B1, Firebase in the app):** `firebase_core` and
+  `firebase_messaging`, FCM only. `PushService` starts Firebase or, with no
+  `google-services.json`, stays off like being logged out; a push tap (from the
+  background, or one that launched the app) opens through B0's opener. The
+  Google services plugin is applied only when the file exists, so a checkout
+  without it still builds. Firebase project `parentveda-15ec4` made, with the
+  three Android apps registered (parent, doctor, partner). Plan "As built: B1";
+  test `test/push_b1_test.dart`. Owed: the build check (with and without the
+  file, all three flavours), on the user's word. Next: B2.
 
 ### 13 · Relevance inside doors
 
