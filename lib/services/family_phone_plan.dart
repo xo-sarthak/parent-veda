@@ -369,7 +369,7 @@ class FamilyPhone {
   }
 
   /// 6b B2: tells the server which evenings now ring and whether TTC is
-  /// quiet after a loss (`push_audience.dart`). Every stage's rings, TTC's
+  /// quiet (a loss, the two-week wait, a treatment round; B3) (`push_audience.dart`). Every stage's rings, TTC's
   /// included, since its own plan arms apart from this one.
   ///
   /// ⚠️ ONLY WHEN ALL THREE STORES HAVE LOADED. One still loading may have
@@ -386,7 +386,7 @@ class FamilyPhone {
     try {
       PushAudience.instance.upload(
         rings: [...rings, for (final (_, m) in ttc.phonePlanned(now: now)) m.at],
-        quiet: pushTtcQuiet(),
+        quiet: pushTtcQuiet(now: now),
         now: now,
       );
     } catch (_) {/* never let the server copy break the phone's arming */}

@@ -1833,3 +1833,30 @@ item format changed. **Commit:** `ecb47348`.
   `google-services.json`). Switching offers off then on in Messages leaves `push_consent.granted = true` with the
   later `decided_at`. Opening Messages fills `push_audience`. Signing out removes the `push_devices` row.
 - Offline: switch offers off, kill the app, come back online, open it: the "no" lands.
+
+## Step 32: push campaigns, bookings and the rules (Notifications 6b B3, 0143)
+
+**Date:** 2026-10-30 (the user's word: "You have my go for B3"). **Migration:**
+`0143_push_campaigns_and_sends.sql`, to be run by the user. **Commit:** pending.
+
+### Why
+- B2 gave the server its inputs. B3 is the half that decides: who gets which campaign tonight, under consent, the
+  cap, every quiet rule and decisions 15 to 22 (`docs/NOTIFICATIONS-6B-PLAN.md`). It only writes rows; B4 sends.
+
+### What changed
+- [x] **0143:** `push_campaigns` (text, link, stages, week / child-month range, dates, `priority`, status; text rules
+  as table checks) and `push_sends` (`send_on`, `send_before` = 21:00 IST, status, `tapped_at`; unique per campaign
+  and person, and per person and evening unless skipped). Own select on `push_sends`; a campaign is readable only
+  once approved and booked for her.
+- [x] `pv_push_check` (every rule, once), `pv_push_enqueue` (one per person, priority then sooner end,
+  `on conflict do nothing`), `pv_push_holdout` (md5, 10%), `pv_push_link_needs`, and `pv_campaign_create`,
+  `_dry_run`, `_approve`, `_cancel`. None callable by `anon` or `authenticated`.
+- [x] pg_cron `push-enqueue-daily`, `30 4 * * *` (10:00 IST).
+- [x] **App:** `pushTtcQuiet` widened: trying AND (after a loss, the two-week wait or late, an active treatment
+  round). Still one yes/no; the server reads no TTC table.
+- [x] Tests: `test/push_b3_contract_test.dart`; `push_b2_contract_test` follows `pushTtcQuiet(now: now)`.
+
+### Verify
+- Run 0143, then paste `supabase/seed/verify_push_campaigns.sql` into the SQL editor. It ends in a red error that is
+  the report (50 checks, PASSED / FAILED) and rolls every fixture back.
+- `select jobname, schedule, active from cron.job where jobname = 'push-enqueue-daily';` shows one active row.

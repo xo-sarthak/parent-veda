@@ -455,6 +455,89 @@ PushService with and without Firebase. `auth_delete_account_test` and
   and see the device row gone.
 - B1's build check still stands.
 
+### As built: B3 (2026-10-30)
+
+**The server now decides who gets what tonight, and writes it down. Nothing
+sends yet (B4).** Migration `0143_push_campaigns_and_sends.sql` (run it
+before installing a B5 build; B3 has no phone build of its own beyond the
+quiet flag). Verify by hand: `supabase/seed/verify_push_campaigns.sql`
+(50 checks, ends in a red "error" that is the report and rolls everything
+back).
+
+| Piece | Where | What it does |
+|---|---|---|
+| `push_campaigns` | 0143 | The text, link, stages, week / child-month range, dates, `priority`, status. Readable by her only once approved AND booked for her |
+| `push_sends` | 0143 | The booking and the log: `send_on`, `send_before` (21:00 IST), status, `tapped_at` (B5). Unique per (campaign, person) and per (person, evening) unless skipped. Own select |
+| `pv_push_holdout` | 0143 | The 10%: md5 of a salted user id, never `hashtext` |
+| `pv_push_check` | 0143 | **Every rule, once.** One row per campaign and person in its stages, with the first rule that failed |
+| `pv_push_enqueue` | 0143, cron `push-enqueue-daily` 04:30 UTC = 10:00 IST | Takes the rows with no reason, keeps one per person (priority, then sooner end), inserts `on conflict do nothing`. Books nothing once tonight's cutoff has passed |
+| `pv_campaign_create` / `_dry_run` / `_approve` / `_cancel` | 0143 | The SQL-editor admin. Create rewrites a draft only; dry run counts outcomes, including `another_campaign_wins`; cancel turns queued bookings to `skipped` |
+| The quiet flag | `lib/services/push_audience.dart` | `pushTtcQuiet` = trying AND (after a loss OR two-week wait / late OR an active treatment round). Still one yes/no |
+
+**The rules, in the order `pv_push_check` tries them:** not live, no
+consent for her current stage, no device able to open the link, holdout,
+signed up within 7 days, the 0112 loss condition, phone quiet, a child born in
+the last 14 days (hers or her partner's, not removed), week / child-age
+targeting, this campaign already reached her, a busy evening, another
+booking tonight, a campaign in the 7 days ending tonight (cap **1**).
+
+**Why it is shaped this way:**
+
+- **One function holds the rules; enqueue and the dry run both read it.**
+  A dry run that kept its own copy would be right on the day it was written
+  and drift after. Two readers of one rule cannot disagree.
+- **The text rules are table checks.** Length, placeholders, a week or day
+  number, the stage words, the link kinds, dates in order. Directus will write
+  the table directly (decision 5) and skip every function; a check on the
+  table holds for every writer.
+- **"One an evening" is a unique index as well as a rule.** Two runs at once
+  could each read "nothing booked" and both insert. A rule a race can break
+  needs a constraint.
+- **The weekly cap counts 7 rolling days**, not the calendar week, so a
+  Sunday and the Monday after are not "one a week" twice.
+- **md5 for the holdout.** `hashtext` is not promised stable across Postgres
+  upgrades; a holdout that reshuffles mixes the groups and the measurement is
+  lost.
+- **No function is open to the app.** `pv_push_check` reads everyone's consent
+  and audience. Revoked from `public`, `anon` and `authenticated` (Supabase
+  grants new functions to both by default); `service_role` only.
+
+**Changed from the plan above, each for a reason:**
+
+- **The stage gate on the quiet flag.** A TTC cycle that reads "late" because
+  she got pregnant would have silenced her pregnancy offers for good. The flag
+  now speaks only while she is trying; a pregnancy loss is the server's own
+  0112 check.
+- **A phase that can't be worked out reads as quiet** (the safe direction).
+- **"Active treatment" is any open round** (IVF, IUI, FET, tablets) from its
+  first date until she closes it: `ttcTreatmentActive`, the same function
+  the TTC home uses.
+- **The week/day check lets a hyphen through.** "Week 20", "3 days left" and
+  "20th week" are refused; "a 7-day trial" is not a count about her and passes.
+- **`pv_push_link_needs(kind)`** answers "which build opens this kind" (all
+  four kinds need 1 today). Raise it with `PushService.linkVersion`.
+
+**For B4 (the sender):** read `queued` rows for today, send only while
+`now() < send_before`, else mark them `skipped` with error `past_cutoff`.
+Fill `sent_at`, `devices_sent`, `status`, `error`. The phone's tap needs the
+booking's `id` in the push data to fill `tapped_at` (B5).
+
+**Test:** `test/push_b3_contract_test.dart` pins both tables' columns, the
+constants (1 a week, 10%, 7 days, 14 days, 21:00, the 10:00 cron), the rule
+order and its doc comment, the 0112 condition word for word, no TTC table read,
+the text checks (the week/day regex run against real titles), every link kind
+in `NotificationOpener.kinds`, the grants and both policies, cancel, and the
+quiet flag's truth table and wiring.
+
+**Owed from B3:**
+- Run 0143, then the verify file (the user).
+- **A stale quiet flag.** The flag is as fresh as her last app open. If she
+  opens the app in her fertile window and not again for five days, the server
+  still reads "not quiet" in her two-week wait. The fix, if the walk shows it
+  matters: `quiet_evenings date[]`, the busy-evenings shape.
+- Campaign text can still be edited after approval by a direct table write
+  (the Directus phase should lock it).
+
 ## Costs
 
 List prices as of 2026-10. Re-check them at build time. ₹84 = $1.
@@ -504,7 +587,7 @@ account you need for the App Store anyway.
 | B0 | One tap opener for every notification, local and pushed | A tap on each 6a kind opens its page. The `syncAll` fix stays out of scope. **BUILT 2026-10-30**, see "As built: B0" |
 | B1 | Firebase in the app (`firebase_core`, `firebase_messaging`). It must not crash with no config: an unconfigured Firebase behaves like being logged out | The app starts on a build with no `google-services.json`. **BUILT 2026-10-30**, see "As built: B1"; the build check is owed |
 | B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`). **BUILT 2026-10-30**, see "As built: B2"; 0140 run 2026-10-30 |
-| B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron | The SQL in "How to test" passes by hand |
+| B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron. Plus decisions 15 to 22 (holdout, `tapped_at`, 7-day grace, wider quiet incl. the phone flag, priority, cutoff, length limits, 1 a week) | `supabase/seed/verify_push_campaigns.sql` passes by hand. **BUILT 2026-10-30**, see "As built: B3"; 0143 to run |
 | B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens, the 19:00 IST cron through `pg_net` | `pv_campaign_test` reaches your phone |
 | B5 | Phone: read bookings, give the evening to the campaign, show it in Messages | Planner tests: a booked evening never rings two |
 | B6 | Phone walk, on the user's word | See "Owed" |
@@ -543,6 +626,14 @@ before calling it done.
 | 12 | Firebase: which parts? | FCM only, on both platforms (one sending path) | Yes: "im on board with firebase" | 2026-10-29 |
 | 13 | Busy evenings or free evenings? | Busy, so a missing upload means free, which is true | Recommended (a design detail, found writing this plan) | 2026-10-29 |
 | 14 | Android and iPhone together? | Android first (B0 to B6), iPhone as B7 | **"android first, apple later"** | 2026-10-29 |
+| 15 | A holdout group that never gets campaigns? | Yes, 10%, a fixed hash of user_id, so push's effect on daily use can be measured | Recommended ("all 7") | 2026-10-30 |
+| 16 | Record a tap? | `push_sends.tapped_at`, added in B3, filled by the phone in B5 | Recommended ("all 7") | 2026-10-30 |
+| 17 | Campaigns in her first days? | None in the first 7 days after sign-up | Recommended ("all 7") | 2026-10-30 |
+| 18 | Quiet beyond a loss? | Also the TTC two-week wait, active IVF/IUI treatment (both through the phone's `quiet` flag), and the first 14 days after a birth (server) | Recommended ("all 7") | 2026-10-30 |
+| 19 | Two campaigns compete for one evening? | A `priority` column, then the one ending sooner | Recommended ("all 7") | 2026-10-30 |
+| 20 | A send running late? | Each booking carries a cutoff (21:00 IST); B4 skips past it, never a night buzz | Recommended ("all 7") | 2026-10-30 |
+| 21 | Text length? | `pv_campaign_create` refuses a title over ~50 or a body over ~150 characters (lock-screen truncation) | Recommended ("all 7") | 2026-10-30 |
+| 22 | Weekly limit at launch (revises row 11)? | One a week, one constant, raised to two once open and opt-out rates look healthy | Recommended: **"cap 1 at launch"** | 2026-10-30 |
 
 Rows 7 to 11 and 13 were written while turning the agreed calls into tables.
 The user's "all recommended" covered them. If any reads wrong, change it here

@@ -4,8 +4,9 @@
 //  Phase 6b, B2 (2026-10-30). docs/NOTIFICATIONS-6B-PLAN.md, "push_audience".
 //
 //  The server books a campaign on an evening only if the phone is not already
-//  ringing then (two a day, decision 3), and never during TTC's quiet after a
-//  loss (decision 8). It cannot work either out, so `FamilyPhone` hands over
+//  ringing then (two a day, decision 3), and never while TTC is quiet: after a
+//  loss, in the two-week wait, or in a treatment round (decision 8, row 18;
+//  B3 widened it). It cannot work either out, so `FamilyPhone` hands over
 //  what it has just armed, and this uploads it. No new computing on the
 //  phone: only a write of what was already decided.
 //
@@ -23,6 +24,11 @@
 import 'package:flutter/foundation.dart';
 
 import '../ttc/cycle_store.dart';
+import '../ttc/ttc_day_context.dart' show ttcDayContext;
+import '../ttc/ttc_phase.dart' show TtcDayPhase;
+import '../ttc/ttc_treatment_round.dart' show ttcTreatmentActive;
+import '../ttc/ttc_treatment_store.dart' show TtcTreatmentStore;
+import 'life_stage_store.dart';
 import 'preg_messages_store.dart' show kPregEveningFromHour;
 import 'push_wire.dart';
 
@@ -45,12 +51,64 @@ List<DateTime> pushBusyEvenings(Iterable<DateTime> rings, DateTime now) {
   return out.toList()..sort();
 }
 
-/// TTC's quiet after a loss: a loss is recorded while she is trying, and she
-/// has not logged a period since. The same condition that keeps 6a's daily
-/// TTC messages silent (`CycleStore.restartOn`, `lastPeriodStart`).
-bool pushTtcQuiet() {
+// Kept for revert (6b B3, the flag grew from a loss to row 18's three
+// reasons, and now speaks only while she is trying):
+// /// TTC's quiet after a loss: a loss is recorded while she is trying, and she
+// /// has not logged a period since. The same condition that keeps 6a's daily
+// /// TTC messages silent (`CycleStore.restartOn`, `lastPeriodStart`).
+// bool pushTtcQuiet() {
+//   final c = CycleStore.instance;
+//   return c.restartOn != null && c.lastPeriodStart == null;
+// }
+
+/// The phone's "no offers now" while she is trying (decision 8, row 18).
+/// Still ONE yes/no: the server never reads her TTC data, only this. Pure.
+///
+/// * [afterLoss]: a loss recorded, no period logged since.
+/// * [phase]: today's phase. The two-week wait and a late period are quiet:
+///   an offer then reads as noise at best and as a nudge to test at worst.
+/// * [treatmentActive]: an IVF, IUI, FET or tablet round runs from its first
+///   date until she closes it.
+///
+/// ⚠️ ONLY WHILE TRYING. A TTC cycle that reads "late" because she got
+/// pregnant would otherwise silence her pregnancy offers for good. A loss in
+/// pregnancy is the server's to see (the 0112 condition).
+bool pushTtcQuietFrom({
+  required bool trying,
+  required bool afterLoss,
+  required TtcDayPhase phase,
+  required bool treatmentActive,
+}) {
+  if (!trying) return false;
+  return afterLoss ||
+      phase == TtcDayPhase.waiting ||
+      phase == TtcDayPhase.late ||
+      treatmentActive;
+}
+
+/// [pushTtcQuietFrom], read from the stores. A phase that cannot be worked
+/// out reads as quiet: an unknown day gets no offer, the safe direction.
+bool pushTtcQuiet({DateTime? now}) {
+  if (LifeStageStore.instance.stage != LifeStage.tryingToConceive) {
+    return false;
+  }
+  final t = now ?? DateTime.now();
   final c = CycleStore.instance;
-  return c.restartOn != null && c.lastPeriodStart == null;
+  final afterLoss = c.restartOn != null && c.lastPeriodStart == null;
+  TtcDayPhase phase;
+  bool treating;
+  try {
+    phase = ttcDayContext(t, now: t).phase;
+    treating = ttcTreatmentActive(TtcTreatmentStore.instance.cycle, t);
+  } catch (_) {
+    return true;
+  }
+  return pushTtcQuietFrom(
+    trying: true,
+    afterLoss: afterLoss,
+    phase: phase,
+    treatmentActive: treating,
+  );
 }
 
 class PushAudience {

@@ -332,7 +332,7 @@ void main() {
       final src = _code('lib/services/family_phone_plan.dart');
       expect(RegExp(r'_tellServer\(now,').allMatches(src).length, 2);
       expect(src, contains('PushAudience.instance.upload('));
-      expect(src, contains('quiet: pushTtcQuiet()'));
+      expect(src, contains('quiet: pushTtcQuiet(now: now)'));
       expect(src, contains('ttc.phonePlanned(now: now)'));
     });
 
