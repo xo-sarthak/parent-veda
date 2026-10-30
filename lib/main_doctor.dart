@@ -63,6 +63,7 @@ import 'screens/doctor/doctor_cant_reach.dart';
 import 'screens/doctor/doctor_scaffold.dart';
 import 'services/expert_store.dart';
 import 'services/notification_service.dart';
+import 'services/pv_community_store.dart';
 import 'services/remote/supabase_repo.dart';
 import 'supabase_config.dart';
 import 'theme/app_theme.dart';
@@ -149,6 +150,11 @@ class _ParentVedaExpertAppState extends State<ParentVedaExpertApp> {
     // worst possible moment to find out.
     if (widget.backendUp) {
       ExpertStore.instance.ensureLoaded();
+      // (0137, LA-21) The community store, for "Your offerings", the course
+      // discussions she hosts and the expert queue. main.dart inits it for
+      // parents; without this line the doctor app opened every discussion on
+      // an empty cache and never learned she is an expert.
+      PvCommunityStore.instance.init();
       _resolve();
     }
   }

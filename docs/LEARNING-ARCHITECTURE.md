@@ -311,10 +311,24 @@ written down so it isn't lost.
 - [x] **LA-18 · Room capacity is not enforced in the room.** · L.16 · **L3** · open · **closed 2026-10-29**, `54875c57`, 0128 run (VERIFY all true, the sweep is cron job 4 and succeeds every minute), five functions deployed, LiveKit webhook added. First proof in use: a call's `livekit-webhook` deliveries answering 200 in the function logs (`livekit-token` calls CreateRoom before minting, `max_participants` = seats + hosts + 1 from `room_max_participants`; fails open, the database is the first lock)
 - [ ] **LA-19 · No recording pipeline** (egress → bucket → Mux → lesson → signed playback). The buy sheet sells "a
   recording to keep". · L.7 · **L3** · open · **live 2026-10-29**, `54875c57`, 0128 run, functions deployed. Still open until the Mux account and S3 keys are set and one class recording has been walked from the call to Your bookings › Watch (host joins a class → `begin_recording` → room-composite egress to the bucket → `egress_ended` → a 24-hour signed URL → a Mux asset → `mux-webhook` writes the playback id → Your bookings › Past "Watch", and a course lesson plays when a row with its `lesson_id` is ready). Needs the Mux account and the S3 keys before it can be walked
-- [ ] **LA-20 · No discussion, though it is sold** ("private discussion group"). · L.2–L.6 · **L4** · open
-- [ ] **LA-21 · Doctor side: no discussion, unread counts, posting or pinning.** · L.5 · **L4** · open
+- [ ] **LA-20 · No discussion, though it is sold** ("private discussion group"). · L.2–L.6 · **L4** · **built
+  2026-10-30 (L4a), not yet committed; 0137 not yet run.** One room per run (`run_<id>`), opened by
+  `has_course_access(programme, 'thread', run)` (receipt, a booked seat incl. a credit seat, a route A host, a
+  moderator; for life). Course page section + lesson Discussion tab + room course variant (about pills, no Join);
+  team voice + pin. Detail: docs/COMMUNITY.md "As built (phase 2)". Closes when 0137 is run and the course thread is
+  walked on a phone with a booked account and a host account
+- [ ] **LA-21 · Doctor side: no discussion, unread counts, posting or pinning.** · L.5 · **L4** · **built 2026-10-30
+  (L4a), not yet committed; 0137 not yet run.** Doctor home section 8 is "Your offerings" from
+  `expert_my_offerings()` (every run she hosts, route A: role, seats, next session, unread) → the room as host (badge +
+  role, answer, pin; no remove or mute), plus "Parents asking an expert to look" → the queue. Go live unchanged
+  (ClassCard / DoctorClassesScreen). Closes with the same walk on the doctor flavour
 - [ ] **LA-22 · A timetable change reaches no one.** A server edit must notify the people booked (a pinned team
-  notice first; push in phase 3). · L.6 · **L4** · open
+  notice first; push in phase 3). · L.6 · **L4** · **pinned notice built 2026-10-30 (L4a), not yet committed; 0137
+  not yet run.** `_mirror_session` reads the slot's old start before the upsert and, when the start moved and anyone
+  holds an upcoming seat, writes a pinned "ParentVeda team" notice in the run's room (old → new time in India time,
+  `moved_from`, pinned until the new start, audit row with actor null). The booking card in Your bookings reads "Moved
+  from …" from it. **Still owed by phase 3 (push):** an FCM message to everyone with an upcoming seat when the notice
+  is written, so she learns without opening the app
 - [ ] **LA-27 · Your bookings shows no payments or refunds, and a bought course lives only on the phone.** A
   reinstall or a second phone loses course access and the history. · L.22 · **L2b** (`my_purchases` fields) + **L2c**
   (Payments section, receipts read from the server) · server half · built 2026-10-29 in `0126` + the three Razorpay functions, server half **closed 2026-10-29**, `7575940a`, 0126 run and deployed (`my_purchases` returns amount, status, provider, mode, payment id, stage, paid / refund dates and the refund rule's verdict); app half **built 2026-10-29 in L2c**, waiting on commit and the walk (Your bookings › Payments, receipts cached per account, receipt sheet with the refund button)

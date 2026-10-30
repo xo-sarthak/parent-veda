@@ -113,8 +113,10 @@ class PvCommunityStore extends ChangeNotifier {
         _ => 'pregnancy',
       };
 
-  static String feedKey({String scope = 'for_you', String sort = 'top', String? room}) =>
-      '$scope|$sort|${room ?? ''}';
+  /// [about] narrows a course room's feed to one lesson or session (0137);
+  /// the part is only added when set, so phase 1's cached keys still parse.
+  static String feedKey({String scope = 'for_you', String sort = 'top', String? room, PvPostAbout? about}) =>
+      '$scope|$sort|${room ?? ''}${about == null ? '' : '|${about.kind}:${about.id}'}';
 
   List<PvCommunityPost> feed(String key) => [
         for (final p in _feeds[key] ?? const <PvCommunityPost>[])
@@ -216,9 +218,10 @@ class PvCommunityStore extends ChangeNotifier {
     String scope = 'for_you',
     String sort = 'top',
     String? room,
+    PvPostAbout? about,
     bool more = false,
   }) async {
-    final key = feedKey(scope: scope, sort: sort, room: room);
+    final key = feedKey(scope: scope, sort: sort, room: room, about: about);
     if (_feedLoading[key] == true) return true;
     if (!signedIn) return false;
     _feedLoading[key] = true;
@@ -233,6 +236,8 @@ class PvCommunityStore extends ChangeNotifier {
         'p_ids': scope == 'ids' ? savedPostIds : null,
         'p_offset': have,
         'p_limit': 20,
+        'p_about_kind': about?.kind,
+        'p_about_id': about?.id,
       });
       final list = [
         for (final p in (res is List ? res : const []))
@@ -242,7 +247,7 @@ class PvCommunityStore extends ChangeNotifier {
         _posts[p.id] = _withLocalMedia(p);
       }
       // Her own queued posts stay at the top of the feeds they belong to.
-      final queued = more ? const <PvCommunityPost>[] : _queuedFor(scope, room);
+      final queued = more ? const <PvCommunityPost>[] : _queuedFor(scope, room, about);
       _feeds[key] = more ? [...?_feeds[key], ...list] : [...queued, ...list];
       _feedEnded[key] = list.length < 20;
       _feedLoading[key] = false;
@@ -258,11 +263,15 @@ class PvCommunityStore extends ChangeNotifier {
     }
   }
 
-  List<PvCommunityPost> _queuedFor(String scope, String? room) => [
+  List<PvCommunityPost> _queuedFor(String scope, String? room, [PvPostAbout? about]) => [
         for (final e in _outbox)
           if (e['kind'] == 'post')
             if (PvCommunityPost.fromJson(e['local']) case final p?)
-              if (scope == 'mine' || scope == 'for_you' || (scope == 'room' && p.roomId == room)) p,
+              if (about == null || p.about == about)
+                if (scope == 'mine' ||
+                    (scope == 'for_you' && p.roomKind != 'offering') ||
+                    (scope == 'room' && p.roomId == room))
+                  p,
       ];
 
   PvCommunityPost _withLocalMedia(PvCommunityPost p) {
@@ -389,9 +398,16 @@ class PvCommunityStore extends ChangeNotifier {
   }
 
   /// Her community-name face, or her first-name face, as she will appear.
+  /// (0137) An expert's named face carries her badge, as the server will.
   PvCommunityAuthor myFace({required bool anon}) => anon
       ? PvCommunityAuthor(label: _me.pseudonym ?? 'You', anon: true, seed: _me.seed, isMine: true)
-      : PvCommunityAuthor(label: _me.firstName ?? 'You', anon: false, isMine: true);
+      : PvCommunityAuthor(
+          label: _me.firstName ?? _me.expert?.name ?? 'You',
+          anon: false,
+          expert: _me.expert,
+          moderator: _me.isMod,
+          isMine: true,
+        );
 
   Future<PvCommunityOutcome> createPost({
     required String roomId,
@@ -401,9 +417,11 @@ class PvCommunityStore extends ChangeNotifier {
     List<String>? pollOptions,
     int pollDays = 3,
     List<String> photoFiles = const [],
+    PvPostAbout? about,
   }) async {
     final id = newId();
     final r = room(roomId);
+    final offering = r?.isOffering == true;
     final media = [
       for (var k = 0; k < photoFiles.length && k < 4; k++)
         PvCommunityMedia(
@@ -431,6 +449,8 @@ class PvCommunityStore extends ChangeNotifier {
       media: media,
       createdAt: DateTime.now(),
       sending: true,
+      roomKind: r?.kind ?? 'room',
+      about: offering ? about : null,
     );
     final entry = <String, dynamic>{
       'kind': 'post',
@@ -443,15 +463,19 @@ class PvCommunityStore extends ChangeNotifier {
         'p_body': body.trim(),
         'p_poll_options': local.poll?.options,
         'p_poll_days': pollDays,
+        'p_about_kind': local.about?.kind,
+        'p_about_id': local.about?.id,
       },
       'local': local.toJson(),
     };
     _outbox.add(entry);
     _posts[id] = local;
     for (final k in [
-      feedKey(),
+      // A course post stays out of For you, as it does on the server.
+      if (!offering) feedKey(),
       feedKey(scope: 'room', sort: 'top', room: roomId),
       feedKey(scope: 'room', sort: 'new', room: roomId),
+      if (local.about != null) feedKey(scope: 'room', sort: 'new', room: roomId, about: local.about),
       feedKey(scope: 'mine', sort: 'new'),
     ]) {
       _feeds[k] = [local, ...?_feeds[k]];
@@ -718,10 +742,12 @@ class PvCommunityStore extends ChangeNotifier {
 
   Future<void> _reloadKey(String key) {
     final parts = key.split('|');
+    final about = parts.length > 3 ? parts[3].split(':') : const <String>[];
     return loadFeed(
       scope: parts[0],
       sort: parts.length > 1 ? parts[1] : 'top',
       room: parts.length > 2 && parts[2].isNotEmpty ? parts[2] : null,
+      about: about.length == 2 ? PvPostAbout(kind: about[0], id: about[1]) : null,
     );
   }
 
@@ -883,6 +909,266 @@ class PvCommunityStore extends ChangeNotifier {
     }
   }
 
+  // ---- course discussions (0137, LA-20) --------------------------------------
+  //
+  // One discussion per offering RUN. The phone never decides who may enter:
+  // it asks `community_offering_room`, which checks her receipt, a booked
+  // seat, a host or a moderator on the server, and also picks her run. The
+  // phone's own record of a purchase is a claim, and a claim is never an
+  // access check.
+
+  final Map<String, PvOfferingRoom> _offering = {};
+
+  /// The last answer for a programme (cached for the screen's first frame).
+  PvOfferingRoom? offering(String programmeId) => _offering[programmeId];
+
+  Future<PvOfferingRoom?> offeringRoom(String programmeId, {String? runId}) async {
+    if (!signedIn) return _offering[programmeId];
+    try {
+      final res = await _call('community_offering_room', {'p_programme': programmeId, 'p_run': runId});
+      final o = PvOfferingRoom.fromJson(res);
+      if (o != null) {
+        _offering[programmeId] = o;
+        if (o.access) {
+          _rooms = [for (final r in _rooms) if (r.id != o.room.id) r, o.room];
+        }
+        notifyListeners();
+      }
+      return o ?? _offering[programmeId];
+    } catch (e) {
+      debugPrint('[community] offering $programmeId: $e');
+      return _offering[programmeId];
+    }
+  }
+
+  /// The course room's state for an open room screen: host / moderator.
+  PvOfferingRoom? offeringForRoom(String roomId) {
+    for (final o in _offering.values) {
+      if (o.room.id == roomId) return o;
+    }
+    return null;
+  }
+
+  /// When a booked session USED to start, from the pinned team notice the
+  /// server wrote when it moved (LA-22). Null when nothing moved, or when this
+  /// course's room has not been read on this phone yet. [slotId] is the
+  /// booking's slot (`ps_` + the session id).
+  DateTime? movedFrom(String slotId) {
+    if (!slotId.startsWith('ps_')) return null;
+    final session = slotId.substring(3);
+    for (final p in _posts.values) {
+      if (p.author.team && p.pinned && p.movedFrom != null && p.about?.kind == 'session' && p.about?.id == session) {
+        return p.movedFrom;
+      }
+    }
+    return null;
+  }
+
+  /// Reads a course's room so its notices are on the phone (My learning
+  /// calls this for each upcoming class). Quiet: nothing to show on failure.
+  Future<void> loadCourseNotices(String programmeId) async {
+    final o = await offeringRoom(programmeId);
+    if (o != null && o.access) await loadFeed(scope: 'room', sort: 'new', room: o.room.id);
+  }
+
+  /// She opened a room: its unread count clears here and on the server.
+  Future<void> roomSeen(String roomId) async {
+    final i = _rooms.indexWhere((r) => r.id == roomId);
+    if (i >= 0 && _rooms[i].unread > 0) {
+      _rooms = [..._rooms]..[i] = _rooms[i].copyWith(unread: 0);
+      notifyListeners();
+    }
+    if (!signedIn) return;
+    try {
+      await _call('community_room_seen', {'p_room': roomId});
+    } catch (_) {}
+  }
+
+  static const _kCourseHeadsUp = 'pv_community_course_heads_up';
+
+  /// B4: the first time she writes in a course thread, she is told it uses
+  /// her first name. Never silent; shown once per phone.
+  Future<bool> courseHeadsUpDue() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_kCourseHeadsUp) != true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> markCourseHeadsUpShown() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_kCourseHeadsUp, true);
+    } catch (_) {}
+  }
+
+  // ---- the team voice and pinning (0137, L.6 / B3) ---------------------------
+
+  /// "Post as ParentVeda team": moderators only. Online only, like a
+  /// moderator action, so its outcome is known at once. Returns the outcome.
+  Future<PvCommunityOutcome> createPrompt({
+    required String roomId,
+    required String title,
+    String body = '',
+    int pinDays = 0,
+  }) async {
+    if (!signedIn) return PvCommunityOutcome.signedOut;
+    final id = newId();
+    try {
+      final res = await _call('community_create_prompt', {
+        'p_id': id,
+        'p_room': roomId,
+        'p_title': title.trim(),
+        'p_body': body.trim(),
+        'p_pin_days': pinDays,
+      });
+      final o = pvOutcomeFrom(res);
+      if (o == PvCommunityOutcome.live) {
+        unawaited(loadFeed(scope: 'room', sort: 'new', room: roomId));
+        unawaited(loadFeed(scope: 'room', sort: 'top', room: roomId));
+      }
+      return o;
+    } catch (_) {
+      return PvCommunityOutcome.queued;
+    }
+  }
+
+  /// Pin for [days] (1..14), or unpin with 0. Moderators, or a course's
+  /// hosts in its room. Returns null on success, or what to tell her.
+  Future<String?> pin(String postId, int days) async {
+    final p = _posts[postId];
+    try {
+      final res = await _call('community_pin', {'p_post': postId, 'p_days': days});
+      if (res is Map && res['ok'] == true) {
+        if (p != null) _posts[postId] = p.copyWith(pinned: days > 0);
+        notifyListeners();
+        if (p != null) unawaited(loadFeed(scope: 'room', sort: 'new', room: p.roomId));
+        return null;
+      }
+      return switch (res is Map ? res['reason'] : null) {
+        'not_mod' => 'Only moderators and this course\'s hosts can pin here.',
+        'gone' => 'That post no longer exists.',
+        _ => 'That did not go through. Try again.',
+      };
+    } catch (_) {
+      return 'No connection. Nothing was pinned.';
+    }
+  }
+
+  // ---- experts (0137) ---------------------------------------------------------
+
+  /// "Ask an expert to look", by the post's author, once per post.
+  /// Returns 'ok' | 'crisis' | 'offline' | 'error'.
+  Future<String> askExpert(String postId) async {
+    final p = _posts[postId];
+    try {
+      final res = await _call('community_ask_expert', {'p_post': postId});
+      if (res is Map && res['ok'] == true) {
+        if (p != null) _posts[postId] = p.copyWith(expertAsked: true);
+        notifyListeners();
+        return 'ok';
+      }
+      return res is Map && res['reason'] == 'crisis' ? 'crisis' : 'error';
+    } catch (_) {
+      return 'offline';
+    }
+  }
+
+  List<PvExpertRequest> _queue = const [];
+  List<PvExpertRequest> get expertQueueItems => _queue;
+
+  /// The questions members asked an expert to look at, oldest first.
+  /// Returns false when the server could not be reached.
+  Future<bool> expertQueue() async {
+    if (!signedIn) return false;
+    try {
+      final res = await _call('community_expert_queue');
+      if (res is Map && res['ok'] == true) {
+        _queue = [
+          for (final i in (res['items'] as List?) ?? const [])
+            ?PvExpertRequest.fromJson(i),
+        ];
+        for (final q in _queue) {
+          _posts[q.post.id] = _withLocalMedia(q.post);
+        }
+        notifyListeners();
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Claim a question so two experts do not answer the same one.
+  /// Returns null on success, or what to tell her.
+  Future<String?> expertClaim(String postId, {bool on = true}) async {
+    try {
+      final res = await _call('community_expert_claim', {'p_post': postId, 'p_on': on});
+      if (res is Map && res['ok'] == true) {
+        _queue = [for (final q in _queue) q.post.id == postId ? q.copyWith(claimedByMe: on) : q];
+        notifyListeners();
+        return null;
+      }
+      return switch (res is Map ? res['reason'] : null) {
+        'taken' => 'Another expert is already on this one.',
+        'gone' => 'This question has been answered.',
+        _ => 'That did not go through. Try again.',
+      };
+    } catch (_) {
+      return 'No connection. Nothing was claimed.';
+    }
+  }
+
+  /// An expert marks a reply helpful. Optimistic; rolls back on a no.
+  Future<bool> endorse(String postId, String commentId, {required bool on}) async {
+    final list = _comments[postId];
+    final c = list?.where((x) => x.id == commentId).firstOrNull;
+    final me = _me.expert;
+    if (list == null || c == null || me == null) return false;
+    void put(PvCommunityComment v) {
+      _comments[postId] = [for (final x in _comments[postId]!) x.id == commentId ? v : x];
+      notifyListeners();
+    }
+
+    put(c.copyWith(
+      endorsed: on,
+      endorsements: on
+          ? [...c.endorsements, me]
+          : [for (final e in c.endorsements) if (e.name != me.name) e],
+    ));
+    try {
+      final res = await _call('community_endorse', {'p_kind': 'comment', 'p_id': commentId, 'p_on': on});
+      if (res is Map && res['ok'] == true) return true;
+    } catch (_) {}
+    put(c);
+    return false;
+  }
+
+  // ---- the doctor's "Your offerings" (0137, LA-21) ---------------------------
+
+  List<PvExpertOffering> _offerings = const [];
+  List<PvExpertOffering> get myOfferingItems => _offerings;
+
+  /// Every run she hosts, from the server. False when it could not be read.
+  Future<bool> myOfferings() async {
+    if (!signedIn) return false;
+    try {
+      final res = await _call('expert_my_offerings');
+      if (res is Map && res['ok'] == true) {
+        _offerings = [
+          for (final i in (res['items'] as List?) ?? const [])
+            ?PvExpertOffering.fromJson(i),
+        ];
+        notifyListeners();
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   // ---- tests -----------------------------------------------------------------
 
   @visibleForTesting
@@ -899,6 +1185,9 @@ class PvCommunityStore extends ChangeNotifier {
     _outbox.clear();
     _signed.clear();
     _activity = const [];
+    _offering.clear();
+    _queue = const [];
+    _offerings = const [];
     debugBackend = null;
     debugSignedIn = null;
   }

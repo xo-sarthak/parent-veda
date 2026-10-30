@@ -22,8 +22,10 @@ import 'package:flutter/material.dart';
 
 import '../../booking/booking_store.dart';
 import '../../data/learn/pv_learn_view.dart';
+import '../../services/pv_community_store.dart';
 import '../../services/pv_learn_progress_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../community/community_offering_thread.dart';
 import 'pv_learn_chrome.dart';
 import 'pv_learn_flow.dart';
 import 'pv_offering_content.dart';
@@ -79,8 +81,12 @@ class PvLessonScreen extends StatefulWidget {
 class _PvLessonScreenState extends State<PvLessonScreen> {
   late int _i = widget.index;
 
+  /// (0137, L.2) Lesson | Discussion, on courses that sell a discussion.
+  bool _discussion = false;
+
   PvOfferingView get v => widget.view;
   PvLearnLesson get lesson => v.lessons[_i];
+  bool get _hasThread => v.offering?.grant.discussionThread == true;
 
   void _go(int i) {
     if (pvLessonGated(v, i)) {
@@ -129,7 +135,13 @@ class _PvLessonScreenState extends State<PvLessonScreen> {
   Widget build(BuildContext context) {
     final p = pvStorePalette;
     return ListenableBuilder(
-      listenable: PvLearnProgressStore.instance,
+      // BookingStore: the gate on a lesson moves the moment she buys.
+      // PvCommunityStore: the Discussion tab's count and posts.
+      listenable: Listenable.merge([
+        PvLearnProgressStore.instance,
+        BookingStore.instance,
+        PvCommunityStore.instance,
+      ]),
       builder: (context, _) {
         final progress = PvLearnProgressStore.instance;
         final done = progress.isDone(lesson.id);
@@ -261,6 +273,25 @@ class _PvLessonScreenState extends State<PvLessonScreen> {
                   ),
                 ),
               ),
+              // ---- Lesson | Discussion (0137) ---------------------------------------------------
+              if (_hasThread)
+                SliverToBoxAdapter(
+                  child: _LessonTabs(
+                    discussion: _discussion,
+                    count: CommunityLessonThread.postsFor(v.id, lesson.id).length,
+                    onChanged: (d) => setState(() => _discussion = d),
+                  ),
+                ),
+              if (_hasThread && _discussion)
+                SliverToBoxAdapter(
+                  child: CommunityLessonThread(
+                    programmeId: v.id,
+                    lessonId: lesson.id,
+                    lessonLabel: 'Lesson ${_i + 1}',
+                    expertName: v.expert.name.isEmpty ? null : v.expert.name,
+                  ),
+                )
+              else ...[
               // ---- up next ----------------------------------------------------------------------
               if (next != null) ...[
                 const SliverToBoxAdapter(child: PvLearnHead('Up next')),
@@ -303,11 +334,55 @@ class _PvLessonScreenState extends State<PvLessonScreen> {
                   ),
                 ),
               ),
+              ],
               const SliverToBoxAdapter(child: SizedBox(height: 40)),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+/// Two tabs under the lesson's actions: Lesson (up next and the list) and
+/// Discussion (this lesson's posts). Skillshare and Mindvalley's shape.
+class _LessonTabs extends StatelessWidget {
+  const _LessonTabs({required this.discussion, required this.count, required this.onChanged});
+  final bool discussion;
+  final int count;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pvStorePalette;
+    Widget tab(String label, bool on, bool value) => Expanded(
+          child: Semantics(
+            selected: on,
+            button: true,
+            child: InkWell(
+              key: ValueKey('pv_lesson_tab_${value ? 'discussion' : 'lesson'}'),
+              onTap: () => onChanged(value),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: on ? p.ink1 : Colors.transparent, width: 2)),
+                ),
+                child: Text(label,
+                    style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: on ? p.ink1 : p.ink3)),
+              ),
+            ),
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+      child: Container(
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: kPvLine))),
+        child: Row(children: [
+          tab('Lesson', !discussion, false),
+          tab(count > 0 ? 'Discussion · $count' : 'Discussion', discussion, true),
+        ]),
+      ),
     );
   }
 }

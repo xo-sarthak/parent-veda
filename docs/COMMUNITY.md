@@ -201,6 +201,12 @@ Cost: Supabase plan as is; photos in Storage at launch volume ≈ $0 (₹0).
 
 ## RESUME HERE (for a fresh session)
 
+- **Phase 2 L4a is BUILT (2026-10-30), not yet committed or run.** Migration `0137_community_phase2.sql` (0136 was
+  taken by Partner Editions P1) holds the WHOLE phase 2 server (D4: one file). The app half built so far: course
+  discussions, the team voice and pin, experts, the moved-session notice, and the doctor's Your offerings. See
+  "As built (phase 2)" below. **Next: the user runs 0137 + its VERIFY block; then L4b in a fresh chat** (birth clubs,
+  Following, search, tags, edit, prompts in Moderation, Over-35 on the rail), per
+  `C:\Users\sarth\.claude\plans\l4-plan.md` "L4b chat".
 - **Phase 1:** committed `9b9dabb9`; the "one place on More" follow-up (decision 11) is in a second commit.
 - **The user's steps** are in "What the user must do" above. Done on 2026-10-28: the migrations, the moderator row, and the grievance officer named (Deepti Sekhri). The officer's contact is in the app. Still open: the takedown process, the helplines, and the phone walk.
 - **Phase 2 is planned (2026-10-28).** Plan `C:\Users\sarth\.claude\plans\sparkling-floating-seahorse.md` (approved). Its decisions are in "Phase 2: plan and decisions" below. Mobbin pass: MOBBIN-DISCOVERY §38. Prototype: https://claude.ai/artifact/2NZoJdbk7CJqdBxuT6bhBY, **waiting for the user's sign-off; no Flutter or SQL before it.** After sign-off: write migration 0123 and widen the tests, then build steps 1 to 7 in order.
@@ -252,6 +258,71 @@ Cost: Supabase plan as is; photos in Storage at launch volume ≈ $0 (₹0).
 | P2.12 | Editorial prompts | A moderator-only function posting as "ParentVeda team", pinned 0 to 14 days, an audit row, cannot be blocked | Plan approved |
 | P2.13 | Over-35 room (STILL-OPEN §79.5) | Seed `preg_over_35` in 0123 | Plan approved |
 | P2.14 | Migrations | One `0123_community_phase2.sql` | Plan approved |
+
+### Amended by L4 (2026-10-30) — where these rows changed
+
+The L4 plan (`C:\Users\sarth\.claude\plans\l4-plan.md`, approved 2026-10-30) put phase 2 on the learning model
+(docs/LEARNING-ARCHITECTURE.md L.2–L.6). Where it differs from the table above, it wins:
+
+| Row | Now |
+|---|---|
+| P2.1 | `has_course_access(programme, 'thread', run)`: a receipt for the run, **a non-cancelled booking on a slot of that run, including one paid by a sponsor's or a pack's credit (D3)**, a route A host, or a moderator. For life, no time window (B2) |
+| P2.2 | **Per offering RUN** (`programme_runs`, L.3): Batch 2 has its own room, `run_<run id>` |
+| P2.3 | First name, with a **one-time heads-up** the first time she writes in a course (B4) |
+| P2.4 | The footer is the wording above, word for word (B4) |
+| new D1 | A timetable change writes a **pinned team notice from the server**, automatically (a trigger path in `_mirror_session`) |
+| new D2 | A moderator's own named post shows **her first name + a "Moderator" chip**; "ParentVeda team" appears only through the explicit team voice |
+| new D4 | One migration (`0137`), the app in two chats (L4a, L4b) |
+
+---
+
+## As built (phase 2) — L4a, 2026-10-30
+
+### Backend: `supabase/migrations/0137_community_phase2.sql` (one file, the whole phase 2 server)
+
+Verified locally on Postgres (pgserver) with a stub schema before hand-over: 0121 + 0137 apply cleanly and a scenario
+covers run access (receipt, credit seat, host; a stranger refused), the badge and role, team posts, the trigger-written
+notice, unread marks, search, edit, the crisis refusal, endorsements, birth clubs, following, the doctor's offerings,
+and a leak scan (no user id in any answer). Harness: the session scratchpad's `l4a/run.py`.
+
+| Piece | What it does |
+|---|---|
+| Tables | `community_rooms` + `programme_id`, `run_id`; members + `via` ('self' / 'auto'); posts + `edited_at`, `pinned_until`, `about_kind`/`about_id`, `moved_from`, a generated `search` tsvector (GIN), identity 'team', `user_id` nullable only for 'team'. New, all locked: `community_endorsements`, `community_follows`, `community_expert_requests`, `community_room_seen` |
+| `has_course_access` (thread) | + moderator, + a booked seat on that run (credit or free; a 'purchase' booking defers to the receipt so a refund closes the room), + route A host only. Recordings keep `my_expert_ids()` |
+| `community_room_access` | The one room rule, called from `community_can_see`, so every read (feed, post, comments, face, search, photos) holds it |
+| `community_offering_room(p_programme, p_run)` | Creates `run_<id>` lazily; the server picks her run (receipt → booked session → hint → current run); answers `access`, `reason` ('book' / 'refunded'), `is_host`, `is_mod`; an entrant joins as 'auto' |
+| `community_room_seen` + `unread` | A per-person, per-room high-water mark |
+| `community_author` | team → "ParentVeda team"; named → `moderator` flag + `expert` object (route A + published); anon → never a badge |
+| `community_create_post` | Room access; `p_about_kind`/`p_about_id` (a session must belong to the room's run); an expert's named post needs no community name (falls back to the profile's full name). Old 7-arg signature dropped first |
+| `community_feed` | Scopes `following`, `tag`; pinned first in a room; For you leaves out course rooms and other months' clubs; `p_about_*` filter. Old 7-arg signature dropped first |
+| `community_create_prompt` / `community_pin` | Team posts (moderators; rooms, clubs and course rooms); pin 1–14 days (moderators anywhere, a course's hosts in its room); audit rows |
+| `community_ask_expert` / `_queue` / `_claim` / `community_endorse` | Author asks once; crisis refused; claims lapse after a day; an endorsement counts as five likes in Top; an expert's named reply marks the request answered |
+| `expert_my_offerings()` | Her runs as an accepted route A host: role, seats booked/capacity, next session, unread |
+| `_mirror_session` → `_community_timetable_notice` | Reads the slot's old start BEFORE the upsert; after it, if the start moved and anyone holds an upcoming seat, writes a pinned team notice ("This session has moved from … to … (India time)") in the run's room, `moved_from` set, `pinned_until` = the new start, older notices for that session unpinned, audit row with actor null |
+| L4b's server half, already here | `community_birth_club`, `community_follow` / `_following_list`, `community_search`, `community_edit_post`, seed room `preg_over_35` |
+
+### App (L4a)
+
+| Where | What |
+|---|---|
+| `lib/models/pv_community.dart` | Author `moderator` / `expert`; post `about`, `pinned`, `editedAt`, `movedFrom`, `hostRole`, `expertAsked`; room `kind`, `programmeId`, `runId`, `access`, `unread`; `PvOfferingRoom`, `PvExpertRequest`, `PvExpertOffering`; outcome `noAccess` |
+| `lib/services/pv_community_store.dart` | `offeringRoom`, `roomSeen`, feed `about`, `createPost(about:)`, `createPrompt`, `pin`, `askExpert`, `expertQueue`, `expertClaim`, `endorse`, `myOfferings`, `movedFrom`, `loadCourseNotices`, the B4 heads-up flag |
+| `community_offering_thread.dart` (new) | The course-page section (pinned notice, three newest, "Open the discussion"; or the blurred invitation) and the lesson's Discussion tab |
+| `pv_offering_screen.dart` | Section mounted after "More like this", only where the grant sells a discussion |
+| `pv_lesson_screen.dart` | Lesson \| Discussion tabs after the actions; listens to BookingStore and the community store |
+| `community_room_screen.dart` | Course variant: no Join, no Leave, the batch line, about pills; room seen on open; "Post as ParentVeda team" for moderators |
+| `community_compose_screen.dart` | About chip; course rooms default to her first name with the one-time heads-up; team mode with pin days |
+| `community_chrome.dart` / `community_marks.dart` / `community_post_screen.dart` | The seal and "Dr Name · category"; role and Moderator chips; the team's ink square; Pinned and About on cards; Pin in the post menu; team posts cannot be blocked or opened as a face; the expert footer, "Found helpful by", Endorse, the Experts pill and "Ask an expert to look" |
+| `pv_my_learning_screen.dart` | A booked class that moved reads "Moved from …" from the pinned notice |
+| Doctor flavour | `main_doctor.dart` inits the store; `doctor_offerings_screen.dart` (Your offerings → the room as host) and `doctor_community_queue_screen.dart` (new); home section 8 is "Your offerings" + "Parents asking an expert to look", the go-live ClassCard unchanged under it |
+
+Tests: `community_schema_contract_test` and `community_anonymity_test` now read every community migration through
+`test/support/community_sql.dart` (last definition wins; a parenthesis-counting parser); new
+`community_phase2_contract_test` and `community_phase2_test` (L4a cases; L4b adds its own).
+
+**Push is not built (phase 3).** A moved session reaches people through the pinned notice on the course page, in the
+discussion and on the booking card. What phase 3 still owes for LA-22: an FCM message to everyone with an upcoming
+seat when `_community_timetable_notice` fires.
 
 ---
 

@@ -796,6 +796,14 @@ consultation audit; five are closed and the sixth is deliberately parked.
   with signed playback after `has_course_access(…,'recording')` (pass L3),
   and the discussion is one per offering run (pass L4). See
   `docs/LEARNING-ARCHITECTURE.md` §4 (L.2, L.7) and the ledger LA-19, LA-20.
+- **2026-10-30 (L4a): the discussion is built, migration `0137_community_phase2.sql` not yet run.** The course page,
+  the lesson's Discussion tab and the doctor's Your offerings are wired (docs/COMMUNITY.md "As built (phase 2)").
+  This entry closes in L4b, after the user runs 0137 and the walk.
+- **W20 (DESIGN-DECISIONS) stays OPEN, half built.** The expert layer is built in L4a: the verified seal on named
+  posts, the footer, endorsement, "Ask an expert to look" and the doctor's claimable queue. **Crisis routing to experts
+  is held back by the user (2026-10-28): crisis posts stay with the moderators for now**, and "Ask an expert to look"
+  on a crisis post is refused with "A moderator is already looking at this, and the helplines are on your post."
+  Widening it later is one trigger: `community_expert_requests.reason` already allows 'crisis', so no table changes.
 
 `0054_programmes.sql` and `§5.1c` (registering programmes in Directus, making
 the masterclass host a dropdown rather than a typed id) are unchanged and still
@@ -1950,6 +1958,10 @@ been a product decision smuggled into plumbing.
 
 ## 11.1 Where HR actually sees their stats — IN-APP BUILT, WEB STILL OPEN
 
+**Update 2026-10-30 (Partner Editions P2):** HR now has a phone app of its own, ParentVeda Partners (Overview, People,
+a shareable monthly report), over the same RPCs, so "install our pregnancy app to see your dashboard" no longer
+applies. The web portal stays the desk surface. Detail: `docs/partner-editions/PARTNERS-APP.md` §P2 as built.
+
 **Update 2026-07-29:** the in-app surface is built (`0060` + Profile → Employer
 Benefits → Programme, behind the `sponsor_admin` capability). The web option
 stays open rather than closed: the two read the same functions, so a `/portal`
@@ -2215,6 +2227,20 @@ bought, and an HR contact at an agency cannot administer at all. Acceptable at
 this size; the fix is a nullable `sponsor_members.role` or a separate
 `sponsor_admins` table, and it should wait until a real customer hits it rather
 than be guessed at now.
+
+## 11.10 A stage mix and an "included consultations" figure for sponsors: not built (P2, 2026-10-30)
+
+The Partners P2 plan listed "Where your families are" (how many members are trying, pregnant or parenting) and "Most
+used" (which sections they use) on Overview, and a KPI of "consults used of included". None was built:
+
+- **Most used** is declined by 0065 on purpose (a section breakdown narrows down who is worried about what in a small
+  team) and the portal's report promises it is absent. Not reopening this.
+- **The stage mix** needs a new aggregate RPC *and* a decision: in a team of 30, "4 are pregnant" is close to naming
+  someone, so it would be behaviour (withheld below `min_cohort`) at the least. **The user's call** whether HR gets it at all.
+- **Included consultations** has no server figure: nothing says how many consultations a sponsor's plan includes. Needs
+  the plan's credit allowance exposed through `sponsor_dashboard`, once the commercial terms are fixed.
+
+Detail: `docs/partner-editions/PARTNERS-APP.md` §P2 as built.
 
 ## 11.9 Company events and resources have no audience scope
 

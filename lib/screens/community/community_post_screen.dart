@@ -15,6 +15,7 @@ import '../../widgets/pv_toast.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
 import 'community_chrome.dart';
 import 'community_marks.dart';
+import 'community_offering_thread.dart' show communityAboutLabel;
 
 class CommunityPostScreen extends StatefulWidget {
   const CommunityPostScreen({super.key, required this.postId});
@@ -43,6 +44,11 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
     _store.init().then((_) async {
       await _store.loadPost(widget.postId);
       await _store.loadComments(widget.postId, sort: _filter == 'new' ? 'new' : 'top');
+      // (0137) An expert replies under her own name and badge; in a course
+      // room the default is her first name (classmates), as in the composer.
+      final p = _store.post(widget.postId);
+      final hasName = (_store.me.firstName ?? '').isNotEmpty || _store.me.isExpert;
+      if (hasName && (_store.me.isExpert || p?.roomKind == 'offering')) _replyAnon = false;
       if (mounted) setState(() => _loaded = true);
     });
     _reply.addListener(() => setState(() {}));
@@ -159,15 +165,42 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
     }
   }
 
+  /// "Ask an expert to look" (0137). A crisis post is refused with the
+  /// moderator line: crisis stays with moderators for now (W20).
+  Future<void> _askExpert() async {
+    final r = await _store.askExpert(widget.postId);
+    if (!mounted) return;
+    switch (r) {
+      case 'ok':
+        pvToast(context, 'Asked. An expert will see your question, and their reply will reach you in Replies.',
+            kind: PvToastKind.done, hold: const Duration(seconds: 5));
+      case 'crisis':
+        pvToast(context, 'A moderator is already looking at this, and the helplines are on your post.',
+            kind: PvToastKind.info, hold: const Duration(seconds: 5));
+      case 'offline':
+        pvToast(context, 'No connection. Nothing was sent; try again when you are online.', kind: PvToastKind.gentle);
+      default:
+        pvToast(context, 'That did not go through. Try again.', kind: PvToastKind.gentle);
+    }
+  }
+
+  static bool _byExpert(PvCommunityComment c) => c.author.expert != null || c.endorsements.isNotEmpty;
+
   List<PvCommunityComment> _top(List<PvCommunityComment> all) {
     var top = [for (final c in all) if (c.parentId == null) c];
     if (_filter == 'mine') {
       final mineThreads = {for (final c in all) if (c.author.isMine) c.parentId ?? c.id};
       top = [for (final c in top) if (mineThreads.contains(c.id)) c];
+    } else if (_filter == 'experts') {
+      // A thread an expert answered in, or a reply an expert found helpful.
+      final expertThreads = {for (final c in all) if (_byExpert(c)) c.parentId ?? c.id};
+      top = [for (final c in top) if (expertThreads.contains(c.id)) c];
     } else if (_filter == 'new') {
       top.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     } else {
-      top.sort((a, b) => b.likeCount.compareTo(a.likeCount));
+      // An expert's endorsement lifts a reply, as the server ranks it (0137).
+      int score(PvCommunityComment c) => c.likeCount + 5 * c.endorsements.length;
+      top.sort((a, b) => score(b).compareTo(score(a)));
     }
     return top;
   }
@@ -201,6 +234,8 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
         final top = _top(all);
         final room = _store.room(post.roomId);
         final crisisMine = post.author.isMine && communityLooksLikeCrisis('${post.title} ${post.body}');
+        final expertAnswered = post.expertAnswered || all.any((c) => c.author.expert != null);
+        final canAsk = post.author.isMine && !post.author.team && !post.sending && post.status == 'live' && !expertAnswered;
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
@@ -257,10 +292,19 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                           author: post.author,
                           when: post.createdAt,
                           size: 36,
-                          onAuthor: post.sending
+                          hostRole: post.hostRole,
+                          edited: post.editedAt != null,
+                          onAuthor: post.sending || post.author.team
                               ? null
                               : () => openCommunityProfile(context, fromId: post.id, anon: post.author.anon),
                         ),
+                        if (post.about != null) ...[
+                          const SizedBox(height: 10),
+                          CommunityAboutChip(
+                            label: communityAboutLabel(room?.programmeId, post.about!),
+                            about: post.about!,
+                          ),
+                        ],
                         if (post.sending || post.waitingForReview) ...[
                           const SizedBox(height: 10),
                           CommunityStatusLine(
@@ -292,20 +336,45 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                         CommunityPostActions(post: post, onReply: () => _focus.requestFocus()),
                       ]),
                     ),
+                    if (canAsk && _filter != 'experts')
+                      _AskRow(asked: post.expertAsked, onAsk: _askExpert),
                     Container(
                       decoration: BoxDecoration(border: Border(top: BorderSide(color: cmP.line))),
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
-                      child: Row(children: [
-                        for (final (k, l) in const [('top', 'Top'), ('new', 'Newest'), ('mine', 'Mine')]) ...[
-                          CommunityPill(label: l, selected: _filter == k, onTap: () => setState(() => _filter = k)),
-                          const SizedBox(width: 8),
-                        ],
-                      ]),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+                        child: Row(children: [
+                          for (final (k, l) in const [
+                            ('top', 'Top'),
+                            ('new', 'Newest'),
+                            ('experts', 'Experts'),
+                            ('mine', 'Mine'),
+                          ]) ...[
+                            CommunityPill(label: l, selected: _filter == k, onTap: () => setState(() => _filter = k)),
+                            const SizedBox(width: 8),
+                          ],
+                        ]),
+                      ),
                     ),
                     if (!_loaded && all.isEmpty)
                       const Padding(
                         padding: EdgeInsets.all(30),
                         child: Center(child: CircularProgressIndicator(color: kPvInk, strokeWidth: 2)),
+                      )
+                    else if (top.isEmpty && _filter == 'experts')
+                      // The Experts pill is always there; its empty state is
+                      // the invitation to ask (0137).
+                      CommunityEmpty(
+                        key: const ValueKey('community_experts_empty'),
+                        icon: Icons.verified_outlined,
+                        title: 'No expert has answered yet',
+                        body: canAsk
+                            ? (post.expertAsked
+                                ? 'An expert has been asked. Their reply will reach you in Replies.'
+                                : 'Ask a verified expert to look at your question. They answer under their own name.')
+                            : 'When a verified expert answers or marks a reply as helpful, it shows here.',
+                        action: canAsk && !post.expertAsked ? 'Ask an expert to look' : null,
+                        onAction: canAsk && !post.expertAsked ? _askExpert : null,
                       )
                     else if (top.isEmpty)
                       CommunityEmpty(
@@ -429,6 +498,13 @@ class _Bubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = comment;
     const rose = Color(0xFFC6295A);
+    final expert = c.author.expert;
+    final chip = c.hostRole != null && c.hostRole!.isNotEmpty
+        ? pvHostRoleLabel(c.hostRole)
+        : (c.author.moderator ? 'Moderator' : null);
+    final store = PvCommunityStore.instance;
+    // An expert may mark another person's reply helpful (0137).
+    final canEndorse = store.me.isExpert && !c.author.isMine && !c.sending;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 12, 2),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -455,9 +531,20 @@ class _Bubble extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Flexible(
-                      child: Text(c.author.label,
-                          maxLines: 1, overflow: TextOverflow.ellipsis, style: cmText(12.5, weight: FontWeight.w800)),
+                      child: Text.rich(
+                        TextSpan(children: [
+                          TextSpan(text: expert?.name ?? c.author.label, style: cmText(12.5, weight: FontWeight.w800)),
+                          if (expert != null && expert.category.isNotEmpty)
+                            TextSpan(text: ' · ${expert.category}', style: cmText(12, weight: FontWeight.w600, color: cmP.ink2)),
+                        ]),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
+                    if (chip != null) ...[
+                      const SizedBox(width: 6),
+                      CommunityNameChip(chip),
+                    ],
                     if (c.isOp) ...[
                       const SizedBox(width: 6),
                       Text('Asked this', style: cmText(11.5, weight: FontWeight.w700, color: cmP.action)),
@@ -467,9 +554,33 @@ class _Bubble extends StatelessWidget {
                   ]),
                   const SizedBox(height: 2),
                   Text(c.body, style: cmText(14.5)),
+                  // Every expert reply ends with the same line (B4).
+                  if (expert != null) ...[
+                    const SizedBox(height: 6),
+                    Container(
+                      key: ValueKey('community_expert_footer_${c.id}'),
+                      padding: const EdgeInsets.only(top: 6),
+                      decoration: BoxDecoration(border: Border(top: BorderSide(color: cmP.line))),
+                      child: Text(kCommunityExpertFooter, style: cmText(11.5, color: cmP.ink2)),
+                    ),
+                  ],
                 ]),
               ),
             )),
+            for (final e in c.endorsements)
+              Padding(
+                padding: const EdgeInsets.only(top: 6, left: 4),
+                child: Row(children: [
+                  const Icon(Icons.verified_rounded, size: 14, color: Color(0xFF1D74E0)),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Found helpful by ${e.name}${e.category.isEmpty ? '' : ', ${e.category}'}',
+                      style: cmText(12, weight: FontWeight.w700, color: cmP.ink2),
+                    ),
+                  ),
+                ]),
+              ),
             if (c.sending || c.status != 'live')
               Padding(
                 padding: const EdgeInsets.only(top: 4, left: 4),
@@ -505,6 +616,28 @@ class _Bubble extends StatelessWidget {
                   ),
                   child: const Text('Reply'),
                 ),
+                if (canEndorse)
+                  TextButton(
+                    key: ValueKey('community_endorse_${c.id}'),
+                    onPressed: () async {
+                      HapticFeedback.lightImpact();
+                      final ok = await store.endorse(postId, c.id, on: !c.endorsed);
+                      if (!context.mounted) return;
+                      pvToast(
+                        context,
+                        !ok
+                            ? 'That did not go through. Try again.'
+                            : (c.endorsed ? 'Endorsement removed' : 'Endorsed. Parents see that you found this helpful.'),
+                        kind: ok ? PvToastKind.done : PvToastKind.gentle,
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: c.endorsed ? const Color(0xFF1D74E0) : cmP.ink2,
+                      visualDensity: VisualDensity.compact,
+                      textStyle: cmText(12.5, weight: FontWeight.w700),
+                    ),
+                    child: Text(c.endorsed ? 'Endorsed' : 'Endorse'),
+                  ),
                 IconButton(
                   tooltip: 'More',
                   visualDensity: VisualDensity.compact,
@@ -517,6 +650,51 @@ class _Bubble extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// "No expert has answered yet" under her own post, with Ask; or, once
+/// asked, what happens next (0137, the prototype's ask row).
+class _AskRow extends StatelessWidget {
+  const _AskRow({required this.asked, required this.onAsk});
+  final bool asked;
+  final VoidCallback onAsk;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: const ValueKey('community_ask_expert_row'),
+        margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+        padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: cmP.line)),
+        child: Row(children: [
+          Icon(asked ? Icons.schedule_rounded : Icons.verified_outlined, size: 22, color: kPvInk),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(asked ? 'An expert has been asked' : 'No expert has answered yet',
+                  style: cmText(13.5, weight: FontWeight.w800)),
+              Text(
+                asked
+                    ? 'Their reply will reach you in Replies. This is not a consultation.'
+                    : 'An expert from the ParentVeda panel can look at your question.',
+                style: cmText(13, color: cmP.ink2),
+              ),
+            ]),
+          ),
+          if (!asked) ...[
+            const SizedBox(width: 8),
+            OutlinedButton(
+              onPressed: onAsk,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: kPvInk,
+                side: const BorderSide(color: kPvInk, width: 1.5),
+                shape: const StadiumBorder(),
+                textStyle: cmText(13, weight: FontWeight.w700),
+              ),
+              child: const Text('Ask'),
+            ),
+          ],
+        ]),
+      );
 }
 
 class _ReplyBar extends StatelessWidget {

@@ -35,6 +35,7 @@ import '../../theme/pv_fonts.dart';
 import '../post_pregnancy/pp_expert_honesty.dart' show ppProgramIsPlaceholder, ppProgramOpeningSoon;
 import '../post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import 'pv_learn_catalog.dart';
+import '../community/community_offering_thread.dart';
 import '../products/pv_review_block.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
 import 'pv_learn_chrome.dart';
@@ -362,6 +363,18 @@ class _PvOfferingScreenState extends State<PvOfferingScreen> {
                       ),
                     ),
                   ],
+                  // ---- the course discussion (0137, LA-20) ----------------------------------------
+                  // Only where the grant SELLS one ("private discussion group":
+                  // masterclass and cohort, never Mind & Mood). Without a seat it
+                  // is an invitation, never hidden; who may enter is the
+                  // server's answer, never this page's.
+                  if (v.offering?.grant.discussionThread == true)
+                    SliverToBoxAdapter(
+                      child: CommunityOfferingThread(
+                        programmeId: v.id,
+                        expertName: v.expert.name.isEmpty ? null : v.expert.name,
+                      ),
+                    ),
                   const SliverToBoxAdapter(
                     child: SizedBox(height: kPvStickyBarClearance),
                   ),

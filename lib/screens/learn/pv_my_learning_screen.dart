@@ -74,6 +74,7 @@ import '../../booking/booking_store.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../data/learn/pv_learn_view.dart';
 import '../../services/life_stage_store.dart';
+import '../../services/pv_community_store.dart';
 import '../../services/pv_learn_progress_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
@@ -111,6 +112,17 @@ class _PvMyLearningScreenState extends State<PvMyLearningScreen> {
     BookingStore.instance.syncPurchases();
     // (L3) And which past sessions she can watch again.
     BookingStore.instance.syncRecordings();
+    // (0137, LA-22) A class the server moved says so on its card, read from
+    // the pinned notice in that course's discussion.
+    final programmes = {
+      for (final b in BookingStore.instance.upcoming())
+        if (b.slotId.startsWith('ps_')) PvLearnCatalog.instance.byOfferingId(b.offeringId)?.id,
+    }.whereType<String>();
+    PvCommunityStore.instance.init().then((_) {
+      for (final id in programmes) {
+        PvCommunityStore.instance.loadCourseNotices(id);
+      }
+    });
   }
 
   /// "Watch" on a past row whose recording is ready. Nothing otherwise: the
@@ -142,6 +154,7 @@ class _PvMyLearningScreenState extends State<PvMyLearningScreen> {
       listenable: Listenable.merge([
         BookingStore.instance,
         PvLearnProgressStore.instance,
+        PvCommunityStore.instance,
       ]),
       builder: (context, _) {
         final store = BookingStore.instance;
@@ -479,6 +492,19 @@ class PvBookingCard extends StatelessWidget {
                   color: p.ink2,
                 ),
               ),
+              // (0137, LA-22) The same words as the team notice.
+              if (PvCommunityStore.instance.movedFrom(b.slotId) case final was?) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Moved from ${pvLearnDay(was.toUtc())}, ${pvLearnTime(was.toUtc())}',
+                  key: ValueKey('pv_booking_moved_${b.id}'),
+                  style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFC6295A),
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               // WHAT
               Text(

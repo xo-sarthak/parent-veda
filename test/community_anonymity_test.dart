@@ -9,8 +9,13 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/community_sql.dart';
+
 void main() {
-  final sql = File('supabase/migrations/0121_community.sql').readAsStringSync();
+  // Every community migration, in apply order (0121, 0122, 0137 …): a table
+  // or function added later must keep the same shape.
+  final cs = CommunitySql.load();
+  final sql = cs.all;
   final media = File('supabase/migrations/0122_community_media.sql').readAsStringSync();
   final model = File('lib/models/pv_community.dart').readAsStringSync();
   final store = File('lib/services/pv_community_store.dart').readAsStringSync();
@@ -20,10 +25,12 @@ void main() {
   ];
 
   test('every community table has RLS on and no rights for the app roles', () {
-    expect(tables.length, greaterThanOrEqualTo(13));
-    final revoke = RegExp(r'revoke all on public\.community_profiles([\s\S]*?)from anon, authenticated;')
-        .firstMatch(sql)!
-        .group(0)!;
+    expect(tables.length, greaterThanOrEqualTo(17));
+    // Every `revoke all on public.<tables> from anon, authenticated;`, in any file.
+    final revoke = [
+      for (final m in RegExp(r'revoke all on public\.community_[\s\S]*?from anon, authenticated;').allMatches(sql))
+        m.group(0)!,
+    ].join(' ');
     for (final t in tables) {
       expect(RegExp('alter table public\\.$t\\s+enable row level security').hasMatch(sql), isTrue,
           reason: '$t has no RLS');
@@ -44,11 +51,8 @@ void main() {
 
   test('the author is resolved on the server, never joined to the other face', () {
     // The body only (after `as $$`): the signature names both parameters.
-    final author = RegExp(r'function public\.community_author\([\s\S]*?\$\$;')
-        .firstMatch(sql)!
-        .group(0)!
-        .split(r'as $$')
-        .last;
+    // The LAST definition (0137 added the team face and the expert badge).
+    final author = cs.functions()['community_author']!.body;
     // The anonymous face reads only the pseudonym; the named face only the
     // label stored on the post. Neither branch reads the other's source.
     final anon = author.split('else').first;
@@ -56,6 +60,15 @@ void main() {
     expect(anon, contains('pseudonym'));
     expect(anon.contains('p_label'), isFalse);
     expect(named.contains('pseudonym'), isFalse);
+    // The badge rides on the named face only: on a community-name post it
+    // would unmask one of a handful of experts.
+    expect(anon.contains('expert'), isFalse);
+    expect(named, contains('community_expert_of'));
+    // The team face prints the house, never the person.
+    final team = author.split("when p_identity = 'anon'").first;
+    expect(team, contains("'ParentVeda team'"));
+    expect(team.contains('p_label'), isFalse);
+    expect(team.contains('pseudonym'), isFalse);
   });
 
   test('the phone model has no user id to leak', () {

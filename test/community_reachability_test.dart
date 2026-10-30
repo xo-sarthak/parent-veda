@@ -50,6 +50,55 @@ void main() {
     expect(uses.length, greaterThanOrEqualTo(4), reason: 'house rules, room rules, report thank-you, plus the class');
   });
 
+  // Phase 2, L4a (0137): every new way in is mounted where the plan put it.
+  test('course discussions are reachable from the course page and the lesson', () {
+    final offering = _live(_read('lib/screens/learn/pv_offering_screen.dart')).join('\n');
+    expect(offering, contains('CommunityOfferingThread('));
+    expect(offering, contains('v.offering?.grant.discussionThread == true'));
+    final lesson = _live(_read('lib/screens/learn/pv_lesson_screen.dart')).join('\n');
+    expect(lesson, contains('CommunityLessonThread('));
+    expect(lesson, contains('_LessonTabs('));
+    // A moved class says so on its booking card.
+    final mine = _live(_read('lib/screens/learn/pv_my_learning_screen.dart')).join('\n');
+    expect(mine, contains('PvCommunityStore.instance.movedFrom('));
+    expect(mine, contains('loadCourseNotices('));
+    // The section opens the room; the room opens the team voice.
+    expect(_read('lib/screens/community/community_offering_thread.dart'), contains('openCommunityRoom(context, o.room.id)'));
+    expect(_live(_read('lib/screens/community/community_room_screen.dart')).join('\n'), contains('asTeam: true'));
+  });
+
+  test('the doctor app reaches Your offerings and the expert queue', () {
+    expect(_live(_read('lib/main_doctor.dart')).join('\n'), contains('PvCommunityStore.instance.init()'));
+    final home = _live(_read('lib/screens/doctor/doctor_home_tab.dart')).join('\n');
+    expect(home, contains('DoctorOfferingsSection('));
+    final offerings = _live(_read('lib/screens/doctor/doctor_offerings_screen.dart')).join('\n');
+    expect(offerings, contains('openDoctorCommunityQueue(context)'));
+    expect(offerings, contains('openDoctorOfferings(context)'));
+    expect(offerings, contains('openCommunityRoom(context, room.room.id)'));
+    expect(_read('lib/screens/doctor/doctor_community_queue_screen.dart'), contains('openCommunityPost(context, q.post.id)'));
+  });
+
+  test('every phase 2 store call is made from a screen', () {
+    final screens = [
+      for (final f in Directory('lib/screens').listSync(recursive: true))
+        if (f is File && f.path.endsWith('.dart')) _live(f.readAsStringSync()).join('\n'),
+    ].join('\n');
+    for (final call in [
+      '.offeringRoom(',
+      '.roomSeen(',
+      '.createPrompt(',
+      '.pin(',
+      '.askExpert(',
+      '.expertQueue(',
+      '.expertClaim(',
+      '.endorse(',
+      '.myOfferings(',
+      '.movedFrom(',
+    ]) {
+      expect(screens, contains(call), reason: '$call has no caller in lib/screens');
+    }
+  });
+
   test('the app loads the new store, not the old one', () {
     final main = _live(_read('lib/main.dart')).join('\n');
     expect(main, contains('PvCommunityStore.instance.init()'));

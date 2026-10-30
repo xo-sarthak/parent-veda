@@ -70,6 +70,7 @@ import 'doctor_chrome.dart';
 import 'doctor_class_launch.dart';
 import 'doctor_classes_screen.dart';
 import 'doctor_art.dart';
+import 'doctor_offerings_screen.dart';
 import 'doctor_prescription_screen.dart';
 import 'doctor_referral_kit_screen.dart';
 import 'doctor_task_feed.dart';
@@ -293,18 +294,27 @@ class DoctorHomeTab extends StatelessWidget {
               const SizedBox(height: 22),
             ],
 
-            // ---- 8. classes -----------------------------------------------------
-            DcSectionHead('Your classes',
-                note: hosts.length > 1 ? 'All ${hosts.length}' : (hosts.isEmpty ? null : 'Open'),
-                onNote: hosts.isEmpty ? null : () => _openClasses(context)),
-            if (hosts.isEmpty)
-              const DcEmpty(
-                'No classes yet',
-                'When ParentVeda assigns you a masterclass or a cohort, it appears here with its seats and a Start button.',
-                mark: DoctorMark.classes,
-              )
-            else
-              ClassCard(session: _soonest(hosts)),
+            // ---- 8. your offerings (0137, LA-21) -------------------------------
+            // Read from the SERVER (expert_my_offerings): "Your classes"
+            // filtered the phone's bundled catalogue by expert id, so a
+            // co-host or a programme the panel added later never showed.
+            // Going live is unchanged: the soonest ClassCard sits under it.
+            DoctorOfferingsSection(
+              goLive: hosts.isEmpty ? null : ClassCard(session: _soonest(hosts)),
+              onAllClasses: hosts.length > 1 ? () => _openClasses(context) : null,
+            ),
+            // Kept for revert (phase 1's section 8):
+            // DcSectionHead('Your classes',
+            //     note: hosts.length > 1 ? 'All ${hosts.length}' : (hosts.isEmpty ? null : 'Open'),
+            //     onNote: hosts.isEmpty ? null : () => _openClasses(context)),
+            // if (hosts.isEmpty)
+            //   const DcEmpty(
+            //     'No classes yet',
+            //     'When ParentVeda assigns you a masterclass or a cohort, it appears here with its seats and a Start button.',
+            //     mark: DoctorMark.classes,
+            //   )
+            // else
+            //   ClassCard(session: _soonest(hosts)),
             const SizedBox(height: 22),
 
             // ---- 9. how parents see you ----------------------------------------

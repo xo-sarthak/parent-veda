@@ -38,6 +38,7 @@ import 'community_compose_screen.dart';
 import 'community_home_screen.dart';
 import 'community_marks.dart';
 import 'community_moderation_screen.dart';
+import 'community_offering_thread.dart';
 import 'community_post_screen.dart';
 import 'community_profile_screen.dart';
 import 'community_room_screen.dart';
@@ -81,12 +82,22 @@ void openCommunityPost(BuildContext context, String postId) {
 
 /// The composer rises from the bottom (a full-screen dialog), the way
 /// writing opens in every app she knows. It returns the new post's id.
-Future<void> openCommunityCompose(BuildContext context, {String? roomId}) async {
+///
+/// (0137) [about] tags a course post to a lesson or session ([aboutLabel] is
+/// how the chip reads, "Lesson 2"). [asTeam] opens the moderators' "Post as
+/// ParentVeda team" mode, with pin days.
+Future<void> openCommunityCompose(
+  BuildContext context, {
+  String? roomId,
+  PvPostAbout? about,
+  String? aboutLabel,
+  bool asTeam = false,
+}) async {
   if (!await communityEnsureMember(context)) return;
   if (!context.mounted) return;
   final id = await Navigator.of(context).push<String>(MaterialPageRoute<String>(
     fullscreenDialog: true,
-    builder: (_) => CommunityComposeScreen(roomId: roomId),
+    builder: (_) => CommunityComposeScreen(roomId: roomId, about: about, aboutLabel: aboutLabel, asTeam: asTeam),
     settings: const RouteSettings(name: kCommunityComposeRoute),
   ));
   if (id != null && context.mounted) openCommunityPost(context, id);
@@ -206,6 +217,9 @@ void communityOutcomeToast(
     case PvCommunityOutcome.signedOut:
       pvToast(context, 'Sign in to $what in the community.', kind: PvToastKind.info,
           action: 'Sign in', onAction: () => openCommunitySignIn(context));
+    case PvCommunityOutcome.noAccess:
+      pvToast(context, 'This discussion is for people with a seat in this course. Your $what was not posted.',
+          kind: PvToastKind.gentle, hold: const Duration(seconds: 5));
     case PvCommunityOutcome.notJoined:
     case PvCommunityOutcome.invalid:
       pvToast(context, 'That did not go through. Try again.', kind: PvToastKind.gentle);
@@ -235,6 +249,10 @@ Future<bool> communityEnsureMember(BuildContext context) async {
     return false;
   }
   if (s.me.joined) return true;
+  // (0137) A verified expert writes under her own name and needs no
+  // community name: the doctor app has no first-time sheet, and the server
+  // lets an expert's NAMED post through without one.
+  if (s.me.isExpert) return true;
   // A new phone, or the first launch after signing in: she may have joined on
   // another device. Ask the server before showing the first-time sheet.
   await s.refreshMe();
@@ -387,7 +405,29 @@ class CommunityEnter extends StatelessWidget {
       );
 }
 
+/// A small grey chip beside a name: "Moderator", "Lead host".
+class CommunityNameChip extends StatelessWidget {
+  const CommunityNameChip(this.label, {super.key});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(color: const Color(0xFFF3F3F4), borderRadius: BorderRadius.circular(999)),
+        child: Text(label, style: cmText(11, weight: FontWeight.w800, color: cmP.ink2)),
+      );
+}
+
+/// The words under every expert's reply (B4, the user's wording 2026-10-28).
+const String kCommunityExpertFooter =
+    'General guidance from a verified expert, not a diagnosis. For your own care, ask your doctor.';
+
 /// Author line: face, name, and (optionally) room and time.
+///
+/// (0137) Three new faces: a verified expert (the seal, "Dr Name ·
+/// category", and their role in a course); a moderator under her first name
+/// (a "Moderator" chip, D2, replacing phase 1's "label · ParentVeda team");
+/// and the house itself ("ParentVeda team", only ever from the team voice).
 class CommunityAuthorRow extends StatelessWidget {
   const CommunityAuthorRow({
     super.key,
@@ -397,6 +437,8 @@ class CommunityAuthorRow extends StatelessWidget {
     this.onAuthor,
     this.trailing,
     this.size = 32,
+    this.hostRole,
+    this.edited = false,
   });
 
   final PvCommunityAuthor author;
@@ -405,10 +447,19 @@ class CommunityAuthorRow extends StatelessWidget {
   final VoidCallback? onAuthor;
   final Widget? trailing;
   final double size;
+  final String? hostRole;
+  final bool edited;
 
   @override
   Widget build(BuildContext context) {
-    final name = author.team ? '${author.label} · ParentVeda team' : author.label;
+    // Kept for revert (phase 1): author.team ? '${author.label} · ParentVeda team' : author.label
+    final expert = author.expert;
+    final name = expert?.name ?? author.label;
+    final chip = author.team
+        ? null
+        : hostRole != null && hostRole!.isNotEmpty
+            ? pvHostRoleLabel(hostRole)
+            : (author.moderator ? 'Moderator' : null);
     return Row(children: [
       PvPress(child: GestureDetector(onTap: onAuthor, child: CommunityFaceMark(author: author, size: size))),
       const SizedBox(width: 10),
@@ -419,18 +470,27 @@ class CommunityAuthorRow extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Flexible(
-                child: Text(name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: cmText(13.5, weight: FontWeight.w800)),
+                child: Text.rich(
+                  TextSpan(children: [
+                    TextSpan(text: name, style: cmText(13.5, weight: FontWeight.w800)),
+                    if (expert != null && expert.category.isNotEmpty)
+                      TextSpan(text: ' · ${expert.category}', style: cmText(13, weight: FontWeight.w600, color: cmP.ink2)),
+                  ]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              if (chip != null) ...[
+                const SizedBox(width: 6),
+                CommunityNameChip(chip),
+              ],
               if (author.isMine) ...[
                 const SizedBox(width: 6),
                 Text('You', style: cmText(11.5, weight: FontWeight.w700, color: cmP.ink3)),
               ],
             ]),
             Text(
-              [if (room != null && room!.isNotEmpty) room!, communityAgo(when)].join(' · '),
+              [if (room != null && room!.isNotEmpty) room!, communityAgo(when), if (edited) 'Edited'].join(' · '),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: cmText(12.5, color: cmP.ink3),
@@ -780,13 +840,26 @@ class CommunityPostCard extends StatelessWidget {
         decoration: BoxDecoration(border: Border(top: BorderSide(color: cmP.line))),
         padding: const EdgeInsets.fromLTRB(16, 14, 8, 6),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (post.pinned) ...[
+            Row(children: [
+              Icon(Icons.push_pin_outlined, size: 14, color: cmP.ink3),
+              const SizedBox(width: 5),
+              Text('Pinned', style: cmText(12, weight: FontWeight.w700, color: cmP.ink3)),
+            ]),
+            const SizedBox(height: 6),
+          ],
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: CommunityAuthorRow(
               author: post.author,
               when: post.createdAt,
               room: showRoom ? post.roomTitle : null,
-              onAuthor: post.sending ? null : () => openCommunityProfile(context, fromId: post.id, anon: post.author.anon),
+              hostRole: post.hostRole,
+              edited: post.editedAt != null,
+              // A team post has no face to open (0137).
+              onAuthor: post.sending || post.author.team
+                  ? null
+                  : () => openCommunityProfile(context, fromId: post.id, anon: post.author.anon),
               trailing: joinable
                   ? TextButton(
                       onPressed: () => communityJoinRoom(context, room.id),
@@ -808,6 +881,10 @@ class CommunityPostCard extends StatelessWidget {
                   ? 'Saved on your phone. Sending when you are online'
                   : 'Waiting for a quick review. Only you can see it',
             ),
+          ],
+          if (post.about != null) ...[
+            const SizedBox(height: 8),
+            CommunityAboutChip(label: communityAboutLabel(room?.programmeId, post.about!), about: post.about!),
           ],
           const SizedBox(height: 8),
           Padding(
@@ -984,10 +1061,35 @@ class CommunitySheetRow extends StatelessWidget {
   }
 }
 
+/// "About: Lesson 2" on a course post (0137).
+class CommunityAboutChip extends StatelessWidget {
+  const CommunityAboutChip({super.key, required this.label, required this.about});
+  final String label;
+  final PvPostAbout about;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+        decoration: BoxDecoration(color: const Color(0xFFF3F3F4), borderRadius: BorderRadius.circular(999)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(about.isLesson ? Icons.play_arrow_rounded : Icons.videocam_outlined, size: 14, color: cmP.ink2),
+          const SizedBox(width: 4),
+          Text('About: $label', style: cmText(12, weight: FontWeight.w700, color: cmP.ink2)),
+        ]),
+      );
+}
+
+/// May she pin this post? Moderators anywhere; a course's hosts in its room.
+bool communityCanPin(PvCommunityPost post) {
+  final store = PvCommunityStore.instance;
+  return store.me.isMod || (store.offeringForRoom(post.roomId)?.isHost ?? false);
+}
+
 /// The ⋯ menu on a post.
 Future<void> showCommunityPostMenu(BuildContext context, PvCommunityPost post) async {
   final store = PvCommunityStore.instance;
   final saved = store.isSaved(post.id);
+  final canPin = communityCanPin(post) && !post.sending;
   final action = await showCommunitySheet<String>(
     context,
     (c) => ListView(shrinkWrap: true, children: [
@@ -996,7 +1098,23 @@ Future<void> showCommunityPostMenu(BuildContext context, PvCommunityPost post) a
         label: saved ? 'Remove from saved' : 'Save',
         onTap: () => Navigator.pop(c, 'save'),
       ),
-      if (!post.author.isMine) ...[
+      if (canPin)
+        CommunitySheetRow(
+          icon: Icons.push_pin_outlined,
+          label: post.pinned ? 'Unpin' : 'Pin to the top',
+          note: post.pinned ? 'It goes back into the feed' : 'For 7 days, at the top of this room',
+          onTap: () => Navigator.pop(c, 'pin'),
+        ),
+      // A team post can be reported, never blocked (0137): it is the house.
+      if (!post.author.isMine && post.author.team)
+        CommunitySheetRow(
+          icon: Icons.flag_outlined,
+          label: 'Report',
+          note: 'Confidential.',
+          danger: true,
+          onTap: () => Navigator.pop(c, 'report'),
+        )
+      else if (!post.author.isMine) ...[
         CommunitySheetRow(
           icon: Icons.visibility_off_outlined,
           label: 'Hide this post',
@@ -1027,6 +1145,15 @@ Future<void> showCommunityPostMenu(BuildContext context, PvCommunityPost post) a
   );
   if (action == null || !context.mounted) return;
   switch (action) {
+    case 'pin':
+      final err = await store.pin(post.id, post.pinned ? 0 : 7);
+      if (context.mounted) {
+        pvToast(
+          context,
+          err ?? (post.pinned ? 'Unpinned' : 'Pinned to the top of this room for 7 days'),
+          kind: err == null ? PvToastKind.done : PvToastKind.gentle,
+        );
+      }
     case 'save':
       await store.toggleSave(post);
       if (context.mounted) {

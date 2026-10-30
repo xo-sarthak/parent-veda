@@ -67,18 +67,54 @@ class CommunityFaceMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!author.anon) {
-      final initial = author.label.trim().isEmpty ? '?' : author.label.trim().characters.first.toUpperCase();
+    // (0137) The house: an ink SQUARE with a leaf, so it never reads as a
+    // member's round face or a room's tinted mark.
+    if (author.team) {
       return ExcludeSemantics(
         child: Container(
           width: size,
           height: size,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
-          child: Text(
-            initial,
-            style: pvManrope(fontSize: size * 0.42, fontWeight: FontWeight.w800, color: Colors.white, height: 1),
-          ),
+          decoration: BoxDecoration(color: kPvInk, borderRadius: BorderRadius.circular(size * 0.3)),
+          child: Icon(Icons.eco_outlined, size: size * 0.52, color: Colors.white),
+        ),
+      );
+    }
+    if (!author.anon) {
+      final shown = author.expert?.name ?? author.label;
+      final trimmed = shown.trim().replaceFirst(RegExp(r'^Dr\.?\s+'), '');
+      final initial = trimmed.isEmpty ? '?' : trimmed.characters.first.toUpperCase();
+      final face = Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(color: kPvInk, shape: BoxShape.circle),
+        child: Text(
+          initial,
+          style: pvManrope(fontSize: size * 0.42, fontWeight: FontWeight.w800, color: Colors.white, height: 1),
+        ),
+      );
+      if (author.expert == null) return ExcludeSemantics(child: face);
+      // The verified seal, from the server's expert register only.
+      final seal = size * 0.48;
+      return Semantics(
+        label: 'Verified expert',
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Stack(clipBehavior: Clip.none, children: [
+            face,
+            Positioned(
+              right: -seal * 0.2,
+              bottom: -seal * 0.2,
+              child: Container(
+                width: seal,
+                height: seal,
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                child: Icon(Icons.verified_rounded, size: seal, color: const Color(0xFF1D74E0)),
+              ),
+            ),
+          ]),
         ),
       );
     }

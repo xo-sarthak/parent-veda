@@ -17,10 +17,20 @@ import '../../widgets/pv_toast.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
 import 'community_chrome.dart';
 import 'community_marks.dart';
+import 'community_offering_thread.dart' show communityAboutLabel;
 
 class CommunityComposeScreen extends StatefulWidget {
-  const CommunityComposeScreen({super.key, this.roomId});
+  const CommunityComposeScreen({super.key, this.roomId, this.about, this.aboutLabel, this.asTeam = false});
   final String? roomId;
+
+  /// (0137) A course post about a lesson or session; [aboutLabel] reads
+  /// "Lesson 2" on the chip.
+  final PvPostAbout? about;
+  final String? aboutLabel;
+
+  /// (0137) "Post as ParentVeda team" (moderators): no face choice, no
+  /// photos or poll, and a pin of 0..14 days.
+  final bool asTeam;
 
   @override
   State<CommunityComposeScreen> createState() => _CommunityComposeScreenState();
@@ -32,21 +42,40 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
   final _body = TextEditingController();
   final _titleFocus = FocusNode();
   late String? _room = widget.roomId;
+  late PvPostAbout? _about = widget.about;
 
   /// Her community name by default (user's call, 2026-10-28): most first
   /// posts are the hard ones, and the safe default is the private one.
+  /// (0137) In a course room the default is her first name instead (plan
+  /// decision 4: these are classmates), and an expert's is always her own.
   bool _anon = true;
   bool _poll = false;
   int _pollDays = 3;
+  int _pinDays = 7;
   final List<TextEditingController> _opts = [TextEditingController(), TextEditingController()];
   final List<String> _photos = [];
   bool _posting = false;
+
+  /// B4: the first time she writes in a course thread she is TOLD it uses her
+  /// first name. Never silent.
+  bool _headsUp = false;
+
+  bool get _inCourse => _room != null && (_store.room(_room!)?.isOffering ?? false);
 
   @override
   void initState() {
     super.initState();
     for (final c in [_title, _body]) {
       c.addListener(() => setState(() {}));
+    }
+    final hasName = (_store.me.firstName ?? '').isNotEmpty || _store.me.isExpert;
+    if (_store.me.isExpert || (_inCourse && hasName)) _anon = false;
+    if (_inCourse && hasName && !widget.asTeam && !_store.me.isExpert) {
+      _store.courseHeadsUpDue().then((due) {
+        if (!due || !mounted) return;
+        setState(() => _headsUp = true);
+        _store.markCourseHeadsUpShown();
+      });
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_room == null) {
@@ -117,9 +146,37 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
     }
   }
 
+  Future<void> _postAsTeam() async {
+    setState(() => _posting = true);
+    HapticFeedback.mediumImpact();
+    final o = await _store.createPrompt(roomId: _room!, title: _title.text, body: _body.text, pinDays: _pinDays);
+    if (!mounted) return;
+    setState(() => _posting = false);
+    if (o == PvCommunityOutcome.live) {
+      pvToast(
+        context,
+        _pinDays > 0
+            ? 'Posted as ParentVeda team and pinned for $_pinDays days'
+            : 'Posted as ParentVeda team',
+        kind: PvToastKind.done,
+      );
+      Navigator.of(context).pop();
+    } else if (o == PvCommunityOutcome.queued) {
+      pvToast(context, 'No connection. Nothing was posted; try again when you are online.', kind: PvToastKind.gentle);
+    } else {
+      pvToast(
+        context,
+        'That did not go through. A team post cannot carry words the safety check would hold, and only moderators can write one.',
+        kind: PvToastKind.gentle,
+        hold: const Duration(seconds: 5),
+      );
+    }
+  }
+
   Future<void> _post() async {
     if (_blocker != null || _posting) return;
-    if (!_anon && (_store.me.firstName ?? '').isEmpty) {
+    if (widget.asTeam) return _postAsTeam();
+    if (!_anon && (_store.me.firstName ?? '').isEmpty && !_store.me.isExpert) {
       communityOutcomeToast(context, PvCommunityOutcome.noName);
       return;
     }
@@ -134,6 +191,7 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
       pollOptions: _poll ? _pollOptions : null,
       pollDays: _pollDays,
       photoFiles: _photos,
+      about: _inCourse ? _about : null,
     );
     if (!mounted) return;
     setState(() => _posting = false);
@@ -158,7 +216,8 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
     final crisis = communityLooksLikeCrisis(text);
     final hold = communityHoldReason(text);
     final me = _store.me;
-    final noName = (me.firstName ?? '').isEmpty;
+    final noName = (me.firstName ?? '').isEmpty && !me.isExpert;
+    final inCourse = _inCourse;
     return PopScope(
       canPop: !_dirty,
       onPopInvokedWithResult: (didPop, _) async {
@@ -185,7 +244,7 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                 child: Tooltip(
                   message: _blocker ?? 'Post',
                   child: CommunityInkButton(
-                    label: 'Post',
+                    label: widget.asTeam ? 'Post as team' : 'Post',
                     compact: true,
                     busy: _posting,
                     onTap: _blocker == null ? _post : null,
@@ -204,10 +263,14 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                   alignment: Alignment.centerLeft,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(999),
-                    onTap: () async {
-                      final r = await pickCommunityRoom(context, current: _room);
-                      if (r != null && mounted) setState(() => _room = r);
-                    },
+                    // A course post stays in its course (and a team post in
+                    // the room it was opened from): no room switching.
+                    onTap: inCourse || widget.asTeam
+                        ? null
+                        : () async {
+                            final r = await pickCommunityRoom(context, current: _room);
+                            if (r != null && mounted) setState(() => _room = r);
+                          },
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(5, 5, 12, 5),
                       decoration: BoxDecoration(
@@ -223,14 +286,88 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                             child: Icon(Icons.forum_outlined, size: 20, color: kPvInk),
                           ),
                         const SizedBox(width: 8),
-                        Text(room?.title ?? 'Choose a room', style: cmText(13.5, weight: FontWeight.w700)),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.expand_more_rounded, size: 18, color: kPvInk),
+                        Flexible(
+                          child: Text(room?.title ?? 'Choose a room',
+                              maxLines: 1, overflow: TextOverflow.ellipsis, style: cmText(13.5, weight: FontWeight.w700)),
+                        ),
+                        if (!inCourse && !widget.asTeam) ...[
+                          const SizedBox(width: 4),
+                          const Icon(Icons.expand_more_rounded, size: 18, color: kPvInk),
+                        ],
                       ]),
                     ),
                   ),
                 ),
+                if (inCourse && _about != null && !widget.asTeam) ...[
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: InputChip(
+                      key: const ValueKey('community_compose_about'),
+                      label: Text('About: ${widget.aboutLabel ?? communityAboutLabel(room?.programmeId, _about!)}',
+                          style: cmText(13, weight: FontWeight.w700)),
+                      avatar: Icon(_about!.isLesson ? Icons.play_arrow_rounded : Icons.videocam_outlined, size: 16),
+                      onDeleted: () => setState(() => _about = null),
+                      deleteButtonTooltipMessage: 'Not about this lesson',
+                      backgroundColor: const Color(0xFFF3F3F4),
+                      side: BorderSide.none,
+                      shape: const StadiumBorder(),
+                    ),
+                  ),
+                ],
+                if (_headsUp) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    key: const ValueKey('community_compose_course_heads_up'),
+                    padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
+                    decoration: BoxDecoration(color: const Color(0xFFE2ECF6), borderRadius: BorderRadius.circular(14)),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      const Icon(Icons.person_outline_rounded, size: 18, color: kPvInk),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'In this course you post under your first name, ${me.firstName}. '
+                          'Tap your community name below to switch.',
+                          style: cmText(13, color: kPvInk),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => setState(() => _headsUp = false),
+                        child: const Padding(padding: EdgeInsets.all(4), child: Icon(Icons.close_rounded, size: 16)),
+                      ),
+                    ]),
+                  ),
+                ],
                 const SizedBox(height: 14),
+                if (widget.asTeam) ...[
+                  Row(children: [
+                    CommunityFaceMark(
+                      author: const PvCommunityAuthor(label: 'ParentVeda team', anon: false, team: true),
+                      size: 32,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(child: Text('ParentVeda team', style: cmText(14, weight: FontWeight.w800))),
+                    Text('Pin for', style: cmText(13, color: cmP.ink2)),
+                    const SizedBox(width: 6),
+                    DropdownButton<int>(
+                      value: _pinDays,
+                      underline: const SizedBox.shrink(),
+                      style: cmText(13.5, weight: FontWeight.w800),
+                      items: const [
+                        DropdownMenuItem(value: 0, child: Text('Not pinned')),
+                        DropdownMenuItem(value: 3, child: Text('3 days')),
+                        DropdownMenuItem(value: 7, child: Text('7 days')),
+                        DropdownMenuItem(value: 14, child: Text('14 days')),
+                      ],
+                      onChanged: (v) => setState(() => _pinDays = v ?? 7),
+                    ),
+                  ]),
+                  const SizedBox(height: 8),
+                  const CommunityStatusLine(
+                    icon: Icons.lock_outline_rounded,
+                    text: 'Members see ParentVeda team, never your name. The audit trail records that you wrote it.',
+                  ),
+                ] else
                 Row(children: [
                   Expanded(
                     child: _FaceChoice(
@@ -252,17 +389,19 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                     ),
                   ),
                 ]),
-                const SizedBox(height: 8),
-                AnimatedSwitcher(
-                  duration: PvMotion.swap,
-                  child: CommunityStatusLine(
-                    key: ValueKey(_anon),
-                    icon: _anon ? Icons.lock_outline_rounded : Icons.person_outline_rounded,
-                    text: _anon
-                        ? 'Others see ${me.pseudonym ?? 'your community name'}. Your name and account stay private.'
-                        : 'Others see ${me.firstName ?? 'your first name'}.',
+                if (!widget.asTeam) ...[
+                  const SizedBox(height: 8),
+                  AnimatedSwitcher(
+                    duration: PvMotion.swap,
+                    child: CommunityStatusLine(
+                      key: ValueKey(_anon),
+                      icon: _anon ? Icons.lock_outline_rounded : Icons.person_outline_rounded,
+                      text: _anon
+                          ? 'Others see ${me.pseudonym ?? 'your community name'}. Your name and account stay private.'
+                          : 'Others see ${me.isExpert ? '${me.expert!.name}, with your verified badge' : me.firstName ?? 'your first name'}.',
+                    ),
                   ),
-                ),
+                ],
                 const SizedBox(height: 14),
                 TextField(
                   controller: _title,
@@ -361,18 +500,20 @@ class _CommunityComposeScreenState extends State<CommunityComposeScreen> {
                 decoration: BoxDecoration(border: Border(top: BorderSide(color: cmP.line))),
                 padding: const EdgeInsets.fromLTRB(6, 4, 14, 4),
                 child: Row(children: [
-                  TextButton.icon(
-                    onPressed: _photos.length >= 4 ? null : _pickPhotos,
-                    icon: const Icon(Icons.image_outlined, size: 20),
-                    label: Text(_photos.isEmpty ? 'Photo' : 'Photo ${_photos.length}/4'),
-                    style: TextButton.styleFrom(foregroundColor: kPvInk, textStyle: cmText(14, weight: FontWeight.w700)),
-                  ),
-                  TextButton.icon(
-                    onPressed: _poll ? null : () => setState(() => _poll = true),
-                    icon: const Icon(Icons.poll_outlined, size: 20),
-                    label: const Text('Poll'),
-                    style: TextButton.styleFrom(foregroundColor: kPvInk, textStyle: cmText(14, weight: FontWeight.w700)),
-                  ),
+                  if (!widget.asTeam) ...[
+                    TextButton.icon(
+                      onPressed: _photos.length >= 4 ? null : _pickPhotos,
+                      icon: const Icon(Icons.image_outlined, size: 20),
+                      label: Text(_photos.isEmpty ? 'Photo' : 'Photo ${_photos.length}/4'),
+                      style: TextButton.styleFrom(foregroundColor: kPvInk, textStyle: cmText(14, weight: FontWeight.w700)),
+                    ),
+                    TextButton.icon(
+                      onPressed: _poll ? null : () => setState(() => _poll = true),
+                      icon: const Icon(Icons.poll_outlined, size: 20),
+                      label: const Text('Poll'),
+                      style: TextButton.styleFrom(foregroundColor: kPvInk, textStyle: cmText(14, weight: FontWeight.w700)),
+                    ),
+                  ],
                   const Spacer(),
                   Text(
                     _blocker ?? '${_body.text.length}/4000',

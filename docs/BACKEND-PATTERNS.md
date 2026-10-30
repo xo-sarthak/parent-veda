@@ -5047,3 +5047,110 @@ has already proved.**
 
 Pinned by `test/partner_app_shell_test.dart` (on the latest definitions) and `supabase/seed/verify_partner_org.sql`
 (against real tables).
+
+---
+
+## 16zzx. A notice the write path cannot forget, a high-water mark, a column Postgres computes, and who put you in a room (Community phase 2, 0137, 2026-10-30)
+
+Four patterns from putting the community on the learning model. Each has a cheaper-looking alternative, and the
+trade-off is the lesson.
+
+**1. A notice written by the write path, not by the person editing.** When a session moves, the people booked must be
+told (LA-22). The obvious design is "the panel shows a reminder to post an announcement". It fails the way every
+"remember to" rule fails: the timetable is edited in Directus, by a person, under time pressure, and sometimes from the
+SQL editor where there is no reminder at all. So the notice is written inside `_mirror_session`, the one function
+every session change already passes through (a trigger on `programme_sessions` calls it). Two details make it correct:
+
+- **Read the old value BEFORE you overwrite it.** The function upserts the slot. If it compared after the upsert, the
+  old start would already be gone. So it reads `booking_slots.starts_utc` first, then upserts, then compares. The
+  general rule: in a function that both changes a row and reacts to the change, capture the "before" first; afterwards
+  it does not exist. (A row trigger gets `OLD` for free; a function called by a trigger has to read it.)
+- **Notify only when someone is affected.** No upcoming booking, no notice. A draft session moved five times before
+  anyone booked writes nothing.
+
+The cost is honest: the notice's words are now code, so changing them is a migration, not a content edit. For a message
+about money and time that is the right side to be on. The notice has no author (`user_id` null), so the table's
+NOT NULL was relaxed to a check: `user_id is not null or identity = 'team'`. **Relaxing a NOT NULL is a decision about
+every reader**, so each function that assumed an author was re-read: `community_mod_act` used `author is null` to mean
+"row missing" and had to switch to `not found`; `community_can_see` compared `p.user_id = auth.uid()`, which is NULL
+(not false) for a null author, and `if not NULL` in PL/pgSQL is NOT true, so a hidden post could slip through. Every
+such comparison is now `coalesce(…, false)`. **Three-valued logic is where a nullable column bites:** `NULL = x` is
+NULL, `NOT NULL` is NULL, and an `IF` treats NULL as false, in whichever branch you least expected.
+
+**2. Unread as a high-water mark.** "How many new posts in this room?" can be stored two ways. Per post read (one row
+for every person × every post) can say WHICH posts she has not read. A high-water mark (one row per person × room:
+"she last looked at T") can only count what is newer than T. We only ever show a count, so the mark wins: it is one
+upsert when she opens the room (`community_room_seen`) and a `count(*) … where created_at > seen_at`. Before her first
+visit, the mark falls back to when she joined, and to "now" for a room she never joined, so an untouched room never
+shouts "12 new". The trade-off to remember: the day the product wants "jump to the first unread post", a mark is not
+enough and you need per-post state.
+
+**3. A generated column for search.** `search tsvector generated always as (to_tsvector('english', title || ' ' ||
+body)) stored`, with a GIN index. Postgres computes it on every insert and update, so it can never drift from the text
+(no trigger to forget, no app code that might send a stale vector). Costs: one table rewrite when the column is added
+(cheap at launch size), a little disk per row, and the expression must be IMMUTABLE, which is why the two-argument
+`to_tsvector('english'::regconfig, …)` is used (the one-argument form reads a setting and is not immutable). Queries
+use `websearch_to_tsquery`, which reads what people type ("sleep -regression", quoted phrases) and never raises on
+odd input, unlike `to_tsquery`. It does not forgive typos; `pg_trgm` can be added later if that is missed.
+
+**4. Who put you in a room: `via`.** Memberships now come from two places: she joined (self), or the app placed her
+(auto: her birth club from her due month, her course's run room when she has a seat). Without a column saying which,
+the next automatic decision cannot tell the two apart: changing her due month would have to either leave every old
+club (and throw out one she chose) or leave none (and pile up clubs). With `via`, "drop my other auto clubs" touches
+only what the app did. And when she taps Stay on the after-a-loss sheet, `community_set_room` flips the row to 'self',
+so no later automatic step ever removes her: **her choice outranks the app's guess, and the data records which is
+which.**
+
+Also in 0137, worth knowing:
+
+- **A changed signature is a new function.** `community_feed` and `community_create_post` gained defaulted arguments.
+  `create or replace` with a different argument list does not replace; it adds an overload, and a call naming only the
+  old arguments then matches both and fails as ambiguous. So each old signature is dropped first, and the grant is
+  written again (a grant belongs to the function it was given to, and dies with it). Installed phones keep working:
+  they name only the old arguments and the defaults fill the rest. The contract test now only counts a grant written
+  after the last drop of that function.
+- **One room rule, called from the one visibility function.** Course and club privacy is `community_room_access`,
+  called from `community_can_see`, which every read already used. One line made feed, post, replies, faces, search and
+  photo signing all hold it; five separate checks would have left one forgotten.
+- **The server picks her batch.** `community_offering_room` takes the phone's run id as a hint only: her receipt's run,
+  then the run of a session she booked, then the hint, then the run a new purchase would join. A phone with a stale id
+  still lands her in her own batch. Derive, never ask; and never let the client's word be the access check.
+
+Pinned by `test/community_phase2_contract_test.dart` (grants, helpers revoked, signature drops, no user id, the
+team-only null author, the notice written after the slot moves) and a local Postgres scenario run before hand-over.
+
+## 16zzy. A client check is a hint, a server check is policy; a status with three values is not a bool; null is not zero (Partner Editions P2, 0138, 2026-10-30)
+
+P2 gave an employer's or a school's admin their Overview, People and a shareable report in ParentVeda Partners,
+all over RPCs that already existed. Three general facts came out of it.
+
+**1. Enforce a rule where the identity is, and treat the client's copy as a shortcut.** The plan said an admin must
+not be able to remove themselves, "client-side and server-side". The client can only compare the row's *email* with
+the signed-in *email*, and those are often different addresses for one person (a work address on the roster, a
+personal one at sign-in). Only the server holds the one fact that settles it: both rows carry the same `user_id`.
+So 0138 refuses on `v_uid = auth.uid()`, and the app's email check just saves a round trip in the common case. The
+trade-off of having both: two places state one rule, and they can drift. What it buys: the common case is instant,
+and the rare case is still caught. **Write the server check first; a client check without one is decoration.** (The
+failure it prevents is nasty: a 0060-style admin whose role is *derived from* her membership would remove the
+membership and lock herself out of the screen she was standing on.)
+
+**2. When a column gains a value, every `!=` on it is a bug waiting.** `sponsor_roster` returned two statuses in 0060
+(`active`, `removed`), and the Dart row class grew `isActive`, and a screen split the list on `isActive` / `!isActive`.
+0061 added a third value, `not_activated`, and nothing failed to compile: the people HR most needed to chase showed
+under "Removed" with a dash for a date. The fix is one getter per value and splitting on those, never on a negation,
+and mapping an *unknown* value to the one that claims least ("not started", not "active" or "removed"). **A negated
+check silently absorbs every value added later; a positive check per value makes the new one visible.**
+
+**3. Null is "withheld", never zero, all the way to the pixel.** `sponsor_engagement` returns a whole month as null
+when fewer than `min_cohort` people opened the app. A bar chart that maps null to 0 draws a month where *nobody*
+came, which is a false claim about a company; the bars draw a hairline and a dash instead, and every sentence that
+explains a withheld figure reads the threshold from the server's `min_cohort` rather than a literal 5, so the day ops
+raises it the words follow. **Suppression is a server decision, and the UI's job is to say that it happened, not to
+fill the gap.**
+
+One more, smaller: **one model, two renderers.** The report shows on screen and leaves as a PDF. The portal avoided a
+second layout by printing the page; a phone cannot, so `PartnerReport` computes every figure and sentence once and
+both the screen and the PDF only lay it out. Two layouts can then disagree about fonts, never about a number.
+
+Pinned by `test/sponsor_roster_status_test.dart` (the three statuses, the HR screen, 0138's guard before the remove),
+`partner_overview_test`, `partner_people_test`.

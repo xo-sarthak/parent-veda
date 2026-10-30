@@ -2,6 +2,7 @@
 // the room's mark and blurb, Join, then Top / New over its posts.
 import 'package:flutter/material.dart';
 
+import '../../models/pv_community.dart';
 import '../../services/pv_community_store.dart';
 import '../../services/saved_store.dart';
 import '../../widgets/pv_toast.dart';
@@ -9,6 +10,7 @@ import '../products/pv_store_chrome.dart' show kPvInk;
 import 'community_chrome.dart';
 import 'community_home_screen.dart';
 import 'community_marks.dart';
+import 'community_offering_thread.dart';
 
 class CommunityRoomScreen extends StatefulWidget {
   const CommunityRoomScreen({super.key, required this.roomId});
@@ -22,7 +24,13 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
   final _store = PvCommunityStore.instance;
   String _sort = 'top';
 
-  String get _key => PvCommunityStore.feedKey(scope: 'room', sort: _sort, room: widget.roomId);
+  /// (0137) A course room can narrow to one lesson or session.
+  PvPostAbout? _about;
+
+  /// Every "about" seen in this room's newest posts, for the pills.
+  final List<PvPostAbout> _abouts = [];
+
+  String get _key => PvCommunityStore.feedKey(scope: 'room', sort: _sort, room: widget.roomId, about: _about);
 
   @override
   void initState() {
@@ -30,10 +38,23 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
     _store.init().then((_) {
       if (_store.room(widget.roomId) == null) _store.refreshMe();
       _load();
+      // Opening the room is reading it: the unread count clears.
+      _store.roomSeen(widget.roomId);
     });
   }
 
-  Future<void> _load() => _store.loadFeed(scope: 'room', sort: _sort, room: widget.roomId);
+  Future<void> _load() async {
+    await _store.loadFeed(scope: 'room', sort: _sort, room: widget.roomId, about: _about);
+    if (_about == null && mounted) {
+      final seen = <PvPostAbout>{
+        for (final p in _store.feed(PvCommunityStore.feedKey(scope: 'room', sort: _sort, room: widget.roomId)))
+          ?p.about,
+      };
+      setState(() => _abouts
+        ..clear()
+        ..addAll(seen));
+    }
+  }
 
   Future<void> _menu() async {
     final r = _store.room(widget.roomId);
@@ -41,6 +62,14 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
     final a = await showCommunitySheet<String>(
       context,
       (c) => ListView(shrinkWrap: true, children: [
+        // B3: the team voice, for moderators, in any room including a course.
+        if (_store.me.isMod)
+          CommunitySheetRow(
+            icon: Icons.campaign_outlined,
+            label: 'Post as ParentVeda team',
+            note: 'Members see the team, never your name',
+            onTap: () => Navigator.pop(c, 'team'),
+          ),
         if (r.joined)
           CommunitySheetRow(
             icon: r.muted ? Icons.notifications_active_outlined : Icons.notifications_off_outlined,
@@ -53,7 +82,9 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
           label: 'House rules',
           onTap: () => Navigator.pop(c, 'rules'),
         ),
-        if (r.joined)
+        // A course room is held by her seat, not by Join, so there is no
+        // Leave: she would be put back the next time the course page opens.
+        if (r.joined && !r.isOffering)
           CommunitySheetRow(
             icon: Icons.logout_rounded,
             label: 'Leave room',
@@ -64,6 +95,8 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
     );
     if (!mounted || a == null) return;
     switch (a) {
+      case 'team':
+        await openCommunityCompose(context, roomId: r.id, asTeam: true);
       case 'mute':
         final ok = await _store.setRoom(r.id, join: true, mute: !r.muted);
         if (mounted) {
@@ -136,6 +169,14 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
                             const SizedBox(height: 12),
                             Text(r.title, style: cmTitle(30)),
                             const SizedBox(height: 6),
+                            if (r.isOffering)
+                              // No Join: her seat is her membership (B1).
+                              CommunityStatusLine(
+                                key: const ValueKey('community_room_offering_line'),
+                                icon: Icons.lock_outline_rounded,
+                                text: '${communityDiscussionTitle(r)} · only people in this batch can see it · moderated',
+                              )
+                            else ...[
                             Text(r.blurb, style: cmText(14.5, color: cmP.ink2)),
                             const SizedBox(height: 14),
                             Row(children: [
@@ -173,11 +214,13 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
                                 ),
                               ),
                             ]),
+                            ],
                           ]),
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: Padding(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
                     child: Row(children: [
                       CommunityPill(
@@ -197,6 +240,21 @@ class _CommunityRoomScreenState extends State<CommunityRoomScreen> {
                           _load();
                         },
                       ),
+                      // (0137) What a course post is about: one room per
+                      // batch, filtered by lesson, beats a row of empty
+                      // per-lesson rooms (L.2).
+                      if (r?.isOffering == true)
+                        for (final a in _abouts) ...[
+                          const SizedBox(width: 8),
+                          CommunityPill(
+                            label: communityAboutLabel(r!.programmeId, a),
+                            selected: _about == a,
+                            onTap: () {
+                              setState(() => _about = _about == a ? null : a);
+                              _load();
+                            },
+                          ),
+                        ],
                     ]),
                   ),
                 ),
