@@ -312,19 +312,19 @@ written down so it isn't lost.
 - [ ] **LA-19 · No recording pipeline** (egress → bucket → Mux → lesson → signed playback). The buy sheet sells "a
   recording to keep". · L.7 · **L3** · open · **live 2026-10-29**, `54875c57`, 0128 run, functions deployed. Still open until the Mux account and S3 keys are set and one class recording has been walked from the call to Your bookings › Watch (host joins a class → `begin_recording` → room-composite egress to the bucket → `egress_ended` → a 24-hour signed URL → a Mux asset → `mux-webhook` writes the playback id → Your bookings › Past "Watch", and a course lesson plays when a row with its `lesson_id` is ready). Needs the Mux account and the S3 keys before it can be walked
 - [ ] **LA-20 · No discussion, though it is sold** ("private discussion group"). · L.2–L.6 · **L4** · **built
-  2026-10-30 (L4a), not yet committed; 0137 not yet run.** One room per run (`run_<id>`), opened by
+  2026-10-30 (L4a), committed `5e1ab087`, 0137 run; member half `33ddfc32` (L4b). Open only for the phone walk.** One room per run (`run_<id>`), opened by
   `has_course_access(programme, 'thread', run)` (receipt, a booked seat incl. a credit seat, a route A host, a
   moderator; for life). Course page section + lesson Discussion tab + room course variant (about pills, no Join);
   team voice + pin. Detail: docs/COMMUNITY.md "As built (phase 2)". Closes when 0137 is run and the course thread is
   walked on a phone with a booked account and a host account
 - [ ] **LA-21 · Doctor side: no discussion, unread counts, posting or pinning.** · L.5 · **L4** · **built 2026-10-30
-  (L4a), not yet committed; 0137 not yet run.** Doctor home section 8 is "Your offerings" from
+  (L4a), committed `5e1ab087`, 0137 run. Open only for the walk.** Doctor home section 8 is "Your offerings" from
   `expert_my_offerings()` (every run she hosts, route A: role, seats, next session, unread) → the room as host (badge +
   role, answer, pin; no remove or mute), plus "Parents asking an expert to look" → the queue. Go live unchanged
   (ClassCard / DoctorClassesScreen). Closes with the same walk on the doctor flavour
 - [ ] **LA-22 · A timetable change reaches no one.** A server edit must notify the people booked (a pinned team
-  notice first; push in phase 3). · L.6 · **L4** · **pinned notice built 2026-10-30 (L4a), not yet committed; 0137
-  not yet run.** `_mirror_session` reads the slot's old start before the upsert and, when the start moved and anyone
+  notice first; push in phase 3). · L.6 · **L4** · **pinned notice built 2026-10-30 (L4a), committed `5e1ab087`,
+  0137 run; open for the walk and for push.** `_mirror_session` reads the slot's old start before the upsert and, when the start moved and anyone
   holds an upcoming seat, writes a pinned "ParentVeda team" notice in the run's room (old → new time in India time,
   `moved_from`, pinned until the new start, audit row with actor null). The booking card in Your bookings reads "Moved
   from …" from it. **Still owed by phase 3 (push):** an FCM message to everyone with an upcoming seat when the notice
@@ -435,7 +435,7 @@ Each step depends only on the steps before it.
 | **L2c** · **built 2026-10-29, not committed** | The app on the server: `PaymentService` sends only the id; `my_purchases()` replaces local minting (kept for revert); the app books `ps_<id>`; the preview through the stub; a recorded course sellable; refund copy; Your bookings gains Payments and reads receipts from the server (L.22) | — | Installs the build; walks buy → book → join in test mode |
 | **L3** · **closed 2026-10-29, `54875c57`, 0128 run, functions deployed, LiveKit webhook added** (recordings open until Mux) | `livekit-webhook` (attendance, +10 / +20 states), room capacity, the 0075 fallback removed, egress → bucket → Mux → lesson, playback through `has_course_access`; Your bookings' Past shows attendance and the recording; LA-29 schedule check with a parity table; LA-32 expand; LA-34 | `0128` (`0127` went to TTC records) | Runs 0128 and its VERIFY; deploys five functions; adds the LiveKit webhook; S3 keys; then a Mux account for the recording walk; LiveKit Ship before the first paid class |
 | **Credits fix** · **done 2026-10-30, `7ee716a9`, 0135 run** | LA-35 to LA-46: a cancel tells the truth, a one-transaction reschedule, refunds once, held sessions, the 6-argument `open_session_room` dropped | `0135` | Ran it 2026-10-30 |
-| **L4** | Community phase 2 on this model (Part B of `course-receipts-then-community-p2.md`), including the doctor's "Your offerings" | next free | As in Part B |
+| **L4** · **closed 2026-10-30, `5e1ab087` (L4a, 0137 run) + `33ddfc32` (L4b); phone walk owed** | Community phase 2 on this model (Part B of `course-receipts-then-community-p2.md`), including the doctor's "Your offerings" | next free | As in Part B |
 
 **Why L2b and L2c are separate.** While L2b is live and L2c isn't, the old app keeps working because the server is
 still in `stub` mode. When you change a contract, the server learns the new shape first and the client moves
