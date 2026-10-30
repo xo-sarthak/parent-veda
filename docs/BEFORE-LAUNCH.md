@@ -134,6 +134,7 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 - [ ] **DECIDE** · The Amazon tag: links carry `ishaanlive07-21` until the ParentWise Associates account is approved; then change `kPartnerTags['amazon.in']` in `lib/brand/outbound.dart` and re-run the converter · user · STILL-OPEN §106.0 · added 2026-10-28
 - [ ] **LAUNCH** · Someone approves parents' reviews: until Directus has a queue, set `moderation_status = 'approved'` on `product_reviews` in the Supabase dashboard; nothing shows to others before that · user · BACKEND-PATTERNS §16zzh · added 2026-10-28
 - [ ] **LAUNCH** · A real-money trial before go-live: dummy payments first, then real ₹1–₹10 payments end to end (the user's brief, 2026-10-28). Affects own products (Track B), not affiliate links · user + dev · store plan, handwritten brief · added 2026-10-28
+- [ ] **BLOCKER** · Firebase project `parentveda-15ec4`: owned by the company's Google account with at least two owners, the partner flavour (`com.parentveda.app.partners`) registered, Analytics left off, and the B1 build check done (parent with and without `google-services.json`, doctor, partner). The FCM service-account key (`FCM_SERVICE_ACCOUNT`) lives only in Supabase secrets and outside the repo · user · `docs/NOTIFICATIONS-6B-PLAN.md` "Setup" · added 2026-10-30
 
 ## 2. Security and privacy
 
@@ -147,6 +148,7 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 - [ ] **LAUNCH** · Sponsor-uploaded resources: a review path and a "never medical advice" rule before any sponsor uploads · dev · STILL-OPEN §11.5 · added 2026-10-17
 
 ---
+- [ ] **LAUNCH** · Privacy policy line: "Your health information is never used to choose which offers you see." True by design in 6b: the server reads no TTC table, only a yes/no "quiet" flag from the phone, and targets offers by stage, pregnancy week and child age. Keep it true: any campaign targeting on health data needs this line revisited first · user + legal · `docs/NOTIFICATIONS-6B-PLAN.md` decision 9, B3 · added 2026-10-30
 
 ## 3. Legal and compliance
 
@@ -160,6 +162,7 @@ Blockers for **real money** and **sponsors** are in §5. They gate those feature
 - [ ] **LAUNCH** · When real prices land, MRP is a legal ceiling (sell below, never above) · dev · BACKEND-PATTERNS §16hh · added 2026-10-17
 - [ ] **LAUNCH** · The IMS Act (Infant Milk Substitutes, Feeding Bottles and Infant Foods Act 1992) read of two catalogue products: the "Anti-Colic Feeding Bottle" (`pp_products_data.dart:585`), which the Feeding door's own rule says is never promoted, and the "Steam Steriliser" (`:636`), a bottle accessory. Neither is linked from the Feeding door (its IMS scan holds by test), but both can still surface on the home "Useful at this age" rail. A lawyer says keep, reword or take down; until then they stay listed · legal · docs/pp-door-plans/01-feeding.md §3d, §8 · added 2026-10-28
 - [ ] **CHECK** · Promotional notifications (Phase 6a offers): off until she taps "Yes, tell me" in Messages, with an in-app switch back (Apple guideline 4.5.4). Confirm this also meets DPDP Act 2023 consent for marketing to an Indian user, and that the Play listing's notification disclosure covers it · user, legal · docs/NOTIFICATIONS-PLAN.md · added 2026-10-28
+- [ ] **CHECK** · DPDP check extended to SERVER offers (6b): consent is a row per stage in `push_consent` with `decided_at` (the record), withdrawn by the same switch, and a "no" is retried until the server has it. Confirm with legal that this, plus the 10% holdout (people who said yes but are never sent offers, for measurement), meets DPDP Act 2023 · user, legal · `docs/NOTIFICATIONS-6B-PLAN.md` "Consent" · added 2026-10-30
 - [ ] **BLOCKER** · Community (user content): a named grievance officer and a 24/36-hour takedown process, as the IT Rules 2021 require of an intermediary hosting user posts; the contact shown in the house rules · user + legal · docs/COMMUNITY.md · added 2026-10-28 · **officer named 2026-10-28: Deepti Sekhri, parentvedateam@gmail.com, shown in the app (house rules, room rules, report thank-you)**; the takedown process is still owed
 - [ ] **BLOCKER** · Community helplines verified and wording signed: Tele-MANAS 14416, iCall 9152987821 (hours), 112, and the helpline block that shows while she types (`lib/services/community_safety.dart`) · legal + clinician · docs/COMMUNITY.md · added 2026-10-28
 - [ ] **LAUNCH** · Community moderators named, with a reply-time promise the report thank-you can keep (it says "within 24 hours"), and at least one `community_moderators` row on the live database · user · docs/COMMUNITY.md · added 2026-10-28
@@ -361,6 +364,7 @@ yet.** Dr Ruchika Sood alone has 72 pieces. There's no male-fertility specialist
 - [ ] **LAUNCH** (iOS only) · Apple Developer account ($99/yr ≈ ₹8,300), Sign in with Apple, `Info.plist` URL types, `apple-app-site-association` · user · AUTH-SETUP §4 · added 2026-10-17
 
 ---
+- [ ] **LAUNCH** · Play Console: the listing's data-safety form declares the push token (device identifier) sent to Firebase Cloud Messaging, and the store listing says the app sends offers and announcements only after a yes in Messages. Android 13+ asks for notification permission at runtime (already asked by the app) · user · `docs/NOTIFICATIONS-6B-PLAN.md` · added 2026-10-30
 
 ## 7. Monitoring and operations
 

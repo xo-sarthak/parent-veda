@@ -5345,3 +5345,47 @@ Pinned by `test/partner_content_test.dart` (the one rule and its doors on the la
 through the public wrapper, `restrict`, the trigger's `when`, the Content tab's held-back dash) and
 `supabase/seed/verify_exclusive_content.sql` (RLS as anon, a non-member, a member and a family; both purchase doors;
 the coupon; the Content RPC; suspended vs ended).
+
+## 16zzz-c. One function holds the rules; a check on the table holds for every writer; a race needs a constraint; a hash you measure with must never change (Notifications 6b B3, 0143, 2026-10-30)
+
+B3 decides who gets which offer tonight. It writes a booking row and sends nothing, so the decision can be read,
+dry-run and re-run safely.
+
+**1. Every rule once, read by everyone who needs it.** The enqueue and the admin's dry run both ask "would she get
+this, and if not, why?". If each had its own copy, the dry run would be right on the day it was written and drift
+after. `pv_push_check` returns one row per campaign and person with the *first* rule that failed (or null).
+The enqueue takes the nulls; the dry run counts the reasons. **Two readers of one rule cannot disagree; two copies of
+one rule eventually will.**
+
+**2. A rule in a function holds only for its callers.** The length limits, "no placeholders" and "no week or day
+number" could live in `pv_campaign_create`. But Directus will later write `push_campaigns` directly and never call it.
+So they are `CHECK` constraints, named, so a refusal says which rule (`push_campaigns_title_length`). **Put a rule as
+low as it can go: the table sees every writer, a function sees only the polite ones.**
+
+**3. A rule a race can break needs a constraint.** "One campaign an evening" is checked in `pv_push_check`, but two
+enqueue runs at the same moment could each read "nothing booked" and both insert. The partial unique index
+`(user_id, send_on) where status <> 'skipped'` makes the second insert a no-op (`on conflict do nothing`). The
+`where` matters: a cancelled booking is `skipped` and frees the evening. **A check-then-insert is a read and a
+write with a gap between them; only the database can close the gap.**
+
+**4. A hash you measure with must never change.** The 10% holdout is `md5(salt || user_id)`, not Postgres's
+`hashtext`, which is not promised stable across versions. If an upgrade reshuffled the groups, the people who had
+been held out would start getting offers and the comparison would be worthless with nothing to show it broke.
+The salt keeps this split independent of any later split on the same ids.
+
+**5. Who may call it is part of the design.** `pv_push_check` reads everyone's consent and audience. Postgres grants
+`EXECUTE` on a new function to `PUBLIC`, and Supabase also grants it to `anon` and `authenticated`, so an app could
+have listed who said yes. Every B3 function revokes all three and grants `service_role` only. The SQL editor and the
+cron run as the owner. The phone reads only its own bookings, and a campaign only once it is booked for her (a policy
+whose subquery reads `push_sends`, itself filtered to her, §16zzz-b point 3).
+
+**6. A cutoff stored with the booking, not computed by the sender.** Each row carries `send_before` (21:00 IST that
+evening). A sender that runs late, or every minute (B4), needs no clock rule of its own: past the cutoff, skip.
+**Store the deadline with the work, and every worker obeys the same one.**
+
+**7. The trade we kept: a yes/no flag goes stale.** The phone's quiet flag (two-week wait, treatment, a loss) is as
+fresh as her last app open. Sending her TTC phase would fix that and break "health data never chooses an offer".
+We kept the flag and wrote the risk down; the fix, if it bites, is a date list in the busy-evenings shape (the
+phone already knows the next 14 days).
+
+Pinned by `test/push_b3_contract_test.dart` and proved on the database by `supabase/seed/verify_push_campaigns.sql`.
