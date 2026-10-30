@@ -328,6 +328,7 @@ class PvCommunityStore extends ChangeNotifier {
             ?PvCommunityComment.fromJson(e['local']),
       ];
       _comments[postId] = [...server, ...queued];
+      _fresh.remove(postId); // a pull shows everything; nothing is left waiting
       notifyListeners();
       return true;
     } catch (_) {
@@ -1447,10 +1448,103 @@ class PvCommunityStore extends ChangeNotifier {
     }
   }
 
+  // ---- the live thread (0145, phase 3 C3-1) -----------------------------------
+  //
+  // While a post is open, the server signals "a reply changed on post X" on a
+  // private topic. The signal carries only the post id, so we re-read through
+  // community_comments_list: blocks, holds and faces apply as they always do.
+  //
+  // ⚠️ THE RE-READ GOES INTO [_fresh], NOT [_comments]. The screen renders
+  // _comments; writing there would move the list under her finger as she
+  // reads. _fresh waits until she taps the pill ([showNewReplies]). A change
+  // with nothing new in it (a reply removed, a like) is not worth a pill and
+  // waits for her next pull or visit.
+
+  final Map<String, PvLiveListen> _live = {};
+  final Map<String, List<PvCommunityComment>> _fresh = {};
+  final Map<String, Timer> _liveWait = {};
+
+  @visibleForTesting
+  PvLiveListen? Function(String topic, void Function() onSignal)? debugListen;
+
+  /// Replies waiting behind the "N new replies" pill.
+  int newReplies(String postId) {
+    final f = _fresh[postId];
+    return f == null ? 0 : communityNewReplyIds(_comments[postId] ?? const [], f).length;
+  }
+
+  /// The post screen opened. Safe to call twice; a no-op signed out.
+  void watchPost(String postId) {
+    if (!signedIn || _live.containsKey(postId)) return;
+    final topic = 'post:$postId';
+    void signal() => _onLiveSignal(postId);
+    final sub = debugListen != null ? debugListen!(topic, signal) : SupabaseRepo.listenBroadcast(topic, 'reply', signal);
+    if (sub != null) _live[postId] = sub;
+  }
+
+  /// The post screen closed: leave the topic and drop what was waiting.
+  void unwatchPost(String postId) {
+    _live.remove(postId)?.close();
+    _liveWait.remove(postId)?.cancel();
+    _fresh.remove(postId);
+  }
+
+  // Three replies in a second are one re-read, not three.
+  void _onLiveSignal(String postId) {
+    _liveWait[postId]?.cancel();
+    _liveWait[postId] = Timer(const Duration(milliseconds: 700), () => _fetchFresh(postId));
+  }
+
+  Future<void> _fetchFresh(String postId) async {
+    if (!_live.containsKey(postId)) return;
+    try {
+      final res = await _call('community_comments_list', {'p_post': postId, 'p_sort': 'top'});
+      final server = [
+        for (final c in (res is List ? res : const []))
+          ?PvCommunityComment.fromJson(c),
+      ];
+      if (!_live.containsKey(postId)) return; // she left while it loaded
+      if (communityNewReplyIds(_comments[postId] ?? const [], server).isEmpty) return;
+      _fresh[postId] = server;
+      notifyListeners();
+    } catch (_) {
+      // A missed re-read costs a pill. Pull to refresh still works.
+    }
+  }
+
+  /// She tapped the pill: show what was waiting. Returns the new replies'
+  /// ids, for the screen to scroll to and ring.
+  List<String> showNewReplies(String postId) {
+    final f = _fresh.remove(postId);
+    if (f == null) return const [];
+    final ids = communityNewReplyIds(_comments[postId] ?? const [], f);
+    final queued = [
+      for (final e in _outbox)
+        if (e['kind'] == 'comment' && e['params']?['p_post'] == postId)
+          ?PvCommunityComment.fromJson(e['local']),
+    ];
+    _comments[postId] = [...f, ...queued];
+    notifyListeners();
+    return ids;
+  }
+
+  @visibleForTesting
+  Future<void> debugFetchFresh(String postId) => _fetchFresh(postId);
+
   // ---- tests -----------------------------------------------------------------
 
   @visibleForTesting
   void debugReset() {
+    for (final l in _live.values) {
+      l.close();
+    }
+    _live.clear();
+    _fresh.clear();
+    for (final t in _liveWait.values) {
+      t.cancel();
+    }
+    _liveWait.clear();
+    debugListen = null;
     _loaded = false;
     _me = const PvCommunityMe();
     _rooms = const [];
@@ -1473,4 +1567,15 @@ class PvCommunityStore extends ChangeNotifier {
     debugBackend = null;
     debugSignedIn = null;
   }
+}
+
+/// Replies in [fresh] that are not in [shown] and not hers, in [fresh]'s
+/// order. Her own replies never count: she saw each one as she sent it, and
+/// the app made its id, so her local copy and the server's share it.
+List<String> communityNewReplyIds(List<PvCommunityComment> shown, List<PvCommunityComment> fresh) {
+  final have = {for (final c in shown) c.id};
+  return [
+    for (final c in fresh)
+      if (!have.contains(c.id) && !c.author.isMine) c.id,
+  ];
 }

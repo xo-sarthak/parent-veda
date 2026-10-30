@@ -2,6 +2,8 @@
 // the post in full, Top / Newest / Mine over the replies, replies one level
 // deep behind "View N replies", and a reply bar docked to the bottom that
 // rides up with the keyboard.
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -37,6 +39,12 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
   bool _loaded = false;
   bool _sending = false;
 
+  // (0145, C3-1) Replies just shown from the pill: ringed for two seconds,
+  // and keyed so the list can scroll to the first.
+  Set<String> _ring = const {};
+  final Map<String, GlobalKey> _ringKeys = {};
+  Timer? _ringTimer;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +52,8 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
     _store.init().then((_) async {
       await _store.loadPost(widget.postId);
       await _store.loadComments(widget.postId, sort: _filter == 'new' ? 'new' : 'top');
+      // (0145) Live while open: another phone's reply raises the pill.
+      if (mounted) _store.watchPost(widget.postId);
       // (0137) An expert replies under her own name and badge; in a course
       // room the default is her first name (classmates), as in the composer.
       final p = _store.post(widget.postId);
@@ -56,6 +66,8 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
 
   @override
   void dispose() {
+    _store.unwatchPost(widget.postId);
+    _ringTimer?.cancel();
     _reply.dispose();
     _focus.dispose();
     _scroll.dispose();
@@ -96,6 +108,48 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       }
     }
     communityOutcomeToast(context, o, what: 'reply', crisis: o == PvCommunityOutcome.live && communityLooksLikeCrisis(text));
+  }
+
+  /// The pill: show the waiting replies, scroll to the first, ring them.
+  /// The list did not move before this tap; now it moves because she asked.
+  void _showNewReplies() {
+    final ids = _store.showNewReplies(widget.postId);
+    if (ids.isEmpty) return;
+    final all = _store.comments(widget.postId) ?? const <PvCommunityComment>[];
+    setState(() {
+      // Mine and Experts could hide them; Newest shows them first.
+      if (_filter == 'mine' || _filter == 'experts') _filter = 'new';
+      for (final c in all) {
+        if (ids.contains(c.id) && c.parentId != null) _open.add(c.parentId!);
+      }
+      _ring = ids.toSet();
+      _ringKeys
+        ..clear()
+        ..addAll({for (final id in ids) id: GlobalKey()});
+    });
+    HapticFeedback.selectionClick();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // The ringed reply highest on the page, in the order the list draws.
+      BuildContext? first;
+      double firstY = double.infinity;
+      for (final k in _ringKeys.values) {
+        final c = k.currentContext;
+        final box = c?.findRenderObject() as RenderBox?;
+        if (c == null || box == null) continue;
+        final y = box.localToGlobal(Offset.zero).dy;
+        if (y < firstY) {
+          first = c;
+          firstY = y;
+        }
+      }
+      if (first != null && first.mounted) {
+        Scrollable.ensureVisible(first, alignment: 0.2, duration: PvMotion.enter, curve: PvMotion.arrive);
+      }
+    });
+    _ringTimer?.cancel();
+    _ringTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _ring = const {});
+    });
   }
 
   void _startReply(PvCommunityComment c) {
@@ -257,7 +311,8 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
           ),
           body: Column(children: [
             Expanded(
-              child: RefreshIndicator(
+              child: Stack(children: [
+              RefreshIndicator(
                 color: kPvInk,
                 onRefresh: () async {
                   await _store.loadPost(widget.postId);
@@ -402,11 +457,32 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                             onReply: _startReply,
                             onMenu: _commentMenu,
                             postId: widget.postId,
+                            ring: _ring,
+                            ringKeys: _ringKeys,
                           ),
                         ),
                   ],
                 ),
               ),
+              // (0145, C3-1) "N new replies": the list waits for her tap.
+              Positioned(
+                top: 10,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: PvMotion.swap,
+                    child: _store.newReplies(widget.postId) == 0
+                        ? const SizedBox.shrink()
+                        : _NewRepliesPill(
+                            key: const ValueKey('community_new_replies_pill'),
+                            count: _store.newReplies(widget.postId),
+                            onTap: _showNewReplies,
+                          ),
+                  ),
+                ),
+              ),
+              ]),
             ),
             _ReplyBar(
               controller: _reply,
@@ -439,10 +515,14 @@ class _Thread extends StatelessWidget {
     required this.onReply,
     required this.onMenu,
     required this.postId,
+    this.ring = const {},
+    this.ringKeys = const {},
   });
 
   final PvCommunityComment comment;
   final List<PvCommunityComment> replies;
+  final Set<String> ring;
+  final Map<String, GlobalKey> ringKeys;
   final bool open;
   final VoidCallback onOpen;
   final ValueChanged<PvCommunityComment> onReply;
@@ -451,7 +531,14 @@ class _Thread extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _Bubble(comment: comment, onReply: onReply, onMenu: onMenu, postId: postId),
+        _Bubble(
+          key: ringKeys[comment.id],
+          comment: comment,
+          onReply: onReply,
+          onMenu: onMenu,
+          postId: postId,
+          ring: ring.contains(comment.id),
+        ),
         if (replies.isNotEmpty)
           AnimatedSize(
             duration: PvMotion.resize,
@@ -462,7 +549,15 @@ class _Thread extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 42),
                     child: Column(children: [
                       for (final r in replies)
-                        _Bubble(comment: r, onReply: onReply, onMenu: onMenu, postId: postId, small: true),
+                        _Bubble(
+                          key: ringKeys[r.id],
+                          comment: r,
+                          onReply: onReply,
+                          onMenu: onMenu,
+                          postId: postId,
+                          small: true,
+                          ring: ring.contains(r.id),
+                        ),
                     ]),
                   )
                 : Padding(
@@ -484,13 +579,16 @@ class _Thread extends StatelessWidget {
 
 class _Bubble extends StatelessWidget {
   const _Bubble({
+    super.key,
     required this.comment,
     required this.onReply,
     required this.onMenu,
     required this.postId,
     this.small = false,
+    this.ring = false,
   });
   final PvCommunityComment comment;
+  final bool ring;
   final ValueChanged<PvCommunityComment> onReply;
   final ValueChanged<PvCommunityComment> onMenu;
   final String postId;
@@ -519,11 +617,15 @@ class _Bubble extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             PvPress(child: GestureDetector(
               onLongPress: () => onMenu(c),
-              child: Container(
+              child: AnimatedContainer(
+                duration: PvMotion.swap,
                 padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF3F3F4),
-                  borderRadius: BorderRadius.only(
+                // (0145) A reply just shown from the pill is ringed for two
+                // seconds, so she can tell which ones are new.
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F3F4),
+                  border: Border.all(color: ring ? const Color(0xFF1D74E0) : const Color(0x00000000), width: 2),
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(4),
                     topRight: Radius.circular(16),
                     bottomLeft: Radius.circular(16),
@@ -828,4 +930,32 @@ class _ReplyBar extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "2 new replies" (0145, C3-1). Ink, like every action in the app.
+class _NewRepliesPill extends StatelessWidget {
+  const _NewRepliesPill({super.key, required this.count, required this.onTap});
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: kPvInk,
+        shape: const StadiumBorder(),
+        elevation: 6,
+        shadowColor: Colors.black38,
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 9, 16, 9),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.arrow_upward_rounded, size: 16, color: Colors.white),
+              const SizedBox(width: 6),
+              Text(count == 1 ? '1 new reply' : '$count new replies',
+                  style: cmText(13.5, weight: FontWeight.w700, color: Colors.white)),
+            ]),
+          ),
+        ),
+      );
 }

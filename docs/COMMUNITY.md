@@ -460,3 +460,85 @@ Tests scoped to `community_*`, `push_*`, `notifications_b0_tap_test`.
 **Owed by the user before C3-4:** Mux's free plan stores only 10 videos; video needs pay-as-you-go ($20 of usage
 included a month, ≈ ₹1,680). Check which plan the L3 account is on. Before C3-3: a Google Cloud key with the Vision
 API on, and a privacy-policy line that photos are screened by Google (DPDP).
+
+### P0 signed off (2026-10-30)
+
+Prototype: https://claude.ai/artifact/WhnEf3SekmCeUjSsREEAND (10 screens). The user: "I like the prototype."
+
+| # | Question | Recommended | User (2026-10-30) |
+|---|---|---|---|
+| P0-1 | She taps "Not now" on the reply-alerts ask: ask again later? | No. The switch stays in Settings, Notifications, Community | Recommended |
+| P0-2 | Moderator alert wording | "A post may need a moderator now" / "Open Moderation to see it." | Keep it; it only has to be clear to a moderator |
+| P0-3 | Moderator alert in quiet hours | Rings at any hour (someone may be at risk); the moderator can turn it off | Recommended, and **on by default** |
+| P0-4 | Tapping the new-replies pill | Scroll to the first new reply, ring the new ones for two seconds | Recommended |
+| P0-5 | Photos and video on one post | Photos or one video, never both | Recommended. Photo limits: keep what phase 1 built (below) |
+| P0-6 | Approving a video | Only after the moderator has played it to the end | Recommended |
+
+**P0-5, the photo limits, checked in the code rather than added.** Phase 1 already caps photos twice, once per
+side. The phone allows **4 per post** and shrinks each one before upload (`pickMultiImage(maxWidth: 1600,
+imageQuality: 85, limit: left)`, `community_compose_screen.dart`), which usually lands at 0.3 to 0.8 MB. The server
+refuses any file over **5 MB**, or anything that is not JPEG, PNG or WebP (`community-media` bucket, 0122). The two
+limits do different jobs. The phone's limit is for her: a small file uploads quickly on a weak connection. The
+server's limit is for us: a modified app cannot skip it. Nothing new is needed.
+
+**How moderators work (the user asked, 2026-10-30).** A moderator uses the same parent app with their own account.
+What makes them a moderator is one row in `community_moderators` holding their account id, added from the Supabase
+dashboard (0121). That is a setting on the server, not a separate login or a separate app. The app learns it from
+`community_me().is_mod`, and only then shows the shield on Community home that opens Moderation. Every moderator
+action is checked again on the server by `community_is_mod()` and written to `community_mod_actions` with their
+name. A changed app therefore gains nothing: hiding the shield is presentation, and the check is the server's. From
+C3-2, a moderator's phone also gets the "Moderation" alerts (P0-3), on the phone where they are signed in. The
+doctor app does not get them (6B decision 6).
+
+## As built (phase 3) — C3-1, the live thread (2026-10-30)
+
+### Server: `supabase/migrations/0145_community_live_thread.sql`
+
+- **`community_comment_broadcast()` + trigger `community_comments_broadcast`** (after insert, or an update of
+  `status` / `deleted_at`, on `community_comments`). It calls `realtime.send({post_id}, 'reply', 'post:<id>',
+  private)`. A held reply's insert sends nothing. Its approval does send.
+- **`community_can_listen(topic)`**, granted to `authenticated` only. It is `community_can_see` for the post the topic
+  names. The policy `community_post_listen` on `realtime.messages` is **SELECT only**. There is no insert policy, so a
+  phone can never send on a post topic.
+- **Verify:** `supabase/seed/verify_community_live.sql` (10 checks, ends in a red ERROR that rolls everything back).
+
+**The patterns are in BACKEND-PATTERNS §16zzz-e (renumbered: B4 took 16zzz-d).** Short form, kept here:
+1. **Signal, then re-read.** The broadcast says "post X changed" and carries no data. The phone re-reads through the
+   same definer function as always, so blocks, holds and faces apply without being re-implemented in a second
+   channel. The cost is one extra RPC per change. In return, Realtime does not need its own privacy rules. The
+   ready-made Postgres Changes stream would have sent the row, `user_id` included.
+2. **A side channel never blocks the main write.** `realtime.send` sits in its own `BEGIN ... EXCEPTION` block. In
+   PL/pgSQL that block is a savepoint, so if Realtime fails, only the signal is rolled back and her reply still
+   saves. A missed signal costs a pill. A failed reply would cost her words.
+3. **Listen-only topics.** On a private channel, a SELECT policy decides who may join and an INSERT policy decides
+   who may send. Leaving out INSERT means only the database speaks on these topics.
+4. **A policy runs as the user.** That is why it calls a granted wrapper (`community_can_listen`), not the revoked
+   helper underneath it.
+
+### App
+
+- `SupabaseRepo.listenBroadcast(topic, event, onSignal)` + `PvLiveListen` (the only Realtime code in the app;
+  `RealtimeChannelConfig(private: true)`). Returns null when signed out or when Supabase is not initialised.
+- `PvCommunityStore`: `watchPost` / `unwatchPost`. A signal waits 700 ms so that a burst of replies causes one
+  re-read. The re-read lands in a **waiting buffer**, never in the list on screen. `newReplies(id)` counts what is
+  new, using `communityNewReplyIds`, which leaves out her own replies. `showNewReplies(id)` swaps the buffer in.
+  `loadComments` (pull to refresh) clears the buffer.
+- `CommunityPostScreen`: watches the post while it is open, shows the ink "N new replies" pill at the top, and on a
+  tap scrolls to the first new reply and rings the new ones in the tick blue for two seconds. If she is on Mine or
+  Experts, it switches to Newest, because those filters could hide the new replies. A reply threaded under another
+  opens its thread.
+
+### Tests
+
+`test/community_live_thread_test.dart` (9): what the payload carries, listen-only access, the savepoint, no rewrite of
+0137 (C13), the new-reply rule, signed out does nothing, the pill with a list that does not move, her own reply
+raising nothing, and the screen's wiring. All community tests: 112 pass.
+
+### Owed by the user
+
+1. Run `0145_community_live_thread.sql` (RUN 2026-10-30). Wake Realtime once: Dashboard > Realtime > Inspector, join any channel. Its daily partitions only exist after a first connection; the first verify found none. Then run `supabase/seed/verify_community_live.sql` and expect "10 passed, 0 failed".
+2. Phone walk with two accounts: A opens a post, B replies, and A sees "1 new reply" without the list moving.
+3. Nothing to switch on in the dashboard. The project is on the FREE plan (seen 2026-10-30): Realtime there allows 200 concurrent connections and 2M messages a month, ample before launch; Pro raises it to 500 concurrent
+   connections and 5M messages a month).
+
+**NEXT:** C3-2 alerts, once 6B's B4 sender is committed (it is in the tree as 0144, not yet committed).

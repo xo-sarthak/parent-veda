@@ -796,6 +796,25 @@ class SupabaseRepo {
     return _client.rpc(fn, params: params);
   }
 
+  /// Listen to a PRIVATE broadcast topic (0145, Community C3-1): the server
+  /// says "something changed" and the caller re-reads through its usual
+  /// RPC. The topic's SELECT policy on realtime.messages decides who may
+  /// join; a refused join simply never fires [onSignal].
+  ///
+  /// Null when logged out or uninitialised, like every other cloud call
+  /// here. A live connection is an extra, never a dependency: whatever
+  /// fails, the caller's pull-to-refresh still works.
+  static PvLiveListen? listenBroadcast(String topic, String event, void Function() onSignal) {
+    if (userId == null) return null;
+    try {
+      final ch = _client.channel(topic, opts: const RealtimeChannelConfig(private: true));
+      ch.onBroadcast(event: event, callback: (_) => onSignal()).subscribe();
+      return PvLiveListen(() => _client.removeChannel(ch).catchError((_) => 'error'));
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Update rows matching every column in [filters]. The mirror of
   /// [deleteMatch], for a table whose natural key is not `id` — a sample claim
   /// is identified by (campaign_id, user_id), not by a serial nobody holds.
@@ -1098,4 +1117,20 @@ class EdgeResult {
 
   /// The server's own word for what went wrong, when it gave one.
   String? get reason => (data?['reason'] ?? data?['error'])?.toString();
+}
+
+/// A live subscription from [SupabaseRepo.listenBroadcast]. [close] leaves
+/// the channel; calling it twice, or after a failure, is harmless.
+class PvLiveListen {
+  PvLiveListen(this._close);
+  final void Function() _close;
+  bool _closed = false;
+
+  void close() {
+    if (_closed) return;
+    _closed = true;
+    try {
+      _close();
+    } catch (_) {}
+  }
 }

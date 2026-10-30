@@ -5428,3 +5428,54 @@ early. The function itself uses the service-role key, which never leaves Supabas
 is gone from that phone), not on any error: a bad payload or a Firebase outage must not wipe her devices.
 
 Pinned by `test/push_b4_contract_test.dart` and proved on the database by `supabase/seed/verify_push_send.sql`.
+
+## 16zzz-e. Signal, then re-read; a side channel never blocks the main write; a topic you may hear but not speak on; a policy runs as the user (Community C3-1, 0145, 2026-10-30)
+
+C3-1 makes an open thread live: another phone's reply raises "N new replies" on hers. The server half is one
+trigger and one policy.
+
+**1. Signal, then re-read.** Supabase offers two kinds of Realtime. *Postgres Changes* streams the changed row to
+everyone the table's RLS admits. *Broadcast* sends whatever message you choose on a named topic. We used Broadcast
+and sent almost nothing: `{post_id}`. The phone then re-reads through `community_comments_list`, the same definer
+function as always. Postgres Changes would have sent the whole row, and the row carries `user_id`, the one thing
+anonymity hides (§16zzd). It would also have needed table grants the app deliberately lacks. Re-reading costs one
+extra RPC per change. In return, the live channel needs no privacy rules of its own: blocks, holds and faces are
+enforced where they already were. **A notification that carries data is a second read path to secure. One that only
+says "look again" is not.**
+
+**2. A side channel never blocks the main write.** The trigger's `realtime.send` sits in its own `BEGIN ...
+EXCEPTION` block. In PL/pgSQL that block is a savepoint: an error inside it rolls back only what happened inside it,
+and the reply that fired the trigger still commits. Without it, a Realtime outage would make posting a reply fail.
+Rank the two failures: a missed signal costs a pill, and pull to refresh still works; a failed reply costs her
+words. The same savepoint makes a broken signal *silent*, so it needs a test that can see it. **The verify file
+counts rows in `realtime.messages`, because nothing in the app would ever notice.**
+
+**3. A topic you may hear but not speak on.** Private broadcast checks the join against policies on
+`realtime.messages`. A SELECT policy decides who may listen; an INSERT policy decides who may send. We wrote only
+SELECT. So no phone can publish on `post:<id>`, and nobody can fake "new replies" on another person's thread. Only
+the database speaks there, through a definer trigger.
+
+**4. A policy runs as the user.** RLS policies run with the caller's rights, not the owner's.
+`community_can_see` is revoked from `authenticated` (0121), so a policy that called it would fail for every user.
+The fix is a narrow wrapper, `community_can_listen(topic)`. It is granted, and it answers only yes or no, for her,
+about the post the topic names. That is nothing she could not learn by opening the post. Signed out never gets that
+far: the policy is `to authenticated` and `anon` cannot execute the wrapper. **Keep the strong helper private and
+grant a question-shaped door to it.**
+
+**5. Keep the list still.** The app writes the re-read into a waiting buffer, not into the list on screen. A list
+that grows under her finger is a list that jumps. The buffer swaps in only when she taps the pill. A change with
+nothing new in it, such as a reply removed or a like, doesn't raise a pill, and waits for her next pull.
+
+Pinned by `test/community_live_thread_test.dart` and proved on the database by `supabase/seed/verify_community_live.sql`.
+
+**6. Found on the live database: a send needs somewhere to land.** The first verify run passed 8 of 10, and no
+broadcast row was ever written. `diagnose_realtime_send.sql` found the cause: `no partition of relation "messages"
+found for row`. `realtime.messages` is *partitioned* by day: one physical table per day under one logical table,
+so old days can be dropped whole instead of deleted row by row. The Realtime server creates each day's partition,
+but only once something has connected to it, and nothing on this project ever had. `realtime.send` caught the
+error and raised only a WARNING, which the SQL editor hides. Our own savepoint (point 2) would have hidden it too.
+Two lessons. First, **when you call a platform function inside an error-swallowing block, a verify that counts the
+rows it should have written is the only way you will learn it is not working.** Second, this heals itself in the
+real app: the phone that opens a thread is the client that wakes Realtime and makes it create the partitions, and
+a broadcast with nobody listening is not missed by anyone. The verify file now checks for partitions first and
+says how to wake Realtime from the dashboard.
