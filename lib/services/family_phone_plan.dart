@@ -71,6 +71,14 @@
 //  ⚠️ ONLY THE PHONE TIME MOVES. The message keeps its own time in Messages,
 //  its id and its cloud row: a corrected cycle date must never rewrite a
 //  child's message, which it would if the store's `at` depended on TTC's.
+//
+//  A CAMPAIGN TAKES THE EVENING (6b B5, 2026-10-30; `push_bookings.dart`).
+//  On an evening the server has booked a campaign for her, the capped evening
+//  message stays in Messages and does not ring: the campaign is that
+//  evening's one. A moment (rank 2 or better) still rings, here and in
+//  [parentingPhonePlan]: an offer never silences care. The server books only
+//  evenings the phone called free, so this is the backstop for a stale copy,
+//  not the everyday path.
 // =============================================================================
 
 import 'dart:async';
@@ -81,6 +89,7 @@ import 'life_stage_store.dart';
 import 'pp_messages_store.dart';
 import 'preg_messages_store.dart';
 import 'push_audience.dart';
+import 'push_bookings.dart';
 
 /// Pregnancy's kinds on the family scale. The order is [PregMessageKindInfo.slotRank]'s.
 double pregFamilyRank(PregMessageKind k) => switch (k) {
@@ -113,6 +122,13 @@ class _Item {
   final int child;
 }
 
+/// The ranks a campaign never silences (6b B5): the moments.
+const double kFamilyMomentRank = 2;
+
+/// The hour a booked campaign arrives (19:00 IST, B4). A moment that still
+/// rings on that evening keeps [kFamilyRingGap] clear of it.
+const int kPushCampaignHour = 19;
+
 String _slot(DateTime at) =>
     '${at.year}-${at.month}-${at.day}|${at.hour < kPregEveningFromHour ? 'am' : 'pm'}';
 
@@ -122,10 +138,14 @@ String _slot(DateTime at) =>
 /// Per calendar day, one morning slot and one evening slot; in each the
 /// lowest rank wins (see the header for the ties). Each winner takes the next
 /// free id of its own kind; a kind out of ids waits for a later refresh.
+///
+/// [bookedEvenings] (6b B5): days whose evening a campaign holds. There only
+/// a moment may still ring; everything else stays in Messages.
 ({List<(int, PregMessage)> preg, List<(int, PpMessage)> pp}) familyPhonePlan({
   List<PregMessage> preg = const [],
   List<PpMessage> pp = const [],
   List<String> childIds = const [],
+  Set<DateTime> bookedEvenings = const {},
 }) {
   final n = childIds.isEmpty ? 1 : childIds.length;
   int childOf(PpMessage m) {
@@ -151,6 +171,10 @@ String _slot(DateTime at) =>
     for (final m in preg) _Item.preg(m),
     for (final m in pp) _Item.pp(m, childOf(m)),
   ]) {
+    if (it.rank > kFamilyMomentRank &&
+        pushEveningBooked(it.at, bookedEvenings, kPregEveningFromHour)) {
+      continue;
+    }
     final key = _slot(it.at);
     final cur = best[key];
     if (cur == null || beats(it, cur)) best[key] = it;
@@ -195,13 +219,18 @@ const int kFamilyRingUntilHour = 21;
 /// [familyPhonePlan] way, only where no moment is. Then [spacePhoneRings]
 /// keeps them [kFamilyRingGap] apart and clear of [keepClearOf] (what TTC
 /// armed). Each ring takes the next free id of its kind, soonest first.
+///
+/// [bookedEvenings] (6b B5): on those evenings no daily kind rings, and the
+/// moments keep clear of the campaign's 19:00 as they do of TTC's rings.
 List<(int, PpMessage)> parentingPhonePlan({
   List<PpMessage> pp = const [],
   List<String> childIds = const [],
   List<DateTime> keepClearOf = const [],
   DateTime? now,
+  Set<DateTime> bookedEvenings = const {},
 }) {
-  bool moment(PpMessage m) => m.kind.slotRank <= 2;
+  // Kept for revert (6b B5, one constant): m.kind.slotRank <= 2
+  bool moment(PpMessage m) => m.kind.slotRank <= kFamilyMomentRank;
   final busy = {
     for (final m in pp)
       if (moment(m)) _slot(m.at),
@@ -212,6 +241,7 @@ List<(int, PpMessage)> parentingPhonePlan({
         if (!moment(m) && !busy.contains(_slot(m.at))) m,
     ],
     childIds: childIds,
+    bookedEvenings: bookedEvenings,
   ).pp;
   final rings = [
     for (final m in pp)
@@ -227,7 +257,17 @@ List<(int, PpMessage)> parentingPhonePlan({
     used[m.kind] = i + 1;
     out.add((ids[i], m));
   }
-  return spacePhoneRings(out, keepClearOf: keepClearOf, now: now);
+  // Kept for revert (6b B5, the campaign's 19:00 is kept clear too):
+  //   return spacePhoneRings(out, keepClearOf: keepClearOf, now: now);
+  return spacePhoneRings(
+    out,
+    keepClearOf: [
+      ...keepClearOf,
+      for (final d in bookedEvenings)
+        DateTime(d.year, d.month, d.day, kPushCampaignHour),
+    ],
+    now: now,
+  );
 }
 
 /// Moves each ring that would land within [kFamilyRingGap] of another to the
@@ -323,6 +363,8 @@ class FamilyPhone {
     final ppList = pp.isLoaded
         ? pp.phonePending(now: now)
         : const <PpMessage>[];
+    // 6b B5: the evenings a campaign holds (`push_bookings.dart`).
+    final booked = PushBookings.instance.bookedEvenings(now: now);
     // Pregnant (or a pregnancy still speaking): one cap of two for both, as
     // PP 11 built it. Otherwise moments always ring, spaced clear of TTC.
     if (LifeStageStore.instance.stage == LifeStage.pregnancy ||
@@ -333,7 +375,14 @@ class FamilyPhone {
       //     pp: pp.isLoaded ? pp.phonePending(now: now) : const [],
       //     childIds: ids,
       //   );
-      final plan = familyPhonePlan(preg: pregList, pp: ppList, childIds: ids);
+      // Kept for revert (6b B5, the booked evenings go in):
+      //   final plan = familyPhonePlan(preg: pregList, pp: ppList, childIds: ids);
+      final plan = familyPhonePlan(
+        preg: pregList,
+        pp: ppList,
+        childIds: ids,
+        bookedEvenings: booked,
+      );
       if (preg.isLoaded) await preg.armPhone(plan.preg);
       if (pp.isLoaded) await pp.armPhone(plan.pp);
       _tellServer(now, [
@@ -352,6 +401,7 @@ class FamilyPhone {
       childIds: ids,
       keepClearOf: ttcRings,
       now: now,
+      bookedEvenings: booked,
     );
     // Kept for revert (6b B2, the plan is now named so the server hears it):
     //   if (pp.isLoaded) {
@@ -371,6 +421,13 @@ class FamilyPhone {
   /// 6b B2: tells the server which evenings now ring and whether TTC is
   /// quiet (a loss, the two-week wait, a treatment round; B3) (`push_audience.dart`). Every stage's rings, TTC's
   /// included, since its own plan arms apart from this one.
+  ///
+  /// ⚠️ A BOOKED EVENING DROPS OUT OF THE LIST (6b B5): the rings here are
+  /// what the phone itself arms, after the campaign took the evening. That
+  /// is correct. The server holds a booked evening with its own
+  /// one-campaign-an-evening index, not with this list. If the campaign is
+  /// cancelled, the next refresh finds no booking, the phone's own message
+  /// rings again, and the evening comes back as busy.
   ///
   /// ⚠️ ONLY WHEN ALL THREE STORES HAVE LOADED. One still loading may have
   /// alarms set on the phone from the last run that this run cannot see, and

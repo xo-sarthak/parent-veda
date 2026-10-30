@@ -47,6 +47,7 @@ import '../v2/v2_palette.dart' show V2Palette;
 import '../learn/pv_learn_catalog.dart' show PvLearnCatalog;
 import '../learn/pv_offering_screen.dart' show pvOpenOffering;
 import '../products/pv_store_chrome.dart' show kPvInk, pvOpenProduct, pvStorePalette;
+import '../../widgets/pv_campaign_tonight.dart';
 import '../../widgets/pv_toast.dart';
 import '../profile/pv_you_sheets.dart' show showPvAddChildSheet;
 import '../reminders_screen.dart';
@@ -308,6 +309,8 @@ class _PregMessagesScreenState extends State<PregMessagesScreen> {
                   ]),
                 ),
                 const SizedBox(height: 18),
+                // 6b B5: tonight's campaign, from 19:00 (`pv_campaign_tonight.dart`).
+                PvCampaignTonight(p: p),
                 if (!store.offersAsked && widget.pregnancy.isDueDateSet)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),

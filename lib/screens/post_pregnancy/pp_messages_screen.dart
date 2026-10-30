@@ -28,6 +28,7 @@ import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
 import '../../services/stage_gateway.dart';
 import '../../widgets/global_ask_fab.dart' show appNavigatorKey;
+import '../../widgets/pv_campaign_tonight.dart';
 import '../../widgets/pv_toast.dart';
 import 'pp_child_profile.dart';
 import '../../services/pp_messages_store.dart';
@@ -245,6 +246,8 @@ class _PpMessagesScreenState extends State<PpMessagesScreen> {
                   ]),
                 ),
                 const SizedBox(height: 18),
+                // 6b B5: tonight's campaign, from 19:00 (`pv_campaign_tonight.dart`).
+                PvCampaignTonight(p: p),
                 if (!store.offersAsked && ChildProfileStore.instance.hasRealChild)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),

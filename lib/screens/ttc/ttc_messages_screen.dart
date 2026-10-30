@@ -39,6 +39,7 @@ import '../../ttc/ttc_messages_store.dart';
 import '../../ttc/ttc_period_due.dart';
 import '../../widgets/global_ask_fab.dart' show FabState, appNavigatorKey;
 import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_campaign_tonight.dart';
 import '../../widgets/pv_toast.dart';
 import '../learn/pv_learn_catalog.dart' show PvLearnCatalog;
 import '../learn/pv_offering_screen.dart' show pvOpenOffering;
@@ -232,6 +233,13 @@ class _TtcMessagesScreenState extends State<TtcMessagesScreen> {
                       style: ttcBody(13.5, h: 1.5)),
                 ],
                 const SizedBox(height: 14),
+                // 6b B5: tonight's campaign, from 19:00 (`pv_campaign_tonight.dart`).
+                // Not in his view: a campaign is booked for her.
+                if (!TtcPartnerMode.instance.on)
+                  PvCampaignTonight(
+                    p: V2PaletteStore.instance.current,
+                    padding: const EdgeInsets.only(bottom: 16),
+                  ),
                 if (!_store.offersAsked && !TtcPartnerMode.instance.on) ...[
                   _TtcOffersCard(store: _store),
                   const SizedBox(height: 16),

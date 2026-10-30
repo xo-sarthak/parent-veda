@@ -163,10 +163,79 @@ class NotificationService {
     } catch (_) {/* a broken page must not take the app down */}
   }
 
+  /// Told of every tapped payload before it is opened (6b B5): `PushService`
+  /// records a campaign tap from the push data a foreground push carries.
+  /// Null until registered; a stage message's payload passes by unrecorded.
+  void Function(String payload)? onPayloadTapped;
+
   void _deliverResponse(int? id, String? payload) {
+    if (payload != null) {
+      try {
+        onPayloadTapped?.call(payload);
+      } catch (_) {/* a metric must never stop the tap */}
+    }
     final link = NotificationLink.parse(payload);
     if (link != null) return openLink(link);
     if (id != null) _deliverTap(id);
+  }
+
+  // ---- server pushes on screen (6b B5, 2026-10-30) ---------------------------
+  //
+  // FCM draws a push itself only while the app is in the background. While it
+  // is OPEN, FCM hands the message to the app and draws nothing, so a campaign
+  // arriving mid-use was silently lost. `PushService` shows it here, on the
+  // channel the push names, with the push data as the payload so a tap opens
+  // its page and is recorded exactly as a background tap is.
+
+  /// Creates an Android channel. FCM and [showPush] can only post to a
+  /// channel that exists, and it must exist before the first push: Android
+  /// sends a push naming an unknown channel to FCM's default one. Creating it
+  /// again is a no-op that keeps her own settings for it. Best-effort.
+  Future<void> createChannel({
+    required String id,
+    required String name,
+    required String description,
+  }) async {
+    if (!_ready) await init();
+    if (!_ready) return;
+    try {
+      await _plugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(AndroidNotificationChannel(
+            id,
+            name,
+            description: description,
+            importance: Importance.defaultImportance,
+          ));
+    } catch (_) {/* best-effort */}
+  }
+
+  /// Shows a server push now, on [channelId]. Same id replaces (the push's
+  /// collapse tag). Respects a sign-out, like every notification here.
+  Future<void> showPush({
+    required int id,
+    required String title,
+    required String body,
+    required String channelId,
+    required String channelName,
+    String? payload,
+  }) async {
+    if (await _muted()) return;
+    if (!_ready) await init();
+    if (!_ready) return;
+    try {
+      await _plugin.show(
+        id,
+        title,
+        body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(channelId, channelName),
+          iOS: const DarwinNotificationDetails(),
+        ),
+        payload: payload,
+      );
+    } catch (_) {/* best-effort */}
   }
 
   /// Test seam: behave as if a notification carrying [payload] was tapped.

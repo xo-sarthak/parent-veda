@@ -156,6 +156,7 @@ import 'ttc_period_due.dart';
 import 'ttc_store.dart';
 import 'ttc_treatment_store.dart';
 import '../services/notification_link.dart';
+import '../services/push_bookings.dart' show PushBookings, pushEveningBooked;
 import '../services/push_consent.dart';
 import '../services/push_wire.dart';
 
@@ -1008,7 +1009,12 @@ List<TtcMessage> ttcDailyCandidates(TtcMessageFacts f, DateTime now) {
 /// the cap. A quiet message never rings. Everything else competes per day for
 /// one morning slot (before [kTtcEveningFromHour]) and one evening slot; the
 /// lowest [TtcMessageKindInfo.slotRank] wins, the earlier on a tie.
-List<(int, TtcMessage)> ttcPhonePlan(List<TtcMessage> pending) {
+///
+/// [bookedEvenings] (6b B5, `push_bookings.dart`): days whose evening the
+/// server gave to a campaign. Their evening slot is the campaign's, so
+/// nothing capped rings in it; a treatment message still does.
+List<(int, TtcMessage)> ttcPhonePlan(List<TtcMessage> pending,
+    {Set<DateTime> bookedEvenings = const {}}) {
   final rings = <TtcMessage>[];
   final best = <String, TtcMessage>{};
   for (final m in pending) {
@@ -1017,6 +1023,7 @@ List<(int, TtcMessage)> ttcPhonePlan(List<TtcMessage> pending) {
       rings.add(m);
       continue;
     }
+    if (pushEveningBooked(m.at, bookedEvenings, kTtcEveningFromHour)) continue;
     final key = '${_key(m.at)}|${m.at.hour < kTtcEveningFromHour ? 'am' : 'pm'}';
     final cur = best[key];
     if (cur == null ||
@@ -1561,8 +1568,14 @@ class TtcMessagesStore extends ChangeNotifier
   /// when she keeps messages in the app only. The one definition, read by the
   /// arming above and by `FamilyPhone`, which spaces a child's messages
   /// clear of these (2026-10-29).
-  List<(int, TtcMessage)> phonePlanned({DateTime? now}) =>
-      _phoneOn ? ttcPhonePlan(pending(now: now)) : const [];
+  ///
+  /// 6b B5: an evening a campaign holds is left to it (`PushBookings`).
+  // Kept for revert (6b B5):
+  //   _phoneOn ? ttcPhonePlan(pending(now: now)) : const [];
+  List<(int, TtcMessage)> phonePlanned({DateTime? now}) => _phoneOn
+      ? ttcPhonePlan(pending(now: now),
+          bookedEvenings: PushBookings.instance.bookedEvenings(now: now))
+      : const [];
 
   /// Folds [candidates] into the list. Returns true when anything changed.
   ///

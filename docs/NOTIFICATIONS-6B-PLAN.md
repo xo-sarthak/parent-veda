@@ -634,12 +634,100 @@ Android `tag`.
 
 **Owed from B4:**
 - ~~The setup above~~ done 2026-10-30: 0144 run (cron job 6), secrets and Vault set, push-send deployed, verify PASSED 38 FAILED 0. Still owed: a test reaching the phone (the B4 row's proof), moved to the phone walk by the user 2026-10-30: the phone has no build with B1/B2 yet, so it has no token on the server. Run step 6 then.
-- A push that arrives while the app is OPEN is not shown (FCM gives it to
-  the app, and the app does not draw it yet): B5, as B1 recorded.
-- An Android channel for campaigns ("Offers and news"): until then FCM's
-  default channel. B5 creates it and the branch returns its id.
+- ~~A push that arrives while the app is OPEN is not shown (FCM gives it to
+  the app, and the app does not draw it yet): B5, as B1 recorded.~~ Built in B5.
+- ~~An Android channel for campaigns ("Offers and news"): until then FCM's
+  default channel. B5 creates it and the branch returns its id.~~ Built in B5 (0146).
 - The Deno code was not type-checked here (no Deno on this machine); the
   deploy compiles it.
+
+### As built: B5 (2026-10-30)
+
+**The phone now knows about tonight's campaign.** It gives the campaign that
+evening, shows it in Messages, shows a push that arrives while the app is
+open, puts campaigns on their own "Offers and news" channel, and records a
+tap. Migration `0146_push_channel_and_tap.sql` (run it before 0147,
+Community's, which builds on it). Verify by hand:
+`supabase/seed/verify_push_b5.sql` (15 checks, ends in the red "error" that is
+the report and rolls back). Test `test/push_b5_test.dart` (23).
+
+**An example.** Priya, pregnant. Her phone uploads at 9:00 with nothing at
+19:00. At 10:00 the server books "A calm birth class" for tonight. At 13:00
+she opens the app. `PushBookings` reads the booking, and the re-arm leaves her
+19:30 check-in in Messages without ringing. At 19:00 the campaign arrives on
+"Offers and news". If the app is open then, the app draws it itself. From
+19:00 it also sits at the top of Messages. She taps it: the class opens, and
+`push_sends.tapped_at` is filled.
+
+| Piece | Where | What it does |
+|---|---|---|
+| `PushBookings` | `lib/services/push_bookings.dart` | Her `queued` and `sent` bookings from today on (own-select RLS, campaign text through the embed). Cached per account; forgotten on sign-out; refreshed on sign-in, on resume (`SyncRegistry`), and when a campaign push arrives. A change re-arms TTC and `FamilyPhone` |
+| The planners | `familyPhonePlan`, `parentingPhonePlan`, `ttcPhonePlan` | Take `bookedEvenings`. On a booked evening, nothing the cap governs rings |
+| Messages | `lib/widgets/pv_campaign_tonight.dart`, in all three Messages screens | Tonight's campaign, from 19:00 or once sent, on its day. Not in his TTC view |
+| The channel | `PushService.offersChannel` = `offers_news`; 0146's `pv_push_due` | Created at start (`NotificationService.createChannel`), named by both campaign branches |
+| Foreground | `PushService.showForeground` | `FirebaseMessaging.onMessage` -> a local notification on the push's channel, the push data as payload, id `939000` + a stable hash of `row_id` |
+| The tap | `PushService.recordTap`, 0146's `pv_push_tapped(row_id)` | `queue = push_sends` only. Background taps through `handleTap`, foreground taps through `NotificationService.onPayloadTapped` |
+
+**The rule, and its two exceptions.** A booked evening gives the campaign the
+slot the two-a-day cap governs. What the cap never governed still rings:
+
+- a TTC treatment message (her clinic's dates; never capped);
+- with no pregnancy, a child's moment (a vaccine visit, an age, a new stage:
+  "moments always ring", 2026-10-29), kept an hour clear of 19:00.
+
+Pregnancy's moments are all at 9:00, so in practice the exception never meets
+a Pregnancy evening. "A booked evening never rings two" holds for everything
+the cap covers, and the test holds it.
+
+**Why it is shaped this way:**
+
+- **The backstop sits where the real state is.** The server books only
+  evenings the phone called free; this catches the stale copy (a message
+  created after the last upload). It is not the everyday path.
+- **The busy-evenings upload stays honest.** Nothing of the phone's own rings
+  on a booked evening, so that evening leaves the list. A booked evening is
+  held by the server's unique `(user_id, send_on)` index, not by the list. A
+  cancelled campaign: the next refresh finds no booking, the phone's message
+  rings again, and the evening is busy again. Pinned by a test.
+- **A verb, not a grant.** The phone has select only on `push_sends`.
+  `pv_push_tapped` writes one column, `now()`, on her own row, once.
+- **No status check on the tap.** A tap can beat the sender's mark; requiring
+  `sent` would lose the fastest taps. The first tap wins.
+- **Only a build with Firebase reads bookings.** A phone that cannot receive
+  the campaign keeps its own evening message.
+- **Messages from 19:00, not from the booking.** A stage message appears in
+  Messages at its own time; the campaign does the same, so Messages never
+  shows tonight's offer at 10 in the morning.
+
+**Changed from the plan, each for a reason:**
+
+- **"Rank 6 / 5.5 in `familyPhonePlan`" (the plan's "The cap")** is not how it
+  was built. Once the server has booked, it will send; competing on rank
+  would only decide which second message rings. The campaign takes the slot
+  and the phone gives way, except for care (above).
+- **The cap's two exceptions** are new: the plan predates "moments always
+  ring" (2026-10-29) and never named treatment messages.
+
+**Coordination with Community (C3-2):** 0147 replaces `pv_push_due` again,
+copied from 0146 (it keeps `offers_news` for both campaign branches). The B5
+test reads the NEWEST migration defining `pv_push_due`, so any later copy that
+drops the channel fails the build. Community also raised
+`PushService.linkVersion` to 2 in the same file B5 edits.
+
+**Owed from B5:**
+- ~~Run `0146_push_channel_and_tap.sql`, then `supabase/seed/verify_push_b5.sql`
+  (the user).~~ Run 2026-10-30: verify PASSED 15 FAILED 0. Then Community's 0147.
+- The phone walk (B6): a campaign while the app is open shows; a booked
+  evening keeps the check-in off the phone; the Messages row from 19:00; a tap
+  fills `tapped_at`; "Offers and news" appears in Android's settings for the
+  app. And B4's `pv_campaign_test` reaching the phone, still owed.
+- **Time zones.** `send_on` is an IST date and the phone compares local dates.
+  The same on an Indian phone; a phone in another zone could give away the
+  wrong evening. Revisit with iPhone (B7) or if users abroad appear.
+- An offline tap is not recorded (fire-and-forget). It is a measurement;
+  losing a few is accepted.
+- iPhone: a foreground push on iOS needs `setForegroundNotificationPresentationOptions`
+  or the same local path; B7.
 
 ## Costs
 
@@ -692,7 +780,7 @@ account you need for the App Store anyway.
 | B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`). **BUILT 2026-10-30**, see "As built: B2"; 0140 run 2026-10-30 |
 | B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron. Plus decisions 15 to 22 (holdout, `tapped_at`, 7-day grace, wider quiet incl. the phone flag, priority, cutoff, length limits, 1 a week) | `supabase/seed/verify_push_campaigns.sql` passes by hand. **BUILT 2026-10-30** (04132625), see "As built: B3"; 0143 run, verify 50/0 |
 | B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens. **Reads only `pv_push_due()` / writes only `pv_push_mark()`, every minute through `pg_net`** (see "For B4, agreed with Community phase 3") | `pv_campaign_test` reaches your phone. **BUILT 2026-10-30**, see "As built: B4"; 0144 run, deployed, verify 38/0; the phone test owed |
-| B5 | Phone: read bookings, give the evening to the campaign, show it in Messages | Planner tests: a booked evening never rings two |
+| B5 | Phone: read bookings, give the evening to the campaign, show it in Messages | Planner tests: a booked evening never rings two. **BUILT 2026-10-30**, see "As built: B5"; 0146 run, verify 15/0 |
 | B6 | Phone walk, on the user's word | See "Owed" |
 | B7 | iPhone, once the Apple account exists | One test campaign on an iPhone |
 
@@ -737,6 +825,8 @@ before calling it done.
 | 20 | A send running late? | Each booking carries a cutoff (21:00 IST); B4 skips past it, never a night buzz | Recommended ("all 7") | 2026-10-30 |
 | 21 | Text length? | `pv_campaign_create` refuses a title over ~50 or a body over ~150 characters (lock-screen truncation) | Recommended ("all 7") | 2026-10-30 |
 | 22 | Weekly limit at launch (revises row 11)? | One a week, one constant, raised to two once open and opt-out rates look healthy | Recommended: **"cap 1 at launch"** | 2026-10-30 |
+| 23 | On a booked evening, does care still ring? | Yes: the campaign takes only the capped slot; a TTC treatment message and (no pregnancy) a child's moment still ring, an hour clear of 19:00 | Chosen in the B5 build and recorded (an offer never silences care); told in chat | 2026-10-30 |
+| 24 | How does the phone fill `tapped_at`? | `pv_push_tapped(row_id)`: own row, first tap wins, no status check; push_sends only | The user's brief ("a small own-row function") | 2026-10-30 |
 
 Rows 7 to 11 and 13 were written while turning the agreed calls into tables.
 The user's "all recommended" covered them. If any reads wrong, change it here
@@ -750,7 +840,7 @@ before B2.
 - **During the build:** ~~a BACKEND-PATTERNS section for 6b~~ written with B2
   (§16zzz-a), and B2's sync-log step (step 31). B3: §16zzz-c, step 32, and the
   BEFORE-LAUNCH lines (Firebase project, privacy line, DPDP for server offers, Play
-  disclosure), written 2026-10-30. B4: §16zzz-d.
+  disclosure), written 2026-10-30. B4: §16zzz-d. B5: §16zzz-f (Community took -e for C3-1).
   Original note: a BACKEND-PATTERNS section for 6b. It should cover
   "moving a decision moves its inputs", "the cost of losing a write decides how
   hard you deliver it" and "pick the shape where missing means the true answer".

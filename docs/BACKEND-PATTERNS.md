@@ -5479,3 +5479,128 @@ rows it should have written is the only way you will learn it is not working.** 
 real app: the phone that opens a thread is the client that wakes Realtime and makes it create the partitions, and
 a broadcast with nobody listening is not missed by anyone. The verify file now checks for partitions first and
 says how to wake Realtime from the dashboard.
+
+## 16zzz-f. A copied input needs a backstop at the point of use; give a client a verb, not a grant; the first answer is the measurement; a field the UI cannot see is still a contract (Notifications 6b B5, 0146, 2026-10-30)
+
+B5 is the phone's half of server push: it reads its own bookings, gives a booked evening to the campaign, shows a
+push that arrives while the app is open, and records a tap.
+
+**1. A copied input needs a backstop where it is used.** The server books a campaign only on an evening the phone
+said was free (`push_audience.busy_evenings`). That list is a copy, and a copy goes stale: she opens the app at
+9:00, the server books tonight at 10:00, and at 13:00 she logs a period, which creates a 19:30 message. The server
+cannot know. So the phone reads its own bookings (`push_sends`, own-select RLS) and every planner leaves a booked
+evening to the campaign. Example: Pregnancy's 19:30 check-in on a booked day stays in Messages and does not ring.
+**When one side decides from a copy of the other's state, the side that holds the real state checks again just
+before it acts.** The stale copy then costs nothing, rather than an extra notification.
+
+**2. Say which rule wins before the two collide.** A campaign taking the evening must not silence care. So the
+campaign displaces only what the two-a-day cap already governed. A TTC treatment message (her clinic's date) and a
+child's moment with no pregnancy (they "always ring") still ring, kept an hour clear of 19:00. The general shape:
+**a new rule slots into the existing priority order; it does not get a private exception path.**
+
+**3. The derived upload stays honest by construction.** After the campaign takes the evening, nothing of the
+phone's own rings then, so that evening drops out of the busy list it uploads. That is correct, because a booked
+evening is held on the server by the unique index on `(user_id, send_on)`, not by the busy list. If the campaign is
+cancelled, the next refresh finds no booking, the phone's own message rings again, and the evening is busy again.
+**Upload what you did, not what you would have done. The server's own constraint covers what it already decided.**
+
+**4. Give a client a verb, not a grant.** The phone must fill `tapped_at` and nothing else. An `update` grant on
+`push_sends`, even one limited to that column, would let it write any value, backdate a tap, or (with a looser
+grant) mark a row `sent`. `pv_push_tapped(row_id)` is `security definer`. It writes `now()`, only where
+`user_id = auth.uid()`, only while `tapped_at is null`, and returns whether it did. **A function is a permission
+with the rule built in.**
+
+**5. The first answer is the measurement.** A second tap, or the same push tapped on her second phone, keeps the
+first time (`tapped_at is null` in the `where`). There is deliberately no `status = 'sent'` check. Firebase can
+deliver, she can tap, and the tap can reach the server before the sender has written its result. Requiring `sent`
+would lose exactly the fastest taps. **When two writers race, decide which order the data can arrive in, not the
+order you would like.**
+
+**6. A value the UI never shows is still a contract.** The Android channel id `offers_news` lives in two places: the
+app creates the channel, and `pv_push_due` names it. If they differ, Android quietly puts the campaign on Firebase's
+"Miscellaneous" channel, so nothing breaks, no log appears, and her "turn off offers" switch does nothing. The test
+reads the newest migration that defines `pv_push_due` and checks it still says `offers_news`. That matters because
+Community's 0147 replaced the function again; a copy started from 0144 would have put the channel back to null.
+**When a function is replaced by several files over time, pin the behaviour against the latest definition, not
+the file that introduced it.**
+
+**7. A push the app is showing must look like a push the OS is showing.** While the app is open, Firebase hands the
+message to the app and draws nothing. The app now draws it on the same channel, with the push data as the payload,
+so its tap opens the same page and records the same tap. **Two delivery paths, one outcome:** otherwise the one you
+test (background) works and the one users hit mid-session silently doesn't.
+
+Pinned by `test/push_b5_test.dart` and proved on the database by `supabase/seed/verify_push_b5.sql`.
+
+## 16zzz-g. One rule, every reader; missing means different things for different switches; a queue row is a buzz, not an event; extend a shared function line for line (Community C3-2, 0147, 2026-10-30)
+
+C3-2 sends three alerts: someone replied to her, a session she booked has moved, and (to moderators) a post may be
+at risk. The server decides all of it. The phone only holds her switches.
+
+**1. One rule, every reader.** "Replied to you" is not stored: `community_activity` works it out when she opens
+Replies to you. The alert trigger needed the same answer at the moment a reply is written. Copying the WHERE clause
+would have made two rules that agree on the day they are written and drift after. We looked, and they had already
+drifted once: `community_me`'s unread count used `p.user_id = me or pc.user_id = me`, while the list required the
+reply to be top-level before the post's author counted. So a reply under someone else's comment on her post lit the
+dot and was not in the list. Now one function, `community_replied_to(c, p, parent_user, me)`, is the rule. The list,
+the dot and the trigger all call it, and the verify checks on real rows that the list and the rule return the same
+replies. **When two features answer the same question, give the question a name and make both ask it.**
+
+**1b. The cost of a function in a WHERE clause.** Postgres can inline a plain SQL function into the query that calls
+it, but not one with its own `set search_path` (which every definer function here has, for safety). So the rule is
+evaluated row by row, and without help the planner would run it on every reply in the community. The fix is a
+narrowing, ANDed next to it: `p.user_id = me or pc.user_id = me`. It can only remove rows the rule would also remove
+(every reply to her is on her post or under her reply), so it is not a second rule. It just gives the planner
+something it can use an index for. **Safety settings and query speed can pull in opposite directions. A superset
+condition next to the function gets both.**
+
+**2. Missing means different things for different switches.** §16zzz-a chose "missing means yes" for one switch.
+Here there are three, and each default follows from why the alert exists. Replies: missing means OFF, because she is
+asked once in context (after her first post goes live) and has not said yes yet. Bookings: missing means ON, because
+she booked, and a moved session is news she needs (C3). Moderation: missing means ON, for moderators only, because
+someone may be at risk (P0-3). The app reads the same defaults back from `community_alerts_get`, so the screen never
+shows a guess. **A default is a product decision. Write it once, where the trigger reads it, and say why next to it.**
+
+**3. A queue row is a buzz, not an event.** The obvious design is one row per reply. But C4 counts buzzes ("3 a
+day"), and three replies to one post should be one alert saying "3 new replies". So a row is one future
+notification, and a reply either merges into the row already waiting for that post (`n = n + 1`) or opens a new one.
+"One waiting row per person, kind and post" is a partial unique index, not just a check in the function: two replies
+at the same instant would otherwise both see nothing waiting and queue two buzzes (§16zzz-c: a rule a race can break
+needs a constraint). The 3-a-day cap is only a count, so a race can exceed it by one. That was accepted, because a
+rare 4th alert is harmless and a lock for it would be more complex. A reply alert waits 3 minutes before it is due,
+so a burst becomes one alert. Quiet hours (21:00 to 08:00 IST) are checked when the row is due, not when it is
+queued, so a row simply waits until 08:00. Its `ring_day` is the IST day it will ring on, and that is the day the
+cap counts it against.
+
+**4. Check consent twice: when queuing and when sending.** A row can wait hours (overnight), and in that time she can
+turn replies off or mute the post. `community_push_allowed` runs when the row is queued and again in
+`community_push_due`, which ends a row whose switch went off as `skipped 'off'`. The same function both times, so
+the two checks cannot disagree.
+
+**5. Extend a shared function line for line.** `pv_push_due`, `pv_push_mark` and `pv_push_any_due` belong to 6b, and
+B5 had just replaced `pv_push_due` (0146) to set the campaign channel. A `create or replace` replaces the whole body,
+so a copy taken from 0144 would have silently put that channel back to null (the §16zzi trap). Community's branch is
+its own function, `community_push_due`, and `pv_push_due` gains one line that calls it. The test finds the latest
+earlier definition of each shared function (whichever migration that is) and checks that every one of its lines is
+still present, in order. **When several teams extend one function, the test should compare against the previous
+definition, not a copy someone remembered.** The sender (`push-send`) was not edited: it still knows no table.
+
+**6. Triggers next to a write, never a rewrite of it (C13).** The moved-session alert is a trigger on the timetable
+notice's insert, recognised by `moved_from`, and not a change to `_community_timetable_notice`. Each trigger keeps
+its work in a savepoint (§16zzz-e point 2), so a queue failure never blocks the reply, the notice or the crisis
+flag. And because a savepoint hides failures, **the verify counts the queue rows each trigger should have written.**
+
+**7. The lock screen is a public surface.** Phones are shared, and a room name can say "loss" or "IVF". So the alert
+text comes from a fixed function, `community_push_text`, which reads only the row's kind, count and overnight flag,
+and never the post. The test checks which fields it reads. The app's preview of the alert uses the same strings.
+
+**8. Found on the live database: a variable that shares a column's name.** The first verify run stopped at check 17
+with `argument of LIMIT must not contain variables`. `community_push_due` copied B4's `#variable_conflict use_column`
+(needed because the function's output columns are called `user_id`, `title` and so on), and its limit variable was
+called `n`, like B4's. But the community queue has a column `n` (the merged-reply count), so inside the query `n`
+meant the column, and a LIMIT cannot depend on a row. Renamed to `v_limit`. Because every call to `pv_push_due` runs
+the community branch, this also broke the campaign sender until the fix ran. **A pragma that resolves name clashes
+silently changes which thing a name means. Prefix local variables (`v_`) so a table can never gain a column that
+captures one.** A test now checks that no variable in that function shares a queue column's name.
+
+Pinned by `test/community_alerts_test.dart` and proved on the database by `supabase/seed/verify_community_alerts.sql`
+(21 checks).

@@ -332,16 +332,20 @@ void main() {
           'lib/services/family_phone_plan.dart',
         ).replaceAll(RegExp(r'\s+'), '');
         expect(fam, contains('ttc.phonePlanned(now:now)'));
+        // Kept for revert (6b B5 added the booked evenings to both calls,
+        // test/push_b5_test.dart):
+        //   'parentingPhonePlan(pp:ppList,childIds:ids,keepClearOf:ttcRings,now:now,)'
+        //   'familyPhonePlan(preg:pregList,pp:ppList,childIds:ids)'
         expect(
           fam,
           contains(
-            'parentingPhonePlan(pp:ppList,childIds:ids,keepClearOf:ttcRings,now:now,)',
+            'parentingPhonePlan(pp:ppList,childIds:ids,keepClearOf:ttcRings,now:now,bookedEvenings:booked,)',
           ),
         );
-        // Pregnant: the PP 11 cap, unchanged.
+        // Pregnant: the PP 11 cap, unchanged but for B5's booked evenings.
         expect(
           fam,
-          contains('familyPhonePlan(preg:pregList,pp:ppList,childIds:ids)'),
+          contains('familyPhonePlan(preg:pregList,pp:ppList,childIds:ids,bookedEvenings:booked,)'),
         );
       },
     );

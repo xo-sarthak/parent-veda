@@ -15,6 +15,11 @@
 //
 //  The stage words are profiles.life_stage's, so the server joins consent to
 //  the profile with a plain equality.
+//
+//  B5 (2026-10-30, 0146): two more. `pv_push_tapped` fills tapped_at on her
+//  own booking (the phone has no update grant on push_sends), and one READ,
+//  [bookingsSelect]: her own push_sends rows with their campaign's text, which
+//  RLS lets her see once a campaign is booked for her (0143).
 // =============================================================================
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -28,6 +33,22 @@ class PushWire {
   static const unregister = 'pv_push_unregister';
   static const consent = 'pv_push_consent';
   static const audience = 'pv_push_audience';
+  static const tapped = 'pv_push_tapped';
+
+  /// B5: the table she reads her bookings from, and the columns, with the
+  /// campaign's text embedded through the campaign_id foreign key.
+  static const bookingsTable = 'push_sends';
+  static const bookingsSelect =
+      'id, send_on, status, push_campaigns(kind, title, body, link_kind, link_id)';
+
+  /// The statuses that hold an evening: still to go, or gone. A `skipped`
+  /// booking (cancelled, past the cutoff, no device) gives the evening back;
+  /// a `failed` one never reached her.
+  static const bookingsHolding = ['queued', 'sent'];
+
+  /// The push data's queue name for campaign bookings. Only these taps are
+  /// recorded; a `push_tests` tap is you checking the text.
+  static const queueBookings = 'push_sends';
 
   /// push_consent.stage, the same three words as profiles.life_stage.
   static const stageTrying = 'trying';
@@ -74,6 +95,10 @@ class PushWire {
     'p_quiet': quiet,
   };
 
+  static Map<String, dynamic> tappedParams(String rowId) => {
+    'p_row_id': rowId,
+  };
+
   /// A calendar date as Postgres reads a `date`.
   static String dateKey(DateTime d) =>
       '${d.year.toString().padLeft(4, '0')}-'
@@ -89,4 +114,16 @@ class PushWire {
   /// caller decides how hard to try. Swapped in tests.
   static Future<dynamic> Function(String fn, Map<String, dynamic> params) call =
       (fn, params) => Supabase.instance.client.rpc(fn, params: params);
+
+  /// B5: her bookings from [fromDay] on that still hold an evening. RLS
+  /// returns only her own rows. Throws on failure. Swapped in tests.
+  static Future<List<Map<String, dynamic>>> Function(String fromDay) bookings =
+      (fromDay) async {
+        final rows = await Supabase.instance.client
+            .from(bookingsTable)
+            .select(bookingsSelect)
+            .gte('send_on', fromDay)
+            .inFilter('status', bookingsHolding);
+        return [for (final r in rows) Map<String, dynamic>.from(r)];
+      };
 }

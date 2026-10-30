@@ -26,14 +26,29 @@
 //  the next send and B4 drops the row. Consent goes through `PushConsent`
 //  whether or not Firebase started: her answer is hers, not this build's.
 //
-//  Not here yet: permission (the app already asks through
-//  flutter_local_notifications), and showing a push that arrives while the
-//  app is open (B5). Android first; iPhone is B7.
+//  Kept for revert (B5 built the second): "Not here yet: permission (the app
+//  already asks through flutter_local_notifications), and showing a push that
+//  arrives while the app is open (B5). Android first; iPhone is B7."
 //
-//  Tests: test/push_b1_test.dart, test/push_b2_contract_test.dart.
+//  B5 (2026-10-30): FOUR MORE THINGS, all only when [ready].
+//   * The "Offers and news" channel ([offersChannel]) is created at start, so
+//     it exists before the first campaign names it (0146's pv_push_due does).
+//   * A push that arrives while the app is OPEN is shown ([showForeground]):
+//     FCM draws nothing then, and before B5 it was lost.
+//   * A tap on a campaign fills push_sends.tapped_at ([recordTap], through
+//     0146's pv_push_tapped), from the `queue` and `row_id` B4 puts in the
+//     push data. Only the push_sends queue; a push_tests tap is you checking.
+//   * [PushBookings] starts, so the phone gives a booked evening to the
+//     campaign.
+//  Not here yet: permission (the app already asks through
+//  flutter_local_notifications). Android first; iPhone is B7.
+//
+//  Tests: test/push_b1_test.dart, test/push_b2_contract_test.dart,
+//  test/push_b5_test.dart.
 // =============================================================================
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -44,6 +59,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'notification_link.dart';
 import 'notification_service.dart';
+import 'push_bookings.dart';
 import 'push_consent.dart';
 import 'push_wire.dart';
 
@@ -71,7 +87,30 @@ class PushService {
   /// Sent with the token, so the server can skip a build too old to open a
   /// campaign's link. RAISE IT BY ONE when the opener learns a new kind.
   /// 1 = B0's kinds: the stage messages, product, course, expert, read.
-  static const int linkVersion = 1;
+  /// 2 = Community C3-2 (0147): community_post, booking, community_moderation.
+  static const int linkVersion = 2;
+
+  /// The Android channel campaigns arrive on (6b B5). 0146's pv_push_due
+  /// returns this id for push_sends and push_tests; the contract test pins
+  /// the two together. She can turn it off in Android's settings without
+  /// losing her care messages, which sit on 'reminders'.
+  static const offersChannel = 'offers_news';
+  static const offersChannelName = 'Offers and news';
+  static const offersChannelDescription =
+      'Classes, offers and new things in ParentVeda. Only if you said yes.';
+
+  /// A foreground push's notification id: this band plus a hash of its tag,
+  /// so a repeat of the same push replaces itself (as the Android tag does
+  /// for a background one) and never lands on a stage message's id.
+  static const foregroundIdBase = 939000;
+
+  /// Wires a push that arrives while the app is open. Swapped in tests.
+  @visibleForTesting
+  static Future<void> Function(
+          void Function(String? title, String? body, Map<String, dynamic> data,
+                  String? channel)
+              onMessage)
+      listenForeground = _listenForeground;
 
   /// This install's id. In LocalWipe.keep: it names the phone, not a person.
   static const deviceIdKey = 'push_device_id';
@@ -113,11 +152,26 @@ class PushService {
       debugPrint('[push] off on this build: $e');
     }
     if (_ready) {
+      // B5: the channel first, so it exists before any push names it.
+      await NotificationService.instance.createChannel(
+        id: offersChannel,
+        name: offersChannelName,
+        description: offersChannelDescription,
+      );
+      NotificationService.instance.onPayloadTapped = recordTapPayload;
       try {
         await listenForTaps(handleTap);
       } catch (e) {
         debugPrint('[push] tap wiring failed: $e');
       }
+      try {
+        await listenForeground(showForeground);
+      } catch (e) {
+        debugPrint('[push] foreground wiring failed: $e');
+      }
+      // A phone with no Firebase gets no campaign, so it gives no evening
+      // away: only a ready build reads bookings.
+      unawaited(PushBookings.instance.init());
     }
     // Consent is sent with or without Firebase; the token only with it.
     try {
@@ -131,6 +185,8 @@ class PushService {
   /// when Firebase is up, register this install's token.
   Future<void> onSignedIn() async {
     unawaited(PushConsent.instance.flush());
+    // B5: tonight may be booked. Only a build that can receive one.
+    if (_ready) unawaited(PushBookings.instance.refresh());
     await register();
   }
 
@@ -213,9 +269,75 @@ class PushService {
   /// and holds it if the app is still starting (a tap that launched the app).
   /// A push with no link only brings the app forward, as the OS already has.
   static void handleTap(Map<String, dynamic> data) {
+    recordTap(data);
     final link = NotificationLink.fromData(data);
     if (link == null) return;
     NotificationService.instance.openLink(link);
+  }
+
+  /// B5: a tap on a campaign booking fills its tapped_at, once (0146's
+  /// pv_push_tapped; the server keeps the first). Fire-and-forget: a tap
+  /// lost offline costs one count in a measurement, nothing she sees.
+  /// Returns whether a call was made, for tests.
+  static bool recordTap(Map<dynamic, dynamic> data) {
+    if (data['queue'] != PushWire.queueBookings) return false;
+    final rowId = data['row_id'];
+    if (rowId is! String || rowId.isEmpty) return false;
+    if (PushWire.userId() == null) return false;
+    try {
+      PushWire.call(PushWire.tapped, PushWire.tappedParams(rowId)).then(
+        (_) {},
+        onError: (Object e) => debugPrint('[push] tap not recorded: $e'),
+      );
+    } catch (e) {
+      debugPrint('[push] tap not recorded: $e');
+    }
+    return true;
+  }
+
+  /// B5: a tapped local notification's payload. A foreground push carries the
+  /// push data as its payload, so its tap is recorded here; a stage message's
+  /// payload has no `queue` and passes by.
+  static void recordTapPayload(String payload) {
+    try {
+      final data = jsonDecode(payload);
+      if (data is Map) recordTap(data);
+    } catch (_) {/* not a push's payload */}
+  }
+
+  /// B5: a push that arrived while the app is open. FCM draws nothing then,
+  /// so it is shown here: same text, the channel it names (campaigns:
+  /// [offersChannel]), the push data as the payload so the tap opens the
+  /// page and is recorded. A booking that just went out also refreshes
+  /// [PushBookings], so Messages shows it.
+  static Future<void> showForeground(String? title, String? body,
+      Map<String, dynamic> data, String? channel) async {
+    if ((title ?? '').isEmpty && (body ?? '').isEmpty) return;
+    final tag = (data['row_id'] as Object?)?.toString() ?? '$title|$body';
+    final ch = (channel == null || channel.isEmpty) ? offersChannel : channel;
+    await NotificationService.instance.showPush(
+      id: foregroundIdBase + foregroundIdOffset(tag),
+      title: title ?? '',
+      body: body ?? '',
+      channelId: ch,
+      channelName: ch == offersChannel ? offersChannelName : ch,
+      payload: jsonEncode({
+        for (final e in data.entries) e.key: e.value?.toString(),
+      }),
+    );
+    if (data['queue'] == PushWire.queueBookings) {
+      unawaited(PushBookings.instance.refresh());
+    }
+  }
+
+  /// A stable 0..999 from [tag]. Not `String.hashCode`, which Dart does not
+  /// promise is the same across runs. Pure.
+  static int foregroundIdOffset(String tag) {
+    var h = 0;
+    for (final c in tag.codeUnits) {
+      h = (h * 31 + c) % 1000;
+    }
+    return h;
   }
 
   /// Test seam: forget that [init] ran.
@@ -246,6 +368,17 @@ void _watchAccount(PushService s) {
       onError: (Object e) => debugPrint('[push] token refresh: $e'),
     );
   }
+}
+
+Future<void> _listenForeground(
+    void Function(String? title, String? body, Map<String, dynamic> data,
+            String? channel)
+        onMessage) async {
+  FirebaseMessaging.onMessage.listen(
+    (m) => onMessage(m.notification?.title, m.notification?.body, m.data,
+        m.notification?.android?.channelId),
+    onError: (Object e) => debugPrint('[push] foreground message: $e'),
+  );
 }
 
 Future<void> _startFirebase() async {
