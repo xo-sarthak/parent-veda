@@ -1807,7 +1807,7 @@ item format changed. **Commit:** `ecb47348`.
 ## Step 31: push devices, consent and audience (Notifications 6b B2, 0140)
 
 **Date:** 2026-10-30 (the user's word: "You have my go for B2"). **Migration:**
-`0140_push_devices_consent_audience.sql`, to be run by the user before installing. **Commit:** pending.
+`0140_push_devices_consent_audience.sql`, run by the user 2026-10-30. **Commit:** `a45e80ea`.
 
 ### Why
 - 6b's server sends offers as visible pushes (`docs/NOTIFICATIONS-6B-PLAN.md`, decision 1). To keep 6a's promises it

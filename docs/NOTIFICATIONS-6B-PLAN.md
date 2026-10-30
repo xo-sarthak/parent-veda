@@ -447,7 +447,7 @@ PushService with and without Firebase. `auth_delete_account_test` and
 `sync_reset_coverage_test` list the two new keys and two files, with why.
 
 **Owed from B2:**
-- Run 0140 (the user), before installing.
+- ~~Run 0140 (the user), before installing.~~ Run 2026-10-30.
 - People who said yes before B2 have no consent row. No real users yet; a tester
   switches offers off and on once.
 - The phone walk (B6): sign in and see a `push_devices` row; switch offers off
@@ -503,7 +503,7 @@ account you need for the App Store anyway.
 |---|---|---|
 | B0 | One tap opener for every notification, local and pushed | A tap on each 6a kind opens its page. The `syncAll` fix stays out of scope. **BUILT 2026-10-30**, see "As built: B0" |
 | B1 | Firebase in the app (`firebase_core`, `firebase_messaging`). It must not crash with no config: an unconfigured Firebase behaves like being logged out | The app starts on a build with no `google-services.json`. **BUILT 2026-10-30**, see "As built: B1"; the build check is owed |
-| B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`). **BUILT 2026-10-30**, see "As built: B2"; 0140 to run |
+| B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`). **BUILT 2026-10-30**, see "As built: B2"; 0140 run 2026-10-30 |
 | B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron | The SQL in "How to test" passes by hand |
 | B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens, the 19:00 IST cron through `pg_net` | `pv_campaign_test` reaches your phone |
 | B5 | Phone: read bookings, give the evening to the campaign, show it in Messages | Planner tests: a booked evening never rings two |
