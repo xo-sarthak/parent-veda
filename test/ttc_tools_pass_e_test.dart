@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/screens/notification_opener.dart' show NotificationOpener;
 import 'package:parentveda/screens/ttc/chats/ttc_chat.dart';
 import 'package:parentveda/screens/ttc/chats/ttc_period_came_chat.dart';
 import 'package:parentveda/screens/ttc/ttc_chapter_screen.dart';
@@ -329,8 +330,13 @@ void main() {
     setUp(() {
       saved = TtcMessagesStore.phoneTapOpener;
       TtcMessagesStore.instance.resetForTest();
+      // B0: an old id-only tap reaches the page through the one opener.
+      NotificationService.instance.setLinkOpener(NotificationOpener.open);
     });
-    tearDown(() => TtcMessagesStore.phoneTapOpener = saved);
+    tearDown(() {
+      TtcMessagesStore.phoneTapOpener = saved;
+      NotificationService.instance.debugResetLinkOpener();
+    });
 
     test('our id is claimed, marked read and opened', () {
       final now = DateTime.now();

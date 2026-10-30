@@ -21,6 +21,7 @@ class _PpPhone implements PpMessagePhone {
     required String title,
     required String body,
     required DateTime when,
+    String? payload,
   }) async => titles.add(title);
   @override
   Future<void> cancel(int id) async {}

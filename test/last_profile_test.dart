@@ -186,7 +186,10 @@ void main() {
     });
 
     test('a launching tap is remembered', () {
-      expect(_code('lib/services/notification_service.dart'), contains('launchedFromTap = true;\n          _deliverTap(id);'));
+      // B0 (2026-10-30): the launching tap carries its payload too. Kept for
+      // revert: contains('launchedFromTap = true;\n          _deliverTap(id);')
+      expect(_code('lib/services/notification_service.dart'),
+          contains('launchedFromTap = true;\n          _deliverResponse(id, payload);'));
     });
 
     test('sign out lowers the flag on both paths', () {

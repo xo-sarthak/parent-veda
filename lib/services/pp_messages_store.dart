@@ -111,6 +111,7 @@ import 'preg_messages_store.dart' show pregWeekOn, pregWeekStart;
 import 'pregnancy_controller.dart';
 import 'programme_store.dart';
 import 'pv_catalog_store.dart';
+import 'notification_link.dart';
 import 'remote/cloud_merged_store.dart';
 // import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
@@ -554,7 +555,9 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
   // ---- activity: Monday mornings --------------------------------------------
   final monday = today.add(Duration(days: (DateTime.monday - today.weekday) % 7));
   String? activityOn(DateTime day) {
-    final months = (day.difference(f.dob).inDays / 30.44).floor();
+    // One count with the tap's opener (B0). Kept for revert:
+    //   final months = (day.difference(f.dob).inDays / 30.44).floor();
+    final months = ppActivityMonthsOn(f.dob, day);
     final note = ppMonthNoteFor(months);
     final idx = phaseIndexForMonths(months.toDouble());
     // The phase doc's first activity, not the authored "Play" section: the
@@ -602,6 +605,21 @@ List<PpMessage> ppMessageCandidates(PpMessageFacts f, DateTime now) {
   out.addAll(ppDailyCandidates(f, now, activityDays: activityDays));
   return out;
 }
+
+/// Whole months of age on [day], the count the Monday activity is picked by.
+int ppActivityMonthsOn(DateTime dob, DateTime day) => (day.difference(dob).inDays / 30.44).floor();
+
+/// The day a dated message is about, read from its id: `act:2026-11-2`,
+/// `tip:2026-11-02` (a child's prefix may come first). Null for the rest. A
+/// tap opens the page for THAT day, not today's (B0, 2026-10-30).
+DateTime? ppMessageDay(String id) {
+  final m = RegExp(r'(?:act|tip):(\d{4})-(\d{1,2})-(\d{1,2})$').firstMatch(id);
+  if (m == null) return null;
+  return DateTime(int.parse(m.group(1)!), int.parse(m.group(2)!), int.parse(m.group(3)!));
+}
+
+/// The stage number a "new stage" message names (`phase:4`), or null.
+int? ppMessagePhaseNumber(String id) => int.tryParse(RegExp(r'phase:(\d+)$').firstMatch(id)?.group(1) ?? '');
 
 String _dayKey(DateTime d) =>
     '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -669,15 +687,18 @@ List<PpMessage> ppDailyCandidates(PpMessageFacts f, DateTime now, {Set<DateTime>
 }
 
 abstract class PpMessagePhone {
-  Future<void> schedule({required int id, required String title, required String body, required DateTime when});
+  /// [payload]: the message's [NotificationLink] (B0, 2026-10-30).
+  Future<void> schedule(
+      {required int id, required String title, required String body, required DateTime when, String? payload});
   Future<void> cancel(int id);
 }
 
 class _OsPhone implements PpMessagePhone {
   const _OsPhone();
   @override
-  Future<void> schedule({required int id, required String title, required String body, required DateTime when}) =>
-      NotificationService.instance.scheduleOneOff(id: id, title: title, body: body, when: when);
+  Future<void> schedule(
+          {required int id, required String title, required String body, required DateTime when, String? payload}) =>
+      NotificationService.instance.scheduleOneOff(id: id, title: title, body: body, when: when, payload: payload);
   @override
   Future<void> cancel(int id) => NotificationService.instance.cancel(id);
 }
@@ -731,6 +752,9 @@ class PpMessagesStore extends ChangeNotifier
   static void Function(PpMessage? m)? phoneTapOpener;
 
   bool get isLoaded => _loaded;
+
+  /// The message with [id], delivered or pending; null when it is gone (B0).
+  PpMessage? messageById(String id) => id.isEmpty ? null : _all.where((m) => m.id == id).firstOrNull;
 
   List<PpMessage> delivered({DateTime? now}) {
     final t = now ?? DateTime.now();
@@ -806,11 +830,14 @@ class PpMessagesStore extends ChangeNotifier
     return arrived.isEmpty ? null : arrived.first;
   }
 
+  /// Only for notifications armed before B0 (2026-10-30), which carry no
+  /// payload: the guess goes to the one opener as a link. Kept for revert:
+  ///   if (m != null) markRead(m.id);
+  ///   phoneTapOpener?.call(m);
   bool handlePhoneTap(int id) {
     if (!PpMessageKind.values.any((k) => k.phoneIds.contains(id))) return false;
     final m = messageForPhoneId(id);
-    if (m != null) markRead(m.id);
-    phoneTapOpener?.call(m);
+    NotificationService.instance.openLink(NotificationLink(NotificationLink.ppMessage, m?.id ?? ''));
     return true;
   }
 
@@ -934,7 +961,13 @@ class PpMessagesStore extends ChangeNotifier
       }
     }
     for (final (id, m) in plan) {
-      await _phone.schedule(id: id, title: phoneTitle(m.title, m.kind, id: m.id), body: m.body, when: m.at);
+      // The message's own id rides along (B0). Kept for revert: no payload.
+      await _phone.schedule(
+          id: id,
+          title: phoneTitle(m.title, m.kind, id: m.id),
+          body: m.body,
+          when: m.at,
+          payload: NotificationLink(NotificationLink.ppMessage, m.id).payload);
     }
   }
 

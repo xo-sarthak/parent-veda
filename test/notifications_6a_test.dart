@@ -30,7 +30,7 @@ class _Phone implements PregMessagePhone {
   final Map<int, DateTime> armed = {};
   @override
   Future<void> schedule(
-      {required int id, required String title, required String body, required DateTime when}) async {
+      {required int id, required String title, required String body, required DateTime when, String? payload}) async {
     armed[id] = when;
   }
 

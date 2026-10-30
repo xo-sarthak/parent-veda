@@ -44,7 +44,7 @@ class _FakePhone implements TtcMessagePhone {
       {required int id,
       required String title,
       required String body,
-      required DateTime when}) async {
+      required DateTime when, String? payload}) async {
     scheduled[id] = when;
     titles[id] = title;
   }

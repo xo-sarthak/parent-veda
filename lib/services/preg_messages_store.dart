@@ -119,6 +119,7 @@ import 'programme_store.dart';
 import 'pv_catalog_store.dart';
 import 'remote/cloud_merged_store.dart';
 import 'symptom_store.dart';
+import 'notification_link.dart';
 // import 'remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 
 /// The seven kinds. The NAME is persisted: renaming one strands every message
@@ -583,8 +584,9 @@ List<(int, PregMessage)> pregPhonePlan(List<PregMessage> pending) {
 /// Where the phone notifications go. An interface so tests can see what was
 /// scheduled without a platform plugin.
 abstract class PregMessagePhone {
+  /// [payload]: the message's [NotificationLink] (B0, 2026-10-30).
   Future<void> schedule(
-      {required int id, required String title, required String body, required DateTime when});
+      {required int id, required String title, required String body, required DateTime when, String? payload});
   Future<void> cancel(int id);
 }
 
@@ -593,8 +595,8 @@ class _OsPhone implements PregMessagePhone {
 
   @override
   Future<void> schedule(
-          {required int id, required String title, required String body, required DateTime when}) =>
-      NotificationService.instance.scheduleOneOff(id: id, title: title, body: body, when: when);
+          {required int id, required String title, required String body, required DateTime when, String? payload}) =>
+      NotificationService.instance.scheduleOneOff(id: id, title: title, body: body, when: when, payload: payload);
 
   @override
   Future<void> cancel(int id) => NotificationService.instance.cancel(id);
@@ -642,6 +644,9 @@ class PregMessagesStore extends ChangeNotifier
   static void Function(PregMessage? m)? phoneTapOpener;
 
   bool get isLoaded => _loaded;
+
+  /// The message with [id], delivered or pending; null when it is gone (B0).
+  PregMessage? messageById(String id) => id.isEmpty ? null : _all.where((m) => m.id == id).firstOrNull;
 
   /// Delivered messages, newest first. What the inbox lists.
   List<PregMessage> delivered({DateTime? now}) {
@@ -714,11 +719,15 @@ class PregMessagesStore extends ChangeNotifier
   }
 
   /// The [NotificationService] tap listener. Claims only our own ids.
+  ///
+  /// Only for notifications armed before B0 (2026-10-30), which carry no
+  /// payload: the guess goes to the one opener as a link. Kept for revert:
+  ///   if (m != null) markRead(m.id);
+  ///   phoneTapOpener?.call(m);
   bool handlePhoneTap(int id) {
     if (!PregMessageKind.values.any((k) => k.phoneIds.contains(id))) return false;
     final m = messageForPhoneId(id);
-    if (m != null) markRead(m.id);
-    phoneTapOpener?.call(m);
+    NotificationService.instance.openLink(NotificationLink(NotificationLink.pregMessage, m?.id ?? ''));
     return true;
   }
 
@@ -894,7 +903,13 @@ class PregMessagesStore extends ChangeNotifier
       }
     }
     for (final (id, m) in plan) {
-      await _phone.schedule(id: id, title: phoneTitle(m.title, m.kind), body: m.body, when: m.at);
+      // The message's own id rides along (B0). Kept for revert: no payload.
+      await _phone.schedule(
+          id: id,
+          title: phoneTitle(m.title, m.kind),
+          body: m.body,
+          when: m.at,
+          payload: NotificationLink(NotificationLink.pregMessage, m.id).payload);
     }
   }
 

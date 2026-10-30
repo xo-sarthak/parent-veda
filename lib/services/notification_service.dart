@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/medication.dart';
 import '../models/reminder.dart';
 import '../localization/app_language.dart';
+import 'notification_link.dart';
 
 class NotificationService {
   NotificationService._();
@@ -57,10 +58,12 @@ class NotificationService {
       // listener, so they behave exactly as before.
       await _plugin.initialize(
         const InitializationSettings(android: android, iOS: ios),
-        onDidReceiveNotificationResponse: (r) {
-          final id = r.id;
-          if (id != null) _deliverTap(id);
-        },
+        // Kept for revert (B0, 2026-10-30): the id alone.
+        //   onDidReceiveNotificationResponse: (r) {
+        //     final id = r.id;
+        //     if (id != null) _deliverTap(id);
+        //   },
+        onDidReceiveNotificationResponse: (r) => _deliverResponse(r.id, r.payload),
       );
       _ready = true;
       // A tap that LAUNCHED the app arrives here instead, before any
@@ -68,9 +71,11 @@ class NotificationService {
       try {
         final launch = await _plugin.getNotificationAppLaunchDetails();
         final id = launch?.notificationResponse?.id;
-        if ((launch?.didNotificationLaunchApp ?? false) && id != null) {
+        final payload = launch?.notificationResponse?.payload;
+        // Kept for revert (B0): `&& id != null`, then _deliverTap(id).
+        if ((launch?.didNotificationLaunchApp ?? false) && (id != null || payload != null)) {
           launchedFromTap = true;
-          _deliverTap(id);
+          _deliverResponse(id, payload);
         }
       } catch (_) {/* best-effort */}
     } catch (_) {/* platform not ready - schedule() will simply no-op */}
@@ -119,6 +124,61 @@ class NotificationService {
   /// Test seam: behave as if the notification [id] was tapped.
   @visibleForTesting
   void debugTap(int id) => _deliverTap(id);
+
+  // ---- one opener (Phase 6b B0, 2026-10-30) ---------------------------------
+  //
+  // ⚠️ A TAP WITH AN ADDRESS GOES TO ONE PLACE. A notification that carries a
+  // [NotificationLink] in its payload (every stage message since B0, and every
+  // push from B1) is opened by the single opener the app registers with
+  // [setLinkOpener], `NotificationOpener.open`. A notification scheduled
+  // before B0 carries no payload, so its id still goes to the listeners
+  // above; each stage turns its id into a link and hands it to [openLink], so
+  // that path ends at the same opener.
+
+  void Function(NotificationLink link)? _linkOpener;
+
+  /// A link tapped before the opener was registered (a tap that launched the
+  /// app). Opened the moment it is.
+  NotificationLink? _unclaimedLink;
+
+  /// Registers THE opener. Called once, from `main.dart`.
+  void setLinkOpener(void Function(NotificationLink link) opener) {
+    _linkOpener = opener;
+    final pending = _unclaimedLink;
+    _unclaimedLink = null;
+    if (pending != null) openLink(pending);
+  }
+
+  /// Opens [link] through the registered opener, or holds it until there is
+  /// one. The entry point for a payload tap, an old id's translated tap and,
+  /// from B1, a push tap.
+  void openLink(NotificationLink link) {
+    final opener = _linkOpener;
+    if (opener == null) {
+      _unclaimedLink = link;
+      return;
+    }
+    try {
+      opener(link);
+    } catch (_) {/* a broken page must not take the app down */}
+  }
+
+  void _deliverResponse(int? id, String? payload) {
+    final link = NotificationLink.parse(payload);
+    if (link != null) return openLink(link);
+    if (id != null) _deliverTap(id);
+  }
+
+  /// Test seam: behave as if a notification carrying [payload] was tapped.
+  @visibleForTesting
+  void debugTapPayload(String payload, {int? id}) => _deliverResponse(id, payload);
+
+  /// Test seam: forget the opener and any held link.
+  @visibleForTesting
+  void debugResetLinkOpener() {
+    _linkOpener = null;
+    _unclaimedLink = null;
+  }
 
   /// Ask the OS for permission to post notifications (Android 13+ / iOS).
   Future<bool> requestPermission() async {
@@ -219,11 +279,15 @@ class NotificationService {
   /// Schedule a ONE-OFF notification at an absolute date/time - used for
   /// vaccine-due reminders (e.g. "1 day before"). Best-effort: no-ops if the
   /// platform isn't ready or the time is in the past.
+  ///
+  /// [payload] is what a tap opens, a [NotificationLink.payload] (B0,
+  /// 2026-10-30). Without one, a tap only offers its id to the listeners.
   Future<void> scheduleOneOff({
     required int id,
     required String title,
     String? body,
     required DateTime when,
+    String? payload,
   }) async {
     if (!_ready) await init();
     if (!_ready) return;
@@ -240,6 +304,7 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
+        payload: payload,
       );
     } catch (_) {/* best-effort */}
   }

@@ -297,6 +297,59 @@ opener (the one `SavedItemOpener` already is for saved items). The app's
 research found "a message that opens the wrong page" among the top complaints,
 so a push that lands on the home screen is a failure, not a detail.
 
+### As built: B0 (2026-10-30)
+
+**The address travels with the notification.** Each notification now carries a
+payload, `{"link_kind": ..., "link_id": ...}`, in the same shape a push's data
+will have. One opener, `NotificationOpener.open`
+(`lib/screens/notification_opener.dart`), turns it into a page. `main.dart`
+registers it with `NotificationService.setLinkOpener`. A tap that launches the
+app is held until it is registered.
+
+| Piece | File | What it does |
+|---|---|---|
+| `NotificationLink` | `lib/services/notification_link.dart` | The two fields, `payload` / `parse` / `fromData`. Pure |
+| Payload in and out | `lib/services/notification_service.dart` | `scheduleOneOff(payload:)`. The tap and launch handlers read `r.payload`. A payload goes to `openLink`, and no payload goes to the old id listeners |
+| Every stage message | the three messages stores | Armed with `ttc_message` / `preg_message` / `pp_message` plus the message's own id. `messageById` looks it up |
+| Old notifications | `handlePhoneTap` in each store | Ones armed before B0 have no payload. The id is guessed into a message as before, then sent to the same opener as a link |
+| The one opener | `lib/screens/notification_opener.dart` | Stage messages: waits for the store, finds the message by id, marks it read, hands it to its stage's own opener. `product` / `course` / `expert` / `read` open the page, or say it has gone. An unknown kind says "needs a newer ParentVeda" |
+
+**Gaps closed:**
+
+- **The message was guessed.** "The newest of its kind" opened today's tip from
+  yesterday's notification. Now the tap opens that exact message.
+- **Silent taps.** A gone message, a page that doesn't resolve (Pregnancy
+  check-in, scans; TTC destinations) and a profile that never opens (the
+  10-second wait in TTC and Pregnancy) now show a pvToast and open the nearest
+  real place.
+- **Parenting landed on the home screen** for four kinds. On the user's call:
+  - a new stage opens `PhaseDetailScreen`;
+  - the Monday activity opens the page for the stage the child was in that
+    Monday;
+  - the tip opens that morning's tip (`SavedTipScreen`);
+  - the age note stays on the child's home, because that is the age page.
+
+**Test:** `test/notifications_b0_tap_test.dart` pins every kind in all three
+stages to its destination. A new kind with no row fails the build. It also
+covers the by-id tap, the payload shape, the toasts and the wiring.
+`last_profile_test`, `preg_messages_test` and `ttc_tools_pass_e_test` were
+updated for the new path, and the eight phone fakes took the `payload`
+parameter.
+
+**Out of B0, owed:**
+
+- **14 older schedulers still only open the app on a tap.** They are
+  reminders, medicines, vaccines, appointments, bookings, sessions, referrals,
+  brand messages, prescriptions, feeding, mood check, health records, the TTC
+  ready plan and habits, and the doctor app. Each now only needs a `payload:`
+  and a kind in the opener.
+- The `syncAll` fix (STILL-OPEN §79.14(b)), as planned.
+- A tip for a child who was not active when it was armed was picked with no
+  correction for prematurity. The tap opens it with that child's correction.
+  For a baby born early, the page and the notification can be a few days of
+  age apart. Same day, same child, so it is accepted.
+- The phone walk (B6).
+
 ## Costs
 
 List prices as of 2026-10. Re-check them at build time. ₹84 = $1.
@@ -343,7 +396,7 @@ account you need for the App Store anyway.
 
 | Step | What | Done when |
 |---|---|---|
-| B0 | One tap opener for every notification, local and pushed | A tap on each 6a kind opens its page. The `syncAll` fix stays out of scope |
+| B0 | One tap opener for every notification, local and pushed | A tap on each 6a kind opens its page. The `syncAll` fix stays out of scope. **BUILT 2026-10-30**, see "As built: B0" |
 | B1 | Firebase in the app (`firebase_core`, `firebase_messaging`). It must not crash with no config: an unconfigured Firebase behaves like being logged out | The app starts on a build with no `google-services.json` |
 | B2 | Migration: `push_devices`, `push_consent`, `push_audience` and their functions. Phone: register, unregister on sign-out, consent with the retrying opt-out, the audience upload from `FamilyPhone` | Contract test pins every column the phone sends (as `ttc_schema_contract_test`) |
 | B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron | The SQL in "How to test" passes by hand |

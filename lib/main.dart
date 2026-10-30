@@ -34,6 +34,7 @@ import 'services/pregnancy_ended_store.dart';
 import 'services/pregnancy_records.dart';
 import 'services/pp_messages_store.dart';
 import 'screens/post_pregnancy/pp_home_reads.dart' show PpLastPageStore;
+import 'screens/notification_opener.dart' show NotificationOpener;
 import 'screens/post_pregnancy/pp_messages_screen.dart' show ppOpenMessageFromPhone;
 import 'services/preg_messages_store.dart';
 import 'screens/pregnancy/preg_theme.dart' show pregThemeFrom;
@@ -329,6 +330,10 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // `NotificationService.syncAll`, which cancels EVERY pending notification.
     // Anything scheduled before it finishes is wiped. See the header of
     // lib/ttc/ttc_messages_store.dart.
+    // THE one tap opener (6b B0, 2026-10-30): every notification that
+    // carries a link opens through it, and a tap that launched the app is
+    // held until now. It waits for each store to load by itself.
+    NotificationService.instance.setLinkOpener(NotificationOpener.open);
     ReminderStore.instance
         .init()
         .then((_) => TtcMessagesStore.instance.init())

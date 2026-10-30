@@ -30,6 +30,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/last_profile.dart' show LastProfile, kLastHomeRoot;
+import '../../services/notification_link.dart' show kNotifMessageGone, kNotifPageMissing, kNotifProfileClosed;
 import '../../services/pv_catalog_store.dart';
 import '../../ttc/ttc_daily_data.dart' show ttcAllInsights;
 import '../../ttc/ttc_insight_read.dart' show openTtcInsight;
@@ -81,6 +82,10 @@ void ttcOpenMessageFromPhone(TtcMessage? m, {int attempt = 0}) {
     if (attempt < 20) {
       Future<void>.delayed(const Duration(milliseconds: 500),
           () => ttcOpenMessageFromPhone(m, attempt: attempt + 1));
+    } else if (ctx != null && LastProfile.instance.homeShown) {
+      // Ten seconds and the trying profile never came (she has moved on to
+      // another stage): say so, never a silent tap (B0, 2026-10-30).
+      pvToast(ctx, kNotifProfileClosed);
     }
     return;
   }
@@ -92,6 +97,9 @@ void ttcOpenMessageFromPhone(TtcMessage? m, {int attempt = 0}) {
   }
   if (m != null && ttcOpenMessageTarget(ctx, m)) return;
   final dest = m == null ? null : ttcFirstOpenable(m.destinations);
+  // The inbox is the fallback, and it now says why (B0). Kept for revert:
+  //   openTtcSurface(ctx, dest ?? 'ttc_messages');
+  if (dest == null) pvToast(ctx, m == null ? kNotifMessageGone : kNotifPageMissing);
   openTtcSurface(ctx, dest ?? 'ttc_messages');
 }
 

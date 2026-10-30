@@ -23,6 +23,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/last_profile.dart' show LastProfile;
+import '../../services/notification_link.dart' show kNotifMessageGone, kNotifPageMissing;
 import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
 import '../../services/stage_gateway.dart';
@@ -39,6 +40,10 @@ import '../learn/pv_offering_screen.dart' show pvOpenOffering;
 import '../products/pv_store_chrome.dart' show kPvInk, pvOpenProduct, pvStorePalette;
 import '../v2/v2_palette.dart' show V2Palette;
 import 'vax_tracker_screen.dart';
+import 'phase_detail_screen.dart' show PhaseDetailScreen;
+import 'pp_daily_tips.dart' show dailyTipFor;
+import 'pp_phases_data.dart' show kPhases, phaseByNumber, phaseIndexForMonths;
+import 'pp_saved_hub_screen.dart' show SavedTipScreen;
 
 const String kPpMessagesRoute = 'pp/messages';
 
@@ -65,11 +70,34 @@ void openPpMessage(BuildContext context, PpMessage m) {
     // PP 11: an offer opens the toy or the class, or says it has gone.
     case PpMessageKind.offer:
       _openOffer(context, m.ref);
-    case PpMessageKind.age:
+    // ⚠️ EACH OPENS ITS OWN PAGE (B0, 2026-10-30, the user's call). They all
+    // went back to the child's home; a tap now lands on what the message is
+    // about. Kept for revert, the four together:
+    //   case PpMessageKind.age:
+    //   case PpMessageKind.milestones:
+    //   case PpMessageKind.activity:
+    //   // PP 11: the tip is the one the child's home shows today.
+    //   case PpMessageKind.tip:
+    // A new stage: that stage's page.
     case PpMessageKind.milestones:
+      final phase = phaseByNumber(ppMessagePhaseNumber(m.id) ?? -1);
+      if (phase == null) return _ppMissing(context);
+      _push(context, 'pp/phase', PhaseDetailScreen(phase: phase));
+    // The Monday idea comes from the stage the child was in that Monday; its
+    // page is where the idea and the rest like it live.
     case PpMessageKind.activity:
-    // PP 11: the tip is the one the child's home shows today.
+      final day = ppMessageDay(m.id);
+      if (day == null) return _ppMissing(context);
+      final phase = kPhases[phaseIndexForMonths(ppActivityMonthsOn(kids.dob, day).toDouble())];
+      _push(context, 'pp/phase', PhaseDetailScreen(phase: phase));
+    // The tip for THAT morning, as Saved opens a tip.
     case PpMessageKind.tip:
+      final day = ppMessageDay(m.id);
+      if (day == null) return _ppMissing(context);
+      final tip = dailyTipFor(dob: kids.dob, correctionWeeks: kids.correctionWeeks, on: day).tip;
+      _push(context, 'pp/tip', SavedTipScreen(tip: tip));
+    // The age note stays on the child's home: that IS the age page.
+    case PpMessageKind.age:
       // The age page is the parenting home: back to it. When parenting is not
       // the root (pregnant again, trying, the learning space), the child's
       // home opens over the root instead. The navigator is held first: this
@@ -80,6 +108,16 @@ void openPpMessage(BuildContext context, PpMessage m) {
         openStageDoor(nav.context, StageDoor.parenting);
       }
   }
+}
+
+void _push(BuildContext context, String name, Widget page) => Navigator.of(context)
+    .push(MaterialPageRoute<void>(settings: RouteSettings(name: name), builder: (_) => page));
+
+/// A page the message names cannot be found: say so, and open the inbox
+/// (no silent tap, B0).
+void _ppMissing(BuildContext context) {
+  pvToast(context, kNotifPageMissing);
+  openPpMessages(context);
 }
 
 /// A phone tap: open the message's page, or the inbox when it is not known.
@@ -94,7 +132,14 @@ void ppOpenMessageFromPhone(PpMessage? m, {int attempt = 0}) {
     }
     return;
   }
-  m == null ? openPpMessages(ctx) : openPpMessage(ctx, m);
+  // A message that has gone says so (B0). Kept for revert:
+  //   m == null ? openPpMessages(ctx) : openPpMessage(ctx, m);
+  if (m == null) {
+    pvToast(ctx, kNotifMessageGone);
+    openPpMessages(ctx);
+  } else {
+    openPpMessage(ctx, m);
+  }
 }
 
 /// What an offer message opens (PP 11), the Pregnancy inbox's rule: the

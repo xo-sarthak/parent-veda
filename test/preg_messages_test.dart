@@ -15,6 +15,8 @@ import 'package:parentveda/screens/pregnancy/preg_due_date_screen.dart';
 import 'package:parentveda/screens/pregnancy/preg_messages_screen.dart';
 import 'package:parentveda/screens/pregnancy/preg_more_screen.dart';
 import 'package:parentveda/screens/tools/due_date_calculator_screen.dart' show DdcMethod;
+import 'package:parentveda/screens/notification_opener.dart' show NotificationOpener;
+import 'package:parentveda/services/notification_service.dart' show NotificationService;
 import 'package:parentveda/services/preg_messages_store.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 
@@ -24,7 +26,7 @@ class _Phone implements PregMessagePhone {
 
   @override
   Future<void> schedule(
-      {required int id, required String title, required String body, required DateTime when}) async {
+      {required int id, required String title, required String body, required DateTime when, String? payload}) async {
     armed[id] = when;
   }
 
@@ -211,6 +213,9 @@ void main() {
       PregMessage? opened;
       PregMessagesStore.phoneTapOpener = (m) => opened = m;
       addTearDown(() => PregMessagesStore.phoneTapOpener = null);
+      // B0: an old id-only tap reaches the page through the one opener.
+      NotificationService.instance.setLinkOpener(NotificationOpener.open);
+      addTearDown(NotificationService.instance.debugResetLinkOpener);
       // The real clock: a tap is handled "now". Day 3 of week 20.
       final due = _dueFor(20, DateTime.now()).subtract(const Duration(days: 2));
       await store.refresh(facts: _facts(due));

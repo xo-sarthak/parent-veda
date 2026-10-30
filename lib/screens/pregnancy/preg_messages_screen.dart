@@ -29,6 +29,7 @@ import '../../data/doors/pv_door_data.dart' show PvDoorLibrary;
 import '../../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
 import '../../services/pv_catalog_store.dart';
 import '../../services/last_profile.dart' show LastProfile, kLastHomeRoot;
+import '../../services/notification_link.dart' show kNotifMessageGone, kNotifPageMissing, kNotifProfileClosed;
 import '../../services/life_stage_store.dart';
 import '../../services/preg_messages_store.dart';
 import '../../services/pregnancy_controller.dart';
@@ -74,9 +75,15 @@ void openPregMessage(BuildContext context, PregMessage m, PregnancyController c)
     case PregMessageKind.dayLine:
       push('pregnancy/week', () => PregWeekScreen(pregnancy: c, week: m.week ?? c.currentWeek));
     // The check-in is the Symptoms door's Today tab, the home's own "log".
+    // A door that does not resolve says so (no silent tap, B0). Kept for
+    // revert: no else.
     case PregMessageKind.checkIn:
       final door = pvDoorScreenForBracket(kSymptomsBracketId, c);
-      if (door != null) push('bracket/$kSymptomsBracketId', () => door);
+      if (door != null) {
+        push('bracket/$kSymptomsBracketId', () => door);
+      } else {
+        _pregMissing(context, c);
+      }
     case PregMessageKind.offer:
       _openOffer(context, m.ref);
     // Batch 7 (2026-10-28): each opens the page the Scans door opens for it,
@@ -87,11 +94,19 @@ void openPregMessage(BuildContext context, PregMessage m, PregnancyController c)
     case PregMessageKind.glucoseTest:
     case PregMessageKind.growthScan:
       final scan = pvDoorEntryScreen(PvDoorLibrary.scan, pregMessageScanId(m.kind)!, c);
-      if (scan != null) push('scans/detail', () => scan);
+      if (scan != null) {
+        push('scans/detail', () => scan);
+      } else {
+        _pregMissing(context, c);
+      }
     case PregMessageKind.ntScan:
     case PregMessageKind.anomalyScan:
       final door = pvDoorScreenForBracket('pregnancy_scans_tests', c);
-      if (door != null) push('bracket/pregnancy_scans_tests', () => door);
+      if (door != null) {
+        push('bracket/pregnancy_scans_tests', () => door);
+      } else {
+        _pregMissing(context, c);
+      }
     case PregMessageKind.tdap:
       openPvDoorRead(context, 'preg_scan_read_vaccines', c);
     case PregMessageKind.movements:
@@ -109,6 +124,13 @@ void openPregMessage(BuildContext context, PregMessage m, PregnancyController c)
         }
       }));
   }
+}
+
+/// A page the message names cannot be found: say so, and open the inbox
+/// (no silent tap, B0, 2026-10-30).
+void _pregMissing(BuildContext context, PregnancyController c) {
+  pvToast(context, kNotifPageMissing);
+  openPregMessages(context, c);
 }
 
 /// A phone tap: wait for the pregnancy shell, then open the message's page,
@@ -132,6 +154,9 @@ void pregOpenMessageFromPhone(PregMessage? m, {int attempt = 0}) {
     if (attempt < 20) {
       Future<void>.delayed(const Duration(milliseconds: 500),
           () => pregOpenMessageFromPhone(m, attempt: attempt + 1));
+    } else if (ctx != null && LastProfile.instance.homeShown) {
+      // Ten seconds and the pregnancy profile never came: say so (B0).
+      pvToast(ctx, kNotifProfileClosed);
     }
     return;
   }
@@ -141,6 +166,7 @@ void pregOpenMessageFromPhone(PregMessage? m, {int attempt = 0}) {
     if (ctx == null) return;
   }
   if (m == null) {
+    pvToast(ctx, kNotifMessageGone); // B0: a message that has gone says so
     openPregMessages(ctx, c);
   } else {
     openPregMessage(ctx, m, c);

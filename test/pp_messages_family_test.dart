@@ -20,7 +20,7 @@ import 'package:parentveda/services/pp_messages_store.dart';
 
 class _QuietPhone implements PpMessagePhone {
   @override
-  Future<void> schedule({required int id, required String title, required String body, required DateTime when}) async {}
+  Future<void> schedule({required int id, required String title, required String body, required DateTime when, String? payload}) async {}
   @override
   Future<void> cancel(int id) async {}
 }

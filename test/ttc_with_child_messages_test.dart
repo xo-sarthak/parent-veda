@@ -24,6 +24,7 @@ class _PpPhone implements PpMessagePhone {
     required String title,
     required String body,
     required DateTime when,
+    String? payload,
   }) async {
     armed[id] = (when, title);
   }

@@ -155,6 +155,7 @@ import 'ttc_fertility_help_store.dart';
 import 'ttc_period_due.dart';
 import 'ttc_store.dart';
 import 'ttc_treatment_store.dart';
+import '../services/notification_link.dart';
 
 /// The five messages. The NAME is persisted, so renaming one strands every
 /// message already delivered under it.
@@ -1258,11 +1259,14 @@ List<TtcMessage> ttcTreatmentMessages(
 /// Where the phone notifications go. An interface so tests can see what was
 /// scheduled without a platform plugin.
 abstract class TtcMessagePhone {
+  /// [payload] is the message's [NotificationLink] (B0, 2026-10-30): what a
+  /// tap opens, carried in the notification.
   Future<void> schedule(
       {required int id,
       required String title,
       required String body,
-      required DateTime when});
+      required DateTime when,
+      String? payload});
   Future<void> cancel(int id);
 }
 
@@ -1274,9 +1278,10 @@ class _OsPhone implements TtcMessagePhone {
           {required int id,
           required String title,
           required String body,
-          required DateTime when}) =>
-      NotificationService.instance
-          .scheduleOneOff(id: id, title: title, body: body, when: when);
+          required DateTime when,
+          String? payload}) =>
+      NotificationService.instance.scheduleOneOff(
+          id: id, title: title, body: body, when: when, payload: payload);
 
   @override
   Future<void> cancel(int id) => NotificationService.instance.cancel(id);
@@ -1322,6 +1327,11 @@ class TtcMessagesStore extends ChangeNotifier
   set phone(TtcMessagePhone p) => _phone = p;
 
   bool get isLoaded => _loaded;
+
+  /// The message with [id], delivered or still pending, or null when it is
+  /// gone (B0: a tapped notification names its message by id).
+  TtcMessage? messageById(String id) =>
+      id.isEmpty ? null : _all.where((m) => m.id == id).firstOrNull;
 
   /// Delivered messages, newest first. What the Messages screen lists.
   List<TtcMessage> delivered({DateTime? now}) {
@@ -1393,7 +1403,8 @@ class TtcMessagesStore extends ChangeNotifier
 
   /// Opens a tapped message. Swappable in tests; defaults to the screen's
   /// opener, which pushes the message's first destination that resolves.
-  @visibleForTesting
+  /// Read by `NotificationOpener` since B0 (2026-10-30), so no longer
+  /// test-only. Kept for revert: @visibleForTesting
   static void Function(TtcMessage? m) phoneTapOpener = ttcOpenMessageFromPhone;
 
   /// The message a phone notification [id] was for, or null when the id is
@@ -1418,12 +1429,19 @@ class TtcMessagesStore extends ChangeNotifier
 
   /// The [NotificationService] tap listener. Claims only our own ids, so
   /// every other feature's notification behaves as it always did.
+  ///
+  /// ⚠️ ONLY FOR NOTIFICATIONS ARMED BEFORE B0 (2026-10-30). Those carry no
+  /// payload, so the id is still guessed into a message; the guess then goes
+  /// to the one opener as a link, like every other tap. Kept for revert:
+  ///   final m = messageForPhoneId(id);
+  ///   if (m != null) markRead(m.id);
+  ///   phoneTapOpener(m);
   bool handlePhoneTap(int id) {
     final ours = TtcMessageKind.values.any((k) => k.phoneIds.contains(id));
     if (!ours) return false;
     final m = messageForPhoneId(id);
-    if (m != null) markRead(m.id);
-    phoneTapOpener(m);
+    NotificationService.instance
+        .openLink(NotificationLink(NotificationLink.ttcMessage, m?.id ?? ''));
     return true;
   }
 
@@ -1513,7 +1531,14 @@ class TtcMessagesStore extends ChangeNotifier
       for (final (id, m) in phonePlanned(now: now)) {
         // The kind's emoji on the phone only (2026-10-29, `phone_emoji.dart`);
         // the message keeps its plain title. Kept for revert: title: m.title,
-        await _phone.schedule(id: id, title: phoneTitle(m.title, m.kind), body: m.body, when: m.at);
+        // The message's own id rides along (B0), so a tap opens THIS one.
+        // Kept for revert: no payload.
+        await _phone.schedule(
+            id: id,
+            title: phoneTitle(m.title, m.kind),
+            body: m.body,
+            when: m.at,
+            payload: NotificationLink(NotificationLink.ttcMessage, m.id).payload);
       }
     }
     // A child's messages step out of the way of what was just armed
