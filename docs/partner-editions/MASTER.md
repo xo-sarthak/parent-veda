@@ -18,6 +18,10 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | D2 | Where do org admins see stats? | **ParentVeda Partners**, a third flavour from this repo. |
 | D3 | Doctors | Most are individuals with their own clinic. They are their own partner and use **ParentVeda+** only. The Partners app is for organisations with several people (employer, school, IVF centre with several doctors). In the parent app a doctor is a "Your doctor" line, never a lockup. |
 | D4 | Order | Doctor app and Partners app first (no other terminal is in them). **Parent app last.** |
+| D5 | A "viewed" count on the Content tab (2026-10-30) | No. Booked and used only (STILL-OPEN §11.9). |
+| D6 | A stage mix for sponsors (2026-10-30) | No, never (STILL-OPEN §11.10). |
+| D7 | Email sender for activation codes (2026-10-30) | Resend (STILL-OPEN §11.6). Still to build. |
+| D8 | A renewed contract after `ended` (2026-10-30) | Ops re-grants by hand; no trigger (STILL-OPEN §11.4). |
 
 ## Recommended defaults, written down (the user can overrule any row)
 | # | Question | Default | Why |

@@ -2155,12 +2155,22 @@ activations are blocked (both already true). `sponsor_members` rows are left as 
 join public.sponsors s on s.id = m.sponsor_id where s.id = '<id>' and m.status = 'active';` (consultation credits are
 granted at activation, so a renewal that includes them needs `grant_consult_credits` as well).
 
+**DECIDED 2026-10-30, the user: by hand, on purpose.** A renewal is often a different deal (fewer seats, another
+plan) and the member list still holds people who left during the gap, so an automatic restore would copy the old
+deal to the wrong people. Narrow the SQL above to the new contract's people before running it. Becomes a Directus
+button later; no trigger.
+
 ## 11.5 Company-uploaded resources are third-party content in a health product
 
 Sponsors upload documents that render inside the app. Needs a review path and a
 hard rule that they are never medical advice, before any sponsor uploads.
 
 ## 11.6 Activation codes have no sender — LAUNCH BLOCKER for sponsors
+
+**Provider DECIDED 2026-10-30, the user: Resend** (free to 3,000 emails a month, then $20/month, about ₹1,700, for
+50,000; simplest from a Supabase Edge Function). **Still to build:** the Resend account and a verified sending
+domain (user), the API key as an Edge Function secret, and the function that sends the code
+`request_sponsor_activation()` writes. Until then the flow below is still inert.
 
 `0058` creates the one-time code, its expiry, the attempt limit and the
 verification. **Nothing sends it.** There is no transactional email provider
@@ -2276,7 +2286,8 @@ used" (which sections they use) on Overview, and a KPI of "consults used of incl
 - **Most used** is declined by 0065 on purpose (a section breakdown narrows down who is worried about what in a small
   team) and the portal's report promises it is absent. Not reopening this.
 - **The stage mix** needs a new aggregate RPC *and* a decision: in a team of 30, "4 are pregnant" is close to naming
-  someone, so it would be behaviour (withheld below `min_cohort`) at the least. **The user's call** whether HR gets it at all.
+  someone, so it would be behaviour (withheld below `min_cohort`) at the least. **DECIDED 2026-10-30, the user: no, never.**
+  Pregnancy is what employees most often keep from HR; activations and active users already show the programme works.
 - **Included consultations** has no server figure: nothing says how many consultations a sponsor's plan includes. Needs
   the plan's credit allowance exposed through `sponsor_dashboard`, once the commercial terms are fixed.
 
@@ -2293,7 +2304,8 @@ Partners. The parent app does not show an "Exclusively for you" rail yet; that i
 - **"Viewed" counts.** The P4 plan asked for them. Nothing records who opened which programme (0065 records rooms,
   never what was in them), so the Content tab shows booked and used only. Adding a per-programme view event is a
   privacy decision: an employer learning that someone *looked at* a fertility session is the same leak as booking.
-  **The user's call** whether to build it, and if so, withheld below `min_cohort` like every behaviour figure.
+  **DECIDED 2026-10-30, the user: not built. Booked and used only.** A view is the same leak as a booking with less
+  reason for it, and booked already shows whether a session was worth running.
 - **Stub-mode `book_slot`** books against a seat without a receipt and is not audience-checked. Live mode books only
   against a receipt, and every receipt door is checked, so this is a demo-mode gap only.
 - **No screen to make a session exclusive.** SQL now (R9), Directus later (`docs/ADMIN-PANEL.md`).
