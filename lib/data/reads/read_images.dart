@@ -1471,6 +1471,13 @@ const Map<String, String> kReadImageUrls = {
   // Trying again: the feelings
   'ttc_read_loss_feelings':
       'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Candle_light_projected_through_a_glass_orb.jpg/1280px-Candle_light_projected_through_a_glass_orb.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // PCOS circle (Community, 2026-10-30): two people at one table, no faces,
+  // so nobody pictured is labelled as having PCOS.
+  'ttc_tile_pcos_circle':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Person_Holding_Mug_on_Table_%2829214761648%29.jpg/1280px-Person_Holding_Mug_on_Table_%2829214761648%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+  // Loss & Recovery room (Community, 2026-10-30): a quiet window, no people.
+  'ttc_tile_loss_recovery_room':
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Window_frame_shadow_on_a_curtain_%28Unsplash%29.jpg/1280px-Window_frame_shadow_on_a_curtain_%28Unsplash%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
   // Your Care Circle
   'ttc_tile_your_care_circle':
       'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Rackets_Court_wooden_bench_in_Copped_Hall_Gardens%2C_Epping%2C_Essex%2C_England.jpg/1280px-Rackets_Court_wooden_bench_in_Copped_Hall_Gardens%2C_Epping%2C_Essex%2C_England.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
@@ -2719,6 +2726,8 @@ const Map<String, String> kReadImageCredits = {
   'ttc_tile_what_to_do_differently_next_time': 'CC0 · StockSnap · eberhard grossgasteiger',
   'ttc_read_loss_feelings': 'CC BY-SA 4.0 · Wikimedia Commons · W.carter',
   'ttc_tile_your_care_circle': 'CC BY-SA 4.0 · Wikimedia Commons · Acabashi',
+  'ttc_tile_pcos_circle': 'CC0 · Wikimedia Commons · rawpixel',
+  'ttc_tile_loss_recovery_room': 'CC0 · Wikimedia Commons · Steinar Engeland',
   'ttc_tile_someone_who_knows_this_kind_of_loss': 'CC0 · StockSnap · Maria Shanina',
   'ttc_tile_after_a_loss_four_sessions': 'CC0 · StockSnap · Aaron Burden',
   'ttc_tile_talk_it_through': 'CC0 · StockSnap · Negative Space',
