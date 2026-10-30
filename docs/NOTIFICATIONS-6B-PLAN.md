@@ -488,7 +488,7 @@ before B2.
 
 - **Before B2:** ~~the user's Firebase setup (steps 1 to 4)~~ done 2026-10-30
   (project `parentveda-15ec4`, three Android apps, key kept outside the repo),
-  and `pg_net` (step 9), still owed.
+  and `pg_net` (step 9), turned on by the user 2026-10-30.
 - **During the build:** a BACKEND-PATTERNS section for 6b. It should cover
   "moving a decision moves its inputs", "the cost of losing a write decides how
   hard you deliver it" and "pick the shape where missing means the true answer".
