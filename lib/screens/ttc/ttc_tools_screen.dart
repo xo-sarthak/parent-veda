@@ -86,6 +86,7 @@ import '../../services/remote/cloud_merged_store.dart';
 // import '../../services/remote/sync_registry.dart'; // kept for revert (step 13: the mixin registers)
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_content_prefs.dart';
+import '../../ttc/ttc_focus_data.dart' show TtcToolTile;
 import '../../ttc/ttc_log_store.dart';
 import '../../widgets/global_ask_fab.dart' show FabState, kAskVedaRoute;
 import '../../widgets/pv_feedback.dart';
@@ -1464,7 +1465,19 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
           hideIntimate: key.$1);
       _indexFor = key;
     }
-    final library = ttcLibrarySearch(q, _index!).take(6).toList();
+    // A door's tile for a tool already listed above is the same tool twice
+    // (2026-10-30): since the door cards took each tool's one name (2bf951f1),
+    // "sleep" found "What you're working on" as a tool and again from the
+    // Getting ready door. Door tool tiles open `ttc_<tool id>`. Kept for
+    // revert: final library = ttcLibrarySearch(q, _index!).take(6).toList();
+    final listed = {for (final tool in tools) 'ttc_${tool.id}'};
+    final library = ttcLibrarySearch(q, _index!)
+        .where((e) => switch (e.$1.tile) {
+              TtcToolTile(:final surfaceId) => !listed.contains(surfaceId),
+              _ => true,
+            })
+        .take(6)
+        .toList();
     // A row that moved to More is named with where it went (2026-09-28): a
     // feature is never hidden, only moved. Words, not a second door: the
     // bar's More is the one way in.

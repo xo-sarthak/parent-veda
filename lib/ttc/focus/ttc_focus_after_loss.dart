@@ -498,6 +498,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // Re-enabled 2026-10-28 for the new community (lib/screens/community).
         TtcCommunityTile(
           title: 'Loss & Recovery room',
+          id: 'ttc_tile_loss_recovery_room',
           blurb: 'A gentle space. Nobody gives you a timeline or a bright side, '
               'and nobody gives advice unless you ask for it.',
           surfaceId: 'ttc_community',

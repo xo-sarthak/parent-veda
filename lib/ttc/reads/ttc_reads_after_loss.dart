@@ -326,9 +326,11 @@ final List<PvRead> kTtcReadsAfterLoss = [
       //   surfaceId: 'ttc_community',
       // ),
       // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+      // Names the place (2026-10-30): "here" named nothing. Kept for revert:
+      //   title: _en('Others who have been here'),
       PvReadNextStep(
         kind: PvNextKind.activity,
-        title: _en('Others who have been here'),
+        title: _en('Others in the Loss & Recovery room'),
         value: _en("People who've been through this too, whenever you want "
             'them. Or not at all.'),
         surfaceId: 'ttc_community',
@@ -618,9 +620,11 @@ final List<PvRead> kTtcReadsAfterLoss = [
       //   surfaceId: 'ttc_community',
       // ),
       // Re-enabled 2026-10-28 for the new community (lib/screens/community).
+      // Names the place (2026-10-30): "here" named nothing. Kept for revert:
+      //   title: _en('Others who have been here'),
       PvReadNextStep(
         kind: PvNextKind.activity,
-        title: _en('Others who have been here'),
+        title: _en('Others in the Loss & Recovery room'),
         value: _en("People who've been through this too, whenever you want "
             'them. Or not at all.'),
         surfaceId: 'ttc_community',
