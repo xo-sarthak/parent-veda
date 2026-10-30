@@ -40,3 +40,21 @@ String partnerHoldText(PartnerOrg org) {
 
 /// Where an admin reaches ParentVeda. One address, also used by the Account tab.
 const kPartnersSupportEmail = 'partners@parentveda.com';
+
+// ---- P2: the sponsor tabs' recurring sentences -------------------------------
+
+/// Every seat is taken: what that stops, and the next step.
+String partnerSeatsFullText(PartnerOrg org, int seats) =>
+    'All $seats seats are taken. New ${org.peopleWord} cannot activate until '
+    'seats are added. Contact your ParentVeda manager.';
+
+/// A behavioural figure held back. [min] is the server's min_cohort.
+String partnerWithheldText(int min) => 'Shown once $min have activated';
+
+/// What the organisation will never see, said where it looks at its numbers.
+String partnerPrivacyText(PartnerOrg org) =>
+    'You see totals, never a person: not who booked, read or asked anything, '
+    'and no breakdown by section, because in a small group that narrows down '
+    'who is worried about what. Every total is held back below a minimum '
+    'group size. Your ${org.peopleWord} were promised this when they '
+    'activated.';

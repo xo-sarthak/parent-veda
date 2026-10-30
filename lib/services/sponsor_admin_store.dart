@@ -24,35 +24,105 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// One employee's ELIGIBILITY. Note what is not here: no user id, no name, no
-/// pregnancy, no child, no usage. The server does not return those fields, so
-/// this class could not carry them even if a screen asked.
+/// One person on the programme's list, and whether they have activated.
+/// Note what is not here: no user id, no pregnancy, no child, no usage. The
+/// server does not return those fields, so this class could not carry them
+/// even if a screen asked.
+///
+/// [fullName] is the one exception worth explaining, and it is not one: HR
+/// SENT US THESE NAMES on their own staff list (0061). Returning them hands
+/// the organisation its data back, not ours. Null for someone who activated
+/// by email domain and was never on a list.
 @immutable
 class SponsorMemberRow {
   const SponsorMemberRow({
     required this.workEmail,
     required this.status,
+    this.fullName,
     this.activatedAt,
     this.removedAt,
   });
 
   final String workEmail;
-  final String status; // active | removed
+  final String? fullName;
+
+  /// active | not_activated | removed (sponsor_roster, 0061). Identity:
+  /// compared, never shown.
+  ///
+  /// ⚠️ THREE values, not two. This class was written against 0060's roster,
+  /// which returned members only, so "not active" meant "removed". 0061 added
+  /// the people on the list who have not started yet, and every screen that
+  /// still split the list on [isActive] showed them as Removed, with a "—"
+  /// for a date: the follow-up list HR opens the screen for, labelled as the
+  /// leavers. Split on the three getters below, never on `!isActive`.
+  final String status;
   final DateTime? activatedAt;
   final DateTime? removedAt;
 
   bool get isActive => status == 'active';
+  bool get isNotActivated => status == 'not_activated';
+  bool get isRemoved => status == 'removed';
 
-  static SponsorMemberRow fromMap(Map<String, dynamic> m) => SponsorMemberRow(
-        workEmail: (m['work_email'] ?? '').toString(),
-        status: (m['status'] ?? 'active').toString(),
-        activatedAt: m['activated_at'] == null
-            ? null
-            : DateTime.tryParse(m['activated_at'].toString()),
-        removedAt: m['removed_at'] == null
-            ? null
-            : DateTime.tryParse(m['removed_at'].toString()),
-      );
+  /// The name HR gave us, or the email when there is none.
+  String get displayName {
+    final n = fullName?.trim();
+    return n == null || n.isEmpty ? workEmail : n;
+  }
+
+  static SponsorMemberRow fromMap(Map<String, dynamic> m) {
+    final name = m['full_name']?.toString().trim();
+    return SponsorMemberRow(
+      workEmail: (m['work_email'] ?? '').toString(),
+      fullName: name == null || name.isEmpty ? null : name,
+      // An unknown status reads as not started: it is the one that claims
+      // nothing (neither "using it" nor "taken off").
+      status: switch (m['status']) {
+        'active' => 'active',
+        'removed' => 'removed',
+        _ => 'not_activated',
+      },
+      activatedAt: m['activated_at'] == null
+          ? null
+          : DateTime.tryParse(m['activated_at'].toString()),
+      removedAt: m['removed_at'] == null
+          ? null
+          : DateTime.tryParse(m['removed_at'].toString()),
+    );
+  }
+}
+
+/// One month of engagement (sponsor_engagement, 0065). Every figure is null
+/// when that month's cohort of people who opened the app was below the
+/// threshold: the headcount itself is behavioural ("2 people opened it in
+/// July"), so it is withheld with the rest. Null is "withheld", never 0.
+@immutable
+class SponsorEngagementPoint {
+  const SponsorEngagementPoint({
+    required this.month,
+    this.activePeople,
+    this.sessions,
+    this.avgSessionMin,
+  });
+
+  final DateTime month;
+  final int? activePeople;
+  final int? sessions;
+  final double? avgSessionMin;
+
+  bool get withheld => activePeople == null;
+
+  static SponsorEngagementPoint? fromMap(Map<String, dynamic> m) {
+    final d = DateTime.tryParse((m['month'] ?? '').toString());
+    if (d == null) return null;
+    num? n(Object? v) =>
+        v == null ? null : (v is num ? v : num.tryParse(v.toString()));
+    return SponsorEngagementPoint(
+      month: d,
+      activePeople: n(m['active_people'])?.toInt(),
+      sessions: n(m['sessions'])?.toInt(),
+      avgSessionMin: n(m['avg_session_min'])?.toDouble(),
+    );
+  }
 }
 
 /// The dashboard, as the server computed it.
@@ -177,6 +247,7 @@ class SponsorAdminStore extends ChangeNotifier {
   SponsorDashboard? _dashboard;
   List<SponsorTrendPoint> _trend = const [];
   List<SponsorMemberRow> _roster = const [];
+  List<SponsorEngagementPoint> _engagement = const [];
   bool _loading = false;
   bool _everLoaded = false;
   String? _error;
@@ -200,6 +271,21 @@ class SponsorAdminStore extends ChangeNotifier {
   }
 
   List<SponsorMemberRow> get roster => List.unmodifiable(_roster);
+
+  /// Oldest month first, six months. Empty until the first refresh.
+  List<SponsorEngagementPoint> get engagement =>
+      List.unmodifiable(_engagement);
+
+  /// This calendar month's engagement, or null when it has not loaded. A
+  /// loaded month can still be [SponsorEngagementPoint.withheld].
+  SponsorEngagementPoint? get thisMonth {
+    if (_engagement.isEmpty) return null;
+    final now = DateTime.now();
+    final last = _engagement.last;
+    return last.month.year == now.year && last.month.month == now.month
+        ? last
+        : null;
+  }
   bool get loading => _loading;
   bool get everLoaded => _everLoaded;
   String? get error => _error;
@@ -255,9 +341,26 @@ class SponsorAdminStore extends ChangeNotifier {
         } catch (_) {
           _trend = const [];
         }
+
+        // Engagement (0065), same reasoning: not fatal. Six months, which is
+        // what the Partners app shows; the server caps it at 24.
+        try {
+          final e = await client.rpc(
+            'sponsor_engagement',
+            params: {'p_months': 6},
+          );
+          _engagement = ((e as List?) ?? const [])
+              .map((x) => SponsorEngagementPoint.fromMap(
+                  (x as Map).cast<String, dynamic>()))
+              .whereType<SponsorEngagementPoint>()
+              .toList();
+        } catch (_) {
+          _engagement = const [];
+        }
       } else {
         _roster = const [];
         _trend = const [];
+        _engagement = const [];
       }
     } catch (e) {
       _error = 'We could not load your programme just now.';
@@ -296,6 +399,7 @@ class SponsorAdminStore extends ChangeNotifier {
     _dashboard = null;
     _roster = const [];
     _trend = const [];
+    _engagement = const [];
     _error = null;
     _loading = false;
     _everLoaded = false;
@@ -307,10 +411,14 @@ class SponsorAdminStore extends ChangeNotifier {
     SponsorDashboard? dashboard,
     List<SponsorMemberRow>? roster,
     List<SponsorTrendPoint>? trend,
+    List<SponsorEngagementPoint>? engagement,
+    String? error,
   }) {
     _dashboard = dashboard;
     _roster = roster ?? const [];
     _trend = trend ?? const [];
+    _engagement = engagement ?? const [];
+    _error = error;
     _everLoaded = true;
     _loading = false;
     notifyListeners();

@@ -80,6 +80,32 @@ coverage, flavour and icons, the 0136 contract on the **latest** definitions). *
 Tests: `partner_overview_test` (suppressed / unsuppressed / unlimited seats), `sponsor_roster_status_test`
 (the bug), and a render test for each tab.
 
+### P2 as built (2026-10-30)
+
+**Dropped from the plan, said plainly.**
+- **"Where your families are" (a stage mix) and "Most used" (a section breakdown).** No RPC returns either, and
+  0065 declines the second on purpose: in a small team "your people spend their time in Health" narrows down who is
+  worried about what. The portal's report says so in its "does not contain" list. Building the stage mix needs a
+  migration *and* a privacy decision (is "how many of your employees are pregnant" behaviour or a contract fact?);
+  parked as STILL-OPEN §11.10, for the user. Overview's privacy note says the section-breakdown half in the product's voice.
+- **"Consults used of included."** No server figure says how many consultations a sponsor's plan includes, so the KPI
+  is consultations booked, with attended and upcoming under it. Parked with §11.10.
+
+| # | What shipped | Where |
+|---|---|---|
+| 1 | Overview: Seats (or Unlimited / No cap), Activated with take-up ("of your list" or "of seats", the server's denominator), Active this month (`sponsor_engagement`'s current month), Consultations. Behaviour is "—" plus the reason when withheld, and every threshold sentence uses the server's `min_cohort`. Take-up bars (12 months, with the three-month change said plainly, down as well as up) and "Coming back" bars (6 months; a withheld month is a hairline and a dash, never a zero bar). A full programme gets a red notice with the next step. Pull to refresh; error with Try again; not-loaded keeps P1's empty state | `lib/screens/partner_app/partner_sponsor_overview.dart` |
+| 2 | Store: `SponsorMemberRow` reads all three statuses (`isActive / isNotActivated / isRemoved`) plus `full_name`; an unknown status reads as not started (it claims nothing). `sponsor_engagement(6)` fetched in `refresh()`, not fatal, like the trend. **The bug:** the in-app HR screen split on `!isActive`, so everyone not yet started showed as "Removed —". Fixed there too (three lists; not-started always shown, they are HR's follow-up list) | `lib/services/sponsor_admin_store.dart`, `lib/screens/enterprise/sponsor_dashboard_screen.dart` |
+| 3 | People: name (HR's own) or email, status and date; search by name or email; filter segments with counts (All / Activated / Not started / Removed). Remove only on active people, opening an **in-page** confirm in the row (what is lost, what is not; Remove / Keep). Not-started people leave by an updated list, and the page says how. The admin's own row reads "· You" and has no Remove. All seats taken: a chip and the next step. Empty roster: P1's explanation card | `lib/screens/partner_app/partner_sponsor_people.dart` |
+| 3+ | **Self-removal refused on the server too** (the plan said both sides; no RPC did it): `0138` adds `cannot_remove_self` to `sponsor_remove_member`, on the **uid**, before the remove. A work email and a login email are often different addresses for one person, so the app's email check is only a shortcut. A legacy (0060) admin who removed herself would have locked herself out | `supabase/migrations/0138_sponsor_remove_not_self.sql` |
+| 4 | Report: Overview → "Monthly report" (named route `partner/report`) mirrors the portal page: headline sentence, four figures, consultations or why withheld, month by month (a table, withheld months a dash), what it does not contain. "Share as PDF" goes through the OS share sheet. One `PartnerReport` model feeds both the screen and the PDF, so they can only differ in typography; the PDF uses built-in Helvetica, so it builds offline | `lib/partner_app/partner_report.dart`, `lib/screens/partner_app/partner_report_screen.dart` |
+| 5 | Stale copy: the HR screen's "time in the app… we do not measure that last one at all" corrected in English and Hindi (0065 measures it, monthly totals only, withheld for small groups); the old line commented out, kept for revert | `sponsor_dashboard_screen.dart` |
+| 6 | School wording from `org.peopleWord` / `isSchool` throughout: parents, parent list | the two new tabs, `partner_words.dart` |
+
+Tests: `partner_overview_test` (11: suppressed with a server threshold of 7, unsuppressed, unlimited seats, full,
+not loaded, error, report route, model arithmetic, PDF bytes), `partner_people_test` (8), `sponsor_roster_status_test`
+(7, incl. the 0138 contract). `partner_app_shell_test` unchanged and green. **Run 0138 before the walk** (until then
+the app's email check still stops the common case).
+
 ## P3: IVF centre view (care_org)
 1. Overview from `partner_impact` + `partner_funnel` + `partner_earnings`; a **per-doctor table** from
    `partner_referral_breakdown()` (first caller in the codebase): doctor, families, latest. Behaviour

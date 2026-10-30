@@ -1,8 +1,10 @@
 // =============================================================================
 //  The Partners app's four tab bodies (P1)
 // -----------------------------------------------------------------------------
-//  Overview · People · Content · Account. P1 builds the frame and the Account
-//  tab in full; the other three open on their empty states, which is the
+//  Overview · People · Content · Account. P1 built the frame and the Account
+//  tab; P2 gave an employer or a school its Overview and People
+//  (partner_sponsor_overview.dart, partner_sponsor_people.dart). What is left
+//  opens on its empty state, which is the
 //  house rule rather than a placeholder: a feature is never hidden, and the
 //  empty state is the feature's advertisement. Each one is replaced in place
 //  by its phase, and its file is the obvious place to do it:
@@ -23,6 +25,8 @@ import '../../partner_app/partner_org_session.dart';
 import '../../partner_app/partner_sign_out.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../doctor/doctor_chrome.dart';
+import 'partner_sponsor_overview.dart';
+import 'partner_sponsor_people.dart';
 import 'partner_words.dart';
 
 enum PartnerTab { overview, people, content, account }
@@ -76,8 +80,8 @@ String partnerOrgKindLabel(PartnerOrg org) => switch (org.kind) {
 };
 
 /// The organisation as a header row, at the top of Overview and Account.
-class _OrgHeader extends StatelessWidget {
-  const _OrgHeader(this.org);
+class PartnerOrgHeader extends StatelessWidget {
+  const PartnerOrgHeader(this.org, {super.key});
   final PartnerOrg org;
 
   @override
@@ -103,25 +107,26 @@ class PartnerOverviewTab extends StatelessWidget {
   const PartnerOverviewTab({super.key, required this.org});
   final PartnerOrg org;
 
+  // P2: an employer or a school gets its numbers; an IVF centre keeps the
+  // empty state until P3.
   @override
-  Widget build(BuildContext context) => DcTab(
-    title: 'Overview',
-    subtitle: org.name,
-    children: [
-      _OrgHeader(org),
-      const SizedBox(height: 20),
-      DcEmpty(
-        'Your numbers live here',
-        org.kind == PartnerOrgKind.careOrg
-            ? 'Families each of your doctors brought, and how many are active, '
-                  'appear on this tab.'
-            : 'How many ${org.peopleWord} activated, who is active this month '
-                  'and the consults used appear on this tab.',
-        icon: Icons.insights_outlined,
-      ),
-      _barRoom,
-    ],
-  );
+  Widget build(BuildContext context) => org.kind == PartnerOrgKind.sponsor
+      ? PartnerSponsorOverview(org: org)
+      : DcTab(
+          title: 'Overview',
+          subtitle: org.name,
+          children: [
+            PartnerOrgHeader(org),
+            const SizedBox(height: 20),
+            const DcEmpty(
+              'Your numbers live here',
+              'Families each of your doctors brought, and how many are active, '
+                  'appear on this tab.',
+              icon: Icons.insights_outlined,
+            ),
+            _barRoom,
+          ],
+        );
 }
 
 class PartnerPeopleTab extends StatelessWidget {
@@ -144,19 +149,8 @@ class PartnerPeopleTab extends StatelessWidget {
         ],
       );
     }
-    final list = org.isSchool ? 'parent list' : 'staff list';
-    return DcTab(
-      title: 'People',
-      children: [
-        DcEmpty(
-          'Your ${org.peopleWord} appear here',
-          'Everyone on your $list, and whether they have activated. '
-              'Send us your $list to get started: $kPartnersSupportEmail.',
-          icon: Icons.groups_outlined,
-        ),
-        _barRoom,
-      ],
-    );
+    // P2: the roster. Its empty state is the one that stood here.
+    return PartnerSponsorPeople(org: org);
   }
 }
 
@@ -209,7 +203,7 @@ class _PartnerAccountTabState extends State<PartnerAccountTab> {
     return DcTab(
       title: 'Account',
       children: [
-        _OrgHeader(org),
+        PartnerOrgHeader(org),
         const SizedBox(height: 20),
         DcRowGroup(
           children: [

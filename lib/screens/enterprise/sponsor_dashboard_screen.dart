@@ -125,8 +125,12 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
       );
     }
 
+    // Three statuses, three lists (0061). This used to be `!r.isActive`,
+    // which filed everyone on the list who had not started yet under
+    // Removed: the follow-up list, labelled as the leavers.
     final active = store.roster.where((r) => r.isActive).toList();
-    final removed = store.roster.where((r) => !r.isActive).toList();
+    final notYet = store.roster.where((r) => r.isNotActivated).toList();
+    final removed = store.roster.where((r) => r.isRemoved).toList();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -260,12 +264,22 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
               const SizedBox(height: 9),
               Text(
                 _p(
+                    // P2 (2026-10-30): this used to say time in the app is
+                    // not measured at all. Wrong since 0065, which measures
+                    // it and returns only monthly totals, withheld for small
+                    // groups. Kept for revert:
+                    // 'Nothing about an individual. Not who booked, not what they '
+                    //     'read, not what they asked, not how long they spent in '
+                    //     'the app — we do not measure that last one at all, for '
+                    //     'anyone. Take-up and totals are the whole picture, and '
+                    //     'that is what makes people willing to activate.',
                     'Nothing about an individual. Not who booked, not what they '
-                        'read, not what they asked, not how long they spent in '
-                        'the app — we do not measure that last one at all, for '
-                        'anyone. Take-up and totals are the whole picture, and '
-                        'that is what makes people willing to activate.',
-                    'किसी एक व्यक्ति के बारे में कुछ नहीं। किसने बुक किया, किसने क्या पढ़ा, किसने क्या पूछा, किसने ऐप में कितना समय बिताया — आख़िरी वाली बात तो हम किसी के लिए भी नापते ही नहीं। कितने लोगों ने लिया और कुल जोड़ — बस यही पूरी तस्वीर है, और इसी वजह से लोग इसे चालू करने को तैयार होते हैं।'),
+                        'read, not what they asked, not how long any one person '
+                        'spent in the app. Time in the app is counted only as a '
+                        'monthly total, and held back for small groups. Take-up '
+                        'and totals are the whole picture, and that is what '
+                        'makes people willing to activate.',
+                    'किसी एक व्यक्ति के बारे में कुछ नहीं। किसने बुक किया, किसने क्या पढ़ा, किसने क्या पूछा, किसी एक इंसान ने ऐप में कितना समय बिताया — कुछ नहीं। ऐप में बिताया समय सिर्फ़ महीने के कुल जोड़ के रूप में गिना जाता है, और छोटे समूहों के लिए रोक लिया जाता है। कितने लोगों ने लिया और कुल जोड़ — बस यही पूरी तस्वीर है, और इसी वजह से लोग इसे चालू करने को तैयार होते हैं।'),
                 style: t.bodySmall
                     ?.copyWith(color: AppTheme.neutral600, height: 1.5),
               ),
@@ -301,7 +315,7 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
         ),
         const SizedBox(height: 12),
 
-        if (active.isEmpty && !_showRemoved)
+        if (active.isEmpty && notYet.isEmpty && !_showRemoved)
           // Never a blank space — the empty state is the feature's
           // advertisement (CLAUDE.md), and here it is also the next action.
           EnterpriseCard(
@@ -325,7 +339,11 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
             ),
           )
         else
-          for (final r in [...active, if (_showRemoved) ...removed])
+          for (final r in [
+            ...active,
+            ...notYet,
+            if (_showRemoved) ...removed,
+          ])
             _rosterRow(r),
       ],
     );
@@ -420,16 +438,18 @@ class _SponsorDashboardScreenState extends State<SponsorDashboardScreen> {
                 Text(r.workEmail,
                     style: t.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: r.isActive
-                            ? AppTheme.neutral900
-                            : AppTheme.neutral400)),
+                        color: r.isRemoved
+                            ? AppTheme.neutral400
+                            : AppTheme.neutral900)),
                 const SizedBox(height: 3),
                 Text(
                   r.isActive
                       ? _p('Activated ${_date(r.activatedAt)}',
                           '${_date(r.activatedAt)} को चालू हुआ')
-                      : _p('Removed ${_date(r.removedAt)}',
-                          '${_date(r.removedAt)} को हटाया गया'),
+                      : r.isNotActivated
+                          ? _p('Not activated yet', 'अभी तक चालू नहीं किया')
+                          : _p('Removed ${_date(r.removedAt)}',
+                              '${_date(r.removedAt)} को हटाया गया'),
                   style: t.labelSmall?.copyWith(color: AppTheme.neutral600),
                 ),
               ],
