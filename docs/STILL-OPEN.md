@@ -533,7 +533,11 @@ A2 as built.
   run because its `runAsync` let google_fonts' network loads fail inside the test; it now pumps instead.
 
 ### Left by A3 (2026-10-31)
-- [ ] **Offers are not applied at checkout (phase A4).** `price_offering` / `open_payment_order` (0126) ignore
+- [x] **BUILT 2026-10-31 in A4 (0149 RUN, verify 24/0; `razorpay-create-order` redeployed).** The server takes the
+  best of her offers off in `open_payment_order` / `record_stub_purchase` through one closed `_offers_for`, the phone
+  reads the same rule through `my_offer_quote`, the order freezes the price, and `_write_purchase` counts the use. See
+  MASTER "A4 as built". Was:
+  **Offers are not applied at checkout (phase A4).** `price_offering` / `open_payment_order` (0126) ignore
   coupons, and nothing calls `preview_programme_coupon`, so a partner offer is shown but never taken off. A4 decides:
   the best offer server-side in `price_offering`, the redemption count in the receipt write (`_write_purchase`), what
   happens when an offer ends between the order and the capture, and whether an offer may ever cover a consult (a
@@ -541,8 +545,24 @@ A2 as built.
   says "Checkout does not take offers yet".
 - [ ] **Pregnancy's and TTC's More rows still say "Employer benefits"** while the page is now "Your benefits". Both
   open the same page; renaming them was not asked. On the user's word.
-- [ ] **The welcome sheet's "Partner offers · Applied automatically at checkout"** (storyboard row 1) must not be
-  written into `care_welcome_sheet.dart` before A4, for the same reason.
+- [x] **BUILT 2026-10-31 in A4.** The welcome sheet's "Partner offers · Applied automatically at checkout"
+  (storyboard row 1), shown only when that partner has a live offer for her. Was: must not be written into
+  `care_welcome_sheet.dart` before A4, for the same reason.
+
+### Left by A4 (2026-10-31)
+- [ ] **A consult is never discounted.** A coupon names a programme (or any programme), never an expert; consults are
+  bought as credits and the expert's cut comes from the booking. So the storyboard's "15% off lactation consults"
+  cannot be true, and ops must label offers against programmes only. Discounting consults needs: a coupon that can
+  name an expert or `consult`, a rule for whose cut absorbs it (A4's decision 8 says ParentVeda), and the sponsor's
+  two included credits kept separate. On the user's word.
+- [ ] **A public code typed by hand stays unwired.** `preview_programme_coupon` (0054/0142) has no screen; the "Apply
+  offer" list shows her partner offers only. Typing a code needs a field, the server's vague refusal, and the order
+  taking a public code too (today `_offers_for` lists audience coupons only, on purpose).
+- [ ] **A cap can be overshot by orders already in flight.** An order freezes its price when it opens and is
+  honoured at capture (decision 4), so if a 200-use cap fills while three orders are being paid, `redeemed` ends at
+  203. Deliberate (refusing a payment Razorpay took is worse); a partner's report should say "about 200".
+- [ ] **An expert's own code and its share** (`programme_coupons.expert_id`, §13.0 item 2) and **who funds a partner's
+  discount** (§5.4 d/e): untouched by A4. ParentVeda absorbs every discount until a contract says otherwise.
 
 ## 5.1d `programmes.price_paise` still stores minor units — minor, deferred
 

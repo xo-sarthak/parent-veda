@@ -13,12 +13,18 @@
 //
 //  Shown via showCareWelcome(), which no-ops when there is no partner — callers
 //  never have to check.
+//
+//  A4 (2026-10-31): the storyboard's "Partner offers · Applied automatically at
+//  checkout" line, under the card, only when this partner has a live offer for
+//  her. It was held back until checkout really applied one (STILL-OPEN §5.1g);
+//  0149 does, on the server. Words only, no button: still not an upsell.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../../care_partner/care_config.dart';
 import '../../care_partner/care_partner_store.dart';
+import '../../services/partner_offer_store.dart';
 import '../post_pregnancy/pp_common.dart';
 import 'care_partner_card.dart';
 import '../../localization/app_language.dart';
@@ -31,6 +37,8 @@ Future<void> showCareWelcome(BuildContext context) async {
   if (partner == null) return;
   if (!CareConfig.instance.welcomeMomentEnabled) return;
   store.recordEvent('welcome_shown');
+  // A4: attribution has only just bound, so ask again for her offers.
+  PartnerOfferStore.instance.refresh();
   if (!context.mounted) return;
   await showDialog<void>(
     context: context,
@@ -66,6 +74,30 @@ class _CareWelcomeDialog extends StatelessWidget {
           const SizedBox(height: 18),
           CarePartnerCard(
               partner: partner, shape: CarePartnerCardShape.full),
+          // A4: only with a live offer from this partner; else no room.
+          ListenableBuilder(
+            listenable: PartnerOfferStore.instance,
+            builder: (context, _) {
+              if (PartnerOfferStore.instance.forPartner(partner.id).isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                key: const ValueKey('care_welcome_offers'),
+                padding: const EdgeInsets.only(top: 14),
+                child: Text.rich(
+                  TextSpan(children: [
+                    TextSpan(
+                        text: 'Partner offers',
+                        style: ppBody(12.5, w: FontWeight.w800, color: ppInk)),
+                    TextSpan(
+                        text: ' · Applied automatically at checkout',
+                        style: ppBody(12.5, h: 1.5)),
+                  ]),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            },
+          ),
           const SizedBox(height: 18),
           SizedBox(
             width: double.infinity,

@@ -32,6 +32,8 @@
 //    * neither: the empty state, pixel for pixel as it was.
 //  Offers say what they are and until when. Checkout does not take them yet
 //  (auto-apply is A4), and the page says so rather than promise it.
+//  A4 (2026-10-31): it does now, on the server (0149), so each offer row says
+//  it is applied at checkout and that she can pick another there.
 //
 //  Superseded by D1, kept for revert (July):
 //  //  ONE APP. There is no enterprise navigation, no company theme, no separate
@@ -564,14 +566,17 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
 
   // ---- A3: a doctor's or clinic's section --------------------------------
 
-  /// One offer as a row: what it is, until when, and plainly that checkout
-  /// does not take it yet (auto-apply is A4).
+  /// One offer as a row: what it is, until when, and that checkout applies
+  /// it (A4, 0149: the server takes the best of her offers off).
+  // Kept for revert (A3):
+  //   body: '${o.until}. Checkout does not take offers yet, so nothing comes '
+  //       'off the price today. We will say here when it does.',
   Widget _offerRow(PartnerOffer o) => _capabilityRow(
     mark: TtcTabMark.wallet,
     title: o.headline,
     body:
-        '${o.until}. Checkout does not take offers yet, so nothing comes '
-        'off the price today. We will say here when it does.',
+        '${o.until}. Applied automatically at checkout. With more than one '
+        'offer, the best is taken off and you can pick another there.',
   );
 
   /// Their name in words (no logo, D3), their offers, their sessions, and

@@ -5720,3 +5720,54 @@ shared preferences is one more key that sign-out has to remember to wipe (`test/
 today for four stores that forgot). What it costs: on a cold start the offer card arrives a beat after the rail.
 
 Pinned by `test/partner_editions_a3_test.dart` and `supabase/seed/verify_partner_offers.sql`.
+
+## 16zzz-k. Quote and charge from one function; an order is an invoice, not a lookup; count the fact, not the attempt; a client's choice is a preference (Partner Editions A4, 0149, 2026-10-31)
+
+A4 made a partner offer come off the price at checkout. It is a money path, so every line is about where a number is
+decided and when it stops changing.
+
+**1. The price she sees and the price she is charged come from one function.** `_offers_for(uid, offering)` is the
+only place a discount is computed. The phone's quote (`my_offer_quote`), the order (`open_payment_order`) and the
+no-charge preview (`record_stub_purchase`) all call it. The tempting alternative is to compute the discount on the
+phone from the offer's kind and value (A3 already had them). That works until the two rounding rules drift, or an
+offer runs out between the screen and the tap, and then the struck-through price says ₹425 and Razorpay asks for
+₹426. With one function there is no second place to be wrong. What it costs: one more round trip when a checkout
+opens. What it buys: "quote = charge" is a property of the design, and the verify script checks it.
+
+**Why beside `price_offering`, not inside it.** `price_offering` is also the seat value `book_slot` records, and the
+expert's cut is taken from that. Putting "her offer" inside it would have quietly paid the expert less on every
+discounted sale (decision 8 says experts are paid on the list price), and made a function every parent may call
+return a different answer per caller. A shared function with several readers is a contract with each of them; to add
+a meaning for one reader, add a function next to it.
+
+**2. An order is an invoice, not a lookup.** `payment_orders` freezes `list_paise`, `discount_paise` and
+`coupon_code` when it opens, and the receipt copies them at capture. Nothing re-reads the coupon table later. That is
+what makes "an offer ending mid-payment is honoured" automatic rather than a special case: by the time Razorpay
+captures, the coupon's state no longer matters, because the order already says what was agreed. The general rule:
+**the record of a transaction stores the terms, not a pointer to where the terms lived.** A pointer gives you a
+receipt that changes when ops edits a coupon next month. The cost: a cap can be overshot by orders already in
+flight, which is cheaper than refusing a payment the gateway took.
+
+**3. Count the fact, not the attempt.** `redeemed + 1` happens in `_write_purchase`'s insert branch, in the same
+transaction as the receipt. Opening an order is an attempt (she may close the Razorpay sheet); a failed payment is an
+attempt; only a written receipt is the fact. And because Razorpay can tell us twice (the phone's verify and the
+webhook), the counter rides the same `on conflict do nothing` that already made the receipt idempotent: a replay
+writes no row, so it reaches no `update`. **Put a side effect behind the same guard as the write it depends on**,
+and idempotency comes free. The `update` also takes the coupon row's lock, so two captures at the same moment count
+one after the other instead of both reading 4 and writing 5 (the lost-update problem).
+
+**4. A client's choice is a preference, never an authority.** The phone may send the code she picked. The server
+uses it only if `_offers_for` still lists it for her, otherwise its best. So a forged code, another family's code or
+an expired one does not refuse anything and does not reveal anything: she gets the best of her own offers, or the
+list price. Refusing with "that code is not yours" would turn the order door into the coupon oracle 0054 refused to
+build. The same move appears elsewhere in this repo (the server prices from an offering id and ignores the phone's
+amount, 0126): **let the client say what it wants, and let the server decide what it gets.**
+
+**5. Dropping an overload in the same migration.** `open_payment_order` and `record_stub_purchase` gained an
+argument. `create or replace` with a new argument list creates a second function beside the first, and PostgREST
+then has to choose between two signatures from named JSON arguments, which fails or picks the wrong one. So each old
+signature is dropped in the same file, and a trailing `default null` keeps every existing caller (the old Edge
+Function included) working before the redeploy. plpgsql callers bind by name when they run, so dropping a function
+they call is safe as long as a compatible one exists by the time they run.
+
+Pinned by `test/partner_editions_a4_test.dart` and `supabase/seed/verify_partner_offer_checkout.sql`.

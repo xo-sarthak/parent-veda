@@ -98,7 +98,10 @@ serve(async (req) => {
     const { data: { user } } = await authClient.auth.getUser();
     if (!user) return json({ error: "not signed in" }, 401);
 
-    const { amountMinor, offeringId, lines } = await req.json();
+    // couponCode (A4, 0149): the offer she picked at checkout. A preference,
+    // not an authority: open_payment_order re-checks it against her own
+    // offers and falls back to the best one, so a forged code buys nothing.
+    const { amountMinor, offeringId, lines, couponCode } = await req.json();
     const isShop = Array.isArray(lines) && lines.length > 0;
     const clientAmount =
       typeof amountMinor === "number" && amountMinor > 0 ? Math.floor(amountMinor) : null;
@@ -111,6 +114,10 @@ serve(async (req) => {
       p_offering_id: isShop ? null : String(offeringId ?? ""),
       p_server_amount: isShop ? await priceLines(lines as Line[]) : null,
       p_client_amount: clientAmount,
+      p_coupon_code:
+        !isShop && typeof couponCode === "string" && couponCode.trim() !== ""
+          ? couponCode.trim()
+          : null,
     });
     if (poErr) return json({ error: poErr.message }, 500);
     if (!po?.ok) return json({ error: po?.reason ?? "refused" }, 400);

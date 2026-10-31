@@ -253,19 +253,22 @@ void main() {
       });
     }
 
-    test('never says Auto-applied: checkout does not take offers yet', () {
-      for (final path in [
-        'lib/widgets/partner_exclusive_rail.dart',
-        'lib/widgets/partner_benefit_card.dart',
-        'lib/services/partner_offer_store.dart',
-        'lib/screens/enterprise/employer_benefits_screen.dart',
-      ]) {
-        final code = _src(
-          path,
-        ).split('\n').where((l) => !l.trimLeft().startsWith('//')).join('\n');
-        expect(code, isNot(contains('Auto-applied')), reason: path);
-      }
-    });
+    // Kept for revert (A4, 2026-10-31): checkout applies offers now (0149), so
+    // the ban became test/partner_editions_a4_test.dart's '"Auto-applied" only
+    // with the server function that makes it true'.
+    // test('never says Auto-applied: checkout does not take offers yet', () {
+    //   for (final path in [
+    //     'lib/widgets/partner_exclusive_rail.dart',
+    //     'lib/widgets/partner_benefit_card.dart',
+    //     'lib/services/partner_offer_store.dart',
+    //     'lib/screens/enterprise/employer_benefits_screen.dart',
+    //   ]) {
+    //     final code = _src(
+    //       path,
+    //     ).split('\n').where((l) => !l.trimLeft().startsWith('//')).join('\n');
+    //     expect(code, isNot(contains('Auto-applied')), reason: path);
+    //   }
+    // });
   });
 
   group('a doctor\'s benefit card on You', () {

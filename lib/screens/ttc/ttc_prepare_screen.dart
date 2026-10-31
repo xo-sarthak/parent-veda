@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
+import '../../booking/offer_quote.dart';
 import '../../booking/payment_service.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../ttc/ttc_prepare_data.dart';
@@ -31,6 +32,7 @@ import '../../services/life_stage_store.dart';
 import '../../data/learn/pv_learn_view.dart';
 import '../learn/pv_offering_screen.dart';
 import '../learn/pv_learn_catalog.dart';
+import '../../widgets/partner_offer_checkout.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
 
@@ -266,7 +268,12 @@ class TtcOfferingScreenClassic extends StatelessWidget {
     }
 
     return AnimatedBuilder(
-      animation: Listenable.merge([BookingStore.instance, TtcLang.instance]),
+      // A4: OfferQuoteStore too, so the price follows the server's quote.
+      animation: Listenable.merge([
+        BookingStore.instance,
+        TtcLang.instance,
+        OfferQuoteStore.instance,
+      ]),
       builder: (context, _) {
         final t = TtcS.current();
         final hi = t.hinglish;
@@ -303,7 +310,10 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                                 style: ttcBody(12.5,
                                     color: ttcSoft, w: FontWeight.w700)),
                             const SizedBox(height: 4),
-                            Text(offering.priceLabel,
+                            // Kept for revert (A4): Text(offering.priceLabel, ...)
+                            Text(
+                                partnerOfferPayLabel(
+                                    offering.id, offering.priceLabel),
                                 style: ttcJakarta(22, color: ttcTitleInk)),
                           ]),
                     ),
@@ -338,6 +348,15 @@ class TtcOfferingScreenClassic extends StatelessWidget {
                           ]),
                   ]),
                 ),
+                // A4: her partner offer, struck price and "Apply offer".
+                if (entitlement == null)
+                  PartnerOfferCheckout(
+                    offeringId: offering.id,
+                    ink: ttcTitleInk,
+                    soft: ttcSoft,
+                    line: ttcLine,
+                    padding: const EdgeInsets.only(top: 12),
+                  ),
                 const SizedBox(height: 20),
 
                 // Real times, from the real engine. Stored UTC, shown local.

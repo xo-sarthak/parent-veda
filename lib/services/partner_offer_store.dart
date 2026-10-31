@@ -19,9 +19,12 @@
 //  `registerReset` empties it on sign-out or a change of account, so one
 //  family's offers can never show on the next family's phone.
 //
-//  ⚠️ NOTHING APPLIES AN OFFER YET. Checkout (0126's price_offering) ignores
-//  coupons, so the phone says what an offer is and until when, never
-//  "Auto-applied" (the user, 2026-10-31; auto-apply is A4).
+//  Kept for revert (A3): "⚠️ NOTHING APPLIES AN OFFER YET. Checkout (0126's
+//  price_offering) ignores coupons, so the phone says what an offer is and
+//  until when, never 'Auto-applied'."
+//  A4 (2026-10-31): checkout applies them now, on the server (0149). This
+//  store still only LISTS offers; what one is worth on a given purchase is
+//  OfferQuoteStore's (`my_offer_quote`), never computed here.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';

@@ -971,6 +971,9 @@ class _ReceiptSheetState extends State<_ReceiptSheet> {
             ),
             const SizedBox(height: 14),
             line('Amount', x.provider == 'free' ? 'Free' : pvRupees(x.amountMinor)),
+            // A4: what a partner offer took off, as the server froze it.
+            if (x.offerLine case final off?)
+              line('Partner offer', '$off · was ${pvRupees(x.listMinor!)}'),
             line('Date', '${pvLearnDay(x.paidUtc)}, ${pvLearnTime(x.paidUtc)}'),
             line('Status', pvPurchaseLine(x)),
             if (x.refundedUtc != null)

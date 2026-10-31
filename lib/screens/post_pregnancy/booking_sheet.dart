@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
+import '../../booking/offer_quote.dart';
 import '../../booking/payment_service.dart';
 // Retired: DoctorAvailability is the old weekly-grid store, replaced by
 // DoctorSchedule. Nothing in the slot path reads it. Kept for revert.
@@ -30,6 +31,7 @@ import 'my_bookings_screen.dart';
 import 'pp_common.dart';
 import '../learn/pv_learn_catalog.dart';
 import '../learn/pv_learn_flow.dart';
+import '../../widgets/partner_offer_checkout.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
 
@@ -141,6 +143,7 @@ class _BookingSheetState extends State<_BookingSheet> {
         BookingStore.instance,
         DoctorScheduleStore.instance,
         ServerSlotStore.instance,
+        OfferQuoteStore.instance, // A4: the pay label follows the quote
       ]),
       builder: (context, _) {
         return SafeArea(
@@ -203,11 +206,22 @@ class _BookingSheetState extends State<_BookingSheet> {
                 Expanded(child: Text(p, style: ppBody(13.5, color: ppInk))),
               ]),
             ),
+          // A4: a partner offer, programmes only (a consult is never
+          // discounted, 0149). Takes no room without one.
+          if (o.kind != OfferingKind.consult && o.priceMinor > 0)
+            PartnerOfferCheckout(
+              offeringId: o.id,
+              ink: ppInk,
+              soft: ppSoft,
+              line: ppHair,
+              padding: const EdgeInsets.only(top: 6),
+            ),
           const SizedBox(height: 14),
+          // Kept for revert (A4): '${_price(o.priceMinor)}  ·  ...'
           _primary(
             _busy
                 ? 'Opening checkout…'
-                : '${_price(o.priceMinor)}  ·  ${g.credits > 1 ? "Buy pack" : "Buy"}',
+                : '${partnerOfferPayLabel(o.id, _price(o.priceMinor))}  ·  ${g.credits > 1 ? "Buy pack" : "Buy"}',
             _busy ? null : _buy,
           ),
         ]);

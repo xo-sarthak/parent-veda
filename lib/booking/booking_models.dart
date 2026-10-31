@@ -35,6 +35,8 @@
 
 import 'package:flutter/foundation.dart';
 
+import 'offer_quote.dart' show offerRupees;
+
 /// The tag that lets one history span pregnancy AND parenting. Mirrors the
 /// existing BrandStage split so the whole app talks about stage the same way.
 /// Which life stage an offering belongs to.
@@ -544,6 +546,8 @@ class Purchase {
     this.refundEligible = false,
     this.refundUntilUtc,
     this.refundReason = '',
+    this.listMinor,
+    this.discountMinor = 0,
   });
 
   final String id;
@@ -580,8 +584,29 @@ class Purchase {
   final DateTime? refundUntilUtc;
   final String refundReason;
 
+  /// A4 (0149): the price before a partner offer, and what came off. Frozen
+  /// on the order and copied to the receipt by the server; an older receipt
+  /// reads as no offer.
+  final int? listMinor;
+  final int discountMinor;
+
   bool get isActive => status == 'active';
   bool get isTest => mode == 'stub' || provider == 'stub';
+  bool get hadOffer => discountMinor > 0 && (listMinor ?? 0) > discountMinor;
+
+  /// "15% off", or "₹100 off" for a flat offer. The receipt does not carry the
+  /// offer's kind (the server sends no code), so a whole percent that the
+  /// server's own floor arithmetic reproduces reads as a percent; anything
+  /// else is said in rupees. Both are true statements about this receipt.
+  String? get offerLine {
+    if (!hadOffer) return null;
+    final list = listMinor!;
+    final pct = (discountMinor * 100 / list).round();
+    if (pct >= 1 && pct <= 99 && (list * pct) ~/ 100 == discountMinor) {
+      return '$pct% off';
+    }
+    return '${offerRupees(discountMinor)} off';
+  }
 
   static DateTime? _at(Object? v) =>
       v == null ? null : DateTime.tryParse(v.toString())?.toUtc();
@@ -609,6 +634,8 @@ class Purchase {
       refundEligible: refund['eligible'] == true,
       refundUntilUtc: _at(refund['until']),
       refundReason: (refund['reason'] ?? '').toString(),
+      listMinor: (r['list_paise'] as num?)?.toInt(),
+      discountMinor: (r['discount_paise'] as num?)?.toInt() ?? 0,
     );
   }
 }

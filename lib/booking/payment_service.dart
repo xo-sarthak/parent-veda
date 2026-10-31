@@ -35,6 +35,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../services/remote/supabase_repo.dart';
 import 'booking_models.dart';
+import 'offer_quote.dart';
 import 'payment_config.dart';
 
 enum PaymentOutcome {
@@ -80,7 +81,13 @@ class PaymentService {
   /// two things on the phone and nothing else: skipping checkout for a free
   /// thing (the server checks that too, in `claim_free_offering`) and the
   /// label. The amount the sheet opens with is the one the server returns.
-  Future<PaymentResult> checkout(Offering offering, {String? email}) {
+  ///
+  /// A4 (0149): [couponCode] is the offer she picked in "Apply offer"
+  /// (default: whatever [OfferQuoteStore] holds for this offering, so every
+  /// checkout site sends it without threading it through). Null means "the
+  /// best", which the server chooses. The server re-checks any code it gets.
+  Future<PaymentResult> checkout(Offering offering,
+      {String? email, String? couponCode}) {
     if (!SupabaseRepo.isLoggedIn) {
       return Future.value(const PaymentResult(PaymentOutcome.signedOut));
     }
@@ -90,6 +97,7 @@ class PaymentService {
       reference: offering.id,
       email: email,
       sendAmount: false,
+      couponCode: couponCode ?? OfferQuoteStore.instance.pickFor(offering.id),
     );
   }
 
@@ -113,6 +121,8 @@ class PaymentService {
     // `products` and reads the phone's figure only in stub mode, for a line
     // it cannot price (0126 open_payment_order). An offering sends nothing.
     bool sendAmount = true,
+    // A4: her pick, passed through to open_payment_order as p_coupon_code.
+    String? couponCode,
   }) async {
     // Free — nothing to charge.
     if (amountMinor <= 0) {
@@ -125,11 +135,13 @@ class PaymentService {
       if (sendAmount) 'amountMinor': amountMinor,
       'offeringId': reference,
       if (lines.isNotEmpty) 'lines': lines,
+      'couponCode': ?couponCode,
     });
     final order = res.data;
     final orderId = order?['orderId'] as String?;
     if (orderId == null) return _refusal(res);
-    // The server's amount wins when it re-priced the lines.
+    // The server's amount wins when it re-priced the lines, and since A4 when
+    // it took a partner offer off: the sheet opens with what the server froze.
     final chargeMinor = (order?['amount'] as num?)?.toInt() ?? amountMinor;
 
     // 2) Open checkout and await the native callback.

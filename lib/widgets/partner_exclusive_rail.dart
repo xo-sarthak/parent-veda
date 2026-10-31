@@ -28,6 +28,9 @@
 //  "15% off …" and "Until 30 Nov", never the storyboard's "Auto-applied",
 //  because checkout does not take offers yet (auto-apply is A4). An offer
 //  alone is enough for a rail.
+//  A4 (2026-10-31): checkout now takes the offer off on the server (0149
+//  `_offers_for`, the same rule `my_offer_quote` and `open_payment_order`
+//  use), so the card says "Auto-applied", as the storyboard drew it.
 //
 //  NO PARTNER COLOURS (D1). The storyboard drew these cards in the partner's
 //  tint; D1 overrules it, so they are ParentVeda's grey panel with ink text.
@@ -231,8 +234,8 @@ class PartnerExclusiveRail extends StatelessWidget {
       ),
     );
     final cards = <Widget>[
-      // A3: the partner's offers. Benefits says the rest (the code, and that
-      // checkout does not take offers yet).
+      // A3: the partner's offers. Benefits says the rest.
+      // A4: true now: checkout applies the best offer on the server.
       for (final o in rail.offers)
         _Card(
           key: ValueKey('partner_rail_offer_${o.code}'),
@@ -240,7 +243,8 @@ class PartnerExclusiveRail extends StatelessWidget {
           width: width,
           chip: 'Offer',
           title: o.headline,
-          meta: o.until,
+          // Kept for revert (A3): meta: o.until,
+          meta: 'Auto-applied · ${o.until}',
           onTap: openBenefits,
         ),
       if (rail.consultsLeft case final left?)

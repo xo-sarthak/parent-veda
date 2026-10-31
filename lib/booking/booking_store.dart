@@ -36,6 +36,7 @@ import '../services/remote/supabase_repo.dart';
 import '../care_partner/care_journey.dart';
 import 'booking_catalog.dart';
 import 'booking_models.dart';
+import 'offer_quote.dart';
 import 'payment_service.dart';
 
 /// What [BookingStore.acquire] came back with.
@@ -287,7 +288,9 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
         final r = await _ask('claim_free_offering', offering.id);
         if (r != null) return r;
       case PaymentOutcome.notConfigured:
-        final r = await _ask('record_stub_purchase', offering.id);
+        // A4: the stub applies the same offer a payment would (0149).
+        final r = await _ask('record_stub_purchase', offering.id,
+            couponCode: OfferQuoteStore.instance.pickFor(offering.id));
         if (r != null) return r;
     }
 
@@ -306,10 +309,13 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
   }
 
   /// Call a 0126 grant function. Null when it granted; a refusal otherwise.
-  Future<AcquireResult?> _ask(String fn, String offeringId) async {
+  Future<AcquireResult?> _ask(String fn, String offeringId,
+      {String? couponCode}) async {
     try {
-      final res =
-          await SupabaseRepo.rpcJson(fn, {'p_offering_id': offeringId});
+      final res = await SupabaseRepo.rpcJson(fn, {
+        'p_offering_id': offeringId,
+        'p_coupon_code': ?couponCode,
+      });
       if (res is Map && res['ok'] == true) return null;
       final reason = res is Map ? (res['reason'] ?? '').toString() : '';
       return AcquireResult(AcquireStatus.refused, switch (reason) {

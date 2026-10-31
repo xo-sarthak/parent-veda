@@ -41,6 +41,7 @@ import 'package:flutter/material.dart';
 import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
+import '../../booking/offer_quote.dart';
 import '../../booking/payment_service.dart';
 import '../../booking/server_slots.dart';
 import '../../data/learn/pv_learn_view.dart';
@@ -48,6 +49,7 @@ import '../../doctor/doctor_schedule_store.dart';
 import '../../services/pv_learn_progress_store.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/partner_offer_checkout.dart';
 import 'pv_learn_art.dart';
 import 'pv_learn_chrome.dart';
 import 'pv_lesson_screen.dart';
@@ -618,6 +620,15 @@ class _ReviewSheetState extends State<_ReviewSheet> {
                   ],
                 ),
               ),
+            // A4: her partner offer, as the server quoted it. No room without.
+            if (!v.isFree && v.offering != null)
+              PartnerOfferCheckout(
+                offeringId: v.offering!.id,
+                ink: p.ink1,
+                soft: p.ink2,
+                line: kPvLine,
+                padding: const EdgeInsets.only(left: 48, top: 2, bottom: 6),
+              ),
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(12),
@@ -645,10 +656,16 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            PvCommit(
-              label: v.isFree ? 'Confirm' : 'Pay ${v.priceLabel}',
-              busy: _busy,
-              onTap: _busy ? null : _pay,
+            // Kept for revert (A4): PvCommit(label: v.isFree ? 'Confirm' : 'Pay ${v.priceLabel}', ...)
+            ListenableBuilder(
+              listenable: OfferQuoteStore.instance,
+              builder: (context, _) => PvCommit(
+                label: v.isFree
+                    ? 'Confirm'
+                    : 'Pay ${v.offering == null ? v.priceLabel : partnerOfferPayLabel(v.offering!.id, v.priceLabel)}',
+                busy: _busy,
+                onTap: _busy ? null : _pay,
+              ),
             ),
             const SizedBox(height: 6),
             Center(

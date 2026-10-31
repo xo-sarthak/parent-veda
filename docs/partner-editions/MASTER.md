@@ -57,7 +57,7 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | **A2** ✓ 2026-10-31, hash in memory | Parent (LAST) | "Exclusively for you" rail, You chip with logo + benefit meter | no | A1, P4 |
 
 | **A3** ✓ 2026-10-31, hash in memory | Parent (+ DB) | Partner offers, a doctor's benefit card on You, and one "Your benefits" row and page (detail at the bottom) | yes (small RPC): `0148` (RUN 2026-10-31, verify 11/0) | A2 |
-| **A4** | DB + Parent | Auto-apply a partner offer at checkout, server-side (the storyboard's "Auto-applied"; see A3 as built) | yes (money path) | A3 |
+| **A4** ✓ 2026-10-31 (0149 RUN, verify 24/0, Edge Function redeployed; hash in memory) | DB + Edge + Parent | Auto-apply a partner offer at checkout, server-side (the storyboard's "Auto-applied"; see A3 as built) | yes (money path): `0149` | A3 |
 
 D-phases and P-phases can run in either order; P3 needs D2 for `my_doctor_referrals` shape parity.
 
@@ -240,3 +240,130 @@ What was built:
   never "Auto-applied", the card's words, no room, a sponsor keeps the slot, the row's three lines, the page's three
   states, 360pt at 1x and 1.5x, and the wiring gate.
 - What A3 left is in STILL-OPEN §5.1g; the migration, A4 and the phone walk are in BEFORE-LAUNCH.
+
+### A4 (planned 2026-10-31, the user)
+Auto-apply a partner offer at checkout. Same rules as A1 to A3, plus: **money is decided on the server**, and the
+phone only ever shows what the server answered. Migration `0149` (the next free number on 2026-10-31; check again at
+build time). The user runs it, then redeploys `razorpay-create-order`, before installing the build.
+
+**Out of scope, said plainly**
+- **Consults.** A coupon names a programme (or any programme), never an expert. Consults are bought as credits, the
+  expert's cut comes from the booking, and sponsors already give two consult credits. A consult is never discounted
+  in A4, so ops labels offers against programmes only (the storyboard's "15% off lactation consults" cannot be true
+  yet). STILL-OPEN row.
+- **Typing a public code.** The "Apply offer" list shows her own partner offers only. A public code typed by hand
+  (`preview_programme_coupon`, 0054) stays unwired.
+- **An expert's own code and its share** (`programme_coupons.expert_id`, STILL-OPEN §13.0 item 2).
+- **Real money between ParentVeda and the partner** (who funds the discount): STILL-OPEN §5.4 d/e.
+- **Free via an offer.** Razorpay cannot take ₹0. "Free for our staff" stays an exclusive programme priced at ₹0.
+- **A rupees-saved total on the partner's Content tab.** Not until a partner asks.
+- **An admin screen for offers.** Ops writes offer rows in SQL (R9; admin-panel-not-ready). A4 ships a commented
+  example insert.
+
+**Decision record**
+| # | Question | Recommended | The user's answer |
+|---|---|---|---|
+| 1 | Where is the discount decided? | A closed helper `_offers_for(uid, offering)` on the server, beside `price_offering` (not inside it: it is also seat value, earnings and titles, and every parent can call it). `open_payment_order` and the stub path use it; the phone's quote uses it too, so the quote and the charge cannot differ. Ops sets each offer's kind and value on `programme_coupons` | Agreed. Ops must be able to input what the discount is |
+| 2 | Several offers | The best saving for her is applied by default (tie: the one ending soonest). One offer per order, never stacked. A ₹0 programme stays free and uses none; credits are spent before money | Best by default, **and she can pick another**: an "Apply offer" list at checkout shows all her offers for that purchase, as every platform does |
+| 3 | When a use counts | When the receipt is written (`_write_purchase`'s insert branch, same transaction). Abandoned or failed: 0. A refund does not give it back | Agreed |
+| 4 | Offer ends or runs out between order and capture | Honour the order's price (Razorpay already took it). Each tap on Pay re-prices | Agreed |
+| 5 | Consults | Out of A4 | Agreed |
+| 6 | Words on the phone | Checkout: list price struck through, the price she pays, "Partner offer applied · {label}". "Auto-applied" returns on the rail card and the welcome sheet's "Applied automatically at checkout" returns, **in the same commit** as the server path. Benefits drops "Checkout does not take offers yet". Your bookings shows the offer on a receipt | Agreed |
+| 7 | Partner's Content tab | No change: `redeemed` is already shown with the small-numbers hide (0142); it starts moving | Agreed |
+| 8 | The expert's cut on a discounted sale | Paid on the list price; ParentVeda absorbs the discount | Agreed: experts never earn less |
+| 9 | Her pick no longer applies at Pay | Fall back to the best offer that does, and the Razorpay sheet shows the server's amount | Default (follows from 2 and 4) |
+| 10 | An offer that would make it free | Not allowed: percent 1 to 99; a flat offer must leave at least ₹1 | Default (follows from out of scope) |
+
+**To build**
+1. `0149_partner_offer_checkout.sql`
+   - `payment_orders` and `course_purchases` gain `list_paise`, `discount_paise`, `coupon_code` (nullable; old rows
+     read as no offer). The order freezes them at open; the receipt copies them. An invoice, not a lookup.
+   - `programme_coupons`: `percent` value 1 to 99 (a check constraint; read the live rows first, as 0126 learned).
+   - `_offers_for(uid, offering)`: closed (revoked from `authenticated`). Programmes only (`source = 'programme'`),
+     live, unexpired, under the cap, `_audience_ok`, the programme visible to her. Each offer with its saving in paise
+     and the price after it; best first. A flat offer that would leave under ₹1 is skipped.
+   - `my_offer_quote(p_offering_id)`: no user argument (16zzz-j point 1). Returns list price, her offers for it with
+     what each saves, and which one is best. Never usage counts.
+   - `open_payment_order` gains `p_coupon_code` (default null). Her pick if `_offers_for` still has it, else the best.
+     Writes list, discount and code on the row. The old five-argument version is dropped in the same file so there is
+     one signature.
+   - `record_stub_purchase` takes the same optional code and the same rule, so a stub walk shows the discount.
+   - `_write_purchase`: copies the three columns from the order; in the insert branch only,
+     `redeemed = redeemed + 1` for the order's code (the row lock serialises it; `on conflict do nothing` keeps a
+     replayed capture from counting twice).
+   - `book_slot` and the expert's earnings: unchanged, on purpose (decision 8).
+   - `my_purchases()` adds `list_paise`, `discount_paise`.
+   - A commented example insert for ops: a percent and a flat offer with label, end date, cap and audience.
+2. `razorpay-create-order`: pass `couponCode` through as `p_coupon_code`; nothing else. The user redeploys it.
+3. Phone
+   - `PaymentService.checkout` / `pay` send the chosen code.
+   - Checkout (the three call sites: `pv_learn_flow.dart`, `booking_sheet.dart` for programmes only,
+     `ttc_prepare_screen.dart`): asks `my_offer_quote`, shows the struck-through price and "Partner offer applied ·
+     {label}", and an "Apply offer" row opening the list of her offers for this purchase, best marked. With no offer,
+     nothing changes on screen.
+   - The rail card and the welcome sheet say "Auto-applied"; Benefits loses "Checkout does not take offers yet";
+     Your bookings shows "15% off" on a receipt with a discount.
+   - The A3 test that bans "Auto-applied" becomes one that requires `my_offer_quote` in 0149 and its call site.
+4. Docs in the same commit: tick A4 here, BACKEND-PATTERNS (the frozen-price order, counting the fact, quote and
+   charge from one function), STILL-OPEN §5.1g (close the A4 row, add the consult row), BEFORE-LAUNCH (0149, the
+   redeploy, the phone walk), memory pointer.
+
+**What must be proven**
+- `supabase/seed/verify_partner_offer_checkout.sql` (rolled back): a member's order opens discounted; a non-member's
+  at full price; best of two wins; her pick wins when valid and falls back when not; another family's code is
+  refused; expired, used-up and inactive offers are not applied; a consult is never discounted; percent 100 is
+  refused; the order freezes list, discount and code; capture copies them to the receipt; a replayed capture counts
+  `redeemed` once; a failed order counts 0; a refund leaves the count; the quote equals the order amount; the quote
+  takes no user argument and returns no counts; the stub path applies the same offer; the expert's booking value is
+  the list price.
+- `test/partner_editions_a4_test.dart`: quote parsing; the struck price only when the server says so; the offer list
+  and her pick; "Auto-applied" only with the server function; the Benefits line gone; 360pt at 1x and 1.5x; the
+  wiring gate at all three checkout sites; the sync reset clears any chosen code.
+
+### A4 as built (2026-10-31)
+Built to the decision record above; nothing in the code contradicted it. What was built:
+- **`0149_partner_offer_checkout.sql`** (the user runs it after 0148, then redeploys `razorpay-create-order`, then
+  installs the build). Safe in that order: the old Edge Function's five named arguments still resolve to the new
+  six-argument `open_payment_order` (the code defaults to null, so the best offer applies), so the migration can land
+  before the redeploy without breaking checkout.
+  - `payment_orders` and `course_purchases` gain `list_paise`, `discount_paise`, `coupon_code`.
+  - `programme_coupons_percent_range` (percent 1 to 99). The migration reads the live rows first and **stops, naming
+    the codes**, if any percent coupon is outside 1 to 99, rather than rewriting what an offer is worth.
+  - `_offers_for(uid, offering)` (closed): audience offers only, programmes only, live, under the cap, `_audience_ok`,
+    a programme she can see; free stays free; anything leaving under ₹1 is skipped (percent and flat alike, since a
+    99% offer on a ₹1.50 price would leave under ₹1 too). Best first: saving, then ending soonest, then code.
+  - `_offer_pick(quote, code)` (closed): her code if the rule still lists it, else the best. One place, used by the
+    order and the stub.
+  - `my_offer_quote(p_offering_id)`: no user argument; list price, her offers with saving and price, the best. Never
+    usage counts.
+  - `open_payment_order(..., p_coupon_code default null)`: the old five-argument version dropped in the same file.
+  - `record_stub_purchase(p_offering_id, p_coupon_code default null)`: the old one-argument version dropped.
+  - `_write_purchase` gains three trailing defaults (the stub's frozen price); an order's own columns win. In the
+    insert branch only, `redeemed = redeemed + 1`. The old eight-argument version dropped.
+  - `my_purchases()` adds `list_paise`, `discount_paise` (not the code).
+  - `price_offering`, `book_slot`, the expert's earnings and the refund path: unchanged, on purpose.
+  - A commented example insert for ops (a percent and a flat offer; flat values are paise).
+  - `supabase/seed/verify_partner_offer_checkout.sql`: 24 checks, rolled back (the consult check says SKIP, not
+    FAIL, if an expert fixture cannot be seeded on that database).
+- **`razorpay-create-order`**: passes `couponCode` as `p_coupon_code` (offerings only); nothing else.
+- **Phone**
+  - `lib/booking/offer_quote.dart`: `OfferQuote` / `QuotedOffer` (parse `my_offer_quote`), `OfferQuoteStore` (memory
+    only, `SyncRegistry.registerReset` clears every quote and pick, a generation guard), `offerRupees`.
+  - `PaymentService.checkout` sends her pick (default: the store's pick for that offering, so the three sites need no
+    extra argument); `BookingStore.acquire` sends it to `record_stub_purchase` on the stub path.
+  - `lib/widgets/partner_offer_checkout.dart`: `PartnerOfferCheckout` (list price struck, the price she pays,
+    "Partner offer applied · 15% off …", an "Apply offer" row opening "Your offers" with the best marked) and
+    `partnerOfferPayLabel`. It takes no room without an offer. On the Learn review sheet (`pv_learn_flow.dart`), the
+    Parenting booking sheet (`booking_sheet.dart`, programmes only) and TTC's offering page (`ttc_prepare_screen.dart`,
+    the classic fallback). Each pay button shows the quoted price.
+  - The rail card says "Auto-applied · Until 30 Nov"; the welcome sheet (`care_welcome_sheet.dart`) says "Partner
+    offers · Applied automatically at checkout" only when that partner has a live offer for her (and refreshes her
+    offers when it opens, since attribution has only just bound); Benefits' offer rows say "Applied automatically at
+    checkout…" instead of "Checkout does not take offers yet".
+  - Your bookings: the receipt sheet shows "Partner offer · 15% off · was ₹500". `Purchase.offerLine` says a percent
+    only when the server's own floor arithmetic reproduces it, else rupees.
+- Tests: `test/partner_editions_a4_test.dart` (25). The A3 test that banned "Auto-applied" is kept commented out for
+  revert. A2, A3 and the booking, learning and money contract tests stay green; `sync_reset_coverage_test` is still red
+  for the four stores that were red before A4 (`community_alerts`, `pv_catalog_store`, `pv_community_store`,
+  `pv_review_store`), not for this one.
+- Left: STILL-OPEN §5.1g "Left by A4". BEFORE-LAUNCH: 0149, the redeploy, the phone walk.
