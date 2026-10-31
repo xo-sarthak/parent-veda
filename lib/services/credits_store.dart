@@ -38,6 +38,10 @@ import 'remote/sync_registry.dart';
 class CreditsStore extends ChangeNotifier {
   CreditsStore._() {
     SyncRegistry.registerReset(_resetForAccount);
+    // Partner Editions A2 (2026-10-31): the reset emptied it on sign-out, but
+    // nothing fetched it again on the next sign-in, so the lockup and the
+    // benefit meter stayed empty until a relaunch. resyncAll runs this.
+    SyncRegistry.register(refresh);
   }
   static final CreditsStore instance = CreditsStore._();
 

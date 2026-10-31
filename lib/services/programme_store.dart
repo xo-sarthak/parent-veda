@@ -34,15 +34,34 @@ import 'package:flutter/material.dart';
 import '../screens/post_pregnancy/pp_learning_data.dart';
 import 'content_store.dart';
 import 'remote/content_repo.dart';
+import 'remote/sync_registry.dart';
 
 class ProgrammeStore extends ContentStore<LearningProgram> {
   ProgrammeStore._()
       : super(
           table: 'programmes_published',
-          cacheKey: 'content_programmes_v1',
+          // v2 (Partner Editions A2, 2026-10-31): rows now carry their
+          // audience. A v1 row has none and would read as "for everyone".
+          // Kept for revert: cacheKey: 'content_programmes_v1',
+          cacheKey: 'content_programmes_v2',
           seed: const <LearningProgram>[],
           serverOnly: true,
-        );
+        ) {
+    // ⚠️ THE LIST DEPENDS ON WHO IS SIGNED IN (0142). The view returns a
+    // partner's exclusive sessions only to its members, so this is the one
+    // content store whose rows are per account. Sign-out (and a different
+    // account found signed in) empties it; the next sign-in fetches afresh.
+    // Before A2 neither happened: the disk cache was wiped by LocalWipe, but
+    // memory kept the last person's list, exclusives included, until a
+    // relaunch. The same SyncRegistry every syncing store already uses.
+    SyncRegistry.registerReset(forgetForAccount);
+    SyncRegistry.register(_refetchForAccount);
+  }
+
+  // Unforced on purpose: resyncAll also runs on every resume (at most once a
+  // minute), and the 30-second throttle keeps that to one cheap request. After
+  // a sign-in the throttle is already clear, because forgetForAccount reset it.
+  Future<void> _refetchForAccount() => refresh();
 
   static final ProgrammeStore instance = ProgrammeStore._();
 
@@ -129,7 +148,15 @@ class ProgrammeStore extends ContentStore<LearningProgram> {
       // is run, or left empty by the editor: every age.
       ageFromMonths: (row['age_from_months'] as num?)?.toInt(),
       ageToMonths: (row['age_to_months'] as num?)?.toInt(),
+      // Whose it is (0142). Absent before 0142, and null = everyone.
+      audienceSponsorId: _id(row['audience_sponsor_id']),
+      audiencePartnerId: _id(row['audience_partner_id']),
     );
+  }
+
+  static String? _id(Object? v) {
+    final s = v?.toString().trim();
+    return (s == null || s.isEmpty) ? null : s;
   }
 
   static String _startLabel(DateTime d) {
@@ -158,6 +185,9 @@ class ProgrammeStore extends ContentStore<LearningProgram> {
         // PP 8: an offline open keeps the ages it is for.
         'age_from_months': p.ageFromMonths,
         'age_to_months': p.ageToMonths,
+        // A2: an offline open still knows whose a session is.
+        'audience_sponsor_id': p.audienceSponsorId,
+        'audience_partner_id': p.audiencePartnerId,
       };
 
   /// The inverse of [_price], for the cache only. Imperfect by design: a cached

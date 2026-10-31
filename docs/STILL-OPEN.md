@@ -499,6 +499,35 @@ though her dismissal, expiry and status still apply. Detail is in `docs/partner-
   doctor's funnel misses "child added" for families onboarded straight into Parenting. The old flow fired only
   `pregnancyStarted`, and A1 keeps that parity. Adding it is one line in `_finish` step 7.
 
+## 5.1g Partner Editions A2 in the parent app: what is built and what it left (2026-10-31)
+
+Built: `ProgrammeStore` follows the signed-in account (`SyncRegistry` reset + resync, a generation guard in
+`ContentStore`, cache key v2), and `EntitlementStore` and `CreditsStore` now refetch on sign-in. An "Only for {name}
+families" rail (`lib/widgets/partner_exclusive_rail.dart`) is the first thing on all three homes' sheets. On You, the
+live hero now carries the sponsor's mark and name, with a benefit card under it (`lib/widgets/partner_benefit_card.dart`).
+Three decisions from the user on 2026-10-31: the storyboard's wording with **full** partner names, programmes plus a
+consult card in the rail, and no room when there is nothing exclusive. Detail is in `docs/partner-editions/MASTER.md`
+A2 as built.
+
+- [ ] **The storyboard's offer card** ("15% off lactation consults · Auto-applied") is not built. 0142 gave
+  `programme_coupons` an audience, but nothing on the phone reads coupons by audience. A card needs a read first (an
+  RPC returning the caller's audience coupons). **The user, 2026-10-31: its own small phase, A3** (MASTER), with
+  the RPC's migration.
+- [x] **`CarePartnerStore` refetches on sign-in — FIXED 2026-10-31 in A2** (the user's call). It reset on sign-out
+  but refreshed only at launch (`main.dart:518`); now `SyncRegistry.register(refreshFromServer)`.
+- [ ] **The old `chip: sponsor?.name` lines** (`pv_you_screen.dart`, three `PvIdentityCard` calls) are on layouts no
+  stage has reached since 2026-10-07. They are kept for revert and untouched; if those layouts are ever deleted, the
+  lines go with them.
+- [x] **The doctor's version of the benefit card — DECIDED 2026-10-31: not built.** The user chose sponsor only on
+  You, after a replica (https://claude.ai/artifact/7ZPoYurF4pzoqXFrByaaWe). A doctor stays a line on the homes and in
+  the Care Circle (D3).
+- [x] **Settings had lost "About ParentVeda" on every stage — FIXED 2026-10-31.** Settings picked it as
+  `support[3]`; the Our experts row (97c9ef57) was inserted before it, so About vanished and Our experts sat under
+  "About" with no mark. Rows are now picked by title (`_supportRow`), Our experts moved to Support with a new
+  `PvProfileMark.people`, and the C3-2 Community alerts row got the same mark (it was the one unmarked row). Found by
+  `pv_you_pregnancy_test`, `ttc_more_profile_test` (x2). The fourth red, `pv_profile_walk_test`, failed on every
+  run because its `runAsync` let google_fonts' network loads fail inside the test; it now pumps instead.
+
 ## 5.1d `programmes.price_paise` still stores minor units — minor, deferred
 
 `0074` moved the consult fee to whole rupees (`expert_profiles.fee_inr`) because

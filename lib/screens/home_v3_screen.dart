@@ -154,6 +154,7 @@ import 'journal_compose_screen.dart' show openJournalCompose;
 import 'garbh/garbh_today_practice.dart' show GarbhTodayPractice, openGarbhDoor;
 import '../widgets/pv_home_arrival.dart';
 import '../widgets/partner_lockup.dart' show PartnerStrip; // Partner Editions A1
+import '../widgets/partner_exclusive_rail.dart'; // Partner Editions A2
 import 'community/community_home_card.dart';
 
 class HomeV3Screen extends StatefulWidget {
@@ -585,6 +586,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
               )),
             // ---- THE SHEET: everything under the fold ------------------------
             V3PregSheet(p: p, children: [
+            // Partner Editions A2: the head on this sheet's 22/12, nothing when there is no partner.
+            PartnerExclusiveRail(p: p, head: (e, t) => Padding(padding: const EdgeInsets.fromLTRB(18, 22, 18, 12), child: V3SectionHead(eyebrow: e, title: t, p: p))),
             // ---- KEPT FOR REVERT: the full-bleed photograph hero ---------------
 
             // if (day != null)

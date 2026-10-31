@@ -45,6 +45,7 @@ import '../../localization/app_language.dart';
 import '../../screens/post_pregnancy/pp_child_profile.dart';
 import '../../services/app_nav.dart';
 import '../../services/entitlement_store.dart';
+import '../../widgets/partner_benefit_card.dart'; // Partner Editions A2
 import '../../services/family_profile.dart';
 import '../../services/ready_birth_context_store.dart';
 import '../../services/journey_dates_store.dart';
@@ -2185,7 +2186,12 @@ class _PvYouScreenState extends State<PvYouScreen> {
         // Her photo, on her side (2026-09-30).
         photoPath: him ? null : ProfilePhotoStore.instance.path,
         onPhoto: him ? null : _photoSheet,
+        // Partner Editions A2: the sponsor's mark and name (the old
+        // `chip: sponsor?.name` never reached this hero; see the widget).
+        partner: const PartnerYouChip(),
       ),
+      // A2: what is left of her benefit, under the hero. Nothing without one.
+      const PartnerBenefitCard(),
       // ⚠️ YOUR JOURNEY IS RIGHT UNDER THE HERO (2026-10-01, the user: the
       // "I got a positive test" button was "very below in the profile section,
       // should be on top or above"). It is the one thing on this page she
@@ -2436,6 +2442,12 @@ class _PvYouScreenState extends State<PvYouScreen> {
     ];
   }
 
+  /// One of [_supportRows] by its title. Throws in a test if a title is
+  /// renamed, which is the point: a missing row should fail loudly.
+  Widget _supportRow(List<Widget> rows, String title) => rows.firstWhere(
+    (r) => r is PvYouRow && r.title == title,
+  );
+
   /// A Settings row's drawn mark, by the row's own title (the rows come from
   /// the shared builders, which draw line icons on every other stage).
   /// Null for a row this page does not draw.
@@ -2456,6 +2468,10 @@ class _PvYouScreenState extends State<PvYouScreen> {
     // Pregnancy's Support row (2026-10-01): providers near her.
     'Find help near you' => PvProfileMark.lifebuoy,
     'About ParentVeda' => PvProfileMark.info,
+    'Our experts' => PvProfileMark.people,
+    // Settings, Notifications (0147, C3-2): its alert switches. Unmarked
+    // since C3-2 added it, the one row on Settings with no drawn mark.
+    'Community' => PvProfileMark.people,
     _ => null,
   };
 
@@ -2624,11 +2640,19 @@ class _PvYouScreenState extends State<PvYouScreen> {
             ),
           ),
           for (final t in content.supportThings) thing(t),
+          // ⚠️ ROWS BY TITLE, NOT BY POSITION (2026-10-31). "Our experts"
+          // (97c9ef57) was inserted into `_supportRows` before About, so
+          // `support[3]` became Our experts: About ParentVeda vanished from
+          // Settings on every stage, and Our experts sat under "About" with
+          // no mark. A list index is a silent contract with whoever edits
+          // the list next; a title says which row it means.
+          m(_supportRow(support, 'Our experts')),
         ],
       ),
       PvSettingsSection(
         title: 'About',
-        rows: [m(support[3])], // About ParentVeda
+        // Kept for revert: rows: [m(support[3])], // About ParentVeda
+        rows: [m(_supportRow(support, 'About ParentVeda'))],
       ),
     ];
   }

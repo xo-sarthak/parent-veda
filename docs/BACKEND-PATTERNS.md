@@ -5634,3 +5634,54 @@ around it.**
 
 Pinned by `test/partner_brand_test.dart` and `test/care_visibility_test.dart` (the home group).
 
+## 16zzz-i. A cache keyed by what, not by whom; a response belongs to the identity that asked; the code you can read is not always the code that runs (Partner Editions A2, 2026-10-31)
+
+A2 put a partner's exclusive sessions on the homes. There was no migration. Three things in it apply beyond this
+feature.
+
+**1. When a server answer starts depending on who asks, every cache of it becomes per-person.** Content stores were
+built for content that is the same for everyone: a recipe is a recipe. So `ContentStore` keeps one cache key per
+*type* and never thinks about accounts. P4 changed one fact underneath it: the `programmes_published` view now filters
+by `auth.uid()`. The query looks the same and the rows look the same, but one key now holds one person's answer. On a
+shared phone the next account would see the last one's exclusive session until a relaunch. The general fact: **a
+cache is keyed by the inputs that change its answer.** When an input is added on the server (here, the caller), every
+cache in front of it has to learn about it, and nothing will warn you.
+
+There were two possible fixes:
+- Put the user id into the key.
+- Join the mechanism every per-person store already uses: `LocalWipe` clears the disk on sign-out,
+  `SyncRegistry.resetAll()` empties memory, and `resyncAll()` fetches again on the next sign-in.
+
+We took the second. A per-user key would leave old accounts' rows on the phone forever, and two mechanisms for the
+same event is how one of them ends up skipped.
+
+**2. A response belongs to the identity that asked for it.** Emptying the store on sign-out is not enough. A fetch
+sent while account A was in can land after B signs in, and would write A's rows into memory and onto disk. Nothing
+fails and nothing is logged. `ContentStore` now keeps a generation number:
+- `forgetForAccount()` bumps it.
+- Every fetch remembers the value it started with.
+- An answer whose generation has moved on is dropped.
+
+The general shape: when the thing a request depends on can change while the request is in flight, **tag the
+request, not the store**, and discard answers to a question nobody is asking any more. Request ids in
+search-as-you-type and version checks in optimistic UI work the same way.
+- What it costs: one integer, and a dropped answer means one extra fetch.
+- What it buys: no assumption about whether the sign-out or the network answer arrives first.
+
+**3. The code you can read is not always the code that runs.** The brief pointed at the sponsor chip at
+`pv_you_screen.dart:598`. The line exists and is correct, but on 2026-10-07 all three stages moved to a different
+profile layout, which had no chip. So for three weeks nobody's You page named their employer, while the code said it
+did. Reading the call site was not enough; the question was whether the branch it sits in is ever reached. Here two
+flags (`kPvTtcProfileV2`, `kPvTtcProfileV3`) and each stage's content (`groups`, `shortProfile`) decide that. The
+general rule: **before you extend a line, prove its branch is live.** A2 adds the chip to the layout that runs, and a
+source test pins it there.
+
+**4. A list index is a contract with whoever edits the list next.** Settings picked "About ParentVeda" as
+`support[3]`. The Our experts work added a row to that list, in a sensible place, and About quietly became Our
+experts. No error, because index 3 still existed. The rule: **pick a row by what it is (its title or a key), not by
+where it is.** A lookup by name that finds nothing fails loudly; an index that points at the wrong row never does.
+A related trap from the same tests: `tester.runAsync` lets real time pass, and with it every pending network call,
+so google_fonts' failed font loads (no network in a test) land inside the test. Pump frames instead unless real I/O
+is the point.
+
+Pinned by `test/partner_editions_a2_test.dart`.

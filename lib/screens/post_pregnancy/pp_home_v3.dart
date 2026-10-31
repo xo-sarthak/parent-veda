@@ -114,6 +114,7 @@ import 'phase_map_screen.dart';
 // import 'pp_hero_field.dart'; // the field gave way to the painted hero (2026-10-22)
 import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/partner_lockup.dart' show PartnerStrip; // Partner Editions A1
+import '../../widgets/partner_exclusive_rail.dart'; // Partner Editions A2
 import '../../widgets/pv_toast.dart' show pvToast;
 // import 'pp_saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
 import '../dear_baby_vault_screen.dart' show DearBabyLettersReadyCard;
@@ -441,6 +442,8 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 )),
                 _Sheet(p: p, children: [
                 const SizedBox(height: 22),
+                // Partner Editions A2: head, 12, cards, then the 26 between this sheet's sections.
+                PartnerExclusiveRail(p: p, head: (e, t) => _pad(_Head(eyebrow: e, title: t, p: p)), headGap: 12, bottom: 26),
                 // ---- HER LETTERS, READY TO OPEN (2026-10-15) -----------------
                 // The Dear Baby letters she wrote in pregnancy open at birth
                 // (STILL-OPEN §83.2). First on the sheet until she opens them,

@@ -67,6 +67,7 @@ import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../widgets/partner_lockup.dart' show PartnerStrip; // Partner Editions A1
+import '../../widgets/partner_exclusive_rail.dart'; // Partner Editions A2
 // PvCardRail left the show list with card B (2026-10-23); add it back to revert.
 import '../products/pv_store_chrome.dart'
     show pvSnack, PvProductImage, pvOpenProduct;
@@ -502,6 +503,8 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                 )),
                 _Sheet(p: p, children: [
                   const SizedBox(height: 26),
+                  // Partner Editions A2: head, 14, cards, 26, as every section on this sheet.
+                  PartnerExclusiveRail(p: p, head: (e, t) => _pad(_Head(eyebrow: e, title: t, p: p)), headGap: 14, bottom: 26),
 
                   // ---- THE ROUND'S ONE NOTICE (2026-09-26) -----------------
                   //

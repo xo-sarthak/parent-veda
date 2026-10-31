@@ -120,6 +120,10 @@ abstract class ContentStore<T> extends ChangeNotifier {
   bool _backendHasServedRows = false;
   DateTime? _lastFetchAt;
 
+  /// Bumped by [forgetForAccount]. A fetch remembers the value it started
+  /// with and drops its answer when the value has moved on: see there.
+  int _generation = 0;
+
   // ---- the subclass contract (two methods) ---------------------------------
 
   /// Build a model from a row. The SAME mapper serves a live Supabase row and a
@@ -167,6 +171,30 @@ abstract class ContentStore<T> extends ChangeNotifier {
   /// (pull-to-refresh), not for lifecycle events.
   Future<void> refresh({bool force = false}) => _fetchFresh(force: force);
 
+  /// Forget everything this store holds for the account that just left
+  /// (sign-out, or a different account found signed in). Back to the seed,
+  /// no "has served rows", no throttle. The disk cache is not touched here:
+  /// `LocalWipe` clears every prefs key in the same step that calls this.
+  ///
+  /// Only a store whose rows depend on WHO is asking registers it with
+  /// `SyncRegistry.registerReset` (ProgrammeStore, Partner Editions A2: the
+  /// view filters exclusive sessions per account). A recipe is the same for
+  /// everyone, so the other content stores do not.
+  ///
+  /// ⚠️ A RESPONSE BELONGS TO THE IDENTITY THAT ASKED FOR IT. A fetch sent
+  /// while account A was signed in can land after B signs in, and would write
+  /// A's rows into memory and onto disk. Bumping [_generation] makes that
+  /// late answer a no-op. The general shape: when the identity behind a
+  /// request can change while it is in flight, tag the request, not the
+  /// store, and discard answers to a question nobody is asking any more.
+  void forgetForAccount() {
+    _generation++;
+    _items = List<T>.of(_seed);
+    _backendHasServedRows = false;
+    _lastFetchAt = null;
+    notifyListeners();
+  }
+
   // ---- internals ------------------------------------------------------------
 
   Future<void> _load() async {
@@ -205,6 +233,7 @@ abstract class ContentStore<T> extends ChangeNotifier {
       return;
     }
 
+    final generation = _generation;
     final List<Map<String, dynamic>> rows;
     try {
       rows = await ContentRepo.fetchPublished(
@@ -218,6 +247,9 @@ abstract class ContentStore<T> extends ChangeNotifier {
       // throttle window that a success does.
       return;
     }
+
+    // Asked for an account that has since left: see [forgetForAccount].
+    if (generation != _generation) return;
 
     _lastFetchAt = DateTime.now();
 
@@ -277,6 +309,7 @@ abstract class ContentStore<T> extends ChangeNotifier {
   /// Testing seam: forget the cache and the once-per-session guard.
   @visibleForTesting
   void resetForTest() {
+    _generation++;
     _items = List<T>.of(_seed);
     _loaded = false;
     _backendHasServedRows = false;

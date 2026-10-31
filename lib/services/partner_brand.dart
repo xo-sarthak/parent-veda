@@ -46,6 +46,7 @@ class PartnerLockupInfo {
     required this.name,
     this.logoUrl,
     this.kind = 'employer',
+    this.id,
   });
 
   final String name;
@@ -53,6 +54,10 @@ class PartnerLockupInfo {
 
   /// 'employer' | 'school' | … as `my_sponsor()` returns it.
   final String kind;
+
+  /// The sponsor's id (A2): a programme's `audience_sponsor_id` is matched
+  /// against it, so the rail names only the partner whose sessions they are.
+  final String? id;
 }
 
 class PartnerBrand extends ChangeNotifier {
@@ -72,6 +77,7 @@ class PartnerBrand extends ChangeNotifier {
       name: s.name.trim(),
       logoUrl: (logo == null || logo.isEmpty) ? null : logo,
       kind: s.kind,
+      id: s.id,
     );
   }
 

@@ -95,6 +95,8 @@ class LearningProgram {
     this.recency = 0,
     this.ageFromMonths,
     this.ageToMonths,
+    this.audienceSponsorId,
+    this.audiencePartnerId,
   });
 
   final String id;
@@ -137,6 +139,17 @@ class LearningProgram {
   /// programme carries it as `age_from_months` / `age_to_months` (0124).
   final int? ageFromMonths;
   final int? ageToMonths;
+
+  /// Who it is only for (0142, Partner Editions P4/A2). Null on both = every
+  /// family. The view returns a row with one of these set only to a member of
+  /// that audience, so the app never decides who may see it; it only reads
+  /// whose it is, to name the partner on the home rail.
+  final String? audienceSponsorId;
+  final String? audiencePartnerId;
+
+  /// True for a programme only one partner's families can see.
+  bool get isExclusive =>
+      audienceSponsorId != null || audiencePartnerId != null;
 
   /// Suits a child of [months]. True when no window is set.
   bool fitsAge(int months) =>

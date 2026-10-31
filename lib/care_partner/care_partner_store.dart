@@ -25,6 +25,11 @@ import 'care_partner_models.dart';
 class CarePartnerStore extends ChangeNotifier {
   CarePartnerStore._() {
     SyncRegistry.registerReset(_resetForAccount);
+    // Partner Editions A2 (2026-10-31): emptied on sign-out, but only refetched
+    // at launch (main.dart), so after a sign-out and sign-in in one run her
+    // doctor's home line and rail waited for a relaunch. resyncAll runs this;
+    // it is a no-op signed out and keeps the cache on failure.
+    SyncRegistry.register(refreshFromServer);
   }
   static final CarePartnerStore instance = CarePartnerStore._();
 

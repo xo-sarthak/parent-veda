@@ -28,6 +28,7 @@
 //    plane      a paper plane: Contact us
 //    phone      a phone with a heart on its screen: Get help now
 //    info       an i in a disc: About ParentVeda
+//    people     two figures, one soft behind: Our experts (2026-10-31)
 //
 //  ⚠️ ONE TINT FOR THE PAGE (the lead, 2026-09-29): every mark on the
 //  profile and on Settings takes `kPvProfileMarkHue`, so the page reads calm
@@ -60,6 +61,7 @@ enum PvProfileMark {
   plane,
   phone,
   info,
+  people,
 }
 
 class PvProfileArt extends StatelessWidget {
@@ -295,6 +297,39 @@ class PvProfilePainter extends CustomPainter {
           soft,
         );
         canvas.drawLine(const Offset(46, 78), const Offset(54, 78), knock);
+
+      case PvProfileMark.people:
+        // The person mark's shapes, twice: a second figure soft behind and to
+        // the right, the front one in ink with a ground ring, as `person`.
+        canvas.drawRRect(
+          RRect.fromLTRBAndCorners(
+            46,
+            52,
+            86,
+            76,
+            topLeft: const Radius.circular(20),
+            topRight: const Radius.circular(20),
+            bottomLeft: const Radius.circular(7),
+            bottomRight: const Radius.circular(7),
+          ),
+          soft,
+        );
+        canvas.drawCircle(const Offset(66, 36), 11, soft);
+        canvas.drawRRect(
+          RRect.fromLTRBAndCorners(
+            16,
+            58,
+            62,
+            84,
+            topLeft: const Radius.circular(23),
+            topRight: const Radius.circular(23),
+            bottomLeft: const Radius.circular(8),
+            bottomRight: const Radius.circular(8),
+          ),
+          ink,
+        );
+        canvas.drawCircle(const Offset(39, 40), 16, ground);
+        canvas.drawCircle(const Offset(39, 40), 12, ink);
 
       case PvProfileMark.info:
         // An i knocked out of an ink disc, a soft disc behind.

@@ -92,6 +92,10 @@ class SponsorInfo {
 class EntitlementStore extends ChangeNotifier {
   EntitlementStore._() {
     SyncRegistry.registerReset(_resetForAccount);
+    // Partner Editions A2 (2026-10-31): the reset emptied it on sign-out, but
+    // nothing fetched it again on the next sign-in, so the lockup and the
+    // benefit meter stayed empty until a relaunch. resyncAll runs this.
+    SyncRegistry.register(refresh);
   }
   static final EntitlementStore instance = EntitlementStore._();
 

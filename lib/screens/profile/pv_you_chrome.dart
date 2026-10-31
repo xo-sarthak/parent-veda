@@ -1234,7 +1234,13 @@ class PvProfileHero extends StatelessWidget {
     this.photoPath,
     this.onPhoto,
     this.showBand = true,
+    this.partner,
   });
+
+  /// Under the status and partner lines: the sponsor's chip (Partner
+  /// Editions A2, `PartnerYouChip`). It owns its own gap and is a zero-size
+  /// box without a sponsor, so a plain family's hero is unchanged.
+  final Widget? partner;
 
   /// Her own photo on this phone (`ProfilePhotoStore`), or null for the
   /// monogram (2026-09-30).
@@ -1533,6 +1539,7 @@ class PvProfileHero extends StatelessWidget {
                 ],
               ),
               ],
+              ?partner,
               if (onEdit != null) ...[
                 const SizedBox(height: 16),
                 PvProfilePill(

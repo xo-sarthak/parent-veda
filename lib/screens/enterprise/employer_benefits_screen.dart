@@ -11,10 +11,20 @@
 //  sponsors ParentVeda would otherwise never learn it), and the BENEFITS are
 //  shown only once there are benefits. Nothing is hidden; nothing is fictional.
 //
-//  ONE APP. There is no enterprise navigation, no company theme, no separate
-//  home. A sponsored parent's app differs from anyone else's by what she
-//  gained, and by one line saying who paid for it. That restraint is the
-//  product decision, not an unfinished state.
+//  ONE APP, CO-BRANDED (Partner Editions D1, the user, 2026-10-29). There is
+//  still no enterprise navigation, no company theme and no separate home: a
+//  partner colours nothing and moves nothing. What a sponsored parent now sees
+//  is a co-brand edition: the "ParentVeda × {name}" lockup under each home's
+//  top row (A1), a one-time welcome (A1), an "Only for {name} families" rail
+//  at the top of each home's sheet (A2), and on You the sponsor's logo with a
+//  card saying what is left (A2). Every one of those taps through to this
+//  screen. See docs/partner-editions/MASTER.md.
+//
+//  Superseded by D1, kept for revert (July):
+//  //  ONE APP. There is no enterprise navigation, no company theme, no separate
+//  //  home. A sponsored parent's app differs from anyone else's by what she
+//  //  gained, and by one line saying who paid for it. That restraint is the
+//  //  product decision, not an unfinished state.
 //
 //  ---------------------------------------------------------------------------
 //  REDRAWN ON THE BASE UI, 2026-09-29. The user, on the TTC More tab's

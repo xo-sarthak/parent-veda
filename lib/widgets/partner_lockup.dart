@@ -146,7 +146,7 @@ class PartnerLockup extends StatelessWidget {
                     ),
                   ),
                 ),
-                _PartnerMark(info: info, size: 22),
+                PartnerMark(info: info, size: 22),
                 const SizedBox(width: 7),
                 Flexible(
                   child: Text(
@@ -167,8 +167,10 @@ class PartnerLockup extends StatelessWidget {
 
 /// The sponsor's logo when it uploaded one, else its monogram in ink. A logo
 /// that fails to load falls back the same way: never a broken image box.
-class _PartnerMark extends StatelessWidget {
-  const _PartnerMark({required this.info, required this.size});
+/// Public since A2: the You chip draws the same mark (kept for revert: it was
+/// `_PartnerMark`, private to the lockup).
+class PartnerMark extends StatelessWidget {
+  const PartnerMark({super.key, required this.info, required this.size});
 
   final PartnerLockupInfo info;
   final double size;

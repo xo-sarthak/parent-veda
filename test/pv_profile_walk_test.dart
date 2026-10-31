@@ -113,10 +113,17 @@ void main() {
       await tester.tap(row);
       await tester.pump();
       // Some rows load a store first (the addresses sheet awaits the order
-      // store): let real time pass, then settle.
-      await tester.runAsync(
-          () => Future<void>.delayed(const Duration(milliseconds: 300)));
-      await tester.pump();
+      // store): give its futures a few frames to settle.
+      //
+      // ⚠️ NOT `runAsync` (2026-10-31). Real time let google_fonts' font
+      // loads (no network in a test, so a 400) fail INSIDE this test, so it
+      // failed on the first row it opened, whatever the row did. The trap
+      // ttc_palette_consistency_test.dart already names. Kept for revert:
+      //   await tester.runAsync(
+      //       () => Future<void>.delayed(const Duration(milliseconds: 300)));
+      for (var i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 60));
+      }
       await tester.pump(const Duration(milliseconds: 400));
       expect(tester.takeException(), isNull, reason: 'Settings › "$t" threw');
       // A switch answers in place: a changed value or a note on screen.

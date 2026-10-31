@@ -54,7 +54,9 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | **P3** ✓ 2026-10-30, hash in memory | Partners | IVF centre: Overview, per-doctor table; ParentVeda+ refuses org logins (R5) | yes: `0139` (`care_org_dashboard`) | P1, D2 |
 | **P4** ✓ 2026-10-30 (0142 RUN, verify 20/0), hash in memory | Partners + DB | Exclusive content: audience columns, Content tab, contract end (R2) | yes | P2 |
 | **A1** ✓ 2026-10-30, hash in memory | Parent (LAST) | `PartnerBrand` resolver, lockup strip, "Your doctor" line, welcome sheet in new onboarding | no | P4 |
-| **A2** | Parent (LAST) | "Exclusively for you" rail, You chip with logo + benefit meter | no | A1, P4 |
+| **A2** ✓ 2026-10-31, hash in memory | Parent (LAST) | "Exclusively for you" rail, You chip with logo + benefit meter | no | A1, P4 |
+
+| **A3** | Parent | The rail's offer card: an RPC returning the caller's audience coupons (0142 gave coupons an audience; nothing reads it), then the card | yes (small RPC) | A2 |
 
 D-phases and P-phases can run in either order; P3 needs D2 for `my_doctor_referrals` shape parity.
 
@@ -113,3 +115,61 @@ What was built:
   `test/care_visibility_test.dart`, where the home group replaces the "home is off" test, kept for revert.
 - What A1 left is in STILL-OPEN §5.1f; the logo hosting and the phone walk are in BEFORE-LAUNCH.
 
+### A2 as built (2026-10-31)
+Four decisions from the user, made before the build:
+- **The storyboard's wording, with full names.** The eyebrow is "Only for Northwind Systems families", "… parents" for
+  a school, and "From Dr Meera Rao" or "From Bloom Fertility Centre" for a care partner. The title is "Included with
+  your benefit", "From your school" or "For Dr Meera Rao's patients". MASTER's "Exclusively for {name}" was shorthand,
+  and the storyboard rules. Shortening a name ("Northwind") would mean guessing, so it is not done.
+- **The rail holds programmes plus a consult card.** The consult card ("1 of 2 left · Book a consult") shows when the
+  sponsor's plan includes consultations, and it opens Benefits. The offer card is owed (STILL-OPEN §5.1g).
+- **No exclusive content means no rail.** It takes no room, the same as having no partner.
+- **The sponsor and credits stores refetch on sign-in too.** Same mechanism as the ProgrammeStore fix.
+
+What was built:
+- **ProgrammeStore follows the account (done first).**
+  - `ContentStore.forgetForAccount()` goes back to the seed, clears `served` and the throttle, and bumps a generation
+    number, so a fetch that lands after the switch is dropped.
+  - `ProgrammeStore` registers it with `SyncRegistry.registerReset`, and an unforced fetch with
+    `SyncRegistry.register`. The disk half was already handled by `LocalWipe` on sign-out and by
+    `LocalOwner.ensureCurrent()` at launch.
+  - The cache key is now `content_programmes_v2`, because rows now carry `audience_sponsor_id` /
+    `audience_partner_id` (`LearningProgram`, both nullable, plus `isExclusive`).
+  - `EntitlementStore` and `CreditsStore` gained `SyncRegistry.register(refresh)`.
+- **The rail** (`lib/widgets/partner_exclusive_rail.dart`).
+  - `partnerRailFor()` is pure. It returns the words and the partner's programmes that are not completed.
+  - A sponsor's rail wins, the same rule as the strip. A care partner's leads only when there is no sponsor rail.
+  - The name comes through `PartnerBrand` (`PartnerLockupInfo` gained the sponsor `id`).
+  - Cards are 150 wide and grow with text up to 1.3×, in ParentVeda's grey panel with ink text. No partner colours
+    (D1, which overrules the storyboard's tint), and no logo for a doctor (D3).
+- **Spacing is each home's own.** Each home passes its own head and gaps:
+  - Pregnancy: the head on 22/12, first in `V3PregSheet`. The next head keeps its own 22.
+  - TTC: after the sheet's 26, then head, 14, cards, 26.
+  - Parenting: after the sheet's 22, then head, 12, cards, 26.
+  With nothing to draw, the rail is a zero-size box.
+- **You.** All three stages draw `PvProfileHero`. The old `chip: sponsor?.name` lines are on layouts no stage
+  reaches, and are kept for revert.
+  - The hero gained a nullable `partner` slot under the status line. It takes `PartnerYouChip`: `PartnerMark` (now
+    public; the logo, or a monogram in ink) and the name.
+  - Under the hero, `PartnerBenefitCard` reads "Your Northwind Systems benefit", then "1 of 2 consults left" with a
+    6pt ink meter from `CreditsStore` and `SponsorBenefits`, then "Valid until …" and "Masterclasses are included."
+    where they apply.
+  - The card is white with a hairline, on the profile's 18 gutter and 28 group gap, and opens Benefits (route
+    `employer`). A sponsor only (D3).
+- `employer_benefits_screen.dart:14–17`: the July "one line saying who paid" is replaced by the D1 co-brand
+  paragraph, with the old text kept for revert.
+- Tests: `test/partner_editions_a2_test.dart` covers:
+  - the store reset and resync, and the cache round trip;
+  - the rail's rule and its words;
+  - 360pt at 1× and 1.5× for the rail, the chip and the card;
+  - zero room with no partner;
+  - the wiring gate on all three homes and the hero.
+- What A2 left is in STILL-OPEN §5.1g; the phone walk is in BEFORE-LAUNCH.
+
+After the build, three more answers from the user (2026-10-31):
+- **`CarePartnerStore` refetches on sign-in too** (`SyncRegistry.register(refreshFromServer)`).
+- **The offer card is A3**, its own small phase with the coupon RPC (table above).
+- **A doctor family's You page is unchanged**, after a replica: https://claude.ai/artifact/7ZPoYurF4pzoqXFrByaaWe.
+
+Found and fixed in the same pass, not A2's own: Settings had lost "About ParentVeda" (picked by position, and the Our
+experts row moved it). Detail in STILL-OPEN §5.1g.
