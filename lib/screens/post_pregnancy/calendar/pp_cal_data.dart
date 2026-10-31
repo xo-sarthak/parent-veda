@@ -20,9 +20,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../services/notification_link.dart';
 import '../../../services/notification_service.dart';
 import '../../../services/remote/sync_registry.dart';
 import '../health_doctor_visit_screen.dart' show ppParseRecordDate;
+import '../pp_child_profile.dart' show ChildProfileStore;
 import '../pp_health_data.dart';
 import '../pp_vaccine_data.dart';
 
@@ -202,13 +204,22 @@ class PpApptReminders {
 
   static const String _key = 'pp_appt_reminders_v1';
 
-  /// visit id -> (when it rings, title, body).
-  final Map<String, ({DateTime at, String title, String body})> _on = {};
+  /// visit id -> (when it rings, title, body, whose visit). [child] (6b
+  /// leftover L4): the child active when it was set, so a tap opens that
+  /// child's calendar. Null on a reminder saved before L4.
+  final Map<String, ({DateTime at, String title, String body, String? child})> _on = {};
   bool _loaded = false;
 
   @visibleForTesting
-  static Future<void> Function({required int id, required String title, String? body, required DateTime when})
+  // Kept for revert (6b L4, no payload):
+  //   static Future<void> Function({required int id, required String title, String? body, required DateTime when})
+  static Future<void> Function(
+          {required int id, required String title, String? body, required DateTime when, String? payload})
       schedule = NotificationService.instance.scheduleOneOff;
+
+  /// What a tap on [visitId]'s reminder opens: that child's calendar.
+  static String payloadFor(String visitId, String? child) =>
+      NotificationLink(NotificationLink.ppAppointment, NotificationLink.withChild(child, visitId)).payload;
   @visibleForTesting
   static Future<void> Function(int id) cancelPhone = NotificationService.instance.cancel;
 
@@ -225,7 +236,12 @@ class PpApptReminders {
         final v = e.value as Map<String, dynamic>;
         final at = DateTime.tryParse(v['at'] as String? ?? '');
         if (at == null) continue;
-        _on[e.key] = (at: at, title: v['title'] as String? ?? '', body: v['body'] as String? ?? '');
+        _on[e.key] = (
+          at: at,
+          title: v['title'] as String? ?? '',
+          body: v['body'] as String? ?? '',
+          child: v['child'] as String?,
+        );
       }
     } catch (_) {/* a corrupt record reads as none */}
   }
@@ -234,7 +250,12 @@ class PpApptReminders {
     try {
       await (await SharedPreferences.getInstance()).setString(_key, jsonEncode({
         for (final e in _on.entries)
-          e.key: {'at': e.value.at.toIso8601String(), 'title': e.value.title, 'body': e.value.body},
+          e.key: {
+            'at': e.value.at.toIso8601String(),
+            'title': e.value.title,
+            'body': e.value.body,
+            if (e.value.child != null) 'child': e.value.child,
+          },
       }));
     } catch (_) {/* the alarm still rings this run */}
   }
@@ -246,9 +267,15 @@ class PpApptReminders {
     await _load();
     final when = ppEveningBefore(appointmentAt, now ?? DateTime.now());
     if (when == null) return null;
-    _on[visitId] = (at: when, title: title, body: body);
+    final child = ChildProfileStore.instance.activeChildId;
+    _on[visitId] = (at: when, title: title, body: body, child: child);
     await _save();
-    await schedule(id: ppApptReminderId(visitId), title: title, body: body, when: when)
+    await schedule(
+            id: ppApptReminderId(visitId),
+            title: title,
+            body: body,
+            when: when,
+            payload: payloadFor(visitId, child))
         .catchError((_) {});
     return when;
   }
@@ -268,7 +295,12 @@ class PpApptReminders {
     _on.removeWhere((_, v) => !v.at.isAfter(t));
     await _save();
     for (final e in _on.entries) {
-      await schedule(id: ppApptReminderId(e.key), title: e.value.title, body: e.value.body, when: e.value.at)
+      await schedule(
+              id: ppApptReminderId(e.key),
+              title: e.value.title,
+              body: e.value.body,
+              when: e.value.at,
+              payload: payloadFor(e.key, e.value.child))
           .catchError((_) {});
     }
   }

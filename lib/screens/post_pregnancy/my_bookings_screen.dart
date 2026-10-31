@@ -30,6 +30,7 @@ import '../../booking/group_call_screen.dart';
 import '../../booking/prescription.dart';
 import '../../booking/prescription_watch.dart';
 import '../../services/notification_service.dart';
+import '../../services/notification_link.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
 import '../../widgets/pv_toast.dart';
 import 'problem_solver_screen.dart';
@@ -96,6 +97,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
         title: b.title,
         body: 'Starts in an hour — ${_timeLabel(b.startsUtc)}.',
         when: remindAt,
+        payload: NotificationLink(NotificationLink.session, b.id).payload, // 6b L4
       );
     }
   }

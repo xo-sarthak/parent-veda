@@ -122,7 +122,7 @@ void main() {
       PpApptReminders.instance.debugReset();
       scheduled.clear();
       cancelled.clear();
-      PpApptReminders.schedule = ({required int id, required String title, String? body, required DateTime when}) async =>
+      PpApptReminders.schedule = ({required int id, required String title, String? body, required DateTime when, String? payload}) async =>
           scheduled.add((id, when));
       PpApptReminders.cancelPhone = (id) async => cancelled.add(id);
     });
@@ -158,7 +158,7 @@ void main() {
           .remind('v2', DateTime(2026, 10, 26, 11), title: 't', body: 'b', now: DateTime(2026, 10, 25));
       // A new run: memory empty, the phone's record read back.
       PpApptReminders.instance.debugReset();
-      PpApptReminders.schedule = ({required int id, required String title, String? body, required DateTime when}) async =>
+      PpApptReminders.schedule = ({required int id, required String title, String? body, required DateTime when, String? payload}) async =>
           scheduled.add((id, when));
       scheduled.clear();
       await PpApptReminders.instance.rearmAfterStartup(now: DateTime(2026, 10, 26, 8));
@@ -172,7 +172,7 @@ void main() {
       ChildProfileStore.instance.resetForTest();
       HealthStore.instance.debugReset();
       PpApptReminders.instance.debugReset();
-      PpApptReminders.schedule = ({required int id, required String title, String? body, required DateTime when}) async {};
+      PpApptReminders.schedule = ({required int id, required String title, String? body, required DateTime when, String? payload}) async {};
       await ChildProfileStore.instance.addChild(name: 'Aarav', isBoy: true, dob: dob);
     });
     tearDown(() => PpApptReminders.instance.debugReset());

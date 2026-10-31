@@ -35,6 +35,7 @@ import '../../booking/group_call_screen.dart';
 import '../../booking/prescription.dart';
 import '../../data/learn/pv_learn_view.dart';
 import '../../services/notification_service.dart';
+import '../../services/notification_link.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
@@ -234,6 +235,7 @@ class _PvSessionScreenState extends State<PvSessionScreen> {
         title: b.title,
         body: 'Starts in an hour — ${pvLearnTime(b.startsUtc)}.',
         when: b.startsUtc.toLocal().subtract(const Duration(hours: 1)),
+        payload: NotificationLink(NotificationLink.session, b.id).payload, // 6b L4
       );
     });
   }

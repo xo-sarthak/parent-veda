@@ -334,7 +334,7 @@ void main() {
         PpApptReminders.instance.debugReset();
         scheduled.clear();
         PpApptReminders.schedule =
-            ({required int id, required String title, String? body, required DateTime when}) async =>
+            ({required int id, required String title, String? body, required DateTime when, String? payload}) async =>
                 scheduled.add(when);
       });
       tearDown(() {

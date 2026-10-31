@@ -67,6 +67,7 @@ void main() {
       required String title,
       required String body,
       required DateTime when,
+      String? payload,
     }) async =>
         _scheduled.add((id: id, title: title, body: body, when: when));
     TtcAppointmentsStore.cancelPhone = (_) async {};

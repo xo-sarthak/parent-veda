@@ -52,6 +52,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/father_preview.dart';
 import '../../services/notification_service.dart';
+import '../../services/notification_link.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_toast.dart';
 import '../pregnancy/preg_chrome.dart' show PregOfferRow, PregRowCard;
@@ -144,6 +145,7 @@ class _PpMoodCheckScreenState extends State<PpMoodCheckScreen> {
       title: 'How have you been?',
       body: 'Two minutes, just for you.',
       when: at,
+      payload: const NotificationLink(NotificationLink.moodCheck, '').payload, // 6b L4
     );
   }
 

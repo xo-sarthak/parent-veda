@@ -79,6 +79,7 @@ void main() {
       required String title,
       required String body,
       required DateTime when,
+      String? payload,
     }) async {
       scheduled.add((when: when, title: title));
     };

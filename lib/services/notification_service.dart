@@ -287,11 +287,15 @@ class NotificationService {
     String title = 'ParentVeda',
     String body = "Test notification - you're all set ✅",
     int id = 999001,
+    // 6b leftover L4: what a tap opens, a NotificationLink.payload. Brand
+    // messages and prescriptions show at once through here.
+    String? payload,
   }) async {
     if (await _muted()) return; // signed out (2026-10-10)
     if (!_ready) await init();
     try {
-      await _plugin.show(id, title, body, _details);
+      // Kept for revert (L4): await _plugin.show(id, title, body, _details);
+      await _plugin.show(id, title, body, _details, payload: payload);
     } catch (_) {/* best-effort */}
   }
 
@@ -463,6 +467,8 @@ class NotificationService {
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
+          // 6b leftover L4: a tap opens this medicine.
+          payload: NotificationLink(NotificationLink.medicine, m.id).payload,
         );
       } catch (_) {/* best-effort */}
       index++;
@@ -638,6 +644,8 @@ class NotificationService {
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
           matchDateTimeComponents: o.match,
+          // 6b leftover L4: a tap opens the list it was set from, by category.
+          payload: NotificationLink(NotificationLink.reminder, r.category).payload,
         );
         debugPrint('[reminders] scheduled "${r.title}" #${o.index} for $when '
             '(now=${tz.TZDateTime.now(tz.local)}, tz=${tz.local.name})');

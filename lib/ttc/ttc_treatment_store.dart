@@ -64,6 +64,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/ttc/ttc_strings.dart' show TtcPartnerMode;
 import '../services/notification_service.dart';
+import '../services/notification_link.dart';
 import '../services/remote/supabase_repo.dart';
 import 'ttc_sync.dart';
 import 'ttc_treatment_round.dart';
@@ -866,6 +867,8 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
       title: 'Trigger injection in 4 hours',
       body: ttcTriggerPrepBody(_cycle.kind, at),
       when: at.subtract(const Duration(hours: 4)),
+      // 6b leftover L4: a tap opens the round, where the time is.
+      payload: const NotificationLink(NotificationLink.ttcTreatment, '').payload,
     );
     await service.scheduleOneOff(
       id: triggerNotificationId,
@@ -873,6 +876,7 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
       body: 'Your clinic set this for ${_hhmm(at)}. '
           'If anything is unclear, call them now instead of guessing.',
       when: at.subtract(const Duration(minutes: 15)),
+      payload: const NotificationLink(NotificationLink.ttcTreatment, '').payload,
     );
   }
 

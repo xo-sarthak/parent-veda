@@ -31,6 +31,7 @@
 // =============================================================================
 
 import '../services/notification_service.dart';
+import '../services/notification_link.dart';
 import '../services/remote/supabase_repo.dart';
 import 'booking_store.dart';
 import 'prescription.dart';
@@ -102,6 +103,7 @@ class PrescriptionWatch {
           ? 'Your prescription is ready'
           : 'Prescription from $what',
       body: detail,
+      payload: NotificationLink(NotificationLink.prescription, bookingId).payload, // 6b L4
     );
   }
 }

@@ -21,6 +21,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../services/notification_service.dart';
+import '../services/notification_link.dart';
 import '../localization/app_language.dart';
 
 class ReferralNotifications {
@@ -63,16 +64,21 @@ class ReferralNotifications {
       id: _id('$club-$rung', 2),
       title: S.now.unlockedTitle(what),
       body: S.now.birthClubBetter,
+      link: NotificationLink.referralClub,
     );
   }
 
   /// Fire in a few seconds rather than instantly: these are triggered during a
   /// sync, and a notification arriving while she is already looking at the
   /// screen that caused it is noise.
+  ///
+  /// [link] (6b leftover L4): the referral link's id, so a tap opens the
+  /// invites page, or the Birth Club for a rung.
   Future<void> _now({
     required int id,
     required String title,
     required String body,
+    String link = '',
   }) async {
     try {
       await NotificationService.instance.scheduleOneOff(
@@ -80,6 +86,7 @@ class ReferralNotifications {
         title: title,
         body: body,
         when: DateTime.now().add(const Duration(seconds: 4)),
+        payload: NotificationLink(NotificationLink.referral, link).payload,
       );
     } catch (_) {
       if (kDebugMode) debugPrint('[referral] notification failed: $title');

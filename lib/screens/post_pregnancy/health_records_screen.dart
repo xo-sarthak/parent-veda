@@ -16,9 +16,11 @@ import '../products/pv_store_chrome.dart' show PvCommit;
 import 'package:flutter/material.dart';
 
 import '../../services/notification_service.dart';
+import '../../services/notification_link.dart';
 import 'pp_attachments.dart';
 import 'pp_care_parts.dart' show ppCareSaved;
 import 'pp_common.dart';
+import 'pp_child_profile.dart' show ChildProfileStore;
 import 'pp_health_data.dart';
 import '../../widgets/pv_feedback.dart' show PvPress;
 
@@ -514,6 +516,13 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
         title: 'Time for ${m.name}',
         body: detail.isEmpty ? 'A gentle reminder for ${m.name}.' : detail,
         when: _nextOccurrence(m.reminderHour!, m.reminderMinute!),
+        // 6b leftover L4: this child's medicines. The medicine's own id is
+        // not known here (the store gives it on save), so the list opens.
+        payload: NotificationLink(
+                NotificationLink.healthRecord,
+                NotificationLink.withChild(
+                    ChildProfileStore.instance.activeChildId, 'medications'))
+            .payload,
       );
     } else {
       await NotificationService.instance.cancel(id);

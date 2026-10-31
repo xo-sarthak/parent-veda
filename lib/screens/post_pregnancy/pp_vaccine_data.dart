@@ -21,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/remote/child_scoped_store.dart';
 import '../../care_partner/care_journey.dart';
 import '../../services/notification_service.dart';
+import '../../services/notification_link.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../services/remote/sync_registry.dart';
 import '../../services/family_profile.dart';
@@ -914,6 +915,10 @@ class VaxStore extends ChangeNotifier {
       title: text.title,
       body: text.body,
       when: at,
+      // 6b leftover L4: that child's visit, whoever is active at the tap.
+      payload: NotificationLink(NotificationLink.vaccine,
+              NotificationLink.withChild(childId, visitId))
+          .payload,
     );
   }
 

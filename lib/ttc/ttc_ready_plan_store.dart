@@ -34,6 +34,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/family_profile.dart';
 import '../services/notification_service.dart';
+import '../services/notification_link.dart';
 import '../services/remote/supabase_repo.dart';
 import 'ttc_care_pathway.dart' show TimingOwnership;
 import 'ttc_fertility_help_store.dart';
@@ -400,6 +401,7 @@ class TtcReadyPlanStore extends ChangeNotifier with TtcSyncedStore {
             : 'A few small things for ${readyMonthLabel(first)}. Open your '
                   'Ready-to-Try plan.',
         when: first,
+        payload: const NotificationLink(NotificationLink.ttcReadyPlan, '').payload, // 6b L4
       );
     }
   }

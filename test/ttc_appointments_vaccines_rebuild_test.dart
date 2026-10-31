@@ -71,6 +71,7 @@ void main() {
       required String title,
       required String body,
       required DateTime when,
+      String? payload,
     }) async {};
     TtcAppointmentsStore.cancelPhone = (id) async {};
   });

@@ -32,6 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/scan_appointment.dart';
 import 'notification_service.dart';
+import 'notification_link.dart';
 import 'remote/sync_registry.dart';
 
 class AppointmentReminders extends ChangeNotifier {
@@ -134,6 +135,7 @@ class AppointmentReminders extends ChangeNotifier {
         title: when.hour == 8 ? 'Today: ${a.title}' : 'Tomorrow: ${a.title}',
         body: body.isEmpty ? 'Your appointment, in your ParentVeda Calendar' : body,
         when: when,
+        payload: NotificationLink(NotificationLink.appointment, a.id).payload, // 6b L4
       );
     } catch (_) {/* best-effort */}
   }

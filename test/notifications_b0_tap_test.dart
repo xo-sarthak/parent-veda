@@ -22,6 +22,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/notification_opener.dart';
+import 'package:parentveda/screens/post_pregnancy/calendar/pp_cal_data.dart' show PpApptReminders;
 import 'package:parentveda/screens/ttc/chats/ttc_chat.dart' show ttcFirstOpenable;
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/services/notification_link.dart';
@@ -346,6 +347,145 @@ void main() {
       // Not a moderator any more: said, not a silent tap or a queue she may not see.
       expect(mod, contains('pvToast(ctx, kNotifNotModerator)'));
       expect(mod, contains('store.me.isMod'));
+    });
+  });
+
+  // ===========================================================================
+  // 6b leftover L4 (2026-10-31): the phone's thirteen older alarms, and the
+  // TTC trigger alarms, carry a payload and open through the one opener.
+  group('6. the older alarms', () {
+    // Each scheduler, the kind its payload names. A scheduler that loses its
+    // payload fails here; a kind with no case in the opener fails below.
+    const schedulers = {
+      'lib/services/notification_service.dart (reminders)': ['lib/services/notification_service.dart', 'NotificationLink(NotificationLink.reminder, r.category).payload'],
+      'medicines': ['lib/services/notification_service.dart', 'NotificationLink(NotificationLink.medicine, m.id).payload'],
+      'vaccines': ['lib/screens/post_pregnancy/pp_vaccine_data.dart', 'NotificationLink(NotificationLink.vaccine,\n              NotificationLink.withChild(childId, visitId))'],
+      'Pregnancy appointments': ['lib/services/appointment_reminders.dart', 'NotificationLink(NotificationLink.appointment, a.id).payload'],
+      'Parenting appointments': ['lib/screens/post_pregnancy/calendar/pp_cal_data.dart', 'NotificationLink(NotificationLink.ppAppointment, NotificationLink.withChild(child, visitId)).payload'],
+      'TTC appointments': ['lib/ttc/ttc_records_store.dart', 'NotificationLink(NotificationLink.ttcAppointment, a.id).payload'],
+      'bookings (the classic list)': ['lib/screens/post_pregnancy/my_bookings_screen.dart', 'NotificationLink(NotificationLink.session, b.id).payload'],
+      'sessions': ['lib/screens/learn/pv_session_screen.dart', 'NotificationLink(NotificationLink.session, b.id).payload'],
+      'referrals': ['lib/referral/referral_notifications.dart', 'NotificationLink(NotificationLink.referral, link).payload'],
+      'brand messages': ['lib/brand/brand_notifications.dart', 'NotificationLink(NotificationLink.brand, campaign.id).payload'],
+      'prescriptions': ['lib/booking/prescription_watch.dart', 'NotificationLink(NotificationLink.prescription, bookingId).payload'],
+      'feeding': ['lib/screens/post_pregnancy/feeding_journey_screen.dart', 'NotificationLink(NotificationLink.feeding,'],
+      'mood check': ['lib/screens/post_pregnancy/pp_mood_check_screen.dart', 'NotificationLink(NotificationLink.moodCheck, \'\').payload'],
+      'health records': ['lib/screens/post_pregnancy/health_records_screen.dart', 'NotificationLink.healthRecord,'],
+      'TTC Ready plan': ['lib/ttc/ttc_ready_plan_store.dart', 'NotificationLink(NotificationLink.ttcReadyPlan, \'\').payload'],
+      'TTC trigger alarms': ['lib/ttc/ttc_treatment_store.dart', 'NotificationLink(NotificationLink.ttcTreatment, \'\').payload'],
+    };
+
+    test('every older scheduler arms a payload', () {
+      for (final e in schedulers.entries) {
+        expect(_code(e.value[0]), contains(e.value[1]), reason: e.key);
+      }
+      // Both TTC trigger alarms, not only the first.
+      expect(RegExp(r'NotificationLink\.ttcTreatment').allMatches(_code('lib/ttc/ttc_treatment_store.dart')).length, 2);
+      // Health records: that child's medicines.
+      expect(_code('lib/screens/post_pregnancy/health_records_screen.dart'),
+          contains("NotificationLink.withChild(\n                    ChildProfileStore.instance.activeChildId, 'medications')"));
+      // The Birth Club rung opens the club, not the invites.
+      expect(_code('lib/referral/referral_notifications.dart'), contains('link: NotificationLink.referralClub,'));
+    });
+
+    test('showNow and both seams carry the payload through', () {
+      final svc = _code('lib/services/notification_service.dart');
+      expect(svc, contains('await _plugin.show(id, title, body, _details, payload: payload);'));
+      final ttc = _code('lib/ttc/ttc_records_store.dart');
+      expect(ttc, contains('id: id, title: title, body: body, when: when, payload: payload);'));
+      final pp = _code('lib/screens/post_pregnancy/calendar/pp_cal_data.dart');
+      expect(RegExp(r'payload: payloadFor\(').allMatches(pp).length, 2,
+          reason: 'remind and rearmAfterStartup both');
+    });
+
+    test('every local kind is a kind the opener knows, and none can come from the server', () {
+      expect(NotificationOpener.localKinds.length, 15);
+      expect(NotificationOpener.kinds, containsAll(NotificationOpener.localKinds));
+      final b3 = File('supabase/migrations/0143_push_campaigns_and_sends.sql').readAsStringSync();
+      final check = RegExp(r"check \(link_kind in \(([^)]*)\)\)").firstMatch(b3)!.group(1)!;
+      for (final k in NotificationOpener.localKinds) {
+        expect(check, isNot(contains("'$k'")), reason: k);
+      }
+    });
+
+    test('each local kind opens its own page', () {
+      final src = _code('lib/screens/notification_opener.dart');
+      const head = 'static void _openThing';
+      const rows = {
+        'reminder': ["openTtcSurface(context, 'ttc_ready_plan')", 'const WalletRemindersScreen()', 'RemindersScreen(controller: preg)'],
+        'medicine': ['openTtcMedicine(context, link.id)', 'openTtcMedication(context)', 'MedicineTrackerScreen(controller: preg)'],
+        'vaccine': ['VaxDetailScreen(visitId: v.item)', 'const VaxTrackerScreen()', '_toChild(context, v.child)'],
+        'appointment': ['CalendarScreen(controller: preg)'],
+        'ppAppointment': ['openPpChildCalendar(context)', '_toChild(context, v.child)'],
+        'ttcAppointment': ['openTtcAppointment(context, TtcApptEntry(', 'openTtcAppointments(context)'],
+        'session': ['pvOpenSession(context, b)', 'const PvMyLearningScreen()'],
+        'referral': ['const BirthClubScreen()', 'const InviteFriendsScreen()'],
+        'brand': ['showSponsorSheet(context, c)'],
+        'prescription': ['PrescriptionViewScreen(prescription: rx', 'pvOpenSession(context, b)'],
+        'feeding': ['const FeedingJourneyScreen()', '_toChild('],
+        'moodCheck': ['const PpMoodCheckScreen()'],
+        'healthRecord': ['HealthRecordsScreen(category:', '_toChild(context, v.child)'],
+        'ttcReadyPlan': ["openTtcSurface(context, 'ttc_ready_plan')"],
+        'ttcTreatment': ['openTtcTreatment(context)'],
+      };
+      expect(rows.length, NotificationOpener.localKinds.length, reason: 'a row per local kind');
+      for (final e in rows.entries) {
+        final body = _caseBody(src, head, 'NotificationLink', e.key);
+        expect(body, isNotEmpty, reason: '${e.key} has no case');
+        for (final want in e.value) {
+          expect(body, contains(want), reason: '${e.key}: $want');
+        }
+      }
+    });
+
+    test('no silent tap: what has gone, or is in another profile, says so', () {
+      final src = _code('lib/screens/notification_opener.dart');
+      const head = 'static void _openThing';
+      for (final e in {
+        'reminder': 'kNotifOtherProfile',
+        'medicine': 'kNotifOtherProfile',
+        'appointment': 'kNotifOtherProfile',
+        'ttcAppointment': 'kNotifGoneAppointment',
+        'session': 'kNotifGoneSession',
+        'brand': 'kNotifGoneBrand',
+        'prescription': 'kNotifNoPrescription',
+      }.entries) {
+        expect(_caseBody(src, head, 'NotificationLink', e.key), contains('pvToast(context, ${e.value})'), reason: e.key);
+      }
+      // A removed child: said, and her page is NOT opened for another child.
+      expect(src, contains('pvToast(context, kNotifChildGone);\n      return false;'));
+    });
+
+    test('a child travels with the id and comes back out', () {
+      final id = NotificationLink.withChild('c_2', 'v_6w');
+      expect(id, 'c_2|v_6w');
+      final back = NotificationLink.splitChild(id);
+      expect(back.child, 'c_2');
+      expect(back.item, 'v_6w');
+      expect(NotificationLink.splitChild('|v_6w').child, isNull);
+      expect(NotificationLink.splitChild('v_6w').item, 'v_6w');
+      // An id is never mangled by the payload round trip.
+      const link = NotificationLink(NotificationLink.vaccine, 'c_2|v_6w');
+      expect(NotificationLink.parse(link.payload), link);
+    });
+
+    test('a Parenting calendar reminder keeps its child, set and re-armed', () async {
+      SharedPreferences.setMockInitialValues({});
+      final seen = <String?>[];
+      PpApptReminders.instance.debugReset();
+      PpApptReminders.schedule = ({required int id, required String title, String? body, required DateTime when, String? payload}) async =>
+          seen.add(payload);
+      final now = DateTime(2026, 10, 31, 9);
+      await PpApptReminders.instance.remind('v_added_1', DateTime(2026, 11, 3, 10),
+          title: 'Tomorrow: a check-up', body: 'At 10:00', now: now);
+      await PpApptReminders.instance.rearmAfterStartup(now: now);
+      expect(seen.length, 2);
+      for (final p in seen) {
+        final link = NotificationLink.parse(p)!;
+        expect(link.kind, NotificationLink.ppAppointment);
+        expect(NotificationLink.splitChild(link.id).item, 'v_added_1');
+      }
+      PpApptReminders.instance.debugReset();
     });
   });
 

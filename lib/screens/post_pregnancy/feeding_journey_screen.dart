@@ -20,6 +20,7 @@ import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../doors/pv_list_row.dart';
 import '../pregnancy/preg_tool_chrome.dart';
 import '../../services/notification_service.dart';
+import '../../services/notification_link.dart';
 import '../../services/pp_use_consent.dart' show PpUseKind;
 import '../../widgets/pv_toast.dart' show pvToast, PvToastKind;
 import '../products/pv_store_chrome.dart' show PvChip, PvCommit, PvSecondary;
@@ -631,6 +632,10 @@ class _FeedingJourneyScreenState extends State<FeedingJourneyScreen> {
       title: 'A feed may be coming up',
       body: 'A gentle nudge, not a schedule. Feed on cue.',
       when: DateTime.now().add(Duration(minutes: gapMinutes)),
+      // 6b leftover L4: this child's feeds, whoever is active at the tap.
+      payload: NotificationLink(NotificationLink.feeding,
+              ChildProfileStore.instance.activeChildId ?? '')
+          .payload,
     );
     if (!mounted) return;
     pvToast(context, 'Reminder set for about ${ppCareClock(DateTime.now().add(Duration(minutes: gapMinutes)))}.',

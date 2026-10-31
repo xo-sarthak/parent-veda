@@ -55,6 +55,41 @@ class NotificationLink {
   static const String booking = 'booking';
   static const String communityModeration = 'community_moderation';
 
+  // ---- the phone's own older alarms (6b leftover L4, 2026-10-31) ----------
+  // Armed on the phone only, never sent by the server: push_campaigns'
+  // link_kind check does not take them, so no build version is involved.
+  static const String reminder = 'reminder'; // id: Reminder.category
+  static const String medicine = 'medicine'; // id: Medication.id
+  static const String vaccine = 'vaccine'; // id: withChild(child, visitId)
+  static const String appointment = 'appointment'; // Pregnancy; id: Appointment.id
+  static const String ppAppointment = 'pp_appointment'; // id: withChild(child, visitId)
+  static const String ttcAppointment = 'ttc_appointment'; // id: TtcAppointment.id
+  static const String session = 'session'; // id: Booking.id
+  static const String referral = 'referral'; // id: '' (invites) or referralClub
+  static const String brand = 'brand'; // id: BrandCampaign.id
+  static const String prescription = 'prescription'; // id: Booking.id
+  static const String feeding = 'feeding'; // id: child id
+  static const String moodCheck = 'mood_check'; // id: ''
+  static const String healthRecord = 'health_record'; // id: withChild(child, category)
+  static const String ttcReadyPlan = 'ttc_ready_plan'; // id: ''
+  static const String ttcTreatment = 'ttc_treatment'; // id: ''
+
+  /// [referral]'s id for a Birth Club rung.
+  static const String referralClub = 'club';
+
+  /// An id that names a child too: `<child>|<item>`. A Parenting alarm is
+  /// set for one child; a tap must open that child's page, not whichever
+  /// child is active when she taps.
+  static String withChild(String? childId, String item) => '${childId ?? ''}|$item';
+
+  /// [withChild] read back. No `|`: the whole id is the item.
+  static ({String? child, String item}) splitChild(String id) {
+    final i = id.indexOf('|');
+    if (i < 0) return (child: null, item: id);
+    final c = id.substring(0, i);
+    return (child: c.isEmpty ? null : c, item: id.substring(i + 1));
+  }
+
   /// The payload string a local notification carries.
   String get payload => jsonEncode({'link_kind': kind, 'link_id': id});
 

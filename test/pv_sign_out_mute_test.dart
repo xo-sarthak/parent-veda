@@ -37,8 +37,9 @@ void main() {
 
   test('every scheduling path is gated, and the stores re-arm after sign-in', () {
     final n = File('lib/services/notification_service.dart').readAsStringSync();
-    expect(RegExp(r'if \(await _muted\(\)\) return;').allMatches(n).length, 5,
-        reason: 'showNow, scheduleOneOff, medication alarms, schedule, syncAll');
+    expect(RegExp(r'if \(await _muted\(\)\) return;').allMatches(n).length, 6,
+        // Kept for revert: 5, before 6b B5 added showPush.
+        reason: 'showNow, showPush (6b B5), scheduleOneOff, medication alarms, schedule, syncAll');
     for (final f in ['lib/services/reminder_store.dart', 'lib/services/medicine_store.dart']) {
       expect(File(f).readAsStringSync(), contains('SyncRegistry.register(rearmNotifications)'),
           reason: f);

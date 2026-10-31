@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/notification_service.dart';
+import '../services/notification_link.dart';
 import '../services/remote/storage_service.dart';
 import '../services/remote/supabase_repo.dart';
 // The evening-before reminder says how many questions a visit has
@@ -811,11 +812,14 @@ int ttcAppointmentReminderId(String appointmentId) {
 }
 
 /// What the store needs from the phone, so a test can watch it.
+///
+/// [payload] (6b leftover L4): what a tap opens, this appointment.
 typedef TtcApptSchedule = Future<void> Function(
     {required int id,
     required String title,
     required String body,
-    required DateTime when});
+    required DateTime when,
+    String? payload});
 
 class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
   TtcAppointmentsStore._() {
@@ -948,9 +952,10 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     required String title,
     required String body,
     required DateTime when,
+    String? payload,
   }) =>
-      NotificationService.instance
-          .scheduleOneOff(id: id, title: title, body: body, when: when);
+      NotificationService.instance.scheduleOneOff(
+          id: id, title: title, body: body, when: when, payload: payload);
 
   @visibleForTesting
   static Future<void> Function(int id) cancelPhone =
@@ -985,6 +990,7 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
       title: text.title,
       body: text.body,
       when: a.reminderAt,
+      payload: NotificationLink(NotificationLink.ttcAppointment, a.id).payload, // 6b L4
     ).catchError((_) {});
   }
 

@@ -24,6 +24,7 @@
 // =============================================================================
 
 import '../services/notification_service.dart';
+import '../services/notification_link.dart';
 import 'brand_context.dart';
 import 'brand_models.dart';
 import 'brand_store.dart';
@@ -65,7 +66,12 @@ class BrandNotifications {
       final title = campaign.creative.headline;
       final body = _bodyWithDisclosure(campaign);
 
-      await NotificationService.instance.showNow(title: title, body: body);
+      // Kept for revert (6b L4): showNow(title: title, body: body);
+      await NotificationService.instance.showNow(
+        title: title,
+        body: body,
+        payload: NotificationLink(NotificationLink.brand, campaign.id).payload,
+      );
 
       // Spend the per-campaign cap AND start the global gap. Order matters: if
       // showNow threw we would not reach here, and would not have claimed an
