@@ -348,24 +348,26 @@ class PpFirstActivityCard extends StatelessWidget {
               Semantics(
                 button: true,
                 label: done ? 'Done' : 'Mark as done',
-                child: GestureDetector(
-                  key: ValueKey('pp_home_activity_done_${a.id}'),
-                  onTap: onDone,
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: done ? p.ink1 : Colors.transparent,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: done ? p.ink1 : p.ink3, width: 1.5),
+                child: PvPress(
+                  child: GestureDetector(
+                    key: ValueKey('pp_home_activity_done_${a.id}'),
+                    onTap: onDone,
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: done ? p.ink1 : Colors.transparent,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: done ? p.ink1 : p.ink3, width: 1.5),
+                        ),
+                        child: done
+                            ? Text('✓', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white))
+                            : null,
                       ),
-                      child: done
-                          ? Text('✓', style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white))
-                          : null,
                     ),
                   ),
                 ),

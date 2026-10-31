@@ -367,19 +367,22 @@ void main() {
     );
 
     test('every receipt door and the coupon validator check the audience', () {
-      for (final f in const [
-        'open_payment_order',
-        'claim_free_offering',
-        'record_stub_purchase',
-        'preview_programme_coupon',
-      ]) {
-        final d = _last(f);
-        expect(
-          d.file,
-          '0142_exclusive_content_and_contract_end.sql',
-          reason: f,
-        );
-        expect(d.body, contains('public._programme_open_to('), reason: f);
+      // The file that holds each door's LATEST definition. open_payment_order
+      // and record_stub_purchase were redefined by 0149 (Partner Editions A4:
+      // the partner offer comes off the price) and kept the 0142 audience
+      // check; the other two are still 0142's. The audience assertion below
+      // is the point, the file name only says where to look.
+      const latestFile = {
+        'open_payment_order': '0149_partner_offer_checkout.sql',
+        'claim_free_offering': '0142_exclusive_content_and_contract_end.sql',
+        'record_stub_purchase': '0149_partner_offer_checkout.sql',
+        'preview_programme_coupon':
+            '0142_exclusive_content_and_contract_end.sql',
+      };
+      for (final e in latestFile.entries) {
+        final d = _last(e.key);
+        expect(d.file, e.value, reason: e.key);
+        expect(d.body, contains('public._programme_open_to('), reason: e.key);
       }
       expect(
         _last('preview_programme_coupon').body,

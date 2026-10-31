@@ -342,6 +342,23 @@ String ppMaaTenMinutesTarget() =>
       _ => 'pp_page/parenting_maternal/move_getting_stronger',
     };
 
+/// A shelf as a parent would say it: the shelf's own name from the catalogue
+/// when [shelf] is a sub id, otherwise the text with any `pvs_` prefix and
+/// underscores turned into plain words. Lowercased, ready for a sentence.
+String _ppShelfWords(String shelf) {
+  final subId = pvSlug(shelf);
+  for (final c in PvCatalogStore.instance.categories) {
+    for (final s in c.subs) {
+      if (s.id == subId) return s.name.toLowerCase();
+    }
+  }
+  return shelf
+      .replaceFirst(RegExp(r'^pvs_'), '')
+      .replaceAll('_', ' ')
+      .replaceAll('&', 'and')
+      .toLowerCase();
+}
+
 /// The words a tap says when its target is not there yet (S8). Null when the
 /// target is there. Pure, so a test can hold every case.
 String? ppSurfaceUnavailable(String id) {
@@ -383,8 +400,14 @@ String? ppSurfaceUnavailable(String id) {
     final subId = pvSlug(shelf);
     final stocked = PvCatalogStore.instance.all.any((p) => p.subId == subId);
     if (stocked) return null;
+    // ⚠️ A shelf id is not a shelf NAME. Most links carry the name ("Night
+    // lights") but some carry the slug ("sleepwear_and_sacks",
+    // "pvs_muslin_swaddle_cloths"), and the slug used to be lowercased into the
+    // sentence as-is. Kept for revert:
+    //   return kPpShelfNotYet[shelf] ??
+    //       "We're still choosing good ${shelf.toLowerCase()}. They'll be in the Store soon.";
     return kPpShelfNotYet[shelf] ??
-        "We're still choosing good ${shelf.toLowerCase()}. They'll be in the Store soon.";
+        "We're still choosing good ${_ppShelfWords(shelf)}. They'll be in the Store soon.";
   }
   // Toys for his age (Development DV6, S8c). An age with no toy picked says
   // so, and points at the house instead of an empty shelf.

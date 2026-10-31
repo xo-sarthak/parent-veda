@@ -74,6 +74,12 @@ void main() {
         'device: an anonymous install id for question analytics',
     'lib/services/pv_door_strip_store.dart':
         'device: which "start here" hint strips were dismissed',
+    'lib/services/pv_catalog_store.dart':
+        'device/cache: the public store catalogue (built-in seed plus the '
+            'public products rows, domain = store, read with no login); the '
+            'same shelf for every account, with no wishlist, history or '
+            'review in it. "For you" ranks read PregnancyController and '
+            'ChildProfileStore, which reset themselves',
     'lib/services/usage_events.dart':
         'device: a queue of screen-level usage events, no content',
     'lib/ttc/ttc_cue_sounds.dart': 'device: practice cue sounds on or off',

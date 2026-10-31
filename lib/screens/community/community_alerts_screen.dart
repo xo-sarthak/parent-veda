@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart' show openAppSettings;
 
 import '../../services/community_alerts.dart';
+import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
 import '../products/pv_store_chrome.dart' show kPvInk;
 import 'community_chrome.dart';
@@ -247,7 +248,7 @@ class _CommunityAlertsScreenState extends State<CommunityAlertsScreen> with Widg
           final off = !_alerts.phoneOn;
           Widget sw(String kind, bool value) => Switch(
                 value: !off && value,
-                activeTrackColor: kPvInk,
+                // activeTrackColor: kPvInk, // kept for revert: the theme draws every switch
                 onChanged: (v) => _flip(kind, v),
               );
           return Scaffold(
@@ -281,11 +282,13 @@ class _CommunityAlertsScreenState extends State<CommunityAlertsScreen> with Widg
                           Expanded(
                             child: Wrap(children: [
                               Text('$kAlertsPhoneOff ', style: cmText(12.5, color: cmP.ink2)),
-                              GestureDetector(
-                                onTap: () => unawaited(openAppSettings()),
-                                child: Text('Open phone settings',
-                                    style: cmText(12.5, weight: FontWeight.w700, color: kPvInk)
-                                        .copyWith(decoration: TextDecoration.underline)),
+                              PvPress(
+                                child: GestureDetector(
+                                  onTap: () => unawaited(openAppSettings()),
+                                  child: Text('Open phone settings',
+                                      style: cmText(12.5, weight: FontWeight.w700, color: kPvInk)
+                                          .copyWith(decoration: TextDecoration.underline)),
+                                ),
                               ),
                             ]),
                           ),

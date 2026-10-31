@@ -32,6 +32,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 /// The words her lock screen shows (C2). Fixed in 0147's community_push_text;
 /// shown in the app as the preview. No room, title, words or name.
@@ -45,7 +46,12 @@ const String kAlertModBody = 'Open Moderation to see it.';
 /// A post she muted, as Community alerts lists it.
 @immutable
 class CommunityMutedPost {
-  const CommunityMutedPost({required this.postId, required this.title, this.room, this.mine = false});
+  const CommunityMutedPost({
+    required this.postId,
+    required this.title,
+    this.room,
+    this.mine = false,
+  });
   final String postId;
   final String title;
   final String? room;
@@ -65,7 +71,11 @@ class CommunityMutedPost {
 }
 
 class CommunityAlerts extends ChangeNotifier {
-  CommunityAlerts._();
+  // Registered when the singleton is first built, so a reset exists from the
+  // moment there is anything in memory to forget (see _resetForAccount).
+  CommunityAlerts._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final CommunityAlerts instance = CommunityAlerts._();
 
   // ---- the three server functions (0147) ----------------------------------
@@ -85,9 +95,18 @@ class CommunityAlerts extends ChangeNotifier {
 
   /// id -> (name, description). The names are what Android's settings show.
   static const Map<String, (String, String)> channels = {
-    channelReplies: ('Replies', 'When someone replies to your post in the Community'),
-    channelBookings: ('Your bookings', 'When a session you booked moves to a new time'),
-    channelModeration: ('Moderation', 'Moderators only: a post that may need a moderator now'),
+    channelReplies: (
+      'Replies',
+      'When someone replies to your post in the Community',
+    ),
+    channelBookings: (
+      'Your bookings',
+      'When a session you booked moves to a new time',
+    ),
+    channelModeration: (
+      'Moderation',
+      'Moderators only: a post that may need a moderator now',
+    ),
   };
 
   /// This phone already asked (or she answered) the reply-alerts question.
@@ -96,7 +115,8 @@ class CommunityAlerts extends ChangeNotifier {
   // ---- seams (tests) ---------------------------------------------------------
 
   @visibleForTesting
-  Future<dynamic> Function(String fn, Map<String, dynamic> params)? debugBackend;
+  Future<dynamic> Function(String fn, Map<String, dynamic> params)?
+  debugBackend;
   @visibleForTesting
   bool? debugSignedIn;
 
@@ -111,7 +131,8 @@ class CommunityAlerts extends ChangeNotifier {
 
   /// Creates one Android channel. Swapped in tests.
   @visibleForTesting
-  static Future<void> Function(String id, String name, String description) makeChannel = _makeChannel;
+  static Future<void> Function(String id, String name, String description)
+  makeChannel = _makeChannel;
 
   bool get signedIn => debugSignedIn ?? SupabaseRepo.isLoggedIn;
 
@@ -192,7 +213,8 @@ class CommunityAlerts extends ChangeNotifier {
         _moderation = mod is bool ? mod : null;
         _askedServer = res['asked'] == true;
         _muted = [
-          for (final m in (res['muted'] as List? ?? const [])) ?CommunityMutedPost.fromJson(m),
+          for (final m in (res['muted'] as List? ?? const []))
+            ?CommunityMutedPost.fromJson(m),
         ];
       }
       _loaded = true;
@@ -267,10 +289,24 @@ class CommunityAlerts extends ChangeNotifier {
 
   /// "Turn off replies for this post", or back on. Optimistic, rolled back
   /// on failure.
-  Future<bool> mute(String postId, {required bool on, String title = '', String? room, bool mine = false}) async {
+  Future<bool> mute(
+    String postId, {
+    required bool on,
+    String title = '',
+    String? room,
+    bool mine = false,
+  }) async {
     final before = _muted;
     _muted = on
-        ? [CommunityMutedPost(postId: postId, title: title, room: room, mine: mine), ..._muted.where((m) => m.postId != postId)]
+        ? [
+            CommunityMutedPost(
+              postId: postId,
+              title: title,
+              room: room,
+              mine: mine,
+            ),
+            ..._muted.where((m) => m.postId != postId),
+          ]
         : [..._muted.where((m) => m.postId != postId)];
     notifyListeners();
     if (signedIn) {
@@ -286,9 +322,12 @@ class CommunityAlerts extends ChangeNotifier {
     return false;
   }
 
-  /// Test seam: forget everything.
-  @visibleForTesting
-  void debugReset() {
+  /// A sign-out, or another account signing in (sync log step 12): forget her
+  /// switches, her muted posts and "already asked" in memory. The singleton
+  /// lives as long as the process, so without this the next account would see
+  /// the last one's switches until `load()` replaced them. The Android
+  /// channels (`_started`) belong to the phone, not to her, and stay.
+  void _resetForAccount() {
     _loaded = false;
     _replies = false;
     _bookings = true;
@@ -296,6 +335,13 @@ class CommunityAlerts extends ChangeNotifier {
     _askedServer = false;
     _askedHere = false;
     _muted = const [];
+    notifyListeners();
+  }
+
+  /// Test seam: forget everything.
+  @visibleForTesting
+  void debugReset() {
+    _resetForAccount();
     _phoneOn = true;
     _started = false;
     debugBackend = null;
@@ -306,7 +352,9 @@ class CommunityAlerts extends ChangeNotifier {
 Future<bool> _phoneAllows() async {
   try {
     final android = FlutterLocalNotificationsPlugin()
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (android == null) return true;
     return await android.areNotificationsEnabled() ?? true;
   } catch (_) {
@@ -317,7 +365,9 @@ Future<bool> _phoneAllows() async {
 Future<bool> _askPhone() async {
   try {
     final android = FlutterLocalNotificationsPlugin()
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (android == null) return true;
     return await android.requestNotificationsPermission() ?? true;
   } catch (_) {
@@ -327,12 +377,18 @@ Future<bool> _askPhone() async {
 
 Future<void> _makeChannel(String id, String name, String description) async {
   await FlutterLocalNotificationsPlugin()
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(AndroidNotificationChannel(
-        id,
-        name,
-        description: description,
-        // Moderation is louder: someone may be at risk (P0-3).
-        importance: id == CommunityAlerts.channelModeration ? Importance.high : Importance.defaultImportance,
-      ));
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >()
+      ?.createNotificationChannel(
+        AndroidNotificationChannel(
+          id,
+          name,
+          description: description,
+          // Moderation is louder: someone may be at risk (P0-3).
+          importance: id == CommunityAlerts.channelModeration
+              ? Importance.high
+              : Importance.defaultImportance,
+        ),
+      );
 }

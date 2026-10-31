@@ -27,6 +27,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 
 /// One parent's review of one product.
 @immutable
@@ -127,7 +128,9 @@ String pvReviewSourceLine(PvStoreReview r) => r.boughtAt.isEmpty
     : 'Bought on ${r.boughtAt}, says the parent';
 
 class PvReviewStore extends ChangeNotifier {
-  PvReviewStore._();
+  PvReviewStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PvReviewStore instance = PvReviewStore._();
 
   static const _key = 'pv_store_reviews_mine';
@@ -271,6 +274,18 @@ class PvReviewStore extends ChangeNotifier {
       (_) => _rand.nextInt(36).toRadixString(36),
     ).join();
     return 'rv_${t}_$n';
+  }
+
+  /// A sign-out, or another account signing in (sync log step 12): her own
+  /// reviews (and the unsent marks on them) are hers, so memory forgets them
+  /// with the wiped prefs. Cloud copies stay; the next sign-in's init() reads
+  /// whatever that account's phone cache holds.
+  void _resetForAccount() {
+    _mine.clear();
+    _others.clear();
+    _asked.clear();
+    _loaded = false;
+    notifyListeners();
   }
 
   /// Tests only: forget everything.

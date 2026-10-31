@@ -73,7 +73,10 @@ void main() {
     expect(find.text('Print your QR poster'), findsWidgets, reason: 'the set-up cards ride in the Needs you rail');
     await see(tester, find.text('FOR YOU'));
     await see(tester, find.text('How a consultation runs here'));
-    await see(tester, find.text('YOUR CLASSES'));
+    // Section 8 became 'Your offerings' (0137, LA-21: read from the server,
+    // co-hosts included; doctor_offerings_screen.dart). Kept for revert:
+    // await see(tester, find.text('YOUR CLASSES'));
+    await see(tester, find.text('YOUR OFFERINGS'));
     await see(tester, find.text('HOW PARENTS SEE YOU'));
     expect(tester.takeException(), isNull);
   });

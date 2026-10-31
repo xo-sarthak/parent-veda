@@ -15,12 +15,37 @@ PvProduct _byId(String id) => buildPvCatalog().firstWhere((p) => p.id == id);
 void main() {
   tearDown(kPvAffiliateFacts.clear);
 
-  test('with no listing checked, an affiliate price is our guide price', () {
+  test('with no listing checked, an Amazon price is left to Amazon', () {
+    // Superseded 2026-10-28 (pv_affiliate.dart, "AMAZON AND FLIPKART PRICES
+    // COME ONLY FROM THEIR OWN API"): a hand-typed Amazon price may not be
+    // shown, so the catalogue clears it and the page says "See price on
+    // Amazon". There is then no price to put a note under.
+    // Kept for revert: the "Our guide price" expectation:
+    //   expect(pvAffiliatePriceNote(p),
+    //       "Our guide price · check today's price on ${p.retailer}");
     final p = _byId('ttc_lh_strips');
     expect(p.soldHere, isFalse);
-    expect(pvAffiliatePriceNote(p),
-        "Our guide price · check today's price on ${p.retailer}");
+    expect(pvApiPricedRetailer(p), 'Amazon');
+    expect(p.hasPrice, isFalse);
+    expect(p.priceNote, 'See price on Amazon');
+    expect(pvAffiliatePriceNote(p), isNull);
     expect(p.extRating, 0);
+  });
+
+  test('a brand-network product keeps its hand-checked guide price', () {
+    // The rule is for Amazon and Flipkart only (their terms); FirstCry and
+    // the like have none, so their guide price and its note stay.
+    final guide = buildPvCatalog().where((p) =>
+        pvApiPricedRetailer(p) == null &&
+        !p.soldHere &&
+        !p.reviewOnly &&
+        p.hasPrice &&
+        (p.buyUrl ?? '').isNotEmpty);
+    for (final p in guide) {
+      expect(pvAffiliatePriceNote(p),
+          "Our guide price · check today's price on ${p.retailer}",
+          reason: p.id);
+    }
   });
 
   test('a product sold here, or with nowhere to check, has no note', () {
@@ -42,8 +67,13 @@ void main() {
     if (nowhere != null) expect(pvAffiliatePriceNote(nowhere), isNull);
   });
 
-  test('a checked listing wins: exact link, its price, its date, its stars',
+  test('a hand-checked listing gives the exact link and ASIN, never a price',
       () {
+    // Superseded 2026-10-28 (pv_catalog_adapters.dart `_enrich`): the hand
+    // map's ASIN still gives the exact listing, but its price, date and stars
+    // are NOT used; only the server's `affiliate-refresh` may stamp those.
+    // Kept for revert: price 349, 'Price on Amazon as of 21 Oct', extRating
+    // 4.1 and extReviewCount 2140 expectations.
     kPvAffiliateFacts['ttc_lh_strips'] = PvAffiliateFacts(
         asin: 'B0TESTASIN',
         price: 349,
@@ -52,13 +82,15 @@ void main() {
         reviewCount: 2140);
     final p = _byId('ttc_lh_strips');
     expect(p.buyUrl, 'https://www.amazon.in/dp/B0TESTASIN');
-    expect(p.price, 349);
+    expect(p.price, 0, reason: 'a typed Amazon price is cleared');
+    expect(p.priceNote, 'See price on Amazon');
+    expect(p.priceCheckedAt, isNull);
     expect(p.retailer, 'Amazon');
     expect(p.asin, 'B0TESTASIN');
-    expect(p.extRating, 4.1);
-    expect(p.extReviewCount, 2140);
+    expect(p.extRating, 0);
+    expect(p.extReviewCount, 0);
     expect(p.rating, 0, reason: "Amazon's stars never become parents' stars");
-    expect(pvAffiliatePriceNote(p), 'Price on Amazon as of 21 Oct');
+    expect(pvAffiliatePriceNote(p), isNull);
   });
 
   test('no affiliate product shows a seed rating', () {

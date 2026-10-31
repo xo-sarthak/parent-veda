@@ -73,7 +73,12 @@ const List<PvComingSoonEntry> kPvComingSoon = [
   PvComingSoonEntry(
     id: '${kPvComingSoonPrefix}sleep_sack',
     name: 'Sleep sack',
-    seedId: 'snugglesack',
+    // Stands on 'Sleepwear & sacks' (the retired Merino sack's shelf), where
+    // the Sleep door's overheating page sends "Sleep sacks and bags".
+    // It sat on the snugglesack's 'Bedding & blackout' shelf, which left
+    // pp_products/sleepwear_and_sacks empty (SL5).
+    // Kept for revert: seedId: 'snugglesack',
+    seedId: 'merinosack',
     line: 'A wearable blanket, so there is nothing loose in the cot.',
   ),
   PvComingSoonEntry(

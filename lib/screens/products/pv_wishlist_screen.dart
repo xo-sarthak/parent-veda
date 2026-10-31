@@ -272,7 +272,8 @@ class _PvWishlistScreenState extends State<PvWishlistScreen> {
         ],
       ),
     );
-    name.dispose();
+    // After the dialog's exit animation: its TextField still listens until then.
+    Future<void>.delayed(const Duration(milliseconds: 600), name.dispose);
     if (made == null || !mounted) return;
     final l = PvListStore.instance.create(made);
     if (l == null) {

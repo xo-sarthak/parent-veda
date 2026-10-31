@@ -271,5 +271,12 @@ Future<void> showPvEditListSheet(BuildContext context, PvProductList list) {
         ),
       ),
     ),
-  ).whenComplete(name.dispose);
+  ).whenComplete(
+    // Not at once: the closing sheet's TextField listens through its exit
+    // animation, so the controller is freed after it (600ms).
+    // Braces, not `=>`: returning the Future would make whenComplete wait for it.
+    () {
+      Future<void>.delayed(const Duration(milliseconds: 600), name.dispose);
+    },
+  );
 }

@@ -122,6 +122,26 @@ void main() {
     'expert_notices': 'the one card from ParentVeda on the doctor Home (0088) '
         '— full CRUD, it is editorial content: a title, a line, a window, an '
         'audience. Carries no family data',
+    // ---- learning: runs, live classes, recordings (0126, 0128) -------------
+    'programme_runs': 'a cohort run of a programme (0126) — full CRUD, the '
+        'same class as programmes and programme_sessions: the dates, label, '
+        'capacity and open/closed status of a run are authored by the team. '
+        'It is already public-read for the app; it carries no family data',
+    'programme_recordings': 'the register of class and lesson films (0128) — '
+        'select+insert+update, NO delete. A course lesson video is "the same '
+        'row with lesson_id set, registered by the team after an upload in the '
+        'Mux dashboard", so the team needs to add the row and fix its title '
+        'or preview flag. Carries slot/lesson ids, a private storage path and '
+        'Mux ids only: nothing about a parent. Playback is not granted by '
+        'this: anon/authenticated are revoked, and a viewer is served only '
+        'through recording-playback, which signs a two-hour token after '
+        'has_course_access',
+    'ops_alerts': 'the team notice board (0128) — select+update ONLY, so '
+        'ops can read a late or missed host and mark it resolved, never invent '
+        'or delete one. A row is a kind, a slot id, a title and one line '
+        '("<offering> with <expert>, 12 Nov 5:00 PM IST · 4 booked · slot '
+        'id"): a head-count and an expert, no parent name or contact. The '
+        'webhook URL it posts to lives in Vault, which this role cannot read',
   };
 
   /// True when the store reads a VIEW rather than a base table. Views play by

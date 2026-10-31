@@ -202,15 +202,30 @@ class TtcLogShareStore extends ChangeNotifier with TtcSyncedStore {
   Future<void> pushToCloud() async {
     final uid = SupabaseRepo.userId;
     if (uid == null) return;
-    for (final e in _mine.entries) {
-      // Fire-and-forget: the next sync re-sends, and the phone already holds
-      // the answer.
-      await SupabaseRepo.upsertRow(
-          kTtcLogSharesTable,
-          rowFor(uid, e.key, e.value, _stamps[e.key] ?? DateTime.now()),
-          onConflict: 'user_id,tracker');
-    }
+    // Confirmed and remembered (no_silent_user_writes_test). It was a
+    // fire-and-forget `SupabaseRepo.upsertRow` per tracker, kept for revert:
+    //   await SupabaseRepo.upsertRow(kTtcLogSharesTable,
+    //       rowFor(uid, e.key, e.value, _stamps[e.key] ?? DateTime.now()),
+    //       onConflict: 'user_id,tracker');
+    // ⚠️ A refused "stop sharing" is the case that matters: the phone shows
+    // "off" while the database still lets her partner read the log, and
+    // nothing would say so. The waiting mark keeps the sign-out sheet honest,
+    // and the next sync re-sends every row, so this needs nothing else.
+    await sendTracked(() async {
+      var allTook = true;
+      for (final e in _mine.entries) {
+        final ok = await SupabaseRepo.upsertRowConfirmed(
+            kTtcLogSharesTable,
+            rowFor(uid, e.key, e.value, _stamps[e.key] ?? DateTime.now()),
+            onConflict: 'user_id,tracker');
+        if (!ok) allTook = false;
+      }
+      return allTook;
+    });
   }
+
+  @override
+  String? get waitingKey => 'pv_waiting_ttc_log_shares';
 
   /// A sign-out, or another account signing in.
   @override

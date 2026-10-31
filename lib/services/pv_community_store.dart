@@ -32,6 +32,7 @@ import 'life_stage_store.dart';
 import 'pregnancy_controller.dart';
 import 'pregnancy_ended_store.dart';
 import 'remote/supabase_repo.dart';
+import 'remote/sync_registry.dart';
 import 'saved_store.dart';
 
 /// The server call the store makes. A seam, so tests can answer for the
@@ -41,7 +42,9 @@ typedef CommunityBackend = Future<dynamic> Function(String fn, Map<String, dynam
 const String kCommunityMediaBucket = 'community-media';
 
 class PvCommunityStore extends ChangeNotifier {
-  PvCommunityStore._();
+  PvCommunityStore._() {
+    SyncRegistry.registerReset(_resetForAccount);
+  }
   static final PvCommunityStore instance = PvCommunityStore._();
 
   static const _kMe = 'pv_community_me';
@@ -1531,10 +1534,12 @@ class PvCommunityStore extends ChangeNotifier {
   @visibleForTesting
   Future<void> debugFetchFresh(String postId) => _fetchFresh(postId);
 
-  // ---- tests -----------------------------------------------------------------
-
-  @visibleForTesting
-  void debugReset() {
+  /// A sign-out, or another account signing in (sync log step 12): drop her
+  /// profile, feeds, posts, outbox, follows and live listeners from memory.
+  /// The outbox matters most: it holds things SHE wrote and the server has not
+  /// taken, and the next account's flush would otherwise post them as itself.
+  /// The test seams (debugBackend, debugSignedIn, ...) are not hers and stay.
+  void _resetForAccount() {
     for (final l in _live.values) {
       l.close();
     }
@@ -1544,7 +1549,6 @@ class PvCommunityStore extends ChangeNotifier {
       t.cancel();
     }
     _liveWait.clear();
-    debugListen = null;
     _loaded = false;
     _me = const PvCommunityMe();
     _rooms = const [];
@@ -1562,8 +1566,17 @@ class PvCommunityStore extends ChangeNotifier {
     _offerings = const [];
     _following = const PvCommunityFollowing();
     _clubAfterLoss = null;
-    debugClubFacts = null;
     lastFaceFollowing = false;
+    notifyListeners();
+  }
+
+  // ---- tests -----------------------------------------------------------------
+
+  @visibleForTesting
+  void debugReset() {
+    _resetForAccount();
+    debugListen = null;
+    debugClubFacts = null;
     debugBackend = null;
     debugSignedIn = null;
   }

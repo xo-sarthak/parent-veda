@@ -82,10 +82,10 @@ const Set<String> kPpMovedToProfile = {
 /// ones for every age, then the rest (relevance PP 8, 2026-10-28). Order
 /// only: nothing is dropped. Stable, so catalogue order holds within each.
 List<PvOfferingView> ppRankByAge(List<PvOfferingView> all, int months) {
-  int rank(PvOfferingView v) => !v.hasAgeWindow ? 1 : (v.fitsAge(months) ? 0 : 2);
+  int ageBand(PvOfferingView v) => !v.hasAgeWindow ? 1 : (v.fitsAge(months) ? 0 : 2);
   final indexed = [for (var i = 0; i < all.length; i++) (i, all[i])];
   indexed.sort((a, b) {
-    final d = rank(a.$2).compareTo(rank(b.$2));
+    final d = ageBand(a.$2).compareTo(ageBand(b.$2));
     return d != 0 ? d : a.$1.compareTo(b.$1);
   });
   return [for (final x in indexed) x.$2];

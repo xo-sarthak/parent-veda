@@ -508,7 +508,8 @@ class _PvProductScreenState extends State<PvProductScreen>
       ),
     );
     final body = words.text;
-    words.dispose();
+    // After the sheet's exit animation: its TextField still listens until then.
+    Future<void>.delayed(const Duration(milliseconds: 600), words.dispose);
     if (saved != true || !mounted) return;
     BoughtStore.instance.markBought(p.id);
     await PvReviewStore.instance.save(
