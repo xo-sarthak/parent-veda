@@ -5685,3 +5685,38 @@ so google_fonts' failed font loads (no network in a test) land inside the test. 
 is the point.
 
 Pinned by `test/partner_editions_a2_test.dart`.
+
+## 16zzz-j. "Mine" takes no arguments; filtering on a number still leaks one bit; listing is publishing; the screen's words are a contract with the server (Partner Editions A3, 0148, 2026-10-31)
+
+A3 let the phone read a family's own partner offers. The migration is small; four things in it travel.
+
+**1. A function that answers "mine" should take no arguments.** `my_partner_offers()` has no parameters, so the only
+person it can be about is `auth.uid()`. Compare a `partner_offers(p_user uuid)` that checks `p_user = auth.uid()`:
+the same answer, but one forgotten check away from handing anyone any family's coupons (the classic insecure direct
+object reference). An argument you do not accept is a check you cannot forget. 0142 used the same idea for
+`in_programme_audience()`, a caller-only wrapper over the closed `_audience_ok(uid, …)`.
+
+**2. Filtering on a sensitive number still says something about it.** The function hides `redeemed` and
+`max_redemptions`, but it drops a used-up coupon, so a member can see an offer vanish. That is one bit: "it ran out".
+The fair test is not "did we return the column" but "what can a caller work out from the answer", and here the bit is
+something she would learn at checkout anyway. The count itself is a partner's uptake, which is behaviour, and R3
+hides behaviour. If the bit mattered (say, revealing that a colleague had used an offer), the right fix would be to
+keep listing it and refuse at checkout instead.
+
+**3. Listing is publishing; an audience is what makes listing safe.** 0054 closed `programme_coupons` because "a
+readable coupon table is a published discount list". A validator that needs the code typed is a lock; a list is a
+noticeboard. A3 lists only coupons with an audience, through the same `_audience_ok` the view and the validator use,
+so the noticeboard only ever hangs in that organisation's own room. A public code stays findable only by typing it.
+
+**4. Words on a screen are a contract with the server.** The storyboard says "Auto-applied". Nothing on the server
+applies a coupon: `price_offering` never looks at one. Printing it would have been a promise the system breaks at
+the moment money changes hands. The phone says what is true ("Until 30 Nov"; "Checkout does not take offers yet"), a
+test fails the build if "Auto-applied" appears in the code, and making it true is its own phase (A4), because it
+changes the amount Razorpay is asked for, and so the capture check and the refund path. The rule: **before a UI
+claims a behaviour, find the line on the server that does it.**
+
+Also chosen: the offer store keeps **no disk copy**. Local-first says show the cache first, but a coupon code in
+shared preferences is one more key that sign-out has to remember to wipe (`test/sync_reset_coverage_test.dart` is red
+today for four stores that forgot). What it costs: on a cold start the offer card arrives a beat after the rail.
+
+Pinned by `test/partner_editions_a3_test.dart` and `supabase/seed/verify_partner_offers.sql`.

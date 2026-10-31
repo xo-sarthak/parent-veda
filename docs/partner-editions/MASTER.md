@@ -56,7 +56,8 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | **A1** ✓ 2026-10-30, hash in memory | Parent (LAST) | `PartnerBrand` resolver, lockup strip, "Your doctor" line, welcome sheet in new onboarding | no | P4 |
 | **A2** ✓ 2026-10-31, hash in memory | Parent (LAST) | "Exclusively for you" rail, You chip with logo + benefit meter | no | A1, P4 |
 
-| **A3** | Parent (+ DB) | Partner offers, a doctor's benefit card on You, and one "Your benefits" row and page (detail at the bottom) | yes (small RPC) | A2 |
+| **A3** ✓ 2026-10-31, hash in memory | Parent (+ DB) | Partner offers, a doctor's benefit card on You, and one "Your benefits" row and page (detail at the bottom) | yes (small RPC): `0148` (RUN 2026-10-31, verify 11/0) | A2 |
+| **A4** | DB + Parent | Auto-apply a partner offer at checkout, server-side (the storyboard's "Auto-applied"; see A3 as built) | yes (money path) | A3 |
 
 D-phases and P-phases can run in either order; P3 needs D2 for `my_doctor_referrals` shape parity.
 
@@ -199,3 +200,43 @@ files, one-line inserts, comment out never delete, English only, no partner colo
 
 Open for the A3 chat to ask, only if the storyboard is silent: where exactly the "Your benefits" row sits on You
 (its own group under the hero card, or a row in an existing group), and the page's new title.
+
+### A3 as built (2026-10-31)
+Two decisions from the user, made before the build:
+- **True words now, auto-apply later (A4).** Nothing applies a coupon today: `price_offering` / `open_payment_order`
+  (0126) ignore coupons, and no screen calls `preview_programme_coupon`. So the offer card reads "15% off {label}" and
+  "Until 30 Nov", never the storyboard's "Auto-applied", and Benefits says plainly that checkout does not take offers
+  yet. Auto-apply is phase A4 (table above), because it changes the amount Razorpay is asked for.
+- **"Your benefits" is the last row of Your things** on the shared profile (all three stages). No new group, so the
+  page's spacing is unchanged. The page is titled "Your benefits"; the route stays `employer`.
+
+What was built:
+- **`0148_partner_offers.sql`** (the user runs it, before installing the build).
+  - `programme_coupons.label` (nullable, 1 to 60 characters): what an offer is for, written by ops.
+  - `my_partner_offers()`: no arguments, so it can only mean the caller. `security definer`, `search_path = ''`,
+    `authenticated` only. Returns code, kind, value, label (else the programme's title), programme id, end date and
+    whose audience. Only audience coupons (a public coupon is still found by typing it, 0054's rule); only live,
+    unexpired, not used up; only through `_audience_ok`; never a coupon for a programme the caller cannot see; never
+    `redeemed` or `max_redemptions`.
+  - `supabase/seed/verify_partner_offers.sql`: 11 checks, rolled back.
+- **`lib/services/partner_offer_store.dart`**: memory only (no coupon code on disk), `SyncRegistry` reset + resync,
+  a generation guard, and an offer past its end date drops on the phone between fetches.
+- **The rail**: `PartnerRail.offers`; an offer alone is enough for a rail; sponsor offers go to the sponsor's rail and
+  a care partner's to theirs (a sponsor still wins). The card is the rail's own `_Card`: chip "Offer", the headline,
+  the end date; it opens Benefits.
+- **You**: `PartnerCareBenefitCard` under `PartnerBenefitCard`. Words only (no logo, no monogram, no meter, D3):
+  "From Dr Meera Rao", the offer's headline or "2 sessions only Dr Meera Rao's patients see", and "Your doctor's
+  sessions and offer live here. Your health details stay private." It uses the rail's rule with no sponsor, so the
+  card and the doctor's rail cannot disagree; it takes no room without a real benefit, and none beside a sponsor.
+  `PartnerBenefitsRow` ("Your benefits") names what is behind it: the sponsor, the doctor, or "Does your employer
+  offer ParentVeda?".
+- **Benefits** (`employer_benefits_screen.dart`): three states. A sponsor: as before, with its offers among the rows,
+  then the doctor's section if there is one. No sponsor but a doctor with a benefit: the doctor's section, then the
+  employer question with its pill. Neither: the empty state, unchanged. The doctor's section is in words with our own
+  drawn mark, and ends with "What {name} sees".
+- Pregnancy's and TTC's More rows already open this same page (route `employer`), so there is one page. Their titles
+  still say "Employer benefits" (not renamed: not asked).
+- Tests: `test/partner_editions_a3_test.dart` (28): parsing, the store's reset, the migration's shape, the rail's rule,
+  never "Auto-applied", the card's words, no room, a sponsor keeps the slot, the row's three lines, the page's three
+  states, 360pt at 1x and 1.5x, and the wiring gate.
+- What A3 left is in STILL-OPEN §5.1g; the migration, A4 and the phone walk are in BEFORE-LAUNCH.

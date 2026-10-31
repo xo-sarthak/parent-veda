@@ -20,6 +20,19 @@
 //  card saying what is left (A2). Every one of those taps through to this
 //  screen. See docs/partner-editions/MASTER.md.
 //
+//  ONE PAGE FOR EVERY BENEFIT (Partner Editions A3, 2026-10-31). Titled
+//  "Your benefits" now, because it also carries a doctor's or clinic's offer
+//  and the sessions only their patients see, under the employer's. The route
+//  name stays `employer`: the auth flow and other screens detect it.
+//  The page's three states:
+//    * a sponsor: the employer's benefits as before, its offers among them,
+//      then the doctor's section if there is one;
+//    * no sponsor, a doctor with a real benefit: the doctor's section, then
+//      the employer question with its pill (a feature is never hidden);
+//    * neither: the empty state, pixel for pixel as it was.
+//  Offers say what they are and until when. Checkout does not take them yet
+//  (auto-apply is A4), and the page says so rather than promise it.
+//
 //  Superseded by D1, kept for revert (July):
 //  //  ONE APP. There is no enterprise navigation, no company theme, no separate
 //  //  home. A sponsored parent's app differs from anyone else's by what she
@@ -75,6 +88,14 @@ import '../../services/entitlement_store.dart';
 import '../../services/sponsor_admin_store.dart';
 import '../../services/sponsor_benefits.dart';
 import '../../services/usage_events.dart';
+import '../../care_partner/care_partner_models.dart';
+import '../../care_partner/care_partner_store.dart';
+import '../../services/partner_brand.dart' show careLineLabel, careLineDetail;
+import '../../services/partner_offer_store.dart';
+import '../../services/programme_store.dart';
+import '../../widgets/partner_exclusive_rail.dart'
+    show PartnerRail, partnerRailFor, partnerRailMeta;
+import '../post_pregnancy/learning_detail_screen.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/pv_fonts.dart';
 import '../ttc/doors/ttc_tab_art.dart';
@@ -114,6 +135,9 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
     // advertised here on the next visit rather than at the next cold start.
     EntitlementStore.instance.refresh();
     SponsorAdminStore.instance.refresh();
+    // A3: the offers and sessions behind the doctor's section.
+    ProgrammeStore.instance.ensureLoaded();
+    PartnerOfferStore.instance.ensureLoaded();
     UsageEvents.instance.screen(UsageSurface.employerBenefits);
   }
 
@@ -137,7 +161,8 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
         foregroundColor: AppTheme.neutral900,
         iconTheme: const IconThemeData(color: AppTheme.neutral900),
         title: Text(
-          _p('Employer benefits', 'Employer benefits'),
+          // Kept for revert (A3): _p('Employer benefits', 'Employer benefits'),
+          'Your benefits',
           style: pvManrope(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -152,6 +177,9 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
             EntitlementStore.instance,
             CreditsStore.instance,
             SponsorAdminStore.instance,
+            CarePartnerStore.instance,
+            ProgrammeStore.instance,
+            PartnerOfferStore.instance,
           ]),
           builder: (context, _) => _body(context),
         ),
@@ -169,6 +197,43 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
     final p = _pal;
     final ent = EntitlementStore.instance;
     final sponsor = ent.sponsor;
+    // A3: the doctor's or clinic's benefit. Here it sits beside a sponsor's
+    // (one page for every benefit); on You and the homes a sponsor wins.
+    final careP = CarePartnerStore.instance.partner;
+    final care = partnerRailFor(
+      sponsor: null,
+      care: careP,
+      programmes: ProgrammeStore.instance.all,
+      offers: PartnerOfferStore.instance.all,
+    );
+
+    if (sponsor == null && care != null && careP != null) {
+      return ListView(
+        key: const ValueKey('employer_benefits_care'),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        children: [
+          ..._careSection(context, careP, care, lead: true),
+          const SizedBox(height: 16),
+          const Divider(height: 1, thickness: 1, color: _kLine),
+          const SizedBox(height: 24),
+          // The employer question, still asked (a feature is never hidden).
+          _note(
+            'Does your employer offer ParentVeda?',
+            'If your company sponsors ParentVeda, activate it with your work '
+                'email.',
+          ),
+          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: _OutlinedPill(
+              key: const ValueKey('employer_benefits_activate'),
+              label: kEmployerBenefitsActivate,
+              onTap: () => openActivationFlow(context, lang: widget.lang),
+            ),
+          ),
+        ],
+      );
+    }
 
     if (sponsor == null) {
       // Reachable if the benefit was revoked while this screen was open — a
@@ -263,6 +328,9 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
             'आपकी कंपनी की अपनी परवरिश नीति और गाइड। डॉक्टरी सलाह कभी नहीं — वह हमेशा हमसे या आपके डॉक्टर से आती है।',
           ),
         ),
+      // A3: the employer's own offers.
+      for (final o in PartnerOfferStore.instance.forSponsor(sponsor.id))
+        _offerRow(o),
     ];
 
     return ListView(
@@ -396,6 +464,14 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
           row,
         ],
 
+        // ---- the doctor's or clinic's, beside the employer's (A3) ----------
+        if (care != null && careP != null) ...[
+          const SizedBox(height: 16),
+          const Divider(height: 1, thickness: 1, color: _kLine),
+          const SizedBox(height: 22),
+          ..._careSection(context, careP, care, lead: false),
+        ],
+
         // ---- HR's own door -------------------------------------------------
         // The capability architecture doing its job: the same app, the same
         // screen, one extra row for the two people at the company who hold it.
@@ -484,6 +560,107 @@ class _EmployerBenefitsScreenState extends State<EmployerBenefitsScreen> {
         ),
       ],
     );
+  }
+
+  // ---- A3: a doctor's or clinic's section --------------------------------
+
+  /// One offer as a row: what it is, until when, and plainly that checkout
+  /// does not take it yet (auto-apply is A4).
+  Widget _offerRow(PartnerOffer o) => _capabilityRow(
+    mark: TtcTabMark.wallet,
+    title: o.headline,
+    body:
+        '${o.until}. Checkout does not take offers yet, so nothing comes '
+        'off the price today. We will say here when it does.',
+  );
+
+  /// Their name in words (no logo, D3), their offers, their sessions, and
+  /// what they can see. [lead] draws the name large, as the page's head.
+  List<Widget> _careSection(
+    BuildContext context,
+    CarePartner partner,
+    PartnerRail rail, {
+    required bool lead,
+  }) {
+    final p = _pal;
+    final name = partner.name.trim();
+    final detail = careLineDetail(partner);
+    final rows = <Widget>[
+      for (final o in rail.offers) _offerRow(o),
+      for (final pr in rail.programmes)
+        Semantics(
+          button: true,
+          container: true,
+          excludeSemantics: true,
+          label: '${pr.title}. ${partnerRailMeta(pr)}',
+          child: InkWell(
+            key: ValueKey('employer_benefits_care_${pr.id}'),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => LearningDetailScreen(program: pr),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _capabilityRow(
+                    mark: TtcTabMark.openBook,
+                    title: pr.title,
+                    body: '${partnerRailMeta(pr)} · only ${rail.chip} see it',
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 20, color: p.ink2),
+              ],
+            ),
+          ),
+        ),
+    ];
+    return [
+      Row(
+        key: const ValueKey('employer_benefits_care_head'),
+        children: [
+          _mark(TtcTabMark.doctorChat, lead ? 56 : 40),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'From $name',
+                  style: pvFraunces(
+                    fontSize: lead ? 22 : 19,
+                    fontWeight: FontWeight.w500,
+                    height: 1.15,
+                    color: p.ink1,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  detail.isEmpty
+                      ? careLineLabel(partner)
+                      : '${careLineLabel(partner)} · $detail',
+                  style: pvManrope(fontSize: 13, height: 1.4, color: p.ink2),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      for (final r in rows) ...[
+        const SizedBox(height: 16),
+        const Divider(height: 1, thickness: 1, color: _kLine),
+        const SizedBox(height: 16),
+        r,
+      ],
+      const SizedBox(height: 24),
+      _note(
+        'What $name sees',
+        'Your health details stay private. They see counts, such as how many '
+            'families joined with their code, never what you log or ask '
+            'here. A consult you book with them is shared with them, as any '
+            'booking is.',
+      ),
+    ];
   }
 
   void _openProgramme(BuildContext context) => Navigator.of(context).push(

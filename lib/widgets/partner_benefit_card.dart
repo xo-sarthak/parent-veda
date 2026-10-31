@@ -23,19 +23,42 @@
 //
 //  A sponsor only. A doctor is a line on the homes and in the Care Circle,
 //  never a brand on her profile (D3).
+//
+//  A3 (2026-10-31, the user revised A2's "a doctor family's You is
+//  unchanged"): two more pieces, below.
+//
+//  PartnerCareBenefitCard: a doctor's or clinic's benefit, storyboard row 3's
+//  doctor variant. WORDS ONLY: no logo, no monogram, no meter (D3). Shown only
+//  with a real benefit (an offer, or a session only their patients see),
+//  otherwise it takes no room; and only without a sponsor, whose card keeps
+//  the slot under the hero (one partner, as for the strip). The benefit is
+//  the rail's own rule (`partnerRailFor` with no sponsor), so the card and
+//  the doctor's rail on the homes cannot disagree about what she has.
+//
+//  PartnerBenefitsRow: "Your benefits", ALWAYS shown (a feature is never
+//  hidden), last in Your things. Parenting had no way in to Benefits for a
+//  parent with no sponsor: its More sheet has no Benefits row, and the old
+//  "Employer benefits" row in `_supportRows` sits in a list the live Settings
+//  never draws. Its line says what is behind it: the sponsor, the doctor, or
+//  the question "Does your employer offer ParentVeda?".
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../screens/enterprise/employer_benefits_screen.dart';
 import '../screens/products/pv_store_chrome.dart' show kPvLine, pvStorePalette;
+import '../care_partner/care_partner_store.dart';
 import '../screens/profile/pv_you_chrome.dart'
-    show kPvProfileGroupGap, kPvProfileGutter;
+    show PvProfileRow, kPvProfileGroupGap, kPvProfileGutter;
+import '../screens/ttc/doors/ttc_tab_art.dart';
 import '../services/credits_store.dart';
 import '../services/entitlement_store.dart';
 import '../services/partner_brand.dart';
+import '../services/partner_offer_store.dart';
+import '../services/programme_store.dart';
 import '../services/sponsor_benefits.dart';
 import '../theme/pv_fonts.dart';
+import 'partner_exclusive_rail.dart' show PartnerRail, partnerRailFor;
 import 'partner_lockup.dart' show PartnerMark;
 import 'pv_feedback.dart' show PvPress;
 
@@ -267,3 +290,166 @@ class _Meter extends StatelessWidget {
     ),
   );
 }
+
+/// The doctor's or clinic's benefit for this family, or null: the rail's rule
+/// with the sponsor left out. Null too when a sponsor holds the slot.
+PartnerRail? careBenefitNow() {
+  if (PartnerBrand.instance.lockup != null) return null;
+  return partnerRailFor(
+    sponsor: null,
+    care: CarePartnerStore.instance.partner,
+    programmes: ProgrammeStore.instance.all,
+    offers: PartnerOfferStore.instance.all,
+  );
+}
+
+/// The card's two lines for a doctor or clinic. Pure, so the wording is
+/// testable without a widget.
+(String, String) careBenefitCopy({
+  required PartnerRail rail,
+  required bool person,
+}) {
+  final n = rail.programmes.length;
+  final sessions = n == 1 ? '1 session' : '$n sessions';
+  final headline = rail.offers.isNotEmpty
+      ? rail.offers.first.headline
+      : '$sessions only ${rail.chip} see';
+  final things = [
+    if (n > 0) 'sessions',
+    if (rail.offers.isNotEmpty) rail.offers.length == 1 ? 'offer' : 'offers',
+  ].join(' and ');
+  final whose = person ? "Your doctor's" : "Your clinic's";
+  final verb = (n > 0 || rail.offers.length > 1) ? 'live' : 'lives';
+  return (
+    headline,
+    '$whose $things $verb here. Your health details stay private.',
+  );
+}
+
+/// "From Dr Meera Rao", what she gets, and the privacy line. Words only (D3).
+class PartnerCareBenefitCard extends StatelessWidget {
+  const PartnerCareBenefitCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    PartnerOfferStore.instance.ensureLoaded();
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        PartnerBrand.instance,
+        ProgrammeStore.instance,
+        PartnerOfferStore.instance,
+      ]),
+      builder: (context, _) {
+        final rail = careBenefitNow();
+        final care = CarePartnerStore.instance.partner;
+        if (rail == null || care == null) return const SizedBox.shrink();
+        final copy = careBenefitCopy(rail: rail, person: !care.isOrganisation);
+        final p = pvStorePalette;
+        return Padding(
+          key: const ValueKey('partner_care_benefit_card'),
+          padding: const EdgeInsets.fromLTRB(
+            kPvProfileGutter,
+            kPvProfileGroupGap,
+            kPvProfileGutter,
+            0,
+          ),
+          child: Semantics(
+            button: true,
+            label: '${rail.eyebrow}. ${copy.$1}. ${copy.$2}',
+            excludeSemantics: true,
+            child: PvPress(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _openBenefits(context),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: kPvLine),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        rail.eyebrow.toUpperCase(),
+                        style: pvManrope(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
+                          color: p.ink2,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        copy.$1,
+                        style: pvFraunces(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          color: p.ink1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        copy.$2,
+                        style: pvManrope(
+                          fontSize: 12.5,
+                          height: 1.45,
+                          color: p.ink2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// "Your benefits", the always-shown row on You. Its line names what is
+/// behind it.
+class PartnerBenefitsRow extends StatelessWidget {
+  const PartnerBenefitsRow({super.key, required this.tint});
+
+  /// The profile's mark tint.
+  final Color tint;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: Listenable.merge([
+      PartnerBrand.instance,
+      ProgrammeStore.instance,
+      PartnerOfferStore.instance,
+    ]),
+    builder: (context, _) {
+      final sponsor = PartnerBrand.instance.lockup;
+      final care = careBenefitNow() == null
+          ? null
+          : CarePartnerStore.instance.partner;
+      return PvProfileRow(
+        key: const ValueKey('pv_profile_benefits'),
+        mark: TtcTabArt(mark: TtcTabMark.wallet, tint: tint),
+        title: 'Your benefits',
+        subtitle: sponsor != null
+            ? 'From ${sponsor.name}'
+            : care != null
+            ? 'From ${care.name.trim()}'
+            : 'Does your employer offer ParentVeda?',
+        onTap: () => _openBenefits(context),
+      );
+    },
+  );
+}
+
+void _openBenefits(BuildContext context) => Navigator.of(context).push(
+  MaterialPageRoute<void>(
+    settings: const RouteSettings(name: 'employer'),
+    builder: (_) => const EmployerBenefitsScreen(),
+  ),
+);

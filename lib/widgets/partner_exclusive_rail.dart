@@ -20,8 +20,14 @@
 //
 //  WHAT GOES IN IT (the user, 2026-10-31): the partner's live and recorded
 //  programmes, plus, for a sponsor that includes consultations, one card
-//  saying how many are left. The storyboard's offer card is owed: nothing on
-//  the phone reads audience coupons yet (STILL-OPEN §5.1g).
+//  saying how many are left.
+//  Kept for revert (A2): "The storyboard's offer card is owed: nothing on
+//  the phone reads audience coupons yet (STILL-OPEN §5.1g)."
+//  A3 (2026-10-31): the offer card is here, read through 0148's
+//  `my_partner_offers()` (PartnerOfferStore). Its words are true today:
+//  "15% off …" and "Until 30 Nov", never the storyboard's "Auto-applied",
+//  because checkout does not take offers yet (auto-apply is A4). An offer
+//  alone is enough for a rail.
 //
 //  NO PARTNER COLOURS (D1). The storyboard drew these cards in the partner's
 //  tint; D1 overrules it, so they are ParentVeda's grey panel with ink text.
@@ -44,6 +50,7 @@ import '../screens/v2/v2_palette.dart';
 import '../services/credits_store.dart';
 import '../services/entitlement_store.dart';
 import '../services/partner_brand.dart';
+import '../services/partner_offer_store.dart';
 import '../services/programme_store.dart';
 import '../services/sponsor_benefits.dart';
 import '../theme/pv_fonts.dart';
@@ -58,6 +65,7 @@ class PartnerRail {
     required this.chip,
     required this.programmes,
     this.consultsLeft,
+    this.offers = const [],
   });
 
   final String eyebrow;
@@ -71,7 +79,13 @@ class PartnerRail {
   /// plan includes none (no consult card).
   final int? consultsLeft;
 
-  bool get isEmpty => programmes.isEmpty && consultsLeft == null;
+  /// The partner's offers (A3), drawn first: an offer is the one card here
+  /// with an end date.
+  final List<PartnerOffer> offers;
+
+  // Kept for revert (A2): programmes.isEmpty && consultsLeft == null;
+  bool get isEmpty =>
+      programmes.isEmpty && consultsLeft == null && offers.isEmpty;
 }
 
 /// The rail for this family, or null when there is nothing only for them.
@@ -81,6 +95,7 @@ PartnerRail? partnerRailFor({
   required CarePartner? care,
   required List<LearningProgram> programmes,
   int? consultsLeft,
+  List<PartnerOffer> offers = const [],
 }) {
   bool live(LearningProgram p) => p.status != LearningStatus.completed;
 
@@ -98,6 +113,10 @@ PartnerRail? partnerRailFor({
       chip: '${sponsor.name} only',
       programmes: mine,
       consultsLeft: consultsLeft,
+      offers: [
+        for (final o in offers)
+          if (o.isSponsor && o.audienceId == sponsor.id) o,
+      ],
     );
     if (!rail.isEmpty) return rail;
   }
@@ -107,7 +126,12 @@ PartnerRail? partnerRailFor({
       for (final p in programmes)
         if (p.audiencePartnerId == care.id && live(p)) p,
     ];
-    if (mine.isEmpty) return null;
+    final theirs = [
+      for (final o in offers)
+        if (!o.isSponsor && o.audienceId == care.id) o,
+    ];
+    // Kept for revert (A2): if (mine.isEmpty) return null;
+    if (mine.isEmpty && theirs.isEmpty) return null;
     final name = care.name.trim();
     final person = !care.isOrganisation;
     return PartnerRail(
@@ -115,6 +139,7 @@ PartnerRail? partnerRailFor({
       title: person ? "For $name's patients" : 'For $name patients',
       chip: person ? "$name's patients" : '$name patients',
       programmes: mine,
+      offers: theirs,
     );
   }
   return null;
@@ -157,11 +182,13 @@ class PartnerExclusiveRail extends StatelessWidget {
   Widget build(BuildContext context) {
     // Loaded at launch (main.dart:449); a no-op then, a safety net in tests.
     ProgrammeStore.instance.ensureLoaded();
+    PartnerOfferStore.instance.ensureLoaded();
     return ListenableBuilder(
       listenable: Listenable.merge([
         PartnerBrand.instance,
         ProgrammeStore.instance,
         CreditsStore.instance,
+        PartnerOfferStore.instance,
       ]),
       builder: (context, _) {
         final ent = EntitlementStore.instance;
@@ -172,6 +199,7 @@ class PartnerExclusiveRail extends StatelessWidget {
           consultsLeft: ent.can(Caps.consultationCredit)
               ? CreditsStore.instance.available
               : null,
+          offers: PartnerOfferStore.instance.all,
         );
         if (rail == null) return const SizedBox.shrink();
         return Padding(
@@ -196,7 +224,25 @@ class PartnerExclusiveRail extends StatelessWidget {
     // lines rather than into a sliver of a column. Names are never cut off.
     final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.3);
     final width = cardWidth * scale;
+    void openBenefits() => Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'employer'),
+        builder: (_) => const EmployerBenefitsScreen(),
+      ),
+    );
     final cards = <Widget>[
+      // A3: the partner's offers. Benefits says the rest (the code, and that
+      // checkout does not take offers yet).
+      for (final o in rail.offers)
+        _Card(
+          key: ValueKey('partner_rail_offer_${o.code}'),
+          p: p,
+          width: width,
+          chip: 'Offer',
+          title: o.headline,
+          meta: o.until,
+          onTap: openBenefits,
+        ),
       if (rail.consultsLeft case final left?)
         _Card(
           key: const ValueKey('partner_rail_consult'),

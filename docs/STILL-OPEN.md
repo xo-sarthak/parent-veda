@@ -509,7 +509,8 @@ Three decisions from the user on 2026-10-31: the storyboard's wording with **ful
 consult card in the rail, and no room when there is nothing exclusive. Detail is in `docs/partner-editions/MASTER.md`
 A2 as built.
 
-- [ ] **The storyboard's offer card** ("15% off lactation consults · Auto-applied") is not built. 0142 gave
+- [x] **BUILT 2026-10-31 in A3** (0148 + `PartnerOfferStore`), with true words: "15% off {label} · Until 30 Nov",
+  not "Auto-applied" (the user's call). Was: **The storyboard's offer card** ("15% off lactation consults · Auto-applied") is not built. 0142 gave
   `programme_coupons` an audience, but nothing on the phone reads coupons by audience. A card needs a read first (an
   RPC returning the caller's audience coupons). **The user, 2026-10-31: its own small phase, A3** (MASTER), with
   the RPC's migration.
@@ -518,10 +519,10 @@ A2 as built.
 - [ ] **The old `chip: sponsor?.name` lines** (`pv_you_screen.dart`, three `PvIdentityCard` calls) are on layouts no
   stage has reached since 2026-10-07. They are kept for revert and untouched; if those layouts are ever deleted, the
   lines go with them.
-- [ ] **The doctor's version of the benefit card — MOVED TO A3 (2026-10-31).** First decided "sponsor only" after a
+- [x] **BUILT 2026-10-31 in A3** (`PartnerCareBenefitCard`, words only). Was: **The doctor's version of the benefit card — MOVED TO A3 (2026-10-31).** First decided "sponsor only" after a
   replica (https://claude.ai/artifact/7ZPoYurF4pzoqXFrByaaWe), then revised by the user the same day. A doctor or
   clinic with a real benefit gets a words-only card on You (no logo, D3), built with the offer RPC.
-- [ ] **No way in to Benefits from Parenting** for a parent with no sponsor (found 2026-10-31).
+- [x] **FIXED 2026-10-31 in A3**: "Your benefits", always shown, last in Your things on every stage. Was: **No way in to Benefits from Parenting** for a parent with no sponsor (found 2026-10-31).
   `pp_more_sheet.dart` has no Benefits row, and `_supportRows`' "Employer benefits" row is never shown in the live
   Settings. A3 adds an always-shown "Your benefits" row on You.
 - [x] **Settings had lost "About ParentVeda" on every stage — FIXED 2026-10-31.** Settings picked it as
@@ -530,6 +531,18 @@ A2 as built.
   `PvProfileMark.people`, and the C3-2 Community alerts row got the same mark (it was the one unmarked row). Found by
   `pv_you_pregnancy_test`, `ttc_more_profile_test` (x2). The fourth red, `pv_profile_walk_test`, failed on every
   run because its `runAsync` let google_fonts' network loads fail inside the test; it now pumps instead.
+
+### Left by A3 (2026-10-31)
+- [ ] **Offers are not applied at checkout (phase A4).** `price_offering` / `open_payment_order` (0126) ignore
+  coupons, and nothing calls `preview_programme_coupon`, so a partner offer is shown but never taken off. A4 decides:
+  the best offer server-side in `price_offering`, the redemption count in the receipt write (`_write_purchase`), what
+  happens when an offer ends between the order and the capture, and whether an offer may ever cover a consult (a
+  coupon covers programmes only today; the storyboard's "lactation consults" cannot exist yet). Until then the phone
+  says "Checkout does not take offers yet".
+- [ ] **Pregnancy's and TTC's More rows still say "Employer benefits"** while the page is now "Your benefits". Both
+  open the same page; renaming them was not asked. On the user's word.
+- [ ] **The welcome sheet's "Partner offers · Applied automatically at checkout"** (storyboard row 1) must not be
+  written into `care_welcome_sheet.dart` before A4, for the same reason.
 
 ## 5.1d `programmes.price_paise` still stores minor units — minor, deferred
 

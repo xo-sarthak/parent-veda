@@ -2192,6 +2192,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
       ),
       // A2: what is left of her benefit, under the hero. Nothing without one.
       const PartnerBenefitCard(),
+      // A3: a doctor's or clinic's benefit, words only; never beside a sponsor's.
+      const PartnerCareBenefitCard(),
       // ⚠️ YOUR JOURNEY IS RIGHT UNDER THE HERO (2026-10-01, the user: the
       // "I got a positive test" button was "very below in the profile section,
       // should be on top or above"). It is the one thing on this page she
@@ -2408,6 +2410,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
           if (!him)
             for (final t in content.keepsakeThings)
               if (t.shown?.call() ?? true) _profileThingRow(p, t),
+          // A3: always shown, the one way in to Benefits on every stage.
+          PartnerBenefitsRow(tint: tint),
         ],
       ),
       // Her quiet rows (pregnancy: "If your pregnancy has ended"), last before
