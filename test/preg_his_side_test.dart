@@ -129,17 +129,36 @@ void main() {
     expect(old, contains("if (partner.isNotEmpty && !him) ...["));
   });
 
-  test('Talk to someone sits in all three home headers (2026-10-14)', () {
-    expect(_code('lib/screens/v2/v3_preg_hero.dart'),
-        contains("semantic: 'Talk to an expert'"));
-    expect(_code('lib/screens/home_v3_screen.dart'), contains('onTalk: () =>'));
+  // Was 'Talk to someone sits in all three home headers (2026-10-14)'. It left
+  // the headers on 2026-10-31 (one header order: avatar, Messages | date |
+  // Search, Calendar) and is the first row of each stage's You page, opening
+  // the same place the button did. His side keeps it too (the row is not
+  // behind `him`). Skilling's chrome is untouched.
+  test('Talk to an expert is the first row of You on every stage, not in the headers (2026-10-31)', () {
+    final hero = _code('lib/screens/v2/v3_preg_hero.dart');
+    expect(RegExp(r"^\s*semantic: 'Talk to an expert'", multiLine: true).hasMatch(hero), isFalse,
+        reason: 'the button is out of the pregnancy header (commented for revert)');
     final ttc = _code('lib/screens/ttc/ttc_home_v3.dart');
-    expect(ttc, contains('onTalk: () =>'));
-    expect(ttc, contains('onTap: onTalk,'));
+    expect(RegExp(r'^\s*onTap: onTalk,', multiLine: true).hasMatch(ttc), isFalse);
+    expect(RegExp(r'^\s*onTalk: \(\) =>', multiLine: true).hasMatch(ttc), isFalse);
+    final pp = _code('lib/screens/post_pregnancy/pp_home_v3.dart');
+    expect(RegExp(r"^\s*onTalk: \(\) => _openSurface", multiLine: true).hasMatch(pp), isFalse);
+    // `_Hero` (kept for revert, never built) still carries the old button; the
+    // painted hero the home builds does not.
+    final painted = pp.substring(pp.indexOf('class _PaintedHero'));
+    expect(RegExp(r'^\s*onTap: onTalk,', multiLine: true).hasMatch(painted), isFalse);
+    // The one door now: the first row on You, branching on the stage.
+    final you = _code('lib/screens/profile/pv_you_screen.dart');
+    expect(you, contains("key: const ValueKey('pv_profile_talk_row')"));
+    expect(you, contains("title: 'Talk to an expert'"));
+    expect(you, contains('onTap: () => _talkToAnExpert(stage)'));
+    expect(you, contains("const TtcPrepareScreen(onlyCategory: 'consults')"));
+    expect(you, contains("ppPushSurface(context, 'pp_experts')"));
+    expect(you, contains('ConsultationsScreen('));
+    expect(you.indexOf('pv_profile_talk_row'), lessThan(you.indexOf("key: const ValueKey('pv_profile_journey')")),
+        reason: 'first row, above Your journey');
     expect(_code('lib/screens/v2/v3_hero_chrome.dart'),
         contains("label: 'Talk to an expert'")); // was 'Talk to someone' (2026-10-22)
-    expect(_code('lib/screens/post_pregnancy/pp_home_v3.dart'),
-        contains("onTalk: () => _openSurface(context, 'pp_experts')"));
   });
 
   test('Milestones looks ahead under "Up next", never "Coming soon"', () {

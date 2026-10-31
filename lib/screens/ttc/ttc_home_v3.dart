@@ -137,6 +137,7 @@ import 'ttc_chapter_screen.dart';
 // import 'ttc_focus_screen.dart'; // kept for revert: the old door push in _openBracket (2026-09-26)
 import 'doors/ttc_door_screen.dart' show openTtcDoor;
 import 'ttc_common.dart';
+import 'ttc_search_screen.dart' show openTtcSearch;
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_daily_insights.dart';
 // import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
@@ -493,12 +494,15 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   onCalendar: () => _openSurface(context, 'ttc_calendar'),
                   onProfile: () => openTtcProfile(context),
                   onMessages: () => _openSurface(context, 'ttc_messages'),
-                  // Talk to someone, from the header (2026-10-14): the consults,
-                  // as "See all consults" under Talk to experts.
-                  onTalk: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                      settings: const RouteSettings(name: 'ttc/consults'),
-                      builder: (_) =>
-                          const TtcPrepareScreen(onlyCategory: 'consults'))),
+                  // Search joined the header (2026-10-31, one header order on
+                  // every home): the whole-stage search, `ttc_search_screen.dart`.
+                  onSearch: () => openTtcSearch(context, him: him),
+                  // Talk to someone left the header on 2026-10-31 and is the first
+                  // row of You (`openTtcProfile`). Kept for revert:
+                  // onTalk: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                  //     settings: const RouteSettings(name: 'ttc/consults'),
+                  //     builder: (_) =>
+                  //         const TtcPrepareScreen(onlyCategory: 'consults'))),
                   unread: TtcMessagesStore.instance.unreadCount,
                 )),
                 _Sheet(p: p, children: [
@@ -1541,7 +1545,8 @@ class _CycleHeader extends StatelessWidget {
     required this.onCalendar,
     required this.onProfile,
     required this.onMessages,
-    required this.onTalk,
+    required this.onSearch,
+    // required this.onTalk, // left the header 2026-10-31, kept for revert (now row 1 of You)
     required this.unread,
     this.partner,
   });
@@ -1558,7 +1563,8 @@ class _CycleHeader extends StatelessWidget {
   /// number). Added 2026-09-26: the app now speaks first, and the envelope is
   /// where what it said waits.
   final VoidCallback onMessages;
-  final VoidCallback onTalk;
+  final VoidCallback onSearch;
+  // final VoidCallback onTalk; // kept for revert (2026-10-31)
   final int unread;
 
   /// The day the whole page is describing. Owned by the screen, not by the
@@ -1645,11 +1651,21 @@ class _CycleHeader extends StatelessWidget {
                 // left beside the avatar: the right already holds two buttons, and a third
                 // there overflowed a 360pt phone. Mobbin: a plain line chat mark in the
                 // app's header weight, never a coloured support badge.
-                _RoundButton(
-                    icon: Icons.forum_outlined,
-                    p: p,
-                    onTap: onTalk,
-                    semantic: 'Talk to an expert'), // was 'Talk to someone' (2026-10-22)
+                // LEFT THE HEADER 2026-10-31 (one header order on every home): it is the
+                // first row of You now. Kept for revert:
+                // _RoundButton(
+                //     icon: Icons.forum_outlined,
+                //     p: p,
+                //     onTap: onTalk,
+                //     semantic: 'Talk to an expert'), // was 'Talk to someone' (2026-10-22)
+                //
+                // ⚠️ THE ORDER, ON EVERY HOME (2026-10-31): avatar, Messages | date |
+                // Search, Calendar. Messages moved here from the right so the second
+                // slot on the left is the same envelope on all three stages.
+                // ⚠️ THE MESSAGES THE APP SENDS HAD NO DOOR ON THE HOME
+                // (gap analysis, "Behind: Guided help", P1). A dot when
+                // something is unread; never a count.
+                TtcMessagesButton(p: p, unread: unread, onTap: onMessages),
                 ]),
               ),
             ),
@@ -1693,11 +1709,17 @@ class _CycleHeader extends StatelessWidget {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // ⚠️ THE MESSAGES THE APP SENDS HAD NO DOOR ON THE HOME
-                    // (gap analysis, "Behind: Guided help", P1). A dot when
-                    // something is unread; never a count.
-                    TtcMessagesButton(
-                        p: p, unread: unread, onTap: onMessages),
+                    // The envelope moved to the left, beside the avatar (2026-10-31).
+                    // Kept for revert:
+                    // TtcMessagesButton(
+                    //     p: p, unread: unread, onTap: onMessages),
+                    // Search, before the calendar (2026-10-31).
+                    _RoundButton(
+                        key: const ValueKey('ttc_home_search'),
+                        icon: Icons.search_rounded,
+                        p: p,
+                        onTap: onSearch,
+                        semantic: 'Search'),
                     // ⚠️ THE CALENDAR HAD NO ENTRANCE ON THIS HOME AT ALL
                     // before the header. It was a nav tab and nothing else,
                     // which meant the one screen showing a whole month of her
@@ -3354,7 +3376,8 @@ bool ttcHomeShowsLatePill(DateTime today) =>
 
 class _RoundButton extends StatelessWidget {
   const _RoundButton(
-      {required this.icon,
+      {super.key,
+      required this.icon,
       required this.p,
       required this.onTap,
       required this.semantic,

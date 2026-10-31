@@ -25,6 +25,7 @@ import 'package:parentveda/widgets/global_ask_fab.dart';
 const _sites = [
   'lib/widgets/global_ask_fab.dart',
   'lib/screens/post_pregnancy/pp_section_extras.dart',
+  'lib/ask_veda/ask_veda_search_shell.dart',
   'lib/screens/tools/ask_veda_screen.dart',
   'lib/screens/post_pregnancy/askveda_screen.dart',
   'lib/screens/ttc/ttc_askveda_screen.dart',

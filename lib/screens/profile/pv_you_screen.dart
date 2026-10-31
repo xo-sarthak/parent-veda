@@ -80,6 +80,9 @@ import '../reminders_screen.dart';
 import '../skilling/sk_child_store.dart';
 import '../skilling/skilling_preview_screen.dart';
 import '../ttc/ttc_strings.dart' show TtcLang, TtcPartnerMode, TtcS;
+import '../ttc/ttc_prepare_screen.dart' show TtcPrepareScreen; // Talk to an expert row (2026-10-31)
+import '../post_pregnancy/pp_surface_router.dart' show ppPushSurface; // Talk to an expert row (2026-10-31)
+import '../prepare/consultations_screen.dart' show ConsultationsScreen; // Talk to an expert row (2026-10-31)
 import 'pv_account_actions.dart';
 import 'pv_child_screen.dart';
 import 'pv_data_privacy_screen.dart';
@@ -2194,6 +2197,30 @@ class _PvYouScreenState extends State<PvYouScreen> {
       const PartnerBenefitCard(),
       // A3: a doctor's or clinic's benefit, words only; never beside a sponsor's.
       const PartnerCareBenefitCard(),
+      // ⚠️ TALK TO AN EXPERT IS THE FIRST ROW OF YOU (2026-10-31, one header
+      // order on every home). It was a round button in each stage's home
+      // header; the header now holds avatar, Messages, the date, Search and
+      // Calendar on all three stages, and this row opens the SAME place the
+      // button did: TTC's consults, Pregnancy's consults list, Parenting's
+      // experts page (`_talkToAnExpert`). Not on Skilling, whose header and
+      // You are unchanged.
+      if (stage != LifeStage.skilling)
+        PvProfileGroup(
+          key: const ValueKey('pv_profile_talk'),
+          children: [
+            PvProfileRow(
+              key: const ValueKey('pv_profile_talk_row'),
+              mark: PvProfileArt(mark: PvProfileMark.bubble, tint: tint),
+              title: 'Talk to an expert',
+              subtitle: switch (stage) {
+                LifeStage.tryingToConceive =>
+                  'Fertility doctors and counsellors, one to one',
+                _ => 'Doctors, dietitians and lactation experts, one to one',
+              },
+              onTap: () => _talkToAnExpert(stage),
+            ),
+          ],
+        ),
       // ⚠️ YOUR JOURNEY IS RIGHT UNDER THE HERO (2026-10-01, the user: the
       // "I got a positive test" button was "very below in the profile section,
       // should be on top or above"). It is the one thing on this page she
@@ -2444,6 +2471,27 @@ class _PvYouScreenState extends State<PvYouScreen> {
         ],
       ),
     ];
+  }
+
+  /// The place the home header's "Talk to an expert" button opened, per stage
+  /// (the button left the header on 2026-10-31; this is its one door now).
+  void _talkToAnExpert(LifeStage stage) {
+    switch (stage.shopStage) {
+      case LifeStage.tryingToConceive:
+        _push(
+          const TtcPrepareScreen(onlyCategory: 'consults'),
+          'ttc/consults',
+        );
+      case LifeStage.parenting:
+        ppPushSurface(context, 'pp_experts');
+      case _:
+        _push(
+          ConsultationsScreen(
+            lang: PregnancyController.current?.language ?? AppLanguage.english,
+          ),
+          'consults',
+        );
+    }
   }
 
   /// One of [_supportRows] by its title. Throws in a test if a title is

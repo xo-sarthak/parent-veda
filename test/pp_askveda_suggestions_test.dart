@@ -24,7 +24,8 @@ void main() {
     addTearDown(t.view.reset);
     await t.pumpWidget(const MaterialApp(home: AskVedaScreen()));
     await t.pumpAndSettle();
-    expect(find.text('For this age'), findsOneWidget);
+    // The home heads this age's questions (2026-10-31, the search flow).
+    expect(find.textContaining('ASKED OFTEN AT'), findsOneWidget);
     final first = phaseFaqs(currentPhase().number, count: 1).first.question;
     expect(find.text(ppFillChild(first)), findsWidgets);
     expect(find.textContaining(RegExp(r'\b(he|him|his)\b')), findsNothing);

@@ -23,6 +23,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
+import '../../ask_veda/ask_veda_search_shell.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../ask_veda/pv_veda_reveal.dart';
@@ -41,6 +42,8 @@ import '../calendar_screen.dart';
 import '../community/community_chrome.dart' show openCommunity;
 import '../products_screen.dart';
 import '../profile_screen.dart';
+import '../profile/pv_you_screen.dart' show openPvYou;
+import '../../services/life_stage_store.dart' show LifeStage;
 import '../read_next_screen.dart';
 import '../weekly_card_stack_screen.dart';
 import 'baby_movement_screen.dart';
@@ -309,11 +312,94 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     }
   }
 
+  // ⚠️ ASK VEDA AS A SEARCH (2026-10-31, the approved Google-mobile-search
+  // prototype). The presentation is the shared shell
+  // (`lib/ask_veda/ask_veda_search_shell.dart`); this screen keeps the
+  // request, the suggestions, the offline fallback and what each card opens.
+  // Kept for revert: `_build` below is the previous top bar + pill + stacked
+  // sections, dormant; point `builder:` back at it to restore.
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: p,
-      builder: (context, _) => _build(context, S(p.language)),
+      builder: (context, _) => _buildSearch(context, S(p.language)),
+    );
+  }
+
+  /// The questions this side offers, as plain strings: her month's questions
+  /// first (the Pregnancy card), a round across the open sections.
+  List<String> _suggestionList(AppLanguage lang) {
+    final lists = [
+      for (final sec in kVedaSuggestions)
+        if (sec.active)
+          [for (final q in (_picked[sec.title.en] ?? sec.questions)) q.of(lang)],
+    ];
+    final out = <String>[];
+    for (var i = 0; out.length < 8; i++) {
+      var any = false;
+      for (final l in lists) {
+        if (i < l.length) {
+          out.add(l[i]);
+          any = true;
+        }
+      }
+      if (!any) break;
+    }
+    return out;
+  }
+
+  /// Everything this side knows, for the typing completions. The sections not
+  /// open yet are in too: a question from another stage still gets asked.
+  List<String> _poolList(AppLanguage lang) => [
+        for (final sec in kVedaSuggestions)
+          for (final q in _questionsFor(sec)) q.of(lang),
+      ];
+
+  VedaRow _hitRow(PvSearchHit h) => VedaRow(
+        rowKey: ValueKey('veda_local_${h.title}'),
+        meta: h.meta,
+        title: h.title,
+        blurb: h.blurb.trim(),
+        icon: h.icon,
+        onTap: () => openPvSearchHit(context, h, p, query: _query),
+      );
+
+  Widget _buildSearch(BuildContext context, S s) {
+    final ended = PregnancyEndedStore.instance.ended;
+    final wk = p.currentWeek;
+    final lang = p.language;
+    final hits = _localHits();
+    final f = _feed;
+    return AskVedaSearchShell(
+      contextLine: ended ? 'where you are now' : 'week $wk of your pregnancy',
+      suggestHeading: ended ? 'Asked often' : 'Asked often in week $wk',
+      suggestions: _suggestionList(lang),
+      pool: _poolList(lang),
+      query: _query,
+      loading: _loading,
+      failed: _failed,
+      result: f,
+      badge: ended ? null : 'Week $wk',
+      avatarInitial: p.motherName.isNotEmpty ? p.motherName[0].toUpperCase() : '',
+      onAvatar: () => openPvYou(context, stage: LifeStage.pregnancy),
+      onAsk: _send,
+      onClear: _clearQuery,
+      onRetry: () {
+        if (_query != null) _send(_query!);
+      },
+      // What each card opens is unchanged: products open the store, the rest
+      // go through the real page first, then the reader.
+      onOpen: (it, section) =>
+          section == VedaSection.products ? _openProducts() : _openFeedItem(it),
+      // The app's own search fills Reads when the service sends none, and is
+      // what she can still open with no connection.
+      contentFallback: (f?.videos.isEmpty ?? true) ? [for (final h in hits) _hitRow(h)] : const [],
+      offlineExtras: [for (final h in hits) _hitRow(h)],
+      followUps: f == null ? const [] : _followUps(),
+      disclaimer: s.vedaDisclaimer,
+      offlineTitle: S.now.uiConnectInternet,
+      offlineBody: S.now.uiAskVedaNeedsConnection,
+      retryLabel: S.now.uiRetry,
     );
   }
 

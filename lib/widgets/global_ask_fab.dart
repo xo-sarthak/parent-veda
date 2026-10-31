@@ -78,7 +78,7 @@ const double kAskFabBottomOffset = 108;
 const double kAskFabRaisedOffset = 166; // was 150; moved with the offset above
 
 /// The circle's diameter.
-const double kAskFabSize = 56;
+const double kAskFabSize = 50; // 56 until 2026-10-31 (the user: smaller FAB)
 
 /// What a scroll view must keep clear at its bottom so its last row is not
 /// stranded under the FAB. Uses the raised offset, because a single constant
@@ -88,7 +88,7 @@ const double kAskFabReserve = kAskFabRaisedOffset + kAskFabSize + 12;
 /// The reserve on an ordinary screen — the FAB at its normal offset. The
 /// door sheets used `kAskFabReserve` (the RAISED reserve, 234pt) for their
 /// foot and the user saw "so much white space… increasing the scroll for no
-/// reason" (2026-09-19). 108 + 56 + 12 = 176.
+/// reason" (2026-09-19). 108 + 50 + 12 = 170 (was 176 at a 56pt disc).
 const double kAskFabReserveNormal = kAskFabBottomOffset + kAskFabSize + 12;
 
 /// Shared, tiny reactive state the observer writes and the FAB reads.

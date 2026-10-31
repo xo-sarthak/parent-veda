@@ -9,11 +9,20 @@
 //  the bottom nav (openPpTab 1). No emojis (parenting rule) - line icons instead.
 // =============================================================================
 
+// ignore_for_file: unused_element, unused_field
+//
+// Ask Veda is drawn by the shared search shell since 2026-10-31
+// (lib/ask_veda/ask_veda_search_shell.dart). The earlier top bar, pill,
+// suggestion cards and stacked sections below are DORMANT, kept for revert,
+// which is what the two ignores above are for.
+
 import 'dart:math';
 import 'pp_child_profile.dart';
 
 import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
+import '../../ask_veda/ask_veda_search_shell.dart';
+import '../profile/pv_you_screen.dart' show openPvYou;
 import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../ask_veda/pv_veda_reveal.dart';
@@ -154,7 +163,8 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
     for (final sec in _sections) {
       final qs = [for (final q in sec.$3) ppFillChild(q)];
       if (sec.$1 != _kForThisAge) qs.shuffle(_rng);
-      _picked[sec.$1] = qs.take(3).toList();
+      // Four of this age's own (the home shows four tiles); three of the rest.
+      _picked[sec.$1] = qs.take(sec.$1 == _kForThisAge ? 4 : 3).toList();
     }
   }
 
@@ -246,8 +256,66 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
   // void _snack(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
   void _open(Widget w) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => w));
 
+  // ⚠️ ASK VEDA AS A SEARCH (2026-10-31, the approved Google-mobile-search
+  // prototype). The shared shell draws it; this screen keeps the request (and
+  // the child's context in `_send`), the age's questions and what each card
+  // opens. Kept for revert: `_buildClassic` below, dormant.
   @override
   Widget build(BuildContext context) {
+    final f = _feed;
+    final child = ChildProfileStore.instance;
+    final used = f == null ? null : askVedaUsedLine(f.usedContext);
+    return AskVedaSearchShell(
+      contextLine: '${child.nameMid} at ${child.ageLabel}',
+      suggestHeading: 'Asked often at ${child.ageLabel}',
+      // This age's own questions first, then the rest, each filled from her
+      // profile so a girl is never asked about as "he".
+      suggestions: [
+        for (final sec in _sections)
+          ...(_picked[sec.$1] ?? [for (final q in sec.$3) ppFillChild(q)]),
+      ].take(8).toList(),
+      pool: [
+        for (final sec in _sections)
+          for (final q in sec.$3) ppFillChild(q),
+      ],
+      query: _query,
+      loading: _loading,
+      failed: _failed,
+      result: f,
+      badge: child.ageLabel,
+      usedLine: used,
+      onAvatar: () => openPvYou(context, stage: LifeStage.parenting),
+      onAsk: _send,
+      onClear: _clearQuery,
+      onRetry: () {
+        if (_query != null) _send(_query!);
+      },
+      // A product opens its page, or the Products tab; the rest go through
+      // the real page first, then the reader. Unchanged.
+      onOpen: (it, section) {
+        if (section == VedaSection.products) {
+          final prod = _matchProduct(it.title);
+          if (prod != null) {
+            _open(ProductDetailScreen(product: prod));
+          } else {
+            openPpTab(context, 4);
+          }
+          return;
+        }
+        _openItem(it);
+      },
+      followUps: f == null ? const [] : _followUps(),
+      disclaimer:
+          'This is general guidance for your child’s stage - please confirm anything important with your paediatrician.',
+      offlineBody:
+          'Ask Veda needs a connection to give you a personalized, up-to-date answer. Please check your internet and try again.',
+      // Parenting keeps its bottom bar; the shell hides it under the keyboard.
+      bottomBar: const PpBottomNav(active: null),
+      bottomInset: 112,
+    );
+  }
+
+  Widget _buildClassic(BuildContext context) {
     final hasResult = _query != null;
     return Scaffold(
       backgroundColor: _vBgMid,

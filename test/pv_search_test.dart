@@ -164,6 +164,9 @@ void main() {
       // blurb — not between "Start anywhere" and the grid.
       final home = _read('lib/screens/home_v3_screen.dart');
       expect(home, isNot(contains(RegExp(r'^\s+PvSearchBar\(', multiLine: true))));
+      // A round Search button in the header is not the bar (2026-10-31, one
+      // header order on every home): it pushes the same screen.
+      expect(home, contains('onSearch: () => openPvSearch(context, pregnancy)'));
       final door = _read('lib/screens/doors/pv_door_screen.dart');
       // LIVE since 2026-09-20 (pv_live_search.dart): the field is the door's
       // own, results draw in the sheet, and the pushed screen is the way on

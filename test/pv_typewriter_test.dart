@@ -122,7 +122,22 @@ void main() {
     expect(t.hasRunningAnimations, isFalse);
   });
 
-  test('all three Ask Veda screens use the reveal (wiring gate)', () {
+  // 2026-10-31: the three screens share one presentation, the search shell
+  // (lib/ask_veda/ask_veda_search_shell.dart). The reveal lives there; each
+  // screen must hand it its result and its related questions.
+  test('all three Ask Veda screens use the reveal through the shell (wiring gate)', () {
+    // Whitespace collapsed: `dart format` may split a call across lines.
+    final shell = File('lib/ask_veda/ask_veda_search_shell.dart')
+        .readAsStringSync()
+        .replaceAll(RegExp(r'\(\s+'), '(');
+    for (final needle in [
+      'PvTypewriterText(f.answer',
+      'PvTypewriterText(f.meaning',
+      'PvVedaFadeIn(',
+      '_Shimmer()', // the wait (it was PvVedaThinking before the search flow)
+    ]) {
+      expect(shell, contains(needle), reason: 'shell: $needle');
+    }
     for (final f in [
       'lib/screens/tools/ask_veda_screen.dart',
       'lib/screens/post_pregnancy/askveda_screen.dart',
@@ -130,9 +145,7 @@ void main() {
     ]) {
       final src = File(f).readAsStringSync();
       for (final needle in [
-        'PvTypewriterText(answer',
-        'PvVedaThinking(',
-        'PvVedaFadeIn(',
+        'AskVedaSearchShell(',
         'pvVedaFollowUps(',
       ]) {
         expect(src, contains(needle), reason: '$f: $needle');

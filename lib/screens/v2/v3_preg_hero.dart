@@ -170,7 +170,8 @@ class V3PregHero extends StatefulWidget {
     this.onAvatar,
     this.onSaved,
     this.onCalendar,
-    this.onTalk,
+    // this.onTalk, // left the header 2026-10-31 (now row 1 of You), kept for revert
+    this.onSearch,
     this.onMessages,
     this.unreadMessages = 0,
     this.timeLeft,
@@ -218,11 +219,16 @@ class V3PregHero extends StatefulWidget {
   /// on 2026-09-29 and was left with no entrance on the home.
   final VoidCallback? onCalendar;
 
-  /// Opens the experts list; null hides the mark.
-  final VoidCallback? onTalk;
+  // /// Opens the experts list; null hides the mark.
+  // final VoidCallback? onTalk; // left the header 2026-10-31, kept for revert
 
-  /// The Messages inbox, top right beside Saved (2026-09-30: the inbox was on More
-  /// only, so a mother had to know it existed). Null draws no envelope.
+  /// Search, top right before the calendar (2026-10-31, one header order on
+  /// every home). Null draws no button.
+  final VoidCallback? onSearch;
+
+  /// The Messages inbox, top LEFT beside the avatar since 2026-10-31 (was top
+  /// right beside Saved, 2026-09-30: the inbox was on More only, so a mother
+  /// had to know it existed). Null draws no envelope.
   final VoidCallback? onMessages;
 
   /// Unread messages, drawn as a small ink count on the envelope, never the brand
@@ -300,7 +306,11 @@ class _V3PregHeroState extends State<V3PregHero> {
           // overflow at a large text size. Kept for revert: the Row of two Spacers.
           Builder(builder: (context) {
             // Kept for revert: widget.onMessages != null ? 84.0 : 38.0
-            final side = (widget.onMessages != null || widget.onTalk != null) ? 84.0 : 38.0;
+            // Kept for revert: (widget.onMessages != null || widget.onTalk != null) ? 84.0 : 38.0
+            // ONE ORDER ON EVERY HOME (2026-10-31): avatar, Messages | date |
+            // Search, Calendar (Saved on his side). Two buttons a side, so the
+            // equal-width rule still keeps the date centred.
+            final side = (widget.onMessages != null || widget.onSearch != null) ? 84.0 : 38.0;
             return Row(children: [
               SizedBox(
                 width: side,
@@ -317,18 +327,48 @@ class _V3PregHeroState extends State<V3PregHero> {
                         : Text(widget.initial.toUpperCase(),
                             style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
                   ),
-                  // TALK TO SOMEONE, FROM THE HEADER (2026-10-14, STILL-OPEN §83.14). On the
-                  // left beside the avatar: the right already holds two buttons, and a third
-                  // there overflowed a 360pt phone. Mobbin: a plain line chat mark in the
-                  // app's header weight, never a coloured support badge.
-                  if (widget.onTalk != null) ...[
+                  // TALK TO SOMEONE, FROM THE HEADER (2026-10-14, STILL-OPEN §83.14). LEFT THE
+                  // HEADER 2026-10-31: it is the first row of You on every stage. Kept for revert:
+                  // if (widget.onTalk != null) ...[
+                  //   const SizedBox(width: 8),
+                  //   _Round(
+                  //     p: p,
+                  //     semantic: 'Talk to an expert',
+                  //     onTap: widget.onTalk!,
+                  //     child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
+                  //   ),
+                  // ],
+                  // The envelope (2026-09-30; moved from the right to here beside the
+                  // avatar, 2026-10-31): the weekly note and the moments worth
+                  // remembering, one tap from Today. Ink count, never coral.
+                  if (widget.onMessages != null) ...[
                     const SizedBox(width: 8),
-                    _Round(
-                      p: p,
-                      semantic: 'Talk to an expert',
-                      onTap: widget.onTalk!,
-                      child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
-                    ),
+                    Stack(clipBehavior: Clip.none, children: [
+                      _Round(
+                        p: p,
+                        boxKey: const ValueKey('preg_hero_messages'),
+                        semantic:
+                            widget.unreadMessages > 0 ? 'Messages, ${widget.unreadMessages} unread' : 'Messages',
+                        onTap: widget.onMessages!,
+                        child: Icon(Icons.mail_outline_rounded, size: 18, color: p.ink2),
+                      ),
+                      if (widget.unreadMessages > 0)
+                        Positioned(
+                          top: -3,
+                          right: -3,
+                          child: IgnorePointer(
+                            child: Container(
+                              key: const ValueKey('preg_hero_messages_count'),
+                              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(color: Color(0xFF2F2C30), shape: BoxShape.circle),
+                              child: Text(widget.unreadMessages > 9 ? '9+' : '${widget.unreadMessages}',
+                                  style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white)),
+                            ),
+                          ),
+                        ),
+                    ]),
                   ],
                   ]),
                 ),
@@ -358,35 +398,17 @@ class _V3PregHeroState extends State<V3PregHero> {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    // The envelope (2026-09-30): the weekly note and the moments worth
-                    // remembering, one tap from Today. Ink count, never coral.
-                    if (widget.onMessages != null) ...[
-                      Stack(clipBehavior: Clip.none, children: [
-                        _Round(
-                          p: p,
-                          boxKey: const ValueKey('preg_hero_messages'),
-                          semantic:
-                              widget.unreadMessages > 0 ? 'Messages, ${widget.unreadMessages} unread' : 'Messages',
-                          onTap: widget.onMessages!,
-                          child: Icon(Icons.mail_outline_rounded, size: 18, color: p.ink2),
-                        ),
-                        if (widget.unreadMessages > 0)
-                          Positioned(
-                            top: -3,
-                            right: -3,
-                            child: IgnorePointer(
-                              child: Container(
-                                key: const ValueKey('preg_hero_messages_count'),
-                                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                alignment: Alignment.center,
-                                decoration: const BoxDecoration(color: Color(0xFF2F2C30), shape: BoxShape.circle),
-                                child: Text(widget.unreadMessages > 9 ? '9+' : '${widget.unreadMessages}',
-                                    style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white)),
-                              ),
-                            ),
-                          ),
-                      ]),
+                    // The envelope lived here from 2026-09-30 to 2026-10-31; it is beside the
+                    // avatar now (see the left side), and Search took its place.
+                    // Search (2026-10-31): the whole-stage search.
+                    if (widget.onSearch != null) ...[
+                      _Round(
+                        p: p,
+                        boxKey: const ValueKey('preg_hero_search'),
+                        semantic: 'Search',
+                        onTap: widget.onSearch!,
+                        child: Icon(Icons.search_rounded, size: 18, color: p.ink2),
+                      ),
                       const SizedBox(width: 8),
                     ],
                     if (widget.onCalendar != null) ...[

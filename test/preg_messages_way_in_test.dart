@@ -90,14 +90,22 @@ void main() {
       await t.pump(const Duration(milliseconds: 300));
     }
 
-    testWidgets('sits top right beside Saved, and opens the inbox', (t) async {
+    // Was 'sits top right beside Saved' (envelope left of Saved). The envelope
+    // moved to the top LEFT, beside the avatar, on 2026-10-31 (one header order
+    // on every home: avatar, Messages | date | Search, Calendar).
+    testWidgets('sits top left beside the avatar, left of the date, and opens the inbox', (t) async {
       var opened = 0;
       await pump(t, onMessages: () => opened++);
       final env = find.byKey(const ValueKey('preg_hero_messages'));
       expect(env, findsOneWidget);
+      final avatar = find.text('A'); // the avatar's initial
       final saved = find.bySemanticsLabel('Saved');
-      expect(t.getTopRight(env).dx, lessThan(t.getTopLeft(saved).dx + 1), reason: 'the envelope is left of Saved');
-      expect(t.getTopLeft(env).dy, closeTo(t.getTopLeft(saved).dy, 1), reason: 'on the same row');
+      final d = DateTime(2026, 9, 30);
+      final date = find.text('${d.day} September');
+      expect(t.getTopLeft(env).dx, greaterThan(t.getTopRight(avatar).dx - 1), reason: 'the envelope is right of the avatar');
+      expect(t.getTopRight(env).dx, lessThan(t.getTopLeft(date).dx + 1), reason: 'the envelope is left of the date');
+      expect(t.getTopLeft(saved).dx, greaterThan(t.getTopRight(date).dx - 1), reason: 'Saved stays on the right');
+      expect(t.getCenter(env).dy, closeTo(t.getCenter(avatar).dy, 2), reason: 'on the same row');
       await t.tap(env);
       expect(opened, 1);
     });
@@ -114,7 +122,7 @@ void main() {
           findsOneWidget);
     });
 
-    testWidgets('the date stays centred with the envelope beside Saved', (t) async {
+    testWidgets('the date stays centred with the envelope beside the avatar', (t) async {
       await pump(t, onMessages: () {}, unread: 2);
       final d = DateTime(2026, 9, 30);
       final date = t.getRect(find.text('${d.day} September'));

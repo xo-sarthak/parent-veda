@@ -93,6 +93,7 @@ import 'can_i/can_i_answer.dart' show openCanIAnswer;
 import 'profile/pv_you_screen.dart';
 import 'saved_screen.dart';
 // import 'search/pv_search_screen.dart'; // the home bar, kept for revert
+import 'search/pv_search_screen.dart' show openPvSearch; // the header's Search button (2026-10-31)
 // import '../widgets/pv_search_bar.dart';
 import '../services/scans_store.dart';
 // openAskVeda dropped from the show list with the Ask door. The FAB still calls
@@ -529,13 +530,18 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                 //   sizeLine: _sizeLine(week, weekContent),
                 //   onSize / onThisWeek: () => _openWeekSheet(context, week, weekContent, p),
                 onDetails: () => openPregWeek(context, pregnancy, _pageWeek(week)),
-                // The envelope, top right (2026-09-30).
+                // The envelope: top right 2026-09-30, top left beside the avatar
+                // since 2026-10-31 (one header order on every home).
                 onMessages: () => openPregMessages(context, pregnancy),
-                // Talk to someone, from the header (2026-10-14): all consults.
-                onTalk: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                  settings: const RouteSettings(name: 'consults'),
-                  builder: (_) => ConsultationsScreen(lang: pregnancy.language),
-                )),
+                // Search, top right before the calendar (2026-10-31).
+                onSearch: () => openPvSearch(context, pregnancy),
+                // Talk to someone, from the header (2026-10-14): all consults. Left
+                // the header 2026-10-31; it is the first row of You now
+                // (`openPvYou`, stage pregnancy). Kept for revert:
+                // onTalk: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                //   settings: const RouteSettings(name: 'consults'),
+                //   builder: (_) => ConsultationsScreen(lang: pregnancy.language),
+                // )),
                 unreadMessages: PregMessagesStore.instance.unreadCount,
                 // "20 weeks to go" with an (i), and past the due date the
                 // count keeps going (2026-09-30, gap analysis). Counted for the

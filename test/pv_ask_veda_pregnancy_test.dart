@@ -109,7 +109,10 @@ void main() {
       (t) async {
     await http.runWithClient(() async {
       await open(t, 'scan');
-      expect(find.text('More information'), findsOneWidget);
+      // The Reads section (2026-10-31: it was "More information" before the
+      // search flow), and its tab.
+      expect(find.byKey(const ValueKey('veda_tab_reads')), findsOneWidget);
+      expect(find.text('Reads'), findsWidgets);
       expect(find.byWidgetPredicate((w) =>
           w.key is ValueKey<String> &&
           (w.key as ValueKey<String>).value.startsWith('veda_local_')),

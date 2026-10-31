@@ -16,8 +16,16 @@
 //  chapter and nothing else. Do not "simplify" that away.
 // =============================================================================
 
+// ignore_for_file: unused_element, unused_field
+//
+// Ask Veda is drawn by the shared search shell since 2026-10-31
+// (lib/ask_veda/ask_veda_search_shell.dart). The earlier top bar, pill,
+// suggestion card, stage-search list and stacked sections below are DORMANT,
+// kept for revert, which is what the two ignores above are for.
+
 import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
+import '../../ask_veda/ask_veda_search_shell.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../ask_veda/pv_veda_reveal.dart';
@@ -41,6 +49,7 @@ import 'ttc_can_i_screen.dart';
 import 'ttc_common.dart';
 // import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_prepare_screen.dart';
+import 'ttc_profile_screen.dart' show openTtcProfile;
 import '../../ttc/ttc_precheck_notes.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_strings.dart';
@@ -226,8 +235,180 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
     });
   }
 
+  // ⚠️ ASK VEDA AS A SEARCH (2026-10-31, the approved Google-mobile-search
+  // prototype). The shared shell draws it; this screen keeps the request (and
+  // the partner-privacy rules in `_send`), the chapter's questions, the stage
+  // search, the reads it finds itself and what each card opens. Kept for
+  // revert: `_buildClassic` below, dormant.
   @override
   Widget build(BuildContext context) {
+    final t = TtcS.current();
+    final f = _feed;
+    final cycleDay = widget.partnerMode ? null : TtcStore.instance.today.cycleDay;
+    // The service's cards, less any she has asked not to see (her "Hide sex
+    // and intimacy content" choice holds here too).
+    final shown = f == null
+        ? null
+        : AskVedaResult(
+            answer: f.answer,
+            meaning: f.meaning,
+            actions: f.actions,
+            content: [for (final it in _shownContent(f)) it],
+            videos: f.videos,
+            products: f.products,
+            services: f.services,
+            source: f.source,
+            cacheHit: f.cacheHit,
+            usedContext: f.usedContext,
+          );
+    final chapter = ttcScreenChapter(TtcStore.instance.displayChapter);
+    return AskVedaSearchShell(
+      contextLine: cycleDay != null
+          ? 'cycle day $cycleDay'
+          : 'where you are in trying to conceive',
+      suggestHeading: 'Asked often where you are',
+      suggestions: ttcChapterContent[chapter]?.askVeda(t.hinglish) ?? const <String>[],
+      // Every chapter's questions, so a question from another point on the
+      // journey still completes.
+      pool: [
+        for (final c in ttcChapterContent.values) ...c.askVeda(t.hinglish),
+      ],
+      query: _query,
+      loading: _loading,
+      failed: _failed,
+      result: shown,
+      onAvatar: () => openTtcProfile(context),
+      onAsk: _send,
+      onClear: _clear,
+      onRetry: () {
+        if (_query != null) _send(_query!);
+      },
+      onOpen: (it, section) => _openItem(it),
+      // When the service sends no reading, we find our own: the TTC reads
+      // whose words match the question, matched on the phone.
+      contentFallback: [
+        for (final r in _matchingReads())
+          VedaRow(
+            meta: 'ParentVeda · Read',
+            title: r.title.en,
+            blurb: r.teaser.en,
+            icon: Icons.menu_book_outlined,
+            onTap: () => openTtcSurface(context, 'ttc_read/${r.id}'),
+          ),
+      ],
+      followUps: f == null ? const [] : _followUps(t),
+      // The shelf and the consults we already have, when the service names none.
+      emptyProducts: VedaRow(
+        title: "What's worth buying",
+        blurb: "The few things worth having while you're trying, and what to skip.",
+        icon: Icons.shopping_bag_outlined,
+        onTap: () => openTtcSurface(context, 'ttc_products'),
+      ),
+      emptyExperts: VedaRow(
+        title: 'Talk to an expert',
+        blurb: 'A fertility specialist, a gynaecologist or a counsellor, when you want a person.',
+        icon: Icons.support_agent_outlined,
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'ttc/consults'),
+          builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
+        )),
+      ),
+      // The stage's own tools, reads, Can I answers and products, matched on
+      // the phone as she types (2026-09-30), under the question completions.
+      typingExtras: _stageHitRows,
+      disclaimer: t.hinglish
+          ? 'Yeh general guidance hai — kuch bhi zaroori ho to apne doctor se zaroor poochho.'
+          : 'This is general guidance. Please check anything important with your doctor.',
+      offlineTitle:
+          t.hinglish ? 'Internet se connect karo' : 'Connect to the internet',
+      offlineBody: t.hinglish
+          ? 'Ask Veda ko personalised jawaab dene ke liye internet chahiye. Connection check karke dobara try karo.'
+          : "Ask Veda needs the internet to answer you. Please check your connection and try again.",
+      retryLabel: t.hinglish ? 'Dobara try karo' : 'Retry',
+    );
+  }
+
+  /// The stage search under the typing completions: what the stage has that
+  /// matches, grouped, each opening its real screen (the `_searchScroll` rows,
+  /// without its black "Ask Veda" row: the shell's first row does that).
+  List<Widget> _stageHitRows(String typed) {
+    final hits = ttcStageSearch(typed, him: widget.partnerMode);
+    final q = typed.trim();
+    return [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(ttcGutter, 18, ttcGutter, 0),
+        child: hits.isEmpty
+            ? Text(
+                'Nothing in trying to conceive matches "$q" yet. Ask Veda above.',
+                key: const ValueKey('ttc_ask_search_empty'),
+                style: ttcBody(13, color: ttcMuted, h: 1.45),
+              )
+            : Column(
+                key: const ValueKey('ttc_ask_search'),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('IN TRYING TO CONCEIVE',
+                      style: ttcBody(11, color: ttcMuted, w: FontWeight.w800)
+                          .copyWith(letterSpacing: 1.1)),
+                  const SizedBox(height: 8),
+                  for (final kind in TtcStageHitKind.values)
+                    if (hits.any((h) => h.kind == kind)) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 6),
+                        child: Text(kind.heading,
+                            style: ttcBody(14, color: ttcInk, w: FontWeight.w800)),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: ttcLine),
+                        ),
+                        child: Column(children: [
+                          for (final (i, h) in hits.where((h) => h.kind == kind).indexed) ...[
+                            if (i > 0)
+                              const Divider(height: 1, thickness: 1, color: ttcLine, indent: 48),
+                            InkWell(
+                              key: ValueKey('ttc_ask_hit_${kind.name}_$i'),
+                              onTap: () => h.open(context),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
+                                child: Row(children: [
+                                  Icon(kind.icon, size: 19, color: ttcTitleInk),
+                                  const SizedBox(width: 15),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(h.title,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: ttcBody(13.5, color: ttcInk, w: FontWeight.w700)),
+                                        if (h.line.isNotEmpty) ...[
+                                          const SizedBox(height: 2),
+                                          Text(h.line,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: ttcBody(12, color: ttcMuted)),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(Icons.chevron_right_rounded, size: 20, color: ttcMuted),
+                                ]),
+                              ),
+                            ),
+                          ],
+                        ]),
+                      ),
+                    ],
+                ],
+              ),
+      ),
+    ];
+  }
+
+  Widget _buildClassic(BuildContext context) {
     final t = TtcS.current();
     final hasResult = _query != null;
     return Scaffold(

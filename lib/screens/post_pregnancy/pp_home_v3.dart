@@ -129,6 +129,7 @@ import 'pp_section_registry.dart';
 import '../../data/doors/pp_door_data.dart';
 import 'doors/pp_door_screen.dart';
 import 'pp_section_screen.dart' show PpSectionTool, ppOpenPage;
+import 'pp_search.dart' show openPpSearch; // the header's Search button (2026-10-31)
 import 'pp_surface_router.dart';
 import 'pp_watch_data.dart';
 import '../../services/father_preview.dart';
@@ -424,8 +425,13 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   //     settings: const RouteSettings(name: 'pp/profile'),
                   //     builder: (_) => const FamilyProfileScreen())),
                   onProfile: () => openPvYou(context, stage: LifeStage.parenting),
-                  // Talk to someone, from the header (2026-10-14).
-                  onTalk: () => _openSurface(context, 'pp_experts'),
+                  // Talk to someone, from the header (2026-10-14). Left the header
+                  // 2026-10-31 (one header order on every home); it is the first
+                  // row of You now (`openPvYou`, stage parenting). Kept for revert:
+                  // onTalk: () => _openSurface(context, 'pp_experts'),
+                  // Search, top right before the calendar (2026-10-31): the
+                  // whole-stage search.
+                  onSearch: () => openPpSearch(context),
                   // ⚠️ ONE HEADER ON EVERY HOME (2026-10-25, the user: "unify
                   // the header as in parenting its a bit missing"). TTC and
                   // Pregnancy carry Messages and Calendar on the right; so does
@@ -4614,7 +4620,8 @@ class _PaintedHero extends StatelessWidget {
     required this.onSpine,
     required this.onSaved,
     required this.onProfile,
-    required this.onTalk,
+    // required this.onTalk, // left the header 2026-10-31, kept for revert (now row 1 of You)
+    required this.onSearch,
     required this.onMessages,
     required this.onCalendar,
     this.unreadMessages = 0,
@@ -4632,7 +4639,8 @@ class _PaintedHero extends StatelessWidget {
   final VoidCallback onSpine;
   final VoidCallback onSaved;
   final VoidCallback onProfile;
-  final VoidCallback onTalk;
+  // final VoidCallback onTalk; // kept for revert (2026-10-31)
+  final VoidCallback onSearch;
   final VoidCallback onMessages;
   final VoidCallback onCalendar;
   final int unreadMessages;
@@ -4687,13 +4695,42 @@ class _PaintedHero extends StatelessWidget {
                             : Text(initial.toUpperCase(),
                                 style: pvJakarta(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
                       ),
+                      // Talk to an expert stood here; it is row 1 of You now
+                      // (2026-10-31). Kept for revert:
+                      // const SizedBox(width: 8),
+                      // _HeroRound(
+                      //   p: p,
+                      //   semantic: 'Talk to an expert', // was 'Talk to someone' (2026-10-22)
+                      //   onTap: onTalk,
+                      //   child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
+                      // ),
+                      // Messages, beside the profile (2026-10-31; was top right).
                       const SizedBox(width: 8),
-                      _HeroRound(
-                        p: p,
-                        semantic: 'Talk to an expert', // was 'Talk to someone' (2026-10-22)
-                        onTap: onTalk,
-                        child: Icon(Icons.forum_outlined, size: 17, color: p.ink2),
-                      ),
+                      Stack(clipBehavior: Clip.none, children: [
+                        _HeroRound(
+                          key: const ValueKey('pp_hero_messages'),
+                          p: p,
+                          semantic: unreadMessages > 0 ? 'Messages, $unreadMessages unread' : 'Messages',
+                          onTap: onMessages,
+                          child: Icon(Icons.mail_outline_rounded, size: 18, color: p.ink2),
+                        ),
+                        if (unreadMessages > 0)
+                          Positioned(
+                            top: -3,
+                            right: -3,
+                            child: IgnorePointer(
+                              child: Container(
+                                key: const ValueKey('pp_hero_messages_count'),
+                                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                alignment: Alignment.center,
+                                decoration: const BoxDecoration(color: Color(0xFF2F2C30), shape: BoxShape.circle),
+                                child: Text(unreadMessages > 9 ? '9+' : '$unreadMessages',
+                                    style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white)),
+                              ),
+                            ),
+                          ),
+                      ]),
                     ]),
                   ),
                 ),
@@ -4740,31 +4777,15 @@ class _PaintedHero extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Stack(clipBehavior: Clip.none, children: [
-                        _HeroRound(
-                          key: const ValueKey('pp_hero_messages'),
-                          p: p,
-                          semantic: unreadMessages > 0 ? 'Messages, $unreadMessages unread' : 'Messages',
-                          onTap: onMessages,
-                          child: Icon(Icons.mail_outline_rounded, size: 18, color: p.ink2),
-                        ),
-                        if (unreadMessages > 0)
-                          Positioned(
-                            top: -3,
-                            right: -3,
-                            child: IgnorePointer(
-                              child: Container(
-                                key: const ValueKey('pp_hero_messages_count'),
-                                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                alignment: Alignment.center,
-                                decoration: const BoxDecoration(color: Color(0xFF2F2C30), shape: BoxShape.circle),
-                                child: Text(unreadMessages > 9 ? '9+' : '$unreadMessages',
-                                    style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white)),
-                              ),
-                            ),
-                          ),
-                      ]),
+                      // Messages stood here until 2026-10-31 (now beside the
+                      // profile, on the left); Search took its place.
+                      _HeroRound(
+                        key: const ValueKey('pp_hero_search'),
+                        p: p,
+                        semantic: 'Search',
+                        onTap: onSearch,
+                        child: Icon(Icons.search_rounded, size: 18, color: p.ink2),
+                      ),
                       const SizedBox(width: 8),
                       _HeroRound(
                         key: const ValueKey('pp_hero_calendar'),

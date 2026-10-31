@@ -80,11 +80,14 @@ void main() {
       (tester) async {
     await tester.pumpWidget(const MaterialApp(home: TtcAskVedaScreen()));
     await tester.pump();
+    // The search flow (2026-10-31): the bar on home opens the typing view.
+    await tester.tap(find.byKey(const ValueKey('veda_home_bar')));
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.enterText(find.byType(TextField), 'chai');
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.byKey(const ValueKey('ttc_ask_search')), findsOneWidget);
-    expect(find.byKey(const ValueKey('ttc_ask_search_ask')), findsOneWidget);
-    expect(find.text('Ask Veda: "chai"'), findsOneWidget);
+    // Her words are the first row: the whole question goes to Ask Veda.
+    expect(find.byKey(const ValueKey('veda_sug_typed')), findsOneWidget);
     expect(find.text('Can I…?'), findsOneWidget);
   });
 

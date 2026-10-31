@@ -34,6 +34,7 @@ import 'package:parentveda/screens/ttc/ttc_home_gap.dart';
 import 'package:parentveda/screens/ttc/ttc_home_v3.dart';
 import 'package:parentveda/screens/ttc/ttc_learn_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_messages_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_search_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_symptom_log_screen.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
@@ -386,6 +387,28 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('ttc_home_messages')));
       await tester.pumpAndSettle();
       expect(find.byType(TtcMessagesScreen), findsOneWidget);
+    });
+
+    // One header order on every home (2026-10-31): the envelope is beside the
+    // avatar on the LEFT (it was on the right, beside the calendar), Search
+    // and the calendar are on the right, and Talk to an expert is not here.
+    testWidgets('the envelope is left of the date, Search is right of it, and Search opens',
+        (tester) async {
+      inWindow();
+      await pumpHome(tester);
+      final env = tester.getRect(find.byKey(const ValueKey('ttc_home_messages')));
+      final search = tester.getRect(find.byKey(const ValueKey('ttc_home_search')));
+      final avatar = tester.getRect(find.bySemanticsLabel('Profile'));
+      expect(env.left, greaterThanOrEqualTo(avatar.right - 1),
+          reason: 'the envelope is right of the avatar');
+      expect(env.right, lessThan(180), reason: 'left half of a 360pt screen');
+      expect(search.left, greaterThan(180), reason: 'right half');
+      expect(env.top, closeTo(search.top, 1), reason: 'one row');
+      expect(find.bySemanticsLabel('Talk to an expert'), findsNothing,
+          reason: 'it is the first row of You now');
+      await tester.tap(find.byKey(const ValueKey('ttc_home_search')));
+      await tester.pumpAndSettle();
+      expect(find.byType(TtcSearchScreen), findsOneWidget);
     });
   });
 

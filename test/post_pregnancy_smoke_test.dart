@@ -528,7 +528,10 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: AskVedaScreen()));
     await tester.pumpAndSettle();
 
-    // type a question into the pinned search pill and submit
+    // Search flow (2026-10-31): tap the bar on home, then type and submit.
+    await tester.tap(find.byKey(const ValueKey('veda_home_bar')));
+    await tester.pumpAndSettle();
+    // type a question into the search bar and submit
     await tester.enterText(find.byType(TextField), 'the 4-month sleep regression');
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();

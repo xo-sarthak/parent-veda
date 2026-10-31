@@ -182,9 +182,14 @@ void main() {
       }
     });
 
-    test('Parenting: Messages and Calendar on the right, Saved moved to You', () {
+    // Was 'Messages and Calendar on the right, Saved moved to You'. Since
+    // 2026-10-31 (one header order): Messages beside the profile on the left,
+    // Search and Calendar on the right, Talk to an expert in You.
+    test('Parenting: Messages on the left, Search and Calendar on the right, Saved in You', () {
       final code = _code('lib/screens/post_pregnancy/pp_home_v3.dart');
       expect(code, contains("ValueKey('pp_hero_messages')"));
+      expect(code, contains("ValueKey('pp_hero_search')"));
+      expect(code, contains('onSearch: () => openPpSearch(context)'));
       expect(code, contains("ValueKey('pp_hero_calendar')"));
       expect(code, contains('onMessages: () => openPpMessages(context)'));
       // The child's own calendar since F7 (2026-10-25); the vaccines were the
