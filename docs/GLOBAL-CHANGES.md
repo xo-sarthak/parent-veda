@@ -33,7 +33,7 @@ Plan of record: `~/.claude/plans/in-this-chat-i-swift-hearth.md` (phases 0–7).
 | 9 | Stage transitions: solid + celebratory | Fixes LIVE (faf0f04); matrix + B1–B7, B10 LIVE (04847a5), see `docs/STAGE-TRANSITIONS.md`; family switch F1/F3, celebration pages F4 and turning six LIVE (adae4d5); B9 and B11 LIVE; per-pregnancy records and Kept for you LIVE (R1, 656bbb3, 0114 run); F2 Add a pregnancy from the family LIVE (2290cce); F5 one learning space per child LIVE (5fa51e2); F6 open on the last profile used, and taps open their own profile, LIVE (0d72a21); R8, R5, R6, R3, trying again, R2, F8 and F7 (child calendar) LIVE 57c844b (F8 and R3 also in the Ask Veda service) | Phase 5 |
 | 10 | Verb cards open actions, then pitch | LIVE (aa1fe9e, 7df4711) | Phase 2 |
 | 11 | "Talk to someone" → "Talk to an expert" | LIVE (faf0f04), labels only | Phase 0 |
-| 12 | Position-aware notifications | 6a LIVE for TTC, Pregnancy and Parenting (Parenting 2026-10-29, PARENTING-GAP 11, one cap with Pregnancy); 6b B0 (one tap opener) BUILT 2026-10-30; B1 (Firebase) and B2 (devices, consent, audience; 0140 run) BUILT 2026-10-30; B3 (campaigns, bookings, the rules; 0143 run, verify 50/0) BUILT 2026-10-30; B4 (the sender, 0144) BUILT 2026-10-30; B5 (the phone reads its booking, 0146) BUILT 2026-10-30; B6 (phone walk) onward OWED | Phase 6 |
+| 12 | Position-aware notifications | 6a LIVE for TTC, Pregnancy and Parenting (Parenting 2026-10-29, PARENTING-GAP 11, one cap with Pregnancy); 6b B0 (one tap opener) BUILT 2026-10-30; B1 (Firebase) and B2 (devices, consent, audience; 0140 run) BUILT 2026-10-30; B3 (campaigns, bookings, the rules; 0143 run, verify 50/0) BUILT 2026-10-30; B4 (the sender, 0144) BUILT 2026-10-30; B5 (the phone reads its booking, 0146) BUILT 2026-10-30; leftovers L1-L5 (campaign lock 0150, IST dates, quiet dates 0151, older-alarm taps, sync-log steps) BUILT 2026-10-31; B6 (phone walk) onward OWED | Phase 6 |
 | 13 | Relevance inside doors | Pregnancy LIVE (19078db); TTC phase tags LIVE (2d3a07f) | Phase 1 |
 | 14 | Nutrition door pitches | LIVE (7df4711); supplements WAITING on sheet | Phase 2 |
 | 15 | Action doors lead with an action | LIVE (aa1fe9e) | Phase 2 |
@@ -246,7 +246,7 @@ needed for those, they match by name / category.
 26 buttons and headings. Crisis lines and "someone you trust" prose
 unchanged, by decision.
 
-### 12 · Position-aware notifications — 6a LIVE in all three stages; 6b B0-B5 BUILT, B6 on OWED (Phase 6)
+### 12 · Position-aware notifications — 6a LIVE in all three stages; 6b B0-B5 and leftovers L1-L5 BUILT, B6 on OWED (Phase 6)
 
 **Asked:** notifications relevant to where she stands (phase / week / child
 age), milestone days (baby turns 2 months), offers and product pitches.
@@ -347,6 +347,20 @@ quote cost in USD and INR first).
   tap is recorded. Plan "As built: B5"; test `test/push_b5_test.dart`; verify
   `supabase/seed/verify_push_b5.sql`. 0146 run 2026-10-30, verify PASSED
   15 FAILED 0. Owed: the phone walk (B6). Next: B6, on the user's word.
+- **BUILT 2026-10-31 (6b leftovers L1-L5):** L1, migration 0150: an approved
+  campaign's words, link, targeting, dates, kind and priority are locked by a
+  trigger (Directus will skip the functions), and a cancelled one stays
+  cancelled. L2: the phone reads `send_on` and busy evenings in India's
+  calendar, so a phone abroad gives away the evening the server means. L3,
+  migration 0151: the phone uploads which evenings in the next 14 days are
+  TTC-quiet, so an offer cannot land in a two-week wait the yes/no missed
+  (un-parked by the user 2026-10-31); the yes/no stays the fallback. L4:
+  the 13 older schedulers and the TTC trigger alarms carry a payload and open
+  their page, with a toast where it has gone. L5: SYNC-LOG steps 33 and 34.
+  Plan "As built: leftovers"; tests `push_l1_campaign_lock_test`,
+  `push_l2_ist_dates_test`, `push_l3_quiet_evenings_test`,
+  `notifications_b0_tap_test` group 6. Owed: run 0150 and 0151 and their
+  verify files; the phone walk (B6).
 
 ### 13 · Relevance inside doors
 

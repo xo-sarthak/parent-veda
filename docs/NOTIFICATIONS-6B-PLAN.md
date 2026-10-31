@@ -338,7 +338,8 @@ parameter.
 
 **Out of B0, owed:**
 
-- **14 older schedulers still only open the app on a tap.** They are
+- ~~**14 older schedulers still only open the app on a tap.**~~ The 13 parent-app
+  ones done in leftover L4 (2026-10-31); the doctor app stays out. They are
   reminders, medicines, vaccines, appointments, bookings, sessions, referrals,
   brand messages, prescriptions, feeding, mood check, health records, the TTC
   ready plan and habits, and the doctor app. Each now only needs a `payload:`
@@ -554,12 +555,13 @@ quiet flag's truth table and wiring.
 
 **Owed from B3:**
 - ~~Run 0143, then the verify file (the user).~~ Run 2026-10-30: cron job 5, verify PASSED 50 FAILED 0, none skipped.
-- **A stale quiet flag.** The flag is as fresh as her last app open. If she
+- ~~**A stale quiet flag.**~~ Fixed in leftover L3 (0151), un-parked by the user
+  2026-10-31 (decision row 25). The flag is as fresh as her last app open. If she
   opens the app in her fertile window and not again for five days, the server
   still reads "not quiet" in her two-week wait. The fix, if the walk shows it
   matters: `quiet_evenings date[]`, the busy-evenings shape.
-- Campaign text can still be edited after approval by a direct table write
-  (the Directus phase should lock it).
+- ~~Campaign text can still be edited after approval by a direct table write
+  (the Directus phase should lock it).~~ Locked by a trigger in leftover L1 (0150).
 
 ### As built: B4 (2026-10-30)
 
@@ -721,13 +723,127 @@ drops the channel fails the build. Community also raised
   evening keeps the check-in off the phone; the Messages row from 19:00; a tap
   fills `tapped_at`; "Offers and news" appears in Android's settings for the
   app. And B4's `pv_campaign_test` reaching the phone, still owed.
-- **Time zones.** `send_on` is an IST date and the phone compares local dates.
+- ~~**Time zones.**~~ Fixed in leftover L2 (2026-10-31). `send_on` is an IST date and the phone compares local dates.
   The same on an Indian phone; a phone in another zone could give away the
   wrong evening. Revisit with iPhone (B7) or if users abroad appear.
 - An offline tap is not recorded (fire-and-forget). It is a measurement;
   losing a few is accepted.
 - iPhone: a foreground push on iOS needs `setForegroundNotificationPresentationOptions`
   or the same local path; B7.
+
+### As built: leftovers L1 to L5 (2026-10-31)
+
+Five fixes owed by B0, B3, B4 and B5, each its own commit. B6 (the phone walk)
+and B7 (iPhone) are not part of this.
+
+| # | What | Where | Run |
+|---|---|---|---|
+| L1 | An approved campaign's words are locked | `0150_push_campaign_lock.sql`, verify `supabase/seed/verify_push_campaign_lock.sql` (28 checks), test `test/push_l1_campaign_lock_test.dart` | Run 0150, then the verify file |
+| L2 | The phone reads the server's dates in India's calendar | `PushWire.ist*`, `push_audience.dart`, `push_bookings.dart`, `family_phone_plan.dart`, `pv_campaign_tonight.dart`; test `test/push_l2_ist_dates_test.dart` | Nothing to run |
+| L3 | The phone's quiet, as dates | `0151_push_quiet_evenings.sql`, verify `supabase/seed/verify_push_quiet_evenings.sql` (18 checks), test `test/push_l3_quiet_evenings_test.dart`; `push_b2_contract_test` now reads the newest definition | Run 0151 before installing an L3 build, then the verify file. Never re-run 0140 after it |
+| L4 | Tap payloads for the 13 older schedulers and the TTC trigger alarms | `NotificationLink` (15 local kinds), `NotificationOpener`, each scheduler; rows in `test/notifications_b0_tap_test.dart` group 6 | Nothing to run |
+| L5 | BACKEND-SYNC-LOG steps 33 (B4, 0144) and 34 (B5, 0146) | `docs/BACKEND-SYNC-LOG.md` | |
+
+**L1, the lock.** An example: "Garbh class, Sunday" is approved at 10:00 and
+booked for 4,000 people tonight. At 15:00 someone edits the title in
+Directus to "Garbh class, Saturday". Before L1 the 19:00 push would carry the
+new words, which nobody dry-ran or approved. Now the update is refused with
+"cancel it and create a new one". A `before update` trigger holds it, because
+Directus writes the table directly and skips every function (decision 5).
+
+- Locked once approved: `id, kind, title, body, link_kind, link_id, stages,
+  week_from, week_to, child_months_from, child_months_to, starts_on, ends_on,
+  priority`. Still allowed: `status` to `cancelled` (with `cancelled_at`),
+  `approved_at`, and an update that changes nothing locked.
+- **Two additions to the brief, both closing a back door:** `id` is locked
+  (a renamed campaign splits from its bookings), and **a cancelled campaign
+  stays cancelled** (otherwise: cancel, edit, set `approved` by hand).
+  Approved back to draft is refused for the same reason.
+- The test holds that every column of `push_campaigns` is either locked or
+  named free, so a column added later must be sorted on purpose.
+
+**L2, India's calendar.** `send_on` is an IST date and the campaign goes at
+19:00 IST. The phone compared both with its own calendar. An example: a
+phone in London at 23:00 on 31 Oct. In India that is 04:30 on 1 Nov, a
+morning, but the phone called it "the 31st, an evening" and could give the
+wrong evening away. Every push date and hour now goes through
+`PushWire.istDay` / `istHour` / `istTime` (a fixed +5:30; India has no summer
+time):
+
+- `pushBusyEvenings` (and its 14-day horizon, now counted by the calendar, not
+  14 x 24 hours);
+- `pushEveningBooked`, `pushBookedEvenings`;
+- **found and fixed in the same pass:** `PushBookings.tonight` and `refresh`
+  (the day it reads from), the cache's "from today", the 19:00 kept clear in
+  `parentingPhonePlan`, and the Messages row's "from 19:00".
+
+On an Indian phone nothing changes. The B5 "Time zones" owed line is closed.
+
+**L3, quiet as dates.** An example: she opens the app on day 12 of her cycle
+(the fertile window, not quiet) and not again for five days. On day 15 she is
+in her two-week wait, but the yes/no uploaded on day 12 still says "not
+quiet", so the server could book an offer. Now the phone sends WHICH evenings
+in the next 14 days are quiet, and on day 15 the server reads "quiet".
+
+- **Phone:** `pushTtcQuietEvenings` walks India's today to 14 days on and asks
+  each day the same rule as the yes/no (`pushTtcQuietFrom`): a loss with no
+  period since (held for the whole fortnight), the day's projected phase
+  (waiting or late), a treatment round open that day. A day it cannot work
+  out is quiet. Not trying: none. Sent as `p_quiet_evenings`, dates only.
+- **Server (0151):** `push_audience.quiet_evenings date[]`, **null** until a
+  phone sends it. `pv_push_audience` gains `p_quiet_evenings default null`;
+  the old two-argument function is dropped first, because a second function
+  beside it would make PostgREST refuse the older build's call as ambiguous.
+- **The rule in `pv_push_check`:** inside the fortnight the upload could see
+  (its IST date to 14 days on), the dates decide. The yes/no decides where
+  the dates cannot: an older build (null), and an evening past the
+  fortnight. That is the brief's "keep the yes/no as the fallback", and in
+  both places it is exactly what 0143 did. Every other line of
+  `pv_push_check` is 0143's; the test compares them line by line.
+- The server still never reads TTC data: no phase, no reason, only dates.
+
+**L4, the older alarms open their page.** 15 new link kinds, all local (the
+phone arms them; `push_campaigns`' link-kind check refuses them, so no build
+version is involved):
+
+| Alarm | Kind, id | A tap opens |
+|---|---|---|
+| Reminders (`NotificationService.schedule`) | `reminder`, the category | TTC habits: the Ready plan; Parenting `hw_*`: Wallet reminders; else Pregnancy reminders |
+| Medicines | `medicine`, the id | TTC: that medicine; Pregnancy: the medicine list |
+| Vaccines (`VaxStore`) | `vaccine`, child + visit | That child's visit |
+| Pregnancy appointments | `appointment`, the id | The Pregnancy calendar |
+| Parenting calendar (`PpApptReminders`) | `pp_appointment`, child + visit | That child's calendar |
+| TTC appointments | `ttc_appointment`, the id | That appointment |
+| Bookings (the classic list) and sessions | `session`, the booking id | The session page |
+| Referrals | `referral`, '' or `club` | Invites, or the Birth Club |
+| Brand messages | `brand`, the campaign id | Its sponsor sheet |
+| Prescriptions | `prescription`, the booking id | The prescription |
+| Feeding | `feeding`, the child | That child's feeds |
+| Mood check | `mood_check` | The mood check |
+| Health records medicines | `health_record`, child + `medications` | That child's medicines |
+| TTC Ready plan | `ttc_ready_plan` | The Ready plan |
+| TTC trigger alarms (not on the list; found) | `ttc_treatment` | The treatment round |
+
+- **No silent tap:** a medicine, reminder or appointment from a profile that
+  is not open, a gone appointment or session, a prescription not yet in,
+  an ended brand message, and a removed child each say so in a pvToast. A
+  removed child's page is never opened for another child.
+- `showNow` gained `payload` (brand messages and prescriptions use it). The
+  `PpApptReminders.schedule` and `TtcAppointmentsStore.schedulePhone` seams
+  gained `payload`; their 10 test fakes took the parameter. `PpApptReminders`
+  now keeps each reminder's child (`child` in its saved record; null for one
+  saved before L4, which opens the active child's calendar).
+- **Not routed, on purpose:** `vaccine_detail_screen.dart`'s demo sheet (no
+  live screen opens it) and the doctor app (decision 6).
+- **Found while testing, not L4's:** `pv_sign_out_mute_test` still counted 5
+  sign-out guards; B5's `showPush` made it 6. Fixed.
+
+**Owed from the leftovers:**
+- ~~Run 0150 and 0151 (in that order), then both verify files (the user).~~ Both run 2026-10-31; verify 0150 PASSED 28 FAILED 0. The 0151 verify first SKIPPED (the oldest profile is in the 10% holdout, so phone_quiet is never reached); it now borrows the oldest profile outside the holdout. Re-run 2026-10-31: PASSED 18 FAILED 0.
+- The phone walk (B6) adds: a TTC two-week wait with no app open (the quiet
+  date holds), and a tap on each older alarm kind.
+- Brand messages still show on the diagnostic id 999001 (`showNow`'s
+  default), so two can replace each other. Not changed here.
 
 ## Costs
 
@@ -781,6 +897,7 @@ account you need for the App Store anyway.
 | B3 | Migration: `push_campaigns`, `push_sends`, `pv_push_enqueue`, the admin functions, the 10:00 IST cron. Plus decisions 15 to 22 (holdout, `tapped_at`, 7-day grace, wider quiet incl. the phone flag, priority, cutoff, length limits, 1 a week) | `supabase/seed/verify_push_campaigns.sql` passes by hand. **BUILT 2026-10-30** (04132625), see "As built: B3"; 0143 run, verify 50/0 |
 | B4 | Edge function `push-send`: FCM HTTP v1, batches, dead tokens. **Reads only `pv_push_due()` / writes only `pv_push_mark()`, every minute through `pg_net`** (see "For B4, agreed with Community phase 3") | `pv_campaign_test` reaches your phone. **BUILT 2026-10-30**, see "As built: B4"; 0144 run, deployed, verify 38/0; the phone test owed |
 | B5 | Phone: read bookings, give the evening to the campaign, show it in Messages | Planner tests: a booked evening never rings two. **BUILT 2026-10-30**, see "As built: B5"; 0146 run, verify 15/0 |
+| L1-L5 | Leftovers: campaign lock, IST dates, quiet dates, older-alarm taps, sync-log steps | **BUILT 2026-10-31**, see "As built: leftovers"; 0150 and 0151 to run |
 | B6 | Phone walk, on the user's word | See "Owed" |
 | B7 | iPhone, once the Apple account exists | One test campaign on an iPhone |
 
@@ -827,6 +944,9 @@ before calling it done.
 | 22 | Weekly limit at launch (revises row 11)? | One a week, one constant, raised to two once open and opt-out rates look healthy | Recommended: **"cap 1 at launch"** | 2026-10-30 |
 | 23 | On a booked evening, does care still ring? | Yes: the campaign takes only the capped slot; a TTC treatment message and (no pregnancy) a child's moment still ring, an hour clear of 19:00 | Chosen in the B5 build and recorded (an offer never silences care); told in chat | 2026-10-30 |
 | 24 | How does the phone fill `tapped_at`? | `pv_push_tapped(row_id)`: own row, first tap wins, no status check; push_sends only | The user's brief ("a small own-row function") | 2026-10-30 |
+| 25 | Fix the stale quiet flag now, or wait for the walk to show it? | `quiet_evenings date[]`, the busy-evenings shape; the yes/no stays the fallback (older builds, and evenings past the upload's fortnight) | **Un-parked by the user**: an offer in the two-week wait is the sensitive case, and a one-session phone walk cannot test it (leftover L3) | 2026-10-31 |
+| 26 | What does the approved-campaign lock cover? | The brief's columns, plus `id`; approved can only become cancelled; a cancelled campaign stays cancelled | Brief's list, with the two back doors closed in the build (told in chat) (leftover L1) | 2026-10-31 |
+| 27 | Route the TTC trigger alarms too (not on the L4 list)? | Yes, to the treatment round: a tap that opens nothing is the bug L4 fixes | Chosen in the build, told in chat (leftover L4) | 2026-10-31 |
 
 Rows 7 to 11 and 13 were written while turning the agreed calls into tables.
 The user's "all recommended" covered them. If any reads wrong, change it here

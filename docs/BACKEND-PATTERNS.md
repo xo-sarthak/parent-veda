@@ -5771,3 +5771,60 @@ Function included) working before the redeploy. plpgsql callers bind by name whe
 they call is safe as long as a compatible one exists by the time they run.
 
 Pinned by `test/partner_editions_a4_test.dart` and `supabase/seed/verify_partner_offer_checkout.sql`.
+
+## 16zzz-l. Approval freezes what was approved; a date carries its calendar; send a schedule, not a snapshot; null, empty and missing are three answers (Notifications 6b leftovers, 0150 and 0151, 2026-10-31)
+
+The 6b leftovers were four small fixes, but each one is a general idea worth carrying.
+
+**1. Approval freezes what was approved (L1, 0150).** An approval is a promise about specific words, to a specific
+audience, on specific dates. If those can still change after the "yes", the yes means nothing. `pv_campaign_create`
+already refused to rewrite an approved campaign, but that rule lived in a function, and Directus will write the table
+directly (16zzz-c: a check on the table holds for every writer). So a `before update` trigger compares the locked
+columns as one row, `(new.title, new.body, ...) is distinct from (old.title, old.body, ...)`, and refuses. Two
+lessons came out of writing it:
+
+- **Look for the back door around your own lock.** Locking an approved row is not enough if it can be set back to
+  draft, edited and approved again, or cancelled, edited and set to approved by hand. So approved can only become
+  cancelled, and cancelled is final. A state machine is only as strong as its weakest transition.
+- **Sort every column on purpose.** The test lists the table's columns and fails if one is neither locked nor
+  named free. A column added next year would otherwise be editable after approval with no one deciding that.
+
+`is distinct from`, not `<>`: with `<>`, a change from null to a value compares as null, which is not true, and
+the trigger would let it through.
+
+**2. A date carries its calendar (L2).** `send_on = 2026-10-31` is not a fact on its own. It means "31 October in
+India". The phone compared it with its own calendar, which is the same thing in India and a different evening
+abroad (23:00 in London is 04:30 the next day in India). The fix is not a time-zone library. It is to say, at the
+one place dates cross the wire (`PushWire.istDay` / `istHour` / `istTime`), which calendar the contract uses. **A
+date in a contract is a date plus a zone, even when the zone is only written in a comment.** Prefer instants
+(`timestamptz`) where you can; where a business rule is about a calendar day ("one an evening"), name the
+calendar and convert at the edge. A fixed +5:30 is honest here because India has had no summer time since 1945; a
+zone with summer time would need the real rules.
+
+A smaller bug of the same family: "14 days ahead" written as `today.add(Duration(days: 14))` is 14 x 24 hours, which
+is not 14 calendar days across a summer-time change. `DateTime(y, m, d + 14)` counts days.
+
+**3. Send a schedule, not a snapshot (L3, 0151).** The phone used to send one yes/no, "quiet now". That is a
+snapshot, and a snapshot is only true at the moment it was taken. She opens the app in her fertile window and not
+again for five days, and the server still reads "not quiet" in her two-week wait. The phone already projects her
+cycle 14 days ahead, so it now sends the answer for each of those days: a schedule. A schedule stays true until its
+horizon, without the phone having to wake up. This is the same shape as `busy_evenings` (16zzz-a), and it keeps the
+data minimisation intact: the server gets dates, never the phase or the reason.
+
+**4. Null, empty and missing are three different answers.** `quiet_evenings` is null when a build that does not
+know the field uploaded (fall back to the yes/no), `{}` when a new build said "no quiet evening", and an evening past
+the upload's fortnight is "not known" (fall back again). Collapsing null into empty would have read every older
+phone as "never quiet". When you add a field to a running system, decide what its absence means before you decide
+its default. (The same idea as 16zzz-a's "missing means the true answer", taken one step further: here missing must
+mean "ask the old field".)
+
+**5. Adding a parameter is dropping an overload.** `pv_push_audience` gained a third parameter. `create or replace`
+with a different argument list makes a second function beside the first, and PostgREST then refuses a call that
+names only the old two as ambiguous: every phone on the older build would silently stop uploading. So 0151 drops the
+old signature first, and the new parameter has `default null` so the older call still lands (16zzz-k point 5, again).
+The flip side: re-running 0140 after 0151 would recreate the old one. A migration that is "safe to re-run" is only
+safe in order.
+
+Pinned by `test/push_l1_campaign_lock_test.dart`, `test/push_l2_ist_dates_test.dart`,
+`test/push_l3_quiet_evenings_test.dart`, and `supabase/seed/verify_push_campaign_lock.sql` /
+`verify_push_quiet_evenings.sql`.

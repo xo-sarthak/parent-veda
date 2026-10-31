@@ -1860,3 +1860,65 @@ item format changed. **Commit:** `ecb47348`.
 - Run 0143, then paste `supabase/seed/verify_push_campaigns.sql` into the SQL editor. It ends in a red error that is
   the report (50 checks, PASSED / FAILED) and rolls every fixture back. **Run 2026-10-30: PASSED 50 FAILED 0.**
 - `select jobname, schedule, active from cron.job where jobname = 'push-enqueue-daily';` shows one active row.
+
+## Step 33: the sender, every queue through two functions (Notifications 6b B4, 0144)
+
+**Date:** 2026-10-30 (built on the user's word; this entry written 2026-10-31 as leftover L5). **Migration:**
+`0144_push_send.sql`, run by the user 2026-10-30 (cron job 6). **Edge function:** `push-send`, deployed with
+`npx supabase functions deploy push-send --no-verify-jwt`. **Commit:** `6c22a269`.
+
+### Why
+- B3 books tonight's campaign as a `push_sends` row; nothing sent it. B4 is the worker that turns due rows into FCM
+  pushes, shaped with Community phase 3 so one sender serves every queue (`docs/NOTIFICATIONS-6B-PLAN.md`, "For B4,
+  agreed with Community phase 3").
+
+### What changed
+- [x] **0144:** `pv_push_due(limit)` returns every due row from every queue in one shape (`queue, row_id, user_id,
+  tokens, title, body, data, collapse_key, priority, channel`), claims what it hands out (`push_sends.claimed_at`, a
+  5-minute lease, `for update skip locked`), and ends what can no longer go (`past_cutoff`, `no_device`).
+  `pv_push_mark(queue, row_id, status, devices_sent, error, dead_tokens)` changes only a row still `queued` and
+  deletes dead tokens. `pv_push_tick()` on pg_cron `push-send-every-minute` calls the function through `pg_net` only
+  when `pv_push_any_due()`. `push_tests` + `pv_campaign_test(id, email)`: your own devices, within a minute.
+- [x] **Edge function `push-send`:** FCM HTTP v1, one request per token, 20 in flight, 500 rows a run; reads only
+  `pv_push_due`, writes only `pv_push_mark`; called with `PUSH_SEND_SECRET`, not the service-role key.
+- [x] **Secrets:** `FCM_SERVICE_ACCOUNT` and `PUSH_SEND_SECRET` (function secrets), Vault `push_send_url` and
+  `push_send_secret` (set by the user 2026-10-30).
+- [x] Pattern written up: BACKEND-PATTERNS §16zzz-d.
+- [x] Tests: `test/push_b4_contract_test.dart` (the sender calls no other function and reads no table).
+
+### Verify
+- Paste `supabase/seed/verify_push_send.sql` into the SQL editor (38 checks; #38 needs the two Vault secrets). It
+  ends in a red error that is the report and rolls back. **Run 2026-10-30: PASSED 38 FAILED 0**, and again after
+  Community's 0147.
+- `select jobname, schedule, active from cron.job where jobname = 'push-send-every-minute';` shows one active row.
+- Owed, on the phone walk: `select public.pv_campaign_test('<id>', '<your email>');` reaches the phone within a
+  minute (the phone had no B1/B2 build on 2026-10-30, so no token).
+
+## Step 34: the phone reads its booking; the channel and the tap (Notifications 6b B5, 0146)
+
+**Date:** 2026-10-30 (built on the user's word; this entry written 2026-10-31 as leftover L5). **Migration:**
+`0146_push_channel_and_tap.sql`, run by the user 2026-10-30, before Community's 0147 which builds on it. **Commit:**
+`5d43e3e9`.
+
+### Why
+- The server books an evening the phone called free, but that copy can be hours stale. B5 lets the phone read its
+  own bookings so a booked evening never rings two, shows the campaign in Messages, draws a push that arrives while
+  the app is open, and records a tap (`tapped_at`, decision row 16).
+
+### What changed
+- [x] **0146:** `pv_push_due` names the Android channel `offers_news` for `push_sends` and `push_tests`.
+  `pv_push_tapped(p_row_id)`: `authenticated` only, her own row, first tap wins, no status check (a tap can beat
+  the sender's mark).
+- [x] **App:** `PushBookings` (her `queued` and `sent` bookings from today, own-select RLS, cached per account,
+  refreshed on sign-in, resume and a campaign push; `SyncRegistry` register + reset). The three planners take
+  `bookedEvenings`; on a booked evening only care rings (a TTC treatment message; with no pregnancy, a child's
+  moment, an hour clear of 19:00). `PvCampaignTonight` in all three Messages screens. `PushService` creates the
+  channel, shows a foreground push, and records a tap from the background and foreground paths.
+- [x] Pattern written up: BACKEND-PATTERNS §16zzz-f.
+- [x] Tests: `test/push_b5_test.dart`; `ttc_with_child_messages_test` follows the planner's new parameter.
+
+### Verify
+- Paste `supabase/seed/verify_push_b5.sql` into the SQL editor (15 checks, ends in the red report and rolls back).
+  **Run 2026-10-30: PASSED 15 FAILED 0**, and again after 0147.
+- Owed, on the phone walk: a booked evening keeps the check-in off the phone; the campaign appears in Messages from
+  19:00; a tap fills `push_sends.tapped_at`; "Offers and news" appears in Android's notification settings.
