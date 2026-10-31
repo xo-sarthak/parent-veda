@@ -518,9 +518,12 @@ A2 as built.
 - [ ] **The old `chip: sponsor?.name` lines** (`pv_you_screen.dart`, three `PvIdentityCard` calls) are on layouts no
   stage has reached since 2026-10-07. They are kept for revert and untouched; if those layouts are ever deleted, the
   lines go with them.
-- [x] **The doctor's version of the benefit card — DECIDED 2026-10-31: not built.** The user chose sponsor only on
-  You, after a replica (https://claude.ai/artifact/7ZPoYurF4pzoqXFrByaaWe). A doctor stays a line on the homes and in
-  the Care Circle (D3).
+- [ ] **The doctor's version of the benefit card — MOVED TO A3 (2026-10-31).** First decided "sponsor only" after a
+  replica (https://claude.ai/artifact/7ZPoYurF4pzoqXFrByaaWe), then revised by the user the same day. A doctor or
+  clinic with a real benefit gets a words-only card on You (no logo, D3), built with the offer RPC.
+- [ ] **No way in to Benefits from Parenting** for a parent with no sponsor (found 2026-10-31).
+  `pp_more_sheet.dart` has no Benefits row, and `_supportRows`' "Employer benefits" row is never shown in the live
+  Settings. A3 adds an always-shown "Your benefits" row on You.
 - [x] **Settings had lost "About ParentVeda" on every stage — FIXED 2026-10-31.** Settings picked it as
   `support[3]`; the Our experts row (97c9ef57) was inserted before it, so About vanished and Our experts sat under
   "About" with no mark. Rows are now picked by title (`_supportRow`), Our experts moved to Support with a new

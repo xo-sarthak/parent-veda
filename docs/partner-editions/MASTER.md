@@ -56,7 +56,7 @@ https://claude.ai/artifact/8YGaoXWaS44DZmK5S573sZ
 | **A1** ✓ 2026-10-30, hash in memory | Parent (LAST) | `PartnerBrand` resolver, lockup strip, "Your doctor" line, welcome sheet in new onboarding | no | P4 |
 | **A2** ✓ 2026-10-31, hash in memory | Parent (LAST) | "Exclusively for you" rail, You chip with logo + benefit meter | no | A1, P4 |
 
-| **A3** | Parent | The rail's offer card: an RPC returning the caller's audience coupons (0142 gave coupons an audience; nothing reads it), then the card | yes (small RPC) | A2 |
+| **A3** | Parent (+ DB) | Partner offers, a doctor's benefit card on You, and one "Your benefits" row and page (detail at the bottom) | yes (small RPC) | A2 |
 
 D-phases and P-phases can run in either order; P3 needs D2 for `my_doctor_referrals` shape parity.
 
@@ -169,7 +169,33 @@ What was built:
 After the build, three more answers from the user (2026-10-31):
 - **`CarePartnerStore` refetches on sign-in too** (`SyncRegistry.register(refreshFromServer)`).
 - **The offer card is A3**, its own small phase with the coupon RPC (table above).
-- **A doctor family's You page is unchanged**, after a replica: https://claude.ai/artifact/7ZPoYurF4pzoqXFrByaaWe.
+- **A doctor family's You page is unchanged**, after a replica: https://claude.ai/artifact/7ZPoYurF4pzoqXFrByaaWe. **Revised the same day:** a doctor or clinic with a real benefit gets a words-only card in A3.
 
 Found and fixed in the same pass, not A2's own: Settings had lost "About ParentVeda" (picked by position, and the Our
 experts row moved it). Detail in STILL-OPEN §5.1g.
+
+### A3 (planned 2026-10-31, the user)
+Three parts, one phase. Same rules as A1 and A2: the storyboard and D1–D8 rule, `git status` first, touch only A3's
+files, one-line inserts, comment out never delete, English only, no partner colours, no navigation change.
+1. **Partner offers.** 0142 gave `programme_coupons` an audience (`audience_sponsor_id` / `audience_partner_id`), but
+   nothing on the phone can read a coupon by audience. Add one RPC that returns **the caller's own** audience coupons
+   only: `security definer`, `search_path = ''`, granted to `authenticated` only, using `_audience_ok(auth.uid(), …)`.
+   It returns the code, label, discount and expiry, never another family's coupon or any usage counts. Check the next
+   free migration number at build time (0147 is the latest on 2026-10-31). Write a `verify_*.sql` too. **The user
+   runs the migration.** Then add the storyboard's offer card to the A2 rail ("15% off lactation consults ·
+   Auto-applied"), using the rail's existing card.
+2. **A doctor's or clinic's benefit card on You.** Storyboard row 3, doctor variant: "From Dr Meera Rao", what she gets
+   (their offer, and the sessions only their patients see), and "Your health details stay private". **Words only:** no
+   logo, no monogram, no meter (D3). Show it only when there is at least one real benefit; otherwise it takes no room.
+   A sponsor's card still wins the slot under the hero (one partner, as for the strip). Revises A2's "doctor family:
+   nothing on You".
+3. **"Your benefits" on You, always shown.** One row on the You page opening one Benefits page that lists the
+   employer's benefits and the doctor's offer and sessions together. With no partner it reads "Does your employer
+   offer ParentVeda?" (a feature is never hidden). `employer_benefits_screen.dart` gains a care-partner section. A
+   rename of its title is fine; keep the route name `employer`, which others detect. Why: **Parenting has no way in
+   to Benefits** for a parent with no sponsor. `pp_more_sheet.dart` has no Benefits row, and the profile's own
+   "Employer benefits" row (`_supportRows` in `pv_you_screen.dart`) is in a list the live Settings never shows. Check
+   Pregnancy's and TTC's More rows still open the same page, so there is one page, not two.
+
+Open for the A3 chat to ask, only if the storyboard is silent: where exactly the "Your benefits" row sits on You
+(its own group under the hero card, or a row in an existing group), and the page's new title.
