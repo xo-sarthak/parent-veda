@@ -90,6 +90,7 @@ import 'pp_messages_store.dart';
 import 'preg_messages_store.dart';
 import 'push_audience.dart';
 import 'push_bookings.dart';
+import 'push_wire.dart' show PushWire;
 
 /// Pregnancy's kinds on the family scale. The order is [PregMessageKindInfo.slotRank]'s.
 double pregFamilyRank(PregMessageKind k) => switch (k) {
@@ -263,8 +264,10 @@ List<(int, PpMessage)> parentingPhonePlan({
     out,
     keepClearOf: [
       ...keepClearOf,
+      // 19:00 IST, as a phone time (6b leftover L2). Kept for revert:
+      //   DateTime(d.year, d.month, d.day, kPushCampaignHour),
       for (final d in bookedEvenings)
-        DateTime(d.year, d.month, d.day, kPushCampaignHour),
+        PushWire.istTime(d, kPushCampaignHour),
     ],
     now: now,
   );
@@ -444,6 +447,7 @@ class FamilyPhone {
       PushAudience.instance.upload(
         rings: [...rings, for (final (_, m) in ttc.phonePlanned(now: now)) m.at],
         quiet: pushTtcQuiet(now: now),
+        quietEvenings: pushTtcQuietEvenings(now: now),
         now: now,
       );
     } catch (_) {/* never let the server copy break the phone's arming */}

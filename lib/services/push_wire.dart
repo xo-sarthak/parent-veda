@@ -87,12 +87,16 @@ class PushWire {
     'p_decided_at': decidedAt.toUtc().toIso8601String(),
   };
 
+  /// [quietEvenings] (6b leftover L3, 0151): the IST evenings in the next
+  /// 14 days the phone calls quiet. Dates only; the reason stays here.
   static Map<String, dynamic> audienceParams({
     required List<DateTime> busyEvenings,
     required bool quiet,
+    required List<DateTime> quietEvenings,
   }) => {
     'p_busy_evenings': [for (final d in busyEvenings) dateKey(d)],
     'p_quiet': quiet,
+    'p_quiet_evenings': [for (final d in quietEvenings) dateKey(d)],
   };
 
   static Map<String, dynamic> tappedParams(String rowId) => {
@@ -104,6 +108,39 @@ class PushWire {
       '${d.year.toString().padLeft(4, '0')}-'
       '${d.month.toString().padLeft(2, '0')}-'
       '${d.day.toString().padLeft(2, '0')}';
+
+  // ---- the server's calendar is India's (6b leftover L2, 2026-10-31) -------
+  //
+  // push_sends.send_on and push_audience.busy_evenings are IST dates, and
+  // the campaign goes at 19:00 IST. A phone set to another zone has another
+  // calendar: 23:00 in London on the 31st is 04:30 on the 1st in India, a
+  // MORNING there. So every date or hour the phone compares with the
+  // server's is read in India, not in the phone's own zone. On an Indian
+  // phone the two are the same, which is why B5 got away with local dates.
+  //
+  // A fixed offset, not a time-zone database: India has had no summer time
+  // since 1945, and pulling in tz data for one zone that never moves would
+  // be weight with no answer it changes.
+
+  static const Duration istOffset = Duration(hours: 5, minutes: 30);
+
+  /// [at]'s wall clock in India. The fields read IST; the value is UTC-flagged,
+  /// so compare its fields, never the instant.
+  static DateTime ist(DateTime at) => at.toUtc().add(istOffset);
+
+  /// [at]'s calendar day in India, as a local date at midnight: the shape the
+  /// phone's sets of days already use, and what [dateKey] writes.
+  static DateTime istDay(DateTime at) {
+    final i = ist(at);
+    return DateTime(i.year, i.month, i.day);
+  }
+
+  /// [at]'s hour in India.
+  static int istHour(DateTime at) => ist(at).hour;
+
+  /// The instant [hour]:00 IST on India's [day], as a phone (local) time.
+  static DateTime istTime(DateTime day, int hour) =>
+      DateTime.utc(day.year, day.month, day.day, hour).subtract(istOffset).toLocal();
 
   /// Who is signed in, or null. Null when Supabase never started, which is
   /// the logged-out shape. Swapped in tests (not @visibleForTesting: the

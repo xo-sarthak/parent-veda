@@ -34,6 +34,22 @@ String _code(String path) => File(path)
     .where((l) => !l.trimLeft().startsWith('//'))
     .join('\n');
 
+/// The NEWEST migration that creates `public.<fn>`: a later file that
+/// replaces a function replaces its parameter list too (6b leftover L3: 0151
+/// gave pv_push_audience a third parameter). Reading 0140 only would pin the
+/// phone to a list the database no longer has.
+String _newestDefining(String fn) {
+  final files = Directory('supabase/migrations')
+      .listSync()
+      .whereType<File>()
+      .where((f) => f.path.endsWith('.sql'))
+      .toList()
+    ..sort((a, b) => a.path.compareTo(b.path));
+  final hit = files.lastWhere(
+      (f) => f.readAsStringSync().contains('create or replace function public.$fn('));
+  return hit.readAsStringSync();
+}
+
 /// The parameter names of `public.<fn>(...)` as created in the migration.
 List<String> _params(String sql, String fn) {
   final m = RegExp(
@@ -93,11 +109,16 @@ void main() {
             stage: PushWire.stageTrying, granted: false,
             source: PushWire.sourceCard, decidedAt: DateTime(2026, 10, 30)),
         PushWire.audience: PushWire.audienceParams(
-            busyEvenings: [DateTime(2026, 10, 31)], quiet: true),
+            busyEvenings: [DateTime(2026, 10, 31)], quiet: true,
+            quietEvenings: [DateTime(2026, 11, 1)]),
       };
       for (final e in sent.entries) {
-        expect(e.value.keys.toList(), _params(sql, e.key), reason: e.key);
+        expect(e.value.keys.toList(), _params(_newestDefining(e.key), e.key),
+            reason: e.key);
       }
+      // Kept for revert (L3): _params(sql, e.key), when 0140 was the only one.
+      expect(_params(_newestDefining(PushWire.audience), PushWire.audience),
+          ['p_busy_evenings', 'p_quiet', 'p_quiet_evenings']);
     });
 
     test('the three tables have the columns the plan names', () {

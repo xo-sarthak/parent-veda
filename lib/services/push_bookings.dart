@@ -22,9 +22,16 @@
 //
 //  ⚠️ THE CACHE IS HER ACCOUNT'S. It is stored with the user id and ignored
 //  for anyone else, and the in-memory list is forgotten on sign-out
-//  (`SyncRegistry.registerReset`). The phone's dates are local; the server's
-//  `send_on` is an IST date. The app is India-first, so they agree; a phone
-//  set to another zone could give the wrong evening away, and B7 revisits it.
+//  (`SyncRegistry.registerReset`).
+//
+//  ⚠️ INDIA'S CALENDAR (6b leftover L2, 2026-10-31). `send_on` is an IST date
+//  and the campaign goes at 19:00 IST, so "today", "tonight" and "is this
+//  ring in a booked evening" are all read in IST (`PushWire.istDay`,
+//  `istHour`). On an Indian phone that is the local calendar; on a phone in
+//  another zone it is the evening the server actually took.
+//  Kept for revert (B5): "The phone's dates are local; the server's `send_on`
+//  is an IST date. The app is India-first, so they agree; a phone set to
+//  another zone could give the wrong evening away, and B7 revisits it."
 // =============================================================================
 
 import 'dart:async';
@@ -55,7 +62,7 @@ class PushBooking {
   /// push_sends.id: the tap's row_id.
   final String rowId;
 
-  /// The evening, as a local date at midnight.
+  /// The evening, India's date (`send_on`), held as a local date at midnight.
   final DateTime day;
 
   /// `queued` or `sent`.
@@ -129,10 +136,11 @@ class PushBooking {
       Object.hash(rowId, day, status, title, body, linkKind, linkId);
 }
 
-/// The evenings in [bookings] that hold a campaign, from [now]'s day on, as
-/// local dates at midnight. What the three planners take. Pure.
+/// The evenings in [bookings] that hold a campaign, from India's today on,
+/// as dates at midnight. What the three planners take. Pure.
 Set<DateTime> pushBookedEvenings(Iterable<PushBooking> bookings, DateTime now) {
-  final today = DateTime(now.year, now.month, now.day);
+  // Kept for revert (L2): final today = DateTime(now.year, now.month, now.day);
+  final today = PushWire.istDay(now);
   return {
     for (final b in bookings)
       if (PushWire.bookingsHolding.contains(b.status) && !b.day.isBefore(today))
@@ -142,9 +150,13 @@ Set<DateTime> pushBookedEvenings(Iterable<PushBooking> bookings, DateTime now) {
 
 /// Whether [at] falls in the evening of a booked day: the half of the day the
 /// campaign takes (from [eveningFromHour], the planners' own split). Pure.
+///
+/// [at] is placed by its IST day and hour (L2): [booked] holds IST dates.
 bool pushEveningBooked(DateTime at, Set<DateTime> booked, int eveningFromHour) =>
-    at.hour >= eveningFromHour &&
-    booked.contains(DateTime(at.year, at.month, at.day));
+    // Kept for revert (L2): at.hour >= eveningFromHour &&
+    //     booked.contains(DateTime(at.year, at.month, at.day));
+    PushWire.istHour(at) >= eveningFromHour &&
+    booked.contains(PushWire.istDay(at));
 
 class PushBookings extends ChangeNotifier {
   PushBookings._();
@@ -175,8 +187,8 @@ class PushBookings extends ChangeNotifier {
 
   /// Tonight's campaign, for Messages, or null.
   PushBooking? tonight({DateTime? now}) {
-    final t = now ?? DateTime.now();
-    final today = DateTime(t.year, t.month, t.day);
+    // Kept for revert (L2): final today = DateTime(t.year, t.month, t.day);
+    final today = PushWire.istDay(now ?? DateTime.now());
     for (final b in _all) {
       if (b.day == today && b.showable) return b;
     }
@@ -202,7 +214,8 @@ class PushBookings extends ChangeNotifier {
     final t = now ?? DateTime.now();
     List<Map<String, dynamic>> rows;
     try {
-      rows = await PushWire.bookings(PushWire.dateKey(t));
+      // India's today (L2): send_on is an IST date.
+      rows = await PushWire.bookings(PushWire.dateKey(PushWire.istDay(t)));
     } catch (e) {
       debugPrint('[push] bookings not read: $e');
       return;
@@ -236,8 +249,7 @@ class PushBookings extends ChangeNotifier {
       if (raw == null || uid == null) return;
       final j = jsonDecode(raw);
       if (j is! Map || j['user'] != uid || j['rows'] is! List) return;
-      final today = DateTime.now();
-      final start = DateTime(today.year, today.month, today.day);
+      final start = PushWire.istDay(DateTime.now()); // L2: India's today
       _all
         ..clear()
         ..addAll([

@@ -21,12 +21,16 @@ import '../screens/v2/v2_palette.dart';
 import '../services/family_phone_plan.dart' show kPushCampaignHour;
 import '../services/notification_service.dart';
 import '../services/push_bookings.dart';
+import '../services/push_wire.dart' show PushWire;
 import 'pv_toast.dart';
 
-/// Whether [b] shows in Messages at [now]: sent, or its 19:00 has come. Pure.
+/// Whether [b] shows in Messages at [now]: sent, or its 19:00 IST has come
+/// (6b leftover L2: `b.day` is India's date, so its 19:00 is India's). Pure.
 bool pvCampaignShowsNow(PushBooking b, DateTime now) =>
     b.status == 'sent' ||
-    !now.isBefore(DateTime(b.day.year, b.day.month, b.day.day, kPushCampaignHour));
+    // Kept for revert (L2):
+    //   !now.isBefore(DateTime(b.day.year, b.day.month, b.day.day, kPushCampaignHour));
+    !now.isBefore(PushWire.istTime(b.day, kPushCampaignHour));
 
 class PvCampaignTonight extends StatelessWidget {
   const PvCampaignTonight({

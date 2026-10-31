@@ -38,13 +38,24 @@ const int kPushAudienceDays = 14;
 /// The evenings in [rings] from today to [kPushAudienceDays] ahead, each once,
 /// in order. An evening is the afternoon slot, from [kPregEveningFromHour]:
 /// the same split the phone's two-a-day plans use. Pure.
+///
+/// ⚠️ IN INDIA'S CALENDAR (6b leftover L2): the server compares these with
+/// `send_on`, an IST date, and books 19:00 IST. A ring is placed by its IST
+/// day and hour, so a phone in another zone names the evening the server
+/// means. On an Indian phone nothing changes.
 List<DateTime> pushBusyEvenings(Iterable<DateTime> rings, DateTime now) {
-  final today = DateTime(now.year, now.month, now.day);
-  final last = today.add(const Duration(days: kPushAudienceDays));
+  // Kept for revert (L2, local calendar):
+  //   final today = DateTime(now.year, now.month, now.day);
+  //   if (r.hour < kPregEveningFromHour) continue;
+  //   final d = DateTime(r.year, r.month, r.day);
+  final today = PushWire.istDay(now);
+  // By the calendar, not 14 x 24 hours: abroad, a summer-time change inside
+  // the fortnight would put the last day's midnight past the horizon.
+  final last = DateTime(today.year, today.month, today.day + kPushAudienceDays);
   final out = <DateTime>{};
   for (final r in rings) {
-    if (r.hour < kPregEveningFromHour) continue;
-    final d = DateTime(r.year, r.month, r.day);
+    if (PushWire.istHour(r) < kPregEveningFromHour) continue;
+    final d = PushWire.istDay(r);
     if (d.isBefore(today) || d.isAfter(last)) continue;
     out.add(d);
   }
@@ -111,6 +122,54 @@ bool pushTtcQuiet({DateTime? now}) {
   );
 }
 
+/// The IST evenings from India's today to [kPushAudienceDays] ahead on which
+/// [pushTtcQuiet]'s rule holds, each worked out for that day (6b leftover
+/// L3, 0151). The server reads the date; the yes/no stays as its fallback.
+///
+/// WHY DATES: the yes/no is as fresh as her last app open. Opened on day 12
+/// (fertile window) and not again for five days, it still says "not quiet"
+/// in her two-week wait. The phone already projects her cycle 14 days ahead
+/// for its own messages, so it can say which evenings will be quiet.
+///
+/// * after a loss: every day, until she logs a period (the phone cannot
+///   know when that will be, so it holds for the whole fortnight);
+/// * the two-week wait or late: from the day's own phase;
+/// * a treatment round: open on that day.
+///
+/// A day whose phase cannot be worked out is quiet, as in [pushTtcQuiet].
+/// Not trying: none, for the same reason the yes/no is false then.
+List<DateTime> pushTtcQuietEvenings({DateTime? now}) {
+  if (LifeStageStore.instance.stage != LifeStage.tryingToConceive) {
+    return const [];
+  }
+  final t = now ?? DateTime.now();
+  final c = CycleStore.instance;
+  final afterLoss = c.restartOn != null && c.lastPeriodStart == null;
+  final first = PushWire.istDay(t);
+  return pushQuietDays(first, (day) {
+    try {
+      return pushTtcQuietFrom(
+        trying: true,
+        afterLoss: afterLoss,
+        // The phone's TTC engine counts its own calendar days; India's date
+        // is handed to it as that day (the same y/m/d on an Indian phone).
+        phase: ttcDayContext(day, now: t).phase,
+        treatmentActive: ttcTreatmentActive(TtcTreatmentStore.instance.cycle, day),
+      );
+    } catch (_) {
+      return true;
+    }
+  });
+}
+
+/// The days from [first] to [kPushAudienceDays] after it, by the calendar,
+/// for which [quietOn] says yes. Pure; the seam [pushTtcQuietEvenings] fills.
+List<DateTime> pushQuietDays(DateTime first, bool Function(DateTime day) quietOn) => [
+      for (var i = 0; i <= kPushAudienceDays; i++)
+        if (quietOn(DateTime(first.year, first.month, first.day + i)))
+          DateTime(first.year, first.month, first.day + i),
+    ];
+
 class PushAudience {
   PushAudience._();
   static final PushAudience instance = PushAudience._();
@@ -118,14 +177,16 @@ class PushAudience {
   String? _lastSent;
 
   /// Uploads what the phone has just armed. [rings] is every notification
-  /// time set by the stage messages, all stages together.
+  /// time set by the stage messages, all stages together. [quietEvenings]
+  /// (L3): [pushTtcQuietEvenings].
   void upload({required Iterable<DateTime> rings, required bool quiet,
-      DateTime? now}) {
+      List<DateTime> quietEvenings = const [], DateTime? now}) {
     final uid = PushWire.userId();
     if (uid == null) return;
     final t = now ?? DateTime.now();
     final busy = pushBusyEvenings(rings, t);
-    final params = PushWire.audienceParams(busyEvenings: busy, quiet: quiet);
+    final params = PushWire.audienceParams(
+        busyEvenings: busy, quiet: quiet, quietEvenings: quietEvenings);
     // The same plan, for the same person, on the same day: nothing to say.
     final sig = '$uid|${PushWire.dateKey(t)}|$params';
     if (sig == _lastSent) return;
