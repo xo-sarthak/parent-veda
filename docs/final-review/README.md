@@ -14,7 +14,7 @@ Timestamps: IST, `YYYY-MM-DD HH:MM`, on every entry. Match them against
 
 | # | Track | File | Status (last update) |
 |---|---|---|---|
-| 1 | Build + install, three apps; test failures and fixes | `01-build-2026-10-31.md` | Parent INSTALLED 2026-10-31 18:22 (13 test fails fixed, uncommitted). Doctor and Partner wait for the user's word. |
+| 1 | Build + install, three apps; test failures and fixes | `01-build-2026-10-31.md` | Parent INSTALLED 2026-10-31 18:22 (13 test fails fixed, committed `5dd32638`). Doctor INSTALLED 18:49. Partner INSTALLED 19:11. **DONE.** |
 | 2 | Phone walk: every walk owed by past sessions, parent app first (doors and relevance lead) | `02-walks/` (one file per area + its own index) | Not started. Do not walk until the user says. |
 | 3 | Clear `STILL-OPEN.md` | `03-still-open/` | Not started |
 | 4 | Clear `BEFORE-LAUNCH.md` | `04-before-launch/` | Not started |
@@ -44,6 +44,6 @@ Order: 1 → 2 → 3/4/5. The user starts each step.
 
 - Do not run git; give the user the commands with explicit paths. No co-author trailer.
 - Ask before driving the phone (taps, installs). Screenshots are announced.
-- Phone `RZCX50ZKLBA` (S21 FE), wired. Run one build at a time.
+- Phone `RZCX50ZKLBA` (S21 FE), on Wi-Fi since 19:00: `adb connect 192.168.1.6:<port>` (the port changes when the screen locks). Run one build at a time.
 - Before each release build, delete the stale `<flavor>Release` native-lib folders
   (see track 1).
