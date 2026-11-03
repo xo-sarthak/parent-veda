@@ -29,6 +29,8 @@ import 'brand_context.dart';
 import 'brand_models.dart';
 import 'brand_store.dart';
 import 'brand_studio.dart';
+import 'brand_inbox.dart';
+import 'pee_safe/pee_safe_brand.dart' show kPeeSafeDemo;
 
 /// The minimum days between any two sponsored notifications. A PLACEHOLDER — a
 /// real sponsor's terms will set the true number; changing it is this one line.
@@ -45,6 +47,9 @@ class BrandNotifications {
   /// the system working correctly, not a failure).
   Future<BrandCampaign?> maybeSend({
     required BrandStage stage,
+    // Item 8: the week-36 campaign targets by week, so the pregnancy shell
+    // passes it in (captureBrandContext cannot read PregnancyController).
+    int? pregnancyWeek,
     DateTime? now,
   }) async {
     try {
@@ -59,7 +64,7 @@ class BrandNotifications {
 
       // Then the ordinary resolver: targeting, schedule, per-campaign cap, the
       // kill switch — all enforced here, exactly as every other slot.
-      final ctx = captureBrandContext(stage: stage, now: at);
+      final ctx = captureBrandContext(stage: stage, pregnancyWeek: pregnancyWeek, now: at);
       final campaign = BrandStudio.instance.resolve(BrandSlot.sponsoredNotification, ctx);
       if (campaign == null) return null;
 
@@ -78,9 +83,53 @@ class BrandNotifications {
       // impression for a notification that never landed.
       BrandStudioStore.instance.recordImpression(campaign.id);
       BrandStudioStore.instance.markNotificationSent(at);
+      // Kept in Messages too (brand_inbox.dart), after the OS has it.
+      await BrandInbox.instance.add(campaign.id, at);
       return campaign;
     } catch (_) {
       // A sponsored notification is never worth a broken session.
+      return null;
+    }
+  }
+
+  /// DEMO "send now" (Pee Safe demo, item 8). The campaign [campaignId] if it
+  /// may be sent on demand right now, else null.
+  ///
+  /// Only when BOTH kPeeSafeDemo and demo mode are on. Then it skips the two
+  /// frequency guards, the global gap and the per-campaign cap (blockReason
+  /// with ignoreCaps; demo mode already relaxes the audience). It never skips
+  /// the kill switch, `active`, or the schedule. Kept separate from [sendNow]
+  /// so the rule can be tested without the notification plugin.
+  BrandCampaign? demoSendable(String campaignId, {DateTime? now}) {
+    if (!kPeeSafeDemo) return null;
+    final studio = BrandStudio.instance;
+    if (!studio.demoMode) return null;
+    for (final c in studio.campaigns) {
+      if (c.id != campaignId || c.slot != BrandSlot.sponsoredNotification) continue;
+      final ctx = captureBrandContext(stage: BrandStage.parenting, now: now);
+      return studio.isEligible(c, ctx, ignoreCaps: true) ? c : null;
+    }
+    return null;
+  }
+
+  /// Sends [campaignId] now, for the demo. Returns it, or null when
+  /// [demoSendable] refuses. It records NO impression and does NOT start the
+  /// global gap: a demo tap must not spend a real parent's allowance, so the
+  /// trade is that "send now" leaves no trace in the frequency state.
+  Future<BrandCampaign?> sendNow(String campaignId) async {
+    try {
+      final c = demoSendable(campaignId);
+      if (c == null) return null;
+      await NotificationService.instance.showNow(
+        title: c.creative.headline,
+        body: _bodyWithDisclosure(c),
+        payload: NotificationLink(NotificationLink.brand, c.id).payload,
+      );
+      // The demo send lands in Messages as a real one would; it still leaves
+      // the frequency state alone.
+      await BrandInbox.instance.add(c.id, DateTime.now());
+      return c;
+    } catch (_) {
       return null;
     }
   }
@@ -90,6 +139,9 @@ class BrandNotifications {
   /// whole permission to be in the notification tray at all.
   String _bodyWithDisclosure(BrandCampaign c) {
     final line = c.creative.subline.isNotEmpty ? c.creative.subline : c.creative.story;
-    return '$line\n\nFrom ${c.brand.name}';
+    // ParentVeda speaks; the partner is named as the disclosure (the user,
+    // 2026-11-03: "parentveda should be there"). Kept for revert:
+    // return '$line\n\nFrom ${c.brand.name}';
+    return '$line\n\nWith ${c.brand.name} · Sponsored';
   }
 }

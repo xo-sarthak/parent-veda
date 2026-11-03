@@ -36,6 +36,7 @@ import 'package:flutter/material.dart';
 import '../booking/booking_store.dart' show BookingStore;
 import '../booking/prescription.dart' show PrescriptionStore;
 import '../brand/brand_studio.dart' show BrandStudio;
+import '../brand/pee_safe/pee_safe_notifications.dart' show openPeeSafeNotification;
 import '../brand/presented_by.dart' show showSponsorSheet;
 import '../services/last_profile.dart' show LastProfile;
 import '../services/life_stage_store.dart';
@@ -294,6 +295,9 @@ class NotificationOpener {
         }
         _push(context, 'invite', const InviteFriendsScreen());
       case NotificationLink.brand:
+        // Pee Safe demo (item 8): its notifications open the screen they talk
+        // about; anything else (or a screen this profile lacks) gets the sheet.
+        if (openPeeSafeNotification(context, link.id)) return;
         final c = BrandStudio.instance.campaigns.where((c) => c.id == link.id).firstOrNull;
         if (c != null) return showSponsorSheet(context, c);
         pvToast(context, kNotifGoneBrand);

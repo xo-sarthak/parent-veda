@@ -19,6 +19,9 @@
 import 'package:flutter/material.dart';
 
 
+import '../../brand/brand_models.dart' show BrandStage;
+import '../../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo;
+import '../../brand/premiere_screen.dart' show showPeeSafePremiereAtOpen;
 import '../../theme/app_theme.dart';
 import 'ttc_common.dart';
 import 'ttc_home_v3.dart';
@@ -89,6 +92,15 @@ class _TtcHomeScreenState extends State<TtcHomeScreen> {
     super.initState();
     TtcIntroGate.owed().then((owed) {
       if (mounted) setState(() => _introOwed = owed);
+      // Pee Safe demo (item 11): the launch film as the app opens, once per
+      // phone — not over the first-run introduction. BrandStage has no TTC
+      // value; the campaign's audience is everyone, so parenting is only the
+      // context it is resolved in.
+      if (owed == false && kPeeSafeDemo) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) showPeeSafePremiereAtOpen(context, stage: BrandStage.parenting);
+        });
+      }
     });
   }
 

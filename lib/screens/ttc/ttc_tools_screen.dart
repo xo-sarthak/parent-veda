@@ -409,6 +409,20 @@ final List<TtcToolGroup> ttcToolGroups = [
       //   descHi: 'Kya ab waqt hai',
       //   open: (c) => openTtcSurface(c, 'ttc_fertility_help'),
       // ),
+      // Pee Safe demo, tried and withdrawn 2026-11-03: a card into the TTC
+      // hygiene read. TTC's Tools holds tools only (a read is not one;
+      // test/ttc_tools_only_tools_test.dart), and the read is reached from
+      // the brand page and the Showcase. Kept for revert:
+      // if (kPeeSafeDemo)
+      //   TtcTool(
+      //     id: 'ps_hygiene',
+      //     icon: Icons.spa_outlined,
+      //     nameEn: 'Intimate hygiene',
+      //     nameHi: 'Intimate hygiene',
+      //     descEn: 'What helps while trying, and what to skip · with Pee Safe',
+      //     descHi: 'What helps while trying, and what to skip · with Pee Safe',
+      //     open: (c) => openPeeSafeRead(c, 'ps_read_ttc'),
+      //   ),
     ],
   ),
   TtcToolGroup(

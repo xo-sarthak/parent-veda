@@ -293,3 +293,82 @@ never settable from campaign data. Certification is an editorial judgement with
 an independent evaluation and a published methodology. **It is not for sale.**
 The field is on `Brand`, not `BrandCampaign`, precisely so a campaign can never
 confer it.
+
+## 15. The Pee Safe demo — what it added (2026-11-02)
+
+A stakeholder demo of one brand across every placement, behind the compile-time
+const `kPeeSafeDemo` (`lib/brand/pee_safe/pee_safe_brand.dart`). Plan and
+item-by-item record: `docs/PEE-SAFE-DEMO.md`. No database change; everything is
+local seed data and goes through `BrandStudio.resolve()` like any campaign.
+
+**New, generic (any brand can use them):**
+- **Brand page** — `lib/brand/brand_page_screen.dart`, route `'brand_page'`
+  via `BrandPageScreen.route(brand, launch:)`. Hero, story and film from the
+  brand's launch, products, a shelf of reads; an empty shelf renders an
+  invitation. Opened from the Launch Hub brand link.
+- **`PvRead.eyebrow` / `PvRead.footer`** — sponsored reads carry their
+  disclosure eyebrow and a products block after the doctor callout, inside the
+  one reader rather than a screen of their own.
+- **`replayPremiere(context, campaignId:)`** — replays one Premiere by id,
+  only under `demoMode`, recording no impression. Trade-off: a second entry
+  point beside `resolve()`, bought so a demo can pick *which* Premiere; the
+  demo-mode gate lives inside it so no caller can forget it.
+- **`BrandNotifications.demoSendable` / `sendNow`** — "send now" skips the gap
+  and the cap only under `kPeeSafeDemo && demoMode`, and records nothing: a
+  demo tap must not spend a real parent's allowance. `maybeSend` now takes
+  `pregnancyWeek`, with a pregnancy-side call in `main_scaffold.dart`.
+- **`PartnerBrand.demoLockup`, `PartnerOfferStore.demoOffers`** — memory-only
+  overrides, so a demo can light the Partner Edition rail and offer without a
+  store QR row in the cloud. `PartnerMark` draws a bundled `logoAsset`.
+- **Fix:** `_featuredItem()` asked `resolve()` with no placement key, and keys
+  match exactly — so no featured pick could ever resolve. It now asks per item.
+
+**Pee Safe only (`lib/brand/pee_safe/`):** brand + 13 products, 6 reads + FAQ,
+the postpartum recovery kit (`'pee_safe_recovery_kit'`), the collab lockup and
+shelf on four placements (featured `pp_selfcare`, hospital bag V1, the "After
+Birth Care" collection, `tv_essentials`), three notifications and their tap
+router, the store-QR switch, and the **Showcase** in You
+(`'pee_safe_showcase'`): seven cards, each "Show me" opening the real
+placement, plus "Reset demo".
+
+- **`showPeeSafePremiereAtOpen`** (`premiere_screen.dart`) — the Pee Safe
+  launch film as the app opens, once per phone, from all three stage shells
+  (`main_scaffold.dart`, `my_child_screen.dart`, `ttc_home_version.dart`, not
+  over the TTC intro). It reads the cap itself because `showPremiereIfAny`
+  honours `kPremiereAlwaysShow` (true), which is what made the Premiere repeat
+  and got it switched off on 2026-09-17; demo mode cannot repeat it either. It
+  loads the store first, since an unloaded store reads 0 impressions.
+  `BrandStudioStore.forgetImpressions(id)` lets "Reset demo" re-arm it.
+
+- **Second pass (2026-11-03).** `lib/brand/brand_inbox.dart`: a sponsored
+  notification, once it reaches the OS, is kept as a Messages row on all three
+  stages, in ParentVeda's voice with "With <brand> · Sponsored" as the
+  disclosure; the phone body ends the same way (was "From <brand>"). A local
+  store of its own, not a new kind in the three Messages stores: those are
+  cloud-synced and rebuild their list from rules on every refresh, so a row
+  pushed in from outside would be dropped or need a new persisted kind, cloud
+  shape and sign-out path three times over. Trade: the rows are this phone's
+  only. The recovery kit is a tool now (Pregnancy "Get ready", Parenting "For
+  you", global search) and wears `PregToolScaffold`. A TTC card into the
+  hygiene read was tried and withdrawn: TTC Tools holds tools only. The Brand
+  Studio tour opens on a Pee Safe hero, its rows carry a "Pee Safe" chip and
+  open Pee Safe's version, and it is off the old purple (ink and the V2
+  ground). Empty brand pages no longer say "coming soon".
+- **Placements belong on live screens.** A walk found the bag rows on the
+  retired `HospitalBagScreen` V1 and the featured/collection/travel picks on
+  the old Recommendations screens: correct code nobody reaches (the wiring
+  gate, CLAUDE.md). They moved to `ReadyForBirthScreen` and to the store's own
+  shelves (`pee_safe_store.dart`: catalogue rows labelled Sponsored, rating 0,
+  no price, appended after ParentVeda's picks so sponsorship buys a place on
+  the shelf, never a better one). A sponsored shelf row is still a catalogue
+  row, so it inherits every store rule; `PvProductImage` now reads bundled
+  `assets/` photos. The general lesson: when a screen is replaced, every
+  placement on it must move or it silently stops existing.
+
+**Unchanged on purpose:** ratings, the rank floor, the kill switch, the
+schedule, disclosure on every surface, and the *general* Premiere staying off
+at app open (§12 note, 2026-09-17) — only Pee Safe's plays, and only once.
+
+**Owed before real users:** the launch film was taken from Pee Safe's YouTube
+for the demo only — the master and written permission are needed
+(`docs/BEFORE-LAUNCH.md`). Turning `kPeeSafeDemo` off removes every surface.

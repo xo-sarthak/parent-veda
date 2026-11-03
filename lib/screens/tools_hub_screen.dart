@@ -41,6 +41,8 @@ import 'brand_showcase_screen.dart';
 import 'care_partner/care_debug_screen.dart';
 import '../brand/brand_models.dart';
 import '../brand/launch_hub_screen.dart';
+import '../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo;
+import '../brand/pee_safe/pee_safe_recovery_kit_screen.dart' show PeeSafeRecoveryKitScreen, kPeeSafeKitRoute;
 import 'product_guide/product_guide_hub_screen.dart';
 import 'prepare/prepare_hub_screen.dart';
 import 'tools/ask_veda_screen.dart';
@@ -383,6 +385,15 @@ class _ToolsHubScreenState extends State<ToolsHubScreen> {
               tool: TtcToolMark.hospitalBag,
               route: 'tools/hospital_bag',
               priority: PregPriority.birthPrep),
+          // Pee Safe demo: the recovery kit, on the shelf where she gets
+          // ready, next to the bag it completes. Sponsored, and the line says
+          // so. Behind the demo flag like every Pee Safe surface.
+          if (kPeeSafeDemo && !_ended)
+            _Tool('Recovery kit', Icons.checklist_rounded, AppTheme.tertiary400,
+                () => _open(kPeeSafeKitRoute, () => const PeeSafeRecoveryKitScreen()),
+                line: 'Eight small things for the weeks after birth · with Pee Safe',
+                tool: TtcToolMark.readyPlan,
+                route: kPeeSafeKitRoute),
           // Added by the gap analysis: the birth plan was built for the Labour
           // door and never listed here.
           // if (!_ended) // kept for revert (P4 D4)

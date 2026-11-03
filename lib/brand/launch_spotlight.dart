@@ -119,7 +119,7 @@ class _LaunchSpotlightState extends State<LaunchSpotlight> {
                           fontSize: 19,
                           height: 1.1,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF2D144C),
+                          color: const Color(0xFF2F2C30), // was 0xFF2D144C (2026-11-03)
                         ),
                       ),
                     ]),

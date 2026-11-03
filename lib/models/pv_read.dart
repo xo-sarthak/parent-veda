@@ -293,7 +293,28 @@ class PvRead {
     this.imageUrl,
     this.reviewed = true,
     this.shortAnswer,
+    this.eyebrow,
+    this.footer,
   });
+
+  /// A label set above the title, when one is TRUE wherever the read opens.
+  ///
+  /// ⚠️ NOT THE KICKER COME BACK. The kicker was retired because it named a
+  /// place ("FERTILE WINDOW") the reader may not have come from. A sponsor
+  /// disclosure ("PRESENTED BY PEE SAFE") is true from every door, and hiding
+  /// it would break the Brand Studio rule that a funded piece says so before
+  /// it says anything else (docs/PEE-SAFE-DEMO.md, item 5). Null on every read
+  /// that is not sponsored, so they render exactly as before.
+  final LocalizedText? eyebrow;
+
+  /// A stage-owned block drawn AFTER the when-to-see-someone callout, through
+  /// the same `PvReaderScreen.customBlock` seam as `PvReadSection.custom`.
+  ///
+  /// Exists for one rule: a sponsored read's products come at the very end,
+  /// after the clinical copy has finished at "see your doctor". As a section
+  /// they would sit above the FAQ and the doctor line. Opaque here for the
+  /// same reason `custom` is: the model stays widget-free and brand-free.
+  final Object? footer;
 
   /// Whether a named clinician stands behind the piece — true for every
   /// hand-written read (their `authorRole` names the reviewer and the month).

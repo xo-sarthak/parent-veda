@@ -137,6 +137,9 @@ class PartnerOfferStore extends ChangeNotifier {
   List<PartnerOffer> get all {
     final now = DateTime.now();
     return [
+      // Pee Safe demo (item 9): the store-QR offer, memory only. Empty
+      // outside the demo, so this line changes nothing there.
+      ...demoOffers,
       for (final o in _all)
         if (o.endsAt == null || o.endsAt!.isAfter(now)) o,
     ];
@@ -155,6 +158,15 @@ class PartnerOfferStore extends ChangeNotifier {
           for (final o in all)
             if (!o.isSponsor && o.audienceId == id) o,
         ];
+
+  /// Offers held on the phone only for the "Pee Safe store QR" demo (item 9).
+  /// Set and cleared by PeeSafeStoreQr; never fetched, saved or sent.
+  List<PartnerOffer> _demoOffers = const [];
+  List<PartnerOffer> get demoOffers => _demoOffers;
+  set demoOffers(List<PartnerOffer> v) {
+    _demoOffers = v;
+    notifyListeners();
+  }
 
   void ensureLoaded() {
     if (_loaded) return;

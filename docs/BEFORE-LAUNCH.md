@@ -29,6 +29,8 @@ The docs' own blockers (STILL-OPEN header, line 20), plus the ones this review a
 below.
 
 - [ ] **BLOCKER** · Remove the demo partners (`demo_%`, `demo_org_%`); a fake doctor is live on a public page · user · STILL-OPEN §1.3 · added 2026-10-17
+- [ ] **BLOCKER** · Turn off `kPeeSafeDemo` (`lib/brand/pee_safe/pee_safe_brand.dart`): the Pee Safe stakeholder demo (Showcase row in You, demo triggers that bypass caps) is not for real users · dev · `docs/PEE-SAFE-DEMO.md` P1 · added 2026-11-02
+- [ ] **BLOCKER** · `assets/brand/pee_safe/launch.mp4` was downloaded from Pee Safe's YouTube for the demo. It is bundled whether or not `kPeeSafeDemo` is on (pubspec declares the folder), so before any store build either get the master file and written permission from Pee Safe, or remove it · the user · `docs/PEE-SAFE-DEMO.md` 10b · added 2026-11-02
 - [ ] **BLOCKER** · `assetlinks.json` returns 404; needs the Play App Signing SHA-256 · website, once on Play · STILL-OPEN §1.1 · added 2026-10-17
 - [ ] **BLOCKER** · Website `APP_LIVE` → true on listing day, plus the store redirect and `referrer` on `/invite/` · website · STILL-OPEN §1.2, §8.2 · added 2026-10-17
 - [ ] **BLOCKER** · `kPremiereAlwaysShow` → `false` (still `true`, `lib/brand/premiere_screen.dart:47`) · dev · STILL-OPEN §1.4 · added 2026-10-17

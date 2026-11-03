@@ -21,6 +21,10 @@
 //  as the product's.
 // =============================================================================
 
+import '../../brand/brand_models.dart' show BrandStage;
+import '../../brand/brand_notifications.dart';
+import '../../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo;
+import '../../brand/premiere_screen.dart' show showPeeSafePremiereAtOpen;
 import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
@@ -56,6 +60,34 @@ class PpHomeVersionStore extends ChangeNotifier {
 }
 
 /// What `home_screen_b.dart` pushes instead of `MyChildScreen` directly.
+/// The parenting side's app-open moments, asked once when the home shell
+/// mounts: the Pee Safe launch film (once per phone), then a sponsored
+/// notification if one is due. They lived in MyChildScreen, the V1 home, so
+/// on V3, the home that ships, neither ever ran. Here they belong to the shell
+/// both homes sit in. Draws nothing. Order: the film is awaited first, so a
+/// notification never lands under the takeover.
+class _PpOpenMoments extends StatefulWidget {
+  const _PpOpenMoments();
+  @override
+  State<_PpOpenMoments> createState() => _PpOpenMomentsState();
+}
+
+class _PpOpenMomentsState extends State<_PpOpenMoments> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      if (kPeeSafeDemo) await showPeeSafePremiereAtOpen(context, stage: BrandStage.parenting);
+      if (!mounted) return;
+      await BrandNotifications.instance.maybeSend(stage: BrandStage.parenting);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
 class PpHomeScreen extends StatelessWidget {
   const PpHomeScreen({super.key, this.lang = AppLanguage.english});
 
@@ -80,6 +112,8 @@ class PpHomeScreen extends StatelessWidget {
             PpHomeVersion.v1 => const MyChildScreen(home: true),
             PpHomeVersion.v3 => PpHomeV3(lang: lang),
           },
+          // The app-open moments, once, whichever home is on (2026-11-03).
+          const _PpOpenMoments(),
           // LEFT, not right. On the right it sat underneath the global Ask FAB
           // and the V3 segment was unreachable — the control that switches the
           // experiment being covered by the thing it is meant to be compared

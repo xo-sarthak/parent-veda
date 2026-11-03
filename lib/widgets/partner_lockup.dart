@@ -181,6 +181,20 @@ class PartnerMark extends StatelessWidget {
       brand: Brand(id: 'partner', name: info.name, colour: _kMonogramInk),
       size: size,
     );
+    // Pee Safe demo (item 9): a bundled logo, the one place its lime shows.
+    final asset = info.logoAsset;
+    if (asset != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(size * 0.28),
+        child: Image.asset(
+          asset,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          errorBuilder: (_, _, _) => monogram,
+        ),
+      );
+    }
     final url = info.logoUrl;
     if (url == null) return monogram;
     return ClipRRect(

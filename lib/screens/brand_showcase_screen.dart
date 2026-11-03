@@ -18,13 +18,23 @@
 
 import 'package:flutter/material.dart';
 
+import 'products/pv_store_chrome.dart' show kPvInk;
+import 'v2/v2_palette.dart' show V2PaletteStore;
 import '../brand/brand_campaigns.dart';
 import '../brand/brand_mark.dart';
+import '../brand/brand_notifications.dart';
 import '../brand/brand_models.dart';
 import '../brand/brand_store.dart';
 import '../brand/brand_studio.dart';
 import '../brand/launch_hub_screen.dart';
 import '../brand/premiere_screen.dart';
+import '../brand/pee_safe/pee_safe_brand.dart';
+import '../brand/pee_safe/pee_safe_partner.dart';
+import '../brand/brand_page_screen.dart' show BrandPageScreen;
+import '../brand/pee_safe/pee_safe_reads.dart' show openPeeSafeRead;
+import '../brand/pee_safe/pee_safe_recovery_kit_screen.dart' show PeeSafeRecoveryKitScreen;
+import '../brand/pee_safe/pee_safe_showcase_screen.dart' show PeeSafeShowcaseScreen, kPeeSafeShowcaseReadId;
+import 'products/pv_shelf_screen.dart' show PvShelfScreen;
 import 'post_pregnancy/journeys_screen.dart';
 import 'post_pregnancy/products_compare_screen.dart';
 import 'post_pregnancy/reading_home_screen.dart';
@@ -36,11 +46,18 @@ import '../localization/app_language.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
 import '../widgets/pv_toast.dart';
 
-const _bg = Color(0xFFFBF9FE);
+// ⚠️ OFF THE OLD PURPLE (2026-11-03, the user: "make sure no old UI screens
+// are there ... the whole purple UI"). The tour now wears the app's one look:
+// the V2 ground, ink buttons and badges (one black accent app-wide), hairline
+// cards. Kept for revert:
+//   const _bg = Color(0xFFFBF9FE);
+//   const _line = Color(0xFFE7E3EE);
+//   const _purple = Color(0xFF6A30B6);
+Color get _bg => V2PaletteStore.instance.current.ground;
 const _ink = Color(0xFF2F2C30);
 const _soft = Color(0xFF69636C);
-const _line = Color(0xFFE7E3EE);
-const _purple = Color(0xFF6A30B6);
+Color get _line => V2PaletteStore.instance.current.line;
+const _purple = kPvInk;
 
 /// One row of the tour.
 class _Product {
@@ -128,12 +145,64 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
     BrandStudio.instance.demoMode = true;
   }
 
+  // Pee Safe demo (item 8): which notification "Show me" sends next. Each tap
+  // sends the next of the three, so the room sees all of them in turn.
+  int _notifTurn = 0;
+
   void _push(Widget screen) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => screen));
 
+  /// The rows Pee Safe has a live placement for: the chip on the row, and
+  /// where "Show me" goes while the demo is on.
+  static const Set<BrandSlot> _peeSafeSlots = {
+    BrandSlot.premiere,
+    BrandSlot.launchHub,
+    BrandSlot.sponsoredEducation,
+    BrandSlot.recoFeatured,
+    BrandSlot.sponsoredTool,
+    BrandSlot.sponsoredCollection,
+    BrandSlot.nativeDiscovery,
+    BrandSlot.sponsoredNotification,
+  };
+
+  /// Pee Safe demo: open the Pee Safe version of a row's placement, when it
+  /// has one. False falls through to the generic surface below.
+  bool _showPeeSafe(BrandSlot? slot) {
+    if (!kPeeSafeDemo) return false;
+    switch (slot) {
+      case BrandSlot.sponsoredEducation:
+        return openPeeSafeRead(context, kPeeSafeShowcaseReadId);
+      case BrandSlot.sponsoredTool:
+        Navigator.of(context).push(PeeSafeRecoveryKitScreen.route());
+        return true;
+      // The live store's shelves (2026-11-03), not the old Recommendations
+      // screens. Kept for revert: a RecoCollectionScreen of
+      // kPeeSafeCollectionKey, and the RecoDetailScreen of kPeeSafeTravelKey.
+      case BrandSlot.recoFeatured:
+      case BrandSlot.sponsoredCollection:
+        _push(const PvShelfScreen(categoryId: 'pvs_maternal_recovery'));
+        return true;
+      case BrandSlot.nativeDiscovery:
+        _push(const PvShelfScreen(categoryId: 'on_the_move'));
+        return true;
+      default:
+        return false;
+    }
+  }
+
   Future<void> _showMe(_Product p) async {
+    // Pee Safe demo: its own placement first. Kept for revert: the switch
+    // below ran for every row.
+    if (_showPeeSafe(p.slot)) return;
     switch (p.slot) {
       case BrandSlot.premiere:
+        // Pee Safe demo (item 3): replay the Pee Safe Premiere by id. Demo
+        // mode is on (initState), so the cap is looked past without wiping
+        // every other campaign's history.
+        if (kPeeSafeDemo) {
+          await replayPremiere(context, campaignId: kPeeSafePremiereId);
+          return;
+        }
         // Replay so it can be watched on demand - it is capped at once ever.
         BrandStudioStore.instance.replayAll();
         await showPremiereIfAny(context, stage: BrandStage.parenting);
@@ -152,6 +221,14 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
         _push(const RecommendationsScreen());
       case BrandSlot.compareGuide:
         _push(const ProductsCompareScreen());
+      case BrandSlot.sponsoredNotification when kPeeSafeDemo:
+        final id = kPeeSafeNotificationIds[_notifTurn % kPeeSafeNotificationIds.length];
+        _notifTurn++;
+        final sent = await BrandNotifications.instance.sendNow(id);
+        if (!mounted) return;
+        _toast(sent == null
+            ? 'Could not send. Is demo mode on?'
+            : 'Sent: ${sent.creative.headline}. Tap it in your notifications.');
       case BrandSlot.liveSession:
         // A debug/showcase surface with no PregnancyController in scope.
         // S.current is main.dart's mirror of the controller's language and is
@@ -190,7 +267,17 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
             style: pvManrope(fontSize: 13.5, height: 1.55, color: _soft),
           ),
           const SizedBox(height: 14),
+          // Pee Safe demo: the live partner first, before the catalogue.
+          if (kPeeSafeDemo) ...[
+            _peeSafeHero(),
+            const SizedBox(height: 14),
+          ],
           _demoBanner(live),
+          // Pee Safe demo (item 9): the Partner track's store-QR family.
+          if (kPeeSafeDemo) ...[
+            const SizedBox(height: 10),
+            const PeeSafeStoreQrSwitch(),
+          ],
           const SizedBox(height: 16),
           _partners(),
           const SizedBox(height: 18),
@@ -207,6 +294,118 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
       ),
     );
   }
+
+  /// "Pee Safe" on the rows with a Pee Safe placement. The lime is Pee
+  /// Safe's own colour, kept to a dot beside its name.
+  Widget _peeSafeChip() => Container(
+        key: const ValueKey('bs_pee_safe_chip'),
+        padding: const EdgeInsets.fromLTRB(6, 3, 8, 3),
+        decoration: BoxDecoration(
+          color: kPeeSafeWash,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kPeeSafe.colour.withValues(alpha: 0.6)),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: kPeeSafe.colour, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 5),
+          Text('Pee Safe',
+              style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, color: kPeeSafeInk)),
+        ]),
+      );
+
+  /// The partner on the tour today: its products, its logo, and the two ways
+  /// in (the Showcase walk and its brand page). Pee Safe's own surface, so
+  /// its lime and wash are allowed here.
+  Widget _peeSafeHero() => ClipRRect(
+        key: const ValueKey('bs_pee_safe_hero'),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          color: kPeeSafeWash,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            SizedBox(
+              height: 120,
+              child: Row(children: [
+                for (final img in const ['night_pads', 'intimate_wash', 'seat_sanitizer'])
+                  Expanded(
+                    child: Image.asset('assets/brand/pee_safe/$img.jpg',
+                        fit: BoxFit.cover,
+                        height: 120,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                  ),
+              ]),
+            ),
+            Container(height: 3, color: kPeeSafe.colour),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  BrandMark(brand: kPeeSafe, size: 30),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text('LIVE PARTNER',
+                        style: pvManrope(
+                            fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: _soft)),
+                  ),
+                  Text('8 placements',
+                      style: pvManrope(fontSize: 11, fontWeight: FontWeight.w700, color: _soft)),
+                ]),
+                const SizedBox(height: 10),
+                Text('Pee Safe, across the whole journey',
+                    style: pvFraunces(fontSize: 20, height: 1.2, fontWeight: FontWeight.w600, color: kPeeSafeInk)),
+                const SizedBox(height: 6),
+                Text(
+                  'A launch film as the app opens, reads a doctor would sign off, a recovery kit, '
+                  'and products where a parent is already looking. Every one labelled.',
+                  style: pvManrope(fontSize: 12.5, height: 1.5, color: _soft),
+                ),
+                const SizedBox(height: 14),
+                Row(children: [
+                  Expanded(
+                    child: PvPress(
+                      child: GestureDetector(
+                        key: const ValueKey('bs_pee_safe_walk'),
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => Navigator.of(context).push(PeeSafeShowcaseScreen.route()),
+                        child: Container(
+                          height: 42,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: kPeeSafeInk, borderRadius: BorderRadius.circular(12)),
+                          child: Text('Walk the Showcase',
+                              style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  PvPress(
+                    child: GestureDetector(
+                      key: const ValueKey('bs_pee_safe_page'),
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => Navigator.of(context).push(BrandPageScreen.route(kPeeSafe)),
+                      child: Container(
+                        height: 42,
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: _line),
+                        ),
+                        child: Text('Brand page',
+                            style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: kPeeSafeInk)),
+                      ),
+                    ),
+                  ),
+                ]),
+              ]),
+            ),
+          ]),
+        ),
+      );
 
   Widget _demoBanner(bool on) => Container(
         padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
@@ -292,6 +491,10 @@ class _BrandShowcaseScreenState extends State<BrandShowcaseScreen> {
                   if (p.stars == 5) ...[
                     const SizedBox(width: 6),
                     const Icon(Icons.star_rounded, size: 14, color: Color(0xFFE0A93B)),
+                  ],
+                  if (kPeeSafeDemo && _peeSafeSlots.contains(p.slot)) ...[
+                    const SizedBox(width: 8),
+                    _peeSafeChip(),
                   ],
                 ]),
                 const SizedBox(height: 3),

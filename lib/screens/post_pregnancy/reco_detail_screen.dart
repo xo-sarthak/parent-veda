@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
+import '../../brand/pee_safe/pee_safe_collab.dart';
 import '../../data/products/pv_catalog_adapters.dart' show pvIsRetiredSeedId;
 
 import 'development_activity_screen.dart';
@@ -37,6 +38,9 @@ class RecoDetailScreen extends StatefulWidget {
 
 class _RecoDetailScreenState extends State<RecoDetailScreen> {
   RecoItem get it => widget.item;
+
+  /// The Pee Safe placement keyed on this item, if any (item 7).
+  PeeSafePlacement? get _peeSafe => PeeSafePlacement.forRecoItem(it.id);
 
   String get _ageLabel {
     final m = ChildProfileStore.instance.ageInMonths;
@@ -183,8 +187,17 @@ class _RecoDetailScreenState extends State<RecoDetailScreen> {
                 _askRow('How do I get the most out of this?'),
               ])),
               const SizedBox(height: 12),
-              _pad(Text('Curated by ParentVeda editors - balanced, evidence-first, never sponsored.',
+              // Kept for revert: the line read "never sponsored" unconditionally,
+              // which is false on a page carrying a sponsored placement.
+              _pad(Text(
+                  _peeSafe?.resolve() == null
+                      ? 'Curated by ParentVeda editors - balanced, evidence-first, never sponsored.'
+                      : 'Curated by ParentVeda editors. Pee Safe sponsors the products below; it did not choose or rate this pick.',
                   textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.5))),
+              // Pee Safe demo (item 7): the featured pick and the travel kit
+              // carry products AFTER the item, each on its own key.
+              if (_peeSafe != null)
+                _pad(PeeSafeCollabShelf(placement: _peeSafe!, padding: const EdgeInsets.only(top: 20))),
             ],
           ),
 

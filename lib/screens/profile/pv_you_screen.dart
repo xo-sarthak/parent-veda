@@ -46,6 +46,8 @@ import '../../screens/post_pregnancy/pp_child_profile.dart';
 import '../../services/app_nav.dart';
 import '../../services/entitlement_store.dart';
 import '../../widgets/partner_benefit_card.dart'; // Partner Editions A2
+import '../../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo; // Pee Safe demo item 10
+import '../../brand/pee_safe/pee_safe_showcase_screen.dart' show PeeSafeShowcaseScreen;
 import '../../services/family_profile.dart';
 import '../../services/ready_birth_context_store.dart';
 import '../../services/journey_dates_store.dart';
@@ -2439,6 +2441,16 @@ class _PvYouScreenState extends State<PvYouScreen> {
               if (t.shown?.call() ?? true) _profileThingRow(p, t),
           // A3: always shown, the one way in to Benefits on every stage.
           PartnerBenefitsRow(tint: tint),
+          // Pee Safe demo (item 10): the Showcase, always visible while the
+          // demo build flag is on (decision P5), on every stage.
+          if (kPeeSafeDemo)
+            PvProfileRow(
+              key: const ValueKey('pv_profile_pee_safe_showcase'),
+              mark: TtcMoreArt(mark: TtcMoreMark.film, tint: tint),
+              title: 'ParentVeda × Pee Safe',
+              subtitle: 'The Showcase: every placement, in order',
+              onTap: () => Navigator.of(context).push(PeeSafeShowcaseScreen.route()),
+            ),
         ],
       ),
       // Her quiet rows (pregnancy: "If your pregnancy has ended"), last before

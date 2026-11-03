@@ -15,19 +15,22 @@ import 'package:flutter/material.dart';
 import 'brand_analytics.dart';
 import 'brand_context.dart';
 import 'brand_disclosure.dart';
+import 'brand_mark.dart';
 import 'brand_models.dart';
+import 'brand_page_screen.dart';
 import 'brand_studio.dart';
 import 'outbound.dart';
+import 'pee_safe/pee_safe_reads.dart';
 import '../theme/pv_fonts.dart';
 import '../localization/app_language.dart';
 import '../widgets/pv_feedback.dart' show PvPress;
 import '../widgets/pv_toast.dart';
 
-const _bg = Color(0xFFFBF9FE);
+const _bg = Color(0xFFFAF9F7); // was 0xFFFBF9FE lavender (2026-11-03, off the old purple)
 const _ink = Color(0xFF2F2C30);
 const _soft = Color(0xFF69636C);
 const _line = Color(0xFFE4E2E5);
-const _titleInk = Color(0xFF2D144C);
+const _titleInk = Color(0xFF2F2C30); // was 0xFF2D144C purple ink (2026-11-03)
 
 TextStyle _serif(double size, {FontWeight w = FontWeight.w600, Color color = _titleInk}) =>
     pvFraunces(fontSize: size, height: 1.12, fontWeight: w, color: color, letterSpacing: -0.4);
@@ -204,6 +207,10 @@ class LaunchDetailScreen extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // The promise, stated before anything the brand wrote.
               IndependenceNote(campaign: c),
+              const SizedBox(height: 14),
+              // The brand's own page (Pee Safe demo, item 4). A link the
+              // parent chooses, never a push.
+              _brandLink(context),
               const SizedBox(height: 18),
               Text(cr.story, style: _body(15, color: _ink, h: 1.65)),
               if (cr.expertHook.isNotEmpty) ...[
@@ -279,6 +286,17 @@ class LaunchDetailScreen extends StatelessWidget {
         ),
       );
 
+  Widget _brandLink(BuildContext context) => PvPress(child: GestureDetector(
+        key: const ValueKey('launch_brand_link'),
+        behavior: HitTestBehavior.opaque,
+        onTap: () => Navigator.of(context).push(BrandPageScreen.route(c.brand, launch: c)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          BrandLockup(brand: c.brand, markSize: 22, nameSize: 13.5, color: _ink),
+          const SizedBox(width: 4),
+          const Icon(Icons.chevron_right_rounded, size: 18, color: _soft),
+        ]),
+      ));
+
   /// The expert speaks for ParentVeda, not for the brand — so their note is
   /// allowed to undercut the launch, and here it does.
   Widget _expert() => Container(
@@ -287,9 +305,9 @@ class LaunchDetailScreen extends StatelessWidget {
         decoration: BoxDecoration(color: const Color(0xFFF3EEF7), borderRadius: BorderRadius.circular(16)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.verified_outlined, size: 15, color: Color(0xFF6A30B6)),
+            const Icon(Icons.verified_outlined, size: 15, color: Color(0xFF2F2C30) /* was 0xFF6A30B6 (2026-11-03) */),
             const SizedBox(width: 7),
-            Text(S.now.uiParentvedaSExpert, style: _eyebrow(color: const Color(0xFF6A30B6))),
+            Text(S.now.uiParentvedaSExpert, style: _eyebrow(color: const Color(0xFF2F2C30) /* was 0xFF6A30B6 */)),
           ]),
           const SizedBox(height: 11),
           Text('"${c.creative.expertHook}"', style: pvFraunces(fontSize: 15, height: 1.55, color: _ink)),
@@ -329,7 +347,12 @@ class LaunchDetailScreen extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: () {
             BrandAnalytics.instance.event(c, BrandEvent.resourceOpened, meta: {'resource': r.label});
-            pvToast(context, S.now.comingSoonLabel(r.label));
+            // Item 5: a resource with a real read opens it. Kept for revert:
+            // pvToast(context, S.now.comingSoonLabel(r.label));
+            final id = r.readId;
+            if (id == null || !openPeeSafeRead(context, id)) {
+              pvToast(context, S.now.comingSoonLabel(r.label));
+            }
           },
           child: Container(
             padding: const EdgeInsets.all(14),
@@ -339,7 +362,7 @@ class LaunchDetailScreen extends StatelessWidget {
               border: Border.all(color: _line),
             ),
             child: Row(children: [
-              const Icon(Icons.menu_book_outlined, size: 17, color: Color(0xFF6A30B6)),
+              const Icon(Icons.menu_book_outlined, size: 17, color: Color(0xFF2F2C30) /* was 0xFF6A30B6 */),
               const SizedBox(width: 11),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

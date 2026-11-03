@@ -7,6 +7,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo;
+import '../brand/pee_safe/pee_safe_recovery_kit_screen.dart' show PeeSafeRecoveryKitScreen;
 import '../ask_veda/ask_veda_mark.dart';
 
 import '../data/can_i_data.dart';
@@ -179,6 +181,10 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         // One name per tool (P4): "Hospital bag". Kept for revert: s.hbName.
         _Dest('Hospital bag', const ['hospital', 'bag', 'pack', 'labour'],
             Icons.luggage_rounded, (c) => ReadyForBirthScreen(controller: c)),
+        // Pee Safe demo: the recovery kit, as its Tools row (sponsored).
+        if (kPeeSafeDemo)
+          _Dest('Recovery kit', const ['recovery', 'kit', 'pads', 'postpartum', 'peri', 'pee safe'],
+              Icons.checklist_rounded, (_) => const PeeSafeRecoveryKitScreen(), hers: true),
         // ONE ENTRY (P1, 2026-10-28): the library was listed twice under one
         // title, so search showed it twice. Both keyword lists now sit on the
         // one row. Kept for revert: a second _Dest(s.tsrTitle, ['report',

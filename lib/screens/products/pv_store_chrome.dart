@@ -347,6 +347,14 @@ class PvProductImage extends StatelessWidget {
       radius: radius,
     );
     if (url == null) return well;
+    // A photo bundled with the app (a partner's own, e.g. Pee Safe's, which
+    // ship in assets/brand/) loads from the bundle, not the network.
+    if (url.startsWith('assets/')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: Image.asset(url, fit: fit, errorBuilder: (_, e, s) => well),
+      );
+    }
     final tint = HSLColor.fromAHSL(1, product.hue, 0.18, 0.95).toColor();
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
@@ -1426,7 +1434,10 @@ class _PvRetryImageState extends State<PvRetryImage> {
   }
 
   @override
-  Widget build(BuildContext context) => Image.network(
+  Widget build(BuildContext context) => widget.url.startsWith('assets/')
+      // A bundled photo (a partner's own): no host, so nothing to retry.
+      ? Image.asset(widget.url, fit: widget.fit, errorBuilder: (_, _, _) => widget.fallback)
+      : Image.network(
         widget.url,
         key: ValueKey('${widget.url}#$_attempt'),
         fit: widget.fit,

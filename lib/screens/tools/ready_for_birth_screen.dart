@@ -23,6 +23,7 @@
 //  no longer reads `meta.color`; each category's mark is `_kCatMark` below.
 // =============================================================================
 
+import '../../brand/pee_safe/pee_safe_collab.dart' show PeeSafeCollabShelf, PeeSafePlacement;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -350,6 +351,15 @@ class _ReadyForBirthScreenState extends State<ReadyForBirthScreen> {
                         for (final c in readyOrderFor(afterLoss: r.afterLoss))
                           _categoryRow(r, c),
                       ]),
+                      // Pee Safe demo (2026-11-03): its bag rows on THE bag,
+                      // the one every way in opens (they were on the retired
+                      // HospitalBagScreen V1). After her own list, which they
+                      // never change; never after a loss.
+                      if (!r.afterLoss)
+                        const PeeSafeCollabShelf(
+                          placement: PeeSafePlacement.hospitalBag,
+                          padding: EdgeInsets.only(top: 20),
+                        ),
                       const SizedBox(height: 8),
                       _startAgainLink(),
                     ])),

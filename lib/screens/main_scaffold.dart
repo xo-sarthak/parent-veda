@@ -18,6 +18,10 @@ import '../services/father_content_controller.dart';
 import '../services/father_preview.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
+import '../brand/brand_models.dart' show BrandStage;
+import '../brand/brand_notifications.dart';
+import '../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo;
+import '../brand/premiere_screen.dart' show showPeeSafePremiereAtOpen;
 // import '../brand/brand_models.dart'; // kept for revert — Premiere off at app open (2026-09-17)
 // import '../brand/premiere_screen.dart'; // kept for revert
 import '../theme/app_theme.dart';
@@ -133,6 +137,30 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
     //     pregnancyWeek: widget.pregnancy.currentWeek,
     //   );
     // });
+    // Pee Safe demo (item 11): the launch film as the app opens, once per
+    // phone. Only Pee Safe's: the general Premiere above stays off.
+    if (kPeeSafeDemo) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showPeeSafePremiereAtOpen(
+          context,
+          stage: BrandStage.pregnancy,
+          pregnancyWeek: widget.pregnancy.currentWeek,
+        );
+      });
+    }
+    // Pee Safe demo (item 8): the pregnancy side's natural moment for a
+    // sponsored notification, as the parenting home is for its own. Passes the
+    // week so the week-36 campaign can match; maybeSend decides everything
+    // else (gap, cap, audience) and almost always sends nothing.
+    if (kPeeSafeDemo) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        BrandNotifications.instance.maybeSend(
+          stage: BrandStage.pregnancy,
+          pregnancyWeek: widget.pregnancy.currentWeek,
+        );
+      });
+    }
   }
 
   @override

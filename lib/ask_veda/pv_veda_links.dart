@@ -41,6 +41,8 @@
 //  'ttcread' for it.
 // =============================================================================
 
+import '../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo;
+import '../brand/pee_safe/pee_safe_recovery_kit_screen.dart' show PeeSafeRecoveryKitScreen, kPeeSafeKitRoute;
 import 'package:flutter/material.dart';
 
 import '../data/doors/pv_door_data.dart';
@@ -185,6 +187,12 @@ final List<PvVedaTool> kPvVedaTools = [
       'What to pack for you, your baby and your partner', 'tools/hospital_bag',
       (c) => ReadyForBirthScreen(controller: c),
       keywords: const ['packing', 'labour bag', 'delivery bag']),
+  // Pee Safe demo: the recovery kit, as its Tools row (sponsored).
+  if (kPeeSafeDemo)
+    PvVedaTool('recovery_kit', (_) => 'Recovery kit',
+        'Eight small things for the weeks after birth · with Pee Safe', kPeeSafeKitRoute,
+        (_) => const PeeSafeRecoveryKitScreen(),
+        keywords: const ['pads', 'peri care', 'postpartum', 'pee safe']),
   PvVedaTool('birth_plan', (_) => 'Birth plan',
       'What you would like on the day, to share with your doctor',
       kLabourSurfaceBirthPlan, (c) => BirthPlanScreen(pregnancy: c),

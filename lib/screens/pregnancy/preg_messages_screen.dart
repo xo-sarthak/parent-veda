@@ -21,6 +21,7 @@
 //  one shared inbox is written down in docs/PREG-TTC-HANDOFF.md §8.
 // =============================================================================
 
+import '../../brand/brand_inbox.dart' show BrandInboxRows;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -311,6 +312,8 @@ class _PregMessagesScreenState extends State<PregMessagesScreen> {
                 const SizedBox(height: 18),
                 // 6b B5: tonight's campaign, from 19:00 (`pv_campaign_tonight.dart`).
                 PvCampaignTonight(p: p),
+                // Pee Safe demo: a sponsored note, once sent, in ParentVeda's voice.
+                BrandInboxRows(p: p),
                 if (!store.offersAsked && widget.pregnancy.isDueDateSet)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),

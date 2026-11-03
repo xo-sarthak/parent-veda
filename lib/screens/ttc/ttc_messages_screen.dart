@@ -27,6 +27,7 @@
 //    * M4: "What we send" is a section head in the display face.
 // =============================================================================
 
+import '../../brand/brand_inbox.dart' show BrandInboxRows;
 import 'package:flutter/material.dart';
 
 import '../../services/last_profile.dart' show LastProfile, kLastHomeRoot;
@@ -240,6 +241,9 @@ class _TtcMessagesScreenState extends State<TtcMessagesScreen> {
                     p: V2PaletteStore.instance.current,
                     padding: const EdgeInsets.only(bottom: 16),
                   ),
+                // Pee Safe demo: a sponsored note, once sent, in ParentVeda's voice.
+                if (!TtcPartnerMode.instance.on)
+                  BrandInboxRows(p: V2PaletteStore.instance.current, padding: const EdgeInsets.only(bottom: 16)),
                 if (!_store.offersAsked && !TtcPartnerMode.instance.on) ...[
                   _TtcOffersCard(store: _store),
                   const SizedBox(height: 16),

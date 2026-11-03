@@ -122,6 +122,13 @@ void main() {
       // be a full https URL, never a relative path a card would 404 on.
       for (final p in store.all) {
         for (final u in p.images) {
+          // Or a photo bundled with the app (a partner's own, 2026-11-03):
+          // PvProductImage and PvRetryImage load `assets/` from the bundle,
+          // so it must be a file that ships. Kept for revert: https only.
+          if (u.startsWith('assets/')) {
+            expect(File(u).existsSync(), isTrue, reason: '${p.id}: $u is not in the bundle');
+            continue;
+          }
           expect(u.startsWith('https://'), isTrue, reason: '${p.id}: $u');
         }
       }

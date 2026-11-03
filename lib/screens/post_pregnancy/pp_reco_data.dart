@@ -28,6 +28,7 @@ import 'pp_child_profile.dart';
 import '../../brand/brand_context.dart';
 import '../../brand/brand_models.dart';
 import '../../brand/brand_studio.dart';
+import '../../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo, kPeeSafeCollectionKey;
 import '../../brand/rank_floor.dart';
 import '../../services/family_profile.dart';
 import 'pp_development_data.dart';
@@ -262,6 +263,10 @@ const List<RecoCollection> kRecoCollections = [
   RecoCollection('indianbooks', 'Indian Story Books', 'Our own tales, our own faces.', Icons.auto_stories_outlined),
   RecoCollection('montessori', 'Montessori Picks', 'Simple, real, child-led.', Icons.spa_outlined),
   RecoCollection('music', 'Music & Rhymes', 'The songs that soothe and teach.', Icons.music_note_outlined),
+  // Pee Safe demo (item 7): a sponsoredCollection. ParentVeda chose the picks
+  // (items tagged 'afterbirth'); Pee Safe's products render after them.
+  if (kPeeSafeDemo)
+    RecoCollection(kPeeSafeCollectionKey, 'After Birth Care', 'Looking after you, in the weeks after birth.', Icons.self_improvement_outlined),
 ];
 
 RecoCollection recoCollectionById(String id) =>
@@ -788,7 +793,7 @@ const List<RecoItem> kReco = [
     consider: 'Not a fix for real low mood - if the fog does not lift, please reach out for support.',
     bestFor: 'Every tired parent.',
     skills: [], benefits: ['Parent wellbeing'],
-    collections: [], tags: ['parent', 'wellness', 'selfcare'],
+    collections: ['afterbirth'], tags: ['parent', 'wellness', 'selfcare'],
     subtype: 'Wellness guide', facets: {'kind': ['wellness'], 'topic': ['wellbeing']},
     relatedVideoId: 'mumwellness', relatedArticleId: 'matrescence',
   ),
@@ -799,7 +804,7 @@ const List<RecoItem> kReco = [
     consider: 'Skip any that trade in fear or rigid rules; you want reassurance, not pressure.',
     bestFor: 'Long feeds and stroller walks.',
     skills: [], benefits: ['Parent confidence'],
-    collections: [], tags: ['podcast', 'parent', 'listening', 'development'],
+    collections: ['afterbirth'], tags: ['podcast', 'parent', 'listening', 'development'],
     subtype: 'Podcast', facets: {'kind': ['podcast'], 'topic': ['development']},
   ),
   RecoItem(
@@ -809,7 +814,7 @@ const List<RecoItem> kReco = [
     consider: 'Track to understand, not to obsess; put it away once you have the picture.',
     bestFor: 'The "why won\'t he sleep?" weeks.',
     skills: [], benefits: ['Parent confidence'],
-    collections: [], tags: ['sleep', 'tracking', 'habit', 'parent'],
+    collections: ['afterbirth'], tags: ['sleep', 'tracking', 'habit', 'parent'],
     subtype: 'Tool', facets: {'kind': ['tool'], 'topic': ['sleep']},
   ),
   RecoItem(
@@ -1223,18 +1228,24 @@ String recoReason(RecoItem it, RecoContext ctx) {
 /// The reco item a live campaign has featured, if any — and only if it clears
 /// the quality floor on its own merits.
 RecoItem? _featuredItem() {
+  // Kept for revert (item 7, 2026-11-02): this asked resolve() with NO
+  // placementKey, but resolve() matches keys exactly and every featured
+  // campaign is keyed by its RecoItem id — so it could never return one.
+  //   final c = BrandStudio.instance.resolve(
+  //     BrandSlot.recoFeatured,
+  //     captureBrandContext(stage: BrandStage.parenting),
+  //   );
+  //   ... then matched c.placementKey against kReco.
+  // Now each item is asked about by its own key; the first live one wins, and
+  // the campaign list carries one featured pick at a time.
   try {
-    final c = BrandStudio.instance.resolve(
-      BrandSlot.recoFeatured,
-      captureBrandContext(stage: BrandStage.parenting),
-    );
-    if (c == null) return null;
-    final id = c.placementKey;
-    if (id == null) return null;
+    final ctx = captureBrandContext(stage: BrandStage.parenting);
     for (final r in kReco) {
+      final c = BrandStudio.instance.resolve(BrandSlot.recoFeatured, ctx, placementKey: r.id);
+      if (c == null) continue;
       // A product we would not recommend unpaid cannot be bought in at any
       // price. Sponsorship buys consideration, not entry.
-      if (r.id == id) return clearsQualityFloor(r.pvRating) ? r : null;
+      return clearsQualityFloor(r.pvRating) ? r : null;
     }
   } catch (_) {/* no feature */}
   return null;

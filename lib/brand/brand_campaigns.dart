@@ -21,6 +21,7 @@
 import 'package:flutter/material.dart';
 
 import 'brand_models.dart';
+import 'pee_safe/pee_safe_brand.dart';
 
 // ---- brands -----------------------------------------------------------------
 // `certified` stays false everywhere. Certification is an editorial judgement
@@ -106,6 +107,9 @@ const List<Brand> kBrands = [
   kNestle,
   kApollo,
   kFisherPrice,
+  // Pee Safe stakeholder demo (docs/PEE-SAFE-DEMO.md, item 3): added with its
+  // first campaign, the Premiere below.
+  kPeeSafe,
 ];
 
 // ---- campaign windows -------------------------------------------------------
@@ -311,6 +315,231 @@ final BrandCampaign _calmBalmPremiere = BrandCampaign(
         'A fragrance-free daily balm, launching into the category parents ask us about most. ParentVeda has no stake in it — here is what we think actually matters when you choose one.',
     cta: 'Watch the launch',
     videoRef: null, // no film yet — the surface renders its own title sequence
+  ),
+);
+
+// =============================================================================
+//  Pee Safe — stakeholder demo (docs/PEE-SAFE-DEMO.md, item 3)
+// -----------------------------------------------------------------------------
+//  Same two rules as every seed above: no invented facts about the company,
+//  and the expert speaks about the CATEGORY for ParentVeda. Audience is
+//  everyone (P3: relevance, not stage — TTC included). Listed only while
+//  kPeeSafeDemo is on.
+// =============================================================================
+
+final BrandCampaign _peeSafeLaunch = BrandCampaign(
+  id: kPeeSafeLaunchId,
+  brand: kPeeSafe,
+  slot: BrandSlot.launchHub,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: BrandAudience.everyone,
+  creative: const BrandCreative(
+    eyebrow: 'New from Pee Safe',
+    headline: 'Care for the in-between',
+    subline: 'Everyday hygiene for pregnancy, the hospital bag and the weeks after birth.',
+    story:
+        'The things mothers ask us about least out loud are often the body\'s quieter changes: more discharge in pregnancy, bleeding after birth, a public toilet with a toddler in tow. Pee Safe makes everyday intimate and toilet hygiene products for those moments. What follows is ParentVeda\'s own reading of what matters, whichever brand you buy.',
+    cta: 'Explore the launch',
+    // Item 10b: the brand page's film slot reads this (the launch's creative).
+    videoRef: kPeeSafeLaunchFilm,
+    expertName: 'Dr Meera Iyer',
+    expertRole: 'Obstetrician · on this category, for ParentVeda',
+    expertHook:
+        'Less is more down there. Water and a mild, unperfumed wash on the outside are enough, and after birth it is pads only until your check-up. If you soak a pad within an hour, pass large clots or run a fever, see your doctor.',
+    highlights: [
+      BrandHighlight(
+        title: 'Water is usually enough',
+        body: 'The vagina cleans itself. Wash the outside gently, skip perfume, and never douche.',
+        icon: Icons.water_drop_outlined,
+      ),
+      BrandHighlight(
+        title: 'Pads after birth',
+        body: 'Nothing internal, no tampons or cups, until your doctor has seen you after the birth.',
+        icon: Icons.health_and_safety_outlined,
+      ),
+      BrandHighlight(
+        title: 'Pack for the first week',
+        body: 'Maternity pads, disposable underwear and a way to rinse with water cover most of the first days.',
+        icon: Icons.luggage_outlined,
+      ),
+    ],
+    // Item 5: every resource points at a real read (pee_safe_reads.dart), so
+    // the brand page's shelf and the launch's list open PvReaderScreen.
+    // test/pee_safe_reads_test.dart holds each readId to a read that exists.
+    // The item-3 pair, kept for revert (no readId, toast on tap):
+    // BrandResource(label: 'Discharge in pregnancy', blurb: 'What is normal, what changes, and when to call your doctor. Written by ParentVeda.'),
+    // BrandResource(label: 'Bleeding after birth', blurb: 'How long it lasts, how it changes, and the signs that need a doctor. ParentVeda\'s guide.'),
+    resources: [
+      BrandResource(
+        label: 'Discharge in pregnancy',
+        blurb: 'What is normal, what changes, and when to call your doctor. Written by ParentVeda.',
+        readId: 'ps_read_discharge',
+      ),
+      BrandResource(
+        label: 'UTIs and toilet hygiene',
+        blurb: 'Why urine infections are more common in pregnancy, and what really helps on the loo.',
+        readId: 'ps_read_uti',
+      ),
+      BrandResource(
+        label: 'Bleeding after birth, and the pads for it',
+        blurb: 'How long it lasts, how it changes, and the signs that need a doctor. ParentVeda\'s guide.',
+        readId: 'ps_read_lochia',
+      ),
+      BrandResource(
+        label: 'Gentle care down below after birth',
+        blurb: 'Stitches, soreness and the first weeks, step by step.',
+        readId: 'ps_read_peri',
+      ),
+      BrandResource(
+        label: 'When your periods come back',
+        blurb: 'When to expect them, how they can feel, and why contraception matters first.',
+        readId: 'ps_read_periods',
+      ),
+      BrandResource(
+        label: 'Intimate hygiene while trying to conceive',
+        blurb: 'What to keep, what to drop, and why simple is kindest.',
+        readId: 'ps_read_ttc',
+      ),
+      BrandResource(
+        label: 'Intimate hygiene: your questions',
+        blurb: 'Short answers to the questions people search for late at night.',
+        readId: 'ps_read_faq',
+      ),
+    ],
+  ),
+);
+
+/// Item 5 — the Pee Safe reading shelf. ParentVeda's reads, Pee Safe's
+/// funding, a visible attribution on every one (pee_safe_reads.dart). The
+/// placement is the shelf itself, so this can never brand another collection.
+final BrandCampaign _peeSafeEducation = BrandCampaign(
+  id: kPeeSafeEducationId,
+  brand: kPeeSafe,
+  slot: BrandSlot.sponsoredEducation,
+  placementKey: kPeeSafeReadsPlacement,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: BrandAudience.everyone,
+  creative: const BrandCreative(
+    eyebrow: 'Presented',
+    headline: 'Read with Pee Safe',
+    subline: 'ParentVeda\'s reads on intimate and toilet hygiene, funded by Pee Safe.',
+    story: '',
+    cta: '',
+  ),
+);
+
+/// Item 6 — the postpartum recovery kit. ParentVeda's checklist, Pee Safe's
+/// funding. Its own placementKey, so it can never brand another tool.
+final BrandCampaign _peeSafeKitTool = BrandCampaign(
+  id: kPeeSafeKitToolId,
+  brand: kPeeSafe,
+  slot: BrandSlot.sponsoredTool,
+  placementKey: kPeeSafeKitPlacement,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: BrandAudience.everyone,
+  creative: const BrandCreative(
+    eyebrow: 'Presented',
+    headline: 'Recovery kit',
+    subline: "ParentVeda's postpartum checklist, funded by Pee Safe.",
+    story: '',
+    cta: '',
+  ),
+);
+
+// ---- Product placements (item 7) --------------------------------------------
+// Four campaigns, four keys, one per surface. The host content (a reco item, a
+// checklist, a collection) is ParentVeda's and unchanged; the products render
+// after it, through PeeSafeCollabShelf (pee_safe/pee_safe_collab.dart).
+
+/// The featured pick. Keyed on an EXISTING RecoItem with its own rating
+/// (pp_selfcare, 4.5): Pee Safe buys consideration, never a rating. Inserted by
+/// the rank floor, so never slot 0 and never above a better pick.
+final BrandCampaign _peeSafeFeatured = BrandCampaign(
+  id: kPeeSafeFeaturedId,
+  brand: kPeeSafe,
+  slot: BrandSlot.recoFeatured,
+  placementKey: kPeeSafeFeaturedKey,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: BrandAudience.everyone,
+  creative: const BrandCreative(
+    eyebrow: 'Featured',
+    headline: 'Featured with Pee Safe',
+    subline: 'Placed by merit, labelled, and never above a better pick.',
+    story: '',
+    cta: '',
+  ),
+);
+
+/// Pee Safe rows after the hospital bag checklist (V1, the one that opens).
+final BrandCampaign _peeSafeBag = BrandCampaign(
+  id: kPeeSafeBagId,
+  brand: kPeeSafe,
+  slot: BrandSlot.sponsoredTool,
+  placementKey: kPeeSafeBagKey,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: BrandAudience.everyone,
+  creative: const BrandCreative(
+    eyebrow: 'Presented',
+    headline: 'Hospital bag',
+    subline: 'Pee Safe picks after your own list.',
+    story: '',
+    cta: '',
+  ),
+);
+
+/// The "After birth care" collection. ParentVeda chose every pick in it.
+final BrandCampaign _peeSafeCollection = BrandCampaign(
+  id: kPeeSafeCollectionId,
+  brand: kPeeSafe,
+  slot: BrandSlot.sponsoredCollection,
+  placementKey: kPeeSafeCollectionKey,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: BrandAudience.everyone,
+  creative: const BrandCreative(
+    eyebrow: 'Presented',
+    headline: 'After Birth Care',
+    subline: 'Supported by Pee Safe.',
+    story: '',
+    cta: '',
+  ),
+);
+
+/// Travel products after "The 4-month travel kit" reco.
+final BrandCampaign _peeSafeTravel = BrandCampaign(
+  id: kPeeSafeTravelId,
+  brand: kPeeSafe,
+  slot: BrandSlot.nativeDiscovery,
+  placementKey: kPeeSafeTravelKey,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: BrandAudience.everyone,
+  creative: const BrandCreative(
+    eyebrow: 'Sponsored',
+    headline: 'For the road',
+    subline: 'Pee Safe travel hygiene, after the travel kit.',
+    story: '',
+    cta: '',
+  ),
+);
+
+final BrandCampaign _peeSafePremiere = BrandCampaign(
+  id: kPeeSafePremiereId,
+  brand: kPeeSafe,
+  slot: BrandSlot.premiere,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: BrandAudience.everyone,
+  maxImpressions: 1, // once per campaign; the demo replays via replayPremiere()
+  linkedCampaignId: kPeeSafeLaunchId,
+  creative: const BrandCreative(
+    eyebrow: 'A ParentVeda Premiere',
+    headline: 'Care for the in-between',
+    subline: 'Everyday hygiene for pregnancy, birth and the weeks after.',
+    story:
+        'Pee Safe makes everyday intimate and toilet hygiene products. ParentVeda has written what we think matters in this category, whichever brand you choose.',
+    cta: "See what's new",
+    // Item 10b: the bundled film. If it fails to load, the Premiere plays its
+    // own title sequence instead (premiere_screen.dart _startFilm).
+    // Kept for revert: videoRef: null,
+    videoRef: kPeeSafeLaunchFilm,
   ),
 );
 
@@ -598,9 +827,106 @@ final BrandCampaign _pumpNotification = BrandCampaign(
   ),
 );
 
+// ---- Sponsored notifications (Pee Safe demo, item 8) -------------------------
+// Three pushed campaigns, each its own id and audience, each sent at most once
+// (maxImpressions: 1) and all behind the global gap in BrandNotifications. The
+// titles are plain: brand notifications never take a phone_emoji mark, and
+// postpartum is a sensitive moment besides. A tap opens the screen that fits
+// (openPeeSafeNotification), not the generic sponsor sheet.
+
+/// Week 36: the hospital bag. Pregnancy only, weeks 36 to 40.
+final BrandCampaign _peeSafeNotifBag = BrandCampaign(
+  id: kPeeSafeNotifBagId,
+  brand: kPeeSafe,
+  slot: BrandSlot.sponsoredNotification,
+  maxImpressions: 1,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: const BrandAudience(
+    stage: BrandStage.pregnancy,
+    pregnancyWeekMin: 36,
+    pregnancyWeekMax: 40,
+  ),
+  creative: const BrandCreative(
+    // Kept for revert: eyebrow 'From Pee Safe', headline 'Your hospital bag,
+    // at 36 weeks', subline 'A few small things make a hospital bathroom
+    // easier: pads, wipes, a seat cover. Your list is ready to check.'
+    eyebrow: 'ParentVeda · with Pee Safe',
+    headline: '36 weeks: the pocket most bags forget',
+    subline: 'Maternity pads, a few wipes and a toilet seat cover make the first hospital bathroom trip easier. They are on your bag list, ready to tick.',
+    story: '',
+    cta: '',
+  ),
+);
+
+/// The first days after birth: peri care. Parenting, a baby under one month
+/// (the context knows months, not days; "day 3" is the moment it is written
+/// for, and the gap plus the once-only cap keep it to one send).
+final BrandCampaign _peeSafeNotifPeri = BrandCampaign(
+  id: kPeeSafeNotifPeriId,
+  brand: kPeeSafe,
+  slot: BrandSlot.sponsoredNotification,
+  maxImpressions: 1,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: const BrandAudience(
+    stage: BrandStage.parenting,
+    childAgeMonthsMax: 0,
+  ),
+  creative: const BrandCreative(
+    // Kept for revert: eyebrow 'From Pee Safe', headline 'Gentle care in the
+    // first days', subline 'How to keep clean and comfortable while you heal.
+    // If bleeding gets heavier, you have a fever, or the pain grows, see your
+    // doctor.'
+    eyebrow: 'ParentVeda · with Pee Safe',
+    headline: 'Healing down there, gently',
+    subline: 'Warm water, a fresh pad every few hours, pat dry. Two minutes on what helps while you heal. If bleeding gets heavier, you have a fever, or the pain grows, see your doctor.',
+    story: '',
+    cta: '',
+  ),
+);
+
+/// Travel: a baby old enough for the first trips (3 to 24 months).
+final BrandCampaign _peeSafeNotifTravel = BrandCampaign(
+  id: kPeeSafeNotifTravelId,
+  brand: kPeeSafe,
+  slot: BrandSlot.sponsoredNotification,
+  maxImpressions: 1,
+  schedule: BrandSchedule(start: _seedStart, end: _seedEnd),
+  audience: const BrandAudience(
+    stage: BrandStage.parenting,
+    childAgeMonthsMin: 3,
+    childAgeMonthsMax: 24,
+  ),
+  creative: const BrandCreative(
+    // Kept for revert: eyebrow 'From Pee Safe', headline 'Travelling with your
+    // baby', subline 'What helps with public toilets on the road, packed
+    // light. The travel kit has the list.'
+    eyebrow: 'ParentVeda · with Pee Safe',
+    headline: 'First trips: the toilet-stop pouch',
+    subline: 'A seat cover, a few wipes and a spare pad fit in one small pouch, so a highway stop is no drama. The travel kit has the list.',
+    story: '',
+    cta: '',
+  ),
+);
+
 /// Every campaign in the ecosystem. Read ONLY by BrandStudio — never import
 /// this from a screen.
 final List<BrandCampaign> kBrandCampaigns = [
+  // Pee Safe demo first: resolve() returns the first eligible Premiere, so
+  // this is the one the app and the Brand Showcase open.
+  if (kPeeSafeDemo) ...[
+    _peeSafePremiere,
+    _peeSafeLaunch,
+    _peeSafeEducation,
+    _peeSafeKitTool,
+    _peeSafeFeatured,
+    _peeSafeBag,
+    _peeSafeCollection,
+    _peeSafeTravel,
+    // Before the pump: resolve() returns the first eligible notification.
+    _peeSafeNotifBag,
+    _peeSafeNotifPeri,
+    _peeSafeNotifTravel,
+  ],
   // Phase 1 — takeover + destination
   _calmBalmPremiere,
   _calmBalmLaunch,
@@ -615,7 +941,9 @@ final List<BrandCampaign> kBrandCampaigns = [
   _liveSession,
   _breastfeedingJourney,
   // Phase 3 — ranked inventory
-  _featuredReco,
+  // One featured pick only: while the Pee Safe demo runs, its featured pick
+  // replaces Cetaphil's rather than sitting beside it (docs/PEE-SAFE-DEMO.md).
+  if (!kPeeSafeDemo) _featuredReco,
   _sponsoredCollection,
   // Research surfaces — flagged, see needs_attention.dart
   _guideExpert,

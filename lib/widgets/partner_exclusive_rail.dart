@@ -108,11 +108,20 @@ PartnerRail? partnerRailFor({
         if (p.audienceSponsorId == sponsor.id && live(p)) p,
     ];
     final school = sponsor.kind == 'school';
+    // Pee Safe demo (item 9): a store-QR family. A brand, so the disclosure
+    // is the eyebrow ("Presented by"), not "Only for".
+    final store = sponsor.kind == 'store';
     final rail = PartnerRail(
-      eyebrow: school
+      eyebrow: store
+          ? 'Presented by ${sponsor.name}'
+          : school
           ? 'Only for ${sponsor.name} parents'
           : 'Only for ${sponsor.name} families',
-      title: school ? 'From your school' : 'Included with your benefit',
+      title: store
+          ? 'For ${sponsor.name} store families'
+          : school
+          ? 'From your school'
+          : 'Included with your benefit',
       chip: '${sponsor.name} only',
       programmes: mine,
       consultsLeft: consultsLeft,

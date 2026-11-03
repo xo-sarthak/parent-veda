@@ -258,6 +258,9 @@ flutter:
     - assets/brand/
     - assets/onboarding/
     - assets/brand/partners/
+    # Pee Safe stakeholder demo (docs/PEE-SAFE-DEMO.md): logo + 13 product
+    # images at 600px. Asset folders don't include subfolders, so its own line.
+    - assets/brand/pee_safe/
     # ParentVeda+ Home hero: three CC0 photographs (morning / afternoon /
     # evening), credits in lib/doctor/doctor_hero_images.dart.
     - assets/doctor/

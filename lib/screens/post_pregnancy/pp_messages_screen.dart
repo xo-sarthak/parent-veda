@@ -20,6 +20,7 @@
 //  again has the pregnancy home there, so her child's home opens over it.
 // =============================================================================
 
+import '../../brand/brand_inbox.dart' show BrandInboxRows;
 import 'package:flutter/material.dart';
 
 import '../../services/last_profile.dart' show LastProfile;
@@ -248,6 +249,8 @@ class _PpMessagesScreenState extends State<PpMessagesScreen> {
                 const SizedBox(height: 18),
                 // 6b B5: tonight's campaign, from 19:00 (`pv_campaign_tonight.dart`).
                 PvCampaignTonight(p: p),
+                // Pee Safe demo: a sponsored note, once sent, in ParentVeda's voice.
+                BrandInboxRows(p: p),
                 if (!store.offersAsked && ChildProfileStore.instance.hasRealChild)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),

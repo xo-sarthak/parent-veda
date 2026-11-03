@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import '../../brand/brand_models.dart';
+import '../../brand/pee_safe/pee_safe_collab.dart';
 import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'pp_reco_data.dart';
@@ -69,6 +70,13 @@ class RecoCollectionScreen extends StatelessWidget {
               _pad(Column(children: [
                 for (final r in items) RecoRow(item: r, onTap: () => _open(context, r)),
               ])),
+            // Pee Safe demo (item 7): products AFTER the picks, only on the
+            // collection its own campaign is keyed to. Renders nothing otherwise.
+            if (collection.id == PeeSafePlacement.afterBirthCollection.key)
+              _pad(const PeeSafeCollabShelf(
+                placement: PeeSafePlacement.afterBirthCollection,
+                padding: EdgeInsets.only(top: 18),
+              )),
           ],
         ),
       ),

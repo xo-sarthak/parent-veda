@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 // import 'recipes_screen.dart'; // kept for revert with the pp_food line
 
 import 'pp_section_registry.dart';
+import '../../brand/pee_safe/pee_safe_recovery_kit_screen.dart' show PeeSafeRecoveryKitScreen;
 import 'pp_section_screen.dart';
 import 'askveda_screen.dart';
 // import 'leap_calendar_screen.dart'; // retired 2026-10-14, kept for revert
@@ -896,6 +897,8 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // (breathe first to six weeks, then gentle kegels). Linked from the
       // pelvic floor pages in "You, Maa" (2026-10-16).
       'pp_kegel' => const KegelCareScreen(),
+      // Pee Safe demo: the recovery kit, listed in Tools > For you.
+      'pp_recovery_kit' => const PeeSafeRecoveryKitScreen(),
       // Everything for this month on one page (gap analysis P1, 2026-10-07).
       'pp_month_checklist' => const PpMonthChecklistScreen(),
 

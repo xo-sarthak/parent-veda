@@ -272,7 +272,10 @@ class _HeroCard extends StatelessWidget {
             if (slide.image != null)
               Hero(
                 tag: slide.heroTag ?? 'pv_hero_${slide.title}',
-                child: Image.network(
+                // A bundled photo (a partner's own) loads from the bundle.
+                child: slide.image!.startsWith('assets/')
+                    ? Image.asset(slide.image!, fit: BoxFit.cover, errorBuilder: (_, e, s) => Container(color: well))
+                    : Image.network(
                   slide.image!,
                   fit: BoxFit.cover,
                   errorBuilder: (_, e, s) => Container(color: well),

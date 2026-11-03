@@ -50,7 +50,8 @@ import 'pp_leaps_data.dart';
 import 'phase_detail_screen.dart';
 import 'phase_map_screen.dart';
 import '../../brand/brand_models.dart';
-import '../../brand/brand_notifications.dart';
+// import '../../brand/brand_notifications.dart'; // kept for revert: the send moved to pp_home_version.dart (2026-11-03)
+// import '../../brand/premiere_screen.dart' show showPeeSafePremiereAtOpen; // kept for revert (moved, 2026-11-03)
 import '../../brand/launch_spotlight.dart';
 import '../referral/invite_nudge_card.dart';
 // import '../../brand/premiere_screen.dart'; // kept for revert — Premiere off at app open (2026-09-17)
@@ -95,7 +96,10 @@ class _MyChildScreenState extends State<MyChildScreen> {
     // (the widget tests pump this screen constantly).
     if (widget.home) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        BrandNotifications.instance.maybeSend(stage: BrandStage.parenting);
+        // ⚠️ MOVED TO THE HOME SHELL (2026-11-03): this is the V1 home, and V3
+        // ships, so the parenting send never ran. pp_home_version.dart's
+        // _PpOpenMoments asks once, whichever home is on. Kept for revert:
+        // BrandNotifications.instance.maybeSend(stage: BrandStage.parenting);
       });
       // PREMIERE (Brand Product 1). Until now the ONLY trigger in the whole app
       // was the pregnancy shell, so the flagship product could never fire on
@@ -116,6 +120,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
         // Premiere off at app open since 2026-09-17 (see main_scaffold.dart);
         // the daily tip still runs. Kept for revert:
         // await showPremiereIfAny(context, stage: BrandStage.parenting);
+        // Pee Safe demo (item 11): its launch film only, once per phone. Moved
+        // to the home shell with the send above (V3 ships). Kept for revert:
+        // await showPeeSafePremiereAtOpen(context, stage: BrandStage.parenting);
         if (!mounted) return;
         // No-ops if it has already shown today — unless kDailyPopupAlwaysShow
         // is on, which it is while this is being reviewed.

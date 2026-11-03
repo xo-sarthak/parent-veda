@@ -100,6 +100,13 @@ class BrandStudioStore extends ChangeNotifier with CloudSyncedStore {
     _save();
   }
 
+  /// Forget one campaign's impressions, so a once-per-phone surface can show
+  /// again. For the Pee Safe Showcase "Reset demo" (item 11): the app-open
+  /// Premiere is spent after one showing, and a presenter needs it back.
+  void forgetImpressions(String campaignId) {
+    if (_impressions.remove(campaignId) != null) _save();
+  }
+
   /// Replay every campaign from scratch, keeping demo mode as-is. The button
   /// the preview screen offers so a Premiere can actually be watched twice.
   void replayAll() {

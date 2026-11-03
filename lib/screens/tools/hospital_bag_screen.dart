@@ -23,6 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // url_launcher + cart_store are used only by the OLD (now-commented) UI below;
 // re-add their imports if that block is restored.
 
+import '../../brand/pee_safe/pee_safe_collab.dart';
 import '../../data/hospital_bag_catalog.dart';
 import '../../data/hospital_bag_seed.dart';
 import '../../localization/app_language.dart';
@@ -39,8 +40,12 @@ import '../../widgets/pv_feedback.dart' show PvPress;
 import '../../widgets/pv_toast.dart';
 
 class HospitalBagScreen extends StatefulWidget {
-  const HospitalBagScreen({super.key, required this.controller});
+  const HospitalBagScreen({super.key, required this.controller, this.forceV1 = false});
   final PregnancyController controller;
+
+  /// Pee Safe demo: open on V1 (where the Pee Safe rows live) without
+  /// touching her saved V1/V2 choice. Only the Showcase passes true.
+  final bool forceV1;
 
   @override
   State<HospitalBagScreen> createState() => _HospitalBagScreenState();
@@ -60,6 +65,7 @@ class _HospitalBagScreenState extends State<HospitalBagScreen> {
   }
 
   Future<void> _loadVersion() async {
+    if (widget.forceV1) return; // stays V1; her saved choice is untouched
     try {
       final p = await SharedPreferences.getInstance();
       if (mounted) setState(() => _useV2 = p.getBool(_verKey) ?? false);
@@ -416,6 +422,12 @@ class _MyBagScreenState extends State<_MyBagScreen> {
                 if (needed.isNotEmpty)
                   _group(s, text, lang, BagItemStatus.needed, needed),
               ],
+              // Pee Safe demo (item 7): rows AFTER her own list, which they
+              // never change. V1 is the bag that opens by default.
+              const PeeSafeCollabShelf(
+                placement: PeeSafePlacement.hospitalBag,
+                padding: EdgeInsets.only(top: 18),
+              ),
             ],
           ),
         );

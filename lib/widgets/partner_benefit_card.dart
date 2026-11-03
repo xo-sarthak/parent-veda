@@ -117,6 +117,7 @@ class PartnerBenefitCard extends StatelessWidget {
     listenable: Listenable.merge([
       PartnerBrand.instance,
       CreditsStore.instance,
+      PartnerOfferStore.instance,
     ]),
     builder: (context, _) {
       final info = PartnerBrand.instance.lockup;
@@ -126,13 +127,24 @@ class PartnerBenefitCard extends StatelessWidget {
       final consults = ent.can(Caps.consultationCredit);
       const per = SponsorBenefits.consultationsPerActivation;
       final left = credits.available.clamp(0, per);
-      final copy = partnerBenefitCopy(
-        consults: consults,
-        left: left,
-        per: per,
-        validUntil: credits.expiringNext,
-        masterclasses: ent.can(Caps.masterclassAccess),
-      );
+      // Pee Safe demo (item 9): a store-QR family holds an offer, not a
+      // benefit plan, so the card names the offer and discloses the brand.
+      final store = info.kind == 'store';
+      final copy = store
+          ? storeBenefitCopy(
+              name: info.name,
+              offers: PartnerOfferStore.instance.forSponsor(info.id),
+            )
+          : partnerBenefitCopy(
+              consults: consults,
+              left: left,
+              per: per,
+              validUntil: credits.expiringNext,
+              masterclasses: ent.can(Caps.masterclassAccess),
+            );
+      final eyebrow = store
+          ? 'Presented by ${info.name}'
+          : 'Your ${info.name} benefit';
       final p = pvStorePalette;
       return Padding(
         key: const ValueKey('partner_benefit_card'),
@@ -144,7 +156,7 @@ class PartnerBenefitCard extends StatelessWidget {
         ),
         child: Semantics(
           button: true,
-          label: 'Your ${info.name} benefit. ${copy.$1}. ${copy.$2}',
+          label: '$eyebrow. ${copy.$1}. ${copy.$2}',
           excludeSemantics: true,
           child: PvPress(
             child: GestureDetector(
@@ -167,7 +179,9 @@ class PartnerBenefitCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Your ${info.name} benefit'.toUpperCase(),
+                      // Kept for revert (item 9):
+                      //   'Your ${info.name} benefit'.toUpperCase(),
+                      eyebrow.toUpperCase(),
                       style: pvManrope(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w800,
@@ -194,7 +208,7 @@ class PartnerBenefitCard extends StatelessWidget {
                         color: p.ink2,
                       ),
                     ),
-                    if (consults) ...[
+                    if (consults && !store) ...[
                       const SizedBox(height: 12),
                       _Meter(
                         fraction: left / per,
@@ -240,6 +254,18 @@ class PartnerBenefitCard extends StatelessWidget {
     note.isEmpty ? 'Book with any ParentVeda doctor or counsellor.' : note,
   );
 }
+
+/// The benefit card's two lines for a store-QR family (Pee Safe demo, item
+/// 9): the first offer, or an invitation when none is held. Pure.
+(String, String) storeBenefitCopy({
+  required String name,
+  required List<PartnerOffer> offers,
+}) => offers.isEmpty
+    ? ('See what is included', 'From the $name store. Your health details stay private.')
+    : (
+        offers.first.headline,
+        'From the $name store. Your health details stay private.',
+      );
 
 String _date(DateTime d) {
   const months = [
@@ -436,7 +462,10 @@ class PartnerBenefitsRow extends StatelessWidget {
         key: const ValueKey('pv_profile_benefits'),
         mark: TtcTabArt(mark: TtcTabMark.wallet, tint: tint),
         title: 'Your benefits',
-        subtitle: sponsor != null
+        // Pee Safe demo (item 9): a store-QR brand is disclosed, not "From".
+        subtitle: sponsor != null && sponsor.kind == 'store'
+            ? 'Presented by ${sponsor.name}'
+            : sponsor != null
             ? 'From ${sponsor.name}'
             : care != null
             ? 'From ${care.name.trim()}'

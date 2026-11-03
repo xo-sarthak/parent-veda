@@ -47,10 +47,15 @@ class PartnerLockupInfo {
     this.logoUrl,
     this.kind = 'employer',
     this.id,
+    this.logoAsset,
   });
 
   final String name;
   final String? logoUrl;
+
+  /// A bundled logo, drawn before [logoUrl]. Only the Pee Safe demo lockup
+  /// sets one (item 9): a demo must draw with no network.
+  final String? logoAsset;
 
   /// 'employer' | 'school' | … as `my_sponsor()` returns it.
   final String kind;
@@ -68,8 +73,36 @@ class PartnerBrand extends ChangeNotifier {
   }
   static final PartnerBrand instance = PartnerBrand._();
 
-  /// The co-brand lockup, or null. Only a sponsor owns one (D1, D3).
+  // ---------------------------------------------------------------------------
+  //  DEMO OVERRIDE (Pee Safe demo, item 9; docs/PEE-SAFE-DEMO.md)
+  //  A lockup held on the phone only, in memory, never saved and never sent:
+  //  the "Pee Safe store QR" switch sets it so the room sees what a store-QR
+  //  family sees, with no database row behind it. When it is null (always,
+  //  outside the demo) [lockup] is exactly the sponsor rule below.
+  //  The trade: a second source of truth inside the one resolver, which is
+  //  the thing this class exists to prevent. Bought back by keeping it
+  //  memory-only (a restart clears it) and set only through PeeSafeStoreQr,
+  //  which checks kPeeSafeDemo. This class stays brand-agnostic.
+  // ---------------------------------------------------------------------------
+  PartnerLockupInfo? _demoLockup;
+
+  /// The demo lockup, or null. Read by tests and the demo switch.
+  PartnerLockupInfo? get demoLockup => _demoLockup;
+
+  set demoLockup(PartnerLockupInfo? info) {
+    if (identical(info, _demoLockup)) return;
+    _demoLockup = info;
+    notifyListeners();
+  }
+
+  /// Clears the demo override; the item 10 "Reset demo" calls this through
+  /// PeeSafeStoreQr.reset().
+  void reset() => demoLockup = null;
+
+  /// The co-brand lockup, or null. Only a sponsor owns one (D1, D3), or the
+  /// demo override while it is on.
   PartnerLockupInfo? get lockup {
+    if (_demoLockup != null) return _demoLockup;
     final s = EntitlementStore.instance.sponsor;
     if (s == null || s.name.trim().isEmpty) return null;
     final logo = s.logoUrl?.trim();

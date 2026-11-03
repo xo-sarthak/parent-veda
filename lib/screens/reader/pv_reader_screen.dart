@@ -510,6 +510,15 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // _pad(Text(a.kicker.of(_lang).toUpperCase(),
                   //     style: _meta(s, color: s.accent))),
                   // const SizedBox(height: 14),
+                  // A sponsored read's disclosure eyebrow (PvRead.eyebrow) —
+                  // the one label true from every door. Ink, not the brand's
+                  // colour: the reader is a shared surface.
+                  if (a.eyebrow case final e?) ...[
+                    _pad(Text(e.of(_lang).toUpperCase(),
+                        key: const ValueKey('pv_reader_eyebrow'),
+                        style: _meta(s, color: s.ink))),
+                    const SizedBox(height: 10),
+                  ],
                   // ⚠️ 24, NOT 32, WHERE THERE IS A PICTURE ABOVE IT. A
                   // 32pt title under a 132pt photo pushes the byline off the
                   // fold and undoes the reason the photo was shortened.
@@ -648,6 +657,13 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                     _pad(_references(s)),
                     const SizedBox(height: 18),
                   ],
+                  // A stage-owned footer (PvRead.footer): a sponsored read's
+                  // products, after the clinical copy has ended.
+                  if (a.footer case final block?)
+                    if (widget.customBlock case final render?) ...[
+                      _pad(render(context, block)),
+                      const SizedBox(height: 22),
+                    ],
                   _pad(_helpful(s)),
                   const SizedBox(height: 26),
 

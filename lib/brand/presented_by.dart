@@ -161,7 +161,7 @@ class _PresentedByState extends State<PresentedBy> {
 void showSponsorSheet(BuildContext context, BrandCampaign c) {
   showModalBottomSheet<void>(
     context: context,
-    backgroundColor: const Color(0xFFFBF9FE),
+    backgroundColor: const Color(0xFFFAF9F7), // was 0xFFFBF9FE lavender (2026-11-03)
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     builder: (_) => Padding(
       padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),

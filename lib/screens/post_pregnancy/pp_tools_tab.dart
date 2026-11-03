@@ -24,6 +24,7 @@
 //  (mobbin.com/screens/c4a99041-293c-49bc-8a64-8c9a9fbbd802).
 // =============================================================================
 
+import '../../brand/pee_safe/pee_safe_brand.dart' show kPeeSafeDemo;
 import 'package:flutter/material.dart';
 import '../../ask_veda/ask_veda_mark.dart';
 
@@ -209,6 +210,12 @@ List<PpToolGroup> ppToolGroups() {
           words: ['kegel', 'pelvic floor', 'leak', 'exercise']),
       PpTool('Yoga & fitness', 'Recovery classes, core and calm.', 'pp_yoga', tab: TtcTabMark.lotus, IntentMark.lotusMark,
           words: ['yoga', 'exercise', 'core', 'workout', 'postnatal']),
+      // Pee Safe demo: her recovery kit, beside the other tools for her body
+      // after birth. Sponsored, and the line says so.
+      if (kPeeSafeDemo)
+        PpTool('Recovery kit', 'Eight small things for the weeks after birth · with Pee Safe', 'pp_recovery_kit',
+            tool: TtcToolMark.readyPlan, IntentMark.bagMark,
+            words: ['pads', 'peri', 'bleeding', 'stitches', 'hygiene', 'pee safe']),
     ]),
     PpToolGroup('Plan and keep', 268, [
       // PpTool('Baby names', '2,031 names, with meaning, origin and Devanagari.', 'pp_names', tab: TtcTabMark.openBook, IntentMark.pageMark,

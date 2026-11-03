@@ -26,6 +26,7 @@
 //  keys and cart lines must not change when the language toggle flips.
 // =============================================================================
 
+import '../../brand/pee_safe/pee_safe_store.dart' show peeSafeStoreProducts;
 import '../../models/product_models.dart' as preg;
 import '../../models/pv_product.dart';
 import '../../screens/post_pregnancy/pp_products_data.dart' as pp;
@@ -482,6 +483,10 @@ List<PvProduct> buildPvCatalog() => [
         // place-holder each, stepping aside when its shelf gets a real
         // product (2026-10-28, pv_coming_soon.dart).
         ...pvComingSoonProducts(),
+        // Pee Safe demo (2026-11-03): its products on the shelves parents
+        // browse, labelled Sponsored, after ParentVeda's own picks. Empty with
+        // the demo flag off (pee_safe_store.dart).
+        ...peeSafeStoreProducts(),
       ]))
         pvGuardRetailerPrice(p),
     ];
